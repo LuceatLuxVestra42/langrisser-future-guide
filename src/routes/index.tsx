@@ -1,4 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+
+import { heroImages, getHeroIndexForDate } from "@/lib/hero-images";
+
 
 import cardUpdate from "@/assets/card-update.png";
 import cardGacha from "@/assets/card-gacha.png";
