@@ -2,13 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import cardUpdate from "@/assets/card-update.png";
 import cardGacha from "@/assets/card-gacha.png";
+import cardCharacter from "@/assets/card-character.png";
 import cardEquip from "@/assets/card-equip.png";
 import cardSkin from "@/assets/card-skin.png";
-import cardRift from "@/assets/card-rift.png";
-import cardEventRegular from "@/assets/card-event-regular.png";
-import cardEventOnce from "@/assets/card-event-once.png";
 import cardMerc from "@/assets/card-merc.png";
+import cardEvent from "@/assets/card-event-regular.png";
+import cardRift from "@/assets/card-rift.png";
 import cardSummit from "@/assets/card-summit.png";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -41,12 +42,12 @@ type Category = {
 const categories: Category[] = [
   { title: "업데이트", image: cardUpdate, to: "/", primary: true },
   { title: "가챠 배너", image: cardGacha, to: "/" },
-  { title: "전용장비 · 율정", image: cardEquip, to: "/" },
+  { title: "캐릭터", image: cardCharacter, to: "/" },
+  { title: "장비", image: cardEquip, to: "/" },
   { title: "스킨", image: cardSkin, to: "/" },
-  { title: "시공", image: cardRift, to: "/" },
-  { title: "정기 이벤트", image: cardEventRegular, to: "/" },
-  { title: "일회성 이벤트", image: cardEventOnce, to: "/" },
   { title: "용병", image: cardMerc, to: "/" },
+  { title: "이벤트", image: cardEvent, to: "/" },
+  { title: "시공", image: cardRift, to: "/" },
   { title: "서밋 신규맵", image: cardSummit, to: "/" },
 ];
 
@@ -108,10 +109,11 @@ function Index() {
       </main>
 
       <footer className="border-t border-border bg-card">
-        <div className="mx-auto max-w-6xl space-y-1.5 px-8 py-8 text-center text-xs leading-relaxed text-muted-foreground">
-          <p>본 사이트는 비영리 · 비수익 목적으로 운영되는 팬 정보 사이트입니다.</p>
+        <div className="mx-auto max-w-6xl space-y-2 px-8 py-9 text-center text-sm leading-relaxed text-muted-foreground">
+          <p>본 사이트는 비영리·비수익 목적으로 운영되는 팬 정보 사이트입니다.</p>
           <p>게임 관련 이미지 및 자료의 권리는 각 권리자에게 있습니다.</p>
-          <p>본 포털은 BY·NC·SA 라이선스에 따라 배포됩니다 · 만든사람: 성검군단 서버 엑시즈</p>
+          <p>본 사이트에서 직접 작성한 정보는 BY-NC-SA 라이선스에 따라 배포됩니다.</p>
+          <p className="text-xs">만든사람: 성검군단 서버 엑시즈</p>
         </div>
       </footer>
     </div>
