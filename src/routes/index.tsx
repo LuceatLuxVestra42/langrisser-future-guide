@@ -42,12 +42,12 @@ type Category = {
 const categories: Category[] = [
   { title: "업데이트", image: cardUpdate, to: "/", primary: true },
   { title: "가챠 배너", image: cardGacha, to: "/" },
-  { title: "전용장비 · 율정", image: cardEquip, to: "/" },
+  { title: "캐릭터", image: cardCharacter, to: "/" },
+  { title: "장비", image: cardEquip, to: "/" },
   { title: "스킨", image: cardSkin, to: "/" },
-  { title: "시공", image: cardRift, to: "/" },
-  { title: "정기 이벤트", image: cardEventRegular, to: "/" },
-  { title: "일회성 이벤트", image: cardEventOnce, to: "/" },
   { title: "용병", image: cardMerc, to: "/" },
+  { title: "이벤트", image: cardEvent, to: "/" },
+  { title: "시공", image: cardRift, to: "/" },
   { title: "서밋 신규맵", image: cardSummit, to: "/" },
 ];
 
