@@ -2,13 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import cardUpdate from "@/assets/card-update.png";
 import cardGacha from "@/assets/card-gacha.png";
+import cardCharacter from "@/assets/card-character.png";
 import cardEquip from "@/assets/card-equip.png";
 import cardSkin from "@/assets/card-skin.png";
-import cardRift from "@/assets/card-rift.png";
-import cardEventRegular from "@/assets/card-event-regular.png";
-import cardEventOnce from "@/assets/card-event-once.png";
 import cardMerc from "@/assets/card-merc.png";
+import cardEvent from "@/assets/card-event-regular.png";
+import cardRift from "@/assets/card-rift.png";
 import cardSummit from "@/assets/card-summit.png";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
