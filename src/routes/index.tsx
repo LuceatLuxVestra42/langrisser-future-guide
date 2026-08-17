@@ -91,15 +91,10 @@ function Index() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-8 pb-20 pt-16">
-        <section className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">
-            랑그릿사 모바일 <span className="text-primary">미래 정보</span>를 한 곳에서
-          </h1>
-          <p className="mt-4 text-base text-muted-foreground">
-            원하는 정보를 아래에서 눌러 바로 확인하세요.
-          </p>
-        </section>
+      <HeroSection />
+
+      <main className="mx-auto -mt-10 w-full max-w-6xl flex-1 px-8 pb-20">
+
 
         <nav aria-label="정보 카테고리" className="mt-14 grid grid-cols-3 gap-7">
           {categories.map((category) => (
