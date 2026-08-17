@@ -79,6 +79,41 @@ function CategoryCard({ category }: { category: Category }) {
   );
 }
 
+function HeroSection() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    setIndex(getHeroIndexForDate());
+  }, []);
+
+  const hero = heroImages[index];
+
+  return (
+    <section className="relative isolate overflow-hidden">
+      <div className="absolute inset-0 -z-10">
+        <img
+          src={hero.url}
+          alt={hero.alt}
+          className="h-full w-full object-cover object-[center_28%]"
+        />
+        {/* 밝기/색이 제각각인 일러스트에서도 문구가 읽히도록 하는 은은한 스크림 */}
+        <div className="absolute inset-0 bg-hero-scrim" />
+        {/* 아래로 갈수록 페이지 배경으로 자연스럽게 사라지는 그라데이션 */}
+        <div className="absolute inset-0 bg-hero-fade" />
+      </div>
+
+      <div className="mx-auto max-w-6xl px-8 pt-20 pb-28 text-center">
+        <h1 className="text-4xl font-bold tracking-tight text-hero-foreground drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]">
+          랑그릿사 모바일 <span className="text-hero-accent">미래 정보</span>를 한 곳에서
+        </h1>
+        <p className="mt-4 text-base text-hero-foreground/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.4)]">
+          원하는 정보를 아래에서 눌러 바로 확인하세요.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function Index() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
