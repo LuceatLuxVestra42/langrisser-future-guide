@@ -109,10 +109,11 @@ function Index() {
       </main>
 
       <footer className="border-t border-border bg-card">
-        <div className="mx-auto max-w-6xl space-y-1.5 px-8 py-8 text-center text-xs leading-relaxed text-muted-foreground">
-          <p>본 사이트는 비영리 · 비수익 목적으로 운영되는 팬 정보 사이트입니다.</p>
+        <div className="mx-auto max-w-6xl space-y-2 px-8 py-9 text-center text-sm leading-relaxed text-muted-foreground">
+          <p>본 사이트는 비영리·비수익 목적으로 운영되는 팬 정보 사이트입니다.</p>
           <p>게임 관련 이미지 및 자료의 권리는 각 권리자에게 있습니다.</p>
-          <p>본 포털은 BY·NC·SA 라이선스에 따라 배포됩니다 · 만든사람: 성검군단 서버 엑시즈</p>
+          <p>본 사이트에서 직접 작성한 정보는 BY-NC-SA 라이선스에 따라 배포됩니다.</p>
+          <p className="text-xs">만든사람: 성검군단 서버 엑시즈</p>
         </div>
       </footer>
     </div>
