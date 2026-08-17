@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { heroImages, getHeroIndexForDate } from "@/lib/hero-images";
-import clockIcon from "@/assets/clock-of-forgiveness.png.asset.json";
+import clockIcon from "@/assets/clock_of_forgiveness.png";
 
 
 import cardUpdate from "@/assets/card-update.png";
@@ -158,7 +158,7 @@ function Index() {
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-8 py-1">
           <img
-            src={clockIcon.url}
+            src={clockIcon}
             alt="용서의 시계"
             width={40}
             height={40}
