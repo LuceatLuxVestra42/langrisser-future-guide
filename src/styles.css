@@ -84,6 +84,9 @@
   --input: oklch(0.929 0.013 255.508);
   --ring: oklch(0.58 0.19 258);
   --illustration-bg: oklch(0.972 0.008 255);
+  --hero-foreground: oklch(0.99 0 0);
+  --hero-accent: oklch(0.86 0.11 250);
+
   --shadow-card: 0 1px 2px oklch(0.55 0.05 258 / 0.06), 0 8px 24px oklch(0.55 0.05 258 / 0.07);
   --shadow-card-hover: 0 2px 4px oklch(0.55 0.05 258 / 0.08), 0 16px 36px oklch(0.55 0.05 258 / 0.13);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -150,8 +153,27 @@
 
 @theme inline {
   --color-illustration-bg: var(--illustration-bg);
+  --color-hero-foreground: var(--hero-foreground);
+  --color-hero-accent: var(--hero-accent);
   --font-sans: var(--font-sans);
 }
+
+@utility bg-hero-scrim {
+  background-image:
+    linear-gradient(to bottom, oklch(0.2 0.03 258 / 0.5) 0%, oklch(0.2 0.03 258 / 0.28) 55%, transparent 100%);
+}
+
+@utility bg-hero-fade {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in oklch, var(--background) 25%, transparent) 45%,
+    color-mix(in oklch, var(--background) 70%, transparent) 72%,
+    color-mix(in oklch, var(--background) 94%, transparent) 88%,
+    var(--background) 100%
+  );
+}
+
 
 @layer base {
   html {
