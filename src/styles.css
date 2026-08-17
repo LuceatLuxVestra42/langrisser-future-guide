@@ -150,8 +150,27 @@
 
 @theme inline {
   --color-illustration-bg: var(--illustration-bg);
+  --color-hero-foreground: var(--hero-foreground);
+  --color-hero-accent: var(--hero-accent);
   --font-sans: var(--font-sans);
 }
+
+@utility bg-hero-scrim {
+  background-image:
+    linear-gradient(to bottom, oklch(0.2 0.03 258 / 0.5) 0%, oklch(0.2 0.03 258 / 0.28) 55%, transparent 100%);
+}
+
+@utility bg-hero-fade {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in oklch, var(--background) 25%, transparent) 45%,
+    color-mix(in oklch, var(--background) 70%, transparent) 72%,
+    color-mix(in oklch, var(--background) 94%, transparent) 88%,
+    var(--background) 100%
+  );
+}
+
 
 @layer base {
   html {
