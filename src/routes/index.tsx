@@ -80,6 +80,7 @@ function CategoryCard({ category }: { category: Category }) {
 }
 
 function HeroSection() {
+  // 기본값은 날짜 기반 자동 선택. 화살표/점을 누르면 수동 미리보기로만 전환됩니다.
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -87,6 +88,8 @@ function HeroSection() {
   }, []);
 
   const hero = heroImages[index] ?? heroImages[0]!;
+  const step = (delta: number) =>
+    setIndex((i) => (i + delta + heroImages.length) % heroImages.length);
 
   return (
     <section className="relative isolate overflow-hidden">
@@ -110,9 +113,42 @@ function HeroSection() {
           원하는 정보를 아래에서 눌러 바로 확인하세요.
         </p>
       </div>
+
+      {/* 개발용 임시 미리보기 컨트롤 (히어로 확정 후 제거 예정) */}
+      <button
+        type="button"
+        onClick={() => step(-1)}
+        aria-label="이전 히어로 이미지 미리보기"
+        className="absolute left-4 top-[42%] -translate-y-1/2 rounded-full p-2 text-hero-foreground/50 transition hover:bg-white/10 hover:text-hero-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+      >
+        <ChevronLeft size={22} />
+      </button>
+      <button
+        type="button"
+        onClick={() => step(1)}
+        aria-label="다음 히어로 이미지 미리보기"
+        className="absolute right-4 top-[42%] -translate-y-1/2 rounded-full p-2 text-hero-foreground/50 transition hover:bg-white/10 hover:text-hero-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+      >
+        <ChevronRight size={22} />
+      </button>
+      <div className="absolute bottom-24 left-1/2 flex -translate-x-1/2 items-center gap-2">
+        {heroImages.map((image, i) => (
+          <button
+            key={image.url}
+            type="button"
+            onClick={() => setIndex(i)}
+            aria-label={`${i + 1}번 히어로 이미지 미리보기`}
+            aria-current={i === index}
+            className={`h-1.5 rounded-full transition-all ${
+              i === index ? "w-5 bg-hero-foreground/75" : "w-1.5 bg-hero-foreground/35"
+            }`}
+          />
+        ))}
+      </div>
     </section>
   );
 }
+
 
 function Index() {
   return (
