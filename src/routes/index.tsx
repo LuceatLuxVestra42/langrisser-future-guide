@@ -6,15 +6,15 @@ import { heroImages, getHeroIndexForDate } from "@/lib/hero-images";
 import clockIcon from "@/assets/clock_of_forgiveness.png";
 
 
-import cardUpdate from "@/assets/card-update.png";
-import cardGacha from "@/assets/card-gacha.png";
+import cardUpdate from "@/assets/card-update.jpg";
+import cardGacha from "@/assets/card-gacha.jpg";
 import cardCharacter from "@/assets/card-character.png";
-import cardEquip from "@/assets/card-equip.png";
-import cardSkin from "@/assets/card-skin.png";
-import cardMerc from "@/assets/card-merc.png";
-import cardEvent from "@/assets/card-event-regular.png";
-import cardRift from "@/assets/card-rift.png";
-import cardSummit from "@/assets/card-summit.png";
+import cardEquip from "@/assets/card-equip.jpg";
+import cardSkin from "@/assets/card-skin.jpg";
+import cardMerc from "@/assets/card-merc.jpg";
+import cardEvent from "@/assets/card-event-regular.jpg";
+import cardRift from "@/assets/card-rift.jpg";
+import cardSummit from "@/assets/card-summit.jpg";
 
 
 export const Route = createFileRoute("/")({
@@ -43,6 +43,7 @@ type Category = {
   image: string;
   to: string;
   primary?: boolean;
+  imageClassName?: string;
 };
 
 const categories: Category[] = [
@@ -52,9 +53,9 @@ const categories: Category[] = [
   { title: "장비", image: cardEquip, to: "/" },
   { title: "스킨", image: cardSkin, to: "/" },
   { title: "용병", image: cardMerc, to: "/" },
-  { title: "이벤트", image: cardEvent, to: "/" },
+  { title: "이벤트", image: cardEvent, to: "/", imageClassName: "h-[132px] w-[132px]" },
   { title: "시공", image: cardRift, to: "/" },
-  { title: "서밋 신규맵", image: cardSummit, to: "/" },
+  { title: "서밋 신규맵", image: cardSummit, to: "/", imageClassName: "h-[132px] w-[132px]" },
 ];
 
 function CategoryCard({ category }: { category: Category }) {
@@ -73,7 +74,9 @@ function CategoryCard({ category }: { category: Category }) {
           width={512}
           height={512}
           loading="lazy"
-          className="h-36 w-36 object-contain transition-transform duration-200 group-hover:scale-105"
+          className={`${
+            category.imageClassName ?? "h-36 w-36"
+          } object-contain transition-transform duration-200 group-hover:scale-105`}
         />
       </div>
       <h3 className="mt-6 text-2xl font-bold tracking-tight text-foreground">{category.title}</h3>
@@ -170,26 +173,19 @@ function Index() {
 
       <HeroSection />
 
-      <main className="mx-auto -mt-12 w-full max-w-6xl flex-1 px-8 pb-20">
-
-
+      <main className="mx-auto -mt-12 w-full max-w-6xl flex-1 px-8 pb-12">
         <nav aria-label="정보 카테고리" className="mt-14 grid grid-cols-3 gap-7">
           {categories.map((category) => (
             <CategoryCard key={category.title} category={category} />
           ))}
         </nav>
-
-        <p className="mt-8 text-center text-sm text-muted-foreground">
-          미래시 관련 정보는 계속해서 보강됩니다.
-        </p>
       </main>
 
       <footer className="border-t border-border bg-card">
-        <div className="mx-auto max-w-6xl space-y-2 px-8 py-9 text-center text-sm leading-relaxed text-muted-foreground">
+        <div className="mx-auto max-w-6xl space-y-1 px-8 py-8 text-center text-sm leading-relaxed text-muted-foreground">
           <p>본 사이트는 비영리·비수익 목적으로 운영되는 팬 정보 사이트입니다.</p>
           <p>게임 관련 이미지 및 자료의 권리는 각 권리자에게 있습니다.</p>
-          <p>본 사이트에서 직접 작성한 정보는 BY-NC-SA 라이선스에 따라 배포됩니다.</p>
-          <p className="text-xs">만든사람: 성검군단 서버 엑시즈</p>
+          <p className="pt-2 text-xs">제작·운영: 성검군단 서버 엑시즈</p>
         </div>
       </footer>
     </div>
