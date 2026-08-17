@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { heroImages, getHeroIndexForDate } from "@/lib/hero-images";
+import clockIcon from "@/assets/clock-of-forgiveness.png.asset.json";
 
 
 import cardUpdate from "@/assets/card-update.png";
@@ -156,10 +157,14 @@ function Index() {
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-8 py-5">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">
-            랑
-          </span>
-          <span className="text-xl font-bold tracking-tight text-foreground">랑그릿사 모바일</span>
+          <img
+            src={clockIcon.url}
+            alt="용서의 시계"
+            width={48}
+            height={48}
+            className="h-12 w-auto object-contain"
+          />
+          <span className="text-xl font-bold tracking-tight text-foreground">미래시 시트</span>
         </div>
       </header>
 
