@@ -86,7 +86,7 @@ function HeroSection() {
     setIndex(getHeroIndexForDate());
   }, []);
 
-  const hero = heroImages[index];
+  const hero = heroImages[index] ?? heroImages[0]!;
 
   return (
     <section className="relative isolate overflow-hidden">
