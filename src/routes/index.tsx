@@ -107,7 +107,7 @@ function HeroSection() {
         <div className="absolute inset-0 bg-hero-fade" />
       </div>
 
-      <div className="mx-auto max-w-6xl px-8 pt-24 pb-28 text-center">
+      <div className="mx-auto max-w-6xl px-8 pt-24 pb-36 text-center">
         <h1 className="text-4xl font-bold tracking-tight text-hero-foreground drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]">
           랑그릿사 모바일 <span className="text-hero-accent">미래 정보</span>를 한 곳에서
         </h1>
@@ -156,13 +156,13 @@ function Index() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-8 py-2">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-8 py-1">
           <img
             src={clockIcon.url}
             alt="용서의 시계"
-            width={56}
-            height={56}
-            className="h-14 w-auto object-contain"
+            width={40}
+            height={40}
+            className="h-10 w-auto object-contain"
           />
           <span className="text-2xl font-bold tracking-tight text-foreground">미래시 시트</span>
         </div>
@@ -170,7 +170,7 @@ function Index() {
 
       <HeroSection />
 
-      <main className="mx-auto -mt-10 w-full max-w-6xl flex-1 px-8 pb-20">
+      <main className="mx-auto -mt-12 w-full max-w-6xl flex-1 px-8 pb-20">
 
 
         <nav aria-label="정보 카테고리" className="mt-14 grid grid-cols-3 gap-7">
