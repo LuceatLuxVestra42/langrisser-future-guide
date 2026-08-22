@@ -15,17 +15,21 @@ const bannerFiles = new Set(fs.readdirSync(bannerDir));
 const noticeFiles = new Set(fs.readdirSync(noticeDir));
 
 console.log('==================================================');
-console.log('       KR BANNER SCHEDULE V1 DECEMBER AUDIT       ');
+console.log('       KR BANNER SCHEDULE V1 MARCH 2027 AUDIT    ');
 console.log('==================================================');
 
-console.log(`1. 전체 recordCount: ${krData.records.length} (기대: 60)`);
+console.log(`1. 전체 recordCount: ${krData.records.length} (기대: 93)`);
 
 // 2. Dates breakdown
 const byDate = {};
+let marCount = 0;
+
 krData.records.forEach(r => {
   byDate[r.krDisplayDate] = (byDate[r.krDisplayDate] || 0) + 1;
+  if (r.krDisplayDate.startsWith('2027-03')) marCount++;
 });
 console.log('2. 날짜별 레코드 수:', byDate);
+console.log(`- 3월 레코드 수: ${marCount} (기대: 13)`);
 
 // 3. Statistics
 let verifiedCount = 0;
@@ -41,7 +45,10 @@ let wishCount = 0;
 
 let legacyReusableCount = 0;
 let manualReplacementCount = 0;
+let chuanShuoCount = 0;
+let under3000Count = 0;
 let missingImageCount = 0;
+const bannerCodeFrequency = {};
 
 krData.records.forEach((r, idx) => {
   if (r.matchStatus === 'verified') verifiedCount++;
@@ -57,8 +64,17 @@ krData.records.forEach((r, idx) => {
 
   if (r.matchBasis && r.matchBasis.includes('legacyReusable')) legacyReusableCount++;
   if (r.manualOverride === true) manualReplacementCount++;
+  if (r.displayImageFile === 'Picture_Notice_ChuanShuoReturn.webp') chuanShuoCount++;
+  if (r.bannerCode) {
+    bannerCodeFrequency[r.bannerCode] = (bannerCodeFrequency[r.bannerCode] || 0) + 1;
+    const num = parseInt(r.bannerCode, 10);
+    if (!isNaN(num) && num < 3000) under3000Count++;
+  }
   if (r.displayImageFile === null && r.visualType !== 'prefab' && r.matchStatus !== 'unresolved') missingImageCount++;
 });
+
+// Reused bannerCodes count in schedule
+const reusedBannerCodes = Object.keys(bannerCodeFrequency).filter(k => bannerCodeFrequency[k] > 1);
 
 console.log('\n--- 3. Statistics ---');
 console.log(`- verified 수: ${verifiedCount}`);
@@ -71,34 +87,45 @@ console.log(`- dual 수: ${dualCount}`);
 console.log(`- triple 수: ${tripleCount}`);
 console.log(`- wish 수: ${wishCount}`);
 console.log(`- legacyReusable 재사용 수: ${legacyReusableCount}`);
+console.log(`- 3000 미만 배너 사용 수: ${under3000Count}`);
 console.log(`- manual replacement 사용 수: ${manualReplacementCount}`);
+console.log(`- ChuanShuoReturn 재사용 수: ${chuanShuoCount}`);
+console.log(`- 스케줄 내 bannerCode 재사용 항목 수: ${reusedBannerCodes.length} (코드들: ${reusedBannerCodes.join(', ')})`);
 console.log(`- 이미지 파일 미확정 수 (비-prefab & 비-unresolved): ${missingImageCount}`);
 
-// 4. Check 성자 강림 소원소환 (12/16 #2)
-const rSaintWish = krData.records.find(r => r.krDisplayDate === '2026-12-16' && r.displayOrder === 2);
-console.log('\n--- 4. 12/16 #2 성자 강림 소원소환 (Banner_OptionalWish) Verification ---');
-console.log(`- 성자 강림 소원소환 존재: ${rSaintWish ? 'PASS' : 'FAIL'}`);
-if (rSaintWish) {
-  console.log(`    sourceRecordKey: ${rSaintWish.sourceRecordKey} (기대: cardpool:99143)`);
-  console.log(`    bannerCode: ${rSaintWish.bannerCode} (null 유지)`);
-  console.log(`    sourceType: ${rSaintWish.sourceType}`);
-  console.log(`    scheduleType: ${rSaintWish.scheduleType}`);
-  console.log(`    selectableText: "${rSaintWish.selectableText}"`);
-  console.log(`    displayImageFile: ${rSaintWish.displayImageFile}`);
-  console.log(`    displayImageStatus: ${rSaintWish.displayImageStatus}`);
-  console.log(`    matchStatus: ${rSaintWish.matchStatus}`);
-  console.log(`    matchBasis: ${rSaintWish.matchBasis}`);
+// 4. Check typo fix in 2027-01-20 #1
+const rJan20 = krData.records.find(r => r.recordKey === 'kr-banner:20270120:1');
+console.log('\n--- 4. 1/20 #1 Typo Fix Verification ---');
+console.log(`- 1/20 #1 heroesKr[0]: ${rJan20 ? rJan20.heroesKr[0] : 'null'} (기대: 이리아) -> ${rJan20 && rJan20.heroesKr[0] === '이리아' ? 'PASS' : 'FAIL'}`);
+
+// 5. Check March specific banners
+const r10201 = krData.records.find(r => r.krDisplayDate === '2027-03-03');
+console.log('\n--- 5. 3/3 Shurato Collab (10201) Verification ---');
+console.log(`- 10201 존재: ${r10201 && r10201.bannerCode === '10201' ? 'PASS' : 'FAIL'}`);
+if (r10201) {
+  console.log(`    sourceType: ${r10201.sourceType} | scheduleType: ${r10201.scheduleType} (new 기대: ${r10201.scheduleType === 'new'})`);
+  console.log(`    displayImageType: ${r10201.displayImageType} (Banner 기대: ${r10201.displayImageType === 'Banner'})`);
+  console.log(`    heroesKr: [${r10201.heroesKr.join(', ')}]`);
 }
 
-// 5. Check 12/2 1503 legacyReusable & 12/30 1404 legacyReusable
-const r1503 = krData.records.find(r => r.krDisplayDate === '2026-12-02' && r.bannerCode === '1503');
-const r1404 = krData.records.find(r => r.krDisplayDate === '2026-12-30' && r.bannerCode === '1404');
-console.log('\n--- 5. Legacy Reusable (1503 & 1404) Verification ---');
-console.log(`- 12/2 1503 (보젤/루나/리아나): ${r1503 ? 'PASS' : 'FAIL'} | sourceKey: ${r1503 ? r1503.sourceRecordKey : 'null'}`);
-console.log(`- 12/30 1404 (레온/엘윈/베른하르트): ${r1404 ? 'PASS' : 'FAIL'} | sourceKey: ${r1404 ? r1404.sourceRecordKey : 'null'}`);
+const r10301 = krData.records.find(r => r.krDisplayDate === '2027-03-31' && r.displayOrder === 1);
+console.log('\n--- 6. 3/31 마검의 화신 (10301) Verification ---');
+console.log(`- 10301 존재: ${r10301 && r10301.bannerCode === '10301' ? 'PASS' : 'FAIL'}`);
+if (r10301) {
+  console.log(`    sourceType: ${r10301.sourceType} | scheduleType: ${r10301.scheduleType} (new 기대: ${r10301.scheduleType === 'new'})`);
+  console.log(`    displayImageType: ${r10301.displayImageType} (Banner 기대: ${r10301.displayImageType === 'Banner'})`);
+}
+
+const r5701 = krData.records.find(r => r.krDisplayDate === '2027-03-31' && r.displayOrder === 3);
+console.log('\n--- 7. 3/31 각성자 (5701) Verification ---');
+console.log(`- 5701 존재: ${r5701 && r5701.bannerCode === '5701' ? 'PASS' : 'FAIL'}`);
+if (r5701) {
+  console.log(`    sourceType: ${r5701.sourceType} | scheduleType: ${r5701.scheduleType} (single 기대: ${r5701.scheduleType === 'single'})`);
+  console.log(`    displayImageType: ${r5701.displayImageType} (Picture_Notice 기대: ${r5701.displayImageType === 'Picture_Notice'})`);
+}
 
 console.log('==================================================');
-const isSuccess = krData.records.length === 60 && unresolvedCount === 0 && verifiedCount === 54 && manualCount === 6 && rSaintWish && rSaintWish.sourceRecordKey === 'cardpool:99143';
+const isSuccess = krData.records.length === 93 && marCount === 13 && unresolvedCount === 0 && verifiedCount === 84 && manualCount === 9 && rJan20.heroesKr[0] === '이리아' && r10201.scheduleType === 'new' && r10301.scheduleType === 'new' && r5701.scheduleType === 'single';
 console.log(` OVERALL VALIDATION STATUS: ${isSuccess ? 'PASS (100% 검증 통과)' : 'FAIL'}`);
 console.log('==================================================');
 if (!isSuccess) process.exit(1);
