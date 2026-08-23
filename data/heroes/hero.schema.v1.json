@@ -1,0 +1,338 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hero.schema.v1.json",
+  "title": "Langrisser Hero Page Data v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "heroId",
+    "slug",
+    "names",
+    "classification",
+    "profile",
+    "visuals",
+    "systems",
+    "forms",
+    "release",
+    "meta"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "heroId": { "type": "integer", "minimum": 1 },
+    "slug": { "type": "string", "minLength": 1 },
+    "names": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ko", "zh", "en"],
+      "properties": {
+        "ko": { "type": ["string", "null"] },
+        "zh": { "type": ["string", "null"] },
+        "en": { "type": ["string", "null"] },
+        "aliasesKo": { "type": "array", "items": { "type": "string" }, "default": [] }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rarity", "factions", "origin"],
+      "properties": {
+        "rarity": { "type": ["string", "null"] },
+        "factions": { "type": "array", "items": { "$ref": "#/$defs/idName" } },
+        "origin": {
+          "type": ["object", "null"],
+          "properties": {
+            "group": { "type": ["string", "null"] },
+            "work": { "type": ["string", "null"] },
+            "workId": { "type": ["integer", "string", "null"] }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "voiceActors", "acquisition"],
+      "properties": {
+        "description": { "$ref": "#/$defs/localizedText" },
+        "voiceActors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "skinIds"],
+            "properties": {
+              "name": { "type": "string" },
+              "skinIds": { "type": "array", "items": { "type": "integer" } }
+            }
+          }
+        },
+        "acquisition": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "visuals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["defaultIllustration", "skins"],
+      "properties": {
+        "defaultIllustration": { "type": ["string", "null"] },
+        "background": { "type": ["string", "null"] },
+        "skins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["skinId", "kind", "displayOrder", "illustration", "acquisition"],
+            "properties": {
+              "skinId": { "type": "integer" },
+              "kind": { "enum": ["base", "skin", "sp"] },
+              "displayOrder": { "type": "integer", "minimum": 1 },
+              "name": { "$ref": "#/$defs/localizedText" },
+              "illustration": { "type": ["string", "null"] },
+              "acquisition": { "type": ["string", "null"] },
+              "voiceActorOverride": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    },
+    "systems": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bond", "exclusiveEquipment", "law"],
+      "properties": {
+        "bond": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["requirements", "effects"],
+          "properties": {
+            "requirements": { "type": "array", "items": { "type": "object" } },
+            "effects": { "type": "array", "items": { "type": "object" } }
+          }
+        },
+        "exclusiveEquipment": {
+          "type": ["object", "null"],
+          "properties": {
+            "equipmentId": { "type": ["integer", "null"] },
+            "name": { "$ref": "#/$defs/localizedText" },
+            "released": { "type": ["boolean", "null"] }
+          },
+          "additionalProperties": true
+        },
+        "law": {
+          "type": ["object", "null"],
+          "properties": {
+            "skillId": { "type": ["integer", "null"] },
+            "name": { "$ref": "#/$defs/localizedText" },
+            "description": { "$ref": "#/$defs/localizedText" },
+            "released": { "type": ["boolean", "null"] }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "forms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base", "sp"],
+      "properties": {
+        "base": { "$ref": "#/$defs/formData" },
+        "sp": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "allOf": [
+                { "$ref": "#/$defs/formData" },
+                {
+                  "type": "object",
+                  "properties": {
+                    "missions": { "type": "array", "items": { "$ref": "#/$defs/mission" } },
+                    "quickMissionPlan": { "type": "array", "items": { "type": "object" } },
+                    "unlockItems": { "type": "array", "items": { "$ref": "#/$defs/itemRef" } },
+                    "soldierChanges": {
+                      "type": "object",
+                      "properties": {
+                        "addedSoldierIds": { "type": "array", "items": { "type": "integer" } },
+                        "removedSoldierIds": { "type": "array", "items": { "type": "integer" } }
+                      },
+                      "required": ["addedSoldierIds", "removedSoldierIds"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["missions", "quickMissionPlan", "unlockItems", "soldierChanges"]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cn", "kr", "sortOrder"],
+      "properties": {
+        "cn": { "type": ["string", "null"] },
+        "kr": { "type": ["string", "null"] },
+        "batch": { "type": ["string", "null"] },
+        "sortOrder": { "type": ["integer", "null"] }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "sources", "unresolved"],
+      "properties": {
+        "status": { "enum": ["prototype", "partial", "verified"] },
+        "sources": { "type": "array", "items": { "type": "string" } },
+        "unresolved": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "reason", "confidence"],
+            "properties": {
+              "key": { "type": "string" },
+              "reason": { "type": "string" },
+              "confidence": { "type": "integer", "minimum": 0, "maximum": 100 }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "localizedText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ko", "zh"],
+      "properties": {
+        "ko": { "type": ["string", "null"] },
+        "zh": { "type": ["string", "null"] }
+      }
+    },
+    "idName": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "type": ["integer", "string", "null"] },
+        "name": { "$ref": "#/$defs/localizedText" }
+      }
+    },
+    "statRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jobId", "hp", "attack", "intelligence", "defense", "magicDefense", "skill"],
+      "properties": {
+        "jobId": { "type": ["integer", "null"] },
+        "hp": { "type": ["integer", "null"] },
+        "attack": { "type": ["integer", "null"] },
+        "intelligence": { "type": ["integer", "null"] },
+        "defense": { "type": ["integer", "null"] },
+        "magicDefense": { "type": ["integer", "null"] },
+        "skill": { "type": ["integer", "null"] }
+      }
+    },
+    "soldierModifiers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hp", "attack", "defense", "magicDefense"],
+      "properties": {
+        "hp": { "type": ["number", "null"] },
+        "attack": { "type": ["number", "null"] },
+        "defense": { "type": ["number", "null"] },
+        "magicDefense": { "type": ["number", "null"] }
+      }
+    },
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skillId", "name", "description", "icon", "cost", "cooldown", "range", "area", "category", "acquisition"],
+      "properties": {
+        "skillId": { "type": "integer" },
+        "name": { "$ref": "#/$defs/localizedText" },
+        "description": { "$ref": "#/$defs/localizedText" },
+        "icon": { "type": ["string", "null"] },
+        "cost": { "type": ["integer", "null"] },
+        "cooldown": { "type": ["integer", "string", "null"] },
+        "range": { "type": ["integer", "string", "null"] },
+        "area": { "type": ["integer", "string", "null"] },
+        "category": { "enum": ["talent", "active", "passive", "awakening", "sp", "other"] },
+        "acquisition": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "job": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jobId", "name", "tier", "armyType", "predecessorJobIds", "skillIds", "upgradeMaterials"],
+      "properties": {
+        "jobId": { "type": "integer" },
+        "name": { "$ref": "#/$defs/localizedText" },
+        "tier": { "type": ["integer", "null"] },
+        "armyType": { "type": ["string", "null"] },
+        "predecessorJobIds": { "type": "array", "items": { "type": "integer" } },
+        "skillIds": { "type": "array", "items": { "type": "integer" } },
+        "upgradeMaterials": { "type": "array", "items": { "$ref": "#/$defs/itemRef" } }
+      }
+    },
+    "talent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skillId", "name", "ranks"],
+      "properties": {
+        "skillId": { "type": ["integer", "null"] },
+        "name": { "$ref": "#/$defs/localizedText" },
+        "ranks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["stars", "description"],
+            "properties": {
+              "stars": { "type": "integer" },
+              "description": { "$ref": "#/$defs/localizedText" }
+            }
+          }
+        }
+      }
+    },
+    "formData": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["talent", "stats", "soldierModifiers", "jobs", "skills", "soldiers"],
+      "properties": {
+        "talent": { "$ref": "#/$defs/talent" },
+        "stats": { "type": "array", "items": { "$ref": "#/$defs/statRow" } },
+        "soldierModifiers": { "$ref": "#/$defs/soldierModifiers" },
+        "jobs": { "type": "array", "items": { "$ref": "#/$defs/job" } },
+        "skills": { "type": "array", "items": { "$ref": "#/$defs/skill" } },
+        "soldiers": { "type": "array", "items": { "$ref": "#/$defs/idName" } }
+      }
+    },
+    "itemRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["itemId", "name", "count"],
+      "properties": {
+        "itemId": { "type": "integer" },
+        "name": { "$ref": "#/$defs/localizedText" },
+        "count": { "type": ["integer", "null"] }
+      }
+    },
+    "mission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["missionId", "part", "order", "kind", "summary", "condition"],
+      "properties": {
+        "missionId": { "type": "integer" },
+        "part": { "type": "integer", "minimum": 1 },
+        "order": { "type": "integer", "minimum": 1 },
+        "kind": { "enum": ["material", "dungeon", "equipment", "completion", "other"] },
+        "summary": { "$ref": "#/$defs/localizedText" },
+        "condition": { "type": "object" }
+      }
+    }
+  }
+}
