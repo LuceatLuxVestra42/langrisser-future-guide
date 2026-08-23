@@ -136,7 +136,7 @@ bannedKeywords.forEach((kw, idx) => {
   check(`${17 + idx}. "${kw}" 잔존 0건`, count === 0, `Count: ${count}`);
 });
 
-// 32. 존재하지 않는 이미지 파일 참조 0건
+// 34. 존재하지 않는 이미지 파일 참조 0건
 let nonExistentImageCount = 0;
 krData.records.forEach(r => {
   if (r.displayImageFile !== null) {
@@ -149,7 +149,7 @@ krData.records.forEach(r => {
 });
 check('32. 존재하지 않는 이미지 파일 참조 0건', nonExistentImageCount === 0, `Missing files: ${nonExistentImageCount}`);
 
-// 33. 번호 연속성으로 새 bannerCode를 추정한 항목 0건
+// 35. 번호 연속성으로 새 bannerCode를 추정한 항목 0건
 let guessedBannerCodeCount = 0;
 krData.records.forEach(r => {
   if (r.matchBasis && r.matchBasis.includes('guessed')) guessedBannerCodeCount++;
