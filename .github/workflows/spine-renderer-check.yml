@@ -1,0 +1,21 @@
+name: Spine renderer check
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/spine-renderer/**'
+      - '.github/workflows/spine-renderer-check.yml'
+
+jobs:
+  validate-spine-33:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build inspector
+        run: dotnet build tools/spine-renderer/SpineInspector.csproj -c Release
+      - name: Parse Ymir Spine 3.3 binary
+        run: dotnet run --project tools/spine-renderer/SpineInspector.csproj -c Release -- tools/spine-renderer/input
