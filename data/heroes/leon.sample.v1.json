@@ -10,8 +10,10 @@
   },
   "classification": {
     "rarity": null,
+    "listTags": ["SP"],
     "factions": [],
-    "origin": null
+    "origin": null,
+    "factionBuffSkillIds": []
   },
   "profile": {
     "description": {
@@ -22,6 +24,7 @@
     "acquisition": []
   },
   "visuals": {
+    "icon": null,
     "defaultIllustration": null,
     "background": null,
     "skins": []
@@ -317,8 +320,13 @@
     ],
     "unresolved": [
       {
-        "key": "classification/profile/release",
-        "reason": "현재 ConfigData 분석 기록만으로 사이트 표시용 의미와 외부 메타데이터를 모두 확정하지 않았음",
+        "key": "classification/profile/release/visuals",
+        "reason": "현재 ConfigData 분석 기록만으로 사이트 표시용 의미와 외부 메타데이터·에셋 경로를 모두 확정하지 않았음",
+        "confidence": 0
+      },
+      {
+        "key": "classification.factionBuffSkillIds",
+        "reason": "영웅 카드의 초절강화 마크를 위해 스키마에는 포함했지만 자동 판별 규칙은 후속 추출 단계에서 확정해야 함",
         "confidence": 0
       },
       {
