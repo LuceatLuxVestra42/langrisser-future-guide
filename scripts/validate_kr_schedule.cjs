@@ -147,14 +147,14 @@ krData.records.forEach(r => {
     }
   }
 });
-check('32. 존재하지 않는 이미지 파일 참조 0건', nonExistentImageCount === 0, `Missing files: ${nonExistentImageCount}`);
+check('34. 존재하지 않는 이미지 파일 참조 0건', nonExistentImageCount === 0, `Missing files: ${nonExistentImageCount}`);
 
 // 35. 번호 연속성으로 새 bannerCode를 추정한 항목 0건
 let guessedBannerCodeCount = 0;
 krData.records.forEach(r => {
   if (r.matchBasis && r.matchBasis.includes('guessed')) guessedBannerCodeCount++;
 });
-check('33. 번호 연속성 추정 bannerCode 0건', guessedBannerCodeCount === 0);
+check('35. 번호 연속성 추정 bannerCode 0건', guessedBannerCodeCount === 0);
 
 // Summary Statistics
 let verifiedCount = 0;
