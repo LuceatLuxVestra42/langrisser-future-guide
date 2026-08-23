@@ -1,0 +1,62 @@
+name: Patch KR schedule 8302
+
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-kr-schedule-8302.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Add missing 8302 record
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const p = 'data/kr-banner-schedule.v1.json';
+          const data = JSON.parse(fs.readFileSync(p, 'utf8'));
+          if (!data.records.some(r => r.krDisplayDate === '2026-09-30' && r.bannerCode === '8302')) {
+            const idx = data.records.findIndex(r => r.krDisplayDate > '2026-09-30');
+            const record = {
+              recordKey: 'kr-banner:20260930:5',
+              krDisplayDate: '2026-09-30',
+              displayOrder: 5,
+              bannerCode: '8302',
+              sourceRecordKey: 'cardpool:316',
+              patchCode: '83',
+              slotCode: '02',
+              sourceType: 'dual',
+              scheduleType: 'dual',
+              nameCn: '谜海的提灯者',
+              heroesCn: ['赛利卡', '光影剑魄'],
+              heroesKr: ['셀리카', '빛과 그림자 검의 영혼'],
+              selectableText: null,
+              visualType: 'static',
+              displayImageType: 'Picture_Notice',
+              displayImageFile: 'Picture_Notice_8302.webp',
+              displayImageStatus: 'matched',
+              manualOverride: false,
+              matchStatus: 'verified',
+              matchBasis: 'pickup heroes exact match (赛利卡/光影剑魄 -> 셀리카/빛과 그림자 검의 영혼) & CN slot 02 dual banner (8302)',
+              note: '2026-09-30 한국 서버 2인 복각 (출처: Patch 83 / cardpool:316 / Picture_Notice 규격 85px)'
+            };
+            if (idx === -1) data.records.push(record); else data.records.splice(idx, 0, record);
+          }
+          data.recordCount = data.records.length;
+          fs.writeFileSync(p, JSON.stringify(data, null, 2) + '\n');
+          NODE
+      - name: Commit patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/kr-banner-schedule.v1.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'fix: add missing 8302 banner to KR schedule'
+          git push
