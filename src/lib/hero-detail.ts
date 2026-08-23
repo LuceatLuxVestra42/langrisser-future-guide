@@ -21,14 +21,24 @@ export type HeroSkill = {
   sourceTable: string;
 };
 
+export type HeroMissionMaterial = {
+  nameCn: string;
+  quantity: number;
+  verification: "configdata" | "external-crosscheck";
+  confidence?: number;
+};
+
 export type HeroSpMission = {
   id: number;
   chapter: 1 | 2;
   kind: "material" | "battle" | "equipment" | "runestone" | "completion" | "unknown";
+  titleCn?: string;
   summary: string;
   status: HeroDetailSourceStatus;
   sourceTable: "ConfigDataMissionInfo";
   sourceParam?: string;
+  materials?: HeroMissionMaterial[];
+  materialSource?: string;
 };
 
 export type HeroDetailMode = {
@@ -132,13 +142,60 @@ const leon: HeroDetail = {
       { id: 31187, chapter: 1, kind: "runestone", summary: "룬스톤 제출", status: "verified", sourceTable: "ConfigDataMissionInfo" },
       { id: 31188, chapter: 1, kind: "battle", summary: "레온 포함 화룡 Lv60+", status: "verified", sourceTable: "ConfigDataMissionInfo" },
       { id: 31189, chapter: 1, kind: "completion", summary: "1부 완료", status: "verified", sourceTable: "ConfigDataMissionInfo" },
-      { id: 31190, chapter: 2, kind: "material", summary: "재료 제출", status: "partial", sourceTable: "ConfigDataMissionInfo", sourceParam: "MissionType 73 / Param1 83" },
-      { id: 31191, chapter: 2, kind: "battle", summary: "레온 포함 바란 Lv65+", status: "verified", sourceTable: "ConfigDataMissionInfo" },
-      { id: 31192, chapter: 2, kind: "material", summary: "재료 제출", status: "partial", sourceTable: "ConfigDataMissionInfo", sourceParam: "MissionType 73 / Param1 84" },
-      { id: 31193, chapter: 2, kind: "battle", summary: "레온 포함 암룡 Lv65+", status: "verified", sourceTable: "ConfigDataMissionInfo" },
-      { id: 31194, chapter: 2, kind: "material", summary: "재료 제출", status: "partial", sourceTable: "ConfigDataMissionInfo", sourceParam: "MissionType 73 / Param1 85" },
-      { id: 31195, chapter: 2, kind: "battle", summary: "레온 포함 발키리 Lv65+", status: "verified", sourceTable: "ConfigDataMissionInfo" },
-      { id: 31196, chapter: 2, kind: "completion", summary: "2부 완료", status: "verified", sourceTable: "ConfigDataMissionInfo" },
+      {
+        id: 31190,
+        chapter: 2,
+        kind: "material",
+        titleCn: "女神之启",
+        summary: "SP 2부 재료 제출",
+        status: "partial",
+        sourceTable: "ConfigDataMissionInfo",
+        sourceParam: "MissionType 73 / Param1 83 → ConfigDataMissionSumitItemInfo.ID 83",
+        materialSource: "Bilibili 현행 영웅 페이지 + 레온 SP 전체 패키지(StaticBox 316) 교차검증",
+        materials: [
+          { nameCn: "闪耀心灵之钥", quantity: 40, verification: "external-crosscheck", confidence: 99 },
+          { nameCn: "超然之心", quantity: 12, verification: "external-crosscheck", confidence: 99 },
+          { nameCn: "灵魂之砂", quantity: 30, verification: "external-crosscheck", confidence: 99 },
+          { nameCn: "源铸之砂", quantity: 60, verification: "external-crosscheck", confidence: 99 },
+        ],
+      },
+      { id: 31191, chapter: 2, kind: "battle", titleCn: "挥汗的同途", summary: "레온 포함 바란 Lv65 이상 클리어", status: "verified", sourceTable: "ConfigDataMissionInfo" },
+      {
+        id: 31192,
+        chapter: 2,
+        kind: "material",
+        titleCn: "碎裂的甲胄",
+        summary: "SP 2부 재료 제출",
+        status: "partial",
+        sourceTable: "ConfigDataMissionInfo",
+        sourceParam: "MissionType 73 / Param1 84 → ConfigDataMissionSumitItemInfo.ID 84",
+        materialSource: "Bilibili 현행 영웅 페이지 + 레온 SP 전체 패키지(StaticBox 316) 교차검증",
+        materials: [
+          { nameCn: "统帅之证", quantity: 40, verification: "external-crosscheck", confidence: 99 },
+          { nameCn: "永耀月华", quantity: 5, verification: "external-crosscheck", confidence: 99 },
+          { nameCn: "璀璨星尘", quantity: 5, verification: "external-crosscheck", confidence: 99 },
+        ],
+      },
+      { id: 31193, chapter: 2, kind: "battle", titleCn: "光暗之争", summary: "레온 포함 암룡 티아마트 Lv65 이상 클리어", status: "verified", sourceTable: "ConfigDataMissionInfo" },
+      {
+        id: 31194,
+        chapter: 2,
+        kind: "material",
+        titleCn: "斩断的回忆",
+        summary: "SP 2부 재료 제출",
+        status: "partial",
+        sourceTable: "ConfigDataMissionInfo",
+        sourceParam: "MissionType 73 / Param1 85 → ConfigDataMissionSumitItemInfo.ID 85",
+        materialSource: "Bilibili 현행 영웅 페이지 + 레온 SP 전체 패키지(StaticBox 316) 교차검증",
+        materials: [
+          { nameCn: "记忆精华", quantity: 600, verification: "external-crosscheck", confidence: 99 },
+          { nameCn: "骑手：特级攻击", quantity: 5, verification: "external-crosscheck", confidence: 99 },
+          { nameCn: "骑手：特级生命", quantity: 5, verification: "external-crosscheck", confidence: 99 },
+          { nameCn: "骑手：特级技巧", quantity: 5, verification: "external-crosscheck", confidence: 99 },
+        ],
+      },
+      { id: 31195, chapter: 2, kind: "battle", titleCn: "极武的双刃", summary: "레온 포함 발키리 Lv65 이상 클리어", status: "verified", sourceTable: "ConfigDataMissionInfo" },
+      { id: 31196, chapter: 2, kind: "completion", titleCn: "湮黯的青龙", summary: "SP 2부 완료", status: "verified", sourceTable: "ConfigDataMissionInfo" },
     ],
     sourceItemIds: [2023, 2029, 7402],
   },
@@ -149,12 +206,15 @@ const leon: HeroDetail = {
     "ConfigDataSPHeroInfo",
     "ConfigDataMissionExtSPHeroInfo",
     "ConfigDataMissionInfo",
+    "ConfigDataMissionSumitItemInfo",
     "ConfigDataItemInfo",
+    "ConfigDataStaticBoxInfo",
   ],
   notes: [
     "Hero ID 6 / 利昂 / Leon은 ConfigData에서 직접 확인된 식별값이다.",
     "SP 미션 31183~31196은 실제 MissionInfo 조건을 기준으로 정규화했다.",
-    "MissionType 73의 Param1 80~85는 레온 전용 재료 제출 조건 ID까지 확인됐지만 실제 재료 묶음 정의는 아직 미확정이다.",
+    "MissionType 73의 Param1은 ConfigDataMissionSumitItemInfo.ID로 이어지고 Items에 제출 재료가 저장되는 구조다.",
+    "2부 MissionType 73(83~85)의 재료명·수량은 Bilibili 현행 화면과 StaticBox 316 전체 비용을 교차검증해 표시한다. 저장소의 MissionSumitItemInfo TextAsset에는 m_bytes가 없어 원시 레코드 직접 검증 전까지 mission.status는 partial로 유지한다.",
     "표시용 한국어 스킬명·직업명·스탯 필드 의미가 확정되지 않은 값은 채우지 않는다.",
   ],
 };
