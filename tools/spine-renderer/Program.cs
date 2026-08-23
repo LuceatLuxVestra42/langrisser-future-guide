@@ -15,7 +15,6 @@ internal sealed class PathTextureLoader : TextureLoader {
 internal static class Program {
     private static int Main(string[] args) {
         try {
-        {
             string inputDir = args.Length > 0
                 ? Path.GetFullPath(args[0])
                 : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "input"));
