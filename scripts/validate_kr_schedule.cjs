@@ -92,14 +92,14 @@ check('12. 12/16 성자 강림 (cardpool:99143 -> matchStatus=verified / Notice_
 
 // 13. 새로 추가된 신규 Banner 이미지 연결 여부
 const expectedNewBanners = [
-  { date: '2026-09-23', code: '9601', file: 'Banner_9601.png' },
-  { date: '2026-10-21', code: '9701', file: 'Banner_9701.png' },
-  { date: '2026-11-11', code: '9801', file: 'Banner_9801.png' },
-  { date: '2026-12-09', code: '9901', file: 'Banner_9901.png' },
-  { date: '2027-01-06', code: '10001', file: 'Banner_10001.png' },
-  { date: '2027-02-03', code: '10101', file: 'Banner_10101.png' },
-  { date: '2027-03-03', code: '10201', file: 'Banner_10201.png' },
-  { date: '2027-03-31', code: '10301', file: 'Banner_10301.png' },
+  { date: '2026-09-23', code: '9601', file: 'Banner_9601.webp' },
+  { date: '2026-10-21', code: '9701', file: 'Banner_9701.webp' },
+  { date: '2026-11-11', code: '9801', file: 'Banner_9801.webp' },
+  { date: '2026-12-09', code: '9901', file: 'Banner_9901.webp' },
+  { date: '2027-01-06', code: '10001', file: 'Banner_10001.webp' },
+  { date: '2027-02-03', code: '10101', file: 'Banner_10101.webp' },
+  { date: '2027-03-03', code: '10201', file: 'Banner_10201.webp' },
+  { date: '2027-03-31', code: '10301', file: 'Banner_10301.webp' },
 ];
 let newBannersValid = true;
 expectedNewBanners.forEach(nb => {
@@ -107,7 +107,7 @@ expectedNewBanners.forEach(nb => {
   const valid = r && r.bannerCode === nb.code && r.displayImageFile === nb.file && r.displayImageStatus === 'matched' && r.visualType === 'static' && bannerFiles.has(nb.file);
   if (!valid) newBannersValid = false;
 });
-check('13. 신규 8개 배너 Banner_*.png 연결 및 정적 파일 존재 확인', newBannersValid);
+check('13. 신규 8개 배너 Banner_*.webp 연결 및 정적 파일 존재 확인', newBannersValid);
 
 // 14. heroesCn 내 '转生' 잔존 0건 확인
 let zhuanShengCount = 0;
