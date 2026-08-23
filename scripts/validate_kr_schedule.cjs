@@ -23,8 +23,8 @@ function check(description, condition, details = '') {
   return condition;
 }
 
-// 1. recordCount = 93
-check('1. recordCount === 93', krData.records.length === 93, `Actual: ${krData.records.length}`);
+// 1. recordCount = 94
+check('1. recordCount === 94', krData.records.length === 94, `Actual: ${krData.records.length}`);
 
 // 2. startDate = 2026-09-02
 check('2. startDate === "2026-09-02"', krData.startDate === '2026-09-02', `Actual: ${krData.startDate}`);
