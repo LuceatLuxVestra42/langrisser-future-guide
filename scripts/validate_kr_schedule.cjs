@@ -1,131 +1,196 @@
 const fs = require('fs');
 const path = require('path');
 
-const cnJsonPath = 'c:/Users/whddn/Downloads/banner-data.v1.json';
-const krJsonPath = 'c:/Users/whddn/Documents/langrisser-future-guide/data/kr-banner-schedule.v1.json';
-const overridesJsonPath = 'c:/Users/whddn/Documents/langrisser-future-guide/data/banner-overrides.v1.json';
-const bannerDir = 'c:/Users/whddn/Documents/langrisser-future-guide/public/images/banners/Banner';
-const noticeDir = 'c:/Users/whddn/Documents/langrisser-future-guide/public/images/banners/Picture_Notice';
+const krJsonPath = path.resolve(__dirname, '../data/kr-banner-schedule.v1.json');
+const bannerDir = path.resolve(__dirname, '../public/images/banners/Banner');
+const noticeDir = path.resolve(__dirname, '../public/images/banners/Picture_Notice');
 
-const cnData = JSON.parse(fs.readFileSync(cnJsonPath, 'utf8'));
 const krData = JSON.parse(fs.readFileSync(krJsonPath, 'utf8'));
-const overrides = JSON.parse(fs.readFileSync(overridesJsonPath, 'utf8'));
+const rawKrText = fs.readFileSync(krJsonPath, 'utf8');
 
 const bannerFiles = new Set(fs.readdirSync(bannerDir));
 const noticeFiles = new Set(fs.readdirSync(noticeDir));
 
 console.log('==================================================');
-console.log('       KR BANNER SCHEDULE V1 MARCH 2027 AUDIT    ');
-console.log('==================================================');
+console.log('       KR BANNER SCHEDULE V1 COMPREHENSIVE AUDIT ');
+console.log('==================================================\n');
 
-console.log(`1. 전체 recordCount: ${krData.records.length} (기대: 93)`);
+let allPassed = true;
+function check(description, condition, details = '') {
+  const status = condition ? 'PASS' : 'FAIL';
+  if (!condition) allPassed = false;
+  console.log(`[${status}] ${description}${details ? ` -> ${details}` : ''}`);
+  return condition;
+}
 
-// 2. Dates breakdown
+// 1. recordCount = 93
+check('1. recordCount === 93', krData.records.length === 93, `Actual: ${krData.records.length}`);
+
+// 2. startDate = 2026-09-02
+check('2. startDate === "2026-09-02"', krData.startDate === '2026-09-02', `Actual: ${krData.startDate}`);
+
+// 3. 8/26 레코드 0건
+const r0826 = krData.records.filter(r => r.krDisplayDate === '2026-08-26');
+check('3. 2026-08-26 레코드 0건', r0826.length === 0, `Count: ${r0826.length}`);
+
+// 4. 3/31 레코드 4건
+const r0331 = krData.records.filter(r => r.krDisplayDate === '2027-03-31');
+check('4. 2027-03-31 레코드 4건', r0331.length === 4, `Count: ${r0331.length}`);
+
+// 5. 3/31 빙설 심연의 지배자 존재
+const r0331_ice = r0331.find(r => r.bannerCode === '7001' && r.scheduleType === 'single');
+check('5. 3/31 빙설 심연의 지배자 (7001 single) 존재', !!r0331_ice && r0331_ice.heroesKr.includes('빙설 심연의 지배자') && r0331_ice.displayImageFile === 'Picture_Notice_7001.webp');
+
+// 6. 날짜별 displayOrder 중복 없음
 const byDate = {};
-let marCount = 0;
-
+let hasOrderDup = false;
 krData.records.forEach(r => {
-  byDate[r.krDisplayDate] = (byDate[r.krDisplayDate] || 0) + 1;
-  if (r.krDisplayDate.startsWith('2027-03')) marCount++;
+  if (!byDate[r.krDisplayDate]) byDate[r.krDisplayDate] = [];
+  byDate[r.krDisplayDate].push(r.displayOrder);
 });
-console.log('2. 날짜별 레코드 수:', byDate);
-console.log(`- 3월 레코드 수: ${marCount} (기대: 13)`);
+for (const [date, orders] of Object.entries(byDate)) {
+  const set = new Set(orders);
+  if (set.size !== orders.length) hasOrderDup = true;
+}
+check('6. 날짜별 displayOrder 중복 없음', !hasOrderDup);
 
-// 3. Statistics
+// 7. scheduleType별 이미지 타입 규칙
+let typeRuleViolations = 0;
+krData.records.forEach(r => {
+  if (r.scheduleType === 'new' && r.displayImageType !== 'Banner') typeRuleViolations++;
+  if (r.scheduleType === 'single' && r.displayImageType !== 'Picture_Notice') typeRuleViolations++;
+  if (r.scheduleType === 'dual' && r.displayImageType !== 'Picture_Notice') typeRuleViolations++;
+  if (r.scheduleType === 'triple' && r.displayImageType !== 'Banner') typeRuleViolations++;
+  if (r.scheduleType === 'wish' && r.displayImageType !== 'Picture_Notice') typeRuleViolations++;
+});
+check('7. scheduleType별 이미지 규격 준수 (new/triple->Banner, single/dual/wish->Picture_Notice)', typeRuleViolations === 0, `Violations: ${typeRuleViolations}`);
+
+// 8. 9/16 라인가하르트 II가 남아 있지 않음
+const r0916_old = krData.records.find(r => (r.heroesKr || []).includes('라인가하르트 II') || (r.note || '').includes('라인가하르트 II'));
+check('8. 9/16 라인가하르트 II 잔존 0건', !r0916_old);
+
+// 9. 9/16 리인카네이션2 연결 확인 & heroesCn 빈 배열 확인
+const r0916_wish = krData.records.find(r => r.krDisplayDate === '2026-09-16' && r.scheduleType === 'wish');
+const r0916_wish_valid = r0916_wish && r0916_wish.bannerCode === '7902' && r0916_wish.sourceRecordKey === 'cardpool:305' && r0916_wish.displayImageFile === 'Picture_Notice_7902.webp' && r0916_wish.matchStatus === 'verified' && r0916_wish.heroesCn.length === 0;
+check('9. 9/16 리인카네이션2 (7902 / cardpool:305 / heroesCn=[]) 연결 확인', !!r0916_wish_valid);
+
+// 10. 9/9 / 11/18 소원 이미지 재매칭 확인
+const r0909_wish = krData.records.find(r => r.krDisplayDate === '2026-09-09' && r.bannerCode === '9616');
+const r1118_wish = krData.records.find(r => r.krDisplayDate === '2026-11-18' && r.bannerCode === '9605');
+const wishSwapValid = r0909_wish && r0909_wish.displayImageFile === 'Picture_Notice_9605.webp' && r1118_wish && r1118_wish.displayImageFile === 'Picture_Notice_9616.webp';
+check('10. 9/9(9616->Notice_9605) & 11/18(9605->Notice_9616) 소원 이미지 재매칭 확인', !!wishSwapValid);
+
+// 11. Picture_Notice_4405.webp 연결 확인
+const r1007_4405 = krData.records.find(r => r.krDisplayDate === '2026-10-07' && r.bannerCode === '4405');
+const r1007_4405_valid = r1007_4405 && r1007_4405.displayImageFile === 'Picture_Notice_4405.webp' && r1007_4405.displayImageStatus === 'matched';
+check('11. 10/7 로젠실/클로테르 (4405 -> Picture_Notice_4405.webp) 연결 확인', !!r1007_4405_valid);
+
+// 12. OptionalWish 이미지 연결 및 verified 상태 확인
+const r1216_opt = krData.records.find(r => r.krDisplayDate === '2026-12-16' && r.sourceRecordKey === 'cardpool:99143');
+const r1216_opt_valid = r1216_opt && r1216_opt.displayImageFile === 'Picture_Notice_OptionalWish.webp' && r1216_opt.displayImageStatus === 'manual-replacement' && r1216_opt.matchStatus === 'verified' && r1216_opt.manualOverride === true;
+check('12. 12/16 성자 강림 (cardpool:99143 -> matchStatus=verified / Notice_OptionalWish) 연결 확인', !!r1216_opt_valid);
+
+// 13. 새로 추가된 신규 Banner 이미지 연결 여부
+const expectedNewBanners = [
+  { date: '2026-09-23', code: '9601', file: 'Banner_9601.png' },
+  { date: '2026-10-21', code: '9701', file: 'Banner_9701.png' },
+  { date: '2026-11-11', code: '9801', file: 'Banner_9801.png' },
+  { date: '2026-12-09', code: '9901', file: 'Banner_9901.png' },
+  { date: '2027-01-06', code: '10001', file: 'Banner_10001.png' },
+  { date: '2027-02-03', code: '10101', file: 'Banner_10101.png' },
+  { date: '2027-03-03', code: '10201', file: 'Banner_10201.png' },
+  { date: '2027-03-31', code: '10301', file: 'Banner_10301.png' },
+];
+let newBannersValid = true;
+expectedNewBanners.forEach(nb => {
+  const r = krData.records.find(item => item.krDisplayDate === nb.date && item.scheduleType === 'new');
+  const valid = r && r.bannerCode === nb.code && r.displayImageFile === nb.file && r.displayImageStatus === 'matched' && r.visualType === 'static' && bannerFiles.has(nb.file);
+  if (!valid) newBannersValid = false;
+});
+check('13. 신규 8개 배너 Banner_*.png 연결 및 정적 파일 존재 확인', newBannersValid);
+
+// 14. heroesCn 내 '转生' 잔존 0건 확인
+let zhuanShengCount = 0;
+krData.records.forEach(r => {
+  if (r.heroesCn && r.heroesCn.includes('转生')) zhuanShengCount++;
+});
+check('14. heroesCn 내 "转生" 잔존 0건', zhuanShengCount === 0, `Count: ${zhuanShengCount}`);
+
+// 15. 沙律 및 塞拉菲娜 매핑 확인
+const r0901_new = krData.records.find(r => r.krDisplayDate === '2026-12-09' && r.bannerCode === '9901');
+const r0310_dual = krData.records.find(r => r.krDisplayDate === '2027-03-10' && r.bannerCode === '10202');
+const shaLuValid = r0901_new && r0901_new.heroesKr.includes('사륜') && r0310_dual && r0310_dual.heroesKr.includes('사륜');
+check('15. 沙律 포함 배너(12/9, 3/10) heroesKr "사륜" 매핑 확인', !!shaLuValid);
+
+const r0113_triple = krData.records.find(r => r.krDisplayDate === '2027-01-13' && r.bannerCode === '8703');
+const r0310_triple = krData.records.find(r => r.krDisplayDate === '2027-03-10' && r.bannerCode === '8403');
+const seraphinaValid = r0113_triple && r0113_triple.heroesKr.includes('세라피나') && r0310_triple && r0310_triple.heroesKr.includes('세라피나');
+check('16. 塞拉菲娜 포함 배너(1/13, 3/10) heroesKr "세라피나" 매핑 확인', !!seraphinaValid);
+
+// 17~31. 한국어 표기 검증 (잔존 금지 단어 0건)
+const bannedKeywords = [
+  '샤르', '세리피나', '이미아', '샤프린', '생겨', '호프먼', '에쉬엘', '레이카', '레이미', '은(백사)', '랑그릿사 1~5', '파사르', '사리크', '알베르타', '홍바바'
+];
+bannedKeywords.forEach((kw, idx) => {
+  const count = rawKrText.split(kw).length - 1;
+  check(`${17 + idx}. "${kw}" 잔존 0건`, count === 0, `Count: ${count}`);
+});
+
+// 32. 존재하지 않는 이미지 파일 참조 0건
+let nonExistentImageCount = 0;
+krData.records.forEach(r => {
+  if (r.displayImageFile !== null) {
+    const dir = r.displayImageType === 'Banner' ? bannerFiles : noticeFiles;
+    if (!dir.has(r.displayImageFile)) {
+      nonExistentImageCount++;
+      console.log(`  [Missing File] ${r.krDisplayDate} #${r.displayOrder}: ${r.displayImageType}/${r.displayImageFile}`);
+    }
+  }
+});
+check('32. 존재하지 않는 이미지 파일 참조 0건', nonExistentImageCount === 0, `Missing files: ${nonExistentImageCount}`);
+
+// 33. 번호 연속성으로 새 bannerCode를 추정한 항목 0건
+let guessedBannerCodeCount = 0;
+krData.records.forEach(r => {
+  if (r.matchBasis && r.matchBasis.includes('guessed')) guessedBannerCodeCount++;
+});
+check('33. 번호 연속성 추정 bannerCode 0건', guessedBannerCodeCount === 0);
+
+// Summary Statistics
 let verifiedCount = 0;
 let probableCount = 0;
 let unresolvedCount = 0;
 let manualCount = 0;
-
-let singleCount = 0;
-let dualCount = 0;
-let tripleCount = 0;
-let newCount = 0;
-let wishCount = 0;
-
-let legacyReusableCount = 0;
+let matchedCount = 0;
 let manualReplacementCount = 0;
-let chuanShuoCount = 0;
-let under3000Count = 0;
-let missingImageCount = 0;
-const bannerCodeFrequency = {};
+let nullImageCount = 0;
 
-krData.records.forEach((r, idx) => {
+krData.records.forEach(r => {
   if (r.matchStatus === 'verified') verifiedCount++;
   if (r.matchStatus === 'probable') probableCount++;
   if (r.matchStatus === 'unresolved') unresolvedCount++;
   if (r.matchStatus === 'manual') manualCount++;
 
-  if (r.scheduleType === 'single') singleCount++;
-  if (r.scheduleType === 'dual') dualCount++;
-  if (r.scheduleType === 'triple') tripleCount++;
-  if (r.scheduleType === 'new') newCount++;
-  if (r.scheduleType === 'wish') wishCount++;
-
-  if (r.matchBasis && r.matchBasis.includes('legacyReusable')) legacyReusableCount++;
-  if (r.manualOverride === true) manualReplacementCount++;
-  if (r.displayImageFile === 'Picture_Notice_ChuanShuoReturn.webp') chuanShuoCount++;
-  if (r.bannerCode) {
-    bannerCodeFrequency[r.bannerCode] = (bannerCodeFrequency[r.bannerCode] || 0) + 1;
-    const num = parseInt(r.bannerCode, 10);
-    if (!isNaN(num) && num < 3000) under3000Count++;
-  }
-  if (r.displayImageFile === null && r.visualType !== 'prefab' && r.matchStatus !== 'unresolved') missingImageCount++;
+  if (r.displayImageStatus === 'matched') matchedCount++;
+  if (r.displayImageStatus === 'manual-replacement') manualReplacementCount++;
+  if (r.displayImageFile === null) nullImageCount++;
 });
 
-// Reused bannerCodes count in schedule
-const reusedBannerCodes = Object.keys(bannerCodeFrequency).filter(k => bannerCodeFrequency[k] > 1);
-
-console.log('\n--- 3. Statistics ---');
+console.log('\n==================================================');
+console.log('                 FINAL STATISTICS                 ');
+console.log('==================================================');
+console.log(`- 전체 recordCount: ${krData.records.length}`);
+console.log(`- 시작일(startDate): ${krData.startDate}`);
 console.log(`- verified 수: ${verifiedCount}`);
 console.log(`- probable 수: ${probableCount}`);
 console.log(`- unresolved 수: ${unresolvedCount}`);
 console.log(`- manual 수: ${manualCount}`);
-console.log(`- new 수: ${newCount}`);
-console.log(`- single 수: ${singleCount}`);
-console.log(`- dual 수: ${dualCount}`);
-console.log(`- triple 수: ${tripleCount}`);
-console.log(`- wish 수: ${wishCount}`);
-console.log(`- legacyReusable 재사용 수: ${legacyReusableCount}`);
-console.log(`- 3000 미만 배너 사용 수: ${under3000Count}`);
-console.log(`- manual replacement 사용 수: ${manualReplacementCount}`);
-console.log(`- ChuanShuoReturn 재사용 수: ${chuanShuoCount}`);
-console.log(`- 스케줄 내 bannerCode 재사용 항목 수: ${reusedBannerCodes.length} (코드들: ${reusedBannerCodes.join(', ')})`);
-console.log(`- 이미지 파일 미확정 수 (비-prefab & 비-unresolved): ${missingImageCount}`);
-
-// 4. Check typo fix in 2027-01-20 #1
-const rJan20 = krData.records.find(r => r.recordKey === 'kr-banner:20270120:1');
-console.log('\n--- 4. 1/20 #1 Typo Fix Verification ---');
-console.log(`- 1/20 #1 heroesKr[0]: ${rJan20 ? rJan20.heroesKr[0] : 'null'} (기대: 이리아) -> ${rJan20 && rJan20.heroesKr[0] === '이리아' ? 'PASS' : 'FAIL'}`);
-
-// 5. Check March specific banners
-const r10201 = krData.records.find(r => r.krDisplayDate === '2027-03-03');
-console.log('\n--- 5. 3/3 Shurato Collab (10201) Verification ---');
-console.log(`- 10201 존재: ${r10201 && r10201.bannerCode === '10201' ? 'PASS' : 'FAIL'}`);
-if (r10201) {
-  console.log(`    sourceType: ${r10201.sourceType} | scheduleType: ${r10201.scheduleType} (new 기대: ${r10201.scheduleType === 'new'})`);
-  console.log(`    displayImageType: ${r10201.displayImageType} (Banner 기대: ${r10201.displayImageType === 'Banner'})`);
-  console.log(`    heroesKr: [${r10201.heroesKr.join(', ')}]`);
-}
-
-const r10301 = krData.records.find(r => r.krDisplayDate === '2027-03-31' && r.displayOrder === 1);
-console.log('\n--- 6. 3/31 마검의 화신 (10301) Verification ---');
-console.log(`- 10301 존재: ${r10301 && r10301.bannerCode === '10301' ? 'PASS' : 'FAIL'}`);
-if (r10301) {
-  console.log(`    sourceType: ${r10301.sourceType} | scheduleType: ${r10301.scheduleType} (new 기대: ${r10301.scheduleType === 'new'})`);
-  console.log(`    displayImageType: ${r10301.displayImageType} (Banner 기대: ${r10301.displayImageType === 'Banner'})`);
-}
-
-const r5701 = krData.records.find(r => r.krDisplayDate === '2027-03-31' && r.displayOrder === 3);
-console.log('\n--- 7. 3/31 각성자 (5701) Verification ---');
-console.log(`- 5701 존재: ${r5701 && r5701.bannerCode === '5701' ? 'PASS' : 'FAIL'}`);
-if (r5701) {
-  console.log(`    sourceType: ${r5701.sourceType} | scheduleType: ${r5701.scheduleType} (single 기대: ${r5701.scheduleType === 'single'})`);
-  console.log(`    displayImageType: ${r5701.displayImageType} (Picture_Notice 기대: ${r5701.displayImageType === 'Picture_Notice'})`);
-}
-
+console.log(`- 이미지 matched 수: ${matchedCount}`);
+console.log(`- 이미지 manual-replacement 수: ${manualReplacementCount}`);
+console.log(`- 이미지 null 수: ${nullImageCount}`);
+console.log(`- 존재하지 않는 파일 참조 수: ${nonExistentImageCount}`);
 console.log('==================================================');
-const isSuccess = krData.records.length === 93 && marCount === 13 && unresolvedCount === 0 && verifiedCount === 84 && manualCount === 9 && rJan20.heroesKr[0] === '이리아' && r10201.scheduleType === 'new' && r10301.scheduleType === 'new' && r5701.scheduleType === 'single';
-console.log(` OVERALL VALIDATION STATUS: ${isSuccess ? 'PASS (100% 검증 통과)' : 'FAIL'}`);
+console.log(` OVERALL VALIDATION: ${allPassed ? 'PASS (모든 검증 조건 100% 만족)' : 'FAIL'}`);
 console.log('==================================================');
-if (!isSuccess) process.exit(1);
+
+if (!allPassed) process.exit(1);
