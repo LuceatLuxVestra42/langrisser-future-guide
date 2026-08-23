@@ -35,9 +35,10 @@
     "classification": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["rarity", "factions", "origin"],
+      "required": ["rarity", "listTags", "factions", "origin", "factionBuffSkillIds"],
       "properties": {
         "rarity": { "type": ["string", "null"] },
+        "listTags": { "type": "array", "items": { "type": "string" } },
         "factions": { "type": "array", "items": { "$ref": "#/$defs/idName" } },
         "origin": {
           "type": ["object", "null"],
@@ -47,7 +48,8 @@
             "workId": { "type": ["integer", "string", "null"] }
           },
           "additionalProperties": false
-        }
+        },
+        "factionBuffSkillIds": { "type": "array", "items": { "type": "integer" } }
       }
     },
     "profile": {
@@ -74,8 +76,9 @@
     "visuals": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["defaultIllustration", "skins"],
+      "required": ["icon", "defaultIllustration", "skins"],
       "properties": {
+        "icon": { "type": ["string", "null"] },
         "defaultIllustration": { "type": ["string", "null"] },
         "background": { "type": ["string", "null"] },
         "skins": {
