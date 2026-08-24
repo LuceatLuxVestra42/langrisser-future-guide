@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "stage": "2-7",
+  "status": "PASS_WITH_REVIEW",
+  "generatedAt": "2026-08-24T12:42:18.779Z",
+  "sources": {
+    "soldier": "data/configdata/ConfigDataSoldierInfo.json",
+    "spSoldier": "data/configdata/ConfigDataSPSoldierInfo.json",
+    "army": "data/configdata/ConfigDataArmyInfo.json",
+    "tier3KoreanMap": "data/metadata/soldier-name-kr-tier3.v1.json"
+  },
+  "counts": {
+    "sourceSoldiers": 777,
+    "displayable": 224,
+    "normalDisplayable": 168,
+    "spRelations": 56,
+    "tier3Normal": 129,
+    "koreanConfirmedMasterRecords": 183,
+    "koreanPendingMasterRecords": 39,
+    "koreanUnreleasedMasterRecords": 2,
+    "passRecords": 183,
+    "reviewRecords": 41
+  },
+  "checks": {
+    "duplicateSoldierIds": 0,
+    "displayableArmyJoinFailures": 0,
+    "invalidDisplayableTiers": 0,
+    "missingChineseNames": 0,
+    "duplicateSpIds": 0,
+    "duplicateSpNormalIds": 0,
+    "missingSpSoldierInfo": 0,
+    "missingNormalSoldierInfo": 0,
+    "tier3MappingMissingInConfig": 0,
+    "tier3ConfigMissingInMapping": 0,
+    "duplicateSiteIds": 0
+  },
+  "errors": [],
+  "reviews": [
+    "39 displayable records have no validated Korean display-name source yet (expected mainly tier 1/2).",
+    "2 records inherit intentionally unreleased Korean-name status."
+  ],
+  "policy": {
+    "canonicalKey": "soldierId",
+    "siteId": "soldier-{soldierId}",
+    "spRelation": "ConfigDataSPSoldierInfo.NormalSoliderId <-> ID; no arithmetic inference",
+    "koreanName": "tier3 mapping is validated; SP inherits its normal soldier display name; unsupported names remain explicit pending",
+    "classification": "tier from SoldierInfo.Rank; army semantic type derived from validated tier3 map + ArmyInfo.ArmyTag; UI group is a separate presentation field"
+  }
+}
