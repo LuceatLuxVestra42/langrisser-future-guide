@@ -1,16 +1,22 @@
-name: Hero stage 3 validation
+name: Hero stage 3 and stage 4 validation
 
 on:
   workflow_dispatch:
   push:
     paths:
       - 'scripts/validate_hero_stage3_final.cjs'
+      - 'scripts/prepare_hero_jobs_stage42.cjs'
+      - 'scripts/prepare_hero_job_trees_stage43.cjs'
+      - 'scripts/prepare_hero_skill_acquisition_stage44.cjs'
       - 'data/hero-name-master.v1.json'
       - 'data/hero-name-corrections.v1.json'
       - 'data/hero-master-stage3-1.v1.json'
       - 'data/hero-normal-stage3-2.v1.json'
       - 'data/hero-sp-stage3-3.v1.json'
       - 'data/hero-page-stage3-4.v1.json'
+      - 'data/hero-job-stage4-2.v1.json'
+      - 'data/hero-job-tree-stage4-3.v1.json'
+      - 'data/hero-skill-acquisition-stage4-4.v1.json'
       - 'data/validation/hero-pages-summary.v1.json'
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/configdata/ConfigDataJobInfo.json'
@@ -25,12 +31,18 @@ on:
     paths:
       - 'data/validation/hero-stage3-validation-trigger.txt'
       - 'scripts/validate_hero_stage3_final.cjs'
+      - 'scripts/prepare_hero_jobs_stage42.cjs'
+      - 'scripts/prepare_hero_job_trees_stage43.cjs'
+      - 'scripts/prepare_hero_skill_acquisition_stage44.cjs'
       - 'data/hero-name-master.v1.json'
       - 'data/hero-name-corrections.v1.json'
       - 'data/hero-master-stage3-1.v1.json'
       - 'data/hero-normal-stage3-2.v1.json'
       - 'data/hero-sp-stage3-3.v1.json'
       - 'data/hero-page-stage3-4.v1.json'
+      - 'data/hero-job-stage4-2.v1.json'
+      - 'data/hero-job-tree-stage4-3.v1.json'
+      - 'data/hero-skill-acquisition-stage4-4.v1.json'
       - 'data/validation/hero-pages-summary.v1.json'
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/configdata/ConfigDataJobInfo.json'
@@ -40,6 +52,9 @@ on:
       - 'data/configdata/ConfigDataSPHeroInfo.json'
       - 'data/configdata/ConfigDataMissionExtSPHeroInfo.json'
       - 'data/configdata/ConfigDataMissionInfo.json'
+
+permissions:
+  contents: write
 
 jobs:
   validate-hero-stage3:
@@ -51,3 +66,37 @@ jobs:
           node-version: '22'
       - name: Run final stage 3 automatic validation
         run: node scripts/validate_hero_stage3_final.cjs
+
+  rebuild-hero-stage4-through-44:
+    if: github.event_name != 'pull_request'
+    needs: validate-hero-stage3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run stage 4-2 Hero to Job validation
+        run: npm run inspect:hero-jobs
+      - name: Run stage 4-3 job tree reconstruction
+        run: npm run inspect:hero-job-trees
+      - name: Run stage 4-4 skill acquisition reconstruction
+        run: npm run inspect:hero-skills
+      - name: Commit regenerated stage 4-2 through 4-4 outputs
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            data/generated/hero-job-links.v1.json \
+            data/generated/hero-job-trees.v1.json \
+            data/generated/hero-skill-acquisition.v1.json \
+            data/validation/hero-job-stage4-2-summary.v1.json \
+            data/validation/hero-job-tree-stage4-3-summary.v1.json \
+            data/validation/hero-skill-stage4-4-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No stage 4 output changes to commit."
+          else
+            git commit -m "rebuild hero stage 4 through 4-4 from restored ConfigData"
+            git push
+          fi
