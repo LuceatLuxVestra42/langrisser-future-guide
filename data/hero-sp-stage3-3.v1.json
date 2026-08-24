@@ -1,7 +1,7 @@
 {
-  "version": 2,
+  "version": 3,
   "stage": "3-3",
-  "status": "complete",
+  "status": "source-blocked",
   "primaryKey": "heroId",
   "canonicalHeroFile": "data/hero-name-master.v1.json",
   "canonicalCorrectionFile": "data/hero-name-corrections.v1.json",
@@ -17,12 +17,17 @@
   },
   "knownMissionRules": {"77": "exclusive-equipment level condition", "73": "SP material submission mission; direct material-bundle interpretation remains a later-detail verification task"},
   "sourceHealth": [
-    {"file": "ConfigDataSPHeroInfo.json", "status": "usable", "m_size": 7129},
-    {"file": "ConfigDataMissionExtSPHeroInfo.json", "status": "usable", "m_size": 40188},
-    {"file": "ConfigDataMissionInfo.json", "status": "usable", "m_size": 302899},
-    {"file": "ConfigDataSkillInfo.json", "status": "usable", "m_size": 10667280},
-    {"file": "ConfigDataJobConnectionInfo.json", "status": "usable", "m_size": 3519252},
-    {"file": "ConfigDataJobInfo.json", "status": "usable", "m_size": 588553}
+    {"file": "ConfigDataSPHeroInfo.json", "status": "payload-validated", "m_size": 7129, "recordCount": 25},
+    {"file": "ConfigDataMissionExtSPHeroInfo.json", "status": "payload-validated", "m_size": 40188, "recordCount": 350},
+    {
+      "file": "ConfigDataMissionInfo.json",
+      "status": "deep-validation-failed",
+      "m_size": 302899,
+      "reason": "Wrapper is structurally valid, but 4-byte big-endian record framing fails after 105 records at byte offset 8240. The next length value is implausible and no plausible record boundary appears in the immediate scan window, so the current payload cannot be accepted as a complete valid export."
+    },
+    {"file": "ConfigDataSkillInfo.json", "status": "payload-validated", "m_size": 10667280, "recordCount": 27198},
+    {"file": "ConfigDataJobConnectionInfo.json", "status": "payload-validated", "m_size": 3519252, "recordCount": 30066},
+    {"file": "ConfigDataJobInfo.json", "status": "payload-validated", "m_size": 588553, "recordCount": 3295}
   ],
   "representativeFixture": {
     "heroId": 6,
@@ -31,12 +36,15 @@
     "expectedSecondStageMissionIds": [31190,31191,31192,31193,31194,31195,31196],
     "expectedSecondStageRewardSkillIds": [12527,12528]
   },
-  "blockedOn": [],
-  "completionRule": "Stage 3-3 is complete when the SP parsing/join contract is fixed, representative fixture policy exists, and core SP/Mission/Skill/Job inputs pass structural source health. Full SP content expansion belongs to stages 4-5.",
+  "blockedOn": [
+    "Individually re-export ConfigDataMissionInfo and replace the current payload.",
+    "Re-run npm run validate:hero-stage3 and require full mission payload framing and SP relation validation to pass."
+  ],
+  "completionRule": "Stage 3-3 is complete only when SPHeroInfo, MissionExtSPHeroInfo, MissionInfo and required Skill/Job inputs pass full payload validation and the representative SP relation fixture can be evaluated from those sources.",
   "notes": [
     "SP presence is derived from ConfigDataSPHeroInfo rather than guessed from names or chronology.",
-    "MissionExtSPHeroInfo supplies scenario text while MissionInfo supplies mission conditions.",
-    "All core SP inputs that previously blocked this stage have been replaced with structurally usable exports.",
+    "SPHeroInfo and MissionExtSPHeroInfo passed full framed protobuf scanning in the final automatic validation.",
+    "MissionInfo was previously accepted from wrapper-level inspection; the deeper scan exposed a payload boundary failure.",
     "The corrected Werner von Egil name is canonical-source-confirmed and no longer a temporary override."
   ]
 }
