@@ -44,16 +44,22 @@ function preflightTextAsset(file, expectedName) {
 }
 
 function readVarint(buf, start) {
-  let value = 0;
-  let shift = 0;
+  let value = 0n;
+  let shift = 0n;
   let offset = start;
-  while (offset < buf.length && shift <= 49) {
+  while (offset < buf.length && shift <= 70n) {
     const b = buf[offset++];
-    value += (b & 0x7f) * 2 ** shift;
+    value |= BigInt(b & 0x7f) << shift;
     if ((b & 0x80) === 0) return { value, offset };
-    shift += 7;
+    shift += 7n;
   }
   throw new Error(`invalid varint at ${start}`);
+}
+
+function bigintToSafeNumber(value) {
+  if (typeof value !== 'bigint') return null;
+  if (value < 0n || value > BigInt(Number.MAX_SAFE_INTEGER)) return null;
+  return Number(value);
 }
 
 function parseMessage(buf) {
@@ -62,8 +68,10 @@ function parseMessage(buf) {
   while (offset < buf.length) {
     const key = readVarint(buf, offset);
     offset = key.offset;
-    const fieldNo = Math.floor(key.value / 8);
-    const wire = key.value & 7;
+    const keyNumber = bigintToSafeNumber(key.value);
+    if (keyNumber === null || keyNumber <= 0) throw new Error(`invalid protobuf key near offset ${offset}`);
+    const fieldNo = keyNumber >>> 3;
+    const wire = keyNumber & 7;
     let value;
     if (wire === 0) {
       const v = readVarint(buf, offset);
@@ -76,9 +84,10 @@ function parseMessage(buf) {
     } else if (wire === 2) {
       const len = readVarint(buf, offset);
       offset = len.offset;
-      if (offset + len.value > buf.length) throw new Error('truncated length-delimited field');
-      value = buf.subarray(offset, offset + len.value);
-      offset += len.value;
+      const length = bigintToSafeNumber(len.value);
+      if (length === null || length < 0 || offset + length > buf.length) throw new Error('truncated length-delimited field');
+      value = buf.subarray(offset, offset + length);
+      offset += length;
     } else if (wire === 5) {
       if (offset + 4 > buf.length) throw new Error('truncated fixed32');
       value = buf.subarray(offset, offset + 4);
@@ -110,7 +119,9 @@ function parseLengthPrefixedRecords(bytes) {
 function scalarInt(fields, no, fallback = 0) {
   const entries = fields.get(no) || [];
   const entry = entries.find((x) => x.wire === 0);
-  return entry ? entry.value : fallback;
+  if (!entry) return fallback;
+  const value = bigintToSafeNumber(entry.value);
+  return value === null ? fallback : value;
 }
 
 function stringValue(fields, no) {
@@ -124,7 +135,9 @@ function packedVarints(bytes) {
   let offset = 0;
   while (offset < bytes.length) {
     const v = readVarint(bytes, offset);
-    out.push(v.value);
+    const value = bigintToSafeNumber(v.value);
+    if (value === null) throw new Error('packed varint exceeds Number.MAX_SAFE_INTEGER');
+    out.push(value);
     offset = v.offset;
   }
   return out;
@@ -133,7 +146,10 @@ function packedVarints(bytes) {
 function repeatedInts(fields, no) {
   const out = [];
   for (const entry of fields.get(no) || []) {
-    if (entry.wire === 0) out.push(entry.value);
+    if (entry.wire === 0) {
+      const value = bigintToSafeNumber(entry.value);
+      if (value !== null) out.push(value);
+    }
     if (entry.wire === 2) out.push(...packedVarints(entry.value));
   }
   return out;
@@ -240,7 +256,8 @@ function main() {
     });
   }
 
-  const leon = heroRows.find((x) => x.heroId === 6) || null;
+  const fixtureIds = new Set([6, 14, 16]);
+  const fixtures = heroRows.filter((x) => fixtureIds.has(x.heroId));
   const result = {
     version: 1,
     status: relationErrors.length ? 'REVIEW' : 'PASS',
@@ -260,7 +277,7 @@ function main() {
     propertyModifyTypeLookup: propertyHealth.status === 'usable'
       ? 'ConfigDataPropertyModifyInfo is usable; a later revision may attach enum labels.'
       : 'ConfigDataPropertyModifyInfo is not structurally usable, so numeric PropertyModifyType IDs are preserved without guessed labels.',
-    leonFixture: leon,
+    fixtures,
     heroCount: heroRows.length,
     heroes: heroRows,
     evidenceNote: 'dump.cs shows JobInfo.Property1-3 and the job-mastery UI method SetMasterRewardProperty(PropertyModifyType,int). This file only extracts those stored rewards and HeroInfo star-correction arrays; it does not claim the exact runtime rounding/order.',
