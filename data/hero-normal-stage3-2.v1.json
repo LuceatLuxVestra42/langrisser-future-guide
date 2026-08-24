@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "stage": "3-2",
+  "status": "source-blocked",
+  "primaryKey": "heroId",
+  "canonicalHeroFile": "data/hero-name-master.v1.json",
+  "temporaryNameOverrides": [
+    {
+      "heroId": 99164,
+      "nameCn": "维尔纳",
+      "canonicalCurrentNameKr": "베르너",
+      "effectiveNameKr": "베르너 폰 에길",
+      "reason": "Canonical Korean-name source correction is pending; use this only as a downstream display/name-resolution override.",
+      "expiresWhen": "The canonical Korean-name source and hero-name-master are corrected."
+    }
+  ],
+  "scope": {
+    "include": [
+      "normal hero jobs",
+      "normal job tree",
+      "normal hero skills",
+      "normal-job talent skill links explicitly exposed by ConfigData"
+    ],
+    "exclude": [
+      "SP jobs",
+      "SP skills",
+      "SP missions"
+    ]
+  },
+  "joinContract": {
+    "heroInfo": {
+      "id": 2,
+      "name": 3,
+      "nameEn": 7,
+      "useable": 10,
+      "rank": 13,
+      "skillIds": 19,
+      "hiddenSkillIds": 20
+    },
+    "jobInfo": {
+      "id": 2,
+      "name": 3,
+      "desc": 5,
+      "nameEn": 7,
+      "rank": 8,
+      "unlockText": 11,
+      "armyId": 12,
+      "iconPath": 32
+    },
+    "jobConnectionInfo": {
+      "id": 2,
+      "jobId": 6,
+      "jobLevelIds": 7,
+      "talentSkillIds": 8,
+      "uiSort": 9,
+      "isRecommend": 11
+    },
+    "skillInfo": {
+      "id": 2,
+      "name": 3,
+      "desc": 5,
+      "iconPath": 71,
+      "displayType": 73,
+      "cooldown": 74,
+      "range": 75,
+      "areaOrTarget": 76
+    }
+  },
+  "sourceHealth": [
+    {
+      "file": "ConfigDataHeroInfo.json",
+      "status": "usable"
+    },
+    {
+      "file": "ConfigDataJobInfo.json",
+      "status": "broken",
+      "reason": "Invalid TextAsset metadata and empty m_bytes in the repository export."
+    },
+    {
+      "file": "ConfigDataJobConnectionInfo.json",
+      "status": "broken",
+      "reason": "m_size is populated but m_bytes is null."
+    },
+    {
+      "file": "ConfigDataJobLevelInfo.json",
+      "status": "broken",
+      "reason": "Negative m_size and null m_bytes in the repository export."
+    },
+    {
+      "file": "ConfigDataSkillInfo.json",
+      "status": "broken",
+      "reason": "m_size is populated but m_bytes is null."
+    }
+  ],
+  "blockedOn": [
+    "Valid individual export of ConfigDataJobInfo",
+    "Valid individual export of ConfigDataJobConnectionInfo",
+    "Valid individual export of ConfigDataJobLevelInfo",
+    "Valid individual export of ConfigDataSkillInfo",
+    "Final verification of the exact HeroInfo-to-JobConnection relation field and JobLevel-to-Skill acquisition relation before normalized output"
+  ],
+  "completionRule": "Do not emit complete normalized normal-job data until all required sources pass structural preflight and relation fields are verified against representative heroes.",
+  "notes": [
+    "heroId remains the only canonical join key.",
+    "The 99164 Korean-name override is temporary and must not mutate the canonical source before the user uploads the corrected source.",
+    "Known field numbers are recorded as a parsing contract, not as permission to infer unresolved relationship fields by numeric pattern."
+  ]
+}
