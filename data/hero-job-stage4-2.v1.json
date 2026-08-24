@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "stage": "4-2",
+  "status": "pipeline-ready-source-blocked",
+  "purpose": "Resolve playable HeroInfo records to their explicit JobConnection references and then to JobInfo records without guessing from names or numeric patterns.",
+  "primaryKey": "heroId",
+  "canonicalHeroFile": "data/hero-name-master.v1.json",
+  "requiredSources": [
+    "ConfigDataHeroInfo.json",
+    "ConfigDataJobConnectionInfo.json",
+    "ConfigDataJobInfo.json"
+  ],
+  "relationContract": {
+    "heroInfo": {
+      "id": 2,
+      "useable": 10,
+      "jobConnectionId": 32,
+      "useableJobConnectionIds": 33
+    },
+    "jobConnectionInfo": {
+      "id": 2,
+      "jobId": 6,
+      "jobLevelIds": 7,
+      "talentSkillIds": 8,
+      "uiSort": 9,
+      "isRecommend": 11
+    },
+    "jobInfo": {
+      "id": 2,
+      "name": 3,
+      "nameEn": 7,
+      "rank": 8
+    }
+  },
+  "fieldEvidence": {
+    "heroInfo": "dump.cs explicitly defines ConfigDataHeroInfo.JobConnection_IDFieldNumber=32 and UseableJobConnections_IDFieldNumber=33.",
+    "jobConnectionInfo": "dump.cs explicitly defines ConfigDataJobConnectionInfo.IDFieldNumber=2, Job_IDFieldNumber=6, JobLevels_IDFieldNumber=7, TalentSkill_IDsFieldNumber=8, UISortFieldNumber=9 and IsRecommendFieldNumber=11.",
+    "interpretation": "These are explicit protobuf field names. No relationship is inferred from ID ranges or display names."
+  },
+  "output": {
+    "generated": "data/generated/hero-job-links.v1.json",
+    "summary": "data/validation/hero-job-stage4-2-summary.v1.json"
+  },
+  "normalizationRules": [
+    "Use heroId as the canonical hero key.",
+    "Preserve HeroInfo.JobConnection_ID as primaryJobConnectionId.",
+    "Preserve HeroInfo.UseableJobConnections_ID as useableJobConnectionIds.",
+    "Create the combined connection list only by deduplicating those two explicit sources.",
+    "Resolve every referenced JobConnection ID against ConfigDataJobConnectionInfo.",
+    "Resolve every JobConnection.Job_ID against ConfigDataJobInfo.",
+    "Do not use job names as unique keys because early/shared class names may collide across heroes.",
+    "Do not infer missing JobConnection IDs from neighboring IDs, UISort, Job rank, or known wiki layouts."
+  ],
+  "validationPolicy": {
+    "SOURCE_BLOCKED": [
+      "Any required TextAsset is missing, has invalid metadata, or has no usable m_bytes payload."
+    ],
+    "FAIL": [
+      "A canonical playable hero is missing from usable HeroInfo.",
+      "A usable HeroInfo hero is missing from the canonical hero master.",
+      "A referenced JobConnection ID does not exist.",
+      "A JobConnection.Job_ID does not exist in JobInfo.",
+      "Duplicate IDs exist in HeroInfo, JobConnectionInfo, or JobInfo."
+    ],
+    "REVIEW": [
+      "A canonical hero has no primary or useable JobConnection reference after source parsing; preserve the record for manual edge-case review instead of inventing a relation."
+    ],
+    "PASS": [
+      "All canonical heroes match usable HeroInfo and every explicit Hero→JobConnection→Job reference resolves without hard relation errors."
+    ]
+  },
+  "currentSourceState": {
+    "ConfigDataHeroInfo.json": "usable",
+    "ConfigDataJobConnectionInfo.json": "broken: m_bytes=null",
+    "ConfigDataJobInfo.json": "broken: invalid metadata and empty m_bytes"
+  },
+  "completionRule": "After valid JobConnectionInfo and JobInfo TextAsset exports replace the broken repository files, run npm run inspect:hero-jobs. The script performs structural preflight first and only emits resolved hero-job records when all required sources are readable.",
+  "nextStage": "4-3 reconstruct the ordered job tree using resolved JobConnection and JobLevel relations."
+}
