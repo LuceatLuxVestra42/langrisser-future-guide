@@ -18,13 +18,13 @@
   ],
   "verifiedRelations": {
     "awakening": {
-      "status": "RELATION_VERIFIED_SOURCE_BLOCKED",
+      "status": "VERIFIED",
       "heroInfoAwakenIdField": 50,
       "awakenInfoIdField": 2,
       "awakenInfoLevel2SkillIdField": 9,
       "skillInfoIdField": 2,
       "path": "HeroInfo.Awaken_ID -> AwakenInfo.ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID",
-      "evidence": "dump.cs explicitly names HeroInfo.Awaken_ID field 50 and ConfigDataAwakenInfo.Level2SkillID field 9. The current ConfigDataAwakenInfo TextAsset payload is still broken, so the relation is verified but per-hero awakening skills cannot yet be resolved."
+      "evidence": "dump.cs explicitly names HeroInfo.Awaken_ID field 50 and ConfigDataAwakenInfo.Level2SkillID field 9. The restored ConfigDataAwakenInfo payload passes structural preflight and is now used to resolve per-hero awakening skills."
     },
     "jobLevelStatComponents": {
       "status": "RAW_COMPONENT_FIELDS_VERIFIED",
@@ -53,8 +53,8 @@
   "semanticGates": [
     {
       "id": "awakeningClassification",
-      "status": "RELATION_VERIFIED_SOURCE_BLOCKED",
-      "requiredEvidence": "Restore a structurally valid ConfigDataAwakenInfo payload and resolve each nonzero HeroInfo.Awaken_ID through Level2SkillID to SkillInfo."
+      "status": "VERIFIED",
+      "requiredEvidence": "ConfigDataAwakenInfo is structurally usable and each nonzero HeroInfo.Awaken_ID can be resolved through AwakenInfo.Level2SkillID to SkillInfo."
     },
     {
       "id": "displayJobStats",
@@ -84,7 +84,7 @@
     "Emit partial records for all upstream heroes when required sources are healthy even if final display semantics remain blocked.",
     "Attach the twelve verified JobLevelInfo INI/UP fields as raw stat components only; never label them final display stats.",
     "Preserve Stage 4-4 connectionTalentSkills as the verified talent reference set; do not assign star-rank labels until the selection rule is verified.",
-    "Read HeroInfo.Awaken_ID directly. Resolve its awakening skill only when ConfigDataAwakenInfo passes structural preflight.",
+    "Read HeroInfo.Awaken_ID directly and resolve the awakening skill through the restored ConfigDataAwakenInfo payload.",
     "Do not infer awakening from skill ID, name, cost, job rank, or wiki order.",
     "Do not substitute SoldierInfo/TrainingTech values for hero soldier modifiers.",
     "Keep unresolved final fields null with a component status and evidence note instead of suppressing the entire 267-hero record set."
@@ -94,16 +94,16 @@
       "Stage 4-3 or Stage 4-4 is missing or has a status other than PASS/REVIEW."
     ],
     "SOURCE_BLOCKED": [
-      "Any required source is missing or structurally invalid. Optional ConfigDataAwakenInfo failure does not suppress otherwise valid partial records."
+      "Any required source is missing or structurally invalid."
     ],
     "FAIL": [
       "Stage 4-3 and Stage 4-4 hero sets disagree.",
       "A Stage 4-3 JobLevel ID is missing from the restored JobLevelInfo source.",
-      "A nonzero awakening relation resolves to a missing AwakenInfo/SkillInfo record once AwakenInfo is healthy.",
+      "A nonzero awakening relation resolves to a missing AwakenInfo/SkillInfo record.",
       "Duplicate IDs make a verified relation ambiguous."
     ],
     "SEMANTIC_BLOCKED": [
-      "Partial records are generated, but one or more final-display semantic gates remain unresolved or the optional AwakenInfo source remains unavailable."
+      "Partial records are generated, but one or more final-display semantic gates remain unresolved."
     ],
     "PASS": [
       "267 basic-combat records are generated and every final-display semantic gate is verified and populated without inferred relationships."
@@ -119,9 +119,9 @@
     "ConfigDataHeroInfo.json": "usable",
     "ConfigDataJobLevelInfo.json": "usable",
     "ConfigDataSkillInfo.json": "usable",
-    "ConfigDataAwakenInfo.json": "broken: empty m_Name, implausible m_size, m_bytes=null"
+    "ConfigDataAwakenInfo.json": "usable: 283 parsed records"
   },
   "stage4CompletionRule": "Stage 4 is data-complete only when Stage 4-5 returns PASS. A 267-record SEMANTIC_BLOCKED output is a valid partial reconstruction, not final page-ready combat data.",
-  "completionRule": "Run npm run inspect:hero-combat. Restore ConfigDataAwakenInfo and separately verify the final-stat, soldier-modifier and talent-star selection rules before promoting Stage 4-5 to PASS.",
+  "completionRule": "Run npm run inspect:hero-combat. Awakening is now source-verified; separately verify the final-stat, soldier-modifier and talent-star selection rules before promoting Stage 4-5 to PASS.",
   "nextStage": "5-1 bond data can be implemented in parallel, but Stage 6 must not treat Stage 4 as data-complete until Stage 4-5 PASS."
 }
