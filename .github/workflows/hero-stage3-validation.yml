@@ -22,6 +22,9 @@ on:
       - 'data/configdata/ConfigDataMissionInfo.json'
       - '.github/workflows/hero-stage3-validation.yml'
 
+permissions:
+  contents: write
+
 jobs:
   validate-hero-stage3:
     runs-on: ubuntu-latest
@@ -31,4 +34,34 @@ jobs:
         with:
           node-version: '22'
       - name: Run final stage 3 automatic validation
-        run: node scripts/validate_hero_stage3_final.cjs
+        id: validate
+        shell: bash
+        run: |
+          set +e
+          node scripts/validate_hero_stage3_final.cjs > /tmp/hero-stage3-validation.log 2>&1
+          code=$?
+          cat /tmp/hero-stage3-validation.log
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -eq 0 ]; then
+            status=PASS
+          else
+            status=FAIL
+          fi
+          mkdir -p data/validation
+          cp /tmp/hero-stage3-validation.log data/validation/hero-stage3-automation.log
+          printf '{\n  "version": 1,\n  "stage": "3",\n  "status": "%s",\n  "exitCode": %s,\n  "validatedCommit": "%s",\n  "workflowRunId": "%s"\n}\n' "$status" "$code" "$GITHUB_SHA" "$GITHUB_RUN_ID" > data/validation/hero-stage3-automation-result.json
+      - name: Persist validation result
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/hero-stage3-automation.log data/validation/hero-stage3-automation-result.json
+          if git diff --cached --quiet; then
+            echo "No validation result changes to commit."
+          else
+            git commit -m "record hero stage 3 automatic validation"
+            git push
+          fi
+      - name: Enforce validation result
+        if: steps.validate.outputs.exit_code != '0'
+        run: exit 1
