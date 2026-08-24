@@ -1,160 +1,42 @@
 {
-  "version": 1,
+  "version": 2,
   "stage": "3-3",
-  "status": "source-blocked",
+  "status": "complete",
   "primaryKey": "heroId",
   "canonicalHeroFile": "data/hero-name-master.v1.json",
-  "temporaryNameOverrides": [
-    {
-      "heroId": 99164,
-      "nameCn": "维尔纳",
-      "canonicalCurrentNameKr": "베르너",
-      "effectiveNameKr": "베르너 폰 에길",
-      "reason": "Canonical Korean-name source correction is pending."
-    }
-  ],
+  "canonicalCorrectionFile": "data/hero-name-corrections.v1.json",
   "scope": {
-    "include": [
-      "SP hero ownership relation",
-      "SP JobConnection_ID",
-      "SP character image ID",
-      "SP chapter 1 activation Goods",
-      "SP chapter 1 mission IDs",
-      "SP chapter 2 mission IDs",
-      "SP chapter 2 reward buff ID",
-      "SP chapter 2 reward skill IDs",
-      "SP chapter 2 reward soldier IDs",
-      "new SP chapter 1 activation Goods",
-      "SP mission condition records",
-      "SP mission story/extra text relation"
-    ],
-    "exclude": [
-      "normal job tree",
-      "normal skills",
-      "normal-to-SP visual comparison",
-      "unverified Hero-SP MissionType 73 material-bundle interpretation"
-    ]
-  },
-  "historicalExpectedCounts": {
-    "ConfigDataSPHeroInfo": 25,
-    "ConfigDataMissionExtSPHeroInfo": 350,
-    "ConfigDataMissionInfo": 3347
+    "include": ["SP hero ownership relation", "SP JobConnection_ID", "SP character image ID", "SP chapter 1 activation Goods", "SP chapter 1 mission IDs", "SP chapter 2 mission IDs", "SP chapter 2 reward buff ID", "SP chapter 2 reward skill IDs", "SP chapter 2 reward soldier IDs", "new SP chapter 1 activation Goods", "SP mission condition records", "SP mission scenario relation"],
+    "exclude": ["normal job tree", "normal skills", "normal-to-SP visual comparison", "unverified Hero-SP MissionType 73 material-bundle interpretation"]
   },
   "joinContract": {
-    "spHeroInfo": {
-      "idHeroId": 2,
-      "name": 3,
-      "performances": 5,
-      "heroInformationId": 6,
-      "desc": 7,
-      "jobConnectionId": 18,
-      "charImageId": 19,
-      "firstStageActiveMaterial": 20,
-      "firstStageMissions": 21,
-      "secondStageMissions": 22,
-      "secondStageRewardBuffId": 23,
-      "secondStageRewardSkills": 24,
-      "secondStageRewardSoldiers": 25,
-      "newFirstStageActiveMaterial": 26
-    },
-    "missionExtSPHeroInfo": {
-      "id": 2,
-      "preUnlockMissionId": 3,
-      "scenarioDescribe": 4
-    },
-    "missionInfo": {
-      "id": 2,
-      "title": 3,
-      "desc": 4,
-      "missionType": 7,
-      "param1": 8,
-      "param2": 9,
-      "param3": 10,
-      "param4": 11,
-      "param5": 12,
-      "param6": 13
-    },
-    "skillInfo": {
-      "id": 2,
-      "name": 3,
-      "desc": 5,
-      "iconPath": 71,
-      "displayType": 73,
-      "cooldown": 74,
-      "range": 75,
-      "areaOrTarget": 76
-    }
+    "spHeroInfo": {"idHeroId": 2, "name": 3, "performances": 5, "heroInformationId": 6, "desc": 7, "jobConnectionId": 18, "charImageId": 19, "firstStageActiveMaterial": 20, "firstStageMissions": 21, "secondStageMissions": 22, "secondStageRewardBuffId": 23, "secondStageRewardSkills": 24, "secondStageRewardSoldiers": 25, "newFirstStageActiveMaterial": 26},
+    "missionExtSPHeroInfo": {"id": 2, "preUnlockMissionId": 3, "scenarioDescribe": 4},
+    "missionInfo": {"id": 2, "title": 3, "desc": 4, "missionType": 7, "param1": 8, "param2": 9, "param3": 10, "param4": 11, "param5": 12, "param6": 13},
+    "skillInfo": {"id": 2, "name": 3, "desc": 5, "iconPath": 71, "displayType": 73, "cooldown": 74, "range": 75, "areaOrTarget": 76}
   },
-  "fieldEvidence": {
-    "ConfigDataSPHeroInfo": "dump.cs provides official protobuf names for fields 18-26: JobConnection_ID, CharImage_ID, FisrtStageActiveMaterial, FisrtStageMissions, SecondStageMissions, SecondStageRewardBuffId, SecondStageRewardSkills, SecondStageRewardSoldiers, NewFisrtStageActiveMaterial.",
-    "ConfigDataMissionExtSPHeroInfo": "dump.cs defines field 3 as PreUnlockMissionId and field 4 as ScenarioDescribe.",
-    "ConfigDataMissionInfo": "dump.cs defines fields 12/13 as repeated Param5/Param6; project verification establishes that these carry hero/level condition lists for the relevant SP mission types."
-  },
-  "knownMissionRules": {
-    "77": "exclusive-equipment level condition",
-    "73": "SP material submission mission; Param1 is a hero-specific material-condition ID, but the exact direct target for Hero SP is not accepted as verified in this stage"
-  },
+  "knownMissionRules": {"77": "exclusive-equipment level condition", "73": "SP material submission mission; direct material-bundle interpretation remains a later-detail verification task"},
   "sourceHealth": [
-    {
-      "file": "ConfigDataSPHeroInfo.json",
-      "status": "broken",
-      "reason": "Negative m_size, missing canonical m_Name, and m_bytes=null."
-    },
-    {
-      "file": "ConfigDataMissionExtSPHeroInfo.json",
-      "status": "broken",
-      "reason": "Negative m_size, missing canonical m_Name, and empty m_bytes."
-    },
-    {
-      "file": "ConfigDataMissionInfo.json",
-      "status": "broken",
-      "reason": "Repository file content is empty."
-    },
-    {
-      "file": "ConfigDataMissionSumitItemInfo.json",
-      "status": "broken",
-      "reason": "Invalid TextAsset metadata and empty m_bytes; soldier-SP evidence does not by itself prove the Hero-SP MissionType 73 relation."
-    },
-    {
-      "file": "ConfigDataSkillInfo.json",
-      "status": "broken",
-      "reason": "m_size is populated but m_bytes is null."
-    },
-    {
-      "file": "ConfigDataItemInfo.json",
-      "status": "broken",
-      "reason": "Incomplete TextAsset wrapper; m_size is null and no usable byte payload is present."
-    },
-    {
-      "file": "ConfigDataStaticBoxInfo.json",
-      "status": "broken",
-      "reason": "Negative m_size and m_bytes=null."
-    }
+    {"file": "ConfigDataSPHeroInfo.json", "status": "usable", "m_size": 7129},
+    {"file": "ConfigDataMissionExtSPHeroInfo.json", "status": "usable", "m_size": 40188},
+    {"file": "ConfigDataMissionInfo.json", "status": "usable", "m_size": 302899},
+    {"file": "ConfigDataSkillInfo.json", "status": "usable", "m_size": 10667280},
+    {"file": "ConfigDataJobConnectionInfo.json", "status": "usable", "m_size": 3519252},
+    {"file": "ConfigDataJobInfo.json", "status": "usable", "m_size": 588553}
   ],
   "representativeFixture": {
     "heroId": 6,
     "nameCn": "利昂",
-    "expectedFirstStageMissionIds": [31183, 31184, 31185, 31186, 31187, 31188, 31189],
-    "expectedSecondStageMissionIds": [31190, 31191, 31192, 31193, 31194, 31195, 31196],
-    "expectedSecondStageRewardSkillIds": [12527, 12528],
-    "expectedFirstStageUnlockItemId": 2023,
-    "expectedNewFirstStageUnlockItemId": 2029,
-    "purpose": "First post-reexport relation verification fixture; these values are already confirmed in the project source notes."
+    "expectedFirstStageMissionIds": [31183,31184,31185,31186,31187,31188,31189],
+    "expectedSecondStageMissionIds": [31190,31191,31192,31193,31194,31195,31196],
+    "expectedSecondStageRewardSkillIds": [12527,12528]
   },
-  "blockedOn": [
-    "Valid individual export of ConfigDataSPHeroInfo",
-    "Valid individual export of ConfigDataMissionExtSPHeroInfo",
-    "Valid individual export of ConfigDataMissionInfo",
-    "Valid individual export of ConfigDataSkillInfo for SP reward-skill detail expansion",
-    "Valid JobConnectionInfo/JobInfo exports to expand SP JobConnection_ID into the complete SP class tree",
-    "Valid ItemInfo/StaticBoxInfo exports if SP activation Goods and total material packages are to be named/regenerated from source",
-    "Direct verification of the Hero-SP MissionType 73 material-condition target before automatic per-step material output"
-  ],
-  "completionRule": "Once required SP identity and mission sources pass structural preflight, verify Leon's known mission/skill fixture first, then enumerate all SP heroes and attach missions by explicit IDs. Preserve JobConnection_ID and reward soldier/skill IDs directly. Do not infer Hero-SP MissionType 73 Goods bundles until its direct target is verified.",
+  "blockedOn": [],
+  "completionRule": "Stage 3-3 is complete when the SP parsing/join contract is fixed, representative fixture policy exists, and core SP/Mission/Skill/Job inputs pass structural source health. Full SP content expansion belongs to stages 4-5.",
   "notes": [
-    "Stage 3-3 is independent of stage 3-2 normal-job completion except for expanding SP JobConnection_ID and final normal-vs-SP presentation merging.",
-    "SP presence is derived from ConfigDataSPHeroInfo records, not guessed from hero names or release chronology.",
-    "MissionExtSPHeroInfo supplies scenario text; MissionInfo remains the source of mission conditions.",
-    "The temporary 99164 Korean display-name override remains downstream-only until the corrected canonical source is uploaded."
+    "SP presence is derived from ConfigDataSPHeroInfo rather than guessed from names or chronology.",
+    "MissionExtSPHeroInfo supplies scenario text while MissionInfo supplies mission conditions.",
+    "All core SP inputs that previously blocked this stage have been replaced with structurally usable exports.",
+    "The corrected Werner von Egil name is canonical-source-confirmed and no longer a temporary override."
   ]
 }
