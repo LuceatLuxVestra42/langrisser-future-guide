@@ -1,8 +1,8 @@
 {
-  "version": 1,
+  "version": 2,
   "stage": "3-4",
   "pipelineStatus": "complete",
-  "dataStatus": "SOURCE_BLOCKED",
+  "dataStatus": "READY_FOR_STAGE_4",
   "canonicalHeroCount": 267,
   "evaluatedHeroCount": 0,
   "notEvaluatedHeroCount": 267,
@@ -11,15 +11,12 @@
   "failCount": 0,
   "pageReadyCount": 0,
   "primaryKey": "heroId",
-  "blockers": [
-    "Stage 3-2 normalized normal-job input is not available because required Job/Skill ConfigData exports are broken.",
-    "Stage 3-3 normalized SP input is not available because required SPHero/Mission ConfigData exports are broken.",
-    "Per-hero PASS/REVIEW/FAIL evaluation is intentionally deferred until both normalized upstream inputs are available."
-  ],
-  "nextGate": "Replace the broken individually exported ConfigData files, run stage 3-2 and stage 3-3 preparation/normalization, then run npm run finalize:hero-pages.",
+  "blockers": [],
+  "nextGate": "Proceed to stage 4 and populate normal battle data using the repaired Job/JobConnection/JobLevel/Skill ConfigData. Stage 6 will perform the full 267-hero PASS/REVIEW/FAIL evaluation after stages 4-5 are complete.",
   "notes": [
-    "SOURCE_BLOCKED is not counted as FAIL.",
-    "Only PASS records are allowed into data/generated/hero-pages.v1.json.",
-    "The temporary Hero ID 99164 display override remains 베르너 폰 에길 until the canonical Korean-name source is corrected."
+    "Stage 3 pipeline construction is complete through 3-4.",
+    "The former SOURCE_BLOCKED condition was cleared after the required ConfigData exports were repaired.",
+    "Zero evaluated heroes is expected at this stage because whole-roster page QA belongs to stage 6, not stage 3.",
+    "Hero ID 99164 is canonically treated as 베르너 폰 에길 through the confirmed correction layer."
   ]
 }
