@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "stage": "3-12",
+  "status": "PASS",
+  "generatedAt": "2026-08-24T13:18:14.726Z",
+  "counts": {
+    "soldierRecords": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "heroRecords": 267,
+    "finalEdges": 5977,
+    "baseEdges": 5720,
+    "directSpHeroAddedEdges": 25,
+    "inheritedSpHeroAddedEdges": 5,
+    "spExpandedEdges": 228,
+    "soldiersWithNoHeroes": 0,
+    "heroesWithNoSoldiers": 0
+  },
+  "checks": {
+    "missingHeroIds": 0,
+    "missingSoldierMasterIds": 0,
+    "missingSpRelations": 0,
+    "spBaseInheritanceMismatch": 0,
+    "spAddedInheritanceMismatch": 0,
+    "missingHeroToSoldierEdges": 0,
+    "missingSoldierToHeroEdges": 0,
+    "duplicateSoldierRows": 0,
+    "duplicateHeroRows": 0
+  },
+  "policy": {
+    "3-5": "Base relation comes from Normal SoldierInfo.GetSoldierHeros_ID; SP Soldier inherits the Normal base list.",
+    "3-6": "SPHeroInfo.SecondStageRewardSoldiers adds Hero -> Soldier edges; the reverse Soldier -> Hero edge is inherited by the SP form through its Normal relation.",
+    "3-7": "Normal <-> SP relation comes only from SPSoldierInfo.NormalSoliderId <-> ID.",
+    "3-11": "SecondStageExpandHeroList adds only newly expanded heroes to the SP Soldier.",
+    "3-12": "Final relation is a set union with provenance preserved, then reversed to build Hero -> Soldier."
+  },
+  "errors": [],
+  "reviews": []
+}
