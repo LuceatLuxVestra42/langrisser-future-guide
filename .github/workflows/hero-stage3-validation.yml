@@ -10,6 +10,7 @@ on:
       - 'scripts/prepare_hero_skill_acquisition_stage44.cjs'
       - 'scripts/prepare_hero_basic_combat_stage45.cjs'
       - 'scripts/investigate_hero_display_stats.cjs'
+      - 'scripts/inspect_parsed_configdata_schema.cjs'
       - 'data/hero-name-master.v1.json'
       - 'data/hero-name-corrections.v1.json'
       - 'data/hero-master-stage3-1.v1.json'
@@ -40,6 +41,7 @@ on:
       - 'scripts/prepare_hero_skill_acquisition_stage44.cjs'
       - 'scripts/prepare_hero_basic_combat_stage45.cjs'
       - 'scripts/investigate_hero_display_stats.cjs'
+      - 'scripts/inspect_parsed_configdata_schema.cjs'
       - 'data/hero-name-master.v1.json'
       - 'data/hero-name-corrections.v1.json'
       - 'data/hero-master-stage3-1.v1.json'
@@ -72,6 +74,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Inspect parsed ConfigData schema
+        run: node scripts/inspect_parsed_configdata_schema.cjs
       - name: Run final stage 3 automatic validation
         run: node scripts/validate_hero_stage3_final.cjs
 
