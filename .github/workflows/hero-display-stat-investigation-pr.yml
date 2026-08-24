@@ -1,0 +1,29 @@
+name: Hero display stat investigation PR
+
+on:
+  pull_request:
+    paths:
+      - 'data/validation/hero-stage3-validation-trigger.txt'
+      - 'scripts/investigate_hero_display_stats.cjs'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataJobInfo.json'
+      - 'data/generated/hero-job-links.v1.json'
+      - '.github/workflows/hero-display-stat-investigation-pr.yml'
+  workflow_dispatch:
+
+jobs:
+  investigate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run display-stat investigation
+        run: npm run investigate:hero-display-stats
+      - name: Upload investigation result
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-display-stat-investigation
+          path: data/validation/hero-display-stat-investigation.v1.json
+          if-no-files-found: error
