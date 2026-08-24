@@ -55,7 +55,7 @@
     "Stage 4-4 normal skill references/acquisition for 267 heroes",
     "JobLevelInfo raw INI/UP stat components fields 16-27",
     "JobConnection TalentSkill_IDs reference sets",
-    "HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID relation semantics"
+    "HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID relation semantics and restored payload"
   ],
   "unresolvedComponents": [
     "displayJobStats",
@@ -67,7 +67,7 @@
     {
       "id": "awakeningClassification",
       "status": "VERIFIED",
-      "requiredEvidence": "ConfigDataAwakenInfo is structurally usable and each nonzero HeroInfo.Awaken_ID can be resolved through AwakenInfo.Level2SkillID to SkillInfo."
+      "requiredEvidence": "Satisfied: ConfigDataAwakenInfo is structurally usable and each nonzero HeroInfo.Awaken_ID resolves through AwakenInfo.Level2SkillID to SkillInfo."
     },
     {
       "id": "displayJobStats",
@@ -91,6 +91,6 @@
     }
   ],
   "hardErrors": [],
-  "safetyDecision": "267 partial basic-combat records are emitted because their verified relations are useful. Final display stats, soldier modifiers, talent star-rank selection, and unavailable awakening payload data remain null/status-tagged rather than inferred.",
-  "nextGate": "Restore ConfigDataAwakenInfo and verify HeroPropertyComputer display-stat/soldier-modifier formulas plus the talent star-selection rule before Stage 4 can be marked data-complete."
+  "safetyDecision": "267 partial basic-combat records are emitted because their verified relations are useful. Awakening data is now source-verified; final display stats, soldier modifiers, and talent star-rank selection remain null/status-tagged rather than inferred.",
+  "nextGate": "Verify the HeroPropertyComputer display-stat formula, the hero soldier-modifier source/formula, and the talent star-selection rule before Stage 4 can be marked data-complete."
 }
