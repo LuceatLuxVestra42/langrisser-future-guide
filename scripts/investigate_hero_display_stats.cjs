@@ -62,6 +62,11 @@ function bigintToSafeNumber(value) {
   return Number(value);
 }
 
+function int32Number(value) {
+  if (typeof value !== 'bigint') return null;
+  return Number(BigInt.asIntN(32, value));
+}
+
 function parseMessage(buf) {
   const fields = new Map();
   let offset = 0;
@@ -120,7 +125,7 @@ function scalarInt(fields, no, fallback = 0) {
   const entries = fields.get(no) || [];
   const entry = entries.find((x) => x.wire === 0);
   if (!entry) return fallback;
-  const value = bigintToSafeNumber(entry.value);
+  const value = int32Number(entry.value);
   return value === null ? fallback : value;
 }
 
@@ -135,8 +140,8 @@ function packedVarints(bytes) {
   let offset = 0;
   while (offset < bytes.length) {
     const v = readVarint(bytes, offset);
-    const value = bigintToSafeNumber(v.value);
-    if (value === null) throw new Error('packed varint exceeds Number.MAX_SAFE_INTEGER');
+    const value = int32Number(v.value);
+    if (value === null) throw new Error('packed varint is not an int32');
     out.push(value);
     offset = v.offset;
   }
@@ -147,7 +152,7 @@ function repeatedInts(fields, no) {
   const out = [];
   for (const entry of fields.get(no) || []) {
     if (entry.wire === 0) {
-      const value = bigintToSafeNumber(entry.value);
+      const value = int32Number(entry.value);
       if (value !== null) out.push(value);
     }
     if (entry.wire === 2) out.push(...packedVarints(entry.value));
