@@ -11,9 +11,11 @@ on:
       - 'data/configdata/ConfigDataMissionInfo.json'
       - 'data/configdata/ConfigDataMissionSumitItemInfo.json'
       - 'data/configdata/ConfigDataSPHeroInfo.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/generated/soldier-master.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'scripts/finalize-soldier-stage3.cjs'
+      - 'scripts/diagnose-soldier-stage3.cjs'
       - '.github/workflows/soldier-stage3-final.yml'
   pull_request:
     paths:
@@ -24,9 +26,11 @@ on:
       - 'data/configdata/ConfigDataMissionInfo.json'
       - 'data/configdata/ConfigDataMissionSumitItemInfo.json'
       - 'data/configdata/ConfigDataSPHeroInfo.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/generated/soldier-master.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'scripts/finalize-soldier-stage3.cjs'
+      - 'scripts/diagnose-soldier-stage3.cjs'
       - '.github/workflows/soldier-stage3-final.yml'
 
 permissions:
@@ -42,6 +46,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Diagnose stage 3 review cases
+        run: node scripts/diagnose-soldier-stage3.cjs
       - name: Run soldier stage 3 validation
         run: node scripts/finalize-soldier-stage3.cjs
       - name: Upload soldier stage 3 outputs
@@ -62,5 +68,3 @@ jobs:
             git commit -m "generate soldier stage 3 final validation"
             git push origin HEAD:${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}
           fi
-
-# validation trigger
