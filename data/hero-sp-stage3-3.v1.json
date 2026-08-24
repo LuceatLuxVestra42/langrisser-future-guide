@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "stage": "3-3",
+  "status": "source-blocked",
+  "primaryKey": "heroId",
+  "canonicalHeroFile": "data/hero-name-master.v1.json",
+  "temporaryNameOverrides": [
+    {
+      "heroId": 99164,
+      "nameCn": "维尔纳",
+      "canonicalCurrentNameKr": "베르너",
+      "effectiveNameKr": "베르너 폰 에길",
+      "reason": "Canonical Korean-name source correction is pending."
+    }
+  ],
+  "scope": {
+    "include": [
+      "SP hero ownership relation",
+      "SP chapter 1 mission IDs",
+      "SP chapter 2 mission IDs",
+      "SP additional skill IDs",
+      "SP unlock item Goods references",
+      "SP mission condition records",
+      "SP mission story/extra text relation"
+    ],
+    "exclude": [
+      "normal job tree",
+      "normal skills",
+      "normal-to-SP visual comparison",
+      "unverified MissionType 73 material-bundle interpretation"
+    ]
+  },
+  "historicalExpectedCounts": {
+    "ConfigDataSPHeroInfo": 25,
+    "ConfigDataMissionExtSPHeroInfo": 350,
+    "ConfigDataMissionInfo": 3347
+  },
+  "joinContract": {
+    "spHeroInfo": {
+      "heroId": 2,
+      "name": 3,
+      "spIntro": 7,
+      "heroSpecificUnlockGoods": 20,
+      "chapter1MissionIds": 21,
+      "chapter2MissionIds": 22,
+      "additionalSkillIds": 24,
+      "genericUnlockGoods": 26
+    },
+    "missionExtSPHeroInfo": {
+      "id": 2,
+      "missionId": 3,
+      "storyText": 4
+    },
+    "missionInfo": {
+      "id": 2,
+      "name": 3,
+      "conditionText": 4,
+      "missionType": 7,
+      "param1": 8,
+      "param2": 9,
+      "heroIds": 12,
+      "levelIds": 13
+    },
+    "skillInfo": {
+      "id": 2,
+      "name": 3,
+      "desc": 5,
+      "iconPath": 71,
+      "displayType": 73,
+      "cooldown": 74,
+      "range": 75,
+      "areaOrTarget": 76
+    }
+  },
+  "knownMissionRules": {
+    "77": "exclusive-equipment level condition",
+    "73": "SP material submission mission; Param1 is a hero-specific material-condition ID, but the exact direct data target is not accepted as verified in this stage"
+  },
+  "sourceHealth": [
+    {
+      "file": "ConfigDataSPHeroInfo.json",
+      "status": "broken",
+      "reason": "Negative m_size, missing canonical m_Name, and m_bytes=null."
+    },
+    {
+      "file": "ConfigDataMissionExtSPHeroInfo.json",
+      "status": "broken",
+      "reason": "Negative m_size, missing canonical m_Name, and empty m_bytes."
+    },
+    {
+      "file": "ConfigDataMissionInfo.json",
+      "status": "broken",
+      "reason": "Repository file content is empty."
+    },
+    {
+      "file": "ConfigDataMissionSumitItemInfo.json",
+      "status": "broken",
+      "reason": "Invalid TextAsset metadata and empty m_bytes; also not treated as a verified Hero-SP MissionType 73 target without direct source verification."
+    },
+    {
+      "file": "ConfigDataSkillInfo.json",
+      "status": "broken",
+      "reason": "m_size is populated but m_bytes is null."
+    },
+    {
+      "file": "ConfigDataItemInfo.json",
+      "status": "broken",
+      "reason": "Incomplete TextAsset wrapper; m_size is null and no usable byte payload is present."
+    },
+    {
+      "file": "ConfigDataStaticBoxInfo.json",
+      "status": "broken",
+      "reason": "Negative m_size and m_bytes=null."
+    }
+  ],
+  "representativeFixture": {
+    "heroId": 6,
+    "nameCn": "利昂",
+    "expectedChapter1MissionIds": [31183, 31184, 31185, 31186, 31187, 31188, 31189],
+    "expectedChapter2MissionIds": [31190, 31191, 31192, 31193, 31194, 31195, 31196],
+    "expectedAdditionalSkillIds": [12527, 12528],
+    "expectedHeroSpecificUnlockItemId": 2023,
+    "expectedGenericUnlockItemId": 2029,
+    "purpose": "First post-reexport relation verification fixture; these values are already confirmed in the project source notes."
+  },
+  "blockedOn": [
+    "Valid individual export of ConfigDataSPHeroInfo",
+    "Valid individual export of ConfigDataMissionExtSPHeroInfo",
+    "Valid individual export of ConfigDataMissionInfo",
+    "Valid individual export of ConfigDataSkillInfo for SP skill detail expansion",
+    "Valid ItemInfo/StaticBoxInfo exports if total SP material packages are to be regenerated from source",
+    "Direct verification of the Hero-SP MissionType 73 material-condition target before automatic per-step material output"
+  ],
+  "completionRule": "Once required SP identity and mission sources pass structural preflight, verify Leon's known mission/skill fixture first, then enumerate all SP heroes and attach missions by explicit IDs. Do not infer MissionType 73 Goods bundles until its direct target is verified.",
+  "notes": [
+    "Stage 3-3 is independent of stage 3-2 normal-job completion except for final normal-vs-SP presentation merging.",
+    "SP presence is derived from ConfigDataSPHeroInfo records, not guessed from hero names or release chronology.",
+    "MissionExtSPHeroInfo supplies story/extra text; MissionInfo remains the source of mission conditions.",
+    "The temporary 99164 Korean display-name override remains downstream-only until the corrected canonical source is uploaded."
+  ]
+}
