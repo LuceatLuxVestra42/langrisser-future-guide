@@ -1,7 +1,7 @@
 {
-  "version": 2,
+  "version": 3,
   "stage": "3-4",
-  "status": "complete",
+  "status": "source-blocked",
   "purpose": "Final hero-detail integrity gate and page-ready output contract.",
   "primaryKey": "heroId",
   "canonicalHeroFile": "data/hero-name-master.v1.json",
@@ -39,7 +39,7 @@
     "PASS": [
       "heroId is unique and exists in the canonical hero master",
       "identity fields are present",
-      "required upstream normalized record exists once stages 4-5 populate it",
+      "required core ConfigData passes wrapper and full payload validation",
       "normal Job/Skill references contain no unresolved hard relation errors",
       "when SP exists, SP record resolves to the same canonical heroId and referenced SP missions exist"
     ],
@@ -49,6 +49,7 @@
       "Hero-SP MissionType 73 material-bundle detail remains unverified"
     ],
     "FAIL": [
+      "core ConfigData wrapper passes but full payload framing or parse validation fails",
       "duplicate heroId",
       "canonical hero reference is missing",
       "Job/Skill/Mission reference points to a missing record",
@@ -56,12 +57,16 @@
       "one hero receives multiple incompatible SP ownership records"
     ]
   },
-  "currentBlockers": [],
-  "completionRule": "Stage 3-4 is complete when the final output contract, PASS/REVIEW/FAIL policy, upstream stage boundaries and safe failure rules are fixed. Actual 267-hero page-data generation belongs to stage 6 after stages 4-5 populate battle and detail data.",
+  "currentBlockers": [
+    "ConfigDataHeroInfo fails full payload framing after 22 records at byte offset 7388; the failure region contains the foreign type name ConfigDataCrystalCardPoolGroupInfo.",
+    "ConfigDataMissionInfo fails full payload framing after 105 records at byte offset 8240.",
+    "Both files must be individually re-exported and the final automatic validation rerun before stage 3 is closed."
+  ],
+  "completionRule": "Stage 3-4 is complete only after the final automatic validator passes the canonical identity checks, core source full-payload checks and cross-table reference checks. Actual 267-hero page-data generation still belongs to stage 6 after stages 4-5 populate battle and detail data.",
   "notes": [
-    "The former SOURCE_BLOCKED state was cleared after required Job/Skill/SP/Mission ConfigData exports were repaired.",
+    "The output contract and PASS/REVIEW/FAIL policy remain valid; only the upstream source-readiness gate was reopened.",
     "heroId is the only canonical join key; Korean names are display values.",
     "The corrected heroId 99164 name is canonical-source-confirmed through data/hero-name-corrections.v1.json.",
-    "Stage 3 defines the pipeline and QA contract; it does not pre-empt stages 4-6 data population."
+    "The final automatic validation was necessary because wrapper-level integrity checks alone did not detect the latent payload problems."
   ]
 }
