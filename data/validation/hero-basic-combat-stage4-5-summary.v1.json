@@ -22,7 +22,7 @@
   "sourceRecordCounts": {
     "playableHeroInfo": 267,
     "jobLevelInfo": 7459,
-    "awakenInfo": 0
+    "awakenInfo": 283
   },
   "sourceHealth": [
     {
@@ -46,11 +46,8 @@
     {
       "filename": "ConfigDataAwakenInfo.json",
       "required": false,
-      "status": "broken",
-      "issues": [
-        "m_Name=\"\" expected=ConfigDataAwakenInfo",
-        "m_bytes is missing, null, or empty"
-      ]
+      "status": "usable",
+      "issues": []
     }
   ],
   "verifiedComponents": [
@@ -61,18 +58,15 @@
     "HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID relation semantics"
   ],
   "unresolvedComponents": [
-    "awakeningClassification",
     "displayJobStats",
     "heroSoldierModifiers",
     "talentStarProgression"
   ],
-  "optionalSourceBlockers": [
-    "ConfigDataAwakenInfo.json: m_Name=\"\" expected=ConfigDataAwakenInfo | m_bytes is missing, null, or empty"
-  ],
+  "optionalSourceBlockers": [],
   "semanticGates": [
     {
       "id": "awakeningClassification",
-      "status": "RELATION_VERIFIED_SOURCE_BLOCKED",
+      "status": "VERIFIED",
       "requiredEvidence": "Restore a structurally valid ConfigDataAwakenInfo payload and resolve each nonzero HeroInfo.Awaken_ID through Level2SkillID to SkillInfo."
     },
     {
