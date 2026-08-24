@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'scripts/validate_soldier_stage1_5.cjs'
+      - 'scripts/validate_soldier_base_stage1_5.cjs'
       - 'scripts/diagnose_sp_soldier_frames.cjs'
       - 'data/configdata/ConfigDataSoldierInfo.json'
       - 'data/configdata/ConfigDataSPSoldierInfo.json'
@@ -19,6 +20,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Validate Soldier and Army base data
+        run: node scripts/validate_soldier_base_stage1_5.cjs
       - name: Diagnose SP Soldier framing
         run: node scripts/diagnose_sp_soldier_frames.cjs
       - name: Run Soldier stage 1-5 final validation
