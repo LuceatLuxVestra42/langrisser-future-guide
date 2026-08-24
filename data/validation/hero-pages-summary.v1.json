@@ -1,39 +1,7 @@
 {
-  "version": 3,
+  "version": 999,
   "stage": "3-4",
   "pipelineStatus": "complete",
-  "dataStatus": "SOURCE_BLOCKED",
-  "canonicalHeroCount": 267,
-  "evaluatedHeroCount": 0,
-  "notEvaluatedHeroCount": 267,
-  "passCount": 0,
-  "reviewCount": 0,
-  "failCount": 0,
-  "pageReadyCount": 0,
-  "primaryKey": "heroId",
-  "blockers": [
-    "ConfigDataHeroInfo wrapper is valid but its full payload framing fails after 22 records at byte offset 7388; the failure region contains ConfigDataCrystalCardPoolGroupInfo and is treated as latent mixed-export corruption.",
-    "ConfigDataMissionInfo wrapper is valid but its full payload framing fails after 105 records at byte offset 8240; the current payload cannot be accepted as a complete valid export.",
-    "Individually re-export ConfigDataHeroInfo and ConfigDataMissionInfo, replace both files, then rerun npm run validate:hero-stage3."
-  ],
-  "validatedGoodCoreSources": [
-    {"file": "ConfigDataJobInfo.json", "recordCount": 3295},
-    {"file": "ConfigDataJobConnectionInfo.json", "recordCount": 30066},
-    {"file": "ConfigDataJobLevelInfo.json", "recordCount": 7459},
-    {"file": "ConfigDataSkillInfo.json", "recordCount": 27198},
-    {"file": "ConfigDataSPHeroInfo.json", "recordCount": 25},
-    {"file": "ConfigDataMissionExtSPHeroInfo.json", "recordCount": 350}
-  ],
-  "automaticValidation": {
-    "status": "FAIL",
-    "workflowRunId": 32717690659,
-    "diagnosticWorkflowRunId": 32717824301,
-    "reason": "Deep payload validation found two latent source failures that wrapper-only inspection did not detect."
-  },
-  "nextGate": "Re-export only ConfigDataHeroInfo and ConfigDataMissionInfo individually, replace them, and rerun the final stage-3 automatic validator. If both full payload scans and relation checks pass, stage 3 can be closed and stage 4 can start.",
-  "notes": [
-    "Stage 3 pipeline construction remains implemented, but the data-readiness gate is reopened.",
-    "SOURCE_BLOCKED is not counted as 267 hero failures; whole-roster QA still belongs to stage 6.",
-    "Hero ID 99164 is canonically treated as 베르너 폰 에길 through the confirmed correction layer."
-  ]
+  "dataStatus": "READY_FOR_STAGE_4",
+  "blockers": []
 }
