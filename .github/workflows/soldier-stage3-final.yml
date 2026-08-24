@@ -11,9 +11,11 @@ on:
       - 'data/configdata/ConfigDataMissionInfo.json'
       - 'data/configdata/ConfigDataMissionSumitItemInfo.json'
       - 'data/configdata/ConfigDataSPHeroInfo.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/generated/soldier-master.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'scripts/finalize-soldier-stage3.cjs'
+      - 'scripts/finalize-soldier-stage3-postprocess.cjs'
       - '.github/workflows/soldier-stage3-final.yml'
   pull_request:
     paths:
@@ -24,9 +26,11 @@ on:
       - 'data/configdata/ConfigDataMissionInfo.json'
       - 'data/configdata/ConfigDataMissionSumitItemInfo.json'
       - 'data/configdata/ConfigDataSPHeroInfo.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/generated/soldier-master.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'scripts/finalize-soldier-stage3.cjs'
+      - 'scripts/finalize-soldier-stage3-postprocess.cjs'
       - '.github/workflows/soldier-stage3-final.yml'
 
 permissions:
@@ -42,8 +46,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run soldier stage 3 validation
+      - name: Build soldier stage 3 data
         run: node scripts/finalize-soldier-stage3.cjs
+      - name: Resolve stage 3 review cases and final-validate
+        run: node scripts/finalize-soldier-stage3-postprocess.cjs
       - name: Upload soldier stage 3 outputs
         uses: actions/upload-artifact@v4
         with:
