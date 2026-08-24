@@ -1,0 +1,17 @@
+const fs=require('fs'),path=require('path'); const root=path.resolve(__dirname,'..');
+function load(n){return JSON.parse(fs.readFileSync(path.join(root,'data/configdata',n),'utf8'))}
+function rv(b,s){let v=0n,q=0n,o=s;while(o<b.length&&q<=63n){const x=b[o++];v|=BigInt(x&127)<<q;if(!(x&128))return{v:Number(v),o};q+=7n}throw Error('varint')}
+function pf(b){const m=new Map();let o=0;while(o<b.length){let r=rv(b,o),t=r.v;o=r.o;const f=t>>>3,w=t&7;let v;if(w===0){r=rv(b,o);o=r.o;v=r.v}else if(w===1){if(o+8>b.length)throw Error('f64');v=b.subarray(o,o+8);o+=8}else if(w===2){r=rv(b,o);o=r.o;if(o+r.v>b.length)throw Error('len');v=b.subarray(o,o+r.v);o+=r.v}else if(w===5){if(o+4>b.length)throw Error('f32');v=b.subarray(o,o+4);o+=4}else throw Error('wire');const a=m.get(f)||[];a.push({w,v});m.set(f,a)}return m}
+function fv(m,f,d=null){const e=(m.get(f)||[]).find(x=>x.w===0);return e?e.v:d}
+function frames(a){const b=Buffer.from(a.m_bytes),out=[];let o=0;while(o<b.length){if(o+4>b.length)throw Error('header');const n=b.readUInt32BE(o);o+=4;if(n<=0||o+n>b.length)throw Error(`badlen@${o-4}:${n}`);out.push(pf(b.subarray(o,o+n)));o+=n}return out}
+function dup(xs){const s=new Set(),d=new Set();for(const x of xs){if(s.has(x))d.add(x);s.add(x)}return[...d]}
+function ck(l,c,d=''){console.log(`[${c?'PASS':'FAIL'}] ${l}${d?' -> '+d:''}`);return c}
+let ok=true; const sa=load('ConfigDataSoldierInfo.json'),aa=load('ConfigDataArmyInfo.json');
+ok&=ck('Soldier structural',Array.isArray(sa.m_bytes)&&sa.m_bytes.length===sa.m_size,`bytes=${sa.m_size}`); ok&=ck('Army structural',Array.isArray(aa.m_bytes)&&aa.m_bytes.length===aa.m_size,`bytes=${aa.m_size}`);
+const sr=frames(sa), ar=frames(aa); console.log(`[INFO] Soldier records=${sr.length}`); console.log(`[INFO] Army records=${ar.length}`);
+const rows=sr.map(r=>({id:fv(r,2),army:fv(r,16,0),rank:fv(r,53,0),enemy:fv(r,54,0),use:fv(r,59,0)})); const ids=rows.map(x=>x.id).filter(Number.isInteger), ds=dup(ids); ok&=ck('Soldier ID duplicate=0',ds.length===0,`duplicates=${ds.join(',')}`);
+const armyIds=new Set(ar.map(r=>fv(r,2)).filter(Number.isInteger)); const disp=rows.filter(x=>x.use===1&&x.enemy!==1); const badArmy=disp.filter(x=>!armyIds.has(x.army)); const badRank=disp.filter(x=>![1,2,3].includes(x.rank));
+ok&=ck('displayable Army_ID resolves',badArmy.length===0,`bad=${badArmy.slice(0,30).map(x=>x.id+':'+x.army).join(',')}`); ok&=ck('displayable Rank in 1/2/3',badRank.length===0,`bad=${badRank.slice(0,30).map(x=>x.id+':'+x.rank).join(',')}`);
+const rc={1:disp.filter(x=>x.rank===1).length,2:disp.filter(x=>x.rank===2).length,3:disp.filter(x=>x.rank===3).length}; const gt5=disp.filter(x=>x.id>=5000&&x.id<7000);
+console.log(`[INFO] displayable=${disp.length} Rank1=${rc[1]} Rank2=${rc[2]} Rank3=${rc[3]}`); console.log(`[INFO] displayable ID 5000-6999 sanity-set=${gt5.length}`); console.log('SANITY_5000_IDS='+gt5.map(x=>x.id).sort((a,b)=>a-b).join(','));
+console.log('BASE_SUMMARY='+JSON.stringify({soldierRecords:sr.length,armyRecords:ar.length,armyIds:armyIds.size,duplicates:ds,displayable:disp.length,rankCounts:rc,badArmy:badArmy.map(x=>x.id),badRank:badRank.map(x=>x.id),sanity5000Count:gt5.length,sanity5000Ids:gt5.map(x=>x.id).sort((a,b)=>a-b)})); if(!ok)process.exit(1);
