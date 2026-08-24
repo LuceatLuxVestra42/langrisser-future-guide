@@ -1,7 +1,7 @@
 {
   "version": 1,
   "stage": "4-4",
-  "status": "pipeline-ready-source-blocked",
+  "status": "validated-review",
   "purpose": "Attach verified normal-form skill acquisition events to the Stage 4-3 job tree using explicit JobLevelInfo.GotSkill_ID relations, while preserving HeroInfo and JobConnection skill references as separate evidence instead of conflating their semantics.",
   "primaryKey": "heroId",
   "upstream": "data/generated/hero-job-trees.v1.json",
@@ -79,11 +79,17 @@
     "summary": "data/validation/hero-skill-stage4-4-summary.v1.json"
   },
   "currentSourceState": {
-    "stage4-3": "UPSTREAM_BLOCKED until Stage 4-2/4-3 source replacements are supplied",
-    "ConfigDataHeroInfo.json": "usable",
-    "ConfigDataJobConnectionInfo.json": "broken: m_bytes=null",
-    "ConfigDataSkillInfo.json": "broken: m_bytes=null"
+    "stage4-3": "PASS: 267/267 job-tree records generated",
+    "ConfigDataHeroInfo.json": "usable: restored/current payload present, m_size=3462088",
+    "ConfigDataJobConnectionInfo.json": "usable: restored payload present, m_size=3519252",
+    "ConfigDataSkillInfo.json": "usable: restored payload present, m_size=10667280"
   },
-  "completionRule": "After Stage 4-3 returns PASS or REVIEW and valid JobConnectionInfo/SkillInfo exports are available, run npm run inspect:hero-skills. The script emits ordered normal job-level acquisition events plus separately resolved hero-direct, hidden, and connection-talent skill references.",
+  "latestValidation": {
+    "status": "REVIEW",
+    "generatedHeroCount": 267,
+    "hardErrors": 0,
+    "reviewReason": "Auxiliary HeroInfo/JobConnection skill references exist without a JobLevel.GotSkill_ID acquisition point for multiple heroes; preserved as auxiliaryOnlySkillIds instead of inventing acquisition positions."
+  },
+  "completionRule": "Run npm run inspect:hero-skills after Stage 4-3. REVIEW is allowed when every explicit reference resolves but auxiliary skill references lack a verified JobLevel acquisition point; those references remain separate for later semantic classification.",
   "nextStage": "4-5 complete the basic combat dataset: awakening classification, job stats, soldier modifiers, talent and star-rank talent changes."
 }

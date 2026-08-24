@@ -1,7 +1,7 @@
 {
   "version": 1,
   "stage": "4-2",
-  "status": "pipeline-ready-source-blocked",
+  "status": "pipeline-ready-source-restored",
   "purpose": "Resolve playable HeroInfo records to their explicit JobConnection references and then to JobInfo records without guessing from names or numeric patterns.",
   "primaryKey": "heroId",
   "canonicalHeroFile": "data/hero-name-master.v1.json",
@@ -70,10 +70,10 @@
     ]
   },
   "currentSourceState": {
-    "ConfigDataHeroInfo.json": "usable",
-    "ConfigDataJobConnectionInfo.json": "broken: m_bytes=null",
-    "ConfigDataJobInfo.json": "broken: invalid metadata and empty m_bytes"
+    "ConfigDataHeroInfo.json": "usable: restored/current payload present",
+    "ConfigDataJobConnectionInfo.json": "usable: restored payload present, m_size=3519252",
+    "ConfigDataJobInfo.json": "usable: restored payload present, m_size=588553"
   },
-  "completionRule": "After valid JobConnectionInfo and JobInfo TextAsset exports replace the broken repository files, run npm run inspect:hero-jobs. The script performs structural preflight first and only emits resolved hero-job records when all required sources are readable.",
+  "completionRule": "Run npm run inspect:hero-jobs against the restored ConfigData. The script performs structural preflight first and emits resolved hero-job records only when all required sources and relations validate.",
   "nextStage": "4-3 reconstruct the ordered job tree using resolved JobConnection and JobLevel relations."
 }

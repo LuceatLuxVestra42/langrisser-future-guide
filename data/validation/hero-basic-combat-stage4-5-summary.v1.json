@@ -1,77 +1,102 @@
 {
-  "version": 1,
+  "version": 2,
   "stage": "4-5",
-  "status": "UPSTREAM_BLOCKED",
-  "pipelineStatus": "READY_FOR_SOURCE_AND_SEMANTIC_VERIFICATION",
+  "status": "SEMANTIC_BLOCKED",
+  "pipelineStatus": "PARTIAL_DATA_ASSEMBLED",
   "stage4CompletionStatus": "NOT_COMPLETE",
+  "generatedHeroCount": 267,
   "upstream": [
     {
       "label": "stage4-3-job-tree",
-      "status": "UPSTREAM_BLOCKED",
-      "usable": false,
-      "recordCount": 0
+      "status": "PASS",
+      "usable": true,
+      "recordCount": 267
     },
     {
       "label": "stage4-4-skill-acquisition",
-      "status": "UPSTREAM_BLOCKED",
-      "usable": false,
-      "recordCount": 0
+      "status": "REVIEW",
+      "usable": true,
+      "recordCount": 267
     }
   ],
+  "sourceRecordCounts": {
+    "playableHeroInfo": 267,
+    "jobLevelInfo": 7459,
+    "awakenInfo": 0
+  },
   "sourceHealth": [
     {
       "filename": "ConfigDataHeroInfo.json",
+      "required": true,
       "status": "usable",
       "issues": []
     },
     {
-      "filename": "ConfigDataJobInfo.json",
-      "status": "broken",
-      "issues": [
-        "current individual TextAsset export is not structurally usable"
-      ]
+      "filename": "ConfigDataJobLevelInfo.json",
+      "required": true,
+      "status": "usable",
+      "issues": []
     },
     {
       "filename": "ConfigDataSkillInfo.json",
+      "required": true,
+      "status": "usable",
+      "issues": []
+    },
+    {
+      "filename": "ConfigDataAwakenInfo.json",
+      "required": false,
       "status": "broken",
       "issues": [
-        "m_bytes is null"
+        "m_Name=\"\" expected=ConfigDataAwakenInfo",
+        "m_bytes is missing, null, or empty"
       ]
     }
+  ],
+  "verifiedComponents": [
+    "Stage 4-3 job topology for 267 heroes",
+    "Stage 4-4 normal skill references/acquisition for 267 heroes",
+    "JobLevelInfo raw INI/UP stat components fields 16-27",
+    "JobConnection TalentSkill_IDs reference sets",
+    "HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID relation semantics"
+  ],
+  "unresolvedComponents": [
+    "awakeningClassification",
+    "displayJobStats",
+    "heroSoldierModifiers",
+    "talentStarProgression"
+  ],
+  "optionalSourceBlockers": [
+    "ConfigDataAwakenInfo.json: m_Name=\"\" expected=ConfigDataAwakenInfo | m_bytes is missing, null, or empty"
   ],
   "semanticGates": [
     {
       "id": "awakeningClassification",
-      "status": "UNVERIFIED"
+      "status": "RELATION_VERIFIED_SOURCE_BLOCKED",
+      "requiredEvidence": "Restore a structurally valid ConfigDataAwakenInfo payload and resolve each nonzero HeroInfo.Awaken_ID through Level2SkillID to SkillInfo."
     },
     {
       "id": "displayJobStats",
-      "status": "UNVERIFIED"
+      "status": "UNVERIFIED_RUNTIME_FORMULA",
+      "requiredEvidence": "Recover or independently validate the HeroPropertyComputer calculation used for the hero-page HP/ATK/INT/DEF/MDEF/SKL display values. ComputeHeroProperties accepts hero, JobConnection, hero level, star level, JobLevel and SP stage; raw JobLevel INI/UP or JobInfo BattlePower fields must not be published as final values by themselves."
     },
     {
       "id": "heroSoldierModifiers",
-      "status": "UNVERIFIED"
+      "status": "UNVERIFIED_RUNTIME_FORMULA",
+      "requiredEvidence": "Verify the source/calculation for the hero-page soldier HP/ATK/DEF/MDEF modifier percentages. SoldierInfo base stats and TrainingTech values are not substitutes."
     },
     {
       "id": "talentIdentity",
-      "status": "PARTIAL_EVIDENCE"
+      "status": "VERIFIED_REFERENCE_SET",
+      "requiredEvidence": "No further evidence is required to preserve the JobConnection TalentSkill_IDs set itself. A separate gate still controls which variant is displayed at each star rank."
     },
     {
       "id": "talentStarProgression",
-      "status": "UNVERIFIED"
+      "status": "UNVERIFIED_SELECTION_RULE",
+      "requiredEvidence": "Verify how hero star rank selects or orders the TalentSkill_IDs variants. HeroInfo.Star, HeroStarInfo upgrade costs, or array position alone are insufficient."
     }
   ],
-  "blockers": [
-    "Stage 4-3 and Stage 4-4 must first return PASS or REVIEW.",
-    "Replace the broken ConfigDataJobInfo and ConfigDataSkillInfo exports.",
-    "Verify the five Stage 4-5 semantic gates before allowing final basic-combat output."
-  ],
-  "resumeCommands": [
-    "npm run inspect:hero-jobs",
-    "npm run inspect:hero-job-trees",
-    "npm run inspect:hero-skills",
-    "npm run inspect:hero-combat"
-  ],
-  "safetyDecision": "Stage 4-5 is implemented as a defensive completion gate. It will not convert named-but-unverified fields into display stats, soldier modifiers, awakening roles, or star-rank talent data by inference.",
-  "nextGate": "Restore trustworthy Job/JobConnection/JobLevel/Skill sources, rerun 4-2 through 4-4, then verify Stage 4-5 semantic mappings with representative heroes."
+  "hardErrors": [],
+  "safetyDecision": "267 partial basic-combat records are emitted because their verified relations are useful. Final display stats, soldier modifiers, talent star-rank selection, and unavailable awakening payload data remain null/status-tagged rather than inferred.",
+  "nextGate": "Restore ConfigDataAwakenInfo and verify HeroPropertyComputer display-stat/soldier-modifier formulas plus the talent star-selection rule before Stage 4 can be marked data-complete."
 }

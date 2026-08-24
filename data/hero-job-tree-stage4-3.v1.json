@@ -1,7 +1,7 @@
 {
   "version": 1,
   "stage": "4-3",
-  "status": "pipeline-ready-source-blocked",
+  "status": "validated-pass",
   "purpose": "Reconstruct each playable hero's normal job tree from explicit JobConnection predecessor edges and ordered JobLevel references without inferring topology from names or numeric ID patterns.",
   "primaryKey": "heroId",
   "upstream": "data/generated/hero-job-links.v1.json",
@@ -72,10 +72,17 @@
     "summary": "data/validation/hero-job-tree-stage4-3-summary.v1.json"
   },
   "currentSourceState": {
-    "stage4-2": "SOURCE_BLOCKED until valid JobConnectionInfo and JobInfo are supplied",
-    "ConfigDataJobConnectionInfo.json": "broken: m_bytes=null",
-    "ConfigDataJobLevelInfo.json": "broken: invalid metadata, negative m_size and m_bytes=null"
+    "stage4-2": "PASS: 267/267 hero-job records generated",
+    "ConfigDataJobConnectionInfo.json": "usable: restored payload present, m_size=3519252",
+    "ConfigDataJobLevelInfo.json": "usable: restored payload present, m_size=681985"
   },
-  "completionRule": "After Stage 4-2 returns PASS or REVIEW and a structurally valid ConfigDataJobLevelInfo export is available, run npm run inspect:hero-job-trees. Emit hero-job-trees only when there are no hard relation errors.",
+  "latestValidation": {
+    "status": "PASS",
+    "heroCount": 267,
+    "generatedHeroCount": 267,
+    "hardErrors": 0,
+    "review": 0
+  },
+  "completionRule": "Run npm run inspect:hero-job-trees after Stage 4-2. Emit hero-job-trees only when there are no hard relation errors.",
   "nextStage": "4-4 attach skill acquisition to the verified JobLevel sequence using explicit GotSkill_ID and other verified skill relations."
 }

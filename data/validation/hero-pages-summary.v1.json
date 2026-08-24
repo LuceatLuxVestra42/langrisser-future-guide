@@ -1,8 +1,8 @@
 {
-  "version": 3,
+  "version": 4,
   "stage": "3-4",
   "pipelineStatus": "complete",
-  "dataStatus": "SOURCE_BLOCKED",
+  "dataStatus": "READY_FOR_STAGE_4",
   "canonicalHeroCount": 267,
   "evaluatedHeroCount": 0,
   "notEvaluatedHeroCount": 267,
@@ -11,29 +11,27 @@
   "failCount": 0,
   "pageReadyCount": 0,
   "primaryKey": "heroId",
-  "blockers": [
-    "ConfigDataHeroInfo wrapper is valid but its full payload framing fails after 22 records at byte offset 7388; the failure region contains ConfigDataCrystalCardPoolGroupInfo and is treated as latent mixed-export corruption.",
-    "ConfigDataMissionInfo wrapper is valid but its full payload framing fails after 105 records at byte offset 8240; the current payload cannot be accepted as a complete valid export.",
-    "Individually re-export ConfigDataHeroInfo and ConfigDataMissionInfo, replace both files, then rerun npm run validate:hero-stage3."
-  ],
+  "blockers": [],
   "validatedGoodCoreSources": [
+    {"file": "ConfigDataHeroInfo.json", "recordCount": 28789},
     {"file": "ConfigDataJobInfo.json", "recordCount": 3295},
     {"file": "ConfigDataJobConnectionInfo.json", "recordCount": 30066},
     {"file": "ConfigDataJobLevelInfo.json", "recordCount": 7459},
     {"file": "ConfigDataSkillInfo.json", "recordCount": 27198},
     {"file": "ConfigDataSPHeroInfo.json", "recordCount": 25},
-    {"file": "ConfigDataMissionExtSPHeroInfo.json", "recordCount": 350}
+    {"file": "ConfigDataMissionExtSPHeroInfo.json", "recordCount": 350},
+    {"file": "ConfigDataMissionInfo.json", "recordCount": 3347}
   ],
   "automaticValidation": {
-    "status": "FAIL",
-    "workflowRunId": 32717690659,
-    "diagnosticWorkflowRunId": 32717824301,
-    "reason": "Deep payload validation found two latent source failures that wrapper-only inspection did not detect."
+    "status": "PASS",
+    "workflowRunId": 32726576982,
+    "reason": "All eight core ConfigData sources passed deep payload parsing and all configured hero/job/skill/SP/mission cross-table checks passed."
   },
-  "nextGate": "Re-export only ConfigDataHeroInfo and ConfigDataMissionInfo individually, replace them, and rerun the final stage-3 automatic validator. If both full payload scans and relation checks pass, stage 3 can be closed and stage 4 can start.",
+  "nextGate": "Proceed to hero stage 4. Stage 6 will perform the full 267-hero PASS/REVIEW/FAIL page evaluation after stages 4-5 are populated.",
   "notes": [
-    "Stage 3 pipeline construction remains implemented, but the data-readiness gate is reopened.",
-    "SOURCE_BLOCKED is not counted as 267 hero failures; whole-roster QA still belongs to stage 6.",
+    "Stage 3 pipeline construction and data-readiness validation are complete through 3-4.",
+    "HeroInfo Useable=true matches exactly 267 canonical heroes.",
+    "All 25 SP heroes resolve to canonical heroes and their tested JobConnection/Mission/Skill references resolve.",
     "Hero ID 99164 is canonically treated as 베르너 폰 에길 through the confirmed correction layer."
   ]
 }
