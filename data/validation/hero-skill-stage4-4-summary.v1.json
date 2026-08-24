@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "stage": "4-4",
+  "status": "UPSTREAM_BLOCKED",
+  "pipelineStatus": "READY_FOR_SOURCE_REPLACEMENT",
+  "upstreamStatus": "UPSTREAM_BLOCKED",
+  "generatedHeroCount": 0,
+  "verifiedRelations": [
+    "ConfigDataJobLevelInfo.GotSkill_ID = protobuf field 28",
+    "ConfigDataJobConnectionInfo.TalentSkill_IDs = protobuf field 8",
+    "ConfigDataHeroInfo.Skill_IDs = protobuf field 19",
+    "ConfigDataHeroInfo.HiddenSkill_IDs = protobuf field 20",
+    "ConfigDataSkillInfo.ID = protobuf field 2"
+  ],
+  "sourceHealth": [
+    {
+      "filename": "ConfigDataHeroInfo.json",
+      "status": "usable",
+      "issues": []
+    },
+    {
+      "filename": "ConfigDataJobConnectionInfo.json",
+      "status": "broken",
+      "issues": ["m_bytes is null"]
+    },
+    {
+      "filename": "ConfigDataSkillInfo.json",
+      "status": "broken",
+      "issues": ["m_bytes is null"]
+    }
+  ],
+  "blockers": [
+    "Stage 4-3 must first return PASS or REVIEW after valid Job/JobConnection/JobLevel inputs are supplied.",
+    "Replace ConfigDataSkillInfo.json with a structurally valid individual TextAsset export.",
+    "ConfigDataJobConnectionInfo.json will already need replacement for Stage 4-2/4-3 and is also required here to preserve TalentSkill_IDs separately."
+  ],
+  "resumeCommands": [
+    "npm run inspect:hero-jobs",
+    "npm run inspect:hero-job-trees",
+    "npm run inspect:hero-skills"
+  ],
+  "completionBehavior": "After Stage 4-3 is usable and SkillInfo/JobConnectionInfo are valid, Stage 4-4 resolves every explicit JobLevel GotSkill_ID to SkillInfo, preserves acquisition order from the verified job tree, and separately resolves HeroInfo direct/hidden skills and JobConnection TalentSkill references without inventing acquisition points.",
+  "nextStage": "4-5 basic combat data completion: awakening classification, job stats, soldier modifiers, talent and star-rank talent changes."
+}
