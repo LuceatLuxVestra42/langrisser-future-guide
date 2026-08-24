@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "stage": "4-3",
+  "status": "pipeline-ready-source-blocked",
+  "purpose": "Reconstruct each playable hero's normal job tree from explicit JobConnection predecessor edges and ordered JobLevel references without inferring topology from names or numeric ID patterns.",
+  "primaryKey": "heroId",
+  "upstream": "data/generated/hero-job-links.v1.json",
+  "requiredSources": [
+    "ConfigDataJobConnectionInfo.json",
+    "ConfigDataJobLevelInfo.json"
+  ],
+  "relationContract": {
+    "jobConnectionInfo": {
+      "id": 2,
+      "jobLevelIds": 7,
+      "uiSort": 9,
+      "preJobConnectionIds": 23
+    },
+    "jobLevelInfo": {
+      "id": 2,
+      "desc": 3,
+      "rankCode": 5,
+      "jobLevelUpHeroLevel": 8,
+      "gotSkillId": 28,
+      "gotSoldierId": 29
+    }
+  },
+  "fieldEvidence": {
+    "jobConnectionInfo": "dump.cs explicitly defines JobLevels_IDFieldNumber=7, UISortFieldNumber=9 and PreJobConnectionListFieldNumber=23. The runtime also exposes m_nextJobConnectionInfos and m_preJobConnectionInfos, supporting graph interpretation of the predecessor list.",
+    "jobLevelInfo": "dump.cs explicitly defines ConfigDataJobLevelInfo.IDFieldNumber=2, rank_codeFieldNumber=5, JobLevelUpHeroLevelFieldNumber=8, GotSkill_IDFieldNumber=28 and GotSoldier_IDFieldNumber=29.",
+    "ordering": "JobLevels_ID is preserved in source list order. JobLevel ID magnitude and rank_code are not used to invent progression order."
+  },
+  "normalizationRules": [
+    "Consume only Stage 4-2 PASS or REVIEW hero-job output.",
+    "Use JobConnection IDs, never job display names, as graph node identities.",
+    "Use PreJobConnectionList as the only authoritative predecessor edge source.",
+    "Within one hero, classify predecessor IDs that belong to that hero as local edges.",
+    "If a predecessor exists globally but is outside the hero's Stage 4-2 connection set, preserve it as externalPredecessorIds and mark the hero REVIEW instead of silently attaching it.",
+    "If a predecessor ID does not exist globally, mark FAIL.",
+    "Preserve JobLevels_ID order exactly and resolve every listed ID against ConfigDataJobLevelInfo.",
+    "Do not sort JobLevels_ID by ID, rank_code, hero-level requirement, skill ID, or wiki layout.",
+    "Use UISort only as a deterministic sibling/display tie-break after topology is known; never use UISort to create a parent-child edge.",
+    "Reject cycles in the local JobConnection graph.",
+    "Emit explicit rootConnectionIds, predecessor/child edges, ordered level records, topological display order and root-to-leaf branch paths."
+  ],
+  "validationPolicy": {
+    "UPSTREAM_BLOCKED": [
+      "Stage 4-2 hero-job-links output is absent or has a status other than PASS/REVIEW."
+    ],
+    "SOURCE_BLOCKED": [
+      "JobConnectionInfo or JobLevelInfo TextAsset is missing, structurally invalid, or has no usable m_bytes payload."
+    ],
+    "FAIL": [
+      "A Stage 4-2 JobConnection is missing from JobConnectionInfo.",
+      "A PreJobConnectionList ID does not exist globally.",
+      "A referenced JobLevel ID does not exist in JobLevelInfo.",
+      "Duplicate JobConnection or JobLevel IDs exist.",
+      "The local predecessor graph contains a cycle.",
+      "Stage 4-2 jobLevelIds disagree with the current JobConnectionInfo source."
+    ],
+    "REVIEW": [
+      "A predecessor exists globally but is outside that hero's Stage 4-2 connection set.",
+      "A hero has no fully resolved local root because all apparent roots depend on external predecessors.",
+      "A hero has disconnected local components; preserve all nodes but require representative validation before public display."
+    ],
+    "PASS": [
+      "Every Stage 4-2 connection resolves, every JobLevel reference resolves, the graph is acyclic, and all hero trees have fully local roots with no unexplained disconnected components."
+    ]
+  },
+  "output": {
+    "generated": "data/generated/hero-job-trees.v1.json",
+    "summary": "data/validation/hero-job-tree-stage4-3-summary.v1.json"
+  },
+  "currentSourceState": {
+    "stage4-2": "SOURCE_BLOCKED until valid JobConnectionInfo and JobInfo are supplied",
+    "ConfigDataJobConnectionInfo.json": "broken: m_bytes=null",
+    "ConfigDataJobLevelInfo.json": "broken: invalid metadata, negative m_size and m_bytes=null"
+  },
+  "completionRule": "After Stage 4-2 returns PASS or REVIEW and a structurally valid ConfigDataJobLevelInfo export is available, run npm run inspect:hero-job-trees. Emit hero-job-trees only when there are no hard relation errors.",
+  "nextStage": "4-4 attach skill acquisition to the verified JobLevel sequence using explicit GotSkill_ID and other verified skill relations."
+}
