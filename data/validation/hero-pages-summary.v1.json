@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "stage": "3-4",
+  "pipelineStatus": "complete",
+  "dataStatus": "SOURCE_BLOCKED",
+  "canonicalHeroCount": 267,
+  "evaluatedHeroCount": 0,
+  "notEvaluatedHeroCount": 267,
+  "passCount": 0,
+  "reviewCount": 0,
+  "failCount": 0,
+  "pageReadyCount": 0,
+  "primaryKey": "heroId",
+  "blockers": [
+    "Stage 3-2 normalized normal-job input is not available because required Job/Skill ConfigData exports are broken.",
+    "Stage 3-3 normalized SP input is not available because required SPHero/Mission ConfigData exports are broken.",
+    "Per-hero PASS/REVIEW/FAIL evaluation is intentionally deferred until both normalized upstream inputs are available."
+  ],
+  "nextGate": "Replace the broken individually exported ConfigData files, run stage 3-2 and stage 3-3 preparation/normalization, then run npm run finalize:hero-pages.",
+  "notes": [
+    "SOURCE_BLOCKED is not counted as FAIL.",
+    "Only PASS records are allowed into data/generated/hero-pages.v1.json.",
+    "The temporary Hero ID 99164 display override remains 베르너 폰 에길 until the canonical Korean-name source is corrected."
+  ]
+}
