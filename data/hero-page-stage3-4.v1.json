@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "stage": "3-4",
+  "status": "source-blocked",
+  "purpose": "Final hero-detail integrity gate and page-ready output contract.",
+  "primaryKey": "heroId",
+  "canonicalHeroFile": "data/hero-name-master.v1.json",
+  "upstream": {
+    "identity": "data/hero-master-stage3-1.v1.json",
+    "normal": "data/hero-normal-stage3-2.v1.json",
+    "sp": "data/hero-sp-stage3-3.v1.json"
+  },
+  "expectedGeneratedInputs": {
+    "normal": "data/generated/hero-normal-normalized.v1.json",
+    "sp": "data/generated/hero-sp-normalized.v1.json"
+  },
+  "outputs": {
+    "pageData": "data/generated/hero-pages.v1.json",
+    "pass": "data/validation/hero-pages-pass.v1.json",
+    "review": "data/validation/hero-pages-review.v1.json",
+    "fail": "data/validation/hero-pages-fail.v1.json",
+    "summary": "data/validation/hero-pages-summary.v1.json"
+  },
+  "temporaryNameOverrides": [
+    {
+      "heroId": 99164,
+      "nameCn": "维尔纳",
+      "canonicalCurrentNameKr": "베르너",
+      "effectiveNameKr": "베르너 폰 에길",
+      "reason": "Canonical Korean-name source correction is pending; downstream display only."
+    }
+  ],
+  "pageContract": {
+    "identity": [
+      "heroId",
+      "nameKr",
+      "nameCn",
+      "nameEn"
+    ],
+    "headerOptional": [
+      "rarity",
+      "cv",
+      "factions",
+      "origin",
+      "artwork",
+      "skins"
+    ],
+    "normal": [
+      "talent",
+      "bonds",
+      "exclusiveEquipment",
+      "covenant",
+      "soldiers",
+      "stats",
+      "jobs",
+      "skills"
+    ],
+    "sp": [
+      "exists",
+      "spJobConnectionId",
+      "talent",
+      "bonds",
+      "exclusiveEquipment",
+      "covenant",
+      "soldiers",
+      "stats",
+      "missions",
+      "rewardSkills"
+    ],
+    "presentationRules": [
+      "Base mode is shown first; SP mode is shown only when SP data exists.",
+      "Exclusive equipment and covenant sections remain present and may display 미출시 instead of being omitted.",
+      "Skin ordering is release order and must preserve acquisition metadata when available.",
+      "Skills are ordered by acquisition group when the source relation is available: tier1, tier2, SP, awakening.",
+      "Do not emit subjective ratings or recommended gear."
+    ]
+  },
+  "validationPolicy": {
+    "PASS": [
+      "heroId is unique and exists in the canonical hero master",
+      "identity fields are present",
+      "normal normalized record exists",
+      "normal Job/Skill references contain no unresolved hard relation errors",
+      "when SP exists, SP record resolves to the same canonical heroId and all referenced SP missions exist"
+    ],
+    "REVIEW": [
+      "display/enrichment fields such as CV, factions, origin, artwork, skins, bonds, exclusive equipment, covenant, soldiers or stat labels are not connected yet",
+      "skill/job Korean display names are pending while IDs and source relations are valid",
+      "Hero-SP MissionType 73 material bundle direct target is not yet verified",
+      "temporary Korean-name override is active"
+    ],
+    "FAIL": [
+      "duplicate heroId",
+      "canonical hero reference is missing",
+      "normal normalized record is missing after stage 3-2 is declared ready",
+      "Job/Skill/Mission reference points to a missing record",
+      "SP record belongs to an unknown hero",
+      "one hero receives multiple incompatible SP ownership records"
+    ]
+  },
+  "currentBlockers": [
+    "Stage 3-2 is source-blocked by broken JobInfo/JobConnectionInfo/JobLevelInfo/SkillInfo exports.",
+    "Stage 3-3 is source-blocked by broken SPHeroInfo/MissionExtSPHeroInfo/MissionInfo and detail-source exports.",
+    "Final PASS page data must not be emitted until the upstream normalized inputs exist."
+  ],
+  "completionRule": "Run the finalizer only after stage 3-2 and stage 3-3 normalized inputs are available. The finalizer may always emit validation summary files, but pageData may contain only PASS records. REVIEW and FAIL records remain separated from public page output.",
+  "notes": [
+    "Stage 3-4 is intentionally able to report SOURCE_BLOCKED without fabricating missing upstream data.",
+    "heroId is the only canonical join key; Korean names are display values only.",
+    "The page contract follows the project design: hero art/skin header, identity metadata, normal/SP mode, core information, stats, jobs/skills or SP missions.",
+    "Missing optional presentation data is REVIEW rather than FAIL so later asset/CV/faction work can be attached without redesigning the hero data core."
+  ]
+}
