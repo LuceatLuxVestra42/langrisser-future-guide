@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "stage": "4-5",
+  "status": "UPSTREAM_BLOCKED",
+  "pipelineStatus": "READY_FOR_SOURCE_AND_SEMANTIC_VERIFICATION",
+  "stage4CompletionStatus": "NOT_COMPLETE",
+  "upstream": [
+    {
+      "label": "stage4-3-job-tree",
+      "status": "UPSTREAM_BLOCKED",
+      "usable": false,
+      "recordCount": 0
+    },
+    {
+      "label": "stage4-4-skill-acquisition",
+      "status": "UPSTREAM_BLOCKED",
+      "usable": false,
+      "recordCount": 0
+    }
+  ],
+  "sourceHealth": [
+    {
+      "filename": "ConfigDataHeroInfo.json",
+      "status": "usable",
+      "issues": []
+    },
+    {
+      "filename": "ConfigDataJobInfo.json",
+      "status": "broken",
+      "issues": [
+        "current individual TextAsset export is not structurally usable"
+      ]
+    },
+    {
+      "filename": "ConfigDataSkillInfo.json",
+      "status": "broken",
+      "issues": [
+        "m_bytes is null"
+      ]
+    }
+  ],
+  "semanticGates": [
+    {
+      "id": "awakeningClassification",
+      "status": "UNVERIFIED"
+    },
+    {
+      "id": "displayJobStats",
+      "status": "UNVERIFIED"
+    },
+    {
+      "id": "heroSoldierModifiers",
+      "status": "UNVERIFIED"
+    },
+    {
+      "id": "talentIdentity",
+      "status": "PARTIAL_EVIDENCE"
+    },
+    {
+      "id": "talentStarProgression",
+      "status": "UNVERIFIED"
+    }
+  ],
+  "blockers": [
+    "Stage 4-3 and Stage 4-4 must first return PASS or REVIEW.",
+    "Replace the broken ConfigDataJobInfo and ConfigDataSkillInfo exports.",
+    "Verify the five Stage 4-5 semantic gates before allowing final basic-combat output."
+  ],
+  "resumeCommands": [
+    "npm run inspect:hero-jobs",
+    "npm run inspect:hero-job-trees",
+    "npm run inspect:hero-skills",
+    "npm run inspect:hero-combat"
+  ],
+  "safetyDecision": "Stage 4-5 is implemented as a defensive completion gate. It will not convert named-but-unverified fields into display stats, soldier modifiers, awakening roles, or star-rank talent data by inference.",
+  "nextGate": "Restore trustworthy Job/JobConnection/JobLevel/Skill sources, rerun 4-2 through 4-4, then verify Stage 4-5 semantic mappings with representative heroes."
+}
