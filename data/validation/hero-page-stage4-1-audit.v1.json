@@ -1,167 +1,88 @@
 {
-  "version": 1,
+  "version": 2,
   "stage": "4-1",
-  "status": "complete",
+  "status": "PASS",
   "auditDate": "2026-08-24",
-  "purpose": "Audit the actual outputs and readiness of the completed Stage 3 hero-page pipeline before starting Stage 4 relation expansion.",
+  "purpose": "Re-audit Stage 3 hero-page data readiness after trustworthy ConfigData recovery, before and alongside the Stage 4-2 through 4-4 rebuild.",
   "primaryKey": "heroId",
   "verdict": {
     "pipelineImplementation": "COMPLETE",
     "canonicalIdentityData": "READY",
-    "normalNormalizedData": "SOURCE_BLOCKED",
-    "spNormalizedData": "SOURCE_BLOCKED",
-    "pageReadyData": "SOURCE_BLOCKED",
-    "interpretation": "Stage 3 completed the defensive pipeline/contracts and identity master, but did not produce 267 populated hero-detail records because required ConfigData TextAsset exports remain structurally broken. This is a source-input blocker, not a pipeline implementation failure."
+    "coreConfigData": "VALIDATED",
+    "stage3DataReadiness": "READY_FOR_STAGE_4",
+    "stage4_2": "PASS",
+    "stage4_3": "PASS",
+    "stage4_4": "REVIEW",
+    "interpretation": "The old AssetStudio multi-export source blocker has been removed for the eight hero core ConfigData sources. Stage 4-2 and 4-3 now resolve all 267 canonical heroes without hard errors. Stage 4-4 emits all 267 skill-acquisition records and remains REVIEW only because auxiliary HeroInfo skill references without a JobLevel acquisition point are intentionally left semantically unclassified until Stage 4-5."
   },
   "canonicalIdentity": {
     "file": "data/hero-name-master.v1.json",
     "recordCount": 267,
     "status": "READY",
-    "fieldsActuallyAvailable": [
-      "heroId",
-      "nameCn",
-      "nameKr",
-      "nameEn",
-      "aliasesKr",
-      "status"
-    ],
     "joinRule": "Use heroId as the only canonical unique join key. Korean display names are not unique."
   },
-  "actualOutputAvailability": {
-    "availableNow": [
-      {
-        "group": "identity",
-        "fields": ["heroId", "nameCn", "nameKr", "nameEn", "aliasesKr", "status"],
-        "sourceType": "canonical verified master"
-      }
-    ],
-    "sourceReadableButNotNormalized": [
-      {
-        "group": "HeroInfo partial direct fields",
-        "fields": ["rank", "skillIds", "hiddenSkillIds"],
-        "reason": "The normal-stage preflight has a parser contract for these fields and ConfigDataHeroInfo is usable, but Stage 3-2 intentionally does not emit normalized normal records until required Job/Skill sources and relation fields are verified."
-      }
-    ],
-    "definedByContractButNotPopulated": [
-      "header.rarity",
-      "header.cv",
-      "header.factions",
-      "header.origin",
-      "header.artwork",
-      "header.skins",
-      "normal.talent",
-      "normal.bonds",
-      "normal.exclusiveEquipment",
-      "normal.covenant",
-      "normal.soldiers",
-      "normal.stats",
-      "normal.jobs",
-      "normal.skills",
-      "sp.exists",
-      "sp.spJobConnectionId",
-      "sp.talent",
-      "sp.bonds",
-      "sp.exclusiveEquipment",
-      "sp.covenant",
-      "sp.soldiers",
-      "sp.stats",
-      "sp.missions",
-      "sp.rewardSkills"
-    ]
-  },
-  "expectedGeneratedOutputs": {
-    "normal": {
-      "path": "data/generated/hero-normal-normalized.v1.json",
-      "status": "NOT_GENERATED"
-    },
-    "sp": {
-      "path": "data/generated/hero-sp-normalized.v1.json",
-      "status": "NOT_GENERATED"
-    },
-    "pageData": {
-      "path": "data/generated/hero-pages.v1.json",
-      "status": "NOT_GENERATED"
-    },
-    "validationSummary": {
-      "path": "data/validation/hero-pages-summary.v1.json",
-      "status": "SOURCE_BLOCKED",
-      "canonicalHeroCount": 267,
-      "evaluatedHeroCount": 0,
-      "pageReadyCount": 0
+  "stage3ReadinessEvidence": {
+    "summary": "data/validation/hero-pages-summary.v1.json",
+    "pipelineStatus": "complete",
+    "dataStatus": "READY_FOR_STAGE_4",
+    "automaticValidation": "PASS",
+    "blockers": [],
+    "validatedGoodCoreSources": {
+      "ConfigDataHeroInfo.json": 28789,
+      "ConfigDataJobInfo.json": 3295,
+      "ConfigDataJobConnectionInfo.json": 30066,
+      "ConfigDataJobLevelInfo.json": 7459,
+      "ConfigDataSkillInfo.json": 27198,
+      "ConfigDataSPHeroInfo.json": 25,
+      "ConfigDataMissionExtSPHeroInfo.json": 350,
+      "ConfigDataMissionInfo.json": 3347
     }
   },
-  "currentSourceHealthConfirmed": [
-    {
-      "file": "data/configdata/ConfigDataHeroInfo.json",
-      "status": "usable",
-      "role": "canonical playable hero / direct HeroInfo fields"
+  "stage4Outputs": {
+    "heroJobLinks": {
+      "path": "data/generated/hero-job-links.v1.json",
+      "status": "PASS",
+      "heroCount": 267
     },
-    {
-      "file": "data/configdata/ConfigDataJobInfo.json",
-      "status": "broken",
-      "observed": "m_Name is empty and m_bytes is an empty array"
+    "heroJobTrees": {
+      "path": "data/generated/hero-job-trees.v1.json",
+      "status": "PASS",
+      "heroCount": 267
     },
-    {
-      "file": "data/configdata/ConfigDataJobConnectionInfo.json",
-      "status": "broken",
-      "observed": "m_size is populated but m_bytes is null"
-    },
-    {
-      "file": "data/configdata/ConfigDataSkillInfo.json",
-      "status": "broken",
-      "observed": "m_size is populated but m_bytes is null"
-    },
-    {
-      "file": "data/configdata/ConfigDataSPHeroInfo.json",
-      "status": "broken",
-      "observed": "m_Name is empty, m_size is negative, and m_bytes is null"
+    "heroSkillAcquisition": {
+      "path": "data/generated/hero-skill-acquisition.v1.json",
+      "status": "REVIEW",
+      "heroCount": 267,
+      "hardErrors": 0,
+      "reviewReason": "Auxiliary skill references present on HeroInfo but not attached to a JobLevel acquisition edge are preserved without guessing their semantic role."
     }
-  ],
-  "stage3PipelineAssets": {
-    "identityContract": "data/hero-master-stage3-1.v1.json",
-    "normalContract": "data/hero-normal-stage3-2.v1.json",
-    "spContract": "data/hero-sp-stage3-3.v1.json",
-    "pageContract": "data/hero-page-stage3-4.v1.json",
-    "normalPreflight": "scripts/prepare_hero_normal_stage32.cjs",
-    "spPreflight": "scripts/prepare_hero_sp_stage33.cjs",
-    "finalizer": "scripts/finalize_hero_pages_stage34.cjs"
   },
-  "fieldReadinessForNextStages": [
-    {
-      "target": "Hero -> Job connection",
-      "readiness": "BLOCKED",
-      "needed": ["ConfigDataJobInfo", "ConfigDataJobConnectionInfo", "ConfigDataJobLevelInfo"]
-    },
-    {
-      "target": "Job -> Skill acquisition",
-      "readiness": "BLOCKED",
-      "needed": ["ConfigDataJobConnectionInfo", "ConfigDataJobLevelInfo", "ConfigDataSkillInfo"]
-    },
-    {
-      "target": "SP ownership / missions / rewards",
-      "readiness": "BLOCKED",
-      "needed": ["ConfigDataSPHeroInfo", "ConfigDataMissionExtSPHeroInfo", "ConfigDataMissionInfo", "ConfigDataSkillInfo"]
-    },
-    {
-      "target": "Header/enrichment fields",
-      "readiness": "DEFERRED",
-      "needed": ["rarity", "cv", "factions", "origin", "artwork", "skins"]
-    }
+  "sourceHealthConfirmed": [
+    {"file": "ConfigDataHeroInfo.json", "status": "validated"},
+    {"file": "ConfigDataJobInfo.json", "status": "validated"},
+    {"file": "ConfigDataJobConnectionInfo.json", "status": "validated"},
+    {"file": "ConfigDataJobLevelInfo.json", "status": "validated"},
+    {"file": "ConfigDataSkillInfo.json", "status": "validated"},
+    {"file": "ConfigDataSPHeroInfo.json", "status": "validated"},
+    {"file": "ConfigDataMissionExtSPHeroInfo.json", "status": "validated"},
+    {"file": "ConfigDataMissionInfo.json", "status": "validated"}
   ],
   "stage4_1CompletionCriteria": {
-    "currentPipelineOutputsEnumerated": true,
-    "actualVsContractFieldsSeparated": true,
-    "sourceVsNormalizedAvailabilitySeparated": true,
-    "currentSourceBlockersReconfirmed": true,
-    "nextGateIdentified": true
+    "stage3PipelineRechecked": true,
+    "restoredCoreSourcesValidated": true,
+    "oldSourceBlockersCleared": true,
+    "stage4_2OutputConfirmed": true,
+    "stage4_3OutputConfirmed": true,
+    "stage4_4OutputConfirmed": true,
+    "semanticReviewDeferredWithoutGuessing": true
   },
   "nextGate": {
-    "recommendedStage": "4-2",
-    "name": "Hero-to-Job source recovery and relation verification",
-    "constraint": "Do not attempt bulk Job tree generation from the current AssetStudio JSON exports. First obtain usable JobInfo/JobConnectionInfo/JobLevelInfo data or an equivalent trustworthy extraction path, then verify the Hero-to-JobConnection relation on representative heroes before bulk normalization."
+    "recommendedStage": "4-5",
+    "name": "Basic combat data completion",
+    "constraint": "Do not promote auxiliary skill references to awakening, talent, star progression, or another role until Stage 4-5 verifies the semantic relation explicitly."
   },
   "confidence": {
     "auditVerdictPercent": 100,
-    "reason": "Based on current repository files, current source payloads, Stage 3 contracts/scripts, and the validation summary rather than inferred data."
+    "reason": "Based on the restored current repository payloads, successful Stage 3 automatic validation, and the actual Stage 4-2 through 4-4 generated outputs."
   }
 }
