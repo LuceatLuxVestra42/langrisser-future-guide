@@ -1,8 +1,8 @@
 {
   "version": 1,
   "stage": "3-1~3-11",
-  "status": "PASS_WITH_REVIEW",
-  "generatedAt": "2026-08-24T13:07:42.916Z",
+  "status": "PASS",
+  "generatedAt": "2026-08-24T13:10:26.100Z",
   "sources": {
     "soldier": "data/configdata/ConfigDataSoldierInfo.json",
     "spSoldier": "data/configdata/ConfigDataSPSoldierInfo.json",
@@ -12,8 +12,7 @@
     "missionSubmit": "data/configdata/ConfigDataMissionSumitItemInfo.json",
     "spHero": "data/configdata/ConfigDataSPHeroInfo.json",
     "soldierMaster": "data/generated/soldier-master.v1.json",
-    "heroMaster": "data/hero-name-master.v1.json",
-    "hero": "data/configdata/ConfigDataHeroInfo.json"
+    "heroMaster": "data/hero-name-master.v1.json"
   },
   "counts": {
     "sourceSoldiers": 777,
@@ -32,7 +31,7 @@
     "tier3MultipleTenLevel": 0,
     "spNormalsWithoutSpDescription": 0,
     "baseHeroEdges": 5720,
-    "spHeroRewardEdges": 0,
+    "spHeroRewardEdges": 25,
     "spExpandHeroEdges": 228,
     "secondStageTrue": 45,
     "secondStageFalse": 11,
@@ -46,7 +45,7 @@
     "duplicateSoldierIds": 0,
     "missingTrainingLevelRefs": 0,
     "missingBaseHeroIds": 0,
-    "missingSpHeroIds": 25,
+    "missingSpHeroIds": 0,
     "missingRewardSoldiers": 0,
     "missingExpandHeroIds": 0,
     "duplicateSpIds": 0,
@@ -58,14 +57,14 @@
     "stage1MissionCountMismatch": 0,
     "stage2MissionCountMismatch": 0,
     "falseWithStage2Data": 0,
-    "spHeroMappingUnmapped": 25,
+    "spHeroMappingUnmapped": 0,
     "spHeroMappingAmbiguous": 0
   },
   "corrections": [
     "3-2 level numbering: ConfigDataTrainingTechLevelInfo has no dedicated tech-level-number field; sequence follows TrainingTechInfo.TechLevelupInfoList order. SoldierSkillLevelup is preserved as an independent skill-level field for validation.",
     "3-5/3-6/3-11 remain separate directed edge sources; stage 3 does not synthesize the final Hero<->Soldier union reserved for 3-12.",
     "3-3 primary growth path: SoldierIDRelated can include shared passive/status techs. For displayed tier-3 soldiers, the soldier-specific Lv1-10 growth path is the unique linked tech whose TrainingTechLevelInfo.SoldierSkillLevelup sequence is 1..10. Current snapshot validates exactly one path for all 129 tier-3 normal soldiers.",
-    "3-6 hero mapping: SPHeroInfo.HeroInformation_ID is not Hero ID. Resolve it through HeroInfo.HeroInformation_ID, then use the matched canonical HeroInfo.ID before reversing SecondStageRewardSoldiers."
+    "3-6 hero mapping: ConfigDataSPHeroInfo.ID is the canonical base Hero ID/key. HeroInformation_ID is separate metadata and is not used to identify the hero for SecondStageRewardSoldiers."
   ],
   "policy": {
     "stats": "3-1 uses SoldierInfo *_INI, BF_MovePoint and BF_AttackDistance; *_UP and IsMelee are preserved but not substituted.",
@@ -73,7 +72,7 @@
     "trainingJoin": "3-3 reverse-joins TrainingTechInfo.SoldierIDRelated; the soldier-specific Lv1-10 path is selected by SoldierSkillLevelup sequence 1..10. GetSoldierTechId remains validation metadata only.",
     "costs": "3-4 preserves per-level LevelupGoldCost/LevelupMaterialsCost and derives Lv5/Lv10 sums per linked tech.",
     "baseHeroes": "3-5 uses Normal SoldierInfo.GetSoldierHeros_ID; SP Soldier inherits its Normal base list.",
-    "spHeroSoldiers": "3-6 resolves SPHeroInfo.HeroInformation_ID -> HeroInfo.HeroInformation_ID -> canonical HeroInfo.ID, then reverse-indexes SecondStageRewardSoldiers by Soldier ID.",
+    "spHeroSoldiers": "3-6 uses ConfigDataSPHeroInfo.ID as the canonical Hero ID/key, validates it against hero-name-master, then reverse-indexes SecondStageRewardSoldiers by Soldier ID.",
     "spRelation": "3-7 uses SPSoldierInfo.NormalSoliderId <-> ID; no +5000 arithmetic inference.",
     "spAbility": "3-8 uses TrainingTechLevelInfo.SpSoidlierDescription directly.",
     "spStage1": "3-9 uses SPSoldierInfo.FisrtStageMissionList -> MissionInfo; type 73 joins Param1 -> MissionSumitItemInfo.ID.",
@@ -81,31 +80,5 @@
     "spExpandHeroes": "3-11 uses SecondStageExpandHeroList only as newly expanded heroes, not the full hero list."
   },
   "errors": [],
-  "reviews": [
-    "SPHeroInfo 12 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 33 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 60 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 13 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 25 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 14 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 11 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 8 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 40 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 27 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 3 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 10 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 1 HeroInformation_ID 1012 canonical matches=0",
-    "SPHeroInfo 6 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 7 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 4 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 53 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 29 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 55 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 26 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 9 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 89 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 56 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 67 HeroInformation_ID 0 canonical matches=0",
-    "SPHeroInfo 37 HeroInformation_ID 0 canonical matches=0"
-  ]
+  "reviews": []
 }
