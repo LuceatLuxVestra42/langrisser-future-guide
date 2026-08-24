@@ -81,7 +81,7 @@ function splitLengthPrefixedMessages(bytes) {
     }
     const length = buffer.readUInt32BE(offset);
     offset += 4;
-    if (length < 0 || offset + length > buffer.length) {
+    if (offset + length > buffer.length) {
       throw new Error(`invalid frame length=${length} at offset ${offset - 4}`);
     }
     messages.push(buffer.subarray(offset, offset + length));
@@ -196,6 +196,12 @@ function integerValues(fields, fieldNumber) {
   return values;
 }
 
+function lengthDelimitedHexValues(fields, fieldNumber) {
+  return (fields.get(fieldNumber) || [])
+    .filter((entry) => entry.wireType === 2)
+    .map((entry) => entry.value.toString('hex'));
+}
+
 function parseRecords(asset) {
   return splitLengthPrefixedMessages(asset.m_bytes).map(parseProtoFields);
 }
@@ -251,13 +257,22 @@ function main() {
   const extRecordsRaw = parseRecords(health.get('ConfigDataMissionExtSPHeroInfo.json').asset);
   const missionRecordsRaw = parseRecords(health.get('ConfigDataMissionInfo.json').asset);
 
+  const sp = stage.joinContract.spHeroInfo;
   const spRecords = spRecordsRaw.map((fields) => ({
-    heroId: firstVarint(fields, stage.joinContract.spHeroInfo.heroId),
-    nameCn: firstString(fields, stage.joinContract.spHeroInfo.name),
-    spIntro: firstString(fields, stage.joinContract.spHeroInfo.spIntro),
-    chapter1MissionIds: integerValues(fields, stage.joinContract.spHeroInfo.chapter1MissionIds),
-    chapter2MissionIds: integerValues(fields, stage.joinContract.spHeroInfo.chapter2MissionIds),
-    additionalSkillIds: integerValues(fields, stage.joinContract.spHeroInfo.additionalSkillIds),
+    heroId: firstVarint(fields, sp.idHeroId),
+    nameCn: firstString(fields, sp.name),
+    performances: integerValues(fields, sp.performances),
+    heroInformationId: firstVarint(fields, sp.heroInformationId),
+    spIntro: firstString(fields, sp.desc),
+    jobConnectionId: firstVarint(fields, sp.jobConnectionId),
+    charImageId: firstVarint(fields, sp.charImageId),
+    firstStageActiveMaterialRaw: lengthDelimitedHexValues(fields, sp.firstStageActiveMaterial),
+    firstStageMissionIds: integerValues(fields, sp.firstStageMissions),
+    secondStageMissionIds: integerValues(fields, sp.secondStageMissions),
+    secondStageRewardBuffId: firstVarint(fields, sp.secondStageRewardBuffId),
+    secondStageRewardSkillIds: integerValues(fields, sp.secondStageRewardSkills),
+    secondStageRewardSoldierIds: integerValues(fields, sp.secondStageRewardSoldiers),
+    newFirstStageActiveMaterialRaw: lengthDelimitedHexValues(fields, sp.newFirstStageActiveMaterial),
   }));
 
   const invalidHeroRefs = spRecords.filter((record) => !Number.isInteger(record.heroId) || !byHeroId.has(record.heroId));
@@ -275,54 +290,59 @@ function main() {
   let fixtureOk = Boolean(leon);
   console.log(`[${leon ? 'PASS' : 'FAIL'}] Leon SPHero fixture exists`);
   if (leon) {
-    fixtureOk = assertArrayEqual('Leon chapter 1 missions', leon.chapter1MissionIds, leonFixture.expectedChapter1MissionIds) && fixtureOk;
-    fixtureOk = assertArrayEqual('Leon chapter 2 missions', leon.chapter2MissionIds, leonFixture.expectedChapter2MissionIds) && fixtureOk;
-    fixtureOk = assertArrayEqual('Leon SP additional skills', leon.additionalSkillIds, leonFixture.expectedAdditionalSkillIds) && fixtureOk;
+    fixtureOk = assertArrayEqual('Leon first-stage missions', leon.firstStageMissionIds, leonFixture.expectedFirstStageMissionIds) && fixtureOk;
+    fixtureOk = assertArrayEqual('Leon second-stage missions', leon.secondStageMissionIds, leonFixture.expectedSecondStageMissionIds) && fixtureOk;
+    fixtureOk = assertArrayEqual('Leon SP reward skills', leon.secondStageRewardSkillIds, leonFixture.expectedSecondStageRewardSkillIds) && fixtureOk;
   }
 
+  const ext = stage.joinContract.missionExtSPHeroInfo;
   const extRecords = extRecordsRaw.map((fields) => ({
-    id: firstVarint(fields, stage.joinContract.missionExtSPHeroInfo.id),
-    missionId: firstVarint(fields, stage.joinContract.missionExtSPHeroInfo.missionId),
-    storyText: firstString(fields, stage.joinContract.missionExtSPHeroInfo.storyText),
+    id: firstVarint(fields, ext.id),
+    preUnlockMissionId: firstVarint(fields, ext.preUnlockMissionId),
+    scenarioDescribe: firstString(fields, ext.scenarioDescribe),
   }));
 
+  const mission = stage.joinContract.missionInfo;
   const missionRecords = missionRecordsRaw.map((fields) => ({
-    id: firstVarint(fields, stage.joinContract.missionInfo.id),
-    name: firstString(fields, stage.joinContract.missionInfo.name),
-    conditionText: firstString(fields, stage.joinContract.missionInfo.conditionText),
-    missionType: firstVarint(fields, stage.joinContract.missionInfo.missionType),
-    param1: firstVarint(fields, stage.joinContract.missionInfo.param1),
-    param2: firstVarint(fields, stage.joinContract.missionInfo.param2),
-    heroIds: integerValues(fields, stage.joinContract.missionInfo.heroIds),
-    levelIds: integerValues(fields, stage.joinContract.missionInfo.levelIds),
+    id: firstVarint(fields, mission.id),
+    title: firstString(fields, mission.title),
+    desc: firstString(fields, mission.desc),
+    missionType: firstVarint(fields, mission.missionType),
+    param1: firstVarint(fields, mission.param1),
+    param2: firstVarint(fields, mission.param2),
+    param3: firstVarint(fields, mission.param3),
+    param4: firstVarint(fields, mission.param4),
+    param5: integerValues(fields, mission.param5),
+    param6: integerValues(fields, mission.param6),
   }));
 
   const missionById = new Map(missionRecords.filter((record) => Number.isInteger(record.id)).map((record) => [record.id, record]));
-  const extByMissionId = new Map(extRecords.filter((record) => Number.isInteger(record.missionId)).map((record) => [record.missionId, record]));
-  const allReferencedMissionIds = [...new Set(spRecords.flatMap((record) => [...record.chapter1MissionIds, ...record.chapter2MissionIds]))];
+  const extByMissionId = new Map(extRecords.filter((record) => Number.isInteger(record.preUnlockMissionId)).map((record) => [record.preUnlockMissionId, record]));
+  const allReferencedMissionIds = [...new Set(spRecords.flatMap((record) => [...record.firstStageMissionIds, ...record.secondStageMissionIds]))];
   const missingMissionIds = allReferencedMissionIds.filter((id) => !missionById.has(id));
 
   console.log(`[${missingMissionIds.length === 0 ? 'PASS' : 'FAIL'}] SPHero mission IDs -> MissionInfo: missing=${missingMissionIds.length}`);
-  console.log(`[INFO] MissionExt records parsed: ${extRecords.length}; SP mission IDs with extra text: ${allReferencedMissionIds.filter((id) => extByMissionId.has(id)).length}/${allReferencedMissionIds.length}`);
+  console.log(`[INFO] MissionExt records parsed: ${extRecords.length}; SP mission IDs with scenario text: ${allReferencedMissionIds.filter((id) => extByMissionId.has(id)).length}/${allReferencedMissionIds.length}`);
 
   let skillStatus = 'blocked';
   let skillById = new Map();
   if (health.get('ConfigDataSkillInfo.json').ok) {
+    const skill = stage.joinContract.skillInfo;
     const skillRecords = parseRecords(health.get('ConfigDataSkillInfo.json').asset).map((fields) => ({
-      id: firstVarint(fields, stage.joinContract.skillInfo.id),
-      name: firstString(fields, stage.joinContract.skillInfo.name),
-      desc: firstString(fields, stage.joinContract.skillInfo.desc),
-      iconPath: firstString(fields, stage.joinContract.skillInfo.iconPath),
-      displayType: firstVarint(fields, stage.joinContract.skillInfo.displayType),
-      cooldown: firstVarint(fields, stage.joinContract.skillInfo.cooldown),
-      range: firstVarint(fields, stage.joinContract.skillInfo.range),
-      areaOrTarget: firstVarint(fields, stage.joinContract.skillInfo.areaOrTarget),
+      id: firstVarint(fields, skill.id),
+      name: firstString(fields, skill.name),
+      desc: firstString(fields, skill.desc),
+      iconPath: firstString(fields, skill.iconPath),
+      displayType: firstVarint(fields, skill.displayType),
+      cooldown: firstVarint(fields, skill.cooldown),
+      range: firstVarint(fields, skill.range),
+      areaOrTarget: firstVarint(fields, skill.areaOrTarget),
     }));
     skillById = new Map(skillRecords.filter((record) => Number.isInteger(record.id)).map((record) => [record.id, record]));
-    const allSkillIds = [...new Set(spRecords.flatMap((record) => record.additionalSkillIds))];
+    const allSkillIds = [...new Set(spRecords.flatMap((record) => record.secondStageRewardSkillIds))];
     const missingSkills = allSkillIds.filter((id) => !skillById.has(id));
     skillStatus = missingSkills.length === 0 ? 'verified' : 'review';
-    console.log(`[${missingSkills.length === 0 ? 'PASS' : 'REVIEW'}] SP additional skill IDs -> SkillInfo: missing=${missingSkills.length}`);
+    console.log(`[${missingSkills.length === 0 ? 'PASS' : 'REVIEW'}] SP reward skill IDs -> SkillInfo: missing=${missingSkills.length}`);
   }
 
   const normalized = spRecords
@@ -331,20 +351,27 @@ function main() {
     .map((record) => {
       const identity = byHeroId.get(record.heroId);
       const normalizeMission = (id, chapter) => {
-        const mission = missionById.get(id);
-        const ext = extByMissionId.get(id);
+        const missionRecord = missionById.get(id);
+        const extRecord = extByMissionId.get(id);
         return {
           id,
           chapter,
-          nameCn: mission?.name || null,
-          conditionTextCn: mission?.conditionText || null,
-          missionType: mission?.missionType ?? null,
-          param1: mission?.param1 ?? null,
-          param2: mission?.param2 ?? null,
-          heroIds: mission?.heroIds || [],
-          levelIds: mission?.levelIds || [],
-          storyTextCn: ext?.storyText || null,
-          materialConditionStatus: mission?.missionType === 73 ? 'unverified-direct-target' : 'not-applicable',
+          titleCn: missionRecord?.title || null,
+          descCn: missionRecord?.desc || null,
+          missionType: missionRecord?.missionType ?? null,
+          param1: missionRecord?.param1 ?? null,
+          param2: missionRecord?.param2 ?? null,
+          param3: missionRecord?.param3 ?? null,
+          param4: missionRecord?.param4 ?? null,
+          param5: missionRecord?.param5 || [],
+          param6: missionRecord?.param6 || [],
+          interpretedConditions: {
+            heroIds: missionRecord?.param5 || [],
+            levelIds: missionRecord?.param6 || [],
+            interpretationStatus: 'verified-for-known-sp-mission-types',
+          },
+          scenarioDescribeCn: extRecord?.scenarioDescribe || null,
+          materialConditionStatus: missionRecord?.missionType === 73 ? 'unverified-direct-target' : 'not-applicable',
         };
       };
 
@@ -353,14 +380,26 @@ function main() {
         nameKr: effectiveName(identity, stage),
         nameCn: identity.nameCn,
         nameEn: identity.nameEn,
+        sourceNameCn: record.nameCn,
+        heroInformationId: record.heroInformationId,
+        performances: record.performances,
         spIntroCn: record.spIntro,
-        chapter1Missions: record.chapter1MissionIds.map((id) => normalizeMission(id, 1)),
-        chapter2Missions: record.chapter2MissionIds.map((id) => normalizeMission(id, 2)),
-        additionalSkills: record.additionalSkillIds.map((id) => ({
+        spJobConnectionId: record.jobConnectionId,
+        charImageId: record.charImageId,
+        activationGoods: {
+          firstStageRawProtobufHex: record.firstStageActiveMaterialRaw,
+          newFirstStageRawProtobufHex: record.newFirstStageActiveMaterialRaw,
+          detailStatus: 'goods-decoder-pending',
+        },
+        firstStageMissions: record.firstStageMissionIds.map((id) => normalizeMission(id, 1)),
+        secondStageMissions: record.secondStageMissionIds.map((id) => normalizeMission(id, 2)),
+        secondStageRewardBuffId: record.secondStageRewardBuffId,
+        secondStageRewardSkills: record.secondStageRewardSkillIds.map((id) => ({
           id,
           ...(skillById.get(id) || {}),
           detailStatus: skillById.has(id) ? 'verified-source-link' : 'source-blocked',
         })),
+        secondStageRewardSoldierIds: record.secondStageRewardSoldierIds,
       };
     });
 
@@ -374,7 +413,9 @@ function main() {
         generatedFrom: CORE_SOURCES,
         recordCount: normalized.length,
         skillDetailStatus: skillStatus,
-        missionType73Policy: 'Do not auto-resolve material bundles until the direct target is verified.',
+        jobExpansionStatus: 'requires ConfigDataJobConnectionInfo/ConfigDataJobInfo',
+        goodsDetailStatus: 'requires Goods decoder plus valid item/material sources',
+        missionType73Policy: 'Do not auto-resolve Hero-SP material bundles until the direct target is verified.',
         records: normalized,
       },
       null,
