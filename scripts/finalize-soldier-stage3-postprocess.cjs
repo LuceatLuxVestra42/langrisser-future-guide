@@ -2,7 +2,6 @@ const fs=require('fs'),path=require('path');
 const ROOT=path.resolve(__dirname,'..');
 const GEN=path.join(ROOT,'data/generated/soldier-stage3.v1.json');
 const VAL=path.join(ROOT,'data/validation/soldier-stage3-final.v1.json');
-const HERO=path.join(ROOT,'data/configdata/ConfigDataHeroInfo.json');
 const SPH=path.join(ROOT,'data/configdata/ConfigDataSPHeroInfo.json');
 const HM=path.join(ROOT,'data/hero-name-master.v1.json');
 const SM=path.join(ROOT,'data/generated/soldier-master.v1.json');
@@ -20,19 +19,20 @@ const out=read(GEN), val=read(VAL), heroMaster=read(HM).records, soldierMaster=r
 const heroIds=new Set(heroMaster.map(x=>x.heroId)), soldierIds=new Set(soldierMaster.map(x=>x.soldierId));
 const errors=[], reviews=[];
 
-// 3-6: SPHeroInfo.HeroInformation_ID -> HeroInfo.HeroInformation_ID -> HeroInfo.ID.
-const heroes=frames(payload(HERO,'ConfigDataHeroInfo')).map(b=>{const m=msg(b);return{id:iv(m,2),name:sv(m,3),useable:!!iv(m,10),heroInformationId:iv(m,35)}});
-const canonicalByInfo=new Map();
-for(const h of heroes){if(!heroIds.has(h.id))continue;if(!canonicalByInfo.has(h.heroInformationId))canonicalByInfo.set(h.heroInformationId,[]);canonicalByInfo.get(h.heroInformationId).push(h);}
-const spHeroes=frames(payload(SPH,'ConfigDataSPHeroInfo')).map(b=>{const m=msg(b);return{spHeroInfoId:iv(m,2),nameCn:sv(m,3),heroInformationId:iv(m,6),rewardSoldierIds:uniq(rvi(m,25))}});
+// 3-6: ConfigDataSPHeroInfo is keyed by the base Hero ID. Its own ID is the
+// canonical Hero ID used to fetch this SP configuration; HeroInformation_ID is
+// separate presentation/information metadata and is often 0 in current records.
+const spHeroes=frames(payload(SPH,'ConfigDataSPHeroInfo')).map(b=>{const m=msg(b);return{heroId:iv(m,2),nameCn:sv(m,3),heroInformationId:iv(m,6),rewardSoldierIds:uniq(rvi(m,25))}});
 const rewardRows=[], reverse=new Map();
-let unmapped=0, ambiguous=0, missingRewardSoldiers=0;
+let unmapped=0, missingRewardSoldiers=0;
 for(const s of spHeroes){
-  const c=canonicalByInfo.get(s.heroInformationId)||[];
-  if(c.length!==1){if(c.length===0)unmapped++;else ambiguous++;reviews.push(`SPHeroInfo ${s.spHeroInfoId} HeroInformation_ID ${s.heroInformationId} canonical matches=${c.length}`);continue;}
-  const heroId=c[0].id;
-  for(const sid of s.rewardSoldierIds){if(!soldierIds.has(sid)){missingRewardSoldiers++;errors.push(`SP hero ${heroId} reward soldier ${sid} missing soldier master`);continue;}if(!reverse.has(sid))reverse.set(sid,[]);reverse.get(sid).push(heroId);}
-  if(s.rewardSoldierIds.length)rewardRows.push({spHeroInfoId:s.spHeroInfoId,heroInformationId:s.heroInformationId,heroId,nameCn:s.nameCn,rewardSoldierIds:s.rewardSoldierIds});
+  if(!heroIds.has(s.heroId)){unmapped++;reviews.push(`SPHeroInfo ID ${s.heroId} missing canonical hero master`);continue;}
+  for(const sid of s.rewardSoldierIds){
+    if(!soldierIds.has(sid)){missingRewardSoldiers++;errors.push(`SP hero ${s.heroId} reward soldier ${sid} missing soldier master`);continue;}
+    if(!reverse.has(sid))reverse.set(sid,[]);
+    reverse.get(sid).push(s.heroId);
+  }
+  if(s.rewardSoldierIds.length)rewardRows.push({heroId:s.heroId,heroInformationId:s.heroInformationId,nameCn:s.nameCn,rewardSoldierIds:s.rewardSoldierIds});
 }
 for(const r of out.records)r.heroes.spHeroAddedHeroIds=uniq(reverse.get(r.soldierId)||[]);
 out.spHeroRewards=rewardRows;
@@ -46,33 +46,35 @@ for(const p of out.trainingProfiles){
   const candidates=p.linkedTechs.filter(t=>t.levels.length===10&&t.levels.every((x,i)=>!x.missing&&x.soldierSkillLevel===i+1));
   p.primaryTenLevelTechId=candidates.length===1?candidates[0].techId:null;
   p.tenLevelTechIds=candidates.map(x=>x.techId);
-  if(tierById.get(p.soldierId)===3){if(candidates.length===0){tier3WithoutPrimary++;errors.push(`tier3 soldier ${p.soldierId} has no Lv1-10 soldier-skill TrainingTech path`);}else if(candidates.length>1){tier3MultiplePrimary++;reviews.push(`tier3 soldier ${p.soldierId} has multiple Lv1-10 soldier-skill TrainingTech paths: ${candidates.map(x=>x.techId).join(',')}`);}}
+  if(tierById.get(p.soldierId)===3){
+    if(candidates.length===0){tier3WithoutPrimary++;errors.push(`tier3 soldier ${p.soldierId} has no Lv1-10 soldier-skill TrainingTech path`);}
+    else if(candidates.length>1){tier3MultiplePrimary++;reviews.push(`tier3 soldier ${p.soldierId} has multiple Lv1-10 soldier-skill TrainingTech paths: ${candidates.map(x=>x.techId).join(',')}`);}
+  }
 }
 
-// Keep only genuine prior reviews that are unrelated to the two corrected rules.
+// Keep only genuine prior reviews unrelated to rules corrected by this post-pass.
 for(const r of val.reviews||[]){
   if(/^tier3 soldier .*multiple 10-level TrainingTech paths:/.test(r))continue;
   if(/^SPHeroInfo .* hero .* missing hero master$/.test(r))continue;
+  if(/^SPHeroInfo .* HeroInformation_ID .* canonical matches=/.test(r))continue;
   reviews.push(r);
 }
 for(const e of val.errors||[])errors.push(e);
 
 val.generatedAt=new Date().toISOString();
 out.generatedAt=val.generatedAt;
-val.sources.hero='data/configdata/ConfigDataHeroInfo.json';
-out.sources.hero='data/configdata/ConfigDataHeroInfo.json';
 val.counts.tier3WithoutTenLevel=tier3WithoutPrimary;
 val.counts.tier3MultipleTenLevel=tier3MultiplePrimary;
 val.counts.spHeroRewardEdges=rewardRows.reduce((n,x)=>n+x.rewardSoldierIds.length,0);
-val.checks.missingSpHeroIds=unmapped+ambiguous;
+val.checks.missingSpHeroIds=unmapped;
 val.checks.missingRewardSoldiers=missingRewardSoldiers;
 val.checks.spHeroMappingUnmapped=unmapped;
-val.checks.spHeroMappingAmbiguous=ambiguous;
-val.corrections=(val.corrections||[]).filter(x=>!x.startsWith('3-3 cardinality:'));
+val.checks.spHeroMappingAmbiguous=0;
+val.corrections=(val.corrections||[]).filter(x=>!x.startsWith('3-3 cardinality:')&&!x.startsWith('3-6 hero mapping:'));
 val.corrections.push('3-3 primary growth path: SoldierIDRelated can include shared passive/status techs. For displayed tier-3 soldiers, the soldier-specific Lv1-10 growth path is the unique linked tech whose TrainingTechLevelInfo.SoldierSkillLevelup sequence is 1..10. Current snapshot validates exactly one path for all 129 tier-3 normal soldiers.');
-val.corrections.push('3-6 hero mapping: SPHeroInfo.HeroInformation_ID is not Hero ID. Resolve it through HeroInfo.HeroInformation_ID, then use the matched canonical HeroInfo.ID before reversing SecondStageRewardSoldiers.');
+val.corrections.push('3-6 hero mapping: ConfigDataSPHeroInfo.ID is the canonical base Hero ID/key. HeroInformation_ID is separate metadata and is not used to identify the hero for SecondStageRewardSoldiers.');
 val.policy.trainingJoin='3-3 reverse-joins TrainingTechInfo.SoldierIDRelated; the soldier-specific Lv1-10 path is selected by SoldierSkillLevelup sequence 1..10. GetSoldierTechId remains validation metadata only.';
-val.policy.spHeroSoldiers='3-6 resolves SPHeroInfo.HeroInformation_ID -> HeroInfo.HeroInformation_ID -> canonical HeroInfo.ID, then reverse-indexes SecondStageRewardSoldiers by Soldier ID.';
+val.policy.spHeroSoldiers='3-6 uses ConfigDataSPHeroInfo.ID as the canonical Hero ID/key, validates it against hero-name-master, then reverse-indexes SecondStageRewardSoldiers by Soldier ID.';
 val.errors=uniq(errors);
 val.reviews=uniq(reviews);
 val.status=val.errors.length?'FAIL':(val.reviews.length?'PASS_WITH_REVIEW':'PASS');
