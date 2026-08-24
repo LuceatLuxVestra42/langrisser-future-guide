@@ -35,7 +35,9 @@
       "useable": 10,
       "rank": 13,
       "skillIds": 19,
-      "hiddenSkillIds": 20
+      "hiddenSkillIds": 20,
+      "jobConnectionId": 32,
+      "useableJobConnectionIds": 33
     },
     "jobInfo": {
       "id": 2,
@@ -65,6 +67,10 @@
       "range": 75,
       "areaOrTarget": 76
     }
+  },
+  "fieldEvidence": {
+    "heroToJobConnection": "Confirmed from dump.cs: ConfigDataHeroInfo.JobConnection_IDFieldNumber=32 and UseableJobConnections_IDFieldNumber=33.",
+    "jobConnectionCore": "Confirmed from dump.cs: ConfigDataJobConnectionInfo ID=2, Job_ID=6, JobLevels_ID=7, TalentSkill_IDs=8, UISort=9, IsRecommend=11."
   },
   "sourceHealth": [
     {
@@ -97,12 +103,13 @@
     "Valid individual export of ConfigDataJobConnectionInfo",
     "Valid individual export of ConfigDataJobLevelInfo",
     "Valid individual export of ConfigDataSkillInfo",
-    "Final verification of the exact HeroInfo-to-JobConnection relation field and JobLevel-to-Skill acquisition relation before normalized output"
+    "Final verification of the JobLevel-to-Skill acquisition relation before complete normal-job normalized output"
   ],
-  "completionRule": "Do not emit complete normalized normal-job data until all required sources pass structural preflight and relation fields are verified against representative heroes.",
+  "completionRule": "Do not emit complete normalized normal-job data until all required sources pass structural preflight and remaining relation fields are verified against representative heroes.",
   "notes": [
     "heroId remains the only canonical join key.",
+    "The HeroInfo-to-JobConnection relation is no longer unresolved; Stage 4-2 owns its isolated source preflight and normalization.",
     "The 99164 Korean-name override is temporary and must not mutate the canonical source before the user uploads the corrected source.",
-    "Known field numbers are recorded as a parsing contract, not as permission to infer unresolved relationship fields by numeric pattern."
+    "Known field numbers are parsing contracts and are never permission to infer missing relations by numeric pattern."
   ]
 }
