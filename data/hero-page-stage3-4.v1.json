@@ -1,7 +1,7 @@
 {
-  "version": 3,
+  "version": 4,
   "stage": "3-4",
-  "status": "source-blocked",
+  "status": "complete",
   "purpose": "Final hero-detail integrity gate and page-ready output contract.",
   "primaryKey": "heroId",
   "canonicalHeroFile": "data/hero-name-master.v1.json",
@@ -57,16 +57,19 @@
       "one hero receives multiple incompatible SP ownership records"
     ]
   },
-  "currentBlockers": [
-    "ConfigDataHeroInfo fails full payload framing after 22 records at byte offset 7388; the failure region contains the foreign type name ConfigDataCrystalCardPoolGroupInfo.",
-    "ConfigDataMissionInfo fails full payload framing after 105 records at byte offset 8240.",
-    "Both files must be individually re-exported and the final automatic validation rerun before stage 3 is closed."
-  ],
-  "completionRule": "Stage 3-4 is complete only after the final automatic validator passes the canonical identity checks, core source full-payload checks and cross-table reference checks. Actual 267-hero page-data generation still belongs to stage 6 after stages 4-5 populate battle and detail data.",
+  "currentBlockers": [],
+  "automaticValidation": {
+    "status": "PASS",
+    "workflowRunId": 32726576982,
+    "validatedSources": 8,
+    "canonicalHeroes": 267,
+    "spHeroes": 25
+  },
+  "completionRule": "Stage 3-4 is complete after the final automatic validator passes canonical identity checks, core source full-payload checks and cross-table reference checks. Actual 267-hero page-data generation remains stage 6 work after stages 4-5 populate battle/detail data.",
   "notes": [
-    "The output contract and PASS/REVIEW/FAIL policy remain valid; only the upstream source-readiness gate was reopened.",
+    "The re-exported HeroInfo and MissionInfo both passed deep full-payload validation.",
     "heroId is the only canonical join key; Korean names are display values.",
     "The corrected heroId 99164 name is canonical-source-confirmed through data/hero-name-corrections.v1.json.",
-    "The final automatic validation was necessary because wrapper-level integrity checks alone did not detect the latent payload problems."
+    "Stage 3 is now cleared for stage 4."
   ]
 }
