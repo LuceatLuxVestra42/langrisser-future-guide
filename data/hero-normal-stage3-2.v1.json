@@ -1,7 +1,7 @@
 {
-  "version": 2,
+  "version": 3,
   "stage": "3-2",
-  "status": "complete",
+  "status": "source-blocked",
   "primaryKey": "heroId",
   "canonicalHeroFile": "data/hero-name-master.v1.json",
   "canonicalCorrectionFile": "data/hero-name-corrections.v1.json",
@@ -20,18 +20,26 @@
     "jobConnectionCore": "Confirmed from dump.cs: ConfigDataJobConnectionInfo ID=2, Job_ID=6, JobLevels_ID=7, TalentSkill_IDs=8, UISort=9, IsRecommend=11."
   },
   "sourceHealth": [
-    {"file": "ConfigDataHeroInfo.json", "status": "usable"},
-    {"file": "ConfigDataJobInfo.json", "status": "usable", "m_size": 588553},
-    {"file": "ConfigDataJobConnectionInfo.json", "status": "usable", "m_size": 3519252},
-    {"file": "ConfigDataJobLevelInfo.json", "status": "usable", "m_size": 681985},
-    {"file": "ConfigDataSkillInfo.json", "status": "usable", "m_size": 10667280}
+    {
+      "file": "ConfigDataHeroInfo.json",
+      "status": "deep-validation-failed",
+      "m_size": 3462088,
+      "reason": "Wrapper is structurally valid, but the final automatic validation loses 4-byte big-endian record framing after 22 records at byte offset 7388. The failure region contains the foreign type name ConfigDataCrystalCardPoolGroupInfo, strongly indicating mixed/contaminated payload data."
+    },
+    {"file": "ConfigDataJobInfo.json", "status": "payload-validated", "m_size": 588553, "recordCount": 3295},
+    {"file": "ConfigDataJobConnectionInfo.json", "status": "payload-validated", "m_size": 3519252, "recordCount": 30066},
+    {"file": "ConfigDataJobLevelInfo.json", "status": "payload-validated", "m_size": 681985, "recordCount": 7459},
+    {"file": "ConfigDataSkillInfo.json", "status": "payload-validated", "m_size": 10667280, "recordCount": 27198}
   ],
-  "blockedOn": [],
-  "completionRule": "Stage 3-2 is complete when its parsing/join contract is fixed and all required ConfigData inputs pass structural source health. Full hero battle-data population belongs to stage 4.",
+  "blockedOn": [
+    "Individually re-export ConfigDataHeroInfo and replace the current contaminated payload.",
+    "Re-run npm run validate:hero-stage3 and require full payload framing plus relation validation to pass."
+  ],
+  "completionRule": "Stage 3-2 is complete only when every required core input passes both wrapper validation and full payload framing/parse validation. Full hero battle-data population remains stage 4 work.",
   "notes": [
     "heroId remains the only canonical join key.",
-    "All previously broken Job/Skill inputs were replaced with structurally usable exports.",
-    "No temporary Korean-name override remains; the corrected source is represented by the canonical correction layer.",
-    "Stage 4 owns full relation expansion and battle-data population."
+    "JobInfo, JobConnectionInfo, JobLevelInfo and SkillInfo passed full framed protobuf scanning in the final automatic validation.",
+    "HeroInfo was previously classified usable from its wrapper and early records; the deeper automatic scan exposed latent mixed-export corruption.",
+    "No temporary Korean-name override remains; heroId 99164 is corrected through the canonical correction layer."
   ]
 }
