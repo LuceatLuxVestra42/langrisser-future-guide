@@ -1,10 +1,11 @@
 {
-  "version": 1,
+  "version": 3,
   "stage": "3-4",
   "status": "source-blocked",
   "purpose": "Final hero-detail integrity gate and page-ready output contract.",
   "primaryKey": "heroId",
   "canonicalHeroFile": "data/hero-name-master.v1.json",
+  "canonicalCorrectionFile": "data/hero-name-corrections.v1.json",
   "upstream": {
     "identity": "data/hero-master-stage3-1.v1.json",
     "normal": "data/hero-normal-stage3-2.v1.json",
@@ -21,52 +22,11 @@
     "fail": "data/validation/hero-pages-fail.v1.json",
     "summary": "data/validation/hero-pages-summary.v1.json"
   },
-  "temporaryNameOverrides": [
-    {
-      "heroId": 99164,
-      "nameCn": "维尔纳",
-      "canonicalCurrentNameKr": "베르너",
-      "effectiveNameKr": "베르너 폰 에길",
-      "reason": "Canonical Korean-name source correction is pending; downstream display only."
-    }
-  ],
   "pageContract": {
-    "identity": [
-      "heroId",
-      "nameKr",
-      "nameCn",
-      "nameEn"
-    ],
-    "headerOptional": [
-      "rarity",
-      "cv",
-      "factions",
-      "origin",
-      "artwork",
-      "skins"
-    ],
-    "normal": [
-      "talent",
-      "bonds",
-      "exclusiveEquipment",
-      "covenant",
-      "soldiers",
-      "stats",
-      "jobs",
-      "skills"
-    ],
-    "sp": [
-      "exists",
-      "spJobConnectionId",
-      "talent",
-      "bonds",
-      "exclusiveEquipment",
-      "covenant",
-      "soldiers",
-      "stats",
-      "missions",
-      "rewardSkills"
-    ],
+    "identity": ["heroId","nameKr","nameCn","nameEn"],
+    "headerOptional": ["rarity","cv","factions","origin","artwork","skins"],
+    "normal": ["talent","bonds","exclusiveEquipment","covenant","soldiers","stats","jobs","skills"],
+    "sp": ["exists","spJobConnectionId","talent","bonds","exclusiveEquipment","covenant","soldiers","stats","missions","rewardSkills"],
     "presentationRules": [
       "Base mode is shown first; SP mode is shown only when SP data exists.",
       "Exclusive equipment and covenant sections remain present and may display 미출시 instead of being omitted.",
@@ -79,35 +39,34 @@
     "PASS": [
       "heroId is unique and exists in the canonical hero master",
       "identity fields are present",
-      "normal normalized record exists",
+      "required core ConfigData passes wrapper and full payload validation",
       "normal Job/Skill references contain no unresolved hard relation errors",
-      "when SP exists, SP record resolves to the same canonical heroId and all referenced SP missions exist"
+      "when SP exists, SP record resolves to the same canonical heroId and referenced SP missions exist"
     ],
     "REVIEW": [
       "display/enrichment fields such as CV, factions, origin, artwork, skins, bonds, exclusive equipment, covenant, soldiers or stat labels are not connected yet",
       "skill/job Korean display names are pending while IDs and source relations are valid",
-      "Hero-SP MissionType 73 material bundle direct target is not yet verified",
-      "temporary Korean-name override is active"
+      "Hero-SP MissionType 73 material-bundle detail remains unverified"
     ],
     "FAIL": [
+      "core ConfigData wrapper passes but full payload framing or parse validation fails",
       "duplicate heroId",
       "canonical hero reference is missing",
-      "normal normalized record is missing after stage 3-2 is declared ready",
       "Job/Skill/Mission reference points to a missing record",
       "SP record belongs to an unknown hero",
       "one hero receives multiple incompatible SP ownership records"
     ]
   },
   "currentBlockers": [
-    "Stage 3-2 is source-blocked by broken JobInfo/JobConnectionInfo/JobLevelInfo/SkillInfo exports.",
-    "Stage 3-3 is source-blocked by broken SPHeroInfo/MissionExtSPHeroInfo/MissionInfo and detail-source exports.",
-    "Final PASS page data must not be emitted until the upstream normalized inputs exist."
+    "ConfigDataHeroInfo fails full payload framing after 22 records at byte offset 7388; the failure region contains the foreign type name ConfigDataCrystalCardPoolGroupInfo.",
+    "ConfigDataMissionInfo fails full payload framing after 105 records at byte offset 8240.",
+    "Both files must be individually re-exported and the final automatic validation rerun before stage 3 is closed."
   ],
-  "completionRule": "Run the finalizer only after stage 3-2 and stage 3-3 normalized inputs are available. The finalizer may always emit validation summary files, but pageData may contain only PASS records. REVIEW and FAIL records remain separated from public page output.",
+  "completionRule": "Stage 3-4 is complete only after the final automatic validator passes the canonical identity checks, core source full-payload checks and cross-table reference checks. Actual 267-hero page-data generation still belongs to stage 6 after stages 4-5 populate battle and detail data.",
   "notes": [
-    "Stage 3-4 is intentionally able to report SOURCE_BLOCKED without fabricating missing upstream data.",
-    "heroId is the only canonical join key; Korean names are display values only.",
-    "The page contract follows the project design: hero art/skin header, identity metadata, normal/SP mode, core information, stats, jobs/skills or SP missions.",
-    "Missing optional presentation data is REVIEW rather than FAIL so later asset/CV/faction work can be attached without redesigning the hero data core."
+    "The output contract and PASS/REVIEW/FAIL policy remain valid; only the upstream source-readiness gate was reopened.",
+    "heroId is the only canonical join key; Korean names are display values.",
+    "The corrected heroId 99164 name is canonical-source-confirmed through data/hero-name-corrections.v1.json.",
+    "The final automatic validation was necessary because wrapper-level integrity checks alone did not detect the latent payload problems."
   ]
 }

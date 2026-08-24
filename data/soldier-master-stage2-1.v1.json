@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "stage": "2-1",
+  "status": "complete",
+  "sourceFile": "data/configdata/ConfigDataSoldierInfo.json",
+  "scope": {
+    "sourceRecordCount": 777,
+    "displayableRecordCount": 224,
+    "displayableRule": "Useable == true && IsEnemy == false",
+    "note": "Displayable scope still contains both normal and SP SoldierInfo records. Final normal/SP relation is resolved separately and is not inferred in stage 2-1."
+  },
+  "primaryKey": "soldierId",
+  "identityContract": {
+    "canonicalField": "soldierId",
+    "source": "ConfigDataSoldierInfo.ID",
+    "type": "integer",
+    "required": true,
+    "unique": true,
+    "immutableForSiteJoin": true
+  },
+  "joinPolicy": {
+    "allGameDataJoinsUseSoldierId": true,
+    "namesAreJoinKeys": false,
+    "slugIsJoinKey": false,
+    "numericPatternInferenceAllowed": false,
+    "spIdArithmeticAllowed": false
+  },
+  "validationEvidence": {
+    "soldierInfoParsedRecords": 777,
+    "duplicateSoldierIds": 0,
+    "displayableRecords": 224,
+    "displayableArmyJoinFailures": 0,
+    "displayableInvalidRanks": 0
+  },
+  "downstreamContract": {
+    "stage2_2": "Attach Chinese display name to soldierId without changing identity.",
+    "stage2_3": "Attach Korean display name/status to soldierId without using names for joins.",
+    "stage2_4": "Attach tier, armyType and uiGroup classification to soldierId.",
+    "stage2_5": "Attach explicit Normal↔SP relationship when a clean ConfigDataSPSoldierInfo source is available.",
+    "stage2_6": "Generate optional site slug while preserving soldierId as the game-data key."
+  },
+  "blockers": [],
+  "completionEvidence": [
+    "ConfigDataSoldierInfo currently parses as 777 framed protobuf records.",
+    "No duplicate SoldierInfo.ID values were found in the final stage 1-5 automated base validation.",
+    "The 224 displayable SoldierInfo records can therefore be addressed uniquely by soldierId.",
+    "SP classification and Normal↔SP pairing are intentionally deferred; stage 2-1 does not derive them from numeric ID patterns."
+  ]
+}
