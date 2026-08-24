@@ -9,6 +9,7 @@ on:
       - 'scripts/prepare_hero_job_trees_stage43.cjs'
       - 'scripts/prepare_hero_skill_acquisition_stage44.cjs'
       - 'scripts/prepare_hero_basic_combat_stage45.cjs'
+      - 'scripts/investigate_hero_display_stats.cjs'
       - 'data/hero-name-master.v1.json'
       - 'data/hero-name-corrections.v1.json'
       - 'data/hero-master-stage3-1.v1.json'
@@ -38,6 +39,7 @@ on:
       - 'scripts/prepare_hero_job_trees_stage43.cjs'
       - 'scripts/prepare_hero_skill_acquisition_stage44.cjs'
       - 'scripts/prepare_hero_basic_combat_stage45.cjs'
+      - 'scripts/investigate_hero_display_stats.cjs'
       - 'data/hero-name-master.v1.json'
       - 'data/hero-name-corrections.v1.json'
       - 'data/hero-master-stage3-1.v1.json'
@@ -90,6 +92,8 @@ jobs:
         run: npm run inspect:hero-skills
       - name: Run stage 4-5 basic combat partial assembly
         run: npm run inspect:hero-combat
+      - name: Investigate final hero display-stat inputs
+        run: npm run investigate:hero-display-stats
       - name: Commit regenerated stage 4-2 through 4-5 outputs
         shell: bash
         run: |
@@ -103,7 +107,8 @@ jobs:
             data/validation/hero-job-stage4-2-summary.v1.json \
             data/validation/hero-job-tree-stage4-3-summary.v1.json \
             data/validation/hero-skill-stage4-4-summary.v1.json \
-            data/validation/hero-basic-combat-stage4-5-summary.v1.json
+            data/validation/hero-basic-combat-stage4-5-summary.v1.json \
+            data/validation/hero-display-stat-investigation.v1.json
           if git diff --cached --quiet; then
             echo "No stage 4 output changes to commit."
           else
