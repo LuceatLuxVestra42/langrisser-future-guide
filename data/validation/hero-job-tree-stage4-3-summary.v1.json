@@ -1,40 +1,31 @@
 {
   "version": 1,
   "stage": "4-3",
-  "status": "UPSTREAM_BLOCKED",
-  "pipelineStatus": "READY_FOR_SOURCE_REPLACEMENT",
-  "upstreamStatus": "SOURCE_BLOCKED",
-  "generatedHeroCount": 0,
-  "verifiedRelations": [
-    "ConfigDataJobConnectionInfo.JobLevels_ID = protobuf field 7",
-    "ConfigDataJobConnectionInfo.UISort = protobuf field 9",
-    "ConfigDataJobConnectionInfo.PreJobConnectionList = protobuf field 23",
-    "ConfigDataJobLevelInfo.ID = protobuf field 2",
-    "ConfigDataJobLevelInfo.rank_code = protobuf field 5",
-    "ConfigDataJobLevelInfo.JobLevelUpHeroLevel = protobuf field 8",
-    "ConfigDataJobLevelInfo.GotSkill_ID = protobuf field 28",
-    "ConfigDataJobLevelInfo.GotSoldier_ID = protobuf field 29"
-  ],
-  "sourceHealth": [
-    {
-      "filename": "ConfigDataJobConnectionInfo.json",
-      "status": "broken",
-      "issues": ["m_bytes is null"]
+  "status": "PASS",
+  "upstreamStatus": "PASS",
+  "heroCount": 267,
+  "generatedHeroCount": 267,
+  "sourceRecordCounts": {
+    "jobConnectionInfo": 30066,
+    "jobLevelInfo": 7459
+  },
+  "hardErrors": [],
+  "review": [],
+  "verifiedFieldContract": {
+    "jobConnectionInfo": {
+      "id": 2,
+      "jobLevelIds": 7,
+      "uiSort": 9,
+      "preJobConnectionIds": 23
     },
-    {
-      "filename": "ConfigDataJobLevelInfo.json",
-      "status": "broken",
-      "issues": ["m_Name is empty instead of ConfigDataJobLevelInfo", "m_size is negative", "m_bytes is null"]
+    "jobLevelInfo": {
+      "id": 2,
+      "desc": 3,
+      "rankCode": 5,
+      "jobLevelUpHeroLevel": 8,
+      "gotSkillId": 28,
+      "gotSoldierId": 29
     }
-  ],
-  "blockers": [
-    "Stage 4-2 must first return PASS or REVIEW after valid JobConnectionInfo and JobInfo are supplied.",
-    "Replace ConfigDataJobLevelInfo.json with a structurally valid individual TextAsset export."
-  ],
-  "resumeCommands": [
-    "npm run inspect:hero-jobs",
-    "npm run inspect:hero-job-trees"
-  ],
-  "completionBehavior": "After Stage 4-2 is usable and JobLevelInfo is valid, Stage 4-3 resolves explicit predecessor edges, validates all JobLevel references, rejects cycles and missing references, preserves JobLevels_ID order, and emits per-hero root/branch/tree structures to data/generated/hero-job-trees.v1.json.",
-  "nextStage": "4-4 skill acquisition attachment after Stage 4-3 returns PASS or REVIEW."
+  },
+  "nextStage": "4-4 skill acquisition attachment"
 }
