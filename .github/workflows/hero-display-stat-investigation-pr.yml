@@ -5,9 +5,11 @@ on:
     paths:
       - 'data/validation/hero-stage3-validation-trigger.txt'
       - 'scripts/investigate_hero_display_stats.cjs'
+      - 'scripts/append_display_stat_fixture_joblevels.cjs'
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/configdata/ConfigDataJobInfo.json'
       - 'data/generated/hero-job-links.v1.json'
+      - 'data/generated/hero-basic-combat.v1.json'
       - '.github/workflows/hero-display-stat-investigation-pr.yml'
   workflow_dispatch:
 
@@ -21,6 +23,8 @@ jobs:
           node-version: '22'
       - name: Run display-stat investigation
         run: npm run investigate:hero-display-stats
+      - name: Append final job-level fixture inputs
+        run: node scripts/append_display_stat_fixture_joblevels.cjs
       - name: Upload investigation result
         uses: actions/upload-artifact@v4
         with:
