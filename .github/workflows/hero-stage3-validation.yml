@@ -52,6 +52,7 @@ on:
       - 'data/configdata/ConfigDataSPHeroInfo.json'
       - 'data/configdata/ConfigDataMissionExtSPHeroInfo.json'
       - 'data/configdata/ConfigDataMissionInfo.json'
+      - '.github/workflows/hero-stage3-validation.yml'
 
 permissions:
   contents: write
@@ -68,11 +69,12 @@ jobs:
         run: node scripts/validate_hero_stage3_final.cjs
 
   rebuild-hero-stage4-through-44:
-    if: github.event_name != 'pull_request'
     needs: validate-hero-stage3
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -98,5 +100,5 @@ jobs:
             echo "No stage 4 output changes to commit."
           else
             git commit -m "rebuild hero stage 4 through 4-4 from restored ConfigData"
-            git push
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
           fi
