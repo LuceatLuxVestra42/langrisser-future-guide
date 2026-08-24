@@ -1,0 +1,31 @@
+name: Soldier Stage 2 Final Validation
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSPSoldierInfo.json'
+      - 'data/configdata/ConfigDataArmyInfo.json'
+      - 'data/metadata/soldier-name-kr-tier3.v1.json'
+      - 'data/soldier-master-stage2-1.v1.json'
+      - 'scripts/finalize-soldier-stage2.cjs'
+      - '.github/workflows/soldier-stage2-final.yml'
+
+jobs:
+  validate-soldier-stage2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run soldier stage 2 final validation
+        run: node scripts/finalize-soldier-stage2.cjs
+      - name: Upload soldier stage 2 outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage2-final
+          path: |
+            data/generated/soldier-master.v1.json
+            data/validation/soldier-stage2-final.v1.json
