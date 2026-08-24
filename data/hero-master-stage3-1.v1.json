@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "stage": "3-1",
+  "status": "complete",
+  "canonicalRecordsFile": "data/hero-name-master.v1.json",
+  "recordCount": 267,
+  "primaryKey": "heroId",
+  "identityFields": [
+    "heroId",
+    "nameCn",
+    "nameKr",
+    "nameEn",
+    "aliasesKr",
+    "status"
+  ],
+  "validationPolicy": {
+    "heroIdMustBeUnique": true,
+    "nameCnMustBeUnique": true,
+    "nameKrMayCollide": true,
+    "allRecordsMustBeVerified": true
+  },
+  "knownNameCollisions": [
+    {
+      "field": "nameKr",
+      "value": "베르너",
+      "records": [
+        {
+          "heroId": 123,
+          "nameCn": "沃尔纳",
+          "nameEn": "Werner"
+        },
+        {
+          "heroId": 99164,
+          "nameCn": "维尔纳",
+          "nameEn": "Verner"
+        }
+      ],
+      "handling": "Never use nameKr as a unique join key; use heroId."
+    }
+  ],
+  "deferredFields": [
+    {
+      "field": "rarity",
+      "targetStage": "3-2 or later",
+      "reason": "Not required to freeze hero identity; authoritative field mapping should be verified before bulk attachment."
+    },
+    {
+      "field": "hasSP",
+      "targetStage": "3-3",
+      "reason": "SP is a separate relationship and should be joined only when SP integration is performed."
+    }
+  ],
+  "notes": [
+    "The existing hero-name-master.v1.json is reused instead of creating a duplicate 267-record identity table.",
+    "The project-reviewed Korean-name source contains 267 non-empty mappings and no duplicate Chinese names.",
+    "The current repository master declares its scope as playable heroes (Useable=true). This stage accepts that existing canonical set; re-deriving the playable filter from raw protobuf bytes is outside the 3-1 identity-freeze scope."
+  ]
+}
