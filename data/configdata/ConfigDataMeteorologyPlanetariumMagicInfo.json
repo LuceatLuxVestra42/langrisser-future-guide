@@ -1,15 +1,480 @@
-{
-  "m_GameObject": {
-    "m_FileID": -1244659909,
-    "m_PathID": 7449320391164129889
+[
+  {
+    "ID": 1,
+    "Name": "风旅",
+    "SimpleDesc": "拥有至少<color=#DC143C>5</color>层强化时，主动进战后可传送自身。",
+    "Desc": "拥有<color=#DC143C>5</color>个及以上强化效果时，主动攻击进入战斗后可传送到周围<color=#DC143C>2</color>格范围内任意一格。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Wind_1.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 3,
+    "BattleEffects": [
+      1
+    ],
+    "WeatherArchiveId": 1
   },
-  "m_Enabled": 111,
-  "m_Script": {
-    "m_FileID": 272433408,
-    "m_PathID": 2487561385683446022
+  {
+    "ID": 2,
+    "Name": "风步",
+    "SimpleDesc": "其他友军通过自身周围时获得移动力减免。",
+    "Desc": "其他友军通过自身周围<color=#DC143C>2</color>格的地形时，可以获得<color=#DC143C>1</color>格免除移动力降低的机会。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Wind_2.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 3,
+    "BattleEffects": [
+      2
+    ],
+    "WeatherArchiveId": 1
   },
-  "m_Name": "",
-  "m_size": 1819239215,
-  "m_bytes": [],
-  "m_MD5": ""
-}
+  {
+    "ID": 3,
+    "Name": "山罡·风",
+    "SimpleDesc": "战斗开始召唤[山罡·风]。",
+    "Desc": "战斗开始时召唤[山罡·风]（携带技能“风神之力”、“风神吹息”）。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Wind_3.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 3,
+    "BattleEffects": [
+      3
+    ],
+    "WeatherArchiveId": 1
+  },
+  {
+    "ID": 4,
+    "Name": "风阵研究",
+    "SimpleDesc": "移动小于等于<color=#DC143C>3</color>格时，回合内免疫[位移]和风效果。",
+    "Desc": "行动结束时若移动小于等于<color=#DC143C>3</color>格，本回合内不受[位移]影响，包括风效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Wind_4.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 4,
+    "BattleEffects": [
+      4
+    ],
+    "WeatherArchiveId": 1
+  },
+  {
+    "ID": 5,
+    "Name": "风势突破",
+    "SimpleDesc": "移动大于等于<color=#DC143C>3</color>格时，战后击退目标并使击退路径生成[乱流]。",
+    "Desc": "进入战斗前移动大于等于<color=#DC143C>3</color>格时，战后造成[位移]效果：将目标击退<color=#DC143C>1</color>格，并使击退路径上的所有格子获得<color=#DC143C>1</color>回合的特殊效果[乱流]。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Wind_5.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 4,
+    "BattleEffects": [
+      5
+    ],
+    "WeatherArchiveId": 1
+  },
+  {
+    "ID": 6,
+    "Name": "风锐战芒",
+    "SimpleDesc": "技能伤害提升。",
+    "Desc": "技能伤害提升<color=#DC143C>20%</color>。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Wind_6.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 4,
+    "BattleEffects": [
+      6
+    ],
+    "WeatherArchiveId": 1
+  },
+  {
+    "ID": 7,
+    "Name": "捕风人·凛冽",
+    "SimpleDesc": "[位移]击退距离增加，对敌方造成[位移]施加[刺骨]。",
+    "Desc": "造成的[位移]击退距离<color=#DC143C>+1</color>，对敌方造成[位移]效果后施加[刺骨]。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Wind_7.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 6,
+    "BattleEffects": [
+      7
+    ],
+    "WeatherArchiveId": 1
+  },
+  {
+    "ID": 8,
+    "Name": "破风士·战意",
+    "SimpleDesc": "主动进战前移动越多伤害提升越高。",
+    "Desc": "主动攻击进入战斗前每移动<color=#DC143C>1</color>格，伤害提升<color=#DC143C>5%</color>，最多提升<color=#DC143C>40%</color>。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Wind_8.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 6,
+    "BattleEffects": [
+      8
+    ],
+    "WeatherArchiveId": 1
+  },
+  {
+    "ID": 9,
+    "Name": "研风者·祝福",
+    "SimpleDesc": "获得[风阵研究]与[风势突破]的效果。",
+    "Desc": "获得[风阵研究]与[风势突破]的效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Wind_9.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 6,
+    "BattleEffects": [
+      9
+    ],
+    "WeatherArchiveId": 1
+  },
+  {
+    "ID": 10,
+    "Name": "沙袭",
+    "SimpleDesc": "主动攻击发生暴击后可再移动。",
+    "Desc": "主动攻击发生暴击后，可再移动<color=#DC143C>3</color>格。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Sand_1.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 7,
+    "BattleEffects": [
+      10
+    ],
+    "WeatherArchiveId": 7
+  },
+  {
+    "ID": 11,
+    "Name": "沙行",
+    "SimpleDesc": "通过[荒漠]时获得移动力减免。",
+    "Desc": "通过[荒漠]时，可以获得<color=#DC143C>2</color>格免除移动力降低的机会。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Sand_2.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 7,
+    "BattleEffects": [
+      11
+    ],
+    "WeatherArchiveId": 7
+  },
+  {
+    "ID": 12,
+    "Name": "山罡·沙",
+    "SimpleDesc": "战斗开始召唤[山罡·沙]。",
+    "Desc": "战斗开始时召唤[山罡·沙]（携带技能“沙影传送”、“尘起沙生”）。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Sand_3.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 7,
+    "BattleEffects": [
+      12
+    ],
+    "WeatherArchiveId": 7
+  },
+  {
+    "ID": 13,
+    "Name": "蜃沙聚焦",
+    "SimpleDesc": "进入战斗时部队的溢出射程使自身获得造成伤害提升与遭受伤害降低的效果，可叠加。",
+    "Desc": "进入战斗时部队每有<color=#DC143C>1</color>格溢出的射程，获得<color=#DC143C>1</color>层[聚焦]:\"造成伤害提升<color=#DC143C>5%</color>，遭受伤害降低<color=#DC143C>5%</color>\"，持续<color=#DC143C>2</color>回合，可叠加<color=#DC143C>4</color>层（无法免疫，不可驱散）。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Sand_4.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 8,
+    "BattleEffects": [
+      13
+    ],
+    "WeatherArchiveId": 7
+  },
+  {
+    "ID": 14,
+    "Name": "狂沙蔓延",
+    "SimpleDesc": "[棘刃]范围<color=#DC143C>+1</color>，[棘刃]对<color=#DC143C>2</color>个及以上单位造成伤害时自身获得[砂梭]。",
+    "Desc": "[棘刃]范围<color=#DC143C>+1</color>，[棘刃]对<color=#DC143C>2</color>个及以上单位造成伤害时自身获得[砂梭]。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Sand_5.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 8,
+    "BattleEffects": [
+      14
+    ],
+    "WeatherArchiveId": 7
+  },
+  {
+    "ID": 15,
+    "Name": "沙舞月华",
+    "SimpleDesc": "生命<color=#DC143C>85%</color>以上时，所有攻防属性提升。",
+    "Desc": "生命<color=#DC143C>85%</color>以上时，所有攻防属性提升<color=#DC143C>15%</color>。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Sand_6.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 8,
+    "BattleEffects": [
+      15
+    ],
+    "WeatherArchiveId": 7
+  },
+  {
+    "ID": 16,
+    "Name": "斗沙人·猛袭",
+    "SimpleDesc": "进入战斗造成伤害提升，距离目标越远效果降低越多。",
+    "Desc": "进入战斗造成伤害提升<color=#DC143C>30%</color>，距离目标每多<color=#DC143C>1</color>格造成伤害降低<color=#DC143C>15%</color>，最多降低<color=#DC143C>30%</color>。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Sand_7.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 10,
+    "BattleEffects": [
+      16
+    ],
+    "WeatherArchiveId": 7
+  },
+  {
+    "ID": 17,
+    "Name": "引沙士·暴击",
+    "SimpleDesc": "移动大于等于<color=#DC143C>3</color>格时，获得使周围友军暴击伤害提升的指挥效果，可叠加。",
+    "Desc": "行动结束时若移动大于等于<color=#DC143C>3</color>格，获得[暴伤指挥]:\"周围<color=#DC143C>2</color>格范围内所有友军暴击伤害提升<color=#DC143C>20%</color>，可叠加，持续<color=#DC143C>1</color>回合\"，无法免疫，不可驱散。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Sand_8.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 10,
+    "BattleEffects": [
+      17
+    ],
+    "WeatherArchiveId": 7
+  },
+  {
+    "ID": 18,
+    "Name": "迷沙者·蜃狂",
+    "SimpleDesc": "获得[蜃沙聚焦]与[狂沙蔓延]的效果，",
+    "Desc": "获得[蜃沙聚焦]与[狂沙蔓延]的效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/PlanetariumMagic_Sand_9.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 10,
+    "BattleEffects": [
+      18
+    ],
+    "WeatherArchiveId": 7
+  },
+  {
+    "ID": 101,
+    "Name": "凝寒",
+    "SimpleDesc": "行动结束时，在自身周围生成天气地形效果。",
+    "Desc": "行动结束时，在自身周围<color=#DC143C>1</color>圈范围内随机<color=#DC143C>2</color>格生成[雪丘]、[寒隙]或[冰坞]，持续<color=#DC143C>1</color>回合。",
+    "Icon": "UI/Meteorology_ABS/Icon/Mystery_snow_1_1.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 3,
+    "BattleEffects": [
+      48
+    ],
+    "WeatherArchiveId": 14
+  },
+  {
+    "ID": 102,
+    "Name": "踏雪",
+    "SimpleDesc": "通过天气地形效果时获得移动力减免。",
+    "Desc": "通过[雪丘]、[寒隙]、[冰坞]时，可以获得<color=#DC143C>2</color>格免除移动力降低的机会。",
+    "Icon": "UI/Meteorology_ABS/Icon/Mystery_snow_1_2.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 3,
+    "BattleEffects": [
+      49
+    ],
+    "WeatherArchiveId": 14
+  },
+  {
+    "ID": 103,
+    "Name": "山罡·雪",
+    "SimpleDesc": "战斗开始时召唤[山罡·雪]。",
+    "Desc": "战斗开始时召唤[山罡·雪]（携带技能“霜息化雪”、“净雪归无”）。",
+    "Icon": "UI/Meteorology_ABS/Icon/Mystery_snow_1_3.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 3,
+    "BattleEffects": [
+      50
+    ],
+    "WeatherArchiveId": 14
+  },
+  {
+    "ID": 104,
+    "Name": "凌霜飞渡",
+    "SimpleDesc": "在天气地形效果上行动结束时，可选择传送至自身周围的天气地形效果上。",
+    "Desc": "在[雪丘]、[寒隙]、[冰坞]上行动结束时，可选择传送至自身<color=#DC143C>3</color>格范围内的任意[雪丘]、[寒隙]或[冰坞]上。",
+    "Icon": "UI/Meteorology_ABS/Icon/Mystery_snow_2_1.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 4,
+    "BattleEffects": [
+      51
+    ],
+    "WeatherArchiveId": 14
+  },
+  {
+    "ID": 105,
+    "Name": "冰雪同心",
+    "SimpleDesc": "我方单位有<color=#DC143C>3</color>人位于同种天气地形效果时，所有我方单位均获得其基础加成效果。",
+    "Desc": "我方单位有<color=#DC143C>3</color>人位于同种天气地形效果（[雪丘]、[寒隙]或[冰坞]）时，所有我方单位均获得其基础加成效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/Mystery_snow_2_2.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 4,
+    "BattleEffects": [
+      52
+    ],
+    "WeatherArchiveId": 14
+  },
+  {
+    "ID": 106,
+    "Name": "寒锋冰甲",
+    "SimpleDesc": "主动攻击进入战斗时造成伤害提升、遭受伤害降低。",
+    "Desc": "主动攻击进入战斗时造成伤害提升<color=#DC143C>20%</color>，遭受伤害降低<color=#DC143C>20%</color>。",
+    "Icon": "UI/Meteorology_ABS/Icon/Mystery_snow_2_3.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 4,
+    "BattleEffects": [
+      53
+    ],
+    "WeatherArchiveId": 14
+  },
+  {
+    "ID": 107,
+    "Name": "御霜者·凛刃",
+    "SimpleDesc": "行动结束时若处于天气地形效果上则获得造成伤害提升的效果，可叠加。",
+    "Desc": "行动结束时若处于[雪丘]、[寒隙]或[冰坞]之上，获得“造成伤害提升<color=#DC143C>10%</color>”，可叠加<color=#DC143C>4</color>层，持续<color=#DC143C>5</color>回合，不可驱散，无法免疫。",
+    "Icon": "UI/Meteorology_ABS/Icon/Mystery_snow_3_1.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 6,
+    "BattleEffects": [
+      54
+    ],
+    "WeatherArchiveId": 14
+  },
+  {
+    "ID": 108,
+    "Name": "逐寒客·蓄势",
+    "SimpleDesc": "在天气地形效果上累计行动结束<color=#DC143C>3</color>次后，可额外行动<color=#DC143C>1</color>次并重新计数（[触发冷却]：<color=#DC143C>3</color>回合）。",
+    "Desc": "在[雪丘]、[寒隙]或[冰坞]上累计行动结束<color=#DC143C>3</color>次后，可额外行动<color=#DC143C>1</color>次并重新计数（[触发冷却]：<color=#DC143C>3</color>回合）。",
+    "Icon": "UI/Meteorology_ABS/Icon/Mystery_snow_3_2.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 6,
+    "BattleEffects": [
+      55
+    ],
+    "WeatherArchiveId": 14
+  },
+  {
+    "ID": 109,
+    "Name": "雪旅人·移形",
+    "SimpleDesc": "获得[凌霜飞渡]与[冰雪同心]的效果。",
+    "Desc": "获得[凌霜飞渡]与[冰雪同心]的效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/Mystery_snow_3_3.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 6,
+    "BattleEffects": [
+      56
+    ],
+    "WeatherArchiveId": 14
+  },
+  {
+    "ID": 110,
+    "Name": "掠雨",
+    "SimpleDesc": "我方击杀敌军时，额外获得水能并使敌军失去水能。",
+    "Desc": "我方击杀敌军时，额外获得<color=#DC143C>2</color>点水能，并使敌军失去<color=#DC143C>2</color>点水能。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Mystery_rain_1_1.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 7,
+    "BattleEffects": [
+      64,
+      65
+    ],
+    "WeatherArchiveId": 21,
+    "IsVisibleInEnergyUI": true
+  },
+  {
+    "ID": 111,
+    "Name": "踏雨",
+    "SimpleDesc": "达到<color=#DC143C>I</color>/<color=#DC143C>II</color>/<color=#DC143C>III</color>级[泽鸣]时，获得移动力提升的效果。",
+    "Desc": "达到<color=#DC143C>I</color>/<color=#DC143C>II</color>/<color=#DC143C>III</color>级[泽鸣]时，额外获得“移动力<color=#DC143C>+1</color>/<color=#DC143C>+2</color>/<color=#DC143C>+3</color>”。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Mystery_rain_1_2.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 7,
+    "BattleEffects": [
+      66
+    ],
+    "WeatherArchiveId": 21,
+    "ShowInExtraEffectsUIDesc": "达到<color=#DC143C>I</color>/<color=#DC143C>II</color>/<color=#DC143C>III</color>级[泽鸣]时，获得移动力提升的效果。",
+    "IsShowInExtraEffectsUI": true
+  },
+  {
+    "ID": 112,
+    "Name": "山罡·雨",
+    "SimpleDesc": "战斗开始时召唤[山罡·雨]。",
+    "Desc": "战斗开始时召唤[山罡·雨]（携带技能“蚀甲雨幕”、“雷殛敕令”）。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Mystery_rain_1_3.png",
+    "Level": 1,
+    "MeteorologyPlanetariumUnlockLevel": 7,
+    "BattleEffects": [
+      67
+    ],
+    "WeatherArchiveId": 21
+  },
+  {
+    "ID": 113,
+    "Name": "噬雷之雨",
+    "SimpleDesc": "我方造成[落雷]伤害提升。",
+    "Desc": "我方造成[落雷]伤害提升<color=#DC143C>100%</color>。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Mystery_rain_2_1.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 8,
+    "BattleEffects": [
+      68
+    ],
+    "WeatherArchiveId": 21,
+    "ShowInExtraEffectsUIDesc": "我方造成[落雷]伤害提升。",
+    "IsShowInExtraEffectsUI": true
+  },
+  {
+    "ID": 114,
+    "Name": "雷霆骤雨",
+    "SimpleDesc": "我方造成[落雷]伤害后，对目标施加[易暴]。",
+    "Desc": "我方造成[落雷]伤害后，对目标施加[易暴]。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Mystery_rain_2_2.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 8,
+    "BattleEffects": [
+      69
+    ],
+    "WeatherArchiveId": 21,
+    "ShowInExtraEffectsUIDesc": "我方造成[落雷]伤害后，对目标施加[易暴]。",
+    "IsShowInExtraEffectsUI": true
+  },
+  {
+    "ID": 115,
+    "Name": "狂雨怒息",
+    "SimpleDesc": "暴击率与暴击伤害提升。",
+    "Desc": "暴击率提升<color=#DC143C>20%</color>，暴击伤害提升<color=#DC143C>30%</color>。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Mystery_rain_2_3.png",
+    "Level": 2,
+    "MeteorologyPlanetariumUnlockLevel": 8,
+    "BattleEffects": [
+      70
+    ],
+    "WeatherArchiveId": 21
+  },
+  {
+    "ID": 116,
+    "Name": "聆潮者·唤雷",
+    "SimpleDesc": "我方主动攻击进入战斗后对目标周围敌军额外造成[落雷]伤害。",
+    "Desc": "我方主动攻击进入战斗后，行动结束时对目标周围<color=#DC143C>2</color>格范围内所有敌军造成本次伤害<color=#DC143C>0.1</color>倍的[落雷]伤害。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Mystery_rain_3_1.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 9,
+    "BattleEffects": [
+      71
+    ],
+    "WeatherArchiveId": 21,
+    "ShowInExtraEffectsUIDesc": "我方主动攻击进入战斗后对目标周围敌军额外造成[落雷]伤害。",
+    "IsShowInExtraEffectsUI": true
+  },
+  {
+    "ID": 117,
+    "Name": "引雨人·逆流",
+    "SimpleDesc": "技能伤害提升。造成暴击后该技能冷却时间减少。",
+    "Desc": "技能伤害提升<color=#DC143C>15%</color>。如果造成了暴击，该技能冷却时间<color=#DC143C>-2</color>。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Mystery_rain_3_2.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 9,
+    "BattleEffects": [
+      72
+    ],
+    "WeatherArchiveId": 21
+  },
+  {
+    "ID": 118,
+    "Name": "执霖使·共鸣",
+    "SimpleDesc": "获得[噬雷之雨]与[雷霆骤雨]的效果。",
+    "Desc": "获得[噬雷之雨]与[雷霆骤雨]的效果。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Mystery_rain_3_3.png",
+    "Level": 3,
+    "MeteorologyPlanetariumUnlockLevel": 9,
+    "BattleEffects": [
+      73
+    ],
+    "WeatherArchiveId": 21
+  }
+]

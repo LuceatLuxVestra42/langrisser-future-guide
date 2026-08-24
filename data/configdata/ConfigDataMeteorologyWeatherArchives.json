@@ -1,14 +1,446 @@
-{
-  "m_GameObject": {
-    "m_FileID": 540030254,
-    "m_PathID": -3620046024699018808
+[
+  {
+    "ID": 1,
+    "EffectGroupIDs": [
+      1,
+      3,
+      5,
+      7,
+      10,
+      20,
+      22,
+      24,
+      26,
+      70,
+      80,
+      100,
+      121,
+      123,
+      125,
+      127
+    ],
+    "Name": "风",
+    "Desc": "回合结束时向指定方向吹[风]：将所有目标击退<color=#DC143C>2</color>格（不可免疫，位于单位、防御地形或无法通过的地形后方<color=#DC143C>2</color>格内的目标不受影响）。\n顺风位进入战斗时，攻击、智力提升<color=#DC143C>10%</color>。",
+    "Summary": "回合结束时吹[风]并击退目标。顺风位进入战斗时攻击、智力提升。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_wind_1.png",
+    "WeatherType": 1,
+    "WeatherArchiveTypeIcon": "UI/Meteorology_ABS/Icon/Meteorology_wind.png",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Green2.png",
+    "IconOutLineColor": "#18AC8B"
   },
-  "m_Enabled": 196,
-  "m_Script": {
-    "m_FileID": 779504645,
-    "m_PathID": 142452855478237698
+  {
+    "ID": 2,
+    "BelongWeatherID": 1,
+    "EffectGroupIDs": [
+      120
+    ],
+    "Name": "轻风",
+    "Desc": "无额外效果。",
+    "Summary": "无额外效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_wind_basic.png",
+    "WeatherType": 1,
+    "ItemUIState": "Wind_NoFx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Green2.png",
+    "IconOutLineColor": "#18AC8B"
   },
-  "m_Name": "",
-  "m_size": 271319040,
-  "m_bytes": null
-}
+  {
+    "ID": 3,
+    "BelongWeatherID": 1,
+    "EffectGroupIDs": [
+      30,
+      31,
+      32,
+      33
+    ],
+    "Name": "疾风",
+    "Desc": "回合结束时未受到[风]的影响则获得[风遁]：“造成伤害提升<color=#DC143C>10%</color>，遭受伤害降低<color=#DC143C>10%</color>”，持续<color=#DC143C>3</color>回合，可叠加<color=#DC143C>3</color>层。",
+    "Summary": "回合结束时未受到[风]的效果则获得造成伤害提升与遭受伤害降低，可叠加。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_wind_strong.png",
+    "WeatherType": 1,
+    "ItemUIState": "Wind_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Green2.png",
+    "IconOutLineColor": "#18AC8B"
+  },
+  {
+    "ID": 4,
+    "BelongWeatherID": 1,
+    "EffectGroupIDs": [
+      40,
+      41,
+      42,
+      43,
+      44
+    ],
+    "Name": "诡风",
+    "Desc": "处于顺风位时，主动攻击进入战斗后行动结束时对目标及其身后<color=#DC143C>3</color>条直线上最远<color=#DC143C>3</color>格位置处的敌军造成\"攻击\"+\"智力\"<color=#DC143C>0.3</color>倍的[固定伤害]，并令命中的格子获得<color=#DC143C>1</color>回合的特殊效果[乱流]:\"友方单位通过时消耗移动力<color=#DC143C>-1</color>，最多减免<color=#DC143C>3</color>格，敌方单位移动至其上行动结束时受到自身最大生命值<color=#DC143C>15%</color>的固定伤害\"。",
+    "Summary": "处于顺风位时，主动攻击进入战斗后对目标及其身后敌军造成伤害并施加特殊地形效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_wind_weird.png",
+    "WeatherType": 1,
+    "ItemUIState": "Wind_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Green2.png",
+    "IconOutLineColor": "#18AC8B"
+  },
+  {
+    "ID": 5,
+    "BelongWeatherID": 1,
+    "EffectGroupIDs": [
+      50,
+      51,
+      52,
+      53
+    ],
+    "Name": "厉风",
+    "Desc": "受到[位移]效果时获得[刺骨]：“遭受暴击率提升<color=#DC143C>20%</color>，遭受暴击伤害提升<color=#DC143C>20%</color>”，持续<color=#DC143C>3</color>回合，可叠加<color=#DC143C>3</color>层，不可驱散，无法免疫。",
+    "Summary": "受到[位移]时获得遭受暴击率与遭受暴击伤害提升的效果，可叠加。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_wind_cold.png",
+    "WeatherType": 1,
+    "ItemUIState": "Wind_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Green2.png",
+    "IconOutLineColor": "#18AC8B"
+  },
+  {
+    "ID": 6,
+    "BelongWeatherID": 1,
+    "EffectGroupIDs": [
+      60,
+      61,
+      62,
+      63
+    ],
+    "Name": "怒风",
+    "Desc": "移动力<color=#DC143C>-2</color>。遭受[位移]时被击退距离<color=#DC143C>+1</color>。",
+    "Summary": "移动力降低。遭受[位移]时被击退距离增加。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_wind_storm.png",
+    "WeatherType": 1,
+    "ItemUIState": "Wind_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Green2.png",
+    "IconOutLineColor": "#18AC8B"
+  },
+  {
+    "ID": 7,
+    "EffectGroupIDs": [
+      201,
+      202,
+      361,
+      362
+    ],
+    "Name": "沙",
+    "Desc": "回合开始时，战场上生成<color=#DC143C>2</color>个<color=#DC143C>1</color>回合的地形效果[绿洲]：[指挥]周围<color=#DC143C>2</color>格范围内所有单位获得[棘刃]:“主动攻击进入战斗前对自身周围<color=#DC143C>2</color>格范围内所有敌军造成自身[攻击+智力]<color=#DC143C>1</color>倍的[固定伤害]（玩家方单位造成该伤害翻倍）”。全场所有单位移动、传送或被位移至[绿洲]范围外时，受到最大生命<color=#DC143C>10%</color>的[固定伤害]（不可免疫）。[绿洲]外所有可通过的格子视为[荒漠]地形。",
+    "Summary": "回合开始时，战场上生成地形效果[绿洲]。在其范围内进入战斗时，战前对自身周围敌人造成伤害。[绿洲]范围外的格子更难以通过。移动至[绿洲]范围外会遭受固伤。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_sand_1.png",
+    "WeatherType": 2,
+    "WeatherArchiveTypeIcon": "UI/Meteorology_ABS/Icon/Meteorology_sand.png",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Yellow.png",
+    "IconOutLineColor": "#BE740E"
+  },
+  {
+    "ID": 8,
+    "BelongWeatherID": 7,
+    "EffectGroupIDs": [
+      260
+    ],
+    "Name": "细尘",
+    "Desc": "无额外效果。",
+    "Summary": "无额外效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_sand_basic.png",
+    "WeatherType": 2,
+    "ItemUIState": "Sand_NoFx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Yellow.png",
+    "IconOutLineColor": "#BE740E"
+  },
+  {
+    "ID": 9,
+    "BelongWeatherID": 7,
+    "EffectGroupIDs": [
+      210,
+      370
+    ],
+    "Name": "沙涌",
+    "Desc": "若[棘刃]对<color=#DC143C>2</color>个及以上单位造成伤害则自身获得[砂梭]：“移动力<color=#DC143C>+1</color>，暴击率提升<color=#DC143C>20%</color>”，持续<color=#DC143C>2</color>回合，可叠加<color=#DC143C>2</color>层。",
+    "Summary": "[棘刃]对多个单位造成伤害则自身获得移动力和暴击率提升效果，可叠加。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_sand_haze.png",
+    "WeatherType": 2,
+    "ItemUIState": "Sand_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Yellow.png",
+    "IconOutLineColor": "#BE740E"
+  },
+  {
+    "ID": 10,
+    "BelongWeatherID": 7,
+    "EffectGroupIDs": [
+      220
+    ],
+    "Name": "沙旋",
+    "Desc": "[绿洲]指挥范围内的单位行动结束时，额外触发<color=#DC143C>1</color>次[棘刃]，若自身周围<color=#DC143C>1</color>格范围内没有其他单位，则其被传送至远离[绿洲]<color=#DC143C>1</color>格的位置上。",
+    "Summary": "[绿洲]范围内单位行动结束时，额外触发[棘刃]，此时若周围无其他单位则被传送至远离[绿洲]的位置上。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_sand_tornado.png",
+    "WeatherType": 2,
+    "ItemUIState": "Sand_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Yellow.png",
+    "IconOutLineColor": "#BE740E"
+  },
+  {
+    "ID": 11,
+    "BelongWeatherID": 7,
+    "EffectGroupIDs": [
+      230,
+      380
+    ],
+    "Name": "沙噬",
+    "Desc": "回合开始时，战场上生成的[绿洲]数量减少<color=#DC143C>1</color>。\n处于[绿洲]指挥范围内行动结束时，获得造成伤害提升效果，距离[绿洲]中心越近，则提升效果越高，处于中心时提升<color=#DC143C>50%</color>，之后每远离<color=#DC143C>1</color>格减少<color=#DC143C>15%</color>，持续<color=#DC143C>1</color>回合（无法免疫，不可驱散）。",
+    "Summary": "新生成的[绿洲]数量<color=#DC143C>-1</color>。处于[绿洲]范围内行动结束时，获得造成伤害提升效果，距离[绿洲]中心越近，则提升效果越高。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_sand_barrier.png",
+    "WeatherType": 2,
+    "ItemUIState": "Sand_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Yellow.png",
+    "IconOutLineColor": "#BE740E"
+  },
+  {
+    "ID": 12,
+    "BelongWeatherID": 7,
+    "EffectGroupIDs": [
+      240
+    ],
+    "Name": "沙暴",
+    "Desc": "[绿洲]的指挥范围<color=#DC143C>-1</color>，全场范围内所有单位遭受固定伤害增加<color=#DC143C>100%</color>。",
+    "Summary": "[绿洲]指挥范围<color=#DC143C>-1</color>，所有单位受到固定伤害增加。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_sand_storm.png",
+    "WeatherType": 2,
+    "ItemUIState": "Sand_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Yellow.png",
+    "IconOutLineColor": "#BE740E"
+  },
+  {
+    "ID": 13,
+    "BelongWeatherID": 1,
+    "EffectGroupIDs": [
+      300,
+      303,
+      306,
+      309,
+      320,
+      323,
+      326,
+      329,
+      340,
+      343,
+      346,
+      349,
+      352,
+      355,
+      358
+    ],
+    "Name": "风/沙",
+    "Desc": "回合结束时向<color=#DC143C>上</color>吹[风]：将所有目标击退<color=#DC143C>2</color>格（不可免疫，位于单位、防御地形或无法通过的地形后方<color=#DC143C>2</color>格内的目标不受影响）。\n顺风位进入战斗时，攻击、智力提升<color=#DC143C>10%</color>。\n\n回合开始时，战场上生成<color=#DC143C>2</color>个<color=#DC143C>1</color>回合的地形效果[绿洲]：[指挥]周围<color=#DC143C>2</color>格范围内所有单位获得[棘刃]:“主动攻击进入战斗前对自身周围<color=#DC143C>2</color>格范围内所有敌军造成自身[攻击+智力]<color=#DC143C>1</color>倍的[固定伤害]（玩家方单位造成该伤害翻倍）”。全场所有单位移动、传送或被位移至[绿洲]范围外时，受到最大生命<color=#DC143C>10%</color>的[固定伤害]（不可免疫）。[绿洲]外所有可通过的格子视为[荒漠]地形。",
+    "Summary": "回合结束时吹[风]并击退目标。顺风位进入战斗时攻击、智力提升。\n\n回合开始时，战场上生成地形效果[绿洲]。在其范围内进入战斗时，战前对自身周围敌人造成伤害。[绿洲]范围外的格子更难以通过。移动至[绿洲]范围外会遭受固伤。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_sandstorm_1.png",
+    "WeatherType": 1,
+    "WeatherArchiveTypeIcon": "UI/Meteorology_ABS/Icon/Meteorology_sandstorm_1.png",
+    "Hide": true,
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Yellow.png",
+    "IconOutLineColor": "#BE740E"
+  },
+  {
+    "ID": 14,
+    "EffectGroupIDs": [
+      400,
+      451,
+      452,
+      453,
+      454
+    ],
+    "Name": "雪",
+    "Desc": "回合开始时，在战场上随机格子生成若干持续<color=#DC143C>1</color>回合的天气地形效果<p>[雪丘]</p>、<p>[寒隙]</p>和<p>[冰坞]</p>，单位在其上时获得加成效果。「Desc<p>[雪丘]</p>color=#A68CEF」<p>[雪丘]</p><color=#A68CEF>:伤害技能射程<color=#DC143C>+1</color>，造成伤害前获得持续<color=#DC143C>1</color>回合的[防御+魔防]<color=#DC143C>1.5</color>倍的护盾（最多获得<color=#DC143C>3</color>倍，不可驱散）</color>「/Desc」「Desc<p>[寒隙]</p>color=#A68CEF」<p>[寒隙]</p><color=#A68CEF>:进入战斗时先攻，且无视敌军<color=#DC143C>15%</color>的防御和魔防</color>「/Desc」「Desc<p>[冰坞]</p>color=#A68CEF」<p>[冰坞]</p><color=#A68CEF>:除生命外全属性<color=#DC143C>+10%</color>，可反击远程</color>「/Desc」",
+    "Summary": "回合开始时，战场上生成<color=#DC143C>3</color>种天气地形效果，单位在其上时分别获得不同加成。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_snow_0_0.png",
+    "WeatherType": 3,
+    "WeatherArchiveTypeIcon": "UI/Meteorology_ABS/Icon/Meteorology_snow.png",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Purple2.png",
+    "IconOutLineColor": "#A171E5"
+  },
+  {
+    "ID": 15,
+    "BelongWeatherID": 14,
+    "EffectGroupIDs": [
+      450
+    ],
+    "Name": "初雪",
+    "Desc": "无额外效果。",
+    "Summary": "无额外效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_snow_0.png",
+    "WeatherType": 3,
+    "ItemUIState": "Snow_NoFx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Purple2.png",
+    "IconOutLineColor": "#A171E5"
+  },
+  {
+    "ID": 16,
+    "BelongWeatherID": 14,
+    "EffectGroupIDs": [
+      410
+    ],
+    "Name": "新雪",
+    "Desc": "位于[雪丘]上时额外获得“造成伤害前施加<color=#DC143C>1</color>个随机弱化效果”；\n位于[寒隙]上时额外获得“战后对目标周围<color=#DC143C>1</color>圈范围内敌军造成本次伤害<color=#DC143C>0.1</color>倍的固定伤害”；\n位于[冰坞]上时额外获得“暴击率提升<color=#DC143C>50%</color>”。",
+    "Summary": "位于天气地形效果上时获得额外加成效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_snow_1.png",
+    "WeatherType": 3,
+    "ItemUIState": "Snow_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Purple2.png",
+    "IconOutLineColor": "#A171E5"
+  },
+  {
+    "ID": 17,
+    "BelongWeatherID": 14,
+    "EffectGroupIDs": [
+      420
+    ],
+    "Name": "积雪",
+    "Desc": "在[雪丘]、[寒隙]、[冰坞]上行动结束时，获得持续<color=#DC143C>1</color>回合的对应基础加成效果，不可驱散，无法免疫。",
+    "Summary": "在天气地形效果上行动结束时，获得持续<color=#DC143C>1</color>回合的对应基础加成效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_snow_2.png",
+    "WeatherType": 3,
+    "ItemUIState": "Snow_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Purple2.png",
+    "IconOutLineColor": "#A171E5"
+  },
+  {
+    "ID": 18,
+    "BelongWeatherID": 14,
+    "EffectGroupIDs": [
+      430
+    ],
+    "Name": "飞雪",
+    "Desc": "[雪丘]、[寒隙]、[冰坞]回合开始时向周围<color=#DC143C>1</color>格扩散。",
+    "Summary": "天气地形效果回合开始时向周围<color=#DC143C>1</color>格扩散。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_snow_3.png",
+    "WeatherType": 3,
+    "ItemUIState": "Snow_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Purple2.png",
+    "IconOutLineColor": "#A171E5"
+  },
+  {
+    "ID": 19,
+    "BelongWeatherID": 14,
+    "EffectGroupIDs": [
+      440
+    ],
+    "Name": "暴雪",
+    "Desc": "位于[雪丘]、[寒隙]、[冰坞]上时的基础加成效果翻倍；行动结束时若未处于[雪丘]、[寒隙]、[冰坞]之上，获得“移动力<color=#DC143C>-1</color>”（可叠加<color=#DC143C>2</color>层，持续<color=#DC143C>2</color>回合，不可驱散，无法免疫）并受到最大生命值<color=#DC143C>20%</color>的固定伤害（无法免疫）。",
+    "Summary": "位于天气地形效果上时的基础加成效果翻倍，行动结束时若未处于天气地形效果上则获得负面效果。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_snow_4.png",
+    "WeatherType": 3,
+    "ItemUIState": "Snow_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Purple2.png",
+    "IconOutLineColor": "#A171E5"
+  },
+  {
+    "ID": 21,
+    "EffectGroupIDs": [
+      500
+    ],
+    "Name": "雨",
+    "Desc": "敌我双方主动造成伤害时每命中<color=#DC143C>1</color>名单位，队伍获得<color=#DC143C>1</color>点水能。达到<color=#DC143C>2</color>/<color=#DC143C>5</color>/<color=#DC143C>8</color>点水能时，队伍全员分别获得<color=#DC143C>I</color>/<color=#DC143C>II</color>/<color=#DC143C>III</color>级<p>[泽鸣]</p>效果。敌我双方回合开始时，队伍当前水能点数减半。「Desc<p>[泽鸣]</p>color=#67AFE5」<p>[泽鸣]</p><color=#67AFE5>:全队造成伤害提升<color=#DC143C>5</color>/<color=#DC143C>12</color>/<color=#DC143C>20%</color>，己方回合结束时召唤<color=#DC143C>2</color>/<color=#DC143C>4</color>/<color=#DC143C>6</color>道[落雷]攻击全场范围内随机敌军，同一敌军受到伤害依次提升<color=#DC143C>30%</color>（位于防御地形上的单位可免疫[落雷]伤害）</color>「/Desc」",
+    "Summary": "主动造成伤害时队伍获得水能。水能点数越高，队伍造成伤害越高，且己方回合结束时召唤更多[落雷]攻击敌方单位。己方回合开始时水能点数减半。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_rain_0_0.png",
+    "WeatherType": 4,
+    "ItemUIState": "Rain_NoFx",
+    "WeatherArchiveTypeIcon": "UI/Meteorology_ABS/Icon/Meteorology_rain.png",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Blue2.png",
+    "IconOutLineColor": "#96CDF6"
+  },
+  {
+    "ID": 22,
+    "BelongWeatherID": 21,
+    "EffectGroupIDs": [
+      550
+    ],
+    "Name": "细雨",
+    "Desc": "无额外效果。",
+    "Summary": "无额外效果。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Meteorology_rain_5.png",
+    "WeatherType": 4,
+    "ItemUIState": "Rain_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Blue2.png",
+    "IconOutLineColor": "#96CDF6"
+  },
+  {
+    "ID": 23,
+    "BelongWeatherID": 21,
+    "EffectGroupIDs": [
+      510
+    ],
+    "Name": "潦雨",
+    "Desc": "遭受[落雷]伤害后，获得[易暴]:“遭受暴击率提升<color=#DC143C>50%</color>，被攻击受到暴击后移除<color=#DC143C>1</color>层”，可叠加<color=#DC143C>2</color>层，持续<color=#DC143C>2</color>回合，无法免疫，不可驱散”。",
+    "Summary": "遭受[落雷]伤害后，获得遭受暴击率提升的效果。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Meteorology_rain_4.png",
+    "WeatherType": 4,
+    "ItemUIState": "Rain_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Blue2.png",
+    "IconOutLineColor": "#96CDF6"
+  },
+  {
+    "ID": 24,
+    "BelongWeatherID": 21,
+    "EffectGroupIDs": [
+      520
+    ],
+    "Name": "雷雨",
+    "Desc": "主动攻击进入战斗后，对目标额外造成本次伤害<color=#DC143C>0.1</color>倍的[落雷]伤害。",
+    "Summary": "主动攻击进入战斗后，对目标额外造成[落雷]伤害。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Meteorology_rain_3.png",
+    "WeatherType": 4,
+    "ItemUIState": "Rain_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Blue2.png",
+    "IconOutLineColor": "#96CDF6"
+  },
+  {
+    "ID": 25,
+    "BelongWeatherID": 21,
+    "EffectGroupIDs": [
+      530
+    ],
+    "Name": "冻雨",
+    "Desc": "敌我双方每次被攻击受到伤害，损失<color=#DC143C>1</color>点水能；击杀单位时，获得<color=#DC143C>2</color>点水能。",
+    "Summary": "被攻击受到伤害损失水能，击杀单位获得水能。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Meteorology_rain_2.png",
+    "WeatherType": 4,
+    "ItemUIState": "Rain_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Blue2.png",
+    "IconOutLineColor": "#96CDF6"
+  },
+  {
+    "ID": 26,
+    "BelongWeatherID": 21,
+    "EffectGroupIDs": [
+      540
+    ],
+    "Name": "暴雨",
+    "Desc": "敌我双方获取水能速率翻倍，[落雷]伤害提升<color=#DC143C>50%</color>。",
+    "Summary": "获取水能速率翻倍，[落雷]伤害提升。",
+    "Icon": "UI/Icon/MeteorologyIcon_ABS/Meteorology_rain_1.png",
+    "WeatherType": 4,
+    "ItemUIState": "Rain_Fx",
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Blue2.png",
+    "IconOutLineColor": "#96CDF6"
+  },
+  {
+    "ID": 27,
+    "BelongWeatherID": 14,
+    "EffectGroupIDs": [
+      600,
+      604,
+      608,
+      612,
+      616
+    ],
+    "Name": "雪/雨",
+    "Desc": "回合开始时，在战场上随机格子生成若干持续<color=#DC143C>1</color>回合的天气地形效果<p>[雪丘]</p>、<p>[寒隙]</p>和<p>[冰坞]</p>，单位在其上时获得加成效果。「Desc<p>[雪丘]</p>color=#A68CEF」<p>[雪丘]</p><color=#A68CEF>:伤害技能射程<color=#DC143C>+1</color>，造成伤害前获得持续<color=#DC143C>1</color>回合的[防御+魔防]<color=#DC143C>1.5</color>倍的护盾（最多获得<color=#DC143C>3</color>倍，不可驱散）</color>「/Desc」「Desc<p>[寒隙]</p>color=#A68CEF」<p>[寒隙]</p><color=#A68CEF>:进入战斗时先攻，且无视敌军<color=#DC143C>15%</color>的防御和魔防</color>「/Desc」「Desc<p>[冰坞]</p>color=#A68CEF」<p>[冰坞]</p><color=#A68CEF>:除生命外全属性<color=#DC143C>+10%</color>，可反击远程</color>「/Desc」\n\n敌我双方主动造成伤害时每命中<color=#DC143C>1</color>名单位，队伍获得<color=#DC143C>1</color>点水能。达到<color=#DC143C>2</color>/<color=#DC143C>5</color>/<color=#DC143C>8</color>点水能时，队伍全员分别获得<color=#DC143C>I</color>/<color=#DC143C>II</color>/<color=#DC143C>III</color>级<p>[泽鸣]</p>效果。敌我双方回合开始时，队伍当前水能点数减半。「Desc<p>[泽鸣]</p>color=#67AFE5」<p>[泽鸣]</p><color=#67AFE5>:全队造成伤害提升<color=#DC143C>5</color>/<color=#DC143C>12</color>/<color=#DC143C>20%</color>，己方回合结束时召唤<color=#DC143C>2</color>/<color=#DC143C>4</color>/<color=#DC143C>6</color>道[落雷]攻击全场范围内随机敌军，同一敌军受到伤害依次提升<color=#DC143C>30%</color>（位于防御地形上的单位可免疫[落雷]伤害）</color>「/Desc」",
+    "Summary": "回合开始时，战场上生成<color=#DC143C>3</color>种天气地形效果，单位在其上时分别获得不同加成。\n主动造成伤害时队伍获得水能。水能点数越高，队伍造成伤害越高，且己方回合结束时召唤更多[落雷]攻击敌方单位。己方回合开始时水能点数减半。",
+    "Icon": "UI/Meteorology_ABS/Icon/Meteorology_rain_0_0.png",
+    "WeatherType": 3,
+    "WeatherArchiveTypeIcon": "UI/Meteorology_ABS/Icon/Meteorology_rain.png",
+    "Hide": true,
+    "IconBackground": "UI/Meteorology_ABS/Image_NoTag/Button_Round_Blue2.png",
+    "IconOutLineColor": "#96CDF6"
+  }
+]

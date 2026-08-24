@@ -1,15 +1,469 @@
-{
-  "m_GameObject": {
-    "m_FileID": 1867407205,
-    "m_PathID": -7888365304664848710
+[
+  {
+    "ID": 1,
+    "Name": "开场白1",
+    "NextDialog_ID": 2,
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_01",
+    "Words": "欢迎你，冒险者。",
+    "ResetWords": "又见面了，冒险者。",
+    "FunctionType": 1
   },
-  "m_Enabled": 0,
-  "m_Script": {
-    "m_FileID": 1600482404,
-    "m_PathID": 3616495450240413284
+  {
+    "ID": 2,
+    "Name": "开场白2",
+    "NextDialog_ID": 3,
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_02",
+    "Words": "我的名字是露希莉斯，在大地被称为光之女神。",
+    "ResetWords": "我是光之女神露希莉斯，你曾经的引导者。"
   },
-  "m_Name": "",
-  "m_size": -1097079136,
-  "m_bytes": [],
-  "m_MD5": ""
-}
+  {
+    "ID": 3,
+    "Name": "开场白3",
+    "NextDialog_ID": 4,
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_03",
+    "Words": "现在，这个世界正处于巨大的威胁中。",
+    "ResetWords": "这个世界依然被黑暗所觊觎……我用仅存的力量为你带来了再次选择的权利。"
+  },
+  {
+    "ID": 4,
+    "Name": "开场白4",
+    "NextDialog_ID": 5,
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_04",
+    "Words": "而我多年来一直在等待着像你这样勇敢的人出现。",
+    "ResetWords": "这是你最后的机会，也是这个世界最后的机会。"
+  },
+  {
+    "ID": 5,
+    "Name": "开场白5",
+    "NextDialog_ID": 6,
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_05",
+    "Words": "为了试炼你是否真的是我所等待的那个人，接着有几个问题想要问你。",
+    "ResetWords": "在这之前，我必须要确认：经过战争的洗礼，你是否对自身有了更深刻的认知？"
+  },
+  {
+    "ID": 6,
+    "Name": "开场白6",
+    "NextDialog_ID": 7,
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_06",
+    "Words": "那么，冒险者啊，请你回答我的问题。",
+    "ResetWords": "那么冒险者，再次回答我的问题吧。",
+    "FunctionType": 2
+  },
+  {
+    "ID": 7,
+    "Name": "问题1",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_07",
+    "Words": "在补充物资时，遇到敌人的偷袭，你会如何应付？",
+    "FeedbackVoice1": "Godness_20",
+    "FeedbackVoice2": "Godness_21",
+    "FeedbackVoice3": "Godness_21",
+    "FeedbackText1": "收到你的答案了。",
+    "FeedbackText2": "好的，我明白了。",
+    "FeedbackText3": "好的，我明白了。",
+    "Choice1Text": "撤退",
+    "Choice1NextDialog_ID": 8,
+    "Choice1Value": [
+      {
+        "Id": 1,
+        "Value": 1
+      }
+    ],
+    "Choice2Text": "防御",
+    "Choice2NextDialog_ID": 8,
+    "Choice2Value": [
+      {
+        "Id": 4,
+        "Value": 1
+      }
+    ],
+    "Choice3Text": "反击",
+    "Choice3NextDialog_ID": 8,
+    "Choice3Value": [
+      {
+        "Id": 3,
+        "Value": 1
+      },
+      {
+        "Id": 2,
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "ID": 8,
+    "Name": "问题2",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_08",
+    "Words": "创造无敌的部队，你认为最重要的是什么？",
+    "FeedbackVoice1": "Godness_21",
+    "FeedbackVoice2": "Godness_20",
+    "FeedbackVoice3": "Godness_20",
+    "FeedbackText1": "好的，我明白了。",
+    "FeedbackText2": "收到你的答案了。",
+    "FeedbackText3": "收到你的答案了。",
+    "Choice1Text": "粉碎敌人的破坏力",
+    "Choice1NextDialog_ID": 9,
+    "Choice1Value": [
+      {
+        "Id": 1,
+        "Value": 1
+      }
+    ],
+    "Choice2Text": "冷静的判断力",
+    "Choice2NextDialog_ID": 9,
+    "Choice2Value": [
+      {
+        "Id": 3,
+        "Value": 1
+      },
+      {
+        "Id": 4,
+        "Value": 1
+      }
+    ],
+    "Choice3Text": "优秀的机动性",
+    "Choice3NextDialog_ID": 9,
+    "Choice3Value": [
+      {
+        "Id": 2,
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "ID": 9,
+    "Name": "问题3",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_09",
+    "Words": "你认为神在哪里？",
+    "FeedbackVoice1": "Godness_23",
+    "FeedbackVoice2": "Godness_20",
+    "FeedbackVoice3": "Godness_21",
+    "FeedbackText1": "啊~ 你真的是这么想的吗?",
+    "FeedbackText2": "收到你的答案了。",
+    "FeedbackText3": "好的，我明白了。",
+    "Choice1Text": "不存在",
+    "Choice1NextDialog_ID": 11,
+    "Choice2Text": "在天上的世界",
+    "Choice2NextDialog_ID": 10,
+    "Choice3Text": "我就是神",
+    "Choice3NextDialog_ID": 11
+  },
+  {
+    "ID": 10,
+    "Name": "问题4",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_10",
+    "Words": "你喜欢什么？",
+    "FeedbackVoice1": "Godness_20",
+    "FeedbackVoice2": "Godness_21",
+    "FeedbackVoice3": "Godness_21",
+    "FeedbackText1": "收到你的答案了。",
+    "FeedbackText2": "好的，我明白了。",
+    "FeedbackText3": "好的，我明白了。",
+    "Choice1Text": "夏日蔚蓝的天空",
+    "Choice1NextDialog_ID": 12,
+    "Choice1Value": [
+      {
+        "Id": 2,
+        "Value": 1
+      },
+      {
+        "Id": 4,
+        "Value": 1
+      }
+    ],
+    "Choice2Text": "夜晚宁静的小屋",
+    "Choice2NextDialog_ID": 12,
+    "Choice2Value": [
+      {
+        "Id": 3,
+        "Value": 1
+      }
+    ],
+    "Choice3Text": "春天绿色的草原",
+    "Choice3NextDialog_ID": 12,
+    "Choice3Value": [
+      {
+        "Id": 1,
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "ID": 11,
+    "Name": "问题5",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_11",
+    "Words": "你在这个世界上是为了什么而生存的？",
+    "FeedbackVoice1": "Godness_21",
+    "FeedbackVoice2": "Godness_20",
+    "FeedbackVoice3": "Godness_23",
+    "FeedbackText1": "好的，我明白了。",
+    "FeedbackText2": "收到你的答案了。",
+    "FeedbackText3": "啊~ 你真的是这么想的吗?",
+    "Choice1Text": "为了得到想要的东西",
+    "Choice1NextDialog_ID": 13,
+    "Choice1Value": [
+      {
+        "Id": 1,
+        "Value": 1
+      },
+      {
+        "Id": 2,
+        "Value": 1
+      }
+    ],
+    "Choice2Text": "为了报仇",
+    "Choice2NextDialog_ID": 13,
+    "Choice2Value": [
+      {
+        "Id": 3,
+        "Value": 1
+      }
+    ],
+    "Choice3Text": "为了守护想要守护的事物",
+    "Choice3NextDialog_ID": 13,
+    "Choice3Value": [
+      {
+        "Id": 4,
+        "Value": 1
+      },
+      {
+        "Id": 1,
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "ID": 12,
+    "Name": "问题6",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_12",
+    "Words": "你喜欢什么样的伙伴？",
+    "FeedbackVoice1": "Godness_20",
+    "FeedbackVoice2": "Godness_20",
+    "FeedbackVoice3": "Godness_21",
+    "FeedbackText1": "收到你的答案了。",
+    "FeedbackText2": "收到你的答案了。",
+    "FeedbackText3": "好的，我明白了。",
+    "Choice1Text": "忠诚",
+    "Choice1NextDialog_ID": 14,
+    "Choice1Value": [
+      {
+        "Id": 1,
+        "Value": 1
+      }
+    ],
+    "Choice2Text": "热情",
+    "Choice2NextDialog_ID": 14,
+    "Choice2Value": [
+      {
+        "Id": 4,
+        "Value": 1
+      },
+      {
+        "Id": 2,
+        "Value": 1
+      }
+    ],
+    "Choice3Text": "隐忍",
+    "Choice3NextDialog_ID": 14,
+    "Choice3Value": [
+      {
+        "Id": 3,
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "ID": 13,
+    "Name": "问题7",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_13",
+    "Words": "要成为英雄必须什么条件？",
+    "FeedbackVoice1": "Godness_20",
+    "FeedbackVoice2": "Godness_21",
+    "FeedbackVoice3": "Godness_21",
+    "FeedbackText1": "收到你的答案了。",
+    "FeedbackText2": "好的，我明白了。",
+    "FeedbackText3": "好的，我明白了。",
+    "Choice1Text": "不屈的精神",
+    "Choice1NextDialog_ID": 14,
+    "Choice1Value": [
+      {
+        "Id": 3,
+        "Value": 1
+      },
+      {
+        "Id": 4,
+        "Value": 1
+      }
+    ],
+    "Choice2Text": "统率力",
+    "Choice2NextDialog_ID": 14,
+    "Choice2Value": [
+      {
+        "Id": 4,
+        "Value": 1
+      },
+      {
+        "Id": 1,
+        "Value": 1
+      }
+    ],
+    "Choice3Text": "勇气",
+    "Choice3NextDialog_ID": 14,
+    "Choice3Value": [
+      {
+        "Id": 1,
+        "Value": 1
+      },
+      {
+        "Id": 2,
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "ID": 14,
+    "Name": "问题8",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_14",
+    "Words": "对你来说，爱是什么？",
+    "FeedbackVoice1": "Godness_21",
+    "FeedbackVoice2": "Godness_20",
+    "FeedbackVoice3": "Godness_20",
+    "FeedbackText1": "好的，我明白了。",
+    "FeedbackText2": "收到你的答案了。",
+    "FeedbackText3": "收到你的答案了。",
+    "Choice1Text": "互相给予",
+    "Choice1NextDialog_ID": 15,
+    "Choice1Value": [
+      {
+        "Id": 2,
+        "Value": 1
+      },
+      {
+        "Id": 4,
+        "Value": 1
+      }
+    ],
+    "Choice2Text": "接受",
+    "Choice2NextDialog_ID": 15,
+    "Choice2Value": [
+      {
+        "Id": 3,
+        "Value": 1
+      }
+    ],
+    "Choice3Text": "服务于人",
+    "Choice3NextDialog_ID": 15,
+    "Choice3Value": [
+      {
+        "Id": 1,
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "ID": 15,
+    "Name": "问题9",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_15",
+    "Words": "最后，你是为何而战？",
+    "FeedbackVoice1": "Godness_20",
+    "FeedbackVoice2": "Godness_20",
+    "FeedbackVoice3": "Godness_21",
+    "FeedbackText1": "收到你的答案了。",
+    "FeedbackText2": "收到你的答案了。",
+    "FeedbackText3": "好的，我明白了。",
+    "Choice1Text": "为了名誉",
+    "Choice1NextDialog_ID": 16,
+    "Choice1Value": [
+      {
+        "Id": 1,
+        "Value": 1
+      }
+    ],
+    "Choice2Text": "为了保卫家园",
+    "Choice2NextDialog_ID": 16,
+    "Choice2Value": [
+      {
+        "Id": 4,
+        "Value": 1
+      },
+      {
+        "Id": 3,
+        "Value": 1
+      }
+    ],
+    "Choice3Text": "为了保卫所爱的人",
+    "Choice3NextDialog_ID": 16,
+    "Choice3Value": [
+      {
+        "Id": 2,
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "ID": 16,
+    "Name": "结果确认",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_16",
+    "Words": "根据你刚才的回答，出现了这样的结果，你确定要这样吗？",
+    "FunctionType": 3
+  },
+  {
+    "ID": 17,
+    "Name": "结果选择",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_17",
+    "Words": "请选择你想要接受的命运。",
+    "FunctionType": 4
+  },
+  {
+    "ID": 18,
+    "Name": "结束语1",
+    "NextDialog_ID": 19,
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_18",
+    "Words": "冒险者，开始你的旅程吧！真心地祝福你，胜利的大门永远向你敞开。",
+    "ResetWords": "冒险者，去吧，为这个世界带去光明，我将真心的祝福你，胜利的大门永远向你敞开。",
+    "FunctionType": 5
+  },
+  {
+    "ID": 19,
+    "Name": "结束语2",
+    "IdleAnimation": "idle_Normal",
+    "IdleFacialAnimation": "idle_Normal",
+    "Voice": "Godness_19",
+    "Words": "相信你自己，永远不要放弃信仰。"
+  }
+]

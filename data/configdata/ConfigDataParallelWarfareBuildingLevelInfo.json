@@ -1,14 +1,636 @@
-{
-  "m_GameObject": {
-    "m_FileID": 65536,
-    "m_PathID": 181473722344
+[
+  {
+    "ID": 100001,
+    "Desc": "1级市政厅",
+    "Effects": [
+      {
+        "EffectType": 2,
+        "Param1": 1500
+      },
+      {
+        "EffectType": 3,
+        "Param1": 1500
+      },
+      {
+        "EffectType": 4,
+        "Param1": 1500
+      }
+    ],
+    "ExtraEffect": "解锁建筑联盟营帐"
   },
-  "m_Enabled": 114,
-  "m_Script": {
-    "m_FileID": 1702257996,
-    "m_PathID": 7380917569214375244
+  {
+    "ID": 100002,
+    "Desc": "2级市政厅",
+    "UnlockCondition": [
+      {
+        "ConditionType": 2,
+        "Parm1": 1000
+      }
+    ],
+    "ExtraEffect": "解锁建筑军士训练场"
   },
-  "m_Name": "",
-  "m_size": 268634117,
-  "m_bytes": null
-}
+  {
+    "ID": 100003,
+    "Desc": "3级市政厅",
+    "UnlockCondition": [
+      {
+        "ConditionType": 2,
+        "Parm1": 2000
+      }
+    ],
+    "ExtraEffect": "解锁建筑圣剑的追忆"
+  },
+  {
+    "ID": 100004,
+    "Desc": "4级市政厅",
+    "UnlockCondition": [
+      {
+        "ConditionType": 2,
+        "Parm1": 4000
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 2,
+        "Param1": 2000
+      },
+      {
+        "EffectType": 3,
+        "Param1": 2000
+      },
+      {
+        "EffectType": 4,
+        "Param1": 2000
+      },
+      {
+        "EffectType": 13,
+        "Param1": 4,
+        "Param2": 1
+      }
+    ]
+  },
+  {
+    "ID": 100005,
+    "Desc": "5级市政厅",
+    "UnlockCondition": [
+      {
+        "ConditionType": 2,
+        "Parm1": 6000
+      }
+    ],
+    "ExtraEffect": "提升联盟营帐和军士训练场的等级上限"
+  },
+  {
+    "ID": 100006,
+    "Desc": "6级市政厅",
+    "UnlockCondition": [
+      {
+        "ConditionType": 2,
+        "Parm1": 12000
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 13,
+        "Param1": 4,
+        "Param2": 1
+      }
+    ]
+  },
+  {
+    "ID": 100007,
+    "Desc": "7级市政厅",
+    "UnlockCondition": [
+      {
+        "ConditionType": 2,
+        "Parm1": 18000
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 13,
+        "Param1": 4,
+        "Param2": 1
+      }
+    ]
+  },
+  {
+    "ID": 100008,
+    "Desc": "8级市政厅",
+    "UnlockCondition": [
+      {
+        "ConditionType": 2,
+        "Parm1": 25000
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 13,
+        "Param1": 4,
+        "Param2": 1
+      }
+    ]
+  },
+  {
+    "ID": 100009,
+    "Desc": "9级市政厅",
+    "UnlockCondition": [
+      {
+        "ConditionType": 2,
+        "Parm1": 32000
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 13,
+        "Param1": 4,
+        "Param2": 1
+      }
+    ]
+  },
+  {
+    "ID": 100010,
+    "Desc": "10级市政厅",
+    "UnlockCondition": [
+      {
+        "ConditionType": 2,
+        "Parm1": 47000
+      }
+    ],
+    "ExtraEffect": "提升联盟营帐和军士训练场的等级上限"
+  },
+  {
+    "ID": 100011,
+    "Desc": "11级市政厅",
+    "UnlockCondition": [
+      {
+        "ConditionType": 2,
+        "Parm1": 60000
+      }
+    ],
+    "ExtraEffect": "提升联盟营帐和军士训练场的等级上限"
+  },
+  {
+    "ID": 100012,
+    "Desc": "12级市政厅",
+    "UnlockCondition": [
+      {
+        "ConditionType": 2,
+        "Parm1": 75000
+      }
+    ],
+    "ExtraEffect": "提升联盟营帐和军士训练场的等级上限"
+  },
+  {
+    "ID": 200001,
+    "Desc": "1级联盟营帐",
+    "UnlockCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1,
+        "Parm2": 1
+      }
+    ],
+    "ReachedCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1000
+      },
+      {
+        "ConditionType": 3,
+        "Parm1": 800
+      },
+      {
+        "ConditionType": 2,
+        "Parm1": 600
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 5,
+        "Param1": 5
+      }
+    ],
+    "UpgradeConsumeTime": 3
+  },
+  {
+    "ID": 200002,
+    "Desc": "2级联盟营帐",
+    "UnlockCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1,
+        "Parm2": 5
+      }
+    ],
+    "ReachedCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 3000
+      },
+      {
+        "ConditionType": 3,
+        "Parm1": 2000
+      },
+      {
+        "ConditionType": 2,
+        "Parm1": 1400
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 5,
+        "Param1": 5
+      }
+    ],
+    "UpgradeConsumeTime": 3
+  },
+  {
+    "ID": 200003,
+    "Desc": "3级联盟营帐",
+    "UnlockCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1,
+        "Parm2": 10
+      }
+    ],
+    "ReachedCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 6000
+      },
+      {
+        "ConditionType": 3,
+        "Parm1": 3600
+      },
+      {
+        "ConditionType": 2,
+        "Parm1": 2600
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 5,
+        "Param1": 6
+      }
+    ],
+    "UpgradeConsumeTime": 3
+  },
+  {
+    "ID": 200004,
+    "Desc": "4级联盟营帐",
+    "UnlockCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1,
+        "Parm2": 11
+      }
+    ],
+    "ReachedCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 10500
+      },
+      {
+        "ConditionType": 3,
+        "Parm1": 5600
+      },
+      {
+        "ConditionType": 2,
+        "Parm1": 4200
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 5,
+        "Param1": 8
+      }
+    ],
+    "UpgradeConsumeTime": 3
+  },
+  {
+    "ID": 200005,
+    "Desc": "5级联盟营帐",
+    "UnlockCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1,
+        "Parm2": 12
+      }
+    ],
+    "ReachedCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 16500
+      },
+      {
+        "ConditionType": 3,
+        "Parm1": 8100
+      },
+      {
+        "ConditionType": 2,
+        "Parm1": 6200
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 5,
+        "Param1": 8
+      }
+    ],
+    "UpgradeConsumeTime": 3
+  },
+  {
+    "ID": 300001,
+    "Desc": "1级军士训练场",
+    "UnlockCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1,
+        "Parm2": 2
+      }
+    ],
+    "ReachedCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 800
+      },
+      {
+        "ConditionType": 3,
+        "Parm1": 1000
+      },
+      {
+        "ConditionType": 2,
+        "Parm1": 600
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 6,
+        "Param1": 1
+      },
+      {
+        "EffectType": 7,
+        "Param1": 1
+      },
+      {
+        "EffectType": 8,
+        "Param1": 1
+      },
+      {
+        "EffectType": 9,
+        "Param1": 1
+      },
+      {
+        "EffectType": 10,
+        "Param1": 1
+      },
+      {
+        "EffectType": 11,
+        "Param1": 1
+      }
+    ],
+    "UpgradeConsumeTime": 3
+  },
+  {
+    "ID": 300002,
+    "Desc": "2级军士训练场",
+    "UnlockCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1,
+        "Parm2": 5
+      }
+    ],
+    "ReachedCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 2000
+      },
+      {
+        "ConditionType": 3,
+        "Parm1": 3000
+      },
+      {
+        "ConditionType": 2,
+        "Parm1": 1400
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 6,
+        "Param1": 1
+      },
+      {
+        "EffectType": 7,
+        "Param1": 1
+      },
+      {
+        "EffectType": 8,
+        "Param1": 1
+      },
+      {
+        "EffectType": 9,
+        "Param1": 1
+      },
+      {
+        "EffectType": 10,
+        "Param1": 1
+      },
+      {
+        "EffectType": 11,
+        "Param1": 1
+      }
+    ],
+    "UpgradeConsumeTime": 3
+  },
+  {
+    "ID": 300003,
+    "Desc": "3级军士训练场",
+    "UnlockCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1,
+        "Parm2": 10
+      }
+    ],
+    "ReachedCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 3600
+      },
+      {
+        "ConditionType": 3,
+        "Parm1": 6000
+      },
+      {
+        "ConditionType": 2,
+        "Parm1": 2600
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 6,
+        "Param1": 1
+      },
+      {
+        "EffectType": 7,
+        "Param1": 1
+      },
+      {
+        "EffectType": 8,
+        "Param1": 1
+      },
+      {
+        "EffectType": 9,
+        "Param1": 1
+      },
+      {
+        "EffectType": 10,
+        "Param1": 1
+      },
+      {
+        "EffectType": 11,
+        "Param1": 1
+      }
+    ],
+    "UpgradeConsumeTime": 3
+  },
+  {
+    "ID": 300004,
+    "Desc": "4级军士训练场",
+    "UnlockCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1,
+        "Parm2": 11
+      }
+    ],
+    "ReachedCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 5600
+      },
+      {
+        "ConditionType": 3,
+        "Parm1": 10500
+      },
+      {
+        "ConditionType": 2,
+        "Parm1": 4200
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 6,
+        "Param1": 2
+      },
+      {
+        "EffectType": 7,
+        "Param1": 2
+      },
+      {
+        "EffectType": 8,
+        "Param1": 2
+      },
+      {
+        "EffectType": 9,
+        "Param1": 2
+      },
+      {
+        "EffectType": 10,
+        "Param1": 2
+      },
+      {
+        "EffectType": 11,
+        "Param1": 2
+      }
+    ],
+    "UpgradeConsumeTime": 3
+  },
+  {
+    "ID": 300005,
+    "Desc": "5级军士训练场",
+    "UnlockCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1,
+        "Parm2": 12
+      }
+    ],
+    "ReachedCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 8100
+      },
+      {
+        "ConditionType": 3,
+        "Parm1": 16500
+      },
+      {
+        "ConditionType": 2,
+        "Parm1": 6200
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 6,
+        "Param1": 2
+      },
+      {
+        "EffectType": 7,
+        "Param1": 2
+      },
+      {
+        "EffectType": 8,
+        "Param1": 2
+      },
+      {
+        "EffectType": 9,
+        "Param1": 2
+      },
+      {
+        "EffectType": 10,
+        "Param1": 2
+      },
+      {
+        "EffectType": 11,
+        "Param1": 2
+      }
+    ],
+    "UpgradeConsumeTime": 3
+  },
+  {
+    "ID": 400001,
+    "Desc": "1级圣剑的追忆",
+    "UnlockCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1,
+        "Parm2": 3
+      }
+    ],
+    "ReachedCondition": [
+      {
+        "ConditionType": 1,
+        "Parm1": 1000
+      },
+      {
+        "ConditionType": 3,
+        "Parm1": 1000
+      },
+      {
+        "ConditionType": 2,
+        "Parm1": 2600
+      }
+    ],
+    "Effects": [
+      {
+        "EffectType": 12,
+        "Param1": 1
+      }
+    ],
+    "UpgradeConsumeTime": 3
+  }
+]

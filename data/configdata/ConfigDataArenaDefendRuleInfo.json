@@ -1,14 +1,53 @@
-{
-  "m_GameObject": {
-    "m_FileID": 135921936,
-    "m_PathID": 1084818905618843915
+[
+  {
+    "ID": 1,
+    "Name": "正面交锋",
+    "DefendWinDesc": "敌方部队全灭",
+    "DefendLoseDesc": "我方部队全灭",
+    "WinDesc": "敌方部队全灭",
+    "LoseDesc": "我方部队全灭",
+    "TurnMax": 10,
+    "WinConditions_ID": [
+      999
+    ],
+    "LoseConditions_ID": [
+      999
+    ],
+    "Icon": "UI/Arena_ABS/2/Icon_Defensive_01.png"
   },
-  "m_Enabled": 116,
-  "m_Script": {
-    "m_FileID": 1702129486,
-    "m_PathID": 6153164415582950259
+  {
+    "ID": 2,
+    "Name": "坚守阵地",
+    "DefendWinDesc": "坚守5回合，撤退将领人数小于2人",
+    "DefendLoseDesc": "5回合内阵亡2支以上部队",
+    "WinDesc": "5回合内击退2支以上敌人",
+    "LoseDesc": "超过回合限制",
+    "TurnMax": 10,
+    "WinConditions_ID": [
+      1000,
+      999
+    ],
+    "LoseConditions_ID": [
+      999
+    ],
+    "Icon": "UI/Arena_ABS/2/Icon_Defensive_02.png"
   },
-  "m_Name": "",
-  "m_size": 1768445043,
-  "m_bytes": null
-}
+  {
+    "ID": 3,
+    "Name": "全军突击",
+    "DefendWinDesc": "优先击退2支敌军",
+    "DefendLoseDesc": "敌人优先击退我方2支部队",
+    "WinDesc": "优先击退2支敌军",
+    "LoseDesc": "敌人优先击退我方2支部队",
+    "TurnMax": 10,
+    "WinConditions_ID": [
+      1000,
+      999
+    ],
+    "LoseConditions_ID": [
+      1001,
+      999
+    ],
+    "Icon": "UI/Arena_ABS/2/Icon_Defensive_03.png"
+  }
+]

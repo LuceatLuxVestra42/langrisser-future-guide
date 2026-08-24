@@ -1,14 +1,401 @@
-{
-  "m_GameObject": {
-    "m_FileID": 1654957,
-    "m_PathID": -1775814231060977271
+[
+  {
+    "ID": 1,
+    "Desc": "[玛娜觉醒]\n[玛娜觉醒Ⅰ]拥有<color=#DC143C>4</color>个<color=#DC143C>2</color>星及以上建筑时，全场友军使用技能造成伤害后，所有技能冷却时间<color=#DC143C>-1</color>，每多<color=#DC143C>1</color>个<color=#DC143C>2</color>星及以上建筑，再多<color=#DC143C>-1</color>冷却时间(最多<color=#DC143C>-3</color>)。\n[玛娜觉醒Ⅱ]拥有至少<color=#DC143C>3</color>个<color=#DC143C>3</color>星及以上建筑时，全场友军行动结束时可再行动<color=#DC143C>1</color>次(每回合限<color=#DC143C>1</color>次)\n\n污染度＞<color=#DC143C>40</color>时，失去[玛娜觉醒Ⅰ]的效果\n污染度＞<color=#DC143C>70</color>时，失去[玛娜觉醒Ⅱ]的效果\n污染度≥<color=#DC143C>100</color>，<color=#DC143C>战斗失败！</color>",
+    "EffectivePanicMax": 40,
+    "DefenderActorBuffIDs": [
+      140132,
+      99140132,
+      98140132,
+      140133,
+      99140133
+    ],
+    "SimpleDesc": "污染度降低，激活<color=#DC143C>[玛娜觉醒Ⅰ][玛娜觉醒Ⅱ]</color>效果"
   },
-  "m_Enabled": 137,
-  "m_Script": {
-    "m_FileID": 1868774570,
-    "m_PathID": 8245928668399877170
+  {
+    "ID": 2,
+    "EffectivePanicMin": 41,
+    "EffectivePanicMax": 70,
+    "DefenderActorBuffIDs": [
+      140133,
+      99140133
+    ],
+    "SimpleDesc": "污染度达到限值，失去<color=#DC143C>[玛娜觉醒Ⅰ]</color>效果"
   },
-  "m_Name": "",
-  "m_size": -2031776881,
-  "m_bytes": null
-}
+  {
+    "ID": 3,
+    "EffectivePanicMin": 71,
+    "EffectivePanicMax": 999,
+    "SimpleDesc": "污染度达到限值，失去<color=#DC143C>[玛娜觉醒Ⅱ]</color>效果"
+  },
+  {
+    "ID": 4,
+    "Desc": "[完善工事]\n拥有至少<color=#DC143C>1</color>个<color=#DC143C>3</color>星建筑激活全场效果：敌方每次遭受伤害后，遭受固定伤害提升<color=#DC143C>100%</color>，持续<color=#DC143C>2</color>回合（最多叠加<color=#DC143C>5</color>层）。\n\n<color=#DC143C>40</color>＜污染度≤<color=#DC143C>70</color>时，需要拥有至少<color=#DC143C>2</color>个<color=#DC143C>3</color>星建筑才能激活\n<color=#DC143C>70</color>＜污染度＜<color=#DC143C>100</color>时，需要拥有至少<color=#DC143C>3</color>个<color=#DC143C>3</color>星建筑才能激活\n污染度=<color=#DC143C>100</color>，<color=#DC143C>战斗失败！</color>",
+    "EffectivePanicMax": 40,
+    "AttackerActorBuffIDs": [
+      100585
+    ],
+    "SimpleDesc": "污染度降低，拥有至少<color=#DC143C>1</color>个<color=#DC143C>3</color>星建筑激活[完善工事]"
+  },
+  {
+    "ID": 5,
+    "EffectivePanicMin": 41,
+    "EffectivePanicMax": 70,
+    "AttackerActorBuffIDs": [
+      100586
+    ],
+    "SimpleDesc": "污染度达到限值，拥有至少<color=#DC143C>2</color>个<color=#DC143C>3</color>星建筑激活[完善工事]"
+  },
+  {
+    "ID": 6,
+    "EffectivePanicMin": 71,
+    "EffectivePanicMax": 999,
+    "AttackerActorBuffIDs": [
+      100587
+    ],
+    "SimpleDesc": "污染度达到限值，拥有至少<color=#DC143C>3</color>个<color=#DC143C>3</color>星建筑激活[完善工事]"
+  },
+  {
+    "ID": 7,
+    "Desc": "[时空乱流]\n击杀拥有[时空乱流]敌人后，降低<color=#DC143C>15</color>污染度，我方英雄恢复生命。坚持住，援军将在决战时抵达！\n\n污染度≤<color=#DC143C>30</color>时，敌人攻击智力降低<color=#DC143C>10%</color>，防御魔防降低<color=#DC143C>10%</color>\n<color=#DC143C>30</color>＜污染度≤<color=#DC143C>70</color>时，敌人属性不变\n污染度＞<color=#DC143C>70</color>时，敌人攻击智力增加<color=#DC143C>20%</color>，防御魔防增加<color=#DC143C>10%</color>\n污染度=<color=#DC143C>100</color>，<color=#DC143C>战斗失败！</color>",
+    "EffectivePanicMax": 30,
+    "AttackerActorBuffIDs": [
+      100581
+    ],
+    "SimpleDesc": "污染度降低，敌人攻击智力防御魔防降低<color=#DC143C>10%</color>"
+  },
+  {
+    "ID": 8,
+    "EffectivePanicMin": 31,
+    "EffectivePanicMax": 70,
+    "SimpleDesc": "污染度达到限值，敌人属性<color=#DC143C>不再降低</color>"
+  },
+  {
+    "ID": 9,
+    "EffectivePanicMin": 71,
+    "EffectivePanicMax": 999,
+    "AttackerActorBuffIDs": [
+      100582
+    ],
+    "SimpleDesc": "污染度达到限值，敌人攻击智力增加<color=#DC143C>20%</color>，防御魔防增加<color=#DC143C>10%</color>"
+  },
+  {
+    "ID": 10,
+    "Desc": "[完善工事]\n拥有至少<color=#DC143C>1</color>个<color=#DC143C>3</color>星建筑激活全场效果：建筑攻击力<color=#DC143C>+15</color>%。\n\n<color=#DC143C>40</color>＜污染度≤<color=#DC143C>70</color>时，需要拥有至少<color=#DC143C>2</color>个<color=#DC143C>3</color>星建筑才能激活\n<color=#DC143C>70</color>＜污染度＜<color=#DC143C>100</color>时，需要拥有至少<color=#DC143C>3</color>个<color=#DC143C>3</color>星建筑才能激活\n污染度=<color=#DC143C>100</color>，<color=#DC143C>战斗失败！</color>",
+    "EffectivePanicMax": 40,
+    "DefenderBuildingBuffIDs": [
+      100628
+    ],
+    "SimpleDesc": "污染度降低，拥有至少<color=#DC143C>1</color>个<color=#DC143C>3</color>星建筑激活[完善工事]"
+  },
+  {
+    "ID": 11,
+    "EffectivePanicMin": 41,
+    "EffectivePanicMax": 70,
+    "DefenderBuildingBuffIDs": [
+      100629
+    ],
+    "SimpleDesc": "污染度达到限值，拥有至少<color=#DC143C>2</color>个<color=#DC143C>3</color>星建筑激活[完善工事]"
+  },
+  {
+    "ID": 12,
+    "EffectivePanicMin": 71,
+    "EffectivePanicMax": 999,
+    "DefenderBuildingBuffIDs": [
+      100630
+    ],
+    "SimpleDesc": "污染度达到限值，拥有至少<color=#DC143C>3</color>个<color=#DC143C>3</color>星建筑激活[完善工事]"
+  },
+  {
+    "ID": 13,
+    "Desc": "0~40恐慌度效果1生效",
+    "EffectivePanicMax": 40,
+    "DefenderActorBuffIDs": [
+      140132,
+      99140132,
+      98140132,
+      140133,
+      99140133
+    ]
+  },
+  {
+    "ID": 14,
+    "Desc": "41~70恐慌度效果2生效",
+    "EffectivePanicMin": 41,
+    "EffectivePanicMax": 70,
+    "DefenderActorBuffIDs": [
+      140133,
+      99140133
+    ]
+  },
+  {
+    "ID": 15,
+    "Desc": "71~100恐慌度效果3生效",
+    "EffectivePanicMin": 71,
+    "EffectivePanicMax": 999
+  },
+  {
+    "ID": 16,
+    "Desc": "[奥术洪流]\n[奥术洪流Ⅰ]拥有<color=#DC143C>4</color>个<color=#DC143C>2</color>星及以上建筑时，全场友军造成伤害提高<color=#DC143C>15%</color>，每多<color=#DC143C>1</color>个<color=#DC143C>2</color>星及以上建筑，再多<color=#DC143C>15%</color>伤害(最多<color=#DC143C>45%</color>)。                                      [奥术洪流Ⅱ]拥有<color=#DC143C>3</color>个<color=#DC143C>3</color>星及以上建筑时，全场友军移动力+<color=#DC143C>1</color>，每多<color=#DC143C>1</color>个<color=#DC143C>3</color>星及以上建筑，移动力再+<color=#DC143C>1</color>（最多+<color=#DC143C>5</color>）。\n[奥术洪流Ⅲ]拥有至少<color=#DC143C>8</color>个<color=#DC143C>3</color>星及以上建筑时，全场友军行动结束时可再行动<color=#DC143C>1</color>次(每回合限<color=#DC143C>1</color>次)                                                        \n\n污染度大于<color=#DC143C>25</color>时，失去[奥术洪流Ⅰ]的效果\n污染度大于<color=#DC143C>50</color>时，失去[奥术洪流Ⅱ]的效果                                                                                   污染度大于<color=#DC143C>75</color>时，失去[奥术洪流Ⅲ]的效果\n污染度大于等于<color=#DC143C>100</color>，<color=#DC143C>战斗失败！</color>",
+    "EffectivePanicMax": 25,
+    "DefenderActorBuffIDs": [
+      100642,
+      99100642,
+      98100642,
+      100643,
+      99100643,
+      98100643,
+      97100643,
+      96100643,
+      100644,
+      99100644
+    ]
+  },
+  {
+    "ID": 17,
+    "EffectivePanicMin": 26,
+    "EffectivePanicMax": 50,
+    "DefenderActorBuffIDs": [
+      100643,
+      99100643,
+      98100643,
+      97100643,
+      96100643,
+      100644,
+      99100644
+    ]
+  },
+  {
+    "ID": 18,
+    "EffectivePanicMin": 50,
+    "EffectivePanicMax": 75,
+    "DefenderActorBuffIDs": [
+      100644,
+      99100644
+    ]
+  },
+  {
+    "ID": 19,
+    "EffectivePanicMin": 75,
+    "EffectivePanicMax": 99
+  },
+  {
+    "ID": 20,
+    "Desc": "[玛娜觉醒]\n[玛娜觉醒Ⅰ]拥有<color=#DC143C>4</color>个<color=#DC143C>2</color>星及以上建筑时，全场友军移动力<color=#DC143C>+1</color>；每多拥有<color=#DC143C>1</color>个两星及以上建筑，移动力额外<color=#DC143C>+1</color>。（最多<color=#DC143C>+3</color>）\n[玛娜觉醒Ⅱ]拥有<color=#DC143C>3</color>个<color=#DC143C>3</color>星及以上建筑时，全场友军行动结束时可再行动<color=#DC143C>1</color>次（每回合最多触发<color=#DC143C>1</color>次）\n污染度大于<color=#DC143C>40</color>时，失去[玛娜觉醒Ⅱ]的效果\n污染度大于<color=#DC143C>70</color>时，失去[玛娜觉醒Ⅰ]的效果\n污染度大于等于<color=#DC143C>100</color>，<color=#DC143C>战斗失败！</color>",
+    "EffectivePanicMax": 40,
+    "DefenderActorBuffIDs": [
+      100645,
+      99100645,
+      98100645,
+      100646,
+      99100646
+    ],
+    "SimpleDesc": "污染度降低，激活<color=#DC143C>[玛娜觉醒Ⅰ][玛娜觉醒Ⅱ]</color>效果"
+  },
+  {
+    "ID": 21,
+    "EffectivePanicMin": 41,
+    "EffectivePanicMax": 70,
+    "DefenderActorBuffIDs": [
+      100645,
+      99100645,
+      98100645
+    ],
+    "SimpleDesc": "污染度达到限值，失去<color=#DC143C>[玛娜觉醒Ⅱ]</color>效果"
+  },
+  {
+    "ID": 22,
+    "EffectivePanicMin": 71,
+    "EffectivePanicMax": 99,
+    "SimpleDesc": "污染度达到限值，失去<color=#DC143C>[玛娜觉醒Ⅰ]</color>效果"
+  },
+  {
+    "ID": 23,
+    "Desc": "[完善工事]\n拥有至少<color=#DC143C>3</color>个<color=#DC143C>3</color>星建筑激活全场效果：全场友军移动力<color=#DC143C>+3</color>，且当部队处于[树林]或[水中]时，若本回合击杀过敌人，可以再行动最多<color=#DC143C>1</color>次。\n<color=#DC143C>40</color>＜污染度≤<color=#DC143C>70</color>时，需要拥有至少<color=#DC143C>5</color>个<color=#DC143C>3</color>星建筑才能激活\n<color=#DC143C>70</color>＜污染度＜<color=#DC143C>100</color>时，需要拥有至少<color=#DC143C>8</color>个<color=#DC143C>3</color>星建筑才能激活\n污染度=<color=#DC143C>100</color>，<color=#DC143C>战斗失败！</color>",
+    "EffectivePanicMax": 40,
+    "DefenderActorBuffIDs": [
+      100648,
+      99100648,
+      97100648
+    ],
+    "SimpleDesc": "污染度降低，拥有至少<color=#DC143C>3</color>个<color=#DC143C>3</color>星建筑激活[完善工事]"
+  },
+  {
+    "ID": 24,
+    "EffectivePanicMin": 41,
+    "EffectivePanicMax": 70,
+    "DefenderActorBuffIDs": [
+      100649,
+      99100649,
+      97100649
+    ],
+    "SimpleDesc": "污染度达到限值，拥有至少<color=#DC143C>5</color>个<color=#DC143C>3</color>星建筑激活[完善工事]"
+  },
+  {
+    "ID": 25,
+    "EffectivePanicMin": 71,
+    "EffectivePanicMax": 99,
+    "DefenderActorBuffIDs": [
+      100650,
+      99100650,
+      97100650
+    ],
+    "SimpleDesc": "污染度达到限值，拥有至少<color=#DC143C>8</color>个<color=#DC143C>3</color>星建筑激活[完善工事]"
+  },
+  {
+    "ID": 26,
+    "EffectivePanicMax": 100,
+    "DefenderActorBuffIDs": [
+      100665
+    ],
+    "DefenderBuildingBuffIDs": [
+      100664
+    ]
+  },
+  {
+    "ID": 27,
+    "Desc": "无污染度效果",
+    "EffectivePanicMax": 100
+  },
+  {
+    "ID": 28,
+    "Desc": "[急行军]\n污染度小于<color=#DC143C>40</color>时，所有建筑受到伤害<color=#DC143C>-10%</color>。\n污染度大于等于<color=#DC143C>40</color>小于<color=#DC143C>70</color>时，所有友方部队移动力<color=#DC143C>+1</color>，但建筑遭受伤害增加<color=#DC143C>20%</color>。\n污染度大于等于<color=#DC143C>70</color>时，所有友方部队移动力<color=#DC143C>+2</color>，但建筑遭受伤害增加<color=#DC143C>50%</color>。\n污染度大于等于<color=#DC143C>100</color>，<color=#DC143C>战斗失败！</color>",
+    "EffectivePanicMax": 39,
+    "DefenderBuildingBuffIDs": [
+      100755
+    ],
+    "SimpleDesc": "污染度降低，所有建筑受到伤害<color=#DC143C>-10%</color>"
+  },
+  {
+    "ID": 29,
+    "EffectivePanicMin": 40,
+    "EffectivePanicMax": 69,
+    "DefenderActorBuffIDs": [
+      99100756
+    ],
+    "DefenderBuildingBuffIDs": [
+      100756
+    ],
+    "SimpleDesc": "污染度达到限值，移动力<color=#DC143C>+1</color>，但建筑遭受伤害增加<color=#DC143C>20%</color>"
+  },
+  {
+    "ID": 30,
+    "EffectivePanicMin": 70,
+    "EffectivePanicMax": 999,
+    "DefenderActorBuffIDs": [
+      99100757
+    ],
+    "DefenderBuildingBuffIDs": [
+      100757
+    ],
+    "SimpleDesc": "污染度达到限值，移动力<color=#DC143C>+2</color>，但建筑遭受伤害增加<color=#DC143C>50%</color>"
+  },
+  {
+    "ID": 31,
+    "Desc": "[玛娜觉醒]\n[玛娜觉醒Ⅰ] 拥有<color=#DC143C>3</color>个<color=#DC143C>2</color>星及以上建筑时，全场友军移动力<color=#DC143C>+1</color>；每多拥有<color=#DC143C>2</color>个<color=#DC143C>2</color>星及以上建筑，移动力额外<color=#DC143C>+1</color>。（最多<color=#DC143C>+3</color>）\n[玛娜觉醒Ⅱ]拥有<color=#DC143C>3</color>个<color=#DC143C>3</color>星及以上建筑时，回合开始全场友军获得[不屈]:\"受到致命伤害不会死亡，战斗后恢复<color=#DC143C>100%</color>生命值，每场战斗最多触发<color=#DC143C>1</color>次。\"（不可驱散，无法免疫）\n污染度大于<color=#DC143C>40</color>时，失去[玛娜觉醒Ⅱ]的效果\n污染度大于<color=#DC143C>70</color>时，失去[玛娜觉醒Ⅰ]的效果\n污染度大于等于<color=#DC143C>100</color>，<color=#DC143C>战斗失败！</color>",
+    "EffectivePanicMax": 40,
+    "DefenderActorBuffIDs": [
+      121469,
+      99121469,
+      98121469,
+      121470
+    ],
+    "SimpleDesc": "污染度降低，激活<color=#DC143C>[玛娜觉醒Ⅰ][玛娜觉醒Ⅱ]</color>效果"
+  },
+  {
+    "ID": 32,
+    "EffectivePanicMin": 41,
+    "EffectivePanicMax": 70,
+    "DefenderActorBuffIDs": [
+      121469,
+      99121469,
+      98121469
+    ],
+    "SimpleDesc": "污染度达到限值，失去<color=#DC143C>[玛娜觉醒Ⅱ]</color>效果"
+  },
+  {
+    "ID": 33,
+    "EffectivePanicMin": 71,
+    "EffectivePanicMax": 999,
+    "SimpleDesc": "污染度达到限值，失去<color=#DC143C>[玛娜觉醒Ⅰ]</color>效果"
+  },
+  {
+    "ID": 34,
+    "Desc": "无污染度效果",
+    "EffectivePanicMax": 100,
+    "DefenderBuildingBuffIDs": [
+      121497
+    ]
+  },
+  {
+    "ID": 35,
+    "Desc": "无污染度效果",
+    "EffectivePanicMax": 100,
+    "DefenderBuildingBuffIDs": [
+      175009
+    ]
+  },
+  {
+    "ID": 36,
+    "Desc": "[奥术洪流]\n[奥术洪流Ⅰ]拥有<color=#DC143C>4</color>个<color=#DC143C>2</color>星及以上建筑时，全场友军造成伤害提高<color=#DC143C>15%</color>，每多<color=#DC143C>1</color>个<color=#DC143C>2</color>星及以上建筑，再多<color=#DC143C>15%</color>伤害(最多<color=#DC143C>45%</color>)。                                      [奥术洪流Ⅱ]拥有<color=#DC143C>3</color>个<color=#DC143C>3</color>星及以上建筑时，全场友军移动力+<color=#DC143C>1</color>，每多<color=#DC143C>1</color>个<color=#DC143C>3</color>星及以上建筑，移动力再+<color=#DC143C>1</color>（最多+<color=#DC143C>5</color>）。\n                                                       \n\n污染度大于<color=#DC143C>25</color>时，失去[奥术洪流Ⅰ]的效果\n污染度大于<color=#DC143C>50</color>时，失去[奥术洪流Ⅱ]的效果                                                                                   \n污染度大于等于<color=#DC143C>100</color>，<color=#DC143C>战斗失败！</color>",
+    "EffectivePanicMax": 25,
+    "DefenderActorBuffIDs": [
+      100642,
+      99100642,
+      98100642,
+      100643,
+      99100643,
+      98100643,
+      97100643,
+      96100643
+    ]
+  },
+  {
+    "ID": 37,
+    "EffectivePanicMin": 26,
+    "EffectivePanicMax": 50,
+    "DefenderActorBuffIDs": [
+      100643,
+      99100643,
+      98100643,
+      97100643,
+      96100643
+    ]
+  },
+  {
+    "ID": 38,
+    "EffectivePanicMin": 51,
+    "EffectivePanicMax": 999
+  },
+  {
+    "ID": 39,
+    "Desc": "无污染度效果",
+    "EffectivePanicMax": 100
+  },
+  {
+    "ID": 40,
+    "Desc": "<color=#59D0F7FF><size=25>轻度污染   (污染度≥0) </size></color>\n不会遭受任何侵蚀效果。",
+    "EffectivePanicMax": 39,
+    "SimpleDesc": "<color=#59D0F7FF>轻度污染，不会遭受任何侵蚀效果</color>"
+  },
+  {
+    "ID": 41,
+    "Desc": "<color=#FFCD04FF><size=25>中度污染  (污染度≥40) </size></color>\n全场友军行动结束时获得1个随机弱化效果。",
+    "EffectivePanicMin": 40,
+    "EffectivePanicMax": 69,
+    "DefenderActorBuffIDs": [
+      122265
+    ],
+    "SimpleDesc": "<color=#FFCD04FF>中度污染，进入Ⅰ阶段侵蚀</color>"
+  },
+  {
+    "ID": 42,
+    "Desc": "<color=#DC1000FF><size=25>重度污染  (污染度≥70) </size></color>\n全场友军行动结束时获得2个随机弱化效果。",
+    "EffectivePanicMin": 70,
+    "EffectivePanicMax": 999,
+    "DefenderActorBuffIDs": [
+      122266
+    ],
+    "SimpleDesc": "<color=#DC1000FF>重度污染，进入Ⅱ阶段侵蚀</color>"
+  }
+]

@@ -1,3 +1,1712 @@
-{
-  "m_GameObject": null
-}
+[
+  {
+    "ID": 101000,
+    "Name": "圣耀之力",
+    "Desc": "所有拥有“主角光环”“光辉军团”“光之起源”“传说彼端”超绝特效的友军，攻击、智力提升3%。",
+    "HeroTag": [
+      1,
+      2,
+      3,
+      9
+    ],
+    "ApplySkillId": 240100,
+    "MountPoint": "1_1",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 101100,
+    "Name": "主角之力",
+    "Desc": "所有拥有“主角光环”超绝特效的友军，攻击、智力提升6%。",
+    "HeroTag": [
+      1
+    ],
+    "PreCampId": [
+      101000
+    ],
+    "ApplySkillId": 240110,
+    "MountPoint": "2_1",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 101101,
+    "Name": "主角的勇毅",
+    "Desc": "所有拥有“主角光环”超绝特效的友军，全场每有1个友军部队，攻击、智力提升3%（最高15%）。",
+    "HeroTag": [
+      1
+    ],
+    "PreCampId": [
+      101100
+    ],
+    "ApplySkillId": 240112,
+    "MountPoint": "3_1",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 101102,
+    "Name": "「马修」的激励",
+    "Desc": "英雄「马修」在场时，全场其他“主角光环”友军，若周围2格内存在其他友军时，攻击、智力提升10%。",
+    "HeroID": [
+      1
+    ],
+    "PreCampId": [
+      101101
+    ],
+    "ApplySkillId": 240113,
+    "MountPoint": "4_1",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 101103,
+    "Name": "进阶阳影",
+    "Desc": "[被动]近战攻击进入战斗，战后有100%的概率恢复本次战斗伤害30%的生命。",
+    "PreCampId": [
+      101102,
+      101104
+    ],
+    "ApplySkillId": 240001,
+    "ReplaceSkillId": 10204,
+    "MountPoint": "5_1"
+  },
+  {
+    "ID": 101104,
+    "Name": "主角的极意",
+    "Desc": "所有拥有“主角光环”超绝特效的友军，造成伤害提升10%。",
+    "HeroTag": [
+      1
+    ],
+    "PreCampId": [
+      101100
+    ],
+    "ApplySkillId": 240111,
+    "MountPoint": "3_2",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Icon_Tyr2.png"
+  },
+  {
+    "ID": 101200,
+    "Name": "光辉之力",
+    "Desc": "所有拥有“光辉军团”超绝特效的友军，攻击、智力提升6%。",
+    "HeroTag": [
+      2
+    ],
+    "PreCampId": [
+      101000
+    ],
+    "ApplySkillId": 240120,
+    "MountPoint": "2_2",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 101201,
+    "Name": "光辉的勇毅",
+    "Desc": "所有拥有“光辉军团”超绝特效的友军，主动攻击时，攻击、智力提升15%。",
+    "HeroTag": [
+      2
+    ],
+    "PreCampId": [
+      101200
+    ],
+    "ApplySkillId": 240122,
+    "MountPoint": "3_3",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 101202,
+    "Name": "「艾尔文」的激励",
+    "Desc": "英雄「艾尔文」在场时，全场其他“光辉军团”友军，攻击、智力提升5%，战后有75%概率恢复生命，恢复量为英雄造成伤害的15%。",
+    "HeroID": [
+      12
+    ],
+    "PreCampId": [
+      101201
+    ],
+    "ApplySkillId": 240123,
+    "MountPoint": "4_2",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 101203,
+    "Name": "进阶剑魂",
+    "Desc": "[物理伤害]攻击单个敌军，造成1.8倍伤害，战前驱散敌军全部强化效果，并使其“无法被治疗”“被动技能失效”，持续2回合，无法驱散。",
+    "PreCampId": [
+      101202,
+      101204
+    ],
+    "ApplySkillId": 240002,
+    "ReplaceSkillId": 10218,
+    "MountPoint": "5_2",
+    "SkillCDDesc": "技能冷却时间减少: <color=#DC143C>3</color>回合"
+  },
+  {
+    "ID": 101204,
+    "Name": "光辉的极意",
+    "Desc": "所有拥有“光辉军团”超绝特效的友军，造成伤害提升10%。",
+    "HeroTag": [
+      2
+    ],
+    "PreCampId": [
+      101200
+    ],
+    "ApplySkillId": 240121,
+    "MountPoint": "3_4",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Icon_Tyr2.png"
+  },
+  {
+    "ID": 101300,
+    "Name": "起源之力",
+    "Desc": "所有拥有“光之起源”超绝特效的友军，攻击、智力提升6%。",
+    "HeroTag": [
+      3
+    ],
+    "PreCampId": [
+      101000
+    ],
+    "ApplySkillId": 240130,
+    "MountPoint": "2_3",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 101301,
+    "Name": "起源的勇毅",
+    "Desc": "所有拥有“光之起源”超绝特效的友军，自身携带5个及以上强化效果时，攻击、智力提升15%。",
+    "HeroTag": [
+      3
+    ],
+    "PreCampId": [
+      101300
+    ],
+    "ApplySkillId": 240132,
+    "MountPoint": "3_5",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 101302,
+    "Name": "「迪哈尔特」的激励",
+    "Desc": "英雄「迪哈尔特」在场时，全场其他“光之起源”友军，若周围3格内存在异性时，攻击、智力提升5%，行动结束时恢复部队10%生命值。",
+    "HeroID": [
+      27
+    ],
+    "PreCampId": [
+      101301
+    ],
+    "ApplySkillId": 240133,
+    "MountPoint": "4_3",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 101303,
+    "Name": "进阶强袭",
+    "Desc": "[支援]主动使用，攻击提升30%，持续2回合。使用后可以额外行动3格，可再次攻击。（使用此技能后，身上携带的强化效果回合数不会减少）",
+    "PreCampId": [
+      101302,
+      101304
+    ],
+    "ApplySkillId": 240003,
+    "ReplaceSkillId": 10309,
+    "MountPoint": "5_3"
+  },
+  {
+    "ID": 101304,
+    "Name": "起源的极意",
+    "Desc": "所有拥有“光之起源”超绝特效的友军，造成伤害提升10%。",
+    "HeroTag": [
+      3
+    ],
+    "PreCampId": [
+      101300
+    ],
+    "ApplySkillId": 240131,
+    "MountPoint": "3_6",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Icon_Tyr2.png"
+  },
+  {
+    "ID": 101400,
+    "Name": "传说之力",
+    "Desc": "所有拥有“传说彼端”超绝特效的友军，攻击、智力提升6%。",
+    "HeroTag": [
+      9
+    ],
+    "PreCampId": [
+      101000
+    ],
+    "ApplySkillId": 240140,
+    "MountPoint": "2_4",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 101401,
+    "Name": "传说的勇毅",
+    "Desc": "所有拥有“传说彼端”超绝特效的友军，与不发生克制关系的部队交战时，攻击、智力提升15%。",
+    "HeroTag": [
+      9
+    ],
+    "PreCampId": [
+      101400
+    ],
+    "ApplySkillId": 240142,
+    "MountPoint": "3_7",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 101402,
+    "Name": "「西格玛」的激励",
+    "Desc": "英雄「西格玛」在场时，全场其他“传说彼端”友军，行动结束时若本回合没有进行攻击，获得“攻击、智力提升10%，移动力+1”，持续1回合。",
+    "HeroID": [
+      60
+    ],
+    "PreCampId": [
+      101401
+    ],
+    "ApplySkillId": 240143,
+    "MountPoint": "4_4",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 101403,
+    "Name": "进阶压制射击",
+    "Desc": "[物理伤害]攻击单个敌军，造成1.5倍的战斗伤害。如果自身处于防御地形上，则在战前造成1次[固定伤害]。（伤害数值为英雄攻击的2倍）",
+    "PreCampId": [
+      101402,
+      101404
+    ],
+    "ApplySkillId": 240004,
+    "ReplaceSkillId": 11778,
+    "MountPoint": "1",
+    "SkillCDDesc": "技能冷却时间减少: <color=#DC143C>2</color>回合"
+  },
+  {
+    "ID": 101404,
+    "Name": "传说的极意",
+    "Desc": "所有拥有“传说彼端”超绝特效的友军，造成伤害提升10%。",
+    "HeroTag": [
+      9
+    ],
+    "PreCampId": [
+      101400
+    ],
+    "ApplySkillId": 240141,
+    "MountPoint": "3_8",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Icon_Tyr2.png"
+  },
+  {
+    "ID": 102000,
+    "Name": "霸者之武",
+    "Desc": "所有拥有“帝国之辉”“黑暗轮回”“战略大师”超绝特效的友军，攻击、智力提升3%。",
+    "HeroTag": [
+      4,
+      5,
+      7
+    ],
+    "ApplySkillId": 240300,
+    "MountPoint": "1_2",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 102100,
+    "Name": "帝国之武",
+    "Desc": "所有拥有“帝国之辉”超绝特效的友军，攻击、智力提升6%。",
+    "HeroTag": [
+      4
+    ],
+    "PreCampId": [
+      102000
+    ],
+    "ApplySkillId": 240310,
+    "MountPoint": "2_5",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 102101,
+    "Name": "帝国的勇毅",
+    "Desc": "所有拥有“帝国之辉”超绝特效的友军，进入战斗时，攻击、智力提升15%。",
+    "HeroTag": [
+      4
+    ],
+    "PreCampId": [
+      102100
+    ],
+    "ApplySkillId": 240312,
+    "MountPoint": "3_9",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 102102,
+    "Name": "「利昂」的激励",
+    "Desc": "英雄「利昂」在场时，全场其他“帝国之辉”友军，攻击前每移动1格，攻击、智力提升2%（最高10%）。",
+    "HeroID": [
+      6
+    ],
+    "PreCampId": [
+      102101
+    ],
+    "ApplySkillId": 240314,
+    "MountPoint": "4_5",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 102103,
+    "Name": "「巴恩哈特」的激励",
+    "Desc": "英雄「巴恩哈特」在场时，全场其他“帝国之辉”友军，与克制的部队交战时，攻击、智力提升5%，主动造成伤害后对敌军再造成1次[固定伤害]（伤害数值为英雄攻击的1倍）。",
+    "HeroID": [
+      7
+    ],
+    "PreCampId": [
+      102101
+    ],
+    "ApplySkillId": 240313,
+    "MountPoint": "4_6",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 102104,
+    "Name": "进阶千骑",
+    "Desc": "[物理伤害]攻击单个敌军，造成1.7倍伤害。并造成[位移]效果：将目标撞开2格，同时使其移动力降低2，且无法进行护卫，持续2回合，无法驱散。",
+    "PreCampId": [
+      102102,
+      102106
+    ],
+    "ApplySkillId": 240006,
+    "ReplaceSkillId": 10302,
+    "MountPoint": "5_4",
+    "SkillCDDesc": "技能冷却时间减少: <color=#DC143C>3</color>回合"
+  },
+  {
+    "ID": 102105,
+    "Name": "进阶剑舞",
+    "Desc": "[物理伤害]对自身周围2格的所有敌军造成0.36倍范围伤害，并使得敌军“无法被治疗”“无法遭受强化效果”，持续1回合。",
+    "PreCampId": [
+      102103,
+      102106
+    ],
+    "ApplySkillId": 240005,
+    "ReplaceSkillId": 10205,
+    "MountPoint": "2"
+  },
+  {
+    "ID": 102106,
+    "Name": "帝国的极意",
+    "Desc": "所有拥有“帝国之辉”超绝特效的友军，造成伤害提升10%。",
+    "HeroTag": [
+      4
+    ],
+    "PreCampId": [
+      102100
+    ],
+    "ApplySkillId": 240311,
+    "MountPoint": "3_10",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Icon_Tyr2.png"
+  },
+  {
+    "ID": 102200,
+    "Name": "黑暗之武",
+    "Desc": "所有拥有“黑暗轮回”超绝特效的友军，攻击、智力提升6%。",
+    "HeroTag": [
+      5
+    ],
+    "PreCampId": [
+      102000
+    ],
+    "ApplySkillId": 240320,
+    "MountPoint": "2_6",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 102201,
+    "Name": "黑暗的勇毅",
+    "Desc": "所有拥有“黑暗轮回”超绝特效的友军，与拥有弱化效果的敌军交战时，攻击、智力提升15%。",
+    "HeroTag": [
+      5
+    ],
+    "PreCampId": [
+      102200
+    ],
+    "ApplySkillId": 240322,
+    "MountPoint": "3_11",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 102202,
+    "Name": "「波赞鲁」的激励",
+    "Desc": "英雄「波赞鲁」在场时，全场其他“黑暗轮回”友军，攻击、智力提升5%，造成伤害后施加1个随机的弱化效果。",
+    "HeroID": [
+      9
+    ],
+    "PreCampId": [
+      102201
+    ],
+    "ApplySkillId": 240323,
+    "MountPoint": "4_7",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 102203,
+    "Name": "进阶黑洞",
+    "Desc": "[魔法伤害]攻击范围内多个敌军，造成0.36倍的范围伤害，并对每个部队分别造成2个不可驱散的随机化效果。",
+    "PreCampId": [
+      102202,
+      102204
+    ],
+    "ApplySkillId": 240007,
+    "ReplaceSkillId": 10717,
+    "MountPoint": "5_5",
+    "SkillCDDesc": "技能冷却时间减少: <color=#DC143C>3</color>回合"
+  },
+  {
+    "ID": 102204,
+    "Name": "黑暗的极意",
+    "Desc": "所有拥有“黑暗轮回”超绝特效的友军，造成伤害提升10%。",
+    "HeroTag": [
+      5
+    ],
+    "PreCampId": [
+      102200
+    ],
+    "ApplySkillId": 240321,
+    "MountPoint": "3_12",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Icon_Tyr2.png"
+  },
+  {
+    "ID": 102300,
+    "Name": "战略之武",
+    "Desc": "所有拥有“战略大师”超绝特效的友军，攻击、智力提升6%。",
+    "HeroTag": [
+      7
+    ],
+    "PreCampId": [
+      102000
+    ],
+    "ApplySkillId": 240330,
+    "MountPoint": "2_7",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 102301,
+    "Name": "战略的勇毅",
+    "Desc": "所有拥有“战略大师”超绝特效的友军，自身为混合部队时，攻击、智力提升15%。",
+    "HeroTag": [
+      7
+    ],
+    "PreCampId": [
+      102300
+    ],
+    "ApplySkillId": 240332,
+    "MountPoint": "3_13",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 102302,
+    "Name": "「兰芳特」的激励",
+    "Desc": "英雄「兰芳特」在场时，全场其他“战略大师”友军，使用技能击杀敌军后，该技能冷却时间-1。",
+    "HeroID": [
+      53
+    ],
+    "PreCampId": [
+      102301
+    ],
+    "ApplySkillId": 240334,
+    "MountPoint": "4_8",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 102303,
+    "Name": "「亚鲁特缪拉」的激励",
+    "Desc": "英雄「亚鲁特缪拉」在场时，全场其他“战略大师”友军，主动攻击进入战斗时，战后若周围1圈有3名以上敌军，可再次攻击但无法移动和再移动（该效果每回合仅能触发1次）。",
+    "HeroID": [
+      25
+    ],
+    "PreCampId": [
+      102301
+    ],
+    "ApplySkillId": 240333,
+    "MountPoint": "4_9",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 102304,
+    "Name": "进阶奔雷",
+    "Desc": "[物理伤害]攻击单个敌军，造成1.5倍的战斗伤害。战前恢复部队50%生命，并获得[御风]：生命大于50%进入战斗时，遭受伤害降低15%，持续2回合。",
+    "PreCampId": [
+      102303,
+      102306
+    ],
+    "ApplySkillId": 240008,
+    "ReplaceSkillId": 10415,
+    "MountPoint": "5_6",
+    "SkillCDDesc": "技能冷却时间减少:<color=#DC143C>1</color>回合"
+  },
+  {
+    "ID": 102305,
+    "Name": "进阶投枪",
+    "Desc": "[物理伤害]攻击单个敌军，造成1倍伤害。攻击前每移动一格，伤害提升20%（最多提升100%）。战斗后，可以获得再次移动2格的机会。携带近战士兵时，士兵也会同时进行攻击。",
+    "PreCampId": [
+      102302,
+      102306
+    ],
+    "ApplySkillId": 240009,
+    "ReplaceSkillId": 11739,
+    "MountPoint": "3",
+    "SkillCDDesc": "技能冷却时间减少: <color=#DC143C>2</color>回合"
+  },
+  {
+    "ID": 102306,
+    "Name": "战略的极意",
+    "Desc": "所有拥有“战略大师”超绝特效的友军，造成伤害提升10%。",
+    "HeroTag": [
+      7
+    ],
+    "PreCampId": [
+      102300
+    ],
+    "ApplySkillId": 240331,
+    "MountPoint": "3_14",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Icon_Tyr2.png"
+  },
+  {
+    "ID": 103000,
+    "Name": "奥法之秘",
+    "Desc": "所有拥有“公主联盟”“超凡领域”“流星直击”“梦幻转生”超绝特效的友军，攻击、智力提升3%。",
+    "HeroTag": [
+      6,
+      8,
+      11,
+      12
+    ],
+    "ApplySkillId": 240500,
+    "MountPoint": "1_3",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 103100,
+    "Name": "公主之秘",
+    "Desc": "所有拥有“公主联盟”超绝特效的友军，攻击、智力提升6%。",
+    "HeroTag": [
+      6
+    ],
+    "PreCampId": [
+      103000
+    ],
+    "ApplySkillId": 240510,
+    "MountPoint": "2_8",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 103101,
+    "Name": "公主的勇毅",
+    "Desc": "所有拥有“公主联盟”超绝特效的友军，使用技能时，攻击、智力提升15%。",
+    "HeroTag": [
+      6
+    ],
+    "PreCampId": [
+      103100
+    ],
+    "ApplySkillId": 240512,
+    "MountPoint": "3_15",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 103102,
+    "Name": "「雪露法妮尔」的激励",
+    "Desc": "英雄「雪露法妮尔」在场时，全场其他“公主联盟”友军，使用范围技能命中3命及以上敌军时，该技能冷却时间-1。",
+    "HeroID": [
+      51
+    ],
+    "PreCampId": [
+      103101
+    ],
+    "ApplySkillId": 240513,
+    "MountPoint": "4_10",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 103103,
+    "Name": "进阶天罚",
+    "Desc": "[魔法伤害]暴击率提升50%，对自身周围5格内所有敌军造成0.35倍的范围伤害，并驱散3个强化效果。对「魔物」有特效。",
+    "PreCampId": [
+      103102,
+      103104
+    ],
+    "ApplySkillId": 240010,
+    "ReplaceSkillId": 10813,
+    "MountPoint": "5_7",
+    "SkillCDDesc": "技能冷却时间减少: <color=#DC143C>2</color>回合"
+  },
+  {
+    "ID": 103104,
+    "Name": "公主的极意",
+    "Desc": "所有拥有“公主联盟”超绝特效的友军，造成伤害提升10%。",
+    "HeroTag": [
+      6
+    ],
+    "PreCampId": [
+      103100
+    ],
+    "ApplySkillId": 240511,
+    "MountPoint": "3_16",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Icon_Tyr2.png"
+  },
+  {
+    "ID": 103200,
+    "Name": "超凡之秘",
+    "Desc": "所有拥有“超凡领域”超绝特效的友军，攻击、智力提升6%。",
+    "HeroTag": [
+      11
+    ],
+    "PreCampId": [
+      103000
+    ],
+    "ApplySkillId": 240520,
+    "MountPoint": "2_9",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 103201,
+    "Name": "超凡的勇毅",
+    "Desc": "所有拥有“超凡领域”超绝特效的友军，任意部队死亡后，攻击、智力提升5%，可累计，最多3层。",
+    "HeroTag": [
+      11
+    ],
+    "PreCampId": [
+      103200
+    ],
+    "ApplySkillId": 240522,
+    "MountPoint": "3_17",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 103202,
+    "Name": "「基扎洛夫」的激励",
+    "Desc": "英雄「基扎洛夫」在场时，全体“超凡领域”友军，主动造成伤害后，随机为2名友军施加1个强化效果。",
+    "HeroID": [
+      59
+    ],
+    "PreCampId": [
+      103201
+    ],
+    "ApplySkillId": 240523,
+    "MountPoint": "4_11",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 103203,
+    "Name": "进阶遗忘",
+    "Desc": "[魔法伤害]攻击范围内多个敌军，造成0.36倍的范围伤害。并使得敌军“所有被动技能失效”“随机1个技能无法使用”，持续2回合。",
+    "PreCampId": [
+      103202,
+      103204
+    ],
+    "ApplySkillId": 240011,
+    "ReplaceSkillId": 10714,
+    "MountPoint": "4",
+    "SkillCDDesc": "技能冷却时间减少: <color=#DC143C>3</color>回合"
+  },
+  {
+    "ID": 103204,
+    "Name": "超凡的极意",
+    "Desc": "所有拥有“超凡领域”超绝特效的友军，造成伤害提升10%。",
+    "HeroTag": [
+      11
+    ],
+    "PreCampId": [
+      103200
+    ],
+    "ApplySkillId": 240521,
+    "MountPoint": "3_18",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Icon_Tyr2.png"
+  },
+  {
+    "ID": 103300,
+    "Name": "流星之秘",
+    "Desc": "所有拥有“流星直击”超绝特效的友军，攻击、智力提升6%。",
+    "HeroTag": [
+      8
+    ],
+    "PreCampId": [
+      103000
+    ],
+    "ApplySkillId": 240530,
+    "MountPoint": "2_10",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 103301,
+    "Name": "流星的勇毅",
+    "Desc": "所有拥有“流星直击”超绝特效的友军，周围1格没有友军时，攻击、智力提升15%，主动攻击时无视敌军10%防御。",
+    "HeroTag": [
+      8
+    ],
+    "PreCampId": [
+      103300
+    ],
+    "ApplySkillId": 240532,
+    "MountPoint": "3_19",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 103302,
+    "Name": "「泽瑞达」的激励",
+    "Desc": "英雄「泽瑞达」在场时，全场其他“流星直击”友军，主动攻击进入战斗时，战前对敌军造成1次[固定伤害]（伤害数值为英雄攻击的1倍）。",
+    "HeroID": [
+      28
+    ],
+    "PreCampId": [
+      103301
+    ],
+    "ApplySkillId": 240533,
+    "MountPoint": "4_12",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 103303,
+    "Name": "进阶影袭",
+    "Desc": "[物理伤害]无视护卫直接攻击单个敌军，造成1.3倍伤害。本技能无视目标15%防御且直接对对英雄造成伤害。",
+    "PreCampId": [
+      103302,
+      103304
+    ],
+    "ApplySkillId": 240012,
+    "ReplaceSkillId": 11701,
+    "MountPoint": "5_8",
+    "SkillCDDesc": "技能冷却时间减少: <color=#DC143C>2</color>回合"
+  },
+  {
+    "ID": 103304,
+    "Name": "流星的极意",
+    "Desc": "所有拥有“流星直击”超绝特效的友军，造成伤害提升10%。",
+    "HeroTag": [
+      8
+    ],
+    "PreCampId": [
+      103300
+    ],
+    "ApplySkillId": 240531,
+    "MountPoint": "3_20",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Icon_Tyr2.png"
+  },
+  {
+    "ID": 103400,
+    "Name": "转生之秘",
+    "Desc": "所有拥有“梦幻转生”超绝特效的友军，攻击、智力提升6%。",
+    "HeroTag": [
+      12
+    ],
+    "PreCampId": [
+      103000
+    ],
+    "ApplySkillId": 240540,
+    "MountPoint": "2_11",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 103401,
+    "Name": "转生的勇毅",
+    "Desc": "所有拥有“梦幻转生”超绝特效的友军，周围3格内每有1名敌军时，攻击、智力提升5%（最高20%）。",
+    "HeroTag": [
+      12
+    ],
+    "PreCampId": [
+      103400
+    ],
+    "ApplySkillId": 240542,
+    "MountPoint": "3_21",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Atkup.png"
+  },
+  {
+    "ID": 103402,
+    "Name": "「阿雷斯」的激励",
+    "Desc": "英雄「阿雷斯」在场时，全场其他“梦幻转生”友军，行动结束时若本回合未造成暴击，暴击率提升30%。",
+    "HeroID": [
+      110
+    ],
+    "PreCampId": [
+      103401
+    ],
+    "ApplySkillId": 240543,
+    "MountPoint": "4_13",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 103403,
+    "Name": "进阶雷光",
+    "Desc": "[物理伤害]攻击单个敌军，造成1.5倍的战斗伤害。成功消灭敌军时，该技能的冷却时间减少3回合，其余技能冷却时间减少1回合。",
+    "PreCampId": [
+      103402,
+      103404
+    ],
+    "ApplySkillId": 240013,
+    "ReplaceSkillId": 10401,
+    "MountPoint": "5_9"
+  },
+  {
+    "ID": 103404,
+    "Name": "转生的极意",
+    "Desc": "所有拥有“梦幻转生”超绝特效的友军，造成伤害提升10%。",
+    "HeroTag": [
+      12
+    ],
+    "PreCampId": [
+      103400
+    ],
+    "ApplySkillId": 240541,
+    "MountPoint": "3_22",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Icon_Tyr2.png"
+  },
+  {
+    "ID": 104000,
+    "Name": "圣耀之佑",
+    "Desc": "所有拥有“主角光环”“光辉军团”“光之起源”“传说彼端”超绝特效的友军，防御、魔防提升4%。",
+    "HeroTag": [
+      1,
+      2,
+      3,
+      9
+    ],
+    "ApplySkillId": 240200,
+    "MountPoint": "1_4",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 104100,
+    "Name": "主角之佑",
+    "Desc": "所有拥有“主角光环”超绝特效的友军，防御、魔防提升8%。",
+    "HeroTag": [
+      1
+    ],
+    "PreCampId": [
+      104000
+    ],
+    "ApplySkillId": 240210,
+    "MountPoint": "2_12",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 104101,
+    "Name": "主角的坚韧",
+    "Desc": "所有拥有“主角光环”超绝特效的友军，自身周围3圈每有1个部队，防御、魔防提升5%（最高25%）。",
+    "HeroTag": [
+      1
+    ],
+    "PreCampId": [
+      104100
+    ],
+    "ApplySkillId": 240212,
+    "MountPoint": "3_23",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 104102,
+    "Name": "「洛维奈尔大帝」的激励",
+    "Desc": "英雄「洛维奈尔大帝」在场时，周围3格范围内所有“主角光环”友军，部队防御、魔防提升10%。",
+    "HeroID": [
+      99170
+    ],
+    "PreCampId": [
+      104101
+    ],
+    "ApplySkillId": 240213,
+    "MountPoint": "4_14",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 104103,
+    "Name": "进阶气浪",
+    "Desc": "[被动]主动进入战斗时，如果部队生命值大于80%，本次战斗先于敌军进行攻击，战斗中遭受伤害降低30%。",
+    "PreCampId": [
+      104102,
+      104104
+    ],
+    "ApplySkillId": 240014,
+    "ReplaceSkillId": 10314,
+    "MountPoint": "5_10"
+  },
+  {
+    "ID": 104104,
+    "Name": "主角的加护",
+    "Desc": "为友军施加“主角光环”超绝特效时，同时为其施加[护盾]：\"可以抵挡自身最大生命15%的伤害\"，无法免疫，不可驱散。",
+    "HeroID": [
+      1,
+      99170
+    ],
+    "PreCampId": [
+      104100
+    ],
+    "ApplySkillId": 240211,
+    "MountPoint": "3_24",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Heimdal01.png"
+  },
+  {
+    "ID": 104200,
+    "Name": "光辉之佑",
+    "Desc": "所有“光辉军团”友军，拥有超绝特效时，防御、魔防提升8%。",
+    "HeroTag": [
+      2
+    ],
+    "PreCampId": [
+      104000
+    ],
+    "ApplySkillId": 240220,
+    "MountPoint": "2_13",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 104201,
+    "Name": "光辉的坚韧",
+    "Desc": "所有拥有“光辉军团”超绝特效的友军，部队生命50%以上时，防御、魔防提升20%。",
+    "HeroTag": [
+      2
+    ],
+    "PreCampId": [
+      104200
+    ],
+    "ApplySkillId": 240222,
+    "MountPoint": "3_25",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 104202,
+    "Name": "「雷丁」的激励",
+    "Desc": "英雄「雷丁」在场时，全场其他“光辉军团”友军，被攻击进入战斗时，有30%概率先于敌军进行攻击。",
+    "HeroID": [
+      10
+    ],
+    "PreCampId": [
+      104201
+    ],
+    "ApplySkillId": 240223,
+    "MountPoint": "4_16",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 104203,
+    "Name": "进阶奉献",
+    "Desc": "[被动]战斗后，60%的概率恢复我方其他部队的生命。恢复量为部队生命上限的20%。",
+    "PreCampId": [
+      104202,
+      104204
+    ],
+    "ApplySkillId": 240015,
+    "ReplaceSkillId": 10829,
+    "MountPoint": "5_11"
+  },
+  {
+    "ID": 104204,
+    "Name": "光辉的加护",
+    "Desc": "为友军施加“光辉军团”超绝特效时，同时为其施加[护盾]：\"可以抵挡自身最大生命15%的伤害\"，无法免疫，不可驱散。",
+    "HeroID": [
+      12,
+      10
+    ],
+    "PreCampId": [
+      104200
+    ],
+    "ApplySkillId": 240221,
+    "MountPoint": "3_26",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Heimdal01.png"
+  },
+  {
+    "ID": 104300,
+    "Name": "起源之佑",
+    "Desc": "所有“光之起源”友军，拥有超绝特效时，防御、魔防提升8%。",
+    "HeroTag": [
+      3
+    ],
+    "PreCampId": [
+      104000
+    ],
+    "ApplySkillId": 240230,
+    "MountPoint": "2_14",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 104301,
+    "Name": "起源的坚韧",
+    "Desc": "所有拥有“光之起源”超绝特效的友军，与部队生命值不高于自身的敌军交战时，防御、魔防提升20%。",
+    "HeroTag": [
+      3
+    ],
+    "PreCampId": [
+      104300
+    ],
+    "ApplySkillId": 240232,
+    "MountPoint": "3_27",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 104302,
+    "Name": "「古巨拉」的激励",
+    "Desc": "英雄「古巨拉」在场时，周围3格范围内所有“光之起源”友军，部队防御、魔防提升10%。",
+    "HeroID": [
+      37
+    ],
+    "PreCampId": [
+      104301
+    ],
+    "ApplySkillId": 240233,
+    "MountPoint": "4_17",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 104303,
+    "Name": "「芙蕾雅」的激励",
+    "Desc": "英雄「芙蕾雅」在场时，全场其他“光之起源”友军，被攻击进入战斗时，战前对敌军造成1次[固定伤害]（伤害数值为英雄\"防御\"+\"魔防\"的0.5倍）。",
+    "HeroID": [
+      33
+    ],
+    "PreCampId": [
+      104301
+    ],
+    "ApplySkillId": 240234,
+    "MountPoint": "5",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 104304,
+    "Name": "进阶海卫",
+    "Desc": "[被动]替相邻友军承受物理攻击。在水中时，用“防御”的1.4倍代替“攻击”，并可以反击2格的远程攻击。\n[主动]护卫范围提升为3格。并获得“驭水”效果：自身所处地形视为“水中”，持续2回合。",
+    "PreCampId": [
+      104302,
+      104306
+    ],
+    "ApplySkillId": 240016,
+    "ReplaceSkillId": 11732,
+    "MountPoint": "5_12"
+  },
+  {
+    "ID": 104305,
+    "Name": "进阶枪阵",
+    "Desc": "[被动]替相邻友军承受物理攻击。\n[主动]护卫范围提升为3格，防御提升20%，并可以反击2格的远程攻击。战斗结束后，必定触发[倒刺]的[固定伤害]，持续2回合。",
+    "PreCampId": [
+      104303,
+      104306
+    ],
+    "ApplySkillId": 240017,
+    "ReplaceSkillId": 10102,
+    "MountPoint": "6"
+  },
+  {
+    "ID": 104306,
+    "Name": "起源的加护",
+    "Desc": "为友军施加“光之起源”超绝特效时，同时为其施加[护盾]：\"可以抵挡自身最大生命15%的伤害\"，无法免疫，不可驱散。",
+    "HeroID": [
+      27,
+      37,
+      33
+    ],
+    "PreCampId": [
+      104300
+    ],
+    "ApplySkillId": 240231,
+    "MountPoint": "3_28",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Heimdal01.png"
+  },
+  {
+    "ID": 104400,
+    "Name": "传说之佑",
+    "Desc": "所有“传说彼端”友军，拥有超绝特效时，防御、魔防提升8%。",
+    "HeroTag": [
+      9
+    ],
+    "PreCampId": [
+      104000
+    ],
+    "ApplySkillId": 240240,
+    "MountPoint": "2_15",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 104401,
+    "Name": "传说的坚韧",
+    "Desc": "所有拥有“传说彼端”超绝特效的友军，自身周围3圈每有1个部队，防御、魔防提升5%（最高25%）。",
+    "HeroTag": [
+      9
+    ],
+    "PreCampId": [
+      104400
+    ],
+    "ApplySkillId": 240242,
+    "MountPoint": "3_29",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 104402,
+    "Name": "「兰迪乌斯」的激励",
+    "Desc": "英雄「兰迪乌斯」在场时，全体“传说彼端”友军，与不发生克制关系的部队交战时，防御、魔防提升10%。",
+    "HeroID": [
+      55
+    ],
+    "PreCampId": [
+      104401
+    ],
+    "ApplySkillId": 240243,
+    "MountPoint": "4_18",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 104403,
+    "Name": "进阶不屈",
+    "Desc": "[被动]抵挡一次致命伤害，获得[免疫][增援]，持续2回合，并且生命值恢复100%。每场战斗最多触发一次。",
+    "PreCampId": [
+      104402,
+      104404
+    ],
+    "ApplySkillId": 240018,
+    "ReplaceSkillId": 11720,
+    "MountPoint": "5_13"
+  },
+  {
+    "ID": 104404,
+    "Name": "传说的加护",
+    "Desc": "为友军施加“传说彼端”超绝特效时，同时为其施加[护盾]：\"可以抵挡自身最大生命15%的伤害\"，无法免疫，不可驱散。",
+    "HeroID": [
+      60,
+      55
+    ],
+    "PreCampId": [
+      104400
+    ],
+    "ApplySkillId": 240241,
+    "MountPoint": "3_30",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Heimdal01.png"
+  },
+  {
+    "ID": 105000,
+    "Name": "霸者之盾",
+    "Desc": "所有拥有“帝国之辉”“黑暗轮回”“战略大师”超绝特效的友军，防御、魔防提升4%。",
+    "HeroTag": [
+      4,
+      5,
+      7
+    ],
+    "ApplySkillId": 240400,
+    "MountPoint": "1_5",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 105100,
+    "Name": "帝国之盾",
+    "Desc": "所有拥有“帝国之辉”超绝特效的友军，防御、魔防提升8%。",
+    "HeroTag": [
+      4
+    ],
+    "PreCampId": [
+      105000
+    ],
+    "ApplySkillId": 240410,
+    "MountPoint": "2_16",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 105101,
+    "Name": "帝国的坚韧",
+    "Desc": "所有拥有“帝国之辉”超绝特效的友军，被攻击进入战斗时，防御、魔防提升20%。",
+    "HeroTag": [
+      4
+    ],
+    "PreCampId": [
+      105100
+    ],
+    "ApplySkillId": 240412,
+    "MountPoint": "3_31",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 105102,
+    "Name": "「罗泽希尔」的激励",
+    "Desc": "英雄「罗泽希尔」在场时，全体“帝国之辉”友军，每拥1层[水晶屏障]，防御、魔防提升2%，。",
+    "HeroID": [
+      100
+    ],
+    "PreCampId": [
+      105101
+    ],
+    "ApplySkillId": 240413,
+    "MountPoint": "4_19",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 105103,
+    "Name": "进阶神迹",
+    "Desc": "[支援]主动使用，使得范围内多个部队伤害提升20%，遭受伤害降低20%，持续3回合。并恢复施法者智力5倍的生命。",
+    "PreCampId": [
+      105102,
+      105104
+    ],
+    "ApplySkillId": 240019,
+    "ReplaceSkillId": 10806,
+    "MountPoint": "5_14"
+  },
+  {
+    "ID": 105104,
+    "Name": "帝国的加护",
+    "Desc": "为友军施加“帝国之辉”超绝特效时，同时为其施加[护盾]：\"可以抵挡自身最大生命15%的伤害\"，无法免疫，不可驱散。",
+    "HeroID": [
+      6,
+      7,
+      100
+    ],
+    "PreCampId": [
+      105100
+    ],
+    "ApplySkillId": 240411,
+    "MountPoint": "3_32",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Heimdal01.png"
+  },
+  {
+    "ID": 105200,
+    "Name": "黑暗之盾",
+    "Desc": "所有“黑暗轮回”友军，拥有超绝特效时，防御、魔防提升8%。",
+    "HeroTag": [
+      5
+    ],
+    "PreCampId": [
+      105000
+    ],
+    "ApplySkillId": 240420,
+    "MountPoint": "2_17",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 105201,
+    "Name": "黑暗的坚韧",
+    "Desc": "所有拥有“黑暗轮回”超绝特效的友军，有技能处于冷却时，防御、魔防提升20%。",
+    "HeroTag": [
+      5
+    ],
+    "PreCampId": [
+      105200
+    ],
+    "ApplySkillId": 240422,
+    "MountPoint": "3_33",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 105202,
+    "Name": "「丽可丽丝」的激励",
+    "Desc": "英雄「丽可丽丝」在场时，全体“黑暗轮回”友军，处于[生命之息]或[黑暗之息]之上时，防御、魔防提升10%。",
+    "HeroID": [
+      125
+    ],
+    "PreCampId": [
+      105201
+    ],
+    "ApplySkillId": 240423,
+    "MountPoint": "4_20",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 105203,
+    "Name": "进阶群体治疗",
+    "Desc": "[治疗]主动使用，恢复范围内多个部队的生命值，恢复量为施法者智力的5倍。并驱散1个弱化效果。同时使所有友军技能冷却时间减少1回合。",
+    "PreCampId": [
+      105202,
+      105204
+    ],
+    "ApplySkillId": 240020,
+    "ReplaceSkillId": 10802,
+    "MountPoint": "5_15",
+    "SkillCDDesc": "技能冷却时间减少:<color=#DC143C>1</color>回合"
+  },
+  {
+    "ID": 105204,
+    "Name": "黑暗的加护",
+    "Desc": "为友军施加“黑暗轮回”超绝特效时，同时为其施加[护盾]：\"可以抵挡自身最大生命15%的伤害\"，无法免疫，不可驱散。",
+    "HeroID": [
+      9,
+      125
+    ],
+    "PreCampId": [
+      105200
+    ],
+    "ApplySkillId": 240421,
+    "MountPoint": "3_34",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Heimdal01.png"
+  },
+  {
+    "ID": 105300,
+    "Name": "战略之盾",
+    "Desc": "所有“战略大师”友军，拥有超绝特效时，防御、魔防提升8%。",
+    "HeroTag": [
+      7
+    ],
+    "PreCampId": [
+      105000
+    ],
+    "ApplySkillId": 240430,
+    "MountPoint": "2_18",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 105301,
+    "Name": "战略的坚韧",
+    "Desc": "所有拥有“战略大师”超绝特效的友军，与移动力不超过自身的单位交战时，防御、魔防提升20%。",
+    "HeroTag": [
+      7
+    ],
+    "PreCampId": [
+      105300
+    ],
+    "ApplySkillId": 240432,
+    "MountPoint": "3_35",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 105302,
+    "Name": "「格伦希尔」的激励",
+    "Desc": "英雄「格伦希尔」在场时，全场其他“战略大师”友军，行动结束时，如果处于[危险范围]内，获得[护盾]：“可以抵挡自身最大生命值10%的伤害”，不可驱散。（[触发冷却]护盾消除后，需要间隔2回合才能再次获得）",
+    "HeroID": [
+      99192
+    ],
+    "PreCampId": [
+      105301
+    ],
+    "ApplySkillId": 240433,
+    "MountPoint": "4_21",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 105303,
+    "Name": "进阶铁腕",
+    "Desc": "[被动]替相邻友军承受物理攻击。\n[主动]护卫范围提升为3格，攻击提升20%，可以反击2格的远程攻击，并获得[招架][免疫][增援]效果，持续2回合。",
+    "PreCampId": [
+      105302,
+      105304
+    ],
+    "ApplySkillId": 240021,
+    "ReplaceSkillId": 10225,
+    "MountPoint": "5_16"
+  },
+  {
+    "ID": 105304,
+    "Name": "战略的加护",
+    "Desc": "为友军施加“战略大师”超绝特效时，同时为其施加[护盾]：\"可以抵挡自身最大生命15%的伤害\"，无法免疫，不可驱散。",
+    "HeroID": [
+      53,
+      25,
+      99192
+    ],
+    "PreCampId": [
+      105300
+    ],
+    "ApplySkillId": 240431,
+    "MountPoint": "3_36",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Heimdal01.png"
+  },
+  {
+    "ID": 106000,
+    "Name": "奥法之壁",
+    "Desc": "所有拥有“公主联盟”“超凡领域”“流星直击”“梦幻转生”超绝特效的友军，防御、魔防提升4%。",
+    "HeroTag": [
+      6,
+      8,
+      11,
+      12
+    ],
+    "ApplySkillId": 240600,
+    "MountPoint": "1_6",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 106100,
+    "Name": "公主之壁",
+    "Desc": "所有拥有“公主联盟”超绝特效的友军，防御、魔防提升8%。",
+    "HeroTag": [
+      6
+    ],
+    "PreCampId": [
+      106000
+    ],
+    "ApplySkillId": 240610,
+    "MountPoint": "2_19",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 106101,
+    "Name": "公主的坚韧",
+    "Desc": "所有拥有“公主联盟”超绝特效的友军，全场每有1名「女性英雄」，防御、魔防提升4%（最高20%）",
+    "HeroTag": [
+      6
+    ],
+    "PreCampId": [
+      106100
+    ],
+    "ApplySkillId": 240612,
+    "MountPoint": "3_37",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 106102,
+    "Name": "「露娜」的激励",
+    "Desc": "英雄「露娜」在场时，全场其他“公主联盟”友军，首次击败敌军后获得[花语·玫瑰]。",
+    "HeroID": [
+      26
+    ],
+    "PreCampId": [
+      106101
+    ],
+    "ApplySkillId": 240614,
+    "MountPoint": "4_22",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 106103,
+    "Name": "「克里斯蒂安妮」的激励",
+    "Desc": "英雄「克里斯蒂安妮」在场时，全场其他“公主联盟”友军，首次击败敌军后获得[花语·百合]。",
+    "HeroID": [
+      124
+    ],
+    "PreCampId": [
+      106101
+    ],
+    "ApplySkillId": 240613,
+    "MountPoint": "4_23",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 106104,
+    "Name": "进阶疾风",
+    "Desc": "[被动]行动结束时，有25%的概率可以再次行动，自身有技能处于冷却时，概率提升25%。",
+    "PreCampId": [
+      106102,
+      106106
+    ],
+    "ApplySkillId": 240023,
+    "ReplaceSkillId": 10405,
+    "MountPoint": "5_17"
+  },
+  {
+    "ID": 106105,
+    "Name": "进阶正义",
+    "Desc": "[被动]普通攻击造成伤害提升30%。\n[物理伤害]攻击单个敌军，造成1.5倍的战斗伤害。战斗前，获得[高阶圣卫]效果：用“魔防”的1.6倍来代替“攻击”，可以反击2格的远程攻击，持续4回合，不可驱散。",
+    "PreCampId": [
+      106103,
+      106106
+    ],
+    "ApplySkillId": 240022,
+    "ReplaceSkillId": 12063,
+    "MountPoint": "5_18"
+  },
+  {
+    "ID": 106106,
+    "Name": "公主的加护",
+    "Desc": "为友军施加“公主联盟”超绝特效时，同时为其施加[护盾]：\"可以抵挡自身最大生命15%的伤害\"，无法免疫，不可驱散。",
+    "HeroID": [
+      51,
+      26,
+      124
+    ],
+    "PreCampId": [
+      106100
+    ],
+    "ApplySkillId": 240611,
+    "MountPoint": "3_38",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Heimdal01.png"
+  },
+  {
+    "ID": 106200,
+    "Name": "超凡之壁",
+    "Desc": "所有“超凡领域”友军，拥有超绝特效时，防御、魔防提升8%。",
+    "HeroTag": [
+      11
+    ],
+    "PreCampId": [
+      106000
+    ],
+    "ApplySkillId": 240620,
+    "MountPoint": "2_20",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 106201,
+    "Name": "超凡的坚韧",
+    "Desc": "所有拥有“超凡领域”超绝特效的友军，自身3格范围内有友军部队，防御、魔防提升20%。",
+    "HeroTag": [
+      11
+    ],
+    "PreCampId": [
+      106200
+    ],
+    "ApplySkillId": 240622,
+    "MountPoint": "3_39",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 106202,
+    "Name": "「树之贤者」的激励",
+    "Desc": "英雄「树之贤者」在场时，全场其他“超凡领域”友军，行动结束时，使自身本回合经过的所有格子获得2回合的特殊效果[炫光]。",
+    "HeroID": [
+      102
+    ],
+    "PreCampId": [
+      106201
+    ],
+    "ApplySkillId": 240623,
+    "MountPoint": "4_24",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 106203,
+    "Name": "进阶净化",
+    "Desc": "[魔法伤害]攻击单个敌军，造成1.5倍伤害，目标为「魔物」时有特效。战后去除目标身上2个强化效果，并使其“无法遭受强化效果”，持续2回合。",
+    "PreCampId": [
+      106202,
+      106204
+    ],
+    "ApplySkillId": 240024,
+    "ReplaceSkillId": 10841,
+    "MountPoint": "7",
+    "SkillCDDesc": "技能冷却时间减少:<color=#DC143C>1</color>回合"
+  },
+  {
+    "ID": 106204,
+    "Name": "超凡的加护",
+    "Desc": "为友军施加“超凡领域”超绝特效时，同时为其施加[护盾]：\"可以抵挡自身最大生命15%的伤害\"，无法免疫，不可驱散。",
+    "HeroID": [
+      59,
+      102
+    ],
+    "PreCampId": [
+      106200
+    ],
+    "ApplySkillId": 240621,
+    "MountPoint": "3_40",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Heimdal01.png"
+  },
+  {
+    "ID": 106300,
+    "Name": "流星之壁",
+    "Desc": "所有“流星直击”友军，拥有超绝特效时，防御、魔防提升8%。",
+    "HeroTag": [
+      8
+    ],
+    "PreCampId": [
+      106000
+    ],
+    "ApplySkillId": 240630,
+    "MountPoint": "2_21",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 106301,
+    "Name": "流星的坚韧",
+    "Desc": "所有拥有“流星直击”超绝特效的友军，进入战斗时，防御、魔防提升20%。",
+    "HeroTag": [
+      8
+    ],
+    "PreCampId": [
+      106300
+    ],
+    "ApplySkillId": 240632,
+    "MountPoint": "3_41",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 106302,
+    "Name": "「伊普西龙」的激励",
+    "Desc": "英雄「伊普西龙」在场时，任意部队死亡时，全场其他“流星直击”友军，驱散自身1个弱化效果，并恢复15%生命。",
+    "HeroID": [
+      106
+    ],
+    "PreCampId": [
+      106301
+    ],
+    "ApplySkillId": 240633,
+    "MountPoint": "4_25",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 106303,
+    "Name": "进阶斩阳",
+    "Desc": "[物理伤害]攻击单个敌军，造成1.5倍伤害。战斗后，为全体友军恢复伤害数值30%的生命。",
+    "PreCampId": [
+      106302,
+      106304
+    ],
+    "ApplySkillId": 240025,
+    "ReplaceSkillId": 10208,
+    "MountPoint": "5_19",
+    "SkillCDDesc": "技能冷却时间减少:<color=#DC143C>1</color>回合"
+  },
+  {
+    "ID": 106304,
+    "Name": "流星的加护",
+    "Desc": "为友军施加“流星直击”超绝特效时，同时为其施加[护盾]：\"可以抵挡自身最大生命15%的伤害\"，无法免疫，不可驱散。",
+    "HeroID": [
+      28,
+      106
+    ],
+    "PreCampId": [
+      106300
+    ],
+    "ApplySkillId": 240631,
+    "MountPoint": "3_42",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Heimdal01.png"
+  },
+  {
+    "ID": 106400,
+    "Name": "转生之壁",
+    "Desc": "所有“梦幻转生”友军，拥有超绝特效时，防御、魔防提升8%。",
+    "HeroTag": [
+      12
+    ],
+    "PreCampId": [
+      106000
+    ],
+    "ApplySkillId": 240640,
+    "MountPoint": "2_22",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 106401,
+    "Name": "转生的坚韧",
+    "Desc": "所有拥有“梦幻转生”超绝特效的友军，拥有5个及以上强化效果时，防御、魔防提升20%。",
+    "HeroTag": [
+      12
+    ],
+    "PreCampId": [
+      106400
+    ],
+    "ApplySkillId": 240642,
+    "MountPoint": "3_43",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Defup.png"
+  },
+  {
+    "ID": 106402,
+    "Name": "「希尔达」的激励",
+    "Desc": "英雄「希尔达」在场时，全场其他“梦幻转生”友军，被攻击进入战斗前，敌军每移动一格则使其攻击、智力降低2%（最高10%）。",
+    "HeroID": [
+      122
+    ],
+    "PreCampId": [
+      106401
+    ],
+    "ApplySkillId": 240643,
+    "MountPoint": "4_26",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_GodsEvening.png"
+  },
+  {
+    "ID": 106403,
+    "Name": "进阶破阵",
+    "Desc": "[物理伤害]无视护卫攻击单个敌军，造成1.2倍伤害。并造成[位移]效果：将目标撞开2格，同时使其下回合无法行动。",
+    "PreCampId": [
+      106402,
+      106404
+    ],
+    "ApplySkillId": 240026,
+    "ReplaceSkillId": 10326,
+    "MountPoint": "5_20",
+    "SkillCDDesc": "技能冷却时间减少: <color=#DC143C>2</color>回合"
+  },
+  {
+    "ID": 106404,
+    "Name": "转生的加护",
+    "Desc": "为友军施加“梦幻转生”超绝特效时，同时为其施加[护盾]：\"可以抵挡自身最大生命15%的伤害\"，无法免疫，不可驱散。",
+    "HeroID": [
+      110,
+      122
+    ],
+    "PreCampId": [
+      106400
+    ],
+    "ApplySkillId": 240641,
+    "MountPoint": "3_44",
+    "CornerMarkIcon": "UI/ParallelWarfare_ABS/SkillBuffIcon/SkillBuffIcon_Heimdal01.png"
+  }
+]

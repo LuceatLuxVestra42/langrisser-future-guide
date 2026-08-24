@@ -1,14 +1,692 @@
-{
-  "m_GameObject": {
-    "m_FileID": 641772863,
-    "m_PathID": 7380917625082242414
+[
+  {
+    "ID": 1,
+    "Desc": "回合开始，回复1点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 1
   },
-  "m_Enabled": 229,
-  "m_Script": {
-    "m_FileID": 320,
-    "m_PathID": -6348526550915706651
+  {
+    "ID": 2,
+    "Desc": "回合开始，回复2点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 2
   },
-  "m_Name": "",
-  "m_size": -442123292,
-  "m_bytes": null
-}
+  {
+    "ID": 3,
+    "Desc": "击杀任意召唤物以外的敌军，回复1点能量",
+    "RecoverEnergyType": 3,
+    "Energy": 1
+  },
+  {
+    "ID": 4,
+    "Desc": "击杀任意召唤物以外的敌军，回复2点能量",
+    "RecoverEnergyType": 3,
+    "Energy": 2
+  },
+  {
+    "ID": 5,
+    "Desc": "主动攻击进入战斗时，若自身没有受到伤害，战斗结束后回复1点能量（召唤类单位无法生效）",
+    "RecoverEnergyType": 2,
+    "Param1": [
+      2
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 6,
+    "Desc": "战斗开始，回复12点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 12
+  },
+  {
+    "ID": 7,
+    "Desc": "战斗开始，回复15点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 15
+  },
+  {
+    "ID": 8,
+    "Desc": "战斗开始，回复18点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 18
+  },
+  {
+    "ID": 9,
+    "Desc": "回合开始，回复<color=#DC143C>2</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 2
+  },
+  {
+    "ID": 10,
+    "Desc": "回合开始，回复<color=#DC143C>4</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 4
+  },
+  {
+    "ID": 11,
+    "Desc": "回合开始，回复<color=#DC143C>6</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 6
+  },
+  {
+    "ID": 12,
+    "Desc": "战斗开始，回复<color=#DC143C>46</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 46
+  },
+  {
+    "ID": 13,
+    "Desc": "战斗开始，回复<color=#DC143C>50</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 50
+  },
+  {
+    "ID": 14,
+    "Desc": "战斗开始，回复<color=#DC143C>54</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 54
+  },
+  {
+    "ID": 15,
+    "Desc": "主动攻击进入战斗，若造成过固定伤害，战斗结束后回复<color=#DC143C>1</color>点能量，每回合至多回复<color=#DC143C>2</color>次（召唤类角色无法生效）",
+    "RecoverEnergyType": 5,
+    "Param1": [
+      2
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 16,
+    "Desc": "主动攻击进入战斗，若造成过固定伤害，战斗结束后回复<color=#DC143C>1</color>点能量，每回合至多回复<color=#DC143C>3</color>次（召唤类角色无法生效）",
+    "RecoverEnergyType": 5,
+    "Param1": [
+      3
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 17,
+    "Desc": "主动攻击进入战斗，若造成过固定伤害，战斗结束后回复<color=#DC143C>1</color>点能量，每回合回复<color=#DC143C>不限次</color>（召唤类角色无法生效）",
+    "RecoverEnergyType": 5,
+    "Energy": 1
+  },
+  {
+    "ID": 18,
+    "Desc": "击杀任意召唤物以外的敌军，回复<color=#DC143C>1</color>点能量",
+    "RecoverEnergyType": 3,
+    "Energy": 1
+  },
+  {
+    "ID": 19,
+    "Desc": "回合开始，回复<color=#DC143C>2</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 2
+  },
+  {
+    "ID": 20,
+    "Desc": "回合开始，回复<color=#DC143C>4</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 4
+  },
+  {
+    "ID": 21,
+    "Desc": "回合开始，回复<color=#DC143C>6</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 6
+  },
+  {
+    "ID": 22,
+    "Desc": "战斗开始，回复<color=#DC143C>46</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 46
+  },
+  {
+    "ID": 23,
+    "Desc": "战斗开始，回复<color=#DC143C>50</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 50
+  },
+  {
+    "ID": 24,
+    "Desc": "战斗开始，回复<color=#DC143C>54</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 54
+  },
+  {
+    "ID": 25,
+    "Desc": "主动攻击进入战斗时，若自身没有遭受反击，战斗结束后回复<color=#DC143C>1</color>点能量，每回合至多回复<color=#DC143C>2</color>次（召唤类角色无法生效）",
+    "RecoverEnergyType": 6,
+    "Param1": [
+      2
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 26,
+    "Desc": "主动攻击进入战斗时，若自身没有遭受反击，战斗结束后回复<color=#DC143C>1</color>点能量，每回合至多回复<color=#DC143C>3</color>次（召唤类角色无法生效）",
+    "RecoverEnergyType": 6,
+    "Param1": [
+      3
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 27,
+    "Desc": "主动攻击进入战斗时，若自身没有遭受反击，战斗结束后回复<color=#DC143C>1</color>点能量，每回合回复<color=#DC143C>不限次</color>（召唤类角色无法生效）",
+    "RecoverEnergyType": 6,
+    "Energy": 1
+  },
+  {
+    "ID": 28,
+    "Desc": "击杀任意召唤物以外的敌军，回复<color=#DC143C>1</color>点能量",
+    "RecoverEnergyType": 3,
+    "Energy": 1
+  },
+  {
+    "ID": 29,
+    "Desc": "回合开始，回复<color=#DC143C>2</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 2
+  },
+  {
+    "ID": 30,
+    "Desc": "回合开始，回复<color=#DC143C>4</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 4
+  },
+  {
+    "ID": 31,
+    "Desc": "回合开始，回复<color=#DC143C>6</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 6
+  },
+  {
+    "ID": 32,
+    "Desc": "战斗开始，回复<color=#DC143C>46</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 46
+  },
+  {
+    "ID": 33,
+    "Desc": "战斗开始，回复<color=#DC143C>50</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 50
+  },
+  {
+    "ID": 34,
+    "Desc": "战斗开始，回复<color=#DC143C>54</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 54
+  },
+  {
+    "ID": 35,
+    "Desc": "在行动回合内，曾由自身天赋、技能、士兵及装备效果施加过治疗效果，回复<color=#DC143C>1</color>点能量。每回合至多回复<color=#DC143C>2</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 7,
+    "Param1": [
+      2
+    ],
+    "Param2": [
+      1
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 36,
+    "Desc": "在行动回合内，曾由自身天赋、技能、士兵及装备效果施加过治疗效果，回复<color=#DC143C>1</color>点能量。每回合至多回复<color=#DC143C>3</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 7,
+    "Param1": [
+      3
+    ],
+    "Param2": [
+      1
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 37,
+    "Desc": "在行动回合内，曾由自身天赋、技能、士兵及装备效果施加过治疗效果，回复<color=#DC143C>1</color>点能量。每回合回复<color=#DC143C>不限次</color>。（召唤类角色无法生效）",
+    "RecoverEnergyType": 7,
+    "Param2": [
+      1
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 38,
+    "Desc": "击杀任意召唤物以外的敌军，回复<color=#DC143C>1</color>点能量",
+    "RecoverEnergyType": 3,
+    "Energy": 1
+  },
+  {
+    "ID": 39,
+    "Desc": "回合开始，回复<color=#DC143C>2</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 2
+  },
+  {
+    "ID": 40,
+    "Desc": "回合开始，回复<color=#DC143C>4</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 4
+  },
+  {
+    "ID": 41,
+    "Desc": "回合开始，回复<color=#DC143C>6</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 6
+  },
+  {
+    "ID": 42,
+    "Desc": "战斗开始，回复<color=#DC143C>46</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 46
+  },
+  {
+    "ID": 43,
+    "Desc": "战斗开始，回复<color=#DC143C>50</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 50
+  },
+  {
+    "ID": 44,
+    "Desc": "战斗开始，回复<color=#DC143C>54</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 54
+  },
+  {
+    "ID": 45,
+    "Desc": "每施放<color=#DC143C>1</color>次冷却时间大于等于<color=#DC143C>2</color>的技能，回复<color=#DC143C>1</color>点能量，每回合至多回复<color=#DC143C>2</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 8,
+    "Param1": [
+      2
+    ],
+    "Param2": [
+      2
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 46,
+    "Desc": "每施放<color=#DC143C>1</color>次冷却时间大于等于<color=#DC143C>2</color>的技能，回复<color=#DC143C>1</color>点能量，每回合至多回复<color=#DC143C>3</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 8,
+    "Param1": [
+      3
+    ],
+    "Param2": [
+      2
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 47,
+    "Desc": "每施放<color=#DC143C>1</color>次冷却时间大于等于<color=#DC143C>2</color>的技能，回复<color=#DC143C>1</color>点能量，每回合至多回复<color=#DC143C>9</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 8,
+    "Param1": [
+      9
+    ],
+    "Param2": [
+      2
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 48,
+    "Desc": "击杀任意召唤物以外的敌军，回复<color=#DC143C>1</color>点能量",
+    "RecoverEnergyType": 3,
+    "Energy": 1
+  },
+  {
+    "ID": 49,
+    "Desc": "回合开始，回复<color=#DC143C>2</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 2
+  },
+  {
+    "ID": 50,
+    "Desc": "回合开始，回复<color=#DC143C>4</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 4
+  },
+  {
+    "ID": 51,
+    "Desc": "回合开始，回复<color=#DC143C>6</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 6
+  },
+  {
+    "ID": 52,
+    "Desc": "战斗开始，回复<color=#DC143C>46</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 46
+  },
+  {
+    "ID": 53,
+    "Desc": "战斗开始，回复<color=#DC143C>50</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 50
+  },
+  {
+    "ID": 54,
+    "Desc": "战斗开始，回复<color=#DC143C>54</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 54
+  },
+  {
+    "ID": 55,
+    "Desc": "每次移动大于等于<color=#DC143C>3</color>格，回复<color=#DC143C>1</color>点能量，每回合至多回复<color=#DC143C>2</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 10,
+    "Param1": [
+      2
+    ],
+    "Param2": [
+      3
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 56,
+    "Desc": "每次移动大于等于<color=#DC143C>3</color>格，回复<color=#DC143C>1</color>点能量，每回合至多回复<color=#DC143C>3</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 10,
+    "Param1": [
+      3
+    ],
+    "Param2": [
+      3
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 57,
+    "Desc": "每次移动大于等于<color=#DC143C>3</color>格，回复<color=#DC143C>1</color>点能量，每回合至多回复<color=#DC143C>9</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 10,
+    "Param1": [
+      9
+    ],
+    "Param2": [
+      3
+    ],
+    "Energy": 1
+  },
+  {
+    "ID": 58,
+    "Desc": "击杀任意召唤物以外的敌军，回复<color=#DC143C>1</color>点能量",
+    "RecoverEnergyType": 3,
+    "Energy": 1
+  },
+  {
+    "ID": 59,
+    "Desc": "回合开始，回复<color=#DC143C>2</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 2
+  },
+  {
+    "ID": 60,
+    "Desc": "回合开始，回复<color=#DC143C>4</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 4
+  },
+  {
+    "ID": 61,
+    "Desc": "回合开始，回复<color=#DC143C>6</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 6
+  },
+  {
+    "ID": 62,
+    "Desc": "战斗开始，回复<color=#DC143C>46</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 46
+  },
+  {
+    "ID": 63,
+    "Desc": "战斗开始，回复<color=#DC143C>50</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 50
+  },
+  {
+    "ID": 64,
+    "Desc": "战斗开始，回复<color=#DC143C>54</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 54
+  },
+  {
+    "ID": 65,
+    "Desc": "行动结束时若未造成过伤害，回复<color=#DC143C>2</color>点能量，每回合至多回复<color=#DC143C>2</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 11,
+    "Param1": [
+      2
+    ],
+    "Energy": 2
+  },
+  {
+    "ID": 66,
+    "Desc": "行动结束时若未造成过伤害，回复<color=#DC143C>2</color>点能量，每回合至多回复<color=#DC143C>3</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 11,
+    "Param1": [
+      3
+    ],
+    "Energy": 2
+  },
+  {
+    "ID": 67,
+    "Desc": "行动结束时若未造成过伤害，回复<color=#DC143C>2</color>点能量，每回合至多回复<color=#DC143C>4</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 11,
+    "Param1": [
+      4
+    ],
+    "Energy": 2
+  },
+  {
+    "ID": 68,
+    "Desc": "击杀任意召唤物以外的敌军，回复<color=#DC143C>1</color>点能量",
+    "RecoverEnergyType": 3,
+    "Energy": 1
+  },
+  {
+    "ID": 69,
+    "Desc": "回合开始，回复<color=#DC143C>2</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 2
+  },
+  {
+    "ID": 70,
+    "Desc": "回合开始，回复<color=#DC143C>4</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 4
+  },
+  {
+    "ID": 71,
+    "Desc": "回合开始，回复<color=#DC143C>6</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 6
+  },
+  {
+    "ID": 72,
+    "Desc": "战斗开始，回复<color=#DC143C>46</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 46
+  },
+  {
+    "ID": 73,
+    "Desc": "战斗开始，回复<color=#DC143C>50</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 50
+  },
+  {
+    "ID": 74,
+    "Desc": "战斗开始，回复<color=#DC143C>54</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 54
+  },
+  {
+    "ID": 75,
+    "Desc": "行动结束时若造成过暴击，回复<color=#DC143C>2</color>点能量，每回合至多回复<color=#DC143C>2</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 12,
+    "Param1": [
+      2
+    ],
+    "Energy": 2
+  },
+  {
+    "ID": 76,
+    "Desc": "行动结束时若造成过暴击，回复<color=#DC143C>2</color>点能量，每回合至多回复<color=#DC143C>3</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 12,
+    "Param1": [
+      3
+    ],
+    "Energy": 2
+  },
+  {
+    "ID": 77,
+    "Desc": "行动结束时若造成过暴击，回复<color=#DC143C>2</color>点能量，每回合至多回复<color=#DC143C>4</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 12,
+    "Param1": [
+      4
+    ],
+    "Energy": 2
+  },
+  {
+    "ID": 78,
+    "Desc": "击杀任意召唤物以外的敌军，回复<color=#DC143C>1</color>点能量",
+    "RecoverEnergyType": 3,
+    "Energy": 1
+  },
+  {
+    "ID": 79,
+    "Desc": "回合开始，回复<color=#DC143C>2</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 2
+  },
+  {
+    "ID": 80,
+    "Desc": "回合开始，回复<color=#DC143C>4</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 4
+  },
+  {
+    "ID": 81,
+    "Desc": "回合开始，回复<color=#DC143C>6</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 6
+  },
+  {
+    "ID": 82,
+    "Desc": "战斗开始，回复<color=#DC143C>28</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 28
+  },
+  {
+    "ID": 83,
+    "Desc": "战斗开始，回复<color=#DC143C>32</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 32
+  },
+  {
+    "ID": 84,
+    "Desc": "战斗开始，回复<color=#DC143C>36</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 36
+  },
+  {
+    "ID": 85,
+    "Desc": "行动结束时若施加过弱化效果，回复<color=#DC143C>2</color>点能量，每回合至多回复<color=#DC143C>2</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 13,
+    "Param1": [
+      2
+    ],
+    "Energy": 2
+  },
+  {
+    "ID": 86,
+    "Desc": "行动结束时若施加过弱化效果，回复<color=#DC143C>3</color>点能量，每回合至多回复<color=#DC143C>2</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 13,
+    "Param1": [
+      2
+    ],
+    "Energy": 3
+  },
+  {
+    "ID": 87,
+    "Desc": "行动结束时若施加过弱化效果，回复<color=#DC143C>4</color>点能量，每回合至多回复<color=#DC143C>2</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 13,
+    "Param1": [
+      2
+    ],
+    "Energy": 4
+  },
+  {
+    "ID": 88,
+    "Desc": "击杀任意召唤物以外的敌军，回复<color=#DC143C>1</color>点能量",
+    "RecoverEnergyType": 3,
+    "Energy": 1
+  },
+  {
+    "ID": 89,
+    "Desc": "回合开始，回复<color=#DC143C>2</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 2
+  },
+  {
+    "ID": 90,
+    "Desc": "回合开始，回复<color=#DC143C>4</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 4
+  },
+  {
+    "ID": 91,
+    "Desc": "回合开始，回复<color=#DC143C>6</color>点能量",
+    "RecoverEnergyType": 1,
+    "Energy": 6
+  },
+  {
+    "ID": 92,
+    "Desc": "战斗开始，回复<color=#DC143C>46</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 46
+  },
+  {
+    "ID": 93,
+    "Desc": "战斗开始，回复<color=#DC143C>50</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 50
+  },
+  {
+    "ID": 94,
+    "Desc": "战斗开始，回复<color=#DC143C>54</color>点能量",
+    "RecoverEnergyType": 4,
+    "Energy": 54
+  },
+  {
+    "ID": 95,
+    "Desc": "若造成了范围伤害或令格子获得了地形效果，则行动结束时回复<color=#DC143C>2</color>点能量，每回合至多回复<color=#DC143C>2</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 14,
+    "Param1": [
+      2
+    ],
+    "Energy": 2
+  },
+  {
+    "ID": 96,
+    "Desc": "若造成了范围伤害或令格子获得了地形效果，则行动结束时回复<color=#DC143C>3</color>点能量，每回合至多回复<color=#DC143C>2</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 14,
+    "Param1": [
+      2
+    ],
+    "Energy": 3
+  },
+  {
+    "ID": 97,
+    "Desc": "若造成了范围伤害或令格子获得了地形效果，则行动结束时回复<color=#DC143C>4</color>点能量，每回合至多回复<color=#DC143C>2</color>次。（召唤类角色无法生效）",
+    "RecoverEnergyType": 14,
+    "Param1": [
+      2
+    ],
+    "Energy": 4
+  },
+  {
+    "ID": 98,
+    "Desc": "击杀任意召唤物以外的敌军，回复<color=#DC143C>1</color>点能量",
+    "RecoverEnergyType": 3,
+    "Energy": 1
+  }
+]
