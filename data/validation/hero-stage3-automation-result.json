@@ -1,42 +1,34 @@
 {
-  "version": 1,
+  "version": 2,
   "stage": "3",
-  "status": "FAIL",
-  "purpose": "Final automatic validation gate before closing hero stage 3.",
-  "workflowRunId": 32717690659,
-  "diagnosticWorkflowRunId": 32717824301,
-  "passed": [
-    "Stage 3-1/3-2/3-3/3-4 metadata-state checks as they existed at validation time",
-    "267 canonical hero count and identity integrity",
-    "Hero 123 display correction remains 베르너",
-    "Hero 99164 effective canonical correction is 베르너 폰 에길",
-    "ConfigDataJobInfo full payload framing: 3295 records",
-    "ConfigDataJobConnectionInfo full payload framing: 30066 records",
-    "ConfigDataJobLevelInfo full payload framing: 7459 records",
-    "ConfigDataSkillInfo full payload framing: 27198 records",
-    "ConfigDataSPHeroInfo full payload framing: 25 records",
-    "ConfigDataMissionExtSPHeroInfo full payload framing: 350 records"
+  "status": "PASS",
+  "workflowRunId": 32726576982,
+  "validatedPullRequest": 6,
+  "validatedMainBaseSha": "6e7653e8169bbc5954d39754acd4797f3476d8ab",
+  "validatedSources": [
+    {"file": "ConfigDataHeroInfo.json", "recordCount": 28789},
+    {"file": "ConfigDataJobInfo.json", "recordCount": 3295},
+    {"file": "ConfigDataJobConnectionInfo.json", "recordCount": 30066},
+    {"file": "ConfigDataJobLevelInfo.json", "recordCount": 7459},
+    {"file": "ConfigDataSkillInfo.json", "recordCount": 27198},
+    {"file": "ConfigDataSPHeroInfo.json", "recordCount": 25},
+    {"file": "ConfigDataMissionExtSPHeroInfo.json", "recordCount": 350},
+    {"file": "ConfigDataMissionInfo.json", "recordCount": 3347}
   ],
-  "failed": [
-    {
-      "file": "ConfigDataHeroInfo.json",
-      "frameCountBeforeFailure": 22,
-      "byteOffset": 7388,
-      "observedInvalidBigEndianLength": 1852206848,
-      "evidence": "The failure region contains the foreign ASCII type name ConfigDataCrystalCardPoolGroupInfo, strongly indicating mixed/contaminated payload data."
-    },
-    {
-      "file": "ConfigDataMissionInfo.json",
-      "frameCountBeforeFailure": 105,
-      "byteOffset": 8240,
-      "observedInvalidBigEndianLength": 144705697,
-      "evidence": "The expected record framing breaks and no plausible next big-endian frame boundary was found in the immediate diagnostic scan window."
-    }
-  ],
-  "requiredAction": [
-    "Individually re-export ConfigDataHeroInfo.",
-    "Individually re-export ConfigDataMissionInfo.",
-    "Replace both repository files.",
-    "Run npm run validate:hero-stage3 again; stage 3 closes only on PASS."
-  ]
+  "relationChecks": {
+    "canonicalHeroes": 267,
+    "heroInfoPlayableHeroes": 267,
+    "heroToJobConnectionMissing": 0,
+    "jobConnectionToJobMissing": 0,
+    "jobConnectionToJobLevelMissing": 0,
+    "heroDirectSkillMissing": 0,
+    "spHeroes": 25,
+    "unknownSpOwners": 0,
+    "duplicateSpOwners": 0,
+    "spJobConnectionMissing": 0,
+    "spMissionMissing": 0,
+    "spRewardSkillMissing": 0,
+    "leonFixture": "PASS"
+  },
+  "nextGate": "hero stage 4"
 }
