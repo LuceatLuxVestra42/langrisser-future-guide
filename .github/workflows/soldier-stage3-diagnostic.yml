@@ -1,0 +1,18 @@
+name: Soldier Stage 3 Diagnostic
+
+on:
+  push:
+    paths:
+      - 'scripts/diagnose-soldier-stage3.cjs'
+      - '.github/workflows/soldier-stage3-diagnostic.yml'
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/diagnose-soldier-stage3.cjs
