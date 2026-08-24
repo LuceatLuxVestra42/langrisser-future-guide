@@ -15,80 +15,52 @@ function readVarint(buffer, start) {
   throw new Error(`invalid varint at ${start}`);
 }
 
-function parseFields(buffer) {
-  const fields = new Map();
-  let offset = 0;
-  while (offset < buffer.length) {
-    const t = readVarint(buffer, offset); offset = t.offset;
-    const field = t.value >>> 3, wire = t.value & 7;
-    let value;
-    if (wire === 0) { const r = readVarint(buffer, offset); offset = r.offset; value = r.value; }
-    else if (wire === 1) { if (offset + 8 > buffer.length) throw new Error('fixed64'); value = buffer.subarray(offset, offset + 8); offset += 8; }
-    else if (wire === 2) { const r = readVarint(buffer, offset); offset = r.offset; if (offset + r.value > buffer.length) throw new Error('len'); value = buffer.subarray(offset, offset + r.value); offset += r.value; }
-    else if (wire === 5) { if (offset + 4 > buffer.length) throw new Error('fixed32'); value = buffer.subarray(offset, offset + 4); offset += 4; }
-    else throw new Error(`wire=${wire}`);
-    const list = fields.get(field) || []; list.push({wire,value}); fields.set(field,list);
-  }
-  return fields;
-}
-function fv(fields, field) {
-  const e = (fields.get(field) || []).find(x => x.wire === 0);
-  return e ? e.value : null;
+function prefixAt(p) {
+  if (p + 7 > b.length) return null;
+  const n = b.readUInt32BE(p);
+  if (n < 8 || n > 512 || p + 4 + n > b.length || b[p + 4] !== 16) return null;
+  try {
+    const idr = readVarint(b, p + 5);
+    if (b[idr.offset] !== 24) return null;
+    const nr = readVarint(b, idr.offset + 1);
+    if (!Number.isInteger(idr.value) || !Number.isInteger(nr.value) || idr.value <= 0 || nr.value <= 0) return null;
+    return {p,n,end:p+4+n,id:idr.value,normalId:nr.value,prefixEnd:nr.offset};
+  } catch { return null; }
 }
 
 console.log(`SP payload bytes=${b.length}`);
-
-const candidates = [];
+const prefixes = [];
 for (let p = 0; p + 4 <= b.length; p++) {
-  const n = b.readUInt32BE(p);
-  if (n < 8 || n > 512 || p + 4 + n > b.length) continue;
-  try {
-    const fields = parseFields(b.subarray(p + 4, p + 4 + n));
-    const id = fv(fields, 2), normalId = fv(fields, 3);
-    if (Number.isInteger(id) && Number.isInteger(normalId) && id > 0 && normalId > 0) {
-      candidates.push({p,n,end:p+4+n,id,normalId});
-    }
-  } catch {}
+  const x = prefixAt(p);
+  if (x && x.id >= 5000 && x.id < 7000 && x.normalId > 0 && x.normalId < 2000) prefixes.push(x);
 }
-console.log(`VALID_TOPLEVEL_CANDIDATES=${candidates.length}`);
-console.log('CANDIDATES=' + JSON.stringify(candidates));
+console.log(`HEADER_PREFIX_CANDIDATES=${prefixes.length}`);
+console.log('PREFIXES=' + JSON.stringify(prefixes));
 
-// Greedy chain starting from byte 0; when an expected header is invalid, resync to the next valid top-level candidate.
-const chain = [];
-let expected = 0;
-while (expected < b.length) {
-  const exact = candidates.find(c => c.p === expected);
-  if (exact) {
-    chain.push({...exact,gapBefore:0}); expected = exact.end; continue;
-  }
-  const next = candidates.find(c => c.p > expected);
+const sequential = [];
+let cursor = 0;
+while (cursor < b.length) {
+  const exact = prefixes.find(x => x.p === cursor);
+  if (exact) { sequential.push({...exact,gapBefore:0}); cursor = exact.end; continue; }
+  const next = prefixes.find(x => x.p > cursor);
   if (!next) break;
-  chain.push({...next,gapBefore:next.p-expected});
-  expected = next.end;
+  sequential.push({...next,gapBefore:next.p-cursor}); cursor = next.end;
 }
-console.log(`GREEDY_CHAIN=${chain.length} final=${expected}/${b.length}`);
-console.log('CHAIN=' + JSON.stringify(chain));
+console.log(`PREFIX_CHAIN=${sequential.length} final=${cursor}/${b.length}`);
+console.log('PREFIX_CHAIN_DATA=' + JSON.stringify(sequential));
 
-const gaps = [];
-let prev = 0;
-for (const c of chain) {
-  if (c.p > prev) gaps.push({start:prev,end:c.p,len:c.p-prev,bytes:[...b.subarray(prev,Math.min(c.p,prev+256))]});
-  prev = c.end;
-}
-if (prev < b.length) gaps.push({start:prev,end:b.length,len:b.length-prev,bytes:[...b.subarray(prev,Math.min(b.length,prev+256))]});
-console.log('GAPS=' + JSON.stringify(gaps));
-
-// Look for raw protobuf SP records in each gap by trying every [start,end) where end is next candidate boundary.
-for (const gap of gaps) {
-  const raw = [];
-  for (let s = gap.start; s < gap.end; s++) {
-    for (let e = s + 8; e <= gap.end; e++) {
-      try {
-        const fields = parseFields(b.subarray(s,e));
-        const id = fv(fields,2), normalId = fv(fields,3);
-        if (Number.isInteger(id) && Number.isInteger(normalId) && id > 0 && normalId > 0) raw.push({s,e,len:e-s,id,normalId});
-      } catch {}
-    }
+const asciiRuns = [];
+let s = null;
+for (let i = 0; i <= b.length; i++) {
+  const printable = i < b.length && b[i] >= 32 && b[i] <= 126;
+  if (printable && s === null) s = i;
+  if ((!printable || i === b.length) && s !== null) {
+    if (i - s >= 8) asciiRuns.push({start:s,end:i,text:b.subarray(s,i).toString('ascii')});
+    s = null;
   }
-  console.log(`RAW_GAP_${gap.start}_${gap.end}=` + JSON.stringify(raw.slice(0,200)));
 }
+console.log('ASCII_RUNS=' + JSON.stringify(asciiRuns));
+
+const uniquePairs = new Map();
+for (const x of prefixes) uniquePairs.set(`${x.id}:${x.normalId}`, x);
+console.log(`UNIQUE_PREFIX_PAIRS=${uniquePairs.size}`);
