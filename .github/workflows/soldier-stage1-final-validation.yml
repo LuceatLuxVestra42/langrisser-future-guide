@@ -1,0 +1,22 @@
+name: Soldier stage 1 final validation
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/validate_soldier_stage1_final.cjs'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSPSoldierInfo.json'
+      - 'data/configdata/ConfigDataArmyInfo.json'
+      - '.github/workflows/soldier-stage1-final-validation.yml'
+  workflow_dispatch:
+
+jobs:
+  validate-soldier-stage1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run final Soldier stage 1 validation
+        run: node scripts/validate_soldier_stage1_final.cjs
