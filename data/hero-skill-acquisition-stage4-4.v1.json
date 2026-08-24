@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "stage": "4-4",
+  "status": "pipeline-ready-source-blocked",
+  "purpose": "Attach verified normal-form skill acquisition events to the Stage 4-3 job tree using explicit JobLevelInfo.GotSkill_ID relations, while preserving HeroInfo and JobConnection skill references as separate evidence instead of conflating their semantics.",
+  "primaryKey": "heroId",
+  "upstream": "data/generated/hero-job-trees.v1.json",
+  "requiredSources": [
+    "ConfigDataHeroInfo.json",
+    "ConfigDataJobConnectionInfo.json",
+    "ConfigDataSkillInfo.json"
+  ],
+  "relationContract": {
+    "heroInfo": {
+      "id": 2,
+      "useable": 10,
+      "skillIds": 19,
+      "hiddenSkillIds": 20
+    },
+    "jobConnectionInfo": {
+      "id": 2,
+      "talentSkillIds": 8
+    },
+    "jobLevelFromStage43": {
+      "gotSkillId": "ConfigDataJobLevelInfo protobuf field 28, already preserved by Stage 4-3"
+    },
+    "skillInfo": {
+      "id": 2,
+      "name": 3,
+      "desc": 5,
+      "iconPath": 71,
+      "displayType": 73,
+      "cooldown": 74,
+      "range": 75,
+      "areaOrTarget": 76
+    }
+  },
+  "fieldEvidence": {
+    "jobLevelAcquisition": "dump.cs explicitly defines ConfigDataJobLevelInfo.GotSkill_IDFieldNumber=28 and exposes m_gotSkillInfo, so this is the authoritative normal job-level acquisition edge.",
+    "connectionTalentSkills": "dump.cs explicitly defines ConfigDataJobConnectionInfo.TalentSkill_IDsFieldNumber=8. Its exact presentation semantics are preserved separately and are not silently treated as JobLevel acquisition events.",
+    "heroDirectSkills": "ConfigDataHeroInfo Skill_IDs/HiddenSkill_IDs are preserved as direct hero-level references. Project evidence confirms HeroInfo field 19 can resolve directly to SkillInfo, e.g. Leon field 19 -> skill 10301. These sets are not assumed to equal the complete job-acquired skill set.",
+    "skillDetail": "SkillInfo IDs are resolved to display metadata only after the explicit acquisition/reference edge has been established."
+  },
+  "normalizationRules": [
+    "Consume only Stage 4-3 PASS or REVIEW hero-job-tree output.",
+    "Use JobLevelInfo.GotSkill_ID as the authoritative source for normal job-level acquisition events.",
+    "Preserve the Stage 4-3 connection order and each connection's JobLevels_ID sequence when ordering acquisition events.",
+    "Do not infer acquisition order from Skill ID magnitude, skill name, icon path, wiki order, or HeroInfo.Skill_IDs order.",
+    "Resolve every nonzero GotSkill_ID against ConfigDataSkillInfo; a missing target is a hard relation error.",
+    "Preserve HeroInfo.Skill_IDs as heroDirectSkills and HiddenSkill_IDs as hiddenSkills. Do not merge them into job-level acquisition unless the same explicit GotSkill_ID edge exists.",
+    "Preserve JobConnectionInfo.TalentSkill_IDs per connection as connectionTalentSkills. Do not reclassify them as ordinary acquired skills in Stage 4-4.",
+    "Allow the same Skill ID to appear in multiple acquisition events when separate branches or JobLevels explicitly reference it; deduplicate only the per-hero skill catalog, not the acquisition events.",
+    "Do not classify awakening, SP, talent, covenant, or other special presentation groups in Stage 4-4 unless the source relation explicitly identifies that role. Awakening grouping remains part of Stage 4-5.",
+    "SP reward/acquisition skills are out of scope and remain in the Stage 5 SP pipeline."
+  ],
+  "validationPolicy": {
+    "UPSTREAM_BLOCKED": [
+      "Stage 4-3 hero-job-trees output is absent or has a status other than PASS/REVIEW."
+    ],
+    "SOURCE_BLOCKED": [
+      "HeroInfo, JobConnectionInfo, or SkillInfo TextAsset is missing, structurally invalid, or has no usable m_bytes payload."
+    ],
+    "FAIL": [
+      "A Stage 4-3 hero is missing from usable HeroInfo.",
+      "A Stage 4-3 JobConnection is missing from JobConnectionInfo.",
+      "Any nonzero JobLevel GotSkill_ID, HeroInfo Skill_ID/HiddenSkill_ID, or JobConnection TalentSkill_ID references a missing SkillInfo record.",
+      "Duplicate HeroInfo, JobConnectionInfo, or SkillInfo IDs exist."
+    ],
+    "REVIEW": [
+      "A hero has no skill references from any Stage 4-4 source despite having a normal job tree.",
+      "A skill is referenced only by an auxiliary HeroInfo/JobConnection relation and never by a JobLevel acquisition edge; preserve it without inventing an acquisition point."
+    ],
+    "PASS": [
+      "All explicit normal-form skill references resolve, all JobLevel acquisition events preserve verified job-tree order, and no hard relation error exists."
+    ]
+  },
+  "output": {
+    "generated": "data/generated/hero-skill-acquisition.v1.json",
+    "summary": "data/validation/hero-skill-stage4-4-summary.v1.json"
+  },
+  "currentSourceState": {
+    "stage4-3": "UPSTREAM_BLOCKED until Stage 4-2/4-3 source replacements are supplied",
+    "ConfigDataHeroInfo.json": "usable",
+    "ConfigDataJobConnectionInfo.json": "broken: m_bytes=null",
+    "ConfigDataSkillInfo.json": "broken: m_bytes=null"
+  },
+  "completionRule": "After Stage 4-3 returns PASS or REVIEW and valid JobConnectionInfo/SkillInfo exports are available, run npm run inspect:hero-skills. The script emits ordered normal job-level acquisition events plus separately resolved hero-direct, hidden, and connection-talent skill references.",
+  "nextStage": "4-5 complete the basic combat dataset: awakening classification, job stats, soldier modifiers, talent and star-rank talent changes."
+}

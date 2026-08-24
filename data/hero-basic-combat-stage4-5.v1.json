@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "stage": "4-5",
+  "status": "pipeline-ready-source-and-semantic-blocked",
+  "purpose": "Close Stage 4 by assembling the verified normal job tree and skill-acquisition outputs with awakening classification, display job stats, hero soldier modifiers, talent identity, and star-rank talent progression only after each semantic relation is explicitly verified.",
+  "primaryKey": "heroId",
+  "upstream": {
+    "jobTree": "data/generated/hero-job-trees.v1.json",
+    "skillAcquisition": "data/generated/hero-skill-acquisition.v1.json"
+  },
+  "requiredSources": [
+    "ConfigDataHeroInfo.json",
+    "ConfigDataJobInfo.json",
+    "ConfigDataSkillInfo.json"
+  ],
+  "safeFieldEvidence": {
+    "heroInfo": {
+      "id": 2,
+      "useable": 10,
+      "star": 12,
+      "rank": 13,
+      "note": "Star is an explicit HeroInfo field, but it is not treated as star-rank talent progression without a verified relation."
+    },
+    "jobInfo": {
+      "id": 2,
+      "name": 3,
+      "rank": 8,
+      "armyId": 12,
+      "isMelee": 13,
+      "moveType": 14,
+      "attackDistance": 15,
+      "moveSpeedIni": 18,
+      "battleMovePoint": 19,
+      "namedButNotDisplayStatMapped": [
+        "Property1_ID/Property1_Value",
+        "Property2_ID/Property2_Value",
+        "Property3_ID/Property3_Value",
+        "BattlePowerHP",
+        "BattlePowerAT",
+        "BattlePowerMagic",
+        "BattlePowerDF",
+        "BattlePowerMagicDF",
+        "BattlePowerDEX"
+      ]
+    },
+    "jobConnectionInfo": {
+      "talentSkillIds": 8,
+      "note": "TalentSkill_IDs is explicit and is preserved by Stage 4-4, but its role is not silently promoted to the complete hero talent/star progression model."
+    },
+    "jobLevelInfo": {
+      "gotSkillId": 28,
+      "note": "Authoritative normal job-level skill acquisition edge already preserved by Stage 4-3/4-4."
+    }
+  },
+  "semanticGates": [
+    {
+      "id": "awakeningClassification",
+      "status": "UNVERIFIED",
+      "requiredEvidence": "An explicit ConfigData relation or client-code rule that identifies awakening skills. Do not classify by skill ID range, name, cost, wiki order, or being attached to an ultimate job."
+    },
+    {
+      "id": "displayJobStats",
+      "status": "UNVERIFIED",
+      "requiredEvidence": "Verified source/calculation for the hero-page HP/ATK/INT/DEF/MDEF/SKL display values, including PropertyModifyType meaning and any level/job/mastery calculation. BattlePower* names alone are insufficient."
+    },
+    {
+      "id": "heroSoldierModifiers",
+      "status": "UNVERIFIED",
+      "requiredEvidence": "Explicit relation for the hero-page soldier HP/ATK/DEF/MDEF modifier values. SoldierInfo base stats or training stats must not be substituted."
+    },
+    {
+      "id": "talentIdentity",
+      "status": "PARTIAL_EVIDENCE",
+      "requiredEvidence": "Verify how a playable hero selects its displayed normal talent from the TalentSkill-labelled relations and any other ConfigData/runtime relation."
+    },
+    {
+      "id": "talentStarProgression",
+      "status": "UNVERIFIED",
+      "requiredEvidence": "Verify the source that maps hero star rank to the displayed talent description/value changes. HeroInfo.Star alone is not sufficient."
+    }
+  ],
+  "normalizationRules": [
+    "Consume only Stage 4-3 and Stage 4-4 outputs whose status is PASS or REVIEW.",
+    "Use heroId as the only canonical hero join key.",
+    "Preserve Stage 4-3 job topology and Stage 4-4 acquisition order; Stage 4-5 must not rebuild or reorder them by names or numeric ID patterns.",
+    "Do not infer awakening from Skill ID, skill name, skill cost, job rank, IsUltimateJob(), or external wiki ordering.",
+    "Do not publish BattlePower* fields as hero display stats until the display-stat calculation is verified.",
+    "Do not substitute SoldierInfo base stats, TrainingTech values, or SP soldier values for hero soldier modifiers.",
+    "Do not equate HeroInfo.Star with talent star-progression data without a verified relation.",
+    "Do not equate JobConnectionInfo.TalentSkill_IDs with the complete displayed talent model until representative heroes verify the relation.",
+    "When a semantic gate is unresolved, keep its final field null/unemitted and block Stage 4 PASS instead of fabricating a value."
+  ],
+  "validationPolicy": {
+    "UPSTREAM_BLOCKED": [
+      "Stage 4-3 or Stage 4-4 output is absent or has a status other than PASS/REVIEW."
+    ],
+    "SOURCE_BLOCKED": [
+      "Any required TextAsset is missing, structurally invalid, or has no usable m_bytes payload."
+    ],
+    "SEMANTIC_BLOCKED": [
+      "One or more Stage 4-5 semantic gates are not VERIFIED."
+    ],
+    "FAIL": [
+      "Upstream hero sets disagree after both upstream stages are ready.",
+      "A referenced hero/job/skill record required by an already-verified Stage 4-5 mapping is missing.",
+      "Duplicate canonical IDs make a verified relation ambiguous."
+    ],
+    "PASS": [
+      "Both upstream stages are usable, all required sources pass structural preflight, all five semantic gates are VERIFIED, and the final basic-combat record can be emitted without inferred relationships."
+    ]
+  },
+  "output": {
+    "generated": "data/generated/hero-basic-combat.v1.json",
+    "summary": "data/validation/hero-basic-combat-stage4-5-summary.v1.json"
+  },
+  "currentSourceState": {
+    "stage4-3": "UPSTREAM_BLOCKED",
+    "stage4-4": "UPSTREAM_BLOCKED",
+    "ConfigDataHeroInfo.json": "usable",
+    "ConfigDataJobInfo.json": "broken",
+    "ConfigDataSkillInfo.json": "broken: m_bytes=null"
+  },
+  "stage4CompletionRule": "Stage 4 is data-complete only when Stage 4-5 returns PASS. Pipeline implementation alone does not mean the hero combat data is complete.",
+  "completionRule": "After source replacement, run Stages 4-2 through 4-4, verify and promote every semantic gate in this contract to VERIFIED with evidence, then run npm run inspect:hero-combat. Do not bypass semantic gates merely because source files parse successfully.",
+  "nextStage": "5-1 bond data after Stage 4-5 PASS; Stage 5 pipeline work may be implemented earlier without falsely marking Stage 4 data complete."
+}

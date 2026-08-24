@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "stage": "4-1",
+  "status": "complete",
+  "auditDate": "2026-08-24",
+  "purpose": "Audit the actual outputs and readiness of the completed Stage 3 hero-page pipeline before starting Stage 4 relation expansion.",
+  "primaryKey": "heroId",
+  "verdict": {
+    "pipelineImplementation": "COMPLETE",
+    "canonicalIdentityData": "READY",
+    "normalNormalizedData": "SOURCE_BLOCKED",
+    "spNormalizedData": "SOURCE_BLOCKED",
+    "pageReadyData": "SOURCE_BLOCKED",
+    "interpretation": "Stage 3 completed the defensive pipeline/contracts and identity master, but did not produce 267 populated hero-detail records because required ConfigData TextAsset exports remain structurally broken. This is a source-input blocker, not a pipeline implementation failure."
+  },
+  "canonicalIdentity": {
+    "file": "data/hero-name-master.v1.json",
+    "recordCount": 267,
+    "status": "READY",
+    "fieldsActuallyAvailable": [
+      "heroId",
+      "nameCn",
+      "nameKr",
+      "nameEn",
+      "aliasesKr",
+      "status"
+    ],
+    "joinRule": "Use heroId as the only canonical unique join key. Korean display names are not unique."
+  },
+  "actualOutputAvailability": {
+    "availableNow": [
+      {
+        "group": "identity",
+        "fields": ["heroId", "nameCn", "nameKr", "nameEn", "aliasesKr", "status"],
+        "sourceType": "canonical verified master"
+      }
+    ],
+    "sourceReadableButNotNormalized": [
+      {
+        "group": "HeroInfo partial direct fields",
+        "fields": ["rank", "skillIds", "hiddenSkillIds"],
+        "reason": "The normal-stage preflight has a parser contract for these fields and ConfigDataHeroInfo is usable, but Stage 3-2 intentionally does not emit normalized normal records until required Job/Skill sources and relation fields are verified."
+      }
+    ],
+    "definedByContractButNotPopulated": [
+      "header.rarity",
+      "header.cv",
+      "header.factions",
+      "header.origin",
+      "header.artwork",
+      "header.skins",
+      "normal.talent",
+      "normal.bonds",
+      "normal.exclusiveEquipment",
+      "normal.covenant",
+      "normal.soldiers",
+      "normal.stats",
+      "normal.jobs",
+      "normal.skills",
+      "sp.exists",
+      "sp.spJobConnectionId",
+      "sp.talent",
+      "sp.bonds",
+      "sp.exclusiveEquipment",
+      "sp.covenant",
+      "sp.soldiers",
+      "sp.stats",
+      "sp.missions",
+      "sp.rewardSkills"
+    ]
+  },
+  "expectedGeneratedOutputs": {
+    "normal": {
+      "path": "data/generated/hero-normal-normalized.v1.json",
+      "status": "NOT_GENERATED"
+    },
+    "sp": {
+      "path": "data/generated/hero-sp-normalized.v1.json",
+      "status": "NOT_GENERATED"
+    },
+    "pageData": {
+      "path": "data/generated/hero-pages.v1.json",
+      "status": "NOT_GENERATED"
+    },
+    "validationSummary": {
+      "path": "data/validation/hero-pages-summary.v1.json",
+      "status": "SOURCE_BLOCKED",
+      "canonicalHeroCount": 267,
+      "evaluatedHeroCount": 0,
+      "pageReadyCount": 0
+    }
+  },
+  "currentSourceHealthConfirmed": [
+    {
+      "file": "data/configdata/ConfigDataHeroInfo.json",
+      "status": "usable",
+      "role": "canonical playable hero / direct HeroInfo fields"
+    },
+    {
+      "file": "data/configdata/ConfigDataJobInfo.json",
+      "status": "broken",
+      "observed": "m_Name is empty and m_bytes is an empty array"
+    },
+    {
+      "file": "data/configdata/ConfigDataJobConnectionInfo.json",
+      "status": "broken",
+      "observed": "m_size is populated but m_bytes is null"
+    },
+    {
+      "file": "data/configdata/ConfigDataSkillInfo.json",
+      "status": "broken",
+      "observed": "m_size is populated but m_bytes is null"
+    },
+    {
+      "file": "data/configdata/ConfigDataSPHeroInfo.json",
+      "status": "broken",
+      "observed": "m_Name is empty, m_size is negative, and m_bytes is null"
+    }
+  ],
+  "stage3PipelineAssets": {
+    "identityContract": "data/hero-master-stage3-1.v1.json",
+    "normalContract": "data/hero-normal-stage3-2.v1.json",
+    "spContract": "data/hero-sp-stage3-3.v1.json",
+    "pageContract": "data/hero-page-stage3-4.v1.json",
+    "normalPreflight": "scripts/prepare_hero_normal_stage32.cjs",
+    "spPreflight": "scripts/prepare_hero_sp_stage33.cjs",
+    "finalizer": "scripts/finalize_hero_pages_stage34.cjs"
+  },
+  "fieldReadinessForNextStages": [
+    {
+      "target": "Hero -> Job connection",
+      "readiness": "BLOCKED",
+      "needed": ["ConfigDataJobInfo", "ConfigDataJobConnectionInfo", "ConfigDataJobLevelInfo"]
+    },
+    {
+      "target": "Job -> Skill acquisition",
+      "readiness": "BLOCKED",
+      "needed": ["ConfigDataJobConnectionInfo", "ConfigDataJobLevelInfo", "ConfigDataSkillInfo"]
+    },
+    {
+      "target": "SP ownership / missions / rewards",
+      "readiness": "BLOCKED",
+      "needed": ["ConfigDataSPHeroInfo", "ConfigDataMissionExtSPHeroInfo", "ConfigDataMissionInfo", "ConfigDataSkillInfo"]
+    },
+    {
+      "target": "Header/enrichment fields",
+      "readiness": "DEFERRED",
+      "needed": ["rarity", "cv", "factions", "origin", "artwork", "skins"]
+    }
+  ],
+  "stage4_1CompletionCriteria": {
+    "currentPipelineOutputsEnumerated": true,
+    "actualVsContractFieldsSeparated": true,
+    "sourceVsNormalizedAvailabilitySeparated": true,
+    "currentSourceBlockersReconfirmed": true,
+    "nextGateIdentified": true
+  },
+  "nextGate": {
+    "recommendedStage": "4-2",
+    "name": "Hero-to-Job source recovery and relation verification",
+    "constraint": "Do not attempt bulk Job tree generation from the current AssetStudio JSON exports. First obtain usable JobInfo/JobConnectionInfo/JobLevelInfo data or an equivalent trustworthy extraction path, then verify the Hero-to-JobConnection relation on representative heroes before bulk normalization."
+  },
+  "confidence": {
+    "auditVerdictPercent": 100,
+    "reason": "Based on current repository files, current source payloads, Stage 3 contracts/scripts, and the validation summary rather than inferred data."
+  }
+}

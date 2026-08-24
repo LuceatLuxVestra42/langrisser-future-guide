@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "stage": "4-2",
+  "status": "SOURCE_BLOCKED",
+  "pipelineStatus": "READY_FOR_SOURCE_REPLACEMENT",
+  "canonicalHeroCount": 267,
+  "generatedHeroCount": 0,
+  "sourceHealth": [
+    {
+      "filename": "ConfigDataHeroInfo.json",
+      "status": "usable",
+      "issues": []
+    },
+    {
+      "filename": "ConfigDataJobConnectionInfo.json",
+      "status": "broken",
+      "issues": [
+        "m_bytes is null"
+      ]
+    },
+    {
+      "filename": "ConfigDataJobInfo.json",
+      "status": "broken",
+      "issues": [
+        "m_Name is empty instead of ConfigDataJobInfo",
+        "m_bytes is empty"
+      ]
+    }
+  ],
+  "verifiedRelations": [
+    "ConfigDataHeroInfo.JobConnection_ID = protobuf field 32",
+    "ConfigDataHeroInfo.UseableJobConnections_ID = protobuf field 33",
+    "ConfigDataJobConnectionInfo.ID = protobuf field 2",
+    "ConfigDataJobConnectionInfo.Job_ID = protobuf field 6",
+    "ConfigDataJobConnectionInfo.JobLevels_ID = protobuf field 7"
+  ],
+  "blockers": [
+    "Replace ConfigDataJobConnectionInfo.json with a structurally valid individual TextAsset export.",
+    "Replace ConfigDataJobInfo.json with a structurally valid individual TextAsset export."
+  ],
+  "resumeCommand": "npm run inspect:hero-jobs",
+  "completionBehavior": "When the two blocked source files are replaced, the Stage 4-2 script will preflight all three sources, resolve explicit HeroInfo JobConnection references, validate each referenced JobConnection and Job ID, and emit data/generated/hero-job-links.v1.json only when no hard relation error exists.",
+  "nextStage": "4-3 job-tree reconstruction after Stage 4-2 returns PASS or REVIEW."
+}
