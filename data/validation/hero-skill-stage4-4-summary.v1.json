@@ -1,44 +1,1643 @@
 {
   "version": 1,
   "stage": "4-4",
-  "status": "UPSTREAM_BLOCKED",
-  "pipelineStatus": "READY_FOR_SOURCE_REPLACEMENT",
-  "upstreamStatus": "UPSTREAM_BLOCKED",
-  "generatedHeroCount": 0,
-  "verifiedRelations": [
-    "ConfigDataJobLevelInfo.GotSkill_ID = protobuf field 28",
-    "ConfigDataJobConnectionInfo.TalentSkill_IDs = protobuf field 8",
-    "ConfigDataHeroInfo.Skill_IDs = protobuf field 19",
-    "ConfigDataHeroInfo.HiddenSkill_IDs = protobuf field 20",
-    "ConfigDataSkillInfo.ID = protobuf field 2"
-  ],
-  "sourceHealth": [
+  "status": "REVIEW",
+  "upstreamStatus": "PASS",
+  "generatedHeroCount": 267,
+  "sourceRecordCounts": {
+    "playableHeroInfo": 267,
+    "jobConnectionInfo": 30066,
+    "skillInfo": 27198
+  },
+  "hardErrors": [],
+  "review": [
     {
-      "filename": "ConfigDataHeroInfo.json",
-      "status": "usable",
-      "issues": []
+      "heroId": 1,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 3142, 3144, 3146, 3148, 3150, 3152"
+      ]
     },
     {
-      "filename": "ConfigDataJobConnectionInfo.json",
-      "status": "broken",
-      "issues": ["m_bytes is null"]
+      "heroId": 3,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 5018, 3154, 3156, 3158, 3160, 3162, 3164"
+      ]
     },
     {
-      "filename": "ConfigDataSkillInfo.json",
-      "status": "broken",
-      "issues": ["m_bytes is null"]
+      "heroId": 4,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 3313, 3314, 3315, 3316, 3317, 93318"
+      ]
+    },
+    {
+      "heroId": 5,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10842, 3247, 3249, 3251, 3253, 3255"
+      ]
+    },
+    {
+      "heroId": 6,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10301, 3067, 3072, 3077, 3082"
+      ]
+    },
+    {
+      "heroId": 7,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10205, 3029, 3030, 3031, 3032"
+      ]
+    },
+    {
+      "heroId": 8,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10716, 3196, 3197, 3198, 3199"
+      ]
+    },
+    {
+      "heroId": 9,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10711, 3200, 3201, 3202, 3203"
+      ]
+    },
+    {
+      "heroId": 10,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 3035, 3036, 3037, 3038"
+      ]
+    },
+    {
+      "heroId": 11,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10606, 3232, 3235, 3238, 3241, 3244"
+      ]
+    },
+    {
+      "heroId": 12,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 3025, 3026, 3027, 3028"
+      ]
+    },
+    {
+      "heroId": 13,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10701, 3290, 3292, 3294, 3296, 3418"
+      ]
+    },
+    {
+      "heroId": 14,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10401, 3208, 3209, 3210, 3211"
+      ]
+    },
+    {
+      "heroId": 15,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 3212, 3214, 3216, 3218"
+      ]
+    },
+    {
+      "heroId": 16,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10403, 3277, 3278, 3279, 3280, 3281"
+      ]
+    },
+    {
+      "heroId": 17,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10713, 3282, 3284, 3286, 3288, 3417"
+      ]
+    },
+    {
+      "heroId": 18,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10705, 3267, 3269, 3271, 3273, 3275"
+      ]
+    },
+    {
+      "heroId": 19,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10501, 3323, 3335, 3347, 3359, 3371"
+      ]
+    },
+    {
+      "heroId": 20,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10309, 3166, 3168, 3170, 3172, 3174"
+      ]
+    },
+    {
+      "heroId": 21,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10108, 3127, 3130, 3133, 3136, 3139"
+      ]
+    },
+    {
+      "heroId": 22,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10707, 3318, 3319, 3320, 3321, 3322"
+      ]
+    },
+    {
+      "heroId": 23,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11704, 3393, 3394, 3395, 3396, 3397"
+      ]
+    },
+    {
+      "heroId": 24,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10311, 3176, 3178, 3180, 3182, 3184"
+      ]
+    },
+    {
+      "heroId": 25,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10415, 3051, 3055, 3059, 3063"
+      ]
+    },
+    {
+      "heroId": 26,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10415, 3220, 3223, 3226, 3229"
+      ]
+    },
+    {
+      "heroId": 27,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10321, 3039, 3042, 3045, 3048"
+      ]
+    },
+    {
+      "heroId": 28,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11724, 3545, 3546, 3547, 3548"
+      ]
+    },
+    {
+      "heroId": 29,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 3204, 3205, 3206, 3207"
+      ]
+    },
+    {
+      "heroId": 30,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10707, 3535, 3536, 3537, 3538, 3539"
+      ]
+    },
+    {
+      "heroId": 31,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 3298, 3301, 3304, 3307, 3310"
+      ]
+    },
+    {
+      "heroId": 32,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10321, 3087, 3090, 3093, 3096, 3099"
+      ]
+    },
+    {
+      "heroId": 33,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10106, 3102, 3104, 3106, 3108, 3110"
+      ]
+    },
+    {
+      "heroId": 34,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 5098, 3112, 3115, 3118, 3121, 3124"
+      ]
+    },
+    {
+      "heroId": 35,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12002, 3633, 3634, 3635, 3636, 3637"
+      ]
+    },
+    {
+      "heroId": 36,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11705, 3257, 3259, 3261, 3263, 3265"
+      ]
+    },
+    {
+      "heroId": 37,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11735, 3562, 3563, 3564, 3565"
+      ]
+    },
+    {
+      "heroId": 38,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10321, 3566, 3567, 3568, 3569"
+      ]
+    },
+    {
+      "heroId": 39,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11704, 3553, 3554, 3555, 3556, 3557"
+      ]
+    },
+    {
+      "heroId": 40,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10223, 3500, 3502, 3504, 3506, 3508"
+      ]
+    },
+    {
+      "heroId": 41,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10503, 3530, 3531, 3532, 3533, 3534"
+      ]
+    },
+    {
+      "heroId": 42,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 5008, 3408, 3410, 3412, 3414, 3416"
+      ]
+    },
+    {
+      "heroId": 43,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 3398, 3400, 3402, 3404, 3406"
+      ]
+    },
+    {
+      "heroId": 44,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10314, 3186, 3188, 3190, 3192, 3194"
+      ]
+    },
+    {
+      "heroId": 45,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10410, 3383, 3385, 3387, 3389, 3391"
+      ]
+    },
+    {
+      "heroId": 47,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10301, 3525, 3526, 3527, 3528, 3529"
+      ]
+    },
+    {
+      "heroId": 48,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10107, 3510, 3513, 3516, 3519, 3522"
+      ]
+    },
+    {
+      "heroId": 49,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10605, 3540, 3541, 3542, 3543, 3544"
+      ]
+    },
+    {
+      "heroId": 51,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10841, 3549, 3550, 3551, 3552"
+      ]
+    },
+    {
+      "heroId": 52,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10401, 3558, 3559, 3560, 3561"
+      ]
+    },
+    {
+      "heroId": 53,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11739, 3570, 3571, 3572, 3573"
+      ]
+    },
+    {
+      "heroId": 54,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11742, 3574, 3575, 3576, 3577"
+      ]
+    },
+    {
+      "heroId": 55,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10326, 3578, 3579, 3580, 3581"
+      ]
+    },
+    {
+      "heroId": 56,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10703, 3582, 3583, 3584, 3585"
+      ]
+    },
+    {
+      "heroId": 57,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 6006, 3624, 3625, 3626, 3627"
+      ]
+    },
+    {
+      "heroId": 58,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10207, 3628, 3629, 3630, 3631, 3632"
+      ]
+    },
+    {
+      "heroId": 59,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11787, 3620, 3621, 3622, 3623"
+      ]
+    },
+    {
+      "heroId": 60,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11778, 3612, 3613, 3614, 3615"
+      ]
+    },
+    {
+      "heroId": 61,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10707, 3616, 3617, 3618, 3619"
+      ]
+    },
+    {
+      "heroId": 62,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12052, 3704, 3705, 3706, 3707, 3708"
+      ]
+    },
+    {
+      "heroId": 63,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12050, 3688, 3689, 3690, 3691"
+      ]
+    },
+    {
+      "heroId": 64,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10321, 3730, 3731, 3732, 3733"
+      ]
+    },
+    {
+      "heroId": 65,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10504, 3717, 3718, 3719, 3720"
+      ]
+    },
+    {
+      "heroId": 66,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10403, 3651, 3652, 3653, 3654"
+      ]
+    },
+    {
+      "heroId": 67,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11705, 3663, 3664, 3665, 3666"
+      ]
+    },
+    {
+      "heroId": 69,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11755, 3586, 3587, 3588, 3589"
+      ]
+    },
+    {
+      "heroId": 70,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11753, 3590, 3591, 3592, 3593"
+      ]
+    },
+    {
+      "heroId": 71,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11767, 3599, 3600, 3601, 3602"
+      ]
+    },
+    {
+      "heroId": 72,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11775, 3603, 3604, 3605, 3606"
+      ]
+    },
+    {
+      "heroId": 73,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10603, 3607, 3608, 3609, 3610, 3611"
+      ]
+    },
+    {
+      "heroId": 74,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 3594, 3595, 3596, 3597, 3598"
+      ]
+    },
+    {
+      "heroId": 75,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10707, 3751, 3752, 3753, 3754"
+      ]
+    },
+    {
+      "heroId": 76,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12098, 3755, 3756, 3757, 3758"
+      ]
+    },
+    {
+      "heroId": 77,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12095, 3764, 3765, 3766, 3767, 3768"
+      ]
+    },
+    {
+      "heroId": 78,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11711, 3759, 3760, 3761, 3762, 3763"
+      ]
+    },
+    {
+      "heroId": 79,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 5012, 3638, 3639, 3640, 3641"
+      ]
+    },
+    {
+      "heroId": 80,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12001, 3642, 3643, 3644, 3645"
+      ]
+    },
+    {
+      "heroId": 81,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 3646, 3647, 3648, 3649, 3650"
+      ]
+    },
+    {
+      "heroId": 82,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12020, 3667, 3668, 3669, 3670"
+      ]
+    },
+    {
+      "heroId": 83,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12028, 3671, 3672, 3673, 3674"
+      ]
+    },
+    {
+      "heroId": 84,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10707, 3675, 3676, 3677, 3678"
+      ]
+    },
+    {
+      "heroId": 85,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12036, 3679, 3680, 3681, 3682"
+      ]
+    },
+    {
+      "heroId": 86,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 5018, 3683, 3684, 3685, 3686, 3687"
+      ]
+    },
+    {
+      "heroId": 87,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11779, 3692, 3693, 3694, 3695"
+      ]
+    },
+    {
+      "heroId": 88,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11778, 3655, 3656, 3657, 3658"
+      ]
+    },
+    {
+      "heroId": 89,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10842, 3659, 3660, 3661, 3662"
+      ]
+    },
+    {
+      "heroId": 91,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12061, 3713, 3714, 3715, 3716"
+      ]
+    },
+    {
+      "heroId": 92,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10701, 3709, 3710, 3711, 3712"
+      ]
+    },
+    {
+      "heroId": 93,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11746, 3696, 3697, 3698, 3699"
+      ]
+    },
+    {
+      "heroId": 94,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10716, 3726, 3727, 3728, 3729"
+      ]
+    },
+    {
+      "heroId": 95,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11704, 3721, 3722, 3723, 3724, 3725"
+      ]
+    },
+    {
+      "heroId": 96,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 3734, 3735, 3736, 3737, 3738"
+      ]
+    },
+    {
+      "heroId": 97,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11732, 3739, 3740, 3741, 3742"
+      ]
+    },
+    {
+      "heroId": 98,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12259, 3880, 3881, 3882, 3883"
+      ]
+    },
+    {
+      "heroId": 99,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12211, 3743, 3744, 3745, 3746"
+      ]
+    },
+    {
+      "heroId": 100,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10705, 3838, 3839, 3840, 3841"
+      ]
+    },
+    {
+      "heroId": 101,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10321, 3810, 3811, 3812, 3813"
+      ]
+    },
+    {
+      "heroId": 102,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10703, 3806, 3807, 3808, 3809"
+      ]
+    },
+    {
+      "heroId": 103,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 3700, 3701, 3702, 3703"
+      ]
+    },
+    {
+      "heroId": 104,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10101, 3960, 3961, 3962, 3963"
+      ]
+    },
+    {
+      "heroId": 105,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10705, 3943, 3944, 3945, 3946"
+      ]
+    },
+    {
+      "heroId": 106,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12312, 3939, 3940, 3941, 3942"
+      ]
+    },
+    {
+      "heroId": 108,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10703, 3884, 3885, 3886, 3887"
+      ]
+    },
+    {
+      "heroId": 109,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 3909, 3910, 3911, 3912"
+      ]
+    },
+    {
+      "heroId": 110,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10223, 3769, 3770, 3771, 3772"
+      ]
+    },
+    {
+      "heroId": 111,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10705, 3773, 3774, 3775, 3776"
+      ]
+    },
+    {
+      "heroId": 112,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10415, 3893, 3894, 3895, 3896"
+      ]
+    },
+    {
+      "heroId": 113,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10701, 3847, 3848, 3849, 3850"
+      ]
+    },
+    {
+      "heroId": 114,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11779, 3851, 3852, 3853, 3854"
+      ]
+    },
+    {
+      "heroId": 115,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10324, 3798, 3799, 3800, 3801"
+      ]
+    },
+    {
+      "heroId": 116,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10701, 3802, 3803, 3804, 3805"
+      ]
+    },
+    {
+      "heroId": 118,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10205, 3930, 3931, 3932, 3933"
+      ]
+    },
+    {
+      "heroId": 119,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10716, 3934, 3935, 3936, 3937"
+      ]
+    },
+    {
+      "heroId": 120,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 3814, 3815, 3816, 3817"
+      ]
+    },
+    {
+      "heroId": 121,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11701, 3818, 3819, 3820, 3821"
+      ]
+    },
+    {
+      "heroId": 122,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10326, 3855, 3856, 3857, 3858"
+      ]
+    },
+    {
+      "heroId": 123,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10324, 3859, 3860, 3861, 3862"
+      ]
+    },
+    {
+      "heroId": 124,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12063, 3947, 3948, 3949, 3950"
+      ]
+    },
+    {
+      "heroId": 125,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10701, 3777, 3778, 3779, 3780"
+      ]
+    },
+    {
+      "heroId": 126,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10701, 3897, 3898, 3899, 3900"
+      ]
+    },
+    {
+      "heroId": 127,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10401, 3781, 3782, 3783, 3784"
+      ]
+    },
+    {
+      "heroId": 129,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12409, 4023, 4024, 4025, 4026"
+      ]
+    },
+    {
+      "heroId": 130,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12408, 4027, 4028, 4029, 4030"
+      ]
+    },
+    {
+      "heroId": 131,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10703, 3785, 3786, 3787, 3788, 3789"
+      ]
+    },
+    {
+      "heroId": 132,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12135, 3790, 3791, 3792, 3793"
+      ]
+    },
+    {
+      "heroId": 133,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12141, 3794, 3795, 3796, 3797"
+      ]
+    },
+    {
+      "heroId": 134,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10703, 3822, 3823, 3824, 3825"
+      ]
+    },
+    {
+      "heroId": 135,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10206, 3826, 3827, 3828, 3829"
+      ]
+    },
+    {
+      "heroId": 136,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12184, 3830, 3831, 3832, 3833"
+      ]
+    },
+    {
+      "heroId": 137,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 3867, 3868, 3869, 3870"
+      ]
+    },
+    {
+      "heroId": 138,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11701, 3871, 3872, 3873, 3874"
+      ]
+    },
+    {
+      "heroId": 139,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10223, 3875, 3876, 3877, 3878, 3879"
+      ]
+    },
+    {
+      "heroId": 140,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 3913, 3914, 3915, 3916"
+      ]
+    },
+    {
+      "heroId": 141,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10841, 3922, 3923, 3924, 3925"
+      ]
+    },
+    {
+      "heroId": 142,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10601, 3917, 3918, 3919, 3920, 3921"
+      ]
+    },
+    {
+      "heroId": 143,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 3972, 3973, 3974, 3975"
+      ]
+    },
+    {
+      "heroId": 144,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10101, 3976, 3977, 3978, 3979"
+      ]
+    },
+    {
+      "heroId": 145,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10223, 3980, 3981, 3982, 3983, 3984"
+      ]
+    },
+    {
+      "heroId": 146,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12425, 4043, 4044, 4045, 4046"
+      ]
+    },
+    {
+      "heroId": 147,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12428, 4047, 4048, 4049, 4050"
+      ]
+    },
+    {
+      "heroId": 148,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12429, 4051, 4052, 4053, 4054, 4055"
+      ]
+    },
+    {
+      "heroId": 99161,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11746, 3905, 3906, 3907, 3908"
+      ]
+    },
+    {
+      "heroId": 99162,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11778, 3951, 3952, 3953, 3954"
+      ]
+    },
+    {
+      "heroId": 99163,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11728, 3964, 3965, 3966, 3967"
+      ]
+    },
+    {
+      "heroId": 99164,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 3985, 3986, 3987, 3988"
+      ]
+    },
+    {
+      "heroId": 99165,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10707, 3989, 3990, 3991, 3992"
+      ]
+    },
+    {
+      "heroId": 99166,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 3993, 3994, 3995, 3996"
+      ]
+    },
+    {
+      "heroId": 99167,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12406, 4018, 4019, 4020, 4021, 4022"
+      ]
+    },
+    {
+      "heroId": 99168,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 4001, 4002, 4003, 4004"
+      ]
+    },
+    {
+      "heroId": 99169,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10703, 3997, 3998, 3999, 4000"
+      ]
+    },
+    {
+      "heroId": 99170,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 4010, 4011, 4012, 4013"
+      ]
+    },
+    {
+      "heroId": 99171,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10705, 4014, 4015, 4016, 4017"
+      ]
+    },
+    {
+      "heroId": 99172,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12418, 4035, 4036, 4037, 4038"
+      ]
+    },
+    {
+      "heroId": 99173,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12420, 4039, 4040, 4041, 4042"
+      ]
+    },
+    {
+      "heroId": 99174,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12436, 4062, 4063, 4064, 4065"
+      ]
+    },
+    {
+      "heroId": 99175,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12438, 4066, 4067, 4068, 4069"
+      ]
+    },
+    {
+      "heroId": 99176,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10324, 4074, 4075, 4076, 4077"
+      ]
+    },
+    {
+      "heroId": 99177,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12442, 4070, 4071, 4072, 4073"
+      ]
+    },
+    {
+      "heroId": 99178,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12449, 4078, 4079, 4080, 4081"
+      ]
+    },
+    {
+      "heroId": 99179,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4082, 4083, 4084, 4085"
+      ]
+    },
+    {
+      "heroId": 99180,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10101, 4086, 4087, 4088, 4089"
+      ]
+    },
+    {
+      "heroId": 99181,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11701, 4090, 4091, 4092, 4093"
+      ]
+    },
+    {
+      "heroId": 99182,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12466, 4102, 4103, 4104, 4105"
+      ]
+    },
+    {
+      "heroId": 99183,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10501, 4098, 4099, 4100, 4101"
+      ]
+    },
+    {
+      "heroId": 99184,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10842, 4106, 4107, 4108, 4109"
+      ]
+    },
+    {
+      "heroId": 99185,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10811, 4110, 4111, 4112, 4113"
+      ]
+    },
+    {
+      "heroId": 99186,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 5100, 4114, 4115, 4116, 4117"
+      ]
+    },
+    {
+      "heroId": 99187,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12480, 4124, 4125, 4126, 4127"
+      ]
+    },
+    {
+      "heroId": 99188,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10701, 4128, 4129, 4130, 4131"
+      ]
+    },
+    {
+      "heroId": 99189,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11701, 4132, 4133, 4134, 4135"
+      ]
+    },
+    {
+      "heroId": 99190,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10101, 4136, 4137, 4138, 4139"
+      ]
+    },
+    {
+      "heroId": 99191,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12494, 4140, 4141, 4142, 4143"
+      ]
+    },
+    {
+      "heroId": 99192,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4147, 4148, 4149, 4150"
+      ]
+    },
+    {
+      "heroId": 99193,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12499, 4151, 4152, 4153, 4154"
+      ]
+    },
+    {
+      "heroId": 99194,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 4159, 4160, 4161, 4162"
+      ]
+    },
+    {
+      "heroId": 99195,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4155, 4156, 4157, 4158"
+      ]
+    },
+    {
+      "heroId": 99196,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10707, 4163, 4164, 4165, 4166"
+      ]
+    },
+    {
+      "heroId": 99197,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12530, 4171, 4172, 4173, 4174"
+      ]
+    },
+    {
+      "heroId": 99198,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12538, 4181, 4182, 4183, 4184"
+      ]
+    },
+    {
+      "heroId": 99199,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10707, 4177, 4178, 4179, 4180"
+      ]
+    },
+    {
+      "heroId": 99200,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10601, 4193, 4194, 4195, 4196"
+      ]
+    },
+    {
+      "heroId": 99201,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4185, 4186, 4187, 4188"
+      ]
+    },
+    {
+      "heroId": 99202,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10101, 4189, 4190, 4191, 4192"
+      ]
+    },
+    {
+      "heroId": 99203,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10705, 4201, 4202, 4203, 4204"
+      ]
+    },
+    {
+      "heroId": 99204,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11701, 4197, 4198, 4199, 4200"
+      ]
+    },
+    {
+      "heroId": 99205,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12560, 4205, 4206, 4207, 4208"
+      ]
+    },
+    {
+      "heroId": 99206,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10324, 4209, 4210, 4211, 4212"
+      ]
+    },
+    {
+      "heroId": 99207,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10842, 4213, 4214, 4215, 4216"
+      ]
+    },
+    {
+      "heroId": 99208,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10101, 4217, 4218, 4219, 4220"
+      ]
+    },
+    {
+      "heroId": 99209,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10701, 4223, 4224, 4225, 4226"
+      ]
+    },
+    {
+      "heroId": 99210,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12582, 4227, 4228, 4229, 4230"
+      ]
+    },
+    {
+      "heroId": 99211,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12580, 4232, 4233, 4234, 4235"
+      ]
+    },
+    {
+      "heroId": 99212,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4236, 4237, 4238, 4239"
+      ]
+    },
+    {
+      "heroId": 99213,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4244, 4245, 4246, 4247"
+      ]
+    },
+    {
+      "heroId": 99214,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10601, 4248, 4249, 4250, 4251"
+      ]
+    },
+    {
+      "heroId": 99215,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10301, 4252, 4253, 4254, 4255"
+      ]
+    },
+    {
+      "heroId": 99216,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4256, 4257, 4258, 4259"
+      ]
+    },
+    {
+      "heroId": 99217,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 5007, 4266, 4267, 4268, 4269"
+      ]
+    },
+    {
+      "heroId": 99218,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10415, 4276, 4277, 4278, 4279"
+      ]
+    },
+    {
+      "heroId": 99219,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10703, 4272, 4273, 4274, 4275"
+      ]
+    },
+    {
+      "heroId": 99220,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10707, 4284, 4285, 4286, 4287"
+      ]
+    },
+    {
+      "heroId": 99221,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12612, 4280, 4281, 4282, 4283"
+      ]
+    },
+    {
+      "heroId": 99222,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10803, 6009, 10717, 4292, 4293, 4294, 4295"
+      ]
+    },
+    {
+      "heroId": 99223,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12620, 10116, 12621, 4288, 4289, 4290, 4291"
+      ]
+    },
+    {
+      "heroId": 99224,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12631, 5024, 12621, 4296, 4297, 4298, 4299"
+      ]
+    },
+    {
+      "heroId": 99225,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12634, 4305, 4300, 4301, 4302, 4303"
+      ]
+    },
+    {
+      "heroId": 99226,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4309, 4310, 4311, 4312"
+      ]
+    },
+    {
+      "heroId": 99227,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 5024, 4313, 4314, 4315, 4316"
+      ]
+    },
+    {
+      "heroId": 99228,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12650, 4321, 4322, 4323, 4324"
+      ]
+    },
+    {
+      "heroId": 99229,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 4317, 4318, 4319, 4320"
+      ]
+    },
+    {
+      "heroId": 99230,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 4332, 4333, 4334, 4335"
+      ]
+    },
+    {
+      "heroId": 99231,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12654, 4325, 4326, 4327, 4328"
+      ]
+    },
+    {
+      "heroId": 99232,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10801, 12668, 4336, 4337, 4338, 4339"
+      ]
+    },
+    {
+      "heroId": 99233,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12671, 4342, 4343, 4344, 4345"
+      ]
+    },
+    {
+      "heroId": 99234,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10101, 4346, 4347, 4348, 4349"
+      ]
+    },
+    {
+      "heroId": 99235,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12677, 4350, 4351, 4352, 4353"
+      ]
+    },
+    {
+      "heroId": 99236,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11701, 4354, 4355, 4356, 4357"
+      ]
+    },
+    {
+      "heroId": 99237,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12686, 4358, 4359, 4360, 4361"
+      ]
+    },
+    {
+      "heroId": 99238,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10701, 4367, 4368, 4369, 4370"
+      ]
+    },
+    {
+      "heroId": 99239,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10703, 4362, 4363, 4364, 4365"
+      ]
+    },
+    {
+      "heroId": 99240,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12979, 4375, 4376, 4377, 4378"
+      ]
+    },
+    {
+      "heroId": 99241,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4371, 4372, 4373, 4374"
+      ]
+    },
+    {
+      "heroId": 99242,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11748, 4381, 4382, 4383, 4384"
+      ]
+    },
+    {
+      "heroId": 99243,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10601, 4385, 4386, 4387, 4388"
+      ]
+    },
+    {
+      "heroId": 99244,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 12990, 4389, 4390, 4391, 4392"
+      ]
+    },
+    {
+      "heroId": 99245,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10223, 11720, 5007, 4401, 4402, 4403, 4404"
+      ]
+    },
+    {
+      "heroId": 99246,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13003, 10401, 10418, 4405, 4406, 4407, 4408"
+      ]
+    },
+    {
+      "heroId": 99247,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11704, 11710, 11703, 4397, 4398, 4399, 4400"
+      ]
+    },
+    {
+      "heroId": 99248,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10716, 4413, 4414, 4415, 4416"
+      ]
+    },
+    {
+      "heroId": 99249,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 5098, 4421, 4422, 4423, 4424"
+      ]
+    },
+    {
+      "heroId": 99250,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4417, 4418, 4419, 4420"
+      ]
+    },
+    {
+      "heroId": 99251,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11704, 4425, 4426, 4427, 4428"
+      ]
+    },
+    {
+      "heroId": 99252,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10223, 4437, 4438, 4439, 4440"
+      ]
+    },
+    {
+      "heroId": 99253,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4433, 4434, 4435, 4436"
+      ]
+    },
+    {
+      "heroId": 99254,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10401, 4441, 4442, 4443, 4444"
+      ]
+    },
+    {
+      "heroId": 99255,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10223, 4445, 4446, 4447, 4448"
+      ]
+    },
+    {
+      "heroId": 99256,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10223, 5004, 5013, 4457, 4458, 4459, 4460"
+      ]
+    },
+    {
+      "heroId": 99257,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13046, 10701, 10811, 4453, 4454, 4455, 4456"
+      ]
+    },
+    {
+      "heroId": 99258,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 5007, 10204, 10201, 4449, 4450, 4451, 4452"
+      ]
+    },
+    {
+      "heroId": 99259,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 4465, 4466, 4467, 4468"
+      ]
+    },
+    {
+      "heroId": 99260,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10604, 4469, 4470, 4471, 4472"
+      ]
+    },
+    {
+      "heroId": 99261,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10716, 4473, 4474, 4475, 4476"
+      ]
+    },
+    {
+      "heroId": 99262,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10101, 4477, 4478, 4479, 4480"
+      ]
+    },
+    {
+      "heroId": 99263,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4481, 4482, 4483, 4484"
+      ]
+    },
+    {
+      "heroId": 99264,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13082, 4485, 4486, 4487, 4488"
+      ]
+    },
+    {
+      "heroId": 99265,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13090, 4497, 4498, 4499, 4500"
+      ]
+    },
+    {
+      "heroId": 99266,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10223, 4493, 4494, 4495, 4496"
+      ]
+    },
+    {
+      "heroId": 99267,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13100, 5005, 10841, 4505, 4506, 4507, 4508"
+      ]
+    },
+    {
+      "heroId": 99268,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13105, 13106, 11723, 4509, 4510, 4511, 4512"
+      ]
+    },
+    {
+      "heroId": 99269,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13097, 13098, 10606, 4501, 4502, 4503, 4504"
+      ]
+    },
+    {
+      "heroId": 99270,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 4517, 4518, 4519, 4520"
+      ]
+    },
+    {
+      "heroId": 99271,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13109, 4513, 4514, 4515, 4516"
+      ]
+    },
+    {
+      "heroId": 99272,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 4531, 4532, 4533, 4534"
+      ]
+    },
+    {
+      "heroId": 99273,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 4521, 4522, 4523, 4524"
+      ]
+    },
+    {
+      "heroId": 99274,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 11782, 4540, 4541, 4542, 4543"
+      ]
+    },
+    {
+      "heroId": 99275,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13126, 4535, 4536, 4537, 4538"
+      ]
+    },
+    {
+      "heroId": 99276,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13132, 11706, 11711, 4544, 4545, 4546, 4547"
+      ]
+    },
+    {
+      "heroId": 99277,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 5024, 10105, 4548, 4549, 4550, 4551"
+      ]
+    },
+    {
+      "heroId": 99278,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13138, 10201, 10101, 4552, 4553, 4554, 4555"
+      ]
+    },
+    {
+      "heroId": 99279,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10201, 4564, 4565, 4566, 4567"
+      ]
+    },
+    {
+      "heroId": 99280,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13144, 4560, 4561, 4562, 4563"
+      ]
+    },
+    {
+      "heroId": 99281,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13155, 4569, 4570, 4571, 4572"
+      ]
+    },
+    {
+      "heroId": 99282,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10401, 4579, 4580, 4581, 4582"
+      ]
+    },
+    {
+      "heroId": 99283,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10703, 4574, 4575, 4576, 4577"
+      ]
+    },
+    {
+      "heroId": 99284,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13166, 5013, 5016, 4583, 4584, 4585, 4586"
+      ]
+    },
+    {
+      "heroId": 99285,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13169, 10804, 10704, 4587, 4588, 4589, 4590"
+      ]
+    },
+    {
+      "heroId": 99286,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 10208, 13178, 10403, 4596, 4597, 4598, 4599"
+      ]
+    },
+    {
+      "heroId": 99287,
+      "reasons": [
+        "auxiliary skill reference(s) without JobLevel acquisition point: 13172, 4591, 4592, 4593, 4594"
+      ]
     }
   ],
-  "blockers": [
-    "Stage 4-3 must first return PASS or REVIEW after valid Job/JobConnection/JobLevel inputs are supplied.",
-    "Replace ConfigDataSkillInfo.json with a structurally valid individual TextAsset export.",
-    "ConfigDataJobConnectionInfo.json will already need replacement for Stage 4-2/4-3 and is also required here to preserve TalentSkill_IDs separately."
-  ],
-  "resumeCommands": [
-    "npm run inspect:hero-jobs",
-    "npm run inspect:hero-job-trees",
-    "npm run inspect:hero-skills"
-  ],
-  "completionBehavior": "After Stage 4-3 is usable and SkillInfo/JobConnectionInfo are valid, Stage 4-4 resolves every explicit JobLevel GotSkill_ID to SkillInfo, preserves acquisition order from the verified job tree, and separately resolves HeroInfo direct/hidden skills and JobConnection TalentSkill references without inventing acquisition points.",
-  "nextStage": "4-5 basic combat data completion: awakening classification, job stats, soldier modifiers, talent and star-rank talent changes."
+  "verifiedFieldContract": {
+    "heroInfo": {
+      "id": 2,
+      "useable": 10,
+      "skillIds": 19,
+      "hiddenSkillIds": 20
+    },
+    "jobConnectionInfo": {
+      "id": 2,
+      "talentSkillIds": 8
+    },
+    "jobLevelFromStage43": {
+      "gotSkillId": "ConfigDataJobLevelInfo protobuf field 28, already preserved by Stage 4-3"
+    },
+    "skillInfo": {
+      "id": 2,
+      "name": 3,
+      "desc": 5,
+      "iconPath": 71,
+      "displayType": 73,
+      "cooldown": 74,
+      "range": 75,
+      "areaOrTarget": 76
+    }
+  },
+  "nextStage": "4-5 basic combat data completion"
 }
