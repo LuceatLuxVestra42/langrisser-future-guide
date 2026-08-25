@@ -58,6 +58,13 @@ function validIntegerArray(value) {
   return Array.isArray(value) && value.every(Number.isInteger);
 }
 
+function describeInvalidArrayValue(value) {
+  if (value === undefined) return { valueType: 'undefined', value: null };
+  if (value === null) return { valueType: 'null', value: null };
+  if (Array.isArray(value)) return { valueType: 'array', value };
+  return { valueType: typeof value, value };
+}
+
 function main() {
   const master = loadJson(PATHS.master);
   const sourceTrace = loadJson(PATHS.sourceTrace);
@@ -101,6 +108,7 @@ function main() {
   const originInvalidHeroIds = [];
   const artworkMissingHeroIds = [];
   const skinListInvalidHeroIds = [];
+  const skinListInvalidDetails = [];
   const skinNoRefsHeroIds = [];
   const unresolvedSkinRefs = [];
   const specifiedHeroMismatches = [];
@@ -137,6 +145,7 @@ function main() {
 
     if (!validIntegerArray(row.Skins_ID)) {
       skinListInvalidHeroIds.push(heroId);
+      skinListInvalidDetails.push({ heroId, ...describeInvalidArrayValue(row.Skins_ID) });
       continue;
     }
     if (row.Skins_ID.length === 0) skinNoRefsHeroIds.push(heroId);
@@ -240,6 +249,8 @@ function main() {
         status: 'SOURCE_JOIN_CONFIRMED',
         join: 'ConfigDataHeroInfo.Skins_ID[] -> ConfigDataHeroSkinInfo.ID',
         heroesWithValidSkinList: canonicalHeroInfoRows.length - skinListInvalidHeroIds.length,
+        heroIdsWithInvalidSkinList: sortedNumbers(skinListInvalidHeroIds),
+        invalidSkinListDetails: skinListInvalidDetails.sort((a, b) => a.heroId - b.heroId),
         heroesWithNoSkinRefs: skinNoRefsHeroIds.length,
         heroIdsWithNoSkinRefs: sortedNumbers(skinNoRefsHeroIds),
         totalSkinRefs,
@@ -269,6 +280,7 @@ function main() {
   console.log(`Origin pointers: ${result.fields.origin.heroesWithNonEmptyValidPointers}/${canonicalHeroInfoRows.length}`);
   console.log(`Artwork pointers: ${artworkPointerHeroes}/${canonicalHeroInfoRows.length}`);
   console.log(`Skin refs resolved: ${resolvedSkinRefs}/${totalSkinRefs}`);
+  console.log(`Invalid skin lists: ${skinListInvalidHeroIds.length}`);
   console.log(`Skin owner mismatches: ${specifiedHeroMismatches.length}`);
   console.log(`Coverage artifact: ${path.relative(rootDir, PATHS.output)}`);
   console.log(`Status: ${result.status}`);
