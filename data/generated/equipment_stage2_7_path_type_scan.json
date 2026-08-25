@@ -1,9 +1,9 @@
 {
-  "matchFileCount": 55,
+  "matchFileCount": 58,
   "matches": [
     {
       "path": ".github/workflows/equipment-acquisition-analysis.yml",
-      "sizeBytes": 1419,
+      "sizeBytes": 1459,
       "excerpts": [
         {
           "line": 8,
@@ -1528,6 +1528,28 @@
       ]
     },
     {
+      "path": "data/contracts/equipment-stage2-7-acquisition-reference.v1.json",
+      "sizeBytes": 3371,
+      "excerpts": [
+        {
+          "line": 51,
+          "text": "    \"exclusivePathType46Count\": 167,"
+        },
+        {
+          "line": 55,
+          "text": "    \"pathType46\": {"
+        },
+        {
+          "line": 58,
+          "text": "      \"basis\": \"The PathType 46-only population aligns with the separate exclusive-equipment population; sentinel rows beginning with IDs 273-277 match the opening rows of the legacy 전용장비 sheet.\""
+        },
+        {
+          "line": 68,
+          "text": "      \"basis\": \"GetPathList is empty. No broader all-heroes/unrestricted acquisition meaning is inferred from the empty field.\""
+        }
+      ]
+    },
+    {
       "path": "data/contracts/hero-page-stage5-5-3-output-contract.v1.json",
       "sizeBytes": 9472,
       "excerpts": [
@@ -2466,6 +2488,48 @@
       ]
     },
     {
+      "path": "scripts/finalize-equipment-stage2-7-acquisition.mjs",
+      "sizeBytes": 7184,
+      "excerpts": [
+        {
+          "line": 54,
+          "text": "  const paths = norm(row.GetPathList);"
+        },
+        {
+          "line": 79,
+          "text": "    classificationBasis = 'empty-GetPathList-no-global-meaning-inferred';"
+        },
+        {
+          "line": 80,
+          "text": "  } else if (paths.length === 1 && Number(paths[0]?.PathType) === 46) {"
+        },
+        {
+          "line": 82,
+          "text": "    confidencePercent = contract.semanticDecisions.pathType46.confidencePercent;"
+        },
+        {
+          "line": 83,
+          "text": "    classificationBasis = 'PathType46-only-and-exclusive-sheet-sentinel-match';"
+        },
+        {
+          "line": 87,
+          "text": "    classificationBasis = 'empty-GetPathList-and-soul-name-prefix';"
+        },
+        {
+          "line": 108,
+          "text": "      getPathList: paths,"
+        },
+        {
+          "line": 109,
+          "text": "      getPathDesc: row.GetPathDesc ?? null,"
+        },
+        {
+          "line": 140,
+          "text": "    emptyPathPolicy: 'An empty GetPathList is not interpreted as unrestricted acquisition. ID 2013 remains explicit unresolved-no-path.',"
+        }
+      ]
+    },
+    {
       "path": "scripts/focus-equipment-stage2-7.mjs",
       "sizeBytes": 2024,
       "excerpts": [
@@ -2556,6 +2620,32 @@
         {
           "line": 41,
           "text": "c.nextAction='Integrate the confirmed Stage 5-5-2 mappings. Build a supplemental acquisition-history dictionary only if exact acquisition text is required for the 176 skins with omitted GetPathType.';"
+        }
+      ]
+    },
+    {
+      "path": "scripts/validate-equipment-stage2-7-acquisition.mjs",
+      "sizeBytes": 5140,
+      "excerpts": [
+        {
+          "line": 27,
+          "text": "check(countClass('exclusive-equipment') === contract.canonicalExpectations.exclusivePathType46Count, 'exclusive count mismatch');"
+        },
+        {
+          "line": 48,
+          "text": "check(unresolved[0].raw.getPathList.length === 0, 'ID 2013 unexpectedly has acquisition paths');"
+        },
+        {
+          "line": 51,
+          "text": "  check(row.raw.getPathList.length === 1 && Number(row.raw.getPathList[0]?.PathType) === 46,"
+        },
+        {
+          "line": 52,
+          "text": "    `exclusive PathType mismatch: ${row.equipmentId}`);"
+        },
+        {
+          "line": 56,
+          "text": "  check(row.raw.getPathList.length === 0 && /^魂·/.test(String(row.nameCn ?? '')), `soul-special shape mismatch: ${row.equipmentId}`);"
         }
       ]
     },
