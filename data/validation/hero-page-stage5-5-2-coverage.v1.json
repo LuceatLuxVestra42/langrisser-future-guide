@@ -102,15 +102,15 @@
       "rule": "Resolve the single HeroBelongProduction ID through the validated origin dictionary. Preserve originLabelCn as source-display text; Korean work-title localization may be layered separately without changing productionId semantics."
     },
     "artwork": {
-      "status": "POINTER_CONFIRMED",
-      "source": "ConfigDataHeroInfo.CharImage_ID",
-      "join": null,
-      "heroDetailArtworkField": null,
+      "status": "SOURCE_JOIN_CONFIRMED",
+      "source": "ConfigDataCharImageInfo.HeroPainting",
+      "join": "ConfigDataHeroInfo.CharImage_ID -> ConfigDataCharImageInfo.ID -> HeroPainting",
+      "heroDetailArtworkField": "ConfigDataCharImageInfo.HeroPainting",
       "heroesWithValidPointer": 267,
       "missingOrInvalidHeroIds": [],
       "displaySemantics": "SOURCE_CONFIRMED",
-      "validation": null,
-      "rule": "CharImage_ID is confirmed as a join pointer into ConfigDataCharImageInfo for CV, but final Hero-detail portrait/artwork field selection remains a separate semantic question."
+      "validation": "data/validation/hero-page-stage5-5-2-artwork.v1.json",
+      "rule": "Use HeroPainting for the base Hero-detail main illustration. Do not substitute CardHeadImage/head icons or Spine resources for the static header painting."
     },
     "skins": {
       "status": "SOURCE_JOIN_CONFIRMED",
