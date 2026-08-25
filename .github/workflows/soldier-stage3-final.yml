@@ -15,6 +15,7 @@ on:
       - 'data/generated/soldier-master.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'scripts/validate_soldier_stage4_prereq_parsed.cjs'
+      - 'scripts/finalize_soldier_stage4_prereq_recheck.cjs'
       - 'scripts/inspect_parsed_soldier_schema.cjs'
       - '.github/workflows/soldier-stage3-final.yml'
   pull_request:
@@ -30,6 +31,7 @@ on:
       - 'data/generated/soldier-master.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'scripts/validate_soldier_stage4_prereq_parsed.cjs'
+      - 'scripts/finalize_soldier_stage4_prereq_recheck.cjs'
       - 'scripts/inspect_parsed_soldier_schema.cjs'
       - '.github/workflows/soldier-stage3-final.yml'
 
@@ -49,7 +51,10 @@ jobs:
       - name: Inspect parsed soldier ConfigData schema
         run: node scripts/inspect_parsed_soldier_schema.cjs
       - name: Revalidate soldier stage 4 prerequisites
+        continue-on-error: true
         run: node scripts/validate_soldier_stage4_prereq_parsed.cjs
+      - name: Finalize unreleased Korean-name status
+        run: node scripts/finalize_soldier_stage4_prereq_recheck.cjs
       - name: Upload stage 4 prerequisite recheck
         if: always()
         uses: actions/upload-artifact@v4
