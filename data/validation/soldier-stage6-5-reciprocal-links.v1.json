@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage6-5-reciprocal-links/v1",
+  "stage": "6-5",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T01:54:37.720Z",
+  "sources": {
+    "relationSet": {
+      "path": "data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    },
+    "relationValidation": {
+      "path": "data/validation/hero-soldier-relation-validation.v1.json",
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638"
+    },
+    "byHero": {
+      "path": "data/generated/hero-soldier-by-hero.v1.json",
+      "gitBlobSha": "e613bd05b0e7173734834cba5d8cfbff973298ad"
+    },
+    "bySoldier": {
+      "path": "data/generated/hero-soldier-by-soldier.v1.json",
+      "gitBlobSha": "ff9d8a881c03b6e0f2a196e12f37cd2e28e3e251"
+    },
+    "heroPage": {
+      "path": "data/generated/hero-page-soldiers-stage5-3.v1.json",
+      "gitBlobSha": "b97beae7aa58c573f16919cf731250bfc359d58e"
+    },
+    "heroPageValidation": {
+      "path": "data/validation/hero-page-stage5-3-final.v1.json",
+      "gitBlobSha": "5fee7bacae2e674d0eb4acc890b3cd15e760854b"
+    },
+    "soldierRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    },
+    "soldierRecordsValidation": {
+      "path": "data/validation/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "cf6d985fe12f21a16124a61ee225d90218835d90"
+    },
+    "soldierHeroValidation": {
+      "path": "data/validation/soldier-stage5-5-heroes.v1.json",
+      "gitBlobSha": "c08de69ec079bf19d10d300e853aa8f10ee6bc4f"
+    },
+    "stage6_2Validation": {
+      "path": "data/validation/soldier-stage6-2-classification.v1.json",
+      "gitBlobSha": "543c363c0c00c3ab9b791b894db468533cd20f25"
+    },
+    "stage6_3Validation": {
+      "path": "data/validation/soldier-stage6-3-representative-qa.v1.json",
+      "gitBlobSha": "bd7d3ee67db8fb8c3c0b5da8f7d269308f771d20"
+    },
+    "stage6_4Validation": {
+      "path": "data/validation/soldier-stage6-4-filter-qa.v1.json",
+      "gitBlobSha": "2195a412c6006db793a6822e996692de6be0aa3f"
+    }
+  },
+  "checks": {
+    "upstreamNonPass": 0,
+    "relationSnapshotMismatch": 0,
+    "canonicalInvalidPairs": 0,
+    "canonicalDuplicatePairs": 0,
+    "byHeroInvalidPairs": 0,
+    "byHeroDuplicatePairs": 0,
+    "bySoldierInvalidPairs": 0,
+    "bySoldierDuplicatePairs": 0,
+    "sharedIndexPairMismatch": 0,
+    "heroPageInvalidPairs": 0,
+    "heroPageDuplicatePairs": 0,
+    "soldierPageInvalidPairs": 0,
+    "soldierPageDuplicatePairs": 0,
+    "heroPagePairMismatch": 0,
+    "soldierPagePairMismatch": 0,
+    "reciprocalPagePairMismatch": 0,
+    "heroKeyCoverageMismatch": 0,
+    "soldierKeyCoverageMismatch": 0,
+    "inheritedRelationValidationMismatch": 0
+  },
+  "coverage": {
+    "heroKeys": 267,
+    "heroPageKeys": 267,
+    "soldierKeys": 224,
+    "soldierPageKeys": 224,
+    "canonicalRelationCount": 5977,
+    "byHeroRelationCount": 5977,
+    "bySoldierRelationCount": 5977,
+    "heroPageRelationCount": 5977,
+    "soldierPageRelationCount": 5977,
+    "snapshotMismatches": [],
+    "heroPageMissingPairs": [],
+    "heroPageExtraPairs": [],
+    "soldierPageMissingPairs": [],
+    "soldierPageExtraPairs": [],
+    "reciprocalHeroPageMissingFromSoldierPage": [],
+    "reciprocalSoldierPageExtraAgainstHeroPage": []
+  },
+  "errors": [],
+  "reviews": [
+    {
+      "code": "HERO_PAGE_SOLDIER_DISPLAY_NAME_REVIEW",
+      "count": 41,
+      "classification": "REVIEW",
+      "rule": "Presentation-name review is non-blocking and must not change Hero-Soldier membership or navigation identity."
+    },
+    {
+      "code": "ROUTE_IMPLEMENTATION_SEPARATE_FROM_MEMBERSHIP",
+      "count": null,
+      "classification": "REVIEW",
+      "rule": "Stage 6-5 freezes canonical reciprocal membership and target identity. Concrete UI route components may consume these IDs but must not recalculate membership."
+    }
+  ]
+}
