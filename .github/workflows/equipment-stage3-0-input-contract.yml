@@ -1,0 +1,35 @@
+name: Equipment Stage 3-0 Input Contract
+
+on:
+  push:
+    paths:
+      - '.github/workflows/equipment-stage3-0-input-contract.yml'
+      - 'scripts/validate-equipment-stage3-0-input-contract.mjs'
+      - 'data/contracts/equipment-stage3-0-input-contract.v1.json'
+      - 'data/generated/equipment_stage2_3_filter_map.json'
+      - 'data/generated/equipment_stage2_4_stats.json'
+      - 'data/generated/equipment_stage2_5_effects.json'
+      - 'data/generated/equipment_stage2_6_restrictions.json'
+      - 'data/generated/equipment_stage2_7_acquisition.json'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate frozen Stage 2 inputs for Stage 3
+        run: node scripts/validate-equipment-stage3-0-input-contract.mjs
+      - name: Persist Stage 3-0 validation checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/equipment-stage3-0-input-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No Stage 3-0 validation changes"
+            exit 0
+          fi
+          git commit -m "Freeze Equipment Stage 3-0 input checkpoint"
+          git push
