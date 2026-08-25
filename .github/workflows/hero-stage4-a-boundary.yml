@@ -1,0 +1,34 @@
+name: Hero Stage 4 A-Boundary Validation
+
+on:
+  pull_request:
+    paths:
+      - 'data/hero-basic-combat-stage4-5.v1.json'
+      - 'data/contracts/hero-identity-contract.v1.json'
+      - 'data/contracts/hero-soldier-relation-ownership-contract.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/generated/hero-job-trees.v1.json'
+      - 'data/generated/hero-skill-acquisition.v1.json'
+      - 'data/generated/hero-basic-combat.v1.json'
+      - 'scripts/validate_hero_stage4_a_boundary.cjs'
+      - '.github/workflows/hero-stage4-a-boundary.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate A-1 identity and A-9 ownership boundary
+        run: node scripts/validate_hero_stage4_a_boundary.cjs
+      - name: Upload validation result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-stage4-a-boundary
+          path: data/validation/hero-stage4-a-boundary.v1.json

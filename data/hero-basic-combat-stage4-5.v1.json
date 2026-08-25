@@ -4,6 +4,22 @@
   "status": "validation-ready-partial-output",
   "purpose": "Assemble the verified normal job tree and skill-acquisition outputs into per-hero basic-combat records, emit evidence-backed partial data for all canonical heroes, and keep unresolved display semantics explicitly blocked instead of fabricating values.",
   "primaryKey": "heroId",
+  "sharedRelationBoundary": {
+    "status": "A1_A9_ADOPTED",
+    "heroIdentityContract": "data/contracts/hero-identity-contract.v1.json",
+    "ownershipContract": "data/contracts/hero-soldier-relation-ownership-contract.v1.json",
+    "canonicalHeroKey": "heroId",
+    "soldierModifiersMeaning": "Hero-owned troop HP/ATK/DEF/MDEF modifier percentages only; this component is not Hero-Soldier membership.",
+    "usableSoldierMembership": "OUT_OF_SCOPE",
+    "membershipOwner": "Hero-Soldier Relation Layer",
+    "futureConsumer": "Hero 5-3 consumes the validated data/generated/hero-soldier-by-hero.v1.json index only after the shared Relation Layer is accepted.",
+    "forbiddenRelationInputs": [
+      "ConfigDataSoldierInfo.GetSoldierHeros_ID",
+      "ConfigDataSPHeroInfo.SecondStageRewardSoldiers",
+      "ConfigDataSPSoldierInfo.SecondStageExpandHeroList",
+      "Normal/SP numeric or name inference"
+    ]
+  },
   "upstream": {
     "jobTree": "data/generated/hero-job-trees.v1.json",
     "skillAcquisition": "data/generated/hero-skill-acquisition.v1.json"
@@ -64,7 +80,7 @@
     {
       "id": "heroSoldierModifiers",
       "status": "UNVERIFIED_RUNTIME_FORMULA",
-      "requiredEvidence": "Verify the source/calculation for the hero-page soldier HP/ATK/DEF/MDEF modifier percentages. SoldierInfo base stats and TrainingTech values are not substitutes."
+      "requiredEvidence": "Verify the source/calculation for the hero-page soldier HP/ATK/DEF/MDEF modifier percentages. SoldierInfo base stats and TrainingTech values are not substitutes. This gate is Hero-owned stat metadata only and must not calculate usable-Soldier membership."
     },
     {
       "id": "talentIdentity",
@@ -79,7 +95,8 @@
   ],
   "normalizationRules": [
     "Consume Stage 4-3 and Stage 4-4 only when their status is PASS or REVIEW.",
-    "Use heroId as the only canonical hero join key.",
+    "Use heroId as the only canonical hero join key and require every emitted heroId to exist in data/hero-name-master.v1.json under the frozen A-1 contract.",
+    "Never use Hero names, aliases, site IDs, HeroInformation_ID, numeric patterns or ordering as Hero identity fallbacks.",
     "Preserve Stage 4-3 topology and Stage 4-4 acquisition order exactly.",
     "Emit partial records for all upstream heroes when required sources are healthy even if final display semantics remain blocked.",
     "Attach the twelve verified JobLevelInfo INI/UP fields as raw stat components only; never label them final display stats.",
@@ -87,6 +104,8 @@
     "Read HeroInfo.Awaken_ID directly and resolve the awakening skill through the restored ConfigDataAwakenInfo payload.",
     "Do not infer awakening from skill ID, name, cost, job rank, or wiki order.",
     "Do not substitute SoldierInfo/TrainingTech values for hero soldier modifiers.",
+    "Keep soldierModifiers limited to Hero-owned troop stat percentages; do not embed soldierId arrays, usable-Soldier membership, SP relation membership or relation provenance in Stage 4-5 records.",
+    "Do not re-read SoldierInfo.GetSoldierHeros_ID, SPHeroInfo.SecondStageRewardSoldiers or SPSoldierInfo.SecondStageExpandHeroList to calculate Hero-Soldier membership in the Hero pipeline.",
     "Keep unresolved final fields null with a component status and evidence note instead of suppressing the entire 267-hero record set."
   ],
   "validationPolicy": {
@@ -98,15 +117,17 @@
     ],
     "FAIL": [
       "Stage 4-3 and Stage 4-4 hero sets disagree.",
+      "An emitted heroId is absent from the A-1 canonical Hero Master or Hero identity is repaired with a forbidden fallback.",
       "A Stage 4-3 JobLevel ID is missing from the restored JobLevelInfo source.",
       "A nonzero awakening relation resolves to a missing AwakenInfo/SkillInfo record.",
-      "Duplicate IDs make a verified relation ambiguous."
+      "Duplicate IDs make a verified relation ambiguous.",
+      "Stage 4-5 independently calculates, embeds or patches usable-Soldier membership instead of leaving relation ownership to the A-9 shared Relation Layer."
     ],
     "SEMANTIC_BLOCKED": [
       "Partial records are generated, but one or more final-display semantic gates remain unresolved."
     ],
     "PASS": [
-      "267 basic-combat records are generated and every final-display semantic gate is verified and populated without inferred relationships."
+      "267 basic-combat records are generated, all hero IDs satisfy the A-1 canonical identity contract, the A-9 relation ownership boundary is preserved, and every final-display semantic gate is verified and populated without inferred relationships."
     ]
   },
   "output": {
@@ -122,6 +143,6 @@
     "ConfigDataAwakenInfo.json": "usable: 283 parsed records"
   },
   "stage4CompletionRule": "Stage 4 is data-complete only when Stage 4-5 returns PASS. A 267-record SEMANTIC_BLOCKED output is a valid partial reconstruction, not final page-ready combat data.",
-  "completionRule": "Run npm run inspect:hero-combat. Awakening is now source-verified; separately verify the final-stat, soldier-modifier and talent-star selection rules before promoting Stage 4-5 to PASS.",
-  "nextStage": "5-1 bond data can be implemented in parallel, but Stage 6 must not treat Stage 4 as data-complete until Stage 4-5 PASS."
+  "completionRule": "Run npm run inspect:hero-combat. Awakening is now source-verified; separately verify the final-stat, soldier-modifier and talent-star selection rules before promoting Stage 4-5 to PASS. Hero-Soldier membership is explicitly not a Stage 4 completion gate.",
+  "nextStage": "5-1 bond data can be implemented in parallel. Hero 5-3 usable Soldiers must later consume the validated A-7 byHeroId index; Stage 6 must not treat Stage 4 as data-complete until Stage 4-5 PASS."
 }
