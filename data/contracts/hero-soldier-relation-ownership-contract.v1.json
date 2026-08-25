@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "stage": "A-9",
+  "status": "FROZEN",
+  "purpose": "Pipeline ownership and lifecycle contract for the shared Hero-Soldier Relation Layer. It establishes one semantic writer for Hero-Soldier membership and limits Hero/Soldier page pipelines to downstream consumption and presentation joins.",
+  "dependsOn": {
+    "heroIdentity": "data/contracts/hero-identity-contract.v1.json",
+    "soldierIdentity": "data/contracts/soldier-identity-contract.v1.json",
+    "sourceKinds": "data/contracts/hero-soldier-relation-source-contract.v1.json",
+    "edgeSchema": "data/contracts/hero-soldier-relation-edge-schema.v1.json",
+    "composition": "data/contracts/hero-soldier-relation-composition-contract.v1.json",
+    "relationSet": "data/contracts/hero-soldier-relation-set-contract.v1.json",
+    "indexes": "data/contracts/hero-soldier-relation-index-contract.v1.json",
+    "validation": "data/contracts/hero-soldier-relation-validation-contract.v1.json"
+  },
+  "singleWriterPrinciple": {
+    "semanticOwner": "Hero-Soldier Relation Layer",
+    "rule": "Only the Relation Layer may compute, merge, validate, publish, or replace canonical Hero-Soldier membership after A-10 adoption.",
+    "canonicalArtifact": "data/generated/hero-soldier-relations.v1.json",
+    "derivedArtifacts": [
+      "data/generated/hero-soldier-by-hero.v1.json",
+      "data/generated/hero-soldier-by-soldier.v1.json",
+      "data/validation/hero-soldier-relation-validation.v1.json"
+    ],
+    "forbiddenParallelWriters": [
+      "Hero page pipeline",
+      "Soldier page pipeline",
+      "page components",
+      "site routing layer",
+      "manual name-based relation tables"
+    ]
+  },
+  "relationLayerResponsibilities": [
+    "Read the canonical Hero and Soldier identities defined by A-1 and A-2.",
+    "Read only relation source fields authorized by A-3.",
+    "Normalize and compose direct/derived relation candidates according to A-4 and A-5.",
+    "Write the A-6 canonical Relation Set.",
+    "Generate both A-7 indexes from the exact same accepted Relation Set.",
+    "Run A-8 integrity, fixture, regression and parity validation.",
+    "Publish relation artifacts for downstream use only when A-8 records PASS for the exact artifact blobs.",
+    "Own future semantic relation changes by versioning the relevant A-contract before changing builder behavior."
+  ],
+  "heroPipelineBoundary": {
+    "role": "CONSUMER",
+    "primaryArtifact": "data/generated/hero-soldier-by-hero.v1.json",
+    "allowed": [
+      "Lookup soldierIds[] by canonical heroId.",
+      "Join returned soldierId values to Soldier Master for names, class, SP/display metadata and links.",
+      "Resolve provenance from the A-6 canonical edge only when diagnostics or evidence are needed.",
+      "Cache page-local presentation results when the cache is invalidated by relation/index or master blob changes."
+    ],
+    "forbidden": [
+      "Re-read ConfigDataSoldierInfo.GetSoldierHeros_ID to independently calculate usable Soldiers.",
+      "Re-read ConfigDataSPHeroInfo.SecondStageRewardSoldiers to independently modify membership.",
+      "Infer Soldier membership by name, numeric ID pattern, SP form, tier or UI metadata.",
+      "Write or patch canonical Relation Set/index artifacts.",
+      "Treat Hero page data as an authoritative relation source."
+    ],
+    "heroStageMapping": {
+      "Hero 5-3 usable Soldiers": "Consume byHeroId only for membership; join Soldier Master for presentation.",
+      "Hero 5-4 SP display": "May display SP-specific Hero data, but Soldier membership remains owned by the Relation Layer."
+    }
+  },
+  "soldierPipelineBoundary": {
+    "role": "UPSTREAM_VALIDATOR_THEN_CONSUMER",
+    "primaryArtifactAfterAdoption": "data/generated/hero-soldier-by-soldier.v1.json",
+    "allowedBeforeA10": [
+      "Complete the current UnityDataTool JSON input migration/regression work needed to prove that Soldier, SP Soldier and SP Hero relation-source fields are readable and semantically unchanged.",
+      "Validate Soldier Master and domain-specific Soldier/SP records needed as Relation Layer inputs.",
+      "Compare migrated source extraction against the frozen stage-3 Golden Baseline for regression diagnosis."
+    ],
+    "allowedAfterA10": [
+      "Lookup heroIds[] by canonical soldierId from bySoldierId.",
+      "Join returned heroId values to Hero Master for names and page links.",
+      "Consume Relation Layer validation status as the readiness gate for usable-Hero display.",
+      "Continue Soldier-specific stats, abilities, missions, training and presentation work independently of relation membership."
+    ],
+    "forbiddenAfterA10": [
+      "Independently rebuild final Hero-Soldier membership from stage-3/4 intermediate data.",
+      "Maintain a second canonical Soldier->Hero relation file.",
+      "Use legacy data/generated/soldier-hero-relations.v1.json as live production truth.",
+      "Modify canonical relation artifacts to make Soldier-page checks pass."
+    ],
+    "soldierStageMapping": {
+      "Soldier 4-1 through 4-5": "Transitional upstream migration/regression gates for current UnityDataTool JSON and relation-source readability; they do not become a parallel final-relation owner.",
+      "Soldier 4-6": "After A-10 adoption, consume or invoke the shared Relation Layer result rather than independently regenerate a separate final Hero<->Soldier relation.",
+      "Soldier 4-7 and later relation fixtures": "Use A-8 shared fixtures/validation where relation semantics overlap; keep Soldier-only fixtures for non-relation domain checks.",
+      "Soldier 5 usable Heroes": "Consume bySoldierId only for membership; join Hero Master for presentation."
+    }
+  },
+  "legacyArtifactPolicy": {
+    "path": "data/generated/soldier-hero-relations.v1.json",
+    "role": "FROZEN_REGRESSION_REFERENCE",
+    "mayBeReadForRegression": true,
+    "mayBeUsedAsProductionRelationSourceAfterA10": false,
+    "mayBeOverwrittenByRelationLayerV1": false,
+    "retirementRule": "Keep until the new Relation Layer has passed A-10 and any desired migration comparison is complete; deletion/archival is a separate explicit cleanup decision."
+  },
+  "artifactLifecycle": {
+    "states": [
+      "GENERATED_UNVALIDATED",
+      "REVIEW",
+      "PASS_ACCEPTED",
+      "STALE"
+    ],
+    "rules": [
+      "A newly generated Relation Set or index is not production-ready merely because the file exists.",
+      "A-8 PASS for the exact relation-set/index blobs promotes the artifact group to PASS_ACCEPTED.",
+      "Any required input blob or semantic contract change makes previously generated relation artifacts STALE for that new snapshot.",
+      "Hero and Soldier consumers must use one mutually consistent PASS_ACCEPTED artifact group, not mix files from different relation-set SHAs.",
+      "A REVIEW or FAIL group must not silently replace the last accepted group."
+    ]
+  },
+  "changeOwnership": {
+    "gameDataChange": "Relation Layer is regenerated after upstream source/master readiness is established; differences are classified by A-8.",
+    "heroNameOrSoldierNameChange": "Update the relevant Master only; do not regenerate semantic relation edges unless canonical IDs/source evidence changed.",
+    "presentationChange": "Hero/Soldier page layers may change without touching Relation Layer semantics.",
+    "newRelationSourceMeaning": "Version A-3 and all affected downstream contracts before builder adoption.",
+    "identityRuleChange": "Version A-1 or A-2 and affected downstream contracts; never silently remap existing relation IDs.",
+    "compositionRuleChange": "Version A-5 and affected downstream contracts before regenerating production relation data."
+  },
+  "executionOrder": {
+    "currentTransition": [
+      "A-0 through A-9 contracts frozen",
+      "Complete Soldier 4-1 through 4-5 UnityDataTool JSON migration/regression gates",
+      "Run A-10 shared Relation Layer generation from current canonical inputs",
+      "Generate A-7 indexes from the A-10 Relation Set",
+      "Run A-8 validation against the exact generated blobs",
+      "Accept/publish the group only on PASS",
+      "Resume Soldier 4-6+ and Hero 5-3+ as consumers of the shared artifacts"
+    ],
+    "reason": "The shared semantic contract can be frozen before migration completion, but the first current-snapshot Relation Set must not be accepted until the required JSON source adapters/inputs are proven reliable."
+  },
+  "downstreamReadinessGate": {
+    "required": [
+      "A-6 Relation Set exists for the intended current input snapshot",
+      "A-7 by-Hero and by-Soldier indexes reference that exact Relation Set",
+      "A-8 validation status is PASS for those exact blobs"
+    ],
+    "onFailure": "Keep the previous accepted relation group or block relation-dependent page generation; never fall back to an independent page-specific recomputation."
+  },
+  "ownershipInvariant": "There is exactly one semantic Hero-Soldier membership owner: the shared Relation Layer. All other layers are upstream data providers/validators or downstream consumers, never parallel semantic authorities.",
+  "completion": "A-9 is complete when relation computation, validation, publication, migration sequencing, legacy handling and downstream Hero/Soldier consumption all have a single non-overlapping owner boundary, with A-10 defined as the first actual current-snapshot implementation gate."
+}
