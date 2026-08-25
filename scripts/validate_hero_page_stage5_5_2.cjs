@@ -220,13 +220,23 @@ function main() {
   if (unresolvedSkinRefs.length) coverageIssues.push('some HeroInfo.Skins_ID references do not resolve');
   if (specifiedHeroMismatches.length) coverageIssues.push('some resolved skin rows disagree with SpecifiedHero');
 
+  const rarityTrace = sourceTrace?.fields?.rarity || {};
+  const factionsTrace = sourceTrace?.fields?.factions || {};
+  const cvTrace = sourceTrace?.fields?.cv || {};
+
+  const unresolvedSemanticFields = [];
+  if (!String(rarityTrace.status || '').includes('CONFIRMED')) unresolvedSemanticFields.push('rarity');
+  if (!String(factionsTrace.status || '').includes('CONFIRMED')) unresolvedSemanticFields.push('factions');
+  if (!String(cvTrace.status || '').includes('CONFIRMED')) unresolvedSemanticFields.push('cv');
+  unresolvedSemanticFields.push('origin.displayDictionary', 'artwork.displaySemantics', 'skins.orderingSemantics', 'skins.acquisitionSemantics');
+
   const result = {
     version: 1,
     stage: 'hero-page-5-5',
     substage: '5-5-2',
     checkpoint: 'coverage',
     status: hardErrors.length === 0 && coverageIssues.length === 0 ? 'REVIEW' : 'REVIEW_WITH_ISSUES',
-    completion: 'COVERAGE_MEASURED_SEMANTICS_PENDING',
+    completion: 'COVERAGE_MEASURED_SEMANTICS_PARTIAL',
     sourceTraceStatus: sourceTrace.status,
     canonicalHeroCount: heroes.length,
     sourceCounts: {
@@ -242,20 +252,24 @@ function main() {
     },
     fields: {
       rarity: {
-        status: 'UNRESOLVED',
-        observedOnly: {
-          starDistribution: countByInteger(canonicalHeroInfoRows, 'Star'),
-          rankDistribution: countByInteger(canonicalHeroInfoRows, 'Rank'),
-        },
-        rule: 'Observed Star/Rank distributions are not rarity labels.',
+        status: rarityTrace.status || 'UNRESOLVED',
+        acceptedSource: rarityTrace.source || null,
+        rankToRarity: rarityTrace.rankToRarity || null,
+        rankDistribution: countByInteger(canonicalHeroInfoRows, 'Rank'),
+        starDistribution: countByInteger(canonicalHeroInfoRows, 'Star'),
+        validation: rarityTrace.validation || null,
+        rule: rarityTrace.rule || null,
       },
       factions: {
-        status: 'UNRESOLVED',
-        acceptedSource: null,
+        status: factionsTrace.status || 'UNRESOLVED',
+        acceptedSource: factionsTrace.source || null,
+        validation: factionsTrace.validation || null,
       },
       cv: {
-        status: 'UNRESOLVED',
-        acceptedSource: null,
+        status: cvTrace.status || 'UNRESOLVED',
+        acceptedSource: cvTrace.source || null,
+        join: cvTrace.join || null,
+        validation: cvTrace.validation || null,
       },
       origin: {
         status: 'POINTER_CONFIRMED',
@@ -302,9 +316,9 @@ function main() {
     },
     hardErrors,
     coverageIssues,
-    unresolvedSemanticFields: ['rarity', 'factions', 'cv', 'origin.displayDictionary', 'artwork.displaySemantics', 'skins.orderingSemantics', 'skins.acquisitionSemantics'],
+    unresolvedSemanticFields,
     readyForDisplayEnrichment: false,
-    nextAction: 'Resolve authoritative mappings for the unresolved semantic fields; do not synthesize display values from the measured candidates.',
+    nextAction: 'Resolve the remaining unresolved display semantics without reopening confirmed rarity, faction or CV source mappings.',
   };
 
   fs.writeFileSync(PATHS.output, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
@@ -312,6 +326,9 @@ function main() {
   console.log('Hero Stage 5-5-2 coverage');
   console.log(`Canonical Heroes: ${heroes.length}`);
   console.log(`HeroInfo resolved: ${canonicalHeroInfoRows.length}/${heroes.length}`);
+  console.log(`Rarity status: ${result.fields.rarity.status}`);
+  console.log(`Faction status: ${result.fields.factions.status}`);
+  console.log(`CV status: ${result.fields.cv.status}`);
   console.log(`Origin pointers: ${result.fields.origin.heroesWithNonEmptyValidPointers}/${canonicalHeroInfoRows.length}`);
   console.log(`Artwork pointers: ${artworkPointerHeroes}/${canonicalHeroInfoRows.length}`);
   console.log(`Skin refs resolved: ${resolvedSkinRefs}/${totalSkinRefs}`);
