@@ -1,0 +1,47 @@
+name: Soldier Stage 4-2 Master Regression
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/finalize-soldier-stage2.cjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/validate-soldier-stage4-2-master.cjs'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSPSoldierInfo.json'
+      - 'data/configdata/ConfigDataArmyInfo.json'
+      - 'data/metadata/soldier-name-kr-tier3.v1.json'
+      - 'data/contracts/soldier-identity-contract.v1.json'
+      - '.github/workflows/soldier-stage4-2-master.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/finalize-soldier-stage2.cjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/validate-soldier-stage4-2-master.cjs'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSPSoldierInfo.json'
+      - 'data/configdata/ConfigDataArmyInfo.json'
+      - 'data/metadata/soldier-name-kr-tier3.v1.json'
+      - 'data/contracts/soldier-identity-contract.v1.json'
+      - '.github/workflows/soldier-stage4-2-master.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-soldier-master:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Regenerate Soldier Master from direct JSON
+        run: node scripts/finalize-soldier-stage2.cjs
+      - name: Validate Stage 4-2 Soldier Master regression
+        run: node scripts/validate-soldier-stage4-2-master.cjs
+      - name: Upload Stage 4-2 validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage4-2-master
+          path: data/validation/soldier-stage4-2-master.v1.json
