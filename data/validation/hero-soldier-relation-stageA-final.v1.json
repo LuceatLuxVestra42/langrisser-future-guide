@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "stage": "A-FINAL",
+  "status": "PASS_ACCEPTED",
+  "closedAt": "2026-08-25",
+  "purpose": "Final closure checkpoint for Hero-Soldier Relation Layer Stage A after contracts A-0 through A-9, actual current-snapshot relation generation, bidirectional index generation, validation, and Soldier pipeline adoption all completed successfully.",
+  "completion": {
+    "A-0": "COMPLETE",
+    "A-1": "COMPLETE",
+    "A-2": "COMPLETE",
+    "A-3": "COMPLETE",
+    "A-4": "COMPLETE",
+    "A-5": "COMPLETE",
+    "A-6": "COMPLETE",
+    "A-7": "COMPLETE",
+    "A-8": "COMPLETE",
+    "A-9": "COMPLETE",
+    "A-10": "IMPLEMENTED_AND_PASS_ACCEPTED"
+  },
+  "contracts": {
+    "heroIdentity": "data/contracts/hero-identity-contract.v1.json",
+    "soldierIdentity": "data/contracts/soldier-identity-contract.v1.json",
+    "relationSources": "data/contracts/hero-soldier-relation-source-contract.v1.json",
+    "edgeSchema": "data/contracts/hero-soldier-relation-edge-schema.v1.json",
+    "composition": "data/contracts/hero-soldier-relation-composition-contract.v1.json",
+    "relationSet": "data/contracts/hero-soldier-relation-set-contract.v1.json",
+    "indexes": "data/contracts/hero-soldier-relation-index-contract.v1.json",
+    "validation": "data/contracts/hero-soldier-relation-validation-contract.v1.json",
+    "ownership": "data/contracts/hero-soldier-relation-ownership-contract.v1.json"
+  },
+  "acceptedArtifacts": {
+    "relationSet": {
+      "path": "data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+      "schemaId": "hero-soldier-relation-set/v1"
+    },
+    "byHero": {
+      "path": "data/generated/hero-soldier-by-hero.v1.json",
+      "gitBlobSha": "e613bd05b0e7173734834cba5d8cfbff973298ad",
+      "schemaId": "hero-soldier-by-hero/v1"
+    },
+    "bySoldier": {
+      "path": "data/generated/hero-soldier-by-soldier.v1.json",
+      "gitBlobSha": "ff9d8a881c03b6e0f2a196e12f37cd2e28e3e251",
+      "schemaId": "hero-soldier-by-soldier/v1"
+    },
+    "validation": {
+      "path": "data/validation/hero-soldier-relation-validation.v1.json",
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638",
+      "schemaId": "hero-soldier-relation-validation/v1",
+      "status": "PASS"
+    },
+    "soldierStage4Baseline": {
+      "path": "data/validation/soldier-stage4-8-baseline.v1.json",
+      "gitBlobSha": "36155be6bc57717cb0ac62c78d54d6a1dcc500ad",
+      "status": "PASS"
+    }
+  },
+  "acceptedCounts": {
+    "heroCount": 267,
+    "soldierCount": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "relationEdges": 5977,
+    "byHeroKeys": 267,
+    "bySoldierKeys": 224,
+    "fixturePass": 5,
+    "fixtureFail": 0
+  },
+  "validationSummary": {
+    "goldenComparison": "MATCH",
+    "legacyPairCount": 5977,
+    "currentPairCount": 5977,
+    "unknownHeroIds": 0,
+    "unknownSoldierIds": 0,
+    "duplicateCanonicalPairs": 0,
+    "edgesWithoutProvenance": 0,
+    "invalidSourceKinds": 0,
+    "invalidInheritedProvenance": 0,
+    "sourceCompletenessMissing": 0,
+    "sourceCompletenessExtra": 0,
+    "byHeroPairMismatch": 0,
+    "bySoldierPairMismatch": 0,
+    "crossIndexPairMismatch": 0,
+    "errors": 0,
+    "reviews": 0
+  },
+  "ownership": {
+    "semanticOwner": "Hero-Soldier Relation Layer",
+    "heroPipeline": "CONSUMER_ONLY",
+    "soldierPipeline": "CONSUMER_ONLY_FOR_MEMBERSHIP",
+    "heroMembershipSource": "data/generated/hero-soldier-by-hero.v1.json#byHeroId",
+    "soldierMembershipSource": "data/generated/hero-soldier-by-soldier.v1.json#bySoldierId",
+    "canonicalSemanticSource": "data/generated/hero-soldier-relations.v1.json#edges",
+    "legacyRelationPath": "data/generated/soldier-hero-relations.v1.json",
+    "legacyRelationRole": "REGRESSION_ONLY"
+  },
+  "downstreamRules": [
+    "Hero 5-3 and later Hero usable-Soldier work must consume byHeroId for membership and join Soldier Master only for presentation metadata.",
+    "Soldier 5 and later Soldier usable-Hero work must consume bySoldierId for membership and join Hero Master only for presentation metadata.",
+    "Hero and Soldier page pipelines must not independently recompute Hero-Soldier membership from ConfigData.",
+    "If a derived index disagrees with canonical edges, regenerate the index; do not patch canonical membership from a page pipeline.",
+    "Any future semantic relation-source, identity, composition, or inheritance rule change requires versioning the relevant A-stage contract before changing production builder behavior."
+  ],
+  "closureDecision": {
+    "stageAClosed": true,
+    "additionalStageAAnalysisRequired": false,
+    "additionalA10RunRequired": false,
+    "reason": "The current UnityDataTool snapshot has already regenerated the canonical relation set and both indexes, passed A-8 validation with zero errors/reviews, matched the frozen 5,977-pair Golden Baseline, passed all five representative fixtures, and was adopted by the Soldier pipeline as the sole membership source."
+  },
+  "resumePoint": "Stage A is closed. Future work should continue from downstream Hero/Soldier consumer stages unless a new game-data snapshot or semantic contract change makes the accepted Relation Layer stale."
+}
