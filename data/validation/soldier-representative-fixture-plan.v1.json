@@ -1,8 +1,12 @@
 {
   "version": 1,
-  "stage": "soldier-page-4-8-1",
+  "stage": "soldier-representative-fixtures",
   "status": "PASS",
-  "purpose": "Fix the representative soldier fixtures and assign non-overlapping validation roles before 4-8-2 source-relation tracing.",
+  "purpose": "Freeze five representative Soldier fixtures for Soldier-domain regression and shared Hero-Soldier relation validation without coupling the fixture plan to a temporary stage number.",
+  "usedBy": [
+    "soldier-page-4-7",
+    "hero-soldier-relation-A-8"
+  ],
   "fixtures": [
     {
       "soldierId": 105,
@@ -100,7 +104,6 @@
     "keepExistingFive": true,
     "addFixture": false,
     "replaceFixture": false,
-    "reason": "The five fixtures already cover five distinct army types and all three structural branches needed for stage 4 integration: normal-only, one-stage SP, and two-stage SP. Additional fixtures would mostly duplicate structural coverage at 4-8-1. Exact ConfigData joins and mission types remain for 4-8-2 verification."
-  },
-  "nextStage": "4-8-2 ConfigData source-relation tracing"
+    "reason": "The five fixtures cover five distinct army types and all three structural branches needed for representative Soldier validation: normal-only, one-stage SP, and two-stage SP. Additional fixtures would mostly duplicate structural coverage."
+  }
 }
