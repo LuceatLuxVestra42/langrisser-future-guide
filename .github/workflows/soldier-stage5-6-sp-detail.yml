@@ -1,0 +1,74 @@
+name: Soldier Stage 5-6 SP Detail
+
+on:
+  push:
+    branches:
+      - main
+      - 'work/**'
+    paths:
+      - 'scripts/finalize-soldier-stage5-6-sp-detail.cjs'
+      - 'data/contracts/soldier-detail-stage5-1-contract.v1.json'
+      - 'data/generated/soldier-detail-stage5-5.v1.json'
+      - 'data/validation/soldier-stage5-5-heroes.v1.json'
+      - 'data/generated/soldier-stage3.v1.json'
+      - 'data/validation/soldier-stage3-final.v1.json'
+      - 'data/generated/soldier-detail-stage5-6.v1.json'
+      - 'data/validation/soldier-stage5-6-sp-detail.v1.json'
+      - '.github/workflows/soldier-stage5-6-sp-detail.yml'
+  pull_request:
+    paths:
+      - 'scripts/finalize-soldier-stage5-6-sp-detail.cjs'
+      - 'data/contracts/soldier-detail-stage5-1-contract.v1.json'
+      - 'data/generated/soldier-detail-stage5-5.v1.json'
+      - 'data/validation/soldier-stage5-5-heroes.v1.json'
+      - 'data/generated/soldier-stage3.v1.json'
+      - 'data/validation/soldier-stage3-final.v1.json'
+      - 'data/generated/soldier-detail-stage5-6.v1.json'
+      - 'data/validation/soldier-stage5-6-sp-detail.v1.json'
+      - '.github/workflows/soldier-stage5-6-sp-detail.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate and validate Soldier Stage 5-6 SP detail
+        run: node scripts/finalize-soldier-stage5-6-sp-detail.cjs
+
+      - name: Upload Stage 5-6 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage5-6-sp-detail
+          path: |
+            data/generated/soldier-detail-stage5-6.v1.json
+            data/validation/soldier-stage5-6-sp-detail.v1.json
+
+      - name: Freeze generated artifacts on work branch
+        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            data/generated/soldier-detail-stage5-6.v1.json \
+            data/validation/soldier-stage5-6-sp-detail.v1.json
+          if git diff --cached --quiet; then
+            echo "Soldier Stage 5-6 artifacts already frozen."
+          else
+            git commit -m "freeze Soldier stage 5-6 SP detail PASS"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+      - name: Verify frozen artifacts on main or PR
+        if: github.event_name != 'push' || github.ref == 'refs/heads/main'
+        run: git diff --exit-code -- data/generated/soldier-detail-stage5-6.v1.json data/validation/soldier-stage5-6-sp-detail.v1.json
