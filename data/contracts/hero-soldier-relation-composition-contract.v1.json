@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "stage": "A-5",
+  "status": "FROZEN",
+  "purpose": "Deterministic composition rules for converting allowed Hero-Soldier relation sources into the final canonical edge set.",
+  "dependsOn": {
+    "heroIdentity": "data/contracts/hero-identity-contract.v1.json",
+    "soldierIdentity": "data/contracts/soldier-identity-contract.v1.json",
+    "sourceKinds": "data/contracts/hero-soldier-relation-source-contract.v1.json",
+    "edgeSchema": "data/contracts/hero-soldier-relation-edge-schema.v1.json",
+    "goldenBaseline": "data/validation/hero-soldier-relation-golden-baseline.v1.json"
+  },
+  "semanticPrinciple": {
+    "finalRelation": "Set union of canonical (heroId, soldierId) pairs with provenance merged per pair.",
+    "notArithmeticAddition": true,
+    "rule": "Source production counts may overlap. The same pair produced by multiple allowed paths remains one canonical edge with multiple provenance entries."
+  },
+  "compositionPhases": [
+    {
+      "phase": 1,
+      "name": "DIRECT_BASE",
+      "sourceKind": "BASE_SOLDIER_HERO",
+      "rule": "For each normal Soldier record, create one direct candidate edge for every Hero ID explicitly present in GetSoldierHeros_ID.",
+      "edge": "(heroId from GetSoldierHeros_ID, soldierId = owning normal Soldier ID)",
+      "inheritanceEligible": true
+    },
+    {
+      "phase": 2,
+      "name": "DIRECT_SP_HERO_REWARD",
+      "sourceKind": "SP_HERO_REWARD",
+      "rule": "For each SP Hero record, create one direct candidate edge from SPHeroInfo.ID to each Soldier ID explicitly listed in SecondStageRewardSoldiers.",
+      "edge": "(heroId = SPHeroInfo.ID, soldierId = listed Soldier ID)",
+      "exactTargetRule": "The listed Soldier ID is used exactly as written. If it identifies a normal Soldier, the direct edge belongs to that normal form. If it identifies an SP Soldier, the direct edge belongs to that SP form.",
+      "inheritanceEligibleWhenTargetIsNormal": true
+    },
+    {
+      "phase": 3,
+      "name": "DIRECT_SP_SOLDIER_EXPAND",
+      "sourceKind": "SP_SOLDIER_EXPAND",
+      "rule": "For each SP Soldier record, create one direct candidate edge from that SP Soldier to every Hero ID explicitly listed in SecondStageExpandHeroList.",
+      "edge": "(heroId from SecondStageExpandHeroList, soldierId = SPSoldierInfo.ID)",
+      "additiveOnly": true,
+      "inheritanceEligible": false
+    },
+    {
+      "phase": 4,
+      "name": "DERIVE_SP_INHERITANCE",
+      "sourceKind": "SP_SOLDIER_INHERIT",
+      "rule": "For each explicit SP_FORM_LINK, inspect the linked normal Soldier's canonical edge provenance. For each eligible DIRECT parent provenance of kind BASE_SOLDIER_HERO or SP_HERO_REWARD, create the same Hero relation on the linked SP Soldier as a DERIVED candidate edge.",
+      "edge": "(heroId = parent edge heroId, soldierId = linked SP Soldier ID)",
+      "parentKinds": [
+        "BASE_SOLDIER_HERO",
+        "SP_HERO_REWARD"
+      ],
+      "supportRequired": "SP_FORM_LINK",
+      "recursiveInheritanceForbidden": true,
+      "ruleDetails": [
+        "Do not inherit SP_SOLDIER_INHERIT provenance again.",
+        "Do not inherit SP_SOLDIER_EXPAND from SP to normal or to another form.",
+        "Do not create inheritance when the Normal <-> SP link is missing.",
+        "Each eligible parent provenance produces its own derived provenance entry so the original direct origin remains traceable."
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "CANONICAL_UNION",
+      "rule": "Merge all direct and derived candidate edges by exact (heroId, soldierId). Keep one canonical edge per pair and merge all distinct provenance entries according to the A-4 schema.",
+      "dedupeKey": [
+        "heroId",
+        "soldierId"
+      ],
+      "provenanceDeduplication": "Structural equality of the full provenance entry.",
+      "orderIndependent": true
+    },
+    {
+      "phase": 6,
+      "name": "FINAL_VALIDATION_AND_SERIALIZATION",
+      "rule": "Validate every canonical edge and provenance entry against A-1 through A-4, then serialize deterministically using the A-4 ordering rules.",
+      "mustNotCreateNewSemanticEdges": true
+    }
+  ],
+  "normalSoldierFormula": {
+    "conceptual": "final(normal) = BASE_SOLDIER_HERO UNION direct SP_HERO_REWARD targeting that normal Soldier",
+    "provenance": "Preserve each direct source independently when both produce the same pair.",
+    "forbidden": [
+      "SP_SOLDIER_EXPAND on an SP form flowing backward to the normal form",
+      "relations inferred from the linked SP form",
+      "name or numeric-pattern inferred additions"
+    ]
+  },
+  "spSoldierFormula": {
+    "conceptual": "final(SP) = inherited eligible normal relations UNION direct SP_HERO_REWARD targeting the SP Soldier UNION SP_SOLDIER_EXPAND",
+    "inheritedEligibleNormalRelations": "Normal-form BASE_SOLDIER_HERO and normal-form SP_HERO_REWARD provenance only, through explicit SP_FORM_LINK.",
+    "directTargetPreservation": "An SP_HERO_REWARD that directly lists the SP Soldier remains DIRECT on the SP edge and is not rewritten as inheritance.",
+    "forbidden": [
+      "Treating SecondStageExpandHeroList as the complete Hero list",
+      "Propagating SP_SOLDIER_EXPAND back to the normal Soldier",
+      "Recursive SP inheritance",
+      "Creating an SP edge from numeric ID offset assumptions"
+    ]
+  },
+  "directionRules": {
+    "canonicalStorageDirection": "Direction-neutral pair (heroId, soldierId).",
+    "sourceNativeDirections": "May be Hero -> Soldier or Soldier -> Hero, but are normalized to the same canonical pair.",
+    "reverseIndexRule": "Hero -> Soldier and Soldier -> Hero indexes are derived only after the final canonical union. Neither index is an independent semantic source.",
+    "reverseInferenceForbidden": true
+  },
+  "conflictRules": [
+    "Allowed sources do not override one another; they accumulate provenance on the same canonical pair.",
+    "Absence from one source does not negate a relation produced by another allowed source.",
+    "No source has deletion precedence in v1; this contract models positive relation evidence only.",
+    "If a source references a Hero or Soldier absent from the relevant canonical master, fail validation rather than dropping or remapping it.",
+    "If an SP inheritance candidate lacks a valid SP_FORM_LINK, fail/review according to validation policy rather than inferring the link."
+  ],
+  "baselineEvidence": {
+    "sourceProductionCounts": {
+      "baseEdges": 5720,
+      "directSpHeroAddedEdges": 25,
+      "inheritedSpHeroAddedEdges": 5,
+      "spExpandedEdges": 228,
+      "rawCountSum": 5978
+    },
+    "finalUniqueEdges": 5977,
+    "interpretation": "The frozen 3-12 baseline is consistent with overlapping source production and therefore confirms that finalEdges must be computed as a set union rather than by summing source counts.",
+    "hardInvariantForFutureSnapshots": false,
+    "reason": "Future client data may legitimately change both source counts and overlap patterns."
+  },
+  "builderRequirements": [
+    "A builder must normalize every allowed source to candidate canonical pairs before final union.",
+    "A builder must retain provenance before and after deduplication.",
+    "A builder must perform SP inheritance only from eligible direct provenance on the explicitly linked normal form.",
+    "A builder must produce the same semantic edge set regardless of source iteration order.",
+    "A builder must not use Hero -> Soldier or Soldier -> Hero output indexes as input evidence for additional relations.",
+    "A builder must not mutate the frozen stage-3 relation output during A-5; this contract defines the target behavior for the later shared Relation Layer implementation."
+  ],
+  "completion": "A-5 is complete when the final Hero-Soldier relation is formally defined as an order-independent canonical set union of allowed direct and derived candidates, with Normal/SP inheritance direction and provenance-preserving deduplication fixed by contract."
+}
