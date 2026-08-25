@@ -104,9 +104,13 @@
     "artwork": {
       "status": "POINTER_CONFIRMED",
       "source": "ConfigDataHeroInfo.CharImage_ID",
+      "join": null,
+      "heroDetailArtworkField": null,
       "heroesWithValidPointer": 267,
       "missingOrInvalidHeroIds": [],
-      "displaySemantics": "UNRESOLVED"
+      "displaySemantics": "SOURCE_CONFIRMED",
+      "validation": null,
+      "rule": "CharImage_ID is confirmed as a join pointer into ConfigDataCharImageInfo for CV, but final Hero-detail portrait/artwork field selection remains a separate semantic question."
     },
     "skins": {
       "status": "SOURCE_JOIN_CONFIRMED",
@@ -371,6 +375,7 @@
         9927802
       ],
       "charImageSkinResourceMissingSkinIds": [],
+      "artworkSemantics": "UNRESOLVED",
       "orderingSemantics": "UNRESOLVED",
       "acquisitionSemantics": "UNRESOLVED"
     }
@@ -378,10 +383,10 @@
   "hardErrors": [],
   "coverageIssues": [],
   "unresolvedSemanticFields": [
-    "artwork.displaySemantics",
+    "skins.artworkSemantics",
     "skins.orderingSemantics",
     "skins.acquisitionSemantics"
   ],
   "readyForDisplayEnrichment": false,
-  "nextAction": "Resolve final artwork display semantics and skin ordering/acquisition semantics without reopening confirmed rarity, faction, CV or origin mappings."
+  "nextAction": "Resolve skin artwork, ordering and acquisition semantics without reopening confirmed rarity, faction, CV, origin or base Hero artwork mappings."
 }
