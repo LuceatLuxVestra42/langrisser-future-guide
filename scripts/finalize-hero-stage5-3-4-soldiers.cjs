@@ -74,12 +74,12 @@ function projectSoldier(record) {
 }
 
 function main() {
-  const generatedAt = new Date().toISOString();
   const contract = loadJson(paths.contract);
   const heroMaster = loadJson(paths.heroMaster);
   const byHero = loadJson(paths.byHero);
   const soldierMaster = loadJson(paths.soldierMaster);
   const relationValidation = loadJson(paths.relationValidation);
+  const generatedAt = byHero.generatedAt ?? relationValidation.generatedAt ?? null;
 
   const heroRecords = Array.isArray(heroMaster.records) ? heroMaster.records : [];
   const soldierRecords = Array.isArray(soldierMaster.records) ? soldierMaster.records : [];
