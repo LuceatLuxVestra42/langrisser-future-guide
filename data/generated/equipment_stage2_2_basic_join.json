@@ -4,808 +4,244 @@
     "item": "data/configdata/ConfigDataItemInfo.json"
   },
   "canonicalRule": "Rank=4 and normalized EquipmentType 0..3 with matching Label",
+  "decision": {
+    "basicMetadataMaster": "ConfigDataEquipmentInfo.ID",
+    "basicMetadataRequiresItemInfoJoin": false,
+    "itemInfoDirectIdJoinAccepted": false,
+    "reason": "Canonical SSR equipment has complete ID/Name/Icon/Rank/slot metadata directly in ConfigDataEquipmentInfo, while ConfigDataItemInfo.ID does not cover the canonical Equipment IDs. FuncTypeParam1 is a non-unique reference relation and is not a basic-metadata primary-key join."
+  },
   "counts": {
     "equipmentRecords": 548,
     "itemRecords": 2250,
-    "canonicalSsrEquipment": 390
+    "canonicalSsrEquipment": 390,
+    "directBasicComplete": 390
   },
   "directEquipmentFields": {
-    "nameCandidates": [
-      {
-        "field": "Name",
-        "count": 390
-      }
-    ],
-    "iconCandidates": [
-      {
-        "field": "Icon",
-        "count": 390
-      }
-    ],
-    "rankCoverage": 390,
-    "equipmentTypeCoverage": 293,
-    "labelCoverage": 390
-  },
-  "itemJoin": {
-    "candidates": [
-      {
-        "field": "FuncTypeParam1",
-        "matchedCanonicalIds": 368,
-        "matchedRows": 1018
-      },
-      {
-        "field": "UISortIndex",
-        "matchedCanonicalIds": 15,
-        "matchedRows": 935
-      },
-      {
-        "field": "ID",
-        "matchedCanonicalIds": 11,
-        "matchedRows": 11
-      },
-      {
-        "field": "FuncType",
-        "matchedCanonicalIds": 8,
-        "matchedRows": 1256
-      },
-      {
-        "field": "FuncTypeParam4",
-        "matchedCanonicalIds": 5,
-        "matchedRows": 5
-      },
-      {
-        "field": "FuncTypeParam2",
-        "matchedCanonicalIds": 3,
-        "matchedRows": 9
-      },
-      {
-        "field": "DisplayType",
-        "matchedCanonicalIds": 2,
-        "matchedRows": 7
-      },
-      {
-        "field": "SellGold",
-        "matchedCanonicalIds": 1,
-        "matchedRows": 1912
-      }
-    ],
-    "selectedCandidate": {
-      "field": "FuncTypeParam1",
-      "matchedCanonicalIds": 368,
-      "matchedRows": 1018
-    },
-    "joinedExactlyOnce": 22,
-    "missing": 22,
-    "duplicate": 346,
-    "missingIds": [
-      190,
-      195,
-      196,
-      197,
-      198,
-      2001,
-      2002,
-      2003,
-      2004,
-      2005,
-      2006,
-      2007,
-      2008,
-      2009,
-      2010,
-      2011,
-      2012,
-      2013,
+    "ID": 390,
+    "Name": 390,
+    "Icon": 390,
+    "Rank": 390,
+    "Label": 390,
+    "EquipmentTypeExplicit": 293,
+    "EquipmentTypeMissingButNormalizedToWeapon": 97,
+    "EquipmentTypeMissingIds": [
+      6,
+      7,
+      8,
+      13,
+      14,
+      15,
+      22,
+      23,
+      24,
+      30,
+      31,
+      32,
+      38,
+      39,
+      40,
+      46,
+      47,
+      48,
+      52,
+      53,
+      137,
+      140,
+      144,
+      147,
+      150,
+      153,
+      157,
+      158,
+      209,
+      210,
+      212,
+      213,
+      214,
+      265,
+      266,
+      267,
+      272,
+      273,
+      281,
+      282,
+      283,
+      284,
+      288,
+      299,
+      404,
+      406,
+      408,
+      422,
+      424,
+      432,
+      440,
+      444,
+      448,
+      449,
+      453,
+      455,
+      456,
+      460,
+      466,
+      468,
+      478,
+      479,
+      483,
+      485,
+      486,
+      487,
+      491,
+      498,
+      506,
+      512,
+      513,
+      515,
+      527,
+      541,
+      553,
+      558,
+      563,
+      567,
+      573,
+      574,
+      583,
+      588,
+      591,
+      597,
+      602,
+      610,
+      613,
+      615,
+      622,
+      623,
+      628,
+      630,
+      635,
+      638,
+      639,
       2014,
-      2015,
-      2016,
-      2017
-    ],
-    "duplicateIds": [
-      {
-        "id": 6,
-        "count": 3
-      },
-      {
-        "id": 7,
-        "count": 3
-      },
-      {
-        "id": 8,
-        "count": 4
-      },
-      {
-        "id": 13,
-        "count": 2
-      },
-      {
-        "id": 14,
-        "count": 3
-      },
-      {
-        "id": 15,
-        "count": 2
-      },
-      {
-        "id": 22,
-        "count": 2
-      },
-      {
-        "id": 23,
-        "count": 2
-      },
-      {
-        "id": 24,
-        "count": 2
-      },
-      {
-        "id": 30,
-        "count": 243
-      },
-      {
-        "id": 31,
-        "count": 2
-      },
-      {
-        "id": 32,
-        "count": 2
-      },
-      {
-        "id": 38,
-        "count": 2
-      },
-      {
-        "id": 39,
-        "count": 3
-      },
-      {
-        "id": 40,
-        "count": 2
-      },
-      {
-        "id": 46,
-        "count": 12
-      },
-      {
-        "id": 47,
-        "count": 2
-      },
-      {
-        "id": 48,
-        "count": 2
-      },
-      {
-        "id": 52,
-        "count": 2
-      },
-      {
-        "id": 53,
-        "count": 2
-      },
-      {
-        "id": 59,
-        "count": 2
-      },
-      {
-        "id": 60,
-        "count": 2
-      },
-      {
-        "id": 66,
-        "count": 2
-      },
-      {
-        "id": 67,
-        "count": 2
-      },
-      {
-        "id": 73,
-        "count": 2
-      },
-      {
-        "id": 74,
-        "count": 2
-      },
-      {
-        "id": 80,
-        "count": 2
-      },
-      {
-        "id": 81,
-        "count": 2
-      },
-      {
-        "id": 87,
-        "count": 2
-      },
-      {
-        "id": 88,
-        "count": 2
-      },
-      {
-        "id": 94,
-        "count": 2
-      },
-      {
-        "id": 95,
-        "count": 2
-      },
-      {
-        "id": 99,
-        "count": 2
-      },
-      {
-        "id": 100,
-        "count": 4
-      },
-      {
-        "id": 106,
-        "count": 3
-      },
-      {
-        "id": 107,
-        "count": 3
-      },
-      {
-        "id": 108,
-        "count": 3
-      },
-      {
-        "id": 114,
-        "count": 3
-      },
-      {
-        "id": 115,
-        "count": 3
-      },
-      {
-        "id": 116,
-        "count": 3
-      },
-      {
-        "id": 120,
-        "count": 3
-      },
-      {
-        "id": 121,
-        "count": 3
-      },
-      {
-        "id": 122,
-        "count": 3
-      },
-      {
-        "id": 126,
-        "count": 3
-      },
-      {
-        "id": 127,
-        "count": 3
-      },
-      {
-        "id": 128,
-        "count": 3
-      },
-      {
-        "id": 132,
-        "count": 3
-      },
-      {
-        "id": 133,
-        "count": 3
-      },
-      {
-        "id": 134,
-        "count": 3
-      },
-      {
-        "id": 137,
-        "count": 3
-      },
-      {
-        "id": 140,
-        "count": 3
-      },
-      {
-        "id": 144,
-        "count": 3
-      },
-      {
-        "id": 147,
-        "count": 3
-      },
-      {
-        "id": 150,
-        "count": 3
-      },
-      {
-        "id": 153,
-        "count": 3
-      },
-      {
-        "id": 157,
-        "count": 3
-      },
-      {
-        "id": 158,
-        "count": 3
-      },
-      {
-        "id": 163,
-        "count": 3
-      },
-      {
-        "id": 164,
-        "count": 3
-      },
-      {
-        "id": 165,
-        "count": 3
-      },
-      {
-        "id": 166,
-        "count": 3
-      },
-      {
-        "id": 171,
-        "count": 2
-      },
-      {
-        "id": 172,
-        "count": 2
-      },
-      {
-        "id": 173,
-        "count": 7
-      },
-      {
-        "id": 174,
-        "count": 2
-      },
-      {
-        "id": 203,
-        "count": 2
-      },
-      {
-        "id": 204,
-        "count": 2
-      },
-      {
-        "id": 205,
-        "count": 2
-      },
-      {
-        "id": 206,
-        "count": 2
-      },
-      {
-        "id": 209,
-        "count": 2
-      },
-      {
-        "id": 210,
-        "count": 2
-      },
-      {
-        "id": 212,
-        "count": 2
-      },
-      {
-        "id": 213,
-        "count": 2
-      },
-      {
-        "id": 214,
-        "count": 2
-      },
-      {
-        "id": 256,
-        "count": 2
-      },
-      {
-        "id": 257,
-        "count": 2
-      },
-      {
-        "id": 258,
-        "count": 3
-      },
-      {
-        "id": 260,
-        "count": 2
-      },
-      {
-        "id": 261,
-        "count": 2
-      },
-      {
-        "id": 262,
-        "count": 2
-      },
-      {
-        "id": 263,
-        "count": 2
-      },
-      {
-        "id": 264,
-        "count": 2
-      },
-      {
-        "id": 265,
-        "count": 2
-      },
-      {
-        "id": 266,
-        "count": 2
-      },
-      {
-        "id": 267,
-        "count": 2
-      },
-      {
-        "id": 268,
-        "count": 2
-      },
-      {
-        "id": 269,
-        "count": 2
-      },
-      {
-        "id": 270,
-        "count": 2
-      },
-      {
-        "id": 271,
-        "count": 2
-      },
-      {
-        "id": 272,
-        "count": 2
-      },
-      {
-        "id": 273,
-        "count": 2
-      },
-      {
-        "id": 274,
-        "count": 2
-      },
-      {
-        "id": 275,
-        "count": 2
-      },
-      {
-        "id": 276,
-        "count": 2
-      },
-      {
-        "id": 277,
-        "count": 2
-      },
-      {
-        "id": 278,
-        "count": 2
-      },
-      {
-        "id": 279,
-        "count": 2
-      },
-      {
-        "id": 280,
-        "count": 2
-      },
-      {
-        "id": 281,
-        "count": 3
-      },
-      {
-        "id": 282,
-        "count": 3
-      }
+      2016
     ]
   },
-  "fieldAgreementOnJoinedRows": {
-    "equipmentNamePresent": 22,
-    "itemNamePresent": 22,
-    "bothNamePresent": 22,
-    "sameName": 0,
-    "equipmentIconPresent": 22,
-    "itemIconPresent": 22,
-    "bothIconPresent": 22,
-    "sameIcon": 0
-  },
-  "schemaCoverage": {
-    "equipment": {
-      "BornStarLevel": 390,
-      "Desc": 390,
-      "EnchantTemplateIds": 390,
-      "Exp": 390,
-      "GetPathDesc": 390,
-      "Icon": 390,
-      "ID": 390,
-      "Label": 390,
-      "Name": 390,
-      "Property1_ID": 390,
-      "Property1_LevelUpValue": 390,
-      "Property1_Value": 390,
-      "Rank": 390,
-      "SkillIds": 390,
-      "SkillLevels": 390,
-      "SortIndex": 390,
-      "Property2_ID": 389,
-      "Property2_LevelUpValue": 389,
-      "Property2_Value": 389,
-      "AlchemyReward": 373,
-      "DisplayRewardCount": 373,
-      "GetPathList": 373,
-      "LevelUpGoods1": 373,
-      "LevelUpGoods2": 373,
-      "LevelUpGoods3": 373,
-      "LevelUpGoods4": 373,
-      "LevelUpGoods5": 373,
-      "RandomDropRewardID": 373,
-      "ArchiveDisplay": 365,
-      "ArmyIds": 321,
-      "JobIds": 320,
-      "EquipmentType": 293,
-      "SkillHero": 167,
-      "IgnoreCost": 4,
-      "EquipCoditionDesc": 3
+  "itemInfoRelations": {
+    "directId": {
+      "matchedCanonicalIds": 11,
+      "matchedRows": 11,
+      "coverageOfCanonical": 0.028205128205128206,
+      "acceptedAsCanonicalJoin": false
     },
-    "item": {
-      "Icon": 2250,
-      "ID": 2250,
-      "Name": 2250,
-      "Rank": 2248,
-      "GetPathDesc": 2220,
-      "DisplayType": 2216,
-      "SellGold": 2202,
-      "FuncTypeParam1": 1872,
-      "FuncType": 1867,
-      "Desc": 1549,
-      "UISortIndex": 981,
-      "GetPathList": 530,
-      "FuncTypeParam2": 331,
-      "AlchemyReward": 265,
-      "DisplayRewardCount": 264,
-      "RandomDropRewardID": 242,
-      "FuncTypeParam3": 108,
-      "FuncTypeParam4": 33,
-      "QuickStoreGoodsID": 16
+    "funcTypeParam1Reference": {
+      "referencedCanonicalIds": 368,
+      "referenceRows": 1018,
+      "missingCanonicalIds": 22,
+      "missingIds": [
+        190,
+        195,
+        196,
+        197,
+        198,
+        2001,
+        2002,
+        2003,
+        2004,
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017
+      ],
+      "oneReferenceRowIds": 22,
+      "multipleReferenceRowIds": 346,
+      "sameNameRows": 0,
+      "sameIconRows": 0,
+      "sameNameAndIconRows": 0,
+      "idsWithSameNameAndIcon": 0,
+      "sameNameAndIconFuncTypeCounts": {},
+      "acceptedAsBasicMetadataJoin": false,
+      "note": "Reference field exists, but cardinality is not 1:1 and is not required for Stage 2-2 basic metadata."
     }
   },
   "samples": [
     {
-      "id": 179,
-      "equipment": {
-        "name": {
-          "field": "Name",
-          "value": "女神法衣"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Equip_ABS/Equip_Clothes12.png"
-        },
-        "rank": 4,
-        "rawEquipmentType": 1,
-        "normalizedSlot": 1,
-        "label": 10
-      },
-      "item": {
-        "joinField": "FuncTypeParam1",
-        "name": {
-          "field": "Name",
-          "value": "基建补给箱"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Item04_ABS/Package_RmbPack77.png"
-        },
-        "funcType": 8
-      }
+      "id": 6,
+      "name": "夜鹰",
+      "icon": "UI/Icon/Equip_ABS/Equip_Dagger6.png",
+      "rank": 4,
+      "rawEquipmentType": null,
+      "normalizedSlot": 0,
+      "label": 4
     },
     {
-      "id": 180,
-      "equipment": {
-        "name": {
-          "field": "Name",
-          "value": "群星斗篷"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Equip_ABS/Equip_Clothes13.png"
-        },
-        "rank": 4,
-        "rawEquipmentType": 1,
-        "normalizedSlot": 1,
-        "label": 10
-      },
-      "item": {
-        "joinField": "FuncTypeParam1",
-        "name": {
-          "field": "Name",
-          "value": "秋日邂逅之愿"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Item_ABS/Package_Newyear3.png"
-        },
-        "funcType": 8
-      }
+      "id": 7,
+      "name": "莎拉维尔",
+      "icon": "UI/Icon/Equip_ABS/Equip_Dagger7.png",
+      "rank": 4,
+      "rawEquipmentType": null,
+      "normalizedSlot": 0,
+      "label": 4
     },
     {
-      "id": 181,
-      "equipment": {
-        "name": {
-          "field": "Name",
-          "value": "死神之衣"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Equip_ABS/Equip_Clothes14.png"
-        },
-        "rank": 4,
-        "rawEquipmentType": 1,
-        "normalizedSlot": 1,
-        "label": 10
-      },
-      "item": {
-        "joinField": "FuncTypeParam1",
-        "name": {
-          "field": "Name",
-          "value": "附魔专精大礼"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Item04_ABS/Package_RmbPack61.png"
-        },
-        "funcType": 8
-      }
+      "id": 8,
+      "name": "风斩",
+      "icon": "UI/Icon/Equip_ABS/Equip_Dagger8.png",
+      "rank": 4,
+      "rawEquipmentType": null,
+      "normalizedSlot": 0,
+      "label": 4
     },
     {
-      "id": 182,
-      "equipment": {
-        "name": {
-          "field": "Name",
-          "value": "巴德尔的白袍"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Equip_ABS/Equip_Clothes15.png"
-        },
-        "rank": 4,
-        "rawEquipmentType": 1,
-        "normalizedSlot": 1,
-        "label": 10
-      },
-      "item": {
-        "joinField": "FuncTypeParam1",
-        "name": {
-          "field": "Name",
-          "value": "异邦风云之章"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Item04_ABS/Package_RmbPack75.png"
-        },
-        "funcType": 8
-      }
+      "id": 13,
+      "name": "冰霜之刃",
+      "icon": "UI/Icon/Equip_ABS/Equip_Sword5.png",
+      "rank": 4,
+      "rawEquipmentType": null,
+      "normalizedSlot": 0,
+      "label": 3
     },
     {
-      "id": 187,
-      "equipment": {
-        "name": {
-          "field": "Name",
-          "value": "领袖之盔"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Equip_ABS/Equip_MetalHelmet12.png"
-        },
-        "rank": 4,
-        "rawEquipmentType": 2,
-        "normalizedSlot": 2,
-        "label": 11
-      },
-      "item": {
-        "joinField": "FuncTypeParam1",
-        "name": {
-          "field": "Name",
-          "value": "庆典狂欢套餐"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Item_ABS/Package_Login4.png"
-        },
-        "funcType": 8
-      }
+      "id": 14,
+      "name": "屠龙剑格拉姆",
+      "icon": "UI/Icon/Equip_ABS/Equip_Sword6.png",
+      "rank": 4,
+      "rawEquipmentType": null,
+      "normalizedSlot": 0,
+      "label": 3
     },
     {
-      "id": 188,
-      "equipment": {
-        "name": {
-          "field": "Name",
-          "value": "吸血鬼假面"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Equip_ABS/Equip_MetalHelmet13.png"
-        },
-        "rank": 4,
-        "rawEquipmentType": 2,
-        "normalizedSlot": 2,
-        "label": 11
-      },
-      "item": {
-        "joinField": "FuncTypeParam1",
-        "name": {
-          "field": "Name",
-          "value": "冰雪铸匠之礼"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Item_ABS/Package_RmbPack12.png"
-        },
-        "funcType": 8
-      }
+      "id": 15,
+      "name": "嗜血剑赫伦汀",
+      "icon": "UI/Icon/Equip_ABS/Equip_Sword7.png",
+      "rank": 4,
+      "rawEquipmentType": null,
+      "normalizedSlot": 0,
+      "label": 3
     },
     {
-      "id": 189,
-      "equipment": {
-        "name": {
-          "field": "Name",
-          "value": "死神的呼吸"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Equip_ABS/Equip_MetalHelmet14.png"
-        },
-        "rank": 4,
-        "rawEquipmentType": 2,
-        "normalizedSlot": 2,
-        "label": 11
-      },
-      "item": {
-        "joinField": "FuncTypeParam1",
-        "name": {
-          "field": "Name",
-          "value": "虎威骑将之哮"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Item04_ABS/Package_RmbPack78.png"
-        },
-        "funcType": 8
-      }
+      "id": 22,
+      "name": "恶魔之吻",
+      "icon": "UI/Icon/Equip_ABS/Equip_Axe6.png",
+      "rank": 4,
+      "rawEquipmentType": null,
+      "normalizedSlot": 0,
+      "label": 2
     },
     {
-      "id": 629,
-      "equipment": {
-        "name": {
-          "field": "Name",
-          "value": "神偶之枷"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Equip_ABS/Equip_MetalHelmet47.png"
-        },
-        "rank": 4,
-        "rawEquipmentType": 2,
-        "normalizedSlot": 2,
-        "label": 11
-      },
-      "item": {
-        "joinField": "FuncTypeParam1",
-        "name": {
-          "field": "Name",
-          "value": "荣耀冠冕礼包"
-        },
-        "icon": {
-          "field": "Icon",
-          "value": "UI/Icon/Item05_ABS/Package_RmbPack103.png"
-        },
-        "funcType": 8
-      }
+      "id": 23,
+      "name": "王座守卫",
+      "icon": "UI/Icon/Equip_ABS/Equip_Axe7.png",
+      "rank": 4,
+      "rawEquipmentType": null,
+      "normalizedSlot": 0,
+      "label": 2
     }
   ]
 }
