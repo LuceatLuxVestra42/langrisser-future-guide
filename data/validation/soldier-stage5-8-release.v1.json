@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage5-8-release-validation/v1",
+  "stage": "5-8",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T00:41:14.143Z",
+  "sources": {
+    "contract": {
+      "path": "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+      "gitBlobSha": "2943af041025c76c647b790661babe784e05f4f2"
+    },
+    "stage5_7": {
+      "path": "data/generated/soldier-list-stage5-7.v1.json",
+      "gitBlobSha": "23bbd1cfe0b813548eec081694f7c2235c48a3fc"
+    },
+    "stage5_7Validation": {
+      "path": "data/validation/soldier-stage5-7-list.v1.json",
+      "gitBlobSha": "e3e05a882fd9520ec8916660ccb8476aa2c41efd"
+    },
+    "releaseSource": {
+      "path": "data/soldier-release-source.v1.json",
+      "gitBlobSha": "296d59f10c7c6d1ecf0d6df1726a35db5199a0fb"
+    },
+    "externalReleaseSource": {
+      "kind": "GOOGLE_SHEET",
+      "spreadsheetId": "1Oa7afFUhP21SRLSJ0uzP9oUc5C1_Cij0JqRExzUJGFo",
+      "spreadsheetTitle": "업데이트",
+      "sheetName": "신규용병",
+      "retrievedAt": "2026-08-25",
+      "dateCells": [
+        {
+          "row": 2,
+          "serial": 45727,
+          "releaseDate": "2025-03-11"
+        },
+        {
+          "row": 15,
+          "serial": 45783,
+          "releaseDate": "2025-05-06"
+        },
+        {
+          "row": 40,
+          "serial": 45839,
+          "releaseDate": "2025-07-01"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "contractNotFrozen": 0,
+    "stage5_7NotPass": 0,
+    "stage5_7ValidationNotPass": 0,
+    "releaseSourceNotFrozenPartial": 0,
+    "duplicateStage5Ids": 0,
+    "invalidStage5Ids": 0,
+    "duplicateReleaseSourceIds": 0,
+    "invalidReleaseSourceIds": 0,
+    "dateSerialMismatches": 0,
+    "unknownSourceIds": 0,
+    "nonTier3OrSpSourceIds": 0,
+    "sourceNameMismatches": 0,
+    "sourceDateErrors": 0,
+    "sourcePatchMismatches": 0,
+    "samePatchOrderPopulated": 0,
+    "malformedSourceRows": 0,
+    "identityMutation": 0,
+    "releaseProjectionMismatch": 0,
+    "baselineMismatches": 0,
+    "outputRecordCountMismatch": 0
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "normalCount": 168,
+    "spCount": 56,
+    "normalTier3Count": 129,
+    "confirmedReleaseCount": 11,
+    "unresolvedReleaseCount": 213,
+    "unresolvedNormalTier3Count": 118,
+    "lowerTierCount": 39,
+    "patchGroups": [
+      {
+        "releaseDate": "2025-07-01",
+        "count": 5,
+        "soldierIds": [
+          135,
+          819,
+          1037,
+          1038,
+          1118
+        ]
+      },
+      {
+        "releaseDate": "2025-05-06",
+        "count": 4,
+        "soldierIds": [
+          251,
+          341,
+          427,
+          517
+        ]
+      },
+      {
+        "releaseDate": "2025-03-11",
+        "count": 2,
+        "soldierIds": [
+          647,
+          648
+        ]
+      }
+    ],
+    "nonPassIdentityMetadataCount": 41,
+    "unknownSourceIds": [],
+    "nonTier3OrSpSourceIds": [],
+    "sourceNameMismatches": [],
+    "sourceDateErrors": [],
+    "samePatchOrderPopulated": [],
+    "identityMutation": [],
+    "releaseProjectionMismatch": [],
+    "baselineMismatches": []
+  },
+  "errors": [],
+  "reviews": [
+    "118 normal tier-3 Soldiers have no externally confirmed release date in the frozen Stage 5-8 source.",
+    "56 SP Soldiers are grouped before normal Soldiers by UI policy; their internal release order remains unresolved because the available SP sheet identifies Soldiers by images rather than canonical IDs.",
+    "39 normal tier-1/tier-2 Soldiers remain in a technical bucket because release ordering is not required for the current list policy.",
+    "41 list rows retain non-PASS identity/presentation metadata from Stage 5-7.",
+    "Same-patch order is intentionally unresolved; no Soldier-ID ordering is presented as release ordering."
+  ]
+}
