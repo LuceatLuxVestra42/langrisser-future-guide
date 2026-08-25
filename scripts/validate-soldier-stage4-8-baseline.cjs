@@ -89,7 +89,7 @@ function stripVolatile(value) {
   if (value && typeof value === 'object') {
     const out = {};
     for (const key of Object.keys(value).sort()) {
-      if (key === 'generatedAt') continue;
+      if (key === 'generatedAt' || /blobsha$/i.test(key)) continue;
       out[key] = stripVolatile(value[key]);
     }
     return out;
