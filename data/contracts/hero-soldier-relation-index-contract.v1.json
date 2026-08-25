@@ -34,14 +34,17 @@
     }
   },
   "commonRootShape": {
-    "requiredFields": [
+    "requiredCommonFields": [
       "version",
       "schemaId",
       "generatedAt",
       "relationSet",
-      "summary",
-      "index"
+      "summary"
     ],
+    "directionSpecificRequiredField": {
+      "byHeroArtifact": "byHeroId",
+      "bySoldierArtifact": "bySoldierId"
+    },
     "relationSetDescriptor": {
       "path": "must equal data/generated/hero-soldier-relations.v1.json",
       "gitBlobSha": "exact Git blob SHA of the canonical relation set used to build this index",
