@@ -137,7 +137,7 @@ function main() {
     if (!Number.isInteger(normalSoldierId)
       || spSoldierId !== soldierId
       || base?.identity?.normalSoldierId !== normalSoldierId
-      || base?.identity?.spSoldierId !== spSoldierId
+      || (base?.identity?.spSoldierId !== null && base?.identity?.spSoldierId !== spSoldierId)
       || previousSp?.normalSoldierId !== normalSoldierId
       || previousSp?.spSoldierId !== spSoldierId) {
       relationIdMismatches.push(soldierId);
