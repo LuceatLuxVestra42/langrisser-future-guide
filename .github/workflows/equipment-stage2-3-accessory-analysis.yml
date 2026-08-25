@@ -1,0 +1,31 @@
+name: Equipment Stage 2-3 Accessory Analysis
+
+on:
+  push:
+    paths:
+      - '.github/workflows/equipment-stage2-3-accessory-analysis.yml'
+      - 'scripts/analyze-equipment-stage2-3.mjs'
+      - 'data/configdata/ConfigDataEquipmentInfo.json'
+      - 'data/configdata/ConfigDataSkillInfo.json'
+
+permissions:
+  contents: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Analyze accessory classification inputs
+        run: node scripts/analyze-equipment-stage2-3.mjs
+      - name: Persist Stage 2-3 analysis
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/equipment_stage2_3_accessory_analysis.json
+          if git diff --cached --quiet; then
+            echo "No analysis changes"
+            exit 0
+          fi
+          git commit -m "Freeze Equipment Stage 2-3 accessory analysis"
+          git push
