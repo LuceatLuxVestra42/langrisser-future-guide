@@ -1,0 +1,680 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-5",
+  "substage": "5-5-5",
+  "checkpoint": "final-gate",
+  "status": "PASS",
+  "completion": "STAGE_5_5_COMPLETE",
+  "purpose": "Final cross-stage gate for Hero header/basic-information Stage 5-5 after source semantics, integrated output, and display exception policies are frozen.",
+  "inputs": {
+    "stage551": "data/validation/hero-page-stage5-5-1.v1.json",
+    "stage552": "data/validation/hero-page-stage5-5-2-coverage.v1.json",
+    "stage553": "data/validation/hero-page-stage5-5-3-validation.v1.json",
+    "stage554": "data/validation/hero-page-stage5-5-4-validation.v1.json",
+    "output553": "data/hero-page-stage5-5-3.v1.json",
+    "contract553": "data/contracts/hero-page-stage5-5-3-output-contract.v1.json",
+    "contract554": "data/contracts/hero-page-stage5-5-4-display-policy.v1.json"
+  },
+  "summary": {
+    "checkCount": 37,
+    "passedCheckCount": 37,
+    "failedCheckCount": 0,
+    "canonicalHeroCount": 267,
+    "integratedOutputRecordCount": 267,
+    "totalRegularSkinCount": 540,
+    "unencodedSkinAcquisitionCount": 176,
+    "hardBlockingDataGaps": 0,
+    "nonBlockingFollowupCount": 5
+  },
+  "stageResults": {
+    "5-5-1": {
+      "completion": "COMPLETE",
+      "hardErrorCount": 0
+    },
+    "5-5-2": {
+      "completion": "COVERAGE_AND_SEMANTICS_COMPLETE_WITH_DATA_GAPS",
+      "hardErrorCount": 0,
+      "unresolvedSemanticFieldCount": 0,
+      "dataCompletionIssueCount": 1
+    },
+    "5-5-3": {
+      "status": "PASS",
+      "completion": "FULL_267_RECORD_CONTRACT_VALIDATION_COMPLETE",
+      "errorCount": 0,
+      "warningCount": 0
+    },
+    "5-5-4": {
+      "status": "PASS",
+      "completion": "DISPLAY_EXCEPTION_POLICY_VALIDATED_FOR_ALL_267_HEROES",
+      "errorCount": 0,
+      "warningCount": 0
+    }
+  },
+  "checks": [
+    {
+      "name": "5-5-1 completion",
+      "pass": true,
+      "detail": "COMPLETE"
+    },
+    {
+      "name": "5-5-1 hard errors empty",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "5-5-1 canonical Hero count",
+      "pass": true,
+      "detail": {
+        "status": "PASS",
+        "canonicalHeroCount": 267,
+        "primaryKey": "heroId",
+        "directHeaderFields": [
+          "heroId",
+          "nameKr",
+          "nameCn",
+          "nameEn"
+        ]
+      }
+    },
+    {
+      "name": "5-5-1 identity key frozen",
+      "pass": true,
+      "detail": "heroId"
+    },
+    {
+      "name": "5-5-1 ownership boundary pass",
+      "pass": true,
+      "detail": {
+        "status": "PASS",
+        "pendingEnrichmentFields": [
+          "rarity",
+          "factions",
+          "cv",
+          "origin",
+          "artwork",
+          "skins"
+        ],
+        "outOfScopeOwnersPreserved": [
+          "Stage 4 combat/stat/job/skill data",
+          "Stage 5-1 bond data",
+          "Stage 5-3 usable-Soldier data",
+          "Stage 5-4 SP data"
+        ]
+      }
+    },
+    {
+      "name": "5-5-2 canonical Hero count",
+      "pass": true,
+      "detail": 267
+    },
+    {
+      "name": "5-5-2 identity coverage",
+      "pass": true,
+      "detail": {
+        "resolved": 267,
+        "missingHeroIds": [],
+        "duplicateHeroIds": [],
+        "useableMismatchHeroIds": []
+      }
+    },
+    {
+      "name": "5-5-2 hard errors empty",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "5-5-2 coverage issues empty",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "5-5-2 unresolved semantic fields empty",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "5-5-2 display enrichment ready",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "5-5-2 skin structural coverage",
+      "pass": true,
+      "detail": {
+        "status": "SOURCE_SEMANTICS_CONFIRMED_WITH_UNENCODED_ACQUISITION_ROWS",
+        "join": "ConfigDataHeroInfo.Skins_ID[] -> ConfigDataHeroSkinInfo.ID",
+        "normalizationRule": "An omitted Skins_ID is normalized to [] only when ConfigDataHeroSkinInfo has no row with SpecifiedHero equal to that canonical Hero ID; omitted lists with reverse owner rows remain a hard error.",
+        "heroesWithValidSkinList": 267,
+        "heroesWithExplicitValidSkinList": 235,
+        "heroesWithNormalizedEmptySkinList": 32,
+        "heroIdsWithNormalizedEmptySkinList": [
+          24,
+          41,
+          42,
+          45,
+          69,
+          71,
+          73,
+          74,
+          76,
+          78,
+          85,
+          86,
+          96,
+          132,
+          137,
+          138,
+          139,
+          141,
+          142,
+          145,
+          148,
+          99194,
+          99202,
+          99210,
+          99224,
+          99235,
+          99236,
+          99247,
+          99258,
+          99269,
+          99273,
+          99286
+        ],
+        "heroIdsWithInvalidSkinList": [],
+        "invalidSkinListDetails": [],
+        "heroesWithNoSkinRefs": 32,
+        "heroIdsWithNoSkinRefs": [
+          24,
+          41,
+          42,
+          45,
+          69,
+          71,
+          73,
+          74,
+          76,
+          78,
+          85,
+          86,
+          96,
+          132,
+          137,
+          138,
+          139,
+          141,
+          142,
+          145,
+          148,
+          99194,
+          99202,
+          99210,
+          99224,
+          99235,
+          99236,
+          99247,
+          99258,
+          99269,
+          99273,
+          99286
+        ],
+        "totalSkinRefs": 540,
+        "resolvedSkinRefs": 540,
+        "unresolvedSkinRefs": [],
+        "specifiedHeroMismatches": [],
+        "sharedSkinRefs": [],
+        "duplicateSkinRecordIds": [],
+        "getPathTypeMissingSkinIds": [
+          102,
+          104,
+          105,
+          302,
+          403,
+          406,
+          603,
+          604,
+          606,
+          702,
+          704,
+          902,
+          905,
+          1203,
+          1206,
+          1207,
+          1401,
+          1403,
+          1406,
+          1408,
+          1502,
+          1506,
+          1507,
+          1601,
+          1602,
+          1701,
+          1702,
+          1802,
+          1901,
+          2001,
+          2101,
+          2102,
+          2201,
+          2202,
+          2301,
+          2502,
+          2601,
+          2606,
+          2702,
+          2803,
+          2804,
+          2902,
+          2906,
+          2907,
+          3002,
+          3003,
+          3101,
+          3102,
+          3201,
+          3301,
+          3302,
+          3401,
+          3501,
+          3602,
+          3701,
+          3702,
+          3703,
+          3901,
+          4001,
+          4301,
+          4401,
+          4402,
+          4701,
+          5106,
+          5202,
+          5302,
+          5402,
+          5403,
+          5502,
+          5504,
+          5604,
+          5702,
+          5801,
+          5901,
+          5902,
+          6002,
+          6102,
+          6201,
+          6302,
+          6402,
+          6502,
+          6602,
+          6603,
+          6702,
+          8702,
+          8802,
+          8902,
+          8907,
+          9202,
+          9302,
+          9402,
+          9501,
+          9702,
+          9802,
+          9902,
+          10002,
+          10003,
+          10004,
+          10102,
+          10302,
+          10602,
+          10802,
+          11102,
+          11202,
+          11302,
+          11402,
+          11403,
+          11502,
+          11602,
+          11802,
+          11902,
+          12002,
+          12202,
+          12302,
+          12502,
+          12504,
+          12602,
+          12902,
+          13002,
+          13401,
+          9916102,
+          9916302,
+          9916402,
+          9916403,
+          9916701,
+          9916802,
+          9916902,
+          9917002,
+          9917102,
+          9917202,
+          9917302,
+          9917403,
+          9917502,
+          9917503,
+          9917602,
+          9917802,
+          9917902,
+          9918002,
+          9918102,
+          9918202,
+          9918302,
+          9918402,
+          9918403,
+          9918502,
+          9918602,
+          9918604,
+          9918702,
+          9918803,
+          9918902,
+          9919002,
+          9919102,
+          9919202,
+          9919302,
+          9919703,
+          9919704,
+          9919802,
+          9919902,
+          9920302,
+          9920402,
+          9920502,
+          9920602,
+          9921202,
+          9921302,
+          9921503,
+          9921603,
+          9923002,
+          9923402,
+          9923702,
+          9924302,
+          9924402,
+          9926002,
+          9926102,
+          9927202,
+          9927601,
+          9927702,
+          9927802
+        ],
+        "charImageSkinResourceMissingSkinIds": [],
+        "artworkSemantics": "SOURCE_JOIN_CONFIRMED",
+        "orderingSemantics": "SOURCE_ORDER_CONFIRMED",
+        "acquisitionSemantics": "ENUM_SEMANTICS_CONFIRMED_WITH_UNENCODED_ROWS",
+        "artworkJoin": "ConfigDataHeroSkinInfo.CharImageSkinResource_ID -> ConfigDataCharImageSkinResourceInfo.ID",
+        "staticImageField": "ConfigDataCharImageSkinResourceInfo.Image",
+        "animatedResourceField": "ConfigDataCharImageSkinResourceInfo.SpineAssetPath",
+        "artworkCoverage": "540/540 canonical skins resolve to non-empty Image and SpineAssetPath.",
+        "orderingSource": "ConfigDataHeroInfo.Skins_ID[] array position",
+        "orderingRule": "Preserve Skins_ID array order exactly. Do not re-sort by skin ID, Score, FixedStoreItemInfo.UISort or acquisition category.",
+        "acquisitionSource": "ConfigDataHeroSkinInfo.GetPathType",
+        "acquisitionMapping": {
+          "2": {
+            "labelCn": "光之回响",
+            "labelKr": "광휘의 메아리",
+            "count": 197
+          },
+          "3": {
+            "labelCn": "命运星织",
+            "labelKr": "운명의 별짜기",
+            "count": 1
+          },
+          "4": {
+            "labelCn": "英雄皮肤商店",
+            "labelKr": "영웅 스킨 상점",
+            "count": 166
+          }
+        },
+        "acquisitionEncodedSkinCount": 364,
+        "acquisitionUnencodedSkinCount": 176,
+        "acquisitionMissingRule": "Missing GetPathType is not one acquisition category. Keep it null/UNENCODED. Exact acquisition history for those skins requires a supplemental verified dictionary rather than inference.",
+        "validation": "data/validation/hero-page-stage5-5-2-skins-acquisition.v1.json"
+      }
+    },
+    {
+      "name": "5-5-2 acquisition gap isolated",
+      "pass": true,
+      "detail": {
+        "encoded": 364,
+        "unencoded": 176
+      }
+    },
+    {
+      "name": "5-5-2 only nonblocking data completion issue",
+      "pass": true,
+      "detail": [
+        {
+          "field": "skins.acquisition",
+          "issue": "ConfigDataHeroSkinInfo.GetPathType omitted",
+          "canonicalSkinCount": 176,
+          "policy": "Keep null/UNENCODED unless a separately verified supplemental acquisition dictionary is supplied."
+        }
+      ]
+    },
+    {
+      "name": "5-5-3 validation pass",
+      "pass": true,
+      "detail": "PASS"
+    },
+    {
+      "name": "5-5-3 completion",
+      "pass": true,
+      "detail": "FULL_267_RECORD_CONTRACT_VALIDATION_COMPLETE"
+    },
+    {
+      "name": "5-5-3 errors empty",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "5-5-3 warnings empty",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "5-5-3 invariants all true",
+      "pass": true,
+      "detail": {
+        "canonicalIdentityExact": true,
+        "rarityExact": true,
+        "factionsValid": true,
+        "cvValid": true,
+        "originValid": true,
+        "artworkValid": true,
+        "skinMembershipAndOrderExact": true,
+        "skinAcquisitionSemanticsValid": true,
+        "noDeferredLocalizationSynthesis": true,
+        "ownershipBoundariesPreserved": true
+      }
+    },
+    {
+      "name": "5-5-3 output count",
+      "pass": true,
+      "detail": {
+        "validation": 267,
+        "outputRecordCount": 267,
+        "records": 267
+      }
+    },
+    {
+      "name": "5-5-3 unique Hero IDs",
+      "pass": true,
+      "detail": 267
+    },
+    {
+      "name": "5-5-3 total skins",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "5-5-3 output contract accepted",
+      "pass": true,
+      "detail": {
+        "status": "ACCEPTED",
+        "count": 267
+      }
+    },
+    {
+      "name": "5-5-4 validation pass",
+      "pass": true,
+      "detail": "PASS"
+    },
+    {
+      "name": "5-5-4 completion",
+      "pass": true,
+      "detail": "DISPLAY_EXCEPTION_POLICY_VALIDATED_FOR_ALL_267_HEROES"
+    },
+    {
+      "name": "5-5-4 errors empty",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "5-5-4 warnings empty",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "5-5-4 policy invariants all true",
+      "pass": true,
+      "detail": {
+        "explicitCvNoneDisplay": true,
+        "noRawCvMarkerLeak": true,
+        "localizationFallbacksNonBlank": true,
+        "noSkinHeroesHideNavigation": true,
+        "skinHeroesShowNavigation": true,
+        "galleryOrderPreserved": true,
+        "encodedAcquisitionShown": true,
+        "unencodedAcquisitionHidden": true,
+        "noAcquisitionInference": true,
+        "ownershipBoundariesPreserved": true
+      }
+    },
+    {
+      "name": "5-5-4 Hero count",
+      "pass": true,
+      "detail": 267
+    },
+    {
+      "name": "5-5-4 skin states",
+      "pass": true,
+      "detail": {
+        "skinCount": 540,
+        "encoded": 364,
+        "unencoded": 176
+      }
+    },
+    {
+      "name": "5-5-4 no raw marker leak",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "5-5-4 no blank visible labels",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "5-5-4 display policy contract accepted",
+      "pass": true,
+      "detail": {
+        "status": "ACCEPTED",
+        "count": 267
+      }
+    },
+    {
+      "name": "SP remains separate Stage 5-4 ownership",
+      "pass": true,
+      "detail": {
+        "stage553": "Stage 5-4 remains the authority for SP existence, SP illustration switching, SP missions and SP-specific page data. Stage 5-5-3 does not synthesize SP into rarity or skins.",
+        "stage554": "SP is OUT_OF_SCOPE and must not overwrite baseLabel."
+      }
+    },
+    {
+      "name": "solo-limited SSR remains banner-owned",
+      "pass": true,
+      "detail": {
+        "stage553": "Banner/summon data owns the one-person-limited SSR distinction. Stage 5-5-3 stores base rarity SSR only until that separate source is joined by a later composition layer.",
+        "stage554": "SSR(1-person-limited) is OUT_OF_SCOPE banner/summon presentation metadata and must not be inferred from base rarity."
+      }
+    },
+    {
+      "name": "combat/bond/soldier ownership preserved",
+      "pass": true,
+      "detail": {
+        "sp": "Stage 5-4 remains the authority for SP existence, SP illustration switching, SP missions and SP-specific page data. Stage 5-5-3 does not synthesize SP into rarity or skins.",
+        "soloLimitedSSR": "Banner/summon data owns the one-person-limited SSR distinction. Stage 5-5-3 stores base rarity SSR only until that separate source is joined by a later composition layer.",
+        "combat": "Stage 4 remains the authority for stats/jobs/skills/talent and is not embedded here.",
+        "bonds": "Stage 5-1 remains the authority for bond data and is not embedded here.",
+        "soldiers": "Stage 5-3 remains the authority for usable-Soldier data and is not embedded here.",
+        "assetExport": "This contract stores authoritative source asset paths. Extraction, conversion and web-serving paths belong to a separate asset pipeline."
+      }
+    },
+    {
+      "name": "asset export remains separate",
+      "pass": true,
+      "detail": {
+        "stage553": "This contract stores authoritative source asset paths. Extraction, conversion and web-serving paths belong to a separate asset pipeline.",
+        "stage554": "Source asset paths are authoritative locators, not browser URLs. Export/web-delivery failure is an asset-pipeline concern and must not be rewritten as source-data absence."
+      }
+    }
+  ],
+  "failures": [],
+  "nonBlockingFollowups": [
+    {
+      "id": "LOCALIZATION",
+      "scope": [
+        "CV Korean actor names",
+        "faction Korean labels",
+        "origin Korean titles",
+        "skin Korean names"
+      ],
+      "blockingStage5_5": false,
+      "reason": "Validated source text/fallback exists; Stage 5-5-4 explicitly treats these as DEFERRED_LOCALIZATION."
+    },
+    {
+      "id": "SKIN_ACQUISITION_SUPPLEMENT",
+      "scope": "176 canonical skins with omitted GetPathType",
+      "blockingStage5_5": false,
+      "reason": "Enum semantics are resolved; missing source values stay UNENCODED and hidden until a verified supplemental dictionary exists."
+    },
+    {
+      "id": "SP_COMPOSITION",
+      "scope": "SP existence/illustration/missions and final gallery composition",
+      "blockingStage5_5": false,
+      "owner": "Hero Stage 5-4 + later composition"
+    },
+    {
+      "id": "SOLO_LIMITED_SSR_COMPOSITION",
+      "scope": "SSR(1-person-limited) presentation label",
+      "blockingStage5_5": false,
+      "owner": "Banner/summon data + later composition"
+    },
+    {
+      "id": "ASSET_EXPORT",
+      "scope": "Convert authoritative prefab/image source paths into extracted web-serving assets",
+      "blockingStage5_5": false,
+      "owner": "asset/export pipeline"
+    }
+  ],
+  "closurePolicy": {
+    "reopen5_5OnlyIf": [
+      "A proven source contradiction invalidates a frozen Stage 5-5 semantic mapping.",
+      "Canonical Hero identity changes and the Stage 5-5 pipeline must be regenerated for the new canonical snapshot.",
+      "A structural regression breaks one of the frozen 5-5-3/5-5-4 invariants."
+    ],
+    "doNotReopenFor": [
+      "Korean localization additions.",
+      "Supplementing exact acquisition history for currently UNENCODED skins.",
+      "SP composition owned by Stage 5-4/later composition.",
+      "SSR(1-person-limited) banner composition.",
+      "Asset extraction or web-path conversion."
+    ]
+  },
+  "nextAction": "Close Hero Stage 5-5 and proceed to Stage 5-wide integration/final review without reopening 5-5 semantics."
+}
