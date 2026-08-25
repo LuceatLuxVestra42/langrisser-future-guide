@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "stage": "5-1",
+  "status": "FROZEN",
+  "schemaId": "soldier-detail-contract/v1",
+  "purpose": "Freeze the page-facing Soldier detail data contract before Stage 5-2~5-7 generation. Reuse the validated Soldier pipeline and shared Hero-Soldier Relation Layer without re-deriving semantics in page code.",
+  "sources": {
+    "soldierMaster": "data/generated/soldier-master.v1.json",
+    "soldierStage3": "data/generated/soldier-stage3.v1.json",
+    "bySoldierIndex": "data/generated/hero-soldier-by-soldier.v1.json",
+    "relationValidation": "data/validation/hero-soldier-relation-validation.v1.json",
+    "stage4Baseline": "data/validation/soldier-stage4-8-baseline.v1.json",
+    "soldierIdentityContract": "data/contracts/soldier-identity-contract.v1.json"
+  },
+  "canonicalKey": {
+    "field": "soldierId",
+    "comparison": "Exact ID equality",
+    "rule": "Every detail record represents exactly one canonical Soldier Master record. Names, siteId, tier, army type and numeric ID patterns are never JOIN keys."
+  },
+  "output": {
+    "plannedPath": "data/generated/soldier-detail-stage5.v1.json",
+    "plannedSchemaId": "soldier-detail/v1",
+    "topLevelShape": {
+      "version": "number",
+      "schemaId": "string",
+      "generatedAt": "ISO-8601 string",
+      "records": "one detail record per canonical displayable soldier",
+      "bySoldierId": "optional lookup index: soldierId string -> record position or record reference"
+    },
+    "currentBaselineRecordCount": 224
+  },
+  "recordShape": {
+    "soldierId": "canonical Soldier ID",
+    "identity": {
+      "siteId": "routing/presentation identifier from Soldier Master",
+      "nameKr": "confirmed Korean name or null",
+      "nameCn": "Chinese source name",
+      "nameKrStatus": "translation/release status from Soldier Master",
+      "tier": "canonical tier",
+      "armyId": "raw canonical army ID",
+      "armyType": "normalized army type",
+      "uiGroup": "page UI grouping",
+      "isSp": "explicit SP membership",
+      "normalSoldierId": "explicit normal form ID or null",
+      "spSoldierId": "explicit SP form ID or null",
+      "validationStatus": "Soldier Master validation status"
+    },
+    "combat": {
+      "hp": "SoldierInfo HP_INI-derived page value",
+      "atk": "SoldierInfo AT_INI-derived page value",
+      "def": "SoldierInfo DF_INI-derived page value",
+      "mdef": "SoldierInfo MagicDF_INI-derived page value",
+      "move": "SoldierInfo BF_MovePoint",
+      "range": "SoldierInfo BF_AttackDistance",
+      "isMelee": "auxiliary combat flag; never replaces range",
+      "moveType": "raw/normalized move-type source value preserved for later UI mapping"
+    },
+    "ability": {
+      "techId": "primary Lv1-10 TrainingTech ID for a normal tier-3 source, otherwise null",
+      "levels": "ordered Lv1-10 ability records when a validated primary path exists, otherwise empty",
+      "finalDescription": "Lv10 description derived from levels when present, otherwise null"
+    },
+    "training": {
+      "techId": "same validated primary TrainingTech ID as ability.techId",
+      "perLevelCost": "ordered original Lv1-10 gold/material cost records; never discard source per-level values",
+      "lv5Total": "derived cumulative cost through Lv5 or null",
+      "lv10Total": "derived cumulative cost through Lv10 or null"
+    },
+    "heroes": {
+      "finalHeroIds": "canonical final usable-Hero membership copied only from hero-soldier-by-soldier.v1.json bySoldierId"
+    },
+    "sp": "null for normal Soldier records; SP detail object for SP Soldier records"
+  },
+  "abilityLevelShape": {
+    "level": "1..10 sequence position from TrainingTechInfo.TechLevelupInfoList",
+    "levelInfoId": "TrainingTechLevelInfo record ID",
+    "description": "normal Soldier description for this level",
+    "soldierSkillLevel": "source SoldierSkillLevelup value preserved for validation",
+    "soldierSkillId": "source SoldierSkillID value when present"
+  },
+  "trainingCostShape": {
+    "level": "1..10",
+    "gold": "original per-level gold cost",
+    "materials": "original per-level material list without cumulative rewriting"
+  },
+  "spShape": {
+    "normalSoldierId": "explicit SPSoldierInfo.NormalSoliderId",
+    "spSoldierId": "explicit SPSoldierInfo.ID and equal to the current record soldierId",
+    "statDelta": "derived comparison of normal full SoldierInfo stats versus SP full SoldierInfo stats; display convenience only",
+    "descriptionLevels": "ordered SP descriptions read from the validated normal-form primary TrainingTech level path",
+    "finalDescription": "final SP description derived from descriptionLevels when present",
+    "stage1": {
+      "awakenLevelId": "source first-stage awaken level ID",
+      "awakenMaterials": "source first-stage awaken material list",
+      "missions": "decoded first-stage MissionInfo records from the validated Stage3 pipeline"
+    },
+    "secondStageUnlock": "explicit SPSoldierInfo SecondStageUnlock flag",
+    "stage2": "null when secondStageUnlock=false; otherwise contains awakenLevelId, awakenMaterials, decoded missions and expandHeroIds",
+    "expandedHeroIds": "SecondStageExpandHeroList only; this is not the final usable-Hero list"
+  },
+  "conditionalRules": [
+    "Every canonical displayable Soldier must receive exactly one detail record.",
+    "Normal and SP forms remain separate records and are linked only by the explicit SPSoldierInfo relationship.",
+    "For normal tier-3 Soldiers, ability/training must use the unique validated TrainingTech path whose SoldierSkillLevelup sequence is 1..10.",
+    "For tier-1/tier-2 or any record without a validated primary ten-level path, ability.levels and training.perLevelCost remain empty and cumulative totals remain null; do not invent a path.",
+    "For SP Soldiers, combat values come from the SP SoldierInfo full record, not normal values plus statDelta.",
+    "SP statDelta is derived only for comparison display and never becomes the canonical SP stat source.",
+    "SP description text must come from the validated SpSoidlierDescription/spDescription source on the normal-form primary TrainingTech path; do not rewrite the normal description by substituting numbers.",
+    "stage2 must be null when secondStageUnlock=false. Do not synthesize second-stage content for the 1-stage SP cases.",
+    "expandedHeroIds is SP second-stage provenance data only and must not be presented as the complete usable-Hero set.",
+    "heroes.finalHeroIds must be copied from validated bySoldierId membership and must never be recomputed from GetSoldierHeros_ID, SPHeroInfo rewards or SPSoldierInfo expansion fields inside Stage 5.",
+    "Do not synthesize Korean names for null/unreleased nameKr values; preserve nameKrStatus and validationStatus.",
+    "Release order and same-patch ordering are outside the 5-1 detail contract and belong to Stage 5-8 release metadata."
+  ],
+  "ownership": {
+    "identityAndClassification": "data/generated/soldier-master.v1.json",
+    "combatTrainingSpSource": "data/generated/soldier-stage3.v1.json plus its validated Stage4 direct-JSON pipeline",
+    "heroMembership": "shared Hero-Soldier Relation Layer via data/generated/hero-soldier-by-soldier.v1.json",
+    "pageBuilder": "May normalize and derive page-display fields only; it must not reinterpret canonical JOIN semantics."
+  },
+  "forbidden": [
+    "Join by nameKr or nameCn",
+    "Infer SP IDs using +5000 or any numeric offset",
+    "Use Soldier ID order as release order",
+    "Use GetSoldierTechId as the sole TrainingTech lookup rule",
+    "Use IsMelee as the source of attack range",
+    "Replace SP full stats with normal stats plus delta",
+    "Treat SecondStageExpandHeroList as final Hero membership",
+    "Recalculate Hero-Soldier membership in Soldier page code",
+    "Discard per-level training cost data after computing Lv5/Lv10 totals"
+  ],
+  "baseline": {
+    "displayableSoldiers": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "normalTier3": 129,
+    "spSecondStageTrue": 45,
+    "spSecondStageFalse": 11,
+    "relationEdges": 5977,
+    "relationBySoldierKeys": 224
+  },
+  "stageOutputs": {
+    "5-2": "populate combat from the validated SoldierInfo-derived Stage3 record",
+    "5-3": "populate normal tier-3 ability Lv1-10 and SP descriptionLevels from the validated primary TrainingTech path",
+    "5-4": "populate original per-level training costs and derived Lv5/Lv10 cumulative totals",
+    "5-5": "attach heroes.finalHeroIds from the shared bySoldier index",
+    "5-6": "populate SP stage/mission/comparison detail for 56 SP records",
+    "5-7": "derive the list bundle from the same canonical identity rather than creating a second master",
+    "5-8": "attach release/order metadata separately without changing this identity/detail contract"
+  },
+  "completion": "Stage 5-1 is complete when the Soldier detail record shape, source ownership, conditional nullability, shared relation consumption rule, SP full-record rule and later 5-2~5-8 boundaries are frozen so subsequent builders can populate data without reopening semantic/JOIN research."
+}
