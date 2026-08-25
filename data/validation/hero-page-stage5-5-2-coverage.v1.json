@@ -1,0 +1,470 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-5",
+  "substage": "5-5-2",
+  "checkpoint": "coverage",
+  "status": "REVIEW_WITH_ISSUES",
+  "completion": "COVERAGE_MEASURED_SEMANTICS_PENDING",
+  "sourceTraceStatus": "REVIEW",
+  "canonicalHeroCount": 267,
+  "sourceCounts": {
+    "heroInfoRows": 28789,
+    "heroSkinInfoRows": 565,
+    "canonicalHeroInfoRows": 267
+  },
+  "heroInfoIdentityCoverage": {
+    "resolved": 267,
+    "missingHeroIds": [],
+    "duplicateHeroIds": [],
+    "useableMismatchHeroIds": []
+  },
+  "fields": {
+    "rarity": {
+      "status": "UNRESOLVED",
+      "observedOnly": {
+        "starDistribution": {
+          "1": 3,
+          "2": 45,
+          "3": 219
+        },
+        "rankDistribution": {
+          "1": 3,
+          "2": 12,
+          "3": 33,
+          "4": 213,
+          "6": 6
+        }
+      },
+      "rule": "Observed Star/Rank distributions are not rarity labels."
+    },
+    "factions": {
+      "status": "UNRESOLVED",
+      "acceptedSource": null
+    },
+    "cv": {
+      "status": "UNRESOLVED",
+      "acceptedSource": null
+    },
+    "origin": {
+      "status": "POINTER_CONFIRMED",
+      "source": "ConfigDataHeroInfo.HeroBelongProduction",
+      "heroesWithNonEmptyValidPointers": 267,
+      "pointerValueCount": 267,
+      "missingHeroIds": [],
+      "invalidHeroIds": [],
+      "displayDictionaryStatus": "UNRESOLVED"
+    },
+    "artwork": {
+      "status": "POINTER_CONFIRMED",
+      "source": "ConfigDataHeroInfo.CharImage_ID",
+      "heroesWithValidPointer": 267,
+      "missingOrInvalidHeroIds": [],
+      "displaySemantics": "UNRESOLVED"
+    },
+    "skins": {
+      "status": "SOURCE_JOIN_CONFIRMED",
+      "join": "ConfigDataHeroInfo.Skins_ID[] -> ConfigDataHeroSkinInfo.ID",
+      "heroesWithValidSkinList": 235,
+      "heroIdsWithInvalidSkinList": [
+        24,
+        41,
+        42,
+        45,
+        69,
+        71,
+        73,
+        74,
+        76,
+        78,
+        85,
+        86,
+        96,
+        132,
+        137,
+        138,
+        139,
+        141,
+        142,
+        145,
+        148,
+        99194,
+        99202,
+        99210,
+        99224,
+        99235,
+        99236,
+        99247,
+        99258,
+        99269,
+        99273,
+        99286
+      ],
+      "invalidSkinListDetails": [
+        {
+          "heroId": 24,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 41,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 42,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 45,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 69,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 71,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 73,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 74,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 76,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 78,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 85,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 86,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 96,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 132,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 137,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 138,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 139,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 141,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 142,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 145,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 148,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 99194,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 99202,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 99210,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 99224,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 99235,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 99236,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 99247,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 99258,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 99269,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 99273,
+          "valueType": "undefined",
+          "value": null
+        },
+        {
+          "heroId": 99286,
+          "valueType": "undefined",
+          "value": null
+        }
+      ],
+      "heroesWithNoSkinRefs": 0,
+      "heroIdsWithNoSkinRefs": [],
+      "totalSkinRefs": 540,
+      "resolvedSkinRefs": 540,
+      "unresolvedSkinRefs": [],
+      "specifiedHeroMismatches": [],
+      "sharedSkinRefs": [],
+      "duplicateSkinRecordIds": [],
+      "getPathTypeMissingSkinIds": [
+        102,
+        104,
+        105,
+        302,
+        403,
+        406,
+        603,
+        604,
+        606,
+        702,
+        704,
+        902,
+        905,
+        1203,
+        1206,
+        1207,
+        1401,
+        1403,
+        1406,
+        1408,
+        1502,
+        1506,
+        1507,
+        1601,
+        1602,
+        1701,
+        1702,
+        1802,
+        1901,
+        2001,
+        2101,
+        2102,
+        2201,
+        2202,
+        2301,
+        2502,
+        2601,
+        2606,
+        2702,
+        2803,
+        2804,
+        2902,
+        2906,
+        2907,
+        3002,
+        3003,
+        3101,
+        3102,
+        3201,
+        3301,
+        3302,
+        3401,
+        3501,
+        3602,
+        3701,
+        3702,
+        3703,
+        3901,
+        4001,
+        4301,
+        4401,
+        4402,
+        4701,
+        5106,
+        5202,
+        5302,
+        5402,
+        5403,
+        5502,
+        5504,
+        5604,
+        5702,
+        5801,
+        5901,
+        5902,
+        6002,
+        6102,
+        6201,
+        6302,
+        6402,
+        6502,
+        6602,
+        6603,
+        6702,
+        8702,
+        8802,
+        8902,
+        8907,
+        9202,
+        9302,
+        9402,
+        9501,
+        9702,
+        9802,
+        9902,
+        10002,
+        10003,
+        10004,
+        10102,
+        10302,
+        10602,
+        10802,
+        11102,
+        11202,
+        11302,
+        11402,
+        11403,
+        11502,
+        11602,
+        11802,
+        11902,
+        12002,
+        12202,
+        12302,
+        12502,
+        12504,
+        12602,
+        12902,
+        13002,
+        13401,
+        9916102,
+        9916302,
+        9916402,
+        9916403,
+        9916701,
+        9916802,
+        9916902,
+        9917002,
+        9917102,
+        9917202,
+        9917302,
+        9917403,
+        9917502,
+        9917503,
+        9917602,
+        9917802,
+        9917902,
+        9918002,
+        9918102,
+        9918202,
+        9918302,
+        9918402,
+        9918403,
+        9918502,
+        9918602,
+        9918604,
+        9918702,
+        9918803,
+        9918902,
+        9919002,
+        9919102,
+        9919202,
+        9919302,
+        9919703,
+        9919704,
+        9919802,
+        9919902,
+        9920302,
+        9920402,
+        9920502,
+        9920602,
+        9921202,
+        9921302,
+        9921503,
+        9921603,
+        9923002,
+        9923402,
+        9923702,
+        9924302,
+        9924402,
+        9926002,
+        9926102,
+        9927202,
+        9927601,
+        9927702,
+        9927802
+      ],
+      "charImageSkinResourceMissingSkinIds": [],
+      "orderingSemantics": "UNRESOLVED",
+      "acquisitionSemantics": "UNRESOLVED"
+    }
+  },
+  "hardErrors": [
+    "canonical Hero rows contain invalid Skins_ID values"
+  ],
+  "coverageIssues": [],
+  "unresolvedSemanticFields": [
+    "rarity",
+    "factions",
+    "cv",
+    "origin.displayDictionary",
+    "artwork.displaySemantics",
+    "skins.orderingSemantics",
+    "skins.acquisitionSemantics"
+  ],
+  "readyForDisplayEnrichment": false,
+  "nextAction": "Resolve authoritative mappings for the unresolved semantic fields; do not synthesize display values from the measured candidates."
+}
