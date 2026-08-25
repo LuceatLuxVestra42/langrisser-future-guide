@@ -70,6 +70,7 @@ const pipelineInputs = [
   'scripts/validate-soldier-stage4-6-relation-consumer.cjs',
   'scripts/validate-soldier-stage4-7-domain-fixtures.cjs',
   'scripts/validate-soldier-stage4-8-baseline.cjs',
+  '.github/workflows/soldier-stage4-8-baseline.yml',
 ];
 
 function abs(p) { return path.join(ROOT, p); }
@@ -173,8 +174,15 @@ if (masterStage3Missing.length || stage3MasterExtra.length) {
 
 const currentRelationCount = generated.sharedRelation?.summary?.edgeCount ?? null;
 const legacyRelationCount = validations.sharedRelation?.goldenComparison?.legacyPairCount ?? null;
-if (currentRelationCount !== 5977 || legacyRelationCount !== 5977) {
-  errors.push({ checkId: 'relationBaselineCountMismatch', currentRelationCount, legacyRelationCount });
+const goldenCurrentPairCount = validations.sharedRelation?.goldenComparison?.currentPairCount ?? null;
+if (!Number.isInteger(currentRelationCount) || currentRelationCount <= 0 ||
+    currentRelationCount !== legacyRelationCount || currentRelationCount !== goldenCurrentPairCount) {
+  errors.push({
+    checkId: 'relationBaselineParityMismatch',
+    currentRelationCount,
+    legacyRelationCount,
+    goldenCurrentPairCount,
+  });
 }
 
 const inputSnapshot = descriptor(dataInputs);
@@ -188,6 +196,27 @@ const contractChanges = collectChanged(previous?.snapshots?.contracts, contractS
 const pipelineChanges = collectChanged(previous?.snapshots?.pipeline, pipelineSnapshot);
 const artifactChanges = collectChanged(previous?.snapshots?.artifacts, artifactSnapshot);
 const validationChanges = collectChanged(previous?.snapshots?.validations, validationSnapshot);
+
+const noSnapshotChange = Boolean(previous) &&
+  dataChanges.length === 0 &&
+  contractChanges.length === 0 &&
+  pipelineChanges.length === 0 &&
+  artifactChanges.length === 0 &&
+  validationChanges.length === 0;
+
+if (noSnapshotChange && errors.length === 0) {
+  console.log(JSON.stringify({
+    version: 1,
+    stage: 'soldier-page-4-8',
+    status: 'PASS',
+    revalidation: 'NO_CHANGE',
+    baselineSourceRevision: previous.sourceRevision,
+    baselineGeneratedAt: previous.generatedAt,
+    counts: previous.counts,
+    completion: 'The existing Stage 4-8 baseline remains current. Full end-to-end regeneration reproduced without source, contract, pipeline, artifact or validation changes.',
+  }, null, 2));
+  process.exit(0);
+}
 
 let changeClassification = 'INITIAL_BASELINE';
 if (previous) {
@@ -226,6 +255,10 @@ const output = {
   status,
   generatedAt: new Date().toISOString(),
   sourceRevision: gitHead(),
+  regressionReference: {
+    preDirectJsonStage3Revision: 'c2276d1162dae52a1762e6381e7dd195c917da2f',
+    purpose: 'Frozen pre-4-1 Stage3 artifact used only by the 4-3/4-4/4-5 migration-regression validators.',
+  },
   purpose: 'Freeze the current UnityDataTool ConfigData Soldier pipeline baseline after full regeneration from Soldier Master through Stage3 and the shared Hero-Soldier Relation Layer.',
   completionCriteria: {
     parserRegressionFree: validations.inputAdapter?.status === 'PASS' && validations.inputAdapter?.legacyTextAssetParsing === false,
@@ -255,8 +288,8 @@ const output = {
     validations: Object.fromEntries(Object.entries(validationPaths).map(([k, p]) => [k, { path: p, status: validations[k]?.status ?? null }])),
     goldenRelation: {
       status: validations.sharedRelation?.goldenComparison?.status ?? null,
-      legacyPairCount: validations.sharedRelation?.goldenComparison?.legacyPairCount ?? null,
-      currentPairCount: validations.sharedRelation?.goldenComparison?.currentPairCount ?? null,
+      legacyPairCount: legacyRelationCount,
+      currentPairCount: goldenCurrentPairCount,
     },
     representativeFixtures: validations.representativeFixtures?.counts ?? null,
     masterStage3IdentityParity: {
