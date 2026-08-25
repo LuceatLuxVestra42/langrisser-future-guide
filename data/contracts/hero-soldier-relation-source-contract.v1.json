@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "stage": "A-3",
+  "status": "FROZEN",
+  "purpose": "Authoritative classification of every allowed Hero-Soldier relation source for the shared relation layer.",
+  "sources": {
+    "stage3Validation": "data/validation/soldier-stage3-final.v1.json",
+    "stage3RelationValidation": "data/validation/soldier-stage3-12-final.v1.json",
+    "spHeroSource": "data/configdata/ConfigDataSPHeroInfo.json",
+    "spSoldierSource": "data/configdata/ConfigDataSPSoldierInfo.json",
+    "heroIdentityContract": "data/contracts/hero-identity-contract.v1.json",
+    "soldierIdentityContract": "data/contracts/soldier-identity-contract.v1.json"
+  },
+  "edgeSourceKinds": {
+    "BASE_SOLDIER_HERO": {
+      "class": "DIRECT",
+      "table": "ConfigDataSoldierInfo",
+      "field": "GetSoldierHeros_ID",
+      "inputOwner": "normal Soldier",
+      "nativeDirection": "soldierId -> heroId",
+      "meaning": "Base heroes that can use the normal Soldier.",
+      "scope": "Normal Soldier only as the direct source record",
+      "spBehavior": "May be inherited by the explicitly linked SP Soldier through SP_SOLDIER_INHERIT.",
+      "authoritative": true
+    },
+    "SP_HERO_REWARD": {
+      "class": "DIRECT",
+      "table": "ConfigDataSPHeroInfo",
+      "ownerField": "ID",
+      "field": "SecondStageRewardSoldiers",
+      "nativeDirection": "heroId -> soldierId",
+      "meaning": "Soldiers newly granted to a Hero by SP Hero progression.",
+      "scope": "The Soldier IDs explicitly listed by the SP Hero record",
+      "spBehavior": "If the rewarded normal Soldier has an explicitly linked SP form, the relation may be inherited by that SP form through SP_SOLDIER_INHERIT.",
+      "authoritative": true
+    },
+    "SP_SOLDIER_EXPAND": {
+      "class": "DIRECT",
+      "table": "ConfigDataSPSoldierInfo",
+      "ownerField": "ID",
+      "field": "SecondStageExpandHeroList",
+      "nativeDirection": "soldierId -> heroId",
+      "meaning": "Heroes newly added to the SP Soldier at its second stage.",
+      "scope": "SP Soldier only",
+      "fullList": false,
+      "inheritToOtherForm": false,
+      "authoritative": true
+    },
+    "SP_SOLDIER_INHERIT": {
+      "class": "DERIVED",
+      "table": null,
+      "field": null,
+      "nativeDirection": "normal soldier relation -> linked SP soldier relation",
+      "meaning": "Derived edge created when an explicitly linked SP Soldier inherits an eligible relation from its normal form.",
+      "allowedParentKinds": [
+        "BASE_SOLDIER_HERO",
+        "SP_HERO_REWARD"
+      ],
+      "requiresSupportRelation": "SP_FORM_LINK",
+      "provenanceRule": "The derived edge must preserve the parent source kind and source record provenance; inheritance must never erase or replace the original source.",
+      "authoritative": false
+    }
+  },
+  "supportRelationKinds": {
+    "SP_FORM_LINK": {
+      "class": "SUPPORT_ONLY",
+      "table": "ConfigDataSPSoldierInfo",
+      "normalField": "NormalSoliderId",
+      "spField": "ID",
+      "direction": "normalSoldierId <-> spSoldierId",
+      "meaning": "Explicit Normal <-> SP Soldier form relationship used to authorize inheritance.",
+      "createsHeroSoldierEdge": false,
+      "authoritative": true,
+      "inferenceForbidden": true
+    }
+  },
+  "compositionRules": [
+    "Only DIRECT edge source kinds may originate a Hero-Soldier relation from ConfigData.",
+    "SP_SOLDIER_INHERIT may create a derived edge only when SP_FORM_LINK exists explicitly.",
+    "SecondStageExpandHeroList is an additive list for the SP Soldier and must never be interpreted as the full usable-Hero list.",
+    "SP_FORM_LINK is not itself a Hero-Soldier edge and must not increase the edge set without a parent relation to inherit.",
+    "An edge may have multiple source/provenance entries when multiple allowed sources independently produce the same heroId-soldierId pair.",
+    "Duplicate production of the same heroId-soldierId pair must merge provenance rather than duplicate the canonical edge.",
+    "No names, numeric ID offsets, tier, army type, ordering or other inferred patterns may create an edge source.",
+    "Any future ConfigData field proposed as a new relation source must be added to a later version of this contract before the shared relation builder may use it."
+  ],
+  "baselineEvidence": {
+    "baseEdges": 5720,
+    "directSpHeroAddedEdges": 25,
+    "inheritedSpHeroAddedEdges": 5,
+    "spExpandedEdges": 228,
+    "finalEdges": 5977,
+    "missingSpRelations": 0,
+    "spBaseInheritanceMismatch": 0,
+    "spAddedInheritanceMismatch": 0,
+    "errors": 0,
+    "reviews": 0
+  },
+  "completion": "A-3 is complete when later relation schemas and builders accept only the source kinds defined here and distinguish direct ConfigData provenance from derived SP inheritance."
+}
