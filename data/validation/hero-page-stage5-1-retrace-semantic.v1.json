@@ -45,10 +45,11 @@
   },
   "verifiedRule": {
     "conditionMissionJoin": "HeroFetter.CompletionConditions[ConditionType=2].Parm1 -> ConfigDataMissionInfo.ID",
+    "missionStageJoin": "When MissionInfo.Param2 == 6, MissionInfo.Param3 -> ConfigDataHeroDungeonLevelInfo.ID; the stage owner Hero is derived by reverse-indexing ConfigDataHeroInformationInfo.DungeonLevels_ID[].",
     "requiredHeroAppliesWhen": "MissionInfo.MissionType == 5 && MissionInfo.Param2 == 6",
-    "candidateResolver": "canonical(MissionInfo.Param1) UNION canonical(HeroDungeonLevelInfo.HeroId for MissionInfo.DungeonId) MINUS FetterOwnerHeroId",
+    "candidateResolver": "canonical(MissionInfo.Param1) UNION canonical(HeroInformationInfo.ID that reverse-owns MissionInfo.Param3 via DungeonLevels_ID[]) MINUS FetterOwnerHeroId",
     "requiredHeroResolver": "the sole remaining canonical Hero candidate",
-    "importantOrientationRule": "MissionInfo.Param1 is not always the required Hero and Dungeon owner is not always the required Hero; either side can be the Fetter owner. Resolve by set subtraction against the Fetter owner.",
+    "importantOrientationRule": "MissionInfo.Param1 is not always the required Hero and the Param3 stage owner is not always the required Hero; either side can be the Fetter owner. Resolve by set subtraction against the Fetter owner.",
     "otherCanonicalType2Rows": "MissionType 5/Param2 2 or 5, MissionType 29, and MissionType 34 do not produce an external required-Hero edge in the verified canonical scope."
   },
   "validation": {
