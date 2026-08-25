@@ -1,0 +1,163 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-5",
+  "substage": "5-5-3",
+  "checkpoint": "output-contract",
+  "status": "ACCEPTED",
+  "purpose": "Freeze the normalized per-Hero output shape that integrates the accepted Stage 5-5-1 canonical identity and Stage 5-5-2 display semantics without reopening source interpretation.",
+  "primaryKey": "heroId",
+  "canonicalHeroCount": 267,
+  "outputPathPlanned": "data/hero-page-stage5-5-3.v1.json",
+  "sources": {
+    "canonicalIdentity": "data/hero-name-master.v1.json",
+    "stage5_5_1Contract": "data/contracts/hero-page-header-stage5-5-contract.v1.json",
+    "stage5_5_2SourceTrace": "data/validation/hero-page-stage5-5-2-source-trace.v1.json",
+    "rarityValidation": "data/validation/hero-page-stage5-5-2-rarity.v1.json",
+    "factionValidation": "data/validation/hero-page-stage5-5-2-factions.v1.json",
+    "cvValidation": "data/validation/hero-page-stage5-5-2-cv.v1.json",
+    "originValidation": "data/validation/hero-page-stage5-5-2-origin.v1.json",
+    "artworkValidation": "data/validation/hero-page-stage5-5-2-artwork.v1.json",
+    "skinValidation": "data/validation/hero-page-stage5-5-2-skins-acquisition.v1.json"
+  },
+  "recordShape": {
+    "heroId": "integer; canonical primary key",
+    "identity": {
+      "nameKr": "string; canonical reviewed Korean Hero name",
+      "nameCn": "string; canonical reviewed Chinese Hero name",
+      "nameEn": "string; canonical reviewed English Hero name"
+    },
+    "rarity": {
+      "rank": "integer; ConfigDataHeroInfo.Rank",
+      "baseLabel": "enum N|R|SR|SSR|LLR resolved from validated Rank mapping"
+    },
+    "factions": [
+      {
+        "factionId": "integer; ConfigDataHeroTagInfo.ID",
+        "nameCn": "string; ConfigDataHeroTagInfo.Name",
+        "nameKr": "string|null; presentation localization layer, null until accepted",
+        "iconSourcePath": "string; ConfigDataHeroTagInfo.Icon"
+      }
+    ],
+    "cv": {
+      "state": "enum NAMED|NONE",
+      "sourceValue": "string; raw ConfigDataCharImageInfo.CVName preserved as-is, including ■■■■ for confirmed NONE cases",
+      "nameKr": "string|null; user-owned Korean localization, null until supplied"
+    },
+    "origin": {
+      "productionId": "integer; single validated HeroBelongProduction ID",
+      "nameCn": "string; validated production dictionary label",
+      "nameKr": "string|null; presentation localization layer, null until supplied",
+      "category": "enum ORIGINAL|MOBILE_ORIGINAL|COLLAB; presentation grouping derived from the accepted design rule"
+    },
+    "artwork": {
+      "sourceAssetPath": "string; ConfigDataCharImageInfo.HeroPainting source prefab path"
+    },
+    "skins": [
+      {
+        "skinId": "integer; ConfigDataHeroSkinInfo.ID",
+        "order": "integer; 1-based order derived only from ConfigDataHeroInfo.Skins_ID[] array position",
+        "nameCn": "string; ConfigDataHeroSkinInfo.Name source value",
+        "nameKr": "string|null; presentation localization layer, null until supplied",
+        "sourceImagePath": "string; ConfigDataCharImageSkinResourceInfo.Image",
+        "sourceSpinePath": "string; ConfigDataCharImageSkinResourceInfo.SpineAssetPath",
+        "acquisition": {
+          "state": "enum ENCODED|UNENCODED",
+          "typeCode": "integer|null; ConfigDataHeroSkinInfo.GetPathType",
+          "labelCn": "string|null; 2=光之回响, 3=命运星织, 4=英雄皮肤商店",
+          "labelKr": "string|null; 2=광휘의 메아리, 3=운명의 별짜기, 4=영웅 스킨 상점"
+        }
+      }
+    ]
+  },
+  "originCategoryRule": {
+    "ORIGINAL": {
+      "productionIds": [4, 5, 6, 7, 8, 9, 25, 30],
+      "meaning": "Langrisser I-V, Reincarnation, Millennium WS, Millennium DC"
+    },
+    "MOBILE_ORIGINAL": {
+      "productionIds": [3, 12, 18, 22],
+      "meaning": "Langrisser Mobile original story groups I-IV"
+    },
+    "COLLAB": {
+      "productionIds": [1, 2, 10, 11, 13, 14, 15, 16, 17, 19, 20, 21, 23, 24, 26, 27, 28, 29, 31, 32],
+      "meaning": "External collaboration works"
+    },
+    "completenessRule": "The three category sets must be disjoint and their union must equal production IDs 1-32."
+  },
+  "normalizationRules": [
+    "Exactly 267 output records are emitted, one per canonical heroId.",
+    "heroId is the only relational join key. Names are display values only.",
+    "identity stays nested and is copied only from the canonical identity master.",
+    "rarity.baseLabel is the base Rank-derived rarity only. SP must not overwrite it.",
+    "The design label SSR(1-person-limited) is not a base rarity value and must not be inferred in Stage 5-5-3; summon/banner semantics own that distinction.",
+    "factions is deterministic by ascending factionId for serialization only; this sort is not asserted as gameplay display semantics.",
+    "CV sourceValue is never auto-transliterated. For heroIds 99235, 99236 and 99276, cv.state is NONE even though sourceValue is preserved as ■■■■.",
+    "CV source strings containing '&' remain one sourceValue and are not split in this stage.",
+    "origin contains exactly one productionId per Hero and derives category only through originCategoryRule.",
+    "artwork.sourceAssetPath is a source asset locator, not a browser URL. Web asset resolution belongs to the asset/export layer.",
+    "skins preserves Skins_ID[] source order exactly and writes order as arrayPosition+1.",
+    "Heroes with no skin refs emit skins: [].",
+    "Skin sourceImagePath/sourceSpinePath are source asset locators, not assumed public URLs.",
+    "Missing GetPathType emits acquisition.state=UNENCODED with typeCode/labelCn/labelKr all null.",
+    "GetPathType 2/3/4 emits acquisition.state=ENCODED and the frozen labels from Stage 5-5-2.",
+    "Do not use HeroSkinInfo.Score, skin ID sorting, store UISort, or acquisition type to reorder skins."
+  ],
+  "ownershipBoundaries": {
+    "sp": "Stage 5-4 remains the authority for SP existence, SP illustration switching, SP missions and SP-specific page data. Stage 5-5-3 does not synthesize SP into rarity or skins.",
+    "soloLimitedSSR": "Banner/summon data owns the one-person-limited SSR distinction. Stage 5-5-3 stores base rarity SSR only until that separate source is joined by a later composition layer.",
+    "combat": "Stage 4 remains the authority for stats/jobs/skills/talent and is not embedded here.",
+    "bonds": "Stage 5-1 remains the authority for bond data and is not embedded here.",
+    "soldiers": "Stage 5-3 remains the authority for usable-Soldier data and is not embedded here.",
+    "assetExport": "This contract stores authoritative source asset paths. Extraction, conversion and web-serving paths belong to a separate asset pipeline."
+  },
+  "localizationPolicy": {
+    "canonicalHeroNames": "nameKr/nameCn/nameEn are already reviewed canonical identity fields and are emitted directly.",
+    "cv": "cv.nameKr remains null until the user supplies Korean voice-actor localization.",
+    "origin": "origin.nameKr remains null until an accepted Korean work-title dictionary is supplied.",
+    "factions": "factions[].nameKr remains null until the Korean faction-label dictionary is explicitly accepted.",
+    "skins": "skins[].nameKr remains null until a Korean skin-name dictionary is supplied.",
+    "rule": "Localization gaps do not block structural generation; they remain explicit nulls rather than synthesized strings."
+  },
+  "requiredValidation": {
+    "recordCount": 267,
+    "uniqueHeroIds": 267,
+    "requiredNonNull": [
+      "heroId",
+      "identity.nameKr",
+      "identity.nameCn",
+      "identity.nameEn",
+      "rarity.rank",
+      "rarity.baseLabel",
+      "factions",
+      "cv.state",
+      "cv.sourceValue",
+      "origin.productionId",
+      "origin.nameCn",
+      "origin.category",
+      "artwork.sourceAssetPath",
+      "skins"
+    ],
+    "allowedExplicitNulls": [
+      "factions[].nameKr",
+      "cv.nameKr",
+      "origin.nameKr",
+      "skins[].nameKr",
+      "skins[].acquisition.typeCode when state=UNENCODED",
+      "skins[].acquisition.labelCn when state=UNENCODED",
+      "skins[].acquisition.labelKr when state=UNENCODED"
+    ],
+    "skinCoverage": "Every referenced skin must resolve to one HeroSkinInfo row and one CharImageSkinResourceInfo row.",
+    "skinOrder": "For every Hero, emitted skins[].skinId sequence must exactly equal HeroInfo.Skins_ID[] after the validated omitted-empty normalization.",
+    "acquisitionGap": "Exactly the current source-defined UNENCODED set may remain null; Stage 5-5-3 must not fabricate missing acquisition data."
+  },
+  "prohibitions": [
+    "Do not flatten all values into a UI-specific string object; preserve semantic groups.",
+    "Do not duplicate Stage 4/5-1/5-3/5-4 owned data in this dataset.",
+    "Do not rewrite base rarity as SP or SSR(1-person-limited).",
+    "Do not replace source asset paths with guessed filenames or URLs.",
+    "Do not translate CV, faction, origin or skin labels automatically where localization is explicitly deferred.",
+    "Do not fill the 176 missing GetPathType rows by inference."
+  ],
+  "completionRule": "The Stage 5-5-3 output structure is fixed when this contract is accepted. The next action is to build data/hero-page-stage5-5-3.v1.json for all 267 Heroes exactly against this record shape and run full contract validation.",
+  "nextAction": "Generate and validate the 267-record Stage 5-5-3 integrated output without changing this schema unless a proven source contradiction is found."
+}
