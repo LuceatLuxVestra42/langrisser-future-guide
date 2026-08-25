@@ -6,6 +6,7 @@ on:
       - '.github/workflows/equipment-acquisition-analysis.yml'
       - 'scripts/analyze-equipment-acquisition.mjs'
       - 'scripts/scan-acquisition-pathtype-sources.mjs'
+      - 'scripts/sample-acquisition-pathtypes.mjs'
       - 'data/configdata/**'
       - 'data/generated/equipment_stage2_6_restrictions.json'
 
@@ -21,11 +22,13 @@ jobs:
         run: node scripts/analyze-equipment-acquisition.mjs
       - name: Scan PathType sources
         run: node scripts/scan-acquisition-pathtype-sources.mjs
+      - name: Sample PathTypes across ConfigData
+        run: node scripts/sample-acquisition-pathtypes.mjs
       - name: Persist acquisition checkpoints
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/generated/equipment_acquisition_path_analysis.json data/generated/equipment_acquisition_pathtype_sources.json
+          git add data/generated/equipment_acquisition_path_analysis.json data/generated/equipment_acquisition_pathtype_sources.json data/generated/equipment_acquisition_pathtype_samples.json
           if git diff --cached --quiet; then
             echo "No acquisition analysis changes"
             exit 0
