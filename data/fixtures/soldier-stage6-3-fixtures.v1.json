@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage6-3-fixtures/v1",
+  "stage": "6-3",
+  "status": "FROZEN",
+  "generatedAt": "2026-08-25T07:09:25.482Z",
+  "purpose": "Frozen representative QA fixtures covering structurally distinct Soldier page-data cases before filter/site integration QA.",
+  "selectionPolicy": "On first creation, select deterministic representatives from frozen Stage 6-1 records and the shared Hero-Soldier relation set; subsequent runs validate these exact frozen fixtures instead of silently replacing them.",
+  "sources": {
+    "fullRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    },
+    "classification": {
+      "path": "data/generated/soldier-stage6-2-classification.v1.json",
+      "gitBlobSha": "7bd9e9b3a0980885de0bb44a8c7186aa7c8012bf"
+    },
+    "relationSet": {
+      "path": "data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    }
+  },
+  "fixtures": {
+    "normalTier3": {
+      "soldierId": 135
+    },
+    "spFirstStageOnly": {
+      "soldierId": 5216
+    },
+    "spTwoStage": {
+      "soldierId": 5115
+    },
+    "spHeroAddedRelation": {
+      "soldierId": 131,
+      "heroId": 10,
+      "sourceKind": "SP_HERO_REWARD"
+    },
+    "secondStageExpandHero": {
+      "soldierId": 5115,
+      "heroId": 10,
+      "sourceKind": "SP_SOLDIER_EXPAND"
+    },
+    "classUiGroupBoundary": {
+      "uiGroup": "ARCHER_ASSASSIN",
+      "left": {
+        "soldierId": 602,
+        "armyType": "ARCHER"
+      },
+      "right": {
+        "soldierId": 1101,
+        "armyType": "ASSASSIN"
+      }
+    }
+  }
+}
