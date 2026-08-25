@@ -1,0 +1,1845 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage6-2-classification/v1",
+  "stage": "6-2",
+  "status": "PASS",
+  "classificationStatus": "PASS_WITH_REVIEW",
+  "generatedAt": "2026-08-25T07:09:25.482Z",
+  "policy": {
+    "PASS": "No blocking data-integrity, JOIN, relation, structural, or required-reference failure.",
+    "REVIEW": "Known non-blocking presentation/release/UI-policy uncertainty that must remain explicit.",
+    "FAIL": "Blocking structural or semantic regression such as duplicate Soldier IDs, missing TrainingTech references, missing SP relations, nonexistent Hero IDs, or Hero-Soldier directional mismatch."
+  },
+  "sources": {
+    "checkpoint": {
+      "path": "data/validation/soldier-stage6-0-checkpoint.v1.json",
+      "gitBlobSha": "86bee6c79cd6c8a45c85d5cfc020436c86eccb09"
+    },
+    "fullRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    },
+    "fullValidation": {
+      "path": "data/validation/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "cf6d985fe12f21a16124a61ee225d90218835d90"
+    },
+    "stage3Validation": {
+      "path": "data/validation/soldier-stage3-final.v1.json",
+      "gitBlobSha": "e1aa89d12d07edd513f993458be3e08e7ec57e03"
+    },
+    "abilityValidation": {
+      "path": "data/validation/soldier-stage5-3-ability.v1.json",
+      "gitBlobSha": "8c5f09485939545a2d32803d96ed620c9598e5c8"
+    },
+    "spValidation": {
+      "path": "data/validation/soldier-stage5-6-sp-detail.v1.json",
+      "gitBlobSha": "a4f190d4f1ea85d9d7e50f6e112f0806b349f85b"
+    },
+    "relationValidation": {
+      "path": "data/validation/hero-soldier-relation-validation.v1.json",
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638"
+    }
+  },
+  "summary": {
+    "records": 224,
+    "passRecords": 11,
+    "reviewRecords": 213,
+    "failRecords": 0,
+    "blockingFailureCount": 0,
+    "reviewIssueCount": 7,
+    "reviewReasonCounts": {
+      "IDENTITY_PRESENTATION_REVIEW": 41,
+      "KR_NAME_UNRESOLVED": 41,
+      "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED": 39,
+      "RELEASE_DATE_UNRESOLVED": 213,
+      "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED": 56
+    }
+  },
+  "failPolicyChecks": {
+    "duplicateSoldierIds": 0,
+    "missingTrainingLevelRefs": 0,
+    "missingBaseHeroIds": 0,
+    "missingSpHeroIds": 0,
+    "missingSpRelations": 0,
+    "byHeroPairMismatch": 0,
+    "bySoldierPairMismatch": 0,
+    "crossIndexPairMismatch": 0
+  },
+  "failures": [],
+  "reviews": [
+    {
+      "code": "KR_NAME_UNRESOLVED",
+      "count": 41,
+      "classification": "REVIEW",
+      "scope": "RECORD_OR_POLICY",
+      "rule": "Do not synthesize Korean names; preserve nameCn/nameKrStatus until a confirmed Korean source exists."
+    },
+    {
+      "code": "RELEASE_DATE_UNRESOLVED",
+      "count": 213,
+      "classification": "REVIEW",
+      "scope": "RECORD_OR_POLICY",
+      "rule": "Only externally confirmed release metadata may be presented as release order/date."
+    },
+    {
+      "code": "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED",
+      "count": 56,
+      "classification": "REVIEW",
+      "scope": "RECORD_OR_POLICY",
+      "rule": "SP Soldiers remain grouped before normal Soldiers by UI policy; do not infer their internal release order from IDs."
+    },
+    {
+      "code": "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED",
+      "count": 39,
+      "classification": "REVIEW",
+      "scope": "RECORD_OR_POLICY",
+      "rule": "Tier-1/tier-2 Soldiers may remain in the technical bucket because current list policy does not require release ordering for them."
+    },
+    {
+      "code": "REPRESENTATIVE_ASSET_ID_UNFROZEN",
+      "count": null,
+      "classification": "REVIEW",
+      "scope": "GLOBAL",
+      "rule": "Do not invent representative icon/image identifiers until a canonical asset-identifier source is frozen."
+    },
+    {
+      "code": "SAME_PATCH_ORDER_UNRESOLVED",
+      "count": null,
+      "classification": "REVIEW",
+      "scope": "GLOBAL",
+      "rule": "Do not present Soldier ID order as same-patch release order."
+    },
+    {
+      "code": "IDENTITY_PRESENTATION_REVIEW",
+      "count": 41,
+      "classification": "REVIEW",
+      "scope": "RECORD",
+      "rule": "Preserve canonical validationStatus; presentation metadata review is non-blocking unless it creates an invalid identity or JOIN."
+    }
+  ],
+  "records": [
+    {
+      "soldierId": 100,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 101,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 102,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 103,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 104,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 105,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 106,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 112,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 115,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 118,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 121,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 128,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 129,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 130,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 131,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 132,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 133,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 134,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 135,
+      "classification": "PASS",
+      "reasons": []
+    },
+    {
+      "soldierId": 136,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 200,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 201,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 202,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 203,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 210,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 213,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 216,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 219,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 225,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 228,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 231,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 234,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 237,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 244,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 245,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 246,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 247,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 248,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 249,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 250,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 251,
+      "classification": "PASS",
+      "reasons": []
+    },
+    {
+      "soldierId": 300,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 301,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 302,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 303,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 304,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 308,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 311,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 314,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 317,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 320,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 323,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 324,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 326,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 333,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 334,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 336,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 337,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 338,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 339,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 340,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 341,
+      "classification": "PASS",
+      "reasons": []
+    },
+    {
+      "soldierId": 400,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 401,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 402,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 403,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 407,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 410,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 413,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 416,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 419,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 420,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 422,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 423,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 424,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 425,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 426,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 427,
+      "classification": "PASS",
+      "reasons": []
+    },
+    {
+      "soldierId": 500,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 501,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 502,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 503,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 504,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 507,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 510,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 511,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 512,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 513,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 514,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 515,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 516,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 517,
+      "classification": "PASS",
+      "reasons": []
+    },
+    {
+      "soldierId": 600,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 601,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 602,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 603,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 604,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 607,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 610,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 613,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 616,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 617,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 618,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 619,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 621,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 622,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 625,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 628,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 631,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 634,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 635,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 636,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 637,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 638,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 639,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 640,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 641,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 642,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 643,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 644,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 645,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 646,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 647,
+      "classification": "PASS",
+      "reasons": []
+    },
+    {
+      "soldierId": 648,
+      "classification": "PASS",
+      "reasons": []
+    },
+    {
+      "soldierId": 800,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 801,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 802,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 805,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 806,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 808,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 811,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 812,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 813,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 814,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 815,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 816,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 817,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 818,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 819,
+      "classification": "PASS",
+      "reasons": []
+    },
+    {
+      "soldierId": 1000,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 1003,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 1006,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1009,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1012,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 1015,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1031,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1032,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1033,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1034,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1035,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1036,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1037,
+      "classification": "PASS",
+      "reasons": []
+    },
+    {
+      "soldierId": 1038,
+      "classification": "PASS",
+      "reasons": []
+    },
+    {
+      "soldierId": 1039,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1100,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 1101,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1102,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 1104,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1105,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1108,
+      "classification": "REVIEW",
+      "reasons": [
+        "KR_NAME_UNRESOLVED",
+        "IDENTITY_PRESENTATION_REVIEW",
+        "RELEASE_DATE_UNRESOLVED",
+        "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      ]
+    },
+    {
+      "soldierId": 1111,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1112,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1113,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1114,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1115,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1116,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1117,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 1118,
+      "classification": "PASS",
+      "reasons": []
+    },
+    {
+      "soldierId": 5115,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5118,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5121,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5129,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5130,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5132,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5203,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5210,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5216,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5225,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5231,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5237,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5244,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5245,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5248,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5308,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5311,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5314,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5320,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5324,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5326,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5402,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5410,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5413,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5419,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5422,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5423,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5504,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5507,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5511,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5514,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5602,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5607,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5610,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5621,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5622,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5631,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5634,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5636,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5637,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5638,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5641,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5644,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5802,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5805,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5811,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5812,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5815,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 5816,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 6015,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 6031,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 6034,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 6101,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 6105,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 6111,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "soldierId": 6113,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    }
+  ]
+}
