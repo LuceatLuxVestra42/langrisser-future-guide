@@ -8,265 +8,223 @@ const CONFIG = path.join(ROOT, 'data', 'configdata');
 const OUT = path.join(ROOT, 'data', 'validation', 'hero-display-stat-investigation.v1.json');
 const JOB_LINKS = path.join(ROOT, 'data', 'generated', 'hero-job-links.v1.json');
 
-const HERO_INFO = path.join(CONFIG, 'ConfigDataHeroInfo.json');
-const JOB_INFO = path.join(CONFIG, 'ConfigDataJobInfo.json');
-const PROPERTY_MODIFY_INFO = path.join(CONFIG, 'ConfigDataPropertyModifyInfo.json');
+const SOURCE_FILES = [
+  'ConfigDataHeroInfo.json',
+  'ConfigDataJobInfo.json',
+  'ConfigDataJobConnectionInfo.json',
+  'ConfigDataJobLevelInfo.json',
+  'ConfigDataSkillInfo.json',
+  'ConfigDataPropertyModifyInfo.json',
+  'ConfigDataHeroStarInfo.json',
+  'ConfigDataSoldierInfo.json',
+];
+
+const RELEVANT_KEY = /(soldier|army|troop|rate|ratio|modify|modifier|correction|talent|star|skill|job|hp|health|life|atk|attack|magic|int|def|dex|master|property)/i;
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 
-function preflightTextAsset(file, expectedName) {
-  const result = { file: path.relative(ROOT, file).replaceAll('\\\\', '/'), status: 'usable', issues: [] };
-  if (!fs.existsSync(file)) {
-    result.status = 'missing';
-    result.issues.push('file missing');
-    return result;
+function writeJson(file, value) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+function recordsOf(value) {
+  if (Array.isArray(value)) return value;
+  if (Array.isArray(value?.records)) return value.records;
+  if (Array.isArray(value?.Data)) return value.Data;
+  return [];
+}
+
+function idOf(record) {
+  if (!record || typeof record !== 'object') return null;
+  for (const key of ['ID', 'Id', 'id', 'Hero_ID', 'HeroID', 'HeroId', 'heroId']) {
+    if (Number.isInteger(record[key])) return record[key];
   }
-  let asset;
+  return null;
+}
+
+function summarizeSource(filename) {
+  const file = path.join(CONFIG, filename);
+  if (!fs.existsSync(file)) return { filename, status: 'missing' };
   try {
-    asset = readJson(file);
-  } catch (err) {
-    result.status = 'invalid-json';
-    result.issues.push(err.message);
-    return result;
-  }
-  if (expectedName && asset.m_Name !== expectedName) result.issues.push(`m_Name=${JSON.stringify(asset.m_Name)} expected ${expectedName}`);
-  if (!Number.isInteger(asset.m_size) || asset.m_size < 0) result.issues.push(`invalid m_size=${asset.m_size}`);
-  if (!Array.isArray(asset.m_bytes) || asset.m_bytes.length === 0) result.issues.push('m_bytes missing/empty');
-  if (Array.isArray(asset.m_bytes) && Number.isInteger(asset.m_size) && asset.m_size >= 0 && asset.m_bytes.length !== asset.m_size) {
-    result.issues.push(`m_size ${asset.m_size} != m_bytes.length ${asset.m_bytes.length}`);
-  }
-  if (Array.isArray(asset.m_bytes) && asset.m_bytes.some((b) => !Number.isInteger(b) || b < 0 || b > 255)) result.issues.push('m_bytes contains invalid byte');
-  if (result.issues.length) result.status = 'broken';
-  result.asset = asset;
-  return result;
-}
-
-function readVarint(buf, start) {
-  let value = 0;
-  let shift = 0;
-  let offset = start;
-  while (offset < buf.length && shift <= 49) {
-    const b = buf[offset++];
-    value += (b & 0x7f) * 2 ** shift;
-    if ((b & 0x80) === 0) return { value, offset };
-    shift += 7;
-  }
-  throw new Error(`invalid varint at ${start}`);
-}
-
-function parseMessage(buf) {
-  const fields = new Map();
-  let offset = 0;
-  while (offset < buf.length) {
-    const key = readVarint(buf, offset);
-    offset = key.offset;
-    const fieldNo = Math.floor(key.value / 8);
-    const wire = key.value & 7;
-    let value;
-    if (wire === 0) {
-      const v = readVarint(buf, offset);
-      value = v.value;
-      offset = v.offset;
-    } else if (wire === 1) {
-      if (offset + 8 > buf.length) throw new Error('truncated fixed64');
-      value = buf.subarray(offset, offset + 8);
-      offset += 8;
-    } else if (wire === 2) {
-      const len = readVarint(buf, offset);
-      offset = len.offset;
-      if (offset + len.value > buf.length) throw new Error('truncated length-delimited field');
-      value = buf.subarray(offset, offset + len.value);
-      offset += len.value;
-    } else if (wire === 5) {
-      if (offset + 4 > buf.length) throw new Error('truncated fixed32');
-      value = buf.subarray(offset, offset + 4);
-      offset += 4;
-    } else {
-      throw new Error(`unsupported wire type ${wire}`);
+    const raw = readJson(file);
+    if (raw && !Array.isArray(raw) && Array.isArray(raw.m_bytes)) {
+      return {
+        filename,
+        status: 'legacy-textasset',
+        recordCount: null,
+        rootKeys: Object.keys(raw),
+      };
     }
-    if (!fields.has(fieldNo)) fields.set(fieldNo, []);
-    fields.get(fieldNo).push({ wire, value });
+    const records = recordsOf(raw);
+    const keyCounts = new Map();
+    for (const record of records) {
+      if (!record || typeof record !== 'object' || Array.isArray(record)) continue;
+      for (const key of Object.keys(record)) keyCounts.set(key, (keyCounts.get(key) || 0) + 1);
+    }
+    const keys = [...keyCounts.keys()].sort();
+    return {
+      filename,
+      status: records.length ? 'direct-json' : 'empty-or-unknown-shape',
+      recordCount: records.length,
+      rootType: Array.isArray(raw) ? 'array' : typeof raw,
+      keys,
+      relevantKeys: keys.filter((key) => RELEVANT_KEY.test(key)),
+      keyPresence: Object.fromEntries(keys.map((key) => [key, keyCounts.get(key)])),
+      records,
+    };
+  } catch (error) {
+    return {
+      filename,
+      status: 'invalid-json',
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
-  return fields;
 }
 
-function parseLengthPrefixedRecords(bytes) {
-  const buf = Buffer.from(bytes);
-  const records = [];
-  let offset = 0;
-  while (offset < buf.length) {
-    if (offset + 4 > buf.length) throw new Error(`truncated record length at ${offset}`);
-    const len = buf.readUInt32BE(offset);
-    offset += 4;
-    if (len <= 0 || offset + len > buf.length) throw new Error(`invalid record length ${len} at ${offset - 4}`);
-    records.push(parseMessage(buf.subarray(offset, offset + len)));
-    offset += len;
-  }
-  return records;
+function compactSource(source) {
+  const { records, ...summary } = source;
+  return summary;
 }
 
-function scalarInt(fields, no, fallback = 0) {
-  const entries = fields.get(no) || [];
-  const entry = entries.find((x) => x.wire === 0);
-  return entry ? entry.value : fallback;
-}
-
-function stringValue(fields, no) {
-  const entries = fields.get(no) || [];
-  const entry = entries.find((x) => x.wire === 2);
-  return entry ? Buffer.from(entry.value).toString('utf8') : null;
-}
-
-function packedVarints(bytes) {
-  const out = [];
-  let offset = 0;
-  while (offset < bytes.length) {
-    const v = readVarint(bytes, offset);
-    out.push(v.value);
-    offset = v.offset;
-  }
-  return out;
-}
-
-function repeatedInts(fields, no) {
-  const out = [];
-  for (const entry of fields.get(no) || []) {
-    if (entry.wire === 0) out.push(entry.value);
-    if (entry.wire === 2) out.push(...packedVarints(entry.value));
-  }
-  return out;
-}
-
-function decodeHeroInfo(fields) {
-  return {
-    id: scalarInt(fields, 2),
-    useable: scalarInt(fields, 10) !== 0,
-    starCorrections: {
-      hp: repeatedInts(fields, 26),
-      at: repeatedInts(fields, 27),
-      magic: repeatedInts(fields, 28),
-      df: repeatedInts(fields, 29),
-      magicDf: repeatedInts(fields, 30),
-      dex: repeatedInts(fields, 31),
-    },
-  };
-}
-
-function decodeJobInfo(fields) {
-  const rewards = [];
-  for (const [typeField, valueField] of [[24, 25], [26, 27], [28, 29]]) {
-    const propertyType = scalarInt(fields, typeField, 0);
-    const value = scalarInt(fields, valueField, 0);
-    if (propertyType !== 0 || value !== 0) rewards.push({ propertyType, value, typeField, valueField });
-  }
-  return {
-    id: scalarInt(fields, 2),
-    nameCn: stringValue(fields, 3),
-    rank: scalarInt(fields, 8),
-    masteryRewards: rewards,
-  };
-}
-
-function indexById(records, decode) {
+function indexById(records) {
   const map = new Map();
-  const duplicates = [];
-  for (const fields of records) {
-    const obj = decode(fields);
-    if (!obj.id) continue;
-    if (map.has(obj.id)) duplicates.push(obj.id);
-    map.set(obj.id, obj);
+  for (const record of records || []) {
+    const id = idOf(record);
+    if (Number.isInteger(id) && !map.has(id)) map.set(id, record);
   }
-  return { map, duplicates: [...new Set(duplicates)].sort((a, b) => a - b) };
+  return map;
+}
+
+function relevantProjection(record) {
+  if (!record || typeof record !== 'object') return null;
+  const out = {};
+  for (const [key, value] of Object.entries(record)) {
+    if (key === 'ID' || key === 'Id' || key === 'id' || RELEVANT_KEY.test(key)) out[key] = value;
+  }
+  return out;
+}
+
+function findArrayFields(record, matcher) {
+  const found = {};
+  if (!record || typeof record !== 'object') return found;
+  for (const [key, value] of Object.entries(record)) {
+    if (matcher.test(key) && Array.isArray(value)) found[key] = value;
+  }
+  return found;
+}
+
+function uniqueIntegers(values) {
+  return [...new Set(values.filter(Number.isInteger))].sort((a, b) => a - b);
 }
 
 function main() {
-  const heroHealth = preflightTextAsset(HERO_INFO, 'ConfigDataHeroInfo');
-  const jobHealth = preflightTextAsset(JOB_INFO, 'ConfigDataJobInfo');
-  const propertyHealth = preflightTextAsset(PROPERTY_MODIFY_INFO, 'ConfigDataPropertyModifyInfo');
-  const sourceHealth = [heroHealth, jobHealth, propertyHealth].map(({ asset, ...rest }) => rest);
+  const sources = SOURCE_FILES.map(summarizeSource);
+  const byName = new Map(sources.map((source) => [source.filename, source]));
+  const required = ['ConfigDataHeroInfo.json', 'ConfigDataJobInfo.json', 'ConfigDataJobConnectionInfo.json', 'ConfigDataJobLevelInfo.json', 'ConfigDataSkillInfo.json'];
+  const blocked = required.filter((name) => byName.get(name)?.status !== 'direct-json');
 
-  if (heroHealth.status !== 'usable' || jobHealth.status !== 'usable') {
-    const blocked = {
-      version: 1,
+  if (blocked.length) {
+    const result = {
+      version: 2,
+      stage: '4-final-gates-investigation',
       status: 'SOURCE_BLOCKED',
-      purpose: 'Inspect HeroInfo star correction arrays and JobInfo job-mastery flat rewards used by the final hero display-stat calculation.',
-      sourceHealth,
+      purpose: 'Migrate Stage 4 semantic-gate investigation from legacy TextAsset m_bytes to UnityDataTool direct JSON without assigning unverified formulas.',
+      blocked,
+      sourceSummary: sources.map(compactSource),
     };
-    fs.mkdirSync(path.dirname(OUT), { recursive: true });
-    fs.writeFileSync(OUT, `${JSON.stringify(blocked, null, 2)}\n`);
+    writeJson(OUT, result);
+    console.error(`SOURCE_BLOCKED: ${blocked.join(', ')}`);
     process.exitCode = 2;
     return;
   }
 
-  const heroRecords = parseLengthPrefixedRecords(heroHealth.asset.m_bytes);
-  const jobRecords = parseLengthPrefixedRecords(jobHealth.asset.m_bytes);
-  const heroIndex = indexById(heroRecords, decodeHeroInfo);
-  const jobIndex = indexById(jobRecords, decodeJobInfo);
   const links = readJson(JOB_LINKS);
+  const linkRecords = Array.isArray(links?.records) ? links.records : [];
+  const fixtureHeroIds = uniqueIntegers([1, 6, ...linkRecords.slice(0, 8).map((x) => x.heroId)]);
 
-  const heroRows = [];
-  const relationErrors = [];
-  for (const link of links.records || []) {
-    const hero = heroIndex.map.get(link.heroId);
-    if (!hero) {
-      relationErrors.push({ heroId: link.heroId, issue: 'HeroInfo missing' });
-      continue;
-    }
-    const uniqueJobIds = [...new Set((link.connections || []).map((x) => x.jobId).filter(Boolean))];
-    const jobs = [];
-    const totalsByPropertyType = {};
-    for (const jobId of uniqueJobIds) {
-      const job = jobIndex.map.get(jobId);
-      if (!job) {
-        relationErrors.push({ heroId: link.heroId, jobId, issue: 'JobInfo missing' });
-        continue;
+  const heroIndex = indexById(byName.get('ConfigDataHeroInfo.json').records);
+  const jobIndex = indexById(byName.get('ConfigDataJobInfo.json').records);
+  const connectionIndex = indexById(byName.get('ConfigDataJobConnectionInfo.json').records);
+  const jobLevelIndex = indexById(byName.get('ConfigDataJobLevelInfo.json').records);
+  const skillIndex = indexById(byName.get('ConfigDataSkillInfo.json').records);
+
+  const fixtures = [];
+  const referencedTalentSkillIds = [];
+
+  for (const heroId of fixtureHeroIds) {
+    const link = linkRecords.find((x) => x.heroId === heroId) || null;
+    const hero = heroIndex.get(heroId) || null;
+    const connectionIds = uniqueIntegers([
+      ...(link?.connections || []).map((x) => x.jobConnectionId),
+      ...(link?.useableJobConnectionIds || []),
+      link?.primaryJobConnectionId,
+    ]);
+    const jobIds = uniqueIntegers((link?.connections || []).map((x) => x.jobId));
+    const jobLevelIds = uniqueIntegers((link?.connections || []).flatMap((x) => x.jobLevelIds || []));
+    const connections = connectionIds.map((id) => connectionIndex.get(id)).filter(Boolean);
+
+    const talentArrayFields = connections.map((record) => ({
+      connectionId: idOf(record),
+      fields: findArrayFields(record, /talent|skill/i),
+    }));
+    for (const item of talentArrayFields) {
+      for (const value of Object.values(item.fields)) {
+        for (const id of value) if (Number.isInteger(id)) referencedTalentSkillIds.push(id);
       }
-      jobs.push(job);
-      for (const reward of job.masteryRewards) {
-        const key = String(reward.propertyType);
-        totalsByPropertyType[key] = (totalsByPropertyType[key] || 0) + reward.value;
-      }
     }
-    heroRows.push({
-      heroId: link.heroId,
-      nameKr: link.nameKr,
-      nameCn: link.nameCn,
-      starCorrections: hero.starCorrections,
-      jobCount: jobs.length,
-      masteryTotalsByPropertyType: totalsByPropertyType,
-      jobs,
+
+    fixtures.push({
+      heroId,
+      nameKr: link?.nameKr || null,
+      hero: relevantProjection(hero),
+      heroAllKeys: hero ? Object.keys(hero).sort() : [],
+      jobConnections: connections.map((record) => relevantProjection(record)),
+      jobConnectionAllKeys: uniqueIntegers([]).length ? [] : [...new Set(connections.flatMap((record) => Object.keys(record)))].sort(),
+      talentArrayFields,
+      jobs: jobIds.map((id) => relevantProjection(jobIndex.get(id))).filter(Boolean),
+      jobLevels: jobLevelIds.map((id) => relevantProjection(jobLevelIndex.get(id))).filter(Boolean),
     });
   }
 
-  const leon = heroRows.find((x) => x.heroId === 6) || null;
+  const talentSkillIds = uniqueIntegers(referencedTalentSkillIds);
+  const talentSkills = talentSkillIds.map((id) => {
+    const record = skillIndex.get(id);
+    if (!record) return { id, missing: true };
+    return { id, record: relevantProjection(record), allKeys: Object.keys(record).sort() };
+  });
+
+  const heroStarSource = byName.get('ConfigDataHeroStarInfo.json');
+  const propertyModifySource = byName.get('ConfigDataPropertyModifyInfo.json');
+  const soldierSource = byName.get('ConfigDataSoldierInfo.json');
+
   const result = {
-    version: 1,
-    status: relationErrors.length ? 'REVIEW' : 'PASS',
-    purpose: 'Inspect evidence-backed inputs for the final hero display-stat formula without assigning unverified runtime arithmetic.',
-    fieldContract: {
-      heroInfoStarCorrections: { hp: 26, at: 27, magic: 28, df: 29, magicDf: 30, dex: 31 },
-      jobInfoMasteryRewards: [
-        { propertyType: 24, value: 25 },
-        { propertyType: 26, value: 27 },
-        { propertyType: 28, value: 29 },
-      ],
+    version: 2,
+    stage: '4-final-gates-investigation',
+    status: 'EVIDENCE_COLLECTED',
+    purpose: 'Collect direct-JSON evidence for displayJobStats, heroSoldierModifiers, and talentStarProgression. This output deliberately does not promote a formula or selection rule without independent evidence.',
+    sourceSummary: sources.map(compactSource),
+    fixtureHeroIds,
+    fixtures,
+    referencedTalentSkills: talentSkills,
+    auxiliarySamples: {
+      heroStarInfo: heroStarSource?.records?.slice(0, 12) || [],
+      propertyModifyInfo: propertyModifySource?.records?.slice(0, 20).map(relevantProjection) || [],
+      soldierInfo: soldierSource?.records?.slice(0, 5).map(relevantProjection) || [],
     },
-    sourceHealth,
-    sourceRecordCounts: { heroInfo: heroRecords.length, jobInfo: jobRecords.length },
-    duplicateIds: { heroInfo: heroIndex.duplicates, jobInfo: jobIndex.duplicates },
-    relationErrors,
-    propertyModifyTypeLookup: propertyHealth.status === 'usable'
-      ? 'ConfigDataPropertyModifyInfo is usable; a later revision may attach enum labels.'
-      : 'ConfigDataPropertyModifyInfo is not structurally usable, so numeric PropertyModifyType IDs are preserved without guessed labels.',
-    leonFixture: leon,
-    heroCount: heroRows.length,
-    heroes: heroRows,
-    evidenceNote: 'dump.cs shows JobInfo.Property1-3 and the job-mastery UI method SetMasterRewardProperty(PropertyModifyType,int). This file only extracts those stored rewards and HeroInfo star-correction arrays; it does not claim the exact runtime rounding/order.',
+    gateStatus: {
+      displayJobStats: 'EVIDENCE_ONLY',
+      heroSoldierModifiers: 'EVIDENCE_ONLY',
+      talentStarProgression: 'EVIDENCE_ONLY',
+    },
+    safetyDecision: 'No final stat arithmetic, soldier modifier percentages, or star-to-talent selection rule is inferred in this diagnostic. The collected named fields and representative records are intended for the next evidence-backed step.',
   };
-  fs.mkdirSync(path.dirname(OUT), { recursive: true });
-  fs.writeFileSync(OUT, `${JSON.stringify(result, null, 2)}\n`);
+
+  writeJson(OUT, result);
+  console.log(`EVIDENCE_COLLECTED: ${OUT}`);
+  console.log(`fixtures=${fixtures.length} talentSkills=${talentSkills.length}`);
 }
 
 main();
