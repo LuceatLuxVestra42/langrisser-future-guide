@@ -1,0 +1,36 @@
+name: Hero Stage 5-5-2 origin candidates
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-5-2-origin-candidates.yml'
+      - 'scripts/inspect_hero_page_stage5_5_2_origin_candidates.cjs'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/*.json'
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inspect origin candidates
+        run: node scripts/inspect_hero_page_stage5_5_2_origin_candidates.cjs
+
+      - name: Freeze candidate artifact
+        run: |
+          TARGET='data/validation/hero-page-stage5-5-2-origin-candidates.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
+            echo 'Origin candidate artifact already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$TARGET"
+          git commit -m 'Freeze Hero Stage 5-5-2 origin candidates'
+          git push
