@@ -21,7 +21,7 @@ const paths = {
   edgeSchema: 'data/contracts/hero-soldier-relation-edge-schema.v1.json',
   composition: 'data/contracts/hero-soldier-relation-composition-contract.v1.json',
   legacy: 'data/generated/soldier-hero-relations.v1.json',
-  fixturePlan: 'data/validation/soldier-stage4-8-1-fixture-plan.v1.json',
+  fixturePlan: 'data/validation/soldier-representative-fixture-plan.v1.json',
   relation: 'data/generated/hero-soldier-relations.v1.json',
   byHero: 'data/generated/hero-soldier-by-hero.v1.json',
   bySoldier: 'data/generated/hero-soldier-by-soldier.v1.json',
@@ -354,7 +354,7 @@ for (const edge of edges) for (const p of edge.provenance) {
   if (p.sourceKind === 'SP_SOLDIER_EXPAND' && p.sourceClass === 'DIRECT') currentConceptualCounts.spExpandedEdges++;
 }
 checks.goldenConceptualCountMismatch = Object.keys(legacyConceptualCounts).reduce((n, k) => n + (legacyConceptualCounts[k] === currentConceptualCounts[k] ? 0 : 1), 0);
-checks.fixturePlanBlobMismatch = gitBlobSha(paths.fixturePlan) === '8364b3840411ebd5bd74b9f027b796ef38a5086a' ? 0 : 1;
+checks.fixturePlanBlobMismatch = gitBlobSha(paths.fixturePlan) === '1f774530428ef6577d34da900f4625606a741de5' ? 0 : 1;
 checks.spSoldierFixtureSnapshotBlobMismatch = inputDescriptors.spSoldierInfo.gitBlobSha === '93dd784a7de913daa6d72f5df6cf6890a710c58a' ? 0 : 1;
 checks.invalidTraceabilitySha = [...Object.values(inputDescriptors), ...Object.values(contractDescriptors)].filter((d) => !/^[0-9a-f]{40}$/.test(d.gitBlobSha)).length;
 
