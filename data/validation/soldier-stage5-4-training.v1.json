@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage5-4-training-validation/v1",
+  "stage": "5-4",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T00:41:14.143Z",
+  "sources": {
+    "contract": {
+      "path": "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+      "gitBlobSha": "2943af041025c76c647b790661babe784e05f4f2"
+    },
+    "stage5_3": {
+      "path": "data/generated/soldier-detail-stage5-3.v1.json",
+      "gitBlobSha": "6752842bd72a0010704452a0f91a7b19ba88c0df"
+    },
+    "stage5_3Validation": {
+      "path": "data/validation/soldier-stage5-3-ability.v1.json",
+      "gitBlobSha": "8c5f09485939545a2d32803d96ed620c9598e5c8"
+    },
+    "soldierStage3": {
+      "path": "data/generated/soldier-stage3.v1.json",
+      "gitBlobSha": "afaebae396017391689c78a1b76c244e06067011"
+    },
+    "stage3Validation": {
+      "path": "data/validation/soldier-stage3-final.v1.json",
+      "gitBlobSha": "e1aa89d12d07edd513f993458be3e08e7ec57e03"
+    }
+  },
+  "checks": {
+    "contractNotFrozen": 0,
+    "stage5_3NotPass": 0,
+    "stage5_3ValidationNotPass": 0,
+    "stage3NotPass": 0,
+    "stage3ValidationNotPass": 0,
+    "stage3Tier3WithoutTenLevel": 0,
+    "stage3Tier3MultipleTenLevel": 0,
+    "duplicateStage5Ids": 0,
+    "duplicateTrainingProfileIds": 0,
+    "missingTrainingProfiles": 0,
+    "missingPrimaryTech": 0,
+    "abilityTechMismatches": 0,
+    "malformedPerLevelCosts": 0,
+    "sourceLv5TotalMismatches": 0,
+    "sourceLv10TotalMismatches": 0,
+    "nonTargetTrainingPopulated": 0,
+    "baselineMismatches": 0,
+    "outputRecordCountMismatch": 0
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "generatedRecords": 224,
+    "normalTier3": 129,
+    "normalNonTier3": 39,
+    "spSoldiers": 56,
+    "trainingPopulated": 129,
+    "perLevelCostRecords": 1290,
+    "expectedPerLevelCostRecords": 1290,
+    "nonPassIdentityMetadataCount": 41,
+    "missingTrainingProfiles": [],
+    "missingPrimaryTech": [],
+    "abilityTechMismatches": [],
+    "malformedPerLevelCosts": [],
+    "sourceLv5TotalMismatches": [],
+    "sourceLv10TotalMismatches": [],
+    "nonTargetTrainingPopulated": []
+  },
+  "errors": [],
+  "reviews": [
+    "41 Soldier identity records retain non-PASS presentation metadata; training cost validation is unaffected."
+  ]
+}
