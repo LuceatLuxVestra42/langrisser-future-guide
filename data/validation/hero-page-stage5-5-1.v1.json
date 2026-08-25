@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-5",
+  "substage": "5-5-1",
+  "status": "PASS_WITH_PENDING_ENRICHMENT",
+  "completion": "COMPLETE",
+  "scope": "Contract and ownership gate for Hero-detail header/basic information.",
+  "sources": {
+    "headerContract": {
+      "path": "data/contracts/hero-page-header-stage5-5-contract.v1.json",
+      "gitBlobSha": "93ff823289dcb3254801d237ab1b0649d8067e76"
+    },
+    "canonicalIdentity": {
+      "path": "data/hero-name-master.v1.json",
+      "gitBlobSha": "12eaf4f84a3e91477c80fbccd78c949b79c3829f",
+      "recordCount": 267
+    },
+    "identityStageContract": {
+      "path": "data/hero-master-stage3-1.v1.json",
+      "gitBlobSha": "6349edba005235159e6a40bccd82bf2af211862e",
+      "recordCount": 267,
+      "status": "complete"
+    },
+    "pageStage3Contract": {
+      "path": "data/hero-page-stage3-4.v1.json",
+      "gitBlobSha": "73c12170f0fd826561ca495d00293a7b493960d2",
+      "status": "complete"
+    }
+  },
+  "gates": {
+    "canonicalHeroIdentityReuse": {
+      "status": "PASS",
+      "canonicalHeroCount": 267,
+      "primaryKey": "heroId",
+      "directHeaderFields": [
+        "heroId",
+        "nameKr",
+        "nameCn",
+        "nameEn"
+      ]
+    },
+    "identityNotRebuilt": {
+      "status": "PASS",
+      "rule": "Stage 5-5 consumes the existing canonical 267-Hero identity master and does not reselect playable Heroes from ConfigData."
+    },
+    "headerOwnershipBoundary": {
+      "status": "PASS",
+      "pendingEnrichmentFields": [
+        "rarity",
+        "factions",
+        "cv",
+        "origin",
+        "artwork",
+        "skins"
+      ],
+      "outOfScopeOwnersPreserved": [
+        "Stage 4 combat/stat/job/skill data",
+        "Stage 5-1 bond data",
+        "Stage 5-3 usable-Soldier data",
+        "Stage 5-4 SP data"
+      ]
+    },
+    "discardedHypothesisGuard": {
+      "status": "PASS",
+      "rule": "HeroInfo Field 16 / ExchangedFragmentCount is explicitly forbidden as a rarity source."
+    },
+    "candidateFieldSemanticGuard": {
+      "status": "PASS",
+      "candidateConfigDataFields": [
+        "Name_Eng",
+        "CharImage_ID",
+        "HeroInformation_ID",
+        "Skins_ID",
+        "HeroBelongProduction"
+      ],
+      "rule": "Readable field names are not promoted to authoritative page-display semantics without source/coverage validation."
+    },
+    "nonSynthesisPolicy": {
+      "status": "PASS",
+      "rule": "Missing enrichment values remain null/review until an accepted source is validated."
+    }
+  },
+  "pending": {
+    "blockingFor5_5_1": false,
+    "fields": {
+      "rarity": "No accepted authoritative page source yet; validate independently in 5-5-2.",
+      "factions": "No accepted canonical Hero-to-faction source yet; validate independently in 5-5-2.",
+      "cv": "No accepted authoritative page source yet; validate independently in 5-5-2.",
+      "origin": "HeroInfo.HeroBelongProduction is a field-name candidate only; validate semantics and coverage before adoption.",
+      "artwork": "HeroInfo.CharImage_ID is a candidate identifier; validate asset resolution and coverage before adoption.",
+      "skins": "HeroInfo.Skins_ID is a candidate membership source; validate skin identity, ordering and acquisition metadata before adoption."
+    }
+  },
+  "hardErrors": [],
+  "completionRule": "5-5-1 is complete because the canonical identity source, header schema ownership, pending-enrichment set, anti-inference guards and downstream ownership boundaries are fixed. Pending enrichment extraction is expected work for 5-5-2 and does not reopen 5-5-1.",
+  "nextStage": "5-5-2: authoritative source and coverage validation for rarity, factions, CV, origin, artwork and skins."
+}
