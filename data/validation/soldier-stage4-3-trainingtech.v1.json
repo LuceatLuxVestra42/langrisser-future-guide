@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "stage": "soldier-page-4-3",
+  "status": "PASS",
+  "purpose": "Regress general tier-3 Soldier TrainingTech semantics after UnityDataTool direct-JSON migration. SP-specific description semantics remain reserved for stage 4-4.",
+  "baseline": {
+    "commit": "c2276d1162dae52a1762e6381e7dd195c917da2f",
+    "artifact": "data/generated/soldier-stage3.v1.json",
+    "role": "pre-4-1 semantic regression reference"
+  },
+  "inputs": {
+    "soldierMaster": "data/generated/soldier-master.v1.json",
+    "trainingTech": "data/configdata/ConfigDataTrainingTechInfo.json",
+    "trainingLevel": "data/configdata/ConfigDataTrainingTechLevelInfo.json",
+    "currentStage3": "data/generated/soldier-stage3.v1.json",
+    "stage3Validation": "data/validation/soldier-stage3-final.v1.json"
+  },
+  "hashes": {
+    "trainingTechBlobSha": "ad8b290f0e34de24b6eab9538894068a06e086d4",
+    "trainingLevelBlobSha": "30789c3e4fb0d79b56514e720bb71a053df78c72",
+    "baselineTier3SemanticSha256": "24bdc0aced7ce23ff70046dd11cedf00f198c3467c2f6856b22483c9792dc168",
+    "currentTier3SemanticSha256": "24bdc0aced7ce23ff70046dd11cedf00f198c3467c2f6856b22483c9792dc168",
+    "recomputedTier3SemanticSha256": "24bdc0aced7ce23ff70046dd11cedf00f198c3467c2f6856b22483c9792dc168"
+  },
+  "counts": {
+    "trainingTechRecords": 287,
+    "trainingLevelRecords": 2945,
+    "tier3Normal": 129,
+    "linkedTechRecords": 133,
+    "uniqueReferencedLevelIds": 1330,
+    "primaryTenLevelPaths": 129,
+    "primaryLevelRecords": 1290,
+    "tier3WithAdditionalLinkedTechs": 1
+  },
+  "checks": {
+    "tier3CountMismatch": 0,
+    "trainingTechCountMismatch": 0,
+    "trainingLevelCountMismatch": 0,
+    "missingTrainingLevelRefs": 0,
+    "tier3WithoutTraining": 0,
+    "tier3WithoutTenLevel": 0,
+    "tier3MultipleTenLevel": 0,
+    "primaryPathDescriptionMissing": 0,
+    "costAggregationMismatch": 0,
+    "baselineProfileMissing": 0,
+    "currentProfileMissing": 0,
+    "baselineSemanticMismatch": 0,
+    "currentSemanticMismatch": 0,
+    "baselineVsCurrentMismatch": 0,
+    "stage3TrainingCheckRegression": 0
+  },
+  "policy": {
+    "join": "Reverse-search ConfigDataTrainingTechInfo.SoldierIDRelated by canonical soldierId.",
+    "primaryPath": "Among linked techs, the soldier-specific path is the unique 10-level TechLevelupInfoList whose TrainingTechLevelInfo.SoldierSkillLevelup sequence is exactly 1..10.",
+    "getSoldierTechId": "Validation metadata only; it is not the authoritative TrainingTech JOIN.",
+    "levelOrder": "TechLevelupInfoList order defines sequenceLevel; SoldierSkillLevelup is preserved independently and validates the soldier-skill Lv1..10 path.",
+    "costs": "Preserve LevelupGoldCost and LevelupMaterialsCost per level; Lv5/Lv10 totals are derived from those exact level records.",
+    "spBoundary": "SpSoidlierDescription is not asserted in 4-3 and is validated with SP-specific semantics in 4-4."
+  },
+  "errors": [],
+  "completion": "All 129 general tier-3 TrainingTech profiles reproduce the pre-4-1 semantics from current direct JSON with unique Lv1-10 paths, intact descriptions and exact per-level-derived Lv5/Lv10 costs."
+}
