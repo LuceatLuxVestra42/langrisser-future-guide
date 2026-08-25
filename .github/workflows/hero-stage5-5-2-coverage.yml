@@ -6,7 +6,9 @@ on:
     paths:
       - '.github/workflows/hero-stage5-5-2-coverage.yml'
       - 'scripts/validate_hero_page_stage5_5_2.cjs'
+      - 'scripts/sync_hero_page_stage5_5_2_semantics.cjs'
       - 'data/validation/hero-page-stage5-5-2-source-trace.v1.json'
+      - 'data/validation/hero-page-stage5-5-2-skins-acquisition.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/configdata/ConfigDataHeroSkinInfo.json'
@@ -21,10 +23,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate Stage 5-5-2 coverage
+      - name: Generate Stage 5-5-2 structural coverage
         id: generate
         continue-on-error: true
         run: node scripts/validate_hero_page_stage5_5_2.cjs
+
+      - name: Sync confirmed semantic status
+        run: node scripts/sync_hero_page_stage5_5_2_semantics.cjs
 
       - name: Show coverage summary
         run: |
@@ -34,28 +39,31 @@ jobs:
           const r = JSON.parse(fs.readFileSync(p, 'utf8'));
           console.log(JSON.stringify({
             status: r.status,
+            completion: r.completion,
             canonicalHeroCount: r.canonicalHeroCount,
-            sourceCounts: r.sourceCounts,
             heroInfoIdentityCoverage: r.heroInfoIdentityCoverage,
+            rarity: r.fields.rarity,
+            factions: r.fields.factions,
+            cv: r.fields.cv,
             origin: r.fields.origin,
             artwork: r.fields.artwork,
             skins: {
+              status: r.fields.skins.status,
               heroesWithValidSkinList: r.fields.skins.heroesWithValidSkinList,
-              heroIdsWithInvalidSkinList: r.fields.skins.heroIdsWithInvalidSkinList,
-              invalidSkinListDetails: r.fields.skins.invalidSkinListDetails,
-              heroesWithNoSkinRefs: r.fields.skins.heroesWithNoSkinRefs,
               totalSkinRefs: r.fields.skins.totalSkinRefs,
               resolvedSkinRefs: r.fields.skins.resolvedSkinRefs,
-              unresolvedSkinRefs: r.fields.skins.unresolvedSkinRefs,
-              specifiedHeroMismatches: r.fields.skins.specifiedHeroMismatches,
-              sharedSkinRefs: r.fields.skins.sharedSkinRefs,
-              duplicateSkinRecordIds: r.fields.skins.duplicateSkinRecordIds,
-              getPathTypeMissingSkinIds: r.fields.skins.getPathTypeMissingSkinIds,
-              charImageSkinResourceMissingSkinIds: r.fields.skins.charImageSkinResourceMissingSkinIds
+              artworkSemantics: r.fields.skins.artworkSemantics,
+              orderingSemantics: r.fields.skins.orderingSemantics,
+              acquisitionSemantics: r.fields.skins.acquisitionSemantics,
+              acquisitionMapping: r.fields.skins.acquisitionMapping,
+              acquisitionEncodedSkinCount: r.fields.skins.acquisitionEncodedSkinCount,
+              acquisitionUnencodedSkinCount: r.fields.skins.acquisitionUnencodedSkinCount
             },
             hardErrors: r.hardErrors,
             coverageIssues: r.coverageIssues,
-            unresolvedSemanticFields: r.unresolvedSemanticFields
+            unresolvedSemanticFields: r.unresolvedSemanticFields,
+            dataCompletionIssues: r.dataCompletionIssues,
+            readyForDisplayEnrichment: r.readyForDisplayEnrichment
           }, null, 2));
           NODE
 
@@ -107,5 +115,9 @@ jobs:
             console.error('Structural hard errors remain:', r.hardErrors);
             process.exit(1);
           }
-          console.log('No structural hard errors remain. Semantic REVIEW items may continue downstream.');
+          if (Array.isArray(r.unresolvedSemanticFields) && r.unresolvedSemanticFields.length > 0) {
+            console.error('Unresolved semantic fields remain:', r.unresolvedSemanticFields);
+            process.exit(1);
+          }
+          console.log('Stage 5-5-2 structural and semantic gates passed; explicit source-data gaps are tracked separately.');
           NODE
