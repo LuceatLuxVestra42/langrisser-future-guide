@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage6-3-representative-qa/v1",
+  "stage": "6-3",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T07:09:25.482Z",
+  "purpose": "Representative manual-style structural QA encoded as deterministic fixtures across the distinct Soldier page-data branches required before filter QA.",
+  "sources": {
+    "fullRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    },
+    "fullValidation": {
+      "path": "data/validation/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "cf6d985fe12f21a16124a61ee225d90218835d90"
+    },
+    "classification": {
+      "path": "data/generated/soldier-stage6-2-classification.v1.json",
+      "gitBlobSha": "7bd9e9b3a0980885de0bb44a8c7186aa7c8012bf"
+    },
+    "classificationValidation": {
+      "path": "data/validation/soldier-stage6-2-classification.v1.json",
+      "gitBlobSha": "543c363c0c00c3ab9b791b894db468533cd20f25"
+    },
+    "relationSet": {
+      "path": "data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    },
+    "relationValidation": {
+      "path": "data/validation/hero-soldier-relation-validation.v1.json",
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638"
+    },
+    "fixturePlan": {
+      "path": "data/fixtures/soldier-stage6-3-fixtures.v1.json",
+      "gitBlobSha": "eb73cc39195fb4d94bd8ed1b49e2949f29c80e3b"
+    }
+  },
+  "checks": {
+    "upstreamNonPass": 0,
+    "duplicateFullRecordIds": 0,
+    "duplicateClassificationIds": 0,
+    "fixtureCountMismatch": 0,
+    "failedFixtures": 0
+  },
+  "coverage": {
+    "fixtureCategories": 6,
+    "passedFixtures": 6,
+    "failedFixtures": 0,
+    "inheritedReviewFixtureMentions": 6,
+    "categories": [
+      "NORMAL_TIER3",
+      "SP_FIRST_STAGE_ONLY",
+      "SP_TWO_STAGE",
+      "SP_HERO_ADDED_RELATION",
+      "SECOND_STAGE_EXPAND_HERO",
+      "CLASS_UI_GROUP_BOUNDARY"
+    ]
+  },
+  "fixtures": [
+    {
+      "kind": "NORMAL_TIER3",
+      "status": "PASS",
+      "soldierId": 135,
+      "label": "산맥의 수호자",
+      "classification": "PASS",
+      "techId": 238,
+      "heroCount": 17,
+      "errors": []
+    },
+    {
+      "kind": "SP_FIRST_STAGE_ONLY",
+      "status": "PASS",
+      "soldierId": 5216,
+      "label": "오크 광전사",
+      "normalSoldierId": 216,
+      "classification": "REVIEW",
+      "errors": []
+    },
+    {
+      "kind": "SP_TWO_STAGE",
+      "status": "PASS",
+      "soldierId": 5115,
+      "label": "근위창병",
+      "normalSoldierId": 115,
+      "expandedHeroCount": 5,
+      "classification": "REVIEW",
+      "errors": []
+    },
+    {
+      "kind": "SP_HERO_ADDED_RELATION",
+      "status": "PASS",
+      "soldierId": 131,
+      "heroId": 10,
+      "label": "교국 위병",
+      "classification": "REVIEW",
+      "provenanceKinds": [
+        "SP_HERO_REWARD"
+      ],
+      "errors": []
+    },
+    {
+      "kind": "SECOND_STAGE_EXPAND_HERO",
+      "status": "PASS",
+      "soldierId": 5115,
+      "heroId": 10,
+      "label": "근위창병",
+      "classification": "REVIEW",
+      "provenanceKinds": [
+        "SP_SOLDIER_EXPAND"
+      ],
+      "errors": []
+    },
+    {
+      "kind": "CLASS_UI_GROUP_BOUNDARY",
+      "status": "PASS",
+      "uiGroup": "ARCHER_ASSASSIN",
+      "left": {
+        "soldierId": 602,
+        "label": "하이엘프",
+        "armyType": "ARCHER",
+        "classification": "REVIEW"
+      },
+      "right": {
+        "soldierId": 1101,
+        "label": "밴디트",
+        "armyType": "ASSASSIN",
+        "classification": "REVIEW"
+      },
+      "errors": []
+    }
+  ],
+  "errors": [],
+  "reviews": [
+    {
+      "kind": "SP_FIRST_STAGE_ONLY",
+      "soldierId": 5216,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "kind": "SP_TWO_STAGE",
+      "soldierId": 5115,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "kind": "SP_HERO_ADDED_RELATION",
+      "soldierId": 131,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "kind": "SECOND_STAGE_EXPAND_HERO",
+      "soldierId": 5115,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED",
+        "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      ]
+    },
+    {
+      "kind": "CLASS_UI_GROUP_BOUNDARY_LEFT",
+      "soldierId": 602,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    },
+    {
+      "kind": "CLASS_UI_GROUP_BOUNDARY_RIGHT",
+      "soldierId": 1101,
+      "classification": "REVIEW",
+      "reasons": [
+        "RELEASE_DATE_UNRESOLVED"
+      ]
+    }
+  ]
+}
