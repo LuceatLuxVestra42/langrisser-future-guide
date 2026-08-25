@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-3",
+  "substage": "5-3-5",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "scope": "Final coverage and integrity gate for the Hero-detail usable-Soldier block.",
+  "sources": {
+    "contract": {
+      "path": "data/contracts/hero-page-soldiers-stage5-3-contract.v1.json",
+      "gitBlobSha": "8ec9ad4879c14fb1153c78412b866e002a8195a8"
+    },
+    "stage5_3_4Validation": {
+      "path": "data/validation/hero-page-stage5-3-4.v1.json",
+      "gitBlobSha": "612e41d0ac8d991b58e8891100eca010ff43893c"
+    },
+    "sharedRelationValidation": {
+      "path": "data/validation/hero-soldier-relation-validation.v1.json",
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638"
+    },
+    "generatedBundle": "data/generated/hero-page-soldiers-stage5-3.v1.json"
+  },
+  "gates": {
+    "sharedRelationAuthority": "PASS",
+    "heroPageDoesNotRecalculateMembership": "PASS",
+    "canonicalHeroCoverage": {
+      "status": "PASS",
+      "canonicalHeroes": 267,
+      "generatedHeroKeys": 267,
+      "heroesWithSoldiers": 267,
+      "heroesWithNoSoldiers": 0
+    },
+    "relationPreservation": {
+      "status": "PASS",
+      "canonicalRelationCount": 5977,
+      "generatedRelationCount": 5977,
+      "countMismatch": 0
+    },
+    "soldierResolution": {
+      "status": "PASS",
+      "referencedUniqueSoldiers": 224,
+      "resolvedSoldierMetadata": 224,
+      "soldierMasterRecords": 224,
+      "unknownSoldierIds": 0
+    },
+    "identityAndDuplicateIntegrity": {
+      "status": "PASS",
+      "duplicateHeroIds": 0,
+      "duplicateSoldierMasterIds": 0,
+      "duplicateSoldierIdsWithinHero": 0,
+      "missingByHeroKeys": 0,
+      "extraByHeroKeys": 0
+    },
+    "relationSnapshotIntegrity": {
+      "status": "PASS",
+      "relationValidationNotPass": 0,
+      "relationSetBlobMismatch": 0,
+      "crossIndexPairMismatch": 0,
+      "legacyGoldenComparison": "MATCH"
+    },
+    "deterministicRegeneration": {
+      "status": "PASS",
+      "mainCommit": "fad489b327c9cd5d53202c58e0ab057e45874647",
+      "workflowRunId": 32802128112,
+      "verification": "Generate and validate succeeded; frozen-output verification succeeded on main."
+    }
+  },
+  "review": {
+    "blocking": false,
+    "pendingKoreanNameSoldierCount": 41,
+    "reason": "41 referenced Soldier Master records have pending/missing Korean display names. This is presentation metadata only; canonical Hero-Soldier membership and Soldier ID resolution are complete.",
+    "policy": "Do not synthesize Korean names. Preserve nameKr=null with nameKrStatus/validationStatus until the presentation metadata is reviewed."
+  },
+  "hardErrors": [],
+  "completionRule": "Stage 5-3 is complete because every canonical Hero is covered, all 5,977 canonical relations are preserved, all 224 referenced Soldier IDs resolve, shared relation validation passes, and no structural or join error remains. Presentation-name REVIEW does not reopen relation analysis.",
+  "nextStage": "Proceed to the next reordered Hero Stage 5 block; Stage 5-3 should be treated as a frozen input checkpoint unless the shared Hero-Soldier Relation Layer or Soldier Master changes."
+}
