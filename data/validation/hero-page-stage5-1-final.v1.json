@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-1",
+  "checkpoint": "final",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "purpose": "Final Stage 5-1 gate for the canonical 267-Hero bond/fetter block.",
+  "inputs": [
+    "data/generated/hero-page-stage5-1-bonds.v1.json",
+    "data/validation/hero-page-stage5-1-production-candidate.v1.json",
+    "data/validation/hero-page-stage5-1-retrace-semantic.v1.json",
+    "data/validation/hero-page-stage5-1-type1-dump-symbols.txt"
+  ],
+  "output": "data/generated/hero-page-stage5-1-bonds-final.v1.json",
+  "semanticRules": {
+    "conditionType1": {
+      "enum": "FetterCompleteConditionType_HeroFavorabilityLevel = 1",
+      "parm1": "target Hero ID",
+      "parm2": "required favorability level",
+      "canonicalValidation": "Parm1 equals the owning canonical Hero for all Type1 rows; source Parm2 thresholds are preserved verbatim."
+    },
+    "conditionType2": {
+      "conditionMissionJoin": "HeroFetter.CompletionConditions[ConditionType=2].Parm1 -> ConfigDataMissionInfo.ID",
+      "missionStageJoin": "When MissionInfo.MissionType == 5 and MissionInfo.Param2 == 6, MissionInfo.Param3 -> ConfigDataHeroDungeonLevelInfo.ID; stage ownership is derived by reverse-indexing ConfigDataHeroInformationInfo.DungeonLevels_ID[].",
+      "requiredHeroAppliesWhen": "MissionInfo.MissionType == 5 && MissionInfo.Param2 == 6",
+      "candidateResolver": "canonical(MissionInfo.Param1) UNION canonical(HeroInformationInfo.ID that reverse-owns MissionInfo.Param3 via DungeonLevels_ID[]) MINUS FetterOwnerHeroId",
+      "requiredHeroResolver": "the sole remaining canonical Hero candidate",
+      "importantOrientationRule": "MissionInfo.Param1 is not always the required Hero and the Param3 stage owner is not always the required Hero; either side can be the Fetter owner. Resolve by set subtraction against the Fetter owner.",
+      "otherCanonicalType2Rows": "MissionType 5/Param2 2 or 5, MissionType 29, and MissionType 34 do not produce an external required-Hero edge in the verified canonical scope."
+    }
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "heroesWithFiveBonds": 267,
+    "bondCount": 1335,
+    "completionConditionCount": 2399,
+    "type1Count": 1335,
+    "type1ResolvedCount": 1335,
+    "type2Count": 1064,
+    "type2RequiredHeroCount": 338,
+    "type2UnresolvedCount": 0,
+    "unknownTypeCount": 0,
+    "hardErrorCount": 0,
+    "reviewCount": 0
+  },
+  "checks": [
+    {
+      "name": "semantic checkpoint resolved",
+      "expected": "RESOLVED",
+      "actual": "RESOLVED",
+      "pass": true
+    },
+    {
+      "name": "candidate hard structural errors",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "candidate invariant checks all pass",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "canonical Hero count",
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    {
+      "name": "all Heroes have five bonds",
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    {
+      "name": "canonical bond count",
+      "expected": 1335,
+      "actual": 1335,
+      "pass": true
+    },
+    {
+      "name": "canonical completion condition count",
+      "expected": 2399,
+      "actual": 2399,
+      "pass": true
+    },
+    {
+      "name": "ConditionType 1 count",
+      "expected": 1335,
+      "actual": 1335,
+      "pass": true
+    },
+    {
+      "name": "ConditionType 1 all resolved",
+      "expected": 1335,
+      "actual": 1335,
+      "pass": true
+    },
+    {
+      "name": "ConditionType 2 count",
+      "expected": 1064,
+      "actual": 1064,
+      "pass": true
+    },
+    {
+      "name": "ConditionType 2 unresolved count",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "ConditionType 2 required-Hero count",
+      "expected": 338,
+      "actual": 338,
+      "pass": true
+    },
+    {
+      "name": "unknown condition type count",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "final hard error count",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "reviews": [],
+  "decision": "Hero Stage 5-1 is complete. The canonical 267-Hero bond block has five source fetters per Hero, all CompletionCondition types are semantically resolved, and all required-Hero joins are unambiguous."
+}

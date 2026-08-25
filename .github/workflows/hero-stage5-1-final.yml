@@ -1,0 +1,60 @@
+name: Hero Stage 5-1 final gate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-1-final.yml'
+      - 'scripts/build_hero_stage5_1_bonds.cjs'
+      - 'scripts/finalize_hero_stage5_1_bonds.cjs'
+      - 'data/validation/hero-page-stage5-1-retrace-semantic.v1.json'
+      - 'data/validation/hero-page-stage5-1-type1-dump-symbols.txt'
+      - 'data/hero-name-master.v1.json'
+      - 'data/configdata/ConfigDataHeroInformationInfo.json'
+      - 'data/configdata/ConfigDataHeroFetterInfo.json'
+      - 'data/configdata/ConfigDataMissionInfo.json'
+      - 'data/configdata/ConfigDataHeroDungeonLevelInfo.json'
+
+permissions:
+  contents: write
+
+jobs:
+  final-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rebuild Stage 5-1 production candidate
+        run: node scripts/build_hero_stage5_1_bonds.cjs
+
+      - name: Run Hero Stage 5-1 final gate
+        run: node scripts/finalize_hero_stage5_1_bonds.cjs
+
+      - name: Show final summary
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = 'data/validation/hero-page-stage5-1-final.v1.json';
+          const r = JSON.parse(fs.readFileSync(p, 'utf8'));
+          console.log(JSON.stringify({
+            status: r.status,
+            completion: r.completion,
+            summary: r.summary,
+            checks: r.checks,
+            decision: r.decision
+          }, null, 2));
+          NODE
+
+      - name: Freeze Stage 5-1 final outputs
+        run: |
+          TARGETS='data/generated/hero-page-stage5-1-bonds-final.v1.json data/validation/hero-page-stage5-1-final.v1.json'
+          if [ -z "$(git status --porcelain -- $TARGETS)" ]; then
+            echo 'Stage 5-1 final outputs already current.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add $TARGETS
+            git commit -m 'Freeze Hero Stage 5-1 final bond block'
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
