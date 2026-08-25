@@ -1,0 +1,211 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage6-4-filter-qa/v1",
+  "stage": "6-4",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T07:09:25.482Z",
+  "purpose": "Validate Soldier list filter semantics against frozen Stage 6 page-data without creating a second Soldier master or inferring missing presentation metadata.",
+  "filterSemantics": {
+    "kindDimension": "TIER_1/TIER_2/TIER_3/SP are OR within one display-kind dimension; tier tokens match normal Soldiers only and SP matches explicit isSp=true.",
+    "actualClass": "armyType exact equality; actual class remains distinct from uiGroup.",
+    "uiGroup": "uiGroup exact equality; combined groups may contain multiple distinct armyType values.",
+    "nameSearch": "NFKC-normalized substring match over stored nameKr/nameCn only; no fuzzy, romanization or inferred aliases.",
+    "crossDimensionCombination": "AND between kind, armyType, uiGroup and name-search dimensions."
+  },
+  "sources": {
+    "fullRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    },
+    "fullValidation": {
+      "path": "data/validation/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "cf6d985fe12f21a16124a61ee225d90218835d90"
+    },
+    "classificationValidation": {
+      "path": "data/validation/soldier-stage6-2-classification.v1.json",
+      "gitBlobSha": "543c363c0c00c3ab9b791b894db468533cd20f25"
+    },
+    "representativeFixtures": {
+      "path": "data/fixtures/soldier-stage6-3-fixtures.v1.json",
+      "gitBlobSha": "eb73cc39195fb4d94bd8ed1b49e2949f29c80e3b"
+    },
+    "representativeValidation": {
+      "path": "data/validation/soldier-stage6-3-representative-qa.v1.json",
+      "gitBlobSha": "bd7d3ee67db8fb8c3c0b5da8f7d269308f771d20"
+    },
+    "listValidation": {
+      "path": "data/validation/soldier-stage5-7-list.v1.json",
+      "gitBlobSha": "e3e05a882fd9520ec8916660ccb8476aa2c41efd"
+    }
+  },
+  "checks": {
+    "upstreamNonPass": 0,
+    "failedTests": 0,
+    "malformedFilterFields": 0,
+    "kindPartitionMismatch": 0,
+    "actualArmyTypeContamination": 0,
+    "uiGroupContamination": 0,
+    "classUiGroupBoundaryMismatch": 0
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "kindCounts": {
+      "TIER_1": 12,
+      "TIER_2": 27,
+      "TIER_3": 129,
+      "SP": 56,
+      "DEFAULT_TIER3_PLUS_SP": 185
+    },
+    "armyTypeCounts": {
+      "ARCHER": 26,
+      "ASSASSIN": 18,
+      "CAVALRY": 27,
+      "DEMON": 18,
+      "FLYING": 22,
+      "HOLY": 21,
+      "INFANTRY": 30,
+      "LANCER": 26,
+      "MAGE": 18,
+      "WATER": 18
+    },
+    "uiGroupCounts": {
+      "ARCHER_ASSASSIN": 44,
+      "CAVALRY": 27,
+      "FLYING_WATER": 40,
+      "INFANTRY": 30,
+      "LANCER": 26,
+      "MAGE_HOLY_DEMON": 57
+    },
+    "testCount": 15,
+    "passedTests": 15,
+    "failedTests": 0
+  },
+  "tests": [
+    {
+      "name": "baseline-224-records",
+      "status": "PASS",
+      "recordCount": 224,
+      "uniqueIdCount": 224
+    },
+    {
+      "name": "kind-partition-covers-all-records-once",
+      "status": "PASS",
+      "tier1": 12,
+      "tier2": 27,
+      "tier3": 129,
+      "sp": 56,
+      "partitionCount": 224
+    },
+    {
+      "name": "tier3-is-normal-only-and-baseline-129",
+      "status": "PASS",
+      "count": 129
+    },
+    {
+      "name": "sp-filter-is-explicit-and-baseline-56",
+      "status": "PASS",
+      "count": 56
+    },
+    {
+      "name": "lower-tier-baseline-39",
+      "status": "PASS",
+      "tier1": 12,
+      "tier2": 27,
+      "total": 39
+    },
+    {
+      "name": "default-tier3-plus-sp-is-union",
+      "status": "PASS",
+      "count": 185,
+      "expectedFromFrozenBaseline": 185
+    },
+    {
+      "name": "actual-army-type-buckets-exact",
+      "status": "PASS",
+      "distinctArmyTypes": 10,
+      "contamination": 0,
+      "counts": {
+        "ARCHER": 26,
+        "ASSASSIN": 18,
+        "CAVALRY": 27,
+        "DEMON": 18,
+        "FLYING": 22,
+        "HOLY": 21,
+        "INFANTRY": 30,
+        "LANCER": 26,
+        "MAGE": 18,
+        "WATER": 18
+      }
+    },
+    {
+      "name": "ui-group-buckets-exact",
+      "status": "PASS",
+      "distinctUiGroups": 6,
+      "contamination": 0,
+      "counts": {
+        "ARCHER_ASSASSIN": 44,
+        "CAVALRY": 27,
+        "FLYING_WATER": 40,
+        "INFANTRY": 30,
+        "LANCER": 26,
+        "MAGE_HOLY_DEMON": 57
+      }
+    },
+    {
+      "name": "actual-class-vs-ui-group-boundary",
+      "status": "PASS",
+      "uiGroup": "ARCHER_ASSASSIN",
+      "left": {
+        "soldierId": 602,
+        "armyType": "ARCHER"
+      },
+      "right": {
+        "soldierId": 1101,
+        "armyType": "ASSASSIN"
+      }
+    },
+    {
+      "name": "stored-korean-name-search",
+      "status": "PASS",
+      "soldierId": 135,
+      "query": "산맥의 수호자",
+      "matchCount": 1
+    },
+    {
+      "name": "stored-chinese-name-search",
+      "status": "PASS",
+      "soldierId": 135,
+      "query": "山峦守望者",
+      "matchCount": 1
+    },
+    {
+      "name": "name-search-uses-stored-cn-without-invented-kr-name",
+      "status": "PASS",
+      "soldierId": 100,
+      "nameKr": null,
+      "query": "枪兵"
+    },
+    {
+      "name": "combined-kind-and-ui-group-use-intersection",
+      "status": "PASS",
+      "uiGroup": "ARCHER_ASSASSIN",
+      "count": 25
+    },
+    {
+      "name": "combined-sp-ui-group-name-filter",
+      "status": "PASS",
+      "soldierId": 5115,
+      "count": 1
+    },
+    {
+      "name": "filter-source-fields-well-formed",
+      "status": "PASS",
+      "malformedSoldierIds": []
+    }
+  ],
+  "errors": [],
+  "reviews": [
+    "Stage 6-2 REVIEW classifications remain non-blocking for filter membership; filters must not hide records merely because release/name presentation metadata is unresolved.",
+    "Name-search QA covers stored Korean/Chinese names only; fuzzy search, romanization aliases and inferred translations are outside Stage 6-4 and must not be silently synthesized."
+  ]
+}
