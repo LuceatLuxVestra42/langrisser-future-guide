@@ -9,6 +9,9 @@ const masterRows = Array.isArray(heroMaster) ? heroMaster : heroMaster.records;
 const heroIds = new Set(masterRows.map(r => Number(r.heroId)).filter(Number.isFinite));
 
 const filenameRe = /(Hero|Camp|Faction|Team|Party|Battle|Group|Relation|Actor|Clause|Force|Army|Power|League|Bond|Tag|Belong|Production|Story|Type)/i;
+const heroFieldRe = /(Hero|Actor|Role|Character|Char)/i;
+const factionFieldRe = /(Camp|Faction|Team|Group|Party|Force|Army|Power|League|Belong|Tag|Type)/i;
+
 const files = fs.readdirSync(configDir)
   .filter(name => name.endsWith('.json'))
   .map(name => ({
@@ -16,15 +19,12 @@ const files = fs.readdirSync(configDir)
     path: path.join(configDir, name),
     size: fs.statSync(path.join(configDir, name)).size
   }));
-
 const shortlisted = files.filter(f => filenameRe.test(f.name));
 
 function recordsOf(root) {
   if (Array.isArray(root)) return root;
   if (!root || typeof root !== 'object') return [];
-  for (const k of ['records', 'data', 'items', 'list', 'values']) {
-    if (Array.isArray(root[k])) return root[k];
-  }
+  for (const k of ['records', 'data', 'items', 'list', 'values']) if (Array.isArray(root[k])) return root[k];
   return [];
 }
 
@@ -42,22 +42,21 @@ function analyzeField(records, key) {
   const values = present.map(r => r[key]);
   const flat = [];
   for (const v of values) flattenPrimitive(v, flat);
-
   const numeric = flat.map(Number).filter(Number.isFinite);
   const distinctNumeric = [...new Set(numeric)];
   const heroMatches = distinctNumeric.filter(v => heroIds.has(v));
-
   const serialized = [...new Set(flat.map(v => JSON.stringify(v)))];
   const kinds = {};
+  const arrayLengths = {};
   for (const v of values) {
     const kind = Array.isArray(v) ? 'array' : (v === null ? 'null' : typeof v);
     kinds[kind] = (kinds[kind] || 0) + 1;
+    if (Array.isArray(v)) arrayLengths[v.length] = (arrayLengths[v.length] || 0) + 1;
   }
-  const arrayLengths = {};
-  for (const v of values.filter(Array.isArray)) arrayLengths[v.length] = (arrayLengths[v.length] || 0) + 1;
-
   return {
     field: key,
+    nameLooksHeroRelated: heroFieldRe.test(key),
+    nameLooksFactionRelated: factionFieldRe.test(key),
     presentCount: present.length,
     kinds,
     arrayLengths: Object.keys(arrayLengths).length ? arrayLengths : undefined,
@@ -73,7 +72,6 @@ function analyzeField(records, key) {
 const tableResults = [];
 const skipped = [];
 for (const file of shortlisted) {
-  // Large candidate tables are still allowed up to 80 MiB; beyond that, skip rather than risk the workflow.
   if (file.size > 80 * 1024 * 1024) {
     skipped.push({ file: file.name, size: file.size, reason: 'over_80_mib' });
     continue;
@@ -87,7 +85,7 @@ for (const file of shortlisted) {
   }
   const records = recordsOf(root);
   if (!records.length || typeof records[0] !== 'object') {
-    tableResults.push({ file: file.name, size: file.size, recordCount: records.length, fields: [], note: 'no_object_records' });
+    tableResults.push({ file: file.name, size: file.size, recordCount: records.length, note: 'no_object_records' });
     continue;
   }
 
@@ -96,36 +94,76 @@ for (const file of shortlisted) {
   const heroRefFields = fields
     .filter(f => f.heroIdOverlapCount > 0)
     .sort((a, b) => b.heroIdOverlapCount - a.heroIdOverlapCount || b.presentCount - a.presentCount);
+  const namedHeroRefFields = heroRefFields.filter(f => f.nameLooksHeroRelated);
+  const factionNamedFields = fields.filter(f => f.nameLooksFactionRelated);
   const compactClassifiers = fields
     .filter(f => f.distinctPrimitiveCount > 1 && f.distinctPrimitiveCount <= 40)
     .sort((a, b) => a.distinctPrimitiveCount - b.distinctPrimitiveCount || a.field.localeCompare(b.field));
 
   const bestOverlap = heroRefFields[0]?.heroIdOverlapCount || 0;
+  const bestNamedHeroOverlap = namedHeroRefFields[0]?.heroIdOverlapCount || 0;
+  const tableNameHero = /Hero/i.test(file.name) ? 1 : 0;
+  const tableNameFaction = /(Camp|Faction|Team|Group|Party|Force|Army|Power|League|Belong)/i.test(file.name) ? 1 : 0;
+  const semanticScore = bestNamedHeroOverlap * 1000 + tableNameHero * 100 + tableNameFaction * 50 + Math.min(bestOverlap, 49);
+
   tableResults.push({
     file: file.name,
     size: file.size,
     recordCount: records.length,
+    semanticScore,
     bestHeroIdOverlapCount: bestOverlap,
-    bestHeroIdOverlapRate: heroIds.size ? Number((bestOverlap / heroIds.size).toFixed(4)) : 0,
+    bestNamedHeroIdOverlapCount: bestNamedHeroOverlap,
     heroReferenceFields: heroRefFields.slice(0, 12),
+    namedHeroReferenceFields: namedHeroRefFields.slice(0, 12),
+    factionNamedFields: factionNamedFields.slice(0, 20),
     compactClassifierFields: compactClassifiers.slice(0, 30),
     fieldNames: keys
   });
 }
 
-tableResults.sort((a, b) => b.bestHeroIdOverlapCount - a.bestHeroIdOverlapCount || a.file.localeCompare(b.file));
+const bySemantic = [...tableResults].sort((a, b) => b.semanticScore - a.semanticScore || b.bestNamedHeroIdOverlapCount - a.bestNamedHeroIdOverlapCount || a.file.localeCompare(b.file));
+const candidateRanking = bySemantic
+  .filter(t => t.bestNamedHeroIdOverlapCount >= 3 || (/Hero/i.test(t.file) && t.bestHeroIdOverlapCount >= 3))
+  .slice(0, 60)
+  .map(t => ({
+    file: t.file,
+    size: t.size,
+    recordCount: t.recordCount,
+    semanticScore: t.semanticScore,
+    bestHeroIdOverlapCount: t.bestHeroIdOverlapCount,
+    bestNamedHeroIdOverlapCount: t.bestNamedHeroIdOverlapCount,
+    namedHeroReferenceFields: (t.namedHeroReferenceFields || []).slice(0, 5).map(f => ({
+      field: f.field,
+      overlap: f.heroIdOverlapCount,
+      presentCount: f.presentCount,
+      kinds: f.kinds,
+      arrayLengths: f.arrayLengths
+    })),
+    factionNamedFields: (t.factionNamedFields || []).slice(0, 8).map(f => ({
+      field: f.field,
+      distinctPrimitiveCount: f.distinctPrimitiveCount,
+      sampleValues: f.sampleValues,
+      kinds: f.kinds,
+      arrayLengths: f.arrayLengths
+    })),
+    compactClassifierFields: (t.compactClassifierFields || []).slice(0, 8).map(f => ({
+      field: f.field,
+      distinctPrimitiveCount: f.distinctPrimitiveCount,
+      sampleValues: f.sampleValues,
+      kinds: f.kinds,
+      arrayLengths: f.arrayLengths
+    }))
+  }));
 
-const topCandidates = tableResults
-  .filter(t => t.bestHeroIdOverlapCount >= 3)
-  .slice(0, 40);
-
+const topCandidates = bySemantic.filter(t => t.semanticScore > 0).slice(0, 40);
 const out = {
-  version: 1,
+  version: 2,
   purpose: 'Find faction/camp relation candidates without asserting semantics.',
   playableHeroIdCount: heroIds.size,
   configJsonFileCount: files.length,
   shortlistedFileCount: shortlisted.length,
   shortlistRegex: String(filenameRe),
+  candidateRanking,
   skipped,
   topCandidates,
   shortlistedFiles: shortlisted.map(f => ({ file: f.name, size: f.size }))
@@ -134,18 +172,10 @@ const out = {
 const outPath = path.join('data', 'validation', 'hero-page-stage5-5-2-faction-candidates.v1.json');
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, JSON.stringify(out, null, 2) + '\n');
-
 console.log(JSON.stringify({
   playableHeroIdCount: out.playableHeroIdCount,
-  configJsonFileCount: out.configJsonFileCount,
   shortlistedFileCount: out.shortlistedFileCount,
   skippedCount: out.skipped.length,
-  topCandidates: topCandidates.slice(0, 12).map(t => ({
-    file: t.file,
-    recordCount: t.recordCount,
-    bestHeroIdOverlapCount: t.bestHeroIdOverlapCount,
-    bestHeroIdOverlapRate: t.bestHeroIdOverlapRate,
-    heroReferenceFields: t.heroReferenceFields.slice(0, 3).map(f => ({ field: f.field, overlap: f.heroIdOverlapCount }))
-  })),
+  candidateRanking: candidateRanking.slice(0, 20),
   output: outPath
 }, null, 2));
