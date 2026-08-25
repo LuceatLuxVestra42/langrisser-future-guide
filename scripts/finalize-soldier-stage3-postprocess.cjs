@@ -1,80 +1,33 @@
-const fs=require('fs'),path=require('path');
-const ROOT=path.resolve(__dirname,'..');
-const GEN=path.join(ROOT,'data/generated/soldier-stage3.v1.json');
-const VAL=path.join(ROOT,'data/validation/soldier-stage3-final.v1.json');
-const SPH=path.join(ROOT,'data/configdata/ConfigDataSPHeroInfo.json');
-const HM=path.join(ROOT,'data/hero-name-master.v1.json');
-const SM=path.join(ROOT,'data/generated/soldier-master.v1.json');
-function read(p){return JSON.parse(fs.readFileSync(p,'utf8'));}
-function payload(p,name){const o=read(p);if(o.m_Name!==name||!Array.isArray(o.m_bytes)||o.m_size!==o.m_bytes.length)throw Error(`${name} invalid payload`);return Buffer.from(o.m_bytes);}
-function frames(b){let p=0,a=[];while(p<b.length){if(p+4>b.length)throw Error('bad frame');const n=b.readUInt32BE(p);p+=4;if(p+n>b.length)throw Error('bad frame length');a.push(b.subarray(p,p+n));p+=n;}return a;}
-function vi(b,p){let v=0n,s=0n;for(;;){if(p>=b.length)throw Error('truncated varint');const x=BigInt(b[p++]);v|=(x&127n)<<s;if(!(x&128n))return[Number(v),p];s+=7n;}}
-function msg(b){let p=0,m=new Map();const add=(f,w,v)=>{if(!m.has(f))m.set(f,[]);m.get(f).push({w,v});};while(p<b.length){let k;[k,p]=vi(b,p);const f=k>>>3,w=k&7;if(w===0){let v;[v,p]=vi(b,p);add(f,w,v);}else if(w===2){let n;[n,p]=vi(b,p);add(f,w,b.subarray(p,p+n));p+=n;}else if(w===1){add(f,w,b.subarray(p,p+8));p+=8;}else if(w===5){add(f,w,b.subarray(p,p+4));p+=4;}else throw Error('wire '+w);}return m;}
-const iv=(m,f,d=0)=>m.get(f)?.find(x=>x.w===0)?.v??d;
-const sv=(m,f,d='')=>{const x=m.get(f)?.find(x=>x.w===2);return x?x.v.toString('utf8'):d};
-function rvi(m,f){const a=[];for(const x of m.get(f)||[]){if(x.w===0)a.push(x.v);else if(x.w===2){let p=0;while(p<x.v.length){let v;[v,p]=vi(x.v,p);a.push(v);}}}return a;}
-const uniq=a=>[...new Set(a)].sort((x,y)=>x-y);
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.resolve(__dirname, '..');
+const GEN = path.join(ROOT, 'data/generated/soldier-stage3.v1.json');
+const VAL = path.join(ROOT, 'data/validation/soldier-stage3-final.v1.json');
+const HM = path.join(ROOT, 'data/hero-name-master.v1.json');
+const SM = path.join(ROOT, 'data/generated/soldier-master.v1.json');
+
+function read(p){ return JSON.parse(fs.readFileSync(p,'utf8')); }
+function uniq(a){ return [...new Set(a)].sort((x,y)=>typeof x === 'number' && typeof y === 'number' ? x-y : String(x).localeCompare(String(y))); }
 
 const out=read(GEN), val=read(VAL), heroMaster=read(HM).records, soldierMaster=read(SM).records;
-const heroIds=new Set(heroMaster.map(x=>x.heroId)), soldierIds=new Set(soldierMaster.map(x=>x.soldierId));
-const errors=[], reviews=[];
+const heroIds=new Set(heroMaster.map(x=>x.heroId));
+const soldierIds=new Set(soldierMaster.map(x=>x.soldierId));
+const tierById=new Map(soldierMaster.map(x=>[x.soldierId,x.tier]));
+const errors=[...(val.errors||[])], reviews=[...(val.reviews||[])];
 
-// 3-6: ConfigDataSPHeroInfo is keyed by the base Hero ID. Its own ID is the
-// canonical Hero ID used to fetch this SP configuration; HeroInformation_ID is
-// separate presentation/information metadata and is often 0 in current records.
-const spHeroes=frames(payload(SPH,'ConfigDataSPHeroInfo')).map(b=>{const m=msg(b);return{heroId:iv(m,2),nameCn:sv(m,3),heroInformationId:iv(m,6),rewardSoldierIds:uniq(rvi(m,25))}});
-const rewardRows=[], reverse=new Map();
-let unmapped=0, missingRewardSoldiers=0;
-for(const s of spHeroes){
-  if(!heroIds.has(s.heroId)){unmapped++;reviews.push(`SPHeroInfo ID ${s.heroId} missing canonical hero master`);continue;}
-  for(const sid of s.rewardSoldierIds){
-    if(!soldierIds.has(sid)){missingRewardSoldiers++;errors.push(`SP hero ${s.heroId} reward soldier ${sid} missing soldier master`);continue;}
-    if(!reverse.has(sid))reverse.set(sid,[]);
-    reverse.get(sid).push(s.heroId);
-  }
-  if(s.rewardSoldierIds.length)rewardRows.push({heroId:s.heroId,heroInformationId:s.heroInformationId,nameCn:s.nameCn,rewardSoldierIds:s.rewardSoldierIds});
-}
-for(const r of out.records)r.heroes.spHeroAddedHeroIds=uniq(reverse.get(r.soldierId)||[]);
-out.spHeroRewards=rewardRows;
-
-// 3-3: SoldierIDRelated returns all directly applicable techs. The soldier-specific
-// Lv1-10 growth path is the unique linked path whose TrainingTechLevelInfo
-// SoldierSkillLevelup sequence is exactly 1..10. Shared passive/status techs carry 0.
-let tier3WithoutPrimary=0,tier3MultiplePrimary=0;
-const tierById=new Map(out.records.map(r=>[r.soldierId,r.combat.tier]));
-for(const p of out.trainingProfiles){
-  const candidates=p.linkedTechs.filter(t=>t.levels.length===10&&t.levels.every((x,i)=>!x.missing&&x.soldierSkillLevel===i+1));
-  p.primaryTenLevelTechId=candidates.length===1?candidates[0].techId:null;
-  p.tenLevelTechIds=candidates.map(x=>x.techId);
-  if(tierById.get(p.soldierId)===3){
-    if(candidates.length===0){tier3WithoutPrimary++;errors.push(`tier3 soldier ${p.soldierId} has no Lv1-10 soldier-skill TrainingTech path`);}
-    else if(candidates.length>1){tier3MultiplePrimary++;reviews.push(`tier3 soldier ${p.soldierId} has multiple Lv1-10 soldier-skill TrainingTech paths: ${candidates.map(x=>x.techId).join(',')}`);}
-  }
+for(const p of out.trainingProfiles||[]){
+  if(tierById.get(p.soldierId)!==3) continue;
+  const candidates=(p.linkedTechs||[]).filter(t=>(t.levels||[]).length===10 && t.levels.every((x,i)=>!x.missing && x.soldierSkillLevel===i+1));
+  if(candidates.length!==1) errors.push(`tier3 soldier ${p.soldierId} expected one Lv1-10 soldier-skill TrainingTech path, got ${candidates.length}`);
+  if((p.primaryTenLevelTechId??null)!==(candidates[0]?.techId??null)) errors.push(`tier3 soldier ${p.soldierId} primaryTenLevelTechId mismatch`);
 }
 
-// Keep only genuine prior reviews unrelated to rules corrected by this post-pass.
-for(const r of val.reviews||[]){
-  if(/^tier3 soldier .*multiple 10-level TrainingTech paths:/.test(r))continue;
-  if(/^SPHeroInfo .* hero .* missing hero master$/.test(r))continue;
-  if(/^SPHeroInfo .* HeroInformation_ID .* canonical matches=/.test(r))continue;
-  reviews.push(r);
+for(const row of out.spHeroRewards||[]){
+  if(!heroIds.has(row.heroId)) errors.push(`SPHeroInfo ID ${row.heroId} missing canonical hero master`);
+  for(const sid of row.rewardSoldierIds||[]) if(!soldierIds.has(sid)) errors.push(`SP hero ${row.heroId} reward soldier ${sid} missing soldier master`);
 }
-for(const e of val.errors||[])errors.push(e);
 
-val.generatedAt=new Date().toISOString();
-out.generatedAt=val.generatedAt;
-val.counts.tier3WithoutTenLevel=tier3WithoutPrimary;
-val.counts.tier3MultipleTenLevel=tier3MultiplePrimary;
-val.counts.spHeroRewardEdges=rewardRows.reduce((n,x)=>n+x.rewardSoldierIds.length,0);
-val.checks.missingSpHeroIds=unmapped;
-val.checks.missingRewardSoldiers=missingRewardSoldiers;
-val.checks.spHeroMappingUnmapped=unmapped;
-val.checks.spHeroMappingAmbiguous=0;
-val.corrections=(val.corrections||[]).filter(x=>!x.startsWith('3-3 cardinality:')&&!x.startsWith('3-6 hero mapping:'));
-val.corrections.push('3-3 primary growth path: SoldierIDRelated can include shared passive/status techs. For displayed tier-3 soldiers, the soldier-specific Lv1-10 growth path is the unique linked tech whose TrainingTechLevelInfo.SoldierSkillLevelup sequence is 1..10. Current snapshot validates exactly one path for all 129 tier-3 normal soldiers.');
-val.corrections.push('3-6 hero mapping: ConfigDataSPHeroInfo.ID is the canonical base Hero ID/key. HeroInformation_ID is separate metadata and is not used to identify the hero for SecondStageRewardSoldiers.');
-val.policy.trainingJoin='3-3 reverse-joins TrainingTechInfo.SoldierIDRelated; the soldier-specific Lv1-10 path is selected by SoldierSkillLevelup sequence 1..10. GetSoldierTechId remains validation metadata only.';
-val.policy.spHeroSoldiers='3-6 uses ConfigDataSPHeroInfo.ID as the canonical Hero ID/key, validates it against hero-name-master, then reverse-indexes SecondStageRewardSoldiers by Soldier ID.';
 val.errors=uniq(errors);
 val.reviews=uniq(reviews);
 val.status=val.errors.length?'FAIL':(val.reviews.length?'PASS_WITH_REVIEW':'PASS');
@@ -82,4 +35,4 @@ out.status=val.status;
 fs.writeFileSync(GEN,JSON.stringify(out,null,2)+'\n');
 fs.writeFileSync(VAL,JSON.stringify(val,null,2)+'\n');
 console.log(JSON.stringify({status:val.status,counts:val.counts,checks:val.checks,errors:val.errors,reviews:val.reviews},null,2));
-if(val.errors.length)process.exit(1);
+if(val.errors.length) process.exit(1);
