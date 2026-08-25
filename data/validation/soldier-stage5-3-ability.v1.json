@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage5-3-ability-validation/v1",
+  "stage": "5-3",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T00:41:14.143Z",
+  "sources": {
+    "contract": {
+      "path": "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+      "gitBlobSha": "2943af041025c76c647b790661babe784e05f4f2"
+    },
+    "stage5_2": {
+      "path": "data/generated/soldier-detail-stage5-2.v1.json",
+      "gitBlobSha": "4f7b42554ed8c4722cddbe8133602be269d475d9"
+    },
+    "stage5_2Validation": {
+      "path": "data/validation/soldier-stage5-2-combat.v1.json",
+      "gitBlobSha": "1171c5e73f94420e40e7821a8c4bf0df73227bc6"
+    },
+    "soldierStage3": {
+      "path": "data/generated/soldier-stage3.v1.json",
+      "gitBlobSha": "afaebae396017391689c78a1b76c244e06067011"
+    },
+    "stage3Validation": {
+      "path": "data/validation/soldier-stage3-final.v1.json",
+      "gitBlobSha": "e1aa89d12d07edd513f993458be3e08e7ec57e03"
+    }
+  },
+  "checks": {
+    "contractNotFrozen": 0,
+    "stage5_2NotPass": 0,
+    "stage5_2ValidationNotPass": 0,
+    "stage3NotPass": 0,
+    "stage3ValidationNotPass": 0,
+    "stage3Tier3WithoutTenLevel": 0,
+    "stage3Tier3MultipleTenLevel": 0,
+    "stage3SpNormalsWithoutSpDescription": 0,
+    "duplicateStage5Ids": 0,
+    "duplicateStage3Ids": 0,
+    "duplicateTrainingProfileIds": 0,
+    "missingTrainingProfiles": 0,
+    "missingPrimaryTech": 0,
+    "malformedTenLevelPaths": 0,
+    "normalDescriptionMissing": 0,
+    "nonTargetAbilityPopulated": 0,
+    "spDescriptionSourceMissing": 0,
+    "spDescriptionEmpty": 0,
+    "spDescriptionRelationMismatch": 0,
+    "baselineMismatches": 0,
+    "outputRecordCountMismatch": 0
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "generatedRecords": 224,
+    "normalTier3": 129,
+    "normalNonTier3": 39,
+    "spSoldiers": 56,
+    "abilityPopulated": 129,
+    "spDescriptionRecords": 56,
+    "nonPassIdentityMetadataCount": 41,
+    "missingTrainingProfiles": [],
+    "missingPrimaryTech": [],
+    "malformedTenLevelPaths": [],
+    "normalDescriptionMissing": [],
+    "spDescriptionSourceMissing": [],
+    "spDescriptionEmpty": [],
+    "spDescriptionRelationMismatch": []
+  },
+  "errors": [],
+  "reviews": [
+    "41 Soldier identity records retain non-PASS presentation metadata; ability source validation is unaffected."
+  ]
+}
