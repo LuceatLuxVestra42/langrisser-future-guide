@@ -47,13 +47,23 @@
       "validation": "data/validation/hero-page-stage5-5-2-cv.v1.json",
       "coverage": {
         "canonicalHeroesResolved": 267,
-        "heroesWithNonEmptyCvName": 267,
-        "heroesWithMaskedCvName": 3,
-        "heroesWithUnmaskedCvName": 264
+        "heroesWithCvFieldValue": 267,
+        "heroesWithNamedVoiceActor": 264,
+        "heroesWithoutVoiceActor": 3
       },
-      "maskedValue": "■■■■",
-      "maskedHeroIds": [99235, 99236, 99276],
-      "rule": "Use CVName as authoritative source display text. Trim whitespace only. Do not infer actor names from numeric voice/sound/resource identifiers, and do not rewrite Chinese-localized actor spellings into Korean/Japanese spellings without a separately validated localization mapping."
+      "noVoiceActorSourceValue": "■■■■",
+      "confirmedNoVoiceActorHeroIds": [99235, 99236, 99276],
+      "confirmedNoVoiceActorHeroes": [
+        "캡틴 코만도&베이비 헤드",
+        "맥&긴주",
+        "아이바 미유키"
+      ],
+      "rule": "Use CVName as the authoritative source field. For Hero IDs 99235, 99236 and 99276, source value ■■■■ is confirmed to mean no voice actor, not masked or unresolved actor data. Preserve all other source spellings as-is.",
+      "localization": {
+        "status": "DEFERRED_USER_LOCALIZATION",
+        "scope": "Chinese-localized CVName spellings -> Korean voice-actor display names",
+        "rule": "Do not auto-transliterate or rewrite actor names in ConfigData-derived artifacts. User will localize display names later."
+      }
     },
     "origin": {
       "status": "POINTER_CONFIRMED",
@@ -82,12 +92,15 @@
       "rule": "Membership and ID resolution are validated; display ordering and GetPathType meaning remain unresolved until separately proven."
     }
   },
-  "nonSynthesisPolicy": "Unresolved fields stay null/review. Candidate field names and numeric values are not sufficient to create page-display values. Confirmed CVName source strings are preserved as-is unless a separate authoritative localization map is accepted.",
+  "nonSynthesisPolicy": "Unresolved fields stay null/review. Candidate field names and numeric values are not sufficient to create page-display values. Confirmed CVName source strings are preserved as-is; CV localization is explicitly deferred to a later user-managed localization step.",
   "coverageGenerator": "scripts/validate_hero_page_stage5_5_2.cjs",
   "expectedCoverageOutput": "data/validation/hero-page-stage5-5-2-coverage.v1.json",
   "confirmedSemanticArtifacts": [
     "data/validation/hero-page-stage5-5-2-factions.v1.json",
     "data/validation/hero-page-stage5-5-2-cv.v1.json"
+  ],
+  "deferredTasks": [
+    "Localize ConfigDataCharImageInfo.CVName source spellings into Korean voice-actor display names without changing the confirmed CV source join."
   ],
   "nextGate": "Continue resolving remaining display semantics (rarity, origin dictionary, final artwork field, skin ordering/acquisition) without reopening confirmed faction or CV joins."
 }
