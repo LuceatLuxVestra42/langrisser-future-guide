@@ -1,0 +1,90 @@
+{
+  "stage": "3-0",
+  "purpose": "Freeze the Stage 2 generated outputs that Stage 3 page consumers are allowed to use, and verify that they describe the same canonical 390 equipment IDs without reopening Stage 2 semantics.",
+  "canonicalExpectations": {
+    "equipmentCount": 390,
+    "generalPageCount": 206,
+    "exclusiveEquipmentCount": 167,
+    "soulSpecialCount": 16,
+    "unresolvedNoPathCount": 1,
+    "siteTabs": {
+      "1": 94,
+      "2": 80,
+      "3": 32
+    },
+    "acquisitionClasses": {
+      "launch": 94,
+      "legacy-additional": 80,
+      "current-additional": 32,
+      "exclusive-equipment": 167,
+      "soul-special": 16,
+      "unresolved-no-path": 1
+    }
+  },
+  "inputs": {
+    "filterMap": {
+      "path": "data/generated/equipment_stage2_3_filter_map.json",
+      "recordPath": "records",
+      "idField": "id",
+      "countField": "canonicalCount",
+      "requiredFields": ["id", "name", "group", "groupKo", "subtype", "subtypeKo", "groupOrder", "subtypeOrder"]
+    },
+    "stats": {
+      "path": "data/generated/equipment_stage2_4_stats.json",
+      "recordPath": "records",
+      "idField": "id",
+      "countField": "canonicalCount",
+      "requiredFields": ["id", "name", "stats"]
+    },
+    "effects": {
+      "path": "data/generated/equipment_stage2_5_effects.json",
+      "recordPath": "records",
+      "idField": "equipmentId",
+      "countField": "canonicalCount",
+      "requiredFields": ["equipmentId", "equipmentName", "maxEffectSkillId", "effectName", "effectText", "effectSegments"]
+    },
+    "restrictions": {
+      "path": "data/generated/equipment_stage2_6_restrictions.json",
+      "recordPath": "records",
+      "idField": "equipmentId",
+      "countField": "canonicalCount",
+      "requiredFields": ["equipmentId", "mode", "generalArmyIds", "specialJobIds", "raw"]
+    },
+    "acquisition": {
+      "path": "data/generated/equipment_stage2_7_acquisition.json",
+      "recordPath": "records",
+      "idField": "equipmentId",
+      "countField": "counts.canonical",
+      "requiredFields": ["equipmentId", "nameCn", "equipmentType", "label", "sortIndex", "acquisitionClass", "siteTab", "confidencePercent", "classificationBasis", "raw"]
+    }
+  },
+  "allowedRestrictionModes": [
+    "army-plus-job-exceptions",
+    "unrestricted-by-fields",
+    "army-only",
+    "job-only"
+  ],
+  "pageAdmission": {
+    "general": ["launch", "legacy-additional", "current-additional"],
+    "exclusive": ["exclusive-equipment"],
+    "specialHiddenFromGeneral": ["soul-special"],
+    "hold": ["unresolved-no-path"]
+  },
+  "consumerPolicy": {
+    "primaryKey": "equipmentId",
+    "sourcePriority": [
+      "Stage 2 generated data",
+      "Stage 2 contracts",
+      "targeted ConfigData lookup only when a genuinely new relation is required"
+    ],
+    "doNotRecompute": [
+      "canonical equipment population",
+      "equipment group/subtype classification",
+      "Lv50 stat formula",
+      "max equipment effect selection",
+      "equipment restriction semantics",
+      "launch/legacy/current/exclusive/soul/unresolved acquisition classification"
+    ],
+    "stage3Responsibility": "Assemble page-consumer schemas and display metadata from frozen Stage 2 outputs. Do not reinterpret Stage 2 semantics unless a concrete contradiction is found."
+  }
+}
