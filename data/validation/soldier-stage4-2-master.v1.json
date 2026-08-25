@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "stage": "soldier-page-4-2",
+  "status": "PASS",
+  "purpose": "Regress the UnityDataTool-generated Soldier Master against the frozen A-2 Soldier identity contract without creating or replacing Hero-Soldier membership.",
+  "inputs": {
+    "soldierMaster": "data/generated/soldier-master.v1.json",
+    "soldierIdentityContract": "data/contracts/soldier-identity-contract.v1.json",
+    "soldierInfo": "data/configdata/ConfigDataSoldierInfo.json",
+    "spSoldierInfo": "data/configdata/ConfigDataSPSoldierInfo.json",
+    "stage2Validation": "data/validation/soldier-stage2-final.v1.json"
+  },
+  "hashes": {
+    "frozenA2MasterBlobSha": "23e01ad8707bd7f026f5a3660cc0342747bd5cdb",
+    "currentMasterBlobSha": "23e01ad8707bd7f026f5a3660cc0342747bd5cdb",
+    "frozenA2SpSourceBlobSha": "93dd784a7de913daa6d72f5df6cf6890a710c58a",
+    "currentSpSourceBlobSha": "93dd784a7de913daa6d72f5df6cf6890a710c58a"
+  },
+  "counts": {
+    "sourceSoldiers": 777,
+    "displayableSoldiers": 224,
+    "normalDisplayable": 168,
+    "spDisplayable": 56,
+    "tier3Normal": 129,
+    "spRelations": 56,
+    "koreanConfirmedMasterRecords": 183,
+    "koreanPendingMasterRecords": 39,
+    "koreanUnreleasedMasterRecords": 2
+  },
+  "checks": {
+    "contractFrozen": 0,
+    "canonicalKeyMismatch": 0,
+    "masterBlobShaMismatch": 0,
+    "spSourceBlobShaMismatch": 0,
+    "duplicateSoldierIds": 0,
+    "duplicateSiteIds": 0,
+    "duplicateSpIds": 0,
+    "duplicateSpNormalIds": 0,
+    "displayableSetMismatch": 0,
+    "sourceFieldMismatch": 0,
+    "siteIdMismatch": 0,
+    "isSpMismatch": 0,
+    "spRelationMismatch": 0,
+    "normalRelationMetadataMismatch": 0,
+    "missingSourceSoldier": 0,
+    "stage2Errors": 0,
+    "stage2IdentityCheckFailures": 0,
+    "baselineCountMismatch": 0
+  },
+  "knownReviewState": {
+    "pendingKoreanNames": 39,
+    "unreleasedKoreanNames": 2,
+    "identityImpact": "NONE; these are presentation/release-status reviews and do not change canonical soldierId identity."
+  },
+  "policy": {
+    "canonicalKey": "soldierId only",
+    "spRelation": "ConfigDataSPSoldierInfo.NormalSoliderId <-> ID only",
+    "siteId": "routing metadata only; exact soldier-{soldierId}",
+    "relationOwnership": "Stage 4-2 validates Soldier identity/master readiness only. It does not compute canonical Hero-Soldier membership; A-9 reserves that ownership for the shared Relation Layer."
+  },
+  "errors": [],
+  "completion": "Current UnityDataTool Soldier Master is byte-identical to the frozen A-2 master and all canonical identity/SP-link invariants reproduce with zero errors."
+}
