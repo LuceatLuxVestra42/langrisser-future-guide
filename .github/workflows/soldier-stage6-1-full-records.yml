@@ -1,0 +1,69 @@
+name: Soldier Stage 6-1 Full Records
+
+on:
+  push:
+    branches:
+      - 'work/**'
+    paths:
+      - 'scripts/finalize-soldier-stage6-1-full-records.cjs'
+      - 'data/validation/soldier-stage6-0-checkpoint.v1.json'
+      - 'data/generated/soldier-detail-stage5-6.v1.json'
+      - 'data/validation/soldier-stage5-6-sp-detail.v1.json'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'data/validation/soldier-stage5-8-release.v1.json'
+      - 'data/generated/soldier-release-metadata.v1.json'
+      - '.github/workflows/soldier-stage6-1-full-records.yml'
+  pull_request:
+    paths:
+      - 'scripts/finalize-soldier-stage6-1-full-records.cjs'
+      - 'data/validation/soldier-stage6-0-checkpoint.v1.json'
+      - 'data/generated/soldier-detail-stage5-6.v1.json'
+      - 'data/validation/soldier-stage5-6-sp-detail.v1.json'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'data/validation/soldier-stage5-8-release.v1.json'
+      - 'data/generated/soldier-release-metadata.v1.json'
+      - 'data/generated/soldier-stage6-1-full-records.v1.json'
+      - 'data/validation/soldier-stage6-1-full-records.v1.json'
+      - '.github/workflows/soldier-stage6-1-full-records.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate and validate Soldier Stage 6-1 full records
+        run: node scripts/finalize-soldier-stage6-1-full-records.cjs
+
+      - name: Upload Stage 6-1 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage6-1-full-records
+          path: |
+            data/generated/soldier-stage6-1-full-records.v1.json
+            data/validation/soldier-stage6-1-full-records.v1.json
+
+      - name: Freeze generated artifacts on work branch
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            data/generated/soldier-stage6-1-full-records.v1.json \
+            data/validation/soldier-stage6-1-full-records.v1.json
+          if git diff --cached --quiet; then
+            echo "Soldier Stage 6-1 artifacts already frozen."
+          else
+            git commit -m "freeze Soldier stage 6-1 full-record PASS"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
