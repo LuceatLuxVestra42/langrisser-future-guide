@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage6-6-expansion-basis/v1",
+  "stage": "6-6",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T07:09:25.482Z",
+  "purpose": "Freeze lossless Soldier page-data inputs needed for later expansion and a level-by-level simulator without implementing simulator formulas in Stage 6.",
+  "simulatorReadiness": {
+    "status": "FOUNDATION_READY",
+    "scope": "DATA_FOUNDATION_ONLY",
+    "implementedNow": [
+      "full normal/SP combat stat preservation",
+      "normal tier-3 trait Lv1-10 preservation",
+      "normal tier-3 per-level training cost Lv1-10 preservation",
+      "SP description/stat-delta/mission/second-stage preservation",
+      "Hero-Soldier provenance authority preservation"
+    ],
+    "deferred": [
+      "combat outcome formulas",
+      "training-state mutation and optimization logic",
+      "interactive simulator UI",
+      "presentation-specific cost simplification rules beyond existing lv5/lv10 totals"
+    ]
+  },
+  "authorities": {
+    "fullStats": {
+      "source": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "field": "records[].combat",
+      "rule": "The current record combat block is the full stat source for both normal and SP Soldiers."
+    },
+    "normalTraitLevels": {
+      "source": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "field": "records[].ability.levels",
+      "scope": "normal tier-3 only",
+      "rule": "Preserve exact Lv1-10 descriptions and source IDs; do not collapse the simulator source to finalDescription only."
+    },
+    "trainingCosts": {
+      "source": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "field": "records[].training.perLevelCost",
+      "scope": "normal tier-3 only",
+      "rule": "Per-level costs are the expansion source; lv5Total/lv10Total are validated aggregates, not replacements for the 10-step path."
+    },
+    "spExpansion": {
+      "source": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "field": "records[].sp",
+      "scope": "SP only",
+      "rule": "Preserve 10 description levels, statDelta, stage1/stage2 mission objects and expandedHeroIds. One-stage SP records must keep stage2=null."
+    },
+    "heroEligibilityProvenance": {
+      "source": "data/generated/hero-soldier-relations.v1.json",
+      "field": "edges[].provenance",
+      "rule": "Hero eligibility and its provenance are one shared authority; consumers must not rebuild membership/provenance from page presentation data."
+    }
+  },
+  "summary": {
+    "canonicalSoldiers": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "normalTier3": 129,
+    "normalAbilityLevelRecords": 1290,
+    "normalTrainingLevelRecords": 1290,
+    "spDescriptionLevelRecords": 560,
+    "spStage1MissionCount": 112,
+    "spStage2MissionCount": 45,
+    "spSecondStageTrue": 45,
+    "spSecondStageFalse": 11,
+    "relationEdges": 5977,
+    "relationProvenance": 5978,
+    "spStatDeltaCount": 56,
+    "spExpandedHeroReferenceCount": 228,
+    "spMissionTypeCounts": {
+      "73": 56,
+      "123": 56,
+      "124": 45
+    },
+    "relationSourceProductionCounts": {
+      "BASE_SOLDIER_HERO": 4290,
+      "SP_HERO_REWARD": 25,
+      "SP_SOLDIER_EXPAND": 228,
+      "SP_SOLDIER_INHERIT": 1435
+    }
+  },
+  "sources": {
+    "fullRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    },
+    "fullValidation": {
+      "path": "data/validation/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "cf6d985fe12f21a16124a61ee225d90218835d90"
+    },
+    "stage5_2": {
+      "path": "data/generated/soldier-detail-stage5-2.v1.json",
+      "gitBlobSha": "4f7b42554ed8c4722cddbe8133602be269d475d9"
+    },
+    "stage5_2Validation": {
+      "path": "data/validation/soldier-stage5-2-combat.v1.json",
+      "gitBlobSha": "1171c5e73f94420e40e7821a8c4bf0df73227bc6"
+    },
+    "stage5_3": {
+      "path": "data/generated/soldier-detail-stage5-3.v1.json",
+      "gitBlobSha": "6752842bd72a0010704452a0f91a7b19ba88c0df"
+    },
+    "stage5_3Validation": {
+      "path": "data/validation/soldier-stage5-3-ability.v1.json",
+      "gitBlobSha": "8c5f09485939545a2d32803d96ed620c9598e5c8"
+    },
+    "stage5_4": {
+      "path": "data/generated/soldier-detail-stage5-4.v1.json",
+      "gitBlobSha": "ef56ecbbaf56ef9b8007b65eb4c41e44c5c3c1a2"
+    },
+    "stage5_4Validation": {
+      "path": "data/validation/soldier-stage5-4-training.v1.json",
+      "gitBlobSha": "32d40cc957e45a358cbf752fb6b685184d0218d5"
+    },
+    "stage5_6": {
+      "path": "data/generated/soldier-detail-stage5-6.v1.json",
+      "gitBlobSha": "e554d0c20ed1629a0774301bc0a5bfe639b63efa"
+    },
+    "stage5_6Validation": {
+      "path": "data/validation/soldier-stage5-6-sp-detail.v1.json",
+      "gitBlobSha": "a4f190d4f1ea85d9d7e50f6e112f0806b349f85b"
+    },
+    "relationSet": {
+      "path": "data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    },
+    "relationValidation": {
+      "path": "data/validation/hero-soldier-relation-validation.v1.json",
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638"
+    },
+    "stage6_5Manifest": {
+      "path": "data/generated/hero-soldier-page-links-stage6-5.v1.json",
+      "gitBlobSha": "52daf5ea15f37a437f796747eb25a126446a1c96"
+    },
+    "stage6_5Validation": {
+      "path": "data/validation/soldier-stage6-5-reciprocal-links.v1.json",
+      "gitBlobSha": "2e0835792c8f6ccfa011cce094d5710d41e62a8a"
+    }
+  }
+}

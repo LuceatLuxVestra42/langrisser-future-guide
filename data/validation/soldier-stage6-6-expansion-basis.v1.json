@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage6-6-expansion-basis-validation/v1",
+  "stage": "6-6",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T07:09:25.482Z",
+  "sources": {
+    "fullRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    },
+    "fullValidation": {
+      "path": "data/validation/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "cf6d985fe12f21a16124a61ee225d90218835d90"
+    },
+    "stage5_2": {
+      "path": "data/generated/soldier-detail-stage5-2.v1.json",
+      "gitBlobSha": "4f7b42554ed8c4722cddbe8133602be269d475d9"
+    },
+    "stage5_2Validation": {
+      "path": "data/validation/soldier-stage5-2-combat.v1.json",
+      "gitBlobSha": "1171c5e73f94420e40e7821a8c4bf0df73227bc6"
+    },
+    "stage5_3": {
+      "path": "data/generated/soldier-detail-stage5-3.v1.json",
+      "gitBlobSha": "6752842bd72a0010704452a0f91a7b19ba88c0df"
+    },
+    "stage5_3Validation": {
+      "path": "data/validation/soldier-stage5-3-ability.v1.json",
+      "gitBlobSha": "8c5f09485939545a2d32803d96ed620c9598e5c8"
+    },
+    "stage5_4": {
+      "path": "data/generated/soldier-detail-stage5-4.v1.json",
+      "gitBlobSha": "ef56ecbbaf56ef9b8007b65eb4c41e44c5c3c1a2"
+    },
+    "stage5_4Validation": {
+      "path": "data/validation/soldier-stage5-4-training.v1.json",
+      "gitBlobSha": "32d40cc957e45a358cbf752fb6b685184d0218d5"
+    },
+    "stage5_6": {
+      "path": "data/generated/soldier-detail-stage5-6.v1.json",
+      "gitBlobSha": "e554d0c20ed1629a0774301bc0a5bfe639b63efa"
+    },
+    "stage5_6Validation": {
+      "path": "data/validation/soldier-stage5-6-sp-detail.v1.json",
+      "gitBlobSha": "a4f190d4f1ea85d9d7e50f6e112f0806b349f85b"
+    },
+    "relationSet": {
+      "path": "data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    },
+    "relationValidation": {
+      "path": "data/validation/hero-soldier-relation-validation.v1.json",
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638"
+    },
+    "stage6_5Manifest": {
+      "path": "data/generated/hero-soldier-page-links-stage6-5.v1.json",
+      "gitBlobSha": "52daf5ea15f37a437f796747eb25a126446a1c96"
+    },
+    "stage6_5Validation": {
+      "path": "data/validation/soldier-stage6-5-reciprocal-links.v1.json",
+      "gitBlobSha": "2e0835792c8f6ccfa011cce094d5710d41e62a8a"
+    }
+  },
+  "checks": {
+    "upstreamNonPass": 0,
+    "invalidFullRecordIds": 0,
+    "duplicateFullRecordIds": 0,
+    "sourceIdSetMismatch": 0,
+    "combatPreservationMismatches": 0,
+    "malformedFullCombat": 0,
+    "abilityPreservationMismatches": 0,
+    "malformedAbilityPaths": 0,
+    "trainingPreservationMismatches": 0,
+    "malformedTrainingPaths": 0,
+    "spPreservationMismatches": 0,
+    "malformedSpBlocks": 0,
+    "nonSpDetailLeak": 0,
+    "relationInvalidPairs": 0,
+    "edgesWithoutProvenance": 0,
+    "provenanceSummaryMismatch": 0,
+    "baselineMismatches": 0
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "normalTier3": 129,
+    "normalAbilityLevelRecords": 1290,
+    "normalTrainingLevelRecords": 1290,
+    "spDescriptionLevelRecords": 560,
+    "spStage1MissionCount": 112,
+    "spStage2MissionCount": 45,
+    "spSecondStageTrue": 45,
+    "spSecondStageFalse": 11,
+    "relationEdges": 5977,
+    "relationProvenance": 5978,
+    "spStatDeltaCount": 56,
+    "spExpandedHeroReferenceCount": 228,
+    "spMissionTypeCounts": {
+      "73": 56,
+      "123": 56,
+      "124": 45
+    },
+    "relationSourceProductionCounts": {
+      "BASE_SOLDIER_HERO": 4290,
+      "SP_HERO_REWARD": 25,
+      "SP_SOLDIER_EXPAND": 228,
+      "SP_SOLDIER_INHERIT": 1435
+    },
+    "sourceIdMismatches": [],
+    "combatPreservationMismatches": [],
+    "malformedFullCombat": [],
+    "abilityPreservationMismatches": [],
+    "malformedAbilityPaths": [],
+    "trainingPreservationMismatches": [],
+    "malformedTrainingPaths": [],
+    "spPreservationMismatches": [],
+    "malformedSpBlocks": [],
+    "nonSpDetailLeak": [],
+    "edgeInvalidPairs": [],
+    "edgesWithoutProvenance": [],
+    "provenanceSummaryMismatch": [],
+    "baselineMismatches": []
+  },
+  "errors": [],
+  "reviews": [
+    {
+      "code": "SIMULATOR_IMPLEMENTATION_DEFERRED",
+      "classification": "REVIEW",
+      "rule": "Stage 6-6 freezes simulator-ready data inputs only. Combat formulas, state mutation and interactive simulator UI remain a later second-phase implementation."
+    },
+    {
+      "code": "SP_FULL_STATS_ARE_AUTHORITATIVE",
+      "classification": "REVIEW",
+      "rule": "Future consumers must use each SP record combat block as the full SP stat source. statDelta is comparison metadata and must not be used to reconstruct SP full stats from the normal form."
+    },
+    {
+      "code": "RELATION_PROVENANCE_SEPARATE_AUTHORITY",
+      "classification": "REVIEW",
+      "rule": "Hero eligibility provenance stays authoritative in the shared Hero-Soldier relation set; page/simulator consumers may join by IDs but must not infer provenance from display lists."
+    }
+  ]
+}
