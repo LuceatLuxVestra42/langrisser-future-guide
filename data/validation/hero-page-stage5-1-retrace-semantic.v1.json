@@ -1,73 +1,115 @@
 {
   "version": 1,
   "stage": "hero-page-5-1",
-  "checkpoint": "fetter-conditiontype2-required-hero-retrace",
+  "checkpoint": "fetter-completion-condition-semantic-retrace",
   "status": "SEMANTIC_VERIFIED",
-  "completion": "RETRACE_COMPLETE_PRODUCTION_SCHEMA_PENDING",
-  "purpose": "Freeze the verified HeroFetter ConditionType=2 required-Hero resolver without declaring the whole Stage 5-1 page block complete.",
+  "completion": "RETRACE_COMPLETE_FINAL_GATE_PENDING",
+  "purpose": "Freeze the verified HeroFetter CompletionConditions semantics for canonical Hero Stage 5-1 without declaring the final production block complete before its final gate runs.",
   "source": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
     "baselineMainCommit": "42c2b5323f648488a59c0daf27ad0b4e9377f717",
-    "investigationBranch": "investigate/hero-fetter-consumer-trace",
-    "investigationHead": "5036072abf15be4ca173772f4c7b6bc647a6d22b",
-    "workflowRunId": 32901674089,
-    "artifact": "hero-fetter-retrace",
+    "conditionType2InvestigationBranch": "investigate/hero-fetter-consumer-trace",
+    "conditionType2InvestigationHead": "5036072abf15be4ca173772f4c7b6bc647a6d22b",
+    "conditionType2WorkflowRunId": 32901674089,
+    "conditionType1Trace": "data/validation/hero-page-stage5-1-type1-dump-symbols.txt",
+    "productionCandidateRecheck": "data/validation/hero-page-stage5-1-production-candidate.v1.json",
     "inputBlobShasVerifiedEqualBetweenMainAndInvestigation": {
       "data/configdata/ConfigDataHeroFetterInfo.json": "1beec024e3d82e57923e59c70048c5abefd92d06",
       "data/configdata/ConfigDataMissionInfo.json": "f61fcb709469829544719e2c4c6cdfd275234528",
       "data/configdata/ConfigDataHeroInformationInfo.json": "262b3c41922162a951d1d55db065f24246455e68",
       "data/configdata/ConfigDataHeroDungeonLevelInfo.json": "57269c2bf8b2e7b7120d26cef8c54751019684c7",
       "data/hero-name-master.v1.json": "808382f1a6858ec615703536634efa648572e04b"
-    },
-    "productionCandidateRecheck": "data/validation/hero-page-stage5-1-production-candidate.v1.json"
+    }
   },
   "scope": {
     "canonicalHeroCount": 267,
-    "conditionType": 2,
-    "allType2Rows": 1140,
-    "canonicalOwnedRows": 1064,
-    "outOfScopeRows": 76
+    "canonicalFetterCount": 1335,
+    "canonicalCompletionConditionCount": 2399,
+    "conditionType1Rows": 1335,
+    "conditionType2Rows": 1064,
+    "unknownConditionTypeRows": 0,
+    "allType2RowsIncludingOutOfScope": 1140,
+    "outOfScopeType2Rows": 76
   },
-  "canonicalDistributions": {
-    "missionType": {
-      "5": 690,
-      "29": 254,
-      "34": 120
+  "conditionType1": {
+    "enumEvidence": {
+      "enumName": "FetterCompleteConditionType",
+      "value": 1,
+      "originalName": "FetterCompleteConditionType_HeroFavorabilityLevel"
     },
-    "missionType5Param2": {
-      "2": 262,
-      "5": 90,
-      "6": 338
+    "verifiedRule": {
+      "meaning": "Hero favorability level requirement",
+      "parm1": "Hero ID whose favorability is evaluated",
+      "parm2": "required favorability level",
+      "canonicalOrientation": "Parm1 equals the owning canonical Hero ID for all 1335 rows"
     },
-    "externalRequiredHeroCount": {
-      "0": 726,
-      "1": 338
+    "validation": {
+      "rows": 1335,
+      "parm1EqualsOwner": 1335,
+      "parm1NotOwner": 0,
+      "parm2Distribution": {
+        "5": 266,
+        "10": 266,
+        "12": 1,
+        "15": 266,
+        "23": 266,
+        "25": 266,
+        "32": 1,
+        "52": 1,
+        "72": 1,
+        "92": 1
+      },
+      "semanticGatePass": true
+    },
+    "notes": "Matthew's five source thresholds (12/32/52/72/92) are preserved as data and are not normalized to the common 5/10/15/23/25 pattern. The enum provides the semantic label; the full canonical relation validates Parm1 ownership."
+  },
+  "conditionType2": {
+    "enumEvidence": {
+      "enumName": "FetterCompleteConditionType",
+      "value": 2,
+      "originalName": "FetterCompleteConditionType_Mission"
+    },
+    "canonicalDistributions": {
+      "missionType": {
+        "5": 690,
+        "29": 254,
+        "34": 120
+      },
+      "missionType5Param2": {
+        "2": 262,
+        "5": 90,
+        "6": 338
+      },
+      "externalRequiredHeroCount": {
+        "0": 726,
+        "1": 338
+      }
+    },
+    "verifiedRule": {
+      "conditionMissionJoin": "HeroFetter.CompletionConditions[ConditionType=2].Parm1 -> ConfigDataMissionInfo.ID",
+      "missionStageJoin": "When MissionInfo.MissionType == 5 and MissionInfo.Param2 == 6, MissionInfo.Param3 -> ConfigDataHeroDungeonLevelInfo.ID; stage ownership is derived by reverse-indexing ConfigDataHeroInformationInfo.DungeonLevels_ID[].",
+      "requiredHeroAppliesWhen": "MissionInfo.MissionType == 5 && MissionInfo.Param2 == 6",
+      "candidateResolver": "canonical(MissionInfo.Param1) UNION canonical(HeroInformationInfo.ID that reverse-owns MissionInfo.Param3 via DungeonLevels_ID[]) MINUS FetterOwnerHeroId",
+      "requiredHeroResolver": "the sole remaining canonical Hero candidate",
+      "importantOrientationRule": "MissionInfo.Param1 is not always the required Hero and the Param3 stage owner is not always the required Hero; either side can be the Fetter owner. Resolve by set subtraction against the Fetter owner.",
+      "otherCanonicalType2Rows": "MissionType 5/Param2 2 or 5, MissionType 29, and MissionType 34 do not produce an external required-Hero edge in the verified canonical scope."
+    },
+    "validation": {
+      "missionType5Param2_6Rows": 338,
+      "exactlyOneRequiredHero": 338,
+      "zeroRequiredHero": 0,
+      "multipleRequiredHeroes": 0,
+      "unresolvedMission": 0,
+      "unresolvedDungeon": 0,
+      "dungeonWithoutCanonicalOwner": 0,
+      "nonCanonicalParam1": 0,
+      "semanticGatePass": true
     }
   },
-  "verifiedRule": {
-    "conditionMissionJoin": "HeroFetter.CompletionConditions[ConditionType=2].Parm1 -> ConfigDataMissionInfo.ID",
-    "missionStageJoin": "When MissionInfo.Param2 == 6, MissionInfo.Param3 -> ConfigDataHeroDungeonLevelInfo.ID; the stage owner Hero is derived by reverse-indexing ConfigDataHeroInformationInfo.DungeonLevels_ID[].",
-    "requiredHeroAppliesWhen": "MissionInfo.MissionType == 5 && MissionInfo.Param2 == 6",
-    "candidateResolver": "canonical(MissionInfo.Param1) UNION canonical(HeroInformationInfo.ID that reverse-owns MissionInfo.Param3 via DungeonLevels_ID[]) MINUS FetterOwnerHeroId",
-    "requiredHeroResolver": "the sole remaining canonical Hero candidate",
-    "importantOrientationRule": "MissionInfo.Param1 is not always the required Hero and the Param3 stage owner is not always the required Hero; either side can be the Fetter owner. Resolve by set subtraction against the Fetter owner.",
-    "otherCanonicalType2Rows": "MissionType 5/Param2 2 or 5, MissionType 29, and MissionType 34 do not produce an external required-Hero edge in the verified canonical scope."
-  },
-  "validation": {
-    "missionType5Param2_6Rows": 338,
-    "exactlyOneRequiredHero": 338,
-    "zeroRequiredHero": 0,
-    "multipleRequiredHeroes": 0,
-    "unresolvedMission": 0,
-    "unresolvedDungeon": 0,
-    "dungeonWithoutCanonicalOwner": 0,
-    "nonCanonicalParam1": 0,
-    "semanticGatePass": true
-  },
   "decision": {
-    "semanticBlocker": "RESOLVED_FOR_CONDITIONTYPE_2",
-    "stage51Overall": "IN_PROGRESS",
-    "reasonStageNotComplete": "The ConditionType=2 resolver semantics are frozen and the 267-Hero production candidate is structurally clean, but ConditionType=1 semantics remain to be frozen before the Stage 5-1 final checkpoint.",
-    "nextStartPoint": "Trace and freeze CompletionConditions ConditionType=1 (1335 canonical rows), then rerun the production builder and freeze hero-page-stage5-1-final.v1.json."
+    "semanticBlocker": "RESOLVED",
+    "stage51Overall": "IN_PROGRESS_FINAL_GATE_PENDING",
+    "reasonStageNotComplete": "Both CompletionCondition types are semantically frozen, and the 267-Hero production candidate is structurally clean. A final production transformation/gate must still emit the display-ready Type1 interpretation and hero-page-stage5-1-final.v1.json.",
+    "nextStartPoint": "Transform the frozen production candidate so Type1 emits favorability target/required-level semantics, validate all 267 Hero bond blocks, and freeze hero-page-stage5-1-final.v1.json."
   }
 }
