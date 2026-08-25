@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/hero-stage5-5-2-origin-summary.yml'
       - 'scripts/summarize_hero_page_stage5_5_2_origin_candidates.cjs'
+      - 'scripts/summarize_hero_page_stage5_5_2_origin_top_candidates.cjs'
       - 'data/validation/hero-page-stage5-5-2-origin-candidates.v1.json'
 
 permissions:
@@ -16,17 +17,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build compact summary
-        run: node scripts/summarize_hero_page_stage5_5_2_origin_candidates.cjs
-      - name: Freeze compact summary
+      - name: Build compact summaries
         run: |
-          TARGET='data/validation/hero-page-stage5-5-2-origin-candidates-summary.v1.json'
-          if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
-            echo 'Summary already current.'
+          node scripts/summarize_hero_page_stage5_5_2_origin_candidates.cjs
+          node scripts/summarize_hero_page_stage5_5_2_origin_top_candidates.cjs
+      - name: Freeze compact summaries
+        run: |
+          TARGET1='data/validation/hero-page-stage5-5-2-origin-candidates-summary.v1.json'
+          TARGET2='data/validation/hero-page-stage5-5-2-origin-top10.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET1" "$TARGET2")" ]; then
+            echo 'Summaries already current.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$TARGET"
-          git commit -m 'Freeze Hero Stage 5-5-2 origin candidate summary'
+          git add "$TARGET1" "$TARGET2"
+          git commit -m 'Freeze Hero Stage 5-5-2 origin candidate summaries'
           git push
