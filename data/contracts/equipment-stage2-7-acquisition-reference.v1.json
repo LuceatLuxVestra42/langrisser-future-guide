@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "stage": "equipment-stage2-7",
+  "source": {
+    "legacyKoreanEquipmentSheet": "https://docs.google.com/spreadsheets/d/1RZFY2N3RU-vctduO_Tg2e4RVoZvJAAveiMgPnW6VTQg/edit",
+    "sourceRole": "Existing Korean sheet reference for launch equipment and historical additional-equipment groups"
+  },
+  "launch": {
+    "sheets": [
+      { "title": "무기(SSR)", "equipmentCount": 33, "slot": 0 },
+      { "title": "갑옷(SSR)", "equipmentCount": 18, "slot": 1 },
+      { "title": "투구(SSR)", "equipmentCount": 18, "slot": 2 },
+      { "title": "장신구(SSR)", "equipmentCount": 25, "slot": 3 }
+    ],
+    "equipmentCount": 94,
+    "derivedCanonicalBoundary": {
+      "maxEquipmentId": 264,
+      "method": "Cross-check the 94 launch-sheet rows against the canonical generic acquisition population; the next canonical generic records are collaboration/additional equipment beginning at ID 265.",
+      "confidencePercent": 99
+    }
+  },
+  "legacyAdditional": {
+    "sheet": "추가장비",
+    "groupCount": 20,
+    "itemsPerGroup": 4,
+    "equipmentCount": 80,
+    "firstGroupDate": "2019-09-04",
+    "lastGroupDate": "2025-05-27",
+    "expectedSignatureScore": 73,
+    "maxSignatureScore": 80,
+    "expectedReferenceMismatchFields": 7,
+    "referenceMismatchPolicy": "Preserve the historical sheet values as-is and record field-level differences against ConfigData-derived values; do not silently correct the reference.",
+    "knownReferenceMismatches": [
+      { "date": "2021-05-26", "equipmentId": 443, "field": "방어", "referenceValue": 64, "configValue": 54 },
+      { "date": "2021-05-26", "equipmentId": 444, "field": "기술", "referenceValue": 54, "configValue": 53 },
+      { "date": "2022-12-14", "equipmentId": 505, "field": "생명", "referenceValue": 439, "configValue": 437 },
+      { "date": "2023-11-08", "equipmentId": 541, "field": "label", "referenceValue": 3, "configValue": 6 },
+      { "date": "2023-11-08", "equipmentId": 543, "field": "생명", "referenceValue": 439, "configValue": 437 },
+      { "date": "2024-09-25", "equipmentId": 576, "field": "생명", "referenceValue": 439, "configValue": 437 },
+      { "date": "2025-05-27", "equipmentId": 591, "field": "기술", "referenceValue": 54, "configValue": 53 }
+    ]
+  },
+  "canonicalExpectations": {
+    "equipmentCount": 390,
+    "genericAcquisitionCount": 207,
+    "launchCount": 94,
+    "legacyAdditionalCount": 80,
+    "postLegacyRemainderCount": 33,
+    "currentStandardCount": 32,
+    "unresolvedNoPathIds": [2013],
+    "exclusivePathType46Count": 167,
+    "soulNoPathCount": 16
+  },
+  "semanticDecisions": {
+    "pathType46": {
+      "class": "exclusive-equipment",
+      "confidencePercent": 99,
+      "basis": "The PathType 46-only population aligns with the separate exclusive-equipment population; sentinel rows beginning with IDs 273-277 match the opening rows of the legacy 전용장비 sheet."
+    },
+    "emptyPathSoulPrefix": {
+      "class": "soul-special",
+      "confidencePercent": 99,
+      "basis": "Sixteen no-path canonical records use the 魂· name prefix and are kept outside the three general equipment tabs."
+    },
+    "id2013": {
+      "class": "unresolved-no-path",
+      "confidencePercent": 100,
+      "basis": "GetPathList is empty. No broader all-heroes/unrestricted acquisition meaning is inferred from the empty field."
+    }
+  }
+}
