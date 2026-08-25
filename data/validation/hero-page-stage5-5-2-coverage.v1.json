@@ -3,7 +3,7 @@
   "stage": "hero-page-5-5",
   "substage": "5-5-2",
   "checkpoint": "coverage",
-  "status": "REVIEW_WITH_ISSUES",
+  "status": "REVIEW",
   "completion": "COVERAGE_MEASURED_SEMANTICS_PENDING",
   "sourceTraceStatus": "REVIEW",
   "canonicalHeroCount": 267,
@@ -64,8 +64,11 @@
     "skins": {
       "status": "SOURCE_JOIN_CONFIRMED",
       "join": "ConfigDataHeroInfo.Skins_ID[] -> ConfigDataHeroSkinInfo.ID",
-      "heroesWithValidSkinList": 235,
-      "heroIdsWithInvalidSkinList": [
+      "normalizationRule": "An omitted Skins_ID is normalized to [] only when ConfigDataHeroSkinInfo has no row with SpecifiedHero equal to that canonical Hero ID; omitted lists with reverse owner rows remain a hard error.",
+      "heroesWithValidSkinList": 267,
+      "heroesWithExplicitValidSkinList": 235,
+      "heroesWithNormalizedEmptySkinList": 32,
+      "heroIdsWithNormalizedEmptySkinList": [
         24,
         41,
         42,
@@ -99,170 +102,43 @@
         99273,
         99286
       ],
-      "invalidSkinListDetails": [
-        {
-          "heroId": 24,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 41,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 42,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 45,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 69,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 71,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 73,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 74,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 76,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 78,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 85,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 86,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 96,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 132,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 137,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 138,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 139,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 141,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 142,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 145,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 148,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 99194,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 99202,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 99210,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 99224,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 99235,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 99236,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 99247,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 99258,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 99269,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 99273,
-          "valueType": "undefined",
-          "value": null
-        },
-        {
-          "heroId": 99286,
-          "valueType": "undefined",
-          "value": null
-        }
+      "heroIdsWithInvalidSkinList": [],
+      "invalidSkinListDetails": [],
+      "heroesWithNoSkinRefs": 32,
+      "heroIdsWithNoSkinRefs": [
+        24,
+        41,
+        42,
+        45,
+        69,
+        71,
+        73,
+        74,
+        76,
+        78,
+        85,
+        86,
+        96,
+        132,
+        137,
+        138,
+        139,
+        141,
+        142,
+        145,
+        148,
+        99194,
+        99202,
+        99210,
+        99224,
+        99235,
+        99236,
+        99247,
+        99258,
+        99269,
+        99273,
+        99286
       ],
-      "heroesWithNoSkinRefs": 0,
-      "heroIdsWithNoSkinRefs": [],
       "totalSkinRefs": 540,
       "resolvedSkinRefs": 540,
       "unresolvedSkinRefs": [],
@@ -452,9 +328,7 @@
       "acquisitionSemantics": "UNRESOLVED"
     }
   },
-  "hardErrors": [
-    "canonical Hero rows contain invalid Skins_ID values"
-  ],
+  "hardErrors": [],
   "coverageIssues": [],
   "unresolvedSemanticFields": [
     "rarity",
