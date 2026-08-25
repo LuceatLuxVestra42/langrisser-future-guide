@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "stage": "A-6",
+  "status": "FROZEN",
+  "purpose": "Canonical Relation Set output contract for the shared Hero-Soldier Relation Layer. This artifact is the single semantic source of truth from which all Hero -> Soldier and Soldier -> Hero indexes must later be derived.",
+  "dependsOn": {
+    "goldenBaseline": "data/validation/hero-soldier-relation-golden-baseline.v1.json",
+    "heroIdentity": "data/contracts/hero-identity-contract.v1.json",
+    "soldierIdentity": "data/contracts/soldier-identity-contract.v1.json",
+    "sourceKinds": "data/contracts/hero-soldier-relation-source-contract.v1.json",
+    "edgeSchema": "data/contracts/hero-soldier-relation-edge-schema.v1.json",
+    "composition": "data/contracts/hero-soldier-relation-composition-contract.v1.json"
+  },
+  "artifact": {
+    "targetPath": "data/generated/hero-soldier-relations.v1.json",
+    "legacyBaselinePath": "data/generated/soldier-hero-relations.v1.json",
+    "legacyRule": "The legacy stage-3 relation file remains a frozen regression reference and must not be overwritten by A-6.",
+    "semanticRole": "Authoritative canonical Hero-Soldier edge set",
+    "schemaId": "hero-soldier-relation-set/v1"
+  },
+  "rootShape": {
+    "requiredFields": [
+      "version",
+      "schemaId",
+      "generatedAt",
+      "inputs",
+      "contracts",
+      "summary",
+      "edges"
+    ],
+    "fields": {
+      "version": "integer; artifact format version; v1 = 1",
+      "schemaId": "must equal hero-soldier-relation-set/v1",
+      "generatedAt": "ISO-8601 UTC timestamp of generation",
+      "inputs": "exact source snapshot descriptors used to build the relation set",
+      "contracts": "exact A-1 through A-5 contract descriptors used by the builder",
+      "summary": "derived counts for regression and auditing; never semantic input",
+      "edges": "ordered array of canonical A-4 edges; the only semantic relation payload"
+    }
+  },
+  "inputSnapshotContract": {
+    "requiredInputs": [
+      "heroMaster",
+      "soldierMaster",
+      "soldierInfo",
+      "spHeroInfo",
+      "spSoldierInfo"
+    ],
+    "descriptorShape": {
+      "path": "repository-relative path; required",
+      "gitBlobSha": "exact Git blob SHA when generated from repository state; required for frozen/reproducible outputs"
+    },
+    "expectedPaths": {
+      "heroMaster": "data/hero-name-master.v1.json",
+      "soldierMaster": "data/generated/soldier-master.v1.json",
+      "soldierInfo": "data/configdata/ConfigDataSoldierInfo.json",
+      "spHeroInfo": "data/configdata/ConfigDataSPHeroInfo.json",
+      "spSoldierInfo": "data/configdata/ConfigDataSPSoldierInfo.json"
+    },
+    "rule": "A generated relation set must identify the exact input blobs it used. File names alone are insufficient for a frozen baseline because the contents may change over time."
+  },
+  "contractSnapshotContract": {
+    "requiredContracts": [
+      "heroIdentity",
+      "soldierIdentity",
+      "sourceKinds",
+      "edgeSchema",
+      "composition"
+    ],
+    "descriptorShape": {
+      "path": "repository-relative contract path",
+      "gitBlobSha": "exact Git blob SHA of the contract used"
+    },
+    "rule": "A builder result is reproducible only when both data inputs and semantic contracts are version-pinned."
+  },
+  "summaryContract": {
+    "requiredFields": [
+      "heroCount",
+      "soldierCount",
+      "edgeCount",
+      "provenanceCount",
+      "sourceProductionCounts"
+    ],
+    "definitions": {
+      "heroCount": "number of distinct heroId values present in edges",
+      "soldierCount": "number of distinct soldierId values present in edges",
+      "edgeCount": "number of unique canonical (heroId, soldierId) edges after A-5 union",
+      "provenanceCount": "total provenance entries across all canonical edges after provenance deduplication",
+      "sourceProductionCounts": "count of provenance entries grouped by sourceKind; may sum to more than edgeCount"
+    },
+    "semanticRule": "summary is derived from edges and must never be used to add, delete, repair or infer an edge.",
+    "baselineReference": {
+      "goldenHeroCount": 267,
+      "goldenSoldierCount": 224,
+      "goldenEdgeCount": 5977,
+      "hardInvariant": false,
+      "reason": "The golden counts are regression references from the pre-migration snapshot, not permanent game-data constants."
+    }
+  },
+  "edgeSetContract": {
+    "itemSchema": "data/contracts/hero-soldier-relation-edge-schema.v1.json",
+    "identity": "exact pair (heroId, soldierId)",
+    "uniqueness": "No duplicate canonical pairs are allowed.",
+    "provenance": "Every edge must have one or more valid provenance entries.",
+    "ordering": "Serialize by soldierId ascending, then heroId ascending; provenance ordering follows A-4.",
+    "presentationMetadataForbidden": true,
+    "reason": "Names, site IDs, tiers, SP flags and other presentation/classification fields remain owned by the canonical masters and are resolved at read time."
+  },
+  "authorityBoundary": {
+    "canonicalSemanticSource": "edges",
+    "derivedOnly": [
+      "summary",
+      "Hero -> Soldier indexes",
+      "Soldier -> Hero indexes",
+      "page-specific Hero soldier lists",
+      "page-specific Soldier hero lists"
+    ],
+    "forbiddenParallelSources": [
+      "independently recomputed Hero-page relation data",
+      "independently recomputed Soldier-page relation data",
+      "reverse indexes treated as new evidence",
+      "name-based relation tables",
+      "numeric-pattern relation tables"
+    ],
+    "rule": "If a derived view disagrees with edges, edges remain authoritative and the derived view is considered stale or invalid."
+  },
+  "indexBoundary": {
+    "includedInA6Artifact": false,
+    "rule": "A-6 contains only the canonical relation set. byHeroId and bySoldierId structures are specified separately in A-7 and must be generated exclusively from edges.",
+    "reason": "Keeping canonical semantics separate from acceleration/index structures prevents duplicated ownership and bidirectional drift."
+  },
+  "validationBoundary": {
+    "artifactMayBeWrittenBeforeFinalPass": true,
+    "publicationRule": "A generated relation set must not replace the current accepted baseline or be consumed as production-ready data until the later shared validation stage records PASS.",
+    "errorsMustNotBeSilentlyDropped": true,
+    "invalidReferenceRule": "Unknown heroId, unknown soldierId, invalid sourceKind or invalid inheritance provenance must remain validation failures rather than being removed to make the output pass."
+  },
+  "versioningRules": {
+    "compatibleChanges": [
+      "adding optional non-semantic build metadata outside edges",
+      "adding derived summary fields"
+    ],
+    "breakingChanges": [
+      "changing canonical edge identity",
+      "changing provenance semantics",
+      "embedding presentation metadata as semantic edge fields",
+      "changing allowed relation source meanings",
+      "changing Normal/SP inheritance semantics"
+    ],
+    "breakingChangeAction": "Create a new contract/artifact major version instead of silently changing v1 semantics."
+  },
+  "exampleRoot": {
+    "version": 1,
+    "schemaId": "hero-soldier-relation-set/v1",
+    "generatedAt": "<ISO-8601 UTC>",
+    "inputs": {
+      "heroMaster": {"path": "data/hero-name-master.v1.json", "gitBlobSha": "<sha>"},
+      "soldierMaster": {"path": "data/generated/soldier-master.v1.json", "gitBlobSha": "<sha>"},
+      "soldierInfo": {"path": "data/configdata/ConfigDataSoldierInfo.json", "gitBlobSha": "<sha>"},
+      "spHeroInfo": {"path": "data/configdata/ConfigDataSPHeroInfo.json", "gitBlobSha": "<sha>"},
+      "spSoldierInfo": {"path": "data/configdata/ConfigDataSPSoldierInfo.json", "gitBlobSha": "<sha>"}
+    },
+    "contracts": "<A-1 through A-5 path + gitBlobSha descriptors>",
+    "summary": {
+      "heroCount": "<derived>",
+      "soldierCount": "<derived>",
+      "edgeCount": "<derived>",
+      "provenanceCount": "<derived>",
+      "sourceProductionCounts": "<derived by sourceKind>"
+    },
+    "edges": [
+      "<A-4 canonical edge records>"
+    ]
+  },
+  "completion": "A-6 is complete when the shared relation layer has one formally defined canonical output artifact whose only semantic payload is the provenance-bearing canonical edge set, with exact input/contract snapshot traceability and no embedded bidirectional indexes."
+}
