@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "stage": "A-2",
+  "status": "FROZEN",
+  "purpose": "Canonical Soldier identity contract for the shared Hero-Soldier Relation Layer.",
+  "sources": {
+    "soldierMaster": "data/generated/soldier-master.v1.json",
+    "soldierMasterBlobSha": "23e01ad8707bd7f026f5a3660cc0342747bd5cdb",
+    "spSoldierSource": "data/configdata/ConfigDataSPSoldierInfo.json",
+    "spSoldierSourceBlobSha": "93dd784a7de913daa6d72f5df6cf6890a710c58a",
+    "stage3Validation": "data/validation/soldier-stage3-final.v1.json"
+  },
+  "canonicalKey": {
+    "field": "soldierId",
+    "sourceMeaning": "ConfigData Soldier ID",
+    "role": "Only canonical JOIN key for Soldier identity across the shared relation layer",
+    "comparison": "Exact ID equality"
+  },
+  "identityRules": [
+    "All Hero <-> Soldier relation edges must reference Soldier by soldierId.",
+    "Soldier names must never be used as JOIN keys.",
+    "siteId, nameKr, nameCn, tier, armyType and uiGroup are presentation, routing, classification or review metadata only.",
+    "For a normal Soldier, soldierId is the SoldierInfo ID represented by the canonical Soldier master.",
+    "For an SP Soldier, soldierId is SPSoldierInfo.ID and identifies the SP Soldier form itself.",
+    "The Normal <-> SP Soldier relationship is defined only by SPSoldierInfo.NormalSoliderId <-> SPSoldierInfo.ID.",
+    "normalSoldierId and spSoldierId are relationship metadata and must not replace soldierId as the identity of the current record.",
+    "isSp must reflect explicit SP membership/relationship data rather than an inferred numeric ID range.",
+    "Numeric offsets such as SP ID = normal ID + 5000 must never be used to infer identity or relationships.",
+    "Name similarity, ordering, tier, army type or other presentation fields must never be used to infer Soldier identity.",
+    "A relation edge whose soldierId is absent from the canonical Soldier master must fail integrity validation rather than being silently accepted."
+  ],
+  "auxiliaryIdentifiers": {
+    "siteId": {
+      "status": "DEFINED_IN_CURRENT_MASTER",
+      "currentForm": "soldier-<soldierId>",
+      "rule": "Site/routing identifier only. It must map back to soldierId and must not be used as a ConfigData JOIN key."
+    },
+    "siteSoldierId": {
+      "status": "NOT_SEPARATELY_DEFINED",
+      "rule": "Do not introduce a second canonical Soldier identifier unless a later site requirement needs it; any future site identifier must map back to soldierId."
+    }
+  },
+  "spRelationshipContract": {
+    "spSoldierIdField": "SPSoldierInfo.ID",
+    "normalSoldierIdField": "SPSoldierInfo.NormalSoliderId",
+    "direction": "normalSoldierId <-> spSoldierId",
+    "inferenceForbidden": true,
+    "recordIdentityRule": "Each normal and SP form remains a distinct Soldier record with its own soldierId; the explicit relation links the two forms."
+  },
+  "currentBaseline": {
+    "displayableSoldiers": 224,
+    "normalDisplayable": 168,
+    "spDisplayable": 56,
+    "duplicateSoldierIds": 0,
+    "duplicateSpIds": 0,
+    "duplicateSpNormalIds": 0,
+    "missingNormalSoldier": 0,
+    "missingSpSoldier": 0
+  },
+  "relationLayerRequirement": {
+    "edgeSoldierField": "soldierId",
+    "soldierIndexKey": "soldierId",
+    "lookupDirection": "soldierId -> shared relation edges -> heroId",
+    "forbiddenFallbacks": [
+      "siteId",
+      "siteSoldierId",
+      "nameKr",
+      "nameCn",
+      "tier",
+      "armyType",
+      "uiGroup",
+      "numeric ID offset inference",
+      "name similarity"
+    ]
+  },
+  "completion": "A-2 is complete when all later relation schemas and builders are required to use soldierId as the sole canonical Soldier identity key and Normal/SP form linkage only from the explicit SPSoldierInfo relation."
+}
