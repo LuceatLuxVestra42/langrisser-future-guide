@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "stage": "A-7",
+  "status": "FROZEN",
+  "purpose": "Derived bidirectional lookup index contract for the shared Hero-Soldier Relation Layer. Both indexes are disposable acceleration artifacts generated exclusively from the A-6 canonical relation set.",
+  "dependsOn": {
+    "relationSetContract": "data/contracts/hero-soldier-relation-set-contract.v1.json",
+    "edgeSchema": "data/contracts/hero-soldier-relation-edge-schema.v1.json",
+    "goldenBaseline": "data/validation/hero-soldier-relation-golden-baseline.v1.json"
+  },
+  "authority": {
+    "semanticSource": "data/generated/hero-soldier-relations.v1.json#edges",
+    "indexesAreSemanticSources": false,
+    "rule": "Neither index may add, remove, reinterpret or infer a relation. If an index disagrees with the canonical edge set, the index is stale or invalid and must be regenerated."
+  },
+  "artifacts": {
+    "byHero": {
+      "targetPath": "data/generated/hero-soldier-by-hero.v1.json",
+      "schemaId": "hero-soldier-by-hero/v1",
+      "primaryLookup": "heroId -> soldierIds[]",
+      "intendedConsumers": [
+        "Hero detail usable-Soldier section",
+        "Hero-oriented relation queries"
+      ]
+    },
+    "bySoldier": {
+      "targetPath": "data/generated/hero-soldier-by-soldier.v1.json",
+      "schemaId": "hero-soldier-by-soldier/v1",
+      "primaryLookup": "soldierId -> heroIds[]",
+      "intendedConsumers": [
+        "Soldier detail usable-Hero section",
+        "Soldier-oriented relation queries"
+      ]
+    }
+  },
+  "commonRootShape": {
+    "requiredFields": [
+      "version",
+      "schemaId",
+      "generatedAt",
+      "relationSet",
+      "summary",
+      "index"
+    ],
+    "relationSetDescriptor": {
+      "path": "must equal data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "exact Git blob SHA of the canonical relation set used to build this index",
+      "schemaId": "must equal hero-soldier-relation-set/v1"
+    },
+    "rule": "The by-Hero and by-Soldier artifacts generated together must reference the exact same relation-set blob SHA."
+  },
+  "byHeroContract": {
+    "rootSchemaId": "hero-soldier-by-hero/v1",
+    "indexField": "byHeroId",
+    "keyEncoding": "Canonical heroId serialized as its base-10 JSON object key string with no prefix or padding.",
+    "value": "Array of canonical soldierId integers connected to that Hero by canonical edges.",
+    "generation": "For every edge (heroId, soldierId), append soldierId to byHeroId[String(heroId)].",
+    "entryRule": "Create keys only for heroId values present in canonical edges. Entity existence outside the edge set remains the responsibility of Hero Master.",
+    "missingKeyMeaning": "No canonical relation edge for that heroId in this relation-set snapshot; it does not by itself mean the Hero ID is invalid.",
+    "ordering": {
+      "keys": "numeric heroId ascending when serialized",
+      "values": "soldierId ascending"
+    },
+    "example": {
+      "byHeroId": {
+        "6": [101, 201, 203]
+      }
+    }
+  },
+  "bySoldierContract": {
+    "rootSchemaId": "hero-soldier-by-soldier/v1",
+    "indexField": "bySoldierId",
+    "keyEncoding": "Canonical soldierId serialized as its base-10 JSON object key string with no prefix or padding.",
+    "value": "Array of canonical heroId integers connected to that Soldier by canonical edges.",
+    "generation": "For every edge (heroId, soldierId), append heroId to bySoldierId[String(soldierId)].",
+    "entryRule": "Create keys only for soldierId values present in canonical edges. Entity existence outside the edge set remains the responsibility of Soldier Master.",
+    "missingKeyMeaning": "No canonical relation edge for that soldierId in this relation-set snapshot; it does not by itself mean the Soldier ID is invalid.",
+    "ordering": {
+      "keys": "numeric soldierId ascending when serialized",
+      "values": "heroId ascending"
+    },
+    "example": {
+      "bySoldierId": {
+        "621": [6, 12, 33]
+      }
+    }
+  },
+  "generationAlgorithm": [
+    "Read only the validated A-6 canonical relation-set edges as semantic input.",
+    "Initialize independent empty byHeroId and bySoldierId maps.",
+    "For each canonical edge exactly once, append edge.soldierId to the edge.heroId key and append edge.heroId to the edge.soldierId key.",
+    "Do not consult provenance to decide whether the pair belongs in either index; edge existence already represents the final A-5 semantic union.",
+    "Do not generate either index from the other index.",
+    "Sort keys and value arrays deterministically, then validate parity against the canonical edge set.",
+    "Write both artifacts with the same relation-set blob SHA."
+  ],
+  "summaryContract": {
+    "byHero": {
+      "requiredFields": ["keyCount", "relationCount"],
+      "keyCount": "number of distinct heroId keys in byHeroId",
+      "relationCount": "sum of all soldierIds array lengths"
+    },
+    "bySoldier": {
+      "requiredFields": ["keyCount", "relationCount"],
+      "keyCount": "number of distinct soldierId keys in bySoldierId",
+      "relationCount": "sum of all heroIds array lengths"
+    },
+    "semanticRule": "Index summaries are derived diagnostics only and must not be used to infer relations."
+  },
+  "parityInvariants": [
+    "byHero.relationCount must equal canonical relation-set summary.edgeCount.",
+    "bySoldier.relationCount must equal canonical relation-set summary.edgeCount.",
+    "byHero.keyCount must equal the count of distinct heroId values present in canonical edges.",
+    "bySoldier.keyCount must equal the count of distinct soldierId values present in canonical edges.",
+    "Every canonical edge (h, s) must appear exactly once as s in byHeroId[h].",
+    "Every canonical edge (h, s) must appear exactly once as h in bySoldierId[s].",
+    "No pair absent from canonical edges may appear in either index.",
+    "No value array may contain duplicates.",
+    "The set reconstructed from byHeroId must exactly equal the canonical edge pair set.",
+    "The set reconstructed from bySoldierId must exactly equal the canonical edge pair set.",
+    "The pair sets reconstructed independently from both indexes must be exactly equal to one another."
+  ],
+  "forbiddenIndexFields": [
+    "nameKr",
+    "nameCn",
+    "nameEn",
+    "siteId",
+    "slug",
+    "tier",
+    "armyType",
+    "uiGroup",
+    "isSp",
+    "normalSoldierId",
+    "spSoldierId",
+    "provenance",
+    "sourceKind"
+  ],
+  "provenanceAccessRule": "Consumers that need evidence for a relation must resolve the exact (heroId, soldierId) pair back to the canonical A-6 edge. Index files intentionally do not duplicate provenance.",
+  "failurePolicy": [
+    "Do not silently deduplicate duplicate values produced from malformed canonical edges; canonical pair duplication must already fail upstream validation.",
+    "Do not repair a missing pair by reading the opposite index.",
+    "Do not repair an index from Hero/Soldier names or ConfigData directly.",
+    "If the two index artifacts reference different relation-set blob SHAs, treat the pair as invalid/stale.",
+    "If any parity invariant fails, discard/regenerate the derived indexes; never modify canonical edges to make an index pass."
+  ],
+  "baselineReference": {
+    "goldenHeroKeys": 267,
+    "goldenSoldierKeys": 224,
+    "goldenRelationCountPerDirection": 5977,
+    "hardInvariant": false,
+    "reason": "These are regression references from the frozen pre-migration 3-12 snapshot. Current/future game data may legitimately change."
+  },
+  "ownershipBoundary": {
+    "heroPipeline": "May consume byHeroId but must not independently calculate Hero-Soldier membership.",
+    "soldierPipeline": "May consume bySoldierId but must not independently calculate Soldier-Hero membership.",
+    "relationLayer": "Owns canonical edges and generation of both indexes.",
+    "pageLayer": "May join IDs from an index to Hero/Soldier Masters for presentation metadata only."
+  },
+  "completion": "A-7 is complete when both lookup directions are formally defined as deterministic, lossless, disposable projections of the exact same canonical relation-set edge blob, with bidirectional parity required before downstream consumption."
+}
