@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-5",
+  "substage": "5-5-4",
+  "checkpoint": "display-policy-validation",
+  "status": "PASS",
+  "contract": "data/contracts/hero-page-stage5-5-4-display-policy.v1.json",
+  "input": "data/hero-page-stage5-5-3.v1.json",
+  "summary": {
+    "heroCount": 267,
+    "heroesWithNoRegularSkins": 32,
+    "heroesWithRegularSkins": 235,
+    "galleryNavigationHidden": 32,
+    "galleryNavigationShown": 235,
+    "totalCurrentScopeGalleryItems": 807,
+    "cvNamed": 264,
+    "cvNone": 3,
+    "cvNamedUsingSourceFallback": 264,
+    "cvNoneDisplayCount": 3,
+    "factionMembershipCount": 730,
+    "factionLabelsUsingSourceFallback": 730,
+    "originLabelsUsingSourceFallback": 267,
+    "skinCount": 540,
+    "skinNamesUsingSourceFallback": 540,
+    "encodedAcquisitionVisible": 364,
+    "unencodedAcquisitionHidden": 176,
+    "deferredLocalizationFieldsAlreadyFilled": 0
+  },
+  "policyInvariants": {
+    "explicitCvNoneDisplay": true,
+    "noRawCvMarkerLeak": true,
+    "localizationFallbacksNonBlank": true,
+    "noSkinHeroesHideNavigation": true,
+    "skinHeroesShowNavigation": true,
+    "galleryOrderPreserved": true,
+    "encodedAcquisitionShown": true,
+    "unencodedAcquisitionHidden": true,
+    "noAcquisitionInference": true,
+    "ownershipBoundariesPreserved": true
+  },
+  "representatives": [
+    {
+      "heroId": 1,
+      "nameKr": "매튜",
+      "cvDisplay": "柿原彻也",
+      "originDisplay": "梦幻模拟战手游I",
+      "factionDisplays": [
+        "主角光环",
+        "光辉军团"
+      ],
+      "gallery": {
+        "totalCurrentScopeItems": 5,
+        "showNavigation": true,
+        "showCounter": true,
+        "skinAcquisitionDisplays": [
+          null,
+          "영웅 스킨 상점",
+          null,
+          null
+        ]
+      }
+    },
+    {
+      "heroId": 24,
+      "nameKr": "스코트",
+      "cvDisplay": "井上雄贵",
+      "originDisplay": "梦幻模拟战II",
+      "factionDisplays": [
+        "光辉军团",
+        "战略大师"
+      ],
+      "gallery": {
+        "totalCurrentScopeItems": 1,
+        "showNavigation": false,
+        "showCounter": false,
+        "skinAcquisitionDisplays": []
+      }
+    },
+    {
+      "heroId": 99225,
+      "nameKr": "빙설 심연의 지배자",
+      "cvDisplay": "高粱碧",
+      "originDisplay": "梦幻模拟战手游IV",
+      "factionDisplays": [
+        "帝国之辉",
+        "战略大师",
+        "时空枢纽"
+      ],
+      "gallery": {
+        "totalCurrentScopeItems": 3,
+        "showNavigation": true,
+        "showCounter": true,
+        "skinAcquisitionDisplays": [
+          "광휘의 메아리",
+          "운명의 별짜기"
+        ]
+      }
+    },
+    {
+      "heroId": 99235,
+      "nameKr": "캡틴 코만도&베이비 헤드",
+      "cvDisplay": "성우 없음",
+      "originDisplay": "名将战队",
+      "factionDisplays": [
+        "主角光环",
+        "战略大师",
+        "时空枢纽"
+      ],
+      "gallery": {
+        "totalCurrentScopeItems": 1,
+        "showNavigation": false,
+        "showCounter": false,
+        "skinAcquisitionDisplays": []
+      }
+    }
+  ],
+  "markerLeaks": [],
+  "blankVisibleLabels": [],
+  "invalidGalleryRows": [],
+  "invalidAcquisitionRows": [],
+  "ownershipBoundaryViolations": [],
+  "errors": [],
+  "warnings": [],
+  "completion": "DISPLAY_EXCEPTION_POLICY_VALIDATED_FOR_ALL_267_HEROES",
+  "nextAction": "Stage 5-5-4 is complete. Proceed to the next 5-5 gate or later Stage 5/6 composition without reopening these display exception rules."
+}
