@@ -86,6 +86,13 @@ function main() {
 
   const heroInfoById = groupByIntegerId(heroInfo, 'ID');
   const skinById = groupByIntegerId(heroSkinInfo, 'ID');
+  const skinIdsBySpecifiedHero = new Map();
+  for (const skin of heroSkinInfo) {
+    if (!Number.isInteger(skin?.SpecifiedHero) || !Number.isInteger(skin?.ID)) continue;
+    const ids = skinIdsBySpecifiedHero.get(skin.SpecifiedHero) || [];
+    ids.push(skin.ID);
+    skinIdsBySpecifiedHero.set(skin.SpecifiedHero, ids);
+  }
 
   const missingHeroInfoIds = [];
   const duplicateHeroInfoIds = [];
@@ -109,6 +116,7 @@ function main() {
   const artworkMissingHeroIds = [];
   const skinListInvalidHeroIds = [];
   const skinListInvalidDetails = [];
+  const skinListNormalizedEmptyHeroIds = [];
   const skinNoRefsHeroIds = [];
   const unresolvedSkinRefs = [];
   const specifiedHeroMismatches = [];
@@ -143,14 +151,35 @@ function main() {
       artworkPointerHeroes += 1;
     }
 
-    if (!validIntegerArray(row.Skins_ID)) {
+    let skinIds = row.Skins_ID;
+    if (skinIds === undefined) {
+      const reverseOwnedSkinIds = sortedNumbers(skinIdsBySpecifiedHero.get(heroId) || []);
+      if (reverseOwnedSkinIds.length === 0) {
+        skinListNormalizedEmptyHeroIds.push(heroId);
+        skinIds = [];
+      } else {
+        skinListInvalidHeroIds.push(heroId);
+        skinListInvalidDetails.push({
+          heroId,
+          ...describeInvalidArrayValue(skinIds),
+          reason: 'OMITTED_SKINS_ID_WITH_REVERSE_OWNER_ROWS',
+          reverseOwnedSkinIds,
+        });
+        continue;
+      }
+    } else if (!validIntegerArray(skinIds)) {
       skinListInvalidHeroIds.push(heroId);
-      skinListInvalidDetails.push({ heroId, ...describeInvalidArrayValue(row.Skins_ID) });
+      skinListInvalidDetails.push({
+        heroId,
+        ...describeInvalidArrayValue(skinIds),
+        reason: 'SKINS_ID_IS_NOT_AN_INTEGER_ARRAY',
+      });
       continue;
     }
-    if (row.Skins_ID.length === 0) skinNoRefsHeroIds.push(heroId);
 
-    for (const skinId of row.Skins_ID) {
+    if (skinIds.length === 0) skinNoRefsHeroIds.push(heroId);
+
+    for (const skinId of skinIds) {
       totalSkinRefs += 1;
       const owners = referencedSkinOwners.get(skinId) || new Set();
       owners.add(heroId);
@@ -248,7 +277,13 @@ function main() {
       skins: {
         status: 'SOURCE_JOIN_CONFIRMED',
         join: 'ConfigDataHeroInfo.Skins_ID[] -> ConfigDataHeroSkinInfo.ID',
+        normalizationRule:
+          'An omitted Skins_ID is normalized to [] only when ConfigDataHeroSkinInfo has no row with SpecifiedHero equal to that canonical Hero ID; omitted lists with reverse owner rows remain a hard error.',
         heroesWithValidSkinList: canonicalHeroInfoRows.length - skinListInvalidHeroIds.length,
+        heroesWithExplicitValidSkinList:
+          canonicalHeroInfoRows.length - skinListInvalidHeroIds.length - skinListNormalizedEmptyHeroIds.length,
+        heroesWithNormalizedEmptySkinList: skinListNormalizedEmptyHeroIds.length,
+        heroIdsWithNormalizedEmptySkinList: sortedNumbers(skinListNormalizedEmptyHeroIds),
         heroIdsWithInvalidSkinList: sortedNumbers(skinListInvalidHeroIds),
         invalidSkinListDetails: skinListInvalidDetails.sort((a, b) => a.heroId - b.heroId),
         heroesWithNoSkinRefs: skinNoRefsHeroIds.length,
@@ -280,6 +315,7 @@ function main() {
   console.log(`Origin pointers: ${result.fields.origin.heroesWithNonEmptyValidPointers}/${canonicalHeroInfoRows.length}`);
   console.log(`Artwork pointers: ${artworkPointerHeroes}/${canonicalHeroInfoRows.length}`);
   console.log(`Skin refs resolved: ${resolvedSkinRefs}/${totalSkinRefs}`);
+  console.log(`Normalized omitted empty skin lists: ${skinListNormalizedEmptyHeroIds.length}`);
   console.log(`Invalid skin lists: ${skinListInvalidHeroIds.length}`);
   console.log(`Skin owner mismatches: ${specifiedHeroMismatches.length}`);
   console.log(`Coverage artifact: ${path.relative(rootDir, PATHS.output)}`);
