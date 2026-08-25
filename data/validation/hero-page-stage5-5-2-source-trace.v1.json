@@ -4,7 +4,7 @@
   "substage": "5-5-2",
   "checkpoint": "source-trace",
   "status": "REVIEW",
-  "completion": "SOURCE_TRACE_COMPLETE_COVERAGE_PENDING",
+  "completion": "SOURCE_TRACE_COMPLETE_SEMANTICS_PARTIAL",
   "scope": "Authoritative source tracing for rarity, factions, CV, origin, artwork and skins without inferred display values.",
   "canonicalIdentity": {
     "path": "data/hero-name-master.v1.json",
@@ -14,6 +14,8 @@
   },
   "sources": {
     "heroInfo": "data/configdata/ConfigDataHeroInfo.json",
+    "heroTagInfo": "data/configdata/ConfigDataHeroTagInfo.json",
+    "charImageInfo": "data/configdata/ConfigDataCharImageInfo.json",
     "heroSkinInfo": "data/configdata/ConfigDataHeroSkinInfo.json",
     "previousGate": "data/validation/hero-page-stage5-5-1.v1.json"
   },
@@ -25,14 +27,33 @@
       "rule": "Star/Rank values may be measured but must not be converted to rarity labels until their semantics are independently validated."
     },
     "factions": {
-      "status": "UNRESOLVED",
-      "acceptedSource": null,
-      "rule": "Do not synthesize factions from jobs, aura eligibility, story affiliation or existing display text without a validated upstream source."
+      "status": "SOURCE_CONFIRMED",
+      "source": "ConfigDataHeroTagInfo",
+      "membershipSource": "ConfigDataHeroTagInfo.RelatedHeros_ID[]",
+      "factionId": "ConfigDataHeroTagInfo.ID",
+      "factionName": "ConfigDataHeroTagInfo.Name",
+      "factionDescription": "ConfigDataHeroTagInfo.Desc",
+      "factionIcon": "ConfigDataHeroTagInfo.Icon",
+      "factionBuffHeroes": "ConfigDataHeroTagInfo.SuperHero_ID[]",
+      "validation": "data/validation/hero-page-stage5-5-2-factions.v1.json",
+      "coverage": "267/267 canonical Heroes have at least one faction; zero SuperHero-not-member mismatches.",
+      "rule": "Use RelatedHeros_ID for membership. SuperHero_ID is faction-buff ownership and must not be used as membership."
     },
     "cv": {
-      "status": "UNRESOLVED",
-      "acceptedSource": null,
-      "rule": "Numeric voice/resource identifiers, when present, are not actor/CV display names without a validated name mapping."
+      "status": "SOURCE_JOIN_CONFIRMED",
+      "source": "ConfigDataCharImageInfo.CVName",
+      "join": "ConfigDataHeroInfo.CharImage_ID -> ConfigDataCharImageInfo.ID",
+      "valueType": "string",
+      "validation": "data/validation/hero-page-stage5-5-2-cv.v1.json",
+      "coverage": {
+        "canonicalHeroesResolved": 267,
+        "heroesWithNonEmptyCvName": 267,
+        "heroesWithMaskedCvName": 3,
+        "heroesWithUnmaskedCvName": 264
+      },
+      "maskedValue": "■■■■",
+      "maskedHeroIds": [99235, 99236, 99276],
+      "rule": "Use CVName as authoritative source display text. Trim whitespace only. Do not infer actor names from numeric voice/sound/resource identifiers, and do not rewrite Chinese-localized actor spellings into Korean/Japanese spellings without a separately validated localization mapping."
     },
     "origin": {
       "status": "POINTER_CONFIRMED",
@@ -46,7 +67,7 @@
       "source": "ConfigDataHeroInfo.CharImage_ID",
       "valueType": "integer",
       "displaySemantics": "UNRESOLVED",
-      "rule": "Measure pointer coverage only. CharImage_ID is not yet promoted to final Hero-detail portrait/artwork semantics."
+      "rule": "CharImage_ID is confirmed as a join pointer into ConfigDataCharImageInfo for CV, but final Hero-detail portrait/artwork field selection remains a separate semantic question."
     },
     "skins": {
       "status": "SOURCE_JOIN_CONFIRMED",
@@ -58,11 +79,15 @@
       "acquisitionCandidate": "ConfigDataHeroSkinInfo.GetPathType",
       "orderingSemantics": "UNRESOLVED",
       "acquisitionSemantics": "UNRESOLVED",
-      "rule": "Membership and ID resolution may be validated now; display ordering and GetPathType meaning remain unresolved until separately proven."
+      "rule": "Membership and ID resolution are validated; display ordering and GetPathType meaning remain unresolved until separately proven."
     }
   },
-  "nonSynthesisPolicy": "Unresolved fields stay null/review. Candidate field names and numeric values are not sufficient to create page-display values.",
+  "nonSynthesisPolicy": "Unresolved fields stay null/review. Candidate field names and numeric values are not sufficient to create page-display values. Confirmed CVName source strings are preserved as-is unless a separate authoritative localization map is accepted.",
   "coverageGenerator": "scripts/validate_hero_page_stage5_5_2.cjs",
   "expectedCoverageOutput": "data/validation/hero-page-stage5-5-2-coverage.v1.json",
-  "nextGate": "Run the coverage generator and review missing HeroInfo rows, origin/artwork pointer coverage, skin orphan IDs and SpecifiedHero mismatches before promoting any additional field."
+  "confirmedSemanticArtifacts": [
+    "data/validation/hero-page-stage5-5-2-factions.v1.json",
+    "data/validation/hero-page-stage5-5-2-cv.v1.json"
+  ],
+  "nextGate": "Continue resolving remaining display semantics (rarity, origin dictionary, final artwork field, skin ordering/acquisition) without reopening confirmed faction or CV joins."
 }
