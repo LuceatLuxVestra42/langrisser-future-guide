@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-page-links/v1",
+  "stage": "6-5",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T01:54:37.720Z",
+  "purpose": "Freeze reciprocal Hero-detail <-> Soldier-detail membership authority for site integration without duplicating or re-inferring Hero-Soldier relations.",
+  "authority": {
+    "canonicalRelationSet": "data/generated/hero-soldier-relations.v1.json",
+    "canonicalRelationBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+    "heroToSoldierIndex": "data/generated/hero-soldier-by-hero.v1.json",
+    "soldierToHeroIndex": "data/generated/hero-soldier-by-soldier.v1.json",
+    "rule": "Both page directions must consume indexes derived from the same canonical relation-set snapshot; page code must not infer membership independently."
+  },
+  "consumers": {
+    "heroPage": {
+      "path": "data/generated/hero-page-soldiers-stage5-3.v1.json",
+      "key": "heroId",
+      "targetIdentity": "soldierId",
+      "targetRoutingMetadata": "Soldier identity.siteId when a concrete Soldier route is rendered"
+    },
+    "soldierPage": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "key": "soldierId",
+      "targetIdentity": "heroId",
+      "targetRoutingMetadata": "Use the canonical Hero-page routing layer; do not derive Hero identity from names"
+    }
+  },
+  "summary": {
+    "heroKeys": 267,
+    "soldierKeys": 224,
+    "canonicalRelationCount": 5977,
+    "heroPageRelationCount": 5977,
+    "soldierPageRelationCount": 5977,
+    "reciprocalMismatchCount": 0
+  },
+  "rules": [
+    "Hero -> Soldier and Soldier -> Hero are two views of one canonical relation set.",
+    "soldierId and heroId are the canonical reciprocal membership identities; names are presentation only.",
+    "A page projection may attach display or routing metadata, but it must preserve the exact canonical pair set.",
+    "Existing REVIEW presentation metadata is non-blocking and must never remove a canonical relation edge.",
+    "Any one-direction-only membership, unknown target ID, duplicate pair, or relation snapshot drift is a Stage 6-5 failure."
+  ]
+}
