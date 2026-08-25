@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-5",
+  "substage": "5-5-4",
+  "checkpoint": "display-exception-policy",
+  "status": "ACCEPTED",
+  "purpose": "Freeze user-facing fallback and exception behavior for the validated Stage 5-5-3 Hero header/basic-information output without changing source semantics.",
+  "input": "data/hero-page-stage5-5-3.v1.json",
+  "canonicalHeroCount": 267,
+  "stateTaxonomy": {
+    "NONE": "The source semantics explicitly confirm that the thing does not exist. User-facing UI may display an explicit absence label when useful.",
+    "UNENCODED": "The source omits the specific metadata. This is not equivalent to NONE and must not be converted into an inferred category.",
+    "DEFERRED_LOCALIZATION": "Authoritative source text exists but Korean presentation text has not yet been supplied. This is not missing source data.",
+    "OUT_OF_SCOPE": "The value belongs to another accepted stage or later composition layer and must not be synthesized here."
+  },
+  "displayPolicies": {
+    "identity": {
+      "primaryName": "identity.nameKr",
+      "secondaryNames": ["identity.nameCn", "identity.nameEn"],
+      "rule": "Canonical Hero names are always displayed directly; no fallback synthesis is required."
+    },
+    "rarity": {
+      "display": "rarity.baseLabel",
+      "rule": "Display only the validated base rarity N/R/SR/SSR/LLR in Stage 5-5-4.",
+      "spRule": "SP is OUT_OF_SCOPE and must not overwrite baseLabel.",
+      "soloLimitedSsrRule": "SSR(1-person-limited) is OUT_OF_SCOPE banner/summon presentation metadata and must not be inferred from base rarity."
+    },
+    "factions": {
+      "icon": "factions[].iconSourcePath",
+      "labelFallback": "factions[].nameKr ?? factions[].nameCn",
+      "nullMeaning": "nameKr=null means DEFERRED_LOCALIZATION, not missing faction data.",
+      "rule": "Always keep all validated faction memberships. Until Korean labels are supplied, source Chinese labels may be used as the text fallback/tooltip while the icon remains authoritative."
+    },
+    "cv": {
+      "NAMED": {
+        "displayFallback": "cv.nameKr ?? cv.sourceValue",
+        "rule": "Preserve the source actor spelling until the user supplies Korean localization."
+      },
+      "NONE": {
+        "displayKr": "성우 없음",
+        "rule": "Never expose the raw ■■■■ marker to the user. NONE is a confirmed absence state, not an unresolved actor."
+      },
+      "rule": "Do not collapse NAMED-with-null-nameKr into NONE or unknown."
+    },
+    "origin": {
+      "labelFallback": "origin.nameKr ?? origin.nameCn",
+      "categoryUse": "origin.category is a filter/grouping value and does not replace the work-title label.",
+      "nullMeaning": "origin.nameKr=null means DEFERRED_LOCALIZATION.",
+      "rule": "Display the validated Chinese work title until an accepted Korean title dictionary is supplied."
+    },
+    "artworkGallery": {
+      "baseSlot": {
+        "position": 1,
+        "source": "artwork.sourceAssetPath",
+        "acquisitionLabel": null
+      },
+      "regularSkinSlots": {
+        "source": "skins[] in existing order",
+        "positionRule": "gallery position = skin.order + 1",
+        "nameFallback": "skins[].nameKr ?? skins[].nameCn",
+        "imageSource": "skins[].sourceImagePath"
+      },
+      "currentScopeTotal": "1 + skins.length",
+      "navigation": {
+        "whenTotalEquals1": "Hide previous/next controls and hide the current/total counter.",
+        "whenTotalGreaterThan1": "Show previous/next controls and show current/total using the current Stage 5-5-4 gallery sequence."
+      },
+      "spIllustration": {
+        "state": "OUT_OF_SCOPE",
+        "owner": "Stage 5-4 plus later composition",
+        "designRequirement": "The final page may include SP illustration in the same gallery when SP exists.",
+        "rule": "Do not invent an SP gallery insertion position in Stage 5-5-4. Preserve the base + regular-skin order until Stage 5-4 data is composed."
+      },
+      "assetRule": "Source asset paths are authoritative locators, not browser URLs. Export/web-delivery failure is an asset-pipeline concern and must not be rewritten as source-data absence."
+    },
+    "skinAcquisition": {
+      "ENCODED": {
+        "display": "skins[].acquisition.labelKr",
+        "rule": "Show the validated Korean acquisition category above the gallery counter when the current gallery item is a regular skin."
+      },
+      "UNENCODED": {
+        "display": null,
+        "internalState": "Keep acquisition.state=UNENCODED.",
+        "rule": "Do not show '미기록', '이벤트', '무료', or any other guessed acquisition route as production user-facing acquisition text. The acquisition line is omitted for that skin until a verified supplemental dictionary exists."
+      },
+      "baseArtworkRule": "Base artwork has no skin-acquisition label.",
+      "rule": "Acquisition text is item-specific presentation metadata, not a Hero-level label."
+    },
+    "noRegularSkins": {
+      "state": "NONE",
+      "condition": "skins.length === 0",
+      "display": "Show only the base artwork. Hide gallery navigation/counter and do not render an empty skin card or '스킨 없음' banner in the header.",
+      "rule": "An empty skins array is a confirmed no-regular-skin state under the current ConfigData snapshot, not an error."
+    },
+    "localization": {
+      "fields": ["factions[].nameKr", "cv.nameKr", "origin.nameKr", "skins[].nameKr"],
+      "state": "DEFERRED_LOCALIZATION",
+      "fallbackRule": "Use the validated source text as the temporary display fallback; never auto-translate it into a new stored Korean source value.",
+      "storageRule": "Fallback rendering must not mutate Stage 5-5-3 output or backfill nameKr."
+    }
+  },
+  "expectedCurrentCounts": {
+    "heroesWithNoRegularSkins": 32,
+    "heroesWithRegularSkins": 235,
+    "cvNamed": 264,
+    "cvNone": 3,
+    "regularSkinCount": 540,
+    "encodedSkinAcquisition": 364,
+    "unencodedSkinAcquisition": 176
+  },
+  "prohibitions": [
+    "Do not display ■■■■ as a voice-actor name.",
+    "Do not treat null Korean localization as missing source data.",
+    "Do not label every UNENCODED skin as event/free/shop or any other inferred acquisition type.",
+    "Do not show meaningless 1/1 gallery controls when a Hero has no regular skins.",
+    "Do not reorder skins while composing the gallery.",
+    "Do not insert SP illustration into the gallery until Stage 5-4 composition defines that behavior.",
+    "Do not rewrite source asset paths into guessed web URLs.",
+    "Do not promote SSR to SSR(1-person-limited) in this stage."
+  ],
+  "completionRule": "Stage 5-5-4 is complete when every current Stage 5-5-3 record maps deterministically to these display states with no source marker leakage, no fabricated acquisition text, no localization synthesis, and no gallery-order changes.",
+  "nextAction": "Validate these policies across all 267 Heroes and freeze a Stage 5-5-4 validation artifact."
+}
