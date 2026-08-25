@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "stage": "A-1",
+  "status": "FROZEN",
+  "purpose": "Canonical Hero identity contract for the shared Hero-Soldier Relation Layer.",
+  "sources": {
+    "heroMaster": "data/hero-name-master.v1.json",
+    "heroMasterBlobSha": "12eaf4f84a3e91477c80fbccd78c949b79c3829f",
+    "heroMasterRecordCount": 267,
+    "heroStage3Validation": "data/validation/hero-stage3-automation-result.json"
+  },
+  "canonicalKey": {
+    "field": "heroId",
+    "sourceMeaning": "ConfigData Hero ID",
+    "role": "Only canonical JOIN key for Hero identity across the shared relation layer",
+    "comparison": "Exact ID equality"
+  },
+  "identityRules": [
+    "All Hero <-> Soldier relation edges must reference Hero by heroId.",
+    "Hero names must never be used as JOIN keys.",
+    "nameKr, nameCn, nameEn and aliasesKr are display, review or search metadata only.",
+    "SPHeroInfo.ID is interpreted as the owning canonical Hero ID for Hero-Soldier relation work.",
+    "HeroInformation_ID and other metadata IDs must not replace heroId as the canonical Hero key.",
+    "Numeric patterns, name similarity and ordering must not be used to infer Hero identity.",
+    "A relation edge whose heroId is absent from the canonical Hero master must fail integrity validation rather than being silently accepted."
+  ],
+  "auxiliaryIdentifiers": {
+    "siteHeroId": {
+      "status": "NOT_DEFINED",
+      "rule": "May be introduced later for site-specific needs, but must map back to heroId and must not become a ConfigData JOIN key."
+    },
+    "slug": {
+      "status": "NOT_DEFINED",
+      "rule": "May be derived later for URLs, but must be treated as presentation/routing metadata only."
+    }
+  },
+  "currentBaseline": {
+    "canonicalHeroes": 267,
+    "heroInfoPlayableHeroes": 267,
+    "unknownSpOwners": 0,
+    "duplicateSpOwners": 0
+  },
+  "relationLayerRequirement": {
+    "edgeHeroField": "heroId",
+    "heroIndexKey": "heroId",
+    "lookupDirection": "heroId -> shared relation edges -> soldierId",
+    "forbiddenFallbacks": [
+      "nameKr",
+      "nameCn",
+      "nameEn",
+      "aliasesKr",
+      "siteHeroId",
+      "slug",
+      "HeroInformation_ID",
+      "numeric ID pattern inference"
+    ]
+  },
+  "completion": "A-1 is complete when all later relation schemas and builders are required to use heroId as the sole canonical Hero identity key."
+}
