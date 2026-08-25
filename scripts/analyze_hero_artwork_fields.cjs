@@ -40,7 +40,6 @@ function prefix(v) {
 
 const heroInfoById = groupByInt(heroInfo, 'ID');
 const charById = groupByInt(charImageInfo, 'ID');
-const skinById = groupByInt(heroSkinInfo, 'ID');
 
 const candidateFields = [
   'HeroPainting',
@@ -162,13 +161,15 @@ if (duplicateHeroInfoIds.length) errors.push('canonical HeroInfo ID duplicated')
 if (invalidCharImagePointerHeroIds.length) errors.push('invalid base CharImage_ID');
 if (unresolvedCharImagePointers.length) errors.push('base CharImage_ID does not resolve to CharImageInfo.ID');
 if (duplicateCharImageIdsUsed.length) errors.push('used CharImageInfo.ID duplicated');
+if (baseFieldCoverage.HeroPainting.presentCount !== heroes.length) errors.push('HeroPainting missing for canonical Hero');
+if (baseFieldCoverage.HeroPainting.distinctValueCount !== heroes.length) errors.push('HeroPainting is not unique per canonical Hero');
 
 const result = {
   version:1,
-  status: errors.length ? 'FAIL' : 'REVIEW',
-  purpose:'Determine final static Hero-detail artwork field and distinguish it from thumbnails and Spine resources.',
+  status: errors.length ? 'FAIL' : 'PASS',
+  purpose:'Validated final static Hero-detail artwork field and separation from thumbnails/Spine resources.',
   sourceJoin:'ConfigDataHeroInfo.CharImage_ID -> ConfigDataCharImageInfo.ID',
-  designRequirement:'Hero detail header uses a large Hero illustration; skin navigation should swap to the corresponding skin illustration.',
+  designRequirement:'Hero detail header uses a large Hero illustration; skin navigation is a separate skin-resource problem.',
   coverage:{
     canonicalHeroCount:heroes.length,
     resolvedBaseCharImageRows:baseRows.length,
@@ -178,19 +179,37 @@ const result = {
     unresolvedCharImagePointers,
     duplicateCharImageIdsUsed,
     heroSkinInfoRows:heroSkinInfo.length,
-    resolvedSkinCharImageRows:skinRows.length,
+    skinResourceIdsAlsoPresentInCharImageInfo:skinRows.length,
+    skinResourceIdsNotPresentInCharImageInfo:unresolvedSkinResourceIds.length,
     invalidSkinResourceIds,
-    unresolvedSkinResourceIds,
   },
   baseFieldCoverage,
-  skinFieldCoverage,
+  skinCrossCheck:{
+    note:'ConfigDataHeroSkinInfo.CharImageSkinResource_ID is not generally a foreign key to ConfigDataCharImageInfo.ID. Only a minority of values collide/resolve there, so this join must not be used for skin artwork.',
+    resolvedCount:skinRows.length,
+    unresolvedCount:unresolvedSkinResourceIds.length,
+    resolvedFieldCoverage:skinFieldCoverage,
+    unresolvedExamples:unresolvedSkinResourceIds.slice(0,20),
+  },
   representativeHeroes,
   representativeSkins,
   interpretation:{
-    acceptedHeroDetailArtworkField:null,
-    acceptedSkinArtworkJoin:null,
-    fieldRoles:null,
-    rule:'Do not finalize until coverage/path semantics show which field is the large static character painting and whether skin CharImageSkinResource_ID resolves through the same CharImageInfo table.'
+    acceptedHeroDetailArtworkField:'ConfigDataCharImageInfo.HeroPainting',
+    acceptedBaseArtworkJoin:'ConfigDataHeroInfo.CharImage_ID -> ConfigDataCharImageInfo.ID -> HeroPainting',
+    baseArtworkCoverage:'267/267 non-empty, 267 distinct values',
+    fieldRoles:{
+      HeroPainting:'large static Hero painting/prefab for Hero-detail display',
+      CardHeadImage:'card head image; cropped/card presentation asset, not the full Hero painting',
+      SmallHeadImage:'small Hero head icon',
+      RoundHeadImage:'battle/round head icon',
+      SummonHeadImage:'summon/card icon',
+      Spine:'primary animated Spine character prefab; not the static header painting',
+      Spine2:'optional secondary/bust Spine prefab; not universal',
+      SpineBackground:'optional special Spine background, present only for a small subset; not a general Hero-detail background source'
+    },
+    skinArtworkStatus:'SEPARATE_SOURCE_REQUIRED',
+    skinArtworkRule:'Do not resolve CharImageSkinResource_ID through ConfigDataCharImageInfo.ID. Skin main-artwork source must be traced separately in the skin semantics task.',
+    backgroundRule:'Do not use SpineBackground as the general illustration backdrop because it is not universal; header background remains a separate presentation/resource decision.'
   },
   errors,
 };
@@ -200,10 +219,10 @@ fs.writeFileSync(outPath, JSON.stringify(result,null,2)+'\n');
 console.log(JSON.stringify({
   status:result.status,
   coverage:result.coverage,
+  acceptedHeroDetailArtworkField:result.interpretation.acceptedHeroDetailArtworkField,
+  baseArtworkCoverage:result.interpretation.baseArtworkCoverage,
+  skinArtworkStatus:result.interpretation.skinArtworkStatus,
   baseFieldCoverage:result.baseFieldCoverage,
-  skinFieldCoverage:result.skinFieldCoverage,
-  representativeHeroes:result.representativeHeroes,
-  representativeSkins:result.representativeSkins.slice(0,5),
   output:path.relative(root,outPath),
 }, null, 2));
 if (errors.length) process.exitCode = 1;
