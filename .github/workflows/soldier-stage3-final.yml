@@ -16,6 +16,7 @@ on:
       - 'data/hero-name-master.v1.json'
       - 'scripts/finalize-soldier-stage3.cjs'
       - 'scripts/finalize-soldier-stage3-postprocess.cjs'
+      - 'scripts/inspect_parsed_soldier_schema.cjs'
       - '.github/workflows/soldier-stage3-final.yml'
   pull_request:
     paths:
@@ -31,6 +32,7 @@ on:
       - 'data/hero-name-master.v1.json'
       - 'scripts/finalize-soldier-stage3.cjs'
       - 'scripts/finalize-soldier-stage3-postprocess.cjs'
+      - 'scripts/inspect_parsed_soldier_schema.cjs'
       - '.github/workflows/soldier-stage3-final.yml'
 
 permissions:
@@ -46,6 +48,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Inspect parsed soldier ConfigData schema
+        run: node scripts/inspect_parsed_soldier_schema.cjs
       - name: Build soldier stage 3 data
         run: node scripts/finalize-soldier-stage3.cjs
       - name: Resolve stage 3 review cases and final-validate
