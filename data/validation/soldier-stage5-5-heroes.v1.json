@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage5-5-heroes-validation/v1",
+  "stage": "5-5",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T01:54:37.720Z",
+  "sources": {
+    "contract": {
+      "path": "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+      "gitBlobSha": "2943af041025c76c647b790661babe784e05f4f2"
+    },
+    "stage5_4": {
+      "path": "data/generated/soldier-detail-stage5-4.v1.json",
+      "gitBlobSha": "ef56ecbbaf56ef9b8007b65eb4c41e44c5c3c1a2"
+    },
+    "stage5_4Validation": {
+      "path": "data/validation/soldier-stage5-4-training.v1.json",
+      "gitBlobSha": "32d40cc957e45a358cbf752fb6b685184d0218d5"
+    },
+    "bySoldier": {
+      "path": "data/generated/hero-soldier-by-soldier.v1.json",
+      "gitBlobSha": "ff9d8a881c03b6e0f2a196e12f37cd2e28e3e251",
+      "relationSetGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    },
+    "relationValidation": {
+      "path": "data/validation/hero-soldier-relation-validation.v1.json",
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638"
+    }
+  },
+  "checks": {
+    "contractNotFrozen": 0,
+    "stage5_4NotPass": 0,
+    "stage5_4ValidationNotPass": 0,
+    "relationValidationNotPass": 0,
+    "duplicateStage5Ids": 0,
+    "invalidStage5Ids": 0,
+    "bySoldierBlobMismatch": 0,
+    "relationSetBlobMismatch": 0,
+    "missingBySoldierKeys": 0,
+    "extraBySoldierKeys": 0,
+    "malformedHeroLists": 0,
+    "duplicateHeroLists": 0,
+    "relationCountMismatch": 0,
+    "contractRelationCountMismatch": 0,
+    "contractKeyCountMismatch": 0,
+    "sharedRelationNonZeroChecks": 0,
+    "outputRecordCountMismatch": 0
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "generatedRecords": 224,
+    "bySoldierKeys": 224,
+    "relationCount": 5977,
+    "soldiersWithNoHeroes": 0,
+    "nonPassIdentityMetadataCount": 41,
+    "missingBySoldierKeys": [],
+    "extraBySoldierKeys": [],
+    "malformedHeroLists": [],
+    "duplicateHeroLists": []
+  },
+  "errors": [],
+  "reviews": [
+    "41 Soldier identity records retain non-PASS presentation metadata; final Hero membership is unaffected."
+  ]
+}
