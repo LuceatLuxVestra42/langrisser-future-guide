@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage5-6-sp-detail-validation/v1",
+  "stage": "5-6",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T00:41:14.143Z",
+  "sources": {
+    "contract": {
+      "path": "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+      "gitBlobSha": "2943af041025c76c647b790661babe784e05f4f2"
+    },
+    "stage5_5": {
+      "path": "data/generated/soldier-detail-stage5-5.v1.json",
+      "gitBlobSha": "f904250cf4a898886967331fbaa574eb43664dd4"
+    },
+    "stage5_5Validation": {
+      "path": "data/validation/soldier-stage5-5-heroes.v1.json",
+      "gitBlobSha": "c08de69ec079bf19d10d300e853aa8f10ee6bc4f"
+    },
+    "soldierStage3": {
+      "path": "data/generated/soldier-stage3.v1.json",
+      "gitBlobSha": "afaebae396017391689c78a1b76c244e06067011"
+    },
+    "stage3Validation": {
+      "path": "data/validation/soldier-stage3-final.v1.json",
+      "gitBlobSha": "e1aa89d12d07edd513f993458be3e08e7ec57e03"
+    }
+  },
+  "checks": {
+    "contractNotFrozen": 0,
+    "stage5_5NotPass": 0,
+    "stage5_5ValidationNotPass": 0,
+    "stage3NotPass": 0,
+    "stage3ValidationNotPass": 0,
+    "duplicateStage5Ids": 0,
+    "invalidStage5Ids": 0,
+    "duplicateSpRelations": 0,
+    "invalidSpRelations": 0,
+    "missingSpRelations": 0,
+    "extraSpRelations": 0,
+    "relationIdMismatches": 0,
+    "descriptionPreservationMismatches": 0,
+    "invalidStatDeltas": 0,
+    "malformedStage1": 0,
+    "malformedStage2": 0,
+    "falseStage2Leak": 0,
+    "expandedHeroMismatches": 0,
+    "nonSpWithSpDetail": 0,
+    "missionTypeMismatches": 0,
+    "baselineMismatches": 0,
+    "outputRecordCountMismatch": 0
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "generatedRecords": 224,
+    "spSoldiers": 56,
+    "spRelations": 56,
+    "secondStageTrue": 45,
+    "secondStageFalse": 11,
+    "stage1MissionCount": 112,
+    "stage2MissionCount": 45,
+    "missionTypeCounts": {
+      "73": 56,
+      "123": 56,
+      "124": 45
+    },
+    "nonPassIdentityMetadataCount": 41,
+    "missingSpRelations": [],
+    "extraSpRelations": [],
+    "relationIdMismatches": [],
+    "descriptionPreservationMismatches": [],
+    "invalidStatDeltas": [],
+    "malformedStage1": [],
+    "malformedStage2": [],
+    "falseStage2Leak": [],
+    "expandedHeroMismatches": [],
+    "nonSpWithSpDetail": [],
+    "missionTypeMismatches": []
+  },
+  "errors": [],
+  "reviews": [
+    "41 Soldier identity records retain non-PASS presentation metadata; SP source projection is unaffected."
+  ]
+}
