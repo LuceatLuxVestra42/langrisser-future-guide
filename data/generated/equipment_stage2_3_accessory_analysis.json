@@ -5,6 +5,12 @@
   },
   "accessoryRule": "Rank=4, normalized EquipmentType=3, Label=14",
   "count": 61,
+  "candidateRule": {
+    "healing": "max Skill Desc matches explicit healing-effect phrase",
+    "attack": "otherwise Property1_ID=2",
+    "intellect": "otherwise Property1_ID=4",
+    "defense": "otherwise Property1_ID in {1,3,5}"
+  },
   "distributions": {
     "property1Counts": {
       "1": 2,
@@ -12,14 +18,6 @@
       "3": 12,
       "4": 17,
       "5": 2
-    },
-    "property2Counts": {
-      "0": 1,
-      "1": 22,
-      "3": 8,
-      "4": 10,
-      "5": 17,
-      "6": 3
     },
     "comboCounts": {
       "2+3": 8,
@@ -35,1967 +33,754 @@
       "2+6": 3,
       "1+4": 1
     },
-    "keywordCounts": {
-      "healing": 13,
-      "attack": 46,
-      "intellect": 23,
-      "defense": 17,
-      "hp": 10,
-      "mdef": 9
+    "healingByProperty1": {
+      "1": 1,
+      "4": 6
+    },
+    "categoryCounts": {
+      "attack": 28,
+      "defense": 15,
+      "intellect": 11,
+      "healing": 7
     }
   },
-  "rows": [
-    {
-      "id": 99,
-      "name": "神翼护胫",
-      "desc": "有点重，但是防护力很明显改善了。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 3,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50342,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "神御"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击<color=#DC143C>+8%</color>。被攻击时，防御提升<color=#DC143C>10%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": true,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 100,
-      "name": "神行靴",
-      "desc": "飞一般的感觉！",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50348,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "神行"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "防御<color=#DC143C>+8%</color>，移动力<color=#DC143C>+1</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": false,
-        "intellect": false,
-        "defense": true,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 106,
-      "name": "精灵石之戒",
-      "desc": "精灵的秘宝，不可多得。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50317,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "精灵之怒"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "主动进入战斗时，攻击、防御提升<color=#DC143C>8%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": true,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 107,
-      "name": "神圣指环",
-      "desc": "充满圣洁的力量，受到神灵的庇护。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50165,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "神圣庇护"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "智力<color=#DC143C>+8%</color>。免疫:“无法使用主动技能”。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": false,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 108,
-      "name": "德罗普尼尔",
-      "desc": "戴着很痛的样子，主神奥丁的统御之戒。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50586,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "反弹"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "智力<color=#DC143C>+8%</color>。被远程攻击进入战斗时，可以反弹本次遭受伤害的<color=#DC143C>30%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 114,
-      "name": "屠龙勋章",
-      "desc": "屠龙者的最高荣耀，冒险者们的梦想。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50591,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "斩龙"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击<color=#DC143C>+8%</color>。和“飞兵”战斗时，攻击额外提升<color=#DC143C>12%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
+  "explicitHealingCandidates": [
     {
       "id": 115,
       "name": "女神之泪",
-      "desc": "传说是女神泪水凝结而成的，赐予女神的祝福。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
+      "property1Id": 4,
+      "property2Id": 5,
       "maxSkillId": 50113,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "女神之泪"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "治疗效果<color=#DC143C>+15%</color>。行动结束时，为周围<color=#DC143C>2</color>格的<color=#DC143C>3</color>个其他友军驱散<color=#DC143C>1</color>个弱化效果。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": false,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 116,
-      "name": "次元宝珠",
-      "desc": "由时空裂缝中的以太旋涡凝结而成的珠宝，拥有操弄时间的力量。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50200,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "时光回溯"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "智力<color=#DC143C>+8%</color>，使用主动技能造成伤害时，<color=#DC143C>30%</color>的概率，使得该技能冷却时间<color=#DC143C>-1</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 120,
-      "name": "光之面纱",
-      "desc": "朦胧的美，虽然不能防御攻击，但能保护你免受诅咒。",
-      "property1": {
-        "id": 5,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50370,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "光尘"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "魔防<color=#DC143C>+8%</color>。免疫:“防御、魔防降低”。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": true,
-        "hp": false,
-        "mdef": true
-      }
-    },
-    {
-      "id": 121,
-      "name": "星之耳坠",
-      "desc": "蕴含着星辰之光。使得黑暗中的潜伏者无所遁形。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50221,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "星之守护"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "智力<color=#DC143C>+8%</color>。和“刺客”“弓手”战斗时，防御提升<color=#DC143C>30%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": false,
-        "intellect": true,
-        "defense": true,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 122,
-      "name": "霸者徽章",
-      "desc": "谁才有资格颁发这样的证明？",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50145,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "霸者"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>。免疫:“防御、魔防降低”、“攻击、智力降低”、“移动力降低”。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": true,
-        "hp": false,
-        "mdef": true
-      }
-    },
-    {
-      "id": 126,
-      "name": "圣骨",
-      "desc": "虽然很神圣……",
-      "property1": {
-        "id": 5,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50108,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "反射"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "生命<color=#DC143C>+8%</color>。被近战攻击时，反弹本次遭受伤害的<color=#DC143C>30%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": true,
-        "mdef": false
-      }
+      "maxSkillName": "女神之泪",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+15%</color>。行动结束时，为周围<color=#DC143C>2</color>格的<color=#DC143C>3</color>个其他友军驱散<color=#DC143C>1</color>个弱化效果。"
     },
     {
       "id": 127,
       "name": "真十字架",
-      "desc": "并不是说其他都是假的。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
+      "property1Id": 4,
+      "property2Id": 1,
       "maxSkillId": 50210,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "驱魔者"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "治疗效果<color=#DC143C>+15%</color>。和魔族、法师战斗时，智力、魔防、防御提升<color=#DC143C>20%</color>。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": false,
-        "intellect": true,
-        "defense": true,
-        "hp": false,
-        "mdef": true
-      }
-    },
-    {
-      "id": 128,
-      "name": "圣杯",
-      "desc": "盛满了愿望，生命的力量。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50215,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "圣杯"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "智力<color=#DC143C>+5%</color>。本回合如果造成过伤害，行动结束时为周围<color=#DC143C>1</color>格的其他友军恢复<color=#DC143C>15%</color>的生命。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": true,
-        "mdef": false
-      }
-    },
-    {
-      "id": 132,
-      "name": "圣王护符",
-      "desc": "强力的守护者，强者的象征。",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50596,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "圣王祝福"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "当周围<color=#DC143C>2</color>格有我方友军时，战斗中，防御、魔防提升<color=#DC143C>10%</color>"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": false,
-        "intellect": false,
-        "defense": true,
-        "hp": false,
-        "mdef": true
-      }
+      "maxSkillName": "驱魔者",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+15%</color>。和魔族、法师战斗时，智力、魔防、防御提升<color=#DC143C>20%</color>。"
     },
     {
       "id": 133,
       "name": "天使之羽",
-      "desc": "天使的羽毛，治愈你的伤痛。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
+      "property1Id": 4,
+      "property2Id": 5,
       "maxSkillId": 50365,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "天佑"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "生命<color=#DC143C>+10%</color>，治疗效果<color=#DC143C>+10%</color>。免疫:“眩晕”。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": false,
-        "intellect": false,
-        "defense": false,
-        "hp": true,
-        "mdef": false
-      }
-    },
-    {
-      "id": 134,
-      "name": "血之盟约",
-      "desc": "鲜血之契约，蕴涵强大的法力，虽然好像有副作用。",
-      "property1": {
-        "id": 1,
-        "base": 73,
-        "growth": 210
-      },
-      "property2": {
-        "id": null,
-        "base": null,
-        "growth": null
-      },
-      "maxSkillId": 50226,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "血契"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "生命<color=#DC143C>+15%</color>。免疫:“无法被治疗”、“无法遭受强化效果”。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": false,
-        "intellect": false,
-        "defense": false,
-        "hp": true,
-        "mdef": false
-      }
-    },
-    {
-      "id": 256,
-      "name": "巨人腰带",
-      "desc": "这条巨大的腰带最初由霜巨人打造而成。",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50786,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "巨人"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "被近战攻击时，战斗中防御、魔防提升<color=#DC143C>10%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": true,
-        "hp": false,
-        "mdef": true
-      }
-    },
-    {
-      "id": 257,
-      "name": "精灵腰带",
-      "desc": "妖精奇匠在腰带上附加了能偏转箭矢轨迹的魔法。",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50791,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "偏折"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "被远程攻击时，战斗中防御、魔防提升<color=#DC143C>10%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": true,
-        "hp": false,
-        "mdef": true
-      }
-    },
-    {
-      "id": 258,
-      "name": "孤星腕轮",
-      "desc": "传说由妖精族的奇匠用极夜的星光打造而成。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50796,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "星之力"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "周围<color=#DC143C>2</color>格没有友军时，战斗中攻击、防御提升<color=#DC143C>10%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": true,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 260,
-      "name": "索尔的项链",
-      "desc": "无数的闪电缠绕在雷神的周围，给予敌人神的制裁。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 3,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50801,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "闪电链"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击<color=#DC143C>+5%</color>。主动进入战斗时，战后<color=#DC143C>50%</color>概率对敌军造成一次固定伤害。伤害值为英雄攻击的<color=#DC143C>1</color>倍。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 261,
-      "name": "审判魔符",
-      "desc": "你有权保持沉默，但你所说的每一句话都将作为呈堂证供。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 3,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50806,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "断罪"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击<color=#DC143C>+8%</color>。和“僧侣”战斗时，攻击额外提升<color=#DC143C>12%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 262,
-      "name": "恐惧魔眼",
-      "desc": "我，看看看看看看到你了！",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50811,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "目光"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "智力<color=#DC143C>+8%</color>。主动进入战斗时，战后有<color=#DC143C>50%</color>概率使敌军“造成伤害”降低<color=#DC143C>15%</color>，持续<color=#DC143C>1</color>回合。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 263,
-      "name": "妖精的步伐",
-      "desc": "一步两步，一步两步。。。。",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50816,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "妖精之舞"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "防御<color=#DC143C>+8%</color>。攻击后可以自由的移动<color=#DC143C>2</color>格。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": true,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 264,
-      "name": "兰德维蒂玫瑰",
-      "desc": "诸神黄昏之后，仅有沉默之神的玫瑰在兰德维蒂寂静盛开。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50821,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "寂静"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "智力<color=#DC143C>+8%</color>。主动攻击造成伤害时，有<color=#DC143C>50%</color>的概率，使敌军损失<color=#DC143C>1</color>个强化效果。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 268,
-      "name": "游击士勋章",
-      "desc": "游击士的的身份证明，象征着自由、勇敢、以及孩子们的梦想。",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50871,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "自由守护"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>。免疫“固定伤害”，“无法使用主动技能”。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 270,
-      "name": "红色小棉袜",
-      "desc": "等等，还有一只跑哪去了！？",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50846,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "轻快"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击<color=#DC143C>+5%</color>，移动力<color=#DC143C>+1</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 277,
-      "name": "团结",
-      "desc": "由记忆打造成的戒指，友谊与羁绊的象征。马修专属装备。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 50896,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "意志之力"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "当周围<color=#DC143C>2</color>格有我方友军时，攻击、防御、魔防提升<color=#DC143C>10%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": true,
-        "hp": false,
-        "mdef": true
-      }
-    },
-    {
-      "id": 285,
-      "name": "铸剑者勋章",
-      "desc": "内含一枚安杰丽卡特制的防伪ID芯片……",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50936,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "自由守护"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>。免疫“固定伤害”，“无法使用主动技能”。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 286,
-      "name": "妖精之翼",
-      "desc": "用魔法重构的妖精羽翼，古典魔法器的巅峰之作。莉法妮专属装备。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 50941,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "羽步"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "智力<color=#DC143C>+5%</color>。攻击后，可以再次移动<color=#DC143C>2</color>格。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
+      "maxSkillName": "天佑",
+      "maxSkillDesc": "生命<color=#DC143C>+10%</color>，治疗效果<color=#DC143C>+10%</color>。免疫:“眩晕”。"
     },
     {
       "id": 291,
       "name": "小熊玩偶",
-      "desc": "爱丽丝的心爱玩具，少女心爆棚的萌物。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
+      "property1Id": 4,
+      "property2Id": 1,
       "maxSkillId": 50966,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "毛茸茸"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "治疗效果<color=#DC143C>+15%</color>。\n当使用单体支援技能时，使得增益效果持续回合数<color=#DC143C>+1</color>。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": false,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
+      "maxSkillName": "毛茸茸",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+15%</color>。\n当使用单体支援技能时，使得增益效果持续回合数<color=#DC143C>+1</color>。"
     },
     {
       "id": 402,
       "name": "Q巨拉",
-      "desc": "听说是由纯圣兽毛制成的，古巨拉脱发问题的副产物。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
+      "property1Id": 4,
+      "property2Id": 1,
       "maxSkillId": 51011,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "毛茸茸"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "治疗效果<color=#DC143C>+15%</color>。\n当使用单体支援技能时，使得增益效果持续回合数<color=#DC143C>+1</color>。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": false,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 413,
-      "name": "世界树的繁花",
-      "desc": "无关战争与宿命，少年与少女于树下的美丽约定。拉姆达专属装备。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 51081,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "昨日之花"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "智力<color=#DC143C>+5%</color>。\n使用技能时，每对<color=#DC143C>1</color>个目标造成伤害，则有<color=#DC143C>10%</color>概率使技能冷却时间<color=#DC143C>-5</color>（概率最高可以提升至<color=#DC143C>50%</color>）。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 421,
-      "name": "晨昏之星",
-      "desc": "晨昏陨落之处，繁星正确之时。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "maxSkillId": 51116,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "破晓"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击、智力<color=#DC143C>+5%</color>。\n主动攻击进入战斗前，对敌军造成<color=#DC143C>1</color>次[固定伤害]，伤害值为英雄攻击和智力中较低一项属性的<color=#DC143C>1</color>倍。如果敌军为[混合部队]，则此次伤害无法被免疫。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 427,
-      "name": "海洋之心",
-      "desc": "雷诺鲁兹领主的家传宝物，能让敌人陷入怒涛的涡流中。阿尔弗雷德专属装备。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 6,
-        "base": 3,
-        "growth": 7
-      },
-      "maxSkillId": 51146,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "沧海之力"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击<color=#DC143C>+8%</color>。\n进入战斗前，如果敌军英雄不是「水兵」，则令其所处地形视为“水中”，持续<color=#DC143C>1</color>回合；如果自身部队生命值为<color=#DC143C>100%</color>，则令自身所处地形视为“水中”，持续<color=#DC143C>1</color>回合。[触发冷却]自身获得“水中”效果需要间隔<color=#DC143C>2</color>回合才可以再次触发。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": true,
-        "mdef": false
-      }
-    },
-    {
-      "id": 433,
-      "name": "暗谋坠饰",
-      "desc": "仔细听，它在向你低语敌人的弱点所在。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 6,
-        "base": 3,
-        "growth": 7
-      },
-      "maxSkillId": 51176,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "死角一击"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>。\n进入战斗时，暴击率<color=#DC143C>+5%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": false,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 445,
-      "name": "氤氲之心",
-      "desc": "水脉的温柔与大地的坚韧交汇其中，编织着创生的力量。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 3,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 51236,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "决心"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>\n免疫“伤口诅咒（遭受治疗转化为伤害）”、“治疗反转（施加的治疗转化为伤害）”。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 452,
-      "name": "红月之心",
-      "desc": "沉入死寂的衰落之心，也在渴望着王子的救赎。雷因法鲁斯专属装备。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 6,
-        "base": 3,
-        "growth": 7
-      },
-      "maxSkillId": 51271,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "异星之力"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击<color=#DC143C>+5%</color>，移动力<color=#DC143C>+1</color>\n当拥有<color=#DC143C>4</color>层及以上[异星之力]时，移动时无视敌军单位阻挡。\n拥有<color=#DC143C>7</color>层[异星之力]时，造成伤害后对敌人施加一个强力弱化效果。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 459,
-      "name": "囚徒的齿轮",
-      "desc": "吱呀转动的齿轮，象征着世间秩序的运转，虽已在狱中染上时光的旧迹，却难以掩盖它神秘的光芒。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 51306,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "秩序运转"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击<color=#DC143C>+8%</color>\n和“骑兵”战斗时，攻击额外提升<color=#DC143C>12%</color>"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 471,
-      "name": "机巧核心",
-      "desc": "现代魔导科技的最新产物，可以满足每一个使用者的独特需求。",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 51366,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "千机变"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>\n被攻击进入战斗时，防御、魔防中较低的一项属性再提升<color=#DC143C>5%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": true,
-        "hp": false,
-        "mdef": true
-      }
+      "maxSkillName": "毛茸茸",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+15%</color>。\n当使用单体支援技能时，使得增益效果持续回合数<color=#DC143C>+1</color>。"
     },
     {
       "id": 480,
       "name": "救赎之心",
-      "desc": "勇毅的圣者甘愿承受一切痛苦，为悲惨的世界带来神谕中的救赎。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
+      "property1Id": 4,
+      "property2Id": 5,
       "maxSkillId": 51411,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "不可接触"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "治疗效果<color=#DC143C>+15%</color>\n免疫“固定伤害”。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 494,
-      "name": "渴血之钉",
-      "desc": "热血在耳边沸腾，低声呼唤着心底征伐的渴望。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 3,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 51491,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "沸腾之血"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击<color=#DC143C>+8%</color>\n免疫：“无法使用主动技能”"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 504,
-      "name": "创世法则",
-      "desc": "蕴藏宇宙奥秘的典藏古籍，切勿随意翻阅。",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 51531,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "元素震荡"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "智力<color=#DC143C>+8%</color>，主动攻击进入战斗时，若使用的技能对敌方英雄有特效，则英雄造成魔法伤害提升<color=#DC143C>10%</color>"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 518,
-      "name": "溟蚀潮音",
-      "desc": "轻触琴弦，那远方传来的潮音，正吞蚀着谁人的心智？",
-      "property1": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 51612,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "神蚀之曲"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "智力<color=#DC143C>+8%</color>，主动攻击造成伤害后，有<color=#DC143C>70%</color>的概率，使敌军“魔防降低<color=#DC143C>20%</color>”，持续<color=#DC143C>1</color>回合。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": true
-      }
-    },
-    {
-      "id": 530,
-      "name": "岚砂之绊",
-      "desc": "风与流沙之间，情人心系彼此的信物。见证过无数守护的誓言。",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 51662,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "情之眷护"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>\n免疫：“眩晕”与“被动技能失效”。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": false,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 544,
-      "name": "回溯之锋",
-      "desc": "当象征往昔、当下与未来的剑刃合而为一，汇聚的锋芒将搅动时间的乱流！",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 3,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 51732,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "三重时溯"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击<color=#DC143C>+8%</color>，使用技能进入战斗造成伤害时，<color=#DC143C>30%</color>的概率，使得该技能冷却时间随机降低<color=#DC143C>1</color><color=#DC143C>-2</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 556,
-      "name": "灾厄使徒",
-      "desc": "嘘——终焉的灾厄已然降临，我们该上路了。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "maxSkillId": 51792,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "厄运临刑"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击、智力<color=#DC143C>+5%</color>。\n主动攻击进入战斗前，<color=#DC143C>100%</color>概率使敌军除生命外随机一项属性降低<color=#DC143C>30%</color>，持续<color=#DC143C>1</color>回合。如果自身为非混合部队时，该效果无法驱散。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": true,
-        "mdef": false
-      }
-    },
-    {
-      "id": 566,
-      "name": "敛辉圣翼",
-      "desc": "荣光的羽翼暂敛锋芒……下一刻，你将知晓它等待的用意。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "maxSkillId": 51842,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "蓄羽之势"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>\n行动结束时，如果本回合未造成伤害，有<color=#DC143C>100%</color>的概率获得“移动力<color=#DC143C>+2</color>”，持续<color=#DC143C>1</color>回合。（若此时已经拥有通用移动力提升效果，则“移动力<color=#DC143C>+3</color>”）"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 571,
-      "name": "永夜之钥",
-      "desc": "一株鸢尾花，一段誓言……她为此守望，漫长而又宁静。伊莉丝专属装备。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 3,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 51867,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "静谧守望"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击<color=#DC143C>+8%</color>\n若自身周围<color=#DC143C>3</color>格范围内存在友军施加的[守护之钥]，部队造成伤害提升<color=#DC143C>20%</color>。\n主动攻击进入战斗，若敌军处于友军施加的[守护之钥]上，战前使敌军“晕眩”<color=#DC143C>1</color>回合。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
-    },
-    {
-      "id": 577,
-      "name": "晶翠灵蝶",
-      "desc": "远古的机巧，蕴藏着咒法的护佑。亵渎的造物，隐匿着古老的秘密。",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
-      "maxSkillId": 51902,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "蝶舞幻佑"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>\n回合开始时获得“免疫遭受的下<color=#DC143C>1</color>个弱化效果，触发时恢复部队<color=#DC143C>20%</color>生命”不可驱散。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": false,
-        "intellect": false,
-        "defense": false,
-        "hp": true,
-        "mdef": false
-      }
-    },
-    {
-      "id": 586,
-      "name": "星运时轨",
-      "desc": "星象易位，时空隐现。少许必要的「知识」，便能使「虚无」为你所用。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
-      "maxSkillId": 51942,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "虚无星象"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击、智力<color=#DC143C>+5%</color>。\n主动攻击进入战斗时，本次战斗敌军“饰品技能失效”，当目标为非玩家英雄时，该效果替换为“部队遭受伤害提升<color=#DC143C>10%</color>”。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
+      "maxSkillName": "不可接触",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+15%</color>\n免疫“固定伤害”。"
     },
     {
       "id": 594,
       "name": "海蕴之瓶",
-      "desc": "女神的恩典蕴藏于深海之下——如今你在岸上也能随时来一口了。",
-      "property1": {
-        "id": 1,
-        "base": 29,
-        "growth": 98
-      },
-      "property2": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
+      "property1Id": 1,
+      "property2Id": 4,
       "maxSkillId": 51982,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "神恩之愈"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "治疗效果<color=#DC143C>+10%</color>、生命<color=#DC143C>+5%</color>\n释放技能时每命中<color=#DC143C>1</color>个友军，自身获得<color=#DC143C>1</color>层“行动结束或被攻击受到伤害时为周围<color=#DC143C>2</color>格内<color=#DC143C>1</color>个生命低于<color=#DC143C>80%</color>的友军恢复<color=#DC143C>1.5</color>倍智力的生命，并移除此效果”，可累积<color=#DC143C>5</color>层，不可驱散。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": true,
-        "mdef": false
-      }
+      "maxSkillName": "神恩之愈",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+10%</color>、生命<color=#DC143C>+5%</color>\n释放技能时每命中<color=#DC143C>1</color>个友军，自身获得<color=#DC143C>1</color>层“行动结束或被攻击受到伤害时为周围<color=#DC143C>2</color>格内<color=#DC143C>1</color>个生命低于<color=#DC143C>80%</color>的友军恢复<color=#DC143C>1.5</color>倍智力的生命，并移除此效果”，可累积<color=#DC143C>5</color>层，不可驱散。"
+    }
+  ],
+  "unclassified": [],
+  "rows": [
+    {
+      "id": 99,
+      "name": "神翼护胫",
+      "property1Id": 2,
+      "property2Id": 3,
+      "maxSkillId": 50342,
+      "maxSkillName": "神御",
+      "maxSkillDesc": "攻击<color=#DC143C>+8%</color>。被攻击时，防御提升<color=#DC143C>10%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 100,
+      "name": "神行靴",
+      "property1Id": 3,
+      "property2Id": 1,
+      "maxSkillId": 50348,
+      "maxSkillName": "神行",
+      "maxSkillDesc": "防御<color=#DC143C>+8%</color>，移动力<color=#DC143C>+1</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 106,
+      "name": "精灵石之戒",
+      "property1Id": 2,
+      "property2Id": 1,
+      "maxSkillId": 50317,
+      "maxSkillName": "精灵之怒",
+      "maxSkillDesc": "主动进入战斗时，攻击、防御提升<color=#DC143C>8%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 107,
+      "name": "神圣指环",
+      "property1Id": 4,
+      "property2Id": 5,
+      "maxSkillId": 50165,
+      "maxSkillName": "神圣庇护",
+      "maxSkillDesc": "智力<color=#DC143C>+8%</color>。免疫:“无法使用主动技能”。",
+      "explicitHealing": false,
+      "derivedCategory": "intellect"
+    },
+    {
+      "id": 108,
+      "name": "德罗普尼尔",
+      "property1Id": 4,
+      "property2Id": 5,
+      "maxSkillId": 50586,
+      "maxSkillName": "反弹",
+      "maxSkillDesc": "智力<color=#DC143C>+8%</color>。被远程攻击进入战斗时，可以反弹本次遭受伤害的<color=#DC143C>30%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "intellect"
+    },
+    {
+      "id": 114,
+      "name": "屠龙勋章",
+      "property1Id": 2,
+      "property2Id": 1,
+      "maxSkillId": 50591,
+      "maxSkillName": "斩龙",
+      "maxSkillDesc": "攻击<color=#DC143C>+8%</color>。和“飞兵”战斗时，攻击额外提升<color=#DC143C>12%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 115,
+      "name": "女神之泪",
+      "property1Id": 4,
+      "property2Id": 5,
+      "maxSkillId": 50113,
+      "maxSkillName": "女神之泪",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+15%</color>。行动结束时，为周围<color=#DC143C>2</color>格的<color=#DC143C>3</color>个其他友军驱散<color=#DC143C>1</color>个弱化效果。",
+      "explicitHealing": true,
+      "derivedCategory": "healing"
+    },
+    {
+      "id": 116,
+      "name": "次元宝珠",
+      "property1Id": 4,
+      "property2Id": 1,
+      "maxSkillId": 50200,
+      "maxSkillName": "时光回溯",
+      "maxSkillDesc": "智力<color=#DC143C>+8%</color>，使用主动技能造成伤害时，<color=#DC143C>30%</color>的概率，使得该技能冷却时间<color=#DC143C>-1</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "intellect"
+    },
+    {
+      "id": 120,
+      "name": "光之面纱",
+      "property1Id": 5,
+      "property2Id": 1,
+      "maxSkillId": 50370,
+      "maxSkillName": "光尘",
+      "maxSkillDesc": "魔防<color=#DC143C>+8%</color>。免疫:“防御、魔防降低”。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 121,
+      "name": "星之耳坠",
+      "property1Id": 4,
+      "property2Id": 1,
+      "maxSkillId": 50221,
+      "maxSkillName": "星之守护",
+      "maxSkillDesc": "智力<color=#DC143C>+8%</color>。和“刺客”“弓手”战斗时，防御提升<color=#DC143C>30%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "intellect"
+    },
+    {
+      "id": 122,
+      "name": "霸者徽章",
+      "property1Id": 2,
+      "property2Id": 1,
+      "maxSkillId": 50145,
+      "maxSkillName": "霸者",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>。免疫:“防御、魔防降低”、“攻击、智力降低”、“移动力降低”。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 126,
+      "name": "圣骨",
+      "property1Id": 5,
+      "property2Id": 1,
+      "maxSkillId": 50108,
+      "maxSkillName": "反射",
+      "maxSkillDesc": "生命<color=#DC143C>+8%</color>。被近战攻击时，反弹本次遭受伤害的<color=#DC143C>30%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 127,
+      "name": "真十字架",
+      "property1Id": 4,
+      "property2Id": 1,
+      "maxSkillId": 50210,
+      "maxSkillName": "驱魔者",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+15%</color>。和魔族、法师战斗时，智力、魔防、防御提升<color=#DC143C>20%</color>。",
+      "explicitHealing": true,
+      "derivedCategory": "healing"
+    },
+    {
+      "id": 128,
+      "name": "圣杯",
+      "property1Id": 4,
+      "property2Id": 5,
+      "maxSkillId": 50215,
+      "maxSkillName": "圣杯",
+      "maxSkillDesc": "智力<color=#DC143C>+5%</color>。本回合如果造成过伤害，行动结束时为周围<color=#DC143C>1</color>格的其他友军恢复<color=#DC143C>15%</color>的生命。",
+      "explicitHealing": false,
+      "derivedCategory": "intellect"
+    },
+    {
+      "id": 132,
+      "name": "圣王护符",
+      "property1Id": 3,
+      "property2Id": 1,
+      "maxSkillId": 50596,
+      "maxSkillName": "圣王祝福",
+      "maxSkillDesc": "当周围<color=#DC143C>2</color>格有我方友军时，战斗中，防御、魔防提升<color=#DC143C>10%</color>",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 133,
+      "name": "天使之羽",
+      "property1Id": 4,
+      "property2Id": 5,
+      "maxSkillId": 50365,
+      "maxSkillName": "天佑",
+      "maxSkillDesc": "生命<color=#DC143C>+10%</color>，治疗效果<color=#DC143C>+10%</color>。免疫:“眩晕”。",
+      "explicitHealing": true,
+      "derivedCategory": "healing"
+    },
+    {
+      "id": 134,
+      "name": "血之盟约",
+      "property1Id": 1,
+      "property2Id": 0,
+      "maxSkillId": 50226,
+      "maxSkillName": "血契",
+      "maxSkillDesc": "生命<color=#DC143C>+15%</color>。免疫:“无法被治疗”、“无法遭受强化效果”。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 256,
+      "name": "巨人腰带",
+      "property1Id": 3,
+      "property2Id": 1,
+      "maxSkillId": 50786,
+      "maxSkillName": "巨人",
+      "maxSkillDesc": "被近战攻击时，战斗中防御、魔防提升<color=#DC143C>10%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 257,
+      "name": "精灵腰带",
+      "property1Id": 3,
+      "property2Id": 1,
+      "maxSkillId": 50791,
+      "maxSkillName": "偏折",
+      "maxSkillDesc": "被远程攻击时，战斗中防御、魔防提升<color=#DC143C>10%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 258,
+      "name": "孤星腕轮",
+      "property1Id": 2,
+      "property2Id": 1,
+      "maxSkillId": 50796,
+      "maxSkillName": "星之力",
+      "maxSkillDesc": "周围<color=#DC143C>2</color>格没有友军时，战斗中攻击、防御提升<color=#DC143C>10%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 260,
+      "name": "索尔的项链",
+      "property1Id": 2,
+      "property2Id": 3,
+      "maxSkillId": 50801,
+      "maxSkillName": "闪电链",
+      "maxSkillDesc": "攻击<color=#DC143C>+5%</color>。主动进入战斗时，战后<color=#DC143C>50%</color>概率对敌军造成一次固定伤害。伤害值为英雄攻击的<color=#DC143C>1</color>倍。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 261,
+      "name": "审判魔符",
+      "property1Id": 2,
+      "property2Id": 3,
+      "maxSkillId": 50806,
+      "maxSkillName": "断罪",
+      "maxSkillDesc": "攻击<color=#DC143C>+8%</color>。和“僧侣”战斗时，攻击额外提升<color=#DC143C>12%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 262,
+      "name": "恐惧魔眼",
+      "property1Id": 4,
+      "property2Id": 5,
+      "maxSkillId": 50811,
+      "maxSkillName": "目光",
+      "maxSkillDesc": "智力<color=#DC143C>+8%</color>。主动进入战斗时，战后有<color=#DC143C>50%</color>概率使敌军“造成伤害”降低<color=#DC143C>15%</color>，持续<color=#DC143C>1</color>回合。",
+      "explicitHealing": false,
+      "derivedCategory": "intellect"
+    },
+    {
+      "id": 263,
+      "name": "妖精的步伐",
+      "property1Id": 3,
+      "property2Id": 1,
+      "maxSkillId": 50816,
+      "maxSkillName": "妖精之舞",
+      "maxSkillDesc": "防御<color=#DC143C>+8%</color>。攻击后可以自由的移动<color=#DC143C>2</color>格。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 264,
+      "name": "兰德维蒂玫瑰",
+      "property1Id": 4,
+      "property2Id": 5,
+      "maxSkillId": 50821,
+      "maxSkillName": "寂静",
+      "maxSkillDesc": "智力<color=#DC143C>+8%</color>。主动攻击造成伤害时，有<color=#DC143C>50%</color>的概率，使敌军损失<color=#DC143C>1</color>个强化效果。",
+      "explicitHealing": false,
+      "derivedCategory": "intellect"
+    },
+    {
+      "id": 268,
+      "name": "游击士勋章",
+      "property1Id": 3,
+      "property2Id": 5,
+      "maxSkillId": 50871,
+      "maxSkillName": "自由守护",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>。免疫“固定伤害”，“无法使用主动技能”。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 270,
+      "name": "红色小棉袜",
+      "property1Id": 2,
+      "property2Id": 5,
+      "maxSkillId": 50846,
+      "maxSkillName": "轻快",
+      "maxSkillDesc": "攻击<color=#DC143C>+5%</color>，移动力<color=#DC143C>+1</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 277,
+      "name": "团结",
+      "property1Id": 2,
+      "property2Id": 1,
+      "maxSkillId": 50896,
+      "maxSkillName": "意志之力",
+      "maxSkillDesc": "当周围<color=#DC143C>2</color>格有我方友军时，攻击、防御、魔防提升<color=#DC143C>10%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 285,
+      "name": "铸剑者勋章",
+      "property1Id": 3,
+      "property2Id": 5,
+      "maxSkillId": 50936,
+      "maxSkillName": "自由守护",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>。免疫“固定伤害”，“无法使用主动技能”。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 286,
+      "name": "妖精之翼",
+      "property1Id": 4,
+      "property2Id": 5,
+      "maxSkillId": 50941,
+      "maxSkillName": "羽步",
+      "maxSkillDesc": "智力<color=#DC143C>+5%</color>。攻击后，可以再次移动<color=#DC143C>2</color>格。",
+      "explicitHealing": false,
+      "derivedCategory": "intellect"
+    },
+    {
+      "id": 291,
+      "name": "小熊玩偶",
+      "property1Id": 4,
+      "property2Id": 1,
+      "maxSkillId": 50966,
+      "maxSkillName": "毛茸茸",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+15%</color>。\n当使用单体支援技能时，使得增益效果持续回合数<color=#DC143C>+1</color>。",
+      "explicitHealing": true,
+      "derivedCategory": "healing"
+    },
+    {
+      "id": 402,
+      "name": "Q巨拉",
+      "property1Id": 4,
+      "property2Id": 1,
+      "maxSkillId": 51011,
+      "maxSkillName": "毛茸茸",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+15%</color>。\n当使用单体支援技能时，使得增益效果持续回合数<color=#DC143C>+1</color>。",
+      "explicitHealing": true,
+      "derivedCategory": "healing"
+    },
+    {
+      "id": 413,
+      "name": "世界树的繁花",
+      "property1Id": 4,
+      "property2Id": 5,
+      "maxSkillId": 51081,
+      "maxSkillName": "昨日之花",
+      "maxSkillDesc": "智力<color=#DC143C>+5%</color>。\n使用技能时，每对<color=#DC143C>1</color>个目标造成伤害，则有<color=#DC143C>10%</color>概率使技能冷却时间<color=#DC143C>-5</color>（概率最高可以提升至<color=#DC143C>50%</color>）。",
+      "explicitHealing": false,
+      "derivedCategory": "intellect"
+    },
+    {
+      "id": 421,
+      "name": "晨昏之星",
+      "property1Id": 2,
+      "property2Id": 4,
+      "maxSkillId": 51116,
+      "maxSkillName": "破晓",
+      "maxSkillDesc": "攻击、智力<color=#DC143C>+5%</color>。\n主动攻击进入战斗前，对敌军造成<color=#DC143C>1</color>次[固定伤害]，伤害值为英雄攻击和智力中较低一项属性的<color=#DC143C>1</color>倍。如果敌军为[混合部队]，则此次伤害无法被免疫。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 427,
+      "name": "海洋之心",
+      "property1Id": 2,
+      "property2Id": 6,
+      "maxSkillId": 51146,
+      "maxSkillName": "沧海之力",
+      "maxSkillDesc": "攻击<color=#DC143C>+8%</color>。\n进入战斗前，如果敌军英雄不是「水兵」，则令其所处地形视为“水中”，持续<color=#DC143C>1</color>回合；如果自身部队生命值为<color=#DC143C>100%</color>，则令自身所处地形视为“水中”，持续<color=#DC143C>1</color>回合。[触发冷却]自身获得“水中”效果需要间隔<color=#DC143C>2</color>回合才可以再次触发。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 433,
+      "name": "暗谋坠饰",
+      "property1Id": 2,
+      "property2Id": 6,
+      "maxSkillId": 51176,
+      "maxSkillName": "死角一击",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>。\n进入战斗时，暴击率<color=#DC143C>+5%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 445,
+      "name": "氤氲之心",
+      "property1Id": 2,
+      "property2Id": 3,
+      "maxSkillId": 51236,
+      "maxSkillName": "决心",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>\n免疫“伤口诅咒（遭受治疗转化为伤害）”、“治疗反转（施加的治疗转化为伤害）”。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 452,
+      "name": "红月之心",
+      "property1Id": 2,
+      "property2Id": 6,
+      "maxSkillId": 51271,
+      "maxSkillName": "异星之力",
+      "maxSkillDesc": "攻击<color=#DC143C>+5%</color>，移动力<color=#DC143C>+1</color>\n当拥有<color=#DC143C>4</color>层及以上[异星之力]时，移动时无视敌军单位阻挡。\n拥有<color=#DC143C>7</color>层[异星之力]时，造成伤害后对敌人施加一个强力弱化效果。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 459,
+      "name": "囚徒的齿轮",
+      "property1Id": 2,
+      "property2Id": 1,
+      "maxSkillId": 51306,
+      "maxSkillName": "秩序运转",
+      "maxSkillDesc": "攻击<color=#DC143C>+8%</color>\n和“骑兵”战斗时，攻击额外提升<color=#DC143C>12%</color>",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 471,
+      "name": "机巧核心",
+      "property1Id": 3,
+      "property2Id": 5,
+      "maxSkillId": 51366,
+      "maxSkillName": "千机变",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>\n被攻击进入战斗时，防御、魔防中较低的一项属性再提升<color=#DC143C>5%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 480,
+      "name": "救赎之心",
+      "property1Id": 4,
+      "property2Id": 5,
+      "maxSkillId": 51411,
+      "maxSkillName": "不可接触",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+15%</color>\n免疫“固定伤害”。",
+      "explicitHealing": true,
+      "derivedCategory": "healing"
+    },
+    {
+      "id": 494,
+      "name": "渴血之钉",
+      "property1Id": 2,
+      "property2Id": 3,
+      "maxSkillId": 51491,
+      "maxSkillName": "沸腾之血",
+      "maxSkillDesc": "攻击<color=#DC143C>+8%</color>\n免疫：“无法使用主动技能”",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 504,
+      "name": "创世法则",
+      "property1Id": 4,
+      "property2Id": 1,
+      "maxSkillId": 51531,
+      "maxSkillName": "元素震荡",
+      "maxSkillDesc": "智力<color=#DC143C>+8%</color>，主动攻击进入战斗时，若使用的技能对敌方英雄有特效，则英雄造成魔法伤害提升<color=#DC143C>10%</color>",
+      "explicitHealing": false,
+      "derivedCategory": "intellect"
+    },
+    {
+      "id": 518,
+      "name": "溟蚀潮音",
+      "property1Id": 4,
+      "property2Id": 1,
+      "maxSkillId": 51612,
+      "maxSkillName": "神蚀之曲",
+      "maxSkillDesc": "智力<color=#DC143C>+8%</color>，主动攻击造成伤害后，有<color=#DC143C>70%</color>的概率，使敌军“魔防降低<color=#DC143C>20%</color>”，持续<color=#DC143C>1</color>回合。",
+      "explicitHealing": false,
+      "derivedCategory": "intellect"
+    },
+    {
+      "id": 530,
+      "name": "岚砂之绊",
+      "property1Id": 3,
+      "property2Id": 1,
+      "maxSkillId": 51662,
+      "maxSkillName": "情之眷护",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>\n免疫：“眩晕”与“被动技能失效”。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 544,
+      "name": "回溯之锋",
+      "property1Id": 2,
+      "property2Id": 3,
+      "maxSkillId": 51732,
+      "maxSkillName": "三重时溯",
+      "maxSkillDesc": "攻击<color=#DC143C>+8%</color>，使用技能进入战斗造成伤害时，<color=#DC143C>30%</color>的概率，使得该技能冷却时间随机降低<color=#DC143C>1</color><color=#DC143C>-2</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 556,
+      "name": "灾厄使徒",
+      "property1Id": 2,
+      "property2Id": 4,
+      "maxSkillId": 51792,
+      "maxSkillName": "厄运临刑",
+      "maxSkillDesc": "攻击、智力<color=#DC143C>+5%</color>。\n主动攻击进入战斗前，<color=#DC143C>100%</color>概率使敌军除生命外随机一项属性降低<color=#DC143C>30%</color>，持续<color=#DC143C>1</color>回合。如果自身为非混合部队时，该效果无法驱散。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 566,
+      "name": "敛辉圣翼",
+      "property1Id": 2,
+      "property2Id": 1,
+      "maxSkillId": 51842,
+      "maxSkillName": "蓄羽之势",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>\n行动结束时，如果本回合未造成伤害，有<color=#DC143C>100%</color>的概率获得“移动力<color=#DC143C>+2</color>”，持续<color=#DC143C>1</color>回合。（若此时已经拥有通用移动力提升效果，则“移动力<color=#DC143C>+3</color>”）",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 571,
+      "name": "永夜之钥",
+      "property1Id": 2,
+      "property2Id": 3,
+      "maxSkillId": 51867,
+      "maxSkillName": "静谧守望",
+      "maxSkillDesc": "攻击<color=#DC143C>+8%</color>\n若自身周围<color=#DC143C>3</color>格范围内存在友军施加的[守护之钥]，部队造成伤害提升<color=#DC143C>20%</color>。\n主动攻击进入战斗，若敌军处于友军施加的[守护之钥]上，战前使敌军“晕眩”<color=#DC143C>1</color>回合。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 577,
+      "name": "晶翠灵蝶",
+      "property1Id": 3,
+      "property2Id": 5,
+      "maxSkillId": 51902,
+      "maxSkillName": "蝶舞幻佑",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>\n回合开始时获得“免疫遭受的下<color=#DC143C>1</color>个弱化效果，触发时恢复部队<color=#DC143C>20%</color>生命”不可驱散。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
+    },
+    {
+      "id": 586,
+      "name": "星运时轨",
+      "property1Id": 2,
+      "property2Id": 4,
+      "maxSkillId": 51942,
+      "maxSkillName": "虚无星象",
+      "maxSkillDesc": "攻击、智力<color=#DC143C>+5%</color>。\n主动攻击进入战斗时，本次战斗敌军“饰品技能失效”，当目标为非玩家英雄时，该效果替换为“部队遭受伤害提升<color=#DC143C>10%</color>”。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
+    },
+    {
+      "id": 594,
+      "name": "海蕴之瓶",
+      "property1Id": 1,
+      "property2Id": 4,
+      "maxSkillId": 51982,
+      "maxSkillName": "神恩之愈",
+      "maxSkillDesc": "治疗效果<color=#DC143C>+10%</color>、生命<color=#DC143C>+5%</color>\n释放技能时每命中<color=#DC143C>1</color>个友军，自身获得<color=#DC143C>1</color>层“行动结束或被攻击受到伤害时为周围<color=#DC143C>2</color>格内<color=#DC143C>1</color>个生命低于<color=#DC143C>80%</color>的友军恢复<color=#DC143C>1.5</color>倍智力的生命，并移除此效果”，可累积<color=#DC143C>5</color>层，不可驱散。",
+      "explicitHealing": true,
+      "derivedCategory": "healing"
     },
     {
       "id": 599,
       "name": "咒溯摇铃",
-      "desc": "传说可以穿梭时间的摇铃……但代价是什么呢？",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 3,
-        "base": 4,
-        "growth": 8
-      },
+      "property1Id": 2,
+      "property2Id": 3,
       "maxSkillId": 52007,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "归来者"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击、技巧<color=#DC143C>+8%</color>\n使用技能攻击进入战斗时，若目标周围<color=#DC143C>1</color>格范围内没有其他敌军，战后恢复<color=#DC143C>15%</color>的最大生命并可以选择传送到回合开始的位置（[触发冷却]传送效果需要间隔<color=#DC143C>3</color>回合才可以再次触发）。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": true,
-        "mdef": false
-      }
+      "maxSkillName": "归来者",
+      "maxSkillDesc": "攻击、技巧<color=#DC143C>+8%</color>\n使用技能攻击进入战斗时，若目标周围<color=#DC143C>1</color>格范围内没有其他敌军，战后恢复<color=#DC143C>15%</color>的最大生命并可以选择传送到回合开始的位置（[触发冷却]传送效果需要间隔<color=#DC143C>3</color>回合才可以再次触发）。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
     },
     {
       "id": 607,
       "name": "天才的注视",
-      "desc": "「自带脑波增幅器，戴上它，你也可以成为天才！」——眼镜商家如是说。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
+      "property1Id": 2,
+      "property2Id": 4,
       "maxSkillId": 52047,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "奇才解析"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击、智力<color=#DC143C>+8%</color>\n主动攻击进入战斗时伤害无视敌军[护盾]。（包含[固定伤害]）"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": true,
-        "hp": false,
-        "mdef": false
-      }
+      "maxSkillName": "奇才解析",
+      "maxSkillDesc": "攻击、智力<color=#DC143C>+8%</color>\n主动攻击进入战斗时伤害无视敌军[护盾]。（包含[固定伤害]）",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
     },
     {
       "id": 618,
       "name": "世界魔方",
-      "desc": "扭转的不止手中的道具，亦是山川大海的规则。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
+      "property1Id": 2,
+      "property2Id": 4,
       "maxSkillId": 52097,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "自然延展"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>\n施加的地形特效持续回合数<color=#DC143C>+1</color>，敌军位于其上时所处地形的防御效果降低<color=#DC143C>5%</color>，友军位于其上时所处地形的防御效果提升<color=#DC143C>5%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": false,
-        "intellect": false,
-        "defense": true,
-        "hp": false,
-        "mdef": false
-      }
+      "maxSkillName": "自然延展",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>\n施加的地形特效持续回合数<color=#DC143C>+1</color>，敌军位于其上时所处地形的防御效果降低<color=#DC143C>5%</color>，友军位于其上时所处地形的防御效果提升<color=#DC143C>5%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
     },
     {
       "id": 626,
       "name": "永劫之剪",
-      "desc": "它以不朽蛇环为枢，每一次开合，皆为对既定秩序发起的裁断一击。",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
+      "property1Id": 2,
+      "property2Id": 4,
       "maxSkillId": 52142,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "二律剪除"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击、智力<color=#DC143C>+5%</color>。\n使用技能攻击部队生命值百分比不高于自身的敌军进入战斗时，战后行动结束时使目标随机<color=#DC143C>5</color>个强化效果持续回合数<color=#DC143C>-1</color>，若敌军未拥有强化效果则本次战斗英雄伤害提升<color=#DC143C>8%</color>。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": true,
-        "mdef": false
-      }
+      "maxSkillName": "二律剪除",
+      "maxSkillDesc": "攻击、智力<color=#DC143C>+5%</color>。\n使用技能攻击部队生命值百分比不高于自身的敌军进入战斗时，战后行动结束时使目标随机<color=#DC143C>5</color>个强化效果持续回合数<color=#DC143C>-1</color>，若敌军未拥有强化效果则本次战斗英雄伤害提升<color=#DC143C>8%</color>。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
     },
     {
       "id": 633,
       "name": "痴情香氛",
-      "desc": "爱是世界上最可怕的力量。",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
+      "property1Id": 3,
+      "property2Id": 5,
       "maxSkillId": 52177,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "扭曲痴恋"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>\n被敌军攻击受到伤害或死亡时，对目标施加<color=#DC143C>1</color>回合的[失去控制]，主动攻击进入战斗后该装备失效<color=#DC143C>1</color>回合。（非竞技模式中，该效果替换为“遭受伤害提高<color=#DC143C>20%</color>”）"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
+      "maxSkillName": "扭曲痴恋",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>\n被敌军攻击受到伤害或死亡时，对目标施加<color=#DC143C>1</color>回合的[失去控制]，主动攻击进入战斗后该装备失效<color=#DC143C>1</color>回合。（非竞技模式中，该效果替换为“遭受伤害提高<color=#DC143C>20%</color>”）",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
     },
     {
       "id": 642,
       "name": "寻迹之书",
-      "desc": "迷途的人啊，你可曾低头看一看我？",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
+      "property1Id": 2,
+      "property2Id": 4,
       "maxSkillId": 52222,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "开卷有益"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击、智力<color=#DC143C>+8%</color>\n使用技能时获得<color=#DC143C>1</color>层[魔典充能]，技能每有<color=#DC143C>1</color>回合冷却时间额外获得<color=#DC143C>1</color>层，可累积<color=#DC143C>3</color>层，不可驱散，受到治疗及[护盾]效果时消耗<color=#DC143C>1</color>层[魔典充能]，减少冷却时间最长的伤害技能<color=#DC143C>1</color>回合冷却时间并驱散<color=#DC143C>1</color>个弱化效果。"
-      },
-      "keywords": {
-        "healing": true,
-        "attack": true,
-        "intellect": true,
-        "defense": true,
-        "hp": false,
-        "mdef": false
-      }
+      "maxSkillName": "开卷有益",
+      "maxSkillDesc": "攻击、智力<color=#DC143C>+8%</color>\n使用技能时获得<color=#DC143C>1</color>层[魔典充能]，技能每有<color=#DC143C>1</color>回合冷却时间额外获得<color=#DC143C>1</color>层，可累积<color=#DC143C>3</color>层，不可驱散，受到治疗及[护盾]效果时消耗<color=#DC143C>1</color>层[魔典充能]，减少冷却时间最长的伤害技能<color=#DC143C>1</color>回合冷却时间并驱散<color=#DC143C>1</color>个弱化效果。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
     },
     {
       "id": 2013,
       "name": "正宗寻宝护符",
-      "desc": "“戴上之后，你就可以在敌军的身上摸到值钱的宝贝！”",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
+      "property1Id": 2,
+      "property2Id": 4,
       "maxSkillId": 200314,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "搜刮"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击、智力<color=#DC143C>+8%</color>。\n战斗胜利时，非常有可能摸到<color=#DC143C>1</color>件装备或学到<color=#DC143C>1</color>个战技。每当携带者击杀一名敌军后，会让自己手气变得更好。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
+      "maxSkillName": "搜刮",
+      "maxSkillDesc": "攻击、智力<color=#DC143C>+8%</color>。\n战斗胜利时，非常有可能摸到<color=#DC143C>1</color>件装备或学到<color=#DC143C>1</color>个战技。每当携带者击杀一名敌军后，会让自己手气变得更好。",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
     },
     {
       "id": 2015,
       "name": "魂·唤蛇吊坠",
-      "desc": "无尽航路专属装备",
-      "property1": {
-        "id": 2,
-        "base": 6,
-        "growth": 14
-      },
-      "property2": {
-        "id": 4,
-        "base": 6,
-        "growth": 14
-      },
+      "property1Id": 2,
+      "property2Id": 4,
       "maxSkillId": 200329,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "唤蛇"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "攻击、智力<color=#DC143C>+5%</color>\n同时装备“魂·唤蛇秘杖”和“魂·唤蛇吊坠”时，击杀敌军后在死亡位置召唤耶梦加得之影，耶梦加得之影继承被击杀者<color=#DC143C>100%</color>死亡时的属性，但是不能超过召唤者对应属性的<color=#DC143C>200%</color>。（场上最多可同时存在<color=#DC143C>3</color>个耶梦加得之影）"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": true,
-        "intellect": true,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
+      "maxSkillName": "唤蛇",
+      "maxSkillDesc": "攻击、智力<color=#DC143C>+5%</color>\n同时装备“魂·唤蛇秘杖”和“魂·唤蛇吊坠”时，击杀敌军后在死亡位置召唤耶梦加得之影，耶梦加得之影继承被击杀者<color=#DC143C>100%</color>死亡时的属性，但是不能超过召唤者对应属性的<color=#DC143C>200%</color>。（场上最多可同时存在<color=#DC143C>3</color>个耶梦加得之影）",
+      "explicitHealing": false,
+      "derivedCategory": "attack"
     },
     {
       "id": 2017,
       "name": "魂·震碎之戒",
-      "desc": "无尽航路专属装备",
-      "property1": {
-        "id": 3,
-        "base": 4,
-        "growth": 9
-      },
-      "property2": {
-        "id": 5,
-        "base": 4,
-        "growth": 8
-      },
+      "property1Id": 3,
+      "property2Id": 5,
       "maxSkillId": 200337,
-      "maxSkillName": {
-        "field": "Name",
-        "value": "震碎"
-      },
-      "maxSkillDesc": {
-        "field": "Desc",
-        "value": "全属性<color=#DC143C>+5%</color>\n同时装备“魂·震碎链枷”和“魂·震碎之戒”时，行动结束时使全场敌军获得<color=#DC143C>2</color>个[破碎]（不可驱散，无法免疫）。"
-      },
-      "keywords": {
-        "healing": false,
-        "attack": false,
-        "intellect": false,
-        "defense": false,
-        "hp": false,
-        "mdef": false
-      }
+      "maxSkillName": "震碎",
+      "maxSkillDesc": "全属性<color=#DC143C>+5%</color>\n同时装备“魂·震碎链枷”和“魂·震碎之戒”时，行动结束时使全场敌军获得<color=#DC143C>2</color>个[破碎]（不可驱散，无法免疫）。",
+      "explicitHealing": false,
+      "derivedCategory": "defense"
     }
   ]
 }
