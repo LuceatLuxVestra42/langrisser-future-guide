@@ -4,7 +4,7 @@
   "substage": "5-5-2",
   "checkpoint": "coverage",
   "status": "REVIEW",
-  "completion": "COVERAGE_MEASURED_SEMANTICS_PENDING",
+  "completion": "COVERAGE_MEASURED_SEMANTICS_PARTIAL",
   "sourceTraceStatus": "REVIEW",
   "canonicalHeroCount": 267,
   "sourceCounts": {
@@ -20,30 +20,40 @@
   },
   "fields": {
     "rarity": {
-      "status": "UNRESOLVED",
-      "observedOnly": {
-        "starDistribution": {
-          "1": 3,
-          "2": 45,
-          "3": 219
-        },
-        "rankDistribution": {
-          "1": 3,
-          "2": 12,
-          "3": 33,
-          "4": 213,
-          "6": 6
-        }
+      "status": "SOURCE_CONFIRMED",
+      "acceptedSource": "ConfigDataHeroInfo.Rank",
+      "rankToRarity": {
+        "1": "N",
+        "2": "R",
+        "3": "SR",
+        "4": "SSR",
+        "6": "LLR"
       },
-      "rule": "Observed Star/Rank distributions are not rarity labels."
+      "rankDistribution": {
+        "1": 3,
+        "2": 12,
+        "3": 33,
+        "4": 213,
+        "6": 6
+      },
+      "starDistribution": {
+        "1": 3,
+        "2": 45,
+        "3": 219
+      },
+      "validation": "data/validation/hero-page-stage5-5-2-rarity.v1.json",
+      "rule": "Use Rank for rarity display. Use Star only for star count. ExchangedFragmentCount remains rejected because it is duplicate-acquisition fragment quantity, not the rarity enum."
     },
     "factions": {
-      "status": "UNRESOLVED",
-      "acceptedSource": null
+      "status": "SOURCE_CONFIRMED",
+      "acceptedSource": "ConfigDataHeroTagInfo",
+      "validation": "data/validation/hero-page-stage5-5-2-factions.v1.json"
     },
     "cv": {
-      "status": "UNRESOLVED",
-      "acceptedSource": null
+      "status": "SOURCE_JOIN_CONFIRMED",
+      "acceptedSource": "ConfigDataCharImageInfo.CVName",
+      "join": "ConfigDataHeroInfo.CharImage_ID -> ConfigDataCharImageInfo.ID",
+      "validation": "data/validation/hero-page-stage5-5-2-cv.v1.json"
     },
     "origin": {
       "status": "POINTER_CONFIRMED",
@@ -331,14 +341,11 @@
   "hardErrors": [],
   "coverageIssues": [],
   "unresolvedSemanticFields": [
-    "rarity",
-    "factions",
-    "cv",
     "origin.displayDictionary",
     "artwork.displaySemantics",
     "skins.orderingSemantics",
     "skins.acquisitionSemantics"
   ],
   "readyForDisplayEnrichment": false,
-  "nextAction": "Resolve authoritative mappings for the unresolved semantic fields; do not synthesize display values from the measured candidates."
+  "nextAction": "Resolve the remaining unresolved display semantics without reopening confirmed rarity, faction or CV source mappings."
 }
