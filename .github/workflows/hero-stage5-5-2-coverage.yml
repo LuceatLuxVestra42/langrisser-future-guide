@@ -1,0 +1,67 @@
+name: Hero Stage 5-5-2 coverage
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-5-2-coverage.yml'
+      - 'scripts/validate_hero_page_stage5_5_2.cjs'
+      - 'data/validation/hero-page-stage5-5-2-source-trace.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataHeroSkinInfo.json'
+
+permissions:
+  contents: write
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate Stage 5-5-2 coverage
+        run: node scripts/validate_hero_page_stage5_5_2.cjs
+
+      - name: Show coverage summary
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = 'data/validation/hero-page-stage5-5-2-coverage.v1.json';
+          const r = JSON.parse(fs.readFileSync(p, 'utf8'));
+          console.log(JSON.stringify({
+            status: r.status,
+            canonicalHeroCount: r.canonicalHeroCount,
+            sourceCounts: r.sourceCounts,
+            heroInfoIdentityCoverage: r.heroInfoIdentityCoverage,
+            origin: r.fields.origin,
+            artwork: r.fields.artwork,
+            skins: {
+              heroesWithValidSkinList: r.fields.skins.heroesWithValidSkinList,
+              heroesWithNoSkinRefs: r.fields.skins.heroesWithNoSkinRefs,
+              totalSkinRefs: r.fields.skins.totalSkinRefs,
+              resolvedSkinRefs: r.fields.skins.resolvedSkinRefs,
+              unresolvedSkinRefs: r.fields.skins.unresolvedSkinRefs,
+              specifiedHeroMismatches: r.fields.skins.specifiedHeroMismatches,
+              duplicateSkinRecordIds: r.fields.skins.duplicateSkinRecordIds,
+              getPathTypeMissingSkinIds: r.fields.skins.getPathTypeMissingSkinIds,
+              charImageSkinResourceMissingSkinIds: r.fields.skins.charImageSkinResourceMissingSkinIds
+            },
+            hardErrors: r.hardErrors,
+            coverageIssues: r.coverageIssues,
+            unresolvedSemanticFields: r.unresolvedSemanticFields
+          }, null, 2));
+          NODE
+
+      - name: Freeze generated coverage artifact
+        run: |
+          if git diff --quiet -- data/validation/hero-page-stage5-5-2-coverage.v1.json; then
+            echo 'Coverage artifact already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/hero-page-stage5-5-2-coverage.v1.json
+          git commit -m 'Freeze Hero Stage 5-5-2 coverage'
+          git push
