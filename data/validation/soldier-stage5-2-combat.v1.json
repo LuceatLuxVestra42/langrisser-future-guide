@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage5-2-combat-validation/v1",
+  "stage": "5-2",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T00:41:14.143Z",
+  "sources": {
+    "contract": {
+      "path": "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+      "gitBlobSha": "2943af041025c76c647b790661babe784e05f4f2"
+    },
+    "soldierMaster": {
+      "path": "data/generated/soldier-master.v1.json",
+      "gitBlobSha": "23e01ad8707bd7f026f5a3660cc0342747bd5cdb"
+    },
+    "soldierStage3": {
+      "path": "data/generated/soldier-stage3.v1.json",
+      "gitBlobSha": "afaebae396017391689c78a1b76c244e06067011"
+    },
+    "stage3Validation": {
+      "path": "data/validation/soldier-stage3-final.v1.json",
+      "gitBlobSha": "e1aa89d12d07edd513f993458be3e08e7ec57e03"
+    },
+    "stage4Baseline": {
+      "path": "data/validation/soldier-stage4-8-baseline.v1.json",
+      "gitBlobSha": "36155be6bc57717cb0ac62c78d54d6a1dcc500ad"
+    }
+  },
+  "checks": {
+    "contractNotFrozen": 0,
+    "stage3ArtifactNotPass": 0,
+    "stage3ValidationNotPass": 0,
+    "stage4BaselineNotPass": 0,
+    "duplicateMasterIds": 0,
+    "duplicateStage3Ids": 0,
+    "invalidMasterIds": 0,
+    "invalidStage3Ids": 0,
+    "missingStage3Records": 0,
+    "extraStage3Records": 0,
+    "tierMismatches": 0,
+    "armyIdMismatches": 0,
+    "invalidCombatRecords": 0,
+    "spRecordSourceMismatches": 0,
+    "baselineMismatches": 0,
+    "outputRecordCountMismatch": 0
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "generatedRecords": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "normalTier3": 129,
+    "nonPassIdentityMetadataCount": 41,
+    "missingStage3Ids": [],
+    "extraStage3Ids": [],
+    "identityTierMismatches": [],
+    "identityArmyMismatches": [],
+    "invalidCombatSoldierIds": [],
+    "spRecordSourceMismatches": []
+  },
+  "errors": [],
+  "reviews": [
+    "41 Soldier identity records retain non-PASS presentation metadata; this does not alter Stage 5-2 combat values."
+  ]
+}
