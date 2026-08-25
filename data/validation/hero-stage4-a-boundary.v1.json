@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "stage": "hero-page-4-a-boundary",
+  "status": "PASS",
+  "purpose": "Verify Hero Stage 4 adoption of A-1 canonical Hero identity and A-9 Hero-Soldier Relation Layer ownership without changing the remaining Stage 4 semantic gates.",
+  "counts": {
+    "canonicalHeroes": 267,
+    "jobTreeHeroes": 267,
+    "skillHeroes": 267,
+    "combatHeroes": 267
+  },
+  "checks": {
+    "heroContractFrozen": 0,
+    "canonicalHeroKeyMismatch": 0,
+    "canonicalHeroCountMismatch": 0,
+    "duplicateMasterHeroIds": 0,
+    "stage4PrimaryKeyMismatch": 0,
+    "stage4BoundaryNotAdopted": 0,
+    "soldierModifierMeaningMismatch": 0,
+    "usableMembershipScopeMismatch": 0,
+    "ownershipContractFrozen": 0,
+    "ownershipSemanticOwnerMismatch": 0,
+    "heroPipelineRoleMismatch": 0,
+    "hero53MappingMismatch": 0,
+    "jobTreeMissingCanonicalHeroes": 0,
+    "jobTreeUnknownHeroes": 0,
+    "skillMissingCanonicalHeroes": 0,
+    "skillUnknownHeroes": 0,
+    "combatMissingCanonicalHeroes": 0,
+    "combatUnknownHeroes": 0,
+    "combatMembershipFieldLeaks": 0
+  },
+  "policy": {
+    "canonicalHeroKey": "heroId only",
+    "soldierModifiers": "Hero-owned troop stat modifier percentages; not membership",
+    "usableSoldierMembership": "OUT_OF_SCOPE for Hero Stage 4",
+    "futureMembershipConsumer": "Hero 5-3 -> validated A-7 byHeroId index",
+    "semanticOwner": "Hero-Soldier Relation Layer"
+  },
+  "errors": []
+}
