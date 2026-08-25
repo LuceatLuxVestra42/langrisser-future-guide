@@ -77,11 +77,27 @@
       "rule": "Resolve the single HeroBelongProduction ID through the validated origin dictionary. Preserve originLabelCn as source-display text; Korean work-title localization may be layered separately without changing productionId semantics."
     },
     "artwork": {
-      "status": "POINTER_CONFIRMED",
-      "source": "ConfigDataHeroInfo.CharImage_ID",
-      "valueType": "integer",
-      "displaySemantics": "UNRESOLVED",
-      "rule": "CharImage_ID is confirmed as a join pointer into ConfigDataCharImageInfo for CV, but final Hero-detail portrait/artwork field selection remains a separate semantic question."
+      "status": "SOURCE_JOIN_CONFIRMED",
+      "source": "ConfigDataCharImageInfo.HeroPainting",
+      "join": "ConfigDataHeroInfo.CharImage_ID -> ConfigDataCharImageInfo.ID -> HeroPainting",
+      "valueType": "string asset path",
+      "heroDetailArtworkField": "ConfigDataCharImageInfo.HeroPainting",
+      "coverage": "267/267 canonical Heroes have non-empty HeroPainting values and all 267 values are distinct.",
+      "validation": "data/validation/hero-page-stage5-5-2-artwork.v1.json",
+      "fieldRoles": {
+        "HeroPainting": "large static Hero painting/prefab for Hero-detail display",
+        "CardHeadImage": "card head/cropped presentation asset",
+        "SmallHeadImage": "small Hero head icon",
+        "RoundHeadImage": "battle/round head icon",
+        "SummonHeadImage": "summon/card icon",
+        "Spine": "primary animated Spine character prefab",
+        "Spine2": "optional secondary/bust Spine prefab",
+        "SpineBackground": "optional special Spine background; not a universal Hero-detail background source"
+      },
+      "skinArtworkStatus": "SEPARATE_SOURCE_REQUIRED",
+      "skinArtworkRule": "ConfigDataHeroSkinInfo.CharImageSkinResource_ID is not generally a foreign key to ConfigDataCharImageInfo.ID, so do not reuse the base HeroPainting join for skins. Trace skin main artwork separately.",
+      "backgroundRule": "Do not use SpineBackground as the common illustration backdrop because it is present only for a small subset. General header/background selection remains a separate presentation/resource decision.",
+      "rule": "Use HeroPainting for the base Hero-detail main illustration. Do not substitute CardHeadImage/head icons or Spine resources for the static header painting."
     },
     "skins": {
       "status": "SOURCE_JOIN_CONFIRMED",
@@ -90,10 +106,11 @@
       "join": "ConfigDataHeroInfo.Skins_ID[] -> ConfigDataHeroSkinInfo.ID",
       "ownerCrossCheck": "ConfigDataHeroSkinInfo.SpecifiedHero",
       "assetPointer": "ConfigDataHeroSkinInfo.CharImageSkinResource_ID",
+      "artworkSemantics": "UNRESOLVED",
       "acquisitionCandidate": "ConfigDataHeroSkinInfo.GetPathType",
       "orderingSemantics": "UNRESOLVED",
       "acquisitionSemantics": "UNRESOLVED",
-      "rule": "Membership and ID resolution are validated; display ordering and GetPathType meaning remain unresolved until separately proven."
+      "rule": "Membership and ID resolution are validated; main skin artwork, display ordering and GetPathType meaning remain unresolved until separately proven."
     }
   },
   "nonSynthesisPolicy": "Unresolved fields stay null/review. Candidate field names and numeric values are not sufficient to create page-display values. Confirmed source-display strings are preserved unless a separate localization layer is accepted.",
@@ -103,11 +120,12 @@
     "data/validation/hero-page-stage5-5-2-rarity.v1.json",
     "data/validation/hero-page-stage5-5-2-factions.v1.json",
     "data/validation/hero-page-stage5-5-2-cv.v1.json",
-    "data/validation/hero-page-stage5-5-2-origin.v1.json"
+    "data/validation/hero-page-stage5-5-2-origin.v1.json",
+    "data/validation/hero-page-stage5-5-2-artwork.v1.json"
   ],
   "deferredTasks": [
     "Localize ConfigDataCharImageInfo.CVName source spellings into Korean voice-actor display names without changing the confirmed CV source join.",
     "Optionally localize originLabelCn work titles into Korean display titles without changing the confirmed HeroBelongProduction productionId dictionary."
   ],
-  "nextGate": "Continue resolving remaining display semantics (final artwork field, skin ordering/acquisition) without reopening confirmed rarity, faction, CV or origin semantics."
+  "nextGate": "Resolve skin main-artwork, ordering and acquisition semantics without reopening confirmed rarity, faction, CV, origin or base Hero artwork semantics."
 }
