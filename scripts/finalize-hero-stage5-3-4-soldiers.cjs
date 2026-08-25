@@ -40,7 +40,7 @@ function gitBlobSha(relativePath) {
   }
 }
 
-function uniqueIntegers(values) {
+function uniqueSortedIntegers(values) {
   return [...new Set(values.filter(Number.isInteger))].sort((a, b) => a - b);
 }
 
@@ -53,10 +53,10 @@ function indexRecords(records, key) {
     if (map.has(id)) duplicates.push(id);
     else map.set(id, record);
   }
-  return { map, duplicates: uniqueIntegers(duplicates) };
+  return { map, duplicates: uniqueSortedIntegers(duplicates) };
 }
 
-function soldierProjection(record) {
+function projectSoldier(record) {
   return {
     soldierId: record.soldierId,
     siteId: record.siteId ?? null,
@@ -85,6 +85,7 @@ function main() {
   const soldierRecords = Array.isArray(soldierMaster.records) ? soldierMaster.records : [];
   const heroIndex = indexRecords(heroRecords, 'heroId');
   const soldierIndex = indexRecords(soldierRecords, 'soldierId');
+  const sourceByHeroId = byHero.byHeroId && typeof byHero.byHeroId === 'object' ? byHero.byHeroId : {};
 
   const errors = [];
   const reviews = [];
@@ -96,15 +97,9 @@ function main() {
   if (heroMaster.recordCount !== heroRecords.length) {
     errors.push(`Hero Master count mismatch: declared=${heroMaster.recordCount} actual=${heroRecords.length}`);
   }
-  if (heroIndex.duplicates.length) {
-    errors.push(`duplicate Hero Master heroIds: ${heroIndex.duplicates.join(', ')}`);
-  }
-  if (soldierIndex.duplicates.length) {
-    errors.push(`duplicate Soldier Master soldierIds: ${soldierIndex.duplicates.join(', ')}`);
-  }
-  if (byHero.schemaId !== 'hero-soldier-by-hero/v1') {
-    errors.push(`unexpected byHero schemaId: ${byHero.schemaId}`);
-  }
+  if (heroIndex.duplicates.length) errors.push(`duplicate Hero IDs: ${heroIndex.duplicates.join(', ')}`);
+  if (soldierIndex.duplicates.length) errors.push(`duplicate Soldier IDs: ${soldierIndex.duplicates.join(', ')}`);
+  if (byHero.schemaId !== 'hero-soldier-by-hero/v1') errors.push(`unexpected byHero schemaId: ${byHero.schemaId}`);
 
   const validationRelationSha = relationValidation?.relationSet?.gitBlobSha ?? null;
   const byHeroRelationSha = byHero?.relationSet?.gitBlobSha ?? null;
@@ -112,31 +107,29 @@ function main() {
     errors.push(`relation-set blob mismatch: validation=${validationRelationSha} byHero=${byHeroRelationSha}`);
   }
 
-  const byHeroId = byHero.byHeroId && typeof byHero.byHeroId === 'object' ? byHero.byHeroId : {};
-  const canonicalHeroIds = heroRecords.map((record) => record.heroId).filter(Number.isInteger).sort((a, b) => a - b);
+  const canonicalHeroIds = heroRecords.map((record) => record.heroId).filter(Number.isInteger);
   const canonicalHeroIdSet = new Set(canonicalHeroIds);
-  const byHeroKeys = Object.keys(byHeroId)
+  const sourceHeroIds = Object.keys(sourceByHeroId)
     .filter((key) => /^\d+$/.test(key))
-    .map(Number)
-    .sort((a, b) => a - b);
-  const byHeroKeySet = new Set(byHeroKeys);
+    .map(Number);
+  const sourceHeroIdSet = new Set(sourceHeroIds);
+  const missingByHeroKeys = canonicalHeroIds.filter((id) => !sourceHeroIdSet.has(id)).sort((a, b) => a - b);
+  const extraByHeroKeys = sourceHeroIds.filter((id) => !canonicalHeroIdSet.has(id)).sort((a, b) => a - b);
 
-  const missingByHeroKeys = canonicalHeroIds.filter((heroId) => !byHeroKeySet.has(heroId));
-  const extraByHeroKeys = byHeroKeys.filter((heroId) => !canonicalHeroIdSet.has(heroId));
   if (missingByHeroKeys.length) errors.push(`canonical Heroes missing from byHeroId: ${missingByHeroKeys.join(', ')}`);
   if (extraByHeroKeys.length) errors.push(`unknown Hero IDs in byHeroId: ${extraByHeroKeys.join(', ')}`);
-
-  if (Number.isInteger(byHero?.summary?.keyCount) && byHero.summary.keyCount !== byHeroKeys.length) {
-    errors.push(`byHero keyCount mismatch: declared=${byHero.summary.keyCount} actual=${byHeroKeys.length}`);
+  if (Number.isInteger(byHero?.summary?.keyCount) && byHero.summary.keyCount !== sourceHeroIds.length) {
+    errors.push(`byHero keyCount mismatch: declared=${byHero.summary.keyCount} actual=${sourceHeroIds.length}`);
   }
 
-  const outputRecords = [];
-  const unknownSoldierIds = new Set();
-  const duplicateSoldierIdsWithinHero = [];
+  const normalizedByHeroId = {};
   const referencedSoldierIds = new Set();
+  const unknownSoldierIds = new Set();
+  const duplicatePairs = [];
+  const reviewHeroIds = new Set();
   const reviewSoldierIds = new Set();
   const pendingKoreanNameSoldierIds = new Set();
-  const reviewHeroIds = new Set();
+  const heroesWithNoSoldiers = [];
   let relationCount = 0;
 
   for (const hero of heroRecords) {
@@ -145,23 +138,24 @@ function main() {
       continue;
     }
 
-    const sourceSoldierIds = Array.isArray(byHeroId[String(hero.heroId)])
-      ? byHeroId[String(hero.heroId)]
+    const sourceIds = Array.isArray(sourceByHeroId[String(hero.heroId)])
+      ? sourceByHeroId[String(hero.heroId)]
       : [];
     const seen = new Set();
-    const soldiers = [];
+    const normalizedIds = [];
 
-    for (const soldierId of sourceSoldierIds) {
+    for (const soldierId of sourceIds) {
       relationCount += 1;
       if (!Number.isInteger(soldierId)) {
         errors.push(`heroId ${hero.heroId} has non-integer Soldier ID: ${JSON.stringify(soldierId)}`);
         continue;
       }
       if (seen.has(soldierId)) {
-        duplicateSoldierIdsWithinHero.push({ heroId: hero.heroId, soldierId });
+        duplicatePairs.push({ heroId: hero.heroId, soldierId });
         continue;
       }
       seen.add(soldierId);
+      normalizedIds.push(soldierId);
       referencedSoldierIds.add(soldierId);
 
       const soldier = soldierIndex.map.get(soldierId);
@@ -169,37 +163,39 @@ function main() {
         unknownSoldierIds.add(soldierId);
         continue;
       }
-
       if (soldier.validationStatus && soldier.validationStatus !== 'PASS') {
-        reviewSoldierIds.add(soldierId);
         reviewHeroIds.add(hero.heroId);
+        reviewSoldierIds.add(soldierId);
       }
       if (soldier.nameKr == null || soldier.nameKrStatus === 'pending') {
-        pendingKoreanNameSoldierIds.add(soldierId);
         reviewHeroIds.add(hero.heroId);
+        pendingKoreanNameSoldierIds.add(soldierId);
       }
-
-      soldiers.push(soldierProjection(soldier));
     }
 
-    outputRecords.push({
-      heroId: hero.heroId,
-      soldierCount: soldiers.length,
-      soldiers,
-    });
+    if (normalizedIds.length === 0) heroesWithNoSoldiers.push(hero.heroId);
+    normalizedByHeroId[String(hero.heroId)] = normalizedIds;
   }
 
-  if (duplicateSoldierIdsWithinHero.length) {
-    errors.push(`duplicate Soldier IDs within Hero lists: ${duplicateSoldierIdsWithinHero.length}`);
-  }
+  if (duplicatePairs.length) errors.push(`duplicate Soldier IDs within Hero lists: ${duplicatePairs.length}`);
   if (unknownSoldierIds.size) {
-    errors.push(`unknown Soldier IDs referenced by byHeroId: ${[...unknownSoldierIds].sort((a, b) => a - b).join(', ')}`);
+    errors.push(`unknown Soldier IDs: ${[...unknownSoldierIds].sort((a, b) => a - b).join(', ')}`);
   }
   if (Number.isInteger(byHero?.summary?.relationCount) && byHero.summary.relationCount !== relationCount) {
     errors.push(`relation count mismatch: declared=${byHero.summary.relationCount} actual=${relationCount}`);
   }
-  if (outputRecords.length !== heroRecords.length) {
-    errors.push(`output record count mismatch: heroMaster=${heroRecords.length} output=${outputRecords.length}`);
+
+  const soldiersById = {};
+  for (const soldierId of [...referencedSoldierIds].sort((a, b) => a - b)) {
+    const soldier = soldierIndex.map.get(soldierId);
+    if (soldier) soldiersById[String(soldierId)] = projectSoldier(soldier);
+  }
+
+  if (Object.keys(normalizedByHeroId).length !== heroRecords.length) {
+    errors.push(`output Hero key count mismatch: heroes=${heroRecords.length} output=${Object.keys(normalizedByHeroId).length}`);
+  }
+  if (Object.keys(soldiersById).length !== referencedSoldierIds.size) {
+    errors.push(`output Soldier metadata count mismatch: referenced=${referencedSoldierIds.size} output=${Object.keys(soldiersById).length}`);
   }
 
   if (pendingKoreanNameSoldierIds.size) {
@@ -210,8 +206,6 @@ function main() {
   }
 
   const status = errors.length ? 'FAIL' : reviews.length ? 'PASS_WITH_REVIEW' : 'PASS';
-  const heroesWithNoSoldiers = outputRecords.filter((record) => record.soldierCount === 0).map((record) => record.heroId);
-
   const sources = {
     contract: { path: paths.contract, gitBlobSha: gitBlobSha(paths.contract) },
     heroMaster: { path: paths.heroMaster, gitBlobSha: gitBlobSha(paths.heroMaster) },
@@ -232,16 +226,17 @@ function main() {
     generatedAt,
     sources,
     summary: {
-      heroCount: outputRecords.length,
+      heroCount: Object.keys(normalizedByHeroId).length,
       relationCount,
       referencedUniqueSoldierCount: referencedSoldierIds.size,
-      soldierMasterRecordCount: soldierRecords.length,
+      soldierMetadataCount: Object.keys(soldiersById).length,
       heroesWithNoSoldiers: heroesWithNoSoldiers.length,
       heroesWithReviewMetadata: reviewHeroIds.size,
       reviewSoldierCount: reviewSoldierIds.size,
       pendingKoreanNameSoldierCount: pendingKoreanNameSoldierIds.size,
     },
-    records: outputRecords,
+    byHeroId: normalizedByHeroId,
+    soldiersById,
   };
 
   const validation = {
@@ -259,19 +254,21 @@ function main() {
       missingByHeroKeys: missingByHeroKeys.length,
       extraByHeroKeys: extraByHeroKeys.length,
       unknownSoldierIds: unknownSoldierIds.size,
-      duplicateSoldierIdsWithinHero: duplicateSoldierIdsWithinHero.length,
+      duplicateSoldierIdsWithinHero: duplicatePairs.length,
       relationCountMismatch: Number.isInteger(byHero?.summary?.relationCount) && byHero.summary.relationCount !== relationCount ? 1 : 0,
-      outputHeroCountMismatch: outputRecords.length === heroRecords.length ? 0 : 1,
+      outputHeroCountMismatch: Object.keys(normalizedByHeroId).length === heroRecords.length ? 0 : 1,
+      outputSoldierMetadataMismatch: Object.keys(soldiersById).length === referencedSoldierIds.size ? 0 : 1,
     },
     coverage: {
       canonicalHeroes: heroRecords.length,
-      generatedHeroBlocks: outputRecords.length,
-      heroesWithSoldiers: outputRecords.length - heroesWithNoSoldiers.length,
+      generatedHeroKeys: Object.keys(normalizedByHeroId).length,
+      heroesWithSoldiers: heroRecords.length - heroesWithNoSoldiers.length,
       heroesWithNoSoldiers,
       relationCount,
       referencedUniqueSoldierCount: referencedSoldierIds.size,
+      soldierMetadataCount: Object.keys(soldiersById).length,
       soldierMasterRecordCount: soldierRecords.length,
-      heroIdsWithReviewMetadata: [...reviewHeroIds].sort((a, b) => a - b),
+      heroesWithReviewMetadata: reviewHeroIds.size,
       reviewSoldierIds: [...reviewSoldierIds].sort((a, b) => a - b),
       pendingKoreanNameSoldierIds: [...pendingKoreanNameSoldierIds].sort((a, b) => a - b),
     },
@@ -283,11 +280,12 @@ function main() {
   writeJson(paths.validation, validation);
 
   console.log(`Hero Stage 5-3-4: ${status}`);
-  console.log(`Hero blocks: ${outputRecords.length}/${heroRecords.length}`);
+  console.log(`Hero keys: ${Object.keys(normalizedByHeroId).length}/${heroRecords.length}`);
   console.log(`Relations: ${relationCount}`);
-  console.log(`Referenced Soldiers: ${referencedSoldierIds.size}/${soldierRecords.length}`);
+  console.log(`Soldier metadata: ${Object.keys(soldiersById).length}/${referencedSoldierIds.size}`);
   console.log(`Review Heroes: ${reviewHeroIds.size}`);
   console.log(`Pending Korean-name Soldiers: ${pendingKoreanNameSoldierIds.size}`);
+
   if (errors.length) {
     for (const error of errors) console.error(`ERROR: ${error}`);
     process.exitCode = 1;
