@@ -10,26 +10,44 @@ const OUT = path.join(ROOT, 'data', 'validation', 'hero-display-stat-investigati
 const text = fs.readFileSync(DUMP, 'utf8');
 const lines = text.split(/\r?\n/);
 
-const terms = [
-  'HeroFetter',
-  'HeroHeartFetter',
-  'CompletionConditions',
-  'ConditionType',
-  'Parm1',
-  'Parm2',
-  'Parm3',
-];
-
-function hitsFor(term) {
-  const hits = [];
-  for (let i = 0; i < lines.length; i += 1) {
-    if (lines[i].includes(term)) hits.push(i);
-  }
-  return hits;
+function findIndexes(term) {
+  const out = [];
+  for (let i = 0; i < lines.length; i += 1) if (lines[i].includes(term)) out.push(i);
+  return out;
 }
 
-function nearestDeclaration(index) {
-  for (let i = index; i >= Math.max(0, index - 250); i -= 1) {
+function around(index, before = 20, after = 40) {
+  const start = Math.max(0, index - before);
+  const end = Math.min(lines.length - 1, index + after);
+  return {
+    startLine: start + 1,
+    endLine: end + 1,
+    lines: lines.slice(start, end + 1).map((value, offset) => ({ line: start + offset + 1, text: value })),
+  };
+}
+
+function findDeclarationIndex(pattern) {
+  return lines.findIndex((line) => pattern.test(line.trim()));
+}
+
+function extractTypeBlock(index, maxLines = 260) {
+  if (index < 0) return null;
+  let end = Math.min(lines.length - 1, index + maxLines);
+  for (let i = index + 1; i <= end; i += 1) {
+    if (i > index + 3 && lines[i].startsWith('// Namespace:')) {
+      end = i - 1;
+      break;
+    }
+  }
+  return {
+    startLine: index + 1,
+    endLine: end + 1,
+    lines: lines.slice(index, end + 1).map((value, offset) => ({ line: index + offset + 1, text: value })),
+  };
+}
+
+function nearestType(index) {
+  for (let i = index; i >= Math.max(0, index - 3000); i -= 1) {
     const s = lines[i].trim();
     if (/^(public|private|protected|internal)\s+(sealed\s+|static\s+|abstract\s+|partial\s+)*(class|struct|enum|interface)\s+/.test(s)) {
       return { line: i + 1, text: s };
@@ -38,81 +56,54 @@ function nearestDeclaration(index) {
   return null;
 }
 
-function nearestNamespace(index) {
-  for (let i = index; i >= Math.max(0, index - 300); i -= 1) {
-    const s = lines[i].trim();
-    if (s.startsWith('// Namespace:')) return { line: i + 1, text: s };
-  }
-  return null;
-}
+const symbols = [
+  'CanReachFetterUnlockCondition',
+  'IsHeroFetterConditionTypeComplete',
+  'GetFettersCoditionDesc',
+  'GetHeroFetterCanJumpUncompleteConditionList',
+  'FettersConfessionUIController_EventOnFetterJumpToMission',
+];
 
-function lineRecord(index) {
-  return {
-    line: index + 1,
-    text: lines[index],
-    declaration: nearestDeclaration(index),
-    namespace: nearestNamespace(index),
-  };
-}
-
-const termHits = Object.fromEntries(
-  terms.map((term) => {
-    const hits = hitsFor(term);
-    return [term, {
-      count: hits.length,
-      lineNumbers: hits.slice(0, 500).map((i) => i + 1),
-      samples: hits.slice(0, 100).map(lineRecord),
-    }];
-  }),
-);
-
-const primaryIndexes = [...new Set([
-  ...hitsFor('HeroFetter'),
-  ...hitsFor('HeroHeartFetter'),
-  ...hitsFor('CompletionConditions'),
-])].sort((a, b) => a - b);
-
-const windows = [];
-for (const idx of primaryIndexes) {
-  const start = Math.max(0, idx - 50);
-  const end = Math.min(lines.length - 1, idx + 80);
-  const previous = windows.at(-1);
-  if (previous && start <= previous.end + 1) previous.end = Math.max(previous.end, end);
-  else windows.push({ start, end });
-}
-
-const contexts = windows.slice(0, 40).map(({ start, end }) => ({
-  startLine: start + 1,
-  endLine: end + 1,
-  lines: lines.slice(start, end + 1).map((value, offset) => ({ line: start + offset + 1, text: value })),
+const symbolHits = Object.fromEntries(symbols.map((symbol) => {
+  const indexes = findIndexes(symbol);
+  return [symbol, indexes.map((index) => ({ line: index + 1, text: lines[index], owner: nearestType(index), context: around(index, 12, 24) }))];
 }));
 
-const fetterNamedLines = [];
-for (let i = 0; i < lines.length; i += 1) {
-  const s = lines[i].trim();
-  if (/Fetter|fetter|羁绊/.test(s)) {
-    fetterNamedLines.push(lineRecord(i));
-    if (fetterNamedLines.length >= 500) break;
-  }
-}
+const completionDecl = findDeclarationIndex(/^public sealed class HeroFetterCompletionCondition\b/);
+const enumDecl = findDeclarationIndex(/^public enum FetterCompleteConditionType\b/);
+const enumReflection = findDeclarationIndex(/^public static class ConfigDataFetterCompleteConditionTypeReflection\b/);
+const heroFetterInfoDecl = findDeclarationIndex(/^public sealed class ConfigDataHeroFetterInfo\b/);
 
 const result = {
-  version: 1,
-  status: primaryIndexes.length ? 'FOUND' : 'NOT_FOUND',
-  purpose: 'Locate HeroFetter-related declarations and nearby method/type signatures in Il2CppDumper dump.cs without loading the file through the GitHub API.',
+  version: 2,
+  status: completionDecl >= 0 ? 'FOUND' : 'NOT_FOUND',
   source: {
     path: 'data/metadata/dump.cs',
     sizeBytes: fs.statSync(DUMP).size,
     lineCount: lines.length,
-    characterCount: text.length,
   },
-  termHits,
-  primaryHitCount: primaryIndexes.length,
-  contexts,
-  fetterNamedLines,
-  note: 'dump.cs is an IL2CPP metadata/type dump; method bodies may be absent. This output is intended to establish available declarations and candidate consumer signatures before deciding whether native-code disassembly is required.',
+  declarations: {
+    heroFetterCompletionCondition: extractTypeBlock(completionDecl),
+    fetterCompleteConditionType: extractTypeBlock(enumDecl),
+    fetterCompleteConditionTypeReflection: extractTypeBlock(enumReflection, 100),
+    configDataHeroFetterInfo: extractTypeBlock(heroFetterInfoDecl, 180),
+  },
+  symbolHits,
+  exactSearch: {
+    completionConditionDeclarationLine: completionDecl >= 0 ? completionDecl + 1 : null,
+    enumDeclarationLine: enumDecl >= 0 ? enumDecl + 1 : null,
+    enumReflectionLine: enumReflection >= 0 ? enumReflection + 1 : null,
+    configDataHeroFetterInfoLine: heroFetterInfoDecl >= 0 ? heroFetterInfoDecl + 1 : null,
+    heroFetterCompletionConditionOccurrences: findIndexes('HeroFetterCompletionCondition').length,
+    fetterCompleteConditionTypeOccurrences: findIndexes('FetterCompleteConditionType').length,
+  },
+  note: 'Il2CppDumper dump.cs exposes type layouts, enum values and method signatures/RVAs, but not native method bodies. Runtime branch semantics beyond enum/type contracts require native GameAssembly disassembly if not inferable from these declarations.',
 };
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, `${JSON.stringify(result, null, 2)}\n`);
-console.log(JSON.stringify({ status: result.status, primaryHitCount: result.primaryHitCount, source: result.source, termCounts: Object.fromEntries(Object.entries(termHits).map(([k, v]) => [k, v.count])) }, null, 2));
+console.log(JSON.stringify({
+  status: result.status,
+  exactSearch: result.exactSearch,
+  symbolLines: Object.fromEntries(Object.entries(symbolHits).map(([k, v]) => [k, v.map((x) => x.line)])),
+}, null, 2));
