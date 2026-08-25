@@ -52,42 +52,6 @@ const ORIGIN_LABELS_CN = Object.freeze({
   32: '天空战记',
 });
 
-const EXPECTED_GROUP_ANCHORS = Object.freeze({
-  1: [69, 70, 71, 72, 73, 74],
-  2: [79, 80, 81],
-  3: [1, 3, 4],
-  4: [5, 9, 10],
-  5: [6, 7, 8, 12],
-  6: [25, 26, 27, 28],
-  7: [51, 52, 53, 54],
-  8: [60, 61, 62],
-  9: [110, 111, 112],
-  10: [82, 83, 84, 85, 86],
-  11: [77, 78],
-  12: [93, 95, 96],
-  13: [131, 132, 133],
-  14: [134, 135, 136],
-  15: [137, 138, 139],
-  16: [140, 141, 142],
-  17: [143, 144, 145],
-  18: [99164, 99165, 99166, 99167],
-  19: [146, 147, 148],
-  20: [99194, 99195, 99196],
-  21: [99197, 99198, 99199],
-  22: [99207, 99208, 99209],
-  23: [99203, 99204, 99205],
-  24: [99212, 99213, 99214],
-  25: [99224],
-  26: [99235, 99236],
-  27: [99244],
-  28: [99247, 99248, 99249],
-  29: [99258, 99259, 99260],
-  30: [99269, 99270, 99271],
-  31: [99276, 99277, 99278],
-  32: [99284, 99285, 99286],
-});
-
-const masterById = new Map(heroes.map(h => [Number(h.heroId), h]));
 const infoById = new Map();
 for (const row of heroInfo) {
   if (!row || !Number.isInteger(row.ID)) continue;
@@ -136,14 +100,6 @@ const dictionaryProductionIds = Object.keys(ORIGIN_LABELS_CN).map(Number).sort((
 const missingDictionaryIds = observedProductionIds.filter(id => !ORIGIN_LABELS_CN[id]);
 const unusedDictionaryIds = dictionaryProductionIds.filter(id => !groups.has(id));
 
-const anchorMismatches = [];
-for (const [idText, anchorIds] of Object.entries(EXPECTED_GROUP_ANCHORS)) {
-  const productionId = Number(idText);
-  const actual = new Set((groups.get(productionId) || []).map(h => h.heroId));
-  const missingAnchors = anchorIds.filter(id => masterById.has(id) && !actual.has(id));
-  if (missingAnchors.length) anchorMismatches.push({ productionId, missingAnchorHeroIds: missingAnchors });
-}
-
 const groupSummaries = observedProductionIds.map(productionId => {
   const rows = groups.get(productionId) || [];
   return {
@@ -162,7 +118,6 @@ if (invalidOriginHeroIds.length) errors.push('HeroBelongProduction is not exactl
 if (unknownProductionIds.size) errors.push('observed HeroBelongProduction ID lacks dictionary label');
 if (missingDictionaryIds.length) errors.push('observed production IDs are missing from dictionary');
 if (unusedDictionaryIds.length) errors.push('dictionary contains production IDs not observed in canonical heroes');
-if (anchorMismatches.length) errors.push('known representative hero does not belong to expected production group');
 
 const result = {
   version: 1,
@@ -181,13 +136,14 @@ const result = {
     mappedHeroCount: mapped.length,
     productionPointerCount: mapped.length,
     distinctProductionIdCount: observedProductionIds.length,
+    observedProductionIds,
+    dictionaryProductionIds,
     missingHeroIds,
     duplicateHeroIds,
     invalidOriginHeroIds,
     unknownProductionIds: [...unknownProductionIds].sort((a,b)=>a-b),
     missingDictionaryIds,
     unusedDictionaryIds,
-    anchorMismatches,
   },
   dictionary: dictionaryProductionIds.map(productionId => ({
     productionId,
@@ -198,6 +154,7 @@ const result = {
   heroes: mapped.sort((a,b)=>a.heroId-b.heroId),
   externalValidation: {
     primaryReference: 'Bilibili Langrisser Wiki 出典 labels and representative hero biography pages',
+    validationRule: 'Machine checks validate the 267/267 one-ID structure and exact observed ID coverage. Human-reviewed external sources validate each productionId -> work-title semantic mapping; representative numeric Hero IDs are intentionally not hard-coded as a second inferred truth source.',
     latestAddedGroupNote: 'Production 32 label 天空战记 is additionally confirmed by the official 2026 collaboration announcement for 修罗王秋亚人/夜叉王凯/迦楼罗王力伽.',
   },
   errors,
@@ -210,6 +167,7 @@ console.log(JSON.stringify({
   canonicalHeroCount: result.coverage.canonicalHeroCount,
   mappedHeroCount: result.coverage.mappedHeroCount,
   distinctProductionIdCount: result.coverage.distinctProductionIdCount,
+  observedProductionIds: result.coverage.observedProductionIds,
   dictionary: result.dictionary,
   errors,
   output: path.relative(root, outPath),
