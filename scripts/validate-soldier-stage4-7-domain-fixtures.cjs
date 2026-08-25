@@ -13,7 +13,7 @@ const {
 
 const STAGE3_PATH = path.join(ROOT, 'data/generated/soldier-stage3.v1.json');
 const MASTER_PATH = path.join(ROOT, 'data/generated/soldier-master.v1.json');
-const FIXTURE_PLAN_PATH = path.join(ROOT, 'data/validation/soldier-stage4-8-1-fixture-plan.v1.json');
+const FIXTURE_PLAN_PATH = path.join(ROOT, 'data/validation/soldier-representative-fixture-plan.v1.json');
 const SHARED_VALIDATION_PATH = path.join(ROOT, 'data/validation/hero-soldier-relation-validation.v1.json');
 const OUT_PATH = path.join(ROOT, 'data/validation/soldier-stage4-7-domain-fixtures.v1.json');
 
@@ -362,7 +362,7 @@ const output = {
   generatedAt: new Date().toISOString(),
   purpose: 'Representative Soldier-domain fixture regression after shared relation adoption. Reuse A-8 relation fixture PASS evidence and independently validate Soldier stats, TrainingTech, SP descriptions, SP missions and awaken branches against current direct JSON.',
   sources: {
-    fixturePlan: 'data/validation/soldier-stage4-8-1-fixture-plan.v1.json',
+    fixturePlan: 'data/validation/soldier-representative-fixture-plan.v1.json',
     sharedRelationValidation: 'data/validation/hero-soldier-relation-validation.v1.json',
     soldierStage3: 'data/generated/soldier-stage3.v1.json',
     soldierMaster: 'data/generated/soldier-master.v1.json',
