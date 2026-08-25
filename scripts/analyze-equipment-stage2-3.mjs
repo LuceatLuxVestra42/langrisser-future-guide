@@ -33,57 +33,63 @@ function normalizedSlot(row){ return row.EquipmentType == null ? 0 : Number(row.
 function isAccessory(row){ return Number(row.Rank)===4 && normalizedSlot(row)===3 && Number(row.Label)===14; }
 function arr(v){ return Array.isArray(v) ? v : (v == null ? [] : [v]); }
 function lastSkillId(row){ const a=arr(row.SkillIds); return a.length ? a[a.length-1] : null; }
-function firstText(row, keys){ for (const k of keys) if (row?.[k] != null && row[k] !== '') return {field:k,value:String(row[k])}; return null; }
-function bucketInc(obj,key){ obj[key]=(obj[key]??0)+1; }
+function text(row,key){ return row?.[key] == null ? '' : String(row[key]); }
+function inc(obj,key){ obj[key]=(obj[key]??0)+1; }
 
 const accessories = equipmentRows.filter(isAccessory);
 const property1Counts={};
-const property2Counts={};
 const comboCounts={};
-const keywordCounts={ healing:0, attack:0, intellect:0, defense:0, hp:0, mdef:0 };
+const healingByProperty1={};
+const explicitHealingCandidates=[];
 const rows=[];
-const kw = {
-  healing: /治疗|治療|回复|回復|恢复|恢復|治愈|治癒|疗效|療效/,
-  attack: /攻击|攻擊|物理|伤害|傷害/,
-  intellect: /智力|魔法|法术|法術/,
-  defense: /防御|防禦|减伤|減傷|护盾|護盾/,
-  hp: /生命|血量/,
-  mdef: /魔防|魔法防御|魔法防禦/,
-};
 
-for (const e of accessories) {
-  const p1 = Number(e.Property1_ID ?? 0);
-  const p2 = Number(e.Property2_ID ?? 0);
-  bucketInc(property1Counts,String(p1));
-  bucketInc(property2Counts,String(p2));
-  bucketInc(comboCounts,`${p1}+${p2}`);
-  const sid = lastSkillId(e);
-  const skill = sid == null ? null : skillById.get(String(sid)) ?? null;
-  const skillName = firstText(skill,['Name','SkillName','name']);
-  const skillDesc = firstText(skill,['Desc','Description','SkillDesc','desc']);
-  const text = [e.Name,e.Desc,skillName?.value,skillDesc?.value].filter(Boolean).join('\n');
-  const keywords={};
-  for (const [k,re] of Object.entries(kw)) { keywords[k]=re.test(text); if (keywords[k]) keywordCounts[k]++; }
-  rows.push({
-    id:e.ID,
-    name:e.Name,
-    desc:e.Desc ?? null,
-    property1:{id:e.Property1_ID ?? null,base:e.Property1_Value ?? null,growth:e.Property1_LevelUpValue ?? null},
-    property2:{id:e.Property2_ID ?? null,base:e.Property2_Value ?? null,growth:e.Property2_LevelUpValue ?? null},
-    maxSkillId:sid,
-    maxSkillName:skillName,
-    maxSkillDesc:skillDesc,
-    keywords,
-  });
+const healingEffectRe = /治疗效果|治療效果|治疗量|治療量|治疗能力|治療能力|造成的治疗|造成的治療|恢复效果|恢復效果/;
+
+function deriveCategory(e, skillDesc) {
+  if (healingEffectRe.test(skillDesc)) return 'healing';
+  const p1=Number(e.Property1_ID ?? 0);
+  if (p1===2) return 'attack';
+  if (p1===4) return 'intellect';
+  if (p1===1 || p1===3 || p1===5) return 'defense';
+  return 'unclassified';
 }
 
+const categoryCounts={};
+for (const e of accessories) {
+  const p1=Number(e.Property1_ID ?? 0);
+  const p2=Number(e.Property2_ID ?? 0);
+  inc(property1Counts,String(p1));
+  inc(comboCounts,`${p1}+${p2}`);
+  const sid=lastSkillId(e);
+  const skill=sid==null?null:(skillById.get(String(sid))??null);
+  const skillName=text(skill,'Name');
+  const skillDesc=text(skill,'Desc');
+  const explicitHealing=healingEffectRe.test(skillDesc);
+  if (explicitHealing) {
+    inc(healingByProperty1,String(p1));
+    explicitHealingCandidates.push({id:e.ID,name:e.Name,property1Id:p1,property2Id:p2,maxSkillId:sid,maxSkillName:skillName,maxSkillDesc:skillDesc});
+  }
+  const category=deriveCategory(e,skillDesc);
+  inc(categoryCounts,category);
+  rows.push({id:e.ID,name:e.Name,property1Id:p1,property2Id:p2,maxSkillId:sid,maxSkillName:skillName,maxSkillDesc:skillDesc,explicitHealing,derivedCategory:category});
+}
+
+const unclassified=rows.filter(r=>r.derivedCategory==='unclassified');
 const result={
   sources:{equipment:'data/configdata/ConfigDataEquipmentInfo.json',skill:'data/configdata/ConfigDataSkillInfo.json'},
   accessoryRule:'Rank=4, normalized EquipmentType=3, Label=14',
   count:accessories.length,
-  distributions:{property1Counts,property2Counts,comboCounts,keywordCounts},
+  candidateRule:{
+    healing:'max Skill Desc matches explicit healing-effect phrase',
+    attack:'otherwise Property1_ID=2',
+    intellect:'otherwise Property1_ID=4',
+    defense:'otherwise Property1_ID in {1,3,5}',
+  },
+  distributions:{property1Counts,comboCounts,healingByProperty1,categoryCounts},
+  explicitHealingCandidates,
+  unclassified,
   rows,
 };
 fs.mkdirSync(path.dirname(outputPath),{recursive:true});
 fs.writeFileSync(outputPath,JSON.stringify(result,null,2)+'\n','utf8');
-console.log(JSON.stringify({count:result.count,distributions:result.distributions},null,2));
+console.log(JSON.stringify({count:result.count,distributions:result.distributions,healingCandidates:explicitHealingCandidates.map(x=>({id:x.id,name:x.name,p1:x.property1Id,p2:x.property2Id,skill:x.maxSkillName}))},null,2));
