@@ -4,7 +4,7 @@
   "substage": "5-5-2",
   "checkpoint": "coverage",
   "status": "REVIEW",
-  "completion": "COVERAGE_MEASURED_SEMANTICS_PARTIAL",
+  "completion": "COVERAGE_AND_SEMANTICS_COMPLETE_WITH_DATA_GAPS",
   "sourceTraceStatus": "PASS_WITH_DATA_GAPS",
   "canonicalHeroCount": 267,
   "sourceCounts": {
@@ -113,7 +113,7 @@
       "rule": "Use HeroPainting for the base Hero-detail main illustration. Do not substitute CardHeadImage/head icons or Spine resources for the static header painting."
     },
     "skins": {
-      "status": "SOURCE_JOIN_CONFIRMED",
+      "status": "SOURCE_SEMANTICS_CONFIRMED_WITH_UNENCODED_ACQUISITION_ROWS",
       "join": "ConfigDataHeroInfo.Skins_ID[] -> ConfigDataHeroSkinInfo.ID",
       "normalizationRule": "An omitted Skins_ID is normalized to [] only when ConfigDataHeroSkinInfo has no row with SpecifiedHero equal to that canonical Hero ID; omitted lists with reverse owner rows remain a hard error.",
       "heroesWithValidSkinList": 267,
@@ -375,18 +375,50 @@
         9927802
       ],
       "charImageSkinResourceMissingSkinIds": [],
-      "artworkSemantics": "UNRESOLVED",
-      "orderingSemantics": "UNRESOLVED",
-      "acquisitionSemantics": "UNRESOLVED"
+      "artworkSemantics": "SOURCE_JOIN_CONFIRMED",
+      "orderingSemantics": "SOURCE_ORDER_CONFIRMED",
+      "acquisitionSemantics": "ENUM_SEMANTICS_CONFIRMED_WITH_UNENCODED_ROWS",
+      "artworkJoin": "ConfigDataHeroSkinInfo.CharImageSkinResource_ID -> ConfigDataCharImageSkinResourceInfo.ID",
+      "staticImageField": "ConfigDataCharImageSkinResourceInfo.Image",
+      "animatedResourceField": "ConfigDataCharImageSkinResourceInfo.SpineAssetPath",
+      "artworkCoverage": "540/540 canonical skins resolve to non-empty Image and SpineAssetPath.",
+      "orderingSource": "ConfigDataHeroInfo.Skins_ID[] array position",
+      "orderingRule": "Preserve Skins_ID array order exactly. Do not re-sort by skin ID, Score, FixedStoreItemInfo.UISort or acquisition category.",
+      "acquisitionSource": "ConfigDataHeroSkinInfo.GetPathType",
+      "acquisitionMapping": {
+        "2": {
+          "labelCn": "光之回响",
+          "labelKr": "광휘의 메아리",
+          "count": 197
+        },
+        "3": {
+          "labelCn": "命运星织",
+          "labelKr": "운명의 별짜기",
+          "count": 1
+        },
+        "4": {
+          "labelCn": "英雄皮肤商店",
+          "labelKr": "영웅 스킨 상점",
+          "count": 166
+        }
+      },
+      "acquisitionEncodedSkinCount": 364,
+      "acquisitionUnencodedSkinCount": 176,
+      "acquisitionMissingRule": "Missing GetPathType is not one acquisition category. Keep it null/UNENCODED. Exact acquisition history for those skins requires a supplemental verified dictionary rather than inference.",
+      "validation": "data/validation/hero-page-stage5-5-2-skins-acquisition.v1.json"
     }
   },
   "hardErrors": [],
   "coverageIssues": [],
-  "unresolvedSemanticFields": [
-    "skins.artworkSemantics",
-    "skins.orderingSemantics",
-    "skins.acquisitionSemantics"
-  ],
-  "readyForDisplayEnrichment": false,
-  "nextAction": "Resolve skin artwork, ordering and acquisition semantics without reopening confirmed rarity, faction, CV, origin or base Hero artwork mappings."
+  "unresolvedSemanticFields": [],
+  "readyForDisplayEnrichment": true,
+  "nextAction": "Integrate the confirmed Stage 5-5-2 mappings. Build a supplemental acquisition-history dictionary only if exact acquisition text is required for the 176 skins with omitted GetPathType.",
+  "dataCompletionIssues": [
+    {
+      "field": "skins.acquisition",
+      "issue": "ConfigDataHeroSkinInfo.GetPathType omitted",
+      "canonicalSkinCount": 176,
+      "policy": "Keep null/UNENCODED unless a separately verified supplemental acquisition dictionary is supplied."
+    }
+  ]
 }
