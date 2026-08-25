@@ -1,0 +1,201 @@
+{
+  "version": 1,
+  "stage": "A-8",
+  "status": "FROZEN",
+  "purpose": "Integrity, regression, and representative-fixture validation contract for the shared Hero-Soldier Relation Layer before any generated relation set or bidirectional index may be accepted for downstream use.",
+  "dependsOn": {
+    "goldenBaseline": "data/validation/hero-soldier-relation-golden-baseline.v1.json",
+    "heroIdentity": "data/contracts/hero-identity-contract.v1.json",
+    "soldierIdentity": "data/contracts/soldier-identity-contract.v1.json",
+    "sourceKinds": "data/contracts/hero-soldier-relation-source-contract.v1.json",
+    "edgeSchema": "data/contracts/hero-soldier-relation-edge-schema.v1.json",
+    "composition": "data/contracts/hero-soldier-relation-composition-contract.v1.json",
+    "relationSet": "data/contracts/hero-soldier-relation-set-contract.v1.json",
+    "indexes": "data/contracts/hero-soldier-relation-index-contract.v1.json",
+    "fixturePlan": "data/validation/soldier-stage4-8-1-fixture-plan.v1.json"
+  },
+  "validationArtifact": {
+    "targetPath": "data/validation/hero-soldier-relation-validation.v1.json",
+    "schemaId": "hero-soldier-relation-validation/v1",
+    "acceptedStatus": "PASS",
+    "publicationGate": "The A-6 relation set and A-7 indexes are not production-ready until this validation artifact records PASS for the exact same relation-set blob SHA."
+  },
+  "severityPolicy": {
+    "FAIL": "Semantic or structural contract violation. Output must not be consumed downstream.",
+    "REVIEW": "No semantic invariant is known to be broken, but frozen-baseline counts or fixture snapshot evidence changed and require explanation as legitimate client-data/source evolution before acceptance.",
+    "PASS": "All hard invariants pass and any baseline differences are either absent or explicitly classified as legitimate source changes.",
+    "rule": "A REVIEW may not be silently promoted to PASS. The validation artifact must record the reason and evidence for the classification."
+  },
+  "hardValidationGroups": {
+    "identity": [
+      "Every edge.heroId exists in the canonical Hero Master used by the relation set.",
+      "Every edge.soldierId exists in the canonical Soldier Master used by the relation set.",
+      "No duplicate canonical (heroId, soldierId) pair exists.",
+      "No relation is repaired or joined by names, site IDs, numeric offsets, tier, army type or ordering."
+    ],
+    "edgeSchema": [
+      "Every edge has provenance.length >= 1.",
+      "Canonical edges contain only A-4 semantic fields; forbidden presentation/classification metadata must not be embedded.",
+      "Serialized edge and provenance ordering follows the deterministic A-4 rules."
+    ],
+    "provenance": [
+      "Every provenance.sourceKind is allowed by A-3.",
+      "Every DIRECT provenance uses the authoritative table and field defined for that sourceKind.",
+      "Every SP_SOLDIER_INHERIT provenance has a valid parentEdge and explicit SP_FORM_LINK.",
+      "Inherited parentEdge.heroId equals derived edge.heroId.",
+      "Inherited parentEdge.soldierId equals supportRelation.normalSoldierId.",
+      "Inherited edge.soldierId equals supportRelation.spSoldierId.",
+      "Recursive inheritance is forbidden.",
+      "SP_SOLDIER_EXPAND provenance is never inherited to another form."
+    ],
+    "sourceCompleteness": [
+      "Every valid BASE_SOLDIER_HERO source member produces the expected canonical pair with matching direct provenance.",
+      "Every valid SP_HERO_REWARD source member produces the exact listed Soldier target pair with matching direct provenance.",
+      "Every valid SP_SOLDIER_EXPAND source member produces the SP Soldier pair with matching direct provenance.",
+      "Every eligible normal-form DIRECT provenance produces the required SP_SOLDIER_INHERIT candidate when an explicit SP_FORM_LINK exists.",
+      "No canonical pair exists without at least one derivation path permitted by A-3 and A-5."
+    ],
+    "composition": [
+      "Candidate production is normalized to exact (heroId, soldierId) pairs before union.",
+      "Multiple production paths for one pair merge provenance instead of creating duplicate edges.",
+      "Normal-form relations do not inherit backward from SP_SOLDIER_EXPAND.",
+      "SP_FORM_LINK alone never creates a Hero-Soldier edge.",
+      "Source iteration order does not alter the semantic pair set or provenance set."
+    ],
+    "summary": [
+      "relation-set summary.heroCount equals distinct heroId count in edges.",
+      "relation-set summary.soldierCount equals distinct soldierId count in edges.",
+      "relation-set summary.edgeCount equals edges.length.",
+      "relation-set summary.provenanceCount equals the total number of provenance entries after deduplication.",
+      "sourceProductionCounts are derived from provenance and are not used as semantic input."
+    ],
+    "indexes": [
+      "Both A-7 indexes reference the exact same validated relation-set blob SHA.",
+      "byHero relationCount equals relation-set edgeCount.",
+      "bySoldier relationCount equals relation-set edgeCount.",
+      "The pair set reconstructed from byHeroId exactly equals canonical edges.",
+      "The pair set reconstructed from bySoldierId exactly equals canonical edges.",
+      "The pair sets reconstructed from both indexes exactly equal one another.",
+      "No index value array contains duplicates."
+    ],
+    "traceability": [
+      "The relation set records exact Git blob SHAs for every required source input and A-1 through A-5 contract used.",
+      "The validation result records the exact relation-set and index blob SHAs it validated.",
+      "A result for one relation-set blob may not be reused to approve another blob."
+    ]
+  },
+  "representativeFixtures": {
+    "sourcePlan": {
+      "path": "data/validation/soldier-stage4-8-1-fixture-plan.v1.json",
+      "gitBlobSha": "8364b3840411ebd5bd74b9f027b796ef38a5086a"
+    },
+    "spSoldierSnapshot": {
+      "path": "data/configdata/ConfigDataSPSoldierInfo.json",
+      "gitBlobSha": "93dd784a7de913daa6d72f5df6cf6890a710c58a"
+    },
+    "fixtures": [
+      {
+        "nameKr": "대지 골렘",
+        "normalSoldierId": 105,
+        "spSoldierId": null,
+        "kind": "NORMAL_ONLY",
+        "assertions": [
+          "Soldier 105 remains a normal-form canonical identity.",
+          "No SP inheritance may be synthesized for Soldier 105 without an explicit SP_FORM_LINK.",
+          "Edges for Soldier 105 may only be supported by direct source kinds valid for a normal Soldier.",
+          "At least one canonical Hero relation must remain for this fixture when validating against the frozen baseline snapshot."
+        ]
+      },
+      {
+        "nameKr": "사막 용병단",
+        "normalSoldierId": 247,
+        "spSoldierId": null,
+        "kind": "NORMAL_ONLY",
+        "assertions": [
+          "Soldier 247 validates the same normal-only composition rules outside the lancer fixture.",
+          "No army-type-specific relation inference is allowed.",
+          "No SP child relation may be inferred from numeric patterns or names."
+        ]
+      },
+      {
+        "nameKr": "늑대인간",
+        "normalSoldierId": 1032,
+        "spSoldierId": null,
+        "kind": "NORMAL_ONLY_HIGH_ID",
+        "assertions": [
+          "Soldier 1032 remains normal-only despite its high numeric ID.",
+          "High ID values must not be interpreted as SP status or used for +5000/-5000 relation inference.",
+          "All canonical relations must still resolve through explicit IDs and allowed sources only."
+        ]
+      },
+      {
+        "nameKr": "마녀",
+        "normalSoldierId": 622,
+        "spSoldierId": 5622,
+        "kind": "SP_FIRST_STAGE_ONLY",
+        "assertions": [
+          "An explicit SP_FORM_LINK 622 <-> 5622 must exist in the pinned SP Soldier snapshot.",
+          "Every eligible BASE_SOLDIER_HERO or normal-target SP_HERO_REWARD provenance on Soldier 622 must be represented on Soldier 5622 through SP_SOLDIER_INHERIT.",
+          "The pinned SP Soldier record has no second-stage unlock/expand branch; therefore Soldier 5622 must not contain SP_SOLDIER_EXPAND provenance derived from absent second-stage data.",
+          "Absence of second-stage fields is a valid first-stage-only branch, not missing-data repair input."
+        ]
+      },
+      {
+        "nameKr": "황가기병",
+        "normalSoldierId": 320,
+        "spSoldierId": 5320,
+        "kind": "SP_TWO_STAGE",
+        "pinnedSecondStageExpandHeroIds": [99226, 124, 115, 53, 99233],
+        "assertions": [
+          "An explicit SP_FORM_LINK 320 <-> 5320 must exist in the pinned SP Soldier snapshot.",
+          "Every eligible normal-form direct provenance on Soldier 320 must be represented on Soldier 5320 through SP_SOLDIER_INHERIT.",
+          "Each pinned SecondStageExpandHeroList Hero ID must have canonical edge (heroId, 5320) with DIRECT SP_SOLDIER_EXPAND provenance.",
+          "SP_SOLDIER_EXPAND edges must remain additive and must not propagate backward to Soldier 320."
+        ]
+      }
+    ]
+  },
+  "fixtureChangePolicy": {
+    "rule": "Pinned fixture expectations are evidence for the referenced source blob, not eternal game constants.",
+    "whenSourceBlobChanges": "Re-evaluate the affected fixture directly from the new source snapshot. A changed explicit SP link or SecondStageExpandHeroList is REVIEW until classified; do not force the old expectation onto new data.",
+    "forbidden": "Do not update fixture expectations merely to make a failing builder pass without source evidence."
+  },
+  "goldenRegression": {
+    "reference": {
+      "heroCount": 267,
+      "soldierCount": 224,
+      "edgeCount": 5977,
+      "baseEdges": 5720,
+      "directSpHeroAddedEdges": 25,
+      "inheritedSpHeroAddedEdges": 5,
+      "spExpandedEdges": 228
+    },
+    "hardInvariant": false,
+    "comparisonRequired": true,
+    "classification": [
+      "If counts and pair/provenance sets match the frozen source snapshot, record MATCH.",
+      "If counts differ because the source blobs changed, classify the exact added/removed pairs and provenance by sourceKind before PASS.",
+      "If counts differ while relevant source evidence is unchanged, treat as probable parser/JOIN/composition regression and FAIL until explained.",
+      "A count match alone is insufficient; semantic pair/provenance and index parity checks still must pass."
+    ]
+  },
+  "validationResultShape": {
+    "requiredFields": [
+      "version",
+      "schemaId",
+      "generatedAt",
+      "status",
+      "relationSet",
+      "indexes",
+      "checks",
+      "fixtures",
+      "goldenComparison",
+      "errors",
+      "reviews"
+    ],
+    "statusRule": "PASS requires zero hard-check failures, zero unresolved fixture failures, exact index parity, and no unresolved REVIEW classification.",
+    "errorsRule": "Every FAIL must include a machine-readable check ID plus the involved heroId/soldierId/sourceKind when applicable.",
+    "reviewsRule": "Every REVIEW must include the changed source blob evidence or explicit reason it cannot yet be classified."
+  },
+  "completion": "A-8 is complete when the relation layer has a frozen validation contract that can reject unsupported/missing/duplicated edges, invalid provenance or SP inheritance, stale bidirectional indexes, and unexplained regression differences, while preserving five representative structural fixtures for targeted diagnosis."
+}
