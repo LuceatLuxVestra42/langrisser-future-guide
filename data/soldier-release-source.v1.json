@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-source/v1",
+  "stage": "5-8",
+  "status": "FROZEN_PARTIAL",
+  "purpose": "Freeze only externally verified Soldier release metadata. Missing release data stays unresolved; Soldier IDs are never interpreted as release order.",
+  "externalSource": {
+    "kind": "GOOGLE_SHEET",
+    "spreadsheetId": "1Oa7afFUhP21SRLSJ0uzP9oUc5C1_Cij0JqRExzUJGFo",
+    "spreadsheetTitle": "업데이트",
+    "sheetName": "신규용병",
+    "retrievedAt": "2026-08-25",
+    "dateCells": [
+      { "row": 2, "serial": 45727, "releaseDate": "2025-03-11" },
+      { "row": 15, "serial": 45783, "releaseDate": "2025-05-06" },
+      { "row": 40, "serial": 45839, "releaseDate": "2025-07-01" }
+    ]
+  },
+  "rules": [
+    "The production join key is soldierId only.",
+    "expectedNameKr and sourceLabel are frozen review evidence, never production join keys.",
+    "Same-patch Soldier order is unresolved unless an external source explicitly supplies it.",
+    "Soldier ID magnitude or numeric sequence must never be used to infer release order.",
+    "Records absent from confirmedRecords remain releaseStatus=UNRESOLVED rather than receiving guessed dates or ranks.",
+    "SP Soldiers are grouped before normal Soldiers by UI policy; Stage 5-8 does not claim an internal SP release order without a mapped external source."
+  ],
+  "confirmedRecords": [
+    {
+      "soldierId": 648,
+      "expectedNameKr": "제이드 날개 궁수",
+      "sourceLabel": "비취 날개 궁수",
+      "releaseDate": "2025-03-11",
+      "patchGroup": "2025-03-11",
+      "samePatchOrder": null,
+      "sourceRows": [2, 7],
+      "mappingStatus": "MANUALLY_VERIFIED"
+    },
+    {
+      "soldierId": 647,
+      "expectedNameKr": "금지된 숲의 영령술사",
+      "sourceLabel": "금지된 숲 법사",
+      "releaseDate": "2025-03-11",
+      "patchGroup": "2025-03-11",
+      "samePatchOrder": null,
+      "sourceRows": [2, 13],
+      "mappingStatus": "MANUALLY_VERIFIED"
+    },
+    {
+      "soldierId": 251,
+      "expectedNameKr": "광야의 격투가",
+      "sourceLabel": "야만인 검투사",
+      "releaseDate": "2025-05-06",
+      "patchGroup": "2025-05-06",
+      "samePatchOrder": null,
+      "sourceRows": [15, 20],
+      "mappingStatus": "MANUALLY_VERIFIED"
+    },
+    {
+      "soldierId": 517,
+      "expectedNameKr": "파도의 역린",
+      "sourceLabel": "검은 조수 비늘",
+      "releaseDate": "2025-05-06",
+      "patchGroup": "2025-05-06",
+      "samePatchOrder": null,
+      "sourceRows": [15, 26],
+      "mappingStatus": "MANUALLY_VERIFIED"
+    },
+    {
+      "soldierId": 341,
+      "expectedNameKr": "밀림 켄타우로스",
+      "sourceLabel": "밀림 켄타우로스",
+      "releaseDate": "2025-05-06",
+      "patchGroup": "2025-05-06",
+      "samePatchOrder": null,
+      "sourceRows": [15, 32],
+      "mappingStatus": "EXACT_LABEL"
+    },
+    {
+      "soldierId": 427,
+      "expectedNameKr": "검은 페가수스 나이트",
+      "sourceLabel": "검은 페가수스 기사",
+      "releaseDate": "2025-05-06",
+      "patchGroup": "2025-05-06",
+      "samePatchOrder": null,
+      "sourceRows": [15, 38],
+      "mappingStatus": "MANUALLY_VERIFIED"
+    },
+    {
+      "soldierId": 135,
+      "expectedNameKr": "산맥의 수호자",
+      "sourceLabel": "산의 파수꾼",
+      "releaseDate": "2025-07-01",
+      "patchGroup": "2025-07-01",
+      "samePatchOrder": null,
+      "sourceRows": [40, 45],
+      "mappingStatus": "MANUALLY_VERIFIED"
+    },
+    {
+      "soldierId": 1037,
+      "expectedNameKr": "마충 거대 수호자",
+      "sourceLabel": "거대 수호 마충",
+      "releaseDate": "2025-07-01",
+      "patchGroup": "2025-07-01",
+      "samePatchOrder": null,
+      "sourceRows": [40, 51],
+      "mappingStatus": "MANUALLY_VERIFIED"
+    },
+    {
+      "soldierId": 819,
+      "expectedNameKr": "산별구조대",
+      "sourceLabel": "산악 구조대",
+      "releaseDate": "2025-07-01",
+      "patchGroup": "2025-07-01",
+      "samePatchOrder": null,
+      "sourceRows": [40, 57],
+      "mappingStatus": "MANUALLY_VERIFIED"
+    },
+    {
+      "soldierId": 1118,
+      "expectedNameKr": "심해의 복수자",
+      "sourceLabel": "심해의 복수자",
+      "releaseDate": "2025-07-01",
+      "patchGroup": "2025-07-01",
+      "samePatchOrder": null,
+      "sourceRows": [40, 63],
+      "mappingStatus": "EXACT_LABEL"
+    },
+    {
+      "soldierId": 1038,
+      "expectedNameKr": "결정체 마령",
+      "sourceLabel": "크리스탈 슬라임",
+      "releaseDate": "2025-07-01",
+      "patchGroup": "2025-07-01",
+      "samePatchOrder": null,
+      "sourceRows": [40, 69],
+      "mappingStatus": "MANUALLY_VERIFIED"
+    }
+  ],
+  "coveragePolicy": {
+    "confirmedRecordCount": 11,
+    "allOtherSoldiers": "UNRESOLVED",
+    "samePatchOrder": "UNRESOLVED",
+    "spInternalOrder": "UNRESOLVED_NOT_REQUIRED_FOR_CURRENT_UI_POLICY"
+  }
+}
