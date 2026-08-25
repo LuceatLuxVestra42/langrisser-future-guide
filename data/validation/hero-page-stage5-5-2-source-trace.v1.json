@@ -3,9 +3,9 @@
   "stage": "hero-page-5-5",
   "substage": "5-5-2",
   "checkpoint": "source-trace",
-  "status": "REVIEW",
-  "completion": "SOURCE_TRACE_COMPLETE_SEMANTICS_PARTIAL",
-  "scope": "Authoritative source tracing for rarity, factions, CV, origin, artwork and skins without inferred display values.",
+  "status": "PASS_WITH_DATA_GAPS",
+  "completion": "SOURCE_TRACE_SEMANTICS_COMPLETE_WITH_UNENCODED_SKIN_ACQUISITION_ROWS",
+  "scope": "Authoritative source tracing for Hero header/basic display semantics with explicit separation of confirmed semantics from source data gaps.",
   "canonicalIdentity": {
     "path": "data/hero-name-master.v1.json",
     "primaryKey": "heroId",
@@ -17,6 +17,9 @@
     "heroTagInfo": "data/configdata/ConfigDataHeroTagInfo.json",
     "charImageInfo": "data/configdata/ConfigDataCharImageInfo.json",
     "heroSkinInfo": "data/configdata/ConfigDataHeroSkinInfo.json",
+    "charImageSkinResourceInfo": "data/configdata/ConfigDataCharImageSkinResourceInfo.json",
+    "fixedStoreItemInfo": "data/configdata/ConfigDataFixedStoreItemInfo.json",
+    "storeInfo": "data/configdata/ConfigDataStoreInfo.json",
     "previousGate": "data/validation/hero-page-stage5-5-1.v1.json"
   },
   "fields": {
@@ -57,11 +60,7 @@
       "confirmedNoVoiceActorHeroIds": [99235,99236,99276],
       "confirmedNoVoiceActorHeroes": ["캡틴 코만도&베이비 헤드","맥&긴주","아이바 미유키"],
       "rule": "Use CVName as the authoritative source field. For Hero IDs 99235, 99236 and 99276, source value ■■■■ is confirmed to mean no voice actor, not masked or unresolved actor data. Preserve all other source spellings as-is.",
-      "localization": {
-        "status": "DEFERRED_USER_LOCALIZATION",
-        "scope": "Chinese-localized CVName spellings -> Korean voice-actor display names",
-        "rule": "Do not auto-transliterate or rewrite actor names in ConfigData-derived artifacts. User will localize display names later."
-      }
+      "localization": {"status":"DEFERRED_USER_LOCALIZATION","scope":"Chinese-localized CVName spellings -> Korean voice-actor display names","rule":"Do not auto-transliterate or rewrite actor names in ConfigData-derived artifacts. User will localize display names later."}
     },
     "origin": {
       "status": "SOURCE_DICTIONARY_CONFIRMED",
@@ -94,26 +93,47 @@
         "Spine2": "optional secondary/bust Spine prefab",
         "SpineBackground": "optional special Spine background; not a universal Hero-detail background source"
       },
-      "skinArtworkStatus": "SEPARATE_SOURCE_REQUIRED",
-      "skinArtworkRule": "ConfigDataHeroSkinInfo.CharImageSkinResource_ID is not generally a foreign key to ConfigDataCharImageInfo.ID, so do not reuse the base HeroPainting join for skins. Trace skin main artwork separately.",
-      "backgroundRule": "Do not use SpineBackground as the common illustration backdrop because it is present only for a small subset. General header/background selection remains a separate presentation/resource decision.",
       "rule": "Use HeroPainting for the base Hero-detail main illustration. Do not substitute CardHeadImage/head icons or Spine resources for the static header painting."
     },
     "skins": {
-      "status": "SOURCE_JOIN_CONFIRMED",
+      "status": "SOURCE_SEMANTICS_CONFIRMED_WITH_UNENCODED_ACQUISITION_ROWS",
       "membershipSource": "ConfigDataHeroInfo.Skins_ID[]",
       "detailSource": "ConfigDataHeroSkinInfo",
       "join": "ConfigDataHeroInfo.Skins_ID[] -> ConfigDataHeroSkinInfo.ID",
       "ownerCrossCheck": "ConfigDataHeroSkinInfo.SpecifiedHero",
-      "assetPointer": "ConfigDataHeroSkinInfo.CharImageSkinResource_ID",
-      "artworkSemantics": "UNRESOLVED",
-      "acquisitionCandidate": "ConfigDataHeroSkinInfo.GetPathType",
-      "orderingSemantics": "UNRESOLVED",
-      "acquisitionSemantics": "UNRESOLVED",
-      "rule": "Membership and ID resolution are validated; main skin artwork, display ordering and GetPathType meaning remain unresolved until separately proven."
+      "coverage": "540/540 canonical skin references resolve uniquely with no ownership mismatch.",
+      "artwork": {
+        "status": "SOURCE_JOIN_CONFIRMED",
+        "join": "ConfigDataHeroSkinInfo.CharImageSkinResource_ID -> ConfigDataCharImageSkinResourceInfo.ID",
+        "staticImage": "ConfigDataCharImageSkinResourceInfo.Image",
+        "animatedResource": "ConfigDataCharImageSkinResourceInfo.SpineAssetPath",
+        "coverage": "540/540 canonical skins resolve to non-empty Image and SpineAssetPath.",
+        "rule": "Use Image for the static skin illustration/resource image and SpineAssetPath for the animated skin model. Do not join skin resource IDs to ConfigDataCharImageInfo."
+      },
+      "ordering": {
+        "status": "SOURCE_ORDER_CONFIRMED",
+        "source": "ConfigDataHeroInfo.Skins_ID[] array position",
+        "rule": "Preserve Skins_ID array order exactly. Do not re-sort by skin ID, Score, FixedStoreItemInfo.UISort or acquisition category.",
+        "reason": "Skins_ID[] is the only explicit per-Hero skin membership sequence; ID and Score sorting do not reproduce all source sequences."
+      },
+      "acquisition": {
+        "status": "ENUM_SEMANTICS_CONFIRMED_WITH_UNENCODED_ROWS",
+        "source": "ConfigDataHeroSkinInfo.GetPathType",
+        "encodedSkinCount": 364,
+        "unencodedSkinCount": 176,
+        "mapping": {
+          "2": {"labelCn":"光之回响","labelKr":"광휘의 메아리","count":197},
+          "3": {"labelCn":"命运星织","labelKr":"운명의 별짜기","count":1},
+          "4": {"labelCn":"英雄皮肤商店","labelKr":"영웅 스킨 상점","count":166}
+        },
+        "missingRule": "Missing GetPathType is not one acquisition category. Keep it null/UNENCODED. Exact acquisition history for those skins requires a supplemental verified dictionary rather than inference.",
+        "counterexample": "Matthew skin 执事美酒 has no GetPathType and is an event reward, proving that missing values cannot be collapsed into a single store/event label."
+      },
+      "scoreRule": "Do not use ConfigDataHeroSkinInfo.Score as display order. It correlates with skin category/value but is not a universal per-Hero ordering field.",
+      "validation": "data/validation/hero-page-stage5-5-2-skins-acquisition.v1.json"
     }
   },
-  "nonSynthesisPolicy": "Unresolved fields stay null/review. Candidate field names and numeric values are not sufficient to create page-display values. Confirmed source-display strings are preserved unless a separate localization layer is accepted.",
+  "nonSynthesisPolicy": "Confirmed source joins and enum meanings may be used directly. Missing GetPathType stays null until a separately verified acquisition dictionary exists; do not invent acquisition routes.",
   "coverageGenerator": "scripts/validate_hero_page_stage5_5_2.cjs",
   "expectedCoverageOutput": "data/validation/hero-page-stage5-5-2-coverage.v1.json",
   "confirmedSemanticArtifacts": [
@@ -121,11 +141,13 @@
     "data/validation/hero-page-stage5-5-2-factions.v1.json",
     "data/validation/hero-page-stage5-5-2-cv.v1.json",
     "data/validation/hero-page-stage5-5-2-origin.v1.json",
-    "data/validation/hero-page-stage5-5-2-artwork.v1.json"
+    "data/validation/hero-page-stage5-5-2-artwork.v1.json",
+    "data/validation/hero-page-stage5-5-2-skins-acquisition.v1.json"
   ],
   "deferredTasks": [
     "Localize ConfigDataCharImageInfo.CVName source spellings into Korean voice-actor display names without changing the confirmed CV source join.",
-    "Optionally localize originLabelCn work titles into Korean display titles without changing the confirmed HeroBelongProduction productionId dictionary."
+    "Optionally localize originLabelCn work titles into Korean display titles without changing the confirmed HeroBelongProduction productionId dictionary.",
+    "If exact acquisition text is required for all skins, build a supplemental verified acquisition dictionary for the 176 canonical skins whose GetPathType is omitted."
   ],
-  "nextGate": "Resolve skin main-artwork, ordering and acquisition semantics without reopening confirmed rarity, faction, CV, origin or base Hero artwork semantics."
+  "nextGate": "Stage 5-5-2 semantic interpretation is complete. Continue integration while treating 176 missing GetPathType values as an explicit source-data gap, not an unresolved enum meaning."
 }
