@@ -4,23 +4,25 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'scripts/validate_hero_stage3_final.cjs'
-      - 'scripts/prepare_hero_jobs_stage42.cjs'
-      - 'scripts/prepare_hero_job_trees_stage43.cjs'
-      - 'scripts/prepare_hero_skill_acquisition_stage44.cjs'
+      - 'scripts/validate_hero_stage3_direct.cjs'
+      - 'scripts/validate_hero_stage4_upstream_direct.cjs'
       - 'scripts/prepare_hero_basic_combat_stage45.cjs'
-      - 'scripts/investigate_hero_display_stats.cjs'
+      - 'scripts/validate_hero_stage4_final.cjs'
+      - 'scripts/validate_hero_stage4_a_boundary.cjs'
       - 'data/hero-name-master.v1.json'
       - 'data/hero-name-corrections.v1.json'
       - 'data/hero-master-stage3-1.v1.json'
       - 'data/hero-normal-stage3-2.v1.json'
       - 'data/hero-sp-stage3-3.v1.json'
       - 'data/hero-page-stage3-4.v1.json'
-      - 'data/hero-job-stage4-2.v1.json'
-      - 'data/hero-job-tree-stage4-3.v1.json'
-      - 'data/hero-skill-acquisition-stage4-4.v1.json'
       - 'data/hero-basic-combat-stage4-5.v1.json'
+      - 'data/generated/hero-job-trees.v1.json'
+      - 'data/generated/hero-skill-acquisition.v1.json'
+      - 'data/generated/hero-basic-combat.v1.json'
       - 'data/validation/hero-pages-summary.v1.json'
+      - 'data/validation/hero-stage4-upstream-direct.v1.json'
+      - 'data/validation/hero-basic-combat-stage4-5-summary.v1.json'
+      - 'data/validation/hero-stage4-a-boundary.v1.json'
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/configdata/ConfigDataJobInfo.json'
       - 'data/configdata/ConfigDataJobConnectionInfo.json'
@@ -33,24 +35,25 @@ on:
       - '.github/workflows/hero-stage3-validation.yml'
   pull_request:
     paths:
-      - 'data/validation/hero-stage3-validation-trigger.txt'
-      - 'scripts/validate_hero_stage3_final.cjs'
-      - 'scripts/prepare_hero_jobs_stage42.cjs'
-      - 'scripts/prepare_hero_job_trees_stage43.cjs'
-      - 'scripts/prepare_hero_skill_acquisition_stage44.cjs'
+      - 'scripts/validate_hero_stage3_direct.cjs'
+      - 'scripts/validate_hero_stage4_upstream_direct.cjs'
       - 'scripts/prepare_hero_basic_combat_stage45.cjs'
-      - 'scripts/investigate_hero_display_stats.cjs'
+      - 'scripts/validate_hero_stage4_final.cjs'
+      - 'scripts/validate_hero_stage4_a_boundary.cjs'
       - 'data/hero-name-master.v1.json'
       - 'data/hero-name-corrections.v1.json'
       - 'data/hero-master-stage3-1.v1.json'
       - 'data/hero-normal-stage3-2.v1.json'
       - 'data/hero-sp-stage3-3.v1.json'
       - 'data/hero-page-stage3-4.v1.json'
-      - 'data/hero-job-stage4-2.v1.json'
-      - 'data/hero-job-tree-stage4-3.v1.json'
-      - 'data/hero-skill-acquisition-stage4-4.v1.json'
       - 'data/hero-basic-combat-stage4-5.v1.json'
+      - 'data/generated/hero-job-trees.v1.json'
+      - 'data/generated/hero-skill-acquisition.v1.json'
+      - 'data/generated/hero-basic-combat.v1.json'
       - 'data/validation/hero-pages-summary.v1.json'
+      - 'data/validation/hero-stage4-upstream-direct.v1.json'
+      - 'data/validation/hero-basic-combat-stage4-5-summary.v1.json'
+      - 'data/validation/hero-stage4-a-boundary.v1.json'
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/configdata/ConfigDataJobInfo.json'
       - 'data/configdata/ConfigDataJobConnectionInfo.json'
@@ -60,9 +63,10 @@ on:
       - 'data/configdata/ConfigDataSPHeroInfo.json'
       - 'data/configdata/ConfigDataMissionExtSPHeroInfo.json'
       - 'data/configdata/ConfigDataMissionInfo.json'
+      - '.github/workflows/hero-stage3-validation.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   validate-hero-stage3:
@@ -72,11 +76,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run final stage 3 automatic validation
-        run: node scripts/validate_hero_stage3_final.cjs
+      - name: Revalidate frozen Hero Stage 3 against current direct JSON
+        run: node scripts/validate_hero_stage3_direct.cjs
 
-  rebuild-hero-stage4-through-45:
-    if: github.event_name != 'pull_request'
+  validate-hero-stage4:
     needs: validate-hero-stage3
     runs-on: ubuntu-latest
     steps:
@@ -84,34 +87,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run stage 4-2 Hero to Job validation
-        run: npm run inspect:hero-jobs
-      - name: Run stage 4-3 job tree reconstruction
-        run: npm run inspect:hero-job-trees
-      - name: Run stage 4-4 skill acquisition reconstruction
-        run: npm run inspect:hero-skills
-      - name: Run stage 4-5 basic combat partial assembly
-        run: npm run inspect:hero-combat
-      - name: Investigate final hero display-stat inputs
-        run: npm run investigate:hero-display-stats
-      - name: Commit regenerated stage 4-2 through 4-5 outputs
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            data/generated/hero-job-links.v1.json \
-            data/generated/hero-job-trees.v1.json \
-            data/generated/hero-skill-acquisition.v1.json \
-            data/generated/hero-basic-combat.v1.json \
-            data/validation/hero-job-stage4-2-summary.v1.json \
-            data/validation/hero-job-tree-stage4-3-summary.v1.json \
-            data/validation/hero-skill-stage4-4-summary.v1.json \
-            data/validation/hero-basic-combat-stage4-5-summary.v1.json \
-            data/validation/hero-display-stat-investigation.v1.json
-          if git diff --cached --quiet; then
-            echo "No stage 4 output changes to commit."
-          else
-            git commit -m "rebuild hero stage 4 through 4-5 from restored ConfigData"
-            git push
-          fi
+      - name: Regress frozen Stage 4-3/4-4 against current direct JSON
+        run: node scripts/validate_hero_stage4_upstream_direct.cjs
+      - name: Generate Hero Stage 4-5 from current direct JSON
+        run: node scripts/prepare_hero_basic_combat_stage45.cjs
+      - name: Validate Hero Stage 4 final output
+        run: node scripts/validate_hero_stage4_final.cjs
+      - name: Recheck A-1/A-9 boundary
+        run: node scripts/validate_hero_stage4_a_boundary.cjs
