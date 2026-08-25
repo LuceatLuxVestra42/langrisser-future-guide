@@ -1,18 +1,184 @@
 {
   "version": 1,
-  "status": "REVIEW",
-  "purpose": "Measure rarity-like fields before assigning display labels.",
-  "source": "ConfigDataHeroInfo",
+  "status": "PASS",
+  "purpose": "Validated Hero rarity mapping for Stage 5-5-2 header display.",
+  "semantics": {
+    "acceptedRarityField": "ConfigDataHeroInfo.Rank",
+    "rankToRarity": {
+      "1": "N",
+      "2": "R",
+      "3": "SR",
+      "4": "SSR",
+      "6": "LLR"
+    },
+    "unusedObservedRankValues": [],
+    "unobservedRank5Meaning": "UNRESOLVED_AND_UNUSED",
+    "starField": "ConfigDataHeroInfo.Star",
+    "starMeaning": "initial/current base star count; not the rarity label",
+    "protagonistEvidence": "Matthew/Grenier/Almeda start at Rank=1, Star=1 and StarToRank promotes them through Rank 2/3/4 at higher stars, directly separating rarity Rank from star count.",
+    "llrEvidence": "Rank=6 contains exactly the six canonical LLR Heroes currently present in the dataset.",
+    "rejectedRaritySource": "ConfigDataHeroInfo.ExchangedFragmentCount",
+    "rejectedReason": "Duplicate-acquisition fragment quantity correlates with ordinary rarity but has distribution/event exceptions and is not the rarity enum."
+  },
   "canonicalHeroCount": 267,
   "mappedHeroCount": 267,
   "missingHeroIds": [],
   "duplicateHeroIds": [],
+  "unknownRankHeroIds": [],
+  "rankStarMismatches": [],
+  "llrValidation": {
+    "expectedHeroIds": [
+      99225,
+      99232,
+      99242,
+      99251,
+      99264,
+      99281
+    ],
+    "actualHeroIds": [
+      99225,
+      99232,
+      99242,
+      99251,
+      99264,
+      99281
+    ],
+    "exactMatch": true,
+    "heroes": [
+      {
+        "heroId": 99225,
+        "nameKr": "빙설 심연의 지배자",
+        "nameCn": "冰渊凌御者",
+        "nameEn": "SovereignOfIceAbyss",
+        "rank": 6,
+        "star": 3,
+        "rarity": "LLR"
+      },
+      {
+        "heroId": 99232,
+        "nameKr": "빛의 소환사",
+        "nameCn": "辉耀圣召使",
+        "nameEn": "Brightsummoner",
+        "rank": 6,
+        "star": 3,
+        "rarity": "LLR"
+      },
+      {
+        "heroId": 99242,
+        "nameKr": "염룡파멸자",
+        "nameCn": "炎龙破灭者",
+        "nameEn": "Dragonslayer",
+        "rank": 6,
+        "star": 3,
+        "rarity": "LLR"
+      },
+      {
+        "heroId": 99251,
+        "nameKr": "마안의 서큐버스",
+        "nameCn": "幽瞳幻惑使",
+        "nameEn": "Gazesuccubus",
+        "rank": 6,
+        "star": 3,
+        "rarity": "LLR"
+      },
+      {
+        "heroId": 99264,
+        "nameKr": "빛과 어둠의 반역자",
+        "nameCn": "辉黯逆命者",
+        "nameEn": "HeavenDefier",
+        "rank": 6,
+        "star": 3,
+        "rarity": "LLR"
+      },
+      {
+        "heroId": 99281,
+        "nameKr": "효랑어홍사",
+        "nameCn": "骁浪驭虹使",
+        "nameEn": "TidalVindicator",
+        "rank": 6,
+        "star": 3,
+        "rarity": "LLR"
+      }
+    ]
+  },
+  "protagonistProgression": [
+    {
+      "heroId": 1,
+      "nameKr": "매튜",
+      "initialRank": 1,
+      "initialStar": 1,
+      "starToRank": [
+        {
+          "Star": 2,
+          "Rank": 2,
+          "CharImageId": 10011
+        },
+        {
+          "Star": 4,
+          "Rank": 3,
+          "CharImageId": 10012
+        },
+        {
+          "Star": 6,
+          "Rank": 4,
+          "CharImageId": 10013
+        }
+      ]
+    },
+    {
+      "heroId": 3,
+      "nameKr": "그레니어",
+      "initialRank": 1,
+      "initialStar": 1,
+      "starToRank": [
+        {
+          "Star": 2,
+          "Rank": 2,
+          "CharImageId": 10031
+        },
+        {
+          "Star": 4,
+          "Rank": 3,
+          "CharImageId": 10032
+        },
+        {
+          "Star": 6,
+          "Rank": 4,
+          "CharImageId": 10033
+        }
+      ]
+    },
+    {
+      "heroId": 4,
+      "nameKr": "아멜다",
+      "initialRank": 1,
+      "initialStar": 1,
+      "starToRank": [
+        {
+          "Star": 2,
+          "Rank": 2,
+          "CharImageId": 10041
+        },
+        {
+          "Star": 4,
+          "Rank": 3,
+          "CharImageId": 10042
+        },
+        {
+          "Star": 6,
+          "Rank": 4,
+          "CharImageId": 10043
+        }
+      ]
+    }
+  ],
   "fields": {
     "Rank": {
       "presentCount": 267,
       "groups": [
         {
           "value": 1,
+          "rarity": "N",
           "heroCount": 3,
           "starDistribution": {
             "1": 3
@@ -27,6 +193,7 @@
               "nameCn": "马修",
               "nameEn": "Matthew",
               "star": 1,
+              "rarity": "N",
               "exchangedFragmentCount": 5
             },
             {
@@ -35,6 +202,7 @@
               "nameCn": "格尼尔",
               "nameEn": "Grenier",
               "star": 1,
+              "rarity": "N",
               "exchangedFragmentCount": 5
             },
             {
@@ -43,6 +211,7 @@
               "nameCn": "艾梅达",
               "nameEn": "Aimeeda",
               "star": 1,
+              "rarity": "N",
               "exchangedFragmentCount": 5
             }
           ],
@@ -59,6 +228,7 @@
         },
         {
           "value": 2,
+          "rarity": "R",
           "heroCount": 12,
           "starDistribution": {
             "2": 12
@@ -73,6 +243,7 @@
               "nameCn": "利斯塔",
               "nameEn": "Lester",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -81,6 +252,7 @@
               "nameCn": "杰西卡",
               "nameEn": "Jessica",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -89,6 +261,7 @@
               "nameCn": "洛加",
               "nameEn": "Rouga",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -97,6 +270,7 @@
               "nameCn": "斯科特",
               "nameEn": "Scott",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -105,6 +279,7 @@
               "nameCn": "路因",
               "nameEn": "Rune",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -113,6 +288,7 @@
               "nameCn": "皮耶鲁",
               "nameEn": "Pieru",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -121,6 +297,7 @@
               "nameCn": "迪欧斯",
               "nameEn": "Diors",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -129,6 +306,7 @@
               "nameCn": "安娜",
               "nameEn": "Anna",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -137,6 +315,7 @@
               "nameCn": "利亚特",
               "nameEn": "Lyatt",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -145,6 +324,7 @@
               "nameCn": "基斯",
               "nameEn": "Keith",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -153,6 +333,7 @@
               "nameCn": "蕾蒂西亚",
               "nameEn": "Leticia",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -161,6 +342,7 @@
               "nameCn": "阿伦",
               "nameEn": "Aaron",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             }
           ],
@@ -195,6 +377,7 @@
         },
         {
           "value": 3,
+          "rarity": "SR",
           "heroCount": 33,
           "starDistribution": {
             "2": 33
@@ -211,6 +394,7 @@
               "nameCn": "克丽丝",
               "nameEn": "Chris",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -219,6 +403,7 @@
               "nameCn": "娜姆",
               "nameEn": "Nurm",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -227,6 +412,7 @@
               "nameCn": "海恩",
               "nameEn": "Hein",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -235,6 +421,7 @@
               "nameCn": "兰斯",
               "nameEn": "Lance",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -243,6 +430,7 @@
               "nameCn": "埃格贝尔特",
               "nameEn": "Eggbert",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -251,6 +439,7 @@
               "nameCn": "伊梅尔达",
               "nameEn": "Imelda",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -259,6 +448,7 @@
               "nameCn": "索尼娅",
               "nameEn": "Sonia",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -267,6 +457,7 @@
               "nameCn": "巴尔加斯",
               "nameEn": "Vargas",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -275,6 +466,7 @@
               "nameCn": "莉法妮",
               "nameEn": "Leafani",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -283,6 +475,7 @@
               "nameCn": "索菲亚",
               "nameEn": "Sofia",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -291,6 +484,7 @@
               "nameCn": "艾马林克",
               "nameEn": "EmmaLink",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -299,6 +493,7 @@
               "nameCn": "芙蕾雅",
               "nameEn": "Freya",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -307,6 +502,7 @@
               "nameCn": "雾风",
               "nameEn": "Kirikaze",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -315,6 +511,7 @@
               "nameCn": "安杰丽卡",
               "nameEn": "Angelica",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -323,6 +520,7 @@
               "nameCn": "银狼",
               "nameEn": "SilverWolf",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -331,6 +529,7 @@
               "nameCn": "弗拉基亚",
               "nameEn": "Flakia",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -339,6 +538,7 @@
               "nameCn": "法娜",
               "nameEn": "Fana",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -347,6 +547,7 @@
               "nameCn": "塞蕾娜",
               "nameEn": "Serena",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -355,6 +556,7 @@
               "nameCn": "阿尔弗雷德",
               "nameEn": "Alfred",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -363,6 +565,7 @@
               "nameCn": "奥利维尔",
               "nameEn": "Olivier",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             }
           ],
@@ -439,6 +642,7 @@
         },
         {
           "value": 4,
+          "rarity": "SSR",
           "heroCount": 213,
           "starDistribution": {
             "3": 213
@@ -453,6 +657,7 @@
               "nameCn": "利昂",
               "nameEn": "Leon",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -461,6 +666,7 @@
               "nameCn": "巴恩哈特",
               "nameEn": "Bernhardt",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -469,6 +675,7 @@
               "nameCn": "拉娜",
               "nameEn": "Lana",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -477,6 +684,7 @@
               "nameCn": "波赞鲁",
               "nameEn": "Bozel",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -485,6 +693,7 @@
               "nameCn": "雷丁",
               "nameEn": "Ledyn",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -493,6 +702,7 @@
               "nameCn": "艾尔文",
               "nameEn": "Elwin",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -501,6 +711,7 @@
               "nameCn": "雪莉",
               "nameEn": "Sherry",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -509,6 +720,7 @@
               "nameCn": "莉亚娜",
               "nameEn": "Riana",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -517,6 +729,7 @@
               "nameCn": "亚鲁特缪拉",
               "nameEn": "Alutemurat",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -525,6 +738,7 @@
               "nameCn": "露娜",
               "nameEn": "Luna",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -533,6 +747,7 @@
               "nameCn": "迪哈尔特",
               "nameEn": "Dehault",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -541,6 +756,7 @@
               "nameCn": "泽瑞达",
               "nameEn": "Zalrahda",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -549,6 +765,7 @@
               "nameCn": "蒂亚莉丝",
               "nameEn": "Tialice",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -557,6 +774,7 @@
               "nameCn": "古巨拉",
               "nameEn": "Zillagod",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -565,6 +783,7 @@
               "nameCn": "杰利奥鲁&蕾拉",
               "nameEn": "Jellioru&Lela",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -573,6 +792,7 @@
               "nameCn": "雪露法妮尔",
               "nameEn": "Schelfaniel",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -581,6 +801,7 @@
               "nameCn": "安洁丽娜",
               "nameEn": "Angelina",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -589,6 +810,7 @@
               "nameCn": "兰芳特",
               "nameEn": "Ranford",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -597,6 +819,7 @@
               "nameCn": "妮丝蒂尔",
               "nameEn": "Listell",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -605,6 +828,7 @@
               "nameCn": "兰迪乌斯",
               "nameEn": "Landius",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             }
           ],
@@ -1041,6 +1265,7 @@
         },
         {
           "value": 6,
+          "rarity": "LLR",
           "heroCount": 6,
           "starDistribution": {
             "3": 6
@@ -1055,6 +1280,7 @@
               "nameCn": "冰渊凌御者",
               "nameEn": "SovereignOfIceAbyss",
               "star": 3,
+              "rarity": "LLR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1063,6 +1289,7 @@
               "nameCn": "辉耀圣召使",
               "nameEn": "Brightsummoner",
               "star": 3,
+              "rarity": "LLR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1071,6 +1298,7 @@
               "nameCn": "炎龙破灭者",
               "nameEn": "Dragonslayer",
               "star": 3,
+              "rarity": "LLR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1079,6 +1307,7 @@
               "nameCn": "幽瞳幻惑使",
               "nameEn": "Gazesuccubus",
               "star": 3,
+              "rarity": "LLR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1087,6 +1316,7 @@
               "nameCn": "辉黯逆命者",
               "nameEn": "HeavenDefier",
               "star": 3,
+              "rarity": "LLR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1095,6 +1325,7 @@
               "nameCn": "骁浪驭虹使",
               "nameEn": "TidalVindicator",
               "star": 3,
+              "rarity": "LLR",
               "exchangedFragmentCount": 50
             }
           ],
@@ -1122,6 +1353,7 @@
       "groups": [
         {
           "value": 1,
+          "rarity": null,
           "heroCount": 3,
           "starDistribution": {
             "1": 3
@@ -1136,6 +1368,7 @@
               "nameCn": "马修",
               "nameEn": "Matthew",
               "star": 1,
+              "rarity": "N",
               "exchangedFragmentCount": 5
             },
             {
@@ -1144,6 +1377,7 @@
               "nameCn": "格尼尔",
               "nameEn": "Grenier",
               "star": 1,
+              "rarity": "N",
               "exchangedFragmentCount": 5
             },
             {
@@ -1152,6 +1386,7 @@
               "nameCn": "艾梅达",
               "nameEn": "Aimeeda",
               "star": 1,
+              "rarity": "N",
               "exchangedFragmentCount": 5
             }
           ],
@@ -1168,6 +1403,7 @@
         },
         {
           "value": 2,
+          "rarity": null,
           "heroCount": 45,
           "starDistribution": {
             "2": 45
@@ -1185,6 +1421,7 @@
               "nameCn": "克丽丝",
               "nameEn": "Chris",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1193,6 +1430,7 @@
               "nameCn": "娜姆",
               "nameEn": "Nurm",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1201,6 +1439,7 @@
               "nameCn": "海恩",
               "nameEn": "Hein",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1209,6 +1448,7 @@
               "nameCn": "兰斯",
               "nameEn": "Lance",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1217,6 +1457,7 @@
               "nameCn": "埃格贝尔特",
               "nameEn": "Eggbert",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1225,6 +1466,7 @@
               "nameCn": "伊梅尔达",
               "nameEn": "Imelda",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1233,6 +1475,7 @@
               "nameCn": "利斯塔",
               "nameEn": "Lester",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -1241,6 +1484,7 @@
               "nameCn": "索尼娅",
               "nameEn": "Sonia",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1249,6 +1493,7 @@
               "nameCn": "巴尔加斯",
               "nameEn": "Vargas",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1257,6 +1502,7 @@
               "nameCn": "杰西卡",
               "nameEn": "Jessica",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -1265,6 +1511,7 @@
               "nameCn": "洛加",
               "nameEn": "Rouga",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -1273,6 +1520,7 @@
               "nameCn": "斯科特",
               "nameEn": "Scott",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -1281,6 +1529,7 @@
               "nameCn": "莉法妮",
               "nameEn": "Leafani",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1289,6 +1538,7 @@
               "nameCn": "索菲亚",
               "nameEn": "Sofia",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1297,6 +1547,7 @@
               "nameCn": "艾马林克",
               "nameEn": "EmmaLink",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1305,6 +1556,7 @@
               "nameCn": "芙蕾雅",
               "nameEn": "Freya",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1313,6 +1565,7 @@
               "nameCn": "雾风",
               "nameEn": "Kirikaze",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1321,6 +1574,7 @@
               "nameCn": "安杰丽卡",
               "nameEn": "Angelica",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1329,6 +1583,7 @@
               "nameCn": "银狼",
               "nameEn": "SilverWolf",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -1337,6 +1592,7 @@
               "nameCn": "弗拉基亚",
               "nameEn": "Flakia",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             }
           ],
@@ -1437,6 +1693,7 @@
         },
         {
           "value": 3,
+          "rarity": null,
           "heroCount": 219,
           "starDistribution": {
             "3": 219
@@ -1451,6 +1708,7 @@
               "nameCn": "利昂",
               "nameEn": "Leon",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1459,6 +1717,7 @@
               "nameCn": "巴恩哈特",
               "nameEn": "Bernhardt",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1467,6 +1726,7 @@
               "nameCn": "拉娜",
               "nameEn": "Lana",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1475,6 +1735,7 @@
               "nameCn": "波赞鲁",
               "nameEn": "Bozel",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1483,6 +1744,7 @@
               "nameCn": "雷丁",
               "nameEn": "Ledyn",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1491,6 +1753,7 @@
               "nameCn": "艾尔文",
               "nameEn": "Elwin",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1499,6 +1762,7 @@
               "nameCn": "雪莉",
               "nameEn": "Sherry",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1507,6 +1771,7 @@
               "nameCn": "莉亚娜",
               "nameEn": "Riana",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1515,6 +1780,7 @@
               "nameCn": "亚鲁特缪拉",
               "nameEn": "Alutemurat",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1523,6 +1789,7 @@
               "nameCn": "露娜",
               "nameEn": "Luna",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1531,6 +1798,7 @@
               "nameCn": "迪哈尔特",
               "nameEn": "Dehault",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1539,6 +1807,7 @@
               "nameCn": "泽瑞达",
               "nameEn": "Zalrahda",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1547,6 +1816,7 @@
               "nameCn": "蒂亚莉丝",
               "nameEn": "Tialice",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1555,6 +1825,7 @@
               "nameCn": "古巨拉",
               "nameEn": "Zillagod",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1563,6 +1834,7 @@
               "nameCn": "杰利奥鲁&蕾拉",
               "nameEn": "Jellioru&Lela",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1571,6 +1843,7 @@
               "nameCn": "雪露法妮尔",
               "nameEn": "Schelfaniel",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1579,6 +1852,7 @@
               "nameCn": "安洁丽娜",
               "nameEn": "Angelina",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1587,6 +1861,7 @@
               "nameCn": "兰芳特",
               "nameEn": "Ranford",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1595,6 +1870,7 @@
               "nameCn": "妮丝蒂尔",
               "nameEn": "Listell",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -1603,6 +1879,7 @@
               "nameCn": "兰迪乌斯",
               "nameEn": "Landius",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             }
           ],
@@ -2052,10 +2329,11 @@
       ]
     },
     "ExchangedFragmentCount": {
-      "note": "Previously rejected as rarity source; included only for cross-check.",
+      "note": "Rejected as rarity source; retained only as a diagnostic cross-check.",
       "groups": [
         {
           "value": 5,
+          "rarity": null,
           "heroCount": 15,
           "starDistribution": {
             "1": 3,
@@ -2071,6 +2349,7 @@
               "nameCn": "马修",
               "nameEn": "Matthew",
               "star": 1,
+              "rarity": "N",
               "exchangedFragmentCount": 5
             },
             {
@@ -2079,6 +2358,7 @@
               "nameCn": "格尼尔",
               "nameEn": "Grenier",
               "star": 1,
+              "rarity": "N",
               "exchangedFragmentCount": 5
             },
             {
@@ -2087,6 +2367,7 @@
               "nameCn": "艾梅达",
               "nameEn": "Aimeeda",
               "star": 1,
+              "rarity": "N",
               "exchangedFragmentCount": 5
             },
             {
@@ -2095,6 +2376,7 @@
               "nameCn": "利斯塔",
               "nameEn": "Lester",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -2103,6 +2385,7 @@
               "nameCn": "杰西卡",
               "nameEn": "Jessica",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -2111,6 +2394,7 @@
               "nameCn": "洛加",
               "nameEn": "Rouga",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -2119,6 +2403,7 @@
               "nameCn": "斯科特",
               "nameEn": "Scott",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -2127,6 +2412,7 @@
               "nameCn": "路因",
               "nameEn": "Rune",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -2135,6 +2421,7 @@
               "nameCn": "皮耶鲁",
               "nameEn": "Pieru",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -2143,6 +2430,7 @@
               "nameCn": "迪欧斯",
               "nameEn": "Diors",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -2151,6 +2439,7 @@
               "nameCn": "安娜",
               "nameEn": "Anna",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -2159,6 +2448,7 @@
               "nameCn": "利亚特",
               "nameEn": "Lyatt",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -2167,6 +2457,7 @@
               "nameCn": "基斯",
               "nameEn": "Keith",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -2175,6 +2466,7 @@
               "nameCn": "蕾蒂西亚",
               "nameEn": "Leticia",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             },
             {
@@ -2183,6 +2475,7 @@
               "nameCn": "阿伦",
               "nameEn": "Aaron",
               "star": 2,
+              "rarity": "R",
               "exchangedFragmentCount": 5
             }
           ],
@@ -2223,6 +2516,7 @@
         },
         {
           "value": 20,
+          "rarity": null,
           "heroCount": 31,
           "starDistribution": {
             "2": 31
@@ -2237,6 +2531,7 @@
               "nameCn": "克丽丝",
               "nameEn": "Chris",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2245,6 +2540,7 @@
               "nameCn": "娜姆",
               "nameEn": "Nurm",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2253,6 +2549,7 @@
               "nameCn": "海恩",
               "nameEn": "Hein",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2261,6 +2558,7 @@
               "nameCn": "兰斯",
               "nameEn": "Lance",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2269,6 +2567,7 @@
               "nameCn": "埃格贝尔特",
               "nameEn": "Eggbert",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2277,6 +2576,7 @@
               "nameCn": "伊梅尔达",
               "nameEn": "Imelda",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2285,6 +2585,7 @@
               "nameCn": "索尼娅",
               "nameEn": "Sonia",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2293,6 +2594,7 @@
               "nameCn": "巴尔加斯",
               "nameEn": "Vargas",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2301,6 +2603,7 @@
               "nameCn": "莉法妮",
               "nameEn": "Leafani",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2309,6 +2612,7 @@
               "nameCn": "索菲亚",
               "nameEn": "Sofia",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2317,6 +2621,7 @@
               "nameCn": "艾马林克",
               "nameEn": "EmmaLink",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2325,6 +2630,7 @@
               "nameCn": "芙蕾雅",
               "nameEn": "Freya",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2333,6 +2639,7 @@
               "nameCn": "雾风",
               "nameEn": "Kirikaze",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2341,6 +2648,7 @@
               "nameCn": "安杰丽卡",
               "nameEn": "Angelica",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2349,6 +2657,7 @@
               "nameCn": "银狼",
               "nameEn": "SilverWolf",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2357,6 +2666,7 @@
               "nameCn": "弗拉基亚",
               "nameEn": "Flakia",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2365,6 +2675,7 @@
               "nameCn": "法娜",
               "nameEn": "Fana",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2373,6 +2684,7 @@
               "nameCn": "塞蕾娜",
               "nameEn": "Serena",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2381,6 +2693,7 @@
               "nameCn": "阿尔弗雷德",
               "nameEn": "Alfred",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             },
             {
@@ -2389,6 +2702,7 @@
               "nameCn": "奥利维尔",
               "nameEn": "Olivier",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 20
             }
           ],
@@ -2461,6 +2775,7 @@
         },
         {
           "value": 30,
+          "rarity": null,
           "heroCount": 1,
           "starDistribution": {
             "2": 1
@@ -2475,6 +2790,7 @@
               "nameCn": "剑部武一郎",
               "nameEn": "Shibaraku",
               "star": 2,
+              "rarity": "SR",
               "exchangedFragmentCount": 30
             }
           ],
@@ -2487,6 +2803,7 @@
         },
         {
           "value": 50,
+          "rarity": null,
           "heroCount": 220,
           "starDistribution": {
             "2": 1,
@@ -2502,6 +2819,7 @@
               "nameCn": "利昂",
               "nameEn": "Leon",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2510,6 +2828,7 @@
               "nameCn": "巴恩哈特",
               "nameEn": "Bernhardt",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2518,6 +2837,7 @@
               "nameCn": "拉娜",
               "nameEn": "Lana",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2526,6 +2846,7 @@
               "nameCn": "波赞鲁",
               "nameEn": "Bozel",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2534,6 +2855,7 @@
               "nameCn": "雷丁",
               "nameEn": "Ledyn",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2542,6 +2864,7 @@
               "nameCn": "艾尔文",
               "nameEn": "Elwin",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2550,6 +2873,7 @@
               "nameCn": "雪莉",
               "nameEn": "Sherry",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2558,6 +2882,7 @@
               "nameCn": "莉亚娜",
               "nameEn": "Riana",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2566,6 +2891,7 @@
               "nameCn": "亚鲁特缪拉",
               "nameEn": "Alutemurat",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2574,6 +2900,7 @@
               "nameCn": "露娜",
               "nameEn": "Luna",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2582,6 +2909,7 @@
               "nameCn": "迪哈尔特",
               "nameEn": "Dehault",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2590,6 +2918,7 @@
               "nameCn": "泽瑞达",
               "nameEn": "Zalrahda",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2598,6 +2927,7 @@
               "nameCn": "蒂亚莉丝",
               "nameEn": "Tialice",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2606,6 +2936,7 @@
               "nameCn": "古巨拉",
               "nameEn": "Zillagod",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2614,6 +2945,7 @@
               "nameCn": "杰利奥鲁&蕾拉",
               "nameEn": "Jellioru&Lela",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2622,6 +2954,7 @@
               "nameCn": "雪露法妮尔",
               "nameEn": "Schelfaniel",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2630,6 +2963,7 @@
               "nameCn": "安洁丽娜",
               "nameEn": "Angelina",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2638,6 +2972,7 @@
               "nameCn": "兰芳特",
               "nameEn": "Ranford",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2646,6 +2981,7 @@
               "nameCn": "妮丝蒂尔",
               "nameEn": "Listell",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             },
             {
@@ -2654,6 +2990,7 @@
               "nameCn": "兰迪乌斯",
               "nameEn": "Landius",
               "star": 3,
+              "rarity": "SSR",
               "exchangedFragmentCount": 50
             }
           ],
@@ -3112,15 +3449,15 @@
     "rank=2|star=2": 12,
     "rank=6|star=3": 6
   },
-  "anchors": [
+  "heroes": [
     {
       "heroId": 1,
       "nameKr": "매튜",
       "nameCn": "马修",
       "nameEn": "Matthew",
       "rank": 1,
-      "star": 1,
-      "exchangedFragmentCount": 5
+      "rarity": "N",
+      "star": 1
     },
     {
       "heroId": 3,
@@ -3128,8 +3465,8 @@
       "nameCn": "格尼尔",
       "nameEn": "Grenier",
       "rank": 1,
-      "star": 1,
-      "exchangedFragmentCount": 5
+      "rarity": "N",
+      "star": 1
     },
     {
       "heroId": 4,
@@ -3137,8 +3474,8 @@
       "nameCn": "艾梅达",
       "nameEn": "Aimeeda",
       "rank": 1,
-      "star": 1,
-      "exchangedFragmentCount": 5
+      "rarity": "N",
+      "star": 1
     },
     {
       "heroId": 5,
@@ -3146,8 +3483,8 @@
       "nameCn": "克丽丝",
       "nameEn": "Chris",
       "rank": 3,
-      "star": 2,
-      "exchangedFragmentCount": 20
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 6,
@@ -3155,8 +3492,35 @@
       "nameCn": "利昂",
       "nameEn": "Leon",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 7,
+      "nameKr": "베른하르트",
+      "nameCn": "巴恩哈特",
+      "nameEn": "Bernhardt",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 8,
+      "nameKr": "라나",
+      "nameCn": "拉娜",
+      "nameEn": "Lana",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 9,
+      "nameKr": "보젤",
+      "nameCn": "波赞鲁",
+      "nameEn": "Bozel",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 10,
@@ -3164,8 +3528,134 @@
       "nameCn": "雷丁",
       "nameEn": "Ledyn",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 11,
+      "nameKr": "나암",
+      "nameCn": "娜姆",
+      "nameEn": "Nurm",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 12,
+      "nameKr": "엘윈",
+      "nameCn": "艾尔文",
+      "nameEn": "Elwin",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 13,
+      "nameKr": "헤인",
+      "nameCn": "海恩",
+      "nameEn": "Hein",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 14,
+      "nameKr": "쉐리",
+      "nameCn": "雪莉",
+      "nameEn": "Sherry",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 15,
+      "nameKr": "리아나",
+      "nameCn": "莉亚娜",
+      "nameEn": "Riana",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 16,
+      "nameKr": "란스",
+      "nameCn": "兰斯",
+      "nameEn": "Lance",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 17,
+      "nameKr": "에그베르트",
+      "nameCn": "埃格贝尔特",
+      "nameEn": "Eggbert",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 18,
+      "nameKr": "이멜다",
+      "nameCn": "伊梅尔达",
+      "nameEn": "Imelda",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 19,
+      "nameKr": "레스터",
+      "nameCn": "利斯塔",
+      "nameEn": "Lester",
+      "rank": 2,
+      "rarity": "R",
+      "star": 2
+    },
+    {
+      "heroId": 20,
+      "nameKr": "소니아",
+      "nameCn": "索尼娅",
+      "nameEn": "Sonia",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 21,
+      "nameKr": "발가스",
+      "nameCn": "巴尔加斯",
+      "nameEn": "Vargas",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 22,
+      "nameKr": "제시카",
+      "nameCn": "杰西卡",
+      "nameEn": "Jessica",
+      "rank": 2,
+      "rarity": "R",
+      "star": 2
+    },
+    {
+      "heroId": 23,
+      "nameKr": "로우가",
+      "nameCn": "洛加",
+      "nameEn": "Rouga",
+      "rank": 2,
+      "rarity": "R",
+      "star": 2
+    },
+    {
+      "heroId": 24,
+      "nameKr": "스코트",
+      "nameCn": "斯科特",
+      "nameEn": "Scott",
+      "rank": 2,
+      "rarity": "R",
+      "star": 2
     },
     {
       "heroId": 25,
@@ -3173,8 +3663,53 @@
       "nameCn": "亚鲁特缪拉",
       "nameEn": "Alutemurat",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 26,
+      "nameKr": "루나",
+      "nameCn": "露娜",
+      "nameEn": "Luna",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 27,
+      "nameKr": "디하르트",
+      "nameCn": "迪哈尔特",
+      "nameEn": "Dehault",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 28,
+      "nameKr": "젤다",
+      "nameCn": "泽瑞达",
+      "nameEn": "Zalrahda",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 29,
+      "nameKr": "티아리스",
+      "nameCn": "蒂亚莉丝",
+      "nameEn": "Tialice",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 30,
+      "nameKr": "리파니",
+      "nameCn": "莉法妮",
+      "nameEn": "Leafani",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 31,
@@ -3182,8 +3717,8 @@
       "nameCn": "索菲亚",
       "nameEn": "Sofia",
       "rank": 3,
-      "star": 2,
-      "exchangedFragmentCount": 20
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 32,
@@ -3191,8 +3726,8 @@
       "nameCn": "艾马林克",
       "nameEn": "EmmaLink",
       "rank": 3,
-      "star": 2,
-      "exchangedFragmentCount": 20
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 33,
@@ -3200,8 +3735,8 @@
       "nameCn": "芙蕾雅",
       "nameEn": "Freya",
       "rank": 3,
-      "star": 2,
-      "exchangedFragmentCount": 20
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 34,
@@ -3209,8 +3744,8 @@
       "nameCn": "雾风",
       "nameEn": "Kirikaze",
       "rank": 3,
-      "star": 2,
-      "exchangedFragmentCount": 20
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 35,
@@ -3218,8 +3753,8 @@
       "nameCn": "安杰丽卡",
       "nameEn": "Angelica",
       "rank": 3,
-      "star": 2,
-      "exchangedFragmentCount": 20
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 36,
@@ -3227,8 +3762,8 @@
       "nameCn": "银狼",
       "nameEn": "SilverWolf",
       "rank": 3,
-      "star": 2,
-      "exchangedFragmentCount": 20
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 37,
@@ -3236,8 +3771,8 @@
       "nameCn": "古巨拉",
       "nameEn": "Zillagod",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 38,
@@ -3245,8 +3780,8 @@
       "nameCn": "杰利奥鲁&蕾拉",
       "nameEn": "Jellioru&Lela",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 39,
@@ -3254,8 +3789,8 @@
       "nameCn": "弗拉基亚",
       "nameEn": "Flakia",
       "rank": 3,
-      "star": 2,
-      "exchangedFragmentCount": 20
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 40,
@@ -3263,8 +3798,8 @@
       "nameCn": "路因",
       "nameEn": "Rune",
       "rank": 2,
-      "star": 2,
-      "exchangedFragmentCount": 5
+      "rarity": "R",
+      "star": 2
     },
     {
       "heroId": 41,
@@ -3272,8 +3807,8 @@
       "nameCn": "皮耶鲁",
       "nameEn": "Pieru",
       "rank": 2,
-      "star": 2,
-      "exchangedFragmentCount": 5
+      "rarity": "R",
+      "star": 2
     },
     {
       "heroId": 42,
@@ -3281,8 +3816,8 @@
       "nameCn": "迪欧斯",
       "nameEn": "Diors",
       "rank": 2,
-      "star": 2,
-      "exchangedFragmentCount": 5
+      "rarity": "R",
+      "star": 2
     },
     {
       "heroId": 43,
@@ -3290,8 +3825,8 @@
       "nameCn": "安娜",
       "nameEn": "Anna",
       "rank": 2,
-      "star": 2,
-      "exchangedFragmentCount": 5
+      "rarity": "R",
+      "star": 2
     },
     {
       "heroId": 44,
@@ -3299,8 +3834,8 @@
       "nameCn": "利亚特",
       "nameEn": "Lyatt",
       "rank": 2,
-      "star": 2,
-      "exchangedFragmentCount": 5
+      "rarity": "R",
+      "star": 2
     },
     {
       "heroId": 45,
@@ -3308,8 +3843,8 @@
       "nameCn": "基斯",
       "nameEn": "Keith",
       "rank": 2,
-      "star": 2,
-      "exchangedFragmentCount": 5
+      "rarity": "R",
+      "star": 2
     },
     {
       "heroId": 47,
@@ -3317,8 +3852,8 @@
       "nameCn": "蕾蒂西亚",
       "nameEn": "Leticia",
       "rank": 2,
-      "star": 2,
-      "exchangedFragmentCount": 5
+      "rarity": "R",
+      "star": 2
     },
     {
       "heroId": 48,
@@ -3326,8 +3861,8 @@
       "nameCn": "阿伦",
       "nameEn": "Aaron",
       "rank": 2,
-      "star": 2,
-      "exchangedFragmentCount": 5
+      "rarity": "R",
+      "star": 2
     },
     {
       "heroId": 49,
@@ -3335,8 +3870,8 @@
       "nameCn": "法娜",
       "nameEn": "Fana",
       "rank": 3,
-      "star": 2,
-      "exchangedFragmentCount": 20
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 51,
@@ -3344,8 +3879,80 @@
       "nameCn": "雪露法妮尔",
       "nameEn": "Schelfaniel",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 52,
+      "nameKr": "안젤리나",
+      "nameCn": "安洁丽娜",
+      "nameEn": "Angelina",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 53,
+      "nameKr": "란포드",
+      "nameCn": "兰芳特",
+      "nameEn": "Ranford",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 54,
+      "nameKr": "리스틸",
+      "nameCn": "妮丝蒂尔",
+      "nameEn": "Listell",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 55,
+      "nameKr": "란디우스",
+      "nameCn": "兰迪乌斯",
+      "nameEn": "Landius",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 56,
+      "nameKr": "레이첼",
+      "nameCn": "蕾伽尔",
+      "nameEn": "Rachel",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 57,
+      "nameKr": "윌러",
+      "nameCn": "威拉",
+      "nameEn": "Wiler",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 58,
+      "nameKr": "세레나",
+      "nameCn": "塞蕾娜",
+      "nameEn": "Serena",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 59,
+      "nameKr": "기자로프",
+      "nameCn": "基扎洛夫",
+      "nameEn": "Gizlof",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 60,
@@ -3353,8 +3960,71 @@
       "nameCn": "西格玛",
       "nameEn": "Sigma",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 61,
+      "nameKr": "람다",
+      "nameCn": "拉姆达",
+      "nameEn": "Lambda",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 62,
+      "nameKr": "알프레드",
+      "nameCn": "阿尔弗雷德",
+      "nameEn": "Alfred",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 63,
+      "nameKr": "레인폴스",
+      "nameCn": "雷因法鲁斯",
+      "nameEn": "Lainforce",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 64,
+      "nameKr": "브렌다",
+      "nameCn": "布琳达",
+      "nameEn": "Brenda",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 65,
+      "nameKr": "비라쥬",
+      "nameCn": "维拉玖",
+      "nameEn": "Virash",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 66,
+      "nameKr": "클라렛",
+      "nameCn": "克拉蕾特",
+      "nameEn": "Clarett",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 67,
+      "nameKr": "오메가",
+      "nameCn": "欧米伽",
+      "nameEn": "Omega",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 69,
@@ -3362,8 +4032,89 @@
       "nameCn": "艾丝蒂尔",
       "nameEn": "Estelle",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 70,
+      "nameKr": "요슈아",
+      "nameCn": "约修亚",
+      "nameEn": "Joshua",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 71,
+      "nameKr": "렌",
+      "nameCn": "玲",
+      "nameEn": "Renne",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 72,
+      "nameKr": "레온하르트",
+      "nameCn": "莱恩哈特",
+      "nameEn": "Leonhardt",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 73,
+      "nameKr": "올리비에",
+      "nameCn": "奥利维尔",
+      "nameEn": "Olivier",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 74,
+      "nameKr": "클로제",
+      "nameCn": "科洛丝",
+      "nameEn": "Klose",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 75,
+      "nameKr": "디드리트",
+      "nameCn": "蒂德莉特",
+      "nameEn": "Deedlit",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 76,
+      "nameKr": "아슈람",
+      "nameCn": "亚修拉姆",
+      "nameEn": "Ashram",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 77,
+      "nameKr": "판",
+      "nameCn": "帕恩",
+      "nameEn": "Parn",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 78,
+      "nameKr": "필로테스",
+      "nameCn": "比萝蒂丝",
+      "nameEn": "Pirotess",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 79,
@@ -3371,8 +4122,116 @@
       "nameCn": "真宫寺樱",
       "nameEn": "SakuraShinguji",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 80,
+      "nameKr": "칸자키 스미레",
+      "nameCn": "神崎堇",
+      "nameEn": "SumireKanzaki",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 81,
+      "nameKr": "아이리스",
+      "nameCn": "爱丽丝",
+      "nameEn": "Iris",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 82,
+      "nameKr": "우라메시 유스케",
+      "nameCn": "浦饭幽助",
+      "nameEn": "Yusuke",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 83,
+      "nameKr": "히에이",
+      "nameCn": "飞影",
+      "nameEn": "Hiei",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 84,
+      "nameKr": "쿠라마",
+      "nameCn": "藏马",
+      "nameEn": "Kurama",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 85,
+      "nameKr": "도구로 형제",
+      "nameCn": "户愚吕兄弟",
+      "nameEn": "Toguro",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 86,
+      "nameKr": "쿠와바라 카즈마",
+      "nameCn": "桑原和真",
+      "nameEn": "Kazuma",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 87,
+      "nameKr": "베티",
+      "nameCn": "贝蒂",
+      "nameEn": "Betty",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 88,
+      "nameKr": "엘라스타",
+      "nameCn": "艾拉斯卓",
+      "nameEn": "Alustriel",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 89,
+      "nameKr": "유리아",
+      "nameCn": "尤利娅",
+      "nameEn": "Yulia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 91,
+      "nameKr": "에밀리아",
+      "nameCn": "艾米莉亚",
+      "nameEn": "Emilia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 92,
+      "nameKr": "환생 제시카",
+      "nameCn": "女神化身",
+      "nameEn": "Prime Jessica",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 93,
@@ -3380,8 +4239,143 @@
       "nameCn": "谜之骑士",
       "nameEn": "MysteryKnight",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 94,
+      "nameKr": "아카야",
+      "nameCn": "阿卡娅",
+      "nameEn": "Aka",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 95,
+      "nameKr": "올리버",
+      "nameCn": "奥利佛",
+      "nameEn": "Olivo",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 96,
+      "nameKr": "멜파니",
+      "nameCn": "梅露帕妮",
+      "nameEn": "Meropeni",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 97,
+      "nameKr": "일루시아",
+      "nameCn": "伊露希亚",
+      "nameEn": "Elucia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 98,
+      "nameKr": "빈센트",
+      "nameCn": "文森特",
+      "nameEn": "Vincent",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99,
+      "nameKr": "클로테르",
+      "nameCn": "克洛泰尔",
+      "nameEn": "Clotaire",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 100,
+      "nameKr": "로젠실",
+      "nameCn": "罗泽希尔",
+      "nameEn": "Rozenciel",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 101,
+      "nameKr": "헬레나",
+      "nameCn": "海伦娜",
+      "nameEn": "Helena",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 102,
+      "nameKr": "세계수의 현자",
+      "nameCn": "树之贤者",
+      "nameEn": "MagusOfTheTree",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 103,
+      "nameKr": "실린카",
+      "nameCn": "希琳卡",
+      "nameEn": "Sirink",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 104,
+      "nameKr": "알파",
+      "nameCn": "阿尔法",
+      "nameEn": "Alpha",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 105,
+      "nameKr": "뮤",
+      "nameCn": "茉",
+      "nameEn": "Mu",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 106,
+      "nameKr": "입실론",
+      "nameCn": "伊普西龙",
+      "nameEn": "Epsilon",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 108,
+      "nameKr": "사신 크루거",
+      "nameCn": "邪神库鲁加",
+      "nameEn": "KreugerTheWicked",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 109,
+      "nameKr": "화이트 시시",
+      "nameCn": "怀特·茜茜",
+      "nameEn": "SissiWhite",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 110,
@@ -3389,8 +4383,170 @@
       "nameCn": "阿雷斯",
       "nameEn": "Ares",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 111,
+      "nameKr": "마이야",
+      "nameCn": "梅雅",
+      "nameEn": "Maiya",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 112,
+      "nameKr": "토와",
+      "nameCn": "托娃",
+      "nameEn": "Towa",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 113,
+      "nameKr": "탄생의 빛",
+      "nameCn": "降生之光",
+      "nameEn": "LightOfGenesis",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 114,
+      "nameKr": "마리엘",
+      "nameCn": "玛丽埃尔",
+      "nameEn": "Mariel",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 115,
+      "nameKr": "로자리아",
+      "nameCn": "罗莎莉娅",
+      "nameEn": "Rozalia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 116,
+      "nameKr": "노에미",
+      "nameCn": "诺埃米",
+      "nameEn": "Noemi",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 118,
+      "nameKr": "오토크라트 4세",
+      "nameCn": "奥托克拉托四世",
+      "nameEn": "AutokratoIV",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 119,
+      "nameKr": "루크레치아",
+      "nameCn": "卢克蕾蒂娅",
+      "nameEn": "Lucretia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 120,
+      "nameKr": "플로렌티아",
+      "nameCn": "弗洛朗蒂娅",
+      "nameEn": "Florentia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 121,
+      "nameKr": "츠바메",
+      "nameCn": "燕",
+      "nameEn": "Tsubame",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 122,
+      "nameKr": "힐다",
+      "nameCn": "希尔达",
+      "nameEn": "Hilda",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 123,
+      "nameKr": "베르너",
+      "nameCn": "沃尔纳",
+      "nameEn": "Werner",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 124,
+      "nameKr": "크리스티아네",
+      "nameCn": "克里斯蒂安妮",
+      "nameEn": "Christiane",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 125,
+      "nameKr": "리코리스",
+      "nameCn": "丽可丽丝",
+      "nameEn": "Licorice",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 126,
+      "nameKr": "팟시르",
+      "nameCn": "帕希尔",
+      "nameEn": "Patyle",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 127,
+      "nameKr": "레나타",
+      "nameCn": "蕾娜塔",
+      "nameEn": "Renata",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 129,
+      "nameKr": "구스타프",
+      "nameCn": "古斯塔夫",
+      "nameEn": "Gustav",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 130,
+      "nameKr": "미셸",
+      "nameCn": "米歇尔",
+      "nameEn": "Michelle",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 131,
@@ -3398,8 +4554,26 @@
       "nameCn": "亚尔缇娜",
       "nameEn": "Altina",
       "rank": 3,
-      "star": 2,
-      "exchangedFragmentCount": 20
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 132,
+      "nameKr": "아리안로드",
+      "nameCn": "阿瑞安赫德",
+      "nameEn": "Arianrhod",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 133,
+      "nameKr": "린 슈바르처",
+      "nameCn": "黎恩",
+      "nameEn": "Rean",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 134,
@@ -3407,8 +4581,26 @@
       "nameCn": "安兹·乌尔·恭",
       "nameEn": "AinzOoalGown",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 135,
+      "nameKr": "알베도",
+      "nameCn": "雅儿贝德",
+      "nameEn": "Albedo",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 136,
+      "nameKr": "샤르티아",
+      "nameCn": "夏提雅",
+      "nameEn": "Shalltear",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 137,
@@ -3416,8 +4608,53 @@
       "nameCn": "战部渡",
       "nameEn": "Wataru",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 138,
+      "nameKr": "히미코",
+      "nameCn": "忍部火美子",
+      "nameEn": "Himiko",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 139,
+      "nameKr": "시바라쿠",
+      "nameCn": "剑部武一郎",
+      "nameEn": "Shibaraku",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 140,
+      "nameKr": "사나다 료",
+      "nameCn": "真田辽",
+      "nameEn": "Ryou",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 141,
+      "nameKr": "카유라",
+      "nameCn": "迦游罗",
+      "nameEn": "Kayura",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 142,
+      "nameKr": "하시바 토마",
+      "nameCn": "羽柴当麻",
+      "nameEn": "Touma",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
     },
     {
       "heroId": 143,
@@ -3425,8 +4662,80 @@
       "nameCn": "坂田银时",
       "nameEn": "GintokiSakata",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 144,
+      "nameKr": "카구라",
+      "nameCn": "神乐",
+      "nameEn": "Kagura",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 145,
+      "nameKr": "시무라 신파치",
+      "nameCn": "志村新八",
+      "nameEn": "ShinpachiShimura",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 146,
+      "nameKr": "셀베리아",
+      "nameCn": "塞贝莉雅",
+      "nameEn": "Selvaria",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 147,
+      "nameKr": "알리시아",
+      "nameCn": "亚莉希雅",
+      "nameEn": "Alicia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 148,
+      "nameKr": "이사라",
+      "nameCn": "伊莎拉",
+      "nameEn": "Isara",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 99161,
+      "nameKr": "크림조의 왕",
+      "nameCn": "红月之王",
+      "nameEn": "LordOfCrimson",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99162,
+      "nameKr": "수제트",
+      "nameCn": "修杰特",
+      "nameEn": "Suzette",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99163,
+      "nameKr": "초월자",
+      "nameCn": "超越之人",
+      "nameEn": "Transcendent",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 99164,
@@ -3434,8 +4743,386 @@
       "nameCn": "维尔纳",
       "nameEn": "Verner",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99165,
+      "nameKr": "마리안델",
+      "nameCn": "玛丽安蒂尔",
+      "nameEn": "Mariandel",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99166,
+      "nameKr": "웨탐",
+      "nameCn": "维坦",
+      "nameEn": "Wehttam",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99167,
+      "nameKr": "리사",
+      "nameCn": "丽莎",
+      "nameEn": "Liza",
+      "rank": 3,
+      "rarity": "SR",
+      "star": 2
+    },
+    {
+      "heroId": 99168,
+      "nameKr": "엘마",
+      "nameCn": "艾尔玛",
+      "nameEn": "Erma",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99169,
+      "nameKr": "켈티스",
+      "nameCn": "凯尔蒂斯",
+      "nameEn": "Kertesz",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99170,
+      "nameKr": "로비나 대제",
+      "nameCn": "洛维奈尔大帝",
+      "nameEn": "EmperorLoviner",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99171,
+      "nameKr": "방주의 성녀",
+      "nameCn": "方舟圣女",
+      "nameEn": "TheSaintOfArk",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99172,
+      "nameKr": "크림조의 집정관",
+      "nameCn": "月之执政官",
+      "nameEn": "TheConsul",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99173,
+      "nameKr": "아이언 챈슬러",
+      "nameCn": "铁血总帅",
+      "nameEn": "IronChancellor",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99174,
+      "nameKr": "아즈사",
+      "nameCn": "梓",
+      "nameEn": "Azusa",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99175,
+      "nameKr": "오보로",
+      "nameCn": "胧",
+      "nameEn": "Oboro",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99176,
+      "nameKr": "캐롤리안",
+      "nameCn": "卡洛莉安",
+      "nameEn": "Carolian",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99177,
+      "nameKr": "카구야",
+      "nameCn": "辉夜",
+      "nameEn": "Kaguya",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99178,
+      "nameKr": "아사멜",
+      "nameCn": "亚莎梅尔",
+      "nameEn": "Ashumere",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99179,
+      "nameKr": "로스탐",
+      "nameCn": "洛斯塔姆",
+      "nameEn": "Rostam",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99180,
+      "nameKr": "방랑투사",
+      "nameCn": "漂逐斗客",
+      "nameEn": "WanderingDuelist",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99181,
+      "nameKr": "줄리안",
+      "nameCn": "朱利安",
+      "nameEn": "Julian",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99182,
+      "nameKr": "리키",
+      "nameCn": "里奇",
+      "nameEn": "Ricky",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99183,
+      "nameKr": "마크렌",
+      "nameCn": "马库雷",
+      "nameEn": "McClaine",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99184,
+      "nameKr": "빛의 수호사도",
+      "nameCn": "光佑使徒",
+      "nameEn": "Lightbringer",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99185,
+      "nameKr": "아단켈모",
+      "nameCn": "亚德凯摩",
+      "nameEn": "Adankelmo",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99186,
+      "nameKr": "빛과 그림자 검의 영혼",
+      "nameCn": "光影剑魄",
+      "nameEn": "SwordofLight&Shadow",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99187,
+      "nameKr": "껍질 소녀",
+      "nameCn": "壳中少女",
+      "nameEn": "GirlInShell",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99188,
+      "nameKr": "리오벡",
+      "nameCn": "里奥贝克",
+      "nameEn": "RioBec",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99189,
+      "nameKr": "시엔",
+      "nameCn": "席恩",
+      "nameEn": "Zion",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99190,
+      "nameKr": "폴리알",
+      "nameCn": "波莉阿鲁",
+      "nameEn": "Polyal",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99191,
+      "nameKr": "루그너",
+      "nameCn": "卢古耐尔",
+      "nameEn": "Lugner",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99192,
+      "nameKr": "그렌실",
+      "nameCn": "格伦希尔",
+      "nameEn": "Grunhind",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99193,
+      "nameKr": "요아&코니",
+      "nameCn": "琼&康娜",
+      "nameEn": "Yoa&Conna",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99194,
+      "nameKr": "일레인",
+      "nameCn": "艾蕾因",
+      "nameEn": "Elaine",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99195,
+      "nameKr": "반",
+      "nameCn": "范恩",
+      "nameEn": "Van",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99196,
+      "nameKr": "아니에스",
+      "nameCn": "亚妮艾丝",
+      "nameEn": "Agnes",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99197,
+      "nameKr": "각성자",
+      "nameCn": "醒觉者",
+      "nameEn": "Awakener",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99198,
+      "nameKr": "아마데우스",
+      "nameCn": "阿玛迪斯",
+      "nameEn": "Amadeus",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99199,
+      "nameKr": "사그니",
+      "nameCn": "萨格尼",
+      "nameEn": "Sagny",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99200,
+      "nameKr": "키리카",
+      "nameCn": "雾香",
+      "nameEn": "Kirika",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99201,
+      "nameKr": "소니아 블랑쉬",
+      "nameCn": "桑妮雅",
+      "nameEn": "Sonia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99202,
+      "nameKr": "엑셀러",
+      "nameCn": "爱克雪拉",
+      "nameEn": "Excela",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99203,
+      "nameKr": "님프",
+      "nameCn": "宁芙",
+      "nameEn": "Nymph",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99204,
+      "nameKr": "타탈리아",
+      "nameCn": "塔塔利亚",
+      "nameEn": "Tatalia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99205,
+      "nameKr": "투어밀크",
+      "nameCn": "托米尔克",
+      "nameEn": "Tourmilk",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99206,
+      "nameKr": "이리스",
+      "nameCn": "伊莉丝",
+      "nameEn": "Iris",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 99207,
@@ -3443,8 +5130,206 @@
       "nameCn": "罗兰",
       "nameEn": "Roland",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99208,
+      "nameKr": "프레시아",
+      "nameCn": "普蕾茜娅",
+      "nameEn": "Precia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99209,
+      "nameKr": "리나",
+      "nameCn": "莉娜",
+      "nameEn": "Lina",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99210,
+      "nameKr": "제르가디스",
+      "nameCn": "杰路刚帝士",
+      "nameEn": "Zelgadiss",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99211,
+      "nameKr": "가우리",
+      "nameCn": "高里",
+      "nameEn": "Gourry",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99212,
+      "nameKr": "강신자",
+      "nameCn": "神降者",
+      "nameEn": "Apotheosis",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99213,
+      "nameKr": "캡틴 잭",
+      "nameCn": "杰克船长",
+      "nameEn": "Jack",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99214,
+      "nameKr": "네미아",
+      "nameCn": "奈米娅",
+      "nameEn": "Nemia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99215,
+      "nameKr": "안드리올",
+      "nameCn": "安德里奥",
+      "nameEn": "Andriole",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99216,
+      "nameKr": "에쉬앤",
+      "nameCn": "艾希恩",
+      "nameEn": "Eshean",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99217,
+      "nameKr": "호프만",
+      "nameCn": "霍夫曼",
+      "nameEn": "Hofmann",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99218,
+      "nameKr": "이졸데",
+      "nameCn": "伊索尔德",
+      "nameEn": "Isolde",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99219,
+      "nameKr": "제이스",
+      "nameCn": "杰斯",
+      "nameEn": "Jayce",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99220,
+      "nameKr": "패트리샤",
+      "nameCn": "帕特里夏",
+      "nameEn": "Patricia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99221,
+      "nameKr": "군",
+      "nameCn": "古恩",
+      "nameEn": "Gunn",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99222,
+      "nameKr": "알칸펠",
+      "nameCn": "阿卡菲尔",
+      "nameEn": "Archanfel",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99223,
+      "nameKr": "쇼우",
+      "nameCn": "深町晶",
+      "nameEn": "Sho",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99224,
+      "nameKr": "아기토",
+      "nameCn": "卷岛颚人",
+      "nameEn": "Agito",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99225,
+      "nameKr": "빙설 심연의 지배자",
+      "nameCn": "冰渊凌御者",
+      "nameEn": "SovereignOfIceAbyss",
+      "rank": 6,
+      "rarity": "LLR",
+      "star": 3
+    },
+    {
+      "heroId": 99226,
+      "nameKr": "테란틸",
+      "nameCn": "泰兰提尔",
+      "nameEn": "Tyrantel",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99227,
+      "nameKr": "타브리스",
+      "nameCn": "塔布莉丝",
+      "nameEn": "Tabres",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99228,
+      "nameKr": "이미르",
+      "nameCn": "尤弥尔",
+      "nameEn": "Ymir",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99229,
+      "nameKr": "셀리카",
+      "nameCn": "赛利卡",
+      "nameEn": "Celica",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     },
     {
       "heroId": 99230,
@@ -3452,13 +5337,522 @@
       "nameCn": "塞拉菲娜",
       "nameEn": "Seraphina",
       "rank": 4,
-      "star": 3,
-      "exchangedFragmentCount": 50
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99231,
+      "nameKr": "비리아",
+      "nameCn": "薇莉娅",
+      "nameEn": "Virelia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99232,
+      "nameKr": "빛의 소환사",
+      "nameCn": "辉耀圣召使",
+      "nameEn": "Brightsummoner",
+      "rank": 6,
+      "rarity": "LLR",
+      "star": 3
+    },
+    {
+      "heroId": 99233,
+      "nameKr": "시온",
+      "nameCn": "席昂",
+      "nameEn": "Shion",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99234,
+      "nameKr": "티아나",
+      "nameCn": "缇雅娜",
+      "nameEn": "Tiana",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99235,
+      "nameKr": "캡틴 코만도&베이비 헤드",
+      "nameCn": "突击队长&天才婴儿",
+      "nameEn": "Captain&Baby",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99236,
+      "nameKr": "맥&긴주",
+      "nameCn": "小刀马克&忍者Ginzu",
+      "nameEn": "Mack&Ginzu",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99237,
+      "nameKr": "엔야",
+      "nameCn": "恩雅",
+      "nameEn": "Enya",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99238,
+      "nameKr": "아리아",
+      "nameCn": "阿莉娅",
+      "nameEn": "Alia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99239,
+      "nameKr": "이리아",
+      "nameCn": "伊莉娅",
+      "nameEn": "Ilia",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99240,
+      "nameKr": "사프린",
+      "nameCn": "萨芙琳",
+      "nameEn": "Safreen",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99241,
+      "nameKr": "노노린",
+      "nameCn": "诺诺琳",
+      "nameEn": "Nornorin",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99242,
+      "nameKr": "염룡파멸자",
+      "nameCn": "炎龙破灭者",
+      "nameEn": "Dragonslayer",
+      "rank": 6,
+      "rarity": "LLR",
+      "star": 3
+    },
+    {
+      "heroId": 99243,
+      "nameKr": "날개 꺾인 새",
+      "nameCn": "断翼鸟",
+      "nameEn": "Hibiscus",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99244,
+      "nameKr": "란델",
+      "nameCn": "兰黛尔",
+      "nameEn": "Randele",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99245,
+      "nameKr": "마리 로즈",
+      "nameCn": "玛莉·萝丝",
+      "nameEn": "Marie Rose",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99246,
+      "nameKr": "뇨텐구",
+      "nameCn": "女天狗",
+      "nameEn": "Nyotengu",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99247,
+      "nameKr": "카스미",
+      "nameCn": "霞",
+      "nameEn": "Kasumi",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99248,
+      "nameKr": "시엘나",
+      "nameCn": "席尔娜",
+      "nameEn": "Sylrna",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99249,
+      "nameKr": "마카엘라",
+      "nameCn": "玛卡艾拉",
+      "nameEn": "Macaera",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99250,
+      "nameKr": "샘",
+      "nameCn": "塞姆",
+      "nameEn": "Shem",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99251,
+      "nameKr": "마안의 서큐버스",
+      "nameCn": "幽瞳幻惑使",
+      "nameEn": "Gazesuccubus",
+      "rank": 6,
+      "rarity": "LLR",
+      "star": 3
+    },
+    {
+      "heroId": 99252,
+      "nameKr": "루크만",
+      "nameCn": "鲁克曼",
+      "nameEn": "Lukhmaan",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99253,
+      "nameKr": "아브샤이트",
+      "nameCn": "阿布沙伊特",
+      "nameEn": "Abishai",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99254,
+      "nameKr": "레이아",
+      "nameCn": "蕾雅",
+      "nameEn": "Reah",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99255,
+      "nameKr": "엘비스",
+      "nameCn": "埃尔维斯",
+      "nameEn": "Elvis",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99256,
+      "nameKr": "엘자",
+      "nameCn": "艾露莎",
+      "nameEn": "Erza",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99257,
+      "nameKr": "루시",
+      "nameCn": "露西",
+      "nameEn": "Lucy",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99258,
+      "nameKr": "나츠",
+      "nameCn": "纳兹",
+      "nameEn": "Natsu",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99259,
+      "nameKr": "레이피어",
+      "nameCn": "蕾贝尔",
+      "nameEn": "Rapier",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99260,
+      "nameKr": "샤리크",
+      "nameCn": "沙里克",
+      "nameEn": "Sharikh",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99261,
+      "nameKr": "훔바바",
+      "nameCn": "蝴姆巴巴",
+      "nameEn": "Humbaba",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99262,
+      "nameKr": "비앙카",
+      "nameCn": "贝安卡",
+      "nameEn": "Bianca",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99263,
+      "nameKr": "키벨레",
+      "nameCn": "西布莉",
+      "nameEn": "Cybele",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99264,
+      "nameKr": "빛과 어둠의 반역자",
+      "nameCn": "辉黯逆命者",
+      "nameEn": "HeavenDefier",
+      "rank": 6,
+      "rarity": "LLR",
+      "star": 3
+    },
+    {
+      "heroId": 99265,
+      "nameKr": "레이가",
+      "nameCn": "黎加",
+      "nameEn": "Reiga",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99266,
+      "nameKr": "생거",
+      "nameCn": "桑格",
+      "nameEn": "Sanger",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99267,
+      "nameKr": "라이잘린 스타우트",
+      "nameCn": "莱莎琳·斯托特",
+      "nameEn": "Reisalin Stout",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99268,
+      "nameKr": "릴라 디자이어스",
+      "nameCn": "莉拉·德西亚斯",
+      "nameEn": "Lila Decyrus",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99269,
+      "nameKr": "클라우디아 발렌츠",
+      "nameCn": "科洛蒂娅·巴兰茨",
+      "nameEn": "Klaudia Valentz",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99270,
+      "nameKr": "타지",
+      "nameCn": "达奇",
+      "nameEn": "Taj",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99271,
+      "nameKr": "린",
+      "nameCn": "琳",
+      "nameEn": "Lynn",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99272,
+      "nameKr": "무닝",
+      "nameCn": "穆宁",
+      "nameEn": "Mullin",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99273,
+      "nameKr": "태초의 젤다",
+      "nameCn": "初真泽瑞达",
+      "nameEn": "PureZalrahda",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99274,
+      "nameKr": "란카",
+      "nameCn": "兰卡",
+      "nameEn": "Ranka",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99275,
+      "nameKr": "아오라",
+      "nameCn": "奥拉",
+      "nameEn": "Ora",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99276,
+      "nameKr": "아이바 미유키",
+      "nameCn": "相羽美雪",
+      "nameEn": "Miyuki",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99277,
+      "nameKr": "D-BOY",
+      "nameCn": "迪波威",
+      "nameEn": "D-Boy",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99278,
+      "nameKr": "아이바 신야",
+      "nameCn": "相羽新也",
+      "nameEn": "Shinya",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99279,
+      "nameKr": "아시",
+      "nameCn": "雅希",
+      "nameEn": "Ashi",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99280,
+      "nameKr": "사륜",
+      "nameCn": "沙律",
+      "nameEn": "Sallune",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99281,
+      "nameKr": "효랑어홍사",
+      "nameCn": "骁浪驭虹使",
+      "nameEn": "TidalVindicator",
+      "rank": 6,
+      "rarity": "LLR",
+      "star": 3
+    },
+    {
+      "heroId": 99282,
+      "nameKr": "은(밴시)",
+      "nameCn": "狺",
+      "nameEn": "Banshee",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99283,
+      "nameKr": "아윈(쿠모)",
+      "nameCn": "阿云",
+      "nameEn": "Kumo",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99284,
+      "nameKr": "야차왕 가이",
+      "nameCn": "夜叉王凯",
+      "nameEn": "Gai",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99285,
+      "nameKr": "수라왕 슈라토",
+      "nameCn": "修罗王秋亚人",
+      "nameEn": "Shurato",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99286,
+      "nameKr": "가루다왕 레이가",
+      "nameCn": "迦楼罗王力伽",
+      "nameEn": "Reiga",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
+    },
+    {
+      "heroId": 99287,
+      "nameKr": "마검의 화신",
+      "nameCn": "魔骸剑使",
+      "nameEn": "Necroblade",
+      "rank": 4,
+      "rarity": "SSR",
+      "star": 3
     }
   ],
-  "interpretation": {
-    "acceptedRarityField": null,
-    "labels": null,
-    "rule": "Do not promote Rank or Star to rarity labels until group membership is independently validated against known rarity examples."
-  }
+  "structuralErrors": []
 }
