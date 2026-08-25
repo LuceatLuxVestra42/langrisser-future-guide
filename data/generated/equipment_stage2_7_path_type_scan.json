@@ -1,5 +1,5 @@
 {
-  "matchFileCount": 49,
+  "matchFileCount": 50,
   "matches": [
     {
       "path": "data/configdata/ConfigDataChatBubbleFrameInfo.json",
@@ -2356,6 +2356,32 @@
         {
           "line": 152,
           "text": "    const typeCode = Number.isInteger(s.GetPathType) ? s.GetPathType : null;"
+        }
+      ]
+    },
+    {
+      "path": "scripts/derive-equipment-stage2-7-candidates.mjs",
+      "sizeBytes": 2027,
+      "excerpts": [
+        {
+          "line": 8,
+          "text": "const pathKey=r=>JSON.stringify(r.GetPathList??null);"
+        },
+        {
+          "line": 9,
+          "text": "const isSecret=r=>Array.isArray(r.GetPathList)&&r.GetPathList.length===1&&Number(r.GetPathList[0]?.PathType)===46;"
+        },
+        {
+          "line": 10,
+          "text": "const isSoul=r=>!r.GetPathList && /^魂·/.test(String(r.Name??''));"
+        },
+        {
+          "line": 14,
+          "text": "const compact=r=>({id:Number(r.ID),name:r.Name??null,slot:r.EquipmentType==null?0:Number(r.EquipmentType),label:r.Label??null,sortIndex:r.SortIndex??null,paths:r.GetPathList??null});"
+        },
+        {
+          "line": 17,
+          "text": "  counts:{secretRealmSinglePath:rows.filter(isSecret).length,soulNoPath:rows.filter(isSoul).length,genericCandidate:generic.length,otherNoPath:rows.filter(r=>!r.GetPathList&&!isSoul(r)).length},"
         }
       ]
     },
