@@ -9,6 +9,7 @@ const MASTER = P('data/hero-name-master.v1.json');
 const TREE = P('data/generated/hero-job-trees.v1.json');
 const SKILLS = P('data/generated/hero-skill-acquisition.v1.json');
 const BOUNDARY = P('data/validation/hero-stage4-a-boundary.v1.json');
+const UPSTREAM = P('data/validation/hero-stage4-upstream-direct.v1.json');
 
 function read(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
 function set(ids) { return new Set(ids.filter(Number.isInteger)); }
@@ -28,6 +29,7 @@ const master = read(MASTER);
 const tree = read(TREE);
 const skills = read(SKILLS);
 const boundary = read(BOUNDARY);
+const upstream = read(UPSTREAM);
 const errors = [];
 
 const canonical = set((master.records || []).map((x) => x.heroId));
@@ -35,6 +37,8 @@ const combatIds = set((combat.records || []).map((x) => x.heroId));
 const treeByHero = new Map((tree.records || []).map((x) => [x.heroId, x]));
 const skillIds = set((skills.records || []).map((x) => x.heroId));
 
+if (upstream.status !== 'PASS') errors.push(`upstream direct regression status=${upstream.status}`);
+if ((upstream.errors || []).length) errors.push(`upstream direct regression errors=${upstream.errors.length}`);
 if (combat.status !== 'PASS') errors.push(`combat.status=${combat.status}`);
 if (summary.status !== 'PASS') errors.push(`summary.status=${summary.status}`);
 if (summary.stage4CompletionStatus !== 'COMPLETE') errors.push(`stage4CompletionStatus=${summary.stage4CompletionStatus}`);
@@ -80,7 +84,7 @@ for (const id of ['awakeningClassification','displayJobStats','heroSoldierModifi
 if (gates.get('talentIdentity') !== 'VERIFIED_REFERENCE_SET') errors.push(`semantic gate talentIdentity=${gates.get('talentIdentity')}`);
 
 console.log(`HERO STAGE 4 FINAL VALIDATION: ${errors.length ? 'FAIL' : 'PASS'}`);
-console.log(`heroes=${combat.records?.length || 0} errors=${errors.length}`);
+console.log(`heroes=${combat.records?.length || 0} upstream=${upstream.status} errors=${errors.length}`);
 if (errors.length) {
   for (const error of errors.slice(0, 100)) console.log(`- FAIL: ${error}`);
   process.exitCode = 1;
