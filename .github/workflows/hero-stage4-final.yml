@@ -6,15 +6,18 @@ on:
       - work/hero-stage4-finalize
     paths:
       - 'scripts/prepare_hero_basic_combat_stage45.cjs'
+      - 'scripts/validate_hero_stage4_upstream_direct.cjs'
       - 'scripts/validate_hero_stage4_final.cjs'
       - 'data/hero-basic-combat-stage4-5.v1.json'
       - '.github/workflows/hero-stage4-final.yml'
   pull_request:
     paths:
       - 'scripts/prepare_hero_basic_combat_stage45.cjs'
+      - 'scripts/validate_hero_stage4_upstream_direct.cjs'
       - 'scripts/validate_hero_stage4_final.cjs'
       - 'data/hero-basic-combat-stage4-5.v1.json'
       - 'data/generated/hero-basic-combat.v1.json'
+      - 'data/validation/hero-stage4-upstream-direct.v1.json'
       - 'data/validation/hero-basic-combat-stage4-5-summary.v1.json'
       - '.github/workflows/hero-stage4-final.yml'
 
@@ -29,6 +32,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Regress frozen 4-3 and 4-4 against current direct JSON
+        run: node scripts/validate_hero_stage4_upstream_direct.cjs
       - name: Generate final Hero Stage 4-5 data
         run: node scripts/prepare_hero_basic_combat_stage45.cjs
       - name: Validate final Hero Stage 4
@@ -40,7 +45,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/generated/hero-basic-combat.v1.json data/validation/hero-basic-combat-stage4-5-summary.v1.json data/validation/hero-stage4-a-boundary.v1.json
+          git add data/generated/hero-basic-combat.v1.json data/validation/hero-stage4-upstream-direct.v1.json data/validation/hero-basic-combat-stage4-5-summary.v1.json data/validation/hero-stage4-a-boundary.v1.json
           if ! git diff --cached --quiet; then
             git commit -m 'Record Hero Stage 4 final PASS outputs'
             git push origin HEAD:work/hero-stage4-finalize
