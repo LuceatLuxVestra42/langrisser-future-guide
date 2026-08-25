@@ -1,6 +1,40 @@
 {
-  "matchFileCount": 52,
+  "matchFileCount": 55,
   "matches": [
+    {
+      "path": ".github/workflows/equipment-acquisition-analysis.yml",
+      "sizeBytes": 1419,
+      "excerpts": [
+        {
+          "line": 8,
+          "text": "      - 'scripts/scan-acquisition-pathtype-sources.mjs'"
+        },
+        {
+          "line": 9,
+          "text": "      - 'scripts/sample-acquisition-pathtypes.mjs'"
+        },
+        {
+          "line": 23,
+          "text": "      - name: Scan PathType sources"
+        },
+        {
+          "line": 24,
+          "text": "        run: node scripts/scan-acquisition-pathtype-sources.mjs"
+        },
+        {
+          "line": 25,
+          "text": "      - name: Sample PathTypes across ConfigData"
+        },
+        {
+          "line": 26,
+          "text": "        run: node scripts/sample-acquisition-pathtypes.mjs"
+        },
+        {
+          "line": 31,
+          "text": "          git add data/generated/equipment_acquisition_path_analysis.json data/generated/equipment_acquisition_pathtype_sources.json data/generated/equipment_acquisition_pathtype_samples.json"
+        }
+      ]
+    },
     {
       "path": "data/configdata/ConfigDataChatBubbleFrameInfo.json",
       "sizeBytes": 12920,
@@ -2438,6 +2472,66 @@
         {
           "line": 29,
           "text": "      if(['ID','Name','Desc','Type','PathType','FunctionType','FuncType','Title','Text','Icon','SortIndex','Army_ID','Rank'].includes(k) || /Path|Name|Desc|Type|Title|Text/i.test(k)) fields[k]=v;"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sample-acquisition-pathtypes.mjs",
+      "sizeBytes": 2238,
+      "excerpts": [
+        {
+          "line": 16,
+          "text": "  if(Number.isInteger(v.PathType)&&targetTypes.has(v.PathType)){"
+        },
+        {
+          "line": 17,
+          "text": "    const arr=pathSamples[v.PathType];"
+        },
+        {
+          "line": 18,
+          "text": "    if(arr.length<40) arr.push({file,context:nextContext,path:{PathType:v.PathType,ID:v.ID??null,Name:v.Name??null}});"
+        },
+        {
+          "line": 21,
+          "text": "    if(k==='GetPathList' && Array.isArray(x)){"
+        },
+        {
+          "line": 23,
+          "text": "        if(p&&typeof p==='object'&&targetTypes.has(Number(p.PathType))){"
+        },
+        {
+          "line": 24,
+          "text": "          const arr=pathSamples[Number(p.PathType)];"
+        },
+        {
+          "line": 25,
+          "text": "          if(arr.length<40) arr.push({file,context:nextContext,path:{PathType:p.PathType,ID:p.ID??null,Name:p.Name??null}});"
+        },
+        {
+          "line": 49,
+          "text": "fs.writeFileSync('data/generated/equipment_acquisition_pathtype_samples.json',JSON.stringify(result,null,2)+'\\n');"
+        }
+      ]
+    },
+    {
+      "path": "scripts/scan-acquisition-pathtype-sources.mjs",
+      "sizeBytes": 1581,
+      "excerpts": [
+        {
+          "line": 5,
+          "text": "const needles=['\"PathType\"','PathType'];"
+        },
+        {
+          "line": 13,
+          "text": "    const idx=txt.indexOf('PathType');"
+        },
+        {
+          "line": 28,
+          "text": "      const idx=txt.indexOf('PathType');"
+        },
+        {
+          "line": 36,
+          "text": "fs.writeFileSync('data/generated/equipment_acquisition_pathtype_sources.json',JSON.stringify(result,null,2)+'\\n');"
         }
       ]
     },
