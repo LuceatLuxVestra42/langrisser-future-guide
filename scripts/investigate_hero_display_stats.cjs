@@ -19,7 +19,7 @@ const SOURCE_FILES = [
   'ConfigDataSoldierInfo.json',
 ];
 
-const RELEVANT_KEY = /(soldier|army|troop|rate|ratio|modify|modifier|correction|talent|star|skill|job|hp|health|life|atk|attack|magic|int|def|dex|master|property)/i;
+const RELEVANT_KEY = /(soldier|army|troop|cmd|rate|ratio|modify|modifier|correction|talent|star|skill|job|hp|health|life|atk|attack|magic|int|def|dex|master|property)/i;
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -51,12 +51,7 @@ function summarizeSource(filename) {
   try {
     const raw = readJson(file);
     if (raw && !Array.isArray(raw) && Array.isArray(raw.m_bytes)) {
-      return {
-        filename,
-        status: 'legacy-textasset',
-        recordCount: null,
-        rootKeys: Object.keys(raw),
-      };
+      return { filename, status: 'legacy-textasset', recordCount: null, rootKeys: Object.keys(raw) };
     }
     const records = recordsOf(raw);
     const keyCounts = new Map();
@@ -76,11 +71,7 @@ function summarizeSource(filename) {
       records,
     };
   } catch (error) {
-    return {
-      filename,
-      status: 'invalid-json',
-      error: error instanceof Error ? error.message : String(error),
-    };
+    return { filename, status: 'invalid-json', error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -102,7 +93,7 @@ function relevantProjection(record) {
   if (!record || typeof record !== 'object') return null;
   const out = {};
   for (const [key, value] of Object.entries(record)) {
-    if (key === 'ID' || key === 'Id' || key === 'id' || RELEVANT_KEY.test(key)) out[key] = value;
+    if (['ID', 'Id', 'id', 'Name', 'Name_Eng', 'Desc', 'DescStrKey'].includes(key) || RELEVANT_KEY.test(key)) out[key] = value;
   }
   return out;
 }
@@ -120,6 +111,16 @@ function uniqueIntegers(values) {
   return [...new Set(values.filter(Number.isInteger))].sort((a, b) => a - b);
 }
 
+function arraysEqual(a, b) {
+  return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((value, index) => value === b[index]);
+}
+
+function histogram(values) {
+  const map = new Map();
+  for (const value of values) map.set(String(value), (map.get(String(value)) || 0) + 1);
+  return Object.fromEntries([...map.entries()].sort((a, b) => Number(a[0]) - Number(b[0])));
+}
+
 function main() {
   const sources = SOURCE_FILES.map(summarizeSource);
   const byName = new Map(sources.map((source) => [source.filename, source]));
@@ -127,22 +128,20 @@ function main() {
   const blocked = required.filter((name) => byName.get(name)?.status !== 'direct-json');
 
   if (blocked.length) {
-    const result = {
-      version: 2,
+    writeJson(OUT, {
+      version: 3,
       stage: '4-final-gates-investigation',
       status: 'SOURCE_BLOCKED',
-      purpose: 'Migrate Stage 4 semantic-gate investigation from legacy TextAsset m_bytes to UnityDataTool direct JSON without assigning unverified formulas.',
       blocked,
       sourceSummary: sources.map(compactSource),
-    };
-    writeJson(OUT, result);
-    console.error(`SOURCE_BLOCKED: ${blocked.join(', ')}`);
+    });
     process.exitCode = 2;
     return;
   }
 
   const links = readJson(JOB_LINKS);
   const linkRecords = Array.isArray(links?.records) ? links.records : [];
+  const playableIds = new Set(linkRecords.map((x) => x.heroId).filter(Number.isInteger));
   const fixtureHeroIds = uniqueIntegers([1, 6, ...linkRecords.slice(0, 8).map((x) => x.heroId)]);
 
   const heroIndex = indexById(byName.get('ConfigDataHeroInfo.json').records);
@@ -151,38 +150,82 @@ function main() {
   const jobLevelIndex = indexById(byName.get('ConfigDataJobLevelInfo.json').records);
   const skillIndex = indexById(byName.get('ConfigDataSkillInfo.json').records);
 
+  const cmdFields = [...new Set(byName.get('ConfigDataHeroInfo.json').records.flatMap((record) => Object.keys(record || {}).filter((key) => /Cmd_INI$/i.test(key))))].sort();
+  const cmdRows = [];
+  for (const link of linkRecords) {
+    const hero = heroIndex.get(link.heroId);
+    if (!hero) continue;
+    const raw = Object.fromEntries(cmdFields.map((key) => [key, Number.isFinite(hero[key]) ? hero[key] : 0]));
+    cmdRows.push({ heroId: link.heroId, nameKr: link.nameKr, raw });
+  }
+  const cmdFieldStats = Object.fromEntries(cmdFields.map((key) => {
+    const values = cmdRows.map((row) => row.raw[key]);
+    const nonzero = values.filter((value) => value !== 0);
+    return [key, {
+      nonzeroCount: nonzero.length,
+      min: nonzero.length ? Math.min(...nonzero) : 0,
+      max: nonzero.length ? Math.max(...nonzero) : 0,
+      distinct: uniqueIntegers(nonzero),
+      notDivisibleBy100: nonzero.filter((value) => value % 100 !== 0).slice(0, 20),
+    }];
+  }));
+
+  const talentRows = [];
+  let connectionMismatchCount = 0;
+  for (const link of linkRecords) {
+    const hero = heroIndex.get(link.heroId);
+    if (!hero) continue;
+    const connectionIds = uniqueIntegers([link.primaryJobConnectionId, ...(link.useableJobConnectionIds || []), ...(link.connections || []).map((x) => x.jobConnectionId)]);
+    const arrays = connectionIds.map((id) => connectionIndex.get(id)?.TalentSkill_IDs).filter(Array.isArray);
+    const primary = connectionIndex.get(link.primaryJobConnectionId)?.TalentSkill_IDs || arrays[0] || [];
+    const allConnectionsAgree = arrays.every((arr) => arraysEqual(arr, primary));
+    if (!allConnectionsAgree) connectionMismatchCount += 1;
+    const initialStar = hero.Star;
+    const prefixThroughInitialAllSame = Number.isInteger(initialStar) && initialStar >= 1 && primary.length >= initialStar
+      ? primary.slice(0, initialStar).every((id) => id === primary[initialStar - 1])
+      : null;
+    talentRows.push({
+      heroId: link.heroId,
+      nameKr: link.nameKr,
+      initialStar,
+      talentIds: primary,
+      talentLength: primary.length,
+      allConnectionsAgree,
+      prefixThroughInitialAllSame,
+    });
+  }
+
+  const talentByInitialStar = {};
+  for (const star of uniqueIntegers(talentRows.map((row) => row.initialStar))) {
+    const rows = talentRows.filter((row) => row.initialStar === star);
+    talentByInitialStar[star] = {
+      heroCount: rows.length,
+      lengthHistogram: histogram(rows.map((row) => row.talentLength)),
+      prefixThroughInitialAllSame: rows.filter((row) => row.prefixThroughInitialAllSame === true).length,
+      prefixThroughInitialNotSame: rows.filter((row) => row.prefixThroughInitialAllSame === false).length,
+      examples: rows.slice(0, 8),
+    };
+  }
+
   const fixtures = [];
   const referencedTalentSkillIds = [];
-
   for (const heroId of fixtureHeroIds) {
     const link = linkRecords.find((x) => x.heroId === heroId) || null;
     const hero = heroIndex.get(heroId) || null;
-    const connectionIds = uniqueIntegers([
-      ...(link?.connections || []).map((x) => x.jobConnectionId),
-      ...(link?.useableJobConnectionIds || []),
-      link?.primaryJobConnectionId,
-    ]);
+    const connectionIds = uniqueIntegers([...(link?.connections || []).map((x) => x.jobConnectionId), ...(link?.useableJobConnectionIds || []), link?.primaryJobConnectionId]);
     const jobIds = uniqueIntegers((link?.connections || []).map((x) => x.jobId));
     const jobLevelIds = uniqueIntegers((link?.connections || []).flatMap((x) => x.jobLevelIds || []));
     const connections = connectionIds.map((id) => connectionIndex.get(id)).filter(Boolean);
-
-    const talentArrayFields = connections.map((record) => ({
-      connectionId: idOf(record),
-      fields: findArrayFields(record, /talent|skill/i),
-    }));
-    for (const item of talentArrayFields) {
-      for (const value of Object.values(item.fields)) {
-        for (const id of value) if (Number.isInteger(id)) referencedTalentSkillIds.push(id);
-      }
-    }
+    const talentArrayFields = connections.map((record) => ({ connectionId: idOf(record), fields: findArrayFields(record, /talent|skill/i) }));
+    for (const item of talentArrayFields) for (const value of Object.values(item.fields)) for (const id of value) if (Number.isInteger(id)) referencedTalentSkillIds.push(id);
 
     fixtures.push({
       heroId,
       nameKr: link?.nameKr || null,
       hero: relevantProjection(hero),
       heroAllKeys: hero ? Object.keys(hero).sort() : [],
-      jobConnections: connections.map((record) => relevantProjection(record)),
-      jobConnectionAllKeys: uniqueIntegers([]).length ? [] : [...new Set(connections.flatMap((record) => Object.keys(record)))].sort(),
+      cmdRaw: hero ? Object.fromEntries(cmdFields.map((key) => [key, Number.isFinite(hero[key]) ? hero[key] : 0])) : null,
+      jobConnections: connections.map(relevantProjection),
       talentArrayFields,
       jobs: jobIds.map((id) => relevantProjection(jobIndex.get(id))).filter(Boolean),
       jobLevels: jobLevelIds.map((id) => relevantProjection(jobLevelIndex.get(id))).filter(Boolean),
@@ -192,39 +235,47 @@ function main() {
   const talentSkillIds = uniqueIntegers(referencedTalentSkillIds);
   const talentSkills = talentSkillIds.map((id) => {
     const record = skillIndex.get(id);
-    if (!record) return { id, missing: true };
-    return { id, record: relevantProjection(record), allKeys: Object.keys(record).sort() };
+    return record ? relevantProjection(record) : { ID: id, missing: true };
   });
 
-  const heroStarSource = byName.get('ConfigDataHeroStarInfo.json');
-  const propertyModifySource = byName.get('ConfigDataPropertyModifyInfo.json');
-  const soldierSource = byName.get('ConfigDataSoldierInfo.json');
-
   const result = {
-    version: 2,
+    version: 3,
     stage: '4-final-gates-investigation',
     status: 'EVIDENCE_COLLECTED',
-    purpose: 'Collect direct-JSON evidence for displayJobStats, heroSoldierModifiers, and talentStarProgression. This output deliberately does not promote a formula or selection rule without independent evidence.',
+    purpose: 'Collect direct-JSON evidence for displayJobStats, heroSoldierModifiers, and talentStarProgression without promoting an unverified formula.',
     sourceSummary: sources.map(compactSource),
+    playableHeroCount: playableIds.size,
+    cmdEvidence: {
+      fields: cmdFields,
+      fieldStats: cmdFieldStats,
+      fixtureRows: cmdRows.filter((row) => fixtureHeroIds.includes(row.heroId)),
+    },
+    talentEvidence: {
+      heroCount: talentRows.length,
+      connectionMismatchCount,
+      lengthHistogram: histogram(talentRows.map((row) => row.talentLength)),
+      byInitialStar: talentByInitialStar,
+      fixtureRows: talentRows.filter((row) => fixtureHeroIds.includes(row.heroId)),
+      referencedTalentSkills: talentSkills,
+    },
     fixtureHeroIds,
     fixtures,
-    referencedTalentSkills: talentSkills,
     auxiliarySamples: {
-      heroStarInfo: heroStarSource?.records?.slice(0, 12) || [],
-      propertyModifyInfo: propertyModifySource?.records?.slice(0, 20).map(relevantProjection) || [],
-      soldierInfo: soldierSource?.records?.slice(0, 5).map(relevantProjection) || [],
+      heroStarInfo: byName.get('ConfigDataHeroStarInfo.json')?.records?.slice(0, 12) || [],
+      propertyModifyInfo: byName.get('ConfigDataPropertyModifyInfo.json')?.records?.slice(0, 20).map(relevantProjection) || [],
+      soldierInfo: byName.get('ConfigDataSoldierInfo.json')?.records?.slice(0, 5).map(relevantProjection) || [],
     },
     gateStatus: {
       displayJobStats: 'EVIDENCE_ONLY',
       heroSoldierModifiers: 'EVIDENCE_ONLY',
       talentStarProgression: 'EVIDENCE_ONLY',
     },
-    safetyDecision: 'No final stat arithmetic, soldier modifier percentages, or star-to-talent selection rule is inferred in this diagnostic. The collected named fields and representative records are intended for the next evidence-backed step.',
+    safetyDecision: 'No final arithmetic or selection rule is inferred in this diagnostic. Named fields, distributions, and representative records are emitted for evidence-backed validation.',
   };
 
   writeJson(OUT, result);
   console.log(`EVIDENCE_COLLECTED: ${OUT}`);
-  console.log(`fixtures=${fixtures.length} talentSkills=${talentSkills.length}`);
+  console.log(`playable=${playableIds.size} cmdFields=${cmdFields.join(',')} talentConnectionMismatches=${connectionMismatchCount}`);
 }
 
 main();
