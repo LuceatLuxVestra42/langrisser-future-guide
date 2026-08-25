@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "stage": "A-4",
+  "status": "FROZEN",
+  "purpose": "Canonical edge and provenance schema for the shared Hero-Soldier Relation Layer.",
+  "dependsOn": {
+    "heroIdentity": "data/contracts/hero-identity-contract.v1.json",
+    "soldierIdentity": "data/contracts/soldier-identity-contract.v1.json",
+    "sourceKinds": "data/contracts/hero-soldier-relation-source-contract.v1.json",
+    "goldenBaseline": "data/validation/hero-soldier-relation-golden-baseline.v1.json"
+  },
+  "canonicalEdge": {
+    "logicalIdentity": [
+      "heroId",
+      "soldierId"
+    ],
+    "storedShape": {
+      "heroId": "integer; canonical Hero ID; required",
+      "soldierId": "integer; canonical Soldier ID for the exact normal or SP form represented by this edge; required",
+      "provenance": "non-empty array of provenance entries; required"
+    },
+    "example": {
+      "heroId": 6,
+      "soldierId": 5621,
+      "provenance": []
+    },
+    "forbiddenEmbeddedFields": [
+      "nameKr",
+      "nameCn",
+      "nameEn",
+      "siteHeroId",
+      "slug",
+      "siteId",
+      "siteSoldierId",
+      "tier",
+      "armyType",
+      "uiGroup",
+      "isSp",
+      "normalSoldierId",
+      "spSoldierId"
+    ],
+    "reasonForMinimalShape": "Identity and presentation metadata remain owned by Hero Master and Soldier Master. The relation edge stores only the canonical pair and evidence for why that pair exists."
+  },
+  "provenanceEntry": {
+    "requiredCommonFields": {
+      "sourceKind": "one of BASE_SOLDIER_HERO, SP_HERO_REWARD, SP_SOLDIER_EXPAND, SP_SOLDIER_INHERIT",
+      "sourceClass": "DIRECT or DERIVED",
+      "origin": {
+        "table": "ConfigData table that directly contains the originating relation evidence",
+        "recordId": "canonical ID of the source record",
+        "recordKeyField": "ID",
+        "field": "relation field in that source record"
+      }
+    },
+    "directRule": "DIRECT entries stop at origin; the canonical edge pair determines which member of the source field is being evidenced.",
+    "derivedRule": "SP_SOLDIER_INHERIT entries must additionally contain parentEdge and supportRelation, while retaining the original DIRECT origin copied from the parent provenance.",
+    "derivedFields": {
+      "parentEdge": {
+        "heroId": "same Hero ID as the derived edge",
+        "soldierId": "normal Soldier ID from which the relation is inherited",
+        "parentSourceKind": "BASE_SOLDIER_HERO or SP_HERO_REWARD"
+      },
+      "supportRelation": {
+        "kind": "SP_FORM_LINK",
+        "table": "ConfigDataSPSoldierInfo",
+        "recordId": "SP Soldier ID / SPSoldierInfo.ID",
+        "normalSoldierId": "SPSoldierInfo.NormalSoliderId",
+        "spSoldierId": "SPSoldierInfo.ID"
+      }
+    }
+  },
+  "allowedShapes": {
+    "BASE_SOLDIER_HERO": {
+      "sourceKind": "BASE_SOLDIER_HERO",
+      "sourceClass": "DIRECT",
+      "origin": {
+        "table": "ConfigDataSoldierInfo",
+        "recordId": 621,
+        "recordKeyField": "ID",
+        "field": "GetSoldierHeros_ID"
+      }
+    },
+    "SP_HERO_REWARD": {
+      "sourceKind": "SP_HERO_REWARD",
+      "sourceClass": "DIRECT",
+      "origin": {
+        "table": "ConfigDataSPHeroInfo",
+        "recordId": 12,
+        "recordKeyField": "ID",
+        "field": "SecondStageRewardSoldiers"
+      }
+    },
+    "SP_SOLDIER_EXPAND": {
+      "sourceKind": "SP_SOLDIER_EXPAND",
+      "sourceClass": "DIRECT",
+      "origin": {
+        "table": "ConfigDataSPSoldierInfo",
+        "recordId": 5805,
+        "recordKeyField": "ID",
+        "field": "SecondStageExpandHeroList"
+      }
+    },
+    "SP_SOLDIER_INHERIT": {
+      "sourceKind": "SP_SOLDIER_INHERIT",
+      "sourceClass": "DERIVED",
+      "origin": {
+        "table": "ConfigDataSoldierInfo",
+        "recordId": 621,
+        "recordKeyField": "ID",
+        "field": "GetSoldierHeros_ID"
+      },
+      "parentEdge": {
+        "heroId": 6,
+        "soldierId": 621,
+        "parentSourceKind": "BASE_SOLDIER_HERO"
+      },
+      "supportRelation": {
+        "kind": "SP_FORM_LINK",
+        "table": "ConfigDataSPSoldierInfo",
+        "recordId": 5621,
+        "normalSoldierId": 621,
+        "spSoldierId": 5621
+      }
+    }
+  },
+  "mergeRules": [
+    "The canonical edge set is keyed only by exact (heroId, soldierId).",
+    "If multiple allowed sources produce the same pair, keep one canonical edge and append all distinct provenance entries.",
+    "Never collapse different provenance source kinds into a single generic reason string.",
+    "Never overwrite an earlier provenance entry when a later source produces the same edge.",
+    "Exact duplicate provenance entries are deduplicated structurally.",
+    "For SP_SOLDIER_INHERIT, create one derived provenance entry per eligible parent provenance so the original direct origin remains traceable.",
+    "SP_FORM_LINK alone never creates an edge or provenance entry because it is support-only."
+  ],
+  "integrityRules": [
+    "Every edge.heroId must exist in the canonical Hero Master.",
+    "Every edge.soldierId must exist in the canonical Soldier Master.",
+    "Every edge must have provenance.length >= 1.",
+    "Every provenance.sourceKind must be allowed by the A-3 source contract.",
+    "DIRECT provenance must match the authoritative table/field pair defined for its sourceKind.",
+    "SP_SOLDIER_INHERIT must have sourceClass DERIVED, a valid parentEdge, and a valid SP_FORM_LINK supportRelation.",
+    "For inherited edges, parentEdge.heroId must equal edge.heroId and supportRelation.spSoldierId must equal edge.soldierId.",
+    "For inherited edges, parentEdge.soldierId must equal supportRelation.normalSoldierId.",
+    "Presentation metadata must be resolved from masters at read time rather than copied into the canonical edge."
+  ],
+  "determinismRules": {
+    "edgeOrder": "sort by soldierId ascending, then heroId ascending when serialized",
+    "provenanceOrder": "sort by sourceKind, origin.table, origin.recordId, origin.field, then parentEdge.soldierId when present",
+    "purpose": "Stable diffs and reproducible regression comparison. Ordering does not change semantic identity."
+  },
+  "migrationFromStage3": {
+    "oldShape": "Soldier-centric rows containing finalHeroIds plus source-specific Hero ID arrays.",
+    "newShape": "One canonical record per heroId-soldierId pair with provenance[] attached directly to that pair.",
+    "rule": "Do not mutate the frozen stage-3 output in A-4. The new schema becomes the target for the shared Relation Layer builder implemented later."
+  },
+  "completion": "A-4 is complete when all later relation builders and indexes are required to emit and consume one canonical edge per (heroId, soldierId) with non-empty provenance[] conforming to this schema."
+}
