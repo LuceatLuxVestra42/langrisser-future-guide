@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-relation-validation/v1",
+  "generatedAt": "2026-08-25T01:54:37.720Z",
+  "status": "PASS",
+  "relationSet": {
+    "path": "data/generated/hero-soldier-relations.v1.json",
+    "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+    "schemaId": "hero-soldier-relation-set/v1"
+  },
+  "indexes": {
+    "byHero": {
+      "path": "data/generated/hero-soldier-by-hero.v1.json",
+      "gitBlobSha": "e613bd05b0e7173734834cba5d8cfbff973298ad",
+      "schemaId": "hero-soldier-by-hero/v1",
+      "relationSetGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    },
+    "bySoldier": {
+      "path": "data/generated/hero-soldier-by-soldier.v1.json",
+      "gitBlobSha": "ff9d8a881c03b6e0f2a196e12f37cd2e28e3e251",
+      "schemaId": "hero-soldier-by-soldier/v1",
+      "relationSetGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    }
+  },
+  "checks": {
+    "unknownHeroIds": 0,
+    "unknownSoldierIds": 0,
+    "duplicateCanonicalPairs": 0,
+    "edgesWithoutProvenance": 0,
+    "forbiddenEmbeddedEdgeFields": 0,
+    "invalidSourceKinds": 0,
+    "invalidDirectOrigins": 0,
+    "invalidInheritedProvenance": 0,
+    "edgeOrderingMismatch": 0,
+    "provenanceOrderingMismatch": 0,
+    "orderDependentBuild": 0,
+    "summaryMismatch": 0,
+    "sourceCompletenessMissing": 0,
+    "sourceCompletenessExtra": 0,
+    "byHeroRelationCountMismatch": 0,
+    "bySoldierRelationCountMismatch": 0,
+    "byHeroPairMismatch": 0,
+    "bySoldierPairMismatch": 0,
+    "crossIndexPairMismatch": 0,
+    "duplicateByHeroValues": 0,
+    "duplicateBySoldierValues": 0,
+    "legacyMissingPairs": 0,
+    "legacyExtraPairs": 0,
+    "legacyCountMismatch": 0,
+    "goldenConceptualCountMismatch": 0,
+    "fixturePlanBlobMismatch": 0,
+    "spSoldierFixtureSnapshotBlobMismatch": 0,
+    "invalidTraceabilitySha": 0
+  },
+  "fixtures": [
+    {
+      "soldierId": 105,
+      "kind": "NORMAL_ONLY",
+      "status": "PASS",
+      "checks": {
+        "hasSpLink": 0,
+        "relationEdges": 26,
+        "invalidSpProvenance": 0
+      }
+    },
+    {
+      "soldierId": 247,
+      "kind": "NORMAL_ONLY",
+      "status": "PASS",
+      "checks": {
+        "hasSpLink": 0,
+        "relationEdges": 28,
+        "invalidSpProvenance": 0
+      }
+    },
+    {
+      "soldierId": 1032,
+      "kind": "NORMAL_ONLY",
+      "status": "PASS",
+      "checks": {
+        "hasSpLink": 0,
+        "relationEdges": 25,
+        "invalidSpProvenance": 0
+      }
+    },
+    {
+      "soldierId": 5622,
+      "normalSoldierId": 622,
+      "kind": "SP_FIRST_STAGE_ONLY",
+      "status": "PASS",
+      "checks": {
+        "linkMismatch": 0,
+        "expandProvenance": 0,
+        "missingInherited": 0
+      }
+    },
+    {
+      "soldierId": 5320,
+      "normalSoldierId": 320,
+      "kind": "SP_TWO_STAGE",
+      "status": "PASS",
+      "checks": {
+        "linkMismatch": 0,
+        "expandMissing": 0,
+        "backwardExpandLeak": 0,
+        "missingInherited": 0
+      }
+    }
+  ],
+  "goldenComparison": {
+    "status": "MATCH",
+    "legacyRelationPath": "data/generated/soldier-hero-relations.v1.json",
+    "legacyRelationGitBlobSha": "6d298acd7a0e55d4c3c1f091d59b2f712177e3e7",
+    "legacyPairCount": 5977,
+    "currentPairCount": 5977,
+    "legacyConceptualCounts": {
+      "baseEdges": 5720,
+      "directSpHeroAddedEdges": 25,
+      "inheritedSpHeroAddedEdges": 5,
+      "spExpandedEdges": 228
+    },
+    "currentConceptualCounts": {
+      "baseEdges": 5720,
+      "directSpHeroAddedEdges": 25,
+      "inheritedSpHeroAddedEdges": 5,
+      "spExpandedEdges": 228
+    }
+  },
+  "errors": [],
+  "reviews": []
+}

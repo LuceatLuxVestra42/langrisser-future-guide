@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "stage": "soldier-page-4-6",
+  "status": "PASS",
+  "purpose": "Adopt the PASS_ACCEPTED shared Hero-Soldier Relation Layer as the sole Soldier -> Hero membership source after Soldier 4-1 through 4-5 upstream migration gates.",
+  "consumerContract": {
+    "membershipSource": "data/generated/hero-soldier-by-soldier.v1.json#bySoldierId",
+    "canonicalRelationSource": "data/generated/hero-soldier-relations.v1.json#edges",
+    "readinessGate": "data/validation/hero-soldier-relation-validation.v1.json must be PASS for the exact relation/index blobs.",
+    "heroPresentationJoin": "Resolve heroId values through data/hero-name-master.v1.json only after membership lookup.",
+    "forbidden": [
+      "Do not re-read ConfigDataSoldierInfo.GetSoldierHeros_ID to calculate final usable Heroes.",
+      "Do not re-read ConfigDataSPHeroInfo.SecondStageRewardSoldiers to patch final membership.",
+      "Do not use legacy data/generated/soldier-hero-relations.v1.json as production truth.",
+      "Do not infer relations by names, numeric patterns, SP status, tier or army type."
+    ]
+  },
+  "sharedArtifacts": {
+    "relationSet": {
+      "path": "data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+      "schemaId": "hero-soldier-relation-set/v1"
+    },
+    "bySoldier": {
+      "path": "data/generated/hero-soldier-by-soldier.v1.json",
+      "gitBlobSha": "ff9d8a881c03b6e0f2a196e12f37cd2e28e3e251",
+      "schemaId": "hero-soldier-by-soldier/v1"
+    },
+    "validation": {
+      "path": "data/validation/hero-soldier-relation-validation.v1.json",
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638",
+      "status": "PASS"
+    }
+  },
+  "counts": {
+    "soldierMasterRecords": 224,
+    "heroMasterRecords": 267,
+    "relationEdges": 5977,
+    "bySoldierKeys": 224,
+    "bySoldierRelations": 5977,
+    "legacyRegressionEdges": 5977
+  },
+  "checks": {
+    "sharedValidationNotPass": 0,
+    "relationBlobMismatchInValidation": 0,
+    "relationBlobMismatchInIndex": 0,
+    "bySoldierBlobMismatchInValidation": 0,
+    "indexRelationCountMismatch": 0,
+    "indexPairMismatch": 0,
+    "duplicateIndexValues": 0,
+    "missingHeroIds": 0,
+    "missingSoldierIndexKeys": 0,
+    "extraIndexSoldierKeys": 0,
+    "legacyMissingPairs": 0,
+    "legacyExtraPairs": 0,
+    "perSoldierLegacyMismatch": 0
+  },
+  "legacyUsage": "REGRESSION_ONLY",
+  "errors": [],
+  "completion": "Soldier membership now consumes only the validated shared bySoldierId index, with exact parity to the canonical relation set and frozen 3-12 regression baseline."
+}
