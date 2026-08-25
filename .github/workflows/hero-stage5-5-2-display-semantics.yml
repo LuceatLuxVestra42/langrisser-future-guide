@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/hero-stage5-5-2-display-semantics.yml'
       - 'scripts/analyze_hero_stage5_5_2_display_semantics.cjs'
+      - 'scripts/profile_hero_stage5_5_2_fields.cjs'
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/hero-name-master.v1.json'
 
@@ -17,17 +18,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build semantic diagnostic
-        run: node scripts/analyze_hero_stage5_5_2_display_semantics.cjs
-      - name: Freeze diagnostic artifact
+      - name: Build semantic diagnostics
         run: |
-          TARGET='data/validation/hero-page-stage5-5-2-display-semantics.v1.json'
-          if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
-            echo 'Diagnostic already current.'
+          node scripts/analyze_hero_stage5_5_2_display_semantics.cjs
+          node scripts/profile_hero_stage5_5_2_fields.cjs
+      - name: Freeze diagnostic artifacts
+        run: |
+          TARGET1='data/validation/hero-page-stage5-5-2-display-semantics.v1.json'
+          TARGET2='data/validation/hero-page-stage5-5-2-field-profile.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET1" "$TARGET2")" ]; then
+            echo 'Diagnostics already current.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$TARGET"
-          git commit -m 'Freeze Hero Stage 5-5-2 display semantics diagnostic'
+          git add "$TARGET1" "$TARGET2"
+          git commit -m 'Freeze Hero Stage 5-5-2 semantic diagnostics'
           git push
