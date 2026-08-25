@@ -6,6 +6,7 @@ on:
       - '.github/workflows/equipment-stage2-7-acquisition.yml'
       - 'scripts/analyze-equipment-stage2-7-acquisition.mjs'
       - 'scripts/scan-equipment-stage2-7-path-types.mjs'
+      - 'scripts/derive-equipment-stage2-7-candidates.mjs'
       - 'data/generated/equipment_stage2_6_restrictions.json'
       - 'data/configdata/ConfigDataEquipmentInfo.json'
 
@@ -21,11 +22,13 @@ jobs:
         run: node scripts/analyze-equipment-stage2-7-acquisition.mjs
       - name: Scan acquisition path mappings
         run: node scripts/scan-equipment-stage2-7-path-types.mjs
+      - name: Derive historical candidates
+        run: node scripts/derive-equipment-stage2-7-candidates.mjs
       - name: Persist Stage 2-7 acquisition checkpoints
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/generated/equipment_stage2_7_acquisition_analysis.json data/generated/equipment_stage2_7_path_type_scan.json
+          git add data/generated/equipment_stage2_7_acquisition_analysis.json data/generated/equipment_stage2_7_path_type_scan.json data/generated/equipment_stage2_7_historical_candidates.json
           if git diff --cached --quiet; then
             echo "No Stage 2-7 acquisition changes"
             exit 0
