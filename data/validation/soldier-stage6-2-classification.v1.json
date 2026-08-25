@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage6-2-classification-validation/v1",
+  "stage": "6-2",
+  "status": "PASS",
+  "classificationStatus": "PASS_WITH_REVIEW",
+  "generatedAt": "2026-08-25T07:09:25.482Z",
+  "sources": {
+    "checkpoint": {
+      "path": "data/validation/soldier-stage6-0-checkpoint.v1.json",
+      "gitBlobSha": "86bee6c79cd6c8a45c85d5cfc020436c86eccb09"
+    },
+    "fullRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    },
+    "fullValidation": {
+      "path": "data/validation/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "cf6d985fe12f21a16124a61ee225d90218835d90"
+    },
+    "stage3Validation": {
+      "path": "data/validation/soldier-stage3-final.v1.json",
+      "gitBlobSha": "e1aa89d12d07edd513f993458be3e08e7ec57e03"
+    },
+    "abilityValidation": {
+      "path": "data/validation/soldier-stage5-3-ability.v1.json",
+      "gitBlobSha": "8c5f09485939545a2d32803d96ed620c9598e5c8"
+    },
+    "spValidation": {
+      "path": "data/validation/soldier-stage5-6-sp-detail.v1.json",
+      "gitBlobSha": "a4f190d4f1ea85d9d7e50f6e112f0806b349f85b"
+    },
+    "relationValidation": {
+      "path": "data/validation/hero-soldier-relation-validation.v1.json",
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638"
+    }
+  },
+  "checks": {
+    "upstreamNonPass": 0,
+    "nonZeroValidationGates": 0,
+    "duplicateSoldierIds": 0,
+    "missingTrainingLevelRefs": 0,
+    "missingBaseHeroIds": 0,
+    "missingSpHeroIds": 0,
+    "missingSpRelations": 0,
+    "byHeroPairMismatch": 0,
+    "bySoldierPairMismatch": 0,
+    "crossIndexPairMismatch": 0,
+    "recordFailCount": 0,
+    "undeclaredReviewCodes": 0,
+    "baselineMismatches": 0,
+    "classificationTotalMismatch": 0
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "passRecords": 11,
+    "reviewRecords": 213,
+    "failRecords": 0,
+    "failSoldierIds": [],
+    "reviewReasonCounts": {
+      "IDENTITY_PRESENTATION_REVIEW": 41,
+      "KR_NAME_UNRESOLVED": 41,
+      "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED": 39,
+      "RELEASE_DATE_UNRESOLVED": 213,
+      "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED": 56
+    },
+    "baselineMismatches": []
+  },
+  "errors": [],
+  "reviews": [
+    {
+      "code": "KR_NAME_UNRESOLVED",
+      "count": 41,
+      "classification": "REVIEW",
+      "scope": "RECORD_OR_POLICY",
+      "rule": "Do not synthesize Korean names; preserve nameCn/nameKrStatus until a confirmed Korean source exists."
+    },
+    {
+      "code": "RELEASE_DATE_UNRESOLVED",
+      "count": 213,
+      "classification": "REVIEW",
+      "scope": "RECORD_OR_POLICY",
+      "rule": "Only externally confirmed release metadata may be presented as release order/date."
+    },
+    {
+      "code": "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED",
+      "count": 56,
+      "classification": "REVIEW",
+      "scope": "RECORD_OR_POLICY",
+      "rule": "SP Soldiers remain grouped before normal Soldiers by UI policy; do not infer their internal release order from IDs."
+    },
+    {
+      "code": "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED",
+      "count": 39,
+      "classification": "REVIEW",
+      "scope": "RECORD_OR_POLICY",
+      "rule": "Tier-1/tier-2 Soldiers may remain in the technical bucket because current list policy does not require release ordering for them."
+    },
+    {
+      "code": "REPRESENTATIVE_ASSET_ID_UNFROZEN",
+      "count": null,
+      "classification": "REVIEW",
+      "scope": "GLOBAL",
+      "rule": "Do not invent representative icon/image identifiers until a canonical asset-identifier source is frozen."
+    },
+    {
+      "code": "SAME_PATCH_ORDER_UNRESOLVED",
+      "count": null,
+      "classification": "REVIEW",
+      "scope": "GLOBAL",
+      "rule": "Do not present Soldier ID order as same-patch release order."
+    },
+    {
+      "code": "IDENTITY_PRESENTATION_REVIEW",
+      "count": 41,
+      "classification": "REVIEW",
+      "scope": "RECORD",
+      "rule": "Preserve canonical validationStatus; presentation metadata review is non-blocking unless it creates an invalid identity or JOIN."
+    }
+  ]
+}
