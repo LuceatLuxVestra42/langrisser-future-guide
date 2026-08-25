@@ -56,13 +56,50 @@
       "validation": "data/validation/hero-page-stage5-5-2-cv.v1.json"
     },
     "origin": {
-      "status": "POINTER_CONFIRMED",
+      "status": "SOURCE_DICTIONARY_CONFIRMED",
       "source": "ConfigDataHeroInfo.HeroBelongProduction",
       "heroesWithNonEmptyValidPointers": 267,
       "pointerValueCount": 267,
+      "distinctProductionIdCount": 32,
+      "observedProductionIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
       "missingHeroIds": [],
       "invalidHeroIds": [],
-      "displayDictionaryStatus": "UNRESOLVED"
+      "displayDictionaryStatus": "SOURCE_CONFIRMED",
+      "validation": "data/validation/hero-page-stage5-5-2-origin.v1.json",
+      "rule": "Resolve the single HeroBelongProduction ID through the validated origin dictionary. Preserve originLabelCn as source-display text; Korean work-title localization may be layered separately without changing productionId semantics."
     },
     "artwork": {
       "status": "POINTER_CONFIRMED",
@@ -341,11 +378,10 @@
   "hardErrors": [],
   "coverageIssues": [],
   "unresolvedSemanticFields": [
-    "origin.displayDictionary",
     "artwork.displaySemantics",
     "skins.orderingSemantics",
     "skins.acquisitionSemantics"
   ],
   "readyForDisplayEnrichment": false,
-  "nextAction": "Resolve the remaining unresolved display semantics without reopening confirmed rarity, faction or CV source mappings."
+  "nextAction": "Resolve final artwork display semantics and skin ordering/acquisition semantics without reopening confirmed rarity, faction, CV or origin mappings."
 }
