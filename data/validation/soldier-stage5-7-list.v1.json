@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage5-7-list-validation/v1",
+  "stage": "5-7",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T00:41:14.143Z",
+  "sources": {
+    "contract": {
+      "path": "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+      "gitBlobSha": "2943af041025c76c647b790661babe784e05f4f2"
+    },
+    "identityContract": {
+      "path": "data/contracts/soldier-identity-contract.v1.json",
+      "gitBlobSha": "ab652ffe7319e977f1d9e01ea906c6b9c0cd3f63"
+    },
+    "stage5_6": {
+      "path": "data/generated/soldier-detail-stage5-6.v1.json",
+      "gitBlobSha": "e554d0c20ed1629a0774301bc0a5bfe639b63efa"
+    },
+    "stage5_6Validation": {
+      "path": "data/validation/soldier-stage5-6-sp-detail.v1.json",
+      "gitBlobSha": "a4f190d4f1ea85d9d7e50f6e112f0806b349f85b"
+    }
+  },
+  "checks": {
+    "contractNotFrozen": 0,
+    "identityContractNotFrozen": 0,
+    "stage5_6NotPass": 0,
+    "stage5_6ValidationNotPass": 0,
+    "duplicateStage5Ids": 0,
+    "invalidStage5Ids": 0,
+    "projectionMismatches": 0,
+    "malformedRows": 0,
+    "siteIdMismatches": 0,
+    "duplicateSiteIds": 0,
+    "unexpectedFields": 0,
+    "outputOrderMismatch": 0,
+    "recordCountMismatch": 0,
+    "normalCountMismatch": 0,
+    "spCountMismatch": 0
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "generatedRecords": 224,
+    "normalCount": 168,
+    "spCount": 56,
+    "nullNameKrCount": 41,
+    "nonPassIdentityMetadataCount": 41,
+    "sourceAlreadySoldierIdAscending": true,
+    "outputSoldierIdAscending": true,
+    "projectionMismatches": [],
+    "malformedRows": [],
+    "siteIdMismatches": [],
+    "duplicateSiteIds": [],
+    "unexpectedFields": []
+  },
+  "errors": [],
+  "reviews": [
+    "41 list rows retain non-PASS identity/presentation metadata from the canonical detail source; Stage 5-7 does not rewrite it.",
+    "41 list rows have nameKr=null and preserve nameCn/nameKrStatus for later presentation handling.",
+    "Representative icon/image identifiers are intentionally not populated because Stage 5-7 has no frozen canonical asset-identifier source.",
+    "Release order is intentionally not attached; Stage 5-7 uses soldierId ascending only as deterministic technical order, never as release order."
+  ]
+}
