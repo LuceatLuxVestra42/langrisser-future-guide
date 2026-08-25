@@ -1,0 +1,88 @@
+name: Soldier Stage 6-6 Expansion Basis
+
+on:
+  push:
+    branches:
+      - 'work/**'
+    paths:
+      - 'scripts/finalize-soldier-stage6-6-expansion-basis.cjs'
+      - '.github/workflows/soldier-stage6-6-expansion-basis.yml'
+      - 'data/generated/soldier-stage6-1-full-records.v1.json'
+      - 'data/validation/soldier-stage6-1-full-records.v1.json'
+      - 'data/generated/soldier-detail-stage5-2.v1.json'
+      - 'data/validation/soldier-stage5-2-combat.v1.json'
+      - 'data/generated/soldier-detail-stage5-3.v1.json'
+      - 'data/validation/soldier-stage5-3-ability.v1.json'
+      - 'data/generated/soldier-detail-stage5-4.v1.json'
+      - 'data/validation/soldier-stage5-4-training.v1.json'
+      - 'data/generated/soldier-detail-stage5-6.v1.json'
+      - 'data/validation/soldier-stage5-6-sp-detail.v1.json'
+      - 'data/generated/hero-soldier-relations.v1.json'
+      - 'data/validation/hero-soldier-relation-validation.v1.json'
+      - 'data/generated/hero-soldier-page-links-stage6-5.v1.json'
+      - 'data/validation/soldier-stage6-5-reciprocal-links.v1.json'
+  pull_request:
+    paths:
+      - 'scripts/finalize-soldier-stage6-6-expansion-basis.cjs'
+      - '.github/workflows/soldier-stage6-6-expansion-basis.yml'
+      - 'data/generated/soldier-stage6-6-expansion-basis.v1.json'
+      - 'data/validation/soldier-stage6-6-expansion-basis.v1.json'
+      - 'data/generated/soldier-stage6-1-full-records.v1.json'
+      - 'data/validation/soldier-stage6-1-full-records.v1.json'
+      - 'data/generated/soldier-detail-stage5-2.v1.json'
+      - 'data/validation/soldier-stage5-2-combat.v1.json'
+      - 'data/generated/soldier-detail-stage5-3.v1.json'
+      - 'data/validation/soldier-stage5-3-ability.v1.json'
+      - 'data/generated/soldier-detail-stage5-4.v1.json'
+      - 'data/validation/soldier-stage5-4-training.v1.json'
+      - 'data/generated/soldier-detail-stage5-6.v1.json'
+      - 'data/validation/soldier-stage5-6-sp-detail.v1.json'
+      - 'data/generated/hero-soldier-relations.v1.json'
+      - 'data/validation/hero-soldier-relation-validation.v1.json'
+      - 'data/generated/hero-soldier-page-links-stage6-5.v1.json'
+      - 'data/validation/soldier-stage6-5-reciprocal-links.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  expansion-basis:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate Soldier Stage 6-6 expansion basis
+        run: node scripts/finalize-soldier-stage6-6-expansion-basis.cjs
+
+      - name: Upload Stage 6-6 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage6-6-expansion-basis
+          path: |
+            data/generated/soldier-stage6-6-expansion-basis.v1.json
+            data/validation/soldier-stage6-6-expansion-basis.v1.json
+
+      - name: Freeze Stage 6-6 artifacts on work branch
+        if: github.event_name == 'push' && startsWith(github.ref_name, 'work/')
+        run: |
+          if git diff --quiet -- data/generated/soldier-stage6-6-expansion-basis.v1.json data/validation/soldier-stage6-6-expansion-basis.v1.json && git ls-files --error-unmatch data/generated/soldier-stage6-6-expansion-basis.v1.json data/validation/soldier-stage6-6-expansion-basis.v1.json >/dev/null 2>&1; then
+            echo 'Stage 6-6 artifacts already frozen.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/generated/soldier-stage6-6-expansion-basis.v1.json data/validation/soldier-stage6-6-expansion-basis.v1.json
+          git commit -m 'freeze Soldier stage 6-6 expansion basis PASS'
+          git push
+
+      - name: Verify frozen Stage 6-6 artifacts on PR
+        if: github.event_name == 'pull_request'
+        run: git diff --exit-code -- data/generated/soldier-stage6-6-expansion-basis.v1.json data/validation/soldier-stage6-6-expansion-basis.v1.json
