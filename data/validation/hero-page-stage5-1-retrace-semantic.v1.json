@@ -18,7 +18,8 @@
       "data/configdata/ConfigDataHeroInformationInfo.json": "262b3c41922162a951d1d55db065f24246455e68",
       "data/configdata/ConfigDataHeroDungeonLevelInfo.json": "57269c2bf8b2e7b7120d26cef8c54751019684c7",
       "data/hero-name-master.v1.json": "808382f1a6858ec615703536634efa648572e04b"
-    }
+    },
+    "productionCandidateRecheck": "data/validation/hero-page-stage5-1-production-candidate.v1.json"
   },
   "scope": {
     "canonicalHeroCount": 267,
@@ -34,8 +35,8 @@
       "34": 120
     },
     "missionType5Param2": {
-      "2": 254,
-      "5": 98,
+      "2": 262,
+      "5": 90,
       "6": 338
     },
     "externalRequiredHeroCount": {
@@ -64,9 +65,9 @@
     "semanticGatePass": true
   },
   "decision": {
-    "semanticBlocker": "RESOLVED",
+    "semanticBlocker": "RESOLVED_FOR_CONDITIONTYPE_2",
     "stage51Overall": "IN_PROGRESS",
-    "reasonStageNotComplete": "The resolver semantics are frozen, but the production Hero bond block/schema and final Stage 5-1 validation output have not yet been generated from this rule.",
-    "nextStartPoint": "Build a dedicated Stage 5-1 production consumer that preserves HeroFetter data, resolves ConditionType=2 missions with this rule, emits one Hero-keyed bond block for all 267 canonical Heroes, and then freeze hero-page-stage5-1-final.v1.json."
+    "reasonStageNotComplete": "The ConditionType=2 resolver semantics are frozen and the 267-Hero production candidate is structurally clean, but ConditionType=1 semantics remain to be frozen before the Stage 5-1 final checkpoint.",
+    "nextStartPoint": "Trace and freeze CompletionConditions ConditionType=1 (1335 canonical rows), then rerun the production builder and freeze hero-page-stage5-1-final.v1.json."
   }
 }
