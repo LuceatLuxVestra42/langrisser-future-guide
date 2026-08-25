@@ -13,7 +13,6 @@
       "5-5"
     ],
     "blockedBlocks": [
-      "5-1",
       "5-2",
       "5-4"
     ],
@@ -21,7 +20,7 @@
     "completedCrossBlockCheckCount": 3,
     "passedCrossBlockCheckCount": 3,
     "hardErrorCount": 0,
-    "blockerCount": 3,
+    "blockerCount": 2,
     "stage5ReadyToClose": false
   },
   "completedBlocks": [
@@ -57,9 +56,16 @@
   ],
   "unfinishedBlockDiscovery": {
     "5-1": {
-      "candidateFiles": [],
-      "finalCheckpointFiles": [],
-      "hasFinalCheckpoint": false
+      "candidateFiles": [
+        "data/generated/hero-page-stage5-1-bonds-final.v1.json",
+        "data/validation/hero-page-stage5-1-final.v1.json",
+        "data/validation/hero-page-stage5-1-retrace-semantic.v1.json"
+      ],
+      "finalCheckpointFiles": [
+        "data/validation/hero-page-stage5-1-final.v1.json",
+        "data/validation/hero-page-stage5-1-retrace-semantic.v1.json"
+      ],
+      "hasFinalCheckpoint": true
     },
     "5-2": {
       "candidateFiles": [],
@@ -96,13 +102,6 @@
     }
   ],
   "blockers": [
-    {
-      "stage": "5-1",
-      "title": "Bond / fetter block",
-      "reason": "No frozen Hero-stage contract/output/final checkpoint was discovered in data/contracts, data/generated, data/validation, or top-level data artifacts.",
-      "discoveredCandidateFiles": [],
-      "requiredForStage5Close": true
-    },
     {
       "stage": "5-2",
       "title": "Exclusive equipment + central-law block",
