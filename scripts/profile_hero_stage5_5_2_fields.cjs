@@ -41,12 +41,12 @@ for (const key of keys) {
     profile.arrayLengthCounts = lengths;
     const distinctMembers = [...new Set(members.map(v => JSON.stringify(v)))];
     profile.distinctArrayMemberCount = distinctMembers.length;
-    profile.sampleArrayMembers = distinctMembers.slice(0, 20).map(v => JSON.parse(v));
+    profile.sampleArrayMembers = distinctMembers.slice(0, 40).map(v => JSON.parse(v));
   } else {
     const distinct = [...new Set(values.map(v => JSON.stringify(v)))];
     profile.distinctValueCount = distinct.length;
-    if (distinct.length <= 40) profile.distinctValues = distinct.map(v => JSON.parse(v));
-    else profile.sampleValues = distinct.slice(0, 12).map(v => JSON.parse(v));
+    if (distinct.length <= 60) profile.distinctValues = distinct.map(v => JSON.parse(v));
+    else profile.sampleValues = distinct.slice(0, 20).map(v => JSON.parse(v));
   }
 
   profile.representativeValues = representativeIds.map(heroId => {
@@ -60,14 +60,22 @@ const likelyMultiValueCandidates = profiles
   .filter(p => p.kindCounts.array || (p.distinctValueCount && p.distinctValueCount <= 40))
   .map(p => p.field);
 
+const focusFields = [
+  'HeroBelongProduction', 'HeroGameActors', 'TeamShow', 'HeroRelateBattle', 'OwningClause',
+  'Rank', 'Star', 'StarToRank', 'ExchangedFragmentCount', 'AnnualTagId', 'GameplayAnnualTagId',
+  'HeroArchiveShow', 'Sex', 'CharImage_ID'
+];
+const focusedProfiles = focusFields.map(field => profiles.find(p => p.field === field)).filter(Boolean);
+
 const out = {
   version: 1,
   playableHeroCount: playable.length,
   representativeIds,
+  focusedProfiles,
   likelyMultiValueCandidates,
   profiles
 };
 const outPath = 'data/validation/hero-page-stage5-5-2-field-profile.v1.json';
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, JSON.stringify(out, null, 2) + '\n');
-console.log(JSON.stringify({ playableHeroCount: playable.length, fieldCount: profiles.length, likelyMultiValueCandidates }, null, 2));
+console.log(JSON.stringify({ playableHeroCount: playable.length, fieldCount: profiles.length, focusFields, likelyMultiValueCandidates }, null, 2));
