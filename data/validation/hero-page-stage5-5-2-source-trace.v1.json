@@ -21,10 +21,30 @@
   },
   "fields": {
     "rarity": {
-      "status": "UNRESOLVED",
-      "observedCandidates": ["ConfigDataHeroInfo.Star", "ConfigDataHeroInfo.Rank"],
+      "status": "SOURCE_CONFIRMED",
+      "source": "ConfigDataHeroInfo.Rank",
+      "valueType": "integer",
+      "rankToRarity": {
+        "1": "N",
+        "2": "R",
+        "3": "SR",
+        "4": "SSR",
+        "6": "LLR"
+      },
+      "rank5Status": "UNOBSERVED_AND_UNRESOLVED",
+      "starSource": "ConfigDataHeroInfo.Star",
+      "starMeaning": "initial/current base star count; not the rarity label",
+      "validation": "data/validation/hero-page-stage5-5-2-rarity.v1.json",
+      "coverage": "267/267 canonical Heroes resolve to a validated Rank value.",
+      "evidence": [
+        "Rank 1 contains Matthew, Grenier and Almeda; their StarToRank data promotes Rank 1 -> 2 -> 3 -> 4 as stars increase, directly establishing Rank as the rarity tier axis.",
+        "Rank 2 contains the canonical R Hero group such as Lester, Jessica, Rouga and Scott.",
+        "Rank 3 contains the canonical SR Hero group such as Chris, Narm, Hein and Altina.",
+        "Rank 4 contains the canonical SSR Hero group such as Leon and Ledin.",
+        "Rank 6 contains exactly the six current LLR Heroes: 빙설 심연의 지배자, 빛의 소환사, 염룡파멸자, 마안의 서큐버스, 빛과 어둠의 반역자, 효랑어홍사."
+      ],
       "rejectedSources": ["ConfigDataHeroInfo.ExchangedFragmentCount"],
-      "rule": "Star/Rank values may be measured but must not be converted to rarity labels until their semantics are independently validated."
+      "rule": "Use Rank for rarity display. Use Star only for star count. ExchangedFragmentCount remains rejected because it is duplicate-acquisition fragment quantity, not the rarity enum."
     },
     "factions": {
       "status": "SOURCE_CONFIRMED",
@@ -96,11 +116,12 @@
   "coverageGenerator": "scripts/validate_hero_page_stage5_5_2.cjs",
   "expectedCoverageOutput": "data/validation/hero-page-stage5-5-2-coverage.v1.json",
   "confirmedSemanticArtifacts": [
+    "data/validation/hero-page-stage5-5-2-rarity.v1.json",
     "data/validation/hero-page-stage5-5-2-factions.v1.json",
     "data/validation/hero-page-stage5-5-2-cv.v1.json"
   ],
   "deferredTasks": [
     "Localize ConfigDataCharImageInfo.CVName source spellings into Korean voice-actor display names without changing the confirmed CV source join."
   ],
-  "nextGate": "Continue resolving remaining display semantics (rarity, origin dictionary, final artwork field, skin ordering/acquisition) without reopening confirmed faction or CV joins."
+  "nextGate": "Continue resolving remaining display semantics (origin dictionary, final artwork field, skin ordering/acquisition) without reopening confirmed rarity, faction or CV semantics."
 }
