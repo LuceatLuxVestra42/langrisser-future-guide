@@ -14,8 +14,7 @@ on:
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/generated/soldier-master.v1.json'
       - 'data/hero-name-master.v1.json'
-      - 'scripts/finalize-soldier-stage3.cjs'
-      - 'scripts/finalize-soldier-stage3-postprocess.cjs'
+      - 'scripts/validate_soldier_stage4_prereq_parsed.cjs'
       - 'scripts/inspect_parsed_soldier_schema.cjs'
       - '.github/workflows/soldier-stage3-final.yml'
   pull_request:
@@ -30,13 +29,12 @@ on:
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/generated/soldier-master.v1.json'
       - 'data/hero-name-master.v1.json'
-      - 'scripts/finalize-soldier-stage3.cjs'
-      - 'scripts/finalize-soldier-stage3-postprocess.cjs'
+      - 'scripts/validate_soldier_stage4_prereq_parsed.cjs'
       - 'scripts/inspect_parsed_soldier_schema.cjs'
       - '.github/workflows/soldier-stage3-final.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   validate-soldier-stage3:
@@ -50,27 +48,13 @@ jobs:
           node-version: '22'
       - name: Inspect parsed soldier ConfigData schema
         run: node scripts/inspect_parsed_soldier_schema.cjs
-      - name: Build soldier stage 3 data
-        run: node scripts/finalize-soldier-stage3.cjs
-      - name: Resolve stage 3 review cases and final-validate
-        run: node scripts/finalize-soldier-stage3-postprocess.cjs
-      - name: Upload soldier stage 3 outputs
+      - name: Revalidate soldier stage 4 prerequisites
+        run: node scripts/validate_soldier_stage4_prereq_parsed.cjs
+      - name: Upload stage 4 prerequisite recheck
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: soldier-stage3-final
-          path: |
-            data/generated/soldier-stage3.v1.json
-            data/validation/soldier-stage3-final.v1.json
-      - name: Commit validated outputs
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/generated/soldier-stage3.v1.json data/validation/soldier-stage3-final.v1.json
-          if git diff --cached --quiet; then
-            echo "No output changes to commit."
-          else
-            git commit -m "generate soldier stage 3 final validation"
-            git push origin HEAD:${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}
-          fi
+          name: soldier-stage4-prereq-recheck
+          path: data/validation/soldier-stage4-prereq-recheck.v1.json
 
-# validation trigger: 2026-08-25 stage4 recheck
+# validation-only branch workflow override
