@@ -1,0 +1,99 @@
+{
+  "stage": "3-1",
+  "purpose": "Freeze the page-consumer List/Detail schema that Stage 3 equipment outputs must follow, using only Stage 2 semantics already admitted by Stage 3-0.",
+  "inputContract": "data/contracts/equipment-stage3-0-input-contract.v1.json",
+  "primaryKey": "equipmentId",
+  "pageAdmission": {
+    "general": ["launch", "legacy-additional", "current-additional"],
+    "exclusive": ["exclusive-equipment"],
+    "hiddenFromGeneral": ["soul-special"],
+    "hold": ["unresolved-no-path"]
+  },
+  "displayMetadataBoundary": {
+    "stage": "3-2",
+    "fields": ["nameKr", "icon"],
+    "policy": "Stage 3-1 defines where these fields live but does not invent or backfill them. Until Stage 3-2 supplies them, schema validation treats them as explicit pending display metadata rather than data failure."
+  },
+  "listRecord": {
+    "description": "Minimum card/list payload shared by general and exclusive equipment consumers.",
+    "fields": {
+      "equipmentId": {"type": "integer", "required": true, "source": "acquisition.equipmentId"},
+      "nameCn": {"type": "string", "required": true, "source": "acquisition.nameCn"},
+      "nameKr": {"type": ["string", "null"], "required": true, "source": "stage3-2-display-metadata", "pendingUntil": "3-2"},
+      "icon": {"type": ["string", "null"], "required": true, "source": "stage3-2-display-metadata", "pendingUntil": "3-2"},
+      "group": {"type": "string", "required": true, "source": "filterMap.group"},
+      "groupKo": {"type": "string", "required": true, "source": "filterMap.groupKo"},
+      "subtype": {"type": "string", "required": true, "source": "filterMap.subtype"},
+      "subtypeKo": {"type": "string", "required": true, "source": "filterMap.subtypeKo"},
+      "groupOrder": {"type": "integer", "required": true, "source": "filterMap.groupOrder"},
+      "subtypeOrder": {"type": "integer", "required": true, "source": "filterMap.subtypeOrder"},
+      "acquisitionClass": {"type": "string", "required": true, "source": "acquisition.acquisitionClass"},
+      "siteTab": {"type": ["integer", "null"], "required": true, "source": "acquisition.siteTab"},
+      "releaseGroupDate": {"type": ["string", "null"], "required": true, "source": "acquisition.releaseGroupDate"},
+      "sortIndex": {"type": "integer", "required": true, "source": "acquisition.sortIndex"},
+      "effectName": {"type": "string", "required": true, "source": "effects.effectName"},
+      "effectText": {"type": "string", "required": true, "source": "effects.effectText"}
+    }
+  },
+  "detailRecord": {
+    "description": "Shared detailed payload. General and exclusive consumers use the same core blocks; admission/presentation is decided outside the semantic blocks.",
+    "blocks": {
+      "identity": {
+        "fields": ["equipmentId", "nameCn", "nameKr", "icon"]
+      },
+      "classification": {
+        "fields": ["group", "groupKo", "subtype", "subtypeKo", "groupOrder", "subtypeOrder", "equipmentType", "label", "acquisitionClass", "siteTab", "sortIndex"]
+      },
+      "stats": {
+        "fields": ["maxLevel", "properties"],
+        "mapping": {
+          "maxLevel": "stats.stats[*].maxLevel must resolve to 50 for current Stage 2 data",
+          "properties": "stats.stats"
+        }
+      },
+      "effect": {
+        "fields": ["maxEffectSkillId", "effectName", "effectText", "effectSegments"]
+      },
+      "restriction": {
+        "fields": ["mode", "generalArmyIds", "specialJobIds"]
+      },
+      "acquisition": {
+        "fields": ["releaseGroupDate", "confidencePercent", "classificationBasis"]
+      }
+    },
+    "sourceMappings": {
+      "equipmentType": "acquisition.equipmentType",
+      "label": "acquisition.label",
+      "maxEffectSkillId": "effects.maxEffectSkillId",
+      "effectSegments": "effects.effectSegments",
+      "mode": "restrictions.mode",
+      "generalArmyIds": "restrictions.generalArmyIds",
+      "specialJobIds": "restrictions.specialJobIds",
+      "confidencePercent": "acquisition.confidencePercent",
+      "classificationBasis": "acquisition.classificationBasis"
+    }
+  },
+  "routingPolicy": {
+    "detailRouteKey": "equipmentId",
+    "directLink": "A list/card consumer must be able to route directly to the detail record by equipmentId; names are display-only and never a route/JOIN key.",
+    "sharedCore": "General and exclusive equipment must not fork the Stage 2 semantic blocks. Exclusive presentation may add consumer-specific fields later while retaining this shared core schema."
+  },
+  "sortingPolicy": {
+    "classificationOrder": "Use filterMap.groupOrder and filterMap.subtypeOrder; never raw Label numeric order.",
+    "history": "siteTab and releaseGroupDate are carried as source metadata. Stage 3-1 does not invent missing exact release order inside a release group.",
+    "fallback": "sortIndex may be used only as a deterministic fallback after explicit page sorting rules; it is not reinterpreted as historical release order."
+  },
+  "textPolicy": {
+    "effect": "Use Stage 2 effectName/effectText as-is. Do not summarize, rewrite, merge, or infer equipment effect wording in page data.",
+    "richEffect": "effectSegments is the rich-text representation; source newlines and highlight segments are preserved."
+  },
+  "stage31Completion": {
+    "expectedCanonical": 390,
+    "expectedStructurallyPageReady": 373,
+    "expectedGeneral": 206,
+    "expectedExclusive": 167,
+    "expectedHidden": 16,
+    "expectedHold": 1,
+    "completionCondition": "Every general/exclusive equipment ID can populate all Stage 3-1 structural List/Detail fields from frozen Stage 2 outputs, with only nameKr/icon explicitly deferred to Stage 3-2."
+  }
+}
