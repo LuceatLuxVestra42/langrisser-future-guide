@@ -5,11 +5,15 @@ on:
   push:
     paths:
       - '.github/workflows/hero-stage5-1-final.yml'
+      - 'scripts/build_hero_stage5_1_bonds.cjs'
       - 'scripts/finalize_hero_stage5_1_bonds.cjs'
-      - 'data/generated/hero-page-stage5-1-bonds.v1.json'
-      - 'data/validation/hero-page-stage5-1-production-candidate.v1.json'
       - 'data/validation/hero-page-stage5-1-retrace-semantic.v1.json'
       - 'data/validation/hero-page-stage5-1-type1-dump-symbols.txt'
+      - 'data/hero-name-master.v1.json'
+      - 'data/configdata/ConfigDataHeroInformationInfo.json'
+      - 'data/configdata/ConfigDataHeroFetterInfo.json'
+      - 'data/configdata/ConfigDataMissionInfo.json'
+      - 'data/configdata/ConfigDataHeroDungeonLevelInfo.json'
 
 permissions:
   contents: write
@@ -20,6 +24,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Rebuild Stage 5-1 production candidate
+        run: node scripts/build_hero_stage5_1_bonds.cjs
 
       - name: Run Hero Stage 5-1 final gate
         run: node scripts/finalize_hero_stage5_1_bonds.cjs
