@@ -1,0 +1,194 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage6-7-site-admission/v1",
+  "stage": "6-7",
+  "status": "PASS",
+  "admissionStatus": "READY_WITH_REVIEW",
+  "generatedAt": "2026-08-25T07:09:25.482Z",
+  "scope": "SOLDIER_PAGE_DATA_ADMISSION",
+  "purpose": "Final gate proving canonical Soldier data can stably support list, detail, filters, reciprocal Hero links and later expansion without reopening semantic or JOIN inference.",
+  "admissionRule": "Admit Soldier page data when every canonical record is generated, automated validation has no FAIL records, REVIEW items are explicit, representative/filter/reciprocal QA passes, expansion inputs are preserved, and every frozen source blob still matches its recorded snapshot.",
+  "capabilities": {
+    "listData": "READY",
+    "detailData": "READY",
+    "filterSemantics": "READY",
+    "reciprocalHeroLinks": "READY",
+    "representativeCoverage": "READY",
+    "simulatorDataFoundation": "FOUNDATION_READY"
+  },
+  "notClaimedByStage6_7": [
+    "concrete frontend rendering components or deployed routes",
+    "canonical Soldier image/icon asset identifiers while REPRESENTATIVE_ASSET_ID_UNFROZEN remains REVIEW",
+    "combat formulas or interactive simulator UI",
+    "unconfirmed release dates, SP internal order or same-patch order"
+  ],
+  "summary": {
+    "canonicalSoldiers": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "normalTier3": 129,
+    "passRecords": 11,
+    "reviewRecords": 213,
+    "failRecords": 0,
+    "representativeFixtures": 6,
+    "representativeFixturesPassed": 6,
+    "filterTests": 15,
+    "filterTestsPassed": 15,
+    "heroKeys": 267,
+    "soldierKeys": 224,
+    "heroSoldierRelations": 5977,
+    "reciprocalMismatchCount": 0,
+    "relationProvenance": 5978,
+    "normalAbilityLevelRecords": 1290,
+    "normalTrainingLevelRecords": 1290
+  },
+  "admissionGates": {
+    "generationComplete": "PASS",
+    "validationClassified": "PASS",
+    "representativeQa": "PASS",
+    "listAndRelease": "PASS",
+    "filterQa": "PASS",
+    "reciprocalHeroLinks": "PASS",
+    "expansionFoundation": "PASS",
+    "sourceSnapshotsFrozen": "PASS",
+    "derivationDocumented": "PASS"
+  },
+  "reviews": [
+    {
+      "code": "HERO_PAGE_SOLDIER_DISPLAY_NAME_REVIEW",
+      "count": 41,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "IDENTITY_PRESENTATION_REVIEW",
+      "count": 41,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "KR_NAME_UNRESOLVED",
+      "count": 41,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED",
+      "count": 39,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "RELATION_PROVENANCE_SEPARATE_AUTHORITY",
+      "count": null,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "RELEASE_DATE_UNRESOLVED",
+      "count": 213,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "REPRESENTATIVE_ASSET_ID_UNFROZEN",
+      "count": null,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "ROUTE_IMPLEMENTATION_SEPARATE_FROM_MEMBERSHIP",
+      "count": null,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "SAME_PATCH_ORDER_UNRESOLVED",
+      "count": null,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "SIMULATOR_IMPLEMENTATION_DEFERRED",
+      "count": null,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "SP_FULL_STATS_ARE_AUTHORITATIVE",
+      "count": null,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED",
+      "count": 56,
+      "classification": "REVIEW"
+    }
+  ],
+  "keyArtifacts": {
+    "detail": {
+      "path": "data/generated/soldier-detail-stage5-6.v1.json",
+      "gitBlobSha": "e554d0c20ed1629a0774301bc0a5bfe639b63efa"
+    },
+    "list": {
+      "path": "data/generated/soldier-list-stage5-8.v1.json",
+      "gitBlobSha": "96df08f5c53ea0ef66922ca6b9d7a274cb599aff"
+    },
+    "releaseMetadata": {
+      "path": "data/generated/soldier-release-metadata.v1.json",
+      "gitBlobSha": "39184cbf348877b0512d2811d514740c7f430fb8"
+    },
+    "fullRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    },
+    "reciprocalLinks": {
+      "path": "data/generated/hero-soldier-page-links-stage6-5.v1.json",
+      "gitBlobSha": "52daf5ea15f37a437f796747eb25a126446a1c96"
+    },
+    "expansionBasis": {
+      "path": "data/generated/soldier-stage6-6-expansion-basis.v1.json",
+      "gitBlobSha": "0bae39829ab0f6bc7af48fbece6e8baad2f484a1"
+    }
+  },
+  "sources": {
+    "contract": {
+      "path": "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+      "gitBlobSha": "2943af041025c76c647b790661babe784e05f4f2"
+    },
+    "checkpoint": {
+      "path": "data/validation/soldier-stage6-0-checkpoint.v1.json",
+      "gitBlobSha": "86bee6c79cd6c8a45c85d5cfc020436c86eccb09"
+    },
+    "stage5_7": {
+      "path": "data/validation/soldier-stage5-7-list.v1.json",
+      "gitBlobSha": "e3e05a882fd9520ec8916660ccb8476aa2c41efd"
+    },
+    "stage5_8": {
+      "path": "data/validation/soldier-stage5-8-release.v1.json",
+      "gitBlobSha": "7fb962ff3824db1ad4b4d9f6ea386d33c7acc173"
+    },
+    "stage6_1": {
+      "path": "data/validation/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "cf6d985fe12f21a16124a61ee225d90218835d90"
+    },
+    "stage6_2": {
+      "path": "data/validation/soldier-stage6-2-classification.v1.json",
+      "gitBlobSha": "543c363c0c00c3ab9b791b894db468533cd20f25"
+    },
+    "stage6_3": {
+      "path": "data/validation/soldier-stage6-3-representative-qa.v1.json",
+      "gitBlobSha": "bd7d3ee67db8fb8c3c0b5da8f7d269308f771d20"
+    },
+    "stage6_4": {
+      "path": "data/validation/soldier-stage6-4-filter-qa.v1.json",
+      "gitBlobSha": "2195a412c6006db793a6822e996692de6be0aa3f"
+    },
+    "stage6_5Manifest": {
+      "path": "data/generated/hero-soldier-page-links-stage6-5.v1.json",
+      "gitBlobSha": "52daf5ea15f37a437f796747eb25a126446a1c96"
+    },
+    "stage6_5": {
+      "path": "data/validation/soldier-stage6-5-reciprocal-links.v1.json",
+      "gitBlobSha": "2e0835792c8f6ccfa011cce094d5710d41e62a8a"
+    },
+    "stage6_6Manifest": {
+      "path": "data/generated/soldier-stage6-6-expansion-basis.v1.json",
+      "gitBlobSha": "0bae39829ab0f6bc7af48fbece6e8baad2f484a1"
+    },
+    "stage6_6": {
+      "path": "data/validation/soldier-stage6-6-expansion-basis.v1.json",
+      "gitBlobSha": "f6d1c598e14768194c80d88c2ed4c645de0a3223"
+    }
+  }
+}
