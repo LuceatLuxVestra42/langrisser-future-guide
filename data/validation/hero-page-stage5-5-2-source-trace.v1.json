@@ -24,25 +24,12 @@
       "status": "SOURCE_CONFIRMED",
       "source": "ConfigDataHeroInfo.Rank",
       "valueType": "integer",
-      "rankToRarity": {
-        "1": "N",
-        "2": "R",
-        "3": "SR",
-        "4": "SSR",
-        "6": "LLR"
-      },
+      "rankToRarity": {"1":"N","2":"R","3":"SR","4":"SSR","6":"LLR"},
       "rank5Status": "UNOBSERVED_AND_UNRESOLVED",
       "starSource": "ConfigDataHeroInfo.Star",
       "starMeaning": "initial/current base star count; not the rarity label",
       "validation": "data/validation/hero-page-stage5-5-2-rarity.v1.json",
       "coverage": "267/267 canonical Heroes resolve to a validated Rank value.",
-      "evidence": [
-        "Rank 1 contains Matthew, Grenier and Almeda; their StarToRank data promotes Rank 1 -> 2 -> 3 -> 4 as stars increase, directly establishing Rank as the rarity tier axis.",
-        "Rank 2 contains the canonical R Hero group such as Lester, Jessica, Rouga and Scott.",
-        "Rank 3 contains the canonical SR Hero group such as Chris, Narm, Hein and Altina.",
-        "Rank 4 contains the canonical SSR Hero group such as Leon and Ledin.",
-        "Rank 6 contains exactly the six current LLR Heroes: 빙설 심연의 지배자, 빛의 소환사, 염룡파멸자, 마안의 서큐버스, 빛과 어둠의 반역자, 효랑어홍사."
-      ],
       "rejectedSources": ["ConfigDataHeroInfo.ExchangedFragmentCount"],
       "rule": "Use Rank for rarity display. Use Star only for star count. ExchangedFragmentCount remains rejected because it is duplicate-acquisition fragment quantity, not the rarity enum."
     },
@@ -65,19 +52,10 @@
       "join": "ConfigDataHeroInfo.CharImage_ID -> ConfigDataCharImageInfo.ID",
       "valueType": "string",
       "validation": "data/validation/hero-page-stage5-5-2-cv.v1.json",
-      "coverage": {
-        "canonicalHeroesResolved": 267,
-        "heroesWithCvFieldValue": 267,
-        "heroesWithNamedVoiceActor": 264,
-        "heroesWithoutVoiceActor": 3
-      },
+      "coverage": {"canonicalHeroesResolved":267,"heroesWithCvFieldValue":267,"heroesWithNamedVoiceActor":264,"heroesWithoutVoiceActor":3},
       "noVoiceActorSourceValue": "■■■■",
-      "confirmedNoVoiceActorHeroIds": [99235, 99236, 99276],
-      "confirmedNoVoiceActorHeroes": [
-        "캡틴 코만도&베이비 헤드",
-        "맥&긴주",
-        "아이바 미유키"
-      ],
+      "confirmedNoVoiceActorHeroIds": [99235,99236,99276],
+      "confirmedNoVoiceActorHeroes": ["캡틴 코만도&베이비 헤드","맥&긴주","아이바 미유키"],
       "rule": "Use CVName as the authoritative source field. For Hero IDs 99235, 99236 and 99276, source value ■■■■ is confirmed to mean no voice actor, not masked or unresolved actor data. Preserve all other source spellings as-is.",
       "localization": {
         "status": "DEFERRED_USER_LOCALIZATION",
@@ -86,11 +64,17 @@
       }
     },
     "origin": {
-      "status": "POINTER_CONFIRMED",
+      "status": "SOURCE_DICTIONARY_CONFIRMED",
       "source": "ConfigDataHeroInfo.HeroBelongProduction",
       "valueType": "integer[]",
-      "displaySemantics": "UNRESOLVED",
-      "rule": "Measure pointer coverage only. Do not map production IDs to work titles until an authoritative dictionary is validated."
+      "canonicalShape": "267/267 canonical Heroes contain exactly one production ID",
+      "meaning": "source/origin work; equivalent to Bilibili Wiki 出典",
+      "dictionary": "data/validation/hero-page-stage5-5-2-origin.v1.json",
+      "dictionaryLanguage": "zh-CN",
+      "productionIdCount": 32,
+      "productionPointerCount": 267,
+      "coverage": "267/267 Heroes resolved; observed production IDs 1-32 exactly match dictionary IDs 1-32; no missing, unknown or unused IDs.",
+      "rule": "Resolve the single HeroBelongProduction ID through the validated origin dictionary. Preserve originLabelCn as source-display text; Korean work-title localization may be layered separately without changing productionId semantics."
     },
     "artwork": {
       "status": "POINTER_CONFIRMED",
@@ -112,16 +96,18 @@
       "rule": "Membership and ID resolution are validated; display ordering and GetPathType meaning remain unresolved until separately proven."
     }
   },
-  "nonSynthesisPolicy": "Unresolved fields stay null/review. Candidate field names and numeric values are not sufficient to create page-display values. Confirmed CVName source strings are preserved as-is; CV localization is explicitly deferred to a later user-managed localization step.",
+  "nonSynthesisPolicy": "Unresolved fields stay null/review. Candidate field names and numeric values are not sufficient to create page-display values. Confirmed source-display strings are preserved unless a separate localization layer is accepted.",
   "coverageGenerator": "scripts/validate_hero_page_stage5_5_2.cjs",
   "expectedCoverageOutput": "data/validation/hero-page-stage5-5-2-coverage.v1.json",
   "confirmedSemanticArtifacts": [
     "data/validation/hero-page-stage5-5-2-rarity.v1.json",
     "data/validation/hero-page-stage5-5-2-factions.v1.json",
-    "data/validation/hero-page-stage5-5-2-cv.v1.json"
+    "data/validation/hero-page-stage5-5-2-cv.v1.json",
+    "data/validation/hero-page-stage5-5-2-origin.v1.json"
   ],
   "deferredTasks": [
-    "Localize ConfigDataCharImageInfo.CVName source spellings into Korean voice-actor display names without changing the confirmed CV source join."
+    "Localize ConfigDataCharImageInfo.CVName source spellings into Korean voice-actor display names without changing the confirmed CV source join.",
+    "Optionally localize originLabelCn work titles into Korean display titles without changing the confirmed HeroBelongProduction productionId dictionary."
   ],
-  "nextGate": "Continue resolving remaining display semantics (origin dictionary, final artwork field, skin ordering/acquisition) without reopening confirmed rarity, faction or CV semantics."
+  "nextGate": "Continue resolving remaining display semantics (final artwork field, skin ordering/acquisition) without reopening confirmed rarity, faction, CV or origin semantics."
 }
