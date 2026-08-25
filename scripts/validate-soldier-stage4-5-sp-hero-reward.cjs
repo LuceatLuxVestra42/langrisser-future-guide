@@ -25,6 +25,13 @@ function stableRewards(rows) {
     rewardSoldierIds: uniqueSorted((r.rewardSoldierIds || []).map(Number)),
   })).sort((a, b) => a.heroId - b.heroId || a.spHeroInfoId - b.spHeroInfoId);
 }
+function relationSemantic(rows) {
+  return rows.map((r) => ({
+    spHeroInfoId: r.spHeroInfoId,
+    heroId: r.heroId,
+    rewardSoldierIds: r.rewardSoldierIds,
+  }));
+}
 function hash(value) {
   return crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 }
@@ -66,6 +73,9 @@ const recomputedRewards = stableRewards(sourceSpHeroes
     rewardSoldierIds: x.rewardSoldierIds,
   })));
 
+const baselineRelation = relationSemantic(baselineRewards);
+const currentRelation = relationSemantic(currentRewards);
+const recomputedRelation = relationSemantic(recomputedRewards);
 const baselineEdges = edgeSet(baselineRewards);
 const currentEdges = edgeSet(currentRewards);
 const recomputedEdges = edgeSet(recomputedRewards);
@@ -83,9 +93,10 @@ const checks = {
   baselineExtraEdges: diffCount(baselineEdges, recomputedEdges),
   currentMissingEdges: diffCount(recomputedEdges, currentEdges),
   currentExtraEdges: diffCount(currentEdges, recomputedEdges),
-  baselineSemanticMismatch: JSON.stringify(baselineRewards) === JSON.stringify(recomputedRewards) ? 0 : 1,
-  currentSemanticMismatch: JSON.stringify(currentRewards) === JSON.stringify(recomputedRewards) ? 0 : 1,
-  baselineVsCurrentMismatch: JSON.stringify(baselineRewards) === JSON.stringify(currentRewards) ? 0 : 1,
+  baselineRelationSemanticMismatch: JSON.stringify(baselineRelation) === JSON.stringify(recomputedRelation) ? 0 : 1,
+  currentRelationSemanticMismatch: JSON.stringify(currentRelation) === JSON.stringify(recomputedRelation) ? 0 : 1,
+  baselineVsCurrentRelationMismatch: JSON.stringify(baselineRelation) === JSON.stringify(currentRelation) ? 0 : 1,
+  currentMetadataPreservationMismatch: JSON.stringify(currentRewards) === JSON.stringify(recomputedRewards) ? 0 : 1,
   stage3SpHeroCheckRegression: (stage3Validation.checks?.missingSpHeroIds || 0) + (stage3Validation.checks?.missingRewardSoldiers || 0) + (stage3Validation.checks?.spHeroMappingUnmapped || 0) + (stage3Validation.checks?.spHeroMappingAmbiguous || 0),
   reverseIndexMissing: 0,
   reverseIndexExtra: 0,
@@ -104,8 +115,11 @@ for (const sid of soldierIds) {
   checks.reverseIndexExtra += diffCount(actual, expected);
 }
 
+const baselineMetadataByHero = new Map(baselineRewards.map((r) => [r.heroId, r.heroInformationId]));
+const baselineMetadataDiffersFromCurrent = currentRewards.filter((r) => baselineMetadataByHero.get(r.heroId) !== r.heroInformationId).length;
 const informative = {
   heroInformationDiffersFromCanonical: sourceSpHeroes.filter((x) => x.heroInformationId !== x.heroId).length,
+  baselineMetadataDiffersFromCurrent,
   heroesWithRewardSoldiers: recomputedRewards.length,
   rewardEdges: recomputedEdges.size,
   distinctRewardSoldiers: new Set(recomputedRewards.flatMap((r) => r.rewardSoldierIds)).size,
@@ -120,7 +134,7 @@ const output = {
   baseline: {
     commit: 'c2276d1162dae52a1762e6381e7dd195c917da2f',
     artifact: 'data/generated/soldier-stage3.v1.json',
-    role: 'pre-4-1 SP Hero reward semantic regression reference',
+    role: 'pre-4-1 SP Hero reward relation reference; non-key HeroInformation_ID metadata is not part of relation equivalence',
   },
   inputs: {
     spHero: 'data/configdata/ConfigDataSPHeroInfo.json',
@@ -130,9 +144,11 @@ const output = {
     stage3Validation: 'data/validation/soldier-stage3-final.v1.json',
   },
   hashes: {
-    baselineRewardSemanticSha256: hash(baselineRewards),
-    currentRewardSemanticSha256: hash(currentRewards),
-    recomputedRewardSemanticSha256: hash(recomputedRewards),
+    baselineRelationSha256: hash(baselineRelation),
+    currentRelationSha256: hash(currentRelation),
+    recomputedRelationSha256: hash(recomputedRelation),
+    currentFullMetadataSha256: hash(currentRewards),
+    recomputedFullMetadataSha256: hash(recomputedRewards),
   },
   counts: {
     spHeroRecords: sourceSpHeroes.length,
@@ -140,16 +156,17 @@ const output = {
     rewardEdges: recomputedEdges.size,
     distinctRewardSoldiers: informative.distinctRewardSoldiers,
     heroInformationDiffersFromCanonical: informative.heroInformationDiffersFromCanonical,
+    baselineMetadataDiffersFromCurrent: informative.baselineMetadataDiffersFromCurrent,
   },
   checks,
   policy: {
     canonicalHeroKey: 'ConfigDataSPHeroInfo.ID is the canonical heroId for SecondStageRewardSoldiers.',
-    heroInformationId: 'HeroInformation_ID is preserved as metadata only and must not replace SPHeroInfo.ID as the Hero JOIN key.',
+    heroInformationId: 'HeroInformation_ID is non-key metadata. It is excluded from relation-equivalence hashes, but the current generated value must exactly preserve the current direct-JSON source.',
     rewardJoin: 'SecondStageRewardSoldiers contains canonical Soldier IDs and is reverse-indexed by Soldier ID without name or numeric-pattern inference.',
     relationBoundary: '4-5 validates the directed SP_HERO_REWARD source edges only. Final canonical Hero-Soldier membership remains owned by the shared Relation Layer and is handled after A-9.',
   },
   errors,
-  completion: errors.length ? null : 'All SP Hero reward-Soldier source edges reproduce the pre-4-1 semantics from current direct JSON and resolve to canonical Hero/Soldier masters with an exact Stage3 reverse index.',
+  completion: errors.length ? null : 'All SP Hero reward-Soldier source edges reproduce the pre-4-1 relation semantics from current direct JSON, resolve to canonical Hero/Soldier masters, preserve current metadata, and have an exact Stage3 reverse index.',
 };
 
 fs.writeFileSync(OUT_PATH, JSON.stringify(output, null, 2) + '\n');
