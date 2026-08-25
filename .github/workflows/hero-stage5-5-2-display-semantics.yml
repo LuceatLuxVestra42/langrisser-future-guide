@@ -10,6 +10,7 @@ on:
       - 'scripts/analyze_hero_faction_candidates.cjs'
       - 'scripts/build_hero_faction_map.cjs'
       - 'scripts/analyze_hero_cv_candidates.cjs'
+      - 'scripts/inventory_hero_cv_fields.cjs'
       - 'data/configdata/**'
       - 'data/hero-name-master.v1.json'
 
@@ -28,6 +29,7 @@ jobs:
           node scripts/analyze_hero_faction_candidates.cjs
           node scripts/build_hero_faction_map.cjs
           node scripts/analyze_hero_cv_candidates.cjs
+          node scripts/inventory_hero_cv_fields.cjs
       - name: Freeze diagnostic artifacts
         run: |
           TARGET1='data/validation/hero-page-stage5-5-2-display-semantics.v1.json'
@@ -35,12 +37,13 @@ jobs:
           TARGET3='data/validation/hero-page-stage5-5-2-faction-candidates.v1.json'
           TARGET4='data/validation/hero-page-stage5-5-2-factions.v1.json'
           TARGET5='data/validation/hero-page-stage5-5-2-cv-candidates.v1.json'
-          if [ -z "$(git status --porcelain -- "$TARGET1" "$TARGET2" "$TARGET3" "$TARGET4" "$TARGET5")" ]; then
+          TARGET6='data/validation/hero-page-stage5-5-2-cv-field-inventory.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET1" "$TARGET2" "$TARGET3" "$TARGET4" "$TARGET5" "$TARGET6")" ]; then
             echo 'Diagnostics already current.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
-          git config user.email '4189822+github-actions[bot]@users.noreply.github.com'
-          git add "$TARGET1" "$TARGET2" "$TARGET3" "$TARGET4" "$TARGET5"
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$TARGET1" "$TARGET2" "$TARGET3" "$TARGET4" "$TARGET5" "$TARGET6"
           git commit -m 'Freeze Hero Stage 5-5-2 semantic diagnostics'
           git push
