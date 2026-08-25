@@ -22,16 +22,22 @@ function asArray(v) {
   return [v];
 }
 
-const playable = heroInfo
-  .filter(h => h && h.Useable === true && names.has(Number(h.ID)))
-  .map(h => ({
-    heroId: Number(h.ID),
-    ...names.get(Number(h.ID)),
-    heroBelongProduction: asArray(h.HeroBelongProduction).map(Number),
-    heroGameActors: h.HeroGameActors ?? null,
-    teamShow: h.TeamShow ?? null,
-    heroRelateBattle: h.HeroRelateBattle ?? null
-  }));
+const playableRaw = heroInfo.filter(h => h && h.Useable === true && names.has(Number(h.ID)));
+const fieldShapeCounts = { array: 0, scalar: 0, missing: 0 };
+for (const h of playableRaw) {
+  if (Array.isArray(h.HeroBelongProduction)) fieldShapeCounts.array++;
+  else if (h.HeroBelongProduction === undefined || h.HeroBelongProduction === null) fieldShapeCounts.missing++;
+  else fieldShapeCounts.scalar++;
+}
+
+const playable = playableRaw.map(h => ({
+  heroId: Number(h.ID),
+  ...names.get(Number(h.ID)),
+  heroBelongProduction: asArray(h.HeroBelongProduction).map(Number),
+  heroGameActors: h.HeroGameActors ?? null,
+  teamShow: h.TeamShow ?? null,
+  heroRelateBattle: h.HeroRelateBattle ?? null
+}));
 
 const productionGroups = new Map();
 for (const h of playable) {
@@ -54,6 +60,13 @@ const groups = [...productionGroups.entries()]
     heroes: heroes.sort((a, b) => a.heroId - b.heroId)
   }));
 
+const productionGroupSamples = groups.map(g => ({
+  productionId: g.productionId,
+  heroCount: g.heroCount,
+  sampleNamesKr: g.heroes.slice(0, 6).map(h => h.nameKr),
+  sampleNamesCn: g.heroes.slice(0, 6).map(h => h.nameCn)
+}));
+
 const multiProductionHeroes = playable
   .filter(h => h.heroBelongProduction.length > 1)
   .sort((a, b) => a.heroId - b.heroId);
@@ -75,9 +88,11 @@ const out = {
     heroNames: 'data/hero-name-master.v1.json'
   },
   playableHeroCount: playable.length,
+  heroBelongProductionFieldShape: fieldShapeCounts,
   productionPointerCount: playable.reduce((n, h) => n + h.heroBelongProduction.length, 0),
   distinctProductionIds: groups.length,
   multiProductionHeroCount: multiProductionHeroes.length,
+  productionGroupSamples,
   multiProductionHeroes,
   productionGroups: groups,
   heroGameActorsValueCounts: actorValueCounts,
@@ -88,8 +103,10 @@ fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, JSON.stringify(out, null, 2) + '\n');
 console.log(JSON.stringify({
   playableHeroCount: out.playableHeroCount,
+  heroBelongProductionFieldShape: out.heroBelongProductionFieldShape,
   productionPointerCount: out.productionPointerCount,
   distinctProductionIds: out.distinctProductionIds,
   multiProductionHeroCount: out.multiProductionHeroCount,
+  productionGroupSamples: out.productionGroupSamples,
   output: outPath
 }, null, 2));
