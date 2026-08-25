@@ -1,0 +1,32 @@
+name: Hero Stage 5-5-2 origin summary
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-5-2-origin-summary.yml'
+      - 'scripts/summarize_hero_page_stage5_5_2_origin_candidates.cjs'
+      - 'data/validation/hero-page-stage5-5-2-origin-candidates.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build compact summary
+        run: node scripts/summarize_hero_page_stage5_5_2_origin_candidates.cjs
+      - name: Freeze compact summary
+        run: |
+          TARGET='data/validation/hero-page-stage5-5-2-origin-candidates-summary.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
+            echo 'Summary already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$TARGET"
+          git commit -m 'Freeze Hero Stage 5-5-2 origin candidate summary'
+          git push
