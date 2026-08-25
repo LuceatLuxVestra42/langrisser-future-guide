@@ -1,0 +1,228 @@
+{
+  "version": 1,
+  "stage": "soldier-page-4-7",
+  "status": "PASS",
+  "generatedAt": "2026-08-25T02:02:00.724Z",
+  "purpose": "Representative Soldier-domain fixture regression after shared relation adoption. Reuse A-8 relation fixture PASS evidence and independently validate Soldier stats, TrainingTech, SP descriptions, SP missions and awaken branches against current direct JSON.",
+  "sources": {
+    "fixturePlan": "data/validation/soldier-stage4-8-1-fixture-plan.v1.json",
+    "sharedRelationValidation": "data/validation/hero-soldier-relation-validation.v1.json",
+    "soldierStage3": "data/generated/soldier-stage3.v1.json",
+    "soldierMaster": "data/generated/soldier-master.v1.json",
+    "configData": [
+      "ConfigDataSoldierInfo",
+      "ConfigDataSPSoldierInfo",
+      "ConfigDataTrainingTechInfo",
+      "ConfigDataTrainingTechLevelInfo",
+      "ConfigDataMissionInfo",
+      "ConfigDataMissionSumitItemInfo"
+    ]
+  },
+  "boundary": {
+    "relationSemantics": "REUSE_A8_PASS_ONLY",
+    "validatedHere": [
+      "SoldierInfo -> Stage3 stats/combat/raw fields",
+      "TrainingTech primary Lv1-10 source fidelity and Lv5/Lv10 cost derivation",
+      "SP primary-path SpSoidlierDescription coverage",
+      "explicit NormalSoliderId <-> ID linkage as Soldier-domain structure",
+      "SP stat delta",
+      "first-stage and second-stage missions/awaken materials/branching"
+    ],
+    "notRecomputedHere": [
+      "final Hero-Soldier membership",
+      "A-6 canonical relation provenance",
+      "A-7 index semantics"
+    ]
+  },
+  "counts": {
+    "fixtureCount": 5,
+    "normalOnly": 3,
+    "spFirstStageOnly": 1,
+    "spTwoStage": 1,
+    "fixturePass": 5,
+    "fixtureFail": 0
+  },
+  "checks": {
+    "fixturePlanInvalid": 0,
+    "sharedRelationFixtureReuseFailure": 0,
+    "missingMasterFixture": 0,
+    "missingStage3Record": 0,
+    "sourceStatsMismatch": 0,
+    "sourceCombatMismatch": 0,
+    "sourceRawMismatch": 0,
+    "normalOnlySpLeak": 0,
+    "trainingProfileMissing": 0,
+    "trainingPrimaryPathInvalid": 0,
+    "trainingLevelSourceMismatch": 0,
+    "trainingDescriptionMissing": 0,
+    "trainingCostMismatch": 0,
+    "spDescriptionMissing": 0,
+    "spSourceLinkMismatch": 0,
+    "spGeneratedLinkMismatch": 0,
+    "spStatsMismatch": 0,
+    "spStatDeltaMismatch": 0,
+    "firstStageMismatch": 0,
+    "firstStageMissionMismatch": 0,
+    "secondStageBranchMismatch": 0,
+    "secondStageMismatch": 0,
+    "secondStageMissionMismatch": 0
+  },
+  "fixtures": [
+    {
+      "soldierId": 105,
+      "nameKr": "대지 골렘",
+      "fixtureKind": "NORMAL_ONLY",
+      "relationFixtureReuse": {
+        "source": "A-8",
+        "status": "PASS"
+      },
+      "primaryTrainingTechId": 215,
+      "checks": {
+        "masterPresent": true,
+        "stage3RecordPresent": true,
+        "statsExact": true,
+        "combatExact": true,
+        "rawExact": true,
+        "profilePresent": true,
+        "uniquePrimaryTenLevel": true,
+        "primaryTechPresent": true,
+        "trainingLevelSourceMismatch": 0,
+        "descriptionMissing": 0,
+        "spDescriptionMissing": 0,
+        "costToLevel5Exact": true,
+        "costToLevel10Exact": true,
+        "noSpSource": true,
+        "noGeneratedSp": true
+      },
+      "status": "PASS"
+    },
+    {
+      "soldierId": 247,
+      "nameKr": "사막 용병단",
+      "fixtureKind": "NORMAL_ONLY",
+      "relationFixtureReuse": {
+        "source": "A-8",
+        "status": "PASS"
+      },
+      "primaryTrainingTechId": 136,
+      "checks": {
+        "masterPresent": true,
+        "stage3RecordPresent": true,
+        "statsExact": true,
+        "combatExact": true,
+        "rawExact": true,
+        "profilePresent": true,
+        "uniquePrimaryTenLevel": true,
+        "primaryTechPresent": true,
+        "trainingLevelSourceMismatch": 0,
+        "descriptionMissing": 0,
+        "spDescriptionMissing": 0,
+        "costToLevel5Exact": true,
+        "costToLevel10Exact": true,
+        "noSpSource": true,
+        "noGeneratedSp": true
+      },
+      "status": "PASS"
+    },
+    {
+      "soldierId": 1032,
+      "nameKr": "늑대인간",
+      "fixtureKind": "NORMAL_ONLY",
+      "relationFixtureReuse": {
+        "source": "A-8",
+        "status": "PASS"
+      },
+      "primaryTrainingTechId": 649,
+      "checks": {
+        "masterPresent": true,
+        "stage3RecordPresent": true,
+        "statsExact": true,
+        "combatExact": true,
+        "rawExact": true,
+        "profilePresent": true,
+        "uniquePrimaryTenLevel": true,
+        "primaryTechPresent": true,
+        "trainingLevelSourceMismatch": 0,
+        "descriptionMissing": 0,
+        "spDescriptionMissing": 0,
+        "costToLevel5Exact": true,
+        "costToLevel10Exact": true,
+        "noSpSource": true,
+        "noGeneratedSp": true
+      },
+      "status": "PASS"
+    },
+    {
+      "soldierId": 622,
+      "spSoldierId": 5622,
+      "nameKr": "마녀",
+      "fixtureKind": "SP_FIRST_STAGE_ONLY",
+      "relationFixtureReuse": {
+        "source": "A-8",
+        "status": "PASS"
+      },
+      "primaryTrainingTechId": 625,
+      "checks": {
+        "masterPresent": true,
+        "stage3RecordPresent": true,
+        "statsExact": true,
+        "combatExact": true,
+        "rawExact": true,
+        "profilePresent": true,
+        "uniquePrimaryTenLevel": true,
+        "primaryTechPresent": true,
+        "trainingLevelSourceMismatch": 0,
+        "descriptionMissing": 0,
+        "spDescriptionMissing": 0,
+        "costToLevel5Exact": true,
+        "costToLevel10Exact": true,
+        "sourceLinkExact": true,
+        "generatedLinkExact": true,
+        "statDeltaExact": true,
+        "firstStageExact": true,
+        "firstStageMissionsExact": true,
+        "secondStageUnlockExact": true,
+        "secondStageAbsent": true,
+        "rawSecondStageEmpty": true
+      },
+      "status": "PASS"
+    },
+    {
+      "soldierId": 320,
+      "spSoldierId": 5320,
+      "nameKr": "황가기병",
+      "fixtureKind": "SP_TWO_STAGE",
+      "relationFixtureReuse": {
+        "source": "A-8",
+        "status": "PASS"
+      },
+      "primaryTrainingTechId": 325,
+      "checks": {
+        "masterPresent": true,
+        "stage3RecordPresent": true,
+        "statsExact": true,
+        "combatExact": true,
+        "rawExact": true,
+        "profilePresent": true,
+        "uniquePrimaryTenLevel": true,
+        "primaryTechPresent": true,
+        "trainingLevelSourceMismatch": 0,
+        "descriptionMissing": 0,
+        "spDescriptionMissing": 0,
+        "costToLevel5Exact": true,
+        "costToLevel10Exact": true,
+        "sourceLinkExact": true,
+        "generatedLinkExact": true,
+        "statDeltaExact": true,
+        "firstStageExact": true,
+        "firstStageMissionsExact": true,
+        "secondStageUnlockExact": true,
+        "secondStageExact": true,
+        "secondStageMissionsExact": true
+      },
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "completion": "All five representative fixtures reuse A-8 relation PASS evidence and independently match current direct JSON for Soldier stats, TrainingTech, SP descriptions, SP missions and awaken branches."
+}
