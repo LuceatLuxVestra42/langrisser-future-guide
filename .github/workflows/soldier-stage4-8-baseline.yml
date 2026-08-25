@@ -1,0 +1,122 @@
+name: Soldier Stage 4-8 Baseline Freeze
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/finalize-soldier-stage2.cjs'
+      - 'scripts/validate-soldier-stage4-1-input.cjs'
+      - 'scripts/validate-soldier-stage4-2-master.cjs'
+      - 'scripts/finalize-soldier-stage3.cjs'
+      - 'scripts/finalize-soldier-stage3-postprocess.cjs'
+      - 'scripts/validate-soldier-stage4-3-trainingtech.cjs'
+      - 'scripts/validate-soldier-stage4-4-sp-mission.cjs'
+      - 'scripts/validate-soldier-stage4-5-sp-hero-reward.cjs'
+      - 'scripts/finalize-soldier-stage3-12.cjs'
+      - 'scripts/finalize-hero-soldier-relation-layer.cjs'
+      - 'scripts/validate-soldier-stage4-6-relation-consumer.cjs'
+      - 'scripts/validate-soldier-stage4-7-domain-fixtures.cjs'
+      - 'scripts/validate-soldier-stage4-8-baseline.cjs'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSPSoldierInfo.json'
+      - 'data/configdata/ConfigDataArmyInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechLevelInfo.json'
+      - 'data/configdata/ConfigDataMissionInfo.json'
+      - 'data/configdata/ConfigDataMissionSumitItemInfo.json'
+      - 'data/configdata/ConfigDataSPHeroInfo.json'
+      - 'data/metadata/soldier-name-kr-tier3.v1.json'
+      - 'data/soldier-master-stage2-1.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/contracts/hero-*.json'
+      - 'data/contracts/soldier-identity-contract.v1.json'
+      - 'data/validation/soldier-representative-fixture-plan.v1.json'
+      - 'data/validation/soldier-stage4-8-baseline.v1.json'
+      - '.github/workflows/soldier-stage4-8-baseline.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/finalize-soldier-stage2.cjs'
+      - 'scripts/validate-soldier-stage4-*.cjs'
+      - 'scripts/finalize-soldier-stage3*.cjs'
+      - 'scripts/finalize-hero-soldier-relation-layer.cjs'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSPSoldierInfo.json'
+      - 'data/configdata/ConfigDataArmyInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechLevelInfo.json'
+      - 'data/configdata/ConfigDataMissionInfo.json'
+      - 'data/configdata/ConfigDataMissionSumitItemInfo.json'
+      - 'data/configdata/ConfigDataSPHeroInfo.json'
+      - 'data/metadata/soldier-name-kr-tier3.v1.json'
+      - 'data/soldier-master-stage2-1.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/contracts/**'
+      - 'data/validation/soldier-representative-fixture-plan.v1.json'
+      - '.github/workflows/soldier-stage4-8-baseline.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate-and-freeze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate UnityDataTool direct inputs
+        run: node scripts/validate-soldier-stage4-1-input.cjs
+
+      - name: Regenerate Soldier Master and validate 4-2
+        run: |
+          node scripts/finalize-soldier-stage2.cjs
+          node scripts/validate-soldier-stage4-2-master.cjs
+
+      - name: Regenerate Soldier Stage 3 and validate 4-3 through 4-5
+        run: |
+          node scripts/finalize-soldier-stage3.cjs
+          node scripts/finalize-soldier-stage3-postprocess.cjs
+          node scripts/validate-soldier-stage4-3-trainingtech.cjs
+          node scripts/validate-soldier-stage4-4-sp-mission.cjs
+          node scripts/validate-soldier-stage4-5-sp-hero-reward.cjs
+
+      - name: Regenerate legacy 3-12 relation baseline
+        run: node scripts/finalize-soldier-stage3-12.cjs
+
+      - name: Regenerate shared Hero-Soldier Relation Layer and validate 4-6
+        run: |
+          node scripts/finalize-hero-soldier-relation-layer.cjs
+          node scripts/validate-soldier-stage4-6-relation-consumer.cjs
+
+      - name: Validate representative Soldier fixtures 4-7
+        run: node scripts/validate-soldier-stage4-7-domain-fixtures.cjs
+
+      - name: Freeze Stage 4-8 baseline
+        run: node scripts/validate-soldier-stage4-8-baseline.cjs
+
+      - name: Upload Stage 4-8 baseline evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage4-8-baseline
+          path: data/validation/soldier-stage4-8-baseline.v1.json
+
+      - name: Commit PASS baseline on PR branch
+        if: github.event_name == 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/soldier-stage4-8-baseline.v1.json
+          if git diff --cached --quiet; then
+            echo "Stage 4-8 baseline is already current."
+          else
+            git commit -m "freeze Soldier stage 4-8 baseline PASS"
+            git push origin HEAD:${{ github.head_ref }}
+          fi
