@@ -1,0 +1,44 @@
+name: Hero Stage 5-1 Type1 symbol trace
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-1-type1-symbol-trace.yml'
+      - 'scripts/trace_hero_stage5_1_type1_symbols.cjs'
+
+permissions:
+  contents: write
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Trace HeroFetter symbols in dump.cs
+        run: node scripts/trace_hero_stage5_1_type1_symbols.cjs
+
+      - name: Show trace summary
+        run: |
+          TARGET='data/validation/hero-page-stage5-1-type1-dump-symbols.txt'
+          echo '--- summary ---'
+          head -n 12 "$TARGET"
+          echo '--- CompletionConditions hits ---'
+          grep -in -m 40 'CompletionConditions' "$TARGET" || true
+          echo '--- HeroFetter hits ---'
+          grep -in -m 80 'HeroFetter' "$TARGET" || true
+
+      - name: Freeze trace checkpoint
+        run: |
+          TARGET='data/validation/hero-page-stage5-1-type1-dump-symbols.txt'
+          if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
+            echo 'Trace checkpoint already current.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add "$TARGET"
+            git commit -m 'Freeze Hero Stage 5-1 Type1 symbol trace'
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
