@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-5",
+  "substage": "5-5-1",
+  "status": "ACCEPTED",
+  "purpose": "Define the authoritative input and ownership contract for Hero-detail header/basic information before enrichment extraction begins.",
+  "primaryKey": "heroId",
+  "canonicalHeroCount": 267,
+  "canonicalIdentity": {
+    "source": "data/hero-name-master.v1.json",
+    "stageContract": "data/hero-master-stage3-1.v1.json",
+    "fields": [
+      "heroId",
+      "nameCn",
+      "nameKr",
+      "nameEn"
+    ],
+    "policy": [
+      "heroId is the only canonical join key.",
+      "Display names are presentation values and must not be used as join keys.",
+      "The existing 267-record verified identity master must be reused; Stage 5-5 must not rebuild playable-Hero identity from ConfigData."
+    ]
+  },
+  "headerSchema": [
+    {
+      "field": "heroId",
+      "classification": "CANONICAL_DIRECT",
+      "source": "data/hero-name-master.v1.json#records[].heroId",
+      "required": true
+    },
+    {
+      "field": "nameKr",
+      "classification": "CANONICAL_DIRECT",
+      "source": "data/hero-name-master.v1.json#records[].nameKr",
+      "required": true
+    },
+    {
+      "field": "nameCn",
+      "classification": "CANONICAL_DIRECT",
+      "source": "data/hero-name-master.v1.json#records[].nameCn",
+      "required": true
+    },
+    {
+      "field": "nameEn",
+      "classification": "CANONICAL_DIRECT",
+      "source": "data/hero-name-master.v1.json#records[].nameEn",
+      "required": true,
+      "note": "Use the reviewed canonical identity master rather than re-reading HeroInfo.Name_Eng as a new identity authority."
+    },
+    {
+      "field": "rarity",
+      "classification": "PENDING_SOURCE_VALIDATION",
+      "required": false,
+      "candidateSources": [],
+      "prohibitions": [
+        "Do not interpret legacy HeroInfo Field 16 / ExchangedFragmentCount as rarity."
+      ]
+    },
+    {
+      "field": "factions",
+      "classification": "PENDING_SOURCE_VALIDATION",
+      "required": false,
+      "candidateSources": [],
+      "note": "A canonical Hero-to-faction source has not yet been accepted by the Hero page pipeline."
+    },
+    {
+      "field": "cv",
+      "classification": "PENDING_SOURCE_VALIDATION",
+      "required": false,
+      "candidateSources": [],
+      "note": "Do not synthesize or infer voice-actor metadata without an accepted source."
+    },
+    {
+      "field": "origin",
+      "classification": "PENDING_SOURCE_VALIDATION",
+      "required": false,
+      "candidateSources": [
+        "data/configdata/ConfigDataHeroInfo.json#HeroBelongProduction"
+      ],
+      "note": "The recovered field name is only a candidate until its page-display semantics and coverage are validated."
+    },
+    {
+      "field": "artwork",
+      "classification": "PENDING_SOURCE_VALIDATION",
+      "required": false,
+      "candidateSources": [
+        "data/configdata/ConfigDataHeroInfo.json#CharImage_ID"
+      ],
+      "note": "The ID field may identify character-image data, but asset-path resolution and presentation coverage require separate validation."
+    },
+    {
+      "field": "skins",
+      "classification": "PENDING_SOURCE_VALIDATION",
+      "required": false,
+      "candidateSources": [
+        "data/configdata/ConfigDataHeroInfo.json#Skins_ID"
+      ],
+      "note": "Skin membership alone is insufficient for the page contract; release order and acquisition metadata must be preserved when available."
+    }
+  ],
+  "candidateConfigDataFields": {
+    "source": "data/configdata/ConfigDataHeroInfo.json",
+    "acceptedAsFieldNamesOnly": [
+      "Name_Eng",
+      "CharImage_ID",
+      "HeroInformation_ID",
+      "Skins_ID",
+      "HeroBelongProduction"
+    ],
+    "semanticPolicy": "A recovered field name does not by itself prove final page-display semantics, completeness, ordering, or join behavior."
+  },
+  "outOfScope": [
+    "talent",
+    "stats",
+    "jobs",
+    "skills",
+    "bonds",
+    "exclusiveEquipment",
+    "covenant",
+    "soldiers",
+    "SP combat data",
+    "SP missions"
+  ],
+  "ownershipBoundaries": {
+    "combat": "Hero Stage 4 output remains the authority for normal combat/stat/job/skill data and is not a header metadata source.",
+    "soldiers": "Hero Stage 5-3 frozen output remains the authority for usable-Soldier page data.",
+    "bonds": "HeroInformation_ID and HeroInformation-related bond/fetter data belong to Hero Stage 5-1 unless independently proven necessary for header display.",
+    "sp": "SP existence and SP-specific page data remain Hero Stage 5-4 owned."
+  },
+  "presentationRules": [
+    "Header/basic information is keyed and assembled by heroId.",
+    "Missing enrichment metadata remains null/review; never fabricate display values.",
+    "Artwork and skin metadata are presentation enrichment and must not alter canonical Hero identity.",
+    "Skin ordering must preserve release order and acquisition metadata when a validated source is available.",
+    "Base and SP presentation may share header identity, but SP-specific switching behavior is not owned by Stage 5-5."
+  ],
+  "prohibitions": [
+    "Do not rebuild the 267-Hero canonical set in Stage 5-5.",
+    "Do not use names as relational keys.",
+    "Do not use HeroInfo.ExchangedFragmentCount as a rarity enum.",
+    "Do not promote a ConfigData field from candidate to authoritative display metadata solely because its field name is readable.",
+    "Do not mix Stage 4 combat calculations into the header/basic-information schema.",
+    "Do not synthesize missing Korean names, CVs, factions, origins, rarity labels, artwork mappings, skin ordering, or acquisition metadata."
+  ],
+  "completionRule": "Stage 5-5-1 is complete when canonical identity reuse, header field ownership, candidate-source boundaries, non-synthesis policy, and the exact pending-enrichment list are frozen. Actual enrichment extraction and coverage validation belong to Stage 5-5-2 and later 5-5 substages.",
+  "nextStage": "5-5-2: validate authoritative sources and coverage for rarity, factions, CV, origin, artwork and skins without reopening canonical Hero identity."
+}
