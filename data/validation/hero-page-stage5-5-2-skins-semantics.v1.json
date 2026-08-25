@@ -1,0 +1,3676 @@
+{
+  "version": 1,
+  "status": "REVIEW",
+  "purpose": "Resolve Hero skin main-artwork, display-order and GetPathType acquisition semantics without assuming numeric coincidences.",
+  "canonicalHeroCount": 267,
+  "canonicalSkinRefCount": 540,
+  "canonicalDistinctSkinIdCount": 540,
+  "canonicalSkinRowCount": 540,
+  "structuralErrors": [],
+  "directSkinFields": {
+    "getPathTypeDistribution": {
+      "2": 197,
+      "3": 1,
+      "4": 166,
+      "__MISSING__": 176
+    },
+    "scoreDistribution": {
+      "10": 15,
+      "30": 12,
+      "50": 32,
+      "60": 98,
+      "95": 96,
+      "100": 1,
+      "110": 88,
+      "120": 197,
+      "130": 1
+    },
+    "enablePreviewDistribution": {
+      "true": 454,
+      "__MISSING__": 86
+    },
+    "charImageSkinResourceIdPresent": 540,
+    "distinctCharImageSkinResourceIds": 540,
+    "distinctModelSkinResourceIds": 789,
+    "getPathTypeSamples": {
+      "2": [
+        {
+          "skinId": 602,
+          "name": "浮浪之刃",
+          "specifiedHero": 6,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Leon_Skin02.png"
+        },
+        {
+          "skinId": 605,
+          "name": "悠扬之音",
+          "specifiedHero": 6,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Leon_Skin05.png"
+        },
+        {
+          "skinId": 803,
+          "name": "月下红樱",
+          "specifiedHero": 8,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Lana_Skin02.png"
+        },
+        {
+          "skinId": 805,
+          "name": "影月和鸣",
+          "specifiedHero": 8,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Lana_Skin06.png"
+        },
+        {
+          "skinId": 904,
+          "name": "邪星魔神",
+          "specifiedHero": 9,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Bozel_Skin04.png"
+        },
+        {
+          "skinId": 1002,
+          "name": "烈焰战神",
+          "specifiedHero": 10,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Ledyn_Skin02.png"
+        },
+        {
+          "skinId": 1202,
+          "name": "天霸绝枪",
+          "specifiedHero": 12,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Elwin_Skin02.png"
+        },
+        {
+          "skinId": 1204,
+          "name": "孤王",
+          "specifiedHero": 12,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Elwin_Skin04.png"
+        },
+        {
+          "skinId": 1302,
+          "name": "超时空公主",
+          "specifiedHero": 13,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Hein_Skin02.png"
+        },
+        {
+          "skinId": 1405,
+          "name": "落樱华击",
+          "specifiedHero": 14,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Sherry_Skin05.png"
+        },
+        {
+          "skinId": 2801,
+          "name": "魔剑精灵",
+          "specifiedHero": 28,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Zalrahda_Skin01.png"
+        },
+        {
+          "skinId": 3502,
+          "name": "安酱终极号",
+          "specifiedHero": 35,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Anjelica_Skin02.png"
+        },
+        {
+          "skinId": 5101,
+          "name": "竹取清辉",
+          "specifiedHero": 51,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_SchelFaniel_Skin01.png"
+        },
+        {
+          "skinId": 5201,
+          "name": "龙游灵刃",
+          "specifiedHero": 52,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Angelina_Skin01.png"
+        },
+        {
+          "skinId": 5301,
+          "name": "暗夜猎手",
+          "specifiedHero": 53,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Ranford_Skin01.png"
+        },
+        {
+          "skinId": 5401,
+          "name": "魔血妖姬",
+          "specifiedHero": 54,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Listell_Skin01.png"
+        },
+        {
+          "skinId": 5501,
+          "name": "堕夜天使",
+          "specifiedHero": 55,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Randiovs_Skin01.png"
+        },
+        {
+          "skinId": 5601,
+          "name": "霹雳小恶魔",
+          "specifiedHero": 56,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Rachel_Skin01.png"
+        },
+        {
+          "skinId": 5701,
+          "name": "自由远行者",
+          "specifiedHero": 57,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Willer_Skin01.png"
+        },
+        {
+          "skinId": 6001,
+          "name": "音乐王子",
+          "specifiedHero": 60,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Sigma_Skin01.png"
+        },
+        {
+          "skinId": 6101,
+          "name": "未来偶像",
+          "specifiedHero": 61,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Lambda_Skin01.png"
+        },
+        {
+          "skinId": 6301,
+          "name": "觅心游医",
+          "specifiedHero": 63,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Lainforce_Skin01.png"
+        },
+        {
+          "skinId": 6401,
+          "name": "桔梗假面",
+          "specifiedHero": 64,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Brenda_Skin01.png"
+        },
+        {
+          "skinId": 6501,
+          "name": "寅虎之拳",
+          "specifiedHero": 65,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Virash_Skin01.png"
+        },
+        {
+          "skinId": 6601,
+          "name": "急急传送令",
+          "specifiedHero": 66,
+          "score": 120,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Claret_Skin01.png"
+        }
+      ],
+      "3": [
+        {
+          "skinId": 9922502,
+          "name": "云穹誓约",
+          "specifiedHero": 99225,
+          "score": 130,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_SovereignOfIceAbyss_Skin02.png"
+        }
+      ],
+      "4": [
+        {
+          "skinId": 103,
+          "name": "灵魂指挥",
+          "specifiedHero": 1,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Matthew_Skin02.png"
+        },
+        {
+          "skinId": 301,
+          "name": "星级大厨",
+          "specifiedHero": 3,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Grenier_Skin01.png"
+        },
+        {
+          "skinId": 401,
+          "name": "甜心女仆",
+          "specifiedHero": 4,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Aimeeda_Skin01.png"
+        },
+        {
+          "skinId": 402,
+          "name": "镜花伊人",
+          "specifiedHero": 4,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Aimeeda_Skin02.png"
+        },
+        {
+          "skinId": 499,
+          "name": "Q梅达",
+          "specifiedHero": 4,
+          "score": 60,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Aimeeda_Skin04.png"
+        },
+        {
+          "skinId": 405,
+          "name": "旧日的呼唤",
+          "specifiedHero": 4,
+          "score": 60,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Aimeeda_Skin05.png"
+        },
+        {
+          "skinId": 501,
+          "name": "防暴女警",
+          "specifiedHero": 5,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Chris_Skin01.png"
+        },
+        {
+          "skinId": 502,
+          "name": "银猫",
+          "specifiedHero": 5,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Chris_Skin03.png"
+        },
+        {
+          "skinId": 503,
+          "name": "锦绣佳缘",
+          "specifiedHero": 5,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Chris_Skin04.png"
+        },
+        {
+          "skinId": 504,
+          "name": "焙烤爱意",
+          "specifiedHero": 5,
+          "score": 60,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Chris_Skin05.png"
+        },
+        {
+          "skinId": 505,
+          "name": "灿丽航程",
+          "specifiedHero": 5,
+          "score": 95,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_Chris_Skin05.png"
+        },
+        {
+          "skinId": 601,
+          "name": "西部世界",
+          "specifiedHero": 6,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Leon_Skin01.png"
+        },
+        {
+          "skinId": 701,
+          "name": "第六天魔王",
+          "specifiedHero": 7,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Bernhardt_Skin01.png"
+        },
+        {
+          "skinId": 703,
+          "name": "卖火柴的小男孩",
+          "specifiedHero": 7,
+          "score": 95,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Bernhardt_Skin03.png"
+        },
+        {
+          "skinId": 801,
+          "name": "旋律的妖精",
+          "specifiedHero": 8,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_LanaSkin_01.png"
+        },
+        {
+          "skinId": 802,
+          "name": "海滨丽人",
+          "specifiedHero": 8,
+          "score": 95,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Lana_SkinSP01.png"
+        },
+        {
+          "skinId": 899,
+          "name": "漫长的告白",
+          "specifiedHero": 8,
+          "score": 95,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Lana_Skin03.png"
+        },
+        {
+          "skinId": 804,
+          "name": "蓝色忧郁",
+          "specifiedHero": 8,
+          "score": 60,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Lana_Skin05.png"
+        },
+        {
+          "skinId": 806,
+          "name": "篮球宝贝",
+          "specifiedHero": 8,
+          "score": 60,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Lana_Skin07.png"
+        },
+        {
+          "skinId": 901,
+          "name": "灵魂收割者",
+          "specifiedHero": 9,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Bozel_Skin01.png"
+        },
+        {
+          "skinId": 903,
+          "name": "冥狼之引",
+          "specifiedHero": 9,
+          "score": 60,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Bozel_Skin03.png"
+        },
+        {
+          "skinId": 1001,
+          "name": "火红的独奏者",
+          "specifiedHero": 10,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Ledyn_Skin01.png"
+        },
+        {
+          "skinId": 1003,
+          "name": "醒狮迎岁",
+          "specifiedHero": 10,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Ledyn_Skin03.png"
+        },
+        {
+          "skinId": 1101,
+          "name": "浪漫一夏",
+          "specifiedHero": 11,
+          "score": 95,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Norm_SkinSP01.png"
+        },
+        {
+          "skinId": 1102,
+          "name": "星海领航员",
+          "specifiedHero": 11,
+          "score": 50,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Norm_Skin01.png"
+        }
+      ],
+      "MISSING": [
+        {
+          "skinId": 102,
+          "name": "执事美酒",
+          "specifiedHero": 1,
+          "score": 10,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Matthew_Skin01.png"
+        },
+        {
+          "skinId": 104,
+          "name": "铸剑的英雄",
+          "specifiedHero": 1,
+          "score": 30,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Matthew_Skin03.png"
+        },
+        {
+          "skinId": 105,
+          "name": "妙想假日",
+          "specifiedHero": 1,
+          "score": 30,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_Matthew_Skin04.png"
+        },
+        {
+          "skinId": 302,
+          "name": "定音坚石",
+          "specifiedHero": 3,
+          "score": 30,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Grenier_Skin02.png"
+        },
+        {
+          "skinId": 403,
+          "name": "金色琴弦",
+          "specifiedHero": 4,
+          "score": 10,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Aimeeda_Skin03.png"
+        },
+        {
+          "skinId": 406,
+          "name": "重逢的交汇",
+          "specifiedHero": 4,
+          "score": 30,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_Aimeeda_Skin06.png"
+        },
+        {
+          "skinId": 603,
+          "name": "苍之骑士",
+          "specifiedHero": 6,
+          "score": 110,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Leon_Skin03.png"
+        },
+        {
+          "skinId": 604,
+          "name": "真源的帝王",
+          "specifiedHero": 6,
+          "score": 60,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Leon_Skin04.png"
+        },
+        {
+          "skinId": 606,
+          "name": "晚宴浅酌",
+          "specifiedHero": 6,
+          "score": 30,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_Leon_Skin06.png"
+        },
+        {
+          "skinId": 702,
+          "name": "巅峰伟力",
+          "specifiedHero": 7,
+          "score": 60,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Bernhardt_Skin02.png"
+        },
+        {
+          "skinId": 704,
+          "name": "霜域霸者",
+          "specifiedHero": 7,
+          "score": 30,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_Bernhardt_Skin04.png"
+        },
+        {
+          "skinId": 902,
+          "name": "冥渊之主",
+          "specifiedHero": 9,
+          "score": 110,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Bozel_Skin02.png"
+        },
+        {
+          "skinId": 905,
+          "name": "永夜礼赞",
+          "specifiedHero": 9,
+          "score": 95,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_Bozel_Skin05.png"
+        },
+        {
+          "skinId": 1203,
+          "name": "红之骑士",
+          "specifiedHero": 12,
+          "score": 10,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Elwin_Skin03.png"
+        },
+        {
+          "skinId": 1206,
+          "name": "炽情弦音",
+          "specifiedHero": 12,
+          "score": 30,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Elwin_Skin06.png"
+        },
+        {
+          "skinId": 1207,
+          "name": "流浪的骑士",
+          "specifiedHero": 12,
+          "score": 95,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_Elwin_Skin07.png"
+        },
+        {
+          "skinId": 1401,
+          "name": "落跑天使",
+          "specifiedHero": 14,
+          "score": 110,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Sherry_Skin02.png"
+        },
+        {
+          "skinId": 1403,
+          "name": "驯鹿奇袭",
+          "specifiedHero": 14,
+          "score": 110,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Sherry_Skin03.png"
+        },
+        {
+          "skinId": 1406,
+          "name": "欢曲铿乐",
+          "specifiedHero": 14,
+          "score": 95,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Sherry_Skin06.png"
+        },
+        {
+          "skinId": 1408,
+          "name": "灵蛇贺春",
+          "specifiedHero": 14,
+          "score": 100,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_Sherry_Skin08.png"
+        },
+        {
+          "skinId": 1502,
+          "name": "千年之恋",
+          "specifiedHero": 15,
+          "score": 110,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Riana_Skin02.png"
+        },
+        {
+          "skinId": 1506,
+          "name": "海浪甜心",
+          "specifiedHero": 15,
+          "score": 95,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_Riana_Skin05.png"
+        },
+        {
+          "skinId": 1507,
+          "name": "待望的巫女",
+          "specifiedHero": 15,
+          "score": 95,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_Riana_Skin06.png"
+        },
+        {
+          "skinId": 1601,
+          "name": "龙游新厨",
+          "specifiedHero": 16,
+          "score": 10,
+          "icon": "UI/Icon/HeroSkin_ABS/Icon_Lance_Skin01.png"
+        },
+        {
+          "skinId": 1602,
+          "name": "远洋骁骑",
+          "specifiedHero": 16,
+          "score": 60,
+          "icon": "UI/Icon/HeroSkin2_ABS/Icon_Lance_Skin02.png"
+        }
+      ]
+    }
+  },
+  "ordering": {
+    "heroesWithSkins": 235,
+    "heroesWithMultipleSkins": 157,
+    "listOrderIdAscending": 149,
+    "listOrderIdDescending": 0,
+    "listOrderScoreAscending": 14,
+    "listOrderScoreDescending": 107,
+    "exactDuplicateSkinIds": 0,
+    "representativeSequences": [
+      {
+        "heroId": 1,
+        "nameKr": "매튜",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 102,
+            "name": "执事美酒",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 102,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 103,
+            "name": "灵魂指挥",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 103,
+            "enablePreview": true
+          },
+          {
+            "index": 2,
+            "skinId": 104,
+            "name": "铸剑的英雄",
+            "score": 30,
+            "getPathType": null,
+            "charImageSkinResourceId": 104,
+            "enablePreview": true
+          },
+          {
+            "index": 3,
+            "skinId": 105,
+            "name": "妙想假日",
+            "score": 30,
+            "getPathType": null,
+            "charImageSkinResourceId": 105,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 3,
+        "nameKr": "그레니어",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 301,
+            "name": "星级大厨",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 301,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 302,
+            "name": "定音坚石",
+            "score": 30,
+            "getPathType": null,
+            "charImageSkinResourceId": 302,
+            "enablePreview": null
+          }
+        ]
+      },
+      {
+        "heroId": 4,
+        "nameKr": "아멜다",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 401,
+            "name": "甜心女仆",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 401,
+            "enablePreview": null
+          },
+          {
+            "index": 1,
+            "skinId": 402,
+            "name": "镜花伊人",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 402,
+            "enablePreview": true
+          },
+          {
+            "index": 2,
+            "skinId": 403,
+            "name": "金色琴弦",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 403,
+            "enablePreview": true
+          },
+          {
+            "index": 3,
+            "skinId": 499,
+            "name": "Q梅达",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 499,
+            "enablePreview": true
+          },
+          {
+            "index": 4,
+            "skinId": 405,
+            "name": "旧日的呼唤",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 405,
+            "enablePreview": null
+          },
+          {
+            "index": 5,
+            "skinId": 406,
+            "name": "重逢的交汇",
+            "score": 30,
+            "getPathType": null,
+            "charImageSkinResourceId": 406,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 5,
+        "nameKr": "크리스",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 501,
+            "name": "防暴女警",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 501,
+            "enablePreview": null
+          },
+          {
+            "index": 1,
+            "skinId": 502,
+            "name": "银猫",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 502,
+            "enablePreview": true
+          },
+          {
+            "index": 2,
+            "skinId": 503,
+            "name": "锦绣佳缘",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 503,
+            "enablePreview": null
+          },
+          {
+            "index": 3,
+            "skinId": 504,
+            "name": "焙烤爱意",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 504,
+            "enablePreview": true
+          },
+          {
+            "index": 4,
+            "skinId": 505,
+            "name": "灿丽航程",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 505,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 6,
+        "nameKr": "레온",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 601,
+            "name": "西部世界",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 601,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 602,
+            "name": "浮浪之刃",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 602,
+            "enablePreview": true
+          },
+          {
+            "index": 2,
+            "skinId": 603,
+            "name": "苍之骑士",
+            "score": 110,
+            "getPathType": null,
+            "charImageSkinResourceId": 603,
+            "enablePreview": true
+          },
+          {
+            "index": 3,
+            "skinId": 604,
+            "name": "真源的帝王",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 604,
+            "enablePreview": true
+          },
+          {
+            "index": 4,
+            "skinId": 605,
+            "name": "悠扬之音",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 605,
+            "enablePreview": true
+          },
+          {
+            "index": 5,
+            "skinId": 606,
+            "name": "晚宴浅酌",
+            "score": 30,
+            "getPathType": null,
+            "charImageSkinResourceId": 606,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 7,
+        "nameKr": "베른하르트",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 701,
+            "name": "第六天魔王",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 701,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 702,
+            "name": "巅峰伟力",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 702,
+            "enablePreview": true
+          },
+          {
+            "index": 2,
+            "skinId": 703,
+            "name": "卖火柴的小男孩",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 703,
+            "enablePreview": true
+          },
+          {
+            "index": 3,
+            "skinId": 704,
+            "name": "霜域霸者",
+            "score": 30,
+            "getPathType": null,
+            "charImageSkinResourceId": 704,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 8,
+        "nameKr": "라나",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 801,
+            "name": "旋律的妖精",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 801,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 802,
+            "name": "海滨丽人",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 802,
+            "enablePreview": null
+          },
+          {
+            "index": 2,
+            "skinId": 803,
+            "name": "月下红樱",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 803,
+            "enablePreview": true
+          },
+          {
+            "index": 3,
+            "skinId": 899,
+            "name": "漫长的告白",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 899,
+            "enablePreview": null
+          },
+          {
+            "index": 4,
+            "skinId": 804,
+            "name": "蓝色忧郁",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 804,
+            "enablePreview": null
+          },
+          {
+            "index": 5,
+            "skinId": 805,
+            "name": "影月和鸣",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 805,
+            "enablePreview": true
+          },
+          {
+            "index": 6,
+            "skinId": 806,
+            "name": "篮球宝贝",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 806,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 9,
+        "nameKr": "보젤",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 901,
+            "name": "灵魂收割者",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 901,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 902,
+            "name": "冥渊之主",
+            "score": 110,
+            "getPathType": null,
+            "charImageSkinResourceId": 902,
+            "enablePreview": true
+          },
+          {
+            "index": 2,
+            "skinId": 903,
+            "name": "冥狼之引",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 903,
+            "enablePreview": true
+          },
+          {
+            "index": 3,
+            "skinId": 904,
+            "name": "邪星魔神",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 904,
+            "enablePreview": true
+          },
+          {
+            "index": 4,
+            "skinId": 905,
+            "name": "永夜礼赞",
+            "score": 95,
+            "getPathType": null,
+            "charImageSkinResourceId": 905,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 10,
+        "nameKr": "레딘",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 1001,
+            "name": "火红的独奏者",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1001,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 1002,
+            "name": "烈焰战神",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 1002,
+            "enablePreview": true
+          },
+          {
+            "index": 2,
+            "skinId": 1003,
+            "name": "醒狮迎岁",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1003,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 11,
+        "nameKr": "나암",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 1101,
+            "name": "浪漫一夏",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1101,
+            "enablePreview": null
+          },
+          {
+            "index": 1,
+            "skinId": 1102,
+            "name": "星海领航员",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1102,
+            "enablePreview": null
+          },
+          {
+            "index": 2,
+            "skinId": 1103,
+            "name": "爱心蘸酱",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1103,
+            "enablePreview": null
+          }
+        ]
+      },
+      {
+        "heroId": 12,
+        "nameKr": "엘윈",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 1201,
+            "name": "另一位勇者",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1201,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 1202,
+            "name": "天霸绝枪",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 1202,
+            "enablePreview": true
+          },
+          {
+            "index": 2,
+            "skinId": 1203,
+            "name": "红之骑士",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 1203,
+            "enablePreview": true
+          },
+          {
+            "index": 3,
+            "skinId": 1204,
+            "name": "孤王",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 1204,
+            "enablePreview": true
+          },
+          {
+            "index": 4,
+            "skinId": 1205,
+            "name": "王牌投手",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1205,
+            "enablePreview": true
+          },
+          {
+            "index": 5,
+            "skinId": 1206,
+            "name": "炽情弦音",
+            "score": 30,
+            "getPathType": null,
+            "charImageSkinResourceId": 1206,
+            "enablePreview": true
+          },
+          {
+            "index": 6,
+            "skinId": 1207,
+            "name": "流浪的骑士",
+            "score": 95,
+            "getPathType": null,
+            "charImageSkinResourceId": 1207,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 13,
+        "nameKr": "헤인",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 1301,
+            "name": "魔法奇缘",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1301,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 1302,
+            "name": "超时空公主",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 1302,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 14,
+        "nameKr": "쉐리",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 1401,
+            "name": "落跑天使",
+            "score": 110,
+            "getPathType": null,
+            "charImageSkinResourceId": 1401,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 1403,
+            "name": "驯鹿奇袭",
+            "score": 110,
+            "getPathType": null,
+            "charImageSkinResourceId": 1403,
+            "enablePreview": null
+          },
+          {
+            "index": 2,
+            "skinId": 1499,
+            "name": "天空的恋人",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1499,
+            "enablePreview": null
+          },
+          {
+            "index": 3,
+            "skinId": 1404,
+            "name": "网球公主",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1404,
+            "enablePreview": null
+          },
+          {
+            "index": 4,
+            "skinId": 1405,
+            "name": "落樱华击",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 1405,
+            "enablePreview": null
+          },
+          {
+            "index": 5,
+            "skinId": 1406,
+            "name": "欢曲铿乐",
+            "score": 95,
+            "getPathType": null,
+            "charImageSkinResourceId": 1406,
+            "enablePreview": true
+          },
+          {
+            "index": 6,
+            "skinId": 1407,
+            "name": "清悦游憩",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1407,
+            "enablePreview": true
+          },
+          {
+            "index": 7,
+            "skinId": 1408,
+            "name": "灵蛇贺春",
+            "score": 100,
+            "getPathType": null,
+            "charImageSkinResourceId": 1408,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 15,
+        "nameKr": "리아나",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 1501,
+            "name": "樱之巫女",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1501,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 1502,
+            "name": "千年之恋",
+            "score": 110,
+            "getPathType": null,
+            "charImageSkinResourceId": 1502,
+            "enablePreview": null
+          },
+          {
+            "index": 2,
+            "skinId": 1503,
+            "name": "迷笛少女",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1503,
+            "enablePreview": true
+          },
+          {
+            "index": 3,
+            "skinId": 1504,
+            "name": "缤纷午后",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1504,
+            "enablePreview": true
+          },
+          {
+            "index": 4,
+            "skinId": 1505,
+            "name": "丹桂盈馨",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1505,
+            "enablePreview": true
+          },
+          {
+            "index": 5,
+            "skinId": 1506,
+            "name": "海浪甜心",
+            "score": 95,
+            "getPathType": null,
+            "charImageSkinResourceId": 1506,
+            "enablePreview": true
+          },
+          {
+            "index": 6,
+            "skinId": 1507,
+            "name": "待望的巫女",
+            "score": 95,
+            "getPathType": null,
+            "charImageSkinResourceId": 1507,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 16,
+        "nameKr": "란스",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 1601,
+            "name": "龙游新厨",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 1601,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 1602,
+            "name": "远洋骁骑",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 1602,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 17,
+        "nameKr": "에그베르트",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 1701,
+            "name": "节奏的爆点",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 1701,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 1702,
+            "name": "霜冥朽巫",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 1702,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 18,
+        "nameKr": "이멜다",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 1801,
+            "name": "传奇女帝",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1801,
+            "enablePreview": null
+          },
+          {
+            "index": 1,
+            "skinId": 1899,
+            "name": "炽热丽姬",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 1899,
+            "enablePreview": null
+          },
+          {
+            "index": 2,
+            "skinId": 1802,
+            "name": "情热斗士",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 1802,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 20,
+        "nameKr": "소니아",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 2001,
+            "name": "飞驰少女",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 2001,
+            "enablePreview": null
+          },
+          {
+            "index": 1,
+            "skinId": 2002,
+            "name": "青澜跃浪",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2002,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 21,
+        "nameKr": "발가스",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 2101,
+            "name": "行星防卫官",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 2101,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 2102,
+            "name": "性感炙烤",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 2102,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 22,
+        "nameKr": "제시카",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 2201,
+            "name": "光辉的启蒙",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 2201,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 2202,
+            "name": "午憩时光",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 2202,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 25,
+        "nameKr": "알테뮬러",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 2501,
+            "name": "重低音狂潮",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2501,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 2502,
+            "name": "怒涛霸主",
+            "score": 110,
+            "getPathType": null,
+            "charImageSkinResourceId": 2502,
+            "enablePreview": true
+          },
+          {
+            "index": 2,
+            "skinId": 2503,
+            "name": "绝代生徒会长",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2503,
+            "enablePreview": true
+          },
+          {
+            "index": 3,
+            "skinId": 2504,
+            "name": "青玫蕴情",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2504,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 26,
+        "nameKr": "루나",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 2601,
+            "name": "战争女神",
+            "score": 110,
+            "getPathType": null,
+            "charImageSkinResourceId": 2601,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 2602,
+            "name": "水弹直击",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2602,
+            "enablePreview": null
+          },
+          {
+            "index": 2,
+            "skinId": 2603,
+            "name": "指尖舞者",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2603,
+            "enablePreview": null
+          },
+          {
+            "index": 3,
+            "skinId": 2604,
+            "name": "蔷薇恋曲",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2604,
+            "enablePreview": null
+          },
+          {
+            "index": 4,
+            "skinId": 2605,
+            "name": "初诣新雪",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2605,
+            "enablePreview": true
+          },
+          {
+            "index": 5,
+            "skinId": 2606,
+            "name": "梦中倩影",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 2606,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 27,
+        "nameKr": "디하르트",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 2701,
+            "name": "雷神之锤",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2701,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 2702,
+            "name": "竹影剑心",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 2702,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 28,
+        "nameKr": "젤다",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 2801,
+            "name": "魔剑精灵",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 2801,
+            "enablePreview": null
+          },
+          {
+            "index": 1,
+            "skinId": 2802,
+            "name": "凌霜侠影",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2802,
+            "enablePreview": true
+          },
+          {
+            "index": 2,
+            "skinId": 2803,
+            "name": "铃动之光",
+            "score": 110,
+            "getPathType": null,
+            "charImageSkinResourceId": 2803,
+            "enablePreview": true
+          },
+          {
+            "index": 3,
+            "skinId": 2804,
+            "name": "羁绊的锋刃",
+            "score": 30,
+            "getPathType": null,
+            "charImageSkinResourceId": 2804,
+            "enablePreview": true
+          },
+          {
+            "index": 4,
+            "skinId": 2899,
+            "name": "蔚蓝宝贝",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2899,
+            "enablePreview": null
+          },
+          {
+            "index": 5,
+            "skinId": 2805,
+            "name": "繁花袂影",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2805,
+            "enablePreview": true
+          },
+          {
+            "index": 6,
+            "skinId": 2806,
+            "name": "邻桌巧心",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2806,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 29,
+        "nameKr": "티아리스",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 2901,
+            "name": "沙滩宝贝",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2901,
+            "enablePreview": null
+          },
+          {
+            "index": 1,
+            "skinId": 2902,
+            "name": "圣女天降",
+            "score": 110,
+            "getPathType": null,
+            "charImageSkinResourceId": 2902,
+            "enablePreview": true
+          },
+          {
+            "index": 2,
+            "skinId": 2903,
+            "name": "神乐鼓姬",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2903,
+            "enablePreview": null
+          },
+          {
+            "index": 3,
+            "skinId": 2904,
+            "name": "堇色月姬",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2904,
+            "enablePreview": true
+          },
+          {
+            "index": 4,
+            "skinId": 2905,
+            "name": "冬青之约",
+            "score": 60,
+            "getPathType": 4,
+            "charImageSkinResourceId": 2905,
+            "enablePreview": true
+          },
+          {
+            "index": 5,
+            "skinId": 2906,
+            "name": "愈心悠风",
+            "score": 95,
+            "getPathType": null,
+            "charImageSkinResourceId": 2906,
+            "enablePreview": null
+          },
+          {
+            "index": 6,
+            "skinId": 2907,
+            "name": "伶俏花仙",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 2907,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 30,
+        "nameKr": "리파니",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 3001,
+            "name": "魔法风纪委员",
+            "score": 95,
+            "getPathType": 4,
+            "charImageSkinResourceId": 3001,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 3002,
+            "name": "蝶影佳人",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 3002,
+            "enablePreview": null
+          },
+          {
+            "index": 2,
+            "skinId": 3003,
+            "name": "奇异幻戏",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 3003,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 31,
+        "nameKr": "소피아",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 3101,
+            "name": "魅心狼女",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 3101,
+            "enablePreview": null
+          },
+          {
+            "index": 1,
+            "skinId": 3102,
+            "name": "圣洁之花",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 3102,
+            "enablePreview": null
+          },
+          {
+            "index": 2,
+            "skinId": 3103,
+            "name": "暖冬醇心",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 3103,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 33,
+        "nameKr": "프레아",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 3301,
+            "name": "阳光热梦",
+            "score": 10,
+            "getPathType": null,
+            "charImageSkinResourceId": 3301,
+            "enablePreview": null
+          },
+          {
+            "index": 1,
+            "skinId": 3302,
+            "name": "斯巴达克斯",
+            "score": 50,
+            "getPathType": null,
+            "charImageSkinResourceId": 3302,
+            "enablePreview": null
+          },
+          {
+            "index": 2,
+            "skinId": 3303,
+            "name": "花火琉璃",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 3303,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 35,
+        "nameKr": "안젤리카",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 3501,
+            "name": "极速巧匠",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 3501,
+            "enablePreview": null
+          },
+          {
+            "index": 1,
+            "skinId": 3502,
+            "name": "安酱终极号",
+            "score": 120,
+            "getPathType": 2,
+            "charImageSkinResourceId": 3502,
+            "enablePreview": true
+          }
+        ]
+      },
+      {
+        "heroId": 36,
+        "nameKr": "실버울프",
+        "skins": [
+          {
+            "index": 0,
+            "skinId": 3601,
+            "name": "致命绅士",
+            "score": 50,
+            "getPathType": 4,
+            "charImageSkinResourceId": 3601,
+            "enablePreview": true
+          },
+          {
+            "index": 1,
+            "skinId": 3602,
+            "name": "废土凶牙",
+            "score": 60,
+            "getPathType": null,
+            "charImageSkinResourceId": 3602,
+            "enablePreview": true
+          }
+        ]
+      }
+    ]
+  },
+  "candidateScan": {
+    "allConfigFileCount": 753,
+    "candidateFileCount": 47,
+    "candidateFiles": [
+      "ConfigDataBloodMoonEden6BMShopEventInfo.json",
+      "ConfigDataBloodMoonEden6BMShopItemInfo.json",
+      "ConfigDataCharImageInfo.json",
+      "ConfigDataCharImageSkinResourceInfo.json",
+      "ConfigDataClientShowGoodsTypeInfo.json",
+      "ConfigDataFigureResourceInfo.json",
+      "ConfigDataFixedStoreItemInfo.json",
+      "ConfigDataFloatingCityActivityTaskInfo.json",
+      "ConfigDataFloatingCityBuyGoodsInteractionInfo.json",
+      "ConfigDataGiftStoreItemInfo.json",
+      "ConfigDataGiveBackResourceRewardInfo.json",
+      "ConfigDataGlobalSkillUnlockTypeInfo.json",
+      "ConfigDataGoodsRankFrameInfo.json",
+      "ConfigDataGoodsTypeInfo.json",
+      "ConfigDataHeroAssistantTaskInfo.json",
+      "ConfigDataHeroSkinInfo.json",
+      "ConfigDataHeroSkinSelfSelectedBoxInfo.json",
+      "ConfigDataHonorCompassUnlockConditionTypeInfo.json",
+      "ConfigDataJobUnlockConditionInfo.json",
+      "ConfigDataModelSkinResourceInfo.json",
+      "ConfigDataNotInBagResourceInfo.json",
+      "ConfigDataParallelWarfareBuildingUnlockConditionTypeInfo.json",
+      "ConfigDataParallelWarfareGoodsInfo.json",
+      "ConfigDataParallelWarfareWaypointUnlockConditionTypeInfo.json",
+      "ConfigDataQuickStoreGoodsInfo.json",
+      "ConfigDataRandomStoreInfo.json",
+      "ConfigDataRandomStoreItemInfo.json",
+      "ConfigDataRandomStoreLevelZoneInfo.json",
+      "ConfigDataRechargeStoreItemInfo.json",
+      "ConfigDataReviewStoryPaintingInfo.json",
+      "ConfigDataRogueLikeRechargeStoreItemInfo.json",
+      "ConfigDataRogueLikeShopItemlInfo.json",
+      "ConfigDataRogueLikeShopLevelInfo.json",
+      "ConfigDataSkinBundlingActivityInfo.json",
+      "ConfigDataSkinCollectionLevelInfo.json",
+      "ConfigDataSkinLotteryActivityInfo.json",
+      "ConfigDataSkinLotteryDrawTimesRewardInfo.json",
+      "ConfigDataSkinLotteryRewardInfo.json",
+      "ConfigDataSkinLotteryRewardItemInfo.json",
+      "ConfigDataSkylineTacticsShopLevelInfo.json",
+      "ConfigDataSmallExpressionPathInfo.json",
+      "ConfigDataSoldierSkinInfo.json",
+      "ConfigDataStoreCurrencyInfo.json",
+      "ConfigDataStoreInfo.json",
+      "ConfigDataTimeCrusadeCityTypeUnlockInfo.json",
+      "ConfigDataTimeSpaceBusinessShopLevel.json",
+      "ConfigDataWeaponMixtureGoodsConsumeInfo.json"
+    ],
+    "candidateTables": [
+      {
+        "file": "ConfigDataBloodMoonEden6BMShopItemInfo.json",
+        "rowCount": 144,
+        "sampleKeys": [
+          "ID",
+          "BloodMoonEdenBlessingId",
+          "BloodCoinCost"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ID",
+            "distinctNumericValues": 144,
+            "skinIdHits": 4,
+            "skinResourceIdHits": 4,
+            "modelResourceIdHits": 4
+          }
+        ],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "BloodMoonEdenBlessingId": 60101,
+          "BloodCoinCost": 6
+        }
+      },
+      {
+        "file": "ConfigDataCharImageInfo.json",
+        "rowCount": 1378,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "Spine",
+          "HeroPainting",
+          "CVName",
+          "HeroDetailScale",
+          "HeroDetailYOffset",
+          "HeroConfessionYOffset",
+          "HeroConfessionEndingScaleOffset",
+          "CombatScale",
+          "CombatYOffset",
+          "BattleDialogScale",
+          "BattleDialogYOffset",
+          "DialogScale",
+          "DialogYOffset",
+          "RoundHeadImage",
+          "SummonHeadImage",
+          "CardHeadImage",
+          "SmallHeadImage",
+          "SkillCutscene_ID",
+          "Sound_Die",
+          "Performances",
+          "BreakPerformances",
+          "SummonPerformances",
+          "JobTransferPerformances",
+          "BattleActionVoice1",
+          "NewPerformances",
+          "NewBreakPerformances",
+          "NewSummonPerformances",
+          "NewJobTransferPerformances"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "NewPerformances.PerformanceId",
+            "distinctNumericValues": 1650,
+            "skinIdHits": 526,
+            "skinResourceIdHits": 526,
+            "modelResourceIdHits": 517
+          },
+          {
+            "field": "Performances.Word",
+            "distinctNumericValues": 294,
+            "skinIdHits": 79,
+            "skinResourceIdHits": 79,
+            "modelResourceIdHits": 79
+          },
+          {
+            "field": "ID",
+            "distinctNumericValues": 1378,
+            "skinIdHits": 54,
+            "skinResourceIdHits": 54,
+            "modelResourceIdHits": 61
+          },
+          {
+            "field": "NewBreakPerformances.PerformanceId",
+            "distinctNumericValues": 275,
+            "skinIdHits": 5,
+            "skinResourceIdHits": 5,
+            "modelResourceIdHits": 5
+          },
+          {
+            "field": "SkillCutscene_ID",
+            "distinctNumericValues": 294,
+            "skinIdHits": 4,
+            "skinResourceIdHits": 4,
+            "modelResourceIdHits": 4
+          },
+          {
+            "field": "CombatScale",
+            "distinctNumericValues": 25,
+            "skinIdHits": 3,
+            "skinResourceIdHits": 3,
+            "modelResourceIdHits": 3
+          },
+          {
+            "field": "BattleDialogScale",
+            "distinctNumericValues": 19,
+            "skinIdHits": 3,
+            "skinResourceIdHits": 3,
+            "modelResourceIdHits": 3
+          },
+          {
+            "field": "HeroDetailScale",
+            "distinctNumericValues": 10,
+            "skinIdHits": 1,
+            "skinResourceIdHits": 1,
+            "modelResourceIdHits": 1
+          },
+          {
+            "field": "CombatYOffset",
+            "distinctNumericValues": 111,
+            "skinIdHits": 1,
+            "skinResourceIdHits": 1,
+            "modelResourceIdHits": 1
+          },
+          {
+            "field": "BattleDialogYOffset",
+            "distinctNumericValues": 99,
+            "skinIdHits": 1,
+            "skinResourceIdHits": 1,
+            "modelResourceIdHits": 1
+          },
+          {
+            "field": "DialogScale",
+            "distinctNumericValues": 13,
+            "skinIdHits": 1,
+            "skinResourceIdHits": 1,
+            "modelResourceIdHits": 1
+          },
+          {
+            "field": "BreakPerformances.Word",
+            "distinctNumericValues": 23,
+            "skinIdHits": 1,
+            "skinResourceIdHits": 1,
+            "modelResourceIdHits": 1
+          },
+          {
+            "field": "NewSummonPerformances.PerformanceId",
+            "distinctNumericValues": 275,
+            "skinIdHits": 1,
+            "skinResourceIdHits": 1,
+            "modelResourceIdHits": 1
+          },
+          {
+            "field": "NewJobTransferPerformances.PerformanceId",
+            "distinctNumericValues": 276,
+            "skinIdHits": 1,
+            "skinResourceIdHits": 1,
+            "modelResourceIdHits": 1
+          }
+        ],
+        "pathFields": [
+          {
+            "field": "Spine",
+            "samples": [
+              "Spine/Char/Mathew_ABS/Mathew_Prefab.prefab",
+              "Spine/Char/Grenier_ABS/Grenier_Prefab.prefab",
+              "Spine/Char/Aimeeda_ABS/Aimeeda_Prefab.prefab",
+              "Spine/Char/Chris_ABS/Chris_Prefab.prefab",
+              "Spine/Char/Leon_ABS/Leon_Prefab.prefab",
+              "Spine/Char/Bernhardt_ABS/Bernhardt_Prefab.prefab",
+              "Spine/Char/Lana_ABS/Lana_Prefab.prefab",
+              "Spine/Char/Bozel_ABS/Bozel_Prefab.prefab"
+            ]
+          },
+          {
+            "field": "HeroPainting",
+            "samples": [
+              "UI/HeroPainting/SSR_ABS/Prefab/Matthew.prefab",
+              "UI/HeroPainting/SSR_ABS/Prefab/Grenier.prefab",
+              "UI/HeroPainting/SSR_ABS/Prefab/Aimeeda.prefab",
+              "UI/HeroPainting/SR_ABS/Prefab/Chris.prefab",
+              "UI/HeroPainting/SSR_ABS/Prefab/Leon.prefab",
+              "UI/HeroPainting/SSR_ABS/Prefab/Bernhardt.prefab",
+              "UI/HeroPainting/SSR_ABS/Prefab/Lana.prefab",
+              "UI/HeroPainting/SSR_ABS/Prefab/Bozel.prefab"
+            ]
+          },
+          {
+            "field": "RoundHeadImage",
+            "samples": [
+              "UI/Icon/HeadBattle_ABS/Head_Matthew_N.png",
+              "UI/Icon/HeadBattle_ABS/Head_Grenier_N.png",
+              "UI/Icon/HeadBattle_ABS/Head_Aimeeda_N.png",
+              "UI/Icon/HeadBattle_ABS/Head_Chris.png",
+              "UI/Icon/HeadBattle_ABS/Head_Leon.png",
+              "UI/Icon/HeadBattle_ABS/Head_Bernhardt.png",
+              "UI/Icon/HeadBattle_ABS/Head_Lana.png",
+              "UI/Icon/HeadBattle_ABS/Head_Bozel.png"
+            ]
+          },
+          {
+            "field": "SummonHeadImage",
+            "samples": [
+              "UI/Icon/Card_ABS/Card_Matthew.png",
+              "UI/Icon/Card_ABS/Card_Grenier.png",
+              "UI/Icon/Card_ABS/Card_Aimeeda.png",
+              "UI/Icon/Card_ABS/Card_Chris.png",
+              "UI/Icon/Card_ABS/Card_Leon.png",
+              "UI/Icon/Card_ABS/Card_Bernhardt.png",
+              "UI/Icon/Card_ABS/Card_Lana.png",
+              "UI/Icon/Card_ABS/Card_Bozel.png"
+            ]
+          },
+          {
+            "field": "CardHeadImage",
+            "samples": [
+              "UI/Card_ABS/Card_Head_Matthew.png",
+              "UI/Card_ABS/Card_Head_Grenier.png",
+              "UI/Card_ABS/Card_Head_Aimeeda.png",
+              "UI/Card_ABS/Card_Head_Chris.png",
+              "UI/Card_ABS/Card_Head_Leon.png",
+              "UI/Card_ABS/Card_Head_Bernhardt.png",
+              "UI/Card_ABS/Card_Head_Lana.png",
+              "UI/Card_ABS/Card_Head_Bozel.png"
+            ]
+          },
+          {
+            "field": "SmallHeadImage",
+            "samples": [
+              "UI/Icon/Head_ABS/Head_Small_Matthew_N.png",
+              "UI/Icon/Head_ABS/Head_Small_Grenier_N.png",
+              "UI/Icon/Head_ABS/Head_Small_Aimeeda_N.png",
+              "UI/Icon/Head_ABS/Head_Small_Chris.png",
+              "UI/Icon/Head_ABS/Head_Small_Leon.png",
+              "UI/Icon/Head_ABS/Head_Small_Bernhardt.png",
+              "UI/Icon/Head_ABS/Head_Small_Lana.png",
+              "UI/Icon/Head_ABS/Head_Small_Bozel.png"
+            ]
+          },
+          {
+            "field": "Spine2",
+            "samples": [
+              "Spine/Char/IceAbyssMonarch_ABS/Bust_IceAbyssMonarch_Prefab.prefab",
+              "Spine/Char/Tabres_ABS/Bust_Tabres_Prefab.prefab",
+              "Spine/Char/Ymir_ABS/Bust_Ymir_Prefab.prefab",
+              "Spine/Char/Celica_ABS/Bust_Celica_Prefab.prefab",
+              "Spine/Char/Seraphina_ABS/Bust_Seraphina_Prefab.prefab",
+              "Spine/Char/Virelia_ABS/Bust_Virelia_Prefab.prefab",
+              "Spine/Char/Brightsummoner_ABS/Bust_Brightsummoner_Prefab.prefab",
+              "Spine/Char/Shion_ABS/Bust_Shion_Prefab.prefab"
+            ]
+          },
+          {
+            "field": "SpineBackground",
+            "samples": [
+              "Spine/Char/IceAbyssMonarch_ABS/IceAbyssMonarch_BG_Prefab.prefab",
+              "Spine/Char/Brightsummoner_ABS/Brightsummoner_BG_Prefab.prefab",
+              "Spine/Char/Dragonslayer_ABS/Dragonslayer_BG_Prefab.prefab",
+              "Spine/Char/Gazesuccubus_ABS/Gazesuccubus_BG_Prefab.prefab",
+              "Spine/Char/HeavenDefier_ABS/HeavenDefier_BG_Prefab.prefab",
+              "Spine/Char/TidalVindicator_ABS/TidalVindicator_BG_Prefab.prefab",
+              "Spine/Char/IceAbyssMonarch_ABS/IceAbyssMonarch_Skin01_BG_Prefab.prefab",
+              "Spine/Char/HeavenDefier_ABS/HeavenDefier_Skin01_BG_Prefab.prefab"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "马修",
+          "Spine": "Spine/Char/Mathew_ABS/Mathew_Prefab.prefab",
+          "HeroPainting": "UI/HeroPainting/SSR_ABS/Prefab/Matthew.prefab",
+          "CVName": "柿原彻也",
+          "HeroDetailScale": 100,
+          "HeroDetailYOffset": -10,
+          "HeroConfessionYOffset": -720,
+          "HeroConfessionEndingScaleOffset": 10,
+          "CombatScale": 100,
+          "CombatYOffset": -20,
+          "BattleDialogScale": 100,
+          "BattleDialogYOffset": -20,
+          "DialogScale": 100,
+          "DialogYOffset": -10,
+          "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Matthew_N.png",
+          "SummonHeadImage": "UI/Icon/Card_ABS/Card_Matthew.png",
+          "CardHeadImage": "UI/Card_ABS/Card_Head_Matthew.png",
+          "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Matthew_N.png",
+          "SkillCutscene_ID": 101,
+          "Sound_Die": "Char037_05",
+          "Performances": [
+            {
+              "Anim": "idle_Smile",
+              "Word": 101,
+              "Voice": "Char037_09"
+            },
+            {
+              "Anim": "idle_Angry",
+              "Word": 102,
+              "Voice": "Char037_10"
+            },
+            {
+              "Anim": "idle_Sad",
+              "Word": 103,
+              "Voice": "Char037_11"
+            },
+            {
+              "Anim": "idle_Normal",
+              "Word": 104,
+              "Voice": "Char037_08"
+            }
+          ],
+          "BreakPerformances": [
+            {
+              "Anim": "idle_Smile",
+              "Word": 105,
+              "Voice": "Char037_01"
+            }
+          ],
+          "SummonPerformances": [
+            {
+              "Anim": "idle_Smile",
+              "Word": 106,
+              "Voice": "Char037_09"
+            }
+          ],
+          "JobTransferPerformances": [
+            {
+              "Anim": "idle_Smile",
+              "Word": 107,
+              "Voice": "Char037_01"
+            },
+            {
+              "Anim": "idle_Smile",
+              "Word": 108,
+              "Voice": "Char037_02"
+            }
+          ],
+          "BattleActionVoice1": "Char037_07",
+          "NewPerformances": [
+            {
+              "FavourabilityLevel": 1,
+              "PerformanceId": 101
+            },
+            {
+              "FavourabilityLevel": 4,
+              "PerformanceId": 102
+            },
+            {
+              "FavourabilityLevel": 9,
+              "PerformanceId": 103
+            },
+            {
+              "FavourabilityLevel": 14,
+              "PerformanceId": 104
+            },
+            {
+              "FavourabilityLevel": 19,
+              "PerformanceId": 105
+            },
+            {
+              "FavourabilityLevel": 24,
+              "PerformanceId": 106
+            }
+          ],
+          "NewBreakPerformances": [
+            {
+              "FavourabilityLevel": 1,
+              "PerformanceId": 107
+            }
+          ],
+          "NewSummonPerformances": [
+            {
+              "FavourabilityLevel": 1,
+              "PerformanceId": 108
+            }
+          ],
+          "NewJobTransferPerformances": [
+            {
+              "FavourabilityLevel": 1,
+              "PerformanceId": 109
+            }
+          ]
+        }
+      },
+      {
+        "file": "ConfigDataCharImageSkinResourceInfo.json",
+        "rowCount": 566,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "Image",
+          "SpineAssetPath"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ID",
+            "distinctNumericValues": 566,
+            "skinIdHits": 540,
+            "skinResourceIdHits": 540,
+            "modelResourceIdHits": 531
+          }
+        ],
+        "pathFields": [
+          {
+            "field": "Image",
+            "samples": [
+              "UI/Icon/HeroSkin_ABS/Skin/Skin_Sherry_01.png",
+              "UI/Icon/HeroSkin_ABS/Skin/Skin_Elwin_01.png",
+              "UI/Icon/HeroSkin_ABS/Skin/Skin_Riana_01.png",
+              "UI/Icon/HeroSkin_ABS/Skin/Skin_Leon_01.png",
+              "UI/Icon/HeroSkin_ABS/Skin/Skin_Bernhardt_01.png",
+              "UI/Icon/HeroSkin_ABS/Skin/Skin_Lana_01.png",
+              "UI/Icon/HeroSkin_ABS/Skin/Skin_Sherry_02.png",
+              "UI/Icon/HeroSkin_ABS/Skin/Skin_Leon_02.png"
+            ]
+          },
+          {
+            "field": "SpineAssetPath",
+            "samples": [
+              "Spine/Char/Flakia_ABS/Flakia_prefab.prefab",
+              "Spine/Char/Elwin_ABS/Elwin_Skin_Prefab.prefab",
+              "Spine/Char/Riana_ABS/Riana_Skin_Prefab.prefab",
+              "Spine/Char/Leon_ABS/Leon_Skin_Prefab.prefab",
+              "Spine/Char/Bernhardt_ABS/Bernhardt_skin_Prefab.prefab",
+              "Spine/Char/Lana_ABS/Lana_Skin_Prefab.prefab",
+              "Spine/Char/Sherry_ABS/SherryAngel_Skin_Prefab.prefab",
+              "Spine/Char/Sherry_ABS/Sherry_Skin_Prefab.prefab"
+            ]
+          },
+          {
+            "field": "Spine2AssetPath",
+            "samples": [
+              "Spine/Char/IceAbyssMonarch_ABS/Bust_IceAbyssMonarch_Skin01_Prefab.prefab",
+              "Spine/Char/Tyrantel_ABS/Bust_Tyrantel_Skin01_Prefab.prefab",
+              "Spine/Char/Tabres_ABS/Bust_Tabres_Skin01_Prefab.prefab",
+              "Spine/Char/Nymph_ABS/Bust_Nymph_Skin02_Prefab.prefab",
+              "Spine/Char/Wehttam_ABS/Bust_Wehttam_Skin03.prefab",
+              "Spine/Char/Ymir_ABS/Bust_Ymir_Skin01_Prefab.prefab",
+              "Spine/Char/Celica_ABS/Bust_Celica_Skin01_Prerfab.prefab",
+              "Spine/Char/Iris_ABS/Bust_Iris_Skin02_Prefab.prefab"
+            ]
+          },
+          {
+            "field": "SpineBackground",
+            "samples": [
+              "Spine/Char/IceAbyssMonarch_ABS/IceAbyssMonarch_Skin01_BG_Prefab.prefab",
+              "Spine/Char/Brightsummoner_ABS/Brightsummoner_Skin01_BG_Prefab.prefab",
+              "Spine/Char/Dragonslayer_ABS/Dragonslayer_Skin01_BG_Prefab.prefab",
+              "Spine/Char/Gazesuccubus_ABS/Gazesuccubus_Skin01_BG_Prefab.prefab",
+              "Spine/Char/HeavenDefier_ABS/HeavenDefier_Skin01_BG_Prefab.prefab",
+              "Spine/Char/IceAbyssMonarch_ABS/IceAbyssMonarch_Skin02_BG_Prefab.prefab",
+              "Spine/Char/TidalVindicator_ABS/TidalVindicator_Skin01_BG_Prefab.prefab"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 101,
+          "Name": "魔剑",
+          "Image": "UI/Icon/HeroSkin_ABS/Skin/Skin_Sherry_01.png",
+          "SpineAssetPath": "Spine/Char/Flakia_ABS/Flakia_prefab.prefab"
+        }
+      },
+      {
+        "file": "ConfigDataClientShowGoodsTypeInfo.json",
+        "rowCount": 9,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "Desc",
+          "Rank",
+          "Icon"
+        ],
+        "numericIdMatches": [],
+        "pathFields": [
+          {
+            "field": "Icon",
+            "samples": [
+              "UI/Guild_ABS/Icon_Bangong.png",
+              "UI/Common_New02_ABS/Icon/Icon_WorldStar.png",
+              "UI/Common_New_ABS/Icon/Icon_Pvpintegration.png",
+              "UI/Icon/Item05_ABS/Icon_PlanetariumTechPoint.png",
+              "UI/Icon/Item05_ABS/PlanetariumRune.png",
+              "UI/Icon/Item05_ABS/Icon_SacredStone.png",
+              "UI/Icon/Item05_ABS/Icon_SeasonChallengeToken.png",
+              "UI/Icon/Equip_ABS/Icon_GoryCrystal.png"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "魔导矿",
+          "Desc": "在时空远征活动中击杀敌人获得的神奇矿物，可以对旅团科技进行升级。",
+          "Rank": 3,
+          "Icon": "UI/Guild_ABS/Icon_Bangong.png"
+        }
+      },
+      {
+        "file": "ConfigDataFigureResourceInfo.json",
+        "rowCount": 1771,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "Desc",
+          "SpinAssetPath",
+          "Scale",
+          "OffsetY",
+          "UICardScale",
+          "UICardOffsetY",
+          "MScale",
+          "MOffsetY"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ID",
+            "distinctNumericValues": 1771,
+            "skinIdHits": 73,
+            "skinResourceIdHits": 73,
+            "modelResourceIdHits": 89
+          }
+        ],
+        "pathFields": [
+          {
+            "field": "SpinAssetPath",
+            "samples": [
+              "Spine/Char/Elwin_ABS/Elwin_Range_Prefab.prefab",
+              "Spine/General/Elwin_ABS/Elwin_Range/Elwin01_Range_Prefab.prefab",
+              "Spine/General/Elwin_ABS/Elwin_Range/Elwin02_Range_Prefab.prefab",
+              "Spine/General/Elwin_ABS/Elwin_Range/Elwin_qb02_Range_Prefab.prefab",
+              "Spine/General/Elwin_ABS/Elwin_Range/Elwin_HighRider_Range_Prefab.prefab",
+              "Spine/General/Elwin_ABS/Elwin_Range/Elwin03_Range_Prefab.prefab",
+              "Spine/General/Elwin_ABS/Elwin_Range/Elwin_qb03_Range_Prefab.prefab",
+              "Spine/Char/Sherry_ABS/Sherry_Range_Prefab.prefab"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "艾尔文",
+          "Desc": "立绘",
+          "SpinAssetPath": "Spine/Char/Elwin_ABS/Elwin_Range_Prefab.prefab",
+          "Scale": 22,
+          "OffsetY": 20,
+          "UICardScale": 28,
+          "UICardOffsetY": 110,
+          "MScale": 28,
+          "MOffsetY": 20
+        }
+      },
+      {
+        "file": "ConfigDataFixedStoreItemInfo.json",
+        "rowCount": 1312,
+        "sampleKeys": [
+          "ID",
+          "StoreID",
+          "Name",
+          "ItemType",
+          "Nums",
+          "ShowStartTime",
+          "BuyLimitType",
+          "CurrencyType",
+          "FirstPrice",
+          "NormalPrice",
+          "UISort"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ItemId",
+            "distinctNumericValues": 875,
+            "skinIdHits": 475,
+            "skinResourceIdHits": 475,
+            "modelResourceIdHits": 467
+          },
+          {
+            "field": "ID",
+            "distinctNumericValues": 1312,
+            "skinIdHits": 89,
+            "skinResourceIdHits": 89,
+            "modelResourceIdHits": 97
+          },
+          {
+            "field": "PreUnlockGoodsId",
+            "distinctNumericValues": 12,
+            "skinIdHits": 3,
+            "skinResourceIdHits": 3,
+            "modelResourceIdHits": 7
+          },
+          {
+            "field": "UISort",
+            "distinctNumericValues": 127,
+            "skinIdHits": 4,
+            "skinResourceIdHits": 4,
+            "modelResourceIdHits": 4
+          },
+          {
+            "field": "UnlockConditions.Param1",
+            "distinctNumericValues": 12,
+            "skinIdHits": 2,
+            "skinResourceIdHits": 2,
+            "modelResourceIdHits": 2
+          }
+        ],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "StoreID": 2,
+          "Name": "5万金币",
+          "ItemType": 1,
+          "Nums": 50000,
+          "ShowStartTime": "2016/12/14 3:30:30",
+          "BuyLimitType": 4,
+          "CurrencyType": 2,
+          "FirstPrice": 30,
+          "NormalPrice": 30,
+          "UISort": 1
+        }
+      },
+      {
+        "file": "ConfigDataFloatingCityActivityTaskInfo.json",
+        "rowCount": 429,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "Desc",
+          "TaskType",
+          "Parm1"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "Parm1",
+            "distinctNumericValues": 266,
+            "skinIdHits": 2,
+            "skinResourceIdHits": 2,
+            "modelResourceIdHits": 2
+          }
+        ],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "黑暗的招聘信",
+          "Desc": "【浮空城邮局提示】：您有一封新信件正等待查收。",
+          "TaskType": 8,
+          "Parm1": 1
+        }
+      },
+      {
+        "file": "ConfigDataGiftStoreItemInfo.json",
+        "rowCount": 940,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "StoreId",
+          "ItemType",
+          "ItemId",
+          "Nums",
+          "ShowStartTime",
+          "BuyLimitType",
+          "NormalPrice",
+          "NormalBuyCompensation",
+          "RecommendDisplayStartTime",
+          "PDSDKGoodsID"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ID",
+            "distinctNumericValues": 940,
+            "skinIdHits": 51,
+            "skinResourceIdHits": 51,
+            "modelResourceIdHits": 67
+          },
+          {
+            "field": "ItemId",
+            "distinctNumericValues": 817,
+            "skinIdHits": 9,
+            "skinResourceIdHits": 9,
+            "modelResourceIdHits": 10
+          }
+        ],
+        "pathFields": [
+          {
+            "field": "BigAdvertisingImage",
+            "samples": [
+              "UI/CommonBG_ABS/BG_Church.png",
+              "UI/Store_ABS/1/Store_Banner_03.png"
+            ]
+          },
+          {
+            "field": "SmallAdvertisingImage",
+            "samples": [
+              "UI/Store_ABS/1/Store_Banner_08.png",
+              "UI/Store_ABS/1/Store_Banner_04.png",
+              "UI/Store_ABS/1/Store_Banner_05.png",
+              "UI/Store_ABS/1/Store_Banner_16.png",
+              "UI/Store_ABS/1/Store_Banner_09.png",
+              "UI/Store_ABS/1/Store_Banner_07.png",
+              "UI/Store_ABS/1/Store_Banner_12.png",
+              "UI/Store_ABS/1/Store_Banner_02.png"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "女神的恩惠",
+          "StoreId": 8,
+          "ItemType": 14,
+          "ItemId": 1,
+          "Nums": 1,
+          "ShowStartTime": "2017/12/14 3:30:30",
+          "BuyLimitType": 4,
+          "NormalPrice": 30,
+          "NormalBuyCompensation": 150,
+          "RecommendDisplayStartTime": "2017/12/14 3:30:30",
+          "PDSDKGoodsID": "cn.30"
+        }
+      },
+      {
+        "file": "ConfigDataGiveBackResourceRewardInfo.json",
+        "rowCount": 6,
+        "sampleKeys": [
+          "ID",
+          "CrystalCost",
+          "Reward"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "Reward.Id",
+            "distinctNumericValues": 7,
+            "skinIdHits": 0,
+            "skinResourceIdHits": 0,
+            "modelResourceIdHits": 1
+          }
+        ],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 2,
+          "CrystalCost": 50,
+          "Reward": [
+            {
+              "GoodsType": 6,
+              "Id": 3503,
+              "Count": 4
+            },
+            {
+              "GoodsType": 6,
+              "Id": 3021,
+              "Count": 2
+            },
+            {
+              "GoodsType": 6,
+              "Id": 3022,
+              "Count": 1
+            },
+            {
+              "GoodsType": 6,
+              "Id": 3023,
+              "Count": 1
+            },
+            {
+              "GoodsType": 6,
+              "Id": 3019,
+              "Count": 10
+            },
+            {
+              "GoodsType": 6,
+              "Id": 3020,
+              "Count": 3
+            },
+            {
+              "GoodsType": 6,
+              "Id": 4009,
+              "Count": 1
+            }
+          ]
+        }
+      },
+      {
+        "file": "ConfigDataGoodsTypeInfo.json",
+        "rowCount": 39,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "Desc",
+          "Rank",
+          "Icon"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ID",
+            "distinctNumericValues": 39,
+            "skinIdHits": 1,
+            "skinResourceIdHits": 1,
+            "modelResourceIdHits": 1
+          }
+        ],
+        "pathFields": [
+          {
+            "field": "Icon",
+            "samples": [
+              "UI/Icon/Item03_ABS/Icon_TimeCrusadeGradePoint.png",
+              "UI/Icon/Item_ABS/Icon_GuildCoin2.png",
+              "UI/Icon/Item03_ABS/Item_RLTicket-Entrance.png",
+              "UI/Icon/Item04_ABS/Item_Skincoin.png",
+              "UI/Icon/Item04_ABS/Covenant_DuskPoleStar.png",
+              "UI/Icon/Item04_ABS/Item_FloatingCityWood.png",
+              "UI/Icon/Item04_ABS/Item_FloatingCityStone.png",
+              "UI/Icon/Item04_ABS/Item_FloatingCityIron.png"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 40,
+          "Name": "远征积分",
+          "Desc": "参与时空远征活动获得的积分，可以提升远征评级并获得远征奖章。",
+          "Rank": 3,
+          "Icon": "UI/Icon/Item03_ABS/Icon_TimeCrusadeGradePoint.png"
+        }
+      },
+      {
+        "file": "ConfigDataHeroAssistantTaskInfo.json",
+        "rowCount": 35,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "Resource",
+          "RequiredUserLevel",
+          "CompletePoints",
+          "Rewards"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "Rewards.DropID",
+            "distinctNumericValues": 140,
+            "skinIdHits": 3,
+            "skinResourceIdHits": 3,
+            "modelResourceIdHits": 3
+          }
+        ],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "步兵助教难度1",
+          "Resource": [
+            "UI",
+            "Icon",
+            "Item_ABS",
+            "Item_StarterPack.png"
+          ],
+          "RequiredUserLevel": 1,
+          "CompletePoints": 2400,
+          "Rewards": [
+            {
+              "CompleteValue": 1,
+              "DropID": 5801
+            },
+            {
+              "CompleteValue": 50,
+              "DropID": 5802
+            },
+            {
+              "CompleteValue": 80,
+              "DropID": 5803
+            },
+            {
+              "CompleteValue": 100,
+              "DropID": 5804
+            }
+          ]
+        }
+      },
+      {
+        "file": "ConfigDataHeroSkinInfo.json",
+        "rowCount": 565,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "SpecifiedHero",
+          "CharImageSkinResource_ID",
+          "SpecifiedModelSkinResource",
+          "Desc",
+          "Icon",
+          "RoundHeadImage",
+          "SmallHeadImage",
+          "CardHeadImage",
+          "EnablePreview",
+          "GetPathType",
+          "Score"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "SpecifiedModelSkinResource.SkinResourceId",
+            "distinctNumericValues": 814,
+            "skinIdHits": 531,
+            "skinResourceIdHits": 531,
+            "modelResourceIdHits": 789
+          },
+          {
+            "field": "ID",
+            "distinctNumericValues": 565,
+            "skinIdHits": 540,
+            "skinResourceIdHits": 540,
+            "modelResourceIdHits": 531
+          },
+          {
+            "field": "CharImageSkinResource_ID",
+            "distinctNumericValues": 565,
+            "skinIdHits": 540,
+            "skinResourceIdHits": 540,
+            "modelResourceIdHits": 531
+          },
+          {
+            "field": "SpecifiedModelSkinResource.JobConnectionId",
+            "distinctNumericValues": 960,
+            "skinIdHits": 35,
+            "skinResourceIdHits": 35,
+            "modelResourceIdHits": 51
+          },
+          {
+            "field": "SpecifiedHero",
+            "distinctNumericValues": 248,
+            "skinIdHits": 4,
+            "skinResourceIdHits": 4,
+            "modelResourceIdHits": 4
+          },
+          {
+            "field": "CharImage_ID",
+            "distinctNumericValues": 67,
+            "skinIdHits": 4,
+            "skinResourceIdHits": 4,
+            "modelResourceIdHits": 4
+          }
+        ],
+        "pathFields": [
+          {
+            "field": "Icon",
+            "samples": [
+              "UI/Icon/HeroSkin_ABS/Icon_Elwin_Skin01.png",
+              "UI/Icon/HeroSkin_ABS/Icon_RianaSkin_01.png",
+              "UI/Icon/HeroSkin_ABS/Icon_Leon_Skin01.png",
+              "UI/Icon/HeroSkin_ABS/Icon_Bernhardt_Skin01.png",
+              "UI/Icon/HeroSkin_ABS/Icon_LanaSkin_01.png",
+              "UI/Icon/HeroSkin_ABS/Icon_Sherry_Skin02.png",
+              "UI/Icon/HeroSkin_ABS/Icon_SherrySkin_01.png",
+              "UI/Icon/HeroSkin_ABS/Icon_Leon_Skin02.png"
+            ]
+          },
+          {
+            "field": "RoundHeadImage",
+            "samples": [
+              "UI/Icon/HeadBattleSkin_ABS/Head_Elwin_Skin01.png",
+              "UI/Icon/HeadBattleSkin_ABS/Head_Riana_Skin01.png",
+              "UI/Icon/HeadBattleSkin_ABS/Head_Leon_Skin02.png",
+              "UI/Icon/HeadBattleSkin_ABS/Head_Bernhardt_Skin01.png",
+              "UI/Icon/HeadBattleSkin_ABS/Head_Lana_Skin01.png",
+              "UI/Icon/HeadBattleSkin_ABS/Head_Sherry_Skin01.png",
+              "UI/Icon/HeadBattleSkin_ABS/Head_Leon_Skin01.png",
+              "UI/Icon/HeadBattleSkin_ABS/Head_Elwin_Skin02.png"
+            ]
+          },
+          {
+            "field": "SmallHeadImage",
+            "samples": [
+              "UI/Icon/HeadSkin_ABS/Head_Small_Elwin_Skin01.png",
+              "UI/Icon/HeadSkin_ABS/Head_Small_Riana_Skin01.png",
+              "UI/Icon/HeadSkin_ABS/Head_Small_Leon_Skin02.png",
+              "UI/Icon/HeadSkin_ABS/Head_Small_Bernhardt_Skin01.png",
+              "UI/Icon/HeadSkin_ABS/Head_Small_Lana_Skin01.png",
+              "UI/Icon/HeadSkin_ABS/Head_Small_Sherry_Skin01.png",
+              "UI/Icon/HeadSkin_ABS/Head_Small_Leon_Skin01.png",
+              "UI/Icon/HeadSkin_ABS/Head_Small_Elwin_Skin02.png"
+            ]
+          },
+          {
+            "field": "CardHeadImage",
+            "samples": [
+              "UI/CarkSkin01_ABS/Card_Head_Elwin_Skin01.png",
+              "UI/CarkSkin01_ABS/Card_Head_Riana_Skin01.png",
+              "UI/CarkSkin01_ABS/Card_Head_Leon_Skin02.png",
+              "UI/CarkSkin01_ABS/Card_Head_Bernhardt_Skin01.png",
+              "UI/CarkSkin01_ABS/Card_Head_Lana_Skin01.png",
+              "UI/CarkSkin01_ABS/Card_Head_Sherry_Skin01.png",
+              "UI/CarkSkin01_ABS/Card_Head_Leon_Skin01.png",
+              "UI/CarkSkin01_ABS/Card_Head_Elwin_Skin02.png"
+            ]
+          },
+          {
+            "field": "Anim",
+            "samples": [
+              "FX/Skill4_ABS/Skill_Soia/Skin/Skill_Soia3_video_Skin.prefab",
+              "FX/Skill5_ABS/Skill_D_Boy/Skill_D_Boy_4_SP.prefab",
+              "FX/Skill5_ABS/Skill_Shinya/Skill_Shinya_4_SP.prefab"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1201,
+          "Name": "另一位勇者",
+          "SpecifiedHero": 12,
+          "CharImageSkinResource_ID": 1201,
+          "SpecifiedModelSkinResource": [
+            {
+              "JobConnectionId": 124,
+              "SkinResourceId": 1201
+            },
+            {
+              "JobConnectionId": 122,
+              "SkinResourceId": 1201
+            },
+            {
+              "JobConnectionId": 125,
+              "SkinResourceId": 12011
+            },
+            {
+              "JobConnectionId": 123,
+              "SkinResourceId": 12011
+            },
+            {
+              "JobConnectionId": 121,
+              "SkinResourceId": 12012
+            },
+            {
+              "JobConnectionId": 126,
+              "SkinResourceId": 12012
+            }
+          ],
+          "Desc": "勇者的气概，不是换一件衣服就能够改变的！",
+          "Icon": "UI/Icon/HeroSkin_ABS/Icon_Elwin_Skin01.png",
+          "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Elwin_Skin01.png",
+          "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Elwin_Skin01.png",
+          "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Elwin_Skin01.png",
+          "EnablePreview": true,
+          "GetPathType": 4,
+          "Score": 50
+        }
+      },
+      {
+        "file": "ConfigDataHeroSkinSelfSelectedBoxInfo.json",
+        "rowCount": 169,
+        "sampleKeys": [
+          "ID",
+          "Items"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ID",
+            "distinctNumericValues": 169,
+            "skinIdHits": 4,
+            "skinResourceIdHits": 4,
+            "modelResourceIdHits": 4
+          }
+        ],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "Items": [
+            2801,
+            803,
+            5201,
+            5101
+          ]
+        }
+      },
+      {
+        "file": "ConfigDataModelSkinResourceInfo.json",
+        "rowCount": 977,
+        "sampleKeys": [
+          "ID",
+          "Model",
+          "RangeATK_ID"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ID",
+            "distinctNumericValues": 977,
+            "skinIdHits": 540,
+            "skinResourceIdHits": 540,
+            "modelResourceIdHits": 789
+          },
+          {
+            "field": "ChangeSkillFx.SkillId",
+            "distinctNumericValues": 40,
+            "skinIdHits": 2,
+            "skinResourceIdHits": 2,
+            "modelResourceIdHits": 2
+          }
+        ],
+        "pathFields": [
+          {
+            "field": "Model",
+            "samples": [
+              "Spine/Soldier/SwordMan_ABS/Skin/SwordMan_Skin01_Prefab.prefab",
+              "Spine/Soldier/SwordMan_ABS/Skin/SwordMan_Skin02_Prefab.prefab",
+              "Spine/Soldier/PikeMan_ABS/Skin/PikeMan_Skin01_Prefab.prefab",
+              "Spine/Soldier/PikeMan_ABS/Skin/PikeMan_Skin02_Prefab.prefab",
+              "Spine/Soldier/SwordHorse_ABS/Skin/SwordHorse_Skin01_Prefab.prefab",
+              "Spine/Soldier/SwordHorse_ABS/Skin/SwordHorse_Skin02_Prefab.prefab",
+              "Spine/Soldier/FlyingUnit/Sword_Griffin_ABS/Skin/Sword_Griffin_Skin01_Prefab.prefab",
+              "Spine/Soldier/FlyingUnit/Sword_Griffin_ABS/Skin/Sword_Griffin_Skin02_Prefab.prefab"
+            ]
+          },
+          {
+            "field": "CombatModel",
+            "samples": [
+              "Spine/Soldier/FlyingUnit/Sword_Griffin_ABS/Skin/Sword_Griffin_Skin01_air_Prefab.prefab",
+              "Spine/Soldier/FlyingUnit/Sword_Griffin_ABS/Skin/Sword_Griffin_Skin02_air_Prefab.prefab",
+              "Spine/Soldier/Gargoyle_ABS/Skin02/Gargoyle_Skin02_air_Prefab.prefab",
+              "Spine/Soldier/VampireBat_ABS/VampireBat_Skin01/VampireBat_Skin01_air_prefab.prefab",
+              "Spine/Soldier/FlyingUnit/Angel_ABS/Skin/Angel_Skin01_air_Prefab.prefab",
+              "Spine/Soldier/Gargoyle_ABS/Skin03/Gargoyle_Skin03_air_Prefab.prefab",
+              "Spine/Soldier/Starprisma_ABS/Skin01/Starprisma_Skin01_air_Prefab.prefab",
+              "Spine/Soldier/SunwingHawk_ABS/Skin01/SunwingHawk_Skin01_air_Prefab.prefab"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 20101,
+          "Model": "Spine/Soldier/SwordMan_ABS/Skin/SwordMan_Skin01_Prefab.prefab",
+          "RangeATK_ID": 270
+        }
+      },
+      {
+        "file": "ConfigDataNotInBagResourceInfo.json",
+        "rowCount": 56,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "Desc",
+          "Rank",
+          "Icon"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ID",
+            "distinctNumericValues": 56,
+            "skinIdHits": 3,
+            "skinResourceIdHits": 3,
+            "modelResourceIdHits": 3
+          }
+        ],
+        "pathFields": [
+          {
+            "field": "Icon",
+            "samples": [
+              "UI/Common_New02_ABS/Icon/Icon_RankProtect.png",
+              "UI/Icon/Item03_ABS/AlterEgo_Random.png",
+              "UI/Icon/Item05_ABS/Icon_Muscle_Supplements.png",
+              "UI/Icon/Item05_ABS/Icon_CaramelBat.png",
+              "UI/Icon/Item05_ABS/Icon_ChristmasCoin02.png",
+              "UI/Icon/Item04_ABS/Activity_Alloycoin.png",
+              "UI/Icon/Item05_ABS/Fulfilled_Blueprint.png",
+              "UI/Icon/Item05_ABS/Fulfilled_Essence.png"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "巅峰保护卡",
+          "Desc": "巅峰竞技场积分赛失利时，可免去一次积分扣除。适用于<color=#a52a2aff>青铜</color>和<color=#a52a2aff>白银</color>段位",
+          "Rank": 3,
+          "Icon": "UI/Common_New02_ABS/Icon/Icon_RankProtect.png"
+        }
+      },
+      {
+        "file": "ConfigDataParallelWarfareGoodsInfo.json",
+        "rowCount": 38,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "Desc",
+          "Icon",
+          "DisplayType",
+          "Source",
+          "Rank"
+        ],
+        "numericIdMatches": [],
+        "pathFields": [
+          {
+            "field": "Icon",
+            "samples": [
+              "UI/Icon/Item04_ABS/Icon_ParalleInstruct.png",
+              "UI/Icon/Item04_ABS/Icon_GloriousSupplement.png",
+              "UI/Icon/Item04_ABS/Icon_AllianceResetting.png",
+              "UI/Icon/Item04_ABS/Icon_OrderResetting.png",
+              "UI/Icon/Item04_ABS/Icon_GloriousInstruct.png",
+              "UI/Icon/Item_ABS/Activity_Tool2.png",
+              "UI/Icon/Skill_ABS/Skill_Crow2.png",
+              "UI/Icon/Skill_ABS/Skill_PeakJessica2.png"
+            ]
+          },
+          {
+            "field": "IconFrame",
+            "samples": [
+              "UI/Common_New_ABS/Border_Icon_Gray_2.png"
+            ]
+          },
+          {
+            "field": "IconMaterial",
+            "samples": [
+              "UI/Icon/Skill_ABS/Material/SkillIcon.mat"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "寰越机芯",
+          "Desc": "一枚能够驱动寰宇枢纽，从而联通时空的机巧核芯。持有者可以此为凭证加入「寰宇竞技场」的角逐。",
+          "Icon": "UI/Icon/Item04_ABS/Icon_ParalleInstruct.png",
+          "DisplayType": 2,
+          "Source": "※参与报名活动有机会获得",
+          "Rank": 4
+        }
+      },
+      {
+        "file": "ConfigDataRandomStoreItemInfo.json",
+        "rowCount": 937,
+        "sampleKeys": [
+          "ID",
+          "StoreID",
+          "LevelZoneID",
+          "Name",
+          "ItemType",
+          "ItemID",
+          "Count",
+          "CurrencyType",
+          "Price"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ID",
+            "distinctNumericValues": 937,
+            "skinIdHits": 39,
+            "skinResourceIdHits": 39,
+            "modelResourceIdHits": 39
+          },
+          {
+            "field": "ItemID",
+            "distinctNumericValues": 199,
+            "skinIdHits": 3,
+            "skinResourceIdHits": 3,
+            "modelResourceIdHits": 15
+          }
+        ],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "StoreID": 1,
+          "LevelZoneID": 1,
+          "Name": "中级经验药剂",
+          "ItemType": 6,
+          "ItemID": 3003,
+          "Count": 2,
+          "CurrencyType": 1,
+          "Price": 300
+        }
+      },
+      {
+        "file": "ConfigDataRechargeStoreItemInfo.json",
+        "rowCount": 6,
+        "sampleKeys": [
+          "ID",
+          "Price",
+          "GotCrystalNums",
+          "FirstBoughtReward",
+          "Icon",
+          "PDSDKGoodsID"
+        ],
+        "numericIdMatches": [],
+        "pathFields": [
+          {
+            "field": "Icon",
+            "samples": [
+              "UI/Icon/Crystal_ABS/Icon_CrystalNew_01.png",
+              "UI/Icon/Crystal_ABS/Icon_CrystalNew_02.png",
+              "UI/Icon/Crystal_ABS/Icon_CrystalNew_03.png",
+              "UI/Icon/Crystal_ABS/Icon_CrystalNew_04.png",
+              "UI/Icon/Crystal_ABS/Icon_CrystalNew_05.png",
+              "UI/Icon/Crystal_ABS/Icon_CrystalNew_06.png"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "Price": 6,
+          "GotCrystalNums": 30,
+          "FirstBoughtReward": 30,
+          "Icon": "UI/Icon/Crystal_ABS/Icon_CrystalNew_01.png",
+          "PDSDKGoodsID": "cn.6"
+        }
+      },
+      {
+        "file": "ConfigDataReviewStoryPaintingInfo.json",
+        "rowCount": 45,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "Prefab",
+          "ViewType",
+          "GameFunctionType",
+          "GameFunctionParm1",
+          "UnlockDesc"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "GameFunctionParm1",
+            "distinctNumericValues": 35,
+            "skinIdHits": 1,
+            "skinResourceIdHits": 1,
+            "modelResourceIdHits": 5
+          }
+        ],
+        "pathFields": [
+          {
+            "field": "Prefab",
+            "samples": [
+              "UI/DialogEvent_ABS/Prefab/FirstFin_UIPrefab.prefab",
+              "UI/DialogEvent2_ABS/Prefab/Event_RedStar_UIPrefab.prefab",
+              "UI/DialogEvent2_ABS/Prefab/Event_MatthewMemory_UIPrefab.prefab",
+              "UI/DialogEvent2_ABS/Prefab/Event_Rozenciel_01_UIPrefab.prefab",
+              "UI/DialogEvent2_ABS/Prefab/Event_Rozenciel_02_UIPrefab.prefab",
+              "UI/DialogEvent2_ABS/Prefab/Event_DeathOfTreeMagus01_UIPrefab.prefab",
+              "UI/DialogEvent2_ABS/Prefab/Event_DeathOfTreeMagus02_UIPrefab.prefab",
+              "UI/DialogEvent3_ABS/Prefab/Event_BlueStar_UIPrefab.prefab"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "一路向阳",
+          "Prefab": "UI/DialogEvent_ABS/Prefab/FirstFin_UIPrefab.prefab",
+          "ViewType": 1,
+          "GameFunctionType": 10,
+          "GameFunctionParm1": 56,
+          "UnlockDesc": "完成主线<color=#DC143CFF>第一部 第五十章 混沌之间、相会之眼</color>后解锁"
+        }
+      },
+      {
+        "file": "ConfigDataRogueLikeRechargeStoreItemInfo.json",
+        "rowCount": 3,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "DESC",
+          "SoldOutDesc",
+          "CrystalCost",
+          "FunctionType",
+          "MaxCount",
+          "Icon",
+          "Rank"
+        ],
+        "numericIdMatches": [],
+        "pathFields": [
+          {
+            "field": "Icon",
+            "samples": [
+              "UI/Icon/Item03_ABS/Item_RLTicket-BeforeReset.png",
+              "UI/Icon/Item03_ABS/Item_RLTicket-NowReset.png",
+              "UI/Icon/Item03_ABS/Item_RLTicket-NowRevive.png"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "往阶重置券",
+          "DESC": "道具包含<color=#DC143C>1</color>次重置回第<color=#DC143C>1</color>或<color=#DC143C>11</color>阶的机会，使用后第<color=#DC143C>1</color>或<color=#DC143C>11</color>阶之后获得的所有资源及强化效果均不会保留（阶奖励不可重复领取）",
+          "SoldOutDesc": "已到达购买上限，往阶重置功能将永久免费开放",
+          "CrystalCost": 200,
+          "FunctionType": 1,
+          "MaxCount": 3,
+          "Icon": "UI/Icon/Item03_ABS/Item_RLTicket-BeforeReset.png",
+          "Rank": 4
+        }
+      },
+      {
+        "file": "ConfigDataRogueLikeShopItemlInfo.json",
+        "rowCount": 2109,
+        "sampleKeys": [
+          "ID",
+          "DESC",
+          "ItemType",
+          "ItemId",
+          "ItemNums",
+          "Price"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ID",
+            "distinctNumericValues": 2109,
+            "skinIdHits": 82,
+            "skinResourceIdHits": 82,
+            "modelResourceIdHits": 92
+          },
+          {
+            "field": "ItemId",
+            "distinctNumericValues": 1993,
+            "skinIdHits": 65,
+            "skinResourceIdHits": 65,
+            "modelResourceIdHits": 81
+          }
+        ],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "DESC": "冰霜之刃",
+          "ItemType": 1,
+          "ItemId": 127,
+          "ItemNums": 1,
+          "Price": 950
+        }
+      },
+      {
+        "file": "ConfigDataSkinBundlingActivityInfo.json",
+        "rowCount": 1,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "RequiredSkinIDs",
+          "RequiredSkinNums",
+          "OptionalSkinIDs",
+          "OptionalSkinNums",
+          "SkinPrice",
+          "RequiredSkinDiscountPrice",
+          "AllSkinDiscountPrice",
+          "BuyLimitNums"
+        ],
+        "numericIdMatches": [],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "缤纷焕衣季",
+          "RequiredSkinIDs": [
+            2901,
+            2602,
+            802,
+            1101,
+            4901,
+            5199,
+            5299,
+            3801
+          ],
+          "RequiredSkinNums": 2,
+          "OptionalSkinIDs": [
+            9917103,
+            5505,
+            9917303,
+            9917702,
+            9903,
+            12204,
+            2806,
+            10503
+          ],
+          "OptionalSkinNums": 1,
+          "SkinPrice": 188,
+          "RequiredSkinDiscountPrice": 8500,
+          "AllSkinDiscountPrice": 8000,
+          "BuyLimitNums": 1
+        }
+      },
+      {
+        "file": "ConfigDataSkinCollectionLevelInfo.json",
+        "rowCount": 90,
+        "sampleKeys": [
+          "ID",
+          "Title",
+          "Icon"
+        ],
+        "numericIdMatches": [],
+        "pathFields": [
+          {
+            "field": "Icon",
+            "samples": [
+              "UI/Friend2_ABS/SkinBadgeImage/SkinCollectionBadge_Bronze.png",
+              "UI/Friend2_ABS/SkinBadgeImage/SkinCollectionBadge_Silver.png",
+              "UI/Friend2_ABS/SkinBadgeImage/SkinCollectionBadge_Gold.png"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "Title": "新衣收集者 Lv.1",
+          "Icon": "UI/Friend2_ABS/SkinBadgeImage/SkinCollectionBadge_Bronze.png"
+        }
+      },
+      {
+        "file": "ConfigDataSkinLotteryActivityInfo.json",
+        "rowCount": 1,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "Cost",
+          "FirstTenDrawCost",
+          "FirstTenDrawCostTip",
+          "RewardGroupID",
+          "DrawTimesRewardGroupID",
+          "ShowSkinID"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "ShowSkinID",
+            "distinctNumericValues": 1,
+            "skinIdHits": 1,
+            "skinResourceIdHits": 1,
+            "modelResourceIdHits": 1
+          }
+        ],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "Name": "命运星织",
+          "Cost": [
+            {
+              "GoodsType": 6,
+              "Id": 4069,
+              "Count": 1
+            }
+          ],
+          "FirstTenDrawCost": [
+            {
+              "GoodsType": 6,
+              "Id": 4069,
+              "Count": 1
+            }
+          ],
+          "FirstTenDrawCostTip": "首次十连消耗 <color=#ff0000>-90%</color>",
+          "RewardGroupID": 1,
+          "DrawTimesRewardGroupID": 1,
+          "ShowSkinID": 9922502
+        }
+      },
+      {
+        "file": "ConfigDataSkinLotteryDrawTimesRewardInfo.json",
+        "rowCount": 25,
+        "sampleKeys": [
+          "ID",
+          "GroupID",
+          "Name",
+          "RewardItemGroupID",
+          "DrawTimes"
+        ],
+        "numericIdMatches": [],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "GroupID": 1,
+          "Name": "美愿之丝*20",
+          "RewardItemGroupID": 15,
+          "DrawTimes": 10
+        }
+      },
+      {
+        "file": "ConfigDataSkinLotteryRewardInfo.json",
+        "rowCount": 14,
+        "sampleKeys": [
+          "ID",
+          "GroupID",
+          "ItemGroupID",
+          "GroupName"
+        ],
+        "numericIdMatches": [],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "GroupID": 1,
+          "ItemGroupID": 1,
+          "GroupName": "LLR冰龙皮肤"
+        }
+      },
+      {
+        "file": "ConfigDataSkinLotteryRewardItemInfo.json",
+        "rowCount": 58,
+        "sampleKeys": [
+          "ID",
+          "GroupID",
+          "Item",
+          "Name",
+          "ExcahgePoints",
+          "IsBigReward",
+          "Broadcasting"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "Item.Id",
+            "distinctNumericValues": 48,
+            "skinIdHits": 36,
+            "skinResourceIdHits": 36,
+            "modelResourceIdHits": 35
+          }
+        ],
+        "pathFields": [],
+        "sampleRow": {
+          "ID": 1,
+          "GroupID": 1,
+          "Item": [
+            {
+              "GoodsType": 16,
+              "Id": 9922502,
+              "Count": 1
+            }
+          ],
+          "Name": "云穹誓约",
+          "ExcahgePoints": 998,
+          "IsBigReward": true,
+          "Broadcasting": true
+        }
+      },
+      {
+        "file": "ConfigDataSmallExpressionPathInfo.json",
+        "rowCount": 72,
+        "sampleKeys": [
+          "ID",
+          "SmallExpressionIconPath"
+        ],
+        "numericIdMatches": [],
+        "pathFields": [
+          {
+            "field": "SmallExpressionIconPath",
+            "samples": [
+              "UI/Chat_ABS/Prefab/EmojiAssets/Emojis/1.png",
+              "UI/Chat_ABS/Prefab/EmojiAssets/Emojis/2.png",
+              "UI/Chat_ABS/Prefab/EmojiAssets/Emojis/3.png",
+              "UI/Chat_ABS/Prefab/EmojiAssets/Emojis/5.png",
+              "UI/Chat_ABS/Prefab/EmojiAssets/Emojis/6.png",
+              "UI/Chat_ABS/Prefab/EmojiAssets/Emojis/7.png",
+              "UI/Chat_ABS/Prefab/EmojiAssets/Emojis/8.png",
+              "UI/Chat_ABS/Prefab/EmojiAssets/Emojis/9.png"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "SmallExpressionIconPath": "UI/Chat_ABS/Prefab/EmojiAssets/Emojis/1.png"
+        }
+      },
+      {
+        "file": "ConfigDataSoldierSkinInfo.json",
+        "rowCount": 134,
+        "sampleKeys": [
+          "ID",
+          "Name",
+          "ShowInListSkinResInfo",
+          "SpecifiedSoldier",
+          "Desc",
+          "Icon",
+          "IsShowBeforeGet",
+          "GetPathType",
+          "Score"
+        ],
+        "numericIdMatches": [
+          {
+            "field": "SpecifiedSoldier.SoldierId",
+            "distinctNumericValues": 135,
+            "skinIdHits": 21,
+            "skinResourceIdHits": 21,
+            "modelResourceIdHits": 25
+          },
+          {
+            "field": "ShowInListSkinResInfo.SoldierId",
+            "distinctNumericValues": 79,
+            "skinIdHits": 11,
+            "skinResourceIdHits": 11,
+            "modelResourceIdHits": 15
+          },
+          {
+            "field": "SpecifiedSoldier.SkinResourceId",
+            "distinctNumericValues": 156,
+            "skinIdHits": 9,
+            "skinResourceIdHits": 9,
+            "modelResourceIdHits": 0
+          },
+          {
+            "field": "ID",
+            "distinctNumericValues": 134,
+            "skinIdHits": 7,
+            "skinResourceIdHits": 7,
+            "modelResourceIdHits": 1
+          },
+          {
+            "field": "ShowInListSkinResInfo.SkinResourceId",
+            "distinctNumericValues": 134,
+            "skinIdHits": 6,
+            "skinResourceIdHits": 6,
+            "modelResourceIdHits": 0
+          }
+        ],
+        "pathFields": [
+          {
+            "field": "Icon",
+            "samples": [
+              "UI/Icon/SoldierSkin_ABS/Icon_SwordMan_skin01.png",
+              "UI/Icon/SoldierSkin_ABS/Icon_HeavySpear_skin01.png",
+              "UI/Icon/SoldierSkin_ABS/Icon_CavalryMan_skin01.png",
+              "UI/Icon/SoldierSkin_ABS/Icon_Griffin_skin01.png",
+              "UI/Icon/SoldierSkin_ABS/Icon_Archer_skin01.png",
+              "UI/Icon/SoldierSkin_ABS/Icon_ClergySkin_skin01.png",
+              "UI/Icon/SoldierSkin_ABS/Icon_Theif_skin01.png",
+              "UI/Icon/SoldierSkin_ABS/Qudao_100W.png"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 20201,
+          "Name": "棒球高手",
+          "ShowInListSkinResInfo": [
+            {
+              "SoldierId": 202,
+              "SkinResourceId": 20201
+            }
+          ],
+          "SpecifiedSoldier": [
+            {
+              "SoldierId": 201,
+              "SkinResourceId": 20101
+            },
+            {
+              "SoldierId": 202,
+              "SkinResourceId": 20201
+            }
+          ],
+          "Desc": "球场和战场，都要打出全垒打！",
+          "Icon": "UI/Icon/SoldierSkin_ABS/Icon_SwordMan_skin01.png",
+          "IsShowBeforeGet": true,
+          "GetPathType": 4,
+          "Score": 15
+        }
+      },
+      {
+        "file": "ConfigDataStoreCurrencyInfo.json",
+        "rowCount": 1,
+        "sampleKeys": [
+          "ID",
+          "CurrencyType",
+          "CurrencyImage",
+          "CurrencySymbol"
+        ],
+        "numericIdMatches": [],
+        "pathFields": [
+          {
+            "field": "CurrencyImage",
+            "samples": [
+              "UI/Common_New01_ABS/Icon/Icon_RMB.png"
+            ]
+          }
+        ],
+        "sampleRow": {
+          "ID": 1,
+          "CurrencyType": "Default",
+          "CurrencyImage": "UI/Common_New01_ABS/Icon/Icon_RMB.png",
+          "CurrencySymbol": "￥"
+        }
+      }
+    ]
+  },
+  "interpretation": {
+    "artwork": {
+      "status": "UNRESOLVED",
+      "source": null,
+      "rule": null
+    },
+    "ordering": {
+      "status": "UNRESOLVED",
+      "source": null,
+      "rule": null
+    },
+    "acquisition": {
+      "status": "UNRESOLVED",
+      "source": "ConfigDataHeroSkinInfo.GetPathType",
+      "dictionary": null,
+      "rule": null
+    }
+  }
+}
