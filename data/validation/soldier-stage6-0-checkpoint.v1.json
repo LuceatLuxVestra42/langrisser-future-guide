@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage6-0-checkpoint/v1",
+  "stage": "6-0",
+  "status": "PASS",
+  "frozenAt": "2026-08-25",
+  "purpose": "Freeze the completed Soldier Stage 5 page-data baseline before Stage 6 full QA. Stage 6 must compare against this checkpoint instead of reopening Stage 1-5 semantic or JOIN research unless a concrete regression is found.",
+  "baseline": {
+    "commitSha": "980f1c66f50d87b4fcbb74644ee82fc699323e41",
+    "treeSha": "da37ddc388a4b6a5c2e60db39c3fdfab0cad24b4",
+    "commitMessage": "Soldier stage 5-8 release metadata"
+  },
+  "contracts": {
+    "soldierDetailStage5_1": {
+      "path": "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+      "gitBlobSha": "2943af041025c76c647b790661babe784e05f4f2",
+      "status": "FROZEN"
+    },
+    "soldierIdentity": {
+      "path": "data/contracts/soldier-identity-contract.v1.json",
+      "gitBlobSha": "ab652ffe7319e977f1d9e01ea906c6b9c0cd3f63"
+    }
+  },
+  "generatedBaseline": {
+    "soldierMaster": {
+      "path": "data/generated/soldier-master.v1.json",
+      "gitBlobSha": "23e01ad8707bd7f026f5a3660cc0342747bd5cdb"
+    },
+    "soldierStage3": {
+      "path": "data/generated/soldier-stage3.v1.json",
+      "gitBlobSha": "afaebae396017391689c78a1b76c244e06067011"
+    },
+    "soldierHeroRelations": {
+      "path": "data/generated/soldier-hero-relations.v1.json",
+      "gitBlobSha": "6d298acd7a0e55d4c3c1f091d59b2f712177e3e7"
+    },
+    "heroSoldierBySoldier": {
+      "path": "data/generated/hero-soldier-by-soldier.v1.json",
+      "gitBlobSha": "ff9d8a881c03b6e0f2a196e12f37cd2e28e3e251"
+    },
+    "soldierDetailFinal": {
+      "path": "data/generated/soldier-detail-stage5-6.v1.json",
+      "gitBlobSha": "e554d0c20ed1629a0774301bc0a5bfe639b63efa"
+    },
+    "soldierListFinal": {
+      "path": "data/generated/soldier-list-stage5-8.v1.json",
+      "gitBlobSha": "96df08f5c53ea0ef66922ca6b9d7a274cb599aff"
+    },
+    "soldierReleaseMetadata": {
+      "path": "data/generated/soldier-release-metadata.v1.json",
+      "gitBlobSha": "39184cbf348877b0512d2811d514740c7f430fb8"
+    }
+  },
+  "validationBaseline": {
+    "stage4_8": {
+      "path": "data/validation/soldier-stage4-8-baseline.v1.json",
+      "gitBlobSha": "36155be6bc57717cb0ac62c78d54d6a1dcc500ad"
+    },
+    "stage5_2": {
+      "path": "data/validation/soldier-stage5-2-combat.v1.json",
+      "gitBlobSha": "1171c5e73f94420e40e7821a8c4bf0df73227bc6",
+      "expectedStatus": "PASS"
+    },
+    "stage5_3": {
+      "path": "data/validation/soldier-stage5-3-ability.v1.json",
+      "gitBlobSha": "8c5f09485939545a2d32803d96ed620c9598e5c8",
+      "expectedStatus": "PASS"
+    },
+    "stage5_4": {
+      "path": "data/validation/soldier-stage5-4-training.v1.json",
+      "gitBlobSha": "32d40cc957e45a358cbf752fb6b685184d0218d5",
+      "expectedStatus": "PASS"
+    },
+    "stage5_5": {
+      "path": "data/validation/soldier-stage5-5-heroes.v1.json",
+      "gitBlobSha": "c08de69ec079bf19d10d300e853aa8f10ee6bc4f",
+      "expectedStatus": "PASS"
+    },
+    "stage5_6": {
+      "path": "data/validation/soldier-stage5-6-sp-detail.v1.json",
+      "gitBlobSha": "a4f190d4f1ea85d9d7e50f6e112f0806b349f85b",
+      "expectedStatus": "PASS"
+    },
+    "stage5_7": {
+      "path": "data/validation/soldier-stage5-7-list.v1.json",
+      "gitBlobSha": "e3e05a882fd9520ec8916660ccb8476aa2c41efd",
+      "expectedStatus": "PASS"
+    },
+    "stage5_8": {
+      "path": "data/validation/soldier-stage5-8-release.v1.json",
+      "gitBlobSha": "7fb962ff3824db1ad4b4d9f6ea386d33c7acc173",
+      "expectedStatus": "PASS"
+    }
+  },
+  "expectedCoverage": {
+    "canonicalSoldiers": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "normalTier3": 129,
+    "spSecondStageTrue": 45,
+    "spSecondStageFalse": 11,
+    "heroSoldierRelationEdges": 5977,
+    "relationBySoldierKeys": 224,
+    "stage1MissionCount": 112,
+    "stage2MissionCount": 45,
+    "confirmedReleaseCount": 11,
+    "unresolvedReleaseCount": 213,
+    "unresolvedNormalTier3ReleaseCount": 118,
+    "lowerTierReleaseBucketCount": 39,
+    "nonPassIdentityMetadataCount": 41,
+    "nullNameKrCount": 41
+  },
+  "knownReviews": [
+    {
+      "code": "KR_NAME_UNRESOLVED",
+      "count": 41,
+      "classification": "REVIEW",
+      "rule": "Do not synthesize Korean names; preserve nameCn/nameKrStatus until a confirmed Korean source exists."
+    },
+    {
+      "code": "RELEASE_DATE_UNRESOLVED",
+      "count": 213,
+      "classification": "REVIEW",
+      "rule": "Only externally confirmed release metadata may be presented as release order/date."
+    },
+    {
+      "code": "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED",
+      "count": 56,
+      "classification": "REVIEW",
+      "rule": "SP Soldiers remain grouped before normal Soldiers by UI policy; do not infer their internal release order from IDs."
+    },
+    {
+      "code": "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED",
+      "count": 39,
+      "classification": "REVIEW",
+      "rule": "Tier-1/tier-2 Soldiers may remain in the technical bucket because current list policy does not require release ordering for them."
+    },
+    {
+      "code": "REPRESENTATIVE_ASSET_ID_UNFROZEN",
+      "count": null,
+      "classification": "REVIEW",
+      "rule": "Do not invent representative icon/image identifiers until a canonical asset-identifier source is frozen."
+    },
+    {
+      "code": "SAME_PATCH_ORDER_UNRESOLVED",
+      "count": null,
+      "classification": "REVIEW",
+      "rule": "Do not present Soldier ID order as same-patch release order."
+    }
+  ],
+  "stage6EntryRules": [
+    "Known REVIEW items in this checkpoint are not Stage 6 FAIL conditions by themselves.",
+    "Any new duplicate ID, missing relation, malformed SP mission, Hero-Soldier directional mismatch, record-count mismatch, or projection mismatch is a regression and must be investigated.",
+    "Stage 6 may consume the frozen Stage 5 outputs but must not duplicate canonical Soldier identity or Hero-Soldier JOIN logic in page/UI code.",
+    "If current source data intentionally changes after this checkpoint, record the source change separately before updating the baseline."
+  ],
+  "completion": "Stage 6-0 is complete when the repository has one frozen baseline that identifies the Stage 5 final artifacts, their validation chain, expected coverage, and known non-failing REVIEW items for deterministic Stage 6 comparison."
+}
