@@ -80,7 +80,12 @@ jobs:
           node scripts/finalize-soldier-stage2.cjs
           node scripts/validate-soldier-stage4-2-master.cjs
 
+      - name: Extract pre-4-1 Stage3 regression baseline
+        run: git show c2276d1162dae52a1762e6381e7dd195c917da2f:data/generated/soldier-stage3.v1.json > "$RUNNER_TEMP/soldier-stage3-pre-4-1.json"
+
       - name: Regenerate Soldier Stage 3 and validate 4-3 through 4-5
+        env:
+          BASELINE_STAGE3_PATH: ${{ runner.temp }}/soldier-stage3-pre-4-1.json
         run: |
           node scripts/finalize-soldier-stage3.cjs
           node scripts/finalize-soldier-stage3-postprocess.cjs
