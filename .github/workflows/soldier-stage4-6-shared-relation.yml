@@ -1,0 +1,91 @@
+name: Soldier Stage 4-6 Shared Relation Adoption
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/finalize-hero-soldier-relation-layer.cjs'
+      - 'scripts/validate-soldier-stage4-6-relation-consumer.cjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSPHeroInfo.json'
+      - 'data/configdata/ConfigDataSPSoldierInfo.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/generated/soldier-master.v1.json'
+      - 'data/contracts/hero-identity-contract.v1.json'
+      - 'data/contracts/soldier-identity-contract.v1.json'
+      - 'data/contracts/hero-soldier-relation-source-contract.v1.json'
+      - 'data/contracts/hero-soldier-relation-edge-schema.v1.json'
+      - 'data/contracts/hero-soldier-relation-composition-contract.v1.json'
+      - 'data/contracts/hero-soldier-relation-set-contract.v1.json'
+      - 'data/contracts/hero-soldier-relation-index-contract.v1.json'
+      - 'data/contracts/hero-soldier-relation-validation-contract.v1.json'
+      - 'data/generated/soldier-hero-relations.v1.json'
+      - 'data/validation/soldier-stage4-8-1-fixture-plan.v1.json'
+      - '.github/workflows/soldier-stage4-6-shared-relation.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/finalize-hero-soldier-relation-layer.cjs'
+      - 'scripts/validate-soldier-stage4-6-relation-consumer.cjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSPHeroInfo.json'
+      - 'data/configdata/ConfigDataSPSoldierInfo.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/generated/soldier-master.v1.json'
+      - 'data/contracts/**'
+      - 'data/generated/hero-soldier-*.v1.json'
+      - 'data/validation/hero-soldier-relation-validation.v1.json'
+      - 'data/validation/soldier-stage4-6-relation-consumer.v1.json'
+      - '.github/workflows/soldier-stage4-6-shared-relation.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-validate-adopt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build A-10 relation set, A-7 indexes, and A-8 validation
+        run: node scripts/finalize-hero-soldier-relation-layer.cjs
+
+      - name: Validate Soldier 4-6 shared-relation consumption
+        run: node scripts/validate-soldier-stage4-6-relation-consumer.cjs
+
+      - name: Upload shared relation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage4-6-shared-relation
+          path: |
+            data/generated/hero-soldier-relations.v1.json
+            data/generated/hero-soldier-by-hero.v1.json
+            data/generated/hero-soldier-by-soldier.v1.json
+            data/validation/hero-soldier-relation-validation.v1.json
+            data/validation/soldier-stage4-6-relation-consumer.v1.json
+
+      - name: Freeze generated artifacts on PR branch
+        if: github.event_name == 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            data/generated/hero-soldier-relations.v1.json \
+            data/generated/hero-soldier-by-hero.v1.json \
+            data/generated/hero-soldier-by-soldier.v1.json \
+            data/validation/hero-soldier-relation-validation.v1.json \
+            data/validation/soldier-stage4-6-relation-consumer.v1.json
+          if git diff --cached --quiet; then
+            echo "Generated relation artifacts are already frozen for this snapshot."
+          else
+            git commit -m "generate A-10 shared Hero-Soldier relation artifacts"
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
