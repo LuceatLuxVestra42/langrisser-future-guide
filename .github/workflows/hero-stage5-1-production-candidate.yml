@@ -1,0 +1,64 @@
+name: Hero Stage 5-1 production candidate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-1-production-candidate.yml'
+      - 'scripts/build_hero_stage5_1_bonds.cjs'
+      - 'data/validation/hero-page-stage5-1-retrace-semantic.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Stage 5-1 bond production candidate
+        id: build
+        continue-on-error: true
+        run: node scripts/build_hero_stage5_1_bonds.cjs
+
+      - name: Show Stage 5-1 candidate summary
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = 'data/validation/hero-page-stage5-1-production-candidate.v1.json';
+          const r = JSON.parse(fs.readFileSync(p, 'utf8'));
+          console.log(JSON.stringify({
+            status: r.status,
+            completion: r.completion,
+            summary: r.summary,
+            semanticCoverage: r.semanticCoverage,
+            invariantChecks: r.invariantChecks,
+            decision: r.decision
+          }, null, 2));
+          NODE
+
+      - name: Freeze candidate outputs
+        run: |
+          TARGETS='data/generated/hero-page-stage5-1-bonds.v1.json data/validation/hero-page-stage5-1-production-candidate.v1.json'
+          if [ -z "$(git status --porcelain -- $TARGETS)" ]; then
+            echo 'Stage 5-1 candidate outputs already current.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add $TARGETS
+            git commit -m 'Freeze Hero Stage 5-1 bond production candidate'
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
+
+      - name: Enforce structural gate
+        run: |
+          node - <<'NODE'
+          const r = require('./data/validation/hero-page-stage5-1-production-candidate.v1.json');
+          if (r.status === 'FAIL') {
+            console.error('Stage 5-1 production candidate has structural/reference failures.');
+            process.exit(1);
+          }
+          console.log(`Structural gate accepted candidate status: ${r.status}`);
+          NODE
