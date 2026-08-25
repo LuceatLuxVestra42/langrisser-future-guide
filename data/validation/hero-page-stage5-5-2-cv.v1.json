@@ -1,0 +1,2930 @@
+{
+  "version": 1,
+  "status": "PASS",
+  "semantics": {
+    "acceptedJoin": "ConfigDataHeroInfo.CharImage_ID -> ConfigDataCharImageInfo.ID",
+    "cvField": "ConfigDataCharImageInfo.CVName",
+    "cvFieldType": "string",
+    "cvMeaning": "voice actor display name stored by ConfigDataCharImageInfo",
+    "normalization": "trim whitespace only; preserve source spelling",
+    "warning": "CVName is source display text and may use Chinese-localized spellings of Japanese voice-actor names. Do not transliterate or rewrite without a separate authoritative localization mapping."
+  },
+  "sourceCounts": {
+    "canonicalHeroCount": 267,
+    "heroInfoRows": 28789,
+    "charImageInfoRows": 1378,
+    "charImageFieldNames": [
+      "BattleActionVoice1",
+      "BattleActionVoice2",
+      "BattleDialogScale",
+      "BattleDialogXOffset",
+      "BattleDialogYOffset",
+      "BreakPerformances",
+      "CVName",
+      "CardHeadImage",
+      "CombatScale",
+      "CombatXOffset",
+      "CombatYOffset",
+      "DialogScale",
+      "DialogYOffset",
+      "Direction",
+      "HeroConfessionEndingScaleOffset",
+      "HeroConfessionEndingYOffset",
+      "HeroConfessionYOffset",
+      "HeroDetailScale",
+      "HeroDetailYOffset",
+      "HeroPainting",
+      "ID",
+      "JobTransferPerformances",
+      "Name",
+      "NewBreakPerformances",
+      "NewJobTransferPerformances",
+      "NewPerformances",
+      "NewSummonPerformances",
+      "Performances",
+      "RoundHeadImage",
+      "SkillCutscene_ID",
+      "SmallHeadImage",
+      "Sound_Die",
+      "Spine",
+      "Spine2",
+      "SpineBackground",
+      "SummonHeadImage",
+      "SummonPerformances"
+    ]
+  },
+  "coverage": {
+    "mappedHeroCount": 267,
+    "heroesWithCvName": 267,
+    "heroesWithoutCvName": 0,
+    "missingCvHeroIds": [],
+    "missingHeroInfoIds": [],
+    "duplicateHeroInfoIds": [],
+    "invalidCharImagePointerHeroIds": [],
+    "unresolvedCharImagePointers": [],
+    "duplicateCharImageIdsUsed": [],
+    "sharedCharImagePointers": [],
+    "distinctCvNameCount": 180
+  },
+  "cvNameDistribution": [
+    {
+      "cvNameRaw": "子安武人",
+      "heroCount": 5
+    },
+    {
+      "cvNameRaw": "绿川光",
+      "heroCount": 5
+    },
+    {
+      "cvNameRaw": "最上嗣生",
+      "heroCount": 4
+    },
+    {
+      "cvNameRaw": "大原沙耶香",
+      "heroCount": 4
+    },
+    {
+      "cvNameRaw": "柿原彻也",
+      "heroCount": 4
+    },
+    {
+      "cvNameRaw": "桑岛法子",
+      "heroCount": 4
+    },
+    {
+      "cvNameRaw": "皆口裕子",
+      "heroCount": 4
+    },
+    {
+      "cvNameRaw": "置鲇龙太郎",
+      "heroCount": 4
+    },
+    {
+      "cvNameRaw": "西田望见",
+      "heroCount": 4
+    },
+    {
+      "cvNameRaw": "高粱碧",
+      "heroCount": 4
+    },
+    {
+      "cvNameRaw": "■■■■",
+      "heroCount": 3
+    },
+    {
+      "cvNameRaw": "三木真一郎",
+      "heroCount": 3
+    },
+    {
+      "cvNameRaw": "上坂堇",
+      "heroCount": 3
+    },
+    {
+      "cvNameRaw": "下山吉光",
+      "heroCount": 3
+    },
+    {
+      "cvNameRaw": "井上麻里奈",
+      "heroCount": 3
+    },
+    {
+      "cvNameRaw": "佐藤美由希",
+      "heroCount": 3
+    },
+    {
+      "cvNameRaw": "寺依沙织",
+      "heroCount": 3
+    },
+    {
+      "cvNameRaw": "悠木碧",
+      "heroCount": 3
+    },
+    {
+      "cvNameRaw": "福山润",
+      "heroCount": 3
+    },
+    {
+      "cvNameRaw": "钉宫理惠",
+      "heroCount": 3
+    },
+    {
+      "cvNameRaw": "东山奈央",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "井上雄贵",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "伊藤美来",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "伊藤静",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "佐仓绫音",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "内山夕实",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "内山昂辉",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "原由实",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "名冢佳织",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "堀江由衣",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "天海由梨奈",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "小林优",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "小泽亚李",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "小清水亚美",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "小野大辅",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "平川大辅",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "户松遥",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "早见沙织",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "本多真梨子",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "杉田智和",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "松本保典",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "林原惠美",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "梶裕贵",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "森岛秀太",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "森川智之",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "渡边明乃",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "濑户麻沙美",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "石川由依",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "福圆美里",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "立花慎之介",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "细谷佳正",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "草尾毅",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "速水奖",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "阪口大助",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "高桥研二",
+      "heroCount": 2
+    },
+    {
+      "cvNameRaw": "KENN",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "Lynn",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "东地宏树",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "东城日沙子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "中村悠一",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "丰口惠美",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "丰崎爱生",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "丰永利行&久保百合花",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "久川绫",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "井上和彦",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "井上喜久子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "井口裕香",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "伊东健人",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "伊濑茉莉也",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "优木加奈",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "佐佐木望",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "佐佐木未来",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "佐藤利奈",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "佐藤朱",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "保志总一朗",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "关俊彦",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "兴津和幸",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "内山茉莉",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "内田真礼",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "内田雄马",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "冈本信彦",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "冬马由美",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "加藤英美里",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "千叶繁",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "友永朱音",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "古川慎",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "喜多村英梨",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "大和田仁美",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "大津爱理",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "子安光树",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "宫村优子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "富泽美智惠",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "富田美忧",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "小松未可子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "小西克幸",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "尤加奈",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "山本彩乃",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "嶋村侑",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "川澄绫子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "市之濑加那",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "平野綾",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "广田行生",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "德井青空",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "志村知幸",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "折笠富美子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "斋藤千和",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "斋贺光希",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "日笠阳子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "日野聪",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "日高里菜",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "杉山纪彰",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "村上聪",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "村川梨衣",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "村田知沙",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "松冈由贵",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "松冈祯丞",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "松浦知惠",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "柳田淳一",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "桑原由气",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "桧山修之",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "榎木淳弥",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "横山智佐",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "樱井浩美",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "樱庭有纱",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "水岛大宙",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "水树奈奈",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "水瀬祈",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "永塚拓马",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "池田秀一",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "沼仓爱美",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "泽城美雪＆鹤冈聪",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "浪川大辅",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "照井春佳",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "玄田哲章&铃木胜美",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "玉川砂记子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "生天目仁美",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "田中爱美",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "田中理惠",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "田中真弓",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "田村奈央",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "白城奈央",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "皆川纯子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "畠中祐",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "相沢舞",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "矢野智也",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "石上静香",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "石原爱依梨",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "石川界人",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "石田彰",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "神田朱未",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "神谷明",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "种崎敦美",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "种田梨沙",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "竹村拓",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "绪方惠美",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "羊宫妃那",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "胜生真沙子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "能登麻美子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "若山诗音",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "若本规夫",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "荒浪和沙",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "西原久美子",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "西村知道",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "诹访部顺一",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "远藤绫",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "野口百合",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "野岛健儿",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "铃村健一",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "长妻树里",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "长绳麻理亚",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "阿部里果",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "青山吉能",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "驹田航",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "高桥孝治",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "高桥智秋",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "高桥未奈美",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "高田忧希",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "鬼头明里",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "鸟海浩辅",
+      "heroCount": 1
+    },
+    {
+      "cvNameRaw": "黑木穗乃香",
+      "heroCount": 1
+    }
+  ],
+  "heroes": [
+    {
+      "heroId": 1,
+      "nameKr": "매튜",
+      "nameCn": "马修",
+      "nameEn": "Matthew",
+      "charImageId": 1,
+      "cvNameRaw": "柿原彻也"
+    },
+    {
+      "heroId": 3,
+      "nameKr": "그레니어",
+      "nameCn": "格尼尔",
+      "nameEn": "Grenier",
+      "charImageId": 3,
+      "cvNameRaw": "立花慎之介"
+    },
+    {
+      "heroId": 4,
+      "nameKr": "아멜다",
+      "nameCn": "艾梅达",
+      "nameEn": "Aimeeda",
+      "charImageId": 4,
+      "cvNameRaw": "内田真礼"
+    },
+    {
+      "heroId": 5,
+      "nameKr": "크리스",
+      "nameCn": "克丽丝",
+      "nameEn": "Chris",
+      "charImageId": 5,
+      "cvNameRaw": "佐仓绫音"
+    },
+    {
+      "heroId": 6,
+      "nameKr": "레온",
+      "nameCn": "利昂",
+      "nameEn": "Leon",
+      "charImageId": 6,
+      "cvNameRaw": "置鲇龙太郎"
+    },
+    {
+      "heroId": 7,
+      "nameKr": "베른하르트",
+      "nameCn": "巴恩哈特",
+      "nameEn": "Bernhardt",
+      "charImageId": 7,
+      "cvNameRaw": "若本规夫"
+    },
+    {
+      "heroId": 8,
+      "nameKr": "라나",
+      "nameCn": "拉娜",
+      "nameEn": "Lana",
+      "charImageId": 8,
+      "cvNameRaw": "小清水亚美"
+    },
+    {
+      "heroId": 9,
+      "nameKr": "보젤",
+      "nameCn": "波赞鲁",
+      "nameEn": "Bozel",
+      "charImageId": 9,
+      "cvNameRaw": "森川智之"
+    },
+    {
+      "heroId": 10,
+      "nameKr": "레딘",
+      "nameCn": "雷丁",
+      "nameEn": "Ledyn",
+      "charImageId": 10,
+      "cvNameRaw": "置鲇龙太郎"
+    },
+    {
+      "heroId": 11,
+      "nameKr": "나암",
+      "nameCn": "娜姆",
+      "nameEn": "Nurm",
+      "charImageId": 11,
+      "cvNameRaw": "德井青空"
+    },
+    {
+      "heroId": 12,
+      "nameKr": "엘윈",
+      "nameCn": "艾尔文",
+      "nameEn": "Elwin",
+      "charImageId": 12,
+      "cvNameRaw": "保志总一朗"
+    },
+    {
+      "heroId": 13,
+      "nameKr": "헤인",
+      "nameCn": "海恩",
+      "nameEn": "Hein",
+      "charImageId": 13,
+      "cvNameRaw": "阪口大助"
+    },
+    {
+      "heroId": 14,
+      "nameKr": "쉐리",
+      "nameCn": "雪莉",
+      "nameEn": "Sherry",
+      "charImageId": 14,
+      "cvNameRaw": "堀江由衣"
+    },
+    {
+      "heroId": 15,
+      "nameKr": "리아나",
+      "nameCn": "莉亚娜",
+      "nameEn": "Riana",
+      "charImageId": 15,
+      "cvNameRaw": "小清水亚美"
+    },
+    {
+      "heroId": 16,
+      "nameKr": "란스",
+      "nameCn": "兰斯",
+      "nameEn": "Lance",
+      "charImageId": 16,
+      "cvNameRaw": "最上嗣生"
+    },
+    {
+      "heroId": 17,
+      "nameKr": "에그베르트",
+      "nameCn": "埃格贝尔特",
+      "nameEn": "Eggbert",
+      "charImageId": 17,
+      "cvNameRaw": "下山吉光"
+    },
+    {
+      "heroId": 18,
+      "nameKr": "이멜다",
+      "nameCn": "伊梅尔达",
+      "nameEn": "Imelda",
+      "charImageId": 18,
+      "cvNameRaw": "高粱碧"
+    },
+    {
+      "heroId": 19,
+      "nameKr": "레스터",
+      "nameCn": "利斯塔",
+      "nameEn": "Lester",
+      "charImageId": 19,
+      "cvNameRaw": "村上聪"
+    },
+    {
+      "heroId": 20,
+      "nameKr": "소니아",
+      "nameCn": "索尼娅",
+      "nameEn": "Sonia",
+      "charImageId": 20,
+      "cvNameRaw": "佐藤美由希"
+    },
+    {
+      "heroId": 21,
+      "nameKr": "발가스",
+      "nameCn": "巴尔加斯",
+      "nameEn": "Vargas",
+      "charImageId": 21,
+      "cvNameRaw": "最上嗣生"
+    },
+    {
+      "heroId": 22,
+      "nameKr": "제시카",
+      "nameCn": "杰西卡",
+      "nameEn": "Jessica",
+      "charImageId": 22,
+      "cvNameRaw": "高粱碧"
+    },
+    {
+      "heroId": 23,
+      "nameKr": "로우가",
+      "nameCn": "洛加",
+      "nameEn": "Rouga",
+      "charImageId": 23,
+      "cvNameRaw": "高桥研二"
+    },
+    {
+      "heroId": 24,
+      "nameKr": "스코트",
+      "nameCn": "斯科特",
+      "nameEn": "Scott",
+      "charImageId": 24,
+      "cvNameRaw": "井上雄贵"
+    },
+    {
+      "heroId": 25,
+      "nameKr": "알테뮬러",
+      "nameCn": "亚鲁特缪拉",
+      "nameEn": "Alutemurat",
+      "charImageId": 25,
+      "cvNameRaw": "子安武人"
+    },
+    {
+      "heroId": 26,
+      "nameKr": "루나",
+      "nameCn": "露娜",
+      "nameEn": "Luna",
+      "charImageId": 26,
+      "cvNameRaw": "早见沙织"
+    },
+    {
+      "heroId": 27,
+      "nameKr": "디하르트",
+      "nameCn": "迪哈尔特",
+      "nameEn": "Dehault",
+      "charImageId": 27,
+      "cvNameRaw": "平川大辅"
+    },
+    {
+      "heroId": 28,
+      "nameKr": "젤다",
+      "nameCn": "泽瑞达",
+      "nameEn": "Zalrahda",
+      "charImageId": 28,
+      "cvNameRaw": "西田望见"
+    },
+    {
+      "heroId": 29,
+      "nameKr": "티아리스",
+      "nameCn": "蒂亚莉丝",
+      "nameEn": "Tialice",
+      "charImageId": 29,
+      "cvNameRaw": "能登麻美子"
+    },
+    {
+      "heroId": 30,
+      "nameKr": "리파니",
+      "nameCn": "莉法妮",
+      "nameEn": "Leafani",
+      "charImageId": 30,
+      "cvNameRaw": "佐藤美由希"
+    },
+    {
+      "heroId": 31,
+      "nameKr": "소피아",
+      "nameCn": "索菲亚",
+      "nameEn": "Sofia",
+      "charImageId": 31,
+      "cvNameRaw": "高粱碧"
+    },
+    {
+      "heroId": 32,
+      "nameKr": "에마링크",
+      "nameCn": "艾马林克",
+      "nameEn": "EmmaLink",
+      "charImageId": 32,
+      "cvNameRaw": "立花慎之介"
+    },
+    {
+      "heroId": 33,
+      "nameKr": "프레아",
+      "nameCn": "芙蕾雅",
+      "nameEn": "Freya",
+      "charImageId": 33,
+      "cvNameRaw": "堀江由衣"
+    },
+    {
+      "heroId": 34,
+      "nameKr": "키리카제",
+      "nameCn": "雾风",
+      "nameEn": "Kirikaze",
+      "charImageId": 34,
+      "cvNameRaw": "下山吉光"
+    },
+    {
+      "heroId": 35,
+      "nameKr": "안젤리카",
+      "nameCn": "安杰丽卡",
+      "nameEn": "Angelica",
+      "charImageId": 35,
+      "cvNameRaw": "友永朱音"
+    },
+    {
+      "heroId": 36,
+      "nameKr": "실버울프",
+      "nameCn": "银狼",
+      "nameEn": "SilverWolf",
+      "charImageId": 36,
+      "cvNameRaw": "志村知幸"
+    },
+    {
+      "heroId": 37,
+      "nameKr": "쥬그라",
+      "nameCn": "古巨拉",
+      "nameEn": "Zillagod",
+      "charImageId": 37,
+      "cvNameRaw": "子安武人"
+    },
+    {
+      "heroId": 38,
+      "nameKr": "제리올&레이라",
+      "nameCn": "杰利奥鲁&蕾拉",
+      "nameEn": "Jellioru&Lela",
+      "charImageId": 38,
+      "cvNameRaw": "永塚拓马"
+    },
+    {
+      "heroId": 39,
+      "nameKr": "페라키아",
+      "nameCn": "弗拉基亚",
+      "nameEn": "Flakia",
+      "charImageId": 39,
+      "cvNameRaw": "寺依沙织"
+    },
+    {
+      "heroId": 40,
+      "nameKr": "루인",
+      "nameCn": "路因",
+      "nameEn": "Rune",
+      "charImageId": 40,
+      "cvNameRaw": "畠中祐"
+    },
+    {
+      "heroId": 41,
+      "nameKr": "피엘",
+      "nameCn": "皮耶鲁",
+      "nameEn": "Pieru",
+      "charImageId": 41,
+      "cvNameRaw": "高桥孝治"
+    },
+    {
+      "heroId": 42,
+      "nameKr": "디오스",
+      "nameCn": "迪欧斯",
+      "nameEn": "Diors",
+      "charImageId": 42,
+      "cvNameRaw": "下山吉光"
+    },
+    {
+      "heroId": 43,
+      "nameKr": "안나",
+      "nameCn": "安娜",
+      "nameEn": "Anna",
+      "charImageId": 43,
+      "cvNameRaw": "樱庭有纱"
+    },
+    {
+      "heroId": 44,
+      "nameKr": "레아드",
+      "nameCn": "利亚特",
+      "nameEn": "Lyatt",
+      "charImageId": 44,
+      "cvNameRaw": "井上雄贵"
+    },
+    {
+      "heroId": 45,
+      "nameKr": "키스",
+      "nameCn": "基斯",
+      "nameEn": "Keith",
+      "charImageId": 45,
+      "cvNameRaw": "高桥研二"
+    },
+    {
+      "heroId": 47,
+      "nameKr": "레티시아",
+      "nameCn": "蕾蒂西亚",
+      "nameEn": "Leticia",
+      "charImageId": 47,
+      "cvNameRaw": "松浦知惠"
+    },
+    {
+      "heroId": 48,
+      "nameKr": "아론",
+      "nameCn": "阿伦",
+      "nameEn": "Aaron",
+      "charImageId": 48,
+      "cvNameRaw": "最上嗣生"
+    },
+    {
+      "heroId": 49,
+      "nameKr": "파나",
+      "nameCn": "法娜",
+      "nameEn": "Fana",
+      "charImageId": 49,
+      "cvNameRaw": "寺依沙织"
+    },
+    {
+      "heroId": 51,
+      "nameKr": "셀파닐",
+      "nameCn": "雪露法妮尔",
+      "nameEn": "Schelfaniel",
+      "charImageId": 51,
+      "cvNameRaw": "白城奈央"
+    },
+    {
+      "heroId": 52,
+      "nameKr": "안젤리나",
+      "nameCn": "安洁丽娜",
+      "nameEn": "Angelina",
+      "charImageId": 52,
+      "cvNameRaw": "天海由梨奈"
+    },
+    {
+      "heroId": 53,
+      "nameKr": "란포드",
+      "nameCn": "兰芳特",
+      "nameEn": "Ranford",
+      "charImageId": 53,
+      "cvNameRaw": "驹田航"
+    },
+    {
+      "heroId": 54,
+      "nameKr": "리스틸",
+      "nameCn": "妮丝蒂尔",
+      "nameEn": "Listell",
+      "charImageId": 54,
+      "cvNameRaw": "内山茉莉"
+    },
+    {
+      "heroId": 55,
+      "nameKr": "란디우스",
+      "nameCn": "兰迪乌斯",
+      "nameEn": "Landius",
+      "charImageId": 55,
+      "cvNameRaw": "置鲇龙太郎"
+    },
+    {
+      "heroId": 56,
+      "nameKr": "레이첼",
+      "nameCn": "蕾伽尔",
+      "nameEn": "Rachel",
+      "charImageId": 56,
+      "cvNameRaw": "种田梨沙"
+    },
+    {
+      "heroId": 57,
+      "nameKr": "윌러",
+      "nameCn": "威拉",
+      "nameEn": "Wiler",
+      "charImageId": 57,
+      "cvNameRaw": "铃村健一"
+    },
+    {
+      "heroId": 58,
+      "nameKr": "세레나",
+      "nameCn": "塞蕾娜",
+      "nameEn": "Serena",
+      "charImageId": 58,
+      "cvNameRaw": "户松遥"
+    },
+    {
+      "heroId": 59,
+      "nameKr": "기자로프",
+      "nameCn": "基扎洛夫",
+      "nameEn": "Gizlof",
+      "charImageId": 59,
+      "cvNameRaw": "广田行生"
+    },
+    {
+      "heroId": 60,
+      "nameKr": "시그마",
+      "nameCn": "西格玛",
+      "nameEn": "Sigma",
+      "charImageId": 60,
+      "cvNameRaw": "绿川光"
+    },
+    {
+      "heroId": 61,
+      "nameKr": "람다",
+      "nameCn": "拉姆达",
+      "nameEn": "Lambda",
+      "charImageId": 61,
+      "cvNameRaw": "皆口裕子"
+    },
+    {
+      "heroId": 62,
+      "nameKr": "알프레드",
+      "nameCn": "阿尔弗雷德",
+      "nameEn": "Alfred",
+      "charImageId": 62,
+      "cvNameRaw": "榎木淳弥"
+    },
+    {
+      "heroId": 63,
+      "nameKr": "레인폴스",
+      "nameCn": "雷因法鲁斯",
+      "nameEn": "Lainforce",
+      "charImageId": 63,
+      "cvNameRaw": "速水奖"
+    },
+    {
+      "heroId": 64,
+      "nameKr": "브렌다",
+      "nameCn": "布琳达",
+      "nameEn": "Brenda",
+      "charImageId": 64,
+      "cvNameRaw": "大原沙耶香"
+    },
+    {
+      "heroId": 65,
+      "nameKr": "비라쥬",
+      "nameCn": "维拉玖",
+      "nameEn": "Virash",
+      "charImageId": 65,
+      "cvNameRaw": "福山润"
+    },
+    {
+      "heroId": 66,
+      "nameKr": "클라렛",
+      "nameCn": "克拉蕾特",
+      "nameEn": "Clarett",
+      "charImageId": 66,
+      "cvNameRaw": "悠木碧"
+    },
+    {
+      "heroId": 67,
+      "nameKr": "오메가",
+      "nameCn": "欧米伽",
+      "nameEn": "Omega",
+      "charImageId": 67,
+      "cvNameRaw": "矢野智也"
+    },
+    {
+      "heroId": 69,
+      "nameKr": "에스텔",
+      "nameCn": "艾丝蒂尔",
+      "nameEn": "Estelle",
+      "charImageId": 69,
+      "cvNameRaw": "神田朱未"
+    },
+    {
+      "heroId": 70,
+      "nameKr": "요슈아",
+      "nameCn": "约修亚",
+      "nameEn": "Joshua",
+      "charImageId": 70,
+      "cvNameRaw": "斋贺光希"
+    },
+    {
+      "heroId": 71,
+      "nameKr": "렌",
+      "nameCn": "玲",
+      "nameEn": "Renne",
+      "charImageId": 71,
+      "cvNameRaw": "悠木碧"
+    },
+    {
+      "heroId": 72,
+      "nameKr": "레온하르트",
+      "nameCn": "莱恩哈特",
+      "nameEn": "Leonhardt",
+      "charImageId": 72,
+      "cvNameRaw": "绿川光"
+    },
+    {
+      "heroId": 73,
+      "nameKr": "올리비에",
+      "nameCn": "奥利维尔",
+      "nameEn": "Olivier",
+      "charImageId": 73,
+      "cvNameRaw": "子安武人"
+    },
+    {
+      "heroId": 74,
+      "nameKr": "클로제",
+      "nameCn": "科洛丝",
+      "nameEn": "Klose",
+      "charImageId": 74,
+      "cvNameRaw": "皆口裕子"
+    },
+    {
+      "heroId": 75,
+      "nameKr": "디드리트",
+      "nameCn": "蒂德莉特",
+      "nameEn": "Deedlit",
+      "charImageId": 75,
+      "cvNameRaw": "冬马由美"
+    },
+    {
+      "heroId": 76,
+      "nameKr": "아슈람",
+      "nameCn": "亚修拉姆",
+      "nameEn": "Ashram",
+      "charImageId": 76,
+      "cvNameRaw": "神谷明"
+    },
+    {
+      "heroId": 77,
+      "nameKr": "판",
+      "nameCn": "帕恩",
+      "nameEn": "Parn",
+      "charImageId": 77,
+      "cvNameRaw": "草尾毅"
+    },
+    {
+      "heroId": 78,
+      "nameKr": "필로테스",
+      "nameCn": "比萝蒂丝",
+      "nameEn": "Pirotess",
+      "charImageId": 78,
+      "cvNameRaw": "玉川砂记子"
+    },
+    {
+      "heroId": 79,
+      "nameKr": "신구지 사쿠라",
+      "nameCn": "真宫寺樱",
+      "nameEn": "SakuraShinguji",
+      "charImageId": 79,
+      "cvNameRaw": "横山智佐"
+    },
+    {
+      "heroId": 80,
+      "nameKr": "칸자키 스미레",
+      "nameCn": "神崎堇",
+      "nameEn": "SumireKanzaki",
+      "charImageId": 80,
+      "cvNameRaw": "富泽美智惠"
+    },
+    {
+      "heroId": 81,
+      "nameKr": "아이리스",
+      "nameCn": "爱丽丝",
+      "nameEn": "Iris",
+      "charImageId": 81,
+      "cvNameRaw": "西原久美子"
+    },
+    {
+      "heroId": 82,
+      "nameKr": "우라메시 유스케",
+      "nameCn": "浦饭幽助",
+      "nameEn": "Yusuke",
+      "charImageId": 82,
+      "cvNameRaw": "佐佐木望"
+    },
+    {
+      "heroId": 83,
+      "nameKr": "히에이",
+      "nameCn": "飞影",
+      "nameEn": "Hiei",
+      "charImageId": 83,
+      "cvNameRaw": "桧山修之"
+    },
+    {
+      "heroId": 84,
+      "nameKr": "쿠라마",
+      "nameCn": "藏马",
+      "nameEn": "Kurama",
+      "charImageId": 84,
+      "cvNameRaw": "绪方惠美"
+    },
+    {
+      "heroId": 85,
+      "nameKr": "도구로 형제",
+      "nameCn": "户愚吕兄弟",
+      "nameEn": "Toguro",
+      "charImageId": 85,
+      "cvNameRaw": "玄田哲章&铃木胜美"
+    },
+    {
+      "heroId": 86,
+      "nameKr": "쿠와바라 카즈마",
+      "nameCn": "桑原和真",
+      "nameEn": "Kazuma",
+      "charImageId": 86,
+      "cvNameRaw": "千叶繁"
+    },
+    {
+      "heroId": 87,
+      "nameKr": "베티",
+      "nameCn": "贝蒂",
+      "nameEn": "Betty",
+      "charImageId": 87,
+      "cvNameRaw": "东城日沙子"
+    },
+    {
+      "heroId": 88,
+      "nameKr": "엘라스타",
+      "nameCn": "艾拉斯卓",
+      "nameEn": "Alustriel",
+      "charImageId": 88,
+      "cvNameRaw": "长妻树里"
+    },
+    {
+      "heroId": 89,
+      "nameKr": "유리아",
+      "nameCn": "尤利娅",
+      "nameEn": "Yulia",
+      "charImageId": 89,
+      "cvNameRaw": "石原爱依梨"
+    },
+    {
+      "heroId": 91,
+      "nameKr": "에밀리아",
+      "nameCn": "艾米莉亚",
+      "nameEn": "Emilia",
+      "charImageId": 91,
+      "cvNameRaw": "钉宫理惠"
+    },
+    {
+      "heroId": 92,
+      "nameKr": "환생 제시카",
+      "nameCn": "女神化身",
+      "nameEn": "Prime Jessica",
+      "charImageId": 92,
+      "cvNameRaw": "Lynn"
+    },
+    {
+      "heroId": 93,
+      "nameKr": "미지의 기사",
+      "nameCn": "谜之骑士",
+      "nameEn": "MysteryKnight",
+      "charImageId": 93,
+      "cvNameRaw": "石川由依"
+    },
+    {
+      "heroId": 94,
+      "nameKr": "아카야",
+      "nameCn": "阿卡娅",
+      "nameEn": "Aka",
+      "charImageId": 94,
+      "cvNameRaw": "丰崎爱生"
+    },
+    {
+      "heroId": 95,
+      "nameKr": "올리버",
+      "nameCn": "奥利佛",
+      "nameEn": "Olivo",
+      "charImageId": 95,
+      "cvNameRaw": "冈本信彦"
+    },
+    {
+      "heroId": 96,
+      "nameKr": "멜파니",
+      "nameCn": "梅露帕妮",
+      "nameEn": "Meropeni",
+      "charImageId": 96,
+      "cvNameRaw": "日高里菜"
+    },
+    {
+      "heroId": 97,
+      "nameKr": "일루시아",
+      "nameCn": "伊露希亚",
+      "nameEn": "Elucia",
+      "charImageId": 97,
+      "cvNameRaw": "皆口裕子"
+    },
+    {
+      "heroId": 98,
+      "nameKr": "빈센트",
+      "nameCn": "文森特",
+      "nameEn": "Vincent",
+      "charImageId": 98,
+      "cvNameRaw": "绿川光"
+    },
+    {
+      "heroId": 99,
+      "nameKr": "클로테르",
+      "nameCn": "克洛泰尔",
+      "nameEn": "Clotaire",
+      "charImageId": 99,
+      "cvNameRaw": "中村悠一"
+    },
+    {
+      "heroId": 100,
+      "nameKr": "로젠실",
+      "nameCn": "罗泽希尔",
+      "nameEn": "Rozenciel",
+      "charImageId": 100,
+      "cvNameRaw": "田中理惠"
+    },
+    {
+      "heroId": 101,
+      "nameKr": "헬레나",
+      "nameCn": "海伦娜",
+      "nameEn": "Helena",
+      "charImageId": 101,
+      "cvNameRaw": "井上麻里奈"
+    },
+    {
+      "heroId": 102,
+      "nameKr": "세계수의 현자",
+      "nameCn": "树之贤者",
+      "nameEn": "MagusOfTheTree",
+      "charImageId": 102,
+      "cvNameRaw": "置鲇龙太郎"
+    },
+    {
+      "heroId": 103,
+      "nameKr": "실린카",
+      "nameCn": "希琳卡",
+      "nameEn": "Sirink",
+      "charImageId": 103,
+      "cvNameRaw": "川澄绫子"
+    },
+    {
+      "heroId": 104,
+      "nameKr": "알파",
+      "nameCn": "阿尔法",
+      "nameEn": "Alpha",
+      "charImageId": 104,
+      "cvNameRaw": "伊藤静"
+    },
+    {
+      "heroId": 105,
+      "nameKr": "뮤",
+      "nameCn": "茉",
+      "nameEn": "Mu",
+      "charImageId": 105,
+      "cvNameRaw": "桑原由气"
+    },
+    {
+      "heroId": 106,
+      "nameKr": "입실론",
+      "nameCn": "伊普西龙",
+      "nameEn": "Epsilon",
+      "charImageId": 106,
+      "cvNameRaw": "内山昂辉"
+    },
+    {
+      "heroId": 108,
+      "nameKr": "사신 크루거",
+      "nameCn": "邪神库鲁加",
+      "nameEn": "KreugerTheWicked",
+      "charImageId": 108,
+      "cvNameRaw": "松冈祯丞"
+    },
+    {
+      "heroId": 109,
+      "nameKr": "화이트 시시",
+      "nameCn": "怀特·茜茜",
+      "nameEn": "SissiWhite",
+      "charImageId": 109,
+      "cvNameRaw": "黑木穗乃香"
+    },
+    {
+      "heroId": 110,
+      "nameKr": "아레스",
+      "nameCn": "阿雷斯",
+      "nameEn": "Ares",
+      "charImageId": 110,
+      "cvNameRaw": "森岛秀太"
+    },
+    {
+      "heroId": 111,
+      "nameKr": "마이야",
+      "nameCn": "梅雅",
+      "nameEn": "Maiya",
+      "charImageId": 111,
+      "cvNameRaw": "内山夕实"
+    },
+    {
+      "heroId": 112,
+      "nameKr": "토와",
+      "nameCn": "托娃",
+      "nameEn": "Towa",
+      "charImageId": 112,
+      "cvNameRaw": "泽城美雪＆鹤冈聪"
+    },
+    {
+      "heroId": 113,
+      "nameKr": "탄생의 빛",
+      "nameCn": "降生之光",
+      "nameEn": "LightOfGenesis",
+      "charImageId": 113,
+      "cvNameRaw": "悠木碧"
+    },
+    {
+      "heroId": 114,
+      "nameKr": "마리엘",
+      "nameCn": "玛丽埃尔",
+      "nameEn": "Mariel",
+      "charImageId": 114,
+      "cvNameRaw": "山本彩乃"
+    },
+    {
+      "heroId": 115,
+      "nameKr": "로자리아",
+      "nameCn": "罗莎莉娅",
+      "nameEn": "Rozalia",
+      "charImageId": 115,
+      "cvNameRaw": "井口裕香"
+    },
+    {
+      "heroId": 116,
+      "nameKr": "노에미",
+      "nameCn": "诺埃米",
+      "nameEn": "Noemi",
+      "charImageId": 116,
+      "cvNameRaw": "村川梨衣"
+    },
+    {
+      "heroId": 118,
+      "nameKr": "오토크라트 4세",
+      "nameCn": "奥托克拉托四世",
+      "nameEn": "AutokratoIV",
+      "charImageId": 118,
+      "cvNameRaw": "兴津和幸"
+    },
+    {
+      "heroId": 119,
+      "nameKr": "루크레치아",
+      "nameCn": "卢克蕾蒂娅",
+      "nameEn": "Lucretia",
+      "charImageId": 119,
+      "cvNameRaw": "福圆美里"
+    },
+    {
+      "heroId": 120,
+      "nameKr": "플로렌티아",
+      "nameCn": "弗洛朗蒂娅",
+      "nameEn": "Florentia",
+      "charImageId": 120,
+      "cvNameRaw": "本多真梨子"
+    },
+    {
+      "heroId": 121,
+      "nameKr": "츠바메",
+      "nameCn": "燕",
+      "nameEn": "Tsubame",
+      "charImageId": 121,
+      "cvNameRaw": "田村奈央"
+    },
+    {
+      "heroId": 122,
+      "nameKr": "힐다",
+      "nameCn": "希尔达",
+      "nameEn": "Hilda",
+      "charImageId": 122,
+      "cvNameRaw": "荒浪和沙"
+    },
+    {
+      "heroId": 123,
+      "nameKr": "베르너",
+      "nameCn": "沃尔纳",
+      "nameEn": "Werner",
+      "charImageId": 123,
+      "cvNameRaw": "石川界人"
+    },
+    {
+      "heroId": 124,
+      "nameKr": "크리스티아네",
+      "nameCn": "克里斯蒂安妮",
+      "nameEn": "Christiane",
+      "charImageId": 124,
+      "cvNameRaw": "樱井浩美"
+    },
+    {
+      "heroId": 125,
+      "nameKr": "리코리스",
+      "nameCn": "丽可丽丝",
+      "nameEn": "Licorice",
+      "charImageId": 125,
+      "cvNameRaw": "东山奈央"
+    },
+    {
+      "heroId": 126,
+      "nameKr": "팟시르",
+      "nameCn": "帕希尔",
+      "nameEn": "Patyle",
+      "charImageId": 126,
+      "cvNameRaw": "高桥智秋"
+    },
+    {
+      "heroId": 127,
+      "nameKr": "레나타",
+      "nameCn": "蕾娜塔",
+      "nameEn": "Renata",
+      "charImageId": 127,
+      "cvNameRaw": "高桥未奈美"
+    },
+    {
+      "heroId": 129,
+      "nameKr": "구스타프",
+      "nameCn": "古斯塔夫",
+      "nameEn": "Gustav",
+      "charImageId": 129,
+      "cvNameRaw": "小林优"
+    },
+    {
+      "heroId": 130,
+      "nameKr": "미셸",
+      "nameCn": "米歇尔",
+      "nameEn": "Michelle",
+      "charImageId": 130,
+      "cvNameRaw": "佐佐木未来"
+    },
+    {
+      "heroId": 131,
+      "nameKr": "알티나",
+      "nameCn": "亚尔缇娜",
+      "nameEn": "Altina",
+      "charImageId": 131,
+      "cvNameRaw": "水瀬祈"
+    },
+    {
+      "heroId": 132,
+      "nameKr": "아리안로드",
+      "nameCn": "阿瑞安赫德",
+      "nameEn": "Arianrhod",
+      "charImageId": 132,
+      "cvNameRaw": "久川绫"
+    },
+    {
+      "heroId": 133,
+      "nameKr": "린 슈바르처",
+      "nameCn": "黎恩",
+      "nameEn": "Rean",
+      "charImageId": 133,
+      "cvNameRaw": "内山昂辉"
+    },
+    {
+      "heroId": 134,
+      "nameKr": "아인즈 울 고운",
+      "nameCn": "安兹·乌尔·恭",
+      "nameEn": "AinzOoalGown",
+      "charImageId": 134,
+      "cvNameRaw": "日野聪"
+    },
+    {
+      "heroId": 135,
+      "nameKr": "알베도",
+      "nameCn": "雅儿贝德",
+      "nameEn": "Albedo",
+      "charImageId": 135,
+      "cvNameRaw": "原由实"
+    },
+    {
+      "heroId": 136,
+      "nameKr": "샤르티아",
+      "nameCn": "夏提雅",
+      "nameEn": "Shalltear",
+      "charImageId": 136,
+      "cvNameRaw": "上坂堇"
+    },
+    {
+      "heroId": 137,
+      "nameKr": "와타루",
+      "nameCn": "战部渡",
+      "nameEn": "Wataru",
+      "charImageId": 137,
+      "cvNameRaw": "田中真弓"
+    },
+    {
+      "heroId": 138,
+      "nameKr": "히미코",
+      "nameCn": "忍部火美子",
+      "nameEn": "Himiko",
+      "charImageId": 138,
+      "cvNameRaw": "林原惠美"
+    },
+    {
+      "heroId": 139,
+      "nameKr": "시바라쿠",
+      "nameCn": "剑部武一郎",
+      "nameEn": "Shibaraku",
+      "charImageId": 139,
+      "cvNameRaw": "西村知道"
+    },
+    {
+      "heroId": 140,
+      "nameKr": "사나다 료",
+      "nameCn": "真田辽",
+      "nameEn": "Ryou",
+      "charImageId": 140,
+      "cvNameRaw": "草尾毅"
+    },
+    {
+      "heroId": 141,
+      "nameKr": "카유라",
+      "nameCn": "迦游罗",
+      "nameEn": "Kayura",
+      "charImageId": 141,
+      "cvNameRaw": "胜生真沙子"
+    },
+    {
+      "heroId": 142,
+      "nameKr": "하시바 토마",
+      "nameCn": "羽柴当麻",
+      "nameEn": "Touma",
+      "charImageId": 142,
+      "cvNameRaw": "竹村拓"
+    },
+    {
+      "heroId": 143,
+      "nameKr": "사카타 긴토키",
+      "nameCn": "坂田银时",
+      "nameEn": "GintokiSakata",
+      "charImageId": 143,
+      "cvNameRaw": "杉田智和"
+    },
+    {
+      "heroId": 144,
+      "nameKr": "카구라",
+      "nameCn": "神乐",
+      "nameEn": "Kagura",
+      "charImageId": 144,
+      "cvNameRaw": "钉宫理惠"
+    },
+    {
+      "heroId": 145,
+      "nameKr": "시무라 신파치",
+      "nameCn": "志村新八",
+      "nameEn": "ShinpachiShimura",
+      "charImageId": 145,
+      "cvNameRaw": "阪口大助"
+    },
+    {
+      "heroId": 146,
+      "nameKr": "셀베리아",
+      "nameCn": "塞贝莉雅",
+      "nameEn": "Selvaria",
+      "charImageId": 146,
+      "cvNameRaw": "大原沙耶香"
+    },
+    {
+      "heroId": 147,
+      "nameKr": "알리시아",
+      "nameCn": "亚莉希雅",
+      "nameEn": "Alicia",
+      "charImageId": 147,
+      "cvNameRaw": "井上麻里奈"
+    },
+    {
+      "heroId": 148,
+      "nameKr": "이사라",
+      "nameCn": "伊莎拉",
+      "nameEn": "Isara",
+      "charImageId": 148,
+      "cvNameRaw": "桑岛法子"
+    },
+    {
+      "heroId": 99161,
+      "nameKr": "크림조의 왕",
+      "nameCn": "红月之王",
+      "nameEn": "LordOfCrimson",
+      "charImageId": 99161,
+      "cvNameRaw": "速水奖"
+    },
+    {
+      "heroId": 99162,
+      "nameKr": "수제트",
+      "nameCn": "修杰特",
+      "nameEn": "Suzette",
+      "charImageId": 99162,
+      "cvNameRaw": "西田望见"
+    },
+    {
+      "heroId": 99163,
+      "nameKr": "초월자",
+      "nameCn": "超越之人",
+      "nameEn": "Transcendent",
+      "charImageId": 99163,
+      "cvNameRaw": "诹访部顺一"
+    },
+    {
+      "heroId": 99164,
+      "nameKr": "베르너",
+      "nameCn": "维尔纳",
+      "nameEn": "Verner",
+      "charImageId": 99164,
+      "cvNameRaw": "绿川光"
+    },
+    {
+      "heroId": 99165,
+      "nameKr": "마리안델",
+      "nameCn": "玛丽安蒂尔",
+      "nameEn": "Mariandel",
+      "charImageId": 99165,
+      "cvNameRaw": "皆口裕子"
+    },
+    {
+      "heroId": 99166,
+      "nameKr": "웨탐",
+      "nameCn": "维坦",
+      "nameEn": "Wehttam",
+      "charImageId": 99166,
+      "cvNameRaw": "柿原彻也"
+    },
+    {
+      "heroId": 99167,
+      "nameKr": "리사",
+      "nameCn": "丽莎",
+      "nameEn": "Liza",
+      "charImageId": 99167,
+      "cvNameRaw": "加藤英美里"
+    },
+    {
+      "heroId": 99168,
+      "nameKr": "엘마",
+      "nameCn": "艾尔玛",
+      "nameEn": "Erma",
+      "charImageId": 99168,
+      "cvNameRaw": "上坂堇"
+    },
+    {
+      "heroId": 99169,
+      "nameKr": "켈티스",
+      "nameCn": "凯尔蒂斯",
+      "nameEn": "Kertesz",
+      "charImageId": 99169,
+      "cvNameRaw": "柳田淳一"
+    },
+    {
+      "heroId": 99170,
+      "nameKr": "로비나 대제",
+      "nameCn": "洛维奈尔大帝",
+      "nameEn": "EmperorLoviner",
+      "charImageId": 99170,
+      "cvNameRaw": "森岛秀太"
+    },
+    {
+      "heroId": 99171,
+      "nameKr": "방주의 성녀",
+      "nameCn": "方舟圣女",
+      "nameEn": "TheSaintOfArk",
+      "charImageId": 99171,
+      "cvNameRaw": "东山奈央"
+    },
+    {
+      "heroId": 99172,
+      "nameKr": "크림조의 집정관",
+      "nameCn": "月之执政官",
+      "nameEn": "TheConsul",
+      "charImageId": 99172,
+      "cvNameRaw": "福山润"
+    },
+    {
+      "heroId": 99173,
+      "nameKr": "아이언 챈슬러",
+      "nameCn": "铁血总帅",
+      "nameEn": "IronChancellor",
+      "charImageId": 99173,
+      "cvNameRaw": "本多真梨子"
+    },
+    {
+      "heroId": 99174,
+      "nameKr": "아즈사",
+      "nameCn": "梓",
+      "nameEn": "Azusa",
+      "charImageId": 99174,
+      "cvNameRaw": "名冢佳织"
+    },
+    {
+      "heroId": 99175,
+      "nameKr": "오보로",
+      "nameCn": "胧",
+      "nameEn": "Oboro",
+      "charImageId": 99175,
+      "cvNameRaw": "梶裕贵"
+    },
+    {
+      "heroId": 99176,
+      "nameKr": "캐롤리안",
+      "nameCn": "卡洛莉安",
+      "nameEn": "Carolian",
+      "charImageId": 99176,
+      "cvNameRaw": "伊濑茉莉也"
+    },
+    {
+      "heroId": 99177,
+      "nameKr": "카구야",
+      "nameCn": "辉夜",
+      "nameEn": "Kaguya",
+      "charImageId": 99177,
+      "cvNameRaw": "喜多村英梨"
+    },
+    {
+      "heroId": 99178,
+      "nameKr": "아사멜",
+      "nameCn": "亚莎梅尔",
+      "nameEn": "Ashumere",
+      "charImageId": 99178,
+      "cvNameRaw": "小林优"
+    },
+    {
+      "heroId": 99179,
+      "nameKr": "로스탐",
+      "nameCn": "洛斯塔姆",
+      "nameEn": "Rostam",
+      "charImageId": 99179,
+      "cvNameRaw": "三木真一郎"
+    },
+    {
+      "heroId": 99180,
+      "nameKr": "방랑투사",
+      "nameCn": "漂逐斗客",
+      "nameEn": "WanderingDuelist",
+      "charImageId": 99180,
+      "cvNameRaw": "大原沙耶香"
+    },
+    {
+      "heroId": 99181,
+      "nameKr": "줄리안",
+      "nameCn": "朱利安",
+      "nameEn": "Julian",
+      "charImageId": 99181,
+      "cvNameRaw": "内田雄马"
+    },
+    {
+      "heroId": 99182,
+      "nameKr": "리키",
+      "nameCn": "里奇",
+      "nameEn": "Ricky",
+      "charImageId": 99182,
+      "cvNameRaw": "子安光树"
+    },
+    {
+      "heroId": 99183,
+      "nameKr": "마크렌",
+      "nameCn": "马库雷",
+      "nameEn": "McClaine",
+      "charImageId": 99183,
+      "cvNameRaw": "三木真一郎"
+    },
+    {
+      "heroId": 99184,
+      "nameKr": "빛의 수호사도",
+      "nameCn": "光佑使徒",
+      "nameEn": "Lightbringer",
+      "charImageId": 99184,
+      "cvNameRaw": "上坂堇"
+    },
+    {
+      "heroId": 99185,
+      "nameKr": "아단켈모",
+      "nameCn": "亚德凯摩",
+      "nameEn": "Adankelmo",
+      "charImageId": 99185,
+      "cvNameRaw": "桑岛法子"
+    },
+    {
+      "heroId": 99186,
+      "nameKr": "빛과 그림자 검의 영혼",
+      "nameCn": "光影剑魄",
+      "nameEn": "SwordofLight&Shadow",
+      "charImageId": 99186,
+      "cvNameRaw": "西田望见"
+    },
+    {
+      "heroId": 99187,
+      "nameKr": "껍질 소녀",
+      "nameCn": "壳中少女",
+      "nameEn": "GirlInShell",
+      "charImageId": 99187,
+      "cvNameRaw": "福圆美里"
+    },
+    {
+      "heroId": 99188,
+      "nameKr": "리오벡",
+      "nameCn": "里奥贝克",
+      "nameEn": "RioBec",
+      "charImageId": 99188,
+      "cvNameRaw": "皆川纯子"
+    },
+    {
+      "heroId": 99189,
+      "nameKr": "시엔",
+      "nameCn": "席恩",
+      "nameEn": "Zion",
+      "charImageId": 99189,
+      "cvNameRaw": "梶裕贵"
+    },
+    {
+      "heroId": 99190,
+      "nameKr": "폴리알",
+      "nameCn": "波莉阿鲁",
+      "nameEn": "Polyal",
+      "charImageId": 99190,
+      "cvNameRaw": "小松未可子"
+    },
+    {
+      "heroId": 99191,
+      "nameKr": "루그너",
+      "nameCn": "卢古耐尔",
+      "nameEn": "Lugner",
+      "charImageId": 99191,
+      "cvNameRaw": "杉田智和"
+    },
+    {
+      "heroId": 99192,
+      "nameKr": "그렌실",
+      "nameCn": "格伦希尔",
+      "nameEn": "Grunhind",
+      "charImageId": 99192,
+      "cvNameRaw": "名冢佳织"
+    },
+    {
+      "heroId": 99193,
+      "nameKr": "요아&코니",
+      "nameCn": "琼&康娜",
+      "nameEn": "Yoa&Conna",
+      "charImageId": 99193,
+      "cvNameRaw": "丰永利行&久保百合花"
+    },
+    {
+      "heroId": 99194,
+      "nameKr": "일레인",
+      "nameCn": "艾蕾因",
+      "nameEn": "Elaine",
+      "charImageId": 99194,
+      "cvNameRaw": "斋藤千和"
+    },
+    {
+      "heroId": 99195,
+      "nameKr": "반",
+      "nameCn": "范恩",
+      "nameEn": "Van",
+      "charImageId": 99195,
+      "cvNameRaw": "小野大辅"
+    },
+    {
+      "heroId": 99196,
+      "nameKr": "아니에스",
+      "nameCn": "亚妮艾丝",
+      "nameEn": "Agnes",
+      "charImageId": 99196,
+      "cvNameRaw": "伊藤美来"
+    },
+    {
+      "heroId": 99197,
+      "nameKr": "각성자",
+      "nameCn": "醒觉者",
+      "nameEn": "Awakener",
+      "charImageId": 99197,
+      "cvNameRaw": "桑岛法子"
+    },
+    {
+      "heroId": 99198,
+      "nameKr": "아마데우스",
+      "nameCn": "阿玛迪斯",
+      "nameEn": "Amadeus",
+      "charImageId": 99198,
+      "cvNameRaw": "三木真一郎"
+    },
+    {
+      "heroId": 99199,
+      "nameKr": "사그니",
+      "nameCn": "萨格尼",
+      "nameEn": "Sagny",
+      "charImageId": 99199,
+      "cvNameRaw": "福山润"
+    },
+    {
+      "heroId": 99200,
+      "nameKr": "키리카",
+      "nameCn": "雾香",
+      "nameEn": "Kirika",
+      "charImageId": 99200,
+      "cvNameRaw": "早见沙织"
+    },
+    {
+      "heroId": 99201,
+      "nameKr": "소니아 블랑쉬",
+      "nameCn": "桑妮雅",
+      "nameEn": "Sonia",
+      "charImageId": 99201,
+      "cvNameRaw": "濑户麻沙美"
+    },
+    {
+      "heroId": 99202,
+      "nameKr": "엑셀러",
+      "nameCn": "爱克雪拉",
+      "nameEn": "Excela",
+      "charImageId": 99202,
+      "cvNameRaw": "水树奈奈"
+    },
+    {
+      "heroId": 99203,
+      "nameKr": "님프",
+      "nameCn": "宁芙",
+      "nameEn": "Nymph",
+      "charImageId": 99203,
+      "cvNameRaw": "青山吉能"
+    },
+    {
+      "heroId": 99204,
+      "nameKr": "타탈리아",
+      "nameCn": "塔塔利亚",
+      "nameEn": "Tatalia",
+      "charImageId": 99204,
+      "cvNameRaw": "大津爱理"
+    },
+    {
+      "heroId": 99205,
+      "nameKr": "투어밀크",
+      "nameCn": "托米尔克",
+      "nameEn": "Tourmilk",
+      "charImageId": 99205,
+      "cvNameRaw": "折笠富美子"
+    },
+    {
+      "heroId": 99206,
+      "nameKr": "이리스",
+      "nameCn": "伊莉丝",
+      "nameEn": "Iris",
+      "charImageId": 99206,
+      "cvNameRaw": "渡边明乃"
+    },
+    {
+      "heroId": 99207,
+      "nameKr": "롤랑",
+      "nameCn": "罗兰",
+      "nameEn": "Roland",
+      "charImageId": 99207,
+      "cvNameRaw": "KENN"
+    },
+    {
+      "heroId": 99208,
+      "nameKr": "프레시아",
+      "nameCn": "普蕾茜娅",
+      "nameEn": "Precia",
+      "charImageId": 99208,
+      "cvNameRaw": "小泽亚李"
+    },
+    {
+      "heroId": 99209,
+      "nameKr": "리나",
+      "nameCn": "莉娜",
+      "nameEn": "Lina",
+      "charImageId": 99209,
+      "cvNameRaw": "林原惠美"
+    },
+    {
+      "heroId": 99210,
+      "nameKr": "제르가디스",
+      "nameCn": "杰路刚帝士",
+      "nameEn": "Zelgadiss",
+      "charImageId": 99210,
+      "cvNameRaw": "绿川光"
+    },
+    {
+      "heroId": 99211,
+      "nameKr": "가우리",
+      "nameCn": "高里",
+      "nameEn": "Gourry",
+      "charImageId": 99211,
+      "cvNameRaw": "松本保典"
+    },
+    {
+      "heroId": 99212,
+      "nameKr": "강신자",
+      "nameCn": "神降者",
+      "nameEn": "Apotheosis",
+      "charImageId": 99212,
+      "cvNameRaw": "柿原彻也"
+    },
+    {
+      "heroId": 99213,
+      "nameKr": "캡틴 잭",
+      "nameCn": "杰克船长",
+      "nameEn": "Jack",
+      "charImageId": 99213,
+      "cvNameRaw": "内山夕实"
+    },
+    {
+      "heroId": 99214,
+      "nameKr": "네미아",
+      "nameCn": "奈米娅",
+      "nameEn": "Nemia",
+      "charImageId": 99214,
+      "cvNameRaw": "松冈由贵"
+    },
+    {
+      "heroId": 99215,
+      "nameKr": "안드리올",
+      "nameCn": "安德里奥",
+      "nameEn": "Andriole",
+      "charImageId": 99215,
+      "cvNameRaw": "鸟海浩辅"
+    },
+    {
+      "heroId": 99216,
+      "nameKr": "에쉬앤",
+      "nameCn": "艾希恩",
+      "nameEn": "Eshean",
+      "charImageId": 99216,
+      "cvNameRaw": "沼仓爱美"
+    },
+    {
+      "heroId": 99217,
+      "nameKr": "호프만",
+      "nameCn": "霍夫曼",
+      "nameEn": "Hofmann",
+      "charImageId": 99217,
+      "cvNameRaw": "浪川大辅"
+    },
+    {
+      "heroId": 99218,
+      "nameKr": "이졸데",
+      "nameCn": "伊索尔德",
+      "nameEn": "Isolde",
+      "charImageId": 99218,
+      "cvNameRaw": "佐藤利奈"
+    },
+    {
+      "heroId": 99219,
+      "nameKr": "제이스",
+      "nameCn": "杰斯",
+      "nameEn": "Jayce",
+      "charImageId": 99219,
+      "cvNameRaw": "水岛大宙"
+    },
+    {
+      "heroId": 99220,
+      "nameKr": "패트리샤",
+      "nameCn": "帕特里夏",
+      "nameEn": "Patricia",
+      "charImageId": 99220,
+      "cvNameRaw": "宫村优子"
+    },
+    {
+      "heroId": 99221,
+      "nameKr": "군",
+      "nameCn": "古恩",
+      "nameEn": "Gunn",
+      "charImageId": 99221,
+      "cvNameRaw": "细谷佳正"
+    },
+    {
+      "heroId": 99222,
+      "nameKr": "알칸펠",
+      "nameCn": "阿卡菲尔",
+      "nameEn": "Archanfel",
+      "charImageId": 99222,
+      "cvNameRaw": "松本保典"
+    },
+    {
+      "heroId": 99223,
+      "nameKr": "쇼우",
+      "nameCn": "深町晶",
+      "nameEn": "Sho",
+      "charImageId": 99223,
+      "cvNameRaw": "野岛健儿"
+    },
+    {
+      "heroId": 99224,
+      "nameKr": "아기토",
+      "nameCn": "卷岛颚人",
+      "nameEn": "Agito",
+      "charImageId": 99224,
+      "cvNameRaw": "小西克幸"
+    },
+    {
+      "heroId": 99225,
+      "nameKr": "빙설 심연의 지배자",
+      "nameCn": "冰渊凌御者",
+      "nameEn": "SovereignOfIceAbyss",
+      "charImageId": 99225,
+      "cvNameRaw": "高粱碧"
+    },
+    {
+      "heroId": 99226,
+      "nameKr": "테란틸",
+      "nameCn": "泰兰提尔",
+      "nameEn": "Tyrantel",
+      "charImageId": 99226,
+      "cvNameRaw": "池田秀一"
+    },
+    {
+      "heroId": 99227,
+      "nameKr": "타브리스",
+      "nameCn": "塔布莉丝",
+      "nameEn": "Tabres",
+      "charImageId": 99227,
+      "cvNameRaw": "种崎敦美"
+    },
+    {
+      "heroId": 99228,
+      "nameKr": "이미르",
+      "nameCn": "尤弥尔",
+      "nameEn": "Ymir",
+      "charImageId": 99228,
+      "cvNameRaw": "石田彰"
+    },
+    {
+      "heroId": 99229,
+      "nameKr": "셀리카",
+      "nameCn": "赛利卡",
+      "nameEn": "Celica",
+      "charImageId": 99229,
+      "cvNameRaw": "尤加奈"
+    },
+    {
+      "heroId": 99230,
+      "nameKr": "세라피나",
+      "nameCn": "塞拉菲娜",
+      "nameEn": "Seraphina",
+      "charImageId": 99230,
+      "cvNameRaw": "原由实"
+    },
+    {
+      "heroId": 99231,
+      "nameKr": "비리아",
+      "nameCn": "薇莉娅",
+      "nameEn": "Virelia",
+      "charImageId": 99231,
+      "cvNameRaw": "鬼头明里"
+    },
+    {
+      "heroId": 99232,
+      "nameKr": "빛의 소환사",
+      "nameCn": "辉耀圣召使",
+      "nameEn": "Brightsummoner",
+      "charImageId": 99232,
+      "cvNameRaw": "佐仓绫音"
+    },
+    {
+      "heroId": 99233,
+      "nameKr": "시온",
+      "nameCn": "席昂",
+      "nameEn": "Shion",
+      "charImageId": 99233,
+      "cvNameRaw": "平川大辅"
+    },
+    {
+      "heroId": 99234,
+      "nameKr": "티아나",
+      "nameCn": "缇雅娜",
+      "nameEn": "Tiana",
+      "charImageId": 99234,
+      "cvNameRaw": "嶋村侑"
+    },
+    {
+      "heroId": 99235,
+      "nameKr": "캡틴 코만도&베이비 헤드",
+      "nameCn": "突击队长&天才婴儿",
+      "nameEn": "Captain&Baby",
+      "charImageId": 99235,
+      "cvNameRaw": "■■■■"
+    },
+    {
+      "heroId": 99236,
+      "nameKr": "맥&긴주",
+      "nameCn": "小刀马克&忍者Ginzu",
+      "nameEn": "Mack&Ginzu",
+      "charImageId": 99236,
+      "cvNameRaw": "■■■■"
+    },
+    {
+      "heroId": 99237,
+      "nameKr": "엔야",
+      "nameCn": "恩雅",
+      "nameEn": "Enya",
+      "charImageId": 99237,
+      "cvNameRaw": "井上喜久子"
+    },
+    {
+      "heroId": 99238,
+      "nameKr": "아리아",
+      "nameCn": "阿莉娅",
+      "nameEn": "Alia",
+      "charImageId": 99238,
+      "cvNameRaw": "富田美忧"
+    },
+    {
+      "heroId": 99239,
+      "nameKr": "이리아",
+      "nameCn": "伊莉娅",
+      "nameEn": "Ilia",
+      "charImageId": 99239,
+      "cvNameRaw": "日笠阳子"
+    },
+    {
+      "heroId": 99240,
+      "nameKr": "사프린",
+      "nameCn": "萨芙琳",
+      "nameEn": "Safreen",
+      "charImageId": 99240,
+      "cvNameRaw": "长绳麻理亚"
+    },
+    {
+      "heroId": 99241,
+      "nameKr": "노노린",
+      "nameCn": "诺诺琳",
+      "nameEn": "Nornorin",
+      "charImageId": 99241,
+      "cvNameRaw": "濑户麻沙美"
+    },
+    {
+      "heroId": 99242,
+      "nameKr": "염룡파멸자",
+      "nameCn": "炎龙破灭者",
+      "nameEn": "Dragonslayer",
+      "charImageId": 99242,
+      "cvNameRaw": "最上嗣生"
+    },
+    {
+      "heroId": 99243,
+      "nameKr": "날개 꺾인 새",
+      "nameCn": "断翼鸟",
+      "nameEn": "Hibiscus",
+      "charImageId": 99243,
+      "cvNameRaw": "市之濑加那"
+    },
+    {
+      "heroId": 99244,
+      "nameKr": "란델",
+      "nameCn": "兰黛尔",
+      "nameEn": "Randele",
+      "charImageId": 99244,
+      "cvNameRaw": "村田知沙"
+    },
+    {
+      "heroId": 99245,
+      "nameKr": "마리 로즈",
+      "nameCn": "玛莉·萝丝",
+      "nameEn": "Marie Rose",
+      "charImageId": 99245,
+      "cvNameRaw": "相沢舞"
+    },
+    {
+      "heroId": 99246,
+      "nameKr": "뇨텐구",
+      "nameCn": "女天狗",
+      "nameEn": "Nyotengu",
+      "charImageId": 99246,
+      "cvNameRaw": "佐藤朱"
+    },
+    {
+      "heroId": 99247,
+      "nameKr": "카스미",
+      "nameCn": "霞",
+      "nameEn": "Kasumi",
+      "charImageId": 99247,
+      "cvNameRaw": "桑岛法子"
+    },
+    {
+      "heroId": 99248,
+      "nameKr": "시엘나",
+      "nameCn": "席尔娜",
+      "nameEn": "Sylrna",
+      "charImageId": 99248,
+      "cvNameRaw": "小泽亚李"
+    },
+    {
+      "heroId": 99249,
+      "nameKr": "마카엘라",
+      "nameCn": "玛卡艾拉",
+      "nameEn": "Macaera",
+      "charImageId": 99249,
+      "cvNameRaw": "石上静香"
+    },
+    {
+      "heroId": 99250,
+      "nameKr": "샘",
+      "nameCn": "塞姆",
+      "nameEn": "Shem",
+      "charImageId": 99250,
+      "cvNameRaw": "细谷佳正"
+    },
+    {
+      "heroId": 99251,
+      "nameKr": "마안의 서큐버스",
+      "nameCn": "幽瞳幻惑使",
+      "nameEn": "Gazesuccubus",
+      "charImageId": 99251,
+      "cvNameRaw": "寺依沙织"
+    },
+    {
+      "heroId": 99252,
+      "nameKr": "루크만",
+      "nameCn": "鲁克曼",
+      "nameEn": "Lukhmaan",
+      "charImageId": 99252,
+      "cvNameRaw": "东地宏树"
+    },
+    {
+      "heroId": 99253,
+      "nameKr": "아브샤이트",
+      "nameCn": "阿布沙伊特",
+      "nameEn": "Abishai",
+      "charImageId": 99253,
+      "cvNameRaw": "渡边明乃"
+    },
+    {
+      "heroId": 99254,
+      "nameKr": "레이아",
+      "nameCn": "蕾雅",
+      "nameEn": "Reah",
+      "charImageId": 99254,
+      "cvNameRaw": "远藤绫"
+    },
+    {
+      "heroId": 99255,
+      "nameKr": "엘비스",
+      "nameCn": "埃尔维斯",
+      "nameEn": "Elvis",
+      "charImageId": 99255,
+      "cvNameRaw": "伊东健人"
+    },
+    {
+      "heroId": 99256,
+      "nameKr": "엘자",
+      "nameCn": "艾露莎",
+      "nameEn": "Erza",
+      "charImageId": 99256,
+      "cvNameRaw": "大原沙耶香"
+    },
+    {
+      "heroId": 99257,
+      "nameKr": "루시",
+      "nameCn": "露西",
+      "nameEn": "Lucy",
+      "charImageId": 99257,
+      "cvNameRaw": "平野綾"
+    },
+    {
+      "heroId": 99258,
+      "nameKr": "나츠",
+      "nameCn": "纳兹",
+      "nameEn": "Natsu",
+      "charImageId": 99258,
+      "cvNameRaw": "柿原彻也"
+    },
+    {
+      "heroId": 99259,
+      "nameKr": "레이피어",
+      "nameCn": "蕾贝尔",
+      "nameEn": "Rapier",
+      "charImageId": 99259,
+      "cvNameRaw": "伊藤静"
+    },
+    {
+      "heroId": 99260,
+      "nameKr": "샤리크",
+      "nameCn": "沙里克",
+      "nameEn": "Sharikh",
+      "charImageId": 99260,
+      "cvNameRaw": "古川慎"
+    },
+    {
+      "heroId": 99261,
+      "nameKr": "훔바바",
+      "nameCn": "蝴姆巴巴",
+      "nameEn": "Humbaba",
+      "charImageId": 99261,
+      "cvNameRaw": "石川由依"
+    },
+    {
+      "heroId": 99262,
+      "nameKr": "비앙카",
+      "nameCn": "贝安卡",
+      "nameEn": "Bianca",
+      "charImageId": 99262,
+      "cvNameRaw": "田中爱美"
+    },
+    {
+      "heroId": 99263,
+      "nameKr": "키벨레",
+      "nameCn": "西布莉",
+      "nameEn": "Cybele",
+      "charImageId": 99263,
+      "cvNameRaw": "生天目仁美"
+    },
+    {
+      "heroId": 99264,
+      "nameKr": "빛과 어둠의 반역자",
+      "nameCn": "辉黯逆命者",
+      "nameEn": "HeavenDefier",
+      "charImageId": 99264,
+      "cvNameRaw": "佐藤美由希"
+    },
+    {
+      "heroId": 99265,
+      "nameKr": "레이가",
+      "nameCn": "黎加",
+      "nameEn": "Reiga",
+      "charImageId": 99265,
+      "cvNameRaw": "小野大辅"
+    },
+    {
+      "heroId": 99266,
+      "nameKr": "생거",
+      "nameCn": "桑格",
+      "nameEn": "Sanger",
+      "charImageId": 99266,
+      "cvNameRaw": "阿部里果"
+    },
+    {
+      "heroId": 99267,
+      "nameKr": "라이잘린 스타우트",
+      "nameCn": "莱莎琳·斯托特",
+      "nameEn": "Reisalin Stout",
+      "charImageId": 99267,
+      "cvNameRaw": "野口百合"
+    },
+    {
+      "heroId": 99268,
+      "nameKr": "릴라 디자이어스",
+      "nameCn": "莉拉·德西亚斯",
+      "nameEn": "Lila Decyrus",
+      "charImageId": 99268,
+      "cvNameRaw": "照井春佳"
+    },
+    {
+      "heroId": 99269,
+      "nameKr": "클라우디아 발렌츠",
+      "nameCn": "科洛蒂娅·巴兰茨",
+      "nameEn": "Klaudia Valentz",
+      "charImageId": 99269,
+      "cvNameRaw": "大和田仁美"
+    },
+    {
+      "heroId": 99270,
+      "nameKr": "타지",
+      "nameCn": "达奇",
+      "nameEn": "Taj",
+      "charImageId": 99270,
+      "cvNameRaw": "井上麻里奈"
+    },
+    {
+      "heroId": 99271,
+      "nameKr": "린",
+      "nameCn": "琳",
+      "nameEn": "Lynn",
+      "charImageId": 99271,
+      "cvNameRaw": "优木加奈"
+    },
+    {
+      "heroId": 99272,
+      "nameKr": "무닝",
+      "nameCn": "穆宁",
+      "nameEn": "Mullin",
+      "charImageId": 99272,
+      "cvNameRaw": "户松遥"
+    },
+    {
+      "heroId": 99273,
+      "nameKr": "태초의 젤다",
+      "nameCn": "初真泽瑞达",
+      "nameEn": "PureZalrahda",
+      "charImageId": 99273,
+      "cvNameRaw": "西田望见"
+    },
+    {
+      "heroId": 99274,
+      "nameKr": "란카",
+      "nameCn": "兰卡",
+      "nameEn": "Ranka",
+      "charImageId": 99274,
+      "cvNameRaw": "若山诗音"
+    },
+    {
+      "heroId": 99275,
+      "nameKr": "아오라",
+      "nameCn": "奥拉",
+      "nameEn": "Ora",
+      "charImageId": 99275,
+      "cvNameRaw": "钉宫理惠"
+    },
+    {
+      "heroId": 99276,
+      "nameKr": "아이바 미유키",
+      "nameCn": "相羽美雪",
+      "nameEn": "Miyuki",
+      "charImageId": 99276,
+      "cvNameRaw": "■■■■"
+    },
+    {
+      "heroId": 99277,
+      "nameKr": "D-BOY",
+      "nameCn": "迪波威",
+      "nameEn": "D-Boy",
+      "charImageId": 99277,
+      "cvNameRaw": "森川智之"
+    },
+    {
+      "heroId": 99278,
+      "nameKr": "아이바 신야",
+      "nameCn": "相羽新也",
+      "nameEn": "Shinya",
+      "charImageId": 99278,
+      "cvNameRaw": "子安武人"
+    },
+    {
+      "heroId": 99279,
+      "nameKr": "아시",
+      "nameCn": "雅希",
+      "nameEn": "Ashi",
+      "charImageId": 99279,
+      "cvNameRaw": "伊藤美来"
+    },
+    {
+      "heroId": 99280,
+      "nameKr": "사륜",
+      "nameCn": "沙律",
+      "nameEn": "Sallune",
+      "charImageId": 99280,
+      "cvNameRaw": "杉山纪彰"
+    },
+    {
+      "heroId": 99281,
+      "nameKr": "효랑어홍사",
+      "nameCn": "骁浪驭虹使",
+      "nameEn": "TidalVindicator",
+      "charImageId": 99281,
+      "cvNameRaw": "天海由梨奈"
+    },
+    {
+      "heroId": 99282,
+      "nameKr": "은(밴시)",
+      "nameCn": "狺",
+      "nameEn": "Banshee",
+      "charImageId": 99282,
+      "cvNameRaw": "丰口惠美"
+    },
+    {
+      "heroId": 99283,
+      "nameKr": "아윈(쿠모)",
+      "nameCn": "阿云",
+      "nameEn": "Kumo",
+      "charImageId": 99283,
+      "cvNameRaw": "高田忧希"
+    },
+    {
+      "heroId": 99284,
+      "nameKr": "야차왕 가이",
+      "nameCn": "夜叉王凯",
+      "nameEn": "Gai",
+      "charImageId": 99284,
+      "cvNameRaw": "子安武人"
+    },
+    {
+      "heroId": 99285,
+      "nameKr": "수라왕 슈라토",
+      "nameCn": "修罗王秋亚人",
+      "nameEn": "Shurato",
+      "charImageId": 99285,
+      "cvNameRaw": "关俊彦"
+    },
+    {
+      "heroId": 99286,
+      "nameKr": "가루다왕 레이가",
+      "nameCn": "迦楼罗王力伽",
+      "nameEn": "Reiga",
+      "charImageId": 99286,
+      "cvNameRaw": "井上和彦"
+    },
+    {
+      "heroId": 99287,
+      "nameKr": "마검의 화신",
+      "nameCn": "魔骸剑使",
+      "nameEn": "Necroblade",
+      "charImageId": 99287,
+      "cvNameRaw": "羊宫妃那"
+    }
+  ],
+  "structuralErrors": []
+}
