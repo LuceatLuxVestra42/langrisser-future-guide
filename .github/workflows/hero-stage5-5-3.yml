@@ -1,0 +1,65 @@
+name: Hero Stage 5-5-3 integrated output
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-5-3.yml'
+      - 'scripts/build_hero_page_stage5_5_3.cjs'
+      - 'scripts/validate_hero_page_stage5_5_3.cjs'
+      - 'data/contracts/hero-page-stage5-5-3-output-contract.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/validation/hero-page-stage5-5-2-rarity.v1.json'
+      - 'data/validation/hero-page-stage5-5-2-factions.v1.json'
+      - 'data/validation/hero-page-stage5-5-2-cv.v1.json'
+      - 'data/validation/hero-page-stage5-5-2-origin.v1.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataCharImageInfo.json'
+      - 'data/configdata/ConfigDataHeroSkinInfo.json'
+      - 'data/configdata/ConfigDataCharImageSkinResourceInfo.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate integrated 267-Hero output
+        run: node scripts/build_hero_page_stage5_5_3.cjs
+
+      - name: Validate full Stage 5-5-3 contract
+        run: node scripts/validate_hero_page_stage5_5_3.cjs
+
+      - name: Show validation summary
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = 'data/validation/hero-page-stage5-5-3-validation.v1.json';
+          const r = JSON.parse(fs.readFileSync(p, 'utf8'));
+          console.log(JSON.stringify({
+            status: r.status,
+            completion: r.completion,
+            summary: r.summary,
+            invariants: r.invariants,
+            errorCount: r.errors.length,
+            warningCount: r.warnings.length
+          }, null, 2));
+          if (r.status !== 'PASS') process.exit(1);
+          NODE
+
+      - name: Freeze Stage 5-5-3 outputs
+        run: |
+          TARGET1='data/hero-page-stage5-5-3.v1.json'
+          TARGET2='data/validation/hero-page-stage5-5-3-validation.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET1" "$TARGET2")" ]; then
+            echo 'Stage 5-5-3 outputs already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$TARGET1" "$TARGET2"
+          git commit -m 'Freeze Hero Stage 5-5-3 integrated output'
+          git push
