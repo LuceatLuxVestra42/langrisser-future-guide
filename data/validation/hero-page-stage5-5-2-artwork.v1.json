@@ -1,0 +1,3822 @@
+{
+  "version": 1,
+  "status": "REVIEW",
+  "purpose": "Determine final static Hero-detail artwork field and distinguish it from thumbnails and Spine resources.",
+  "sourceJoin": "ConfigDataHeroInfo.CharImage_ID -> ConfigDataCharImageInfo.ID",
+  "designRequirement": "Hero detail header uses a large Hero illustration; skin navigation should swap to the corresponding skin illustration.",
+  "coverage": {
+    "canonicalHeroCount": 267,
+    "resolvedBaseCharImageRows": 267,
+    "missingHeroInfoIds": [],
+    "duplicateHeroInfoIds": [],
+    "invalidCharImagePointerHeroIds": [],
+    "unresolvedCharImagePointers": [],
+    "duplicateCharImageIdsUsed": [],
+    "heroSkinInfoRows": 565,
+    "resolvedSkinCharImageRows": 54,
+    "invalidSkinResourceIds": [],
+    "unresolvedSkinResourceIds": [
+      {
+        "skinId": 1501,
+        "specifiedHero": 15,
+        "charImageSkinResourceId": 1501
+      },
+      {
+        "skinId": 1401,
+        "specifiedHero": 14,
+        "charImageSkinResourceId": 1401
+      },
+      {
+        "skinId": 1402,
+        "specifiedHero": 14,
+        "charImageSkinResourceId": 1402
+      },
+      {
+        "skinId": 1202,
+        "specifiedHero": 12,
+        "charImageSkinResourceId": 1202
+      },
+      {
+        "skinId": 2501,
+        "specifiedHero": 25,
+        "charImageSkinResourceId": 2501
+      },
+      {
+        "skinId": 2101,
+        "specifiedHero": 21,
+        "charImageSkinResourceId": 2101
+      },
+      {
+        "skinId": 1801,
+        "specifiedHero": 18,
+        "charImageSkinResourceId": 1801
+      },
+      {
+        "skinId": 2601,
+        "specifiedHero": 26,
+        "charImageSkinResourceId": 2601
+      },
+      {
+        "skinId": 5201,
+        "specifiedHero": 52,
+        "charImageSkinResourceId": 5201
+      },
+      {
+        "skinId": 5101,
+        "specifiedHero": 51,
+        "charImageSkinResourceId": 5101
+      },
+      {
+        "skinId": 1301,
+        "specifiedHero": 13,
+        "charImageSkinResourceId": 1301
+      },
+      {
+        "skinId": 4901,
+        "specifiedHero": 49,
+        "charImageSkinResourceId": 4901
+      },
+      {
+        "skinId": 3301,
+        "specifiedHero": 33,
+        "charImageSkinResourceId": 3301
+      },
+      {
+        "skinId": 2602,
+        "specifiedHero": 26,
+        "charImageSkinResourceId": 2602
+      },
+      {
+        "skinId": 2901,
+        "specifiedHero": 29,
+        "charImageSkinResourceId": 2901
+      },
+      {
+        "skinId": 3601,
+        "specifiedHero": 36,
+        "charImageSkinResourceId": 3601
+      },
+      {
+        "skinId": 2801,
+        "specifiedHero": 28,
+        "charImageSkinResourceId": 2801
+      },
+      {
+        "skinId": 2701,
+        "specifiedHero": 27,
+        "charImageSkinResourceId": 2701
+      },
+      {
+        "skinId": 3302,
+        "specifiedHero": 33,
+        "charImageSkinResourceId": 3302
+      },
+      {
+        "skinId": 1701,
+        "specifiedHero": 17,
+        "charImageSkinResourceId": 1701
+      },
+      {
+        "skinId": 2902,
+        "specifiedHero": 29,
+        "charImageSkinResourceId": 2902
+      },
+      {
+        "skinId": 5301,
+        "specifiedHero": 53,
+        "charImageSkinResourceId": 5301
+      },
+      {
+        "skinId": 5401,
+        "specifiedHero": 54,
+        "charImageSkinResourceId": 5401
+      },
+      {
+        "skinId": 1502,
+        "specifiedHero": 15,
+        "charImageSkinResourceId": 1502
+      },
+      {
+        "skinId": 5501,
+        "specifiedHero": 55,
+        "charImageSkinResourceId": 5501
+      },
+      {
+        "skinId": 5601,
+        "specifiedHero": 56,
+        "charImageSkinResourceId": 5601
+      },
+      {
+        "skinId": 1403,
+        "specifiedHero": 14,
+        "charImageSkinResourceId": 1403
+      },
+      {
+        "skinId": 5102,
+        "specifiedHero": 51,
+        "charImageSkinResourceId": 5102
+      },
+      {
+        "skinId": 5202,
+        "specifiedHero": 52,
+        "charImageSkinResourceId": 5202
+      },
+      {
+        "skinId": 1203,
+        "specifiedHero": 12,
+        "charImageSkinResourceId": 1203
+      },
+      {
+        "skinId": 1302,
+        "specifiedHero": 13,
+        "charImageSkinResourceId": 1302
+      },
+      {
+        "skinId": 7001,
+        "specifiedHero": 70,
+        "charImageSkinResourceId": 7001
+      },
+      {
+        "skinId": 2802,
+        "specifiedHero": 28,
+        "charImageSkinResourceId": 2802
+      },
+      {
+        "skinId": 7201,
+        "specifiedHero": 72,
+        "charImageSkinResourceId": 7201
+      },
+      {
+        "skinId": 2502,
+        "specifiedHero": 25,
+        "charImageSkinResourceId": 2502
+      },
+      {
+        "skinId": 6001,
+        "specifiedHero": 60,
+        "charImageSkinResourceId": 6001
+      },
+      {
+        "skinId": 6101,
+        "specifiedHero": 61,
+        "charImageSkinResourceId": 6101
+      },
+      {
+        "skinId": 3201,
+        "specifiedHero": 32,
+        "charImageSkinResourceId": 3201
+      },
+      {
+        "skinId": 5701,
+        "specifiedHero": 57,
+        "charImageSkinResourceId": 5701
+      },
+      {
+        "skinId": 1204,
+        "specifiedHero": 12,
+        "charImageSkinResourceId": 1204
+      },
+      {
+        "skinId": 5402,
+        "specifiedHero": 54,
+        "charImageSkinResourceId": 5402
+      },
+      {
+        "skinId": 5502,
+        "specifiedHero": 55,
+        "charImageSkinResourceId": 5502
+      },
+      {
+        "skinId": 7901,
+        "specifiedHero": 79,
+        "charImageSkinResourceId": 7901
+      },
+      {
+        "skinId": 8001,
+        "specifiedHero": 80,
+        "charImageSkinResourceId": 8001
+      },
+      {
+        "skinId": 8101,
+        "specifiedHero": 81,
+        "charImageSkinResourceId": 8101
+      },
+      {
+        "skinId": 6601,
+        "specifiedHero": 66,
+        "charImageSkinResourceId": 6601
+      },
+      {
+        "skinId": 8801,
+        "specifiedHero": 88,
+        "charImageSkinResourceId": 8801
+      },
+      {
+        "skinId": 2603,
+        "specifiedHero": 26,
+        "charImageSkinResourceId": 2603
+      },
+      {
+        "skinId": 2803,
+        "specifiedHero": 28,
+        "charImageSkinResourceId": 2803
+      },
+      {
+        "skinId": 1503,
+        "specifiedHero": 15,
+        "charImageSkinResourceId": 1503
+      },
+      {
+        "skinId": 6701,
+        "specifiedHero": 67,
+        "charImageSkinResourceId": 6701
+      },
+      {
+        "skinId": 8901,
+        "specifiedHero": 89,
+        "charImageSkinResourceId": 8901
+      },
+      {
+        "skinId": 3701,
+        "specifiedHero": 37,
+        "charImageSkinResourceId": 3701
+      },
+      {
+        "skinId": 2102,
+        "specifiedHero": 21,
+        "charImageSkinResourceId": 2102
+      },
+      {
+        "skinId": 3303,
+        "specifiedHero": 33,
+        "charImageSkinResourceId": 3303
+      },
+      {
+        "skinId": 2903,
+        "specifiedHero": 29,
+        "charImageSkinResourceId": 2903
+      },
+      {
+        "skinId": 2702,
+        "specifiedHero": 27,
+        "charImageSkinResourceId": 2702
+      },
+      {
+        "skinId": 1499,
+        "specifiedHero": 14,
+        "charImageSkinResourceId": 1499
+      },
+      {
+        "skinId": 3901,
+        "specifiedHero": 39,
+        "charImageSkinResourceId": 3901
+      },
+      {
+        "skinId": 5302,
+        "specifiedHero": 53,
+        "charImageSkinResourceId": 5302
+      },
+      {
+        "skinId": 8201,
+        "specifiedHero": 82,
+        "charImageSkinResourceId": 8201
+      },
+      {
+        "skinId": 8401,
+        "specifiedHero": 84,
+        "charImageSkinResourceId": 8401
+      },
+      {
+        "skinId": 8301,
+        "specifiedHero": 83,
+        "charImageSkinResourceId": 8301
+      },
+      {
+        "skinId": 8802,
+        "specifiedHero": 88,
+        "charImageSkinResourceId": 8802
+      },
+      {
+        "skinId": 8701,
+        "specifiedHero": 87,
+        "charImageSkinResourceId": 8701
+      },
+      {
+        "skinId": 6301,
+        "specifiedHero": 63,
+        "charImageSkinResourceId": 6301
+      },
+      {
+        "skinId": 2804,
+        "specifiedHero": 28,
+        "charImageSkinResourceId": 2804
+      },
+      {
+        "skinId": 2201,
+        "specifiedHero": 22,
+        "charImageSkinResourceId": 2201
+      },
+      {
+        "skinId": 2899,
+        "specifiedHero": 28,
+        "charImageSkinResourceId": 2899
+      },
+      {
+        "skinId": 1899,
+        "specifiedHero": 18,
+        "charImageSkinResourceId": 1899
+      },
+      {
+        "skinId": 6102,
+        "specifiedHero": 61,
+        "charImageSkinResourceId": 6102
+      },
+      {
+        "skinId": 9201,
+        "specifiedHero": 92,
+        "charImageSkinResourceId": 9201
+      },
+      {
+        "skinId": 9101,
+        "specifiedHero": 91,
+        "charImageSkinResourceId": 9101
+      },
+      {
+        "skinId": 2904,
+        "specifiedHero": 29,
+        "charImageSkinResourceId": 2904
+      },
+      {
+        "skinId": 5199,
+        "specifiedHero": 51,
+        "charImageSkinResourceId": 5199
+      },
+      {
+        "skinId": 5299,
+        "specifiedHero": 52,
+        "charImageSkinResourceId": 5299
+      },
+      {
+        "skinId": 6501,
+        "specifiedHero": 65,
+        "charImageSkinResourceId": 6501
+      },
+      {
+        "skinId": 9301,
+        "specifiedHero": 93,
+        "charImageSkinResourceId": 9301
+      },
+      {
+        "skinId": 6002,
+        "specifiedHero": 60,
+        "charImageSkinResourceId": 6002
+      },
+      {
+        "skinId": 3801,
+        "specifiedHero": 38,
+        "charImageSkinResourceId": 3801
+      },
+      {
+        "skinId": 3401,
+        "specifiedHero": 34,
+        "charImageSkinResourceId": 3401
+      },
+      {
+        "skinId": 9401,
+        "specifiedHero": 94,
+        "charImageSkinResourceId": 9401
+      },
+      {
+        "skinId": 6401,
+        "specifiedHero": 64,
+        "charImageSkinResourceId": 6401
+      },
+      {
+        "skinId": 6602,
+        "specifiedHero": 66,
+        "charImageSkinResourceId": 6602
+      },
+      {
+        "skinId": 5602,
+        "specifiedHero": 56,
+        "charImageSkinResourceId": 5602
+      },
+      {
+        "skinId": 2503,
+        "specifiedHero": 25,
+        "charImageSkinResourceId": 2503
+      },
+      {
+        "skinId": 94001,
+        "specifiedHero": 40002,
+        "charImageSkinResourceId": 94001
+      },
+      {
+        "skinId": 94002,
+        "specifiedHero": 40003,
+        "charImageSkinResourceId": 94002
+      },
+      {
+        "skinId": 7701,
+        "specifiedHero": 77,
+        "charImageSkinResourceId": 7701
+      },
+      {
+        "skinId": 7501,
+        "specifiedHero": 75,
+        "charImageSkinResourceId": 7501
+      },
+      {
+        "skinId": 5901,
+        "specifiedHero": 59,
+        "charImageSkinResourceId": 5901
+      },
+      {
+        "skinId": 59001,
+        "specifiedHero": 6407,
+        "charImageSkinResourceId": 59001
+      },
+      {
+        "skinId": 59002,
+        "specifiedHero": 6408,
+        "charImageSkinResourceId": 59002
+      },
+      {
+        "skinId": 59003,
+        "specifiedHero": 6410,
+        "charImageSkinResourceId": 59003
+      },
+      {
+        "skinId": 11001,
+        "specifiedHero": 110,
+        "charImageSkinResourceId": 11001
+      },
+      {
+        "skinId": 11101,
+        "specifiedHero": 111,
+        "charImageSkinResourceId": 11101
+      },
+      {
+        "skinId": 8702,
+        "specifiedHero": 87,
+        "charImageSkinResourceId": 8702
+      },
+      {
+        "skinId": 8902,
+        "specifiedHero": 89,
+        "charImageSkinResourceId": 8902
+      },
+      {
+        "skinId": 5801,
+        "specifiedHero": 58,
+        "charImageSkinResourceId": 5801
+      },
+      {
+        "skinId": 5702,
+        "specifiedHero": 57,
+        "charImageSkinResourceId": 5702
+      },
+      {
+        "skinId": 10301,
+        "specifiedHero": 103,
+        "charImageSkinResourceId": 10301
+      },
+      {
+        "skinId": 9701,
+        "specifiedHero": 97,
+        "charImageSkinResourceId": 9701
+      },
+      {
+        "skinId": 5603,
+        "specifiedHero": 56,
+        "charImageSkinResourceId": 5603
+      },
+      {
+        "skinId": 4902,
+        "specifiedHero": 49,
+        "charImageSkinResourceId": 4902
+      },
+      {
+        "skinId": 12501,
+        "specifiedHero": 125,
+        "charImageSkinResourceId": 12501
+      },
+      {
+        "skinId": 12701,
+        "specifiedHero": 127,
+        "charImageSkinResourceId": 12701
+      },
+      {
+        "skinId": 9202,
+        "specifiedHero": 92,
+        "charImageSkinResourceId": 9202
+      },
+      {
+        "skinId": 5303,
+        "specifiedHero": 53,
+        "charImageSkinResourceId": 5303
+      },
+      {
+        "skinId": 13301,
+        "specifiedHero": 133,
+        "charImageSkinResourceId": 13301
+      },
+      {
+        "skinId": 13101,
+        "specifiedHero": 131,
+        "charImageSkinResourceId": 13101
+      },
+      {
+        "skinId": 6702,
+        "specifiedHero": 67,
+        "charImageSkinResourceId": 6702
+      },
+      {
+        "skinId": 3799,
+        "specifiedHero": 37,
+        "charImageSkinResourceId": 3799
+      },
+      {
+        "skinId": 11501,
+        "specifiedHero": 115,
+        "charImageSkinResourceId": 11501
+      },
+      {
+        "skinId": 11601,
+        "specifiedHero": 116,
+        "charImageSkinResourceId": 11601
+      },
+      {
+        "skinId": 9302,
+        "specifiedHero": 93,
+        "charImageSkinResourceId": 9302
+      },
+      {
+        "skinId": 5403,
+        "specifiedHero": 54,
+        "charImageSkinResourceId": 5403
+      },
+      {
+        "skinId": 3501,
+        "specifiedHero": 35,
+        "charImageSkinResourceId": 3501
+      },
+      {
+        "skinId": 8903,
+        "specifiedHero": 89,
+        "charImageSkinResourceId": 8903
+      },
+      {
+        "skinId": 903,
+        "specifiedHero": 9,
+        "charImageSkinResourceId": 903
+      },
+      {
+        "skinId": 9102,
+        "specifiedHero": 91,
+        "charImageSkinResourceId": 9102
+      },
+      {
+        "skinId": 10101,
+        "specifiedHero": 101,
+        "charImageSkinResourceId": 10101
+      },
+      {
+        "skinId": 10201,
+        "specifiedHero": 102,
+        "charImageSkinResourceId": 10201
+      },
+      {
+        "skinId": 2604,
+        "specifiedHero": 26,
+        "charImageSkinResourceId": 2604
+      },
+      {
+        "skinId": 5103,
+        "specifiedHero": 51,
+        "charImageSkinResourceId": 5103
+      },
+      {
+        "skinId": 6302,
+        "specifiedHero": 63,
+        "charImageSkinResourceId": 6302
+      },
+      {
+        "skinId": 8904,
+        "specifiedHero": 89,
+        "charImageSkinResourceId": 8904
+      },
+      {
+        "skinId": 6402,
+        "specifiedHero": 64,
+        "charImageSkinResourceId": 6402
+      },
+      {
+        "skinId": 12001,
+        "specifiedHero": 120,
+        "charImageSkinResourceId": 12001
+      },
+      {
+        "skinId": 12101,
+        "specifiedHero": 121,
+        "charImageSkinResourceId": 12101
+      },
+      {
+        "skinId": 5503,
+        "specifiedHero": 55,
+        "charImageSkinResourceId": 5503
+      },
+      {
+        "skinId": 5203,
+        "specifiedHero": 52,
+        "charImageSkinResourceId": 5203
+      },
+      {
+        "skinId": 13401,
+        "specifiedHero": 134,
+        "charImageSkinResourceId": 13401
+      },
+      {
+        "skinId": 13501,
+        "specifiedHero": 135,
+        "charImageSkinResourceId": 13501
+      },
+      {
+        "skinId": 13601,
+        "specifiedHero": 136,
+        "charImageSkinResourceId": 13601
+      },
+      {
+        "skinId": 6502,
+        "specifiedHero": 65,
+        "charImageSkinResourceId": 6502
+      },
+      {
+        "skinId": 4701,
+        "specifiedHero": 47,
+        "charImageSkinResourceId": 4701
+      },
+      {
+        "skinId": 1504,
+        "specifiedHero": 15,
+        "charImageSkinResourceId": 1504
+      },
+      {
+        "skinId": 10001,
+        "specifiedHero": 100,
+        "charImageSkinResourceId": 10001
+      },
+      {
+        "skinId": 9901,
+        "specifiedHero": 99,
+        "charImageSkinResourceId": 9901
+      },
+      {
+        "skinId": 5604,
+        "specifiedHero": 56,
+        "charImageSkinResourceId": 5604
+      },
+      {
+        "skinId": 9303,
+        "specifiedHero": 93,
+        "charImageSkinResourceId": 9303
+      },
+      {
+        "skinId": 6603,
+        "specifiedHero": 66,
+        "charImageSkinResourceId": 6603
+      },
+      {
+        "skinId": 11002,
+        "specifiedHero": 110,
+        "charImageSkinResourceId": 11002
+      },
+      {
+        "skinId": 11301,
+        "specifiedHero": 113,
+        "charImageSkinResourceId": 11301
+      },
+      {
+        "skinId": 11401,
+        "specifiedHero": 114,
+        "charImageSkinResourceId": 11401
+      },
+      {
+        "skinId": 9402,
+        "specifiedHero": 94,
+        "charImageSkinResourceId": 9402
+      },
+      {
+        "skinId": 94003,
+        "specifiedHero": 40002,
+        "charImageSkinResourceId": 94003
+      },
+      {
+        "skinId": 94004,
+        "specifiedHero": 40003,
+        "charImageSkinResourceId": 94004
+      },
+      {
+        "skinId": 1205,
+        "specifiedHero": 12,
+        "charImageSkinResourceId": 1205
+      },
+      {
+        "skinId": 1404,
+        "specifiedHero": 14,
+        "charImageSkinResourceId": 1404
+      },
+      {
+        "skinId": 12301,
+        "specifiedHero": 123,
+        "charImageSkinResourceId": 12301
+      },
+      {
+        "skinId": 12201,
+        "specifiedHero": 122,
+        "charImageSkinResourceId": 12201
+      },
+      {
+        "skinId": 11102,
+        "specifiedHero": 111,
+        "charImageSkinResourceId": 11102
+      },
+      {
+        "skinId": 5902,
+        "specifiedHero": 59,
+        "charImageSkinResourceId": 5902
+      },
+      {
+        "skinId": 59004,
+        "specifiedHero": 6407,
+        "charImageSkinResourceId": 59004
+      },
+      {
+        "skinId": 59005,
+        "specifiedHero": 6408,
+        "charImageSkinResourceId": 59005
+      },
+      {
+        "skinId": 59006,
+        "specifiedHero": 6410,
+        "charImageSkinResourceId": 59006
+      },
+      {
+        "skinId": 3502,
+        "specifiedHero": 35,
+        "charImageSkinResourceId": 3502
+      },
+      {
+        "skinId": 10302,
+        "specifiedHero": 103,
+        "charImageSkinResourceId": 10302
+      },
+      {
+        "skinId": 6103,
+        "specifiedHero": 61,
+        "charImageSkinResourceId": 6103
+      },
+      {
+        "skinId": 9801,
+        "specifiedHero": 98,
+        "charImageSkinResourceId": 9801
+      },
+      {
+        "skinId": 10801,
+        "specifiedHero": 108,
+        "charImageSkinResourceId": 10801
+      },
+      {
+        "skinId": 2905,
+        "specifiedHero": 29,
+        "charImageSkinResourceId": 2905
+      },
+      {
+        "skinId": 12702,
+        "specifiedHero": 127,
+        "charImageSkinResourceId": 12702
+      },
+      {
+        "skinId": 9702,
+        "specifiedHero": 97,
+        "charImageSkinResourceId": 9702
+      },
+      {
+        "skinId": 3702,
+        "specifiedHero": 37,
+        "charImageSkinResourceId": 3702
+      },
+      {
+        "skinId": 11201,
+        "specifiedHero": 112,
+        "charImageSkinResourceId": 11201
+      },
+      {
+        "skinId": 12601,
+        "specifiedHero": 126,
+        "charImageSkinResourceId": 12601
+      },
+      {
+        "skinId": 12502,
+        "specifiedHero": 125,
+        "charImageSkinResourceId": 12502
+      },
+      {
+        "skinId": 2605,
+        "specifiedHero": 26,
+        "charImageSkinResourceId": 2605
+      },
+      {
+        "skinId": 9916101,
+        "specifiedHero": 99161,
+        "charImageSkinResourceId": 9916101
+      },
+      {
+        "skinId": 10901,
+        "specifiedHero": 109,
+        "charImageSkinResourceId": 10901
+      },
+      {
+        "skinId": 11502,
+        "specifiedHero": 115,
+        "charImageSkinResourceId": 11502
+      },
+      {
+        "skinId": 1601,
+        "specifiedHero": 16,
+        "charImageSkinResourceId": 1601
+      },
+      {
+        "skinId": 8803,
+        "specifiedHero": 88,
+        "charImageSkinResourceId": 8803
+      },
+      {
+        "skinId": 5104,
+        "specifiedHero": 51,
+        "charImageSkinResourceId": 5104
+      },
+      {
+        "skinId": 1405,
+        "specifiedHero": 14,
+        "charImageSkinResourceId": 1405
+      },
+      {
+        "skinId": 14001,
+        "specifiedHero": 140,
+        "charImageSkinResourceId": 14001
+      },
+      {
+        "skinId": 11602,
+        "specifiedHero": 116,
+        "charImageSkinResourceId": 11602
+      },
+      {
+        "skinId": 12202,
+        "specifiedHero": 122,
+        "charImageSkinResourceId": 12202
+      },
+      {
+        "skinId": 3602,
+        "specifiedHero": 36,
+        "charImageSkinResourceId": 3602
+      },
+      {
+        "skinId": 2504,
+        "specifiedHero": 25,
+        "charImageSkinResourceId": 2504
+      },
+      {
+        "skinId": 11801,
+        "specifiedHero": 118,
+        "charImageSkinResourceId": 11801
+      },
+      {
+        "skinId": 11901,
+        "specifiedHero": 119,
+        "charImageSkinResourceId": 11901
+      },
+      {
+        "skinId": 119001,
+        "specifiedHero": 40021,
+        "charImageSkinResourceId": 119001
+      },
+      {
+        "skinId": 10102,
+        "specifiedHero": 101,
+        "charImageSkinResourceId": 10102
+      },
+      {
+        "skinId": 12102,
+        "specifiedHero": 121,
+        "charImageSkinResourceId": 12102
+      },
+      {
+        "skinId": 10202,
+        "specifiedHero": 102,
+        "charImageSkinResourceId": 10202
+      },
+      {
+        "skinId": 10501,
+        "specifiedHero": 105,
+        "charImageSkinResourceId": 10501
+      },
+      {
+        "skinId": 10601,
+        "specifiedHero": 106,
+        "charImageSkinResourceId": 10601
+      },
+      {
+        "skinId": 12002,
+        "specifiedHero": 120,
+        "charImageSkinResourceId": 12002
+      },
+      {
+        "skinId": 12503,
+        "specifiedHero": 125,
+        "charImageSkinResourceId": 12503
+      },
+      {
+        "skinId": 12401,
+        "specifiedHero": 124,
+        "charImageSkinResourceId": 12401
+      },
+      {
+        "skinId": 9916201,
+        "specifiedHero": 99162,
+        "charImageSkinResourceId": 9916201
+      },
+      {
+        "skinId": 9902,
+        "specifiedHero": 99,
+        "charImageSkinResourceId": 9902
+      },
+      {
+        "skinId": 6604,
+        "specifiedHero": 66,
+        "charImageSkinResourceId": 6604
+      },
+      {
+        "skinId": 9703,
+        "specifiedHero": 97,
+        "charImageSkinResourceId": 9703
+      },
+      {
+        "skinId": 2805,
+        "specifiedHero": 28,
+        "charImageSkinResourceId": 2805
+      },
+      {
+        "skinId": 10401,
+        "specifiedHero": 104,
+        "charImageSkinResourceId": 10401
+      },
+      {
+        "skinId": 9916301,
+        "specifiedHero": 99163,
+        "charImageSkinResourceId": 9916301
+      },
+      {
+        "skinId": 11402,
+        "specifiedHero": 114,
+        "charImageSkinResourceId": 11402
+      },
+      {
+        "skinId": 10002,
+        "specifiedHero": 100,
+        "charImageSkinResourceId": 10002
+      },
+      {
+        "skinId": 9501,
+        "specifiedHero": 95,
+        "charImageSkinResourceId": 9501
+      },
+      {
+        "skinId": 10103,
+        "specifiedHero": 101,
+        "charImageSkinResourceId": 10103
+      },
+      {
+        "skinId": 12203,
+        "specifiedHero": 122,
+        "charImageSkinResourceId": 12203
+      },
+      {
+        "skinId": 14301,
+        "specifiedHero": 143,
+        "charImageSkinResourceId": 14301
+      },
+      {
+        "skinId": 14401,
+        "specifiedHero": 144,
+        "charImageSkinResourceId": 14401
+      },
+      {
+        "skinId": 12302,
+        "specifiedHero": 123,
+        "charImageSkinResourceId": 12302
+      },
+      {
+        "skinId": 9203,
+        "specifiedHero": 92,
+        "charImageSkinResourceId": 9203
+      },
+      {
+        "skinId": 9916401,
+        "specifiedHero": 99164,
+        "charImageSkinResourceId": 9916401
+      },
+      {
+        "skinId": 9916501,
+        "specifiedHero": 99165,
+        "charImageSkinResourceId": 9916501
+      },
+      {
+        "skinId": 11202,
+        "specifiedHero": 112,
+        "charImageSkinResourceId": 11202
+      },
+      {
+        "skinId": 1505,
+        "specifiedHero": 15,
+        "charImageSkinResourceId": 1505
+      },
+      {
+        "skinId": 9916801,
+        "specifiedHero": 99168,
+        "charImageSkinResourceId": 9916801
+      },
+      {
+        "skinId": 99168001,
+        "specifiedHero": 40026,
+        "charImageSkinResourceId": 99168001
+      },
+      {
+        "skinId": 9916901,
+        "specifiedHero": 99169,
+        "charImageSkinResourceId": 9916901
+      },
+      {
+        "skinId": 9802,
+        "specifiedHero": 98,
+        "charImageSkinResourceId": 9802
+      },
+      {
+        "skinId": 11302,
+        "specifiedHero": 113,
+        "charImageSkinResourceId": 11302
+      },
+      {
+        "skinId": 6201,
+        "specifiedHero": 62,
+        "charImageSkinResourceId": 6201
+      },
+      {
+        "skinId": 9917001,
+        "specifiedHero": 99170,
+        "charImageSkinResourceId": 9917001
+      },
+      {
+        "skinId": 9917101,
+        "specifiedHero": 99171,
+        "charImageSkinResourceId": 9917101
+      },
+      {
+        "skinId": 12602,
+        "specifiedHero": 126,
+        "charImageSkinResourceId": 12602
+      },
+      {
+        "skinId": 12402,
+        "specifiedHero": 124,
+        "charImageSkinResourceId": 12402
+      },
+      {
+        "skinId": 11303,
+        "specifiedHero": 113,
+        "charImageSkinResourceId": 11303
+      },
+      {
+        "skinId": 9204,
+        "specifiedHero": 92,
+        "charImageSkinResourceId": 9204
+      },
+      {
+        "skinId": 12901,
+        "specifiedHero": 129,
+        "charImageSkinResourceId": 12901
+      },
+      {
+        "skinId": 13001,
+        "specifiedHero": 130,
+        "charImageSkinResourceId": 13001
+      },
+      {
+        "skinId": 10802,
+        "specifiedHero": 108,
+        "charImageSkinResourceId": 10802
+      },
+      {
+        "skinId": 9917201,
+        "specifiedHero": 99172,
+        "charImageSkinResourceId": 9917201
+      },
+      {
+        "skinId": 9917301,
+        "specifiedHero": 99173,
+        "charImageSkinResourceId": 9917301
+      },
+      {
+        "skinId": 9916102,
+        "specifiedHero": 99161,
+        "charImageSkinResourceId": 9916102
+      },
+      {
+        "skinId": 11503,
+        "specifiedHero": 115,
+        "charImageSkinResourceId": 11503
+      },
+      {
+        "skinId": 8905,
+        "specifiedHero": 89,
+        "charImageSkinResourceId": 8905
+      },
+      {
+        "skinId": 14601,
+        "specifiedHero": 146,
+        "charImageSkinResourceId": 14601
+      },
+      {
+        "skinId": 14701,
+        "specifiedHero": 147,
+        "charImageSkinResourceId": 14701
+      },
+      {
+        "skinId": 10003,
+        "specifiedHero": 100,
+        "charImageSkinResourceId": 10003
+      },
+      {
+        "skinId": 11902,
+        "specifiedHero": 119,
+        "charImageSkinResourceId": 11902
+      },
+      {
+        "skinId": 119002,
+        "specifiedHero": 40021,
+        "charImageSkinResourceId": 119002
+      },
+      {
+        "skinId": 12003,
+        "specifiedHero": 120,
+        "charImageSkinResourceId": 12003
+      },
+      {
+        "skinId": 10902,
+        "specifiedHero": 109,
+        "charImageSkinResourceId": 10902
+      },
+      {
+        "skinId": 10104,
+        "specifiedHero": 101,
+        "charImageSkinResourceId": 10104
+      },
+      {
+        "skinId": 9917401,
+        "specifiedHero": 99174,
+        "charImageSkinResourceId": 9917401
+      },
+      {
+        "skinId": 9917501,
+        "specifiedHero": 99175,
+        "charImageSkinResourceId": 9917501
+      },
+      {
+        "skinId": 11802,
+        "specifiedHero": 118,
+        "charImageSkinResourceId": 11802
+      },
+      {
+        "skinId": 9916601,
+        "specifiedHero": 99166,
+        "charImageSkinResourceId": 9916601
+      },
+      {
+        "skinId": 9917601,
+        "specifiedHero": 99176,
+        "charImageSkinResourceId": 9917601
+      },
+      {
+        "skinId": 9917701,
+        "specifiedHero": 99177,
+        "charImageSkinResourceId": 9917701
+      },
+      {
+        "skinId": 9916302,
+        "specifiedHero": 99163,
+        "charImageSkinResourceId": 9916302
+      },
+      {
+        "skinId": 3703,
+        "specifiedHero": 37,
+        "charImageSkinResourceId": 3703
+      },
+      {
+        "skinId": 9917801,
+        "specifiedHero": 99178,
+        "charImageSkinResourceId": 9917801
+      },
+      {
+        "skinId": 9917901,
+        "specifiedHero": 99179,
+        "charImageSkinResourceId": 9917901
+      },
+      {
+        "skinId": 10402,
+        "specifiedHero": 104,
+        "charImageSkinResourceId": 10402
+      },
+      {
+        "skinId": 9916402,
+        "specifiedHero": 99164,
+        "charImageSkinResourceId": 9916402
+      },
+      {
+        "skinId": 11403,
+        "specifiedHero": 114,
+        "charImageSkinResourceId": 11403
+      },
+      {
+        "skinId": 4401,
+        "specifiedHero": 44,
+        "charImageSkinResourceId": 4401
+      },
+      {
+        "skinId": 9918101,
+        "specifiedHero": 99181,
+        "charImageSkinResourceId": 9918101
+      },
+      {
+        "skinId": 9918001,
+        "specifiedHero": 99180,
+        "charImageSkinResourceId": 9918001
+      },
+      {
+        "skinId": 9916802,
+        "specifiedHero": 99168,
+        "charImageSkinResourceId": 9916802
+      },
+      {
+        "skinId": 99168002,
+        "specifiedHero": 40026,
+        "charImageSkinResourceId": 99168002
+      },
+      {
+        "skinId": 10502,
+        "specifiedHero": 105,
+        "charImageSkinResourceId": 10502
+      },
+      {
+        "skinId": 9918301,
+        "specifiedHero": 99183,
+        "charImageSkinResourceId": 9918301
+      },
+      {
+        "skinId": 9918201,
+        "specifiedHero": 99182,
+        "charImageSkinResourceId": 9918201
+      },
+      {
+        "skinId": 9917002,
+        "specifiedHero": 99170,
+        "charImageSkinResourceId": 9917002
+      },
+      {
+        "skinId": 11203,
+        "specifiedHero": 112,
+        "charImageSkinResourceId": 11203
+      },
+      {
+        "skinId": 9917102,
+        "specifiedHero": 99171,
+        "charImageSkinResourceId": 9917102
+      },
+      {
+        "skinId": 6403,
+        "specifiedHero": 64,
+        "charImageSkinResourceId": 6403
+      },
+      {
+        "skinId": 9916202,
+        "specifiedHero": 99162,
+        "charImageSkinResourceId": 9916202
+      },
+      {
+        "skinId": 9918501,
+        "specifiedHero": 99185,
+        "charImageSkinResourceId": 9918501
+      },
+      {
+        "skinId": 9918401,
+        "specifiedHero": 99184,
+        "charImageSkinResourceId": 9918401
+      },
+      {
+        "skinId": 9916902,
+        "specifiedHero": 99169,
+        "charImageSkinResourceId": 9916902
+      },
+      {
+        "skinId": 12603,
+        "specifiedHero": 126,
+        "charImageSkinResourceId": 12603
+      },
+      {
+        "skinId": 5504,
+        "specifiedHero": 55,
+        "charImageSkinResourceId": 5504
+      },
+      {
+        "skinId": 1802,
+        "specifiedHero": 18,
+        "charImageSkinResourceId": 1802
+      },
+      {
+        "skinId": 9918601,
+        "specifiedHero": 99186,
+        "charImageSkinResourceId": 9918601
+      },
+      {
+        "skinId": 9918701,
+        "specifiedHero": 99187,
+        "charImageSkinResourceId": 9918701
+      },
+      {
+        "skinId": 9917302,
+        "specifiedHero": 99173,
+        "charImageSkinResourceId": 9917302
+      },
+      {
+        "skinId": 9916602,
+        "specifiedHero": 99166,
+        "charImageSkinResourceId": 9916602
+      },
+      {
+        "skinId": 11504,
+        "specifiedHero": 115,
+        "charImageSkinResourceId": 11504
+      },
+      {
+        "skinId": 1206,
+        "specifiedHero": 12,
+        "charImageSkinResourceId": 1206
+      },
+      {
+        "skinId": 2906,
+        "specifiedHero": 29,
+        "charImageSkinResourceId": 2906
+      },
+      {
+        "skinId": 1406,
+        "specifiedHero": 14,
+        "charImageSkinResourceId": 1406
+      },
+      {
+        "skinId": 9918801,
+        "specifiedHero": 99188,
+        "charImageSkinResourceId": 9918801
+      },
+      {
+        "skinId": 9918901,
+        "specifiedHero": 99189,
+        "charImageSkinResourceId": 9918901
+      },
+      {
+        "skinId": 12902,
+        "specifiedHero": 129,
+        "charImageSkinResourceId": 12902
+      },
+      {
+        "skinId": 9919001,
+        "specifiedHero": 99190,
+        "charImageSkinResourceId": 9919001
+      },
+      {
+        "skinId": 9919101,
+        "specifiedHero": 99191,
+        "charImageSkinResourceId": 9919101
+      },
+      {
+        "skinId": 9917202,
+        "specifiedHero": 99172,
+        "charImageSkinResourceId": 9917202
+      },
+      {
+        "skinId": 11903,
+        "specifiedHero": 119,
+        "charImageSkinResourceId": 11903
+      },
+      {
+        "skinId": 119003,
+        "specifiedHero": 40021,
+        "charImageSkinResourceId": 119003
+      },
+      {
+        "skinId": 9919201,
+        "specifiedHero": 99192,
+        "charImageSkinResourceId": 9919201
+      },
+      {
+        "skinId": 9919301,
+        "specifiedHero": 99193,
+        "charImageSkinResourceId": 9919301
+      },
+      {
+        "skinId": 99193001,
+        "specifiedHero": 40030,
+        "charImageSkinResourceId": 99193001
+      },
+      {
+        "skinId": 13002,
+        "specifiedHero": 130,
+        "charImageSkinResourceId": 13002
+      },
+      {
+        "skinId": 10602,
+        "specifiedHero": 106,
+        "charImageSkinResourceId": 10602
+      },
+      {
+        "skinId": 1702,
+        "specifiedHero": 17,
+        "charImageSkinResourceId": 1702
+      },
+      {
+        "skinId": 9919501,
+        "specifiedHero": 99195,
+        "charImageSkinResourceId": 9919501
+      },
+      {
+        "skinId": 9919601,
+        "specifiedHero": 99196,
+        "charImageSkinResourceId": 9919601
+      },
+      {
+        "skinId": 9917502,
+        "specifiedHero": 99175,
+        "charImageSkinResourceId": 9917502
+      },
+      {
+        "skinId": 10105,
+        "specifiedHero": 101,
+        "charImageSkinResourceId": 10105
+      },
+      {
+        "skinId": 12403,
+        "specifiedHero": 124,
+        "charImageSkinResourceId": 12403
+      },
+      {
+        "skinId": 9919701,
+        "specifiedHero": 99197,
+        "charImageSkinResourceId": 9919701
+      },
+      {
+        "skinId": 9917402,
+        "specifiedHero": 99174,
+        "charImageSkinResourceId": 9917402
+      },
+      {
+        "skinId": 9917602,
+        "specifiedHero": 99176,
+        "charImageSkinResourceId": 9917602
+      },
+      {
+        "skinId": 9917103,
+        "specifiedHero": 99171,
+        "charImageSkinResourceId": 9917103
+      },
+      {
+        "skinId": 9917303,
+        "specifiedHero": 99173,
+        "charImageSkinResourceId": 9917303
+      },
+      {
+        "skinId": 9917702,
+        "specifiedHero": 99177,
+        "charImageSkinResourceId": 9917702
+      },
+      {
+        "skinId": 9919801,
+        "specifiedHero": 99198,
+        "charImageSkinResourceId": 9919801
+      },
+      {
+        "skinId": 9919901,
+        "specifiedHero": 99199,
+        "charImageSkinResourceId": 9919901
+      },
+      {
+        "skinId": 99199001,
+        "specifiedHero": 40032,
+        "charImageSkinResourceId": 99199001
+      },
+      {
+        "skinId": 9917802,
+        "specifiedHero": 99178,
+        "charImageSkinResourceId": 9917802
+      },
+      {
+        "skinId": 9903,
+        "specifiedHero": 99,
+        "charImageSkinResourceId": 9903
+      },
+      {
+        "skinId": 9920001,
+        "specifiedHero": 99200,
+        "charImageSkinResourceId": 9920001
+      },
+      {
+        "skinId": 9920101,
+        "specifiedHero": 99201,
+        "charImageSkinResourceId": 9920101
+      },
+      {
+        "skinId": 9917902,
+        "specifiedHero": 99179,
+        "charImageSkinResourceId": 9917902
+      },
+      {
+        "skinId": 9916403,
+        "specifiedHero": 99164,
+        "charImageSkinResourceId": 9916403
+      },
+      {
+        "skinId": 9916701,
+        "specifiedHero": 99167,
+        "charImageSkinResourceId": 9916701
+      },
+      {
+        "skinId": 9920301,
+        "specifiedHero": 99203,
+        "charImageSkinResourceId": 9920301
+      },
+      {
+        "skinId": 9920401,
+        "specifiedHero": 99204,
+        "charImageSkinResourceId": 9920401
+      },
+      {
+        "skinId": 9918002,
+        "specifiedHero": 99180,
+        "charImageSkinResourceId": 9918002
+      },
+      {
+        "skinId": 12204,
+        "specifiedHero": 122,
+        "charImageSkinResourceId": 12204
+      },
+      {
+        "skinId": 2806,
+        "specifiedHero": 28,
+        "charImageSkinResourceId": 2806
+      },
+      {
+        "skinId": 9920501,
+        "specifiedHero": 99205,
+        "charImageSkinResourceId": 9920501
+      },
+      {
+        "skinId": 9920601,
+        "specifiedHero": 99206,
+        "charImageSkinResourceId": 9920601
+      },
+      {
+        "skinId": 9918102,
+        "specifiedHero": 99181,
+        "charImageSkinResourceId": 9918102
+      },
+      {
+        "skinId": 9918802,
+        "specifiedHero": 99188,
+        "charImageSkinResourceId": 9918802
+      },
+      {
+        "skinId": 9920701,
+        "specifiedHero": 99207,
+        "charImageSkinResourceId": 9920701
+      },
+      {
+        "skinId": 9920801,
+        "specifiedHero": 99208,
+        "charImageSkinResourceId": 9920801
+      },
+      {
+        "skinId": 9918502,
+        "specifiedHero": 99185,
+        "charImageSkinResourceId": 9918502
+      },
+      {
+        "skinId": 9916502,
+        "specifiedHero": 99165,
+        "charImageSkinResourceId": 9916502
+      },
+      {
+        "skinId": 6605,
+        "specifiedHero": 66,
+        "charImageSkinResourceId": 6605
+      },
+      {
+        "skinId": 9920901,
+        "specifiedHero": 99209,
+        "charImageSkinResourceId": 9920901
+      },
+      {
+        "skinId": 9921101,
+        "specifiedHero": 99211,
+        "charImageSkinResourceId": 9921101
+      },
+      {
+        "skinId": 9918302,
+        "specifiedHero": 99183,
+        "charImageSkinResourceId": 9918302
+      },
+      {
+        "skinId": 1901,
+        "specifiedHero": 19,
+        "charImageSkinResourceId": 1901
+      },
+      {
+        "skinId": 10903,
+        "specifiedHero": 109,
+        "charImageSkinResourceId": 10903
+      },
+      {
+        "skinId": 8906,
+        "specifiedHero": 89,
+        "charImageSkinResourceId": 8906
+      },
+      {
+        "skinId": 5105,
+        "specifiedHero": 51,
+        "charImageSkinResourceId": 5105
+      },
+      {
+        "skinId": 9917403,
+        "specifiedHero": 99174,
+        "charImageSkinResourceId": 9917403
+      },
+      {
+        "skinId": 9921201,
+        "specifiedHero": 99212,
+        "charImageSkinResourceId": 9921201
+      },
+      {
+        "skinId": 9921301,
+        "specifiedHero": 99213,
+        "charImageSkinResourceId": 9921301
+      },
+      {
+        "skinId": 9918402,
+        "specifiedHero": 99184,
+        "charImageSkinResourceId": 9918402
+      },
+      {
+        "skinId": 4801,
+        "specifiedHero": 48,
+        "charImageSkinResourceId": 4801
+      },
+      {
+        "skinId": 1506,
+        "specifiedHero": 15,
+        "charImageSkinResourceId": 1506
+      },
+      {
+        "skinId": 5204,
+        "specifiedHero": 52,
+        "charImageSkinResourceId": 5204
+      },
+      {
+        "skinId": 5404,
+        "specifiedHero": 54,
+        "charImageSkinResourceId": 5404
+      },
+      {
+        "skinId": 9921401,
+        "specifiedHero": 99214,
+        "charImageSkinResourceId": 9921401
+      },
+      {
+        "skinId": 9921501,
+        "specifiedHero": 99215,
+        "charImageSkinResourceId": 9921501
+      },
+      {
+        "skinId": 9918202,
+        "specifiedHero": 99182,
+        "charImageSkinResourceId": 9918202
+      },
+      {
+        "skinId": 1407,
+        "specifiedHero": 14,
+        "charImageSkinResourceId": 1407
+      },
+      {
+        "skinId": 6104,
+        "specifiedHero": 61,
+        "charImageSkinResourceId": 6104
+      },
+      {
+        "skinId": 3902,
+        "specifiedHero": 39,
+        "charImageSkinResourceId": 3902
+      },
+      {
+        "skinId": 9921601,
+        "specifiedHero": 99216,
+        "charImageSkinResourceId": 9921601
+      },
+      {
+        "skinId": 9921701,
+        "specifiedHero": 99217,
+        "charImageSkinResourceId": 9921701
+      },
+      {
+        "skinId": 9918602,
+        "specifiedHero": 99186,
+        "charImageSkinResourceId": 9918602
+      },
+      {
+        "skinId": 10503,
+        "specifiedHero": 105,
+        "charImageSkinResourceId": 10503
+      },
+      {
+        "skinId": 5505,
+        "specifiedHero": 55,
+        "charImageSkinResourceId": 5505
+      },
+      {
+        "skinId": 9921801,
+        "specifiedHero": 99218,
+        "charImageSkinResourceId": 9921801
+      },
+      {
+        "skinId": 9921901,
+        "specifiedHero": 99219,
+        "charImageSkinResourceId": 9921901
+      },
+      {
+        "skinId": 9918803,
+        "specifiedHero": 99188,
+        "charImageSkinResourceId": 9918803
+      },
+      {
+        "skinId": 9919202,
+        "specifiedHero": 99192,
+        "charImageSkinResourceId": 9919202
+      },
+      {
+        "skinId": 4301,
+        "specifiedHero": 43,
+        "charImageSkinResourceId": 4301
+      },
+      {
+        "skinId": 6703,
+        "specifiedHero": 67,
+        "charImageSkinResourceId": 6703
+      },
+      {
+        "skinId": 9922001,
+        "specifiedHero": 99220,
+        "charImageSkinResourceId": 9922001
+      },
+      {
+        "skinId": 9922101,
+        "specifiedHero": 99221,
+        "charImageSkinResourceId": 9922101
+      },
+      {
+        "skinId": 9918702,
+        "specifiedHero": 99187,
+        "charImageSkinResourceId": 9918702
+      },
+      {
+        "skinId": 9922301,
+        "specifiedHero": 99223,
+        "charImageSkinResourceId": 9922301
+      },
+      {
+        "skinId": 9922201,
+        "specifiedHero": 99222,
+        "charImageSkinResourceId": 9922201
+      },
+      {
+        "skinId": 9918902,
+        "specifiedHero": 99189,
+        "charImageSkinResourceId": 9918902
+      },
+      {
+        "skinId": 9916803,
+        "specifiedHero": 99168,
+        "charImageSkinResourceId": 9916803
+      },
+      {
+        "skinId": 99168003,
+        "specifiedHero": 40026,
+        "charImageSkinResourceId": 99168003
+      },
+      {
+        "skinId": 9919002,
+        "specifiedHero": 99190,
+        "charImageSkinResourceId": 9919002
+      },
+      {
+        "skinId": 9919702,
+        "specifiedHero": 99197,
+        "charImageSkinResourceId": 9919702
+      },
+      {
+        "skinId": 9918503,
+        "specifiedHero": 99185,
+        "charImageSkinResourceId": 9918503
+      },
+      {
+        "skinId": 1207,
+        "specifiedHero": 12,
+        "charImageSkinResourceId": 1207
+      },
+      {
+        "skinId": 1507,
+        "specifiedHero": 15,
+        "charImageSkinResourceId": 1507
+      },
+      {
+        "skinId": 9917503,
+        "specifiedHero": 99175,
+        "charImageSkinResourceId": 9917503
+      },
+      {
+        "skinId": 2301,
+        "specifiedHero": 23,
+        "charImageSkinResourceId": 2301
+      },
+      {
+        "skinId": 9922501,
+        "specifiedHero": 99225,
+        "charImageSkinResourceId": 9922501
+      },
+      {
+        "skinId": 9922601,
+        "specifiedHero": 99226,
+        "charImageSkinResourceId": 9922601
+      },
+      {
+        "skinId": 9922701,
+        "specifiedHero": 99227,
+        "charImageSkinResourceId": 9922701
+      },
+      {
+        "skinId": 9920302,
+        "specifiedHero": 99203,
+        "charImageSkinResourceId": 9920302
+      },
+      {
+        "skinId": 9916603,
+        "specifiedHero": 99166,
+        "charImageSkinResourceId": 9916603
+      },
+      {
+        "skinId": 9922801,
+        "specifiedHero": 99228,
+        "charImageSkinResourceId": 9922801
+      },
+      {
+        "skinId": 9922901,
+        "specifiedHero": 99229,
+        "charImageSkinResourceId": 9922901
+      },
+      {
+        "skinId": 9920602,
+        "specifiedHero": 99206,
+        "charImageSkinResourceId": 9920602
+      },
+      {
+        "skinId": 11603,
+        "specifiedHero": 116,
+        "charImageSkinResourceId": 11603
+      },
+      {
+        "skinId": 9923001,
+        "specifiedHero": 99230,
+        "charImageSkinResourceId": 9923001
+      },
+      {
+        "skinId": 9923101,
+        "specifiedHero": 99231,
+        "charImageSkinResourceId": 9923101
+      },
+      {
+        "skinId": 9919302,
+        "specifiedHero": 99193,
+        "charImageSkinResourceId": 9919302
+      },
+      {
+        "skinId": 99193002,
+        "specifiedHero": 40030,
+        "charImageSkinResourceId": 99193002
+      },
+      {
+        "skinId": 9923201,
+        "specifiedHero": 99232,
+        "charImageSkinResourceId": 9923201
+      },
+      {
+        "skinId": 99232001,
+        "specifiedHero": 40038,
+        "charImageSkinResourceId": 99232001
+      },
+      {
+        "skinId": 99232002,
+        "specifiedHero": 40039,
+        "charImageSkinResourceId": 99232002
+      },
+      {
+        "skinId": 99232003,
+        "specifiedHero": 40040,
+        "charImageSkinResourceId": 99232003
+      },
+      {
+        "skinId": 99232004,
+        "specifiedHero": 40041,
+        "charImageSkinResourceId": 99232004
+      },
+      {
+        "skinId": 9919902,
+        "specifiedHero": 99199,
+        "charImageSkinResourceId": 9919902
+      },
+      {
+        "skinId": 99199002,
+        "specifiedHero": 40032,
+        "charImageSkinResourceId": 99199002
+      },
+      {
+        "skinId": 9918403,
+        "specifiedHero": 99184,
+        "charImageSkinResourceId": 9918403
+      },
+      {
+        "skinId": 9923301,
+        "specifiedHero": 99233,
+        "charImageSkinResourceId": 9923301
+      },
+      {
+        "skinId": 9923401,
+        "specifiedHero": 99234,
+        "charImageSkinResourceId": 9923401
+      },
+      {
+        "skinId": 11103,
+        "specifiedHero": 111,
+        "charImageSkinResourceId": 11103
+      },
+      {
+        "skinId": 9917903,
+        "specifiedHero": 99179,
+        "charImageSkinResourceId": 9917903
+      },
+      {
+        "skinId": 12205,
+        "specifiedHero": 122,
+        "charImageSkinResourceId": 12205
+      },
+      {
+        "skinId": 9919102,
+        "specifiedHero": 99191,
+        "charImageSkinResourceId": 9919102
+      },
+      {
+        "skinId": 9919203,
+        "specifiedHero": 99192,
+        "charImageSkinResourceId": 9919203
+      },
+      {
+        "skinId": 9918703,
+        "specifiedHero": 99187,
+        "charImageSkinResourceId": 9918703
+      },
+      {
+        "skinId": 9923701,
+        "specifiedHero": 99237,
+        "charImageSkinResourceId": 9923701
+      },
+      {
+        "skinId": 9920402,
+        "specifiedHero": 99204,
+        "charImageSkinResourceId": 9920402
+      },
+      {
+        "skinId": 9918603,
+        "specifiedHero": 99186,
+        "charImageSkinResourceId": 9918603
+      },
+      {
+        "skinId": 9917703,
+        "specifiedHero": 99177,
+        "charImageSkinResourceId": 9917703
+      },
+      {
+        "skinId": 2202,
+        "specifiedHero": 22,
+        "charImageSkinResourceId": 2202
+      },
+      {
+        "skinId": 9919703,
+        "specifiedHero": 99197,
+        "charImageSkinResourceId": 9919703
+      },
+      {
+        "skinId": 9919802,
+        "specifiedHero": 99198,
+        "charImageSkinResourceId": 9919802
+      },
+      {
+        "skinId": 9923901,
+        "specifiedHero": 99239,
+        "charImageSkinResourceId": 9923901
+      },
+      {
+        "skinId": 9923801,
+        "specifiedHero": 99238,
+        "charImageSkinResourceId": 9923801
+      },
+      {
+        "skinId": 9924001,
+        "specifiedHero": 99240,
+        "charImageSkinResourceId": 9924001
+      },
+      {
+        "skinId": 9924101,
+        "specifiedHero": 99241,
+        "charImageSkinResourceId": 9924101
+      },
+      {
+        "skinId": 9922902,
+        "specifiedHero": 99229,
+        "charImageSkinResourceId": 9922902
+      },
+      {
+        "skinId": 9920502,
+        "specifiedHero": 99205,
+        "charImageSkinResourceId": 9920502
+      },
+      {
+        "skinId": 9923002,
+        "specifiedHero": 99230,
+        "charImageSkinResourceId": 9923002
+      },
+      {
+        "skinId": 9921602,
+        "specifiedHero": 99216,
+        "charImageSkinResourceId": 9921602
+      },
+      {
+        "skinId": 9924201,
+        "specifiedHero": 99242,
+        "charImageSkinResourceId": 9924201
+      },
+      {
+        "skinId": 9924301,
+        "specifiedHero": 99243,
+        "charImageSkinResourceId": 9924301
+      },
+      {
+        "skinId": 9924401,
+        "specifiedHero": 99244,
+        "charImageSkinResourceId": 9924401
+      },
+      {
+        "skinId": 9921502,
+        "specifiedHero": 99215,
+        "charImageSkinResourceId": 9921502
+      },
+      {
+        "skinId": 9921802,
+        "specifiedHero": 99218,
+        "charImageSkinResourceId": 9921802
+      },
+      {
+        "skinId": 9924601,
+        "specifiedHero": 99246,
+        "charImageSkinResourceId": 9924601
+      },
+      {
+        "skinId": 9923702,
+        "specifiedHero": 99237,
+        "charImageSkinResourceId": 9923702
+      },
+      {
+        "skinId": 9924501,
+        "specifiedHero": 99245,
+        "charImageSkinResourceId": 9924501
+      },
+      {
+        "skinId": 10004,
+        "specifiedHero": 100,
+        "charImageSkinResourceId": 10004
+      },
+      {
+        "skinId": 1602,
+        "specifiedHero": 16,
+        "charImageSkinResourceId": 1602
+      },
+      {
+        "skinId": 9921202,
+        "specifiedHero": 99212,
+        "charImageSkinResourceId": 9921202
+      },
+      {
+        "skinId": 9924801,
+        "specifiedHero": 99248,
+        "charImageSkinResourceId": 9924801
+      },
+      {
+        "skinId": 9919704,
+        "specifiedHero": 99197,
+        "charImageSkinResourceId": 9919704
+      },
+      {
+        "skinId": 9921402,
+        "specifiedHero": 99214,
+        "charImageSkinResourceId": 9921402
+      },
+      {
+        "skinId": 9921302,
+        "specifiedHero": 99213,
+        "charImageSkinResourceId": 9921302
+      },
+      {
+        "skinId": 1408,
+        "specifiedHero": 14,
+        "charImageSkinResourceId": 1408
+      },
+      {
+        "skinId": 9921503,
+        "specifiedHero": 99215,
+        "charImageSkinResourceId": 9921503
+      },
+      {
+        "skinId": 9922802,
+        "specifiedHero": 99228,
+        "charImageSkinResourceId": 9922802
+      },
+      {
+        "skinId": 9925001,
+        "specifiedHero": 99250,
+        "charImageSkinResourceId": 9925001
+      },
+      {
+        "skinId": 9924901,
+        "specifiedHero": 99249,
+        "charImageSkinResourceId": 9924901
+      },
+      {
+        "skinId": 9923402,
+        "specifiedHero": 99234,
+        "charImageSkinResourceId": 9923402
+      },
+      {
+        "skinId": 2907,
+        "specifiedHero": 29,
+        "charImageSkinResourceId": 2907
+      },
+      {
+        "skinId": 9923902,
+        "specifiedHero": 99239,
+        "charImageSkinResourceId": 9923902
+      },
+      {
+        "skinId": 9925101,
+        "specifiedHero": 99251,
+        "charImageSkinResourceId": 9925101
+      },
+      {
+        "skinId": 9923802,
+        "specifiedHero": 99238,
+        "charImageSkinResourceId": 9923802
+      },
+      {
+        "skinId": 9925301,
+        "specifiedHero": 99253,
+        "charImageSkinResourceId": 9925301
+      },
+      {
+        "skinId": 9925201,
+        "specifiedHero": 99252,
+        "charImageSkinResourceId": 9925201
+      },
+      {
+        "skinId": 9924002,
+        "specifiedHero": 99240,
+        "charImageSkinResourceId": 9924002
+      },
+      {
+        "skinId": 9924402,
+        "specifiedHero": 99244,
+        "charImageSkinResourceId": 9924402
+      },
+      {
+        "skinId": 9925401,
+        "specifiedHero": 99254,
+        "charImageSkinResourceId": 9925401
+      },
+      {
+        "skinId": 9925501,
+        "specifiedHero": 99255,
+        "charImageSkinResourceId": 9925501
+      },
+      {
+        "skinId": 9925701,
+        "specifiedHero": 99257,
+        "charImageSkinResourceId": 9925701
+      },
+      {
+        "skinId": 9925601,
+        "specifiedHero": 99256,
+        "charImageSkinResourceId": 9925601
+      },
+      {
+        "skinId": 9924802,
+        "specifiedHero": 99248,
+        "charImageSkinResourceId": 9924802
+      },
+      {
+        "skinId": 9921603,
+        "specifiedHero": 99216,
+        "charImageSkinResourceId": 9921603
+      },
+      {
+        "skinId": 9920802,
+        "specifiedHero": 99208,
+        "charImageSkinResourceId": 9920802
+      },
+      {
+        "skinId": 9926001,
+        "specifiedHero": 99260,
+        "charImageSkinResourceId": 9926001
+      },
+      {
+        "skinId": 9922903,
+        "specifiedHero": 99229,
+        "charImageSkinResourceId": 9922903
+      },
+      {
+        "skinId": 9925901,
+        "specifiedHero": 99259,
+        "charImageSkinResourceId": 9925901
+      },
+      {
+        "skinId": 2606,
+        "specifiedHero": 26,
+        "charImageSkinResourceId": 2606
+      },
+      {
+        "skinId": 9923102,
+        "specifiedHero": 99231,
+        "charImageSkinResourceId": 9923102
+      },
+      {
+        "skinId": 9926101,
+        "specifiedHero": 99261,
+        "charImageSkinResourceId": 9926101
+      },
+      {
+        "skinId": 9921403,
+        "specifiedHero": 99214,
+        "charImageSkinResourceId": 9921403
+      },
+      {
+        "skinId": 9926201,
+        "specifiedHero": 99262,
+        "charImageSkinResourceId": 9926201
+      },
+      {
+        "skinId": 9926301,
+        "specifiedHero": 99263,
+        "charImageSkinResourceId": 9926301
+      },
+      {
+        "skinId": 9921803,
+        "specifiedHero": 99218,
+        "charImageSkinResourceId": 9921803
+      },
+      {
+        "skinId": 9925502,
+        "specifiedHero": 99255,
+        "charImageSkinResourceId": 9925502
+      },
+      {
+        "skinId": 9926401,
+        "specifiedHero": 99264,
+        "charImageSkinResourceId": 9926401
+      },
+      {
+        "skinId": 9918604,
+        "specifiedHero": 99186,
+        "charImageSkinResourceId": 9918604
+      },
+      {
+        "skinId": 12504,
+        "specifiedHero": 125,
+        "charImageSkinResourceId": 12504
+      },
+      {
+        "skinId": 9926501,
+        "specifiedHero": 99265,
+        "charImageSkinResourceId": 9926501
+      },
+      {
+        "skinId": 9925402,
+        "specifiedHero": 99254,
+        "charImageSkinResourceId": 9925402
+      },
+      {
+        "skinId": 9926601,
+        "specifiedHero": 99266,
+        "charImageSkinResourceId": 9926601
+      },
+      {
+        "skinId": 9926701,
+        "specifiedHero": 99267,
+        "charImageSkinResourceId": 9926701
+      },
+      {
+        "skinId": 9926801,
+        "specifiedHero": 99268,
+        "charImageSkinResourceId": 9926801
+      },
+      {
+        "skinId": 9926002,
+        "specifiedHero": 99260,
+        "charImageSkinResourceId": 9926002
+      },
+      {
+        "skinId": 9922002,
+        "specifiedHero": 99220,
+        "charImageSkinResourceId": 9922002
+      },
+      {
+        "skinId": 9922502,
+        "specifiedHero": 99225,
+        "charImageSkinResourceId": 9922502
+      },
+      {
+        "skinId": 9927001,
+        "specifiedHero": 99270,
+        "charImageSkinResourceId": 9927001
+      },
+      {
+        "skinId": 9927101,
+        "specifiedHero": 99271,
+        "charImageSkinResourceId": 9927101
+      },
+      {
+        "skinId": 9922904,
+        "specifiedHero": 99229,
+        "charImageSkinResourceId": 9922904
+      },
+      {
+        "skinId": 8907,
+        "specifiedHero": 89,
+        "charImageSkinResourceId": 8907
+      },
+      {
+        "skinId": 9926102,
+        "specifiedHero": 99261,
+        "charImageSkinResourceId": 9926102
+      },
+      {
+        "skinId": 9924403,
+        "specifiedHero": 99244,
+        "charImageSkinResourceId": 9924403
+      },
+      {
+        "skinId": 9927201,
+        "specifiedHero": 99272,
+        "charImageSkinResourceId": 9927201
+      },
+      {
+        "skinId": 9927401,
+        "specifiedHero": 99274,
+        "charImageSkinResourceId": 9927401
+      },
+      {
+        "skinId": 9925902,
+        "specifiedHero": 99259,
+        "charImageSkinResourceId": 9925902
+      },
+      {
+        "skinId": 9927501,
+        "specifiedHero": 99275,
+        "charImageSkinResourceId": 9927501
+      },
+      {
+        "skinId": 9927702,
+        "specifiedHero": 99277,
+        "charImageSkinResourceId": 9927702
+      },
+      {
+        "skinId": 9927701,
+        "specifiedHero": 99277,
+        "charImageSkinResourceId": 9927701
+      },
+      {
+        "skinId": 9927601,
+        "specifiedHero": 99276,
+        "charImageSkinResourceId": 9927601
+      },
+      {
+        "skinId": 9927801,
+        "specifiedHero": 99278,
+        "charImageSkinResourceId": 9927801
+      },
+      {
+        "skinId": 9927802,
+        "specifiedHero": 99278,
+        "charImageSkinResourceId": 9927802
+      },
+      {
+        "skinId": 9924902,
+        "specifiedHero": 99249,
+        "charImageSkinResourceId": 9924902
+      },
+      {
+        "skinId": 9928001,
+        "specifiedHero": 99280,
+        "charImageSkinResourceId": 9928001
+      },
+      {
+        "skinId": 9927901,
+        "specifiedHero": 99279,
+        "charImageSkinResourceId": 9927901
+      },
+      {
+        "skinId": 9924302,
+        "specifiedHero": 99243,
+        "charImageSkinResourceId": 9924302
+      },
+      {
+        "skinId": 5106,
+        "specifiedHero": 51,
+        "charImageSkinResourceId": 5106
+      },
+      {
+        "skinId": 9928101,
+        "specifiedHero": 99281,
+        "charImageSkinResourceId": 9928101
+      },
+      {
+        "skinId": 9921504,
+        "specifiedHero": 99215,
+        "charImageSkinResourceId": 9921504
+      },
+      {
+        "skinId": 9928201,
+        "specifiedHero": 99282,
+        "charImageSkinResourceId": 9928201
+      },
+      {
+        "skinId": 9928301,
+        "specifiedHero": 99283,
+        "charImageSkinResourceId": 9928301
+      },
+      {
+        "skinId": 9928501,
+        "specifiedHero": 99285,
+        "charImageSkinResourceId": 9928501
+      },
+      {
+        "skinId": 9928401,
+        "specifiedHero": 99284,
+        "charImageSkinResourceId": 9928401
+      },
+      {
+        "skinId": 9924803,
+        "specifiedHero": 99248,
+        "charImageSkinResourceId": 9924803
+      },
+      {
+        "skinId": 9928701,
+        "specifiedHero": 99287,
+        "charImageSkinResourceId": 9928701
+      },
+      {
+        "skinId": 9927202,
+        "specifiedHero": 99272,
+        "charImageSkinResourceId": 9927202
+      },
+      {
+        "skinId": 9926103,
+        "specifiedHero": 99261,
+        "charImageSkinResourceId": 9926103
+      },
+      {
+        "skinId": 4402,
+        "specifiedHero": 44,
+        "charImageSkinResourceId": 4402
+      },
+      {
+        "skinId": 9926302,
+        "specifiedHero": 99263,
+        "charImageSkinResourceId": 9926302
+      }
+    ]
+  },
+  "baseFieldCoverage": {
+    "HeroPainting": {
+      "presentCount": 267,
+      "missingCount": 0,
+      "distinctValueCount": 267,
+      "duplicateValueCount": 0,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "UI/HeroPainting/SSR_ABS/Prefab/",
+          "count": 130
+        },
+        {
+          "pathPrefix": "UI/HeroPainting2/SSR_ABS/Prefab/",
+          "count": 68
+        },
+        {
+          "pathPrefix": "UI/HeroPainting/SR_ABS/Prefab/",
+          "count": 33
+        },
+        {
+          "pathPrefix": "UI/HeroPainting3/SSR_ABS/Prefab/",
+          "count": 21
+        },
+        {
+          "pathPrefix": "UI/HeroPainting/R_ABS/Prefab/",
+          "count": 12
+        },
+        {
+          "pathPrefix": "UI/HeroPainting01/SSR_ABS/Prefab/",
+          "count": 2
+        },
+        {
+          "pathPrefix": "UI/HeroPainting2/SR_ABS/Prefab/",
+          "count": 1
+        }
+      ],
+      "sampleValues": [
+        "UI/HeroPainting/SSR_ABS/Prefab/Matthew.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Grenier.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Aimeeda.prefab",
+        "UI/HeroPainting/SR_ABS/Prefab/Chris.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Leon.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Bernhardt.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Lana.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Bozel.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Ledyn.prefab",
+        "UI/HeroPainting/SR_ABS/Prefab/Nurm.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Elwin.prefab",
+        "UI/HeroPainting/SR_ABS/Prefab/Hein.prefab"
+      ]
+    },
+    "CardHeadImage": {
+      "presentCount": 267,
+      "missingCount": 0,
+      "distinctValueCount": 267,
+      "duplicateValueCount": 0,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "UI/Card03_ABS/",
+          "count": 42
+        },
+        {
+          "pathPrefix": "UI/Card04_ABS/",
+          "count": 40
+        },
+        {
+          "pathPrefix": "UI/Card07_ABS/",
+          "count": 33
+        },
+        {
+          "pathPrefix": "UI/Card08_ABS/",
+          "count": 30
+        },
+        {
+          "pathPrefix": "UI/Card_ABS/",
+          "count": 28
+        },
+        {
+          "pathPrefix": "UI/Card09_ABS/",
+          "count": 25
+        },
+        {
+          "pathPrefix": "UI/Card05_ABS/",
+          "count": 24
+        },
+        {
+          "pathPrefix": "UI/Card02_ABS/",
+          "count": 23
+        },
+        {
+          "pathPrefix": "UI/Card06_ABS/",
+          "count": 22
+        }
+      ],
+      "sampleValues": [
+        "UI/Card_ABS/Card_Head_Matthew.png",
+        "UI/Card_ABS/Card_Head_Grenier.png",
+        "UI/Card_ABS/Card_Head_Aimeeda.png",
+        "UI/Card_ABS/Card_Head_Chris.png",
+        "UI/Card_ABS/Card_Head_Leon.png",
+        "UI/Card_ABS/Card_Head_Bernhardt.png",
+        "UI/Card_ABS/Card_Head_Lana.png",
+        "UI/Card_ABS/Card_Head_Bozel.png",
+        "UI/Card_ABS/Card_Head_Ledyn.png",
+        "UI/Card_ABS/Card_Head_Nurm.png",
+        "UI/Card_ABS/Card_Head_Elwin.png",
+        "UI/Card_ABS/Card_Head_Hein.png"
+      ]
+    },
+    "SmallHeadImage": {
+      "presentCount": 267,
+      "missingCount": 0,
+      "distinctValueCount": 267,
+      "duplicateValueCount": 0,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "UI/Icon/Head_ABS/",
+          "count": 267
+        }
+      ],
+      "sampleValues": [
+        "UI/Icon/Head_ABS/Head_Small_Matthew_N.png",
+        "UI/Icon/Head_ABS/Head_Small_Grenier_N.png",
+        "UI/Icon/Head_ABS/Head_Small_Aimeeda_N.png",
+        "UI/Icon/Head_ABS/Head_Small_Chris.png",
+        "UI/Icon/Head_ABS/Head_Small_Leon.png",
+        "UI/Icon/Head_ABS/Head_Small_Bernhardt.png",
+        "UI/Icon/Head_ABS/Head_Small_Lana.png",
+        "UI/Icon/Head_ABS/Head_Small_Bozel.png",
+        "UI/Icon/Head_ABS/Head_Small_Ledyn.png",
+        "UI/Icon/Head_ABS/Head_Small_Nurm.png",
+        "UI/Icon/Head_ABS/Head_Small_Elwin.png",
+        "UI/Icon/Head_ABS/Head_Small_Hein.png"
+      ]
+    },
+    "RoundHeadImage": {
+      "presentCount": 267,
+      "missingCount": 0,
+      "distinctValueCount": 267,
+      "duplicateValueCount": 0,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "UI/Icon/HeadBattle_ABS/",
+          "count": 267
+        }
+      ],
+      "sampleValues": [
+        "UI/Icon/HeadBattle_ABS/Head_Matthew_N.png",
+        "UI/Icon/HeadBattle_ABS/Head_Grenier_N.png",
+        "UI/Icon/HeadBattle_ABS/Head_Aimeeda_N.png",
+        "UI/Icon/HeadBattle_ABS/Head_Chris.png",
+        "UI/Icon/HeadBattle_ABS/Head_Leon.png",
+        "UI/Icon/HeadBattle_ABS/Head_Bernhardt.png",
+        "UI/Icon/HeadBattle_ABS/Head_Lana.png",
+        "UI/Icon/HeadBattle_ABS/Head_Bozel.png",
+        "UI/Icon/HeadBattle_ABS/Head_Ledyn.png",
+        "UI/Icon/HeadBattle_ABS/Head_Nurm.png",
+        "UI/Icon/HeadBattle_ABS/Head_Elwin.png",
+        "UI/Icon/HeadBattle_ABS/Head_Hein.png"
+      ]
+    },
+    "SummonHeadImage": {
+      "presentCount": 267,
+      "missingCount": 0,
+      "distinctValueCount": 267,
+      "duplicateValueCount": 0,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "UI/Icon/Card_ABS/",
+          "count": 267
+        }
+      ],
+      "sampleValues": [
+        "UI/Icon/Card_ABS/Card_Matthew.png",
+        "UI/Icon/Card_ABS/Card_Grenier.png",
+        "UI/Icon/Card_ABS/Card_Aimeeda.png",
+        "UI/Icon/Card_ABS/Card_Chris.png",
+        "UI/Icon/Card_ABS/Card_Leon.png",
+        "UI/Icon/Card_ABS/Card_Bernhardt.png",
+        "UI/Icon/Card_ABS/Card_Lana.png",
+        "UI/Icon/Card_ABS/Card_Bozel.png",
+        "UI/Icon/Card_ABS/Card_Ledyn.png",
+        "UI/Icon/Card_ABS/Card_Nurm.png",
+        "UI/Icon/Card_ABS/Card_Elwin.png",
+        "UI/Icon/Card_ABS/Card_Hein.png"
+      ]
+    },
+    "Spine": {
+      "presentCount": 267,
+      "missingCount": 0,
+      "distinctValueCount": 267,
+      "duplicateValueCount": 0,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "Spine/Char/Abishai_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Adankelmo_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Agnes_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Aimeeda_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/AinsOoalGown_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Aka_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Alan_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Albedo_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Alfred_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Alia_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Alice_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Alicia_ABS/",
+          "count": 1
+        }
+      ],
+      "sampleValues": [
+        "Spine/Char/Mathew_ABS/Mathew_Prefab.prefab",
+        "Spine/Char/Grenier_ABS/Grenier_Prefab.prefab",
+        "Spine/Char/Aimeeda_ABS/Aimeeda_Prefab.prefab",
+        "Spine/Char/Chris_ABS/Chris_Prefab.prefab",
+        "Spine/Char/Leon_ABS/Leon_Prefab.prefab",
+        "Spine/Char/Bernhardt_ABS/Bernhardt_Prefab.prefab",
+        "Spine/Char/Lana_ABS/Lana_Prefab.prefab",
+        "Spine/Char/Bozel_ABS/Bozel_Prefab.prefab",
+        "Spine/Char/Ledin_ABS/Ledin_Prefab.prefab",
+        "Spine/Char/Nahm_ABS/Nahm_Prefab.prefab",
+        "Spine/Char/Elwin_ABS/Elwin_Prefab.prefab",
+        "Spine/Char/Hein_ABS/Hein_Prefab.prefab"
+      ]
+    },
+    "Spine2": {
+      "presentCount": 62,
+      "missingCount": 205,
+      "distinctValueCount": 62,
+      "duplicateValueCount": 0,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "Spine/Char/Abishai_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Alia_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Ashi_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Banshee_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Brightsummoner_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Captain&Head_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Celica_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/D-Boy_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Dragonslayer_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Elvis_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Enya_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Erza_ABS/",
+          "count": 1
+        }
+      ],
+      "sampleValues": [
+        "Spine/Char/IceAbyssMonarch_ABS/Bust_IceAbyssMonarch_Prefab.prefab",
+        "Spine/Char/Tabres_ABS/Bust_Tabres_Prefab.prefab",
+        "Spine/Char/Ymir_ABS/Bust_Ymir_Prefab.prefab",
+        "Spine/Char/Celica_ABS/Bust_Celica_Prefab.prefab",
+        "Spine/Char/Seraphina_ABS/Bust_Seraphina_Prefab.prefab",
+        "Spine/Char/Virelia_ABS/Bust_Virelia_Prefab.prefab",
+        "Spine/Char/Brightsummoner_ABS/Bust_Brightsummoner_Prefab.prefab",
+        "Spine/Char/Shion_ABS/Bust_Shion_Prefab.prefab",
+        "Spine/Char/Tiana_ABS/Bust_Tiana_Prefab.prefab",
+        "Spine/Char/Captain&Head_ABS/Bust_Captain&Head_Prefab.prefab",
+        "Spine/Char/Mack&Giuzu_ABS/Bust_Mack&Giuzu_Prefab.prefab",
+        "Spine/Char/Enya_ABS/Bust_Enya_Prefab.prefab"
+      ]
+    },
+    "SpineBackground": {
+      "presentCount": 6,
+      "missingCount": 261,
+      "distinctValueCount": 6,
+      "duplicateValueCount": 0,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "Spine/Char/Brightsummoner_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Dragonslayer_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Gazesuccubus_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/HeavenDefier_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/IceAbyssMonarch_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/TidalVindicator_ABS/",
+          "count": 1
+        }
+      ],
+      "sampleValues": [
+        "Spine/Char/IceAbyssMonarch_ABS/IceAbyssMonarch_BG_Prefab.prefab",
+        "Spine/Char/Brightsummoner_ABS/Brightsummoner_BG_Prefab.prefab",
+        "Spine/Char/Dragonslayer_ABS/Dragonslayer_BG_Prefab.prefab",
+        "Spine/Char/Gazesuccubus_ABS/Gazesuccubus_BG_Prefab.prefab",
+        "Spine/Char/HeavenDefier_ABS/HeavenDefier_BG_Prefab.prefab",
+        "Spine/Char/TidalVindicator_ABS/TidalVindicator_BG_Prefab.prefab"
+      ]
+    }
+  },
+  "skinFieldCoverage": {
+    "HeroPainting": {
+      "presentCount": 17,
+      "missingCount": 37,
+      "distinctValueCount": 13,
+      "duplicateValueCount": 2,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "UI/HeroPainting/SSR_ABS/Prefab/",
+          "count": 8
+        },
+        {
+          "pathPrefix": "UI/HeroPainting2/SSR_ABS/Prefab/",
+          "count": 7
+        },
+        {
+          "pathPrefix": "UI/HeroPainting/R_ABS/Prefab/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "UI/HeroPainting/SR_ABS/Prefab/",
+          "count": 1
+        }
+      ],
+      "sampleValues": [
+        "UI/HeroPainting/R_ABS/Prefab/Lyatt.prefab",
+        "UI/HeroPainting2/SSR_ABS/Prefab/Hofmann.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Alpha.prefab",
+        "UI/HeroPainting/SR_ABS/Prefab/Freya.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Licorice.prefab",
+        "UI/HeroPainting2/SSR_ABS/Prefab/Sanger.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/MagusOfTheTree.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Sigma.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Sirink.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/TheConsul.prefab",
+        "UI/HeroPainting2/SSR_ABS/Prefab/Enya.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Mu.prefab"
+      ]
+    },
+    "CardHeadImage": {
+      "presentCount": 52,
+      "missingCount": 2,
+      "distinctValueCount": 50,
+      "duplicateValueCount": 1,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "UI/Card07_ABS/",
+          "count": 7
+        },
+        {
+          "pathPrefix": "UI/Card04_ABS/",
+          "count": 6
+        },
+        {
+          "pathPrefix": "UI/CarkSkin06_ABS/",
+          "count": 6
+        },
+        {
+          "pathPrefix": "UI/Card_ABS/",
+          "count": 5
+        },
+        {
+          "pathPrefix": "UI/Card06_ABS/",
+          "count": 5
+        },
+        {
+          "pathPrefix": "UI/CarkSkin02_ABS/",
+          "count": 5
+        },
+        {
+          "pathPrefix": "UI/Card05_ABS/",
+          "count": 4
+        },
+        {
+          "pathPrefix": "UI/CarkSkin01_ABS/",
+          "count": 4
+        },
+        {
+          "pathPrefix": "UI/CarkSkin03_ABS/",
+          "count": 3
+        },
+        {
+          "pathPrefix": "UI/Card03_ABS/",
+          "count": 2
+        },
+        {
+          "pathPrefix": "UI/CarkSkin05_ABS/",
+          "count": 2
+        },
+        {
+          "pathPrefix": "UI/Card02_ABS/",
+          "count": 1
+        }
+      ],
+      "sampleValues": [
+        "UI/Card_ABS/Card_Head_Lyatt.png",
+        "UI/Card06_ABS/Card_Head_ElysiumAssassin.png",
+        "UI/CarkSkin01_ABS/Card_Head_Riana_Skin03.png",
+        "UI/Card07_ABS/Card_Head_MoltenSorcerer_NPC.png",
+        "UI/CarkSkin03_ABS/Card_Head_Alpha_Skin01.png",
+        "UI/Card04_ABS/Card_Head_FreyaSP.png",
+        "UI/CarkSkin03_ABS/Card_Head_Gizlof_Skin02.png",
+        "UI/Card07_ABS/Card_Head_GylmannaSaintess_NPC.png",
+        "UI/CarkSkin06_ABS/Card_Head_Licorice_Skin04.png",
+        "UI/Card07_ABS/Card_Head_SeraphinaShadow_NPC.png",
+        "UI/CarkSkin06_ABS/Card_Head_Grunhind_Skin03.png",
+        "UI/CarkSkin06_ABS/Card_Head_Sanger_Skin01.png"
+      ]
+    },
+    "SmallHeadImage": {
+      "presentCount": 50,
+      "missingCount": 4,
+      "distinctValueCount": 28,
+      "duplicateValueCount": 4,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "UI/Icon/Head_ABS/",
+          "count": 39
+        },
+        {
+          "pathPrefix": "UI/Icon/HeadSkin_ABS/",
+          "count": 5
+        },
+        {
+          "pathPrefix": "UI/Icon/HeadSkin2_ABS/",
+          "count": 5
+        },
+        {
+          "pathPrefix": "UI/Common_New01_ABS/Summoner/",
+          "count": 1
+        }
+      ],
+      "sampleValues": [
+        "UI/Icon/Head_ABS/Head_Small_Laird_2.png",
+        "UI/Icon/Head_ABS/Head_Small_Zalrahda.png",
+        "UI/Icon/HeadSkin_ABS/Head_Small_Riana_Skin03.png",
+        "UI/Icon/Head_ABS/Head_Small_Hofmann.png",
+        "UI/Icon/Head_ABS/Head_Small_Alpha01.png",
+        "UI/Icon/HeadSkin_ABS/Head_Small_Freya_SP.png",
+        "UI/Icon/Head_ABS/Head_Small_Gizlof.png",
+        "UI/Icon/HeadSkin2_ABS/Head_Small_Licorice_Skin04.png",
+        "UI/Icon/HeadSkin2_ABS/Head_Small_Grunhind_Skin03.png",
+        "UI/Icon/HeadSkin2_ABS/Head_Small_Sanger_Skin01.png",
+        "UI/Icon/Head_ABS/Head_Small_MagusOfTheTree.png",
+        "UI/Icon/Head_ABS/Head_Small_Bozel.png"
+      ]
+    },
+    "RoundHeadImage": {
+      "presentCount": 54,
+      "missingCount": 0,
+      "distinctValueCount": 35,
+      "duplicateValueCount": 4,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "UI/Icon/HeadBattle_ABS/",
+          "count": 46
+        },
+        {
+          "pathPrefix": "UI/Icon/HeadBattleSkin2_ABS/",
+          "count": 5
+        },
+        {
+          "pathPrefix": "UI/Icon/HeadBattleSkin_ABS/",
+          "count": 2
+        },
+        {
+          "pathPrefix": "UI/Common_New01_ABS/Summoner/",
+          "count": 1
+        }
+      ],
+      "sampleValues": [
+        "UI/Icon/HeadBattle_ABS/Head_Laird_2.png",
+        "UI/Icon/HeadBattle_ABS/Head_Zalrahda.png",
+        "UI/Icon/HeadBattleSkin_ABS/Head_Riana_Skin03.png",
+        "UI/Icon/HeadBattle_ABS/Head_OzgusSoldier.png",
+        "UI/Icon/HeadBattle_ABS/Head_Alpha01.png",
+        "UI/Icon/HeadBattle_ABS/Head_Freya_SP.png",
+        "UI/Icon/HeadBattle_ABS/Head_Gizlof.png",
+        "UI/Icon/HeadBattle_ABS/Head_Hofmann.png",
+        "UI/Icon/HeadBattleSkin2_ABS/Head_Licorice_Skin04.png",
+        "UI/Icon/HeadBattleSkin2_ABS/Headl_Grunhind_Skin03.png",
+        "UI/Icon/HeadBattleSkin2_ABS/Head_Sanger_Skin01.png",
+        "UI/Icon/HeadBattle_ABS/Head_MagusOfTheTree.png"
+      ]
+    },
+    "SummonHeadImage": {
+      "presentCount": 29,
+      "missingCount": 25,
+      "distinctValueCount": 24,
+      "duplicateValueCount": 3,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "UI/Icon/Card_ABS/",
+          "count": 29
+        }
+      ],
+      "sampleValues": [
+        "UI/Icon/Card_ABS/Card_Laird.png",
+        "UI/Icon/Card_ABS/Card_Riana.png",
+        "UI/Icon/Card_ABS/Card_Hofmann.png",
+        "UI/Icon/Card_ABS/Card_Alpha01.png",
+        "UI/Icon/Card_ABS/Card_Freya.png",
+        "UI/Icon/Card_ABS/Card_Gizlof.png",
+        "UI/Icon/Card_ABS/Card_Licorice.png",
+        "UI/Icon/Card_ABS/Card_Grunhind.png",
+        "UI/Icon/Card_ABS/Card_Sanger.png",
+        "UI/Icon/Card_ABS/Card_MagusOfTheTree.png",
+        "UI/Icon/Card_ABS/Card_Bozel.png",
+        "UI/Icon/Card_ABS/Card_Sigma.png"
+      ]
+    },
+    "Spine": {
+      "presentCount": 54,
+      "missingCount": 0,
+      "distinctValueCount": 54,
+      "duplicateValueCount": 0,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "Spine/Char/Alpha_ABS/",
+          "count": 2
+        },
+        {
+          "pathPrefix": "Spine/Char/NPC_Popuko_ABS/",
+          "count": 2
+        },
+        {
+          "pathPrefix": "Spine/Char/Sherry_ABS/",
+          "count": 2
+        },
+        {
+          "pathPrefix": "Spine/Bust/3_ABS/Zoe-Kayiro/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Aimeeda_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Bozel_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Consul_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Dehault_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Enya_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Freya_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Gizlof_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Grunhind_ABS/",
+          "count": 1
+        }
+      ],
+      "sampleValues": [
+        "Spine/Char/Lyatt_ABS/Lyatt_Prefab.prefab",
+        "Spine/Char/NPC_Elysium_ABS/Elysium_Perfab.prefab",
+        "Spine/Char/Riana_ABS/Riana_Skin03_Prefab.prefab",
+        "Spine/Char/NPC_MoltenSorcerer_ABS/NPC_MoltenSorcerer_Prefab.prefab",
+        "Spine/Char/Alpha_ABS/Alpha_Skin01_Prefab.prefab",
+        "Spine/Char/Freya_ABS/Freya_SP_Prefab.prefab",
+        "Spine/Char/Gizlof_ABS/Gizlof_Skin02_Prefab.prefab",
+        "Spine/Char/NPC_GylmannaSaintess_ABS/GylmannaSaintess_Prefab.prefab",
+        "Spine/Char/Licorice_ABS/Licorice_Skin04_Prefab.prefab",
+        "Spine/Char/Seraphina_ABS/Seraphina_S_Prefab.prefab",
+        "Spine/Char/Grunhind_ABS/Grunhind_Skin03_Prefab.prefab",
+        "Spine/Char/Sanger_ABS/Sanger_Skin01_Prefab.prefab"
+      ]
+    },
+    "Spine2": {
+      "presentCount": 7,
+      "missingCount": 47,
+      "distinctValueCount": 7,
+      "duplicateValueCount": 0,
+      "topPathPrefixes": [
+        {
+          "pathPrefix": "Spine/Char/Enya_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Licorice_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Lila_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/MarieRose_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/NPC_Eidolon_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/NPC_Immortalwill_ABS/",
+          "count": 1
+        },
+        {
+          "pathPrefix": "Spine/Char/Sanger_ABS/",
+          "count": 1
+        }
+      ],
+      "sampleValues": [
+        "Spine/Char/Licorice_ABS/Bust_Licorice_Skin04_Prefab.prefab",
+        "Spine/Char/Sanger_ABS/Bust_Sanger_Skin01_Prefab.prefab",
+        "Spine/Char/NPC_Eidolon_ABS/Bust_Eidolon_Prefab.prefab",
+        "Spine/Char/Lila_ABS/Bust_Lila_Skin01_Prefab.prefab",
+        "Spine/Char/Enya_ABS/Bust_Enya_Skin01_Prefab.prefab",
+        "Spine/Char/NPC_Immortalwill_ABS/Bust_Immortalwill_Prefab.prefab",
+        "Spine/Char/MarieRose_ABS/Bust_MarieRose_Skin01_Prefab.prefab"
+      ]
+    },
+    "SpineBackground": {
+      "presentCount": 0,
+      "missingCount": 54,
+      "distinctValueCount": 0,
+      "duplicateValueCount": 0,
+      "topPathPrefixes": [],
+      "sampleValues": []
+    }
+  },
+  "representativeHeroes": [
+    {
+      "heroId": 1,
+      "nameKr": "매튜",
+      "charImageId": 1,
+      "values": {
+        "HeroPainting": "UI/HeroPainting/SSR_ABS/Prefab/Matthew.prefab",
+        "CardHeadImage": "UI/Card_ABS/Card_Head_Matthew.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Matthew_N.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Matthew_N.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Matthew.png",
+        "Spine": "Spine/Char/Mathew_ABS/Mathew_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "heroId": 6,
+      "nameKr": "레온",
+      "charImageId": 6,
+      "values": {
+        "HeroPainting": "UI/HeroPainting/SSR_ABS/Prefab/Leon.prefab",
+        "CardHeadImage": "UI/Card_ABS/Card_Head_Leon.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Leon.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Leon.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Leon.png",
+        "Spine": "Spine/Char/Leon_ABS/Leon_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "heroId": 10,
+      "nameKr": "레딘",
+      "charImageId": 10,
+      "values": {
+        "HeroPainting": "UI/HeroPainting/SSR_ABS/Prefab/Ledyn.prefab",
+        "CardHeadImage": "UI/Card_ABS/Card_Head_Ledyn.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Ledyn.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Ledyn.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Ledyn.png",
+        "Spine": "Spine/Char/Ledin_ABS/Ledin_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "heroId": 25,
+      "nameKr": "알테뮬러",
+      "charImageId": 25,
+      "values": {
+        "HeroPainting": "UI/HeroPainting/SSR_ABS/Prefab/Alutemurat.prefab",
+        "CardHeadImage": "UI/Card02_ABS/Card_Head_Alutemurat.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Alutemurat.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Alutemurat.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Alutemurat.png",
+        "Spine": "Spine/Char/Alutemurat_ABS/Alutemurat_prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "heroId": 69,
+      "nameKr": "에스텔",
+      "charImageId": 69,
+      "values": {
+        "HeroPainting": "UI/HeroPainting/SSR_ABS/Prefab/Estelle.prefab",
+        "CardHeadImage": "UI/Card03_ABS/Card_Head_Estelle.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Estelle.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Estelle.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Estelle.png",
+        "Spine": "Spine/Char/Estelle_ABS/Estelle_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "heroId": 79,
+      "nameKr": "신구지 사쿠라",
+      "charImageId": 79,
+      "values": {
+        "HeroPainting": "UI/HeroPainting/SSR_ABS/Prefab/SakuraShinguji.prefab",
+        "CardHeadImage": "UI/Card03_ABS/Card_Head_Sakura.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Sakura.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Sakura.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Sakura.png",
+        "Spine": "Spine/Char/Sakura_ABS/Sakura_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "heroId": 134,
+      "nameKr": "아인즈 울 고운",
+      "charImageId": 134,
+      "values": {
+        "HeroPainting": "UI/HeroPainting/SSR_ABS/Prefab/AinsOoalGown.prefab",
+        "CardHeadImage": "UI/Card04_ABS/Card_head_AinsOoalGown.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_AinsOoalGown.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_AinsOoalGown.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_AinsOoalGown.png",
+        "Spine": "Spine/Char/AinsOoalGown_ABS/AinsOoalGown_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "heroId": 99225,
+      "nameKr": "빙설 심연의 지배자",
+      "charImageId": 99225,
+      "values": {
+        "HeroPainting": "UI/HeroPainting2/SSR_ABS/Prefab/SovereignOfIceAbyss.prefab",
+        "CardHeadImage": "UI/Card07_ABS/Card_Head_SovereignOfIceAbyss.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_SovereignOfIceAbyss.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_SovereignOfIceAbyss.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_SovereignOfIceAbyss.png",
+        "Spine": "Spine/Char/IceAbyssMonarch_ABS/IceAbyssMonarch_Prefab.prefab",
+        "Spine2": "Spine/Char/IceAbyssMonarch_ABS/Bust_IceAbyssMonarch_Prefab.prefab",
+        "SpineBackground": "Spine/Char/IceAbyssMonarch_ABS/IceAbyssMonarch_BG_Prefab.prefab"
+      }
+    },
+    {
+      "heroId": 99232,
+      "nameKr": "빛의 소환사",
+      "charImageId": 99232,
+      "values": {
+        "HeroPainting": "UI/HeroPainting2/SSR_ABS/Prefab/Brightsummoner.prefab",
+        "CardHeadImage": "UI/Card07_ABS/Card_Head_Brightsummoner.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Brightsummoner.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Brightsummoner.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Brightsummoner.png",
+        "Spine": "Spine/Char/Brightsummoner_ABS/Brightsummoner_Prefab.prefab",
+        "Spine2": "Spine/Char/Brightsummoner_ABS/Bust_Brightsummoner_Prefab.prefab",
+        "SpineBackground": "Spine/Char/Brightsummoner_ABS/Brightsummoner_BG_Prefab.prefab"
+      }
+    },
+    {
+      "heroId": 99235,
+      "nameKr": "캡틴 코만도&베이비 헤드",
+      "charImageId": 99235,
+      "values": {
+        "HeroPainting": "UI/HeroPainting2/SSR_ABS/Prefab/Captain&Baby.prefab",
+        "CardHeadImage": "UI/Card08_ABS/Card_Head_Captain&Baby.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Captain&Baby.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Captain&Baby.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Captain&Baby.png",
+        "Spine": "Spine/Char/Captain&Head_ABS/Captain&Head_Prefab.prefab",
+        "Spine2": "Spine/Char/Captain&Head_ABS/Bust_Captain&Head_Prefab.prefab",
+        "SpineBackground": null
+      }
+    },
+    {
+      "heroId": 99276,
+      "nameKr": "아이바 미유키",
+      "charImageId": 99276,
+      "values": {
+        "HeroPainting": "UI/HeroPainting3/SSR_ABS/Prefab/Miyuki.prefab",
+        "CardHeadImage": "UI/Card09_ABS/Card_Head_Miyuki.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Miyuki.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Miyuki.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Miyuki.png",
+        "Spine": "Spine/Char/Miyuki_ABS/Miyuki_Prefab.prefab",
+        "Spine2": "Spine/Char/Miyuki_ABS/Bust_Miyuki_Prefab.prefab",
+        "SpineBackground": null
+      }
+    },
+    {
+      "heroId": 99284,
+      "nameKr": "야차왕 가이",
+      "charImageId": 99284,
+      "values": {
+        "HeroPainting": "UI/HeroPainting3/SSR_ABS/Prefab/Kurogi.prefab",
+        "CardHeadImage": "UI/Card09_ABS/Card_Head_Kurogi.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Kurogi.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Kurogi.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Kurogi.png",
+        "Spine": "Spine/Char/Kurogi_ABS/Kurogi_Prefab.prefab",
+        "Spine2": "Spine/Char/Kurogi_ABS/Bust_Kurogi_Prefab.prefab",
+        "SpineBackground": null
+      }
+    }
+  ],
+  "representativeSkins": [
+    {
+      "skinId": 1201,
+      "skinName": "另一位勇者",
+      "specifiedHero": 12,
+      "charImageSkinResourceId": 1201,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Elwin_Skin01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Elwin_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Elwin_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Elwin_Skin01.png"
+      },
+      "charImageValues": {
+        "HeroPainting": "UI/HeroPainting/R_ABS/Prefab/Lyatt.prefab",
+        "CardHeadImage": "UI/Card_ABS/Card_Head_Lyatt.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Laird_2.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Laird_2.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Laird.png",
+        "Spine": "Spine/Char/Lyatt_ABS/Lyatt_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 601,
+      "skinName": "西部世界",
+      "specifiedHero": 6,
+      "charImageSkinResourceId": 601,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Leon_Skin01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Leon_Skin02.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Leon_Skin02.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Leon_Skin02.png"
+      },
+      "charImageValues": {
+        "HeroPainting": null,
+        "CardHeadImage": "UI/Card06_ABS/Card_Head_ElysiumAssassin.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Zalrahda.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Zalrahda.png",
+        "SummonHeadImage": null,
+        "Spine": "Spine/Char/NPC_Elysium_ABS/Elysium_Perfab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 701,
+      "skinName": "第六天魔王",
+      "specifiedHero": 7,
+      "charImageSkinResourceId": 701,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Bernhardt_Skin01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Bernhardt_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Bernhardt_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Bernhardt_Skin01.png"
+      },
+      "charImageValues": {
+        "HeroPainting": null,
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Riana_Skin03.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Riana_Skin03.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Riana_Skin03.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Riana.png",
+        "Spine": "Spine/Char/Riana_ABS/Riana_Skin03_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 801,
+      "skinName": "旋律的妖精",
+      "specifiedHero": 8,
+      "charImageSkinResourceId": 801,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_LanaSkin_01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Lana_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Lana_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Lana_Skin01.png"
+      },
+      "charImageValues": {
+        "HeroPainting": "UI/HeroPainting2/SSR_ABS/Prefab/Hofmann.prefab",
+        "CardHeadImage": "UI/Card07_ABS/Card_Head_MoltenSorcerer_NPC.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Hofmann.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_OzgusSoldier.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Hofmann.png",
+        "Spine": "Spine/Char/NPC_MoltenSorcerer_ABS/NPC_MoltenSorcerer_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 602,
+      "skinName": "浮浪之刃",
+      "specifiedHero": 6,
+      "charImageSkinResourceId": 602,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Leon_Skin02.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Leon_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Leon_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Leon_Skin01.png"
+      },
+      "charImageValues": {
+        "HeroPainting": "UI/HeroPainting/SSR_ABS/Prefab/Alpha.prefab",
+        "CardHeadImage": "UI/CarkSkin03_ABS/Card_Head_Alpha_Skin01.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Alpha01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Alpha01.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Alpha01.png",
+        "Spine": "Spine/Char/Alpha_ABS/Alpha_Skin01_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 1001,
+      "skinName": "火红的独奏者",
+      "specifiedHero": 10,
+      "charImageSkinResourceId": 1001,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Ledyn_Skin01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Ledyn_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Ledyn_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Ledyn_Skin01.png"
+      },
+      "charImageValues": {
+        "HeroPainting": "UI/HeroPainting/SR_ABS/Prefab/Freya.prefab",
+        "CardHeadImage": "UI/Card04_ABS/Card_Head_FreyaSP.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Freya_SP.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Freya_SP.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Freya.png",
+        "Spine": "Spine/Char/Freya_ABS/Freya_SP_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 501,
+      "skinName": "防暴女警",
+      "specifiedHero": 5,
+      "charImageSkinResourceId": 501,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Chris_Skin01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Chris_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Chris_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Chris_Skin01.png"
+      },
+      "charImageValues": {
+        "HeroPainting": null,
+        "CardHeadImage": "UI/CarkSkin03_ABS/Card_Head_Gizlof_Skin02.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Gizlof.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Gizlof.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Gizlof.png",
+        "Spine": "Spine/Char/Gizlof_ABS/Gizlof_Skin02_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 802,
+      "skinName": "海滨丽人",
+      "specifiedHero": 8,
+      "charImageSkinResourceId": 802,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Lana_SkinSP01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Lana_Skin03.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Lana_Skin03.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Lana_Skin03.png"
+      },
+      "charImageValues": {
+        "HeroPainting": "UI/HeroPainting2/SSR_ABS/Prefab/Hofmann.prefab",
+        "CardHeadImage": "UI/Card07_ABS/Card_Head_GylmannaSaintess_NPC.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Hofmann.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Hofmann.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Hofmann.png",
+        "Spine": "Spine/Char/NPC_GylmannaSaintess_ABS/GylmannaSaintess_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 1101,
+      "skinName": "浪漫一夏",
+      "specifiedHero": 11,
+      "charImageSkinResourceId": 1101,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Norm_SkinSP01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Nurm_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Nurm_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Nurm_Skin01.png"
+      },
+      "charImageValues": {
+        "HeroPainting": "UI/HeroPainting/SSR_ABS/Prefab/Licorice.prefab",
+        "CardHeadImage": "UI/CarkSkin06_ABS/Card_Head_Licorice_Skin04.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin2_ABS/Head_Small_Licorice_Skin04.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin2_ABS/Head_Licorice_Skin04.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Licorice.png",
+        "Spine": "Spine/Char/Licorice_ABS/Licorice_Skin04_Prefab.prefab",
+        "Spine2": "Spine/Char/Licorice_ABS/Bust_Licorice_Skin04_Prefab.prefab",
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 803,
+      "skinName": "月下红樱",
+      "specifiedHero": 8,
+      "charImageSkinResourceId": 803,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Lana_Skin02.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Lana_Skin02.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Lana_Skin02.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Lana_Skin02.png"
+      },
+      "charImageValues": {
+        "HeroPainting": "UI/HeroPainting2/SSR_ABS/Prefab/Hofmann.prefab",
+        "CardHeadImage": "UI/Card07_ABS/Card_Head_SeraphinaShadow_NPC.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Hofmann.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Hofmann.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Hofmann.png",
+        "Spine": "Spine/Char/Seraphina_ABS/Seraphina_S_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 901,
+      "skinName": "灵魂收割者",
+      "specifiedHero": 9,
+      "charImageSkinResourceId": 901,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Bozel_Skin01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Bozel_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Bozel_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Bozel_Skin01.png"
+      },
+      "charImageValues": {
+        "HeroPainting": null,
+        "CardHeadImage": "UI/CarkSkin06_ABS/Card_Head_Grunhind_Skin03.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin2_ABS/Head_Small_Grunhind_Skin03.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin2_ABS/Headl_Grunhind_Skin03.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Grunhind.png",
+        "Spine": "Spine/Char/Grunhind_ABS/Grunhind_Skin03_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 1102,
+      "skinName": "星海领航员",
+      "specifiedHero": 11,
+      "charImageSkinResourceId": 1102,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Norm_Skin01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Nurm_Skin02.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Nurm_Skin02.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Nurm_Skin02.png"
+      },
+      "charImageValues": {
+        "HeroPainting": "UI/HeroPainting2/SSR_ABS/Prefab/Sanger.prefab",
+        "CardHeadImage": "UI/CarkSkin06_ABS/Card_Head_Sanger_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin2_ABS/Head_Small_Sanger_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin2_ABS/Head_Sanger_Skin01.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_Sanger.png",
+        "Spine": "Spine/Char/Sanger_ABS/Sanger_Skin01_Prefab.prefab",
+        "Spine2": "Spine/Char/Sanger_ABS/Bust_Sanger_Skin01_Prefab.prefab",
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 102,
+      "skinName": "执事美酒",
+      "specifiedHero": 1,
+      "charImageSkinResourceId": 102,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Matthew_Skin01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Matthew_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Matthew_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Matthew_Skin01.png"
+      },
+      "charImageValues": {
+        "HeroPainting": "UI/HeroPainting/SSR_ABS/Prefab/MagusOfTheTree.prefab",
+        "CardHeadImage": "UI/Card04_ABS/Card_Head_MagusOfTheTree.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_MagusOfTheTree.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_MagusOfTheTree.png",
+        "SummonHeadImage": "UI/Icon/Card_ABS/Card_MagusOfTheTree.png",
+        "Spine": "Spine/Char/MagusOfTheTree_Hero_ABS/MagusOfTheTree_Hero_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 301,
+      "skinName": "星级大厨",
+      "specifiedHero": 3,
+      "charImageSkinResourceId": 301,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Grenier_Skin01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Grenier_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Grenier_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Grenier_Skin01.png"
+      },
+      "charImageValues": {
+        "HeroPainting": null,
+        "CardHeadImage": "UI/Card02_ABS/Card_head_Zoe-Kayiro.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Zalrahda.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Zalrahda.png",
+        "SummonHeadImage": null,
+        "Spine": "Spine/Bust/3_ABS/Zoe-Kayiro/Zoe-Kayiro_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 401,
+      "skinName": "甜心女仆",
+      "specifiedHero": 4,
+      "charImageSkinResourceId": 401,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Aimeeda_Skin01.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Aimeeda_Skin01.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Aimeeda_Skin01.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Aimeeda_Skin01.png"
+      },
+      "charImageValues": {
+        "HeroPainting": null,
+        "CardHeadImage": "UI/CarkSkin02_ABS/Card_Head_Rachel_Skin04.png",
+        "SmallHeadImage": null,
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Rachel.png",
+        "SummonHeadImage": null,
+        "Spine": "Spine/Char/Rachel_ABS/Rachel_Skin04_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    },
+    {
+      "skinId": 603,
+      "skinName": "苍之骑士",
+      "specifiedHero": 6,
+      "charImageSkinResourceId": 603,
+      "skinInfoImages": {
+        "Icon": "UI/Icon/HeroSkin_ABS/Icon_Leon_Skin03.png",
+        "CardHeadImage": "UI/CarkSkin01_ABS/Card_Head_Leon_Skin03.png",
+        "SmallHeadImage": "UI/Icon/HeadSkin_ABS/Head_Small_Leon_Skin03.png",
+        "RoundHeadImage": "UI/Icon/HeadBattleSkin_ABS/Head_Leon_Skin03.png"
+      },
+      "charImageValues": {
+        "HeroPainting": null,
+        "CardHeadImage": "UI/Card06_ABS/Card_Head_NPC_POPPIPI.png",
+        "SmallHeadImage": "UI/Icon/Head_ABS/Head_Small_Zalrahda.png",
+        "RoundHeadImage": "UI/Icon/HeadBattle_ABS/Head_Zalrahda.png",
+        "SummonHeadImage": null,
+        "Spine": "Spine/Char/NPC_Popuko_ABS/NPC_Popuko_Prefab.prefab",
+        "Spine2": null,
+        "SpineBackground": null
+      }
+    }
+  ],
+  "interpretation": {
+    "acceptedHeroDetailArtworkField": null,
+    "acceptedSkinArtworkJoin": null,
+    "fieldRoles": null,
+    "rule": "Do not finalize until coverage/path semantics show which field is the large static character painting and whether skin CharImageSkinResource_ID resolves through the same CharImageInfo table."
+  },
+  "errors": []
+}
