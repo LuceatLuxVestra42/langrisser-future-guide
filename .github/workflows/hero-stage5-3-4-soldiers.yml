@@ -1,0 +1,72 @@
+name: Hero Stage 5-3-4 Soldier Blocks
+
+on:
+  push:
+    branches:
+      - main
+      - 'work/**'
+    paths:
+      - 'scripts/finalize-hero-stage5-3-4-soldiers.cjs'
+      - 'data/contracts/hero-page-soldiers-stage5-3-contract.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/soldier-master.v1.json'
+      - 'data/validation/hero-soldier-relation-validation.v1.json'
+      - '.github/workflows/hero-stage5-3-4-soldiers.yml'
+  pull_request:
+    paths:
+      - 'scripts/finalize-hero-stage5-3-4-soldiers.cjs'
+      - 'data/contracts/hero-page-soldiers-stage5-3-contract.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/soldier-master.v1.json'
+      - 'data/validation/hero-soldier-relation-validation.v1.json'
+      - 'data/generated/hero-page-soldiers-stage5-3.v1.json'
+      - 'data/validation/hero-page-stage5-3-4.v1.json'
+      - '.github/workflows/hero-stage5-3-4-soldiers.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate and validate Hero Stage 5-3-4 Soldier blocks
+        run: node scripts/finalize-hero-stage5-3-4-soldiers.cjs
+
+      - name: Upload Stage 5-3-4 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-stage5-3-4-soldiers
+          path: |
+            data/generated/hero-page-soldiers-stage5-3.v1.json
+            data/validation/hero-page-stage5-3-4.v1.json
+
+      - name: Freeze generated artifacts on work branch
+        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            data/generated/hero-page-soldiers-stage5-3.v1.json \
+            data/validation/hero-page-stage5-3-4.v1.json
+          if git diff --cached --quiet; then
+            echo "Hero Stage 5-3-4 artifacts already frozen."
+          else
+            git commit -m "freeze Hero stage 5-3-4 Soldier blocks"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+      - name: Verify frozen artifacts on main or PR
+        if: github.event_name != 'push' || github.ref == 'refs/heads/main'
+        run: git diff --exit-code -- data/generated/hero-page-soldiers-stage5-3.v1.json data/validation/hero-page-stage5-3-4.v1.json
