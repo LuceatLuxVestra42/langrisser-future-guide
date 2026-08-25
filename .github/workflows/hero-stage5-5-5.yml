@@ -1,0 +1,56 @@
+name: Hero Stage 5-5-5 final gate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-5-5.yml'
+      - 'scripts/validate_hero_page_stage5_5_5.cjs'
+      - 'data/validation/hero-page-stage5-5-1.v1.json'
+      - 'data/validation/hero-page-stage5-5-2-coverage.v1.json'
+      - 'data/validation/hero-page-stage5-5-3-validation.v1.json'
+      - 'data/validation/hero-page-stage5-5-4-validation.v1.json'
+      - 'data/contracts/hero-page-stage5-5-3-output-contract.v1.json'
+      - 'data/contracts/hero-page-stage5-5-4-display-policy.v1.json'
+      - 'data/hero-page-stage5-5-3.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  final-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Stage 5-5 final gate
+        run: node scripts/validate_hero_page_stage5_5_5.cjs
+
+      - name: Show final gate summary
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const r = JSON.parse(fs.readFileSync('data/validation/hero-page-stage5-5-5-final.v1.json','utf8'));
+          console.log(JSON.stringify({
+            status: r.status,
+            completion: r.completion,
+            summary: r.summary,
+            stageResults: r.stageResults,
+            failures: r.failures,
+            nonBlockingFollowups: r.nonBlockingFollowups,
+            nextAction: r.nextAction
+          }, null, 2));
+          NODE
+
+      - name: Freeze Stage 5-5 final artifact
+        run: |
+          TARGET='data/validation/hero-page-stage5-5-5-final.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
+            echo 'Stage 5-5 final artifact already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$TARGET"
+          git commit -m 'Freeze Hero Stage 5-5-5 final gate'
+          git push
