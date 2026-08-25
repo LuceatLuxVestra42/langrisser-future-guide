@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "stage": "soldier-page-4-5",
+  "status": "PASS",
+  "purpose": "Regress SP Hero -> reward Soldier source edges after UnityDataTool direct-JSON migration while preserving the shared Relation Layer ownership boundary.",
+  "baseline": {
+    "commit": "c2276d1162dae52a1762e6381e7dd195c917da2f",
+    "artifact": "data/generated/soldier-stage3.v1.json",
+    "role": "pre-4-1 SP Hero reward edge reference; legacy provenance fields are excluded from canonical relation equivalence"
+  },
+  "inputs": {
+    "spHero": "data/configdata/ConfigDataSPHeroInfo.json",
+    "heroMaster": "data/hero-name-master.v1.json",
+    "soldierMaster": "data/generated/soldier-master.v1.json",
+    "currentStage3": "data/generated/soldier-stage3.v1.json",
+    "stage3Validation": "data/validation/soldier-stage3-final.v1.json"
+  },
+  "hashes": {
+    "baselineRelationSha256": "9b1307387caa6f28cb25880060e3ceb62e63c44ab4cc5ceafcb5fcd98a727209",
+    "currentRelationSha256": "9b1307387caa6f28cb25880060e3ceb62e63c44ab4cc5ceafcb5fcd98a727209",
+    "recomputedRelationSha256": "9b1307387caa6f28cb25880060e3ceb62e63c44ab4cc5ceafcb5fcd98a727209",
+    "currentFullMetadataSha256": "52deec0dd93df53d85c0e768e88bd74a232e53d89654d5809a95a49c2cd651d1",
+    "recomputedFullMetadataSha256": "52deec0dd93df53d85c0e768e88bd74a232e53d89654d5809a95a49c2cd651d1"
+  },
+  "counts": {
+    "spHeroRecords": 25,
+    "rewardRecords": 25,
+    "rewardEdges": 25,
+    "distinctRewardSoldiers": 21,
+    "heroInformationDiffersFromCanonical": 25,
+    "baselineMetadataDiffersFromCurrent": 0,
+    "baselineSpHeroInfoIdDiffersFromCurrent": 25
+  },
+  "checks": {
+    "spHeroRecordCountMismatch": 0,
+    "rewardRecordCountMismatch": 0,
+    "rewardEdgeCountMismatch": 0,
+    "duplicateSpHeroIds": 0,
+    "duplicateRewardEdges": 0,
+    "canonicalHeroIdMismatch": 0,
+    "currentOutputCanonicalIdMismatch": 0,
+    "missingCanonicalHeroIds": 0,
+    "missingRewardSoldierIds": 0,
+    "baselineMissingEdges": 0,
+    "baselineExtraEdges": 0,
+    "currentMissingEdges": 0,
+    "currentExtraEdges": 0,
+    "baselineRelationSemanticMismatch": 0,
+    "currentRelationSemanticMismatch": 0,
+    "baselineVsCurrentRelationMismatch": 0,
+    "currentMetadataPreservationMismatch": 0,
+    "stage3SpHeroCheckRegression": 0,
+    "reverseIndexMissing": 0,
+    "reverseIndexExtra": 0
+  },
+  "policy": {
+    "canonicalHeroKey": "ConfigDataSPHeroInfo.ID is the canonical heroId for SecondStageRewardSoldiers.",
+    "legacyProvenance": "Pre-4-1 spHeroInfoId is not trusted as a canonical relation field. Baseline equivalence therefore compares canonical heroId + rewardSoldierIds only.",
+    "currentProvenance": "Current direct-JSON output must satisfy spHeroInfoId === heroId === ConfigDataSPHeroInfo.ID.",
+    "heroInformationId": "HeroInformation_ID is non-key metadata. It is excluded from relation-equivalence hashes, but the current generated value must exactly preserve the current direct-JSON source.",
+    "rewardJoin": "SecondStageRewardSoldiers contains canonical Soldier IDs and is reverse-indexed by Soldier ID without name or numeric-pattern inference.",
+    "relationBoundary": "4-5 validates the directed SP_HERO_REWARD source edges only. Final canonical Hero-Soldier membership remains owned by the shared Relation Layer and is handled after A-9."
+  },
+  "errors": [],
+  "completion": "All SP Hero reward-Soldier canonical edges reproduce the pre-4-1 relation semantics from current direct JSON, resolve to canonical Hero/Soldier masters, preserve current metadata/provenance, and have an exact Stage3 reverse index."
+}
