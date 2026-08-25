@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "stage": "A-0",
+  "status": "FROZEN",
+  "purpose": "Golden baseline for the shared Hero-Soldier Relation Layer. This freezes the last fully validated pre-migration Hero <-> Soldier relation result and must be used for regression comparison, not treated as current UnityDataTool JSON output.",
+  "source": {
+    "validationPath": "data/validation/soldier-stage3-12-final.v1.json",
+    "validationBlobSha": "a8d2f69177aaa93309aea94a3ff293e1857818f0",
+    "relationPath": "data/generated/soldier-hero-relations.v1.json",
+    "sourceStage": "3-12",
+    "sourceGeneratedAt": "2026-08-24T13:18:14.726Z"
+  },
+  "baseline": {
+    "soldierRecords": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "heroRecords": 267,
+    "finalEdges": 5977,
+    "baseEdges": 5720,
+    "directSpHeroAddedEdges": 25,
+    "inheritedSpHeroAddedEdges": 5,
+    "spExpandedEdges": 228,
+    "soldiersWithNoHeroes": 0,
+    "heroesWithNoSoldiers": 0
+  },
+  "integrityChecks": {
+    "missingHeroIds": 0,
+    "missingSoldierMasterIds": 0,
+    "missingSpRelations": 0,
+    "spBaseInheritanceMismatch": 0,
+    "spAddedInheritanceMismatch": 0,
+    "missingHeroToSoldierEdges": 0,
+    "missingSoldierToHeroEdges": 0,
+    "duplicateSoldierRows": 0,
+    "duplicateHeroRows": 0
+  },
+  "frozenPolicies": {
+    "baseRelation": "Normal Soldier relation comes from SoldierInfo.GetSoldierHeros_ID; SP Soldier inherits the Normal base list.",
+    "spHeroReward": "SPHeroInfo.SecondStageRewardSoldiers adds Hero -> Soldier edges; reverse Soldier -> Hero relation is inherited by the SP form through its Normal relation.",
+    "spRelation": "Normal <-> SP Soldier relation comes only from SPSoldierInfo.NormalSoliderId <-> ID.",
+    "spExpand": "SecondStageExpandHeroList adds only newly expanded heroes to the SP Soldier.",
+    "finalRelation": "Final relation is a set union with provenance preserved, then reversed to build Hero -> Soldier."
+  },
+  "usageRules": [
+    "Do not regenerate or reinterpret this file during A-1 through A-9.",
+    "Use this baseline to detect regression when the relation pipeline is migrated to UnityDataTool parsed JSON.",
+    "A count difference from this baseline is not automatically an error; distinguish real client-data changes from parser or JOIN regression.",
+    "The shared Relation Layer must preserve bidirectional consistency and provenance before replacing this baseline with a new current-data PASS baseline."
+  ]
+}
