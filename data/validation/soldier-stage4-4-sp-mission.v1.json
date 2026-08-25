@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "stage": "soldier-page-4-4",
+  "status": "PASS",
+  "purpose": "Regress SP Soldier structure, SP ability text, stage missions/materials and SecondStageUnlock semantics after UnityDataTool direct-JSON migration without creating canonical Hero-Soldier membership.",
+  "baseline": {
+    "commit": "c2276d1162dae52a1762e6381e7dd195c917da2f",
+    "artifact": "data/generated/soldier-stage3.v1.json",
+    "role": "pre-4-1 SP semantic regression reference"
+  },
+  "inputs": {
+    "spSoldier": "data/configdata/ConfigDataSPSoldierInfo.json",
+    "soldier": "data/configdata/ConfigDataSoldierInfo.json",
+    "trainingTech": "data/configdata/ConfigDataTrainingTechInfo.json",
+    "trainingLevel": "data/configdata/ConfigDataTrainingTechLevelInfo.json",
+    "mission": "data/configdata/ConfigDataMissionInfo.json",
+    "missionSubmit": "data/configdata/ConfigDataMissionSumitItemInfo.json",
+    "heroMaster": "data/hero-name-master.v1.json",
+    "currentStage3": "data/generated/soldier-stage3.v1.json",
+    "stage3Validation": "data/validation/soldier-stage3-final.v1.json"
+  },
+  "hashes": {
+    "spSoldierBlobSha": "93dd784a7de913daa6d72f5df6cf6890a710c58a",
+    "trainingLevelBlobSha": "30789c3e4fb0d79b56514e720bb71a053df78c72",
+    "missionBlobSha": "72c62b297a0664844c3c53dc10452a1b0ca4704d",
+    "missionSubmitBlobSha": "e4cf4e20ce6aaf19f6acaa7c75d54d1adf7517dc",
+    "baselineSpSemanticSha256": "6b4f4ada222dd91822a3188e62078affbe53ad3a5a1ad3fdf24c3b761f92d8ec",
+    "currentSpSemanticSha256": "6b4f4ada222dd91822a3188e62078affbe53ad3a5a1ad3fdf24c3b761f92d8ec",
+    "recomputedSpSemanticSha256": "6b4f4ada222dd91822a3188e62078affbe53ad3a5a1ad3fdf24c3b761f92d8ec"
+  },
+  "counts": {
+    "spSoldierRecords": 56,
+    "secondStageTrue": 45,
+    "secondStageFalse": 11,
+    "missionTypes": {
+      "73": 56,
+      "123": 56,
+      "124": 45
+    },
+    "uniqueSubmitBundlesReferenced": 6,
+    "spDescriptionLevelRecords": 560,
+    "firstStageAwakenMaterialEntries": 168,
+    "secondStageAwakenMaterialEntries": 180,
+    "expandedHeroEdges": 228
+  },
+  "checks": {
+    "spCountMismatch": 0,
+    "secondStageSplitMismatch": 0,
+    "duplicateSpIds": 0,
+    "duplicateSpNormalIds": 0,
+    "missingNormalSoldier": 0,
+    "missingSpSoldier": 0,
+    "stage1MissionCountMismatch": 0,
+    "stage2MissionCountMismatch": 0,
+    "falseWithStage2Data": 0,
+    "missingMissionRefs": 0,
+    "missingSubmitBundles": 0,
+    "missionTypeCountMismatch": 0,
+    "missingExpandHeroIds": 0,
+    "primaryTrainingMissing": 0,
+    "primaryTrainingMultiple": 0,
+    "spDescriptionMissing": 0,
+    "baselineRelationMissing": 0,
+    "currentRelationMissing": 0,
+    "baselineSemanticMismatch": 0,
+    "currentSemanticMismatch": 0,
+    "baselineVsCurrentMismatch": 0,
+    "stage3SpCheckRegression": 0
+  },
+  "policy": {
+    "spRelation": "ConfigDataSPSoldierInfo.NormalSoliderId <-> ID only; no arithmetic inference.",
+    "spAbility": "Use TrainingTechLevelInfo.SpSoidlierDescription from the Normal Soldier unique SoldierSkillLevelup 1..10 TrainingTech path.",
+    "stage1": "FisrtStageMissionList is authoritative for stage 1; MissionType 73 joins MissionInfo.Param1 -> MissionSumitItemInfo.ID.",
+    "stage2": "SecondStageUnlock is authoritative. Only true records expose second-stage mission/material/expanded-Hero semantics.",
+    "expandHeroes": "SecondStageExpandHeroList is validated as source structure only here; canonical Hero-Soldier membership remains owned by the shared Relation Layer after A-9."
+  },
+  "errors": [],
+  "completion": "All 56 SP Soldier structures reproduce the pre-4-1 semantics from current direct JSON with intact SP descriptions, missions, awaken materials, 45/11 stage branching and expanded-Hero source lists."
+}
