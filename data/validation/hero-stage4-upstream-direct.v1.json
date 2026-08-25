@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "stage": "hero-stage4-upstream-direct-regression",
+  "status": "PASS",
+  "purpose": "Prove that frozen Stage 4-3/4-4 Hero topology and skill references remain compatible with the current UnityDataTool direct-JSON snapshot without rerunning legacy m_bytes builders.",
+  "counts": {
+    "canonicalHeroes": 267,
+    "playableHeroInfo": 267,
+    "jobTreeHeroes": 267,
+    "skillHeroes": 267,
+    "currentJobConnections": 30027,
+    "currentJobs": 3285,
+    "currentJobLevels": 7459,
+    "currentSkills": 27198,
+    "checkedSkillRefs": 1424
+  },
+  "checks": {
+    "heroConnectionSetMismatches": 0,
+    "primaryConnectionMismatches": 0,
+    "jobReferenceMismatches": 0,
+    "jobLevelSetMismatches": 0,
+    "missingCurrentSkillRefs": 0
+  },
+  "interpretation": "PASS means the existing 4-3 topology and 4-4 skill-reference artifacts are not stale relative to current direct JSON for the relations they claim; it does not make the legacy builders direct-JSON compatible.",
+  "errors": []
+}

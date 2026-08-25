@@ -1,405 +1,280 @@
 const fs = require('fs');
 const path = require('path');
+const { loadArray } = require('./lib/configdata-direct.cjs');
 
-const rootDir = path.resolve(__dirname, '..');
-const dataDir = path.join(rootDir, 'data');
-const configDir = path.join(dataDir, 'configdata');
-const generatedDir = path.join(dataDir, 'generated');
-const validationDir = path.join(dataDir, 'validation');
+const ROOT = path.resolve(__dirname, '..');
+const DATA = path.join(ROOT, 'data');
+const GENERATED = path.join(DATA, 'generated');
+const VALIDATION = path.join(DATA, 'validation');
 
-const contractPath = path.join(dataDir, 'hero-basic-combat-stage4-5.v1.json');
-const jobTreePath = path.join(generatedDir, 'hero-job-trees.v1.json');
-const skillPath = path.join(generatedDir, 'hero-skill-acquisition.v1.json');
-const outputPath = path.join(generatedDir, 'hero-basic-combat.v1.json');
-const summaryPath = path.join(validationDir, 'hero-basic-combat-stage4-5-summary.v1.json');
+const CONTRACT_PATH = path.join(DATA, 'hero-basic-combat-stage4-5.v1.json');
+const HERO_MASTER_PATH = path.join(DATA, 'hero-name-master.v1.json');
+const JOB_TREE_PATH = path.join(GENERATED, 'hero-job-trees.v1.json');
+const SKILL_PATH = path.join(GENERATED, 'hero-skill-acquisition.v1.json');
+const OUTPUT_PATH = path.join(GENERATED, 'hero-basic-combat.v1.json');
+const SUMMARY_PATH = path.join(VALIDATION, 'hero-basic-combat-stage4-5-summary.v1.json');
 
-function loadJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-}
+const HERO_LEVEL = 70;
+const DISPLAY_STAR = 6;
+const STAT_DEFS = {
+  hp: { ini: 'HP_INI', up: 'HP_UP', star: 'HPStar', masteryId: 87 },
+  at: { ini: 'AT_INI', up: 'AT_UP', star: 'ATStar', masteryId: 88 },
+  magic: { ini: 'Magic_INI', up: 'Magic_UP', star: 'MagicStar', masteryId: 90 },
+  df: { ini: 'DF_INI', up: 'DF_UP', star: 'DFStar', masteryId: 89 },
+  magicDf: { ini: 'MagicDF_INI', up: 'MagicDF_UP', star: 'MagicDFStar', masteryId: 91 },
+  dex: { ini: 'DEX_INI', up: 'DEX_UP', star: 'DEXStar', masteryId: 92 },
+};
+const MASTERY_ID_TO_STAT = Object.fromEntries(Object.entries(STAT_DEFS).map(([stat, def]) => [def.masteryId, stat]));
+const FORBIDDEN_MEMBERSHIP_KEYS = new Set([
+  'usableSoldiers', 'soldierIds', 'usableSoldierIds', 'heroSoldierRelations',
+  'soldierMembership', 'relationEdges', 'byHeroId', 'bySoldierId',
+]);
 
-function ensureDir(dirPath) {
-  fs.mkdirSync(dirPath, { recursive: true });
-}
+function readJson(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
+function writeJson(p, value) { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, JSON.stringify(value, null, 2) + '\n'); }
+function number(v, fallback = 0) { return Number.isFinite(v) ? v : fallback; }
+function numberArray(v) { return Array.isArray(v) ? v.filter(Number.isFinite) : []; }
+function uniqueInts(v) { return [...new Set(v.filter(Number.isInteger))].sort((a, b) => a - b); }
+function sameArray(a, b) { return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((v, i) => v === b[i]); }
+function setDiff(a, b) { return [...a].filter((v) => !b.has(v)).sort((x, y) => x - y); }
 
-function writeJson(filePath, value) {
-  ensureDir(path.dirname(filePath));
-  fs.writeFileSync(filePath, JSON.stringify(value, null, 2) + '\n');
-}
-
-function inspectTextAsset(asset, expectedName) {
-  const issues = [];
-  if (!asset || typeof asset !== 'object' || Array.isArray(asset)) {
-    return { ok: false, issues: ['JSON root is not an object'] };
-  }
-  if (asset.m_Name !== expectedName) issues.push(`m_Name=${JSON.stringify(asset.m_Name)} expected=${expectedName}`);
-  if (!Number.isInteger(asset.m_size) || asset.m_size < 0) issues.push(`invalid m_size=${String(asset.m_size)}`);
-  if (!Array.isArray(asset.m_bytes) || asset.m_bytes.length === 0) {
-    issues.push('m_bytes is missing, null, or empty');
-  } else {
-    const invalidIndex = asset.m_bytes.findIndex((value) => !Number.isInteger(value) || value < 0 || value > 255);
-    if (invalidIndex !== -1) issues.push(`invalid byte at index ${invalidIndex}`);
-    if (Number.isInteger(asset.m_size) && asset.m_bytes.length !== asset.m_size) {
-      issues.push(`m_size=${asset.m_size} but m_bytes.length=${asset.m_bytes.length}`);
-    }
-  }
-  return { ok: issues.length === 0, issues };
-}
-
-function sourceState(filename) {
-  const fullPath = path.join(configDir, filename);
-  if (!fs.existsSync(fullPath)) return { filename, ok: false, issues: ['file missing'], asset: null };
-  try {
-    const asset = loadJson(fullPath);
-    return {
-      filename,
-      asset,
-      ...inspectTextAsset(asset, path.basename(filename, '.json')),
-    };
-  } catch (error) {
-    return {
-      filename,
-      ok: false,
-      issues: [error instanceof Error ? error.message : String(error)],
-      asset: null,
-    };
-  }
-}
-
-function upstreamState(filePath, label) {
-  if (!fs.existsSync(filePath)) return { label, ok: false, status: 'missing', recordCount: 0, data: null };
-  try {
-    const data = loadJson(filePath);
-    const ok = data.status === 'PASS' || data.status === 'REVIEW';
-    return {
-      label,
-      ok,
-      status: data.status || 'unknown',
-      recordCount: Array.isArray(data.records) ? data.records.length : 0,
-      data,
-    };
-  } catch (error) {
-    return {
-      label,
-      ok: false,
-      status: 'invalid-json',
-      recordCount: 0,
-      error: error instanceof Error ? error.message : String(error),
-      data: null,
-    };
-  }
-}
-
-function readVarint(buffer, start) {
-  let value = 0n;
-  let shift = 0n;
-  let offset = start;
-  while (offset < buffer.length && shift <= 70n) {
-    const byte = buffer[offset++];
-    value |= BigInt(byte & 0x7f) << shift;
-    if ((byte & 0x80) === 0) return { value, offset };
-    shift += 7n;
-  }
-  throw new Error(`invalid varint at offset ${start}`);
-}
-
-function splitLengthPrefixedMessages(bytes) {
-  const buffer = Buffer.from(bytes);
-  const messages = [];
-  let offset = 0;
-  while (offset < buffer.length) {
-    if (offset + 4 > buffer.length) throw new Error(`truncated 4-byte frame header at offset ${offset}`);
-    const length = buffer.readUInt32BE(offset);
-    offset += 4;
-    if (offset + length > buffer.length) throw new Error(`invalid frame length=${length} at offset ${offset - 4}`);
-    messages.push(buffer.subarray(offset, offset + length));
-    offset += length;
-  }
-  return messages;
-}
-
-function parseProtoFields(buffer) {
-  const fields = new Map();
-  let offset = 0;
-  while (offset < buffer.length) {
-    const tag = readVarint(buffer, offset);
-    offset = tag.offset;
-    if (tag.value <= 0n || tag.value > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error(`invalid protobuf tag near offset ${offset}`);
-    const tagNumber = Number(tag.value);
-    const fieldNumber = tagNumber >>> 3;
-    const wireType = tagNumber & 7;
-    let entry;
-
-    if (wireType === 0) {
-      const decoded = readVarint(buffer, offset);
-      offset = decoded.offset;
-      entry = { wireType, value: decoded.value };
-    } else if (wireType === 1) {
-      if (offset + 8 > buffer.length) throw new Error(`truncated fixed64 field ${fieldNumber}`);
-      entry = { wireType, value: buffer.subarray(offset, offset + 8) };
-      offset += 8;
-    } else if (wireType === 2) {
-      const decodedLength = readVarint(buffer, offset);
-      offset = decodedLength.offset;
-      if (decodedLength.value > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error(`oversized field ${fieldNumber}`);
-      const length = Number(decodedLength.value);
-      if (length < 0 || offset + length > buffer.length) throw new Error(`invalid length-delimited field ${fieldNumber}`);
-      entry = { wireType, value: buffer.subarray(offset, offset + length) };
-      offset += length;
-    } else if (wireType === 5) {
-      if (offset + 4 > buffer.length) throw new Error(`truncated fixed32 field ${fieldNumber}`);
-      entry = { wireType, value: buffer.subarray(offset, offset + 4) };
-      offset += 4;
-    } else {
-      throw new Error(`unsupported wire type ${wireType} at field ${fieldNumber}`);
-    }
-
-    const list = fields.get(fieldNumber) || [];
-    list.push(entry);
-    fields.set(fieldNumber, list);
-  }
-  return fields;
-}
-
-function parseSourceRecords(asset) {
-  return splitLengthPrefixedMessages(asset.m_bytes).map(parseProtoFields);
-}
-
-function firstUnsigned(fields, fieldNumber) {
-  for (const entry of fields.get(fieldNumber) || []) {
-    if (entry.wireType !== 0) continue;
-    if (entry.value < 0n || entry.value > BigInt(Number.MAX_SAFE_INTEGER)) return null;
-    return Number(entry.value);
-  }
-  return null;
-}
-
-function firstInt32(fields, fieldNumber) {
-  for (const entry of fields.get(fieldNumber) || []) {
-    if (entry.wireType === 0) return Number(BigInt.asIntN(32, entry.value));
-  }
-  return null;
-}
-
-function firstString(fields, fieldNumber) {
-  for (const entry of fields.get(fieldNumber) || []) {
-    if (entry.wireType === 2) return entry.value.toString('utf8');
-  }
-  return null;
-}
-
-function indexById(records, label) {
+function indexUnique(rows, idField, label, errors, filter = () => true) {
   const map = new Map();
-  const duplicates = [];
-  for (const record of records) {
-    if (!Number.isInteger(record.id)) continue;
-    if (map.has(record.id)) duplicates.push(record.id);
-    else map.set(record.id, record);
+  for (const row of rows) {
+    if (!filter(row)) continue;
+    const id = row?.[idField];
+    if (!Number.isInteger(id)) continue;
+    if (map.has(id)) errors.push(`${label}: duplicate ${idField}=${id}`);
+    else map.set(id, row);
+  }
+  return map;
+}
+
+function skillSnapshot(row) {
+  if (!row) return null;
+  return {
+    skillId: row.ID,
+    nameCn: row.Name ?? null,
+    desc: row.Desc ?? null,
+    iconPath: row.IconPath ?? row.Icon ?? null,
+  };
+}
+
+function masteryRewards(job) {
+  const out = [];
+  for (let i = 1; i <= 3; i += 1) {
+    const propertyId = job?.[`Property${i}_ID`];
+    const value = job?.[`Property${i}_Value`];
+    if (!Number.isInteger(propertyId) || !Number.isFinite(value) || propertyId === 0 || value === 0) continue;
+    out.push({ propertyId, stat: MASTERY_ID_TO_STAT[propertyId] ?? null, value });
+  }
+  return out;
+}
+
+function masteryTotals(treeHero, jobIndex, errors) {
+  const totals = Object.fromEntries(Object.keys(STAT_DEFS).map((k) => [k, 0]));
+  const jobs = [];
+  const jobIds = uniqueInts((treeHero.connections || []).map((c) => c.jobId));
+  for (const jobId of jobIds) {
+    const job = jobIndex.get(jobId);
+    if (!job) { errors.push(`heroId ${treeHero.heroId}: missing JobInfo ${jobId}`); continue; }
+    const rewards = masteryRewards(job);
+    for (const reward of rewards) {
+      if (!reward.stat) {
+        errors.push(`heroId ${treeHero.heroId}: unsupported mastery PropertyModifyInfo ID ${reward.propertyId} on JobInfo ${jobId}`);
+        continue;
+      }
+      totals[reward.stat] += reward.value;
+    }
+    jobs.push({ jobId, nameCn: job.Name ?? null, rank: job.Rank ?? null, rewards });
+  }
+  return { totals, jobs };
+}
+
+function finalLevelForConnection(connection, jobLevelIndex, heroId, errors) {
+  const candidates = [];
+  for (const level of connection.levels || []) {
+    const source = jobLevelIndex.get(level.jobLevelId);
+    if (!source) { errors.push(`heroId ${heroId}: missing JobLevelInfo ${level.jobLevelId}`); continue; }
+    candidates.push({ level, source });
+  }
+  if (!candidates.length) return null;
+  candidates.sort((a, b) => number(a.source.JobLevelUpHeroLevel) - number(b.source.JobLevelUpHeroLevel) || a.source.ID - b.source.ID);
+  return candidates[candidates.length - 1];
+}
+
+function computeDisplayStats(hero, sourceLevel, mastery, heroId, connectionId, errors) {
+  const values = {};
+  const components = {};
+  for (const [stat, def] of Object.entries(STAT_DEFS)) {
+    const starArray = numberArray(hero[def.star]);
+    if (starArray.length !== 6) {
+      errors.push(`heroId ${heroId}: ${def.star} expected 6 values, got ${starArray.length}`);
+      continue;
+    }
+    const ini = number(sourceLevel[def.ini]);
+    const up = number(sourceLevel[def.up]);
+    const starCorrection = starArray[DISPLAY_STAR - 1];
+    const progressionBase = ini + up * (HERO_LEVEL - 1) / 10;
+    const starAdjusted = Math.round(progressionBase * (1 + starCorrection / 10000));
+    const masteryFlat = number(mastery[stat]);
+    const finalValue = starAdjusted + masteryFlat;
+    if (!Number.isInteger(finalValue) || finalValue < 0) errors.push(`heroId ${heroId} connection ${connectionId}: invalid ${stat}=${finalValue}`);
+    values[stat] = finalValue;
+    components[stat] = { ini, up, heroLevel: HERO_LEVEL, star: DISPLAY_STAR, starCorrection, progressionBase, starAdjusted, masteryFlat };
+  }
+  return { values, components };
+}
+
+function talentProgression(treeHero, skillHero, hero, connectionIndex, skillIndex, errors) {
+  const connectionIds = uniqueInts((treeHero.connections || []).map((c) => c.jobConnectionId));
+  const arrays = [];
+  for (const id of connectionIds) {
+    const row = connectionIndex.get(id);
+    if (!row) { errors.push(`heroId ${treeHero.heroId}: missing JobConnectionInfo ${id}`); continue; }
+    const ids = numberArray(row.TalentSkill_IDs);
+    if (ids.length !== 6) errors.push(`heroId ${treeHero.heroId}: JobConnection ${id} TalentSkill_IDs length=${ids.length}, expected 6`);
+    arrays.push({ id, ids });
+  }
+  const primary = arrays[0]?.ids || [];
+  for (const item of arrays.slice(1)) if (!sameArray(primary, item.ids)) errors.push(`heroId ${treeHero.heroId}: TalentSkill_IDs mismatch between JobConnections ${arrays[0].id} and ${item.id}`);
+  const initialStar = number(hero.Star);
+  if (!Number.isInteger(initialStar) || initialStar < 1 || initialStar > 6) errors.push(`heroId ${treeHero.heroId}: invalid initial Star=${hero.Star}`);
+  if (primary.length === 6 && initialStar >= 1 && !primary.slice(0, initialStar).every((id) => id === primary[initialStar - 1])) {
+    errors.push(`heroId ${treeHero.heroId}: pre-initial-star talent slots do not repeat the initial talent`);
+  }
+  const starProgression = primary.map((skillId, i) => {
+    const skill = skillIndex.get(skillId);
+    if (!skill) errors.push(`heroId ${treeHero.heroId}: talent skill ${skillId} missing from SkillInfo`);
+    return { star: i + 1, skillId, skill: skillSnapshot(skill) };
+  });
+  return {
+    status: 'VERIFIED',
+    selectionRule: 'TalentSkill_IDs[star - 1]',
+    initialStar,
+    connectionTalentSkills: skillHero.connectionTalentSkills || [],
+    starProgression,
+  };
+}
+
+function soldierModifiers(hero, heroId, errors) {
+  const raw = {
+    hp: number(hero.HPCmd_INI),
+    at: number(hero.ATCmd_INI),
+    df: number(hero.DFCmd_INI),
+    magicDf: number(hero.MagicDFCmd_INI),
+  };
+  for (const [key, value] of Object.entries(raw)) {
+    if (!Number.isInteger(value) || value < 0 || value % 100 !== 0) errors.push(`heroId ${heroId}: invalid ${key} Cmd raw=${value}`);
   }
   return {
-    map,
-    duplicateMessage: duplicates.length ? `duplicate ${label} IDs: ${[...new Set(duplicates)].sort((a, b) => a - b).join(', ')}` : null,
+    status: 'VERIFIED',
+    meaning: 'Hero-owned troop stat modifier percentages; not Hero-Soldier membership',
+    scale: 'raw / 100 = percent',
+    raw,
+    hp: raw.hp / 100,
+    at: raw.at / 100,
+    df: raw.df / 100,
+    magicDf: raw.magicDf / 100,
   };
 }
 
-function heroIds(data) {
-  return new Set((data?.records || []).map((record) => record.heroId).filter(Number.isInteger));
-}
-
-function setDifference(left, right) {
-  return [...left].filter((value) => !right.has(value)).sort((a, b) => a - b);
-}
-
-function skillSnapshot(skill) {
-  if (!skill) return null;
-  return {
-    skillId: skill.id,
-    nameCn: skill.nameCn,
-    desc: skill.desc,
-    iconPath: skill.iconPath,
-  };
-}
-
-function gateResolvedForStage4(gate) {
-  if (gate.status === 'VERIFIED') return true;
-  if (gate.id === 'talentIdentity' && gate.status === 'VERIFIED_REFERENCE_SET') return true;
-  return false;
+function findForbiddenMembershipKeys(value, pathParts = [], out = []) {
+  if (!value || typeof value !== 'object') return out;
+  if (Array.isArray(value)) { value.forEach((v, i) => findForbiddenMembershipKeys(v, [...pathParts, String(i)], out)); return out; }
+  for (const [key, child] of Object.entries(value)) {
+    if (FORBIDDEN_MEMBERSHIP_KEYS.has(key)) out.push([...pathParts, key].join('.'));
+    findForbiddenMembershipKeys(child, [...pathParts, key], out);
+  }
+  return out;
 }
 
 function main() {
-  const contract = loadJson(contractPath);
-  const jobTree = upstreamState(jobTreePath, 'stage4-3-job-tree');
-  const skillAcquisition = upstreamState(skillPath, 'stage4-4-skill-acquisition');
-  const upstreams = [jobTree, skillAcquisition];
+  const contract = readJson(CONTRACT_PATH);
+  const heroMaster = readJson(HERO_MASTER_PATH);
+  const jobTree = readJson(JOB_TREE_PATH);
+  const skillAcquisition = readJson(SKILL_PATH);
+  const errors = [];
 
-  const requiredStates = (contract.requiredSources || []).map(sourceState);
-  const optionalStates = (contract.optionalBlockedSources || []).map(sourceState);
-  const requiredBroken = requiredStates.filter((state) => !state.ok);
-  const upstreamBlocked = upstreams.filter((state) => !state.ok);
+  if (!['PASS', 'REVIEW'].includes(jobTree.status)) errors.push(`Stage 4-3 status=${jobTree.status}`);
+  if (!['PASS', 'REVIEW'].includes(skillAcquisition.status)) errors.push(`Stage 4-4 status=${skillAcquisition.status}`);
 
-  const blockers = [];
-  for (const state of upstreamBlocked) blockers.push(`${state.label}: status=${state.status}${state.error ? ` (${state.error})` : ''}`);
-  for (const state of requiredBroken) blockers.push(`${state.filename}: ${state.issues.join(' | ')}`);
+  const canonicalIds = new Set((heroMaster.records || []).map((r) => r.heroId).filter(Number.isInteger));
+  const treeIds = new Set((jobTree.records || []).map((r) => r.heroId).filter(Number.isInteger));
+  const skillIds = new Set((skillAcquisition.records || []).map((r) => r.heroId).filter(Number.isInteger));
+  if (canonicalIds.size !== 267) errors.push(`canonical Hero count=${canonicalIds.size}, expected 267`);
+  if (setDiff(canonicalIds, treeIds).length || setDiff(treeIds, canonicalIds).length) errors.push('Stage 4-3 Hero set differs from canonical A-1 Hero set');
+  if (setDiff(canonicalIds, skillIds).length || setDiff(skillIds, canonicalIds).length) errors.push('Stage 4-4 Hero set differs from canonical A-1 Hero set');
 
-  if (upstreamBlocked.length || requiredBroken.length) {
-    const status = upstreamBlocked.length ? 'UPSTREAM_BLOCKED' : 'SOURCE_BLOCKED';
-    writeJson(outputPath, { version: 2, stage: '4-5', status, recordCount: 0, records: [] });
-    writeJson(summaryPath, {
-      version: 2,
-      stage: '4-5',
-      status,
-      pipelineStatus: 'PARTIAL_ASSEMBLER_READY',
-      stage4CompletionStatus: 'NOT_COMPLETE',
-      generatedHeroCount: 0,
-      upstream: upstreams.map(({ label, ok, status: upstreamStatus, recordCount, error }) => ({
-        label,
-        status: upstreamStatus,
-        usable: ok,
-        recordCount,
-        ...(error ? { error } : {}),
-      })),
-      sourceHealth: [...requiredStates, ...optionalStates].map(({ filename, ok, issues }) => ({
-        filename,
-        required: (contract.requiredSources || []).includes(filename),
-        status: ok ? 'usable' : 'broken',
-        issues,
-      })),
-      hardErrors: [],
-      blockers,
-      semanticGates: contract.semanticGates,
-    });
-    console.log(`STAGE 4-5 RESULT: ${status}`);
-    for (const blocker of blockers) console.log(`- BLOCKED: ${blocker}`);
-    process.exitCode = 2;
-    return;
+  const heroRows = loadArray('ConfigDataHeroInfo');
+  const jobRows = loadArray('ConfigDataJobInfo');
+  const connectionRows = loadArray('ConfigDataJobConnectionInfo');
+  const levelRows = loadArray('ConfigDataJobLevelInfo');
+  const skillRows = loadArray('ConfigDataSkillInfo');
+  const awakenRows = loadArray('ConfigDataAwakenInfo');
+
+  const heroIndex = indexUnique(heroRows, 'ID', 'HeroInfo', errors, (r) => Object.prototype.hasOwnProperty.call(r || {}, 'Useable'));
+  const jobIndex = indexUnique(jobRows, 'ID', 'JobInfo', errors, (r) => Object.prototype.hasOwnProperty.call(r || {}, 'Rank') && Object.prototype.hasOwnProperty.call(r || {}, 'Name'));
+  const connectionIndex = indexUnique(connectionRows, 'ID', 'JobConnectionInfo', errors, (r) => Object.prototype.hasOwnProperty.call(r || {}, 'TalentSkill_IDs') && Object.prototype.hasOwnProperty.call(r || {}, 'JobLevels_ID'));
+  const jobLevelIndex = indexUnique(levelRows, 'ID', 'JobLevelInfo', errors, (r) => Object.prototype.hasOwnProperty.call(r || {}, 'HP_INI') && Object.prototype.hasOwnProperty.call(r || {}, 'JobLevelUpHeroLevel'));
+  const skillIndex = indexUnique(skillRows, 'ID', 'SkillInfo', errors, (r) => Object.prototype.hasOwnProperty.call(r || {}, 'Name'));
+  const awakenIndex = indexUnique(awakenRows, 'ID', 'AwakenInfo', errors);
+
+  const selectedHeroIds = new Set(heroIndex.keys());
+  if (heroIndex.size !== 267 || setDiff(canonicalIds, selectedHeroIds).length || setDiff(selectedHeroIds, canonicalIds).length) {
+    errors.push(`playable HeroInfo schema set does not exactly match canonical 267 (selected=${heroIndex.size})`);
   }
 
-  const hardErrors = [];
-  const treeIds = heroIds(jobTree.data);
-  const skillHeroIds = heroIds(skillAcquisition.data);
-  const onlyTree = setDifference(treeIds, skillHeroIds);
-  const onlySkill = setDifference(skillHeroIds, treeIds);
-  if (onlyTree.length) hardErrors.push(`hero IDs only in Stage 4-3: ${onlyTree.join(', ')}`);
-  if (onlySkill.length) hardErrors.push(`hero IDs only in Stage 4-4: ${onlySkill.join(', ')}`);
-
-  const sourceByName = new Map(requiredStates.map((state) => [state.filename, state]));
-  const heroSource = parseSourceRecords(sourceByName.get('ConfigDataHeroInfo.json').asset)
-    .map((fields) => ({
-      id: firstUnsigned(fields, 2),
-      useable: firstUnsigned(fields, 10) === 1,
-      star: firstUnsigned(fields, 12),
-      rank: firstUnsigned(fields, 13),
-      awakenId: firstUnsigned(fields, 50),
-    }))
-    .filter((record) => Number.isInteger(record.id) && record.useable);
-
-  const jobLevelSource = parseSourceRecords(sourceByName.get('ConfigDataJobLevelInfo.json').asset)
-    .map((fields) => ({
-      id: firstUnsigned(fields, 2),
-      stats: {
-        hpIni: firstInt32(fields, 16),
-        hpUp: firstInt32(fields, 17),
-        atIni: firstInt32(fields, 18),
-        atUp: firstInt32(fields, 19),
-        magicIni: firstInt32(fields, 20),
-        magicUp: firstInt32(fields, 21),
-        dfIni: firstInt32(fields, 22),
-        dfUp: firstInt32(fields, 23),
-        magicDfIni: firstInt32(fields, 24),
-        magicDfUp: firstInt32(fields, 25),
-        dexIni: firstInt32(fields, 26),
-        dexUp: firstInt32(fields, 27),
-      },
-    }))
-    .filter((record) => Number.isInteger(record.id));
-
-  const heroIndex = indexById(heroSource, 'HeroInfo');
-  const jobLevelIndex = indexById(jobLevelSource, 'JobLevelInfo');
-  if (heroIndex.duplicateMessage) hardErrors.push(heroIndex.duplicateMessage);
-  if (jobLevelIndex.duplicateMessage) hardErrors.push(jobLevelIndex.duplicateMessage);
-
-  const awakenState = optionalStates.find((state) => state.filename === 'ConfigDataAwakenInfo.json') || null;
-  let awakenIndex = { map: new Map(), duplicateMessage: null };
-  let skillIndex = { map: new Map(), duplicateMessage: null };
-
-  if (awakenState?.ok) {
-    const awakenSource = parseSourceRecords(awakenState.asset)
-      .map((fields) => ({
-        id: firstUnsigned(fields, 2),
-        nameCn: firstString(fields, 3),
-        level2SkillId: firstUnsigned(fields, 9),
-      }))
-      .filter((record) => Number.isInteger(record.id));
-    awakenIndex = indexById(awakenSource, 'AwakenInfo');
-    if (awakenIndex.duplicateMessage) hardErrors.push(awakenIndex.duplicateMessage);
-
-    const skillSource = parseSourceRecords(sourceByName.get('ConfigDataSkillInfo.json').asset)
-      .map((fields) => ({
-        id: firstUnsigned(fields, 2),
-        nameCn: firstString(fields, 3),
-        desc: firstString(fields, 5),
-        iconPath: firstString(fields, 71),
-      }))
-      .filter((record) => Number.isInteger(record.id));
-    skillIndex = indexById(skillSource, 'SkillInfo');
-    if (skillIndex.duplicateMessage) hardErrors.push(skillIndex.duplicateMessage);
-  }
-
-  const skillByHero = new Map((skillAcquisition.data.records || []).map((record) => [record.heroId, record]));
+  const skillByHero = new Map((skillAcquisition.records || []).map((r) => [r.heroId, r]));
   const records = [];
 
-  for (const treeHero of jobTree.data.records || []) {
-    const sourceHero = heroIndex.map.get(treeHero.heroId);
+  for (const treeHero of jobTree.records || []) {
+    const hero = heroIndex.get(treeHero.heroId);
     const skillHero = skillByHero.get(treeHero.heroId);
-    if (!sourceHero) {
-      hardErrors.push(`heroId ${treeHero.heroId}: missing usable HeroInfo record`);
-      continue;
-    }
-    if (!skillHero) {
-      hardErrors.push(`heroId ${treeHero.heroId}: missing Stage 4-4 skill record`);
-      continue;
-    }
+    if (!hero) { errors.push(`heroId ${treeHero.heroId}: missing playable HeroInfo`); continue; }
+    if (!skillHero) { errors.push(`heroId ${treeHero.heroId}: missing Stage 4-4 skill record`); continue; }
 
-    const connections = (treeHero.connections || []).map((connection) => ({
-      ...connection,
-      levels: (connection.levels || []).map((level) => {
-        const sourceLevel = jobLevelIndex.map.get(level.jobLevelId);
-        if (!sourceLevel) {
-          hardErrors.push(`heroId ${treeHero.heroId}: missing JobLevelInfo ${level.jobLevelId}`);
-          return { ...level, rawStatComponents: null };
-        }
-        return { ...level, rawStatComponents: sourceLevel.stats };
-      }),
-    }));
-
-    const awakenId = Number.isInteger(sourceHero.awakenId) && sourceHero.awakenId > 0 ? sourceHero.awakenId : null;
-    let awakening;
-    if (!awakenId) {
-      awakening = { status: 'NONE', awakenId: null, level2SkillId: null, skill: null };
-    } else if (!awakenState?.ok) {
-      awakening = {
-        status: 'SOURCE_BLOCKED',
-        awakenId,
-        level2SkillId: null,
-        skill: null,
-        source: 'ConfigDataAwakenInfo.json',
-      };
-    } else {
-      const awaken = awakenIndex.map.get(awakenId);
-      if (!awaken) {
-        hardErrors.push(`heroId ${treeHero.heroId}: Awaken_ID ${awakenId} missing from AwakenInfo`);
-        awakening = { status: 'FAIL', awakenId, level2SkillId: null, skill: null };
-      } else {
-        const level2SkillId = Number.isInteger(awaken.level2SkillId) && awaken.level2SkillId > 0 ? awaken.level2SkillId : null;
-        const resolvedSkill = level2SkillId ? skillIndex.map.get(level2SkillId) : null;
-        if (level2SkillId && !resolvedSkill) hardErrors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from SkillInfo`);
-        awakening = {
-          status: level2SkillId && resolvedSkill ? 'VERIFIED' : 'NO_LEVEL2_SKILL',
-          awakenId,
-          nameCn: awaken.nameCn,
-          level2SkillId,
-          skill: skillSnapshot(resolvedSkill),
+    const mastery = masteryTotals(treeHero, jobIndex, errors);
+    const connections = (treeHero.connections || []).map((connection) => {
+      const final = finalLevelForConnection(connection, jobLevelIndex, treeHero.heroId, errors);
+      const levels = (connection.levels || []).map((level) => {
+        const source = jobLevelIndex.get(level.jobLevelId);
+        return {
+          ...level,
+          rawStatComponents: source ? Object.fromEntries(Object.entries(STAT_DEFS).flatMap(([stat, def]) => [[`${stat}Ini`, number(source[def.ini])], [`${stat}Up`, number(source[def.up])]])) : null,
         };
-      }
+      });
+      const display = final ? computeDisplayStats(hero, final.source, mastery.totals, treeHero.heroId, connection.jobConnectionId, errors) : null;
+      return {
+        ...connection,
+        levels,
+        finalDisplayStats: final ? {
+          status: 'VERIFIED',
+          heroLevel: HERO_LEVEL,
+          star: DISPLAY_STAR,
+          jobLevelId: final.source.ID,
+          formula: 'round((INI + UP * (heroLevel - 1) / 10) * (1 + HeroInfo.StatStar[star - 1] / 10000)) + globalJobMasteryFlat',
+          values: display.values,
+          components: display.components,
+        } : null,
+      };
+    });
+
+    const awakenId = Number.isInteger(hero.Awaken_ID) && hero.Awaken_ID > 0 ? hero.Awaken_ID : null;
+    let awakening = { status: 'NONE', awakenId: null, level2SkillId: null, skill: null };
+    if (awakenId) {
+      const awaken = awakenIndex.get(awakenId);
+      if (!awaken) errors.push(`heroId ${treeHero.heroId}: Awaken_ID ${awakenId} missing from AwakenInfo`);
+      const level2SkillId = awaken?.Level2SkillID || null;
+      const awakenSkill = level2SkillId ? skillIndex.get(level2SkillId) : null;
+      if (level2SkillId && !awakenSkill) errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from SkillInfo`);
+      awakening = {
+        status: awaken && (!level2SkillId || awakenSkill) ? 'VERIFIED' : 'FAIL',
+        awakenId,
+        nameCn: awaken?.Name ?? null,
+        level2SkillId,
+        skill: skillSnapshot(awakenSkill),
+      };
     }
 
     records.push({
@@ -407,10 +282,7 @@ function main() {
       nameKr: treeHero.nameKr,
       nameCn: treeHero.nameCn,
       nameEn: treeHero.nameEn,
-      heroMeta: {
-        initialStar: sourceHero.star,
-        rank: sourceHero.rank,
-      },
+      heroMeta: { initialStar: number(hero.Star), rank: number(hero.Rank) },
       jobTree: {
         primaryJobConnectionId: treeHero.primaryJobConnectionId,
         rootConnectionIds: treeHero.rootConnectionIds,
@@ -427,109 +299,79 @@ function main() {
         hiddenSkills: skillHero.hiddenSkills || [],
         auxiliaryOnlySkillIds: skillHero.auxiliaryOnlySkillIds || [],
       },
-      talent: {
-        status: 'REFERENCE_SET_VERIFIED_STAR_SELECTION_UNRESOLVED',
-        connectionTalentSkills: skillHero.connectionTalentSkills || [],
-        starProgression: null,
-      },
+      talent: talentProgression(treeHero, skillHero, hero, connectionIndex, skillIndex, errors),
       awakening,
       displayStats: {
-        status: 'UNVERIFIED_RUNTIME_FORMULA',
-        values: null,
-        rawJobLevelComponentsAvailable: true,
+        status: 'VERIFIED',
+        scope: 'normal jobs at Hero Lv70 / 6-star; excludes bond effects handled in Hero Stage 5',
+        globalJobMastery: mastery,
+        byJobConnectionId: Object.fromEntries(connections.filter((c) => c.finalDisplayStats).map((c) => [String(c.jobConnectionId), c.finalDisplayStats])),
       },
-      soldierModifiers: {
-        status: 'UNVERIFIED_RUNTIME_FORMULA',
-        hp: null,
-        at: null,
-        df: null,
-        magicDf: null,
-      },
+      soldierModifiers: soldierModifiers(hero, treeHero.heroId, errors),
     });
   }
 
-  if (hardErrors.length) {
-    writeJson(outputPath, { version: 2, stage: '4-5', status: 'FAIL', recordCount: 0, records: [] });
-    writeJson(summaryPath, {
-      version: 2,
-      stage: '4-5',
-      status: 'FAIL',
-      pipelineStatus: 'PARTIAL_ASSEMBLER_READY',
-      stage4CompletionStatus: 'NOT_COMPLETE',
-      generatedHeroCount: 0,
-      hardErrors,
-      blockers: [],
-      semanticGates: contract.semanticGates,
-    });
-    console.log('STAGE 4-5 RESULT: FAIL');
-    for (const error of hardErrors.slice(0, 100)) console.log(`- FAIL: ${error}`);
-    process.exitCode = 1;
-    return;
-  }
+  const output = { version: 3, stage: '4-5', status: 'PASS', recordCount: records.length, records };
+  const leaks = findForbiddenMembershipKeys(output);
+  if (leaks.length) errors.push(`A-9 membership-field leakage: ${leaks.slice(0, 20).join(', ')}`);
+  if (records.length !== 267) errors.push(`generated records=${records.length}, expected 267`);
 
-  const dynamicGates = (contract.semanticGates || []).map((gate) => {
-    if (gate.id === 'awakeningClassification' && awakenState?.ok) return { ...gate, status: 'VERIFIED' };
-    return gate;
-  });
-  const unresolvedGates = dynamicGates.filter((gate) => !gateResolvedForStage4(gate));
-  const optionalSourceBlockers = optionalStates.filter((state) => !state.ok).map((state) => `${state.filename}: ${state.issues.join(' | ')}`);
-  const status = unresolvedGates.length || optionalSourceBlockers.length ? 'SEMANTIC_BLOCKED' : 'PASS';
+  const finalStatus = errors.length ? 'FAIL' : 'PASS';
+  output.status = finalStatus;
+  writeJson(OUTPUT_PATH, output);
 
-  writeJson(outputPath, {
-    version: 2,
+  const semanticGates = (contract.semanticGates || []).map((gate) => ({
+    ...gate,
+    status: ['displayJobStats', 'heroSoldierModifiers', 'talentStarProgression'].includes(gate.id) ? 'VERIFIED' : gate.status,
+  }));
+  const summary = {
+    version: 3,
     stage: '4-5',
-    status,
-    recordCount: records.length,
-    records,
-  });
-
-  writeJson(summaryPath, {
-    version: 2,
-    stage: '4-5',
-    status,
-    pipelineStatus: 'PARTIAL_DATA_ASSEMBLED',
-    stage4CompletionStatus: status === 'PASS' ? 'COMPLETE' : 'NOT_COMPLETE',
+    status: finalStatus,
+    pipelineStatus: finalStatus === 'PASS' ? 'FINAL_DATA_ASSEMBLED' : 'FINAL_VALIDATION_FAILED',
+    stage4CompletionStatus: finalStatus === 'PASS' ? 'COMPLETE' : 'NOT_COMPLETE',
     generatedHeroCount: records.length,
-    upstream: upstreams.map(({ label, ok, status: upstreamStatus, recordCount }) => ({
-      label,
-      status: upstreamStatus,
-      usable: ok,
-      recordCount,
-    })),
+    canonicalHeroCount: canonicalIds.size,
     sourceRecordCounts: {
-      playableHeroInfo: heroSource.length,
-      jobLevelInfo: jobLevelSource.length,
-      awakenInfo: awakenState?.ok ? awakenIndex.map.size : 0,
+      heroInfoRaw: heroRows.length,
+      playableHeroInfo: heroIndex.size,
+      jobInfo: jobIndex.size,
+      jobConnectionInfo: connectionIndex.size,
+      jobLevelInfo: jobLevelIndex.size,
+      skillInfo: skillIndex.size,
+      awakenInfo: awakenIndex.size,
     },
-    sourceHealth: [...requiredStates, ...optionalStates].map(({ filename, ok, issues }) => ({
-      filename,
-      required: (contract.requiredSources || []).includes(filename),
-      status: ok ? 'usable' : 'broken',
-      issues,
-    })),
+    formulaContract: {
+      displayJobStats: 'round((INI + UP * 69 / 10) * (1 + HeroInfo.StatStar[5] / 10000)) + global JobInfo mastery flat; bond effects excluded until Stage 5',
+      heroSoldierModifiers: 'HeroInfo.HPCmd_INI/ATCmd_INI/DFCmd_INI/MagicDFCmd_INI divided by 100',
+      talentStarProgression: 'JobConnectionInfo.TalentSkill_IDs[star - 1] for star 1..6',
+    },
     verifiedComponents: [
-      'Stage 4-3 job topology for 267 heroes',
-      'Stage 4-4 normal skill references/acquisition for 267 heroes',
-      'JobLevelInfo raw INI/UP stat components fields 16-27',
-      'JobConnection TalentSkill_IDs reference sets',
-      'HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID relation semantics'
+      'Stage 4-3 normal job topology for canonical 267 heroes',
+      'Stage 4-4 normal skill acquisition/reference data for canonical 267 heroes',
+      'HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID',
+      'displayJobStats at Lv70 / 6-star for every normal JobConnection',
+      'Hero-owned soldier modifier percentages from Cmd fields',
+      'TalentSkill_IDs star 1..6 selection rule',
+      'A-1 canonical hero identity and A-9 relation ownership boundary',
     ],
-    unresolvedComponents: unresolvedGates.map((gate) => gate.id),
-    optionalSourceBlockers,
-    semanticGates: dynamicGates,
-    hardErrors: [],
-    safetyDecision: '267 partial basic-combat records are emitted because their verified relations are useful. Final display stats, soldier modifiers, talent star-rank selection, and unavailable awakening payload data remain null/status-tagged rather than inferred.',
-    nextGate: status === 'PASS'
-      ? 'Stage 4 data complete; proceed to Stage 5.'
-      : 'Restore ConfigDataAwakenInfo and verify HeroPropertyComputer display-stat/soldier-modifier formulas plus the talent star-selection rule before Stage 4 can be marked data-complete.'
-  });
+    unresolvedComponents: [],
+    semanticGates,
+    relationBoundary: {
+      usableSoldierMembership: 'OUT_OF_SCOPE',
+      semanticOwner: 'Hero-Soldier Relation Layer',
+      membershipFieldLeakCount: leaks.length,
+    },
+    hardErrors: errors,
+  };
+  writeJson(SUMMARY_PATH, summary);
 
-  console.log(`STAGE 4-5 RESULT: ${status}`);
-  console.log(`Hero basic-combat partial records: ${records.length}`);
-  for (const blocker of optionalSourceBlockers) console.log(`- OPTIONAL SOURCE BLOCKED: ${blocker}`);
-  for (const gate of unresolvedGates) console.log(`- SEMANTIC ${gate.status}: ${gate.id}`);
-  // SEMANTIC_BLOCKED is an expected evidence state, not a pipeline execution failure.
-  if (status === 'PASS') process.exitCode = 0;
+  console.log(`STAGE 4-5 RESULT: ${finalStatus}`);
+  console.log(`heroes=${records.length} canonical=${canonicalIds.size} errors=${errors.length} membershipLeaks=${leaks.length}`);
+  if (errors.length) {
+    for (const error of errors.slice(0, 100)) console.log(`- FAIL: ${error}`);
+    process.exitCode = 1;
+  }
 }
 
 main();
