@@ -3,7 +3,7 @@
   "stage": "5-3-3/5-3-4",
   "status": "FROZEN",
   "schemaId": "hero-page-soldiers-contract/v1",
-  "purpose": "Define the Hero-detail usable-Soldier block as a presentation projection of the validated shared Hero-Soldier Relation Layer. Stage 5-3 must consume canonical relations and must never recalculate membership from ConfigData.",
+  "purpose": "Define the Hero-detail usable-Soldier block as a normalized presentation bundle over the validated shared Hero-Soldier Relation Layer. Stage 5-3 must reuse canonical relations and must never recalculate membership from ConfigData.",
   "sources": {
     "heroMaster": "data/hero-name-master.v1.json",
     "byHeroIndex": "data/generated/hero-soldier-by-hero.v1.json",
@@ -28,11 +28,9 @@
   "output": {
     "path": "data/generated/hero-page-soldiers-stage5-3.v1.json",
     "schemaId": "hero-page-soldiers/v1",
-    "recordKey": "heroId",
-    "recordShape": {
-      "heroId": "integer canonical Hero ID",
-      "soldierCount": "integer equal to soldiers.length",
-      "soldiers": "ordered array of Soldier presentation records"
+    "shape": {
+      "byHeroId": "heroId string -> ordered canonical soldierId[]",
+      "soldiersById": "soldierId string -> one Soldier presentation record"
     },
     "soldierFields": [
       "soldierId",
@@ -50,15 +48,16 @@
     ]
   },
   "generationRules": [
-    "Iterate canonical Hero Master records, not byHeroId keys, so every canonical Hero receives exactly one page-block record.",
-    "Resolve soldierIds only from byHeroId[String(heroId)].",
-    "Join each soldierId to Soldier Master by exact soldierId equality.",
+    "Create exactly one byHeroId key for every canonical Hero Master record.",
+    "Copy Soldier membership only from validated byHeroId[String(heroId)] arrays.",
+    "Store each referenced Soldier presentation record exactly once in soldiersById; do not duplicate Soldier metadata per Hero relation.",
+    "Join Soldier metadata by exact soldierId equality only.",
     "Preserve every canonical relation; Stage 5-3-4 performs no tier/SP/UI filtering.",
-    "Preserve byHeroId soldier ordering, which is deterministic soldierId ascending under the shared index contract.",
+    "Preserve deterministic soldierId ascending order from the shared by-Hero index.",
     "Do not synthesize a Korean name when nameKr is null; retain nameKrStatus and validationStatus for later presentation/QA policy.",
     "A missing/unknown Soldier ID, duplicate canonical key, duplicate Soldier ID within one Hero list, relation-set blob mismatch or non-PASS shared relation validation is a hard failure.",
     "Pending Korean display metadata is REVIEW only and must not delete a valid relation."
   ],
   "validationOutput": "data/validation/hero-page-stage5-3-4.v1.json",
-  "completion": "Stage 5-3-4 is complete when one Soldier block is generated for every canonical Hero, every canonical by-Hero relation is preserved exactly once, every referenced soldierId resolves to Soldier Master, and structural validation has no hard errors."
+  "completion": "Stage 5-3-4 is complete when all canonical Heroes are represented in byHeroId, all canonical relations are preserved exactly once, every referenced soldierId resolves to exactly one soldiersById record, and structural validation has no hard errors."
 }
