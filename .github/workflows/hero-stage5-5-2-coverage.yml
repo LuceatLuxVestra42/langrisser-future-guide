@@ -41,6 +41,8 @@ jobs:
             artwork: r.fields.artwork,
             skins: {
               heroesWithValidSkinList: r.fields.skins.heroesWithValidSkinList,
+              heroIdsWithInvalidSkinList: r.fields.skins.heroIdsWithInvalidSkinList,
+              invalidSkinListDetails: r.fields.skins.invalidSkinListDetails,
               heroesWithNoSkinRefs: r.fields.skins.heroesWithNoSkinRefs,
               totalSkinRefs: r.fields.skins.totalSkinRefs,
               resolvedSkinRefs: r.fields.skins.resolvedSkinRefs,
@@ -59,12 +61,13 @@ jobs:
 
       - name: Freeze generated coverage artifact
         run: |
-          if git diff --quiet -- data/validation/hero-page-stage5-5-2-coverage.v1.json; then
+          TARGET='data/validation/hero-page-stage5-5-2-coverage.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
             echo 'Coverage artifact already current.'
           else
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add data/validation/hero-page-stage5-5-2-coverage.v1.json
+            git add "$TARGET"
             git commit -m 'Freeze Hero Stage 5-5-2 coverage'
             git push
           fi
