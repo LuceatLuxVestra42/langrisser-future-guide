@@ -1,0 +1,88 @@
+name: Soldier Stage 6-7 Site Admission
+
+on:
+  push:
+    branches:
+      - main
+      - 'work/soldier-stage6-7-site-admission'
+    paths:
+      - 'scripts/finalize-soldier-stage6-7-site-admission.cjs'
+      - 'data/contracts/soldier-detail-stage5-1-contract.v1.json'
+      - 'data/validation/soldier-stage6-0-checkpoint.v1.json'
+      - 'data/validation/soldier-stage5-7-list.v1.json'
+      - 'data/validation/soldier-stage5-8-release.v1.json'
+      - 'data/validation/soldier-stage6-1-full-records.v1.json'
+      - 'data/validation/soldier-stage6-2-classification.v1.json'
+      - 'data/validation/soldier-stage6-3-representative-qa.v1.json'
+      - 'data/validation/soldier-stage6-4-filter-qa.v1.json'
+      - 'data/generated/hero-soldier-page-links-stage6-5.v1.json'
+      - 'data/validation/soldier-stage6-5-reciprocal-links.v1.json'
+      - 'data/generated/soldier-stage6-6-expansion-basis.v1.json'
+      - 'data/validation/soldier-stage6-6-expansion-basis.v1.json'
+      - 'data/generated/soldier-stage6-7-site-admission.v1.json'
+      - 'data/validation/soldier-stage6-7-site-admission.v1.json'
+      - '.github/workflows/soldier-stage6-7-site-admission.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/finalize-soldier-stage6-7-site-admission.cjs'
+      - 'data/contracts/soldier-detail-stage5-1-contract.v1.json'
+      - 'data/validation/soldier-stage6-0-checkpoint.v1.json'
+      - 'data/validation/soldier-stage5-7-list.v1.json'
+      - 'data/validation/soldier-stage5-8-release.v1.json'
+      - 'data/validation/soldier-stage6-1-full-records.v1.json'
+      - 'data/validation/soldier-stage6-2-classification.v1.json'
+      - 'data/validation/soldier-stage6-3-representative-qa.v1.json'
+      - 'data/validation/soldier-stage6-4-filter-qa.v1.json'
+      - 'data/generated/hero-soldier-page-links-stage6-5.v1.json'
+      - 'data/validation/soldier-stage6-5-reciprocal-links.v1.json'
+      - 'data/generated/soldier-stage6-6-expansion-basis.v1.json'
+      - 'data/validation/soldier-stage6-6-expansion-basis.v1.json'
+      - 'data/generated/soldier-stage6-7-site-admission.v1.json'
+      - 'data/validation/soldier-stage6-7-site-admission.v1.json'
+      - '.github/workflows/soldier-stage6-7-site-admission.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  site-admission:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run Soldier Stage 6-7 final admission gate
+        run: node scripts/finalize-soldier-stage6-7-site-admission.cjs
+
+      - name: Upload Stage 6-7 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage6-7-site-admission
+          path: |
+            data/generated/soldier-stage6-7-site-admission.v1.json
+            data/validation/soldier-stage6-7-site-admission.v1.json
+
+      - name: Freeze Stage 6-7 artifacts on work branch
+        if: github.event_name == 'push' && startsWith(github.ref_name, 'work/soldier-stage6-7-site-admission')
+        run: |
+          if git diff --quiet -- data/generated/soldier-stage6-7-site-admission.v1.json data/validation/soldier-stage6-7-site-admission.v1.json; then
+            echo 'Stage 6-7 artifacts already frozen.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/generated/soldier-stage6-7-site-admission.v1.json data/validation/soldier-stage6-7-site-admission.v1.json
+          git commit -m 'freeze Soldier stage 6-7 site admission PASS'
+          git push
+
+      - name: Verify frozen Stage 6-7 artifacts on main or PR
+        if: github.event_name == 'pull_request' || github.ref_name == 'main'
+        run: git diff --exit-code -- data/generated/soldier-stage6-7-site-admission.v1.json data/validation/soldier-stage6-7-site-admission.v1.json
