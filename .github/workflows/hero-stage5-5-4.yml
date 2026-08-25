@@ -1,0 +1,52 @@
+name: Hero Stage 5-5-4 display policy
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-5-4.yml'
+      - 'scripts/validate_hero_page_stage5_5_4.cjs'
+      - 'data/contracts/hero-page-stage5-5-4-display-policy.v1.json'
+      - 'data/hero-page-stage5-5-3.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Stage 5-5-4 display policies
+        run: node scripts/validate_hero_page_stage5_5_4.cjs
+
+      - name: Show validation summary
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = 'data/validation/hero-page-stage5-5-4-validation.v1.json';
+          const r = JSON.parse(fs.readFileSync(p, 'utf8'));
+          console.log(JSON.stringify({
+            status: r.status,
+            summary: r.summary,
+            policyInvariants: r.policyInvariants,
+            errors: r.errors,
+            warnings: r.warnings,
+            completion: r.completion,
+          }, null, 2));
+          if (r.status !== 'PASS') process.exit(1);
+          NODE
+
+      - name: Freeze Stage 5-5-4 validation artifact
+        run: |
+          TARGET='data/validation/hero-page-stage5-5-4-validation.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
+            echo 'Stage 5-5-4 validation artifact already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$TARGET"
+          git commit -m 'Freeze Hero Stage 5-5-4 display policy validation'
+          git push
