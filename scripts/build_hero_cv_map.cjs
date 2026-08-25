@@ -18,6 +18,9 @@ if (!Array.isArray(heroInfo)) throw new Error('ConfigDataHeroInfo must be an arr
 if (!Array.isArray(charImageInfo)) throw new Error('ConfigDataCharImageInfo must be an array');
 if (heroes.length !== 267) throw new Error(`Expected 267 canonical heroes; got ${heroes.length}`);
 
+const NO_VOICE_ACTOR_MARKER = '■■■■';
+const CONFIRMED_NO_VOICE_ACTOR_HERO_IDS = new Set([99235, 99236, 99276]);
+
 function groupByInt(rows, field) {
   const m = new Map();
   for (const row of rows) {
@@ -43,6 +46,8 @@ const invalidCharImagePointerHeroIds = [];
 const unresolvedCharImagePointers = [];
 const duplicateCharImageIdsUsed = [];
 const missingCvHeroIds = [];
+const unexpectedNoVoiceActorMarkerHeroIds = [];
+const confirmedNoVoiceActorRows = [];
 const mapped = [];
 const cvNameCounts = new Map();
 const charImagePointerOwners = new Map();
@@ -59,7 +64,7 @@ for (const hero of heroes) {
   const charImageId = h.CharImage_ID;
   if (!Number.isInteger(charImageId) || charImageId <= 0) {
     invalidCharImagePointerHeroIds.push(heroId);
-    mapped.push({ heroId, nameKr: hero.nameKr || null, nameCn: hero.nameCn || null, nameEn: hero.nameEn || null, charImageId: null, cvNameRaw: null });
+    mapped.push({ heroId, nameKr: hero.nameKr || null, nameCn: hero.nameCn || null, nameEn: hero.nameEn || null, charImageId: null, cvNameRaw: null, voiceActorStatus: 'UNRESOLVED' });
     continue;
   }
   const owners = charImagePointerOwners.get(charImageId) || [];
@@ -69,13 +74,28 @@ for (const hero of heroes) {
   const cRows = charImageById.get(charImageId) || [];
   if (cRows.length === 0) {
     unresolvedCharImagePointers.push({ heroId, charImageId });
-    mapped.push({ heroId, nameKr: hero.nameKr || null, nameCn: hero.nameCn || null, nameEn: hero.nameEn || null, charImageId, cvNameRaw: null });
+    mapped.push({ heroId, nameKr: hero.nameKr || null, nameCn: hero.nameCn || null, nameEn: hero.nameEn || null, charImageId, cvNameRaw: null, voiceActorStatus: 'UNRESOLVED' });
     continue;
   }
   if (cRows.length > 1) duplicateCharImageIdsUsed.push({ heroId, charImageId, rowCount: cRows.length });
   const c = cRows[0];
   const cvName = cleanString(c.CVName);
   if (!cvName) missingCvHeroIds.push(heroId);
+
+  const isNoVoiceActorMarker = cvName === NO_VOICE_ACTOR_MARKER;
+  const confirmedNoVoiceActor = isNoVoiceActorMarker && CONFIRMED_NO_VOICE_ACTOR_HERO_IDS.has(heroId);
+  if (isNoVoiceActorMarker && !confirmedNoVoiceActor) unexpectedNoVoiceActorMarkerHeroIds.push(heroId);
+  if (confirmedNoVoiceActor) {
+    confirmedNoVoiceActorRows.push({
+      heroId,
+      nameKr: hero.nameKr || null,
+      nameCn: hero.nameCn || null,
+      nameEn: hero.nameEn || null,
+      charImageId,
+      sourceValue: cvName,
+    });
+  }
+
   if (cvName) cvNameCounts.set(cvName, (cvNameCounts.get(cvName) || 0) + 1);
   mapped.push({
     heroId,
@@ -84,6 +104,7 @@ for (const hero of heroes) {
     nameEn: hero.nameEn || null,
     charImageId,
     cvNameRaw: cvName || null,
+    voiceActorStatus: confirmedNoVoiceActor ? 'NONE_CONFIRMED' : (cvName ? 'PRESENT' : 'UNRESOLVED'),
   });
 }
 
@@ -102,6 +123,10 @@ if (duplicateHeroInfoIds.length) structuralErrors.push('canonical hero IDs dupli
 if (invalidCharImagePointerHeroIds.length) structuralErrors.push('canonical HeroInfo has missing/invalid CharImage_ID');
 if (unresolvedCharImagePointers.length) structuralErrors.push('HeroInfo.CharImage_ID does not resolve to ConfigDataCharImageInfo.ID');
 if (duplicateCharImageIdsUsed.length) structuralErrors.push('used ConfigDataCharImageInfo.ID is duplicated');
+if (unexpectedNoVoiceActorMarkerHeroIds.length) structuralErrors.push('unexpected Hero CVName uses the no-voice-actor marker');
+
+const heroesWithNamedVoiceActor = mapped.filter(r => r.voiceActorStatus === 'PRESENT').length;
+const heroesWithoutVoiceActor = mapped.filter(r => r.voiceActorStatus === 'NONE_CONFIRMED').length;
 
 const result = {
   version: 1,
@@ -112,7 +137,8 @@ const result = {
     cvFieldType: 'string',
     cvMeaning: 'voice actor display name stored by ConfigDataCharImageInfo',
     normalization: 'trim whitespace only; preserve source spelling',
-    warning: 'CVName is source display text and may use Chinese-localized spellings of Japanese voice-actor names. Do not transliterate or rewrite without a separate authoritative localization mapping.'
+    noVoiceActorRule: `For canonical Hero IDs 99235, 99236 and 99276, source value ${NO_VOICE_ACTOR_MARKER} is confirmed to mean no voice actor and must not be treated as unresolved or masked actor data.`,
+    localizationRule: 'Preserve source CVName spelling in this artifact. Korean voice-actor display-name localization is a separate later task and must not change the source join semantics.',
   },
   sourceCounts: {
     canonicalHeroCount: heroes.length,
@@ -122,16 +148,21 @@ const result = {
   },
   coverage: {
     mappedHeroCount: mapped.length,
-    heroesWithCvName: mapped.filter(r => r.cvNameRaw).length,
-    heroesWithoutCvName: missingCvHeroIds.length,
+    heroesWithCvFieldValue: mapped.filter(r => r.cvNameRaw).length,
+    heroesWithNamedVoiceActor,
+    heroesWithoutVoiceActor,
+    confirmedNoVoiceActorHeroIds: confirmedNoVoiceActorRows.map(r => r.heroId).sort((a,b)=>a-b),
+    confirmedNoVoiceActorRows,
+    heroesWithoutCvFieldValue: missingCvHeroIds.length,
     missingCvHeroIds: [...missingCvHeroIds].sort((a,b)=>a-b),
+    unexpectedNoVoiceActorMarkerHeroIds: [...unexpectedNoVoiceActorMarkerHeroIds].sort((a,b)=>a-b),
     missingHeroInfoIds: [...missingHeroInfoIds].sort((a,b)=>a-b),
     duplicateHeroInfoIds: [...duplicateHeroInfoIds].sort((a,b)=>a-b),
     invalidCharImagePointerHeroIds: [...invalidCharImagePointerHeroIds].sort((a,b)=>a-b),
     unresolvedCharImagePointers,
     duplicateCharImageIdsUsed,
     sharedCharImagePointers,
-    distinctCvNameCount: cvNameCounts.size,
+    distinctCvFieldValueCount: cvNameCounts.size,
   },
   cvNameDistribution,
   heroes: mapped,
@@ -144,10 +175,11 @@ console.log(JSON.stringify({
   status: result.status,
   canonicalHeroCount: heroes.length,
   mappedHeroCount: result.coverage.mappedHeroCount,
-  heroesWithCvName: result.coverage.heroesWithCvName,
-  heroesWithoutCvName: result.coverage.heroesWithoutCvName,
-  distinctCvNameCount: result.coverage.distinctCvNameCount,
-  missingCvHeroIds: result.coverage.missingCvHeroIds,
+  heroesWithNamedVoiceActor: result.coverage.heroesWithNamedVoiceActor,
+  heroesWithoutVoiceActor: result.coverage.heroesWithoutVoiceActor,
+  confirmedNoVoiceActorHeroIds: result.coverage.confirmedNoVoiceActorHeroIds,
+  heroesWithoutCvFieldValue: result.coverage.heroesWithoutCvFieldValue,
+  distinctCvFieldValueCount: result.coverage.distinctCvFieldValueCount,
   unresolvedCharImagePointers: result.coverage.unresolvedCharImagePointers.length,
   duplicateCharImageIdsUsed: result.coverage.duplicateCharImageIdsUsed.length,
   sharedCharImagePointers: result.coverage.sharedCharImagePointers.length,
