@@ -7,7 +7,8 @@
     "cvFieldType": "string",
     "cvMeaning": "voice actor display name stored by ConfigDataCharImageInfo",
     "normalization": "trim whitespace only; preserve source spelling",
-    "warning": "CVName is source display text and may use Chinese-localized spellings of Japanese voice-actor names. Do not transliterate or rewrite without a separate authoritative localization mapping."
+    "noVoiceActorRule": "For canonical Hero IDs 99235, 99236 and 99276, source value ■■■■ is confirmed to mean no voice actor and must not be treated as unresolved or masked actor data.",
+    "localizationRule": "Preserve source CVName spelling in this artifact. Korean voice-actor display-name localization is a separate later task and must not change the source join semantics."
   },
   "sourceCounts": {
     "canonicalHeroCount": 267,
@@ -55,16 +56,50 @@
   },
   "coverage": {
     "mappedHeroCount": 267,
-    "heroesWithCvName": 267,
-    "heroesWithoutCvName": 0,
+    "heroesWithCvFieldValue": 267,
+    "heroesWithNamedVoiceActor": 264,
+    "heroesWithoutVoiceActor": 3,
+    "confirmedNoVoiceActorHeroIds": [
+      99235,
+      99236,
+      99276
+    ],
+    "confirmedNoVoiceActorRows": [
+      {
+        "heroId": 99235,
+        "nameKr": "캡틴 코만도&베이비 헤드",
+        "nameCn": "突击队长&天才婴儿",
+        "nameEn": "Captain&Baby",
+        "charImageId": 99235,
+        "sourceValue": "■■■■"
+      },
+      {
+        "heroId": 99236,
+        "nameKr": "맥&긴주",
+        "nameCn": "小刀马克&忍者Ginzu",
+        "nameEn": "Mack&Ginzu",
+        "charImageId": 99236,
+        "sourceValue": "■■■■"
+      },
+      {
+        "heroId": 99276,
+        "nameKr": "아이바 미유키",
+        "nameCn": "相羽美雪",
+        "nameEn": "Miyuki",
+        "charImageId": 99276,
+        "sourceValue": "■■■■"
+      }
+    ],
+    "heroesWithoutCvFieldValue": 0,
     "missingCvHeroIds": [],
+    "unexpectedNoVoiceActorMarkerHeroIds": [],
     "missingHeroInfoIds": [],
     "duplicateHeroInfoIds": [],
     "invalidCharImagePointerHeroIds": [],
     "unresolvedCharImagePointers": [],
     "duplicateCharImageIdsUsed": [],
     "sharedCharImagePointers": [],
-    "distinctCvNameCount": 180
+    "distinctCvFieldValueCount": 180
   },
   "cvNameDistribution": [
     {
@@ -795,7 +830,8 @@
       "nameCn": "马修",
       "nameEn": "Matthew",
       "charImageId": 1,
-      "cvNameRaw": "柿原彻也"
+      "cvNameRaw": "柿原彻也",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 3,
@@ -803,7 +839,8 @@
       "nameCn": "格尼尔",
       "nameEn": "Grenier",
       "charImageId": 3,
-      "cvNameRaw": "立花慎之介"
+      "cvNameRaw": "立花慎之介",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 4,
@@ -811,7 +848,8 @@
       "nameCn": "艾梅达",
       "nameEn": "Aimeeda",
       "charImageId": 4,
-      "cvNameRaw": "内田真礼"
+      "cvNameRaw": "内田真礼",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 5,
@@ -819,7 +857,8 @@
       "nameCn": "克丽丝",
       "nameEn": "Chris",
       "charImageId": 5,
-      "cvNameRaw": "佐仓绫音"
+      "cvNameRaw": "佐仓绫音",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 6,
@@ -827,7 +866,8 @@
       "nameCn": "利昂",
       "nameEn": "Leon",
       "charImageId": 6,
-      "cvNameRaw": "置鲇龙太郎"
+      "cvNameRaw": "置鲇龙太郎",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 7,
@@ -835,7 +875,8 @@
       "nameCn": "巴恩哈特",
       "nameEn": "Bernhardt",
       "charImageId": 7,
-      "cvNameRaw": "若本规夫"
+      "cvNameRaw": "若本规夫",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 8,
@@ -843,7 +884,8 @@
       "nameCn": "拉娜",
       "nameEn": "Lana",
       "charImageId": 8,
-      "cvNameRaw": "小清水亚美"
+      "cvNameRaw": "小清水亚美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 9,
@@ -851,7 +893,8 @@
       "nameCn": "波赞鲁",
       "nameEn": "Bozel",
       "charImageId": 9,
-      "cvNameRaw": "森川智之"
+      "cvNameRaw": "森川智之",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 10,
@@ -859,7 +902,8 @@
       "nameCn": "雷丁",
       "nameEn": "Ledyn",
       "charImageId": 10,
-      "cvNameRaw": "置鲇龙太郎"
+      "cvNameRaw": "置鲇龙太郎",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 11,
@@ -867,7 +911,8 @@
       "nameCn": "娜姆",
       "nameEn": "Nurm",
       "charImageId": 11,
-      "cvNameRaw": "德井青空"
+      "cvNameRaw": "德井青空",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 12,
@@ -875,7 +920,8 @@
       "nameCn": "艾尔文",
       "nameEn": "Elwin",
       "charImageId": 12,
-      "cvNameRaw": "保志总一朗"
+      "cvNameRaw": "保志总一朗",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 13,
@@ -883,7 +929,8 @@
       "nameCn": "海恩",
       "nameEn": "Hein",
       "charImageId": 13,
-      "cvNameRaw": "阪口大助"
+      "cvNameRaw": "阪口大助",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 14,
@@ -891,7 +938,8 @@
       "nameCn": "雪莉",
       "nameEn": "Sherry",
       "charImageId": 14,
-      "cvNameRaw": "堀江由衣"
+      "cvNameRaw": "堀江由衣",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 15,
@@ -899,7 +947,8 @@
       "nameCn": "莉亚娜",
       "nameEn": "Riana",
       "charImageId": 15,
-      "cvNameRaw": "小清水亚美"
+      "cvNameRaw": "小清水亚美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 16,
@@ -907,7 +956,8 @@
       "nameCn": "兰斯",
       "nameEn": "Lance",
       "charImageId": 16,
-      "cvNameRaw": "最上嗣生"
+      "cvNameRaw": "最上嗣生",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 17,
@@ -915,7 +965,8 @@
       "nameCn": "埃格贝尔特",
       "nameEn": "Eggbert",
       "charImageId": 17,
-      "cvNameRaw": "下山吉光"
+      "cvNameRaw": "下山吉光",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 18,
@@ -923,7 +974,8 @@
       "nameCn": "伊梅尔达",
       "nameEn": "Imelda",
       "charImageId": 18,
-      "cvNameRaw": "高粱碧"
+      "cvNameRaw": "高粱碧",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 19,
@@ -931,7 +983,8 @@
       "nameCn": "利斯塔",
       "nameEn": "Lester",
       "charImageId": 19,
-      "cvNameRaw": "村上聪"
+      "cvNameRaw": "村上聪",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 20,
@@ -939,7 +992,8 @@
       "nameCn": "索尼娅",
       "nameEn": "Sonia",
       "charImageId": 20,
-      "cvNameRaw": "佐藤美由希"
+      "cvNameRaw": "佐藤美由希",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 21,
@@ -947,7 +1001,8 @@
       "nameCn": "巴尔加斯",
       "nameEn": "Vargas",
       "charImageId": 21,
-      "cvNameRaw": "最上嗣生"
+      "cvNameRaw": "最上嗣生",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 22,
@@ -955,7 +1010,8 @@
       "nameCn": "杰西卡",
       "nameEn": "Jessica",
       "charImageId": 22,
-      "cvNameRaw": "高粱碧"
+      "cvNameRaw": "高粱碧",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 23,
@@ -963,7 +1019,8 @@
       "nameCn": "洛加",
       "nameEn": "Rouga",
       "charImageId": 23,
-      "cvNameRaw": "高桥研二"
+      "cvNameRaw": "高桥研二",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 24,
@@ -971,7 +1028,8 @@
       "nameCn": "斯科特",
       "nameEn": "Scott",
       "charImageId": 24,
-      "cvNameRaw": "井上雄贵"
+      "cvNameRaw": "井上雄贵",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 25,
@@ -979,7 +1037,8 @@
       "nameCn": "亚鲁特缪拉",
       "nameEn": "Alutemurat",
       "charImageId": 25,
-      "cvNameRaw": "子安武人"
+      "cvNameRaw": "子安武人",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 26,
@@ -987,7 +1046,8 @@
       "nameCn": "露娜",
       "nameEn": "Luna",
       "charImageId": 26,
-      "cvNameRaw": "早见沙织"
+      "cvNameRaw": "早见沙织",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 27,
@@ -995,7 +1055,8 @@
       "nameCn": "迪哈尔特",
       "nameEn": "Dehault",
       "charImageId": 27,
-      "cvNameRaw": "平川大辅"
+      "cvNameRaw": "平川大辅",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 28,
@@ -1003,7 +1064,8 @@
       "nameCn": "泽瑞达",
       "nameEn": "Zalrahda",
       "charImageId": 28,
-      "cvNameRaw": "西田望见"
+      "cvNameRaw": "西田望见",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 29,
@@ -1011,7 +1073,8 @@
       "nameCn": "蒂亚莉丝",
       "nameEn": "Tialice",
       "charImageId": 29,
-      "cvNameRaw": "能登麻美子"
+      "cvNameRaw": "能登麻美子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 30,
@@ -1019,7 +1082,8 @@
       "nameCn": "莉法妮",
       "nameEn": "Leafani",
       "charImageId": 30,
-      "cvNameRaw": "佐藤美由希"
+      "cvNameRaw": "佐藤美由希",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 31,
@@ -1027,7 +1091,8 @@
       "nameCn": "索菲亚",
       "nameEn": "Sofia",
       "charImageId": 31,
-      "cvNameRaw": "高粱碧"
+      "cvNameRaw": "高粱碧",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 32,
@@ -1035,7 +1100,8 @@
       "nameCn": "艾马林克",
       "nameEn": "EmmaLink",
       "charImageId": 32,
-      "cvNameRaw": "立花慎之介"
+      "cvNameRaw": "立花慎之介",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 33,
@@ -1043,7 +1109,8 @@
       "nameCn": "芙蕾雅",
       "nameEn": "Freya",
       "charImageId": 33,
-      "cvNameRaw": "堀江由衣"
+      "cvNameRaw": "堀江由衣",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 34,
@@ -1051,7 +1118,8 @@
       "nameCn": "雾风",
       "nameEn": "Kirikaze",
       "charImageId": 34,
-      "cvNameRaw": "下山吉光"
+      "cvNameRaw": "下山吉光",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 35,
@@ -1059,7 +1127,8 @@
       "nameCn": "安杰丽卡",
       "nameEn": "Angelica",
       "charImageId": 35,
-      "cvNameRaw": "友永朱音"
+      "cvNameRaw": "友永朱音",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 36,
@@ -1067,7 +1136,8 @@
       "nameCn": "银狼",
       "nameEn": "SilverWolf",
       "charImageId": 36,
-      "cvNameRaw": "志村知幸"
+      "cvNameRaw": "志村知幸",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 37,
@@ -1075,7 +1145,8 @@
       "nameCn": "古巨拉",
       "nameEn": "Zillagod",
       "charImageId": 37,
-      "cvNameRaw": "子安武人"
+      "cvNameRaw": "子安武人",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 38,
@@ -1083,7 +1154,8 @@
       "nameCn": "杰利奥鲁&蕾拉",
       "nameEn": "Jellioru&Lela",
       "charImageId": 38,
-      "cvNameRaw": "永塚拓马"
+      "cvNameRaw": "永塚拓马",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 39,
@@ -1091,7 +1163,8 @@
       "nameCn": "弗拉基亚",
       "nameEn": "Flakia",
       "charImageId": 39,
-      "cvNameRaw": "寺依沙织"
+      "cvNameRaw": "寺依沙织",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 40,
@@ -1099,7 +1172,8 @@
       "nameCn": "路因",
       "nameEn": "Rune",
       "charImageId": 40,
-      "cvNameRaw": "畠中祐"
+      "cvNameRaw": "畠中祐",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 41,
@@ -1107,7 +1181,8 @@
       "nameCn": "皮耶鲁",
       "nameEn": "Pieru",
       "charImageId": 41,
-      "cvNameRaw": "高桥孝治"
+      "cvNameRaw": "高桥孝治",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 42,
@@ -1115,7 +1190,8 @@
       "nameCn": "迪欧斯",
       "nameEn": "Diors",
       "charImageId": 42,
-      "cvNameRaw": "下山吉光"
+      "cvNameRaw": "下山吉光",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 43,
@@ -1123,7 +1199,8 @@
       "nameCn": "安娜",
       "nameEn": "Anna",
       "charImageId": 43,
-      "cvNameRaw": "樱庭有纱"
+      "cvNameRaw": "樱庭有纱",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 44,
@@ -1131,7 +1208,8 @@
       "nameCn": "利亚特",
       "nameEn": "Lyatt",
       "charImageId": 44,
-      "cvNameRaw": "井上雄贵"
+      "cvNameRaw": "井上雄贵",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 45,
@@ -1139,7 +1217,8 @@
       "nameCn": "基斯",
       "nameEn": "Keith",
       "charImageId": 45,
-      "cvNameRaw": "高桥研二"
+      "cvNameRaw": "高桥研二",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 47,
@@ -1147,7 +1226,8 @@
       "nameCn": "蕾蒂西亚",
       "nameEn": "Leticia",
       "charImageId": 47,
-      "cvNameRaw": "松浦知惠"
+      "cvNameRaw": "松浦知惠",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 48,
@@ -1155,7 +1235,8 @@
       "nameCn": "阿伦",
       "nameEn": "Aaron",
       "charImageId": 48,
-      "cvNameRaw": "最上嗣生"
+      "cvNameRaw": "最上嗣生",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 49,
@@ -1163,7 +1244,8 @@
       "nameCn": "法娜",
       "nameEn": "Fana",
       "charImageId": 49,
-      "cvNameRaw": "寺依沙织"
+      "cvNameRaw": "寺依沙织",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 51,
@@ -1171,7 +1253,8 @@
       "nameCn": "雪露法妮尔",
       "nameEn": "Schelfaniel",
       "charImageId": 51,
-      "cvNameRaw": "白城奈央"
+      "cvNameRaw": "白城奈央",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 52,
@@ -1179,7 +1262,8 @@
       "nameCn": "安洁丽娜",
       "nameEn": "Angelina",
       "charImageId": 52,
-      "cvNameRaw": "天海由梨奈"
+      "cvNameRaw": "天海由梨奈",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 53,
@@ -1187,7 +1271,8 @@
       "nameCn": "兰芳特",
       "nameEn": "Ranford",
       "charImageId": 53,
-      "cvNameRaw": "驹田航"
+      "cvNameRaw": "驹田航",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 54,
@@ -1195,7 +1280,8 @@
       "nameCn": "妮丝蒂尔",
       "nameEn": "Listell",
       "charImageId": 54,
-      "cvNameRaw": "内山茉莉"
+      "cvNameRaw": "内山茉莉",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 55,
@@ -1203,7 +1289,8 @@
       "nameCn": "兰迪乌斯",
       "nameEn": "Landius",
       "charImageId": 55,
-      "cvNameRaw": "置鲇龙太郎"
+      "cvNameRaw": "置鲇龙太郎",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 56,
@@ -1211,7 +1298,8 @@
       "nameCn": "蕾伽尔",
       "nameEn": "Rachel",
       "charImageId": 56,
-      "cvNameRaw": "种田梨沙"
+      "cvNameRaw": "种田梨沙",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 57,
@@ -1219,7 +1307,8 @@
       "nameCn": "威拉",
       "nameEn": "Wiler",
       "charImageId": 57,
-      "cvNameRaw": "铃村健一"
+      "cvNameRaw": "铃村健一",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 58,
@@ -1227,7 +1316,8 @@
       "nameCn": "塞蕾娜",
       "nameEn": "Serena",
       "charImageId": 58,
-      "cvNameRaw": "户松遥"
+      "cvNameRaw": "户松遥",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 59,
@@ -1235,7 +1325,8 @@
       "nameCn": "基扎洛夫",
       "nameEn": "Gizlof",
       "charImageId": 59,
-      "cvNameRaw": "广田行生"
+      "cvNameRaw": "广田行生",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 60,
@@ -1243,7 +1334,8 @@
       "nameCn": "西格玛",
       "nameEn": "Sigma",
       "charImageId": 60,
-      "cvNameRaw": "绿川光"
+      "cvNameRaw": "绿川光",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 61,
@@ -1251,7 +1343,8 @@
       "nameCn": "拉姆达",
       "nameEn": "Lambda",
       "charImageId": 61,
-      "cvNameRaw": "皆口裕子"
+      "cvNameRaw": "皆口裕子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 62,
@@ -1259,7 +1352,8 @@
       "nameCn": "阿尔弗雷德",
       "nameEn": "Alfred",
       "charImageId": 62,
-      "cvNameRaw": "榎木淳弥"
+      "cvNameRaw": "榎木淳弥",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 63,
@@ -1267,7 +1361,8 @@
       "nameCn": "雷因法鲁斯",
       "nameEn": "Lainforce",
       "charImageId": 63,
-      "cvNameRaw": "速水奖"
+      "cvNameRaw": "速水奖",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 64,
@@ -1275,7 +1370,8 @@
       "nameCn": "布琳达",
       "nameEn": "Brenda",
       "charImageId": 64,
-      "cvNameRaw": "大原沙耶香"
+      "cvNameRaw": "大原沙耶香",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 65,
@@ -1283,7 +1379,8 @@
       "nameCn": "维拉玖",
       "nameEn": "Virash",
       "charImageId": 65,
-      "cvNameRaw": "福山润"
+      "cvNameRaw": "福山润",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 66,
@@ -1291,7 +1388,8 @@
       "nameCn": "克拉蕾特",
       "nameEn": "Clarett",
       "charImageId": 66,
-      "cvNameRaw": "悠木碧"
+      "cvNameRaw": "悠木碧",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 67,
@@ -1299,7 +1397,8 @@
       "nameCn": "欧米伽",
       "nameEn": "Omega",
       "charImageId": 67,
-      "cvNameRaw": "矢野智也"
+      "cvNameRaw": "矢野智也",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 69,
@@ -1307,7 +1406,8 @@
       "nameCn": "艾丝蒂尔",
       "nameEn": "Estelle",
       "charImageId": 69,
-      "cvNameRaw": "神田朱未"
+      "cvNameRaw": "神田朱未",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 70,
@@ -1315,7 +1415,8 @@
       "nameCn": "约修亚",
       "nameEn": "Joshua",
       "charImageId": 70,
-      "cvNameRaw": "斋贺光希"
+      "cvNameRaw": "斋贺光希",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 71,
@@ -1323,7 +1424,8 @@
       "nameCn": "玲",
       "nameEn": "Renne",
       "charImageId": 71,
-      "cvNameRaw": "悠木碧"
+      "cvNameRaw": "悠木碧",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 72,
@@ -1331,7 +1433,8 @@
       "nameCn": "莱恩哈特",
       "nameEn": "Leonhardt",
       "charImageId": 72,
-      "cvNameRaw": "绿川光"
+      "cvNameRaw": "绿川光",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 73,
@@ -1339,7 +1442,8 @@
       "nameCn": "奥利维尔",
       "nameEn": "Olivier",
       "charImageId": 73,
-      "cvNameRaw": "子安武人"
+      "cvNameRaw": "子安武人",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 74,
@@ -1347,7 +1451,8 @@
       "nameCn": "科洛丝",
       "nameEn": "Klose",
       "charImageId": 74,
-      "cvNameRaw": "皆口裕子"
+      "cvNameRaw": "皆口裕子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 75,
@@ -1355,7 +1460,8 @@
       "nameCn": "蒂德莉特",
       "nameEn": "Deedlit",
       "charImageId": 75,
-      "cvNameRaw": "冬马由美"
+      "cvNameRaw": "冬马由美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 76,
@@ -1363,7 +1469,8 @@
       "nameCn": "亚修拉姆",
       "nameEn": "Ashram",
       "charImageId": 76,
-      "cvNameRaw": "神谷明"
+      "cvNameRaw": "神谷明",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 77,
@@ -1371,7 +1478,8 @@
       "nameCn": "帕恩",
       "nameEn": "Parn",
       "charImageId": 77,
-      "cvNameRaw": "草尾毅"
+      "cvNameRaw": "草尾毅",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 78,
@@ -1379,7 +1487,8 @@
       "nameCn": "比萝蒂丝",
       "nameEn": "Pirotess",
       "charImageId": 78,
-      "cvNameRaw": "玉川砂记子"
+      "cvNameRaw": "玉川砂记子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 79,
@@ -1387,7 +1496,8 @@
       "nameCn": "真宫寺樱",
       "nameEn": "SakuraShinguji",
       "charImageId": 79,
-      "cvNameRaw": "横山智佐"
+      "cvNameRaw": "横山智佐",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 80,
@@ -1395,7 +1505,8 @@
       "nameCn": "神崎堇",
       "nameEn": "SumireKanzaki",
       "charImageId": 80,
-      "cvNameRaw": "富泽美智惠"
+      "cvNameRaw": "富泽美智惠",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 81,
@@ -1403,7 +1514,8 @@
       "nameCn": "爱丽丝",
       "nameEn": "Iris",
       "charImageId": 81,
-      "cvNameRaw": "西原久美子"
+      "cvNameRaw": "西原久美子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 82,
@@ -1411,7 +1523,8 @@
       "nameCn": "浦饭幽助",
       "nameEn": "Yusuke",
       "charImageId": 82,
-      "cvNameRaw": "佐佐木望"
+      "cvNameRaw": "佐佐木望",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 83,
@@ -1419,7 +1532,8 @@
       "nameCn": "飞影",
       "nameEn": "Hiei",
       "charImageId": 83,
-      "cvNameRaw": "桧山修之"
+      "cvNameRaw": "桧山修之",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 84,
@@ -1427,7 +1541,8 @@
       "nameCn": "藏马",
       "nameEn": "Kurama",
       "charImageId": 84,
-      "cvNameRaw": "绪方惠美"
+      "cvNameRaw": "绪方惠美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 85,
@@ -1435,7 +1550,8 @@
       "nameCn": "户愚吕兄弟",
       "nameEn": "Toguro",
       "charImageId": 85,
-      "cvNameRaw": "玄田哲章&铃木胜美"
+      "cvNameRaw": "玄田哲章&铃木胜美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 86,
@@ -1443,7 +1559,8 @@
       "nameCn": "桑原和真",
       "nameEn": "Kazuma",
       "charImageId": 86,
-      "cvNameRaw": "千叶繁"
+      "cvNameRaw": "千叶繁",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 87,
@@ -1451,7 +1568,8 @@
       "nameCn": "贝蒂",
       "nameEn": "Betty",
       "charImageId": 87,
-      "cvNameRaw": "东城日沙子"
+      "cvNameRaw": "东城日沙子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 88,
@@ -1459,7 +1577,8 @@
       "nameCn": "艾拉斯卓",
       "nameEn": "Alustriel",
       "charImageId": 88,
-      "cvNameRaw": "长妻树里"
+      "cvNameRaw": "长妻树里",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 89,
@@ -1467,7 +1586,8 @@
       "nameCn": "尤利娅",
       "nameEn": "Yulia",
       "charImageId": 89,
-      "cvNameRaw": "石原爱依梨"
+      "cvNameRaw": "石原爱依梨",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 91,
@@ -1475,7 +1595,8 @@
       "nameCn": "艾米莉亚",
       "nameEn": "Emilia",
       "charImageId": 91,
-      "cvNameRaw": "钉宫理惠"
+      "cvNameRaw": "钉宫理惠",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 92,
@@ -1483,7 +1604,8 @@
       "nameCn": "女神化身",
       "nameEn": "Prime Jessica",
       "charImageId": 92,
-      "cvNameRaw": "Lynn"
+      "cvNameRaw": "Lynn",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 93,
@@ -1491,7 +1613,8 @@
       "nameCn": "谜之骑士",
       "nameEn": "MysteryKnight",
       "charImageId": 93,
-      "cvNameRaw": "石川由依"
+      "cvNameRaw": "石川由依",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 94,
@@ -1499,7 +1622,8 @@
       "nameCn": "阿卡娅",
       "nameEn": "Aka",
       "charImageId": 94,
-      "cvNameRaw": "丰崎爱生"
+      "cvNameRaw": "丰崎爱生",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 95,
@@ -1507,7 +1631,8 @@
       "nameCn": "奥利佛",
       "nameEn": "Olivo",
       "charImageId": 95,
-      "cvNameRaw": "冈本信彦"
+      "cvNameRaw": "冈本信彦",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 96,
@@ -1515,7 +1640,8 @@
       "nameCn": "梅露帕妮",
       "nameEn": "Meropeni",
       "charImageId": 96,
-      "cvNameRaw": "日高里菜"
+      "cvNameRaw": "日高里菜",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 97,
@@ -1523,7 +1649,8 @@
       "nameCn": "伊露希亚",
       "nameEn": "Elucia",
       "charImageId": 97,
-      "cvNameRaw": "皆口裕子"
+      "cvNameRaw": "皆口裕子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 98,
@@ -1531,7 +1658,8 @@
       "nameCn": "文森特",
       "nameEn": "Vincent",
       "charImageId": 98,
-      "cvNameRaw": "绿川光"
+      "cvNameRaw": "绿川光",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99,
@@ -1539,7 +1667,8 @@
       "nameCn": "克洛泰尔",
       "nameEn": "Clotaire",
       "charImageId": 99,
-      "cvNameRaw": "中村悠一"
+      "cvNameRaw": "中村悠一",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 100,
@@ -1547,7 +1676,8 @@
       "nameCn": "罗泽希尔",
       "nameEn": "Rozenciel",
       "charImageId": 100,
-      "cvNameRaw": "田中理惠"
+      "cvNameRaw": "田中理惠",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 101,
@@ -1555,7 +1685,8 @@
       "nameCn": "海伦娜",
       "nameEn": "Helena",
       "charImageId": 101,
-      "cvNameRaw": "井上麻里奈"
+      "cvNameRaw": "井上麻里奈",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 102,
@@ -1563,7 +1694,8 @@
       "nameCn": "树之贤者",
       "nameEn": "MagusOfTheTree",
       "charImageId": 102,
-      "cvNameRaw": "置鲇龙太郎"
+      "cvNameRaw": "置鲇龙太郎",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 103,
@@ -1571,7 +1703,8 @@
       "nameCn": "希琳卡",
       "nameEn": "Sirink",
       "charImageId": 103,
-      "cvNameRaw": "川澄绫子"
+      "cvNameRaw": "川澄绫子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 104,
@@ -1579,7 +1712,8 @@
       "nameCn": "阿尔法",
       "nameEn": "Alpha",
       "charImageId": 104,
-      "cvNameRaw": "伊藤静"
+      "cvNameRaw": "伊藤静",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 105,
@@ -1587,7 +1721,8 @@
       "nameCn": "茉",
       "nameEn": "Mu",
       "charImageId": 105,
-      "cvNameRaw": "桑原由气"
+      "cvNameRaw": "桑原由气",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 106,
@@ -1595,7 +1730,8 @@
       "nameCn": "伊普西龙",
       "nameEn": "Epsilon",
       "charImageId": 106,
-      "cvNameRaw": "内山昂辉"
+      "cvNameRaw": "内山昂辉",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 108,
@@ -1603,7 +1739,8 @@
       "nameCn": "邪神库鲁加",
       "nameEn": "KreugerTheWicked",
       "charImageId": 108,
-      "cvNameRaw": "松冈祯丞"
+      "cvNameRaw": "松冈祯丞",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 109,
@@ -1611,7 +1748,8 @@
       "nameCn": "怀特·茜茜",
       "nameEn": "SissiWhite",
       "charImageId": 109,
-      "cvNameRaw": "黑木穗乃香"
+      "cvNameRaw": "黑木穗乃香",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 110,
@@ -1619,7 +1757,8 @@
       "nameCn": "阿雷斯",
       "nameEn": "Ares",
       "charImageId": 110,
-      "cvNameRaw": "森岛秀太"
+      "cvNameRaw": "森岛秀太",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 111,
@@ -1627,7 +1766,8 @@
       "nameCn": "梅雅",
       "nameEn": "Maiya",
       "charImageId": 111,
-      "cvNameRaw": "内山夕实"
+      "cvNameRaw": "内山夕实",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 112,
@@ -1635,7 +1775,8 @@
       "nameCn": "托娃",
       "nameEn": "Towa",
       "charImageId": 112,
-      "cvNameRaw": "泽城美雪＆鹤冈聪"
+      "cvNameRaw": "泽城美雪＆鹤冈聪",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 113,
@@ -1643,7 +1784,8 @@
       "nameCn": "降生之光",
       "nameEn": "LightOfGenesis",
       "charImageId": 113,
-      "cvNameRaw": "悠木碧"
+      "cvNameRaw": "悠木碧",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 114,
@@ -1651,7 +1793,8 @@
       "nameCn": "玛丽埃尔",
       "nameEn": "Mariel",
       "charImageId": 114,
-      "cvNameRaw": "山本彩乃"
+      "cvNameRaw": "山本彩乃",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 115,
@@ -1659,7 +1802,8 @@
       "nameCn": "罗莎莉娅",
       "nameEn": "Rozalia",
       "charImageId": 115,
-      "cvNameRaw": "井口裕香"
+      "cvNameRaw": "井口裕香",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 116,
@@ -1667,7 +1811,8 @@
       "nameCn": "诺埃米",
       "nameEn": "Noemi",
       "charImageId": 116,
-      "cvNameRaw": "村川梨衣"
+      "cvNameRaw": "村川梨衣",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 118,
@@ -1675,7 +1820,8 @@
       "nameCn": "奥托克拉托四世",
       "nameEn": "AutokratoIV",
       "charImageId": 118,
-      "cvNameRaw": "兴津和幸"
+      "cvNameRaw": "兴津和幸",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 119,
@@ -1683,7 +1829,8 @@
       "nameCn": "卢克蕾蒂娅",
       "nameEn": "Lucretia",
       "charImageId": 119,
-      "cvNameRaw": "福圆美里"
+      "cvNameRaw": "福圆美里",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 120,
@@ -1691,7 +1838,8 @@
       "nameCn": "弗洛朗蒂娅",
       "nameEn": "Florentia",
       "charImageId": 120,
-      "cvNameRaw": "本多真梨子"
+      "cvNameRaw": "本多真梨子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 121,
@@ -1699,7 +1847,8 @@
       "nameCn": "燕",
       "nameEn": "Tsubame",
       "charImageId": 121,
-      "cvNameRaw": "田村奈央"
+      "cvNameRaw": "田村奈央",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 122,
@@ -1707,7 +1856,8 @@
       "nameCn": "希尔达",
       "nameEn": "Hilda",
       "charImageId": 122,
-      "cvNameRaw": "荒浪和沙"
+      "cvNameRaw": "荒浪和沙",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 123,
@@ -1715,7 +1865,8 @@
       "nameCn": "沃尔纳",
       "nameEn": "Werner",
       "charImageId": 123,
-      "cvNameRaw": "石川界人"
+      "cvNameRaw": "石川界人",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 124,
@@ -1723,7 +1874,8 @@
       "nameCn": "克里斯蒂安妮",
       "nameEn": "Christiane",
       "charImageId": 124,
-      "cvNameRaw": "樱井浩美"
+      "cvNameRaw": "樱井浩美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 125,
@@ -1731,7 +1883,8 @@
       "nameCn": "丽可丽丝",
       "nameEn": "Licorice",
       "charImageId": 125,
-      "cvNameRaw": "东山奈央"
+      "cvNameRaw": "东山奈央",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 126,
@@ -1739,7 +1892,8 @@
       "nameCn": "帕希尔",
       "nameEn": "Patyle",
       "charImageId": 126,
-      "cvNameRaw": "高桥智秋"
+      "cvNameRaw": "高桥智秋",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 127,
@@ -1747,7 +1901,8 @@
       "nameCn": "蕾娜塔",
       "nameEn": "Renata",
       "charImageId": 127,
-      "cvNameRaw": "高桥未奈美"
+      "cvNameRaw": "高桥未奈美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 129,
@@ -1755,7 +1910,8 @@
       "nameCn": "古斯塔夫",
       "nameEn": "Gustav",
       "charImageId": 129,
-      "cvNameRaw": "小林优"
+      "cvNameRaw": "小林优",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 130,
@@ -1763,7 +1919,8 @@
       "nameCn": "米歇尔",
       "nameEn": "Michelle",
       "charImageId": 130,
-      "cvNameRaw": "佐佐木未来"
+      "cvNameRaw": "佐佐木未来",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 131,
@@ -1771,7 +1928,8 @@
       "nameCn": "亚尔缇娜",
       "nameEn": "Altina",
       "charImageId": 131,
-      "cvNameRaw": "水瀬祈"
+      "cvNameRaw": "水瀬祈",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 132,
@@ -1779,7 +1937,8 @@
       "nameCn": "阿瑞安赫德",
       "nameEn": "Arianrhod",
       "charImageId": 132,
-      "cvNameRaw": "久川绫"
+      "cvNameRaw": "久川绫",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 133,
@@ -1787,7 +1946,8 @@
       "nameCn": "黎恩",
       "nameEn": "Rean",
       "charImageId": 133,
-      "cvNameRaw": "内山昂辉"
+      "cvNameRaw": "内山昂辉",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 134,
@@ -1795,7 +1955,8 @@
       "nameCn": "安兹·乌尔·恭",
       "nameEn": "AinzOoalGown",
       "charImageId": 134,
-      "cvNameRaw": "日野聪"
+      "cvNameRaw": "日野聪",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 135,
@@ -1803,7 +1964,8 @@
       "nameCn": "雅儿贝德",
       "nameEn": "Albedo",
       "charImageId": 135,
-      "cvNameRaw": "原由实"
+      "cvNameRaw": "原由实",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 136,
@@ -1811,7 +1973,8 @@
       "nameCn": "夏提雅",
       "nameEn": "Shalltear",
       "charImageId": 136,
-      "cvNameRaw": "上坂堇"
+      "cvNameRaw": "上坂堇",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 137,
@@ -1819,7 +1982,8 @@
       "nameCn": "战部渡",
       "nameEn": "Wataru",
       "charImageId": 137,
-      "cvNameRaw": "田中真弓"
+      "cvNameRaw": "田中真弓",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 138,
@@ -1827,7 +1991,8 @@
       "nameCn": "忍部火美子",
       "nameEn": "Himiko",
       "charImageId": 138,
-      "cvNameRaw": "林原惠美"
+      "cvNameRaw": "林原惠美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 139,
@@ -1835,7 +2000,8 @@
       "nameCn": "剑部武一郎",
       "nameEn": "Shibaraku",
       "charImageId": 139,
-      "cvNameRaw": "西村知道"
+      "cvNameRaw": "西村知道",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 140,
@@ -1843,7 +2009,8 @@
       "nameCn": "真田辽",
       "nameEn": "Ryou",
       "charImageId": 140,
-      "cvNameRaw": "草尾毅"
+      "cvNameRaw": "草尾毅",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 141,
@@ -1851,7 +2018,8 @@
       "nameCn": "迦游罗",
       "nameEn": "Kayura",
       "charImageId": 141,
-      "cvNameRaw": "胜生真沙子"
+      "cvNameRaw": "胜生真沙子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 142,
@@ -1859,7 +2027,8 @@
       "nameCn": "羽柴当麻",
       "nameEn": "Touma",
       "charImageId": 142,
-      "cvNameRaw": "竹村拓"
+      "cvNameRaw": "竹村拓",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 143,
@@ -1867,7 +2036,8 @@
       "nameCn": "坂田银时",
       "nameEn": "GintokiSakata",
       "charImageId": 143,
-      "cvNameRaw": "杉田智和"
+      "cvNameRaw": "杉田智和",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 144,
@@ -1875,7 +2045,8 @@
       "nameCn": "神乐",
       "nameEn": "Kagura",
       "charImageId": 144,
-      "cvNameRaw": "钉宫理惠"
+      "cvNameRaw": "钉宫理惠",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 145,
@@ -1883,7 +2054,8 @@
       "nameCn": "志村新八",
       "nameEn": "ShinpachiShimura",
       "charImageId": 145,
-      "cvNameRaw": "阪口大助"
+      "cvNameRaw": "阪口大助",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 146,
@@ -1891,7 +2063,8 @@
       "nameCn": "塞贝莉雅",
       "nameEn": "Selvaria",
       "charImageId": 146,
-      "cvNameRaw": "大原沙耶香"
+      "cvNameRaw": "大原沙耶香",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 147,
@@ -1899,7 +2072,8 @@
       "nameCn": "亚莉希雅",
       "nameEn": "Alicia",
       "charImageId": 147,
-      "cvNameRaw": "井上麻里奈"
+      "cvNameRaw": "井上麻里奈",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 148,
@@ -1907,7 +2081,8 @@
       "nameCn": "伊莎拉",
       "nameEn": "Isara",
       "charImageId": 148,
-      "cvNameRaw": "桑岛法子"
+      "cvNameRaw": "桑岛法子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99161,
@@ -1915,7 +2090,8 @@
       "nameCn": "红月之王",
       "nameEn": "LordOfCrimson",
       "charImageId": 99161,
-      "cvNameRaw": "速水奖"
+      "cvNameRaw": "速水奖",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99162,
@@ -1923,7 +2099,8 @@
       "nameCn": "修杰特",
       "nameEn": "Suzette",
       "charImageId": 99162,
-      "cvNameRaw": "西田望见"
+      "cvNameRaw": "西田望见",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99163,
@@ -1931,7 +2108,8 @@
       "nameCn": "超越之人",
       "nameEn": "Transcendent",
       "charImageId": 99163,
-      "cvNameRaw": "诹访部顺一"
+      "cvNameRaw": "诹访部顺一",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99164,
@@ -1939,7 +2117,8 @@
       "nameCn": "维尔纳",
       "nameEn": "Verner",
       "charImageId": 99164,
-      "cvNameRaw": "绿川光"
+      "cvNameRaw": "绿川光",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99165,
@@ -1947,7 +2126,8 @@
       "nameCn": "玛丽安蒂尔",
       "nameEn": "Mariandel",
       "charImageId": 99165,
-      "cvNameRaw": "皆口裕子"
+      "cvNameRaw": "皆口裕子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99166,
@@ -1955,7 +2135,8 @@
       "nameCn": "维坦",
       "nameEn": "Wehttam",
       "charImageId": 99166,
-      "cvNameRaw": "柿原彻也"
+      "cvNameRaw": "柿原彻也",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99167,
@@ -1963,7 +2144,8 @@
       "nameCn": "丽莎",
       "nameEn": "Liza",
       "charImageId": 99167,
-      "cvNameRaw": "加藤英美里"
+      "cvNameRaw": "加藤英美里",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99168,
@@ -1971,7 +2153,8 @@
       "nameCn": "艾尔玛",
       "nameEn": "Erma",
       "charImageId": 99168,
-      "cvNameRaw": "上坂堇"
+      "cvNameRaw": "上坂堇",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99169,
@@ -1979,7 +2162,8 @@
       "nameCn": "凯尔蒂斯",
       "nameEn": "Kertesz",
       "charImageId": 99169,
-      "cvNameRaw": "柳田淳一"
+      "cvNameRaw": "柳田淳一",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99170,
@@ -1987,7 +2171,8 @@
       "nameCn": "洛维奈尔大帝",
       "nameEn": "EmperorLoviner",
       "charImageId": 99170,
-      "cvNameRaw": "森岛秀太"
+      "cvNameRaw": "森岛秀太",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99171,
@@ -1995,7 +2180,8 @@
       "nameCn": "方舟圣女",
       "nameEn": "TheSaintOfArk",
       "charImageId": 99171,
-      "cvNameRaw": "东山奈央"
+      "cvNameRaw": "东山奈央",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99172,
@@ -2003,7 +2189,8 @@
       "nameCn": "月之执政官",
       "nameEn": "TheConsul",
       "charImageId": 99172,
-      "cvNameRaw": "福山润"
+      "cvNameRaw": "福山润",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99173,
@@ -2011,7 +2198,8 @@
       "nameCn": "铁血总帅",
       "nameEn": "IronChancellor",
       "charImageId": 99173,
-      "cvNameRaw": "本多真梨子"
+      "cvNameRaw": "本多真梨子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99174,
@@ -2019,7 +2207,8 @@
       "nameCn": "梓",
       "nameEn": "Azusa",
       "charImageId": 99174,
-      "cvNameRaw": "名冢佳织"
+      "cvNameRaw": "名冢佳织",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99175,
@@ -2027,7 +2216,8 @@
       "nameCn": "胧",
       "nameEn": "Oboro",
       "charImageId": 99175,
-      "cvNameRaw": "梶裕贵"
+      "cvNameRaw": "梶裕贵",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99176,
@@ -2035,7 +2225,8 @@
       "nameCn": "卡洛莉安",
       "nameEn": "Carolian",
       "charImageId": 99176,
-      "cvNameRaw": "伊濑茉莉也"
+      "cvNameRaw": "伊濑茉莉也",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99177,
@@ -2043,7 +2234,8 @@
       "nameCn": "辉夜",
       "nameEn": "Kaguya",
       "charImageId": 99177,
-      "cvNameRaw": "喜多村英梨"
+      "cvNameRaw": "喜多村英梨",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99178,
@@ -2051,7 +2243,8 @@
       "nameCn": "亚莎梅尔",
       "nameEn": "Ashumere",
       "charImageId": 99178,
-      "cvNameRaw": "小林优"
+      "cvNameRaw": "小林优",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99179,
@@ -2059,7 +2252,8 @@
       "nameCn": "洛斯塔姆",
       "nameEn": "Rostam",
       "charImageId": 99179,
-      "cvNameRaw": "三木真一郎"
+      "cvNameRaw": "三木真一郎",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99180,
@@ -2067,7 +2261,8 @@
       "nameCn": "漂逐斗客",
       "nameEn": "WanderingDuelist",
       "charImageId": 99180,
-      "cvNameRaw": "大原沙耶香"
+      "cvNameRaw": "大原沙耶香",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99181,
@@ -2075,7 +2270,8 @@
       "nameCn": "朱利安",
       "nameEn": "Julian",
       "charImageId": 99181,
-      "cvNameRaw": "内田雄马"
+      "cvNameRaw": "内田雄马",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99182,
@@ -2083,7 +2279,8 @@
       "nameCn": "里奇",
       "nameEn": "Ricky",
       "charImageId": 99182,
-      "cvNameRaw": "子安光树"
+      "cvNameRaw": "子安光树",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99183,
@@ -2091,7 +2288,8 @@
       "nameCn": "马库雷",
       "nameEn": "McClaine",
       "charImageId": 99183,
-      "cvNameRaw": "三木真一郎"
+      "cvNameRaw": "三木真一郎",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99184,
@@ -2099,7 +2297,8 @@
       "nameCn": "光佑使徒",
       "nameEn": "Lightbringer",
       "charImageId": 99184,
-      "cvNameRaw": "上坂堇"
+      "cvNameRaw": "上坂堇",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99185,
@@ -2107,7 +2306,8 @@
       "nameCn": "亚德凯摩",
       "nameEn": "Adankelmo",
       "charImageId": 99185,
-      "cvNameRaw": "桑岛法子"
+      "cvNameRaw": "桑岛法子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99186,
@@ -2115,7 +2315,8 @@
       "nameCn": "光影剑魄",
       "nameEn": "SwordofLight&Shadow",
       "charImageId": 99186,
-      "cvNameRaw": "西田望见"
+      "cvNameRaw": "西田望见",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99187,
@@ -2123,7 +2324,8 @@
       "nameCn": "壳中少女",
       "nameEn": "GirlInShell",
       "charImageId": 99187,
-      "cvNameRaw": "福圆美里"
+      "cvNameRaw": "福圆美里",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99188,
@@ -2131,7 +2333,8 @@
       "nameCn": "里奥贝克",
       "nameEn": "RioBec",
       "charImageId": 99188,
-      "cvNameRaw": "皆川纯子"
+      "cvNameRaw": "皆川纯子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99189,
@@ -2139,7 +2342,8 @@
       "nameCn": "席恩",
       "nameEn": "Zion",
       "charImageId": 99189,
-      "cvNameRaw": "梶裕贵"
+      "cvNameRaw": "梶裕贵",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99190,
@@ -2147,7 +2351,8 @@
       "nameCn": "波莉阿鲁",
       "nameEn": "Polyal",
       "charImageId": 99190,
-      "cvNameRaw": "小松未可子"
+      "cvNameRaw": "小松未可子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99191,
@@ -2155,7 +2360,8 @@
       "nameCn": "卢古耐尔",
       "nameEn": "Lugner",
       "charImageId": 99191,
-      "cvNameRaw": "杉田智和"
+      "cvNameRaw": "杉田智和",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99192,
@@ -2163,7 +2369,8 @@
       "nameCn": "格伦希尔",
       "nameEn": "Grunhind",
       "charImageId": 99192,
-      "cvNameRaw": "名冢佳织"
+      "cvNameRaw": "名冢佳织",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99193,
@@ -2171,7 +2378,8 @@
       "nameCn": "琼&康娜",
       "nameEn": "Yoa&Conna",
       "charImageId": 99193,
-      "cvNameRaw": "丰永利行&久保百合花"
+      "cvNameRaw": "丰永利行&久保百合花",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99194,
@@ -2179,7 +2387,8 @@
       "nameCn": "艾蕾因",
       "nameEn": "Elaine",
       "charImageId": 99194,
-      "cvNameRaw": "斋藤千和"
+      "cvNameRaw": "斋藤千和",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99195,
@@ -2187,7 +2396,8 @@
       "nameCn": "范恩",
       "nameEn": "Van",
       "charImageId": 99195,
-      "cvNameRaw": "小野大辅"
+      "cvNameRaw": "小野大辅",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99196,
@@ -2195,7 +2405,8 @@
       "nameCn": "亚妮艾丝",
       "nameEn": "Agnes",
       "charImageId": 99196,
-      "cvNameRaw": "伊藤美来"
+      "cvNameRaw": "伊藤美来",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99197,
@@ -2203,7 +2414,8 @@
       "nameCn": "醒觉者",
       "nameEn": "Awakener",
       "charImageId": 99197,
-      "cvNameRaw": "桑岛法子"
+      "cvNameRaw": "桑岛法子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99198,
@@ -2211,7 +2423,8 @@
       "nameCn": "阿玛迪斯",
       "nameEn": "Amadeus",
       "charImageId": 99198,
-      "cvNameRaw": "三木真一郎"
+      "cvNameRaw": "三木真一郎",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99199,
@@ -2219,7 +2432,8 @@
       "nameCn": "萨格尼",
       "nameEn": "Sagny",
       "charImageId": 99199,
-      "cvNameRaw": "福山润"
+      "cvNameRaw": "福山润",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99200,
@@ -2227,7 +2441,8 @@
       "nameCn": "雾香",
       "nameEn": "Kirika",
       "charImageId": 99200,
-      "cvNameRaw": "早见沙织"
+      "cvNameRaw": "早见沙织",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99201,
@@ -2235,7 +2450,8 @@
       "nameCn": "桑妮雅",
       "nameEn": "Sonia",
       "charImageId": 99201,
-      "cvNameRaw": "濑户麻沙美"
+      "cvNameRaw": "濑户麻沙美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99202,
@@ -2243,7 +2459,8 @@
       "nameCn": "爱克雪拉",
       "nameEn": "Excela",
       "charImageId": 99202,
-      "cvNameRaw": "水树奈奈"
+      "cvNameRaw": "水树奈奈",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99203,
@@ -2251,7 +2468,8 @@
       "nameCn": "宁芙",
       "nameEn": "Nymph",
       "charImageId": 99203,
-      "cvNameRaw": "青山吉能"
+      "cvNameRaw": "青山吉能",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99204,
@@ -2259,7 +2477,8 @@
       "nameCn": "塔塔利亚",
       "nameEn": "Tatalia",
       "charImageId": 99204,
-      "cvNameRaw": "大津爱理"
+      "cvNameRaw": "大津爱理",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99205,
@@ -2267,7 +2486,8 @@
       "nameCn": "托米尔克",
       "nameEn": "Tourmilk",
       "charImageId": 99205,
-      "cvNameRaw": "折笠富美子"
+      "cvNameRaw": "折笠富美子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99206,
@@ -2275,7 +2495,8 @@
       "nameCn": "伊莉丝",
       "nameEn": "Iris",
       "charImageId": 99206,
-      "cvNameRaw": "渡边明乃"
+      "cvNameRaw": "渡边明乃",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99207,
@@ -2283,7 +2504,8 @@
       "nameCn": "罗兰",
       "nameEn": "Roland",
       "charImageId": 99207,
-      "cvNameRaw": "KENN"
+      "cvNameRaw": "KENN",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99208,
@@ -2291,7 +2513,8 @@
       "nameCn": "普蕾茜娅",
       "nameEn": "Precia",
       "charImageId": 99208,
-      "cvNameRaw": "小泽亚李"
+      "cvNameRaw": "小泽亚李",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99209,
@@ -2299,7 +2522,8 @@
       "nameCn": "莉娜",
       "nameEn": "Lina",
       "charImageId": 99209,
-      "cvNameRaw": "林原惠美"
+      "cvNameRaw": "林原惠美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99210,
@@ -2307,7 +2531,8 @@
       "nameCn": "杰路刚帝士",
       "nameEn": "Zelgadiss",
       "charImageId": 99210,
-      "cvNameRaw": "绿川光"
+      "cvNameRaw": "绿川光",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99211,
@@ -2315,7 +2540,8 @@
       "nameCn": "高里",
       "nameEn": "Gourry",
       "charImageId": 99211,
-      "cvNameRaw": "松本保典"
+      "cvNameRaw": "松本保典",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99212,
@@ -2323,7 +2549,8 @@
       "nameCn": "神降者",
       "nameEn": "Apotheosis",
       "charImageId": 99212,
-      "cvNameRaw": "柿原彻也"
+      "cvNameRaw": "柿原彻也",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99213,
@@ -2331,7 +2558,8 @@
       "nameCn": "杰克船长",
       "nameEn": "Jack",
       "charImageId": 99213,
-      "cvNameRaw": "内山夕实"
+      "cvNameRaw": "内山夕实",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99214,
@@ -2339,7 +2567,8 @@
       "nameCn": "奈米娅",
       "nameEn": "Nemia",
       "charImageId": 99214,
-      "cvNameRaw": "松冈由贵"
+      "cvNameRaw": "松冈由贵",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99215,
@@ -2347,7 +2576,8 @@
       "nameCn": "安德里奥",
       "nameEn": "Andriole",
       "charImageId": 99215,
-      "cvNameRaw": "鸟海浩辅"
+      "cvNameRaw": "鸟海浩辅",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99216,
@@ -2355,7 +2585,8 @@
       "nameCn": "艾希恩",
       "nameEn": "Eshean",
       "charImageId": 99216,
-      "cvNameRaw": "沼仓爱美"
+      "cvNameRaw": "沼仓爱美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99217,
@@ -2363,7 +2594,8 @@
       "nameCn": "霍夫曼",
       "nameEn": "Hofmann",
       "charImageId": 99217,
-      "cvNameRaw": "浪川大辅"
+      "cvNameRaw": "浪川大辅",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99218,
@@ -2371,7 +2603,8 @@
       "nameCn": "伊索尔德",
       "nameEn": "Isolde",
       "charImageId": 99218,
-      "cvNameRaw": "佐藤利奈"
+      "cvNameRaw": "佐藤利奈",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99219,
@@ -2379,7 +2612,8 @@
       "nameCn": "杰斯",
       "nameEn": "Jayce",
       "charImageId": 99219,
-      "cvNameRaw": "水岛大宙"
+      "cvNameRaw": "水岛大宙",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99220,
@@ -2387,7 +2621,8 @@
       "nameCn": "帕特里夏",
       "nameEn": "Patricia",
       "charImageId": 99220,
-      "cvNameRaw": "宫村优子"
+      "cvNameRaw": "宫村优子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99221,
@@ -2395,7 +2630,8 @@
       "nameCn": "古恩",
       "nameEn": "Gunn",
       "charImageId": 99221,
-      "cvNameRaw": "细谷佳正"
+      "cvNameRaw": "细谷佳正",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99222,
@@ -2403,7 +2639,8 @@
       "nameCn": "阿卡菲尔",
       "nameEn": "Archanfel",
       "charImageId": 99222,
-      "cvNameRaw": "松本保典"
+      "cvNameRaw": "松本保典",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99223,
@@ -2411,7 +2648,8 @@
       "nameCn": "深町晶",
       "nameEn": "Sho",
       "charImageId": 99223,
-      "cvNameRaw": "野岛健儿"
+      "cvNameRaw": "野岛健儿",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99224,
@@ -2419,7 +2657,8 @@
       "nameCn": "卷岛颚人",
       "nameEn": "Agito",
       "charImageId": 99224,
-      "cvNameRaw": "小西克幸"
+      "cvNameRaw": "小西克幸",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99225,
@@ -2427,7 +2666,8 @@
       "nameCn": "冰渊凌御者",
       "nameEn": "SovereignOfIceAbyss",
       "charImageId": 99225,
-      "cvNameRaw": "高粱碧"
+      "cvNameRaw": "高粱碧",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99226,
@@ -2435,7 +2675,8 @@
       "nameCn": "泰兰提尔",
       "nameEn": "Tyrantel",
       "charImageId": 99226,
-      "cvNameRaw": "池田秀一"
+      "cvNameRaw": "池田秀一",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99227,
@@ -2443,7 +2684,8 @@
       "nameCn": "塔布莉丝",
       "nameEn": "Tabres",
       "charImageId": 99227,
-      "cvNameRaw": "种崎敦美"
+      "cvNameRaw": "种崎敦美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99228,
@@ -2451,7 +2693,8 @@
       "nameCn": "尤弥尔",
       "nameEn": "Ymir",
       "charImageId": 99228,
-      "cvNameRaw": "石田彰"
+      "cvNameRaw": "石田彰",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99229,
@@ -2459,7 +2702,8 @@
       "nameCn": "赛利卡",
       "nameEn": "Celica",
       "charImageId": 99229,
-      "cvNameRaw": "尤加奈"
+      "cvNameRaw": "尤加奈",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99230,
@@ -2467,7 +2711,8 @@
       "nameCn": "塞拉菲娜",
       "nameEn": "Seraphina",
       "charImageId": 99230,
-      "cvNameRaw": "原由实"
+      "cvNameRaw": "原由实",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99231,
@@ -2475,7 +2720,8 @@
       "nameCn": "薇莉娅",
       "nameEn": "Virelia",
       "charImageId": 99231,
-      "cvNameRaw": "鬼头明里"
+      "cvNameRaw": "鬼头明里",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99232,
@@ -2483,7 +2729,8 @@
       "nameCn": "辉耀圣召使",
       "nameEn": "Brightsummoner",
       "charImageId": 99232,
-      "cvNameRaw": "佐仓绫音"
+      "cvNameRaw": "佐仓绫音",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99233,
@@ -2491,7 +2738,8 @@
       "nameCn": "席昂",
       "nameEn": "Shion",
       "charImageId": 99233,
-      "cvNameRaw": "平川大辅"
+      "cvNameRaw": "平川大辅",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99234,
@@ -2499,7 +2747,8 @@
       "nameCn": "缇雅娜",
       "nameEn": "Tiana",
       "charImageId": 99234,
-      "cvNameRaw": "嶋村侑"
+      "cvNameRaw": "嶋村侑",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99235,
@@ -2507,7 +2756,8 @@
       "nameCn": "突击队长&天才婴儿",
       "nameEn": "Captain&Baby",
       "charImageId": 99235,
-      "cvNameRaw": "■■■■"
+      "cvNameRaw": "■■■■",
+      "voiceActorStatus": "NONE_CONFIRMED"
     },
     {
       "heroId": 99236,
@@ -2515,7 +2765,8 @@
       "nameCn": "小刀马克&忍者Ginzu",
       "nameEn": "Mack&Ginzu",
       "charImageId": 99236,
-      "cvNameRaw": "■■■■"
+      "cvNameRaw": "■■■■",
+      "voiceActorStatus": "NONE_CONFIRMED"
     },
     {
       "heroId": 99237,
@@ -2523,7 +2774,8 @@
       "nameCn": "恩雅",
       "nameEn": "Enya",
       "charImageId": 99237,
-      "cvNameRaw": "井上喜久子"
+      "cvNameRaw": "井上喜久子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99238,
@@ -2531,7 +2783,8 @@
       "nameCn": "阿莉娅",
       "nameEn": "Alia",
       "charImageId": 99238,
-      "cvNameRaw": "富田美忧"
+      "cvNameRaw": "富田美忧",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99239,
@@ -2539,7 +2792,8 @@
       "nameCn": "伊莉娅",
       "nameEn": "Ilia",
       "charImageId": 99239,
-      "cvNameRaw": "日笠阳子"
+      "cvNameRaw": "日笠阳子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99240,
@@ -2547,7 +2801,8 @@
       "nameCn": "萨芙琳",
       "nameEn": "Safreen",
       "charImageId": 99240,
-      "cvNameRaw": "长绳麻理亚"
+      "cvNameRaw": "长绳麻理亚",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99241,
@@ -2555,7 +2810,8 @@
       "nameCn": "诺诺琳",
       "nameEn": "Nornorin",
       "charImageId": 99241,
-      "cvNameRaw": "濑户麻沙美"
+      "cvNameRaw": "濑户麻沙美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99242,
@@ -2563,7 +2819,8 @@
       "nameCn": "炎龙破灭者",
       "nameEn": "Dragonslayer",
       "charImageId": 99242,
-      "cvNameRaw": "最上嗣生"
+      "cvNameRaw": "最上嗣生",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99243,
@@ -2571,7 +2828,8 @@
       "nameCn": "断翼鸟",
       "nameEn": "Hibiscus",
       "charImageId": 99243,
-      "cvNameRaw": "市之濑加那"
+      "cvNameRaw": "市之濑加那",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99244,
@@ -2579,7 +2837,8 @@
       "nameCn": "兰黛尔",
       "nameEn": "Randele",
       "charImageId": 99244,
-      "cvNameRaw": "村田知沙"
+      "cvNameRaw": "村田知沙",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99245,
@@ -2587,7 +2846,8 @@
       "nameCn": "玛莉·萝丝",
       "nameEn": "Marie Rose",
       "charImageId": 99245,
-      "cvNameRaw": "相沢舞"
+      "cvNameRaw": "相沢舞",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99246,
@@ -2595,7 +2855,8 @@
       "nameCn": "女天狗",
       "nameEn": "Nyotengu",
       "charImageId": 99246,
-      "cvNameRaw": "佐藤朱"
+      "cvNameRaw": "佐藤朱",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99247,
@@ -2603,7 +2864,8 @@
       "nameCn": "霞",
       "nameEn": "Kasumi",
       "charImageId": 99247,
-      "cvNameRaw": "桑岛法子"
+      "cvNameRaw": "桑岛法子",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99248,
@@ -2611,7 +2873,8 @@
       "nameCn": "席尔娜",
       "nameEn": "Sylrna",
       "charImageId": 99248,
-      "cvNameRaw": "小泽亚李"
+      "cvNameRaw": "小泽亚李",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99249,
@@ -2619,7 +2882,8 @@
       "nameCn": "玛卡艾拉",
       "nameEn": "Macaera",
       "charImageId": 99249,
-      "cvNameRaw": "石上静香"
+      "cvNameRaw": "石上静香",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99250,
@@ -2627,7 +2891,8 @@
       "nameCn": "塞姆",
       "nameEn": "Shem",
       "charImageId": 99250,
-      "cvNameRaw": "细谷佳正"
+      "cvNameRaw": "细谷佳正",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99251,
@@ -2635,7 +2900,8 @@
       "nameCn": "幽瞳幻惑使",
       "nameEn": "Gazesuccubus",
       "charImageId": 99251,
-      "cvNameRaw": "寺依沙织"
+      "cvNameRaw": "寺依沙织",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99252,
@@ -2643,7 +2909,8 @@
       "nameCn": "鲁克曼",
       "nameEn": "Lukhmaan",
       "charImageId": 99252,
-      "cvNameRaw": "东地宏树"
+      "cvNameRaw": "东地宏树",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99253,
@@ -2651,7 +2918,8 @@
       "nameCn": "阿布沙伊特",
       "nameEn": "Abishai",
       "charImageId": 99253,
-      "cvNameRaw": "渡边明乃"
+      "cvNameRaw": "渡边明乃",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99254,
@@ -2659,7 +2927,8 @@
       "nameCn": "蕾雅",
       "nameEn": "Reah",
       "charImageId": 99254,
-      "cvNameRaw": "远藤绫"
+      "cvNameRaw": "远藤绫",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99255,
@@ -2667,7 +2936,8 @@
       "nameCn": "埃尔维斯",
       "nameEn": "Elvis",
       "charImageId": 99255,
-      "cvNameRaw": "伊东健人"
+      "cvNameRaw": "伊东健人",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99256,
@@ -2675,7 +2945,8 @@
       "nameCn": "艾露莎",
       "nameEn": "Erza",
       "charImageId": 99256,
-      "cvNameRaw": "大原沙耶香"
+      "cvNameRaw": "大原沙耶香",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99257,
@@ -2683,7 +2954,8 @@
       "nameCn": "露西",
       "nameEn": "Lucy",
       "charImageId": 99257,
-      "cvNameRaw": "平野綾"
+      "cvNameRaw": "平野綾",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99258,
@@ -2691,7 +2963,8 @@
       "nameCn": "纳兹",
       "nameEn": "Natsu",
       "charImageId": 99258,
-      "cvNameRaw": "柿原彻也"
+      "cvNameRaw": "柿原彻也",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99259,
@@ -2699,7 +2972,8 @@
       "nameCn": "蕾贝尔",
       "nameEn": "Rapier",
       "charImageId": 99259,
-      "cvNameRaw": "伊藤静"
+      "cvNameRaw": "伊藤静",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99260,
@@ -2707,7 +2981,8 @@
       "nameCn": "沙里克",
       "nameEn": "Sharikh",
       "charImageId": 99260,
-      "cvNameRaw": "古川慎"
+      "cvNameRaw": "古川慎",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99261,
@@ -2715,7 +2990,8 @@
       "nameCn": "蝴姆巴巴",
       "nameEn": "Humbaba",
       "charImageId": 99261,
-      "cvNameRaw": "石川由依"
+      "cvNameRaw": "石川由依",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99262,
@@ -2723,7 +2999,8 @@
       "nameCn": "贝安卡",
       "nameEn": "Bianca",
       "charImageId": 99262,
-      "cvNameRaw": "田中爱美"
+      "cvNameRaw": "田中爱美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99263,
@@ -2731,7 +3008,8 @@
       "nameCn": "西布莉",
       "nameEn": "Cybele",
       "charImageId": 99263,
-      "cvNameRaw": "生天目仁美"
+      "cvNameRaw": "生天目仁美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99264,
@@ -2739,7 +3017,8 @@
       "nameCn": "辉黯逆命者",
       "nameEn": "HeavenDefier",
       "charImageId": 99264,
-      "cvNameRaw": "佐藤美由希"
+      "cvNameRaw": "佐藤美由希",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99265,
@@ -2747,7 +3026,8 @@
       "nameCn": "黎加",
       "nameEn": "Reiga",
       "charImageId": 99265,
-      "cvNameRaw": "小野大辅"
+      "cvNameRaw": "小野大辅",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99266,
@@ -2755,7 +3035,8 @@
       "nameCn": "桑格",
       "nameEn": "Sanger",
       "charImageId": 99266,
-      "cvNameRaw": "阿部里果"
+      "cvNameRaw": "阿部里果",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99267,
@@ -2763,7 +3044,8 @@
       "nameCn": "莱莎琳·斯托特",
       "nameEn": "Reisalin Stout",
       "charImageId": 99267,
-      "cvNameRaw": "野口百合"
+      "cvNameRaw": "野口百合",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99268,
@@ -2771,7 +3053,8 @@
       "nameCn": "莉拉·德西亚斯",
       "nameEn": "Lila Decyrus",
       "charImageId": 99268,
-      "cvNameRaw": "照井春佳"
+      "cvNameRaw": "照井春佳",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99269,
@@ -2779,7 +3062,8 @@
       "nameCn": "科洛蒂娅·巴兰茨",
       "nameEn": "Klaudia Valentz",
       "charImageId": 99269,
-      "cvNameRaw": "大和田仁美"
+      "cvNameRaw": "大和田仁美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99270,
@@ -2787,7 +3071,8 @@
       "nameCn": "达奇",
       "nameEn": "Taj",
       "charImageId": 99270,
-      "cvNameRaw": "井上麻里奈"
+      "cvNameRaw": "井上麻里奈",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99271,
@@ -2795,7 +3080,8 @@
       "nameCn": "琳",
       "nameEn": "Lynn",
       "charImageId": 99271,
-      "cvNameRaw": "优木加奈"
+      "cvNameRaw": "优木加奈",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99272,
@@ -2803,7 +3089,8 @@
       "nameCn": "穆宁",
       "nameEn": "Mullin",
       "charImageId": 99272,
-      "cvNameRaw": "户松遥"
+      "cvNameRaw": "户松遥",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99273,
@@ -2811,7 +3098,8 @@
       "nameCn": "初真泽瑞达",
       "nameEn": "PureZalrahda",
       "charImageId": 99273,
-      "cvNameRaw": "西田望见"
+      "cvNameRaw": "西田望见",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99274,
@@ -2819,7 +3107,8 @@
       "nameCn": "兰卡",
       "nameEn": "Ranka",
       "charImageId": 99274,
-      "cvNameRaw": "若山诗音"
+      "cvNameRaw": "若山诗音",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99275,
@@ -2827,7 +3116,8 @@
       "nameCn": "奥拉",
       "nameEn": "Ora",
       "charImageId": 99275,
-      "cvNameRaw": "钉宫理惠"
+      "cvNameRaw": "钉宫理惠",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99276,
@@ -2835,7 +3125,8 @@
       "nameCn": "相羽美雪",
       "nameEn": "Miyuki",
       "charImageId": 99276,
-      "cvNameRaw": "■■■■"
+      "cvNameRaw": "■■■■",
+      "voiceActorStatus": "NONE_CONFIRMED"
     },
     {
       "heroId": 99277,
@@ -2843,7 +3134,8 @@
       "nameCn": "迪波威",
       "nameEn": "D-Boy",
       "charImageId": 99277,
-      "cvNameRaw": "森川智之"
+      "cvNameRaw": "森川智之",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99278,
@@ -2851,7 +3143,8 @@
       "nameCn": "相羽新也",
       "nameEn": "Shinya",
       "charImageId": 99278,
-      "cvNameRaw": "子安武人"
+      "cvNameRaw": "子安武人",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99279,
@@ -2859,7 +3152,8 @@
       "nameCn": "雅希",
       "nameEn": "Ashi",
       "charImageId": 99279,
-      "cvNameRaw": "伊藤美来"
+      "cvNameRaw": "伊藤美来",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99280,
@@ -2867,7 +3161,8 @@
       "nameCn": "沙律",
       "nameEn": "Sallune",
       "charImageId": 99280,
-      "cvNameRaw": "杉山纪彰"
+      "cvNameRaw": "杉山纪彰",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99281,
@@ -2875,7 +3170,8 @@
       "nameCn": "骁浪驭虹使",
       "nameEn": "TidalVindicator",
       "charImageId": 99281,
-      "cvNameRaw": "天海由梨奈"
+      "cvNameRaw": "天海由梨奈",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99282,
@@ -2883,7 +3179,8 @@
       "nameCn": "狺",
       "nameEn": "Banshee",
       "charImageId": 99282,
-      "cvNameRaw": "丰口惠美"
+      "cvNameRaw": "丰口惠美",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99283,
@@ -2891,7 +3188,8 @@
       "nameCn": "阿云",
       "nameEn": "Kumo",
       "charImageId": 99283,
-      "cvNameRaw": "高田忧希"
+      "cvNameRaw": "高田忧希",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99284,
@@ -2899,7 +3197,8 @@
       "nameCn": "夜叉王凯",
       "nameEn": "Gai",
       "charImageId": 99284,
-      "cvNameRaw": "子安武人"
+      "cvNameRaw": "子安武人",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99285,
@@ -2907,7 +3206,8 @@
       "nameCn": "修罗王秋亚人",
       "nameEn": "Shurato",
       "charImageId": 99285,
-      "cvNameRaw": "关俊彦"
+      "cvNameRaw": "关俊彦",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99286,
@@ -2915,7 +3215,8 @@
       "nameCn": "迦楼罗王力伽",
       "nameEn": "Reiga",
       "charImageId": 99286,
-      "cvNameRaw": "井上和彦"
+      "cvNameRaw": "井上和彦",
+      "voiceActorStatus": "PRESENT"
     },
     {
       "heroId": 99287,
@@ -2923,7 +3224,8 @@
       "nameCn": "魔骸剑使",
       "nameEn": "Necroblade",
       "charImageId": 99287,
-      "cvNameRaw": "羊宫妃那"
+      "cvNameRaw": "羊宫妃那",
+      "voiceActorStatus": "PRESENT"
     }
   ],
   "structuralErrors": []
