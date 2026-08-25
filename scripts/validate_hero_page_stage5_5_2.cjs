@@ -14,15 +14,8 @@ const PATHS = {
   output: path.join(validationDir, 'hero-page-stage5-5-2-coverage.v1.json'),
 };
 
-function loadJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-}
-
-function requireArray(value, label) {
-  if (!Array.isArray(value)) throw new Error(`${label} must be a parsed JSON array`);
-  return value;
-}
-
+function loadJson(filePath) { return JSON.parse(fs.readFileSync(filePath, 'utf8')); }
+function requireArray(value, label) { if (!Array.isArray(value)) throw new Error(`${label} must be a parsed JSON array`); return value; }
 function groupByIntegerId(rows, field) {
   const map = new Map();
   for (const row of rows) {
@@ -33,9 +26,7 @@ function groupByIntegerId(rows, field) {
   }
   return map;
 }
-
 function sortedNumbers(values) { return [...values].sort((a, b) => a - b); }
-
 function countByInteger(rows, field) {
   const counts = new Map();
   for (const row of rows) {
@@ -45,10 +36,8 @@ function countByInteger(rows, field) {
   }
   return Object.fromEntries([...counts.entries()].sort((a, b) => a[0] - b[0]));
 }
-
 function validPositiveInteger(value) { return Number.isInteger(value) && value > 0; }
 function validIntegerArray(value) { return Array.isArray(value) && value.every(Number.isInteger); }
-
 function describeInvalidArrayValue(value) {
   if (value === undefined) return { valueType: 'undefined', value: null };
   if (value === null) return { valueType: 'null', value: null };
@@ -64,7 +53,6 @@ function main() {
 
   const heroes = Array.isArray(master.records) ? master.records : [];
   if (heroes.length !== 267) throw new Error(`canonical Hero master count=${heroes.length}; expected 267`);
-
   const canonicalIds = heroes.map((hero) => hero.heroId);
   if (canonicalIds.some((id) => !Number.isInteger(id))) throw new Error('canonical Hero master contains non-integer heroId');
   if (new Set(canonicalIds).size !== canonicalIds.length) throw new Error('canonical Hero master contains duplicate heroId values');
@@ -83,7 +71,6 @@ function main() {
   const duplicateHeroInfoIds = [];
   const canonicalHeroInfoRows = [];
   const useableMismatchHeroIds = [];
-
   for (const hero of heroes) {
     const matches = heroInfoById.get(hero.heroId) || [];
     if (matches.length === 0) { missingHeroInfoIds.push(hero.heroId); continue; }
@@ -107,7 +94,6 @@ function main() {
   const skinGetPathTypeMissingIds = new Set();
   const skinImagePointerMissingIds = new Set();
   const referencedSkinOwners = new Map();
-
   let originPointerValues = 0;
   let artworkPointerHeroes = 0;
   let totalSkinRefs = 0;
@@ -117,15 +103,9 @@ function main() {
 
   for (const row of canonicalHeroInfoRows) {
     const heroId = row.ID;
-
-    if (!Array.isArray(row.HeroBelongProduction) || row.HeroBelongProduction.length === 0) {
-      originMissingHeroIds.push(heroId);
-    } else if (row.HeroBelongProduction.length !== 1 || !row.HeroBelongProduction.every(validPositiveInteger)) {
-      originInvalidHeroIds.push(heroId);
-    } else {
-      originPointerValues += 1;
-      originIds.add(row.HeroBelongProduction[0]);
-    }
+    if (!Array.isArray(row.HeroBelongProduction) || row.HeroBelongProduction.length === 0) originMissingHeroIds.push(heroId);
+    else if (row.HeroBelongProduction.length !== 1 || !row.HeroBelongProduction.every(validPositiveInteger)) originInvalidHeroIds.push(heroId);
+    else { originPointerValues += 1; originIds.add(row.HeroBelongProduction[0]); }
 
     if (!validPositiveInteger(row.CharImage_ID)) artworkMissingHeroIds.push(heroId);
     else artworkPointerHeroes += 1;
@@ -133,10 +113,8 @@ function main() {
     let skinIds = row.Skins_ID;
     if (skinIds === undefined) {
       const reverseOwnedSkinIds = sortedNumbers(skinIdsBySpecifiedHero.get(heroId) || []);
-      if (reverseOwnedSkinIds.length === 0) {
-        skinListNormalizedEmptyHeroIds.push(heroId);
-        skinIds = [];
-      } else {
+      if (reverseOwnedSkinIds.length === 0) { skinListNormalizedEmptyHeroIds.push(heroId); skinIds = []; }
+      else {
         skinListInvalidHeroIds.push(heroId);
         skinListInvalidDetails.push({ heroId, ...describeInvalidArrayValue(skinIds), reason: 'OMITTED_SKINS_ID_WITH_REVERSE_OWNER_ROWS', reverseOwnedSkinIds });
         continue;
@@ -146,14 +124,10 @@ function main() {
       skinListInvalidDetails.push({ heroId, ...describeInvalidArrayValue(skinIds), reason: 'SKINS_ID_IS_NOT_AN_INTEGER_ARRAY' });
       continue;
     }
-
     if (skinIds.length === 0) skinNoRefsHeroIds.push(heroId);
-
     for (const skinId of skinIds) {
       totalSkinRefs += 1;
-      const owners = referencedSkinOwners.get(skinId) || new Set();
-      owners.add(heroId);
-      referencedSkinOwners.set(skinId, owners);
+      const owners = referencedSkinOwners.get(skinId) || new Set(); owners.add(heroId); referencedSkinOwners.set(skinId, owners);
       const skinRows = skinById.get(skinId) || [];
       if (skinRows.length === 0) { unresolvedSkinRefs.push({ heroId, skinId }); continue; }
       resolvedSkinRefs += 1;
@@ -164,10 +138,8 @@ function main() {
     }
   }
 
-  const sharedSkinRefs = [...referencedSkinOwners.entries()]
-    .filter(([, owners]) => owners.size > 1)
-    .map(([skinId, owners]) => ({ skinId, heroIds: sortedNumbers(owners) }))
-    .sort((a, b) => a.skinId - b.skinId);
+  const sharedSkinRefs = [...referencedSkinOwners.entries()].filter(([, owners]) => owners.size > 1)
+    .map(([skinId, owners]) => ({ skinId, heroIds: sortedNumbers(owners) })).sort((a, b) => a.skinId - b.skinId);
 
   const hardErrors = [];
   if (missingHeroInfoIds.length) hardErrors.push('canonical Hero IDs missing from ConfigDataHeroInfo');
@@ -185,74 +157,62 @@ function main() {
   const factionsTrace = sourceTrace?.fields?.factions || {};
   const cvTrace = sourceTrace?.fields?.cv || {};
   const originTrace = sourceTrace?.fields?.origin || {};
+  const artworkTrace = sourceTrace?.fields?.artwork || {};
 
   const unresolvedSemanticFields = [];
   if (!String(rarityTrace.status || '').includes('CONFIRMED')) unresolvedSemanticFields.push('rarity');
   if (!String(factionsTrace.status || '').includes('CONFIRMED')) unresolvedSemanticFields.push('factions');
   if (!String(cvTrace.status || '').includes('CONFIRMED')) unresolvedSemanticFields.push('cv');
   if (!String(originTrace.status || '').includes('CONFIRMED')) unresolvedSemanticFields.push('origin.displayDictionary');
-  unresolvedSemanticFields.push('artwork.displaySemantics', 'skins.orderingSemantics', 'skins.acquisitionSemantics');
+  if (!String(artworkTrace.status || '').includes('CONFIRMED')) unresolvedSemanticFields.push('artwork.displaySemantics');
+  unresolvedSemanticFields.push('skins.artworkSemantics', 'skins.orderingSemantics', 'skins.acquisitionSemantics');
 
   const result = {
     version: 1,
-    stage: 'hero-page-5-5',
-    substage: '5-5-2',
-    checkpoint: 'coverage',
+    stage: 'hero-page-5-5', substage: '5-5-2', checkpoint: 'coverage',
     status: hardErrors.length === 0 && coverageIssues.length === 0 ? 'REVIEW' : 'REVIEW_WITH_ISSUES',
-    completion: 'COVERAGE_MEASURED_SEMANTICS_PARTIAL',
-    sourceTraceStatus: sourceTrace.status,
+    completion: 'COVERAGE_MEASURED_SEMANTICS_PARTIAL', sourceTraceStatus: sourceTrace.status,
     canonicalHeroCount: heroes.length,
     sourceCounts: { heroInfoRows: heroInfo.length, heroSkinInfoRows: heroSkinInfo.length, canonicalHeroInfoRows: canonicalHeroInfoRows.length },
-    heroInfoIdentityCoverage: {
-      resolved: canonicalHeroInfoRows.length,
-      missingHeroIds: sortedNumbers(missingHeroInfoIds),
-      duplicateHeroIds: sortedNumbers(duplicateHeroInfoIds),
-      useableMismatchHeroIds: sortedNumbers(useableMismatchHeroIds),
-    },
+    heroInfoIdentityCoverage: { resolved: canonicalHeroInfoRows.length, missingHeroIds: sortedNumbers(missingHeroInfoIds), duplicateHeroIds: sortedNumbers(duplicateHeroInfoIds), useableMismatchHeroIds: sortedNumbers(useableMismatchHeroIds) },
     fields: {
-      rarity: {
-        status: rarityTrace.status || 'UNRESOLVED', acceptedSource: rarityTrace.source || null,
-        rankToRarity: rarityTrace.rankToRarity || null, rankDistribution: countByInteger(canonicalHeroInfoRows, 'Rank'),
-        starDistribution: countByInteger(canonicalHeroInfoRows, 'Star'), validation: rarityTrace.validation || null, rule: rarityTrace.rule || null,
-      },
+      rarity: { status: rarityTrace.status || 'UNRESOLVED', acceptedSource: rarityTrace.source || null, rankToRarity: rarityTrace.rankToRarity || null, rankDistribution: countByInteger(canonicalHeroInfoRows, 'Rank'), starDistribution: countByInteger(canonicalHeroInfoRows, 'Star'), validation: rarityTrace.validation || null, rule: rarityTrace.rule || null },
       factions: { status: factionsTrace.status || 'UNRESOLVED', acceptedSource: factionsTrace.source || null, validation: factionsTrace.validation || null },
       cv: { status: cvTrace.status || 'UNRESOLVED', acceptedSource: cvTrace.source || null, join: cvTrace.join || null, validation: cvTrace.validation || null },
       origin: {
-        status: originTrace.status || 'POINTER_CONFIRMED',
-        source: 'ConfigDataHeroInfo.HeroBelongProduction',
+        status: originTrace.status || 'POINTER_CONFIRMED', source: 'ConfigDataHeroInfo.HeroBelongProduction',
         heroesWithNonEmptyValidPointers: canonicalHeroInfoRows.length - originMissingHeroIds.length - originInvalidHeroIds.length,
-        pointerValueCount: originPointerValues,
-        distinctProductionIdCount: originIds.size,
-        observedProductionIds: sortedNumbers(originIds),
-        missingHeroIds: sortedNumbers(originMissingHeroIds),
-        invalidHeroIds: sortedNumbers(originInvalidHeroIds),
+        pointerValueCount: originPointerValues, distinctProductionIdCount: originIds.size, observedProductionIds: sortedNumbers(originIds),
+        missingHeroIds: sortedNumbers(originMissingHeroIds), invalidHeroIds: sortedNumbers(originInvalidHeroIds),
         displayDictionaryStatus: String(originTrace.status || '').includes('DICTIONARY_CONFIRMED') ? 'SOURCE_CONFIRMED' : 'UNRESOLVED',
-        validation: originTrace.dictionary || null,
-        rule: originTrace.rule || null,
+        validation: originTrace.dictionary || null, rule: originTrace.rule || null,
       },
       artwork: {
-        status: 'POINTER_CONFIRMED', source: 'ConfigDataHeroInfo.CharImage_ID', heroesWithValidPointer: artworkPointerHeroes,
-        missingOrInvalidHeroIds: sortedNumbers(artworkMissingHeroIds), displaySemantics: 'UNRESOLVED',
+        status: artworkTrace.status || 'POINTER_CONFIRMED',
+        source: artworkTrace.source || 'ConfigDataHeroInfo.CharImage_ID',
+        join: artworkTrace.join || null,
+        heroDetailArtworkField: artworkTrace.heroDetailArtworkField || null,
+        heroesWithValidPointer: artworkPointerHeroes,
+        missingOrInvalidHeroIds: sortedNumbers(artworkMissingHeroIds),
+        displaySemantics: String(artworkTrace.status || '').includes('CONFIRMED') ? 'SOURCE_CONFIRMED' : 'UNRESOLVED',
+        validation: artworkTrace.validation || null,
+        rule: artworkTrace.rule || null,
       },
       skins: {
         status: 'SOURCE_JOIN_CONFIRMED', join: 'ConfigDataHeroInfo.Skins_ID[] -> ConfigDataHeroSkinInfo.ID',
         normalizationRule: 'An omitted Skins_ID is normalized to [] only when ConfigDataHeroSkinInfo has no row with SpecifiedHero equal to that canonical Hero ID; omitted lists with reverse owner rows remain a hard error.',
         heroesWithValidSkinList: canonicalHeroInfoRows.length - skinListInvalidHeroIds.length,
         heroesWithExplicitValidSkinList: canonicalHeroInfoRows.length - skinListInvalidHeroIds.length - skinListNormalizedEmptyHeroIds.length,
-        heroesWithNormalizedEmptySkinList: skinListNormalizedEmptyHeroIds.length,
-        heroIdsWithNormalizedEmptySkinList: sortedNumbers(skinListNormalizedEmptyHeroIds),
+        heroesWithNormalizedEmptySkinList: skinListNormalizedEmptyHeroIds.length, heroIdsWithNormalizedEmptySkinList: sortedNumbers(skinListNormalizedEmptyHeroIds),
         heroIdsWithInvalidSkinList: sortedNumbers(skinListInvalidHeroIds), invalidSkinListDetails: skinListInvalidDetails.sort((a, b) => a.heroId - b.heroId),
-        heroesWithNoSkinRefs: skinNoRefsHeroIds.length, heroIdsWithNoSkinRefs: sortedNumbers(skinNoRefsHeroIds),
-        totalSkinRefs, resolvedSkinRefs, unresolvedSkinRefs, specifiedHeroMismatches, sharedSkinRefs,
-        duplicateSkinRecordIds: sortedNumbers(duplicateSkinRecordIds), getPathTypeMissingSkinIds: sortedNumbers(skinGetPathTypeMissingIds),
-        charImageSkinResourceMissingSkinIds: sortedNumbers(skinImagePointerMissingIds), orderingSemantics: 'UNRESOLVED', acquisitionSemantics: 'UNRESOLVED',
+        heroesWithNoSkinRefs: skinNoRefsHeroIds.length, heroIdsWithNoSkinRefs: sortedNumbers(skinNoRefsHeroIds), totalSkinRefs, resolvedSkinRefs,
+        unresolvedSkinRefs, specifiedHeroMismatches, sharedSkinRefs, duplicateSkinRecordIds: sortedNumbers(duplicateSkinRecordIds),
+        getPathTypeMissingSkinIds: sortedNumbers(skinGetPathTypeMissingIds), charImageSkinResourceMissingSkinIds: sortedNumbers(skinImagePointerMissingIds),
+        artworkSemantics: 'UNRESOLVED', orderingSemantics: 'UNRESOLVED', acquisitionSemantics: 'UNRESOLVED',
       },
     },
-    hardErrors,
-    coverageIssues,
-    unresolvedSemanticFields,
-    readyForDisplayEnrichment: false,
-    nextAction: 'Resolve final artwork display semantics and skin ordering/acquisition semantics without reopening confirmed rarity, faction, CV or origin mappings.',
+    hardErrors, coverageIssues, unresolvedSemanticFields, readyForDisplayEnrichment: false,
+    nextAction: 'Resolve skin artwork, ordering and acquisition semantics without reopening confirmed rarity, faction, CV, origin or base Hero artwork mappings.',
   };
 
   fs.writeFileSync(PATHS.output, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
@@ -263,9 +223,7 @@ function main() {
   console.log(`Faction status: ${result.fields.factions.status}`);
   console.log(`CV status: ${result.fields.cv.status}`);
   console.log(`Origin status: ${result.fields.origin.status}`);
-  console.log(`Origin pointers: ${result.fields.origin.heroesWithNonEmptyValidPointers}/${canonicalHeroInfoRows.length}`);
-  console.log(`Origin IDs: ${result.fields.origin.distinctProductionIdCount}`);
-  console.log(`Artwork pointers: ${artworkPointerHeroes}/${canonicalHeroInfoRows.length}`);
+  console.log(`Artwork status: ${result.fields.artwork.status}`);
   console.log(`Skin refs resolved: ${resolvedSkinRefs}/${totalSkinRefs}`);
   console.log(`Coverage artifact: ${path.relative(rootDir, PATHS.output)}`);
   console.log(`Status: ${result.status}`);
