@@ -1,0 +1,48 @@
+{
+  "stage": "3-1",
+  "status": "PASS",
+  "schemaContract": "data/contracts/equipment-stage3-1-page-schema.v1.json",
+  "inputContract": "data/contracts/equipment-stage3-0-input-contract.v1.json",
+  "canonicalEquipmentCount": 390,
+  "schemaReadiness": {
+    "structurallyPageReady": 373,
+    "general": 206,
+    "exclusive": 167,
+    "hiddenFromGeneral": 16,
+    "hold": 1,
+    "displayMetadataPending": 373,
+    "pendingFields": [
+      "nameKr",
+      "icon"
+    ]
+  },
+  "structuralCoverage": {
+    "list": {
+      "ready": 373,
+      "missing": 0
+    },
+    "detail": {
+      "ready": 373,
+      "missing": 0
+    }
+  },
+  "acquisitionClasses": {
+    "launch": 94,
+    "current-additional": 32,
+    "legacy-additional": 80,
+    "exclusive-equipment": 167,
+    "soul-special": 16,
+    "unresolved-no-path": 1
+  },
+  "routing": {
+    "primaryKey": "equipmentId",
+    "uniquePageReadyRouteKeys": 373
+  },
+  "policies": {
+    "stage2SemanticsReopened": false,
+    "rawLabelUsedAsDisplayOrder": false,
+    "exactReleaseOrderInvented": false,
+    "effectTextRewritten": false,
+    "nextStage": "3-2 display metadata layer (nameKr/icon)"
+  }
+}
