@@ -1,5 +1,5 @@
 {
-  "matchFileCount": 50,
+  "matchFileCount": 52,
   "matches": [
     {
       "path": "data/configdata/ConfigDataChatBubbleFrameInfo.json",
@@ -2188,6 +2188,52 @@
       ]
     },
     {
+      "path": "scripts/analyze-equipment-acquisition.mjs",
+      "sizeBytes": 2098,
+      "excerpts": [
+        {
+          "line": 16,
+          "text": "  const list = norm(r.GetPathList);"
+        },
+        {
+          "line": 17,
+          "text": "  const desc = r.GetPathDesc ?? null;"
+        },
+        {
+          "line": 22,
+          "text": "  records.push({equipmentId:Number(r.ID),name:r.Name,slot:r.EquipmentType??0,label:r.Label??null,getPathList:list,getPathDesc:desc});"
+        },
+        {
+          "line": 29,
+          "text": "    emptyGetPathList:records.filter(r=>r.getPathList.length===0).length,"
+        },
+        {
+          "line": 30,
+          "text": "    emptyGetPathDesc:records.filter(r=>r.getPathDesc==null||r.getPathDesc==='').length,"
+        },
+        {
+          "line": 31,
+          "text": "    distinctGetPathLists:listMap.size,"
+        },
+        {
+          "line": 32,
+          "text": "    distinctGetPathDescs:descMap.size,"
+        },
+        {
+          "line": 35,
+          "text": "  topGetPathLists:sortCounts(listMap).slice(0,40),"
+        },
+        {
+          "line": 36,
+          "text": "  topGetPathDescs:sortCounts(descMap).slice(0,80),"
+        },
+        {
+          "line": 41,
+          "text": "console.log(JSON.stringify({canonicalCount:result.canonicalCount,counts:result.counts,topGetPathLists:result.topGetPathLists.slice(0,20),topGetPathDescs:result.topGetPathDescs.slice(0,30)},null,2));"
+        }
+      ]
+    },
+    {
       "path": "scripts/analyze-equipment-stage2-7-acquisition.mjs",
       "sizeBytes": 4863,
       "excerpts": [
@@ -2382,6 +2428,16 @@
         {
           "line": 17,
           "text": "  counts:{secretRealmSinglePath:rows.filter(isSecret).length,soulNoPath:rows.filter(isSoul).length,genericCandidate:generic.length,otherNoPath:rows.filter(r=>!r.GetPathList&&!isSoul(r)).length},"
+        }
+      ]
+    },
+    {
+      "path": "scripts/focus-equipment-stage2-7.mjs",
+      "sizeBytes": 2024,
+      "excerpts": [
+        {
+          "line": 29,
+          "text": "      if(['ID','Name','Desc','Type','PathType','FunctionType','FuncType','Title','Text','Icon','SortIndex','Army_ID','Rank'].includes(k) || /Path|Name|Desc|Type|Title|Text/i.test(k)) fields[k]=v;"
         }
       ]
     },
