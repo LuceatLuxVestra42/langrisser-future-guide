@@ -1,96 +1,68 @@
 {
-  "version": 2,
+  "version": 3,
   "stage": "4-5",
-  "status": "SEMANTIC_BLOCKED",
-  "pipelineStatus": "PARTIAL_DATA_ASSEMBLED",
-  "stage4CompletionStatus": "NOT_COMPLETE",
+  "status": "PASS",
+  "pipelineStatus": "FINAL_DATA_ASSEMBLED",
+  "stage4CompletionStatus": "COMPLETE",
   "generatedHeroCount": 267,
-  "upstream": [
-    {
-      "label": "stage4-3-job-tree",
-      "status": "PASS",
-      "usable": true,
-      "recordCount": 267
-    },
-    {
-      "label": "stage4-4-skill-acquisition",
-      "status": "REVIEW",
-      "usable": true,
-      "recordCount": 267
-    }
-  ],
+  "canonicalHeroCount": 267,
   "sourceRecordCounts": {
+    "heroInfoRaw": 28789,
     "playableHeroInfo": 267,
+    "jobInfo": 3285,
+    "jobConnectionInfo": 12856,
     "jobLevelInfo": 7459,
+    "skillInfo": 27198,
     "awakenInfo": 283
   },
-  "sourceHealth": [
-    {
-      "filename": "ConfigDataHeroInfo.json",
-      "required": true,
-      "status": "usable",
-      "issues": []
-    },
-    {
-      "filename": "ConfigDataJobLevelInfo.json",
-      "required": true,
-      "status": "usable",
-      "issues": []
-    },
-    {
-      "filename": "ConfigDataSkillInfo.json",
-      "required": true,
-      "status": "usable",
-      "issues": []
-    },
-    {
-      "filename": "ConfigDataAwakenInfo.json",
-      "required": false,
-      "status": "usable",
-      "issues": []
-    }
-  ],
+  "formulaContract": {
+    "displayJobStats": "round((INI + UP * 69 / 10) * (1 + HeroInfo.StatStar[5] / 10000)) + global JobInfo mastery flat; bond effects excluded until Stage 5",
+    "heroSoldierModifiers": "HeroInfo.HPCmd_INI/ATCmd_INI/DFCmd_INI/MagicDFCmd_INI divided by 100",
+    "talentStarProgression": "JobConnectionInfo.TalentSkill_IDs[star - 1] for star 1..6"
+  },
   "verifiedComponents": [
-    "Stage 4-3 job topology for 267 heroes",
-    "Stage 4-4 normal skill references/acquisition for 267 heroes",
-    "JobLevelInfo raw INI/UP stat components fields 16-27",
-    "JobConnection TalentSkill_IDs reference sets",
-    "HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID relation semantics and restored payload"
+    "Stage 4-3 normal job topology for canonical 267 heroes",
+    "Stage 4-4 normal skill acquisition/reference data for canonical 267 heroes",
+    "HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID",
+    "displayJobStats at Lv70 / 6-star for every normal JobConnection",
+    "Hero-owned soldier modifier percentages from Cmd fields",
+    "TalentSkill_IDs star 1..6 selection rule",
+    "A-1 canonical hero identity and A-9 relation ownership boundary"
   ],
-  "unresolvedComponents": [
-    "displayJobStats",
-    "heroSoldierModifiers",
-    "talentStarProgression"
-  ],
-  "optionalSourceBlockers": [],
+  "unresolvedComponents": [],
   "semanticGates": [
     {
       "id": "awakeningClassification",
       "status": "VERIFIED",
-      "requiredEvidence": "Satisfied: ConfigDataAwakenInfo is structurally usable and each nonzero HeroInfo.Awaken_ID resolves through AwakenInfo.Level2SkillID to SkillInfo."
+      "rule": "HeroInfo.Awaken_ID -> AwakenInfo.ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID"
     },
     {
       "id": "displayJobStats",
-      "status": "UNVERIFIED_RUNTIME_FORMULA",
-      "requiredEvidence": "Recover or independently validate the HeroPropertyComputer calculation used for the hero-page HP/ATK/INT/DEF/MDEF/SKL display values. ComputeHeroProperties accepts hero, JobConnection, hero level, star level, JobLevel and SP stage; raw JobLevel INI/UP or JobInfo BattlePower fields must not be published as final values by themselves."
+      "status": "VERIFIED",
+      "rule": "At Hero Lv70 / 6-star, for each normal JobConnection final JobLevel: round((INI + UP * (70 - 1) / 10) * (1 + HeroInfo.StatStar[5] / 10000)) + global JobInfo mastery flat.",
+      "scope": "Bond percentage/flat effects are intentionally excluded and remain Hero Stage 5 data."
     },
     {
       "id": "heroSoldierModifiers",
-      "status": "UNVERIFIED_RUNTIME_FORMULA",
-      "requiredEvidence": "Verify the source/calculation for the hero-page soldier HP/ATK/DEF/MDEF modifier percentages. SoldierInfo base stats and TrainingTech values are not substitutes."
+      "status": "VERIFIED",
+      "rule": "HP%=HeroInfo.HPCmd_INI/100, ATK%=ATCmd_INI/100, DEF%=DFCmd_INI/100, MDEF%=MagicDFCmd_INI/100.",
+      "scope": "Hero-owned troop stat metadata only; never usable-Soldier membership."
     },
     {
       "id": "talentIdentity",
       "status": "VERIFIED_REFERENCE_SET",
-      "requiredEvidence": "No further evidence is required to preserve the JobConnection TalentSkill_IDs set itself. A separate gate still controls which variant is displayed at each star rank."
+      "rule": "JobConnectionInfo.TalentSkill_IDs is the verified talent reference set."
     },
     {
       "id": "talentStarProgression",
-      "status": "UNVERIFIED_SELECTION_RULE",
-      "requiredEvidence": "Verify how hero star rank selects or orders the TalentSkill_IDs variants. HeroInfo.Star, HeroStarInfo upgrade costs, or array position alone are insufficient."
+      "status": "VERIFIED",
+      "rule": "TalentSkill_IDs[star - 1] selects the displayed talent for star 1..6; all normal JobConnections for one Hero must carry the same six-slot array."
     }
   ],
-  "hardErrors": [],
-  "safetyDecision": "267 partial basic-combat records are emitted because their verified relations are useful. Awakening data is now source-verified; final display stats, soldier modifiers, and talent star-rank selection remain null/status-tagged rather than inferred.",
-  "nextGate": "Verify the HeroPropertyComputer display-stat formula, the hero soldier-modifier source/formula, and the talent star-selection rule before Stage 4 can be marked data-complete."
+  "relationBoundary": {
+    "usableSoldierMembership": "OUT_OF_SCOPE",
+    "semanticOwner": "Hero-Soldier Relation Layer",
+    "membershipFieldLeakCount": 0
+  },
+  "hardErrors": []
 }
