@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "stage": "B-0",
+  "status": "FROZEN",
+  "purpose": "Freeze the scope, ownership semantics, canonical relation shape, consumer boundary, and validation rules for the shared Hero <-> Exclusive Equipment relation layer before source investigation begins.",
+  "sources": {
+    "heroIdentityContract": "data/contracts/hero-identity-contract.v1.json",
+    "exclusiveEquipmentConsumerContract": "data/contracts/equipment-stage3-5-exclusive-consumer.v1.json",
+    "equipmentAcquisition": "data/generated/equipment_stage2_7_acquisition.json",
+    "equipmentExclusiveConsumer": "data/generated/equipment_stage3_5_exclusive_consumer.json"
+  },
+  "scope": {
+    "heroPopulation": {
+      "expectedTotal": 267,
+      "identityKey": "heroId",
+      "policy": "Use the canonical playable Hero master only. Names are display metadata and never relation keys."
+    },
+    "equipmentPopulation": {
+      "expectedTotal": 167,
+      "identityKey": "equipmentId",
+      "requiredAcquisitionClass": "exclusive-equipment",
+      "requiredSiteTab": null,
+      "policy": "Only the frozen 167-record exclusive-equipment population is admitted into Stage B."
+    },
+    "explicitlyExcludedEquipment": {
+      "generalEquipment": {
+        "count": 206,
+        "classes": [
+          "launch",
+          "legacy-additional",
+          "current-additional"
+        ],
+        "policy": "Never load, relate, enumerate, or derive Hero ownership edges for general equipment in Stage B."
+      },
+      "soulSpecial": {
+        "count": 16,
+        "class": "soul-special",
+        "policy": "Outside Stage B ownership scope."
+      },
+      "unresolvedNoPath": {
+        "count": 1,
+        "equipmentId": 2013,
+        "class": "unresolved-no-path",
+        "policy": "Outside Stage B ownership scope."
+      }
+    }
+  },
+  "relationSemantics": {
+    "relationName": "HeroExclusiveEquipmentOwnership",
+    "relationType": "exclusive",
+    "meaning": "The exclusive Equipment canonically belongs to the Hero for exclusive-equipment display and cross-page navigation.",
+    "notMeaning": [
+      "Hero can equip this Equipment",
+      "Hero is recommended to use this Equipment",
+      "Hero satisfies ArmyIds or JobIds restriction for this Equipment",
+      "General Equipment eligibility or recommendation",
+      "Release-order, name, icon, or ID-pattern similarity"
+    ],
+    "semanticOwner": "shared relation layer",
+    "consumerRule": "Hero and Equipment page pipelines consume the shared relation and must not independently re-derive ownership."
+  },
+  "canonicalEdgeContract": {
+    "artifact": "data/generated/hero-exclusive-equipment-relations.v1.json",
+    "edgeIdentity": [
+      "heroId",
+      "equipmentId"
+    ],
+    "recordShape": {
+      "heroId": "integer; must exist in canonical 267 Hero master",
+      "equipmentId": "integer; must exist in the 167 exclusive-equipment population",
+      "relationType": "constant: exclusive",
+      "provenance": "non-empty array of admitted explicit ID-based source evidence; exact source kinds are frozen in later Stage B source contract",
+      "verificationStatus": "VERIFIED | REVIEW"
+    },
+    "deduplication": "The same heroId-equipmentId pair is one canonical edge. Multiple independent evidence sources merge into provenance instead of creating duplicate edges.",
+    "ownershipCardinality": {
+      "policy": "Do not hard-code 1:1 cardinality before full-population validation.",
+      "expectedObservation": "Exclusive Equipment is expected to resolve to one owner Hero and each Hero is expected to own at most one current exclusive Equipment, but this is a validation hypothesis until Stage B full mapping proves it.",
+      "schemaConsequence": "Both directions remain array-capable until Stage B validation freezes actual cardinality invariants."
+    }
+  },
+  "derivedIndexContract": {
+    "byHero": {
+      "artifact": "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+      "shape": "heroId -> equipmentIds[]",
+      "consumer": "Hero Stage 5-2 exclusive-equipment block"
+    },
+    "byEquipment": {
+      "artifact": "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+      "shape": "equipmentId -> heroIds[]",
+      "consumer": "Equipment page owner-Hero display/navigation"
+    },
+    "authority": "Indexes are derived from the canonical edge set only. Index contents must never patch or override canonical ownership."
+  },
+  "sourceAdmissionBoundary": {
+    "stageB0Decision": "B-0 does not declare the production ownership source. Source discovery and admission are B-1/B-2 work.",
+    "requiredPropertiesForFutureSource": [
+      "Produces or supports an explicit Hero ID <-> Equipment ID relation through actual ConfigData fields or a verified ID chain",
+      "Can be traced to source record identity and field-level provenance",
+      "Does not require name similarity, icon similarity, numeric ordering, release order, or other heuristic inference",
+      "Can be tested on representative fixtures before full-population generation"
+    ],
+    "knownFixtureEvidence": {
+      "missionType77": {
+        "status": "VERIFIED_FIXTURE_ONLY",
+        "example": "Hero 6 Leon SP mission -> MissionType 77 -> Param1 Equipment 416",
+        "meaning": "MissionType 77 Param1 is an exclusive Equipment ID in the verified Leon fixture.",
+        "boundary": "This does not prove that MissionType 77 is the canonical ownership source for all 167 exclusive Equipment records. It may be used for B-2 cross-validation unless B-1 proves broader source coverage."
+      }
+    }
+  },
+  "forbiddenInference": [
+    "Hero name <-> Equipment name similarity",
+    "Chinese/Korean/English name substring matching",
+    "Equipment icon or asset filename similarity",
+    "Hero icon or asset filename similarity",
+    "Hero ID and Equipment ID numeric proximity or ordering",
+    "release order or list position",
+    "equipment subtype, ArmyIds, or JobIds eligibility",
+    "267 x 206 general-equipment eligibility expansion",
+    "any general-equipment Hero relation generation",
+    "forcing 167/167 mapping by heuristic when explicit evidence is missing"
+  ],
+  "consumerBoundaries": {
+    "heroStage5_2": "Consume byHero index, then join equipmentId to the frozen exclusive-equipment consumer payload. Hero Stage 5-2 must not reopen ConfigData to infer ownership.",
+    "equipmentPage": "Consume byEquipment index, then join heroId to canonical Hero identity/page data. Equipment page must not infer owner from names, restrictions, or ordering.",
+    "generalEquipment": "Any future 'this Hero can equip these general items' feature belongs to a separate eligibility/search-index stage and must not extend or mutate Stage B."
+  },
+  "validationPolicy": {
+    "hardRequirementsForStageB": [
+      "input Hero IDs are restricted to the canonical 267 Hero master",
+      "input Equipment IDs are restricted to exactly the exclusive-equipment population",
+      "no launch, legacy-additional, current-additional, soul-special, or unresolved-no-path record appears in canonical edges or indexes",
+      "every canonical edge contains valid heroId, valid exclusive equipmentId, relationType exclusive, non-empty provenance, and explicit verificationStatus",
+      "no duplicate canonical heroId-equipmentId pair",
+      "byHero and byEquipment are generated only from canonical edges",
+      "canonical-edge/index round-trip mismatch is zero",
+      "heuristic inference contributes zero production edges"
+    ],
+    "fullMappingTargets": {
+      "exclusiveEquipmentTotal": 167,
+      "mappedTarget": 167,
+      "unmappedTarget": 0,
+      "ambiguousTarget": 0,
+      "unknownHeroIdTarget": 0,
+      "unknownEquipmentIdTarget": 0,
+      "duplicatePairTarget": 0,
+      "indexMismatchTarget": 0
+    },
+    "targetInterpretation": "167/167 is a goal, not a reason to fabricate evidence. Any record that cannot be explicitly resolved remains REVIEW/unmapped until a valid source is found."
+  },
+  "plannedStageSequence": [
+    "B-0 scope/semantic contract",
+    "B-1 ownership source investigation",
+    "B-2 representative fixture JOIN validation",
+    "B-3 full 167-record canonical ownership generation",
+    "B-4 full relation validation and cardinality freeze",
+    "B-5 byHero/byEquipment index generation",
+    "B-6 Hero Stage 5-2 and Equipment-page consumer admission"
+  ],
+  "completion": "B-0 is complete when Stage B is frozen as an exclusive-equipment-only shared ownership relation layer, general Equipment is explicitly excluded, the canonical edge and derived-index shapes are fixed, heuristic relation generation is forbidden, and B-1 may investigate explicit ID-based ownership sources without changing scope."
+}
