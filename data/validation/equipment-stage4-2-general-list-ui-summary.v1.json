@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "stage": "4-2",
+  "status": "PASS",
+  "finalStageStatus": "STAGE4_2_GENERAL_LIST_UI_READY",
+  "upstream": {
+    "stage41": "STAGE4_1_ROUTE_LOADER_SCAFFOLD_READY"
+  },
+  "list": {
+    "route": "/equipment",
+    "total": 206,
+    "uniqueEquipmentIds": 206,
+    "tabs": {
+      "1": 94,
+      "2": 80,
+      "3": 32
+    },
+    "generatedOrderPreserved": true,
+    "frontendSortAdded": false
+  },
+  "filters": {
+    "groups": [
+      {
+        "group": "weapon",
+        "groupKo": "무기",
+        "subtypes": [
+          "sword",
+          "dagger",
+          "spear",
+          "axe",
+          "hammer",
+          "bow",
+          "staff"
+        ]
+      },
+      {
+        "group": "armor",
+        "groupKo": "갑옷",
+        "subtypes": [
+          "heavy",
+          "light",
+          "cloth"
+        ]
+      },
+      {
+        "group": "headgear",
+        "groupKo": "투구",
+        "subtypes": [
+          "heavy",
+          "light",
+          "cloth"
+        ]
+      },
+      {
+        "group": "accessory",
+        "groupKo": "악세사리",
+        "subtypes": [
+          "attack",
+          "intellect",
+          "defense",
+          "healing"
+        ]
+      }
+    ],
+    "singleActiveGroup": true,
+    "singleActiveSubtype": true,
+    "groupChangeClearsSubtype": true
+  },
+  "persistence": {
+    "mechanism": "localStorage",
+    "storageKey": "equipment-general-list-ui.v1",
+    "tab": true,
+    "group": true,
+    "subtype": true,
+    "invalidStateSanitized": true
+  },
+  "navigation": {
+    "detail": "/equipment/$equipmentId",
+    "routeKey": "equipmentId",
+    "exclusive": "/equipment/exclusive"
+  },
+  "display": {
+    "nameFallback": "nameKr ?? nameCn",
+    "iconAssetsBound": false,
+    "iconAssetReason": "No web-served Equipment icon asset set exists in the repository at Stage 4-2; broken/fabricated mappings are intentionally avoided.",
+    "releaseChronologyClaimed": false
+  },
+  "sourceDiscipline": {
+    "stage41LoaderOnly": true,
+    "directGeneratedJsonImportInRoute": false,
+    "directConfigDataReads": false,
+    "acquisitionRederivation": false,
+    "releaseOrderRederivation": false
+  },
+  "build": {
+    "command": "bun run build",
+    "pass": true
+  },
+  "nextStage": "4-3 general equipment Detail UI"
+}
