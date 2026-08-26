@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-8",
+  "status": "PASS_STAGE1_FREEZE_READY_FOR_STAGE2",
+  "input": "data/checkpoints/banner-stage1-8-freeze.v1.json",
+  "checks": {
+    "stage1SequenceCompleteThrough1_8": true,
+    "currentScheduleOccurrenceCount": 94,
+    "occurrenceRowGrainFrozen": true,
+    "occurrenceDistinctFromCanonicalDefinition": true,
+    "sourceRecordKeyNotCanonicalBannerId": true,
+    "bannerCodeNotCanonicalBannerId": true,
+    "displayImageFileNotCanonicalBannerId": true,
+    "multiAxisTaxonomyPreserved": true,
+    "sourceTypePreservedSeparately": true,
+    "cpRelatedLatestSemanticsUpgradedFromReviewToVerifiedContext": true,
+    "occurrenceToCardPoolCardinalityFrozen": true,
+    "manualSourceNullAllowed": true,
+    "pickupHeroExactIdRuleFrozen": true,
+    "wishCandidateFieldFamiliesFrozen": true,
+    "wishCandidateNotCollapsedIntoPickupHero": true,
+    "manualWishHeroEdgesNotSynthesized": true,
+    "cpEventCanonicalJoinStillReview": true,
+    "nameBasedEventJoinForbidden": true,
+    "krDisplayDateDayPrecisionFrozen": true,
+    "endDateOrDurationInvented": false,
+    "fixedRecurrenceCadenceCreated": false,
+    "assetReferenceOccurrenceLevelFrozen": true,
+    "manualReplacementSeparatedFromMissingAsset": true,
+    "assetHashOrVisualDiffPulledIntoStage1": false,
+    "stage1_4CorrectionMandatoryForLaterConsumers": true,
+    "7001EffectiveSourceRecordKey": "cardpool:265",
+    "sourceScheduleMutatedDuringStage1": false,
+    "representativeFixtureHardFailureCount": 0,
+    "newCrossStageContradictionCount": 0,
+    "allKnownReviewUnknownItemsRecorded": true,
+    "unrecordedKnownReviewBoundaryCount": 0,
+    "productionSchemaCreatedInStage1": false,
+    "stage2EntryStatusReady": true
+  },
+  "frozenCoreInvariants": [
+    "One current schedule row is one Korean banner occurrence/display row, not one canonical definition.",
+    "Occurrence/source/definition identities must remain separable in Stage 2.",
+    "Hero relations use explicit Hero IDs only; PICKUP_HERO and WISH_CANDIDATE_HERO remain distinct semantics.",
+    "CP_RELATED is a non-exclusive context derived from explicit CardPool text; canonical Event ID remains REVIEW.",
+    "krDisplayDate is a day-precision occurrence display date; exact time/end/duration are unknown unless later sourced.",
+    "Recurrence is observed repeated occurrence rows linked through verified/corrected source identity, not a fixed cadence rule.",
+    "displayImageType/displayImageFile are occurrence display references, not canonical identity.",
+    "Stage 1-4 correction cardpool:263 -> cardpool:265 for kr-banner:20270331:4 is mandatory before later grouping/consumption.",
+    "REVIEW and UNKNOWN are valid production-design inputs and must not be erased by guesses."
+  ],
+  "carriedOpenItems": {
+    "count": 7,
+    "items": [
+      "Canonical CP Event ID relation",
+      "Canonical identity policy for source-null manual wish rows",
+      "Replacement image for kr-manual-wish-20260902",
+      "Exact opening/closing time, timezone, endDate and duration",
+      "Canonical asset ownership/hash/visual duplicate groups",
+      "Canonical first-ever release dates outside the current schedule window",
+      "Final bannerDefinition/bannerOccurrence production schema and IDs"
+    ],
+    "blockingStage2EntryCount": 0
+  },
+  "decision": "Banner Stage 1 is complete and frozen. The investigation established the information-unit boundaries and relation/date/asset invariants needed for safe schema design while keeping every known unresolved item explicit. No known Stage 1 contradiction remains unrecorded, and no final production schema, asset hash inventory, or frontend work was pulled forward. Stage 2 may now design canonical bannerDefinition/bannerOccurrence identities and normalized production fields, but must consume the Stage 1-4 correction checkpoint and preserve all frozen boundaries.",
+  "nextStartPoint": {
+    "stage": "Banner Stage 2",
+    "task": "Canonical banner identity and production schema design",
+    "firstObjectives": [
+      "Choose canonical IDs for bannerDefinition and bannerOccurrence without reusing bannerCode/sourceRecordKey/asset filename as identity by default.",
+      "Define normalized source, Hero, taxonomy, date, recurrence, and display-reference fields.",
+      "Specify how source-null manual occurrences are represented without synthetic joins.",
+      "Apply or formally incorporate the verified 7001 relation correction before production grouping."
+    ]
+  }
+}
