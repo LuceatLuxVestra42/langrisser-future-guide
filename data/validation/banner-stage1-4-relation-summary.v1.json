@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-4",
+  "status": "PASS_RELATION_CENSUS_WITH_EVENT_JOIN_REVIEW",
+  "input": "data/investigation/banner-stage1-4-relation-census.v1.json",
+  "correctionCheckpoint": "data/checkpoints/banner-stage1-4-relation-corrections.v1.json",
+  "checks": {
+    "currentSchedulePopulation": 94,
+    "rowGrainPreservedAsOccurrenceDisplayRow": true,
+    "occurrenceToCardPoolRelationIdentified": true,
+    "occurrenceMayHaveNullCardPoolForManualRows": true,
+    "cardPoolMayBeReusedAcrossOccurrences": true,
+    "sourceRecordKeyPromotedToCanonicalBannerId": false,
+    "pickupHeroExplicitField": "UpHeroList[]",
+    "pickupHeroJoinedByExactHeroId": true,
+    "wishCandidateRelationIdentified": true,
+    "wishOptionalUpHeroListFieldPreserved": true,
+    "wishHeroFieldPreservedAsDistinctSourceShape": true,
+    "wishForcedIntoPickupHeroRelation": false,
+    "manualWishHeroEdgesSynthesized": false,
+    "cpRelatedSemanticsConfirmed": true,
+    "cpRelatedTreatedAsContextNotExclusiveMechanic": true,
+    "cpInferenceFromBannerCodeOrHeroPair": false,
+    "cpEventTextReferenceObserved": true,
+    "canonicalEventIdJoinProven": false,
+    "eventNameJoinIntroduced": false,
+    "directEventFieldFoundInCurrentSchedule": false,
+    "directEventIdFieldObservedInCardPoolInfo": false,
+    "previewFieldsPromotedToCanonicalPickupRelation": false,
+    "verifiedRelationCorrectionCount": 1,
+    "verifiedCorrectionRecord": "kr-banner:20270331:4",
+    "verifiedCorrectedSource": "cardpool:265",
+    "sourceScheduleMutated": false,
+    "nameBasedHeroJoinIntroduced": false,
+    "finalProductionRelationSchemaCreated": false,
+    "assetRelationWorkPerformed": false,
+    "dateRecurrenceWorkPerformed": false
+  },
+  "decision": "Stage 1-4 passes as a relation census. Occurrence-to-CardPool, CardPool-to-pickup-Hero, wish candidate-Hero, and CP context relation shapes are now separated and evidence-backed. The previously discovered 7001 source conflict is formally checkpointed as cardpool:263 -> cardpool:265 without mutating the assembled schedule. CP is confirmed as a non-exclusive context relation because CardPool descriptions explicitly grant CP points for named events. However, those event references are text labels rather than explicit Event IDs, so a canonical banner/CP-to-Event JOIN remains REVIEW and must not be created by name matching.",
+  "openReviewItems": [
+    {
+      "item": "Canonical CP/banner-to-Event relation",
+      "status": "REVIEW",
+      "reason": "Current banner sources provide event display labels in CP descriptions but no explicit Event ID relation."
+    },
+    {
+      "item": "Manual wish Hero candidate edges",
+      "status": "REVIEW_WHEN_SOURCE_NULL",
+      "reason": "Manual Korean wish rows with only selectableText/display names cannot be converted to canonical Hero edges without an explicit ID-bearing source or approved manual ID map."
+    }
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-5",
+    "task": "Date and recurrence structure census",
+    "priorities": [
+      "Separate dated Korean occurrence timing from reusable CardPool/banner source identity.",
+      "Determine which dates are exact observed schedule dates versus derived/repeated recurrence markers.",
+      "Identify repeated source reuse across multiple occurrence dates without inferring chronology from IDs or banner codes.",
+      "Keep unresolved Event ID relations out of date-based automatic JOINs."
+    ]
+  }
+}
