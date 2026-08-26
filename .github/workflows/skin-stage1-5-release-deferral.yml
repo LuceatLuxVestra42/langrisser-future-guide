@@ -1,0 +1,35 @@
+name: Skin Stage 1-5 Release Deferral
+
+on:
+  push:
+    branches:
+      - work/skin-stage1-5-release-deferral
+    paths:
+      - 'data/contracts/skin-stage1-release-deferral-policy.v1.json'
+      - 'scripts/validate-skin-stage1-5-release-deferral.py'
+      - '.github/workflows/skin-stage1-5-release-deferral.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/skin-stage1-5-release-deferral
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Validate release-selection deferral
+        run: python scripts/validate-skin-stage1-5-release-deferral.py
+      - name: Commit checkpoint and remove one-shot workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/skin-stage1-5-release-deferral.yml
+          git add data/validation/skin-stage1-5-final.v1.json .github/workflows/skin-stage1-5-release-deferral.yml
+          git commit -m "Freeze Skin Stage 1-5 release deferral gate"
+          git push origin HEAD:work/skin-stage1-5-release-deferral
