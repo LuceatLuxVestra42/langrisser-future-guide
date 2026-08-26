@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-3",
+  "status": "OCCURRENCE_MATERIALIZATION_CONTRACT_FROZEN",
+  "purpose": "Materialize one canonical production bannerOccurrence record for every Stage 1 Korean schedule occurrence using the Stage 2-2 canonical occurrence-to-definition mapping.",
+  "inputs": {
+    "stage2_2Validation": "data/validation/banner-stage2-2-summary.v1.json",
+    "baseSchedule": "data/kr-banner-schedule.v1.json",
+    "occurrenceDefinitionMap": "data/generated/banner-occurrence-definition-map.v1.json",
+    "canonicalDefinitions": "data/generated/banner-definitions.v1.json"
+  },
+  "output": "data/generated/banner-occurrences.v1.json",
+  "expectedOccurrenceCount": 94,
+  "schema": {
+    "bannerOccurrenceId": "Canonical occurrence ID frozen by Stage 2-1: bocc:<recordKey>.",
+    "bannerDefinitionId": "Exactly one canonical definition ID from the Stage 2-2 occurrence-definition map.",
+    "sourceOccurrenceKey": "Original Stage 1 schedule recordKey retained as provenance.",
+    "krDisplayDate": "Day-precision Korean display/schedule date only.",
+    "displayOrder": "Original within-date display ordering.",
+    "sourceRelation": {
+      "recordedSourceRecordKey": "Original Stage 1 sourceRecordKey, including null.",
+      "effectiveSourceRecordKey": "Stage 2 effective CardPool source after verified correction overlay, including null.",
+      "correctionStatus": "Correction status from Stage 2-2 mapping."
+    },
+    "scheduleProvenance": {
+      "bannerCode": "Raw schedule bannerCode; not canonical identity.",
+      "patchCode": "Raw schedule patchCode; provenance only.",
+      "slotCode": "Raw schedule slotCode; provenance only.",
+      "sourceTypeRaw": "Raw Stage 1 sourceType; not normalized taxonomy.",
+      "scheduleTypeRaw": "Raw Stage 1 scheduleType; not normalized taxonomy.",
+      "manualOverride": "Raw Stage 1 manualOverride flag.",
+      "matchStatus": "Raw Stage 1 matchStatus verification label."
+    },
+    "display": {
+      "visualType": "Raw display visual type.",
+      "imageType": "Display image family/reference type.",
+      "imageFile": "Display image filename or null.",
+      "imageStatus": "Display image match/replacement status."
+    }
+  },
+  "boundaries": [
+    "Stage 2-3 does not infer lifecycle NEW/RERUN or any normalized mechanic taxonomy.",
+    "Stage 2-3 does not materialize Hero relations, Wish candidate relations, CP/Event relations or canonical Event IDs.",
+    "Stage 2-3 does not infer start/end timestamps, timezone, duration or first-ever release.",
+    "Stage 2-3 does not treat bannerCode, sourceRecordKey or display image references as canonical definition identity.",
+    "Stage 2-3 does not canonicalize assets or perform frontend integration.",
+    "Human-readable source names, Hero name lists and selectableText remain in the Stage 1 schedule/source layer for later dedicated consumers; they are not duplicated into the canonical occurrence core."
+  ],
+  "completionCriteria": {
+    "all94OccurrencesMaterializedExactlyOnce": true,
+    "allOccurrenceIdsUnique": true,
+    "allOccurrenceDefinitionIdsResolve": true,
+    "allStage2_2MappingsPreservedExactly": true,
+    "allIncludedScheduleFieldsPreservedExactly": true,
+    "corrected7001EffectiveSourcePreserved": true,
+    "sourceNullManualRowsRemainSourceNull": true,
+    "forbiddenDownstreamFieldsAbsent": true,
+    "errorCount": 0
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-4",
+    "task": "Materialize normalized banner taxonomy dimensions without changing canonical occurrence/definition identities."
+  }
+}
