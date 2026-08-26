@@ -1,0 +1,351 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-integration-stageC-3-special-fixtures/v1",
+  "stage": "C-3",
+  "checkpoint": "special-relation-final-consumer-regression",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "purpose": "Regression-test representative accepted A-stage Hero-Soldier relation semantics through the final Hero and Soldier consumers without rereading or re-deriving raw ConfigData.",
+  "sourcePolicy": "C-3 reads only frozen A/C checkpoints, the accepted canonical relation set with provenance, the frozen representative fixture plan, and final materialized Hero/Soldier consumer outputs.",
+  "sources": {
+    "c0": {
+      "path": "data/contracts/hero-soldier-integration-stageC-0-input.v1.json",
+      "gitBlobSha": "ec4effc3fb35b2ea90cc267e0c96609e2b36f312"
+    },
+    "c1": {
+      "path": "data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json",
+      "gitBlobSha": "c8a2d96ff5fce0dffb6ffbe89b92d5c37cf78bc3"
+    },
+    "c2": {
+      "path": "data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json",
+      "gitBlobSha": "2c1efc5bc324b2f0f3b37db666aafe8633a5a157"
+    },
+    "aFinal": {
+      "path": "data/validation/hero-soldier-relation-stageA-final.v1.json",
+      "gitBlobSha": "963dd9933d2e28e1bf66e663878c60e1c61198a0"
+    },
+    "aValidation": {
+      "path": "data/validation/hero-soldier-relation-validation.v1.json",
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638"
+    },
+    "fixturePlan": {
+      "path": "data/validation/soldier-representative-fixture-plan.v1.json",
+      "gitBlobSha": "1f774530428ef6577d34da900f4625606a741de5"
+    },
+    "relation": {
+      "path": "data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    },
+    "heroManifest": {
+      "path": "data/generated/hero-detail.v1.json",
+      "gitBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66"
+    },
+    "soldierRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    }
+  },
+  "upstreamChecks": {
+    "aFinalAccepted": true,
+    "aValidationPass": true,
+    "aFixturePassFive": true,
+    "c1PassComplete": true,
+    "c2PassFamilyComplete": true,
+    "fixturePlanPass": true
+  },
+  "snapshotChecks": {
+    "c0": true,
+    "c1": true,
+    "c2": true,
+    "aFinal": true,
+    "aValidation": true,
+    "fixturePlan": true,
+    "relation": true,
+    "heroManifest": true,
+    "soldierRecords": true,
+    "c0CanonicalRelationMatches": true
+  },
+  "fixturePlanChecks": {
+    "normal105Present": true,
+    "firstStage622to5622Present": true,
+    "twoStage320to5320Present": true,
+    "aNormal105Pass": true,
+    "aFirstStage5622Pass": true,
+    "aTwoStage5320Pass": true,
+    "aFirstStageNoExpand": true,
+    "aTwoStageExpandPresent": true,
+    "aTwoStageNoBackwardLeak": true
+  },
+  "frozenAConceptualCounts": {
+    "baseEdges": 5720,
+    "directSpHeroAddedEdges": 25,
+    "inheritedSpHeroAddedEdges": 5,
+    "spExpandedEdges": 228
+  },
+  "conceptualCountChecks": {
+    "baseEdges": true,
+    "directSpHeroAddedEdges": true,
+    "inheritedSpHeroAddedEdges": true,
+    "spExpandedEdges": true
+  },
+  "summary": {
+    "canonicalRelationCount": 5977,
+    "semanticFixtureCount": 6,
+    "fixturePassCount": 6,
+    "fixtureFailCount": 0,
+    "provenanceFailureCount": 0,
+    "heroConsumerFailureCount": 0,
+    "soldierConsumerFailureCount": 0,
+    "firstStageUnexpectedExpandEdgeCount": 0,
+    "hardErrorCount": 0
+  },
+  "fixtures": [
+    {
+      "code": "NORMAL_BASE",
+      "description": "Normal Soldier baseline relation produced by direct BASE_SOLDIER_HERO provenance.",
+      "status": "PASS",
+      "heroId": 7,
+      "soldierId": 105,
+      "pairKey": "7:105",
+      "canonicalEdgePresent": true,
+      "canonicalProvenancePass": true,
+      "provenance": {
+        "sourceKind": "BASE_SOLDIER_HERO",
+        "sourceClass": "DIRECT",
+        "origin": {
+          "table": "ConfigDataSoldierInfo",
+          "recordId": 105,
+          "recordKeyField": "ID",
+          "field": "GetSoldierHeros_ID"
+        },
+        "parentEdge": null,
+        "supportRelation": null
+      },
+      "finalHero": {
+        "shardPath": "data/generated/hero-detail/by-id/7.json",
+        "containsSoldierId": true
+      },
+      "finalSoldier": {
+        "containsHeroId": true
+      },
+      "diagnostics": []
+    },
+    {
+      "code": "SP_FIRST_STAGE_INHERIT_BASE",
+      "description": "One-stage SP Soldier inherits a normal Soldier direct base relation through the explicit 622 -> 5622 SP form link.",
+      "status": "PASS",
+      "heroId": 8,
+      "soldierId": 5622,
+      "pairKey": "8:5622",
+      "canonicalEdgePresent": true,
+      "canonicalProvenancePass": true,
+      "provenance": {
+        "sourceKind": "SP_SOLDIER_INHERIT",
+        "sourceClass": "DERIVED",
+        "origin": {
+          "table": "ConfigDataSoldierInfo",
+          "recordId": 622,
+          "recordKeyField": "ID",
+          "field": "GetSoldierHeros_ID"
+        },
+        "parentEdge": {
+          "heroId": 8,
+          "soldierId": 622,
+          "parentSourceKind": "BASE_SOLDIER_HERO"
+        },
+        "supportRelation": {
+          "kind": "SP_FORM_LINK",
+          "table": "ConfigDataSPSoldierInfo",
+          "recordId": 5622,
+          "normalSoldierId": 622,
+          "spSoldierId": 5622
+        }
+      },
+      "finalHero": {
+        "shardPath": "data/generated/hero-detail/by-id/8.json",
+        "containsSoldierId": true
+      },
+      "finalSoldier": {
+        "containsHeroId": true
+      },
+      "diagnostics": []
+    },
+    {
+      "code": "SP_TWO_STAGE_INHERIT_BASE",
+      "description": "Two-stage SP Soldier preserves inherited normal-Soldier membership through the explicit 320 -> 5320 SP form link.",
+      "status": "PASS",
+      "heroId": 6,
+      "soldierId": 5320,
+      "pairKey": "6:5320",
+      "canonicalEdgePresent": true,
+      "canonicalProvenancePass": true,
+      "provenance": {
+        "sourceKind": "SP_SOLDIER_INHERIT",
+        "sourceClass": "DERIVED",
+        "origin": {
+          "table": "ConfigDataSoldierInfo",
+          "recordId": 320,
+          "recordKeyField": "ID",
+          "field": "GetSoldierHeros_ID"
+        },
+        "parentEdge": {
+          "heroId": 6,
+          "soldierId": 320,
+          "parentSourceKind": "BASE_SOLDIER_HERO"
+        },
+        "supportRelation": {
+          "kind": "SP_FORM_LINK",
+          "table": "ConfigDataSPSoldierInfo",
+          "recordId": 5320,
+          "normalSoldierId": 320,
+          "spSoldierId": 5320
+        }
+      },
+      "finalHero": {
+        "shardPath": "data/generated/hero-detail/by-id/6.json",
+        "containsSoldierId": true
+      },
+      "finalSoldier": {
+        "containsHeroId": true
+      },
+      "diagnostics": []
+    },
+    {
+      "code": "SP_HERO_REWARD_DIRECT",
+      "description": "Direct SP Hero second-stage reward relation is present in the accepted canonical relation set.",
+      "status": "PASS",
+      "heroId": 10,
+      "soldierId": 131,
+      "pairKey": "10:131",
+      "canonicalEdgePresent": true,
+      "canonicalProvenancePass": true,
+      "provenance": {
+        "sourceKind": "SP_HERO_REWARD",
+        "sourceClass": "DIRECT",
+        "origin": {
+          "table": "ConfigDataSPHeroInfo",
+          "recordId": 10,
+          "recordKeyField": "ID",
+          "field": "SecondStageRewardSoldiers"
+        },
+        "parentEdge": null,
+        "supportRelation": null
+      },
+      "finalHero": {
+        "shardPath": "data/generated/hero-detail/by-id/10.json",
+        "containsSoldierId": true
+      },
+      "finalSoldier": {
+        "containsHeroId": true
+      },
+      "diagnostics": []
+    },
+    {
+      "code": "SP_HERO_REWARD_INHERITED",
+      "description": "An SP Hero reward attached to a normal Soldier is inherited by its explicitly linked SP Soldier form.",
+      "status": "PASS",
+      "heroId": 37,
+      "soldierId": 5423,
+      "pairKey": "37:5423",
+      "canonicalEdgePresent": true,
+      "canonicalProvenancePass": true,
+      "provenance": {
+        "sourceKind": "SP_SOLDIER_INHERIT",
+        "sourceClass": "DERIVED",
+        "origin": {
+          "table": "ConfigDataSPHeroInfo",
+          "recordId": 37,
+          "recordKeyField": "ID",
+          "field": "SecondStageRewardSoldiers"
+        },
+        "parentEdge": {
+          "heroId": 37,
+          "soldierId": 423,
+          "parentSourceKind": "SP_HERO_REWARD"
+        },
+        "supportRelation": {
+          "kind": "SP_FORM_LINK",
+          "table": "ConfigDataSPSoldierInfo",
+          "recordId": 5423,
+          "normalSoldierId": 423,
+          "spSoldierId": 5423
+        }
+      },
+      "finalHero": {
+        "shardPath": "data/generated/hero-detail/by-id/37.json",
+        "containsSoldierId": true
+      },
+      "finalSoldier": {
+        "containsHeroId": true
+      },
+      "diagnostics": []
+    },
+    {
+      "code": "SECOND_STAGE_EXPAND",
+      "description": "Two-stage SP Soldier 5320 contains a direct SecondStageExpandHeroList relation.",
+      "status": "PASS",
+      "heroId": 53,
+      "soldierId": 5320,
+      "pairKey": "53:5320",
+      "canonicalEdgePresent": true,
+      "canonicalProvenancePass": true,
+      "provenance": {
+        "sourceKind": "SP_SOLDIER_EXPAND",
+        "sourceClass": "DIRECT",
+        "origin": {
+          "table": "ConfigDataSPSoldierInfo",
+          "recordId": 5320,
+          "recordKeyField": "ID",
+          "field": "SecondStageExpandHeroList"
+        },
+        "parentEdge": null,
+        "supportRelation": null
+      },
+      "finalHero": {
+        "shardPath": "data/generated/hero-detail/by-id/53.json",
+        "containsSoldierId": true
+      },
+      "finalSoldier": {
+        "containsHeroId": true
+      },
+      "diagnostics": []
+    }
+  ],
+  "nonBlockingReviewsForwarded": [
+    {
+      "code": "SOLDIER_KR_NAME_UNRESOLVED",
+      "count": 41,
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "Korean display-name absence is presentation-only and must never remove or alter a canonical soldierId reference."
+    },
+    {
+      "code": "RELEASE_DATE_UNRESOLVED",
+      "count": 213,
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "Release metadata is outside C-2 identity/resolution integrity."
+    },
+    {
+      "code": "ROUTE_IMPLEMENTATION_SEPARATE_FROM_IDENTITY",
+      "count": null,
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "C-2 validates stable IDs and Soldier siteId round-trip metadata, not deployed click/route behavior."
+    }
+  ],
+  "hardErrors": [],
+  "passCriteria": {
+    "upstreamAFinalC1C2Accepted": true,
+    "frozenSnapshotsUnchanged": true,
+    "semanticFixtures": 6,
+    "fixtureFailures": 0,
+    "provenanceFailures": 0,
+    "finalHeroMembershipFailures": 0,
+    "finalSoldierMembershipFailures": 0,
+    "firstStageUnexpectedSecondStageExpansion": 0,
+    "hardErrors": 0
+  },
+  "decision": "C-3 PASS. Six representative semantic relation paths—normal base, one-stage SP inheritance, two-stage SP inheritance, direct SP Hero reward, inherited SP Hero reward, and second-stage SP expansion—remain present in the accepted canonical relation and are preserved in both final Hero and final Soldier consumers.",
+  "nextStartPoint": "C-4 production-boundary contract: freeze canonical/index/consumer/frontend ownership and prohibit runtime relation recomputation."
+}
