@@ -1,0 +1,191 @@
+{
+  "version": 1,
+  "stage": "hero-page-6-4",
+  "checkpoint": "site-consumer-contract-final-freeze",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "heroDataPipelineStatus": "FINAL_FROZEN",
+  "contract": "data/contracts/hero-stage6-4-site-consumer.v1.json",
+  "sources": {
+    "data/contracts/hero-stage6-4-site-consumer.v1.json": {
+      "gitBlobSha": "111c81ae79b31517a0c41ae97d35083c3e7e14c0"
+    },
+    "data/generated/hero-detail.v1.json": {
+      "gitBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66"
+    },
+    "data/generated/hero-detail-shared.v1.json": {
+      "gitBlobSha": "cd455c567e7a9e3f8449e2eedf44a43897bf4c68"
+    },
+    "data/validation/hero-stage6-3-final.v1.json": {
+      "gitBlobSha": "04c1e841d43e1ec20edd3e5e875b465152c49a56"
+    },
+    "data/validation/hero-exclusive-equipment-relation-stageB-final.v1.json": {
+      "gitBlobSha": "ff3b0a8b1c7a9b364f4c638f0a1110aa3d7626ee"
+    },
+    "data/generated/hero-exclusive-equipment-consumer-admission.v1.json": {
+      "gitBlobSha": "49f2c8698cd5c2a96aea64bb14a14e30b887015d"
+    },
+    "data/generated/hero-exclusive-equipment-by-hero.v1.json": {
+      "gitBlobSha": "fcc9deb514755dc9df9de2e40e96685f68d08fba"
+    },
+    "data/generated/hero-exclusive-equipment-by-equipment.v1.json": {
+      "gitBlobSha": "a49c3a549fd1d97fff0321f45fe1bc94526e1f8d"
+    },
+    "data/generated/equipment_stage3_5_exclusive_consumer.json": {
+      "gitBlobSha": "014885f23a507f6c0171172290f010a351e015c5"
+    }
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "heroShardCount": 267,
+    "shardMissingCount": 0,
+    "shardIntegrityMismatchCount": 0,
+    "shardHeroIdMismatchCount": 0,
+    "shardStructuralMismatchCount": 0,
+    "siteUsableHeroCount": 267,
+    "sharedSoldierMetadataCount": 224,
+    "soldierMetadataMissingRefCount": 0,
+    "stageBStatus": "PASS_ACCEPTED",
+    "stageBClosed": true,
+    "exclusiveOwnershipRelationCount": 167,
+    "heroesWithExclusive": 167,
+    "heroesWithoutExclusive": 100,
+    "crossIndexMismatchCount": 0,
+    "equipmentMetadataMissingCount": 0,
+    "exclusiveSnapshotMismatchCount": 0,
+    "spReleasedCount": 25,
+    "spNotReleasedCount": 242,
+    "productionBoundaryViolationCount": 0,
+    "hardErrorCount": 0
+  },
+  "checks": [
+    {
+      "name": "contract-frozen",
+      "pass": true,
+      "detail": "1/hero-page-6-4/FROZEN"
+    },
+    {
+      "name": "stage6-3-complete",
+      "pass": true,
+      "detail": "{\"completion\":\"COMPLETE\",\"canonical\":267,\"generated\":267,\"structuralFail\":0,\"siteUsable\":267,\"hard\":0}"
+    },
+    {
+      "name": "stage-b-final-closed",
+      "pass": true,
+      "detail": "B-FINAL/PASS_ACCEPTED/closed=true/hard=0"
+    },
+    {
+      "name": "stage-b-consumer-admitted",
+      "pass": true,
+      "detail": "{\"heroCount\":267,\"heroOwnershipKeys\":167,\"heroesWithoutExclusiveKey\":100,\"equipmentOwnershipKeys\":167,\"ownershipPairCount\":167,\"equipmentMetadataCoverage\":167,\"legacyPairParityMismatch\":0,\"legacyAbsenceParityMismatch\":0,\"hardErrorCount\":0}"
+    },
+    {
+      "name": "manifest-stage6-3",
+      "pass": true,
+      "detail": "hero-page-6-3/COMPLETE/SHARDED_BY_HERO/records=267"
+    },
+    {
+      "name": "manifest-267-unique-hero-keys",
+      "pass": true,
+      "detail": "keys=267"
+    },
+    {
+      "name": "shared-payload-integrity",
+      "pass": true,
+      "detail": "expected=9ed3fc3f8c0733ea4cba21de53809f2759c83881f8cc725f502bcbb90be0fab2, actual=9ed3fc3f8c0733ea4cba21de53809f2759c83881f8cc725f502bcbb90be0fab2"
+    },
+    {
+      "name": "shared-soldier-metadata-present",
+      "pass": true,
+      "detail": "count=224"
+    },
+    {
+      "name": "b-byhero-cardinality",
+      "pass": true,
+      "detail": "summary={\"keyCount\":167,\"relationCount\":167,\"maxValueCountPerKey\":1,\"canonicalHeroesWithoutKey\":100}, keys=167"
+    },
+    {
+      "name": "b-byequipment-cardinality",
+      "pass": true,
+      "detail": "summary={\"keyCount\":167,\"relationCount\":167,\"maxValueCountPerKey\":1}, keys=167"
+    },
+    {
+      "name": "b-index-roundtrip",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "exclusive-equipment-metadata-coverage",
+      "pass": true,
+      "detail": "detail=167, list=167, detailUnique=167, missing=0"
+    },
+    {
+      "name": "all-shards-present",
+      "pass": true,
+      "detail": "missing=0"
+    },
+    {
+      "name": "all-shards-integrity-pass",
+      "pass": true,
+      "detail": "hashOrSize=0, heroId=0"
+    },
+    {
+      "name": "all-shards-site-usable",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "all-soldier-metadata-resolves",
+      "pass": true,
+      "detail": "missingRefs=0"
+    },
+    {
+      "name": "exclusive-b-adoption-parity",
+      "pass": true,
+      "detail": "mismatch=0, released=167, absent=100"
+    },
+    {
+      "name": "sp-population-preserved",
+      "pass": true,
+      "detail": "released=25, notReleased=242"
+    },
+    {
+      "name": "total-shard-bytes-preserved",
+      "pass": true,
+      "detail": "expected=15093766, actual=15093766"
+    },
+    {
+      "name": "production-input-boundary",
+      "pass": true,
+      "detail": "[]"
+    }
+  ],
+  "productionConsumerContract": {
+    "detailRoute": "/hero/$heroId",
+    "routeKey": "heroId",
+    "heroDetailLookup": "data/generated/hero-detail.v1.json#storage.byHeroId -> shard path",
+    "soldierMetadata": "data/generated/hero-detail-shared.v1.json#soldiersById",
+    "exclusiveOwnership": "data/generated/hero-exclusive-equipment-by-hero.v1.json#byHeroId",
+    "exclusiveMetadata": "data/generated/equipment_stage3_5_exclusive_consumer.json#detailRecords",
+    "embeddedShardExclusiveBlockRole": "PARITY_ONLY_MATERIALIZED_SNAPSHOT",
+    "configDataRuntimeReadsAdmitted": false,
+    "stage4Or5RuntimeReadsAdmitted": false,
+    "relationReDerivationAdmitted": false
+  },
+  "nonBlockingReviews": [
+    {
+      "owner": "Hero Stage 6-3 publication metadata",
+      "issue": "Hero records may retain presentation-only REVIEW (Soldier Korean names, CV/faction/origin/skin localization, source asset delivery).",
+      "blockingStage64Completion": false
+    },
+    {
+      "owner": "frontend/asset integration",
+      "issue": "Source asset paths still require web-delivery conversion and final responsive rendering. This is outside Hero semantic-data Stage 6.",
+      "blockingStage64Completion": false
+    }
+  ],
+  "failedHeroIds": [],
+  "hardErrors": [],
+  "decision": "Hero Stage 6-4 COMPLETE. The 267 sharded Hero publication is the final Hero detail payload, Stage B byHero is the production exclusive-equipment ownership lookup, all shard/inverse-index/metadata parity checks pass, and the Hero semantic data pipeline is FINAL_FROZEN for frontend consumption.",
+  "nextStartPoint": "Hero frontend/UI and web-asset integration. Consume the Stage 6-4 contract; do not reopen Stage 4/5 or Stage B semantics unless a new source snapshot or explicit contradiction requires the owning stage to reopen."
+}
