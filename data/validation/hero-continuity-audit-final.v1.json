@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "audit": "hero-page-continuity",
+  "auditDate": "2026-08-26",
+  "status": "PASS_ACCEPTED",
+  "completion": "CONTINUITY_AUDIT_COMPLETE",
+  "purpose": "Establish one authoritative continuity checkpoint after Hero page work was interrupted and resumed across multiple work sessions. This audit does not reopen frozen semantics; it verifies that interrupted work was absorbed by later final gates and that production consumers use frozen generated relations instead of re-deriving ConfigData joins.",
+  "authority": {
+    "currentEndpoint": "data/validation/hero-stage6-4-final.v1.json",
+    "currentEndpointSha": "9ae03d2dcc0660aae9c28900345212426b2a4dd1",
+    "rule": "When older chat/progress notes conflict with this audit or the cited final checkpoints, prefer the final repository checkpoints.",
+    "heroSemanticPipeline": "FINAL_FROZEN",
+    "nextStartPoint": "Hero frontend/UI and web-asset integration"
+  },
+  "scope": [
+    "Stage 1-3 identity/master continuity",
+    "Stage 4 combat semantics",
+    "Stage 5-1 bond/fetter",
+    "Stage 5-2 exclusive equipment + central discipline",
+    "Stage 5-3 Hero-Soldier membership",
+    "Stage 5-4 SP",
+    "Stage 5-5 header/basic/skin",
+    "Stage 5 cross-block integration",
+    "Stage 6 normalized composition, representative QA, full 267-Hero generation, and final site-consumer contract",
+    "Hero-Soldier shared relation",
+    "Hero-exclusive Equipment shared relation"
+  ],
+  "interruptionAudit": {
+    "stage1_2": {
+      "verdict": "DOWNSTREAM_ABSORBED_NO_DEFECT_EVIDENCE",
+      "note": "The historical 1-2 session boundary is not preserved as a standalone modern final checkpoint. Its canonical output is nevertheless transitively revalidated: the canonical Hero population is 267, Stage 3 automatic validation passes, every Stage 4/5 block preserves 267, and Stage 6-4 freezes 267 usable Hero shards with zero hard errors. No evidence requires reopening Stage 1-2."
+    },
+    "stage5_5_2": {
+      "verdict": "DOWNSTREAM_ABSORBED_PASS",
+      "sourceTrace": "data/validation/hero-page-stage5-5-2-source-trace.v1.json",
+      "sourceTraceStatus": "PASS_WITH_DATA_GAPS",
+      "semanticUnresolvedCount": 0,
+      "finalGate": "data/validation/hero-page-stage5-5-5-final.v1.json",
+      "finalGateStatus": "PASS/STAGE_5_5_COMPLETE",
+      "regularSkinCount": 540,
+      "note": "The only retained gap is source-omitted acquisition metadata for 176 regular skins; it is explicitly non-blocking and is not a continuity or semantic defect."
+    }
+  },
+  "finalStageState": {
+    "stage4": "PASS/COMPLETE",
+    "stage5_1": "PASS/COMPLETE",
+    "stage5_2": "PASS/COMPLETE",
+    "stage5_3": "PASS_WITH_REVIEW/COMPLETE",
+    "stage5_4": "PASS/COMPLETE",
+    "stage5_5": "PASS/STAGE_5_5_COMPLETE",
+    "stage5Integration": "PASS/STAGE_5_COMPLETE",
+    "stage6_1": "PASS/COMPLETE",
+    "stage6_2": "PASS/COMPLETE",
+    "stage6_3": "PASS_WITH_REVIEW/COMPLETE",
+    "stage6_4": "PASS_WITH_REVIEW/COMPLETE/FINAL_FROZEN"
+  },
+  "integrity": {
+    "canonicalHeroCount": 267,
+    "siteUsableHeroCount": 267,
+    "heroShardCount": 267,
+    "missingHeroShardCount": 0,
+    "structuralFailCount": 0,
+    "hardErrorCount": 0,
+    "heroSoldierRelationCount": 5977,
+    "heroSoldierRelationStatus": "PASS_ACCEPTED",
+    "exclusiveEquipmentRelationCount": 167,
+    "exclusiveEquipmentRelationStatus": "PASS_ACCEPTED",
+    "heroesWithoutExclusiveEquipment": 100,
+    "relationCrossIndexMismatchCount": 0,
+    "productionBoundaryViolationCount": 0
+  },
+  "antiDuplicateJoinRules": {
+    "configDataRuntimeReadsAdmitted": false,
+    "stage4Or5RuntimeReadsAdmitted": false,
+    "relationReDerivationAdmitted": false,
+    "heroSoldier": "Consume the frozen byHero relation/index; do not recalculate membership from ConfigData.",
+    "heroExclusiveEquipment": "Consume Stage B byHeroId for production ownership; do not reread SkillHero in page/frontend code.",
+    "skin": "Preserve frozen Hero Stage 5-5 ownership/order; missing acquisition source fields remain explicit UNENCODED rather than inferred."
+  },
+  "nonBlockingReviews": [
+    "41 referenced Soldier records retain pending/missing Korean presentation names.",
+    "176 regular skins retain UNENCODED acquisition because source GetPathType is omitted.",
+    "Some CV/faction/origin/skin Korean localization remains presentation-layer follow-up.",
+    "Source asset paths still require web-delivery conversion and final responsive frontend rendering."
+  ],
+  "reopenPolicy": "Do not reopen Stage 1-5, Hero-Soldier relation semantics, or Hero-exclusive Equipment ownership because of old chat discontinuity alone. Reopen only when a new source snapshot, an explicit contradiction, or a failing regression check identifies the owning stage.",
+  "decision": "No continuity defect was found that justifies redoing interrupted Hero work. The current authoritative start point is the frozen Stage 6-4 site-consumer contract, with remaining work limited to presentation metadata, assets, and frontend/UI integration unless new evidence invalidates an owning checkpoint.",
+  "evidence": [
+    {"path": "data/validation/hero-basic-combat-stage4-5-summary.v1.json", "sha": "6352647f024a9249003b7e99383843caf44653c3"},
+    {"path": "data/validation/hero-page-stage5-1-final.v1.json", "sha": "8d6dc550824fe3e5368cc1071fd049054416989c"},
+    {"path": "data/validation/hero-page-stage5-2-final.v1.json", "sha": "2e0a1ed56ff9fe4b74edd186408c8f8f532daba7"},
+    {"path": "data/validation/hero-page-stage5-4-final.v1.json", "sha": "89d632e663014d769c13a2231c5a90b5dd0e7734"},
+    {"path": "data/validation/hero-page-stage5-5-5-final.v1.json", "sha": "1f46b7a68563cd4b5ffb355b80ec707f18adee3c"},
+    {"path": "data/validation/hero-page-stage5-integration-review.v1.json", "sha": "54317baa86c5efbcff3139c298683edc3b70b9af"},
+    {"path": "data/validation/hero-soldier-relation-stageA-final.v1.json", "sha": "963dd9a4f935911c102bd2999281339d24aa83e3"},
+    {"path": "data/validation/hero-exclusive-equipment-relation-stageB-final.v1.json", "sha": "ff3b0a8b1c7a9b364f4c638f0a1110aa3d7626ee"},
+    {"path": "data/validation/hero-stage6-3-final.v1.json", "sha": "04c1e841d43e1ec20edd3e5e875b465152c49a56"},
+    {"path": "data/validation/hero-stage6-4-final.v1.json", "sha": "9ae03d2dcc0660aae9c28900345212426b2a4dd1"}
+  ]
+}
