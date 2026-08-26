@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-5",
+  "status": "PASS_STAGE2_5_CANONICAL_HERO_RELATIONS",
+  "validationMode": "EXECUTED_FULL_POPULATION_REGRESSION",
+  "definitionCount": 77,
+  "definitionHandlingResultCount": 77,
+  "heroRelationEdgeCount": 600,
+  "uniqueRelatedHeroCount": 167,
+  "relationTypeCounts": {
+    "PICKUP_HERO": 136,
+    "WISH_CANDIDATE_HERO": 464
+  },
+  "sourceFieldCounts": {
+    "UpHeroList[]": 136,
+    "OptionalUpHeroList[].HeroId": 464
+  },
+  "sourceNullDefinitionCount": 8,
+  "zeroEdgeDefinitionCount": 8,
+  "sourceLinkedZeroEdgeDefinitionCount": 0,
+  "unresolvedReferenceCount": 0,
+  "errorCount": 0,
+  "errors": [],
+  "invariants": {
+    "canonicalDefinitionIdsUnchanged": true,
+    "all77DefinitionsHaveHandlingResult": true,
+    "allEmittedHeroIdsResolveCanonicalMaster": true,
+    "pickupEdgesUseUpHeroListOnly": true,
+    "wishEdgesUseApprovedHeroIdFieldsOnly": true,
+    "pickupAndWishRelationTypesRemainDistinct": true,
+    "sourceNullManualDefinitionsHaveZeroHeroEdges": true,
+    "nameBasedHeroJoinCountZero": true,
+    "jobConnectionIdUsedAsHeroIdentity": false,
+    "previewHeroIdsUsedAsCanonicalRelationSource": false,
+    "corrected7001ResolvesHero99225ViaCardpool265": true,
+    "heroRelationsDoNotChangeBannerIdentity": true,
+    "cpEventJoinsNotMaterialized": true,
+    "assetCanonicalizationNotMaterialized": true
+  },
+  "completion": {
+    "heroRelationContractFrozen": true,
+    "definitionHeroRelationsMaterialized": true,
+    "stage2_5Closed": true,
+    "nextStageReady": true
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-6",
+    "task": "Materialize CP context and Event-reference structure without name-based Event joins."
+  }
+}

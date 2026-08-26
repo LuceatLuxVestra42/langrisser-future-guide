@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-5",
+  "status": "STAGE2_5_CLOSED_READY_FOR_STAGE2_6",
+  "confirmed": {
+    "definitionCount": 77,
+    "definitionHandlingResultCount": 77,
+    "heroRelationEdgeCount": 600,
+    "uniqueRelatedHeroCount": 167,
+    "pickupHeroEdgeCount": 136,
+    "wishCandidateHeroEdgeCount": 464,
+    "sourceFieldCounts": {
+      "UpHeroList[]": 136,
+      "OptionalUpHeroList[].HeroId": 464,
+      "WishHero[].HeroId": 0
+    },
+    "sourceNullDefinitionCount": 8,
+    "sourceLinkedZeroEdgeDefinitionCount": 0,
+    "unresolvedReferenceCount": 0,
+    "errorCount": 0
+  },
+  "frozenBoundaries": [
+    "PICKUP_HERO and WISH_CANDIDATE_HERO remain distinct relation types.",
+    "Hero identity is exact heroId only.",
+    "Hero names are denormalized display metadata only and are never join keys.",
+    "Wish JobConnectionId is not Hero identity.",
+    "PreviewHeroIds and DynamicDisplayHeroIds are not canonical relation sources in Stage 2-5.",
+    "Source-null manual definitions receive no synthesized Hero relations.",
+    "The current 77-definition population uses OptionalUpHeroList[].HeroId for all materialized wish-candidate edges; WishHero[].HeroId remains an approved source family but has zero observed edges in this population.",
+    "The verified 7001 corrected source cardpool:265 resolves PICKUP_HERO heroId 99225."
+  ],
+  "sources": [
+    "data/investigation/banner-stage1-4-relation-census.v1.json",
+    "data/generated/banner-definitions.v1.json",
+    "data/generated/banner-definition-taxonomy.v1.json",
+    "data/configdata/ConfigDataCardPoolInfo.json",
+    "data/hero-name-master.v1.json",
+    "data/generated/banner-definition-hero-relations.v1.json",
+    "data/validation/banner-stage2-5-summary.v1.json"
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-6",
+    "task": "Materialize CP context and Event-reference structure without name-based Event joins."
+  }
+}
