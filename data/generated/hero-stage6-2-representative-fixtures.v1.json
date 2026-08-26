@@ -1,0 +1,2405 @@
+{
+  "version": 1,
+  "stage": "hero-page-6-2",
+  "artifact": "representative-fixtures",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "sourcePolicy": "QA-only representative fixtures resolved from frozen Stage 4/5 and Stage 6-1 outputs. No semantic relation is re-derived here.",
+  "sources": {
+    "data/contracts/hero-stage6-2-representative-fixture-qa.v1.json": {
+      "gitBlobSha": "d155814cc5d5fa3b36bb8da280031ad9422be1f2"
+    },
+    "data/generated/hero-detail-stage6-1.v1.json": {
+      "gitBlobSha": "a412a0c1449590b9e81f4bb5c523c0414498a1be"
+    },
+    "data/validation/hero-stage6-1-final.v1.json": {
+      "gitBlobSha": "675b39b591fcab7517309cff7d735287d8a9c107"
+    },
+    "data/generated/hero-basic-combat.v1.json": {
+      "gitBlobSha": "1661efec786de37b00adcef02839b607a947765f"
+    },
+    "data/generated/hero-page-stage5-1-bonds-final.v1.json": {
+      "gitBlobSha": "5be989e9d0723782f491dc3005a11c0ad3143c43"
+    },
+    "data/generated/hero-page-stage5-2-exclusive-central.v1.json": {
+      "gitBlobSha": "6c34231f114177d5612947533f57322ba9bf8578"
+    },
+    "data/generated/hero-page-soldiers-stage5-3.v1.json": {
+      "gitBlobSha": "b97beae7aa58c573f16919cf731250bfc359d58e"
+    },
+    "data/generated/hero-page-stage5-4-sp.v1.json": {
+      "gitBlobSha": "d281dbf094939ae34a5c3e8fbd4f4225bd065fd9"
+    },
+    "data/hero-page-stage5-5-3.v1.json": {
+      "gitBlobSha": "dd56c47602b2aee42001b8a32f1830769d5c44c1"
+    }
+  },
+  "selectionSummary": {
+    "requiredFamilyCount": 7,
+    "selectedFamilyCount": 7,
+    "distinctHeroCount": 7,
+    "releaseChronologyAsserted": false
+  },
+  "fixtures": [
+    {
+      "family": "regular-ssr",
+      "heroId": 28,
+      "identity": {
+        "nameKr": "젤다",
+        "nameCn": "泽瑞达",
+        "nameEn": "Zalrahda"
+      },
+      "selection": {
+        "selector": "closest to eligible-population median branch count, then lowest heroId",
+        "eligiblePopulationCount": 141,
+        "medianBranchCount": 2
+      },
+      "traits": {
+        "rarity": "SSR",
+        "originCategory": "MOBILE_ORIGINAL",
+        "spStatus": "NOT_RELEASED",
+        "branchCount": 2,
+        "jobConnectionCount": 5,
+        "sharedJobNameCount": 4,
+        "sharedJobFrequencyScore": 30,
+        "sharedJobNames": [
+          {
+            "nameCn": "暗杀者",
+            "heroFrequency": 11
+          },
+          {
+            "nameCn": "忍者",
+            "heroFrequency": 10
+          },
+          {
+            "nameCn": "影",
+            "heroFrequency": 6
+          },
+          {
+            "nameCn": "魔剑使者",
+            "heroFrequency": 3
+          }
+        ],
+        "soldierCount": 23,
+        "bondCount": 5,
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 412,
+        "centralDisciplineStatus": "RELEASED",
+        "factionCount": 3,
+        "skinCount": 7
+      },
+      "qa": {
+        "checkCount": 37,
+        "failedCheckCount": 0,
+        "checks": [
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "stage61-record-present",
+            "pass": true
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "locator",
+            "name": "source-locator-normal",
+            "pass": true,
+            "detail": "index=26, resolvedHeroId=28"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "locator",
+            "name": "source-locator-bonds",
+            "pass": true,
+            "detail": "index=26, resolvedHeroId=28"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "locator",
+            "name": "source-locator-exclusiveCentral",
+            "pass": true,
+            "detail": "index=26, resolvedHeroId=28"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "locator",
+            "name": "source-locator-sp",
+            "pass": true,
+            "detail": "index=26, resolvedHeroId=28"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "locator",
+            "name": "source-locator-header",
+            "pass": true,
+            "detail": "index=26, resolvedHeroId=28"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "locator",
+            "name": "soldiers-key",
+            "pass": true,
+            "detail": "soldiersKey=28"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "snapshot",
+            "name": "snapshot-exclusive-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "snapshot",
+            "name": "snapshot-equipment-id",
+            "pass": true,
+            "detail": "412 vs 412"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "snapshot",
+            "name": "snapshot-central-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "snapshot",
+            "name": "snapshot-soldier-count",
+            "pass": true,
+            "detail": "23 vs 23"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "snapshot",
+            "name": "snapshot-sp-status",
+            "pass": true,
+            "detail": "NOT_RELEASED vs NOT_RELEASED"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "identity-nameKr",
+            "pass": true,
+            "detail": "[\"젤다\",\"젤다\",\"젤다\",\"젤다\",\"젤다\"]"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "identity-nameCn",
+            "pass": true,
+            "detail": "[\"泽瑞达\",\"泽瑞达\",\"泽瑞达\",\"泽瑞达\",\"泽瑞达\"]"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "identity-nameEn",
+            "pass": true,
+            "detail": "[\"Zalrahda\",\"Zalrahda\",\"Zalrahda\",\"Zalrahda\",\"Zalrahda\"]"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "job-connections-present",
+            "pass": true,
+            "detail": "count=5"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "job-connection-ids-unique",
+            "pass": true,
+            "detail": "ids=5, unique=5"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "job-primary-resolves",
+            "pass": true,
+            "detail": "primary=280"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "job-branch-ids-resolve",
+            "pass": true,
+            "detail": "unresolved="
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "bonds-array",
+            "pass": true
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "bonds-source-resolved",
+            "pass": true,
+            "detail": "unresolved=0"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "exclusive-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "central-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "exclusive-released-equipment-id",
+            "pass": true,
+            "detail": "equipmentId=412"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "exclusive-owner-parity",
+            "pass": true,
+            "detail": "ownerHeroId=28"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "soldiers-array",
+            "pass": true
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "soldier-ids-unique",
+            "pass": true,
+            "detail": "count=23, unique=23"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "soldier-ids-resolve",
+            "pass": true,
+            "detail": "missing="
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "sp-status-valid",
+            "pass": true,
+            "detail": "status=NOT_RELEASED"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "header-rarity-valid",
+            "pass": true,
+            "detail": "baseLabel=SSR"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "header-origin-valid",
+            "pass": true,
+            "detail": "category=MOBILE_ORIGINAL"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "header-factions-array",
+            "pass": true
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "header-skins-array",
+            "pass": true
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "common",
+            "name": "header-artwork-path",
+            "pass": true,
+            "detail": "path=UI/HeroPainting/SSR_ABS/Prefab/Zalrahda.prefab"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "family",
+            "name": "family-regular-ssr-rarity",
+            "pass": true,
+            "detail": "rarity=SSR"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "family",
+            "name": "family-regular-ssr-origin",
+            "pass": true,
+            "detail": "origin=MOBILE_ORIGINAL"
+          },
+          {
+            "family": "regular-ssr",
+            "heroId": 28,
+            "type": "family",
+            "name": "family-regular-ssr-no-sp",
+            "pass": true,
+            "detail": "sp=NOT_RELEASED"
+          }
+        ]
+      }
+    },
+    {
+      "family": "multi-branch-structural",
+      "heroId": 4,
+      "identity": {
+        "nameKr": "아멜다",
+        "nameCn": "艾梅达",
+        "nameEn": "Aimeeda"
+      },
+      "selection": {
+        "selector": "maximum unused non-COLLAB Stage-4 branch count, then lowest heroId",
+        "eligibleCount": 197,
+        "maxEligibleBranchCount": 3,
+        "releaseChronologyAsserted": false
+      },
+      "traits": {
+        "rarity": "N",
+        "originCategory": "MOBILE_ORIGINAL",
+        "spStatus": "RELEASED",
+        "branchCount": 3,
+        "jobConnectionCount": 7,
+        "sharedJobNameCount": 6,
+        "sharedJobFrequencyScore": 71,
+        "sharedJobNames": [
+          {
+            "nameCn": "主教",
+            "heroFrequency": 17
+          },
+          {
+            "nameCn": "圣徒",
+            "heroFrequency": 16
+          },
+          {
+            "nameCn": "圣者",
+            "heroFrequency": 12
+          },
+          {
+            "nameCn": "修女",
+            "heroFrequency": 11
+          },
+          {
+            "nameCn": "司祭",
+            "heroFrequency": 8
+          },
+          {
+            "nameCn": "神使",
+            "heroFrequency": 7
+          }
+        ],
+        "soldierCount": 30,
+        "bondCount": 5,
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 404,
+        "centralDisciplineStatus": "RELEASED",
+        "factionCount": 3,
+        "skinCount": 6
+      },
+      "qa": {
+        "checkCount": 36,
+        "failedCheckCount": 0,
+        "checks": [
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "stage61-record-present",
+            "pass": true
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "locator",
+            "name": "source-locator-normal",
+            "pass": true,
+            "detail": "index=2, resolvedHeroId=4"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "locator",
+            "name": "source-locator-bonds",
+            "pass": true,
+            "detail": "index=2, resolvedHeroId=4"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "locator",
+            "name": "source-locator-exclusiveCentral",
+            "pass": true,
+            "detail": "index=2, resolvedHeroId=4"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "locator",
+            "name": "source-locator-sp",
+            "pass": true,
+            "detail": "index=2, resolvedHeroId=4"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "locator",
+            "name": "source-locator-header",
+            "pass": true,
+            "detail": "index=2, resolvedHeroId=4"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "locator",
+            "name": "soldiers-key",
+            "pass": true,
+            "detail": "soldiersKey=4"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "snapshot",
+            "name": "snapshot-exclusive-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "snapshot",
+            "name": "snapshot-equipment-id",
+            "pass": true,
+            "detail": "404 vs 404"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "snapshot",
+            "name": "snapshot-central-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "snapshot",
+            "name": "snapshot-soldier-count",
+            "pass": true,
+            "detail": "30 vs 30"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "snapshot",
+            "name": "snapshot-sp-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "identity-nameKr",
+            "pass": true,
+            "detail": "[\"아멜다\",\"아멜다\",\"아멜다\",\"아멜다\",\"아멜다\"]"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "identity-nameCn",
+            "pass": true,
+            "detail": "[\"艾梅达\",\"艾梅达\",\"艾梅达\",\"艾梅达\",\"艾梅达\"]"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "identity-nameEn",
+            "pass": true,
+            "detail": "[\"Aimeeda\",\"Aimeeda\",\"Aimeeda\",\"Aimeeda\",\"Aimeeda\"]"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "job-connections-present",
+            "pass": true,
+            "detail": "count=7"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "job-connection-ids-unique",
+            "pass": true,
+            "detail": "ids=7, unique=7"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "job-primary-resolves",
+            "pass": true,
+            "detail": "primary=40"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "job-branch-ids-resolve",
+            "pass": true,
+            "detail": "unresolved="
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "bonds-array",
+            "pass": true
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "bonds-source-resolved",
+            "pass": true,
+            "detail": "unresolved=0"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "exclusive-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "central-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "exclusive-released-equipment-id",
+            "pass": true,
+            "detail": "equipmentId=404"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "exclusive-owner-parity",
+            "pass": true,
+            "detail": "ownerHeroId=4"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "soldiers-array",
+            "pass": true
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "soldier-ids-unique",
+            "pass": true,
+            "detail": "count=30, unique=30"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "soldier-ids-resolve",
+            "pass": true,
+            "detail": "missing="
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "sp-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "header-rarity-valid",
+            "pass": true,
+            "detail": "baseLabel=N"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "header-origin-valid",
+            "pass": true,
+            "detail": "category=MOBILE_ORIGINAL"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "header-factions-array",
+            "pass": true
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "header-skins-array",
+            "pass": true
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "common",
+            "name": "header-artwork-path",
+            "pass": true,
+            "detail": "path=UI/HeroPainting/SSR_ABS/Prefab/Aimeeda.prefab"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "family",
+            "name": "family-multi-branch-max",
+            "pass": true,
+            "detail": "branchCount=3, expectedMax=3"
+          },
+          {
+            "family": "multi-branch-structural",
+            "heroId": 4,
+            "type": "family",
+            "name": "family-release-chronology-not-asserted",
+            "pass": true
+          }
+        ]
+      }
+    },
+    {
+      "family": "shared-job-rsr",
+      "heroId": 18,
+      "identity": {
+        "nameKr": "이멜다",
+        "nameCn": "伊梅尔达",
+        "nameEn": "Imelda"
+      },
+      "selection": {
+        "selector": "maximize shared job-name count, then aggregate cross-Hero frequency, then lowest heroId",
+        "eligibleCount": 45,
+        "selectedSharedJobNameCount": 6,
+        "selectedSharedJobFrequencyScore": 134
+      },
+      "traits": {
+        "rarity": "SR",
+        "originCategory": "ORIGINAL",
+        "spStatus": "NOT_RELEASED",
+        "branchCount": 3,
+        "jobConnectionCount": 6,
+        "sharedJobNameCount": 6,
+        "sharedJobFrequencyScore": 134,
+        "sharedJobNames": [
+          {
+            "nameCn": "剑士",
+            "heroFrequency": 45
+          },
+          {
+            "nameCn": "大魔法师",
+            "heroFrequency": 32
+          },
+          {
+            "nameCn": "魔术师",
+            "heroFrequency": 31
+          },
+          {
+            "nameCn": "主教",
+            "heroFrequency": 17
+          },
+          {
+            "nameCn": "神使",
+            "heroFrequency": 7
+          },
+          {
+            "nameCn": "女王",
+            "heroFrequency": 2
+          }
+        ],
+        "soldierCount": 23,
+        "bondCount": 5,
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 276,
+        "centralDisciplineStatus": "RELEASED",
+        "factionCount": 2,
+        "skinCount": 3
+      },
+      "qa": {
+        "checkCount": 36,
+        "failedCheckCount": 0,
+        "checks": [
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "stage61-record-present",
+            "pass": true
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "locator",
+            "name": "source-locator-normal",
+            "pass": true,
+            "detail": "index=16, resolvedHeroId=18"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "locator",
+            "name": "source-locator-bonds",
+            "pass": true,
+            "detail": "index=16, resolvedHeroId=18"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "locator",
+            "name": "source-locator-exclusiveCentral",
+            "pass": true,
+            "detail": "index=16, resolvedHeroId=18"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "locator",
+            "name": "source-locator-sp",
+            "pass": true,
+            "detail": "index=16, resolvedHeroId=18"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "locator",
+            "name": "source-locator-header",
+            "pass": true,
+            "detail": "index=16, resolvedHeroId=18"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "locator",
+            "name": "soldiers-key",
+            "pass": true,
+            "detail": "soldiersKey=18"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "snapshot",
+            "name": "snapshot-exclusive-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "snapshot",
+            "name": "snapshot-equipment-id",
+            "pass": true,
+            "detail": "276 vs 276"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "snapshot",
+            "name": "snapshot-central-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "snapshot",
+            "name": "snapshot-soldier-count",
+            "pass": true,
+            "detail": "23 vs 23"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "snapshot",
+            "name": "snapshot-sp-status",
+            "pass": true,
+            "detail": "NOT_RELEASED vs NOT_RELEASED"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "identity-nameKr",
+            "pass": true,
+            "detail": "[\"이멜다\",\"이멜다\",\"이멜다\",\"이멜다\",\"이멜다\"]"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "identity-nameCn",
+            "pass": true,
+            "detail": "[\"伊梅尔达\",\"伊梅尔达\",\"伊梅尔达\",\"伊梅尔达\",\"伊梅尔达\"]"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "identity-nameEn",
+            "pass": true,
+            "detail": "[\"Imelda\",\"Imelda\",\"Imelda\",\"Imelda\",\"Imelda\"]"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "job-connections-present",
+            "pass": true,
+            "detail": "count=6"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "job-connection-ids-unique",
+            "pass": true,
+            "detail": "ids=6, unique=6"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "job-primary-resolves",
+            "pass": true,
+            "detail": "primary=180"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "job-branch-ids-resolve",
+            "pass": true,
+            "detail": "unresolved="
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "bonds-array",
+            "pass": true
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "bonds-source-resolved",
+            "pass": true,
+            "detail": "unresolved=0"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "exclusive-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "central-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "exclusive-released-equipment-id",
+            "pass": true,
+            "detail": "equipmentId=276"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "exclusive-owner-parity",
+            "pass": true,
+            "detail": "ownerHeroId=18"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "soldiers-array",
+            "pass": true
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "soldier-ids-unique",
+            "pass": true,
+            "detail": "count=23, unique=23"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "soldier-ids-resolve",
+            "pass": true,
+            "detail": "missing="
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "sp-status-valid",
+            "pass": true,
+            "detail": "status=NOT_RELEASED"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "header-rarity-valid",
+            "pass": true,
+            "detail": "baseLabel=SR"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "header-origin-valid",
+            "pass": true,
+            "detail": "category=ORIGINAL"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "header-factions-array",
+            "pass": true
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "header-skins-array",
+            "pass": true
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "common",
+            "name": "header-artwork-path",
+            "pass": true,
+            "detail": "path=UI/HeroPainting/SR_ABS/Prefab/Imelda.prefab"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "family",
+            "name": "family-rsr-rarity",
+            "pass": true,
+            "detail": "rarity=SR"
+          },
+          {
+            "family": "shared-job-rsr",
+            "heroId": 18,
+            "type": "family",
+            "name": "family-rsr-shared-job",
+            "pass": true,
+            "detail": "sharedJobNameCount=6"
+          }
+        ]
+      }
+    },
+    {
+      "family": "sp",
+      "heroId": 3,
+      "identity": {
+        "nameKr": "그레니어",
+        "nameCn": "格尼尔",
+        "nameEn": "Grenier"
+      },
+      "selection": {
+        "selector": "lowest unused canonical heroId with Stage 5-4 SP RELEASED",
+        "eligibleCount": 24
+      },
+      "traits": {
+        "rarity": "N",
+        "originCategory": "MOBILE_ORIGINAL",
+        "spStatus": "RELEASED",
+        "branchCount": 3,
+        "jobConnectionCount": 7,
+        "sharedJobNameCount": 6,
+        "sharedJobFrequencyScore": 78,
+        "sharedJobNames": [
+          {
+            "nameCn": "骑士长",
+            "heroFrequency": 28
+          },
+          {
+            "nameCn": "将军",
+            "heroFrequency": 22
+          },
+          {
+            "nameCn": "士官",
+            "heroFrequency": 12
+          },
+          {
+            "nameCn": "大元帅",
+            "heroFrequency": 8
+          },
+          {
+            "nameCn": "弓骑士",
+            "heroFrequency": 5
+          },
+          {
+            "nameCn": "弓骑统帅",
+            "heroFrequency": 3
+          }
+        ],
+        "soldierCount": 21,
+        "bondCount": 5,
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 415,
+        "centralDisciplineStatus": "RELEASED",
+        "factionCount": 1,
+        "skinCount": 2
+      },
+      "qa": {
+        "checkCount": 35,
+        "failedCheckCount": 0,
+        "checks": [
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "stage61-record-present",
+            "pass": true
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "locator",
+            "name": "source-locator-normal",
+            "pass": true,
+            "detail": "index=1, resolvedHeroId=3"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "locator",
+            "name": "source-locator-bonds",
+            "pass": true,
+            "detail": "index=1, resolvedHeroId=3"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "locator",
+            "name": "source-locator-exclusiveCentral",
+            "pass": true,
+            "detail": "index=1, resolvedHeroId=3"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "locator",
+            "name": "source-locator-sp",
+            "pass": true,
+            "detail": "index=1, resolvedHeroId=3"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "locator",
+            "name": "source-locator-header",
+            "pass": true,
+            "detail": "index=1, resolvedHeroId=3"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "locator",
+            "name": "soldiers-key",
+            "pass": true,
+            "detail": "soldiersKey=3"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "snapshot",
+            "name": "snapshot-exclusive-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "snapshot",
+            "name": "snapshot-equipment-id",
+            "pass": true,
+            "detail": "415 vs 415"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "snapshot",
+            "name": "snapshot-central-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "snapshot",
+            "name": "snapshot-soldier-count",
+            "pass": true,
+            "detail": "21 vs 21"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "snapshot",
+            "name": "snapshot-sp-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "identity-nameKr",
+            "pass": true,
+            "detail": "[\"그레니어\",\"그레니어\",\"그레니어\",\"그레니어\",\"그레니어\"]"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "identity-nameCn",
+            "pass": true,
+            "detail": "[\"格尼尔\",\"格尼尔\",\"格尼尔\",\"格尼尔\",\"格尼尔\"]"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "identity-nameEn",
+            "pass": true,
+            "detail": "[\"Grenier\",\"Grenier\",\"Grenier\",\"Grenier\",\"Grenier\"]"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "job-connections-present",
+            "pass": true,
+            "detail": "count=7"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "job-connection-ids-unique",
+            "pass": true,
+            "detail": "ids=7, unique=7"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "job-primary-resolves",
+            "pass": true,
+            "detail": "primary=30"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "job-branch-ids-resolve",
+            "pass": true,
+            "detail": "unresolved="
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "bonds-array",
+            "pass": true
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "bonds-source-resolved",
+            "pass": true,
+            "detail": "unresolved=0"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "exclusive-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "central-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "exclusive-released-equipment-id",
+            "pass": true,
+            "detail": "equipmentId=415"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "exclusive-owner-parity",
+            "pass": true,
+            "detail": "ownerHeroId=3"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "soldiers-array",
+            "pass": true
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "soldier-ids-unique",
+            "pass": true,
+            "detail": "count=21, unique=21"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "soldier-ids-resolve",
+            "pass": true,
+            "detail": "missing="
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "sp-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "header-rarity-valid",
+            "pass": true,
+            "detail": "baseLabel=N"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "header-origin-valid",
+            "pass": true,
+            "detail": "category=MOBILE_ORIGINAL"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "header-factions-array",
+            "pass": true
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "header-skins-array",
+            "pass": true
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "common",
+            "name": "header-artwork-path",
+            "pass": true,
+            "detail": "path=UI/HeroPainting/SSR_ABS/Prefab/Grenier.prefab"
+          },
+          {
+            "family": "sp",
+            "heroId": 3,
+            "type": "family",
+            "name": "family-sp-released",
+            "pass": true,
+            "detail": "sp=RELEASED"
+          }
+        ]
+      }
+    },
+    {
+      "family": "llr",
+      "heroId": 99225,
+      "identity": {
+        "nameKr": "빙설 심연의 지배자",
+        "nameCn": "冰渊凌御者",
+        "nameEn": "SovereignOfIceAbyss"
+      },
+      "selection": {
+        "selector": "lowest canonical heroId with baseLabel LLR",
+        "eligibleCount": 6
+      },
+      "traits": {
+        "rarity": "LLR",
+        "originCategory": "MOBILE_ORIGINAL",
+        "spStatus": "NOT_RELEASED",
+        "branchCount": 2,
+        "jobConnectionCount": 5,
+        "sharedJobNameCount": 1,
+        "sharedJobFrequencyScore": 31,
+        "sharedJobNames": [
+          {
+            "nameCn": "魔术师",
+            "heroFrequency": 31
+          }
+        ],
+        "soldierCount": 20,
+        "bondCount": 5,
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 643,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "factionCount": 3,
+        "skinCount": 2
+      },
+      "qa": {
+        "checkCount": 35,
+        "failedCheckCount": 0,
+        "checks": [
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "stage61-record-present",
+            "pass": true
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "locator",
+            "name": "source-locator-normal",
+            "pass": true,
+            "detail": "index=204, resolvedHeroId=99225"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "locator",
+            "name": "source-locator-bonds",
+            "pass": true,
+            "detail": "index=204, resolvedHeroId=99225"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "locator",
+            "name": "source-locator-exclusiveCentral",
+            "pass": true,
+            "detail": "index=204, resolvedHeroId=99225"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "locator",
+            "name": "source-locator-sp",
+            "pass": true,
+            "detail": "index=204, resolvedHeroId=99225"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "locator",
+            "name": "source-locator-header",
+            "pass": true,
+            "detail": "index=204, resolvedHeroId=99225"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "locator",
+            "name": "soldiers-key",
+            "pass": true,
+            "detail": "soldiersKey=99225"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "snapshot",
+            "name": "snapshot-exclusive-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "snapshot",
+            "name": "snapshot-equipment-id",
+            "pass": true,
+            "detail": "643 vs 643"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "snapshot",
+            "name": "snapshot-central-status",
+            "pass": true,
+            "detail": "NOT_RELEASED vs NOT_RELEASED"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "snapshot",
+            "name": "snapshot-soldier-count",
+            "pass": true,
+            "detail": "20 vs 20"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "snapshot",
+            "name": "snapshot-sp-status",
+            "pass": true,
+            "detail": "NOT_RELEASED vs NOT_RELEASED"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "identity-nameKr",
+            "pass": true,
+            "detail": "[\"빙설 심연의 지배자\",\"빙설 심연의 지배자\",\"빙설 심연의 지배자\",\"빙설 심연의 지배자\",\"빙설 심연의 지배자\"]"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "identity-nameCn",
+            "pass": true,
+            "detail": "[\"冰渊凌御者\",\"冰渊凌御者\",\"冰渊凌御者\",\"冰渊凌御者\",\"冰渊凌御者\"]"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "identity-nameEn",
+            "pass": true,
+            "detail": "[\"SovereignOfIceAbyss\",\"SovereignOfIceAbyss\",\"SovereignOfIceAbyss\",\"SovereignOfIceAbyss\",\"SovereignOfIceAbyss\"]"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "job-connections-present",
+            "pass": true,
+            "detail": "count=5"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "job-connection-ids-unique",
+            "pass": true,
+            "detail": "ids=5, unique=5"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "job-primary-resolves",
+            "pass": true,
+            "detail": "primary=992250"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "job-branch-ids-resolve",
+            "pass": true,
+            "detail": "unresolved="
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "bonds-array",
+            "pass": true
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "bonds-source-resolved",
+            "pass": true,
+            "detail": "unresolved=0"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "exclusive-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "central-status-valid",
+            "pass": true,
+            "detail": "status=NOT_RELEASED"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "exclusive-released-equipment-id",
+            "pass": true,
+            "detail": "equipmentId=643"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "exclusive-owner-parity",
+            "pass": true,
+            "detail": "ownerHeroId=99225"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "soldiers-array",
+            "pass": true
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "soldier-ids-unique",
+            "pass": true,
+            "detail": "count=20, unique=20"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "soldier-ids-resolve",
+            "pass": true,
+            "detail": "missing="
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "sp-status-valid",
+            "pass": true,
+            "detail": "status=NOT_RELEASED"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "header-rarity-valid",
+            "pass": true,
+            "detail": "baseLabel=LLR"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "header-origin-valid",
+            "pass": true,
+            "detail": "category=MOBILE_ORIGINAL"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "header-factions-array",
+            "pass": true
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "header-skins-array",
+            "pass": true
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "common",
+            "name": "header-artwork-path",
+            "pass": true,
+            "detail": "path=UI/HeroPainting2/SSR_ABS/Prefab/SovereignOfIceAbyss.prefab"
+          },
+          {
+            "family": "llr",
+            "heroId": 99225,
+            "type": "family",
+            "name": "family-llr-rarity",
+            "pass": true,
+            "detail": "rarity=LLR"
+          }
+        ]
+      }
+    },
+    {
+      "family": "collab",
+      "heroId": 69,
+      "identity": {
+        "nameKr": "에스텔",
+        "nameCn": "艾丝蒂尔",
+        "nameEn": "Estelle"
+      },
+      "selection": {
+        "selector": "lowest canonical heroId with origin.category COLLAB",
+        "eligibleCount": 65
+      },
+      "traits": {
+        "rarity": "SSR",
+        "originCategory": "COLLAB",
+        "spStatus": "NOT_RELEASED",
+        "branchCount": 2,
+        "jobConnectionCount": 5,
+        "sharedJobNameCount": 3,
+        "sharedJobFrequencyScore": 35,
+        "sharedJobNames": [
+          {
+            "nameCn": "将军",
+            "heroFrequency": 22
+          },
+          {
+            "nameCn": "禁卫",
+            "heroFrequency": 11
+          },
+          {
+            "nameCn": "游击士",
+            "heroFrequency": 2
+          }
+        ],
+        "soldierCount": 17,
+        "bondCount": 5,
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "factionCount": 3,
+        "skinCount": 0
+      },
+      "qa": {
+        "checkCount": 33,
+        "failedCheckCount": 0,
+        "checks": [
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "stage61-record-present",
+            "pass": true
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "locator",
+            "name": "source-locator-normal",
+            "pass": true,
+            "detail": "index=64, resolvedHeroId=69"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "locator",
+            "name": "source-locator-bonds",
+            "pass": true,
+            "detail": "index=64, resolvedHeroId=69"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "locator",
+            "name": "source-locator-exclusiveCentral",
+            "pass": true,
+            "detail": "index=64, resolvedHeroId=69"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "locator",
+            "name": "source-locator-sp",
+            "pass": true,
+            "detail": "index=64, resolvedHeroId=69"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "locator",
+            "name": "source-locator-header",
+            "pass": true,
+            "detail": "index=64, resolvedHeroId=69"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "locator",
+            "name": "soldiers-key",
+            "pass": true,
+            "detail": "soldiersKey=69"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "snapshot",
+            "name": "snapshot-exclusive-status",
+            "pass": true,
+            "detail": "NOT_RELEASED vs NOT_RELEASED"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "snapshot",
+            "name": "snapshot-equipment-id",
+            "pass": true,
+            "detail": "0 vs 0"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "snapshot",
+            "name": "snapshot-central-status",
+            "pass": true,
+            "detail": "NOT_RELEASED vs NOT_RELEASED"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "snapshot",
+            "name": "snapshot-soldier-count",
+            "pass": true,
+            "detail": "17 vs 17"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "snapshot",
+            "name": "snapshot-sp-status",
+            "pass": true,
+            "detail": "NOT_RELEASED vs NOT_RELEASED"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "identity-nameKr",
+            "pass": true,
+            "detail": "[\"에스텔\",\"에스텔\",\"에스텔\",\"에스텔\",\"에스텔\"]"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "identity-nameCn",
+            "pass": true,
+            "detail": "[\"艾丝蒂尔\",\"艾丝蒂尔\",\"艾丝蒂尔\",\"艾丝蒂尔\",\"艾丝蒂尔\"]"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "identity-nameEn",
+            "pass": true,
+            "detail": "[\"Estelle\",\"Estelle\",\"Estelle\",\"Estelle\",\"Estelle\"]"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "job-connections-present",
+            "pass": true,
+            "detail": "count=5"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "job-connection-ids-unique",
+            "pass": true,
+            "detail": "ids=5, unique=5"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "job-primary-resolves",
+            "pass": true,
+            "detail": "primary=690"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "job-branch-ids-resolve",
+            "pass": true,
+            "detail": "unresolved="
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "bonds-array",
+            "pass": true
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "bonds-source-resolved",
+            "pass": true,
+            "detail": "unresolved=0"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "exclusive-status-valid",
+            "pass": true,
+            "detail": "status=NOT_RELEASED"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "central-status-valid",
+            "pass": true,
+            "detail": "status=NOT_RELEASED"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "soldiers-array",
+            "pass": true
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "soldier-ids-unique",
+            "pass": true,
+            "detail": "count=17, unique=17"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "soldier-ids-resolve",
+            "pass": true,
+            "detail": "missing="
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "sp-status-valid",
+            "pass": true,
+            "detail": "status=NOT_RELEASED"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "header-rarity-valid",
+            "pass": true,
+            "detail": "baseLabel=SSR"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "header-origin-valid",
+            "pass": true,
+            "detail": "category=COLLAB"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "header-factions-array",
+            "pass": true
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "header-skins-array",
+            "pass": true
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "common",
+            "name": "header-artwork-path",
+            "pass": true,
+            "detail": "path=UI/HeroPainting/SSR_ABS/Prefab/Estelle.prefab"
+          },
+          {
+            "family": "collab",
+            "heroId": 69,
+            "type": "family",
+            "name": "family-collab-origin",
+            "pass": true,
+            "detail": "origin=COLLAB"
+          }
+        ]
+      }
+    },
+    {
+      "family": "matthew-structural-exception",
+      "heroId": 1,
+      "identity": {
+        "nameKr": "매튜",
+        "nameCn": "马修",
+        "nameEn": "Matthew"
+      },
+      "selection": {
+        "selector": "canonical heroId 1",
+        "releaseChronologyAsserted": false
+      },
+      "traits": {
+        "rarity": "N",
+        "originCategory": "MOBILE_ORIGINAL",
+        "spStatus": "RELEASED",
+        "branchCount": 5,
+        "jobConnectionCount": 12,
+        "sharedJobNameCount": 11,
+        "sharedJobFrequencyScore": 172,
+        "sharedJobNames": [
+          {
+            "nameCn": "剑士",
+            "heroFrequency": 45
+          },
+          {
+            "nameCn": "战士",
+            "heroFrequency": 29
+          },
+          {
+            "nameCn": "狙击手",
+            "heroFrequency": 19
+          },
+          {
+            "nameCn": "龙骑士",
+            "heroFrequency": 15
+          },
+          {
+            "nameCn": "强袭骑士",
+            "heroFrequency": 11
+          },
+          {
+            "nameCn": "游侠",
+            "heroFrequency": 11
+          },
+          {
+            "nameCn": "龙骑统帅",
+            "heroFrequency": 11
+          },
+          {
+            "nameCn": "忍者",
+            "heroFrequency": 10
+          },
+          {
+            "nameCn": "英雄",
+            "heroFrequency": 8
+          },
+          {
+            "nameCn": "突击骑士",
+            "heroFrequency": 7
+          },
+          {
+            "nameCn": "影",
+            "heroFrequency": 6
+          }
+        ],
+        "soldierCount": 42,
+        "bondCount": 5,
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 277,
+        "centralDisciplineStatus": "RELEASED",
+        "factionCount": 2,
+        "skinCount": 4
+      },
+      "qa": {
+        "checkCount": 36,
+        "failedCheckCount": 0,
+        "checks": [
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "stage61-record-present",
+            "pass": true
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "locator",
+            "name": "source-locator-normal",
+            "pass": true,
+            "detail": "index=0, resolvedHeroId=1"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "locator",
+            "name": "source-locator-bonds",
+            "pass": true,
+            "detail": "index=0, resolvedHeroId=1"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "locator",
+            "name": "source-locator-exclusiveCentral",
+            "pass": true,
+            "detail": "index=0, resolvedHeroId=1"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "locator",
+            "name": "source-locator-sp",
+            "pass": true,
+            "detail": "index=0, resolvedHeroId=1"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "locator",
+            "name": "source-locator-header",
+            "pass": true,
+            "detail": "index=0, resolvedHeroId=1"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "locator",
+            "name": "soldiers-key",
+            "pass": true,
+            "detail": "soldiersKey=1"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "snapshot",
+            "name": "snapshot-exclusive-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "snapshot",
+            "name": "snapshot-equipment-id",
+            "pass": true,
+            "detail": "277 vs 277"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "snapshot",
+            "name": "snapshot-central-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "snapshot",
+            "name": "snapshot-soldier-count",
+            "pass": true,
+            "detail": "42 vs 42"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "snapshot",
+            "name": "snapshot-sp-status",
+            "pass": true,
+            "detail": "RELEASED vs RELEASED"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "identity-nameKr",
+            "pass": true,
+            "detail": "[\"매튜\",\"매튜\",\"매튜\",\"매튜\",\"매튜\"]"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "identity-nameCn",
+            "pass": true,
+            "detail": "[\"马修\",\"马修\",\"马修\",\"马修\",\"马修\"]"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "identity-nameEn",
+            "pass": true,
+            "detail": "[\"Matthew\",\"Matthew\",\"Matthew\",\"Matthew\",\"Matthew\"]"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "job-connections-present",
+            "pass": true,
+            "detail": "count=12"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "job-connection-ids-unique",
+            "pass": true,
+            "detail": "ids=12, unique=12"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "job-primary-resolves",
+            "pass": true,
+            "detail": "primary=10"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "job-branch-ids-resolve",
+            "pass": true,
+            "detail": "unresolved="
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "bonds-array",
+            "pass": true
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "bonds-source-resolved",
+            "pass": true,
+            "detail": "unresolved=0"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "exclusive-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "central-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "exclusive-released-equipment-id",
+            "pass": true,
+            "detail": "equipmentId=277"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "exclusive-owner-parity",
+            "pass": true,
+            "detail": "ownerHeroId=1"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "soldiers-array",
+            "pass": true
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "soldier-ids-unique",
+            "pass": true,
+            "detail": "count=42, unique=42"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "soldier-ids-resolve",
+            "pass": true,
+            "detail": "missing="
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "sp-status-valid",
+            "pass": true,
+            "detail": "status=RELEASED"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "header-rarity-valid",
+            "pass": true,
+            "detail": "baseLabel=N"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "header-origin-valid",
+            "pass": true,
+            "detail": "category=MOBILE_ORIGINAL"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "header-factions-array",
+            "pass": true
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "header-skins-array",
+            "pass": true
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "common",
+            "name": "header-artwork-path",
+            "pass": true,
+            "detail": "path=UI/HeroPainting/SSR_ABS/Prefab/Matthew.prefab"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "family",
+            "name": "family-matthew-id",
+            "pass": true,
+            "detail": "heroId=1"
+          },
+          {
+            "family": "matthew-structural-exception",
+            "heroId": 1,
+            "type": "family",
+            "name": "family-matthew-branch-count",
+            "pass": true,
+            "detail": "branchCount=5"
+          }
+        ]
+      }
+    }
+  ]
+}

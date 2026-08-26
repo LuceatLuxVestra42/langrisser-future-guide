@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "stage": "hero-page-6-2",
+  "checkpoint": "representative-fixture-qa",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/hero-stage6-2-representative-fixture-qa.v1.json",
+  "sources": {
+    "data/contracts/hero-stage6-2-representative-fixture-qa.v1.json": {
+      "gitBlobSha": "d155814cc5d5fa3b36bb8da280031ad9422be1f2"
+    },
+    "data/generated/hero-detail-stage6-1.v1.json": {
+      "gitBlobSha": "a412a0c1449590b9e81f4bb5c523c0414498a1be"
+    },
+    "data/validation/hero-stage6-1-final.v1.json": {
+      "gitBlobSha": "675b39b591fcab7517309cff7d735287d8a9c107"
+    },
+    "data/generated/hero-basic-combat.v1.json": {
+      "gitBlobSha": "1661efec786de37b00adcef02839b607a947765f"
+    },
+    "data/generated/hero-page-stage5-1-bonds-final.v1.json": {
+      "gitBlobSha": "5be989e9d0723782f491dc3005a11c0ad3143c43"
+    },
+    "data/generated/hero-page-stage5-2-exclusive-central.v1.json": {
+      "gitBlobSha": "6c34231f114177d5612947533f57322ba9bf8578"
+    },
+    "data/generated/hero-page-soldiers-stage5-3.v1.json": {
+      "gitBlobSha": "b97beae7aa58c573f16919cf731250bfc359d58e"
+    },
+    "data/generated/hero-page-stage5-4-sp.v1.json": {
+      "gitBlobSha": "d281dbf094939ae34a5c3e8fbd4f4225bd065fd9"
+    },
+    "data/hero-page-stage5-5-3.v1.json": {
+      "gitBlobSha": "dd56c47602b2aee42001b8a32f1830769d5c44c1"
+    }
+  },
+  "summary": {
+    "requiredFixtureFamilyCount": 7,
+    "selectedFixtureFamilyCount": 7,
+    "distinctFixtureHeroCount": 7,
+    "totalCheckCount": 248,
+    "failedCheckCount": 0,
+    "sourceLocatorMismatchCount": 0,
+    "snapshotMismatchCount": 0,
+    "familyRuleFailureCount": 0,
+    "hardErrorCount": 0,
+    "stageBState": "PENDING_B_STAGE_NON_BLOCKING",
+    "releaseChronologyAsserted": false
+  },
+  "selectedFixtures": [
+    {
+      "family": "regular-ssr",
+      "heroId": 28,
+      "nameKr": "젤다",
+      "nameEn": "Zalrahda",
+      "rarity": "SSR",
+      "originCategory": "MOBILE_ORIGINAL",
+      "spStatus": "NOT_RELEASED",
+      "branchCount": 2,
+      "sharedJobNameCount": 4,
+      "soldierCount": 23,
+      "failedCheckCount": 0
+    },
+    {
+      "family": "multi-branch-structural",
+      "heroId": 4,
+      "nameKr": "아멜다",
+      "nameEn": "Aimeeda",
+      "rarity": "N",
+      "originCategory": "MOBILE_ORIGINAL",
+      "spStatus": "RELEASED",
+      "branchCount": 3,
+      "sharedJobNameCount": 6,
+      "soldierCount": 30,
+      "failedCheckCount": 0
+    },
+    {
+      "family": "shared-job-rsr",
+      "heroId": 18,
+      "nameKr": "이멜다",
+      "nameEn": "Imelda",
+      "rarity": "SR",
+      "originCategory": "ORIGINAL",
+      "spStatus": "NOT_RELEASED",
+      "branchCount": 3,
+      "sharedJobNameCount": 6,
+      "soldierCount": 23,
+      "failedCheckCount": 0
+    },
+    {
+      "family": "sp",
+      "heroId": 3,
+      "nameKr": "그레니어",
+      "nameEn": "Grenier",
+      "rarity": "N",
+      "originCategory": "MOBILE_ORIGINAL",
+      "spStatus": "RELEASED",
+      "branchCount": 3,
+      "sharedJobNameCount": 6,
+      "soldierCount": 21,
+      "failedCheckCount": 0
+    },
+    {
+      "family": "llr",
+      "heroId": 99225,
+      "nameKr": "빙설 심연의 지배자",
+      "nameEn": "SovereignOfIceAbyss",
+      "rarity": "LLR",
+      "originCategory": "MOBILE_ORIGINAL",
+      "spStatus": "NOT_RELEASED",
+      "branchCount": 2,
+      "sharedJobNameCount": 1,
+      "soldierCount": 20,
+      "failedCheckCount": 0
+    },
+    {
+      "family": "collab",
+      "heroId": 69,
+      "nameKr": "에스텔",
+      "nameEn": "Estelle",
+      "rarity": "SSR",
+      "originCategory": "COLLAB",
+      "spStatus": "NOT_RELEASED",
+      "branchCount": 2,
+      "sharedJobNameCount": 3,
+      "soldierCount": 17,
+      "failedCheckCount": 0
+    },
+    {
+      "family": "matthew-structural-exception",
+      "heroId": 1,
+      "nameKr": "매튜",
+      "nameEn": "Matthew",
+      "rarity": "N",
+      "originCategory": "MOBILE_ORIGINAL",
+      "spStatus": "RELEASED",
+      "branchCount": 5,
+      "sharedJobNameCount": 11,
+      "soldierCount": 42,
+      "failedCheckCount": 0
+    }
+  ],
+  "failedChecks": [],
+  "hardErrors": [],
+  "nonBlockingNotes": [
+    "The project QA target describes a multi-branch old-character case, but Stage 6-2 has no release chronology source. This checkpoint validates the multi-branch structure and explicitly does not assert release age.",
+    "Hero-exclusive Equipment shared-relation adoption remains owned by Stage B; current Stage 6-1 dependency state is PENDING_B_STAGE_NON_BLOCKING.",
+    "Existing presentation-only localization gaps inherited from Stage 5 remain outside the structural fixture gate."
+  ],
+  "decision": "Hero Stage 6-2 is COMPLETE. Seven distinct representative Hero fixtures cover regular SSR, multi-branch structure, shared-job R/SR, SP, LLR, collaboration, and Matthew structural-exception cases with zero locator, snapshot, family-rule, or hard errors."
+}
