@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-7",
+  "status": "PASS_REPRESENTATIVE_FIXTURE_VALIDATION_WITH_EXPECTED_REVIEWS",
+  "input": "data/investigation/banner-stage1-7-representative-fixtures.v1.json",
+  "checks": {
+    "representativeFixtureCount": 8,
+    "hardFailureCount": 0,
+    "newCrossStageContradictionCount": 0,
+    "newPickupStaticFixturePassed": true,
+    "newPickupExactHeroIdJoinPassed": true,
+    "singleRerunPrefabFixturePassed": true,
+    "sourceTypeVsOccurrenceLifecycleBoundaryPassed": true,
+    "repeatedDualSourceFixturePassed": true,
+    "repeatedTripleSourceFixturePassed": true,
+    "sameSourceAssetReuseObserved": true,
+    "assetEqualityPromotedToSourceIdentity": false,
+    "sourceLinkedWishFixturePassed": true,
+    "wishOptionalCandidateFieldObserved": true,
+    "wishForcedToDual": false,
+    "assetFilenameMismatchWithBannerCodeHandledWithoutInference": true,
+    "manualWishWithConcreteReplacementFixturePassed": true,
+    "manualSourceNullAccepted": true,
+    "manualHeroEdgesSynthesized": false,
+    "manualAssetReuseUsedAsCanonicalRecurrenceJoin": false,
+    "cpRelatedFixturePassed": true,
+    "cpRelatedTreatedAsNonExclusiveContext": true,
+    "cpEventTextReferencePreserved": true,
+    "canonicalCpEventIdJoinCreated": false,
+    "eventNameJoinIntroduced": false,
+    "stage1_4CorrectionConsumedFor7001": true,
+    "7001EffectiveSourceIsCardpool265": true,
+    "7001ExactHeroId99225Validated": true,
+    "7001RecurrenceGroupingAfterCorrectionPassed": true,
+    "7001SameAssetReferenceAcrossOccurrencesPassed": true,
+    "sourceScheduleMutated": false,
+    "manualNullAssetFixturePreservedAsReview": true,
+    "replacementCandidateInventedForNullAsset": false,
+    "dayPrecisionDateBoundaryPreserved": true,
+    "endDateOrDurationInvented": false,
+    "fixedRecurrenceCadenceCreated": false,
+    "canonicalAssetIdCreated": false,
+    "productionSchemaCreated": false,
+    "guessBasedJoinIntroduced": false
+  },
+  "fixtureResults": [
+    {"fixtureId": "F1_NEW_PICKUP_STATIC_EXACT_HERO_ID", "status": "PASS"},
+    {"fixtureId": "F2_SINGLE_RERUN_PREFAB_SOURCE_REUSE", "status": "PASS"},
+    {"fixtureId": "F3_REPEATED_DUAL_AND_TRIPLE_SOURCE_ASSET_REUSE", "status": "PASS"},
+    {"fixtureId": "F4_SOURCE_LINKED_WISH_WITH_EXPLICIT_CANDIDATES", "status": "PASS"},
+    {"fixtureId": "F5_MANUAL_WISH_WITH_CONCRETE_REPLACEMENT", "status": "PASS_WITH_REVIEW_BOUNDARY"},
+    {"fixtureId": "F6_CP_RELATED_AS_NON_EXCLUSIVE_CONTEXT", "status": "PASS_WITH_EVENT_JOIN_REVIEW"},
+    {"fixtureId": "F7_7001_CORRECTION_END_TO_END", "status": "PASS_AFTER_VERIFIED_CORRECTION"},
+    {"fixtureId": "F8_MANUAL_WISH_NULL_ASSET_REFERENCE", "status": "EXPECTED_REVIEW_NOT_FAILURE"}
+  ],
+  "expectedReviewBoundaries": [
+    {
+      "item": "Manual wish canonical source/Hero/recurrence identity when sourceRecordKey is null",
+      "status": "REVIEW",
+      "blockingStage1_8Freeze": false
+    },
+    {
+      "item": "Canonical Event ID relation for CP/banner+event consumers",
+      "status": "REVIEW",
+      "blockingStage1_8Freeze": false
+    },
+    {
+      "item": "Replacement asset for kr-manual-wish-20260902",
+      "status": "MISSING_REFERENCE_REVIEW",
+      "blockingStage1_8Freeze": false
+    },
+    {
+      "item": "Exact banner opening/closing timestamp and duration",
+      "status": "UNKNOWN_NOT_IN_CURRENT_SOURCE",
+      "blockingStage1_8Freeze": false
+    },
+    {
+      "item": "Canonical asset ownership/hash/visual duplicate groups",
+      "status": "DEFERRED_TO_STAGE3",
+      "blockingStage1_8Freeze": false
+    }
+  ],
+  "decision": "Stage 1-7 passes. Eight representative fixtures collectively exercise the frozen occurrence grain, multi-axis taxonomy, exact-ID Hero joins, source-linked and manual wish behavior, source reuse/recurrence, CP context semantics, correction-layer handling, and occurrence-level asset references. No new contradiction was found. Known unresolved items remain explicit REVIEW boundaries rather than being guessed or silently normalized.",
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-8",
+    "task": "Freeze and summarize Stage 1 findings",
+    "priorities": [
+      "Freeze the Stage 1 information units and invariants without converting them into the final production schema.",
+      "List all carried REVIEW/UNKNOWN items with the stage that should resolve them.",
+      "Record the verified 7001 correction checkpoint as mandatory input for later consumers.",
+      "Define Stage 2 entry conditions from the frozen occurrence/source/relation/date/asset boundaries."
+    ]
+  }
+}
