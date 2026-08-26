@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 3-4",
+  "purpose": "Materialize the Wish summon consumer from frozen Stage 2 WISH_CANDIDATE_HERO relations and Stage 3-3 Wish occurrence rows. Store candidate lists once per bannerDefinitionId and let occurrences reference those sets without duplicating large candidate arrays.",
+  "inputs": {
+    "stage33Summary": "data/validation/banner-stage3-3-basic-table-summary.v1.json",
+    "stage33Consumer": "data/generated/banner-stage3-3-basic-table-consumer.v1.json",
+    "definitionTaxonomy": "data/generated/banner-definition-taxonomy.v1.json",
+    "heroRelations": "data/generated/banner-definition-hero-relations.v1.json"
+  },
+  "expectedCanonicalPopulation": {
+    "definitions": 77,
+    "occurrences": 94,
+    "wishDefinitions": 14,
+    "wishOccurrences": 23,
+    "sourceLinkedWishDefinitions": 6,
+    "manualSourceNullWishDefinitions": 8,
+    "wishCandidateHeroEdges": 464
+  },
+  "consumerPolicy": {
+    "definitionCandidateSetIdentity": "bannerDefinitionId",
+    "occurrenceIdentity": "bannerOccurrenceId",
+    "candidateRelationType": "WISH_CANDIDATE_HERO",
+    "candidateSourceField": "OptionalUpHeroList[].HeroId",
+    "candidateSortOrder": [
+      "sourceIndex ASC",
+      "heroId ASC"
+    ],
+    "candidateListsStoredOncePerDefinition": true,
+    "occurrenceCandidateArraysDuplicated": false,
+    "occurrenceCandidateJoinKey": "bannerDefinitionId",
+    "manualSourceNullCandidatesSynthesized": false,
+    "manualSourceNullState": "NO_EXPLICIT_ID_SOURCE_REVIEW",
+    "pickupHeroRelationsIncluded": false,
+    "heroRoutesInvented": false,
+    "candidateGroupsInvented": false,
+    "selectableTextParsedIntoCandidates": false,
+    "cpEventRelationsIncluded": false,
+    "recurrenceHistoryIncluded": false
+  },
+  "completionPolicy": {
+    "allWishDefinitionsAccounted": true,
+    "allWishOccurrencesAccounted": true,
+    "allFrozenWishCandidateEdgesAccounted": true,
+    "duplicateDefinitionCandidateSetsAllowed": false,
+    "duplicateWishOccurrenceRowsAllowed": false,
+    "nonWishDefinitionsAllowed": false,
+    "nonWishCandidateRelationsAllowed": false,
+    "sourceLinkedWishDefinitionsMayHaveZeroCandidates": false,
+    "manualSourceNullWishDefinitionsMayReceiveSyntheticCandidates": false,
+    "stage2CanonicalIdsMutable": false,
+    "stage2HeroRelationsMutable": false,
+    "stage33OccurrenceRowsMutable": false
+  },
+  "outputs": {
+    "consumer": "data/generated/banner-stage3-4-wish-consumer.v1.json",
+    "summary": "data/validation/banner-stage3-4-wish-summary.v1.json"
+  },
+  "nextStage": "Banner Stage 3-5 CP/Event consumer"
+}
