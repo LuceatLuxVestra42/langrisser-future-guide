@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "stage": "4-4",
+  "status": "PASS",
+  "finalStageStatus": "STAGE4_4_EXCLUSIVE_UI_AND_OWNERSHIP_READY",
+  "upstream": {
+    "stage40": "FROZEN",
+    "stage43": "STAGE4_3_GENERAL_DETAIL_UI_READY",
+    "stageB": "PASS_ACCEPTED",
+    "stage35": "COMPLETE_WITH_REVIEW"
+  },
+  "routes": {
+    "list": "/equipment/exclusive",
+    "detail": "/equipment/$equipmentId",
+    "routeKey": "equipmentId"
+  },
+  "population": {
+    "exclusiveList": 167,
+    "exclusiveDetail": 167,
+    "uniqueEquipmentIds": 167,
+    "generalEquipmentLeak": 0
+  },
+  "ownership": {
+    "source": "data/generated/hero-exclusive-equipment-by-equipment.v1.json#byEquipmentId",
+    "metadataJoin": "data/hero-name-master.v1.json#records by exact heroId",
+    "byEquipmentKeys": 167,
+    "cardinalityMismatch": 0,
+    "ownerHeroMissing": 0,
+    "ownershipRederivation": false
+  },
+  "filters": {
+    "source": "data/generated/equipment_stage3_5_exclusive_consumer.json#filters",
+    "generatedTaxonomyPreserved": true,
+    "missingSubtypesAllowedWhenNoExclusiveRecordsExist": true,
+    "groups": [
+      {
+        "group": "weapon",
+        "groupKo": "무기",
+        "subtypes": [
+          "sword",
+          "dagger",
+          "spear",
+          "axe",
+          "hammer",
+          "bow",
+          "staff"
+        ]
+      },
+      {
+        "group": "armor",
+        "groupKo": "갑옷",
+        "subtypes": [
+          "heavy",
+          "light",
+          "cloth"
+        ]
+      },
+      {
+        "group": "headgear",
+        "groupKo": "투구",
+        "subtypes": [
+          "heavy",
+          "light",
+          "cloth"
+        ]
+      },
+      {
+        "group": "accessory",
+        "groupKo": "악세사리",
+        "subtypes": [
+          "attack",
+          "intellect"
+        ]
+      }
+    ]
+  },
+  "detail": {
+    "maxLevel": 50,
+    "twoProperties": 167,
+    "effectSegmentParityChecked": true,
+    "restrictionModeCounts": {
+      "army-plus-job-exceptions": 161,
+      "unrestricted-by-fields": 4,
+      "army-only": 1,
+      "job-only": 1
+    },
+    "restrictionSemantics": "structural-inference",
+    "restrictionConfidence": 0.99
+  },
+  "naming": {
+    "fallback": "nameKr ?? nameCn",
+    "verified": 39,
+    "review": 128,
+    "reviewPromoted": false
+  },
+  "release": {
+    "knownDates": 0,
+    "chronologyStatus": "REVIEW",
+    "presentationOrderOnly": true,
+    "chronologyInvented": false
+  },
+  "assets": {
+    "equipmentIconBound": false,
+    "reason": "No web-served Equipment icon asset set exists yet; Stage 4-4 preserves icon metadata without fabricating a public asset mapping."
+  },
+  "sourceDiscipline": {
+    "stage35DisplayDetailOnly": true,
+    "stageBOwnershipOnly": true,
+    "directConfigDataReads": false,
+    "directSkillHeroOwnershipReads": false,
+    "missionType77OwnershipReads": false
+  },
+  "build": {
+    "command": "bun run build",
+    "pass": true
+  },
+  "nextStage": "4-5 display/state policy hardening"
+}
