@@ -7,13 +7,12 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  // GitHub Pages is static hosting, so Nitro's server adapter is intentionally disabled
+  // for this isolated feasibility branch. This also avoids the known Nitro v3 +
+  // TanStack prerender preview-server output-path conflict.
+  nitro: false,
   tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
     server: { entry: "server" },
-    // GitHub Pages feasibility test: prerender only the already-static banner route.
-    // Keep automatic discovery/crawling off so remaining server-function routes do not
-    // participate in this isolated fixture test.
     prerender: {
       enabled: true,
       autoStaticPathsDiscovery: false,
