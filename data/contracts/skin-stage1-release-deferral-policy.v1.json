@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "stage": "skin-page-1",
+  "substage": "1-5",
+  "checkpoint": "release-selection-deferral-policy",
+  "status": "ACCEPTED",
+  "decision": "DEFERRED_PENDING_STAGE4_AUTHORITY",
+  "purpose": "Prevent Skin Stage 1 from guessing CN/KR release state or future-page eligibility before an authoritative release-metadata source and matching rule are established in Skin Stage 4.",
+  "population": {
+    "source": "data/generated/skin-stage1-canonical.v1.json",
+    "canonicalSkinCount": 540,
+    "populationMutationAllowed": false
+  },
+  "releaseSelection": {
+    "allowedInStage1": false,
+    "futureSkinSelectionAllowed": false,
+    "releaseMetadataAuthorityEstablished": false,
+    "requiredAuthorityOwner": "Skin Stage 4",
+    "requiredBeforeAssignment": [
+      "An authoritative or separately verified CN release source is established.",
+      "An authoritative or separately verified KR release source is established.",
+      "A deterministic skinId-to-release-record matching rule is validated on representative samples and then across the canonical population.",
+      "Missing or conflicting release evidence has an explicit unresolved state rather than guess-based completion."
+    ]
+  },
+  "deferredReleaseVocabulary": {
+    "status": "RESERVED_FOR_STAGE4_NOT_ASSIGNED_IN_STAGE1",
+    "candidateStates": [
+      "CN_RELEASED",
+      "KR_RELEASED",
+      "KR_FUTURE",
+      "UNKNOWN"
+    ],
+    "rule": "These labels describe the planned Stage 4 decision space only. Stage 1-5 must not materialize any of them onto canonical skin records."
+  },
+  "displayTarget": {
+    "status": "DEFERRED",
+    "assignmentAllowedInStage1": false,
+    "rule": "Do not assign Hero-page/future-page/both/hidden consumer targeting until release metadata is validated. Consumer routing is downstream of Stage 4 release classification."
+  },
+  "prohibitedStage1Fields": [
+    "releaseStatus",
+    "cnReleaseStatus",
+    "krReleaseStatus",
+    "cnReleaseDate",
+    "krReleaseDate",
+    "krFuture",
+    "isFutureSkin",
+    "futureEligible",
+    "displayTarget"
+  ],
+  "nonAuthorities": [
+    "skinId numeric order or pattern",
+    "sourceOrder",
+    "GetPathType or GetPathDesc",
+    "Score",
+    "asset path or filename",
+    "presence of model bindings",
+    "Hero release chronology without a validated skin-release relation"
+  ],
+  "downstreamBoundary": {
+    "stage3": "May inventory/extract/map assets but must not classify release state from asset presence or filenames.",
+    "stage4": "Owns CN/KR release evidence, matching rules, Korean skin names and future-status classification.",
+    "stage5": "Future Skin page consumer may select records only from Stage 4 validated release classification.",
+    "stage6": "Hero consumer may reuse the canonical population independently of future-page eligibility."
+  },
+  "completionRule": "Stage 1-5 passes only when the 540-record canonical population remains unchanged, Stages 1-1 through 1-4 remain PASS, no prohibited release/display field is present in Stage 1 generated record datasets, and no future-skin subset is materialized."
+}

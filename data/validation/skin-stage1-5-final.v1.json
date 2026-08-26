@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "stage": "skin-page-1",
+  "substage": "1-5",
+  "checkpoint": "release-selection-deferral",
+  "status": "PASS",
+  "completion": "SKIN_STAGE1_5_COMPLETE",
+  "sources": {
+    "policy": "data/contracts/skin-stage1-release-deferral-policy.v1.json",
+    "canonical": "data/generated/skin-stage1-canonical.v1.json",
+    "previousGates": {
+      "1-1": "data/validation/skin-stage1-1-final.v1.json",
+      "1-2": "data/validation/skin-stage1-2-parity.v1.json",
+      "1-3": "data/validation/skin-stage1-3-final.v1.json",
+      "1-4": "data/validation/skin-stage1-4-final.v1.json"
+    }
+  },
+  "metrics": {
+    "canonicalSkinCount": 540,
+    "distinctCanonicalSkinIdCount": 540,
+    "stage1GeneratedJsonFileCount": 3,
+    "prohibitedReleaseFieldOccurrenceCount": 0,
+    "futureSubsetFileCount": 0,
+    "releaseClassifiedSkinCount": 0,
+    "displayTargetAssignedSkinCount": 0
+  },
+  "previousGateStatus": {
+    "1-1": {
+      "status": "PASS",
+      "completion": "SKIN_STAGE1_1_COMPLETE",
+      "pass": true
+    },
+    "1-2": {
+      "status": "PASS",
+      "completion": "SKIN_STAGE1_2_COMPLETE",
+      "pass": true
+    },
+    "1-3": {
+      "status": "PASS",
+      "completion": "SKIN_STAGE1_3_COMPLETE",
+      "pass": true
+    },
+    "1-4": {
+      "status": "PASS",
+      "completion": "SKIN_STAGE1_4_COMPLETE",
+      "pass": true
+    }
+  },
+  "checks": {
+    "policyAccepted": true,
+    "policyDecisionDeferred": true,
+    "futureSelectionDisabled": true,
+    "releaseAuthorityNotEstablished": true,
+    "displayTargetAssignmentDisabled": true,
+    "stage11Pass": true,
+    "stage12Pass": true,
+    "stage13Pass": true,
+    "stage14Pass": true,
+    "canonicalRecordCount540": true,
+    "canonicalSkinIdsDistinct540": true,
+    "prohibitedReleaseFieldsZero": true,
+    "futureSubsetFilesZero": true,
+    "stage4CandidateVocabularyReservedOnly": true
+  },
+  "failures": {
+    "prohibitedFieldOccurrences": [],
+    "futureSubsetFiles": []
+  },
+  "rulesFrozen": [
+    "Skin Stage 1 does not classify any canonical skin as CN_RELEASED, KR_RELEASED, KR_FUTURE or UNKNOWN.",
+    "The candidate release-state vocabulary is reserved for Skin Stage 4 and is not materialized into Stage 1 records.",
+    "No displayTarget or future-page eligibility is assigned before validated CN/KR release metadata exists.",
+    "Asset presence, sourceOrder, acquisition metadata, IDs and filenames are not release-state authorities.",
+    "The 540-record canonical population remains consumer-agnostic through the end of Stage 1-5."
+  ],
+  "nextAction": "Skin 1-6: run the final Stage 1 cross-check across input contract, canonical population, parity, source metadata, acquisition freeze and release-selection deferral, then close Skin Stage 1."
+}
