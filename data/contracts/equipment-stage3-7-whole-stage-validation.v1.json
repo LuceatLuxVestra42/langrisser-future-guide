@@ -1,0 +1,79 @@
+{
+  "stage": "3-7",
+  "purpose": "Validate Stage 3 equipment consumer outputs as one closed system without recomputing Stage 2 semantics: checkpoint continuity, canonical partition closure, public List/Detail parity, routing uniqueness, review/hold preservation, and no hidden-state leakage.",
+  "sources": {
+    "stage30Summary": "data/validation/equipment-stage3-0-input-summary.v1.json",
+    "stage31Summary": "data/validation/equipment-stage3-1-schema-summary.v1.json",
+    "stage32Summary": "data/validation/equipment-stage3-2-display-metadata-summary.v1.json",
+    "stage33Summary": "data/validation/equipment-stage3-3-general-list-summary.v1.json",
+    "stage34Summary": "data/validation/equipment-stage3-4-general-detail-summary.v1.json",
+    "stage35Summary": "data/validation/equipment-stage3-5-exclusive-consumer-summary.v1.json",
+    "stage36Summary": "data/validation/equipment-stage3-6-special-unresolved-summary.v1.json",
+    "acquisition": "data/generated/equipment_stage2_7_acquisition.json",
+    "displayMetadata": "data/generated/equipment_stage3_2_display_metadata.json",
+    "generalList": "data/generated/equipment_stage3_3_general_list.json",
+    "generalDetail": "data/generated/equipment_stage3_4_general_detail.json",
+    "exclusiveConsumer": "data/generated/equipment_stage3_5_exclusive_consumer.json",
+    "specialUnresolved": "data/generated/equipment_stage3_6_special_unresolved.json"
+  },
+  "expected": {
+    "canonical": 390,
+    "publicPageReady": 373,
+    "general": 206,
+    "exclusive": 167,
+    "soulSpecial": 16,
+    "hold": 1,
+    "siteTabs": {"1": 94, "2": 80, "3": 32},
+    "display": {
+      "iconVerifiedPublic": 373,
+      "nameKrVerifiedPublic": 186,
+      "nameKrReviewPublic": 187
+    },
+    "releaseOrderReview": {
+      "generalTab3": 32,
+      "exclusive": 167,
+      "total": 199
+    },
+    "explicitHoldIds": [2013]
+  },
+  "hardGates": {
+    "checkpointContinuity": [
+      "Stage 3-0 through 3-6 validation summaries must remain PASS",
+      "Stage 3-1 structurally page-ready count remains 373",
+      "Stage 3-2 public icon coverage remains 373/373"
+    ],
+    "partitionClosure": [
+      "general 206, exclusive 167, soul-special 16, unresolved-no-path 1 are pairwise disjoint",
+      "their union equals the 390 canonical acquisition IDs exactly"
+    ],
+    "consumerParity": [
+      "general Stage 3-3 List IDs equal Stage 3-4 Detail IDs exactly",
+      "exclusive Stage 3-5 List IDs equal Stage 3-5 Detail IDs exactly",
+      "public route keys are equipmentId and are unique across all 373 public records",
+      "List and Detail identity/display/classification fields remain mutually consistent"
+    ],
+    "reviewAndHoldIntegrity": [
+      "only Stage 3-2 VERIFIED_REFERENCE_MATCH Korean names may appear in public consumers",
+      "all 373 public icons equal Stage 3-2 VERIFIED_DIRECT icons",
+      "soul-special and unresolved records never enter public List/Detail consumers",
+      "ID 2013 remains HOLD_UNRESOLVED_ACQUISITION with empty GetPathList and no public siteTab",
+      "review/hold states are not silently promoted into invented Korean names, release dates, acquisition meanings, hero ownership, or runtime-direct restriction proof"
+    ]
+  },
+  "nonBlockingReview": {
+    "koreanNames": 187,
+    "releaseOrder": 199,
+    "restrictionRuntimeDirectProof": "UNLOCATED_LOW_PRIORITY",
+    "exclusiveHeroOwnership": "OUT_OF_SCOPE_SEPARATE_HERO_CONSUMER"
+  },
+  "explicitHold": {
+    "equipmentId": 2013,
+    "status": "HOLD_UNRESOLVED_ACQUISITION",
+    "reason": "Empty GetPathList has no confirmed acquisition meaning; Stage 3 must not infer one."
+  },
+  "completion": {
+    "passStatus": "STAGE3_COMPLETE_WITH_REVIEW_AND_EXPLICIT_HOLD",
+    "meaning": "Stage 3 equipment consumer data is structurally complete and regression-validated for all 390 canonical records. Remaining REVIEW/HOLD items are explicitly tracked and are not silently filled.",
+    "nextStage": "Stage 4 frontend/UI integration and consumer QA"
+  }
+}
