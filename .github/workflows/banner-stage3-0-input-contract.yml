@@ -1,0 +1,39 @@
+name: Banner Stage 3-0 Input Contract
+
+on:
+  push:
+    paths:
+      - '.github/workflows/banner-stage3-0-input-contract.yml'
+      - 'scripts/validate-banner-stage3-0-input-contract.mjs'
+      - 'data/contracts/banner-stage3-0-input-contract.v1.json'
+      - 'data/generated/banner-stage2-production-manifest.v1.json'
+      - 'data/generated/banner-definitions.v1.json'
+      - 'data/generated/banner-occurrence-definition-map.v1.json'
+      - 'data/generated/banner-occurrences.v1.json'
+      - 'data/generated/banner-definition-taxonomy.v1.json'
+      - 'data/generated/banner-occurrence-taxonomy.v1.json'
+      - 'data/generated/banner-definition-hero-relations.v1.json'
+      - 'data/generated/banner-cp-event-relations.v1.json'
+      - 'data/generated/banner-recurrence-history.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate frozen Banner Stage 2 inputs for Stage 3
+        run: node scripts/validate-banner-stage3-0-input-contract.mjs
+      - name: Persist Banner Stage 3-0 validation checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/banner-stage3-0-input-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No Banner Stage 3-0 validation changes"
+            exit 0
+          fi
+          git commit -m "Freeze Banner Stage 3-0 input checkpoint"
+          git push
