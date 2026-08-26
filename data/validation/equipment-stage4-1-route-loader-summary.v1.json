@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "stage": "4-1",
+  "status": "PASS",
+  "finalStageStatus": "STAGE4_1_ROUTE_LOADER_SCAFFOLD_READY",
+  "upstream": {
+    "stage40": "PASS",
+    "stage40Final": "STAGE4_0_FRONTEND_CONSUMER_CONTRACT_FROZEN"
+  },
+  "routes": {
+    "general": "/equipment",
+    "exclusive": "/equipment/exclusive",
+    "detail": "/equipment/$equipmentId",
+    "generatedRouteTreeVerified": true,
+    "nonNestedSiblingScaffold": true
+  },
+  "loaderCoverage": {
+    "generalList": 206,
+    "generalDetail": 206,
+    "exclusiveList": 167,
+    "exclusiveDetail": 167,
+    "publicUniqueEquipmentIds": 373,
+    "generalTabs": {
+      "1": 94,
+      "2": 80,
+      "3": 32
+    }
+  },
+  "ownership": {
+    "byEquipmentKeys": 167,
+    "relationCount": 167,
+    "ownershipCardinalityMismatch": 0,
+    "ownerHeroMissing": 0
+  },
+  "admission": {
+    "hiddenSpecial": 16,
+    "hold": 1,
+    "holdEquipmentIds": [
+      2013
+    ],
+    "publicHiddenLeak": 0,
+    "publicHoldLeak": 0
+  },
+  "sourceDiscipline": {
+    "createServerFnBoundary": true,
+    "rawGeneratedJsonOnlyInServerModule": true,
+    "directConfigDataReads": false,
+    "directSkillHeroOwnershipReads": false,
+    "ownershipRederivation": false
+  },
+  "build": {
+    "command": "bun run build",
+    "pass": true,
+    "routeTreeGenerated": true
+  },
+  "uiScope": {
+    "diagnosticScaffoldOnly": true,
+    "finalGeneralListUiDeferredTo": "4-2",
+    "finalGeneralDetailUiDeferredTo": "4-3",
+    "finalExclusiveUiDeferredTo": "4-4"
+  },
+  "completionMeaning": "All three public Equipment routes exist as independent file routes, load only frozen consumer sources through server functions, enforce public detail admission by exact equipmentId, and are ready for Stage 4-2 UI implementation.",
+  "nextStage": "4-2 general equipment List UI"
+}
