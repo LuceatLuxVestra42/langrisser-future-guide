@@ -1,0 +1,116 @@
+{
+  "version": "banner-stage3-8-regression-freeze/v1",
+  "stage": "3-8",
+  "purpose": "Run the frozen Stage 3 validators, cross-check Stage 3-0 through 3-7 checkpoints, require a production frontend build, and freeze the Banner Stage 3 production surface without recomputing source joins or duplicating large generated data.",
+  "inputs": {
+    "summaries": {
+      "stage30": { "path": "data/validation/banner-stage3-0-input-summary.v1.json", "status": "PASS_BANNER_STAGE3_0_INPUT_CONTRACT" },
+      "stage31": { "path": "data/validation/banner-stage3-1-asset-summary.v1.json", "status": "PASS_BANNER_STAGE3_1_ASSET_RELATION" },
+      "stage32": { "path": "data/validation/banner-stage3-2-display-summary.v1.json", "status": "PASS_BANNER_STAGE3_2_DISPLAY_METADATA" },
+      "stage33": { "path": "data/validation/banner-stage3-3-basic-table-summary.v1.json", "status": "PASS_BANNER_STAGE3_3_BASIC_TABLE_CONSUMER" },
+      "stage34": { "path": "data/validation/banner-stage3-4-wish-summary.v1.json", "status": "PASS_BANNER_STAGE3_4_WISH_CONSUMER" },
+      "stage35": { "path": "data/validation/banner-stage3-5-cp-event-summary.v1.json", "status": "PASS_BANNER_STAGE3_5_CP_EVENT_CONSUMER" },
+      "stage36": { "path": "data/validation/banner-stage3-6-recurrence-pickup-log-summary.v1.json", "status": "PASS_BANNER_STAGE3_6_RECURRENCE_PICKUP_LOG_CONSUMER" },
+      "stage37": { "path": "data/validation/banner-stage3-7-frontend-integration-summary.v1.json", "status": "PASS_BANNER_STAGE3_7_FRONTEND_INTEGRATION" }
+    },
+    "validators": [
+      "scripts/validate-banner-stage3-0-input-contract.mjs",
+      "scripts/validate-banner-stage3-1-asset-relation.mjs",
+      "scripts/validate-banner-stage3-2-display-metadata.mjs",
+      "scripts/validate-banner-stage3-3-basic-table-consumer.mjs",
+      "scripts/validate-banner-stage3-4-wish-consumer.mjs",
+      "scripts/validate-banner-stage3-5-cp-event-consumer.mjs",
+      "scripts/validate-banner-stage3-6-recurrence-pickup-log-consumer.mjs",
+      "scripts/validate-banner-stage3-7-frontend-integration.mjs"
+    ],
+    "frontendRouteTree": "src/routeTree.gen.ts"
+  },
+  "expected": {
+    "canonical": { "definitions": 77, "occurrences": 94 },
+    "display": {
+      "resolvedOrRenderableOccurrences": 93,
+      "placeholderOccurrences": 1,
+      "placeholderOccurrenceIds": ["bocc:kr-manual-wish-20260902"]
+    },
+    "basicTable": {
+      "rows": 94,
+      "dateGroups": 31,
+      "pickupRows": 71,
+      "wishRows": 23,
+      "renderableRows": 93,
+      "firstDate": "2026-09-02",
+      "lastDate": "2027-03-31"
+    },
+    "wish": {
+      "definitions": 14,
+      "occurrences": 23,
+      "candidateEdges": 464,
+      "verifiedDefinitions": 6,
+      "reviewDefinitions": 8,
+      "manualCandidatesSynthesized": false
+    },
+    "cpEvent": {
+      "definitions": 4,
+      "occurrences": 4,
+      "canonicalEventRelations": 0,
+      "eventNavigationOccurrences": 0,
+      "textReferenceOnlyReviews": 4
+    },
+    "recurrence": {
+      "definitionHistories": 77,
+      "occurrenceLogs": 94,
+      "repeatedDefinitions": 11,
+      "repeatedPickupDefinitions": 8,
+      "recurrenceLinks": 17,
+      "futurePredictionsMaterialized": 0,
+      "firstEverReleaseEstablished": false,
+      "fixedCadenceEstablished": false
+    },
+    "pickupCardinalityReviews": {
+      "count": 5,
+      "neutralizedRowIds": [
+        "bocc:kr-banner:20261021:1",
+        "bocc:kr-banner:20261111:1",
+        "bocc:kr-banner:20261209:1",
+        "bocc:kr-banner:20270203:1",
+        "bocc:kr-banner:20270303:1"
+      ]
+    },
+    "frontend": {
+      "route": "/banners",
+      "mainCategoryLinked": true,
+      "sections": ["배너표", "배너+이벤트", "CP배너", "픽업 log"]
+    }
+  },
+  "knownDeferredNonErrors": [
+    { "code": "MANUAL_BANNER_IMAGE_PENDING", "count": 1, "scope": "bocc:kr-manual-wish-20260902" },
+    { "code": "MANUAL_WISH_NO_EXPLICIT_ID_SOURCE", "count": 8, "scope": "source-null manual Wish definitions" },
+    { "code": "PICKUP_CARDINALITY_RELATION_REVIEW", "count": 5, "scope": "neutralized PICKUP display rows" },
+    { "code": "CANONICAL_EVENT_ID_UNRESOLVED", "count": 4, "scope": "CP text references only" },
+    { "code": "HERO_FRONTEND_ROUTE_UNRESOLVED", "count": null, "scope": "Hero navigation is not invented" },
+    { "code": "EXACT_BANNER_TIME_DURATION_TIMEZONE_UNRESOLVED", "count": null, "scope": "krDisplayDate remains day placement only" },
+    { "code": "FIRST_EVER_BEFORE_DATASET_UNASSERTED", "count": null, "scope": "first observed is not first ever" },
+    { "code": "RECURRENCE_CADENCE_AND_FUTURE_PREDICTION_UNASSERTED", "count": null, "scope": "observed gaps only" }
+  ],
+  "freezePolicy": {
+    "sourceConfigDataRecomputationAllowed": false,
+    "silentIdentityRegroupingAllowed": false,
+    "silentJoinSemanticChangesAllowed": false,
+    "assetIdentityPromotionAllowed": false,
+    "manualWishCandidateSynthesisAllowed": false,
+    "canonicalEventInferenceAllowed": false,
+    "heroRouteInferenceAllowed": false,
+    "recurrencePredictionAllowed": false,
+    "futureSemanticChangeRequiresExplicitScopedStageOrMigration": true
+  },
+  "outputs": {
+    "summary": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+    "manifest": "data/generated/banner-stage3-production-manifest.v1.json"
+  },
+  "manifest": {
+    "status": "BANNER_STAGE3_FROZEN_READY",
+    "representation": "REFERENCE_MANIFEST_NO_LARGE_DATA_DUPLICATION"
+  },
+  "completionStatus": "PASS_BANNER_STAGE3_8_REGRESSION_FREEZE",
+  "freezeState": "BANNER_STAGE3_FROZEN"
+}
