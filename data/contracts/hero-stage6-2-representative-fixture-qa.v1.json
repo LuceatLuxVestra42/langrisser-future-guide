@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "stage": "hero-page-6-2",
+  "status": "FROZEN",
+  "purpose": "Validate the frozen Stage 6-1 Hero composition against a deterministic representative fixture set before broader Hero-page admission work. This stage is QA only and does not become a new semantic producer.",
+  "input": {
+    "stage61": "data/generated/hero-detail-stage6-1.v1.json",
+    "stage61Validation": "data/validation/hero-stage6-1-final.v1.json",
+    "stage4": "data/generated/hero-basic-combat.v1.json",
+    "stage51": "data/generated/hero-page-stage5-1-bonds-final.v1.json",
+    "stage52": "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
+    "stage53": "data/generated/hero-page-soldiers-stage5-3.v1.json",
+    "stage54": "data/generated/hero-page-stage5-4-sp.v1.json",
+    "stage55": "data/hero-page-stage5-5-3.v1.json"
+  },
+  "fixtureFamilies": [
+    {
+      "id": "regular-ssr",
+      "requirement": "A non-COLLAB base SSR without released SP, selected closest to the median Stage-4 branch count of the eligible population."
+    },
+    {
+      "id": "multi-branch-structural",
+      "requirement": "A non-COLLAB Hero with the maximum Stage-4 branch count among currently unused candidates. This covers the multi-branch structural QA target only; release chronology is not asserted because no release-order source is joined in Stage 6-2."
+    },
+    {
+      "id": "shared-job-rsr",
+      "requirement": "An R or SR Hero maximizing the number and aggregate cross-Hero frequency of Stage-4 job display names shared with other Heroes."
+    },
+    {
+      "id": "sp",
+      "requirement": "A Hero whose frozen Stage 5-4 SP status is RELEASED."
+    },
+    {
+      "id": "llr",
+      "requirement": "A Hero whose frozen Stage 5-5 base rarity label is LLR."
+    },
+    {
+      "id": "collab",
+      "requirement": "A Hero whose frozen Stage 5-5 origin category is COLLAB."
+    },
+    {
+      "id": "matthew-structural-exception",
+      "requirement": "Canonical heroId 1 (Matthew/매튜), explicitly retained as the known multi-branch structural exception fixture."
+    }
+  ],
+  "selectionPolicy": {
+    "sourceOnly": "Fixture traits are selected only from already-frozen Stage 4/5 outputs. Names are display evidence and are never join keys.",
+    "distinctness": "Use distinct heroIds across fixture families whenever an eligible candidate exists.",
+    "tieBreak": "After family-specific scores, choose the lowest canonical heroId for deterministic output.",
+    "releaseChronology": "Stage 6-2 does not infer old/new release age from heroId, names, production title, artwork, or any other proxy."
+  },
+  "commonQa": [
+    "Stage 6-1 must be PASS / COMPLETE and its frozen validation must have zero hard errors.",
+    "Every selected Stage 6-1 sourceIndexes locator must resolve to the same canonical heroId in Stage 4, Stage 5-1, Stage 5-2, Stage 5-4 and Stage 5-5.",
+    "Stage 6-1 soldiersKey must resolve the same Hero in Stage 5-3 byHeroId.",
+    "Stage 6-1 snapshot values for exclusive-equipment status/id, central-discipline status, Soldier count and SP status must match the frozen source blocks exactly.",
+    "Hero identity display values must agree across frozen sources whenever the source carries that value.",
+    "Stage-4 job-tree connection IDs must be unique; primary and all branch connection IDs must resolve within that Hero's frozen connection set.",
+    "Stage 5-1 bonds must remain source-resolved.",
+    "Stage 5-2 feature states must be RELEASED or NOT_RELEASED; released exclusive equipment must carry an integer equipmentId and, when ownerHeroId is present, it must equal the fixture heroId.",
+    "Stage 5-3 Soldier IDs must be unique per Hero and every referenced Soldier must exist in soldiersById.",
+    "Stage 5-4 SP status must be RELEASED or NOT_RELEASED.",
+    "Stage 5-5 base rarity, origin category, factions, skins and artwork source path must remain structurally valid."
+  ],
+  "familyQa": {
+    "regular-ssr": ["rarity.baseLabel == SSR", "origin.category != COLLAB", "sp.status != RELEASED"],
+    "multi-branch-structural": ["selected branchCount equals the maximum eligible non-COLLAB branchCount after prior distinct fixtures", "releaseChronologyAsserted == false"],
+    "shared-job-rsr": ["rarity.baseLabel is R or SR", "sharedJobNameCount > 0"],
+    "sp": ["sp.status == RELEASED"],
+    "llr": ["rarity.baseLabel == LLR"],
+    "collab": ["origin.category == COLLAB"],
+    "matthew-structural-exception": ["heroId == 1", "Stage-4 branchCount >= 5"]
+  },
+  "outputs": {
+    "fixtures": "data/generated/hero-stage6-2-representative-fixtures.v1.json",
+    "validation": "data/validation/hero-stage6-2-final.v1.json"
+  },
+  "forbiddenWork": [
+    "Recalculate Hero stats, talent, job semantics, skill acquisition or awakening semantics.",
+    "Re-resolve bond Mission semantics.",
+    "Recalculate Hero-Soldier membership.",
+    "Re-resolve SP mission semantics.",
+    "Re-derive Hero-exclusive Equipment ownership or compete with Stage B.",
+    "Infer release age from heroId or other unsourced proxies.",
+    "Invent localization or browser asset URLs."
+  ],
+  "completion": "Stage 6-2 is COMPLETE when all seven deterministic fixture families are represented, every fixture passes common and family-specific QA, no source locator or snapshot mismatch exists, and hardErrorCount is zero."
+}
