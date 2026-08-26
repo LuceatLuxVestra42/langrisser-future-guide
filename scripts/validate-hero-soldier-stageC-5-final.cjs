@@ -24,7 +24,7 @@ const inputs = {
   },
   c4: {
     path: 'data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json',
-    sha: '461b14408e60803817b74a7b446f30a0b9df180f',
+    sha: '86ca7865559856e66698dda0e9704d25f0e56939',
   },
 };
 
