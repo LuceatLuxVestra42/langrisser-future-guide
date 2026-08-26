@@ -1,0 +1,54 @@
+name: Hero Stage 5-2 relation discovery
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-2-relation-discovery.yml'
+      - 'scripts/investigate_hero_stage5_2_relations.cjs'
+
+permissions:
+  contents: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Discover Stage 5-2 relations
+        run: node scripts/investigate_hero_stage5_2_relations.cjs
+
+      - name: Show compact discovery summary
+        run: |
+          node - <<'NODE'
+          const r = require('./data/validation/hero-page-stage5-2-relation-discovery.v1.json');
+          console.log(JSON.stringify({
+            exclusiveEquipmentPopulation: r.exclusiveEquipmentPopulation,
+            candidateFileCount: r.heroEquipmentCandidateScan.candidateFileCount,
+            topCandidates: r.heroEquipmentCandidateScan.candidates.slice(0, 12).map(x => ({
+              file: x.file,
+              sameObjectHeroEquipShapeCount: x.sameObjectHeroEquipShapeCount,
+              exclusiveRefObjectCount: x.exclusiveRefObjectCount,
+              heroKeys: x.heroKeys,
+              equipmentKeys: x.equipmentKeys,
+              samples: x.samples.slice(0, 3)
+            })),
+            centralDiscipline: r.centralDiscipline,
+            decision: r.decision
+          }, null, 2));
+          NODE
+
+      - name: Freeze relation discovery checkpoint
+        run: |
+          TARGET='data/validation/hero-page-stage5-2-relation-discovery.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
+            echo 'Discovery checkpoint already current.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add "$TARGET"
+            git commit -m 'Freeze Hero Stage 5-2 relation discovery'
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
