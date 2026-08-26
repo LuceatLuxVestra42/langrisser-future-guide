@@ -1,0 +1,34 @@
+name: Skin Stage 1-4 Acquisition Freeze
+
+on:
+  push:
+    branches:
+      - work/skin-stage1-4-acquisition-freeze
+    paths:
+      - 'scripts/generate-skin-stage1-4-acquisition.py'
+      - 'data/contracts/skin-stage1-acquisition-policy.v1.json'
+      - '.github/workflows/skin-stage1-4-acquisition-freeze.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/skin-stage1-4-acquisition-freeze
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate and validate acquisition freeze
+        run: python scripts/generate-skin-stage1-4-acquisition.py
+      - name: Commit generated checkpoint and remove one-shot workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/skin-stage1-acquisition-state.v1.json data/validation/skin-stage1-4-final.v1.json
+          git rm .github/workflows/skin-stage1-4-acquisition-freeze.yml
+          git commit -m "Generate Skin Stage 1-4 acquisition freeze"
+          git push origin HEAD:work/skin-stage1-4-acquisition-freeze
