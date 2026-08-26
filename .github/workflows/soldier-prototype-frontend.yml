@@ -10,11 +10,12 @@ on:
       - 'src/lib/soldier-page.functions.ts'
       - 'src/routes/soldiers-prototype.tsx'
       - 'src/routes/soldiers.prototype.tsx'
+      - 'src/routeTree.gen.ts'
       - 'package.json'
       - 'bun.lock'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -32,3 +33,14 @@ jobs:
         run: |
           grep -q '/soldiers-prototype' src/routeTree.gen.ts
           grep -q '/soldiers/prototype' src/routeTree.gen.ts
+      - name: Persist generated route tree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routeTree.gen.ts
+          if git diff --cached --quiet; then
+            echo "No route tree changes"
+            exit 0
+          fi
+          git commit -m "Register Soldier prototype routes"
+          git push
