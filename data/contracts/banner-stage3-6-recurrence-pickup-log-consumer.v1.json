@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 3-6",
+  "purpose": "Project frozen current-dataset recurrence history into UI-safe banner history and pickup-log consumers without inferring first-ever release, cadence, or future recurrence.",
+  "inputs": {
+    "stage33Summary": "data/validation/banner-stage3-3-basic-table-summary.v1.json",
+    "stage33BasicTable": "data/generated/banner-stage3-3-basic-table-consumer.v1.json",
+    "stage35Summary": "data/validation/banner-stage3-5-cp-event-summary.v1.json",
+    "stage35CpEventConsumer": "data/generated/banner-stage3-5-cp-event-consumer.v1.json",
+    "recurrenceHistory": "data/generated/banner-recurrence-history.v1.json"
+  },
+  "expectedCanonicalPopulation": {
+    "definitions": 77,
+    "occurrences": 94,
+    "repeatedDefinitions": 11,
+    "singleObservedDefinitions": 66,
+    "recurrenceLinks": 17,
+    "maxObservedOccurrenceCount": 5,
+    "pickupOccurrences": 71,
+    "cpPickupOccurrences": 4
+  },
+  "historyPolicy": {
+    "scope": "CURRENT_CANONICAL_KR_SCHEDULE_DATASET",
+    "definitionHistoryIdentity": "bannerDefinitionId",
+    "occurrenceLogIdentity": "bannerOccurrenceId",
+    "chronology": [
+      "krDisplayDate ASC",
+      "displayOrder ASC",
+      "bannerOccurrenceId ASC"
+    ],
+    "preserveAppearanceIndex": true,
+    "preserveObservedGapDays": true,
+    "firstObservedMeansFirstEver": false,
+    "fixedCadenceInferenceAllowed": false,
+    "futureRecurrencePredictionAllowed": false,
+    "nextExpectedDateMaterialized": false,
+    "durationOrTimeInferenceAllowed": false,
+    "stage2LifecycleRewriteAllowed": false
+  },
+  "pickupLogPolicy": {
+    "source": "Stage 3-3 basic-table PICKUP rows only",
+    "includeWishRows": false,
+    "heroRelationsRecomputed": false,
+    "heroRoutesInvented": false,
+    "cpPickupLogSource": "Stage 3-5 CP/Event occurrence records only",
+    "cpEventCanonicalJoinExpanded": false
+  },
+  "completionPolicy": {
+    "allDefinitionHistoriesAccounted": true,
+    "allOccurrencesAccounted": true,
+    "historyOccurrenceIdentityMustMatchStage33": true,
+    "repeatedDefinitionCountMustMatch": true,
+    "recurrenceLinkCountMustMatch": true,
+    "manualRepeatedDefinitionAllowed": false,
+    "predictionFieldsAllowed": false,
+    "errorsAllowed": false
+  },
+  "outputs": {
+    "consumer": "data/generated/banner-stage3-6-recurrence-pickup-log-consumer.v1.json",
+    "summary": "data/validation/banner-stage3-6-recurrence-pickup-log-summary.v1.json"
+  },
+  "nextStage": "Banner Stage 3-7 frontend integration"
+}
