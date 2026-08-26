@@ -1,0 +1,128 @@
+name: Hero Stage 6-3 Full 267 Generation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'work/**'
+    paths:
+      - 'data/contracts/hero-stage6-3-full-generation.v1.json'
+      - 'data/generated/hero-detail-stage6-1.v1.json'
+      - 'data/validation/hero-stage6-1-final.v1.json'
+      - 'data/validation/hero-stage6-2-final.v1.json'
+      - 'data/generated/hero-basic-combat.v1.json'
+      - 'data/validation/hero-basic-combat-stage4-5-summary.v1.json'
+      - 'data/validation/hero-page-stage5-integration-review.v1.json'
+      - 'data/generated/hero-page-stage5-1-bonds-final.v1.json'
+      - 'data/generated/hero-page-stage5-2-exclusive-central.v1.json'
+      - 'data/generated/hero-page-soldiers-stage5-3.v1.json'
+      - 'data/validation/hero-soldier-relation-validation.v1.json'
+      - 'data/generated/hero-page-stage5-4-sp.v1.json'
+      - 'data/hero-page-stage5-5-3.v1.json'
+      - 'data/generated/hero-exclusive-equipment-relations.v1.json'
+      - 'data/validation/hero-exclusive-equipment-relation-stageB4-validation.v1.json'
+      - 'scripts/build_hero_stage6_3_full_generation.cjs'
+      - 'scripts/run_hero_stage6_3_full_generation.cjs'
+      - 'scripts/shard_hero_stage6_3_output.cjs'
+      - '.github/workflows/hero-stage6-3-full-generation.yml'
+  pull_request:
+    paths:
+      - 'data/contracts/hero-stage6-3-full-generation.v1.json'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/hero-detail-shared.v1.json'
+      - 'data/generated/hero-detail/by-id/**'
+      - 'data/validation/hero-stage6-3-final.v1.json'
+      - 'data/checkpoints/hero-stage6-3-full-generation.json'
+      - 'data/checkpoints/hero-stage6-3-full-generation.md'
+      - 'data/generated/hero-detail-stage6-1.v1.json'
+      - 'data/validation/hero-stage6-1-final.v1.json'
+      - 'data/validation/hero-stage6-2-final.v1.json'
+      - 'data/generated/hero-basic-combat.v1.json'
+      - 'data/validation/hero-basic-combat-stage4-5-summary.v1.json'
+      - 'data/validation/hero-page-stage5-integration-review.v1.json'
+      - 'data/generated/hero-page-stage5-1-bonds-final.v1.json'
+      - 'data/generated/hero-page-stage5-2-exclusive-central.v1.json'
+      - 'data/generated/hero-page-soldiers-stage5-3.v1.json'
+      - 'data/validation/hero-soldier-relation-validation.v1.json'
+      - 'data/generated/hero-page-stage5-4-sp.v1.json'
+      - 'data/hero-page-stage5-5-3.v1.json'
+      - 'data/generated/hero-exclusive-equipment-relations.v1.json'
+      - 'data/validation/hero-exclusive-equipment-relation-stageB4-validation.v1.json'
+      - 'scripts/build_hero_stage6_3_full_generation.cjs'
+      - 'scripts/run_hero_stage6_3_full_generation.cjs'
+      - 'scripts/shard_hero_stage6_3_output.cjs'
+      - '.github/workflows/hero-stage6-3-full-generation.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  full-generation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build, validate and shard all 267 Hero details
+        id: build
+        continue-on-error: true
+        run: |
+          node scripts/run_hero_stage6_3_full_generation.cjs
+          node scripts/shard_hero_stage6_3_output.cjs
+
+      - name: Show Stage 6-3 summary
+        if: always() && hashFiles('data/validation/hero-stage6-3-final.v1.json') != ''
+        run: |
+          node - <<'NODE'
+          const v = require('./data/validation/hero-stage6-3-final.v1.json');
+          console.log(JSON.stringify({status:v.status, completion:v.completion, summary:v.summary, storage:v.storage, upstreamGates:v.upstreamGates, failedHeroes:v.failedHeroes, hardErrors:v.hardErrors}, null, 2));
+          NODE
+
+      - name: Upload Stage 6-3 diagnostics
+        if: always() && hashFiles('data/validation/hero-stage6-3-final.v1.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-stage6-3-diagnostics
+          path: |
+            data/generated/hero-detail.v1.json
+            data/validation/hero-stage6-3-final.v1.json
+            data/checkpoints/hero-stage6-3-full-generation.json
+            data/checkpoints/hero-stage6-3-full-generation.md
+
+      - name: Commit generated Stage 6-3 outputs on work branch
+        if: steps.build.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
+        run: |
+          TARGETS='data/generated/hero-detail.v1.json data/generated/hero-detail-shared.v1.json data/generated/hero-detail/by-id data/validation/hero-stage6-3-final.v1.json data/checkpoints/hero-stage6-3-full-generation.json data/checkpoints/hero-stage6-3-full-generation.md'
+          if [ -z "$(git status --porcelain -- $TARGETS)" ]; then
+            echo 'Stage 6-3 outputs already frozen.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add $TARGETS
+          git commit -m 'Freeze sharded Hero Stage 6-3 full generation'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Verify frozen outputs on PR or main
+        if: steps.build.outcome == 'success' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
+        run: |
+          TARGETS='data/generated/hero-detail.v1.json data/generated/hero-detail-shared.v1.json data/generated/hero-detail/by-id data/validation/hero-stage6-3-final.v1.json data/checkpoints/hero-stage6-3-full-generation.json data/checkpoints/hero-stage6-3-full-generation.md'
+          if [ -n "$(git status --porcelain -- $TARGETS)" ]; then
+            echo 'Stage 6-3 generated outputs are not frozen or are stale.'
+            git status --short -- $TARGETS
+            exit 1
+          fi
+
+      - name: Enforce Stage 6-3 build gate
+        if: always() && steps.build.outcome != 'success'
+        run: exit 1

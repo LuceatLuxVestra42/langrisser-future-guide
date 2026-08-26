@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "stage": "hero-page-6-3",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "completedScope": "Full 267-Hero detail materialization and structural validation",
+  "confirmed": {
+    "generatedHeroCount": 267,
+    "structuralPassCount": 267,
+    "structuralFailCount": 0,
+    "publicationReviewCount": 267,
+    "siteUsableCount": 267,
+    "heroSoldierRelationCount": 5977,
+    "exclusiveEquipmentRelationCount": 167,
+    "stageBState": "B4_CANONICAL_RELATION_ADOPTED_B5_B6_DEFERRED_TO_6_4",
+    "hardErrorCount": 0,
+    "storageMode": "SHARDED_BY_HERO",
+    "heroShardCount": 267,
+    "heroShardMissingCount": 0
+  },
+  "sources": {
+    "data/contracts/hero-stage6-3-full-generation.v1.json": "97425c7b3ed30dccd7a5ea0207b83d413b9c2487",
+    "data/generated/hero-detail-stage6-1.v1.json": "a412a0c1449590b9e81f4bb5c523c0414498a1be",
+    "data/validation/hero-stage6-1-final.v1.json": "675b39b591fcab7517309cff7d735287d8a9c107",
+    "data/validation/hero-stage6-2-final.v1.json": "0adad661db297ec9ee8555576e2b4e89a62d16ee",
+    "data/generated/hero-basic-combat.v1.json": "1661efec786de37b00adcef02839b607a947765f",
+    "data/validation/hero-basic-combat-stage4-5-summary.v1.json": "6352647f024a9249003b7e99383843caf44653c3",
+    "data/validation/hero-page-stage5-integration-review.v1.json": "54317baa86c5efbcff3139c298683edc3b70b9af",
+    "data/generated/hero-page-stage5-1-bonds-final.v1.json": "5be989e9d0723782f491dc3005a11c0ad3143c43",
+    "data/generated/hero-page-stage5-2-exclusive-central.v1.json": "6c34231f114177d5612947533f57322ba9bf8578",
+    "data/generated/hero-page-soldiers-stage5-3.v1.json": "b97beae7aa58c573f16919cf731250bfc359d58e",
+    "data/validation/hero-soldier-relation-validation.v1.json": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638",
+    "data/generated/hero-page-stage5-4-sp.v1.json": "d281dbf094939ae34a5c3e8fbd4f4225bd065fd9",
+    "data/hero-page-stage5-5-3.v1.json": "dd56c47602b2aee42001b8a32f1830769d5c44c1",
+    "data/generated/hero-exclusive-equipment-relations.v1.json": "33caa16212a5a71195015e05c815024fb62e6be6",
+    "data/validation/hero-exclusive-equipment-relation-stageB4-validation.v1.json": "8bfb68bd011fdcccb234e557dbda9c64c9ec3623"
+  },
+  "outputs": [
+    "data/generated/hero-detail.v1.json",
+    "data/generated/hero-detail/by-id/<heroId>.json",
+    "data/generated/hero-detail-shared.v1.json",
+    "data/validation/hero-stage6-3-final.v1.json"
+  ],
+  "nextStart": "Hero Stage 6-4 site consumer contract + final Hero data pipeline freeze. Consume the Stage 6-3 manifest and per-Hero shards; do not reopen Stage 4/5 semantics or rebuild confirmed relations."
+}
