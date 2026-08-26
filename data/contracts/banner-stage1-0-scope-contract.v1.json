@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-0",
+  "status": "PASS_SCOPE_FROZEN",
+  "purpose": "Freeze the investigation scope, source boundaries, prohibited inference rules, and completion criteria for Banner Stage 1 before any census, schema finalization, or bulk asset work begins.",
+  "projectIntent": {
+    "pageFamilies": [
+      "banner schedule",
+      "banner + event schedule",
+      "CP / pickup log",
+      "wish summon",
+      "special banner"
+    ],
+    "principle": "Stage 1 investigates existing banner data units and source relationships. It does not create the final canonical banner schema."
+  },
+  "knownInputs": [
+    {
+      "source": "data/configdata/ConfigDataCardPoolInfo.json",
+      "role": "Primary in-repository card-pool ConfigData candidate for Stage 1 census",
+      "authority": "STRUCTURE_AND_INTERNAL_ID_CANDIDATE",
+      "stage1Action": "inspect_in_1_1"
+    },
+    {
+      "source": "data/banner-overrides.v1.json",
+      "role": "Existing Korean replacement assets and verified legacy reusable banner mappings",
+      "authority": "EXISTING_VERIFIED_OVERRIDE_AND_REUSE_CHECKPOINT",
+      "stage1Action": "reuse_and_validate_first",
+      "canonicalBannerMaster": false
+    },
+    {
+      "source": "data/hero-name-master.v1.json",
+      "role": "Canonical Hero identity source for any Hero relation validation",
+      "authority": "CANONICAL_HERO_IDENTITY",
+      "stage1Action": "consume_only"
+    },
+    {
+      "source": "legacy Korean guide / existing banner tables",
+      "role": "Korean schedule history, display structure, terminology, and legacy management behavior",
+      "authority": "LEGACY_KR_REFERENCE",
+      "stage1Action": "inspect_in_1_1_and_later"
+    },
+    {
+      "source": "project design notes",
+      "role": "Defines required banner page families and intended consumer behavior",
+      "authority": "PRODUCT_REQUIREMENT_REFERENCE",
+      "stage1Action": "scope_reference_only"
+    }
+  ],
+  "sourcePriorityPolicy": [
+    "Reuse existing verified repository artifacts before reconstructing the same relationship from raw sources.",
+    "Use explicit ConfigData fields and IDs before names, numeric patterns, filenames, or visual similarity.",
+    "Use Hero relations through the existing Hero canonical identity layer; do not create a new name-based Hero join.",
+    "If Korean legacy data and current ConfigData disagree, record the discrepancy instead of overwriting either source.",
+    "Treat external/reference sources as read-only during Stage 1."
+  ],
+  "inScope": [
+    "Identify all current banner-related source families to be censused in Stage 1-1.",
+    "Determine what kinds of records need investigation: banner definitions, occurrences, batches, pickup logs, selectable pools, event links, and asset references.",
+    "Record which existing generated or manual banner artifacts can be reused as checkpoints.",
+    "Define investigation status values so unknown structures can remain explicit rather than being guessed.",
+    "Define the boundary between raw/source evidence, investigation outputs, and later production consumers."
+  ],
+  "outOfScope": [
+    "Final bannerId or canonical primary-key design",
+    "Final bannerType enum",
+    "Final definition-versus-occurrence schema decision",
+    "Full CardPool census or record counting",
+    "Bulk banner asset extraction",
+    "Asset hash or diff inventory",
+    "Automatic candidate image generation",
+    "Manual approval map construction",
+    "Whole-history banner mapping",
+    "Frontend consumer generation",
+    "Frontend implementation or QA"
+  ],
+  "prohibitedInferences": [
+    "Do not infer Hero relationships from Korean, Chinese, or English name similarity.",
+    "Do not infer release chronology from cardPoolId, bannerCode, patchCode, slotCode, Hero ID, asset filename, or file order unless a later stage verifies the rule.",
+    "Do not treat bannerCode as the final canonical bannerId during Stage 1.",
+    "Do not assume one existing table row equals one unique banner definition or one unique banner occurrence before the row-grain census.",
+    "Do not force every record into a known banner type; UNKNOWN and REVIEW must remain valid investigation states.",
+    "Do not invent missing start dates, end dates, events, selectable Hero lists, or asset mappings.",
+    "Do not overwrite or discard existing banner-overrides mappings while investigating raw sources."
+  ],
+  "investigationStatus": [
+    "VERIFIED",
+    "REVIEW",
+    "UNKNOWN",
+    "SOURCE_CONFLICT",
+    "NOT_APPLICABLE"
+  ],
+  "artifactPolicy": {
+    "rawSources": "read_only",
+    "existingVerifiedArtifacts": "reuse_before_rebuild",
+    "stage1Outputs": "investigation_only",
+    "productionConsumer": "forbidden_until_later_stage"
+  },
+  "stage1Sequence": [
+    "1-0 scope contract",
+    "1-1 source census",
+    "1-2 row-grain census",
+    "1-3 provisional banner taxonomy",
+    "1-4 relation census",
+    "1-5 date and recurrence structure census",
+    "1-6 asset-reference census",
+    "1-7 representative fixture validation",
+    "1-8 Stage 1 freeze"
+  ],
+  "completionCriteria": [
+    "Stage 1 investigation boundaries are explicit.",
+    "Known reusable banner artifacts are named and protected from unnecessary reconstruction.",
+    "Hero identity consumption rule is fixed to the existing canonical Hero ID layer.",
+    "Guess-based joins and chronology inference are explicitly prohibited.",
+    "Schema, asset extraction, and frontend work are explicitly deferred.",
+    "Stage 1-1 has a clear starting set of source families without requiring any Stage 1-0 data census."
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-1",
+    "task": "Source census",
+    "firstPriority": "Inventory existing repository banner-related artifacts and source families, beginning with existing verified/reusable artifacts before raw ConfigData expansion."
+  }
+}
