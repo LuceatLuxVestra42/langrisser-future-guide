@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "stage": "skin-page-2",
+  "substage": "2-5",
+  "checkpoint": "relation-consumer-contract",
+  "status": "ACCEPTED",
+  "purpose": "Publish the single official Skin Stage 2 relation consumer surface after full Stage 1 upstream parity has been proven, so downstream Skin/Hero consumers read frozen derived indexes instead of recalculating ownership or ordering from ConfigData or intermediate relation artifacts.",
+  "officialConsumerSource": {
+    "path": "data/generated/skin-stage2-3-bidirectional-relation.v1.json",
+    "requiredStatus": "ACCEPTED",
+    "requiredCompletion": "SKIN_STAGE2_3_COMPLETE",
+    "requiredCounts": {
+      "bySkinId": 540,
+      "byHeroId": 267,
+      "edgeCount": 540
+    }
+  },
+  "requiredUpstreamGates": [
+    {
+      "path": "data/validation/skin-stage2-0-input-summary.v1.json",
+      "status": "PASS",
+      "completion": "SKIN_STAGE2_0_COMPLETE"
+    },
+    {
+      "path": "data/validation/skin-stage2-1-final.v1.json",
+      "status": "PASS",
+      "completion": "SKIN_STAGE2_1_COMPLETE"
+    },
+    {
+      "path": "data/validation/skin-stage2-2-final.v1.json",
+      "status": "PASS",
+      "completion": "SKIN_STAGE2_2_COMPLETE"
+    },
+    {
+      "path": "data/validation/skin-stage2-3-final.v1.json",
+      "status": "PASS",
+      "completion": "SKIN_STAGE2_3_COMPLETE"
+    },
+    {
+      "path": "data/validation/skin-stage2-4-final.v1.json",
+      "status": "PASS",
+      "completion": "SKIN_STAGE2_4_COMPLETE"
+    }
+  ],
+  "consumerLookups": {
+    "bySkinId": {
+      "access": "relation.bySkinId[String(skinId)]",
+      "cardinality": "EXACTLY_ONE for every canonical regular Hero skin",
+      "keyCount": 540,
+      "valueShape": {
+        "heroId": "integer / canonical Hero foreign key",
+        "sourceOrder": "integer / frozen Hero skin order"
+      },
+      "useFor": "Resolve a canonical regular Hero skin to its owner Hero and frozen source order."
+    },
+    "byHeroId": {
+      "access": "relation.byHeroId[String(heroId)]",
+      "cardinality": "ZERO_OR_MANY",
+      "keyCount": 267,
+      "valueShape": "integer[] / ordered canonical skinIds",
+      "emptyEntryRule": "All canonical Heroes are present; the 32 Heroes without regular skins have an explicit empty array.",
+      "orderingRule": "Array order is frozen Stage 1 sourceOrder. Consumers must preserve the stored order and must not sort by skinId or any alternate field.",
+      "useFor": "Resolve a canonical Hero to the complete ordered list of regular Hero skins."
+    }
+  },
+  "cardinality": {
+    "skinToHero": "EXACTLY_ONE",
+    "heroToSkin": "ZERO_OR_MANY"
+  },
+  "consumerRules": [
+    "The official runtime/research relation source is data/generated/skin-stage2-3-bidirectional-relation.v1.json; downstream consumers must not combine Stage 2-1 and Stage 2-2 themselves.",
+    "Do not read ConfigDataHeroInfo.Skins_ID[], ConfigDataHeroSkinInfo.SpecifiedHero, Hero Stage 5-5, or Skin Stage 1 canonical as a fallback relation calculator when the Stage 2 consumer relation is present.",
+    "Do not infer Hero ownership from skin names, filenames, asset paths, resource IDs, acquisition metadata or numeric skinId patterns.",
+    "Do not sort by skinId, Score, UISort, release state, acquisition category, filename or asset path; preserve the stored byHeroId array order.",
+    "Do not omit zero-skin Heroes from Hero-keyed consumers; an empty byHeroId array is an authoritative ZERO result, not missing data.",
+    "JSON object keys are serialized strings; consumers convert numeric heroId/skinId lookup keys to strings without changing the underlying integer identity.",
+    "Stage 2 relation indexes contain relation identity/order only and must not be treated as authorities for release state, localization, acquisition enrichment, asset extraction/export or displayTarget."
+  ],
+  "downstreamBoundary": {
+    "allowed": [
+      "Skin-domain code may use bySkinId to join skin records to canonical Hero identity.",
+      "Hero-domain code may use byHeroId to retrieve the complete ordered regular-skin list, including explicit empty arrays.",
+      "Later stages may join release, localization, acquisition or asset metadata by skinId without altering Stage 2 owner/order semantics."
+    ],
+    "notProvidedByStage2": [
+      "CN/KR release state or KR_FUTURE eligibility",
+      "Korean skin-name localization",
+      "asset extraction, conversion or web-export path",
+      "supplemental acquisition interpretation",
+      "future-only Skin-page display filtering"
+    ]
+  },
+  "changePolicy": {
+    "normalState": "FROZEN",
+    "reopenOnlyWhen": [
+      "An authoritative correction changes the accepted Stage 1 canonical skinId population, heroId ownership or sourceOrder.",
+      "The accepted Hero Stage 5-5 to Skin Stage 1 parity chain is formally corrected upstream.",
+      "A generation/serialization defect is proven in the Stage 2 relation artifacts."
+    ],
+    "doNotReopenFor": [
+      "release/localization/acquisition/asset metadata updates that do not change owner or sourceOrder",
+      "frontend presentation-order preferences",
+      "new speculative relations inferred from names, files or numeric patterns"
+    ]
+  },
+  "finalGate": "data/validation/skin-stage2-5-final.v1.json",
+  "completionRule": "Skin Stage 2 completes only when Stage 2-0 through Stage 2-4 are PASS, the official bidirectional consumer relation is ACCEPTED with 540 bySkinId keys, 267 byHeroId keys and 540 edges, all consumer value shapes/cardinalities are valid, 32 zero-skin Heroes remain explicit empty arrays, and the official no-recalculation/no-resort consumer rules are frozen.",
+  "nextAction": "Skin Stage 3: inventory/extract/export/map Skin assets using the frozen Stage 2 relation indexes for ownership/order joins without reopening ConfigData relation semantics."
+}
