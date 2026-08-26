@@ -1,0 +1,55 @@
+name: Hero Stage 5-2 final gate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-2-final.yml'
+      - 'scripts/build_hero_stage5_2_exclusive_central.cjs'
+      - 'data/hero-name-master.v1.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataSkillInfo.json'
+      - 'data/configdata/ConfigDataEquipmentInfo.json'
+      - 'data/generated/equipment_stage2_7_acquisition.json'
+      - 'data/generated/equipment_stage3_2_display_metadata.json'
+
+permissions:
+  contents: write
+
+jobs:
+  final:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and validate Hero Stage 5-2
+        run: node scripts/build_hero_stage5_2_exclusive_central.cjs
+
+      - name: Show final summary
+        run: |
+          node - <<'NODE'
+          const r = require('./data/validation/hero-page-stage5-2-final.v1.json');
+          console.log(JSON.stringify({
+            status: r.status,
+            completion: r.completion,
+            summary: r.summary,
+            checks: r.checks,
+            ownershipEvidence: r.ownershipEvidence,
+            centralDisciplineEvidence: r.centralDisciplineEvidence,
+            decision: r.decision
+          }, null, 2));
+          NODE
+
+      - name: Freeze Hero Stage 5-2 outputs
+        run: |
+          TARGETS='data/generated/hero-page-stage5-2-exclusive-central.v1.json data/validation/hero-page-stage5-2-final.v1.json'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add $TARGETS
+          if git diff --cached --quiet; then
+            echo 'Stage 5-2 final outputs already current.'
+          else
+            git commit -m 'Freeze Hero Stage 5-2 exclusive central block'
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
