@@ -39,6 +39,8 @@ for (const edges of pickupEdgesByDefinition.values()) {
     || a.heroId - b.heroId);
 }
 
+const expectedCardinalityCount = { SINGLE: 1, DUAL: 2, TRIPLE: 3 };
+
 assert(occurrenceById.size === occurrences.length, 'duplicate source occurrence IDs');
 assert(new Set(output.rows.map(row => row.rowId)).size === output.rows.length, 'duplicate consumer row IDs');
 
@@ -80,9 +82,22 @@ for (const row of output.rows) {
     }));
     assert(JSON.stringify(row.pickupHeroes) === JSON.stringify(expectedHeroes), `${row.rowId}: pickup hero projection mismatch`);
     assert(row.deferredDetail === null, `${row.rowId}: PICKUP row has deferred Wish detail`);
+
+    const expectedCount = expectedCardinalityCount[definitionTax.pickupCardinality] ?? null;
+    const matches = expectedCount == null ? null : expectedHeroes.length === expectedCount;
+    assert(row.pickupHeroCountMatchesCardinality === matches, `${row.rowId}: cardinality relation flag mismatch`);
+    if (matches === false) {
+      assert(row.typeLabelKr === contract.typeLabelsKr.PICKUP_REVIEW, `${row.rowId}: reviewed mismatch label not neutralized`);
+      assert(row.typeLabelBasis === 'NEUTRALIZED_CARDINALITY_RELATION_REVIEW', `${row.rowId}: reviewed mismatch label basis missing`);
+    } else {
+      assert(row.typeLabelKr === contract.typeLabelsKr[`PICKUP_${definitionTax.pickupCardinality}`], `${row.rowId}: normal pickup label mismatch`);
+      assert(row.typeLabelBasis === 'TAXONOMY_CARDINALITY', `${row.rowId}: normal pickup label basis mismatch`);
+    }
   } else {
     assert(row.mechanicFamily === 'WISH', `${row.rowId}: unsupported mechanic family ${row.mechanicFamily}`);
     assert(Array.isArray(row.pickupHeroes) && row.pickupHeroes.length === 0, `${row.rowId}: Wish row contains pickup heroes`);
+    assert(row.typeLabelKr === contract.typeLabelsKr.WISH, `${row.rowId}: Wish label mismatch`);
+    assert(row.typeLabelBasis === 'MECHANIC_FAMILY', `${row.rowId}: Wish label basis mismatch`);
     assert(row.deferredDetail?.kind === 'WISH_CANDIDATES', `${row.rowId}: Wish deferral missing`);
     assert(row.deferredDetail?.materializedHere === false, `${row.rowId}: Wish candidates materialized early`);
     assert(!Object.prototype.hasOwnProperty.call(row, 'wishCandidates'), `${row.rowId}: Wish candidate payload leaked`);
@@ -113,16 +128,23 @@ for (const group of output.dateGroups) {
 
 const renderable = output.rows.filter(row => row.image.canRenderImage).length;
 const placeholders = output.rows.length - renderable;
+const neutralizedRows = output.rows.filter(row => row.typeLabelBasis === 'NEUTRALIZED_CARDINALITY_RELATION_REVIEW');
+const mismatchDefinitions = new Set(neutralizedRows.map(row => row.bannerDefinitionId));
 assert(renderable === contract.expectedCanonicalPopulation.renderableOccurrences, `renderable ${renderable}`);
 assert(placeholders === contract.expectedCanonicalPopulation.placeholderOccurrences, `placeholders ${placeholders}`);
 assert(summary.imageDisplay.renderableRows === renderable, 'summary renderable mismatch');
 assert(summary.imageDisplay.placeholderRows === placeholders, 'summary placeholder mismatch');
+assert(summary.pickupSummary.definitionCardinalityRelationMismatchCount === mismatchDefinitions.size, 'summary mismatch definition count mismatch');
+assert(summary.pickupSummary.neutralizedDisplayRowCount === neutralizedRows.length, 'summary neutralized row count mismatch');
+assert(JSON.stringify(summary.pickupSummary.neutralizedDisplayRowIds) === JSON.stringify(neutralizedRows.map(row => row.rowId)), 'summary neutralized row IDs mismatch');
 assert(summary.wishSummary.candidateListsMaterialized === 0, 'Wish candidates materialized in Stage 3-3');
 assert(output.policy.cpEventRelationsIncluded === false, 'CP/Event joined early');
 assert(output.policy.recurrenceHistoryIncluded === false, 'recurrence joined early');
 assert(output.policy.bannerTitlesInvented === false, 'banner title invented');
 assert(output.policy.heroRoutesInvented === false, 'hero route invented');
 assert(output.policy.fallbackAssetsInvented === false, 'fallback asset invented');
+assert(summary.semanticFreeze.stage2PickupRelationsTrimmed === false, 'Stage 2 pickup relations trimmed');
+assert(summary.semanticFreeze.stage2PickupTaxonomyRewritten === false, 'Stage 2 pickup taxonomy rewritten');
 
 if (failures.length > 0) {
   console.error(JSON.stringify({ status: 'FAIL_BANNER_STAGE3_3_BASIC_TABLE_VALIDATION', failures }, null, 2));
@@ -137,5 +159,7 @@ console.log(JSON.stringify({
   placeholders,
   pickupRows: output.rows.filter(row => row.mechanicFamily === 'PICKUP').length,
   wishRows: output.rows.filter(row => row.mechanicFamily === 'WISH').length,
+  neutralizedRows: neutralizedRows.length,
+  mismatchDefinitions: mismatchDefinitions.size,
   reviewCount: output.reviews?.length ?? 0
 }, null, 2));
