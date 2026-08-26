@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "stage": "skin-page-1",
+  "substage": "1-0",
+  "checkpoint": "input-contract",
+  "status": "ACCEPTED",
+  "purpose": "Freeze the authoritative inputs and ownership boundaries for Skin Stage 1 without reopening Hero Stage 5-5 skin semantics.",
+  "branchContext": "work/skin-stage1-0-input-contract",
+  "authoritativeInputs": {
+    "canonicalHeroIdentity": {
+      "path": "data/hero-name-master.v1.json",
+      "primaryKey": "heroId",
+      "expectedRecordCount": 267,
+      "reuseRule": "Reuse the existing canonical Hero identity. Do not rebuild playable-Hero population or name identity in Skin Stage 1."
+    },
+    "heroSkinSourceTrace": {
+      "path": "data/validation/hero-page-stage5-5-2-source-trace.v1.json",
+      "role": "Authoritative source/JOIN semantics for regular Hero skins, artwork resources, source order and acquisition encoding."
+    },
+    "heroSkinOutputContract": {
+      "path": "data/contracts/hero-page-stage5-5-3-output-contract.v1.json",
+      "role": "Accepted per-Hero normalized skin shape and ownership boundaries."
+    },
+    "heroSkinFinalGate": {
+      "path": "data/validation/hero-page-stage5-5-5-final.v1.json",
+      "expectedStatus": "PASS",
+      "expectedCompletion": "STAGE_5_5_COMPLETE",
+      "expectedCanonicalHeroCount": 267,
+      "expectedCanonicalSkinCount": 540,
+      "role": "Frozen upstream completion gate and regression baseline."
+    }
+  },
+  "sourceConfigData": {
+    "heroInfo": "data/configdata/ConfigDataHeroInfo.json",
+    "heroSkinInfo": "data/configdata/ConfigDataHeroSkinInfo.json",
+    "charImageSkinResourceInfo": "data/configdata/ConfigDataCharImageSkinResourceInfo.json"
+  },
+  "frozenRelations": {
+    "membership": "ConfigDataHeroInfo.Skins_ID[] -> ConfigDataHeroSkinInfo.ID",
+    "ownerCrossCheck": "ConfigDataHeroSkinInfo.SpecifiedHero == canonical heroId",
+    "artwork": "ConfigDataHeroSkinInfo.CharImageSkinResource_ID -> ConfigDataCharImageSkinResourceInfo.ID",
+    "staticArtworkField": "ConfigDataCharImageSkinResourceInfo.Image",
+    "animatedResourceField": "ConfigDataCharImageSkinResourceInfo.SpineAssetPath",
+    "orderingSource": "ConfigDataHeroInfo.Skins_ID[] array position",
+    "orderingRule": "Preserve source array order exactly. Do not re-sort by skinId, Score, store UISort or acquisition category."
+  },
+  "acceptedBaseline": {
+    "canonicalHeroCount": 267,
+    "canonicalRegularSkinCount": 540,
+    "distinctSkinIdCount": 540,
+    "resolvedSkinRefCount": 540,
+    "ownerMismatchCount": 0,
+    "sharedSkinRefCount": 0,
+    "duplicateSkinIdCount": 0,
+    "staticArtworkResolvedCount": 540,
+    "animatedResourceResolvedCount": 540,
+    "acquisitionEncodedCount": 364,
+    "acquisitionUnencodedCount": 176
+  },
+  "populationScope": {
+    "includedClass": "REGULAR_HERO_SKIN",
+    "includedDefinition": "Canonical regular Hero skins already accepted by Hero Stage 5-5 through HeroInfo.Skins_ID[].",
+    "excluded": {
+      "baseHeroArtwork": "Owned by ConfigDataCharImageInfo.HeroPainting; not a regular skin record.",
+      "spHeroIllustration": "Owned by Hero Stage 5-4 SP data; do not synthesize SP illustration switching into the regular skin master.",
+      "soldierSkins": "Out of scope for this Hero skin pipeline.",
+      "unprovenSpecialAssets": "Do not admit assets merely because filenames or folders contain skin-like terms."
+    }
+  },
+  "acquisitionPolicy": {
+    "source": "ConfigDataHeroSkinInfo.GetPathType",
+    "encodedMappings": {
+      "2": "광휘의 메아리",
+      "3": "운명의 별짜기",
+      "4": "영웅 스킨 상점"
+    },
+    "missingValueState": "UNENCODED",
+    "rule": "Missing GetPathType is a source-data gap, not an acquisition category. Do not infer event/store/acquisition history in Stage 1."
+  },
+  "ownershipBoundaries": {
+    "skinStage1": "Canonical population admission and Skin-domain checkpointing only.",
+    "heroStage5_5": "Upstream authority for accepted regular skin membership, owner relation, source order, source image path, source Spine path and encoded acquisition semantics.",
+    "heroStage5_4": "Authority for SP existence, SP illustration switching, SP missions and SP-specific page data.",
+    "assetPipeline": "Extraction, conversion, hashing and web-serving output paths are deferred to Skin Stage 3.",
+    "releaseMetadata": "CN/KR release dates, KR future status, Korean skin names and supplemental acquisition history are deferred to Skin Stage 4.",
+    "futureSkinConsumer": "Future-skin-page eligibility must not be decided in Stage 1; it is derived only after release metadata is available."
+  },
+  "prohibitions": [
+    "Do not rescan raw Asset folders to redefine the canonical regular skin population.",
+    "Do not rebuild Hero identity or playable-Hero filtering.",
+    "Do not infer Hero ownership from skin names, filenames, folder names or numeric ID patterns.",
+    "Do not sort skins by skinId, Score, FixedStoreItemInfo.UISort or acquisition category.",
+    "Do not treat missing GetPathType as a single acquisition category.",
+    "Do not classify SP artwork as a regular Hero skin.",
+    "Do not assign HERO_PAGE_ONLY, FUTURE_SKIN_PAGE, BOTH or HIDDEN before release/admission metadata is established.",
+    "Do not perform asset extraction/conversion or frontend consumer generation in Stage 1-0."
+  ],
+  "requiredDownstreamChecks": {
+    "upstreamFinalGateStatus": "PASS",
+    "canonicalHeroCount": 267,
+    "canonicalSkinCount": 540,
+    "distinctSkinIdCount": 540,
+    "unresolvedSkinRefs": 0,
+    "ownerMismatches": 0,
+    "sharedSkinRefs": 0,
+    "duplicateSkinIds": 0,
+    "missingStaticArtwork": 0,
+    "missingAnimatedResource": 0
+  },
+  "completionRule": "Skin Stage 1-0 is complete when this contract is committed and all referenced upstream artifacts exist on the same repository snapshot with the accepted Hero Stage 5-5 baseline intact.",
+  "nextAction": "Skin 1-1: materialize the 540 accepted regular Hero skins as the Skin-domain canonical population without changing the frozen upstream semantics."
+}
