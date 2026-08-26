@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-4",
+  "status": "VERIFIED_RELATION_CORRECTION_CHECKPOINT",
+  "purpose": "Preserve relation corrections that are explicitly supported by raw ConfigData and canonical Hero identity without mutating the assembled Korean schedule during Stage 1 investigation.",
+  "corrections": [
+    {
+      "occurrenceRecordKey": "kr-banner:20270331:4",
+      "field": "sourceRecordKey",
+      "observedValue": "cardpool:263",
+      "correctedValue": "cardpool:265",
+      "status": "VERIFIED_CORRECTION",
+      "reason": "The occurrence is bannerCode 7001 / 寒龙冰棘之征 / 빙설 심연의 지배자. ConfigDataCardPoolInfo ID 263 is 猩红圣光之复颂, while ID 265 is 寒龙冰棘之征 with Icon_7001 and UpHeroList [99225]. Canonical Hero ID 99225 is 冰渊凌御者 / 빙설 심연의 지배자. The earlier 2026-10-07 occurrence of bannerCode 7001 also points to cardpool:265.",
+      "evidence": {
+        "scheduleOccurrence": {
+          "recordKey": "kr-banner:20270331:4",
+          "bannerCode": "7001",
+          "sourceRecordKey": "cardpool:263",
+          "nameCn": "寒龙冰棘之征",
+          "heroKr": "빙설 심연의 지배자"
+        },
+        "rejectedSource": {
+          "cardPoolId": 263,
+          "nameCn": "猩红圣光之复颂",
+          "toggleImage": "UI/Icon/SelectCardHero_ABS/Icon_6902.png"
+        },
+        "acceptedSource": {
+          "cardPoolId": 265,
+          "nameCn": "寒龙冰棘之征",
+          "toggleImage": "UI/Icon/SelectCardHero_ABS/Icon_7001.png",
+          "upHeroIds": [99225]
+        },
+        "canonicalHero": {
+          "heroId": 99225,
+          "nameCn": "冰渊凌御者",
+          "nameKr": "빙설 심연의 지배자",
+          "status": "verified"
+        },
+        "comparisonOccurrence": {
+          "recordKey": "kr-banner:20261007:8",
+          "bannerCode": "7001",
+          "sourceRecordKey": "cardpool:265"
+        }
+      },
+      "mutationPolicy": "DO_NOT_MUTATE_SOURCE_SCHEDULE_IN_STAGE1",
+      "consumerPolicy": "Later repair/consumer generation must apply this checkpoint or update the source schedule only after an explicit repair step."
+    }
+  ],
+  "correctionCount": 1,
+  "nextUse": "Banner Stage 1-4 relation census and all later banner relation validation."
+}
