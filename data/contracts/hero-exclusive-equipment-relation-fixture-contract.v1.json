@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "stage": "B-2",
+  "status": "FROZEN",
+  "purpose": "Validate representative Hero <-> Exclusive Equipment ownership JOIN fixtures against the B-1 frozen EQUIPMENT_SKILL_HERO production source, including one independent MissionType 77 cross-check and explicit scope-boundary probes, without reopening source discovery.",
+  "dependsOn": {
+    "scopeContract": "data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json",
+    "sourceContract": "data/contracts/hero-exclusive-equipment-relation-source-contract.v1.json",
+    "priorSourceValidation": "data/validation/hero-exclusive-equipment-relation-stageB1-source-summary.v1.json",
+    "heroStage5_2Generated": "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
+    "heroStage5_2Validation": "data/validation/hero-page-stage5-2-final.v1.json",
+    "equipmentStage3_5Validation": "data/validation/equipment-stage3-5-exclusive-consumer-summary.v1.json"
+  },
+  "fixtureSelectionPolicy": {
+    "goal": "Exercise all four EquipmentType values represented by the early frozen Hero Stage 5-2 output and include a cross-source fixture whose Equipment ID is independently exposed by a verified MissionType 77 record.",
+    "equipmentTypeCoverage": [0, 1, 2, 3],
+    "selectionReason": "EquipmentType is not an ownership JOIN field, but covering weapon/armor/headgear/accessory fixtures demonstrates that the frozen resolver does not vary by display equipment category.",
+    "reusePolicy": "Reuse already validated Hero Stage 5-2 generated ownership records instead of rereading the 1.4MB EquipmentInfo blob. The direct source semantics were already fully validated 167/167 in B-1; B-2 tests representative manifestations and independent corroboration.",
+    "noAlternateResolverSearch": true
+  },
+  "positiveFixtures": [
+    {
+      "fixtureId": "weapon-aimeeda-404",
+      "hero": {
+        "heroId": 4,
+        "nameKr": "아멜다",
+        "nameCn": "艾梅达"
+      },
+      "equipment": {
+        "equipmentId": 404,
+        "nameCn": "■■■■",
+        "equipmentType": 0,
+        "acquisitionClass": "exclusive-equipment",
+        "acquisitionPathTypes": [46]
+      },
+      "ownership": {
+        "ownerHeroId": 4,
+        "ownerResolver": "ConfigDataEquipmentInfo.SkillHero",
+        "expectedPair": [4, 404]
+      },
+      "diagnosticCorroboration": {
+        "ownerNamePresentInDescription": true,
+        "productionAuthority": false
+      },
+      "expectedStatus": "VERIFIED"
+    },
+    {
+      "fixtureId": "armor-leon-416",
+      "hero": {
+        "heroId": 6,
+        "nameKr": "레온",
+        "nameCn": "利昂"
+      },
+      "equipment": {
+        "equipmentId": 416,
+        "nameCn": "青龙之胄",
+        "equipmentType": 1,
+        "acquisitionClass": "exclusive-equipment",
+        "acquisitionPathTypes": [46]
+      },
+      "ownership": {
+        "ownerHeroId": 6,
+        "ownerResolver": "ConfigDataEquipmentInfo.SkillHero",
+        "expectedPair": [6, 416]
+      },
+      "independentCrossValidation": {
+        "sourceKind": "MISSION_TYPE_77",
+        "heroId": 6,
+        "missionId": 31186,
+        "missionType": 77,
+        "param1EquipmentId": 416,
+        "param2RequiredLevel": 50,
+        "pairMatchesProductionOwnership": true,
+        "productionAuthority": false
+      },
+      "diagnosticCorroboration": {
+        "ownerNamePresentInDescription": true,
+        "productionAuthority": false
+      },
+      "expectedStatus": "VERIFIED"
+    },
+    {
+      "fixtureId": "headgear-grenier-415",
+      "hero": {
+        "heroId": 3,
+        "nameKr": "그레니어",
+        "nameCn": "格尼尔"
+      },
+      "equipment": {
+        "equipmentId": 415,
+        "nameCn": "逐梦之冠",
+        "equipmentType": 2,
+        "acquisitionClass": "exclusive-equipment",
+        "acquisitionPathTypes": [46]
+      },
+      "ownership": {
+        "ownerHeroId": 3,
+        "ownerResolver": "ConfigDataEquipmentInfo.SkillHero",
+        "expectedPair": [3, 415]
+      },
+      "diagnosticCorroboration": {
+        "ownerNamePresentInDescription": true,
+        "productionAuthority": false
+      },
+      "expectedStatus": "VERIFIED"
+    },
+    {
+      "fixtureId": "accessory-matthew-277",
+      "hero": {
+        "heroId": 1,
+        "nameKr": "매튜",
+        "nameCn": "马修"
+      },
+      "equipment": {
+        "equipmentId": 277,
+        "nameCn": "团结",
+        "equipmentType": 3,
+        "acquisitionClass": "exclusive-equipment",
+        "acquisitionPathTypes": [46]
+      },
+      "ownership": {
+        "ownerHeroId": 1,
+        "ownerResolver": "ConfigDataEquipmentInfo.SkillHero",
+        "expectedPair": [1, 277]
+      },
+      "diagnosticCorroboration": {
+        "ownerNamePresentInDescription": true,
+        "productionAuthority": false
+      },
+      "expectedStatus": "VERIFIED"
+    }
+  ],
+  "negativeBoundaryFixtures": [
+    {
+      "fixtureId": "general-equipment-class-boundary",
+      "inputClasses": ["launch", "legacy-additional", "current-additional"],
+      "populationCount": 206,
+      "expectedAdmission": false,
+      "expectedResolverEvaluation": false,
+      "reason": "General Equipment eligibility is outside Stage B and must be rejected before SkillHero ownership evaluation."
+    },
+    {
+      "fixtureId": "unresolved-no-path-2013-boundary",
+      "equipmentId": 2013,
+      "acquisitionClass": "unresolved-no-path",
+      "expectedAdmission": false,
+      "expectedResolverEvaluation": false,
+      "reason": "Equipment 2013 is explicitly outside the frozen 167 exclusive-equipment population."
+    }
+  ],
+  "validationRules": [
+    "Each positive fixture equipmentId must belong to acquisitionClass exclusive-equipment.",
+    "Each positive fixture must preserve PathType 46 as population-support evidence.",
+    "Each positive fixture ownerResolver must be ConfigDataEquipmentInfo.SkillHero and ownerHeroId must exactly equal the fixture canonical heroId.",
+    "The four positive fixtures together must cover EquipmentType 0, 1, 2, and 3.",
+    "Leon Equipment 416 must match the verified MissionType 77 Param1 Equipment 416 cross-validation fixture.",
+    "Description owner-name presence may corroborate a verified pair but must not create or repair a pair.",
+    "General Equipment and Equipment 2013 must be rejected before ownership resolver evaluation.",
+    "No heuristic source and no alternate production resolver may contribute a fixture result."
+  ],
+  "admissionDecision": {
+    "productionResolver": "EQUIPMENT_SKILL_HERO",
+    "fixtureContradictionPolicy": "Any mismatch between a positive fixture and an admitted independent cross-check blocks B-2 and reopens B-1 source investigation. No mismatch is permitted to be silently patched.",
+    "downstreamOnPass": "B-3 may generate the full 167-record canonical ownership edge set from the frozen EQUIPMENT_SKILL_HERO source."
+  },
+  "completion": "B-2 is complete when four EquipmentType-diverse positive fixtures resolve by the frozen SkillHero source, Leon 416 agrees with MissionType 77, excluded populations are rejected before resolver evaluation, and contradiction/heuristic counts are zero."
+}
