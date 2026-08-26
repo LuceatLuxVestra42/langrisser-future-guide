@@ -1,0 +1,38 @@
+name: Banner Stage 3-6 Recurrence Pickup Log Consumer
+
+on:
+  push:
+    paths:
+      - '.github/workflows/banner-stage3-6-recurrence-pickup-log-consumer.yml'
+      - 'scripts/finalize-banner-stage3-6-recurrence-pickup-log-consumer.mjs'
+      - 'scripts/validate-banner-stage3-6-recurrence-pickup-log-consumer.mjs'
+      - 'data/contracts/banner-stage3-6-recurrence-pickup-log-consumer.v1.json'
+      - 'data/validation/banner-stage3-3-basic-table-summary.v1.json'
+      - 'data/generated/banner-stage3-3-basic-table-consumer.v1.json'
+      - 'data/validation/banner-stage3-5-cp-event-summary.v1.json'
+      - 'data/generated/banner-stage3-5-cp-event-consumer.v1.json'
+      - 'data/generated/banner-recurrence-history.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Materialize Banner Stage 3-6 recurrence pickup log consumer
+        run: node scripts/finalize-banner-stage3-6-recurrence-pickup-log-consumer.mjs
+      - name: Validate Banner Stage 3-6 recurrence pickup log consumer
+        run: node scripts/validate-banner-stage3-6-recurrence-pickup-log-consumer.mjs
+      - name: Persist Banner Stage 3-6 checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/banner-stage3-6-recurrence-pickup-log-consumer.v1.json data/validation/banner-stage3-6-recurrence-pickup-log-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No Banner Stage 3-6 checkpoint changes"
+            exit 0
+          fi
+          git commit -m "Freeze Banner Stage 3-6 recurrence pickup log checkpoint"
+          git push
