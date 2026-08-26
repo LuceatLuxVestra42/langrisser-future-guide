@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "stage": "skin-page-2",
+  "substage": "2-2",
+  "checkpoint": "reverse-index-contract",
+  "status": "ACCEPTED",
+  "inputContract": "data/contracts/skin-stage2-input-contract.v1.json",
+  "authoritativeSource": "data/generated/skin-stage2-1-forward-relation.v1.json",
+  "authoritativeHeroKeyspace": "data/hero-name-master.v1.json",
+  "upstreamValidation": "data/validation/skin-stage2-1-final.v1.json",
+  "purpose": "Materialize the complete Hero -> ordered Skin reverse index for all 267 canonical Heroes by inverting the accepted 540-edge Stage 2-1 Skin -> Hero relation without reopening raw ConfigData ownership semantics.",
+  "output": "data/generated/skin-stage2-2-reverse-index.v1.json",
+  "recordShape": {
+    "heroId": "integer / canonical Hero primary key",
+    "skinIds": "integer[] / zero-or-many Skin foreign keys ordered by ascending frozen sourceOrder"
+  },
+  "cardinality": "Hero -> Skin = ZERO_OR_MANY",
+  "orderingRule": "Within each Hero entry, skinIds must be ordered by ascending sourceOrder from the accepted Stage 2-1 forward relation. sourceOrder itself is not copied into the reverse-index consumer record.",
+  "requiredChecks": {
+    "heroEntryCount": 267,
+    "distinctHeroIdCount": 267,
+    "heroWithSkinsCount": 235,
+    "heroWithoutSkinsCount": 32,
+    "reverseEdgeCount": 540,
+    "distinctReverseSkinIdCount": 540,
+    "unknownForwardHeroIdCount": 0,
+    "duplicateReverseSkinIdCount": 0,
+    "forwardReverseOwnerMismatchCount": 0,
+    "forwardReverseMissingEdgeCount": 0,
+    "forwardReverseExtraEdgeCount": 0,
+    "sourceOrderMismatchCount": 0
+  },
+  "prohibitions": [
+    "Do not read raw ConfigData or Hero Stage 5-5 as a new ownership or ordering source.",
+    "Do not omit Heroes with zero regular skins; all 267 canonical heroIds must have one reverse-index entry.",
+    "Do not re-sort skinIds by skinId, name, Score, UISort, release state, acquisition metadata, filename or asset path.",
+    "Do not introduce releaseStatus, displayTarget, KR_FUTURE, localization, acquisition or asset-export fields.",
+    "Do not synthesize or renumber sourceOrder values."
+  ],
+  "completionRule": "2-2 completes only when exactly 267 canonical Hero entries are emitted, exactly 235 contain one-or-more skinIds, exactly 32 contain an empty skinIds array, the reverse index contains exactly the same 540 Skin -> Hero edges as Stage 2-1, and every per-Hero skinIds list preserves ascending Stage 2-1 sourceOrder.",
+  "nextAction": "Skin 2-3: prove full forward/reverse relation parity and publish the accepted bidirectional relation checkpoint for downstream consumers."
+}
