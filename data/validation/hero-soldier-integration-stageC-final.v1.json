@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-integration-stageC-final/v1",
+  "stage": "C-5",
+  "checkpoint": "C-FINAL",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "pipelineStatus": "FINAL_FROZEN",
+  "purpose": "Close Stage C using only frozen C-0 through C-4 checkpoints; do not reread ConfigData, canonical relation data, indexes, Hero shards, Soldier records, or frontend source.",
+  "sourcePolicy": "C-5 reads exactly five Stage C checkpoint JSON files (C-0, C-1, C-2, C-3, C-4) and validates their frozen blob identities, acceptance states, counts, zero-error gates, and cross-stage consistency.",
+  "sources": {
+    "c0": {
+      "path": "data/validation/hero-soldier-integration-stageC-0-summary.v1.json",
+      "expectedGitBlobSha": "8ff0dbc475e4ca306bbed4c7aa4666d40af2c5b9",
+      "actualGitBlobSha": "8ff0dbc475e4ca306bbed4c7aa4666d40af2c5b9",
+      "matchesFrozenSnapshot": true
+    },
+    "c1": {
+      "path": "data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json",
+      "expectedGitBlobSha": "c8a2d96ff5fce0dffb6ffbe89b92d5c37cf78bc3",
+      "actualGitBlobSha": "c8a2d96ff5fce0dffb6ffbe89b92d5c37cf78bc3",
+      "matchesFrozenSnapshot": true
+    },
+    "c2": {
+      "path": "data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json",
+      "expectedGitBlobSha": "2c1efc5bc324b2f0f3b37db666aafe8633a5a157",
+      "actualGitBlobSha": "2c1efc5bc324b2f0f3b37db666aafe8633a5a157",
+      "matchesFrozenSnapshot": true
+    },
+    "c3": {
+      "path": "data/validation/hero-soldier-integration-stageC-3-special-fixtures.v1.json",
+      "expectedGitBlobSha": "a729e5580d34c06fe11c108cbf2700381bd3ca39",
+      "actualGitBlobSha": "a729e5580d34c06fe11c108cbf2700381bd3ca39",
+      "matchesFrozenSnapshot": true
+    },
+    "c4": {
+      "path": "data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json",
+      "expectedGitBlobSha": "bebc39e3ab7ee1da04e9418315f93d3107387a4c",
+      "actualGitBlobSha": "bebc39e3ab7ee1da04e9418315f93d3107387a4c",
+      "matchesFrozenSnapshot": true
+    }
+  },
+  "expected": {
+    "heroes": 267,
+    "soldiers": 224,
+    "pairs": 5977
+  },
+  "checks": {
+    "onlyStageCCheckpointsRead": true,
+    "c0Accepted": true,
+    "c1Accepted": true,
+    "c2Accepted": true,
+    "c3Accepted": true,
+    "c4Accepted": true,
+    "allCheckpointSnapshotsFrozen": true,
+    "c0Population": true,
+    "c0NoBlockingMismatch": true,
+    "c1Population": true,
+    "c1PairParityClean": true,
+    "c1AllSixDifferencesZero": true,
+    "c2Population": true,
+    "c2StructuralIntegrityClean": true,
+    "c3SpecialRegressionClean": true,
+    "c4ProductionBoundaryClean": true,
+    "c4OwnershipChecksAllTrue": true
+  },
+  "summary": {
+    "heroCount": 267,
+    "soldierCount": 224,
+    "canonicalPairCount": 5977,
+    "c1AllPairDifferences": 0,
+    "c1UnknownOrDuplicateIdentityErrors": 0,
+    "c2StructuralIdentityErrors": 0,
+    "c3SemanticFixtureCount": 6,
+    "c3SemanticFixtureFailures": 0,
+    "c4BoundaryViolations": 0,
+    "failedCheckCount": 0,
+    "hardErrorCount": 0,
+    "nonBlockingReviewCount": 5
+  },
+  "nonBlockingReviews": [
+    {
+      "code": "SOLDIER_KR_NAME_UNRESOLVED",
+      "count": 41,
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "Korean display-name absence is presentation-only and must never remove or alter a canonical soldierId reference.",
+      "sourceStage": "C-2"
+    },
+    {
+      "code": "RELEASE_DATE_UNRESOLVED",
+      "count": 213,
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "Release metadata is outside C-2 identity/resolution integrity.",
+      "sourceStage": "C-2"
+    },
+    {
+      "code": "ROUTE_IMPLEMENTATION_SEPARATE_FROM_IDENTITY",
+      "count": null,
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "C-2 validates stable IDs and Soldier siteId round-trip metadata, not deployed click/route behavior.",
+      "sourceStage": "C-2"
+    },
+    {
+      "code": "PRESENTATION_METADATA_INCOMPLETE",
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "Localization/release/assets cannot mutate membership IDs.",
+      "sourceStage": "C-4"
+    },
+    {
+      "code": "HERO_SOLDIER_FRONTEND_NOT_YET_IMPLEMENTED",
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "C-4 is the production ownership boundary; deployed navigation behavior is a later UI Integration QA concern.",
+      "sourceStage": "C-4"
+    }
+  ],
+  "hardErrors": [],
+  "finalBoundary": {
+    "relationSemanticsOwner": "A-stage canonical relation pipeline",
+    "offlineProjectionOwners": [
+      "byHero",
+      "bySoldier"
+    ],
+    "productionMembershipConsumers": [
+      "Hero final soldiers.ids",
+      "Soldier final heroes.finalHeroIds"
+    ],
+    "frontendRole": "presentation/navigation consumer only",
+    "runtimeRelationRecomputationForbidden": true,
+    "rawConfigDataRelationReadForbidden": true,
+    "nameJoinForbidden": true,
+    "idArithmeticInferenceForbidden": true,
+    "arbitraryPairPatchForbidden": true
+  },
+  "decision": "C-5 PASS_WITH_REVIEW. Stage C is COMPLETE and FINAL_FROZEN at 267 Heroes, 224 Soldiers, and 5,977 reciprocal Hero-Soldier pairs with zero hard structural, parity, identity, special-fixture, or production-boundary errors. Remaining reviews are non-blocking presentation/UI-integration concerns only.",
+  "nextStartPoint": "Stage C is closed. Proceed to frontend/UI Integration implementation and route/click/back/404/mobile QA while consuming only the frozen final Hero/Soldier membership consumers."
+}
