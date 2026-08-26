@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-1",
+  "status": "PASS",
+  "input": "data/investigation/banner-stage1-1-source-census.v1.json",
+  "checks": {
+    "stage1_0ScopeContractPreserved": true,
+    "sourceFamilyCount": 11,
+    "confirmedRepositorySourceFamilyCount": 7,
+    "externalReadOnlyReferenceCount": 3,
+    "historicalLocalMissingInputCount": 1,
+    "rawCardPoolSourceConfirmed": true,
+    "verifiedOverrideCheckpointConfirmed": true,
+    "overrideManualReplacementCount": 4,
+    "overrideLegacyReusableCount": 5,
+    "currentKrScheduleConfirmed": true,
+    "currentKrScheduleRecordCount": 94,
+    "currentKrScheduleStartDate": "2026-09-02",
+    "canonicalHeroMasterConfirmed": true,
+    "canonicalHeroCount": 267,
+    "bannerAssetDirectoryConfirmed": true,
+    "pictureNoticeAssetDirectoryConfirmed": true,
+    "historicalBannerDataExpectedCountFromLegacyValidator": 248,
+    "historicalBannerDataPresentAtDataPath": false,
+    "missingHistoricalBannerDataBlocksNextStage": false,
+    "finalBannerIdDecided": false,
+    "finalBannerTypeEnumDecided": false,
+    "rowGrainDecided": false,
+    "assetDeepCensusPerformed": false,
+    "guessBasedJoinIntroduced": false
+  },
+  "decision": "Stage 1-1 source census is complete. Existing verified/reusable repository artifacts are separated from raw ConfigData, assembled KR schedule data, asset collections, legacy local inputs, and external read-only references. The missing historical local banner-data.v1.json is recorded but does not block Stage 1-2 because the repository contains CardPoolInfo plus current schedule and override checkpoints.",
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-2",
+    "task": "Row-grain census",
+    "primaryPopulation": "data/kr-banner-schedule.v1.json",
+    "primaryRawCrosscheck": "data/configdata/ConfigDataCardPoolInfo.json",
+    "preserveCheckpoint": "data/banner-overrides.v1.json"
+  }
+}
