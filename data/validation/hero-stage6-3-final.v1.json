@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "stage": "hero-page-6-3",
+  "checkpoint": "full-267-hero-generation",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/hero-stage6-3-full-generation.v1.json",
+  "sources": {
+    "data/contracts/hero-stage6-3-full-generation.v1.json": {
+      "gitBlobSha": "a9ff920b2aa4aeba344f6837e6fafd0e0e655e4e"
+    },
+    "data/generated/hero-detail-stage6-1.v1.json": {
+      "gitBlobSha": "a412a0c1449590b9e81f4bb5c523c0414498a1be"
+    },
+    "data/validation/hero-stage6-1-final.v1.json": {
+      "gitBlobSha": "675b39b591fcab7517309cff7d735287d8a9c107"
+    },
+    "data/validation/hero-stage6-2-final.v1.json": {
+      "gitBlobSha": "0adad661db297ec9ee8555576e2b4e89a62d16ee"
+    },
+    "data/generated/hero-basic-combat.v1.json": {
+      "gitBlobSha": "1661efec786de37b00adcef02839b607a947765f"
+    },
+    "data/validation/hero-basic-combat-stage4-5-summary.v1.json": {
+      "gitBlobSha": "6352647f024a9249003b7e99383843caf44653c3"
+    },
+    "data/validation/hero-page-stage5-integration-review.v1.json": {
+      "gitBlobSha": "54317baa86c5efbcff3139c298683edc3b70b9af"
+    },
+    "data/generated/hero-page-stage5-1-bonds-final.v1.json": {
+      "gitBlobSha": "5be989e9d0723782f491dc3005a11c0ad3143c43"
+    },
+    "data/generated/hero-page-stage5-2-exclusive-central.v1.json": {
+      "gitBlobSha": "6c34231f114177d5612947533f57322ba9bf8578"
+    },
+    "data/generated/hero-page-soldiers-stage5-3.v1.json": {
+      "gitBlobSha": "b97beae7aa58c573f16919cf731250bfc359d58e"
+    },
+    "data/validation/hero-soldier-relation-validation.v1.json": {
+      "gitBlobSha": "7c38a07f25c7ee3829e7cc0d699d0ec4bbc28638"
+    },
+    "data/generated/hero-page-stage5-4-sp.v1.json": {
+      "gitBlobSha": "d281dbf094939ae34a5c3e8fbd4f4225bd065fd9"
+    },
+    "data/hero-page-stage5-5-3.v1.json": {
+      "gitBlobSha": "dd56c47602b2aee42001b8a32f1830769d5c44c1"
+    },
+    "data/generated/hero-exclusive-equipment-relations.v1.json": {
+      "gitBlobSha": "33caa16212a5a71195015e05c815024fb62e6be6"
+    },
+    "data/validation/hero-exclusive-equipment-relation-stageB4-validation.v1.json": {
+      "gitBlobSha": "8bfb68bd011fdcccb234e557dbda9c64c9ec3623"
+    }
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "generatedHeroCount": 267,
+    "missingHeroCount": 0,
+    "duplicateHeroCount": 0,
+    "sourceLocatorMismatchCount": 0,
+    "stage4RegressionMismatchCount": 0,
+    "stage5RegressionMismatchCount": 0,
+    "exclusiveEquipmentRelationMismatchCount": 0,
+    "heroSoldierRelationMismatchCount": 0,
+    "spRelationMismatchCount": 0,
+    "requiredHeaderMissingCount": 0,
+    "structuralPassCount": 267,
+    "structuralFailCount": 0,
+    "publicationPassCount": 0,
+    "publicationReviewCount": 267,
+    "siteUsableCount": 267,
+    "releasedSpCount": 25,
+    "notReleasedSpCount": 242,
+    "heroSoldierRelationCount": 5977,
+    "exclusiveEquipmentRelationCount": 167,
+    "inheritedSoldierReviewHeroCount": 267,
+    "stageBState": "B4_CANONICAL_RELATION_ADOPTED_B5_B6_DEFERRED_TO_6_4",
+    "stageB5ParityMismatchCount": 0,
+    "hardErrorCount": 0
+  },
+  "upstreamGates": {
+    "stage4": "PASS/COMPLETE",
+    "stage5": "PASS/STAGE_5_COMPLETE",
+    "stage61": "PASS/COMPLETE",
+    "stage62": "PASS/COMPLETE",
+    "heroSoldierRelation": "PASS",
+    "heroExclusiveEquipmentB4": "PASS/COMPLETE"
+  },
+  "nonBlockingReviews": [
+    {
+      "owner": "5-3 presentation metadata",
+      "issue": "41 referenced Soldier records still have pending/missing Korean display names.",
+      "blockingStage5Integration": false
+    },
+    {
+      "owner": "5-5 presentation metadata",
+      "issue": "176 regular skins have source-omitted GetPathType and remain UNENCODED by policy.",
+      "blockingStage5Integration": false
+    },
+    {
+      "owner": "5-5 localization",
+      "issue": "CV/faction/origin/skin Korean localization may be layered later without reopening source semantics.",
+      "blockingStage5Integration": false
+    },
+    {
+      "owner": "asset pipeline",
+      "issue": "Source asset paths still require extraction/web-delivery conversion outside Stage 5 semantic integration.",
+      "blockingStage5Integration": false
+    },
+    {
+      "owner": "Hero Stage 6-3 publication classification",
+      "issue": "267 Hero records inherit presentation-only REVIEW while all structurally valid records remain siteUsable=true.",
+      "blockingStage63Completion": false
+    },
+    {
+      "owner": "Hero-exclusive Equipment Stage B",
+      "issue": "Stage 6-3 consumes the frozen B-4 canonical ownership relation only. B-5/B-6 consumer-index admission is intentionally deferred to Stage 6-4 so Stage 6-3 output stays invariant to derived-index availability.",
+      "blockingStage63Completion": false
+    }
+  ],
+  "failedHeroes": [],
+  "hardErrors": [],
+  "decision": "Hero Stage 6-3 COMPLETE. 267/267 Hero details materialized with 267 structural PASS, 267 publication REVIEW, zero structural FAIL, and zero hard errors."
+}
