@@ -1,0 +1,82 @@
+name: Banner Stage 3-8 Regression Freeze
+
+on:
+  push:
+    branches:
+      - main
+      - freeze/banner-stage3-8
+    paths:
+      - '.github/workflows/banner-stage3-8-regression-freeze.yml'
+      - 'data/contracts/banner-stage3-*.json'
+      - 'data/generated/banner-stage2-production-manifest.v1.json'
+      - 'data/generated/banner-stage3-*.json'
+      - 'data/validation/banner-stage3-*.json'
+      - 'scripts/finalize-banner-stage3-8-regression-freeze.mjs'
+      - 'scripts/validate-banner-stage3-*.mjs'
+      - 'src/routes/banners.tsx'
+      - 'src/lib/banner-page.server.ts'
+      - 'src/lib/banner-page.functions.ts'
+      - 'src/routeTree.gen.ts'
+      - 'package.json'
+      - 'bun.lock'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: banner-stage3-8-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression-freeze:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Re-run frozen Stage 3 validators
+        run: |
+          node scripts/validate-banner-stage3-0-input-contract.mjs
+          node scripts/validate-banner-stage3-1-asset-relation.mjs
+          node scripts/validate-banner-stage3-2-display-metadata.mjs
+          node scripts/validate-banner-stage3-3-basic-table-consumer.mjs
+          node scripts/validate-banner-stage3-4-wish-consumer.mjs
+          node scripts/validate-banner-stage3-5-cp-event-consumer.mjs
+          node scripts/validate-banner-stage3-6-recurrence-pickup-log-consumer.mjs
+          node scripts/validate-banner-stage3-7-frontend-integration.mjs
+
+      - name: Build production frontend
+        run: bun run build
+
+      - name: Verify generated banner route
+        run: |
+          grep -Fq "'/banners'" src/routeTree.gen.ts
+          grep -Fq '배너표' src/routes/banners.tsx
+          grep -Fq '배너+이벤트' src/routes/banners.tsx
+          grep -Fq 'CP배너' src/routes/banners.tsx
+          grep -Fq '픽업 log' src/routes/banners.tsx
+
+      - name: Materialize Stage 3 freeze checkpoint
+        run: node scripts/finalize-banner-stage3-8-regression-freeze.mjs
+
+      - name: Validate Stage 3 freeze checkpoint
+        run: node scripts/validate-banner-stage3-8-regression-freeze.mjs
+
+      - name: Persist Stage 3 freeze checkpoint
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/banner-stage3-8-regression-freeze-summary.v1.json data/generated/banner-stage3-production-manifest.v1.json src/routeTree.gen.ts
+          if git diff --cached --quiet; then
+            echo 'Stage 3 freeze checkpoint already current.'
+            exit 0
+          fi
+          git commit -m 'Persist Banner Stage 3-8 freeze checkpoint'
+          git push
