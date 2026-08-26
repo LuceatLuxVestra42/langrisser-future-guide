@@ -18,7 +18,7 @@
     "serverFunctionsModule": "src/lib/equipment-page.functions.ts",
     "routes": {
       "general": {
-        "file": "src/routes/equipment_.tsx",
+        "file": "src/routes/equipment.tsx",
         "path": "/equipment",
         "loader": "getGeneralEquipmentPageData"
       },
@@ -33,7 +33,7 @@
         "loader": "getEquipmentDetailPageData"
       }
     },
-    "routeNesting": "Use the trailing-underscore non-nested file convention so the three Equipment routes are root-level siblings. /equipment is not a layout parent of exclusive/detail.",
+    "routeNesting": "Use src/routes/equipment.tsx for the standalone /equipment page. Use the trailing-underscore non-nested prefix only on equipment_.$equipmentId.tsx and equipment_.exclusive.tsx so detail/exclusive keep /equipment/... URLs but are root-level siblings, not children that require an Outlet from /equipment.",
     "dataBoundary": "Route modules call createServerFn wrappers. Raw generated JSON is imported only by the .server.ts module and is not directly imported by route components.",
     "jsonModuleSupport": "tsconfig compilerOptions.resolveJsonModule=true is required for typed static server-only JSON imports."
   },

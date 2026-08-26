@@ -146,6 +146,20 @@ const routeTree = read("src/routeTree.gen.ts");
 for (const path of ["/equipment", "/equipment/exclusive", "/equipment/$equipmentId"]) {
   assert(routeTree.includes(path), `generated route tree missing ${path}`);
 }
+const detailRouteTreeBlock = routeTree.match(
+  /const EquipmentEquipmentIdRoute = EquipmentEquipmentIdRouteImport\.update\([\s\S]*?\n\} as any\)/,
+)?.[0] ?? "";
+const exclusiveRouteTreeBlock = routeTree.match(
+  /const EquipmentExclusiveRoute = EquipmentExclusiveRouteImport\.update\([\s\S]*?\n\} as any\)/,
+)?.[0] ?? "";
+assert(
+  detailRouteTreeBlock.includes("getParentRoute: () => rootRouteImport"),
+  "detail route is nested under /equipment instead of being a root-level sibling",
+);
+assert(
+  exclusiveRouteTreeBlock.includes("getParentRoute: () => rootRouteImport"),
+  "exclusive route is nested under /equipment instead of being a root-level sibling",
+);
 
 const summary = {
   version: 1,
