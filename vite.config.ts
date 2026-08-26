@@ -6,6 +6,37 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+import exclusiveEquipmentJson from "./data/generated/equipment_stage3_5_exclusive_consumer.json";
+import generalEquipmentJson from "./data/generated/equipment_stage3_3_general_list.json";
+
+type EquipmentIdRecord = {
+  equipmentId: number;
+};
+
+const generalEquipmentIds = (
+  generalEquipmentJson as unknown as { records: EquipmentIdRecord[] }
+).records.map((record) => record.equipmentId);
+
+const exclusiveEquipmentIds = (
+  exclusiveEquipmentJson as unknown as { detailRecords: EquipmentIdRecord[] }
+).detailRecords.map((record) => record.equipmentId);
+
+const equipmentIds = [...generalEquipmentIds, ...exclusiveEquipmentIds];
+
+if (equipmentIds.length !== 373 || new Set(equipmentIds).size !== 373) {
+  throw new Error(
+    `Expected 373 unique public equipment IDs for static pages; got ${equipmentIds.length} records / ${new Set(equipmentIds).size} unique.`,
+  );
+}
+
+const equipmentDetailPages = equipmentIds.map((equipmentId) => ({
+  path: `/equipment/${equipmentId}`,
+  prerender: {
+    enabled: true,
+    outputPath: `/equipment/${equipmentId}/index.html`,
+  },
+}));
+
 export default defineConfig({
   // GitHub Pages project site base path.
   vite: {
@@ -36,6 +67,21 @@ export default defineConfig({
           outputPath: "/banners/index.html",
         },
       },
+      {
+        path: "/equipment",
+        prerender: {
+          enabled: true,
+          outputPath: "/equipment/index.html",
+        },
+      },
+      {
+        path: "/equipment/exclusive",
+        prerender: {
+          enabled: true,
+          outputPath: "/equipment/exclusive/index.html",
+        },
+      },
+      ...equipmentDetailPages,
     ],
   },
 });
