@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "stage": "4-0",
+  "status": "FROZEN",
+  "purpose": "Freeze the frontend consumer boundary for the Equipment page before route/UI implementation. Stage 4 must consume validated Stage 3 equipment page payloads and the closed Stage B exclusive-equipment ownership indexes without reopening ConfigData semantics or re-deriving ownership.",
+  "dependsOn": {
+    "stage3WholeSummary": "data/validation/equipment-stage3-7-whole-stage-summary.v1.json",
+    "stage3PageSchema": "data/contracts/equipment-stage3-1-page-schema.v1.json",
+    "generalList": "data/generated/equipment_stage3_3_general_list.json",
+    "generalDetail": "data/generated/equipment_stage3_4_general_detail.json",
+    "exclusiveConsumer": "data/generated/equipment_stage3_5_exclusive_consumer.json",
+    "specialUnresolved": "data/generated/equipment_stage3_6_special_unresolved.json",
+    "stageBFinal": "data/validation/hero-exclusive-equipment-relation-stageB-final.v1.json",
+    "stageBConsumerContract": "data/contracts/hero-exclusive-equipment-relation-consumer-contract.v1.json",
+    "exclusiveByEquipment": "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+    "heroMaster": "data/hero-name-master.v1.json"
+  },
+  "expected": {
+    "canonicalEquipment": 390,
+    "publicPageReady": 373,
+    "general": 206,
+    "exclusive": 167,
+    "hiddenSpecial": 16,
+    "hold": 1,
+    "holdEquipmentIds": [
+      2013
+    ],
+    "heroPopulation": 267,
+    "exclusiveOwnershipKeys": 167,
+    "exclusiveOwnershipRelations": 167,
+    "generalSiteTabs": {
+      "1": 94,
+      "2": 80,
+      "3": 32
+    },
+    "filterTaxonomy": [
+      {
+        "group": "weapon",
+        "groupKo": "무기",
+        "subtypes": [
+          "sword",
+          "dagger",
+          "spear",
+          "axe",
+          "hammer",
+          "bow",
+          "staff"
+        ]
+      },
+      {
+        "group": "armor",
+        "groupKo": "갑옷",
+        "subtypes": [
+          "heavy",
+          "light",
+          "cloth"
+        ]
+      },
+      {
+        "group": "headgear",
+        "groupKo": "투구",
+        "subtypes": [
+          "heavy",
+          "light",
+          "cloth"
+        ]
+      },
+      {
+        "group": "accessory",
+        "groupKo": "악세사리",
+        "subtypes": [
+          "attack",
+          "intellect",
+          "defense",
+          "healing"
+        ]
+      }
+    ]
+  },
+  "routes": {
+    "generalList": {
+      "path": "/equipment",
+      "source": "data/generated/equipment_stage3_3_general_list.json#records",
+      "admission": "general equipment only: launch, legacy-additional, current-additional"
+    },
+    "exclusiveList": {
+      "path": "/equipment/exclusive",
+      "source": "data/generated/equipment_stage3_5_exclusive_consumer.json#listRecords",
+      "admission": "exclusive-equipment only"
+    },
+    "detail": {
+      "path": "/equipment/$equipmentId",
+      "routeKey": "equipmentId",
+      "sources": [
+        "data/generated/equipment_stage3_4_general_detail.json#records",
+        "data/generated/equipment_stage3_5_exclusive_consumer.json#detailRecords"
+      ],
+      "resolution": "Resolve by exact numeric equipmentId across the two pairwise-disjoint public detail sets. If the ID is not in either public set, return the public not-found state; do not fall through to hidden/HOLD data."
+    }
+  },
+  "generalListUi": {
+    "tabSource": "record.siteTab",
+    "allowedTabs": [
+      1,
+      2,
+      3
+    ],
+    "singleActiveTab": true,
+    "filterSource": "data/generated/equipment_stage3_3_general_list.json#filters",
+    "groupSelection": "zero-or-one active group",
+    "subtypeSelection": "zero-or-one active subtype within the active group",
+    "multiSubtypeSelection": false,
+    "groupChangeRule": "Changing the active group clears an incompatible subtype selection.",
+    "persistenceRequirement": "Preserve the user's equipment list filter/tab UI state across revisit/reload, consistent with the site design requirement. Storage mechanism is an implementation choice for Stage 4-2.",
+    "taxonomyRule": "Use the generated filter taxonomy and order; do not reconstruct it from raw Label values in frontend code."
+  },
+  "displayPolicy": {
+    "name": {
+      "primary": "nameKr when non-null",
+      "fallback": "nameCn",
+      "rule": "A null nameKr is an explicit REVIEW state. Fallback display must not be written back or promoted to verified Korean metadata."
+    },
+    "icon": "Use the Stage 3 consumer icon field directly.",
+    "effectText": "Display Stage 3 effectName/effectText or effectSegments without rewriting the semantic content.",
+    "restriction": "Display the Stage 3 restriction block as supplied. Do not claim runtime-direct proof; current OR semantics remains structural-inference confidence 0.99.",
+    "releaseOrder": {
+      "tab1": "Do not claim exact historical chronology. Use the existing deterministic presentation order only.",
+      "tab2": "releaseGroupDate may be used for verified release-group ordering; do not invent order inside an equal release group.",
+      "tab3": "REVIEW_RELEASE_ORDER. sortIndex/equipmentId are deterministic fallback only and must not be labeled latest/release chronology.",
+      "exclusive": "Release chronology remains REVIEW for the current 167 records. Existing order is presentation order only."
+    }
+  },
+  "exclusiveOwnership": {
+    "scope": "exclusive-equipment only",
+    "ownershipInput": "data/generated/hero-exclusive-equipment-by-equipment.v1.json#byEquipmentId",
+    "lookup": "equipmentId -> heroIds[]",
+    "heroMetadataJoin": "Join returned heroId to data/hero-name-master.v1.json by exact heroId.",
+    "currentCardinality": "EXACTLY_ONE owner Hero per admitted exclusive Equipment under the frozen Stage B snapshot.",
+    "metadataSource": "data/generated/equipment_stage3_5_exclusive_consumer.json supplies equipment display/detail metadata only.",
+    "nonDuplication": "Do not generate a third ownership copy in Stage 4-0. Resolve owner Hero from the accepted B-5 byEquipment index at page composition time.",
+    "forbidden": [
+      "direct ConfigDataEquipmentInfo.SkillHero reads in Stage 4 page code",
+      "MissionType 77 as production ownership authority",
+      "ArmyIds/JobIds equipability as ownership",
+      "equipment/Hero names, descriptions, icons or numeric patterns as ownership",
+      "sortIndex, equipmentId order or release chronology as ownership"
+    ]
+  },
+  "admissionPolicy": {
+    "public": {
+      "general": 206,
+      "exclusive": 167,
+      "total": 373
+    },
+    "hidden": {
+      "soulSpecial": 16,
+      "disposition": "HIDDEN_SPECIAL",
+      "detailRouteAdmission": false
+    },
+    "hold": {
+      "count": 1,
+      "equipmentIds": [
+        2013
+      ],
+      "disposition": "HOLD_UNRESOLVED_ACQUISITION",
+      "detailRouteAdmission": false
+    },
+    "rule": "Frontend publication is driven by the validated Stage 3 public consumer sets. Hidden/HOLD records must not appear in list navigation or resolve through the public detail route."
+  },
+  "sourceDiscipline": {
+    "stage3GeneratedConsumersFirst": true,
+    "reopenStage2Semantics": false,
+    "directConfigDataReadsForPageComposition": false,
+    "recomputeStats": false,
+    "rewriteEffectText": false,
+    "reclassifyAcquisition": false,
+    "inventKoreanNames": false,
+    "inventReleaseDatesOrChronology": false,
+    "rederiveExclusiveOwnership": false,
+    "principle": "UI bugs and presentation decisions belong to Stage 4; semantic contradictions in frozen upstream data reopen the owning upstream stage instead of being patched in frontend code."
+  },
+  "hardGates": [
+    "Equipment Stage 3-7 remains PASS with 390 canonical / 373 public / 206 general / 167 exclusive / 16 hidden special / 1 explicit HOLD and zero public hidden/HOLD leak.",
+    "Stage B FINAL remains PASS_ACCEPTED and closed, with 167 exclusive ownership edges, 167 byEquipment keys and 0 general-equipment ownership admission.",
+    "General List and Detail retain exact 206-ID parity; Exclusive List and Detail retain exact 167-ID parity.",
+    "The 167 byEquipment ownership keys equal the 167 exclusive consumer equipment IDs exactly, and every owner Hero resolves in the canonical 267 Hero master.",
+    "General tab counts remain 94 / 80 / 32 and generated filter taxonomy remains weapon / armor / headgear / accessory with its frozen subtype order.",
+    "nameKr REVIEW values remain nullable with nameCn fallback only; no REVIEW/HOLD state is promoted to verified semantics in frontend policy.",
+    "soul-special 16 and equipmentId 2013 remain outside all public list/detail route admission."
+  ],
+  "completion": {
+    "passStatus": "STAGE4_0_FRONTEND_CONSUMER_CONTRACT_FROZEN",
+    "meaning": "Stage 4 frontend implementation has a frozen, regression-checked input/admission/routing/display/ownership contract and can proceed without reading raw ConfigData for page composition.",
+    "nextStage": "4-1 route/loader scaffold"
+  }
+}

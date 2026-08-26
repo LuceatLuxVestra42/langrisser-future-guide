@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "stage": "4-0",
+  "status": "PASS",
+  "finalStageStatus": "STAGE4_0_FRONTEND_CONSUMER_CONTRACT_FROZEN",
+  "contract": "data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json",
+  "upstream": {
+    "equipmentStage3": {
+      "status": "PASS",
+      "finalStageStatus": "STAGE3_COMPLETE_WITH_REVIEW_AND_EXPLICIT_HOLD",
+      "canonical": 390,
+      "publicPageReady": 373
+    },
+    "exclusiveOwnershipStageB": {
+      "status": "PASS_ACCEPTED",
+      "closed": true,
+      "relations": 167,
+      "byEquipmentKeys": 167
+    }
+  },
+  "frontendInputs": {
+    "generalList": "data/generated/equipment_stage3_3_general_list.json",
+    "generalDetail": "data/generated/equipment_stage3_4_general_detail.json",
+    "exclusiveConsumer": "data/generated/equipment_stage3_5_exclusive_consumer.json",
+    "exclusiveOwnership": "data/generated/hero-exclusive-equipment-by-equipment.v1.json#byEquipmentId",
+    "heroMaster": "data/hero-name-master.v1.json",
+    "hiddenHoldReference": "data/generated/equipment_stage3_6_special_unresolved.json"
+  },
+  "routes": {
+    "generalList": {
+      "path": "/equipment",
+      "source": "data/generated/equipment_stage3_3_general_list.json#records",
+      "admission": "general equipment only: launch, legacy-additional, current-additional"
+    },
+    "exclusiveList": {
+      "path": "/equipment/exclusive",
+      "source": "data/generated/equipment_stage3_5_exclusive_consumer.json#listRecords",
+      "admission": "exclusive-equipment only"
+    },
+    "detail": {
+      "path": "/equipment/$equipmentId",
+      "routeKey": "equipmentId",
+      "sources": [
+        "data/generated/equipment_stage3_4_general_detail.json#records",
+        "data/generated/equipment_stage3_5_exclusive_consumer.json#detailRecords"
+      ],
+      "resolution": "Resolve by exact numeric equipmentId across the two pairwise-disjoint public detail sets. If the ID is not in either public set, return the public not-found state; do not fall through to hidden/HOLD data."
+    }
+  },
+  "admission": {
+    "general": 206,
+    "exclusive": 167,
+    "publicTotal": 373,
+    "hiddenSpecial": 16,
+    "hold": 1,
+    "holdEquipmentIds": [
+      2013
+    ],
+    "publicLeak": 0
+  },
+  "filters": {
+    "tabs": {
+      "1": 94,
+      "2": 80,
+      "3": 32
+    },
+    "taxonomy": [
+      {
+        "group": "weapon",
+        "groupKo": "무기",
+        "subtypes": [
+          "sword",
+          "dagger",
+          "spear",
+          "axe",
+          "hammer",
+          "bow",
+          "staff"
+        ]
+      },
+      {
+        "group": "armor",
+        "groupKo": "갑옷",
+        "subtypes": [
+          "heavy",
+          "light",
+          "cloth"
+        ]
+      },
+      {
+        "group": "headgear",
+        "groupKo": "투구",
+        "subtypes": [
+          "heavy",
+          "light",
+          "cloth"
+        ]
+      },
+      {
+        "group": "accessory",
+        "groupKo": "악세사리",
+        "subtypes": [
+          "attack",
+          "intellect",
+          "defense",
+          "healing"
+        ]
+      }
+    ],
+    "singleActiveTab": true,
+    "multiSubtypeSelection": false,
+    "persistenceRequired": true
+  },
+  "displayPolicy": {
+    "nameFallback": "nameKr ?? nameCn",
+    "nameKrReview": 187,
+    "reviewNameCandidateLeak": 0,
+    "releaseOrderReview": {
+      "generalTab3": 32,
+      "exclusive": 167,
+      "total": 199
+    },
+    "restrictionRuntimeDirectProofClaimed": false
+  },
+  "ownership": {
+    "scope": "exclusive-equipment only",
+    "byEquipmentKeys": 167,
+    "relations": 167,
+    "ownerHeroMissing": 0,
+    "metadataJoin": "Join returned heroId to data/hero-name-master.v1.json by exact heroId.",
+    "rederivedInStage4": false
+  },
+  "sourceDiscipline": {
+    "stage3GeneratedConsumersFirst": true,
+    "reopenStage2Semantics": false,
+    "directConfigDataReadsForPageComposition": false,
+    "recomputeStats": false,
+    "rewriteEffectText": false,
+    "reclassifyAcquisition": false,
+    "inventKoreanNames": false,
+    "inventReleaseDatesOrChronology": false,
+    "rederiveExclusiveOwnership": false,
+    "principle": "UI bugs and presentation decisions belong to Stage 4; semantic contradictions in frozen upstream data reopen the owning upstream stage instead of being patched in frontend code."
+  },
+  "completionMeaning": "Stage 4 frontend implementation has a frozen, regression-checked input/admission/routing/display/ownership contract and can proceed without reading raw ConfigData for page composition.",
+  "nextStage": "4-1 route/loader scaffold"
+}
