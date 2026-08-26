@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "stage": "skin-page-1",
+  "substage": "1-4",
+  "checkpoint": "acquisition-policy",
+  "status": "ACCEPTED",
+  "authoritativeField": "ConfigDataHeroSkinInfo.GetPathType",
+  "states": {
+    "ENCODED": "GetPathType is explicitly present and is one of the accepted canonical codes 2, 3 or 4.",
+    "UNENCODED": "GetPathType is omitted. This is a source-data gap and must not be replaced by inference."
+  },
+  "encodedMappings": {
+    "2": {"labelCn": "光之回响", "labelKr": "광휘의 메아리", "expectedCount": 197},
+    "3": {"labelCn": "命运星织", "labelKr": "운명의 별짜기", "expectedCount": 1},
+    "4": {"labelCn": "英雄皮肤商店", "labelKr": "영웅 스킨 상점", "expectedCount": 166}
+  },
+  "acceptedBaseline": {
+    "canonicalSkinCount": 540,
+    "encodedCount": 364,
+    "unencodedCount": 176
+  },
+  "supplementalEvidencePolicy": {
+    "field": "ConfigDataHeroSkinInfo.GetPathDesc",
+    "role": "SUPPLEMENTAL_EVIDENCE_ONLY",
+    "mayChangeStage1State": false,
+    "mayAssignAcquisitionCategory": false,
+    "rule": "Preserve source text and presence exactly, but do not parse keywords or prose into acquisition categories in Stage 1. Exact history for UNENCODED skins requires a separately verified supplemental dictionary in a later stage."
+  },
+  "prohibitions": [
+    "Do not parse GetPathDesc keywords to convert UNENCODED into an acquisition category.",
+    "Do not use ConfigDataHeroSkinInfo.Score as acquisition evidence.",
+    "Do not use skin ID patterns, asset paths, store UI order or filenames as acquisition evidence.",
+    "Do not introduce GetPathType codes outside the accepted canonical codes 2, 3 and 4 in the 540-record Stage 1 population.",
+    "Do not add KR/CN release status, KR_FUTURE or displayTarget in Stage 1-4."
+  ],
+  "downstreamRule": "Later verified acquisition enrichment may add supplemental display history, but it must preserve this Stage 1 source state and distinguish verified enrichment from ConfigData GetPathType authority."
+}
