@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-7",
+  "status": "STAGE2_7_CLOSED_READY_FOR_STAGE2_8",
+  "purpose": "Record the confirmed recurrence/history consumer boundary and the exact restart point for Banner Stage 2-8.",
+  "confirmedSources": [
+    "data/investigation/banner-stage1-5-date-recurrence-census.v1.json",
+    "data/generated/banner-definitions.v1.json",
+    "data/generated/banner-occurrences.v1.json",
+    "data/investigation/banner-stage2-7-history-census.v1.json",
+    "data/generated/banner-recurrence-history.v1.json",
+    "data/validation/banner-stage2-7-summary.v1.json"
+  ],
+  "confirmedResults": {
+    "canonicalDefinitionCount": 77,
+    "canonicalOccurrenceCount": 94,
+    "occurrenceCountHistogram": {
+      "1": 66,
+      "2": 8,
+      "3": 1,
+      "4": 1,
+      "5": 1
+    },
+    "repeatedDefinitionCount": 11,
+    "singleObservedDefinitionCount": 66,
+    "recurrenceLinkCount": 17,
+    "maxObservedOccurrenceCountPerDefinition": 5,
+    "manualRepeatedDefinitionCount": 0,
+    "identityMismatchCount": 0,
+    "chronologyMismatchCount": 0,
+    "errorCount": 0
+  },
+  "historySemantics": {
+    "scope": "CURRENT_CANONICAL_KR_SCHEDULE_DATASET",
+    "chronology": "krDisplayDate then displayOrder then bannerOccurrenceId",
+    "firstObservedIsFirstEver": false,
+    "fixedCadenceEstablished": false,
+    "futureRecurrencePredictionCreated": false,
+    "endDateOrDurationInferred": false,
+    "stage24LifecycleRewritten": false,
+    "manualCrossDefinitionMergePerformed": false
+  },
+  "verifiedFixtures": {
+    "cardpool285ObservedOccurrenceCount": 5,
+    "cardpool305ObservedOccurrenceCount": 4,
+    "cardpool370ObservedOccurrenceCount": 2,
+    "corrected7001Cardpool265ObservedOccurrenceCount": 2,
+    "corrected7001HistoryPreserved": true
+  },
+  "execution": {
+    "fullPopulationValidationExecuted": true,
+    "finalWorkflowConclusion": "success",
+    "finalValidationStatus": "PASS_STAGE2_7_RECURRENCE_HISTORY",
+    "implementationNote": "The first execution produced a PASS summary with zero data errors but the validator process exited after writing the summary because its final console log referenced an undefined variable name. Only that logging typo was corrected; the second full-population run completed successfully without changing the history rules or data result."
+  },
+  "completedScope": [
+    "current-dataset definition history records",
+    "chronological occurrence appearance indexes",
+    "previous/next observed occurrence pointers",
+    "adjacent observed gapDays",
+    "single-vs-repeated observed history status",
+    "full-population history regression"
+  ],
+  "deferredOrProhibited": [
+    "first-ever release date",
+    "fixed recurrence cadence",
+    "next expected or predicted recurrence date",
+    "banner end date or duration",
+    "time-of-day or timezone inference",
+    "manual recurrence merge from presentation similarity"
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-8",
+    "task": "Run whole-stage regression across Stage 2-0 through 2-7, consolidate the production consumer outputs, verify all cross-stage invariants, and freeze Banner Stage 2."
+  }
+}

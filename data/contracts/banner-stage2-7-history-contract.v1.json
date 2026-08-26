@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-7",
+  "status": "HISTORY_CONTRACT_FROZEN",
+  "purpose": "Materialize a current-dataset recurrence/history consumer from canonical banner definitions and occurrences without predicting cadence, first-ever release, duration, or future dates.",
+  "inputs": {
+    "stage1RecurrenceCensus": "data/investigation/banner-stage1-5-date-recurrence-census.v1.json",
+    "canonicalDefinitions": "data/generated/banner-definitions.v1.json",
+    "canonicalOccurrences": "data/generated/banner-occurrences.v1.json",
+    "stage24TaxonomySummary": "data/validation/banner-stage2-4-summary.v1.json",
+    "stage27Census": "data/investigation/banner-stage2-7-history-census.v1.json"
+  },
+  "output": "data/generated/banner-recurrence-history.v1.json",
+  "scope": "CURRENT_CANONICAL_KR_SCHEDULE_DATASET",
+  "chronology": {
+    "primaryField": "krDisplayDate",
+    "precision": "DAY",
+    "sameDateTieBreakers": ["displayOrder", "bannerOccurrenceId"],
+    "recordKeyDateParsingAllowed": false
+  },
+  "definitionHistoryRules": {
+    "oneHistoryRecordPerCanonicalDefinition": true,
+    "historyStatus": {
+      "SINGLE_OBSERVED_OCCURRENCE": "Exactly one canonical occurrence is observed for the definition in the current dataset.",
+      "REPEATED_OBSERVED_OCCURRENCES": "Two or more canonical occurrences are observed for the same canonical definition in the current dataset."
+    },
+    "firstObservedMeaning": "Earliest canonical occurrence inside the current dataset only; never first-ever release unless separately proven.",
+    "latestObservedMeaning": "Latest canonical occurrence inside the current dataset only."
+  },
+  "occurrenceHistoryRules": {
+    "appearanceIndex": "1-based chronological index inside one bannerDefinition history.",
+    "observationRole": {
+      "FIRST_OBSERVED_IN_CURRENT_DATASET": "appearanceIndex=1",
+      "REOBSERVED_IN_CURRENT_DATASET": "appearanceIndex>1"
+    },
+    "previousAndNext": "Adjacency is defined only inside the same canonical bannerDefinition history.",
+    "gapDays": "Calendar-day difference between adjacent explicit krDisplayDate values; it is an observed interval, not a cadence rule.",
+    "lifecycleBoundary": "Stage 2-4 lifecycle remains separate and is not rewritten or inferred from history position."
+  },
+  "manualPolicy": {
+    "manualOccurrenceScopedDefinitionsRemainIndependent": true,
+    "crossDefinitionManualMergeAllowed": false,
+    "presentationSimilarityCanProveRecurrence": false
+  },
+  "prohibitedInferences": [
+    "fixed recurrence cadence",
+    "future nextExpectedDate",
+    "first-ever release date",
+    "end date",
+    "duration",
+    "time of day",
+    "timezone",
+    "cross-definition recurrence from name, heroes, text, asset, bannerCode, patchCode, or slotCode"
+  ],
+  "requiredFixtures": [
+    {"effectiveSourceRecordKey": "cardpool:285", "expectedObservedOccurrenceCount": 5},
+    {"effectiveSourceRecordKey": "cardpool:305", "expectedObservedOccurrenceCount": 4},
+    {"effectiveSourceRecordKey": "cardpool:370", "expectedObservedOccurrenceCount": 2},
+    {"effectiveSourceRecordKey": "cardpool:265", "expectedObservedOccurrenceCount": 2, "note": "Corrected 7001 source identity must retain one shared history."}
+  ],
+  "completionCriteria": [
+    "77 definition history records",
+    "94 occurrence history entries represented exactly once",
+    "canonical IDs and occurrence-to-definition mapping unchanged",
+    "all adjacent pointers and gapDays recompute exactly from explicit dates",
+    "11 repeated definitions and 17 observed recurrence links for the current frozen population",
+    "manual repeated-definition count remains zero",
+    "no prohibited forecast or first-ever fields are materialized",
+    "errorCount=0"
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-8",
+    "task": "Run whole-stage regression, consolidate Stage 2 production outputs, and freeze Banner Stage 2."
+  }
+}
