@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-0",
+  "status": "EFFECTIVE_SOURCE_VIEW_READY",
+  "representation": "BASE_SCHEDULE_PLUS_VERIFIED_CORRECTION_OVERLAY",
+  "baseSchedule": {
+    "path": "data/kr-banner-schedule.v1.json",
+    "recordCount": 94,
+    "rowGrain": "KR_BANNER_OCCURRENCE_DISPLAY_ROW",
+    "readOnly": true
+  },
+  "correctionCheckpoint": {
+    "path": "data/checkpoints/banner-stage1-4-relation-corrections.v1.json",
+    "correctionCount": 1
+  },
+  "effectiveOccurrenceCount": 94,
+  "overlayCount": 1,
+  "resolver": "effectiveSourceRecordKey = correctionByOccurrence[recordKey]?.effectiveValue ?? sourceRecordKey ?? null",
+  "correctionOverlay": [
+    {
+      "occurrenceRecordKey": "kr-banner:20270331:4",
+      "field": "sourceRecordKey",
+      "recordedValue": "cardpool:263",
+      "effectiveValue": "cardpool:265",
+      "status": "VERIFIED_CORRECTION"
+    }
+  ],
+  "consumerRules": [
+    "Read occurrence fields from data/kr-banner-schedule.v1.json.",
+    "Resolve CardPool source identity through the effectiveSourceRecordKey resolver before definition grouping, recurrence grouping, Hero relation consumption or later production generation.",
+    "Preserve the original sourceRecordKey as provenance; do not mutate the Stage 1 schedule.",
+    "If no correction overlay exists for an occurrence, effectiveSourceRecordKey equals the recorded sourceRecordKey, including null.",
+    "Source-null manual occurrences remain source-null unless a later explicit approved mapping exists."
+  ],
+  "invariants": {
+    "sourceScheduleMutationPerformed": false,
+    "duplicateOccurrenceRowsMaterialized": false,
+    "manualNullSourceRowsRemainBaseScheduleValues": true,
+    "syntheticManualSourceRelationCount": 0,
+    "uncheckpointedCorrectionCount": 0,
+    "canonicalDefinitionGroupingPerformed": false,
+    "canonicalIdsAssigned": false,
+    "assetCanonicalizationPerformed": false,
+    "frontendIntegrationPerformed": false
+  },
+  "nextStageReady": true,
+  "nextStartPoint": "Banner Stage 2-1 canonical identity and grouping policy"
+}

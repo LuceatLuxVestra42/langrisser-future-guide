@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-0",
+  "status": "PASS_STAGE2_0_INPUT_CONTRACT",
+  "validationMode": "STATIC_CHECKPOINT_CONTINUITY_AND_DIRECT_SOURCE_ASSERTIONS",
+  "executableRegressionScript": "scripts/validate-banner-stage2-0-effective-input.mjs",
+  "executableRegressionScriptRunInConnector": false,
+  "validationBasis": [
+    "Banner Stage 1 final/freeze declares the current schedule population as 94 occurrences and Stage 2 entry ready.",
+    "Direct repository read confirms data/kr-banner-schedule.v1.json recordCount = 94.",
+    "Direct repository read confirms kr-banner:20270331:4 records sourceRecordKey = cardpool:263.",
+    "Stage 1-4 verified correction checkpoint explicitly corrects kr-banner:20270331:4 sourceRecordKey from cardpool:263 to cardpool:265.",
+    "The Stage 2-0 effective source view contains exactly that one checkpointed overlay and no other source repair.",
+    "The Stage 1 schedule file was not edited by Stage 2-0."
+  ],
+  "sourceScheduleCount": 94,
+  "effectiveOccurrenceCount": 94,
+  "correctionCheckpointCount": 1,
+  "correctionOverlayCount": 1,
+  "appliedCorrectionCount": 1,
+  "sourceScheduleMutationCount": 0,
+  "duplicateOccurrenceRowsMaterialized": 0,
+  "syntheticManualSourceRelationCount": 0,
+  "uncheckpointedCorrectionCount": 0,
+  "errorCount": 0,
+  "reviewCount": 0,
+  "fixture": {
+    "occurrenceRecordKey": "kr-banner:20270331:4",
+    "bannerCode": "7001",
+    "recordedSourceRecordKey": "cardpool:263",
+    "effectiveSourceRecordKey": "cardpool:265",
+    "status": "PASS_VERIFIED_CORRECTION_CONSUMED"
+  },
+  "invariants": {
+    "occurrenceCoverage94": true,
+    "effectiveViewIsSparseOverlay": true,
+    "verifiedCorrectionAppliedExactlyOnce": true,
+    "correction7001RecordedSourceIs263": true,
+    "correction7001EffectiveSourceIs265": true,
+    "sourceScheduleNotMutated": true,
+    "sourceNullRowsRemainSourceNullByDefaultResolver": true,
+    "uncheckpointedCorrectionsAbsent": true,
+    "stage1ReviewUnknownBoundariesPreserved": true,
+    "canonicalDefinitionGroupingNotStarted": true,
+    "canonicalIdsNotAssigned": true,
+    "assetStageNotPulledForward": true,
+    "frontendWorkNotPulledForward": true
+  },
+  "completion": {
+    "inputContractFrozen": true,
+    "effectiveSourceViewReady": true,
+    "correctionCheckpointConsumed": true,
+    "stage2_0Closed": true,
+    "nextStageReady": true
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-1",
+    "task": "Canonical bannerDefinition/bannerOccurrence identity and grouping policy",
+    "requiredInputs": [
+      "data/contracts/banner-stage2-0-input-contract.v1.json",
+      "data/generated/banner-stage2-0-effective-occurrences.v1.json",
+      "data/validation/banner-stage2-0-input-summary.v1.json"
+    ]
+  }
+}
