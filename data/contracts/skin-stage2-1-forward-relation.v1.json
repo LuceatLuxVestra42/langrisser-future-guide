@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "stage": "skin-page-2",
+  "substage": "2-1",
+  "checkpoint": "forward-relation-contract",
+  "status": "ACCEPTED",
+  "inputContract": "data/contracts/skin-stage2-input-contract.v1.json",
+  "authoritativeSource": "data/generated/skin-stage1-canonical.v1.json",
+  "purpose": "Materialize the Skin -> Hero forward relation for the frozen 540 regular Hero skins using only the accepted Stage 1 canonical skinId, heroId and sourceOrder fields.",
+  "output": "data/generated/skin-stage2-1-forward-relation.v1.json",
+  "recordShape": {
+    "skinId": "integer / primary key",
+    "heroId": "integer / canonical Hero foreign key",
+    "sourceOrder": "integer / frozen Hero skin order"
+  },
+  "cardinality": "Skin -> Hero = EXACTLY_ONE",
+  "requiredChecks": {
+    "recordCount": 540,
+    "distinctSkinIdCount": 540,
+    "unknownHeroIdCount": 0,
+    "duplicateSkinIdCount": 0,
+    "missingHeroIdCount": 0,
+    "invalidSourceOrderCount": 0,
+    "stage1OwnerMismatchCount": 0,
+    "stage1SourceOrderMismatchCount": 0
+  },
+  "prohibitions": [
+    "Do not read raw ConfigData to recalculate owner or source order.",
+    "Do not infer owner from names, filenames, resource paths or ID patterns.",
+    "Do not introduce acquisition, asset-export, release, localization or displayTarget fields.",
+    "Do not re-sort or renumber sourceOrder."
+  ],
+  "completionRule": "2-1 completes only when exactly 540 unique skinId records are generated from Stage 1 canonical, every heroId belongs to the 267-Hero canonical keyspace, and heroId/sourceOrder are exact copies of Stage 1 canonical values.",
+  "nextAction": "Skin 2-2: generate the 267-entry Hero -> ordered Skin reverse index from the accepted 2-1 forward relation."
+}
