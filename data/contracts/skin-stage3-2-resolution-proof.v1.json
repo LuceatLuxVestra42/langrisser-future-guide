@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "stage": "skin-page-3",
+  "substage": "3-2",
+  "checkpoint": "representative-asset-resolution-proof-contract",
+  "status": "ACCEPTED",
+  "purpose": "Select deterministic representative Skin fixtures from the Stage 3-1 inventory and require evidence that static artwork, Spine prefab dependencies, and model skin resources resolve to concrete authoritative assets before bulk extraction.",
+  "inputs": {
+    "stage31Validation": "data/validation/skin-stage3-1-final.v1.json",
+    "inventory": "data/generated/skin-stage3-1-asset-inventory.v1.json",
+    "priorSkinSemanticsScan": "data/validation/hero-page-stage5-5-2-skins-semantics.v1.json"
+  },
+  "outputs": {
+    "fixtures": "data/fixtures/skin-stage3-2-resolution-fixtures.v1.json",
+    "readiness": "data/validation/skin-stage3-2-readiness.v1.json",
+    "evidence": "data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json"
+  },
+  "fixtureRoles": [
+    "SIMPLE_SINGLE_RESOURCE_MIN_BINDINGS",
+    "MAX_DISTINCT_MODEL_RESOURCES",
+    "MAX_TOTAL_MODEL_BINDINGS",
+    "MAX_BINDINGS_PER_RESOURCE"
+  ],
+  "selectionPolicy": {
+    "source": "Stage 3-1 inventory records only",
+    "tieBreak": "first Stage 3-1 inventory record order",
+    "deduplicateSkinIds": true,
+    "multipleRolesAllowed": true,
+    "simpleSingleResource": "among skins with exactly one distinct modelResourceId, choose the minimum model binding count",
+    "maxDistinctResources": "choose first skin attaining the global maximum distinct modelResourceId count",
+    "maxTotalBindings": "choose first skin attaining the global maximum model binding count",
+    "maxBindingsPerResource": "choose first skin attaining the global maximum repeated binding count for one skinResourceId"
+  },
+  "expectedStage31": {
+    "skinCount": 540,
+    "uniqueStaticPathCount": 540,
+    "uniqueSpinePathCount": 540,
+    "modelBindingEdgeCount": 2277,
+    "uniqueModelResourceIdCount": 789,
+    "maxModelResourceIdsPerSkin": 5,
+    "maxModelBindingsPerSkin": 11,
+    "maxBindingsPerModelResource": 7
+  },
+  "proofRequirements": {
+    "static": [
+      "fixture sourceImagePath exactly matches Stage 3-1 inventory",
+      "sourceImagePath resolves to a concrete authoritative source asset",
+      "evidence records the resolved source path and nonzero byte size"
+    ],
+    "spine": [
+      "fixture sourceSpinePath exactly matches Stage 3-1 inventory",
+      "sourceSpinePath resolves to a concrete authoritative prefab asset",
+      "actual dependency set is recorded from evidence rather than assumed",
+      "at least one concrete dependency record with path and type is present"
+    ],
+    "model": [
+      "every fixture modelResourceId is preserved from Stage 3-1 inventory",
+      "every fixture modelResourceId resolves to an authoritative concrete model resource or locator",
+      "numeric coincidence or filename similarity alone is not sufficient proof"
+    ]
+  },
+  "statusPolicy": {
+    "PASS": "all representative fixture static, Spine, and model resolution evidence is present and validates",
+    "READY_FOR_ASSET_EVIDENCE": "fixture/gate construction validates but authoritative asset bytes or equivalent resolution evidence is unavailable",
+    "FAIL": "fixture selection, Stage 3-1 parity, or supplied evidence is inconsistent"
+  },
+  "prohibitedInference": [
+    "asset existence or extraction success may not define release status",
+    "asset filename/path may not redefine owner or sourceOrder",
+    "Spine dependency layout may not be assumed without evidence",
+    "numeric overlap may not establish model-resource semantics",
+    "release/localization/acquisition enrichment is outside Stage 3-2",
+    "localExtractPath/exportPath/webPath assignment is outside Stage 3-2 readiness proof"
+  ],
+  "nextActionOnPass": "Skin Stage 3-3 static artwork extraction/export using the proven resolver rule.",
+  "nextActionWhenReady": "Provide or mount the authoritative Unity asset source/root, generate Stage 3-2 evidence for the selected fixtures, and rerun the Stage 3-2 validator without recomputing Stage 3-1."
+}
