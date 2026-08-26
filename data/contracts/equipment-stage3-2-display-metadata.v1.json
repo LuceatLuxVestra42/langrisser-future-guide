@@ -1,0 +1,48 @@
+{
+  "stage": "3-2",
+  "purpose": "Resolve equipment display metadata without reopening Stage 2 semantics. Icon comes directly from the confirmed EquipmentInfo master; Korean names come only from the existing Korean equipment sheet and are accepted only when the source row can be safely matched to a canonical equipment ID.",
+  "inputContracts": [
+    "data/contracts/equipment-stage3-0-input-contract.v1.json",
+    "data/contracts/equipment-stage3-1-page-schema.v1.json",
+    "data/contracts/equipment-stage2-7-acquisition-reference.v1.json"
+  ],
+  "canonicalCount": 390,
+  "pageReadyCount": 373,
+  "primaryKey": "equipmentId",
+  "fields": {
+    "icon": {
+      "source": "ConfigDataEquipmentInfo.Icon",
+      "join": "ConfigDataEquipmentInfo.ID = equipmentId",
+      "policy": "Direct confirmed basic metadata relation; do not derive icon from ItemInfo or Korean-sheet image filenames."
+    },
+    "nameKr": {
+      "source": "https://docs.google.com/spreadsheets/d/1RZFY2N3RU-vctduO_Tg2e4RVoZvJAAveiMgPnW6VTQg/edit",
+      "sheets": ["무기(SSR)", "갑옷(SSR)", "투구(SSR)", "장신구(SSR)", "추가장비", "전용장비"],
+      "policy": "Never invent or machine-translate a missing Korean name. Preserve source sheet/row provenance and leave nameKr null with REVIEW_NAME_KR when the row is absent or the ID match is not strong enough.",
+      "legacyParentheticalPolicy": "In 추가장비 rows, when the cell contains a former/collaboration name followed by a parenthetical generic/current Korean name, use the last parenthetical label as nameKr and preserve the original source cell in provenance."
+    }
+  },
+  "matchingPolicy": {
+    "features": ["acquisitionClass", "equipmentType", "subtypeKo when available", "releaseGroupDate for legacy additional equipment", "Lv50 stat signature", "max-effect numeric signature"],
+    "launch": "Match only inside the frozen launch population and source slot/subtype. Exact stat/effect signatures are preferred; ambiguous equal-score rows remain REVIEW rather than being guessed.",
+    "legacyAdditional": "Reuse the frozen legacy-additional class/date structure. Matching stays inside the same release group whenever releaseGroupDate exists.",
+    "exclusiveEquipment": "Use the frozen exclusive-equipment population and monotonic source/canonical order only as a disambiguation constraint after slot/stat/effect evidence. A low-score forced sequence match is never accepted as a Korean name.",
+    "doNotUse": ["name translation similarity as an automatic join", "Equipment ID arithmetic", "raw Label order as display order", "unverified release-order guesses"]
+  },
+  "statuses": {
+    "nameKr": ["VERIFIED_REFERENCE_MATCH", "REVIEW_REFERENCE_MATCH", "REVIEW_NAME_KR"],
+    "icon": ["VERIFIED_DIRECT", "FAIL_MISSING_ICON"]
+  },
+  "completion": {
+    "iconCoveragePageReady": 373,
+    "requirements": [
+      "Every general/exclusive page-ready equipment record has a non-empty direct EquipmentInfo icon.",
+      "Every page-ready record has an explicit nameKrStatus.",
+      "Every non-null nameKr has source sheet/row provenance and an accepted match score.",
+      "Missing or ambiguous Korean names remain explicit REVIEW; no synthetic translation is inserted.",
+      "Stage 2 classification, stats, effects, restrictions and acquisition semantics are not recomputed."
+    ],
+    "allowedFinalStatus": "COMPLETE_WITH_REVIEW"
+  },
+  "nextStage": "3-3 general equipment list generation"
+}
