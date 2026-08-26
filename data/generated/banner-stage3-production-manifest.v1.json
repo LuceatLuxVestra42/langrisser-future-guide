@@ -1,0 +1,157 @@
+{
+  "version": "banner-stage3-production-manifest/v1",
+  "status": "BANNER_STAGE3_FROZEN_READY",
+  "representation": "REFERENCE_MANIFEST_NO_LARGE_DATA_DUPLICATION",
+  "freezeState": "BANNER_STAGE3_FROZEN",
+  "canonicalPopulation": {
+    "definitions": 77,
+    "occurrences": 94
+  },
+  "datasetWindow": {
+    "firstKrDisplayDate": "2026-09-02",
+    "lastKrDisplayDate": "2027-03-31"
+  },
+  "stageCheckpoints": [
+    {
+      "path": "data/validation/banner-stage3-0-input-summary.v1.json",
+      "expectedStatus": "PASS_BANNER_STAGE3_0_INPUT_CONTRACT"
+    },
+    {
+      "path": "data/validation/banner-stage3-1-asset-summary.v1.json",
+      "expectedStatus": "PASS_BANNER_STAGE3_1_ASSET_RELATION"
+    },
+    {
+      "path": "data/validation/banner-stage3-2-display-summary.v1.json",
+      "expectedStatus": "PASS_BANNER_STAGE3_2_DISPLAY_METADATA"
+    },
+    {
+      "path": "data/validation/banner-stage3-3-basic-table-summary.v1.json",
+      "expectedStatus": "PASS_BANNER_STAGE3_3_BASIC_TABLE_CONSUMER"
+    },
+    {
+      "path": "data/validation/banner-stage3-4-wish-summary.v1.json",
+      "expectedStatus": "PASS_BANNER_STAGE3_4_WISH_CONSUMER"
+    },
+    {
+      "path": "data/validation/banner-stage3-5-cp-event-summary.v1.json",
+      "expectedStatus": "PASS_BANNER_STAGE3_5_CP_EVENT_CONSUMER"
+    },
+    {
+      "path": "data/validation/banner-stage3-6-recurrence-pickup-log-summary.v1.json",
+      "expectedStatus": "PASS_BANNER_STAGE3_6_RECURRENCE_PICKUP_LOG_CONSUMER"
+    },
+    {
+      "path": "data/validation/banner-stage3-7-frontend-integration-summary.v1.json",
+      "expectedStatus": "PASS_BANNER_STAGE3_7_FRONTEND_INTEGRATION"
+    }
+  ],
+  "productionArtifacts": [
+    {
+      "role": "stage2FrozenSourceManifest",
+      "path": "data/generated/banner-stage2-production-manifest.v1.json"
+    },
+    {
+      "role": "assetRelations",
+      "path": "data/generated/banner-stage3-1-asset-relations.v1.json"
+    },
+    {
+      "role": "displayMetadata",
+      "path": "data/generated/banner-stage3-2-display-metadata.v1.json"
+    },
+    {
+      "role": "basicTableConsumer",
+      "path": "data/generated/banner-stage3-3-basic-table-consumer.v1.json"
+    },
+    {
+      "role": "wishConsumer",
+      "path": "data/generated/banner-stage3-4-wish-consumer.v1.json"
+    },
+    {
+      "role": "cpEventConsumer",
+      "path": "data/generated/banner-stage3-5-cp-event-consumer.v1.json"
+    },
+    {
+      "role": "recurrencePickupLogConsumer",
+      "path": "data/generated/banner-stage3-6-recurrence-pickup-log-consumer.v1.json"
+    },
+    {
+      "role": "frontendRoute",
+      "path": "src/routes/banners.tsx"
+    },
+    {
+      "role": "frontendServerAdapter",
+      "path": "src/lib/banner-page.server.ts"
+    },
+    {
+      "role": "frontendServerFunction",
+      "path": "src/lib/banner-page.functions.ts"
+    },
+    {
+      "role": "stage3FreezeSummary",
+      "path": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json"
+    }
+  ],
+  "frontend": {
+    "route": "/banners",
+    "sections": [
+      "배너표",
+      "배너+이벤트",
+      "CP배너",
+      "픽업 log"
+    ]
+  },
+  "knownDeferredNonErrors": [
+    {
+      "code": "MANUAL_BANNER_IMAGE_PENDING",
+      "count": 1,
+      "scope": "bocc:kr-manual-wish-20260902"
+    },
+    {
+      "code": "MANUAL_WISH_NO_EXPLICIT_ID_SOURCE",
+      "count": 8,
+      "scope": "source-null manual Wish definitions"
+    },
+    {
+      "code": "PICKUP_CARDINALITY_RELATION_REVIEW",
+      "count": 5,
+      "scope": "neutralized PICKUP display rows"
+    },
+    {
+      "code": "CANONICAL_EVENT_ID_UNRESOLVED",
+      "count": 4,
+      "scope": "CP text references only"
+    },
+    {
+      "code": "HERO_FRONTEND_ROUTE_UNRESOLVED",
+      "count": null,
+      "scope": "Hero navigation is not invented"
+    },
+    {
+      "code": "EXACT_BANNER_TIME_DURATION_TIMEZONE_UNRESOLVED",
+      "count": null,
+      "scope": "krDisplayDate remains day placement only"
+    },
+    {
+      "code": "FIRST_EVER_BEFORE_DATASET_UNASSERTED",
+      "count": null,
+      "scope": "first observed is not first ever"
+    },
+    {
+      "code": "RECURRENCE_CADENCE_AND_FUTURE_PREDICTION_UNASSERTED",
+      "count": null,
+      "scope": "observed gaps only"
+    }
+  ],
+  "semanticBoundaries": {
+    "sourceConfigDataRecomputationAllowed": false,
+    "silentIdentityRegroupingAllowed": false,
+    "silentJoinSemanticChangesAllowed": false,
+    "assetIdentityPromotionAllowed": false,
+    "manualWishCandidateSynthesisAllowed": false,
+    "canonicalEventInferenceAllowed": false,
+    "heroRouteInferenceAllowed": false,
+    "recurrencePredictionAllowed": false,
+    "futureSemanticChangeRequiresExplicitScopedStageOrMigration": true
+  },
+  "changeControl": "Future Banner semantic changes require an explicit scoped stage or migration; silent identity, JOIN, display, or recurrence reinterpretation is not allowed."
+}
