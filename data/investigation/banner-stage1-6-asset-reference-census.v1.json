@@ -1,0 +1,202 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-6",
+  "status": "ASSET_REFERENCE_CENSUS_COMPLETE",
+  "purpose": "Census how the 94 Korean banner occurrence rows reference already-prepared Banner/Picture_Notice display assets, without performing image hashing, visual duplicate detection, candidate matching, or final asset ownership modeling.",
+  "inputs": {
+    "currentSchedule": "data/kr-banner-schedule.v1.json",
+    "sourceCensus": "data/investigation/banner-stage1-1-source-census.v1.json",
+    "rowGrain": "data/investigation/banner-stage1-2-row-grain-census.v1.json",
+    "relationCensus": "data/investigation/banner-stage1-4-relation-census.v1.json",
+    "relationCorrections": "data/checkpoints/banner-stage1-4-relation-corrections.v1.json",
+    "dateRecurrenceCensus": "data/investigation/banner-stage1-5-date-recurrence-census.v1.json",
+    "existingValidator": "scripts/validate_kr_schedule.cjs",
+    "assetDirectories": [
+      "public/images/banners/Banner",
+      "public/images/banners/Picture_Notice"
+    ]
+  },
+  "coreDecision": {
+    "referenceGrain": "OCCURRENCE_DISPLAY_ASSET_REFERENCE",
+    "meaning": "The current schedule stores the display-asset family and filename on each Korean occurrence row. This is an occurrence-level reference location, not proof that the occurrence owns the underlying asset or that the filename is a canonical asset identity.",
+    "canonicalAssetOwnershipDecided": false,
+    "hashOrVisualIdentityDecided": false
+  },
+  "populationStats": {
+    "occurrenceCount": 94,
+    "displayImageType": {
+      "Banner": 37,
+      "Picture_Notice": 57,
+      "total": 94
+    },
+    "displayImageStatus": {
+      "matched": 73,
+      "manual-replacement": 21,
+      "total": 94
+    },
+    "displayImageFile": {
+      "nonNull": 93,
+      "null": 1,
+      "total": 94
+    },
+    "visualType": {
+      "static": 81,
+      "prefab": 13,
+      "total": 94
+    }
+  },
+  "referenceFamilies": {
+    "Banner": {
+      "rowCount": 37,
+      "expectedDirectory": "public/images/banners/Banner",
+      "nonNullFileCount": 37,
+      "nullFileCount": 0,
+      "matchedCount": 37,
+      "manualReplacementCount": 0,
+      "observedUse": "Current NEW and TRIPLE display behavior uses the larger Banner family under the existing schedule rules.",
+      "ownershipDecision": "DEFERRED"
+    },
+    "Picture_Notice": {
+      "rowCount": 57,
+      "expectedDirectory": "public/images/banners/Picture_Notice",
+      "nonNullFileCount": 56,
+      "nullFileCount": 1,
+      "matchedCount": 36,
+      "manualReplacementCount": 21,
+      "observedUse": "Current SINGLE, DUAL, and WISH display behavior uses the Picture_Notice family under the existing schedule rules.",
+      "ownershipDecision": "DEFERRED"
+    }
+  },
+  "manualReplacementSemantics": {
+    "status": "SEPARATE_FROM_MISSING_ASSET",
+    "manualReplacementRowCount": 21,
+    "manualReplacementWithFileCount": 20,
+    "manualReplacementWithoutFileCount": 1,
+    "onlyNullFixture": {
+      "recordKey": "kr-manual-wish-20260902",
+      "krDisplayDate": "2026-09-02",
+      "scheduleType": "wish",
+      "selectableText": "5인 선택",
+      "displayImageType": "Picture_Notice",
+      "displayImageFile": null,
+      "displayImageStatus": "manual-replacement"
+    },
+    "rule": "Do not interpret displayImageStatus=manual-replacement as displayImageFile missing. Most manual-replacement rows already reference a concrete replacement file."
+  },
+  "visualTypeSemantics": {
+    "observedVocabulary": ["static", "prefab"],
+    "staticRowCount": 81,
+    "prefabRowCount": 13,
+    "importantBoundary": "visualType records how the banner source/display case is characterized in the assembled schedule. It is not the same axis as displayImageType. Prefab-origin single-rerun rows can still reference a prepared Picture_Notice webp display asset.",
+    "prefabReferencePattern": "Observed prefab rows reference Picture_Notice assets with matched status in the current schedule.",
+    "doNotInfer": [
+      "Do not treat visualType=prefab as meaning there is no static website image.",
+      "Do not use visualType alone as canonical asset identity."
+    ]
+  },
+  "verifiedReuseFixtures": [
+    {
+      "sourceRecordKey": "cardpool:366",
+      "bannerCode": "9603",
+      "occurrences": ["kr-banner:20261007:10", "kr-banner:20270210:2"],
+      "displayImageType": "Banner",
+      "displayImageFile": "Banner_9603.webp",
+      "status": "SAME_REFERENCE_REUSED"
+    },
+    {
+      "sourceRecordKey": "cardpool:370",
+      "bannerCode": "9702",
+      "occurrences": ["kr-banner:20261028:1", "kr-banner:20270317:2"],
+      "displayImageType": "Picture_Notice",
+      "displayImageFile": "Picture_Notice_9702.webp",
+      "status": "SAME_REFERENCE_REUSED"
+    },
+    {
+      "sourceRecordKey": "cardpool:213",
+      "bannerCode": "5701",
+      "occurrences": ["kr-banner:20261007:9", "kr-banner:20270331:3"],
+      "displayImageType": "Picture_Notice",
+      "displayImageFile": "Picture_Notice_5701.webp",
+      "status": "SAME_REFERENCE_REUSED"
+    },
+    {
+      "sourceRecordKey": "cardpool:305",
+      "bannerCode": "7902",
+      "occurrences": [
+        "kr-banner:20260916:3",
+        "kr-banner:20261202:3",
+        "kr-banner:20270127:2",
+        "kr-banner:20270324:3"
+      ],
+      "displayImageType": "Picture_Notice",
+      "displayImageFile": "Picture_Notice_7902.webp",
+      "displayImageStatus": "manual-replacement",
+      "status": "SAME_REPLACEMENT_REFERENCE_REUSED"
+    },
+    {
+      "bannerCode": "7001",
+      "effectiveSourceRecordKey": "cardpool:265",
+      "occurrences": ["kr-banner:20261007:8", "kr-banner:20270331:4"],
+      "displayImageType": "Picture_Notice",
+      "displayImageFile": "Picture_Notice_7001.webp",
+      "status": "SAME_REFERENCE_REUSED_AFTER_STAGE1_4_RELATION_CORRECTION"
+    }
+  ],
+  "reuseDecision": {
+    "observation": "Multiple dated occurrences can carry the same displayImageFile reference when they reuse the same verified CardPool/banner source.",
+    "importantLimit": "The reverse is not safe: the same filename or apparent visual reuse must not be used by itself to prove two occurrences share a canonical banner definition.",
+    "reason": "Manual replacement assets can also be intentionally reused across multiple dated manual occurrences, and Stage 1 does not perform content hashing or visual equivalence analysis.",
+    "relationRule": "Source/recurrence identity comes from the verified relation layer first; asset references are supporting display evidence only."
+  },
+  "directoryAndExistencePolicy": {
+    "bannerDirectoryConfirmed": true,
+    "pictureNoticeDirectoryConfirmed": true,
+    "existingValidatorBehavior": "For every non-null displayImageFile, scripts/validate_kr_schedule.cjs checks the corresponding Banner or Picture_Notice directory for the named file.",
+    "freshBulkDirectoryExistenceRevalidationPerformedInStage1_6": false,
+    "reason": "Stage 1-6 is a reference census. The project already has a schedule validator for file existence; this stage does not replace Stage 3 asset inventory/hash/diff work with another deep asset crawl.",
+    "hashReadPerformed": false,
+    "imageBytesReadPerformed": false
+  },
+  "prohibitedInferences": [
+    "Do not promote displayImageFile into canonical bannerId or canonical assetId.",
+    "Do not infer CardPool/Hero/event relations from asset filename equality.",
+    "Do not infer canonical banner recurrence solely from the same image reference.",
+    "Do not classify manual-replacement as missing-image when a concrete replacement filename exists.",
+    "Do not hash or visually compare the asset collection in Stage 1-6.",
+    "Do not deduplicate or rename Banner/Picture_Notice files in Stage 1."
+  ],
+  "coverageAndLimits": {
+    "all94RowsIncludedInReferenceCount": true,
+    "displayImageTypeCountSumValidated": true,
+    "displayImageStatusCountSumValidated": true,
+    "displayImageFileCountSumValidated": true,
+    "visualTypeCountSumValidated": true,
+    "representativeSourceReuseReferencePatternsRecorded": true,
+    "allRepeatedSourcesExhaustivelyGroupedByAssetReference": false,
+    "directoryInventoryCountProduced": false,
+    "fileHashInventoryProduced": false,
+    "visualDuplicateGroupsProduced": false,
+    "canonicalAssetOwnershipProduced": false
+  },
+  "notDecided": [
+    "Canonical asset identity/assetId",
+    "Whether one canonical banner definition owns one or multiple display variants",
+    "Whether Banner and Picture_Notice are alternate renditions of the same source banner in each case",
+    "Content-hash duplicate groups",
+    "Perceptual/visual duplicate groups",
+    "Candidate image replacement decisions",
+    "Bulk orphan/unreferenced asset inventory",
+    "Final asset storage/renaming policy"
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-7",
+    "task": "Representative fixture validation across the frozen Stage 1 findings",
+    "consume": [
+      "Treat displayImageType/displayImageFile as occurrence-level display references, not canonical ownership.",
+      "Current population: Banner 37, Picture_Notice 57; matched 73, manual-replacement 21; non-null file 93, null 1; static 81, prefab 13.",
+      "Manual-replacement is a provenance/status distinction and usually still has a concrete replacement file.",
+      "Same verified source can reuse the same asset reference across multiple occurrence dates, but asset equality alone cannot establish source identity.",
+      "Defer hash/diff, visual duplicate grouping, and asset ownership to Stage 3."
+    ]
+  }
+}
