@@ -7,13 +7,11 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
-  // GitHub Pages feasibility branch: this repository is served below /langrisser-future-guide/.
+  // GitHub Pages project site base path.
   vite: {
     base: "/langrisser-future-guide/",
   },
-  // GitHub Pages is static hosting, so Nitro's server adapter is intentionally disabled
-  // for this isolated feasibility branch. This also avoids the known Nitro v3 +
-  // TanStack prerender preview-server output-path conflict.
+  // GitHub Pages is static hosting, so Nitro's server adapter is intentionally disabled.
   nitro: false,
   tanstackStart: {
     server: { entry: "server" },
@@ -24,6 +22,13 @@ export default defineConfig({
       failOnError: true,
     },
     pages: [
+      {
+        path: "/",
+        prerender: {
+          enabled: true,
+          outputPath: "/index.html",
+        },
+      },
       {
         path: "/banners",
         prerender: {
