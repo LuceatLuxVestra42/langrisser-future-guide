@@ -44,41 +44,54 @@
     "pickupHeroReferencesAcrossRows": 155,
     "uniquePickupHeroes": 96,
     "definitionCardinalityRelationMismatchCount": 5,
+    "neutralizedDisplayRowCount": 5,
+    "neutralizedDisplayRowIds": [
+      "bocc:kr-banner:20261021:1",
+      "bocc:kr-banner:20261111:1",
+      "bocc:kr-banner:20261209:1",
+      "bocc:kr-banner:20270203:1",
+      "bocc:kr-banner:20270303:1"
+    ],
     "definitionCardinalityRelationMismatches": [
       {
         "bannerDefinitionId": "bdef:v1:1dff1ae57975fe06408f796c",
         "pickupCardinality": "SINGLE",
         "expectedHeroCount": 1,
         "actualPickupHeroCount": 2,
-        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+        "consumerTypeLabelKr": "픽업",
+        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
       },
       {
         "bannerDefinitionId": "bdef:v1:3ab57930a1fe3947da643f64",
         "pickupCardinality": "SINGLE",
         "expectedHeroCount": 1,
         "actualPickupHeroCount": 2,
-        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+        "consumerTypeLabelKr": "픽업",
+        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
       },
       {
         "bannerDefinitionId": "bdef:v1:6293cb2342eb6f99e4c34e30",
         "pickupCardinality": "SINGLE",
         "expectedHeroCount": 1,
         "actualPickupHeroCount": 2,
-        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+        "consumerTypeLabelKr": "픽업",
+        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
       },
       {
         "bannerDefinitionId": "bdef:v1:74783713495bbb3b05647b21",
         "pickupCardinality": "SINGLE",
         "expectedHeroCount": 1,
         "actualPickupHeroCount": 2,
-        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+        "consumerTypeLabelKr": "픽업",
+        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
       },
       {
         "bannerDefinitionId": "bdef:v1:d14a4c6837636d525c13c914",
         "pickupCardinality": "SINGLE",
         "expectedHeroCount": 1,
         "actualPickupHeroCount": 2,
-        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+        "consumerTypeLabelKr": "픽업",
+        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
       }
     ]
   },
@@ -97,6 +110,8 @@
     "stage2OccurrenceIdsChanged": false,
     "stage31AssetIdsChanged": false,
     "stage32DisplayRecomputed": false,
+    "stage2PickupRelationsTrimmed": false,
+    "stage2PickupTaxonomyRewritten": false,
     "wishCandidateListsMaterializedEarly": false,
     "cpEventRelationsJoinedEarly": false,
     "recurrenceHistoryJoinedEarly": false,
@@ -107,42 +122,47 @@
     {
       "code": "PICKUP_CARDINALITY_RELATION_COUNT_DIFFERENCE",
       "count": 5,
-      "interpretation": "Do not rewrite Stage 2 taxonomy or Hero relations in Stage 3-3; consumer exposes both fields separately.",
+      "interpretation": "Do not rewrite Stage 2 taxonomy or Hero relations in Stage 3-3. Preserve both and neutralize the user-facing Korean type label for affected rows.",
       "definitions": [
         {
           "bannerDefinitionId": "bdef:v1:1dff1ae57975fe06408f796c",
           "pickupCardinality": "SINGLE",
           "expectedHeroCount": 1,
           "actualPickupHeroCount": 2,
-          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+          "consumerTypeLabelKr": "픽업",
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
         },
         {
           "bannerDefinitionId": "bdef:v1:3ab57930a1fe3947da643f64",
           "pickupCardinality": "SINGLE",
           "expectedHeroCount": 1,
           "actualPickupHeroCount": 2,
-          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+          "consumerTypeLabelKr": "픽업",
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
         },
         {
           "bannerDefinitionId": "bdef:v1:6293cb2342eb6f99e4c34e30",
           "pickupCardinality": "SINGLE",
           "expectedHeroCount": 1,
           "actualPickupHeroCount": 2,
-          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+          "consumerTypeLabelKr": "픽업",
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
         },
         {
           "bannerDefinitionId": "bdef:v1:74783713495bbb3b05647b21",
           "pickupCardinality": "SINGLE",
           "expectedHeroCount": 1,
           "actualPickupHeroCount": 2,
-          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+          "consumerTypeLabelKr": "픽업",
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
         },
         {
           "bannerDefinitionId": "bdef:v1:d14a4c6837636d525c13c914",
           "pickupCardinality": "SINGLE",
           "expectedHeroCount": 1,
           "actualPickupHeroCount": 2,
-          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+          "consumerTypeLabelKr": "픽업",
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
         }
       ]
     }
