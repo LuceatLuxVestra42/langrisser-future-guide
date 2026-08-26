@@ -1,0 +1,340 @@
+{
+  "version": 1,
+  "stage": "skin-page-3",
+  "substage": "3-2",
+  "checkpoint": "representative-asset-resolution-proof-readiness",
+  "status": "READY_FOR_ASSET_EVIDENCE",
+  "completion": null,
+  "purpose": "Select deterministic representative Skin fixtures from the Stage 3-1 inventory and require evidence that static artwork, Spine prefab dependencies, and model skin resources resolve to concrete authoritative assets before bulk extraction.",
+  "metrics": {
+    "checkCount": 45,
+    "passedCheckCount": 45,
+    "failedCheckCount": 0,
+    "fixtureRoleCount": 4,
+    "uniqueFixtureSkinCount": 3,
+    "evidencePresent": false,
+    "evidenceIssueCount": 0
+  },
+  "fixtureSelection": {
+    "SIMPLE_SINGLE_RESOURCE_MIN_BINDINGS": 1901,
+    "MAX_DISTINCT_MODEL_RESOURCES": 102,
+    "MAX_TOTAL_MODEL_BINDINGS": 102,
+    "MAX_BINDINGS_PER_RESOURCE": 3701
+  },
+  "selectionMetrics": {
+    "minBindingsAmongSingleResourceSkins": 2,
+    "maxModelResourceIdsPerSkin": 5,
+    "maxModelBindingsPerSkin": 11,
+    "maxBindingsPerModelResource": 7,
+    "roleCount": 4,
+    "uniqueFixtureSkinCount": 3
+  },
+  "priorScanUse": {
+    "path": "data/validation/hero-page-stage5-5-2-skins-semantics.v1.json",
+    "status": "REVIEW",
+    "authority": "CANDIDATE_CONTEXT_ONLY",
+    "note": "Numeric/path overlap from this prior scan is not treated as model asset resolution proof."
+  },
+  "evidence": {
+    "expectedPath": "data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json",
+    "present": false,
+    "blocker": "ASSET_BYTES_OR_AUTHENTIC_RESOLUTION_EVIDENCE_NOT_AVAILABLE_IN_REPOSITORY",
+    "issues": []
+  },
+  "checks": [
+    {
+      "name": "contract ACCEPTED",
+      "pass": true,
+      "detail": "ACCEPTED"
+    },
+    {
+      "name": "contract substage 3-2",
+      "pass": true,
+      "detail": "3-2"
+    },
+    {
+      "name": "Stage 3-1 PASS",
+      "pass": true,
+      "detail": "PASS"
+    },
+    {
+      "name": "Stage 3-1 complete",
+      "pass": true,
+      "detail": "SKIN_STAGE3_1_COMPLETE"
+    },
+    {
+      "name": "Stage 3-1 metric skinCount",
+      "pass": true,
+      "detail": {
+        "expected": 540,
+        "actual": 540
+      }
+    },
+    {
+      "name": "Stage 3-1 metric uniqueStaticPathCount",
+      "pass": true,
+      "detail": {
+        "expected": 540,
+        "actual": 540
+      }
+    },
+    {
+      "name": "Stage 3-1 metric uniqueSpinePathCount",
+      "pass": true,
+      "detail": {
+        "expected": 540,
+        "actual": 540
+      }
+    },
+    {
+      "name": "Stage 3-1 metric modelBindingEdgeCount",
+      "pass": true,
+      "detail": {
+        "expected": 2277,
+        "actual": 2277
+      }
+    },
+    {
+      "name": "Stage 3-1 metric uniqueModelResourceIdCount",
+      "pass": true,
+      "detail": {
+        "expected": 789,
+        "actual": 789
+      }
+    },
+    {
+      "name": "Stage 3-1 metric maxModelResourceIdsPerSkin",
+      "pass": true,
+      "detail": {
+        "expected": 5,
+        "actual": 5
+      }
+    },
+    {
+      "name": "Stage 3-1 metric maxModelBindingsPerSkin",
+      "pass": true,
+      "detail": {
+        "expected": 11,
+        "actual": 11
+      }
+    },
+    {
+      "name": "Stage 3-1 metric maxBindingsPerModelResource",
+      "pass": true,
+      "detail": {
+        "expected": 7,
+        "actual": 7
+      }
+    },
+    {
+      "name": "inventory record count 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "fixtures GENERATED",
+      "pass": true,
+      "detail": "GENERATED"
+    },
+    {
+      "name": "fixture role count 4",
+      "pass": true,
+      "detail": 4
+    },
+    {
+      "name": "fixture skin count within 1..4",
+      "pass": true,
+      "detail": 3
+    },
+    {
+      "name": "fixture role SIMPLE_SINGLE_RESOURCE_MIN_BINDINGS exact",
+      "pass": true,
+      "detail": {
+        "expected": 1901,
+        "actual": 1901
+      }
+    },
+    {
+      "name": "fixture role MAX_DISTINCT_MODEL_RESOURCES exact",
+      "pass": true,
+      "detail": {
+        "expected": 102,
+        "actual": 102
+      }
+    },
+    {
+      "name": "fixture role MAX_TOTAL_MODEL_BINDINGS exact",
+      "pass": true,
+      "detail": {
+        "expected": 102,
+        "actual": 102
+      }
+    },
+    {
+      "name": "fixture role MAX_BINDINGS_PER_RESOURCE exact",
+      "pass": true,
+      "detail": {
+        "expected": 3701,
+        "actual": 3701
+      }
+    },
+    {
+      "name": "fixture 102 exists in Stage 3-1",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "fixture 102 unique",
+      "pass": true,
+      "detail": 102
+    },
+    {
+      "name": "fixture 102 heroId parity",
+      "pass": true,
+      "detail": {
+        "fixture": 1,
+        "source": 1
+      }
+    },
+    {
+      "name": "fixture 102 sourceOrder parity",
+      "pass": true,
+      "detail": {
+        "fixture": 1,
+        "source": 1
+      }
+    },
+    {
+      "name": "fixture 102 static path parity",
+      "pass": true,
+      "detail": "UI/Icon/HeroSkin_ABS/Skin/Skin_Matthew_01.png"
+    },
+    {
+      "name": "fixture 102 Spine path parity",
+      "pass": true,
+      "detail": "Spine/Char/Mathew_ABS/Mathew_Skin01_Prefab.prefab"
+    },
+    {
+      "name": "fixture 102 model resource parity",
+      "pass": true,
+      "detail": [
+        102,
+        1021,
+        1022,
+        1023,
+        1024
+      ]
+    },
+    {
+      "name": "fixture 1901 exists in Stage 3-1",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "fixture 1901 unique",
+      "pass": true,
+      "detail": 1901
+    },
+    {
+      "name": "fixture 1901 heroId parity",
+      "pass": true,
+      "detail": {
+        "fixture": 19,
+        "source": 19
+      }
+    },
+    {
+      "name": "fixture 1901 sourceOrder parity",
+      "pass": true,
+      "detail": {
+        "fixture": 1,
+        "source": 1
+      }
+    },
+    {
+      "name": "fixture 1901 static path parity",
+      "pass": true,
+      "detail": "UI/Icon/HeroSkin2_ABS/Skin/Skin_Lista_Skin01.png"
+    },
+    {
+      "name": "fixture 1901 Spine path parity",
+      "pass": true,
+      "detail": "Spine/Char/Lista_ABS/Lista_Skin01_Prefab.prefab"
+    },
+    {
+      "name": "fixture 1901 model resource parity",
+      "pass": true,
+      "detail": [
+        1901
+      ]
+    },
+    {
+      "name": "fixture 3701 exists in Stage 3-1",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "fixture 3701 unique",
+      "pass": true,
+      "detail": 3701
+    },
+    {
+      "name": "fixture 3701 heroId parity",
+      "pass": true,
+      "detail": {
+        "fixture": 37,
+        "source": 37
+      }
+    },
+    {
+      "name": "fixture 3701 sourceOrder parity",
+      "pass": true,
+      "detail": {
+        "fixture": 1,
+        "source": 1
+      }
+    },
+    {
+      "name": "fixture 3701 static path parity",
+      "pass": true,
+      "detail": "UI/Icon/HeroSkin_ABS/Skin/Skin_Zigodlla_01.png"
+    },
+    {
+      "name": "fixture 3701 Spine path parity",
+      "pass": true,
+      "detail": "Spine/Char/Zigodlla_ABS/Zigodlla_Skin01_Prefab.prefab"
+    },
+    {
+      "name": "fixture 3701 model resource parity",
+      "pass": true,
+      "detail": [
+        3701
+      ]
+    },
+    {
+      "name": "fixtures contain no Stage 3-2 prohibited enrichment/path fields",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "prior semantic scan available as candidate-only context",
+      "pass": true,
+      "detail": "REVIEW"
+    },
+    {
+      "name": "prior semantic scan has no structural errors",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "authoritative asset evidence intentionally not claimed",
+      "pass": true,
+      "detail": "evidence file absent"
+    }
+  ],
+  "failures": {
+    "failedChecks": [],
+    "forbiddenFixtureFields": []
+  },
+  "nextAction": "Provide or mount the authoritative Unity asset source/root, generate Stage 3-2 evidence for the selected fixtures, and rerun the Stage 3-2 validator without recomputing Stage 3-1."
+}
