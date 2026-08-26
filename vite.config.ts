@@ -11,5 +11,23 @@ export default defineConfig({
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    // GitHub Pages feasibility test: prerender only the already-static banner route.
+    // Keep automatic discovery/crawling off so remaining server-function routes do not
+    // participate in this isolated fixture test.
+    prerender: {
+      enabled: true,
+      autoStaticPathsDiscovery: false,
+      crawlLinks: false,
+      failOnError: true,
+    },
+    pages: [
+      {
+        path: "/banners",
+        prerender: {
+          enabled: true,
+          outputPath: "/banners/index.html",
+        },
+      },
+    ],
   },
 });
