@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-integration-stageC-2-id-resolution/v1",
+  "stage": "C-2",
+  "checkpoint": "consumer-identity-id-resolution",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "purpose": "Prove that final Hero and Soldier consumers preserve canonical integer identities, resolve every reciprocal membership target, and retain a lossless Soldier routing-ID mapping without using names or ConfigData inference.",
+  "sourcePolicy": "C-2 consumes frozen C-0/C-1 outputs, A-stage identity contracts, final Hero manifest/shards/shared metadata, and final Soldier records only. It does not recompute Hero-Soldier membership semantics.",
+  "sources": {
+    "c0Contract": {
+      "path": "data/contracts/hero-soldier-integration-stageC-0-input.v1.json",
+      "gitBlobSha": "ec4effc3fb35b2ea90cc267e0c96609e2b36f312"
+    },
+    "c0Summary": {
+      "path": "data/validation/hero-soldier-integration-stageC-0-summary.v1.json",
+      "gitBlobSha": "8ff0dbc475e4ca306bbed4c7aa4666d40af2c5b9"
+    },
+    "c1": {
+      "path": "data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json",
+      "gitBlobSha": "c8a2d96ff5fce0dffb6ffbe89b92d5c37cf78bc3"
+    },
+    "heroIdentityContract": {
+      "path": "data/contracts/hero-identity-contract.v1.json",
+      "gitBlobSha": "7bd0450ba517953ae5c623244e9cb5e2aeb44c4a"
+    },
+    "soldierIdentityContract": {
+      "path": "data/contracts/soldier-identity-contract.v1.json",
+      "gitBlobSha": "ab652ffe7319e977f1d9e01ea906c6b9c0cd3f63"
+    },
+    "heroMaster": {
+      "path": "data/hero-name-master.v1.json",
+      "gitBlobSha": "12eaf4f84a3e91477c80fbccd78c949b79c3829f"
+    },
+    "soldierMaster": {
+      "path": "data/generated/soldier-master.v1.json",
+      "gitBlobSha": "23e01ad8707bd7f026f5a3660cc0342747bd5cdb"
+    },
+    "heroManifest": {
+      "path": "data/generated/hero-detail.v1.json",
+      "gitBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66"
+    },
+    "heroShared": {
+      "path": "data/generated/hero-detail-shared.v1.json",
+      "gitBlobSha": "cd455c567e7a9e3f8449e2eedf44a43897bf4c68"
+    },
+    "heroFinal": {
+      "path": "data/validation/hero-stage6-4-final.v1.json",
+      "gitBlobSha": "9ae03d2dcc0660aae9c28900345212426b2a4dd1"
+    },
+    "soldierRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    },
+    "soldierFinal": {
+      "path": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "gitBlobSha": "c1f9253ddea94e9f7a4f9c7e1aee9163c3abc3bb"
+    }
+  },
+  "upstreamChecks": {
+    "c0PassComplete": true,
+    "c1PassComplete": true,
+    "heroIdentityFrozen": true,
+    "soldierIdentityFrozen": true,
+    "heroFinalFrozen": true,
+    "soldierFinalReady": true
+  },
+  "snapshotChecks": {
+    "heroManifestMatchesC0": true,
+    "heroFinalMatchesC0": true,
+    "soldierRecordsMatchC0": true,
+    "soldierFinalMatchesC0": true,
+    "heroSharedMatchesHeroFinal": true,
+    "heroMasterMatchesIdentityContract": true,
+    "soldierMasterMatchesIdentityContract": true
+  },
+  "expected": {
+    "heroes": 267,
+    "soldiers": 224,
+    "c1CanonicalPairs": 5977
+  },
+  "identityRules": {
+    "heroCanonicalKey": "heroId",
+    "soldierCanonicalKey": "soldierId",
+    "membershipValueType": "positive safe integer JSON number",
+    "objectKeySerialization": "canonical positive decimal string; String(Number(key)) must equal key",
+    "heroShardLocator": "data/generated/hero-detail/by-id/{heroId}.json",
+    "soldierSiteIdForm": "soldier-<soldierId>",
+    "nameJoinForbidden": true,
+    "numericOffsetInferenceForbidden": true
+  },
+  "summary": {
+    "heroMasterCount": 267,
+    "heroManifestCount": 267,
+    "soldierMasterCount": 224,
+    "soldierRecordCount": 224,
+    "sharedSoldierMetadataCount": 224,
+    "heroMembershipReferenceCount": 5977,
+    "soldierMembershipReferenceCount": 5977,
+    "heroManifestVsMasterMismatch": 0,
+    "soldierRecordsVsMasterMismatch": 0,
+    "sharedMetadataVsMasterMismatch": 0,
+    "sharedMetadataVsFinalRecordsMismatch": 0,
+    "heroMasterInvalidIds": 0,
+    "heroMasterDuplicateIds": 0,
+    "soldierMasterInvalidIds": 0,
+    "soldierMasterDuplicateIds": 0,
+    "heroManifestInvalidKeys": 0,
+    "heroManifestPathMismatches": 0,
+    "heroShardIdentityMismatches": 0,
+    "heroMembershipTypeErrors": 0,
+    "heroMembershipDuplicateIds": 0,
+    "heroMembershipUnknownSoldierIds": 0,
+    "soldierRecordInvalidIds": 0,
+    "soldierRecordDuplicateIds": 0,
+    "soldierMembershipTypeErrors": 0,
+    "soldierMembershipDuplicateIds": 0,
+    "soldierMembershipUnknownHeroIds": 0,
+    "sharedMetadataInvalidKeys": 0,
+    "sharedMetadataIdMismatches": 0,
+    "sharedMetadataDuplicateIds": 0,
+    "sharedMetadataSiteIdMismatches": 0,
+    "sharedMetadataMissingForHeroRefs": 0,
+    "missingHeroShards": 0,
+    "malformedMembershipContainers": 0,
+    "missingKoreanNameCount": 41,
+    "hardErrorCount": 0
+  },
+  "setParity": {
+    "heroManifestVsHeroMaster": {
+      "mismatchCount": 0,
+      "leftMinusRight": [],
+      "rightMinusLeft": []
+    },
+    "soldierRecordsVsSoldierMaster": {
+      "mismatchCount": 0,
+      "leftMinusRight": [],
+      "rightMinusLeft": []
+    },
+    "sharedMetadataVsSoldierMaster": {
+      "mismatchCount": 0,
+      "leftMinusRight": [],
+      "rightMinusLeft": []
+    },
+    "sharedMetadataVsSoldierRecords": {
+      "mismatchCount": 0,
+      "leftMinusRight": [],
+      "rightMinusLeft": []
+    }
+  },
+  "diagnostics": {
+    "heroMasterInvalidIds": [],
+    "heroMasterDuplicateIds": [],
+    "soldierMasterInvalidIds": [],
+    "soldierMasterDuplicateIds": [],
+    "heroManifestInvalidKeys": [],
+    "heroManifestPathMismatches": [],
+    "heroShardIdentityMismatches": [],
+    "heroMembershipTypeErrors": [],
+    "heroMembershipDuplicateIds": [],
+    "heroMembershipUnknownSoldierIds": [],
+    "soldierRecordInvalidIds": [],
+    "soldierRecordDuplicateIds": [],
+    "soldierMembershipTypeErrors": [],
+    "soldierMembershipDuplicateIds": [],
+    "soldierMembershipUnknownHeroIds": [],
+    "sharedMetadataInvalidKeys": [],
+    "sharedMetadataIdMismatches": [],
+    "sharedMetadataDuplicateIds": [],
+    "sharedMetadataSiteIdMismatches": [],
+    "sharedMetadataMissingForHeroRefs": [],
+    "missingHeroShards": [],
+    "malformedMembershipContainers": []
+  },
+  "nonBlockingReviews": [
+    {
+      "code": "SOLDIER_KR_NAME_UNRESOLVED",
+      "count": 41,
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "Korean display-name absence is presentation-only and must never remove or alter a canonical soldierId reference."
+    },
+    {
+      "code": "RELEASE_DATE_UNRESOLVED",
+      "count": 213,
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "Release metadata is outside C-2 identity/resolution integrity."
+    },
+    {
+      "code": "ROUTE_IMPLEMENTATION_SEPARATE_FROM_IDENTITY",
+      "count": null,
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "C-2 validates stable IDs and Soldier siteId round-trip metadata, not deployed click/route behavior."
+    }
+  ],
+  "hardErrors": [],
+  "passCriteria": {
+    "heroes": 267,
+    "soldiers": 224,
+    "allIdentitySetsEqual": true,
+    "allMembershipIdsArePositiveIntegers": true,
+    "allMembershipTargetsResolve": true,
+    "allHeroShardKeysAndPathsRoundTrip": true,
+    "allSharedSoldierKeysAndIdsRoundTrip": true,
+    "allSoldierSiteIdsMapBackToSoldierId": true,
+    "duplicateMembershipIds": 0,
+    "malformedMembershipContainers": 0,
+    "hardErrors": 0,
+    "presentationReviewsMayRemain": true
+  },
+  "decision": "C-2 PASS_WITH_REVIEW. All 267 Hero identities, 224 Soldier identities, final membership ID types, target lookups, Hero shard locators, shared Soldier metadata keys and Soldier siteId mappings resolve exactly with zero structural identity errors. Presentation-only name/release reviews remain non-blocking.",
+  "nextStartPoint": "C-3 representative special-relation fixture regression against frozen A-stage membership and final consumers."
+}
