@@ -1,0 +1,13 @@
+'use strict';
+const fs=require('fs'),path=require('path'); const root=path.resolve(__dirname,'..');
+const read=p=>JSON.parse(fs.readFileSync(path.join(root,p),'utf8')); const rows=d=>Array.isArray(d)?d:(d?.records||d?.rows||d?.data||[]); const byId=a=>new Map(a.map(x=>[Number(x.ID),x]));
+const sp=rows(read('data/configdata/ConfigDataSPHeroInfo.json')); const missions=rows(read('data/configdata/ConfigDataMissionInfo.json')); const mBy=byId(missions);
+const ids=[...new Set(sp.flatMap(r=>[...(r.FisrtStageMissions||[]),...(r.SecondStageMissions||[])]).map(Number))];
+const selected=ids.map(id=>mBy.get(id)).filter(Boolean); const types=[...new Set(selected.map(m=>Number(m.MissionType)))].sort((a,b)=>a-b);
+const submit=rows(read('data/configdata/ConfigDataMissionSumitItemInfo.json')); const submitBy=byId(submit); const equip=rows(read('data/configdata/ConfigDataEquipmentInfo.json')); const equipBy=byId(equip);
+const walkNums=(v,p='$',out=[])=>{if(Array.isArray(v))v.forEach((x,i)=>walkNums(x,`${p}[${i}]`,out)); else if(v&&typeof v==='object')Object.entries(v).forEach(([k,x])=>walkNums(x,`${p}.${k}`,out)); else if(typeof v==='number')out.push({path:p,value:v}); return out;};
+const analyses={};
+for(const t of types){const arr=selected.filter(m=>Number(m.MissionType)===t); const keys=[...new Set(arr.flatMap(x=>Object.keys(x)))].sort(); analyses[t]={count:arr.length,keys,samples:arr.slice(0,6),param1Values:[...new Set(arr.map(x=>x.Param1).filter(x=>x!=null))].slice(0,50),param2Values:[...new Set(arr.map(x=>x.Param2).filter(x=>x!=null))].slice(0,50),param3Values:[...new Set(arr.map(x=>x.Param3).filter(x=>x!=null))].slice(0,50),numericPaths:[...new Set(arr.slice(0,20).flatMap(x=>walkNums(x).map(n=>n.path)))].sort()};}
+analyses[73].submitResolution={resolved:selected.filter(m=>Number(m.MissionType)===73&&submitBy.has(Number(m.Param1))).length,total:selected.filter(m=>Number(m.MissionType)===73).length,missing:selected.filter(m=>Number(m.MissionType)===73&&!submitBy.has(Number(m.Param1))).map(m=>m.ID)};
+analyses[77].equipmentResolution={resolved:selected.filter(m=>Number(m.MissionType)===77&&equipBy.has(Number(m.Param1))).length,total:selected.filter(m=>Number(m.MissionType)===77).length,missing:selected.filter(m=>Number(m.MissionType)===77&&!equipBy.has(Number(m.Param1))).map(m=>m.ID),levels:[...new Set(selected.filter(m=>Number(m.MissionType)===77).map(m=>Number(m.Param2)))]};
+const out={version:1,stage:'hero-page-5-4',checkpoint:'mission-semantics-probe',types,analyses}; fs.mkdirSync(path.join(root,'data','validation'),{recursive:true}); fs.writeFileSync(path.join(root,'data/validation/hero-page-stage5-4-mission-semantics.v1.json'),JSON.stringify(out,null,2)+'\n'); console.log(JSON.stringify(out,null,2));
