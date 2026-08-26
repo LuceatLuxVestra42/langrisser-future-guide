@@ -1,0 +1,56 @@
+{
+  "stage": "3-4",
+  "purpose": "Assemble the 206-record general equipment detail payload from frozen Stage 2 outputs and Stage 3-2/3-3 consumer data without reopening equipment semantics.",
+  "sources": {
+    "pageSchema": "data/contracts/equipment-stage3-1-page-schema.v1.json",
+    "generalList": "data/generated/equipment_stage3_3_general_list.json",
+    "stats": "data/generated/equipment_stage2_4_stats.json",
+    "effects": "data/generated/equipment_stage2_5_effects.json",
+    "restrictions": "data/generated/equipment_stage2_6_restrictions.json",
+    "acquisition": "data/generated/equipment_stage2_7_acquisition.json"
+  },
+  "admission": {
+    "source": "Stage 3-3 general list records",
+    "expectedTotal": 206,
+    "expectedTabs": {"1": 94, "2": 80, "3": 32},
+    "classes": ["launch", "legacy-additional", "current-additional"]
+  },
+  "recordSchema": {
+    "primaryKey": "equipmentId",
+    "routeKey": "equipmentId",
+    "blocks": {
+      "identity": ["equipmentId", "nameCn", "nameKr", "icon"],
+      "classification": ["group", "groupKo", "subtype", "subtypeKo", "groupOrder", "subtypeOrder", "equipmentType", "label", "acquisitionClass", "siteTab", "sortIndex"],
+      "stats": ["maxLevel", "properties"],
+      "effect": ["maxEffectSkillId", "effectName", "effectText", "effectSegments"],
+      "restriction": ["mode", "generalArmyIds", "specialJobIds"],
+      "acquisition": ["releaseGroupDate", "confidencePercent", "classificationBasis"]
+    }
+  },
+  "copyPolicy": {
+    "identityAndListClassification": "Copy Stage 3-3 list identity/display/filter fields exactly; nameKr may remain null only when inherited from Stage 3-2 review state.",
+    "stats": "Copy Stage 2-4 stats[*] without recalculation; all current properties must resolve to maxLevel 50.",
+    "effect": "Copy Stage 2-5 maxEffectSkillId/effectName/effectText/effectSegments exactly. Do not translate, summarize, rewrite, or merge effect wording.",
+    "restriction": "Copy Stage 2-6 mode/generalArmyIds/specialJobIds exactly. The current OR equip-eligibility meaning remains a 0.99 structural inference and is not upgraded to runtime-direct proof in Stage 3-4.",
+    "acquisition": "Copy Stage 2-7 releaseGroupDate/confidencePercent/classificationBasis and classification metadata exactly; do not invent missing release dates or chronology.",
+    "historicalMismatch": "Known historical-sheet/ConfigData mismatches remain preserved upstream and are not corrected inside detail assembly."
+  },
+  "validation": {
+    "hardRequirements": [
+      "exactly 206 unique equipmentId records matching the Stage 3-3 general-list ID set",
+      "tab counts remain 94/80/32 and no exclusive/soul-special/unresolved class leaks",
+      "identity and list classification fields equal Stage 3-3 source values",
+      "stats properties equal Stage 2-4 source rows and maxLevel resolves to 50",
+      "effect block equals Stage 2-5 source values including rich segments",
+      "restriction block equals Stage 2-6 source values",
+      "acquisition block and equipmentType/label equal Stage 2-7 source values",
+      "all records are directly routable by equipmentId"
+    ],
+    "reviewAllowed": [
+      "59 inherited unresolved Korean names from Stage 3-2/3-3",
+      "32 tab3 records without exact release chronology in the frozen acquisition source",
+      "Stage 2-6 runtime equip-check direct proof remains unlocated"
+    ]
+  },
+  "completion": "All 206 general equipment records can be loaded by equipmentId with the frozen Stage 3-1 detail blocks populated from existing upstream outputs, with only explicitly inherited review states retained."
+}
