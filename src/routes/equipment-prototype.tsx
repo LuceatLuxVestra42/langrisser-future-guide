@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Crown, Gem, Shield, Swords } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
 import { getGeneralEquipmentPageData } from "@/lib/equipment-page.functions";
 import type { EquipmentListRecord } from "@/lib/equipment-page.server";
@@ -19,12 +19,12 @@ export const Route = createFileRoute("/equipment-prototype")({
   component: EquipmentGalleryPrototype,
 });
 
-const GROUP_ORDER = ["weapon", "armor", "head", "accessory"] as const;
+const GROUP_ORDER = ["weapon", "armor", "headgear", "accessory"] as const;
 
 const GROUP_LABELS: Record<string, string> = {
   weapon: "무기",
   armor: "갑옷",
-  head: "투구",
+  headgear: "투구",
   accessory: "악세",
 };
 
@@ -150,7 +150,7 @@ function FilterButton({
 }: {
   selected: boolean;
   onClick: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <button
@@ -175,7 +175,7 @@ function SubFilterButton({
 }: {
   selected: boolean;
   onClick: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <button
@@ -206,7 +206,7 @@ function EquipmentImageCard({ record }: { record: EquipmentListRecord }) {
     >
       <EquipmentPlaceholder record={record} />
 
-      <div className="absolute inset-x-0 bottom-0 bg-black/72 px-1.5 py-1.5 text-center backdrop-blur-[1px]">
+      <div className="absolute inset-x-0 bottom-0 bg-black/70 px-1.5 py-1.5 text-center backdrop-blur-[1px]">
         <span className="line-clamp-2 text-[11px] font-bold leading-tight text-white sm:text-xs">
           {displayName}
         </span>
@@ -224,7 +224,7 @@ function EquipmentPlaceholder({ record }: { record: EquipmentListRecord }) {
         <Swords className={iconClass} strokeWidth={1.35} aria-hidden="true" />
       ) : record.group === "armor" ? (
         <Shield className={iconClass} strokeWidth={1.35} aria-hidden="true" />
-      ) : record.group === "head" ? (
+      ) : record.group === "headgear" ? (
         <Crown className={iconClass} strokeWidth={1.35} aria-hidden="true" />
       ) : (
         <Gem className={iconClass} strokeWidth={1.35} aria-hidden="true" />
