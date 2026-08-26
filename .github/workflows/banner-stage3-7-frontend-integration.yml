@@ -16,6 +16,8 @@ on:
       - 'data/generated/equipment_stage3_4_general_detail.json'
       - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
       - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'data/generated/soldier-detail-stage5-2.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'scripts/validate-banner-stage3-7-frontend-integration.mjs'
       - 'src/lib/banner-page.server.ts'
@@ -23,11 +25,14 @@ on:
       - 'src/lib/banner-page.functions.ts'
       - 'src/lib/equipment-page.server.ts'
       - 'src/lib/equipment-page.functions.ts'
+      - 'src/lib/soldier-page.server.ts'
+      - 'src/lib/soldier-page.functions.ts'
       - 'src/router.tsx'
       - 'src/routes/banners.tsx'
       - 'src/routes/equipment.tsx'
       - 'src/routes/equipment_.exclusive.tsx'
       - 'src/routes/equipment_.$equipmentId.tsx'
+      - 'src/routes/soldiers.tsx'
       - 'src/routes/index.tsx'
       - 'src/routeTree.gen.ts'
       - 'package.json'
@@ -50,16 +55,20 @@ jobs:
         run: node scripts/validate-banner-stage3-7-frontend-integration.mjs
       - name: Build production frontend
         run: bun run build
-      - name: Verify static home, banner, and equipment pages
+      - name: Verify static home, banner, equipment, and Soldier pages
         run: |
           test -f dist/client/index.html
           test -f dist/client/banners/index.html
           test -f dist/client/equipment/index.html
           test -f dist/client/equipment/exclusive/index.html
+          test -f dist/client/soldiers/index.html
           DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
           test "$DETAIL_COUNT" -eq 373
+          node -e "const x=require('./data/generated/soldier-list-stage5-8.v1.json'); if(x.summary.recordCount!==224 || x.summary.normalCount!==168 || x.summary.spCount!==56) process.exit(1)"
           grep -q '/banners' src/routeTree.gen.ts
           grep -q '/equipment' src/routeTree.gen.ts
+          grep -q '/soldiers' src/routeTree.gen.ts
+          grep -q '224종' dist/client/soldiers/index.html
       - name: Persist Banner Stage 3-7 checkpoint
         run: |
           git config user.name "github-actions[bot]"
