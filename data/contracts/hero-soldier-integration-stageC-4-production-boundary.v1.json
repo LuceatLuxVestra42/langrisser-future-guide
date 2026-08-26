@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-integration-stageC-4-production-boundary/v1",
+  "stage": "C-4",
+  "status": "FROZEN",
+  "purpose": "Freeze one-way production ownership for Hero-Soldier membership after Stage C-3. Relation semantics are owned by the accepted A-stage canonical relation layer; indexes and final Hero/Soldier consumers are derived offline; frontend code may consume final materialized IDs but must not recompute or reinterpret membership.",
+  "upstreamCheckpoints": {
+    "c0": {
+      "path": "data/contracts/hero-soldier-integration-stageC-0-input.v1.json",
+      "gitBlobSha": "ec4effc3fb35b2ea90cc267e0c96609e2b36f312",
+      "requiredStatus": "FROZEN"
+    },
+    "c1": {
+      "path": "data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json",
+      "gitBlobSha": "c8a2d96ff5fce0dffb6ffbe89b92d5c37cf78bc3",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "COMPLETE"
+    },
+    "c2": {
+      "path": "data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json",
+      "gitBlobSha": "2c1efc5bc324b2f0f3b37db666aafe8633a5a157",
+      "requiredStatusFamily": "PASS",
+      "requiredCompletion": "COMPLETE"
+    },
+    "c3": {
+      "path": "data/validation/hero-soldier-integration-stageC-3-special-fixtures.v1.json",
+      "gitBlobSha": "a729e5580d34c06fe11c108cbf2700381bd3ca39",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "COMPLETE"
+    }
+  },
+  "frozenProductionArtifacts": {
+    "canonicalRelation": {
+      "owner": "A_STAGE_RELATION_PIPELINE",
+      "path": "data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+      "schemaId": "hero-soldier-relation-set/v1",
+      "expectedPairCount": 5977,
+      "writePolicy": "Only the offline accepted relation-generation pipeline may create or replace relation membership. Downstream consumers are read-only with respect to canonical membership."
+    },
+    "byHeroIndex": {
+      "owner": "OFFLINE_RELATION_PROJECTION",
+      "path": "data/generated/hero-soldier-by-hero.v1.json",
+      "gitBlobSha": "e613bd05b0e7173734834cba5d8cfbff973298ad",
+      "expectedKeyCount": 267,
+      "expectedPairCount": 5977,
+      "source": "canonicalRelation"
+    },
+    "bySoldierIndex": {
+      "owner": "OFFLINE_RELATION_PROJECTION",
+      "path": "data/generated/hero-soldier-by-soldier.v1.json",
+      "gitBlobSha": "ff9d8a881c03b6e0f2a196e12f37cd2e28e3e251",
+      "expectedKeyCount": 224,
+      "expectedPairCount": 5977,
+      "source": "canonicalRelation"
+    },
+    "heroFinalConsumer": {
+      "owner": "HERO_FINAL_PIPELINE",
+      "manifestPath": "data/generated/hero-detail.v1.json",
+      "manifestGitBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66",
+      "membershipField": "data/generated/hero-detail/by-id/{heroId}.json#soldiers.ids",
+      "expectedHeroCount": 267,
+      "source": "byHeroIndex"
+    },
+    "soldierFinalConsumer": {
+      "owner": "SOLDIER_FINAL_PIPELINE",
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df",
+      "membershipField": "records[*].heroes.finalHeroIds",
+      "expectedSoldierCount": 224,
+      "source": "bySoldierIndex"
+    }
+  },
+  "productionFlow": [
+    "A_STAGE_RELATION_PIPELINE -> canonicalRelation",
+    "canonicalRelation -> byHeroIndex + bySoldierIndex",
+    "byHeroIndex -> heroFinalConsumer.soldiers.ids",
+    "bySoldierIndex -> soldierFinalConsumer.heroes.finalHeroIds",
+    "heroFinalConsumer + soldierFinalConsumer -> frontend presentation/navigation"
+  ],
+  "frontendBoundary": {
+    "currentImplementationStatus": "NOT_YET_IMPLEMENTED",
+    "allowed": [
+      "Read stable Hero IDs and final Hero soldiers.ids membership from final Hero consumer output.",
+      "Read stable Soldier IDs/site IDs and final Soldier heroes.finalHeroIds membership from final Soldier consumer output.",
+      "Resolve display metadata after identity has already been resolved by stable IDs.",
+      "Build Hero-to-Soldier and Soldier-to-Hero navigation from final materialized membership IDs.",
+      "Render missing Korean names, release dates or assets as presentation state without altering relation membership."
+    ],
+    "forbidden": [
+      "Read raw ConfigData to determine Hero-Soldier membership at runtime or build time in frontend source.",
+      "Import canonicalRelation, byHeroIndex or bySoldierIndex directly into frontend source as an alternate membership owner.",
+      "Reconstruct membership from BASE_SOLDIER_HERO, SP_HERO_REWARD, SP_SOLDIER_INHERIT, SP_SOLDIER_EXPAND, GetSoldierHeros_ID, SecondStageRewardSoldiers or SecondStageExpandHeroList semantics.",
+      "Infer SP Soldier membership by adding or subtracting 5000 or any other ID arithmetic.",
+      "Join Hero and Soldier membership by Korean/Chinese/English display names or other presentation strings.",
+      "Patch one consumer from the other consumer when a mismatch is found; mismatches must fail validation and return to the owning upstream pipeline.",
+      "Add arbitrary pair-specific exceptions in route/component code."
+    ]
+  },
+  "mutationPolicy": {
+    "direction": "ONE_WAY_ONLY",
+    "canonicalMayFeedIndexes": true,
+    "indexesMayFeedFinalConsumers": true,
+    "finalConsumersMayFeedFrontend": true,
+    "frontendMayWriteBackMembership": false,
+    "heroConsumerMayPatchSoldierConsumer": false,
+    "soldierConsumerMayPatchHeroConsumer": false,
+    "nameOrPresentationMayChangeMembership": false
+  },
+  "staticGate": {
+    "scanRoot": "src",
+    "blockedFrontendPathTokens": [
+      "data/configdata/ConfigDataSoldierInfo.json",
+      "data/configdata/ConfigDataSPHeroInfo.json",
+      "data/configdata/ConfigDataSPSoldierInfo.json",
+      "data/generated/hero-soldier-relations.v1.json",
+      "data/generated/hero-soldier-by-hero.v1.json",
+      "data/generated/hero-soldier-by-soldier.v1.json"
+    ],
+    "blockedSemanticTokensInHeroSoldierSource": [
+      "GetSoldierHeros_ID",
+      "SecondStageRewardSoldiers",
+      "SecondStageExpandHeroList",
+      "BASE_SOLDIER_HERO",
+      "SP_HERO_REWARD",
+      "SP_SOLDIER_INHERIT",
+      "SP_SOLDIER_EXPAND"
+    ],
+    "blockedIdArithmetic": "Hero/Soldier integration frontend source must not contain membership logic that adds or subtracts 5000 to translate normal/SP Soldier IDs."
+  },
+  "nonBlockingPresentationReview": {
+    "policy": "Presentation/localization/release/asset incompleteness remains REVIEW-only and cannot mutate stable membership IDs.",
+    "examples": [
+      "Korean Soldier name unresolved",
+      "release date unresolved",
+      "asset delivery pending",
+      "route implementation not yet complete"
+    ]
+  },
+  "completionRule": "C-4 passes only when C-0 through C-3 remain accepted and frozen, all five production layers point to the frozen artifacts above, one-way ownership is explicit, and the frontend source tree contains no blocked raw-relation imports or detected Hero/Soldier membership recomputation signatures."
+}
