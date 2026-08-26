@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "stage": "hero-page-6-4",
+  "status": "FROZEN",
+  "purpose": "Freeze the final Hero site-consumer boundary after Stage 6-3 full generation. Production page code must consume the sharded Hero detail publication and the closed Stage B byHero ownership index without reopening Stage 4/5/ConfigData semantics or duplicating relation logic.",
+  "dependsOn": {
+    "stage63Validation": "data/validation/hero-stage6-3-final.v1.json",
+    "heroDetailManifest": "data/generated/hero-detail.v1.json",
+    "heroDetailShared": "data/generated/hero-detail-shared.v1.json",
+    "stageBFinal": "data/validation/hero-exclusive-equipment-relation-stageB-final.v1.json",
+    "stageBConsumerAdmission": "data/generated/hero-exclusive-equipment-consumer-admission.v1.json",
+    "exclusiveByHero": "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+    "exclusiveByEquipment": "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+    "exclusiveEquipmentMetadata": "data/generated/equipment_stage3_5_exclusive_consumer.json"
+  },
+  "expected": {
+    "canonicalHeroCount": 267,
+    "heroShardCount": 267,
+    "siteUsableHeroCount": 267,
+    "structuralFailCount": 0,
+    "stage63HardErrorCount": 0,
+    "stageBClosed": true,
+    "stageBStatus": "PASS_ACCEPTED",
+    "exclusiveOwnershipRelations": 167,
+    "heroesWithExclusive": 167,
+    "heroesWithoutExclusive": 100,
+    "exclusiveMetadataRecords": 167,
+    "consumerOwnershipMismatchCount": 0,
+    "shardIntegrityMismatchCount": 0,
+    "hardErrorCount": 0
+  },
+  "productionInputs": {
+    "heroDetail": {
+      "manifest": "data/generated/hero-detail.v1.json",
+      "heroShardLookup": "manifest.storage.byHeroId[String(heroId)].path",
+      "heroShardIntegrity": "SHA-256 must equal manifest.storage.byHeroId[String(heroId)].sha256",
+      "sharedSoldierMetadata": "data/generated/hero-detail-shared.v1.json#soldiersById"
+    },
+    "exclusiveEquipment": {
+      "ownership": "data/generated/hero-exclusive-equipment-by-hero.v1.json#byHeroId",
+      "lookup": "heroId -> equipmentIds[]",
+      "metadata": "data/generated/equipment_stage3_5_exclusive_consumer.json#detailRecords by equipmentId",
+      "currentCardinality": "ZERO_OR_ONE exclusive Equipment per canonical Hero"
+    }
+  },
+  "validationOnlyInputs": {
+    "stage63": "data/validation/hero-stage6-3-final.v1.json",
+    "stageBFinal": "data/validation/hero-exclusive-equipment-relation-stageB-final.v1.json",
+    "stageBConsumerAdmission": "data/generated/hero-exclusive-equipment-consumer-admission.v1.json",
+    "exclusiveByEquipment": "data/generated/hero-exclusive-equipment-by-equipment.v1.json#byEquipmentId"
+  },
+  "routes": {
+    "heroDetail": {
+      "path": "/hero/$heroId",
+      "routeKey": "heroId",
+      "resolution": "Resolve the exact numeric heroId in hero-detail.v1.json storage.byHeroId. Load only that shard for the detail route. Unknown IDs return the public not-found state; never search Stage 4/5 or ConfigData as fallback."
+    }
+  },
+  "composition": {
+    "identityHeaderNormalBondsCentralSp": "Use the selected Hero shard as the canonical materialized payload for identity, presentation, normal combat, bonds, centralDiscipline and sp blocks.",
+    "soldiers": "Use shard.soldiers.ids as the frozen Hero-Soldier membership and resolve display metadata from hero-detail-shared.v1.json#soldiersById. Do not rebuild Hero-Soldier membership in page code.",
+    "exclusiveEquipment": {
+      "ownershipStep": "Resolve ownership membership only from B-5 byHeroId.",
+      "absenceSemantics": "A canonical Hero missing from byHeroId has no released exclusive Equipment in the accepted snapshot. Render the not-released/absent state; do not infer an Equipment.",
+      "metadataStep": "When byHeroId returns one equipmentId, join that exact ID to Equipment Stage 3-5 exclusive detail metadata.",
+      "embeddedShardExclusiveBlockRole": "PARITY_ONLY_MATERIALIZED_SNAPSHOT",
+      "legacyOwnerResolverRole": "DIAGNOSTIC_ONLY_NOT_PRODUCTION_AUTHORITY"
+    }
+  },
+  "uiContract": {
+    "normalSpInitialState": "Normal form is the default on page entry/re-entry. SP form may be toggled only when shard.sp.status == RELEASED.",
+    "normalBlocks": [
+      "talent",
+      "bonds",
+      "exclusiveEquipment",
+      "centralDiscipline",
+      "soldiers",
+      "stats",
+      "jobs",
+      "skills"
+    ],
+    "spBlocks": [
+      "spTalentAndStatsFromSpBlock",
+      "bonds",
+      "exclusiveEquipment",
+      "centralDiscipline",
+      "soldiers",
+      "spMissions"
+    ],
+    "presentationReviewPolicy": "Presentation-only REVIEW remains renderable/site-usable. Null Korean display metadata may fall back for display but must not be written back as verified source data.",
+    "assetBoundary": "Source asset paths are data identifiers only. Web-delivery conversion/extraction belongs to the later frontend/asset integration step and does not reopen Hero semantic data."
+  },
+  "forbiddenProductionReadsOrDerivations": [
+    "data/configdata/ConfigData*.json from Hero page code",
+    "Stage 4 or Stage 5 producer outputs as runtime page inputs",
+    "Stage 6-1 composition locators as runtime page inputs",
+    "data/generated/hero-exclusive-equipment-relations.v1.json as a page lookup when the admitted byHero index exists",
+    "ConfigDataEquipmentInfo.SkillHero direct reads in Hero page code",
+    "legacy Stage 5-2 ownerHeroId/ownerResolver as production ownership authority",
+    "Hero-Soldier membership re-derivation from SoldierInfo/SP relations",
+    "ownership inference from names, descriptions, icons, ArmyIds/JobIds, numeric patterns, sorting or chronology"
+  ],
+  "nonDuplication": {
+    "newMonolithicHeroDetail": false,
+    "newOwnershipPairCopy": false,
+    "reason": "Stage 6-3 already freezes one canonical shard per Hero, and Stage B already freezes the minimal byHero/byEquipment projections. Stage 6-4 freezes consumption and validation rather than copying those payloads again."
+  },
+  "publicationGate": [
+    "Hero Stage 6-3 is COMPLETE with 267/267 site-usable Hero records, zero structural FAIL and zero hard errors.",
+    "All 267 manifest entries resolve to one existing Hero shard whose SHA-256 and heroId match the manifest.",
+    "The shared Soldier payload SHA-256 matches the manifest and every referenced Soldier ID resolves in soldiersById.",
+    "Stage B final is PASS_ACCEPTED and closed, and B-6 consumer admission is COMPLETE with zero hard errors.",
+    "B byHero/byEquipment indexes round-trip the same 167 ownership pairs.",
+    "All 167 B-owned equipment IDs resolve in Equipment Stage 3-5 exclusive detail metadata.",
+    "Each materialized Hero shard's embedded exclusiveEquipment snapshot has exact parity with B byHero membership after treating absent/not-released as no relation.",
+    "No runtime fallback to ConfigData, Stage 4, Stage 5, Stage 6-1 or heuristic relationship reconstruction is admitted."
+  ],
+  "freezeDecision": {
+    "stage6CompleteWhenGatePasses": true,
+    "heroDataPipelineStatus": "FINAL_FROZEN",
+    "nextScope": "Frontend/UI and web-asset integration may consume this contract. Semantic producer stages remain frozen unless a new source snapshot or explicit contradiction requires their owning stage to be reopened."
+  },
+  "outputs": {
+    "validation": "data/validation/hero-stage6-4-final.v1.json",
+    "checkpointJson": "data/checkpoints/hero-stage6-4-site-consumer.json",
+    "checkpointMarkdown": "data/checkpoints/hero-stage6-4-site-consumer.md"
+  }
+}
