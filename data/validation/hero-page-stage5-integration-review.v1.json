@@ -2,27 +2,26 @@
   "version": 1,
   "stage": "hero-page-5",
   "checkpoint": "stage-wide-integration-review",
-  "status": "BLOCKED",
-  "completion": "STAGE_5_INTEGRATION_REVIEW_COMPLETE_BLOCKED_BY_UNFINISHED_BLOCKS",
+  "status": "PASS",
+  "completion": "STAGE_5_COMPLETE",
   "purpose": "Stage-wide integration audit for Hero Stage 5. Only frozen COMPLETE final checkpoints are promoted; pending semantic/retrace checkpoints remain non-final.",
   "summary": {
     "plannedBlockCount": 5,
-    "completedBlockCount": 4,
+    "completedBlockCount": 5,
     "completedBlocks": [
       "5-1",
       "5-2",
       "5-3",
+      "5-4",
       "5-5"
     ],
-    "blockedBlocks": [
-      "5-4"
-    ],
+    "blockedBlocks": [],
     "canonicalHeroCount": 267,
     "completedCrossBlockCheckCount": 3,
     "passedCrossBlockCheckCount": 3,
     "hardErrorCount": 0,
-    "blockerCount": 1,
-    "stage5ReadyToClose": false
+    "blockerCount": 0,
+    "stage5ReadyToClose": true
   },
   "completedBlocks": [
     {
@@ -61,6 +60,15 @@
       }
     },
     {
+      "stage": "5-4",
+      "title": "SP block",
+      "status": "PASS",
+      "completion": "COMPLETE",
+      "checkpoint": "data/validation/hero-page-stage5-4-final.v1.json",
+      "canonicalHeroes": 267,
+      "hardErrorCount": 0
+    },
+    {
       "stage": "5-5",
       "title": "Header / basic information",
       "status": "PASS",
@@ -96,9 +104,14 @@
       "hasFinalCheckpoint": true
     },
     "5-4": {
-      "candidateFiles": [],
-      "finalCheckpointFiles": [],
-      "hasFinalCheckpoint": false
+      "candidateFiles": [
+        "data/generated/hero-page-stage5-4-sp.v1.json",
+        "data/validation/hero-page-stage5-4-final.v1.json"
+      ],
+      "finalCheckpointFiles": [
+        "data/validation/hero-page-stage5-4-final.v1.json"
+      ],
+      "hasFinalCheckpoint": true
     }
   },
   "unfinishedBlockDiscovery": {
@@ -124,9 +137,14 @@
       "hasFinalCheckpoint": true
     },
     "5-4": {
-      "candidateFiles": [],
-      "finalCheckpointFiles": [],
-      "hasFinalCheckpoint": false
+      "candidateFiles": [
+        "data/generated/hero-page-stage5-4-sp.v1.json",
+        "data/validation/hero-page-stage5-4-final.v1.json"
+      ],
+      "finalCheckpointFiles": [
+        "data/validation/hero-page-stage5-4-final.v1.json"
+      ],
+      "hasFinalCheckpoint": true
     }
   },
   "crossBlockChecks": [
@@ -155,6 +173,10 @@
           "canonicalHeroes": 267
         },
         {
+          "stage": "5-4",
+          "canonicalHeroes": 267
+        },
+        {
           "stage": "5-5",
           "canonicalHeroes": 267
         }
@@ -166,15 +188,7 @@
       "detail": []
     }
   ],
-  "blockers": [
-    {
-      "stage": "5-4",
-      "title": "SP block",
-      "reason": "No frozen Hero-stage contract/output/final checkpoint was discovered in data/contracts, data/generated, data/validation, or top-level data artifacts.",
-      "discoveredCandidateFiles": [],
-      "requiredForStage5Close": true
-    }
-  ],
+  "blockers": [],
   "hardErrors": [],
   "nonBlockingFollowups": [
     {
@@ -198,9 +212,6 @@
       "blockingStage5Integration": false
     }
   ],
-  "decision": "Do not declare Hero Stage 5 complete. Preserve frozen 5-1, 5-2, 5-3, 5-5 inputs; finish 5-4 independently, then rerun this integration gate.",
-  "recommendedWorkOrder": [
-    "5-4: build and freeze SP existence/job/skill/stat/soldier/mission integration, consuming frozen Stage 4 and Stage 5-3 where appropriate.",
-    "Rerun Stage 5 integration review and close Stage 5 only when all five block checkpoints are present and compatible."
-  ]
+  "decision": "Hero Stage 5 may be closed and passed to the next page-composition stage.",
+  "recommendedWorkOrder": []
 }
