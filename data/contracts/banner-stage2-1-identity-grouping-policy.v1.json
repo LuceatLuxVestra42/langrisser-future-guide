@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-1",
+  "status": "IDENTITY_AND_GROUPING_POLICY_FROZEN",
+  "purpose": "Freeze canonical occurrence identity and banner definition grouping rules for Stage 2-2.",
+  "inputs": {
+    "stage2_0Validation": "data/validation/banner-stage2-0-input-summary.v1.json",
+    "effectiveView": "data/generated/banner-stage2-0-effective-occurrences.v1.json",
+    "baseSchedule": "data/kr-banner-schedule.v1.json"
+  },
+  "occurrenceIdentity": {
+    "field": "bannerOccurrenceId",
+    "format": "bocc:<recordKey>",
+    "resolver": "prefix bocc: to recordKey",
+    "boundary": "recordKey is occurrence identity only and never bannerDefinition identity"
+  },
+  "definitionGrouping": {
+    "sourceLinked": "same effectiveSourceRecordKey => same definitionGroupKey",
+    "sourceLinkedGroupKey": "source:<effectiveSourceRecordKey>",
+    "differentSources": "remain separate unless a later explicit equivalence checkpoint is approved",
+    "sourceNullManual": "manual-occurrence:<recordKey>",
+    "manualAutoMerge": false,
+    "occurrenceToDefinition": "EXACTLY_ONE",
+    "definitionToOccurrence": "ONE_OR_MORE"
+  },
+  "definitionIdentity": {
+    "field": "bannerDefinitionId",
+    "format": "bdef:v1:<24 lowercase hex chars>",
+    "identityInput": "banner-definition:v1|<definitionGroupKey>",
+    "resolver": "sha256 identityInput and use first 24 lowercase hex chars",
+    "collisionPolicy": "fail materialization if distinct group keys collide",
+    "boundary": "bannerDefinitionId is not recordKey, sourceRecordKey, bannerCode, Hero ID or asset filename"
+  },
+  "prohibitedGroupingInputs": [
+    "bannerCode",
+    "patchCode",
+    "slotCode",
+    "display names",
+    "Hero names or Hero sets",
+    "selectableText",
+    "displayImageFile",
+    "asset equality",
+    "scheduleType alone",
+    "sourceType alone"
+  ],
+  "verifiedSameDefinitionFixtures": [
+    {"source":"cardpool:370","occurrences":["kr-banner:20261028:1","kr-banner:20270317:2"]},
+    {"source":"cardpool:213","occurrences":["kr-banner:20261007:9","kr-banner:20270331:3"]},
+    {"source":"cardpool:366","occurrences":["kr-banner:20261007:10","kr-banner:20270210:2"]},
+    {"source":"cardpool:305","occurrences":["kr-banner:20260916:3","kr-banner:20261202:3","kr-banner:20270127:2","kr-banner:20270324:3"]},
+    {"source":"cardpool:265","occurrences":["kr-banner:20261007:8","kr-banner:20270331:4"],"requiresStage1Correction":true}
+  ],
+  "verifiedSeparateManualFixture": {
+    "occurrences": ["kr-manual-wish-langrisser-1-5-20260909","kr-manual-wish-langrisser-1-5-20270317"],
+    "reason": "source-null manual rows are not merged from repeated label or image"
+  },
+  "preservedBoundaries": [
+    "PICKUP_HERO and WISH_CANDIDATE_HERO are not grouping keys",
+    "CP_RELATED is context, not identity",
+    "Event ID remains REVIEW until explicit mapping exists",
+    "NEW/RERUN lifecycle does not split or merge definition identity",
+    "asset references do not create or merge definitions",
+    "first observed is not first-ever"
+  ],
+  "nextStartPoint": "Banner Stage 2-2 canonical bannerDefinition materialization"
+}
