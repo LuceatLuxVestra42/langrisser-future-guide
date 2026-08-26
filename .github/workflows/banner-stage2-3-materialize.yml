@@ -1,0 +1,41 @@
+name: Banner Stage 2-3 Materialize
+
+on:
+  push:
+    branches:
+      - investigate/banner-stage2-3
+    paths:
+      - '.github/workflows/banner-stage2-3-materialize.yml'
+      - 'data/contracts/banner-stage2-3-occurrence-materialization-contract.v1.json'
+      - 'scripts/finalize-banner-stage2-3-occurrences.mjs'
+      - 'scripts/validate-banner-stage2-3-occurrences.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Materialize canonical occurrences
+        run: node scripts/finalize-banner-stage2-3-occurrences.mjs
+      - name: Validate full occurrence population
+        run: node scripts/validate-banner-stage2-3-occurrences.mjs
+      - name: Commit generated Stage 2-3 outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/banner-occurrences.v1.json \
+                  data/validation/banner-stage2-3-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+          else
+            git commit -m "Materialize Banner Stage 2-3 canonical occurrences"
+            git push
+          fi
