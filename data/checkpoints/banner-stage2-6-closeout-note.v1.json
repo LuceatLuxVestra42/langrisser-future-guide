@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-6",
+  "status": "STAGE2_6_CLOSED_READY_FOR_STAGE2_7",
+  "confirmed": {
+    "cpRelatedDefinitionCount": 4,
+    "cpRelatedOccurrenceCount": 4,
+    "eventTextReferenceCount": 4,
+    "uniqueEventTextLabels": ["相通的心灵"],
+    "canonicalEventRelationCount": 0,
+    "sourceNullCpRelationCount": 0,
+    "errorCount": 0
+  },
+  "cpDefinitions": [
+    {"effectiveSourceRecordKey":"cardpool:167","bannerDefinitionId":"bdef:v1:36d2d42524268a6f7f1d752e"},
+    {"effectiveSourceRecordKey":"cardpool:269","bannerDefinitionId":"bdef:v1:3f6de26d7bd2a24ea919dbbf"},
+    {"effectiveSourceRecordKey":"cardpool:319","bannerDefinitionId":"bdef:v1:68a0556452e966cd0f615196"},
+    {"effectiveSourceRecordKey":"cardpool:367","bannerDefinitionId":"bdef:v1:ad24b93fa048422db17e4f13"}
+  ],
+  "boundaries": [
+    "CP_RELATED is a non-exclusive context relation, not a top-level mechanic family.",
+    "Only explicit CardPoolDetailDesc CP-point semantics establish CP_RELATED.",
+    "相通的心灵 is retained only as CP_EVENT_TEXT_REFERENCE evidence.",
+    "No canonical Event ID is assigned and no Event ConfigData name join is performed.",
+    "Source-null manual definitions receive no synthetic CP/Event relation.",
+    "Stage 2-4 taxonomy and Stage 2-5 Hero relations are unchanged."
+  ],
+  "sources": [
+    "data/investigation/banner-stage1-4-relation-census.v1.json",
+    "data/investigation/banner-stage2-6-cp-event-census.v1.json",
+    "data/configdata/ConfigDataCardPoolInfo.json",
+    "data/generated/banner-definitions.v1.json",
+    "data/generated/banner-occurrences.v1.json"
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-7",
+    "task": "Materialize recurrence/history consumer structure without inventing fixed cadence or first-ever dates."
+  }
+}
