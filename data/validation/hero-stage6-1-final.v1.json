@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "stage": "hero-page-6-1",
+  "checkpoint": "final-integration",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/hero-stage6-1-detail-integration.v1.json",
+  "sources": {
+    "data/hero-name-master.v1.json": {
+      "gitBlobSha": "12eaf4f84a3e91477c80fbccd78c949b79c3829f"
+    },
+    "data/generated/hero-basic-combat.v1.json": {
+      "gitBlobSha": "1661efec786de37b00adcef02839b607a947765f"
+    },
+    "data/validation/hero-basic-combat-stage4-5-summary.v1.json": {
+      "gitBlobSha": "6352647f024a9249003b7e99383843caf44653c3"
+    },
+    "data/generated/hero-page-stage5-1-bonds-final.v1.json": {
+      "gitBlobSha": "5be989e9d0723782f491dc3005a11c0ad3143c43"
+    },
+    "data/generated/hero-page-stage5-2-exclusive-central.v1.json": {
+      "gitBlobSha": "6c34231f114177d5612947533f57322ba9bf8578"
+    },
+    "data/generated/hero-page-soldiers-stage5-3.v1.json": {
+      "gitBlobSha": "b97beae7aa58c573f16919cf731250bfc359d58e"
+    },
+    "data/generated/hero-page-stage5-4-sp.v1.json": {
+      "gitBlobSha": "d281dbf094939ae34a5c3e8fbd4f4225bd065fd9"
+    },
+    "data/hero-page-stage5-5-3.v1.json": {
+      "gitBlobSha": "dd56c47602b2aee42001b8a32f1830769d5c44c1"
+    },
+    "data/validation/hero-page-stage5-integration-review.v1.json": {
+      "gitBlobSha": "54317baa86c5efbcff3139c298683edc3b70b9af"
+    },
+    "data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json": {
+      "gitBlobSha": "84d99070ef272ad4a4d7bbf080b96f973cee18b0"
+    }
+  },
+  "checks": {
+    "heroMasterCoverage": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "stage4Coverage": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "stage51Coverage": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "stage52Coverage": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "stage53HeroCoverage": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "stage53RelationCount": {
+      "expected": 5977,
+      "actual": 5977,
+      "pass": true
+    },
+    "stage54Coverage": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "stage55Coverage": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "outputCoverage": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "exactCopyIntegrity": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "stage5IntegrationClosed": {
+      "expected": "PASS/STAGE_5_COMPLETE",
+      "actual": "PASS/STAGE_5_COMPLETE",
+      "pass": true
+    },
+    "stageBParallelBoundary": {
+      "state": "PENDING_B_STAGE_NON_BLOCKING",
+      "artifactPresent": false,
+      "validationPresent": false,
+      "parityMismatchCount": 0,
+      "passForStage61": true
+    },
+    "hardErrors": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "generatedHeroCount": 267,
+    "heroSoldierRelationCount": 5977,
+    "sharedSoldierMetadataCount": 224,
+    "stageBState": "PENDING_B_STAGE_NON_BLOCKING",
+    "stageBParityMismatchCount": 0,
+    "exactCopyMismatchCount": 0,
+    "inheritedReviewCount": 3,
+    "hardErrorCount": 0
+  },
+  "inheritedReviews": [
+    "Stage B shared Hero-exclusive Equipment byHero index is not present yet; Stage 6-1 uses the frozen Stage 5-2 display snapshot without re-deriving ownership.",
+    "41 Soldier Korean display names remain non-blocking presentation REVIEW from Stage 5-3.",
+    "176 regular skins remain UNENCODED for acquisition because source GetPathType is omitted."
+  ],
+  "stageBParityMismatches": [],
+  "hardErrors": [],
+  "decision": "Hero Stage 6-1 is COMPLETE. All 267 Hero detail records are composed from frozen Stage 4/5 sources without semantic re-derivation. Stage B ownership adoption remains an explicit parallel dependency only when its shared relation artifact is not yet available."
+}
