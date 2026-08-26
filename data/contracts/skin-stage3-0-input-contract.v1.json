@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "stage": "skin-page-3",
+  "substage": "3-0",
+  "checkpoint": "stage3-input-contract",
+  "status": "ACCEPTED",
+  "purpose": "Freeze the validated Skin Stage 1 asset-source metadata and Skin Stage 2 bidirectional relation that Skin Stage 3 may consume, without rediscovering canonical membership, ownership, order, or ConfigData resource joins.",
+  "canonicalExpectations": {
+    "canonicalSkinCount": 540,
+    "canonicalHeroCount": 267,
+    "relationEdgeCount": 540,
+    "zeroSkinHeroCount": 32,
+    "sourceMetadataRecordCount": 540,
+    "staticArtworkLocatorCoverage": 540,
+    "spineLocatorCoverage": 540,
+    "modelBindingSkinCount": 540,
+    "modelBindingTotalCount": 2277,
+    "uniqueModelSkinResourceIdCount": 789
+  },
+  "inputs": {
+    "sourceMetadata": {
+      "path": "data/generated/skin-stage1-source-metadata.v1.json",
+      "gitBlobSha": "d95f0cdcf41ac7599d1e0b418cd8c4b42a28b483",
+      "role": "ASSET_LOCATOR_AUTHORITY",
+      "recordPath": "records",
+      "idField": "skinId",
+      "requiredFields": [
+        "skinId",
+        "heroId",
+        "sourceOrder",
+        "sourceClass",
+        "populationStatus",
+        "heroSkinSource",
+        "artworkSource"
+      ]
+    },
+    "stage1SourceMetadataValidation": {
+      "path": "data/validation/skin-stage1-3-final.v1.json",
+      "gitBlobSha": "754be0637a4dbb34eaf84f5fefe063830cc42531",
+      "role": "SOURCE_METADATA_VALIDATION_GATE"
+    },
+    "stage1Final": {
+      "path": "data/validation/skin-stage1-6-final.v1.json",
+      "gitBlobSha": "4dfa1200a073bef403da36c12ac4de2e6153baf6",
+      "role": "STAGE1_FINAL_GATE"
+    },
+    "relation": {
+      "path": "data/generated/skin-stage2-3-bidirectional-relation.v1.json",
+      "gitBlobSha": "c69bc6a970909b66502574dcd709d3c731607ead",
+      "role": "OWNER_ORDER_RELATION_AUTHORITY"
+    },
+    "stage2Final": {
+      "path": "data/validation/skin-stage2-5-final.v1.json",
+      "gitBlobSha": "1ea21a2c72be78daab8ae7b326976544432b617b",
+      "role": "STAGE2_FINAL_GATE"
+    }
+  },
+  "authority": {
+    "skinIdentity": "sourceMetadata.records[].skinId",
+    "assetLocators": "sourceMetadata.records[].artworkSource + sourceMetadata.records[].heroSkinSource.modelBindings",
+    "ownerAndOrder": "relation.bySkinId[String(skinId)]",
+    "heroReverseLookup": "relation.byHeroId[String(heroId)]",
+    "modelResourceWorkUnit": "deduplicated heroSkinSource.modelBindings[].skinResourceId"
+  },
+  "cardinality": {
+    "skinToHero": "EXACTLY_ONE",
+    "heroToSkin": "ZERO_OR_MANY"
+  },
+  "stage3Scope": [
+    "build lightweight asset locator/resource inventory",
+    "prove locator-to-actual-asset resolution on representative fixtures",
+    "extract/export static artwork assets",
+    "inventory/extract/export Spine asset dependency sets",
+    "resolve model skin resources using deduplicated resource IDs",
+    "materialize local/export/web path mappings",
+    "publish a downstream web asset manifest",
+    "run whole-stage asset parity and exception QA"
+  ],
+  "doNotRecompute": [
+    "canonical 540 regular Hero Skin population",
+    "skinId -> heroId ownership",
+    "skinId -> sourceOrder",
+    "heroId -> ordered skinId[]",
+    "HeroSkinInfo / CharImageSkinResourceInfo source joins already carried forward by Stage 1",
+    "SpecifiedModelSkinResource model bindings already carried forward by Stage 1"
+  ],
+  "prohibitedInference": [
+    "infer release status from asset existence, asset filename, asset path, or extraction success",
+    "infer owner from filename, name, path, or numeric skinId pattern",
+    "sort Hero skins by numeric skinId, asset name, Score, UISort, acquisition, or release metadata",
+    "classify Korean localization or acquisition from asset metadata",
+    "mix SP Hero artwork or Soldier skins into the regular 540 canonical population"
+  ],
+  "stage3Boundary": {
+    "releaseLocalizationAcquisitionEnrichment": "Skin Stage 4",
+    "futureSkinConsumer": "Skin Stage 5",
+    "heroSkinConsumer": "Skin Stage 6",
+    "frontendIntegrationOverallQA": "Skin Stage 7"
+  },
+  "nextAction": "Skin Stage 3-1: materialize a lightweight locator/resource inventory from the frozen source metadata and relation, then measure unique/shared static, Spine, and model-resource work units before any bulk extraction."
+}
