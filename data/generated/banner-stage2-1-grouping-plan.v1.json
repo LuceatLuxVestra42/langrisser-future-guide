@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-1",
+  "status": "GROUPING_PLAN_READY_FOR_STAGE2_2",
+  "representation": "TOTAL_RESOLVER_POLICY_PLUS_VERIFIED_FIXTURES",
+  "basePopulation": {
+    "source": "data/kr-banner-schedule.v1.json",
+    "occurrenceCount": 94,
+    "effectiveSourceView": "data/generated/banner-stage2-0-effective-occurrences.v1.json"
+  },
+  "resolvers": {
+    "effectiveSourceRecordKey": "Stage 2-0 correction overlay value when present, otherwise recorded sourceRecordKey, otherwise null",
+    "bannerOccurrenceId": "bocc:<recordKey>",
+    "definitionGroupKeyWhenSourceLinked": "source:<effectiveSourceRecordKey>",
+    "definitionGroupKeyWhenSourceNull": "manual-occurrence:<recordKey>",
+    "bannerDefinitionId": "bdef:v1:<first 24 lowercase hex chars of SHA-256('banner-definition:v1|' + definitionGroupKey)>"
+  },
+  "currentApprovedCrossSourceEquivalenceMappings": [],
+  "currentApprovedManualDefinitionMappings": [],
+  "fixtures": [
+    {
+      "definitionGroupKey": "source:cardpool:370",
+      "bannerDefinitionId": "bdef:v1:364dee3fe0993c87abfd8920",
+      "occurrenceRecordKeys": ["kr-banner:20261028:1", "kr-banner:20270317:2"],
+      "expectedOutcome": "SAME_DEFINITION"
+    },
+    {
+      "definitionGroupKey": "source:cardpool:213",
+      "bannerDefinitionId": "bdef:v1:87b20d10e6cc1d7d1133aaa4",
+      "occurrenceRecordKeys": ["kr-banner:20261007:9", "kr-banner:20270331:3"],
+      "expectedOutcome": "SAME_DEFINITION"
+    },
+    {
+      "definitionGroupKey": "source:cardpool:366",
+      "bannerDefinitionId": "bdef:v1:74776c0fce2751ad36a46212",
+      "occurrenceRecordKeys": ["kr-banner:20261007:10", "kr-banner:20270210:2"],
+      "expectedOutcome": "SAME_DEFINITION"
+    },
+    {
+      "definitionGroupKey": "source:cardpool:305",
+      "bannerDefinitionId": "bdef:v1:3e4567c8f850446457f43077",
+      "occurrenceRecordKeys": ["kr-banner:20260916:3", "kr-banner:20261202:3", "kr-banner:20270127:2", "kr-banner:20270324:3"],
+      "expectedOutcome": "SAME_DEFINITION"
+    },
+    {
+      "definitionGroupKey": "source:cardpool:265",
+      "bannerDefinitionId": "bdef:v1:da8726e4782450283c65a5b0",
+      "occurrenceRecordKeys": ["kr-banner:20261007:8", "kr-banner:20270331:4"],
+      "requiredCorrection": {"occurrenceRecordKey":"kr-banner:20270331:4","recorded":"cardpool:263","effective":"cardpool:265"},
+      "expectedOutcome": "SAME_DEFINITION_AFTER_EFFECTIVE_CORRECTION"
+    },
+    {
+      "definitionGroupKey": "manual-occurrence:kr-manual-wish-langrisser-1-5-20260909",
+      "bannerDefinitionId": "bdef:v1:8a8be80c9c0ed39614460ce3",
+      "occurrenceRecordKeys": ["kr-manual-wish-langrisser-1-5-20260909"],
+      "expectedOutcome": "ISOLATED_MANUAL_DEFINITION"
+    },
+    {
+      "definitionGroupKey": "manual-occurrence:kr-manual-wish-langrisser-1-5-20270317",
+      "bannerDefinitionId": "bdef:v1:e550063d4c405f5688a7a6d9",
+      "occurrenceRecordKeys": ["kr-manual-wish-langrisser-1-5-20270317"],
+      "expectedOutcome": "ISOLATED_MANUAL_DEFINITION"
+    }
+  ],
+  "invariants": {
+    "everyOccurrenceHasExactlyOneResolverOutcome": true,
+    "sourceLinkedReuseCollapsesByEffectiveSourceOnly": true,
+    "differentEffectiveSourcesRemainSeparate": true,
+    "sourceNullManualRowsRemainOccurrenceScoped": true,
+    "bannerCodeNotUsedForGrouping": true,
+    "displayNameNotUsedForGrouping": true,
+    "heroSetNotUsedForGrouping": true,
+    "assetReferenceNotUsedForGrouping": true,
+    "lifecycleNotUsedForGrouping": true,
+    "cpContextNotUsedForGrouping": true,
+    "eventNameNotUsedForGrouping": true
+  },
+  "materializationPolicy": "Stage 2-2 must iterate all 94 occurrences through these resolvers, deduplicate by definitionGroupKey, and fail on definition ID collision or occurrence without exactly one definition.",
+  "nextStageReady": true
+}
