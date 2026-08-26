@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "stage": "B-2",
+  "checkpoint": "representative-fixture-join-validation",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/hero-exclusive-equipment-relation-fixture-contract.v1.json",
+  "sources": {
+    "scopeContract": "data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json",
+    "sourceContract": "data/contracts/hero-exclusive-equipment-relation-source-contract.v1.json",
+    "heroStage5_2Generated": "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
+    "heroStage5_2Final": "data/validation/hero-page-stage5-2-final.v1.json",
+    "equipmentStage3_5Final": "data/validation/equipment-stage3-5-exclusive-consumer-summary.v1.json"
+  },
+  "checks": {
+    "positiveFixtureCount": {
+      "expected": 4,
+      "actual": 4,
+      "pass": true
+    },
+    "equipmentTypeCoverage": {
+      "expected": [0, 1, 2, 3],
+      "actual": [0, 1, 2, 3],
+      "pass": true
+    },
+    "exclusiveClassification": {
+      "expected": 4,
+      "actual": 4,
+      "pass": true
+    },
+    "pathType46Support": {
+      "expected": 4,
+      "actual": 4,
+      "pass": true
+    },
+    "skillHeroResolverConsistency": {
+      "expected": 4,
+      "actual": 4,
+      "pass": true
+    },
+    "exactOwnerPairMatch": {
+      "expected": 4,
+      "actual": 4,
+      "pass": true
+    },
+    "missionType77CrossValidation": {
+      "expected": 1,
+      "actual": 1,
+      "pass": true,
+      "fixture": "Hero 6 Leon <-> Equipment 416"
+    },
+    "descriptionDiagnosticAgreement": {
+      "expected": 4,
+      "actual": 4,
+      "pass": true,
+      "productionAuthority": false
+    },
+    "negativeBoundaryFixtureCount": {
+      "expected": 2,
+      "actual": 2,
+      "pass": true
+    },
+    "excludedPopulationAdmitted": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "alternateProductionResolverUsed": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "heuristicFixtureEdges": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "contradictions": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "hardErrors": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  },
+  "positiveFixtures": [
+    {
+      "fixtureId": "weapon-aimeeda-404",
+      "equipmentType": 0,
+      "heroId": 4,
+      "heroNameKr": "아멜다",
+      "equipmentId": 404,
+      "equipmentNameCn": "■■■■",
+      "ownerHeroId": 4,
+      "ownerResolver": "ConfigDataEquipmentInfo.SkillHero",
+      "acquisitionClass": "exclusive-equipment",
+      "pathType46": true,
+      "descriptionOwnerNameAgreement": true,
+      "status": "VERIFIED"
+    },
+    {
+      "fixtureId": "armor-leon-416",
+      "equipmentType": 1,
+      "heroId": 6,
+      "heroNameKr": "레온",
+      "equipmentId": 416,
+      "equipmentNameCn": "青龙之胄",
+      "ownerHeroId": 6,
+      "ownerResolver": "ConfigDataEquipmentInfo.SkillHero",
+      "acquisitionClass": "exclusive-equipment",
+      "pathType46": true,
+      "descriptionOwnerNameAgreement": true,
+      "missionType77": {
+        "missionId": 31186,
+        "missionType": 77,
+        "param1EquipmentId": 416,
+        "param2RequiredLevel": 50,
+        "matchesOwnershipEquipmentId": true,
+        "productionAuthority": false
+      },
+      "status": "VERIFIED"
+    },
+    {
+      "fixtureId": "headgear-grenier-415",
+      "equipmentType": 2,
+      "heroId": 3,
+      "heroNameKr": "그레니어",
+      "equipmentId": 415,
+      "equipmentNameCn": "逐梦之冠",
+      "ownerHeroId": 3,
+      "ownerResolver": "ConfigDataEquipmentInfo.SkillHero",
+      "acquisitionClass": "exclusive-equipment",
+      "pathType46": true,
+      "descriptionOwnerNameAgreement": true,
+      "status": "VERIFIED"
+    },
+    {
+      "fixtureId": "accessory-matthew-277",
+      "equipmentType": 3,
+      "heroId": 1,
+      "heroNameKr": "매튜",
+      "equipmentId": 277,
+      "equipmentNameCn": "团结",
+      "ownerHeroId": 1,
+      "ownerResolver": "ConfigDataEquipmentInfo.SkillHero",
+      "acquisitionClass": "exclusive-equipment",
+      "pathType46": true,
+      "descriptionOwnerNameAgreement": true,
+      "status": "VERIFIED"
+    }
+  ],
+  "negativeBoundaryFixtures": [
+    {
+      "fixtureId": "general-equipment-class-boundary",
+      "populationCount": 206,
+      "classes": ["launch", "legacy-additional", "current-additional"],
+      "admitted": false,
+      "resolverEvaluated": false,
+      "status": "REJECTED_BY_SCOPE_AS_EXPECTED"
+    },
+    {
+      "fixtureId": "unresolved-no-path-2013-boundary",
+      "equipmentId": 2013,
+      "acquisitionClass": "unresolved-no-path",
+      "admitted": false,
+      "resolverEvaluated": false,
+      "status": "REJECTED_BY_SCOPE_AS_EXPECTED"
+    }
+  ],
+  "evidenceInterpretation": {
+    "productionEvidence": "All positive ownership pairs are manifestations of the B-1 frozen ConfigDataEquipmentInfo.SkillHero resolver. The prior full Hero Stage 5-2 validation already resolved the complete exclusive population 167/167 with zero owner errors and duplicate owners.",
+    "independentCrossCheck": "Leon Mission 31186 MissionType 77 Param1=416 independently exposes the same exclusive Equipment ID that the SkillHero ownership path assigns to canonical Hero 6 Leon.",
+    "diagnosticOnly": "Owner-name text in Equipment descriptions agrees for all four representative fixtures, but description text remains forbidden as an ownership assignment source.",
+    "categoryInterpretation": "EquipmentType does not participate in the ownership JOIN. Four-type coverage is used only to confirm the resolver remains category-independent on representative records.",
+    "scopeInterpretation": "General Equipment and unresolved-no-path Equipment 2013 are rejected before SkillHero evaluation, preserving the Stage B exclusive-only boundary."
+  },
+  "summary": {
+    "positiveFixtures": 4,
+    "verifiedPositiveFixtures": 4,
+    "equipmentTypesCovered": 4,
+    "independentCrossChecks": 1,
+    "negativeBoundaryFixtures": 2,
+    "contradictionCount": 0,
+    "heuristicEdgeCount": 0,
+    "hardErrorCount": 0
+  },
+  "nextStage": "B-3 full 167-record canonical ownership edge generation",
+  "decision": "B-2 is closed as PASS / COMPLETE. The frozen EQUIPMENT_SKILL_HERO resolver is consistent across representative weapon, armor, headgear, and accessory fixtures; Leon Equipment 416 agrees with the independent MissionType 77 fixture; excluded populations remain outside resolver evaluation. B-3 may proceed without reopening B-1."
+}
