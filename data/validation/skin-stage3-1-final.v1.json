@@ -1,0 +1,392 @@
+{
+  "version": 1,
+  "stage": "skin-page-3",
+  "substage": "3-1",
+  "checkpoint": "asset-locator-resource-inventory-final",
+  "status": "PASS",
+  "completion": "SKIN_STAGE3_1_COMPLETE",
+  "purpose": "Materialize a lightweight Skin asset inventory from the frozen Stage 3-0 inputs, measure unique/shared static artwork, Spine locator and model-resource work units, and publish reverse indexes before any bulk asset extraction.",
+  "metrics": {
+    "checkCount": 53,
+    "passedCheckCount": 53,
+    "failedCheckCount": 0,
+    "skinCount": 540,
+    "heroCount": 267,
+    "staticReferenceEdgeCount": 540,
+    "uniqueStaticPathCount": 540,
+    "sharedStaticPathCount": 0,
+    "skinRefsOnSharedStaticPaths": 0,
+    "spineReferenceEdgeCount": 540,
+    "uniqueSpinePathCount": 540,
+    "sharedSpinePathCount": 0,
+    "skinRefsOnSharedSpinePaths": 0,
+    "modelBindingEdgeCount": 2277,
+    "uniqueModelResourceIdCount": 789,
+    "modelResourceIdsSharedAcrossSkins": 0,
+    "modelResourceIdsSharedAcrossBindings": 771,
+    "skinsWithMultipleModelResourceIds": 207,
+    "maxModelResourceIdsPerSkin": 5,
+    "maxModelBindingsPerSkin": 11,
+    "maxSkinsPerModelResource": 1,
+    "maxBindingsPerModelResource": 7,
+    "ownerMismatchCount": 0,
+    "sourceOrderMismatchCount": 0,
+    "projectionMismatchCount": 0,
+    "staticRoundTripMismatchCount": 0,
+    "spineRoundTripMismatchCount": 0,
+    "modelRoundTripMismatchCount": 0,
+    "forbiddenFieldOccurrenceCount": 0
+  },
+  "workUnitInterpretation": {
+    "staticWorkUnits": 540,
+    "spineWorkUnits": 540,
+    "modelWorkUnits": 789,
+    "note": "These are deduplicated source-locator/resource work units for Stage 3 processing, not release/display chronology."
+  },
+  "sharedWorkUnits": {
+    "staticPathCount": 0,
+    "spinePathCount": 0,
+    "modelResourceAcrossSkinCount": 0,
+    "modelResourceAcrossBindingCount": 771
+  },
+  "checks": [
+    {
+      "name": "contract accepted",
+      "pass": true,
+      "detail": "ACCEPTED"
+    },
+    {
+      "name": "contract substage 3-1",
+      "pass": true,
+      "detail": "3-1"
+    },
+    {
+      "name": "Stage 3-0 PASS",
+      "pass": true,
+      "detail": "PASS"
+    },
+    {
+      "name": "Stage 3-0 complete",
+      "pass": true,
+      "detail": "SKIN_STAGE3_0_COMPLETE"
+    },
+    {
+      "name": "source metadata record count 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "relation bySkinId count 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "relation byHeroId count 267",
+      "pass": true,
+      "detail": 267
+    },
+    {
+      "name": "inventory GENERATED",
+      "pass": true,
+      "detail": "GENERATED"
+    },
+    {
+      "name": "inventory substage 3-1",
+      "pass": true,
+      "detail": "3-1"
+    },
+    {
+      "name": "inventory record count 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "inventory skinId unique",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "inventory skinId set exact",
+      "pass": true,
+      "detail": {
+        "source": 540,
+        "inventory": 540
+      }
+    },
+    {
+      "name": "per-skin source projection exact",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "Stage 2 owner parity exact",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "Stage 2 sourceOrder parity exact",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "model binding edges 2277",
+      "pass": true,
+      "detail": 2277
+    },
+    {
+      "name": "unique model resource IDs 789",
+      "pass": true,
+      "detail": 789
+    },
+    {
+      "name": "byStaticPath exact reverse index",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "bySpinePath exact reverse index",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "byModelResourceId exact reverse index",
+      "pass": true,
+      "detail": 789
+    },
+    {
+      "name": "count parity: skinCount",
+      "pass": true,
+      "detail": {
+        "inventory": 540,
+        "recomputed": 540
+      }
+    },
+    {
+      "name": "count parity: heroCount",
+      "pass": true,
+      "detail": {
+        "inventory": 267,
+        "recomputed": 267
+      }
+    },
+    {
+      "name": "count parity: staticReferenceEdgeCount",
+      "pass": true,
+      "detail": {
+        "inventory": 540,
+        "recomputed": 540
+      }
+    },
+    {
+      "name": "count parity: uniqueStaticPathCount",
+      "pass": true,
+      "detail": {
+        "inventory": 540,
+        "recomputed": 540
+      }
+    },
+    {
+      "name": "count parity: sharedStaticPathCount",
+      "pass": true,
+      "detail": {
+        "inventory": 0,
+        "recomputed": 0
+      }
+    },
+    {
+      "name": "count parity: skinRefsOnSharedStaticPaths",
+      "pass": true,
+      "detail": {
+        "inventory": 0,
+        "recomputed": 0
+      }
+    },
+    {
+      "name": "count parity: spineReferenceEdgeCount",
+      "pass": true,
+      "detail": {
+        "inventory": 540,
+        "recomputed": 540
+      }
+    },
+    {
+      "name": "count parity: uniqueSpinePathCount",
+      "pass": true,
+      "detail": {
+        "inventory": 540,
+        "recomputed": 540
+      }
+    },
+    {
+      "name": "count parity: sharedSpinePathCount",
+      "pass": true,
+      "detail": {
+        "inventory": 0,
+        "recomputed": 0
+      }
+    },
+    {
+      "name": "count parity: skinRefsOnSharedSpinePaths",
+      "pass": true,
+      "detail": {
+        "inventory": 0,
+        "recomputed": 0
+      }
+    },
+    {
+      "name": "count parity: modelBindingEdgeCount",
+      "pass": true,
+      "detail": {
+        "inventory": 2277,
+        "recomputed": 2277
+      }
+    },
+    {
+      "name": "count parity: uniqueModelResourceIdCount",
+      "pass": true,
+      "detail": {
+        "inventory": 789,
+        "recomputed": 789
+      }
+    },
+    {
+      "name": "count parity: modelResourceIdsSharedAcrossSkins",
+      "pass": true,
+      "detail": {
+        "inventory": 0,
+        "recomputed": 0
+      }
+    },
+    {
+      "name": "count parity: modelResourceIdsSharedAcrossBindings",
+      "pass": true,
+      "detail": {
+        "inventory": 771,
+        "recomputed": 771
+      }
+    },
+    {
+      "name": "count parity: skinsWithMultipleModelResourceIds",
+      "pass": true,
+      "detail": {
+        "inventory": 207,
+        "recomputed": 207
+      }
+    },
+    {
+      "name": "count parity: maxModelResourceIdsPerSkin",
+      "pass": true,
+      "detail": {
+        "inventory": 5,
+        "recomputed": 5
+      }
+    },
+    {
+      "name": "count parity: maxModelBindingsPerSkin",
+      "pass": true,
+      "detail": {
+        "inventory": 11,
+        "recomputed": 11
+      }
+    },
+    {
+      "name": "count parity: maxSkinsPerModelResource",
+      "pass": true,
+      "detail": {
+        "inventory": 1,
+        "recomputed": 1
+      }
+    },
+    {
+      "name": "count parity: maxBindingsPerModelResource",
+      "pass": true,
+      "detail": {
+        "inventory": 7,
+        "recomputed": 7
+      }
+    },
+    {
+      "name": "static reverse refs total 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "Spine reverse refs total 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "model reverse binding refs total 2277",
+      "pass": true,
+      "detail": 2277
+    },
+    {
+      "name": "model reverse unique keys 789",
+      "pass": true,
+      "detail": 789
+    },
+    {
+      "name": "static round-trip exact",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "Spine round-trip exact",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "model-binding round-trip exact",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "no extraction/export/web fields",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "no release/localization/acquisition enrichment fields",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "policy raw ConfigData not rescanned",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "policy extraction not performed",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "policy ownership not rediscovered",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "policy sourceOrder not recomputed",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "next action points to Stage 3-2",
+      "pass": true,
+      "detail": "Skin Stage 3-2 representative asset-resolution proof using inventory-selected fixtures before bulk extraction."
+    }
+  ],
+  "failures": {
+    "failedChecks": [],
+    "duplicateInventorySkinIds": 0,
+    "projectionMismatchSkinIds": [],
+    "ownerMismatchSkinIds": [],
+    "sourceOrderMismatchSkinIds": [],
+    "staticRoundTripMismatch": [],
+    "spineRoundTripMismatch": [],
+    "modelRoundTripMismatch": [],
+    "forbiddenOccurrences": []
+  },
+  "officialInventory": "data/generated/skin-stage3-1-asset-inventory.v1.json",
+  "nextAction": "Skin Stage 3-2 representative asset-resolution proof using inventory-selected fixtures before bulk extraction."
+}
