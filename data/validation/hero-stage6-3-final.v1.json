@@ -76,7 +76,12 @@
     "inheritedSoldierReviewHeroCount": 267,
     "stageBState": "B4_CANONICAL_RELATION_ADOPTED_B5_B6_DEFERRED_TO_6_4",
     "stageB5ParityMismatchCount": 0,
-    "hardErrorCount": 0
+    "hardErrorCount": 0,
+    "storageMode": "SHARDED_BY_HERO",
+    "heroShardCount": 267,
+    "heroShardMissingCount": 0,
+    "heroShardDuplicateCount": 0,
+    "totalHeroShardBytes": 15093766
   },
   "upstreamGates": {
     "stage4": "PASS/COMPLETE",
@@ -120,5 +125,12 @@
   ],
   "failedHeroes": [],
   "hardErrors": [],
-  "decision": "Hero Stage 6-3 COMPLETE. 267/267 Hero details materialized with 267 structural PASS, 267 publication REVIEW, zero structural FAIL, and zero hard errors."
+  "decision": "Hero Stage 6-3 COMPLETE. 267/267 Hero details materialized and sharded by Hero ID with 267 structural PASS, 267 publication REVIEW, zero structural FAIL, and zero hard errors.",
+  "storage": {
+    "manifestPath": "data/generated/hero-detail.v1.json",
+    "shardDirectory": "data/generated/hero-detail/by-id",
+    "sharedPath": "data/generated/hero-detail-shared.v1.json",
+    "manifestRecordCount": 267,
+    "integrity": "SHA256_PER_SHARD"
+  }
 }

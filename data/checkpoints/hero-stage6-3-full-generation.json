@@ -13,7 +13,10 @@
     "heroSoldierRelationCount": 5977,
     "exclusiveEquipmentRelationCount": 167,
     "stageBState": "B4_CANONICAL_RELATION_ADOPTED_B5_B6_DEFERRED_TO_6_4",
-    "hardErrorCount": 0
+    "hardErrorCount": 0,
+    "storageMode": "SHARDED_BY_HERO",
+    "heroShardCount": 267,
+    "heroShardMissingCount": 0
   },
   "sources": {
     "data/contracts/hero-stage6-3-full-generation.v1.json": "97425c7b3ed30dccd7a5ea0207b83d413b9c2487",
@@ -34,7 +37,9 @@
   },
   "outputs": [
     "data/generated/hero-detail.v1.json",
+    "data/generated/hero-detail/by-id/<heroId>.json",
+    "data/generated/hero-detail-shared.v1.json",
     "data/validation/hero-stage6-3-final.v1.json"
   ],
-  "nextStart": "Hero Stage 6-4 site consumer contract + final Hero data pipeline freeze. Do not reopen Stage 4/5 semantics or rebuild confirmed Hero-Soldier / Hero-exclusive Equipment relations."
+  "nextStart": "Hero Stage 6-4 site consumer contract + final Hero data pipeline freeze. Consume the Stage 6-3 manifest and per-Hero shards; do not reopen Stage 4/5 semantics or rebuild confirmed relations."
 }
