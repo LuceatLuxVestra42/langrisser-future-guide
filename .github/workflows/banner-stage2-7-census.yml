@@ -1,0 +1,36 @@
+name: Banner Stage 2-7 History Census
+
+on:
+  push:
+    branches:
+      - investigate/banner-stage2-7
+    paths:
+      - '.github/workflows/banner-stage2-7-census.yml'
+      - 'scripts/investigate-banner-stage2-7-history.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Generate history census
+        run: node scripts/investigate-banner-stage2-7-history.mjs
+      - name: Commit census
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/investigation/banner-stage2-7-history-census.v1.json
+          if git diff --cached --quiet; then
+            echo "No census changes."
+          else
+            git commit -m "Generate Banner Stage 2-7 history census"
+            git push
+          fi
