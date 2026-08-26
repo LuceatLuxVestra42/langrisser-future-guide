@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "stage": "B-5",
+  "status": "FROZEN",
+  "purpose": "Define deterministic, lossless, bidirectional lookup indexes derived only from the B-4 validated Hero <-> Exclusive Equipment canonical relation.",
+  "dependsOn": {
+    "scopeContract": "data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json",
+    "sourceContract": "data/contracts/hero-exclusive-equipment-relation-source-contract.v1.json",
+    "validationContract": "data/contracts/hero-exclusive-equipment-relation-validation-contract.v1.json",
+    "b4Validation": "data/validation/hero-exclusive-equipment-relation-stageB4-validation.v1.json",
+    "relationSet": "data/generated/hero-exclusive-equipment-relations.v1.json"
+  },
+  "publicationGate": {
+    "requiredB4Status": "PASS",
+    "requiredB4Completion": "COMPLETE",
+    "requiredRelationBlobSha": "The exact gitBlobSha pinned by B-4 validation.",
+    "rule": "B-5 must abort if the current relation blob SHA differs from the blob SHA validated by B-4."
+  },
+  "authority": {
+    "semanticSource": "data/generated/hero-exclusive-equipment-relations.v1.json#records",
+    "indexesAreSemanticSources": false,
+    "rule": "Indexes may only project existing canonical pairs. They may not add, remove, repair, reinterpret, infer, or override ownership."
+  },
+  "artifacts": {
+    "byHero": {
+      "targetPath": "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+      "schemaId": "hero-exclusive-equipment-by-hero/v1",
+      "indexField": "byHeroId",
+      "lookup": "heroId -> equipmentIds[]",
+      "entryRule": "Create keys only for Hero IDs present in canonical relation edges.",
+      "missingKeyMeaning": "This Hero has no current canonical exclusive-equipment ownership edge in this relation snapshot; it does not mean the Hero ID is invalid."
+    },
+    "byEquipment": {
+      "targetPath": "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+      "schemaId": "hero-exclusive-equipment-by-equipment/v1",
+      "indexField": "byEquipmentId",
+      "lookup": "equipmentId -> heroIds[]",
+      "entryRule": "Create keys only for Equipment IDs present in canonical relation edges.",
+      "missingKeyMeaning": "This Equipment ID has no canonical Stage B ownership edge; B-4 requires every frozen exclusive Equipment ID to be present."
+    }
+  },
+  "generationAlgorithm": [
+    "Read B-4 validation and require PASS / COMPLETE.",
+    "Compute the current Git blob SHA of data/generated/hero-exclusive-equipment-relations.v1.json and require exact equality with B-4 relationSet.gitBlobSha.",
+    "Read only canonical relation records as semantic membership input.",
+    "For each canonical edge (heroId, equipmentId), append equipmentId to byHeroId[String(heroId)] and append heroId to byEquipmentId[String(equipmentId)].",
+    "Do not derive one index from the other.",
+    "Sort numeric keys ascending and sort every value array ascending.",
+    "Write both indexes referencing the exact same canonical relation blob SHA.",
+    "Validate both reconstructed pair sets independently against the canonical pair set before publication."
+  ],
+  "cardinalityProjection": {
+    "frozenByB4": {
+      "equipmentToHero": "EXACTLY_ONE",
+      "heroToEquipment": "ZERO_OR_ONE"
+    },
+    "byHeroExpected": {
+      "keyCount": 167,
+      "relationCount": 167,
+      "maxValueCountPerKey": 1,
+      "canonicalHeroesWithoutKey": 100
+    },
+    "byEquipmentExpected": {
+      "keyCount": 167,
+      "relationCount": 167,
+      "valueCountPerKey": 1
+    },
+    "shapePolicy": "Values remain arrays even while B-4 cardinality is zero-or-one / exactly-one so consumer structure does not depend on a scalar optimization."
+  },
+  "ordering": {
+    "keys": "Numeric ID ascending during serialization.",
+    "values": "Numeric ID ascending.",
+    "determinism": "Identical canonical relation content must yield semantically identical index maps independent of source record iteration order."
+  },
+  "indexShape": {
+    "commonFields": ["version", "stage", "schemaId", "relationSet", "summary"],
+    "relationSet": {
+      "path": "data/generated/hero-exclusive-equipment-relations.v1.json",
+      "gitBlobSha": "Exact B-4 validated relation blob SHA",
+      "edgeCount": 167
+    },
+    "summary": {
+      "keyCount": "Distinct index key count",
+      "relationCount": "Sum of all value array lengths",
+      "maxValueCountPerKey": "Maximum value array length"
+    }
+  },
+  "forbiddenIndexFields": [
+    "nameKr",
+    "nameCn",
+    "nameEn",
+    "icon",
+    "equipmentType",
+    "ArmyIds",
+    "JobIds",
+    "provenance",
+    "sourceKind",
+    "verificationStatus"
+  ],
+  "parityInvariants": [
+    "Both index artifacts reference the same exact B-4 validated relation blob SHA.",
+    "byHero relationCount equals canonical edge count 167.",
+    "byEquipment relationCount equals canonical edge count 167.",
+    "byHero keyCount equals distinct heroId count in canonical edges: 167.",
+    "byEquipment keyCount equals distinct equipmentId count in canonical edges: 167.",
+    "No value array contains duplicates.",
+    "Every canonical pair appears exactly once in each directional reconstruction.",
+    "No pair absent from canonical edges appears in either index.",
+    "Pair set reconstructed from byHeroId exactly equals the canonical pair set.",
+    "Pair set reconstructed from byEquipmentId exactly equals the canonical pair set.",
+    "Both reconstructed pair sets exactly equal one another."
+  ],
+  "consumerBoundary": {
+    "heroStage5_2": "Consume byHeroId to locate exclusive equipment IDs, then join display payload by equipmentId. Do not reopen ConfigData ownership logic.",
+    "equipmentPage": "Consume byEquipmentId to locate owner Hero IDs, then join canonical Hero metadata. Do not infer owner from names, restrictions, ordering, or other equipment metadata.",
+    "generalEquipment": "General Equipment remains outside Stage B and must not appear in either index."
+  },
+  "failurePolicy": [
+    "If B-4 validation is not PASS / COMPLETE, do not generate B-5 indexes.",
+    "If relation blob SHA differs from B-4, stop and require B-4 revalidation.",
+    "If either index parity check fails, discard/regenerate indexes; never alter canonical edges to make an index pass.",
+    "Do not silently deduplicate malformed canonical pairs or duplicate index values.",
+    "Do not repair one index from the other index or from ConfigData."
+  ],
+  "completion": "B-5 is complete when byHero and byEquipment are generated only from the exact B-4 validated relation blob, both directions contain 167 relations with frozen cardinality preserved, and independent round-trip reconstruction yields zero pair mismatch and zero hard errors."
+}
