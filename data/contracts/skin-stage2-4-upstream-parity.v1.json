@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "stage": "skin-page-2",
+  "substage": "2-4",
+  "checkpoint": "upstream-parity-contract",
+  "status": "ACCEPTED",
+  "purpose": "Verify that the accepted Stage 2-3 bidirectional Hero<->Skin relation checkpoint remains exactly identical to the frozen Stage 1 canonical membership, owner and sourceOrder semantics that were already proven against Hero Stage 5-5 in Skin Stage 1-2.",
+  "authoritativeSources": {
+    "stage1Canonical": "data/generated/skin-stage1-canonical.v1.json",
+    "stage1UpstreamParity": "data/validation/skin-stage1-2-parity.v1.json",
+    "stage2BidirectionalRelation": "data/generated/skin-stage2-3-bidirectional-relation.v1.json",
+    "stage2BidirectionalValidation": "data/validation/skin-stage2-3-final.v1.json",
+    "heroKeyspace": "data/hero-name-master.v1.json"
+  },
+  "verificationChain": [
+    "Hero Stage 5-5 -> Stage 1 canonical parity is accepted from skin-stage1-2-parity.v1.json and is not recomputed in Stage 2-4.",
+    "Stage 1 canonical -> Stage 2-3 bySkinId must preserve every skinId, heroId and sourceOrder exactly.",
+    "Stage 1 canonical grouped by canonical Hero keyspace -> Stage 2-3 byHeroId must preserve all 267 Hero entries, including 32 empty arrays, and exact per-Hero sourceOrder."
+  ],
+  "requiredChecks": {
+    "stage1ParityStatus": "PASS",
+    "stage1ParityCompletion": "SKIN_STAGE1_2_COMPLETE",
+    "stage2BidirectionalStatus": "PASS",
+    "stage2BidirectionalCompletion": "SKIN_STAGE2_3_COMPLETE",
+    "canonicalHeroCount": 267,
+    "canonicalSkinCount": 540,
+    "distinctCanonicalSkinIdCount": 540,
+    "bySkinIdCount": 540,
+    "byHeroIdCount": 267,
+    "heroesWithSkins": 235,
+    "heroesWithoutSkins": 32,
+    "missingSkinIdCount": 0,
+    "extraSkinIdCount": 0,
+    "ownerMismatchCount": 0,
+    "sourceOrderMismatchCount": 0,
+    "missingHeroEntryCount": 0,
+    "extraHeroEntryCount": 0,
+    "reverseListMismatchCount": 0
+  },
+  "prohibitions": [
+    "Do not reopen raw ConfigData or Hero Stage 5-5 to rediscover membership, owner or order.",
+    "Do not infer or repair relations from names, filenames, IDs, assets, acquisition or release metadata.",
+    "Do not sort Hero skin lists by numeric skinId or any field other than frozen sourceOrder.",
+    "Do not add localization, release, acquisition, asset or displayTarget fields to this parity checkpoint."
+  ],
+  "completionRule": "2-4 completes only when Stage 1-2 and Stage 2-3 upstream gates are PASS, all 540 Stage 1 canonical skins appear exactly once in Stage 2-3 bySkinId with identical heroId/sourceOrder, and all 267 canonical Heroes have an exact byHeroId list equal to Stage 1 canonical grouped in sourceOrder, including exactly 32 empty lists.",
+  "nextAction": "Skin 2-5: publish the official relation consumer contract and close Skin Stage 2 without reopening relation semantics."
+}
