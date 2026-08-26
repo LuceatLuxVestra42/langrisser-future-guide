@@ -1,0 +1,282 @@
+{
+  "version": 1,
+  "stage": "skin-page-1",
+  "substage": "1-6",
+  "checkpoint": "stage1-final-gate",
+  "status": "PASS",
+  "completion": "SKIN_STAGE1_COMPLETE",
+  "purpose": "Final cross-check closing Skin Stage 1 across the accepted input contract, 540-record canonical population, upstream parity, source metadata carry-forward, acquisition-state freeze and release-selection deferral.",
+  "sources": {
+    "inputContract": "data/contracts/skin-stage1-input-contract.v1.json",
+    "canonical": "data/generated/skin-stage1-canonical.v1.json",
+    "sourceMetadata": "data/generated/skin-stage1-source-metadata.v1.json",
+    "acquisitionState": "data/generated/skin-stage1-acquisition-state.v1.json",
+    "acquisitionPolicy": "data/contracts/skin-stage1-acquisition-policy.v1.json",
+    "releaseDeferralPolicy": "data/contracts/skin-stage1-release-deferral-policy.v1.json",
+    "gates": [
+      "data/validation/skin-stage1-1-final.v1.json",
+      "data/validation/skin-stage1-2-parity.v1.json",
+      "data/validation/skin-stage1-3-final.v1.json",
+      "data/validation/skin-stage1-4-final.v1.json",
+      "data/validation/skin-stage1-5-final.v1.json"
+    ]
+  },
+  "summary": {
+    "checkCount": 39,
+    "passedCheckCount": 39,
+    "failedCheckCount": 0,
+    "canonicalSkinCount": 540,
+    "distinctCanonicalSkinIdCount": 540,
+    "sourceMetadataRecordCount": 540,
+    "acquisitionRecordCount": 540,
+    "encodedAcquisitionCount": 364,
+    "unencodedAcquisitionCount": 176,
+    "encodedTypeCounts": {
+      "2": 197,
+      "3": 1,
+      "4": 166
+    },
+    "releaseClassifiedSkinCount": 0,
+    "displayTargetAssignedSkinCount": 0,
+    "hardBlockingIssueCount": 0
+  },
+  "stageResults": {
+    "1-0": {
+      "status": "ACCEPTED"
+    },
+    "1-1": {
+      "status": "PASS",
+      "completion": "SKIN_STAGE1_1_COMPLETE"
+    },
+    "1-2": {
+      "status": "PASS",
+      "completion": "SKIN_STAGE1_2_COMPLETE"
+    },
+    "1-3": {
+      "status": "PASS",
+      "completion": "SKIN_STAGE1_3_COMPLETE"
+    },
+    "1-4": {
+      "status": "PASS",
+      "completion": "SKIN_STAGE1_4_COMPLETE"
+    },
+    "1-5": {
+      "status": "PASS",
+      "completion": "SKIN_STAGE1_5_COMPLETE"
+    }
+  },
+  "checks": [
+    {
+      "name": "input contract accepted",
+      "pass": true,
+      "detail": "ACCEPTED"
+    },
+    {
+      "name": "1-1 PASS",
+      "pass": true,
+      "detail": "PASS"
+    },
+    {
+      "name": "1-1 completion",
+      "pass": true,
+      "detail": "SKIN_STAGE1_1_COMPLETE"
+    },
+    {
+      "name": "1-2 PASS",
+      "pass": true,
+      "detail": "PASS"
+    },
+    {
+      "name": "1-2 completion",
+      "pass": true,
+      "detail": "SKIN_STAGE1_2_COMPLETE"
+    },
+    {
+      "name": "1-3 PASS",
+      "pass": true,
+      "detail": "PASS"
+    },
+    {
+      "name": "1-3 completion",
+      "pass": true,
+      "detail": "SKIN_STAGE1_3_COMPLETE"
+    },
+    {
+      "name": "1-4 PASS",
+      "pass": true,
+      "detail": "PASS"
+    },
+    {
+      "name": "1-4 completion",
+      "pass": true,
+      "detail": "SKIN_STAGE1_4_COMPLETE"
+    },
+    {
+      "name": "1-5 PASS",
+      "pass": true,
+      "detail": "PASS"
+    },
+    {
+      "name": "1-5 completion",
+      "pass": true,
+      "detail": "SKIN_STAGE1_5_COMPLETE"
+    },
+    {
+      "name": "canonical count 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "canonical distinct ids 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "metadata count 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "acquisition count 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "metadata ids exact canonical",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "acquisition ids exact canonical",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "1-2 owner mismatch zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "1-2 source order mismatch zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "1-2 static artwork mismatch zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "1-2 animated resource mismatch zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "1-2 acquisition mismatch zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "1-3 hero skin info resolved 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "1-3 image resource resolved 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "1-3 critical failures zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "acquisition policy accepted",
+      "pass": true,
+      "detail": "ACCEPTED"
+    },
+    {
+      "name": "encoded 364",
+      "pass": true,
+      "detail": 364
+    },
+    {
+      "name": "unencoded 176",
+      "pass": true,
+      "detail": 176
+    },
+    {
+      "name": "acquisition partition 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "type 2 count 197",
+      "pass": true,
+      "detail": 197
+    },
+    {
+      "name": "type 3 count 1",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "type 4 count 166",
+      "pass": true,
+      "detail": 166
+    },
+    {
+      "name": "1-4 critical failures zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "release policy accepted",
+      "pass": true,
+      "detail": "ACCEPTED"
+    },
+    {
+      "name": "release decision deferred",
+      "pass": true,
+      "detail": "DEFERRED_PENDING_STAGE4_AUTHORITY"
+    },
+    {
+      "name": "1-5 prohibited release fields zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "1-5 future subset zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "1-5 release classified zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "1-5 display target zero",
+      "pass": true,
+      "detail": 0
+    }
+  ],
+  "failures": [],
+  "frozenStage1Outputs": {
+    "canonicalPopulation": "540 regular Hero skins, one record per accepted skinId",
+    "ownershipAndOrder": "Exact parity with accepted Hero Stage 5-5 membership and source order",
+    "assetLocators": "Static image and Spine source locators preserved; web export deferred to Skin Stage 3",
+    "sourceMetadata": "Explicit HeroSkinInfo/resource metadata carried forward without semantic invention",
+    "acquisition": "GetPathType authority frozen as ENCODED 364 / UNENCODED 176; raw GetPathDesc is supplemental evidence only",
+    "releaseSelection": "No CN/KR/future classification and no displayTarget in Stage 1; authority deferred to Skin Stage 4"
+  },
+  "outOfScopeAfterClosure": [
+    "Asset extraction/export/web-path mapping (Skin Stage 3)",
+    "CN/KR release evidence and deterministic matching (Skin Stage 4)",
+    "Korean skin-name localization (Skin Stage 4)",
+    "Future-page subset generation from validated KR_FUTURE status (Skin Stage 5)",
+    "Hero consumer regeneration/parity (Skin Stage 6)"
+  ],
+  "nextAction": "Skin Stage 1 is closed. Proceed to Skin Stage 2 relation freeze/parity or Skin Stage 3 asset work without reopening the 540-record population unless an upstream authoritative correction is explicitly introduced."
+}
