@@ -14,6 +14,12 @@ const countBy = (rows, keyFn) => {
   }
   return out;
 };
+const compareList = (a, b) => {
+  if (a.groupOrder !== b.groupOrder) return a.groupOrder - b.groupOrder;
+  if (a.subtypeOrder !== b.subtypeOrder) return a.subtypeOrder - b.subtypeOrder;
+  if (a.sortIndex !== b.sortIndex) return a.sortIndex - b.sortIndex;
+  return a.equipmentId - b.equipmentId;
+};
 
 const contract = load('data/contracts/equipment-stage3-5-exclusive-consumer.v1.json');
 const pageSchema = load(contract.sources.pageSchema);
@@ -168,16 +174,7 @@ assert(heroOwnershipLeak === 0, `hero ownership leak ${heroOwnershipLeak}`);
 assert(consumer.policy?.heroOwnershipGenerated === false, 'hero ownership must remain outside Stage 3-5');
 
 for (let i = 1; i < consumer.listRecords.length; i++) {
-  const a = consumer.listRecords[i - 1];
-  const b = consumer.listRecords[i];
-  const tupleA = [a.groupOrder, a.subtypeOrder, a.sortIndex, a.equipmentId];
-  const tupleB = [b.groupOrder, b.subtypeOrder, b.sortIndex, b.equipmentId];
-  assert(tupleA.join('|') <= tupleB.join('|') ||
-    a.groupOrder < b.groupOrder ||
-    (a.groupOrder === b.groupOrder && a.subtypeOrder < b.subtypeOrder) ||
-    (a.groupOrder === b.groupOrder && a.subtypeOrder === b.subtypeOrder && a.sortIndex < b.sortIndex) ||
-    (a.groupOrder === b.groupOrder && a.subtypeOrder === b.subtypeOrder && a.sortIndex === b.sortIndex && a.equipmentId < b.equipmentId),
-    `list ordering mismatch at ${i}`);
+  assert(compareList(consumer.listRecords[i - 1], consumer.listRecords[i]) <= 0, `list ordering mismatch at ${i}`);
 }
 
 const releaseDateKnown = consumer.listRecords.filter(r => r.releaseGroupDate).length;
