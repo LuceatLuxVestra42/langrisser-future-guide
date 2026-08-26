@@ -56,6 +56,12 @@ const TAB_DEFINITIONS: ReadonlyArray<{
   },
 ];
 
+const TAB_ORDER_POLICIES: Record<TabId, string> = {
+  1: "표시 순서는 확정된 역사적 출시순이 아니라 Stage 3의 deterministic presentation order야.",
+  2: "검증된 출시 그룹 단위만 반영하며 같은 그룹 안의 개별 출시순은 확정하지 않았어.",
+  3: "정확한 출시 순서는 REVIEW 상태라 현재 순서를 최신순이나 출시순으로 해석하지 않아.",
+};
+
 function isTabId(value: unknown): value is TabId {
   return value === 1 || value === 2 || value === 3;
 }
@@ -288,11 +294,16 @@ function EquipmentGeneralListPage() {
           </div>
         </section>
 
-        <div className="mt-6 flex items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            현재 탭 {currentTabCount}개 중 <span className="font-semibold text-foreground">{filteredRecords.length}개</span> 표시
-          </p>
-          <p className="hidden text-xs text-muted-foreground sm:block">
+        <div className="mt-6 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+          <div>
+            <p className="text-sm text-muted-foreground">
+              현재 탭 {currentTabCount}개 중 <span className="font-semibold text-foreground">{filteredRecords.length}개</span> 표시
+            </p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              {TAB_ORDER_POLICIES[uiState.tab]}
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground sm:text-right">
             선택한 탭과 필터는 다음 방문에도 유지돼.
           </p>
         </div>
@@ -331,7 +342,9 @@ function EquipmentGeneralListPage() {
                   <div className="flex flex-1 flex-col p-4">
                     <h2 className="text-lg font-bold leading-snug text-foreground">{displayName}</h2>
                     {record.nameKr === null && (
-                      <p className="mt-1 text-[11px] text-muted-foreground">중문명 임시 표시</p>
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        한국명 REVIEW · 중문명 임시 표시
+                      </p>
                     )}
 
                     <div className="mt-4 rounded-xl bg-muted/55 p-3">

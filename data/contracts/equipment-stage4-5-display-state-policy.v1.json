@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "stage": "4-5",
+  "status": "FROZEN",
+  "purpose": "Harden Equipment frontend display and list-state behavior without reopening Stage 3 semantics, Stage B ownership, routing, or admission.",
+  "dependsOn": {
+    "stage40": "data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json",
+    "stage42": "data/validation/equipment-stage4-2-general-list-ui-summary.v1.json",
+    "stage43": "data/validation/equipment-stage4-3-general-detail-ui-summary.v1.json",
+    "stage44": "data/validation/equipment-stage4-4-exclusive-ui-ownership-summary.v1.json"
+  },
+  "statePolicy": {
+    "general": {
+      "route": "/equipment",
+      "storage": "localStorage",
+      "key": "equipment-general-list-ui.v1",
+      "fields": ["tab", "group", "subtype"],
+      "default": {"tab": 1, "group": null, "subtype": null},
+      "sanitize": "tab must be 1/2/3; group must exist in generated filters; subtype must exist under the sanitized active group; incompatible/unknown values become null/default.",
+      "writeGuard": "Do not write default state until the restore attempt has completed.",
+      "storageFailure": "Malformed JSON, unavailable storage, or write failure is non-fatal and falls back to safe defaults/current in-memory state.",
+      "groupChange": "Changing or clearing group clears subtype.",
+      "tabChange": "Changing tab preserves the selected equipment-type filter; an empty result is handled by the list empty-state reset action.",
+      "detailReturn": "Returning from /equipment/$equipmentId to /equipment restores the persisted tab/group/subtype state."
+    },
+    "exclusive": {
+      "route": "/equipment/exclusive",
+      "storage": "localStorage",
+      "key": "equipment-exclusive-list-ui.v1",
+      "fields": ["group", "subtype"],
+      "default": {"group": null, "subtype": null},
+      "sanitize": "group must exist in the generated exclusive filters; subtype must exist under the sanitized active group; incompatible/unknown values become null.",
+      "writeGuard": "Do not write default state until the restore attempt has completed.",
+      "storageFailure": "Malformed JSON, unavailable storage, or write failure is non-fatal and falls back to safe defaults/current in-memory state.",
+      "groupChange": "Changing or clearing group clears subtype.",
+      "detailReturn": "Returning from /equipment/$equipmentId to /equipment/exclusive restores the persisted group/subtype state."
+    },
+    "isolation": "General and exclusive lists use separate versioned storage keys; state must not leak between list modes."
+  },
+  "displayPolicy": {
+    "nameFallback": {
+      "expression": "nameKr ?? nameCn",
+      "reviewLabel": "한국명 REVIEW · 중문명 임시 표시",
+      "rule": "A nameCn fallback is presentation only and never upgrades REVIEW metadata."
+    },
+    "generalOrderMessaging": {
+      "tab1": "Presentation order only; do not claim exact historical release chronology.",
+      "tab2": "Verified release-group ordering may be reflected, but exact order inside an equal release group is not claimed.",
+      "tab3": "REVIEW_RELEASE_ORDER; current order must not be described as latest or exact release chronology."
+    },
+    "exclusiveOrderMessaging": "Exclusive chronology remains REVIEW; deterministic generated order is presentation-only.",
+    "effect": "Continue displaying frozen Stage 3 effect text/segments without semantic rewrite.",
+    "restriction": "Continue displaying structural-inference semantics at confidence 0.99 without claiming direct runtime proof.",
+    "emptyState": "Both list routes provide an explicit empty state with a filter-reset action; general reset preserves the active tab and exclusive reset clears group/subtype."
+  },
+  "sourceDiscipline": {
+    "generatedOrderPreserved": true,
+    "frontendSortAdded": false,
+    "directConfigDataReads": false,
+    "statsRecalculated": false,
+    "effectTextRewritten": false,
+    "releaseChronologyInvented": false,
+    "exclusiveOwnershipRederived": false
+  },
+  "completion": {
+    "passStatus": "STAGE4_5_DISPLAY_STATE_POLICY_HARDENED",
+    "nextStage": "4-6 admission/route QA"
+  }
+}
