@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-3",
+  "status": "PROVISIONAL_TAXONOMY_COMPLETE",
+  "purpose": "Define a reversible, evidence-backed provisional taxonomy for Korean banner occurrence rows without finalizing the production bannerType enum or canonical banner schema.",
+  "inputs": {
+    "rowGrain": "data/investigation/banner-stage1-2-row-grain-census.v1.json",
+    "sourceCensus": "data/investigation/banner-stage1-1-source-census.v1.json",
+    "currentSchedule": "data/kr-banner-schedule.v1.json",
+    "designReference": "시트 설계도 Mk.1.txt"
+  },
+  "coreDecision": {
+    "singleEnumRejectedForStage1": true,
+    "reason": "The current scheduleType field mixes different semantic dimensions: new expresses lifecycle, single/dual/triple express pickup cardinality/display behavior, and wish expresses summon mechanic. A single provisional bannerType would preserve that ambiguity instead of resolving it.",
+    "taxonomyShape": "MULTI_AXIS_PROVISIONAL",
+    "confidence": 0.98
+  },
+  "axes": {
+    "mechanicFamily": {
+      "description": "What kind of summon/banner behavior the occurrence represents.",
+      "values": [
+        {
+          "value": "PICKUP",
+          "status": "OBSERVED",
+          "meaning": "Ordinary hero pickup occurrence, including new and rerun forms."
+        },
+        {
+          "value": "WISH",
+          "status": "OBSERVED",
+          "meaning": "Wish/selectable summon occurrence. Selection-list semantics are separate relations and are not inferred from pickup cardinality."
+        },
+        {
+          "value": "SPECIAL",
+          "status": "RESERVED_BY_PRODUCT_REQUIREMENT",
+          "meaning": "Special banner concept that cannot safely be represented as ordinary pickup or wish. No current 94-row assignment is forced solely because the product design requires a special-banner surface."
+        },
+        {
+          "value": "UNKNOWN",
+          "status": "REQUIRED_FALLBACK",
+          "meaning": "Use when evidence is insufficient or a future occurrence does not fit the observed families."
+        }
+      ]
+    },
+    "lifecycle": {
+      "description": "Whether the Korean occurrence is presented as a new release or a rerun/return occurrence.",
+      "values": ["NEW", "RERUN", "UNKNOWN", "NOT_APPLICABLE"]
+    },
+    "pickupCardinality": {
+      "description": "Number/form of featured pickup heroes when that property is explicitly supported. This is not derived from bannerCode numbering.",
+      "values": ["SINGLE", "DUAL", "TRIPLE", "MULTI", "UNKNOWN", "NOT_APPLICABLE"]
+    },
+    "contextTags": {
+      "description": "Non-exclusive modifiers that must not replace the main mechanic/lifecycle/cardinality axes.",
+      "values": [
+        {
+          "value": "COLLAB",
+          "status": "OBSERVED",
+          "meaning": "Collaboration context. It is a tag because collaboration can still be a NEW PICKUP occurrence."
+        },
+        {
+          "value": "MANUAL_KR",
+          "status": "OBSERVED",
+          "meaning": "Korean manually managed occurrence/asset case."
+        },
+        {
+          "value": "LEGACY_REUSE",
+          "status": "OBSERVED",
+          "meaning": "Occurrence reusing an already verified legacy source/banner mapping."
+        },
+        {
+          "value": "SOURCE_CONFLICT",
+          "status": "OBSERVED",
+          "meaning": "Recorded source linkage conflicts with raw ConfigData evidence and must remain explicit until relation repair."
+        },
+        {
+          "value": "CP_RELATED",
+          "status": "RESERVED_REVIEW",
+          "meaning": "Reserved for CP banner/pickup-log relationships required by the product design. Stage 1-3 does not prove that CP is a mutually exclusive banner mechanic, so no current occurrence is assigned automatically."
+        }
+      ]
+    }
+  },
+  "legacyScheduleTypeMapping": [
+    {
+      "scheduleType": "new",
+      "mechanicFamily": "PICKUP",
+      "lifecycle": "NEW",
+      "pickupCardinality": "UNKNOWN",
+      "reason": "Current NEW rows can contain different featured-hero counts, so cardinality must come from explicit source/relation evidence rather than from scheduleType=new."
+    },
+    {
+      "scheduleType": "single",
+      "mechanicFamily": "PICKUP",
+      "lifecycle": "RERUN",
+      "pickupCardinality": "SINGLE",
+      "reason": "Current Korean schedule uses single for one-hero rerun occurrences."
+    },
+    {
+      "scheduleType": "dual",
+      "mechanicFamily": "PICKUP",
+      "lifecycle": "RERUN",
+      "pickupCardinality": "DUAL",
+      "reason": "Current Korean schedule uses dual for two-hero rerun occurrences."
+    },
+    {
+      "scheduleType": "triple",
+      "mechanicFamily": "PICKUP",
+      "lifecycle": "RERUN",
+      "pickupCardinality": "TRIPLE",
+      "reason": "Current Korean schedule uses triple for three-hero selected/rerun occurrences."
+    },
+    {
+      "scheduleType": "wish",
+      "mechanicFamily": "WISH",
+      "lifecycle": "UNKNOWN",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "reason": "Wish banners use selectable-pool semantics; treating the two chosen heroes as ordinary DUAL pickup would collapse different mechanics."
+    },
+    {
+      "scheduleType": "other-or-unseen",
+      "mechanicFamily": "UNKNOWN",
+      "lifecycle": "UNKNOWN",
+      "pickupCardinality": "UNKNOWN",
+      "reason": "Unknown future or exceptional rows remain explicit rather than being guessed into a known type."
+    }
+  ],
+  "sourceTypePolicy": {
+    "rule": "Keep sourceType as source-pool classification evidence and never overwrite it with the occurrence taxonomy.",
+    "observedSourceTypeVocabularyFromCurrentCheckpoint": ["new", "dual", "triple", "wish", null],
+    "importantExample": "A sourceType=new record may later appear in the Korean schedule as lifecycle=RERUN and pickupCardinality=SINGLE."
+  },
+  "representativeFixtures": [
+    {
+      "recordKey": "kr-banner:20260923:1",
+      "legacy": {"scheduleType": "new", "sourceType": "new", "bannerCode": "9601"},
+      "provisional": {"mechanicFamily": "PICKUP", "lifecycle": "NEW", "pickupCardinality": "UNKNOWN", "tags": []},
+      "note": "One-hero NEW example; cardinality is intentionally not encoded by scheduleType=new."
+    },
+    {
+      "recordKey": "kr-banner:20261021:1",
+      "legacy": {"scheduleType": "new", "sourceType": "new", "bannerCode": "9701"},
+      "provisional": {"mechanicFamily": "PICKUP", "lifecycle": "NEW", "pickupCardinality": "UNKNOWN", "tags": []},
+      "note": "Two-hero NEW example demonstrating that new is not a cardinality type."
+    },
+    {
+      "recordKey": "kr-banner:20261111:1",
+      "legacy": {"scheduleType": "new", "sourceType": "new", "bannerCode": "9801"},
+      "provisional": {"mechanicFamily": "PICKUP", "lifecycle": "NEW", "pickupCardinality": "UNKNOWN", "tags": ["COLLAB"]},
+      "note": "Collaboration is modeled as a non-exclusive tag rather than a top-level mutually exclusive banner type."
+    },
+    {
+      "recordKey": "kr-banner:20261007:9",
+      "legacy": {"scheduleType": "single", "sourceType": "new", "bannerCode": "5701", "sourceRecordKey": "cardpool:213"},
+      "provisional": {"mechanicFamily": "PICKUP", "lifecycle": "RERUN", "pickupCardinality": "SINGLE", "tags": []},
+      "note": "Demonstrates source classification and occurrence classification are different axes."
+    },
+    {
+      "recordKey": "kr-banner:20261028:1",
+      "legacy": {"scheduleType": "dual", "sourceType": "dual", "bannerCode": "9702", "sourceRecordKey": "cardpool:370"},
+      "provisional": {"mechanicFamily": "PICKUP", "lifecycle": "RERUN", "pickupCardinality": "DUAL", "tags": []}
+    },
+    {
+      "recordKey": "kr-banner:20260902:2",
+      "legacy": {"scheduleType": "triple", "sourceType": "triple", "bannerCode": "8603", "sourceRecordKey": "cardpool:330"},
+      "provisional": {"mechanicFamily": "PICKUP", "lifecycle": "RERUN", "pickupCardinality": "TRIPLE", "tags": []}
+    },
+    {
+      "recordKey": "kr-banner:20260916:3",
+      "legacy": {"scheduleType": "wish", "sourceType": "wish", "bannerCode": "7902", "sourceRecordKey": "cardpool:305"},
+      "provisional": {"mechanicFamily": "WISH", "lifecycle": "UNKNOWN", "pickupCardinality": "NOT_APPLICABLE", "tags": ["MANUAL_KR"]}
+    },
+    {
+      "recordKey": "kr-manual-wish-langrisser-1-5-20260909",
+      "legacy": {"scheduleType": "wish", "sourceType": null, "bannerCode": null, "sourceRecordKey": null},
+      "provisional": {"mechanicFamily": "WISH", "lifecycle": "UNKNOWN", "pickupCardinality": "NOT_APPLICABLE", "tags": ["MANUAL_KR"]},
+      "note": "Manual occurrence remains taxonomically valid without CardPool identity."
+    },
+    {
+      "recordKey": "kr-banner:20270331:4",
+      "legacy": {"scheduleType": "single", "sourceType": "new", "bannerCode": "7001", "sourceRecordKey": "cardpool:263"},
+      "provisional": {"mechanicFamily": "PICKUP", "lifecycle": "RERUN", "pickupCardinality": "SINGLE", "tags": ["SOURCE_CONFLICT"]},
+      "note": "Taxonomy can be assigned from occurrence evidence while the incorrect source relation remains unresolved and separately flagged."
+    }
+  ],
+  "productRequirementBoundary": {
+    "cp": "The design requires a CP banner pickup-log surface, but current Stage 1 evidence does not establish CP as a mutually exclusive source/occurrence banner type. Keep CP_RELATED reserved for relation census.",
+    "special": "The design requires explanations for special banner concepts. SPECIAL is therefore reserved, but no current 94-row occurrence is forced into SPECIAL without evidence.",
+    "wish": "Wish summon is independently supported by both current schedule records and the design requirement for selectable-character lists.",
+    "singleRerun": "The design explicitly requires rerun history for important one-person pickup characters, consistent with lifecycle=RERUN plus pickupCardinality=SINGLE."
+  },
+  "coveragePolicy": {
+    "currentPopulation": 94,
+    "knownLegacyScheduleTypes": ["new", "single", "dual", "triple", "wish"],
+    "unknownFallbackPresent": true,
+    "allCurrentRowsHaveAProvisionalClassificationPath": true,
+    "productionMigrationPerformed": false
+  },
+  "prohibitedShortcuts": [
+    "Do not define COLLAB as a mutually exclusive banner mechanic when it can coexist with NEW pickup.",
+    "Do not infer pickup cardinality from bannerCode, slotCode, asset filename, or source record ordering.",
+    "Do not classify WISH as DUAL merely because the user may choose two heroes.",
+    "Do not classify CP as a proven banner mechanic before relation census establishes its data unit and relationship.",
+    "Do not erase sourceType when producing occurrence taxonomy.",
+    "Do not silently repair SOURCE_CONFLICT records during taxonomy work."
+  ],
+  "notDecided": [
+    "Final production bannerType enum or field layout",
+    "Whether the final consumer stores the axes as columns, tags, or normalized relations",
+    "Final CP data-unit semantics",
+    "Final special-banner subtype list",
+    "Exact lifecycle for each wish occurrence",
+    "Cardinality for NEW occurrences until explicit relation evidence is consumed",
+    "Event relationship taxonomy",
+    "Asset ownership taxonomy"
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-4",
+    "task": "Relation census",
+    "consume": [
+      "Use mechanicFamily/lifecycle/pickupCardinality/contextTags as provisional independent dimensions.",
+      "Preserve sourceType separately from occurrence taxonomy.",
+      "Resolve Hero relations only through explicit source IDs and canonical Hero identity.",
+      "Investigate CP_RELATED and special-banner relationships without forcing them into the current five legacy scheduleType values.",
+      "Carry kr-banner:20270331:4 as SOURCE_CONFLICT."
+    ]
+  }
+}
