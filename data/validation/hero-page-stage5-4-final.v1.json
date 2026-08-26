@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-4",
+  "checkpoint": "final",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "checks": {
+    "canonicalHeroes": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "spHeroIdentity": {
+      "released": 25,
+      "unique": 25,
+      "allCanonical": true,
+      "pass": true
+    },
+    "spJobs": {
+      "resolved": 25,
+      "total": 25,
+      "pass": true
+    },
+    "missions": {
+      "total": 350,
+      "unique": 350,
+      "expectedTypes": {
+        "5": 5,
+        "73": 200,
+        "74": 1,
+        "77": 25,
+        "81": 119
+      },
+      "actualTypes": {
+        "5": 5,
+        "73": 200,
+        "74": 1,
+        "77": 25,
+        "81": 119
+      },
+      "pass": true
+    },
+    "missionExtensions": {
+      "resolved": 350,
+      "total": 350,
+      "pass": true
+    },
+    "submitItemConditions": {
+      "resolved": 200,
+      "total": 200,
+      "pass": true
+    },
+    "exclusiveEquipmentConditions": {
+      "total": 25,
+      "pass": true
+    },
+    "requiredHeroStageConditions": {
+      "total": 125,
+      "pass": true
+    },
+    "rewardBuffs": {
+      "resolved": 25,
+      "total": 25,
+      "pass": true
+    },
+    "rewardSkills": {
+      "resolved": 50,
+      "total": 50,
+      "pass": true
+    },
+    "rewardSoldiers": {
+      "resolved": 25,
+      "total": 25,
+      "stage53MembershipPass": true,
+      "pass": true
+    },
+    "hardErrors": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  },
+  "missionSemantics": {
+    "5": "Param2/Param3 route-stage parameters; Param4 clear count; Param5 required Hero IDs",
+    "73": "Param1 -> ConfigDataMissionSumitItemInfo.ID -> Items; Goods entries preserve their native GoodsType/Id namespaces.",
+    "74": "Param1/Param2 activity-stage parameters; Param3 clear count; Param5 required Hero IDs",
+    "77": "Param1 = exclusive EquipmentInfo.ID; Param2 = required level; equipment identity cross-checked against frozen Stage 5-2",
+    "81": "Param2 activity category; Param4 clear count; Param5 required Hero IDs; Param6 target/allowed stage IDs",
+    "story": "MissionInfo.MissionExtentionParm1 -> MissionExtSPHeroInfo.ID -> ScenarioDescribe; PreUnlockMissionId preserves previous unlock dependency"
+  },
+  "crossBlockReuse": {
+    "stage52": "Frozen exclusive-equipment identity reused.",
+    "stage53": "Frozen Hero-Soldier membership and Soldier Master reused."
+  },
+  "hardErrors": [],
+  "summary": {
+    "canonicalHeroCount": 267,
+    "spReleasedCount": 25,
+    "spNotReleasedCount": 242,
+    "totalMissionCount": 350,
+    "missionTypeCounts": {
+      "5": 5,
+      "73": 200,
+      "74": 1,
+      "77": 25,
+      "81": 119
+    },
+    "missionExtResolvedCount": 350,
+    "rewardBuffResolvedCount": 25,
+    "rewardSkillResolvedCount": 50,
+    "rewardSoldierResolvedCount": 25,
+    "hardErrorCount": 0
+  },
+  "decision": "Hero Stage 5-4 is source-resolved and COMPLETE; Stage 5 integration may promote 5-4 without reopening SP semantics."
+}

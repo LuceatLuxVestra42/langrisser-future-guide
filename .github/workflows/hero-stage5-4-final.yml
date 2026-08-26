@@ -1,0 +1,56 @@
+name: Hero Stage 5-4 final gate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-4-final.yml'
+      - 'scripts/build_hero_stage5_4_sp_v2.cjs'
+      - 'data/configdata/ConfigDataSPHeroInfo.json'
+      - 'data/configdata/ConfigDataMissionInfo.json'
+      - 'data/configdata/ConfigDataMissionExtSPHeroInfo.json'
+      - 'data/configdata/ConfigDataMissionSumitItemInfo.json'
+      - 'data/configdata/ConfigDataJobConnectionInfo.json'
+      - 'data/configdata/ConfigDataJobInfo.json'
+      - 'data/configdata/ConfigDataSkillInfo.json'
+      - 'data/configdata/ConfigDataBuffInfo.json'
+      - 'data/generated/hero-page-stage5-2-exclusive-central.v1.json'
+      - 'data/generated/hero-page-soldiers-stage5-3.v1.json'
+      - 'data/generated/soldier-master.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  final:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build and validate Hero Stage 5-4
+        run: node scripts/build_hero_stage5_4_sp_v2.cjs
+
+      - name: Show final summary
+        run: |
+          node - <<'NODE'
+          const r=require('./data/validation/hero-page-stage5-4-final.v1.json');
+          console.log(JSON.stringify({status:r.status,completion:r.completion,summary:r.summary,checks:r.checks,hardErrors:r.hardErrors},null,2));
+          NODE
+
+      - name: Freeze Hero Stage 5-4 outputs
+        run: |
+          TARGETS='data/generated/hero-page-stage5-4-sp.v1.json data/validation/hero-page-stage5-4-final.v1.json'
+          if [ -z "$(git status --porcelain -- $TARGETS)" ]; then
+            echo 'Stage 5-4 outputs already current.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add $TARGETS
+            git commit -m 'Freeze Hero Stage 5-4 SP block'
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
