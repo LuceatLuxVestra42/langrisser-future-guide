@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/banner-stage3-7-frontend-integration.yml'
+      - 'vite.config.ts'
       - 'data/contracts/banner-stage3-7-frontend-integration.v1.json'
       - 'data/generated/banner-stage3-3-basic-table-consumer.v1.json'
       - 'data/generated/banner-stage3-4-wish-consumer.v1.json'
@@ -11,7 +12,9 @@ on:
       - 'data/generated/banner-stage3-6-recurrence-pickup-log-consumer.v1.json'
       - 'scripts/validate-banner-stage3-7-frontend-integration.mjs'
       - 'src/lib/banner-page.server.ts'
+      - 'src/lib/banner-page.static.ts'
       - 'src/lib/banner-page.functions.ts'
+      - 'src/router.tsx'
       - 'src/routes/banners.tsx'
       - 'src/routes/index.tsx'
       - 'src/routeTree.gen.ts'
@@ -35,8 +38,10 @@ jobs:
         run: node scripts/validate-banner-stage3-7-frontend-integration.mjs
       - name: Build production frontend
         run: bun run build
-      - name: Verify generated banner route
+      - name: Verify static home and banner pages
         run: |
+          test -f dist/client/index.html
+          test -f dist/client/banners/index.html
           grep -q '/banners' src/routeTree.gen.ts
       - name: Persist Banner Stage 3-7 checkpoint
         run: |
@@ -49,3 +54,17 @@ jobs:
           fi
           git commit -m "Freeze Banner Stage 3-7 frontend checkpoint"
           git push
+      - name: Publish static preview to gh-pages
+        if: github.ref == 'refs/heads/test/github-pages-static-banner'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy banner preview ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
