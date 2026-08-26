@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-2",
+  "checkpoint": "final",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "purpose": "Freeze the 267-Hero exclusive-equipment + central-discipline block from current ConfigData with explicit NOT_RELEASED states and no inferred ownership.",
+  "checks": {
+    "canonicalHeroCount": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "outputHeroCount": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "uniqueOutputHeroIds": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "exclusivePopulation": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "exclusiveRawResolution": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "exclusiveSkillHeroResolution": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "exclusiveOwnerUniqueness": {
+      "duplicateOwnerCount": 0,
+      "pass": true
+    },
+    "exclusivePathType46": {
+      "pass": true
+    },
+    "centralDisciplineSkillResolution": {
+      "releasedCount": 166,
+      "resolvedCount": 166,
+      "pass": true
+    },
+    "hardErrors": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  },
+  "ownershipEvidence": {
+    "resolver": "ConfigDataEquipmentInfo.SkillHero -> canonical Hero ID",
+    "resolvedExclusiveCount": 167,
+    "resolvedUniqueOwnerCount": 167,
+    "descContainsCanonicalOwnerNameCount": 167,
+    "representative": {
+      "equipmentId": 273,
+      "equipmentNameCn": "流浪的骑士",
+      "skillHero": 12,
+      "canonicalOwner": {
+        "heroId": 12,
+        "nameCn": "艾尔文",
+        "nameKr": "엘윈",
+        "nameEn": "Elwin",
+        "aliasesKr": [],
+        "status": "verified"
+      },
+      "descCn": "没有人能在我的BGM里打败我。艾尔文专属武器。"
+    },
+    "rejectedFallbacks": [
+      "JobIds/ArmyIds equipability restrictions are not treated as owner identity.",
+      "Equipment name/description text parsing is not used to assign owner IDs.",
+      "PathType=46 identifies exclusive-equipment population but is not treated as an owner resolver."
+    ]
+  },
+  "centralDisciplineEvidence": {
+    "resolver": "ConfigDataHeroInfo.CastingLawSkill_ID -> ConfigDataSkillInfo.ID",
+    "releasedCount": 166,
+    "unresolvedSkillRefs": [],
+    "representative": {
+      "status": "RELEASED",
+      "skillId": 90085,
+      "nameCn": "骑士楷模",
+      "descCn": "[骑士精神]施加的效果持续回合<color=#DC143C>+2</color>，使用后全场友军骑兵部队攻击、智力提升<color=#DC143C>20%</color>，并同时获得[免疫]、[气浪]和[增援]效果，持续<color=#DC143C>2</color>回合。",
+      "icon": "UI/Icon/Skill_ABS/Skill_CastMetal.png",
+      "templates": [
+        3,
+        1,
+        29,
+        32,
+        41
+      ],
+      "unlock": {
+        "equipmentLevel": 1,
+        "heroStarLevel": 6,
+        "castingLawLevel": 5,
+        "materials": [
+          {
+            "GoodsType": 6,
+            "Id": 3303,
+            "Count": 12
+          }
+        ]
+      },
+      "resolver": "ConfigDataHeroInfo.CastingLawSkill_ID -> ConfigDataSkillInfo.ID"
+    }
+  },
+  "diagnostics": {
+    "missingEquipmentIds": [],
+    "ownerErrors": [],
+    "duplicateExclusiveOwners": [],
+    "centralMissingSkillRefs": [],
+    "hardErrors": []
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "outputHeroCount": 267,
+    "exclusiveReleasedCount": 167,
+    "exclusiveNotReleasedCount": 100,
+    "centralDisciplineReleasedCount": 166,
+    "centralDisciplineNotReleasedCount": 101,
+    "hardErrorCount": 0
+  },
+  "decision": "Hero Stage 5-2 is source-resolved and may be frozen as COMPLETE. Stage 5 integration may promote 5-2 without reopening equipment ownership or central-discipline semantics."
+}
