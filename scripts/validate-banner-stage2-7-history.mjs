@@ -146,5 +146,5 @@ const summary = {
 };
 
 write('data/validation/banner-stage2-7-summary.v1.json', summary);
-console.log(JSON.stringify({ status: summary.status, errorCount: summary.errorCount, repeatedDefinitionCount, recurrenceLinkCount: recomputedLinks }, null, 2));
+console.log(JSON.stringify({ status: summary.status, errorCount: summary.errorCount, repeatedDefinitionCount: repeatedCount, recurrenceLinkCount: recomputedLinks }, null, 2));
 if (errors.length) process.exit(1);
