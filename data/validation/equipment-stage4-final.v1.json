@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "stage": "4-FINAL",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "pipelineStatus": "FINAL_FROZEN",
+  "finalStageStatus": "STAGE4_FINAL_PC_FIRST_REVIEW_READY",
+  "reviewReadiness": "PC_FIRST_REVIEW_READY",
+  "upstream": {
+    "stage40": "FROZEN",
+    "stage41": "STAGE4_1_ROUTE_LOADER_SCAFFOLD_READY",
+    "stage42": "STAGE4_2_GENERAL_LIST_UI_READY",
+    "stage43": "STAGE4_3_GENERAL_DETAIL_UI_READY",
+    "stage44": "STAGE4_4_EXCLUSIVE_UI_AND_OWNERSHIP_READY",
+    "stage45": "STAGE4_5_DISPLAY_STATE_POLICY_HARDENED",
+    "stage46": "STAGE4_6_ADMISSION_ROUTE_QA_READY",
+    "stage47": "STAGE4_7_WHOLE_CONSUMER_REGRESSION_READY"
+  },
+  "population": {
+    "canonical": 390,
+    "public": 373,
+    "general": 206,
+    "exclusive": 167,
+    "hiddenSpecial": 16,
+    "hold": 1,
+    "holdEquipmentIds": [
+      2013
+    ],
+    "generalTabs": {
+      "1": 94,
+      "2": 80,
+      "3": 32
+    }
+  },
+  "finalConsumerBoundary": {
+    "publicEquipment": 373,
+    "generalList": "/equipment",
+    "exclusiveList": "/equipment/exclusive",
+    "detail": "/equipment/$equipmentId",
+    "homepageEquipmentTarget": "/equipment",
+    "homepageEntryVerified": true,
+    "generalListDetailExact": true,
+    "exclusiveListDetailExact": true,
+    "runtimeKindMismatch": 0,
+    "runtimeEquipmentIdMismatch": 0,
+    "exclusiveOwnerPayloadMismatch": 0
+  },
+  "finalAdmissionBoundary": {
+    "hiddenSpecial": 16,
+    "hold": 1,
+    "holdEquipmentIds": [
+      2013
+    ],
+    "hiddenResolved": 0,
+    "holdResolved": 0,
+    "unknownResolved": 0
+  },
+  "statePolicy": {
+    "generalStorageKey": "equipment-general-list-ui.v1",
+    "exclusiveStorageKey": "equipment-exclusive-list-ui.v1",
+    "isolatedKeys": true,
+    "restoreAndSanitizeMarkersPresent": true
+  },
+  "ownership": {
+    "source": "data/generated/hero-exclusive-equipment-by-equipment.v1.json#byEquipmentId",
+    "keys": 167,
+    "cardinalityMismatch": 0,
+    "ownerHeroMissing": 0,
+    "rederived": false
+  },
+  "sourceDiscipline": {
+    "finalCloseoutReadsFrozenStage4Checkpoints": true,
+    "rawConfigDataReads": false,
+    "stage3SemanticRecomputation": false,
+    "ownershipRederivation": false,
+    "admissionReclassification": false
+  },
+  "build": {
+    "command": "bun run build",
+    "pass": true
+  },
+  "hardErrors": [],
+  "hardErrorCount": 0,
+  "nonBlockingReviews": [
+    {
+      "code": "GENERAL_KR_NAME_REVIEW",
+      "count": 59,
+      "blocking": false,
+      "rule": "Keep nameKr ?? nameCn fallback and REVIEW labeling until Korean names are verified."
+    },
+    {
+      "code": "EXCLUSIVE_KR_NAME_REVIEW",
+      "count": 128,
+      "blocking": false,
+      "rule": "Keep nameKr ?? nameCn fallback and REVIEW labeling until Korean names are verified."
+    },
+    {
+      "code": "RELEASE_CHRONOLOGY_REVIEW",
+      "count": null,
+      "blocking": false,
+      "rule": "Do not interpret generated order as exact release chronology where Stage 4 display policy marks chronology unverified.",
+      "evidence": {
+        "generalReleaseDatesByTab": {
+          "1": 0,
+          "2": 80,
+          "3": 0
+        },
+        "exclusiveReleaseDates": 0
+      }
+    },
+    {
+      "code": "EQUIPMENT_ICON_BINDING_DEFERRED",
+      "count": 373,
+      "blocking": false,
+      "rule": "No web-served Equipment icon asset set exists in the repository at Stage 4-2; broken/fabricated mappings are intentionally avoided."
+    },
+    {
+      "code": "BROWSER_PIXEL_MOBILE_QA_FOLLOWUP",
+      "count": null,
+      "blocking": false,
+      "rule": "Stage 4 validates data/consumer/build boundaries; browser screenshot, pixel polish, and mobile interaction QA remain follow-up review work."
+    }
+  ],
+  "nonBlockingReviewCount": 5,
+  "decision": "Equipment Stage 4 closes as PASS_WITH_REVIEW / COMPLETE / FINAL_FROZEN. All public consumer, ownership, state, route, admission, homepage-entry, and production-build hard gates pass. Remaining items are presentation/review follow-ups and do not block PC-first review.",
+  "nextStartPoint": "PC-first review and UI polish follow-up. Do not reopen Stage 2/3 semantics or Stage B ownership unless a concrete regression contradicts a frozen checkpoint."
+}
