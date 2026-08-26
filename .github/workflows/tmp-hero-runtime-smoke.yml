@@ -24,13 +24,13 @@ jobs:
           bun run dev -- --host 127.0.0.1 > /tmp/hero-dev.log 2>&1 &
           DEV_PID=$!
           for i in $(seq 1 30); do
-            if curl -sSf http://127.0.0.1:5173/ >/dev/null 2>&1; then
+            if curl -sSf http://127.0.0.1:8080/ >/dev/null 2>&1; then
               break
             fi
             sleep 1
           done
           echo '=== HERO RESPONSE ==='
-          curl -i http://127.0.0.1:5173/heroes/6 || true
+          curl -i http://127.0.0.1:8080/heroes/6 || true
           sleep 2
           echo '=== DEV LOG ==='
           cat /tmp/hero-dev.log || true
