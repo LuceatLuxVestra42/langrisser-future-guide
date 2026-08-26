@@ -6,9 +6,6 @@ import restrictionSourceJson from "../../data/generated/equipment_stage2_6_restr
 import jobIndexJson from "../../data/generated/equipment_stage2_6_job_index.json";
 import heroMasterJson from "../../data/hero-name-master.v1.json";
 
-type JsonPrimitive = string | number | boolean | null;
-type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
-
 export type EquipmentListRecord = {
   equipmentId: number;
   nameCn: string;
@@ -39,17 +36,6 @@ export type EquipmentFilterGroup = {
   }>;
 };
 
-export type EquipmentDetailRecord = {
-  equipmentId: number;
-  identity?: {
-    equipmentId: number;
-    nameCn: string;
-    nameKr: string | null;
-    icon: string;
-  };
-  [key: string]: JsonValue | undefined;
-};
-
 export type EquipmentStatProperty = {
   propertyId: number;
   propertyKo: string;
@@ -65,7 +51,13 @@ export type EquipmentEffectSegment = {
   highlight: boolean;
 };
 
-export type GeneralEquipmentDetailRecord = {
+type EquipmentRestrictionRecord = {
+  mode: string;
+  generalArmyIds: number[];
+  specialJobIds: number[];
+};
+
+type EquipmentDetailCommon = {
   equipmentId: number;
   identity: {
     equipmentId: number;
@@ -73,6 +65,25 @@ export type GeneralEquipmentDetailRecord = {
     nameKr: string | null;
     icon: string;
   };
+  stats: {
+    maxLevel: number;
+    properties: EquipmentStatProperty[];
+  };
+  effect: {
+    maxEffectSkillId: number;
+    effectName: string;
+    effectText: string;
+    effectSegments: EquipmentEffectSegment[];
+  };
+  restriction: EquipmentRestrictionRecord;
+  acquisition: {
+    releaseGroupDate: string | null;
+    confidencePercent: number;
+    classificationBasis: string;
+  };
+};
+
+export type GeneralEquipmentDetailRecord = EquipmentDetailCommon & {
   classification: {
     group: string;
     groupKo: string;
@@ -86,25 +97,21 @@ export type GeneralEquipmentDetailRecord = {
     siteTab: number;
     sortIndex: number;
   };
-  stats: {
-    maxLevel: number;
-    properties: EquipmentStatProperty[];
-  };
-  effect: {
-    maxEffectSkillId: number;
-    effectName: string;
-    effectText: string;
-    effectSegments: EquipmentEffectSegment[];
-  };
-  restriction: {
-    mode: string;
-    generalArmyIds: number[];
-    specialJobIds: number[];
-  };
-  acquisition: {
-    releaseGroupDate: string | null;
-    confidencePercent: number;
-    classificationBasis: string;
+};
+
+export type ExclusiveEquipmentDetailRecord = EquipmentDetailCommon & {
+  classification: {
+    group: string;
+    groupKo: string;
+    subtype: string;
+    subtypeKo: string;
+    groupOrder: number;
+    subtypeOrder: number;
+    equipmentType: number;
+    label: number;
+    acquisitionClass: string;
+    siteTab: null;
+    sortIndex: number;
   };
 };
 
@@ -122,13 +129,19 @@ export type RestrictionJobDisplay = {
   armyNameKo: string;
 };
 
+type EquipmentRestrictionPresentation = EquipmentRestrictionRecord & {
+  generalArmies: RestrictionArmyDisplay[];
+  specialJobs: RestrictionJobDisplay[];
+  semanticStatus: string;
+  semanticConfidence: number;
+};
+
 export type GeneralEquipmentDetailPresentation = Omit<GeneralEquipmentDetailRecord, "restriction"> & {
-  restriction: GeneralEquipmentDetailRecord["restriction"] & {
-    generalArmies: RestrictionArmyDisplay[];
-    specialJobs: RestrictionJobDisplay[];
-    semanticStatus: string;
-    semanticConfidence: number;
-  };
+  restriction: EquipmentRestrictionPresentation;
+};
+
+export type ExclusiveEquipmentDetailPresentation = Omit<ExclusiveEquipmentDetailRecord, "restriction"> & {
+  restriction: EquipmentRestrictionPresentation;
 };
 
 export type HeroNameRecord = {
@@ -154,8 +167,14 @@ type GeneralDetailSource = {
 };
 
 type ExclusiveConsumerSource = {
+  counts: {
+    total: number;
+    list: number;
+    detail: number;
+  };
+  filters: EquipmentFilterGroup[];
   listRecords: EquipmentListRecord[];
-  detailRecords: EquipmentDetailRecord[];
+  detailRecords: ExclusiveEquipmentDetailRecord[];
 };
 
 type ExclusiveByEquipmentSource = {
@@ -230,19 +249,18 @@ function resolveExclusiveOwnerHero(equipmentId: number): HeroNameRecord {
   return ownerHero;
 }
 
-function getDisplayName(record: { equipmentId: number; identity?: EquipmentDetailRecord["identity"] }): string {
-  const identity = record.identity;
-  if (!identity) return String(record.equipmentId);
-  return identity.nameKr ?? identity.nameCn;
+function getDisplayName(record: EquipmentDetailCommon): string {
+  return record.identity.nameKr ?? record.identity.nameCn;
 }
 
-function resolveGeneralRestrictionPresentation(
-  record: GeneralEquipmentDetailRecord,
-): GeneralEquipmentDetailPresentation["restriction"] {
-  const generalArmies = record.restriction.generalArmyIds.map((armyId) => {
+function resolveRestrictionPresentation(
+  equipmentId: number,
+  restriction: EquipmentRestrictionRecord,
+): EquipmentRestrictionPresentation {
+  const generalArmies = restriction.generalArmyIds.map((armyId) => {
     const army = restrictionSource.armyIndex[String(armyId)];
     if (!army) {
-      throw new Error(`Equipment ${record.equipmentId} references missing Army ${armyId}.`);
+      throw new Error(`Equipment ${equipmentId} references missing Army ${armyId}.`);
     }
     return {
       armyId,
@@ -251,10 +269,10 @@ function resolveGeneralRestrictionPresentation(
     };
   });
 
-  const specialJobs = record.restriction.specialJobIds.map((jobId) => {
+  const specialJobs = restriction.specialJobIds.map((jobId) => {
     const job = jobIndex.jobs[String(jobId)];
     if (!job) {
-      throw new Error(`Equipment ${record.equipmentId} references missing Job ${jobId}.`);
+      throw new Error(`Equipment ${equipmentId} references missing Job ${jobId}.`);
     }
     return {
       jobId,
@@ -266,12 +284,24 @@ function resolveGeneralRestrictionPresentation(
   });
 
   return {
-    ...record.restriction,
+    ...restriction,
     generalArmies,
     specialJobs,
     semanticStatus: restrictionSource.semantics.status,
     semanticConfidence: restrictionSource.semantics.confidence,
   };
+}
+
+function resolveGeneralRestrictionPresentation(
+  record: GeneralEquipmentDetailRecord,
+): EquipmentRestrictionPresentation {
+  return resolveRestrictionPresentation(record.equipmentId, record.restriction);
+}
+
+function resolveExclusiveRestrictionPresentation(
+  record: ExclusiveEquipmentDetailRecord,
+): EquipmentRestrictionPresentation {
+  return resolveRestrictionPresentation(record.equipmentId, record.restriction);
 }
 
 export function readGeneralEquipmentPageData() {
@@ -288,6 +318,8 @@ export function readExclusiveEquipmentPageData() {
       ...record,
       ownerHero: resolveExclusiveOwnerHero(record.equipmentId),
     })),
+    filters: exclusiveConsumer.filters,
+    total: exclusiveConsumer.counts.total,
   };
 }
 
@@ -303,7 +335,7 @@ export type ExclusiveEquipmentDetailPageData = {
   kind: "exclusive";
   equipmentId: number;
   displayName: string;
-  detail: JsonValue;
+  detail: ExclusiveEquipmentDetailPresentation;
   ownerHero: HeroNameRecord;
 };
 
@@ -334,7 +366,10 @@ export function readEquipmentDetailPageData(
       kind: "exclusive",
       equipmentId,
       displayName: getDisplayName(exclusive),
-      detail: exclusive as unknown as JsonValue,
+      detail: {
+        ...exclusive,
+        restriction: resolveExclusiveRestrictionPresentation(exclusive),
+      },
       ownerHero: resolveExclusiveOwnerHero(equipmentId),
     };
   }

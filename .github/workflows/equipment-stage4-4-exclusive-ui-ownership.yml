@@ -1,0 +1,46 @@
+name: Equipment Stage 4-4 Exclusive UI Ownership
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/equipment-stage4-4-exclusive-ui-ownership.yml'
+      - 'scripts/validate-equipment-stage4-4-exclusive-ui-ownership.mjs'
+      - 'src/lib/equipment-page.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
+      - 'src/routes/equipment_.exclusive.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/generated/equipment_stage2_6_restrictions.json'
+      - 'data/generated/equipment_stage2_6_job_index.json'
+      - 'data/generated/equipment_stage3_4_general_detail.json'
+      - 'data/validation/equipment-stage4-3-general-detail-ui-summary.v1.json'
+      - 'data/validation/hero-exclusive-equipment-relation-stageB-final.v1.json'
+      - 'data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Validate Equipment Stage 4-4 exclusive UI and ownership
+        run: node scripts/validate-equipment-stage4-4-exclusive-ui-ownership.mjs
+      - name: Persist Stage 4-4 checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/equipment-stage4-4-exclusive-ui-ownership-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No Stage 4-4 generated changes"
+            exit 0
+          fi
+          git commit -m "Freeze Equipment Stage 4-4 exclusive UI ownership checkpoint"
+          git push
