@@ -190,6 +190,16 @@ function projectHero(hero: BannerHero | WishCandidate) {
   };
 }
 
+function projectImage(image: BannerImage): BannerImage {
+  if (!image.publicPath || !image.publicPath.startsWith("/")) return image;
+
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+  return {
+    ...image,
+    publicPath: `${base}${image.publicPath}`,
+  };
+}
+
 export function readBannerPageData() {
   const rows: BannerPageRow[] = basicTable.rows.map((row) => {
     const wish = row.mechanicFamily === "WISH" ? wishByDefinition.get(row.bannerDefinitionId) : null;
@@ -202,7 +212,7 @@ export function readBannerPageData() {
       mechanicFamily: row.mechanicFamily,
       typeLabelKr: row.typeLabelKr,
       lifecycleLabelKr: row.lifecycleLabelKr,
-      image: row.image,
+      image: projectImage(row.image),
       pickupHeroes: row.pickupHeroes.map(projectHero),
       wishCandidateState: wish?.candidateState ?? null,
       wishCandidateCount: wish?.candidateCount ?? null,
@@ -262,7 +272,7 @@ export function readBannerPageData() {
           krDisplayDate: row.krDisplayDate,
           displayOrder: row.displayOrder,
           gapDaysFromPrevious: gapByToOccurrence.get(occurrenceId) ?? null,
-          image: row.image,
+          image: projectImage(row.image),
           pickupHeroes: row.pickupHeroes.map(projectHero),
         };
       }),
