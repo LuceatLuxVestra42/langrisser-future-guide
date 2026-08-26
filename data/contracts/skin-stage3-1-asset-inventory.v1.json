@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "stage": "skin-page-3",
+  "substage": "3-1",
+  "checkpoint": "asset-locator-resource-inventory-contract",
+  "status": "ACCEPTED",
+  "purpose": "Materialize a lightweight Skin asset inventory from the frozen Stage 3-0 inputs, measure unique/shared static artwork, Spine locator and model-resource work units, and publish reverse indexes before any bulk asset extraction.",
+  "inputs": {
+    "stage30": "data/validation/skin-stage3-0-input-summary.v1.json",
+    "sourceMetadata": "data/generated/skin-stage1-source-metadata.v1.json",
+    "relation": "data/generated/skin-stage2-3-bidirectional-relation.v1.json"
+  },
+  "outputs": {
+    "inventory": "data/generated/skin-stage3-1-asset-inventory.v1.json",
+    "validation": "data/validation/skin-stage3-1-final.v1.json"
+  },
+  "canonicalExpectations": {
+    "skinCount": 540,
+    "heroCount": 267,
+    "relationEdgeCount": 540,
+    "modelBindingEdgeCount": 2277,
+    "uniqueModelResourceIdCount": 789
+  },
+  "recordSchema": {
+    "primaryKey": "skinId",
+    "fields": [
+      "skinId",
+      "heroId",
+      "sourceOrder",
+      "static.sourceImagePath",
+      "spine.sourceSpinePath",
+      "modelBindings",
+      "modelResourceIds"
+    ]
+  },
+  "reverseIndexes": {
+    "byStaticPath": "sourceImagePath -> { skinIds[], skinCount }",
+    "bySpinePath": "sourceSpinePath -> { skinIds[], skinCount }",
+    "byModelResourceId": "skinResourceId -> { skinIds[], jobConnectionIds[], bindings[], skinCount, bindingCount }"
+  },
+  "workUnitDefinitions": {
+    "static": "one unique sourceImagePath",
+    "spine": "one unique sourceSpinePath",
+    "model": "one unique skinResourceId",
+    "sharedStaticPath": "a sourceImagePath referenced by more than one canonical skin",
+    "sharedSpinePath": "a sourceSpinePath referenced by more than one canonical skin",
+    "sharedModelResourceAcrossSkins": "a skinResourceId referenced by more than one canonical skin",
+    "sharedModelResourceAcrossBindings": "a skinResourceId referenced by more than one model binding edge"
+  },
+  "requiredParity": [
+    "inventory skinId set exactly equals the frozen 540 source-metadata skinId set",
+    "inventory heroId/sourceOrder exactly equals Stage 2 bySkinId",
+    "static-path reverse index covers exactly 540 skin references",
+    "Spine-path reverse index covers exactly 540 skin references",
+    "model-resource reverse index covers exactly 2,277 binding edges",
+    "model-resource reverse index contains exactly 789 unique skinResourceId keys",
+    "all reverse indexes round-trip to the per-skin inventory without missing or extra references"
+  ],
+  "prohibitedInStage31": [
+    "raw ConfigData rescan",
+    "actual asset extraction",
+    "asset format conversion",
+    "local extraction path assignment",
+    "export path assignment",
+    "web path assignment",
+    "release/localization/acquisition inference",
+    "ownership/order rediscovery"
+  ],
+  "nextAction": "Skin Stage 3-2 representative asset-resolution proof using inventory-selected fixtures before bulk extraction."
+}
