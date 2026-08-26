@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "stage": "B-1",
+  "checkpoint": "ownership-source-admission",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/hero-exclusive-equipment-relation-source-contract.v1.json",
+  "evidence": {
+    "scopeContract": "data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json",
+    "priorBuilder": "scripts/build_hero_stage5_2_exclusive_central.cjs",
+    "priorValidation": "data/validation/hero-page-stage5-2-final.v1.json"
+  },
+  "checks": {
+    "exclusiveOnlyScope": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "generalEquipmentAdmitted": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "exclusiveRawResolution": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "skillHeroResolution": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "resolvedOwnerEntries": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "duplicateOwnerHeroes": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "missingEquipmentIds": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "ownerResolutionErrors": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "heuristicProductionEdges": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "hardErrors": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  },
+  "admittedProductionSource": {
+    "sourceKind": "EQUIPMENT_SKILL_HERO",
+    "resolver": "ConfigDataEquipmentInfo.SkillHero -> canonical Hero ID",
+    "scope": "frozen exclusive-equipment 167 only",
+    "confidencePercent": 100,
+    "status": "FROZEN"
+  },
+  "supportOnly": [
+    "PathType 46 / acquisitionClass exclusive-equipment identifies the admitted equipment population but does not resolve owner Hero.",
+    "MissionType 77 is retained for representative fixture cross-validation only.",
+    "Owner-name text in Equipment Desc is diagnostic corroboration only."
+  ],
+  "explicitlyRejected": [
+    "ArmyIds / JobIds equipability",
+    "name similarity",
+    "description parsing as owner assignment",
+    "icon or asset filename matching",
+    "numeric ID patterns or ordering",
+    "release chronology",
+    "general-equipment Hero relation generation"
+  ],
+  "representativeFromPriorValidation": {
+    "equipmentId": 273,
+    "equipmentNameCn": "流浪的骑士",
+    "skillHero": 12,
+    "heroId": 12,
+    "heroNameCn": "艾尔文"
+  },
+  "nextStage": "B-2 representative fixture JOIN validation",
+  "decision": "B-1 is closed. Do not continue searching for an alternate production ownership source unless B-2 or later full validation produces a contradiction."
+}
