@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "stage": "4-7",
+  "status": "PASS",
+  "finalStageStatus": "STAGE4_7_WHOLE_CONSUMER_REGRESSION_READY",
+  "upstream": {
+    "stage40": "FROZEN",
+    "stage41": "STAGE4_1_ROUTE_LOADER_SCAFFOLD_READY",
+    "stage42": "STAGE4_2_GENERAL_LIST_UI_READY",
+    "stage43": "STAGE4_3_GENERAL_DETAIL_UI_READY",
+    "stage44": "STAGE4_4_EXCLUSIVE_UI_AND_OWNERSHIP_READY",
+    "stage45": "STAGE4_5_DISPLAY_STATE_POLICY_HARDENED",
+    "stage46": "STAGE4_6_ADMISSION_ROUTE_QA_READY"
+  },
+  "population": {
+    "canonical": 390,
+    "public": 373,
+    "general": 206,
+    "exclusive": 167,
+    "hiddenSpecial": 16,
+    "hold": 1,
+    "holdEquipmentIds": [
+      2013
+    ],
+    "generalTabs": {
+      "1": 94,
+      "2": 80,
+      "3": 32
+    }
+  },
+  "consumerChain": {
+    "generalListDetailExact": true,
+    "exclusiveListDetailExact": true,
+    "exactEquipmentIdNavigation": true,
+    "runtimeGeneralResolved": 206,
+    "runtimeExclusiveResolved": 167,
+    "runtimeKindMismatch": 0,
+    "runtimeEquipmentIdMismatch": 0,
+    "exclusiveOwnerPayloadMismatch": 0
+  },
+  "statePolicy": {
+    "generalStorageKey": "equipment-general-list-ui.v1",
+    "exclusiveStorageKey": "equipment-exclusive-list-ui.v1",
+    "isolatedKeys": true,
+    "restoreAndSanitizeMarkersPresent": true
+  },
+  "displayPolicy": {
+    "nameFallback": "nameKr ?? nameCn",
+    "generalNameReview": 59,
+    "exclusiveNameReview": 128,
+    "reviewPromoted": false,
+    "generalReleaseDatesByTab": {
+      "1": 0,
+      "2": 80,
+      "3": 0
+    },
+    "exclusiveReleaseDates": 0,
+    "generatedOrderPreserved": true,
+    "frontendSortAdded": false,
+    "detailIntegrityChecked": 373
+  },
+  "ownership": {
+    "source": "data/generated/hero-exclusive-equipment-by-equipment.v1.json#byEquipmentId",
+    "keys": 167,
+    "cardinalityMismatch": 0,
+    "ownerHeroMissing": 0,
+    "rederived": false
+  },
+  "admission": {
+    "hiddenResolved": 0,
+    "holdResolved": 0,
+    "blockedRecordCount": 17,
+    "unknownPositiveIdsTested": [
+      999999,
+      888888888,
+      9007199254740991
+    ],
+    "unknownResolved": 0,
+    "publicServerImportsHiddenHold": false
+  },
+  "routes": {
+    "generalList": "/equipment",
+    "exclusiveList": "/equipment/exclusive",
+    "detail": "/equipment/$equipmentId",
+    "generatedRouteTreeVerified": true,
+    "invalidParamGuardPreservedFromStage46": true,
+    "notFoundBoundaryPresent": true
+  },
+  "sourceDiscipline": {
+    "stage3ConsumersUsed": true,
+    "rawConfigDataReads": false,
+    "exclusiveOwnershipRederived": false,
+    "publicAdmissionReclassified": false
+  },
+  "build": {
+    "command": "bun run build",
+    "pass": true
+  },
+  "nextStage": "4-FINAL closure / PC-first review ready"
+}
