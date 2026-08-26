@@ -25,7 +25,6 @@ const P = {
 
 const abs = rel => path.join(ROOT, rel);
 const read = rel => JSON.parse(fs.readFileSync(abs(rel), 'utf8'));
-const clone = value => JSON.parse(JSON.stringify(value));
 const exists = rel => fs.existsSync(abs(rel));
 const write = (rel, value) => {
   fs.mkdirSync(path.dirname(abs(rel)), { recursive: true });
@@ -44,17 +43,12 @@ function blobSha(rel) {
   }
 }
 
-function deepEqual(a, b) {
-  return JSON.stringify(a) === JSON.stringify(b);
-}
-
 function uniqueSortedInts(values) {
   return [...new Set((values || []).map(Number).filter(Number.isInteger))].sort((a, b) => a - b);
 }
 
 function recordArray(doc, label, errors) {
-  const candidates = [doc?.records, doc?.rows, doc?.data, doc?.output?.records];
-  const rows = candidates.find(Array.isArray);
+  const rows = [doc?.records, doc?.rows, doc?.data, doc?.output?.records].find(Array.isArray);
   if (!rows) {
     errors.push(`${label}: no record array found`);
     return [];
@@ -64,27 +58,29 @@ function recordArray(doc, label, errors) {
 
 function indexHeroRecords(doc, label, canonicalIds, errors) {
   const rows = recordArray(doc, label, errors);
-  const map = new Map();
+  const byId = new Map();
+  const indexById = new Map();
   const duplicateIds = [];
-  const invalidIds = [];
   const extraIds = [];
-  for (const row of rows) {
+  rows.forEach((row, index) => {
     const heroId = Number(row?.heroId);
     if (!Number.isInteger(heroId)) {
-      invalidIds.push(row?.heroId ?? null);
-      continue;
+      errors.push(`${label}: invalid heroId at record ${index}`);
+      return;
     }
     if (!canonicalIds.has(heroId)) extraIds.push(heroId);
-    if (map.has(heroId)) duplicateIds.push(heroId);
-    else map.set(heroId, row);
-  }
+    if (byId.has(heroId)) duplicateIds.push(heroId);
+    else {
+      byId.set(heroId, row);
+      indexById.set(heroId, index);
+    }
+  });
+  const missing = [...canonicalIds].filter(id => !byId.has(id)).sort((a, b) => a - b);
   if (duplicateIds.length) errors.push(`${label}: duplicate heroIds ${uniqueSortedInts(duplicateIds).join(',')}`);
-  if (invalidIds.length) errors.push(`${label}: invalid heroId count ${invalidIds.length}`);
   if (extraIds.length) errors.push(`${label}: extra noncanonical heroIds ${uniqueSortedInts(extraIds).join(',')}`);
-  const missing = [...canonicalIds].filter(id => !map.has(id)).sort((a, b) => a - b);
   if (missing.length) errors.push(`${label}: missing canonical heroIds ${missing.join(',')}`);
-  if (map.size !== canonicalIds.size) errors.push(`${label}: indexed Hero count ${map.size}, expected ${canonicalIds.size}`);
-  return { map, rows, missing, duplicateIds: uniqueSortedInts(duplicateIds), extraIds: uniqueSortedInts(extraIds) };
+  if (byId.size !== canonicalIds.size) errors.push(`${label}: indexed Hero count ${byId.size}, expected ${canonicalIds.size}`);
+  return { rows, byId, indexById };
 }
 
 function normalizeNumericArray(value) {
@@ -139,6 +135,9 @@ for (const hero of heroes) {
 }
 if (heroes.length !== 267 || canonicalIds.size !== 267) hardErrors.push(`Hero master coverage ${heroes.length}/${canonicalIds.size}, expected 267/267`);
 
+if (contract?.version !== 2 || contract?.stage !== 'hero-page-6-1' || contract?.status !== 'FROZEN') {
+  hardErrors.push(`Stage 6-1 contract is not frozen v2 (${contract?.version}/${contract?.stage}/${contract?.status})`);
+}
 if (stage4?.status !== 'PASS') hardErrors.push(`Stage 4 generated status=${stage4?.status}`);
 if (stage4Validation?.status !== 'PASS') hardErrors.push(`Stage 4 validation status=${stage4Validation?.status}`);
 if (stage5Integration?.status !== 'PASS' || stage5Integration?.completion !== 'STAGE_5_COMPLETE') {
@@ -161,27 +160,27 @@ const soldiersById = stage53?.soldiersById && typeof stage53.soldiersById === 'o
 if (!stage53ByHero) hardErrors.push('Stage 5-3 byHeroId map missing.');
 if (!soldiersById) hardErrors.push('Stage 5-3 soldiersById map missing.');
 
-const canonicalKeySet = new Set([...canonicalIds].map(String));
+const canonicalKeys = new Set([...canonicalIds].map(String));
 if (stage53ByHero) {
   const keys = Object.keys(stage53ByHero);
-  const missingKeys = [...canonicalKeySet].filter(k => !Object.prototype.hasOwnProperty.call(stage53ByHero, k));
-  const extraKeys = keys.filter(k => !canonicalKeySet.has(k));
-  if (missingKeys.length) hardErrors.push(`Stage 5-3 missing Hero keys ${missingKeys.join(',')}`);
-  if (extraKeys.length) hardErrors.push(`Stage 5-3 extra Hero keys ${extraKeys.join(',')}`);
+  const missing = [...canonicalKeys].filter(k => !Object.prototype.hasOwnProperty.call(stage53ByHero, k));
+  const extra = keys.filter(k => !canonicalKeys.has(k));
+  if (missing.length) hardErrors.push(`Stage 5-3 missing Hero keys ${missing.join(',')}`);
+  if (extra.length) hardErrors.push(`Stage 5-3 extra Hero keys ${extra.join(',')}`);
   if (keys.length !== 267) hardErrors.push(`Stage 5-3 Hero key count ${keys.length}, expected 267`);
 }
 
 let relationCount = 0;
-const unknownStage53Soldiers = [];
+const unknownSoldiers = [];
 if (stage53ByHero && soldiersById) {
   for (const heroId of canonicalIds) {
     const ids = Array.isArray(stage53ByHero[String(heroId)]) ? stage53ByHero[String(heroId)].map(Number) : [];
     if (ids.length !== new Set(ids).size) hardErrors.push(`Stage 5-3 Hero ${heroId} has duplicate soldierIds.`);
     relationCount += ids.length;
-    for (const soldierId of ids) if (!Object.prototype.hasOwnProperty.call(soldiersById, String(soldierId))) unknownStage53Soldiers.push(soldierId);
+    for (const soldierId of ids) if (!Object.prototype.hasOwnProperty.call(soldiersById, String(soldierId))) unknownSoldiers.push(soldierId);
   }
 }
-if (unknownStage53Soldiers.length) hardErrors.push(`Stage 5-3 unresolved Soldier IDs ${uniqueSortedInts(unknownStage53Soldiers).join(',')}`);
+if (unknownSoldiers.length) hardErrors.push(`Stage 5-3 unresolved Soldier IDs ${uniqueSortedInts(unknownSoldiers).join(',')}`);
 if (relationCount !== 5977) hardErrors.push(`Stage 5-3 relation count ${relationCount}, expected frozen 5977`);
 
 const bArtifactPresent = exists(P.bByHero);
@@ -190,22 +189,22 @@ let bByHero = null;
 let bParityMismatch = [];
 let bValidationStatus = null;
 if (bArtifactPresent) {
-  const bDoc = read(P.bByHero);
-  bByHero = parseBByHero(bDoc, canonicalIds, hardErrors);
+  bByHero = parseBByHero(read(P.bByHero), canonicalIds, hardErrors);
   if (bValidationPresent) {
-    const v = read(P.bValidation);
-    bValidationStatus = v?.status ?? null;
+    const validation = read(P.bValidation);
+    bValidationStatus = validation?.status ?? null;
     if (!['PASS', 'PASS_WITH_REVIEW'].includes(String(bValidationStatus))) {
       hardErrors.push(`Stage B relation validation status=${bValidationStatus}`);
     }
   }
   if (bByHero) {
     for (const heroId of canonicalIds) {
-      const ex = i52.map.get(heroId)?.exclusiveEquipment;
-      const expected = ex?.status === 'RELEASED' && Number.isInteger(Number(ex?.equipmentId))
-        ? [Number(ex.equipmentId)] : [];
+      const ex = i52.byId.get(heroId)?.exclusiveEquipment;
+      const expected = ex?.status === 'RELEASED' && Number.isInteger(Number(ex?.equipmentId)) ? [Number(ex.equipmentId)] : [];
       const actual = normalizeNumericArray(bByHero[String(heroId)] || []);
-      if (!deepEqual(actual, expected)) bParityMismatch.push({ heroId, stage52EquipmentIds: expected, stageBEquipmentIds: actual });
+      if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        bParityMismatch.push({ heroId, stage52EquipmentIds: expected, stageBEquipmentIds: actual });
+      }
     }
     if (bParityMismatch.length) hardErrors.push(`Stage B / frozen Stage 5-2 ownership parity mismatch for ${bParityMismatch.length} Heroes.`);
   }
@@ -214,79 +213,73 @@ if (bArtifactPresent) {
 const bState = bArtifactPresent && bByHero && bParityMismatch.length === 0
   ? (bValidationPresent ? 'ADOPTED_SHARED_RELATION' : 'PARITY_MATCHED_VALIDATION_PENDING')
   : 'PENDING_B_STAGE_NON_BLOCKING';
-if (!bArtifactPresent) inheritedReviews.push('Stage B shared Hero-exclusive Equipment byHero index is not present yet; Stage 6-1 uses the frozen Stage 5-2 display snapshot without re-deriving ownership.');
-else if (!bValidationPresent) inheritedReviews.push('Stage B byHero index is present and matches Stage 5-2, but the dedicated Stage B relation validation checkpoint is not present yet.');
+if (!bArtifactPresent) inheritedReviews.push('Stage B shared Hero-exclusive Equipment byHero index is not present yet; Stage 6-1 references the frozen Stage 5-2 snapshot without re-deriving ownership.');
+else if (!bValidationPresent) inheritedReviews.push('Stage B byHero index is present and matches Stage 5-2, but the dedicated Stage B validation checkpoint is not present yet.');
 
 const soldierNameReviewCount = Number(stage5Integration?.completedBlocks?.find(x => x.stage === '5-3')?.nonBlockingReview?.pendingKoreanNameSoldierCount ?? 0);
 const skinUnencodedCount = Number(stage5Integration?.completedBlocks?.find(x => x.stage === '5-5')?.unencodedSkinAcquisitionCount ?? 0);
 if (soldierNameReviewCount) inheritedReviews.push(`${soldierNameReviewCount} Soldier Korean display names remain non-blocking presentation REVIEW from Stage 5-3.`);
 if (skinUnencodedCount) inheritedReviews.push(`${skinUnencodedCount} regular skins remain UNENCODED for acquisition because source GetPathType is omitted.`);
 
-let exactCopyMismatchCount = 0;
 const records = [];
+let locatorMismatchCount = 0;
 for (const hero of heroes) {
   const heroId = Number(hero.heroId);
-  const s4 = i4.map.get(heroId);
-  const s51 = i51.map.get(heroId);
-  const s52 = i52.map.get(heroId);
-  const s54 = i54.map.get(heroId);
-  const s55 = i55.map.get(heroId);
-  if (!s4 || !s51 || !s52 || !s54 || !s55 || !stage53ByHero) continue;
-
-  const header = clone(s55);
-  delete header.heroId;
-  const soldierIds = clone(stage53ByHero[String(heroId)] || []);
-  const out = {
-    heroId,
-    identity: clone(s55.identity ?? {
-      nameKr: hero.nameKr ?? null,
-      nameCn: hero.nameCn ?? null,
-      nameEn: hero.nameEn ?? null,
-    }),
-    header,
-    normal: {
-      talent: clone(s4.talent),
-      stats: clone(s4.displayStats),
-      soldierModifiers: clone(s4.soldierModifiers),
-      jobs: clone(s4.jobTree),
-      skills: clone(s4.skills),
-      awakening: clone(s4.awakening),
-    },
-    bonds: clone(s51.bonds ?? []),
-    exclusiveEquipment: clone(s52.exclusiveEquipment),
-    centralDiscipline: clone(s52.centralDiscipline),
-    soldiers: { soldierIds },
-    sp: clone(s54.sp),
+  const sourceIndexes = {
+    normal: i4.indexById.get(heroId),
+    bonds: i51.indexById.get(heroId),
+    exclusiveCentral: i52.indexById.get(heroId),
+    sp: i54.indexById.get(heroId),
+    header: i55.indexById.get(heroId),
   };
-
-  const sourceChecks = [
-    [out.identity, s55.identity ?? out.identity],
-    [out.normal.talent, s4.talent],
-    [out.normal.stats, s4.displayStats],
-    [out.normal.soldierModifiers, s4.soldierModifiers],
-    [out.normal.jobs, s4.jobTree],
-    [out.normal.skills, s4.skills],
-    [out.normal.awakening, s4.awakening],
-    [out.bonds, s51.bonds ?? []],
-    [out.exclusiveEquipment, s52.exclusiveEquipment],
-    [out.centralDiscipline, s52.centralDiscipline],
-    [out.soldiers.soldierIds, stage53ByHero[String(heroId)] || []],
-    [out.sp, s54.sp],
+  const resolvers = [
+    [i4.rows, sourceIndexes.normal],
+    [i51.rows, sourceIndexes.bonds],
+    [i52.rows, sourceIndexes.exclusiveCentral],
+    [i54.rows, sourceIndexes.sp],
+    [i55.rows, sourceIndexes.header],
   ];
-  if (sourceChecks.some(([a, b]) => !deepEqual(a, b))) exactCopyMismatchCount += 1;
-  records.push(out);
+  if (resolvers.some(([rows, index]) => !Number.isInteger(index) || Number(rows[index]?.heroId) !== heroId)) {
+    locatorMismatchCount += 1;
+  }
+  const ex = i52.byId.get(heroId)?.exclusiveEquipment ?? null;
+  const central = i52.byId.get(heroId)?.centralDiscipline ?? null;
+  const sp = i54.byId.get(heroId)?.sp ?? null;
+  const soldierIds = stage53ByHero?.[String(heroId)] ?? [];
+  records.push({
+    heroId,
+    sourceIndexes,
+    soldiersKey: String(heroId),
+    snapshot: {
+      exclusiveEquipmentStatus: ex?.status ?? null,
+      equipmentId: Number.isInteger(Number(ex?.equipmentId)) ? Number(ex.equipmentId) : null,
+      centralDisciplineStatus: central?.status ?? null,
+      soldierCount: Array.isArray(soldierIds) ? soldierIds.length : 0,
+      spStatus: sp?.status ?? null,
+    },
+  });
 }
-if (records.length !== 267) hardErrors.push(`Stage 6-1 generated ${records.length} Hero records, expected 267.`);
+if (records.length !== 267) hardErrors.push(`Stage 6-1 generated ${records.length} Hero index records, expected 267.`);
 if (new Set(records.map(x => x.heroId)).size !== 267) hardErrors.push('Stage 6-1 output Hero IDs are not unique.');
-if (exactCopyMismatchCount) hardErrors.push(`Stage 6-1 exact-copy mismatch on ${exactCopyMismatchCount} Hero records.`);
+if (locatorMismatchCount) hardErrors.push(`Stage 6-1 source locator mismatch on ${locatorMismatchCount} Hero records.`);
+
+const sourceMap = {
+  normal: { path: P.stage4, recordKey: 'heroId' },
+  bonds: { path: P.stage51, recordKey: 'heroId' },
+  exclusiveCentral: { path: P.stage52, recordKey: 'heroId' },
+  soldiers: { path: P.stage53, recordKey: 'byHeroId[String(heroId)]', sharedMetadata: 'soldiersById' },
+  sp: { path: P.stage54, recordKey: 'heroId' },
+  header: { path: P.stage55, recordKey: 'heroId' },
+};
 
 const output = {
-  version: 1,
+  version: 2,
   stage: 'hero-page-6-1',
   status: hardErrors.length ? 'FAIL' : 'PASS',
   completion: hardErrors.length ? 'BLOCKED' : 'COMPLETE',
-  sourcePolicy: 'Compose only from frozen Hero Stage 4/5 outputs. Stage 6-1 performs no ConfigData semantic re-derivation. Hero-Soldier membership stays normalized from Stage 5-3. Hero-exclusive Equipment ownership remains a shared Stage B responsibility; frozen Stage 5-2 is the current display snapshot until shared relation adoption.',
-  recordCount: records.length,
+  representation: 'normalized-composition-index',
+  sourcePolicy: 'Frozen Stage 4/5 blocks remain canonical at their source paths. This file freezes the per-Hero composition locators and small parity checkpoints only; it does not duplicate the large payload blocks or perform semantic re-derivation.',
+  sourceMap,
   parallelDependencies: {
     heroExclusiveEquipmentRelation: {
       state: bState,
@@ -295,27 +288,32 @@ const output = {
       stageBValidationPresent: bValidationPresent,
       stageBValidationStatus: bValidationStatus,
       parityMismatchCount: bParityMismatch.length,
-      currentStage61DisplaySource: P.stage52,
+      currentStage61SnapshotSource: P.stage52,
       finalAdmissionRequirement: 'Shared Stage B relation adoption required before final Hero site-admission freeze.'
     }
   },
+  recordCount: records.length,
   shared: {
-    soldiersById: clone(soldiersById || {}),
+    soldierMetadataSource: P.stage53,
+    soldierMetadataKey: 'soldiersById',
+    soldierMetadataCount: soldiersById ? Object.keys(soldiersById).length : 0,
+    heroSoldierRelationCount: relationCount,
   },
   records,
 };
 
 const checks = {
   heroMasterCoverage: { expected: 267, actual: canonicalIds.size, pass: canonicalIds.size === 267 },
-  stage4Coverage: { expected: 267, actual: i4.map.size, pass: i4.map.size === 267 },
-  stage51Coverage: { expected: 267, actual: i51.map.size, pass: i51.map.size === 267 },
-  stage52Coverage: { expected: 267, actual: i52.map.size, pass: i52.map.size === 267 },
+  stage4Coverage: { expected: 267, actual: i4.byId.size, pass: i4.byId.size === 267 },
+  stage51Coverage: { expected: 267, actual: i51.byId.size, pass: i51.byId.size === 267 },
+  stage52Coverage: { expected: 267, actual: i52.byId.size, pass: i52.byId.size === 267 },
   stage53HeroCoverage: { expected: 267, actual: stage53ByHero ? Object.keys(stage53ByHero).length : 0, pass: !!stage53ByHero && Object.keys(stage53ByHero).length === 267 },
   stage53RelationCount: { expected: 5977, actual: relationCount, pass: relationCount === 5977 },
-  stage54Coverage: { expected: 267, actual: i54.map.size, pass: i54.map.size === 267 },
-  stage55Coverage: { expected: 267, actual: i55.map.size, pass: i55.map.size === 267 },
+  stage54Coverage: { expected: 267, actual: i54.byId.size, pass: i54.byId.size === 267 },
+  stage55Coverage: { expected: 267, actual: i55.byId.size, pass: i55.byId.size === 267 },
   outputCoverage: { expected: 267, actual: records.length, pass: records.length === 267 },
-  exactCopyIntegrity: { expected: 0, actual: exactCopyMismatchCount, pass: exactCopyMismatchCount === 0 },
+  sourceLocatorIntegrity: { expected: 0, actual: locatorMismatchCount, pass: locatorMismatchCount === 0 },
+  normalizedOutput: { expected: true, actual: true, pass: true, duplicatedUpstreamPayloadBlocks: false },
   stage5IntegrationClosed: { expected: 'PASS/STAGE_5_COMPLETE', actual: `${stage5Integration?.status}/${stage5Integration?.completion}`, pass: stage5Integration?.status === 'PASS' && stage5Integration?.completion === 'STAGE_5_COMPLETE' },
   stageBParallelBoundary: {
     state: bState,
@@ -328,9 +326,9 @@ const checks = {
 };
 
 const validation = {
-  version: 1,
+  version: 2,
   stage: 'hero-page-6-1',
-  checkpoint: 'final-integration',
+  checkpoint: 'normalized-composition-index',
   status: hardErrors.length ? 'FAIL' : 'PASS',
   completion: hardErrors.length ? 'BLOCKED' : 'COMPLETE',
   contract: P.contract,
@@ -346,7 +344,8 @@ const validation = {
     sharedSoldierMetadataCount: soldiersById ? Object.keys(soldiersById).length : 0,
     stageBState: bState,
     stageBParityMismatchCount: bParityMismatch.length,
-    exactCopyMismatchCount,
+    sourceLocatorMismatchCount: locatorMismatchCount,
+    duplicatedUpstreamPayloadBlocks: false,
     inheritedReviewCount: inheritedReviews.length,
     hardErrorCount: hardErrors.length,
   },
@@ -354,8 +353,8 @@ const validation = {
   stageBParityMismatches: bParityMismatch,
   hardErrors,
   decision: hardErrors.length
-    ? 'Do not close Hero Stage 6-1. Structural integration checks failed.'
-    : 'Hero Stage 6-1 is COMPLETE. All 267 Hero detail records are composed from frozen Stage 4/5 sources without semantic re-derivation. Stage B ownership adoption remains an explicit parallel dependency only when its shared relation artifact is not yet available.',
+    ? 'Do not close Hero Stage 6-1. Structural composition-index validation failed.'
+    : 'Hero Stage 6-1 is COMPLETE. A normalized 267-Hero composition index resolves all frozen Stage 4/5 blocks without duplicating their payloads or re-deriving semantics. Stage B ownership adoption remains an explicit parallel dependency only while its shared relation artifact is unavailable.',
 };
 
 write(P.output, output);
