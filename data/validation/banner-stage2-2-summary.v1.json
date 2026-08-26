@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-2",
+  "status": "PASS_STAGE2_2_CANONICAL_DEFINITION_MATERIALIZATION",
+  "validationMode": "EXECUTED_FULL_POPULATION_REGRESSION",
+  "sourceOccurrenceCount": 94,
+  "mappedOccurrenceCount": 94,
+  "canonicalDefinitionCount": 77,
+  "sourceLinkedDefinitionCount": 69,
+  "manualOccurrenceScopedDefinitionCount": 8,
+  "reusedDefinitionCount": 11,
+  "maxOccurrenceCountPerDefinition": 5,
+  "correctionOverlayCount": 1,
+  "errorCount": 0,
+  "errors": [],
+  "invariants": {
+    "all94OccurrencesMappedExactlyOnce": true,
+    "occurrenceIdsUnique": true,
+    "definitionIdsUnique": true,
+    "groupKeysUnique": true,
+    "allDefinitionsNonEmpty": true,
+    "corrected7001UsesCardpool265": true,
+    "corrected7001SharesDefinitionWithEarlierOccurrence": true,
+    "sourceNullManualRowsRemainOccurrenceScoped": true,
+    "repeatedManualWishPresentationNotAutoMerged": true,
+    "crossSourceAutomaticMergePerformed": false,
+    "heroRelationMaterialized": false,
+    "cpEventCanonicalJoinMaterialized": false,
+    "assetCanonicalizationPerformed": false,
+    "frontendIntegrationPerformed": false
+  },
+  "completion": {
+    "definitionsMaterialized": true,
+    "occurrenceDefinitionMapMaterialized": true,
+    "stage2_2Closed": true,
+    "nextStageReady": true
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-3",
+    "task": "Materialize canonical production bannerOccurrence records using the Stage 2-2 definition mapping."
+  }
+}

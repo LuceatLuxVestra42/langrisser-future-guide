@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-2",
+  "status": "MATERIALIZATION_CONTRACT_FROZEN",
+  "purpose": "Materialize the canonical bannerDefinition population and complete occurrence-to-definition mapping from the frozen Stage 2-1 identity/grouping policy without reopening Stage 1/2-1 semantics.",
+  "inputs": {
+    "schedule": "data/kr-banner-schedule.v1.json",
+    "effectiveSourceView": "data/generated/banner-stage2-0-effective-occurrences.v1.json",
+    "identityGroupingPolicy": "data/contracts/banner-stage2-1-identity-grouping-policy.v1.json",
+    "groupingPlan": "data/generated/banner-stage2-1-grouping-plan.v1.json",
+    "stage21Validation": "data/validation/banner-stage2-1-summary.v1.json"
+  },
+  "outputs": {
+    "definitions": "data/generated/banner-definitions.v1.json",
+    "occurrenceDefinitionMap": "data/generated/banner-occurrence-definition-map.v1.json",
+    "validation": "data/validation/banner-stage2-2-summary.v1.json"
+  },
+  "materializationRules": {
+    "occurrenceId": "bocc:<recordKey>",
+    "effectiveSourceResolver": "Stage 2-0 overlay value when present, otherwise sourceRecordKey, otherwise null",
+    "sourceLinkedDefinitionGroupKey": "source:<effectiveSourceRecordKey>",
+    "sourceNullDefinitionGroupKey": "manual-occurrence:<recordKey>",
+    "definitionId": "bdef:v1:<first 24 lowercase hex chars of SHA-256('banner-definition:v1|' + definitionGroupKey)>",
+    "occurrenceToDefinition": "EXACTLY_ONE",
+    "definitionToOccurrence": "ONE_OR_MORE",
+    "differentSourcesAutomaticMerge": false,
+    "sourceNullManualAutomaticMerge": false
+  },
+  "definitionRecordShape": {
+    "required": ["bannerDefinitionId", "definitionGroupKey", "sourceKind", "effectiveSourceRecordKey", "occurrenceCount", "occurrenceIds", "occurrenceRecordKeys"],
+    "sourceKindValues": ["CARDPOOL_SOURCE", "MANUAL_OCCURRENCE_SCOPED"],
+    "rule": "Stage 2-2 definition records contain identity, source provenance and occurrence membership only. Hero/CP/Event/taxonomy consumer semantics remain downstream Stage 2 work."
+  },
+  "occurrenceMapRecordShape": {
+    "required": ["bannerOccurrenceId", "recordKey", "bannerDefinitionId", "definitionGroupKey", "recordedSourceRecordKey", "effectiveSourceRecordKey", "correctionStatus"]
+  },
+  "requiredFixtures": {
+    "corrected7001": {
+      "recordKey": "kr-banner:20270331:4",
+      "recordedSourceRecordKey": "cardpool:263",
+      "effectiveSourceRecordKey": "cardpool:265",
+      "sameDefinitionAs": "kr-banner:20261007:8"
+    },
+    "sourceReuse": [
+      ["kr-banner:20261028:1", "kr-banner:20270317:2"],
+      ["kr-banner:20261007:9", "kr-banner:20270331:3"],
+      ["kr-banner:20260916:3", "kr-banner:20261202:3", "kr-banner:20270127:2", "kr-banner:20270324:3"]
+    ],
+    "manualIsolation": ["kr-manual-wish-langrisser-1-5-20260909", "kr-manual-wish-langrisser-1-5-20270317"]
+  },
+  "prohibitedWork": [
+    "No cross-CardPool equivalence inference.",
+    "No manual Wish merge from repeated text/image/Hero labels.",
+    "No Hero relation materialization yet.",
+    "No CP/Event canonical join yet.",
+    "No asset ownership/hash work.",
+    "No endDate/duration/timestamp inference.",
+    "No frontend integration."
+  ],
+  "completionCriteria": {
+    "all94OccurrencesMappedExactlyOnce": true,
+    "allDefinitionsHaveOneOrMoreOccurrences": true,
+    "definitionIdsUnique": true,
+    "groupKeysUnique": true,
+    "corrected7001UsesCardpool265": true,
+    "sourceNullManualRowsRemainIsolated": true,
+    "uncheckpointedGroupingInferenceCount": 0,
+    "hardErrorCount": 0
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-3",
+    "task": "Materialize production bannerOccurrence records using the Stage 2-2 canonical definition mapping."
+  }
+}
