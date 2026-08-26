@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BannersRouteImport } from './routes/banners'
 import { Route as EquipmentRouteImport } from './routes/equipment'
 import { Route as EquipmentPrototypeRouteImport } from './routes/equipment-prototype'
+import { Route as SoldiersRouteImport } from './routes/soldiers'
 import { Route as SoldiersPrototypeRouteImport } from './routes/soldiers-prototype'
 import { Route as EquipmentEquipmentIdRouteImport } from './routes/equipment_.$equipmentId'
 import { Route as EquipmentExclusiveRouteImport } from './routes/equipment_.exclusive'
@@ -37,6 +38,11 @@ const EquipmentPrototypeRoute = EquipmentPrototypeRouteImport.update({
   path: '/equipment-prototype',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SoldiersRoute = SoldiersRouteImport.update({
+  id: '/soldiers',
+  path: '/soldiers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SoldiersPrototypeRoute = SoldiersPrototypeRouteImport.update({
   id: '/soldiers-prototype',
   path: '/soldiers-prototype',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/banners': typeof BannersRoute
   '/equipment': typeof EquipmentRoute
   '/equipment-prototype': typeof EquipmentPrototypeRoute
+  '/soldiers': typeof SoldiersRoute
   '/soldiers-prototype': typeof SoldiersPrototypeRoute
   '/equipment/$equipmentId': typeof EquipmentEquipmentIdRoute
   '/equipment/exclusive': typeof EquipmentExclusiveRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/banners': typeof BannersRoute
   '/equipment': typeof EquipmentRoute
   '/equipment-prototype': typeof EquipmentPrototypeRoute
+  '/soldiers': typeof SoldiersRoute
   '/soldiers-prototype': typeof SoldiersPrototypeRoute
   '/equipment/$equipmentId': typeof EquipmentEquipmentIdRoute
   '/equipment/exclusive': typeof EquipmentExclusiveRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/banners': typeof BannersRoute
   '/equipment': typeof EquipmentRoute
   '/equipment-prototype': typeof EquipmentPrototypeRoute
+  '/soldiers': typeof SoldiersRoute
   '/soldiers-prototype': typeof SoldiersPrototypeRoute
   '/equipment_/$equipmentId': typeof EquipmentEquipmentIdRoute
   '/equipment_/exclusive': typeof EquipmentExclusiveRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/banners'
     | '/equipment'
     | '/equipment-prototype'
+    | '/soldiers'
     | '/soldiers-prototype'
     | '/equipment/$equipmentId'
     | '/equipment/exclusive'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/banners'
     | '/equipment'
     | '/equipment-prototype'
+    | '/soldiers'
     | '/soldiers-prototype'
     | '/equipment/$equipmentId'
     | '/equipment/exclusive'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/banners'
     | '/equipment'
     | '/equipment-prototype'
+    | '/soldiers'
     | '/soldiers-prototype'
     | '/equipment_/$equipmentId'
     | '/equipment_/exclusive'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   BannersRoute: typeof BannersRoute
   EquipmentRoute: typeof EquipmentRoute
   EquipmentPrototypeRoute: typeof EquipmentPrototypeRoute
+  SoldiersRoute: typeof SoldiersRoute
   SoldiersPrototypeRoute: typeof SoldiersPrototypeRoute
   EquipmentEquipmentIdRoute: typeof EquipmentEquipmentIdRoute
   EquipmentExclusiveRoute: typeof EquipmentExclusiveRoute
@@ -151,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipmentPrototypeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/soldiers': {
+      id: '/soldiers'
+      path: '/soldiers'
+      fullPath: '/soldiers'
+      preLoaderRoute: typeof SoldiersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/soldiers-prototype': {
       id: '/soldiers-prototype'
       path: '/soldiers-prototype'
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   BannersRoute: BannersRoute,
   EquipmentRoute: EquipmentRoute,
   EquipmentPrototypeRoute: EquipmentPrototypeRoute,
+  SoldiersRoute: SoldiersRoute,
   SoldiersPrototypeRoute: SoldiersPrototypeRoute,
   EquipmentEquipmentIdRoute: EquipmentEquipmentIdRoute,
   EquipmentExclusiveRoute: EquipmentExclusiveRoute,
