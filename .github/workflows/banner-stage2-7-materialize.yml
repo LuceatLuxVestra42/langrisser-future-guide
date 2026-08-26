@@ -1,0 +1,47 @@
+name: Banner Stage 2-7 Materialize
+
+on:
+  push:
+    branches:
+      - investigate/banner-stage2-7
+    paths:
+      - '.github/workflows/banner-stage2-7-materialize.yml'
+      - 'data/contracts/banner-stage2-7-history-contract.v1.json'
+      - 'scripts/finalize-banner-stage2-7-history.mjs'
+      - 'scripts/validate-banner-stage2-7-history.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Materialize recurrence history
+        run: node scripts/finalize-banner-stage2-7-history.mjs
+      - name: Validate full history population
+        id: validate
+        continue-on-error: true
+        run: node scripts/validate-banner-stage2-7-history.mjs
+      - name: Commit generated Stage 2-7 outputs
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/banner-recurrence-history.v1.json \
+                  data/validation/banner-stage2-7-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+          else
+            git commit -m "Materialize Banner Stage 2-7 recurrence history"
+            git push
+          fi
+      - name: Fail workflow if validation failed
+        if: steps.validate.outcome == 'failure'
+        run: exit 1
