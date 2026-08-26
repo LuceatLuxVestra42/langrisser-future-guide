@@ -31,16 +31,14 @@
       "role": "CANONICAL_HERO_IDENTITY"
     }
   },
-  "effectiveOccurrencePolicy": {
+  "effectiveSourceView": {
     "output": "data/generated/banner-stage2-0-effective-occurrences.v1.json",
-    "preserveRecordedValues": true,
-    "fields": [
-      "recordKey",
-      "recordedSourceRecordKey",
-      "effectiveSourceRecordKey",
-      "correctionStatus"
-    ],
-    "rule": "Start from every Stage 1 occurrence row, preserve the recorded source relation as provenance, and apply only explicitly checkpointed relation corrections to the effective relation used by Stage 2 grouping and downstream relations.",
+    "representation": "BASE_SCHEDULE_PLUS_VERIFIED_CORRECTION_OVERLAY",
+    "reason": "Do not duplicate 94 already-frozen occurrence rows when Stage 2-0 changes only one source relation. Reuse the Stage 1 schedule and store the minimal verified overlay.",
+    "effectiveOccurrenceCount": 94,
+    "resolver": "effectiveSourceRecordKey = correctionByOccurrence[recordKey]?.correctedValue ?? sourceRecordKey ?? null",
+    "recordedValueSource": "data/kr-banner-schedule.v1.json sourceRecordKey",
+    "effectiveValueSource": "data/checkpoints/banner-stage1-4-relation-corrections.v1.json when a verified correction exists; otherwise the recorded sourceRecordKey",
     "manualNullPolicy": "A null sourceRecordKey remains null unless an explicit approved correction or mapping exists; Stage 2-0 does not synthesize CardPool identity.",
     "correction": {
       "occurrenceRecordKey": "kr-banner:20270331:4",
@@ -48,7 +46,8 @@
       "recordedValue": "cardpool:263",
       "effectiveValue": "cardpool:265",
       "status": "VERIFIED_CORRECTION"
-    }
+    },
+    "consumerRule": "Stage 2-1 and all later canonical grouping/relation consumers must resolve source identity through this effective view instead of reading sourceRecordKey from the schedule directly."
   },
   "frozenBoundaries": [
     "Occurrence identity remains distinct from CardPool source identity and future canonical bannerDefinition identity.",
@@ -62,6 +61,7 @@
   "stage2_0ProhibitedWork": [
     "No bannerDefinition grouping beyond proving the effective input contract.",
     "No final canonical bannerDefinition or bannerOccurrence ID assignment.",
+    "No 94-row duplicate materialization when a correction overlay is sufficient.",
     "No asset hashing, perceptual duplicate analysis or candidate replacement work.",
     "No frontend integration.",
     "No name-based Hero or Event joins.",
@@ -69,7 +69,9 @@
     "No uncheckpointed sourceRecordKey repair."
   ],
   "completionCriteria": {
-    "all94OccurrencesRepresentedInEffectiveLayer": true,
+    "baseScheduleOccurrenceCount": 94,
+    "all94OccurrencesRepresentedByBasePlusOverlay": true,
+    "verifiedCorrectionOverlayCount": 1,
     "verifiedCorrectionAppliedExactlyOnce": true,
     "sourceScheduleMutationCount": 0,
     "syntheticManualSourceRelationCount": 0,
