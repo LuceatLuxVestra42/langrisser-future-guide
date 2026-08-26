@@ -1,0 +1,39 @@
+name: Skin Stage 2-4 Validate
+
+on:
+  push:
+    paths:
+      - '.github/workflows/skin-stage2-4-validate.yml'
+      - 'scripts/validate-skin-stage2-4-upstream-parity.py'
+      - 'data/contracts/skin-stage2-4-upstream-parity.v1.json'
+      - 'data/generated/skin-stage1-canonical.v1.json'
+      - 'data/validation/skin-stage1-2-parity.v1.json'
+      - 'data/generated/skin-stage2-3-bidirectional-relation.v1.json'
+      - 'data/validation/skin-stage2-3-final.v1.json'
+      - 'data/hero-name-master.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Skin Stage 2-4 upstream parity
+        run: python scripts/validate-skin-stage2-4-upstream-parity.py
+      - name: Commit validation checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/skin-stage2-4-final.v1.json
+          if git diff --cached --quiet; then
+            echo "No validation changes"
+          else
+            git commit -m "Validate Skin Stage 2-4 upstream parity"
+            git push
+          fi
