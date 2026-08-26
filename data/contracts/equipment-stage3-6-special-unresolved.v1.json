@@ -1,0 +1,80 @@
+{
+  "stage": "3-6",
+  "purpose": "Handle the 16 soul-special equipment and the single unresolved-no-path equipment explicitly after general/exclusive consumer generation, preserving known data without admitting them to public equipment consumers or inventing acquisition semantics.",
+  "sources": {
+    "stage30InputContract": "data/contracts/equipment-stage3-0-input-contract.v1.json",
+    "filterMap": "data/generated/equipment_stage2_3_filter_map.json",
+    "stats": "data/generated/equipment_stage2_4_stats.json",
+    "effects": "data/generated/equipment_stage2_5_effects.json",
+    "restrictions": "data/generated/equipment_stage2_6_restrictions.json",
+    "acquisition": "data/generated/equipment_stage2_7_acquisition.json",
+    "displayMetadata": "data/generated/equipment_stage3_2_display_metadata.json",
+    "generalConsumer": "data/generated/equipment_stage3_3_general_list.json",
+    "exclusiveConsumer": "data/generated/equipment_stage3_5_exclusive_consumer.json"
+  },
+  "buckets": {
+    "special": {
+      "acquisitionClass": "soul-special",
+      "expectedCount": 16,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "evidence": {
+        "getPathListCount": 0,
+        "namePrefix": "魂·",
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix"
+      },
+      "policy": "Preserve the full known semantic/display blocks for future reference, but do not place these records in the general or exclusive equipment consumer. Empty GetPathList is not reinterpreted as unrestricted/global/shop acquisition."
+    },
+    "hold": {
+      "acquisitionClass": "unresolved-no-path",
+      "expectedCount": 1,
+      "expectedEquipmentIds": [2013],
+      "disposition": "HOLD_UNRESOLVED_ACQUISITION",
+      "pageAdmission": false,
+      "evidence": {
+        "getPathListCount": 0,
+        "classificationBasis": "empty-GetPathList-no-global-meaning-inferred"
+      },
+      "policy": "ID 2013 remains an explicit hold. Preserve its known metadata and semantic blocks, but do not infer an acquisition path, public tab, unrestricted availability, global availability, shop availability, or chronology."
+    }
+  },
+  "recordPolicy": {
+    "primaryKey": "equipmentId",
+    "identity": "Use equipmentId/nameCn plus Stage 3-2 display metadata. Only VERIFIED_REFERENCE_MATCH Korean names may be copied; review candidates remain null.",
+    "classification": "Copy Stage 2-3 filter fields and Stage 2-7 equipmentType/label/sortIndex/acquisition class exactly.",
+    "stats": "Copy Stage 2-4 stats exactly without recalculation; current maxLevel remains 50.",
+    "effect": "Copy Stage 2-5 maxEffectSkillId/effectName/effectText/effectSegments exactly without translation, summary, or rewrite.",
+    "restriction": "Copy Stage 2-6 mode/generalArmyIds/specialJobIds exactly. Existing structural-inference semantics are not upgraded.",
+    "acquisition": "Copy Stage 2-7 releaseGroupDate/confidencePercent/classificationBasis and raw GetPathList count as evidence only.",
+    "routing": "Both buckets are intentionally excluded from normal general/exclusive page routing in Stage 3. Their equipmentId remains a stable identity key for diagnostics and future explicit consumers."
+  },
+  "partitionPolicy": {
+    "expectedCanonical": 390,
+    "expectedGeneral": 206,
+    "expectedExclusive": 167,
+    "expectedSpecial": 16,
+    "expectedHold": 1,
+    "requireDisjointBuckets": true,
+    "requireCanonicalClosure": true,
+    "equation": "206 general + 167 exclusive + 16 soul-special + 1 unresolved-no-path = 390 canonical"
+  },
+  "validation": {
+    "hardRequirements": [
+      "exactly 16 soul-special and 1 unresolved-no-path records",
+      "all 16 soul-special records have siteTab null, empty GetPathList, the 魂· name prefix, and the frozen soul-special classificationBasis",
+      "the hold bucket contains equipmentId 2013 only, with siteTab null, empty GetPathList, and the frozen unresolved classificationBasis",
+      "special and hold IDs do not overlap Stage 3-3 general IDs or Stage 3-5 exclusive IDs",
+      "the four Stage 3 buckets are pairwise disjoint and their union is the full 390 canonical equipment IDs",
+      "icons must remain direct Stage 3-2 values and review Korean-name candidates must not leak",
+      "all preserved stats/effects/restrictions/classification/acquisition fields exactly match frozen upstream outputs",
+      "no acquisition path, public siteTab, release chronology, or unrestricted/global/shop meaning is invented"
+    ],
+    "reviewAllowed": [
+      "unverified Korean display names inherited from Stage 3-2",
+      "soul-special acquisition meaning beyond its observed empty-path plus 魂· prefix classification",
+      "ID 2013 acquisition meaning remains unresolved",
+      "Stage 2-6 runtime equip-check direct proof remains unlocated"
+    ]
+  },
+  "completion": "All 17 non-general/non-exclusive canonical records are explicitly preserved in either HIDDEN_SPECIAL or HOLD_UNRESOLVED_ACQUISITION, and the 390-record Stage 3 partition closes without semantic invention."
+}
