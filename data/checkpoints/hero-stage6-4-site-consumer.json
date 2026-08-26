@@ -1,0 +1,30 @@
+{
+  "stage": "hero-page-6-4",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "heroDataPipelineStatus": "FINAL_FROZEN",
+  "confirmed": {
+    "heroRouteKey": "heroId",
+    "heroDetailManifest": "data/generated/hero-detail.v1.json",
+    "heroShardPattern": "data/generated/hero-detail/by-id/{heroId}.json",
+    "heroShardCount": 267,
+    "heroSoldierMembership": "frozen in each Hero shard; metadata resolves through hero-detail-shared.v1.json",
+    "exclusiveEquipmentOwnership": "B-5 byHeroId",
+    "exclusiveEquipmentMetadata": "data/generated/equipment_stage3_5_exclusive_consumer.json",
+    "stageBFinal": "PASS_ACCEPTED/closed=true"
+  },
+  "completedScope": "Stage 6-4 site consumer boundary, all 267 shard integrity/admission checks, Stage B byHero/byEquipment adoption parity, Equipment Stage 3-5 metadata coverage, and final Hero semantic-pipeline freeze.",
+  "reviews": [
+    {
+      "owner": "Hero Stage 6-3 publication metadata",
+      "issue": "Hero records may retain presentation-only REVIEW (Soldier Korean names, CV/faction/origin/skin localization, source asset delivery).",
+      "blockingStage64Completion": false
+    },
+    {
+      "owner": "frontend/asset integration",
+      "issue": "Source asset paths still require web-delivery conversion and final responsive rendering. This is outside Hero semantic-data Stage 6.",
+      "blockingStage64Completion": false
+    }
+  ],
+  "nextStartPoint": "Hero frontend/UI and web-asset integration. Consume the Stage 6-4 contract; do not reopen Stage 4/5 or Stage B semantics unless a new source snapshot or explicit contradiction requires the owning stage to reopen."
+}
