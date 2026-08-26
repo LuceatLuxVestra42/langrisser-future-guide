@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-4",
+  "status": "PASS_STAGE2_4_TAXONOMY",
+  "validationMode": "EXECUTED_FULL_POPULATION_REGRESSION",
+  "definitionCount": 77,
+  "occurrenceCount": 94,
+  "mechanicFamilyCounts": {
+    "PICKUP": 63,
+    "WISH": 14
+  },
+  "pickupCardinalityCounts": {
+    "DUAL": 20,
+    "NOT_APPLICABLE": 14,
+    "SINGLE": 19,
+    "TRIPLE": 24
+  },
+  "lifecycleCounts": {
+    "FIRST_OBSERVED_IN_CURRENT_DATASET": 58,
+    "NEW": 8,
+    "RERUN": 28
+  },
+  "contextTagAssignmentCount": 0,
+  "provenanceTagCounts": {
+    "MANUAL_KR": 8,
+    "LEGACY_REUSE": 6
+  },
+  "validationTagCounts": {
+    "SOURCE_CONFLICT": 1
+  },
+  "identityMismatchCount": 0,
+  "lifecycleMismatchCount": 0,
+  "provenanceMismatchCount": 0,
+  "validationMismatchCount": 0,
+  "errorCount": 0,
+  "errors": [],
+  "invariants": {
+    "canonicalDefinitionIdsUnchanged": true,
+    "canonicalOccurrenceIdsUnchanged": true,
+    "occurrenceDefinitionMappingUnchanged": true,
+    "all77DefinitionsClassified": true,
+    "all94OccurrencesClassified": true,
+    "firstObservedNeverAutoPromotedToNew": true,
+    "contextNotInferredFromTextOrAssets": true,
+    "manualKrSourceNullOnly": true,
+    "legacyReuseExplicitBasisOnly": true,
+    "sourceConflictCorrectionOnly": true,
+    "specialNotSynthesized": true,
+    "multiNotSynthesized": true,
+    "heroRelationsNotMaterialized": true,
+    "cpEventJoinsNotMaterialized": true,
+    "assetCanonicalizationNotMaterialized": true
+  },
+  "completion": {
+    "taxonomyContractFrozen": true,
+    "definitionTaxonomyMaterialized": true,
+    "occurrenceTaxonomyMaterialized": true,
+    "stage2_4Closed": true,
+    "nextStageReady": true
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-5",
+    "task": "Materialize canonical Hero relations on banner definitions using exact Hero IDs and Stage 1 relation semantics."
+  }
+}

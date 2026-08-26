@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-4",
+  "status": "STAGE2_4_CLOSED_READY_FOR_STAGE2_5",
+  "completedScope": {
+    "canonicalDefinitionCount": 77,
+    "canonicalOccurrenceCount": 94,
+    "mechanicFamilyCounts": {"PICKUP": 63, "WISH": 14},
+    "pickupCardinalityCounts": {"SINGLE": 19, "DUAL": 20, "TRIPLE": 24, "NOT_APPLICABLE": 14},
+    "lifecycleCounts": {"NEW": 8, "RERUN": 28, "FIRST_OBSERVED_IN_CURRENT_DATASET": 58},
+    "provenanceTagCounts": {"MANUAL_KR": 8, "LEGACY_REUSE": 6},
+    "validationTagCounts": {"SOURCE_CONFLICT": 1},
+    "canonicalContextTagAssignments": 0,
+    "errorCount": 0
+  },
+  "frozenBoundaries": [
+    "Canonical bannerDefinitionId and bannerOccurrenceId were not changed.",
+    "FIRST_OBSERVED_IN_CURRENT_DATASET is not first-ever release and is not NEW.",
+    "CP_RELATED and COLLAB remain valid context dimensions but are not assigned from text, names, Hero sets or assets.",
+    "SPECIAL and MULTI remain reserved taxonomy values and were not synthesized for the current population.",
+    "Hero relations, CP/Event joins and asset canonicalization remain outside Stage 2-4."
+  ],
+  "sources": [
+    "data/investigation/banner-stage2-4-taxonomy-census.v1.json",
+    "data/contracts/banner-stage2-4-taxonomy-contract.v1.json",
+    "data/generated/banner-definition-taxonomy.v1.json",
+    "data/generated/banner-occurrence-taxonomy.v1.json",
+    "data/validation/banner-stage2-4-summary.v1.json"
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-5",
+    "task": "Materialize canonical Hero relations on banner definitions using exact Hero IDs and the frozen PICKUP_HERO / WISH_CANDIDATE_HERO semantics."
+  }
+}
