@@ -1,0 +1,80 @@
+name: Equipment Stage 4 Final Closeout
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/equipment-stage4-final-closeout.v1.json'
+      - 'data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json'
+      - 'data/validation/equipment-stage4-1-route-loader-summary.v1.json'
+      - 'data/validation/equipment-stage4-2-general-list-ui-summary.v1.json'
+      - 'data/validation/equipment-stage4-3-general-detail-ui-summary.v1.json'
+      - 'data/validation/equipment-stage4-4-exclusive-ui-ownership-summary.v1.json'
+      - 'data/validation/equipment-stage4-5-display-state-policy-summary.v1.json'
+      - 'data/validation/equipment-stage4-6-admission-route-qa-summary.v1.json'
+      - 'data/validation/equipment-stage4-7-whole-consumer-regression-summary.v1.json'
+      - 'scripts/validate-equipment-stage4-final.mjs'
+      - 'src/routes/index.tsx'
+      - '.github/workflows/equipment-stage4-final.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/equipment-stage4-final-closeout.v1.json'
+      - 'data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json'
+      - 'data/validation/equipment-stage4-1-route-loader-summary.v1.json'
+      - 'data/validation/equipment-stage4-2-general-list-ui-summary.v1.json'
+      - 'data/validation/equipment-stage4-3-general-detail-ui-summary.v1.json'
+      - 'data/validation/equipment-stage4-4-exclusive-ui-ownership-summary.v1.json'
+      - 'data/validation/equipment-stage4-5-display-state-policy-summary.v1.json'
+      - 'data/validation/equipment-stage4-6-admission-route-qa-summary.v1.json'
+      - 'data/validation/equipment-stage4-7-whole-consumer-regression-summary.v1.json'
+      - 'scripts/validate-equipment-stage4-final.mjs'
+      - 'src/routes/index.tsx'
+      - '.github/workflows/equipment-stage4-final.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate Equipment Stage 4 final closeout
+        run: node scripts/validate-equipment-stage4-final.mjs
+
+      - name: Persist Equipment Stage 4 final checkpoint
+        if: github.event_name == 'push' && success()
+        run: |
+          OUTPUT='data/validation/equipment-stage4-final.v1.json'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$OUTPUT"
+          if git diff --cached --quiet; then
+            echo 'Equipment Stage 4 final output already frozen.'
+            exit 0
+          fi
+          git commit -m 'Freeze Equipment Stage 4 FINAL PASS_WITH_REVIEW'
+          git reset --hard HEAD
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo 'Push raced with another main update; retrying without force.'
+            sleep 2
+          done
+          echo 'Unable to persist Equipment Stage 4 final checkpoint after safe retries.'
+          exit 1
