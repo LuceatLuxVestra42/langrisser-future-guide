@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "stage": "skin-page-2",
+  "substage": "2-0",
+  "checkpoint": "input-contract",
+  "status": "ACCEPTED",
+  "purpose": "Freeze the authoritative Skin Stage 1 outputs that Skin Stage 2 may consume when materializing independent Skin-domain Hero<->Skin relation indexes. Stage 2 must reuse the accepted 540-record canonical population, owner relation and source order without reopening Hero Stage 5-5 or raw ConfigData semantics.",
+  "authoritativeInputs": {
+    "canonicalHeroIdentity": {
+      "path": "data/hero-name-master.v1.json",
+      "primaryKey": "heroId",
+      "expectedRecordCount": 267,
+      "role": "Canonical Hero keyspace for the reverse Hero -> Skin index."
+    },
+    "skinCanonical": {
+      "path": "data/generated/skin-stage1-canonical.v1.json",
+      "primaryKey": "skinId",
+      "expectedRecordCount": 540,
+      "expectedDistinctSkinIdCount": 540,
+      "requiredSourceClass": "REGULAR_HERO_SKIN",
+      "requiredPopulationStatus": "CANONICAL",
+      "role": "Authoritative Skin-domain population and direct source of skinId, heroId and sourceOrder."
+    },
+    "stage1UpstreamParity": {
+      "path": "data/validation/skin-stage1-2-parity.v1.json",
+      "expectedStatus": "PASS",
+      "expectedCompletion": "SKIN_STAGE1_2_COMPLETE",
+      "expectedCanonicalHeroCount": 267,
+      "expectedCanonicalSkinCount": 540,
+      "expectedOwnerMismatchCount": 0,
+      "expectedSourceOrderMismatchCount": 0,
+      "role": "Frozen proof that Stage 1 canonical membership, owner and source order preserve accepted Hero Stage 5-5 semantics."
+    },
+    "stage1FinalGate": {
+      "path": "data/validation/skin-stage1-6-final.v1.json",
+      "expectedStatus": "PASS",
+      "expectedCompletion": "SKIN_STAGE1_COMPLETE",
+      "expectedCheckCount": 39,
+      "expectedPassedCheckCount": 39,
+      "expectedFailedCheckCount": 0,
+      "expectedCanonicalSkinCount": 540,
+      "expectedDistinctSkinIdCount": 540,
+      "expectedHardBlockingIssueCount": 0,
+      "role": "Authoritative Stage 1 closure gate."
+    }
+  },
+  "frozenBaseline": {
+    "canonicalHeroCount": 267,
+    "canonicalSkinCount": 540,
+    "distinctSkinIdCount": 540,
+    "heroesWithSkins": 235,
+    "heroesWithNoRegularSkins": 32,
+    "ownerMismatchCount": 0,
+    "sourceOrderMismatchCount": 0,
+    "sharedSkinRefCount": 0,
+    "duplicateSkinIdCount": 0,
+    "hardBlockingIssueCount": 0
+  },
+  "relationSemantics": {
+    "skinPrimaryKey": "skinId",
+    "heroPrimaryKey": "heroId",
+    "skinToHeroCardinality": "EXACTLY_ONE",
+    "heroToSkinCardinality": "ZERO_OR_MANY",
+    "ownerSource": "data/generated/skin-stage1-canonical.v1.json records[].heroId",
+    "orderSource": "data/generated/skin-stage1-canonical.v1.json records[].sourceOrder",
+    "orderingRule": "Hero -> Skin lists must preserve ascending sourceOrder as inherited from accepted Hero Stage 5-5 Skins_ID[] array position. No alternate chronology or presentation order is introduced in Stage 2."
+  },
+  "stage2OwnershipBoundary": {
+    "stage2Does": [
+      "Materialize Skin -> Hero forward relation from accepted Stage 1 canonical records.",
+      "Materialize Hero -> ordered Skin reverse index for all 267 canonical Heroes, including empty arrays for Heroes with no regular skins.",
+      "Prove forward/reverse parity across all 540 accepted skin edges.",
+      "Publish an official relation consumer contract so downstream pages do not recalculate ownership from ConfigData."
+    ],
+    "stage2DoesNot": [
+      "Rebuild the 540-skin canonical population.",
+      "Read raw ConfigData to rediscover Hero ownership or source order.",
+      "Infer ownership from skin names, filenames, resource paths or numeric ID patterns.",
+      "Reclassify acquisition metadata.",
+      "Extract, convert or map image/Spine assets to web paths.",
+      "Determine CN/KR release state or KR_FUTURE eligibility.",
+      "Create Korean skin-name localization.",
+      "Regenerate the final Hero-page skin consumer beyond relation parity."
+    ]
+  },
+  "prohibitions": [
+    "Do not use ConfigDataHeroInfo.Skins_ID[] or ConfigDataHeroSkinInfo.SpecifiedHero as a new Stage 2 ownership calculation source; Stage 1 parity has already frozen those semantics.",
+    "Do not re-sort Hero skin lists by skinId, Score, store UISort, acquisition category, filename or asset path.",
+    "Do not omit Heroes with zero regular skins from the reverse index; all 267 canonical heroIds must be represented.",
+    "Do not admit SP illustrations, Soldier skins or unproven skin-like assets into the Stage 2 relation population.",
+    "Do not add releaseStatus, displayTarget, KR_FUTURE or web-export fields to Stage 2 relation outputs."
+  ],
+  "requiredStage2Checks": {
+    "forwardRelationCount": 540,
+    "distinctForwardSkinIdCount": 540,
+    "reverseHeroEntryCount": 267,
+    "reverseHeroWithSkinsCount": 235,
+    "reverseHeroWithoutSkinsCount": 32,
+    "reverseEdgeCount": 540,
+    "unknownHeroIdCount": 0,
+    "duplicateForwardSkinIdCount": 0,
+    "forwardReverseOwnerMismatchCount": 0,
+    "forwardReverseMissingEdgeCount": 0,
+    "forwardReverseExtraEdgeCount": 0,
+    "sourceOrderMismatchCount": 0
+  },
+  "completionRule": "Skin Stage 2-0 is complete when this contract is committed and the referenced Stage 1 artifacts are confirmed present with Stage 1 final PASS, 540 distinct canonical skins, 267 canonical Heroes, owner/source-order mismatch 0 and hard blocker 0.",
+  "nextAction": "Skin 2-1: generate the 540-record Skin -> Hero forward relation from skin-stage1-canonical.v1.json without reading raw ConfigData."
+}
