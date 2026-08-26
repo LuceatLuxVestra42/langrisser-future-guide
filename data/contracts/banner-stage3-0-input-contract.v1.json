@@ -1,0 +1,126 @@
+{
+  "stage": "3-0",
+  "purpose": "Freeze the Banner Stage 2 production manifest and its eight production artifacts as the only canonical inputs that Banner Stage 3 consumers may use, and verify cross-artifact identity/relation/history continuity without reopening Stage 2 semantics.",
+  "manifest": {
+    "path": "data/generated/banner-stage2-production-manifest.v1.json",
+    "status": "BANNER_STAGE2_PRODUCTION_MANIFEST_MATERIALIZED",
+    "representation": "REFERENCE_MANIFEST_NO_LARGE_DATA_DUPLICATION"
+  },
+  "canonicalExpectations": {
+    "bannerDefinitionCount": 77,
+    "bannerOccurrenceCount": 94,
+    "mappedOccurrenceCount": 94,
+    "sourceLinkedDefinitionCount": 69,
+    "manualOccurrenceScopedDefinitionCount": 8,
+    "heroRelationEdgeCount": 600,
+    "pickupHeroEdgeCount": 136,
+    "wishCandidateHeroEdgeCount": 464,
+    "cpRelatedDefinitionCount": 4,
+    "cpRelatedOccurrenceCount": 4,
+    "repeatedDefinitionCount": 11,
+    "singleObservedDefinitionCount": 66,
+    "recurrenceLinkCount": 17,
+    "canonicalEventRelationCount": 0,
+    "definitionMechanicFamilies": {
+      "PICKUP": 63,
+      "WISH": 14
+    },
+    "occurrenceLifecycle": {
+      "FIRST_OBSERVED_IN_CURRENT_DATASET": 58,
+      "NEW": 8,
+      "RERUN": 28
+    }
+  },
+  "productionArtifacts": {
+    "canonicalDefinitions": {
+      "role": "canonical-definitions",
+      "path": "data/generated/banner-definitions.v1.json",
+      "status": "CANONICAL_BANNER_DEFINITIONS_MATERIALIZED",
+      "manifestCountField": "recordCount"
+    },
+    "occurrenceDefinitionMap": {
+      "role": "occurrence-definition-map",
+      "path": "data/generated/banner-occurrence-definition-map.v1.json",
+      "status": "OCCURRENCE_DEFINITION_MAP_MATERIALIZED",
+      "manifestCountField": "recordCount"
+    },
+    "canonicalOccurrences": {
+      "role": "canonical-occurrences",
+      "path": "data/generated/banner-occurrences.v1.json",
+      "status": "CANONICAL_BANNER_OCCURRENCES_MATERIALIZED",
+      "manifestCountField": "recordCount"
+    },
+    "definitionTaxonomy": {
+      "role": "definition-taxonomy",
+      "path": "data/generated/banner-definition-taxonomy.v1.json",
+      "status": "CANONICAL_DEFINITION_TAXONOMY_MATERIALIZED",
+      "manifestCountField": "recordCount"
+    },
+    "occurrenceTaxonomy": {
+      "role": "occurrence-taxonomy",
+      "path": "data/generated/banner-occurrence-taxonomy.v1.json",
+      "status": "CANONICAL_OCCURRENCE_TAXONOMY_MATERIALIZED",
+      "manifestCountField": "recordCount"
+    },
+    "heroRelations": {
+      "role": "definition-hero-relations",
+      "path": "data/generated/banner-definition-hero-relations.v1.json",
+      "status": "CANONICAL_HERO_RELATIONS_MATERIALIZED",
+      "manifestCountField": "edgeCount"
+    },
+    "cpEventRelations": {
+      "role": "cp-event-reference-relations",
+      "path": "data/generated/banner-cp-event-relations.v1.json",
+      "status": "CANONICAL_CP_EVENT_REFERENCE_STRUCTURE_MATERIALIZED",
+      "manifestCountField": "definitionRelationCount"
+    },
+    "recurrenceHistory": {
+      "role": "recurrence-history",
+      "path": "data/generated/banner-recurrence-history.v1.json",
+      "status": "CANONICAL_BANNER_RECURRENCE_HISTORY_MATERIALIZED",
+      "manifestCountField": "definitionHistoryCount"
+    }
+  },
+  "semanticFreeze": {
+    "occurrenceIdentity": "bannerOccurrenceId = bocc:<recordKey>",
+    "definitionIdentity": "bannerDefinitionId is the frozen Stage 2 deterministic canonical ID",
+    "sourceLinkedGrouping": "same effectiveSourceRecordKey => same canonical definition",
+    "sourceNullManualGrouping": "one occurrence-scoped definition unless an explicit approved mapping is introduced",
+    "heroRelations": "only canonical Hero ID edges emitted by Stage 2-5 are accepted",
+    "cpRelation": "CP_RELATED remains a non-exclusive context relation",
+    "eventRelation": "event references remain text-only while canonicalEventId is unresolved",
+    "historyScope": "CURRENT_CANONICAL_KR_SCHEDULE_DATASET",
+    "assetRole": "Stage 2 occurrence display data is provenance/display metadata, not canonical banner identity"
+  },
+  "consumerPolicy": {
+    "primaryDefinitionKey": "bannerDefinitionId",
+    "primaryOccurrenceKey": "bannerOccurrenceId",
+    "sourcePriority": [
+      "Banner Stage 2 production manifest",
+      "the eight Stage 2 production artifacts referenced by that manifest",
+      "targeted Stage 1/ConfigData lookup only when Stage 3 requires a genuinely new asset/frontend relation"
+    ],
+    "doNotRecompute": [
+      "77 canonical banner definitions",
+      "94 canonical banner occurrences",
+      "occurrence-to-definition grouping",
+      "definition/occurrence taxonomy",
+      "canonical Hero relations",
+      "CP/Event reference semantics",
+      "recurrence/history semantics"
+    ],
+    "doNotInfer": [
+      "canonical Event IDs from event text labels",
+      "Hero IDs for source-null manual Wish definitions",
+      "first-ever release dates outside the current dataset",
+      "future recurrence dates from observed gaps",
+      "canonical banner identity from displayImageFile, asset equality, Hero set, bannerCode, or display name"
+    ],
+    "stage3DisplayHandoff": "Existing occurrence display.imageFile/imageStatus values may be consumed only as Stage 2 provenance for the Stage 3 asset census. Canonical asset ownership/hash/visual duplicate semantics remain deferred to Stage 3-1.",
+    "nextStage": "Banner Stage 3-1 asset relation / asset census"
+  },
+  "completion": {
+    "validatorStatus": "PASS_BANNER_STAGE3_0_INPUT_CONTRACT",
+    "summaryPath": "data/validation/banner-stage3-0-input-summary.v1.json"
+  }
+}
