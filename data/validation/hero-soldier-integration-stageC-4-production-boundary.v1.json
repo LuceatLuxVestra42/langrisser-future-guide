@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-integration-stageC-4-production-boundary-validation/v1",
+  "stage": "C-4",
+  "checkpoint": "production-boundary-contract",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "purpose": "Validate that accepted Hero-Soldier relation ownership is frozen as a one-way offline production flow and that frontend source does not bypass final Hero/Soldier consumers or reconstruct membership.",
+  "sources": {
+    "contract": {
+      "path": "data/contracts/hero-soldier-integration-stageC-4-production-boundary.v1.json",
+      "gitBlobSha": "5e3ecb3b2474d6f9b3badf05d191d9551205ef26"
+    },
+    "c0": {
+      "path": "data/contracts/hero-soldier-integration-stageC-0-input.v1.json",
+      "gitBlobSha": "ec4effc3fb35b2ea90cc267e0c96609e2b36f312"
+    },
+    "c1": {
+      "path": "data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json",
+      "gitBlobSha": "c8a2d96ff5fce0dffb6ffbe89b92d5c37cf78bc3"
+    },
+    "c2": {
+      "path": "data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json",
+      "gitBlobSha": "2c1efc5bc324b2f0f3b37db666aafe8633a5a157"
+    },
+    "c3": {
+      "path": "data/validation/hero-soldier-integration-stageC-3-special-fixtures.v1.json",
+      "gitBlobSha": "a729e5580d34c06fe11c108cbf2700381bd3ca39"
+    },
+    "canonicalRelation": {
+      "path": "data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    },
+    "byHeroIndex": {
+      "path": "data/generated/hero-soldier-by-hero.v1.json",
+      "gitBlobSha": "e613bd05b0e7173734834cba5d8cfbff973298ad"
+    },
+    "bySoldierIndex": {
+      "path": "data/generated/hero-soldier-by-soldier.v1.json",
+      "gitBlobSha": "ff9d8a881c03b6e0f2a196e12f37cd2e28e3e251"
+    },
+    "heroManifest": {
+      "path": "data/generated/hero-detail.v1.json",
+      "gitBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66"
+    },
+    "soldierRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    }
+  },
+  "productionFlow": [
+    "A_STAGE_RELATION_PIPELINE -> canonicalRelation",
+    "canonicalRelation -> byHeroIndex + bySoldierIndex",
+    "byHeroIndex -> heroFinalConsumer.soldiers.ids",
+    "bySoldierIndex -> soldierFinalConsumer.heroes.finalHeroIds",
+    "heroFinalConsumer + soldierFinalConsumer -> frontend presentation/navigation"
+  ],
+  "checks": {
+    "contractStageIsC4": true,
+    "contractFrozen": true,
+    "c0BlobFrozen": true,
+    "c1BlobFrozen": true,
+    "c2BlobFrozen": true,
+    "c3BlobFrozen": true,
+    "c0Accepted": true,
+    "c1Accepted": true,
+    "c2Accepted": true,
+    "c3Accepted": true,
+    "canonicalBlobFrozen": true,
+    "byHeroBlobFrozen": true,
+    "bySoldierBlobFrozen": true,
+    "heroManifestBlobFrozen": true,
+    "soldierRecordsBlobFrozen": true,
+    "canonicalPairCount": true,
+    "byHeroSourceIsCanonical": true,
+    "bySoldierSourceIsCanonical": true,
+    "byHeroKeyCount": true,
+    "byHeroPairCount": true,
+    "bySoldierKeyCount": true,
+    "bySoldierPairCount": true,
+    "c0CanonicalMatches": true,
+    "c3CanonicalCountMatches": true,
+    "oneWayDirectionFrozen": true,
+    "frontendWritebackForbidden": true,
+    "crossConsumerPatchForbidden": true,
+    "presentationCannotChangeMembership": true,
+    "finalHeroMembershipFieldFrozen": true,
+    "finalSoldierMembershipFieldFrozen": true,
+    "noBlockedFrontendPathImports": true,
+    "noBlockedSemanticReconstruction": true,
+    "noBlockedIdArithmetic": true,
+    "noBlockedNameJoin": true
+  },
+  "summary": {
+    "canonicalRelationCount": 5977,
+    "heroIndexKeyCount": 267,
+    "heroIndexPairCount": 5977,
+    "soldierIndexKeyCount": 224,
+    "soldierIndexPairCount": 5977,
+    "frontendSourceFileCount": 63,
+    "blockedFrontendPathImportCount": 0,
+    "blockedSemanticReconstructionCount": 0,
+    "blockedIdArithmeticCount": 0,
+    "blockedNameJoinCount": 0,
+    "failedCheckCount": 0,
+    "hardErrorCount": 0
+  },
+  "frontendBoundary": {
+    "implementationStatus": "NOT_YET_IMPLEMENTED",
+    "scansFinalImplementationNow": false,
+    "note": "C-4 freezes ownership and enforces forbidden bypass/recompute signatures. Route/click/back/404/mobile behavior remains outside Stage C and is validated later in UI Integration QA."
+  },
+  "diagnostics": {
+    "blockedPathHits": [],
+    "blockedSemanticHits": [],
+    "blockedIdArithmeticHits": [],
+    "blockedNameJoinHits": [],
+    "failedChecks": []
+  },
+  "nonBlockingReviewsForwarded": [
+    {
+      "code": "PRESENTATION_METADATA_INCOMPLETE",
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "Localization/release/assets cannot mutate membership IDs."
+    },
+    {
+      "code": "HERO_SOLDIER_FRONTEND_NOT_YET_IMPLEMENTED",
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "C-4 is the production ownership boundary; deployed navigation behavior is a later UI Integration QA concern."
+    }
+  ],
+  "hardErrors": [],
+  "decision": "C-4 PASS. Hero-Soldier production ownership is frozen as canonical relation -> byHero/bySoldier offline projections -> final Hero/Soldier consumers -> frontend presentation/navigation. Frontend writeback, raw ConfigData relation reads, direct canonical/index ownership, semantic reconstruction, detected +/-5000 translation, and detected display-name membership JOINs are prohibited.",
+  "nextStartPoint": "C-5 final closeout: read only C-0 through C-4 and freeze the integrated Hero-Soldier pipeline as FINAL_FROZEN."
+}
