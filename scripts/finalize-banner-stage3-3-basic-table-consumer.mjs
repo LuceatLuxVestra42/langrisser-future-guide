@@ -68,9 +68,23 @@ const cardinalityExpectedCount = {
   TRIPLE: 3
 };
 
-function typeLabel(taxonomy) {
-  if (taxonomy.mechanicFamily === 'WISH') return contract.typeLabelsKr.WISH;
-  return contract.typeLabelsKr[`PICKUP_${taxonomy.pickupCardinality}`] ?? `픽업(${taxonomy.pickupCardinality})`;
+function typeLabel(taxonomy, pickupHeroCountMatchesCardinality) {
+  if (taxonomy.mechanicFamily === 'WISH') {
+    return {
+      label: contract.typeLabelsKr.WISH,
+      basis: 'MECHANIC_FAMILY'
+    };
+  }
+  if (pickupHeroCountMatchesCardinality === false) {
+    return {
+      label: contract.typeLabelsKr.PICKUP_REVIEW,
+      basis: 'NEUTRALIZED_CARDINALITY_RELATION_REVIEW'
+    };
+  }
+  return {
+    label: contract.typeLabelsKr[`PICKUP_${taxonomy.pickupCardinality}`] ?? `픽업(${taxonomy.pickupCardinality})`,
+    basis: 'TAXONOMY_CARDINALITY'
+  };
 }
 
 const rows = [];
@@ -109,6 +123,7 @@ for (const occurrence of occurrences) {
   const pickupHeroCountMatchesCardinality = expectedPickupCount == null
     ? null
     : pickupHeroes.length === expectedPickupCount;
+  const label = typeLabel(definitionTax, pickupHeroCountMatchesCardinality);
 
   rows.push({
     rowId: occurrence.bannerOccurrenceId,
@@ -118,7 +133,8 @@ for (const occurrence of occurrences) {
     displayOrder: occurrence.displayOrder,
     mechanicFamily: definitionTax.mechanicFamily,
     pickupCardinality: definitionTax.pickupCardinality,
-    typeLabelKr: typeLabel(definitionTax),
+    typeLabelKr: label.label,
+    typeLabelBasis: label.basis,
     lifecycle: occurrenceTax.lifecycle,
     lifecycleLabelKr: contract.lifecycleLabelsKr[occurrenceTax.lifecycle] ?? occurrenceTax.lifecycle,
     provenanceTags: occurrenceTax.provenanceTags ?? [],
@@ -188,7 +204,8 @@ for (const taxonomy of definitionTaxonomy) {
       pickupCardinality: taxonomy.pickupCardinality,
       expectedHeroCount: expected,
       actualPickupHeroCount: actual,
-      disposition: 'PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY'
+      consumerTypeLabelKr: contract.typeLabelsKr.PICKUP_REVIEW,
+      disposition: 'PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL'
     });
   }
 }
@@ -196,7 +213,7 @@ if (pickupDefinitionMismatches.length > 0) {
   reviews.push({
     code: 'PICKUP_CARDINALITY_RELATION_COUNT_DIFFERENCE',
     count: pickupDefinitionMismatches.length,
-    interpretation: 'Do not rewrite Stage 2 taxonomy or Hero relations in Stage 3-3; consumer exposes both fields separately.',
+    interpretation: 'Do not rewrite Stage 2 taxonomy or Hero relations in Stage 3-3. Preserve both and neutralize the user-facing Korean type label for affected rows.',
     definitions: pickupDefinitionMismatches
   });
 }
@@ -212,6 +229,7 @@ check(placeholderRows === contract.expectedCanonicalPopulation.placeholderOccurr
 
 const pickupRows = rows.filter(row => row.mechanicFamily === 'PICKUP');
 const wishRows = rows.filter(row => row.mechanicFamily === 'WISH');
+const neutralizedPickupRows = pickupRows.filter(row => row.typeLabelBasis === 'NEUTRALIZED_CARDINALITY_RELATION_REVIEW');
 const uniquePickupHeroIds = uniq(pickupRows.flatMap(row => row.pickupHeroes.map(hero => hero.heroId)));
 
 const output = {
@@ -227,6 +245,7 @@ const output = {
     cpEventRelationsIncluded: false,
     recurrenceHistoryIncluded: false,
     imageSource: contract.consumerPolicy.imageSource,
+    pickupCardinalityRelationMismatchDisplay: contract.consumerPolicy.pickupCardinalityRelationMismatchDisplay,
     bannerTitlesInvented: false,
     heroRoutesInvented: false,
     fallbackAssetsInvented: false
@@ -276,6 +295,8 @@ const summary = {
     pickupHeroReferencesAcrossRows: pickupRows.reduce((sum, row) => sum + row.pickupHeroCount, 0),
     uniquePickupHeroes: uniquePickupHeroIds.length,
     definitionCardinalityRelationMismatchCount: pickupDefinitionMismatches.length,
+    neutralizedDisplayRowCount: neutralizedPickupRows.length,
+    neutralizedDisplayRowIds: neutralizedPickupRows.map(row => row.rowId),
     definitionCardinalityRelationMismatches: pickupDefinitionMismatches
   },
   wishSummary: {
@@ -293,6 +314,8 @@ const summary = {
     stage2OccurrenceIdsChanged: false,
     stage31AssetIdsChanged: false,
     stage32DisplayRecomputed: false,
+    stage2PickupRelationsTrimmed: false,
+    stage2PickupTaxonomyRewritten: false,
     wishCandidateListsMaterializedEarly: false,
     cpEventRelationsJoinedEarly: false,
     recurrenceHistoryJoinedEarly: false,
