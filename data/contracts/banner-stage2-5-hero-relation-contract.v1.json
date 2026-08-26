@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-5",
+  "status": "HERO_RELATION_CONTRACT_FROZEN",
+  "purpose": "Materialize canonical Hero relations on the frozen Banner Stage 2-2 definition population without changing definition or occurrence identity.",
+  "inputs": {
+    "stage24Validation": "data/validation/banner-stage2-4-summary.v1.json",
+    "definitions": "data/generated/banner-definitions.v1.json",
+    "definitionTaxonomy": "data/generated/banner-definition-taxonomy.v1.json",
+    "rawCardPool": "data/configdata/ConfigDataCardPoolInfo.json",
+    "canonicalHero": "data/hero-name-master.v1.json",
+    "stage14RelationCensus": "data/investigation/banner-stage1-4-relation-census.v1.json"
+  },
+  "identityBoundary": {
+    "bannerDefinitionIdImmutable": true,
+    "bannerOccurrenceIdImmutable": true,
+    "occurrenceDefinitionMappingImmutable": true,
+    "heroRelationNeverDefinesBannerIdentity": true
+  },
+  "relationTypes": {
+    "PICKUP_HERO": {
+      "appliesToMechanicFamily": "PICKUP",
+      "sourceField": "ConfigDataCardPoolInfo.UpHeroList[]",
+      "targetIdentity": "hero-name-master.v1.json.records[].heroId",
+      "joinRule": "Exact integer Hero ID only",
+      "cardinality": "0..N"
+    },
+    "WISH_CANDIDATE_HERO": {
+      "appliesToMechanicFamily": "WISH",
+      "sourceFields": [
+        "ConfigDataCardPoolInfo.OptionalUpHeroList[].HeroId",
+        "ConfigDataCardPoolInfo.WishHero[].HeroId"
+      ],
+      "targetIdentity": "hero-name-master.v1.json.records[].heroId",
+      "joinRule": "Exact integer Hero ID only; preserve the exact source field family on every edge",
+      "cardinality": "0..N"
+    }
+  },
+  "manualSourceNullPolicy": {
+    "rule": "Definitions without an effective CardPool source receive zero Hero edges unless an explicit approved manual Hero-ID map exists.",
+    "approvedManualHeroIdMappings": [],
+    "syntheticHeroEdgesAllowed": false,
+    "displayNameFallbackAllowed": false
+  },
+  "sourceMetadataBoundary": {
+    "wishJobConnectionIdIsHeroIdentity": false,
+    "previewHeroIdsAreCanonicalRelationSource": false,
+    "dynamicDisplayHeroIdsAreCanonicalRelationSource": false,
+    "heroesKrNameMatchingAllowed": false,
+    "heroesCnNameMatchingAllowed": false,
+    "assetMatchingAllowed": false,
+    "bannerCodeInferenceAllowed": false
+  },
+  "materializedEdgeShape": {
+    "fields": [
+      "bannerDefinitionId",
+      "relationType",
+      "heroId",
+      "sourceRecordKey",
+      "sourceField",
+      "sourceIndex",
+      "heroNameCn",
+      "heroNameKr",
+      "heroStatus"
+    ],
+    "namesAreDenormalizedDisplayMetadataOnly": true,
+    "heroIdIsCanonicalTargetIdentity": true
+  },
+  "validation": {
+    "expectedDefinitionCount": 77,
+    "allDefinitionIdsMustMatchStage22": true,
+    "allEdgesMustResolveCanonicalHero": true,
+    "pickupEdgesMustUseUpHeroListOnly": true,
+    "wishEdgesMustUseApprovedWishFieldFamiliesOnly": true,
+    "manualSourceNullEdgesMustRemainZero": true,
+    "relationTypesMustRemainDistinct": true,
+    "unknownOrMissingExplicitIdsMustNotUseNameFallback": true
+  },
+  "outOfScope": [
+    "CP_RELATED materialization",
+    "canonical Event join",
+    "asset canonicalization",
+    "timing or recurrence consumers",
+    "frontend integration"
+  ],
+  "completionCondition": "All 77 banner definitions have an explicit Hero-relation handling result; every emitted edge resolves by exact Hero ID; source-null manual definitions have zero synthesized edges; canonical banner identities remain unchanged.",
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-6",
+    "task": "Materialize CP context and Event-reference structure without name-based Event joins."
+  }
+}
