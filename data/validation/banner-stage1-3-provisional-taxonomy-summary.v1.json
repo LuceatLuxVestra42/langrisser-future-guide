@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-3",
+  "status": "PASS_PROVISIONAL_TAXONOMY",
+  "input": "data/investigation/banner-stage1-3-provisional-taxonomy.v1.json",
+  "checks": {
+    "currentPopulationRecordCount": 94,
+    "rowGrainPreservedAsOccurrenceDisplayRow": true,
+    "singleFinalBannerTypeEnumCreated": false,
+    "multiAxisTaxonomyCreated": true,
+    "mechanicFamilyAxisCreated": true,
+    "lifecycleAxisCreated": true,
+    "pickupCardinalityAxisCreated": true,
+    "contextTagAxisCreated": true,
+    "knownLegacyScheduleTypesMapped": ["new", "single", "dual", "triple", "wish"],
+    "unknownFallbackAvailable": true,
+    "sourceTypePreservedSeparately": true,
+    "sourceTypeVocabularyDeclaredFinalOrExhaustive": false,
+    "newTreatedAsLifecycleNotCardinality": true,
+    "singleDualTripleTreatedAsPickupCardinalityWithRerunBehavior": true,
+    "wishTreatedAsSeparateMechanic": true,
+    "wishForcedToDual": false,
+    "collabTreatedAsNonExclusiveTag": true,
+    "cpForcedIntoCurrentOccurrenceType": false,
+    "cpRelatedReservedForRelationCensus": true,
+    "specialReservedWithoutForcedAssignment": true,
+    "manualRowsRemainClassifiableWithoutCardPool": true,
+    "sourceConflictCarryForwardCount": 1,
+    "sourceConflictRecord": "kr-banner:20270331:4",
+    "sourceConflictAutoCorrected": false,
+    "finalProductionSchemaCreated": false,
+    "guessBasedJoinIntroduced": false
+  },
+  "evidenceSummary": [
+    "The existing Stage 1-1 census records current scheduleType values new, single, dual, triple, and wish.",
+    "The existing validator applies different image behavior to those five legacy scheduleType values, confirming that scheduleType is an implementation/display field rather than a clean canonical semantic enum.",
+    "The current schedule contains NEW examples with different hero counts, including 9601 and 9701, so NEW cannot safely encode pickup cardinality.",
+    "The current schedule contains collaboration banner 9801 as scheduleType=new, so COLLAB is cross-cutting context rather than a mutually exclusive mechanic.",
+    "Stage 1-2 already proved sourceType=new can appear in a later scheduleType=single occurrence, so source classification and occurrence taxonomy must remain separate.",
+    "Project design requires CP pickup logs, wish selectable lists, special-banner explanation, and single-pickup rerun history; only wish and single-rerun semantics are directly aligned with current schedule evidence, while CP remains relation-level review."
+  ],
+  "decision": "Stage 1-3 passes. The provisional taxonomy is intentionally multi-axis: mechanicFamily, lifecycle, pickupCardinality, and non-exclusive contextTags. This removes the semantic mixing present in legacy scheduleType while preserving sourceType and all unresolved states. It is investigation taxonomy only and must not yet replace production fields.",
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-4",
+    "task": "Relation census",
+    "priorities": [
+      "Banner occurrence -> CardPool source relation correctness",
+      "CardPool/source -> explicit Hero ID relations using canonical Hero identity",
+      "Wish selectable-pool relation shape",
+      "CP_RELATED data-unit/relationship investigation",
+      "Event relation presence/cardinality only if evidenced",
+      "Resolve or formally repair kr-banner:20270331:4 source conflict before production consumer generation"
+    ]
+  }
+}
