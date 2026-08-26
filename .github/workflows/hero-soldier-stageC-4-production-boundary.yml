@@ -68,16 +68,20 @@ jobs:
       - name: Freeze C-4 output on work branch
         if: github.event_name == 'push' && success()
         run: |
-          if git diff --quiet -- data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json; then
+          OUTPUT='data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json'
+          if [ -z "$(git status --porcelain -- "$OUTPUT")" ]; then
             echo 'C-4 output already frozen.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json
+          git add "$OUTPUT"
           git commit -m 'Freeze Hero-Soldier Stage C-4 production boundary PASS'
           git push
 
       - name: Verify frozen C-4 output on PR
         if: github.event_name == 'pull_request' && success()
-        run: git diff --exit-code -- data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json
+        run: |
+          OUTPUT='data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json'
+          test -f "$OUTPUT"
+          test -z "$(git status --porcelain -- "$OUTPUT")"
