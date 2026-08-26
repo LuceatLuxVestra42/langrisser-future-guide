@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 3-3",
+  "purpose": "Materialize a compact chronological basic banner-table consumer from frozen Stage 2 semantics and Stage 3-2 display metadata. Keep Wish candidate detail, CP/Event detail, and recurrence logs deferred to their dedicated later consumers.",
+  "inputs": {
+    "stage32Summary": "data/validation/banner-stage3-2-display-summary.v1.json",
+    "stage32DisplayMetadata": "data/generated/banner-stage3-2-display-metadata.v1.json",
+    "occurrences": "data/generated/banner-occurrences.v1.json",
+    "definitionTaxonomy": "data/generated/banner-definition-taxonomy.v1.json",
+    "occurrenceTaxonomy": "data/generated/banner-occurrence-taxonomy.v1.json",
+    "heroRelations": "data/generated/banner-definition-hero-relations.v1.json"
+  },
+  "expectedCanonicalPopulation": {
+    "definitions": 77,
+    "occurrences": 94,
+    "definitionMechanicFamilies": {
+      "PICKUP": 63,
+      "WISH": 14
+    },
+    "renderableOccurrences": 93,
+    "placeholderOccurrences": 1
+  },
+  "consumerPolicy": {
+    "rowIdentity": "bannerOccurrenceId",
+    "sortOrder": [
+      "krDisplayDate ASC",
+      "displayOrder ASC",
+      "bannerOccurrenceId ASC"
+    ],
+    "includeAllOccurrences": true,
+    "includeWishRows": true,
+    "pickupHeroSource": "Stage 2 PICKUP_HERO relations only, ordered by sourceIndex then heroId",
+    "wishCandidateHeroListsIncluded": false,
+    "wishCandidateDetailDeferredTo": "Banner Stage 3-4 Wish consumer",
+    "cpEventRelationsIncluded": false,
+    "cpEventDetailDeferredTo": "Banner Stage 3-5 CP/Event consumer",
+    "recurrenceHistoryIncluded": false,
+    "recurrenceDetailDeferredTo": "Banner Stage 3-6 recurrence/pickup-log consumer",
+    "imageSource": "Stage 3-2 occurrenceDisplayRecords only",
+    "heroRoutesInvented": false,
+    "bannerTitlesInvented": false,
+    "exactTimesInvented": false,
+    "fallbackAssetsInvented": false
+  },
+  "typeLabelsKr": {
+    "PICKUP_SINGLE": "1인 픽업",
+    "PICKUP_DUAL": "2인 픽업",
+    "PICKUP_TRIPLE": "3인 픽업",
+    "WISH": "소원소환"
+  },
+  "lifecycleLabelsKr": {
+    "NEW": "신규",
+    "RERUN": "복각",
+    "FIRST_OBSERVED_IN_CURRENT_DATASET": "현 데이터셋 최초 관측"
+  },
+  "completionPolicy": {
+    "allOccurrencesAccounted": true,
+    "duplicateRowsAllowed": false,
+    "missingDefinitionTaxonomyAllowed": false,
+    "missingOccurrenceTaxonomyAllowed": false,
+    "missingStage32DisplayAllowed": false,
+    "nonPickupHeroRelationsInPickupSummaryAllowed": false,
+    "wishCandidateListsMustRemainDeferred": true,
+    "stage2CanonicalIdsMutable": false,
+    "stage31AssetIdsMutable": false
+  },
+  "outputs": {
+    "consumer": "data/generated/banner-stage3-3-basic-table-consumer.v1.json",
+    "summary": "data/validation/banner-stage3-3-basic-table-summary.v1.json"
+  },
+  "nextStage": "Banner Stage 3-4 Wish consumer"
+}
