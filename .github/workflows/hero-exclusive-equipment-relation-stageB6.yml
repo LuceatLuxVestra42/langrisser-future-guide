@@ -1,0 +1,37 @@
+name: Hero Exclusive Equipment Relation Stage B-6
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-exclusive-equipment-relation-stageB6.yml'
+      - 'scripts/validate_hero_exclusive_equipment_relation_stageB6.cjs'
+      - 'data/contracts/hero-exclusive-equipment-relation-consumer-contract.v1.json'
+      - 'data/validation/hero-exclusive-equipment-relation-stageB5-index-summary.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
+      - 'data/generated/hero-page-stage5-2-exclusive-central.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-consumers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate and admit Stage B-6 consumers
+        run: node scripts/validate_hero_exclusive_equipment_relation_stageB6.cjs
+      - name: Persist Stage B-6 admission
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/hero-exclusive-equipment-consumer-admission.v1.json data/validation/hero-exclusive-equipment-relation-stageB6-consumer-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No Stage B-6 changes"
+            exit 0
+          fi
+          git commit -m "Freeze Stage B-6 exclusive equipment consumer admission"
+          git push
