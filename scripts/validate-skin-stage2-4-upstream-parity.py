@@ -170,8 +170,8 @@ def main():
             "heroKeyspace": "data/hero-name-master.v1.json"
         },
         "verificationBoundary": {
-            "heroStage55DirectRead": false,
-            "rawConfigDataRead": false,
+            "heroStage55DirectRead": False,
+            "rawConfigDataRead": False,
             "reason": "Skin Stage 1-2 is the accepted frozen proof of Hero Stage 5-5 membership/owner/sourceOrder parity; Stage 2-4 reuses that checkpoint and verifies Stage 2-3 against Stage 1 canonical."
         },
         "metrics": {
