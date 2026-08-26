@@ -102,22 +102,22 @@ type HeroDetailSource = {
         jobLevelUpHeroLevel: number;
       }>;
       heroDirectSkills: SourceSkill[];
-      talent: {
-        status: string;
-        selectionRule: string;
-        initialStar: number;
-        starProgression: Array<{
-          star: number;
-          skillId: number;
-          skill: SourceSkill;
-        }>;
-      };
-      awakening: {
-        status: string;
-        awakenId: number | null;
-        level2SkillId: number | null;
-        skill: SourceSkill | null;
-      };
+    };
+    talent: {
+      status: string;
+      selectionRule: string;
+      initialStar: number;
+      starProgression: Array<{
+        star: number;
+        skillId: number;
+        skill: SourceSkill;
+      }>;
+    };
+    awakening: {
+      status: string;
+      awakenId: number | null;
+      level2SkillId: number | null;
+      skill: SourceSkill | null;
     };
     soldierModifiers: {
       status: string;
@@ -366,20 +366,20 @@ function projectHero(source: HeroDetailSource) {
         jobLevelUpHeroLevel: record.jobLevelUpHeroLevel,
       })),
       talent: {
-        status: source.normal.skills.talent.status,
-        selectionRule: source.normal.skills.talent.selectionRule,
-        initialStar: source.normal.skills.talent.initialStar,
-        starProgression: source.normal.skills.talent.starProgression.map((entry) => ({
+        status: source.normal.talent.status,
+        selectionRule: source.normal.talent.selectionRule,
+        initialStar: source.normal.talent.initialStar,
+        starProgression: source.normal.talent.starProgression.map((entry) => ({
           star: entry.star,
           skill: projectSkill(entry.skill),
         })),
       },
       awakening: {
-        status: source.normal.skills.awakening.status,
+        status: source.normal.awakening.status,
         skill:
-          source.normal.skills.awakening.skill === null
+          source.normal.awakening.skill === null
             ? null
-            : projectSkill(source.normal.skills.awakening.skill),
+            : projectSkill(source.normal.awakening.skill),
       },
       soldierModifiers: source.normal.soldierModifiers,
     },
