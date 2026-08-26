@@ -52,7 +52,7 @@ const categories: Category[] = [
   { title: "캐릭터", image: cardCharacter, to: "/" },
   { title: "장비", image: cardEquip, to: "/equipment" },
   { title: "스킨", image: cardSkin, to: "/" },
-  { title: "용병", image: cardMerc, to: "/" },
+  { title: "용병", image: cardMerc, to: "/soldiers" },
   { title: "이벤트", image: cardEvent, to: "/", imageClassName: "h-[132px] w-[132px]" },
   { title: "시공", image: cardRift, to: "/" },
   { title: "서밋 신규맵", image: cardSummit, to: "/", imageClassName: "h-[132px] w-[132px]" },
