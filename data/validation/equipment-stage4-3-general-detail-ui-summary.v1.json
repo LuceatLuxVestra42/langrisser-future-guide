@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "stage": "4-3",
+  "status": "PASS",
+  "finalStageStatus": "STAGE4_3_GENERAL_DETAIL_UI_READY",
+  "upstream": {
+    "stage40": "FROZEN",
+    "stage42": "STAGE4_2_GENERAL_LIST_UI_READY",
+    "stage34": "COMPLETE_WITH_REVIEW"
+  },
+  "route": {
+    "path": "/equipment/$equipmentId",
+    "routeKey": "equipmentId",
+    "generalDetailCount": 206,
+    "uniqueEquipmentIds": 206,
+    "exclusiveBranchDeferredTo": "4-4"
+  },
+  "stats": {
+    "maxLevel": 50,
+    "oneProperty": 1,
+    "twoProperties": 205,
+    "frontendRecalculation": false,
+    "displayField": "maxValue"
+  },
+  "effects": {
+    "sourceTextPreserved": true,
+    "segmentParityChecked": true,
+    "semanticRewrite": false
+  },
+  "restrictions": {
+    "modeCounts": {
+      "army-plus-job-exceptions": 155,
+      "unrestricted-by-fields": 47,
+      "army-only": 4
+    },
+    "armyLabelsFrom": "data/generated/equipment_stage2_6_restrictions.json#armyIndex",
+    "specialJobLabelsFrom": "data/generated/equipment_stage2_6_job_index.json#jobs",
+    "semantics": "structural-inference",
+    "confidence": 0.99,
+    "runtimeDirectProofClaimed": false
+  },
+  "acquisition": {
+    "verifiedReleaseGroupDatesByTab": {
+      "1": 0,
+      "2": 80,
+      "3": 0
+    },
+    "chronologyInvented": false,
+    "tab3ReviewPreserved": true
+  },
+  "naming": {
+    "fallback": "nameKr ?? nameCn",
+    "verified": 147,
+    "review": 59,
+    "reviewPromoted": false
+  },
+  "assets": {
+    "equipmentIconBound": false,
+    "reason": "No web-served Equipment icon asset set exists yet; Stage 4-3 preserves the Stage 3 icon field without fabricating a public asset mapping."
+  },
+  "sourceDiscipline": {
+    "detailSource": "data/generated/equipment_stage3_4_general_detail.json",
+    "supportingRestrictionIndexesOnly": true,
+    "directConfigDataReads": false,
+    "statsRecalculated": false,
+    "effectTextRewritten": false,
+    "acquisitionReclassified": false
+  },
+  "build": {
+    "command": "bun run build",
+    "pass": true
+  },
+  "nextStage": "4-4 exclusive equipment UI + Hero ownership display"
+}
