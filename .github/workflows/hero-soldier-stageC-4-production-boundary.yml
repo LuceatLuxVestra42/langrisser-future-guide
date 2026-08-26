@@ -1,0 +1,83 @@
+name: Hero-Soldier Stage C-4 Production Boundary
+
+on:
+  push:
+    branches:
+      - work/hero-soldier-stageC-4
+    paths:
+      - 'data/contracts/hero-soldier-integration-stageC-4-production-boundary.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-*.json'
+      - 'data/generated/hero-soldier-relations.v1.json'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/hero-soldier-by-soldier.v1.json'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/soldier-stage6-1-full-records.v1.json'
+      - 'scripts/validate-hero-soldier-stageC-4-production-boundary.cjs'
+      - 'src/**'
+      - '.github/workflows/hero-soldier-stageC-4-production-boundary.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/hero-soldier-integration-stageC-4-production-boundary.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-*.json'
+      - 'data/generated/hero-soldier-relations.v1.json'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/hero-soldier-by-soldier.v1.json'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/soldier-stage6-1-full-records.v1.json'
+      - 'scripts/validate-hero-soldier-stageC-4-production-boundary.cjs'
+      - 'src/**'
+      - '.github/workflows/hero-soldier-stageC-4-production-boundary.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-production-boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate C-4 production boundary
+        run: node scripts/validate-hero-soldier-stageC-4-production-boundary.cjs
+
+      - name: Show C-4 summary
+        if: always()
+        run: |
+          if [ -f data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json ]; then
+            node -e "const x=require('./data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json'); console.log(JSON.stringify({status:x.status,completion:x.completion,summary:x.summary,decision:x.decision},null,2))"
+          fi
+
+      - name: Upload C-4 diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-soldier-stageC-4-production-boundary
+          path: data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json
+          if-no-files-found: ignore
+
+      - name: Freeze C-4 output on work branch
+        if: github.event_name == 'push' && success()
+        run: |
+          if git diff --quiet -- data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json; then
+            echo 'C-4 output already frozen.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json
+          git commit -m 'Freeze Hero-Soldier Stage C-4 production boundary PASS'
+          git push
+
+      - name: Verify frozen C-4 output on PR
+        if: github.event_name == 'pull_request' && success()
+        run: git diff --exit-code -- data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json
