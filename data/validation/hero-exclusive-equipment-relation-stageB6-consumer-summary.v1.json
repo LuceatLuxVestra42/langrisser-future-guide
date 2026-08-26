@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "stage": "B-6",
+  "checkpoint": "consumer-admission",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/hero-exclusive-equipment-relation-consumer-contract.v1.json",
+  "manifest": "data/generated/hero-exclusive-equipment-consumer-admission.v1.json",
+  "relationSet": {
+    "gitBlobSha": "33caa16212a5a71195015e05c815024fb62e6be6"
+  },
+  "checks": {
+    "b5Gate": {
+      "pass": true
+    },
+    "relationBlobPin": {
+      "pass": true
+    },
+    "heroPopulation": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "byHeroCoverage": {
+      "keys": 167,
+      "pairs": 167,
+      "expected": 167,
+      "pass": true
+    },
+    "heroAbsenceSemantics": {
+      "expected": 100,
+      "actual": 100,
+      "pass": true
+    },
+    "byEquipmentCoverage": {
+      "keys": 167,
+      "pairs": 167,
+      "expected": 167,
+      "pass": true
+    },
+    "equipmentMetadataCoverage": {
+      "expected": 167,
+      "actual": 167,
+      "missing": 0,
+      "extra": 0,
+      "pass": true
+    },
+    "generalEquipmentAdmitted": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "canonicalOwnerHeroResolution": {
+      "expectedUnknown": 0,
+      "actualUnknown": 0,
+      "pass": true
+    },
+    "legacyOwnershipPairParity": {
+      "expectedMismatch": 0,
+      "actualMismatch": 0,
+      "pass": true
+    },
+    "legacyNotReleasedParity": {
+      "expectedMismatch": 0,
+      "actualMismatch": 0,
+      "pass": true
+    },
+    "directionalParity": {
+      "pass": true
+    },
+    "leonFixture": {
+      "pass": true
+    },
+    "newOwnershipPairCopy": {
+      "expected": false,
+      "actual": false,
+      "pass": true
+    },
+    "hardErrors": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  },
+  "diagnostics": {
+    "equipmentMissing": [],
+    "equipmentExtra": [],
+    "generalLeak": [],
+    "legacyMissing": [],
+    "legacyExtra": [],
+    "absenceMissing": [],
+    "absenceExtra": [],
+    "errors": []
+  },
+  "decision": "B-6 PASS / COMPLETE. Hero Stage 5-2 ownership is admitted to byHeroId and Equipment-page ownership is admitted to byEquipmentId; legacy direct SkillHero output is parity-only evidence. Stage B is complete."
+}

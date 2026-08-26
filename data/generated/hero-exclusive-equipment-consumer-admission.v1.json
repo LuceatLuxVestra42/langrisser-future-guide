@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "stage": "B-6",
+  "status": "COMPLETE",
+  "semanticAuthority": {
+    "path": "data/generated/hero-exclusive-equipment-relations.v1.json",
+    "gitBlobSha": "33caa16212a5a71195015e05c815024fb62e6be6"
+  },
+  "consumerLookupAuthority": {
+    "hero": {
+      "path": "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+      "gitBlobSha": "fcc9deb514755dc9df9de2e40e96685f68d08fba",
+      "indexField": "byHeroId",
+      "lookup": "heroId -> equipmentIds[]",
+      "metadataJoin": "data/generated/equipment_stage3_5_exclusive_consumer.json by equipmentId"
+    },
+    "equipment": {
+      "path": "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+      "gitBlobSha": "a49c3a549fd1d97fff0321f45fe1bc94526e1f8d",
+      "indexField": "byEquipmentId",
+      "lookup": "equipmentId -> heroIds[]",
+      "metadataJoin": "data/hero-name-master.v1.json by heroId"
+    }
+  },
+  "legacyTransition": {
+    "path": "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
+    "classification": "PARITY_ONLY_LEGACY_SNAPSHOT",
+    "ownershipAuthority": false,
+    "centralDisciplineUnchanged": true
+  },
+  "boundaries": {
+    "generalEquipmentAdmitted": false,
+    "directConfigDataOwnershipInPageConsumers": false,
+    "heuristicOwnership": false,
+    "newOwnershipPairCopy": false
+  },
+  "summary": {
+    "heroCount": 267,
+    "heroOwnershipKeys": 167,
+    "heroesWithoutExclusiveKey": 100,
+    "equipmentOwnershipKeys": 167,
+    "ownershipPairCount": 167,
+    "equipmentMetadataCoverage": 167,
+    "legacyPairParityMismatch": 0,
+    "legacyAbsenceParityMismatch": 0,
+    "hardErrorCount": 0
+  }
+}
