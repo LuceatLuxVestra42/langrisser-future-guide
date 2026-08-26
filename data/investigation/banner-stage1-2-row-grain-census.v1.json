@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-2",
+  "status": "ROW_GRAIN_CENSUS_COMPLETE_WITH_SOURCE_CONFLICT",
+  "purpose": "Determine what one current Korean banner schedule row represents, without finalizing bannerId, bannerType, canonical definition schema, or relation schema.",
+  "inputs": {
+    "primaryPopulation": "data/kr-banner-schedule.v1.json",
+    "populationRecordCount": 94,
+    "rawCrosscheck": "data/configdata/ConfigDataCardPoolInfo.json",
+    "preservedCheckpoint": "data/banner-overrides.v1.json",
+    "existingValidator": "scripts/validate_kr_schedule.cjs"
+  },
+  "rowGrainDecision": {
+    "currentScheduleRowGrain": "KR_BANNER_OCCURRENCE_DISPLAY_ROW",
+    "confidence": 0.99,
+    "meaning": "One record represents one banner/summon item displayed for one Korean schedule date and display position. It is an occurrence/display row, not a unique canonical banner definition.",
+    "currentRowIdentity": {
+      "field": "recordKey",
+      "observedPattern": "kr-banner:YYYYMMDD:displayOrder or manual occurrence-specific key",
+      "role": "CURRENT_SCHEDULE_ROW_KEY_ONLY",
+      "canonicalBannerId": false
+    },
+    "occurrenceFields": [
+      "krDisplayDate",
+      "displayOrder",
+      "scheduleType",
+      "displayImageType",
+      "displayImageFile",
+      "displayImageStatus",
+      "manualOverride",
+      "matchStatus",
+      "matchBasis",
+      "note"
+    ],
+    "sourceDefinitionReferenceFields": [
+      "sourceRecordKey",
+      "bannerCode",
+      "patchCode",
+      "slotCode",
+      "sourceType",
+      "nameCn"
+    ],
+    "importantBoundary": "sourceRecordKey/cardPool identity and the dated Korean occurrence row are different data units and must not be collapsed into one canonical identifier."
+  },
+  "evidence": [
+    {
+      "evidenceId": "same-cardpool-multiple-occurrences",
+      "status": "VERIFIED",
+      "records": [
+        {
+          "recordKey": "kr-banner:20261028:1",
+          "krDisplayDate": "2026-10-28",
+          "bannerCode": "9702",
+          "sourceRecordKey": "cardpool:370",
+          "scheduleType": "dual"
+        },
+        {
+          "recordKey": "kr-banner:20270317:2",
+          "krDisplayDate": "2027-03-17",
+          "bannerCode": "9702",
+          "sourceRecordKey": "cardpool:370",
+          "scheduleType": "dual"
+        }
+      ],
+      "conclusion": "Multiple dated Korean rows can point to the same CardPool source record. Therefore a schedule row cannot be the CardPool/banner definition itself."
+    },
+    {
+      "evidenceId": "source-type-vs-occurrence-type",
+      "status": "VERIFIED",
+      "examples": [
+        {
+          "recordKey": "kr-banner:20261007:9",
+          "bannerCode": "5701",
+          "sourceRecordKey": "cardpool:213",
+          "sourceType": "new",
+          "scheduleType": "single",
+          "meaning": "A source that originated as a new single-hero pool is displayed as a single rerun occurrence."
+        },
+        {
+          "recordKey": "kr-banner:20270331:3",
+          "bannerCode": "5701",
+          "sourceRecordKey": "cardpool:213",
+          "sourceType": "new",
+          "scheduleType": "single",
+          "meaning": "The same source pool can produce another later single-rerun occurrence row."
+        }
+      ],
+      "conclusion": "sourceType describes source-pool origin/classification while scheduleType can describe Korean occurrence/display behavior. They must remain separate during Stage 1."
+    },
+    {
+      "evidenceId": "manual-occurrence-without-cardpool",
+      "status": "VERIFIED",
+      "examples": [
+        {
+          "recordKey": "kr-manual-wish-langrisser-1-5-20260909",
+          "krDisplayDate": "2026-09-09",
+          "sourceRecordKey": null,
+          "bannerCode": null,
+          "scheduleType": "wish",
+          "manualOverride": true
+        },
+        {
+          "recordKey": "kr-manual-wish-langrisser-1-5-20270317",
+          "krDisplayDate": "2027-03-17",
+          "sourceRecordKey": null,
+          "bannerCode": null,
+          "scheduleType": "wish",
+          "manualOverride": true
+        }
+      ],
+      "conclusion": "A valid Korean occurrence row can exist without a numeric bannerCode or CardPool sourceRecordKey. Occurrence identity therefore cannot depend on either field being non-null."
+    },
+    {
+      "evidenceId": "date-and-display-order",
+      "status": "VERIFIED_BY_EXISTING_VALIDATOR",
+      "knownFact": "The current validator checks 94 total records and verifies no duplicate displayOrder within the same krDisplayDate.",
+      "conclusion": "krDisplayDate plus displayOrder are presentation/occurrence coordinates, not source definition identity."
+    }
+  ],
+  "sourceConflicts": [
+    {
+      "status": "SOURCE_CONFLICT",
+      "severity": "HIGH_FOR_RELATION_CENSUS_LOW_FOR_ROW_GRAIN_DECISION",
+      "scheduleRecordKey": "kr-banner:20270331:4",
+      "scheduleData": {
+        "krDisplayDate": "2027-03-31",
+        "displayOrder": 4,
+        "bannerCode": "7001",
+        "sourceRecordKey": "cardpool:263",
+        "nameCn": "寒龙冰棘之征",
+        "heroesCn": ["冰渊凌御者"]
+      },
+      "rawConfigData": {
+        "cardpool:263": {
+          "nameCn": "猩红圣光之复颂",
+          "adsImage": "UI/SelectCard9_ABS/Banner_6902.png",
+          "upHeroList": [99168, 122]
+        },
+        "cardpool:265": {
+          "nameCn": "寒龙冰棘之征",
+          "toggleImage": "UI/Icon/SelectCardHero_ABS/Icon_7001.png",
+          "upHeroList": [99225]
+        }
+      },
+      "comparisonRecord": {
+        "recordKey": "kr-banner:20261007:8",
+        "bannerCode": "7001",
+        "sourceRecordKey": "cardpool:265",
+        "nameCn": "寒龙冰棘之征"
+      },
+      "decision": "Do not auto-correct in Stage 1-2. Preserve as SOURCE_CONFLICT and require explicit relation correction/validation in Stage 1-4 or a dedicated repair step before production consumers."
+    }
+  ],
+  "rowClasses": [
+    {
+      "class": "SOURCE_LINKED_OCCURRENCE",
+      "definition": "Dated display row with sourceRecordKey and usually bannerCode.",
+      "examples": ["kr-banner:20260902:1", "kr-banner:20261028:1", "kr-banner:20270317:2"]
+    },
+    {
+      "class": "MANUAL_OCCURRENCE",
+      "definition": "Dated display row managed manually and allowed to have null sourceRecordKey/bannerCode.",
+      "examples": ["kr-manual-wish-20260902", "kr-manual-wish-langrisser-1-5-20260909", "kr-manual-wish-langrisser-1-5-20270317"]
+    },
+    {
+      "class": "SOURCE_CONFLICT_OCCURRENCE",
+      "definition": "Dated display row whose recorded source linkage conflicts with raw ConfigData evidence.",
+      "examples": ["kr-banner:20270331:4"]
+    }
+  ],
+  "notDecided": [
+    "Final canonical banner definition grain",
+    "Final occurrence primary key",
+    "Whether bannerCode becomes any canonical key",
+    "Final bannerType enum",
+    "Definition-to-occurrence cardinality beyond the verified many-occurrences-to-one-source example",
+    "Whether source CardPool records need a separate normalized bannerDefinition layer",
+    "Full sourceRecordKey correctness across all 94 rows",
+    "Date recurrence rules",
+    "Asset ownership grain"
+  ],
+  "stage1_2Completion": {
+    "all94RowsCoveredByCurrentScheduleGrainRule": true,
+    "rawLinkageExhaustivelyRevalidated": false,
+    "reasonRawLinkageNotExhaustive": "Stage 1-2 classifies row grain. Full relation correctness belongs to Stage 1-4. A representative raw crosscheck was sufficient to confirm grain and exposed one explicit source conflict.",
+    "unknownRowGrainCount": 0,
+    "sourceConflictCountDiscovered": 1,
+    "finalBannerSchemaCreated": false
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-3",
+    "task": "Provisional banner taxonomy",
+    "consume": [
+      "Treat every current kr-banner-schedule record as an occurrence/display row.",
+      "Keep sourceType and scheduleType distinct.",
+      "Keep MANUAL occurrences valid without sourceRecordKey/bannerCode.",
+      "Carry kr-banner:20270331:4 forward as SOURCE_CONFLICT; do not silently repair it."
+    ]
+  }
+}
