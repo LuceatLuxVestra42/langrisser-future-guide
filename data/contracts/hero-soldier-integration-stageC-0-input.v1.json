@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-integration-stageC-0-input/v1",
+  "stage": "C-0",
+  "status": "FROZEN",
+  "purpose": "Freeze the three authoritative inputs for Hero-Soldier integration QA before any cross-consumer pair comparison. Stage C must validate downstream consumers only and must not reopen Hero-Soldier relation semantics or re-derive membership from ConfigData.",
+  "repositoryBaseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "branchBase": "main",
+    "observedHeadCommit": "bf3b4468e0133dfe7e5e3c62eb0b15b1fed1135c"
+  },
+  "authoritativeInputs": {
+    "relationLayer": {
+      "finalCheckpoint": {
+        "path": "data/validation/hero-soldier-relation-stageA-final.v1.json",
+        "gitBlobSha": "963dd9933d2e28e1bf66e663878c60e1c61198a0",
+        "requiredStatus": "PASS_ACCEPTED"
+      },
+      "canonicalRelationSet": {
+        "path": "data/generated/hero-soldier-relations.v1.json",
+        "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "expectedPairCount": 5977
+      },
+      "byHero": {
+        "path": "data/generated/hero-soldier-by-hero.v1.json",
+        "gitBlobSha": "e613bd05b0e7173734834cba5d8cfbff973298ad",
+        "expectedKeyCount": 267
+      },
+      "bySoldier": {
+        "path": "data/generated/hero-soldier-by-soldier.v1.json",
+        "gitBlobSha": "ff9d8a881c03b6e0f2a196e12f37cd2e28e3e251",
+        "expectedKeyCount": 224
+      }
+    },
+    "heroFinal": {
+      "finalCheckpoint": {
+        "path": "data/validation/hero-stage6-4-final.v1.json",
+        "gitBlobSha": "9ae03d2dcc0660aae9c28900345212426b2a4dd1",
+        "requiredStatus": "PASS_WITH_REVIEW",
+        "requiredCompletion": "COMPLETE",
+        "requiredPipelineStatus": "FINAL_FROZEN"
+      },
+      "manifest": {
+        "path": "data/generated/hero-detail.v1.json",
+        "gitBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66",
+        "expectedHeroCount": 267
+      },
+      "stage63Checkpoint": {
+        "path": "data/validation/hero-stage6-3-final.v1.json",
+        "gitBlobSha": "04c1e841d43e1ec20edd3e5e875b465152c49a56"
+      },
+      "membershipConsumerSnapshot": {
+        "path": "data/generated/hero-page-soldiers-stage5-3.v1.json",
+        "gitBlobSha": "b97beae7aa58c573f16919cf731250bfc359d58e",
+        "sourceByHeroGitBlobSha": "e613bd05b0e7173734834cba5d8cfbff973298ad",
+        "relationSetGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "expectedPairCount": 5977
+      },
+      "finalMembershipField": "data/generated/hero-detail/by-id/{heroId}.json#soldiers.ids"
+    },
+    "soldierFinal": {
+      "finalCheckpoint": {
+        "path": "data/validation/soldier-stage6-7-site-admission.v1.json",
+        "gitBlobSha": "c1f9253ddea94e9f7a4f9c7e1aee9163c3abc3bb",
+        "requiredStatus": "PASS",
+        "requiredAdmissionStatus": "READY_WITH_REVIEW"
+      },
+      "admissionManifest": {
+        "path": "data/generated/soldier-stage6-7-site-admission.v1.json",
+        "gitBlobSha": "f5a8c1c74c00130ac7b9db9b40b76f2d59174f85",
+        "expectedSoldierCount": 224,
+        "expectedPairCount": 5977
+      },
+      "fullRecords": {
+        "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+        "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+      },
+      "reciprocalLinkManifest": {
+        "path": "data/generated/hero-soldier-page-links-stage6-5.v1.json",
+        "gitBlobSha": "52daf5ea15f37a437f796747eb25a126446a1c96",
+        "relationSetGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "expectedPairCount": 5977,
+        "expectedReciprocalMismatchCount": 0
+      },
+      "finalMembershipField": "data/generated/soldier-stage6-1-full-records.v1.json#records[*].heroes"
+    }
+  },
+  "relationSnapshotIdentity": {
+    "canonicalGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+    "aFinal": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+    "heroConsumer": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+    "soldierConsumer": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+    "allEqualRequired": true
+  },
+  "expectedPopulation": {
+    "heroes": 267,
+    "soldiers": 224,
+    "canonicalPairs": 5977
+  },
+  "stageCBoundary": {
+    "allowed": [
+      "Read frozen A-FINAL relation artifacts.",
+      "Read final Hero production manifest and Hero shards.",
+      "Read final Soldier production records and Stage 6 admission artifacts.",
+      "Compare already-materialized membership pairs and ID resolution."
+    ],
+    "forbidden": [
+      "Re-derive Hero-Soldier membership from ConfigData.",
+      "Reopen A-stage relation semantics during Stage C.",
+      "Infer membership from names, ID arithmetic or presentation metadata.",
+      "Patch canonical relation membership from Hero or Soldier page consumers.",
+      "Treat Korean-name, release-date, asset-delivery or route-implementation REVIEW as relation failure."
+    ]
+  },
+  "completionRule": "C-0 passes only when A-FINAL, Hero Stage 6-4 and Soldier Stage 6-7 are all accepted PASS-family checkpoints, their recorded current blobs match the frozen inputs, and the Hero and Soldier consumers both trace to the same canonical relation-set blob SHA."
+}
