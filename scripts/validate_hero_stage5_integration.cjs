@@ -39,7 +39,9 @@ function completionLooksFinal(doc) {
   if (!doc || typeof doc !== 'object') return false;
   const completion = String(doc.completion || '').toUpperCase();
   const status = String(doc.status || '').toUpperCase();
-  return completion.includes('COMPLETE') && !completion.includes('PARTIAL') && !['FAIL', 'BLOCKED', 'REVIEW'].includes(status);
+  if (!completion.includes('COMPLETE')) return false;
+  if (['PARTIAL', 'PENDING', 'IN_PROGRESS'].some(token => completion.includes(token))) return false;
+  return !['FAIL', 'BLOCKED', 'REVIEW'].includes(status);
 }
 
 const scanFiles = [
@@ -70,9 +72,55 @@ function discoverStage(stageNo) {
   };
 }
 
+function finalCheckpointEntry(discovered) {
+  if (!discovered?.finalCheckpointFiles?.length) return null;
+  const preferred = discovered.finalCheckpointFiles.find(p => /validation\/.*final/i.test(p)) || discovered.finalCheckpointFiles[0];
+  return parsedFiles.find(x => x.rel === preferred) || null;
+}
+
+function firstNumber(...values) {
+  for (const value of values) {
+    if (Number.isFinite(Number(value))) return Number(value);
+  }
+  return null;
+}
+
+function checkpointHardErrorCount(doc) {
+  if (!doc || typeof doc !== 'object') return null;
+  if (Number.isFinite(Number(doc?.summary?.hardErrorCount))) return Number(doc.summary.hardErrorCount);
+  if (Array.isArray(doc.hardErrors)) return doc.hardErrors.length;
+  if (Array.isArray(doc.errors)) return doc.errors.length;
+  return null;
+}
+
+function describeDiscoveredBlock(stage, title, discovered) {
+  const entry = finalCheckpointEntry(discovered);
+  if (!entry) return null;
+  const doc = entry.doc;
+  return {
+    stage,
+    title,
+    status: doc?.status ?? null,
+    completion: doc?.completion ?? null,
+    checkpoint: entry.rel,
+    canonicalHeroes: firstNumber(
+      doc?.summary?.canonicalHeroCount,
+      doc?.summary?.outputHeroCount,
+      doc?.gates?.canonicalHeroCoverage?.canonicalHeroes,
+    ),
+    hardErrorCount: checkpointHardErrorCount(doc),
+  };
+}
+
 const stage51 = discoverStage(1);
 const stage52 = discoverStage(2);
 const stage54 = discoverStage(4);
+
+const discoveredDefs = [
+  { stage: '5-1', title: 'Bond / fetter block', discovered: stage51 },
+  { stage: '5-2', title: 'Exclusive equipment + central-law block', discovered: stage52 },
+  { stage: '5-4', title: 'SP block', discovered: stage54 },
+];
 
 const stage53Path = 'data/validation/hero-page-stage5-3-final.v1.json';
 const stage55Path = 'data/validation/hero-page-stage5-5-5-final.v1.json';
@@ -89,26 +137,40 @@ if (stage55?.summary?.canonicalHeroCount !== CANONICAL_HERO_COUNT) hardErrors.pu
 if (stage55?.summary?.integratedOutputRecordCount !== CANONICAL_HERO_COUNT) hardErrors.push('Stage 5-5 integrated output count drifted from 267.');
 if ((stage55?.summary?.failedCheckCount ?? 1) !== 0) hardErrors.push('Stage 5-5 contains failed final-gate checks.');
 
+const discoveredCompletedBlocks = [];
+for (const def of discoveredDefs) {
+  if (!def.discovered.hasFinalCheckpoint) continue;
+  const block = describeDiscoveredBlock(def.stage, def.title, def.discovered);
+  if (!block) {
+    hardErrors.push(`Stage ${def.stage} reported a final checkpoint but its document could not be loaded.`);
+    continue;
+  }
+  if (block.canonicalHeroes !== null && block.canonicalHeroes !== CANONICAL_HERO_COUNT) {
+    hardErrors.push(`Stage ${def.stage} canonical Hero count drifted from 267.`);
+  }
+  if (block.hardErrorCount !== null && block.hardErrorCount !== 0) {
+    hardErrors.push(`Stage ${def.stage} final checkpoint contains hard errors.`);
+  }
+  discoveredCompletedBlocks.push(block);
+}
+
 const blockers = [];
-for (const [stage, title, discovered] of [
-  ['5-1', 'Bond / fetter block', stage51],
-  ['5-2', 'Exclusive equipment + central-law block', stage52],
-  ['5-4', 'SP block', stage54],
-]) {
-  if (!discovered.hasFinalCheckpoint) {
+for (const def of discoveredDefs) {
+  if (!def.discovered.hasFinalCheckpoint) {
     blockers.push({
-      stage,
-      title,
-      reason: discovered.candidateFiles.length
+      stage: def.stage,
+      title: def.title,
+      reason: def.discovered.candidateFiles.length
         ? 'Hero-stage candidate files exist, but no frozen COMPLETE final checkpoint was discovered.'
         : 'No frozen Hero-stage contract/output/final checkpoint was discovered in data/contracts, data/generated, data/validation, or top-level data artifacts.',
-      discoveredCandidateFiles: discovered.candidateFiles,
+      discoveredCandidateFiles: def.discovered.candidateFiles,
       requiredForStage5Close: true,
     });
   }
 }
 
 const completedBlocks = [
+  ...discoveredCompletedBlocks,
   {
     stage: '5-3',
     title: 'Usable Soldiers',
@@ -133,7 +195,12 @@ const completedBlocks = [
     unencodedSkinAcquisitionCount: stage55?.summary?.unencodedSkinAcquisitionCount ?? null,
     hardBlockingDataGaps: stage55?.summary?.hardBlockingDataGaps ?? null,
   },
-];
+].sort((a, b) => a.stage.localeCompare(b.stage, undefined, { numeric: true }));
+
+const completedStageIds = completedBlocks.map(x => x.stage);
+const completedKnownCanonicalCounts = completedBlocks
+  .filter(x => Number.isFinite(Number(x.canonicalHeroes)))
+  .map(x => ({ stage: x.stage, canonicalHeroes: Number(x.canonicalHeroes) }));
 
 const crossBlockChecks = [
   {
@@ -145,12 +212,9 @@ const crossBlockChecks = [
     },
   },
   {
-    name: '5-3 and 5-5 both preserve 267 canonical Hero keys',
-    pass: stage53?.gates?.canonicalHeroCoverage?.generatedHeroKeys === CANONICAL_HERO_COUNT && stage55?.summary?.integratedOutputRecordCount === CANONICAL_HERO_COUNT,
-    detail: {
-      stage53GeneratedHeroKeys: stage53?.gates?.canonicalHeroCoverage?.generatedHeroKeys ?? null,
-      stage55OutputRecords: stage55?.summary?.integratedOutputRecordCount ?? null,
-    },
+    name: 'All completed blocks with a declared canonical Hero count preserve 267 Heroes',
+    pass: completedKnownCanonicalCounts.every(x => x.canonicalHeroes === CANONICAL_HERO_COUNT),
+    detail: completedKnownCanonicalCounts,
   },
   {
     name: 'Completed blocks have no hard structural failures',
@@ -189,18 +253,25 @@ const completion = hardErrors.length
     ? 'STAGE_5_INTEGRATION_REVIEW_COMPLETE_BLOCKED_BY_UNFINISHED_BLOCKS'
     : 'STAGE_5_COMPLETE';
 
+const blockerInstructions = {
+  '5-1': '5-1: build and freeze the bond/fetter Hero block.',
+  '5-2': '5-2: build and freeze exclusive-equipment + central-law presence/display block, preserving 미출시 states.',
+  '5-4': '5-4: build and freeze SP existence/job/skill/stat/soldier/mission integration, consuming frozen Stage 4 and Stage 5-3 where appropriate.',
+};
+
+const remainingStageIds = blockers.map(x => x.stage);
 const result = {
   version: 1,
   stage: 'hero-page-5',
   checkpoint: 'stage-wide-integration-review',
   status,
   completion,
-  purpose: 'Stage-wide integration audit for Hero Stage 5. Completed sub-blocks are cross-checked without fabricating missing 5-1/5-2/5-4 outputs.',
+  purpose: 'Stage-wide integration audit for Hero Stage 5. Only frozen COMPLETE final checkpoints are promoted; pending semantic/retrace checkpoints remain non-final.',
   summary: {
     plannedBlockCount: 5,
-    completedBlockCount: 2,
-    completedBlocks: ['5-3', '5-5'],
-    blockedBlocks: blockers.map(x => x.stage),
+    completedBlockCount: completedStageIds.length,
+    completedBlocks: completedStageIds,
+    blockedBlocks: remainingStageIds,
     canonicalHeroCount: CANONICAL_HERO_COUNT,
     completedCrossBlockCheckCount: crossBlockChecks.length,
     passedCrossBlockCheckCount: crossBlockChecks.filter(x => x.pass).length,
@@ -209,6 +280,12 @@ const result = {
     stage5ReadyToClose: status === 'PASS',
   },
   completedBlocks,
+  blockDiscovery: {
+    '5-1': stage51,
+    '5-2': stage52,
+    '5-4': stage54,
+  },
+  // Backward-compatible alias retained for existing readers.
   unfinishedBlockDiscovery: {
     '5-1': stage51,
     '5-2': stage52,
@@ -219,12 +296,10 @@ const result = {
   hardErrors,
   nonBlockingFollowups,
   decision: blockers.length
-    ? 'Do not declare Hero Stage 5 complete. Preserve frozen 5-3 and 5-5 inputs, finish 5-1, 5-2 and 5-4 independently, then rerun this integration gate.'
+    ? `Do not declare Hero Stage 5 complete. Preserve frozen ${completedStageIds.join(', ')} inputs; finish ${remainingStageIds.join(', ')} independently, then rerun this integration gate.`
     : 'Hero Stage 5 may be closed and passed to the next page-composition stage.',
   recommendedWorkOrder: blockers.length ? [
-    '5-1: build and freeze the bond/fetter Hero block.',
-    '5-2: build and freeze exclusive-equipment + central-law presence/display block, preserving 미출시 states.',
-    '5-4: build and freeze SP existence/job/skill/stat/soldier/mission integration, consuming frozen Stage 4 and Stage 5-3 where appropriate.',
+    ...remainingStageIds.map(stage => blockerInstructions[stage]).filter(Boolean),
     'Rerun Stage 5 integration review and close Stage 5 only when all five block checkpoints are present and compatible.',
   ] : [],
 };

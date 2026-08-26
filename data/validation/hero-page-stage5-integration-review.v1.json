@@ -4,11 +4,12 @@
   "checkpoint": "stage-wide-integration-review",
   "status": "BLOCKED",
   "completion": "STAGE_5_INTEGRATION_REVIEW_COMPLETE_BLOCKED_BY_UNFINISHED_BLOCKS",
-  "purpose": "Stage-wide integration audit for Hero Stage 5. Completed sub-blocks are cross-checked without fabricating missing 5-1/5-2/5-4 outputs.",
+  "purpose": "Stage-wide integration audit for Hero Stage 5. Only frozen COMPLETE final checkpoints are promoted; pending semantic/retrace checkpoints remain non-final.",
   "summary": {
     "plannedBlockCount": 5,
-    "completedBlockCount": 2,
+    "completedBlockCount": 3,
     "completedBlocks": [
+      "5-1",
       "5-3",
       "5-5"
     ],
@@ -24,6 +25,15 @@
     "stage5ReadyToClose": false
   },
   "completedBlocks": [
+    {
+      "stage": "5-1",
+      "title": "Bond / fetter block",
+      "status": "PASS",
+      "completion": "COMPLETE",
+      "checkpoint": "data/validation/hero-page-stage5-1-final.v1.json",
+      "canonicalHeroes": 267,
+      "hardErrorCount": 0
+    },
     {
       "stage": "5-3",
       "title": "Usable Soldiers",
@@ -54,6 +64,29 @@
       "hardBlockingDataGaps": 0
     }
   ],
+  "blockDiscovery": {
+    "5-1": {
+      "candidateFiles": [
+        "data/generated/hero-page-stage5-1-bonds-final.v1.json",
+        "data/validation/hero-page-stage5-1-final.v1.json",
+        "data/validation/hero-page-stage5-1-retrace-semantic.v1.json"
+      ],
+      "finalCheckpointFiles": [
+        "data/validation/hero-page-stage5-1-final.v1.json"
+      ],
+      "hasFinalCheckpoint": true
+    },
+    "5-2": {
+      "candidateFiles": [],
+      "finalCheckpointFiles": [],
+      "hasFinalCheckpoint": false
+    },
+    "5-4": {
+      "candidateFiles": [],
+      "finalCheckpointFiles": [],
+      "hasFinalCheckpoint": false
+    }
+  },
   "unfinishedBlockDiscovery": {
     "5-1": {
       "candidateFiles": [
@@ -62,8 +95,7 @@
         "data/validation/hero-page-stage5-1-retrace-semantic.v1.json"
       ],
       "finalCheckpointFiles": [
-        "data/validation/hero-page-stage5-1-final.v1.json",
-        "data/validation/hero-page-stage5-1-retrace-semantic.v1.json"
+        "data/validation/hero-page-stage5-1-final.v1.json"
       ],
       "hasFinalCheckpoint": true
     },
@@ -88,12 +120,22 @@
       }
     },
     {
-      "name": "5-3 and 5-5 both preserve 267 canonical Hero keys",
+      "name": "All completed blocks with a declared canonical Hero count preserve 267 Heroes",
       "pass": true,
-      "detail": {
-        "stage53GeneratedHeroKeys": 267,
-        "stage55OutputRecords": 267
-      }
+      "detail": [
+        {
+          "stage": "5-1",
+          "canonicalHeroes": 267
+        },
+        {
+          "stage": "5-3",
+          "canonicalHeroes": 267
+        },
+        {
+          "stage": "5-5",
+          "canonicalHeroes": 267
+        }
+      ]
     },
     {
       "name": "Completed blocks have no hard structural failures",
@@ -140,9 +182,8 @@
       "blockingStage5Integration": false
     }
   ],
-  "decision": "Do not declare Hero Stage 5 complete. Preserve frozen 5-3 and 5-5 inputs, finish 5-1, 5-2 and 5-4 independently, then rerun this integration gate.",
+  "decision": "Do not declare Hero Stage 5 complete. Preserve frozen 5-1, 5-3, 5-5 inputs; finish 5-2, 5-4 independently, then rerun this integration gate.",
   "recommendedWorkOrder": [
-    "5-1: build and freeze the bond/fetter Hero block.",
     "5-2: build and freeze exclusive-equipment + central-law presence/display block, preserving 미출시 states.",
     "5-4: build and freeze SP existence/job/skill/stat/soldier/mission integration, consuming frozen Stage 4 and Stage 5-3 where appropriate.",
     "Rerun Stage 5 integration review and close Stage 5 only when all five block checkpoints are present and compatible."
