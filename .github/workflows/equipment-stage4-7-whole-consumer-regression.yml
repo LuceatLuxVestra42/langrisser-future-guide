@@ -62,6 +62,10 @@ jobs:
 
           git commit -m "Freeze Equipment Stage 4-7 whole consumer regression checkpoint"
 
+          # Build tooling can leave tracked generated files modified in the ephemeral runner.
+          # The Stage 4-7 summary is already committed, so restore only the CI worktree before rebasing.
+          git reset --hard HEAD
+
           for attempt in 1 2 3; do
             git pull --rebase origin main
             if git push origin HEAD:main; then
