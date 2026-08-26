@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-6",
+  "status": "PASS_ASSET_REFERENCE_CENSUS",
+  "input": "data/investigation/banner-stage1-6-asset-reference-census.v1.json",
+  "checks": {
+    "currentScheduleRecordCount": 94,
+    "referenceGrainClassifiedAsOccurrenceDisplayAssetReference": true,
+    "bannerReferenceRowCount": 37,
+    "pictureNoticeReferenceRowCount": 57,
+    "displayImageTypeCountSum": 94,
+    "matchedStatusCount": 73,
+    "manualReplacementStatusCount": 21,
+    "displayImageStatusCountSum": 94,
+    "nonNullDisplayImageFileCount": 93,
+    "nullDisplayImageFileCount": 1,
+    "displayImageFileCountSum": 94,
+    "staticVisualTypeCount": 81,
+    "prefabVisualTypeCount": 13,
+    "visualTypeCountSum": 94,
+    "bannerRowsAllReferenceNonNullFiles": true,
+    "bannerRowsAllMatched": true,
+    "pictureNoticeNonNullFileCount": 56,
+    "pictureNoticeMatchedCount": 36,
+    "pictureNoticeManualReplacementCount": 21,
+    "manualReplacementWithConcreteFileCount": 20,
+    "manualReplacementWithoutFileCount": 1,
+    "onlyNullFixtureRecordKey": "kr-manual-wish-20260902",
+    "manualReplacementEquatedWithMissingAsset": false,
+    "prefabEquatedWithMissingStaticWebsiteImage": false,
+    "sameVerifiedSourceCanReuseSameAssetReference": true,
+    "sameAssetReferenceUsedAsCanonicalSourceJoin": false,
+    "stage1_4CorrectionConsumedFor7001ReuseFixture": true,
+    "assetFilenamePromotedToCanonicalBannerId": false,
+    "assetFilenamePromotedToCanonicalAssetId": false,
+    "bulkDirectoryExistenceRevalidationPerformed": false,
+    "contentHashInventoryPerformed": false,
+    "perceptualHashOrVisualDiffPerformed": false,
+    "candidateReplacementMatchingPerformed": false,
+    "assetRenameOrDedupPerformed": false,
+    "canonicalAssetOwnershipDecided": false
+  },
+  "verifiedReuseFixtures": [
+    {"bannerCode":"9603","sourceRecordKey":"cardpool:366","displayImageFile":"Banner_9603.webp"},
+    {"bannerCode":"9702","sourceRecordKey":"cardpool:370","displayImageFile":"Picture_Notice_9702.webp"},
+    {"bannerCode":"5701","sourceRecordKey":"cardpool:213","displayImageFile":"Picture_Notice_5701.webp"},
+    {"bannerCode":"7902","sourceRecordKey":"cardpool:305","displayImageFile":"Picture_Notice_7902.webp"},
+    {"bannerCode":"7001","sourceRecordKeyAfterCorrection":"cardpool:265","displayImageFile":"Picture_Notice_7001.webp"}
+  ],
+  "decision": "Stage 1-6 passes as an asset-reference census. All 94 occurrence rows are accounted for at the reference layer: 37 Banner and 57 Picture_Notice rows; 73 matched and 21 manual-replacement statuses; 93 concrete filenames and one null manual-wish reference; 81 static and 13 prefab visual-source cases. Manual replacement is not equivalent to a missing image because 20 of 21 such rows already reference a concrete replacement file. Verified source reuses can carry the same display asset reference across dates, but filename equality is supporting display evidence only and must not become a canonical source/recurrence join. Hashing, visual duplicate detection, candidate matching, asset ownership, and bulk asset inventory remain deferred to Stage 3.",
+  "openReviewItems": [
+    {
+      "item": "2026-09-02 manual 5-person wish image",
+      "status": "MISSING_REFERENCE_REVIEW",
+      "recordKey": "kr-manual-wish-20260902",
+      "reason": "displayImageFile is null while displayImageStatus is manual-replacement. Stage 1-6 records the gap but does not select a replacement candidate."
+    },
+    {
+      "item": "Canonical asset ownership",
+      "status": "DEFERRED_TO_LATER_SCHEMA_AND_STAGE3",
+      "reason": "The current occurrence row stores a display reference, while repeated occurrences prove that underlying assets can be reused."
+    },
+    {
+      "item": "Hash/visual duplicate groups",
+      "status": "DEFERRED_TO_STAGE3",
+      "reason": "Stage 1-6 intentionally does not inspect image bytes or compute hashes."
+    }
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-7",
+    "task": "Representative fixture validation",
+    "priorities": [
+      "Validate one normal pickup/new occurrence across source, Hero relation, date, and Banner reference.",
+      "Validate one single rerun/prefab occurrence across source reuse, date, and Picture_Notice reference.",
+      "Validate one repeated dual/triple source occurrence pair with the same asset reference.",
+      "Validate one source-linked wish occurrence and one manual wish occurrence separately.",
+      "Validate CP_RELATED as a non-exclusive context relation without inventing Event ID joins.",
+      "Carry the 2026-09-02 null image reference as REVIEW rather than selecting an asset in Stage 1-7."
+    ]
+  }
+}
