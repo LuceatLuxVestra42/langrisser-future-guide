@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BannersRouteImport } from './routes/banners'
 import { Route as EquipmentRouteImport } from './routes/equipment'
+import { Route as EquipmentPrototypeRouteImport } from './routes/equipment-prototype'
+import { Route as SoldiersPrototypeRouteImport } from './routes/soldiers-prototype'
 import { Route as EquipmentEquipmentIdRouteImport } from './routes/equipment_.$equipmentId'
 import { Route as EquipmentExclusiveRouteImport } from './routes/equipment_.exclusive'
 
@@ -30,6 +32,16 @@ const EquipmentRoute = EquipmentRouteImport.update({
   path: '/equipment',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EquipmentPrototypeRoute = EquipmentPrototypeRouteImport.update({
+  id: '/equipment-prototype',
+  path: '/equipment-prototype',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SoldiersPrototypeRoute = SoldiersPrototypeRouteImport.update({
+  id: '/soldiers-prototype',
+  path: '/soldiers-prototype',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EquipmentEquipmentIdRoute = EquipmentEquipmentIdRouteImport.update({
   id: '/equipment_/$equipmentId',
   path: '/equipment/$equipmentId',
@@ -45,6 +57,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/banners': typeof BannersRoute
   '/equipment': typeof EquipmentRoute
+  '/equipment-prototype': typeof EquipmentPrototypeRoute
+  '/soldiers-prototype': typeof SoldiersPrototypeRoute
   '/equipment/$equipmentId': typeof EquipmentEquipmentIdRoute
   '/equipment/exclusive': typeof EquipmentExclusiveRoute
 }
@@ -52,6 +66,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/banners': typeof BannersRoute
   '/equipment': typeof EquipmentRoute
+  '/equipment-prototype': typeof EquipmentPrototypeRoute
+  '/soldiers-prototype': typeof SoldiersPrototypeRoute
   '/equipment/$equipmentId': typeof EquipmentEquipmentIdRoute
   '/equipment/exclusive': typeof EquipmentExclusiveRoute
 }
@@ -60,6 +76,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/banners': typeof BannersRoute
   '/equipment': typeof EquipmentRoute
+  '/equipment-prototype': typeof EquipmentPrototypeRoute
+  '/soldiers-prototype': typeof SoldiersPrototypeRoute
   '/equipment_/$equipmentId': typeof EquipmentEquipmentIdRoute
   '/equipment_/exclusive': typeof EquipmentExclusiveRoute
 }
@@ -69,6 +87,8 @@ export interface FileRouteTypes {
     | '/'
     | '/banners'
     | '/equipment'
+    | '/equipment-prototype'
+    | '/soldiers-prototype'
     | '/equipment/$equipmentId'
     | '/equipment/exclusive'
   fileRoutesByTo: FileRoutesByTo
@@ -76,6 +96,8 @@ export interface FileRouteTypes {
     | '/'
     | '/banners'
     | '/equipment'
+    | '/equipment-prototype'
+    | '/soldiers-prototype'
     | '/equipment/$equipmentId'
     | '/equipment/exclusive'
   id:
@@ -83,6 +105,8 @@ export interface FileRouteTypes {
     | '/'
     | '/banners'
     | '/equipment'
+    | '/equipment-prototype'
+    | '/soldiers-prototype'
     | '/equipment_/$equipmentId'
     | '/equipment_/exclusive'
   fileRoutesById: FileRoutesById
@@ -91,6 +115,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BannersRoute: typeof BannersRoute
   EquipmentRoute: typeof EquipmentRoute
+  EquipmentPrototypeRoute: typeof EquipmentPrototypeRoute
+  SoldiersPrototypeRoute: typeof SoldiersPrototypeRoute
   EquipmentEquipmentIdRoute: typeof EquipmentEquipmentIdRoute
   EquipmentExclusiveRoute: typeof EquipmentExclusiveRoute
 }
@@ -118,6 +144,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipmentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/equipment-prototype': {
+      id: '/equipment-prototype'
+      path: '/equipment-prototype'
+      fullPath: '/equipment-prototype'
+      preLoaderRoute: typeof EquipmentPrototypeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/soldiers-prototype': {
+      id: '/soldiers-prototype'
+      path: '/soldiers-prototype'
+      fullPath: '/soldiers-prototype'
+      preLoaderRoute: typeof SoldiersPrototypeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/equipment_/$equipmentId': {
       id: '/equipment_/$equipmentId'
       path: '/equipment/$equipmentId'
@@ -139,6 +179,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BannersRoute: BannersRoute,
   EquipmentRoute: EquipmentRoute,
+  EquipmentPrototypeRoute: EquipmentPrototypeRoute,
+  SoldiersPrototypeRoute: SoldiersPrototypeRoute,
   EquipmentEquipmentIdRoute: EquipmentEquipmentIdRoute,
   EquipmentExclusiveRoute: EquipmentExclusiveRoute,
 }
