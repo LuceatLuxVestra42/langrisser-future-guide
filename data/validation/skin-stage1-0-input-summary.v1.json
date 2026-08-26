@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "stage": "skin-page-1",
+  "substage": "1-0",
+  "checkpoint": "input-summary",
+  "status": "PASS",
+  "contract": "data/contracts/skin-stage1-input-contract.v1.json",
+  "baseline": {
+    "canonicalHeroCount": 267,
+    "canonicalRegularSkinCount": 540,
+    "distinctSkinIdCount": 540,
+    "resolvedSkinRefCount": 540,
+    "ownerMismatchCount": 0,
+    "sharedSkinRefCount": 0,
+    "duplicateSkinIdCount": 0,
+    "staticArtworkResolvedCount": 540,
+    "animatedResourceResolvedCount": 540,
+    "acquisitionEncodedCount": 364,
+    "acquisitionUnencodedCount": 176
+  },
+  "sourceSemantics": {
+    "membership": "ConfigDataHeroInfo.Skins_ID[] -> ConfigDataHeroSkinInfo.ID",
+    "ownerCrossCheck": "ConfigDataHeroSkinInfo.SpecifiedHero",
+    "resourceJoin": "ConfigDataHeroSkinInfo.CharImageSkinResource_ID -> ConfigDataCharImageSkinResourceInfo.ID",
+    "ordering": "ConfigDataHeroInfo.Skins_ID[] array position",
+    "acquisition": "ConfigDataHeroSkinInfo.GetPathType; missing values remain UNENCODED"
+  },
+  "scope": {
+    "included": "REGULAR_HERO_SKIN",
+    "baseHeroArtwork": "OUT_OF_SCOPE",
+    "spHeroIllustration": "OUT_OF_SCOPE",
+    "soldierSkins": "OUT_OF_SCOPE",
+    "releaseEligibility": "DEFERRED_TO_SKIN_STAGE4",
+    "assetExport": "DEFERRED_TO_SKIN_STAGE3"
+  },
+  "checks": [
+    {"name":"reuse canonical Hero identity","pass":true,"detail":"267 Hero baseline reused"},
+    {"name":"reuse Hero Stage 5-5 regular skin semantics","pass":true,"detail":"540 distinct canonical regular skins"},
+    {"name":"owner relation frozen","pass":true,"detail":"SpecifiedHero mismatches 0"},
+    {"name":"skin membership uniqueness frozen","pass":true,"detail":"shared 0 / duplicate 0 / unresolved 0"},
+    {"name":"resource semantics frozen","pass":true,"detail":"Image 540/540 / SpineAssetPath 540/540"},
+    {"name":"acquisition data gap preserved","pass":true,"detail":"ENCODED 364 / UNENCODED 176"},
+    {"name":"SP ownership boundary preserved","pass":true,"detail":"SP remains Hero Stage 5-4 owned"},
+    {"name":"future-skin admission deferred","pass":true,"detail":"No KR future/release classification in Stage 1-0"}
+  ],
+  "completion": "SKIN_STAGE1_0_COMPLETE",
+  "nextAction": "Skin 1-1 canonical population materialization from the accepted 540 regular Hero skins."
+}
