@@ -1,0 +1,249 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-4",
+  "status": "RELATION_CENSUS_COMPLETE_WITH_REVIEW_ITEMS",
+  "purpose": "Identify and separate explicit banner occurrence, CardPool, Hero, wish-selection, CP, and event relation shapes without creating the final production schema or using name-based joins.",
+  "inputs": {
+    "sourceCensus": "data/investigation/banner-stage1-1-source-census.v1.json",
+    "rowGrain": "data/investigation/banner-stage1-2-row-grain-census.v1.json",
+    "provisionalTaxonomy": "data/investigation/banner-stage1-3-provisional-taxonomy.v1.json",
+    "currentSchedule": "data/kr-banner-schedule.v1.json",
+    "rawCardPool": "data/configdata/ConfigDataCardPoolInfo.json",
+    "canonicalHero": "data/hero-name-master.v1.json",
+    "existingOverrides": "data/banner-overrides.v1.json",
+    "relationCorrections": "data/checkpoints/banner-stage1-4-relation-corrections.v1.json",
+    "existingValidator": "scripts/validate_kr_schedule.cjs",
+    "productRequirement": "시트 설계도 Mk.1.txt"
+  },
+  "coreDecision": {
+    "relationLayersMustRemainSeparate": true,
+    "layers": [
+      "Korean occurrence/display row",
+      "CardPool source record",
+      "pickup Hero relation",
+      "wish selectable/candidate Hero relation",
+      "CP context relation",
+      "event text reference"
+    ],
+    "principle": "Resolve relations from explicit IDs or explicit source semantics. Do not collapse display names, asset codes, CardPool identity, Hero identity, CP context, or event labels into one inferred relation."
+  },
+  "relations": {
+    "occurrenceToCardPool": {
+      "status": "VERIFIED_SHAPE_WITH_CORRECTION_LAYER",
+      "relationType": "OCCURRENCE_SOURCE_CARDPOOL",
+      "source": "kr-banner-schedule record",
+      "target": "ConfigDataCardPoolInfo record",
+      "sourceField": "sourceRecordKey",
+      "targetIdentity": "ConfigDataCardPoolInfo.ID",
+      "cardinality": {
+        "occurrenceToCardPool": "0..1",
+        "cardPoolToOccurrence": "0..N"
+      },
+      "rules": [
+        "Manual Korean occurrence rows may legitimately have null sourceRecordKey.",
+        "A CardPool source may be reused by multiple dated Korean occurrences.",
+        "sourceRecordKey is a source relation, not the final website bannerId.",
+        "Apply verified relation-correction checkpoints before later consumer generation."
+      ],
+      "verifiedReuseFixture": {
+        "sourceRecordKey": "cardpool:370",
+        "bannerCode": "9702",
+        "occurrences": ["kr-banner:20261028:1", "kr-banner:20270317:2"]
+      },
+      "verifiedCorrectionCount": 1,
+      "correctionCheckpoint": "data/checkpoints/banner-stage1-4-relation-corrections.v1.json"
+    },
+    "cardPoolToPickupHero": {
+      "status": "VERIFIED_EXPLICIT_ID_RELATION",
+      "relationType": "PICKUP_HERO",
+      "source": "ConfigDataCardPoolInfo",
+      "sourceField": "UpHeroList[]",
+      "target": "hero-name-master.v1.json",
+      "targetField": "heroId",
+      "cardinality": "0..N Hero IDs per CardPool",
+      "joinRule": "Exact integer Hero ID only.",
+      "sourceSemantics": "CardPool detail text identifies the featured probability-up heroes while UpHeroList stores their explicit Hero IDs.",
+      "verifiedExamples": [
+        {
+          "upHeroIds": [12, 14],
+          "descriptionHeroesCn": ["艾尔文", "雪莉"]
+        },
+        {
+          "upHeroIds": [6, 7],
+          "descriptionHeroesCn": ["利昂", "巴恩哈特"]
+        },
+        {
+          "cardPoolId": 265,
+          "upHeroIds": [99225],
+          "canonicalHero": {
+            "heroId": 99225,
+            "nameCn": "冰渊凌御者",
+            "nameKr": "빙설 심연의 지배자",
+            "status": "verified"
+          }
+        }
+      ],
+      "prohibitedFallbacks": [
+        "heroesKr name matching",
+        "heroesCn name matching",
+        "asset filename matching",
+        "bannerCode digit inference"
+      ]
+    },
+    "cardPoolToWishCandidateHero": {
+      "status": "VERIFIED_MULTI_FIELD_FAMILY",
+      "relationType": "WISH_CANDIDATE_HERO",
+      "target": "hero-name-master.v1.json.heroId",
+      "fieldFamilies": [
+        {
+          "sourceField": "OptionalUpHeroList[].HeroId",
+          "status": "VERIFIED",
+          "meaning": "Explicit selectable/candidate Hero list used by optional/return/reminiscence and related wish structures.",
+          "observedExamples": [
+            "圣临·许愿召唤",
+            "荣归·许愿召唤",
+            "追忆·许愿召唤",
+            "轮纪·许愿召唤"
+          ]
+        },
+        {
+          "sourceField": "WishHero[].HeroId",
+          "status": "VERIFIED_DISTINCT_SOURCE_SHAPE",
+          "meaning": "Explicit Hero candidate list used by other wish structures such as 新晋·许愿召唤 and rotating/team wish variants. Preserve this source field separately even if a later normalized consumer chooses a common relation type."
+        }
+      ],
+      "joinRule": "Use HeroId only; preserve JobConnectionId as source metadata and do not use it as Hero identity.",
+      "manualOccurrencePolicy": "If a Korean manual wish occurrence has no CardPool source and only selectableText/display names, do not synthesize Hero edges. Keep the selectable relation in REVIEW until an explicit ID-bearing source or approved manual ID map exists.",
+      "importantBoundary": "WISH_CANDIDATE_HERO is not PICKUP_HERO and must not be inferred as DUAL simply because two heroes may eventually be selected."
+    },
+    "cardPoolToCpContext": {
+      "status": "VERIFIED_EXPLICIT_SOURCE_SEMANTICS",
+      "relationType": "CP_RELATED",
+      "source": "ConfigDataCardPoolInfo.CardPoolDetailDesc",
+      "evidenceRule": "Assign CP_RELATED only when the CardPool source text explicitly states that drawing an SSR also grants CP points usable in a named event.",
+      "mechanicDecision": "CP_RELATED is a non-exclusive context relation/tag on a pickup CardPool/occurrence, not a mutually exclusive top-level summon mechanic.",
+      "observedSourceExamples": [
+        "辉光之恋曲",
+        "相依的孤影",
+        "禁断的邂逅",
+        "回忆尽头之恋",
+        "永隔的时光",
+        "缘起的邂逅",
+        "骑士与信仰之誓",
+        "疾风之源起",
+        "烛光交映之约",
+        "魔焰与冰晶之舞",
+        "黯渊相随的恋羽",
+        "苍翼与轻纱之舞",
+        "原初之绮侣",
+        "新生之眷侣",
+        "物灵流转之谣",
+        "流光之溯缘",
+        "凛正涤邪之光",
+        "宁世安平之辉",
+        "暗槛的光曲",
+        "重逢的圆舞曲"
+      ],
+      "prohibitedInference": "Do not assign CP_RELATED from Hero pairing, bannerCode, asset code, or Korean terminology alone."
+    },
+    "cpContextToEvent": {
+      "status": "TEXT_REFERENCE_ONLY_REVIEW",
+      "relationType": "CP_EVENT_TEXT_REFERENCE",
+      "source": "ConfigDataCardPoolInfo.CardPoolDetailDesc",
+      "observedEventLabels": ["相通的心灵", "未尽的羁绊"],
+      "observedShape": "A CP CardPool description can explicitly name the event in which CP points are usable.",
+      "canonicalEventIdAvailableInCurrentBannerSource": false,
+      "currentScheduleHasDirectEventField": false,
+      "cardPoolInfoHasDirectEventIdFieldObserved": false,
+      "separateEventConfigSourcesExist": [
+        "ConfigDataGeneralEventInfo.json",
+        "ConfigDataGeneralEventTypeInfo.json"
+      ],
+      "joinPolicy": "Do not join event records by display-name equality. Preserve the CardPool event label as text evidence until an explicit event ID relation or separately verified mapping is established.",
+      "productRequirementImpact": "The banner+event page is supported as a product requirement, but its canonical event JOIN is not yet proven by current banner sources."
+    },
+    "displayAndPreviewFields": {
+      "status": "NOT_CANONICAL_HERO_RELATION_SOURCE_IN_STAGE1",
+      "fieldsObserved": [
+        "heroesCn",
+        "heroesKr",
+        "PreviewHeroIds",
+        "DynamicDisplayHeroIds",
+        "PreviewHeroJobConnectionIds"
+      ],
+      "rule": "Preserve for display/provenance as applicable, but do not substitute these fields for UpHeroList or wish-candidate fields when defining pickup/selectable Hero relations."
+    }
+  },
+  "verifiedRelationCorrection": {
+    "recordKey": "kr-banner:20270331:4",
+    "observedSourceRecordKey": "cardpool:263",
+    "correctedSourceRecordKey": "cardpool:265",
+    "status": "VERIFIED_CORRECTION_CHECKPOINTED",
+    "rawEvidence": {
+      "cardpool:263": "猩红圣光之复颂 / Icon_6902",
+      "cardpool:265": "寒龙冰棘之征 / Icon_7001 / UpHeroList [99225]",
+      "hero:99225": "冰渊凌御者 / 빙설 심연의 지배자 / verified"
+    },
+    "sourceScheduleMutated": false
+  },
+  "relationStatusByDataUnit": [
+    {
+      "dataUnit": "source-linked Korean occurrence",
+      "relationStatus": "SOURCE_RELATION_AVAILABLE",
+      "nextConsumerRule": "Follow sourceRecordKey after applying correction checkpoints."
+    },
+    {
+      "dataUnit": "manual Korean occurrence without CardPool",
+      "relationStatus": "SOURCE_RELATION_NOT_APPLICABLE_OR_REVIEW",
+      "nextConsumerRule": "Keep manual display data; do not synthesize CardPool or Hero IDs."
+    },
+    {
+      "dataUnit": "ordinary pickup CardPool",
+      "relationStatus": "PICKUP_HERO_EXPLICIT",
+      "nextConsumerRule": "Use UpHeroList -> canonical heroId."
+    },
+    {
+      "dataUnit": "wish CardPool",
+      "relationStatus": "WISH_CANDIDATE_EXPLICIT_WITH_MULTIPLE_FIELD_SHAPES",
+      "nextConsumerRule": "Use the explicit field present on that source and preserve sourceField provenance."
+    },
+    {
+      "dataUnit": "CP CardPool",
+      "relationStatus": "CP_CONTEXT_EXPLICIT_EVENT_ID_UNRESOLVED",
+      "nextConsumerRule": "CP tag from explicit source text; event label remains noncanonical text evidence."
+    }
+  ],
+  "coverageAndLimits": {
+    "currentSchedulePopulation": 94,
+    "allCurrentRowsRetainAValidRelationHandlingPath": true,
+    "existingVerifiedScheduleMappingsReusedBeforeRawReconstruction": true,
+    "rawCardPoolRelationShapesInspected": true,
+    "all94SourceLinksIndependentlyRecomputedFromScratch": false,
+    "reasonNotRecomputed": "Stage 1 policy requires reuse of existing verified project mappings before rebuilding them. Stage 1-4 censuses relation shapes, verifies representative explicit ID semantics, and records discovered conflicts/corrections rather than discarding the existing verified schedule checkpoint.",
+    "verifiedCorrectionCount": 1,
+    "unresolvedCanonicalEventJoinCount": "OPEN_RELATION_FAMILY",
+    "manualWishHeroEdgesSynthesized": 0,
+    "nameBasedHeroJoinsIntroduced": 0,
+    "nameBasedEventJoinsIntroduced": 0
+  },
+  "notDecided": [
+    "Final normalized bannerDefinition and bannerOccurrence relation schema",
+    "Final production field names for Hero edges",
+    "Whether OptionalUpHeroList and WishHero normalize into one consumer table or remain separate relation subtypes",
+    "Canonical Event ID mapping for CP/banner+event consumers",
+    "Final event cardinality across all banner families",
+    "Asset ownership relations",
+    "Date and recurrence semantics"
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-5",
+    "task": "Date and recurrence structure census",
+    "consume": [
+      "Occurrence and CardPool source are separate units with 0..1 source relation per occurrence.",
+      "Use UpHeroList for PICKUP_HERO and explicit wish HeroId field families for WISH_CANDIDATE_HERO.",
+      "Treat CP_RELATED as a context relation derived only from explicit CardPool source text.",
+      "Keep CP event labels as noncanonical text references; do not name-join to Event ConfigData.",
+      "Apply banner-stage1-4-relation-corrections.v1.json before later production consumer generation."
+    ]
+  }
+}
