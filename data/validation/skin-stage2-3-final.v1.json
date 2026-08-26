@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "stage": "skin-page-2",
+  "substage": "2-3",
+  "checkpoint": "bidirectional-relation-final",
+  "status": "PASS",
+  "completion": "SKIN_STAGE2_3_COMPLETE",
+  "sources": {
+    "contract": "data/contracts/skin-stage2-3-bidirectional-relation.v1.json",
+    "forwardRelation": "data/generated/skin-stage2-1-forward-relation.v1.json",
+    "forwardValidation": "data/validation/skin-stage2-1-final.v1.json",
+    "reverseIndex": "data/generated/skin-stage2-2-reverse-index.v1.json",
+    "reverseValidation": "data/validation/skin-stage2-2-final.v1.json"
+  },
+  "metrics": {
+    "forwardRecordCount": 540,
+    "reverseHeroEntryCount": 267,
+    "reverseHeroWithSkinsCount": 235,
+    "reverseHeroWithoutSkinsCount": 32,
+    "reverseEdgeCount": 540,
+    "distinctForwardSkinIdCount": 540,
+    "distinctReverseSkinIdCount": 540,
+    "duplicateForwardSkinIdCount": 0,
+    "duplicateReverseSkinIdCount": 0,
+    "duplicateReverseHeroIdCount": 0,
+    "ownerMismatchCount": 0,
+    "missingEdgeCount": 0,
+    "extraEdgeCount": 0,
+    "sourceOrderMismatchCount": 0
+  },
+  "checks": {
+    "upstreamStage21Pass": true,
+    "upstreamStage22Pass": true,
+    "forwardRecordCount540": true,
+    "reverseHeroEntryCount267": true,
+    "reverseDistinctHeroIdCount267": true,
+    "heroWithSkinsCount235": true,
+    "heroWithoutSkinsCount32": true,
+    "reverseEdgeCount540": true,
+    "distinctForwardSkinIdCount540": true,
+    "distinctReverseSkinIdCount540": true,
+    "duplicateForwardSkinIdZero": true,
+    "duplicateReverseSkinIdZero": true,
+    "duplicateReverseHeroIdZero": true,
+    "ownerMismatchZero": true,
+    "missingEdgeZero": true,
+    "extraEdgeZero": true,
+    "sourceOrderMismatchZero": true,
+    "exactEdgeSetParity": true,
+    "exactEdgeCardinalityParity": true
+  },
+  "failures": {
+    "duplicateForwardSkinIds": [],
+    "duplicateReverseSkinIds": [],
+    "duplicateReverseHeroIds": [],
+    "ownerMismatches": [],
+    "missingEdges": [],
+    "extraEdges": [],
+    "sourceOrderMismatches": []
+  },
+  "frozenConsumerPaths": {
+    "bySkinId": "skinId -> { heroId, sourceOrder }",
+    "byHeroId": "heroId -> ordered skinId[]"
+  },
+  "frozenRules": [
+    "The bidirectional checkpoint is derived only from accepted Stage 2-1 and Stage 2-2 relation outputs.",
+    "Skin consumers use bySkinId and Hero consumers use byHeroId; downstream code must not rediscover ownership from raw ConfigData.",
+    "All 267 canonical Heroes remain present in byHeroId, including 32 empty arrays.",
+    "Hero skin order remains the accepted Stage 2-1 sourceOrder and is never replaced by numeric skinId sorting.",
+    "No release, localization, acquisition or asset metadata is included in the relation checkpoint."
+  ],
+  "nextAction": "Skin 2-4: verify this accepted bidirectional relation checkpoint against the frozen Stage 1 canonical/Hero Stage 5-5 parity baseline."
+}
