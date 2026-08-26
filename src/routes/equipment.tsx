@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import { getGeneralEquipmentPageData } from "@/lib/equipment-page.functions";
 
@@ -13,38 +15,353 @@ export const Route = createFileRoute("/equipment")({
       },
     ],
   }),
-  component: EquipmentRouteScaffold,
+  component: EquipmentGeneralListPage,
 });
 
-function EquipmentRouteScaffold() {
+type TabId = 1 | 2 | 3;
+
+type EquipmentListUiState = {
+  tab: TabId;
+  group: string | null;
+  subtype: string | null;
+};
+
+const EQUIPMENT_LIST_STORAGE_KEY = "equipment-general-list-ui.v1";
+
+const DEFAULT_UI_STATE: EquipmentListUiState = {
+  tab: 1,
+  group: null,
+  subtype: null,
+};
+
+const TAB_DEFINITIONS: ReadonlyArray<{
+  id: TabId;
+  label: string;
+  description: string;
+}> = [
+  {
+    id: 1,
+    label: "초기 장비",
+    description: "게임 출시부터 존재하던 장비",
+  },
+  {
+    id: 2,
+    label: "이전 추가 장비",
+    description: "과거 장비뽑기 계열에서 추가된 장비",
+  },
+  {
+    id: 3,
+    label: "장비패스",
+    description: "현재 장비패스 계열 장비",
+  },
+];
+
+function isTabId(value: unknown): value is TabId {
+  return value === 1 || value === 2 || value === 3;
+}
+
+function EquipmentGeneralListPage() {
   const data = Route.useLoaderData();
+  const [uiState, setUiState] = useState<EquipmentListUiState>(DEFAULT_UI_STATE);
+  const [persistenceReady, setPersistenceReady] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(EQUIPMENT_LIST_STORAGE_KEY);
+      if (!stored) {
+        setPersistenceReady(true);
+        return;
+      }
+
+      const parsed = JSON.parse(stored) as Partial<EquipmentListUiState>;
+      const tab = isTabId(parsed.tab) ? parsed.tab : DEFAULT_UI_STATE.tab;
+      const selectedGroup =
+        typeof parsed.group === "string"
+          ? data.filters.find((filter) => filter.group === parsed.group)
+          : undefined;
+      const group = selectedGroup?.group ?? null;
+      const subtype =
+        group && typeof parsed.subtype === "string"
+          ? selectedGroup?.subtypes.some((item) => item.subtype === parsed.subtype)
+            ? parsed.subtype
+            : null
+          : null;
+
+      setUiState({ tab, group, subtype });
+    } catch {
+      setUiState(DEFAULT_UI_STATE);
+    } finally {
+      setPersistenceReady(true);
+    }
+  }, [data.filters]);
+
+  useEffect(() => {
+    if (!persistenceReady) return;
+
+    try {
+      window.localStorage.setItem(EQUIPMENT_LIST_STORAGE_KEY, JSON.stringify(uiState));
+    } catch {
+      // Storage can be unavailable in privacy-restricted environments.
+    }
+  }, [persistenceReady, uiState]);
+
+  const activeFilter = data.filters.find((filter) => filter.group === uiState.group) ?? null;
+
+  const filteredRecords = useMemo(
+    () =>
+      data.records.filter((record) => {
+        if (record.siteTab !== uiState.tab) return false;
+        if (uiState.group && record.group !== uiState.group) return false;
+        if (uiState.subtype && record.subtype !== uiState.subtype) return false;
+        return true;
+      }),
+    [data.records, uiState],
+  );
+
+  const currentTabCount = data.tabs[String(uiState.tab)] ?? 0;
+
+  const selectGroup = (group: string) => {
+    setUiState((current) =>
+      current.group === group
+        ? { ...current, group: null, subtype: null }
+        : { ...current, group, subtype: null },
+    );
+  };
+
+  const selectSubtype = (subtype: string) => {
+    setUiState((current) => ({
+      ...current,
+      subtype: current.subtype === subtype ? null : subtype,
+    }));
+  };
+
+  const resetFilters = () => {
+    setUiState((current) => ({ ...current, group: null, subtype: null }));
+  };
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-8 py-12">
-      <div className="flex items-center justify-between gap-6">
-        <div>
-          <p className="text-sm text-muted-foreground">Equipment Stage 4-1</p>
-          <h1 className="mt-1 text-3xl font-bold text-foreground">SSR 장비</h1>
-        </div>
-        <Link
-          to="/equipment/exclusive"
-          className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground"
-        >
-          전용장비 보러가기
-        </Link>
-      </div>
+    <main className="min-h-screen bg-background">
+      <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+            >
+              <ArrowLeft size={16} aria-hidden="true" />
+              메인으로
+            </Link>
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              SSR 장비
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+              일반 SSR 장비 206개를 획득 계열과 장비 종류로 나눠 확인할 수 있어.
+            </p>
+          </div>
 
-      <section className="mt-8 rounded-lg border border-border bg-card p-6">
-        <p className="text-sm text-muted-foreground">
-          Route/loader scaffold ready. 목록 UI는 Stage 4-2에서 연결합니다.
-        </p>
-        <p className="mt-3 text-lg font-semibold text-foreground">
-          일반 장비 {data.records.length}개
-        </p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          탭 {data.tabs["1"] ?? 0} / {data.tabs["2"] ?? 0} / {data.tabs["3"] ?? 0}
-        </p>
-      </section>
+          <Link
+            to="/equipment/exclusive"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-primary/25 bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/45 hover:bg-accent"
+          >
+            전용장비 보러가기
+            <ChevronRight size={16} aria-hidden="true" />
+          </Link>
+        </div>
+
+        <section className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+          <div className="grid grid-cols-1 border-b border-border sm:grid-cols-3">
+            {TAB_DEFINITIONS.map((tab) => {
+              const selected = uiState.tab === tab.id;
+              const count = data.tabs[String(tab.id)] ?? 0;
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => setUiState((current) => ({ ...current, tab: tab.id }))}
+                  className={`border-b px-5 py-4 text-left transition last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0 ${
+                    selected
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-card text-foreground hover:bg-muted/60"
+                  }`}
+                >
+                  <span className="flex items-center justify-between gap-3">
+                    <span className="font-semibold">{tab.label}</span>
+                    <span className="rounded-full bg-background/80 px-2 py-0.5 text-xs font-semibold text-muted-foreground">
+                      {count}
+                    </span>
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                    {tab.description}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="space-y-4 p-4 sm:p-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                장비 종류
+              </span>
+              <button
+                type="button"
+                aria-pressed={uiState.group === null}
+                onClick={resetFilters}
+                className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+                  uiState.group === null
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-accent"
+                }`}
+              >
+                전체
+              </button>
+              {data.filters.map((filter) => {
+                const selected = uiState.group === filter.group;
+                return (
+                  <button
+                    key={filter.group}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => selectGroup(filter.group)}
+                    className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+                      selected
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-accent"
+                    }`}
+                  >
+                    {filter.groupKo}
+                  </button>
+                );
+              })}
+
+              {uiState.group && (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                >
+                  <RotateCcw size={13} aria-hidden="true" />
+                  필터 초기화
+                </button>
+              )}
+            </div>
+
+            {activeFilter && (
+              <div className="flex flex-wrap items-center gap-2 border-t border-border pt-4">
+                <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {activeFilter.groupKo} 세부
+                </span>
+                <button
+                  type="button"
+                  aria-pressed={uiState.subtype === null}
+                  onClick={() => setUiState((current) => ({ ...current, subtype: null }))}
+                  className={`rounded-lg border px-3 py-1.5 text-sm transition ${
+                    uiState.subtype === null
+                      ? "border-primary/50 bg-accent font-semibold text-accent-foreground"
+                      : "border-border bg-background text-foreground hover:bg-muted"
+                  }`}
+                >
+                  전체
+                </button>
+                {activeFilter.subtypes.map((subtype) => {
+                  const selected = uiState.subtype === subtype.subtype;
+                  return (
+                    <button
+                      key={subtype.subtype}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => selectSubtype(subtype.subtype)}
+                      className={`rounded-lg border px-3 py-1.5 text-sm transition ${
+                        selected
+                          ? "border-primary/50 bg-accent font-semibold text-accent-foreground"
+                          : "border-border bg-background text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {subtype.subtypeKo}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <div className="mt-6 flex items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground">
+            현재 탭 {currentTabCount}개 중 <span className="font-semibold text-foreground">{filteredRecords.length}개</span> 표시
+          </p>
+          <p className="hidden text-xs text-muted-foreground sm:block">
+            선택한 탭과 필터는 다음 방문에도 유지돼.
+          </p>
+        </div>
+
+        {filteredRecords.length > 0 ? (
+          <section
+            aria-label="SSR 장비 목록"
+            className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          >
+            {filteredRecords.map((record) => {
+              const displayName = record.nameKr ?? record.nameCn;
+
+              return (
+                <Link
+                  key={record.equipmentId}
+                  to="/equipment/$equipmentId"
+                  params={{ equipmentId: String(record.equipmentId) }}
+                  className="group flex min-h-64 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <div className="flex items-center justify-between gap-3 border-b border-border bg-muted/40 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-md bg-primary px-2 py-1 text-[11px] font-bold tracking-wide text-primary-foreground">
+                        SSR
+                      </span>
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {record.groupKo} · {record.subtypeKo}
+                      </span>
+                    </div>
+                    <ChevronRight
+                      size={17}
+                      aria-hidden="true"
+                      className="text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
+                    />
+                  </div>
+
+                  <div className="flex flex-1 flex-col p-4">
+                    <h2 className="text-lg font-bold leading-snug text-foreground">{displayName}</h2>
+                    {record.nameKr === null && (
+                      <p className="mt-1 text-[11px] text-muted-foreground">중문명 임시 표시</p>
+                    )}
+
+                    <div className="mt-4 rounded-xl bg-muted/55 p-3">
+                      <p className="text-xs font-semibold text-foreground">{record.effectName}</p>
+                      <p className="mt-1 line-clamp-4 text-xs leading-5 text-muted-foreground">
+                        {record.effectText}
+                      </p>
+                    </div>
+
+                    <div className="mt-auto pt-4 text-[11px] text-muted-foreground">
+                      장비 ID {record.equipmentId}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </section>
+        ) : (
+          <section className="mt-4 rounded-2xl border border-dashed border-border bg-card px-6 py-16 text-center">
+            <p className="font-semibold text-foreground">조건에 맞는 장비가 없어.</p>
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="mt-3 text-sm font-medium text-primary hover:underline"
+            >
+              장비 종류 필터 초기화
+            </button>
+          </section>
+        )}
+      </div>
     </main>
   );
 }

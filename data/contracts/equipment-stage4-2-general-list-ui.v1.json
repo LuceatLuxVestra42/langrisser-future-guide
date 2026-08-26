@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "stage": "4-2",
+  "status": "IMPLEMENTATION_CONTRACT",
+  "purpose": "Implement the public general-equipment List UI on top of the frozen Stage 4-0 consumer contract and Stage 4-1 route/loader scaffold without re-deriving Equipment semantics.",
+  "dependsOn": {
+    "stage40": "data/validation/equipment-stage4-0-frontend-consumer-summary.v1.json",
+    "stage41": "data/validation/equipment-stage4-1-route-loader-summary.v1.json",
+    "generalConsumer": "data/generated/equipment_stage3_3_general_list.json",
+    "route": "src/routes/equipment.tsx"
+  },
+  "scope": {
+    "route": "/equipment",
+    "records": 206,
+    "tabs": {
+      "1": 94,
+      "2": 80,
+      "3": 32
+    },
+    "filterGroups": ["weapon", "armor", "headgear", "accessory"],
+    "detailTarget": "/equipment/$equipmentId",
+    "exclusiveTarget": "/equipment/exclusive"
+  },
+  "interaction": {
+    "singleActiveTab": true,
+    "defaultTab": 1,
+    "groupSelection": "zero-or-one",
+    "subtypeSelection": "zero-or-one inside the active group",
+    "sameGroupClickCanClear": true,
+    "groupChangeClearsSubtype": true,
+    "statePersistence": "localStorage",
+    "storageKey": "equipment-general-list-ui.v1",
+    "invalidStoredStateFallsBackSafely": true
+  },
+  "display": {
+    "name": "nameKr ?? nameCn",
+    "nameKrNullMarker": "중문명 임시 표시",
+    "cardFields": ["SSR", "groupKo", "subtypeKo", "displayName", "effectName", "effectText"],
+    "iconPolicy": "The frozen icon source field remains in the consumer payload, but no web-served Equipment icon asset set exists in the repository at Stage 4-2. Do not emit broken image URLs or fabricate mappings; visual icon binding is deferred until extracted assets are published.",
+    "ordering": "Filter the Stage 3 generated record sequence in place. Frontend must not re-sort by equipmentId or claim exact release chronology.",
+    "releaseOrderClaims": false
+  },
+  "sourceDiscipline": {
+    "useStage41Loader": true,
+    "directGeneratedJsonImportInRoute": false,
+    "directConfigDataReads": false,
+    "rederiveFilters": false,
+    "rederiveAcquisition": false,
+    "recomputeReleaseOrder": false
+  },
+  "completion": {
+    "passStatus": "STAGE4_2_GENERAL_LIST_UI_READY",
+    "requirements": [
+      "The /equipment route renders all 206 general records through the frozen loader.",
+      "Tab counts remain 94/80/32 and exactly one tab is active.",
+      "Group/subtype filters follow the generated taxonomy and preserve source order.",
+      "Tab/group/subtype UI state persists across reload/revisit and invalid saved state is sanitized.",
+      "Every rendered card links by exact equipmentId to /equipment/$equipmentId.",
+      "The exclusive-equipment navigation target remains /equipment/exclusive.",
+      "No hidden/special/HOLD record is introduced and no release chronology is invented.",
+      "bun run build passes."
+    ],
+    "nextStage": "4-3 general equipment Detail UI"
+  }
+}
