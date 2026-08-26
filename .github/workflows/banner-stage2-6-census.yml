@@ -1,0 +1,36 @@
+name: Banner Stage 2-6 CP Event Census
+
+on:
+  push:
+    branches:
+      - investigate/banner-stage2-6
+    paths:
+      - '.github/workflows/banner-stage2-6-census.yml'
+      - 'scripts/investigate-banner-stage2-6-cp-event.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Generate CP/Event census
+        run: node scripts/investigate-banner-stage2-6-cp-event.mjs
+      - name: Commit census
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/investigation/banner-stage2-6-cp-event-census.v1.json
+          if git diff --cached --quiet; then
+            echo "No census changes."
+          else
+            git commit -m "Generate Banner Stage 2-6 CP/Event census"
+            git push
+          fi
