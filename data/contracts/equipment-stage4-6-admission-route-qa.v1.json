@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "stage": "4-6",
+  "status": "FROZEN_QA_MATRIX",
+  "purpose": "Verify the Equipment public admission boundary and route behavior after Stage 4-5 without reopening Equipment semantics or changing the frozen public population.",
+  "upstream": {
+    "stage40": "data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json",
+    "stage41": "data/validation/equipment-stage4-1-route-loader-summary.v1.json",
+    "stage42": "data/validation/equipment-stage4-2-general-list-ui-summary.v1.json",
+    "stage43": "data/validation/equipment-stage4-3-general-detail-ui-summary.v1.json",
+    "stage44": "data/validation/equipment-stage4-4-exclusive-ui-ownership-summary.v1.json",
+    "stage45": "data/validation/equipment-stage4-5-display-state-policy-summary.v1.json",
+    "specialUnresolved": "data/generated/equipment_stage3_6_special_unresolved.json"
+  },
+  "expected": {
+    "canonical": 390,
+    "public": 373,
+    "general": 206,
+    "exclusive": 167,
+    "hiddenSpecial": 16,
+    "hold": 1,
+    "holdEquipmentIds": [2013]
+  },
+  "routes": {
+    "generalList": "/equipment",
+    "exclusiveList": "/equipment/exclusive",
+    "detail": "/equipment/$equipmentId",
+    "detailKey": "equipmentId",
+    "detailParamSyntax": "ASCII decimal digits only, then positive safe integer validation",
+    "canonicalNavigation": "List links emit String(record.equipmentId). QA does not introduce a new textual canonicalization rule beyond the existing route guard.",
+    "publicResolution": "After syntactic validation, only exact numeric equipmentId membership in the frozen general/exclusive public detail maps may resolve. Missing public membership must return the route not-found state."
+  },
+  "invalidRouteParams": [
+    "",
+    "abc",
+    "-1",
+    "0",
+    "1.5",
+    "+1",
+    "1e3",
+    " 1",
+    "1 ",
+    "Infinity",
+    "NaN",
+    "9007199254740992"
+  ],
+  "admission": {
+    "general": "All 206 Stage 3-4 general detail IDs resolve as kind=general and no others are admitted through that set.",
+    "exclusive": "All 167 Stage 3-5 exclusive detail IDs resolve as kind=exclusive and no others are admitted through that set.",
+    "hiddenSpecial": "All 16 Stage 3-6 HIDDEN_SPECIAL IDs remain pageAdmission=false and must resolve null through the public detail loader.",
+    "hold": "equipmentId 2013 remains HOLD_UNRESOLVED_ACQUISITION, pageAdmission=false, and must resolve null through the public detail loader.",
+    "unknownPositiveIds": "Positive safe integers outside the canonical/public populations must resolve null through the public detail loader."
+  },
+  "hardGates": [
+    "General List and General Detail are exactly 206 unique IDs with exact set parity.",
+    "Exclusive List and Exclusive Detail are exactly 167 unique IDs with exact set parity.",
+    "General and Exclusive public sets are pairwise disjoint and union to exactly 373 public IDs.",
+    "The 16 hidden-special IDs and HOLD equipmentId 2013 are disjoint from all 373 public IDs.",
+    "General + Exclusive + Hidden Special + HOLD are pairwise disjoint and union to exactly 390 canonical IDs.",
+    "Every public general/exclusive ID resolves through readEquipmentDetailPageData with the expected kind.",
+    "Every hidden-special/HOLD ID and representative unknown positive safe integer resolves null through readEquipmentDetailPageData.",
+    "The detail route rejects non-digit, zero, negative, fractional, signed, scientific, whitespace-padded, non-finite text and unsafe integer inputs before public lookup.",
+    "The detail route has an explicit notFoundComponent and maps missing public loader data to notFound().",
+    "The generated route tree contains independent /equipment, /equipment/exclusive and /equipment/$equipmentId routes.",
+    "No Equipment page composition code imports Stage 3-6 special/unresolved data or raw ConfigData to widen public admission.",
+    "bun run build passes."
+  ],
+  "completion": {
+    "passStatus": "STAGE4_6_ADMISSION_ROUTE_QA_READY",
+    "nextStage": "4-7 whole consumer regression"
+  }
+}
