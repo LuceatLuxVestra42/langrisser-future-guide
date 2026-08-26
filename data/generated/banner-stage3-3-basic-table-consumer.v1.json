@@ -1,0 +1,4216 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 3-3",
+  "status": "BANNER_STAGE3_3_BASIC_TABLE_CONSUMER_MATERIALIZED",
+  "policy": {
+    "rowIdentity": "bannerOccurrenceId",
+    "sortOrder": [
+      "krDisplayDate ASC",
+      "displayOrder ASC",
+      "bannerOccurrenceId ASC"
+    ],
+    "allOccurrencesIncluded": true,
+    "wishRowsIncluded": true,
+    "wishCandidateListsIncluded": false,
+    "cpEventRelationsIncluded": false,
+    "recurrenceHistoryIncluded": false,
+    "imageSource": "Stage 3-2 occurrenceDisplayRecords only",
+    "pickupCardinalityRelationMismatchDisplay": "Preserve Stage 2 taxonomy and all PICKUP_HERO relations; neutralize the Korean type label to PICKUP_REVIEW instead of asserting an inconsistent hero count.",
+    "bannerTitlesInvented": false,
+    "heroRoutesInvented": false,
+    "fallbackAssetsInvented": false
+  },
+  "tableColumns": [
+    "krDisplayDate",
+    "displayOrder",
+    "typeLabelKr",
+    "lifecycleLabelKr",
+    "image",
+    "pickupHeroes"
+  ],
+  "rowCount": 94,
+  "dateGroupCount": 31,
+  "rows": [
+    {
+      "rowId": "bocc:kr-banner:20260902:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20260902:1",
+      "bannerDefinitionId": "bdef:v1:ce5418fcb325fe99a58b2f64",
+      "krDisplayDate": "2026-09-02",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9502.webp",
+        "assetId": "basset:v1:75d8dae3ba65be678928365c",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99263,
+          "heroNameKr": "키벨레",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99243,
+          "heroNameKr": "날개 꺾인 새",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260902:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20260902:2",
+      "bannerDefinitionId": "bdef:v1:f3ddc5e3d85b0086a458f36f",
+      "krDisplayDate": "2026-09-02",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_8603.webp",
+        "assetId": "basset:v1:86c3749aa72b78b8dcf7467e",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99238,
+          "heroNameKr": "아리아",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99231,
+          "heroNameKr": "비리아",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 100,
+          "heroNameKr": "로젠실",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-manual-wish-20260902",
+      "bannerOccurrenceId": "bocc:kr-manual-wish-20260902",
+      "bannerDefinitionId": "bdef:v1:f723f05efffc5f5f4ae0d65c",
+      "krDisplayDate": "2026-09-02",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "MANUAL_KR"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "PLACEHOLDER_MANUAL_ASSET_REQUIRED",
+        "canRenderImage": false,
+        "publicPath": null,
+        "assetId": null,
+        "provenance": "NO_RESOLVED_ASSET",
+        "replacementState": "MANUAL_ASSET_REQUIRED",
+        "placeholderKey": "BANNER_IMAGE_PENDING_MANUAL_ASSET"
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "IMAGE_PLACEHOLDER"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260909:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20260909:1",
+      "bannerDefinitionId": "bdef:v1:9da1b8a2161f0f95a255dcf2",
+      "krDisplayDate": "2026-09-09",
+      "displayOrder": 1,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9605.webp",
+        "assetId": "basset:v1:200b1acb6e00c8703301f0b0",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260909:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20260909:2",
+      "bannerDefinitionId": "bdef:v1:b1c2fcb17871c7efc780c2a2",
+      "krDisplayDate": "2026-09-09",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9202.webp",
+        "assetId": "basset:v1:dd3b242b0543efc29a18bc57",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99252,
+          "heroNameKr": "루크만",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99255,
+          "heroNameKr": "엘비스",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260909:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20260909:3",
+      "bannerDefinitionId": "bdef:v1:a82ccbb9c17be1580e8f1b71",
+      "krDisplayDate": "2026-09-09",
+      "displayOrder": 3,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9503.webp",
+        "assetId": "basset:v1:463426a184340ea636fb9dfd",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99208,
+          "heroNameKr": "프레시아",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99240,
+          "heroNameKr": "사프린",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99219,
+          "heroNameKr": "제이스",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-manual-wish-langrisser-1-5-20260909",
+      "bannerOccurrenceId": "bocc:kr-manual-wish-langrisser-1-5-20260909",
+      "bannerDefinitionId": "bdef:v1:8a8be80c9c0ed39614460ce3",
+      "krDisplayDate": "2026-09-09",
+      "displayOrder": 4,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "MANUAL_KR"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_ChuanShuoReturn.webp",
+        "assetId": "basset:v1:f425028b068612ffe6a1af23",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260916:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20260916:1",
+      "bannerDefinitionId": "bdef:v1:c8efdffc4fa7f14d0d07a203",
+      "krDisplayDate": "2026-09-16",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_7203.webp",
+        "assetId": "basset:v1:16dd4246e49ab47c8690b8d8",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99170,
+          "heroNameKr": "로비나 대제",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99191,
+          "heroNameKr": "루그너",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99192,
+          "heroNameKr": "그렌실",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260916:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20260916:2",
+      "bannerDefinitionId": "bdef:v1:70f639fb373b5e2045d1af6c",
+      "krDisplayDate": "2026-09-16",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "LEGACY_REUSE"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_1704.webp",
+        "assetId": "basset:v1:1667a46c6b49523d309860bf",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 55,
+          "heroNameKr": "란디우스",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 89,
+          "heroNameKr": "유리아",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 37,
+          "heroNameKr": "쥬그라",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260916:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20260916:3",
+      "bannerDefinitionId": "bdef:v1:3e4567c8f850446457f43077",
+      "krDisplayDate": "2026-09-16",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7902.webp",
+        "assetId": "basset:v1:44b4a1e31a26d397047998a6",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260923:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20260923:1",
+      "bannerDefinitionId": "bdef:v1:aed943ae861a294a1581a9b3",
+      "krDisplayDate": "2026-09-23",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "NEW",
+      "lifecycleLabelKr": "신규",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9601.webp",
+        "assetId": "basset:v1:6374667a7ef425002b99d136",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99272,
+          "heroNameKr": "무닝",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260923:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20260923:2",
+      "bannerDefinitionId": "bdef:v1:763ddce678ffc26bc4e9b8b6",
+      "krDisplayDate": "2026-09-23",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7802.webp",
+        "assetId": "basset:v1:1d2fb3b751e56e23c8e62b3b",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99219,
+          "heroNameKr": "제이스",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99227,
+          "heroNameKr": "타브리스",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260930:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20260930:1",
+      "bannerDefinitionId": "bdef:v1:01013eda3e140e3752dc9b8a",
+      "krDisplayDate": "2026-09-30",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9001.webp",
+        "assetId": "basset:v1:47d45ed68520791ed062ce22",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99261,
+          "heroNameKr": "훔바바",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260930:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20260930:2",
+      "bannerDefinitionId": "bdef:v1:d228896f8847ca9f93bbf338",
+      "krDisplayDate": "2026-09-30",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_8501.webp",
+        "assetId": "basset:v1:98f162bd533dce5d9656990c",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99251,
+          "heroNameKr": "마안의 서큐버스",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260930:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20260930:3",
+      "bannerDefinitionId": "bdef:v1:8b2883e5140c7c7352910c82",
+      "krDisplayDate": "2026-09-30",
+      "displayOrder": 3,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7401.webp",
+        "assetId": "basset:v1:0fe77a36c8dfdaa4be77433b",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99232,
+          "heroNameKr": "빛의 소환사",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260930:4",
+      "bannerOccurrenceId": "bocc:kr-banner:20260930:4",
+      "bannerDefinitionId": "bdef:v1:dd04349351ec410337cee9f5",
+      "krDisplayDate": "2026-09-30",
+      "displayOrder": 4,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9602.webp",
+        "assetId": "basset:v1:04cd4b400c3bab455933d8ae",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99262,
+          "heroNameKr": "비앙카",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99266,
+          "heroNameKr": "생거",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20260930:5",
+      "bannerOccurrenceId": "bocc:kr-banner:20260930:5",
+      "bannerDefinitionId": "bdef:v1:024e4d53ba9aea98bffd525b",
+      "krDisplayDate": "2026-09-30",
+      "displayOrder": 5,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_8302.webp",
+        "assetId": "basset:v1:68874c132eef468b7488fc42",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99229,
+          "heroNameKr": "셀리카",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99186,
+          "heroNameKr": "빛과 그림자 검의 영혼",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261007:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261007:1",
+      "bannerDefinitionId": "bdef:v1:ad24b93fa048422db17e4f13",
+      "krDisplayDate": "2026-10-07",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9604.webp",
+        "assetId": "basset:v1:6b6756eddc6305b51c956afb",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99255,
+          "heroNameKr": "엘비스",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99227,
+          "heroNameKr": "타브리스",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261007:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20261007:2",
+      "bannerDefinitionId": "bdef:v1:68a0556452e966cd0f615196",
+      "krDisplayDate": "2026-10-07",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_8306.webp",
+        "assetId": "basset:v1:3eb3274bf8e90949a8301b37",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99228,
+          "heroNameKr": "이미르",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99203,
+          "heroNameKr": "님프",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261007:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20261007:3",
+      "bannerDefinitionId": "bdef:v1:3f6de26d7bd2a24ea919dbbf",
+      "krDisplayDate": "2026-10-07",
+      "displayOrder": 3,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7005.webp",
+        "assetId": "basset:v1:762f8ed9216959ca3dac8b24",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99174,
+          "heroNameKr": "아즈사",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99175,
+          "heroNameKr": "오보로",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261007:4",
+      "bannerOccurrenceId": "bocc:kr-banner:20261007:4",
+      "bannerDefinitionId": "bdef:v1:36d2d42524268a6f7f1d752e",
+      "krDisplayDate": "2026-10-07",
+      "displayOrder": 4,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_4405.webp",
+        "assetId": "basset:v1:72e700fd245a1e82a28409fc",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99,
+          "heroNameKr": "클로테르",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 100,
+          "heroNameKr": "로젠실",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261007:5",
+      "bannerOccurrenceId": "bocc:kr-banner:20261007:5",
+      "bannerDefinitionId": "bdef:v1:de6e18db806eeadefc316c87",
+      "krDisplayDate": "2026-10-07",
+      "displayOrder": 5,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_8301.webp",
+        "assetId": "basset:v1:527210b664e2ad4290408188",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99248,
+          "heroNameKr": "시엘나",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261007:6",
+      "bannerOccurrenceId": "bocc:kr-banner:20261007:6",
+      "bannerDefinitionId": "bdef:v1:8752c5968ba6874c0e2fa3d8",
+      "krDisplayDate": "2026-10-07",
+      "displayOrder": 6,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7701.webp",
+        "assetId": "basset:v1:e8c6d4fae624f62c31e99ef3",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99237,
+          "heroNameKr": "엔야",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261007:7",
+      "bannerOccurrenceId": "bocc:kr-banner:20261007:7",
+      "bannerDefinitionId": "bdef:v1:f093f508ad376a8dae563672",
+      "krDisplayDate": "2026-10-07",
+      "displayOrder": 7,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_8001.webp",
+        "assetId": "basset:v1:c374e9a73a6d46b292018cbe",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99242,
+          "heroNameKr": "염룡파멸자",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261007:8",
+      "bannerOccurrenceId": "bocc:kr-banner:20261007:8",
+      "bannerDefinitionId": "bdef:v1:da8726e4782450283c65a5b0",
+      "krDisplayDate": "2026-10-07",
+      "displayOrder": 8,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7001.webp",
+        "assetId": "basset:v1:59d4b9000ce5aa32eea22e21",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99225,
+          "heroNameKr": "빙설 심연의 지배자",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261007:9",
+      "bannerOccurrenceId": "bocc:kr-banner:20261007:9",
+      "bannerDefinitionId": "bdef:v1:87b20d10e6cc1d7d1133aaa4",
+      "krDisplayDate": "2026-10-07",
+      "displayOrder": 9,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_5701.webp",
+        "assetId": "basset:v1:37b13aeeb9243c33be6ac1ec",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99197,
+          "heroNameKr": "각성자",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261007:10",
+      "bannerOccurrenceId": "bocc:kr-banner:20261007:10",
+      "bannerDefinitionId": "bdef:v1:74776c0fce2751ad36a46212",
+      "krDisplayDate": "2026-10-07",
+      "displayOrder": 10,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9603.webp",
+        "assetId": "basset:v1:484ee98a55842a95cd7b4cc9",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99244,
+          "heroNameKr": "란델",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99228,
+          "heroNameKr": "이미르",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 106,
+          "heroNameKr": "입실론",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261014:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261014:1",
+      "bannerDefinitionId": "bdef:v1:7f3cd91427c194fa06cb8674",
+      "krDisplayDate": "2026-10-14",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_6401.webp",
+        "assetId": "basset:v1:7376ece52d40d28781e3d5f9",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99212,
+          "heroNameKr": "강신자",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261014:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20261014:2",
+      "bannerDefinitionId": "bdef:v1:4f390d66438877fde49a25a1",
+      "krDisplayDate": "2026-10-14",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_3902.webp",
+        "assetId": "basset:v1:72f72c08be7a8e5bee9e5e58",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99166,
+          "heroNameKr": "웨탐",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261014:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20261014:3",
+      "bannerDefinitionId": "bdef:v1:bca4766121b0bc469361cf1c",
+      "krDisplayDate": "2026-10-14",
+      "displayOrder": 3,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9103.webp",
+        "assetId": "basset:v1:f540c1364d0b6ea2407ca5bc",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99249,
+          "heroNameKr": "마카엘라",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99239,
+          "heroNameKr": "이리아",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99227,
+          "heroNameKr": "타브리스",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261021:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261021:1",
+      "bannerDefinitionId": "bdef:v1:d14a4c6837636d525c13c914",
+      "krDisplayDate": "2026-10-21",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "픽업",
+      "typeLabelBasis": "NEUTRALIZED_CARDINALITY_RELATION_REVIEW",
+      "lifecycle": "NEW",
+      "lifecycleLabelKr": "신규",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9701.webp",
+        "assetId": "basset:v1:bd708b4be74c762702596f67",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99274,
+          "heroNameKr": "란카",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99275,
+          "heroNameKr": "아오라",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": false,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261028:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261028:1",
+      "bannerDefinitionId": "bdef:v1:364dee3fe0993c87abfd8920",
+      "krDisplayDate": "2026-10-28",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9702.webp",
+        "assetId": "basset:v1:1497909430d3792c1d52622c",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99265,
+          "heroNameKr": "레이가",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99259,
+          "heroNameKr": "레이피어",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261028:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20261028:2",
+      "bannerDefinitionId": "bdef:v1:330a2a692cdffcc1d0084806",
+      "krDisplayDate": "2026-10-28",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9303.webp",
+        "assetId": "basset:v1:c1953a4959b76bb617ca5e23",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99206,
+          "heroNameKr": "이리스",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99186,
+          "heroNameKr": "빛과 그림자 검의 영혼",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 89,
+          "heroNameKr": "유리아",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261028:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20261028:3",
+      "bannerDefinitionId": "bdef:v1:a4889f0955cafa5a818c2294",
+      "krDisplayDate": "2026-10-28",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7804.webp",
+        "assetId": "basset:v1:b0b0314c0e45f5b55cb7c292",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261104:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261104:1",
+      "bannerDefinitionId": "bdef:v1:31d85cfec9cbff0fee26ec47",
+      "krDisplayDate": "2026-11-04",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9703.webp",
+        "assetId": "basset:v1:7f78c1a1822d5eeb56762961",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 125,
+          "heroNameKr": "리코리스",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 126,
+          "heroNameKr": "팟시르",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99253,
+          "heroNameKr": "아브샤이트",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261104:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20261104:2",
+      "bannerDefinitionId": "bdef:v1:c7452c25908619fa43e75a57",
+      "krDisplayDate": "2026-11-04",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_8702.webp",
+        "assetId": "basset:v1:17ce28a40781c67363f19217",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99240,
+          "heroNameKr": "사프린",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99244,
+          "heroNameKr": "란델",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-manual-wish-langrisser-1-5-20261104",
+      "bannerOccurrenceId": "bocc:kr-manual-wish-langrisser-1-5-20261104",
+      "bannerDefinitionId": "bdef:v1:8c52228bbf442bf04eb92102",
+      "krDisplayDate": "2026-11-04",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "MANUAL_KR"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_ChuanShuoReturn.webp",
+        "assetId": "basset:v1:f425028b068612ffe6a1af23",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261111:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261111:1",
+      "bannerDefinitionId": "bdef:v1:1dff1ae57975fe06408f796c",
+      "krDisplayDate": "2026-11-11",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "픽업",
+      "typeLabelBasis": "NEUTRALIZED_CARDINALITY_RELATION_REVIEW",
+      "lifecycle": "NEW",
+      "lifecycleLabelKr": "신규",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9801.webp",
+        "assetId": "basset:v1:402f2363ae1aa1c7e82f20ba",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99277,
+          "heroNameKr": "D-BOY",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99278,
+          "heroNameKr": "아이바 신야",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": false,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261118:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261118:1",
+      "bannerDefinitionId": "bdef:v1:22d142890ff2b5a1009708e0",
+      "krDisplayDate": "2026-11-18",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9802.webp",
+        "assetId": "basset:v1:64c5aef3404d3fdec076c1c0",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99260,
+          "heroNameKr": "샤리크",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99270,
+          "heroNameKr": "타지",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261118:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20261118:2",
+      "bannerDefinitionId": "bdef:v1:bcbd95d328e373322028cf08",
+      "krDisplayDate": "2026-11-18",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_7103.webp",
+        "assetId": "basset:v1:e8f5928df3efc18409e0e907",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99217,
+          "heroNameKr": "호프만",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99203,
+          "heroNameKr": "님프",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99180,
+          "heroNameKr": "방랑투사",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261118:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20261118:3",
+      "bannerDefinitionId": "bdef:v1:10095695c7fd6883bb98e2ea",
+      "krDisplayDate": "2026-11-18",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9616.webp",
+        "assetId": "basset:v1:4b129732b63047717345d295",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261118:4",
+      "bannerOccurrenceId": "bocc:kr-banner:20261118:4",
+      "bannerDefinitionId": "bdef:v1:ec86d84a698da0e735e2455d",
+      "krDisplayDate": "2026-11-18",
+      "displayOrder": 4,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7404.webp",
+        "assetId": "basset:v1:9b569d7ac2c5fd2f73da0acb",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261125:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261125:1",
+      "bannerDefinitionId": "bdef:v1:fc12cd723f389da825ca3b6c",
+      "krDisplayDate": "2026-11-25",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_8902.webp",
+        "assetId": "basset:v1:ddff74f3cd1e5a13c41ceef3",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99249,
+          "heroNameKr": "마카엘라",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99234,
+          "heroNameKr": "티아나",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261125:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20261125:2",
+      "bannerDefinitionId": "bdef:v1:8c68c9f4f2d45f9c05432bd7",
+      "krDisplayDate": "2026-11-25",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9803.webp",
+        "assetId": "basset:v1:425574edceebcc71a613bf1a",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99215,
+          "heroNameKr": "안드리올",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99262,
+          "heroNameKr": "비앙카",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 25,
+          "heroNameKr": "알테뮬러",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-manual-wish-langrisser-1-5-20261125",
+      "bannerOccurrenceId": "bocc:kr-manual-wish-langrisser-1-5-20261125",
+      "bannerDefinitionId": "bdef:v1:cef629ebf44b389971d1bbb8",
+      "krDisplayDate": "2026-11-25",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "MANUAL_KR"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_ChuanShuoReturn.webp",
+        "assetId": "basset:v1:f425028b068612ffe6a1af23",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261202:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261202:1",
+      "bannerDefinitionId": "bdef:v1:cb14061cc02d8c231216427b",
+      "krDisplayDate": "2026-12-02",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_8303.webp",
+        "assetId": "basset:v1:e5942bb397caa09025ded89b",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99214,
+          "heroNameKr": "네미아",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99219,
+          "heroNameKr": "제이스",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99221,
+          "heroNameKr": "군",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261202:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20261202:2",
+      "bannerDefinitionId": "bdef:v1:a23cfae292dd5845f0aa56c4",
+      "krDisplayDate": "2026-12-02",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "LEGACY_REUSE"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_1503.webp",
+        "assetId": "basset:v1:5f06f124b216ab82cb2db25f",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 15,
+          "heroNameKr": "리아나",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 26,
+          "heroNameKr": "루나",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 9,
+          "heroNameKr": "보젤",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261202:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20261202:3",
+      "bannerDefinitionId": "bdef:v1:3e4567c8f850446457f43077",
+      "krDisplayDate": "2026-12-02",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7902.webp",
+        "assetId": "basset:v1:44b4a1e31a26d397047998a6",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261209:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261209:1",
+      "bannerDefinitionId": "bdef:v1:74783713495bbb3b05647b21",
+      "krDisplayDate": "2026-12-09",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "픽업",
+      "typeLabelBasis": "NEUTRALIZED_CARDINALITY_RELATION_REVIEW",
+      "lifecycle": "NEW",
+      "lifecycleLabelKr": "신규",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9901.webp",
+        "assetId": "basset:v1:eddd82cff414365d6fde21e0",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99279,
+          "heroNameKr": "아시",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99280,
+          "heroNameKr": "사륜",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": false,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261216:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261216:1",
+      "bannerDefinitionId": "bdef:v1:4286fe5169774f238a819996",
+      "krDisplayDate": "2026-12-16",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9201.webp",
+        "assetId": "basset:v1:23bb64ee94aa28116effe15f",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99264,
+          "heroNameKr": "빛과 어둠의 반역자",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261216:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20261216:2",
+      "bannerDefinitionId": "bdef:v1:850318bb3fb250fc29af3829",
+      "krDisplayDate": "2026-12-16",
+      "displayOrder": 2,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_OptionalWish.webp",
+        "assetId": "basset:v1:3154da984de3ec526be819c1",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261216:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20261216:3",
+      "bannerDefinitionId": "bdef:v1:2dcf75e5b15482afb5b6f766",
+      "krDisplayDate": "2026-12-16",
+      "displayOrder": 3,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9902.webp",
+        "assetId": "basset:v1:ad4e18026d284a0c05b0c60f",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99271,
+          "heroNameKr": "린",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99266,
+          "heroNameKr": "생거",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261216:4",
+      "bannerOccurrenceId": "bocc:kr-banner:20261216:4",
+      "bannerDefinitionId": "bdef:v1:c1d19290a1d948dd3969afb5",
+      "krDisplayDate": "2026-12-16",
+      "displayOrder": 4,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_6603.webp",
+        "assetId": "basset:v1:7dc7d75a5880a96ea2adbba9",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99198,
+          "heroNameKr": "아마데우스",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 129,
+          "heroNameKr": "구스타프",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 100,
+          "heroNameKr": "로젠실",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261216:5",
+      "bannerOccurrenceId": "bocc:kr-banner:20261216:5",
+      "bannerDefinitionId": "bdef:v1:ec86d84a698da0e735e2455d",
+      "krDisplayDate": "2026-12-16",
+      "displayOrder": 5,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7404.webp",
+        "assetId": "basset:v1:9b569d7ac2c5fd2f73da0acb",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261223:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261223:1",
+      "bannerDefinitionId": "bdef:v1:1cbc35e2f1a3f84127cd99dd",
+      "krDisplayDate": "2026-12-23",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_8802.webp",
+        "assetId": "basset:v1:6abcd54ed237d8dc87b24e5d",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99216,
+          "heroNameKr": "에쉬앤",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99226,
+          "heroNameKr": "테란틸",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261223:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20261223:2",
+      "bannerDefinitionId": "bdef:v1:bada8f4e5ad708f38f02bc34",
+      "krDisplayDate": "2026-12-23",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9903.webp",
+        "assetId": "basset:v1:5ae0d3d0e52b418648558a74",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99229,
+          "heroNameKr": "셀리카",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99252,
+          "heroNameKr": "루크만",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99207,
+          "heroNameKr": "롤랑",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-manual-wish-langrisser-1-5-20261223",
+      "bannerOccurrenceId": "bocc:kr-manual-wish-langrisser-1-5-20261223",
+      "bannerDefinitionId": "bdef:v1:eba6134e47e888f55be60503",
+      "krDisplayDate": "2026-12-23",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "MANUAL_KR"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_ChuanShuoReturn.webp",
+        "assetId": "basset:v1:f425028b068612ffe6a1af23",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261230:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20261230:1",
+      "bannerDefinitionId": "bdef:v1:f6fc7ce4101dba13a5470356",
+      "krDisplayDate": "2026-12-30",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_4203.webp",
+        "assetId": "basset:v1:2d3e83e57db22f5524649fcf",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 125,
+          "heroNameKr": "리코리스",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 114,
+          "heroNameKr": "마리엘",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 121,
+          "heroNameKr": "츠바메",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261230:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20261230:2",
+      "bannerDefinitionId": "bdef:v1:f0673dcb9d5929b58a112a81",
+      "krDisplayDate": "2026-12-30",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "LEGACY_REUSE"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_1404.webp",
+        "assetId": "basset:v1:60e456d0baa627ee00f72fc4",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 7,
+          "heroNameKr": "베른하르트",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 12,
+          "heroNameKr": "엘윈",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 6,
+          "heroNameKr": "레온",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20261230:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20261230:3",
+      "bannerDefinitionId": "bdef:v1:a4889f0955cafa5a818c2294",
+      "krDisplayDate": "2026-12-30",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7804.webp",
+        "assetId": "basset:v1:b0b0314c0e45f5b55cb7c292",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270106:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270106:1",
+      "bannerDefinitionId": "bdef:v1:2f75639828c647d18f4ff5d6",
+      "krDisplayDate": "2027-01-06",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "NEW",
+      "lifecycleLabelKr": "신규",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_10001.webp",
+        "assetId": "basset:v1:3403963d35a405cddd8b5af5",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99281,
+          "heroNameKr": "효랑어홍사",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270113:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270113:1",
+      "bannerDefinitionId": "bdef:v1:a302e5adc2d6b68c3c240dc8",
+      "krDisplayDate": "2027-01-13",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_10002.webp",
+        "assetId": "basset:v1:80cc3d9ab1157478de031596",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99275,
+          "heroNameKr": "아오라",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99265,
+          "heroNameKr": "레이가",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270113:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20270113:2",
+      "bannerDefinitionId": "bdef:v1:9e7c42ceae23219bb46e71d6",
+      "krDisplayDate": "2027-01-13",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_8703.webp",
+        "assetId": "basset:v1:69fb9e9186b392a70a07cef3",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99230,
+          "heroNameKr": "세라피나",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99215,
+          "heroNameKr": "안드리올",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99193,
+          "heroNameKr": "요아&코니",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270113:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20270113:3",
+      "bannerDefinitionId": "bdef:v1:ec86d84a698da0e735e2455d",
+      "krDisplayDate": "2027-01-13",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7404.webp",
+        "assetId": "basset:v1:9b569d7ac2c5fd2f73da0acb",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270120:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270120:1",
+      "bannerDefinitionId": "bdef:v1:67f9d1aa7aa5f909bf4e0fdb",
+      "krDisplayDate": "2027-01-20",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_10003.webp",
+        "assetId": "basset:v1:ccb3cd5545611e37fa3b6ac3",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99239,
+          "heroNameKr": "이리아",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99240,
+          "heroNameKr": "사프린",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 113,
+          "heroNameKr": "탄생의 빛",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270120:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20270120:2",
+      "bannerDefinitionId": "bdef:v1:01693e2bd08c7fb0c26ac256",
+      "krDisplayDate": "2027-01-20",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7302.webp",
+        "assetId": "basset:v1:d22797e386a871d56c86ed2d",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 124,
+          "heroNameKr": "크리스티아네",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99216,
+          "heroNameKr": "에쉬앤",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-manual-wish-langrisser-1-5-20270120",
+      "bannerOccurrenceId": "bocc:kr-manual-wish-langrisser-1-5-20270120",
+      "bannerDefinitionId": "bdef:v1:2bcf8e94a166bfd3a91fc347",
+      "krDisplayDate": "2027-01-20",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "MANUAL_KR"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_ChuanShuoReturn.webp",
+        "assetId": "basset:v1:f425028b068612ffe6a1af23",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270127:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270127:1",
+      "bannerDefinitionId": "bdef:v1:78a475f1493748e14e6a67ab",
+      "krDisplayDate": "2027-01-27",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_2003.webp",
+        "assetId": "basset:v1:b293591f2c4dde5dc4b52865",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 54,
+          "heroNameKr": "리스틸",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 61,
+          "heroNameKr": "람다",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 64,
+          "heroNameKr": "브렌다",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270127:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20270127:2",
+      "bannerDefinitionId": "bdef:v1:3e4567c8f850446457f43077",
+      "krDisplayDate": "2027-01-27",
+      "displayOrder": 2,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7902.webp",
+        "assetId": "basset:v1:44b4a1e31a26d397047998a6",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270127:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20270127:3",
+      "bannerDefinitionId": "bdef:v1:f0673dcb9d5929b58a112a81",
+      "krDisplayDate": "2027-01-27",
+      "displayOrder": 3,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [
+        "LEGACY_REUSE"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_1404.webp",
+        "assetId": "basset:v1:60e456d0baa627ee00f72fc4",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 7,
+          "heroNameKr": "베른하르트",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 12,
+          "heroNameKr": "엘윈",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 6,
+          "heroNameKr": "레온",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270203:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270203:1",
+      "bannerDefinitionId": "bdef:v1:6293cb2342eb6f99e4c34e30",
+      "krDisplayDate": "2027-02-03",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "픽업",
+      "typeLabelBasis": "NEUTRALIZED_CARDINALITY_RELATION_REVIEW",
+      "lifecycle": "NEW",
+      "lifecycleLabelKr": "신규",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_10101.webp",
+        "assetId": "basset:v1:42974380db59e2d6a064ef04",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99282,
+          "heroNameKr": "은(밴시)",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99283,
+          "heroNameKr": "아윈(쿠모)",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": false,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270210:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270210:1",
+      "bannerDefinitionId": "bdef:v1:90193c3c4bf8ed674fc792d3",
+      "krDisplayDate": "2027-02-10",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_10102.webp",
+        "assetId": "basset:v1:f3b609ec62496896cfc76d59",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99274,
+          "heroNameKr": "란카",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99279,
+          "heroNameKr": "아시",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270210:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20270210:2",
+      "bannerDefinitionId": "bdef:v1:74776c0fce2751ad36a46212",
+      "krDisplayDate": "2027-02-10",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_9603.webp",
+        "assetId": "basset:v1:484ee98a55842a95cd7b4cc9",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99244,
+          "heroNameKr": "란델",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99228,
+          "heroNameKr": "이미르",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 106,
+          "heroNameKr": "입실론",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270210:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20270210:3",
+      "bannerDefinitionId": "bdef:v1:ec86d84a698da0e735e2455d",
+      "krDisplayDate": "2027-02-10",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7404.webp",
+        "assetId": "basset:v1:9b569d7ac2c5fd2f73da0acb",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270217:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270217:1",
+      "bannerDefinitionId": "bdef:v1:effc5adeb127365d69e55b69",
+      "krDisplayDate": "2027-02-17",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_10103.webp",
+        "assetId": "basset:v1:5827ad4301852105f0818e8b",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99203,
+          "heroNameKr": "님프",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99233,
+          "heroNameKr": "시온",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99250,
+          "heroNameKr": "샘",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270217:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20270217:2",
+      "bannerDefinitionId": "bdef:v1:4379a2fa9682f6db4e41bbc1",
+      "krDisplayDate": "2027-02-17",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9302.webp",
+        "assetId": "basset:v1:028b70177a53e6d879fd8f01",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99259,
+          "heroNameKr": "레이피어",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99254,
+          "heroNameKr": "레이아",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-manual-wish-langrisser-1-5-20270217",
+      "bannerOccurrenceId": "bocc:kr-manual-wish-langrisser-1-5-20270217",
+      "bannerDefinitionId": "bdef:v1:b72feedb42d7a376fe4244ed",
+      "krDisplayDate": "2027-02-17",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "MANUAL_KR"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_ChuanShuoReturn.webp",
+        "assetId": "basset:v1:f425028b068612ffe6a1af23",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270224:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270224:1",
+      "bannerDefinitionId": "bdef:v1:c1d19290a1d948dd3969afb5",
+      "krDisplayDate": "2027-02-24",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_6603.webp",
+        "assetId": "basset:v1:7dc7d75a5880a96ea2adbba9",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99198,
+          "heroNameKr": "아마데우스",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 129,
+          "heroNameKr": "구스타프",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 100,
+          "heroNameKr": "로젠실",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270224:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20270224:2",
+      "bannerDefinitionId": "bdef:v1:a4889f0955cafa5a818c2294",
+      "krDisplayDate": "2027-02-24",
+      "displayOrder": 2,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7804.webp",
+        "assetId": "basset:v1:b0b0314c0e45f5b55cb7c292",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270224:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20270224:3",
+      "bannerDefinitionId": "bdef:v1:70f639fb373b5e2045d1af6c",
+      "krDisplayDate": "2027-02-24",
+      "displayOrder": 3,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [
+        "LEGACY_REUSE"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_1704.webp",
+        "assetId": "basset:v1:1667a46c6b49523d309860bf",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 55,
+          "heroNameKr": "란디우스",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 89,
+          "heroNameKr": "유리아",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 37,
+          "heroNameKr": "쥬그라",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270303:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270303:1",
+      "bannerDefinitionId": "bdef:v1:3ab57930a1fe3947da643f64",
+      "krDisplayDate": "2027-03-03",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "픽업",
+      "typeLabelBasis": "NEUTRALIZED_CARDINALITY_RELATION_REVIEW",
+      "lifecycle": "NEW",
+      "lifecycleLabelKr": "신규",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_10201.webp",
+        "assetId": "basset:v1:4e23ff6804cebd9211f8bc86",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99284,
+          "heroNameKr": "야차왕 가이",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99285,
+          "heroNameKr": "수라왕 슈라토",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": false,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270310:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270310:1",
+      "bannerDefinitionId": "bdef:v1:bc6ba1439bf71c31a5ab8100",
+      "krDisplayDate": "2027-03-10",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_10202.webp",
+        "assetId": "basset:v1:b51c9c2440d568bcc0a39ed3",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99280,
+          "heroNameKr": "사륜",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99249,
+          "heroNameKr": "마카엘라",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270310:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20270310:2",
+      "bannerDefinitionId": "bdef:v1:45e4fb6a13f8493f140458df",
+      "krDisplayDate": "2027-03-10",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_8403.webp",
+        "assetId": "basset:v1:c580193cb0285837ba46c776",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99230,
+          "heroNameKr": "세라피나",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99215,
+          "heroNameKr": "안드리올",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99,
+          "heroNameKr": "클로테르",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270310:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20270310:3",
+      "bannerDefinitionId": "bdef:v1:ec86d84a698da0e735e2455d",
+      "krDisplayDate": "2027-03-10",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7404.webp",
+        "assetId": "basset:v1:9b569d7ac2c5fd2f73da0acb",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270317:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270317:1",
+      "bannerDefinitionId": "bdef:v1:22a7085256518913de73c59b",
+      "krDisplayDate": "2027-03-17",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_10203.webp",
+        "assetId": "basset:v1:122e033d1a50675168620699",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99238,
+          "heroNameKr": "아리아",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99239,
+          "heroNameKr": "이리아",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99231,
+          "heroNameKr": "비리아",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270317:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20270317:2",
+      "bannerDefinitionId": "bdef:v1:364dee3fe0993c87abfd8920",
+      "krDisplayDate": "2027-03-17",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "DUAL",
+      "typeLabelKr": "2인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_9702.webp",
+        "assetId": "basset:v1:1497909430d3792c1d52622c",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99265,
+          "heroNameKr": "레이가",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99259,
+          "heroNameKr": "레이피어",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 2,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-manual-wish-langrisser-1-5-20270317",
+      "bannerOccurrenceId": "bocc:kr-manual-wish-langrisser-1-5-20270317",
+      "bannerDefinitionId": "bdef:v1:e550063d4c405f5688a7a6d9",
+      "krDisplayDate": "2027-03-17",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "MANUAL_KR"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_ChuanShuoReturn.webp",
+        "assetId": "basset:v1:f425028b068612ffe6a1af23",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270324:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270324:1",
+      "bannerDefinitionId": "bdef:v1:bcbd95d328e373322028cf08",
+      "krDisplayDate": "2027-03-24",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_7103.webp",
+        "assetId": "basset:v1:e8f5928df3efc18409e0e907",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99217,
+          "heroNameKr": "호프만",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99203,
+          "heroNameKr": "님프",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99180,
+          "heroNameKr": "방랑투사",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270324:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20270324:2",
+      "bannerDefinitionId": "bdef:v1:44a4c2ff338c15a3cff184e8",
+      "krDisplayDate": "2027-03-24",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [
+        "LEGACY_REUSE"
+      ],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_1304.webp",
+        "assetId": "basset:v1:7d5790905442aa83a48227b6",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 10,
+          "heroNameKr": "레딘",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 25,
+          "heroNameKr": "알테뮬러",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 56,
+          "heroNameKr": "레이첼",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270324:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20270324:3",
+      "bannerDefinitionId": "bdef:v1:3e4567c8f850446457f43077",
+      "krDisplayDate": "2027-03-24",
+      "displayOrder": 3,
+      "mechanicFamily": "WISH",
+      "pickupCardinality": "NOT_APPLICABLE",
+      "typeLabelKr": "소원소환",
+      "typeLabelBasis": "MECHANIC_FAMILY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7902.webp",
+        "assetId": "basset:v1:44b4a1e31a26d397047998a6",
+        "provenance": "MANUAL_REPLACEMENT",
+        "replacementState": "VERIFIED_MANUAL_REPLACEMENT",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [],
+      "pickupHeroCount": 0,
+      "pickupHeroCountMatchesCardinality": null,
+      "deferredDetail": {
+        "kind": "WISH_CANDIDATES",
+        "stage": "Banner Stage 3-4 Wish consumer",
+        "materializedHere": false
+      },
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270331:1",
+      "bannerOccurrenceId": "bocc:kr-banner:20270331:1",
+      "bannerDefinitionId": "bdef:v1:189728e454a3912f77a97d84",
+      "krDisplayDate": "2027-03-31",
+      "displayOrder": 1,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "NEW",
+      "lifecycleLabelKr": "신규",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_10301.webp",
+        "assetId": "basset:v1:3405c94cf71f675ce5f0653b",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99287,
+          "heroNameKr": "마검의 화신",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270331:2",
+      "bannerOccurrenceId": "bocc:kr-banner:20270331:2",
+      "bannerDefinitionId": "bdef:v1:1ce76b43bff2f3f9eaa9071d",
+      "krDisplayDate": "2027-03-31",
+      "displayOrder": 2,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "TRIPLE",
+      "typeLabelKr": "3인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "FIRST_OBSERVED_IN_CURRENT_DATASET",
+      "lifecycleLabelKr": "현 데이터셋 최초 관측",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Banner/Banner_10303.webp",
+        "assetId": "basset:v1:cfbc24f2b65213a3614be171",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 122,
+          "heroNameKr": "힐다",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99244,
+          "heroNameKr": "란델",
+          "sourceIndex": 1,
+          "heroStatus": "verified"
+        },
+        {
+          "heroId": 99263,
+          "heroNameKr": "키벨레",
+          "sourceIndex": 2,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 3,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270331:3",
+      "bannerOccurrenceId": "bocc:kr-banner:20270331:3",
+      "bannerDefinitionId": "bdef:v1:87b20d10e6cc1d7d1133aaa4",
+      "krDisplayDate": "2027-03-31",
+      "displayOrder": 3,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_5701.webp",
+        "assetId": "basset:v1:37b13aeeb9243c33be6ac1ec",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99197,
+          "heroNameKr": "각성자",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    },
+    {
+      "rowId": "bocc:kr-banner:20270331:4",
+      "bannerOccurrenceId": "bocc:kr-banner:20270331:4",
+      "bannerDefinitionId": "bdef:v1:da8726e4782450283c65a5b0",
+      "krDisplayDate": "2027-03-31",
+      "displayOrder": 4,
+      "mechanicFamily": "PICKUP",
+      "pickupCardinality": "SINGLE",
+      "typeLabelKr": "1인 픽업",
+      "typeLabelBasis": "TAXONOMY_CARDINALITY",
+      "lifecycle": "RERUN",
+      "lifecycleLabelKr": "복각",
+      "provenanceTags": [],
+      "validationTags": [
+        "SOURCE_CONFLICT"
+      ],
+      "image": {
+        "displayState": "READY_VERIFIED_SOURCE_ASSET",
+        "canRenderImage": true,
+        "publicPath": "/images/banners/Picture_Notice/Picture_Notice_7001.webp",
+        "assetId": "basset:v1:59d4b9000ce5aa32eea22e21",
+        "provenance": "SOURCE_MATCHED",
+        "replacementState": "NONE",
+        "placeholderKey": null
+      },
+      "pickupHeroes": [
+        {
+          "heroId": 99225,
+          "heroNameKr": "빙설 심연의 지배자",
+          "sourceIndex": 0,
+          "heroStatus": "verified"
+        }
+      ],
+      "pickupHeroCount": 1,
+      "pickupHeroCountMatchesCardinality": true,
+      "deferredDetail": null,
+      "rowStatus": "READY"
+    }
+  ],
+  "dateGroups": [
+    {
+      "krDisplayDate": "2026-09-02",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20260902:1",
+        "bocc:kr-banner:20260902:2",
+        "bocc:kr-manual-wish-20260902"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-09-09",
+      "rowCount": 4,
+      "rowIds": [
+        "bocc:kr-banner:20260909:1",
+        "bocc:kr-banner:20260909:2",
+        "bocc:kr-banner:20260909:3",
+        "bocc:kr-manual-wish-langrisser-1-5-20260909"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-09-16",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20260916:1",
+        "bocc:kr-banner:20260916:2",
+        "bocc:kr-banner:20260916:3"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-09-23",
+      "rowCount": 2,
+      "rowIds": [
+        "bocc:kr-banner:20260923:1",
+        "bocc:kr-banner:20260923:2"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-09-30",
+      "rowCount": 5,
+      "rowIds": [
+        "bocc:kr-banner:20260930:1",
+        "bocc:kr-banner:20260930:2",
+        "bocc:kr-banner:20260930:3",
+        "bocc:kr-banner:20260930:4",
+        "bocc:kr-banner:20260930:5"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-10-07",
+      "rowCount": 10,
+      "rowIds": [
+        "bocc:kr-banner:20261007:1",
+        "bocc:kr-banner:20261007:2",
+        "bocc:kr-banner:20261007:3",
+        "bocc:kr-banner:20261007:4",
+        "bocc:kr-banner:20261007:5",
+        "bocc:kr-banner:20261007:6",
+        "bocc:kr-banner:20261007:7",
+        "bocc:kr-banner:20261007:8",
+        "bocc:kr-banner:20261007:9",
+        "bocc:kr-banner:20261007:10"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-10-14",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20261014:1",
+        "bocc:kr-banner:20261014:2",
+        "bocc:kr-banner:20261014:3"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-10-21",
+      "rowCount": 1,
+      "rowIds": [
+        "bocc:kr-banner:20261021:1"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-10-28",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20261028:1",
+        "bocc:kr-banner:20261028:2",
+        "bocc:kr-banner:20261028:3"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-11-04",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20261104:1",
+        "bocc:kr-banner:20261104:2",
+        "bocc:kr-manual-wish-langrisser-1-5-20261104"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-11-11",
+      "rowCount": 1,
+      "rowIds": [
+        "bocc:kr-banner:20261111:1"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-11-18",
+      "rowCount": 4,
+      "rowIds": [
+        "bocc:kr-banner:20261118:1",
+        "bocc:kr-banner:20261118:2",
+        "bocc:kr-banner:20261118:3",
+        "bocc:kr-banner:20261118:4"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-11-25",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20261125:1",
+        "bocc:kr-banner:20261125:2",
+        "bocc:kr-manual-wish-langrisser-1-5-20261125"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-12-02",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20261202:1",
+        "bocc:kr-banner:20261202:2",
+        "bocc:kr-banner:20261202:3"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-12-09",
+      "rowCount": 1,
+      "rowIds": [
+        "bocc:kr-banner:20261209:1"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-12-16",
+      "rowCount": 5,
+      "rowIds": [
+        "bocc:kr-banner:20261216:1",
+        "bocc:kr-banner:20261216:2",
+        "bocc:kr-banner:20261216:3",
+        "bocc:kr-banner:20261216:4",
+        "bocc:kr-banner:20261216:5"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-12-23",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20261223:1",
+        "bocc:kr-banner:20261223:2",
+        "bocc:kr-manual-wish-langrisser-1-5-20261223"
+      ]
+    },
+    {
+      "krDisplayDate": "2026-12-30",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20261230:1",
+        "bocc:kr-banner:20261230:2",
+        "bocc:kr-banner:20261230:3"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-01-06",
+      "rowCount": 1,
+      "rowIds": [
+        "bocc:kr-banner:20270106:1"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-01-13",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20270113:1",
+        "bocc:kr-banner:20270113:2",
+        "bocc:kr-banner:20270113:3"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-01-20",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20270120:1",
+        "bocc:kr-banner:20270120:2",
+        "bocc:kr-manual-wish-langrisser-1-5-20270120"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-01-27",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20270127:1",
+        "bocc:kr-banner:20270127:2",
+        "bocc:kr-banner:20270127:3"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-02-03",
+      "rowCount": 1,
+      "rowIds": [
+        "bocc:kr-banner:20270203:1"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-02-10",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20270210:1",
+        "bocc:kr-banner:20270210:2",
+        "bocc:kr-banner:20270210:3"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-02-17",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20270217:1",
+        "bocc:kr-banner:20270217:2",
+        "bocc:kr-manual-wish-langrisser-1-5-20270217"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-02-24",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20270224:1",
+        "bocc:kr-banner:20270224:2",
+        "bocc:kr-banner:20270224:3"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-03-03",
+      "rowCount": 1,
+      "rowIds": [
+        "bocc:kr-banner:20270303:1"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-03-10",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20270310:1",
+        "bocc:kr-banner:20270310:2",
+        "bocc:kr-banner:20270310:3"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-03-17",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20270317:1",
+        "bocc:kr-banner:20270317:2",
+        "bocc:kr-manual-wish-langrisser-1-5-20270317"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-03-24",
+      "rowCount": 3,
+      "rowIds": [
+        "bocc:kr-banner:20270324:1",
+        "bocc:kr-banner:20270324:2",
+        "bocc:kr-banner:20270324:3"
+      ]
+    },
+    {
+      "krDisplayDate": "2027-03-31",
+      "rowCount": 4,
+      "rowIds": [
+        "bocc:kr-banner:20270331:1",
+        "bocc:kr-banner:20270331:2",
+        "bocc:kr-banner:20270331:3",
+        "bocc:kr-banner:20270331:4"
+      ]
+    }
+  ],
+  "reviews": [
+    {
+      "code": "PICKUP_CARDINALITY_RELATION_COUNT_DIFFERENCE",
+      "count": 5,
+      "interpretation": "Do not rewrite Stage 2 taxonomy or Hero relations in Stage 3-3. Preserve both and neutralize the user-facing Korean type label for affected rows.",
+      "definitions": [
+        {
+          "bannerDefinitionId": "bdef:v1:1dff1ae57975fe06408f796c",
+          "pickupCardinality": "SINGLE",
+          "expectedHeroCount": 1,
+          "actualPickupHeroCount": 2,
+          "consumerTypeLabelKr": "픽업",
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
+        },
+        {
+          "bannerDefinitionId": "bdef:v1:3ab57930a1fe3947da643f64",
+          "pickupCardinality": "SINGLE",
+          "expectedHeroCount": 1,
+          "actualPickupHeroCount": 2,
+          "consumerTypeLabelKr": "픽업",
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
+        },
+        {
+          "bannerDefinitionId": "bdef:v1:6293cb2342eb6f99e4c34e30",
+          "pickupCardinality": "SINGLE",
+          "expectedHeroCount": 1,
+          "actualPickupHeroCount": 2,
+          "consumerTypeLabelKr": "픽업",
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
+        },
+        {
+          "bannerDefinitionId": "bdef:v1:74783713495bbb3b05647b21",
+          "pickupCardinality": "SINGLE",
+          "expectedHeroCount": 1,
+          "actualPickupHeroCount": 2,
+          "consumerTypeLabelKr": "픽업",
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
+        },
+        {
+          "bannerDefinitionId": "bdef:v1:d14a4c6837636d525c13c914",
+          "pickupCardinality": "SINGLE",
+          "expectedHeroCount": 1,
+          "actualPickupHeroCount": 2,
+          "consumerTypeLabelKr": "픽업",
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_NEUTRALIZE_DISPLAY_LABEL"
+        }
+      ]
+    }
+  ],
+  "errors": []
+}
