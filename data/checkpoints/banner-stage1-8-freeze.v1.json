@@ -1,0 +1,252 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-8",
+  "status": "STAGE1_FROZEN_READY_FOR_STAGE2",
+  "purpose": "Freeze the verified Banner Stage 1 information units, invariants, correction requirements, and explicit REVIEW/UNKNOWN boundaries so Stage 2 can design the production canonical schema without reopening already-settled investigation questions.",
+  "scopeContract": "data/contracts/banner-stage1-0-scope-contract.v1.json",
+  "stageArtifacts": [
+    {"stage":"1-0","artifact":"data/contracts/banner-stage1-0-scope-contract.v1.json","status":"PASS_SCOPE_FROZEN"},
+    {"stage":"1-1","artifact":"data/investigation/banner-stage1-1-source-census.v1.json","validation":"data/validation/banner-stage1-1-source-census-summary.v1.json","status":"PASS"},
+    {"stage":"1-2","artifact":"data/investigation/banner-stage1-2-row-grain-census.v1.json","validation":"data/validation/banner-stage1-2-row-grain-summary.v1.json","status":"PASS_WITH_SOURCE_CONFLICT"},
+    {"stage":"1-3","artifact":"data/investigation/banner-stage1-3-provisional-taxonomy.v1.json","validation":"data/validation/banner-stage1-3-provisional-taxonomy-summary.v1.json","status":"PASS_PROVISIONAL_TAXONOMY"},
+    {"stage":"1-4","artifact":"data/investigation/banner-stage1-4-relation-census.v1.json","validation":"data/validation/banner-stage1-4-relation-summary.v1.json","correctionCheckpoint":"data/checkpoints/banner-stage1-4-relation-corrections.v1.json","status":"PASS_RELATION_CENSUS_WITH_EVENT_JOIN_REVIEW"},
+    {"stage":"1-5","artifact":"data/investigation/banner-stage1-5-date-recurrence-census.v1.json","validation":"data/validation/banner-stage1-5-date-recurrence-summary.v1.json","status":"PASS_DATE_RECURRENCE_CENSUS"},
+    {"stage":"1-6","artifact":"data/investigation/banner-stage1-6-asset-reference-census.v1.json","validation":"data/validation/banner-stage1-6-asset-reference-summary.v1.json","status":"PASS_ASSET_REFERENCE_CENSUS"},
+    {"stage":"1-7","artifact":"data/investigation/banner-stage1-7-representative-fixtures.v1.json","validation":"data/validation/banner-stage1-7-representative-fixtures-summary.v1.json","status":"PASS_REPRESENTATIVE_FIXTURE_VALIDATION_WITH_EXPECTED_REVIEWS"}
+  ],
+  "frozenPopulation": {
+    "currentSchedule": "data/kr-banner-schedule.v1.json",
+    "occurrenceRowCount": 94,
+    "datasetStartDate": "2026-09-02",
+    "latestObservedKrDisplayDate": "2027-03-31",
+    "rowGrain": "KR_BANNER_OCCURRENCE_DISPLAY_ROW",
+    "rowGrainMeaning": "One Korean schedule row represents one dated/display-position banner occurrence item. It is not a canonical banner definition row.",
+    "recordKeyRole": "Occurrence row key only; not canonical banner definition identity."
+  },
+  "frozenInformationUnits": [
+    {
+      "unit": "bannerOccurrence",
+      "status": "FROZEN_CONCEPTUAL_UNIT",
+      "meaning": "A dated Korean schedule/display occurrence with per-date presentation order, lifecycle/display behavior, source relation when available, and occurrence-level display-asset reference.",
+      "finalProductionShapeDecided": false
+    },
+    {
+      "unit": "bannerSourceCardPool",
+      "status": "FROZEN_DISTINCT_SOURCE_UNIT",
+      "meaning": "ConfigDataCardPoolInfo source identity reached through sourceRecordKey when available.",
+      "finalWebsiteBannerId": false
+    },
+    {
+      "unit": "bannerDefinition",
+      "status": "REQUIRED_DISTINCT_IDENTITY_PROBLEM_FOR_STAGE2",
+      "meaning": "Stage 1 evidence requires Stage 2 to model recurring banner/source concept separately from individual dated occurrences; final table/key design is intentionally not frozen in Stage 1."
+    },
+    {
+      "unit": "heroRelation",
+      "status": "FROZEN_EXPLICIT_ID_RELATION_FAMILIES",
+      "families": ["PICKUP_HERO", "WISH_CANDIDATE_HERO"]
+    },
+    {
+      "unit": "cpContext",
+      "status": "FROZEN_NON_EXCLUSIVE_CONTEXT",
+      "meaning": "CP_RELATED is a context relation/tag derived from explicit CardPool source text, not a mutually exclusive summon mechanic."
+    },
+    {
+      "unit": "eventReference",
+      "status": "REVIEW_TEXT_REFERENCE_ONLY",
+      "meaning": "CP CardPool text can name an event, but canonical Event ID relation is not proven."
+    },
+    {
+      "unit": "occurrenceDisplayAssetReference",
+      "status": "FROZEN_REFERENCE_UNIT",
+      "meaning": "displayImageType/displayImageFile are occurrence-level display references, not canonical banner or asset identities."
+    }
+  ],
+  "frozenTaxonomy": {
+    "shape": "MULTI_AXIS_REQUIRED",
+    "singleBannerTypeEnumRejectedAsStage1Model": true,
+    "axes": {
+      "mechanicFamily": ["PICKUP", "WISH", "SPECIAL", "UNKNOWN"],
+      "lifecycle": ["NEW", "RERUN", "UNKNOWN", "NOT_APPLICABLE"],
+      "pickupCardinality": ["SINGLE", "DUAL", "TRIPLE", "MULTI", "UNKNOWN", "NOT_APPLICABLE"],
+      "contextTags": ["COLLAB", "MANUAL_KR", "LEGACY_REUSE", "SOURCE_CONFLICT", "CP_RELATED"]
+    },
+    "latestClarification": "CP_RELATED was reserved for review in Stage 1-3 and was subsequently verified in Stage 1-4 as a non-exclusive context relation derived only from explicit CardPool source semantics.",
+    "sourceTypePolicy": "sourceType remains source classification evidence and must not be overwritten by occurrence taxonomy."
+  },
+  "frozenRelations": {
+    "occurrenceToCardPool": {
+      "cardinality": {"occurrenceToCardPool":"0..1","cardPoolToOccurrence":"0..N"},
+      "joinField": "sourceRecordKey -> ConfigDataCardPoolInfo.ID",
+      "manualNullAllowed": true,
+      "sourceRecordKeyIsCanonicalBannerId": false
+    },
+    "pickupHero": {
+      "sourceField": "ConfigDataCardPoolInfo.UpHeroList[]",
+      "target": "hero-name-master.v1.json.heroId",
+      "joinRule": "EXACT_INTEGER_HERO_ID_ONLY"
+    },
+    "wishCandidateHero": {
+      "relationType": "WISH_CANDIDATE_HERO",
+      "sourceFieldFamilies": ["OptionalUpHeroList[].HeroId", "WishHero[].HeroId"],
+      "rule": "Preserve sourceField provenance; use HeroId as Hero identity; do not merge wish candidates into PICKUP_HERO semantics."
+    },
+    "manualWish": {
+      "rule": "When sourceRecordKey is null, do not synthesize CardPool, Hero candidate, or recurrence identity from display text, names, or asset reuse."
+    },
+    "cpRelated": {
+      "rule": "Assign only from explicit CardPoolDetailDesc CP-point semantics.",
+      "eventJoin": "TEXT_REFERENCE_ONLY_REVIEW",
+      "nameBasedEventJoinAllowed": false
+    }
+  },
+  "frozenDateAndRecurrence": {
+    "krDisplayDate": {
+      "meaning": "Occurrence display-date anchor in the Korean schedule",
+      "precision": "DAY",
+      "exactOpeningTimestamp": false,
+      "timezoneEncoded": false,
+      "endDatePresent": false,
+      "durationPresent": false
+    },
+    "displayOrder": "Presentation order within one krDisplayDate only; not chronology.",
+    "recurrenceRule": "Repeated dated occurrences may reuse the same verified/corrected source identity. Store observed occurrences; do not generate recurrence from a fixed cadence.",
+    "fixedCadenceProven": false,
+    "firstObservedBoundary": "Earliest occurrence inside the 94-row current window is not automatically first-ever release."
+  },
+  "frozenAssetReference": {
+    "population": {
+      "Banner": 37,
+      "Picture_Notice": 57,
+      "matched": 73,
+      "manualReplacement": 21,
+      "nonNullDisplayImageFile": 93,
+      "nullDisplayImageFile": 1,
+      "static": 81,
+      "prefab": 13
+    },
+    "rules": [
+      "displayImageFile is not canonical bannerId or assetId.",
+      "Same verified source may reuse the same asset reference across multiple occurrence dates.",
+      "Same asset reference alone must not establish source or recurrence identity.",
+      "manual-replacement is a provenance/status distinction and is not equivalent to missing image.",
+      "visualType=prefab does not mean the website lacks a static display image."
+    ],
+    "deferred": ["content hash inventory", "perceptual/visual duplicate groups", "candidate replacement matching", "canonical asset ownership", "bulk orphan inventory", "asset rename/dedup"]
+  },
+  "mandatoryCorrectionCheckpoint": {
+    "artifact": "data/checkpoints/banner-stage1-4-relation-corrections.v1.json",
+    "correctionCount": 1,
+    "recordKey": "kr-banner:20270331:4",
+    "field": "sourceRecordKey",
+    "observedValue": "cardpool:263",
+    "effectiveValue": "cardpool:265",
+    "status": "MANDATORY_INPUT_FOR_STAGE2_AND_LATER_CONSUMERS",
+    "sourceScheduleMutatedInStage1": false,
+    "rule": "Apply the correction checkpoint before definition grouping, recurrence grouping, Hero relation consumption, or production consumer generation, unless an explicit later repair step updates the source schedule itself."
+  },
+  "prohibitedInferencesFrozen": [
+    "No name-based Hero join.",
+    "No name-based Event join.",
+    "No chronology from CardPool ID, bannerCode, patchCode, slotCode, Hero ID, asset filename, or file order.",
+    "No canonical banner identity from bannerCode, sourceRecordKey, recordKey, or displayImageFile alone.",
+    "No endDate/duration inference from the next schedule date or assumed banner duration.",
+    "No fixed recurrence generation from observed gaps.",
+    "No source/recurrence join from asset equality alone.",
+    "No Hero candidate synthesis for source-null manual wish rows.",
+    "No forced classification when evidence is insufficient; REVIEW/UNKNOWN remain valid."
+  ],
+  "carriedReviewAndUnknown": [
+    {
+      "item": "Canonical Event ID relation for CP/banner+event consumers",
+      "status": "REVIEW",
+      "resolutionTarget": "Stage 2 relation/schema work or a dedicated Event-ID verification subtask",
+      "blockingStage2Entry": false
+    },
+    {
+      "item": "Canonical CardPool/Hero candidate/recurrence identity for source-null manual wish rows",
+      "status": "REVIEW",
+      "resolutionTarget": "Stage 2 manual-definition policy or an approved manual ID map",
+      "blockingStage2Entry": false
+    },
+    {
+      "item": "Replacement asset for kr-manual-wish-20260902",
+      "status": "MISSING_REFERENCE_REVIEW",
+      "resolutionTarget": "Stage 3 candidate image/approval work",
+      "blockingStage2Entry": false
+    },
+    {
+      "item": "Exact banner opening/closing timestamp, timezone semantics, endDate and duration",
+      "status": "UNKNOWN_NOT_IN_CURRENT_SOURCE",
+      "resolutionTarget": "Later authoritative schedule/time source if available",
+      "blockingStage2Entry": false
+    },
+    {
+      "item": "Canonical asset identity/ownership and hash/visual duplicate groups",
+      "status": "DEFERRED",
+      "resolutionTarget": "Stage 3 asset inventory/hash/diff",
+      "blockingStage2Entry": false
+    },
+    {
+      "item": "Canonical first-ever release date outside current 94-row schedule window",
+      "status": "NOT_PROVEN",
+      "resolutionTarget": "Later history-source work if required by consumers",
+      "blockingStage2Entry": false
+    },
+    {
+      "item": "Final production bannerDefinition/bannerOccurrence schema and canonical IDs",
+      "status": "INTENTIONALLY_UNDECIDED_IN_STAGE1",
+      "resolutionTarget": "Stage 2",
+      "blockingStage2Entry": false
+    }
+  ],
+  "stage1Completion": {
+    "allKnownStage1InformationUnitsHaveHandlingPath": true,
+    "unrecordedKnownConflictCount": 0,
+    "unrecordedKnownReviewBoundaryCount": 0,
+    "representativeFixtureHardFailureCount": 0,
+    "newCrossStageContradictionCount": 0,
+    "finalProductionSchemaCreated": false,
+    "stage1Decision": "COMPLETE_AND_FROZEN"
+  },
+  "stage2EntryConditions": {
+    "status": "READY",
+    "mustConsume": [
+      "This Stage 1-8 freeze checkpoint",
+      "Stage 1-4 relation correction checkpoint",
+      "Current 94-row Korean occurrence schedule",
+      "ConfigDataCardPoolInfo source identity layer",
+      "Canonical hero-name-master Hero ID layer"
+    ],
+    "mustPreserve": [
+      "Occurrence identity distinct from source/definition identity",
+      "0..1 source relation per occurrence with legitimate source-null manual rows",
+      "Exact-ID Hero relations and distinct pickup vs wish-candidate semantics",
+      "Multi-axis mechanic/lifecycle/cardinality/context distinction",
+      "CP_RELATED as non-exclusive context and Event ID as unresolved until proven",
+      "Day-precision occurrence date semantics without invented end/duration",
+      "Occurrence-level asset references without treating filenames as canonical identity",
+      "Explicit REVIEW/UNKNOWN states"
+    ],
+    "stage2MayDecide": [
+      "Canonical bannerDefinition and bannerOccurrence primary keys/IDs",
+      "Final normalized tables/objects and field names",
+      "How the provisional taxonomy axes are represented in production",
+      "Definition-to-occurrence relation schema",
+      "Manual banner definition policy and approved manual IDs if needed",
+      "Production correction application/repair strategy",
+      "Consumer-facing recurrence/history representation",
+      "Whether explicit Event ID mapping can be proven without name-only joins"
+    ],
+    "stage2MustNotPullForward": [
+      "Stage 3 asset hashing/visual diff/candidate matching",
+      "Frontend integration and QA",
+      "Guess-based relation repair"
+    ]
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 2",
+    "task": "Canonical banner identity and production schema design",
+    "firstObjective": "Define bannerDefinition/bannerOccurrence canonical identities and normalized relation fields while preserving every Stage 1 frozen invariant and REVIEW boundary."
+  }
+}
