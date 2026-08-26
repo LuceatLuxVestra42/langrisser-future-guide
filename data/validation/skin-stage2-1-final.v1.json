@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "stage": "skin-page-2",
+  "substage": "2-1",
+  "checkpoint": "forward-relation-final",
+  "status": "PASS",
+  "completion": "SKIN_STAGE2_1_COMPLETE",
+  "sources": {
+    "inputContract": "data/contracts/skin-stage2-input-contract.v1.json",
+    "contract": "data/contracts/skin-stage2-1-forward-relation.v1.json",
+    "canonical": "data/generated/skin-stage1-canonical.v1.json",
+    "heroMaster": "data/hero-name-master.v1.json"
+  },
+  "metrics": {
+    "canonicalHeroCount": 267,
+    "canonicalSkinCount": 540,
+    "forwardRelationCount": 540,
+    "distinctForwardSkinIdCount": 540,
+    "duplicateSkinIdCount": 0,
+    "unknownHeroIdCount": 0,
+    "missingHeroIdCount": 0,
+    "invalidSourceOrderCount": 0
+  },
+  "checks": {
+    "recordCount540": true,
+    "distinctSkinIdCount540": true,
+    "canonicalRecordCount540": true,
+    "canonicalHeroCount267": true,
+    "duplicateSkinIdZero": true,
+    "unknownHeroIdZero": true,
+    "missingHeroIdZero": true,
+    "invalidSourceOrderZero": true,
+    "exactProjectionParity": true
+  },
+  "failures": {
+    "duplicateSkinIds": [],
+    "unknownHeroIds": [],
+    "missingHeroIds": [],
+    "invalidSourceOrders": []
+  },
+  "frozenRules": [
+    "The Stage 2-1 relation is a projection of Stage 1 canonical skinId, heroId and sourceOrder only.",
+    "Skin -> Hero cardinality is EXACTLY_ONE.",
+    "No raw ConfigData ownership or ordering rediscovery is performed.",
+    "No alternate sorting or sourceOrder renumbering is permitted."
+  ],
+  "nextAction": "Skin 2-2: build the 267-entry Hero -> ordered Skin reverse index from this accepted forward relation."
+}
