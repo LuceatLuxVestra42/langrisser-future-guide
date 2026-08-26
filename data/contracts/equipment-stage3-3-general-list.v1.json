@@ -1,0 +1,80 @@
+{
+  "stage": "3-3",
+  "purpose": "Generate the 206-record general equipment list payload from frozen Stage 2 semantics plus Stage 3-2 display metadata, without reopening classification or inventing missing Korean names/release dates.",
+  "sources": {
+    "pageSchema": "data/contracts/equipment-stage3-1-page-schema.v1.json",
+    "filterMap": "data/generated/equipment_stage2_3_filter_map.json",
+    "effects": "data/generated/equipment_stage2_5_effects.json",
+    "acquisition": "data/generated/equipment_stage2_7_acquisition.json",
+    "displayMetadata": "data/generated/equipment_stage3_2_display_metadata.json"
+  },
+  "admission": {
+    "classes": ["launch", "legacy-additional", "current-additional"],
+    "expectedTotal": 206,
+    "expectedTabs": {
+      "1": 94,
+      "2": 80,
+      "3": 32
+    }
+  },
+  "recordPolicy": {
+    "schema": "equipment-stage3-1-page-schema.v1.json#listRecord",
+    "requiredFields": [
+      "equipmentId",
+      "nameCn",
+      "nameKr",
+      "icon",
+      "group",
+      "groupKo",
+      "subtype",
+      "subtypeKo",
+      "groupOrder",
+      "subtypeOrder",
+      "acquisitionClass",
+      "siteTab",
+      "releaseGroupDate",
+      "sortIndex",
+      "effectName",
+      "effectText"
+    ],
+    "nameKr": "Copy only Stage 3-2 verified nameKr. REVIEW candidates must never leak into the page list; null remains explicit and nameCn stays available as source display text.",
+    "icon": "Must copy Stage 3-2 VERIFIED_DIRECT icon and be non-empty for all 206 records.",
+    "effect": "Copy Stage 2 effectName/effectText verbatim. No translation, summary, or rewrite."
+  },
+  "sortingPolicy": {
+    "primary": ["siteTab asc", "groupOrder asc", "subtypeOrder asc"],
+    "tab1": "No fabricated historical order. After classification order, use sortIndex asc then equipmentId asc as deterministic fallback only.",
+    "tab2": "Within each group/subtype, sort known releaseGroupDate descending, then sortIndex asc and equipmentId asc. Do not invent order inside a release group.",
+    "tab3": "Current frozen Stage 2 output has no explicit releaseGroupDate for the 32 current-additional records. Keep release-order status REVIEW and use sortIndex/equipmentId only as deterministic fallback, never as claimed release chronology.",
+    "never": [
+      "raw Label numeric order as display order",
+      "equipmentId as release chronology",
+      "sortIndex as release chronology"
+    ]
+  },
+  "filterPolicy": {
+    "groups": [
+      {"group": "weapon", "groupKo": "무기", "groupOrder": 0, "subtypes": ["검", "비수", "창", "도끼", "망치", "활", "지팡이"]},
+      {"group": "armor", "groupKo": "갑옷", "groupOrder": 1, "subtypes": ["중갑", "경갑", "천"]},
+      {"group": "headgear", "groupKo": "투구", "groupOrder": 2, "subtypes": ["중갑", "경갑", "천"]},
+      {"group": "accessory", "groupKo": "악세사리", "groupOrder": 3, "subtypes": ["공격", "지력", "방어", "치료"]}
+    ],
+    "selection": "A group may be selected alone to show all subtypes. Subtypes are single-select within the active group; list data itself carries one canonical group/subtype per record."
+  },
+  "completion": {
+    "hardRequirements": [
+      "exactly 206 unique general equipment IDs",
+      "tab counts 94/80/32",
+      "all Stage 3-1 list fields populated except nameKr/releaseGroupDate where upstream explicitly permits null",
+      "206/206 verified icons",
+      "no exclusive/soul-special/unresolved-no-path leakage",
+      "no REVIEW name candidate leakage",
+      "effect text copied exactly",
+      "sorting comparator follows frozen page policy"
+    ],
+    "reviewAllowed": [
+      "missing/unverified nameKr inherited from Stage 3-2",
+      "tab3 exact release chronology absent from frozen Stage 2 source"
+    ]
+  }
+}
