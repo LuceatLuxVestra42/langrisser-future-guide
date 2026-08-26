@@ -1,0 +1,75 @@
+name: Equipment Stage 4-7 Whole Consumer Regression
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/equipment-stage4-7-whole-consumer-regression.yml'
+      - 'scripts/validate-equipment-stage4-7-whole-consumer-regression.mjs'
+      - 'src/lib/equipment-page.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.exclusive.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - 'src/routeTree.gen.ts'
+      - 'data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json'
+      - 'data/validation/equipment-stage4-1-route-loader-summary.v1.json'
+      - 'data/validation/equipment-stage4-2-general-list-ui-summary.v1.json'
+      - 'data/validation/equipment-stage4-3-general-detail-ui-summary.v1.json'
+      - 'data/validation/equipment-stage4-4-exclusive-ui-ownership-summary.v1.json'
+      - 'data/validation/equipment-stage4-5-display-state-policy-summary.v1.json'
+      - 'data/validation/equipment-stage4-6-admission-route-qa-summary.v1.json'
+      - 'data/generated/equipment_stage3_3_general_list.json'
+      - 'data/generated/equipment_stage3_4_general_detail.json'
+      - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
+      - 'data/generated/equipment_stage3_6_special_unresolved.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/generated/equipment_stage2_6_restrictions.json'
+      - 'data/generated/equipment_stage2_6_job_index.json'
+      - 'package.json'
+      - 'bun.lock'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate Equipment Stage 4-7 whole consumer regression
+        run: node scripts/validate-equipment-stage4-7-whole-consumer-regression.mjs
+
+      - name: Persist Stage 4-7 checkpoint
+        run: |
+          OUTPUT='data/validation/equipment-stage4-7-whole-consumer-regression-summary.v1.json'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$OUTPUT"
+          if git diff --cached --quiet; then
+            echo "No Stage 4-7 generated changes"
+            exit 0
+          fi
+
+          git commit -m "Freeze Equipment Stage 4-7 whole consumer regression checkpoint"
+
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Push raced with another main update; retrying without force."
+            sleep 2
+          done
+
+          echo "Unable to persist Stage 4-7 checkpoint after safe retries."
+          exit 1
