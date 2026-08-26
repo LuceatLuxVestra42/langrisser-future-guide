@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-0",
+  "status": "INPUT_CONTRACT_FROZEN",
+  "purpose": "Freeze the exact Banner Stage 2 entry inputs and correction-consumption rules before canonical bannerDefinition grouping or any Stage 2 consumer generation.",
+  "predecessor": {
+    "final": "data/validation/banner-stage1-final.v1.json",
+    "freeze": "data/checkpoints/banner-stage1-8-freeze.v1.json",
+    "requiredStatus": "PASS_ACCEPTED / STAGE1_FROZEN_READY_FOR_STAGE2"
+  },
+  "inputs": {
+    "occurrenceSchedule": {
+      "path": "data/kr-banner-schedule.v1.json",
+      "expectedOccurrenceCount": 94,
+      "rowGrain": "KR_BANNER_OCCURRENCE_DISPLAY_ROW",
+      "mutationPolicy": "READ_ONLY_STAGE2_INPUT"
+    },
+    "relationCorrections": {
+      "path": "data/checkpoints/banner-stage1-4-relation-corrections.v1.json",
+      "required": true,
+      "expectedCorrectionCount": 1
+    },
+    "cardPoolSource": {
+      "path": "data/configdata/ConfigDataCardPoolInfo.json",
+      "identity": "ConfigDataCardPoolInfo.ID",
+      "role": "SOURCE_IDENTITY_AND_EXPLICIT_RELATION_SOURCE"
+    },
+    "heroMaster": {
+      "path": "data/hero-name-master.v1.json",
+      "identity": "heroId",
+      "role": "CANONICAL_HERO_IDENTITY"
+    }
+  },
+  "effectiveOccurrencePolicy": {
+    "output": "data/generated/banner-stage2-0-effective-occurrences.v1.json",
+    "preserveRecordedValues": true,
+    "fields": [
+      "recordKey",
+      "recordedSourceRecordKey",
+      "effectiveSourceRecordKey",
+      "correctionStatus"
+    ],
+    "rule": "Start from every Stage 1 occurrence row, preserve the recorded source relation as provenance, and apply only explicitly checkpointed relation corrections to the effective relation used by Stage 2 grouping and downstream relations.",
+    "manualNullPolicy": "A null sourceRecordKey remains null unless an explicit approved correction or mapping exists; Stage 2-0 does not synthesize CardPool identity.",
+    "correction": {
+      "occurrenceRecordKey": "kr-banner:20270331:4",
+      "field": "sourceRecordKey",
+      "recordedValue": "cardpool:263",
+      "effectiveValue": "cardpool:265",
+      "status": "VERIFIED_CORRECTION"
+    }
+  },
+  "frozenBoundaries": [
+    "Occurrence identity remains distinct from CardPool source identity and future canonical bannerDefinition identity.",
+    "recordKey, sourceRecordKey, bannerCode and displayImageFile are not canonical bannerDefinition IDs.",
+    "Source-null manual occurrences are valid and must not receive synthetic CardPool, Hero or recurrence relations in Stage 2-0.",
+    "Hero relations remain exact-ID only and PICKUP_HERO remains distinct from WISH_CANDIDATE_HERO.",
+    "CP_RELATED remains non-exclusive context; canonical Event ID remains REVIEW until explicitly proven.",
+    "krDisplayDate remains day-precision occurrence display date; no endDate, duration, timezone or exact timestamp is invented.",
+    "Asset references remain display/provenance references and are not canonical identity evidence."
+  ],
+  "stage2_0ProhibitedWork": [
+    "No bannerDefinition grouping beyond proving the effective input contract.",
+    "No final canonical bannerDefinition or bannerOccurrence ID assignment.",
+    "No asset hashing, perceptual duplicate analysis or candidate replacement work.",
+    "No frontend integration.",
+    "No name-based Hero or Event joins.",
+    "No source schedule mutation.",
+    "No uncheckpointed sourceRecordKey repair."
+  ],
+  "completionCriteria": {
+    "all94OccurrencesRepresentedInEffectiveLayer": true,
+    "verifiedCorrectionAppliedExactlyOnce": true,
+    "sourceScheduleMutationCount": 0,
+    "syntheticManualSourceRelationCount": 0,
+    "uncheckpointedCorrectionCount": 0,
+    "stage1FrozenReviewBoundariesPreserved": true
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-1",
+    "task": "Canonical bannerDefinition/bannerOccurrence identity and grouping policy",
+    "mustConsume": [
+      "data/contracts/banner-stage2-0-input-contract.v1.json",
+      "data/generated/banner-stage2-0-effective-occurrences.v1.json",
+      "data/validation/banner-stage2-0-input-summary.v1.json"
+    ]
+  }
+}
