@@ -1,0 +1,242 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-1",
+  "status": "SOURCE_CENSUS_COMPLETE",
+  "purpose": "Inventory current banner-related source families, existing checkpoints, assets, and external references without deciding final banner record grain or production schema.",
+  "predecessor": "data/contracts/banner-stage1-0-scope-contract.v1.json",
+  "sources": [
+    {
+      "sourceId": "cardpool-configdata",
+      "location": "data/configdata/ConfigDataCardPoolInfo.json",
+      "kind": "RAW_CONFIGDATA",
+      "repositoryPresence": "CONFIRMED",
+      "authority": "PRIMARY_INTERNAL_STRUCTURE_AND_ID_SOURCE",
+      "knownFacts": [
+        "UnityDataTool parsed JSON is present in the repository.",
+        "Records expose an explicit ID and named fields such as Name and PoolType."
+      ],
+      "stage1Use": "Primary raw source for card-pool record structure and explicit internal relations.",
+      "limitations": [
+        "Full record census and field semantics are deferred to later Stage 1 work.",
+        "CardPoolInfo ID is not declared to be the final website bannerId."
+      ],
+      "nextAction": "ROW_GRAIN_CENSUS_INPUT"
+    },
+    {
+      "sourceId": "banner-overrides",
+      "location": "data/banner-overrides.v1.json",
+      "kind": "VERIFIED_REUSE_CHECKPOINT",
+      "repositoryPresence": "CONFIRMED",
+      "authority": "REUSE_BEFORE_REBUILD",
+      "knownFacts": [
+        "manualReplacements contains 4 entries.",
+        "Three numeric manual replacements are wish banners 7404, 7804, and 7902.",
+        "ChuanShuoReturn is a special manual replacement without numeric bannerCode.",
+        "legacyReusable contains 5 verified triple-banner mappings.",
+        "Legacy reusable records preserve cardPoolId, sourceRecordKey, heroIds, banner image, notice image candidate, and match provenance."
+      ],
+      "stage1Use": "Preserve verified manual/reuse decisions and use them as fixtures/checkpoints before reconstructing equivalent relations from raw sources.",
+      "limitations": [
+        "This file is not a canonical banner master.",
+        "Its bannerCode values must not be promoted to the final website primary key during Stage 1."
+      ],
+      "nextAction": "REUSE_IN_1_2_AND_FIXTURES"
+    },
+    {
+      "sourceId": "kr-banner-schedule",
+      "location": "data/kr-banner-schedule.v1.json",
+      "kind": "CURRENT_ASSEMBLED_SCHEDULE_CHECKPOINT",
+      "repositoryPresence": "CONFIRMED",
+      "authority": "CURRENT_KR_SCHEDULE_CHECKPOINT_NOT_RAW_MASTER",
+      "knownFacts": [
+        "version is 1.",
+        "startDate is 2026-09-02.",
+        "recordCount is 94.",
+        "Records contain recordKey, krDisplayDate, displayOrder, bannerCode, sourceRecordKey, patchCode, slotCode, sourceType, scheduleType, names, image references, and verification status.",
+        "Observed schedule types include new, single, dual, triple, and wish.",
+        "Manual Korean-only rows can have null bannerCode and null sourceRecordKey."
+      ],
+      "stage1Use": "Primary existing row population for the 1-2 row-grain census and for identifying already solved KR display/mapping cases.",
+      "limitations": [
+        "This is an assembled Korean schedule, not the authoritative raw definition of every CN card pool.",
+        "Existing row structure must not be assumed to equal the final canonical banner definition or occurrence schema.",
+        "Display names are not a replacement for canonical Hero ID relations."
+      ],
+      "nextAction": "PRIMARY_1_2_ROW_POPULATION"
+    },
+    {
+      "sourceId": "hero-name-master",
+      "location": "data/hero-name-master.v1.json",
+      "kind": "CANONICAL_SHARED_IDENTITY",
+      "repositoryPresence": "CONFIRMED",
+      "authority": "CANONICAL_HERO_IDENTITY",
+      "knownFacts": [
+        "recordCount is 267 playable heroes.",
+        "Records use heroId with verified Korean, Chinese, and English display names."
+      ],
+      "stage1Use": "Consumer-only identity layer when validating explicit Hero IDs from banner sources.",
+      "limitations": [
+        "Do not create banner-to-Hero relations by fuzzy or name-only matching."
+      ],
+      "nextAction": "CONSUME_WHEN_EXPLICIT_HERO_IDS_ARE_AVAILABLE"
+    },
+    {
+      "sourceId": "banner-assets-static",
+      "location": "public/images/banners/Banner",
+      "kind": "REPOSITORY_ASSET_COLLECTION",
+      "repositoryPresence": "CONFIRMED",
+      "authority": "ASSET_EXISTENCE_SOURCE",
+      "knownFacts": [
+        "The Banner asset directory exists and contains numeric Banner_*.webp files including legacy and current codes."
+      ],
+      "stage1Use": "Asset-reference existence checks only during early investigation.",
+      "limitations": [
+        "File count, hash inventory, orphan classification, and asset ownership are deferred to 1-6 / later asset stages.",
+        "Filename numbering is not chronology or canonical identity."
+      ],
+      "nextAction": "DEFER_DEEP_CENSUS_TO_1_6"
+    },
+    {
+      "sourceId": "banner-assets-notice",
+      "location": "public/images/banners/Picture_Notice",
+      "kind": "REPOSITORY_ASSET_COLLECTION",
+      "repositoryPresence": "CONFIRMED",
+      "authority": "ASSET_EXISTENCE_SOURCE",
+      "knownFacts": [
+        "The Picture_Notice asset directory exists separately from the Banner directory.",
+        "Existing schedule and override data use Picture_Notice for multiple non-static-banner display cases and Korean manual replacements."
+      ],
+      "stage1Use": "Asset-reference existence checks and source-family distinction.",
+      "limitations": [
+        "Do not infer banner type solely from filename or directory before taxonomy validation.",
+        "Hash/diff and full inventory are deferred."
+      ],
+      "nextAction": "DEFER_DEEP_CENSUS_TO_1_6"
+    },
+    {
+      "sourceId": "legacy-cn-banner-data-local",
+      "location": "historical local path: Downloads/banner-data.v1.json",
+      "kind": "LEGACY_LOCAL_DERIVED_INPUT",
+      "repositoryPresence": "NOT_FOUND_AT_data/banner-data.v1.json",
+      "authority": "HISTORICAL_PIPELINE_INPUT_ONLY",
+      "knownFacts": [
+        "Existing banner validation scripts read this file from a local Downloads path.",
+        "validate_banner_overrides.cjs expects 248 CN banner records in this historical input.",
+        "verify_banners.cjs treats its banners array as an input for bannerCode reuse and asset verification."
+      ],
+      "stage1Use": "Provenance evidence for how existing schedule/override work was built; reuse only if the exact artifact is recovered and verified.",
+      "limitations": [
+        "The file is not currently available at data/banner-data.v1.json.",
+        "Do not reconstruct the 248-record artifact from assumptions during 1-1."
+      ],
+      "nextAction": "DO_NOT_BLOCK_1_2; USE_CONFIGDATA_AND_EXISTING_CHECKPOINTS_FIRST"
+    },
+    {
+      "sourceId": "banner-validation-tooling",
+      "location": "scripts/verify_banners.cjs; scripts/validate_banner_overrides.cjs; scripts/validate_kr_schedule.cjs",
+      "kind": "PROVENANCE_AND_VALIDATION_TOOLING",
+      "repositoryPresence": "CONFIRMED",
+      "authority": "SUPPORTING_EVIDENCE_NOT_DATA_MASTER",
+      "knownFacts": [
+        "verify_banners.cjs checks banner image reuse, prefab/static cases, manual replacements, missing files, and orphan asset categories.",
+        "validate_banner_overrides.cjs cross-checks overrides against the historical CN-derived input, KR schedule, and both asset directories.",
+        "validate_kr_schedule.cjs audits the 94-record KR schedule, schedule/image-type rules, manual replacements, source links, Korean naming checks, missing files, and guessed bannerCode absence."
+      ],
+      "stage1Use": "Use as provenance for existing decisions and as regression guidance; do not treat hardcoded historical assumptions as new canonical semantics.",
+      "limitations": [
+        "Some scripts reference machine-local paths.",
+        "Existing scheduleType and image rules remain existing implementation behavior until later Stage 1 taxonomy/schema validation."
+      ],
+      "nextAction": "REFERENCE_IN_1_2_TO_1_7"
+    },
+    {
+      "sourceId": "legacy-korean-guide",
+      "location": "https://redpanda7301.github.io/langrisser/",
+      "kind": "EXTERNAL_LEGACY_KR_REFERENCE",
+      "repositoryPresence": "EXTERNAL_READ_ONLY",
+      "authority": "KR_TERMINOLOGY_HISTORY_AND_EXISTING_IMPLEMENTATION_REFERENCE",
+      "knownFacts": [
+        "Project source notes designate the existing Korean guide as a reference for Korean terminology, legacy Korean data, and prior page implementation."
+      ],
+      "stage1Use": "Use for legacy table behavior, Korean display terminology, and historical schedule cross-checking.",
+      "limitations": [
+        "Do not override current ConfigData structure or project canonical mappings solely from the legacy site."
+      ],
+      "nextAction": "INSPECT_STRUCTURE_DURING_1_2_WHEN_NEEDED"
+    },
+    {
+      "sourceId": "legacy-korean-assets-drive",
+      "location": "Google Drive reference recorded in project source notes",
+      "kind": "EXTERNAL_ASSET_REFERENCE",
+      "repositoryPresence": "EXTERNAL_READ_ONLY",
+      "authority": "LEGACY_ASSET_AND_NAMING_REFERENCE",
+      "knownFacts": [
+        "Project source notes designate the Drive folder for existing asset checks and historical file-naming reference."
+      ],
+      "stage1Use": "Fallback reference for legacy asset identity when repository assets/checkpoints are insufficient.",
+      "limitations": [
+        "Not required for 1-1 completion.",
+        "No bulk collection or modification during Stage 1."
+      ],
+      "nextAction": "DEFER_UNLESS_1_6_REQUIRES_IT"
+    },
+    {
+      "sourceId": "bilibili-wiki",
+      "location": "https://wiki.biligame.com/langrisser/首页",
+      "kind": "EXTERNAL_CN_CROSSCHECK",
+      "repositoryPresence": "EXTERNAL_READ_ONLY",
+      "authority": "LATEST_PUBLIC_CN_CROSSCHECK",
+      "knownFacts": [
+        "Project source notes designate Bilibili Wiki for CN latest public information, patch/display checks, and cross-validation."
+      ],
+      "stage1Use": "Use only where current ConfigData and existing project artifacts need external display/latest-patch cross-checking.",
+      "limitations": [
+        "External values do not silently overwrite ConfigData or existing verified project mappings."
+      ],
+      "nextAction": "ON_DEMAND_FROM_LATER_STAGE1"
+    }
+  ],
+  "sourcePriorityForStage1": [
+    "data/banner-overrides.v1.json and other already verified project checkpoints",
+    "data/kr-banner-schedule.v1.json as the existing KR row population",
+    "data/configdata/ConfigDataCardPoolInfo.json for raw explicit structure and IDs",
+    "data/hero-name-master.v1.json for shared Hero identity",
+    "repository Banner / Picture_Notice assets when asset existence matters",
+    "legacy Korean guide and other external references only for gaps/cross-checks",
+    "historical local banner-data.v1.json only if the exact artifact is recovered"
+  ],
+  "stage1_1Findings": {
+    "repositoryHasRawCardPoolSource": true,
+    "repositoryHasVerifiedBannerOverrides": true,
+    "repositoryHasCurrentKrSchedule": true,
+    "currentKrScheduleRecordCount": 94,
+    "repositoryHasCanonicalHeroIdentity": true,
+    "canonicalHeroCount": 267,
+    "repositoryHasTwoBannerAssetFamilies": true,
+    "historicalLocalCnDerivedBannerArtifactExpectedCount": 248,
+    "historicalLocalCnDerivedBannerArtifactPresentAtDataPath": false,
+    "stage1BlockedByMissingHistoricalArtifact": false
+  },
+  "deferredQuestions": [
+    "What exactly does one KR schedule row represent: definition, occurrence, batch member, or display row?",
+    "Which CardPoolInfo records map to which row grains and which do not belong to website banner scope?",
+    "Are existing scheduleType values sufficient as taxonomy or only legacy display categories?",
+    "How should repeated/reused bannerCode values be modeled without conflating identity and occurrence?",
+    "How should manual Korean-only wish/special rows with no sourceRecordKey be represented canonically?",
+    "Which asset belongs to a reusable definition versus a specific occurrence?"
+  ],
+  "completionCriteria": {
+    "sourceFamiliesInventoried": true,
+    "reusableCheckpointsSeparatedFromRawSources": true,
+    "externalReferencesMarkedReadOnly": true,
+    "missingHistoricalLocalInputExplicitlyRecorded": true,
+    "nextStageHasStartingPopulation": true
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-2",
+    "task": "Row-grain census",
+    "primaryPopulation": "data/kr-banner-schedule.v1.json",
+    "primaryRawCrosscheck": "data/configdata/ConfigDataCardPoolInfo.json",
+    "preserveFirst": "data/banner-overrides.v1.json"
+  }
+}
