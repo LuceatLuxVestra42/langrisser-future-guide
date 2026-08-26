@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-4",
+  "status": "TAXONOMY_CONTRACT_FROZEN",
+  "purpose": "Normalize banner mechanic, pickup cardinality, occurrence lifecycle and safe provenance dimensions without changing Stage 2-2/2-3 canonical identities.",
+  "inputs": {
+    "stage2_3Validation": "data/validation/banner-stage2-3-summary.v1.json",
+    "definitions": "data/generated/banner-definitions.v1.json",
+    "occurrences": "data/generated/banner-occurrences.v1.json",
+    "scheduleProvenance": "data/kr-banner-schedule.v1.json",
+    "census": "data/investigation/banner-stage2-4-taxonomy-census.v1.json"
+  },
+  "definitionTaxonomy": {
+    "mechanicFamily": {
+      "values": ["PICKUP", "WISH", "SPECIAL"],
+      "rules": {
+        "new": "PICKUP",
+        "dual": "PICKUP",
+        "triple": "PICKUP",
+        "wish": "WISH",
+        "sourceNullManualWish": "WISH"
+      },
+      "reservedButNotGeneratedInCurrentPopulation": ["SPECIAL"]
+    },
+    "pickupCardinality": {
+      "values": ["SINGLE", "DUAL", "TRIPLE", "MULTI", "NOT_APPLICABLE"],
+      "rules": {
+        "new": "SINGLE",
+        "dual": "DUAL",
+        "triple": "TRIPLE",
+        "wish": "NOT_APPLICABLE",
+        "sourceNullManualWish": "NOT_APPLICABLE"
+      },
+      "reservedButNotGeneratedInCurrentPopulation": ["MULTI"]
+    }
+  },
+  "occurrenceTaxonomy": {
+    "lifecycle": {
+      "values": ["NEW", "RERUN", "FIRST_OBSERVED_IN_CURRENT_DATASET"],
+      "rulesInPriorityOrder": [
+        "scheduleTypeRaw == new => NEW",
+        "scheduleTypeRaw == single => RERUN",
+        "otherwise, if occurrence is not the first dated occurrence of its canonical bannerDefinitionId in the current 94-row dataset => RERUN",
+        "otherwise => FIRST_OBSERVED_IN_CURRENT_DATASET"
+      ],
+      "boundary": "FIRST_OBSERVED_IN_CURRENT_DATASET is not first-ever release and must not be rewritten to NEW."
+    },
+    "contextTags": {
+      "allowedValues": ["CP_RELATED", "COLLAB"],
+      "currentMaterializationRule": "Do not assign from display name, note keywords, Hero set or asset. Keep empty until an explicit canonical context mapping is approved.",
+      "currentExpectedAssignedCount": 0
+    },
+    "provenanceTags": {
+      "allowedValues": ["MANUAL_KR", "LEGACY_REUSE"],
+      "rules": {
+        "MANUAL_KR": "effectiveSourceRecordKey is null and matchStatus == manual",
+        "LEGACY_REUSE": "base schedule matchBasis explicitly contains legacyReusable"
+      }
+    },
+    "validationTags": {
+      "allowedValues": ["SOURCE_CONFLICT"],
+      "rules": {
+        "SOURCE_CONFLICT": "sourceRelation.correctionStatus != NONE"
+      }
+    }
+  },
+  "identityInvariants": {
+    "bannerDefinitionIdUnchanged": true,
+    "bannerOccurrenceIdUnchanged": true,
+    "occurrenceToDefinitionMappingUnchanged": true,
+    "effectiveSourceRelationUnchanged": true
+  },
+  "prohibitedInference": [
+    "Do not infer CP_RELATED from CP-like text.",
+    "Do not infer COLLAB from names or note keywords.",
+    "Do not infer first-ever release from earliest current occurrence.",
+    "Do not use Hero sets, display names or assets as mechanic/cardinality identity.",
+    "Do not merge or split canonical definitions in this stage."
+  ],
+  "nextStartPoint": "Banner Stage 2-5 canonical Hero relations"
+}
