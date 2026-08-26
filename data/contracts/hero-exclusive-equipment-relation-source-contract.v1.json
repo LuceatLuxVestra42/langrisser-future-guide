@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "stage": "B-1",
+  "status": "FROZEN",
+  "purpose": "Freeze the authoritative ownership source for the shared Hero <-> Exclusive Equipment relation layer after reusing the already validated Hero Stage 5-2 source resolution.",
+  "dependsOn": {
+    "scopeContract": "data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json",
+    "heroIdentityContract": "data/contracts/hero-identity-contract.v1.json",
+    "exclusivePopulation": "data/generated/equipment_stage2_7_acquisition.json",
+    "exclusiveConsumer": "data/generated/equipment_stage3_5_exclusive_consumer.json",
+    "priorValidatedCheckpoint": "data/validation/hero-page-stage5-2-final.v1.json",
+    "priorBuilder": "scripts/build_hero_stage5_2_exclusive_central.cjs"
+  },
+  "admissionOrder": {
+    "step1": "Obtain exactly the frozen 167 equipmentId values whose acquisitionClass is exclusive-equipment.",
+    "step2": "Resolve only those 167 equipmentId values to ConfigDataEquipmentInfo.ID.",
+    "step3": "Read SkillHero only from those admitted exclusive EquipmentInfo records.",
+    "step4": "Resolve SkillHero by exact ID equality against the canonical 267 Hero master.",
+    "generalEquipmentBoundary": "No launch, legacy-additional, current-additional, soul-special, or unresolved-no-path Equipment record may enter ownership-source evaluation. General-equipment Hero eligibility is not part of Stage B."
+  },
+  "productionSourceKinds": {
+    "EQUIPMENT_SKILL_HERO": {
+      "class": "DIRECT",
+      "authoritative": true,
+      "productionEdgeAllowed": true,
+      "table": "ConfigDataEquipmentInfo",
+      "equipmentField": "ID",
+      "heroField": "SkillHero",
+      "nativeDirection": "equipmentId -> heroId",
+      "scope": "Only the frozen 167 exclusive-equipment IDs admitted before the field is evaluated.",
+      "meaning": "SkillHero is the canonical owner-Hero ID for an admitted exclusive Equipment record.",
+      "join": "exclusive equipmentId == ConfigDataEquipmentInfo.ID; ConfigDataEquipmentInfo.SkillHero == canonical heroId",
+      "requiredChecks": [
+        "equipmentId exists in the frozen 167 exclusive-equipment population",
+        "exactly one EquipmentInfo record resolves for equipmentId",
+        "SkillHero is finite and non-zero",
+        "SkillHero exists in canonical 267 Hero master",
+        "no heuristic fallback is used when any check fails"
+      ],
+      "provenanceShape": {
+        "sourceKind": "EQUIPMENT_SKILL_HERO",
+        "table": "ConfigDataEquipmentInfo",
+        "recordId": "equipmentId",
+        "field": "SkillHero",
+        "value": "heroId"
+      }
+    }
+  },
+  "supportEvidenceKinds": {
+    "EXCLUSIVE_POPULATION_PATH46": {
+      "class": "SUPPORT_ONLY",
+      "productionEdgeAllowed": false,
+      "source": "Equipment acquisition / GetPathList",
+      "meaning": "PathType 46 supports identification of the frozen exclusive-equipment population.",
+      "boundary": "PathType 46 does not identify an owner Hero and must never create a Hero-Equipment ownership edge."
+    },
+    "MISSION_TYPE_77": {
+      "class": "CROSS_VALIDATION_ONLY",
+      "productionEdgeAllowed": false,
+      "source": "ConfigDataMissionInfo",
+      "meaning": "For verified SP-Hero fixtures, MissionType 77 Param1 identifies the exclusive Equipment required by that mission.",
+      "knownFixture": "Hero 6 Leon -> Mission 31186 -> MissionType 77 -> Param1 Equipment 416",
+      "boundary": "MissionType 77 is retained for B-2 representative cross-validation, not as the canonical 167-record ownership source."
+    },
+    "OWNER_NAME_IN_DESCRIPTION": {
+      "class": "DIAGNOSTIC_ONLY",
+      "productionEdgeAllowed": false,
+      "meaning": "The prior full validation observed canonical owner-name text in all 167 exclusive Equipment descriptions.",
+      "boundary": "Description text is never parsed to assign heroId. It may only corroborate an ID-derived relation after the relation already exists."
+    }
+  },
+  "rejectedSourceKinds": {
+    "ARMY_JOB_RESTRICTION": "ArmyIds / JobIds express equip eligibility semantics, not exclusive ownership.",
+    "NAME_SIMILARITY": "Equipment/Hero names are display or diagnostic metadata only.",
+    "DESCRIPTION_PARSING": "Description strings may corroborate but never create an ownership edge.",
+    "ICON_OR_ASSET_NAME": "Icon and asset filenames are not ownership identifiers.",
+    "NUMERIC_PATTERN": "Equipment ID order, Hero ID proximity, or numeric patterns are forbidden.",
+    "RELEASE_ORDER": "Release chronology or list position is forbidden as an owner resolver.",
+    "MISSION_TYPE_77_AS_GLOBAL_SOURCE": "A verified fixture relation is not generalized into the canonical 167-record source when SkillHero already provides direct complete coverage."
+  },
+  "reusedValidationEvidence": {
+    "source": "data/validation/hero-page-stage5-2-final.v1.json",
+    "canonicalHeroCount": 267,
+    "exclusivePopulation": 167,
+    "exclusiveRawResolution": 167,
+    "exclusiveSkillHeroResolution": 167,
+    "resolvedExclusiveCount": 167,
+    "resolvedUniqueOwnerCount": 167,
+    "duplicateOwnerCount": 0,
+    "ownerErrors": 0,
+    "missingEquipmentIds": 0,
+    "hardErrors": 0,
+    "descContainsCanonicalOwnerNameCount": 167,
+    "status": "PASS",
+    "completion": "COMPLETE"
+  },
+  "sourceDecision": {
+    "canonicalProductionResolver": "ConfigDataEquipmentInfo.SkillHero -> canonical Hero ID",
+    "confidencePercent": 100,
+    "decision": "ADMITTED_AND_FROZEN",
+    "reason": "The field is a direct named ConfigData field, the previous production builder already scoped to exclusive-equipment before resolving SkillHero, and full-population validation resolved 167/167 with no missing IDs, owner errors, duplicate owners, or hard errors."
+  },
+  "downstreamRules": [
+    "B-2 validates representative fixtures against the frozen EQUIPMENT_SKILL_HERO source without searching for an alternate production resolver unless a contradiction appears.",
+    "B-3 builds canonical edges only from the 167 admitted exclusive Equipment records and their SkillHero values.",
+    "No page pipeline may independently infer ownership after the shared canonical relation is generated.",
+    "General Equipment must remain outside all Stage B relation artifacts and validation populations."
+  ],
+  "completion": "B-1 is complete when EQUIPMENT_SKILL_HERO is frozen as the sole production ownership source for the admitted 167 exclusive Equipment records, support/cross-validation evidence is separated from ownership authority, and all heuristic/general-equipment fallbacks are explicitly rejected."
+}
