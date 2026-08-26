@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "stage": "4-5",
+  "status": "PASS",
+  "finalStageStatus": "STAGE4_5_DISPLAY_STATE_POLICY_HARDENED",
+  "upstream": {
+    "stage40": "FROZEN",
+    "stage42": "STAGE4_2_GENERAL_LIST_UI_READY",
+    "stage43": "STAGE4_3_GENERAL_DETAIL_UI_READY",
+    "stage44": "STAGE4_4_EXCLUSIVE_UI_AND_OWNERSHIP_READY"
+  },
+  "state": {
+    "general": {
+      "storage": "localStorage",
+      "key": "equipment-general-list-ui.v1",
+      "fields": [
+        "tab",
+        "group",
+        "subtype"
+      ],
+      "invalidStateSanitized": true,
+      "restoreBeforeWrite": true,
+      "storageFailureNonFatal": true,
+      "groupChangeClearsSubtype": true,
+      "tabChangePreservesEquipmentTypeFilter": true,
+      "detailReturnRestoresState": true
+    },
+    "exclusive": {
+      "storage": "localStorage",
+      "key": "equipment-exclusive-list-ui.v1",
+      "fields": [
+        "group",
+        "subtype"
+      ],
+      "invalidStateSanitized": true,
+      "restoreBeforeWrite": true,
+      "storageFailureNonFatal": true,
+      "groupChangeClearsSubtype": true,
+      "detailReturnRestoresState": true
+    },
+    "isolatedKeys": true
+  },
+  "display": {
+    "nameFallback": "nameKr ?? nameCn",
+    "reviewLabelExplicit": true,
+    "generalTab1ChronologyClaimed": false,
+    "generalTab2EqualGroupOrderClaimed": false,
+    "generalTab3ChronologyReviewExplicit": true,
+    "exclusiveChronologyReviewExplicit": true,
+    "emptyStateResetGeneral": true,
+    "emptyStateResetExclusive": true
+  },
+  "sourceDiscipline": {
+    "generalGeneratedOrderPreserved": true,
+    "exclusiveGeneratedOrderPreserved": true,
+    "frontendSortAdded": false,
+    "directConfigDataReads": false,
+    "exclusiveOwnershipRederived": false
+  },
+  "build": {
+    "command": "bun run build",
+    "pass": true
+  },
+  "nextStage": "4-6 admission/route QA"
+}
