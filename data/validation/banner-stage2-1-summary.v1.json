@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-1",
+  "status": "PASS_STAGE2_1_IDENTITY_GROUPING_POLICY",
+  "validationMode": "STATIC_CHECKPOINT_CONTINUITY_AND_DETERMINISTIC_POLICY_ASSERTIONS",
+  "executableRegressionScript": "scripts/validate-banner-stage2-1-identity-grouping.mjs",
+  "executableRegressionScriptRunInConnector": false,
+  "validationBasis": [
+    "Stage 2-0 is closed with PASS_STAGE2_0_INPUT_CONTRACT and 94 occurrence coverage.",
+    "Stage 1 verified recurrence as repeated dated occurrences reusing the same verified/effective CardPool source identity.",
+    "The Stage 1 correction for kr-banner:20270331:4 is consumed before grouping, so its effective source is cardpool:265 rather than recorded cardpool:263.",
+    "Stage 1 explicitly forbids recurrence synthesis for source-null manual Wish rows from repeated text, Hero labels or asset reuse.",
+    "The Stage 2-1 definition ID resolver is deterministic and separate from recordKey, sourceRecordKey, bannerCode, Hero identity and asset filename.",
+    "Verified fixture definition IDs were independently recomputed from the frozen SHA-256 resolver before this checkpoint was written."
+  ],
+  "policyDecisions": {
+    "bannerOccurrenceId": "bocc:<recordKey>",
+    "sourceLinkedDefinitionGrouping": "same effectiveSourceRecordKey => same definitionGroupKey",
+    "differentEffectiveSourcesAutomaticMerge": false,
+    "sourceNullManualDefinitionGrouping": "one isolated definitionGroupKey per occurrence unless later explicit approved mapping exists",
+    "bannerDefinitionId": "bdef:v1:<first 24 lowercase hex chars of SHA-256('banner-definition:v1|' + definitionGroupKey)>",
+    "occurrenceToDefinitionCardinality": "EXACTLY_ONE",
+    "definitionToOccurrenceCardinality": "ONE_OR_MORE"
+  },
+  "verifiedFixtureResults": {
+    "cardpool370SameDefinition": true,
+    "cardpool213SameDefinition": true,
+    "cardpool366SameDefinition": true,
+    "cardpool305FourOccurrencesSameDefinition": true,
+    "cardpool265Corrected7001SameDefinition": true,
+    "sourceNullManualWishRepeatedPresentationRemainsSeparate": true
+  },
+  "knownFixtureDefinitionIds": {
+    "source:cardpool:370": "bdef:v1:364dee3fe0993c87abfd8920",
+    "source:cardpool:213": "bdef:v1:87b20d10e6cc1d7d1133aaa4",
+    "source:cardpool:366": "bdef:v1:74776c0fce2751ad36a46212",
+    "source:cardpool:305": "bdef:v1:3e4567c8f850446457f43077",
+    "source:cardpool:265": "bdef:v1:da8726e4782450283c65a5b0",
+    "manual-occurrence:kr-manual-wish-langrisser-1-5-20260909": "bdef:v1:8a8be80c9c0ed39614460ce3",
+    "manual-occurrence:kr-manual-wish-langrisser-1-5-20270317": "bdef:v1:e550063d4c405f5688a7a6d9"
+  },
+  "currentApprovedCrossSourceEquivalenceCount": 0,
+  "currentApprovedManualDefinitionMappingCount": 0,
+  "errorCount": 0,
+  "reviewCount": 0,
+  "invariants": {
+    "stage20PassConsumed": true,
+    "occurrenceIdentityDistinctFromDefinitionIdentity": true,
+    "effectiveSourceUsedBeforeGrouping": true,
+    "corrected7001GroupsUnderCardpool265": true,
+    "bannerCodeNotDefinitionIdentity": true,
+    "assetReferenceNotDefinitionIdentity": true,
+    "heroRelationNotDefinitionIdentity": true,
+    "lifecycleNotDefinitionIdentity": true,
+    "cpContextNotDefinitionIdentity": true,
+    "eventNameNotDefinitionIdentity": true,
+    "sourceNullManualAutoMergeDisabled": true,
+    "finalBannerDefinitionsNotMaterializedYet": true,
+    "finalBannerOccurrencesNotMaterializedYet": true,
+    "stage1ReviewUnknownBoundariesPreserved": true
+  },
+  "completion": {
+    "identityPolicyFrozen": true,
+    "groupingPolicyFrozen": true,
+    "verifiedFixturesResolved": true,
+    "stage2_1Closed": true,
+    "nextStageReady": true
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-2",
+    "task": "Materialize canonical bannerDefinition population and full occurrence-to-definition mapping from the frozen Stage 2-1 policy."
+  }
+}
