@@ -1,0 +1,184 @@
+{
+  "version": 1,
+  "stage": "B-FINAL",
+  "status": "PASS_ACCEPTED",
+  "closedAt": "2026-08-26",
+  "purpose": "Final closure checkpoint for the Hero-Exclusive Equipment Relation Layer after scope/source freezing, representative fixture validation, full 167-edge generation, full-population/cardinality validation, bidirectional index generation, and Hero/Equipment consumer admission all completed successfully.",
+  "completion": {
+    "B-0": "COMPLETE",
+    "B-1": "COMPLETE",
+    "B-2": "COMPLETE",
+    "B-3": "COMPLETE",
+    "B-4": "COMPLETE",
+    "B-5": "COMPLETE",
+    "B-6": "COMPLETE"
+  },
+  "contracts": {
+    "scope": "data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json",
+    "source": "data/contracts/hero-exclusive-equipment-relation-source-contract.v1.json",
+    "fixtures": "data/contracts/hero-exclusive-equipment-relation-fixture-contract.v1.json",
+    "validation": "data/contracts/hero-exclusive-equipment-relation-validation-contract.v1.json",
+    "indexes": "data/contracts/hero-exclusive-equipment-relation-index-contract.v1.json",
+    "consumers": "data/contracts/hero-exclusive-equipment-relation-consumer-contract.v1.json"
+  },
+  "acceptedArtifacts": {
+    "relationSet": {
+      "path": "data/generated/hero-exclusive-equipment-relations.v1.json",
+      "gitBlobSha": "33caa16212a5a71195015e05c815024fb62e6be6",
+      "relationName": "HeroExclusiveEquipmentOwnership",
+      "edgeCount": 167
+    },
+    "byHero": {
+      "path": "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+      "gitBlobSha": "fcc9deb514755dc9df9de2e40e96685f68d08fba",
+      "schemaId": "hero-exclusive-equipment-by-hero/v1",
+      "keyCount": 167,
+      "relationCount": 167
+    },
+    "byEquipment": {
+      "path": "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+      "gitBlobSha": "a49c3a549fd1d97fff0321f45fe1bc94526e1f8d",
+      "schemaId": "hero-exclusive-equipment-by-equipment/v1",
+      "keyCount": 167,
+      "relationCount": 167
+    },
+    "b4Validation": {
+      "path": "data/validation/hero-exclusive-equipment-relation-stageB4-validation.v1.json",
+      "gitBlobSha": "8bfb68bd011fdcccb234e557dbda9c64c9ec3623",
+      "status": "PASS"
+    },
+    "b5Validation": {
+      "path": "data/validation/hero-exclusive-equipment-relation-stageB5-index-summary.v1.json",
+      "gitBlobSha": "8b6917be373bd3f6161aed34bea4ae182a512ee6",
+      "status": "PASS"
+    },
+    "consumerAdmission": {
+      "path": "data/generated/hero-exclusive-equipment-consumer-admission.v1.json",
+      "gitBlobSha": "49f2c8698cd5c2a96aea64bb14a14e30b887015d",
+      "status": "COMPLETE"
+    },
+    "b6Validation": {
+      "path": "data/validation/hero-exclusive-equipment-relation-stageB6-consumer-summary.v1.json",
+      "gitBlobSha": "06abc3957f26e4aa83d19574febe2c0aaceea4d7",
+      "status": "PASS"
+    }
+  },
+  "stageEvidence": {
+    "B-1": "data/validation/hero-exclusive-equipment-relation-stageB1-source-summary.v1.json",
+    "B-2": "data/validation/hero-exclusive-equipment-relation-stageB2-fixture-summary.v1.json",
+    "B-3": "data/validation/hero-exclusive-equipment-relation-stageB3-summary.v1.json",
+    "B-4": "data/validation/hero-exclusive-equipment-relation-stageB4-validation.v1.json",
+    "B-5": "data/validation/hero-exclusive-equipment-relation-stageB5-index-summary.v1.json",
+    "B-6": "data/validation/hero-exclusive-equipment-relation-stageB6-consumer-summary.v1.json"
+  },
+  "acceptedScope": {
+    "heroPopulation": 267,
+    "exclusiveEquipmentPopulation": 167,
+    "includedAcquisitionClass": "exclusive-equipment",
+    "excluded": {
+      "generalEquipment": {
+        "population": 206,
+        "classes": [
+          "launch",
+          "legacy-additional",
+          "current-additional"
+        ]
+      },
+      "soulSpecial": 16,
+      "unresolvedNoPath": 1,
+      "unresolvedNoPathEquipmentId": 2013
+    },
+    "generalEquipmentOwnershipAdmission": false
+  },
+  "sourceSemantics": {
+    "productionSourceKind": "EQUIPMENT_SKILL_HERO",
+    "productionSourceChain": "exclusive equipmentId -> ConfigDataEquipmentInfo.ID -> ConfigDataEquipmentInfo.SkillHero -> canonical Hero.heroId",
+    "nativeDirection": "equipmentId -> heroId",
+    "productionAuthority": true,
+    "missionType77Role": "CROSS_VALIDATION_ONLY",
+    "descriptionOwnerNameRole": "DIAGNOSTIC_ONLY",
+    "rejectedOwnershipInference": [
+      "ArmyIds/JobIds",
+      "equipment or Hero name similarity",
+      "description parsing as owner assignment",
+      "icons/assets",
+      "numeric ID order/proximity/pattern",
+      "release order",
+      "MissionType 77 as a global ownership source"
+    ]
+  },
+  "acceptedCounts": {
+    "heroCount": 267,
+    "exclusiveEquipmentCount": 167,
+    "relationEdges": 167,
+    "uniqueOwnerHeroes": 167,
+    "heroesWithExclusive": 167,
+    "heroesWithoutExclusive": 100,
+    "byHeroKeys": 167,
+    "byEquipmentKeys": 167,
+    "generalEquipmentAdmitted": 0,
+    "fixturePass": 4,
+    "fixtureFail": 0,
+    "independentCrossChecks": 1
+  },
+  "cardinalityInvariant": {
+    "equipmentToHero": "EXACTLY_ONE",
+    "heroToEquipment": "ZERO_OR_ONE",
+    "meaning": "The current canonical relation is one-to-one between the 167 released exclusive Equipment records and a 167-Hero owner subset. It does not claim that all 267 canonical Heroes have released exclusive Equipment.",
+    "frozen": true,
+    "changePolicy": "If explicit future source data introduces shared ownership or more than one current exclusive Equipment for a Hero, mark the old invariant for REVIEW and version the B-stage contract. Never discard or heuristically select edges merely to preserve the old cardinality."
+  },
+  "validationSummary": {
+    "exclusiveEquipmentCoverageMissing": 0,
+    "exclusiveEquipmentCoverageExtra": 0,
+    "duplicateCanonicalPairs": 0,
+    "unknownHeroIds": 0,
+    "relationTypeMismatch": 0,
+    "verificationMismatch": 0,
+    "authoritativeProvenanceMismatch": 0,
+    "unadmittedProvenance": 0,
+    "equipmentWithMultipleOwners": 0,
+    "heroesWithMultipleExclusiveEquipment": 0,
+    "byHeroPairMissing": 0,
+    "byHeroPairExtra": 0,
+    "byEquipmentPairMissing": 0,
+    "byEquipmentPairExtra": 0,
+    "crossIndexPairMismatch": 0,
+    "legacyHeroStage5_2PairMismatch": 0,
+    "legacyHeroStage5_2AbsenceMismatch": 0,
+    "equipmentMetadataCoverageMissing": 0,
+    "equipmentMetadataCoverageExtra": 0,
+    "generalEquipmentLeak": 0,
+    "hardErrors": 0
+  },
+  "ownership": {
+    "semanticOwner": "Hero-Exclusive Equipment Relation Layer",
+    "canonicalSemanticSource": "data/generated/hero-exclusive-equipment-relations.v1.json#records",
+    "heroPipeline": "CONSUMER_ONLY_FOR_OWNERSHIP",
+    "equipmentPipeline": "CONSUMER_ONLY_FOR_OWNERSHIP",
+    "heroOwnershipSource": "data/generated/hero-exclusive-equipment-by-hero.v1.json#byHeroId",
+    "equipmentOwnershipSource": "data/generated/hero-exclusive-equipment-by-equipment.v1.json#byEquipmentId",
+    "heroMetadataJoinForEquipmentPage": "data/hero-name-master.v1.json by heroId",
+    "equipmentMetadataJoinForHeroPage": "data/generated/equipment_stage3_5_exclusive_consumer.json by equipmentId",
+    "legacyHeroStage5_2Path": "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
+    "legacyHeroStage5_2Role": "PARITY_ONLY_LEGACY_SNAPSHOT",
+    "equipmentStage3_5Role": "DISPLAY_AND_DETAIL_METADATA_ONLY; DOES_NOT_DERIVE_OWNERSHIP"
+  },
+  "downstreamRules": [
+    "Hero Stage 5-2 and later Hero exclusive-equipment display must consume byHeroId for ownership membership, then join Equipment Stage 3-5 payload by equipmentId for presentation metadata.",
+    "Exclusive Equipment list/detail owner-Hero display must consume byEquipmentId, then join Hero Master by exact heroId for presentation metadata and navigation.",
+    "Hero and Equipment page pipelines must not directly read ConfigDataEquipmentInfo.SkillHero to re-derive production ownership after B-6 admission.",
+    "General Equipment remains outside Stage B. ArmyIds/JobIds equipability restrictions must never be converted into Hero ownership relations.",
+    "Names, descriptions, icons, numeric patterns, sort order and release order are not ownership resolvers.",
+    "If a derived index disagrees with canonical relations, regenerate/revalidate the indexes; do not patch ownership from a page pipeline.",
+    "If the canonical relation blob changes under the same source semantics, rerun full-population relation validation, index generation and consumer admission before publication.",
+    "If ownership source semantics change or an explicit contradiction to EQUIPMENT_SKILL_HERO appears, reopen B-1/B-2 and version the relevant B-stage contracts before regenerating production relations."
+  ],
+  "closureDecision": {
+    "stageBClosed": true,
+    "additionalStageBAnalysisRequired": false,
+    "additionalB6RunRequired": false,
+    "reason": "The frozen 167 exclusive-equipment population resolves to 167 canonical ownership edges through ConfigDataEquipmentInfo.SkillHero, representative fixtures and the Leon MissionType 77 cross-check agree, full-population validation has zero scope/identity/provenance/cardinality errors, both directional indexes round-trip exactly to the canonical pair set, and Hero/Equipment consumers are admitted to those indexes with zero legacy parity or metadata-coverage mismatch."
+  },
+  "resumePoint": "Stage B is closed. Future Hero/Equipment page work should consume the accepted B-5 indexes and existing metadata sources. Reopen Stage B only when a new game-data snapshot changes the accepted relation population/content or when explicit source evidence changes the ownership semantics/cardinality contract."
+}
