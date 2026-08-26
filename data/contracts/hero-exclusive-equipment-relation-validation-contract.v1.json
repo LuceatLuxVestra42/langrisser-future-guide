@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "stage": "B-4",
+  "status": "FROZEN",
+  "purpose": "Freeze full-population integrity validation and the observed cardinality invariant for the shared Hero <-> Exclusive Equipment canonical relation before bidirectional indexes are generated.",
+  "dependsOn": {
+    "scopeContract": "data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json",
+    "sourceContract": "data/contracts/hero-exclusive-equipment-relation-source-contract.v1.json",
+    "fixtureContract": "data/contracts/hero-exclusive-equipment-relation-fixture-contract.v1.json",
+    "b3Summary": "data/validation/hero-exclusive-equipment-relation-stageB3-summary.v1.json",
+    "relationSet": "data/generated/hero-exclusive-equipment-relations.v1.json",
+    "heroMaster": "data/hero-name-master.v1.json",
+    "exclusivePopulation": "data/generated/equipment_stage2_7_acquisition.json"
+  },
+  "validationArtifact": {
+    "targetPath": "data/validation/hero-exclusive-equipment-relation-stageB4-validation.v1.json",
+    "acceptedStatus": "PASS",
+    "publicationGate": "B-5 may generate byHero/byEquipment indexes only from the exact relation-set blob SHA that B-4 validates as PASS."
+  },
+  "hardValidationGroups": {
+    "scope": [
+      "Canonical Hero population is exactly 267 unique heroId values.",
+      "Exclusive Equipment population is exactly 167 unique equipmentId values selected only by acquisitionClass=exclusive-equipment.",
+      "The relation equipmentId set exactly equals the frozen 167 exclusive-equipment ID set.",
+      "No launch, legacy-additional, current-additional, soul-special, or unresolved-no-path equipment appears in the relation."
+    ],
+    "identity": [
+      "Every edge.heroId exists in the canonical Hero master.",
+      "Every edge.equipmentId exists in the frozen exclusive-equipment population.",
+      "No duplicate canonical (heroId, equipmentId) pair exists."
+    ],
+    "edgeSchema": [
+      "Every edge.relationType is exactly exclusive.",
+      "Every edge.verificationStatus is VERIFIED.",
+      "Every edge has non-empty provenance."
+    ],
+    "provenance": [
+      "Every edge contains authoritative EQUIPMENT_SKILL_HERO provenance.",
+      "Authoritative provenance table is ConfigDataEquipmentInfo, recordId equals edge.equipmentId, field is SkillHero, and value equals edge.heroId.",
+      "No heuristic source may repair, create, or override an ownership edge."
+    ],
+    "coverage": [
+      "Canonical edge count is exactly 167.",
+      "Every frozen exclusive equipment ID appears exactly once.",
+      "Unmapped exclusive equipment count is zero."
+    ],
+    "cardinality": [
+      "Every exclusive equipment has exactly one canonical owner Hero.",
+      "Every canonical Hero owns zero or one current exclusive equipment in this relation snapshot.",
+      "Exactly 167 Heroes have one exclusive equipment and 100 Heroes have zero.",
+      "No Hero has two or more current exclusive equipment edges.",
+      "No exclusive Equipment has two or more owner Hero edges."
+    ],
+    "b3Parity": [
+      "B-3 status is PASS / COMPLETE.",
+      "B-3 canonicalEdgeCount, mappedExclusiveEquipmentCount, uniqueOwnerHeroCount and error counters agree with direct B-4 recomputation."
+    ]
+  },
+  "cardinalityInvariant": {
+    "equipmentToHero": "EXACTLY_ONE",
+    "heroToEquipment": "ZERO_OR_ONE",
+    "exclusiveEquipmentCount": 167,
+    "heroCount": 267,
+    "heroWithExclusiveCount": 167,
+    "heroWithoutExclusiveCount": 100,
+    "meaning": "The current canonical relation is one-to-one between the 167 released exclusive Equipment records and a 167-Hero owner subset; it is not a claim that all 267 Heroes already have released exclusive Equipment.",
+    "frozen": true,
+    "changePolicy": "If a future source snapshot explicitly introduces shared ownership or more than one current exclusive Equipment for a Hero, treat the old invariant as REVIEW and update the Stage B contract/version from explicit source evidence. Never silently collapse, discard, or heuristically select one edge to preserve this invariant."
+  },
+  "severityPolicy": {
+    "PASS": "All hard validation groups pass with zero unresolved errors.",
+    "FAIL": "A current-source structural or semantic invariant is broken; B-5 must not consume the relation.",
+    "REVIEW": "Explicit source evolution may have changed a frozen population/cardinality assumption and requires contract/version review before acceptance."
+  },
+  "downstreamRule": "B-5 derives both indexes only from the B-4 validated canonical relation set. Neither index may add, delete, repair, or reinterpret ownership.",
+  "completion": "B-4 is complete when the full 167-edge relation passes exact scope, identity, schema, provenance, coverage, and cardinality checks; the equipment->Hero exactly-one and Hero->Equipment zero-or-one cardinality is frozen; and the validation result pins the exact relation-set blob SHA for B-5."
+}
