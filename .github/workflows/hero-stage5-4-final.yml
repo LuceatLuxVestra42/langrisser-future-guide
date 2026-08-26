@@ -5,7 +5,7 @@ on:
   push:
     paths:
       - '.github/workflows/hero-stage5-4-final.yml'
-      - 'scripts/build_hero_stage5_4_sp.cjs'
+      - 'scripts/build_hero_stage5_4_sp_v2.cjs'
       - 'data/configdata/ConfigDataSPHeroInfo.json'
       - 'data/configdata/ConfigDataMissionInfo.json'
       - 'data/configdata/ConfigDataMissionExtSPHeroInfo.json'
@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
 
       - name: Build and validate Hero Stage 5-4
-        run: node scripts/build_hero_stage5_4_sp.cjs
+        run: node scripts/build_hero_stage5_4_sp_v2.cjs
 
       - name: Show final summary
         run: |
