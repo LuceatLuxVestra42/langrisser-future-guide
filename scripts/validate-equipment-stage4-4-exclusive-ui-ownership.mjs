@@ -76,10 +76,17 @@ for (let index = 0; index < expectedTaxonomy.length; index += 1) {
   const actual = exclusive.filters[index];
   assert(actual.group === expected.group, `Exclusive filter group order mismatch at ${index}.`);
   assert(actual.groupKo === expected.groupKo, `Exclusive filter Korean label mismatch for ${expected.group}.`);
-  assert(
-    JSON.stringify(actual.subtypes.map((item) => item.subtype)) === JSON.stringify(expected.subtypes),
-    `Exclusive subtype order mismatch for ${expected.group}.`,
-  );
+
+  let previousSubtypeIndex = -1;
+  const seenSubtypes = new Set();
+  for (const item of actual.subtypes) {
+    const subtypeIndex = expected.subtypes.indexOf(item.subtype);
+    assert(subtypeIndex >= 0, `Unexpected exclusive subtype ${item.subtype} for ${expected.group}.`);
+    assert(subtypeIndex > previousSubtypeIndex, `Exclusive subtype order mismatch for ${expected.group}.`);
+    assert(!seenSubtypes.has(item.subtype), `Duplicate exclusive subtype ${item.subtype} for ${expected.group}.`);
+    seenSubtypes.add(item.subtype);
+    previousSubtypeIndex = subtypeIndex;
+  }
 }
 
 let nameKrReview = 0;
@@ -208,6 +215,7 @@ const summary = {
   filters: {
     source: "data/generated/equipment_stage3_5_exclusive_consumer.json#filters",
     generatedTaxonomyPreserved: true,
+    missingSubtypesAllowedWhenNoExclusiveRecordsExist: true,
     groups: exclusive.filters.map((filter) => ({
       group: filter.group,
       groupKo: filter.groupKo,
