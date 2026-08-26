@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-3",
+  "status": "PASS_STAGE2_3_CANONICAL_OCCURRENCE_MATERIALIZATION",
+  "validationMode": "EXECUTED_FULL_POPULATION_REGRESSION",
+  "sourceOccurrenceCount": 94,
+  "mappedOccurrenceCount": 94,
+  "materializedOccurrenceCount": 94,
+  "referencedDefinitionCount": 77,
+  "canonicalDefinitionPopulationCount": 77,
+  "sourceNullOccurrenceCount": 8,
+  "correctedOccurrenceCount": 1,
+  "mappingMismatchCount": 0,
+  "scheduleFieldMismatchCount": 0,
+  "unresolvedDefinitionCount": 0,
+  "sourceNullLeakCount": 0,
+  "forbiddenFieldCount": 0,
+  "errorCount": 0,
+  "errors": [],
+  "invariants": {
+    "all94OccurrencesMaterializedExactlyOnce": true,
+    "occurrenceIdsUnique": true,
+    "allOccurrenceDefinitionIdsResolve": true,
+    "allStage22MappingsPreservedExactly": true,
+    "allIncludedScheduleFieldsPreservedExactly": true,
+    "corrected7001RecordedSourceIs263": true,
+    "corrected7001EffectiveSourceIs265": true,
+    "corrected7001DefinitionContinuityPreserved": true,
+    "sourceNullManualRowsRemainSourceNull": true,
+    "downstreamTaxonomyRelationsTimingFieldsAbsent": true,
+    "definitionPopulationStill77": true
+  },
+  "completion": {
+    "bannerOccurrencesMaterialized": true,
+    "stage2_3Closed": true,
+    "nextStageReady": true
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 2-4",
+    "task": "Materialize normalized banner taxonomy dimensions without changing canonical occurrence/definition identities."
+  }
+}
