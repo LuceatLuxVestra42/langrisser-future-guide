@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "stage": "B-4",
+  "checkpoint": "full-relation-validation-cardinality-freeze",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/hero-exclusive-equipment-relation-validation-contract.v1.json",
+  "relationSet": {
+    "path": "data/generated/hero-exclusive-equipment-relations.v1.json",
+    "gitBlobSha": "33caa16212a5a71195015e05c815024fb62e6be6",
+    "edgeCount": 167
+  },
+  "checks": {
+    "canonicalHeroPopulation": {
+      "expected": 267,
+      "actual": 267,
+      "unique": 267,
+      "pass": true
+    },
+    "exclusiveEquipmentPopulation": {
+      "expected": 167,
+      "actual": 167,
+      "unique": 167,
+      "pass": true
+    },
+    "exactEquipmentSetCoverage": {
+      "expected": 167,
+      "actual": 167,
+      "missing": 0,
+      "outOfScope": 0,
+      "pass": true
+    },
+    "canonicalEdgeCount": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "duplicatePairs": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "unknownHeroIds": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "relationTypeMismatch": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "verificationMismatch": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "authoritativeProvenanceMismatch": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "unadmittedProvenance": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "equipmentWithMultipleOwners": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "heroesWithMultipleExclusiveEquipment": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "heroesWithOneExclusive": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "heroesWithZeroExclusive": {
+      "expected": 100,
+      "actual": 100,
+      "pass": true
+    },
+    "b3Parity": {
+      "pass": true
+    },
+    "hardErrors": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  },
+  "cardinalityInvariant": {
+    "equipmentToHero": "EXACTLY_ONE",
+    "heroToEquipment": "ZERO_OR_ONE",
+    "heroWithExclusiveCount": 167,
+    "heroWithoutExclusiveCount": 100,
+    "frozen": true
+  },
+  "diagnostics": {
+    "missingEquipmentIds": [],
+    "multiOwnerEquipment": [],
+    "multipleEquipmentHeroes": [],
+    "errors": []
+  },
+  "nextStage": "B-5 bidirectional index generation",
+  "decision": "B-4 PASS / COMPLETE. Freeze equipment->Hero EXACTLY_ONE and Hero->Equipment ZERO_OR_ONE for this contract version; B-5 may derive indexes from this exact relation blob."
+}
