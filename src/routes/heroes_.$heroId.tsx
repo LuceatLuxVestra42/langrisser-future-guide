@@ -3,7 +3,7 @@ import { ArrowLeft, CircleHelp, Shield, Sparkles, Swords } from "lucide-react";
 
 import { getHeroPrototypePageData } from "@/lib/hero-page.functions";
 
-export const Route = createFileRoute("/heroes/$heroId")({
+export const Route = createFileRoute("/heroes_/$heroId")({
   loader: async ({ params }) => {
     if (!/^\d+$/.test(params.heroId)) throw notFound();
 

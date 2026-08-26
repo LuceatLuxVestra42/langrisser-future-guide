@@ -15,7 +15,7 @@ import type {
   GeneralEquipmentDetailPageData,
 } from "@/lib/equipment-page.server";
 
-export const Route = createFileRoute("/equipment/$equipmentId")({
+export const Route = createFileRoute("/equipment_/$equipmentId")({
   loader: async ({ params }) => {
     if (!/^\d+$/.test(params.equipmentId)) {
       throw notFound();

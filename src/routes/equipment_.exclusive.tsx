@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getExclusiveEquipmentPageData } from "@/lib/equipment-page.functions";
 
-export const Route = createFileRoute("/equipment/exclusive")({
+export const Route = createFileRoute("/equipment_/exclusive")({
   loader: () => getExclusiveEquipmentPageData(),
   head: () => ({
     meta: [
