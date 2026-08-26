@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BannersRouteImport } from './routes/banners'
 import { Route as EquipmentRouteImport } from './routes/equipment'
 import { Route as EquipmentEquipmentIdRouteImport } from './routes/equipment_.$equipmentId'
 import { Route as EquipmentExclusiveRouteImport } from './routes/equipment_.exclusive'
@@ -17,6 +18,11 @@ import { Route as EquipmentExclusiveRouteImport } from './routes/equipment_.excl
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BannersRoute = BannersRouteImport.update({
+  id: '/banners',
+  path: '/banners',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EquipmentRoute = EquipmentRouteImport.update({
@@ -37,12 +43,14 @@ const EquipmentExclusiveRoute = EquipmentExclusiveRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/banners': typeof BannersRoute
   '/equipment': typeof EquipmentRoute
   '/equipment/$equipmentId': typeof EquipmentEquipmentIdRoute
   '/equipment/exclusive': typeof EquipmentExclusiveRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/banners': typeof BannersRoute
   '/equipment': typeof EquipmentRoute
   '/equipment/$equipmentId': typeof EquipmentEquipmentIdRoute
   '/equipment/exclusive': typeof EquipmentExclusiveRoute
@@ -50,6 +58,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/banners': typeof BannersRoute
   '/equipment': typeof EquipmentRoute
   '/equipment_/$equipmentId': typeof EquipmentEquipmentIdRoute
   '/equipment_/exclusive': typeof EquipmentExclusiveRoute
@@ -57,12 +66,22 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/equipment' | '/equipment/$equipmentId' | '/equipment/exclusive'
+    | '/'
+    | '/banners'
+    | '/equipment'
+    | '/equipment/$equipmentId'
+    | '/equipment/exclusive'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/equipment' | '/equipment/$equipmentId' | '/equipment/exclusive'
+  to:
+    | '/'
+    | '/banners'
+    | '/equipment'
+    | '/equipment/$equipmentId'
+    | '/equipment/exclusive'
   id:
     | '__root__'
     | '/'
+    | '/banners'
     | '/equipment'
     | '/equipment_/$equipmentId'
     | '/equipment_/exclusive'
@@ -70,6 +89,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BannersRoute: typeof BannersRoute
   EquipmentRoute: typeof EquipmentRoute
   EquipmentEquipmentIdRoute: typeof EquipmentEquipmentIdRoute
   EquipmentExclusiveRoute: typeof EquipmentExclusiveRoute
@@ -82,6 +102,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/banners': {
+      id: '/banners'
+      path: '/banners'
+      fullPath: '/banners'
+      preLoaderRoute: typeof BannersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/equipment': {
@@ -110,6 +137,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BannersRoute: BannersRoute,
   EquipmentRoute: EquipmentRoute,
   EquipmentEquipmentIdRoute: EquipmentEquipmentIdRoute,
   EquipmentExclusiveRoute: EquipmentExclusiveRoute,
