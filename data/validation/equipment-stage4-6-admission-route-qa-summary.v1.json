@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "stage": "4-6",
+  "status": "PASS",
+  "finalStageStatus": "STAGE4_6_ADMISSION_ROUTE_QA_READY",
+  "upstream": {
+    "stage40": "FROZEN",
+    "stage41": "STAGE4_1_ROUTE_LOADER_SCAFFOLD_READY",
+    "stage42": "STAGE4_2_GENERAL_LIST_UI_READY",
+    "stage43": "STAGE4_3_GENERAL_DETAIL_UI_READY",
+    "stage44": "STAGE4_4_EXCLUSIVE_UI_AND_OWNERSHIP_READY",
+    "stage45": "STAGE4_5_DISPLAY_STATE_POLICY_HARDENED"
+  },
+  "population": {
+    "canonical": 390,
+    "public": 373,
+    "general": 206,
+    "exclusive": 167,
+    "hiddenSpecial": 16,
+    "hold": 1,
+    "holdEquipmentIds": [
+      2013
+    ]
+  },
+  "parity": {
+    "generalListDetailExact": true,
+    "exclusiveListDetailExact": true,
+    "publicGeneralExclusiveDisjoint": true,
+    "canonicalPartitionDisjoint": true,
+    "canonicalPartitionClosed": true
+  },
+  "runtimeAdmission": {
+    "generalResolved": 206,
+    "exclusiveResolved": 167,
+    "hiddenResolved": 0,
+    "holdResolved": 0,
+    "unknownPositiveIdsTested": [
+      999999,
+      888888888,
+      9007199254740991
+    ],
+    "unknownResolved": 0
+  },
+  "routeGuards": {
+    "invalidParamsTested": 12,
+    "invalidParamsRejected": 12,
+    "digitsOnlyBeforeNumericConversion": true,
+    "positiveSafeIntegerRequired": true,
+    "missingPublicDataToNotFound": true,
+    "explicitNotFoundComponent": true,
+    "canonicalNavigationUsesRecordEquipmentId": true
+  },
+  "routes": {
+    "generalList": "/equipment",
+    "exclusiveList": "/equipment/exclusive",
+    "detail": "/equipment/$equipmentId",
+    "generatedRouteTreeVerified": true
+  },
+  "sourceDiscipline": {
+    "hiddenHoldImportedByPublicServer": false,
+    "directConfigDataReads": false,
+    "publicAdmissionReclassified": false,
+    "ownershipRederived": false
+  },
+  "build": {
+    "command": "bun run build",
+    "pass": true
+  },
+  "nextStage": "4-7 whole consumer regression"
+}
