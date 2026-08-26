@@ -1,0 +1,152 @@
+{
+  "stage": "3-3",
+  "status": "PASS_BANNER_STAGE3_3_BASIC_TABLE_CONSUMER",
+  "canonicalPopulation": {
+    "definitions": 77,
+    "occurrences": 94,
+    "consumerRows": 94
+  },
+  "chronology": {
+    "dateGroups": 31,
+    "firstDate": "2026-09-02",
+    "lastDate": "2027-03-31",
+    "sortOrder": [
+      "krDisplayDate ASC",
+      "displayOrder ASC",
+      "bannerOccurrenceId ASC"
+    ]
+  },
+  "rowTaxonomy": {
+    "mechanicFamilyCounts": {
+      "PICKUP": 71,
+      "WISH": 23
+    },
+    "pickupCardinalityCounts": {
+      "DUAL": 21,
+      "TRIPLE": 29,
+      "SINGLE": 21
+    },
+    "lifecycleCounts": {
+      "FIRST_OBSERVED_IN_CURRENT_DATASET": 58,
+      "NEW": 8,
+      "RERUN": 28
+    }
+  },
+  "imageDisplay": {
+    "renderableRows": 93,
+    "placeholderRows": 1,
+    "placeholderRowIds": [
+      "bocc:kr-manual-wish-20260902"
+    ]
+  },
+  "pickupSummary": {
+    "pickupRows": 71,
+    "pickupHeroReferencesAcrossRows": 155,
+    "uniquePickupHeroes": 96,
+    "definitionCardinalityRelationMismatchCount": 5,
+    "definitionCardinalityRelationMismatches": [
+      {
+        "bannerDefinitionId": "bdef:v1:1dff1ae57975fe06408f796c",
+        "pickupCardinality": "SINGLE",
+        "expectedHeroCount": 1,
+        "actualPickupHeroCount": 2,
+        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+      },
+      {
+        "bannerDefinitionId": "bdef:v1:3ab57930a1fe3947da643f64",
+        "pickupCardinality": "SINGLE",
+        "expectedHeroCount": 1,
+        "actualPickupHeroCount": 2,
+        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+      },
+      {
+        "bannerDefinitionId": "bdef:v1:6293cb2342eb6f99e4c34e30",
+        "pickupCardinality": "SINGLE",
+        "expectedHeroCount": 1,
+        "actualPickupHeroCount": 2,
+        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+      },
+      {
+        "bannerDefinitionId": "bdef:v1:74783713495bbb3b05647b21",
+        "pickupCardinality": "SINGLE",
+        "expectedHeroCount": 1,
+        "actualPickupHeroCount": 2,
+        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+      },
+      {
+        "bannerDefinitionId": "bdef:v1:d14a4c6837636d525c13c914",
+        "pickupCardinality": "SINGLE",
+        "expectedHeroCount": 1,
+        "actualPickupHeroCount": 2,
+        "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+      }
+    ]
+  },
+  "wishSummary": {
+    "wishRows": 23,
+    "candidateListsMaterialized": 0,
+    "deferredTo": "Banner Stage 3-4 Wish consumer"
+  },
+  "deferredConsumers": {
+    "wish": "Banner Stage 3-4 Wish consumer",
+    "cpEvent": "Banner Stage 3-5 CP/Event consumer",
+    "recurrence": "Banner Stage 3-6 recurrence/pickup-log consumer"
+  },
+  "semanticFreeze": {
+    "stage2DefinitionIdsChanged": false,
+    "stage2OccurrenceIdsChanged": false,
+    "stage31AssetIdsChanged": false,
+    "stage32DisplayRecomputed": false,
+    "wishCandidateListsMaterializedEarly": false,
+    "cpEventRelationsJoinedEarly": false,
+    "recurrenceHistoryJoinedEarly": false,
+    "bannerTitlesInvented": false,
+    "exactTimesInvented": false
+  },
+  "reviews": [
+    {
+      "code": "PICKUP_CARDINALITY_RELATION_COUNT_DIFFERENCE",
+      "count": 5,
+      "interpretation": "Do not rewrite Stage 2 taxonomy or Hero relations in Stage 3-3; consumer exposes both fields separately.",
+      "definitions": [
+        {
+          "bannerDefinitionId": "bdef:v1:1dff1ae57975fe06408f796c",
+          "pickupCardinality": "SINGLE",
+          "expectedHeroCount": 1,
+          "actualPickupHeroCount": 2,
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+        },
+        {
+          "bannerDefinitionId": "bdef:v1:3ab57930a1fe3947da643f64",
+          "pickupCardinality": "SINGLE",
+          "expectedHeroCount": 1,
+          "actualPickupHeroCount": 2,
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+        },
+        {
+          "bannerDefinitionId": "bdef:v1:6293cb2342eb6f99e4c34e30",
+          "pickupCardinality": "SINGLE",
+          "expectedHeroCount": 1,
+          "actualPickupHeroCount": 2,
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+        },
+        {
+          "bannerDefinitionId": "bdef:v1:74783713495bbb3b05647b21",
+          "pickupCardinality": "SINGLE",
+          "expectedHeroCount": 1,
+          "actualPickupHeroCount": 2,
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+        },
+        {
+          "bannerDefinitionId": "bdef:v1:d14a4c6837636d525c13c914",
+          "pickupCardinality": "SINGLE",
+          "expectedHeroCount": 1,
+          "actualPickupHeroCount": 2,
+          "disposition": "PRESERVE_STAGE2_TAXONOMY_AND_RELATIONS_SEPARATELY"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "nextStage": "Banner Stage 3-4 Wish consumer"
+}
