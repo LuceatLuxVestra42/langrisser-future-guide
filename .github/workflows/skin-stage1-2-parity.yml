@@ -1,0 +1,33 @@
+name: Skin Stage 1-2 Parity
+
+on:
+  push:
+    branches:
+      - work/skin-stage1-2-parity
+    paths:
+      - '.github/workflows/skin-stage1-2-parity.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: work/skin-stage1-2-parity
+          fetch-depth: 0
+
+      - name: Validate parity
+        run: python3 scripts/validate-skin-stage1-2.py
+
+      - name: Commit checkpoint and remove one-shot workflow
+        run: |
+          rm .github/workflows/skin-stage1-2-parity.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/skin-stage1-2-parity.v1.json .github/workflows/skin-stage1-2-parity.yml
+          git commit -m "Validate Skin Stage 1-2 upstream parity"
+          git push origin HEAD:work/skin-stage1-2-parity
