@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "stage": "skin-page-2",
+  "substage": "2-3",
+  "checkpoint": "bidirectional-relation-contract",
+  "status": "ACCEPTED",
+  "inputContract": "data/contracts/skin-stage2-input-contract.v1.json",
+  "authoritativeInputs": {
+    "forwardRelation": "data/generated/skin-stage2-1-forward-relation.v1.json",
+    "forwardValidation": "data/validation/skin-stage2-1-final.v1.json",
+    "reverseIndex": "data/generated/skin-stage2-2-reverse-index.v1.json",
+    "reverseValidation": "data/validation/skin-stage2-2-final.v1.json"
+  },
+  "purpose": "Prove full parity between the accepted Stage 2-1 Skin -> Hero relation and Stage 2-2 Hero -> ordered Skin reverse index, then publish one Skin-domain bidirectional checkpoint for downstream consumers without reopening raw ConfigData semantics.",
+  "output": "data/generated/skin-stage2-3-bidirectional-relation.v1.json",
+  "consumerPaths": {
+    "bySkinId": "skinId -> { heroId, sourceOrder }",
+    "byHeroId": "heroId -> ordered skinId[]"
+  },
+  "cardinality": {
+    "skinToHero": "EXACTLY_ONE",
+    "heroToSkin": "ZERO_OR_MANY"
+  },
+  "requiredChecks": {
+    "forwardRecordCount": 540,
+    "reverseHeroEntryCount": 267,
+    "reverseEdgeCount": 540,
+    "distinctForwardSkinIdCount": 540,
+    "distinctReverseSkinIdCount": 540,
+    "heroWithSkinsCount": 235,
+    "heroWithoutSkinsCount": 32,
+    "ownerMismatchCount": 0,
+    "missingEdgeCount": 0,
+    "extraEdgeCount": 0,
+    "sourceOrderMismatchCount": 0,
+    "duplicateForwardSkinIdCount": 0,
+    "duplicateReverseSkinIdCount": 0
+  },
+  "consumerRules": [
+    "Skin consumers must resolve ownership through bySkinId and must not recalculate owner from raw ConfigData.",
+    "Hero consumers must resolve regular-skin membership and order through byHeroId and must not re-read ConfigDataHeroInfo.Skins_ID[] for a fresh relation.",
+    "byHeroId must include all 267 canonical Heroes, including 32 entries with an empty array.",
+    "byHeroId ordering must preserve Stage 2-1 sourceOrder exactly; skinId numeric sorting is forbidden."
+  ],
+  "prohibitions": [
+    "Do not read raw ConfigData or Hero Stage 5-5 as a new relation authority.",
+    "Do not add skin names, acquisition metadata, asset paths, release state, localization, displayTarget or KR_FUTURE fields to this relation checkpoint.",
+    "Do not infer, renumber or re-sort sourceOrder.",
+    "Do not omit Heroes with zero regular skins."
+  ],
+  "completionRule": "2-3 completes only when both upstream Stage 2-1 and Stage 2-2 validations are PASS, the bidirectional checkpoint contains 540 unique bySkinId entries and 267 byHeroId entries with exactly 540 reverse edges, and owner/edge/order parity mismatches are all zero.",
+  "nextAction": "Skin 2-4: verify the accepted Stage 2 bidirectional checkpoint against the frozen Stage 1 canonical/Hero Stage 5-5 parity baseline without reopening raw ownership discovery."
+}
