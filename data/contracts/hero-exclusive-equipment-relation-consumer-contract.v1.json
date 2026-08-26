@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "stage": "B-6",
+  "status": "FROZEN",
+  "purpose": "Admit the B-5 bidirectional indexes as the only production ownership inputs for Hero Stage 5-2 exclusive-equipment display and Equipment-page owner-Hero display without duplicating or re-deriving ownership.",
+  "dependsOn": {
+    "indexContract": "data/contracts/hero-exclusive-equipment-relation-index-contract.v1.json",
+    "b5Validation": "data/validation/hero-exclusive-equipment-relation-stageB5-index-summary.v1.json",
+    "byHero": "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+    "byEquipment": "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+    "heroMaster": "data/hero-name-master.v1.json",
+    "equipmentConsumer": "data/generated/equipment_stage3_5_exclusive_consumer.json",
+    "legacyHeroStage5_2": "data/generated/hero-page-stage5-2-exclusive-central.v1.json"
+  },
+  "publicationGate": {
+    "requiredB5Status": "PASS",
+    "requiredB5Completion": "COMPLETE",
+    "relationBlobRule": "Both indexes must reference the same exact relation blob SHA pinned by B-5/B-4.",
+    "scopeRule": "Only the frozen 167 exclusive-equipment relations are admitted. General Equipment remains outside Stage B."
+  },
+  "heroConsumer": {
+    "consumer": "Hero Stage 5-2 exclusive-equipment ownership block",
+    "ownershipInput": "data/generated/hero-exclusive-equipment-by-hero.v1.json#byHeroId",
+    "lookup": "heroId -> equipmentIds[]",
+    "metadataJoin": "Join returned equipmentId to data/generated/equipment_stage3_5_exclusive_consumer.json by equipmentId for display/detail fields.",
+    "absenceSemantics": "A canonical Hero ID missing from byHeroId has no current released exclusive-equipment ownership edge in this snapshot; do not synthesize an owner relation.",
+    "forbiddenOwnershipInputs": [
+      "ConfigDataEquipmentInfo.SkillHero direct reads in page-consumer code",
+      "legacy Hero Stage 5-2 ownerHeroId/ownerResolver fields as production authority",
+      "equipment names or description text",
+      "ArmyIds or JobIds",
+      "icons, ordering, release chronology or numeric patterns"
+    ]
+  },
+  "equipmentConsumer": {
+    "consumer": "Exclusive Equipment detail/list owner-Hero display and navigation",
+    "ownershipInput": "data/generated/hero-exclusive-equipment-by-equipment.v1.json#byEquipmentId",
+    "lookup": "equipmentId -> heroIds[]",
+    "heroMetadataJoin": "Join returned heroId to data/hero-name-master.v1.json by exact heroId.",
+    "equipmentMetadataSource": "data/generated/equipment_stage3_5_exclusive_consumer.json remains the 167-record display/detail payload and does not derive ownership.",
+    "forbiddenOwnershipInputs": [
+      "Equipment Stage 3-5 ArmyIds/JobIds restrictions",
+      "equipment or Hero names",
+      "icons/assets",
+      "sortIndex or release ordering",
+      "direct ConfigData ownership re-derivation in page-consumer code"
+    ]
+  },
+  "legacyTransition": {
+    "heroStage5_2Snapshot": "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
+    "classification": "PARITY_ONLY_LEGACY_SNAPSHOT",
+    "policy": "The snapshot remains valid historical evidence that the old direct SkillHero implementation produced the same 167 ownership pairs and 100 NOT_RELEASED Hero states. After B-6 it is not an ownership semantic source for future page composition.",
+    "centralDisciplineBoundary": "B-6 changes only exclusive-equipment ownership authority. Hero Stage 5-2 central-discipline data remains governed by its existing source and is not migrated into Stage B."
+  },
+  "nonDuplication": {
+    "newOwnershipRecordCopy": false,
+    "reason": "B-5 indexes already provide the minimal consumer projections. B-6 records admission and parity only; it does not create a third copy of the 167 relation pairs."
+  },
+  "validationRequirements": [
+    "B-5 is PASS / COMPLETE and both indexes pin the same validated relation blob SHA.",
+    "byHero contains exactly 167 ownership relations and leaves exactly 100 canonical Heroes without an ownership key.",
+    "byEquipment contains exactly the same 167 equipment IDs as Equipment Stage 3-5 exclusive consumer listRecords.",
+    "Every byEquipment owner Hero exists in the canonical 267 Hero master.",
+    "The legacy Hero Stage 5-2 released ownership pair set exactly equals the byHero pair set; its 100 NOT_RELEASED Heroes exactly equal canonical Heroes missing from byHero.",
+    "Hero 6 resolves to Equipment 416 through byHero and Equipment 416 resolves to Hero 6 through byEquipment.",
+    "General Equipment admission count is zero and no page consumer needs ArmyIds/JobIds to resolve ownership.",
+    "No new ownership pair is generated in B-6."
+  ],
+  "downstreamRule": "Future Hero and Equipment page composition must consume the B-5 indexes for ownership and may join display metadata afterward. If ownership changes, regenerate/revalidate Stage B instead of patching page outputs.",
+  "completion": "B-6 is complete when both page directions are formally admitted to the B-5 indexes, legacy direct SkillHero ownership is demoted to parity-only evidence, 167/167 consumer coverage and 100-Hero absence parity pass, and no general-equipment or heuristic ownership path is admitted."
+}
