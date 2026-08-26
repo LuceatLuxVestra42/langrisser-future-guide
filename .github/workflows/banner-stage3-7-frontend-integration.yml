@@ -1,0 +1,51 @@
+name: Banner Stage 3-7 Frontend Integration
+
+on:
+  push:
+    paths:
+      - '.github/workflows/banner-stage3-7-frontend-integration.yml'
+      - 'data/contracts/banner-stage3-7-frontend-integration.v1.json'
+      - 'data/generated/banner-stage3-3-basic-table-consumer.v1.json'
+      - 'data/generated/banner-stage3-4-wish-consumer.v1.json'
+      - 'data/generated/banner-stage3-5-cp-event-consumer.v1.json'
+      - 'data/generated/banner-stage3-6-recurrence-pickup-log-consumer.v1.json'
+      - 'scripts/validate-banner-stage3-7-frontend-integration.mjs'
+      - 'src/lib/banner-page.server.ts'
+      - 'src/lib/banner-page.functions.ts'
+      - 'src/routes/banners.tsx'
+      - 'src/routes/index.tsx'
+      - 'src/routeTree.gen.ts'
+      - 'package.json'
+      - 'bun.lock'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Validate Banner Stage 3-7 frontend integration
+        run: node scripts/validate-banner-stage3-7-frontend-integration.mjs
+      - name: Build production frontend
+        run: bun run build
+      - name: Verify generated banner route
+        run: |
+          grep -q '/banners' src/routeTree.gen.ts
+      - name: Persist Banner Stage 3-7 checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routeTree.gen.ts data/validation/banner-stage3-7-frontend-integration-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No Banner Stage 3-7 checkpoint changes"
+            exit 0
+          fi
+          git commit -m "Freeze Banner Stage 3-7 frontend checkpoint"
+          git push
