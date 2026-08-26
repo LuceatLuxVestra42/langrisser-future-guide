@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-6",
+  "status": "CP_EVENT_RELATION_CONTRACT_FROZEN",
+  "inputs": {
+    "definitions": "data/generated/banner-definitions.v1.json",
+    "occurrences": "data/generated/banner-occurrences.v1.json",
+    "definitionTaxonomy": "data/generated/banner-definition-taxonomy.v1.json",
+    "cardPoolSource": "data/configdata/ConfigDataCardPoolInfo.json",
+    "stage1RelationCensus": "data/investigation/banner-stage1-4-relation-census.v1.json",
+    "stage26Census": "data/investigation/banner-stage2-6-cp-event-census.v1.json"
+  },
+  "cpContext": {
+    "relationType": "CP_RELATED",
+    "scope": "bannerDefinition with occurrence projection",
+    "sourceField": "ConfigDataCardPoolInfo.CardPoolDetailDesc",
+    "rule": "Assign only when the source sentence explicitly states that drawing an SSR simultaneously grants CP points usable in a named activity.",
+    "evidencePattern": "抽取到SSR英雄时 ... 在「<event label>」活动中可以使用的「CP点」",
+    "nonExclusiveContext": true,
+    "notTopLevelMechanicFamily": true
+  },
+  "eventReference": {
+    "relationType": "CP_EVENT_TEXT_REFERENCE",
+    "source": "the event label captured from the same explicit CP sentence",
+    "canonicalEventId": null,
+    "resolutionStatus": "TEXT_REFERENCE_ONLY_REVIEW",
+    "joinMethod": "NONE",
+    "rule": "Preserve the source event label as text evidence. Do not join Event ConfigData by display-name equality."
+  },
+  "occurrenceProjection": {
+    "rule": "Every canonical occurrence whose bannerDefinitionId is CP_RELATED receives a derived CP_RELATED projection without changing occurrence identity or lifecycle.",
+    "identityMutationAllowed": false
+  },
+  "prohibited": [
+    "name-based Event ConfigData join",
+    "creating a canonical event ID from the source label",
+    "CP inference from Hero pairing",
+    "CP inference from bannerCode or asset filename",
+    "CP inference from Korean terminology alone",
+    "using arbitrary quoted labels as Event identity",
+    "changing bannerDefinitionId or bannerOccurrenceId",
+    "changing Stage 2-4 taxonomy or Stage 2-5 Hero relations"
+  ],
+  "currentCensusExpectation": {
+    "definitionCount": 77,
+    "cpRelatedDefinitionCount": 4,
+    "eventTextLabels": ["相通的心灵"]
+  },
+  "nextStage": "Banner Stage 2-7"
+}
