@@ -24,6 +24,8 @@
     "heroSoldierRelationMismatchCount": 0,
     "spRelationMismatchCount": 0,
     "structuralFailCount": 0,
+    "heroShardCount": 267,
+    "heroShardMissingCount": 0,
     "hardErrorCount": 0
   },
   "materializedRecord": {
@@ -38,11 +40,19 @@
     "sp": "Stage 5-4 SP block",
     "validation": "per-Hero structural/publication status"
   },
+  "storage": {
+    "mode": "SHARDED_BY_HERO",
+    "manifest": "data/generated/hero-detail.v1.json",
+    "heroPathTemplate": "data/generated/hero-detail/by-id/{heroId}.json",
+    "sharedPayload": "data/generated/hero-detail-shared.v1.json",
+    "integrity": "SHA256_PER_SHARD",
+    "reason": "Avoid forcing ordinary GitHub/site consumers to read or diff one very large monolithic Hero-detail Blob while preserving exactly one canonical generated record per Hero."
+  },
   "sharedPayload": {
-    "soldiersById": "Store the Stage 5-3 Soldier metadata map once at top level; do not duplicate Soldier metadata per Hero."
+    "soldiersById": "Store the Stage 5-3 Soldier metadata map once in hero-detail-shared.v1.json; do not duplicate Soldier metadata per Hero shard."
   },
   "classification": {
-    "FAIL": "Missing/duplicate canonical Hero, broken Stage 6-1 locator, frozen-block identity mismatch, invalid required structure, canonical exclusive-equipment mismatch, invalid Soldier reference, or SP structural mismatch.",
+    "FAIL": "Missing/duplicate canonical Hero, broken Stage 6-1 locator, frozen-block identity mismatch, invalid required structure, canonical exclusive-equipment mismatch, invalid Soldier reference, SP structural mismatch, or missing/duplicate Hero shard.",
     "REVIEW": "Site-usable record with presentation-only follow-up such as inherited Soldier Korean localization, missing Korean display text, source-path delivery work, or intentionally unencoded skin acquisition metadata.",
     "PASS": "No structural failure and no record-level presentation review.",
     "siteUsable": "PASS and REVIEW are site-usable; FAIL is not."
@@ -52,14 +62,16 @@
     "Do not re-run Stage 4 or Stage 5 semantic research in Stage 6-3.",
     "Do not rebuild Hero-Soldier membership; consume the frozen relation and validation.",
     "Do not rebuild Hero-exclusive Equipment ownership; consume the frozen Stage B canonical relation.",
-    "A declared NOT_RELEASED/absent optional feature is not a JOIN failure.",
+    "A declared NOT_RELEASED/absent optional feature is not a JOIN failure; Stage 5-2 equipmentId=0 is an absence sentinel, not an Equipment ID.",
     "Presentation-only localization or web-asset gaps must not be promoted to structural FAIL."
   ],
   "outputs": {
-    "heroDetail": "data/generated/hero-detail.v1.json",
+    "heroDetailManifest": "data/generated/hero-detail.v1.json",
+    "heroDetailShards": "data/generated/hero-detail/by-id/<heroId>.json",
+    "heroDetailShared": "data/generated/hero-detail-shared.v1.json",
     "validation": "data/validation/hero-stage6-3-final.v1.json",
     "checkpointJson": "data/checkpoints/hero-stage6-3-full-generation.json",
     "checkpointMarkdown": "data/checkpoints/hero-stage6-3-full-generation.md"
   },
-  "completionGate": "267/267 materialized, zero structural FAIL, zero hard errors, frozen Stage 4/5 and Stage 6-1/6-2 gates preserved, canonical Hero-Soldier relation preserved, and Stage B exclusive-equipment relation parity preserved."
+  "completionGate": "267/267 materialized into 267 unique Hero shards, zero structural FAIL, zero hard errors, frozen Stage 4/5 and Stage 6-1/6-2 gates preserved, canonical Hero-Soldier relation preserved, and Stage B exclusive-equipment relation parity preserved."
 }
