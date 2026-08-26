@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2-8",
+  "status": "FREEZE_CONTRACT_FROZEN",
+  "purpose": "Run final whole-stage regression across Banner Stage 2-0 through 2-7, publish a lightweight production manifest, and freeze the canonical Banner Stage 2 model without duplicating large generated datasets.",
+  "predecessorStages": [
+    {"stage":"2-0","expectedStatus":"PASS_STAGE2_0_INPUT_CONTRACT"},
+    {"stage":"2-1","expectedStatus":"PASS_STAGE2_1_IDENTITY_GROUPING_POLICY"},
+    {"stage":"2-2","expectedStatus":"PASS_STAGE2_2_CANONICAL_DEFINITION_MATERIALIZATION"},
+    {"stage":"2-3","expectedStatus":"PASS_STAGE2_3_CANONICAL_OCCURRENCE_MATERIALIZATION"},
+    {"stage":"2-4","expectedStatus":"PASS_STAGE2_4_TAXONOMY"},
+    {"stage":"2-5","expectedStatus":"PASS_STAGE2_5_CANONICAL_HERO_RELATIONS"},
+    {"stage":"2-6","expectedStatus":"PASS_STAGE2_6_CP_EVENT_STRUCTURE"},
+    {"stage":"2-7","expectedStatus":"PASS_STAGE2_7_RECURRENCE_HISTORY"}
+  ],
+  "canonicalProductionOutputs": [
+    "data/generated/banner-definitions.v1.json",
+    "data/generated/banner-occurrence-definition-map.v1.json",
+    "data/generated/banner-occurrences.v1.json",
+    "data/generated/banner-definition-taxonomy.v1.json",
+    "data/generated/banner-occurrence-taxonomy.v1.json",
+    "data/generated/banner-definition-hero-relations.v1.json",
+    "data/generated/banner-cp-event-relations.v1.json",
+    "data/generated/banner-recurrence-history.v1.json"
+  ],
+  "requiredPopulation": {
+    "bannerDefinitionCount": 77,
+    "bannerOccurrenceCount": 94,
+    "sourceLinkedDefinitionCount": 69,
+    "manualOccurrenceScopedDefinitionCount": 8,
+    "heroRelationEdgeCount": 600,
+    "cpRelatedDefinitionCount": 4,
+    "repeatedDefinitionCount": 11,
+    "recurrenceLinkCount": 17
+  },
+  "requiredCrossStageInvariants": [
+    "Every canonical occurrence resolves to exactly one frozen canonical definition.",
+    "Definition and occurrence IDs remain unchanged across taxonomy, Hero relation, CP/Event and history consumers.",
+    "All 77 definitions receive definition taxonomy and history records.",
+    "All 94 occurrences receive occurrence taxonomy and appear exactly once in recurrence/history consumer coverage.",
+    "Hero relation edges reference only canonical definitions and canonical Hero IDs.",
+    "CP_RELATED remains an explicit-source-backed non-exclusive context relation; Event references remain text-only with no synthesized canonical Event ID.",
+    "kr-banner:20270331:4 preserves recorded cardpool:263, effective cardpool:265 and definition continuity with kr-banner:20261007:8.",
+    "All source-null manual definitions remain occurrence-scoped and are not cross-merged from text, Hero names or assets.",
+    "Recurrence/history remains observed-current-dataset history only, with no fixed cadence, future prediction or first-ever release inference."
+  ],
+  "deferredBoundaries": [
+    "canonical Event ID resolution",
+    "exact opening/closing timestamp, timezone and duration",
+    "asset canonical ownership/hash/visual duplicate resolution",
+    "first-ever release dates outside the current dataset",
+    "future recurrence prediction",
+    "source-null manual cross-definition equivalence unless an explicit approved mapping is later introduced",
+    "frontend integration"
+  ],
+  "freezePolicy": {
+    "definitionIdentityFrozen": true,
+    "occurrenceIdentityFrozen": true,
+    "silentRegroupingAfterFreezeAllowed": false,
+    "identityChangeRequiresExplicitMigrationOrAliasCheckpoint": true,
+    "stage1SourceScheduleMutationAllowed": false,
+    "largeProductionOutputDuplicationAllowed": false
+  },
+  "completionCriteria": {
+    "allPredecessorValidatorsExecuteSuccessfully": true,
+    "crossStageRegressionErrorCount": 0,
+    "productionManifestMaterialized": true,
+    "stage2FreezeCheckpointMaterialized": true
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 2",
+  "status": "BANNER_STAGE2_FROZEN_READY_FOR_STAGE3",
+  "frozenAtStage": "Banner Stage 2-8",
+  "validationStatus": "PASS_BANNER_STAGE2_FINAL_FREEZE",
+  "completedScope": {
+    "canonicalDefinitionCount": 77,
+    "canonicalOccurrenceCount": 94,
+    "sourceLinkedDefinitionCount": 69,
+    "manualOccurrenceScopedDefinitionCount": 8,
+    "heroRelationEdgeCount": 600,
+    "cpRelatedDefinitionCount": 4,
+    "repeatedDefinitionCount": 11,
+    "recurrenceLinkCount": 17,
+    "errorCount": 0
+  },
+  "frozenCanonicalOutputs": [
+    "data/generated/banner-definitions.v1.json",
+    "data/generated/banner-occurrence-definition-map.v1.json",
+    "data/generated/banner-occurrences.v1.json",
+    "data/generated/banner-definition-taxonomy.v1.json",
+    "data/generated/banner-occurrence-taxonomy.v1.json",
+    "data/generated/banner-definition-hero-relations.v1.json",
+    "data/generated/banner-cp-event-relations.v1.json",
+    "data/generated/banner-recurrence-history.v1.json"
+  ],
+  "frozenIdentityRules": {
+    "bannerOccurrenceId": "bocc:<recordKey>",
+    "bannerDefinitionId": "bdef:v1:<first 24 lowercase hex chars of SHA-256('banner-definition:v1|' + definitionGroupKey)>",
+    "sourceLinkedDefinitionGrouping": "same effectiveSourceRecordKey => same canonical definition",
+    "sourceNullManualDefinitionGrouping": "one occurrence-scoped definition unless an explicit approved mapping is introduced",
+    "silentRegroupingAllowedAfterFreeze": false,
+    "identityChangeRequiresMigrationOrAliasCheckpoint": true
+  },
+  "preservedUnknownsAndDeferrals": [
+    "canonical Event ID resolution",
+    "exact opening/closing timestamp, timezone and duration",
+    "asset canonical ownership/hash/visual duplicate resolution",
+    "first-ever release dates outside the current dataset",
+    "future recurrence prediction",
+    "source-null manual cross-definition equivalence unless an explicit approved mapping is later introduced",
+    "frontend integration"
+  ],
+  "regressionBasis": {
+    "predecessorStages": [
+      {
+        "stage": "2-0",
+        "expectedStatus": "PASS_STAGE2_0_INPUT_CONTRACT"
+      },
+      {
+        "stage": "2-1",
+        "expectedStatus": "PASS_STAGE2_1_IDENTITY_GROUPING_POLICY"
+      },
+      {
+        "stage": "2-2",
+        "expectedStatus": "PASS_STAGE2_2_CANONICAL_DEFINITION_MATERIALIZATION"
+      },
+      {
+        "stage": "2-3",
+        "expectedStatus": "PASS_STAGE2_3_CANONICAL_OCCURRENCE_MATERIALIZATION"
+      },
+      {
+        "stage": "2-4",
+        "expectedStatus": "PASS_STAGE2_4_TAXONOMY"
+      },
+      {
+        "stage": "2-5",
+        "expectedStatus": "PASS_STAGE2_5_CANONICAL_HERO_RELATIONS"
+      },
+      {
+        "stage": "2-6",
+        "expectedStatus": "PASS_STAGE2_6_CP_EVENT_STRUCTURE"
+      },
+      {
+        "stage": "2-7",
+        "expectedStatus": "PASS_STAGE2_7_RECURRENCE_HISTORY"
+      }
+    ],
+    "wholeStageValidation": "data/validation/banner-stage2-8-summary.v1.json",
+    "productionManifest": "data/generated/banner-stage2-production-manifest.v1.json"
+  },
+  "changePolicy": {
+    "strongerContradictorySourceMayReopen": true,
+    "semanticModelChangeMayReopen": true,
+    "silentCanonicalRegroupingAllowed": false,
+    "identityChangeRequiresExplicitMigrationOrAliasCheckpoint": true
+  },
+  "nextStartPoint": {
+    "stage": "Banner Stage 3",
+    "task": "Consume the frozen Stage 2 canonical model for asset/frontend integration without silently changing canonical banner identity."
+  }
+}
