@@ -1,0 +1,75 @@
+{
+  "stage": "3-7",
+  "status": "PASS",
+  "finalStageStatus": "STAGE3_COMPLETE_WITH_REVIEW_AND_EXPLICIT_HOLD",
+  "checkpointContinuity": {
+    "stage30": "PASS",
+    "stage31": "PASS",
+    "stage32": "PASS",
+    "stage33": "PASS",
+    "stage34": "PASS",
+    "stage35": "PASS",
+    "stage36": "PASS"
+  },
+  "canonicalCoverage": {
+    "canonical": 390,
+    "general": 206,
+    "exclusive": 167,
+    "soulSpecial": 16,
+    "hold": 1,
+    "publicPageReady": 373,
+    "union": 390,
+    "disjoint": true,
+    "closed": true
+  },
+  "consumerParity": {
+    "generalListDetail": 206,
+    "exclusiveListDetail": 167,
+    "uniquePublicRouteKeys": 373,
+    "routeKey": "equipmentId"
+  },
+  "displayIntegrity": {
+    "iconVerified": 373,
+    "nameKrVerified": 186,
+    "nameKrReview": 187,
+    "reviewNameCandidateLeak": 0
+  },
+  "releaseOrderReview": {
+    "generalTab3": 32,
+    "exclusive": 167,
+    "total": 199
+  },
+  "hiddenAndHoldIntegrity": {
+    "hiddenSpecial": 16,
+    "explicitHold": 1,
+    "publicLeak": 0,
+    "holdIds": [
+      2013
+    ],
+    "unresolved2013Disposition": "HOLD_UNRESOLVED_ACQUISITION"
+  },
+  "policyRegression": {
+    "stage2SemanticsReopened": false,
+    "inventedKoreanNames": false,
+    "inventedReleaseDates": false,
+    "effectTextRewritten": false,
+    "statsRecalculated": false,
+    "acquisitionChronologyInvented": false,
+    "heroOwnershipInvented": false,
+    "emptyGetPathListMeaningInvented": false,
+    "restrictionRuntimeDirectProofClaimed": false
+  },
+  "nonBlockingReview": {
+    "koreanNames": 187,
+    "releaseOrder": 199,
+    "restrictionRuntimeDirectProof": "UNLOCATED_LOW_PRIORITY",
+    "exclusiveHeroOwnership": "OUT_OF_SCOPE_SEPARATE_HERO_CONSUMER"
+  },
+  "explicitHold": {
+    "equipmentId": 2013,
+    "status": "HOLD_UNRESOLVED_ACQUISITION",
+    "reason": "Empty GetPathList has no confirmed acquisition meaning; Stage 3 must not infer one."
+  },
+  "completionMeaning": "Stage 3 equipment consumer data is structurally complete and regression-validated for all 390 canonical records. Remaining REVIEW/HOLD items are explicitly tracked and are not silently filled.",
+  "nextStage": "Stage 4 frontend/UI integration and consumer QA"
+}
