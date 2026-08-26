@@ -1,0 +1,363 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-7",
+  "status": "REPRESENTATIVE_FIXTURE_VALIDATION_COMPLETE_WITH_EXPECTED_REVIEWS",
+  "purpose": "Validate the frozen Stage 1 row-grain, taxonomy, relation, date/recurrence, correction, and asset-reference decisions across a small set of representative Korean banner occurrences without rebuilding all 94 mappings from scratch or creating the production schema.",
+  "inputs": {
+    "currentSchedule": "data/kr-banner-schedule.v1.json",
+    "rowGrain": "data/investigation/banner-stage1-2-row-grain-census.v1.json",
+    "taxonomy": "data/investigation/banner-stage1-3-provisional-taxonomy.v1.json",
+    "relationCensus": "data/investigation/banner-stage1-4-relation-census.v1.json",
+    "relationCorrection": "data/checkpoints/banner-stage1-4-relation-corrections.v1.json",
+    "dateRecurrence": "data/investigation/banner-stage1-5-date-recurrence-census.v1.json",
+    "assetReference": "data/investigation/banner-stage1-6-asset-reference-census.v1.json",
+    "rawCardPool": "data/configdata/ConfigDataCardPoolInfo.json",
+    "canonicalHero": "data/hero-name-master.v1.json"
+  },
+  "validationStrategy": {
+    "fixtureCount": 8,
+    "scope": "Representative cross-layer validation",
+    "full94RawRemapPerformed": false,
+    "reason": "Existing verified schedule mappings and Stage 1 checkpoints are reused first. Fixtures are selected to exercise distinct semantics and exception boundaries rather than redoing the already validated population.",
+    "hardFailureRule": "Any fixture contradicting a frozen Stage 1 decision is a hard failure. A fixture intentionally preserving a known unresolved relation or asset gap is an expected REVIEW, not a failure."
+  },
+  "fixtures": [
+    {
+      "fixtureId": "F1_NEW_PICKUP_STATIC_EXACT_HERO_ID",
+      "status": "PASS",
+      "occurrence": {
+        "recordKey": "kr-banner:20260923:1",
+        "krDisplayDate": "2026-09-23",
+        "displayOrder": 1,
+        "bannerCode": "9601",
+        "sourceRecordKey": "cardpool:364",
+        "scheduleType": "new"
+      },
+      "taxonomyExpected": {
+        "mechanicFamily": "PICKUP",
+        "lifecycle": "NEW",
+        "pickupCardinality": "UNKNOWN"
+      },
+      "sourceEvidence": {
+        "cardPoolId": 364,
+        "nameCn": "主宰！秘夜之影！",
+        "upHeroIds": [99272]
+      },
+      "heroEvidence": {
+        "heroId": 99272,
+        "nameCn": "穆宁",
+        "nameKr": "무닝",
+        "status": "verified"
+      },
+      "assetEvidence": {
+        "visualType": "static",
+        "displayImageType": "Banner",
+        "displayImageFile": "Banner_9601.webp",
+        "displayImageStatus": "matched"
+      },
+      "dateEvidence": {
+        "precision": "DAY",
+        "endDateKnown": false
+      },
+      "assertions": {
+        "occurrenceAndSourceRemainSeparate": true,
+        "pickupHeroUsesExactId": true,
+        "newDoesNotEncodeCardinality": true,
+        "dateIsOccurrenceDisplayDate": true,
+        "assetIsOccurrenceDisplayReference": true
+      }
+    },
+    {
+      "fixtureId": "F2_SINGLE_RERUN_PREFAB_SOURCE_REUSE",
+      "status": "PASS",
+      "sourceRecordKey": "cardpool:213",
+      "bannerCode": "5701",
+      "sourceType": "new",
+      "occurrences": [
+        {"recordKey": "kr-banner:20261007:9", "krDisplayDate": "2026-10-07"},
+        {"recordKey": "kr-banner:20270331:3", "krDisplayDate": "2027-03-31"}
+      ],
+      "taxonomyExpected": {
+        "mechanicFamily": "PICKUP",
+        "lifecycle": "RERUN",
+        "pickupCardinality": "SINGLE"
+      },
+      "recurrenceEvidence": {
+        "gapDays": 175,
+        "gapWeeks": 25,
+        "status": "VERIFIED_SOURCE_REUSE"
+      },
+      "assetEvidence": {
+        "visualType": "prefab",
+        "displayImageType": "Picture_Notice",
+        "displayImageFile": "Picture_Notice_5701.webp",
+        "displayImageStatus": "matched",
+        "sameReferenceAcrossOccurrences": true
+      },
+      "assertions": {
+        "sourceTypeAndOccurrenceLifecycleRemainSeparate": true,
+        "prefabDoesNotMeanMissingWebsiteImage": true,
+        "recurrenceIsRepeatedOccurrenceRows": true,
+        "fixedCadenceNotRequired": true
+      }
+    },
+    {
+      "fixtureId": "F3_REPEATED_DUAL_AND_TRIPLE_SOURCE_ASSET_REUSE",
+      "status": "PASS",
+      "subcases": [
+        {
+          "kind": "DUAL",
+          "sourceRecordKey": "cardpool:370",
+          "bannerCode": "9702",
+          "occurrences": ["kr-banner:20261028:1", "kr-banner:20270317:2"],
+          "gapWeeks": 20,
+          "displayImageFile": "Picture_Notice_9702.webp"
+        },
+        {
+          "kind": "TRIPLE",
+          "sourceRecordKey": "cardpool:366",
+          "bannerCode": "9603",
+          "occurrences": ["kr-banner:20261007:10", "kr-banner:20270210:2"],
+          "gapWeeks": 18,
+          "displayImageFile": "Banner_9603.webp"
+        }
+      ],
+      "assertions": {
+        "sameSourceCanHaveMultipleOccurrences": true,
+        "sameVerifiedSourceCanReuseSameAssetReference": true,
+        "differentObservedGapsRejectGlobalFixedCadence": true,
+        "assetEqualityIsSupportingEvidenceOnly": true
+      }
+    },
+    {
+      "fixtureId": "F4_SOURCE_LINKED_WISH_WITH_EXPLICIT_CANDIDATES",
+      "status": "PASS",
+      "occurrence": {
+        "recordKey": "kr-banner:20260909:1",
+        "krDisplayDate": "2026-09-09",
+        "bannerCode": "9616",
+        "sourceRecordKey": "cardpool:368",
+        "scheduleType": "wish"
+      },
+      "taxonomyExpected": {
+        "mechanicFamily": "WISH",
+        "lifecycle": "UNKNOWN",
+        "pickupCardinality": "NOT_APPLICABLE"
+      },
+      "sourceEvidence": {
+        "cardPoolId": 368,
+        "nameCn": "誓约·许愿召唤",
+        "candidateSourceField": "OptionalUpHeroList[].HeroId",
+        "sourceTextSelectsTwoFromCandidatePool": true
+      },
+      "assetEvidence": {
+        "displayImageType": "Picture_Notice",
+        "displayImageFile": "Picture_Notice_9605.webp",
+        "displayImageStatus": "matched"
+      },
+      "assertions": {
+        "wishCandidateRelationSeparateFromPickupHero": true,
+        "wishNotForcedToDual": true,
+        "assetFilenameMayDifferFromBannerCode": true,
+        "assetFilenameCannotBeSourceIdentity": true
+      }
+    },
+    {
+      "fixtureId": "F5_MANUAL_WISH_WITH_CONCRETE_REPLACEMENT",
+      "status": "PASS_WITH_REVIEW_BOUNDARY",
+      "occurrence": {
+        "recordKey": "kr-manual-wish-langrisser-1-5-20260909",
+        "krDisplayDate": "2026-09-09",
+        "bannerCode": null,
+        "sourceRecordKey": null,
+        "scheduleType": "wish",
+        "manualOverride": true
+      },
+      "taxonomyExpected": {
+        "mechanicFamily": "WISH",
+        "lifecycle": "UNKNOWN",
+        "pickupCardinality": "NOT_APPLICABLE",
+        "tags": ["MANUAL_KR"]
+      },
+      "assetEvidence": {
+        "displayImageType": "Picture_Notice",
+        "displayImageFile": "Picture_Notice_ChuanShuoReturn.webp",
+        "displayImageStatus": "manual-replacement",
+        "sameReplacementFileObservedOnLaterManualOccurrences": true
+      },
+      "reviewBoundary": {
+        "canonicalCardPoolRelation": "NOT_AVAILABLE",
+        "canonicalHeroCandidateEdges": "REVIEW",
+        "canonicalRecurrenceIdentity": "REVIEW"
+      },
+      "assertions": {
+        "manualOccurrenceValidWithoutSourceRecordKey": true,
+        "manualReplacementDoesNotMeanMissingFile": true,
+        "sameManualAssetDoesNotProveCanonicalRecurrence": true,
+        "noHeroEdgesSynthesizedFromDisplayText": true
+      }
+    },
+    {
+      "fixtureId": "F6_CP_RELATED_AS_NON_EXCLUSIVE_CONTEXT",
+      "status": "PASS_WITH_EVENT_JOIN_REVIEW",
+      "occurrence": {
+        "recordKey": "kr-banner:20261007:1",
+        "krDisplayDate": "2026-10-07",
+        "bannerCode": "9604",
+        "sourceRecordKey": "cardpool:367",
+        "scheduleType": "dual"
+      },
+      "taxonomyExpected": {
+        "mechanicFamily": "PICKUP",
+        "lifecycle": "RERUN",
+        "pickupCardinality": "DUAL",
+        "contextTags": ["CP_RELATED"]
+      },
+      "sourceEvidence": {
+        "cardPoolId": 367,
+        "nameCn": "重逢的圆舞曲",
+        "cpPointGrantExplicitInCardPoolDetailDesc": true,
+        "eventTextLabel": "相通的心灵"
+      },
+      "assetEvidence": {
+        "displayImageType": "Picture_Notice",
+        "displayImageFile": "Picture_Notice_9604.webp",
+        "displayImageStatus": "matched"
+      },
+      "reviewBoundary": {
+        "canonicalEventId": "UNPROVEN",
+        "nameBasedEventJoinAllowed": false
+      },
+      "assertions": {
+        "cpRelatedIsContextNotExclusiveMechanic": true,
+        "cpAssignedFromExplicitSourceSemantics": true,
+        "eventTextPreservedWithoutCanonicalJoin": true
+      }
+    },
+    {
+      "fixtureId": "F7_7001_CORRECTION_END_TO_END",
+      "status": "PASS_AFTER_VERIFIED_CORRECTION",
+      "bannerCode": "7001",
+      "occurrences": [
+        {"recordKey": "kr-banner:20261007:8", "krDisplayDate": "2026-10-07", "sourceRecordKey": "cardpool:265"},
+        {"recordKey": "kr-banner:20270331:4", "krDisplayDate": "2027-03-31", "recordedSourceRecordKey": "cardpool:263", "effectiveSourceRecordKey": "cardpool:265"}
+      ],
+      "correction": {
+        "from": "cardpool:263",
+        "to": "cardpool:265",
+        "status": "VERIFIED_CORRECTION"
+      },
+      "sourceEvidence": {
+        "cardPoolId": 265,
+        "nameCn": "寒龙冰棘之征",
+        "upHeroIds": [99225]
+      },
+      "heroEvidence": {
+        "heroId": 99225,
+        "nameCn": "冰渊凌御者",
+        "nameKr": "빙설 심연의 지배자",
+        "status": "verified"
+      },
+      "taxonomyExpected": {
+        "mechanicFamily": "PICKUP",
+        "lifecycle": "RERUN",
+        "pickupCardinality": "SINGLE"
+      },
+      "recurrenceEvidence": {
+        "gapWeeks": 25,
+        "groupAfterCorrection": true
+      },
+      "assetEvidence": {
+        "displayImageType": "Picture_Notice",
+        "displayImageFile": "Picture_Notice_7001.webp",
+        "sameReferenceAcrossOccurrences": true
+      },
+      "assertions": {
+        "correctionLayerConsumedBeforeGrouping": true,
+        "heroJoinUsesExactHeroId": true,
+        "sourceScheduleRemainsUnmutatedInStage1": true,
+        "taxonomyIndependentFromSourceConflictRepair": true
+      }
+    },
+    {
+      "fixtureId": "F8_MANUAL_WISH_NULL_ASSET_REFERENCE",
+      "status": "EXPECTED_REVIEW_NOT_FAILURE",
+      "occurrence": {
+        "recordKey": "kr-manual-wish-20260902",
+        "krDisplayDate": "2026-09-02",
+        "displayOrder": 3,
+        "bannerCode": null,
+        "sourceRecordKey": null,
+        "scheduleType": "wish",
+        "selectableText": "5인 선택"
+      },
+      "assetEvidence": {
+        "displayImageType": "Picture_Notice",
+        "displayImageFile": null,
+        "displayImageStatus": "manual-replacement"
+      },
+      "assertions": {
+        "validOccurrenceWithoutCardPool": true,
+        "taxonomyPathStillAvailable": true,
+        "missingAssetReferenceRemainsExplicit": true,
+        "replacementCandidateNotInvented": true,
+        "heroCandidateEdgesNotSynthesized": true
+      }
+    }
+  ],
+  "crossStageInvariantResults": {
+    "occurrenceRowGrainPreserved": true,
+    "sourceIdentitySeparatedFromOccurrenceIdentity": true,
+    "multiAxisTaxonomyRemainsNecessary": true,
+    "sourceTypeNotOverwrittenByOccurrenceTaxonomy": true,
+    "pickupHeroExactIdJoinValidated": true,
+    "wishCandidateRelationSeparatedFromPickupHero": true,
+    "manualSourceNullPathValidated": true,
+    "cpRelatedContextSemanticsValidated": true,
+    "canonicalEventJoinStillReview": true,
+    "dayPrecisionDateSemanticsValidated": true,
+    "fixedRecurrenceCadenceStillRejected": true,
+    "assetReferenceNotPromotedToCanonicalIdentity": true,
+    "manualReplacementSeparatedFromMissingAsset": true,
+    "relationCorrectionLayerValidated": true,
+    "guessBasedJoinIntroduced": false
+  },
+  "result": {
+    "hardFailureCount": 0,
+    "newCrossStageContradictionCount": 0,
+    "expectedReviewFixtureCount": 3,
+    "expectedReviewFixtureIds": [
+      "F5_MANUAL_WISH_WITH_CONCRETE_REPLACEMENT",
+      "F6_CP_RELATED_AS_NON_EXCLUSIVE_CONTEXT",
+      "F8_MANUAL_WISH_NULL_ASSET_REFERENCE"
+    ],
+    "decision": "PASS_REPRESENTATIVE_FIXTURE_VALIDATION_WITH_EXPECTED_REVIEWS"
+  },
+  "openReviewItemsCarriedForward": [
+    "Canonical Event ID relation for CP/banner+event consumers",
+    "Canonical Hero candidate edges for manual wish rows without an ID-bearing source",
+    "Canonical recurrence identity for manual rows without a source identity",
+    "Replacement asset for kr-manual-wish-20260902",
+    "Exact banner opening/closing timestamps and duration",
+    "Canonical asset ownership and hash/visual duplicate groups",
+    "Final production bannerDefinition/bannerOccurrence schema"
+  ],
+  "notPerformed": [
+    "No full 94-row raw remapping",
+    "No production schema migration",
+    "No Event name-based JOIN",
+    "No manual Hero name-based JOIN",
+    "No asset hashing or visual comparison",
+    "No source schedule mutation"
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-8",
+    "task": "Freeze and summarize Stage 1 findings",
+    "consume": [
+      "All eight representative fixtures are compatible with the frozen Stage 1 model; no hard contradiction was found.",
+      "Preserve three expected REVIEW boundaries: manual source-null identity, CP Event ID, and the one null image reference.",
+      "Use the Stage 1-4 relation correction checkpoint before any later relation/recurrence consumer generation.",
+      "Do not collapse occurrence, source, Hero, event, or asset identities in the Stage 1 freeze summary."
+    ]
+  }
+}
