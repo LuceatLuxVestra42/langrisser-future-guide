@@ -1,0 +1,201 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 1-5",
+  "status": "DATE_RECURRENCE_CENSUS_COMPLETE",
+  "purpose": "Define the observed Korean banner occurrence date semantics and recurrence/reuse evidence without inventing banner durations, fixed recurrence rules, or production date fields.",
+  "inputs": {
+    "currentSchedule": "data/kr-banner-schedule.v1.json",
+    "rowGrain": "data/investigation/banner-stage1-2-row-grain-census.v1.json",
+    "provisionalTaxonomy": "data/investigation/banner-stage1-3-provisional-taxonomy.v1.json",
+    "relationCensus": "data/investigation/banner-stage1-4-relation-census.v1.json",
+    "relationCorrections": "data/checkpoints/banner-stage1-4-relation-corrections.v1.json",
+    "existingValidator": "scripts/validate_kr_schedule.cjs"
+  },
+  "currentPopulation": {
+    "recordCount": 94,
+    "datasetStartDate": "2026-09-02",
+    "latestObservedKrDisplayDate": "2027-03-31",
+    "latestObservedDateRecordCount": 4,
+    "dateFieldOnOccurrence": "krDisplayDate",
+    "orderFieldWithinDate": "displayOrder"
+  },
+  "dateSemantics": {
+    "krDisplayDate": {
+      "status": "VERIFIED_OCCURRENCE_DISPLAY_DATE",
+      "meaning": "Calendar date used to place one Korean banner occurrence/display row in the assembled Korean schedule.",
+      "precision": "DAY",
+      "exactFor": "Korean schedule display placement",
+      "notProvenAs": [
+        "exact in-game opening timestamp",
+        "exact server reset timestamp",
+        "banner end date",
+        "banner duration"
+      ],
+      "timezoneEncoded": false,
+      "timeOfDayEncoded": false,
+      "rule": "Preserve krDisplayDate directly. Do not derive it from recordKey, bannerCode, patchCode, slotCode, CardPool ID, or asset filename."
+    },
+    "topLevelStartDate": {
+      "status": "VERIFIED_DATASET_RANGE_MARKER",
+      "value": "2026-09-02",
+      "meaning": "Lower-bound/start marker for the current assembled schedule dataset.",
+      "notAnOccurrenceDurationField": true
+    },
+    "endDate": {
+      "status": "NOT_PRESENT_IN_CURRENT_SCHEDULE",
+      "fieldObserved": false,
+      "rule": "Do not infer an occurrence end date from the next krDisplayDate, the next patch, or a conventional banner duration."
+    },
+    "displayOrder": {
+      "status": "VERIFIED_PER_DATE_PRESENTATION_COORDINATE",
+      "uniquenessRule": "No duplicate displayOrder within the same krDisplayDate according to the existing validator.",
+      "chronologyRole": "Orders rows within one display date only; it is not source chronology or recurrence order."
+    }
+  },
+  "recurrenceModel": {
+    "coreDecision": "Recurrence is represented by multiple dated occurrence rows reusing the same verified source identity; it is not represented by mutating one row's date and it is not generated from a fixed interval rule.",
+    "strongEvidence": [
+      "same corrected sourceRecordKey / CardPool identity appears on multiple krDisplayDate values",
+      "same explicit source semantics are preserved across those occurrence rows"
+    ],
+    "supportingEvidence": [
+      "same bannerCode when the source relation is already verified",
+      "notes or matchBasis explicitly state that the same banner is reused"
+    ],
+    "notSufficientAlone": [
+      "same bannerCode without verified CardPool relation",
+      "same hero names",
+      "same Korean display text",
+      "same asset filename",
+      "same patchCode or slotCode",
+      "numeric proximity of CardPool IDs or banner codes"
+    ],
+    "provisionalOccurrenceStatuses": [
+      {
+        "value": "FIRST_OBSERVED_SOURCE_OCCURRENCE",
+        "meaning": "Earliest occurrence of a verified source identity inside the current schedule window only. It does not claim first-ever server release unless separately proven."
+      },
+      {
+        "value": "REUSED_SOURCE_OCCURRENCE",
+        "meaning": "Later occurrence row reusing a previously observed verified source identity."
+      },
+      {
+        "value": "MANUAL_REUSE_REVIEW",
+        "meaning": "Manual occurrence has no canonical CardPool identity; apparent repeated text/image is insufficient for automatic recurrence linkage."
+      }
+    ]
+  },
+  "verifiedRecurrenceFixtures": [
+    {
+      "sourceRecordKey": "cardpool:370",
+      "bannerCode": "9702",
+      "occurrences": [
+        {"recordKey": "kr-banner:20261028:1", "krDisplayDate": "2026-10-28"},
+        {"recordKey": "kr-banner:20270317:2", "krDisplayDate": "2027-03-17"}
+      ],
+      "gapDays": 140,
+      "gapWeeks": 20,
+      "status": "VERIFIED_SOURCE_REUSE"
+    },
+    {
+      "sourceRecordKey": "cardpool:213",
+      "bannerCode": "5701",
+      "occurrences": [
+        {"recordKey": "kr-banner:20261007:9", "krDisplayDate": "2026-10-07"},
+        {"recordKey": "kr-banner:20270331:3", "krDisplayDate": "2027-03-31"}
+      ],
+      "gapDays": 175,
+      "gapWeeks": 25,
+      "status": "VERIFIED_SOURCE_REUSE"
+    },
+    {
+      "sourceRecordKey": "cardpool:366",
+      "bannerCode": "9603",
+      "occurrences": [
+        {"recordKey": "kr-banner:20261007:10", "krDisplayDate": "2026-10-07"},
+        {"recordKey": "kr-banner:20270210:2", "krDisplayDate": "2027-02-10"}
+      ],
+      "gapDays": 126,
+      "gapWeeks": 18,
+      "status": "VERIFIED_SOURCE_REUSE"
+    },
+    {
+      "sourceRecordKey": "cardpool:305",
+      "bannerCode": "7902",
+      "mechanicFamily": "WISH",
+      "occurrences": [
+        {"recordKey": "kr-banner:20260916:3", "krDisplayDate": "2026-09-16"},
+        {"recordKey": "kr-banner:20261202:3", "krDisplayDate": "2026-12-02"},
+        {"recordKey": "kr-banner:20270127:2", "krDisplayDate": "2027-01-27"},
+        {"recordKey": "kr-banner:20270324:3", "krDisplayDate": "2027-03-24"}
+      ],
+      "successiveGapWeeks": [11, 8, 8],
+      "status": "VERIFIED_SOURCE_REUSE",
+      "conclusion": "A reusable wish source can recur multiple times and the observed intervals are not a single fixed cadence."
+    },
+    {
+      "bannerCode": "7001",
+      "correctedSourceRecordKey": "cardpool:265",
+      "occurrences": [
+        {"recordKey": "kr-banner:20261007:8", "krDisplayDate": "2026-10-07", "sourceRecordKey": "cardpool:265"},
+        {"recordKey": "kr-banner:20270331:4", "krDisplayDate": "2027-03-31", "recordedSourceRecordKey": "cardpool:263", "effectiveSourceRecordKey": "cardpool:265"}
+      ],
+      "gapDays": 175,
+      "gapWeeks": 25,
+      "status": "VERIFIED_REUSE_AFTER_RELATION_CORRECTION",
+      "rule": "Recurrence grouping must consume the Stage 1-4 correction checkpoint before source-identity grouping."
+    }
+  ],
+  "fixedCadenceDecision": {
+    "status": "REJECTED",
+    "reason": "Verified source reuses show different observed intervals: 18 weeks, 20 weeks, 25 weeks, and a wish source with successive gaps of 11/8/8 weeks.",
+    "rule": "Store observed occurrence dates; do not create future recurrence dates from a banner/source-specific or global fixed interval unless a separate authoritative scheduling rule is later proven."
+  },
+  "manualOccurrencePolicy": {
+    "status": "PRESERVE_WITHOUT_SYNTHETIC_RECURRENCE_JOIN",
+    "rule": "Manual Korean occurrences with null sourceRecordKey remain independently dated occurrences. Repeated selectableText, heroesKr, displayImageFile, or similar presentation values do not by themselves prove that two manual rows are the same canonical recurring banner definition."
+  },
+  "lifecycleBoundary": {
+    "rule": "Stage 1-3 lifecycle=NEW/RERUN describes the occurrence presentation. Recurrence/source reuse is a separate structural fact.",
+    "importantExample": "sourceType=new / cardpool:213 can later appear as multiple lifecycle=RERUN SINGLE occurrences without changing the source CardPool identity."
+  },
+  "prohibitedDateInference": [
+    "Do not derive chronology from CardPool ID ordering.",
+    "Do not derive chronology from bannerCode or patchCode numbering.",
+    "Do not derive endDate from the next scheduled date.",
+    "Do not assume one-week duration because schedule display dates are week-aligned.",
+    "Do not assume a fixed rerun interval from one or two repeated examples.",
+    "Do not treat the earliest row in this dataset as the first-ever release unless independently proven.",
+    "Do not parse recordKey as the authoritative date when krDisplayDate exists explicitly."
+  ],
+  "coverageAndLimits": {
+    "allCurrentRowsHaveExplicitKrDisplayDateByExistingRowGrainContract": true,
+    "allCurrentRowsHavePerDateDisplayOrderByExistingRowGrainContract": true,
+    "scheduleEndDateFieldObserved": false,
+    "timeOfDayOrTimezoneSemanticsObserved": false,
+    "fixedRecurrenceRuleProven": false,
+    "representativeVerifiedSourceReusePatternsRecorded": true,
+    "relationCorrectionAppliedConceptuallyForRecurrenceGrouping": true,
+    "productionDateSchemaCreated": false
+  },
+  "notDecided": [
+    "Final production field name for occurrence start/display date",
+    "Whether a later authoritative source can provide exact opening/closing timestamps",
+    "Final datePrecision enum",
+    "Canonical first-ever release date outside the current Korean schedule window",
+    "Future recurrence prediction rules",
+    "Whether manual banner concepts receive an approved canonical definition identity",
+    "Final definition-to-occurrence table design"
+  ],
+  "nextStartPoint": {
+    "stage": "Banner Stage 1-6",
+    "task": "Asset-reference census only",
+    "consume": [
+      "Treat krDisplayDate as the exact Korean schedule display-date anchor, not a duration/timestamp field.",
+      "Keep endDate/duration unknown until independently sourced.",
+      "Represent recurrence as repeated dated occurrences linked to verified source identity.",
+      "Do not generate recurrence from fixed intervals.",
+      "Apply Stage 1-4 source corrections before recurrence grouping."
+    ]
+  }
+}
