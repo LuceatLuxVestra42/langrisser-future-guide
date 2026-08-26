@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "stage": "skin-page-1",
+  "substage": "1-1",
+  "checkpoint": "canonical-population",
+  "status": "PASS",
+  "completion": "SKIN_STAGE1_1_COMPLETE",
+  "sources": [
+    "data/contracts/skin-stage1-input-contract.v1.json",
+    "data/hero-page-stage5-5-3.v1.json"
+  ],
+  "output": "data/generated/skin-stage1-canonical.v1.json",
+  "metrics": {
+    "canonicalHeroCount": 267,
+    "heroesWithSkins": 235,
+    "heroesWithNoSkins": 32,
+    "canonicalSkinCount": 540,
+    "distinctSkinIdCount": 540,
+    "duplicateSkinIdCount": 0,
+    "missingStaticArtworkCount": 0,
+    "missingAnimatedResourceCount": 0,
+    "invalidSourceOrderCount": 0,
+    "acquisitionEncodedCount": 364,
+    "acquisitionUnencodedCount": 176
+  },
+  "failures": {
+    "duplicateSkinIds": [],
+    "missingStaticArtworkSkinIds": [],
+    "missingAnimatedResourceSkinIds": [],
+    "invalidSourceOrderSkinIds": [],
+    "invalidSourceClassSkinIds": [],
+    "invalidPopulationStatusSkinIds": []
+  },
+  "checks": {
+    "upstreamRecordCount267": true,
+    "canonicalSkinCount540": true,
+    "distinctSkinIdCount540": true,
+    "duplicateSkinIdsZero": true,
+    "missingStaticArtworkZero": true,
+    "missingAnimatedResourceZero": true,
+    "invalidSourceOrderZero": true,
+    "sourceClassAllRegularHeroSkin": true,
+    "populationStatusAllCanonical": true,
+    "acquisitionEncoded364": true,
+    "acquisitionUnencoded176": true,
+    "acquisitionStateTotal540": true,
+    "heroSkinPartition267": true
+  },
+  "rulesFrozen": [
+    "One canonical record per accepted regular skinId.",
+    "heroId and sourceOrder are copied from the accepted Hero Stage 5-5 consumer; no ownership/order inference is performed.",
+    "sourceImagePath and sourceSpinePath remain source asset locators, not web-serving URLs.",
+    "Missing acquisition encoding remains UNENCODED and is not inferred.",
+    "No future/KR release displayTarget classification is performed in Skin Stage 1-1.",
+    "No SP illustration or Soldier skin is admitted to this canonical population."
+  ],
+  "nextAction": "Skin 1-2: run owner/order/resource parity checks against the frozen upstream relation contract without redefining the 540-record population."
+}
