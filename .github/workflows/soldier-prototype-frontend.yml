@@ -1,0 +1,31 @@
+name: Soldier Prototype Frontend
+
+on:
+  push:
+    paths:
+      - '.github/workflows/soldier-prototype-frontend.yml'
+      - 'data/generated/soldier-detail-stage5-2.v1.json'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'src/lib/soldier-page.server.ts'
+      - 'src/lib/soldier-page.functions.ts'
+      - 'src/routes/soldiers-prototype.tsx'
+      - 'package.json'
+      - 'bun.lock'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Build production frontend
+        run: bun run build
+      - name: Verify generated Soldier prototype route
+        run: grep -q '/soldiers-prototype' src/routeTree.gen.ts
