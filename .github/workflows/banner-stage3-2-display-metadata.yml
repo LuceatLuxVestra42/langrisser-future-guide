@@ -1,0 +1,37 @@
+name: Banner Stage 3-2 Display Metadata
+
+on:
+  push:
+    paths:
+      - '.github/workflows/banner-stage3-2-display-metadata.yml'
+      - 'scripts/finalize-banner-stage3-2-display-metadata.mjs'
+      - 'scripts/validate-banner-stage3-2-display-metadata.mjs'
+      - 'data/contracts/banner-stage3-2-display-metadata.v1.json'
+      - 'data/validation/banner-stage3-1-asset-summary.v1.json'
+      - 'data/generated/banner-stage3-1-asset-relations.v1.json'
+      - 'data/generated/banner-occurrences.v1.json'
+      - 'data/generated/banner-definitions.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Materialize Banner Stage 3-2 display metadata
+        run: node scripts/finalize-banner-stage3-2-display-metadata.mjs
+      - name: Validate Banner Stage 3-2 display metadata
+        run: node scripts/validate-banner-stage3-2-display-metadata.mjs
+      - name: Persist Banner Stage 3-2 checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/banner-stage3-2-display-metadata.v1.json data/validation/banner-stage3-2-display-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No Banner Stage 3-2 checkpoint changes"
+            exit 0
+          fi
+          git commit -m "Freeze Banner Stage 3-2 display metadata checkpoint"
+          git push
