@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-integration-stageC-1-pair-parity/v1",
+  "stage": "C-1",
+  "checkpoint": "final-cross-consumer-pair-parity",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "purpose": "Directly compare the frozen canonical Hero-Soldier edge set against the final 267 Hero shards and final 224 Soldier full records without re-deriving membership from ConfigData.",
+  "c0Contract": "data/contracts/hero-soldier-integration-stageC-0-input.v1.json",
+  "sources": {
+    "c0Contract": {
+      "path": "data/contracts/hero-soldier-integration-stageC-0-input.v1.json",
+      "gitBlobSha": "ec4effc3fb35b2ea90cc267e0c96609e2b36f312"
+    },
+    "c0Summary": {
+      "path": "data/validation/hero-soldier-integration-stageC-0-summary.v1.json",
+      "gitBlobSha": "8ff0dbc475e4ca306bbed4c7aa4666d40af2c5b9"
+    },
+    "aFinal": {
+      "path": "data/validation/hero-soldier-relation-stageA-final.v1.json",
+      "gitBlobSha": "963dd9933d2e28e1bf66e663878c60e1c61198a0"
+    },
+    "relationSet": {
+      "path": "data/generated/hero-soldier-relations.v1.json",
+      "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    },
+    "heroManifest": {
+      "path": "data/generated/hero-detail.v1.json",
+      "gitBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66"
+    },
+    "heroFinal": {
+      "path": "data/validation/hero-stage6-4-final.v1.json",
+      "gitBlobSha": "9ae03d2dcc0660aae9c28900345212426b2a4dd1"
+    },
+    "soldierRecords": {
+      "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+      "gitBlobSha": "26a6054484cccb7d2613305fe3ae01d697c713df"
+    },
+    "soldierFinal": {
+      "path": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "gitBlobSha": "c1f9253ddea94e9f7a4f9c7e1aee9163c3abc3bb"
+    }
+  },
+  "upstreamChecks": {
+    "c0PassComplete": true,
+    "aFinalAccepted": true,
+    "heroFinalFrozen": true,
+    "soldierFinalReady": true
+  },
+  "snapshotChecks": {
+    "relationSet": true,
+    "heroManifest": true,
+    "heroFinal": true,
+    "soldierRecords": true,
+    "soldierFinal": true
+  },
+  "expected": {
+    "heroes": 267,
+    "soldiers": 224,
+    "pairs": 5977
+  },
+  "summary": {
+    "heroCount": 267,
+    "soldierCount": 224,
+    "canonicalPairCount": 5977,
+    "heroFinalPairCount": 5977,
+    "soldierFinalPairCount": 5977,
+    "canonicalVsHeroMismatch": 0,
+    "canonicalVsSoldierMismatch": 0,
+    "heroVsSoldierMismatch": 0,
+    "duplicatePairCount": 0,
+    "malformedPairCount": 0,
+    "unknownHeroIdCount": 0,
+    "unknownSoldierIdCount": 0,
+    "duplicateHeroIdCount": 0,
+    "duplicateSoldierIdCount": 0,
+    "heroShardErrorCount": 0,
+    "soldierRecordErrorCount": 0,
+    "hardErrorCount": 0
+  },
+  "differences": {
+    "canonicalMinusHero": {
+      "count": 0,
+      "sample": []
+    },
+    "heroMinusCanonical": {
+      "count": 0,
+      "sample": []
+    },
+    "canonicalMinusSoldier": {
+      "count": 0,
+      "sample": []
+    },
+    "soldierMinusCanonical": {
+      "count": 0,
+      "sample": []
+    },
+    "heroMinusSoldier": {
+      "count": 0,
+      "sample": []
+    },
+    "soldierMinusHero": {
+      "count": 0,
+      "sample": []
+    }
+  },
+  "diagnostics": {
+    "canonicalInvalidPairs": [],
+    "canonicalDuplicatePairs": [],
+    "heroInvalidPairs": [],
+    "heroDuplicatePairs": [],
+    "soldierInvalidPairs": [],
+    "soldierDuplicatePairs": [],
+    "unknownHeroIds": [],
+    "unknownSoldierIds": [],
+    "duplicateHeroIds": [],
+    "duplicateSoldierIds": [],
+    "heroShardErrors": [],
+    "soldierRecordErrors": []
+  },
+  "passCriteria": {
+    "heroCount": 267,
+    "soldierCount": 224,
+    "canonicalPairs": 5977,
+    "heroFinalPairs": 5977,
+    "soldierFinalPairs": 5977,
+    "allSixSetDifferences": 0,
+    "duplicatePairs": 0,
+    "unknownHeroIds": 0,
+    "unknownSoldierIds": 0,
+    "malformedPairs": 0,
+    "hardErrors": 0
+  },
+  "hardErrors": [],
+  "decision": "C-1 PASS. The canonical 5,977 Hero-Soldier pairs, final Hero-shard soldiers.ids pairs, and final Soldier-record heroes.finalHeroIds pairs are exactly identical with zero missing, extra, duplicate, malformed, or unknown-ID membership.",
+  "nextStartPoint": "C-2 consumer identity / ID resolution QA."
+}
