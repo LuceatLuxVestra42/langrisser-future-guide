@@ -1,0 +1,1749 @@
+{
+  "stage": "3-6",
+  "status": "COMPLETE_WITH_EXPLICIT_HOLD",
+  "sources": {
+    "stage30InputContract": "data/contracts/equipment-stage3-0-input-contract.v1.json",
+    "filterMap": "data/generated/equipment_stage2_3_filter_map.json",
+    "stats": "data/generated/equipment_stage2_4_stats.json",
+    "effects": "data/generated/equipment_stage2_5_effects.json",
+    "restrictions": "data/generated/equipment_stage2_6_restrictions.json",
+    "acquisition": "data/generated/equipment_stage2_7_acquisition.json",
+    "displayMetadata": "data/generated/equipment_stage3_2_display_metadata.json",
+    "generalConsumer": "data/generated/equipment_stage3_3_general_list.json",
+    "exclusiveConsumer": "data/generated/equipment_stage3_5_exclusive_consumer.json"
+  },
+  "policy": {
+    "specialDisposition": "HIDDEN_SPECIAL",
+    "holdDisposition": "HOLD_UNRESOLVED_ACQUISITION",
+    "publicConsumerAdmission": false,
+    "emptyGetPathListMeaningInvented": false,
+    "publicSiteTabInvented": false,
+    "acquisitionChronologyInvented": false,
+    "stage2SemanticsReopened": false,
+    "statsRecalculated": false,
+    "effectTextRewritten": false,
+    "restrictionSemantics": {
+      "confidence": 0.99,
+      "status": "structural-inference",
+      "rule": "eligible when JobInfo.Army_ID is in ArmyIds OR JobInfo.ID is in JobIds; both empty means unrestricted-by-fields",
+      "note": "Direct runtime equip-check code was not located in the repository. Army/Job joins themselves are direct field joins; OR semantics is inferred from full-population structure.",
+      "display": "show generalArmyIds as broad allowed types; resolve specialJobIds through equipment_stage2_6_job_index.json only when exact exceptions need expansion."
+    }
+  },
+  "counts": {
+    "special": 16,
+    "hold": 1,
+    "totalHandled": 17,
+    "iconVerified": 17,
+    "nameKrVerified": 0,
+    "nameKrReview": 17,
+    "propertyCounts": {
+      "2": 17
+    },
+    "restrictionModes": {
+      "unrestricted-by-fields": 17
+    }
+  },
+  "partition": {
+    "general": 206,
+    "exclusive": 167,
+    "special": 16,
+    "hold": 1,
+    "canonical": 390,
+    "union": 390,
+    "disjoint": true,
+    "closed": true
+  },
+  "specialRecords": [
+    {
+      "equipmentId": 2014,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2014,
+        "nameCn": "魂·唤蛇秘杖",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_Spear15.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "weapon",
+        "groupKo": "무기",
+        "subtype": "spear",
+        "subtypeKo": "창",
+        "groupOrder": 0,
+        "subtypeOrder": 2,
+        "equipmentType": 0,
+        "label": 1,
+        "sortIndex": 2014,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 2,
+            "propertyKo": "공격",
+            "base": 9,
+            "growthPer10Levels": 20,
+            "maxLevel": 50,
+            "maxRaw": 107,
+            "maxValue": 107
+          },
+          {
+            "propertyId": 4,
+            "propertyKo": "지력",
+            "base": 9,
+            "growthPer10Levels": 20,
+            "maxLevel": 50,
+            "maxRaw": 107,
+            "maxValue": 107
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200325,
+        "effectName": "唤蛇",
+        "effectText": "攻击、智力+10%\n同时装备“魂·唤蛇秘杖”和“魂·唤蛇吊坠”时，击杀敌军后在死亡位置召唤耶梦加得之影，耶梦加得之影继承被击杀者100%死亡时的属性，但是不能超过召唤者对应属性的200%。（场上最多可同时存在3个耶梦加得之影）",
+        "effectSegments": [
+          {
+            "text": "攻击、智力",
+            "highlight": false
+          },
+          {
+            "text": "+10%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·唤蛇秘杖”和“魂·唤蛇吊坠”时，击杀敌军后在死亡位置召唤耶梦加得之影，耶梦加得之影继承被击杀者",
+            "highlight": false
+          },
+          {
+            "text": "100%",
+            "highlight": true
+          },
+          {
+            "text": "死亡时的属性，但是不能超过召唤者对应属性的",
+            "highlight": false
+          },
+          {
+            "text": "200%",
+            "highlight": true
+          },
+          {
+            "text": "。（场上最多可同时存在",
+            "highlight": false
+          },
+          {
+            "text": "3",
+            "highlight": true
+          },
+          {
+            "text": "个耶梦加得之影）",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2016,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2016,
+        "nameCn": "魂·震碎链枷",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_Hammer20.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "weapon",
+        "groupKo": "무기",
+        "subtype": "hammer",
+        "subtypeKo": "망치",
+        "groupOrder": 0,
+        "subtypeOrder": 4,
+        "equipmentType": 0,
+        "label": 5,
+        "sortIndex": 2016,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 2,
+            "propertyKo": "공격",
+            "base": 7,
+            "growthPer10Levels": 16,
+            "maxLevel": 50,
+            "maxRaw": 85.4,
+            "maxValue": 85
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 34,
+            "growthPer10Levels": 112,
+            "maxLevel": 50,
+            "maxRaw": 582.8,
+            "maxValue": 583
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200333,
+        "effectName": "震碎",
+        "effectText": "防御、魔防+8%\n同时装备“魂·震碎链枷”和“魂·震碎之戒”时，行动结束时使全场敌军获得2个[破碎]（不可驱散，无法免疫）。",
+        "effectSegments": [
+          {
+            "text": "防御、魔防",
+            "highlight": false
+          },
+          {
+            "text": "+8%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·震碎链枷”和“魂·震碎之戒”时，行动结束时使全场敌军获得",
+            "highlight": false
+          },
+          {
+            "text": "2",
+            "highlight": true
+          },
+          {
+            "text": "个[破碎]（不可驱散，无法免疫）。",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2004,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2004,
+        "nameCn": "魂·护盾盔甲",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_MetalArmor24.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "armor",
+        "groupKo": "갑옷",
+        "subtype": "heavy",
+        "subtypeKo": "중갑",
+        "groupOrder": 1,
+        "subtypeOrder": 0,
+        "equipmentType": 1,
+        "label": 8,
+        "sortIndex": 2004,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 3,
+            "propertyKo": "방어",
+            "base": 6,
+            "growthPer10Levels": 12,
+            "maxLevel": 50,
+            "maxRaw": 64.8,
+            "maxValue": 65
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 25,
+            "growthPer10Levels": 84,
+            "maxLevel": 50,
+            "maxRaw": 436.6,
+            "maxValue": 437
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200226,
+        "effectName": "护盾",
+        "effectText": "防御、魔防+5%\n同时装备“魂·护盾之冠”和“魂·护盾盔甲”时，行动结束时获得最大生命20%的护盾，持续1回合（不可驱散，无法免疫）。",
+        "effectSegments": [
+          {
+            "text": "防御、魔防",
+            "highlight": false
+          },
+          {
+            "text": "+5%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·护盾之冠”和“魂·护盾盔甲”时，行动结束时获得最大生命",
+            "highlight": false
+          },
+          {
+            "text": "20%",
+            "highlight": true
+          },
+          {
+            "text": "的护盾，持续",
+            "highlight": false
+          },
+          {
+            "text": "1",
+            "highlight": true
+          },
+          {
+            "text": "回合（不可驱散，无法免疫）。",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2008,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2008,
+        "nameCn": "魂·破碎战甲",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_MetalArmor30.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "armor",
+        "groupKo": "갑옷",
+        "subtype": "heavy",
+        "subtypeKo": "중갑",
+        "groupOrder": 1,
+        "subtypeOrder": 0,
+        "equipmentType": 1,
+        "label": 8,
+        "sortIndex": 2008,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 3,
+            "propertyKo": "방어",
+            "base": 6,
+            "growthPer10Levels": 12,
+            "maxLevel": 50,
+            "maxRaw": 64.8,
+            "maxValue": 65
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 25,
+            "growthPer10Levels": 84,
+            "maxLevel": 50,
+            "maxRaw": 436.6,
+            "maxValue": 437
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200242,
+        "effectName": "破碎",
+        "effectText": "生命+10%\n同时装备“魂·破碎角盔”和“魂·破碎战甲”时，造成伤害后使目标获得4个[破碎]（不可驱散，无法免疫），进入战斗时若敌军带有[破碎]效果，伤害提升10%",
+        "effectSegments": [
+          {
+            "text": "生命",
+            "highlight": false
+          },
+          {
+            "text": "+10%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·破碎角盔”和“魂·破碎战甲”时，造成伤害后使目标获得",
+            "highlight": false
+          },
+          {
+            "text": "4",
+            "highlight": true
+          },
+          {
+            "text": "个[破碎]（不可驱散，无法免疫），进入战斗时若敌军带有[破碎]效果，伤害提升",
+            "highlight": false
+          },
+          {
+            "text": "10%",
+            "highlight": true
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2010,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2010,
+        "nameCn": "魂·陷阵战甲",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_LeatherArmor22.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "armor",
+        "groupKo": "갑옷",
+        "subtype": "heavy",
+        "subtypeKo": "중갑",
+        "groupOrder": 1,
+        "subtypeOrder": 0,
+        "equipmentType": 1,
+        "label": 8,
+        "sortIndex": 2010,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 3,
+            "propertyKo": "방어",
+            "base": 6,
+            "growthPer10Levels": 12,
+            "maxLevel": 50,
+            "maxRaw": 64.8,
+            "maxValue": 65
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 25,
+            "growthPer10Levels": 84,
+            "maxLevel": 50,
+            "maxRaw": 436.6,
+            "maxValue": 437
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200256,
+        "effectName": "陷阵",
+        "effectText": "生命，防御+5%\n同时装备“魂·陷阵头冠”和“魂·陷阵战甲”时，主动攻击进入战斗时，周围2格每有1名敌军，造成伤害提升10%，遭受伤害降低10%。（最多提升和降低30%）",
+        "effectSegments": [
+          {
+            "text": "生命，防御",
+            "highlight": false
+          },
+          {
+            "text": "+5%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·陷阵头冠”和“魂·陷阵战甲”时，主动攻击进入战斗时，周围",
+            "highlight": false
+          },
+          {
+            "text": "2",
+            "highlight": true
+          },
+          {
+            "text": "格每有",
+            "highlight": false
+          },
+          {
+            "text": "1",
+            "highlight": true
+          },
+          {
+            "text": "名敌军，造成伤害提升",
+            "highlight": false
+          },
+          {
+            "text": "10%",
+            "highlight": true
+          },
+          {
+            "text": "，遭受伤害降低",
+            "highlight": false
+          },
+          {
+            "text": "10%",
+            "highlight": true
+          },
+          {
+            "text": "。（最多提升和降低",
+            "highlight": false
+          },
+          {
+            "text": "30%",
+            "highlight": true
+          },
+          {
+            "text": "）",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2012,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2012,
+        "nameCn": "魂·共鸣法衣",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_Clothes20.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "armor",
+        "groupKo": "갑옷",
+        "subtype": "heavy",
+        "subtypeKo": "중갑",
+        "groupOrder": 1,
+        "subtypeOrder": 0,
+        "equipmentType": 1,
+        "label": 8,
+        "sortIndex": 2012,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 3,
+            "propertyKo": "방어",
+            "base": 5,
+            "growthPer10Levels": 10,
+            "maxLevel": 50,
+            "maxRaw": 54,
+            "maxValue": 54
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 34,
+            "growthPer10Levels": 112,
+            "maxLevel": 50,
+            "maxRaw": 582.8,
+            "maxValue": 583
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200264,
+        "effectName": "共鸣",
+        "effectText": "生命+10%\n同时装备“魂·共鸣头饰”和“魂·共鸣法衣”时，战技”清风“、”时钟“、”寒冰“、”荆棘“、”顽石·破碎“的触发几率提升20%。",
+        "effectSegments": [
+          {
+            "text": "生命",
+            "highlight": false
+          },
+          {
+            "text": "+10%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·共鸣头饰”和“魂·共鸣法衣”时，战技”清风“、”时钟“、”寒冰“、”荆棘“、”顽石·破碎“的触发几率提升",
+            "highlight": false
+          },
+          {
+            "text": "20%",
+            "highlight": true
+          },
+          {
+            "text": "。",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2002,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2002,
+        "nameCn": "魂·化龙盔甲",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_MetalArmor19.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "armor",
+        "groupKo": "갑옷",
+        "subtype": "light",
+        "subtypeKo": "경갑",
+        "groupOrder": 1,
+        "subtypeOrder": 1,
+        "equipmentType": 1,
+        "label": 9,
+        "sortIndex": 2002,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 3,
+            "propertyKo": "방어",
+            "base": 5,
+            "growthPer10Levels": 11,
+            "maxLevel": 50,
+            "maxRaw": 58.9,
+            "maxValue": 59
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 29,
+            "growthPer10Levels": 98,
+            "maxLevel": 50,
+            "maxRaw": 509.2,
+            "maxValue": 509
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200218,
+        "effectName": "化龙",
+        "effectText": "生命，魔防+5%\n同时装备“魂·化龙战盔”和“魂·化龙盔甲”时，自身英雄兵种转变为“龙”，战斗开始时获得3层[龙吟]：除生命外全属性+4%，最多叠加5层，持续3回合（不可驱散，无法免疫）。",
+        "effectSegments": [
+          {
+            "text": "生命，魔防",
+            "highlight": false
+          },
+          {
+            "text": "+5%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·化龙战盔”和“魂·化龙盔甲”时，自身英雄兵种转变为“龙”，战斗开始时获得",
+            "highlight": false
+          },
+          {
+            "text": "3",
+            "highlight": true
+          },
+          {
+            "text": "层[龙吟]：除生命外全属性",
+            "highlight": false
+          },
+          {
+            "text": "+4%",
+            "highlight": true
+          },
+          {
+            "text": "，最多叠加",
+            "highlight": false
+          },
+          {
+            "text": "5",
+            "highlight": true
+          },
+          {
+            "text": "层，持续",
+            "highlight": false
+          },
+          {
+            "text": "3",
+            "highlight": true
+          },
+          {
+            "text": "回合（不可驱散，无法免疫）。",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2006,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2006,
+        "nameCn": "魂·血族法袍",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_Clothes22.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "armor",
+        "groupKo": "갑옷",
+        "subtype": "cloth",
+        "subtypeKo": "천",
+        "groupOrder": 1,
+        "subtypeOrder": 2,
+        "equipmentType": 1,
+        "label": 10,
+        "sortIndex": 2006,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 3,
+            "propertyKo": "방어",
+            "base": 5,
+            "growthPer10Levels": 10,
+            "maxLevel": 50,
+            "maxRaw": 54,
+            "maxValue": 54
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 34,
+            "growthPer10Levels": 112,
+            "maxLevel": 50,
+            "maxRaw": 582.8,
+            "maxValue": 583
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200234,
+        "effectName": "血族",
+        "effectText": "生命+10%\n同时装备“魂·血族皇冠”和“魂·血族法袍”时，行动结束时召唤1个[顶级血族]，该效果每间隔2回合可再次触发",
+        "effectSegments": [
+          {
+            "text": "生命",
+            "highlight": false
+          },
+          {
+            "text": "+10%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·血族皇冠”和“魂·血族法袍”时，行动结束时召唤",
+            "highlight": false
+          },
+          {
+            "text": "1",
+            "highlight": true
+          },
+          {
+            "text": "个[顶级血族]，该效果每间隔",
+            "highlight": false
+          },
+          {
+            "text": "2",
+            "highlight": true
+          },
+          {
+            "text": "回合可再次触发",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2003,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2003,
+        "nameCn": "魂·护盾之冠",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_MetalHelmet18.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "headgear",
+        "groupKo": "투구",
+        "subtype": "heavy",
+        "subtypeKo": "중갑",
+        "groupOrder": 2,
+        "subtypeOrder": 0,
+        "equipmentType": 2,
+        "label": 11,
+        "sortIndex": 2003,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 5,
+            "propertyKo": "마방",
+            "base": 4,
+            "growthPer10Levels": 9,
+            "maxLevel": 50,
+            "maxRaw": 48.1,
+            "maxValue": 48
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 34,
+            "growthPer10Levels": 112,
+            "maxLevel": 50,
+            "maxRaw": 582.8,
+            "maxValue": 583
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200222,
+        "effectName": "护盾",
+        "effectText": "防御、魔防+5%\n同时装备“魂·护盾之冠”和“魂·护盾盔甲”时，行动结束时获得最大生命20%的护盾，持续1回合（不可驱散，无法免疫）。",
+        "effectSegments": [
+          {
+            "text": "防御、魔防",
+            "highlight": false
+          },
+          {
+            "text": "+5%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·护盾之冠”和“魂·护盾盔甲”时，行动结束时获得最大生命",
+            "highlight": false
+          },
+          {
+            "text": "20%",
+            "highlight": true
+          },
+          {
+            "text": "的护盾，持续",
+            "highlight": false
+          },
+          {
+            "text": "1",
+            "highlight": true
+          },
+          {
+            "text": "回合（不可驱散，无法免疫）。",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2007,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2007,
+        "nameCn": "魂·破碎角盔",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_LeatherHelmet35.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "headgear",
+        "groupKo": "투구",
+        "subtype": "heavy",
+        "subtypeKo": "중갑",
+        "groupOrder": 2,
+        "subtypeOrder": 0,
+        "equipmentType": 2,
+        "label": 11,
+        "sortIndex": 2007,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 5,
+            "propertyKo": "마방",
+            "base": 4,
+            "growthPer10Levels": 9,
+            "maxLevel": 50,
+            "maxRaw": 48.1,
+            "maxValue": 48
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 34,
+            "growthPer10Levels": 112,
+            "maxLevel": 50,
+            "maxRaw": 582.8,
+            "maxValue": 583
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200238,
+        "effectName": "破碎",
+        "effectText": "生命+10%\n同时装备“魂·破碎角盔”和“魂·破碎战甲”时，造成伤害后使目标获得4个[破碎]（不可驱散，无法免疫），进入战斗时若敌军带有[破碎]效果，伤害提升10%",
+        "effectSegments": [
+          {
+            "text": "生命",
+            "highlight": false
+          },
+          {
+            "text": "+10%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·破碎角盔”和“魂·破碎战甲”时，造成伤害后使目标获得",
+            "highlight": false
+          },
+          {
+            "text": "4",
+            "highlight": true
+          },
+          {
+            "text": "个[破碎]（不可驱散，无法免疫），进入战斗时若敌军带有[破碎]效果，伤害提升",
+            "highlight": false
+          },
+          {
+            "text": "10%",
+            "highlight": true
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2009,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2009,
+        "nameCn": "魂·陷阵头冠",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_MetalHelmet20.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "headgear",
+        "groupKo": "투구",
+        "subtype": "heavy",
+        "subtypeKo": "중갑",
+        "groupOrder": 2,
+        "subtypeOrder": 0,
+        "equipmentType": 2,
+        "label": 11,
+        "sortIndex": 2009,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 5,
+            "propertyKo": "마방",
+            "base": 4,
+            "growthPer10Levels": 9,
+            "maxLevel": 50,
+            "maxRaw": 48.1,
+            "maxValue": 48
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 34,
+            "growthPer10Levels": 112,
+            "maxLevel": 50,
+            "maxRaw": 582.8,
+            "maxValue": 583
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200252,
+        "effectName": "陷阵",
+        "effectText": "生命，防御+5%\n同时装备“魂·陷阵头冠”和“魂·陷阵战甲”时，主动攻击进入战斗时，周围2格每有1名敌军，造成伤害提升10%，遭受伤害降低10%。（最多提升和降低30%）",
+        "effectSegments": [
+          {
+            "text": "生命，防御",
+            "highlight": false
+          },
+          {
+            "text": "+5%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·陷阵头冠”和“魂·陷阵战甲”时，主动攻击进入战斗时，周围",
+            "highlight": false
+          },
+          {
+            "text": "2",
+            "highlight": true
+          },
+          {
+            "text": "格每有",
+            "highlight": false
+          },
+          {
+            "text": "1",
+            "highlight": true
+          },
+          {
+            "text": "名敌军，造成伤害提升",
+            "highlight": false
+          },
+          {
+            "text": "10%",
+            "highlight": true
+          },
+          {
+            "text": "，遭受伤害降低",
+            "highlight": false
+          },
+          {
+            "text": "10%",
+            "highlight": true
+          },
+          {
+            "text": "。（最多提升和降低",
+            "highlight": false
+          },
+          {
+            "text": "30%",
+            "highlight": true
+          },
+          {
+            "text": "）",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2011,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2011,
+        "nameCn": "魂·共鸣头饰",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_Hat22.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "headgear",
+        "groupKo": "투구",
+        "subtype": "heavy",
+        "subtypeKo": "중갑",
+        "groupOrder": 2,
+        "subtypeOrder": 0,
+        "equipmentType": 2,
+        "label": 11,
+        "sortIndex": 2011,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 5,
+            "propertyKo": "마방",
+            "base": 6,
+            "growthPer10Levels": 12,
+            "maxLevel": 50,
+            "maxRaw": 64.8,
+            "maxValue": 65
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 21,
+            "growthPer10Levels": 70,
+            "maxLevel": 50,
+            "maxRaw": 364,
+            "maxValue": 364
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200260,
+        "effectName": "共鸣",
+        "effectText": "生命+10%\n同时装备“魂·共鸣头饰”和“魂·共鸣法衣”时，战技”清风“、”时钟“、”寒冰“、”荆棘“、”顽石·破碎“的触发几率提升20%。",
+        "effectSegments": [
+          {
+            "text": "生命",
+            "highlight": false
+          },
+          {
+            "text": "+10%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·共鸣头饰”和“魂·共鸣法衣”时，战技”清风“、”时钟“、”寒冰“、”荆棘“、”顽石·破碎“的触发几率提升",
+            "highlight": false
+          },
+          {
+            "text": "20%",
+            "highlight": true
+          },
+          {
+            "text": "。",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2001,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2001,
+        "nameCn": "魂·化龙战盔",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_LeatherHelmet33.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "headgear",
+        "groupKo": "투구",
+        "subtype": "light",
+        "subtypeKo": "경갑",
+        "groupOrder": 2,
+        "subtypeOrder": 1,
+        "equipmentType": 2,
+        "label": 12,
+        "sortIndex": 2001,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 5,
+            "propertyKo": "마방",
+            "base": 5,
+            "growthPer10Levels": 11,
+            "maxLevel": 50,
+            "maxRaw": 58.9,
+            "maxValue": 59
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 25,
+            "growthPer10Levels": 84,
+            "maxLevel": 50,
+            "maxRaw": 436.6,
+            "maxValue": 437
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200214,
+        "effectName": "化龙",
+        "effectText": "生命，防御+5%\n同时装备“魂·化龙战盔”和“魂·化龙盔甲”时，自身英雄兵种转变为“龙”，战斗开始时获得3层[龙吟]：除生命外全属性+4%，最多叠加5层，持续3回合（不可驱散，无法免疫）。",
+        "effectSegments": [
+          {
+            "text": "生命，防御",
+            "highlight": false
+          },
+          {
+            "text": "+5%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·化龙战盔”和“魂·化龙盔甲”时，自身英雄兵种转变为“龙”，战斗开始时获得",
+            "highlight": false
+          },
+          {
+            "text": "3",
+            "highlight": true
+          },
+          {
+            "text": "层[龙吟]：除生命外全属性",
+            "highlight": false
+          },
+          {
+            "text": "+4%",
+            "highlight": true
+          },
+          {
+            "text": "，最多叠加",
+            "highlight": false
+          },
+          {
+            "text": "5",
+            "highlight": true
+          },
+          {
+            "text": "层，持续",
+            "highlight": false
+          },
+          {
+            "text": "3",
+            "highlight": true
+          },
+          {
+            "text": "回合（不可驱散，无法免疫）。",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2005,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2005,
+        "nameCn": "魂·血族皇冠",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_Hat27.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "headgear",
+        "groupKo": "투구",
+        "subtype": "cloth",
+        "subtypeKo": "천",
+        "groupOrder": 2,
+        "subtypeOrder": 2,
+        "equipmentType": 2,
+        "label": 13,
+        "sortIndex": 2005,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 5,
+            "propertyKo": "마방",
+            "base": 6,
+            "growthPer10Levels": 12,
+            "maxLevel": 50,
+            "maxRaw": 64.8,
+            "maxValue": 65
+          },
+          {
+            "propertyId": 1,
+            "propertyKo": "생명",
+            "base": 21,
+            "growthPer10Levels": 70,
+            "maxLevel": 50,
+            "maxRaw": 364,
+            "maxValue": 364
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200230,
+        "effectName": "血族",
+        "effectText": "生命+10%\n同时装备“魂·血族皇冠”和“魂·血族法袍”时，行动结束时召唤1个[顶级血族]，该效果每间隔2回合可再次触发",
+        "effectSegments": [
+          {
+            "text": "生命",
+            "highlight": false
+          },
+          {
+            "text": "+10%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·血族皇冠”和“魂·血族法袍”时，行动结束时召唤",
+            "highlight": false
+          },
+          {
+            "text": "1",
+            "highlight": true
+          },
+          {
+            "text": "个[顶级血族]，该效果每间隔",
+            "highlight": false
+          },
+          {
+            "text": "2",
+            "highlight": true
+          },
+          {
+            "text": "回合可再次触发",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2015,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2015,
+        "nameCn": "魂·唤蛇吊坠",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_Attackgem11.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "accessory",
+        "groupKo": "악세사리",
+        "subtype": "attack",
+        "subtypeKo": "공격",
+        "groupOrder": 3,
+        "subtypeOrder": 0,
+        "equipmentType": 3,
+        "label": 14,
+        "sortIndex": 2015,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 2,
+            "propertyKo": "공격",
+            "base": 6,
+            "growthPer10Levels": 14,
+            "maxLevel": 50,
+            "maxRaw": 74.6,
+            "maxValue": 75
+          },
+          {
+            "propertyId": 4,
+            "propertyKo": "지력",
+            "base": 6,
+            "growthPer10Levels": 14,
+            "maxLevel": 50,
+            "maxRaw": 74.6,
+            "maxValue": 75
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200329,
+        "effectName": "唤蛇",
+        "effectText": "攻击、智力+5%\n同时装备“魂·唤蛇秘杖”和“魂·唤蛇吊坠”时，击杀敌军后在死亡位置召唤耶梦加得之影，耶梦加得之影继承被击杀者100%死亡时的属性，但是不能超过召唤者对应属性的200%。（场上最多可同时存在3个耶梦加得之影）",
+        "effectSegments": [
+          {
+            "text": "攻击、智力",
+            "highlight": false
+          },
+          {
+            "text": "+5%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·唤蛇秘杖”和“魂·唤蛇吊坠”时，击杀敌军后在死亡位置召唤耶梦加得之影，耶梦加得之影继承被击杀者",
+            "highlight": false
+          },
+          {
+            "text": "100%",
+            "highlight": true
+          },
+          {
+            "text": "死亡时的属性，但是不能超过召唤者对应属性的",
+            "highlight": false
+          },
+          {
+            "text": "200%",
+            "highlight": true
+          },
+          {
+            "text": "。（场上最多可同时存在",
+            "highlight": false
+          },
+          {
+            "text": "3",
+            "highlight": true
+          },
+          {
+            "text": "个耶梦加得之影）",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    },
+    {
+      "equipmentId": 2017,
+      "disposition": "HIDDEN_SPECIAL",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2017,
+        "nameCn": "魂·震碎之戒",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_Attackgem6.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "accessory",
+        "groupKo": "악세사리",
+        "subtype": "defense",
+        "subtypeKo": "방어",
+        "groupOrder": 3,
+        "subtypeOrder": 2,
+        "equipmentType": 3,
+        "label": 14,
+        "sortIndex": 2017,
+        "acquisitionClass": "soul-special",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 3,
+            "propertyKo": "방어",
+            "base": 4,
+            "growthPer10Levels": 9,
+            "maxLevel": 50,
+            "maxRaw": 48.1,
+            "maxValue": 48
+          },
+          {
+            "propertyId": 5,
+            "propertyKo": "마방",
+            "base": 4,
+            "growthPer10Levels": 8,
+            "maxLevel": 50,
+            "maxRaw": 43.2,
+            "maxValue": 43
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200337,
+        "effectName": "震碎",
+        "effectText": "全属性+5%\n同时装备“魂·震碎链枷”和“魂·震碎之戒”时，行动结束时使全场敌军获得2个[破碎]（不可驱散，无法免疫）。",
+        "effectSegments": [
+          {
+            "text": "全属性",
+            "highlight": false
+          },
+          {
+            "text": "+5%",
+            "highlight": true
+          },
+          {
+            "text": "\n同时装备“魂·震碎链枷”和“魂·震碎之戒”时，行动结束时使全场敌军获得",
+            "highlight": false
+          },
+          {
+            "text": "2",
+            "highlight": true
+          },
+          {
+            "text": "个[破碎]（不可驱散，无法免疫）。",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 99,
+        "classificationBasis": "empty-GetPathList-and-soul-name-prefix",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    }
+  ],
+  "holdRecords": [
+    {
+      "equipmentId": 2013,
+      "disposition": "HOLD_UNRESOLVED_ACQUISITION",
+      "pageAdmission": false,
+      "identity": {
+        "equipmentId": 2013,
+        "nameCn": "正宗寻宝护符",
+        "nameKr": null,
+        "icon": "UI/Icon/Equip_ABS/Equip_MagicProps2.png",
+        "nameKrStatus": "REVIEW_NAME_KR",
+        "iconStatus": "VERIFIED_DIRECT"
+      },
+      "classification": {
+        "group": "accessory",
+        "groupKo": "악세사리",
+        "subtype": "attack",
+        "subtypeKo": "공격",
+        "groupOrder": 3,
+        "subtypeOrder": 0,
+        "equipmentType": 3,
+        "label": 14,
+        "sortIndex": 2013,
+        "acquisitionClass": "unresolved-no-path",
+        "siteTab": null
+      },
+      "stats": {
+        "maxLevel": 50,
+        "properties": [
+          {
+            "propertyId": 2,
+            "propertyKo": "공격",
+            "base": 6,
+            "growthPer10Levels": 14,
+            "maxLevel": 50,
+            "maxRaw": 74.6,
+            "maxValue": 75
+          },
+          {
+            "propertyId": 4,
+            "propertyKo": "지력",
+            "base": 6,
+            "growthPer10Levels": 14,
+            "maxLevel": 50,
+            "maxRaw": 74.6,
+            "maxValue": 75
+          }
+        ]
+      },
+      "effect": {
+        "maxEffectSkillId": 200314,
+        "effectName": "搜刮",
+        "effectText": "攻击、智力+8%。\n战斗胜利时，非常有可能摸到1件装备或学到1个战技。每当携带者击杀一名敌军后，会让自己手气变得更好。",
+        "effectSegments": [
+          {
+            "text": "攻击、智力",
+            "highlight": false
+          },
+          {
+            "text": "+8%",
+            "highlight": true
+          },
+          {
+            "text": "。\n战斗胜利时，非常有可能摸到",
+            "highlight": false
+          },
+          {
+            "text": "1",
+            "highlight": true
+          },
+          {
+            "text": "件装备或学到",
+            "highlight": false
+          },
+          {
+            "text": "1",
+            "highlight": true
+          },
+          {
+            "text": "个战技。每当携带者击杀一名敌军后，会让自己手气变得更好。",
+            "highlight": false
+          }
+        ]
+      },
+      "restriction": {
+        "mode": "unrestricted-by-fields",
+        "generalArmyIds": [],
+        "specialJobIds": []
+      },
+      "acquisition": {
+        "releaseGroupDate": null,
+        "confidencePercent": 100,
+        "classificationBasis": "empty-GetPathList-no-global-meaning-inferred",
+        "getPathListCount": 0,
+        "getPathList": []
+      }
+    }
+  ]
+}
