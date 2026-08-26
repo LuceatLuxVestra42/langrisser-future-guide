@@ -7,21 +7,21 @@
   "purpose": "Stage-wide integration audit for Hero Stage 5. Only frozen COMPLETE final checkpoints are promoted; pending semantic/retrace checkpoints remain non-final.",
   "summary": {
     "plannedBlockCount": 5,
-    "completedBlockCount": 3,
+    "completedBlockCount": 4,
     "completedBlocks": [
       "5-1",
+      "5-2",
       "5-3",
       "5-5"
     ],
     "blockedBlocks": [
-      "5-2",
       "5-4"
     ],
     "canonicalHeroCount": 267,
     "completedCrossBlockCheckCount": 3,
     "passedCrossBlockCheckCount": 3,
     "hardErrorCount": 0,
-    "blockerCount": 2,
+    "blockerCount": 1,
     "stage5ReadyToClose": false
   },
   "completedBlocks": [
@@ -31,6 +31,15 @@
       "status": "PASS",
       "completion": "COMPLETE",
       "checkpoint": "data/validation/hero-page-stage5-1-final.v1.json",
+      "canonicalHeroes": 267,
+      "hardErrorCount": 0
+    },
+    {
+      "stage": "5-2",
+      "title": "Exclusive equipment + central-law block",
+      "status": "PASS",
+      "completion": "COMPLETE",
+      "checkpoint": "data/validation/hero-page-stage5-2-final.v1.json",
       "canonicalHeroes": 267,
       "hardErrorCount": 0
     },
@@ -77,9 +86,14 @@
       "hasFinalCheckpoint": true
     },
     "5-2": {
-      "candidateFiles": [],
-      "finalCheckpointFiles": [],
-      "hasFinalCheckpoint": false
+      "candidateFiles": [
+        "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
+        "data/validation/hero-page-stage5-2-final.v1.json"
+      ],
+      "finalCheckpointFiles": [
+        "data/validation/hero-page-stage5-2-final.v1.json"
+      ],
+      "hasFinalCheckpoint": true
     },
     "5-4": {
       "candidateFiles": [],
@@ -100,9 +114,14 @@
       "hasFinalCheckpoint": true
     },
     "5-2": {
-      "candidateFiles": [],
-      "finalCheckpointFiles": [],
-      "hasFinalCheckpoint": false
+      "candidateFiles": [
+        "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
+        "data/validation/hero-page-stage5-2-final.v1.json"
+      ],
+      "finalCheckpointFiles": [
+        "data/validation/hero-page-stage5-2-final.v1.json"
+      ],
+      "hasFinalCheckpoint": true
     },
     "5-4": {
       "candidateFiles": [],
@@ -128,6 +147,10 @@
           "canonicalHeroes": 267
         },
         {
+          "stage": "5-2",
+          "canonicalHeroes": 267
+        },
+        {
           "stage": "5-3",
           "canonicalHeroes": 267
         },
@@ -144,13 +167,6 @@
     }
   ],
   "blockers": [
-    {
-      "stage": "5-2",
-      "title": "Exclusive equipment + central-law block",
-      "reason": "No frozen Hero-stage contract/output/final checkpoint was discovered in data/contracts, data/generated, data/validation, or top-level data artifacts.",
-      "discoveredCandidateFiles": [],
-      "requiredForStage5Close": true
-    },
     {
       "stage": "5-4",
       "title": "SP block",
@@ -182,9 +198,8 @@
       "blockingStage5Integration": false
     }
   ],
-  "decision": "Do not declare Hero Stage 5 complete. Preserve frozen 5-1, 5-3, 5-5 inputs; finish 5-2, 5-4 independently, then rerun this integration gate.",
+  "decision": "Do not declare Hero Stage 5 complete. Preserve frozen 5-1, 5-2, 5-3, 5-5 inputs; finish 5-4 independently, then rerun this integration gate.",
   "recommendedWorkOrder": [
-    "5-2: build and freeze exclusive-equipment + central-law presence/display block, preserving 미출시 states.",
     "5-4: build and freeze SP existence/job/skill/stat/soldier/mission integration, consuming frozen Stage 4 and Stage 5-3 where appropriate.",
     "Rerun Stage 5 integration review and close Stage 5 only when all five block checkpoints are present and compatible."
   ]
