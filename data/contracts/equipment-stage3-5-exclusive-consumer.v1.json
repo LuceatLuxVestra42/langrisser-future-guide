@@ -1,0 +1,63 @@
+{
+  "stage": "3-5",
+  "purpose": "Assemble the 167-record exclusive-equipment consumer payload using the shared Stage 3-1 list/detail schema and frozen Stage 2 semantics, without inventing hero ownership or release chronology.",
+  "sources": {
+    "pageSchema": "data/contracts/equipment-stage3-1-page-schema.v1.json",
+    "filterMap": "data/generated/equipment_stage2_3_filter_map.json",
+    "stats": "data/generated/equipment_stage2_4_stats.json",
+    "effects": "data/generated/equipment_stage2_5_effects.json",
+    "restrictions": "data/generated/equipment_stage2_6_restrictions.json",
+    "acquisition": "data/generated/equipment_stage2_7_acquisition.json",
+    "displayMetadata": "data/generated/equipment_stage3_2_display_metadata.json"
+  },
+  "admission": {
+    "class": "exclusive-equipment",
+    "expectedTotal": 167,
+    "siteTab": null,
+    "requiredAcquisitionEvidence": {
+      "getPathListCount": 1,
+      "pathType": 46,
+      "classificationBasis": "PathType46-only-and-exclusive-sheet-sentinel-match"
+    }
+  },
+  "listPolicy": {
+    "schema": "equipment-stage3-1-page-schema.v1.json#listRecord",
+    "nameKr": "Copy only Stage 3-2 VERIFIED_REFERENCE_MATCH nameKr. REVIEW candidates must not leak; unresolved nameKr stays null.",
+    "icon": "Must copy Stage 3-2 VERIFIED_DIRECT icon for all 167 records.",
+    "effect": "Copy Stage 2-5 effectName/effectText verbatim.",
+    "sorting": "Sort by groupOrder asc, subtypeOrder asc, sortIndex asc, equipmentId asc. This is deterministic presentation order only and is never claimed as exclusive-equipment release chronology."
+  },
+  "detailPolicy": {
+    "schema": "equipment-stage3-1-page-schema.v1.json#detailRecord",
+    "identity": "Use equipmentId/nameCn plus Stage 3-2 verified display metadata.",
+    "classification": "Copy Stage 2-3 classification and Stage 2-7 equipmentType/label/acquisition metadata exactly.",
+    "stats": "Copy Stage 2-4 stats without recalculation; maxLevel remains 50.",
+    "effect": "Copy Stage 2-5 max effect data and rich segments exactly; no translation/summary/rewrite.",
+    "restriction": "Copy Stage 2-6 mode/generalArmyIds/specialJobIds exactly; retain the existing 0.99 structural-inference status without claiming runtime-direct proof.",
+    "acquisition": "Copy Stage 2-7 releaseGroupDate/confidencePercent/classificationBasis exactly. Do not invent dates or chronology."
+  },
+  "heroOwnershipBoundary": {
+    "included": false,
+    "policy": "Stage 3-5 does not derive Hero -> exclusive Equipment ownership. That relation is a separate Hero consumer task. Never infer ownership from name similarity, equipment order, icon naming, or release order."
+  },
+  "validation": {
+    "hardRequirements": [
+      "exactly 167 unique equipmentId records",
+      "all records are acquisitionClass exclusive-equipment and siteTab null",
+      "all 167 upstream acquisition rows retain exactly one GetPathList entry with PathType 46",
+      "all 167 list records satisfy the shared Stage 3-1 list field contract",
+      "all 167 detail records satisfy the shared Stage 3-1 detail block contract",
+      "icons are verified for 167/167",
+      "review Korean-name candidates never leak into consumer nameKr",
+      "stats/effects/restrictions/acquisition blocks exactly equal their frozen Stage 2 sources",
+      "no general/soul-special/unresolved record leaks into the exclusive consumer",
+      "no hero ownership relation is generated"
+    ],
+    "reviewAllowed": [
+      "128 inherited unresolved Korean names from Stage 3-2",
+      "exact exclusive-equipment release chronology is not asserted unless an upstream releaseGroupDate exists",
+      "Stage 2-6 runtime equip-check direct proof remains unlocated"
+    ]
+  },
+  "completion": "The 167 exclusive-equipment records have page-consumable list and detail payloads with frozen semantics and explicit inherited review states, while hero ownership remains intentionally outside this stage."
+}
