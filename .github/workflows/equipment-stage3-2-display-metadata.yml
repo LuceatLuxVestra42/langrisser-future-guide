@@ -1,0 +1,41 @@
+name: Equipment Stage 3-2 Display Metadata
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/equipment-stage3-2-display-metadata.yml'
+      - 'scripts/finalize-equipment-stage3-2-display-metadata.mjs'
+      - 'scripts/validate-equipment-stage3-2-display-metadata.mjs'
+      - 'data/contracts/equipment-stage3-2-display-metadata.v1.json'
+      - 'data/contracts/equipment-stage3-1-page-schema.v1.json'
+      - 'data/contracts/equipment-stage3-0-input-contract.v1.json'
+      - 'data/generated/equipment_stage2_3_filter_map.json'
+      - 'data/generated/equipment_stage2_4_stats.json'
+      - 'data/generated/equipment_stage2_5_effects.json'
+      - 'data/generated/equipment_stage2_7_acquisition.json'
+      - 'data/configdata/ConfigDataEquipmentInfo.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Equipment Stage 3-2 display metadata
+        run: node scripts/finalize-equipment-stage3-2-display-metadata.mjs
+      - name: Validate Equipment Stage 3-2 display metadata
+        run: node scripts/validate-equipment-stage3-2-display-metadata.mjs
+      - name: Persist Stage 3-2 checkpoints
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/equipment_stage3_2_display_metadata.json data/validation/equipment-stage3-2-display-metadata-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No Stage 3-2 changes"
+            exit 0
+          fi
+          git commit -m "Freeze Equipment Stage 3-2 display metadata"
+          git push
