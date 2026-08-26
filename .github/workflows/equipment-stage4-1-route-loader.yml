@@ -1,0 +1,45 @@
+name: Equipment Stage 4-1 Route Loader
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/equipment-stage4-1-route-loader.yml'
+      - 'data/contracts/equipment-stage4-1-route-loader.v1.json'
+      - 'scripts/validate-equipment-stage4-1-route-loader.mjs'
+      - 'src/lib/equipment-page.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
+      - 'src/routes/equipment_.tsx'
+      - 'src/routes/equipment_.exclusive.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - 'tsconfig.json'
+      - 'data/generated/equipment_stage3_3_general_list.json'
+      - 'data/generated/equipment_stage3_4_general_detail.json'
+      - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/hero-name-master.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Validate Equipment Stage 4-1 routes and loaders
+        run: node scripts/validate-equipment-stage4-1-route-loader.mjs
+      - name: Persist generated route tree and Stage 4-1 checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routeTree.gen.ts data/validation/equipment-stage4-1-route-loader-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No Stage 4-1 generated changes"
+            exit 0
+          fi
+          git commit -m "Freeze Equipment Stage 4-1 route-loader checkpoint"
+          git push

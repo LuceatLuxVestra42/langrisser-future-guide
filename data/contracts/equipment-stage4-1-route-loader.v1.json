@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "stage": "4-1",
+  "status": "FROZEN",
+  "purpose": "Create the Equipment page route/loader scaffold from the frozen Stage 4-0 frontend consumer contract. This stage establishes public routes, server-only consumer loading, exact equipmentId detail resolution, and public not-found behavior without implementing the final list/detail presentation UI.",
+  "dependsOn": {
+    "stage40Contract": "data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json",
+    "stage40Summary": "data/validation/equipment-stage4-0-frontend-consumer-summary.v1.json",
+    "generalList": "data/generated/equipment_stage3_3_general_list.json",
+    "generalDetail": "data/generated/equipment_stage3_4_general_detail.json",
+    "exclusiveConsumer": "data/generated/equipment_stage3_5_exclusive_consumer.json",
+    "exclusiveByEquipment": "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+    "heroMaster": "data/hero-name-master.v1.json",
+    "specialUnresolved": "data/generated/equipment_stage3_6_special_unresolved.json"
+  },
+  "implementation": {
+    "serverDataModule": "src/lib/equipment-page.server.ts",
+    "serverFunctionsModule": "src/lib/equipment-page.functions.ts",
+    "routes": {
+      "general": {
+        "file": "src/routes/equipment_.tsx",
+        "path": "/equipment",
+        "loader": "getGeneralEquipmentPageData"
+      },
+      "exclusive": {
+        "file": "src/routes/equipment_.exclusive.tsx",
+        "path": "/equipment/exclusive",
+        "loader": "getExclusiveEquipmentPageData"
+      },
+      "detail": {
+        "file": "src/routes/equipment_.$equipmentId.tsx",
+        "path": "/equipment/$equipmentId",
+        "loader": "getEquipmentDetailPageData"
+      }
+    },
+    "routeNesting": "Use the trailing-underscore non-nested file convention so the three Equipment routes are root-level siblings. /equipment is not a layout parent of exclusive/detail.",
+    "dataBoundary": "Route modules call createServerFn wrappers. Raw generated JSON is imported only by the .server.ts module and is not directly imported by route components.",
+    "jsonModuleSupport": "tsconfig compilerOptions.resolveJsonModule=true is required for typed static server-only JSON imports."
+  },
+  "loaderContracts": {
+    "general": {
+      "returns": ["records", "filters", "tabs"],
+      "recordCount": 206,
+      "tabCounts": {"1": 94, "2": 80, "3": 32},
+      "source": "equipment_stage3_3_general_list.json"
+    },
+    "exclusive": {
+      "returns": ["records"],
+      "recordCount": 167,
+      "ownerJoin": "Each exclusive list record is enriched at read time with ownerHero from byEquipmentId -> hero-name-master exact heroId join.",
+      "source": "equipment_stage3_5_exclusive_consumer.json#listRecords"
+    },
+    "detail": {
+      "input": "positive integer equipmentId",
+      "returns": "general or exclusive detail payload, or null when the ID is not in the 373 public detail records",
+      "generalSource": "equipment_stage3_4_general_detail.json#records",
+      "exclusiveSource": "equipment_stage3_5_exclusive_consumer.json#detailRecords",
+      "exclusiveOwnerJoin": "byEquipmentId -> hero-name-master",
+      "hiddenHoldRule": "soul-special 16 and equipmentId 2013 do not resolve because detail lookup is limited to the two public detail sets."
+    }
+  },
+  "routeBehavior": {
+    "general": "Loads the 206 general list records and generated filter/tab metadata. 4-1 renders only a diagnostic scaffold; full list/filter UI is Stage 4-2.",
+    "exclusive": "Loads the 167 exclusive list records with canonical owner Hero metadata. 4-1 renders only a diagnostic scaffold; full exclusive UI is Stage 4-4.",
+    "detail": "Parses the URL equipmentId as a positive integer, loads from public detail sources, and throws TanStack Router notFound() when the ID is invalid or not public."
+  },
+  "hardGates": [
+    "Stage 4-0 remains PASS and frozen.",
+    "General loader exposes exactly 206 records and tab counts 94/80/32 from the Stage 3 generated consumer.",
+    "Exclusive loader exposes exactly 167 records and every record resolves exactly one canonical owner Hero through the accepted byEquipmentId index.",
+    "Public detail lookup contains exactly 373 unique IDs = 206 general + 167 exclusive and the sets are disjoint.",
+    "soul-special 16 and equipmentId 2013 are absent from public detail resolution.",
+    "No route or server-function code reads data/configdata or ConfigDataEquipmentInfo directly.",
+    "No Stage 4 code re-derives exclusive ownership from SkillHero, names, restrictions, icons, sort order, or release chronology.",
+    "TanStack Start build succeeds with the new file routes and server functions."
+  ],
+  "nonGoals": [
+    "Final card/grid design",
+    "Filter interaction and persistence implementation",
+    "Final detail block presentation",
+    "Release-order review resolution",
+    "Korean-name review resolution",
+    "Reopening Stage 2/3 semantics or Stage B ownership"
+  ],
+  "completion": {
+    "passStatus": "STAGE4_1_ROUTE_LOADER_SCAFFOLD_READY",
+    "meaning": "All three public Equipment routes exist as independent file routes, load only frozen consumer sources through server functions, enforce public detail admission by exact equipmentId, and are ready for Stage 4-2 UI implementation.",
+    "nextStage": "4-2 general equipment List UI"
+  }
+}
