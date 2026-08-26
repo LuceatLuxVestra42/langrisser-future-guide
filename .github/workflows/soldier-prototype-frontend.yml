@@ -9,7 +9,6 @@ on:
       - 'src/lib/soldier-page.server.ts'
       - 'src/lib/soldier-page.functions.ts'
       - 'src/routes/soldiers-prototype.tsx'
-      - 'src/routes/soldiers.prototype.tsx'
       - 'src/routeTree.gen.ts'
       - 'package.json'
       - 'bun.lock'
@@ -29,10 +28,8 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Build production frontend
         run: bun run build
-      - name: Verify generated Soldier prototype routes
-        run: |
-          grep -q '/soldiers-prototype' src/routeTree.gen.ts
-          grep -q '/soldiers/prototype' src/routeTree.gen.ts
+      - name: Verify generated Soldier prototype route
+        run: grep -q '/soldiers-prototype' src/routeTree.gen.ts
       - name: Persist generated route tree
         run: |
           git config user.name "github-actions[bot]"
@@ -42,5 +39,5 @@ jobs:
             echo "No route tree changes"
             exit 0
           fi
-          git commit -m "Register Soldier prototype routes"
+          git commit -m "Register Soldier prototype route"
           git push
