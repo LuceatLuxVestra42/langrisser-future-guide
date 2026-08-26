@@ -1,0 +1,41 @@
+name: Hero Stage 5-2 exclusive owner trace
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-stage5-2-exclusive-owner-trace.yml'
+      - 'scripts/trace_hero_stage5_2_exclusive_owner.cjs'
+
+permissions:
+  contents: write
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Trace runtime symbols and source sheet
+        run: node scripts/trace_hero_stage5_2_exclusive_owner.cjs
+
+      - name: Show compact trace summary
+        run: |
+          echo '--- runtime symbol headers ---'
+          grep '^===== ' data/validation/hero-page-stage5-2-exclusive-owner-trace.txt || true
+          echo '--- sheet probe ---'
+          cat data/validation/hero-page-stage5-2-exclusive-sheet-probe.json
+
+      - name: Freeze trace checkpoint
+        run: |
+          TARGETS='data/validation/hero-page-stage5-2-exclusive-owner-trace.txt data/validation/hero-page-stage5-2-exclusive-sheet-probe.json'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add $TARGETS
+          if git diff --cached --quiet; then
+            echo 'Trace checkpoint already current.'
+          else
+            git commit -m 'Freeze Hero Stage 5-2 exclusive owner trace'
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
