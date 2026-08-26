@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "stage": "skin-page-3",
+  "substage": "3-0",
+  "checkpoint": "stage3-input-freeze",
+  "status": "PASS",
+  "completion": "SKIN_STAGE3_0_COMPLETE",
+  "validationMode": "CHECKPOINT_REUSE_WITH_BLOB_FREEZE",
+  "purpose": "Freeze the validated Stage 1 asset-source metadata and Stage 2 relation as the only data authorities for Skin Stage 3 asset work, reusing already accepted upstream checkpoints instead of repeating raw ConfigData relation discovery.",
+  "metrics": {
+    "checkCount": 37,
+    "passedCheckCount": 37,
+    "failedCheckCount": 0,
+    "canonicalSkinCount": 540,
+    "canonicalHeroCount": 267,
+    "sourceMetadataRecordCount": 540,
+    "staticArtworkLocatorCoverage": 540,
+    "spineLocatorCoverage": 540,
+    "modelBindingSkinCount": 540,
+    "modelBindingTotalCount": 2277,
+    "uniqueModelSkinResourceIdCount": 789,
+    "relationEdgeCount": 540,
+    "zeroSkinHeroCount": 32,
+    "ownerMismatchCount": 0,
+    "sourceOrderMismatchCount": 0,
+    "hardBlockingIssueCount": 0
+  },
+  "frozenInputs": {
+    "sourceMetadata": {
+      "path": "data/generated/skin-stage1-source-metadata.v1.json",
+      "role": "ASSET_LOCATOR_AUTHORITY",
+      "gitBlobSha": "d95f0cdcf41ac7599d1e0b418cd8c4b42a28b483"
+    },
+    "stage1SourceMetadataValidation": {
+      "path": "data/validation/skin-stage1-3-final.v1.json",
+      "role": "SOURCE_METADATA_VALIDATION_GATE",
+      "gitBlobSha": "754be0637a4dbb34eaf84f5fefe063830cc42531"
+    },
+    "stage1Final": {
+      "path": "data/validation/skin-stage1-6-final.v1.json",
+      "role": "STAGE1_FINAL_GATE",
+      "gitBlobSha": "4dfa1200a073bef403da36c12ac4de2e6153baf6"
+    },
+    "relation": {
+      "path": "data/generated/skin-stage2-3-bidirectional-relation.v1.json",
+      "role": "OWNER_ORDER_RELATION_AUTHORITY",
+      "gitBlobSha": "c69bc6a970909b66502574dcd709d3c731607ead"
+    },
+    "stage2Final": {
+      "path": "data/validation/skin-stage2-5-final.v1.json",
+      "role": "STAGE2_FINAL_GATE",
+      "gitBlobSha": "1ea21a2c72be78daab8ae7b326976544432b617b"
+    }
+  },
+  "authority": {
+    "skinIdentity": "sourceMetadata.records[].skinId",
+    "assetLocators": "sourceMetadata.records[].artworkSource + sourceMetadata.records[].heroSkinSource.modelBindings",
+    "ownerAndOrder": "relation.bySkinId[String(skinId)]",
+    "heroReverseLookup": "relation.byHeroId[String(heroId)]",
+    "modelResourceWorkUnit": "deduplicated heroSkinSource.modelBindings[].skinResourceId"
+  },
+  "policy": {
+    "rawConfigDataRelationRediscoveryAllowed": false,
+    "canonicalPopulationRecomputationAllowed": false,
+    "assetExistenceMayDefineReleaseStatus": false,
+    "filenameOrPathMayDefineOwnership": false,
+    "sourceMetadataIsAssetLocatorAuthority": true,
+    "stage2RelationIsOwnerOrderAuthority": true,
+    "modelResourceWorkUnit": "deduplicated skinResourceId (789 current unique IDs)",
+    "nextStage": "Skin Stage 3-1 asset locator/resource inventory"
+  },
+  "checks": [
+    {"name":"sourceMetadata blob frozen","pass":true,"detail":"d95f0cdcf41ac7599d1e0b418cd8c4b42a28b483"},
+    {"name":"stage1SourceMetadataValidation blob frozen","pass":true,"detail":"754be0637a4dbb34eaf84f5fefe063830cc42531"},
+    {"name":"stage1Final blob frozen","pass":true,"detail":"4dfa1200a073bef403da36c12ac4de2e6153baf6"},
+    {"name":"relation blob frozen","pass":true,"detail":"c69bc6a970909b66502574dcd709d3c731607ead"},
+    {"name":"stage2Final blob frozen","pass":true,"detail":"1ea21a2c72be78daab8ae7b326976544432b617b"},
+    {"name":"Stage 1-3 PASS","pass":true,"detail":"PASS"},
+    {"name":"Stage 1-3 completion","pass":true,"detail":"SKIN_STAGE1_3_COMPLETE"},
+    {"name":"source metadata record count 540","pass":true,"detail":540},
+    {"name":"HeroSkinInfo resolved 540","pass":true,"detail":540},
+    {"name":"CharImageSkinResource resolved 540","pass":true,"detail":540},
+    {"name":"model binding skin count 540","pass":true,"detail":540},
+    {"name":"model binding total 2277","pass":true,"detail":2277},
+    {"name":"unique model skin resource IDs 789","pass":true,"detail":789},
+    {"name":"Stage 1-3 critical failures zero","pass":true,"detail":0},
+    {"name":"Stage 1 final PASS","pass":true,"detail":"PASS"},
+    {"name":"Stage 1 complete","pass":true,"detail":"SKIN_STAGE1_COMPLETE"},
+    {"name":"Stage 1 canonical skin count 540","pass":true,"detail":540},
+    {"name":"Stage 1 hard blockers zero","pass":true,"detail":0},
+    {"name":"relation ACCEPTED","pass":true,"detail":"ACCEPTED"},
+    {"name":"relation completion 2-3","pass":true,"detail":"SKIN_STAGE2_3_COMPLETE"},
+    {"name":"Skin to Hero EXACTLY_ONE","pass":true,"detail":"EXACTLY_ONE"},
+    {"name":"Hero to Skin ZERO_OR_MANY","pass":true,"detail":"ZERO_OR_MANY"},
+    {"name":"relation bySkinId 540","pass":true,"detail":540},
+    {"name":"relation byHeroId 267","pass":true,"detail":267},
+    {"name":"relation edge 540","pass":true,"detail":540},
+    {"name":"Stage 2 final PASS","pass":true,"detail":"PASS"},
+    {"name":"Stage 2 complete","pass":true,"detail":"SKIN_STAGE2_COMPLETE"},
+    {"name":"Stage 2 final checks 35/35","pass":true,"detail":"35/35"},
+    {"name":"Stage 2 bySkinId 540","pass":true,"detail":540},
+    {"name":"Stage 2 byHeroId 267","pass":true,"detail":267},
+    {"name":"Stage 2 edge 540","pass":true,"detail":540},
+    {"name":"zero-skin Hero 32","pass":true,"detail":32},
+    {"name":"Stage 2 owner mismatch zero","pass":true,"detail":0},
+    {"name":"Stage 2 sourceOrder mismatch zero","pass":true,"detail":0},
+    {"name":"raw ConfigData relation rediscovery prohibited","pass":true,"detail":false},
+    {"name":"static artwork locator coverage 540","pass":true,"detail":540},
+    {"name":"Spine locator coverage 540","pass":true,"detail":540}
+  ],
+  "failures": {
+    "failedChecks": []
+  },
+  "nextAction": "Build Stage 3-1 lightweight inventory/index from the frozen 540 source metadata records and Stage 2 relation; measure unique/shared sourceImagePath, sourceSpinePath, and model skinResourceId work units before any bulk extraction."
+}
