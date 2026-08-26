@@ -1,4 +1,4 @@
-name: Banner Stage 3-7 Frontend Integration
+name: Static Pages Preview
 
 on:
   push:
@@ -10,12 +10,24 @@ on:
       - 'data/generated/banner-stage3-4-wish-consumer.v1.json'
       - 'data/generated/banner-stage3-5-cp-event-consumer.v1.json'
       - 'data/generated/banner-stage3-6-recurrence-pickup-log-consumer.v1.json'
+      - 'data/generated/equipment_stage2_6_restrictions.json'
+      - 'data/generated/equipment_stage2_6_job_index.json'
+      - 'data/generated/equipment_stage3_3_general_list.json'
+      - 'data/generated/equipment_stage3_4_general_detail.json'
+      - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/hero-name-master.v1.json'
       - 'scripts/validate-banner-stage3-7-frontend-integration.mjs'
       - 'src/lib/banner-page.server.ts'
       - 'src/lib/banner-page.static.ts'
       - 'src/lib/banner-page.functions.ts'
+      - 'src/lib/equipment-page.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
       - 'src/router.tsx'
       - 'src/routes/banners.tsx'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.exclusive.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
       - 'src/routes/index.tsx'
       - 'src/routeTree.gen.ts'
       - 'package.json'
@@ -38,11 +50,16 @@ jobs:
         run: node scripts/validate-banner-stage3-7-frontend-integration.mjs
       - name: Build production frontend
         run: bun run build
-      - name: Verify static home and banner pages
+      - name: Verify static home, banner, and equipment pages
         run: |
           test -f dist/client/index.html
           test -f dist/client/banners/index.html
+          test -f dist/client/equipment/index.html
+          test -f dist/client/equipment/exclusive/index.html
+          DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$DETAIL_COUNT" -eq 373
           grep -q '/banners' src/routeTree.gen.ts
+          grep -q '/equipment' src/routeTree.gen.ts
       - name: Persist Banner Stage 3-7 checkpoint
         run: |
           git config user.name "github-actions[bot]"
@@ -66,5 +83,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Deploy banner preview ${GITHUB_SHA}"
+          git commit -m "Deploy static preview ${GITHUB_SHA}"
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
