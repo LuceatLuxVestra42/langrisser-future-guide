@@ -1,0 +1,96 @@
+name: Hero Stage 6-1 Detail Integration
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'work/**'
+    paths:
+      - '.github/workflows/hero-stage6-1-detail.yml'
+      - 'scripts/build_hero_stage6_1_detail.cjs'
+      - 'data/contracts/hero-stage6-1-detail-integration.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/generated/hero-basic-combat.v1.json'
+      - 'data/validation/hero-basic-combat-stage4-5-summary.v1.json'
+      - 'data/generated/hero-page-stage5-1-bonds-final.v1.json'
+      - 'data/generated/hero-page-stage5-2-exclusive-central.v1.json'
+      - 'data/generated/hero-page-soldiers-stage5-3.v1.json'
+      - 'data/generated/hero-page-stage5-4-sp.v1.json'
+      - 'data/hero-page-stage5-5-3.v1.json'
+      - 'data/validation/hero-page-stage5-integration-review.v1.json'
+      - 'data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
+      - 'data/validation/hero-exclusive-equipment-relation-validation.v1.json'
+  pull_request:
+    paths:
+      - '.github/workflows/hero-stage6-1-detail.yml'
+      - 'scripts/build_hero_stage6_1_detail.cjs'
+      - 'data/contracts/hero-stage6-1-detail-integration.v1.json'
+      - 'data/generated/hero-detail-stage6-1.v1.json'
+      - 'data/validation/hero-stage6-1-final.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
+      - 'data/validation/hero-exclusive-equipment-relation-validation.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build-validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build and validate Hero Stage 6-1
+        run: node scripts/build_hero_stage6_1_detail.cjs
+
+      - name: Show Stage 6-1 summary
+        run: |
+          node - <<'NODE'
+          const r = require('./data/validation/hero-stage6-1-final.v1.json');
+          console.log(JSON.stringify({
+            status: r.status,
+            completion: r.completion,
+            summary: r.summary,
+            checks: r.checks,
+            inheritedReviews: r.inheritedReviews,
+            decision: r.decision
+          }, null, 2));
+          NODE
+
+      - name: Upload Stage 6-1 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-stage6-1-detail
+          path: |
+            data/generated/hero-detail-stage6-1.v1.json
+            data/validation/hero-stage6-1-final.v1.json
+
+      - name: Freeze Stage 6-1 outputs on work branch
+        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+        run: |
+          TARGETS='data/generated/hero-detail-stage6-1.v1.json data/validation/hero-stage6-1-final.v1.json'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add $TARGETS
+          if git diff --cached --quiet; then
+            echo 'Hero Stage 6-1 outputs already frozen.'
+          else
+            git commit -m 'Freeze Hero Stage 6-1 detail integration'
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
+
+      - name: Verify frozen outputs on main or PR
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+        run: git diff --exit-code -- data/generated/hero-detail-stage6-1.v1.json data/validation/hero-stage6-1-final.v1.json

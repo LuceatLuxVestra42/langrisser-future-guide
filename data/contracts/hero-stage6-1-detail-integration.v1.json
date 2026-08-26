@@ -1,0 +1,96 @@
+{
+  "version": 2,
+  "stage": "hero-page-6-1",
+  "status": "FROZEN",
+  "purpose": "Freeze the 267-Hero final composition map across frozen Hero Stage 4 and Stage 5 outputs without copying the large upstream blocks into a second monolithic dataset or reopening their semantics.",
+  "primaryKey": "heroId",
+  "canonicalHeroCount": 267,
+  "inputs": {
+    "heroMaster": "data/hero-name-master.v1.json",
+    "stage4Combat": "data/generated/hero-basic-combat.v1.json",
+    "stage51Bonds": "data/generated/hero-page-stage5-1-bonds-final.v1.json",
+    "stage52ExclusiveCentral": "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
+    "stage53Soldiers": "data/generated/hero-page-soldiers-stage5-3.v1.json",
+    "stage54Sp": "data/generated/hero-page-stage5-4-sp.v1.json",
+    "stage55Header": "data/hero-page-stage5-5-3.v1.json",
+    "stage5Integration": "data/validation/hero-page-stage5-integration-review.v1.json",
+    "exclusiveRelationScope": "data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json"
+  },
+  "optionalParallelInputs": {
+    "exclusiveByHero": "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+    "exclusiveRelationValidation": "data/validation/hero-exclusive-equipment-relation-validation.v1.json",
+    "policy": "Stage 6-1 does not block while Stage B is still producing the shared ownership relation. If the shared byHero index appears, Stage 6-1 requires exact parity with the frozen Stage 5-2 equipmentId snapshot."
+  },
+  "output": {
+    "path": "data/generated/hero-detail-stage6-1.v1.json",
+    "validation": "data/validation/hero-stage6-1-final.v1.json",
+    "representation": "lightweight normalized composition index",
+    "materializationPolicy": "Upstream Stage 4/5 blocks remain canonical in their frozen files. Stage 6-1 records where each Hero block lives and validates all joins instead of duplicating the blocks. A frontend/static build may materialize one Hero in memory from this index and sourceMap when needed."
+  },
+  "recordContract": {
+    "heroId": "canonical Hero ID",
+    "sourceIndexes": {
+      "normal": "record index in Stage 4 combat output",
+      "bonds": "record index in Stage 5-1 output",
+      "exclusiveCentral": "record index in Stage 5-2 output",
+      "sp": "record index in Stage 5-4 output",
+      "header": "record index in Stage 5-5 output"
+    },
+    "soldiersKey": "String(heroId) key in Stage 5-3 byHeroId",
+    "snapshot": {
+      "exclusiveEquipmentStatus/equipmentId": "small Stage 5-2 parity checkpoint only",
+      "centralDisciplineStatus": "small Stage 5-2 status checkpoint",
+      "soldierCount": "Stage 5-3 relation-count checkpoint",
+      "spStatus": "Stage 5-4 status checkpoint"
+    }
+  },
+  "sourceMap": {
+    "normal": "stage4Combat",
+    "bonds": "stage51Bonds",
+    "exclusiveCentral": "stage52ExclusiveCentral",
+    "soldiers": "stage53Soldiers",
+    "sp": "stage54Sp",
+    "header": "stage55Header"
+  },
+  "normalizationPolicy": {
+    "noLargeBlockDuplication": true,
+    "soldiers": "Keep the existing Stage 5-3 byHeroId + soldiersById normalization. Stage 6-1 does not copy the 224 Soldier dictionary or 5,977 relation metadata into another structure.",
+    "header": "Stage 5-5 remains the presentation/header authority; no localization or asset path synthesis in Stage 6-1.",
+    "exclusiveEquipment": "Stage 5-2 is a frozen display snapshot while Stage B owns the final shared ownership relation."
+  },
+  "exclusiveEquipmentParallelBoundary": {
+    "semanticOwner": "shared Hero <-> Exclusive Equipment relation layer defined by Stage B",
+    "stage61Role": "consumer/integrator only",
+    "currentBehavior": "Reference Stage 5-2 and keep only its equipmentId/status as a parity checkpoint. Do not derive ownership from ConfigData or Equipment presentation metadata.",
+    "whenStageBArtifactMissing": "Record PENDING_B_STAGE_NON_BLOCKING and allow Stage 6-1 structural completion.",
+    "whenStageBArtifactPresent": "Require exact by-Hero equipment ID parity with frozen Stage 5-2. Any mismatch is a hard error.",
+    "finalAdmissionBoundary": "Final Hero site-admission must require shared Stage B relation adoption before the whole Hero data pipeline is declared site-frozen."
+  },
+  "forbiddenWork": [
+    "Copy all Stage 4/5 payload blocks into a second monolithic Hero detail file",
+    "Recalculate Hero-Soldier membership from ConfigData",
+    "Recalculate Hero-exclusive Equipment ownership in Stage 6-1",
+    "Infer exclusive Equipment ownership from names, descriptions, icons, restrictions, PathType, IDs, or release order",
+    "Recompute Stage 4 stat/talent/job/skill formulas",
+    "Re-resolve Stage 5 bond or SP Mission semantics",
+    "Invent Korean localization, acquisition metadata, release dates, or asset delivery paths"
+  ],
+  "hardValidationRules": [
+    "Hero Stage 5 integration checkpoint must be PASS / STAGE_5_COMPLETE with zero blockers and zero hard errors",
+    "Hero master must contain exactly 267 unique heroIds",
+    "Stage 4, Stage 5-1, Stage 5-2, Stage 5-4 and Stage 5-5 must each contain exactly one record for every canonical heroId",
+    "Stage 5-3 byHeroId must contain exactly all 267 canonical Hero keys",
+    "Every Stage 5-3 soldierId must exist in Stage 5-3 soldiersById",
+    "All source index locators in the output must resolve back to the same heroId",
+    "No per-Hero Soldier membership or exclusive Equipment ownership is recalculated in Stage 6-1",
+    "If Stage B byHero exists, its Hero keys and equipment IDs must exactly match frozen Stage 5-2 ownership presence/identity",
+    "Duplicate, missing, extra or noncanonical Hero IDs are hard errors"
+  ],
+  "nonBlockingInheritedReview": [
+    "Stage 5-3 pending Korean Soldier display names remain presentation REVIEW only",
+    "Stage 5-5 skins with omitted GetPathType remain UNENCODED by policy",
+    "Stage 5-5 Korean localization and web-delivery asset conversion remain downstream presentation work",
+    "Stage B relation adoption is nonblocking for 6-1 only while the parallel relation stage is still in progress"
+  ],
+  "completion": "Stage 6-1 is COMPLETE when a lightweight 267-Hero composition index resolves every frozen Stage 4/5 block with zero structural mismatch, preserves all 5,977 Hero-Soldier edges by reference, and performs zero semantic re-derivation. Pending Stage B adoption is explicit and deferred to final Hero site-admission."
+}

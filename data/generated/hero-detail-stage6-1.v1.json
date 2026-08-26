@@ -1,0 +1,4862 @@
+{
+  "version": 2,
+  "stage": "hero-page-6-1",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "representation": "normalized-composition-index",
+  "sourcePolicy": "Frozen Stage 4/5 blocks remain canonical at their source paths. This file freezes the per-Hero composition locators and small parity checkpoints only; it does not duplicate the large payload blocks or perform semantic re-derivation.",
+  "sourceMap": {
+    "normal": {
+      "path": "data/generated/hero-basic-combat.v1.json",
+      "recordKey": "heroId"
+    },
+    "bonds": {
+      "path": "data/generated/hero-page-stage5-1-bonds-final.v1.json",
+      "recordKey": "heroId"
+    },
+    "exclusiveCentral": {
+      "path": "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
+      "recordKey": "heroId"
+    },
+    "soldiers": {
+      "path": "data/generated/hero-page-soldiers-stage5-3.v1.json",
+      "recordKey": "byHeroId[String(heroId)]",
+      "sharedMetadata": "soldiersById"
+    },
+    "sp": {
+      "path": "data/generated/hero-page-stage5-4-sp.v1.json",
+      "recordKey": "heroId"
+    },
+    "header": {
+      "path": "data/hero-page-stage5-5-3.v1.json",
+      "recordKey": "heroId"
+    }
+  },
+  "parallelDependencies": {
+    "heroExclusiveEquipmentRelation": {
+      "state": "PENDING_B_STAGE_NON_BLOCKING",
+      "semanticOwner": "shared Hero <-> Exclusive Equipment relation layer",
+      "stageBArtifactPresent": false,
+      "stageBValidationPresent": false,
+      "stageBValidationStatus": null,
+      "parityMismatchCount": 0,
+      "currentStage61SnapshotSource": "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
+      "finalAdmissionRequirement": "Shared Stage B relation adoption required before final Hero site-admission freeze."
+    }
+  },
+  "recordCount": 267,
+  "shared": {
+    "soldierMetadataSource": "data/generated/hero-page-soldiers-stage5-3.v1.json",
+    "soldierMetadataKey": "soldiersById",
+    "soldierMetadataCount": 224,
+    "heroSoldierRelationCount": 5977
+  },
+  "records": [
+    {
+      "heroId": 1,
+      "sourceIndexes": {
+        "normal": 0,
+        "bonds": 0,
+        "exclusiveCentral": 0,
+        "sp": 0,
+        "header": 0
+      },
+      "soldiersKey": "1",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 277,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 42,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 3,
+      "sourceIndexes": {
+        "normal": 1,
+        "bonds": 1,
+        "exclusiveCentral": 1,
+        "sp": 1,
+        "header": 1
+      },
+      "soldiersKey": "3",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 415,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 4,
+      "sourceIndexes": {
+        "normal": 2,
+        "bonds": 2,
+        "exclusiveCentral": 2,
+        "sp": 2,
+        "header": 2
+      },
+      "soldiersKey": "4",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 404,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 30,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 5,
+      "sourceIndexes": {
+        "normal": 3,
+        "bonds": 3,
+        "exclusiveCentral": 3,
+        "sp": 3,
+        "header": 3
+      },
+      "soldiersKey": "5",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 447,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 28,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 6,
+      "sourceIndexes": {
+        "normal": 4,
+        "bonds": 4,
+        "exclusiveCentral": 4,
+        "sp": 4,
+        "header": 4
+      },
+      "soldiersKey": "6",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 416,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 35,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 7,
+      "sourceIndexes": {
+        "normal": 5,
+        "bonds": 5,
+        "exclusiveCentral": 5,
+        "sp": 5,
+        "header": 5
+      },
+      "soldiersKey": "7",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 295,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 26,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 8,
+      "sourceIndexes": {
+        "normal": 6,
+        "bonds": 6,
+        "exclusiveCentral": 6,
+        "sp": 6,
+        "header": 6
+      },
+      "soldiersKey": "8",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 275,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 35,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 9,
+      "sourceIndexes": {
+        "normal": 7,
+        "bonds": 7,
+        "exclusiveCentral": 7,
+        "sp": 7,
+        "header": 7
+      },
+      "soldiersKey": "9",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 446,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 29,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 10,
+      "sourceIndexes": {
+        "normal": 8,
+        "bonds": 8,
+        "exclusiveCentral": 8,
+        "sp": 8,
+        "header": 8
+      },
+      "soldiersKey": "10",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 406,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 11,
+      "sourceIndexes": {
+        "normal": 9,
+        "bonds": 9,
+        "exclusiveCentral": 9,
+        "sp": 9,
+        "header": 9
+      },
+      "soldiersKey": "11",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 436,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 12,
+      "sourceIndexes": {
+        "normal": 10,
+        "bonds": 10,
+        "exclusiveCentral": 10,
+        "sp": 10,
+        "header": 10
+      },
+      "soldiersKey": "12",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 273,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 29,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 13,
+      "sourceIndexes": {
+        "normal": 11,
+        "bonds": 11,
+        "exclusiveCentral": 11,
+        "sp": 11,
+        "header": 11
+      },
+      "soldiersKey": "13",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 298,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 14,
+      "sourceIndexes": {
+        "normal": 12,
+        "bonds": 12,
+        "exclusiveCentral": 12,
+        "sp": 12,
+        "header": 12
+      },
+      "soldiersKey": "14",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 292,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 15,
+      "sourceIndexes": {
+        "normal": 13,
+        "bonds": 13,
+        "exclusiveCentral": 13,
+        "sp": 13,
+        "header": 13
+      },
+      "soldiersKey": "15",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 535,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 16,
+      "sourceIndexes": {
+        "normal": 14,
+        "bonds": 14,
+        "exclusiveCentral": 14,
+        "sp": 14,
+        "header": 14
+      },
+      "soldiersKey": "16",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 418,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 17,
+      "sourceIndexes": {
+        "normal": 15,
+        "bonds": 15,
+        "exclusiveCentral": 15,
+        "sp": 15,
+        "header": 15
+      },
+      "soldiersKey": "17",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 405,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 29,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 18,
+      "sourceIndexes": {
+        "normal": 16,
+        "bonds": 16,
+        "exclusiveCentral": 16,
+        "sp": 16,
+        "header": 16
+      },
+      "soldiersKey": "18",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 276,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 19,
+      "sourceIndexes": {
+        "normal": 17,
+        "bonds": 17,
+        "exclusiveCentral": 17,
+        "sp": 17,
+        "header": 17
+      },
+      "soldiersKey": "19",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 20,
+      "sourceIndexes": {
+        "normal": 18,
+        "bonds": 18,
+        "exclusiveCentral": 18,
+        "sp": 18,
+        "header": 18
+      },
+      "soldiersKey": "20",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 281,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 32,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 21,
+      "sourceIndexes": {
+        "normal": 19,
+        "bonds": 19,
+        "exclusiveCentral": 19,
+        "sp": 19,
+        "header": 19
+      },
+      "soldiersKey": "21",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 441,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 22,
+      "sourceIndexes": {
+        "normal": 20,
+        "bonds": 20,
+        "exclusiveCentral": 20,
+        "sp": 20,
+        "header": 20
+      },
+      "soldiersKey": "22",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 23,
+      "sourceIndexes": {
+        "normal": 21,
+        "bonds": 21,
+        "exclusiveCentral": 21,
+        "sp": 21,
+        "header": 21
+      },
+      "soldiersKey": "23",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 24,
+      "sourceIndexes": {
+        "normal": 22,
+        "bonds": 22,
+        "exclusiveCentral": 22,
+        "sp": 22,
+        "header": 22
+      },
+      "soldiersKey": "24",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 25,
+      "sourceIndexes": {
+        "normal": 23,
+        "bonds": 23,
+        "exclusiveCentral": 23,
+        "sp": 23,
+        "header": 23
+      },
+      "soldiersKey": "25",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 278,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 30,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 26,
+      "sourceIndexes": {
+        "normal": 24,
+        "bonds": 24,
+        "exclusiveCentral": 24,
+        "sp": 24,
+        "header": 24
+      },
+      "soldiersKey": "26",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 462,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 27,
+      "sourceIndexes": {
+        "normal": 25,
+        "bonds": 25,
+        "exclusiveCentral": 25,
+        "sp": 25,
+        "header": 25
+      },
+      "soldiersKey": "27",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 274,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 29,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 28,
+      "sourceIndexes": {
+        "normal": 26,
+        "bonds": 26,
+        "exclusiveCentral": 26,
+        "sp": 26,
+        "header": 26
+      },
+      "soldiersKey": "28",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 412,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 29,
+      "sourceIndexes": {
+        "normal": 27,
+        "bonds": 27,
+        "exclusiveCentral": 27,
+        "sp": 27,
+        "header": 27
+      },
+      "soldiersKey": "29",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 522,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 30,
+      "sourceIndexes": {
+        "normal": 28,
+        "bonds": 28,
+        "exclusiveCentral": 28,
+        "sp": 28,
+        "header": 28
+      },
+      "soldiersKey": "30",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 286,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 31,
+      "sourceIndexes": {
+        "normal": 29,
+        "bonds": 29,
+        "exclusiveCentral": 29,
+        "sp": 29,
+        "header": 29
+      },
+      "soldiersKey": "31",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 434,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 32,
+      "sourceIndexes": {
+        "normal": 30,
+        "bonds": 30,
+        "exclusiveCentral": 30,
+        "sp": 30,
+        "header": 30
+      },
+      "soldiersKey": "32",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 287,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 33,
+      "sourceIndexes": {
+        "normal": 31,
+        "bonds": 31,
+        "exclusiveCentral": 31,
+        "sp": 31,
+        "header": 31
+      },
+      "soldiersKey": "33",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 403,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 29,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 34,
+      "sourceIndexes": {
+        "normal": 32,
+        "bonds": 32,
+        "exclusiveCentral": 32,
+        "sp": 32,
+        "header": 32
+      },
+      "soldiersKey": "34",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 297,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 35,
+      "sourceIndexes": {
+        "normal": 33,
+        "bonds": 33,
+        "exclusiveCentral": 33,
+        "sp": 33,
+        "header": 33
+      },
+      "soldiersKey": "35",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 425,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 36,
+      "sourceIndexes": {
+        "normal": 34,
+        "bonds": 34,
+        "exclusiveCentral": 34,
+        "sp": 34,
+        "header": 34
+      },
+      "soldiersKey": "36",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 414,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 37,
+      "sourceIndexes": {
+        "normal": 35,
+        "bonds": 35,
+        "exclusiveCentral": 35,
+        "sp": 35,
+        "header": 35
+      },
+      "soldiersKey": "37",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 280,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 35,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 38,
+      "sourceIndexes": {
+        "normal": 36,
+        "bonds": 36,
+        "exclusiveCentral": 36,
+        "sp": 36,
+        "header": 36
+      },
+      "soldiersKey": "38",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 455,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 39,
+      "sourceIndexes": {
+        "normal": 37,
+        "bonds": 37,
+        "exclusiveCentral": 37,
+        "sp": 37,
+        "header": 37
+      },
+      "soldiersKey": "39",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 411,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 34,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 40,
+      "sourceIndexes": {
+        "normal": 38,
+        "bonds": 38,
+        "exclusiveCentral": 38,
+        "sp": 38,
+        "header": 38
+      },
+      "soldiersKey": "40",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 488,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 41,
+      "sourceIndexes": {
+        "normal": 39,
+        "bonds": 39,
+        "exclusiveCentral": 39,
+        "sp": 39,
+        "header": 39
+      },
+      "soldiersKey": "41",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 42,
+      "sourceIndexes": {
+        "normal": 40,
+        "bonds": 40,
+        "exclusiveCentral": 40,
+        "sp": 40,
+        "header": 40
+      },
+      "soldiersKey": "42",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 43,
+      "sourceIndexes": {
+        "normal": 41,
+        "bonds": 41,
+        "exclusiveCentral": 41,
+        "sp": 41,
+        "header": 41
+      },
+      "soldiersKey": "43",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 44,
+      "sourceIndexes": {
+        "normal": 42,
+        "bonds": 42,
+        "exclusiveCentral": 42,
+        "sp": 42,
+        "header": 42
+      },
+      "soldiersKey": "44",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 45,
+      "sourceIndexes": {
+        "normal": 43,
+        "bonds": 43,
+        "exclusiveCentral": 43,
+        "sp": 43,
+        "header": 43
+      },
+      "soldiersKey": "45",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 47,
+      "sourceIndexes": {
+        "normal": 44,
+        "bonds": 44,
+        "exclusiveCentral": 44,
+        "sp": 44,
+        "header": 44
+      },
+      "soldiersKey": "47",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 48,
+      "sourceIndexes": {
+        "normal": 45,
+        "bonds": 45,
+        "exclusiveCentral": 45,
+        "sp": 45,
+        "header": 45
+      },
+      "soldiersKey": "48",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 13,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 49,
+      "sourceIndexes": {
+        "normal": 46,
+        "bonds": 46,
+        "exclusiveCentral": 46,
+        "sp": 46,
+        "header": 46
+      },
+      "soldiersKey": "49",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 429,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 51,
+      "sourceIndexes": {
+        "normal": 47,
+        "bonds": 47,
+        "exclusiveCentral": 47,
+        "sp": 47,
+        "header": 47
+      },
+      "soldiersKey": "51",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 293,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 52,
+      "sourceIndexes": {
+        "normal": 48,
+        "bonds": 48,
+        "exclusiveCentral": 48,
+        "sp": 48,
+        "header": 48
+      },
+      "soldiersKey": "52",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 294,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 53,
+      "sourceIndexes": {
+        "normal": 49,
+        "bonds": 49,
+        "exclusiveCentral": 49,
+        "sp": 49,
+        "header": 49
+      },
+      "soldiersKey": "53",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 296,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 36,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 54,
+      "sourceIndexes": {
+        "normal": 50,
+        "bonds": 50,
+        "exclusiveCentral": 50,
+        "sp": 50,
+        "header": 50
+      },
+      "soldiersKey": "54",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 490,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 55,
+      "sourceIndexes": {
+        "normal": 51,
+        "bonds": 51,
+        "exclusiveCentral": 51,
+        "sp": 51,
+        "header": 51
+      },
+      "soldiersKey": "55",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 466,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 30,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 56,
+      "sourceIndexes": {
+        "normal": 52,
+        "bonds": 52,
+        "exclusiveCentral": 52,
+        "sp": 52,
+        "header": 52
+      },
+      "soldiersKey": "56",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 279,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 57,
+      "sourceIndexes": {
+        "normal": 53,
+        "bonds": 53,
+        "exclusiveCentral": 53,
+        "sp": 53,
+        "header": 53
+      },
+      "soldiersKey": "57",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 472,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 58,
+      "sourceIndexes": {
+        "normal": 54,
+        "bonds": 54,
+        "exclusiveCentral": 54,
+        "sp": 54,
+        "header": 54
+      },
+      "soldiersKey": "58",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 423,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 59,
+      "sourceIndexes": {
+        "normal": 55,
+        "bonds": 55,
+        "exclusiveCentral": 55,
+        "sp": 55,
+        "header": 55
+      },
+      "soldiersKey": "59",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 424,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 60,
+      "sourceIndexes": {
+        "normal": 56,
+        "bonds": 56,
+        "exclusiveCentral": 56,
+        "sp": 56,
+        "header": 56
+      },
+      "soldiersKey": "60",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 428,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 30,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 61,
+      "sourceIndexes": {
+        "normal": 57,
+        "bonds": 57,
+        "exclusiveCentral": 57,
+        "sp": 57,
+        "header": 57
+      },
+      "soldiersKey": "61",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 413,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 62,
+      "sourceIndexes": {
+        "normal": 58,
+        "bonds": 58,
+        "exclusiveCentral": 58,
+        "sp": 58,
+        "header": 58
+      },
+      "soldiersKey": "62",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 427,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 63,
+      "sourceIndexes": {
+        "normal": 59,
+        "bonds": 59,
+        "exclusiveCentral": 59,
+        "sp": 59,
+        "header": 59
+      },
+      "soldiersKey": "63",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 452,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 64,
+      "sourceIndexes": {
+        "normal": 60,
+        "bonds": 60,
+        "exclusiveCentral": 60,
+        "sp": 60,
+        "header": 60
+      },
+      "soldiersKey": "64",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 439,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 31,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 65,
+      "sourceIndexes": {
+        "normal": 61,
+        "bonds": 61,
+        "exclusiveCentral": 61,
+        "sp": 61,
+        "header": 61
+      },
+      "soldiersKey": "65",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 437,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 66,
+      "sourceIndexes": {
+        "normal": 62,
+        "bonds": 62,
+        "exclusiveCentral": 62,
+        "sp": 62,
+        "header": 62
+      },
+      "soldiersKey": "66",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 464,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 67,
+      "sourceIndexes": {
+        "normal": 63,
+        "bonds": 63,
+        "exclusiveCentral": 63,
+        "sp": 63,
+        "header": 63
+      },
+      "soldiersKey": "67",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 465,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 29,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 69,
+      "sourceIndexes": {
+        "normal": 64,
+        "bonds": 64,
+        "exclusiveCentral": 64,
+        "sp": 64,
+        "header": 64
+      },
+      "soldiersKey": "69",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 70,
+      "sourceIndexes": {
+        "normal": 65,
+        "bonds": 65,
+        "exclusiveCentral": 65,
+        "sp": 65,
+        "header": 65
+      },
+      "soldiersKey": "70",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 71,
+      "sourceIndexes": {
+        "normal": 66,
+        "bonds": 66,
+        "exclusiveCentral": 66,
+        "sp": 66,
+        "header": 66
+      },
+      "soldiersKey": "71",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 72,
+      "sourceIndexes": {
+        "normal": 67,
+        "bonds": 67,
+        "exclusiveCentral": 67,
+        "sp": 67,
+        "header": 67
+      },
+      "soldiersKey": "72",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 73,
+      "sourceIndexes": {
+        "normal": 68,
+        "bonds": 68,
+        "exclusiveCentral": 68,
+        "sp": 68,
+        "header": 68
+      },
+      "soldiersKey": "73",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 74,
+      "sourceIndexes": {
+        "normal": 69,
+        "bonds": 69,
+        "exclusiveCentral": 69,
+        "sp": 69,
+        "header": 69
+      },
+      "soldiersKey": "74",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 16,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 75,
+      "sourceIndexes": {
+        "normal": 70,
+        "bonds": 70,
+        "exclusiveCentral": 70,
+        "sp": 70,
+        "header": 70
+      },
+      "soldiersKey": "75",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 76,
+      "sourceIndexes": {
+        "normal": 71,
+        "bonds": 71,
+        "exclusiveCentral": 71,
+        "sp": 71,
+        "header": 71
+      },
+      "soldiersKey": "76",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 26,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 77,
+      "sourceIndexes": {
+        "normal": 72,
+        "bonds": 72,
+        "exclusiveCentral": 72,
+        "sp": 72,
+        "header": 72
+      },
+      "soldiersKey": "77",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 78,
+      "sourceIndexes": {
+        "normal": 73,
+        "bonds": 73,
+        "exclusiveCentral": 73,
+        "sp": 73,
+        "header": 73
+      },
+      "soldiersKey": "78",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 79,
+      "sourceIndexes": {
+        "normal": 74,
+        "bonds": 74,
+        "exclusiveCentral": 74,
+        "sp": 74,
+        "header": 74
+      },
+      "soldiersKey": "79",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 80,
+      "sourceIndexes": {
+        "normal": 75,
+        "bonds": 75,
+        "exclusiveCentral": 75,
+        "sp": 75,
+        "header": 75
+      },
+      "soldiersKey": "80",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 81,
+      "sourceIndexes": {
+        "normal": 76,
+        "bonds": 76,
+        "exclusiveCentral": 76,
+        "sp": 76,
+        "header": 76
+      },
+      "soldiersKey": "81",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 82,
+      "sourceIndexes": {
+        "normal": 77,
+        "bonds": 77,
+        "exclusiveCentral": 77,
+        "sp": 77,
+        "header": 77
+      },
+      "soldiersKey": "82",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 83,
+      "sourceIndexes": {
+        "normal": 78,
+        "bonds": 78,
+        "exclusiveCentral": 78,
+        "sp": 78,
+        "header": 78
+      },
+      "soldiersKey": "83",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 84,
+      "sourceIndexes": {
+        "normal": 79,
+        "bonds": 79,
+        "exclusiveCentral": 79,
+        "sp": 79,
+        "header": 79
+      },
+      "soldiersKey": "84",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 85,
+      "sourceIndexes": {
+        "normal": 80,
+        "bonds": 80,
+        "exclusiveCentral": 80,
+        "sp": 80,
+        "header": 80
+      },
+      "soldiersKey": "85",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 86,
+      "sourceIndexes": {
+        "normal": 81,
+        "bonds": 81,
+        "exclusiveCentral": 81,
+        "sp": 81,
+        "header": 81
+      },
+      "soldiersKey": "86",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 87,
+      "sourceIndexes": {
+        "normal": 82,
+        "bonds": 82,
+        "exclusiveCentral": 82,
+        "sp": 82,
+        "header": 82
+      },
+      "soldiersKey": "87",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 435,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 88,
+      "sourceIndexes": {
+        "normal": 83,
+        "bonds": 83,
+        "exclusiveCentral": 83,
+        "sp": 83,
+        "header": 83
+      },
+      "soldiersKey": "88",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 417,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 89,
+      "sourceIndexes": {
+        "normal": 84,
+        "bonds": 84,
+        "exclusiveCentral": 84,
+        "sp": 84,
+        "header": 84
+      },
+      "soldiersKey": "89",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 474,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 26,
+        "spStatus": "RELEASED"
+      }
+    },
+    {
+      "heroId": 91,
+      "sourceIndexes": {
+        "normal": 85,
+        "bonds": 85,
+        "exclusiveCentral": 85,
+        "sp": 85,
+        "header": 85
+      },
+      "soldiersKey": "91",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 453,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 92,
+      "sourceIndexes": {
+        "normal": 86,
+        "bonds": 86,
+        "exclusiveCentral": 86,
+        "sp": 86,
+        "header": 86
+      },
+      "soldiersKey": "92",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 426,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 28,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 93,
+      "sourceIndexes": {
+        "normal": 87,
+        "bonds": 87,
+        "exclusiveCentral": 87,
+        "sp": 87,
+        "header": 87
+      },
+      "soldiersKey": "93",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 479,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 94,
+      "sourceIndexes": {
+        "normal": 88,
+        "bonds": 88,
+        "exclusiveCentral": 88,
+        "sp": 88,
+        "header": 88
+      },
+      "soldiersKey": "94",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 440,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 95,
+      "sourceIndexes": {
+        "normal": 89,
+        "bonds": 89,
+        "exclusiveCentral": 89,
+        "sp": 89,
+        "header": 89
+      },
+      "soldiersKey": "95",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 438,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 96,
+      "sourceIndexes": {
+        "normal": 90,
+        "bonds": 90,
+        "exclusiveCentral": 90,
+        "sp": 90,
+        "header": 90
+      },
+      "soldiersKey": "96",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 460,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 97,
+      "sourceIndexes": {
+        "normal": 91,
+        "bonds": 91,
+        "exclusiveCentral": 91,
+        "sp": 91,
+        "header": 91
+      },
+      "soldiersKey": "97",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 448,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 98,
+      "sourceIndexes": {
+        "normal": 92,
+        "bonds": 92,
+        "exclusiveCentral": 92,
+        "sp": 92,
+        "header": 92
+      },
+      "soldiersKey": "98",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 476,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99,
+      "sourceIndexes": {
+        "normal": 93,
+        "bonds": 93,
+        "exclusiveCentral": 93,
+        "sp": 93,
+        "header": 93
+      },
+      "soldiersKey": "99",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 540,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 100,
+      "sourceIndexes": {
+        "normal": 94,
+        "bonds": 94,
+        "exclusiveCentral": 94,
+        "sp": 94,
+        "header": 94
+      },
+      "soldiersKey": "100",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 549,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 101,
+      "sourceIndexes": {
+        "normal": 95,
+        "bonds": 95,
+        "exclusiveCentral": 95,
+        "sp": 95,
+        "header": 95
+      },
+      "soldiersKey": "101",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 463,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 102,
+      "sourceIndexes": {
+        "normal": 96,
+        "bonds": 96,
+        "exclusiveCentral": 96,
+        "sp": 96,
+        "header": 96
+      },
+      "soldiersKey": "102",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 477,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 103,
+      "sourceIndexes": {
+        "normal": 97,
+        "bonds": 97,
+        "exclusiveCentral": 97,
+        "sp": 97,
+        "header": 97
+      },
+      "soldiersKey": "103",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 451,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 104,
+      "sourceIndexes": {
+        "normal": 98,
+        "bonds": 98,
+        "exclusiveCentral": 98,
+        "sp": 98,
+        "header": 98
+      },
+      "soldiersKey": "104",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 508,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 105,
+      "sourceIndexes": {
+        "normal": 99,
+        "bonds": 99,
+        "exclusiveCentral": 99,
+        "sp": 99,
+        "header": 99
+      },
+      "soldiersKey": "105",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 497,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 30,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 106,
+      "sourceIndexes": {
+        "normal": 100,
+        "bonds": 100,
+        "exclusiveCentral": 100,
+        "sp": 100,
+        "header": 100
+      },
+      "soldiersKey": "106",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 487,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 108,
+      "sourceIndexes": {
+        "normal": 101,
+        "bonds": 101,
+        "exclusiveCentral": 101,
+        "sp": 101,
+        "header": 101
+      },
+      "soldiersKey": "108",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 499,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 109,
+      "sourceIndexes": {
+        "normal": 102,
+        "bonds": 102,
+        "exclusiveCentral": 102,
+        "sp": 102,
+        "header": 102
+      },
+      "soldiersKey": "109",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 489,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 110,
+      "sourceIndexes": {
+        "normal": 103,
+        "bonds": 103,
+        "exclusiveCentral": 103,
+        "sp": 103,
+        "header": 103
+      },
+      "soldiersKey": "110",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 475,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 111,
+      "sourceIndexes": {
+        "normal": 104,
+        "bonds": 104,
+        "exclusiveCentral": 104,
+        "sp": 104,
+        "header": 104
+      },
+      "soldiersKey": "111",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 449,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 112,
+      "sourceIndexes": {
+        "normal": 105,
+        "bonds": 105,
+        "exclusiveCentral": 105,
+        "sp": 105,
+        "header": 105
+      },
+      "soldiersKey": "112",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 501,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 26,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 113,
+      "sourceIndexes": {
+        "normal": 106,
+        "bonds": 106,
+        "exclusiveCentral": 106,
+        "sp": 106,
+        "header": 106
+      },
+      "soldiersKey": "113",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 507,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 114,
+      "sourceIndexes": {
+        "normal": 107,
+        "bonds": 107,
+        "exclusiveCentral": 107,
+        "sp": 107,
+        "header": 107
+      },
+      "soldiersKey": "114",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 485,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 115,
+      "sourceIndexes": {
+        "normal": 108,
+        "bonds": 108,
+        "exclusiveCentral": 108,
+        "sp": 108,
+        "header": 108
+      },
+      "soldiersKey": "115",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 478,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 116,
+      "sourceIndexes": {
+        "normal": 109,
+        "bonds": 109,
+        "exclusiveCentral": 109,
+        "sp": 109,
+        "header": 109
+      },
+      "soldiersKey": "116",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 461,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 118,
+      "sourceIndexes": {
+        "normal": 110,
+        "bonds": 110,
+        "exclusiveCentral": 110,
+        "sp": 110,
+        "header": 110
+      },
+      "soldiersKey": "118",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 496,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 119,
+      "sourceIndexes": {
+        "normal": 111,
+        "bonds": 111,
+        "exclusiveCentral": 111,
+        "sp": 111,
+        "header": 111
+      },
+      "soldiersKey": "119",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 526,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 28,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 120,
+      "sourceIndexes": {
+        "normal": 112,
+        "bonds": 112,
+        "exclusiveCentral": 112,
+        "sp": 112,
+        "header": 112
+      },
+      "soldiersKey": "120",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 473,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 121,
+      "sourceIndexes": {
+        "normal": 113,
+        "bonds": 113,
+        "exclusiveCentral": 113,
+        "sp": 113,
+        "header": 113
+      },
+      "soldiersKey": "121",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 454,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 26,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 122,
+      "sourceIndexes": {
+        "normal": 114,
+        "bonds": 114,
+        "exclusiveCentral": 114,
+        "sp": 114,
+        "header": 114
+      },
+      "soldiersKey": "122",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 502,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 123,
+      "sourceIndexes": {
+        "normal": 115,
+        "bonds": 115,
+        "exclusiveCentral": 115,
+        "sp": 115,
+        "header": 115
+      },
+      "soldiersKey": "123",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 486,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 124,
+      "sourceIndexes": {
+        "normal": 116,
+        "bonds": 116,
+        "exclusiveCentral": 116,
+        "sp": 116,
+        "header": 116
+      },
+      "soldiersKey": "124",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 519,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 26,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 125,
+      "sourceIndexes": {
+        "normal": 117,
+        "bonds": 117,
+        "exclusiveCentral": 117,
+        "sp": 117,
+        "header": 117
+      },
+      "soldiersKey": "125",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 467,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 126,
+      "sourceIndexes": {
+        "normal": 118,
+        "bonds": 118,
+        "exclusiveCentral": 118,
+        "sp": 118,
+        "header": 118
+      },
+      "soldiersKey": "126",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 484,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 29,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 127,
+      "sourceIndexes": {
+        "normal": 119,
+        "bonds": 119,
+        "exclusiveCentral": 119,
+        "sp": 119,
+        "header": 119
+      },
+      "soldiersKey": "127",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 450,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 26,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 129,
+      "sourceIndexes": {
+        "normal": 120,
+        "bonds": 120,
+        "exclusiveCentral": 120,
+        "sp": 120,
+        "header": 120
+      },
+      "soldiersKey": "129",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 520,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 29,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 130,
+      "sourceIndexes": {
+        "normal": 121,
+        "bonds": 121,
+        "exclusiveCentral": 121,
+        "sp": 121,
+        "header": 121
+      },
+      "soldiersKey": "130",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 512,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 131,
+      "sourceIndexes": {
+        "normal": 122,
+        "bonds": 122,
+        "exclusiveCentral": 122,
+        "sp": 122,
+        "header": 122
+      },
+      "soldiersKey": "131",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 132,
+      "sourceIndexes": {
+        "normal": 123,
+        "bonds": 123,
+        "exclusiveCentral": 123,
+        "sp": 123,
+        "header": 123
+      },
+      "soldiersKey": "132",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 133,
+      "sourceIndexes": {
+        "normal": 124,
+        "bonds": 124,
+        "exclusiveCentral": 124,
+        "sp": 124,
+        "header": 124
+      },
+      "soldiersKey": "133",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 16,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 134,
+      "sourceIndexes": {
+        "normal": 125,
+        "bonds": 125,
+        "exclusiveCentral": 125,
+        "sp": 125,
+        "header": 125
+      },
+      "soldiersKey": "134",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 135,
+      "sourceIndexes": {
+        "normal": 126,
+        "bonds": 126,
+        "exclusiveCentral": 126,
+        "sp": 126,
+        "header": 126
+      },
+      "soldiersKey": "135",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 136,
+      "sourceIndexes": {
+        "normal": 127,
+        "bonds": 127,
+        "exclusiveCentral": 127,
+        "sp": 127,
+        "header": 127
+      },
+      "soldiersKey": "136",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 26,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 137,
+      "sourceIndexes": {
+        "normal": 128,
+        "bonds": 128,
+        "exclusiveCentral": 128,
+        "sp": 128,
+        "header": 128
+      },
+      "soldiersKey": "137",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 138,
+      "sourceIndexes": {
+        "normal": 129,
+        "bonds": 129,
+        "exclusiveCentral": 129,
+        "sp": 129,
+        "header": 129
+      },
+      "soldiersKey": "138",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 139,
+      "sourceIndexes": {
+        "normal": 130,
+        "bonds": 130,
+        "exclusiveCentral": 130,
+        "sp": 130,
+        "header": 130
+      },
+      "soldiersKey": "139",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 140,
+      "sourceIndexes": {
+        "normal": 131,
+        "bonds": 131,
+        "exclusiveCentral": 131,
+        "sp": 131,
+        "header": 131
+      },
+      "soldiersKey": "140",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 141,
+      "sourceIndexes": {
+        "normal": 132,
+        "bonds": 132,
+        "exclusiveCentral": 132,
+        "sp": 132,
+        "header": 132
+      },
+      "soldiersKey": "141",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 142,
+      "sourceIndexes": {
+        "normal": 133,
+        "bonds": 133,
+        "exclusiveCentral": 133,
+        "sp": 133,
+        "header": 133
+      },
+      "soldiersKey": "142",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 143,
+      "sourceIndexes": {
+        "normal": 134,
+        "bonds": 134,
+        "exclusiveCentral": 134,
+        "sp": 134,
+        "header": 134
+      },
+      "soldiersKey": "143",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 144,
+      "sourceIndexes": {
+        "normal": 135,
+        "bonds": 135,
+        "exclusiveCentral": 135,
+        "sp": 135,
+        "header": 135
+      },
+      "soldiersKey": "144",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 145,
+      "sourceIndexes": {
+        "normal": 136,
+        "bonds": 136,
+        "exclusiveCentral": 136,
+        "sp": 136,
+        "header": 136
+      },
+      "soldiersKey": "145",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 146,
+      "sourceIndexes": {
+        "normal": 137,
+        "bonds": 137,
+        "exclusiveCentral": 137,
+        "sp": 137,
+        "header": 137
+      },
+      "soldiersKey": "146",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 147,
+      "sourceIndexes": {
+        "normal": 138,
+        "bonds": 138,
+        "exclusiveCentral": 138,
+        "sp": 138,
+        "header": 138
+      },
+      "soldiersKey": "147",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 148,
+      "sourceIndexes": {
+        "normal": 139,
+        "bonds": 139,
+        "exclusiveCentral": 139,
+        "sp": 139,
+        "header": 139
+      },
+      "soldiersKey": "148",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99161,
+      "sourceIndexes": {
+        "normal": 140,
+        "bonds": 140,
+        "exclusiveCentral": 140,
+        "sp": 140,
+        "header": 140
+      },
+      "soldiersKey": "99161",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 495,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99162,
+      "sourceIndexes": {
+        "normal": 141,
+        "bonds": 141,
+        "exclusiveCentral": 141,
+        "sp": 141,
+        "header": 141
+      },
+      "soldiersKey": "99162",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 498,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99163,
+      "sourceIndexes": {
+        "normal": 142,
+        "bonds": 142,
+        "exclusiveCentral": 142,
+        "sp": 142,
+        "header": 142
+      },
+      "soldiersKey": "99163",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 500,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99164,
+      "sourceIndexes": {
+        "normal": 143,
+        "bonds": 143,
+        "exclusiveCentral": 143,
+        "sp": 143,
+        "header": 143
+      },
+      "soldiersKey": "99164",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 534,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 29,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99165,
+      "sourceIndexes": {
+        "normal": 144,
+        "bonds": 144,
+        "exclusiveCentral": 144,
+        "sp": 144,
+        "header": 144
+      },
+      "soldiersKey": "99165",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 510,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 28,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99166,
+      "sourceIndexes": {
+        "normal": 145,
+        "bonds": 145,
+        "exclusiveCentral": 145,
+        "sp": 145,
+        "header": 145
+      },
+      "soldiersKey": "99166",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 539,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99167,
+      "sourceIndexes": {
+        "normal": 146,
+        "bonds": 146,
+        "exclusiveCentral": 146,
+        "sp": 146,
+        "header": 146
+      },
+      "soldiersKey": "99167",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 511,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99168,
+      "sourceIndexes": {
+        "normal": 147,
+        "bonds": 147,
+        "exclusiveCentral": 147,
+        "sp": 147,
+        "header": 147
+      },
+      "soldiersKey": "99168",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 537,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99169,
+      "sourceIndexes": {
+        "normal": 148,
+        "bonds": 148,
+        "exclusiveCentral": 148,
+        "sp": 148,
+        "header": 148
+      },
+      "soldiersKey": "99169",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 509,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 28,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99170,
+      "sourceIndexes": {
+        "normal": 149,
+        "bonds": 149,
+        "exclusiveCentral": 149,
+        "sp": 149,
+        "header": 149
+      },
+      "soldiersKey": "99170",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 513,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99171,
+      "sourceIndexes": {
+        "normal": 150,
+        "bonds": 150,
+        "exclusiveCentral": 150,
+        "sp": 150,
+        "header": 150
+      },
+      "soldiersKey": "99171",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 514,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99172,
+      "sourceIndexes": {
+        "normal": 151,
+        "bonds": 151,
+        "exclusiveCentral": 151,
+        "sp": 151,
+        "header": 151
+      },
+      "soldiersKey": "99172",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 524,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99173,
+      "sourceIndexes": {
+        "normal": 152,
+        "bonds": 152,
+        "exclusiveCentral": 152,
+        "sp": 152,
+        "header": 152
+      },
+      "soldiersKey": "99173",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 538,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99174,
+      "sourceIndexes": {
+        "normal": 153,
+        "bonds": 153,
+        "exclusiveCentral": 153,
+        "sp": 153,
+        "header": 153
+      },
+      "soldiersKey": "99174",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 533,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99175,
+      "sourceIndexes": {
+        "normal": 154,
+        "bonds": 154,
+        "exclusiveCentral": 154,
+        "sp": 154,
+        "header": 154
+      },
+      "soldiersKey": "99175",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 536,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99176,
+      "sourceIndexes": {
+        "normal": 155,
+        "bonds": 155,
+        "exclusiveCentral": 155,
+        "sp": 155,
+        "header": 155
+      },
+      "soldiersKey": "99176",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 521,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99177,
+      "sourceIndexes": {
+        "normal": 156,
+        "bonds": 156,
+        "exclusiveCentral": 156,
+        "sp": 156,
+        "header": 156
+      },
+      "soldiersKey": "99177",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 523,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99178,
+      "sourceIndexes": {
+        "normal": 157,
+        "bonds": 157,
+        "exclusiveCentral": 157,
+        "sp": 157,
+        "header": 157
+      },
+      "soldiersKey": "99178",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 532,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99179,
+      "sourceIndexes": {
+        "normal": 158,
+        "bonds": 158,
+        "exclusiveCentral": 158,
+        "sp": 158,
+        "header": 158
+      },
+      "soldiersKey": "99179",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 547,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 26,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99180,
+      "sourceIndexes": {
+        "normal": 159,
+        "bonds": 159,
+        "exclusiveCentral": 159,
+        "sp": 159,
+        "header": 159
+      },
+      "soldiersKey": "99180",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 525,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99181,
+      "sourceIndexes": {
+        "normal": 160,
+        "bonds": 160,
+        "exclusiveCentral": 160,
+        "sp": 160,
+        "header": 160
+      },
+      "soldiersKey": "99181",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 551,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99182,
+      "sourceIndexes": {
+        "normal": 161,
+        "bonds": 161,
+        "exclusiveCentral": 161,
+        "sp": 161,
+        "header": 161
+      },
+      "soldiersKey": "99182",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 531,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99183,
+      "sourceIndexes": {
+        "normal": 162,
+        "bonds": 162,
+        "exclusiveCentral": 162,
+        "sp": 162,
+        "header": 162
+      },
+      "soldiersKey": "99183",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 550,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99184,
+      "sourceIndexes": {
+        "normal": 163,
+        "bonds": 163,
+        "exclusiveCentral": 163,
+        "sp": 163,
+        "header": 163
+      },
+      "soldiersKey": "99184",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 559,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99185,
+      "sourceIndexes": {
+        "normal": 164,
+        "bonds": 164,
+        "exclusiveCentral": 164,
+        "sp": 164,
+        "header": 164
+      },
+      "soldiersKey": "99185",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 560,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99186,
+      "sourceIndexes": {
+        "normal": 165,
+        "bonds": 165,
+        "exclusiveCentral": 165,
+        "sp": 165,
+        "header": 165
+      },
+      "soldiersKey": "99186",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 568,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99187,
+      "sourceIndexes": {
+        "normal": 166,
+        "bonds": 166,
+        "exclusiveCentral": 166,
+        "sp": 166,
+        "header": 166
+      },
+      "soldiersKey": "99187",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 548,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99188,
+      "sourceIndexes": {
+        "normal": 167,
+        "bonds": 167,
+        "exclusiveCentral": 167,
+        "sp": 167,
+        "header": 167
+      },
+      "soldiersKey": "99188",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 546,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99189,
+      "sourceIndexes": {
+        "normal": 168,
+        "bonds": 168,
+        "exclusiveCentral": 168,
+        "sp": 168,
+        "header": 168
+      },
+      "soldiersKey": "99189",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 545,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99190,
+      "sourceIndexes": {
+        "normal": 169,
+        "bonds": 169,
+        "exclusiveCentral": 169,
+        "sp": 169,
+        "header": 169
+      },
+      "soldiersKey": "99190",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 569,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99191,
+      "sourceIndexes": {
+        "normal": 170,
+        "bonds": 170,
+        "exclusiveCentral": 170,
+        "sp": 170,
+        "header": 170
+      },
+      "soldiersKey": "99191",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 552,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99192,
+      "sourceIndexes": {
+        "normal": 171,
+        "bonds": 171,
+        "exclusiveCentral": 171,
+        "sp": 171,
+        "header": 171
+      },
+      "soldiersKey": "99192",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 570,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99193,
+      "sourceIndexes": {
+        "normal": 172,
+        "bonds": 172,
+        "exclusiveCentral": 172,
+        "sp": 172,
+        "header": 172
+      },
+      "soldiersKey": "99193",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 557,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99194,
+      "sourceIndexes": {
+        "normal": 173,
+        "bonds": 173,
+        "exclusiveCentral": 173,
+        "sp": 173,
+        "header": 173
+      },
+      "soldiersKey": "99194",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99195,
+      "sourceIndexes": {
+        "normal": 174,
+        "bonds": 174,
+        "exclusiveCentral": 174,
+        "sp": 174,
+        "header": 174
+      },
+      "soldiersKey": "99195",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99196,
+      "sourceIndexes": {
+        "normal": 175,
+        "bonds": 175,
+        "exclusiveCentral": 175,
+        "sp": 175,
+        "header": 175
+      },
+      "soldiersKey": "99196",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99197,
+      "sourceIndexes": {
+        "normal": 176,
+        "bonds": 176,
+        "exclusiveCentral": 176,
+        "sp": 176,
+        "header": 176
+      },
+      "soldiersKey": "99197",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 603,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 28,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99198,
+      "sourceIndexes": {
+        "normal": 177,
+        "bonds": 177,
+        "exclusiveCentral": 177,
+        "sp": 177,
+        "header": 177
+      },
+      "soldiersKey": "99198",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 558,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99199,
+      "sourceIndexes": {
+        "normal": 178,
+        "bonds": 178,
+        "exclusiveCentral": 178,
+        "sp": 178,
+        "header": 178
+      },
+      "soldiersKey": "99199",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 562,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99200,
+      "sourceIndexes": {
+        "normal": 179,
+        "bonds": 179,
+        "exclusiveCentral": 179,
+        "sp": 179,
+        "header": 179
+      },
+      "soldiersKey": "99200",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99201,
+      "sourceIndexes": {
+        "normal": 180,
+        "bonds": 180,
+        "exclusiveCentral": 180,
+        "sp": 180,
+        "header": 180
+      },
+      "soldiersKey": "99201",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99202,
+      "sourceIndexes": {
+        "normal": 181,
+        "bonds": 181,
+        "exclusiveCentral": 181,
+        "sp": 181,
+        "header": 181
+      },
+      "soldiersKey": "99202",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99203,
+      "sourceIndexes": {
+        "normal": 182,
+        "bonds": 182,
+        "exclusiveCentral": 182,
+        "sp": 182,
+        "header": 182
+      },
+      "soldiersKey": "99203",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 567,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99204,
+      "sourceIndexes": {
+        "normal": 183,
+        "bonds": 183,
+        "exclusiveCentral": 183,
+        "sp": 183,
+        "header": 183
+      },
+      "soldiersKey": "99204",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 561,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 27,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99205,
+      "sourceIndexes": {
+        "normal": 184,
+        "bonds": 184,
+        "exclusiveCentral": 184,
+        "sp": 184,
+        "header": 184
+      },
+      "soldiersKey": "99205",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 572,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99206,
+      "sourceIndexes": {
+        "normal": 185,
+        "bonds": 185,
+        "exclusiveCentral": 185,
+        "sp": 185,
+        "header": 185
+      },
+      "soldiersKey": "99206",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 571,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99207,
+      "sourceIndexes": {
+        "normal": 186,
+        "bonds": 186,
+        "exclusiveCentral": 186,
+        "sp": 186,
+        "header": 186
+      },
+      "soldiersKey": "99207",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 578,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99208,
+      "sourceIndexes": {
+        "normal": 187,
+        "bonds": 187,
+        "exclusiveCentral": 187,
+        "sp": 187,
+        "header": 187
+      },
+      "soldiersKey": "99208",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 573,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99209,
+      "sourceIndexes": {
+        "normal": 188,
+        "bonds": 188,
+        "exclusiveCentral": 188,
+        "sp": 188,
+        "header": 188
+      },
+      "soldiersKey": "99209",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99210,
+      "sourceIndexes": {
+        "normal": 189,
+        "bonds": 189,
+        "exclusiveCentral": 189,
+        "sp": 189,
+        "header": 189
+      },
+      "soldiersKey": "99210",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99211,
+      "sourceIndexes": {
+        "normal": 190,
+        "bonds": 190,
+        "exclusiveCentral": 190,
+        "sp": 190,
+        "header": 190
+      },
+      "soldiersKey": "99211",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99212,
+      "sourceIndexes": {
+        "normal": 191,
+        "bonds": 191,
+        "exclusiveCentral": 191,
+        "sp": 191,
+        "header": 191
+      },
+      "soldiersKey": "99212",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 580,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99213,
+      "sourceIndexes": {
+        "normal": 192,
+        "bonds": 192,
+        "exclusiveCentral": 192,
+        "sp": 192,
+        "header": 192
+      },
+      "soldiersKey": "99213",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 579,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99214,
+      "sourceIndexes": {
+        "normal": 193,
+        "bonds": 193,
+        "exclusiveCentral": 193,
+        "sp": 193,
+        "header": 193
+      },
+      "soldiersKey": "99214",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 582,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99215,
+      "sourceIndexes": {
+        "normal": 194,
+        "bonds": 194,
+        "exclusiveCentral": 194,
+        "sp": 194,
+        "header": 194
+      },
+      "soldiersKey": "99215",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 604,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99216,
+      "sourceIndexes": {
+        "normal": 195,
+        "bonds": 195,
+        "exclusiveCentral": 195,
+        "sp": 195,
+        "header": 195
+      },
+      "soldiersKey": "99216",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 612,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99217,
+      "sourceIndexes": {
+        "normal": 196,
+        "bonds": 196,
+        "exclusiveCentral": 196,
+        "sp": 196,
+        "header": 196
+      },
+      "soldiersKey": "99217",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 581,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99218,
+      "sourceIndexes": {
+        "normal": 197,
+        "bonds": 197,
+        "exclusiveCentral": 197,
+        "sp": 197,
+        "header": 197
+      },
+      "soldiersKey": "99218",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 619,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99219,
+      "sourceIndexes": {
+        "normal": 198,
+        "bonds": 198,
+        "exclusiveCentral": 198,
+        "sp": 198,
+        "header": 198
+      },
+      "soldiersKey": "99219",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 589,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99220,
+      "sourceIndexes": {
+        "normal": 199,
+        "bonds": 199,
+        "exclusiveCentral": 199,
+        "sp": 199,
+        "header": 199
+      },
+      "soldiersKey": "99220",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 588,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99221,
+      "sourceIndexes": {
+        "normal": 200,
+        "bonds": 200,
+        "exclusiveCentral": 200,
+        "sp": 200,
+        "header": 200
+      },
+      "soldiersKey": "99221",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 587,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99222,
+      "sourceIndexes": {
+        "normal": 201,
+        "bonds": 201,
+        "exclusiveCentral": 201,
+        "sp": 201,
+        "header": 201
+      },
+      "soldiersKey": "99222",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99223,
+      "sourceIndexes": {
+        "normal": 202,
+        "bonds": 202,
+        "exclusiveCentral": 202,
+        "sp": 202,
+        "header": 202
+      },
+      "soldiersKey": "99223",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 15,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99224,
+      "sourceIndexes": {
+        "normal": 203,
+        "bonds": 203,
+        "exclusiveCentral": 203,
+        "sp": 203,
+        "header": 203
+      },
+      "soldiersKey": "99224",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99225,
+      "sourceIndexes": {
+        "normal": 204,
+        "bonds": 204,
+        "exclusiveCentral": 204,
+        "sp": 204,
+        "header": 204
+      },
+      "soldiersKey": "99225",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 643,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99226,
+      "sourceIndexes": {
+        "normal": 205,
+        "bonds": 205,
+        "exclusiveCentral": 205,
+        "sp": 205,
+        "header": 205
+      },
+      "soldiersKey": "99226",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 595,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 26,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99227,
+      "sourceIndexes": {
+        "normal": 206,
+        "bonds": 206,
+        "exclusiveCentral": 206,
+        "sp": 206,
+        "header": 206
+      },
+      "soldiersKey": "99227",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 590,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99228,
+      "sourceIndexes": {
+        "normal": 207,
+        "bonds": 207,
+        "exclusiveCentral": 207,
+        "sp": 207,
+        "header": 207
+      },
+      "soldiersKey": "99228",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 620,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99229,
+      "sourceIndexes": {
+        "normal": 208,
+        "bonds": 208,
+        "exclusiveCentral": 208,
+        "sp": 208,
+        "header": 208
+      },
+      "soldiersKey": "99229",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 628,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99230,
+      "sourceIndexes": {
+        "normal": 209,
+        "bonds": 209,
+        "exclusiveCentral": 209,
+        "sp": 209,
+        "header": 209
+      },
+      "soldiersKey": "99230",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 596,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99231,
+      "sourceIndexes": {
+        "normal": 210,
+        "bonds": 210,
+        "exclusiveCentral": 210,
+        "sp": 210,
+        "header": 210
+      },
+      "soldiersKey": "99231",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 614,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99232,
+      "sourceIndexes": {
+        "normal": 211,
+        "bonds": 211,
+        "exclusiveCentral": 211,
+        "sp": 211,
+        "header": 211
+      },
+      "soldiersKey": "99232",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99233,
+      "sourceIndexes": {
+        "normal": 212,
+        "bonds": 212,
+        "exclusiveCentral": 212,
+        "sp": 212,
+        "header": 212
+      },
+      "soldiersKey": "99233",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 597,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 23,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99234,
+      "sourceIndexes": {
+        "normal": 213,
+        "bonds": 213,
+        "exclusiveCentral": 213,
+        "sp": 213,
+        "header": 213
+      },
+      "soldiersKey": "99234",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 598,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99235,
+      "sourceIndexes": {
+        "normal": 214,
+        "bonds": 214,
+        "exclusiveCentral": 214,
+        "sp": 214,
+        "header": 214
+      },
+      "soldiersKey": "99235",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99236,
+      "sourceIndexes": {
+        "normal": 215,
+        "bonds": 215,
+        "exclusiveCentral": 215,
+        "sp": 215,
+        "header": 215
+      },
+      "soldiersKey": "99236",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99237,
+      "sourceIndexes": {
+        "normal": 216,
+        "bonds": 216,
+        "exclusiveCentral": 216,
+        "sp": 216,
+        "header": 216
+      },
+      "soldiersKey": "99237",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99238,
+      "sourceIndexes": {
+        "normal": 217,
+        "bonds": 217,
+        "exclusiveCentral": 217,
+        "sp": 217,
+        "header": 217
+      },
+      "soldiersKey": "99238",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 605,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99239,
+      "sourceIndexes": {
+        "normal": 218,
+        "bonds": 218,
+        "exclusiveCentral": 218,
+        "sp": 218,
+        "header": 218
+      },
+      "soldiersKey": "99239",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 636,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99240,
+      "sourceIndexes": {
+        "normal": 219,
+        "bonds": 219,
+        "exclusiveCentral": 219,
+        "sp": 219,
+        "header": 219
+      },
+      "soldiersKey": "99240",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 613,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 27,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99241,
+      "sourceIndexes": {
+        "normal": 220,
+        "bonds": 220,
+        "exclusiveCentral": 220,
+        "sp": 220,
+        "header": 220
+      },
+      "soldiersKey": "99241",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 606,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99242,
+      "sourceIndexes": {
+        "normal": 221,
+        "bonds": 221,
+        "exclusiveCentral": 221,
+        "sp": 221,
+        "header": 221
+      },
+      "soldiersKey": "99242",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99243,
+      "sourceIndexes": {
+        "normal": 222,
+        "bonds": 222,
+        "exclusiveCentral": 222,
+        "sp": 222,
+        "header": 222
+      },
+      "soldiersKey": "99243",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 627,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99244,
+      "sourceIndexes": {
+        "normal": 223,
+        "bonds": 223,
+        "exclusiveCentral": 223,
+        "sp": 223,
+        "header": 223
+      },
+      "soldiersKey": "99244",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 611,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 28,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99245,
+      "sourceIndexes": {
+        "normal": 224,
+        "bonds": 224,
+        "exclusiveCentral": 224,
+        "sp": 224,
+        "header": 224
+      },
+      "soldiersKey": "99245",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 16,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99246,
+      "sourceIndexes": {
+        "normal": 225,
+        "bonds": 225,
+        "exclusiveCentral": 225,
+        "sp": 225,
+        "header": 225
+      },
+      "soldiersKey": "99246",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 13,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99247,
+      "sourceIndexes": {
+        "normal": 226,
+        "bonds": 226,
+        "exclusiveCentral": 226,
+        "sp": 226,
+        "header": 226
+      },
+      "soldiersKey": "99247",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 12,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99248,
+      "sourceIndexes": {
+        "normal": 227,
+        "bonds": 227,
+        "exclusiveCentral": 227,
+        "sp": 227,
+        "header": 227
+      },
+      "soldiersKey": "99248",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99249,
+      "sourceIndexes": {
+        "normal": 228,
+        "bonds": 228,
+        "exclusiveCentral": 228,
+        "sp": 228,
+        "header": 228
+      },
+      "soldiersKey": "99249",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 622,
+        "centralDisciplineStatus": "RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99250,
+      "sourceIndexes": {
+        "normal": 229,
+        "bonds": 229,
+        "exclusiveCentral": 229,
+        "sp": 229,
+        "header": 229
+      },
+      "soldiersKey": "99250",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 621,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99251,
+      "sourceIndexes": {
+        "normal": 230,
+        "bonds": 230,
+        "exclusiveCentral": 230,
+        "sp": 230,
+        "header": 230
+      },
+      "soldiersKey": "99251",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 28,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99252,
+      "sourceIndexes": {
+        "normal": 231,
+        "bonds": 231,
+        "exclusiveCentral": 231,
+        "sp": 231,
+        "header": 231
+      },
+      "soldiersKey": "99252",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 635,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99253,
+      "sourceIndexes": {
+        "normal": 232,
+        "bonds": 232,
+        "exclusiveCentral": 232,
+        "sp": 232,
+        "header": 232
+      },
+      "soldiersKey": "99253",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 629,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99254,
+      "sourceIndexes": {
+        "normal": 233,
+        "bonds": 233,
+        "exclusiveCentral": 233,
+        "sp": 233,
+        "header": 233
+      },
+      "soldiersKey": "99254",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 637,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99255,
+      "sourceIndexes": {
+        "normal": 234,
+        "bonds": 234,
+        "exclusiveCentral": 234,
+        "sp": 234,
+        "header": 234
+      },
+      "soldiersKey": "99255",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 634,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99256,
+      "sourceIndexes": {
+        "normal": 235,
+        "bonds": 235,
+        "exclusiveCentral": 235,
+        "sp": 235,
+        "header": 235
+      },
+      "soldiersKey": "99256",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 14,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99257,
+      "sourceIndexes": {
+        "normal": 236,
+        "bonds": 236,
+        "exclusiveCentral": 236,
+        "sp": 236,
+        "header": 236
+      },
+      "soldiersKey": "99257",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 13,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99258,
+      "sourceIndexes": {
+        "normal": 237,
+        "bonds": 237,
+        "exclusiveCentral": 237,
+        "sp": 237,
+        "header": 237
+      },
+      "soldiersKey": "99258",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 16,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99259,
+      "sourceIndexes": {
+        "normal": 238,
+        "bonds": 238,
+        "exclusiveCentral": 238,
+        "sp": 238,
+        "header": 238
+      },
+      "soldiersKey": "99259",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "RELEASED",
+        "equipmentId": 638,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99260,
+      "sourceIndexes": {
+        "normal": 239,
+        "bonds": 239,
+        "exclusiveCentral": 239,
+        "sp": 239,
+        "header": 239
+      },
+      "soldiersKey": "99260",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99261,
+      "sourceIndexes": {
+        "normal": 240,
+        "bonds": 240,
+        "exclusiveCentral": 240,
+        "sp": 240,
+        "header": 240
+      },
+      "soldiersKey": "99261",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99262,
+      "sourceIndexes": {
+        "normal": 241,
+        "bonds": 241,
+        "exclusiveCentral": 241,
+        "sp": 241,
+        "header": 241
+      },
+      "soldiersKey": "99262",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99263,
+      "sourceIndexes": {
+        "normal": 242,
+        "bonds": 242,
+        "exclusiveCentral": 242,
+        "sp": 242,
+        "header": 242
+      },
+      "soldiersKey": "99263",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99264,
+      "sourceIndexes": {
+        "normal": 243,
+        "bonds": 243,
+        "exclusiveCentral": 243,
+        "sp": 243,
+        "header": 243
+      },
+      "soldiersKey": "99264",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 24,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99265,
+      "sourceIndexes": {
+        "normal": 244,
+        "bonds": 244,
+        "exclusiveCentral": 244,
+        "sp": 244,
+        "header": 244
+      },
+      "soldiersKey": "99265",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99266,
+      "sourceIndexes": {
+        "normal": 245,
+        "bonds": 245,
+        "exclusiveCentral": 245,
+        "sp": 245,
+        "header": 245
+      },
+      "soldiersKey": "99266",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99267,
+      "sourceIndexes": {
+        "normal": 246,
+        "bonds": 246,
+        "exclusiveCentral": 246,
+        "sp": 246,
+        "header": 246
+      },
+      "soldiersKey": "99267",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 15,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99268,
+      "sourceIndexes": {
+        "normal": 247,
+        "bonds": 247,
+        "exclusiveCentral": 247,
+        "sp": 247,
+        "header": 247
+      },
+      "soldiersKey": "99268",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 14,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99269,
+      "sourceIndexes": {
+        "normal": 248,
+        "bonds": 248,
+        "exclusiveCentral": 248,
+        "sp": 248,
+        "header": 248
+      },
+      "soldiersKey": "99269",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 14,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99270,
+      "sourceIndexes": {
+        "normal": 249,
+        "bonds": 249,
+        "exclusiveCentral": 249,
+        "sp": 249,
+        "header": 249
+      },
+      "soldiersKey": "99270",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 16,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99271,
+      "sourceIndexes": {
+        "normal": 250,
+        "bonds": 250,
+        "exclusiveCentral": 250,
+        "sp": 250,
+        "header": 250
+      },
+      "soldiersKey": "99271",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 17,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99272,
+      "sourceIndexes": {
+        "normal": 251,
+        "bonds": 251,
+        "exclusiveCentral": 251,
+        "sp": 251,
+        "header": 251
+      },
+      "soldiersKey": "99272",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 21,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99273,
+      "sourceIndexes": {
+        "normal": 252,
+        "bonds": 252,
+        "exclusiveCentral": 252,
+        "sp": 252,
+        "header": 252
+      },
+      "soldiersKey": "99273",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99274,
+      "sourceIndexes": {
+        "normal": 253,
+        "bonds": 253,
+        "exclusiveCentral": 253,
+        "sp": 253,
+        "header": 253
+      },
+      "soldiersKey": "99274",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 18,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99275,
+      "sourceIndexes": {
+        "normal": 254,
+        "bonds": 254,
+        "exclusiveCentral": 254,
+        "sp": 254,
+        "header": 254
+      },
+      "soldiersKey": "99275",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99276,
+      "sourceIndexes": {
+        "normal": 255,
+        "bonds": 255,
+        "exclusiveCentral": 255,
+        "sp": 255,
+        "header": 255
+      },
+      "soldiersKey": "99276",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 14,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99277,
+      "sourceIndexes": {
+        "normal": 256,
+        "bonds": 256,
+        "exclusiveCentral": 256,
+        "sp": 256,
+        "header": 256
+      },
+      "soldiersKey": "99277",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 14,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99278,
+      "sourceIndexes": {
+        "normal": 257,
+        "bonds": 257,
+        "exclusiveCentral": 257,
+        "sp": 257,
+        "header": 257
+      },
+      "soldiersKey": "99278",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 11,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99279,
+      "sourceIndexes": {
+        "normal": 258,
+        "bonds": 258,
+        "exclusiveCentral": 258,
+        "sp": 258,
+        "header": 258
+      },
+      "soldiersKey": "99279",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99280,
+      "sourceIndexes": {
+        "normal": 259,
+        "bonds": 259,
+        "exclusiveCentral": 259,
+        "sp": 259,
+        "header": 259
+      },
+      "soldiersKey": "99280",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99281,
+      "sourceIndexes": {
+        "normal": 260,
+        "bonds": 260,
+        "exclusiveCentral": 260,
+        "sp": 260,
+        "header": 260
+      },
+      "soldiersKey": "99281",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 20,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99282,
+      "sourceIndexes": {
+        "normal": 261,
+        "bonds": 261,
+        "exclusiveCentral": 261,
+        "sp": 261,
+        "header": 261
+      },
+      "soldiersKey": "99282",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 22,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99283,
+      "sourceIndexes": {
+        "normal": 262,
+        "bonds": 262,
+        "exclusiveCentral": 262,
+        "sp": 262,
+        "header": 262
+      },
+      "soldiersKey": "99283",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 19,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99284,
+      "sourceIndexes": {
+        "normal": 263,
+        "bonds": 263,
+        "exclusiveCentral": 263,
+        "sp": 263,
+        "header": 263
+      },
+      "soldiersKey": "99284",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 12,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99285,
+      "sourceIndexes": {
+        "normal": 264,
+        "bonds": 264,
+        "exclusiveCentral": 264,
+        "sp": 264,
+        "header": 264
+      },
+      "soldiersKey": "99285",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 15,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99286,
+      "sourceIndexes": {
+        "normal": 265,
+        "bonds": 265,
+        "exclusiveCentral": 265,
+        "sp": 265,
+        "header": 265
+      },
+      "soldiersKey": "99286",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 12,
+        "spStatus": "NOT_RELEASED"
+      }
+    },
+    {
+      "heroId": 99287,
+      "sourceIndexes": {
+        "normal": 266,
+        "bonds": 266,
+        "exclusiveCentral": 266,
+        "sp": 266,
+        "header": 266
+      },
+      "soldiersKey": "99287",
+      "snapshot": {
+        "exclusiveEquipmentStatus": "NOT_RELEASED",
+        "equipmentId": 0,
+        "centralDisciplineStatus": "NOT_RELEASED",
+        "soldierCount": 25,
+        "spStatus": "NOT_RELEASED"
+      }
+    }
+  ]
+}
