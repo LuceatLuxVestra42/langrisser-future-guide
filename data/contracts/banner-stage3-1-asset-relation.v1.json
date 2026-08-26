@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 3-1",
+  "purpose": "Resolve frozen Stage 2 occurrence display provenance to actual repository banner assets, census the two approved asset roots, and materialize occurrence/definition asset relations without changing canonical banner identity.",
+  "inputs": {
+    "stage30Summary": "data/validation/banner-stage3-0-input-summary.v1.json",
+    "definitions": "data/generated/banner-definitions.v1.json",
+    "occurrences": "data/generated/banner-occurrences.v1.json"
+  },
+  "assetRoots": {
+    "Banner": "public/images/banners/Banner",
+    "Picture_Notice": "public/images/banners/Picture_Notice"
+  },
+  "expectedCanonicalPopulation": {
+    "definitions": 77,
+    "occurrences": 94,
+    "occurrenceDisplayBlocks": 94,
+    "nonNullImageReferences": 93,
+    "nullImageReferences": 1
+  },
+  "allowedSourceImageStatuses": [
+    "matched",
+    "manual-replacement"
+  ],
+  "resolutionPolicy": {
+    "lookup": "exact basename inside the root selected by occurrence.display.imageType",
+    "crossRootFallbackAllowed": false,
+    "filenameSimilarityAllowed": false,
+    "assetId": "basset:v1:<first 24 lowercase hex chars of SHA-256(file bytes)>",
+    "exactByteDuplicates": "share one assetId and are reported as multiple repository paths",
+    "perceptualImageEquivalence": false,
+    "canonicalAssetOwner": false,
+    "assetMayMergeBannerDefinitions": false,
+    "nullImageFile": "MANUAL_ASSET_REQUIRED; do not synthesize a filename"
+  },
+  "relationStatuses": [
+    "VERIFIED_MATCHED_FILE",
+    "VERIFIED_MANUAL_REPLACEMENT_FILE",
+    "MANUAL_ASSET_REQUIRED",
+    "MISSING_REFERENCED_FILE",
+    "AMBIGUOUS_REFERENCED_FILE",
+    "UNSUPPORTED_IMAGE_TYPE"
+  ],
+  "completionPolicy": {
+    "allOccurrencesAccounted": true,
+    "missingReferencedFilesAllowed": false,
+    "ambiguousReferencedFilesAllowed": false,
+    "unsupportedImageTypesAllowed": false,
+    "nullReferenceMustRemainExplicit": true,
+    "stage2CanonicalIdsMutable": false
+  },
+  "outputs": {
+    "relations": "data/generated/banner-stage3-1-asset-relations.v1.json",
+    "summary": "data/validation/banner-stage3-1-asset-summary.v1.json"
+  },
+  "nextStage": "Banner Stage 3-2 asset display metadata / replacement policy"
+}
