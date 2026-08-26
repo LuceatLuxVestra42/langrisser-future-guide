@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 3-2",
+  "purpose": "Project frozen Stage 3-1 asset relations into UI-safe occurrence/definition display metadata and freeze explicit replacement/fallback policy without changing canonical banner identity or inventing asset ownership.",
+  "inputs": {
+    "stage31Summary": "data/validation/banner-stage3-1-asset-summary.v1.json",
+    "stage31Relations": "data/generated/banner-stage3-1-asset-relations.v1.json",
+    "occurrences": "data/generated/banner-occurrences.v1.json",
+    "definitions": "data/generated/banner-definitions.v1.json"
+  },
+  "expectedCanonicalPopulation": {
+    "definitions": 77,
+    "occurrences": 94,
+    "resolvedOccurrences": 93,
+    "manualAssetRequiredOccurrences": 1,
+    "definitionsWithNoResolvedAsset": 1,
+    "definitionsWithMultipleAssets": 0
+  },
+  "occurrenceDisplayPolicy": {
+    "VERIFIED_MATCHED_FILE": {
+      "displayState": "READY_VERIFIED_SOURCE_ASSET",
+      "canRenderImage": true,
+      "provenance": "SOURCE_MATCHED",
+      "replacementState": "NONE"
+    },
+    "VERIFIED_MANUAL_REPLACEMENT_FILE": {
+      "displayState": "READY_VERIFIED_MANUAL_REPLACEMENT",
+      "canRenderImage": true,
+      "provenance": "MANUAL_REPLACEMENT",
+      "replacementState": "VERIFIED_MANUAL_REPLACEMENT"
+    },
+    "MANUAL_ASSET_REQUIRED": {
+      "displayState": "PLACEHOLDER_MANUAL_ASSET_REQUIRED",
+      "canRenderImage": false,
+      "provenance": "NO_RESOLVED_ASSET",
+      "replacementState": "MANUAL_ASSET_REQUIRED"
+    }
+  },
+  "publicPathPolicy": {
+    "repositoryPrefix": "public/",
+    "webPrefix": "/",
+    "rule": "resolvedPath must start with public/; remove the prefix and prepend /"
+  },
+  "fallbackPolicy": {
+    "occurrenceMayInheritDefinitionAsset": false,
+    "occurrenceMayBorrowSiblingOccurrenceAsset": false,
+    "crossDefinitionAssetFallback": false,
+    "filenameSimilarityFallback": false,
+    "perceptualSimilarityFallback": false,
+    "placeholderForUnresolvedOccurrence": true,
+    "manualReplacementRequiresExplicitOccurrenceScopedAssignment": true,
+    "replacementAssignmentAuthority": "upstream occurrence display provenance plus Stage 3-1 verified relation; Stage 3-2 does not invent override assignments"
+  },
+  "definitionDisplayPolicy": {
+    "singleUniqueResolvedAsset": "DERIVED_SINGLE_ASSET_REFERENCE",
+    "zeroResolvedAssets": "NO_RESOLVED_DISPLAY_ASSET",
+    "multipleResolvedAssets": "MULTIPLE_ASSETS_NO_AUTOMATIC_DEFAULT",
+    "canonicalAssetOwner": false,
+    "assetSharingMayMergeDefinitions": false
+  },
+  "completionPolicy": {
+    "allOccurrencesHaveDisplayMetadata": true,
+    "allDefinitionsHaveDisplayMetadata": true,
+    "renderableOccurrenceRequiresResolvedAsset": true,
+    "unresolvedOccurrenceMustRemainExplicitPlaceholder": true,
+    "multipleDefinitionAssetsMustNotAutoChooseDefault": true,
+    "stage2CanonicalIdsMutable": false,
+    "stage31AssetIdsMutable": false
+  },
+  "outputs": {
+    "displayMetadata": "data/generated/banner-stage3-2-display-metadata.v1.json",
+    "summary": "data/validation/banner-stage3-2-display-summary.v1.json"
+  },
+  "nextStage": "Banner Stage 3-3 basic banner table consumer"
+}
