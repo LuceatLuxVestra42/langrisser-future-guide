@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 3-5",
+  "purpose": "Materialize a compact CP/Event consumer from the frozen Stage 2 CP text-reference structure and Stage 3-3 basic-table display rows without inventing a canonical Event join.",
+  "inputs": {
+    "stage33Summary": "data/validation/banner-stage3-3-basic-table-summary.v1.json",
+    "stage33BasicTable": "data/generated/banner-stage3-3-basic-table-consumer.v1.json",
+    "cpEventRelations": "data/generated/banner-cp-event-relations.v1.json"
+  },
+  "expectedCanonicalPopulation": {
+    "definitions": 77,
+    "occurrences": 94,
+    "cpRelatedDefinitions": 4,
+    "cpRelatedOccurrences": 4,
+    "eventTextReferences": 4,
+    "canonicalEventRelations": 0
+  },
+  "consumerPolicy": {
+    "definitionContextStoredOnce": true,
+    "occurrenceIdentity": "bannerOccurrenceId",
+    "definitionIdentity": "bannerDefinitionId",
+    "cpRelationType": "CP_RELATED",
+    "eventReferenceRelationType": "CP_EVENT_TEXT_REFERENCE",
+    "eventReferenceLabelSource": "Stage 2 eventTextReference.labelCn only",
+    "eventEvidenceSource": "Stage 2 cpContext evidence only",
+    "basicDisplaySource": "Stage 3-3 basic table row only",
+    "pickupSummarySource": "Stage 3-3 projected pickupHeroes only",
+    "canonicalEventIdInvented": false,
+    "eventConfigJoined": false,
+    "eventRouteInvented": false,
+    "eventKoreanNameInvented": false,
+    "textReferenceUsedAsCanonicalIdentity": false,
+    "wishCandidateRelationsIncluded": false,
+    "recurrenceHistoryIncluded": false
+  },
+  "completionPolicy": {
+    "allCpDefinitionsAccounted": true,
+    "allCpOccurrencesAccounted": true,
+    "allEventTextReferencesAccounted": true,
+    "canonicalEventRelationMustRemainZero": true,
+    "canonicalEventIdMustRemainNull": true,
+    "joinMethodMustRemainNone": true,
+    "missingStage33RowsAllowed": false,
+    "nonCpOccurrenceLeakAllowed": false,
+    "stage2CanonicalIdsMutable": false,
+    "stage2CpRelationsMutable": false
+  },
+  "outputs": {
+    "consumer": "data/generated/banner-stage3-5-cp-event-consumer.v1.json",
+    "summary": "data/validation/banner-stage3-5-cp-event-summary.v1.json"
+  },
+  "nextStage": "Banner Stage 3-6 recurrence/pickup-log consumer"
+}
