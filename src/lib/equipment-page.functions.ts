@@ -1,24 +1,23 @@
-import { createServerFn } from "@tanstack/react-start";
-
 import {
   readEquipmentDetailPageData,
   readExclusiveEquipmentPageData,
   readGeneralEquipmentPageData,
 } from "./equipment-page.server";
 
-export const getGeneralEquipmentPageData = createServerFn({ method: "GET" }).handler(
-  async () => readGeneralEquipmentPageData(),
-);
+export function getGeneralEquipmentPageData() {
+  return readGeneralEquipmentPageData();
+}
 
-export const getExclusiveEquipmentPageData = createServerFn({ method: "GET" }).handler(
-  async () => readExclusiveEquipmentPageData(),
-);
+export function getExclusiveEquipmentPageData() {
+  return readExclusiveEquipmentPageData();
+}
 
-export const getEquipmentDetailPageData = createServerFn({ method: "GET" })
-  .validator((input: { equipmentId: number }) => {
-    if (!Number.isSafeInteger(input.equipmentId) || input.equipmentId <= 0) {
-      throw new Error("equipmentId must be a positive safe integer.");
-    }
-    return input;
-  })
-  .handler(async ({ data }) => readEquipmentDetailPageData(data.equipmentId));
+export function getEquipmentDetailPageData(input: { data: { equipmentId: number } }) {
+  const equipmentId = input.data.equipmentId;
+
+  if (!Number.isSafeInteger(equipmentId) || equipmentId <= 0) {
+    throw new Error("equipmentId must be a positive safe integer.");
+  }
+
+  return readEquipmentDetailPageData(equipmentId);
+}
