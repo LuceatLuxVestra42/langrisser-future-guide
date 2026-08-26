@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "stage": "B-3",
+  "checkpoint": "full-canonical-ownership-generation",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "generatedArtifact": "data/generated/hero-exclusive-equipment-relations.v1.json",
+  "generationMode": "REUSE_VALIDATED_SKILLHERO_CHECKPOINT",
+  "authoritativeProvenance": "ConfigDataEquipmentInfo.SkillHero",
+  "summary": {
+    "canonicalHeroCount": 267,
+    "exclusiveEquipmentCount": 167,
+    "canonicalEdgeCount": 167,
+    "mappedExclusiveEquipmentCount": 167,
+    "uniqueOwnerHeroCount": 167,
+    "unmappedExclusiveEquipmentCount": 0,
+    "duplicatePairCount": 0,
+    "multiOwnerEquipmentCount": 0,
+    "multipleEquipmentHeroCount": 0,
+    "excludedEquipmentLeakCount": 0,
+    "unknownHeroIdCount": 0,
+    "ownerResolverMismatchCount": 0,
+    "ownerHeroMismatchCount": 0,
+    "heuristicEdgeCount": 0,
+    "hardErrorCount": 0
+  },
+  "unmappedExclusiveEquipmentIds": [],
+  "hardErrors": [],
+  "cardinalityObservation": {
+    "uniqueOwnerHeroCount": 167,
+    "heroesWithMultipleExclusiveEquipment": 0,
+    "equipmentWithMultipleOwners": 0,
+    "frozenAsInvariant": false,
+    "boundary": "B-4 owns cardinality freeze."
+  },
+  "nextStage": "B-4 full relation validation and cardinality freeze",
+  "decision": "B-3 PASS / COMPLETE; proceed to B-4 without reopening B-1/B-2."
+}
