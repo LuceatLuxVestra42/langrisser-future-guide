@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "stage": "Banner Stage 3-7",
+  "purpose": "Integrate the frozen Banner Stage 3 consumers into the actual TanStack frontend without changing banner semantics.",
+  "route": "/banners",
+  "mainNavigation": {
+    "categoryLabel": "가챠 배너",
+    "target": "/banners"
+  },
+  "sections": [
+    "배너표",
+    "배너+이벤트",
+    "CP배너",
+    "픽업 log"
+  ],
+  "expected": {
+    "bannerRows": 94,
+    "dateGroups": 31,
+    "pickupRows": 71,
+    "wishRows": 23,
+    "renderableRows": 93,
+    "wishDefinitions": 14,
+    "wishCandidateEdges": 464,
+    "cpOccurrences": 4,
+    "canonicalEventRelations": 0,
+    "recurrenceLinks": 17,
+    "repeatedPickupDefinitions": 8
+  },
+  "policy": {
+    "basicTableSource": "data/generated/banner-stage3-3-basic-table-consumer.v1.json",
+    "wishSource": "data/generated/banner-stage3-4-wish-consumer.v1.json",
+    "cpEventSource": "data/generated/banner-stage3-5-cp-event-consumer.v1.json",
+    "recurrenceSource": "data/generated/banner-stage3-6-recurrence-pickup-log-consumer.v1.json",
+    "generalEventScheduleJoined": false,
+    "canonicalEventIdInvented": false,
+    "eventRouteInvented": false,
+    "heroRouteInvented": false,
+    "wishManualCandidatesSynthesized": false,
+    "recurrencePredictionAllowed": false,
+    "observedGapPromotedToCadence": false,
+    "sourceConfigDataReadByFrontend": false
+  },
+  "completion": {
+    "frontendValidationPasses": true,
+    "productionBuildPasses": true,
+    "routeTreeContainsBannerRoute": true,
+    "stage3SemanticSourcesRemainUnchanged": true
+  }
+}
