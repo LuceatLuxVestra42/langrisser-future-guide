@@ -1,0 +1,108 @@
+name: Hero-Soldier Stage C-1 Pair Parity
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'work/hero-soldier-stageC-1'
+    paths:
+      - 'scripts/validate-hero-soldier-stageC-1-pair-parity.cjs'
+      - 'data/contracts/hero-soldier-integration-stageC-0-input.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-0-summary.v1.json'
+      - 'data/validation/hero-soldier-relation-stageA-final.v1.json'
+      - 'data/generated/hero-soldier-relations.v1.json'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/hero-detail/by-id/**'
+      - 'data/validation/hero-stage6-4-final.v1.json'
+      - 'data/generated/soldier-stage6-1-full-records.v1.json'
+      - 'data/validation/soldier-stage6-7-site-admission.v1.json'
+      - '.github/workflows/hero-soldier-stageC-1-pair-parity.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/validate-hero-soldier-stageC-1-pair-parity.cjs'
+      - 'data/contracts/hero-soldier-integration-stageC-0-input.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-0-summary.v1.json'
+      - 'data/validation/hero-soldier-relation-stageA-final.v1.json'
+      - 'data/generated/hero-soldier-relations.v1.json'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/hero-detail/by-id/**'
+      - 'data/validation/hero-stage6-4-final.v1.json'
+      - 'data/generated/soldier-stage6-1-full-records.v1.json'
+      - 'data/validation/soldier-stage6-7-site-admission.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json'
+      - '.github/workflows/hero-soldier-stageC-1-pair-parity.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-final-pair-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate C-1 final cross-consumer pair parity
+        id: validate
+        continue-on-error: true
+        run: node scripts/validate-hero-soldier-stageC-1-pair-parity.cjs
+
+      - name: Show C-1 summary
+        if: always() && hashFiles('data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json') != ''
+        run: |
+          node - <<'NODE'
+          const v = require('./data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json');
+          console.log(JSON.stringify({
+            status: v.status,
+            completion: v.completion,
+            summary: v.summary,
+            differences: v.differences,
+            hardErrors: v.hardErrors,
+            decision: v.decision
+          }, null, 2));
+          NODE
+
+      - name: Upload C-1 diagnostics
+        if: always() && hashFiles('data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-soldier-stageC-1-pair-parity
+          path: data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json
+
+      - name: Freeze C-1 output on work branch
+        if: steps.validate.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/hero-soldier-stageC-1')
+        run: |
+          TARGET='data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
+            echo 'C-1 output already frozen.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$TARGET"
+          git commit -m 'Freeze Hero-Soldier Stage C-1 pair parity PASS'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Verify frozen C-1 output on PR
+        if: steps.validate.outcome == 'success' && github.event_name == 'pull_request'
+        run: |
+          TARGET='data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json'
+          if [ -n "$(git status --porcelain -- "$TARGET")" ]; then
+            echo 'C-1 output is missing or stale.'
+            git status --short -- "$TARGET"
+            exit 1
+          fi
+
+      - name: Enforce C-1 gate
+        if: always() && steps.validate.outcome != 'success'
+        run: exit 1
