@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "stage": "B-5",
+  "checkpoint": "bidirectional-index-generation-round-trip-validation",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/hero-exclusive-equipment-relation-index-contract.v1.json",
+  "relationSet": {
+    "path": "data/generated/hero-exclusive-equipment-relations.v1.json",
+    "gitBlobSha": "33caa16212a5a71195015e05c815024fb62e6be6",
+    "edgeCount": 167,
+    "b4ValidatedBlobSha": "33caa16212a5a71195015e05c815024fb62e6be6"
+  },
+  "artifacts": {
+    "byHero": "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+    "byEquipment": "data/generated/hero-exclusive-equipment-by-equipment.v1.json"
+  },
+  "checks": {
+    "b4Gate": {
+      "pass": true
+    },
+    "relationBlobPin": {
+      "pass": true
+    },
+    "byHeroKeyCount": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "byHeroRelationCount": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "byHeroMaxValueCount": {
+      "expected": 1,
+      "actual": 1,
+      "pass": true
+    },
+    "byEquipmentKeyCount": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "byEquipmentRelationCount": {
+      "expected": 167,
+      "actual": 167,
+      "pass": true
+    },
+    "byEquipmentMaxValueCount": {
+      "expected": 1,
+      "actual": 1,
+      "pass": true
+    },
+    "byHeroDuplicateValues": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "byEquipmentDuplicateValues": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "canonicalVsByHero": {
+      "missing": 0,
+      "extra": 0,
+      "pass": true
+    },
+    "canonicalVsByEquipment": {
+      "missing": 0,
+      "extra": 0,
+      "pass": true
+    },
+    "directionalParity": {
+      "mismatch": 0,
+      "pass": true
+    },
+    "hardErrors": {
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  },
+  "cardinalityProjection": {
+    "equipmentToHero": "EXACTLY_ONE",
+    "heroToEquipment": "ZERO_OR_ONE",
+    "byHeroKeys": 167,
+    "canonicalHeroesWithoutKey": 100,
+    "byEquipmentKeys": 167,
+    "arrayShapePreserved": true
+  },
+  "diagnostics": {
+    "canonicalMissingFromHero": [],
+    "heroExtra": [],
+    "canonicalMissingFromEquipment": [],
+    "equipmentExtra": [],
+    "directionalMismatch": [],
+    "errors": []
+  },
+  "nextStage": "B-6 consumer admission",
+  "decision": "B-5 PASS / COMPLETE. Both indexes are lossless projections of the exact B-4 validated relation blob and may be admitted to B-6 consumers."
+}
