@@ -1,0 +1,83 @@
+name: Hero-Soldier Stage C-5 Final Closeout
+
+on:
+  push:
+    branches:
+      - work/hero-soldier-stageC-5
+    paths:
+      - 'data/validation/hero-soldier-integration-stageC-0-summary.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-3-special-fixtures.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-final.v1.json'
+      - 'scripts/validate-hero-soldier-stageC-5-final.cjs'
+      - '.github/workflows/hero-soldier-stageC-5-final.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/validation/hero-soldier-integration-stageC-0-summary.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-3-special-fixtures.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json'
+      - 'data/validation/hero-soldier-integration-stageC-final.v1.json'
+      - 'scripts/validate-hero-soldier-stageC-5-final.cjs'
+      - '.github/workflows/hero-soldier-stageC-5-final.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-final-closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate C-5 final closeout
+        run: node scripts/validate-hero-soldier-stageC-5-final.cjs
+
+      - name: Show C-FINAL summary
+        if: always()
+        run: |
+          if [ -f data/validation/hero-soldier-integration-stageC-final.v1.json ]; then
+            node -e "const x=require('./data/validation/hero-soldier-integration-stageC-final.v1.json'); console.log(JSON.stringify({status:x.status,completion:x.completion,pipelineStatus:x.pipelineStatus,summary:x.summary,decision:x.decision},null,2))"
+          fi
+
+      - name: Upload C-FINAL diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-soldier-stageC-final
+          path: data/validation/hero-soldier-integration-stageC-final.v1.json
+          if-no-files-found: ignore
+
+      - name: Freeze C-FINAL output on work branch
+        if: github.event_name == 'push' && success()
+        run: |
+          OUTPUT='data/validation/hero-soldier-integration-stageC-final.v1.json'
+          if [ -z "$(git status --porcelain -- "$OUTPUT")" ]; then
+            echo 'C-FINAL output already frozen.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$OUTPUT"
+          git commit -m 'Freeze Hero-Soldier Stage C-FINAL PASS_WITH_REVIEW'
+          git push
+
+      - name: Verify frozen C-FINAL output on PR
+        if: github.event_name == 'pull_request' && success()
+        run: |
+          OUTPUT='data/validation/hero-soldier-integration-stageC-final.v1.json'
+          test -f "$OUTPUT"
+          test -z "$(git status --porcelain -- "$OUTPUT")"
