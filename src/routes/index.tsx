@@ -50,7 +50,7 @@ const categories: Category[] = [
   { title: "업데이트", image: cardUpdate, to: "/", primary: true },
   { title: "가챠 배너", image: cardGacha, to: "/" },
   { title: "캐릭터", image: cardCharacter, to: "/" },
-  { title: "장비", image: cardEquip, to: "/" },
+  { title: "장비", image: cardEquip, to: "/equipment" },
   { title: "스킨", image: cardSkin, to: "/" },
   { title: "용병", image: cardMerc, to: "/" },
   { title: "이벤트", image: cardEvent, to: "/", imageClassName: "h-[132px] w-[132px]" },
