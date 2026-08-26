@@ -1,0 +1,37 @@
+name: Hero Exclusive Equipment Relation Stage B-3
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hero-exclusive-equipment-relation-stageB3.yml'
+      - 'scripts/build_hero_exclusive_equipment_relation_stageB3.cjs'
+      - 'data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json'
+      - 'data/contracts/hero-exclusive-equipment-relation-source-contract.v1.json'
+      - 'data/validation/hero-exclusive-equipment-relation-stageB2-fixture-summary.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'data/generated/equipment_stage2_7_acquisition.json'
+      - 'data/generated/hero-page-stage5-2-exclusive-central.v1.json'
+      - 'data/validation/hero-page-stage5-2-final.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and validate Stage B-3 canonical relation
+        run: node scripts/build_hero_exclusive_equipment_relation_stageB3.cjs
+      - name: Persist Stage B-3 checkpoints
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/hero-exclusive-equipment-relations.v1.json data/validation/hero-exclusive-equipment-relation-stageB3-summary.v1.json
+          if git diff --cached --quiet; then
+            echo "No Stage B-3 changes"
+            exit 0
+          fi
+          git commit -m "Freeze Stage B-3 canonical exclusive equipment relation"
+          git push
