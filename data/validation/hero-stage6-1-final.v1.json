@@ -1,7 +1,7 @@
 {
-  "version": 1,
+  "version": 2,
   "stage": "hero-page-6-1",
-  "checkpoint": "final-integration",
+  "checkpoint": "normalized-composition-index",
   "status": "PASS",
   "completion": "COMPLETE",
   "contract": "data/contracts/hero-stage6-1-detail-integration.v1.json",
@@ -83,10 +83,16 @@
       "actual": 267,
       "pass": true
     },
-    "exactCopyIntegrity": {
+    "sourceLocatorIntegrity": {
       "expected": 0,
       "actual": 0,
       "pass": true
+    },
+    "normalizedOutput": {
+      "expected": true,
+      "actual": true,
+      "pass": true,
+      "duplicatedUpstreamPayloadBlocks": false
     },
     "stage5IntegrationClosed": {
       "expected": "PASS/STAGE_5_COMPLETE",
@@ -113,16 +119,17 @@
     "sharedSoldierMetadataCount": 224,
     "stageBState": "PENDING_B_STAGE_NON_BLOCKING",
     "stageBParityMismatchCount": 0,
-    "exactCopyMismatchCount": 0,
+    "sourceLocatorMismatchCount": 0,
+    "duplicatedUpstreamPayloadBlocks": false,
     "inheritedReviewCount": 3,
     "hardErrorCount": 0
   },
   "inheritedReviews": [
-    "Stage B shared Hero-exclusive Equipment byHero index is not present yet; Stage 6-1 uses the frozen Stage 5-2 display snapshot without re-deriving ownership.",
+    "Stage B shared Hero-exclusive Equipment byHero index is not present yet; Stage 6-1 references the frozen Stage 5-2 snapshot without re-deriving ownership.",
     "41 Soldier Korean display names remain non-blocking presentation REVIEW from Stage 5-3.",
     "176 regular skins remain UNENCODED for acquisition because source GetPathType is omitted."
   ],
   "stageBParityMismatches": [],
   "hardErrors": [],
-  "decision": "Hero Stage 6-1 is COMPLETE. All 267 Hero detail records are composed from frozen Stage 4/5 sources without semantic re-derivation. Stage B ownership adoption remains an explicit parallel dependency only when its shared relation artifact is not yet available."
+  "decision": "Hero Stage 6-1 is COMPLETE. A normalized 267-Hero composition index resolves all frozen Stage 4/5 blocks without duplicating their payloads or re-deriving semantics. Stage B ownership adoption remains an explicit parallel dependency only while its shared relation artifact is unavailable."
 }
