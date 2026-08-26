@@ -22,8 +22,8 @@ on:
       - 'data/hero-page-stage5-5-3.v1.json'
       - 'data/generated/hero-exclusive-equipment-relations.v1.json'
       - 'data/validation/hero-exclusive-equipment-relation-stageB4-validation.v1.json'
-      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
       - 'scripts/build_hero_stage6_3_full_generation.cjs'
+      - 'scripts/run_hero_stage6_3_full_generation.cjs'
       - '.github/workflows/hero-stage6-3-full-generation.yml'
   pull_request:
     paths:
@@ -46,8 +46,8 @@ on:
       - 'data/hero-page-stage5-5-3.v1.json'
       - 'data/generated/hero-exclusive-equipment-relations.v1.json'
       - 'data/validation/hero-exclusive-equipment-relation-stageB4-validation.v1.json'
-      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
       - 'scripts/build_hero_stage6_3_full_generation.cjs'
+      - 'scripts/run_hero_stage6_3_full_generation.cjs'
       - '.github/workflows/hero-stage6-3-full-generation.yml'
 
 permissions:
@@ -71,7 +71,7 @@ jobs:
       - name: Build and validate all 267 Hero details
         id: build
         continue-on-error: true
-        run: node scripts/build_hero_stage6_3_full_generation.cjs
+        run: node scripts/run_hero_stage6_3_full_generation.cjs
 
       - name: Show Stage 6-3 summary
         if: always() && hashFiles('data/validation/hero-stage6-3-final.v1.json') != ''
