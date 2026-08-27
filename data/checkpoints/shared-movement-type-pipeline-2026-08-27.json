@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "checkpoint": "shared-movement-type-pipeline-2026-08-27",
+  "status": "IMPLEMENTED_PENDING_BULK_RUN",
+  "completedScope": [
+    "Defined the shared five-value MoveType dictionary for Hero jobs and Soldiers.",
+    "Defined Hero movement as Job-scoped via ConfigDataJobInfo.MoveType.",
+    "Defined Soldier movement as Soldier-scoped via ConfigDataSoldierInfo.MoveType.",
+    "Added a deterministic generator for a lightweight shared runtime index and validation report.",
+    "Preserved the existing Hero and Soldier frozen semantic stages without rewriting their large generated outputs."
+  ],
+  "movementTypes": [
+    { "id": 1, "key": "RIDE", "nameKr": "기마 이동", "iconFileName": "Move_Ride.png" },
+    { "id": 2, "key": "WALK", "nameKr": "보행 이동", "iconFileName": "Move_Walk.png" },
+    { "id": 3, "key": "WATER", "nameKr": "수상 이동", "iconFileName": "Move_Water.png" },
+    { "id": 4, "key": "FLY", "nameKr": "비행 이동", "iconFileName": "Move_Fly.png" },
+    { "id": 5, "key": "FIELD_ARMY", "nameKr": "야전 이동", "iconFileName": "Move_FieldArmy.png" }
+  ],
+  "confirmedJoins": {
+    "hero": "hero-job-links.v1.json records[].connections[].jobId == ConfigDataJobInfo.ID -> MoveType/BF_MovePoint",
+    "soldier": "soldier-master.v1.json records[].soldierId == ConfigDataSoldierInfo.ID -> MoveType/BF_MovePoint"
+  },
+  "fieldArmyEvidence": {
+    "soldierIds": [1033, 1037],
+    "gameUiCrossCheckedSoldierId": 1037,
+    "meaning": "MoveType 5 = 야전 이동"
+  },
+  "sources": [
+    "data/configdata/ConfigDataJobInfo.json",
+    "data/configdata/ConfigDataSoldierInfo.json",
+    "data/generated/hero-job-links.v1.json",
+    "data/generated/soldier-master.v1.json"
+  ],
+  "newFiles": [
+    "data/contracts/hero-soldier-movement-type-presentation.v1.json",
+    "scripts/build_shared_movement_types.mjs"
+  ],
+  "plannedOutputs": [
+    "data/generated/shared-movement-type-index.v1.json",
+    "data/validation/shared-movement-type-index-final.v1.json"
+  ],
+  "boundaries": {
+    "heroSemanticPipelineReopened": false,
+    "soldierSemanticPipelineReopened": false,
+    "actualIconBinaryWebDeliveryIncluded": false,
+    "runtimeConfigDataReadAllowed": false
+  },
+  "nextStartPoint": "Run node scripts/build_shared_movement_types.mjs against the current decoded ConfigData snapshot, inspect the compact validation summary, then publish the generated shared index. After PNG extraction, bind the five iconFileName identifiers in frontend asset integration."
+}
