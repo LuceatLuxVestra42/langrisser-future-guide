@@ -1,0 +1,102 @@
+name: Soldier Stage 3G Hosted QA Final Smoke
+
+on:
+  push:
+    branches:
+      - qa/soldier-stage3g-hosted-deploy7
+    paths:
+      - '.github/workflows/soldier-stage3g-hosted-smoke-final.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hosted-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hosted HTTP final smoke
+        env:
+          BASE: https://luceatluxvestra42.github.io/langrisser-future-guide
+          EXPECTED_QA_SHA: 2d126496fe393b9383840ea20ac00d86ee221a56
+        run: |
+          set -euo pipefail
+          get_code() { curl -sS -L -o "$2" -w '%{http_code}' "$BASE$1"; }
+
+          marker="$(curl -fsSL "$BASE/qa-commit.txt" | tr -d '\r\n')"
+          test "$marker" = "$EXPECTED_QA_SHA"
+          echo "PASS freshness $marker"
+
+          for route in / /soldiers/ /soldiers/300/ /soldiers/1000/ /soldiers/102/ /soldiers/5621/ /equipment/exclusive/ /banners/; do
+            code="$(curl -sS -L -o /tmp/route.html -w '%{http_code}' "$BASE$route")"
+            test "$code" = 200
+            echo "PASS route $route"
+          done
+
+          for route in /soldiers/ /soldiers/300/ /soldiers/1000/ /soldiers/5621/ /equipment/exclusive/; do
+            curl -fsSL "$BASE$route" -o /tmp/a
+            curl -fsSL "$BASE$route" -o /tmp/b
+            cmp -s /tmp/a /tmp/b
+            echo "PASS direct-refresh $route"
+          done
+
+          for pair in '/soldiers /soldiers/' '/soldiers/300 /soldiers/300/' '/equipment/exclusive /equipment/exclusive/'; do
+            set -- $pair
+            curl -fsSL "$BASE$1" -o /tmp/a
+            curl -fsSL "$BASE$2" -o /tmp/b
+            cmp -s /tmp/a /tmp/b
+            echo "PASS trailing-slash $1 $2"
+          done
+
+          code="$(curl -sS -L -o /tmp/unknown -w '%{http_code}' "$BASE/soldiers/999999/")"
+          test "$code" = 404
+          echo "PASS unknown-404"
+
+          for asset in /images/soldiers/300.png /images/soldiers/1000.png /images/soldiers/102.png /images/army/Icon_Occupation_Cavalry.png /favicon.ico; do
+            curl -fsSL "$BASE$asset" -o /tmp/asset
+            test -s /tmp/asset
+            echo "PASS asset $asset"
+          done
+          code="$(curl -sS -L -o /tmp/wrongcase -w '%{http_code}' "$BASE/Images/soldiers/300.png")"
+          test "$code" != 200
+          echo "PASS case-guard $code"
+
+          for sid in 300 1000 102; do
+            curl -fsSL "$BASE/soldiers/$sid/" -o /tmp/detail
+            grep -q "images/soldiers/$sid.png" /tmp/detail
+            echo "PASS portrait-reference $sid"
+          done
+
+          curl -fsSL "$BASE/soldiers/" -o /tmp/soldiers.html
+          grep -q '/langrisser-future-guide/favicon.ico' /tmp/soldiers.html
+          if grep -Eq '(src|href)=["'"']/((assets|images)/|favicon\.ico)' /tmp/soldiers.html; then
+            echo 'FAIL domain-root static reference remains'
+            grep -Eo '(src|href)=["'"']/[^"'"']+' /tmp/soldiers.html | head -20 || true
+            exit 1
+          fi
+          echo 'PASS repo-base static references'
+
+          python - <<'PY'
+          import re, urllib.request
+          html=open('/tmp/soldiers.html', encoding='utf-8').read()
+          refs=sorted(set(re.findall(r'(?:src|href)=["\']([^"\']+)["\']', html)))
+          checked=0
+          for ref in refs:
+              if not ref.startswith('/langrisser-future-guide/'):
+                  continue
+              if not ('/assets/' in ref or '/images/' in ref or ref.endswith(('.js','.css','.json','.woff','.woff2','.ico'))):
+                  continue
+              url='https://luceatluxvestra42.github.io'+ref
+              req=urllib.request.Request(url, headers={'User-Agent':'soldier-stage3g-hosted-qa/1.0'})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  if r.status != 200:
+                      raise SystemExit(f'bad emitted resource {ref}: {r.status}')
+                  r.read(1)
+              checked += 1
+              print('PASS emitted-resource', ref)
+          if checked == 0:
+              raise SystemExit('no emitted resources checked')
+          print('PASS emitted-resource-count', checked)
+          PY
+
+          echo 'HOSTED_QA_PASS candidate=7f1ce0053c5435934f9758ff98e0d743ee804b94 wrapper=2d126496fe393b9383840ea20ac00d86ee221a56 gh-pages=7f7eaf1ca4d4ab960cb6c0adc90fa52fcbaf1d88'
