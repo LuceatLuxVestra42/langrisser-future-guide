@@ -1,0 +1,111 @@
+name: Hosted QA tier 1-2 Korean Soldier names
+
+on:
+  push:
+    branches:
+      - deploy/soldier-lower-tier-kr-names-20260828
+    paths:
+      - '.github/workflows/hosted-qa-soldier-lower-tier-kr-names.yml'
+  workflow_dispatch:
+
+jobs:
+  hosted-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Hosted Gate - freshness, list, direct entry, all 39 Korean names
+        run: |
+          python - <<'PY'
+          import json, time, urllib.request
+          BASE='https://luceatluxvestra42.github.io/langrisser-future-guide/'
+          EXPECTED_MAIN='0c72fa13b9a102f30145cb37915e0c034cd1515c'
+          EXPECTED_SURFACE='soldier-lower-tier-kr-names-39'
+          source=json.load(open('data/presentation/soldier-lower-tier-name-kr.v1.json', encoding='utf-8'))
+
+          def get(path, attempts=8):
+              url=BASE+path
+              last=None
+              for i in range(attempts):
+                  try:
+                      with urllib.request.urlopen(url, timeout=30) as r:
+                          body=r.read()
+                          if r.status==200:
+                              return body
+                          last=f'HTTP {r.status}'
+                  except Exception as e:
+                      last=repr(e)
+                  time.sleep(5)
+              raise RuntimeError(f'GET failed {url}: {last}')
+
+          main_source=get('qa-main-source.txt').decode().strip()
+          surface=get('qa-surface.txt').decode().strip()
+          if main_source != EXPECTED_MAIN: raise RuntimeError(f'stale main source: {main_source}')
+          if surface != EXPECTED_SURFACE: raise RuntimeError(f'stale surface: {surface}')
+
+          list_html=get('soldiers/').decode('utf-8')
+          if '/langrisser-future-guide/' not in list_html: raise RuntimeError('base path marker missing')
+          for r in source['records']:
+              if r['nameKr'] not in list_html:
+                  raise RuntimeError(f'live list missing Korean name {r["soldierId"]} {r["nameKr"]}')
+              detail=get(f'soldiers/{r["soldierId"]}/').decode('utf-8')
+              if r['nameKr'] not in detail:
+                  raise RuntimeError(f'live detail missing Korean name {r["soldierId"]} {r["nameKr"]}')
+          # direct-entry and no-trailing-slash behavior
+          for sid, name in [(100,'창병'),(304,'본디노'),(628,'샤프슈터'),(1108,'쿠노이치')]:
+              direct=get(f'soldiers/{sid}').decode('utf-8')
+              if name not in direct: raise RuntimeError(f'direct entry missing {sid} {name}')
+          print('PASS Hosted Gate: deployed commit fresh; 39/39 Korean names in list/detail; direct entry PASS')
+          PY
+
+      - name: Prepare browser QA
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Browser UI Gate - filter, Korean search, detail, refresh, mobile
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const base = 'https://luceatluxvestra42.github.io/langrisser-future-guide/';
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+            await page.goto(base + 'soldiers/', { waitUntil: 'networkidle' });
+            await page.getByRole('button', { name: '1·2티어' }).click();
+            const cards = page.locator('a[aria-label$="상세 보기"]');
+            if (await cards.count() !== 39) throw new Error(`tier 1-2 filtered card count ${await cards.count()} != 39`);
+            for (const name of ['창병','정예 창병','본디노','마법 견습생','샤프슈터','쿠노이치']) {
+              if (!(await page.getByRole('link', { name: `${name} 상세 보기`, exact: true }).isVisible())) throw new Error(`not visible: ${name}`);
+            }
+
+            const search = page.getByPlaceholder('검색');
+            await search.fill('샤프슈터');
+            if (await cards.count() !== 1) throw new Error(`Korean search count ${await cards.count()} != 1`);
+            await page.getByRole('link', { name: '샤프슈터 상세 보기', exact: true }).click();
+            await page.locator('#soldier-detail-title').waitFor();
+            if ((await page.locator('#soldier-detail-title').textContent())?.trim() !== '샤프슈터') throw new Error('detail title mismatch for 샤프슈터');
+
+            await page.goto(base + 'soldiers/1108/', { waitUntil: 'networkidle' });
+            if ((await page.locator('#soldier-detail-title').textContent())?.trim() !== '쿠노이치') throw new Error('direct detail title mismatch');
+            await page.reload({ waitUntil: 'networkidle' });
+            if ((await page.locator('#soldier-detail-title').textContent())?.trim() !== '쿠노이치') throw new Error('refresh detail title mismatch');
+
+            const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+            await mobile.goto(base + 'soldiers/', { waitUntil: 'networkidle' });
+            await mobile.getByRole('button', { name: '1·2티어' }).click();
+            const mobileCards = mobile.locator('a[aria-label$="상세 보기"]');
+            if (await mobileCards.count() !== 39) throw new Error(`mobile lower-tier count ${await mobileCards.count()} != 39`);
+            const overflow = await mobile.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+            if (overflow > 2) throw new Error(`mobile horizontal overflow ${overflow}px`);
+            await mobile.getByPlaceholder('검색').fill('창병');
+            if (!(await mobile.getByRole('link', { name: '창병 상세 보기', exact: true }).isVisible())) throw new Error('mobile Korean search failed');
+
+            await browser.close();
+            console.log('PASS Browser/UI Gate: filter/search/detail/direct-entry/refresh/mobile');
+          })().catch((e) => { console.error(e); process.exit(1); });
+          NODE
