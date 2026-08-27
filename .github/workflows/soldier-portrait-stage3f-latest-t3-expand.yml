@@ -1,0 +1,56 @@
+name: Soldier Portrait Stage 3F Latest T3 Closeout
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - 'scripts/expand-soldier-portraits-stage3f-latest-t3.mjs'
+      - '.github/workflows/soldier-portrait-stage3f-latest-t3-expand.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Resolve latest T3 portraits from current-source evidence
+        run: node scripts/expand-soldier-portraits-stage3f-latest-t3.mjs
+      - name: Validate Stage 3F closeout
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const x = require('./data/generated/soldier-portrait-manifest.v5.json');
+          if (x.status !== 'PASS_WITH_REVIEW' || x.assetsReady !== true) throw new Error('Stage 3F manifest not ready');
+          if (x.coverage.canonicalSoldierCount !== 224 || x.coverage.resolvedCount !== 158 || x.coverage.unresolvedCount !== 66) throw new Error('Stage 3F coverage mismatch');
+          if (x.coverage.resolvedNormalCount !== 158 || x.coverage.resolvedSpCount !== 0) throw new Error('Stage 3F normal/SP mismatch');
+          if (x.coverage.tier1Resolved !== 7 || x.coverage.tier2Resolved !== 22 || x.coverage.tier3Resolved !== 129) throw new Error('Stage 3F tier coverage mismatch');
+          if (x.coverage.remainingT3UnresolvedCount !== 0 || x.coverage.newlyResolvedCount !== 13) throw new Error('T3 closeout mismatch');
+          const expected = '135,136,251,427,516,648,819,1033,1035,1037,1038,1039,1118';
+          if (x.newlyResolvedSoldierIds.join(',') !== expected) throw new Error(`new ID mismatch ${x.newlyResolvedSoldierIds.join(',')}`);
+          for (const id of x.newlyResolvedSoldierIds) {
+            const r = x.records.find(v => v.soldierId === id);
+            if (!r) throw new Error(`missing Stage3F record ${id}`);
+            const file = path.join('public/images/soldiers', r.fileName);
+            if (!fs.existsSync(file) || fs.statSync(file).size !== r.size) throw new Error(`asset mismatch ${id}`);
+            const b = fs.readFileSync(file);
+            if (!(b[0]===0x89 && b[1]===0x50 && b[2]===0x4e && b[3]===0x47)) throw new Error(`not PNG ${id}`);
+          }
+          const ev = require('./data/validation/soldier-portrait-stage3f-latest-t3-evidence.v1.json');
+          if (ev.targetCount !== 13 || ev.passCount !== 13 || ev.rows.length !== 13 || ev.rows.some(r => r.status !== 'PASS')) throw new Error('Stage3F evidence mismatch');
+          console.log('STAGE3F_T3_CLOSEOUT_VALIDATED 129/129');
+          NODE
+      - name: Commit Stage 3F assets and checkpoints
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/images/soldiers data/generated/soldier-portrait-manifest.v5.json data/validation/soldier-portrait-stage3f-latest-t3-evidence.v1.json data/checkpoints/soldier-frontend-stage3f-latest-t3.txt
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Close out latest T3 Soldier portraits'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
