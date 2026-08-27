@@ -18,42 +18,34 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Probe public Drive folder payload
+      - name: Measure canonical lower-tier distribution and legacy images
         run: |
           node <<'NODE'
-          const folders = {
-            I: '1Br-tmzvjc4xo7baBaiziwweGyU75H-8x',
-            II: '15a3Rc2w2i3Zkf32LZwB4xT8Ldaej0yXl',
-            III: '17586qKXHeDoCZ13E6bmrmgMRtMUk9fzQ',
+          const fs = require('node:fs');
+          const canonical = JSON.parse(fs.readFileSync('data/generated/soldier-detail-stage5-2.v1.json','utf8')).records;
+          const armyPages = {
+            INFANTRY: '보병', LANCER: '창병', CAVALRY: '기병', FLYING: '비병', WATER: '수병',
+            ARCHER: '궁병', ASSASSIN: '암살자', MAGE: '마법사', HOLY: '승병', DEMON: '마족'
           };
-          for (const [tier, id] of Object.entries(folders)) {
-            const url = `https://drive.google.com/drive/folders/${id}`;
-            const res = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0' }, redirect: 'follow' });
-            const text = await res.text();
-            const entries = [...text.matchAll(/aria-label="([^"]+) Shared folder"[\s\S]{0,900}?data-id="([^"]+)"/g)]
-              .map((m) => ({ name: m[1], id: m[2] }));
-            const unique = [...new Map(entries.map((x) => [x.id, x])).values()];
-            console.log(`DRIVE_TIER=${tier} status=${res.status} entries=${unique.length}`);
-            console.log(JSON.stringify(unique.slice(0, 5)));
+          const norm = s => s.replace(/[\s_\-]/g,'').toLowerCase();
+          for (const tier of [1,2]) {
+            const rows = canonical.filter(r => !r.identity.isSp && r.identity.tier === tier);
+            const byArmy = Object.groupBy(rows, r => r.identity.armyType);
+            console.log(`CANONICAL_TIER=${tier} count=${rows.length}`);
+            for (const [army, rs] of Object.entries(byArmy)) console.log(`CANONICAL tier=${tier} army=${army} ids=${rs.map(r=>r.soldierId).join(',')}`);
           }
-          NODE
-      - name: Probe Korean legacy sheet lower-tier records
-        run: |
-          node <<'NODE'
-          const url = 'https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/troop/%EC%B0%BD%EB%B3%91.html';
-          const res = await fetch(url);
-          const text = await res.text();
-          console.log(`LEGACY status=${res.status} bytes=${text.length}`);
-          for (const needle of ['창병','정예 창병','바위 골렘','중장 창병','대지 골렘']) {
-            let from = 0;
-            let seen = 0;
-            while (seen < 2) {
-              const i = text.indexOf(needle, from);
-              if (i < 0) break;
-              console.log(`LEGACY needle=${needle} index=${i}`);
-              console.log(text.slice(Math.max(0, i - 650), i + 900).replace(/\n/g, ' '));
-              from = i + needle.length;
-              seen += 1;
-            }
+          for (const [army, page] of Object.entries(armyPages)) {
+            const url = `https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/troop/${encodeURIComponent(page)}.html`;
+            const res = await fetch(url);
+            const text = await res.text();
+            if (!res.ok) { console.log(`LEGACY_PAGE_FAIL army=${army} status=${res.status}`); continue; }
+            const headings = [...text.matchAll(/<div class="view_title">([123])티어 용병<\/div>/g)].map(m => ({tier:Number(m[1]), index:m.index}));
+            const imgs = [...text.matchAll(/<img class="filterDiv [^"]+"[^>]*src="\.\.\/img\/troop\/[^\"]+\/병종\/([^\"]+\.webp)"[^>]*>/g)].map(m => ({file:m[1], index:m.index}));
+            const rows = imgs.map(x => {
+              const h = headings.filter(h => h.index < x.index).at(-1);
+              const raw = x.file.replace(/\.webp$/,'').replace(/^\d+_/, '');
+              return {tier:h?.tier ?? null, file:x.file, raw, key:norm(raw)};
+            }).filter(x => x.tier === 1 || x.tier === 2);
+            console.log(`LEGACY army=${army} t1=${rows.filter(x=>x.tier===1).map(x=>x.raw).join('|')} t2=${rows.filter(x=>x.tier===2).map(x=>x.raw).join('|')}`);
           }
           NODE
