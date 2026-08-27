@@ -1,0 +1,88 @@
+name: Build Soldier WebP Lossless Fast
+
+on:
+  push:
+    branches:
+      - work/soldier-webp-optimize
+    paths:
+      - '.github/workflows/build-soldier-webp-lossless-fast.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install WebP tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webp imagemagick
+      - name: Verify PNG source set
+        run: |
+          node <<'NODE'
+          const fs=require('fs'), crypto=require('crypto');
+          const m=require('./data/generated/soldier-portrait-manifest.v9.json');
+          if(m.status!=='PASS'||m.records.length!==224||m.coverage.resolvedCount!==224) throw new Error('v9 coverage mismatch');
+          for(const r of m.records){
+            const p=`public/${m.publicRoot}/${r.fileName}`;
+            const b=fs.readFileSync(p);
+            if(!r.fileName.endsWith('.png')||b.length!==r.size||crypto.createHash('sha256').update(b).digest('hex')!==r.sha256) throw new Error(`PNG source mismatch ${r.soldierId}`);
+          }
+          console.log('PASS PNG source 224/224');
+          NODE
+      - name: Convert lossless WebP parallel
+        run: |
+          set -euo pipefail
+          rm -rf public/images/soldiers-webp
+          mkdir -p public/images/soldiers-webp
+          node -e "const m=require('./data/generated/soldier-portrait-manifest.v9.json'); for(const r of m.records) console.log(r.soldierId+'\t'+r.fileName)" > /tmp/in.tsv
+          cat /tmp/in.tsv | xargs -P 4 -n 2 bash -c 'id="$0"; file="$1"; cwebp -quiet -lossless -z 6 -metadata none "public/images/soldiers/$file" -o "public/images/soldiers-webp/$id.webp"'
+          test "$(find public/images/soldiers-webp -type f -name '*.webp' | wc -l | tr -d ' ')" -eq 224
+      - name: Validate and create manifest
+        run: |
+          node <<'NODE'
+          const fs=require('fs'), crypto=require('crypto'), {spawnSync,execFileSync}=require('child_process');
+          const src=require('./data/generated/soldier-portrait-manifest.v9.json');
+          const records=[]; let pngTotal=0, webpTotal=0;
+          for(const r of src.records){
+            const png=`public/${src.publicRoot}/${r.fileName}`, webp=`public/images/soldiers-webp/${r.soldierId}.webp`;
+            const cmp=spawnSync('compare',['-metric','AE',png,webp,'null:'],{encoding:'utf8'});
+            const metric=(cmp.stderr||cmp.stdout||'').trim();
+            if(cmp.status!==0||metric!=='0') throw new Error(`pixel mismatch ${r.soldierId}: ${cmp.status}/${metric}`);
+            const [w,h]=execFileSync('identify',['-format','%w %h',webp],{encoding:'utf8'}).trim().split(/\s+/).map(Number);
+            if(w!==r.width||h!==r.height) throw new Error(`dimension mismatch ${r.soldierId}`);
+            const b=fs.readFileSync(webp), size=b.length, sha=crypto.createHash('sha256').update(b).digest('hex');
+            pngTotal+=r.size; webpTotal+=size;
+            records.push({soldierId:r.soldierId,nameKr:r.nameKr??r.presentationNameEvidence??null,fileName:`${r.soldierId}.webp`,sourceKind:'DERIVED_WEBP_LOSSLESS_FROM_V9_PNG',resolutionMethod:'LOSSLESS_WEBP_PIXEL_EXACT_FROM_CANONICAL_V9_PNG',sourcePngFileName:r.fileName,sourcePngSha256:r.sha256,sha256:sha,size,width:r.width,height:r.height,isSp:r.isSp});
+          }
+          const savingBytes=pngTotal-webpTotal, savingRatio=savingBytes/pngTotal;
+          const out={version:1,stage:'frontend-soldier-portrait-webp-lossless',status:savingRatio>=0.15?'PASS':'INSUFFICIENT_SAVINGS',publicRoot:'images/soldiers-webp',assetsReady:savingRatio>=0.15,sourceManifest:'data/generated/soldier-portrait-manifest.v9.json',policy:{sourcePngPreserved:true,webpMode:'lossless',decodedPixelExact:true,alphaPreservedByDecodedPixelEquality:true,dimensionsPreserved:true,encoderEffortPreset:6,minimumSavingRatioForActivation:0.15},coverage:{canonicalSoldierCount:224,resolvedCount:records.length,unresolvedCount:224-records.length,resolvedSpCount:records.filter(r=>r.isSp).length},sizeAudit:{pngTotalBytes:pngTotal,webpTotalBytes:webpTotal,savingBytes,savingRatio,pngTotalMiB:pngTotal/1024/1024,webpTotalMiB:webpTotal/1024/1024},records};
+          fs.writeFileSync('data/generated/soldier-portrait-web-manifest.v1.json',JSON.stringify(out,null,2)+'\n');
+          console.log('WEBP_AUDIT='+JSON.stringify(out.sizeAudit));
+          if(records.length!==224||records.filter(r=>r.isSp).length!==56) throw new Error('coverage mismatch');
+          if(savingRatio<0.15) throw new Error(`saving insufficient ${(savingRatio*100).toFixed(2)}%`);
+          console.log(`PASS lossless WebP ${(savingRatio*100).toFixed(2)}% saving`);
+          NODE
+      - name: Switch resolver
+        run: |
+          node <<'NODE'
+          const fs=require('fs'); const p='src/lib/soldier-portrait-assets.ts'; let s=fs.readFileSync(p,'utf8');
+          const a='import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v9.json";';
+          const b='import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-web-manifest.v1.json";';
+          if(!s.includes(a)) throw new Error('resolver v9 import not found'); fs.writeFileSync(p,s.replace(a,b));
+          NODE
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Production build
+        run: bun run build
+      - name: Commit optimized web assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/images/soldiers-webp data/generated/soldier-portrait-web-manifest.v1.json src/lib/soldier-portrait-assets.ts
+          git commit -m "Add lossless WebP Soldier portraits and activate web delivery"
+          git push
