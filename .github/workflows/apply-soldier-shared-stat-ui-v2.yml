@@ -1,0 +1,25 @@
+name: Apply Soldier Shared Stat UI v2
+on:
+  push:
+    branches: [test/github-pages-static-banner]
+    paths: ['.github/workflows/apply-soldier-shared-stat-ui-v2.yml']
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test/github-pages-static-banner
+      - run: python scripts/patch_soldier_stat_ui_stage4.py
+      - run: |
+          grep -q 'Icon_Range.png' src/components/soldier-detail-modal.tsx
+          grep -q 'Move_FieldArmy.png' src/components/soldier-detail-modal.tsx
+          grep -q 'grid-cols-\[180px_minmax(0,1fr)_156px\]' src/components/soldier-detail-modal.tsx
+      - run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/components/soldier-detail-modal.tsx
+          git commit -m 'Use shared stat and movement icons in Soldier modal'
+          git push origin HEAD:test/github-pages-static-banner
