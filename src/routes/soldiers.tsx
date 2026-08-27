@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, Shield, X } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
+import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
 
@@ -306,6 +307,31 @@ function ArmyIcon({
   armyType: string;
   className?: string;
 }) {
+  const officialUrl = getOfficialArmyIconUrl(armyType);
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+
+  if (officialUrl && failedUrl !== officialUrl) {
+    return (
+      <img
+        src={officialUrl}
+        alt=""
+        className={`${className} object-contain`}
+        aria-hidden="true"
+        onError={() => setFailedUrl(officialUrl)}
+      />
+    );
+  }
+
+  return <FallbackArmyIcon armyType={armyType} className={className} />;
+}
+
+function FallbackArmyIcon({
+  armyType,
+  className = "h-5 w-5",
+}: {
+  armyType: string;
+  className?: string;
+}) {
   let content: ReactNode;
 
   switch (armyType) {
@@ -379,11 +405,7 @@ function ArmyIcon({
       );
       break;
     case "HOLY":
-      content = (
-        <>
-          <path d="M10 3h4v6h5v4h-5v8h-4v-8H5V9h5V3Z" />
-        </>
-      );
+      content = <path d="M10 3h4v6h5v4h-5v8h-4v-8H5V9h5V3Z" />;
       break;
     case "DEMON":
       content = (
