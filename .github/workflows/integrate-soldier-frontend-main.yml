@@ -1,0 +1,114 @@
+name: Integrate Soldier Frontend into Main Baseline
+
+on:
+  push:
+    branches:
+      - integration/soldier-frontend-main-20260827
+    paths:
+      - '.github/workflows/integrate-soldier-frontend-main.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Fetch frozen Soldier frontend source
+        run: git fetch origin work/soldier-frontend-stage3-full-portraits:refs/remotes/origin/work/soldier-frontend-stage3-full-portraits --depth=1
+
+      - name: Copy only Soldier frontend production surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC='origin/work/soldier-frontend-stage3-full-portraits'
+          git checkout "$SRC" -- \
+            'src/routes/soldiers.tsx' \
+            'src/routes/soldiers.$soldierId.tsx' \
+            'src/components/soldier-detail-modal.tsx' \
+            'src/lib/soldier-page.functions.ts' \
+            'src/lib/soldier-page.server.ts' \
+            'src/lib/soldier-portrait-assets.ts' \
+            'src/lib/army-icon-assets.ts' \
+            'data/generated/soldier-list-stage5-8.v1.json' \
+            'data/generated/soldier-detail-stage5-2.v1.json' \
+            'data/generated/soldier-portrait-manifest.v8.json' \
+            'data/generated/army-icon-manifest.v1.json' \
+            'public/data/soldier-detail-stage5-6.v1.json' \
+            'public/images/soldiers' \
+            'public/images/army' \
+            'public/images/shared/stats' \
+            'public/images/shared/movement'
+          git show "$SRC:scripts/validate-soldier-portrait-stage3j-frontend-full.mjs" > /tmp/validate-soldier-stage3j.mjs
+
+      - name: Preflight — 224 portrait parity and wiring
+        run: node /tmp/validate-soldier-stage3j.mjs
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Gate
+        run: bun run build
+
+      - name: Integration assertions
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f src/routes/soldiers.tsx
+          test -f 'src/routes/soldiers.$soldierId.tsx'
+          test -f data/generated/soldier-portrait-manifest.v8.json
+          test "$(find public/images/soldiers -maxdepth 1 -type f -name '*.png' | wc -l)" -eq 224
+          grep -q 'soldier-portrait-manifest.v8.json' src/lib/soldier-portrait-assets.ts
+          grep -q 'getOfficialSoldierPortraitUrl(record.soldierId)' src/routes/soldiers.tsx
+          grep -q 'getOfficialSoldierPortraitUrl(record.soldierId)' src/components/soldier-detail-modal.tsx
+          printf '%s\n' \
+            'Soldier main integration checkpoint' \
+            'status: PASS' \
+            'sourceBranch: work/soldier-frontend-stage3-full-portraits' \
+            'targetBaseline: main@e736d4d031e0a20bde28ece6a8460935e0b477f0' \
+            'canonicalSoldiers: 224' \
+            'normalPortraits: 168/168' \
+            'spPortraits: 56/56' \
+            'overallPortraits: 224/224' \
+            'route: /soldiers' \
+            'detailRoute: /soldiers/$soldierId' \
+            'buildGate: PASS' \
+            > data/checkpoints/soldier-main-integration-20260827.txt
+
+      - name: Commit clean integration result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            src/routes/soldiers.tsx \
+            'src/routes/soldiers.$soldierId.tsx' \
+            src/components/soldier-detail-modal.tsx \
+            src/lib/soldier-page.functions.ts \
+            src/lib/soldier-page.server.ts \
+            src/lib/soldier-portrait-assets.ts \
+            src/lib/army-icon-assets.ts \
+            data/generated/soldier-list-stage5-8.v1.json \
+            data/generated/soldier-detail-stage5-2.v1.json \
+            data/generated/soldier-portrait-manifest.v8.json \
+            data/generated/army-icon-manifest.v1.json \
+            data/validation/soldier-portrait-stage3j-frontend-full.v1.json \
+            data/checkpoints/soldier-frontend-stage3j-portrait-full.txt \
+            data/checkpoints/soldier-main-integration-20260827.txt \
+            public/data/soldier-detail-stage5-6.v1.json \
+            public/images/soldiers \
+            public/images/army \
+            public/images/shared/stats \
+            public/images/shared/movement
+          if [ -f src/routeTree.gen.ts ]; then git add src/routeTree.gen.ts; fi
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Integrate complete Soldier frontend and 224 portraits'
+          git push origin HEAD:integration/soldier-frontend-main-20260827
