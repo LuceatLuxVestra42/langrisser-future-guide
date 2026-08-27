@@ -21,7 +21,7 @@ jobs:
       - name: Measure canonical lower-tier distribution and legacy images
         run: |
           node <<'NODE'
-          const fs = require('node:fs');
+          import fs from 'node:fs';
           const canonical = JSON.parse(fs.readFileSync('data/generated/soldier-detail-stage5-2.v1.json','utf8')).records;
           const armyPages = {
             INFANTRY: '보병', LANCER: '창병', CAVALRY: '기병', FLYING: '비병', WATER: '수병',
