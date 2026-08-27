@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
+import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
 
 type MaterialCost = {
@@ -236,15 +237,27 @@ function SoldierPreview({ record }: { record: SoldierPrototypeRecord }) {
   const army = ARMY_META.get(record.armyType);
   const displayName = record.nameKr ?? record.nameCn;
   const officialUrl = getOfficialArmyIconUrl(record.armyType);
+  const portraitUrl = getOfficialSoldierPortraitUrl(record.soldierId);
   const [imageFailed, setImageFailed] = useState(false);
+  const [portraitFailed, setPortraitFailed] = useState(false);
 
   return (
     <div className="mx-auto h-[180px] w-[180px] sm:mx-0 sm:h-full sm:w-full">
       <div className="relative h-full w-full overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-9 text-muted-foreground">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-current/20 bg-background/70">
-            <span className="text-lg font-black tracking-tight">{army?.shortLabel ?? "?"}</span>
-          </div>
+        <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-9 text-muted-foreground">
+          {portraitUrl && !portraitFailed ? (
+            <img
+              src={portraitUrl}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full object-contain object-bottom px-2 pb-8 pt-2"
+              onError={() => setPortraitFailed(true)}
+            />
+          ) : (
+            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-current/20 bg-background/70">
+              <span className="text-lg font-black tracking-tight">{army?.shortLabel ?? "?"}</span>
+            </div>
+          )}
         </div>
 
         <div className="absolute left-2 top-2">

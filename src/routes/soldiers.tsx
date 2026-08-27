@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
+import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
 
@@ -384,6 +385,8 @@ function FallbackArmyIcon({
 function SoldierCard({ record }: { record: SoldierPrototypeRecord }) {
   const army = ARMY_BY_TYPE.get(record.armyType);
   const displayName = record.nameKr ?? record.nameCn;
+  const portraitUrl = getOfficialSoldierPortraitUrl(record.soldierId);
+  const [portraitFailed, setPortraitFailed] = useState(false);
 
   return (
     <Link
@@ -394,12 +397,22 @@ function SoldierCard({ record }: { record: SoldierPrototypeRecord }) {
       title={`${displayName} · Soldier ${record.soldierId}`}
       className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-8 text-muted-foreground transition group-hover:text-foreground">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-current/20 bg-background/70 sm:h-16 sm:w-16">
-          <span className="text-base font-black tracking-tight sm:text-lg">
-            {army?.shortLabel ?? "?"}
-          </span>
-        </div>
+      <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-8 text-muted-foreground transition group-hover:text-foreground">
+        {portraitUrl && !portraitFailed ? (
+          <img
+            src={portraitUrl}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-contain object-bottom px-1 pb-7 pt-2 transition-transform duration-200 group-hover:scale-[1.02]"
+            onError={() => setPortraitFailed(true)}
+          />
+        ) : (
+          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-current/20 bg-background/70 sm:h-16 sm:w-16">
+            <span className="text-base font-black tracking-tight sm:text-lg">
+              {army?.shortLabel ?? "?"}
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="absolute left-1.5 top-1.5 flex gap-1">
