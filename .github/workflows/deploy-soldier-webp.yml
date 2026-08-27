@@ -1,0 +1,107 @@
+name: Deploy Soldier WebP
+
+on:
+  push:
+    branches:
+      - deploy/soldier-webp-20260828
+    paths:
+      - '.github/workflows/deploy-soldier-webp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Verify lossless WebP delivery contract
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const web = require('./data/generated/soldier-portrait-web-manifest.v1.json');
+          const png = require('./data/generated/soldier-portrait-manifest.v9.json');
+          const resolver = fs.readFileSync('src/lib/soldier-portrait-assets.ts', 'utf8');
+
+          if (web.status !== 'PASS' || !web.assetsReady) throw new Error('WebP manifest not active');
+          if (web.coverage.canonicalSoldierCount !== 224 || web.coverage.resolvedCount !== 224 || web.coverage.unresolvedCount !== 0) throw new Error('WebP coverage mismatch');
+          if (web.coverage.resolvedSpCount !== 56) throw new Error('SP WebP coverage mismatch');
+          if (!web.policy.sourcePngPreserved || web.policy.webpMode !== 'lossless' || !web.policy.decodedPixelExact || !web.policy.alphaPreservedByDecodedPixelEquality || !web.policy.dimensionsPreserved) throw new Error('WebP lossless policy mismatch');
+          if (web.sizeAudit.pngTotalBytes !== 48931121 || web.sizeAudit.webpTotalBytes !== 30577298) throw new Error('WebP size audit mismatch');
+          if (web.sizeAudit.savingRatio < 0.37) throw new Error(`WebP savings too low: ${web.sizeAudit.savingRatio}`);
+          if (!resolver.includes('soldier-portrait-web-manifest.v1.json')) throw new Error('resolver does not consume WebP manifest');
+          if (resolver.includes('import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v9.json"')) throw new Error('resolver still imports PNG v9 manifest');
+
+          const pngById = new Map(png.records.map(r => [r.soldierId, r]));
+          if (pngById.size !== 224 || web.records.length !== 224) throw new Error('manifest ID cardinality mismatch');
+
+          for (const r of web.records) {
+            const src = pngById.get(r.soldierId);
+            if (!src) throw new Error(`missing PNG source record ${r.soldierId}`);
+            const webPath = `public/${web.publicRoot}/${r.fileName}`;
+            if (!fs.existsSync(webPath)) throw new Error(`missing WebP ${r.soldierId}`);
+            const wb = fs.readFileSync(webPath);
+            if (wb.length !== r.size) throw new Error(`WebP size mismatch ${r.soldierId}`);
+            if (crypto.createHash('sha256').update(wb).digest('hex') !== r.sha256) throw new Error(`WebP hash mismatch ${r.soldierId}`);
+            if (wb.subarray(0,4).toString('ascii') !== 'RIFF' || wb.subarray(8,12).toString('ascii') !== 'WEBP') throw new Error(`WebP signature mismatch ${r.soldierId}`);
+
+            const pngPath = `public/${png.publicRoot}/${src.fileName}`;
+            if (!fs.existsSync(pngPath)) throw new Error(`canonical PNG removed ${r.soldierId}`);
+            const pb = fs.readFileSync(pngPath);
+            if (pb.length !== src.size || crypto.createHash('sha256').update(pb).digest('hex') !== src.sha256) throw new Error(`canonical PNG changed ${r.soldierId}`);
+            if (r.sourcePngSha256 !== src.sha256 || r.width !== src.width || r.height !== src.height) throw new Error(`WebP source provenance mismatch ${r.soldierId}`);
+          }
+          console.log(`PASS WebP contract 224/224; ${(web.sizeAudit.savingRatio*100).toFixed(2)}% smaller; PNG sources preserved`);
+          NODE
+
+      - name: Build GitHub Pages static site
+        run: bun run build
+
+      - name: Verify static WebP candidate
+        run: |
+          set -euo pipefail
+          test -f dist/client/soldiers/index.html
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
+          WEBP_COUNT="$(find dist/client/images/soldiers-webp -type f -name '*.webp' | wc -l | tr -d ' ')"
+          test "$WEBP_COUNT" -eq 224
+          node <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const web = require('./data/generated/soldier-portrait-web-manifest.v1.json');
+          for (const r of web.records) {
+            const p = `dist/client/${web.publicRoot}/${r.fileName}`;
+            if (!fs.existsSync(p)) throw new Error(`built WebP missing ${r.soldierId}`);
+            const b = fs.readFileSync(p);
+            if (b.length !== r.size) throw new Error(`built WebP size mismatch ${r.soldierId}`);
+            if (crypto.createHash('sha256').update(b).digest('hex') !== r.sha256) throw new Error(`built WebP hash mismatch ${r.soldierId}`);
+          }
+          console.log('PASS static WebP assets 224/224');
+          NODE
+          grep -q '/langrisser-future-guide/' dist/client/soldiers/index.html
+          printf '%s\n' 'f870f103c1aed085f2763ba2631ea8cb006dad6a' > dist/client/qa-main-source.txt
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-deploy-source.txt
+          printf '%s\n' 'soldier-webp-lossless-224' > dist/client/qa-surface.txt
+
+      - name: Publish to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Soldier lossless WebP ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
