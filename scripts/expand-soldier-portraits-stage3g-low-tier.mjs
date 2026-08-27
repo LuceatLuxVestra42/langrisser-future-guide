@@ -16,6 +16,15 @@ const DRIVE_TIER_FOLDERS = {
   1: '1Br-tmzvjc4xo7baBaiziwweGyU75H-8x',
   2: '15a3Rc2w2i3Zkf32LZwB4xT8Ldaej0yXl',
 };
+const LEGACY_COMMIT = 'a85bba49dcf073563e7366dc18e96b7ba67c2ae3';
+const LEGACY_PAGES = [
+  { page: '보병', direct: 'INFANTRY' },
+  { page: '창병', direct: 'LANCER' },
+  { page: '기병', direct: 'CAVALRY' },
+  { page: '비병', subgroup: { 1: 'FLYING', 2: 'WATER' } },
+  { page: '궁병', subgroup: { 1: 'ARCHER', 2: 'ASSASSIN' } },
+  { page: '승병', subgroup: { 1: 'MAGE', 2: 'HOLY', 3: 'DEMON' } },
+];
 const REQUEST_TIMEOUT_MS = 15000;
 
 function normalizeName(value) {
@@ -30,6 +39,10 @@ function isPng(bytes) {
   return bytes.length >= 8 && bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
 }
 
+function isWebp(bytes) {
+  return bytes.length >= 12 && bytes.subarray(0, 4).toString('ascii') === 'RIFF' && bytes.subarray(8, 12).toString('ascii') === 'WEBP';
+}
+
 function pngDimensions(bytes) {
   if (!isPng(bytes) || bytes.length < 24) return null;
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
@@ -38,7 +51,7 @@ function pngDimensions(bytes) {
 async function fetchResponse(url) {
   return fetch(url, {
     redirect: 'follow',
-    headers: { 'user-agent': 'Mozilla/5.0 SoldierPortraitStage3G/1.1' },
+    headers: { 'user-agent': 'Mozilla/5.0 SoldierPortraitStage3G/1.2' },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
 }
@@ -59,12 +72,11 @@ async function loadDriveFolderIndex(tier) {
   const parentFolderId = DRIVE_TIER_FOLDERS[tier];
   const text = await fetchText(`https://drive.google.com/drive/folders/${parentFolderId}`);
   const matches = [...text.matchAll(/aria-label="([^"]+) Shared folder"[\s\S]{0,900}?data-id="([^"]+)"/g)];
-  const records = [...new Map(matches.map((match) => [match[2], {
+  return [...new Map(matches.map((match) => [match[2], {
     name: match[1],
     nameKey: normalizeName(match[1]),
     folderId: match[2],
   }])).values()];
-  return records;
 }
 
 async function resolveDefaultPng(folderId) {
@@ -101,24 +113,57 @@ async function downloadDrivePng(fileId) {
   throw new Error(`Drive PNG download failed for ${fileId}: ${failures.join('; ')}`);
 }
 
+async function loadLegacyEntries() {
+  const entries = [];
+  for (const definition of LEGACY_PAGES) {
+    const pageUrl = `https://raw.githubusercontent.com/redpanda7301/langrisser/${LEGACY_COMMIT}/troop/${encodeURIComponent(definition.page)}.html`;
+    const text = await fetchText(pageUrl);
+    const headings = [...text.matchAll(/<div class="view_title">([123])티어 용병<\/div>/g)]
+      .map((match) => ({ tier: Number(match[1]), index: match.index }));
+    const images = [...text.matchAll(/<img class="filterDiv [^"]+"[^>]*src="(\.\.\/img\/troop\/[^\"]+\/병종\/(\d+)_([^\"]+\.webp))"[^>]*>/g)];
+    for (let index = 0; index < images.length; index += 1) {
+      const match = images[index];
+      const heading = headings.filter((item) => item.index < match.index).at(-1);
+      if (!heading || heading.tier > 2) continue;
+      let fileStem = match[3].replace(/\.webp$/i, '');
+      let subgroup = null;
+      const subgroupMatch = fileStem.match(/^(\d+)_(.+)$/);
+      if (subgroupMatch) {
+        subgroup = Number(subgroupMatch[1]);
+        fileStem = subgroupMatch[2];
+      }
+      const armyType = definition.direct ?? definition.subgroup?.[subgroup] ?? null;
+      if (!armyType) continue;
+      const end = images[index + 1]?.index ?? Math.min(text.length, match.index + 24000);
+      const chunk = text.slice(match.index, end);
+      const name = chunk.match(/<h2>\s*([^<]+?)\s*<\/h2>/)?.[1]?.trim() ?? fileStem;
+      entries.push({
+        tier: heading.tier,
+        armyType,
+        name,
+        nameKey: normalizeName(name),
+        legacyPage: definition.page,
+        sourceUrl: new URL(match[1], pageUrl).href,
+      });
+    }
+  }
+  return entries;
+}
+
 const v5 = JSON.parse(await readFile(V5_PATH, 'utf8'));
 const config = JSON.parse(await readFile(CONFIG_PATH, 'utf8'));
 const spConfig = JSON.parse(await readFile(SP_CONFIG_PATH, 'utf8'));
 const detail = JSON.parse(await readFile(DETAIL_PATH, 'utf8')).records;
 const nameMap = JSON.parse(await readFile(NAME_MAP_PATH, 'utf8'));
 
-if (nameMap.status !== 'USER_REVIEWED' || nameMap.rows.length !== 39) {
-  throw new Error('Stage 3G reviewed CN-KR mapping contract mismatch');
-}
+if (nameMap.status !== 'USER_REVIEWED' || nameMap.rows.length !== 39) throw new Error('Stage 3G reviewed CN-KR mapping contract mismatch');
 const krByCn = new Map();
 for (const row of nameMap.rows) {
   if (!row.nameCn || !row.nameKr || krByCn.has(row.nameCn)) throw new Error(`Invalid/duplicate reviewed name row ${JSON.stringify(row)}`);
   krByCn.set(row.nameCn, row.nameKr);
 }
+if (v5.coverage.resolvedCount !== 158 || v5.coverage.unresolvedCount !== 66 || v5.coverage.tier3Resolved !== 129) throw new Error('Stage 3G parent v5 invariant mismatch');
 
-if (v5.coverage.resolvedCount !== 158 || v5.coverage.unresolvedCount !== 66 || v5.coverage.tier3Resolved !== 129) {
-  throw new Error('Stage 3G parent v5 invariant mismatch');
-}
 const configById = new Map(config.map((row) => [Number(row.ID), row]));
 const detailById = new Map(detail.map((row) => [Number(row.soldierId), row]));
 const spIds = new Set(spConfig.map((row) => Number(row.ID)));
@@ -128,12 +173,10 @@ const evidenceRows = [];
 const newlyResolved = [];
 await mkdir(PUBLIC_DIR, { recursive: true });
 
-const driveByTier = {
-  1: await loadDriveFolderIndex(1),
-  2: await loadDriveFolderIndex(2),
-};
+const driveByTier = { 1: await loadDriveFolderIndex(1), 2: await loadDriveFolderIndex(2) };
 if (driveByTier[1].length !== 11) throw new Error(`Expected 11 Drive I folders, got ${driveByTier[1].length}`);
 if (driveByTier[2].length !== 27) throw new Error(`Expected 27 Drive II folders, got ${driveByTier[2].length}`);
+const legacyEntries = await loadLegacyEntries();
 
 for (const soldierId of TARGET_IDS) {
   const c = configById.get(soldierId);
@@ -152,44 +195,84 @@ for (const soldierId of TARGET_IDS) {
   if (d.identity?.nameCn && d.identity.nameCn !== nameCn) throw new Error(`Stage 3G ConfigData/detail CN mismatch ${soldierId}`);
   const nameKr = krByCn.get(nameCn);
   if (!nameKr) throw new Error(`Stage 3G reviewed Korean mapping missing exact CN name ${soldierId} ${nameCn}`);
-
   const modelStem = model.split('/').at(-2) ?? null;
   const prefab = model.split('/').at(-1) ?? null;
   if (!modelStem || !prefab) throw new Error(`Stage 3G malformed model path ${soldierId}: ${model}`);
 
   const nameKey = normalizeName(nameKr);
   const driveCandidates = driveByTier[tier].filter((row) => row.nameKey === nameKey);
-  if (driveCandidates.length !== 1) {
-    throw new Error(`Stage 3G Drive T${tier} exact reviewed-KR folder mismatch ${soldierId} ${nameCn} -> ${nameKr}: candidates=${JSON.stringify(driveCandidates)}`);
-  }
-  const drive = driveCandidates[0];
-  const driveFileId = await resolveDefaultPng(drive.folderId);
-  const downloaded = await downloadDrivePng(driveFileId);
-  const bytes = downloaded.bytes;
-  const dimensions = pngDimensions(bytes);
-  if (!dimensions) throw new Error(`Stage 3G PNG dimension parse failed ${soldierId}`);
-  const fileName = `${soldierId}.png`;
-  await writeFile(path.join(PUBLIC_DIR, fileName), bytes);
+  let record;
+  let evidenceAsset;
 
-  const record = {
-    soldierId,
-    nameKr,
-    nameCn,
-    tier,
-    sourceKind: `DRIVE_DEFAULT_PNG_STAGE3G_T${tier}_USER_REVIEWED_CN_KR_EXACT`,
-    sourceFileName: 'Default.png',
-    driveFolderId: drive.folderId,
-    driveFileId,
-    sourceUrl: downloaded.sourceUrl,
-    model,
-    modelStem,
-    fileName,
-    resolutionMethod: 'CANONICAL_SOLDIER_ID_TO_CONFIGDATA_CN_MODEL_TO_USER_REVIEWED_KR_TO_EXACT_DRIVE_TIER_FOLDER_DEFAULT_PNG',
-    size: bytes.length,
-    sha256: sha256(bytes),
-    width: dimensions.width,
-    height: dimensions.height,
-  };
+  if (driveCandidates.length === 1) {
+    const drive = driveCandidates[0];
+    const driveFileId = await resolveDefaultPng(drive.folderId);
+    const downloaded = await downloadDrivePng(driveFileId);
+    const dimensions = pngDimensions(downloaded.bytes);
+    if (!dimensions) throw new Error(`Stage 3G PNG dimension parse failed ${soldierId}`);
+    const fileName = `${soldierId}.png`;
+    await writeFile(path.join(PUBLIC_DIR, fileName), downloaded.bytes);
+    record = {
+      soldierId, nameKr, nameCn, tier,
+      sourceKind: `DRIVE_DEFAULT_PNG_STAGE3G_T${tier}_USER_REVIEWED_CN_KR_EXACT`,
+      sourceFileName: 'Default.png',
+      driveFolderId: drive.folderId,
+      driveFileId,
+      sourceUrl: downloaded.sourceUrl,
+      model,
+      modelStem,
+      fileName,
+      resolutionMethod: 'CANONICAL_SOLDIER_ID_TO_CONFIGDATA_CN_MODEL_TO_USER_REVIEWED_KR_TO_EXACT_DRIVE_TIER_FOLDER_DEFAULT_PNG',
+      size: downloaded.bytes.length,
+      sha256: sha256(downloaded.bytes),
+      width: dimensions.width,
+      height: dimensions.height,
+    };
+    evidenceAsset = {
+      assetResolution: 'DRIVE_DEFAULT_PNG',
+      driveName: drive.name,
+      driveTierFolderId: DRIVE_TIER_FOLDERS[tier],
+      driveFolderId: drive.folderId,
+      driveFileId,
+      driveFileName: 'Default.png',
+      sourceUrl: downloaded.sourceUrl,
+    };
+  } else if (driveCandidates.length === 0) {
+    const armyType = d.identity?.armyType ?? null;
+    const legacyCandidates = legacyEntries.filter((row) => row.tier === tier && row.armyType === armyType && row.nameKey === nameKey);
+    if (legacyCandidates.length !== 1) {
+      throw new Error(`Stage 3G no Drive folder and no unique exact legacy fallback ${soldierId} ${nameCn} -> ${nameKr}: army=${armyType} legacy=${JSON.stringify(legacyCandidates)}`);
+    }
+    const legacy = legacyCandidates[0];
+    const bytes = await fetchBytes(legacy.sourceUrl);
+    if (!isWebp(bytes)) throw new Error(`Stage 3G exact legacy fallback is not WebP ${soldierId}: ${legacy.sourceUrl}`);
+    const fileName = `${soldierId}.webp`;
+    await writeFile(path.join(PUBLIC_DIR, fileName), bytes);
+    record = {
+      soldierId, nameKr, nameCn, tier,
+      sourceKind: 'PINNED_LEGACY_KR_WEBP_STAGE3G_USER_REVIEWED_CN_KR_EXACT',
+      sourceFileName: path.basename(new URL(legacy.sourceUrl).pathname),
+      legacyName: legacy.name,
+      sourceUrl: legacy.sourceUrl,
+      model,
+      modelStem,
+      fileName,
+      resolutionMethod: 'CANONICAL_SOLDIER_ID_TO_CONFIGDATA_CN_MODEL_TO_USER_REVIEWED_KR_TO_EXACT_LEGACY_SAME_TIER_ARMY_WEBP',
+      size: bytes.length,
+      sha256: sha256(bytes),
+      width: null,
+      height: null,
+    };
+    evidenceAsset = {
+      assetResolution: 'PINNED_LEGACY_EXACT_KR_WEBP',
+      legacyPage: legacy.legacyPage,
+      legacyName: legacy.name,
+      sourceUrl: legacy.sourceUrl,
+    };
+  } else {
+    throw new Error(`Stage 3G ambiguous Drive T${tier} exact reviewed-KR folder ${soldierId} ${nameCn} -> ${nameKr}: ${JSON.stringify(driveCandidates)}`);
+  }
+
   records.push(record);
   newlyResolved.push(record);
   unresolvedById.delete(soldierId);
@@ -197,20 +280,18 @@ for (const soldierId of TARGET_IDS) {
     soldierId,
     status: 'PASS',
     tier,
+    armyType: d.identity?.armyType ?? null,
     nameCn,
     nameKr,
     previousNameKr: d.identity?.nameKr ?? null,
     nameMappingBasis: 'USER_REVIEWED_EXACT_CN_KR_MAP',
-    driveName: drive.name,
-    driveTierFolderId: DRIVE_TIER_FOLDERS[tier],
-    driveFolderId: drive.folderId,
-    driveFileId,
-    driveFileName: 'Default.png',
     model,
     model2,
     modelStem,
     prefab,
-    byteSize: bytes.length,
+    ...evidenceAsset,
+    fileName: record.fileName,
+    byteSize: record.size,
     sha256: record.sha256,
     width: record.width,
     height: record.height,
@@ -219,7 +300,9 @@ for (const soldierId of TARGET_IDS) {
 
 const newlyT1 = newlyResolved.filter((row) => row.tier === 1).length;
 const newlyT2 = newlyResolved.filter((row) => row.tier === 2).length;
+const legacyFallbackRows = evidenceRows.filter((row) => row.assetResolution === 'PINNED_LEGACY_EXACT_KR_WEBP');
 if (newlyT1 !== 5 || newlyT2 !== 5) throw new Error(`Stage 3G expected 5 T1 + 5 T2, got ${newlyT1} + ${newlyT2}`);
+if (legacyFallbackRows.length !== 1 || legacyFallbackRows[0].soldierId !== 1000) throw new Error(`Stage 3G expected only Soldier 1000 legacy fallback: ${JSON.stringify(legacyFallbackRows)}`);
 
 records.sort((a, b) => a.soldierId - b.soldierId);
 const unresolved = [...unresolvedById.values()].sort((a, b) => a.soldierId - b.soldierId);
@@ -230,11 +313,8 @@ if (TARGET_IDS.some((id) => unresolvedById.has(id))) throw new Error('Stage 3G l
 if (unresolved.some((row) => !spIds.has(Number(row.soldierId)))) throw new Error('Stage 3G normal Soldier remains unresolved after low-tier closeout');
 
 const sourceCounts = Object.fromEntries(
-  [...new Set(records.map((row) => row.sourceKind))]
-    .sort()
-    .map((kind) => [kind, records.filter((row) => row.sourceKind === kind).length]),
+  [...new Set(records.map((row) => row.sourceKind))].sort().map((kind) => [kind, records.filter((row) => row.sourceKind === kind).length]),
 );
-
 const output = {
   version: 6,
   stage: 'frontend-stage3g-low-tier-normal-closeout',
@@ -244,11 +324,13 @@ const output = {
   assetsReady: true,
   policy: {
     ...v5.policy,
-    stage3gAdmission: 'Target must be one of the 10 v5 unresolved normal T1/T2 Soldier IDs. ConfigDataSoldierInfo exact ID supplies Chinese name + Model; Korean presentation name must exact-match the user-reviewed CN-KR contract; that reviewed Korean name must exact-normalize to exactly one folder in the corresponding Drive I/II tier; use Default.png only.',
-    stage3gAssetTransport: 'Use the existing public Korean legacy-sheet Drive tier folders, resolve Default.png only, validate PNG signature/dimensions/SHA-256, and time out each request.',
+    stage3gAdmission: 'Target must be one of the 10 v5 unresolved normal T1/T2 Soldier IDs. ConfigDataSoldierInfo exact ID supplies Chinese name + Model; Korean presentation name must exact-match the user-reviewed CN-KR contract; prefer one exact-normalized same-tier Drive I/II Korean folder and Default.png. If that exact Drive folder is absent, allow exactly one pinned legacy same-tier+army exact Korean-name WebP.',
+    stage3gAssetTransport: 'Drive path uses Default.png only; exact legacy fallback uses the pinned legacy commit WebP. Validate content signature and SHA-256; no fuzzy lookup.',
     lowTierNameSimilarityUsedForAdmission: false,
     lowTierCombatSignatureUsedForAdmission: false,
     lowTierIdArithmeticUsedForAdmission: false,
+    lowTierLegacyFallbackCount: 1,
+    lowTierLegacyFallbackSoldierIds: [1000],
     allNormalPortraitsResolved: true,
     spPortraitExpansion: 'Not included; all remaining unresolved records must be explicit SPSoldierInfo IDs.',
   },
@@ -260,6 +342,7 @@ const output = {
     userReviewedLowTierNameMap: NAME_MAP_PATH,
     driveTier1FolderId: DRIVE_TIER_FOLDERS[1],
     driveTier2FolderId: DRIVE_TIER_FOLDERS[2],
+    legacyCommit: LEGACY_COMMIT,
     stage3gEvidence: EVIDENCE_PATH,
   },
   coverage: {
@@ -297,6 +380,8 @@ const evidence = {
   mappingContractCount: nameMap.rows.length,
   driveTier1FolderCount: driveByTier[1].length,
   driveTier2FolderCount: driveByTier[2].length,
+  driveResolvedCount: evidenceRows.filter((row) => row.assetResolution === 'DRIVE_DEFAULT_PNG').length,
+  legacyResolvedCount: legacyFallbackRows.length,
   rows: evidenceRows.sort((a, b) => a.soldierId - b.soldierId),
 };
 await writeFile(EVIDENCE_PATH, `${JSON.stringify(evidence, null, 2)}\n`);
@@ -307,6 +392,9 @@ await writeFile(CHECKPOINT_PATH, [
   `parentManifest: ${V5_PATH}`,
   'targetLowTierNormalCount: 10',
   `resolvedThisStage: ${newlyResolved.length}`,
+  `driveDefaultResolved: ${evidence.driveResolvedCount}`,
+  `pinnedLegacyWebpResolved: ${evidence.legacyResolvedCount}`,
+  'pinnedLegacyWebpExceptionSoldierId: 1000',
   `tier1Resolved: ${output.coverage.tier1Resolved}/12`,
   `tier2Resolved: ${output.coverage.tier2Resolved}/27`,
   'tier3Resolved: 129/129',
@@ -316,7 +404,7 @@ await writeFile(CHECKPOINT_PATH, [
   'remainingNormalUnresolved: 0',
   'remainingSpUnresolved: 56',
   `nameSource: ${NAME_MAP_PATH}`,
-  'identityRule: canonical Soldier ID -> ConfigDataSoldierInfo exact ID -> exact Chinese name + Model -> user-reviewed exact CN-KR mapping -> exact same-tier Drive I/II Korean folder -> Default.png',
+  'identityRule: canonical Soldier ID -> ConfigData exact Chinese name + Model -> user-reviewed exact CN-KR mapping -> same-tier exact Drive folder Default.png; if absent, pinned legacy same-tier+army exact Korean-name WebP',
   'nameSimilarity: PROHIBITED',
   'combatSignature: NOT_USED_FOR_STAGE3G',
   'idArithmetic: PROHIBITED',
@@ -324,6 +412,5 @@ await writeFile(CHECKPOINT_PATH, [
   'next: SP 56 portrait source-resolution proof; normal Soldier portrait work is closed',
   '',
 ].join('\n'));
-
-console.log(`STAGE3G_LOW_TIER_CLOSEOUT resolved=${output.coverage.resolvedCount} unresolved=${output.coverage.unresolvedCount} normal=${output.coverage.resolvedNormalCount} t1=${output.coverage.tier1Resolved} t2=${output.coverage.tier2Resolved} t3=${output.coverage.tier3Resolved}`);
-for (const row of evidence.rows) console.log(`${row.soldierId}\tT${row.tier}\t${row.nameCn}\t${row.nameKr}\t${row.modelStem}\t${row.driveName}\t${row.driveFolderId}\t${row.driveFileId}`);
+console.log(`STAGE3G_LOW_TIER_CLOSEOUT resolved=${output.coverage.resolvedCount} unresolved=${output.coverage.unresolvedCount} normal=${output.coverage.resolvedNormalCount} t1=${output.coverage.tier1Resolved} t2=${output.coverage.tier2Resolved} t3=${output.coverage.tier3Resolved} drive=${evidence.driveResolvedCount} legacy=${evidence.legacyResolvedCount}`);
+for (const row of evidence.rows) console.log(`${row.soldierId}\tT${row.tier}\t${row.nameCn}\t${row.nameKr}\t${row.modelStem}\t${row.assetResolution}\t${row.driveFolderId ?? row.sourceUrl}`);
