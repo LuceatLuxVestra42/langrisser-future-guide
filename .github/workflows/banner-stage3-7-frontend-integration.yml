@@ -40,6 +40,7 @@ on:
       - 'src/routes/equipment_.exclusive.tsx'
       - 'src/routes/equipment_.$equipmentId.tsx'
       - 'src/routes/soldiers.tsx'
+      - 'src/routes/soldiers.$soldierId.tsx'
       - 'src/routes/index.tsx'
       - 'src/routeTree.gen.ts'
       - 'package.json'
@@ -75,6 +76,8 @@ jobs:
           test -f dist/client/soldiers/index.html
           DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
           test "$DETAIL_COUNT" -eq 373
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
           node -e "const x=require('./data/generated/soldier-list-stage5-8.v1.json'); if(x.summary.recordCount!==224 || x.summary.normalCount!==168 || x.summary.spCount!==56) process.exit(1)"
           node -e "const x=require('./data/generated/army-icon-manifest.v1.json'); if(x.assetsReady!==true || x.importedAssetCount!==10) process.exit(1)"
           ARMY_ICON_COUNT="$(find public/images/army -maxdepth 1 -type f -name 'Icon_Occupation_*.png' | wc -l | tr -d ' ')"
@@ -92,6 +95,7 @@ jobs:
           grep -q '/banners' src/routeTree.gen.ts
           grep -q '/equipment' src/routeTree.gen.ts
           grep -q '/soldiers' src/routeTree.gen.ts
+          grep -q 'soldiers/\$soldierId' src/routeTree.gen.ts
           grep -q '224종' dist/client/soldiers/index.html
       - name: Persist static frontend checkpoint
         run: |
