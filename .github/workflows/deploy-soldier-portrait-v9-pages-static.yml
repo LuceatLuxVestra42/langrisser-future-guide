@@ -1,0 +1,85 @@
+name: Deploy Soldier Portrait V9 Static Pages
+
+on:
+  push:
+    branches:
+      - deploy/soldier-portrait-v9-20260828
+    paths:
+      - '.github/workflows/deploy-soldier-portrait-v9-pages-static.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Verify v9 portrait source contract
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const crypto = require('crypto');
+          const m = require('./data/generated/soldier-portrait-manifest.v9.json');
+          const a = require('./data/validation/soldier-portrait-v9-source-audit.json');
+          if (m.status !== 'PASS' || !m.assetsReady || a.status !== 'PASS' || a.cleanResolvedCount !== 224 || a.unresolvedCount !== 0) throw new Error('v9 evidence not PASS');
+          if (m.records.length !== 224 || m.coverage.resolvedCount !== 224 || m.coverage.canonicalNormalCount !== 168 || m.coverage.canonicalSpCount !== 56) throw new Error('v9 coverage mismatch');
+          for (const r of m.records) {
+            if (r.sourceKind !== 'BWIKI_CURRENT_CN_EXACT_TRANSPARENT_PNG_V9' || !r.sourceHasAlpha || !r.fileName.endsWith('.png')) throw new Error(`source mismatch ${r.soldierId}`);
+            if (r.transparentPixelRatio < .08 || r.borderTransparentPixelRatio < .5 || r.transparentCornerCount < 3) throw new Error(`transparent gate ${r.soldierId}`);
+            const p = path.join('public/images/soldiers', r.fileName);
+            const b = fs.readFileSync(p);
+            if (crypto.createHash('sha256').update(b).digest('hex') !== r.sha256) throw new Error(`hash mismatch ${r.soldierId}`);
+          }
+          const files = fs.readdirSync('public/images/soldiers');
+          if (files.length !== 224 || files.some(f => !f.endsWith('.png'))) throw new Error('portrait directory not exactly 224 PNG');
+          console.log('PASS v9 portrait contract 224/224');
+          NODE
+      - name: Build GitHub Pages static site
+        run: bun run build
+      - name: Verify static candidate
+        run: |
+          set -euo pipefail
+          test -f dist/client/index.html
+          test -f dist/client/soldiers/index.html
+          test -f dist/client/heroes/index.html
+          test -f dist/client/equipment/index.html
+          test -f dist/client/banners/index.html
+          test "$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')" -eq 224
+          test "$(find dist/client/heroes -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/heroes/[0-9]+/index\.html$' | wc -l | tr -d ' ')" -eq 267
+          test "$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')" -eq 373
+          node <<'NODE'
+          const fs=require('fs'), path=require('path'), crypto=require('crypto');
+          const m=require('./data/generated/soldier-portrait-manifest.v9.json');
+          for (const r of m.records) {
+            const p=path.join('dist/client/images/soldiers',r.fileName);
+            const d=path.join('dist/client/soldiers',String(r.soldierId),'index.html');
+            if(!fs.existsSync(p)||!fs.existsSync(d)) throw new Error(`missing built surface ${r.soldierId}`);
+            if(crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')!==r.sha256) throw new Error(`built hash ${r.soldierId}`);
+            if(!fs.readFileSync(d,'utf8').includes(`images/soldiers/${r.fileName}`)) throw new Error(`detail ref ${r.soldierId}`);
+          }
+          NODE
+          grep -q '/langrisser-future-guide/' dist/client/soldiers/index.html
+          printf '%s\n' '5b81f1bbc916ba83dfd5c406273383c3da2b6a6f' > dist/client/qa-main-source.txt
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-deploy-source.txt
+          printf '%s\n' 'soldier-portrait-v9-transparent-224' > dist/client/qa-surface.txt
+      - name: Publish to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Soldier portrait v9 ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
