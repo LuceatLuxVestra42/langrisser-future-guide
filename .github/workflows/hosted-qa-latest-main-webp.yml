@@ -42,7 +42,6 @@ jobs:
                       if i+1<attempts: time.sleep(5)
               raise RuntimeError(f'GET failed {url}: {last!r}')
 
-          # Freshness gate: wait for Pages CDN to expose this exact integrated deployment.
           for attempt in range(15):
               try:
                   _,_,main_body=get('qa-main-source.txt')
@@ -79,7 +78,6 @@ jobs:
           if len(checked)!=224 or len(set(checked))!=224:
               raise RuntimeError('live WebP cardinality mismatch')
 
-          # Key public surfaces remain intact.
           for path in ['soldiers/','soldiers/102/','soldiers/5115/','heroes/']:
               status,_,body=get(path, attempts=3)
               if status!=200 or not body: raise RuntimeError(f'public route failed {path}')
@@ -125,8 +123,13 @@ jobs:
             if(await portraits.count()!==224) throw new Error(`WebP card portrait count ${await portraits.count()} != 224`);
             const badCardSrc=await portraits.evaluateAll(imgs=>imgs.map(x=>x.getAttribute('src')).filter(x=>!x || !x.endsWith('.webp')));
             if(badCardSrc.length) throw new Error(`non-WebP card src ${badCardSrc.slice(0,3)}`);
-            const broken=await portraits.evaluateAll(imgs=>imgs.filter(x=>x.naturalWidth<=0 || x.naturalHeight<=0).map(x=>x.getAttribute('src')));
-            if(broken.length) throw new Error(`broken WebP portraits ${broken.slice(0,5)}`);
+
+            await page.waitForFunction(() => {
+              const imgs=[...document.querySelectorAll('a[aria-label$="상세 보기"] img[src*="/images/soldiers-webp/"]')];
+              return imgs.length===224 && imgs.every(img=>img.complete && img.naturalWidth>0 && img.naturalHeight>0);
+            }, null, {timeout:30000});
+            const broken=await portraits.evaluateAll(imgs=>imgs.filter(x=>!x.complete || x.naturalWidth<=0 || x.naturalHeight<=0).map(x=>x.getAttribute('src')));
+            if(broken.length) throw new Error(`broken WebP portraits after decode wait ${broken.slice(0,5)}`);
             if(oldPngRequests.length) throw new Error(`legacy Soldier PNG requested: ${oldPngRequests.slice(0,3)}`);
 
             await page.getByRole('button',{name:'SP'}).click();
@@ -139,11 +142,11 @@ jobs:
               await page.locator('#soldier-detail-title').waitFor();
               const imgs=page.locator(`img[src$="/images/soldiers-webp/${id}.webp"]`);
               if(await imgs.count()<1) throw new Error(`detail WebP missing ${id}`);
-              const ok=await imgs.evaluateAll(nodes=>nodes.some(x=>x.naturalWidth>0 && x.naturalHeight>0));
-              if(!ok) throw new Error(`detail WebP broken ${id}`);
+              await page.waitForFunction((sid)=>[...document.querySelectorAll(`img[src$="/images/soldiers-webp/${sid}.webp"]`)].some(img=>img.complete && img.naturalWidth>0 && img.naturalHeight>0), id, {timeout:15000});
               await page.reload({waitUntil:'networkidle'});
               const refresh=page.locator(`img[src$="/images/soldiers-webp/${id}.webp"]`);
               if(await refresh.count()<1) throw new Error(`refresh WebP missing ${id}`);
+              await page.waitForFunction((sid)=>[...document.querySelectorAll(`img[src$="/images/soldiers-webp/${sid}.webp"]`)].some(img=>img.complete && img.naturalWidth>0 && img.naturalHeight>0), id, {timeout:15000});
             }
             if(oldPngRequests.length) throw new Error(`legacy PNG request after details: ${oldPngRequests.slice(0,3)}`);
             if(webpResponses.length<224) throw new Error(`too few WebP responses observed: ${webpResponses.length}`);
@@ -163,6 +166,6 @@ jobs:
             if(overflow>2) throw new Error(`mobile horizontal overflow ${overflow}px`);
 
             await browser.close();
-            console.log(`PASS Browser/UI Gate: 224 WebP cards, SP 56, normal/SP details+refresh, no Soldier PNG requests, Hero samples 5, mobile PASS; observed WebP responses ${webpResponses.length}`);
+            console.log(`PASS Browser/UI Gate: 224 WebP cards decoded, SP 56, normal/SP details+refresh, no Soldier PNG requests, Hero samples 5, mobile PASS; observed WebP responses ${webpResponses.length}`);
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
