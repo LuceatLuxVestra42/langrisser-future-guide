@@ -1,0 +1,17 @@
+name: Hero List Stage 5 Structure Probe
+
+on:
+  push:
+    branches:
+      - work/hero-list-stage5
+    paths:
+      - scripts/inspect-hero-list-stage5.mjs
+      - .github/workflows/hero-list-stage5-inspect.yml
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect representative frozen Hero shards
+        run: node scripts/inspect-hero-list-stage5.mjs
