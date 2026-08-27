@@ -26,7 +26,7 @@ function SoldierDetailRoute() {
   const record = Route.useLoaderData();
   const navigate = useNavigate();
   const closeDetail = useCallback(() => {
-    void navigate({ to: "/soldiers", replace: true });
+    void navigate({ to: "/soldiers", replace: true, resetScroll: false });
   }, [navigate]);
 
   useEffect(() => {
@@ -60,7 +60,7 @@ function SoldierNotFound() {
       <section role="dialog" aria-modal="true" aria-labelledby="soldier-not-found-title" className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-center shadow-2xl">
         <h2 id="soldier-not-found-title" className="text-xl font-black text-foreground">용병을 찾을 수 없어</h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">공개 대상 Soldier ID가 아니거나 존재하지 않는 주소야.</p>
-        <Link to="/soldiers" replace className="mt-5 inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-bold text-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">용병 목록으로</Link>
+        <Link to="/soldiers" replace resetScroll={false} className="mt-5 inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-bold text-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">용병 목록으로</Link>
       </section>
     </div>
   );

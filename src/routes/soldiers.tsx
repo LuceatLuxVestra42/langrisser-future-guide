@@ -393,6 +393,7 @@ function SoldierCard({ record }: { record: SoldierPrototypeRecord }) {
       to="/soldiers/$soldierId"
       params={{ soldierId: String(record.soldierId) }}
       preload="intent"
+      resetScroll={false}
       aria-label={`${displayName} 상세 보기`}
       title={`${displayName} · Soldier ${record.soldierId}`}
       className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
