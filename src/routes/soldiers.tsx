@@ -445,16 +445,16 @@ function SoldierCard({
       </div>
 
       <div className="absolute left-1.5 top-1.5 flex gap-1">
-        <span className="rounded bg-black/65 px-1.5 py-0.5 text-xs font-bold text-white">
+        <span className="rounded bg-black/65 px-1.5 py-0.5 text-[14px] font-bold leading-none text-white">
           {record.isSp ? "SP" : `T${record.tier}`}
         </span>
       </div>
 
       <div
-        className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded bg-black/65 text-white shadow-sm sm:h-8 sm:w-8"
+        className="absolute right-1.5 top-1.5 flex h-[22px] w-[22px] items-center justify-center rounded bg-black/65 text-white shadow-sm sm:h-[26px] sm:w-[26px]"
         title={army?.label ?? record.armyType}
       >
-        <ArmyIcon armyType={record.armyType} className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+        <ArmyIcon armyType={record.armyType} className="h-[14px] w-[14px] sm:h-4 sm:w-4" />
         <span className="sr-only">{army?.label ?? record.armyType}</span>
       </div>
 
