@@ -161,7 +161,7 @@ function SoldierPage() {
             ))}
           </div>
 
-          <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
+          <div className="flex flex-col gap-[8.4px] p-[8.4px] sm:flex-row sm:items-center sm:justify-between sm:p-[11.2px]">
             <div className="flex flex-wrap gap-2">
               {TIER_FILTERS.map((filter) => (
                 <PillButton
@@ -184,7 +184,7 @@ function SoldierPage() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="검색"
-                className="h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/50 focus:ring-2 focus:ring-ring"
+                className="h-7 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/50 focus:ring-2 focus:ring-ring"
               />
             </label>
           </div>
@@ -285,7 +285,7 @@ function PillButton({
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`rounded-md border px-3 py-1.5 text-sm font-semibold transition ${
+      className={`h-7 rounded-md border px-3 py-0 text-sm font-semibold transition ${
         selected
           ? "border-foreground bg-foreground text-background"
           : "border-border bg-background text-foreground hover:border-foreground/50 hover:bg-muted"
