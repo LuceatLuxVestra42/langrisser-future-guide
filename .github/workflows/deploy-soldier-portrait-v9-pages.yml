@@ -1,0 +1,111 @@
+name: Deploy Soldier Portrait V9 Pages
+
+on:
+  push:
+    branches:
+      - deploy/soldier-portrait-v9-20260828
+    paths:
+      - '.github/workflows/deploy-soldier-portrait-v9-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Verify v9 clean Soldier portrait evidence
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const crypto = require('crypto');
+          const manifest = require('./data/generated/soldier-portrait-manifest.v9.json');
+          const audit = require('./data/validation/soldier-portrait-v9-source-audit.json');
+          if (manifest.status !== 'PASS' || !manifest.assetsReady) throw new Error('v9 manifest not ready');
+          if (audit.status !== 'PASS' || audit.cleanResolvedCount !== 224 || audit.unresolvedCount !== 0) throw new Error('v9 audit mismatch');
+          const c = manifest.coverage;
+          if (c.canonicalSoldierCount !== 224 || c.canonicalNormalCount !== 168 || c.canonicalSpCount !== 56 || c.resolvedCount !== 224 || c.unresolvedCount !== 0) throw new Error('v9 coverage mismatch');
+          if (manifest.policy.generatedImageUsed || manifest.policy.backgroundRemovalUsed || manifest.policy.syntheticEditingUsed || manifest.policy.normalSpPortraitReuse || !manifest.policy.allPortraitsUseOneSourceFamily) throw new Error('v9 source policy mismatch');
+          if (!Array.isArray(manifest.records) || manifest.records.length !== 224) throw new Error('v9 records mismatch');
+          const ids = new Set();
+          for (const r of manifest.records) {
+            if (ids.has(r.soldierId)) throw new Error(`duplicate Soldier ${r.soldierId}`);
+            ids.add(r.soldierId);
+            if (r.sourceKind !== 'BWIKI_CURRENT_CN_EXACT_TRANSPARENT_PNG_V9') throw new Error(`mixed source ${r.soldierId}`);
+            if (!r.fileName.endsWith('.png') || !r.sourceHasAlpha) throw new Error(`not alpha PNG ${r.soldierId}`);
+            if (r.transparentPixelRatio < 0.08 || r.borderTransparentPixelRatio < 0.50 || r.transparentCornerCount < 3) throw new Error(`transparency gate ${r.soldierId}`);
+            const p = path.join('public/images/soldiers', r.fileName);
+            if (!fs.existsSync(p)) throw new Error(`missing portrait ${r.soldierId}`);
+            const body = fs.readFileSync(p);
+            if (!body.subarray(0,8).equals(Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]))) throw new Error(`bad PNG ${r.soldierId}`);
+            const sha = crypto.createHash('sha256').update(body).digest('hex');
+            if (sha !== r.sha256) throw new Error(`hash mismatch ${r.soldierId}`);
+          }
+          const files = fs.readdirSync('public/images/soldiers');
+          if (files.length !== 224 || files.some((f) => !f.endsWith('.png'))) throw new Error('public Soldier portrait directory is not exactly 224 PNG files');
+          console.log('PASS: v9 224/224 exact transparent PNG evidence and hashes');
+          NODE
+
+      - name: Build GitHub Pages static site
+        run: bun run build
+
+      - name: Verify hosted candidate
+        run: |
+          set -euo pipefail
+          test -f dist/client/index.html
+          test -f dist/client/soldiers/index.html
+          test -f dist/client/heroes/index.html
+          test -f dist/client/equipment/index.html
+          test -f dist/client/banners/index.html
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          HERO_DETAIL_COUNT="$(find dist/client/heroes -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/heroes/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          EQUIPMENT_DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
+          test "$HERO_DETAIL_COUNT" -eq 267
+          test "$EQUIPMENT_DETAIL_COUNT" -eq 373
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const crypto = require('crypto');
+          const manifest = require('./data/generated/soldier-portrait-manifest.v9.json');
+          for (const record of manifest.records) {
+            const asset = path.join('dist/client/images/soldiers', record.fileName);
+            const detail = path.join('dist/client/soldiers', String(record.soldierId), 'index.html');
+            if (!fs.existsSync(asset)) throw new Error(`missing hosted portrait ${record.soldierId}`);
+            if (!fs.existsSync(detail)) throw new Error(`missing Soldier detail ${record.soldierId}`);
+            const body = fs.readFileSync(asset);
+            const sha = crypto.createHash('sha256').update(body).digest('hex');
+            if (sha !== record.sha256) throw new Error(`built asset hash mismatch ${record.soldierId}`);
+            const html = fs.readFileSync(detail, 'utf8');
+            if (!html.includes(`images/soldiers/${record.fileName}`)) throw new Error(`portrait not referenced in detail ${record.soldierId}`);
+          }
+          NODE
+          grep -q '/langrisser-future-guide/' dist/client/soldiers/index.html
+          printf '%s\n' '5b81f1bbc916ba83dfd5c406273383c3da2b6a6f' > dist/client/qa-main-source.txt
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-deploy-source.txt
+          printf '%s\n' 'soldier-portrait-v9-transparent-224' > dist/client/qa-surface.txt
+
+      - name: Publish to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Soldier portrait v9 ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
