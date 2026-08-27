@@ -44,7 +44,7 @@ const ARMY_FILTERS: Array<{
   { id: "FLYING", label: "비병", shortLabel: "비" },
   { id: "WATER", label: "수병", shortLabel: "수" },
   { id: "ARCHER", label: "궁병", shortLabel: "궁" },
-  { id: "ASSASSIN", label: "암살", shortLabel: "암" },
+  { id: "ASSASSIN", label: "암살자", shortLabel: "암" },
   { id: "MAGE", label: "마법사", shortLabel: "법" },
   { id: "HOLY", label: "승병", shortLabel: "승" },
   { id: "DEMON", label: "마족", shortLabel: "마" },
@@ -52,6 +52,10 @@ const ARMY_FILTERS: Array<{
 
 const ARMY_BY_TYPE = new Map<string, (typeof ARMY_FILTERS)[number]>(
   ARMY_FILTERS.map((army) => [army.id, army]),
+);
+
+const ARMY_ORDER = new Map<string, number>(
+  ARMY_FILTERS.map((army, index) => [army.id, index]),
 );
 
 const TIER_FILTERS: Array<{ id: TierFilter; label: string }> = [
@@ -71,24 +75,33 @@ function SoldierPage() {
   const records = useMemo(() => {
     const needle = query.trim().toLowerCase();
 
-    return data.records.filter((record) => {
-      if (armyFilter && record.armyType !== armyFilter) return false;
-      if (tierFilter === "SP" && !record.isSp) return false;
-      if (
-        tierFilter === "T1_T2" &&
-        (record.isSp || (record.tier !== 1 && record.tier !== 2))
-      ) {
-        return false;
-      }
-      if (tierFilter === "T3" && (record.isSp || record.tier !== 3)) return false;
+    return data.records
+      .filter((record) => {
+        if (armyFilter && record.armyType !== armyFilter) return false;
+        if (tierFilter === "SP" && !record.isSp) return false;
+        if (
+          tierFilter === "T1_T2" &&
+          (record.isSp || (record.tier !== 1 && record.tier !== 2))
+        ) {
+          return false;
+        }
+        if (tierFilter === "T3" && (record.isSp || record.tier !== 3)) return false;
 
-      if (needle) {
-        const values = [record.nameKr ?? "", record.nameCn, String(record.soldierId)];
-        if (!values.some((value) => value.toLowerCase().includes(needle))) return false;
-      }
+        if (needle) {
+          const values = [record.nameKr ?? "", record.nameCn, String(record.soldierId)];
+          if (!values.some((value) => value.toLowerCase().includes(needle))) return false;
+        }
 
-      return true;
-    });
+        return true;
+      })
+      .sort((a, b) => {
+        const armyOrderDiff =
+          (ARMY_ORDER.get(a.armyType) ?? Number.MAX_SAFE_INTEGER) -
+          (ARMY_ORDER.get(b.armyType) ?? Number.MAX_SAFE_INTEGER);
+        if (armyOrderDiff !== 0) return armyOrderDiff;
+
+        return b.soldierId - a.soldierId;
+      });
   }, [armyFilter, data.records, query, tierFilter]);
 
   const selectedRecord =
