@@ -1,0 +1,290 @@
+name: Soldier Frontend Stage 2 Portrait
+
+on:
+  push:
+    branches:
+      - 'work/soldier-frontend-stage2-portrait'
+    paths:
+      - '.github/workflows/soldier-frontend-stage2-portrait.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  implement-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Write representative Soldier portrait manifest and resolver
+        shell: bash
+        run: |
+          cat > data/generated/soldier-portrait-manifest.v1.json <<'JSON'
+          {
+            "version": 1,
+            "stage": "frontend-stage2-representative-proof",
+            "status": "PASS_REPRESENTATIVE_PROOF",
+            "source": "Korean legacy sheet asset Drive",
+            "sourceRootFolderId": "1_mTd0VFSUano8fViihUpOH2Y0zx6ThcJ",
+            "sourceTierFolderId": "17586qKXHeDoCZ13E6bmrmgMRtMUk9fzQ",
+            "selectionRule": "confirmed canonical Korean name exact-matches same-name Drive folder; use Default.png, never Default_Enemy.png or cosmetic Skin*.png",
+            "publicRoot": "images/soldiers",
+            "assetsReady": true,
+            "coverage": {
+              "canonicalSoldierCount": 224,
+              "representativeResolvedCount": 3,
+              "fullCoverageStatus": "NOT_STARTED"
+            },
+            "records": [
+              {
+                "soldierId": 102,
+                "nameKr": "중장 창병",
+                "tier": 3,
+                "driveFolderId": "1wYaDbGR9zWac_mjgkQMrm5tbmeLn4HLU",
+                "driveFileId": "1vWXwPrM2-KW-0oi4OTDDg6i70d0JEbqT",
+                "sourceFileName": "Default.png",
+                "fileName": "102.png",
+                "size": 79361,
+                "sha256": "89be0e1cdb7e28d295f95d2e0b27d791f2ef441741866a11d76607d29c81d4b4",
+                "width": 244,
+                "height": 339,
+                "mappingEvidence": "canonical name exact-match + Drive folder exact-match + Default.png visual verification"
+              },
+              {
+                "soldierId": 105,
+                "nameKr": "대지 골렘",
+                "tier": 3,
+                "driveFolderId": "1OPo5Y3N-HcpcFaWKwtDqze2zh_ydh3kd",
+                "driveFileId": "17Ir2sZlMC8kIo3uNe2RZhM-TRXOBe_4_",
+                "sourceFileName": "Default.png",
+                "fileName": "105.png",
+                "size": 100144,
+                "sha256": "cc5c0da73039be61263b108f76af1cf8eb4429660924ef2c7a8207cffaefac94",
+                "width": 326,
+                "height": 350,
+                "mappingEvidence": "canonical name exact-match + Drive folder exact-match + Default.png"
+              },
+              {
+                "soldierId": 106,
+                "nameKr": "할버드",
+                "tier": 3,
+                "driveFolderId": "1Eb3FAsDYLJhmlAiYYSvWWxKYKh_M7xFt",
+                "driveFileId": "1iZqOuVBmxUIl_z0pxM9gfPaznLCYVS-i",
+                "sourceFileName": "Default.png",
+                "fileName": "106.png",
+                "size": 94028,
+                "sha256": "68349a699833456801dfaab6da3899f15e1dc1bb635043a99cb6fe79413c7a8e",
+                "width": 261,
+                "height": 360,
+                "mappingEvidence": "canonical name exact-match + Drive folder exact-match + Default.png"
+              }
+            ]
+          }
+          JSON
+
+          cat > src/lib/soldier-portrait-assets.ts <<'TS'
+          import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v1.json";
+
+          type SoldierPortraitManifestRecord = {
+            soldierId: number;
+            nameKr: string;
+            fileName: string;
+            driveFolderId: string;
+            driveFileId: string;
+            sourceFileName: "Default.png";
+          };
+
+          type SoldierPortraitManifest = {
+            version: number;
+            publicRoot: string;
+            assetsReady: boolean;
+            records: SoldierPortraitManifestRecord[];
+          };
+
+          const soldierPortraitManifest = soldierPortraitManifestJson as SoldierPortraitManifest;
+          const portraitBySoldierId = new Map(
+            soldierPortraitManifest.records.map((record) => [record.soldierId, record]),
+          );
+
+          export function getOfficialSoldierPortraitUrl(soldierId: number): string | null {
+            if (!soldierPortraitManifest.assetsReady) return null;
+            const record = portraitBySoldierId.get(soldierId);
+            if (!record) return null;
+            return `${import.meta.env.BASE_URL}${soldierPortraitManifest.publicRoot}/${record.fileName}`;
+          }
+
+          export function getSoldierPortraitSource(soldierId: number) {
+            return portraitBySoldierId.get(soldierId) ?? null;
+          }
+
+          export function areRepresentativeSoldierPortraitsReady(): boolean {
+            return soldierPortraitManifest.assetsReady;
+          }
+          TS
+
+      - name: Connect representative portraits to Soldier list and detail
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          route_path = Path('src/routes/soldiers.tsx')
+          route = route_path.read_text()
+          old_import = 'import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";\n'
+          new_import = old_import + 'import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";\n'
+          if old_import not in route:
+              raise SystemExit('Soldier list army asset import not found')
+          route = route.replace(old_import, new_import, 1)
+
+          old_card_head = '''function SoldierCard({ record }: { record: SoldierPrototypeRecord }) {\n  const army = ARMY_BY_TYPE.get(record.armyType);\n  const displayName = record.nameKr ?? record.nameCn;\n\n  return ('''
+          new_card_head = '''function SoldierCard({ record }: { record: SoldierPrototypeRecord }) {\n  const army = ARMY_BY_TYPE.get(record.armyType);\n  const displayName = record.nameKr ?? record.nameCn;\n  const portraitUrl = getOfficialSoldierPortraitUrl(record.soldierId);\n  const [portraitFailed, setPortraitFailed] = useState(false);\n\n  return ('''
+          if old_card_head not in route:
+              raise SystemExit('SoldierCard header not found')
+          route = route.replace(old_card_head, new_card_head, 1)
+
+          old_card_preview = '''      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-8 text-muted-foreground transition group-hover:text-foreground">\n        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-current/20 bg-background/70 sm:h-16 sm:w-16">\n          <span className="text-base font-black tracking-tight sm:text-lg">\n            {army?.shortLabel ?? "?"}\n          </span>\n        </div>\n      </div>'''
+          new_card_preview = '''      <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-8 text-muted-foreground transition group-hover:text-foreground">\n        {portraitUrl && !portraitFailed ? (\n          <img\n            src={portraitUrl}\n            alt=""\n            aria-hidden="true"\n            className="absolute inset-0 h-full w-full object-contain object-bottom px-1 pb-7 pt-2 transition-transform duration-200 group-hover:scale-[1.02]"\n            onError={() => setPortraitFailed(true)}\n          />\n        ) : (\n          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-current/20 bg-background/70 sm:h-16 sm:w-16">\n            <span className="text-base font-black tracking-tight sm:text-lg">\n              {army?.shortLabel ?? "?"}\n            </span>\n          </div>\n        )}\n      </div>'''
+          if old_card_preview not in route:
+              raise SystemExit('SoldierCard placeholder preview not found')
+          route = route.replace(old_card_preview, new_card_preview, 1)
+          route_path.write_text(route)
+
+          detail_path = Path('src/components/soldier-detail-modal.tsx')
+          detail = detail_path.read_text()
+          old_detail_import = 'import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";\n'
+          new_detail_import = old_detail_import + 'import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";\n'
+          if old_detail_import not in detail:
+              raise SystemExit('Soldier detail army asset import not found')
+          detail = detail.replace(old_detail_import, new_detail_import, 1)
+
+          old_preview_head = '''  const army = ARMY_META.get(record.armyType);\n  const displayName = record.nameKr ?? record.nameCn;\n  const officialUrl = getOfficialArmyIconUrl(record.armyType);\n  const [imageFailed, setImageFailed] = useState(false);'''
+          new_preview_head = '''  const army = ARMY_META.get(record.armyType);\n  const displayName = record.nameKr ?? record.nameCn;\n  const officialUrl = getOfficialArmyIconUrl(record.armyType);\n  const portraitUrl = getOfficialSoldierPortraitUrl(record.soldierId);\n  const [imageFailed, setImageFailed] = useState(false);\n  const [portraitFailed, setPortraitFailed] = useState(false);'''
+          if old_preview_head not in detail:
+              raise SystemExit('SoldierPreview header not found')
+          detail = detail.replace(old_preview_head, new_preview_head, 1)
+
+          old_detail_preview = '''        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-9 text-muted-foreground">\n          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-current/20 bg-background/70">\n            <span className="text-lg font-black tracking-tight">{army?.shortLabel ?? "?"}</span>\n          </div>\n        </div>'''
+          new_detail_preview = '''        <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-9 text-muted-foreground">\n          {portraitUrl && !portraitFailed ? (\n            <img\n              src={portraitUrl}\n              alt=""\n              aria-hidden="true"\n              className="absolute inset-0 h-full w-full object-contain object-bottom px-2 pb-8 pt-2"\n              onError={() => setPortraitFailed(true)}\n            />\n          ) : (\n            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-current/20 bg-background/70">\n              <span className="text-lg font-black tracking-tight">{army?.shortLabel ?? "?"}</span>\n            </div>\n          )}\n        </div>'''
+          if old_detail_preview not in detail:
+              raise SystemExit('SoldierPreview placeholder not found')
+          detail = detail.replace(old_detail_preview, new_detail_preview, 1)
+          detail_path.write_text(detail)
+          PY
+
+      - name: Import and verify representative Soldier portraits
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { mkdir, readFile, writeFile } from 'node:fs/promises';
+          import path from 'node:path';
+
+          const manifest = JSON.parse(await readFile('data/generated/soldier-portrait-manifest.v1.json', 'utf8'));
+          const outDir = path.join(process.cwd(), 'public/images/soldiers');
+          await mkdir(outDir, { recursive: true });
+
+          const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
+          const isPng = (bytes) => bytes.length >= 24 && bytes.subarray(0, 8).equals(Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]));
+
+          for (const asset of manifest.records) {
+            const urls = [
+              `https://drive.usercontent.google.com/download?id=${asset.driveFileId}&export=download&confirm=t`,
+              `https://drive.google.com/uc?export=download&id=${asset.driveFileId}&confirm=t`,
+            ];
+            let bytes = null;
+            const errors = [];
+            for (const url of urls) {
+              try {
+                const response = await fetch(url, { redirect: 'follow', headers: { 'user-agent': 'Mozilla/5.0' } });
+                if (!response.ok) { errors.push(`${response.status} ${new URL(url).host}`); continue; }
+                const candidate = Buffer.from(await response.arrayBuffer());
+                if (!isPng(candidate)) { errors.push(`non-PNG ${new URL(url).host}`); continue; }
+                bytes = candidate;
+                break;
+              } catch (error) {
+                errors.push(error instanceof Error ? error.message : String(error));
+              }
+            }
+            if (!bytes) throw new Error(`Soldier ${asset.soldierId}: download failed: ${errors.join('; ')}`);
+            if (bytes.length !== asset.size) throw new Error(`Soldier ${asset.soldierId}: size mismatch ${bytes.length} != ${asset.size}`);
+            if (digest(bytes) !== asset.sha256) throw new Error(`Soldier ${asset.soldierId}: SHA-256 mismatch`);
+            const width = bytes.readUInt32BE(16);
+            const height = bytes.readUInt32BE(20);
+            if (width !== asset.width || height !== asset.height) throw new Error(`Soldier ${asset.soldierId}: dimensions mismatch ${width}x${height}`);
+            await writeFile(path.join(outDir, asset.fileName), bytes);
+            console.log(`verified Soldier ${asset.soldierId}: ${asset.fileName} ${width}x${height} ${bytes.length} bytes`);
+          }
+          NODE
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build production frontend
+        run: bun run build
+
+      - name: Validate representative portrait integration
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const m = require('./data/generated/soldier-portrait-manifest.v1.json');
+          if (m.assetsReady !== true) process.exit(1);
+          if (m.coverage.canonicalSoldierCount !== 224) process.exit(1);
+          if (m.coverage.representativeResolvedCount !== 3) process.exit(1);
+          if (m.records.map(x => x.soldierId).join(',') !== '102,105,106') process.exit(1);
+          NODE
+          for id in 102 105 106; do
+            test -f "public/images/soldiers/${id}.png"
+            test -f "dist/client/images/soldiers/${id}.png"
+            test -f "dist/client/soldiers/${id}/index.html"
+            grep -q "images/soldiers/${id}.png" "dist/client/soldiers/${id}/index.html"
+          done
+          grep -q 'getOfficialSoldierPortraitUrl' src/routes/soldiers.tsx
+          grep -q 'getOfficialSoldierPortraitUrl' src/components/soldier-detail-modal.tsx
+          grep -q 'publicRoot.*images/soldiers' data/generated/soldier-portrait-manifest.v1.json
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
+
+      - name: Write Stage 2 checkpoint
+        shell: bash
+        run: |
+          printf '%s\n' \
+            'Soldier Frontend Stage 2 — representative portrait asset resolution' \
+            'status: PASS' \
+            'parentCheckpoint: 690ca0055b0381e3cee79125e97a90883651e634' \
+            'canonicalSoldierCount: 224' \
+            'representativeResolvedCount: 3' \
+            'representativeSoldierIds: 102,105,106' \
+            'source: Korean legacy sheet asset Drive / III / exact canonical Korean-name folder / Default.png' \
+            'selectionRule: Default.png only; exclude Default_Enemy.png and Skin*.png' \
+            'publicRoot: images/soldiers' \
+            'listIntegration: PASS' \
+            'detailIntegration: PASS' \
+            'assetHashValidation: PASS' \
+            'assetDimensionValidation: PASS' \
+            'build: PASS' \
+            'staticPrerender224: PASS' \
+            'full224PortraitCoverage: NOT_STARTED' \
+            'next: expand proven resolver to complete Soldier portrait coverage without changing canonical identity' \
+            > data/checkpoints/soldier-frontend-stage2-portrait.txt
+
+      - name: Persist Stage 2 implementation
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            data/generated/soldier-portrait-manifest.v1.json \
+            data/checkpoints/soldier-frontend-stage2-portrait.txt \
+            public/images/soldiers \
+            src/lib/soldier-portrait-assets.ts \
+            src/routes/soldiers.tsx \
+            src/components/soldier-detail-modal.tsx
+          git diff --cached --check
+          git commit -m "Connect representative Soldier portrait assets"
+          git reset --hard HEAD
+          git clean -fd
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
