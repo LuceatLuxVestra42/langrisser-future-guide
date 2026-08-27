@@ -49,6 +49,8 @@ type SoldierRichRecord = {
   sp: null | {
     normalSoldierId: number;
     spSoldierId: number;
+    descriptionLevels: AbilityLevel[];
+    finalDescription: string;
     stage1?: SpStage | null;
     secondStageUnlock?: boolean;
     stage2?: SpStage | null;
@@ -126,11 +128,7 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
     if (!detail) return null;
 
     if (record.isSp) {
-      return (
-        detail.ability.finalDescription ??
-        detail.ability.levels.find((level) => level.level === 10)?.description ??
-        null
-      );
+      return detail.sp?.finalDescription ?? null;
     }
 
     return (
