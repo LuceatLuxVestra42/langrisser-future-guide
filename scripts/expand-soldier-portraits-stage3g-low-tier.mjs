@@ -12,9 +12,15 @@ const EVIDENCE_PATH = 'data/validation/soldier-portrait-stage3g-low-tier-evidenc
 const CHECKPOINT_PATH = 'data/checkpoints/soldier-frontend-stage3g-low-tier.txt';
 const PUBLIC_DIR = 'public/images/soldiers';
 const TARGET_IDS = [300, 303, 600, 625, 1000, 407, 503, 619, 1100, 1108];
-const BWIKI_API = 'https://wiki.biligame.com/langrisser/api.php';
-const BWIKI_FILE_REDIRECT = 'https://wiki.biligame.com/langrisser/Special:Redirect/file/';
+const DRIVE_TIER_FOLDERS = {
+  1: '1Br-tmzvjc4xo7baBaiziwweGyU75H-8x',
+  2: '15a3Rc2w2i3Zkf32LZwB4xT8Ldaej0yXl',
+};
 const REQUEST_TIMEOUT_MS = 15000;
+
+function normalizeName(value) {
+  return String(value ?? '').normalize('NFC').replace(/[\s_\-]/g, '').toLowerCase();
+}
 
 function sha256(bytes) {
   return createHash('sha256').update(bytes).digest('hex');
@@ -32,96 +38,67 @@ function pngDimensions(bytes) {
 async function fetchResponse(url) {
   return fetch(url, {
     redirect: 'follow',
-    headers: { 'user-agent': 'Mozilla/5.0 SoldierPortraitStage3G/1.0' },
+    headers: { 'user-agent': 'Mozilla/5.0 SoldierPortraitStage3G/1.1' },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
 }
 
-async function fetchJson(url) {
+async function fetchText(url) {
   const response = await fetchResponse(url);
   if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${url}`);
-  return response.json();
+  return response.text();
 }
 
-async function tryPng(url) {
-  try {
-    const response = await fetchResponse(url);
-    if (!response.ok) return { ok: false, error: `${response.status} ${response.statusText}`, finalUrl: response.url };
-    const bytes = Buffer.from(await response.arrayBuffer());
-    if (!isPng(bytes)) {
-      return { ok: false, error: `NON_PNG ${response.headers.get('content-type') ?? ''}`, finalUrl: response.url };
-    }
-    return { ok: true, bytes, finalUrl: response.url };
-  } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : String(error), finalUrl: null };
+async function fetchBytes(url) {
+  const response = await fetchResponse(url);
+  if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${url}`);
+  return Buffer.from(await response.arrayBuffer());
+}
+
+async function loadDriveFolderIndex(tier) {
+  const parentFolderId = DRIVE_TIER_FOLDERS[tier];
+  const text = await fetchText(`https://drive.google.com/drive/folders/${parentFolderId}`);
+  const matches = [...text.matchAll(/aria-label="([^"]+) Shared folder"[\s\S]{0,900}?data-id="([^"]+)"/g)];
+  const records = [...new Map(matches.map((match) => [match[2], {
+    name: match[1],
+    nameKey: normalizeName(match[1]),
+    folderId: match[2],
+  }])).values()];
+  return records;
+}
+
+async function resolveDefaultPng(folderId) {
+  const text = await fetchText(`https://drive.google.com/drive/folders/${folderId}`);
+  const patterns = [
+    /aria-label="Default\.png(?: Image)?(?: Shared)?"[\s\S]{0,1200}?data-id="([^"]+)"/,
+    /data-id="([^"]+)"[\s\S]{0,1200}?aria-label="Default\.png(?: Image)?(?: Shared)?"/,
+  ];
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match) return match[1];
   }
+  throw new Error(`Default.png not found in Drive folder ${folderId}`);
 }
 
-async function resolveBwikiAsset(nameCn) {
-  const fileNames = [`Q${nameCn}.png`, `士兵 ${nameCn}.png`];
-  const attempts = [];
-
-  for (const fileName of fileNames) {
-    const title = `File:${fileName}`;
-    const params = new URLSearchParams({
-      action: 'query',
-      format: 'json',
-      origin: '*',
-      prop: 'imageinfo',
-      iiprop: 'url|size|sha1',
-      titles: title,
-    });
-    const apiUrl = `${BWIKI_API}?${params}`;
+async function downloadDrivePng(fileId) {
+  const urls = [
+    `https://drive.usercontent.google.com/download?id=${fileId}&export=download&confirm=t`,
+    `https://drive.google.com/uc?export=download&id=${fileId}&confirm=t`,
+  ];
+  const failures = [];
+  for (const url of urls) {
     try {
-      const json = await fetchJson(apiUrl);
-      const page = Object.values(json?.query?.pages ?? {})[0];
-      const info = page?.imageinfo?.[0];
-      if (page && !page.missing && info?.url) {
-        const asset = await tryPng(info.url);
-        if (asset.ok) {
-          return {
-            title,
-            fileName,
-            resolution: 'MEDIAWIKI_IMAGEINFO',
-            apiUrl,
-            sourceUrl: asset.finalUrl ?? info.url,
-            bytes: asset.bytes,
-          };
-        }
-        attempts.push({ title, method: 'MEDIAWIKI_IMAGEINFO', status: 'BAD_ASSET', error: asset.error, sourceUrl: info.url });
-      } else {
-        attempts.push({ title, method: 'MEDIAWIKI_IMAGEINFO', status: 'MISSING' });
+      const bytes = await fetchBytes(url);
+      if (!isPng(bytes)) {
+        failures.push(`non-PNG from ${new URL(url).host}`);
+        continue;
       }
+      return { bytes, sourceUrl: url };
     } catch (error) {
-      attempts.push({ title, method: 'MEDIAWIKI_IMAGEINFO', status: 'ERROR', error: error instanceof Error ? error.message : String(error) });
+      failures.push(error instanceof Error ? error.message : String(error));
     }
   }
-
-  for (const fileName of fileNames) {
-    const title = `File:${fileName}`;
-    const redirectUrl = `${BWIKI_FILE_REDIRECT}${encodeURIComponent(fileName)}`;
-    const asset = await tryPng(redirectUrl);
-    if (asset.ok) {
-      return {
-        title,
-        fileName,
-        resolution: 'MEDIAWIKI_SPECIAL_REDIRECT',
-        apiUrl: null,
-        sourceUrl: asset.finalUrl ?? redirectUrl,
-        bytes: asset.bytes,
-      };
-    }
-    attempts.push({
-      title,
-      method: 'MEDIAWIKI_SPECIAL_REDIRECT',
-      status: 'ERROR',
-      error: asset.error,
-      sourceUrl: redirectUrl,
-      finalUrl: asset.finalUrl,
-    });
-  }
-
-  throw new Error(`BWIKI image unresolved for ${nameCn}: ${JSON.stringify(attempts)}`);
+  throw new Error(`Drive PNG download failed for ${fileId}: ${failures.join('; ')}`);
 }
 
 const v5 = JSON.parse(await readFile(V5_PATH, 'utf8'));
@@ -151,6 +128,13 @@ const evidenceRows = [];
 const newlyResolved = [];
 await mkdir(PUBLIC_DIR, { recursive: true });
 
+const driveByTier = {
+  1: await loadDriveFolderIndex(1),
+  2: await loadDriveFolderIndex(2),
+};
+if (driveByTier[1].length !== 11) throw new Error(`Expected 11 Drive I folders, got ${driveByTier[1].length}`);
+if (driveByTier[2].length !== 27) throw new Error(`Expected 27 Drive II folders, got ${driveByTier[2].length}`);
+
 for (const soldierId of TARGET_IDS) {
   const c = configById.get(soldierId);
   const d = detailById.get(soldierId);
@@ -173,8 +157,15 @@ for (const soldierId of TARGET_IDS) {
   const prefab = model.split('/').at(-1) ?? null;
   if (!modelStem || !prefab) throw new Error(`Stage 3G malformed model path ${soldierId}: ${model}`);
 
-  const bwiki = await resolveBwikiAsset(nameCn);
-  const bytes = bwiki.bytes;
+  const nameKey = normalizeName(nameKr);
+  const driveCandidates = driveByTier[tier].filter((row) => row.nameKey === nameKey);
+  if (driveCandidates.length !== 1) {
+    throw new Error(`Stage 3G Drive T${tier} exact reviewed-KR folder mismatch ${soldierId} ${nameCn} -> ${nameKr}: candidates=${JSON.stringify(driveCandidates)}`);
+  }
+  const drive = driveCandidates[0];
+  const driveFileId = await resolveDefaultPng(drive.folderId);
+  const downloaded = await downloadDrivePng(driveFileId);
+  const bytes = downloaded.bytes;
   const dimensions = pngDimensions(bytes);
   if (!dimensions) throw new Error(`Stage 3G PNG dimension parse failed ${soldierId}`);
   const fileName = `${soldierId}.png`;
@@ -185,15 +176,15 @@ for (const soldierId of TARGET_IDS) {
     nameKr,
     nameCn,
     tier,
-    sourceKind: bwiki.fileName.startsWith('Q') ? 'BWIKI_CURRENT_CN_EXACT_Q_PNG_STAGE3G_LOW_TIER' : 'BWIKI_CURRENT_CN_EXACT_SOLDIER_PNG_STAGE3G_LOW_TIER',
-    sourceUrl: bwiki.sourceUrl,
-    bwikiFileTitle: bwiki.title,
-    bwikiResolution: bwiki.resolution,
-    bwikiPageUrl: `https://wiki.biligame.com/langrisser/士兵/${encodeURIComponent(nameCn)}`,
+    sourceKind: `DRIVE_DEFAULT_PNG_STAGE3G_T${tier}_USER_REVIEWED_CN_KR_EXACT`,
+    sourceFileName: 'Default.png',
+    driveFolderId: drive.folderId,
+    driveFileId,
+    sourceUrl: downloaded.sourceUrl,
     model,
     modelStem,
     fileName,
-    resolutionMethod: 'CANONICAL_SOLDIER_ID_TO_CONFIGDATA_CN_MODEL_TO_USER_REVIEWED_KR_AND_BWIKI_EXACT_CN_IMAGE',
+    resolutionMethod: 'CANONICAL_SOLDIER_ID_TO_CONFIGDATA_CN_MODEL_TO_USER_REVIEWED_KR_TO_EXACT_DRIVE_TIER_FOLDER_DEFAULT_PNG',
     size: bytes.length,
     sha256: sha256(bytes),
     width: dimensions.width,
@@ -210,14 +201,15 @@ for (const soldierId of TARGET_IDS) {
     nameKr,
     previousNameKr: d.identity?.nameKr ?? null,
     nameMappingBasis: 'USER_REVIEWED_EXACT_CN_KR_MAP',
+    driveName: drive.name,
+    driveTierFolderId: DRIVE_TIER_FOLDERS[tier],
+    driveFolderId: drive.folderId,
+    driveFileId,
+    driveFileName: 'Default.png',
     model,
     model2,
     modelStem,
     prefab,
-    bwikiFileTitle: bwiki.title,
-    bwikiResolution: bwiki.resolution,
-    bwikiApiUrl: bwiki.apiUrl,
-    sourceUrl: bwiki.sourceUrl,
     byteSize: bytes.length,
     sha256: record.sha256,
     width: record.width,
@@ -235,9 +227,7 @@ const ids = new Set(records.map((row) => row.soldierId));
 if (ids.size !== records.length) throw new Error('Duplicate Soldier portrait ID after Stage 3G');
 if (records.length + unresolved.length !== 224) throw new Error('Stage 3G total coverage mismatch');
 if (TARGET_IDS.some((id) => unresolvedById.has(id))) throw new Error('Stage 3G low-tier target remains unresolved');
-if (unresolved.some((row) => !spIds.has(Number(row.soldierId)))) {
-  throw new Error('Stage 3G normal Soldier remains unresolved after low-tier closeout');
-}
+if (unresolved.some((row) => !spIds.has(Number(row.soldierId)))) throw new Error('Stage 3G normal Soldier remains unresolved after low-tier closeout');
 
 const sourceCounts = Object.fromEntries(
   [...new Set(records.map((row) => row.sourceKind))]
@@ -254,8 +244,8 @@ const output = {
   assetsReady: true,
   policy: {
     ...v5.policy,
-    stage3gAdmission: 'Target must be one of the 10 v5 unresolved normal T1/T2 Soldier IDs. ConfigDataSoldierInfo exact ID supplies Chinese name + Model; Korean presentation name must exact-match the user-reviewed CN-KR contract; BWIKI image file must exact-match the same Chinese name.',
-    stage3gAssetTransport: 'Prefer MediaWiki imageinfo, fall back only to MediaWiki Special:Redirect/file for the same exact file title, validate PNG signature/dimensions/SHA-256, and time out each request.',
+    stage3gAdmission: 'Target must be one of the 10 v5 unresolved normal T1/T2 Soldier IDs. ConfigDataSoldierInfo exact ID supplies Chinese name + Model; Korean presentation name must exact-match the user-reviewed CN-KR contract; that reviewed Korean name must exact-normalize to exactly one folder in the corresponding Drive I/II tier; use Default.png only.',
+    stage3gAssetTransport: 'Use the existing public Korean legacy-sheet Drive tier folders, resolve Default.png only, validate PNG signature/dimensions/SHA-256, and time out each request.',
     lowTierNameSimilarityUsedForAdmission: false,
     lowTierCombatSignatureUsedForAdmission: false,
     lowTierIdArithmeticUsedForAdmission: false,
@@ -268,8 +258,8 @@ const output = {
     configDataSoldierInfo: CONFIG_PATH,
     configDataSpSoldierInfo: SP_CONFIG_PATH,
     userReviewedLowTierNameMap: NAME_MAP_PATH,
-    bwikiApi: BWIKI_API,
-    bwikiFileRedirect: BWIKI_FILE_REDIRECT,
+    driveTier1FolderId: DRIVE_TIER_FOLDERS[1],
+    driveTier2FolderId: DRIVE_TIER_FOLDERS[2],
     stage3gEvidence: EVIDENCE_PATH,
   },
   coverage: {
@@ -293,15 +283,9 @@ const output = {
   unresolved,
 };
 
-if (output.coverage.resolvedCount !== 168 || output.coverage.unresolvedCount !== 56) {
-  throw new Error(`Unexpected Stage 3G coverage ${output.coverage.resolvedCount}/${output.coverage.unresolvedCount}`);
-}
-if (output.coverage.resolvedNormalCount !== 168 || output.coverage.resolvedSpCount !== 0) {
-  throw new Error('Stage 3G normal/SP coverage mismatch');
-}
-if (output.coverage.tier1Resolved !== 12 || output.coverage.tier2Resolved !== 27 || output.coverage.tier3Resolved !== 129) {
-  throw new Error('Stage 3G tier coverage mismatch');
-}
+if (output.coverage.resolvedCount !== 168 || output.coverage.unresolvedCount !== 56) throw new Error(`Unexpected Stage 3G coverage ${output.coverage.resolvedCount}/${output.coverage.unresolvedCount}`);
+if (output.coverage.resolvedNormalCount !== 168 || output.coverage.resolvedSpCount !== 0) throw new Error('Stage 3G normal/SP coverage mismatch');
+if (output.coverage.tier1Resolved !== 12 || output.coverage.tier2Resolved !== 27 || output.coverage.tier3Resolved !== 129) throw new Error('Stage 3G tier coverage mismatch');
 if (unresolved.length !== spIds.size || spIds.size !== 56) throw new Error(`Stage 3G SP unresolved invariant mismatch unresolved=${unresolved.length} spIds=${spIds.size}`);
 
 const evidence = {
@@ -311,6 +295,8 @@ const evidence = {
   targetCount: TARGET_IDS.length,
   passCount: evidenceRows.length,
   mappingContractCount: nameMap.rows.length,
+  driveTier1FolderCount: driveByTier[1].length,
+  driveTier2FolderCount: driveByTier[2].length,
   rows: evidenceRows.sort((a, b) => a.soldierId - b.soldierId),
 };
 await writeFile(EVIDENCE_PATH, `${JSON.stringify(evidence, null, 2)}\n`);
@@ -330,7 +316,7 @@ await writeFile(CHECKPOINT_PATH, [
   'remainingNormalUnresolved: 0',
   'remainingSpUnresolved: 56',
   `nameSource: ${NAME_MAP_PATH}`,
-  'identityRule: canonical Soldier ID -> ConfigDataSoldierInfo exact ID -> exact Chinese name + Model -> user-reviewed exact CN-KR mapping + BWIKI exact Chinese-name image file',
+  'identityRule: canonical Soldier ID -> ConfigDataSoldierInfo exact ID -> exact Chinese name + Model -> user-reviewed exact CN-KR mapping -> exact same-tier Drive I/II Korean folder -> Default.png',
   'nameSimilarity: PROHIBITED',
   'combatSignature: NOT_USED_FOR_STAGE3G',
   'idArithmetic: PROHIBITED',
@@ -340,6 +326,4 @@ await writeFile(CHECKPOINT_PATH, [
 ].join('\n'));
 
 console.log(`STAGE3G_LOW_TIER_CLOSEOUT resolved=${output.coverage.resolvedCount} unresolved=${output.coverage.unresolvedCount} normal=${output.coverage.resolvedNormalCount} t1=${output.coverage.tier1Resolved} t2=${output.coverage.tier2Resolved} t3=${output.coverage.tier3Resolved}`);
-for (const row of evidence.rows) {
-  console.log(`${row.soldierId}\tT${row.tier}\t${row.nameCn}\t${row.nameKr}\t${row.modelStem}\t${row.bwikiFileTitle}\t${row.bwikiResolution}`);
-}
+for (const row of evidence.rows) console.log(`${row.soldierId}\tT${row.tier}\t${row.nameCn}\t${row.nameKr}\t${row.modelStem}\t${row.driveName}\t${row.driveFolderId}\t${row.driveFileId}`);
