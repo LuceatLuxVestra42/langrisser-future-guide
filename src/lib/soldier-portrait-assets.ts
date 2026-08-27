@@ -1,15 +1,17 @@
-import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v3.json";
+import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v4.json";
 
 type SoldierPortraitManifestRecord = {
   soldierId: number;
   nameKr: string | null;
   fileName: string;
   sourceKind: string;
-  sourceFileName: string;
+  sourceFileName?: string;
   resolutionMethod: string;
   driveFolderId?: string;
   driveFileId?: string;
   sourceUrl?: string;
+  evidenceUrl?: string;
+  evidenceName?: string;
   sha256: string;
   size: number;
 };
