@@ -15,18 +15,52 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect representative legacy stat markup
+      - name: Resolve legacy Soldier combat signatures
         run: |
           node <<'NODE'
-          const url='https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/troop/%EC%B0%BD%EB%B3%91.html';
-          const text=await (await fetch(url)).text();
-          const start=text.indexOf('11_정예창병.webp');
-          const next=text.indexOf('<img class="filterDiv', start+1);
-          const chunk=text.slice(start, next>start?next:start+15000);
-          console.log(`start=${start} next=${next} chunk=${chunk.length}`);
-          for(const label of ['사거리','이동거리','생명','공격','방어','마방']){
-            const i=chunk.indexOf(`<!--${label}-->`);
-            console.log(`LABEL=${label} index=${i}`);
-            if(i>=0) console.log(chunk.slice(i,i+500).replace(/\n/g,' '));
+          import fs from 'node:fs';
+          const canonical=JSON.parse(fs.readFileSync('data/generated/soldier-detail-stage5-2.v1.json','utf8')).records;
+          const pages=[
+            {page:'보병',direct:'INFANTRY'}, {page:'창병',direct:'LANCER'}, {page:'기병',direct:'CAVALRY'},
+            {page:'비병',subgroup:{1:'FLYING',2:'WATER'}}, {page:'궁병',subgroup:{1:'ARCHER',2:'ASSASSIN'}},
+            {page:'승병',subgroup:{1:'MAGE',2:'HOLY',3:'DEMON'}},
+          ];
+          const labelMap={range:'사거리',move:'이동거리',hp:'생명',atk:'공격',def:'물리방어',mdef:'마법방어'};
+          const statValue=(chunk,label)=>{const m=chunk.match(new RegExp(`<!--\\s*${label}\\s*-->[\\s\\S]{0,900}?<td[^>]*>\\s*([0-9]+)\\s*<\\/td>`,'i'));return m?Number(m[1]):null;};
+          const legacy=[];
+          for(const def of pages){
+            const url=`https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/troop/${encodeURIComponent(def.page)}.html`;
+            const res=await fetch(url), text=await res.text(); if(!res.ok) throw new Error(`${def.page} ${res.status}`);
+            const headings=[...text.matchAll(/<div class="view_title">([123])티어 용병<\/div>/g)].map(m=>({tier:Number(m[1]),index:m.index}));
+            const imgs=[...text.matchAll(/<img class="filterDiv [^"]+"[^>]*src="(\.\.\/img\/troop\/[^\"]+\/병종\/(\d+)_([^\"]+\.webp))"[^>]*>/g)];
+            for(let i=0;i<imgs.length;i++){
+              const m=imgs[i],h=headings.filter(h=>h.index<m.index).at(-1); if(!h||h.tier>3) continue;
+              let body=m[3].replace(/\.webp$/,''); let subgroup=null; const sm=body.match(/^(\d+)_(.+)$/); if(sm){subgroup=Number(sm[1]);body=sm[2];}
+              const armyType=def.direct??(def.subgroup?def.subgroup[subgroup]:null)??null;
+              const end=imgs[i+1]?.index??Math.min(text.length,m.index+24000),chunk=text.slice(m.index,end);
+              const name=chunk.match(/<h2>\s*([^<]+?)\s*<\/h2>/)?.[1]?.trim()??body;
+              const stats=Object.fromEntries(Object.entries(labelMap).map(([k,l])=>[k,statValue(chunk,l)]));
+              legacy.push({tier:h.tier,armyType,name,src:m[1],stats});
+            }
           }
+          const complete=legacy.filter(x=>x.armyType&&!Object.values(x.stats).some(v=>v==null));
+          const sig=x=>[x.armyType,x.tier,x.range,x.move,x.hp,x.atk,x.def,x.mdef].join(':');
+          const bySig=new Map(); for(const x of complete){const k=sig({...x,...x.stats});const a=bySig.get(k)??[];a.push(x);bySig.set(k,a);}
+          const norm=s=>s.replace(/[\s_\-]/g,'').toLowerCase();
+          const mappings=[],unresolved=[]; let contradictions=0;
+          for(const r of canonical.filter(r=>!r.identity.isSp)){
+            const key=sig({armyType:r.identity.armyType,tier:r.identity.tier,...r.combat}),c=bySig.get(key)??[];
+            if(c.length===1){
+              const x=c[0]; if(r.identity.nameKr&&r.identity.tier===3&&norm(r.identity.nameKr)!==norm(x.name)){contradictions++;console.log(`NAME_CONTRADICTION id=${r.soldierId} canonical=${r.identity.nameKr} legacy=${x.name}`);}
+              mappings.push({soldierId:r.soldierId,tier:r.identity.tier,armyType:r.identity.armyType,nameKr:r.identity.nameKr,legacyName:x.name,legacySrc:x.src});
+            }else unresolved.push({soldierId:r.soldierId,tier:r.identity.tier,armyType:r.identity.armyType,nameKr:r.identity.nameKr,reason:c.length?'AMBIGUOUS_SIGNATURE':'NO_LEGACY_SIGNATURE',candidates:c.map(x=>x.name)});
+          }
+          const lowMap=mappings.filter(x=>x.tier<3),lowUn=unresolved.filter(x=>x.tier<3),t3Map=mappings.filter(x=>x.tier===3),t3Un=unresolved.filter(x=>x.tier===3);
+          console.log(`LEGACY_STATS parsed=${complete.length}/${legacy.length}`);
+          console.log(`LOW_RESULT mapped=${lowMap.length} unresolved=${lowUn.length}`);
+          console.log(`T3_RESULT mapped=${t3Map.length} unresolved=${t3Un.length}`);
+          console.log(`LOW_MAPPINGS ${JSON.stringify(lowMap)}`);
+          console.log(`LOW_UNRESOLVED ${JSON.stringify(lowUn)}`);
+          console.log(`T3_UNRESOLVED ${JSON.stringify(t3Un)}`);
+          if(contradictions) process.exit(1);
           NODE
