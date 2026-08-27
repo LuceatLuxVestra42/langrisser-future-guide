@@ -40,6 +40,15 @@ jobs:
           ! grep -q 'aspect-\[4/5\]' src/routes/heroes.tsx
           ! grep -q 'object-top pb-10' src/routes/heroes.tsx
 
+      - name: Reuse proven GitHub Pages static config
+        run: |
+          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
+          git show FETCH_HEAD:vite.config.ts > vite.config.ts
+          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
+          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
+          grep -q 'nitro: false' vite.config.ts
+          grep -q 'outputPath: `/heroes/${heroId}/index.html`' vite.config.ts
+
       - name: Build GitHub Pages static site
         run: bun run build
 
@@ -57,7 +66,8 @@ jobs:
             '/langrisser-future-guide/',
             '/langrisser-future-guide/heroes/99287',
             '마검의 화신',
-            '검색 결과'
+            '검색 결과',
+            'aspect-square'
           ];
           for (const token of required) {
             if (!html.includes(token)) throw new Error(`Hero static output missing: ${token}`);
