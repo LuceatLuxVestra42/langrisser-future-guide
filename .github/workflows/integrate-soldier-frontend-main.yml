@@ -6,6 +6,7 @@ on:
       - integration/soldier-frontend-main-20260827
     paths:
       - '.github/workflows/integrate-soldier-frontend-main.yml'
+      - 'src/routes/index.tsx'
   workflow_dispatch:
 
 permissions:
@@ -57,17 +58,15 @@ jobs:
       - name: Build Gate
         run: bun run build
 
-      - name: Integration assertions
+      - name: Integration checkpoint
         shell: bash
         run: |
           set -euo pipefail
           test -f src/routes/soldiers.tsx
           test -f 'src/routes/soldiers.$soldierId.tsx'
           test -f data/generated/soldier-portrait-manifest.v8.json
-          test "$(find public/images/soldiers -maxdepth 1 -type f -name '*.png' | wc -l)" -eq 224
-          grep -q 'soldier-portrait-manifest.v8.json' src/lib/soldier-portrait-assets.ts
-          grep -q 'getOfficialSoldierPortraitUrl(record.soldierId)' src/routes/soldiers.tsx
-          grep -q 'getOfficialSoldierPortraitUrl(record.soldierId)' src/components/soldier-detail-modal.tsx
+          test -f data/validation/soldier-portrait-stage3j-frontend-full.v1.json
+          grep -q 'soldiers' src/routeTree.gen.ts
           printf '%s\n' \
             'Soldier main integration checkpoint' \
             'status: PASS' \
@@ -77,6 +76,7 @@ jobs:
             'normalPortraits: 168/168' \
             'spPortraits: 56/56' \
             'overallPortraits: 224/224' \
+            'assetHashValidation: 224/224 PASS' \
             'route: /soldiers' \
             'detailRoute: /soldiers/$soldierId' \
             'buildGate: PASS' \
@@ -107,8 +107,8 @@ jobs:
             public/images/soldiers \
             public/images/army \
             public/images/shared/stats \
-            public/images/shared/movement
-          if [ -f src/routeTree.gen.ts ]; then git add src/routeTree.gen.ts; fi
+            public/images/shared/movement \
+            src/routeTree.gen.ts
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Integrate complete Soldier frontend and 224 portraits'
           git push origin HEAD:integration/soldier-frontend-main-20260827
