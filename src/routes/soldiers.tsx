@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search, Shield } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
+import { Search, Shield, X } from "lucide-react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
@@ -105,7 +105,27 @@ function SoldierPage() {
   }, [armyFilter, data.records, query, tierFilter]);
 
   const selectedRecord =
-    records.find((record) => record.soldierId === selectedId) ?? records[0] ?? null;
+    selectedId === null
+      ? null
+      : data.records.find((record) => record.soldierId === selectedId) ?? null;
+
+  useEffect(() => {
+    if (!selectedRecord) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedId(null);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [selectedRecord]);
 
   return (
     <main className="min-h-screen bg-background">
@@ -176,40 +196,52 @@ function SoldierPage() {
           </p>
         </div>
 
-        <div className="mt-3 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
-          <section
-            aria-label="용병 목록"
-            className="grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3 md:grid-cols-6 xl:grid-cols-8"
-          >
-            {records.map((record) => (
-              <SoldierCard
-                key={record.soldierId}
-                record={record}
-                selected={selectedRecord?.soldierId === record.soldierId}
-                onClick={() => setSelectedId(record.soldierId)}
-              />
-            ))}
+        <section
+          aria-label="용병 목록"
+          className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3 md:grid-cols-6 xl:grid-cols-8"
+        >
+          {records.map((record) => (
+            <SoldierCard
+              key={record.soldierId}
+              record={record}
+              selected={selectedId === record.soldierId}
+              onClick={() => setSelectedId(record.soldierId)}
+            />
+          ))}
 
-            {records.length === 0 ? (
-              <div className="col-span-full rounded-xl border border-dashed border-border px-4 py-14 text-center text-sm text-muted-foreground">
-                현재 조건에 맞는 용병이 없어.
-              </div>
-            ) : null}
-          </section>
-
-          <aside className="order-first lg:order-last">
-            <div className="lg:sticky lg:top-6">
-              {selectedRecord ? (
-                <SoldierDetail record={selectedRecord} />
-              ) : (
-                <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
-                  표시할 용병이 없어.
-                </div>
-              )}
+          {records.length === 0 ? (
+            <div className="col-span-full rounded-xl border border-dashed border-border px-4 py-14 text-center text-sm text-muted-foreground">
+              현재 조건에 맞는 용병이 없어.
             </div>
-          </aside>
-        </div>
+          ) : null}
+        </section>
       </div>
+
+      {selectedRecord ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-6"
+          onMouseDown={(event) => {
+            if (event.currentTarget === event.target) setSelectedId(null);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="soldier-detail-title"
+            className="relative max-h-[calc(100dvh-1rem)] w-full max-w-4xl overflow-y-auto sm:max-h-[90vh]"
+          >
+            <button
+              type="button"
+              aria-label="상세 창 닫기"
+              onClick={() => setSelectedId(null)}
+              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/95 text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <X className="h-5 w-5" aria-hidden="true" />
+            </button>
+            <SoldierDetail record={selectedRecord} />
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
@@ -295,7 +327,7 @@ function SoldierCard({
       </div>
 
       <div className="absolute left-1.5 top-1.5 flex gap-1">
-        <span className="rounded bg-black/65 px-1.5 py-0.5 text-[10px] font-bold text-white">
+        <span className="rounded bg-black/65 px-1.5 py-0.5 text-xs font-bold text-white">
           {record.isSp ? "SP" : `T${record.tier}`}
         </span>
       </div>
@@ -314,8 +346,8 @@ function SoldierDetail({ record }: { record: SoldierPrototypeRecord }) {
   const army = ARMY_BY_TYPE.get(record.armyType);
 
   return (
-    <section className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-      <div className="flex items-start gap-4 border-b border-border p-4">
+    <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+      <div className="flex items-start gap-4 border-b border-border p-4 pr-16 sm:p-5 sm:pr-16">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border bg-muted text-foreground">
           <Shield className="h-8 w-8" strokeWidth={1.5} aria-hidden="true" />
         </div>
@@ -328,15 +360,17 @@ function SoldierDetail({ record }: { record: SoldierPrototypeRecord }) {
               {army?.label ?? record.armyType}
             </span>
           </div>
-          <h2 className="mt-2 truncate text-xl font-bold text-foreground">{displayName}</h2>
+          <h2 id="soldier-detail-title" className="mt-2 truncate text-xl font-bold text-foreground">
+            {displayName}
+          </h2>
           <p className="mt-0.5 truncate text-sm text-muted-foreground">{record.nameCn}</p>
           <p className="mt-1 text-xs text-muted-foreground">Soldier ID {record.soldierId}</p>
         </div>
       </div>
 
-      <div className="p-4">
+      <div className="p-4 sm:p-5">
         <h3 className="text-sm font-bold text-foreground">기초 스탯</h3>
-        <div className="mt-2 grid grid-cols-4 gap-2">
+        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
           <Stat label="HP" value={record.combat.hp} />
           <Stat label="ATK" value={record.combat.atk} />
           <Stat label="DEF" value={record.combat.def} />
