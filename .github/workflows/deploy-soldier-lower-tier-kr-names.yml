@@ -1,0 +1,85 @@
+name: Deploy tier 1-2 Korean Soldier names
+
+on:
+  push:
+    branches:
+      - deploy/soldier-lower-tier-kr-names-20260828
+    paths:
+      - '.github/workflows/deploy-soldier-lower-tier-kr-names.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Verify tier 1-2 Korean presentation contract
+        run: |
+          node <<'NODE'
+          const source = require('./data/presentation/soldier-lower-tier-name-kr.v1.json');
+          const frozen = require('./data/generated/soldier-list-stage5-8.v1.json');
+          if (source.status !== 'PASS' || source.scope !== 'frontend-presentation-only') throw new Error('presentation source status mismatch');
+          if (source.coverage.recordCount !== 39 || source.coverage.tier1Count !== 12 || source.coverage.tier2Count !== 27 || source.coverage.unresolvedCount !== 0) throw new Error('coverage mismatch');
+          const lower = frozen.records.filter((r) => r.sortBucket === 'LOWER_TIER_TECHNICAL');
+          if (lower.length !== 39) throw new Error(`frozen lower-tier count ${lower.length}`);
+          const byId = new Map(source.records.map((r) => [r.soldierId, r]));
+          if (byId.size !== 39) throw new Error('duplicate Soldier ID');
+          for (const base of lower) {
+            const p = byId.get(base.soldierId);
+            if (!p || p.nameCn !== base.nameCn || p.tier !== base.tier || !p.nameKr) throw new Error(`mapping mismatch ${base.soldierId}`);
+          }
+          console.log('PASS: exact Korean presentation names 39/39');
+          NODE
+
+      - name: Build GitHub Pages static site
+        run: bun run build
+
+      - name: Verify static Korean Soldier candidate
+        run: |
+          set -euo pipefail
+          test -f dist/client/soldiers/index.html
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
+          node <<'NODE'
+          const fs = require('fs');
+          const source = require('./data/presentation/soldier-lower-tier-name-kr.v1.json');
+          const listHtml = fs.readFileSync('dist/client/soldiers/index.html', 'utf8');
+          for (const r of source.records) {
+            const detailPath = `dist/client/soldiers/${r.soldierId}/index.html`;
+            if (!fs.existsSync(detailPath)) throw new Error(`missing detail ${r.soldierId}`);
+            const detailHtml = fs.readFileSync(detailPath, 'utf8');
+            if (!detailHtml.includes(r.nameKr)) throw new Error(`Korean detail name missing ${r.soldierId} ${r.nameKr}`);
+            if (!listHtml.includes(r.nameKr)) throw new Error(`Korean list name missing ${r.soldierId} ${r.nameKr}`);
+          }
+          const examples = ['창병','정예 창병','본디노','마법 견습생','샤프슈터','쿠노이치'];
+          for (const name of examples) if (!listHtml.includes(name)) throw new Error(`example missing ${name}`);
+          console.log('PASS: 39/39 Korean names prerendered in list and detail');
+          NODE
+          grep -q '/langrisser-future-guide/' dist/client/soldiers/index.html
+          printf '%s\n' '0c72fa13b9a102f30145cb37915e0c034cd1515c' > dist/client/qa-main-source.txt
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-deploy-source.txt
+          printf '%s\n' 'soldier-lower-tier-kr-names-39' > dist/client/qa-surface.txt
+
+      - name: Publish to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy tier 1-2 Korean Soldier names ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
