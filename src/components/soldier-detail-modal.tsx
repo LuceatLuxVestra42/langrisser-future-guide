@@ -150,12 +150,12 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
 
       <div className="space-y-6 p-4 sm:p-5">
         <section aria-label={`${displayName} 핵심 정보`}>
-          <div className="grid gap-3 sm:grid-cols-[170px_minmax(0,1fr)_250px] sm:items-stretch lg:grid-cols-[220px_minmax(0,1fr)_300px]">
+          <div className="grid gap-3 sm:h-[180px] sm:grid-cols-[180px_minmax(0,1fr)_210px] sm:items-stretch lg:h-[210px] lg:grid-cols-[210px_minmax(0,1fr)_220px]">
             <SoldierPreview record={record} />
 
-            <div className="flex min-h-[190px] flex-col rounded-xl border border-border bg-background p-4">
-              <p className="text-sm font-black text-foreground">{abilityTitle}</p>
-              <div className="mt-3 flex flex-1 items-center text-sm leading-7 text-foreground">
+            <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-background p-3 sm:h-full sm:p-4">
+              <p className="shrink-0 text-sm font-black text-foreground">{abilityTitle}</p>
+              <div className="mt-2 min-h-0 flex-1 overflow-y-auto pr-1 text-sm leading-6 text-foreground sm:mt-3">
                 {loadState === "loading" ? (
                   <LoadingText />
                 ) : loadState === "error" ? (
@@ -239,8 +239,8 @@ function SoldierPreview({ record }: { record: SoldierPrototypeRecord }) {
   const [imageFailed, setImageFailed] = useState(false);
 
   return (
-    <div className="mx-auto w-full max-w-[220px] sm:mx-0 sm:max-w-none">
-      <div className="relative aspect-square overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+    <div className="mx-auto h-[180px] w-[180px] sm:mx-0 sm:h-full sm:w-full">
+      <div className="relative h-full w-full overflow-hidden rounded-xl border border-border bg-card shadow-sm">
         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-9 text-muted-foreground">
           <div className="flex h-16 w-16 items-center justify-center rounded-full border border-current/20 bg-background/70">
             <span className="text-lg font-black tracking-tight">{army?.shortLabel ?? "?"}</span>
@@ -279,41 +279,32 @@ function SoldierPreview({ record }: { record: SoldierPrototypeRecord }) {
 }
 
 function SoldierStatTable({ record }: { record: SoldierPrototypeRecord }) {
-  return (
-    <div className="overflow-hidden rounded-xl border border-border bg-background">
-      <div className="border-b border-border bg-muted/60 px-3 py-2 text-center text-sm font-black text-foreground">
-        기본 속성
-      </div>
-      <div className="grid grid-cols-2 border-b border-border">
-        <CompactStat label="사거리" value={record.combat.range} />
-        <CompactStat
-          label="이동"
-          value={`타입 ${record.combat.moveType} · ${record.combat.move}칸`}
-          bordered
-        />
-      </div>
-      <StatRow label="생명" value={record.combat.hp} />
-      <StatRow label="공격" value={record.combat.atk} />
-      <StatRow label="방어" value={record.combat.def} />
-      <StatRow label="마방" value={record.combat.mdef} last />
-    </div>
-  );
-}
+  const stats = [
+    { label: "사거리", value: record.combat.range },
+    { label: "이동", value: `타입 ${record.combat.moveType} · ${record.combat.move}칸` },
+    { label: "생명", value: record.combat.hp },
+    { label: "공격", value: record.combat.atk },
+    { label: "방어", value: record.combat.def },
+    { label: "마방", value: record.combat.mdef },
+  ];
 
-function CompactStat({ label, value, bordered = false }: { label: string; value: string | number; bordered?: boolean }) {
   return (
-    <div className={`px-2 py-2.5 text-center ${bordered ? "border-l border-border" : ""}`}>
-      <p className="text-[10px] font-bold text-muted-foreground">{label}</p>
-      <p className="mt-0.5 text-sm font-black tabular-nums text-foreground">{value}</p>
-    </div>
-  );
-}
-
-function StatRow({ label, value, last = false }: { label: string; value: string | number; last?: boolean }) {
-  return (
-    <div className={`grid grid-cols-[92px_1fr] ${last ? "" : "border-b border-border"}`}>
-      <div className="bg-muted/40 px-3 py-2.5 text-xs font-bold text-muted-foreground">{label}</div>
-      <div className="px-3 py-2.5 text-center text-sm font-black tabular-nums text-foreground">{value}</div>
+    <div className="grid overflow-hidden rounded-xl border border-border bg-background sm:h-full sm:grid-cols-2 sm:grid-rows-3">
+      {stats.map((stat, index) => (
+        <div
+          key={stat.label}
+          className={`flex min-h-[54px] flex-col items-center justify-center px-2 py-2 text-center sm:min-h-0 ${
+            index % 2 === 0 ? "sm:border-r sm:border-border" : ""
+          } ${index < 4 ? "sm:border-b sm:border-border" : ""}`}
+        >
+          <p className="text-[9px] font-bold leading-none text-muted-foreground sm:text-[10px]">
+            {stat.label}
+          </p>
+          <p className="mt-1 text-xs font-black leading-tight tabular-nums text-foreground sm:text-sm">
+            {stat.value}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }
@@ -410,11 +401,11 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
   }
 
   return (
-    <div className="mt-2 grid gap-3">
+    <div className="mt-2 grid gap-3 md:grid-cols-[280px_minmax(0,1fr)]">
       <div className="rounded-xl border border-border bg-background p-3 sm:p-4">
         <p className="text-sm font-black text-foreground">레벨 범위</p>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <label className="text-xs font-bold text-muted-foreground">
+        <div className="mt-3 flex items-end gap-2">
+          <label className="min-w-0 flex-1 text-xs font-bold text-muted-foreground">
             A 레벨
             <input
               type="number"
@@ -427,11 +418,15 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
                 setStartLevel(next);
                 if (next >= endLevel) setEndLevel(Math.min(maxLevel, next + 1));
               }}
-              className="mt-1 h-10 w-full rounded-md border border-border bg-card px-3 text-center text-base font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
+              className="mt-1 h-10 w-full rounded-md border border-border bg-card px-2 text-center text-base font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
             />
           </label>
 
-          <label className="text-xs font-bold text-muted-foreground">
+          <span className="pb-2 text-lg font-black text-muted-foreground" aria-hidden="true">
+            →
+          </span>
+
+          <label className="min-w-0 flex-1 text-xs font-bold text-muted-foreground">
             B 레벨
             <input
               type="number"
@@ -444,13 +439,10 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
                 setEndLevel(next);
                 if (next <= startLevel) setStartLevel(Math.max(0, next - 1));
               }}
-              className="mt-1 h-10 w-full rounded-md border border-border bg-card px-3 text-center text-base font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
+              className="mt-1 h-10 w-full rounded-md border border-border bg-card px-2 text-center text-base font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
             />
           </label>
         </div>
-        <p className="mt-3 text-xs leading-5 text-muted-foreground">
-          A 레벨에서 B 레벨까지 올릴 때 필요한 재료만 합산해.
-        </p>
       </div>
 
       <div className="rounded-xl border border-border bg-muted/50 p-3 sm:p-4">
