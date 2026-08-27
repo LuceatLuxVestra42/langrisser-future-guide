@@ -6,6 +6,7 @@ on:
       - qa/soldier-stage3g-hosted-deploy7
     paths:
       - '.github/workflows/soldier-stage3g-hosted-qa.yml'
+      - 'src/routes/__root.tsx'
   workflow_dispatch:
 
 permissions:
@@ -31,8 +32,11 @@ jobs:
         run: |
           test -f dist/client/index.html
           test -f dist/client/soldiers/index.html
+          test -f dist/client/favicon.ico
           SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
           test "$SOLDIER_DETAIL_COUNT" -eq 224
+          grep -q '/langrisser-future-guide/favicon.ico' dist/client/soldiers/index.html
+          ! grep -q 'href="/favicon.ico"' dist/client/soldiers/index.html
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
