@@ -35,6 +35,10 @@ const output = {
   rows,
 };
 await writeFile('data/validation/soldier-portrait-stage3e-t3-inventory.v1.json', `${JSON.stringify(output, null, 2)}\n`);
+await writeFile(
+  'data/validation/soldier-portrait-stage3e-t3-inventory.compact.tsv',
+  ['soldierId\tnameKr\tarmyType\tstage3cStatus\tlegacyName', ...rows.map((r) => [r.soldierId, r.nameKr ?? '', r.armyType ?? '', r.stage3cStatus ?? '', r.legacyName ?? ''].join('\t'))].join('\n') + '\n',
+);
 console.log(`STAGE3E_T3_COUNT=${rows.length}`);
 for (const row of rows) {
   console.log(`T3 ${row.soldierId}\t${row.nameKr ?? '(null)'}\t${row.armyType}\t${row.stage3cStatus}\tlegacy=${row.legacyName ?? '-'}\tmodel=${row.model ?? '-'}`);
