@@ -47,13 +47,13 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: TypeScript gate
-        run: bunx tsc --noEmit
-
-      - name: Production build gate
+      - name: Production build and route generation gate
         run: bun run build
 
       - name: Verify generated Hero route
         run: |
           test -f src/routeTree.gen.ts
           grep -q "heroes" src/routeTree.gen.ts
+
+      - name: TypeScript gate
+        run: bunx tsc --noEmit
