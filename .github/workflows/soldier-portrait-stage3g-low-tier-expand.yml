@@ -1,0 +1,66 @@
+name: Soldier Portrait Stage 3G Low Tier Closeout
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - 'data/contracts/soldier-low-tier-cn-kr-map.v1.json'
+      - 'scripts/expand-soldier-portraits-stage3g-low-tier.mjs'
+      - '.github/workflows/soldier-portrait-stage3g-low-tier-expand.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Resolve remaining lower-tier normal portraits
+        run: node scripts/expand-soldier-portraits-stage3g-low-tier.mjs
+      - name: Validate Stage 3G lower-tier closeout
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const x = require('./data/generated/soldier-portrait-manifest.v6.json');
+          if (x.status !== 'PASS_WITH_REVIEW' || x.assetsReady !== true) throw new Error('Stage 3G manifest not ready');
+          if (x.coverage.canonicalSoldierCount !== 224 || x.coverage.resolvedCount !== 168 || x.coverage.unresolvedCount !== 56) throw new Error('Stage 3G coverage mismatch');
+          if (x.coverage.resolvedNormalCount !== 168 || x.coverage.resolvedSpCount !== 0) throw new Error('Stage 3G normal/SP mismatch');
+          if (x.coverage.tier1Resolved !== 12 || x.coverage.tier2Resolved !== 27 || x.coverage.tier3Resolved !== 129) throw new Error('Stage 3G tier coverage mismatch');
+          if (x.coverage.remainingNormalUnresolvedCount !== 0 || x.coverage.remainingSpUnresolvedCount !== 56 || x.coverage.newlyResolvedCount !== 10) throw new Error('Stage 3G closeout mismatch');
+          const expected = '300,303,407,503,600,619,625,1000,1100,1108';
+          if (x.newlyResolvedSoldierIds.join(',') !== expected) throw new Error(`new ID mismatch ${x.newlyResolvedSoldierIds.join(',')}`);
+          if (x.records.length !== 168 || x.unresolved.length !== 56) throw new Error('Stage 3G record arrays mismatch');
+          const sp = require('./data/configdata/ConfigDataSPSoldierInfo.json');
+          const spIds = new Set(sp.map(r => Number(r.ID)));
+          if (spIds.size !== 56 || x.unresolved.some(r => !spIds.has(Number(r.soldierId)))) throw new Error('Stage 3G unresolved set is not exactly SP population');
+          for (const id of x.newlyResolvedSoldierIds) {
+            const r = x.records.find(v => v.soldierId === id);
+            if (!r) throw new Error(`missing Stage3G record ${id}`);
+            const file = path.join('public/images/soldiers', r.fileName);
+            if (!fs.existsSync(file) || fs.statSync(file).size !== r.size) throw new Error(`asset mismatch ${id}`);
+            const b = fs.readFileSync(file);
+            if (!(b[0]===0x89 && b[1]===0x50 && b[2]===0x4e && b[3]===0x47)) throw new Error(`not PNG ${id}`);
+          }
+          const ev = require('./data/validation/soldier-portrait-stage3g-low-tier-evidence.v1.json');
+          if (ev.targetCount !== 10 || ev.passCount !== 10 || ev.mappingContractCount !== 39 || ev.rows.length !== 10 || ev.rows.some(r => r.status !== 'PASS')) throw new Error('Stage3G evidence mismatch');
+          if (ev.rows.filter(r => r.tier === 1).length !== 5 || ev.rows.filter(r => r.tier === 2).length !== 5) throw new Error('Stage3G tier target split mismatch');
+          const map = require('./data/contracts/soldier-low-tier-cn-kr-map.v1.json');
+          if (map.status !== 'USER_REVIEWED' || map.rows.length !== 39) throw new Error('reviewed CN-KR map mismatch');
+          const krByCn = new Map(map.rows.map(r => [r.nameCn, r.nameKr]));
+          if (ev.rows.some(r => krByCn.get(r.nameCn) !== r.nameKr)) throw new Error('Stage3G exact CN-KR mapping mismatch');
+          console.log('STAGE3G_LOW_TIER_CLOSEOUT_VALIDATED normal=168/168 remaining=SP56');
+          NODE
+      - name: Commit Stage 3G assets and checkpoints
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/images/soldiers data/generated/soldier-portrait-manifest.v6.json data/validation/soldier-portrait-stage3g-low-tier-evidence.v1.json data/checkpoints/soldier-frontend-stage3g-low-tier.txt
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Close out lower-tier normal Soldier portraits'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
