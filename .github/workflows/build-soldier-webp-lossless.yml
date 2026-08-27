@@ -41,19 +41,17 @@ jobs:
           console.log('PASS canonical PNG source 224/224');
           NODE
 
-      - name: Convert 224 portraits to lossless WebP
+      - name: Convert 224 portraits to lossless WebP in parallel
         run: |
+          set -euo pipefail
           rm -rf public/images/soldiers-webp
           mkdir -p public/images/soldiers-webp
-          node <<'NODE'
-          const { execFileSync } = require('child_process');
-          const m = require('./data/generated/soldier-portrait-manifest.v9.json');
-          for (const r of m.records) {
-            const src = `public/${m.publicRoot}/${r.fileName}`;
-            const dst = `public/images/soldiers-webp/${r.soldierId}.webp`;
-            execFileSync('cwebp', ['-quiet', '-lossless', '-z', '9', '-metadata', 'none', src, '-o', dst], { stdio: 'inherit' });
-          }
-          NODE
+          node -e "const m=require('./data/generated/soldier-portrait-manifest.v9.json'); for(const r of m.records) console.log(r.soldierId+'\t'+r.fileName)" > /tmp/soldier-webp-input.tsv
+          cat /tmp/soldier-webp-input.tsv | xargs -P 4 -n 2 bash -c '
+            id="$0"; file="$1";
+            cwebp -quiet -lossless -z 6 -metadata none "public/images/soldiers/$file" -o "public/images/soldiers-webp/$id.webp"
+          '
+          test "$(find public/images/soldiers-webp -type f -name '*.webp' | wc -l | tr -d ' ')" -eq 224
 
       - name: Validate decoded pixels, dimensions and build WebP manifest
         run: |
@@ -110,6 +108,7 @@ jobs:
               decodedPixelExact: true,
               alphaPreservedByDecodedPixelEquality: true,
               dimensionsPreserved: true,
+              encoderEffortPreset: 6,
               minimumSavingRatioForActivation: 0.15
             },
             coverage: {
