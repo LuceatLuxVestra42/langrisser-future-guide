@@ -1,0 +1,190 @@
+name: Soldier portrait clean unify v9 fast
+
+on:
+  push:
+    branches:
+      - work/soldier-portrait-clean-unify-v9
+    paths:
+      - '.github/workflows/soldier-portrait-clean-unify-v9-fast.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  unify-fast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check pillow requests
+      - name: Batch resolve and verify clean source assets
+        shell: bash
+        run: |
+          python <<'PY'
+          import hashlib, io, json, shutil, sys
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+          from pathlib import Path
+          from urllib.parse import quote
+          import requests
+          from PIL import Image
+
+          ROOT=Path('.')
+          v8=json.loads((ROOT/'data/generated/soldier-portrait-manifest.v8.json').read_text(encoding='utf-8'))
+          canonical_ids=[int(r['soldierId']) for r in v8['records']]
+          canonical=set(canonical_ids)
+          if len(canonical)!=224: raise SystemExit('v8 canonical IDs != 224')
+
+          def walk(x):
+            if isinstance(x,dict):
+              yield x
+              for v in x.values(): yield from walk(v)
+            elif isinstance(x,list):
+              for v in x: yield from walk(v)
+          def intval(x):
+            try: return int(x) if not isinstance(x,bool) else None
+            except: return None
+          def get(d,*keys):
+            for k in keys:
+              if k in d:return d[k]
+            return None
+
+          cfg=json.loads((ROOT/'data/configdata/ConfigDataSoldierInfo.json').read_text(encoding='utf-8-sig'))
+          names={}
+          conflicts={}
+          for d in walk(cfg):
+            sid=intval(get(d,'ID','Id','id')); name=get(d,'Name','name')
+            if sid in canonical and isinstance(name,str) and name.strip():
+              name=name.strip(); prev=names.get(sid)
+              if prev and prev!=name: conflicts.setdefault(sid,set()).update((prev,name))
+              else:names[sid]=name
+          if conflicts: raise SystemExit(f'ConfigData name conflicts: {conflicts}')
+          missing=sorted(canonical-set(names))
+          if missing: raise SystemExit(f'missing ConfigData names: {missing}')
+
+          spcfg=json.loads((ROOT/'data/configdata/ConfigDataSPSoldierInfo.json').read_text(encoding='utf-8-sig'))
+          sp_all=set()
+          for d in walk(spcfg):
+            sid=intval(get(d,'ID','Id','id'))
+            if sid is not None: sp_all.add(sid)
+          sp=canonical & sp_all
+          if len(sp)!=56: raise SystemExit(f'SP canonical count {len(sp)} != 56')
+
+          API='https://wiki.biligame.com/langrisser/api.php'
+          REDIRECT='https://wiki.biligame.com/langrisser/Special:Redirect/file/'
+          HEAD={'User-Agent':'langrisser-future-guide exact portrait verifier/1.1','Referer':'https://wiki.biligame.com/langrisser/'}
+
+          candidate_map={}
+          for sid in canonical_ids:
+            n=names[sid]
+            candidate_map[sid]=[f'Q{n}SP.png'] if sid in sp else [f'Q{n}.png',f'士兵 {n}.png',f'士兵{n}.png']
+
+          # Resolve primary exact titles in batched MediaWiki calls first.
+          all_titles=[]
+          for sid in canonical_ids: all_titles.extend(candidate_map[sid])
+          title_urls={}
+          sess=requests.Session(); sess.headers.update(HEAD)
+          for start in range(0,len(all_titles),40):
+            chunk=all_titles[start:start+40]
+            try:
+              res=sess.get(API,params={'action':'query','format':'json','formatversion':'2','prop':'imageinfo','iiprop':'url|mime|size','titles':'|'.join('File:'+t for t in chunk)},timeout=12)
+              res.raise_for_status()
+              for p in res.json().get('query',{}).get('pages',[]):
+                info=(p.get('imageinfo') or [None])[0]
+                title=p.get('title','')
+                if info and info.get('url') and title.startswith('File:'):
+                  title_urls[title[5:]]=info['url']
+            except Exception as e:
+              print(f'WARN batch imageinfo {start}: {type(e).__name__}: {e}',flush=True)
+
+          def metrics(body):
+            if not body.startswith(b'\x89PNG\r\n\x1a\n'): return None,'NOT_PNG'
+            try:
+              with Image.open(io.BytesIO(body)) as im:
+                has_alpha=im.mode in ('RGBA','LA') or 'transparency' in im.info
+                rgba=im.convert('RGBA'); w,h=rgba.size; a=rgba.getchannel('A'); px=a.load()
+                vals=list(a.getdata()); tr=sum(v<=8 for v in vals)/len(vals)
+                border=[px[x,0] for x in range(w)]+[px[x,h-1] for x in range(w)]
+                if h>2:border += [px[0,y] for y in range(1,h-1)]+[px[w-1,y] for y in range(1,h-1)]
+                br=sum(v<=8 for v in border)/len(border)
+                cc=sum(v<=8 for v in [px[0,0],px[w-1,0],px[0,h-1],px[w-1,h-1]])
+                m={'format':im.format,'width':w,'height':h,'sourceHasAlpha':has_alpha,'transparentPixelRatio':round(tr,6),'borderTransparentPixelRatio':round(br,6),'transparentCornerCount':cc}
+                ok=im.format=='PNG' and has_alpha and tr>=0.08 and br>=0.50 and cc==4
+                return m,('PASS' if ok else 'NON_TRANSPARENT_SOURCE')
+            except Exception as e:return None,f'DECODE:{e}'
+
+          def fetch_one(sid):
+            attempts=[]
+            for title in candidate_map[sid]:
+              urls=[]
+              if title in title_urls: urls.append(title_urls[title])
+              urls.append(REDIRECT+quote(title,safe=''))
+              seen=set()
+              for u in urls:
+                if u in seen:continue
+                seen.add(u)
+                try:
+                  r=requests.get(u,headers=HEAD,timeout=10,allow_redirects=True)
+                  r.raise_for_status(); body=r.content
+                  m,status=metrics(body)
+                  if status=='PASS':
+                    return sid,{'soldierId':sid,'chineseName':names[sid],'isSp':sid in sp,'sourceFileName':title,'sourceUrl':r.url,'fileName':f'{sid}.png','size':len(body),'sha256':hashlib.sha256(body).hexdigest(),**m,'body':body},attempts
+                  attempts.append({'title':title,'status':status,'metrics':m})
+                  break
+                except Exception as e:
+                  attempts.append({'title':title,'status':'FETCH_FAILED','error':f'{type(e).__name__}:{e}'})
+            return sid,None,attempts
+
+          resolved={}; unresolved=[]
+          with ThreadPoolExecutor(max_workers=16) as pool:
+            futs=[pool.submit(fetch_one,sid) for sid in canonical_ids]
+            done=0
+            for f in as_completed(futs):
+              sid,item,attempts=f.result(); done+=1
+              if item: resolved[sid]=item
+              else: unresolved.append({'soldierId':sid,'chineseName':names[sid],'isSp':sid in sp,'attempts':attempts})
+              if done%25==0 or done==224: print(f'checked {done}/224 clean={len(resolved)} unresolved={len(unresolved)}',flush=True)
+
+          audit={'status':'PASS' if not unresolved else 'BLOCKED','canonicalCount':224,'normalCount':168,'spCount':56,'cleanResolvedCount':len(resolved),'unresolvedCount':len(unresolved),'thresholds':{'minimumTransparentPixelRatio':0.08,'minimumBorderTransparentPixelRatio':0.50,'requiredTransparentCorners':4},'unresolved':sorted(unresolved,key=lambda x:x['soldierId'])}
+          ap=ROOT/'data/validation/soldier-portrait-v9-source-audit.json'; ap.parent.mkdir(parents=True,exist_ok=True); ap.write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          if unresolved:
+            print('UNRESOLVED_BEGIN')
+            print(json.dumps(audit,ensure_ascii=False,indent=2))
+            print('UNRESOLVED_END')
+            raise SystemExit(f'BLOCKED {len(unresolved)} exact transparent sources; public assets untouched')
+
+          out=ROOT/'public/images/soldiers'
+          if out.exists(): shutil.rmtree(out)
+          out.mkdir(parents=True)
+          old={int(r['soldierId']):r for r in v8['records']}; records=[]
+          for sid in sorted(canonical_ids):
+            x=resolved[sid]; (out/f'{sid}.png').write_bytes(x.pop('body'))
+            prev=old[sid]
+            r={'soldierId':sid,'nameKr':prev.get('nameKr'),'presentationNameEvidence':prev.get('presentationNameEvidence'),'tier':prev.get('tier'),'chineseName':x['chineseName'],'isSp':x['isSp'],'sourceKind':'BWIKI_CURRENT_CN_EXACT_TRANSPARENT_PNG_V9','sourceFileName':x['sourceFileName'],'sourceUrl':x['sourceUrl'],'fileName':x['fileName'],'resolutionMethod':'CANONICAL_ID_TO_CONFIGDATA_EXACT_CN_NAME_TO_BWIKI_EXACT_TRANSPARENT_FILE','size':x['size'],'sha256':x['sha256'],'width':x['width'],'height':x['height'],'sourceHasAlpha':x['sourceHasAlpha'],'transparentPixelRatio':x['transparentPixelRatio'],'borderTransparentPixelRatio':x['borderTransparentPixelRatio'],'transparentCornerCount':x['transparentCornerCount']}
+            records.append({k:v for k,v in r.items() if v is not None})
+
+          v9={'version':9,'stage':'frontend-soldier-portrait-clean-source-unification','status':'PASS','publicRoot':'images/soldiers','assetsReady':True,'policy':{'noGuessing':True,'generatedImageUsed':False,'backgroundRemovalUsed':False,'syntheticEditingUsed':False,'identityJoin':'canonical Soldier ID -> ConfigDataSoldierInfo exact ID -> exact current Chinese Name','normalBwikiAdmission':'Exact Q<Name>.png first; exact 士兵 <Name>.png variants only when independently verified as the exact transparent unit source.','spBwikiAdmission':'Exact Q<Name>SP.png only.','transparencyGate':{'sourceMustBePng':True,'sourceMustContainAlpha':True,'minimumTransparentPixelRatio':0.08,'minimumBorderTransparentPixelRatio':0.50,'requiredTransparentCorners':4},'nameSimilarityUsed':False,'idArithmeticUsed':False,'normalSpPortraitReuse':False,'allPortraitsUseOneSourceFamily':True},'sources':{'previousManifest':'data/generated/soldier-portrait-manifest.v8.json','configDataSoldierInfo':'data/configdata/ConfigDataSoldierInfo.json','configDataSpSoldierInfo':'data/configdata/ConfigDataSPSoldierInfo.json','bwikiApi':API,'bwikiFileRedirect':REDIRECT,'sourceAudit':'data/validation/soldier-portrait-v9-source-audit.json'},'coverage':{'canonicalSoldierCount':224,'canonicalNormalCount':168,'canonicalSpCount':56,'resolvedCount':224,'unresolvedCount':0,'resolvedNormalCount':168,'resolvedSpCount':56,'sourceCounts':{'BWIKI_CURRENT_CN_EXACT_TRANSPARENT_PNG_V9':224}},'records':records}
+          (ROOT/'data/generated/soldier-portrait-manifest.v9.json').write_text(json.dumps(v9,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          rp=ROOT/'src/lib/soldier-portrait-assets.ts'; text=rp.read_text(encoding='utf-8')
+          if 'soldier-portrait-manifest.v8.json' not in text: raise SystemExit('resolver not v8')
+          rp.write_text(text.replace('soldier-portrait-manifest.v8.json','soldier-portrait-manifest.v9.json',1),encoding='utf-8')
+          files=list(out.iterdir())
+          if len(files)!=224 or any(p.suffix!='.png' for p in files): raise SystemExit('public asset set is not exactly 224 PNG')
+          print('PASS 224/224 exact transparent source portraits')
+          PY
+      - uses: oven-sh/setup-bun@v2
+      - name: Production build
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+      - name: Commit v9
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/images/soldiers data/generated/soldier-portrait-manifest.v9.json data/validation/soldier-portrait-v9-source-audit.json src/lib/soldier-portrait-assets.ts
+          git commit -m 'Unify Soldier portraits to transparent BWIKI source assets'
+          git push origin HEAD:work/soldier-portrait-clean-unify-v9
