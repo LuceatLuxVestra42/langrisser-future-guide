@@ -1,0 +1,67 @@
+name: Deploy Soldier SP ability display
+
+on:
+  push:
+    branches:
+      - work/soldier-sp-ability-display
+    paths:
+      - '.github/workflows/deploy-soldier-sp-ability-display.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Preflight SP unique-skill contract
+        run: |
+          node <<'NODE'
+          const validation = require('./data/validation/soldier-stage5-3-ability.v1.json');
+          const runtime = require('./public/data/soldier-detail-stage5-6.v1.json');
+          if (validation.status !== 'PASS' || validation.coverage.spSoldiers !== 56 || validation.coverage.spDescriptionRecords !== 56) throw new Error('Stage 5-3 SP validation mismatch');
+          if (validation.coverage.spDescriptionSourceMissing.length || validation.coverage.spDescriptionEmpty.length || validation.coverage.spDescriptionRelationMismatch.length) throw new Error('Stage 5-3 unresolved SP descriptions');
+          const sp = runtime.records.filter((r) => r.identity?.isSp === true);
+          const invalid = sp.filter((r) => !r.sp || typeof r.sp.finalDescription !== 'string' || !r.sp.finalDescription.trim() || !Array.isArray(r.sp.descriptionLevels) || r.sp.descriptionLevels.length !== 10);
+          if (sp.length !== 56 || invalid.length) throw new Error(`Runtime SP skill coverage ${(sp.length-invalid.length)}/56`);
+          console.log('PASS: SP unique-skill source 56/56');
+          NODE
+          grep -Fq 'return detail.sp?.finalDescription ?? null;' src/components/soldier-detail-modal.tsx
+      - name: Build GitHub Pages static site
+        run: bun run build
+      - name: Verify static candidate
+        run: |
+          set -euo pipefail
+          test -f dist/client/soldiers/index.html
+          test -f dist/client/data/soldier-detail-stage5-6.v1.json
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
+          node <<'NODE'
+          const runtime = require('./dist/client/data/soldier-detail-stage5-6.v1.json');
+          const sp = runtime.records.filter((r) => r.identity?.isSp === true);
+          const invalid = sp.filter((r) => !r.sp?.finalDescription?.trim());
+          if (sp.length !== 56 || invalid.length) throw new Error(`Built runtime SP skill coverage ${(sp.length-invalid.length)}/56`);
+          console.log('PASS: built runtime SP unique skills 56/56');
+          NODE
+          grep -q '/langrisser-future-guide/' dist/client/soldiers/index.html
+          printf '%s\n' '3f3b17dadfdcf9872aa80cfa3219989204c07d37' > dist/client/qa-main-source.txt
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-deploy-source.txt
+          printf '%s\n' 'soldier-sp-ability-display-56' > dist/client/qa-surface.txt
+      - name: Publish to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Soldier SP ability display ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
