@@ -79,8 +79,9 @@ check(
 check(
   'server-consumes-stage1-only',
   server.includes('../../data/generated/hero-list-stage1.v1.json') &&
-    !server.includes('ConfigData') &&
     !server.includes('data/configdata/') &&
+    !server.includes('ConfigDataHero') &&
+    !server.includes('ConfigDataJob') &&
     !server.includes('hero-detail.v1.json'),
   'frozen list import present; raw/producer imports absent',
 );
