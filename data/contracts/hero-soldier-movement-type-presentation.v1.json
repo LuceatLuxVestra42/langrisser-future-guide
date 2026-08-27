@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-movement-type-presentation/v1",
+  "stage": "shared-presentation-movement",
+  "status": "FROZEN",
+  "purpose": "Define one shared movement-type presentation contract for Soldier records and Hero jobs without reopening the frozen Soldier or Hero semantic pipelines. Movement type is a source value; movement-point distance is independent and must never be used to infer the type.",
+  "definitions": [
+    {
+      "id": 1,
+      "key": "RIDE",
+      "nameKr": "기마 이동",
+      "iconFileName": "Move_Ride.png"
+    },
+    {
+      "id": 2,
+      "key": "WALK",
+      "nameKr": "보행 이동",
+      "iconFileName": "Move_Walk.png"
+    },
+    {
+      "id": 3,
+      "key": "WATER",
+      "nameKr": "수상 이동",
+      "iconFileName": "Move_Water.png"
+    },
+    {
+      "id": 4,
+      "key": "FLY",
+      "nameKr": "비행 이동",
+      "iconFileName": "Move_Fly.png"
+    },
+    {
+      "id": 5,
+      "key": "FIELD_ARMY",
+      "nameKr": "야전 이동",
+      "iconFileName": "Move_FieldArmy.png"
+    }
+  ],
+  "sourceOwnership": {
+    "soldier": {
+      "source": "data/configdata/ConfigDataSoldierInfo.json",
+      "sourceKey": "ID",
+      "moveTypeField": "MoveType",
+      "movePointField": "BF_MovePoint",
+      "canonicalScope": "data/generated/soldier-master.v1.json#records[].soldierId",
+      "join": "soldierId == ConfigDataSoldierInfo.ID"
+    },
+    "hero": {
+      "source": "data/configdata/ConfigDataJobInfo.json",
+      "sourceKey": "ID",
+      "moveTypeField": "MoveType",
+      "movePointField": "BF_MovePoint",
+      "canonicalScope": "data/generated/hero-job-links.v1.json#records[].connections[].jobId",
+      "join": "Hero job connection jobId == ConfigDataJobInfo.ID",
+      "scopeRule": "Hero movement type is job-scoped. Do not assign one global movement type to a Hero when that Hero has multiple jobs."
+    }
+  },
+  "generatedOutput": {
+    "path": "data/generated/shared-movement-type-index.v1.json",
+    "validation": "data/validation/shared-movement-type-index-final.v1.json",
+    "builder": "scripts/build_shared_movement_types.mjs",
+    "shape": {
+      "definitions": "the five shared movement-type definitions",
+      "heroJobsById": "jobId -> moveType/movePoint/source display metadata",
+      "soldiersById": "soldierId -> moveType/movePoint/source display metadata"
+    }
+  },
+  "runtimeConsumption": {
+    "soldier": "Resolve the canonical Soldier ID in shared-movement-type-index.v1.json#soldiersById and then resolve its moveType against definitions.",
+    "hero": "Resolve the currently displayed Hero job's jobId in shared-movement-type-index.v1.json#heroJobsById and then resolve its moveType against definitions.",
+    "configDataRuntimeRead": false,
+    "iconRule": "Use definition.iconFileName as the source asset identifier. Actual extracted PNG delivery/web path is a separate frontend/asset integration step and does not reopen movement semantics."
+  },
+  "hardValidationRules": [
+    "Exactly five movement definitions with unique IDs 1..5 must exist.",
+    "Every canonical Soldier ID must resolve to exactly one ConfigDataSoldierInfo record.",
+    "Every Hero jobId referenced by the canonical Hero job-link output must resolve to exactly one ConfigDataJobInfo record.",
+    "Every resolved Soldier and Hero Job MoveType must be one of the five defined IDs.",
+    "MoveType and BF_MovePoint are independent fields. Never infer MoveType from movement distance or vice versa.",
+    "Hero movement type remains job-scoped and must not be collapsed to a single Hero-level value.",
+    "Production Hero or Soldier page code must not read ConfigData directly when the generated shared index is available."
+  ],
+  "fieldArmyEvidence": {
+    "meaning": "MoveType 5 = 야전 이동",
+    "soldierWitnesses": [
+      1033,
+      1037
+    ],
+    "gameUiCrossCheckedSoldierId": 1037,
+    "note": "Soldier 1037 (마충 거대 수호자 / 魔虫巨卫) is cross-checked against the game UI as 야전 이동. Soldier 1033 is an additional source-data witness that MoveType 5 is not a one-record anomaly."
+  },
+  "freezeBoundary": {
+    "soldierSemanticPipelineReopened": false,
+    "heroSemanticPipelineReopened": false,
+    "reason": "Soldier Stage 5 already preserves raw/normalized moveType for later UI mapping, while Hero movement presentation can be joined by existing canonical jobId. This contract adds a shared presentation/index layer only."
+  }
+}
