@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "schemaId": "shared-movement-type-index-validation/v1",
+  "status": "PASS",
+  "generatedAt": "2026-08-27T07:32:34.377Z",
+  "sources": {
+    "contract": "data/contracts/hero-soldier-movement-type-presentation.v1.json",
+    "heroJobs": "data/generated/hero-job-links.v1.json",
+    "soldierMaster": "data/generated/soldier-master.v1.json",
+    "jobInfo": "data/configdata/ConfigDataJobInfo.json",
+    "soldierInfo": "data/configdata/ConfigDataSoldierInfo.json"
+  },
+  "summary": {
+    "definitionCount": 5,
+    "canonicalHeroCount": 267,
+    "heroJobCount": 804,
+    "generatedHeroJobCount": 804,
+    "canonicalSoldierCount": 224,
+    "generatedSoldierCount": 224,
+    "heroJobUsageByMoveType": {
+      "1": 58,
+      "2": 558,
+      "3": 28,
+      "4": 120,
+      "5": 40
+    },
+    "soldierUsageByMoveType": {
+      "1": 29,
+      "2": 129,
+      "3": 17,
+      "4": 37,
+      "5": 12
+    },
+    "missingHeroJobCount": 0,
+    "missingSoldierCount": 0,
+    "unknownHeroJobMoveTypeCount": 0,
+    "unknownSoldierMoveTypeCount": 0,
+    "hardErrorCount": 0
+  },
+  "fieldArmyWitnesses": [
+    {
+      "soldierId": 1033,
+      "expectedMoveType": 5,
+      "actualMoveType": 5,
+      "nameCn": "巨型灵俑",
+      "pass": true
+    },
+    {
+      "soldierId": 1037,
+      "expectedMoveType": 5,
+      "actualMoveType": 5,
+      "nameCn": "魔虫巨卫",
+      "pass": true
+    }
+  ],
+  "missingHeroJobIds": [],
+  "missingSoldierIds": [],
+  "unknownHeroJobMoveTypes": [],
+  "unknownSoldierMoveTypes": [],
+  "hardErrors": [],
+  "invariants": {
+    "moveTypeIndependentFromMovePoint": true,
+    "heroMovementTypeScope": "JOB",
+    "soldierMovementTypeScope": "SOLDIER",
+    "runtimeConfigDataReadRequired": false,
+    "semanticProducerStagesReopened": false
+  }
+}
