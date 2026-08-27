@@ -226,16 +226,16 @@ function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
       aria-label={`${displayName} ${hero.rarity.baseLabel} 상세 보기`}
       className="group block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2"
     >
-      <article className="relative aspect-[4/5] overflow-hidden rounded-md border border-border bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
+      <article className="relative aspect-square overflow-hidden rounded-md border border-border bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
         {imageUrl ? (
           <img
             src={imageUrl}
             alt=""
-            className="h-full w-full object-cover object-top pb-10"
+            className="h-full w-full object-cover object-top"
             loading="lazy"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-12 text-muted-foreground">
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted text-muted-foreground">
             <UserRound
               className="h-12 w-12 transition group-hover:text-foreground sm:h-14 sm:w-14"
               strokeWidth={1.25}
@@ -259,8 +259,8 @@ function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
           ) : null}
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 bg-black/75 px-1.5 py-2 text-center backdrop-blur-[1px]">
-          <span className="line-clamp-2 text-[11px] font-bold leading-tight text-white sm:text-xs">
+        <div className="absolute inset-x-0 bottom-0 bg-black/60 px-2 py-1.5 text-center backdrop-blur-[1px]">
+          <span className="line-clamp-1 text-[11px] font-bold leading-tight text-white sm:text-xs">
             {displayName}
           </span>
         </div>
