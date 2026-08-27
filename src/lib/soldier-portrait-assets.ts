@@ -1,4 +1,4 @@
-import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v8.json";
+import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v9.json";
 
 type SoldierPortraitManifestRecord = {
   soldierId: number;
