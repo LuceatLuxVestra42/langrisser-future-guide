@@ -15,16 +15,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect lazy Drive folder payload
+      - name: Inspect missing Drive portrait folder
         run: |
           node <<'NODE'
-          const id='17586qKXHeDoCZ13E6bmrmgMRtMUk9fzQ';
-          const text=await (await fetch(`https://drive.google.com/drive/folders/${id}`,{headers:{'user-agent':'Mozilla/5.0'}})).text();
-          console.log(`bytes=${text.length}`);
-          for(const name of ['가면 메이드','볼트 레인저','로열 그리폰','야만 뿔투사','중장 창병']){
-            const positions=[]; let from=0;
-            while(true){const i=text.indexOf(name,from);if(i<0)break;positions.push(i);from=i+name.length;if(positions.length>=5)break;}
-            console.log(`NAME=${name} positions=${positions.join(',')||'NONE'}`);
-            for(const i of positions.slice(0,2)) console.log(text.slice(Math.max(0,i-600),i+900).replace(/\n/g,' '));
+          const id='1nUe6vHORKmU1w8rDKvFieRJm3j1KHty_';
+          const res=await fetch(`https://drive.google.com/drive/folders/${id}`,{headers:{'user-agent':'Mozilla/5.0'}});
+          const text=await res.text();
+          console.log(`status=${res.status} bytes=${text.length}`);
+          const labels=[...text.matchAll(/aria-label="([^"]+)"/g)].map(m=>m[1]);
+          const interesting=[...new Set(labels.filter(x=>/png|jpg|jpeg|webp|default|shared file|image/i.test(x)))];
+          console.log(`INTERESTING_LABELS ${JSON.stringify(interesting.slice(0,100))}`);
+          const ids=[...text.matchAll(/data-id="([^"]+)"/g)].map(m=>m[1]);
+          console.log(`DATA_ID_COUNT=${new Set(ids).size}`);
+          for(const needle of ['Default.png','.png','.webp','.jpg']){
+            const i=text.indexOf(needle);
+            console.log(`NEEDLE=${needle} index=${i}`);
+            if(i>=0) console.log(text.slice(Math.max(0,i-1000),i+1500).replace(/\n/g,' '));
           }
           NODE
