@@ -1,0 +1,44 @@
+name: Soldier Portrait Stage 3D Low Tier Discovery
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - '.github/workflows/soldier-portrait-stage3d-low-tier.yml'
+      - 'scripts/discover-soldier-portrait-low-tier-stage3d.mjs'
+      - 'data/generated/soldier-portrait-manifest.v3.json'
+
+permissions:
+  contents: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Discover safe low-tier Soldier portrait joins
+        run: node scripts/discover-soldier-portrait-low-tier-stage3d.mjs
+      - name: Validate low-tier discovery
+        run: |
+          node <<'NODE'
+          const x = require('./data/validation/soldier-portrait-low-tier-discovery-stage3d.v1.json');
+          if (x.summary.unresolvedLowTierCount !== x.results.length) throw new Error('low-tier count mismatch');
+          if (x.summary.passCount !== x.passedSoldierIds.length) throw new Error('pass count mismatch');
+          if (x.driveCounts.tier1 !== 11 || x.driveCounts.tier2 !== 27) throw new Error('Drive low-tier index mismatch');
+          if (x.policy.combatStatsUsedForIdentity !== false || x.policy.nameSimilarityUsedForAdmission !== false) throw new Error('identity policy regression');
+          console.log(`STAGE3D_LOW_TIER_VALIDATED pass=${x.summary.passCount} review=${x.summary.reviewCount}`);
+          NODE
+      - name: Commit low-tier discovery checkpoint
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/soldier-portrait-low-tier-discovery-stage3d.v1.json
+          if git diff --cached --quiet; then
+            echo 'NO_LOW_TIER_DISCOVERY_CHANGES'
+            exit 0
+          fi
+          git commit -m 'Checkpoint Soldier portrait Stage 3D low tier discovery'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
