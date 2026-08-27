@@ -1,0 +1,168 @@
+name: Hosted QA Latest Main Soldier WebP
+
+on:
+  push:
+    branches:
+      - deploy/latest-main-webp-20260828
+    paths:
+      - '.github/workflows/hosted-qa-latest-main-webp.yml'
+  workflow_dispatch:
+
+jobs:
+  hosted-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Hosted Gate - freshness and 224 live WebP assets
+        run: |
+          python - <<'PY'
+          import concurrent.futures, hashlib, json, time, urllib.request
+
+          BASE='https://luceatluxvestra42.github.io/langrisser-future-guide/'
+          EXPECTED_MAIN='740528b8238c4a952f2a00b2163e04388be23722'
+          EXPECTED_SURFACE='latest-main-soldier-webp-224-hero-sample-5'
+          manifest=json.load(open('data/generated/soldier-portrait-web-manifest.v1.json', encoding='utf-8'))
+
+          def get(path, attempts=1):
+              url=BASE+path
+              last=None
+              for i in range(attempts):
+                  try:
+                      req=urllib.request.Request(url, headers={'User-Agent':'langrisser-hosted-qa'})
+                      with urllib.request.urlopen(req, timeout=45) as r:
+                          body=r.read()
+                          return r.status, dict(r.headers), body
+                  except Exception as e:
+                      last=e
+                      if i+1<attempts: time.sleep(5)
+              raise RuntimeError(f'GET failed {url}: {last!r}')
+
+          # Freshness gate: wait for Pages CDN to expose this exact integrated deployment.
+          for attempt in range(15):
+              try:
+                  _,_,main_body=get('qa-main-source.txt')
+                  _,_,surface_body=get('qa-surface.txt')
+                  main_source=main_body.decode().strip()
+                  surface=surface_body.decode().strip()
+                  if main_source==EXPECTED_MAIN and surface==EXPECTED_SURFACE:
+                      break
+              except Exception:
+                  pass
+              if attempt==14:
+                  raise RuntimeError(f'live deployment stale: main={locals().get("main_source")!r} surface={locals().get("surface")!r}')
+              time.sleep(5)
+
+          if manifest['status']!='PASS' or not manifest['assetsReady'] or len(manifest['records'])!=224:
+              raise RuntimeError('manifest contract invalid')
+          if manifest['coverage']['resolvedSpCount']!=56:
+              raise RuntimeError('SP coverage invalid')
+
+          def verify_webp(r):
+              path=f"{manifest['publicRoot']}/{r['fileName']}"
+              status,headers,body=get(path, attempts=3)
+              if status!=200: raise RuntimeError(f"HTTP {status} {r['soldierId']}")
+              ctype=headers.get('Content-Type','').split(';')[0].strip().lower()
+              if ctype!='image/webp': raise RuntimeError(f"Content-Type {ctype} {r['soldierId']}")
+              if len(body)!=r['size']: raise RuntimeError(f"size {len(body)} != {r['size']} {r['soldierId']}")
+              sha=hashlib.sha256(body).hexdigest()
+              if sha!=r['sha256']: raise RuntimeError(f"sha mismatch {r['soldierId']}")
+              if body[:4]!=b'RIFF' or body[8:12]!=b'WEBP': raise RuntimeError(f"signature mismatch {r['soldierId']}")
+              return r['soldierId']
+
+          with concurrent.futures.ThreadPoolExecutor(max_workers=12) as ex:
+              checked=list(ex.map(verify_webp, manifest['records']))
+          if len(checked)!=224 or len(set(checked))!=224:
+              raise RuntimeError('live WebP cardinality mismatch')
+
+          # Key public surfaces remain intact.
+          for path in ['soldiers/','soldiers/102/','soldiers/5115/','heroes/']:
+              status,_,body=get(path, attempts=3)
+              if status!=200 or not body: raise RuntimeError(f'public route failed {path}')
+          _,_,heroes=get('heroes/', attempts=3)
+          hero_html=heroes.decode('utf-8')
+          if hero_html.count('redpanda7301.github.io/langrisser/img/card/') != 5:
+              raise RuntimeError('Hero sample 5 not preserved in live deployment')
+
+          print('PASS Hosted Gate: fresh integrated deployment; WebP 224/224 HTTP+MIME+size+SHA; Hero samples preserved')
+          PY
+
+      - name: Prepare browser QA
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Browser UI Gate - actual WebP delivery, detail, SP, refresh, mobile
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const base='https://luceatluxvestra42.github.io/langrisser-future-guide/';
+
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            const oldPngRequests=[];
+            const webpResponses=[];
+            const page=await browser.newPage({viewport:{width:1280,height:900}});
+            page.on('request', req=>{
+              const u=new URL(req.url());
+              if (/\/images\/soldiers\/\d+\.png$/.test(u.pathname)) oldPngRequests.push(req.url());
+            });
+            page.on('response', async res=>{
+              const u=new URL(res.url());
+              if (/\/images\/soldiers-webp\/\d+\.webp$/.test(u.pathname)) {
+                webpResponses.push({url:res.url(), status:res.status(), contentType:(await res.allHeaders())['content-type']||''});
+              }
+            });
+
+            await page.goto(base+'soldiers/',{waitUntil:'networkidle'});
+            const cards=page.locator('a[aria-label$="상세 보기"]');
+            if(await cards.count()!==224) throw new Error(`Soldier card count ${await cards.count()} != 224`);
+            const portraits=page.locator('a[aria-label$="상세 보기"] img[src*="/images/soldiers-webp/"]');
+            if(await portraits.count()!==224) throw new Error(`WebP card portrait count ${await portraits.count()} != 224`);
+            const badCardSrc=await portraits.evaluateAll(imgs=>imgs.map(x=>x.getAttribute('src')).filter(x=>!x || !x.endsWith('.webp')));
+            if(badCardSrc.length) throw new Error(`non-WebP card src ${badCardSrc.slice(0,3)}`);
+            const broken=await portraits.evaluateAll(imgs=>imgs.filter(x=>x.naturalWidth<=0 || x.naturalHeight<=0).map(x=>x.getAttribute('src')));
+            if(broken.length) throw new Error(`broken WebP portraits ${broken.slice(0,5)}`);
+            if(oldPngRequests.length) throw new Error(`legacy Soldier PNG requested: ${oldPngRequests.slice(0,3)}`);
+
+            await page.getByRole('button',{name:'SP'}).click();
+            if(await cards.count()!==56) throw new Error(`SP card count ${await cards.count()} != 56`);
+            const spPortraits=page.locator('a[aria-label$="상세 보기"] img[src*="/images/soldiers-webp/"]');
+            if(await spPortraits.count()!==56) throw new Error(`SP WebP portrait count ${await spPortraits.count()} != 56`);
+
+            for(const id of [102,5115]){
+              await page.goto(base+`soldiers/${id}/`,{waitUntil:'networkidle'});
+              await page.locator('#soldier-detail-title').waitFor();
+              const imgs=page.locator(`img[src$="/images/soldiers-webp/${id}.webp"]`);
+              if(await imgs.count()<1) throw new Error(`detail WebP missing ${id}`);
+              const ok=await imgs.evaluateAll(nodes=>nodes.some(x=>x.naturalWidth>0 && x.naturalHeight>0));
+              if(!ok) throw new Error(`detail WebP broken ${id}`);
+              await page.reload({waitUntil:'networkidle'});
+              const refresh=page.locator(`img[src$="/images/soldiers-webp/${id}.webp"]`);
+              if(await refresh.count()<1) throw new Error(`refresh WebP missing ${id}`);
+            }
+            if(oldPngRequests.length) throw new Error(`legacy PNG request after details: ${oldPngRequests.slice(0,3)}`);
+            if(webpResponses.length<224) throw new Error(`too few WebP responses observed: ${webpResponses.length}`);
+            const badResponses=webpResponses.filter(r=>r.status!==200 || !r.contentType.startsWith('image/webp'));
+            if(badResponses.length) throw new Error(`bad WebP responses ${JSON.stringify(badResponses.slice(0,3))}`);
+
+            const heroes=await browser.newPage({viewport:{width:1280,height:900}});
+            await heroes.goto(base+'heroes/',{waitUntil:'networkidle'});
+            const heroSamples=heroes.locator('img[src*="redpanda7301.github.io/langrisser/img/card/"]');
+            if(await heroSamples.count()!==5) throw new Error(`Hero samples lost: ${await heroSamples.count()} != 5`);
+
+            const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+            await mobile.goto(base+'soldiers/',{waitUntil:'networkidle'});
+            const mobilePortraits=mobile.locator('a[aria-label$="상세 보기"] img[src*="/images/soldiers-webp/"]');
+            if(await mobilePortraits.count()!==224) throw new Error(`mobile WebP count ${await mobilePortraits.count()} != 224`);
+            const overflow=await mobile.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+            if(overflow>2) throw new Error(`mobile horizontal overflow ${overflow}px`);
+
+            await browser.close();
+            console.log(`PASS Browser/UI Gate: 224 WebP cards, SP 56, normal/SP details+refresh, no Soldier PNG requests, Hero samples 5, mobile PASS; observed WebP responses ${webpResponses.length}`);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
