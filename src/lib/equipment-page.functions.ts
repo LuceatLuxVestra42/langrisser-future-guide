@@ -4,7 +4,7 @@ import {
   readEquipmentDetailPageData,
   readExclusiveEquipmentPageData,
   readGeneralEquipmentPageData,
-} from "./equipment-page.server";
+} from "./equipment-page.localized.server";
 
 export const getGeneralEquipmentPageData = createServerFn({ method: "GET" }).handler(
   async () => readGeneralEquipmentPageData(),
