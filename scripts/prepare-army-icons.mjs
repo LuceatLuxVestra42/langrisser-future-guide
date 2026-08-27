@@ -16,6 +16,11 @@ const sourceRoot =
     : process.env.LANGRISSER_ARMY_ASSET_ROOT
       ? path.resolve(process.env.LANGRISSER_ARMY_ASSET_ROOT)
       : null;
+const sourceLabelIndex = args.indexOf("--source-label");
+const sourceLabel =
+  sourceLabelIndex >= 0 && args[sourceLabelIndex + 1]
+    ? args[sourceLabelIndex + 1]
+    : "Unity export; source path intentionally not persisted";
 
 const config = JSON.parse(await readFile(CONFIG_PATH, "utf8"));
 const manifest = JSON.parse(await readFile(MANIFEST_PATH, "utf8"));
@@ -95,9 +100,9 @@ if (checkOnly) {
 }
 
 if (!sourceRoot) {
-  console.log("Army icon locators are valid, but no Unity-export source root was supplied.");
+  console.log("Army icon locators are valid, but no source root was supplied.");
   console.log(
-    "Import usage: node scripts/prepare-army-icons.mjs --source-root <directory containing UI/Icon/Army_ABS or the Army_ABS files>",
+    "Import usage: node scripts/prepare-army-icons.mjs --source-root <directory containing UI/Icon/Army_ABS or the Army_ABS files> [--source-label <provenance>]",
   );
   process.exit(0);
 }
@@ -135,7 +140,7 @@ for (const record of manifest.records) {
 
 manifest.assetsReady = true;
 manifest.importedAssetCount = manifest.records.length;
-manifest.importedFrom = "Unity export; source path intentionally not persisted";
+manifest.importedFrom = sourceLabel;
 await writeFile(MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 
 console.log(`Army icon import PASS: ${manifest.records.length} official Icon_NoBack PNGs copied.`);
