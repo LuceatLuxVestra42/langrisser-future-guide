@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
 
 type MaterialCost = {
@@ -60,6 +61,24 @@ type SoldierRichSource = {
 
 type LoadState = "loading" | "ready" | "error";
 
+type ArmyMeta = {
+  label: string;
+  shortLabel: string;
+};
+
+const ARMY_META = new Map<string, ArmyMeta>([
+  ["INFANTRY", { label: "보병", shortLabel: "보" }],
+  ["LANCER", { label: "창병", shortLabel: "창" }],
+  ["CAVALRY", { label: "기병", shortLabel: "기" }],
+  ["FLYING", { label: "비병", shortLabel: "비" }],
+  ["WATER", { label: "수병", shortLabel: "수" }],
+  ["ARCHER", { label: "궁병", shortLabel: "궁" }],
+  ["ASSASSIN", { label: "암살자", shortLabel: "암" }],
+  ["MAGE", { label: "마법사", shortLabel: "법" }],
+  ["HOLY", { label: "승병", shortLabel: "승" }],
+  ["DEMON", { label: "마족", shortLabel: "마" }],
+]);
+
 let soldierRichSourcePromise: Promise<SoldierRichSource> | null = null;
 
 function loadSoldierRichSource() {
@@ -103,50 +122,57 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
     };
   }, [record.soldierId]);
 
-  const level10Effect = useMemo(() => {
+  const abilityEffect = useMemo(() => {
     if (!detail) return null;
+
+    if (record.isSp) {
+      return (
+        detail.ability.finalDescription ??
+        detail.ability.levels.find((level) => level.level === 10)?.description ??
+        null
+      );
+    }
+
     return (
       detail.ability.levels.find((level) => level.level === 10)?.description ??
       detail.ability.finalDescription
     );
-  }, [detail]);
+  }, [detail, record.isSp]);
+
+  const abilityTitle = record.isSp ? "SP 고유기" : "10레벨 효과";
 
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
       <header className="border-b border-border px-4 py-3 pr-16 sm:px-5 sm:py-4 sm:pr-16">
-        <h2 id="soldier-detail-title" className="truncate text-lg font-black text-foreground sm:text-xl">
+        <h2
+          id="soldier-detail-title"
+          className="truncate text-lg font-black text-foreground sm:text-xl"
+        >
           {displayName}
         </h2>
       </header>
 
       <div className="space-y-6 p-4 sm:p-5">
-        <section aria-labelledby="soldier-basic-stats-title">
-          <SectionHeading id="soldier-basic-stats-title">기본 속성</SectionHeading>
-          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-            <StatCard label="사거리" value={`${record.combat.range}`} />
-            <StatCard
-              label="이동"
-              value={`타입 ${record.combat.moveType} · ${record.combat.move}칸`}
-            />
-            <StatCard label="생명" value={record.combat.hp} />
-            <StatCard label="공격" value={record.combat.atk} />
-            <StatCard label="방어" value={record.combat.def} />
-            <StatCard label="마방" value={record.combat.mdef} />
-          </div>
-        </section>
+        <section aria-label={`${displayName} 핵심 정보`}>
+          <div className="grid gap-3 lg:grid-cols-[190px_minmax(0,1fr)_300px] lg:items-stretch">
+            <SoldierPreview record={record} />
 
-        <section aria-labelledby="soldier-level10-effect-title" className="border-t border-border pt-5">
-          <SectionHeading id="soldier-level10-effect-title">10레벨 효과</SectionHeading>
-          <div className="mt-2 rounded-xl border border-border bg-background px-4 py-3 text-sm leading-7 text-foreground">
-            {loadState === "loading" ? (
-              <LoadingText />
-            ) : loadState === "error" ? (
-              <p className="text-muted-foreground">10레벨 효과 데이터를 불러오지 못했어.</p>
-            ) : level10Effect ? (
-              <ConfigText text={level10Effect} />
-            ) : (
-              <p className="text-muted-foreground">10레벨 효과 데이터가 없는 용병이야.</p>
-            )}
+            <div className="flex min-h-[190px] flex-col rounded-xl border border-border bg-background p-4">
+              <p className="text-sm font-black text-foreground">{abilityTitle}</p>
+              <div className="mt-3 flex flex-1 items-center text-sm leading-7 text-foreground">
+                {loadState === "loading" ? (
+                  <LoadingText />
+                ) : loadState === "error" ? (
+                  <p className="text-muted-foreground">{abilityTitle} 데이터를 불러오지 못했어.</p>
+                ) : abilityEffect ? (
+                  <ConfigText text={abilityEffect} />
+                ) : (
+                  <p className="text-muted-foreground">{abilityTitle} 데이터가 없는 용병이야.</p>
+                )}
+              </div>
+            </div>
+
+            <SoldierStatTable record={record} />
           </div>
         </section>
 
@@ -210,20 +236,117 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
   );
 }
 
+function SoldierPreview({ record }: { record: SoldierPrototypeRecord }) {
+  const army = ARMY_META.get(record.armyType);
+  const displayName = record.nameKr ?? record.nameCn;
+  const officialUrl = getOfficialArmyIconUrl(record.armyType);
+  const [imageFailed, setImageFailed] = useState(false);
+
+  return (
+    <div className="mx-auto w-full max-w-[190px] lg:mx-0">
+      <div className="relative aspect-square overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-9 text-muted-foreground">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-current/20 bg-background/70">
+            <span className="text-lg font-black tracking-tight">{army?.shortLabel ?? "?"}</span>
+          </div>
+        </div>
+
+        <div className="absolute left-2 top-2">
+          <span className="rounded bg-black/65 px-1.5 py-0.5 text-[14px] font-bold leading-none text-white">
+            {record.isSp ? "SP" : `T${record.tier}`}
+          </span>
+        </div>
+
+        <div
+          className="absolute right-2 top-2 flex h-[22px] w-[22px] items-center justify-center"
+          title={army?.label ?? record.armyType}
+        >
+          {officialUrl && !imageFailed ? (
+            <img
+              src={officialUrl}
+              alt=""
+              className="h-full w-full object-contain"
+              aria-hidden="true"
+              onError={() => setImageFailed(true)}
+            />
+          ) : (
+            <span className="text-xs font-black text-foreground">{army?.shortLabel ?? "?"}</span>
+          )}
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 bg-black/75 px-2 py-2 text-center backdrop-blur-[1px]">
+          <span className="line-clamp-2 text-xs font-bold leading-tight text-white">
+            {displayName}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SoldierStatTable({ record }: { record: SoldierPrototypeRecord }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-border bg-background">
+      <div className="border-b border-border bg-muted/60 px-3 py-2 text-center text-sm font-black text-foreground">
+        기본 속성
+      </div>
+      <div className="grid grid-cols-2 border-b border-border">
+        <CompactStat label="사거리" value={record.combat.range} />
+        <CompactStat
+          label="이동"
+          value={`타입 ${record.combat.moveType} · ${record.combat.move}칸`}
+          bordered
+        />
+      </div>
+      <StatRow label="생명" value={record.combat.hp} />
+      <StatRow label="공격" value={record.combat.atk} />
+      <StatRow label="방어" value={record.combat.def} />
+      <StatRow label="마방" value={record.combat.mdef} last />
+    </div>
+  );
+}
+
+function CompactStat({
+  label,
+  value,
+  bordered = false,
+}: {
+  label: string;
+  value: string | number;
+  bordered?: boolean;
+}) {
+  return (
+    <div className={`px-2 py-2.5 text-center ${bordered ? "border-l border-border" : ""}`}>
+      <p className="text-[10px] font-bold text-muted-foreground">{label}</p>
+      <p className="mt-0.5 text-sm font-black tabular-nums text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function StatRow({
+  label,
+  value,
+  last = false,
+}: {
+  label: string;
+  value: string | number;
+  last?: boolean;
+}) {
+  return (
+    <div className={`grid grid-cols-[92px_1fr] ${last ? "" : "border-b border-border"}`}>
+      <div className="bg-muted/40 px-3 py-2.5 text-xs font-bold text-muted-foreground">{label}</div>
+      <div className="px-3 py-2.5 text-center text-sm font-black tabular-nums text-foreground">
+        {value}
+      </div>
+    </div>
+  );
+}
+
 function SectionHeading({ id, children }: { id: string; children: string }) {
   return (
     <h3 id={id} className="text-sm font-black tracking-tight text-foreground sm:text-base">
       {children}
     </h3>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="flex min-h-[68px] flex-col items-center justify-center rounded-xl border border-border bg-background px-2 py-2 text-center sm:min-h-[76px]">
-      <p className="text-[10px] font-bold text-muted-foreground sm:text-xs">{label}</p>
-      <p className="mt-1 text-sm font-black tabular-nums text-foreground sm:text-base">{value}</p>
-    </div>
   );
 }
 
@@ -245,7 +368,10 @@ function ConfigText({ text }: { text: string }) {
     }
 
     nodes.push(
-      <span key={`${index++}-${token.slice(0, 8)}`} className={emphasized ? "font-bold text-destructive" : undefined}>
+      <span
+        key={`${index++}-${token.slice(0, 8)}`}
+        className={emphasized ? "font-bold text-destructive" : undefined}
+      >
         {token.replace(/<[^>]+>/g, "")}
       </span>,
     );
@@ -263,17 +389,17 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
     () => levels.reduce((max, level) => Math.max(max, level.level), 0),
     [levels],
   );
-  const [currentLevel, setCurrentLevel] = useState(0);
-  const [targetLevel, setTargetLevel] = useState(maxLevel || 10);
+  const [startLevel, setStartLevel] = useState(0);
+  const [endLevel, setEndLevel] = useState(maxLevel || 10);
 
   useEffect(() => {
-    setCurrentLevel(0);
-    setTargetLevel(maxLevel || 10);
+    setStartLevel(0);
+    setEndLevel(maxLevel || 10);
   }, [maxLevel]);
 
   const selectedLevels = useMemo(
-    () => levels.filter((level) => level.level > currentLevel && level.level <= targetLevel),
-    [currentLevel, levels, targetLevel],
+    () => levels.filter((level) => level.level > startLevel && level.level <= endLevel),
+    [endLevel, levels, startLevel],
   );
 
   const totals = useMemo(() => {
@@ -307,96 +433,85 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
     );
   }
 
-  const levelOptions = Array.from({ length: maxLevel + 1 }, (_, index) => index);
-
   return (
-    <div className="mt-2 grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
+    <div className="mt-2 grid gap-3 lg:grid-cols-[minmax(240px,0.7fr)_minmax(0,1.3fr)]">
       <div className="rounded-xl border border-border bg-background p-3 sm:p-4">
-        <div className="grid grid-cols-2 gap-2">
+        <p className="text-sm font-black text-foreground">레벨 범위</p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <label className="text-xs font-bold text-muted-foreground">
-            현재 레벨
-            <select
-              value={currentLevel}
+            A 레벨
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={Math.max(0, maxLevel - 1)}
+              value={startLevel}
               onChange={(event) => {
-                const next = Number(event.target.value);
-                setCurrentLevel(next);
-                if (next >= targetLevel) setTargetLevel(Math.min(maxLevel, next + 1));
+                const next = clampLevel(Number(event.target.value), 0, Math.max(0, maxLevel - 1));
+                setStartLevel(next);
+                if (next >= endLevel) setEndLevel(Math.min(maxLevel, next + 1));
               }}
-              className="mt-1 h-9 w-full rounded-md border border-border bg-card px-2 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-ring"
-            >
-              {levelOptions.slice(0, -1).map((level) => (
-                <option key={level} value={level}>
-                  Lv.{level}
-                </option>
-              ))}
-            </select>
+              className="mt-1 h-10 w-full rounded-md border border-border bg-card px-3 text-center text-base font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
+            />
           </label>
           <label className="text-xs font-bold text-muted-foreground">
-            목표 레벨
-            <select
-              value={targetLevel}
+            B 레벨
+            <input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={maxLevel}
+              value={endLevel}
               onChange={(event) => {
-                const next = Number(event.target.value);
-                setTargetLevel(next);
-                if (next <= currentLevel) setCurrentLevel(Math.max(0, next - 1));
+                const next = clampLevel(Number(event.target.value), 1, maxLevel);
+                setEndLevel(next);
+                if (next <= startLevel) setStartLevel(Math.max(0, next - 1));
               }}
-              className="mt-1 h-9 w-full rounded-md border border-border bg-card px-2 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-ring"
-            >
-              {levelOptions.slice(1).map((level) => (
-                <option key={level} value={level}>
-                  Lv.{level}
-                </option>
-              ))}
-            </select>
+              className="mt-1 h-10 w-full rounded-md border border-border bg-card px-3 text-center text-base font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
+            />
           </label>
         </div>
-
-        <div className="mt-3 overflow-hidden rounded-lg border border-border">
-          <div className="grid grid-cols-[58px_92px_1fr] bg-muted px-2 py-1.5 text-[10px] font-black text-muted-foreground sm:text-xs">
-            <span>레벨</span>
-            <span>골드</span>
-            <span>재료</span>
-          </div>
-          <div className="max-h-64 divide-y divide-border overflow-y-auto">
-            {selectedLevels.map((level) => (
-              <div
-                key={level.level}
-                className="grid grid-cols-[58px_92px_1fr] items-start gap-0 px-2 py-2 text-xs text-foreground"
-              >
-                <span className="font-black">Lv.{level.level}</span>
-                <span className="tabular-nums">{formatNumber(level.gold)}</span>
-                <div className="flex flex-wrap gap-x-2 gap-y-1">
-                  {level.materials.map((material) => (
-                    <span key={`${material.goodsType}:${material.itemId}`} className="whitespace-nowrap">
-                      #{material.itemId} × {material.count}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <p className="mt-3 text-xs leading-5 text-muted-foreground">
+          A 레벨에서 B 레벨까지 올릴 때 필요한 재료만 합산해.
+        </p>
       </div>
 
       <div className="rounded-xl border border-border bg-muted/50 p-3 sm:p-4">
-        <p className="text-sm font-black text-foreground">총 소모재료</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-black text-foreground">총 소모재료</p>
+          <span className="text-xs font-semibold tabular-nums text-muted-foreground">
+            Lv.{startLevel} → Lv.{endLevel}
+          </span>
+        </div>
         <div className="mt-3 rounded-lg border border-border bg-background px-3 py-2.5">
           <p className="text-[10px] font-bold text-muted-foreground">골드</p>
           <p className="mt-0.5 text-lg font-black tabular-nums text-foreground">
             {formatNumber(totals.gold)}
           </p>
         </div>
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-2">
+        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
           {totals.materials.map((material) => (
-            <div key={`${material.goodsType}:${material.itemId}`} className="rounded-lg border border-border bg-background px-2.5 py-2">
-              <p className="truncate text-[10px] font-semibold text-muted-foreground">아이템 #{material.itemId}</p>
-              <p className="mt-0.5 text-base font-black tabular-nums text-foreground">× {material.count}</p>
+            <div
+              key={`${material.goodsType}:${material.itemId}`}
+              className="rounded-lg border border-border bg-background px-2.5 py-2"
+            >
+              <p className="truncate text-[10px] font-semibold text-muted-foreground">
+                아이템 #{material.itemId}
+              </p>
+              <p className="mt-0.5 text-base font-black tabular-nums text-foreground">
+                × {material.count}
+              </p>
             </div>
           ))}
         </div>
       </div>
     </div>
   );
+}
+
+function clampLevel(value: number, min: number, max: number) {
+  if (!Number.isFinite(value)) return min;
+  return Math.min(max, Math.max(min, Math.trunc(value)));
 }
 
 function SpConversionPanel({ sp }: { sp: SoldierRichRecord["sp"] }) {
@@ -459,9 +574,14 @@ function SpStageCard({ title, stage }: { title: string; stage: SpStage | null })
       <div className="mt-4 space-y-2">
         <p className="text-xs font-bold text-muted-foreground">전직 미션</p>
         {stage.missions.map((mission) => (
-          <div key={mission.missionId} className="rounded-lg border border-border bg-card px-3 py-2.5">
+          <div
+            key={mission.missionId}
+            className="rounded-lg border border-border bg-card px-3 py-2.5"
+          >
             <p className="text-xs font-black text-foreground">{mission.title}</p>
-            <p className="mt-1 whitespace-pre-line text-xs leading-5 text-muted-foreground">{mission.desc}</p>
+            <p className="mt-1 whitespace-pre-line text-xs leading-5 text-muted-foreground">
+              {mission.desc}
+            </p>
           </div>
         ))}
       </div>
