@@ -1,10 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { heroImages, getHeroIndexForDate } from "@/lib/hero-images";
 import clockIcon from "@/assets/clock_of_forgiveness.png";
-
 
 import cardUpdate from "@/assets/card-update.jpg";
 import cardGacha from "@/assets/card-gacha.jpg";
@@ -15,7 +14,6 @@ import cardMerc from "@/assets/card-merc.jpg";
 import cardEvent from "@/assets/card-event-regular.jpg";
 import cardRift from "@/assets/card-rift.jpg";
 import cardSummit from "@/assets/card-summit.jpg";
-
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -58,10 +56,17 @@ const categories: Category[] = [
   { title: "서밋 신규맵", image: cardSummit, to: "/", imageClassName: "h-[132px] w-[132px]" },
 ];
 
+function resolveCategoryHref(to: string) {
+  const base = import.meta.env.BASE_URL || "/";
+  const normalizedBase = base.endsWith("/") ? base : `${base}/`;
+  const normalizedPath = to.replace(/^\/+|\/+$/g, "");
+  return normalizedPath ? `${normalizedBase}${normalizedPath}/` : normalizedBase;
+}
+
 function CategoryCard({ category }: { category: Category }) {
   return (
-    <Link
-      to={category.to}
+    <a
+      href={resolveCategoryHref(category.to)}
       aria-label={category.title}
       className={`card-nav card-nav-hover group flex flex-col items-center px-8 py-9 ${
         category.primary ? "card-nav-primary" : ""
@@ -80,12 +85,11 @@ function CategoryCard({ category }: { category: Category }) {
         />
       </div>
       <h3 className="mt-6 text-2xl font-bold tracking-tight text-foreground">{category.title}</h3>
-    </Link>
+    </a>
   );
 }
 
 function HeroSection() {
-  // 기본값은 날짜 기반 자동 선택. 화살표/점을 누르면 수동 미리보기로만 전환됩니다.
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -104,9 +108,7 @@ function HeroSection() {
           alt={hero.alt}
           className="h-full w-full object-cover object-[center_28%]"
         />
-        {/* 밝기/색이 제각각인 일러스트에서도 문구가 읽히도록 하는 은은한 스크림 */}
         <div className="absolute inset-0 bg-hero-scrim" />
-        {/* 아래로 갈수록 페이지 배경으로 자연스럽게 사라지는 그라데이션 */}
         <div className="absolute inset-0 bg-hero-fade" />
       </div>
 
@@ -119,7 +121,6 @@ function HeroSection() {
         </p>
       </div>
 
-      {/* 개발용 임시 미리보기 컨트롤 (히어로 확정 후 제거 예정) */}
       <button
         type="button"
         onClick={() => step(-1)}
@@ -153,7 +154,6 @@ function HeroSection() {
     </section>
   );
 }
-
 
 function Index() {
   return (
