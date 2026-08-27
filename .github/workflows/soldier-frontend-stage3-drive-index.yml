@@ -15,17 +15,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect targeted ConfigDataSoldierInfo asset fields
+      - name: Inspect lazy Drive folder payload
         run: |
           node <<'NODE'
-          import fs from 'node:fs';
-          const raw=JSON.parse(fs.readFileSync('data/configdata/ConfigDataSoldierInfo.json','utf8'));
-          const rows=Array.isArray(raw)?raw:(raw.records??raw.data??raw.Data??Object.values(raw).find(Array.isArray));
-          if(!Array.isArray(rows)) throw new Error('ConfigDataSoldierInfo rows not found');
-          const ids=new Set([100,200,300,303,400,407,500,503,600,617,619,625,800,1000,1100,1102,1108,136,1039,102,105,5115]);
-          const selected=rows.filter(r=>ids.has(Number(r.ID??r.Id??r.id)));
-          console.log(`ROW_COUNT=${rows.length} SELECTED=${selected.length}`);
-          console.log(`KEYS=${JSON.stringify([...new Set(selected.flatMap(r=>Object.keys(r)))])}`);
-          const pick=r=>Object.fromEntries(Object.entries(r).filter(([k,v])=>/icon|image|img|model|skin|resource|res|avatar|portrait|head|show|art/i.test(k)||['ID','Name','SoldierName','Army','ArmyType','MoveType','BF_MovePoint'].includes(k)));
-          for(const r of selected) console.log(`REC ${JSON.stringify({id:Number(r.ID??r.Id??r.id),fields:pick(r)})}`);
+          const id='17586qKXHeDoCZ13E6bmrmgMRtMUk9fzQ';
+          const text=await (await fetch(`https://drive.google.com/drive/folders/${id}`,{headers:{'user-agent':'Mozilla/5.0'}})).text();
+          console.log(`bytes=${text.length}`);
+          for(const name of ['가면 메이드','볼트 레인저','로열 그리폰','야만 뿔투사','중장 창병']){
+            const positions=[]; let from=0;
+            while(true){const i=text.indexOf(name,from);if(i<0)break;positions.push(i);from=i+name.length;if(positions.length>=5)break;}
+            console.log(`NAME=${name} positions=${positions.join(',')||'NONE'}`);
+            for(const i of positions.slice(0,2)) console.log(text.slice(Math.max(0,i-600),i+900).replace(/\n/g,' '));
+          }
           NODE
