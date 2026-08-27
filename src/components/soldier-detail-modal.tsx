@@ -91,7 +91,6 @@ function loadSoldierRichSource() {
       return (await response.json()) as SoldierRichSource;
     });
   }
-
   return soldierRichSourcePromise;
 }
 
@@ -144,17 +143,14 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
       <header className="border-b border-border px-4 py-3 pr-16 sm:px-5 sm:py-4 sm:pr-16">
-        <h2
-          id="soldier-detail-title"
-          className="truncate text-lg font-black text-foreground sm:text-xl"
-        >
+        <h2 id="soldier-detail-title" className="truncate text-lg font-black text-foreground sm:text-xl">
           {displayName}
         </h2>
       </header>
 
       <div className="space-y-6 p-4 sm:p-5">
         <section aria-label={`${displayName} 핵심 정보`}>
-          <div className="grid gap-3 lg:grid-cols-[190px_minmax(0,1fr)_300px] lg:items-stretch">
+          <div className="grid gap-3 sm:grid-cols-[170px_minmax(0,1fr)_250px] sm:items-stretch lg:grid-cols-[220px_minmax(0,1fr)_300px]">
             <SoldierPreview record={record} />
 
             <div className="flex min-h-[190px] flex-col rounded-xl border border-border bg-background p-4">
@@ -243,7 +239,7 @@ function SoldierPreview({ record }: { record: SoldierPrototypeRecord }) {
   const [imageFailed, setImageFailed] = useState(false);
 
   return (
-    <div className="mx-auto w-full max-w-[190px] lg:mx-0">
+    <div className="mx-auto w-full max-w-[220px] sm:mx-0 sm:max-w-none">
       <div className="relative aspect-square overflow-hidden rounded-xl border border-border bg-card shadow-sm">
         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-9 text-muted-foreground">
           <div className="flex h-16 w-16 items-center justify-center rounded-full border border-current/20 bg-background/70">
@@ -275,9 +271,7 @@ function SoldierPreview({ record }: { record: SoldierPrototypeRecord }) {
         </div>
 
         <div className="absolute inset-x-0 bottom-0 bg-black/75 px-2 py-2 text-center backdrop-blur-[1px]">
-          <span className="line-clamp-2 text-xs font-bold leading-tight text-white">
-            {displayName}
-          </span>
+          <span className="line-clamp-2 text-xs font-bold leading-tight text-white">{displayName}</span>
         </div>
       </div>
     </div>
@@ -306,15 +300,7 @@ function SoldierStatTable({ record }: { record: SoldierPrototypeRecord }) {
   );
 }
 
-function CompactStat({
-  label,
-  value,
-  bordered = false,
-}: {
-  label: string;
-  value: string | number;
-  bordered?: boolean;
-}) {
+function CompactStat({ label, value, bordered = false }: { label: string; value: string | number; bordered?: boolean }) {
   return (
     <div className={`px-2 py-2.5 text-center ${bordered ? "border-l border-border" : ""}`}>
       <p className="text-[10px] font-bold text-muted-foreground">{label}</p>
@@ -323,21 +309,11 @@ function CompactStat({
   );
 }
 
-function StatRow({
-  label,
-  value,
-  last = false,
-}: {
-  label: string;
-  value: string | number;
-  last?: boolean;
-}) {
+function StatRow({ label, value, last = false }: { label: string; value: string | number; last?: boolean }) {
   return (
     <div className={`grid grid-cols-[92px_1fr] ${last ? "" : "border-b border-border"}`}>
       <div className="bg-muted/40 px-3 py-2.5 text-xs font-bold text-muted-foreground">{label}</div>
-      <div className="px-3 py-2.5 text-center text-sm font-black tabular-nums text-foreground">
-        {value}
-      </div>
+      <div className="px-3 py-2.5 text-center text-sm font-black tabular-nums text-foreground">{value}</div>
     </div>
   );
 }
@@ -434,7 +410,7 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
   }
 
   return (
-    <div className="mt-2 grid gap-3 lg:grid-cols-[minmax(240px,0.7fr)_minmax(0,1.3fr)]">
+    <div className="mt-2 grid gap-3">
       <div className="rounded-xl border border-border bg-background p-3 sm:p-4">
         <p className="text-sm font-black text-foreground">레벨 범위</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
@@ -454,6 +430,7 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
               className="mt-1 h-10 w-full rounded-md border border-border bg-card px-3 text-center text-base font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
             />
           </label>
+
           <label className="text-xs font-bold text-muted-foreground">
             B 레벨
             <input
@@ -483,12 +460,14 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
             Lv.{startLevel} → Lv.{endLevel}
           </span>
         </div>
+
         <div className="mt-3 rounded-lg border border-border bg-background px-3 py-2.5">
           <p className="text-[10px] font-bold text-muted-foreground">골드</p>
           <p className="mt-0.5 text-lg font-black tabular-nums text-foreground">
             {formatNumber(totals.gold)}
           </p>
         </div>
+
         <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
           {totals.materials.map((material) => (
             <div
@@ -498,9 +477,7 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
               <p className="truncate text-[10px] font-semibold text-muted-foreground">
                 아이템 #{material.itemId}
               </p>
-              <p className="mt-0.5 text-base font-black tabular-nums text-foreground">
-                × {material.count}
-              </p>
+              <p className="mt-0.5 text-base font-black tabular-nums text-foreground">× {material.count}</p>
             </div>
           ))}
         </div>
@@ -574,10 +551,7 @@ function SpStageCard({ title, stage }: { title: string; stage: SpStage | null })
       <div className="mt-4 space-y-2">
         <p className="text-xs font-bold text-muted-foreground">전직 미션</p>
         {stage.missions.map((mission) => (
-          <div
-            key={mission.missionId}
-            className="rounded-lg border border-border bg-card px-3 py-2.5"
-          >
+          <div key={mission.missionId} className="rounded-lg border border-border bg-card px-3 py-2.5">
             <p className="text-xs font-black text-foreground">{mission.title}</p>
             <p className="mt-1 whitespace-pre-line text-xs leading-5 text-muted-foreground">
               {mission.desc}
