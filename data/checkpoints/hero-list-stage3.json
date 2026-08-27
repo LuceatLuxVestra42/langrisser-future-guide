@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "stage": "hero-list-stage3",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "predecessor": {
+    "stage": "hero-list-stage2",
+    "status": "PASS_WITH_REVIEW",
+    "completion": "COMPLETE"
+  },
+  "source": {
+    "consumer": "data/generated/hero-list-stage1.v1.json",
+    "freezeState": "HERO_LIST_STAGE1_FROZEN",
+    "heroCount": 267
+  },
+  "completedScope": [
+    "Korean/Chinese/English Hero-name search",
+    "rarity filters derived from frozen Hero records",
+    "SP-only filter",
+    "live filtered-result count",
+    "filter reset and zero-result state",
+    "responsive filter controls above the Stage 2 Hero grid",
+    "Stage 2 predecessor and frozen-consumer preflight",
+    "production build, route and TypeScript gates",
+    "static GitHub Pages build and gh-pages deployment verification"
+  ],
+  "validatedCounts": {
+    "heroCount": 267,
+    "spCount": 25,
+    "rarity": {
+      "LLR": 6,
+      "SSR": 213,
+      "SR": 33,
+      "R": 12,
+      "N": 3
+    }
+  },
+  "productionBoundary": {
+    "rawConfigDataRead": false,
+    "heroStage4Or5Fallback": false,
+    "relationshipRederivation": false,
+    "nameOrIdHeuristics": false,
+    "releaseOrderInference": false,
+    "inventedFactionKoreanLabels": false,
+    "inventedOriginKoreanLabels": false
+  },
+  "validation": {
+    "preflight": "PASS",
+    "productionBuild": "PASS",
+    "routeGeneration": "PASS",
+    "typescript": "PASS",
+    "staticPagesPreviewRunId": 33058046923,
+    "staticPagesPreview": "PASS",
+    "qaSourceCommit": "5dbaafc14f3f1d9cf170762375a88c4c9e59b074",
+    "ghPagesDeployCommit": "c05e4be4fe8aca24beeb3304a34633eed6ba7c2a",
+    "ghPagesHeroArtifact": "heroes/index.html",
+    "repositoryBasePath": "/langrisser-future-guide/",
+    "hostedArtifactControls": [
+      "한국명 · 중국명 · 영문명",
+      "희귀도 필터",
+      "SP만 25",
+      "검색 결과 267 / 267명",
+      "초기화"
+    ],
+    "browserInteractionReview": "NON_BLOCKING_NOT_EXECUTED"
+  },
+  "deferred": [
+    "web-served Hero artwork resolution",
+    "Hero detail route/card navigation",
+    "release chronology/display ordering",
+    "faction filter until confirmed Korean presentation labels are available",
+    "origin filter until confirmed Korean presentation labels are available",
+    "fusion power badge metadata",
+    "SSR solo-limited presentation metadata",
+    "interactive browser filtering and responsive visual QA"
+  ],
+  "nextStart": "Stage 4: resolve web-served Hero card artwork and/or detail navigation without reopening Stage 1 or Hero semantic producers."
+}
