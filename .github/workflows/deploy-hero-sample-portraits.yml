@@ -56,8 +56,7 @@ jobs:
           const fs = require('fs');
           const html = fs.readFileSync('dist/client/heroes/index.html', 'utf8');
           const required = [
-            '초상화 샘플 5명 연결',
-            'redpanda7301.github.io/langrisser/img/card/',
+            '초상화 샘플',
             '/langrisser-future-guide/heroes/6',
             '레온',
             '라나',
@@ -68,7 +67,9 @@ jobs:
           for (const token of required) {
             if (!html.includes(token)) throw new Error(`Hero static output missing: ${token}`);
           }
-          console.log('PASS: Hero portrait samples present in static output');
+          const imageHostCount = (html.match(/redpanda7301\.github\.io\/langrisser\/img\/card\//g) ?? []).length;
+          if (imageHostCount !== 5) throw new Error(`Expected 5 Hero portrait sample URLs; got ${imageHostCount}`);
+          console.log(`PASS: Hero portrait samples present in static output (${imageHostCount})`);
           NODE
           printf '%s\n' "$GITHUB_SHA" > dist/client/qa-main-source.txt
           printf '%s\n' 'hero-portrait-sample-5' > dist/client/qa-surface.txt
