@@ -21,6 +21,19 @@ export const Route = createFileRoute("/heroes")({
 
 const ALL_RARITIES = "ALL";
 
+// Presentation-only sample set for portrait layout QA.
+// Canonical artwork resolution remains owned by hero-card-artwork-stage4 and
+// public/images/heroes/cards/{heroId}.png. Remove this override once local assets land.
+const SAMPLE_HERO_CARD_URLS: Readonly<Record<number, string>> = {
+  5: "https://redpanda7301.github.io/langrisser/img/card/%ED%81%AC%EB%A6%AC%EC%8A%A4.webp",
+  6: "https://redpanda7301.github.io/langrisser/img/card/%EB%A0%88%EC%98%A8%EC%B4%88%EC%A0%88SP.webp",
+  8: "https://redpanda7301.github.io/langrisser/img/card/%EB%9D%BC%EB%82%98SP.webp",
+  12: "https://redpanda7301.github.io/langrisser/img/card/%EC%97%98%EC%9C%88%EC%B4%88%EC%A0%88SP.webp",
+  15: "https://redpanda7301.github.io/langrisser/img/card/%EB%A6%AC%EC%95%84%EB%82%98.webp",
+};
+
+const SAMPLE_HERO_CARD_COUNT = Object.keys(SAMPLE_HERO_CARD_URLS).length;
+
 function normalizeSearch(value: string) {
   return value.trim().toLocaleLowerCase();
 }
@@ -160,7 +173,7 @@ function HeroGridPage() {
             <span className="text-muted-foreground"> / {data.summary.total}명</span>
           </p>
           <p className="hidden text-xs text-muted-foreground sm:block">
-            이미지 {data.artwork.resolved}/{data.artwork.total} 연결 · 나머지는 placeholder
+            초상화 샘플 {SAMPLE_HERO_CARD_COUNT}명 연결 · 나머지는 placeholder
           </p>
         </div>
 
@@ -217,7 +230,9 @@ function FilterButton({
 
 function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
   const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
-  const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
+  const imageUrl = hero.card.webAssetPath
+    ? resolvePublicAssetUrl(hero.card.webAssetPath)
+    : SAMPLE_HERO_CARD_URLS[hero.heroId] ?? null;
 
   return (
     <Link
