@@ -130,8 +130,8 @@ async function loadDriveFolderIndex(tier) {
 async function resolveDefaultPng(folderId) {
   const text = await fetchText(`https://drive.google.com/drive/folders/${folderId}`);
   const patterns = [
-    /aria-label="Default\.png"[\s\S]{0,1200}?data-id="([^"]+)"/,
-    /data-id="([^"]+)"[\s\S]{0,1200}?aria-label="Default\.png"/,
+    /aria-label="Default\.png(?: Image)?(?: Shared)?"[\s\S]{0,1200}?data-id="([^"]+)"/,
+    /data-id="([^"]+)"[\s\S]{0,1200}?aria-label="Default\.png(?: Image)?(?: Shared)?"/,
   ];
   let fileId = null;
   for (const pattern of patterns) {
