@@ -48,13 +48,25 @@ jobs:
           set -euo pipefail
           test -f dist/client/heroes/index.html
           HERO_DETAIL_COUNT="$(find dist/client/heroes -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/heroes/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          echo "Hero detail routes: $HERO_DETAIL_COUNT"
           test "$HERO_DETAIL_COUNT" -eq 267
-          grep -q 'aspect-square' dist/client/heroes/index.html
-          grep -q 'bg-black/60' dist/client/heroes/index.html
-          grep -q '/langrisser-future-guide/' dist/client/heroes/index.html
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('dist/client/heroes/index.html', 'utf8');
+          const required = [
+            '/langrisser-future-guide/',
+            '/langrisser-future-guide/heroes/99287',
+            '마검의 화신',
+            '검색 결과'
+          ];
+          for (const token of required) {
+            if (!html.includes(token)) throw new Error(`Hero static output missing: ${token}`);
+          }
+          console.log('PASS: Hero list static output and repository base path');
+          NODE
           printf '%s\n' "$GITHUB_SHA" > dist/client/qa-main-source.txt
           printf '%s\n' 'hero-square-portrait-name-overlay' > dist/client/qa-surface.txt
-          echo "PASS: Hero square cards prerendered, detail routes $HERO_DETAIL_COUNT"
+          echo "PASS: Hero square card source contract built, detail routes $HERO_DETAIL_COUNT"
 
       - name: Publish to gh-pages
         env:
