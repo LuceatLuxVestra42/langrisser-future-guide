@@ -134,13 +134,10 @@ function SoldierPage() {
         <header>
           <Link
             to="/"
-            className="text-xs font-semibold text-muted-foreground transition hover:text-foreground"
+            className="inline-flex items-center rounded-md border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             ← 메인으로
           </Link>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            용병
-          </h1>
         </header>
 
         <section className="mt-7 overflow-hidden rounded-xl border border-border bg-card">
@@ -191,12 +188,9 @@ function SoldierPage() {
           </div>
         </section>
 
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
+        <div className="mt-5">
           <p className="text-sm text-muted-foreground">
             <span className="font-bold text-foreground">{records.length}</span>개 표시
-          </p>
-          <p className="text-xs text-muted-foreground">
-            실제 용병 이미지 asset은 아직 연결하지 않았어.
           </p>
         </div>
 
@@ -473,10 +467,13 @@ function SoldierCard({
       </div>
 
       <div
-        className="absolute right-1.5 top-1.5 flex h-[22px] w-[22px] items-center justify-center rounded bg-black/65 text-white shadow-sm sm:h-[26px] sm:w-[26px]"
+        className="absolute right-1.5 top-1.5 flex items-center justify-center"
         title={army?.label ?? record.armyType}
       >
-        <ArmyIcon armyType={record.armyType} className="h-[14px] w-[14px] sm:h-4 sm:w-4" />
+        <ArmyIcon
+          armyType={record.armyType}
+          className="h-[16px] w-[16px] sm:h-[18px] sm:w-[18px]"
+        />
         <span className="sr-only">{army?.label ?? record.armyType}</span>
       </div>
 
