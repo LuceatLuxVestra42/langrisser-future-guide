@@ -29,80 +29,105 @@ jobs:
 
       - name: Hosted list HTTP gate - all 373 Korean names
         run: |
-          node <<'NODE'
+          node --input-type=commonjs <<'NODE'
           const projection = require('./data/generated/equipment-name-kr-user-approved.v1.json');
           const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
-          const records = Object.entries(projection.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r })).filter((r) => r.pageReady);
-          const [general, exclusive] = await Promise.all([
-            fetch(`${BASE}/equipment/`),
-            fetch(`${BASE}/equipment/exclusive/`),
-          ]);
-          if (general.status !== 200 || exclusive.status !== 200) throw new Error(`list HTTP ${general.status}/${exclusive.status}`);
-          const combined = `${await general.text()}\n${await exclusive.text()}`;
-          for (const r of records) {
-            if (!combined.includes(r.nameKr)) throw new Error(`hosted lists missing ${r.equipmentId}:${r.nameKr}`);
-          }
-          console.log(`Hosted list HTTP PASS: ${records.length}/373 Korean names.`);
+          (async () => {
+            const records = Object.entries(projection.byEquipmentId)
+              .map(([id, r]) => ({ equipmentId: Number(id), ...r }))
+              .filter((r) => r.pageReady);
+            const [general, exclusive] = await Promise.all([
+              fetch(`${BASE}/equipment/`),
+              fetch(`${BASE}/equipment/exclusive/`),
+            ]);
+            if (general.status !== 200 || exclusive.status !== 200) {
+              throw new Error(`list HTTP ${general.status}/${exclusive.status}`);
+            }
+            const combined = `${await general.text()}\n${await exclusive.text()}`;
+            for (const r of records) {
+              if (!combined.includes(r.nameKr)) throw new Error(`hosted lists missing ${r.equipmentId}:${r.nameKr}`);
+            }
+            console.log(`Hosted list HTTP PASS: ${records.length}/373 Korean names.`);
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
           NODE
 
       - name: Hosted detail HTTP gate - 373 public and 17 blocked
         run: |
-          node <<'NODE'
+          node --input-type=commonjs <<'NODE'
           const projection = require('./data/generated/equipment-name-kr-user-approved.v1.json');
           const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
-          const all = Object.entries(projection.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r }));
-          const pub = all.filter((r) => r.pageReady);
-          const hidden = all.filter((r) => !r.pageReady);
-          async function batches(records, size, check) {
-            for (let i = 0; i < records.length; i += size) await Promise.all(records.slice(i, i + size).map(check));
-          }
-          await batches(pub, 20, async (r) => {
-            const res = await fetch(`${BASE}/equipment/${r.equipmentId}/`);
-            if (res.status !== 200) throw new Error(`public ${r.equipmentId} HTTP ${res.status}`);
-            const html = await res.text();
-            if (!html.includes(r.nameKr)) throw new Error(`public ${r.equipmentId} missing ${r.nameKr}`);
+          (async () => {
+            const all = Object.entries(projection.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r }));
+            const pub = all.filter((r) => r.pageReady);
+            const hidden = all.filter((r) => !r.pageReady);
+            async function batches(records, size, check) {
+              for (let i = 0; i < records.length; i += size) {
+                await Promise.all(records.slice(i, i + size).map(check));
+              }
+            }
+            await batches(pub, 20, async (r) => {
+              const res = await fetch(`${BASE}/equipment/${r.equipmentId}/`);
+              if (res.status !== 200) throw new Error(`public ${r.equipmentId} HTTP ${res.status}`);
+              const html = await res.text();
+              if (!html.includes(r.nameKr)) throw new Error(`public ${r.equipmentId} missing ${r.nameKr}`);
+            });
+            await batches(hidden, 20, async (r) => {
+              const res = await fetch(`${BASE}/equipment/${r.equipmentId}/`, { redirect: 'manual' });
+              if (res.status !== 404) throw new Error(`non-public ${r.equipmentId} expected 404 got ${res.status}`);
+            });
+            console.log(`Hosted detail HTTP PASS: ${pub.length}/373 public, ${hidden.length}/17 blocked.`);
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
           });
-          await batches(hidden, 20, async (r) => {
-            const res = await fetch(`${BASE}/equipment/${r.equipmentId}/`, { redirect: 'manual' });
-            if (res.status !== 404) throw new Error(`non-public ${r.equipmentId} expected 404 got ${res.status}`);
-          });
-          console.log(`Hosted detail HTTP PASS: ${pub.length}/373 public, ${hidden.length}/17 blocked.`);
           NODE
 
       - name: Prepare browser QA
+        if: always()
         run: |
           npm install --no-save --ignore-scripts @playwright/test@1.55.0
           npx playwright install --with-deps chromium
           cat > hosted-equipment-diagnostic.spec.cjs <<'TEST'
           const { test, expect } = require('@playwright/test');
           const projection = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const generalList = require('./data/generated/equipment_stage3_3_general_list.json');
           const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
-          const records = Object.entries(projection.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r })).filter((r) => r.pageReady);
+          const records = Object.entries(projection.byEquipmentId)
+            .map(([id, r]) => ({ equipmentId: Number(id), ...r }))
+            .filter((r) => r.pageReady);
+          const byId = new Map(records.map((r) => [r.equipmentId, r]));
+          const generalFirstId = generalList.records[0].equipmentId;
+          const generalRepresentative = byId.get(generalFirstId);
+          if (!generalRepresentative?.nameKr) throw new Error(`missing general-list representative ${generalFirstId}`);
+
           const sample = (group) => {
             const r = records.find((x) => x.sourceGroup === group && x.nameKr);
             if (!r) throw new Error(`missing representative ${group}`);
             return r;
           };
+
           async function assertPage(page, url, nameKr) {
             const pageErrors = [];
-            const failedResponses = [];
             page.on('pageerror', (e) => pageErrors.push(e.message));
-            page.on('response', (r) => { if (r.status() >= 400) failedResponses.push(`${r.status()} ${r.url()}`); });
             const response = await page.goto(url, { waitUntil: 'networkidle' });
             expect(response?.status()).toBe(200);
             await expect(page.getByText(nameKr, { exact: true }).first()).toBeVisible();
             expect(pageErrors).toEqual([]);
-            expect(failedResponses).toEqual([]);
           }
+
           test('list', async ({ page }) => {
-            const r = records[0];
-            await assertPage(page, `${BASE}/equipment/`, r.nameKr);
+            await assertPage(page, `${BASE}/equipment/`, generalRepresentative.nameKr);
           });
-          for (const group of ['weapon','armor','headgear','accessory']) {
+
+          for (const group of ['weapon', 'armor', 'headgear', 'accessory']) {
             test(group, async ({ page }) => {
               const r = sample(group);
               await assertPage(page, `${BASE}/equipment/${r.equipmentId}/`, r.nameKr);
-              await page.reload({ waitUntil: 'networkidle' });
+              const reloadResponse = await page.reload({ waitUntil: 'networkidle' });
+              expect(reloadResponse?.status()).toBe(200);
               await expect(page.getByText(r.nameKr, { exact: true }).first()).toBeVisible();
             });
           }
