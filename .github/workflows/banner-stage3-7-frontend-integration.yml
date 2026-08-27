@@ -22,6 +22,7 @@ on:
       - 'data/generated/soldier-detail-stage5-2.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'public/images/army/**'
+      - 'scripts/import-army-icons-from-drive.mjs'
       - 'scripts/prepare-army-icons.mjs'
       - 'scripts/validate-banner-stage3-7-frontend-integration.mjs'
       - 'src/lib/army-icon-assets.ts'
@@ -56,6 +57,8 @@ jobs:
           bun-version: latest
       - name: Install dependencies
         run: bun install --frozen-lockfile
+      - name: Import official Soldier army icons
+        run: node scripts/import-army-icons-from-drive.mjs
       - name: Validate Soldier army icon pipeline
         run: bun run check:army-icons
       - name: Validate Banner Stage 3-7 frontend integration
@@ -72,20 +75,37 @@ jobs:
           DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
           test "$DETAIL_COUNT" -eq 373
           node -e "const x=require('./data/generated/soldier-list-stage5-8.v1.json'); if(x.summary.recordCount!==224 || x.summary.normalCount!==168 || x.summary.spCount!==56) process.exit(1)"
+          node -e "const x=require('./data/generated/army-icon-manifest.v1.json'); if(x.assetsReady!==true || x.importedAssetCount!==10) process.exit(1)"
+          ARMY_ICON_COUNT="$(find public/images/army -maxdepth 1 -type f -name 'Icon_Occupation_*.png' | wc -l | tr -d ' ')"
+          test "$ARMY_ICON_COUNT" -eq 10
+          test -f dist/client/images/army/Icon_Occupation_Infantryman.png
+          test -f dist/client/images/army/Icon_Occupation_Marines.png
+          test -f dist/client/images/army/Icon_Occupation_Cavalry.png
+          test -f dist/client/images/army/Icon_Occupation_Fly.png
+          test -f dist/client/images/army/Icon_Occupation_Water.png
+          test -f dist/client/images/army/Icon_Occupation_Archer.png
+          test -f dist/client/images/army/Icon_Occupation_Assassin.png
+          test -f dist/client/images/army/Icon_Occupation_Magician.png
+          test -f dist/client/images/army/Icon_Occupation_Monk.png
+          test -f dist/client/images/army/Icon_Occupation_Monster.png
           grep -q '/banners' src/routeTree.gen.ts
           grep -q '/equipment' src/routeTree.gen.ts
           grep -q '/soldiers' src/routeTree.gen.ts
           grep -q '224종' dist/client/soldiers/index.html
-      - name: Persist Banner Stage 3-7 checkpoint
+      - name: Persist static frontend checkpoint
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/routeTree.gen.ts data/validation/banner-stage3-7-frontend-integration-summary.v1.json
+          git add \
+            src/routeTree.gen.ts \
+            data/validation/banner-stage3-7-frontend-integration-summary.v1.json \
+            data/generated/army-icon-manifest.v1.json \
+            public/images/army
           if git diff --cached --quiet; then
-            echo "No Banner Stage 3-7 checkpoint changes"
+            echo "No static frontend checkpoint changes"
             exit 0
           fi
-          git commit -m "Freeze Banner Stage 3-7 frontend checkpoint"
+          git commit -m "Freeze static frontend asset checkpoint"
           git push
       - name: Publish static preview to gh-pages
         if: github.ref == 'refs/heads/test/github-pages-static-banner'
