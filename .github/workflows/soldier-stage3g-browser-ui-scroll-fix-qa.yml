@@ -1,0 +1,171 @@
+name: Soldier Stage 3G Browser UI Scroll Fix QA
+
+on:
+  push:
+    branches:
+      - qa/soldier-stage3g-hosted-deploy7
+    paths:
+      - '.github/workflows/soldier-stage3g-browser-ui-scroll-fix-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-deploy-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Apply scroll restoration fix to QA candidate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/routes/soldiers.tsx')
+          s=p.read_text()
+          old='      preload="intent"\n      aria-label={`${displayName} 상세 보기`}'
+          new='      preload="intent"\n      resetScroll={false}\n      aria-label={`${displayName} 상세 보기`}'
+          if s.count(old)!=1: raise SystemExit(f'SoldierCard match={s.count(old)}')
+          p.write_text(s.replace(old,new))
+
+          p=Path('src/routes/soldiers.$soldierId.tsx')
+          s=p.read_text()
+          old='    void navigate({ to: "/soldiers", replace: true });'
+          new='    void navigate({ to: "/soldiers", replace: true, resetScroll: false });'
+          if s.count(old)!=1: raise SystemExit(f'close navigate match={s.count(old)}')
+          s=s.replace(old,new)
+          old2='<Link to="/soldiers" replace className='
+          new2='<Link to="/soldiers" replace resetScroll={false} className='
+          if s.count(old2)!=1: raise SystemExit(f'notFound link match={s.count(old2)}')
+          p.write_text(s.replace(old2,new2))
+          PY
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routes/soldiers.tsx 'src/routes/soldiers.$soldierId.tsx'
+          git commit -m "Preserve Soldier list scroll across detail modal"
+          git push origin HEAD:qa/soldier-stage3g-hosted-deploy7
+          echo "QA_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Build fixed candidate
+        run: |
+          bun install --frozen-lockfile
+          node scripts/import-army-icons-from-drive.mjs
+          bun run check:army-icons
+          bun run build
+          test -f dist/client/soldiers/index.html
+          test "$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')" -eq 224
+          printf '%s\n' "$QA_SHA" > dist/client/qa-commit.txt
+          printf '%s\n' 'soldier-stage3g-browser-ui-scroll-fix' > dist/client/qa-surface.txt
+
+      - name: Publish fixed candidate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Soldier Browser UI QA ${QA_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
+
+      - name: Confirm Pages propagation
+        env:
+          BASE: https://luceatluxvestra42.github.io/langrisser-future-guide
+        run: |
+          python - <<'PY'
+          import os,time,urllib.request
+          base=os.environ['BASE'].rstrip('/')
+          expected=os.environ['QA_SHA']
+          last=None
+          for i in range(36):
+              try:
+                  req=urllib.request.Request(f'{base}/qa-commit.txt?qa={i}',headers={'Cache-Control':'no-cache','User-Agent':'soldier-browser-ui-qa/3.0'})
+                  with urllib.request.urlopen(req,timeout=20) as r:
+                      last=r.read().decode().strip()
+                  if last==expected:
+                      print('PASS Pages propagation',last)
+                      break
+              except Exception as e:
+                  last=repr(e)
+              time.sleep(5)
+          else:
+              raise SystemExit(f'Pages propagation failed last={last!r} expected={expected}')
+          PY
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run Browser UI Gate
+        env:
+          BASE: https://luceatluxvestra42.github.io/langrisser-future-guide
+        run: |
+          mkdir -p browser-ui-artifacts
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const BASE=process.env.BASE.replace(/\/$/,'');
+          const EXPECTED=process.env.QA_SHA;
+          const results=[];
+          const out='browser-ui-artifacts';
+          const ok=(name,detail='')=>{results.push({name,status:'PASS',detail});console.log('PASS',name,detail)};
+          const na=(name,detail='')=>{results.push({name,status:'NOT_APPLICABLE_CURRENT_STAGE',detail});console.log('N/A',name,detail)};
+          const assert=(v,m)=>{if(!v)throw new Error(m)};
+          async function ready(p){await p.waitForLoadState('domcontentloaded');await p.locator('section[aria-label="용병 목록"] a').first().waitFor({state:'visible',timeout:30000})}
+          function errors(p){const e=[];p.on('console',m=>{if(m.type()==='error')e.push(m.text())});p.on('pageerror',x=>e.push(x.message));return e}
+          async function rowCols(loc){return loc.evaluateAll(es=>{const b=es.slice(0,16).map(e=>e.getBoundingClientRect()).filter(x=>x.width&&x.height);if(!b.length)return 0;return b.filter(x=>Math.abs(x.top-b[0].top)<3).length})}
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            try{
+              const fresh=await fetch(`${BASE}/qa-commit.txt?browser=1`,{cache:'no-store'});const marker=(await fresh.text()).trim();assert(fresh.status===200&&marker===EXPECTED,`stale ${marker} != ${EXPECTED}`);ok('freshness',marker);
+
+              const ctx=await browser.newContext({viewport:{width:1440,height:1000},deviceScaleFactor:1});
+              const p=await ctx.newPage();const errs=errors(p);
+              await p.goto(`${BASE}/soldiers/`,{waitUntil:'domcontentloaded'});await ready(p);
+              const filters=p.locator('main section').first();const list=p.locator('section[aria-label="용병 목록"]');const cards=list.locator('a');
+              await p.screenshot({path:`${out}/desktop-list.png`,fullPage:true});
+
+              const sp=filters.getByRole('button',{name:'SP',exact:true});await sp.click();await p.waitForFunction(()=>document.body.innerText.includes('56개 표시'));assert(await sp.getAttribute('aria-pressed')==='true','SP not pressed');ok('hydration/client interaction','SP count 56');
+              const alls=filters.getByRole('button',{name:'전체',exact:true});assert(await alls.count()===2,'전체 buttons !=2');await alls.nth(1).click();
+              const cavalry=filters.getByRole('button',{name:'기병',exact:true});const t3=filters.getByRole('button',{name:'3티어',exact:true});await cavalry.click();await t3.click();const fc=list.locator('a');assert(await fc.count()>0,'no cavalry T3');const picked=await fc.first().getAttribute('title');await fc.first().click();const dialog=p.getByRole('dialog');await dialog.waitFor({state:'visible'});await p.getByText('사용 가능 영웅',{exact:true}).waitFor({state:'visible'});assert(await p.evaluate(()=>document.body.style.overflow)==='hidden','body not locked');await p.screenshot({path:`${out}/desktop-detail.png`});ok('list → detail',picked||'filtered card');ok('detail render','rich modal sections visible');
+              await p.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});assert(await cavalry.getAttribute('aria-pressed')==='true'&&await t3.getAttribute('aria-pressed')==='true','filter state lost');assert(await p.evaluate(()=>document.body.style.overflow)!=='hidden','body lock not restored');ok('filter state persistence','army+tier');ok('Escape close','PASS');
+
+              await alls.nth(0).click();await alls.nth(1).click();const search=p.getByPlaceholder('검색');await search.fill('300');const c300=p.locator('a[title$="Soldier 300"]');await c300.waitFor({state:'visible'});await c300.click();await p.getByRole('dialog').waitFor({state:'visible'});const detailUrl=p.url();await p.goBack({waitUntil:'domcontentloaded'});await p.getByPlaceholder('검색').waitFor({state:'visible'});await p.goForward({waitUntil:'domcontentloaded'});await p.getByRole('dialog').waitFor({state:'visible'});assert(p.url()===detailUrl,'forward detail mismatch');ok('back/forward','list ↔ detail');await p.keyboard.press('Escape');assert(await p.getByPlaceholder('검색').inputValue()==='300','search state lost');ok('search state persistence','query=300');await p.getByPlaceholder('검색').fill('');
+
+              const c102=p.locator('a[title$="Soldier 102"]');await c102.scrollIntoViewIfNeeded();const before=await p.evaluate(()=>scrollY);await c102.click();await p.getByRole('dialog').waitFor({state:'visible'});const during=await p.evaluate(()=>scrollY);await p.keyboard.press('Escape');await p.getByRole('dialog').waitFor({state:'hidden'});const after=await p.evaluate(()=>scrollY);assert(Math.abs(before-during)<=3&&Math.abs(before-after)<=3,`scroll ${before}->${during}->${after}`);ok('scroll position',`${before} → ${during} → ${after}`);
+
+              await sp.focus();await p.keyboard.press('Space');assert(await sp.getAttribute('aria-pressed')==='true','keyboard filter failed');await alls.nth(1).click();await c102.focus();await p.keyboard.press('Enter');await p.getByRole('dialog').waitFor({state:'visible'});await p.keyboard.press('Escape');ok('keyboard','Space filter + Enter card + Escape close');
+
+              const ov=await p.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);assert(ov<=1,`desktop overflow ${ov}`);const dc=await rowCols(cards);assert(dc>=8,`desktop cols ${dc}`);const pic=await p.locator('img[src*="/images/soldiers/"]').first().evaluate(i=>({fit:getComputedStyle(i).objectFit,pos:getComputedStyle(i).objectPosition,w:i.naturalWidth,h:i.naturalHeight}));assert(pic.fit==='contain'&&pic.w>0&&pic.h>0,`portrait ${JSON.stringify(pic)}`);ok('desktop layout',`${dc} cols/no overflow`);ok('image ratio/crop',JSON.stringify(pic));assert(errs.length===0,`desktop console/pageerror ${errs.join(' | ')}`);ok('desktop console/pageerror','0 errors');
+
+              const unknown=await ctx.newPage();const ur=await unknown.goto(`${BASE}/soldiers/999999/`,{waitUntil:'domcontentloaded'});assert(ur&&ur.status()===404,`unknown status ${ur&&ur.status()}`);ok('unknown ID','hosted direct 404');await unknown.close();await ctx.close();
+
+              const mctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});const m=await mctx.newPage();const merr=errors(m);await m.goto(`${BASE}/soldiers/`,{waitUntil:'domcontentloaded'});await ready(m);const mf=m.locator('main section').first(), ml=m.locator('section[aria-label="용병 목록"]'), mc=ml.locator('a');const mov=await m.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);assert(mov<=1,`mobile overflow ${mov}`);const cols=await rowCols(mc);assert(cols===3,`mobile cols ${cols}`);await mf.getByRole('button',{name:'SP',exact:true}).tap();await m.waitForFunction(()=>document.body.innerText.includes('56개 표시'));ok('mobile layout','390x844/3 cols/no overflow');ok('touch filter','SP tap');await m.screenshot({path:`${out}/mobile-list.png`,fullPage:true});const ma=mf.getByRole('button',{name:'전체',exact:true});await ma.nth(1).tap();const mc102=m.locator('a[title$="Soldier 102"]');await mc102.scrollIntoViewIfNeeded();await mc102.tap();const md=m.getByRole('dialog');await md.waitFor({state:'visible'});const box=await md.boundingBox();assert(box&&box.width<=390.5&&box.x>=-0.5,`mobile dialog ${JSON.stringify(box)}`);const close=m.getByRole('button',{name:'상세 창 닫기'});await close.waitFor({state:'visible'});await m.screenshot({path:`${out}/mobile-detail.png`});await close.tap();await md.waitFor({state:'hidden'});ok('touch detail','tap open/close');ok('mobile modal bounds',JSON.stringify(box));assert(merr.length===0,`mobile console/pageerror ${merr.join(' | ')}`);ok('mobile console/pageerror','0 errors');await mctx.close();
+
+              na('Hero ↔ Soldier navigation','F6 not implemented in current Stage 3G');
+              na('equipment → Hero navigation','outside Soldier Stage 3G scope');
+              na('local/session storage restore','no storage contract for Soldier filters');
+              na('SP normal/SP detail toggle','current contract is SP tier filter + SP presentation');
+              na('skin carousel','outside Soldier Stage 3G scope');
+              fs.writeFileSync(`${out}/browser-ui-results.json`,JSON.stringify({status:'PASS_CURRENT_SOLDIER_STAGE3G_SCOPE',qaSha:EXPECTED,results},null,2));
+              console.log('BROWSER_UI_GATE_PASS_CURRENT_SOLDIER_STAGE3G_SCOPE');
+            }finally{await browser.close()}
+          })().catch(e=>{console.error(e.stack||e);process.exit(1)});
+          NODE
+
+      - name: Upload Browser UI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage3g-browser-ui-scroll-fix-evidence
+          path: browser-ui-artifacts/
+          if-no-files-found: warn
