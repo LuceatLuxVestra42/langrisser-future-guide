@@ -72,7 +72,7 @@ function assertFrozenStage1Source(source: HeroListStage1Source) {
     source.completion !== "COMPLETE" ||
     source.freezeState !== "HERO_LIST_STAGE1_FROZEN"
   ) {
-    throw new Error("Hero list Stage 2 requires the frozen Stage 1 consumer.");
+    throw new Error("Hero list frontend requires the frozen Stage 1 consumer.");
   }
 
   if (
@@ -99,6 +99,26 @@ function assertFrozenStage1Source(source: HeroListStage1Source) {
 
 assertFrozenStage1Source(heroList);
 
+function buildRarityOptions(records: HeroListRecord[]) {
+  const rarityMap = new Map<string, { label: string; rank: number; count: number }>();
+
+  for (const hero of records) {
+    const current = rarityMap.get(hero.rarity.baseLabel);
+    if (current) {
+      current.count += 1;
+      continue;
+    }
+
+    rarityMap.set(hero.rarity.baseLabel, {
+      label: hero.rarity.baseLabel,
+      rank: hero.rarity.rank,
+      count: 1,
+    });
+  }
+
+  return [...rarityMap.values()].sort((a, b) => b.rank - a.rank || a.label.localeCompare(b.label));
+}
+
 export function readHeroListStage2Data() {
   return {
     records: heroList.records,
@@ -110,6 +130,22 @@ export function readHeroListStage2Data() {
       stage: heroList.stage,
       schemaId: heroList.schemaId,
       freezeState: heroList.freezeState,
+    },
+  };
+}
+
+export function readHeroListStage3Data() {
+  return {
+    ...readHeroListStage2Data(),
+    filters: {
+      rarities: buildRarityOptions(heroList.records),
+      spCount: heroList.records.filter((hero) => hero.hasSp).length,
+    },
+    presentation: {
+      displayOrdering: "FROZEN_RECORD_ORDER",
+      releaseChronologyAvailable: false,
+      factionKoreanLabelsComplete: false,
+      originKoreanLabelsComplete: false,
     },
   };
 }
