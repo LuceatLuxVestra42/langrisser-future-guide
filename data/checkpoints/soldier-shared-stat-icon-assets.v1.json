@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "checkpointId": "soldier-shared-stat-icon-assets-v1",
+  "createdAt": "2026-08-27",
+  "scope": "Soldier/Hero shared combat stat and range icon asset provenance",
+  "status": "ASSET_SOURCE_VERIFIED_CLIENT_INTERNAL_PATH_UNRESOLVED",
+  "stageImpact": {
+    "soldierStage1To6": "UNCHANGED",
+    "heroStage1To6": "UNCHANGED",
+    "note": "This is frontend/display asset provenance work only. It must not reopen frozen Soldier/Hero semantic or relation stages."
+  },
+  "verifiedSources": {
+    "legacySiteRepository": {
+      "repository": "redpanda7301/langrisser",
+      "branch": "gh-pages",
+      "pngToWebpCommit": "ef8d7640b23f10143b3b2e874867fb03aa9637c2",
+      "pngToWebpCommitMessage": "2021-05-27 이미지 교체 작업 / png -> webp 교체",
+      "preConversionCommit": "a69cadac65ae13c2a6d9f9fa9fb7f33f8c2d3e85"
+    },
+    "legacyAssetDrive": {
+      "rootFolder": "한국 기존 시트 에셋 Google Drive",
+      "assetFolder": "아이콘/영웅 / 부대 정보",
+      "folderId": "1MwF_x42RyQvn_UBt5uonenxM7DleTJyT",
+      "sourceNotice": "Drive notice states that images are original-size transparent PNG files.",
+      "copyrightNotice": "Drive notice states copyright belongs to Zilong Game Limited / extreme and commercial use is not allowed."
+    },
+    "currentProject": {
+      "repository": "LuceatLuxVestra42/langrisser-future-guide",
+      "publicImageStateAtCheckpoint": "public/images contains banners only; shared stat/range PNG assets are not yet committed."
+    }
+  },
+  "assets": [
+    {
+      "key": "hp",
+      "combatField": "HP_INI",
+      "legacySiteCurrent": "img/Icon/Stat/Icon_Heart.webp",
+      "legacySitePreWebp": "img/Icon/Stat/Icon_Heart.png",
+      "verifiedOriginalPngSource": {
+        "fileName": "Icon_HP.png",
+        "driveFileId": "1sI3Lw7ek1CmRZP8xZZV7h_gDIsaEbrE7",
+        "dimensions": "40x40",
+        "mimeType": "image/png"
+      },
+      "mappingStatus": "VERIFIED_VISUAL_EQUIVALENT_ASSET_FAMILY",
+      "clientInternalLocator": null
+    },
+    {
+      "key": "attack",
+      "combatField": "AT_INI",
+      "legacySiteCurrent": "img/Icon/Stat/Icon_Offence.webp",
+      "legacySitePreWebp": "img/Icon/Stat/Icon_Offence.png",
+      "verifiedOriginalPngSource": {
+        "fileName": "Icon_Attack.png",
+        "driveFileId": "14amJcGa9ESsjGnQw4zCo_OvMg6F14ITd",
+        "dimensions": "38x40",
+        "mimeType": "image/png"
+      },
+      "mappingStatus": "VERIFIED_VISUAL_EQUIVALENT_ASSET_FAMILY",
+      "clientInternalLocator": null
+    },
+    {
+      "key": "defense",
+      "combatField": "DF_INI",
+      "legacySiteCurrent": "img/Icon/Stat/Icon_Def.webp",
+      "legacySitePreWebp": "img/Icon/Stat/Icon_Def.png",
+      "verifiedOriginalPngSource": {
+        "fileName": "Icon_Defense.png",
+        "driveFileId": "1h-xBFXnbQ_xST6DC6p5d8O6_eHi19IrP",
+        "dimensions": "38x40",
+        "mimeType": "image/png"
+      },
+      "mappingStatus": "VERIFIED_SEMANTIC_AND_ASSET_SOURCE",
+      "clientInternalLocator": null
+    },
+    {
+      "key": "magicDefense",
+      "combatField": "MagicDF_INI",
+      "legacySiteCurrent": "img/Icon/Stat/Icon_MDef.webp",
+      "legacySitePreWebp": "img/Icon/Stat/Icon_MDef.png",
+      "verifiedOriginalPngSource": {
+        "fileName": "Icon_MagicDefense.png",
+        "driveFileId": "1wwKpr1gC0qJu9afKuBArVMlRFDg4u-tg",
+        "dimensions": "38x40",
+        "mimeType": "image/png"
+      },
+      "mappingStatus": "VERIFIED_SEMANTIC_AND_ASSET_SOURCE",
+      "clientInternalLocator": null
+    },
+    {
+      "key": "range",
+      "combatField": "BF_AttackDistance",
+      "legacySiteCurrent": "img/Icon/Icon_Range.webp",
+      "legacySitePreWebp": "img/Icon/Icon_Range.png",
+      "verifiedOriginalPngSource": {
+        "fileName": "Icon_Range.png",
+        "driveFileId": "1Na1_l_bmE86XvBx19xd__K6AdBgOxM8b",
+        "dimensions": "38x40",
+        "mimeType": "image/png"
+      },
+      "mappingStatus": "VERIFIED_NAME_SEMANTIC_AND_ASSET_SOURCE",
+      "clientInternalLocator": null
+    }
+  ],
+  "acquisitionPolicy": {
+    "preferredSource": "Use the verified original-size PNG files from the legacy asset Drive rather than regenerating icons or re-encoding the legacy WebP files.",
+    "doNotInfer": [
+      "Do not invent UI/... Unity internal paths from filenames alone.",
+      "Do not treat the legacy website directory as the original client directory.",
+      "Do not substitute synthetic icons when a verified source PNG exists."
+    ],
+    "nextTargetDirectory": "public/images/shared/stats/",
+    "binaryCommitState": "PENDING",
+    "binaryCommitReason": "The currently available GitHub contents write wrapper accepts UTF-8 text files only; binary PNG upload needs a binary-capable path or a manual repository upload."
+  },
+  "remainingGate": {
+    "clientInternalLocator": "UNRESOLVED",
+    "reason": "No exact UI/... or AssetBundle internal path reference for Icon_HP/Icon_Attack/Icon_Defense/Icon_MagicDefense/Icon_Range was found in current project ConfigData or repository text search. Exact internal locator must be recovered from a raw client asset index/export manifest if later required."
+  }
+}
