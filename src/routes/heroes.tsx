@@ -2,11 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { RotateCcw, Search, Sparkles, UserRound } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { getHeroListStage3Data } from "@/lib/hero-list.functions";
-import type { HeroListRecord } from "@/lib/hero-list.server";
+import { getHeroListStage4Data } from "@/lib/hero-list.functions";
+import type { HeroListRecord, HeroListStage4Record } from "@/lib/hero-list.server";
 
 export const Route = createFileRoute("/heroes")({
-  loader: () => getHeroListStage3Data(),
+  loader: () => getHeroListStage4Data(),
   head: () => ({
     meta: [
       { title: "영웅 | 랑그릿사 모바일 미래시 정보" },
@@ -31,6 +31,11 @@ function matchesHeroSearch(hero: HeroListRecord, normalizedQuery: string) {
   return [hero.identity.nameKr, hero.identity.nameCn, hero.identity.nameEn]
     .filter((name): name is string => Boolean(name))
     .some((name) => name.toLocaleLowerCase().includes(normalizedQuery));
+}
+
+function resolvePublicAssetUrl(webAssetPath: string) {
+  const base = import.meta.env.BASE_URL || "/";
+  return `${base.replace(/\/$/, "")}${webAssetPath}`;
 }
 
 function HeroGridPage() {
@@ -153,7 +158,7 @@ function HeroGridPage() {
             <span className="text-muted-foreground"> / {data.summary.total}명</span>
           </p>
           <p className="hidden text-xs text-muted-foreground sm:block">
-            Stage 1 frozen consumer · {data.source.freezeState}
+            이미지 {data.artwork.resolved}/{data.artwork.total} 연결 · 나머지는 placeholder
           </p>
         </div>
 
@@ -208,42 +213,56 @@ function FilterButton({
   );
 }
 
-function HeroGridCard({ hero }: { hero: HeroListRecord }) {
+function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
   const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
+  const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
 
   return (
-    <article
-      aria-label={`${displayName} ${hero.rarity.baseLabel}`}
-      className="group relative aspect-[4/5] overflow-hidden rounded-md border border-border bg-card shadow-sm"
+    <Link
+      to="/heroes/$heroId"
+      params={{ heroId: String(hero.heroId) }}
+      aria-label={`${displayName} ${hero.rarity.baseLabel} 상세 보기`}
+      className="group block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2"
     >
-      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-12 text-muted-foreground">
-        <UserRound
-          className="h-12 w-12 transition group-hover:text-foreground sm:h-14 sm:w-14"
-          strokeWidth={1.25}
-          aria-hidden="true"
-        />
-      </div>
+      <article className="relative aspect-[4/5] overflow-hidden rounded-md border border-border bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt=""
+            className="h-full w-full object-cover object-top pb-10"
+            loading="lazy"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-12 text-muted-foreground">
+            <UserRound
+              className="h-12 w-12 transition group-hover:text-foreground sm:h-14 sm:w-14"
+              strokeWidth={1.25}
+              aria-hidden="true"
+            />
+          </div>
+        )}
 
-      <div className="absolute left-1.5 top-1.5 flex items-center gap-1">
-        <span className="rounded bg-black/75 px-1.5 py-0.5 text-[10px] font-bold text-white sm:text-[11px]">
-          {hero.rarity.baseLabel}
-        </span>
-        {hero.hasSp ? (
-          <span
-            className="inline-flex items-center gap-0.5 rounded border border-foreground/20 bg-background/90 px-1.5 py-0.5 text-[10px] font-bold text-foreground backdrop-blur-sm sm:text-[11px]"
-            title="SP 해금 영웅"
-          >
-            <Sparkles className="h-3 w-3" aria-hidden="true" />
-            SP
+        <div className="absolute left-1.5 top-1.5 flex items-center gap-1">
+          <span className="rounded bg-black/75 px-1.5 py-0.5 text-[10px] font-bold text-white sm:text-[11px]">
+            {hero.rarity.baseLabel}
           </span>
-        ) : null}
-      </div>
+          {hero.hasSp ? (
+            <span
+              className="inline-flex items-center gap-0.5 rounded border border-foreground/20 bg-background/90 px-1.5 py-0.5 text-[10px] font-bold text-foreground backdrop-blur-sm sm:text-[11px]"
+              title="SP 해금 영웅"
+            >
+              <Sparkles className="h-3 w-3" aria-hidden="true" />
+              SP
+            </span>
+          ) : null}
+        </div>
 
-      <div className="absolute inset-x-0 bottom-0 bg-black/75 px-1.5 py-2 text-center backdrop-blur-[1px]">
-        <span className="line-clamp-2 text-[11px] font-bold leading-tight text-white sm:text-xs">
-          {displayName}
-        </span>
-      </div>
-    </article>
+        <div className="absolute inset-x-0 bottom-0 bg-black/75 px-1.5 py-2 text-center backdrop-blur-[1px]">
+          <span className="line-clamp-2 text-[11px] font-bold leading-tight text-white sm:text-xs">
+            {displayName}
+          </span>
+        </div>
+      </article>
+    </Link>
   );
 }

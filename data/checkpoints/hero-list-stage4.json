@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "stage": "hero-list-stage4",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "predecessor": {
+    "stage": "hero-list-stage3",
+    "status": "PASS_WITH_REVIEW",
+    "completion": "COMPLETE"
+  },
+  "sources": {
+    "heroList": "data/generated/hero-list-stage1.v1.json",
+    "heroListFreezeState": "HERO_LIST_STAGE1_FROZEN",
+    "heroStage6Manifest": "data/generated/hero-detail.v1.json",
+    "artworkManifest": "data/generated/hero-card-artwork-stage4.v1.json"
+  },
+  "completedScope": [
+    "file-existence-only Hero card artwork resolver",
+    "267 Hero artwork manifest records with exact Hero ID paths",
+    "safe placeholder fallback when a web artwork file is absent",
+    "Hero list card navigation to /heroes/{heroId}",
+    "267-Hero detail route shell admitted by the frozen Stage 6 shard manifest",
+    "invalid/noncanonical Hero ID not-found handling",
+    "GitHub Pages base-path-safe resolved artwork URLs",
+    "production preflight, build, generated route and TypeScript gates",
+    "Hosted QA prerender of 267 Hero detail routes while preserving 373 equipment detail routes",
+    "gh-pages deployment verification"
+  ],
+  "artwork": {
+    "assetRoot": "public/images/heroes/cards",
+    "webRoot": "/images/heroes/cards",
+    "filePattern": "{heroId}.png",
+    "resolvedCount": 0,
+    "pendingCount": 267,
+    "totalCount": 267,
+    "status": "RESOLVER_READY_ASSET_INPUT_PENDING",
+    "inferWebPathFromUnityLocator": false
+  },
+  "detailRoutes": {
+    "routePattern": "/heroes/{heroId}",
+    "stage6AdmittedHeroCount": 267,
+    "hostedStaticDetailCount": 267,
+    "representativeRoutes": ["/heroes/1", "/heroes/6"],
+    "fullStage6ShardRuntimeRead": false,
+    "stage": "ROUTE_SHELL"
+  },
+  "productionBoundary": {
+    "rawConfigDataRead": false,
+    "heroStage4Or5SemanticFallback": false,
+    "relationshipRederivation": false,
+    "nameOrIdHeuristics": false,
+    "unityArtworkPathToWebUrlInference": false,
+    "runtimeFullStage6ShardRead": false
+  },
+  "validation": {
+    "preflight": "PASS",
+    "heroCount": 267,
+    "malformedArtworkCount": 0,
+    "stage6MissingCount": 0,
+    "hardErrorCount": 0,
+    "productionCiRunId": 33060181892,
+    "productionBuild": "PASS",
+    "routeGeneration": "PASS",
+    "typescript": "PASS",
+    "staticPagesPreviewRunId": 33060482272,
+    "staticPagesPreview": "PASS",
+    "qaSourceCommit": "11654b379faccad7781c2727da83c861128a8433",
+    "ghPagesDeployCommit": "bf99bb3de9cea53aad819d326e4ce1a7047d0890",
+    "equipmentStaticDetailCountPreserved": 373,
+    "heroStaticDetailCount": 267,
+    "repositoryBasePath": "/langrisser-future-guide/",
+    "browserInteractionReview": "NON_BLOCKING_NOT_EXECUTED"
+  },
+  "reviewNotes": [
+    "Actual Hero artwork bytes are not currently present in GitHub or the connected Drive source, so artwork coverage is intentionally 0/267 rather than inferred.",
+    "Interactive browser and responsive visual review remain non-blocking presentation QA.",
+    "The detail route is a Stage 4 shell; full Hero detail blocks remain a later frontend stage."
+  ],
+  "deferred": [
+    "supply/import actual Hero card artwork files and raise resolver coverage from 0/267",
+    "full Hero detail content projection from individual frozen Stage 6 shards",
+    "confirmed Korean faction/origin presentation labels",
+    "release chronology/display ordering",
+    "fusion-power badge metadata",
+    "SSR solo-limited presentation metadata",
+    "interactive browser and responsive visual QA"
+  ],
+  "nextStart": "Stage 5: expand the Stage 4 Hero detail route shell with frozen Stage 6 detail blocks using per-Hero shard reads only; artwork files may be imported independently without changing the Stage 4 resolver contract."
+}

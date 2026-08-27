@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "stage": "hero-list-stage4",
+  "schemaId": "hero-list-stage4/v1",
+  "predecessor": {
+    "checkpoint": "data/checkpoints/hero-list-stage3.json",
+    "requiredStatus": "PASS_WITH_REVIEW",
+    "requiredCompletion": "COMPLETE"
+  },
+  "sources": {
+    "heroList": "data/generated/hero-list-stage1.v1.json",
+    "heroStage6Manifest": "data/generated/hero-detail.v1.json"
+  },
+  "artworkPolicy": {
+    "assetRoot": "public/images/heroes/cards",
+    "webRoot": "/images/heroes/cards",
+    "filePattern": "{heroId}.png",
+    "resolveOnlyWhenFileExists": true,
+    "sourceArtworkPathIsLocatorOnly": true,
+    "inferWebPathFromUnityLocator": false,
+    "missingAssetStatus": "PENDING_ASSET"
+  },
+  "routePolicy": {
+    "detailRoutePattern": "/heroes/{heroId}",
+    "requireStage6ShardAdmission": true,
+    "runtimeRawConfigDataRead": false,
+    "runtimeFullStage6ShardRead": false,
+    "detailStage": "ROUTE_SHELL"
+  }
+}

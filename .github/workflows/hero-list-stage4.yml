@@ -1,0 +1,89 @@
+name: Hero List Stage 4 Artwork and Detail Routes
+
+on:
+  push:
+    branches:
+      - work/hero-list-stage4
+    paths:
+      - "data/contracts/hero-list-stage4.v1.json"
+      - "data/generated/hero-list-stage1.v1.json"
+      - "data/generated/hero-detail.v1.json"
+      - "data/generated/hero-card-artwork-stage4.v1.json"
+      - "data/checkpoints/hero-list-stage3.json"
+      - "public/images/heroes/cards/**"
+      - "scripts/generate_hero_list_stage4_artwork.cjs"
+      - "scripts/validate_hero_list_stage4.cjs"
+      - "src/lib/hero-list.server.ts"
+      - "src/lib/hero-list.functions.ts"
+      - "src/routes/heroes.tsx"
+      - "src/routes/heroes_.$heroId.tsx"
+      - ".github/workflows/hero-list-stage4.yml"
+      - "package.json"
+      - "bun.lock"
+  pull_request:
+    paths:
+      - "data/contracts/hero-list-stage4.v1.json"
+      - "data/generated/hero-card-artwork-stage4.v1.json"
+      - "public/images/heroes/cards/**"
+      - "scripts/generate_hero_list_stage4_artwork.cjs"
+      - "scripts/validate_hero_list_stage4.cjs"
+      - "src/lib/hero-list.server.ts"
+      - "src/lib/hero-list.functions.ts"
+      - "src/routes/heroes.tsx"
+      - "src/routes/heroes_.$heroId.tsx"
+      - ".github/workflows/hero-list-stage4.yml"
+      - "package.json"
+      - "bun.lock"
+
+permissions:
+  contents: write
+
+jobs:
+  hero-list-stage4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Generate file-existence-only Hero artwork manifest
+        run: node scripts/generate_hero_list_stage4_artwork.cjs
+
+      - name: Preflight Stage 4 consumer and route boundary
+        run: node scripts/validate_hero_list_stage4.cjs
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Production build gate
+        run: bun run build
+
+      - name: Verify generated Hero detail route
+        run: |
+          test -f src/routeTree.gen.ts
+          grep -q '/heroes/$heroId' src/routeTree.gen.ts
+          test -f .output/public/assets/index-DjSqoBfP.js || true
+          find .output/public/assets -maxdepth 1 -type f -name 'heroes_._heroId-*.js' | grep -q .
+
+      - name: TypeScript gate
+        run: bunx tsc --noEmit
+
+      - name: Persist generated Stage 4 checkpoints on work branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/hero-list-stage4'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            data/generated/hero-card-artwork-stage4.v1.json \
+            data/validation/hero-list-stage4.v1.json \
+            src/routeTree.gen.ts
+          if git diff --cached --quiet; then
+            echo "No generated Stage 4 changes"
+            exit 0
+          fi
+          git commit -m "Freeze Hero Stage 4 generated outputs"
+          git push
