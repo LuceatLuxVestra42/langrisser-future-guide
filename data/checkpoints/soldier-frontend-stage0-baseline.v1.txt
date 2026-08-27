@@ -1,0 +1,55 @@
+Soldier Frontend Stage 0 Baseline
+Date: 2026-08-27
+Status: PASS_WITH_INTEGRATION_REVIEW
+
+1. Purpose
+- Freeze the frontend starting point before URL-addressable Soldier detail work.
+- Reuse frozen Soldier/Hero-Soldier semantics; do not reopen ConfigData/JOIN research for presentation or routing work.
+
+2. Baseline source
+- Working branch: work/soldier-frontend-stage0-baseline
+- Baseline implementation commit: 77ee4072339acccaceeafa8e6a9e9e28fccff242
+- Baseline commit message: Use shared stat and movement icons in Soldier modal
+- Current main HEAD observed at Stage 0 start: 0bd9aa357843a1802e5b9586129d2193d9e70fb5
+
+3. Repository topology review
+- 77ee4072 exists in the repository but was not the HEAD of any branch at Stage 0 start.
+- Compared with main 0bd9aa3, 77ee4072 is diverged: ahead 59 / behind 9, merge base 72bd50f5eb84d6379b32a43ce6bda154b42e6e34.
+- Therefore Stage 0 anchors 77ee4072 on a durable work branch before further Soldier frontend changes.
+- Do not fast-forward or overwrite main from this branch without a separate integration/reconciliation step.
+
+4. Frozen semantic/data boundaries
+- Canonical Soldier population: 224 = normal 168 + SP 56.
+- Hero-Soldier canonical reciprocal relation: 5,977 pairs.
+- Frontend consumes frozen presentation/navigation data only.
+- Runtime relation recomputation is prohibited.
+- Raw ConfigData relation reads are prohibited.
+- Name JOIN, ID arithmetic inference, and arbitrary pair patches are prohibited.
+- Shared stat and movement icon contracts are treated as already confirmed checkpoints.
+
+5. Current frontend state
+- Existing production list route implementation: /soldiers.
+- Soldier detail currently opens from local React state selectedId.
+- Modal close currently clears selectedId.
+- There is no src/routes/soldiers.$soldierId.tsx route at this baseline.
+- Therefore Soldier detail is not URL-addressable yet.
+- Existing Soldier modal already consumes shared stat/movement icons.
+
+6. Stage 0 completion judgment
+PASS_WITH_INTEGRATION_REVIEW
+
+PASS:
+- Latest known Soldier modal implementation is no longer orphaned; it is anchored to a named work branch.
+- Existing /soldiers state-based detail behavior is confirmed.
+- Absence of a Soldier detail route is confirmed.
+- Semantic/data boundaries for subsequent frontend work are frozen.
+
+INTEGRATION_REVIEW:
+- The working baseline and main have diverged histories.
+- Reconciliation with main must be handled explicitly before final merge/deployment from main.
+- This review does not reopen Soldier/Hero-Soldier semantic stages.
+
+7. Next start point
+Stage 1: convert Soldier detail from state-only modal to route-backed URL-addressable detail behavior while preserving the existing modal UI and frozen Soldier consumer data.
+Target route concept: /soldiers/{soldierId}
+Required later QA: direct entry, refresh, back/forward, unknown ID, GitHub Pages base path, asset path, hosted/browser behavior.
