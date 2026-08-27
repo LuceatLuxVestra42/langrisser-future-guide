@@ -49,7 +49,7 @@ type Category = {
 const categories: Category[] = [
   { title: "업데이트", image: cardUpdate, to: "/", primary: true },
   { title: "가챠 배너", image: cardGacha, to: "/banners" },
-  { title: "캐릭터", image: cardCharacter, to: "/" },
+  { title: "캐릭터", image: cardCharacter, to: "/heroes" },
   { title: "장비", image: cardEquip, to: "/equipment" },
   { title: "스킨", image: cardSkin, to: "/" },
   { title: "용병", image: cardMerc, to: "/soldiers" },
