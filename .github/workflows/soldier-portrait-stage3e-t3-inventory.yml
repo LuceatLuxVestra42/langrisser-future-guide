@@ -1,0 +1,39 @@
+name: Soldier Portrait Stage 3E T3 Inventory
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - 'scripts/report-soldier-portrait-stage3e-t3.mjs'
+      - '.github/workflows/soldier-portrait-stage3e-t3-inventory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Build Stage 3E T3 inventory
+        run: node scripts/report-soldier-portrait-stage3e-t3.mjs
+      - name: Validate inventory
+        run: |
+          node <<'NODE'
+          const x = require('./data/validation/soldier-portrait-stage3e-t3-inventory.v1.json');
+          if (x.unresolvedT3Count !== x.rows.length) throw new Error('T3 inventory count mismatch');
+          if (x.rows.some(r => r.tier !== 3)) throw new Error('non-T3 record in inventory');
+          console.log(`STAGE3E_T3_INVENTORY_VALIDATED count=${x.rows.length}`);
+          NODE
+      - name: Commit inventory checkpoint
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/soldier-portrait-stage3e-t3-inventory.v1.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Checkpoint Soldier portrait Stage 3E T3 inventory'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
