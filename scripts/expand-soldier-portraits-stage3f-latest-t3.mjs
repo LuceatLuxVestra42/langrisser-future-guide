@@ -10,6 +10,7 @@ const CHECKPOINT_PATH = 'data/checkpoints/soldier-frontend-stage3f-latest-t3.txt
 const PUBLIC_DIR = 'public/images/soldiers';
 const TARGET_IDS = [135,136,251,427,516,648,819,1033,1035,1037,1038,1039,1118];
 const BWIKI_API = 'https://wiki.biligame.com/langrisser/api.php';
+const BWIKI_FILE_REDIRECT = 'https://wiki.biligame.com/langrisser/Special:Redirect/file/';
 
 function sha256(bytes) { return createHash('sha256').update(bytes).digest('hex'); }
 function isPng(bytes) { return bytes.length >= 8 && bytes.subarray(0,8).equals(Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a])); }
@@ -17,35 +18,59 @@ function pngDimensions(bytes) {
   if (!isPng(bytes) || bytes.length < 24) return null;
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
+async function fetchResponse(url) {
+  return fetch(url, { redirect: 'follow', headers: { 'user-agent': 'Mozilla/5.0 SoldierPortraitStage3F/1.1' } });
+}
 async function fetchJson(url) {
-  const response = await fetch(url, { redirect: 'follow', headers: { 'user-agent': 'Mozilla/5.0 SoldierPortraitStage3F/1.0' } });
+  const response = await fetchResponse(url);
   if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${url}`);
   return response.json();
 }
-async function fetchBytes(url) {
-  const response = await fetch(url, { redirect: 'follow', headers: { 'user-agent': 'Mozilla/5.0 SoldierPortraitStage3F/1.0' } });
-  if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${url}`);
-  return Buffer.from(await response.arrayBuffer());
+async function tryPng(url) {
+  try {
+    const response = await fetchResponse(url);
+    if (!response.ok) return { ok: false, error: `${response.status} ${response.statusText}`, finalUrl: response.url };
+    const bytes = Buffer.from(await response.arrayBuffer());
+    if (!isPng(bytes)) return { ok: false, error: `NON_PNG ${response.headers.get('content-type') ?? ''}`, finalUrl: response.url };
+    return { ok: true, bytes, finalUrl: response.url };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error), finalUrl: null };
+  }
 }
-async function resolveBwikiImage(nameCn) {
-  const titles = [`File:Q${nameCn}.png`, `File:士兵 ${nameCn}.png`];
+async function resolveBwikiAsset(nameCn) {
+  const fileNames = [`Q${nameCn}.png`, `士兵 ${nameCn}.png`];
   const attempts = [];
-  for (const title of titles) {
+
+  // First use exact MediaWiki image metadata when available.
+  for (const fileName of fileNames) {
+    const title = `File:${fileName}`;
     const params = new URLSearchParams({ action: 'query', format: 'json', origin: '*', prop: 'imageinfo', iiprop: 'url|size|sha1', titles: title });
     const apiUrl = `${BWIKI_API}?${params}`;
     try {
       const json = await fetchJson(apiUrl);
-      const pages = Object.values(json?.query?.pages ?? {});
-      const page = pages[0];
+      const page = Object.values(json?.query?.pages ?? {})[0];
       const info = page?.imageinfo?.[0];
       if (page && !page.missing && info?.url) {
-        return { title, apiUrl, sourceUrl: info.url, apiWidth: info.width ?? null, apiHeight: info.height ?? null, apiSize: info.size ?? null, apiSha1: info.sha1 ?? null };
+        const asset = await tryPng(info.url);
+        if (asset.ok) return { title, fileName, resolution: 'MEDIAWIKI_IMAGEINFO', apiUrl, sourceUrl: asset.finalUrl ?? info.url, bytes: asset.bytes };
+        attempts.push({ title, method: 'MEDIAWIKI_IMAGEINFO', status: 'BAD_ASSET', error: asset.error, sourceUrl: info.url });
+      } else {
+        attempts.push({ title, method: 'MEDIAWIKI_IMAGEINFO', status: 'MISSING' });
       }
-      attempts.push({ title, status: 'MISSING' });
     } catch (error) {
-      attempts.push({ title, status: 'ERROR', error: error instanceof Error ? error.message : String(error) });
+      attempts.push({ title, method: 'MEDIAWIKI_IMAGEINFO', status: 'ERROR', error: error instanceof Error ? error.message : String(error) });
     }
   }
+
+  // BWIKI intermittently returns 567 for imageinfo. Use MediaWiki's file redirect as an independent path.
+  for (const fileName of fileNames) {
+    const title = `File:${fileName}`;
+    const redirectUrl = `${BWIKI_FILE_REDIRECT}${encodeURIComponent(fileName)}`;
+    const asset = await tryPng(redirectUrl);
+    if (asset.ok) return { title, fileName, resolution: 'MEDIAWIKI_SPECIAL_REDIRECT', apiUrl: null, sourceUrl: asset.finalUrl ?? redirectUrl, bytes: asset.bytes };
+    attempts.push({ title, method: 'MEDIAWIKI_SPECIAL_REDIRECT', status: 'ERROR', error: asset.error, sourceUrl: redirectUrl, finalUrl: asset.finalUrl });
+  }
+
   throw new Error(`BWIKI image unresolved for ${nameCn}: ${JSON.stringify(attempts)}`);
 }
 
@@ -66,9 +91,8 @@ for (const soldierId of TARGET_IDS) {
   if (Number(model.rank) !== 3) throw new Error(`Stage 3F non-T3 target ${soldierId}`);
   if (!model.nameCn || !model.model || !model.modelStem) throw new Error(`Stage 3F identity/model evidence incomplete ${soldierId}`);
 
-  const bwiki = await resolveBwikiImage(model.nameCn);
-  const bytes = await fetchBytes(bwiki.sourceUrl);
-  if (!isPng(bytes)) throw new Error(`BWIKI asset is not PNG for ${soldierId}: ${bwiki.sourceUrl}`);
+  const bwiki = await resolveBwikiAsset(model.nameCn);
+  const bytes = bwiki.bytes;
   const dimensions = pngDimensions(bytes);
   const fileName = `${soldierId}.png`;
   await writeFile(path.join(PUBLIC_DIR, fileName), bytes);
@@ -78,9 +102,10 @@ for (const soldierId of TARGET_IDS) {
     nameKr: model.nameKr ?? null,
     nameCn: model.nameCn,
     tier: 3,
-    sourceKind: bwiki.title.startsWith('File:Q') ? 'BWIKI_CURRENT_CN_EXACT_Q_PNG_STAGE3F' : 'BWIKI_CURRENT_CN_EXACT_SOLDIER_PNG_STAGE3F',
+    sourceKind: bwiki.fileName.startsWith('Q') ? 'BWIKI_CURRENT_CN_EXACT_Q_PNG_STAGE3F' : 'BWIKI_CURRENT_CN_EXACT_SOLDIER_PNG_STAGE3F',
     sourceUrl: bwiki.sourceUrl,
     bwikiFileTitle: bwiki.title,
+    bwikiResolution: bwiki.resolution,
     bwikiPageUrl: `https://wiki.biligame.com/langrisser/士兵/${encodeURIComponent(model.nameCn)}`,
     model: model.model,
     modelStem: model.modelStem,
@@ -102,6 +127,7 @@ for (const soldierId of TARGET_IDS) {
     model: model.model,
     modelStem: model.modelStem,
     bwikiFileTitle: bwiki.title,
+    bwikiResolution: bwiki.resolution,
     bwikiApiUrl: bwiki.apiUrl,
     sourceUrl: bwiki.sourceUrl,
     byteSize: bytes.length,
@@ -118,7 +144,6 @@ if (ids.size !== records.length) throw new Error('Duplicate Soldier portrait ID 
 if (records.length + unresolved.length !== 224) throw new Error('Stage 3F total coverage mismatch');
 if (TARGET_IDS.some((id) => unresolvedById.has(id))) throw new Error('Stage 3F target remains unresolved');
 
-const normalResolved = records.filter((r) => !String(r.soldierId).startsWith('9')); // overwritten below from v4 invariant rather than ID heuristic
 const tier1Resolved = v4.coverage.tier1Resolved;
 const tier2Resolved = v4.coverage.tier2Resolved;
 const tier3Resolved = v4.coverage.tier3Resolved + newlyResolved.length;
@@ -136,6 +161,7 @@ const output = {
   policy: {
     ...v4.policy,
     stage3fAdmission: 'Canonical Soldier ID must be in v4 unresolved T3; ConfigDataSoldierInfo exact ID supplies current Chinese name and unique Model; BWIKI image file must match that exact Chinese name as Q<name>.png or 士兵 <name>.png.',
+    stage3fAssetTransport: 'Prefer MediaWiki imageinfo; if BWIKI blocks imageinfo, use independent Special:Redirect/file for the same exact file title and validate PNG bytes.',
     latestT3LegacyDependency: false,
     nameSimilarityUsedForAdmission: false,
     combatStatsUsedForIdentity: false,
@@ -146,6 +172,7 @@ const output = {
     previousManifest: V4_PATH,
     modelCheckpoint: MODEL_PATH,
     bwikiApi: BWIKI_API,
+    bwikiFileRedirect: BWIKI_FILE_REDIRECT,
     stage3fEvidence: EVIDENCE_PATH,
   },
   coverage: {
