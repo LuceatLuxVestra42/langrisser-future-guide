@@ -1,0 +1,89 @@
+name: Hosted QA Main Soldier Pages
+
+on:
+  push:
+    branches:
+      - deploy/main-soldier-pages-20260827
+    paths:
+      - '.github/workflows/hosted-qa-main-soldier-pages.yml'
+  workflow_dispatch:
+
+jobs:
+  hosted-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify deployed source markers over HTTPS
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://luceatluxvestra42.github.io/langrisser-future-guide'
+          for i in {1..12}; do
+            MAIN="$(curl -fsSL --retry 2 --retry-delay 2 "$BASE/qa-main-source.txt" || true)"
+            SURFACE="$(curl -fsSL --retry 2 --retry-delay 2 "$BASE/qa-surface.txt" || true)"
+            if [ "$MAIN" = '4428d59d42133054c512283e5e67ce6fd1124ba3' ] && [ "$SURFACE" = 'soldier-portrait-v8-224' ]; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Hosted markers did not reach expected deployment" >&2
+          exit 1
+
+      - name: Prepare browser QA
+        run: |
+          npm install --no-save --ignore-scripts @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Browser/UI Gate — deployed /soldiers
+        shell: bash
+        run: |
+          cat > hosted-soldier.spec.cjs <<'TEST'
+          const { test, expect } = require('@playwright/test');
+          const fs = require('fs');
+          const manifest = require('./data/generated/soldier-portrait-manifest.v8.json');
+          const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
+
+          function record(id) {
+            const r = manifest.records.find((x) => x.soldierId === id);
+            if (!r) throw new Error(`No portrait record for ${id}`);
+            return r;
+          }
+
+          test('main category links to deployed Soldier page', async ({ page }) => {
+            await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
+            const link = page.getByRole('link', { name: '용병' });
+            await expect(link).toHaveAttribute('href', '/langrisser-future-guide/soldiers/');
+            await link.click();
+            await expect(page).toHaveURL(/\/langrisser-future-guide\/soldiers\/?$/);
+            await expect(page.getByText('224')).toBeVisible();
+          });
+
+          for (const id of [102, 5115]) {
+            test(`Soldier ${id} direct detail renders own portrait`, async ({ page }) => {
+              const r = record(id);
+              const failed = [];
+              page.on('response', (response) => {
+                if (response.url().includes('/images/soldiers/') && response.status() >= 400) {
+                  failed.push(`${response.status()} ${response.url()}`);
+                }
+              });
+              await page.goto(`${BASE}/soldiers/${id}/`, { waitUntil: 'networkidle' });
+              const portrait = page.locator(`img[src*="/images/soldiers/${r.fileName}"]`).first();
+              await expect(portrait).toBeVisible();
+              expect(await portrait.evaluate((img) => img.complete && img.naturalWidth > 0 && img.naturalHeight > 0)).toBeTruthy();
+              expect(failed).toEqual([]);
+            });
+          }
+
+          test('all 224 hosted portrait URLs answer successfully', async ({ request }) => {
+            expect(manifest.records).toHaveLength(224);
+            for (const r of manifest.records) {
+              const res = await request.get(`${BASE}/images/soldiers/${r.fileName}`);
+              expect(res.status(), `${r.soldierId} ${r.fileName}`).toBe(200);
+              const type = res.headers()['content-type'] || '';
+              expect(type, `${r.soldierId} ${r.fileName}`).toMatch(/^image\//);
+            }
+          });
+          TEST
+          npx playwright test hosted-soldier.spec.cjs --reporter=line --workers=1
