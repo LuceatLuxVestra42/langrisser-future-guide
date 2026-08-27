@@ -18,6 +18,7 @@ on:
       - 'data/generated/equipment_stage3_4_general_detail.json'
       - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
       - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/generated/hero-list-stage1.v1.json'
       - 'data/generated/soldier-list-stage5-8.v1.json'
       - 'data/generated/soldier-detail-stage5-2.v1.json'
       - 'data/hero-name-master.v1.json'
@@ -34,6 +35,8 @@ on:
       - 'src/lib/banner-page.functions.ts'
       - 'src/lib/equipment-page.server.ts'
       - 'src/lib/equipment-page.functions.ts'
+      - 'src/lib/hero-list.server.ts'
+      - 'src/lib/hero-list.functions.ts'
       - 'src/lib/soldier-page.server.ts'
       - 'src/lib/soldier-page.functions.ts'
       - 'src/router.tsx'
@@ -41,6 +44,7 @@ on:
       - 'src/routes/equipment.tsx'
       - 'src/routes/equipment_.exclusive.tsx'
       - 'src/routes/equipment_.$equipmentId.tsx'
+      - 'src/routes/heroes.tsx'
       - 'src/routes/soldiers.tsx'
       - 'src/routes/index.tsx'
       - 'src/routeTree.gen.ts'
@@ -68,16 +72,18 @@ jobs:
         run: node scripts/validate-banner-stage3-7-frontend-integration.mjs
       - name: Build production frontend
         run: bun run build
-      - name: Verify static home, banner, equipment, and Soldier pages
+      - name: Verify static home, banner, equipment, Soldier, and Hero pages
         run: |
           test -f dist/client/index.html
           test -f dist/client/banners/index.html
           test -f dist/client/equipment/index.html
           test -f dist/client/equipment/exclusive/index.html
           test -f dist/client/soldiers/index.html
+          test -f dist/client/heroes/index.html
           DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
           test "$DETAIL_COUNT" -eq 373
           node -e "const x=require('./data/generated/soldier-list-stage5-8.v1.json'); if(x.summary.recordCount!==224 || x.summary.normalCount!==168 || x.summary.spCount!==56) process.exit(1)"
+          node -e "const x=require('./data/generated/hero-list-stage1.v1.json'); if(x.freezeState!=='HERO_LIST_STAGE1_FROZEN' || x.summary.generatedRecordCount!==267 || x.summary.uniqueHeroCount!==267 || x.summary.hardErrorCount!==0) process.exit(1)"
           node -e "const x=require('./data/generated/army-icon-manifest.v1.json'); if(x.assetsReady!==true || x.importedAssetCount!==10) process.exit(1)"
           ARMY_ICON_COUNT="$(find public/images/army -maxdepth 1 -type f -name 'Icon_Occupation_*.png' | wc -l | tr -d ' ')"
           test "$ARMY_ICON_COUNT" -eq 10
@@ -106,7 +112,13 @@ jobs:
           grep -q '/banners' src/routeTree.gen.ts
           grep -q '/equipment' src/routeTree.gen.ts
           grep -q '/soldiers' src/routeTree.gen.ts
+          grep -q '/heroes' src/routeTree.gen.ts
           grep -q '224종' dist/client/soldiers/index.html
+          grep -q '267' dist/client/heroes/index.html
+          grep -q '매튜' dist/client/heroes/index.html
+          grep -q '레온' dist/client/heroes/index.html
+          grep -q 'to: "/soldiers"' src/routes/index.tsx
+          grep -q 'to: "/heroes"' src/routes/index.tsx
       - name: Persist static frontend checkpoint
         run: |
           git config user.name "github-actions[bot]"
