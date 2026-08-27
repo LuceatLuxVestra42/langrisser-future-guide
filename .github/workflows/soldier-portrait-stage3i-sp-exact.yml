@@ -1,0 +1,107 @@
+name: Soldier Portrait Stage 3I Exact SP Closeout
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - 'scripts/expand-soldier-portraits-stage3i-sp-exact.mjs'
+      - '.github/workflows/soldier-portrait-stage3i-sp-exact.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Resolve exact SP-suffixed Soldier portraits
+        run: node scripts/expand-soldier-portraits-stage3i-sp-exact.mjs
+
+      - name: Validate corrected SP portrait closeout
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const { createHash } = require('crypto');
+          const manifest = require('./data/generated/soldier-portrait-manifest.v8.json');
+          const evidence = require('./data/validation/soldier-portrait-stage3i-sp-exact-evidence.v1.json');
+          const sp = require('./data/configdata/ConfigDataSPSoldierInfo.json');
+          const frontend = fs.readFileSync('src/lib/soldier-portrait-assets.ts', 'utf8');
+
+          if (manifest.status !== 'PASS' || manifest.version !== 8 || manifest.assetsReady !== true) throw new Error('Corrected SP manifest not ready');
+          if (manifest.coverage.canonicalSoldierCount !== 224 || manifest.coverage.canonicalNormalCount !== 168 || manifest.coverage.canonicalSpCount !== 56) throw new Error('Canonical population mismatch');
+          if (manifest.coverage.resolvedCount !== 224 || manifest.coverage.unresolvedCount !== 0 || manifest.unresolved.length !== 0) throw new Error('Full coverage mismatch');
+          if (manifest.coverage.resolvedNormalCount !== 168 || manifest.coverage.resolvedSpCount !== 56) throw new Error('Normal/SP coverage mismatch');
+          if (manifest.policy.baseBwikiQNameImageUsedForSp !== false || manifest.policy.spNormalImageFallbackUsed !== false || manifest.policy.spPortraitNormalReuse !== false) throw new Error('Corrected SP policy mismatch');
+          if (manifest.correction?.invalidatedManifest !== 'data/generated/soldier-portrait-manifest.v7.json') throw new Error('Invalidated v7 correction metadata missing');
+
+          const spById = new Map(sp.map(r => [Number(r.ID), r]));
+          const spIds = [...spById.keys()].sort((a,b) => a-b);
+          if (spById.size !== 56) throw new Error(`Expected 56 SP IDs, got ${spById.size}`);
+          if (manifest.newlyResolvedSoldierIds.join(',') !== spIds.join(',')) throw new Error('SP target ID set mismatch');
+
+          const recordById = new Map(manifest.records.map(r => [Number(r.soldierId), r]));
+          if (recordById.size !== 224) throw new Error('Manifest record uniqueness mismatch');
+          for (const id of spIds) {
+            const r = recordById.get(id);
+            const relation = spById.get(id);
+            const normal = recordById.get(Number(relation.NormalSoliderId));
+            if (!r || !normal) throw new Error(`SP or paired normal manifest record missing ${id}`);
+            if (r.isSp !== true || Number(r.normalSoldierId) !== Number(relation.NormalSoliderId)) throw new Error(`Explicit SP relation mismatch ${id}`);
+            const expectedTitle = `File:Q${r.nameCn}SP.png`;
+            if (r.bwikiFileTitle !== expectedTitle) throw new Error(`Non-SP-suffixed BWIKI title ${id}: ${r.bwikiFileTitle}`);
+            if (r.sourceKind !== 'BWIKI_CURRENT_CN_EXACT_Q_SP_PNG_STAGE3I') throw new Error(`Unexpected SP source kind ${id}`);
+            if (!r.model || !r.modelStem || !r.nameCn) throw new Error(`Incomplete SP provenance ${id}`);
+            if (r.sha256 === normal.sha256) throw new Error(`SP bytes identical to paired normal portrait ${id}`);
+
+            const file = path.join('public/images/soldiers', r.fileName);
+            if (!fs.existsSync(file)) throw new Error(`Missing corrected SP portrait ${id}`);
+            const bytes = fs.readFileSync(file);
+            if (bytes.length !== r.size) throw new Error(`Size mismatch ${id}`);
+            if (!(bytes[0]===0x89 && bytes[1]===0x50 && bytes[2]===0x4e && bytes[3]===0x47 && bytes[4]===0x0d && bytes[5]===0x0a && bytes[6]===0x1a && bytes[7]===0x0a)) throw new Error(`Not PNG ${id}`);
+            const digest = createHash('sha256').update(bytes).digest('hex');
+            if (digest !== r.sha256) throw new Error(`SHA-256 mismatch ${id}`);
+            if (!Number.isInteger(r.width) || !Number.isInteger(r.height) || r.width <= 0 || r.height <= 0) throw new Error(`Invalid dimensions ${id}`);
+          }
+
+          if (evidence.status !== 'PASS' || evidence.targetCount !== 56 || evidence.passCount !== 56 || evidence.rows.length !== 56) throw new Error('Evidence count mismatch');
+          if (evidence.exactSpSuffixFileCount !== 56 || evidence.basePortraitFilenameUsedCount !== 0 || evidence.normalPortraitReuseCount !== 0 || evidence.pairByteHashCollisionCount !== 0) throw new Error('Evidence source-safety mismatch');
+          if (evidence.rows.some(r => r.bwikiFileTitle !== `File:Q${r.nameCn}SP.png` || r.normalPortraitReused !== false || r.byteIdenticalToPairedNormal !== false)) throw new Error('Evidence row mismatch');
+
+          if (fs.existsSync('data/generated/soldier-portrait-manifest.v7.json')) throw new Error('Invalid v7 manifest still present');
+          if (fs.existsSync('data/validation/soldier-portrait-stage3h-sp-evidence.v1.json')) throw new Error('Invalid Stage3H evidence still present');
+          if (fs.existsSync('data/checkpoints/soldier-frontend-stage3h-sp.txt')) throw new Error('Invalid Stage3H checkpoint still present');
+          if (!frontend.includes('soldier-portrait-manifest.v8.json') || frontend.includes('soldier-portrait-manifest.v7.json')) throw new Error('Frontend is not on corrected v8');
+
+          console.log('STAGE3I_EXACT_SP_VALIDATED normal=168/168 sp=56/56 total=224/224 exactQSp=56');
+          NODE
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Production build gate
+        run: bun run build
+
+      - name: Commit corrected SP assets and checkpoints
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/images/soldiers \
+            data/generated/soldier-portrait-manifest.v8.json \
+            data/validation/soldier-portrait-stage3i-sp-exact-evidence.v1.json \
+            data/checkpoints/soldier-frontend-stage3i-sp-exact.txt \
+            src/lib/soldier-portrait-assets.ts
+          git add -A data/generated/soldier-portrait-manifest.v7.json \
+            data/validation/soldier-portrait-stage3h-sp-evidence.v1.json \
+            data/checkpoints/soldier-frontend-stage3h-sp.txt
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Correct SP Soldier portraits to exact SP assets'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
