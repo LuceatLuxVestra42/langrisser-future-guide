@@ -26,9 +26,14 @@ type Stage6JobConnection = {
   } | null;
 };
 
+type Stage6JobTree = {
+  branches?: number[][];
+  connections?: Stage6JobConnection[];
+};
+
 type FeatureBlock = {
   status?: string | null;
-} | null;
+} | null | undefined;
 
 type Stage6HeroShard = {
   heroId: number;
@@ -50,17 +55,12 @@ type Stage6HeroShard = {
       initialStar?: number | null;
       rank?: number | null;
     } | null;
-    jobTree?: {
-      branches?: number[][];
-      connections?: Stage6JobConnection[];
-    } | null;
+    jobTree?: Stage6JobTree | null;
   } | null;
   bonds?: unknown[] | null;
   exclusiveEquipment?: FeatureBlock;
   centralDiscipline?: FeatureBlock;
-  soldiers?: {
-    ids?: number[];
-  } | null;
+  soldiers?: { ids?: number[] } | null;
   sp?: FeatureBlock;
   validation?: {
     structuralStatus?: string | null;
@@ -79,22 +79,20 @@ function isReleased(value: FeatureBlock): boolean {
   return value?.status === "RELEASED";
 }
 
-function projectJobBranches(jobTree: Stage6HeroShard["normal"] extends infer _T ? {
-  branches?: number[][];
-  connections?: Stage6JobConnection[];
-} | null | undefined : never) {
+function projectJobBranches(jobTree: Stage6JobTree | null | undefined) {
   const branchIds = Array.isArray(jobTree?.branches) ? jobTree.branches : [];
   const connections = Array.isArray(jobTree?.connections) ? jobTree.connections : [];
-  const byConnectionId = new Map(
-    connections
-      .filter((row) => Number.isInteger(row.jobConnectionId))
-      .map((row) => [Number(row.jobConnectionId), row] as const),
-  );
+  const byConnectionId = new Map<number, Stage6JobConnection>();
+  for (const row of connections) {
+    if (Number.isInteger(row.jobConnectionId)) byConnectionId.set(Number(row.jobConnectionId), row);
+  }
 
   return branchIds.map((ids, branchIndex) => {
-    const jobs = ids
-      .map((id) => byConnectionId.get(Number(id)))
-      .filter((row): row is Stage6JobConnection => Boolean(row));
+    const jobs: Stage6JobConnection[] = [];
+    for (const id of ids) {
+      const row = byConnectionId.get(Number(id));
+      if (row) jobs.push(row);
+    }
     const capstone = jobs.at(-1) ?? null;
     const values = capstone?.finalDisplayStats?.values;
 
@@ -134,7 +132,7 @@ function projectJobBranches(jobTree: Stage6HeroShard["normal"] extends infer _T 
 
 function projectStage6Shard(shard: Stage6HeroShard) {
   const validation = shard.validation;
-  if (validation?.structuralStatus !== "PASS" || validation?.siteUsable !== true) {
+  if (!validation || validation.structuralStatus !== "PASS" || validation.siteUsable !== true) {
     throw new Error(`Hero ${shard.heroId} Stage 6 shard is not structurally usable.`);
   }
 
@@ -143,7 +141,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
   const connections = Array.isArray(jobTree?.connections) ? jobTree.connections : [];
   const soldierIds = Array.isArray(shard.soldiers?.ids) ? shard.soldiers.ids : [];
   const skins = Array.isArray(shard.presentation?.skins) ? shard.presentation.skins : [];
-  const reviewCodes = Array.isArray(validation?.reviewCodes) ? validation.reviewCodes : [];
+  const reviewCodes = Array.isArray(validation.reviewCodes) ? validation.reviewCodes : [];
 
   return {
     identity: {
@@ -166,10 +164,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
       connectionCount: connections.length,
       branches,
     },
-    soldiers: {
-      count: soldierIds.length,
-      ids: soldierIds,
-    },
+    soldiers: { count: soldierIds.length, ids: soldierIds },
     systems: {
       bondRowCount: Array.isArray(shard.bonds) ? shard.bonds.length : 0,
       exclusiveEquipmentStatus: shard.exclusiveEquipment?.status ?? null,
@@ -191,16 +186,11 @@ function projectStage6Shard(shard: Stage6HeroShard) {
 export async function readHeroDetailRouteStage5Data(heroId: number) {
   const shell = readHeroDetailRouteStage4Data(heroId);
   if (!shell) return null;
-
   const moduleKey = `../../data/generated/hero-detail/by-id/${heroId}.json`;
   const loadShard = stage6ShardModules[moduleKey];
   if (!loadShard) return null;
-
   const shard = await loadShard();
-  if (!shard || shard.heroId !== heroId) {
-    throw new Error(`Hero ${heroId} Stage 6 shard identity mismatch.`);
-  }
-
+  if (!shard || shard.heroId !== heroId) throw new Error(`Hero ${heroId} Stage 6 shard identity mismatch.`);
   return {
     ...shell,
     stage6: {
