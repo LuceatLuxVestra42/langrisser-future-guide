@@ -1,0 +1,77 @@
+name: Patch Soldier SP ability display
+
+on:
+  push:
+    branches:
+      - work/soldier-sp-ability-display
+    paths:
+      - '.github/workflows/patch-soldier-sp-ability-display.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/soldier-sp-ability-display
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Preflight validated SP ability source
+        run: |
+          node <<'NODE'
+          const validation = require('./data/validation/soldier-stage5-3-ability.v1.json');
+          const runtime = require('./public/data/soldier-detail-stage5-6.v1.json');
+          if (validation.status !== 'PASS') throw new Error(`Stage 5-3 validation is ${validation.status}`);
+          if (validation.coverage.spSoldiers !== 56 || validation.coverage.spDescriptionRecords !== 56) {
+            throw new Error(`Stage 5-3 SP coverage mismatch: ${validation.coverage.spSoldiers}/${validation.coverage.spDescriptionRecords}`);
+          }
+          if (validation.coverage.spDescriptionSourceMissing.length || validation.coverage.spDescriptionEmpty.length || validation.coverage.spDescriptionRelationMismatch.length) {
+            throw new Error('Stage 5-3 SP description validation has unresolved records');
+          }
+          const sp = runtime.records.filter((r) => r.identity?.isSp === true);
+          const invalid = sp.filter((r) => !r.sp || typeof r.sp.finalDescription !== 'string' || !r.sp.finalDescription.trim() || !Array.isArray(r.sp.descriptionLevels) || r.sp.descriptionLevels.length !== 10);
+          if (sp.length !== 56 || invalid.length) throw new Error(`Runtime SP description coverage ${sp.length - invalid.length}/56; invalid=${invalid.map((r) => r.soldierId).join(',')}`);
+          console.log('PASS: validated SP unique-skill source 56/56');
+          NODE
+      - name: Patch SP ability consumer
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          p = Path('src/components/soldier-detail-modal.tsx')
+          s = p.read_text()
+          old_type = '''  sp: null | {\n    normalSoldierId: number;\n    spSoldierId: number;\n    stage1?: SpStage | null;'''
+          new_type = '''  sp: null | {\n    normalSoldierId: number;\n    spSoldierId: number;\n    descriptionLevels: AbilityLevel[];\n    finalDescription: string;\n    stage1?: SpStage | null;'''
+          old_effect = '''    if (record.isSp) {\n      return (\n        detail.ability.finalDescription ??\n        detail.ability.levels.find((level) => level.level === 10)?.description ??\n        null\n      );\n    }'''
+          new_effect = '''    if (record.isSp) {\n      return detail.sp?.finalDescription ?? null;\n    }'''
+          if s.count(old_type) != 1:
+              raise SystemExit(f'SP type target count={s.count(old_type)}')
+          if s.count(old_effect) != 1:
+              raise SystemExit(f'SP ability consumer target count={s.count(old_effect)}')
+          s = s.replace(old_type, new_type).replace(old_effect, new_effect)
+          p.write_text(s)
+          PY
+      - name: Verify production boundary
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          s = Path('src/components/soldier-detail-modal.tsx').read_text()
+          assert 'return detail.sp?.finalDescription ?? null;' in s
+          assert 'descriptionLevels: AbilityLevel[];' in s
+          assert 'finalDescription: string;' in s
+          print('PASS: SP UI consumes existing Stage 5-6 sp.finalDescription')
+          PY
+      - run: bun install --frozen-lockfile
+      - name: Production build
+        run: bun run build
+      - name: Commit targeted frontend fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/components/soldier-detail-modal.tsx
+          git commit -m 'Display validated SP Soldier unique skills'
+          git push origin HEAD:work/soldier-sp-ability-display
