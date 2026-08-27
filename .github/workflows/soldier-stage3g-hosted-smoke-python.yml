@@ -1,0 +1,113 @@
+name: Soldier Stage 3G Hosted QA Python Smoke
+
+on:
+  push:
+    branches:
+      - qa/soldier-stage3g-hosted-deploy7
+    paths:
+      - '.github/workflows/soldier-stage3g-hosted-smoke-python.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hosted-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hosted HTTP smoke
+        env:
+          BASE: https://luceatluxvestra42.github.io/langrisser-future-guide
+          EXPECTED_QA_SHA: 2d126496fe393b9383840ea20ac00d86ee221a56
+        run: |
+          python - <<'PY'
+          import os, re, urllib.request, urllib.error
+
+          base = os.environ['BASE'].rstrip('/')
+          expected = os.environ['EXPECTED_QA_SHA']
+          host = 'https://luceatluxvestra42.github.io'
+
+          def fetch(path):
+              url = path if path.startswith('http') else base + path
+              req = urllib.request.Request(url, headers={'User-Agent':'soldier-stage3g-hosted-qa/2.0'})
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      return r.status, r.geturl(), r.headers, r.read()
+              except urllib.error.HTTPError as e:
+                  return e.code, e.geturl(), e.headers, e.read()
+
+          status, _, _, body = fetch('/qa-commit.txt')
+          marker = body.decode('utf-8','replace').strip() if status == 200 else None
+          if marker != expected:
+              raise SystemExit(f'STALE_DEPLOY marker={marker!r} expected={expected}')
+          print('PASS freshness', marker)
+
+          route_paths = ['/', '/soldiers/', '/soldiers/300/', '/soldiers/1000/', '/soldiers/102/', '/soldiers/5621/', '/equipment/exclusive/', '/banners/']
+          bodies = {}
+          for path in route_paths:
+              s,u,h,b = fetch(path)
+              if s != 200:
+                  raise SystemExit(f'route fail {path}: {s} {u}')
+              bodies[path] = b
+              print('PASS route', path, len(b))
+
+          for path in ['/soldiers/','/soldiers/300/','/soldiers/1000/','/soldiers/5621/','/equipment/exclusive/']:
+              a = fetch(path)
+              b = fetch(path)
+              if a[0] != 200 or b[0] != 200 or a[3] != b[3]:
+                  raise SystemExit(f'direct-refresh fail {path}')
+              print('PASS direct-refresh', path)
+
+          for a,b in [('/soldiers','/soldiers/'),('/soldiers/300','/soldiers/300/'),('/equipment/exclusive','/equipment/exclusive/')]:
+              ra, rb = fetch(a), fetch(b)
+              if ra[0] != 200 or rb[0] != 200 or ra[3] != rb[3]:
+                  raise SystemExit(f'trailing slash fail {a} {b}: {ra[0]}/{rb[0]}')
+              print('PASS trailing-slash', a, b)
+
+          if fetch('/soldiers/999999/')[0] != 404:
+              raise SystemExit('unknown Soldier is not 404')
+          print('PASS unknown-404')
+
+          for path in ['/images/soldiers/300.png','/images/soldiers/1000.png','/images/soldiers/102.png','/images/army/Icon_Occupation_Cavalry.png','/favicon.ico']:
+              s,u,h,b = fetch(path)
+              if s != 200 or not b:
+                  raise SystemExit(f'asset fail {path}: {s}')
+              print('PASS asset', path, len(b), h.get_content_type())
+          if fetch('/Images/soldiers/300.png')[0] == 200:
+              raise SystemExit('wrong-case asset unexpectedly 200')
+          print('PASS case-guard')
+
+          for sid in (300,1000,102):
+              text = bodies[f'/soldiers/{sid}/'].decode('utf-8','replace')
+              if f'images/soldiers/{sid}.png' not in text:
+                  raise SystemExit(f'detail {sid} lacks portrait reference')
+              print('PASS portrait-reference', sid)
+
+          html = bodies['/soldiers/'].decode('utf-8','replace')
+          refs = sorted(set(re.findall(r'(?:src|href)=["\']([^"\']+)["\']', html)))
+          internal = []
+          for ref in refs:
+              if ref.startswith(('http://','https://','#','mailto:','tel:','data:','javascript:')):
+                  continue
+              if ref.startswith('/') and not ref.startswith('/langrisser-future-guide/'):
+                  raise SystemExit(f'bad repo-base root-relative ref: {ref}')
+              if ref.startswith('/langrisser-future-guide/'):
+                  internal.append(ref)
+          if '/langrisser-future-guide/favicon.ico' not in internal:
+              raise SystemExit('base-safe favicon ref missing')
+          print('PASS repo-base refs', len(internal))
+
+          checked = 0
+          for ref in internal:
+              if not ('/assets/' in ref or '/images/' in ref or ref.endswith(('.js','.css','.json','.woff','.woff2','.ico'))):
+                  continue
+              s,u,h,b = fetch(host + ref)
+              if s != 200:
+                  raise SystemExit(f'emitted resource fail {ref}: {s}')
+              checked += 1
+              print('PASS emitted-resource', ref, len(b))
+          if checked == 0:
+              raise SystemExit('no emitted resources checked')
+
+          print('HOSTED_QA_PASS candidate=7f1ce0053c5435934f9758ff98e0d743ee804b94 wrapper='+expected+' gh-pages=7f7eaf1ca4d4ab960cb6c0adc90fa52fcbaf1d88')
+          PY
