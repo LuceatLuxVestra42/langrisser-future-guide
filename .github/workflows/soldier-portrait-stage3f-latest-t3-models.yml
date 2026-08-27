@@ -1,0 +1,39 @@
+name: Soldier Portrait Stage 3F Latest T3 Model Keys
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - 'scripts/report-soldier-portrait-stage3f-latest-t3-models.mjs'
+      - '.github/workflows/soldier-portrait-stage3f-latest-t3-models.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Extract latest T3 model keys
+        run: node scripts/report-soldier-portrait-stage3f-latest-t3-models.mjs
+      - name: Validate target set
+        run: |
+          node <<'NODE'
+          const x = require('./data/validation/soldier-portrait-stage3f-latest-t3-models.v1.json');
+          if (x.targetCount !== 13 || x.rows.length !== 13) throw new Error('target count mismatch');
+          if (x.rows.some(r => !r.model || !r.prefab)) throw new Error('missing model key');
+          console.log('STAGE3F_MODEL_KEYS_VALIDATED');
+          NODE
+      - name: Commit model-key checkpoint
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/soldier-portrait-stage3f-latest-t3-models.v1.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Checkpoint latest T3 Soldier model keys'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
