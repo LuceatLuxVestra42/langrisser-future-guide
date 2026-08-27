@@ -18,34 +18,52 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Measure canonical lower-tier distribution and legacy images
+      - name: Validate legacy page subgroup mapping against canonical T3
         run: |
           node <<'NODE'
           import fs from 'node:fs';
           const canonical = JSON.parse(fs.readFileSync('data/generated/soldier-detail-stage5-2.v1.json','utf8')).records;
-          const armyPages = {
-            INFANTRY: '보병', LANCER: '창병', CAVALRY: '기병', FLYING: '비병', WATER: '수병',
-            ARCHER: '궁병', ASSASSIN: '암살자', MAGE: '마법사', HOLY: '승병', DEMON: '마족'
-          };
+          const pages = [
+            {page:'보병', direct:'INFANTRY'},
+            {page:'창병', direct:'LANCER'},
+            {page:'기병', direct:'CAVALRY'},
+            {page:'비병', subgroup:{1:'FLYING',2:'WATER'}},
+            {page:'궁병', subgroup:{1:'ARCHER',2:'ASSASSIN'}},
+            {page:'승병', subgroup:{1:'MAGE',2:'HOLY',3:'DEMON'}},
+          ];
           const norm = s => s.replace(/[\s_\-]/g,'').toLowerCase();
-          for (const tier of [1,2]) {
-            const rows = canonical.filter(r => !r.identity.isSp && r.identity.tier === tier);
-            const byArmy = Object.groupBy(rows, r => r.identity.armyType);
-            console.log(`CANONICAL_TIER=${tier} count=${rows.length}`);
-            for (const [army, rs] of Object.entries(byArmy)) console.log(`CANONICAL tier=${tier} army=${army} ids=${rs.map(r=>r.soldierId).join(',')}`);
-          }
-          for (const [army, page] of Object.entries(armyPages)) {
-            const url = `https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/troop/${encodeURIComponent(page)}.html`;
+          const legacy = [];
+          for (const def of pages) {
+            const url = `https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/troop/${encodeURIComponent(def.page)}.html`;
             const res = await fetch(url);
             const text = await res.text();
-            if (!res.ok) { console.log(`LEGACY_PAGE_FAIL army=${army} status=${res.status}`); continue; }
+            if (!res.ok) throw new Error(`${def.page} fetch ${res.status}`);
             const headings = [...text.matchAll(/<div class="view_title">([123])티어 용병<\/div>/g)].map(m => ({tier:Number(m[1]), index:m.index}));
-            const imgs = [...text.matchAll(/<img class="filterDiv [^"]+"[^>]*src="\.\.\/img\/troop\/[^\"]+\/병종\/([^\"]+\.webp)"[^>]*>/g)].map(m => ({file:m[1], index:m.index}));
-            const rows = imgs.map(x => {
-              const h = headings.filter(h => h.index < x.index).at(-1);
-              const raw = x.file.replace(/\.webp$/,'').replace(/^\d+_/, '');
-              return {tier:h?.tier ?? null, file:x.file, raw, key:norm(raw)};
-            }).filter(x => x.tier === 1 || x.tier === 2);
-            console.log(`LEGACY army=${army} t1=${rows.filter(x=>x.tier===1).map(x=>x.raw).join('|')} t2=${rows.filter(x=>x.tier===2).map(x=>x.raw).join('|')}`);
+            for (const m of text.matchAll(/<img class="filterDiv [^"]+"[^>]*src="\.\.\/img\/troop\/[^\"]+\/병종\/(\d+)_([^\"]+\.webp)"[^>]*>/g)) {
+              const h = headings.filter(h => h.index < m.index).at(-1);
+              if (!h) continue;
+              let body = m[2].replace(/\.webp$/,'');
+              let subgroup = null;
+              const sm = body.match(/^(\d+)_(.+)$/);
+              if (sm) { subgroup = Number(sm[1]); body = sm[2]; }
+              const armyType = def.direct ?? def.subgroup?.[subgroup] ?? null;
+              legacy.push({page:def.page,tier:h.tier,armyType,nameKey:norm(body),name:body,file:m[0].match(/src="([^"]+)"/)?.[1] ?? null});
+            }
           }
+          let matched = 0, contradictions = 0, missing = 0;
+          for (const row of canonical.filter(r => !r.identity.isSp && r.identity.tier === 3 && r.identity.nameKr)) {
+            const candidates = legacy.filter(x => x.tier === 3 && x.nameKey === norm(row.identity.nameKr));
+            if (candidates.length === 0) { missing++; continue; }
+            if (candidates.length !== 1) { console.log(`AMBIG name=${row.identity.nameKr} id=${row.soldierId} count=${candidates.length}`); contradictions++; continue; }
+            const c = candidates[0];
+            if (c.armyType !== row.identity.armyType) {
+              console.log(`CONTRADICTION id=${row.soldierId} name=${row.identity.nameKr} canonical=${row.identity.armyType} legacy=${c.armyType} page=${c.page}`);
+              contradictions++;
+            } else matched++;
+          }
+          const groupCounts = {};
+          for (const x of legacy) if (x.tier <= 3 && x.armyType) groupCounts[`${x.tier}:${x.armyType}`]=(groupCounts[`${x.tier}:${x.armyType}`]??0)+1;
+          console.log(`T3_SUBGROUP_VALIDATION matched=${matched} missingLegacyName=${missing} contradictions=${contradictions}`);
+          console.log(`LEGACY_GROUP_COUNTS ${JSON.stringify(groupCounts)}`);
+          if (contradictions !== 0) process.exit(1);
           NODE
