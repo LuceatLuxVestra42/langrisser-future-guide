@@ -1,0 +1,111 @@
+name: Hosted QA Soldier SP ability display
+
+on:
+  push:
+    branches:
+      - work/soldier-sp-ability-display
+    paths:
+      - '.github/workflows/hosted-qa-soldier-sp-ability-display.yml'
+
+jobs:
+  hosted-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Hosted Gate - freshness, routes, live SP skill source
+        run: |
+          python - <<'PY'
+          import json, time, urllib.request
+          BASE='https://luceatluxvestra42.github.io/langrisser-future-guide/'
+          EXPECTED_MAIN='3f3b17dadfdcf9872aa80cfa3219989204c07d37'
+          EXPECTED_SURFACE='soldier-sp-ability-display-56'
+
+          def get(path, attempts=10):
+              url=BASE+path
+              last=None
+              for _ in range(attempts):
+                  try:
+                      with urllib.request.urlopen(url, timeout=30) as r:
+                          body=r.read()
+                          if r.status == 200:
+                              return body
+                          last=f'HTTP {r.status}'
+                  except Exception as e:
+                      last=repr(e)
+                  time.sleep(5)
+              raise RuntimeError(f'GET failed {url}: {last}')
+
+          if get('qa-main-source.txt').decode().strip() != EXPECTED_MAIN:
+              raise RuntimeError('stale main source')
+          if get('qa-surface.txt').decode().strip() != EXPECTED_SURFACE:
+              raise RuntimeError('stale QA surface')
+
+          list_html=get('soldiers/').decode('utf-8')
+          if '/langrisser-future-guide/' not in list_html:
+              raise RuntimeError('base path marker missing')
+
+          live=json.loads(get('data/soldier-detail-stage5-6.v1.json').decode('utf-8'))
+          sp=[r for r in live['records'] if r.get('identity',{}).get('isSp') is True]
+          invalid=[r.get('soldierId') for r in sp if not isinstance(r.get('sp'),dict) or not str(r['sp'].get('finalDescription') or '').strip() or len(r['sp'].get('descriptionLevels') or []) != 10]
+          if len(sp) != 56 or invalid:
+              raise RuntimeError(f'live SP skill coverage {56-len(invalid)}/56 invalid={invalid}')
+
+          for sid in (5115, 5203, 5326, 5514, 5621, 5816, 6034, 6113):
+              detail=get(f'soldiers/{sid}/').decode('utf-8')
+              if 'SP 고유기' not in detail:
+                  raise RuntimeError(f'SP detail shell missing heading {sid}')
+              direct=get(f'soldiers/{sid}').decode('utf-8')
+              if 'SP 고유기' not in direct:
+                  raise RuntimeError(f'direct-entry SP shell missing heading {sid}')
+          print('PASS Hosted Gate: fresh deploy; live SP skill source 56/56; SP direct-entry routes PASS')
+          PY
+      - name: Prepare browser QA
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Browser UI Gate - SP skill rendering, refresh, mobile
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const base = 'https://luceatluxvestra42.github.io/langrisser-future-guide/';
+          const samples = [5115, 5203, 5326, 5514, 5621, 5816, 6034, 6113];
+
+          async function assertSkill(page, sid) {
+            await page.goto(base + `soldiers/${sid}/`, { waitUntil: 'networkidle' });
+            const heading = page.getByText('SP 고유기', { exact: true });
+            await heading.waitFor();
+            const box = heading.locator('..');
+            await page.waitForFunction(() => !document.body.innerText.includes('데이터 불러오는 중...'));
+            const text = (await box.innerText()).trim();
+            if (!text.startsWith('SP 고유기')) throw new Error(`SP heading missing ${sid}`);
+            if (text.includes('SP 고유기 데이터가 없는 용병이야.') || text.includes('SP 고유기 데이터를 불러오지 못했어.')) throw new Error(`SP skill fallback shown ${sid}: ${text}`);
+            const body = text.replace(/^SP 고유기\s*/, '').trim();
+            if (body.length < 4) throw new Error(`SP skill text empty ${sid}: ${JSON.stringify(text)}`);
+          }
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+
+            await page.goto(base + 'soldiers/', { waitUntil: 'networkidle' });
+            await page.getByRole('button', { name: 'SP', exact: true }).click();
+            const cards = page.locator('a[aria-label$="상세 보기"]');
+            if (await cards.count() !== 56) throw new Error(`SP filtered card count ${await cards.count()} != 56`);
+
+            for (const sid of samples) await assertSkill(page, sid);
+            await page.reload({ waitUntil: 'networkidle' });
+            const refreshed = (await page.getByText('SP 고유기', { exact: true }).locator('..').innerText()).trim();
+            if (refreshed.includes('데이터가 없는') || refreshed.includes('불러오지 못했어')) throw new Error('SP skill refresh regression');
+
+            const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+            await assertSkill(mobile, 5115);
+            const overflow = await mobile.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+            if (overflow > 2) throw new Error(`mobile horizontal overflow ${overflow}px`);
+
+            await browser.close();
+            console.log('PASS Browser/UI Gate: SP filter 56; representative SP unique skills render; refresh/mobile PASS');
+          })().catch((e) => { console.error(e); process.exit(1); });
+          NODE
