@@ -1,0 +1,72 @@
+name: Hero List Stage 2 Basic Grid
+
+on:
+  push:
+    branches:
+      - work/hero-list-stage2
+    paths:
+      - "data/generated/hero-list-stage1.v1.json"
+      - "src/lib/hero-list.server.ts"
+      - "src/lib/hero-list.functions.ts"
+      - "src/routes/heroes.tsx"
+      - "src/routes/index.tsx"
+      - "scripts/validate_hero_list_stage2.cjs"
+      - ".github/workflows/hero-list-stage2.yml"
+      - "package.json"
+      - "bun.lock"
+  pull_request:
+    paths:
+      - "data/generated/hero-list-stage1.v1.json"
+      - "src/lib/hero-list.server.ts"
+      - "src/lib/hero-list.functions.ts"
+      - "src/routes/heroes.tsx"
+      - "src/routes/index.tsx"
+      - "scripts/validate_hero_list_stage2.cjs"
+      - ".github/workflows/hero-list-stage2.yml"
+      - "package.json"
+      - "bun.lock"
+
+permissions:
+  contents: write
+
+jobs:
+  hero-list-stage2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Preflight frozen consumer boundary
+        run: node scripts/validate_hero_list_stage2.cjs
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Production build and route generation gate
+        run: bun run build
+
+      - name: Verify generated Hero route
+        run: |
+          test -f src/routeTree.gen.ts
+          grep -q "heroes" src/routeTree.gen.ts
+
+      - name: TypeScript gate
+        run: bunx tsc --noEmit
+
+      - name: Persist generated Hero route tree on work branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/hero-list-stage2'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routeTree.gen.ts
+          if git diff --cached --quiet; then
+            echo "No generated route tree changes"
+            exit 0
+          fi
+          git commit -m "Freeze Hero Stage 2 generated route tree"
+          git push
