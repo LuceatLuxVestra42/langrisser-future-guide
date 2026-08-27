@@ -19,10 +19,13 @@ on:
       - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
       - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
       - 'data/generated/hero-list-stage1.v1.json'
+      - 'data/generated/hero-card-artwork-stage4.v1.json'
+      - 'data/generated/hero-detail.v1.json'
       - 'data/generated/soldier-list-stage5-8.v1.json'
       - 'data/generated/soldier-detail-stage5-2.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'public/images/army/**'
+      - 'public/images/heroes/cards/**'
       - 'public/images/shared/stats/**'
       - 'public/images/shared/movement/**'
       - 'scripts/import-army-icons-from-drive.mjs'
@@ -45,6 +48,7 @@ on:
       - 'src/routes/equipment_.exclusive.tsx'
       - 'src/routes/equipment_.$equipmentId.tsx'
       - 'src/routes/heroes.tsx'
+      - 'src/routes/heroes_.$heroId.tsx'
       - 'src/routes/soldiers.tsx'
       - 'src/routes/index.tsx'
       - 'src/routeTree.gen.ts'
@@ -80,10 +84,15 @@ jobs:
           test -f dist/client/equipment/exclusive/index.html
           test -f dist/client/soldiers/index.html
           test -f dist/client/heroes/index.html
-          DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
-          test "$DETAIL_COUNT" -eq 373
+          EQUIPMENT_DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          HERO_DETAIL_COUNT="$(find dist/client/heroes -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/heroes/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          echo "Equipment detail static pages: $EQUIPMENT_DETAIL_COUNT"
+          echo "Hero detail static pages: $HERO_DETAIL_COUNT"
+          test "$EQUIPMENT_DETAIL_COUNT" -eq 373
+          test "$HERO_DETAIL_COUNT" -eq 267
           node -e "const x=require('./data/generated/soldier-list-stage5-8.v1.json'); if(x.summary.recordCount!==224 || x.summary.normalCount!==168 || x.summary.spCount!==56) process.exit(1)"
           node -e "const x=require('./data/generated/hero-list-stage1.v1.json'); if(x.freezeState!=='HERO_LIST_STAGE1_FROZEN' || x.summary.generatedRecordCount!==267 || x.summary.uniqueHeroCount!==267 || x.summary.hardErrorCount!==0) process.exit(1)"
+          node -e "const x=require('./data/generated/hero-card-artwork-stage4.v1.json'); const s=x.summary; if(x.status!=='PASS' || x.completion!=='RESOLVER_READY' || s.heroCount!==267 || s.resolvedCount+s.pendingCount!==267 || s.stage6MissingCount!==0 || s.hardErrorCount!==0) process.exit(1)"
           node -e "const x=require('./data/generated/army-icon-manifest.v1.json'); if(x.assetsReady!==true || x.importedAssetCount!==10) process.exit(1)"
           ARMY_ICON_COUNT="$(find public/images/army -maxdepth 1 -type f -name 'Icon_Occupation_*.png' | wc -l | tr -d ' ')"
           test "$ARMY_ICON_COUNT" -eq 10
@@ -113,10 +122,16 @@ jobs:
           grep -q '/equipment' src/routeTree.gen.ts
           grep -q '/soldiers' src/routeTree.gen.ts
           grep -q '/heroes' src/routeTree.gen.ts
+          grep -q '/heroes/\$heroId' src/routeTree.gen.ts
           grep -q '224종' dist/client/soldiers/index.html
           grep -q '267' dist/client/heroes/index.html
           grep -q '매튜' dist/client/heroes/index.html
           grep -q '레온' dist/client/heroes/index.html
+          test -f dist/client/heroes/1/index.html
+          test -f dist/client/heroes/6/index.html
+          grep -q '매튜' dist/client/heroes/1/index.html
+          grep -q '레온' dist/client/heroes/6/index.html
+          grep -q 'Stage 6' dist/client/heroes/6/index.html
           grep -q 'to: "/soldiers"' src/routes/index.tsx
           grep -q 'to: "/heroes"' src/routes/index.tsx
       - name: Persist static frontend checkpoint
