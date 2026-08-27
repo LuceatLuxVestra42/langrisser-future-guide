@@ -1,0 +1,72 @@
+name: Hero List Stage 5 Frozen Detail Projection
+
+on:
+  push:
+    branches:
+      - work/hero-list-stage5
+    paths:
+      - "data/generated/hero-detail.v1.json"
+      - "data/generated/hero-detail/by-id/**"
+      - "data/generated/hero-list-stage1.v1.json"
+      - "scripts/validate_hero_list_stage5.cjs"
+      - "src/lib/hero-detail-stage5.server.ts"
+      - "src/lib/hero-list.functions.ts"
+      - "src/routes/heroes_.$heroId.tsx"
+      - ".github/workflows/hero-list-stage5.yml"
+      - "package.json"
+      - "bun.lock"
+  pull_request:
+    paths:
+      - "scripts/validate_hero_list_stage5.cjs"
+      - "src/lib/hero-detail-stage5.server.ts"
+      - "src/lib/hero-list.functions.ts"
+      - "src/routes/heroes_.$heroId.tsx"
+      - ".github/workflows/hero-list-stage5.yml"
+      - "package.json"
+      - "bun.lock"
+
+permissions:
+  contents: write
+
+jobs:
+  hero-list-stage5:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Validate all 267 frozen Hero shards and Stage 5 boundary
+        run: node scripts/validate_hero_list_stage5.cjs
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Production build gate
+        run: bun run build
+
+      - name: Verify generated Hero detail route and lazy shard chunks
+        run: |
+          test -f src/routeTree.gen.ts
+          grep -q '/heroes/$heroId' src/routeTree.gen.ts
+          find .output -type f | grep -q .
+
+      - name: TypeScript gate
+        run: bunx tsc --noEmit
+
+      - name: Persist Stage 5 validation report on work branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/hero-list-stage5'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/hero-list-stage5.v1.json src/routeTree.gen.ts
+          if git diff --cached --quiet; then
+            echo "No generated Stage 5 changes"
+            exit 0
+          fi
+          git commit -m "Freeze Hero Stage 5 validation outputs"
+          git push

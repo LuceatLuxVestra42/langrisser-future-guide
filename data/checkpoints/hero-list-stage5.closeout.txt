@@ -1,0 +1,36 @@
+Hero List Stage 5 closeout
+Status: PASS_WITH_REVIEW / COMPLETE
+
+Production validation
+- run: 33066500844
+- result: PASS
+- Hero shards: 267/267
+- structural failures: 0
+- missing shards: 0
+- parity mismatches: 0
+- job branches: 610
+- job connections: 1388
+- verified capstone stats: 610
+- Hero-Soldier edges: 5977
+- SP RELEASED Heroes: 25
+- exclusive equipment RELEASED Heroes: 167
+- central discipline RELEASED Heroes: 166
+- bond rows: 1335
+- skins: 540
+
+Hosted QA
+- run: 33066658465
+- result: PASS
+- QA source commit: 49e34a6867b04240cc598f550250420ba86fd273
+- gh-pages deploy commit: 1b2de2440bf72c1ccb5fd8b41590b7ce36e9de55
+- Hero static detail pages: 267
+- Equipment static detail pages preserved: 373
+- representative published Hero: /heroes/6 (Leon)
+- verified blocks: job tree, Lv70/6-star VERIFIED final stats, Soldier relation, frozen system statuses
+
+Runtime boundary
+- one requested Hero Stage 6 shard is lazy-loaded
+- full Stage 6 dataset runtime read: prohibited
+- raw ConfigData runtime read: prohibited
+- relationship rederivation: prohibited
+- name/ID heuristic joins: prohibited
