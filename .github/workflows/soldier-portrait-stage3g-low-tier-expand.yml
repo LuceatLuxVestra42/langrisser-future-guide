@@ -39,17 +39,23 @@ jobs:
           const sp = require('./data/configdata/ConfigDataSPSoldierInfo.json');
           const spIds = new Set(sp.map(r => Number(r.ID)));
           if (spIds.size !== 56 || x.unresolved.some(r => !spIds.has(Number(r.soldierId)))) throw new Error('Stage 3G unresolved set is not exactly SP population');
+          let webpCount = 0;
           for (const id of x.newlyResolvedSoldierIds) {
             const r = x.records.find(v => v.soldierId === id);
             if (!r) throw new Error(`missing Stage3G record ${id}`);
             const file = path.join('public/images/soldiers', r.fileName);
             if (!fs.existsSync(file) || fs.statSync(file).size !== r.size) throw new Error(`asset mismatch ${id}`);
             const b = fs.readFileSync(file);
-            if (!(b[0]===0x89 && b[1]===0x50 && b[2]===0x4e && b[3]===0x47)) throw new Error(`not PNG ${id}`);
+            const png = b.length >= 8 && b[0]===0x89 && b[1]===0x50 && b[2]===0x4e && b[3]===0x47;
+            const webp = b.length >= 12 && b.subarray(0,4).toString('ascii') === 'RIFF' && b.subarray(8,12).toString('ascii') === 'WEBP';
+            if (!png && !webp) throw new Error(`unsupported portrait bytes ${id}`);
+            if (webp) webpCount += 1;
           }
+          if (webpCount !== 1) throw new Error(`expected exactly one pinned legacy WebP exception, got ${webpCount}`);
           const ev = require('./data/validation/soldier-portrait-stage3g-low-tier-evidence.v1.json');
           if (ev.targetCount !== 10 || ev.passCount !== 10 || ev.mappingContractCount !== 39 || ev.rows.length !== 10 || ev.rows.some(r => r.status !== 'PASS')) throw new Error('Stage3G evidence mismatch');
           if (ev.rows.filter(r => r.tier === 1).length !== 5 || ev.rows.filter(r => r.tier === 2).length !== 5) throw new Error('Stage3G tier target split mismatch');
+          if (ev.rows.filter(r => r.assetResolution === 'PINNED_LEGACY_EXACT_KR_WEBP').length !== 1) throw new Error('Stage3G legacy exception evidence mismatch');
           const map = require('./data/contracts/soldier-low-tier-cn-kr-map.v1.json');
           if (map.status !== 'USER_REVIEWED' || map.rows.length !== 39) throw new Error('reviewed CN-KR map mismatch');
           const krByCn = new Map(map.rows.map(r => [r.nameCn, r.nameKr]));
