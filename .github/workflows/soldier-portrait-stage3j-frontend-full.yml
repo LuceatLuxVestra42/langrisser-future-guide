@@ -1,0 +1,49 @@
+name: Soldier Portrait Stage 3J Frontend Full Wiring
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - 'scripts/validate-soldier-portrait-stage3j-frontend-full.mjs'
+      - '.github/workflows/soldier-portrait-stage3j-frontend-full.yml'
+      - 'src/lib/soldier-portrait-assets.ts'
+      - 'src/routes/soldiers.tsx'
+      - 'src/routes/soldiers.$soldierId.tsx'
+      - 'src/components/soldier-detail-modal.tsx'
+      - 'data/generated/soldier-portrait-manifest.v8.json'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'public/images/soldiers/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Validate all 224 Soldier portraits and frontend wiring
+        run: node scripts/validate-soldier-portrait-stage3j-frontend-full.mjs
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Production build gate
+        run: bun run build
+
+      - name: Commit Stage 3J evidence and checkpoint
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/soldier-portrait-stage3j-frontend-full.v1.json \
+            data/checkpoints/soldier-frontend-stage3j-portrait-full.txt
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Close out full Soldier portrait frontend wiring'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
