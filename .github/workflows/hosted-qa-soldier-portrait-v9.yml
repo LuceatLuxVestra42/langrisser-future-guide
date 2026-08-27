@@ -1,0 +1,113 @@
+name: Hosted QA Soldier Portrait V9
+
+on:
+  push:
+    branches:
+      - deploy/soldier-portrait-v9-20260828
+    paths:
+      - '.github/workflows/hosted-qa-soldier-portrait-v9.yml'
+  workflow_dispatch:
+
+jobs:
+  hosted-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install live asset verifier
+        run: python -m pip install --disable-pip-version-check pillow requests
+      - name: Verify deployed source markers and all 224 live transparent assets
+        shell: bash
+        run: |
+          python <<'PY'
+          import hashlib, io, json, time
+          import requests
+          from PIL import Image
+
+          BASE='https://luceatluxvestra42.github.io/langrisser-future-guide'
+          expected_main='5b81f1bbc916ba83dfd5c406273383c3da2b6a6f'
+          expected_surface='soldier-portrait-v9-transparent-224'
+          session=requests.Session()
+          session.headers['User-Agent']='langrisser-future-guide hosted-v9-qa/1.0'
+
+          for i in range(24):
+            try:
+              main=session.get(BASE+'/qa-main-source.txt',timeout=15).text.strip()
+              surface=session.get(BASE+'/qa-surface.txt',timeout=15).text.strip()
+              if main==expected_main and surface==expected_surface:
+                break
+            except Exception:
+              pass
+            time.sleep(5)
+          else:
+            raise SystemExit('Hosted deployment markers did not reach v9')
+
+          manifest=json.load(open('data/generated/soldier-portrait-manifest.v9.json',encoding='utf-8'))
+          assert len(manifest['records'])==224
+          for i,r in enumerate(manifest['records'],1):
+            url=f"{BASE}/images/soldiers/{r['fileName']}"
+            response=session.get(url,timeout=20)
+            if response.status_code!=200:
+              raise SystemExit(f"HTTP {response.status_code}: {r['soldierId']} {url}")
+            body=response.content
+            if hashlib.sha256(body).hexdigest()!=r['sha256']:
+              raise SystemExit(f"LIVE HASH MISMATCH: {r['soldierId']}")
+            if not body.startswith(b'\x89PNG\r\n\x1a\n'):
+              raise SystemExit(f"LIVE NOT PNG: {r['soldierId']}")
+            with Image.open(io.BytesIO(body)) as im:
+              has_alpha=im.mode in ('RGBA','LA') or 'transparency' in im.info
+              rgba=im.convert('RGBA'); w,h=rgba.size; alpha=rgba.getchannel('A'); px=alpha.load()
+              values=list(alpha.getdata())
+              tr=sum(a<=8 for a in values)/len(values)
+              border=[px[x,0] for x in range(w)]+[px[x,h-1] for x in range(w)]
+              if h>2:
+                border += [px[0,y] for y in range(1,h-1)]+[px[w-1,y] for y in range(1,h-1)]
+              br=sum(a<=8 for a in border)/len(border)
+              cc=sum(a<=8 for a in (px[0,0],px[w-1,0],px[0,h-1],px[w-1,h-1]))
+              if im.format!='PNG' or not has_alpha or tr<0.08 or br<0.50 or cc<3:
+                raise SystemExit(f"LIVE TRANSPARENCY FAIL: {r['soldierId']} fmt={im.format} alpha={has_alpha} tr={tr:.6f} br={br:.6f} corners={cc}")
+            if i%32==0 or i==224:
+              print(f'live transparent/hash verified {i}/224',flush=True)
+          print('PASS: live 224/224 exact-hash transparent PNG Soldier assets')
+          PY
+      - name: Prepare browser QA
+        run: |
+          npm install --no-save --ignore-scripts @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Browser UI gate for deployed Soldier list and detail
+        shell: bash
+        run: |
+          cat > hosted-v9.spec.cjs <<'TEST'
+          const { test, expect } = require('@playwright/test');
+          const manifest = require('./data/generated/soldier-portrait-manifest.v9.json');
+          const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
+          const byId = (id) => manifest.records.find((r) => r.soldierId === id);
+
+          test('main links to deployed 224 Soldier list', async ({ page }) => {
+            await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
+            const link = page.getByRole('link', { name: '용병' });
+            await expect(link).toHaveAttribute('href', '/langrisser-future-guide/soldiers/');
+            await link.click();
+            await expect(page).toHaveURL(/\/langrisser-future-guide\/soldiers\/?$/);
+            await expect(page.getByText('224')).toBeVisible();
+          });
+
+          for (const id of [102, 5115]) {
+            test(`Soldier ${id} direct detail renders its v9 PNG`, async ({ page }) => {
+              const r = byId(id);
+              expect(r).toBeTruthy();
+              const failures = [];
+              page.on('response', (res) => {
+                if (res.url().includes('/images/soldiers/') && res.status() >= 400) failures.push(`${res.status()} ${res.url()}`);
+              });
+              await page.goto(`${BASE}/soldiers/${id}/`, { waitUntil: 'networkidle' });
+              const img = page.locator(`img[src*="/images/soldiers/${r.fileName}"]`).first();
+              await expect(img).toBeVisible();
+              expect(await img.evaluate((el) => el.complete && el.naturalWidth > 0 && el.naturalHeight > 0)).toBeTruthy();
+              expect(failures).toEqual([]);
+            });
+          }
+          TEST
+          npx playwright test hosted-v9.spec.cjs --reporter=line --workers=1
