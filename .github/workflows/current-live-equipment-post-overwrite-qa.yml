@@ -1,0 +1,82 @@
+name: Current Live Equipment Post-Overwrite QA
+
+on:
+  push:
+    branches:
+      - deploy/equipment-korean-names-20260827
+    paths:
+      - '.github/workflows/current-live-equipment-post-overwrite-qa.yml'
+  workflow_dispatch:
+
+jobs:
+  current-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate Equipment Korean-name projection
+        run: node scripts/build-equipment-name-kr-presentation.mjs
+
+      - name: Verify current deployed main marker
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://luceatluxvestra42.github.io/langrisser-future-guide'
+          test "$(curl -fsSL "$BASE/qa-main-source.txt")" = '5b81f1bbc916ba83dfd5c406273383c3da2b6a6f'
+
+      - name: Verify all 373 Korean names and 373/17 current live routes
+        run: |
+          node --input-type=commonjs <<'NODE'
+          const projection = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
+          (async () => {
+            const all = Object.entries(projection.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r }));
+            const pub = all.filter((r) => r.pageReady);
+            const hidden = all.filter((r) => !r.pageReady);
+            const [general, exclusive] = await Promise.all([fetch(`${BASE}/equipment/`), fetch(`${BASE}/equipment/exclusive/`)]);
+            if (general.status !== 200 || exclusive.status !== 200) throw new Error(`list HTTP ${general.status}/${exclusive.status}`);
+            const combined = `${await general.text()}\n${await exclusive.text()}`;
+            for (const r of pub) {
+              if (!combined.includes(r.nameKr)) throw new Error(`current lists missing ${r.equipmentId}:${r.nameKr}`);
+            }
+            async function batches(records, size, check) {
+              for (let i = 0; i < records.length; i += size) await Promise.all(records.slice(i, i + size).map(check));
+            }
+            await batches(pub, 20, async (r) => {
+              const res = await fetch(`${BASE}/equipment/${r.equipmentId}/`);
+              if (res.status !== 200) throw new Error(`current public ${r.equipmentId} HTTP ${res.status}`);
+              const html = await res.text();
+              if (!html.includes(r.nameKr)) throw new Error(`current public ${r.equipmentId} missing ${r.nameKr}`);
+            });
+            await batches(hidden, 20, async (r) => {
+              const res = await fetch(`${BASE}/equipment/${r.equipmentId}/`, { redirect: 'manual' });
+              if (res.status !== 404) throw new Error(`current non-public ${r.equipmentId} expected 404 got ${res.status}`);
+            });
+            console.log(`CURRENT LIVE PASS: names ${pub.length}/373; public ${pub.length}/373; blocked ${hidden.length}/17.`);
+          })().catch((error) => { console.error(error); process.exit(1); });
+          NODE
+
+      - name: Chromium smoke on current live list and four equipment groups
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://luceatluxvestra42.github.io/langrisser-future-guide'
+          node --input-type=commonjs <<'NODE' > /tmp/browser-cases.tsv
+          const p = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const general = require('./data/generated/equipment_stage3_3_general_list.json');
+          const records = Object.entries(p.byEquipmentId).map(([id,r]) => ({equipmentId:Number(id),...r})).filter(r => r.pageReady);
+          const byId = new Map(records.map(r => [r.equipmentId,r]));
+          const listRep = byId.get(general.records[0].equipmentId);
+          console.log(`equipment/\t${listRep.nameKr}`);
+          for (const group of ['weapon','armor','headgear','accessory']) {
+            const r = records.find(x => x.sourceGroup === group && x.nameKr);
+            console.log(`equipment/${r.equipmentId}/\t${r.nameKr}`);
+          }
+          NODE
+          while IFS=$'\t' read -r path name; do
+            DOM="$(google-chrome --headless --no-sandbox --disable-gpu --dump-dom "$BASE/$path" 2>/dev/null)"
+            printf '%s' "$DOM" | grep -Fq "$name"
+            echo "CHROMIUM CURRENT LIVE PASS: $path -> $name"
+          done < /tmp/browser-cases.tsv
