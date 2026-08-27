@@ -1,0 +1,140 @@
+name: Soldier Stage 3G Hosted QA Smoke
+
+on:
+  push:
+    branches:
+      - qa/soldier-stage3g-hosted-deploy7
+    paths:
+      - '.github/workflows/soldier-stage3g-hosted-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hosted-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hosted HTTP smoke
+        env:
+          BASE: https://luceatluxvestra42.github.io/langrisser-future-guide
+          EXPECTED_QA_SHA: 279c0c35d5fe8d6567302d16db5ddb98454e0c2c
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re, sys, time, urllib.request, urllib.error
+          from urllib.parse import urljoin, urlparse
+
+          base = os.environ['BASE'].rstrip('/')
+          expected = os.environ['EXPECTED_QA_SHA'].strip()
+
+          def fetch(path, follow=True):
+              url = path if path.startswith('http') else base + path
+              req = urllib.request.Request(url, headers={'User-Agent':'soldier-stage3g-hosted-qa/1.0'})
+              opener = urllib.request.build_opener() if follow else urllib.request.build_opener(urllib.request.HTTPHandler)
+              try:
+                  with opener.open(req, timeout=30) as r:
+                      return r.status, r.geturl(), r.headers, r.read()
+              except urllib.error.HTTPError as e:
+                  return e.code, e.geturl(), e.headers, e.read()
+
+          # Freshness: tolerate propagation delay, but require the deployed marker before any PASS.
+          marker = None
+          for _ in range(12):
+              s,u,h,b = fetch('/qa-commit.txt')
+              if s == 200:
+                  marker = b.decode('utf-8','replace').strip()
+                  if marker == expected:
+                      break
+              time.sleep(5)
+          if marker != expected:
+              raise SystemExit(f'STALE_DEPLOY marker={marker!r} expected={expected}')
+          print('PASS freshness', marker)
+
+          checks = [
+              ('home','/'),
+              ('soldier-list','/soldiers/'),
+              ('soldier-t1-300','/soldiers/300/'),
+              ('soldier-t1-gap-1000','/soldiers/1000/'),
+              ('soldier-t3-102','/soldiers/102/'),
+              ('soldier-sp-5621','/soldiers/5621/'),
+              ('equipment-nested','/equipment/exclusive/'),
+              ('banners','/banners/'),
+          ]
+          bodies = {}
+          for name,path in checks:
+              s,u,h,b = fetch(path)
+              if s != 200:
+                  raise SystemExit(f'{name} status={s} url={u}')
+              bodies[path] = b
+              print('PASS route', name, s, u, len(b))
+
+          # Direct entry + refresh equivalent: independent repeated HTTP GET of list/detail/nested.
+          for path in ['/soldiers/','/soldiers/300/','/soldiers/1000/','/soldiers/5621/','/equipment/exclusive/']:
+              s1,u1,h1,b1 = fetch(path)
+              s2,u2,h2,b2 = fetch(path)
+              if s1 != 200 or s2 != 200 or b1 != b2:
+                  raise SystemExit(f'refresh/direct-entry mismatch {path}: {s1}/{s2} bytes={len(b1)}/{len(b2)}')
+              print('PASS direct-refresh', path, len(b1))
+
+          # Trailing slash policy: both forms must resolve to the same successful content.
+          for a,b in [('/soldiers','/soldiers/'),('/soldiers/300','/soldiers/300/'),('/equipment/exclusive','/equipment/exclusive/')]:
+              sa,ua,ha,ba = fetch(a)
+              sb,ub,hb,bb = fetch(b)
+              if sa != 200 or sb != 200 or ba != bb:
+                  raise SystemExit(f'trailing-slash mismatch {a} {sa} -> {ua}; {b} {sb} -> {ub}')
+              print('PASS trailing-slash', a, b)
+
+          # Unknown static detail must not silently become a valid Soldier page.
+          su,uu,hu,bu = fetch('/soldiers/999999/')
+          if su != 404:
+              raise SystemExit(f'unknown Soldier expected 404, got {su} {uu}')
+          print('PASS unknown-404', su)
+
+          # New Stage 3G portraits and established shared assets must exist with correct case.
+          asset_paths = [
+              '/images/soldiers/300.png',
+              '/images/soldiers/1000.png',
+              '/images/soldiers/102.png',
+              '/images/army/Icon_Occupation_Cavalry.png',
+          ]
+          for path in asset_paths:
+              s,u,h,b = fetch(path)
+              if s != 200 or not b:
+                  raise SystemExit(f'asset fail {path}: {s} bytes={len(b)}')
+              print('PASS asset', path, len(b), h.get_content_type())
+          sc,uc,hc,bc = fetch('/Images/soldiers/300.png')
+          if sc == 200:
+              raise SystemExit('case-sensitivity guard failed: wrong-case asset unexpectedly 200')
+          print('PASS case-guard', sc)
+
+          # Recent Stage 3G detail pages must contain their own portrait references.
+          for sid in (300,1000,102):
+              text = bodies[f'/soldiers/{sid}/'].decode('utf-8','replace')
+              if f'images/soldiers/{sid}.png' not in text:
+                  raise SystemExit(f'detail {sid} missing own portrait reference')
+              print('PASS portrait-reference', sid)
+
+          # Base-path and emitted static resource checks from hosted HTML.
+          html = bodies['/soldiers/'].decode('utf-8','replace')
+          refs = set(re.findall(r'(?:src|href)=["\']([^"\']+)["\']', html))
+          internal = []
+          for ref in refs:
+              if ref.startswith(('http://','https://','#','mailto:','tel:','data:','javascript:')):
+                  continue
+              if ref.startswith('/') and not ref.startswith('/langrisser-future-guide/'):
+                  raise SystemExit(f'bad repo-base root-relative ref: {ref}')
+              if ref.startswith('/langrisser-future-guide/'):
+                  internal.append(ref)
+          if not internal:
+              raise SystemExit('no repo-base internal refs found in hosted Soldier list')
+          for ref in sorted(internal):
+              # Route links can be many; require every static asset/chunk ref emitted by the page to resolve.
+              if any(token in ref for token in ('/assets/','/images/')) or ref.endswith(('.js','.css','.json','.woff','.woff2')):
+                  s,u,h,b = fetch('https://luceatluxvestra42.github.io'+ref)
+                  if s != 200:
+                      raise SystemExit(f'emitted asset/chunk 404: {ref} -> {s}')
+                  print('PASS emitted-resource', ref, len(b))
+
+          print('HOSTED_QA_PASS candidate=2ca53b040f1adf896acb525eaf531a829078a6b7 wrapper='+expected)
+          PY
