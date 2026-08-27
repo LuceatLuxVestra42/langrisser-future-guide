@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search, Shield, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
+import { SoldierDetailModal } from "@/components/soldier-detail-modal";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
@@ -228,7 +229,7 @@ function SoldierPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="soldier-detail-title"
-            className="relative max-h-[calc(100dvh-1rem)] w-full max-w-4xl overflow-y-auto sm:max-h-[90vh]"
+            className="relative max-h-[calc(100dvh-1rem)] w-full max-w-6xl overflow-y-auto sm:max-h-[90vh]"
           >
             <button
               type="button"
@@ -238,7 +239,7 @@ function SoldierPage() {
             >
               <X className="h-5 w-5" aria-hidden="true" />
             </button>
-            <SoldierDetail record={selectedRecord} />
+            <SoldierDetailModal key={selectedRecord.soldierId} record={selectedRecord} />
           </div>
         </div>
       ) : null}
@@ -485,93 +486,5 @@ function SoldierCard({
         </span>
       </div>
     </button>
-  );
-}
-
-function SoldierDetail({ record }: { record: SoldierPrototypeRecord }) {
-  const displayName = record.nameKr ?? record.nameCn;
-  const army = ARMY_BY_TYPE.get(record.armyType);
-
-  return (
-    <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
-      <div className="flex items-start gap-4 border-b border-border p-4 pr-16 sm:p-5 sm:pr-16">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border bg-muted text-foreground">
-          <Shield className="h-8 w-8" strokeWidth={1.5} aria-hidden="true" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap gap-1.5">
-            <span className="rounded bg-foreground px-2 py-0.5 text-[11px] font-bold text-background">
-              {record.isSp ? "SP" : `${record.tier}티어`}
-            </span>
-            <span className="inline-flex items-center gap-1 rounded border border-border px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
-              <ArmyIcon armyType={record.armyType} className="h-3.5 w-3.5" />
-              {army?.label ?? record.armyType}
-            </span>
-          </div>
-          <h2 id="soldier-detail-title" className="mt-2 truncate text-xl font-bold text-foreground">
-            {displayName}
-          </h2>
-          <p className="mt-0.5 truncate text-sm text-muted-foreground">{record.nameCn}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Soldier ID {record.soldierId}</p>
-        </div>
-      </div>
-
-      <div className="p-4 sm:p-5">
-        <h3 className="text-sm font-bold text-foreground">기초 스탯</h3>
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <Stat label="HP" value={record.combat.hp} />
-          <Stat label="ATK" value={record.combat.atk} />
-          <Stat label="DEF" value={record.combat.def} />
-          <Stat label="MDEF" value={record.combat.mdef} />
-        </div>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          <Stat label="이동" value={record.combat.move} />
-          <Stat label="사거리" value={record.combat.range} />
-        </div>
-
-        <div className="mt-5 space-y-2 border-t border-border pt-4 text-sm">
-          <DetailRow
-            label="한국명 상태"
-            value={record.nameKrStatus === "confirmed" ? "확정" : "검수 중"}
-          />
-          <DetailRow label="출시 정보" value={record.release.releaseDate ?? "미확정"} />
-          <DetailRow
-            label="SP 관계"
-            value={
-              record.isSp
-                ? record.normalSoldierId
-                  ? `일반형 ID ${record.normalSoldierId}`
-                  : "관계 없음"
-                : record.spSoldierId
-                  ? `SP ID ${record.spSoldierId}`
-                  : "없음"
-            }
-          />
-        </div>
-
-        <div className="mt-4 rounded-lg bg-muted px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-          frozen 목록·전투 consumer를 그대로 표시해. 패시브, 훈련 비용, 사용 영웅, SP 미션과
-          실제 용병 이미지는 후속 UI 연결 대상이야.
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-lg border border-border bg-background px-2 py-2 text-center">
-      <p className="text-[10px] font-semibold text-muted-foreground">{label}</p>
-      <p className="mt-0.5 text-base font-black tabular-nums text-foreground">{value}</p>
-    </div>
-  );
-}
-
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-start justify-between gap-4">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="text-right font-semibold text-foreground">{value}</span>
-    </div>
   );
 }
