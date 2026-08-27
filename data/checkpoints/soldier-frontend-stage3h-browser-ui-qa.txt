@@ -1,0 +1,44 @@
+Soldier Frontend Stage 3H — Browser/UI Gate
+status: PASS_CURRENT_SOLDIER_STAGE3G_SCOPE
+sourceFixCommit: 22799234ea4e0363406517fd7caca70144fa42c4
+qaBranch: qa/soldier-stage3g-hosted-deploy7
+qaValidatedCommit: 5717d68a97db748cda97cfb2d1b7428e0988b8b5
+browserUiRunId: 33072914947
+browserUiArtifactId: 9646635257
+artifactSha256: 3478adb3ddd673cea1066c14e4dbe51eb25759911cb2c6232887a4eeb1cff203
+browserEngine: Chromium / Playwright 1.55
+desktopViewport: 1440x1000
+mobileViewport: 390x844 / isMobile=true / hasTouch=true
+freshness: PASS
+hydrationClientInteraction: PASS
+spTierFilter: PASS (56 records)
+listToDetail: PASS
+detailRender: PASS
+filterStatePersistence: PASS
+searchStatePersistence: PASS
+backForward: PASS
+escapeCloseAndBodyScrollRestore: PASS
+scrollPosition: PASS (780 -> 780 -> 780)
+keyboardInteraction: PASS (Space filter / Enter card / Escape modal)
+desktopLayout: PASS (8 columns / no horizontal overflow)
+portraitCrop: PASS (object-fit contain / bottom aligned / loaded dimensions 1013x846)
+desktopConsolePageerror: PASS (0 errors)
+unknownId: PASS (hosted direct 404)
+mobileLayout: PASS (390x844 / 3 columns / no horizontal overflow)
+touchFilter: PASS
+touchDetailOpenClose: PASS
+mobileModalBounds: PASS (x=8 y=8 width=374 height=828)
+mobileConsolePageerror: PASS (0 errors)
+heroSoldierNavigation: NOT_APPLICABLE_CURRENT_STAGE (F6 not implemented; current Hero cards are placeholders)
+equipmentHeroNavigation: NOT_APPLICABLE_CURRENT_STAGE
+storageRestore: NOT_APPLICABLE_CURRENT_STAGE (no storage contract for Soldier filters)
+spNormalSpDetailToggle: NOT_APPLICABLE_CURRENT_STAGE (current contract is SP tier filter + SP detail presentation)
+skinCarousel: NOT_APPLICABLE_CURRENT_STAGE
+initialBrowserGateRunId: 33072535076
+initialFailure: detail modal navigation reset Soldier list scroll from 780 to 0
+fix: set resetScroll=false on Soldier detail card Link and close/notFound navigation
+hostedGate: PASS
+browserUiGateCurrentSoldierScope: PASS
+fullProjectBrowserUiFreeze: NOT_READY
+notes: Browser/UI Gate used the actual hosted GitHub Pages candidate and real Chromium interactions. First run correctly failed on scroll restoration. The navigation-only fix was applied without reopening canonical Soldier identity, relation semantics, portrait mapping, or raw ConfigData.
+next: restore public test surface, then continue remaining feature work (F6 Hero-Soldier navigation, SP portrait source-resolution, or other planned stages) before any full-project UI freeze.
