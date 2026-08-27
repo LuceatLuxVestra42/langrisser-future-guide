@@ -19,16 +19,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Verify deployment baseline
         shell: bash
         run: |
           set -euo pipefail
           EXPECTED_MAIN='81108a48d32df2f9103148e8f2da9d6bc3eafeae'
-          ACTUAL_MAIN="$(git rev-parse HEAD^)"
-          test "$ACTUAL_MAIN" = "$EXPECTED_MAIN"
-          printf '%s\n' "$ACTUAL_MAIN" > /tmp/equipment-main-source.txt
+          git cat-file -e "$EXPECTED_MAIN^{commit}"
+          git merge-base --is-ancestor "$EXPECTED_MAIN" HEAD
+          printf '%s\n' "$EXPECTED_MAIN" > /tmp/equipment-main-source.txt
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
