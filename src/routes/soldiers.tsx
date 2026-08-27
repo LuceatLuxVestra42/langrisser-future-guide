@@ -258,7 +258,7 @@ function GroupButton({
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`min-h-14 border-r border-border px-1 text-xs font-bold transition last:border-r-0 sm:min-h-16 sm:text-sm ${
+      className={`min-h-[44.8px] border-r border-border px-1 text-xs font-bold transition last:border-r-0 sm:min-h-[51.2px] sm:text-sm ${
         selected
           ? "bg-foreground text-background"
           : "bg-card text-foreground hover:bg-muted"
@@ -472,7 +472,7 @@ function SoldierCard({
       >
         <ArmyIcon
           armyType={record.armyType}
-          className="h-[16px] w-[16px] sm:h-[18px] sm:w-[18px]"
+          className="h-[19.2px] w-[19.2px] sm:h-[21.6px] sm:w-[21.6px]"
         />
         <span className="sr-only">{army?.label ?? record.armyType}</span>
       </div>
