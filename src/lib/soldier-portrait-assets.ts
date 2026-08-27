@@ -1,4 +1,4 @@
-import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v2.json";
+import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v3.json";
 
 type SoldierPortraitManifestRecord = {
   soldierId: number;
@@ -57,7 +57,8 @@ export function areSoldierPortraitAssetsReady(): boolean {
 }
 
 // Backward-compatible Stage 2 readiness helper. The frontend now consumes the
-// Stage 3 manifest, but callers using the old helper should keep working.
+// latest evidence-backed portrait manifest, but callers using the old helper
+// should keep working.
 export function areRepresentativeSoldierPortraitsReady(): boolean {
   return areSoldierPortraitAssetsReady() && soldierPortraitManifest.coverage.resolvedCount >= 3;
 }
