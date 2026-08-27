@@ -1,0 +1,45 @@
+name: Soldier Portrait Stage 3C Legacy Discovery
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - '.github/workflows/soldier-portrait-stage3c-discovery.yml'
+      - 'scripts/discover-soldier-portrait-legacy-by-ability-stage3c.mjs'
+      - 'data/generated/soldier-portrait-manifest.v3.json'
+
+permissions:
+  contents: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Discover unique legacy matches by ability signature
+        run: node scripts/discover-soldier-portrait-legacy-by-ability-stage3c.mjs
+      - name: Validate discovery checkpoint
+        run: |
+          node <<'NODE'
+          const x = require('./data/validation/soldier-portrait-legacy-discovery-stage3c.v1.json');
+          if (x.summary.unresolvedNormalCount !== x.results.length) throw new Error('unresolved normal count mismatch');
+          if (x.summary.uniqueLegacyMatchCount !== x.uniqueMatches.length) throw new Error('unique match count mismatch');
+          if (x.policy.nameSimilarityUsedForAdmission !== false || x.policy.combatStatsUsedForIdentity !== false) throw new Error('identity policy regression');
+          const passed = x.results.filter(r => r.status === 'PASS_UNIQUE_LEGACY_ABILITY_MATCH');
+          if (passed.some(r => !r.legacyName || !Array.isArray(r.subsequencePositions))) throw new Error('invalid passed discovery');
+          console.log(`STAGE3C_DISCOVERY_VALIDATED unique=${x.summary.uniqueLegacyMatchCount} review=${x.summary.reviewCount}`);
+          NODE
+      - name: Commit discovery checkpoint
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/soldier-portrait-legacy-discovery-stage3c.v1.json
+          if git diff --cached --quiet; then
+            echo 'NO_DISCOVERY_CHANGES'
+            exit 0
+          fi
+          git commit -m 'Checkpoint Soldier portrait Stage 3C discovery'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
