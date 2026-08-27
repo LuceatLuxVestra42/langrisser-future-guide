@@ -26,7 +26,7 @@ const EXTERNAL_SOURCES = new Map([
     admission: 'CURRENT_ABILITY_ALIAS_WITH_PINNED_WEB_EVIDENCE',
     evidenceUrl: 'https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EC%95%8C%ED%85%8C%EB%AE%AC%EB%9F%ACsp-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/',
     evidenceName: '드래고니아 나이트',
-    assetUrl: 'https://redpanda7301.github.io/langrisser/img/troop/%EB%B9%84%EB%B3%91_%EC%88%98%EB%B3%91/%EB%B9%84%EB%B3%91/%EB%B3%91%EC%A2%85/20_1_%EB%93%9C%EB%9E%98%EA%B3%A0%EB%8B%88%EC%95%84%EB%82%98%EC%9D%B4%ED%8A%B8.webp',
+    assetUrl: 'https://redpanda7301.github.io/langrisser/img/troop/%EB%B9%84%EB%B3%91_%EC%88%98%EB%B3%91/%EB%B9%84%EB%B3%91/%EB%B3%91%EC%A2%85/20_1_%EB%93%9C%EB%A0%88%EA%B3%A0%EB%8B%88%EC%95%84%EB%82%98%EC%9D%B4%ED%8A%B8.webp',
     expectedLevel1Numbers: [2, 2, 10, 2, 10, 2, 1],
     expectedLevel10Numbers: [30, 6, 30, 6, 30, 2, 1],
   }],
