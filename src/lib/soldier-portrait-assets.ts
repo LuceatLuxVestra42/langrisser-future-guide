@@ -1,18 +1,30 @@
-import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v1.json";
+import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v2.json";
 
 type SoldierPortraitManifestRecord = {
   soldierId: number;
-  nameKr: string;
+  nameKr: string | null;
   fileName: string;
-  driveFolderId: string;
-  driveFileId: string;
-  sourceFileName: "Default.png";
+  sourceKind: string;
+  sourceFileName: string;
+  resolutionMethod: string;
+  driveFolderId?: string;
+  driveFileId?: string;
+  sourceUrl?: string;
+  sha256: string;
+  size: number;
 };
 
 type SoldierPortraitManifest = {
   version: number;
+  status: string;
   publicRoot: string;
   assetsReady: boolean;
+  coverage: {
+    canonicalSoldierCount: number;
+    resolvedCount: number;
+    unresolvedCount: number;
+    resolvedSpCount: number;
+  };
   records: SoldierPortraitManifestRecord[];
 };
 
@@ -32,6 +44,20 @@ export function getSoldierPortraitSource(soldierId: number) {
   return portraitBySoldierId.get(soldierId) ?? null;
 }
 
+export function getResolvedSoldierPortraitCount(): number {
+  return soldierPortraitManifest.coverage.resolvedCount;
+}
+
+export function areSoldierPortraitAssetsReady(): boolean {
+  return (
+    soldierPortraitManifest.assetsReady &&
+    soldierPortraitManifest.coverage.canonicalSoldierCount === 224 &&
+    soldierPortraitManifest.coverage.resolvedCount === portraitBySoldierId.size
+  );
+}
+
+// Backward-compatible Stage 2 readiness helper. The frontend now consumes the
+// Stage 3 manifest, but callers using the old helper should keep working.
 export function areRepresentativeSoldierPortraitsReady(): boolean {
-  return soldierPortraitManifest.assetsReady;
+  return areSoldierPortraitAssetsReady() && soldierPortraitManifest.coverage.resolvedCount >= 3;
 }
