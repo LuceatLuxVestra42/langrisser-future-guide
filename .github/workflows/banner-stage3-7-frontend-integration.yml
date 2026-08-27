@@ -24,8 +24,12 @@ on:
       - 'data/generated/soldier-portrait-manifest.v2.json'
       - 'data/generated/soldier-portrait-manifest.v3.json'
       - 'data/generated/soldier-portrait-manifest.v4.json'
+      - 'data/generated/soldier-portrait-manifest.v5.json'
       - 'data/validation/soldier-portrait-alias-evidence-stage3b.v1.json'
       - 'data/validation/soldier-portrait-stage3e-t3-evidence.v1.json'
+      - 'data/validation/soldier-portrait-stage3f-latest-t3-models.v1.json'
+      - 'data/validation/soldier-portrait-stage3f-latest-t3-evidence.v1.json'
+      - 'data/checkpoints/soldier-frontend-stage3f-latest-t3.txt'
       - 'data/hero-name-master.v1.json'
       - 'public/images/army/**'
       - 'public/images/soldiers/**'
@@ -33,6 +37,8 @@ on:
       - 'scripts/verify-soldier-portrait-aliases-stage3b.mjs'
       - 'scripts/expand-soldier-portraits-stage3b.mjs'
       - 'scripts/expand-soldier-portraits-stage3e-t3.mjs'
+      - 'scripts/report-soldier-portrait-stage3f-latest-t3-models.mjs'
+      - 'scripts/expand-soldier-portraits-stage3f-latest-t3.mjs'
       - 'scripts/import-army-icons-from-drive.mjs'
       - 'scripts/prepare-army-icons.mjs'
       - 'scripts/validate-banner-stage3-7-frontend-integration.mjs'
@@ -96,16 +102,16 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
-          const x = require('./data/generated/soldier-portrait-manifest.v4.json');
-          if (x.assetsReady !== true || x.status !== 'PASS_WITH_REVIEW') throw new Error('Stage 3E portrait manifest not ready');
-          if (x.coverage.canonicalSoldierCount !== 224 || x.coverage.resolvedCount !== 145 || x.coverage.unresolvedCount !== 79) throw new Error('Stage 3E portrait coverage mismatch');
-          if (x.coverage.resolvedNormalCount !== 145 || x.coverage.resolvedSpCount !== 0) throw new Error('Stage 3E normal/SP coverage mismatch');
-          if (x.coverage.tier1Resolved !== 7 || x.coverage.tier2Resolved !== 22 || x.coverage.tier3Resolved !== 116) throw new Error('Stage 3E tier coverage mismatch');
-          if (x.coverage.newlyResolvedCount !== 9) throw new Error('Stage 3E expansion summary mismatch');
-          if (x.newlyResolvedSoldierIds.join(',') !== '249,250,341,422,515,517,645,647,1036') throw new Error('Stage 3E newly resolved IDs mismatch');
-          if (x.records.length !== 145 || x.unresolved.length !== 79) throw new Error('Stage 3E record arrays mismatch');
+          const x = require('./data/generated/soldier-portrait-manifest.v5.json');
+          if (x.assetsReady !== true || x.status !== 'PASS_WITH_REVIEW') throw new Error('Stage 3F portrait manifest not ready');
+          if (x.coverage.canonicalSoldierCount !== 224 || x.coverage.resolvedCount !== 158 || x.coverage.unresolvedCount !== 66) throw new Error('Stage 3F portrait coverage mismatch');
+          if (x.coverage.resolvedNormalCount !== 158 || x.coverage.resolvedSpCount !== 0) throw new Error('Stage 3F normal/SP coverage mismatch');
+          if (x.coverage.tier1Resolved !== 7 || x.coverage.tier2Resolved !== 22 || x.coverage.tier3Resolved !== 129) throw new Error('Stage 3F tier coverage mismatch');
+          if (x.coverage.newlyResolvedCount !== 13 || x.coverage.remainingT3UnresolvedCount !== 0) throw new Error('Stage 3F closeout summary mismatch');
+          if (x.newlyResolvedSoldierIds.join(',') !== '135,136,251,427,516,648,819,1033,1035,1037,1038,1039,1118') throw new Error('Stage 3F newly resolved IDs mismatch');
+          if (x.records.length !== 158 || x.unresolved.length !== 66) throw new Error('Stage 3F record arrays mismatch');
           const resolvedIds = new Set(x.records.map((r) => r.soldierId));
-          if (resolvedIds.size !== 145) throw new Error('duplicate resolved Soldier portrait IDs');
+          if (resolvedIds.size !== 158) throw new Error('duplicate resolved Soldier portrait IDs');
           for (const record of x.records) {
             const publicFile = path.join('public/images/soldiers', record.fileName);
             const distFile = path.join('dist/client/images/soldiers', record.fileName);
@@ -119,9 +125,11 @@ jobs:
           for (const record of x.unresolved) {
             if (resolvedIds.has(record.soldierId)) throw new Error(`resolved/unresolved overlap ${record.soldierId}`);
           }
-          const evidence = require('./data/validation/soldier-portrait-stage3e-t3-evidence.v1.json');
-          if (evidence.rows.length !== 9 || evidence.rows.some((r) => r.status !== 'PASS')) throw new Error('Stage 3E evidence mismatch');
-          console.log(`SOLDIER_PORTRAIT_STAGE3E PASS resolved=${x.coverage.resolvedCount} fallback=${x.coverage.unresolvedCount} spReuse=${x.coverage.resolvedSpCount}`);
+          const evidence = require('./data/validation/soldier-portrait-stage3f-latest-t3-evidence.v1.json');
+          if (evidence.targetCount !== 13 || evidence.passCount !== 13 || evidence.rows.length !== 13 || evidence.rows.some((r) => r.status !== 'PASS')) throw new Error('Stage 3F evidence mismatch');
+          const models = require('./data/validation/soldier-portrait-stage3f-latest-t3-models.v1.json');
+          if (models.targetCount !== 13 || models.rows.length !== 13 || models.rows.some((r) => !r.nameCn || !r.model || !r.modelStem)) throw new Error('Stage 3F model-key checkpoint mismatch');
+          console.log(`SOLDIER_PORTRAIT_STAGE3F PASS resolved=${x.coverage.resolvedCount} fallback=${x.coverage.unresolvedCount} t3=${x.coverage.tier3Resolved} spReuse=${x.coverage.resolvedSpCount}`);
           NODE
           ARMY_ICON_COUNT="$(find public/images/army -maxdepth 1 -type f -name 'Icon_Occupation_*.png' | wc -l | tr -d ' ')"
           test "$ARMY_ICON_COUNT" -eq 10
@@ -145,7 +153,7 @@ jobs:
           grep -q '/equipment' src/routeTree.gen.ts
           grep -q '/soldiers' src/routeTree.gen.ts
           grep -q 'soldiers/\$soldierId' src/routeTree.gen.ts
-          grep -q 'soldier-portrait-manifest.v4.json' src/lib/soldier-portrait-assets.ts
+          grep -q 'soldier-portrait-manifest.v5.json' src/lib/soldier-portrait-assets.ts
           grep -q 'getOfficialSoldierPortraitUrl' src/routes/soldiers.tsx
           grep -q 'getOfficialSoldierPortraitUrl' src/components/soldier-detail-modal.tsx
           grep -q '224종' dist/client/soldiers/index.html
