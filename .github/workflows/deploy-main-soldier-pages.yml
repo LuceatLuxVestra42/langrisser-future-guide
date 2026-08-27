@@ -1,0 +1,86 @@
+name: Deploy Main Soldier Pages
+
+on:
+  push:
+    branches:
+      - deploy/main-soldier-pages-20260827
+    paths:
+      - '.github/workflows/deploy-main-soldier-pages.yml'
+      - 'vite.config.ts'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Verify promoted Soldier portrait evidence
+        run: |
+          node <<'NODE'
+          const v = require('./data/validation/soldier-portrait-stage3j-frontend-full.v1.json');
+          if (v.status !== 'PASS') throw new Error('Stage3J status is not PASS');
+          const c = v.coverage;
+          if (c.canonicalSoldierCount !== 224 || c.portraitRecordCount !== 224 || c.normalPortraitCount !== 168 || c.spPortraitCount !== 56 || c.missingPortraitCount !== 0 || c.extraPortraitCount !== 0 || c.verifiedAssetFileCount !== 224) throw new Error('Stage3J coverage mismatch');
+          if (!v.safety.allAssetHashesVerified || v.safety.spNormalPortraitReuse) throw new Error('Stage3J safety mismatch');
+          NODE
+
+      - name: Build GitHub Pages static site
+        run: bun run build
+
+      - name: Verify hosted candidate
+        run: |
+          set -euo pipefail
+          test -f dist/client/index.html
+          test -f dist/client/soldiers/index.html
+          test -f dist/client/heroes/index.html
+          test -f dist/client/equipment/index.html
+          test -f dist/client/banners/index.html
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          HERO_DETAIL_COUNT="$(find dist/client/heroes -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/heroes/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          EQUIPMENT_DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
+          test "$HERO_DETAIL_COUNT" -eq 267
+          test "$EQUIPMENT_DETAIL_COUNT" -eq 373
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const manifest = require('./data/generated/soldier-portrait-manifest.v8.json');
+          if (!Array.isArray(manifest.records) || manifest.records.length !== 224) throw new Error('portrait manifest record mismatch');
+          for (const record of manifest.records) {
+            const asset = path.join('dist/client/images/soldiers', record.fileName);
+            const detail = path.join('dist/client/soldiers', String(record.soldierId), 'index.html');
+            if (!fs.existsSync(asset)) throw new Error(`missing hosted portrait ${record.soldierId}: ${record.fileName}`);
+            if (!fs.existsSync(detail)) throw new Error(`missing Soldier detail ${record.soldierId}`);
+            const html = fs.readFileSync(detail, 'utf8');
+            if (!html.includes(`images/soldiers/${record.fileName}`)) throw new Error(`portrait not referenced in detail ${record.soldierId}`);
+          }
+          NODE
+          grep -q '/langrisser-future-guide/' dist/client/soldiers/index.html
+          printf '%s\n' '4428d59d42133054c512283e5e67ce6fd1124ba3' > dist/client/qa-main-source.txt
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-deploy-source.txt
+          printf '%s\n' 'soldier-portrait-v8-224' > dist/client/qa-surface.txt
+
+      - name: Publish to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy main Soldier portraits ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
