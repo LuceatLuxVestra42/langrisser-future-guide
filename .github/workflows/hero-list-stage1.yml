@@ -1,0 +1,103 @@
+name: Hero List Stage 1 Lightweight Consumer
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'work/**'
+    paths:
+      - 'data/contracts/hero-list-stage1.v1.json'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/hero-detail/by-id/**'
+      - 'scripts/finalize_hero_list_stage1.cjs'
+      - '.github/workflows/hero-list-stage1.yml'
+  pull_request:
+    paths:
+      - 'data/contracts/hero-list-stage1.v1.json'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/hero-detail/by-id/**'
+      - 'data/generated/hero-list-stage1.v1.json'
+      - 'data/validation/hero-list-stage1-final.v1.json'
+      - 'data/checkpoints/hero-list-stage1.json'
+      - 'data/checkpoints/hero-list-stage1.md'
+      - 'scripts/finalize_hero_list_stage1.cjs'
+      - '.github/workflows/hero-list-stage1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  hero-list-stage1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Generate and validate Hero list Stage 1
+        id: finalize
+        continue-on-error: true
+        run: node scripts/finalize_hero_list_stage1.cjs
+
+      - name: Show Hero list Stage 1 summary
+        if: always() && hashFiles('data/validation/hero-list-stage1-final.v1.json') != ''
+        run: |
+          node - <<'NODE'
+          const v = require('./data/validation/hero-list-stage1-final.v1.json');
+          console.log(JSON.stringify({
+            status: v.status,
+            completion: v.completion,
+            freezeState: v.freezeState,
+            summary: v.summary,
+            hardErrors: v.hardErrors,
+            decision: v.decision
+          }, null, 2));
+          NODE
+
+      - name: Upload Hero list Stage 1 diagnostics
+        if: always() && hashFiles('data/validation/hero-list-stage1-final.v1.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-list-stage1-diagnostics
+          path: |
+            data/generated/hero-list-stage1.v1.json
+            data/validation/hero-list-stage1-final.v1.json
+            data/checkpoints/hero-list-stage1.json
+            data/checkpoints/hero-list-stage1.md
+
+      - name: Commit frozen Stage 1 outputs on work branch
+        if: steps.finalize.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
+        run: |
+          TARGETS='data/generated/hero-list-stage1.v1.json data/validation/hero-list-stage1-final.v1.json data/checkpoints/hero-list-stage1.json data/checkpoints/hero-list-stage1.md'
+          if [ -z "$(git status --porcelain -- $TARGETS)" ]; then
+            echo 'Hero list Stage 1 outputs already frozen.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add $TARGETS
+          git commit -m 'Freeze Hero list Stage 1 consumer'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Verify frozen outputs on PR or main
+        if: steps.finalize.outcome == 'success' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
+        run: |
+          TARGETS='data/generated/hero-list-stage1.v1.json data/validation/hero-list-stage1-final.v1.json data/checkpoints/hero-list-stage1.json data/checkpoints/hero-list-stage1.md'
+          if [ -n "$(git status --porcelain -- $TARGETS)" ]; then
+            echo 'Hero list Stage 1 generated outputs are stale or not frozen.'
+            git status --short -- $TARGETS
+            exit 1
+          fi
+
+      - name: Enforce Hero list Stage 1 gate
+        if: always() && steps.finalize.outcome != 'success'
+        run: exit 1
