@@ -1,0 +1,54 @@
+name: Soldier Portrait Stage 3E T3 Expansion
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - 'scripts/expand-soldier-portraits-stage3e-t3.mjs'
+      - '.github/workflows/soldier-portrait-stage3e-t3-expand.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Expand evidence-backed T3 portraits
+        run: node scripts/expand-soldier-portraits-stage3e-t3.mjs
+      - name: Validate Stage 3E coverage and assets
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const x = require('./data/generated/soldier-portrait-manifest.v4.json');
+          if (x.status !== 'PASS_WITH_REVIEW' || x.assetsReady !== true) throw new Error('Stage 3E manifest not ready');
+          if (x.coverage.canonicalSoldierCount !== 224) throw new Error('canonical count mismatch');
+          if (x.coverage.resolvedCount !== 145 || x.coverage.unresolvedCount !== 79) throw new Error(`coverage mismatch ${x.coverage.resolvedCount}/${x.coverage.unresolvedCount}`);
+          if (x.coverage.resolvedNormalCount !== 145 || x.coverage.resolvedSpCount !== 0) throw new Error('normal/SP mismatch');
+          if (x.coverage.tier1Resolved !== 7 || x.coverage.tier2Resolved !== 22 || x.coverage.tier3Resolved !== 116) throw new Error('tier coverage mismatch');
+          const expected = '249,250,341,422,515,517,645,647,1036';
+          if (x.newlyResolvedSoldierIds.join(',') !== expected) throw new Error(`new IDs mismatch ${x.newlyResolvedSoldierIds.join(',')}`);
+          for (const id of x.newlyResolvedSoldierIds) {
+            const record = x.records.find(r => r.soldierId === id);
+            if (!record) throw new Error(`missing record ${id}`);
+            const file = path.join('public/images/soldiers', record.fileName);
+            if (!fs.existsSync(file) || fs.statSync(file).size !== record.size) throw new Error(`asset mismatch ${id}`);
+          }
+          const ev = require('./data/validation/soldier-portrait-stage3e-t3-evidence.v1.json');
+          if (ev.rows.length !== 9 || ev.rows.some(r => r.status !== 'PASS')) throw new Error('evidence checkpoint mismatch');
+          console.log(`STAGE3E_VALIDATED resolved=${x.coverage.resolvedCount} fallback=${x.coverage.unresolvedCount} new=${x.coverage.newlyResolvedCount}`);
+          NODE
+      - name: Commit Stage 3E assets and checkpoints
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/images/soldiers data/generated/soldier-portrait-manifest.v4.json data/validation/soldier-portrait-stage3e-t3-evidence.v1.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Expand Soldier portrait Stage 3E T3 coverage'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
