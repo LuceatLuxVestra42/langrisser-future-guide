@@ -1,0 +1,62 @@
+name: Soldier Stage 3G Hosted QA Deploy
+
+on:
+  push:
+    branches:
+      - qa/soldier-stage3g-hosted-deploy7
+    paths:
+      - '.github/workflows/soldier-stage3g-hosted-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Import Soldier army icons
+        run: node scripts/import-army-icons-from-drive.mjs
+      - name: Validate Soldier army icons
+        run: bun run check:army-icons
+      - name: Build production frontend
+        run: bun run build
+      - name: Verify hosted candidate artifact
+        run: |
+          test -f dist/client/index.html
+          test -f dist/client/soldiers/index.html
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const x = require('./data/generated/soldier-portrait-manifest.v6.json');
+          if (x.coverage.resolvedNormalCount !== 168 || x.coverage.remainingNormalUnresolvedCount !== 0 || x.coverage.remainingSpUnresolvedCount !== 56) throw new Error('portrait closeout mismatch');
+          for (const r of x.records) {
+            const asset = path.join('dist/client/images/soldiers', r.fileName);
+            const detail = path.join('dist/client/soldiers', String(r.soldierId), 'index.html');
+            if (!fs.existsSync(asset) || !fs.existsSync(detail)) throw new Error(`missing hosted candidate ${r.soldierId}`);
+            if (!fs.readFileSync(detail, 'utf8').includes(`images/soldiers/${r.fileName}`)) throw new Error(`portrait not referenced ${r.soldierId}`);
+          }
+          NODE
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-commit.txt
+          printf '%s\n' 'soldier-stage3g-hosted-qa' > dist/client/qa-surface.txt
+      - name: Publish Hosted QA candidate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Soldier Stage 3G Hosted QA ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
