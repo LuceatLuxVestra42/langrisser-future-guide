@@ -1,0 +1,66 @@
+{
+  "stage": "hero-list-stage4",
+  "status": "PASS",
+  "completion": "PREFLIGHT_COMPLETE",
+  "summary": {
+    "heroCount": 267,
+    "resolvedArtworkCount": 0,
+    "pendingArtworkCount": 267,
+    "malformedArtworkCount": 0,
+    "stage6AdmittedHeroCount": 267,
+    "hardErrorCount": 0
+  },
+  "checks": [
+    {
+      "name": "stage3-predecessor",
+      "pass": true,
+      "detail": "hero-list-stage3/PASS_WITH_REVIEW/COMPLETE"
+    },
+    {
+      "name": "stage1-frozen-source",
+      "pass": true,
+      "detail": "HERO_LIST_STAGE1_FROZEN/267/0"
+    },
+    {
+      "name": "stage6-admission-source",
+      "pass": true,
+      "detail": "PASS_WITH_REVIEW/COMPLETE/267/SHARDED_BY_HERO"
+    },
+    {
+      "name": "artwork-manifest",
+      "pass": true,
+      "detail": "{\"heroCount\":267,\"uniqueHeroCount\":267,\"resolvedCount\":0,\"pendingCount\":267,\"stage6MissingCount\":0,\"routeMismatchCount\":0,\"sourceLocatorMissingCount\":0,\"hardErrorCount\":0}"
+    },
+    {
+      "name": "artwork-record-parity",
+      "pass": true,
+      "detail": "malformed=0"
+    },
+    {
+      "name": "no-artwork-path-inference",
+      "pass": true,
+      "detail": "Unity source locators are not converted into browser URLs"
+    },
+    {
+      "name": "stage4-server-consumer",
+      "pass": true,
+      "detail": "Stage 4 consumes lightweight frozen/generated sources only"
+    },
+    {
+      "name": "stage4-server-functions",
+      "pass": true,
+      "detail": "Stage 4 list/detail server functions present"
+    },
+    {
+      "name": "list-detail-navigation",
+      "pass": true,
+      "detail": "Hero cards use Stage 4 resolver and typed detail navigation"
+    },
+    {
+      "name": "detail-route-shell",
+      "pass": true,
+      "detail": "267-Hero detail route shell consumes Stage 4 projection"
+    }
+  ],
+  "failures": []
+}
