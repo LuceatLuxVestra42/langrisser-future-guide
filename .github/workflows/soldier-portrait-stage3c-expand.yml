@@ -1,0 +1,54 @@
+name: Soldier Portrait Stage 3C Expand
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - '.github/workflows/soldier-portrait-stage3c-expand.yml'
+      - 'scripts/expand-soldier-portraits-stage3c.mjs'
+      - 'data/validation/soldier-portrait-legacy-discovery-stage3c.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Expand unique-legacy-evidence Soldier portraits
+        run: node scripts/expand-soldier-portraits-stage3c.mjs
+      - name: Validate Stage 3C portrait manifest
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const x = require('./data/generated/soldier-portrait-manifest.v4.json');
+          if (x.coverage.canonicalSoldierCount !== 224) throw new Error('canonical mismatch');
+          if (x.coverage.resolvedCount !== 140 || x.coverage.unresolvedCount !== 84) throw new Error('Stage 3C expected coverage mismatch');
+          if (x.coverage.resolvedNormalCount !== 140 || x.coverage.resolvedSpCount !== 0) throw new Error('normal/SP mismatch');
+          if (x.coverage.newlyResolvedCount !== 4) throw new Error('new count mismatch');
+          if (x.newlyResolvedSoldierIds.join(',') !== '249,515,517,645') throw new Error('new IDs mismatch');
+          const ids = new Set(x.records.map(r => r.soldierId));
+          if (ids.size !== x.records.length || x.records.length + x.unresolved.length !== 224) throw new Error('coverage arrays invalid');
+          for (const r of x.records) {
+            const file = path.join('public/images/soldiers', r.fileName);
+            if (!fs.existsSync(file)) throw new Error(`missing portrait ${file}`);
+            if (!r.sha256 || !r.size) throw new Error(`missing integrity metadata ${r.soldierId}`);
+          }
+          console.log(`STAGE3C_EXPANSION_VALIDATED resolved=${x.coverage.resolvedCount} unresolved=${x.coverage.unresolvedCount}`);
+          NODE
+      - name: Commit Stage 3C portraits
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/generated/soldier-portrait-manifest.v4.json public/images/soldiers
+          if git diff --cached --quiet; then
+            echo 'NO_STAGE3C_CHANGES'
+            exit 0
+          fi
+          git commit -m 'Expand Soldier portrait Stage 3C assets'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
