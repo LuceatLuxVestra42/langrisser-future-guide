@@ -1,0 +1,199 @@
+name: Deploy and Hosted QA Equipment Korean Names
+
+on:
+  push:
+    branches:
+      - deploy/equipment-korean-names-20260827
+    paths:
+      - '.github/workflows/deploy-hosted-qa-equipment-korean-names.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-hosted-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify deployment baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_MAIN='81108a48d32df2f9103148e8f2da9d6bc3eafeae'
+          ACTUAL_MAIN="$(git rev-parse HEAD^)"
+          test "$ACTUAL_MAIN" = "$EXPECTED_MAIN"
+          printf '%s\n' "$ACTUAL_MAIN" > /tmp/equipment-main-source.txt
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Korean equipment-name presentation
+        run: node scripts/build-equipment-name-kr-presentation.mjs
+
+      - name: Verify localization projection
+        run: |
+          node <<'NODE'
+          const p = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const v = require('./data/validation/equipment-name-kr-user-approved-summary.v1.json');
+          if (p.status !== 'PASS_USER_APPROVED_EQUIPMENT_KR_PRESENTATION') throw new Error('projection status mismatch');
+          if (p.counts.canonical !== 390 || p.counts.public !== 373 || p.counts.publicNameKr !== 373 || p.counts.nonPublic !== 17 || p.counts.unresolvedNonPublic !== 17) throw new Error('projection counts mismatch');
+          if (v.status !== 'PASS' || v.runtimeNameJoin !== false || v.productionJoinKey !== 'equipmentId') throw new Error('projection policy mismatch');
+          NODE
+
+      - name: Re-run frozen Equipment admission QA
+        run: bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
+
+      - name: Production build
+        run: bun run build
+
+      - name: Verify static Equipment candidate exhaustively
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f dist/client/index.html
+          test -f dist/client/equipment/index.html
+          test -f dist/client/equipment/exclusive/index.html
+          EQUIPMENT_DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$EQUIPMENT_DETAIL_COUNT" -eq 373
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const p = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const entries = Object.entries(p.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r }));
+          const pub = entries.filter((r) => r.pageReady === true);
+          const hidden = entries.filter((r) => r.pageReady !== true);
+          if (pub.length !== 373 || hidden.length !== 17) throw new Error('public/non-public split mismatch');
+          const listHtml = fs.readFileSync('dist/client/equipment/index.html', 'utf8') + '\n' + fs.readFileSync('dist/client/equipment/exclusive/index.html', 'utf8');
+          for (const r of pub) {
+            if (!r.nameKr) throw new Error(`public equipment missing nameKr: ${r.equipmentId}`);
+            const detail = path.join('dist/client/equipment', String(r.equipmentId), 'index.html');
+            if (!fs.existsSync(detail)) throw new Error(`missing public detail: ${r.equipmentId}`);
+            const html = fs.readFileSync(detail, 'utf8');
+            if (!html.includes(r.nameKr)) throw new Error(`detail missing Korean name ${r.equipmentId}: ${r.nameKr}`);
+            if (!listHtml.includes(r.nameKr)) throw new Error(`list surfaces missing Korean name ${r.equipmentId}: ${r.nameKr}`);
+          }
+          for (const r of hidden) {
+            if (r.nameKr !== null) throw new Error(`non-public equipment exposed nameKr: ${r.equipmentId}`);
+            const detail = path.join('dist/client/equipment', String(r.equipmentId), 'index.html');
+            if (fs.existsSync(detail)) throw new Error(`non-public detail unexpectedly generated: ${r.equipmentId}`);
+          }
+          console.log(`Static candidate PASS: ${pub.length} public Korean names / ${hidden.length} non-public blocked.`);
+          NODE
+          grep -q '/langrisser-future-guide/' dist/client/equipment/index.html
+          cp /tmp/equipment-main-source.txt dist/client/qa-main-source.txt
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-deploy-source.txt
+          printf '%s\n' 'equipment-korean-names-373' > dist/client/qa-surface.txt
+
+      - name: Publish to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Korean equipment names ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
+
+      - name: Wait for deployed source markers over HTTPS
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://luceatluxvestra42.github.io/langrisser-future-guide'
+          EXPECTED_MAIN='81108a48d32df2f9103148e8f2da9d6bc3eafeae'
+          for i in {1..30}; do
+            MAIN="$(curl -fsSL --retry 2 --retry-delay 1 "$BASE/qa-main-source.txt" || true)"
+            SURFACE="$(curl -fsSL --retry 2 --retry-delay 1 "$BASE/qa-surface.txt" || true)"
+            if [ "$MAIN" = "$EXPECTED_MAIN" ] && [ "$SURFACE" = 'equipment-korean-names-373' ]; then
+              echo "Hosted deployment markers reached expected Equipment build."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Hosted markers did not reach expected Equipment deployment" >&2
+          exit 1
+
+      - name: Prepare browser QA
+        run: |
+          npm install --no-save --ignore-scripts @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Browser and HTTPS Gate - deployed Equipment pages
+        shell: bash
+        run: |
+          cat > hosted-equipment.spec.cjs <<'TEST'
+          const { test, expect } = require('@playwright/test');
+          const projection = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
+          const entries = Object.entries(projection.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r }));
+          const publicRecords = entries.filter((r) => r.pageReady === true);
+          const nonPublicRecords = entries.filter((r) => r.pageReady !== true);
+
+          function representative(group) {
+            const r = publicRecords.find((x) => x.sourceGroup === group && x.nameKr);
+            if (!r) throw new Error(`No public representative for ${group}`);
+            return r;
+          }
+
+          test('deployed Equipment list renders Korean names', async ({ page }) => {
+            const errors = [];
+            page.on('pageerror', (error) => errors.push(error.message));
+            await page.goto(`${BASE}/equipment/`, { waitUntil: 'networkidle' });
+            await expect(page.getByText('서리검', { exact: true }).first()).toBeVisible();
+            expect(errors).toEqual([]);
+          });
+
+          for (const group of ['weapon', 'armor', 'headgear', 'accessory']) {
+            const r = representative(group);
+            test(`${group} representative detail direct-entry and refresh`, async ({ page }) => {
+              const errors = [];
+              page.on('pageerror', (error) => errors.push(error.message));
+              await page.goto(`${BASE}/equipment/${r.equipmentId}/`, { waitUntil: 'networkidle' });
+              await expect(page.getByText(r.nameKr, { exact: true }).first()).toBeVisible();
+              await page.reload({ waitUntil: 'networkidle' });
+              await expect(page.getByText(r.nameKr, { exact: true }).first()).toBeVisible();
+              expect(errors).toEqual([]);
+            });
+          }
+
+          test('all 373 hosted public detail pages contain their Korean name', async ({ request }) => {
+            expect(publicRecords).toHaveLength(373);
+            for (const r of publicRecords) {
+              const res = await request.get(`${BASE}/equipment/${r.equipmentId}/`);
+              expect(res.status(), `public equipment ${r.equipmentId}`).toBe(200);
+              const html = await res.text();
+              expect(html, `Korean name missing for ${r.equipmentId}`).toContain(r.nameKr);
+            }
+          });
+
+          test('hosted list surfaces contain all 373 Korean names', async ({ request }) => {
+            const general = await request.get(`${BASE}/equipment/`);
+            const exclusive = await request.get(`${BASE}/equipment/exclusive/`);
+            expect(general.status()).toBe(200);
+            expect(exclusive.status()).toBe(200);
+            const combined = (await general.text()) + '\n' + (await exclusive.text());
+            for (const r of publicRecords) {
+              expect(combined, `list surfaces missing ${r.equipmentId} ${r.nameKr}`).toContain(r.nameKr);
+            }
+          });
+
+          test('all 17 non-public Equipment routes remain unavailable', async ({ request }) => {
+            expect(nonPublicRecords).toHaveLength(17);
+            for (const r of nonPublicRecords) {
+              expect(r.nameKr).toBeNull();
+              const res = await request.get(`${BASE}/equipment/${r.equipmentId}/`);
+              expect(res.status(), `non-public equipment ${r.equipmentId}`).toBe(404);
+            }
+          });
+          TEST
+          npx playwright test hosted-equipment.spec.cjs --reporter=line --workers=1
