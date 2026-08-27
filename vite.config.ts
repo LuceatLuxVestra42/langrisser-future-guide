@@ -88,6 +88,13 @@ export default defineConfig({
           outputPath: "/soldiers/index.html",
         },
       },
+      {
+        path: "/heroes",
+        prerender: {
+          enabled: true,
+          outputPath: "/heroes/index.html",
+        },
+      },
       ...equipmentDetailPages,
     ],
   },
