@@ -1,0 +1,318 @@
+name: Soldier Frontend Stage 1 Route
+
+on:
+  push:
+    branches:
+      - 'work/soldier-frontend-stage1-route'
+    paths:
+      - '.github/workflows/soldier-frontend-stage1-route.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  implement-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Implement nested Soldier detail route
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          soldiers_path = Path('src/routes/soldiers.tsx')
+          source = soldiers_path.read_text()
+
+          replacements = [
+              (
+                  'import { createFileRoute, Link } from "@tanstack/react-router";',
+                  'import { createFileRoute, Link, Outlet } from "@tanstack/react-router";',
+              ),
+              (
+                  'import { Search, X } from "lucide-react";',
+                  'import { Search } from "lucide-react";',
+              ),
+              (
+                  'import { useEffect, useMemo, useState, type ReactNode } from "react";',
+                  'import { useMemo, useState, type ReactNode } from "react";',
+              ),
+              (
+                  'import { SoldierDetailModal } from "@/components/soldier-detail-modal";\n',
+                  '',
+              ),
+              (
+                  '  const [selectedId, setSelectedId] = useState<number | null>(null);\n',
+                  '',
+              ),
+          ]
+          for old, new in replacements:
+              if old not in source:
+                  raise SystemExit(f'missing expected Soldier source fragment: {old!r}')
+              source = source.replace(old, new, 1)
+
+          selected_start = source.find('  const selectedRecord =')
+          return_start = source.find('\n\n  return (', selected_start)
+          if selected_start < 0 or return_start < 0:
+              raise SystemExit('failed to locate selectedRecord/useEffect block')
+          source = source[:selected_start] + source[return_start:]
+
+          old_cards = '''          {records.map((record) => (\n            <SoldierCard\n              key={record.soldierId}\n              record={record}\n              selected={selectedId === record.soldierId}\n              onClick={() => setSelectedId(record.soldierId)}\n            />\n          ))}'''
+          new_cards = '''          {records.map((record) => (\n            <SoldierCard key={record.soldierId} record={record} />\n          ))}'''
+          if old_cards not in source:
+              raise SystemExit('failed to locate SoldierCard map block')
+          source = source.replace(old_cards, new_cards, 1)
+
+          modal_start = source.find('\n      {selectedRecord ? (')
+          modal_end_marker = '\n      ) : null}'
+          modal_end = source.find(modal_end_marker, modal_start)
+          if modal_start < 0 or modal_end < 0:
+              raise SystemExit('failed to locate legacy state modal block')
+          modal_end += len(modal_end_marker)
+          source = source[:modal_start] + '\n      <Outlet />' + source[modal_end:]
+
+          old_signature = '''function SoldierCard({\n  record,\n  selected,\n  onClick,\n}: {\n  record: SoldierPrototypeRecord;\n  selected: boolean;\n  onClick: () => void;\n}) {'''
+          new_signature = '''function SoldierCard({ record }: { record: SoldierPrototypeRecord }) {'''
+          if old_signature not in source:
+              raise SystemExit('failed to locate SoldierCard signature')
+          source = source.replace(old_signature, new_signature, 1)
+
+          card_marker = source.find('function SoldierCard(')
+          if card_marker < 0:
+              raise SystemExit('SoldierCard marker missing after signature rewrite')
+          prefix = source[:card_marker]
+          card = source[card_marker:]
+
+          old_open = '''  return (\n    <button\n      type="button"\n      aria-pressed={selected}\n      onClick={onClick}\n      title={`${displayName} · Soldier ${record.soldierId}`}\n      className={`group relative aspect-square overflow-hidden rounded-lg border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${\n        selected ? "border-foreground ring-1 ring-foreground" : "border-border"\n      }`}\n    >'''
+          new_open = '''  return (\n    <Link\n      to="/soldiers/$soldierId"\n      params={{ soldierId: String(record.soldierId) }}\n      preload="intent"\n      aria-label={`${displayName} 상세 보기`}\n      title={`${displayName} · Soldier ${record.soldierId}`}\n      className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"\n    >'''
+          if old_open not in card:
+              raise SystemExit('failed to locate SoldierCard button opening')
+          card = card.replace(old_open, new_open, 1)
+
+          closing = '    </button>\n  );\n}'
+          if closing not in card:
+              raise SystemExit('failed to locate SoldierCard button closing')
+          card = card.replace(closing, '    </Link>\n  );\n}', 1)
+          source = prefix + card
+
+          soldiers_path.write_text(source)
+
+          detail_path = Path('src/routes/soldiers.$soldierId.tsx')
+          detail_path.write_text(r'''import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { X } from "lucide-react";
+import { useCallback, useEffect } from "react";
+
+import { SoldierDetailModal } from "@/components/soldier-detail-modal";
+import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
+
+export const Route = createFileRoute("/soldiers/$soldierId")({
+  loader: ({ params }) => {
+    if (!/^[1-9]\d*$/.test(params.soldierId)) {
+      throw notFound();
+    }
+
+    const soldierId = Number(params.soldierId);
+    if (!Number.isSafeInteger(soldierId) || soldierId <= 0) {
+      throw notFound();
+    }
+
+    const data = getSoldierPrototypePageData();
+    const record = data.records.find((item) => item.soldierId === soldierId) ?? null;
+    if (!record) {
+      throw notFound();
+    }
+
+    return record;
+  },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: loaderData
+          ? `${loaderData.nameKr ?? loaderData.nameCn} | 랑그릿사 모바일 용병`
+          : "용병 | 랑그릿사 모바일 미래시 정보",
+      },
+    ],
+  }),
+  component: SoldierDetailRoute,
+  notFoundComponent: SoldierNotFound,
+});
+
+function SoldierDetailRoute() {
+  const record = Route.useLoaderData();
+  const navigate = useNavigate();
+  const closeDetail = useCallback(() => {
+    void navigate({ to: "/soldiers", replace: true });
+  }, [navigate]);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeDetail();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [closeDetail]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-6"
+      onMouseDown={(event) => {
+        if (event.currentTarget === event.target) closeDetail();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="soldier-detail-title"
+        className="relative max-h-[calc(100dvh-1rem)] w-full max-w-6xl overflow-y-auto sm:max-h-[90vh]"
+      >
+        <button
+          type="button"
+          aria-label="상세 창 닫기"
+          onClick={closeDetail}
+          className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/95 text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <X className="h-5 w-5" aria-hidden="true" />
+        </button>
+        <SoldierDetailModal key={record.soldierId} record={record} />
+      </div>
+    </div>
+  );
+}
+
+function SoldierNotFound() {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="soldier-not-found-title"
+        className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-center shadow-2xl"
+      >
+        <h2 id="soldier-not-found-title" className="text-xl font-black text-foreground">
+          용병을 찾을 수 없어
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          공개 대상 Soldier ID가 아니거나 존재하지 않는 주소야.
+        </p>
+        <Link
+          to="/soldiers"
+          replace
+          className="mt-5 inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-bold text-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          용병 목록으로
+        </Link>
+      </section>
+    </div>
+  );
+}
+''')
+
+          vite_path = Path('vite.config.ts')
+          vite = vite_path.read_text()
+
+          import_anchor = 'import generalEquipmentJson from "./data/generated/equipment_stage3_3_general_list.json" with { type: "json" };\n'
+          soldier_import = 'import soldierListJson from "./data/generated/soldier-list-stage5-8.v1.json" with { type: "json" };\n'
+          if import_anchor not in vite:
+              raise SystemExit('vite equipment import anchor missing')
+          if soldier_import not in vite:
+              vite = vite.replace(import_anchor, import_anchor + soldier_import, 1)
+
+          ids_anchor = 'const equipmentIds = [...generalEquipmentIds, ...exclusiveEquipmentIds];\n'
+          soldier_ids = '''\ntype SoldierIdRecord = {\n  soldierId: number;\n};\n\nconst soldierIds = (\n  soldierListJson as unknown as { records: SoldierIdRecord[] }\n).records.map((record) => record.soldierId);\n'''
+          if ids_anchor not in vite:
+              raise SystemExit('vite equipmentIds anchor missing')
+          if 'const soldierIds =' not in vite:
+              vite = vite.replace(ids_anchor, ids_anchor + soldier_ids, 1)
+
+          validation_anchor = '''if (equipmentIds.length !== 373 || new Set(equipmentIds).size !== 373) {\n  throw new Error(\n    `Expected 373 unique public equipment IDs for static pages; got ${equipmentIds.length} records / ${new Set(equipmentIds).size} unique.`,\n  );\n}\n'''
+          soldier_validation = '''\nif (soldierIds.length !== 224 || new Set(soldierIds).size !== 224) {\n  throw new Error(\n    `Expected 224 unique public Soldier IDs for static pages; got ${soldierIds.length} records / ${new Set(soldierIds).size} unique.`,\n  );\n}\n'''
+          if validation_anchor not in vite:
+              raise SystemExit('vite equipment validation anchor missing')
+          if 'Expected 224 unique public Soldier IDs' not in vite:
+              vite = vite.replace(validation_anchor, validation_anchor + soldier_validation, 1)
+
+          detail_anchor = '''const equipmentDetailPages = equipmentIds.map((equipmentId) => ({\n  path: `/equipment/${equipmentId}`,\n  prerender: {\n    enabled: true,\n    outputPath: `/equipment/${equipmentId}/index.html`,\n  },\n}));\n'''
+          soldier_pages = '''\nconst soldierDetailPages = soldierIds.map((soldierId) => ({\n  path: `/soldiers/${soldierId}`,\n  prerender: {\n    enabled: true,\n    outputPath: `/soldiers/${soldierId}/index.html`,\n  },\n}));\n'''
+          if detail_anchor not in vite:
+              raise SystemExit('vite equipment detail page anchor missing')
+          if 'const soldierDetailPages =' not in vite:
+              vite = vite.replace(detail_anchor, detail_anchor + soldier_pages, 1)
+
+          soldiers_page = '''      {\n        path: "/soldiers",\n        prerender: {\n          enabled: true,\n          outputPath: "/soldiers/index.html",\n        },\n      },\n'''
+          if soldiers_page not in vite:
+              raise SystemExit('vite /soldiers static page anchor missing')
+          if '      ...soldierDetailPages,\n' not in vite:
+              vite = vite.replace(soldiers_page, soldiers_page + '      ...soldierDetailPages,\n', 1)
+
+          vite_path.write_text(vite)
+          PY
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build production frontend
+        run: bun run build
+
+      - name: Validate Soldier route-backed modal and static detail pages
+        shell: bash
+        run: |
+          test -f dist/client/soldiers/index.html
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
+          node -e "const x=require('./data/generated/soldier-list-stage5-8.v1.json'); const ids=x.records.map(r=>r.soldierId); if(ids.length!==224 || new Set(ids).size!==224) process.exit(1)"
+          FIRST_SOLDIER_ID="$(node -p "require('./data/generated/soldier-list-stage5-8.v1.json').records[0].soldierId")"
+          test -f "dist/client/soldiers/${FIRST_SOLDIER_ID}/index.html"
+          grep -q 'soldiers/\$soldierId' src/routeTree.gen.ts
+          grep -q '<Outlet />' src/routes/soldiers.tsx
+          grep -q 'to="/soldiers/\$soldierId"' src/routes/soldiers.tsx
+          grep -q 'throw notFound()' 'src/routes/soldiers.$soldierId.tsx'
+          if grep -q 'ConfigData' 'src/routes/soldiers.$soldierId.tsx'; then
+            echo 'Route must not read raw ConfigData'
+            exit 1
+          fi
+
+      - name: Write Stage 1 checkpoint
+        shell: bash
+        run: |
+          cat > data/checkpoints/soldier-frontend-stage1-route.txt <<'EOF'
+          Soldier Frontend Stage 1 — route-backed detail modal
+          status: PASS
+          parentCheckpoint: 7f5f4941d338fa09216b099e31fe9c19ef449749
+          canonicalSoldierCount: 224
+          route: /soldiers/$soldierId
+          routeMode: nested route-backed modal
+          parentListPersistence: YES
+          publicStaticDetailPages: 224
+          invalidIdHandling: notFound
+          rawConfigDataRead: false
+          relationRecomputation: false
+          build: PASS
+          staticPrerender: PASS
+          next: Soldier portrait asset resolution
+          EOF
+
+      - name: Persist Stage 1 implementation
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/routes/soldiers.tsx \
+            'src/routes/soldiers.$soldierId.tsx' \
+            src/routeTree.gen.ts \
+            vite.config.ts \
+            data/checkpoints/soldier-frontend-stage1-route.txt
+          git diff --cached --check
+          git commit -m "Implement Soldier route-backed detail modal"
+          git push
