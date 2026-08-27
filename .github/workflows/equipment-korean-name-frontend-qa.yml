@@ -1,0 +1,89 @@
+name: Equipment Korean Name Frontend QA
+
+on:
+  push:
+    branches:
+      - work/equipment-frontend-korean-names
+    paths:
+      - 'data/localization/equipment-name-kr/**'
+      - 'scripts/build-equipment-name-kr-presentation.mjs'
+      - 'src/lib/equipment-page.localized.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
+      - 'package.json'
+      - '.github/workflows/equipment-korean-name-frontend-qa.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/localization/equipment-name-kr/**'
+      - 'scripts/build-equipment-name-kr-presentation.mjs'
+      - 'src/lib/equipment-page.localized.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
+      - 'package.json'
+      - '.github/workflows/equipment-korean-name-frontend-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Korean equipment-name presentation projection
+        run: node scripts/build-equipment-name-kr-presentation.mjs
+
+      - name: Validate Korean-name projection contract
+        run: |
+          node --input-type=module <<'EOF'
+          import fs from 'node:fs';
+          const projection = JSON.parse(fs.readFileSync('data/generated/equipment-name-kr-user-approved.v1.json', 'utf8'));
+          const summary = JSON.parse(fs.readFileSync('data/validation/equipment-name-kr-user-approved-summary.v1.json', 'utf8'));
+          const assert = (condition, message) => { if (!condition) throw new Error(message); };
+          assert(summary.status === 'PASS', 'Localization summary must PASS.');
+          assert(summary.sourceRows === 390, `Expected 390 source rows, got ${summary.sourceRows}.`);
+          assert(summary.canonicalRows === 390, `Expected 390 canonical rows, got ${summary.canonicalRows}.`);
+          assert(summary.resolvedRows === 390, `Expected 390 resolved rows, got ${summary.resolvedRows}.`);
+          assert(summary.publicCount === 373, `Expected 373 public records, got ${summary.publicCount}.`);
+          assert(summary.publicMissingNameKr === 0, `Public nameKr gaps: ${summary.publicMissingNameKr}.`);
+          assert(summary.nonPublicCount === 17, `Expected 17 non-public records, got ${summary.nonPublicCount}.`);
+          assert(summary.nonPublicUnexpectedNameKr === 0, `Non-public name leak: ${summary.nonPublicUnexpectedNameKr}.`);
+          assert(projection.policy.productionJoinKey === 'equipmentId', 'Production localization join must use equipmentId.');
+          assert(projection.policy.runtimeNameJoin === false, 'Runtime name JOIN must remain disabled.');
+          assert(projection.policy.semanticStageReopened === false, 'Semantic Stage must remain frozen.');
+          assert(projection.counts.publicNameKr === 373, `Expected Korean names for all 373 public records, got ${projection.counts.publicNameKr}.`);
+          console.log('Korean equipment-name projection contract: PASS');
+          EOF
+
+      - name: Re-run frozen Equipment admission / route QA
+        run: bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
+
+      - name: Production build
+        run: bun run build
+
+      - name: Validate frontend localization boundary
+        run: |
+          node --input-type=module <<'EOF'
+          import fs from 'node:fs';
+          const functionsSource = fs.readFileSync('src/lib/equipment-page.functions.ts', 'utf8');
+          const localizedSource = fs.readFileSync('src/lib/equipment-page.localized.server.ts', 'utf8');
+          const routeTree = fs.readFileSync('src/routeTree.gen.ts', 'utf8');
+          const assert = (condition, message) => { if (!condition) throw new Error(message); };
+          assert(functionsSource.includes('./equipment-page.localized.server'), 'Equipment server functions must consume localized presentation wrapper.');
+          assert(localizedSource.includes('equipment-name-kr-user-approved.v1.json'), 'Localized wrapper must consume generated ID projection.');
+          assert(localizedSource.includes('byEquipmentId[String(equipmentId)]'), 'Runtime localization lookup must be equipmentId-keyed.');
+          assert(!localizedSource.includes('ConfigDataEquipmentInfo'), 'Localized wrapper must not read raw ConfigDataEquipmentInfo.');
+          assert(routeTree.includes('/equipment/exclusive'), 'Route tree missing /equipment/exclusive.');
+          assert(routeTree.includes('/equipment/$equipmentId'), 'Route tree missing equipment detail route.');
+          assert(routeTree.includes('/equipment'), 'Route tree missing /equipment.');
+          console.log('Equipment Korean-name frontend boundary: PASS');
+          EOF
