@@ -153,7 +153,10 @@ function SoldierPage() {
                 selected={armyFilter === item.id}
                 onClick={() => setArmyFilter(item.id)}
               >
-                {item.label}
+                <span className="inline-flex items-center justify-center gap-1 sm:gap-1.5">
+                  <ArmyIcon armyType={item.id} className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
+                  <span>{item.label}</span>
+                </span>
               </GroupButton>
             ))}
           </div>
@@ -296,6 +299,121 @@ function PillButton({
   );
 }
 
+function ArmyIcon({
+  armyType,
+  className = "h-5 w-5",
+}: {
+  armyType: string;
+  className?: string;
+}) {
+  let content: ReactNode;
+
+  switch (armyType) {
+    case "INFANTRY":
+      content = (
+        <>
+          <path d="M15 4 20 3l-1 5-9 9-3-3 9-9Z" />
+          <path d="m7 14-3 3 3 3 3-3" />
+        </>
+      );
+      break;
+    case "LANCER":
+      content = (
+        <>
+          <path d="M4 20 17 7" />
+          <path d="m16 3 5 1-1 5-4-6Z" />
+          <path d="m7 14 3 3" />
+        </>
+      );
+      break;
+    case "CAVALRY":
+      content = (
+        <>
+          <path d="M6 5v7a6 6 0 0 0 12 0V5" />
+          <path d="M6 5h4v7a2 2 0 0 0 4 0V5h4" />
+        </>
+      );
+      break;
+    case "FLYING":
+      content = (
+        <>
+          <path d="M4 15c6 0 9-7 16-10-2 8-6 13-14 14" />
+          <path d="M7 15c4-1 7-4 10-7" />
+          <path d="M9 18c3-1 5-3 7-5" />
+        </>
+      );
+      break;
+    case "WATER":
+      content = (
+        <>
+          <path d="M3 8c2.5 2 4.5 2 7 0s4.5-2 7 0 4.5 2 4 2" />
+          <path d="M3 13c2.5 2 4.5 2 7 0s4.5-2 7 0 4.5 2 4 2" />
+          <path d="M3 18c2.5 2 4.5 2 7 0s4.5-2 7 0 4.5 2 4 2" />
+        </>
+      );
+      break;
+    case "ARCHER":
+      content = (
+        <>
+          <path d="M5 4c8 3 8 13 0 16" />
+          <path d="M5 4v16" />
+          <path d="M5 12h15" />
+          <path d="m17 9 3 3-3 3" />
+        </>
+      );
+      break;
+    case "ASSASSIN":
+      content = (
+        <>
+          <path d="m14 3 4 1-1 4-7 7-3-3 7-7Z" />
+          <path d="m7 12-3 3 5 5 3-3" />
+        </>
+      );
+      break;
+    case "MAGE":
+      content = (
+        <>
+          <path d="m12 3 1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4L12 3Z" />
+          <path d="m19 15 .7 2.3L22 18l-2.3.7L19 21l-.7-2.3L16 18l2.3-.7L19 15Z" />
+        </>
+      );
+      break;
+    case "HOLY":
+      content = (
+        <>
+          <path d="M10 3h4v6h5v4h-5v8h-4v-8H5V9h5V3Z" />
+        </>
+      );
+      break;
+    case "DEMON":
+      content = (
+        <>
+          <path d="M5 4c0 4 2 7 7 8 5-1 7-4 7-8" />
+          <path d="M8 8c-2 4-1 9 4 12 5-3 6-8 4-12" />
+          <path d="M9 14h.01M15 14h.01" />
+        </>
+      );
+      break;
+    default:
+      content = <circle cx="12" cy="12" r="7" />;
+  }
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      {content}
+    </svg>
+  );
+}
+
 function SoldierCard({
   record,
   selected,
@@ -332,6 +450,14 @@ function SoldierCard({
         </span>
       </div>
 
+      <div
+        className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded bg-black/65 text-white shadow-sm sm:h-8 sm:w-8"
+        title={army?.label ?? record.armyType}
+      >
+        <ArmyIcon armyType={record.armyType} className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+        <span className="sr-only">{army?.label ?? record.armyType}</span>
+      </div>
+
       <div className="absolute inset-x-0 bottom-0 bg-black/75 px-1.5 py-1.5 text-center backdrop-blur-[1px]">
         <span className="line-clamp-2 text-[11px] font-bold leading-tight text-white sm:text-xs">
           {displayName}
@@ -356,7 +482,8 @@ function SoldierDetail({ record }: { record: SoldierPrototypeRecord }) {
             <span className="rounded bg-foreground px-2 py-0.5 text-[11px] font-bold text-background">
               {record.isSp ? "SP" : `${record.tier}티어`}
             </span>
-            <span className="rounded border border-border px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+            <span className="inline-flex items-center gap-1 rounded border border-border px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+              <ArmyIcon armyType={record.armyType} className="h-3.5 w-3.5" />
               {army?.label ?? record.armyType}
             </span>
           </div>
