@@ -1,0 +1,27 @@
+name: Shared Movement Type Validation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/hero-soldier-movement-type-presentation.v1.json'
+      - 'data/configdata/ConfigDataJobInfo.json'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/generated/hero-job-links.v1.json'
+      - 'data/generated/soldier-master.v1.json'
+      - 'scripts/build_shared_movement_types.mjs'
+      - 'package.json'
+      - '.github/workflows/shared-movement-type-validation.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build and validate shared movement types
+        run: npm run build:movement-types
+      - name: Show validation summary
+        run: cat data/validation/shared-movement-type-index-final.v1.json
