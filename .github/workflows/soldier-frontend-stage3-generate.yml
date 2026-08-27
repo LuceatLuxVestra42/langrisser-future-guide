@@ -1,0 +1,53 @@
+name: Soldier Frontend Stage 3 Generate Portraits
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - '.github/workflows/soldier-frontend-stage3-generate.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Generate safe Soldier portrait coverage
+        run: node scripts/generate-soldier-portraits-stage3.mjs
+      - name: Validate generated manifest and assets
+        run: |
+          node <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          const manifest = JSON.parse(fs.readFileSync('data/generated/soldier-portrait-manifest.v2.json','utf8'));
+          if (manifest.coverage.canonicalSoldierCount !== 224) throw new Error('canonical count mismatch');
+          if (manifest.coverage.resolvedCount + manifest.coverage.unresolvedCount !== 224) throw new Error('coverage mismatch');
+          if (manifest.coverage.resolvedSpCount !== 0) throw new Error('SP portrait reuse unexpectedly enabled');
+          if (!manifest.policy?.noGuessing) throw new Error('noGuessing policy missing');
+          for (const record of manifest.records) {
+            const file = path.join('public/images/soldiers', record.fileName);
+            if (!fs.existsSync(file)) throw new Error(`missing generated asset ${file}`);
+            if (!record.sha256 || !record.size) throw new Error(`missing integrity metadata for ${record.soldierId}`);
+          }
+          console.log(`VALIDATION resolved=${manifest.coverage.resolvedCount} unresolved=${manifest.coverage.unresolvedCount}`);
+          console.log(`TIERS T1=${manifest.coverage.tier1Resolved} T2=${manifest.coverage.tier2Resolved} T3=${manifest.coverage.tier3Resolved} SP=${manifest.coverage.resolvedSpCount}`);
+          console.log(`SOURCES ${JSON.stringify(manifest.coverage.sourceCounts)}`);
+          const reasons = Object.groupBy(manifest.unresolved, x => x.reason);
+          console.log(`UNRESOLVED_REASONS ${JSON.stringify(Object.fromEntries(Object.entries(reasons).map(([k,v])=>[k,v.length])))}`);
+          NODE
+      - name: Commit generated portrait assets and manifest
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/generated/soldier-portrait-manifest.v2.json public/images/soldiers
+          if git diff --cached --quiet; then
+            echo 'NO_GENERATED_CHANGES'
+            exit 0
+          fi
+          git commit -m 'Generate Soldier portrait Stage 3 assets'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
