@@ -9,120 +9,97 @@ const FUNCTIONS = path.join(ROOT, "src/lib/hero-list.functions.ts");
 const ROUTE = path.join(ROOT, "src/routes/heroes_.$heroId.tsx");
 const OUT = path.join(ROOT, "data/validation/hero-list-stage5.v1.json");
 
-function readJson(file) {
-  return JSON.parse(fs.readFileSync(file, "utf8"));
-}
-
-function fail(message) {
-  throw new Error(`[Hero Stage 5] ${message}`);
-}
+const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
+const fail = (message) => { throw new Error(`[Hero Stage 5] ${message}`); };
 
 const manifest = readJson(MANIFEST);
 const heroList = readJson(HERO_LIST);
-
-if (manifest?.status !== "PASS_WITH_REVIEW" || manifest?.completion !== "COMPLETE") {
-  fail("Stage 6 manifest is not FINAL consumer-ready.");
-}
-if (manifest?.storage?.mode !== "SHARDED_BY_HERO" || manifest?.storage?.recordCount !== 267) {
-  fail("Stage 6 manifest must contain 267 sharded Hero records.");
-}
-if (manifest?.summary?.hardErrorCount !== 0 || manifest?.summary?.siteUsableCount !== 267) {
-  fail("Stage 6 manifest integrity summary is invalid.");
-}
-if (heroList?.freezeState !== "HERO_LIST_STAGE1_FROZEN" || heroList?.records?.length !== 267) {
-  fail("Frozen Hero list population is invalid.");
-}
+if (manifest?.status !== "PASS_WITH_REVIEW" || manifest?.completion !== "COMPLETE") fail("Stage 6 manifest is not consumer-ready.");
+if (manifest?.storage?.mode !== "SHARDED_BY_HERO" || manifest?.storage?.recordCount !== 267) fail("Stage 6 must contain 267 Hero shards.");
+if (manifest?.summary?.hardErrorCount !== 0 || manifest?.summary?.siteUsableCount !== 267) fail("Stage 6 integrity summary is invalid.");
+if (heroList?.freezeState !== "HERO_LIST_STAGE1_FROZEN" || heroList?.records?.length !== 267) fail("Frozen Hero list population is invalid.");
 
 const listIds = new Set(heroList.records.map((hero) => hero.heroId));
 const manifestIds = Object.keys(manifest.storage.byHeroId).map(Number);
-if (manifestIds.length !== 267 || new Set(manifestIds).size !== 267) {
-  fail("Stage 6 manifest Hero IDs are not unique 267 records.");
-}
+if (manifestIds.length !== 267 || new Set(manifestIds).size !== 267) fail("Stage 6 Hero IDs are not unique 267 records.");
 
-let shardCount = 0;
-let hardErrorCount = 0;
-let warningCount = 0;
-let branchCount = 0;
+let parsedShardCount = 0;
+let structuralFailureCount = 0;
+let reviewCodeCount = 0;
+let jobBranchCount = 0;
+let jobConnectionCount = 0;
 let capstoneCount = 0;
+let verifiedCapstoneStatCount = 0;
 let soldierEdgeCount = 0;
-let spHeroCount = 0;
-let exclusiveEquipmentHeroCount = 0;
-let centralDisciplineHeroCount = 0;
+let releasedSpHeroCount = 0;
+let releasedExclusiveEquipmentHeroCount = 0;
+let releasedCentralDisciplineHeroCount = 0;
 let bondHeroCount = 0;
+let bondRowCount = 0;
 let skinCount = 0;
 const missing = [];
 const mismatches = [];
 
-function meaningful(value) {
-  if (value == null) return false;
-  if (Array.isArray(value)) return value.length > 0;
-  if (typeof value === "object") return Object.keys(value).length > 0;
-  if (typeof value === "string") return value.trim().length > 0;
-  return true;
-}
-
 for (const heroId of manifestIds) {
   if (!listIds.has(heroId)) mismatches.push(`Hero ${heroId}: missing frozen list record`);
-
   const meta = manifest.storage.byHeroId[String(heroId)];
-  const rel = meta?.path;
-  const absolute = typeof rel === "string" ? path.join(ROOT, rel) : null;
-  if (!absolute || !fs.existsSync(absolute)) {
-    missing.push(heroId);
-    continue;
-  }
+  const absolute = typeof meta?.path === "string" ? path.join(ROOT, meta.path) : null;
+  if (!absolute || !fs.existsSync(absolute)) { missing.push(heroId); continue; }
 
   const shard = readJson(absolute);
-  shardCount += 1;
+  parsedShardCount += 1;
   if (shard.heroId !== heroId) mismatches.push(`Hero ${heroId}: shard identity ${shard.heroId}`);
-  if (!shard.identity || !shard.normal || !shard.soldiers || !shard.validation) {
-    mismatches.push(`Hero ${heroId}: required Stage 6 block missing`);
-  }
+  if (!shard.identity || !shard.normal?.jobTree || !shard.soldiers || !shard.validation) mismatches.push(`Hero ${heroId}: required Stage 6 block missing`);
+  if (shard.validation?.structuralStatus !== "PASS" || shard.validation?.siteUsable !== true) structuralFailureCount += 1;
+  reviewCodeCount += Array.isArray(shard.validation?.reviewCodes) ? shard.validation.reviewCodes.length : 0;
 
-  const errors = Array.isArray(shard.validation?.hardErrors) ? shard.validation.hardErrors : [];
-  const warnings = Array.isArray(shard.validation?.warnings) ? shard.validation.warnings : [];
-  hardErrorCount += errors.length;
-  warningCount += warnings.length;
+  const branches = Array.isArray(shard.normal?.jobTree?.branches) ? shard.normal.jobTree.branches : [];
+  const connections = Array.isArray(shard.normal?.jobTree?.connections) ? shard.normal.jobTree.connections : [];
+  const byConnectionId = new Map(connections.map((row) => [Number(row.jobConnectionId), row]));
+  jobBranchCount += branches.length;
+  jobConnectionCount += connections.length;
+  if (branches.length === 0 || connections.length === 0) mismatches.push(`Hero ${heroId}: empty job tree`);
 
-  const branches = Array.isArray(shard.normal?.jobTree?.branch) ? shard.normal.jobTree.branch : [];
-  branchCount += branches.length;
   for (const branch of branches) {
-    const connections = Array.isArray(branch?.connections) ? branch.connections : [];
-    const capstone = connections.find((job) => job?.isCapstone === true) ||
-      connections.find((job) => job?.jobId === branch?.capstoneJobId) ||
-      connections.at(-1);
-    if (capstone) capstoneCount += 1;
+    if (!Array.isArray(branch) || branch.length === 0) { mismatches.push(`Hero ${heroId}: empty job branch`); continue; }
+    const capstone = byConnectionId.get(Number(branch.at(-1)));
+    if (!capstone) { mismatches.push(`Hero ${heroId}: branch capstone unresolved`); continue; }
+    capstoneCount += 1;
+    if (capstone.finalDisplayStats?.status === "VERIFIED" && capstone.finalDisplayStats?.values) verifiedCapstoneStatCount += 1;
   }
 
   const soldiers = Array.isArray(shard.soldiers?.ids) ? shard.soldiers.ids : [];
   if (new Set(soldiers).size !== soldiers.length) mismatches.push(`Hero ${heroId}: duplicate Soldier IDs`);
   soldierEdgeCount += soldiers.length;
 
-  const skins = Array.isArray(shard.presentation?.skins) ? shard.presentation.skins : [];
-  skinCount += skins.length;
-  if (meaningful(shard.sp)) spHeroCount += 1;
-  if (meaningful(shard.exclusiveEquipment)) exclusiveEquipmentHeroCount += 1;
-  if (meaningful(shard.centralDiscipline)) centralDisciplineHeroCount += 1;
-  if (meaningful(shard.bonds)) bondHeroCount += 1;
+  const bonds = Array.isArray(shard.bonds) ? shard.bonds : [];
+  bondRowCount += bonds.length;
+  if (bonds.length) bondHeroCount += 1;
+  skinCount += Array.isArray(shard.presentation?.skins) ? shard.presentation.skins.length : 0;
+  if (shard.sp?.status === "RELEASED") releasedSpHeroCount += 1;
+  if (shard.exclusiveEquipment?.status === "RELEASED") releasedExclusiveEquipmentHeroCount += 1;
+  if (shard.centralDiscipline?.status === "RELEASED") releasedCentralDisciplineHeroCount += 1;
 }
 
 if (missing.length) fail(`Missing Stage 6 shards: ${missing.slice(0, 10).join(", ")}`);
 if (mismatches.length) fail(`Stage 6 parity mismatch: ${mismatches.slice(0, 10).join(" | ")}`);
-if (shardCount !== 267) fail(`Expected 267 parsed shards, got ${shardCount}.`);
-if (hardErrorCount !== 0) fail(`Expected zero shard hard errors, got ${hardErrorCount}.`);
+if (parsedShardCount !== 267) fail(`Expected 267 parsed shards, got ${parsedShardCount}.`);
+if (structuralFailureCount !== 0) fail(`Expected zero structurally unusable shards, got ${structuralFailureCount}.`);
+if (soldierEdgeCount !== 5977 || Number(manifest?.summary?.heroSoldierRelationCount) !== 5977) fail(`Hero-Soldier relation mismatch: ${soldierEdgeCount}.`);
+if (releasedSpHeroCount !== Number(manifest?.summary?.releasedSpCount) || releasedSpHeroCount !== 25) fail(`SP release population mismatch: ${releasedSpHeroCount}.`);
+if (releasedExclusiveEquipmentHeroCount !== Number(manifest?.summary?.exclusiveEquipmentRelationCount) || releasedExclusiveEquipmentHeroCount !== 167) fail(`Exclusive equipment population mismatch: ${releasedExclusiveEquipmentHeroCount}.`);
+if (capstoneCount !== jobBranchCount || verifiedCapstoneStatCount !== capstoneCount) fail(`Capstone/stat parity mismatch branches=${jobBranchCount} capstones=${capstoneCount} verified=${verifiedCapstoneStatCount}.`);
 
 const serverSource = fs.readFileSync(SERVER, "utf8");
 const functionsSource = fs.readFileSync(FUNCTIONS, "utf8");
 const routeSource = fs.readFileSync(ROUTE, "utf8");
-
 if (!serverSource.includes("import.meta.glob<Stage6HeroShard>")) fail("Stage 5 server must use lazy shard modules.");
-if (!serverSource.includes('eager: false')) fail("Stage 5 shard glob must remain lazy.");
+if (!serverSource.includes("eager: false")) fail("Stage 5 shard glob must remain lazy.");
 if (serverSource.includes("ConfigData")) fail("Stage 5 server must not read raw ConfigData.");
 if (!serverSource.includes("fullDatasetRuntimeRead: false")) fail("Stage 5 must declare no full Stage 6 dataset runtime read.");
 if (!functionsSource.includes("getHeroDetailRouteStage5Data")) fail("Stage 5 server function is not exposed.");
 if (!routeSource.includes("getHeroDetailRouteStage5Data")) fail("Hero detail route is not consuming Stage 5.");
-if (!routeSource.includes("직업 트리 · 최종 스탯")) fail("Stage 5 job detail block is missing.");
-if (!routeSource.includes("사용 가능 병종")) fail("Stage 5 Soldier detail block is missing.");
+if (!routeSource.includes("직업 트리 · 최종 스탯") || !routeSource.includes("사용 가능 병종")) fail("Stage 5 required detail blocks are missing.");
 
 for (const witness of [1, 6]) {
   const meta = manifest.storage.byHeroId[String(witness)];
@@ -130,7 +107,7 @@ for (const witness of [1, 6]) {
 }
 
 const report = {
-  version: 1,
+  version: 2,
   stage: "hero-list-stage5",
   status: "PASS",
   completion: "VALIDATED",
@@ -144,16 +121,19 @@ const report = {
   },
   summary: {
     heroCount: 267,
-    parsedShardCount: shardCount,
-    hardErrorCount,
-    warningCount,
-    jobBranchCount: branchCount,
+    parsedShardCount,
+    structuralFailureCount,
+    reviewCodeCount,
+    jobBranchCount,
+    jobConnectionCount,
     capstoneCount,
+    verifiedCapstoneStatCount,
     soldierEdgeCount,
-    spHeroCount,
-    exclusiveEquipmentHeroCount,
-    centralDisciplineHeroCount,
+    releasedSpHeroCount,
+    releasedExclusiveEquipmentHeroCount,
+    releasedCentralDisciplineHeroCount,
     bondHeroCount,
+    bondRowCount,
     skinCount,
     missingShardCount: missing.length,
     parityMismatchCount: mismatches.length,
