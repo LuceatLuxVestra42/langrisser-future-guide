@@ -47,12 +47,14 @@ function HeroGridPage() {
   const filteredHeroes = useMemo(() => {
     const normalizedQuery = normalizeSearch(query);
 
-    return data.records.filter((hero) => {
-      if (!matchesHeroSearch(hero, normalizedQuery)) return false;
-      if (rarity !== ALL_RARITIES && hero.rarity.baseLabel !== rarity) return false;
-      if (spOnly && !hero.hasSp) return false;
-      return true;
-    });
+    return data.records
+      .filter((hero) => {
+        if (!matchesHeroSearch(hero, normalizedQuery)) return false;
+        if (rarity !== ALL_RARITIES && hero.rarity.baseLabel !== rarity) return false;
+        if (spOnly && !hero.hasSp) return false;
+        return true;
+      })
+      .reverse();
   }, [data.records, query, rarity, spOnly]);
 
   const hasActiveFilters = Boolean(query.trim()) || rarity !== ALL_RARITIES || spOnly;
