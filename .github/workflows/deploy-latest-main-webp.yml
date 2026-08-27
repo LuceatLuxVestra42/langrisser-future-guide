@@ -1,0 +1,103 @@
+name: Deploy Latest Main with Soldier WebP
+
+on:
+  push:
+    branches:
+      - deploy/latest-main-webp-20260828
+    paths:
+      - '.github/workflows/deploy-latest-main-webp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Verify integrated main contract
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const web = require('./data/generated/soldier-portrait-web-manifest.v1.json');
+          const png = require('./data/generated/soldier-portrait-manifest.v9.json');
+          const resolver = fs.readFileSync('src/lib/soldier-portrait-assets.ts', 'utf8');
+          const heroes = fs.readFileSync('src/routes/heroes.tsx', 'utf8');
+
+          if (web.status !== 'PASS' || !web.assetsReady || web.coverage.resolvedCount !== 224 || web.coverage.resolvedSpCount !== 56) throw new Error('WebP manifest coverage mismatch');
+          if (!web.policy.sourcePngPreserved || web.policy.webpMode !== 'lossless' || !web.policy.decodedPixelExact || !web.policy.alphaPreservedByDecodedPixelEquality || !web.policy.dimensionsPreserved) throw new Error('WebP policy mismatch');
+          if (web.sizeAudit.pngTotalBytes !== 48931121 || web.sizeAudit.webpTotalBytes !== 30577298 || web.sizeAudit.savingRatio < 0.37) throw new Error('WebP size audit mismatch');
+          if (!resolver.includes('soldier-portrait-web-manifest.v1.json')) throw new Error('Soldier resolver not on WebP manifest');
+          if (!heroes.includes('SAMPLE_HERO_CARD_URLS') || !heroes.includes('초상화 샘플')) throw new Error('latest Hero portrait sample change missing');
+          for (const id of [5,6,8,12,15]) if (!heroes.includes(`  ${id}:`)) throw new Error(`Hero sample ${id} missing`);
+
+          const pngById = new Map(png.records.map(r => [r.soldierId, r]));
+          for (const r of web.records) {
+            const wpath = `public/${web.publicRoot}/${r.fileName}`;
+            const wb = fs.readFileSync(wpath);
+            if (wb.length !== r.size || crypto.createHash('sha256').update(wb).digest('hex') !== r.sha256) throw new Error(`WebP file mismatch ${r.soldierId}`);
+            if (wb.subarray(0,4).toString('ascii') !== 'RIFF' || wb.subarray(8,12).toString('ascii') !== 'WEBP') throw new Error(`WebP signature mismatch ${r.soldierId}`);
+            const src = pngById.get(r.soldierId);
+            if (!src) throw new Error(`PNG provenance missing ${r.soldierId}`);
+            const ppath = `public/${png.publicRoot}/${src.fileName}`;
+            const pb = fs.readFileSync(ppath);
+            if (pb.length !== src.size || crypto.createHash('sha256').update(pb).digest('hex') !== src.sha256) throw new Error(`PNG source changed ${r.soldierId}`);
+          }
+          console.log('PASS integrated main: WebP 224/224 + Hero sample 5 + PNG provenance preserved');
+          NODE
+
+      - name: Build GitHub Pages static site
+        run: bun run build
+
+      - name: Verify integrated static candidate
+        run: |
+          set -euo pipefail
+          test -f dist/client/soldiers/index.html
+          test -f dist/client/heroes/index.html
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          HERO_DETAIL_COUNT="$(find dist/client/heroes -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/heroes/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          WEBP_COUNT="$(find dist/client/images/soldiers-webp -type f -name '*.webp' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
+          test "$HERO_DETAIL_COUNT" -eq 267
+          test "$WEBP_COUNT" -eq 224
+          node <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const web = require('./data/generated/soldier-portrait-web-manifest.v1.json');
+          for (const r of web.records) {
+            const p = `dist/client/${web.publicRoot}/${r.fileName}`;
+            const b = fs.readFileSync(p);
+            if (b.length !== r.size || crypto.createHash('sha256').update(b).digest('hex') !== r.sha256) throw new Error(`built WebP mismatch ${r.soldierId}`);
+          }
+          const heroHtml = fs.readFileSync('dist/client/heroes/index.html','utf8');
+          const imageHostCount = (heroHtml.match(/redpanda7301\.github\.io\/langrisser\/img\/card\//g) ?? []).length;
+          if (imageHostCount !== 5) throw new Error(`Hero sample static count ${imageHostCount} != 5`);
+          console.log('PASS static candidate: Soldier WebP 224/224 + Hero samples 5');
+          NODE
+          grep -q '/langrisser-future-guide/' dist/client/soldiers/index.html
+          printf '%s\n' '740528b8238c4a952f2a00b2163e04388be23722' > dist/client/qa-main-source.txt
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-deploy-source.txt
+          printf '%s\n' 'latest-main-soldier-webp-224-hero-sample-5' > dist/client/qa-surface.txt
+
+      - name: Publish to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy latest main with Soldier WebP ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
