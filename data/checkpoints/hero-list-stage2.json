@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "stage": "hero-list-stage2",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "source": {
+    "consumer": "data/generated/hero-list-stage1.v1.json",
+    "freezeState": "HERO_LIST_STAGE1_FROZEN",
+    "heroCount": 267
+  },
+  "completedScope": [
+    "/heroes basic responsive grid",
+    "267 Hero records rendered from the frozen Stage 1 consumer",
+    "Hero Korean-name fallback, rarity and SP presentation",
+    "explicit placeholder while web artwork resolution is deferred",
+    "home character category navigation to /heroes",
+    "generated TanStack route tree persisted",
+    "preflight, production build and TypeScript gates",
+    "static GitHub Pages prerender and gh-pages deployment verification"
+  ],
+  "productionBoundary": {
+    "rawConfigDataRead": false,
+    "heroStage4Or5Fallback": false,
+    "relationshipRederivation": false,
+    "nameOrIdHeuristics": false,
+    "sourceArtworkToWebAssetInference": false
+  },
+  "validation": {
+    "preflight": "PASS",
+    "productionBuild": "PASS",
+    "routeGeneration": "PASS",
+    "typescript": "PASS",
+    "staticPagesPreviewRunId": 33057029227,
+    "staticPagesPreview": "PASS",
+    "qaSourceCommit": "69089eefcc3ca3a1b279335438b792f5f362e485",
+    "ghPagesDeployCommit": "1687e3fc8eda5b7472a49c31f51921c54c099e20",
+    "ghPagesHeroArtifact": "heroes/index.html",
+    "repositoryBasePath": "/langrisser-future-guide/",
+    "browserHttpProbe": "NOT_EXECUTED_ENV_DNS",
+    "browserReview": "NON_BLOCKING"
+  },
+  "regressionGuards": {
+    "homeHeroLink": "/heroes",
+    "homeSoldierLinkPreserved": "/soldiers",
+    "heroStaticCountMarker": 267,
+    "heroWitnesses": ["매튜", "레온"]
+  },
+  "deferred": [
+    "web-served Hero artwork resolution",
+    "release chronology/display ordering",
+    "Hero filters and search",
+    "Hero detail route/card navigation",
+    "fusion power badge metadata",
+    "SSR solo-limited presentation metadata",
+    "interactive browser and responsive visual QA"
+  ],
+  "nextStart": "Stage 3: add Hero list presentation metadata/features without reopening Stage 1 or Hero semantic producers."
+}
