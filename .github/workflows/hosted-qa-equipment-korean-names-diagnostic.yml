@@ -1,0 +1,129 @@
+name: Equipment Korean Names Hosted QA Diagnostic
+
+on:
+  push:
+    branches:
+      - deploy/equipment-korean-names-20260827
+    paths:
+      - '.github/workflows/hosted-qa-equipment-korean-names-diagnostic.yml'
+  workflow_dispatch:
+
+jobs:
+  hosted-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate Equipment Korean-name projection
+        run: node scripts/build-equipment-name-kr-presentation.mjs
+
+      - name: Hosted marker gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://luceatluxvestra42.github.io/langrisser-future-guide'
+          test "$(curl -fsSL "$BASE/qa-main-source.txt")" = '81108a48d32df2f9103148e8f2da9d6bc3eafeae'
+          test "$(curl -fsSL "$BASE/qa-surface.txt")" = 'equipment-korean-names-373'
+
+      - name: Hosted list HTTP gate - all 373 Korean names
+        run: |
+          node <<'NODE'
+          const projection = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
+          const records = Object.entries(projection.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r })).filter((r) => r.pageReady);
+          const [general, exclusive] = await Promise.all([
+            fetch(`${BASE}/equipment/`),
+            fetch(`${BASE}/equipment/exclusive/`),
+          ]);
+          if (general.status !== 200 || exclusive.status !== 200) throw new Error(`list HTTP ${general.status}/${exclusive.status}`);
+          const combined = `${await general.text()}\n${await exclusive.text()}`;
+          for (const r of records) {
+            if (!combined.includes(r.nameKr)) throw new Error(`hosted lists missing ${r.equipmentId}:${r.nameKr}`);
+          }
+          console.log(`Hosted list HTTP PASS: ${records.length}/373 Korean names.`);
+          NODE
+
+      - name: Hosted detail HTTP gate - 373 public and 17 blocked
+        run: |
+          node <<'NODE'
+          const projection = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
+          const all = Object.entries(projection.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r }));
+          const pub = all.filter((r) => r.pageReady);
+          const hidden = all.filter((r) => !r.pageReady);
+          async function batches(records, size, check) {
+            for (let i = 0; i < records.length; i += size) await Promise.all(records.slice(i, i + size).map(check));
+          }
+          await batches(pub, 20, async (r) => {
+            const res = await fetch(`${BASE}/equipment/${r.equipmentId}/`);
+            if (res.status !== 200) throw new Error(`public ${r.equipmentId} HTTP ${res.status}`);
+            const html = await res.text();
+            if (!html.includes(r.nameKr)) throw new Error(`public ${r.equipmentId} missing ${r.nameKr}`);
+          });
+          await batches(hidden, 20, async (r) => {
+            const res = await fetch(`${BASE}/equipment/${r.equipmentId}/`, { redirect: 'manual' });
+            if (res.status !== 404) throw new Error(`non-public ${r.equipmentId} expected 404 got ${res.status}`);
+          });
+          console.log(`Hosted detail HTTP PASS: ${pub.length}/373 public, ${hidden.length}/17 blocked.`);
+          NODE
+
+      - name: Prepare browser QA
+        run: |
+          npm install --no-save --ignore-scripts @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+          cat > hosted-equipment-diagnostic.spec.cjs <<'TEST'
+          const { test, expect } = require('@playwright/test');
+          const projection = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
+          const records = Object.entries(projection.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r })).filter((r) => r.pageReady);
+          const sample = (group) => {
+            const r = records.find((x) => x.sourceGroup === group && x.nameKr);
+            if (!r) throw new Error(`missing representative ${group}`);
+            return r;
+          };
+          async function assertPage(page, url, nameKr) {
+            const pageErrors = [];
+            const failedResponses = [];
+            page.on('pageerror', (e) => pageErrors.push(e.message));
+            page.on('response', (r) => { if (r.status() >= 400) failedResponses.push(`${r.status()} ${r.url()}`); });
+            const response = await page.goto(url, { waitUntil: 'networkidle' });
+            expect(response?.status()).toBe(200);
+            await expect(page.getByText(nameKr, { exact: true }).first()).toBeVisible();
+            expect(pageErrors).toEqual([]);
+            expect(failedResponses).toEqual([]);
+          }
+          test('list', async ({ page }) => {
+            const r = records[0];
+            await assertPage(page, `${BASE}/equipment/`, r.nameKr);
+          });
+          for (const group of ['weapon','armor','headgear','accessory']) {
+            test(group, async ({ page }) => {
+              const r = sample(group);
+              await assertPage(page, `${BASE}/equipment/${r.equipmentId}/`, r.nameKr);
+              await page.reload({ waitUntil: 'networkidle' });
+              await expect(page.getByText(r.nameKr, { exact: true }).first()).toBeVisible();
+            });
+          }
+          TEST
+
+      - name: Browser list gate
+        if: always()
+        run: npx playwright test hosted-equipment-diagnostic.spec.cjs --grep '^list$' --reporter=line --workers=1
+
+      - name: Browser weapon detail gate
+        if: always()
+        run: npx playwright test hosted-equipment-diagnostic.spec.cjs --grep '^weapon$' --reporter=line --workers=1
+
+      - name: Browser armor detail gate
+        if: always()
+        run: npx playwright test hosted-equipment-diagnostic.spec.cjs --grep '^armor$' --reporter=line --workers=1
+
+      - name: Browser headgear detail gate
+        if: always()
+        run: npx playwright test hosted-equipment-diagnostic.spec.cjs --grep '^headgear$' --reporter=line --workers=1
+
+      - name: Browser accessory detail gate
+        if: always()
+        run: npx playwright test hosted-equipment-diagnostic.spec.cjs --grep '^accessory$' --reporter=line --workers=1
