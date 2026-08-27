@@ -135,5 +135,6 @@ jobs:
             data/checkpoints/soldier-frontend-stage1-route.txt
           git diff --cached --check
           git commit -m "Implement Soldier route-backed detail modal"
+          git reset --hard HEAD
           git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin HEAD:"$GITHUB_REF_NAME"
