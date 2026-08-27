@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "stage": "hero-list-stage1",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "HERO_LIST_STAGE1_FROZEN",
+  "checkedAt": "2026-08-27T08:42:46.254Z",
+  "sources": {
+    "contract": "data/contracts/hero-list-stage1.v1.json",
+    "heroStage6Manifest": "data/generated/hero-detail.v1.json"
+  },
+  "checks": [
+    {
+      "name": "contract-frozen",
+      "pass": true,
+      "detail": "1/hero-list-stage1/FROZEN"
+    },
+    {
+      "name": "stage6-manifest-frozen-input",
+      "pass": true,
+      "detail": "{\"stage\":\"hero-page-6-3\",\"completion\":\"COMPLETE\",\"storageMode\":\"SHARDED_BY_HERO\",\"recordCount\":267,\"siteUsable\":267,\"hardErrors\":0}"
+    },
+    {
+      "name": "manifest-hero-population",
+      "pass": true,
+      "detail": "heroKeys=267"
+    },
+    {
+      "name": "all-hero-shards-present",
+      "pass": true,
+      "detail": "missing=0"
+    },
+    {
+      "name": "all-hero-shards-integrity-pass",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "hero-id-parity",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "all-source-heroes-site-usable",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "identity-projection-ready",
+      "pass": true,
+      "detail": "missing=0"
+    },
+    {
+      "name": "rarity-projection-ready",
+      "pass": true,
+      "detail": "missing=0"
+    },
+    {
+      "name": "faction-projection-shape",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "origin-projection-ready",
+      "pass": true,
+      "detail": "missing=0"
+    },
+    {
+      "name": "projection-exact-copy",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "stable-detail-route",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "sp-population-preserved",
+      "pass": true,
+      "detail": "released=25, notReleased=242, unexpected=0"
+    },
+    {
+      "name": "record-population-preserved",
+      "pass": true,
+      "detail": "records=267, unique=267"
+    },
+    {
+      "name": "no-deferred-presentation-inference",
+      "pass": true,
+      "detail": "forbiddenFields=0"
+    },
+    {
+      "name": "source-boundary-frozen-consumer-only",
+      "pass": true,
+      "detail": "{\"heroStage6FinalFrozenOnly\":true,\"rawConfigDataRead\":false,\"stage4ProducerRead\":false,\"stage5ProducerRead\":false,\"relationshipRederivation\":false,\"nameOrIdHeuristics\":false}"
+    }
+  ],
+  "summary": {
+    "canonicalHeroCount": 267,
+    "generatedRecordCount": 267,
+    "uniqueHeroCount": 267,
+    "shardMissingCount": 0,
+    "shardIntegrityMismatchCount": 0,
+    "shardHeroIdMismatchCount": 0,
+    "siteUsableMismatchCount": 0,
+    "identityMissingCount": 0,
+    "rarityMissingCount": 0,
+    "factionShapeMismatchCount": 0,
+    "originMissingCount": 0,
+    "sourceArtworkPresentCount": 267,
+    "sourceArtworkMissingCount": 0,
+    "spReleasedCount": 25,
+    "spNotReleasedCount": 242,
+    "unexpectedSpStatusCount": 0,
+    "projectionMismatchCount": 0,
+    "routeMismatchCount": 0,
+    "forbiddenPresentationInferenceCount": 0,
+    "hardErrorCount": 0
+  },
+  "failedHeroIds": [],
+  "hardErrors": [],
+  "decision": "Stage 1 is complete. The lightweight Hero list projection is frozen and Stage 2 may consume it for /heroes grid work."
+}
