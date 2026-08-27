@@ -1,0 +1,266 @@
+name: Soldier Stage 3G Browser UI Gate
+
+on:
+  push:
+    branches:
+      - qa/soldier-stage3g-hosted-deploy7
+    paths:
+      - '.github/workflows/soldier-stage3g-browser-ui-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Run hosted browser UI gate
+        env:
+          BASE: https://luceatluxvestra42.github.io/langrisser-future-guide
+          EXPECTED_QA_SHA: 2d126496fe393b9383840ea20ac00d86ee221a56
+        run: |
+          mkdir -p browser-ui-artifacts
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+
+          const BASE = process.env.BASE.replace(/\/$/, '');
+          const EXPECTED = process.env.EXPECTED_QA_SHA;
+          const out = 'browser-ui-artifacts';
+          const results = [];
+
+          function pass(name, detail='') {
+            results.push({name, status:'PASS', detail});
+            console.log(`PASS ${name}${detail ? ' — '+detail : ''}`);
+          }
+          function na(name, detail='') {
+            results.push({name, status:'NOT_APPLICABLE_CURRENT_STAGE', detail});
+            console.log(`N/A ${name}${detail ? ' — '+detail : ''}`);
+          }
+          function assert(cond, msg) { if (!cond) throw new Error(msg); }
+          async function waitUi(page) {
+            await page.waitForLoadState('domcontentloaded');
+            await page.locator('section[aria-label="용병 목록"] a').first().waitFor({state:'visible', timeout:30000});
+          }
+          function monitor(page, label) {
+            const errors = [];
+            page.on('console', msg => {
+              if (msg.type() === 'error') errors.push(`console:${msg.text()}`);
+            });
+            page.on('pageerror', err => errors.push(`pageerror:${err.message}`));
+            return {
+              assertClean() {
+                const meaningful = errors.filter(x => !x.includes('favicon.ico'));
+                assert(meaningful.length === 0, `${label} browser errors: ${meaningful.join(' | ')}`);
+                pass(`${label} console/pageerror`, '0 errors');
+              }
+            };
+          }
+          async function sameFirstRowCount(locator) {
+            return locator.evaluateAll(els => {
+              const boxes = els.slice(0, 16).map(el => el.getBoundingClientRect()).filter(b => b.width > 0 && b.height > 0);
+              if (!boxes.length) return 0;
+              const y = boxes[0].top;
+              return boxes.filter(b => Math.abs(b.top-y) < 3).length;
+            });
+          }
+
+          (async () => {
+            const browser = await chromium.launch({headless:true});
+            try {
+              // Deployment freshness before any browser PASS.
+              const fresh = await fetch(`${BASE}/qa-commit.txt`, {cache:'no-store'});
+              const marker = (await fresh.text()).trim();
+              assert(fresh.status === 200 && marker === EXPECTED, `STALE_DEPLOY marker=${marker} expected=${EXPECTED}`);
+              pass('freshness', marker);
+
+              // Desktop Chromium.
+              const desktop = await browser.newContext({viewport:{width:1440,height:1000}, deviceScaleFactor:1});
+              const page = await desktop.newPage();
+              const desktopMonitor = monitor(page, 'desktop');
+              await page.goto(`${BASE}/soldiers/`, {waitUntil:'domcontentloaded'});
+              await waitUi(page);
+              await page.screenshot({path:`${out}/desktop-list.png`, fullPage:true});
+
+              const filterPanel = page.locator('main section').first();
+              const list = page.locator('section[aria-label="용병 목록"]');
+              const cards = list.locator('a');
+
+              // Hydration/client interaction + SP filter count.
+              const spButton = filterPanel.getByRole('button', {name:'SP', exact:true});
+              await spButton.click();
+              await page.waitForFunction(() => document.body.innerText.includes('56개 표시'));
+              assert(await spButton.getAttribute('aria-pressed') === 'true', 'SP filter did not become pressed');
+              pass('hydration/client interaction', 'SP filter changed rendered count');
+              pass('SP tier filter', '56 records');
+
+              // Restore tier All, then test army+tier state persistence through nested detail close.
+              const allButtons = filterPanel.getByRole('button', {name:'전체', exact:true});
+              assert(await allButtons.count() === 2, 'expected army and tier 전체 buttons');
+              await allButtons.nth(1).click();
+              const cavalry = filterPanel.getByRole('button', {name:'기병', exact:true});
+              const t3 = filterPanel.getByRole('button', {name:'3티어', exact:true});
+              await cavalry.click();
+              await t3.click();
+              assert(await cavalry.getAttribute('aria-pressed') === 'true', 'cavalry filter not pressed');
+              assert(await t3.getAttribute('aria-pressed') === 'true', 'T3 filter not pressed');
+              const filteredCards = list.locator('a');
+              assert(await filteredCards.count() > 0, 'cavalry T3 filter yielded no cards');
+              const firstFiltered = filteredCards.first();
+              const filteredTitle = await firstFiltered.getAttribute('title');
+              await firstFiltered.click();
+              const dialog = page.getByRole('dialog');
+              await dialog.waitFor({state:'visible'});
+              assert(page.url().includes('/soldiers/'), 'detail route URL missing');
+              assert(await page.evaluate(() => document.body.style.overflow) === 'hidden', 'body scroll was not locked');
+              await page.getByText('사용 가능 영웅', {exact:true}).waitFor({state:'visible'});
+              await page.screenshot({path:`${out}/desktop-detail.png`, fullPage:false});
+              pass('list → detail click', filteredTitle || 'filtered Soldier');
+              pass('detail modal render', 'dialog + rich sections visible');
+
+              await page.keyboard.press('Escape');
+              await dialog.waitFor({state:'hidden'});
+              assert(await cavalry.getAttribute('aria-pressed') === 'true', 'army filter state lost after closing detail');
+              assert(await t3.getAttribute('aria-pressed') === 'true', 'tier filter state lost after closing detail');
+              assert(await page.evaluate(() => document.body.style.overflow) !== 'hidden', 'body scroll lock not restored');
+              pass('filter state persistence', 'army+tier survived nested detail close');
+              pass('Escape close', 'modal closes and body scroll restores');
+
+              // History back/forward using Soldier 300 search.
+              await allButtons.nth(0).click();
+              await allButtons.nth(1).click();
+              const search = page.getByPlaceholder('검색');
+              await search.fill('300');
+              const card300 = page.locator('a[title$="Soldier 300"]');
+              await card300.waitFor({state:'visible'});
+              await card300.click();
+              await page.getByRole('dialog').waitFor({state:'visible'});
+              const detailUrl = page.url();
+              await page.goBack({waitUntil:'domcontentloaded'});
+              await page.getByPlaceholder('검색').waitFor({state:'visible'});
+              assert(page.url().endsWith('/soldiers/') || page.url().endsWith('/soldiers'), `back did not return list: ${page.url()}`);
+              await page.goForward({waitUntil:'domcontentloaded'});
+              await page.getByRole('dialog').waitFor({state:'visible'});
+              assert(page.url() === detailUrl, 'forward did not restore detail route');
+              pass('back/forward', 'list ↔ detail history works');
+              await page.keyboard.press('Escape');
+
+              // Search state remains because parent route stays mounted.
+              assert(await page.getByPlaceholder('검색').inputValue() === '300', 'search state lost after detail close');
+              pass('search state persistence', 'query survived nested route');
+              await page.getByPlaceholder('검색').fill('');
+
+              // Scroll position preservation.
+              const card102 = page.locator('a[title$="Soldier 102"]');
+              await card102.scrollIntoViewIfNeeded();
+              const beforeScroll = await page.evaluate(() => window.scrollY);
+              await card102.click();
+              await page.getByRole('dialog').waitFor({state:'visible'});
+              await page.keyboard.press('Escape');
+              await page.getByRole('dialog').waitFor({state:'hidden'});
+              const afterScroll = await page.evaluate(() => window.scrollY);
+              assert(Math.abs(afterScroll-beforeScroll) <= 3, `scroll position changed ${beforeScroll} -> ${afterScroll}`);
+              pass('scroll position', `${beforeScroll} -> ${afterScroll}`);
+
+              // Keyboard activation.
+              await spButton.focus();
+              await page.keyboard.press('Space');
+              assert(await spButton.getAttribute('aria-pressed') === 'true', 'keyboard Space failed on SP filter');
+              await allButtons.nth(1).click();
+              await card102.focus();
+              await page.keyboard.press('Enter');
+              await page.getByRole('dialog').waitFor({state:'visible'});
+              await page.keyboard.press('Escape');
+              pass('keyboard interaction', 'filter Space + card Enter + modal Escape');
+
+              // Desktop layout / crop / no horizontal overflow.
+              const overflowDesktop = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+              assert(overflowDesktop <= 1, `desktop horizontal overflow ${overflowDesktop}px`);
+              const desktopCols = await sameFirstRowCount(cards);
+              assert(desktopCols >= 8, `desktop grid expected >=8 columns, got ${desktopCols}`);
+              const portraitStyle = await page.locator('img[src*="/images/soldiers/"]').first().evaluate(img => ({fit:getComputedStyle(img).objectFit,pos:getComputedStyle(img).objectPosition,nw:img.naturalWidth,nh:img.naturalHeight}));
+              assert(portraitStyle.fit === 'contain' && portraitStyle.nw > 0 && portraitStyle.nh > 0, `portrait crop/load bad ${JSON.stringify(portraitStyle)}`);
+              pass('desktop responsive/layout', `${desktopCols} columns, no horizontal overflow`);
+              pass('image ratio/crop', `${portraitStyle.fit} ${portraitStyle.pos} ${portraitStyle.nw}x${portraitStyle.nh}`);
+
+              // Direct unknown route: static Pages intentionally returns HTTP 404.
+              const unknown = await page.goto(`${BASE}/soldiers/999999/`, {waitUntil:'domcontentloaded'});
+              assert(unknown && unknown.status() === 404, `unknown Soldier direct entry expected 404, got ${unknown && unknown.status()}`);
+              pass('unknown ID', 'direct hosted route returns 404');
+              desktopMonitor.assertClean();
+              await desktop.close();
+
+              // Mobile/touch Chromium.
+              const mobile = await browser.newContext({viewport:{width:390,height:844}, isMobile:true, hasTouch:true, deviceScaleFactor:1});
+              const mp = await mobile.newPage();
+              const mobileMonitor = monitor(mp, 'mobile');
+              await mp.goto(`${BASE}/soldiers/`, {waitUntil:'domcontentloaded'});
+              await waitUi(mp);
+              const mFilter = mp.locator('main section').first();
+              const mList = mp.locator('section[aria-label="용병 목록"]');
+              const mCards = mList.locator('a');
+              const mOverflow = await mp.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+              assert(mOverflow <= 1, `mobile horizontal overflow ${mOverflow}px`);
+              const mobileCols = await sameFirstRowCount(mCards);
+              assert(mobileCols === 3, `mobile grid expected 3 columns, got ${mobileCols}`);
+              await mFilter.getByRole('button', {name:'SP', exact:true}).tap();
+              await mp.waitForFunction(() => document.body.innerText.includes('56개 표시'));
+              pass('mobile responsive/layout', '390x844, 3 columns, no horizontal overflow');
+              pass('touch filter', 'SP tap updates count');
+              await mp.screenshot({path:`${out}/mobile-list.png`, fullPage:true});
+
+              const mAll = mFilter.getByRole('button', {name:'전체', exact:true});
+              await mAll.nth(1).tap();
+              const mCard102 = mp.locator('a[title$="Soldier 102"]');
+              await mCard102.scrollIntoViewIfNeeded();
+              await mCard102.tap();
+              const mDialog = mp.getByRole('dialog');
+              await mDialog.waitFor({state:'visible'});
+              const box = await mDialog.boundingBox();
+              assert(box && box.width <= 390.5 && box.x >= -0.5, `mobile dialog outside viewport ${JSON.stringify(box)}`);
+              const close = mp.getByRole('button', {name:'상세 창 닫기'});
+              await close.waitFor({state:'visible'});
+              await mp.screenshot({path:`${out}/mobile-detail.png`, fullPage:false});
+              await close.tap();
+              await mDialog.waitFor({state:'hidden'});
+              pass('touch detail open/close', 'card tap + close tap');
+              pass('mobile modal bounds', JSON.stringify(box));
+              mobileMonitor.assertClean();
+              await mobile.close();
+
+              // Items from the global Browser/UI standard that are outside this Stage 3G Soldier portrait/list-detail scope.
+              na('Hero ↔ Soldier navigation', 'F6 is not implemented; Hero cards are placeholders in this stage');
+              na('equipment → Hero navigation', 'outside Soldier Stage 3G scope');
+              na('local/session storage restore', 'Soldier filters are component state; no storage contract exists in this stage');
+              na('SP normal/SP detail toggle', 'current stage has SP tier filter and SP detail presentation, not a paired toggle contract');
+              na('skin carousel', 'Skin page feature, outside Soldier Stage 3G scope');
+
+              fs.writeFileSync(`${out}/browser-ui-results.json`, JSON.stringify({
+                status:'PASS_CURRENT_SOLDIER_STAGE3G_SCOPE',
+                expectedQaSha:EXPECTED,
+                base:BASE,
+                results
+              }, null, 2));
+              console.log('BROWSER_UI_GATE_PASS_CURRENT_SOLDIER_STAGE3G_SCOPE');
+            } finally {
+              await browser.close();
+            }
+          })().catch(err => {
+            console.error(err.stack || err);
+            process.exit(1);
+          });
+          NODE
+      - name: Upload browser UI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage3g-browser-ui-evidence
+          path: browser-ui-artifacts/
+          if-no-files-found: warn
