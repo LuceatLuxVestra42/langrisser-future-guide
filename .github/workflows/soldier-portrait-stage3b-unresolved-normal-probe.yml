@@ -1,0 +1,68 @@
+name: Soldier Portrait Stage 3B Unresolved Normal Probe
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - '.github/workflows/soldier-portrait-stage3b-unresolved-normal-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare unresolved normal Soldiers with Drive tier folders
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const manifest = JSON.parse(fs.readFileSync('data/generated/soldier-portrait-manifest.v2.json','utf8'));
+          const canonical = JSON.parse(fs.readFileSync('data/generated/soldier-detail-stage5-2.v1.json','utf8')).records;
+          const byId = new Map(canonical.map(r => [r.soldierId, r]));
+          const ROOTS = {
+            1: '1Br-tmzvjc4xo7baBaiziwweGyU75H-8x',
+            2: '15a3Rc2w2i3Zkf32LZwB4xT8Ldaej0yXl',
+            3: '17586qKXHeDoCZ13E6bmrmgMRtMUk9fzQ',
+          };
+          const normalize = v => String(v ?? '').normalize('NFC').replace(/[\s_\-]/g,'').toLowerCase();
+          async function folderIndex(id) {
+            const res = await fetch(`https://drive.google.com/drive/folders/${id}`, {headers:{'user-agent':'Mozilla/5.0'}});
+            if (!res.ok) throw new Error(`Drive root ${id} ${res.status}`);
+            const text = await res.text();
+            const matches = [...text.matchAll(/aria-label="([^"]+) Shared folder"[\s\S]{0,900}?data-id="([^"]+)"/g)];
+            return [...new Map(matches.map(m => [m[2], {name:m[1], key:normalize(m[1]), folderId:m[2]}])).values()];
+          }
+          const indexes = {};
+          for (const tier of [1,2,3]) indexes[tier] = await folderIndex(ROOTS[tier]);
+          console.log(`DRIVE_COUNTS T1=${indexes[1].length} T2=${indexes[2].length} T3=${indexes[3].length}`);
+
+          const unresolvedNormal = manifest.unresolved.filter(x => !x.isSp);
+          console.log(`UNRESOLVED_NORMAL=${unresolvedNormal.length}`);
+          const exact = [];
+          const noName = [];
+          const noMatch = [];
+          const ambiguous = [];
+          for (const item of unresolvedNormal) {
+            const c = byId.get(item.soldierId);
+            const name = c?.identity?.nameKr ?? item.nameKr ?? null;
+            if (!name) {
+              noName.push({id:item.soldierId,tier:item.tier,army:item.armyType,reason:item.reason});
+              continue;
+            }
+            const matches = (indexes[item.tier] ?? []).filter(x => x.key === normalize(name));
+            if (matches.length === 1) exact.push({id:item.soldierId,tier:item.tier,army:item.armyType,name,reason:item.reason,folderId:matches[0].folderId,driveName:matches[0].name});
+            else if (matches.length === 0) noMatch.push({id:item.soldierId,tier:item.tier,army:item.armyType,name,reason:item.reason});
+            else ambiguous.push({id:item.soldierId,tier:item.tier,army:item.armyType,name,reason:item.reason,matches});
+          }
+          console.log(`EXACT_MATCH_COUNT=${exact.length}`);
+          console.log(`NO_NAME_COUNT=${noName.length}`);
+          console.log(`NO_MATCH_COUNT=${noMatch.length}`);
+          console.log(`AMBIGUOUS_COUNT=${ambiguous.length}`);
+          console.log('EXACT_MATCHES '+JSON.stringify(exact));
+          console.log('NO_NAME '+JSON.stringify(noName));
+          console.log('NO_MATCH '+JSON.stringify(noMatch));
+          console.log('AMBIGUOUS '+JSON.stringify(ambiguous));
+          NODE
