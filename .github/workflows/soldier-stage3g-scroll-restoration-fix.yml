@@ -1,0 +1,62 @@
+name: Soldier Stage 3G Scroll Restoration Fix
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - '.github/workflows/soldier-stage3g-scroll-restoration-fix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Preserve list scroll across Soldier detail modal navigation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('src/routes/soldiers.tsx')
+          s = p.read_text()
+          old = '      preload="intent"\n      aria-label={`${displayName} 상세 보기`}'
+          new = '      preload="intent"\n      resetScroll={false}\n      aria-label={`${displayName} 상세 보기`}'
+          if s.count(old) != 1:
+              raise SystemExit(f'unexpected SoldierCard Link match count: {s.count(old)}')
+          p.write_text(s.replace(old, new))
+
+          p = Path('src/routes/soldiers.$soldierId.tsx')
+          s = p.read_text()
+          old = '    void navigate({ to: "/soldiers", replace: true });'
+          new = '    void navigate({ to: "/soldiers", replace: true, resetScroll: false });'
+          if s.count(old) != 1:
+              raise SystemExit(f'unexpected close navigate match count: {s.count(old)}')
+          s = s.replace(old, new)
+          old2 = '<Link to="/soldiers" replace className='
+          new2 = '<Link to="/soldiers" replace resetScroll={false} className='
+          if s.count(old2) != 1:
+              raise SystemExit(f'unexpected notFound Link match count: {s.count(old2)}')
+          p.write_text(s.replace(old2, new2))
+          PY
+          git diff --check
+          git diff -- src/routes/soldiers.tsx 'src/routes/soldiers.$soldierId.tsx'
+      - name: Validate build
+        run: |
+          bun install --frozen-lockfile
+          node scripts/import-army-icons-from-drive.mjs
+          bun run check:army-icons
+          bun run build
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routes/soldiers.tsx 'src/routes/soldiers.$soldierId.tsx'
+          git commit -m "Preserve Soldier list scroll across detail modal"
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
