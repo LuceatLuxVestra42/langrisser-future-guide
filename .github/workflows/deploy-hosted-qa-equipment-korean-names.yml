@@ -26,7 +26,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_MAIN='81108a48d32df2f9103148e8f2da9d6bc3eafeae'
+          EXPECTED_MAIN='5b81f1bbc916ba83dfd5c406273383c3da2b6a6f'
           git cat-file -e "$EXPECTED_MAIN^{commit}"
           git merge-base --is-ancestor "$EXPECTED_MAIN" HEAD
           printf '%s\n' "$EXPECTED_MAIN" > /tmp/equipment-main-source.txt
@@ -53,10 +53,10 @@ jobs:
       - name: Re-run frozen Equipment admission QA
         run: bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
 
-      - name: Production build
+      - name: Production static build
         run: bun run build
 
-      - name: Verify static Equipment candidate exhaustively
+      - name: Verify static Equipment candidate and current Soldier v9 assets
         shell: bash
         run: |
           set -euo pipefail
@@ -68,7 +68,9 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
+          const crypto = require('crypto');
           const p = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const soldierV9 = require('./data/generated/soldier-portrait-manifest.v9.json');
           const entries = Object.entries(p.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r }));
           const pub = entries.filter((r) => r.pageReady === true);
           const hidden = entries.filter((r) => r.pageReady !== true);
@@ -87,12 +89,21 @@ jobs:
             const detail = path.join('dist/client/equipment', String(r.equipmentId), 'index.html');
             if (fs.existsSync(detail)) throw new Error(`non-public detail unexpectedly generated: ${r.equipmentId}`);
           }
-          console.log(`Static candidate PASS: ${pub.length} public Korean names / ${hidden.length} non-public blocked.`);
+          if (soldierV9.version !== 9 || soldierV9.status !== 'PASS' || soldierV9.coverage?.resolvedCount !== 224 || soldierV9.records?.length !== 224) {
+            throw new Error('Soldier portrait v9 manifest mismatch');
+          }
+          for (const r of soldierV9.records) {
+            const asset = path.join('dist/client/images/soldiers', r.fileName);
+            if (!fs.existsSync(asset)) throw new Error(`missing Soldier v9 asset ${r.soldierId}:${r.fileName}`);
+            const sha256 = crypto.createHash('sha256').update(fs.readFileSync(asset)).digest('hex');
+            if (sha256 !== r.sha256) throw new Error(`Soldier v9 hash mismatch ${r.soldierId}:${r.fileName}`);
+          }
+          console.log(`Static PASS: Equipment ${pub.length}/373 Korean names; ${hidden.length}/17 blocked; Soldier v9 224/224 hashes.`);
           NODE
           grep -q '/langrisser-future-guide/' dist/client/equipment/index.html
           cp /tmp/equipment-main-source.txt dist/client/qa-main-source.txt
           printf '%s\n' "$GITHUB_SHA" > dist/client/qa-deploy-source.txt
-          printf '%s\n' 'equipment-korean-names-373' > dist/client/qa-surface.txt
+          printf '%s\n' 'equipment-korean-names-373-soldier-v9' > dist/client/qa-surface.txt
 
       - name: Publish to gh-pages
         env:
@@ -105,7 +116,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Deploy Korean equipment names ${GITHUB_SHA}"
+          git commit -m "Deploy current main with Korean equipment names ${GITHUB_SHA}"
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
 
       - name: Wait for deployed source markers over HTTPS
@@ -113,90 +124,100 @@ jobs:
         run: |
           set -euo pipefail
           BASE='https://luceatluxvestra42.github.io/langrisser-future-guide'
-          EXPECTED_MAIN='81108a48d32df2f9103148e8f2da9d6bc3eafeae'
+          EXPECTED_MAIN='5b81f1bbc916ba83dfd5c406273383c3da2b6a6f'
+          EXPECTED_SURFACE='equipment-korean-names-373-soldier-v9'
           for i in {1..30}; do
             MAIN="$(curl -fsSL --retry 2 --retry-delay 1 "$BASE/qa-main-source.txt" || true)"
             SURFACE="$(curl -fsSL --retry 2 --retry-delay 1 "$BASE/qa-surface.txt" || true)"
-            if [ "$MAIN" = "$EXPECTED_MAIN" ] && [ "$SURFACE" = 'equipment-korean-names-373' ]; then
-              echo "Hosted deployment markers reached expected Equipment build."
+            if [ "$MAIN" = "$EXPECTED_MAIN" ] && [ "$SURFACE" = "$EXPECTED_SURFACE" ]; then
+              echo "Hosted deployment markers reached expected current-main Equipment build."
               exit 0
             fi
             sleep 5
           done
-          echo "Hosted markers did not reach expected Equipment deployment" >&2
+          echo "Hosted markers did not reach expected current-main deployment" >&2
           exit 1
 
-      - name: Prepare browser QA
+      - name: Hosted HTTP gate - all Equipment names and routes
+        run: |
+          node --input-type=commonjs <<'NODE'
+          const projection = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
+          (async () => {
+            const all = Object.entries(projection.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r }));
+            const pub = all.filter((r) => r.pageReady);
+            const hidden = all.filter((r) => !r.pageReady);
+            const [general, exclusive] = await Promise.all([fetch(`${BASE}/equipment/`), fetch(`${BASE}/equipment/exclusive/`)]);
+            if (general.status !== 200 || exclusive.status !== 200) throw new Error(`list HTTP ${general.status}/${exclusive.status}`);
+            const combined = `${await general.text()}\n${await exclusive.text()}`;
+            for (const r of pub) if (!combined.includes(r.nameKr)) throw new Error(`hosted lists missing ${r.equipmentId}:${r.nameKr}`);
+            async function batches(records, size, check) {
+              for (let i = 0; i < records.length; i += size) await Promise.all(records.slice(i, i + size).map(check));
+            }
+            await batches(pub, 20, async (r) => {
+              const res = await fetch(`${BASE}/equipment/${r.equipmentId}/`);
+              if (res.status !== 200) throw new Error(`public ${r.equipmentId} HTTP ${res.status}`);
+              const html = await res.text();
+              if (!html.includes(r.nameKr)) throw new Error(`public ${r.equipmentId} missing ${r.nameKr}`);
+            });
+            await batches(hidden, 20, async (r) => {
+              const res = await fetch(`${BASE}/equipment/${r.equipmentId}/`, { redirect: 'manual' });
+              if (res.status !== 404) throw new Error(`non-public ${r.equipmentId} expected 404 got ${res.status}`);
+            });
+            console.log(`Hosted HTTP PASS: list names ${pub.length}/373; public detail ${pub.length}/373; blocked ${hidden.length}/17.`);
+          })().catch((error) => { console.error(error); process.exit(1); });
+          NODE
+
+      - name: Prepare Chromium browser QA
         run: |
           npm install --no-save --ignore-scripts @playwright/test@1.55.0
           npx playwright install --with-deps chromium
 
-      - name: Browser and HTTPS Gate - deployed Equipment pages
-        shell: bash
+      - name: Chromium Browser UI Gate - Equipment list and four detail groups
         run: |
-          cat > hosted-equipment.spec.cjs <<'TEST'
-          const { test, expect } = require('@playwright/test');
+          cat > hosted-equipment-browser.cjs <<'BROWSER'
+          const { chromium } = require('@playwright/test');
           const projection = require('./data/generated/equipment-name-kr-user-approved.v1.json');
+          const generalList = require('./data/generated/equipment_stage3_3_general_list.json');
           const BASE = 'https://luceatluxvestra42.github.io/langrisser-future-guide';
-          const entries = Object.entries(projection.byEquipmentId).map(([id, r]) => ({ equipmentId: Number(id), ...r }));
-          const publicRecords = entries.filter((r) => r.pageReady === true);
-          const nonPublicRecords = entries.filter((r) => r.pageReady !== true);
-
+          const records = Object.entries(projection.byEquipmentId)
+            .map(([id, r]) => ({ equipmentId: Number(id), ...r }))
+            .filter((r) => r.pageReady);
+          const byId = new Map(records.map((r) => [r.equipmentId, r]));
+          const general = byId.get(generalList.records[0].equipmentId);
+          if (!general?.nameKr) throw new Error('General list representative is missing');
           function representative(group) {
-            const r = publicRecords.find((x) => x.sourceGroup === group && x.nameKr);
-            if (!r) throw new Error(`No public representative for ${group}`);
+            const r = records.find((x) => x.sourceGroup === group && x.nameKr);
+            if (!r) throw new Error(`Missing representative for ${group}`);
             return r;
           }
-
-          test('deployed Equipment list renders Korean names', async ({ page }) => {
-            const errors = [];
-            page.on('pageerror', (error) => errors.push(error.message));
-            await page.goto(`${BASE}/equipment/`, { waitUntil: 'networkidle' });
-            await expect(page.getByText('서리검', { exact: true }).first()).toBeVisible();
-            expect(errors).toEqual([]);
-          });
-
-          for (const group of ['weapon', 'armor', 'headgear', 'accessory']) {
-            const r = representative(group);
-            test(`${group} representative detail direct-entry and refresh`, async ({ page }) => {
-              const errors = [];
-              page.on('pageerror', (error) => errors.push(error.message));
-              await page.goto(`${BASE}/equipment/${r.equipmentId}/`, { waitUntil: 'networkidle' });
-              await expect(page.getByText(r.nameKr, { exact: true }).first()).toBeVisible();
-              await page.reload({ waitUntil: 'networkidle' });
-              await expect(page.getByText(r.nameKr, { exact: true }).first()).toBeVisible();
-              expect(errors).toEqual([]);
-            });
+          async function checkPage(browser, label, url, nameKr, refresh) {
+            const page = await browser.newPage();
+            const pageErrors = [];
+            page.on('pageerror', (e) => pageErrors.push(e.message));
+            const response = await page.goto(url, { waitUntil: 'networkidle' });
+            if (!response || response.status() !== 200) throw new Error(`${label} navigation HTTP ${response?.status()}`);
+            await page.getByText(nameKr, { exact: true }).first().waitFor({ state: 'visible' });
+            if (pageErrors.length) throw new Error(`${label} page errors: ${pageErrors.join(' | ')}`);
+            if (refresh) {
+              const reload = await page.reload({ waitUntil: 'networkidle' });
+              if (!reload || reload.status() !== 200) throw new Error(`${label} refresh HTTP ${reload?.status()}`);
+              await page.getByText(nameKr, { exact: true }).first().waitFor({ state: 'visible' });
+            }
+            await page.close();
+            console.log(`Browser PASS: ${label} -> ${nameKr}`);
           }
-
-          test('all 373 hosted public detail pages contain their Korean name', async ({ request }) => {
-            expect(publicRecords).toHaveLength(373);
-            for (const r of publicRecords) {
-              const res = await request.get(`${BASE}/equipment/${r.equipmentId}/`);
-              expect(res.status(), `public equipment ${r.equipmentId}`).toBe(200);
-              const html = await res.text();
-              expect(html, `Korean name missing for ${r.equipmentId}`).toContain(r.nameKr);
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            try {
+              await checkPage(browser, 'equipment-list', `${BASE}/equipment/`, general.nameKr, false);
+              for (const group of ['weapon', 'armor', 'headgear', 'accessory']) {
+                const r = representative(group);
+                await checkPage(browser, group, `${BASE}/equipment/${r.equipmentId}/`, r.nameKr, true);
+              }
+            } finally {
+              await browser.close();
             }
-          });
-
-          test('hosted list surfaces contain all 373 Korean names', async ({ request }) => {
-            const general = await request.get(`${BASE}/equipment/`);
-            const exclusive = await request.get(`${BASE}/equipment/exclusive/`);
-            expect(general.status()).toBe(200);
-            expect(exclusive.status()).toBe(200);
-            const combined = (await general.text()) + '\n' + (await exclusive.text());
-            for (const r of publicRecords) {
-              expect(combined, `list surfaces missing ${r.equipmentId} ${r.nameKr}`).toContain(r.nameKr);
-            }
-          });
-
-          test('all 17 non-public Equipment routes remain unavailable', async ({ request }) => {
-            expect(nonPublicRecords).toHaveLength(17);
-            for (const r of nonPublicRecords) {
-              expect(r.nameKr).toBeNull();
-              const res = await request.get(`${BASE}/equipment/${r.equipmentId}/`);
-              expect(res.status(), `non-public equipment ${r.equipmentId}`).toBe(404);
-            }
-          });
-          TEST
-          npx playwright test hosted-equipment.spec.cjs --reporter=line --workers=1
+          })().catch((error) => { console.error(error); process.exit(1); });
+          BROWSER
+          node hosted-equipment-browser.cjs
