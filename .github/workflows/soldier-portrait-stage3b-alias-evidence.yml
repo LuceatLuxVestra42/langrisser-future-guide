@@ -1,0 +1,44 @@
+name: Soldier Portrait Stage 3B Alias Evidence
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - '.github/workflows/soldier-portrait-stage3b-alias-evidence.yml'
+      - 'scripts/verify-soldier-portrait-aliases-stage3b.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Verify alias candidates with pinned ability evidence
+        run: node scripts/verify-soldier-portrait-aliases-stage3b.mjs
+      - name: Validate evidence output
+        run: |
+          node <<'NODE'
+          const x = require('./data/validation/soldier-portrait-alias-evidence-stage3b.v1.json');
+          if (x.summary.candidateCount !== x.results.length) throw new Error('candidate count mismatch');
+          if (x.summary.passCount !== x.passedSoldierIds.length) throw new Error('pass count mismatch');
+          if (!x.policy.candidateDiscoveryIsNotAdmission || !x.policy.admissionRequiresAbilityNumericProgressionSubsequence) throw new Error('evidence policy missing');
+          const passed = x.results.filter(r => r.status === 'PASS_ALIAS_EVIDENCE');
+          if (passed.some(r => !r.informative || !Array.isArray(r.subsequencePositions))) throw new Error('invalid passed evidence');
+          console.log(`ALIAS_EVIDENCE_VALIDATED pass=${x.summary.passCount} review=${x.summary.reviewCount}`);
+          NODE
+      - name: Commit alias evidence checkpoint
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/soldier-portrait-alias-evidence-stage3b.v1.json
+          if git diff --cached --quiet; then
+            echo 'NO_EVIDENCE_CHANGES'
+            exit 0
+          fi
+          git commit -m 'Checkpoint Soldier portrait alias evidence'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
