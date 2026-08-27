@@ -20,13 +20,16 @@ on:
       - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
       - 'data/generated/soldier-list-stage5-8.v1.json'
       - 'data/generated/soldier-detail-stage5-2.v1.json'
+      - 'data/generated/soldier-portrait-manifest.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'public/images/army/**'
+      - 'public/images/soldiers/**'
       - 'scripts/import-army-icons-from-drive.mjs'
       - 'scripts/prepare-army-icons.mjs'
       - 'scripts/validate-banner-stage3-7-frontend-integration.mjs'
       - 'src/components/soldier-detail-modal.tsx'
       - 'src/lib/army-icon-assets.ts'
+      - 'src/lib/soldier-portrait-assets.ts'
       - 'src/lib/banner-page.server.ts'
       - 'src/lib/banner-page.static.ts'
       - 'src/lib/banner-page.functions.ts'
@@ -80,6 +83,7 @@ jobs:
           test "$SOLDIER_DETAIL_COUNT" -eq 224
           node -e "const x=require('./data/generated/soldier-list-stage5-8.v1.json'); if(x.summary.recordCount!==224 || x.summary.normalCount!==168 || x.summary.spCount!==56) process.exit(1)"
           node -e "const x=require('./data/generated/army-icon-manifest.v1.json'); if(x.assetsReady!==true || x.importedAssetCount!==10) process.exit(1)"
+          node -e "const x=require('./data/generated/soldier-portrait-manifest.v1.json'); if(x.assetsReady!==true || x.coverage.canonicalSoldierCount!==224 || x.coverage.representativeResolvedCount!==3 || x.records.map(r=>r.soldierId).join(',')!=='102,105,106') process.exit(1)"
           ARMY_ICON_COUNT="$(find public/images/army -maxdepth 1 -type f -name 'Icon_Occupation_*.png' | wc -l | tr -d ' ')"
           test "$ARMY_ICON_COUNT" -eq 10
           test -f dist/client/images/army/Icon_Occupation_Infantryman.png
@@ -92,10 +96,18 @@ jobs:
           test -f dist/client/images/army/Icon_Occupation_Magician.png
           test -f dist/client/images/army/Icon_Occupation_Monk.png
           test -f dist/client/images/army/Icon_Occupation_Monster.png
+          for id in 102 105 106; do
+            test -f "public/images/soldiers/${id}.png"
+            test -f "dist/client/images/soldiers/${id}.png"
+            test -f "dist/client/soldiers/${id}/index.html"
+            grep -q "images/soldiers/${id}.png" "dist/client/soldiers/${id}/index.html"
+          done
           grep -q '/banners' src/routeTree.gen.ts
           grep -q '/equipment' src/routeTree.gen.ts
           grep -q '/soldiers' src/routeTree.gen.ts
           grep -q 'soldiers/\$soldierId' src/routeTree.gen.ts
+          grep -q 'getOfficialSoldierPortraitUrl' src/routes/soldiers.tsx
+          grep -q 'getOfficialSoldierPortraitUrl' src/components/soldier-detail-modal.tsx
           grep -q '224종' dist/client/soldiers/index.html
       - name: Persist static frontend checkpoint
         run: |
