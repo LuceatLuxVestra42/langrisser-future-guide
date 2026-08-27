@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "stage": "hero-list-stage1",
+  "status": "FROZEN",
+  "purpose": "Project the FINAL_FROZEN Hero Stage 6 site consumer into a lightweight Hero list dataset without reopening Hero semantics.",
+  "productionInputs": {
+    "manifest": "data/generated/hero-detail.v1.json",
+    "heroShards": "data/generated/hero-detail/by-id/{heroId}.json"
+  },
+  "sourcePolicy": {
+    "heroStage6FinalFrozenOnly": true,
+    "rawConfigDataRead": false,
+    "stage4ProducerRead": false,
+    "stage5ProducerRead": false,
+    "relationshipRederivation": false,
+    "nameOrIdHeuristics": false
+  },
+  "expectedPopulation": {
+    "heroCount": 267,
+    "releasedSpHeroCount": 25,
+    "notReleasedSpHeroCount": 242
+  },
+  "recordProjection": {
+    "heroId": "shard.heroId",
+    "detailRoute": "synthetic stable navigation path /heroes/{heroId}",
+    "identity": "shard.identity",
+    "rarity": "shard.presentation.rarity",
+    "hasSp": "shard.sp.status === RELEASED",
+    "spStatus": "shard.sp.status",
+    "factions": "shard.presentation.factions",
+    "origin": "shard.presentation.origin",
+    "card.sourceArtworkPath": "shard.presentation.artwork.sourceAssetPath",
+    "card.webAssetPath": "null until asset presentation stage",
+    "card.assetStatus": "SOURCE_ONLY when source path exists; SOURCE_MISSING otherwise"
+  },
+  "explicitlyDeferred": {
+    "releaseChronology": "Do not infer release order from Hero ID or current record order.",
+    "webArtworkResolution": "Source locator is preserved; web-served asset mapping is a later presentation stage.",
+    "fusionPowerBadge": "No badge inference from skill names, descriptions, or Hero relations.",
+    "soloLimitedTag": "No permanent Hero tag inference from banner pickup cardinality."
+  },
+  "technicalOrdering": {
+    "mode": "HERO_ID_ASC_FOR_DETERMINISTIC_ARTIFACT_ONLY",
+    "isDisplayReleaseOrder": false
+  },
+  "completionGate": {
+    "manifestStage": "hero-page-6-3",
+    "manifestCompletion": "COMPLETE",
+    "manifestStorageMode": "SHARDED_BY_HERO",
+    "all267ShardsPresent": true,
+    "all267ShardIntegrityPass": true,
+    "all267SiteUsable": true,
+    "uniqueHeroIds": 267,
+    "spPopulationPreserved": true,
+    "forbiddenPresentationInferenceCount": 0,
+    "hardErrorCount": 0
+  }
+}
