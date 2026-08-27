@@ -22,6 +22,8 @@ on:
       - 'data/generated/soldier-detail-stage5-2.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'public/images/army/**'
+      - 'public/images/shared/stats/**'
+      - 'public/images/shared/movement/**'
       - 'scripts/import-army-icons-from-drive.mjs'
       - 'scripts/prepare-army-icons.mjs'
       - 'scripts/validate-banner-stage3-7-frontend-integration.mjs'
@@ -89,6 +91,18 @@ jobs:
           test -f dist/client/images/army/Icon_Occupation_Magician.png
           test -f dist/client/images/army/Icon_Occupation_Monk.png
           test -f dist/client/images/army/Icon_Occupation_Monster.png
+          test -f dist/client/images/shared/stats/Icon_HP.png
+          test -f dist/client/images/shared/stats/Icon_Attack.png
+          test -f dist/client/images/shared/stats/Icon_Defense.png
+          test -f dist/client/images/shared/stats/Icon_MagicDefense.png
+          test -f dist/client/images/shared/stats/Icon_Range.png
+          test -f dist/client/images/shared/movement/Move_Ride.png
+          test -f dist/client/images/shared/movement/Move_Walk.png
+          test -f dist/client/images/shared/movement/Move_Water.png
+          test -f dist/client/images/shared/movement/Move_Fly.png
+          test -f dist/client/images/shared/movement/Move_FieldArmy.png
+          grep -q 'Icon_Range.png' src/components/soldier-detail-modal.tsx
+          grep -q 'Move_FieldArmy.png' src/components/soldier-detail-modal.tsx
           grep -q '/banners' src/routeTree.gen.ts
           grep -q '/equipment' src/routeTree.gen.ts
           grep -q '/soldiers' src/routeTree.gen.ts
