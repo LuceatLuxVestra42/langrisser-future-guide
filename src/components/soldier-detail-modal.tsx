@@ -150,7 +150,7 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
 
       <div className="space-y-6 p-4 sm:p-5">
         <section aria-label={`${displayName} 핵심 정보`}>
-          <div className="grid gap-3 sm:h-[180px] sm:grid-cols-[180px_minmax(0,1fr)_210px] sm:items-stretch lg:h-[210px] lg:grid-cols-[210px_minmax(0,1fr)_220px]">
+          <div className="grid gap-3 sm:h-[180px] sm:grid-cols-[180px_minmax(0,1fr)_156px] sm:items-stretch lg:h-[210px] lg:grid-cols-[210px_minmax(0,1fr)_168px]">
             <SoldierPreview record={record} />
 
             <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-background p-3 sm:h-full sm:p-4">
@@ -279,13 +279,28 @@ function SoldierPreview({ record }: { record: SoldierPrototypeRecord }) {
 }
 
 function SoldierStatTable({ record }: { record: SoldierPrototypeRecord }) {
+  const assetUrl = (folder: "stats" | "movement", fileName: string) =>
+    `${import.meta.env.BASE_URL}images/shared/${folder}/${fileName}`;
+
+  const movementIcons: Record<number, string> = {
+    1: "Move_Ride.png",
+    2: "Move_Walk.png",
+    3: "Move_Water.png",
+    4: "Move_Fly.png",
+    5: "Move_FieldArmy.png",
+  };
+
   const stats = [
-    { label: "사거리", value: record.combat.range },
-    { label: "이동", value: `타입 ${record.combat.moveType} · ${record.combat.move}칸` },
-    { label: "생명", value: record.combat.hp },
-    { label: "공격", value: record.combat.atk },
-    { label: "방어", value: record.combat.def },
-    { label: "마방", value: record.combat.mdef },
+    { label: "사거리", icon: assetUrl("stats", "Icon_Range.png"), value: record.combat.range },
+    {
+      label: "이동",
+      icon: assetUrl("movement", movementIcons[record.combat.moveType] ?? "Move_Walk.png"),
+      value: record.combat.move,
+    },
+    { label: "생명", icon: assetUrl("stats", "Icon_HP.png"), value: record.combat.hp },
+    { label: "공격", icon: assetUrl("stats", "Icon_Attack.png"), value: record.combat.atk },
+    { label: "방어", icon: assetUrl("stats", "Icon_Defense.png"), value: record.combat.def },
+    { label: "마방", icon: assetUrl("stats", "Icon_MagicDefense.png"), value: record.combat.mdef },
   ];
 
   return (
@@ -293,16 +308,21 @@ function SoldierStatTable({ record }: { record: SoldierPrototypeRecord }) {
       {stats.map((stat, index) => (
         <div
           key={stat.label}
-          className={`flex min-h-[54px] flex-col items-center justify-center px-2 py-2 text-center sm:min-h-0 ${
+          title={stat.label}
+          className={`flex min-h-[48px] items-center justify-center gap-1.5 px-1.5 py-1.5 sm:min-h-0 ${
             index % 2 === 0 ? "sm:border-r sm:border-border" : ""
           } ${index < 4 ? "sm:border-b sm:border-border" : ""}`}
         >
-          <p className="text-[9px] font-bold leading-none text-muted-foreground sm:text-[10px]">
-            {stat.label}
-          </p>
-          <p className="mt-1 text-xs font-black leading-tight tabular-nums text-foreground sm:text-sm">
+          <img
+            src={stat.icon}
+            alt=""
+            aria-hidden="true"
+            className="h-5 w-5 shrink-0 object-contain sm:h-6 sm:w-6"
+          />
+          <span className="text-sm font-black leading-none tabular-nums text-foreground sm:text-base">
             {stat.value}
-          </p>
+          </span>
+          <span className="sr-only">{stat.label}</span>
         </div>
       ))}
     </div>
