@@ -6,7 +6,9 @@ on:
       - '.github/workflows/banner-stage3-7-frontend-integration.yml'
       - 'vite.config.ts'
       - 'data/contracts/banner-stage3-7-frontend-integration.v1.json'
+      - 'data/contracts/soldier-low-tier-cn-kr-map.v1.json'
       - 'data/configdata/ConfigDataArmyInfo.json'
+      - 'data/configdata/ConfigDataSPSoldierInfo.json'
       - 'data/generated/army-icon-manifest.v1.json'
       - 'data/generated/banner-stage3-3-basic-table-consumer.v1.json'
       - 'data/generated/banner-stage3-4-wish-consumer.v1.json'
@@ -25,11 +27,14 @@ on:
       - 'data/generated/soldier-portrait-manifest.v3.json'
       - 'data/generated/soldier-portrait-manifest.v4.json'
       - 'data/generated/soldier-portrait-manifest.v5.json'
+      - 'data/generated/soldier-portrait-manifest.v6.json'
       - 'data/validation/soldier-portrait-alias-evidence-stage3b.v1.json'
       - 'data/validation/soldier-portrait-stage3e-t3-evidence.v1.json'
       - 'data/validation/soldier-portrait-stage3f-latest-t3-models.v1.json'
       - 'data/validation/soldier-portrait-stage3f-latest-t3-evidence.v1.json'
+      - 'data/validation/soldier-portrait-stage3g-low-tier-evidence.v1.json'
       - 'data/checkpoints/soldier-frontend-stage3f-latest-t3.txt'
+      - 'data/checkpoints/soldier-frontend-stage3g-low-tier.txt'
       - 'data/hero-name-master.v1.json'
       - 'public/images/army/**'
       - 'public/images/soldiers/**'
@@ -39,6 +44,7 @@ on:
       - 'scripts/expand-soldier-portraits-stage3e-t3.mjs'
       - 'scripts/report-soldier-portrait-stage3f-latest-t3-models.mjs'
       - 'scripts/expand-soldier-portraits-stage3f-latest-t3.mjs'
+      - 'scripts/expand-soldier-portraits-stage3g-low-tier.mjs'
       - 'scripts/import-army-icons-from-drive.mjs'
       - 'scripts/prepare-army-icons.mjs'
       - 'scripts/validate-banner-stage3-7-frontend-integration.mjs'
@@ -102,16 +108,20 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
-          const x = require('./data/generated/soldier-portrait-manifest.v5.json');
-          if (x.assetsReady !== true || x.status !== 'PASS_WITH_REVIEW') throw new Error('Stage 3F portrait manifest not ready');
-          if (x.coverage.canonicalSoldierCount !== 224 || x.coverage.resolvedCount !== 158 || x.coverage.unresolvedCount !== 66) throw new Error('Stage 3F portrait coverage mismatch');
-          if (x.coverage.resolvedNormalCount !== 158 || x.coverage.resolvedSpCount !== 0) throw new Error('Stage 3F normal/SP coverage mismatch');
-          if (x.coverage.tier1Resolved !== 7 || x.coverage.tier2Resolved !== 22 || x.coverage.tier3Resolved !== 129) throw new Error('Stage 3F tier coverage mismatch');
-          if (x.coverage.newlyResolvedCount !== 13 || x.coverage.remainingT3UnresolvedCount !== 0) throw new Error('Stage 3F closeout summary mismatch');
-          if (x.newlyResolvedSoldierIds.join(',') !== '135,136,251,427,516,648,819,1033,1035,1037,1038,1039,1118') throw new Error('Stage 3F newly resolved IDs mismatch');
-          if (x.records.length !== 158 || x.unresolved.length !== 66) throw new Error('Stage 3F record arrays mismatch');
+          const x = require('./data/generated/soldier-portrait-manifest.v6.json');
+          if (x.assetsReady !== true || x.status !== 'PASS_WITH_REVIEW') throw new Error('Stage 3G portrait manifest not ready');
+          if (x.coverage.canonicalSoldierCount !== 224 || x.coverage.canonicalNormalCount !== 168 || x.coverage.canonicalSpCount !== 56) throw new Error('Stage 3G canonical coverage mismatch');
+          if (x.coverage.resolvedCount !== 168 || x.coverage.unresolvedCount !== 56) throw new Error('Stage 3G portrait coverage mismatch');
+          if (x.coverage.resolvedNormalCount !== 168 || x.coverage.resolvedSpCount !== 0) throw new Error('Stage 3G normal/SP coverage mismatch');
+          if (x.coverage.tier1Resolved !== 12 || x.coverage.tier2Resolved !== 27 || x.coverage.tier3Resolved !== 129) throw new Error('Stage 3G tier coverage mismatch');
+          if (x.coverage.newlyResolvedCount !== 10 || x.coverage.remainingNormalUnresolvedCount !== 0 || x.coverage.remainingSpUnresolvedCount !== 56) throw new Error('Stage 3G closeout summary mismatch');
+          if (x.newlyResolvedSoldierIds.join(',') !== '300,303,407,503,600,619,625,1000,1100,1108') throw new Error('Stage 3G newly resolved IDs mismatch');
+          if (x.records.length !== 168 || x.unresolved.length !== 56) throw new Error('Stage 3G record arrays mismatch');
           const resolvedIds = new Set(x.records.map((r) => r.soldierId));
-          if (resolvedIds.size !== 158) throw new Error('duplicate resolved Soldier portrait IDs');
+          if (resolvedIds.size !== 168) throw new Error('duplicate resolved Soldier portrait IDs');
+          const sp = require('./data/configdata/ConfigDataSPSoldierInfo.json');
+          const spIds = new Set(sp.map((r) => Number(r.ID)));
+          if (spIds.size !== 56) throw new Error('SP canonical ID set mismatch');
           for (const record of x.records) {
             const publicFile = path.join('public/images/soldiers', record.fileName);
             const distFile = path.join('dist/client/images/soldiers', record.fileName);
@@ -124,12 +134,24 @@ jobs:
           }
           for (const record of x.unresolved) {
             if (resolvedIds.has(record.soldierId)) throw new Error(`resolved/unresolved overlap ${record.soldierId}`);
+            if (!spIds.has(Number(record.soldierId))) throw new Error(`normal Soldier remains unresolved ${record.soldierId}`);
           }
-          const evidence = require('./data/validation/soldier-portrait-stage3f-latest-t3-evidence.v1.json');
-          if (evidence.targetCount !== 13 || evidence.passCount !== 13 || evidence.rows.length !== 13 || evidence.rows.some((r) => r.status !== 'PASS')) throw new Error('Stage 3F evidence mismatch');
+          if (new Set(x.unresolved.map((r) => Number(r.soldierId))).size !== 56) throw new Error('unresolved SP set duplicate/mismatch');
+          const evidence = require('./data/validation/soldier-portrait-stage3g-low-tier-evidence.v1.json');
+          if (evidence.targetCount !== 10 || evidence.passCount !== 10 || evidence.mappingContractCount !== 39 || evidence.rows.length !== 10 || evidence.rows.some((r) => r.status !== 'PASS')) throw new Error('Stage 3G evidence mismatch');
+          if (evidence.driveResolvedCount !== 9 || evidence.pinnedBwikiResolvedCount !== 1) throw new Error('Stage 3G source split mismatch');
+          if (evidence.rows.filter((r) => r.tier === 1).length !== 5 || evidence.rows.filter((r) => r.tier === 2).length !== 5) throw new Error('Stage 3G target tier split mismatch');
+          const pinned = evidence.rows.filter((r) => r.assetResolution === 'PINNED_BWIKI_EXACT_CN_PAGE_IMAGE');
+          if (pinned.length !== 1 || pinned[0].soldierId !== 1000 || pinned[0].nameCn !== '骷髅兵' || pinned[0].nameKr !== '해골병사' || pinned[0].bwikiFileTitle !== 'File:Q骷髅兵.png') throw new Error('Stage 3G pinned BWIKI evidence mismatch');
+          const map = require('./data/contracts/soldier-low-tier-cn-kr-map.v1.json');
+          if (map.status !== 'USER_REVIEWED' || map.rows.length !== 39) throw new Error('Stage 3G reviewed name map mismatch');
+          const krByCn = new Map(map.rows.map((r) => [r.nameCn, r.nameKr]));
+          if (evidence.rows.some((r) => krByCn.get(r.nameCn) !== r.nameKr)) throw new Error('Stage 3G exact CN-KR mapping mismatch');
+          const stage3fEvidence = require('./data/validation/soldier-portrait-stage3f-latest-t3-evidence.v1.json');
+          if (stage3fEvidence.targetCount !== 13 || stage3fEvidence.passCount !== 13 || stage3fEvidence.rows.length !== 13 || stage3fEvidence.rows.some((r) => r.status !== 'PASS')) throw new Error('Stage 3F evidence regression');
           const models = require('./data/validation/soldier-portrait-stage3f-latest-t3-models.v1.json');
-          if (models.targetCount !== 13 || models.rows.length !== 13 || models.rows.some((r) => !r.nameCn || !r.model || !r.modelStem)) throw new Error('Stage 3F model-key checkpoint mismatch');
-          console.log(`SOLDIER_PORTRAIT_STAGE3F PASS resolved=${x.coverage.resolvedCount} fallback=${x.coverage.unresolvedCount} t3=${x.coverage.tier3Resolved} spReuse=${x.coverage.resolvedSpCount}`);
+          if (models.targetCount !== 13 || models.rows.length !== 13 || models.rows.some((r) => !r.nameCn || !r.model || !r.modelStem)) throw new Error('Stage 3F model-key checkpoint regression');
+          console.log(`SOLDIER_PORTRAIT_STAGE3G PASS resolved=${x.coverage.resolvedCount} fallback=${x.coverage.unresolvedCount} normal=${x.coverage.resolvedNormalCount} t1=${x.coverage.tier1Resolved} t2=${x.coverage.tier2Resolved} t3=${x.coverage.tier3Resolved} spReuse=${x.coverage.resolvedSpCount}`);
           NODE
           ARMY_ICON_COUNT="$(find public/images/army -maxdepth 1 -type f -name 'Icon_Occupation_*.png' | wc -l | tr -d ' ')"
           test "$ARMY_ICON_COUNT" -eq 10
@@ -153,7 +175,7 @@ jobs:
           grep -q '/equipment' src/routeTree.gen.ts
           grep -q '/soldiers' src/routeTree.gen.ts
           grep -q 'soldiers/\$soldierId' src/routeTree.gen.ts
-          grep -q 'soldier-portrait-manifest.v5.json' src/lib/soldier-portrait-assets.ts
+          grep -q 'soldier-portrait-manifest.v6.json' src/lib/soldier-portrait-assets.ts
           grep -q 'getOfficialSoldierPortraitUrl' src/routes/soldiers.tsx
           grep -q 'getOfficialSoldierPortraitUrl' src/components/soldier-detail-modal.tsx
           grep -q '224종' dist/client/soldiers/index.html
