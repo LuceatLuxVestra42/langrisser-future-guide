@@ -1,5 +1,6 @@
 import soldierCombatJson from "../../data/generated/soldier-detail-stage5-2.v1.json";
 import soldierListJson from "../../data/generated/soldier-list-stage5-8.v1.json";
+import soldierLowerTierNameKrJson from "../../data/presentation/soldier-lower-tier-name-kr.v1.json";
 
 export type SoldierUiGroup =
   | "INFANTRY"
@@ -74,11 +75,77 @@ type SoldierCombatSource = {
   }>;
 };
 
+type SoldierLowerTierNameKrSource = {
+  status: string;
+  scope: string;
+  coverage: {
+    tier1Count: number;
+    tier2Count: number;
+    recordCount: number;
+    unresolvedCount: number;
+  };
+  records: Array<{
+    soldierId: number;
+    tier: number;
+    nameCn: string;
+    nameKr: string;
+  }>;
+};
+
 const soldierList = soldierListJson as unknown as SoldierListSource;
 const soldierCombat = soldierCombatJson as unknown as SoldierCombatSource;
+const soldierLowerTierNameKr = soldierLowerTierNameKrJson as unknown as SoldierLowerTierNameKrSource;
 const combatById = new Map(
   soldierCombat.records.map((record) => [record.soldierId, record.combat]),
 );
+
+if (
+  soldierLowerTierNameKr.status !== "PASS" ||
+  soldierLowerTierNameKr.scope !== "frontend-presentation-only" ||
+  soldierLowerTierNameKr.coverage.recordCount !== soldierList.summary.lowerTierCount ||
+  soldierLowerTierNameKr.coverage.unresolvedCount !== 0
+) {
+  throw new Error("Tier 1-2 Korean Soldier presentation source is not complete.");
+}
+
+const lowerTierNameKrById = new Map(
+  soldierLowerTierNameKr.records.map((record) => [record.soldierId, record]),
+);
+
+if (lowerTierNameKrById.size !== soldierLowerTierNameKr.records.length) {
+  throw new Error("Tier 1-2 Korean Soldier presentation source contains duplicate Soldier IDs.");
+}
+
+const lowerTierBaseRecords = soldierList.records.filter(
+  (record) => record.sortBucket === "LOWER_TIER_TECHNICAL",
+);
+
+if (lowerTierBaseRecords.length !== soldierList.summary.lowerTierCount) {
+  throw new Error("Frozen Soldier list lower-tier count mismatch.");
+}
+
+for (const record of lowerTierBaseRecords) {
+  const presentation = lowerTierNameKrById.get(record.soldierId);
+  if (!presentation) {
+    throw new Error(`Missing Korean presentation name for lower-tier Soldier ${record.soldierId}.`);
+  }
+  if (
+    record.isSp ||
+    (record.tier !== 1 && record.tier !== 2) ||
+    presentation.tier !== record.tier ||
+    presentation.nameCn !== record.nameCn ||
+    !presentation.nameKr.trim()
+  ) {
+    throw new Error(`Tier 1-2 Korean presentation mapping mismatch for Soldier ${record.soldierId}.`);
+  }
+}
+
+for (const presentation of soldierLowerTierNameKr.records) {
+  const base = soldierList.records.find((record) => record.soldierId === presentation.soldierId);
+  if (!base || base.sortBucket !== "LOWER_TIER_TECHNICAL") {
+    throw new Error(`Unexpected lower-tier Korean presentation mapping for Soldier ${presentation.soldierId}.`);
+  }
+}
 
 const BUCKET_ORDER: Record<string, number> = {
   SP: 0,
@@ -110,8 +177,17 @@ export function readSoldierPrototypePageData() {
       throw new Error(`Soldier ${record.soldierId} is missing Stage 5-2 combat data.`);
     }
 
+    const lowerTierNameKr = lowerTierNameKrById.get(record.soldierId);
+    const presentationRecord = lowerTierNameKr
+      ? {
+          ...record,
+          nameKr: lowerTierNameKr.nameKr,
+          nameKrStatus: "confirmed-presentation",
+        }
+      : record;
+
     return {
-      ...record,
+      ...presentationRecord,
       combat,
     } satisfies SoldierPrototypeRecord;
   });
