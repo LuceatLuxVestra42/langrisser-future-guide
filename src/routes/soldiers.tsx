@@ -141,10 +141,12 @@ function SoldierPage() {
         </header>
 
         <section className="mt-7 overflow-hidden rounded-xl border border-border bg-card">
-          <div className="grid grid-cols-4 border-b border-border sm:grid-cols-6 lg:grid-cols-11">
-            <GroupButton selected={armyFilter === null} onClick={() => setArmyFilter(null)}>
-              전체
-            </GroupButton>
+          <div className="grid grid-cols-6">
+            <div className="row-span-2 grid">
+              <GroupButton selected={armyFilter === null} onClick={() => setArmyFilter(null)}>
+                전체
+              </GroupButton>
+            </div>
             {ARMY_FILTERS.map((item) => (
               <GroupButton
                 key={item.id}
@@ -258,7 +260,7 @@ function GroupButton({
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`min-h-[44.8px] border-r border-border px-1 text-xs font-bold transition last:border-r-0 sm:min-h-[51.2px] sm:text-sm ${
+      className={`min-h-[35.84px] border-b border-r border-border px-1 text-xs font-bold transition sm:min-h-[40.96px] sm:text-sm ${
         selected
           ? "bg-foreground text-background"
           : "bg-card text-foreground hover:bg-muted"
