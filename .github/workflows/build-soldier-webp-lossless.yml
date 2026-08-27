@@ -1,0 +1,167 @@
+name: Build Soldier WebP Lossless
+
+on:
+  push:
+    branches:
+      - work/soldier-webp-optimize
+    paths:
+      - '.github/workflows/build-soldier-webp-lossless.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install WebP tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webp imagemagick
+
+      - name: Verify canonical PNG source set
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const m = require('./data/generated/soldier-portrait-manifest.v9.json');
+          if (m.status !== 'PASS' || m.coverage.resolvedCount !== 224 || m.records.length !== 224) throw new Error('manifest v9 coverage mismatch');
+          for (const r of m.records) {
+            if (!r.fileName.endsWith('.png')) throw new Error(`non-PNG manifest source ${r.soldierId}`);
+            const p = `public/${m.publicRoot}/${r.fileName}`;
+            if (!fs.existsSync(p)) throw new Error(`missing PNG ${p}`);
+            const buf = fs.readFileSync(p);
+            if (buf.length !== r.size) throw new Error(`PNG size mismatch ${r.soldierId}`);
+            const sha = crypto.createHash('sha256').update(buf).digest('hex');
+            if (sha !== r.sha256) throw new Error(`PNG hash mismatch ${r.soldierId}`);
+          }
+          console.log('PASS canonical PNG source 224/224');
+          NODE
+
+      - name: Convert 224 portraits to lossless WebP
+        run: |
+          rm -rf public/images/soldiers-webp
+          mkdir -p public/images/soldiers-webp
+          node <<'NODE'
+          const { execFileSync } = require('child_process');
+          const m = require('./data/generated/soldier-portrait-manifest.v9.json');
+          for (const r of m.records) {
+            const src = `public/${m.publicRoot}/${r.fileName}`;
+            const dst = `public/images/soldiers-webp/${r.soldierId}.webp`;
+            execFileSync('cwebp', ['-quiet', '-lossless', '-z', '9', '-metadata', 'none', src, '-o', dst], { stdio: 'inherit' });
+          }
+          NODE
+
+      - name: Validate decoded pixels, dimensions and build WebP manifest
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const { execFileSync, spawnSync } = require('child_process');
+          const src = require('./data/generated/soldier-portrait-manifest.v9.json');
+          const records = [];
+          let pngTotal = 0;
+          let webpTotal = 0;
+          for (const r of src.records) {
+            const png = `public/${src.publicRoot}/${r.fileName}`;
+            const webp = `public/images/soldiers-webp/${r.soldierId}.webp`;
+            if (!fs.existsSync(webp)) throw new Error(`missing WebP ${r.soldierId}`);
+            const cmp = spawnSync('compare', ['-metric', 'AE', png, webp, 'null:'], { encoding: 'utf8' });
+            const metric = (cmp.stderr || cmp.stdout || '').trim();
+            if (cmp.status !== 0 || metric !== '0') throw new Error(`decoded pixel mismatch ${r.soldierId}: status=${cmp.status} metric=${metric}`);
+            const dims = execFileSync('identify', ['-format', '%w %h', webp], { encoding: 'utf8' }).trim().split(/\s+/).map(Number);
+            if (dims[0] !== r.width || dims[1] !== r.height) throw new Error(`dimension mismatch ${r.soldierId}`);
+            const stat = fs.statSync(webp);
+            const buf = fs.readFileSync(webp);
+            const sha = crypto.createHash('sha256').update(buf).digest('hex');
+            pngTotal += r.size;
+            webpTotal += stat.size;
+            records.push({
+              soldierId: r.soldierId,
+              nameKr: r.nameKr ?? r.presentationNameEvidence ?? null,
+              fileName: `${r.soldierId}.webp`,
+              sourceKind: 'DERIVED_WEBP_LOSSLESS_FROM_V9_PNG',
+              resolutionMethod: 'LOSSLESS_WEBP_PIXEL_EXACT_FROM_CANONICAL_V9_PNG',
+              sourcePngFileName: r.fileName,
+              sourcePngSha256: r.sha256,
+              sha256: sha,
+              size: stat.size,
+              width: r.width,
+              height: r.height,
+              isSp: r.isSp,
+            });
+          }
+          const savingBytes = pngTotal - webpTotal;
+          const savingRatio = savingBytes / pngTotal;
+          const out = {
+            version: 1,
+            stage: 'frontend-soldier-portrait-webp-lossless',
+            status: savingRatio >= 0.15 ? 'PASS' : 'INSUFFICIENT_SAVINGS',
+            publicRoot: 'images/soldiers-webp',
+            assetsReady: savingRatio >= 0.15,
+            sourceManifest: 'data/generated/soldier-portrait-manifest.v9.json',
+            policy: {
+              sourcePngPreserved: true,
+              webpMode: 'lossless',
+              decodedPixelExact: true,
+              alphaPreservedByDecodedPixelEquality: true,
+              dimensionsPreserved: true,
+              minimumSavingRatioForActivation: 0.15
+            },
+            coverage: {
+              canonicalSoldierCount: 224,
+              resolvedCount: records.length,
+              unresolvedCount: 224 - records.length,
+              resolvedSpCount: records.filter(r => r.isSp).length
+            },
+            sizeAudit: {
+              pngTotalBytes: pngTotal,
+              webpTotalBytes: webpTotal,
+              savingBytes,
+              savingRatio,
+              pngTotalMiB: pngTotal / 1024 / 1024,
+              webpTotalMiB: webpTotal / 1024 / 1024
+            },
+            records
+          };
+          fs.writeFileSync('data/generated/soldier-portrait-web-manifest.v1.json', JSON.stringify(out, null, 2) + '\n');
+          console.log(JSON.stringify(out.sizeAudit, null, 2));
+          if (records.length !== 224) throw new Error(`WebP count ${records.length}`);
+          if (records.filter(r => r.isSp).length !== 56) throw new Error('SP WebP count mismatch');
+          if (savingRatio < 0.15) throw new Error(`lossless WebP savings insufficient: ${(savingRatio*100).toFixed(2)}%`);
+          console.log(`PASS lossless WebP 224/224; saving ${(savingRatio*100).toFixed(2)}%`);
+          NODE
+
+      - name: Switch frontend resolver to WebP manifest
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const p = 'src/lib/soldier-portrait-assets.ts';
+          let s = fs.readFileSync(p, 'utf8');
+          const old = 'import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-manifest.v9.json";';
+          const next = 'import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-web-manifest.v1.json";';
+          if (!s.includes(old)) throw new Error('resolver v9 import not found');
+          s = s.replace(old, next);
+          fs.writeFileSync(p, s);
+          NODE
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Production build
+        run: bun run build
+
+      - name: Commit WebP assets and resolver switch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/images/soldiers-webp data/generated/soldier-portrait-web-manifest.v1.json src/lib/soldier-portrait-assets.ts
+          git commit -m "Add lossless WebP Soldier portraits and activate web delivery"
+          git push
