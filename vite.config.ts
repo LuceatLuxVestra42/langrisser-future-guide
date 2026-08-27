@@ -8,9 +8,14 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 import exclusiveEquipmentJson from "./data/generated/equipment_stage3_5_exclusive_consumer.json" with { type: "json" };
 import generalEquipmentJson from "./data/generated/equipment_stage3_3_general_list.json" with { type: "json" };
+import soldierListJson from "./data/generated/soldier-list-stage5-8.v1.json" with { type: "json" };
 
 type EquipmentIdRecord = {
   equipmentId: number;
+};
+
+type SoldierIdRecord = {
+  soldierId: number;
 };
 
 const generalEquipmentIds = (
@@ -23,9 +28,19 @@ const exclusiveEquipmentIds = (
 
 const equipmentIds = [...generalEquipmentIds, ...exclusiveEquipmentIds];
 
+const soldierIds = (
+  soldierListJson as unknown as { records: SoldierIdRecord[] }
+).records.map((record) => record.soldierId);
+
 if (equipmentIds.length !== 373 || new Set(equipmentIds).size !== 373) {
   throw new Error(
     `Expected 373 unique public equipment IDs for static pages; got ${equipmentIds.length} records / ${new Set(equipmentIds).size} unique.`,
+  );
+}
+
+if (soldierIds.length !== 224 || new Set(soldierIds).size !== 224) {
+  throw new Error(
+    `Expected 224 unique public Soldier IDs for static pages; got ${soldierIds.length} records / ${new Set(soldierIds).size} unique.`,
   );
 }
 
@@ -34,6 +49,14 @@ const equipmentDetailPages = equipmentIds.map((equipmentId) => ({
   prerender: {
     enabled: true,
     outputPath: `/equipment/${equipmentId}/index.html`,
+  },
+}));
+
+const soldierDetailPages = soldierIds.map((soldierId) => ({
+  path: `/soldiers/${soldierId}`,
+  prerender: {
+    enabled: true,
+    outputPath: `/soldiers/${soldierId}/index.html`,
   },
 }));
 
@@ -89,6 +112,7 @@ export default defineConfig({
         },
       },
       ...equipmentDetailPages,
+      ...soldierDetailPages,
     ],
   },
 });
