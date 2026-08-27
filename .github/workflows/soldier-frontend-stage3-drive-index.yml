@@ -15,54 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-      - name: Match legacy Soldier records to canonical combat signatures
+      - name: Inspect representative legacy stat markup
         run: |
           node <<'NODE'
-          import fs from 'node:fs';
-          const canonical = JSON.parse(fs.readFileSync('data/generated/soldier-detail-stage5-2.v1.json','utf8')).records;
-          const pages = [
-            {page:'보병', direct:'INFANTRY'}, {page:'창병', direct:'LANCER'}, {page:'기병', direct:'CAVALRY'},
-            {page:'비병', subgroup:{1:'FLYING',2:'WATER'}}, {page:'궁병', subgroup:{1:'ARCHER',2:'ASSASSIN'}},
-            {page:'승병', subgroup:{1:'MAGE',2:'HOLY',3:'DEMON'}},
-          ];
-          const legacy=[];
-          const statValue=(chunk,label)=>{
-            const m=chunk.match(new RegExp(`<!--\\s*${label}\\s*-->[\\s\\S]{0,900}?<td[^>]*>\\s*([0-9]+)\\s*<\\/td>`,'i'));
-            return m?Number(m[1]):null;
-          };
-          for(const def of pages){
-            const url=`https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/troop/${encodeURIComponent(def.page)}.html`;
-            const res=await fetch(url); const text=await res.text(); if(!res.ok) throw new Error(`${def.page} ${res.status}`);
-            const headings=[...text.matchAll(/<div class="view_title">([123])티어 용병<\/div>/g)].map(m=>({tier:Number(m[1]),index:m.index}));
-            const imgs=[...text.matchAll(/<img class="filterDiv [^"]+"[^>]*src="(\.\.\/img\/troop\/[^\"]+\/병종\/(\d+)_([^\"]+\.webp))"[^>]*>/g)];
-            for(let i=0;i<imgs.length;i++){
-              const m=imgs[i], h=headings.filter(h=>h.index<m.index).at(-1); if(!h||h.tier>3) continue;
-              let body=m[3].replace(/\.webp$/,''); let subgroup=null; const sm=body.match(/^(\d+)_(.+)$/); if(sm){subgroup=Number(sm[1]);body=sm[2];}
-              const armyType=def.direct??(def.subgroup?def.subgroup[subgroup]:null)??null;
-              const end=imgs[i+1]?.index??Math.min(text.length,m.index+24000); const chunk=text.slice(m.index,end);
-              const name=chunk.match(/<h2>\s*([^<]+?)\s*<\/h2>/)?.[1]?.trim()??body;
-              legacy.push({tier:h.tier,armyType,name,src:m[1],stats:{range:statValue(chunk,'사거리'),move:statValue(chunk,'이동거리'),hp:statValue(chunk,'생명'),atk:statValue(chunk,'공격'),def:statValue(chunk,'방어'),mdef:statValue(chunk,'마방')}});
-            }
+          const url='https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/troop/%EC%B0%BD%EB%B3%91.html';
+          const text=await (await fetch(url)).text();
+          const start=text.indexOf('11_정예창병.webp');
+          const next=text.indexOf('<img class="filterDiv', start+1);
+          const chunk=text.slice(start, next>start?next:start+15000);
+          console.log(`start=${start} next=${next} chunk=${chunk.length}`);
+          for(const label of ['사거리','이동거리','생명','공격','방어','마방']){
+            const i=chunk.indexOf(`<!--${label}-->`);
+            console.log(`LABEL=${label} index=${i}`);
+            if(i>=0) console.log(chunk.slice(i,i+500).replace(/\n/g,' '));
           }
-          const complete=legacy.filter(x=>x.armyType&&!Object.values(x.stats).some(v=>v==null));
-          console.log(`LEGACY_STATS parsed=${complete.length}/${legacy.length}`);
-          console.log(`LEGACY_SAMPLE ${JSON.stringify(complete.slice(0,5))}`);
-          const sig=x=>[x.armyType,x.tier,x.range,x.move,x.hp,x.atk,x.def,x.mdef].join(':');
-          const bySig=new Map(); for(const x of complete){const k=sig({...x,...x.stats});const a=bySig.get(k)??[];a.push(x);bySig.set(k,a);}
-          const norm=s=>s.replace(/[\s_\-]/g,'').toLowerCase();
-          let unique=0,ambiguous=0,missing=0,nameChecks=0,nameContradictions=0; const unresolved=[];
-          for(const r of canonical.filter(r=>!r.identity.isSp)){
-            const k=sig({armyType:r.identity.armyType,tier:r.identity.tier,...r.combat}); const c=bySig.get(k)??[];
-            if(c.length===1){unique++; if(r.identity.nameKr&&r.identity.tier===3){nameChecks++;if(norm(r.identity.nameKr)!==norm(c[0].name)){nameContradictions++;console.log(`NAME_CONTRADICTION id=${r.soldierId} canonical=${r.identity.nameKr} legacy=${c[0].name}`);}} if(r.identity.tier<3||!r.identity.nameKr) console.log(`UNIQUE_JOIN id=${r.soldierId} tier=${r.identity.tier} army=${r.identity.armyType} legacyName=${c[0].name} src=${c[0].src}`);
-            } else if(c.length>1){ambiguous++;unresolved.push({id:r.soldierId,reason:'AMBIG',names:c.map(x=>x.name)});} else {missing++;unresolved.push({id:r.soldierId,reason:'NO_LEGACY_SIGNATURE'});}
-          }
-          const low=canonical.filter(r=>!r.identity.isSp&&r.identity.tier<3); let lu=0,la=0,lm=0;
-          for(const r of low){const n=(bySig.get(sig({armyType:r.identity.armyType,tier:r.identity.tier,...r.combat}))??[]).length;if(n===1)lu++;else if(n>1)la++;else lm++;}
-          console.log(`SIGNATURE_RESULT normalUnique=${unique} normalAmbiguous=${ambiguous} normalMissing=${missing} t3NameChecks=${nameChecks} t3NameContradictions=${nameContradictions}`);
-          console.log(`LOW_TIER_RESULT total=${low.length} unique=${lu} ambiguous=${la} missing=${lm}`);
-          console.log(`LOW_UNRESOLVED ${JSON.stringify(unresolved.filter(x=>low.some(r=>r.soldierId===x.id)))}`);
-          if(nameContradictions!==0) process.exit(1);
           NODE
