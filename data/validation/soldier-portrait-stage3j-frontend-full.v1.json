@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "stage": "soldier-portrait-stage3j-frontend-full",
+  "status": "PASS",
+  "manifest": "data/generated/soldier-portrait-manifest.v8.json",
+  "canonicalList": "data/generated/soldier-list-stage5-8.v1.json",
+  "coverage": {
+    "canonicalSoldierCount": 224,
+    "portraitRecordCount": 224,
+    "normalPortraitCount": 168,
+    "spPortraitCount": 56,
+    "missingPortraitCount": 0,
+    "extraPortraitCount": 0,
+    "missingPortraitIds": [],
+    "extraPortraitIds": [],
+    "verifiedAssetFileCount": 224,
+    "verifiedByteTotal": 32493523,
+    "extensionCounts": {
+      ".png": 139,
+      ".webp": 85
+    }
+  },
+  "frontendWiring": {
+    "sharedResolver": "src/lib/soldier-portrait-assets.ts",
+    "manifestVersion": 8,
+    "listRoute": "src/routes/soldiers.tsx",
+    "listUsesCanonicalIdResolver": true,
+    "detailRoute": "src/routes/soldiers.$soldierId.tsx",
+    "detailModal": "src/components/soldier-detail-modal.tsx",
+    "detailUsesCanonicalIdResolver": true,
+    "hardcodedPerSoldierPortraitMap": false
+  },
+  "safety": {
+    "noMissingCanonicalPortraits": true,
+    "noExtraPortraitIds": true,
+    "noDuplicatePortraitIds": true,
+    "noDuplicatePortraitFileNames": true,
+    "allAssetHashesVerified": true,
+    "staleManifestImportAbsent": true,
+    "spNormalPortraitReuse": false,
+    "spNameSimilarityAdmission": false,
+    "spIdArithmeticAdmission": false
+  }
+}
