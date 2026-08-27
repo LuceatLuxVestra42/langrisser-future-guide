@@ -1,0 +1,48 @@
+name: Soldier Portrait Stage 3B Alias Ability Probe
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - '.github/workflows/soldier-portrait-stage3b-alias-ability-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare current and legacy ability text
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const current = JSON.parse(fs.readFileSync('data/generated/soldier-detail-stage5-6.v1.json','utf8')).records;
+          const selected = new Map([[337,'황금 기사'],[639,'공성 발리스타'],[513,'빙하의 정령']]);
+          const currentById = new Map(current.map(r=>[r.soldierId,r]));
+          const LEGACY_COMMIT='a85bba49dcf073563e7366dc18e96b7ba67c2ae3';
+          const pages=['기병','궁병','승병','창병','보병','비병'];
+          function textify(html){return html.replace(/<br\s*\/?\s*>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();}
+          for (const [id,legacyName] of selected) {
+            const rec=currentById.get(id);
+            console.log(`CURRENT id=${id} name=${rec?.identity?.nameKr ?? rec?.nameKr ?? ''}`);
+            console.log('CURRENT_ABILITY '+JSON.stringify(rec?.ability ?? null));
+            let found=false;
+            for (const page of pages) {
+              const url=`https://raw.githubusercontent.com/redpanda7301/langrisser/${LEGACY_COMMIT}/troop/${encodeURIComponent(page)}.html`;
+              const html=await (await fetch(url)).text();
+              const needle=`<h2>${legacyName}</h2>`;
+              let idx=html.indexOf(needle);
+              if(idx<0) idx=html.indexOf(`<h2>${legacyName.replace(/ /g,'')}</h2>`);
+              if(idx<0) continue;
+              found=true;
+              const chunk=html.slice(idx, idx+9000);
+              console.log(`LEGACY page=${page} name=${legacyName}`);
+              console.log('LEGACY_TEXT '+textify(chunk).slice(0,1800));
+              break;
+            }
+            if(!found) console.log(`LEGACY_NOT_FOUND ${legacyName}`);
+          }
+          NODE
