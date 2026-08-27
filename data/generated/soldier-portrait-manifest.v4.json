@@ -1,8 +1,8 @@
 {
   "version": 4,
-  "stage": "frontend-stage3c-unique-legacy-ability-expansion",
+  "stage": "frontend-stage3e-t3-evidence-backed-expansion",
   "status": "PASS_WITH_REVIEW",
-  "generatedAt": "2026-08-27T10:14:44.381Z",
+  "generatedAt": "2026-08-27T11:11:56.420Z",
   "publicRoot": "images/soldiers",
   "assetsReady": true,
   "policy": {
@@ -17,43 +17,51 @@
     "stage3bExactAdmission": "Canonical Korean name exact normalized match to Drive III folder title.",
     "combatStatsAreNotIdentity": true,
     "spPortraitExpansion": "Not included.",
-    "stage3cAdmission": "Same tier/army, informative current level1-to-level10 ability progression, exactly one pinned legacy Korean entry matching the numeric progression; consume that pinned legacy WebP directly.",
-    "driveFolderTitleRequiredForStage3c": false,
+    "stage3eLegacyAdmission": "Reuse only Stage 3C PASS_UNIQUE_LEGACY_ABILITY_MATCH pinned WebP sources.",
+    "stage3eCurrentWebAdmission": "Use pinned web evidence after prior browser verification; Actions does not re-fetch blocked evidence pages and instead validates current canonical Korean name or current ability progression plus actual image bytes.",
     "nameSimilarityUsedForAdmission": false,
     "combatStatsUsedForIdentity": false
   },
   "sources": {
     "previousManifest": "data/generated/soldier-portrait-manifest.v3.json",
-    "legacyDiscovery": "data/validation/soldier-portrait-legacy-discovery-stage3c.v1.json",
-    "canonical": "data/generated/soldier-detail-stage5-2.v1.json"
+    "stage3cDiscovery": "data/validation/soldier-portrait-legacy-discovery-stage3c.v1.json",
+    "currentCanonical": "data/generated/soldier-detail-stage5-6.v1.json",
+    "stage3eEvidence": "data/validation/soldier-portrait-stage3e-t3-evidence.v1.json"
   },
   "coverage": {
     "canonicalSoldierCount": 224,
     "canonicalNormalCount": 168,
     "canonicalSpCount": 56,
-    "resolvedCount": 140,
-    "unresolvedCount": 84,
-    "resolvedNormalCount": 140,
+    "resolvedCount": 145,
+    "unresolvedCount": 79,
+    "resolvedNormalCount": 145,
     "resolvedSpCount": 0,
     "tier1Resolved": 7,
     "tier2Resolved": 22,
-    "tier3Resolved": 111,
-    "newlyResolvedCount": 4,
+    "tier3Resolved": 116,
+    "newlyResolvedCount": 9,
     "sourceCounts": {
+      "CURRENT_ABILITY_ALIAS_PINNED_WEB_EVIDENCE_IMAGE": 1,
+      "CURRENT_KR_PINNED_WEB_EVIDENCE_IMAGE": 4,
       "DRIVE_DEFAULT_PNG_STAGE2_PROOF": 3,
       "DRIVE_DEFAULT_PNG_STAGE3B_ALIAS_ABILITY_EVIDENCE": 23,
       "DRIVE_DEFAULT_PNG_STAGE3B_CANONICAL_NAME_EXACT": 3,
       "DRIVE_DEFAULT_PNG_T1_STRUCTURAL_CROSSCHECKED": 7,
       "DRIVE_DEFAULT_PNG_T2_CROSSCHECKED": 22,
       "PINNED_LEGACY_KR_WEBP": 78,
-      "PINNED_LEGACY_KR_WEBP_STAGE3C_UNIQUE_ABILITY_EVIDENCE": 4
+      "PINNED_LEGACY_KR_WEBP_STAGE3C_UNIQUE_ABILITY": 4
     }
   },
   "newlyResolvedSoldierIds": [
     249,
+    250,
+    341,
+    422,
     515,
     517,
-    645
+    645,
+    647,
+    1036
   ],
   "records": [
     {
@@ -582,14 +590,30 @@
       "soldierId": 249,
       "nameKr": "상아 부대",
       "tier": 3,
-      "legacyName": "송곳니 근위대",
-      "sourceKind": "PINNED_LEGACY_KR_WEBP_STAGE3C_UNIQUE_ABILITY_EVIDENCE",
-      "sourceFileName": "28_%EC%86%A1%EA%B3%B3%EB%8B%88%EA%B7%BC%EC%9C%84%EB%8C%80.webp",
+      "sourceKind": "PINNED_LEGACY_KR_WEBP_STAGE3C_UNIQUE_ABILITY",
       "sourceUrl": "https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/img/troop/%EB%B3%B4%EB%B3%91/%EB%B3%91%EC%A2%85/28_%EC%86%A1%EA%B3%B3%EB%8B%88%EA%B7%BC%EC%9C%84%EB%8C%80.webp",
+      "sourceName": "송곳니 근위대",
       "fileName": "249.webp",
-      "resolutionMethod": "SAME_TIER_ARMY_UNIQUE_PINNED_LEGACY_ENTRY_BY_CURRENT_LEVEL1_TO_LEVEL10_ABILITY_NUMERIC_PROGRESSION",
+      "resolutionMethod": "SAME_TIER_ARMY_UNIQUE_LEGACY_ABILITY_NUMERIC_PROGRESSION",
       "size": 6108,
-      "sha256": "8d303dac0967268b6b1b24d2526457c7bbb06b0b672af5b85bba37dc1f411797"
+      "sha256": "8d303dac0967268b6b1b24d2526457c7bbb06b0b672af5b85bba37dc1f411797",
+      "width": null,
+      "height": null
+    },
+    {
+      "soldierId": 250,
+      "nameKr": "숲의 무용가",
+      "tier": 3,
+      "sourceKind": "CURRENT_KR_PINNED_WEB_EVIDENCE_IMAGE",
+      "sourceUrl": "https://redpanda7301.github.io/langrisser/img/troop/%EC%A0%95%EA%B8%80%20%EC%82%AC%EC%8A%AC%20%EB%AC%B4%ED%9D%AC.webp",
+      "evidenceUrl": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EC%83%98-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "evidenceName": "숲의 무용가",
+      "fileName": "250.webp",
+      "resolutionMethod": "CURRENT_KR_EXACT_WITH_PINNED_WEB_EVIDENCE",
+      "size": 40922,
+      "sha256": "b3cdd5ecee53e93add7f89bf3900592871a67f2c76bbcc1db39f95171ea194fd",
+      "width": null,
+      "height": null
     },
     {
       "soldierId": 301,
@@ -847,6 +871,21 @@
       "height": 450
     },
     {
+      "soldierId": 341,
+      "nameKr": "밀림 켄타우로스",
+      "tier": 3,
+      "sourceKind": "CURRENT_KR_PINNED_WEB_EVIDENCE_IMAGE",
+      "sourceUrl": "https://img.gamewith.jp/article_tools/langrisser/gacha/miturin.png",
+      "evidenceUrl": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%ED%82%A4%EB%B2%A8%EB%A0%88-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "evidenceName": "밀림 켄타우로스",
+      "fileName": "341.png",
+      "resolutionMethod": "CURRENT_KR_EXACT_WITH_PINNED_WEB_EVIDENCE",
+      "size": 123615,
+      "sha256": "5f4f4b0f8fbf065b11bb998d3ad1818818a6bd53a05d0a8daf5d71aaee386d45",
+      "width": 236,
+      "height": 293
+    },
+    {
       "soldierId": 400,
       "nameKr": null,
       "presentationNameEvidence": "히포그리프",
@@ -971,6 +1010,21 @@
       "resolutionMethod": "CANONICAL_KR_NAME_EXACT_LEGACY_KR_NAME_SAME_TIER_ARMY",
       "size": 9226,
       "sha256": "8f9acad01daae2002f26c6e2944832452edae8203f6c993e348a273c1ea87b78"
+    },
+    {
+      "soldierId": 422,
+      "nameKr": "드래고니아",
+      "tier": 3,
+      "sourceKind": "CURRENT_ABILITY_ALIAS_PINNED_WEB_EVIDENCE_IMAGE",
+      "sourceUrl": "https://redpanda7301.github.io/langrisser/img/troop/%EB%B9%84%EB%B3%91_%EC%88%98%EB%B3%91/%EB%B9%84%EB%B3%91/%EB%B3%91%EC%A2%85/20_1_%EB%93%9C%EB%A0%88%EA%B3%A0%EB%8B%88%EC%95%84%EB%82%98%EC%9D%B4%ED%8A%B8.webp",
+      "evidenceUrl": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EC%95%8C%ED%85%8C%EB%AE%AC%EB%9F%ACsp-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "evidenceName": "드래고니아 나이트",
+      "fileName": "422.webp",
+      "resolutionMethod": "CURRENT_ABILITY_ALIAS_WITH_PINNED_WEB_EVIDENCE",
+      "size": 9830,
+      "sha256": "59e07bf052d676cee4410fb024dacd83610c63f1c2bfa2dd0807bfcdd4269315",
+      "width": null,
+      "height": null
     },
     {
       "soldierId": 423,
@@ -1179,27 +1233,29 @@
       "soldierId": 515,
       "nameKr": "섬의 특사",
       "tier": 3,
-      "legacyName": "군도의 특사",
-      "sourceKind": "PINNED_LEGACY_KR_WEBP_STAGE3C_UNIQUE_ABILITY_EVIDENCE",
-      "sourceFileName": "21_2_%EA%B5%B0%EB%8F%84%EC%9D%98%ED%8A%B9%EC%82%AC.webp",
+      "sourceKind": "PINNED_LEGACY_KR_WEBP_STAGE3C_UNIQUE_ABILITY",
       "sourceUrl": "https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/img/troop/%EB%B9%84%EB%B3%91_%EC%88%98%EB%B3%91/%EC%88%98%EB%B3%91/%EB%B3%91%EC%A2%85/21_2_%EA%B5%B0%EB%8F%84%EC%9D%98%ED%8A%B9%EC%82%AC.webp",
+      "sourceName": "군도의 특사",
       "fileName": "515.webp",
-      "resolutionMethod": "SAME_TIER_ARMY_UNIQUE_PINNED_LEGACY_ENTRY_BY_CURRENT_LEVEL1_TO_LEVEL10_ABILITY_NUMERIC_PROGRESSION",
+      "resolutionMethod": "SAME_TIER_ARMY_UNIQUE_LEGACY_ABILITY_NUMERIC_PROGRESSION",
       "size": 6964,
-      "sha256": "b0c2e286b15a8903ac5f92cdd19c1ae04e3560ce7a62069daf92f4aa4f22e9ce"
+      "sha256": "b0c2e286b15a8903ac5f92cdd19c1ae04e3560ce7a62069daf92f4aa4f22e9ce",
+      "width": null,
+      "height": null
     },
     {
       "soldierId": 517,
       "nameKr": "파도의 역린",
       "tier": 3,
-      "legacyName": "심해의 해적",
-      "sourceKind": "PINNED_LEGACY_KR_WEBP_STAGE3C_UNIQUE_ABILITY_EVIDENCE",
-      "sourceFileName": "18_2_%EC%8B%AC%ED%95%B4%EC%9D%98%ED%95%B4%EC%A0%81.webp",
+      "sourceKind": "PINNED_LEGACY_KR_WEBP_STAGE3C_UNIQUE_ABILITY",
       "sourceUrl": "https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/img/troop/%EB%B9%84%EB%B3%91_%EC%88%98%EB%B3%91/%EC%88%98%EB%B3%91/%EB%B3%91%EC%A2%85/18_2_%EC%8B%AC%ED%95%B4%EC%9D%98%ED%95%B4%EC%A0%81.webp",
+      "sourceName": "심해의 해적",
       "fileName": "517.webp",
-      "resolutionMethod": "SAME_TIER_ARMY_UNIQUE_PINNED_LEGACY_ENTRY_BY_CURRENT_LEVEL1_TO_LEVEL10_ABILITY_NUMERIC_PROGRESSION",
+      "resolutionMethod": "SAME_TIER_ARMY_UNIQUE_LEGACY_ABILITY_NUMERIC_PROGRESSION",
       "size": 10542,
-      "sha256": "21bd23a9a5a23f7b87f372bbaec5b682533fbaf1562c9efa85c6bd779dd0457c"
+      "sha256": "21bd23a9a5a23f7b87f372bbaec5b682533fbaf1562c9efa85c6bd779dd0457c",
+      "width": null,
+      "height": null
     },
     {
       "soldierId": 601,
@@ -1563,14 +1619,15 @@
       "soldierId": 645,
       "nameKr": "마법술사",
       "tier": 3,
-      "legacyName": "주문술사",
-      "sourceKind": "PINNED_LEGACY_KR_WEBP_STAGE3C_UNIQUE_ABILITY_EVIDENCE",
-      "sourceFileName": "20_1_%EC%A3%BC%EB%AC%B8%EC%88%A0%EC%82%AC.webp",
+      "sourceKind": "PINNED_LEGACY_KR_WEBP_STAGE3C_UNIQUE_ABILITY",
       "sourceUrl": "https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/img/troop/%EB%A7%88%EB%B2%95%EC%82%AC_%EC%8A%B9%EB%B3%91_%EB%A7%88%EB%AC%BC/%EB%A7%88%EB%B2%95%EC%82%AC/%EB%B3%91%EC%A2%85/20_1_%EC%A3%BC%EB%AC%B8%EC%88%A0%EC%82%AC.webp",
+      "sourceName": "주문술사",
       "fileName": "645.webp",
-      "resolutionMethod": "SAME_TIER_ARMY_UNIQUE_PINNED_LEGACY_ENTRY_BY_CURRENT_LEVEL1_TO_LEVEL10_ABILITY_NUMERIC_PROGRESSION",
+      "resolutionMethod": "SAME_TIER_ARMY_UNIQUE_LEGACY_ABILITY_NUMERIC_PROGRESSION",
       "size": 35878,
-      "sha256": "be3fab53f4b06e57b5dbf9fab1d24bdd72bc41e73ff2f518867572c4973c2731"
+      "sha256": "be3fab53f4b06e57b5dbf9fab1d24bdd72bc41e73ff2f518867572c4973c2731",
+      "width": null,
+      "height": null
     },
     {
       "soldierId": 646,
@@ -1587,6 +1644,21 @@
       "sha256": "ea848ccb261d226d339bc559719d2d08c43f3d3386a6de81d6d829a2ce9ca6eb",
       "width": 314,
       "height": 341
+    },
+    {
+      "soldierId": 647,
+      "nameKr": "금지된 숲의 영령술사",
+      "tier": 3,
+      "sourceKind": "CURRENT_KR_PINNED_WEB_EVIDENCE_IMAGE",
+      "sourceUrl": "https://img.gamewith.jp/article_tools/langrisser/gacha/kinrin.png",
+      "evidenceUrl": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%ED%9B%94%EB%B0%94%EB%B0%94-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "evidenceName": "금지된 숲의 영령술사",
+      "fileName": "647.png",
+      "resolutionMethod": "CURRENT_KR_EXACT_WITH_PINNED_WEB_EVIDENCE",
+      "size": 128384,
+      "sha256": "b23a17c1d2d1563e97451123d4735f7cc18f318cf444de1eb132e9a5de48400a",
+      "width": 239,
+      "height": 295
     },
     {
       "soldierId": 800,
@@ -1899,6 +1971,21 @@
       "sha256": "878c658936a1757ec85edb9c8ae648224e26bd83160c781e314885c5c8c9f775"
     },
     {
+      "soldierId": 1036,
+      "nameKr": "지옥 마핵",
+      "tier": 3,
+      "sourceKind": "CURRENT_KR_PINNED_WEB_EVIDENCE_IMAGE",
+      "sourceUrl": "https://redpanda7301.github.io/langrisser/img/troop/%EB%A7%88%EB%B2%95%EC%82%AC_%EC%8A%B9%EB%B3%91_%EB%A7%88%EB%AC%BC/%EB%A7%88%EB%AC%BC/%EB%B3%91%EC%A2%85/21_3_%EC%97%B0%EC%98%A5%EC%9D%98%EB%A7%88%EB%A0%A5%EC%BD%94%EC%96%B4.webp",
+      "evidenceUrl": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EC%97%BC%EB%A3%A1-%ED%8C%8C%EB%A9%B8%EC%9E%90-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "evidenceName": "지옥 마핵",
+      "fileName": "1036.webp",
+      "resolutionMethod": "CURRENT_KR_EXACT_WITH_PINNED_WEB_EVIDENCE",
+      "size": 38058,
+      "sha256": "b19dcd7820f6bff840e9afdb4b5cc07c6d85e1f460fc417999d3ad12d18abc57",
+      "width": null,
+      "height": null
+    },
+    {
       "soldierId": 1101,
       "nameKr": "밴디트",
       "tier": 3,
@@ -2071,15 +2158,6 @@
       "details": null
     },
     {
-      "soldierId": 250,
-      "tier": 3,
-      "isSp": false,
-      "armyType": "INFANTRY",
-      "nameKr": "숲의 무용가",
-      "reason": "NO_EXACT_LEGACY_KR_NAME_MATCH",
-      "details": []
-    },
-    {
       "soldierId": 251,
       "tier": 3,
       "isSp": false,
@@ -2113,30 +2191,12 @@
       }
     },
     {
-      "soldierId": 341,
-      "tier": 3,
-      "isSp": false,
-      "armyType": "CAVALRY",
-      "nameKr": "밀림 켄타우로스",
-      "reason": "NO_EXACT_LEGACY_KR_NAME_MATCH",
-      "details": []
-    },
-    {
       "soldierId": 407,
       "tier": 2,
       "isSp": false,
       "armyType": "FLYING",
       "nameKr": null,
       "reason": "NO_UNIQUE_T2_COMBAT_SIGNATURE",
-      "details": []
-    },
-    {
-      "soldierId": 422,
-      "tier": 3,
-      "isSp": false,
-      "armyType": "FLYING",
-      "nameKr": "드래고니아",
-      "reason": "NO_EXACT_LEGACY_KR_NAME_MATCH",
       "details": []
     },
     {
@@ -2200,15 +2260,6 @@
       }
     },
     {
-      "soldierId": 647,
-      "tier": 3,
-      "isSp": false,
-      "armyType": "MAGE",
-      "nameKr": "금지된 숲의 영령술사",
-      "reason": "NO_EXACT_LEGACY_KR_NAME_MATCH",
-      "details": []
-    },
-    {
       "soldierId": 648,
       "tier": 3,
       "isSp": false,
@@ -2253,15 +2304,6 @@
       "isSp": false,
       "armyType": "DEMON",
       "nameKr": "계약 마법 조각상",
-      "reason": "NO_EXACT_LEGACY_KR_NAME_MATCH",
-      "details": []
-    },
-    {
-      "soldierId": 1036,
-      "tier": 3,
-      "isSp": false,
-      "armyType": "DEMON",
-      "nameKr": "지옥 마핵",
       "reason": "NO_EXACT_LEGACY_KR_NAME_MATCH",
       "details": []
     },
