@@ -6,6 +6,8 @@ on:
       - '.github/workflows/banner-stage3-7-frontend-integration.yml'
       - 'vite.config.ts'
       - 'data/contracts/banner-stage3-7-frontend-integration.v1.json'
+      - 'data/configdata/ConfigDataArmyInfo.json'
+      - 'data/generated/army-icon-manifest.v1.json'
       - 'data/generated/banner-stage3-3-basic-table-consumer.v1.json'
       - 'data/generated/banner-stage3-4-wish-consumer.v1.json'
       - 'data/generated/banner-stage3-5-cp-event-consumer.v1.json'
@@ -19,7 +21,10 @@ on:
       - 'data/generated/soldier-list-stage5-8.v1.json'
       - 'data/generated/soldier-detail-stage5-2.v1.json'
       - 'data/hero-name-master.v1.json'
+      - 'public/images/army/**'
+      - 'scripts/prepare-army-icons.mjs'
       - 'scripts/validate-banner-stage3-7-frontend-integration.mjs'
+      - 'src/lib/army-icon-assets.ts'
       - 'src/lib/banner-page.server.ts'
       - 'src/lib/banner-page.static.ts'
       - 'src/lib/banner-page.functions.ts'
@@ -51,6 +56,8 @@ jobs:
           bun-version: latest
       - name: Install dependencies
         run: bun install --frozen-lockfile
+      - name: Validate Soldier army icon pipeline
+        run: bun run check:army-icons
       - name: Validate Banner Stage 3-7 frontend integration
         run: node scripts/validate-banner-stage3-7-frontend-integration.mjs
       - name: Build production frontend
