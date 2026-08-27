@@ -1,0 +1,53 @@
+name: Soldier Portrait Stage 3B Expand
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - '.github/workflows/soldier-portrait-stage3b-expand.yml'
+      - 'scripts/expand-soldier-portraits-stage3b.mjs'
+      - 'data/validation/soldier-portrait-alias-evidence-stage3b.v1.json'
+
+permissions:
+  contents: write
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Expand evidence-backed Soldier portrait coverage
+        run: node scripts/expand-soldier-portraits-stage3b.mjs
+      - name: Validate Stage 3B manifest and assets
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const x = require('./data/generated/soldier-portrait-manifest.v3.json');
+          if (x.coverage.canonicalSoldierCount !== 224) throw new Error('canonical mismatch');
+          if (x.coverage.resolvedCount + x.coverage.unresolvedCount !== 224) throw new Error('coverage mismatch');
+          if (x.coverage.resolvedSpCount !== 0) throw new Error('SP portrait reuse unexpectedly enabled');
+          if (x.coverage.newlyResolvedCount !== x.newlyResolvedSoldierIds.length) throw new Error('newly resolved mismatch');
+          const ids = new Set(x.records.map(r => r.soldierId));
+          if (ids.size !== x.records.length) throw new Error('duplicate resolved IDs');
+          for (const r of x.records) {
+            const file = path.join('public/images/soldiers', r.fileName);
+            if (!fs.existsSync(file)) throw new Error(`missing asset ${file}`);
+            if (!r.sha256 || !r.size) throw new Error(`integrity metadata missing ${r.soldierId}`);
+          }
+          console.log(`STAGE3B_VALIDATED resolved=${x.coverage.resolvedCount} unresolved=${x.coverage.unresolvedCount} new=${x.coverage.newlyResolvedCount} assetReview=${x.coverage.assetReviewCount}`);
+          NODE
+      - name: Commit expanded portrait assets and manifest
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/generated/soldier-portrait-manifest.v3.json public/images/soldiers
+          if git diff --cached --quiet; then
+            echo 'NO_STAGE3B_GENERATED_CHANGES'
+            exit 0
+          fi
+          git commit -m 'Expand Soldier portrait Stage 3B assets'
+          git push origin HEAD:work/soldier-frontend-stage3-full-portraits
