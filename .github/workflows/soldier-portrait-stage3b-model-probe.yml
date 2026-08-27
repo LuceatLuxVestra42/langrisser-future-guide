@@ -1,0 +1,66 @@
+name: Soldier Portrait Stage 3B Model Probe
+
+on:
+  push:
+    branches:
+      - work/soldier-frontend-stage3-full-portraits
+    paths:
+      - '.github/workflows/soldier-portrait-stage3b-model-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract unresolved Soldier model fields
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const manifest = JSON.parse(fs.readFileSync('data/generated/soldier-portrait-manifest.v2.json','utf8'));
+          const canonical = JSON.parse(fs.readFileSync('data/generated/soldier-detail-stage5-2.v1.json','utf8')).records;
+          const configRaw = JSON.parse(fs.readFileSync('data/configdata/ConfigDataSoldierInfo.json','utf8'));
+          function rowsFrom(raw) {
+            if (Array.isArray(raw)) return raw;
+            for (const key of ['records','data','Data','list','items','Items']) if (Array.isArray(raw?.[key])) return raw[key];
+            const vals = Object.values(raw ?? {});
+            const objectRows = vals.filter(v => v && typeof v === 'object' && !Array.isArray(v) && ('ID' in v || 'Id' in v || 'id' in v));
+            if (objectRows.length) return objectRows;
+            for (const value of vals) {
+              if (Array.isArray(value) && value.some(v => v && typeof v === 'object' && ('ID' in v || 'Id' in v || 'id' in v))) return value;
+            }
+            throw new Error('Cannot locate SoldierInfo rows');
+          }
+          const rows = rowsFrom(configRaw);
+          const idOf = r => Number(r.ID ?? r.Id ?? r.id);
+          const byConfigId = new Map(rows.map(r => [idOf(r), r]));
+          const byCanonicalId = new Map(canonical.map(r => [r.soldierId, r]));
+          console.log(`CONFIG_ROWS=${rows.length}`);
+          console.log(`CONFIG_SAMPLE_KEYS=${JSON.stringify(Object.keys(rows[0] ?? {}))}`);
+          const output = [];
+          for (const item of manifest.unresolved) {
+            const c = byCanonicalId.get(item.soldierId);
+            const row = byConfigId.get(item.soldierId);
+            const assetFields = {};
+            if (row) {
+              for (const [k,v] of Object.entries(row)) {
+                if (/model|icon|res|skin|spine|image|avatar|portrait|head/i.test(k)) assetFields[k] = v;
+              }
+            }
+            output.push({
+              soldierId:item.soldierId,
+              tier:item.tier,
+              isSp:item.isSp,
+              armyType:item.armyType,
+              nameKr:c?.identity?.nameKr ?? item.nameKr ?? null,
+              nameCn:c?.identity?.nameCn ?? null,
+              reason:item.reason,
+              configFound:!!row,
+              assetFields,
+              canonicalSp:c?.sp ?? null,
+            });
+          }
+          console.log('UNRESOLVED_MODEL_ROWS '+JSON.stringify(output));
+          NODE
