@@ -30,12 +30,30 @@ jobs:
             const url = `https://drive.google.com/drive/folders/${id}`;
             const res = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0' }, redirect: 'follow' });
             const text = await res.text();
-            console.log(`TIER=${tier} status=${res.status} bytes=${text.length}`);
-            for (const needle of ['중장 창병','대지 골렘','할버드','정예 창병','창병']) {
-              const i = text.indexOf(needle);
-              console.log(`TIER=${tier} needle=${needle} index=${i}`);
-              if (i >= 0) console.log(text.slice(Math.max(0, i - 240), i + 400).replace(/\n/g, ' '));
+            const entries = [...text.matchAll(/aria-label="([^"]+) Shared folder"[\s\S]{0,900}?data-id="([^"]+)"/g)]
+              .map((m) => ({ name: m[1], id: m[2] }));
+            const unique = [...new Map(entries.map((x) => [x.id, x])).values()];
+            console.log(`DRIVE_TIER=${tier} status=${res.status} entries=${unique.length}`);
+            console.log(JSON.stringify(unique.slice(0, 5)));
+          }
+          NODE
+      - name: Probe Korean legacy sheet lower-tier records
+        run: |
+          node <<'NODE'
+          const url = 'https://raw.githubusercontent.com/redpanda7301/langrisser/a85bba49dcf073563e7366dc18e96b7ba67c2ae3/troop/%EC%B0%BD%EB%B3%91.html';
+          const res = await fetch(url);
+          const text = await res.text();
+          console.log(`LEGACY status=${res.status} bytes=${text.length}`);
+          for (const needle of ['창병','정예 창병','바위 골렘','중장 창병','대지 골렘']) {
+            let from = 0;
+            let seen = 0;
+            while (seen < 2) {
+              const i = text.indexOf(needle, from);
+              if (i < 0) break;
+              console.log(`LEGACY needle=${needle} index=${i}`);
+              console.log(text.slice(Math.max(0, i - 650), i + 900).replace(/\n/g, ' '));
+              from = i + needle.length;
+              seen += 1;
             }
-            console.log(`TIER=${tier} folderMimeOccurrences=${(text.match(/application\\\/vnd\\.google-apps\\.folder/g) || []).length}`);
           }
           NODE
