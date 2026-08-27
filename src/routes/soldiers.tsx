@@ -3,10 +3,7 @@ import { Search, Shield } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
-import type {
-  SoldierPrototypeRecord,
-  SoldierUiGroup,
-} from "@/lib/soldier-page.server";
+import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
 
 export const Route = createFileRoute("/soldiers")({
   loader: () => getSoldierPrototypePageData(),
@@ -22,34 +19,51 @@ export const Route = createFileRoute("/soldiers")({
   component: SoldierPage,
 });
 
-type TierFilter = "ALL" | "T1" | "T2" | "T3" | "SP";
+type ArmyFilter =
+  | "INFANTRY"
+  | "LANCER"
+  | "CAVALRY"
+  | "FLYING"
+  | "WATER"
+  | "ARCHER"
+  | "ASSASSIN"
+  | "MAGE"
+  | "HOLY"
+  | "DEMON";
 
-const GROUPS: Array<{
-  id: SoldierUiGroup;
+type TierFilter = "ALL" | "T1_T2" | "T3" | "SP";
+
+const ARMY_FILTERS: Array<{
+  id: ArmyFilter;
   label: string;
   shortLabel: string;
 }> = [
   { id: "INFANTRY", label: "보병", shortLabel: "보" },
   { id: "LANCER", label: "창병", shortLabel: "창" },
   { id: "CAVALRY", label: "기병", shortLabel: "기" },
-  { id: "FLYING_WATER", label: "비병+수병", shortLabel: "비·수" },
-  { id: "ARCHER_ASSASSIN", label: "궁병+암살", shortLabel: "궁·암" },
-  { id: "MAGE_HOLY_DEMON", label: "마법사+승병+마족", shortLabel: "법·승·마" },
+  { id: "FLYING", label: "비병", shortLabel: "비" },
+  { id: "WATER", label: "수병", shortLabel: "수" },
+  { id: "ARCHER", label: "궁병", shortLabel: "궁" },
+  { id: "ASSASSIN", label: "암살", shortLabel: "암" },
+  { id: "MAGE", label: "마법사", shortLabel: "법" },
+  { id: "HOLY", label: "승병", shortLabel: "승" },
+  { id: "DEMON", label: "마족", shortLabel: "마" },
 ];
 
-const GROUP_BY_ID = new Map(GROUPS.map((group) => [group.id, group]));
+const ARMY_BY_TYPE = new Map<string, (typeof ARMY_FILTERS)[number]>(
+  ARMY_FILTERS.map((army) => [army.id, army]),
+);
 
 const TIER_FILTERS: Array<{ id: TierFilter; label: string }> = [
   { id: "ALL", label: "전체" },
-  { id: "T1", label: "1티어" },
-  { id: "T2", label: "2티어" },
+  { id: "T1_T2", label: "1·2티어" },
   { id: "T3", label: "3티어" },
   { id: "SP", label: "SP" },
 ];
 
 function SoldierPage() {
   const data = Route.useLoaderData();
-  const [group, setGroup] = useState<SoldierUiGroup | null>(null);
+  const [armyFilter, setArmyFilter] = useState<ArmyFilter | null>(null);
   const [tierFilter, setTierFilter] = useState<TierFilter>("ALL");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -58,10 +72,14 @@ function SoldierPage() {
     const needle = query.trim().toLowerCase();
 
     return data.records.filter((record) => {
-      if (group && record.uiGroup !== group) return false;
+      if (armyFilter && record.armyType !== armyFilter) return false;
       if (tierFilter === "SP" && !record.isSp) return false;
-      if (tierFilter === "T1" && (record.isSp || record.tier !== 1)) return false;
-      if (tierFilter === "T2" && (record.isSp || record.tier !== 2)) return false;
+      if (
+        tierFilter === "T1_T2" &&
+        (record.isSp || (record.tier !== 1 && record.tier !== 2))
+      ) {
+        return false;
+      }
       if (tierFilter === "T3" && (record.isSp || record.tier !== 3)) return false;
 
       if (needle) {
@@ -71,7 +89,7 @@ function SoldierPage() {
 
       return true;
     });
-  }, [data.records, group, query, tierFilter]);
+  }, [armyFilter, data.records, query, tierFilter]);
 
   const selectedRecord =
     records.find((record) => record.soldierId === selectedId) ?? records[0] ?? null;
@@ -79,37 +97,28 @@ function SoldierPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <Link
-              to="/"
-              className="text-xs font-semibold text-muted-foreground transition hover:text-foreground"
-            >
-              ← 메인으로
-            </Link>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              용병
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              확정된 224종 Soldier consumer를 이용한 목록·기초정보
-            </p>
-          </div>
-          <div className="text-right text-xs text-muted-foreground">
-            <p>일반 {data.summary.normalCount} · SP {data.summary.spCount}</p>
-            <p>3티어 일반 {data.summary.normalTier3Count}</p>
-          </div>
+        <header>
+          <Link
+            to="/"
+            className="text-xs font-semibold text-muted-foreground transition hover:text-foreground"
+          >
+            ← 메인으로
+          </Link>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            용병
+          </h1>
         </header>
 
         <section className="mt-7 overflow-hidden rounded-xl border border-border bg-card">
-          <div className="grid grid-cols-4 border-b border-border sm:grid-cols-7">
-            <GroupButton selected={group === null} onClick={() => setGroup(null)}>
+          <div className="grid grid-cols-4 border-b border-border sm:grid-cols-6 lg:grid-cols-11">
+            <GroupButton selected={armyFilter === null} onClick={() => setArmyFilter(null)}>
               전체
             </GroupButton>
-            {GROUPS.map((item) => (
+            {ARMY_FILTERS.map((item) => (
               <GroupButton
                 key={item.id}
-                selected={group === item.id}
-                onClick={() => setGroup(item.id)}
+                selected={armyFilter === item.id}
+                onClick={() => setArmyFilter(item.id)}
               >
                 {item.label}
               </GroupButton>
@@ -138,7 +147,7 @@ function SoldierPage() {
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="한국명 · 중국명 · ID 검색"
+                placeholder="검색"
                 className="h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/50 focus:ring-2 focus:ring-ring"
               />
             </label>
@@ -251,7 +260,7 @@ function SoldierCard({
   selected: boolean;
   onClick: () => void;
 }) {
-  const group = GROUP_BY_ID.get(record.uiGroup);
+  const army = ARMY_BY_TYPE.get(record.armyType);
   const displayName = record.nameKr ?? record.nameCn;
 
   return (
@@ -267,7 +276,7 @@ function SoldierCard({
       <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-8 text-muted-foreground transition group-hover:text-foreground">
         <div className="flex h-14 w-14 items-center justify-center rounded-full border border-current/20 bg-background/70 sm:h-16 sm:w-16">
           <span className="text-base font-black tracking-tight sm:text-lg">
-            {group?.shortLabel ?? "?"}
+            {army?.shortLabel ?? "?"}
           </span>
         </div>
       </div>
@@ -289,7 +298,7 @@ function SoldierCard({
 
 function SoldierDetail({ record }: { record: SoldierPrototypeRecord }) {
   const displayName = record.nameKr ?? record.nameCn;
-  const group = GROUP_BY_ID.get(record.uiGroup);
+  const army = ARMY_BY_TYPE.get(record.armyType);
 
   return (
     <section className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
@@ -303,7 +312,7 @@ function SoldierDetail({ record }: { record: SoldierPrototypeRecord }) {
               {record.isSp ? "SP" : `${record.tier}티어`}
             </span>
             <span className="rounded border border-border px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
-              {group?.label ?? record.uiGroup}
+              {army?.label ?? record.armyType}
             </span>
           </div>
           <h2 className="mt-2 truncate text-xl font-bold text-foreground">{displayName}</h2>
