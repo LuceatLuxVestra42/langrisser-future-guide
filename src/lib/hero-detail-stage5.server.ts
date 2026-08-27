@@ -1,73 +1,72 @@
 import { readHeroDetailRouteStage4Data } from "./hero-list.server";
 
-type UnknownRecord = Record<string, unknown>;
-
-type Stage6JobStats = {
-  HP?: number | null;
-  ATK?: number | null;
-  INT?: number | null;
-  DEF?: number | null;
-  MDEF?: number | null;
-};
-
 type Stage6JobConnection = {
+  jobConnectionId?: number;
   jobId?: number;
-  jobIndex?: number;
-  nameZh?: string | null;
-  tier?: number | null;
-  routeRow?: number | null;
-  isCapstone?: boolean;
-  levelCap?: number | null;
-  moveType?: number | null;
-  movePoint?: number | null;
-  finalDisplayStats?: Stage6JobStats | null;
+  role?: string | null;
+  depth?: number | null;
+  job?: {
+    id?: number;
+    nameCn?: string | null;
+    nameEn?: string | null;
+    rank?: number | null;
+  } | null;
+  finalDisplayStats?: {
+    status?: string | null;
+    heroLevel?: number | null;
+    star?: number | null;
+    values?: {
+      hp?: number | null;
+      at?: number | null;
+      magic?: number | null;
+      df?: number | null;
+      magicDf?: number | null;
+      dex?: number | null;
+    } | null;
+  } | null;
 };
 
-type Stage6JobBranch = {
-  routeRow?: number | null;
-  jobIds?: number[];
-  capstoneJobId?: number | null;
-  connections?: Stage6JobConnection[];
-};
+type FeatureBlock = {
+  status?: string | null;
+} | null;
 
 type Stage6HeroShard = {
   heroId: number;
   identity?: {
-    grade?: number | null;
-    nameZh?: string | null;
+    nameCn?: string | null;
     nameEn?: string | null;
     nameKr?: string | null;
-  };
+  } | null;
   presentation?: {
-    sourceArtworkPath?: string | null;
-    cvZh?: string | null;
-    cvJp?: string | null;
+    cv?: {
+      state?: string | null;
+      sourceValue?: string | null;
+      nameKr?: string | null;
+    } | null;
     skins?: unknown[] | null;
-  };
+  } | null;
   normal?: {
     heroMeta?: {
       initialStar?: number | null;
-      sex?: number | string | null;
-      voiceId?: number | null;
-      talentId?: number | null;
+      rank?: number | null;
     } | null;
     jobTree?: {
-      nodes?: unknown[];
-      branch?: Stage6JobBranch[];
+      branches?: number[][];
+      connections?: Stage6JobConnection[];
     } | null;
-  };
-  bonds?: unknown;
-  exclusiveEquipment?: unknown;
-  centralDiscipline?: unknown;
+  } | null;
+  bonds?: unknown[] | null;
+  exclusiveEquipment?: FeatureBlock;
+  centralDiscipline?: FeatureBlock;
   soldiers?: {
     ids?: number[];
-    source?: string | null;
-    consumerHint?: string | null;
   } | null;
-  sp?: unknown;
+  sp?: FeatureBlock;
   validation?: {
-    hardErrors?: unknown[];
-    warnings?: unknown[];
+    structuralStatus?: string | null;
+    publicationStatus?: string | null;
+    siteUsable?: boolean | null;
+    reviewCodes?: string[] | null;
   } | null;
 };
 
@@ -76,104 +75,115 @@ const stage6ShardModules = import.meta.glob<Stage6HeroShard>(
   { eager: false, import: "default" },
 );
 
-function isMeaningful(value: unknown): boolean {
-  if (value == null) return false;
-  if (Array.isArray(value)) return value.length > 0;
-  if (typeof value === "object") return Object.keys(value as UnknownRecord).length > 0;
-  if (typeof value === "string") return value.trim().length > 0;
-  return true;
+function isReleased(value: FeatureBlock): boolean {
+  return value?.status === "RELEASED";
 }
 
-function projectJobBranch(branch: Stage6JobBranch) {
-  const connections = Array.isArray(branch.connections) ? branch.connections : [];
-  const capstone =
-    connections.find((job) => job.isCapstone === true) ??
-    connections.find((job) => job.jobId === branch.capstoneJobId) ??
-    connections.at(-1) ??
-    null;
+function projectJobBranches(jobTree: Stage6HeroShard["normal"] extends infer _T ? {
+  branches?: number[][];
+  connections?: Stage6JobConnection[];
+} | null | undefined : never) {
+  const branchIds = Array.isArray(jobTree?.branches) ? jobTree.branches : [];
+  const connections = Array.isArray(jobTree?.connections) ? jobTree.connections : [];
+  const byConnectionId = new Map(
+    connections
+      .filter((row) => Number.isInteger(row.jobConnectionId))
+      .map((row) => [Number(row.jobConnectionId), row] as const),
+  );
 
-  return {
-    routeRow: branch.routeRow ?? null,
-    capstoneJobId: branch.capstoneJobId ?? capstone?.jobId ?? null,
-    jobs: connections.map((job) => ({
-      jobId: job.jobId ?? null,
-      jobIndex: job.jobIndex ?? null,
-      nameZh: job.nameZh ?? null,
-      tier: job.tier ?? null,
-      isCapstone: job === capstone,
-    })),
-    capstone: capstone
-      ? {
-          jobId: capstone.jobId ?? null,
-          nameZh: capstone.nameZh ?? null,
-          levelCap: capstone.levelCap ?? null,
-          moveType: capstone.moveType ?? null,
-          movePoint: capstone.movePoint ?? null,
-          finalStats: {
-            HP: capstone.finalDisplayStats?.HP ?? null,
-            ATK: capstone.finalDisplayStats?.ATK ?? null,
-            INT: capstone.finalDisplayStats?.INT ?? null,
-            DEF: capstone.finalDisplayStats?.DEF ?? null,
-            MDEF: capstone.finalDisplayStats?.MDEF ?? null,
-          },
-        }
-      : null,
-  };
+  return branchIds.map((ids, branchIndex) => {
+    const jobs = ids
+      .map((id) => byConnectionId.get(Number(id)))
+      .filter((row): row is Stage6JobConnection => Boolean(row));
+    const capstone = jobs.at(-1) ?? null;
+    const values = capstone?.finalDisplayStats?.values;
+
+    return {
+      branchIndex: branchIndex + 1,
+      connectionIds: ids.map(Number),
+      jobs: jobs.map((job) => ({
+        jobConnectionId: job.jobConnectionId ?? null,
+        jobId: job.jobId ?? job.job?.id ?? null,
+        nameCn: job.job?.nameCn ?? null,
+        nameEn: job.job?.nameEn ?? null,
+        rank: job.job?.rank ?? null,
+        depth: job.depth ?? null,
+      })),
+      capstone: capstone
+        ? {
+            jobConnectionId: capstone.jobConnectionId ?? null,
+            jobId: capstone.jobId ?? capstone.job?.id ?? null,
+            nameCn: capstone.job?.nameCn ?? null,
+            rank: capstone.job?.rank ?? null,
+            heroLevel: capstone.finalDisplayStats?.heroLevel ?? null,
+            star: capstone.finalDisplayStats?.star ?? null,
+            statStatus: capstone.finalDisplayStats?.status ?? null,
+            finalStats: {
+              HP: values?.hp ?? null,
+              ATK: values?.at ?? null,
+              INT: values?.magic ?? null,
+              DEF: values?.df ?? null,
+              MDEF: values?.magicDf ?? null,
+              DEX: values?.dex ?? null,
+            },
+          }
+        : null,
+    };
+  });
 }
 
 function projectStage6Shard(shard: Stage6HeroShard) {
-  const hardErrors = shard.validation?.hardErrors ?? [];
-  if (!Array.isArray(hardErrors) || hardErrors.length !== 0) {
-    throw new Error(`Hero ${shard.heroId} Stage 6 shard contains hard errors.`);
+  const validation = shard.validation;
+  if (validation?.structuralStatus !== "PASS" || validation?.siteUsable !== true) {
+    throw new Error(`Hero ${shard.heroId} Stage 6 shard is not structurally usable.`);
   }
 
-  const branches = Array.isArray(shard.normal?.jobTree?.branch)
-    ? shard.normal.jobTree.branch
-    : [];
+  const jobTree = shard.normal?.jobTree;
+  const branches = projectJobBranches(jobTree);
+  const connections = Array.isArray(jobTree?.connections) ? jobTree.connections : [];
   const soldierIds = Array.isArray(shard.soldiers?.ids) ? shard.soldiers.ids : [];
   const skins = Array.isArray(shard.presentation?.skins) ? shard.presentation.skins : [];
+  const reviewCodes = Array.isArray(validation?.reviewCodes) ? validation.reviewCodes : [];
 
   return {
     identity: {
-      grade: shard.identity?.grade ?? null,
       nameKr: shard.identity?.nameKr ?? null,
-      nameZh: shard.identity?.nameZh ?? null,
+      nameCn: shard.identity?.nameCn ?? null,
       nameEn: shard.identity?.nameEn ?? null,
     },
     presentation: {
-      cvJp: shard.presentation?.cvJp ?? null,
-      cvZh: shard.presentation?.cvZh ?? null,
+      cvState: shard.presentation?.cv?.state ?? null,
+      cvSourceValue: shard.presentation?.cv?.sourceValue ?? null,
+      cvNameKr: shard.presentation?.cv?.nameKr ?? null,
       skinCount: skins.length,
     },
     base: {
       initialStar: shard.normal?.heroMeta?.initialStar ?? null,
-      sex: shard.normal?.heroMeta?.sex ?? null,
-      voiceId: shard.normal?.heroMeta?.voiceId ?? null,
-      talentId: shard.normal?.heroMeta?.talentId ?? null,
+      rank: shard.normal?.heroMeta?.rank ?? null,
     },
     jobs: {
       branchCount: branches.length,
-      nodeCount: Array.isArray(shard.normal?.jobTree?.nodes)
-        ? shard.normal.jobTree.nodes.length
-        : 0,
-      branches: branches.map(projectJobBranch),
+      connectionCount: connections.length,
+      branches,
     },
     soldiers: {
       count: soldierIds.length,
       ids: soldierIds,
-      source: shard.soldiers?.source ?? null,
     },
     systems: {
-      bonds: isMeaningful(shard.bonds),
-      exclusiveEquipment: isMeaningful(shard.exclusiveEquipment),
-      centralDiscipline: isMeaningful(shard.centralDiscipline),
-      sp: isMeaningful(shard.sp),
+      bondRowCount: Array.isArray(shard.bonds) ? shard.bonds.length : 0,
+      exclusiveEquipmentStatus: shard.exclusiveEquipment?.status ?? null,
+      exclusiveEquipmentReleased: isReleased(shard.exclusiveEquipment),
+      centralDisciplineStatus: shard.centralDiscipline?.status ?? null,
+      centralDisciplineReleased: isReleased(shard.centralDiscipline),
+      spStatus: shard.sp?.status ?? null,
+      spReleased: isReleased(shard.sp),
     },
     validation: {
-      hardErrorCount: hardErrors.length,
-      warningCount: Array.isArray(shard.validation?.warnings)
-        ? shard.validation.warnings.length
-        : 0,
+      structuralStatus: validation.structuralStatus,
+      publicationStatus: validation.publicationStatus ?? null,
+      reviewCodes,
+      reviewCount: reviewCodes.length,
     },
   };
 }
