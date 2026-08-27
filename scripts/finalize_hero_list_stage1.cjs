@@ -17,6 +17,8 @@ const P = {
 
 const abs = rel => path.join(ROOT, rel);
 const read = rel => JSON.parse(fs.readFileSync(abs(rel), 'utf8'));
+const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
+const sha256 = buffer => crypto.createHash('sha256').update(buffer).digest('hex');
 const writeJson = (rel, value) => {
   fs.mkdirSync(path.dirname(abs(rel)), { recursive: true });
   fs.writeFileSync(abs(rel), JSON.stringify(value, null, 2) + '\n');
@@ -25,8 +27,6 @@ const writeText = (rel, value) => {
   fs.mkdirSync(path.dirname(abs(rel)), { recursive: true });
   fs.writeFileSync(abs(rel), value.endsWith('\n') ? value : value + '\n');
 };
-const sha256 = buffer => crypto.createHash('sha256').update(buffer).digest('hex');
-const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 const blobSha = rel => {
   try {
     return execFileSync('git', ['rev-parse', `HEAD:${rel}`], {
@@ -41,8 +41,8 @@ const blobSha = rel => {
 
 const contract = read(P.contract);
 const manifest = read(P.manifest);
-const hardErrors = [];
 const checks = [];
+const hardErrors = [];
 const check = (name, pass, detail = null) => {
   const row = { name, pass: Boolean(pass) };
   if (detail !== null) row.detail = detail;
@@ -74,11 +74,7 @@ check(
 );
 
 const manifestIndex = manifest?.storage?.byHeroId || {};
-const heroIds = Object.keys(manifestIndex)
-  .map(Number)
-  .filter(Number.isInteger)
-  .sort((a, b) => a - b);
-
+const heroIds = Object.keys(manifestIndex).map(Number).filter(Number.isInteger).sort((a, b) => a - b);
 check(
   'manifest-hero-population',
   heroIds.length === contract?.expectedPopulation?.heroCount && new Set(heroIds).size === heroIds.length,
@@ -86,6 +82,7 @@ check(
 );
 
 const records = [];
+const failedHeroIds = new Set();
 let shardMissingCount = 0;
 let shardIntegrityMismatchCount = 0;
 let shardHeroIdMismatchCount = 0;
@@ -99,9 +96,8 @@ let sourceArtworkMissingCount = 0;
 let spReleasedCount = 0;
 let spNotReleasedCount = 0;
 let unexpectedSpStatusCount = 0;
-let routeMismatchCount = 0;
 let projectionMismatchCount = 0;
-const failedHeroIds = new Set();
+let routeMismatchCount = 0;
 
 for (const heroId of heroIds) {
   const locator = manifestIndex[String(heroId)];
@@ -112,8 +108,7 @@ for (const heroId of heroIds) {
   }
 
   const buffer = fs.readFileSync(abs(locator.path));
-  const actualSha = sha256(buffer);
-  if (actualSha !== locator.sha256 || buffer.length !== locator.byteLength) {
+  if (sha256(buffer) !== locator.sha256 || buffer.length !== locator.byteLength) {
     shardIntegrityMismatchCount += 1;
     failedHeroIds.add(heroId);
     continue;
@@ -144,12 +139,10 @@ for (const heroId of heroIds) {
   const sourceArtworkPath = shard?.presentation?.artwork?.sourceAssetPath ?? null;
   const spStatus = shard?.sp?.status ?? null;
 
-  if (!identity || !identity.nameCn) identityMissingCount += 1;
-  if (!rarity || !Number.isFinite(Number(rarity.rank)) || !rarity.baseLabel) rarityMissingCount += 1;
-  if (!Array.isArray(factions) || factions.some(row => !Number.isInteger(Number(row?.factionId)))) {
-    factionShapeMismatchCount += 1;
-  }
-  if (!origin || !Number.isInteger(Number(origin.productionId)) || !origin.category) originMissingCount += 1;
+  if (!identity?.nameCn) identityMissingCount += 1;
+  if (!rarity?.baseLabel || !Number.isFinite(Number(rarity?.rank))) rarityMissingCount += 1;
+  if (factions.some(row => !Number.isInteger(Number(row?.factionId)))) factionShapeMismatchCount += 1;
+  if (!origin?.category || !Number.isInteger(Number(origin?.productionId))) originMissingCount += 1;
   if (sourceArtworkPath) sourceArtworkPresentCount += 1;
   else sourceArtworkMissingCount += 1;
 
@@ -185,7 +178,6 @@ for (const heroId of heroIds) {
     projectionMismatchCount += 1;
     failedHeroIds.add(heroId);
   }
-
   records.push(record);
 }
 
@@ -219,11 +211,7 @@ for (const record of records) {
     if (Object.prototype.hasOwnProperty.call(record, key)) forbiddenPresentationInferenceCount += 1;
   }
 }
-check(
-  'no-deferred-presentation-inference',
-  forbiddenPresentationInferenceCount === 0,
-  `forbiddenFields=${forbiddenPresentationInferenceCount}`,
-);
+check('no-deferred-presentation-inference', forbiddenPresentationInferenceCount === 0, `forbiddenFields=${forbiddenPresentationInferenceCount}`);
 
 const sourcePolicy = contract?.sourcePolicy || {};
 check(
@@ -259,12 +247,11 @@ const summary = {
   forbiddenPresentationInferenceCount,
   hardErrorCount: hardErrors.length,
 };
-
 const status = hardErrors.length === 0 ? 'PASS' : 'FAIL';
 const completion = hardErrors.length === 0 ? 'COMPLETE' : 'BLOCKED';
 const freezeState = hardErrors.length === 0 ? 'HERO_LIST_STAGE1_FROZEN' : 'HERO_LIST_STAGE1_NOT_FROZEN';
 
-const output = {
+writeJson(P.output, {
   version: 1,
   stage: 'hero-list-stage1',
   schemaId: 'hero-list/v1',
@@ -289,16 +276,14 @@ const output = {
   deferredPresentation: clone(contract?.explicitlyDeferred || {}),
   summary,
   records,
-};
-writeJson(P.output, output);
+});
 
-const validation = {
+writeJson(P.validation, {
   version: 1,
   stage: 'hero-list-stage1',
   status,
   completion,
   freezeState,
-  checkedAt: new Date().toISOString(),
   sources: {
     contract: P.contract,
     heroStage6Manifest: P.manifest,
@@ -310,10 +295,9 @@ const validation = {
   decision: hardErrors.length === 0
     ? 'Stage 1 is complete. The lightweight Hero list projection is frozen and Stage 2 may consume it for /heroes grid work.'
     : 'Stage 1 is blocked. Do not start the /heroes grid until all hard errors are resolved.',
-};
-writeJson(P.validation, validation);
+});
 
-const checkpoint = {
+writeJson(P.checkpointJson, {
   version: 1,
   stage: 'hero-list-stage1',
   status,
@@ -336,11 +320,9 @@ const checkpoint = {
   ],
   nextStart: 'Stage 2: build the /heroes basic grid from data/generated/hero-list-stage1.v1.json without raw ConfigData or Hero semantic recomputation.',
   summary,
-};
-writeJson(P.checkpointJson, checkpoint);
+});
 
-const md = `# Hero List Stage 1 checkpoint\n\n- status: ${status}\n- completion: ${completion}\n- freezeState: ${freezeState}\n- Hero: ${summary.generatedRecordCount}/${summary.canonicalHeroCount}\n- unique Hero: ${summary.uniqueHeroCount}\n- SP: ${summary.spReleasedCount} released / ${summary.spNotReleasedCount} not released\n- shard missing/integrity mismatch: ${summary.shardMissingCount}/${summary.shardIntegrityMismatchCount}\n- projection mismatch: ${summary.projectionMismatchCount}\n- deferred presentation inference: ${summary.forbiddenPresentationInferenceCount}\n- hard errors: ${summary.hardErrorCount}\n\n## Official consumer\n\n\`${P.output}\`\n\n## Deferred\n\n- release chronology/display ordering\n- web artwork resolution\n- fusion power badge metadata\n- SSR solo-limited presentation metadata\n\n## Next start\n\nStage 2: build the \`/heroes\` basic grid from the frozen Stage 1 consumer. Do not read raw ConfigData or re-derive Hero semantics.\n`;
-writeText(P.checkpointMd, md);
+writeText(P.checkpointMd, `# Hero List Stage 1 checkpoint\n\n- status: ${status}\n- completion: ${completion}\n- freezeState: ${freezeState}\n- Hero: ${summary.generatedRecordCount}/${summary.canonicalHeroCount}\n- unique Hero: ${summary.uniqueHeroCount}\n- SP: ${summary.spReleasedCount} released / ${summary.spNotReleasedCount} not released\n- shard missing/integrity mismatch: ${summary.shardMissingCount}/${summary.shardIntegrityMismatchCount}\n- projection mismatch: ${summary.projectionMismatchCount}\n- deferred presentation inference: ${summary.forbiddenPresentationInferenceCount}\n- hard errors: ${summary.hardErrorCount}\n\n## Official consumer\n\n\`${P.output}\`\n\n## Deferred\n\n- release chronology/display ordering\n- web artwork resolution\n- fusion power badge metadata\n- SSR solo-limited presentation metadata\n\n## Next start\n\nStage 2: build the \`/heroes\` basic grid from the frozen Stage 1 consumer. Do not read raw ConfigData or re-derive Hero semantics.\n`);
 
 console.log(JSON.stringify({ status, completion, freezeState, summary, hardErrors }, null, 2));
 if (hardErrors.length) process.exit(1);
