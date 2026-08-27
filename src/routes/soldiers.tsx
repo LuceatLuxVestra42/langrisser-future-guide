@@ -1,8 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search, X } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { Search } from "lucide-react";
+import { useMemo, useState, type ReactNode } from "react";
 
-import { SoldierDetailModal } from "@/components/soldier-detail-modal";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
@@ -72,7 +71,6 @@ function SoldierPage() {
   const [armyFilter, setArmyFilter] = useState<ArmyFilter | null>(null);
   const [tierFilter, setTierFilter] = useState<TierFilter>("ALL");
   const [query, setQuery] = useState("");
-  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const records = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -106,28 +104,7 @@ function SoldierPage() {
       });
   }, [armyFilter, data.records, query, tierFilter]);
 
-  const selectedRecord =
-    selectedId === null
-      ? null
-      : data.records.find((record) => record.soldierId === selectedId) ?? null;
 
-  useEffect(() => {
-    if (!selectedRecord) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSelectedId(null);
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [selectedRecord]);
 
   return (
     <main className="min-h-screen bg-background">
@@ -202,12 +179,7 @@ function SoldierPage() {
           className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3 md:grid-cols-6 xl:grid-cols-8"
         >
           {records.map((record) => (
-            <SoldierCard
-              key={record.soldierId}
-              record={record}
-              selected={selectedId === record.soldierId}
-              onClick={() => setSelectedId(record.soldierId)}
-            />
+            <SoldierCard key={record.soldierId} record={record} />
           ))}
 
           {records.length === 0 ? (
@@ -218,31 +190,7 @@ function SoldierPage() {
         </section>
       </div>
 
-      {selectedRecord ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-6"
-          onMouseDown={(event) => {
-            if (event.currentTarget === event.target) setSelectedId(null);
-          }}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="soldier-detail-title"
-            className="relative max-h-[calc(100dvh-1rem)] w-full max-w-6xl overflow-y-auto sm:max-h-[90vh]"
-          >
-            <button
-              type="button"
-              aria-label="상세 창 닫기"
-              onClick={() => setSelectedId(null)}
-              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/95 text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <X className="h-5 w-5" aria-hidden="true" />
-            </button>
-            <SoldierDetailModal key={selectedRecord.soldierId} record={selectedRecord} />
-          </div>
-        </div>
-      ) : null}
+      <Outlet />
     </main>
   );
 }
@@ -433,27 +381,18 @@ function FallbackArmyIcon({
   );
 }
 
-function SoldierCard({
-  record,
-  selected,
-  onClick,
-}: {
-  record: SoldierPrototypeRecord;
-  selected: boolean;
-  onClick: () => void;
-}) {
+function SoldierCard({ record }: { record: SoldierPrototypeRecord }) {
   const army = ARMY_BY_TYPE.get(record.armyType);
   const displayName = record.nameKr ?? record.nameCn;
 
   return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onClick}
+    <Link
+      to="/soldiers/$soldierId"
+      params={{ soldierId: String(record.soldierId) }}
+      preload="intent"
+      aria-label={`${displayName} 상세 보기`}
       title={`${displayName} · Soldier ${record.soldierId}`}
-      className={`group relative aspect-square overflow-hidden rounded-lg border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-        selected ? "border-foreground ring-1 ring-foreground" : "border-border"
-      }`}
+      className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-8 text-muted-foreground transition group-hover:text-foreground">
         <div className="flex h-14 w-14 items-center justify-center rounded-full border border-current/20 bg-background/70 sm:h-16 sm:w-16">
@@ -485,6 +424,6 @@ function SoldierCard({
           {displayName}
         </span>
       </div>
-    </button>
+    </Link>
   );
 }
