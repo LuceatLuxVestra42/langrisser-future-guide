@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-status-source-promotion-contract/v1",
+  "stage": "PROJECT-STATUS-STAGE3",
+  "checkpoint": "PROJECT_DOCTOR_STATUS_SOURCE_PROMOTION",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Create explicit Active Source Registry successor declarations through one guarded command without inferring semantic authority from filenames, chronology, or source contents.",
+  "registryContract": "data/contracts/project-doctor-active-source-registry.v1.json",
+  "entryDirectory": "data/status-sources",
+  "command": "node scripts/promote-project-doctor-status-source.mjs --domain <domain> --id <entry-id> --source <validated-json>",
+  "policy": {
+    "predecessorIsCurrentSelectedEntry": true,
+    "defaultAdmissionMode": "INHERIT_CURRENT_ACTIVE_ENTRY",
+    "defaultProjectionOverrideMode": "INHERIT_CURRENT_ACTIVE_ENTRY",
+    "defaultFacetMode": "INHERIT_CURRENT_ACTIVE_ENTRY",
+    "explicitAdmissionOverrideAllowed": true,
+    "explicitProjectionOverrideAllowed": true,
+    "autoSnapshotAdmissionFromNewSourceForbidden": true,
+    "newSourceMustPassRegistryAdmissionBeforeWrite": true,
+    "newSourceMustPassEffectiveD1ProjectionBeforeWrite": true,
+    "writeIsTransactional": true,
+    "failedPostWriteRefreshRollsBackPromotionFile": true,
+    "idempotentWhenRequestedEntryIsAlreadyActive": true,
+    "sourceMustAlreadyExist": true,
+    "sourceMustRemainUnderRegistryAllowedPrefixes": true,
+    "noFilenameInference": true,
+    "noStageNumberInference": true,
+    "noTimestampInference": true,
+    "noCommitDateInference": true,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "canonicalJoinRecomputation": false
+  },
+  "cli": {
+    "required": ["--domain", "--id", "--source"],
+    "optional": ["--facet", "--equals", "--in", "--projection-file", "--note", "--check"],
+    "equalsSyntax": "--equals /json/pointer=<JSON scalar or string>",
+    "inSyntax": "--in /json/pointer=<comma-separated values or JSON array>",
+    "checkMode": "Validate the proposed promotion without writing a status-source sidecar or regenerating Project Status."
+  },
+  "preflight": {
+    "registryMustCurrentlyPass": true,
+    "domainMustExist": true,
+    "entryIdMustBeSafeFilenameToken": true,
+    "duplicateNonActiveEntryIdForbidden": true,
+    "candidateRegistryMustPass": true,
+    "requiredSelectorsMustResolve": true,
+    "zeroRequiredSelectorsMustExistAndEqualZero": true,
+    "expectedValuesMustRemainSatisfied": true,
+    "supplementalSourcesRemainInheritedFromEffectiveDomainSpec": true
+  },
+  "postWrite": {
+    "rebuildRegistry": true,
+    "runD1StatusChain": true,
+    "rebuildProjectStatus": true,
+    "rollbackOnFailure": true
+  },
+  "boundaries": {
+    "doesNotCreateOrModifyDomainValidation": true,
+    "doesNotPromoteGeneratedArtifactAsSemanticAuthority": true,
+    "doesNotGuessAdmissionFromObservedValues": true,
+    "doesNotRewriteFrozenD1Contract": true,
+    "doesNotReopenFrozenSemantics": true
+  }
+}
