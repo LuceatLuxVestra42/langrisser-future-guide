@@ -21,14 +21,18 @@ for (const target of TARGETS) {
       return openingTag;
     }
 
+    replacements += 1;
     const indentMatch = openingTag.match(/^<Link\n(\s+)/);
-    if (!indentMatch) {
-      throw new Error(`${target.path}: unsupported Equipment Link formatting: ${openingTag}`);
+    if (indentMatch) {
+      const indent = indentMatch[1];
+      return openingTag.replace(/^<Link\n(\s+)/, `<Link\n${indent}reloadDocument\n${indent}`);
     }
 
-    replacements += 1;
-    const indent = indentMatch[1];
-    return openingTag.replace(/^<Link\n(\s+)/, `<Link\n${indent}reloadDocument\n${indent}`);
+    if (/^<Link\s+/.test(openingTag)) {
+      return openingTag.replace(/^<Link\s+/, "<Link reloadDocument ");
+    }
+
+    throw new Error(`${target.path}: unsupported Equipment Link formatting: ${openingTag}`);
   });
 
   if (equipmentLinks !== target.expected) {
