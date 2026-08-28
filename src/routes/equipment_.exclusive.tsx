@@ -111,6 +111,7 @@ function ExclusiveEquipmentPage() {
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <Link
+              reloadDocument
               to="/equipment"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
             >
@@ -237,6 +238,7 @@ function ExclusiveEquipmentPage() {
 
               return (
                 <Link
+                  reloadDocument
                   key={record.equipmentId}
                   to="/equipment/$equipmentId"
                   params={{ equipmentId: String(record.equipmentId) }}

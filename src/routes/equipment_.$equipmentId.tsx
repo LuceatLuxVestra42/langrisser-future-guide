@@ -76,6 +76,7 @@ function GeneralEquipmentDetail({ data }: { data: GeneralEquipmentDetailPageData
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <Link
+          reloadDocument
           to="/equipment"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
         >
@@ -132,6 +133,7 @@ function GeneralEquipmentDetail({ data }: { data: GeneralEquipmentDetailPageData
 
         <div className="mt-8 flex justify-between border-t border-border pt-6">
           <Link
+            reloadDocument
             to="/equipment"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition hover:text-foreground"
           >
@@ -139,6 +141,7 @@ function GeneralEquipmentDetail({ data }: { data: GeneralEquipmentDetailPageData
             목록으로 돌아가기
           </Link>
           <Link
+            reloadDocument
             to="/equipment/exclusive"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition hover:text-foreground"
           >
@@ -159,6 +162,7 @@ function ExclusiveEquipmentDetail({ data }: { data: ExclusiveEquipmentDetailPage
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <Link
+          reloadDocument
           to="/equipment/exclusive"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
         >
@@ -213,6 +217,7 @@ function ExclusiveEquipmentDetail({ data }: { data: ExclusiveEquipmentDetailPage
 
         <div className="mt-8 flex justify-between border-t border-border pt-6">
           <Link
+            reloadDocument
             to="/equipment/exclusive"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition hover:text-foreground"
           >
@@ -220,6 +225,7 @@ function ExclusiveEquipmentDetail({ data }: { data: ExclusiveEquipmentDetailPage
             전용장비 목록
           </Link>
           <Link
+            reloadDocument
             to="/equipment"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition hover:text-foreground"
           >
@@ -438,7 +444,7 @@ function EquipmentNotFound() {
       <p className="mt-3 text-sm text-muted-foreground">
         공개 consumer에 포함되지 않은 장비이거나 잘못된 equipmentId야.
       </p>
-      <Link to="/equipment" className="mt-6 inline-block text-sm font-medium text-foreground">
+      <Link reloadDocument to="/equipment" className="mt-6 inline-block text-sm font-medium text-foreground">
         SSR 장비로 돌아가기
       </Link>
     </main>
