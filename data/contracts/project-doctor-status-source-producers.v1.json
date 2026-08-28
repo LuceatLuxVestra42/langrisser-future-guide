@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-status-source-producers/v1",
+  "stage": "PROJECT-STATUS-STAGE4",
+  "checkpoint": "PROJECT_DOCTOR_STATUS_SOURCE_PRODUCER_GATE",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Allow only explicitly registered domain completion producers to submit a validated status source into the guarded Stage 3 promotion path.",
+  "promotionContract": "data/contracts/project-doctor-status-source-promotion.v1.json",
+  "command": "node scripts/submit-project-doctor-status-source.mjs --producer <producer-id> --id <entry-id> --source <validated-json>",
+  "policy": {
+    "producerMustBeRegistered": true,
+    "producerDomainIsAuthoritative": true,
+    "producerMustBeEnabled": true,
+    "sourcePathMustMatchProducerOutputFamily": true,
+    "sourceMustAlreadyExistBeforePromotion": true,
+    "submissionAlwaysDelegatesToStage3Guard": true,
+    "checkModeDelegatesToStage3CheckMode": true,
+    "producerDoesNotInferEntryId": true,
+    "producerDoesNotInferAuthorityFromFilename": true,
+    "producerDoesNotInferAuthorityFromChronology": true,
+    "producerCannotBypassAdmission": true,
+    "producerCannotBypassD1Projection": true,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "canonicalJoinRecomputation": false
+  },
+  "producers": [
+    {
+      "id": "hero-final",
+      "domain": "hero",
+      "enabled": true,
+      "allowedSourcePattern": "^data/validation/hero-[A-Za-z0-9._/-]+\\.v1\\.json$",
+      "role": "Hero completion/freeze validator output"
+    },
+    {
+      "id": "soldier-final",
+      "domain": "soldier",
+      "enabled": true,
+      "allowedSourcePattern": "^data/validation/soldier-[A-Za-z0-9._/-]+\\.v1\\.json$",
+      "role": "Soldier completion/site-admission validator output"
+    },
+    {
+      "id": "equipment-final",
+      "domain": "equipment",
+      "enabled": true,
+      "allowedSourcePattern": "^data/validation/equipment-[A-Za-z0-9._/-]+\\.v1\\.json$",
+      "role": "Equipment completion/freeze validator output"
+    },
+    {
+      "id": "hero-soldier-final",
+      "domain": "hero-soldier",
+      "enabled": true,
+      "allowedSourcePattern": "^data/validation/hero-soldier-[A-Za-z0-9._/-]+\\.v1\\.json$",
+      "role": "Hero-Soldier relation completion/freeze validator output"
+    },
+    {
+      "id": "banner-final",
+      "domain": "banner",
+      "enabled": true,
+      "allowedSourcePattern": "^data/validation/banner-[A-Za-z0-9._/-]+\\.v1\\.json$",
+      "role": "Banner completion/regression-freeze validator output"
+    },
+    {
+      "id": "skin-final",
+      "domain": "skin",
+      "enabled": true,
+      "allowedSourcePattern": "^data/validation/skin-[A-Za-z0-9._/-]+\\.v1\\.json$",
+      "role": "Skin readiness/final-evidence validator output"
+    }
+  ],
+  "boundaries": {
+    "doesNotRunDomainValidation": true,
+    "doesNotCreateDomainValidation": true,
+    "doesNotChangeStage3AdmissionRules": true,
+    "doesNotAutoPromoteOnFileCreation": true,
+    "doesNotReopenFrozenSemantics": true
+  }
+}
