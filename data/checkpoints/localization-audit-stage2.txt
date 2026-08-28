@@ -1,0 +1,78 @@
+Localization Audit Stage 2 — Soldier status/conflict contamination audit
+
+Status: PASS_WITH_REVIEW / COMPLETE
+
+Scope:
+- strengthens the Stage 1 read-only Soldier localization audit
+- no automatic translation
+- no canonical/presentation/frontend mutation
+- exact soldierId identity remains the only JOIN key
+
+Implemented:
+- scripts/audit-localization.mjs upgraded to Stage 2
+- data/validation/localization-audit-soldier-stage2.v1.json
+
+Validated baseline:
+- canonical Soldier: 224
+- unique Soldier IDs: 224
+- normal / SP: 168 / 56
+- normal tier 3: 129
+- confirmed canonical tier 3 Korean names: 127
+- lower-tier presentation: 39 / 39
+- tier-3 provisional presentation: 2
+- effective Korean display: 224 / 224
+- canonical name/status conflicts: 0
+- stale confirmed overlays: 0
+- invalid promotions: 0
+- stale provisional overlays: 0
+- overlay collisions: 0
+- unrelated duplicate Korean-name groups: 0
+- explicit normal-SP same-name groups allowed by canonical relationship: 56
+- hard errors: 0
+- REVIEW: 2 approved provisional Korean display names
+
+Important false-positive correction:
+- the first duplicate-name scan found 56 duplicate groups
+- all 56 were normal Soldier + SP Soldier pairs sharing the same Korean display name
+- these are not inferred by numeric ID offset
+- they are accepted only when canonical normal.spSoldierId and SP.normalSoldierId explicitly point to each other
+- duplicate Korean names outside that explicit relationship remain REVIEW as DUPLICATE_KR_NAME
+
+REVIEW targets:
+- Soldier 136 / 烬色卫队 / 잿빛 호위대 / PROVISIONAL_UNRESOLVED
+- Soldier 1039 / 断罪修女 / 단죄의 수녀 / PROVISIONAL_UNRESOLVED
+
+New/strengthened issue boundaries:
+- CANONICAL_LOCALIZATION_STATE_CONFLICT: nameKr and nameKrStatus disagree
+- INVALID_PROMOTION: provisional record leaves null/unreleased/REVIEW without approved transition
+- STALE_PROVISIONAL: canonical confirmation is established but provisional overlay remains after boundary retirement
+- STALE_CONFIRMED_OVERLAY: lower-tier canonical confirmation exists while presentation backfill remains
+- DUPLICATE_KR_NAME: unrelated Soldier IDs resolve to the same effective Korean display name
+- MISSING_DISPLAY: effective Korean display is absent
+- T3_CONFIRMED_COVERAGE_MISMATCH: confirmed tier-3 count diverges from frozen baseline
+- existing identity/source/duplicate-ID/overlay-collision failures remain active
+
+Contamination self-tests:
+- invalid promotion -> detected
+- Chinese identity mismatch -> detected
+- duplicate presentation Soldier ID -> detected
+- missing Korean display -> detected
+- canonical name/status conflict -> detected
+- unrelated duplicate Korean display name -> detected
+- result: PASS 6 / 6
+
+Final verification evidence:
+- GitHub Actions run: 33150748794
+- job: 98781903469
+- verified head: 422cf05232fc82cbf3b95ee79b17cd2733a6a5f8
+- command: node scripts/audit-localization.mjs --check
+- result: Localization Audit Stage 2: PASS_WITH_REVIEW
+- result: Soldier 224, display 224, errors 0, reviews 2
+- command: node scripts/audit-localization.mjs --self-test
+- result: PASS (6/6)
+- job conclusion: success
+
+Temporary verification workflow is removed before merge; no permanent CI gate is introduced in Stage 2.
+
+Next start point:
+Localization Audit Stage 3 — extend the proven audit model to Hero and Equipment while preserving entity-specific authoritative source contracts.
