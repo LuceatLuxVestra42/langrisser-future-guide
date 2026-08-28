@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - work/project-doctor-closeout
+    paths:
+      - .github/workflows/project-doctor-refresh-once.yml
 
 permissions:
   contents: write
 
 jobs:
   refresh:
-    if: github.event.head_commit.message != 'chore: refresh Project Doctor D1/D5'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
