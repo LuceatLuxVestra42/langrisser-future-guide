@@ -2,6 +2,7 @@ import {
   buildEntityIndex,
   buildSummary,
   loadStage1Contract,
+  writeIndexJson,
   writeJson,
 } from './lib/configdata-lookup-stage1.mjs';
 
@@ -13,7 +14,7 @@ async function main() {
 
   for (const [entity, spec] of Object.entries(contract.entities)) {
     const index = await buildEntityIndex(entity, spec, contract);
-    await writeJson(spec.output, index);
+    await writeIndexJson(spec.output, index);
     built[entity] = index;
     console.log(`${entity}: ${index.index.entryCount} IDs -> ${spec.output}`);
   }
