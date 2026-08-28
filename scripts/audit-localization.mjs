@@ -1,13 +1,23 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
+import { spawnSync } from 'node:child_process';
 
 const ROOT = process.cwd();
-const CONTRACT_PATH = 'data/contracts/localization-audit.v1.json';
-const EXPECTED_PATH = 'data/validation/localization-audit-soldier-stage2.v1.json';
+const CONTRACT_PATH = 'data/contracts/localization-audit-stage5.v1.json';
+const SNAPSHOT_PATH = 'data/validation/localization-audit-stage5.v1.json';
+const STAGE4_SCRIPT = 'scripts/audit-localization-stage4.mjs';
 
-function readJson(relativePath) {
-  return JSON.parse(fs.readFileSync(path.join(ROOT, relativePath), 'utf8'));
+const readText = (relativePath) => fs.readFileSync(path.join(ROOT, relativePath), 'utf8');
+const readJson = (relativePath) => JSON.parse(readText(relativePath));
+
+function stable(value) {
+  if (Array.isArray(value)) return value.map(stable);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stable(value[key])]));
+  }
+  return value;
 }
 
 function clone(value) {
@@ -18,463 +28,341 @@ function fail(code, message, context = {}) {
   return { severity: 'FAIL', code, message, context };
 }
 
-function review(code, message, context = {}) {
-  return { severity: 'REVIEW', code, message, context };
-}
-
-function uniqueBy(records, key) {
-  const seen = new Map();
-  const duplicates = [];
-  for (const record of records) {
-    const value = record[key];
-    if (seen.has(value)) duplicates.push(value);
-    else seen.set(value, record);
-  }
-  return { map: seen, duplicates };
-}
-
-function nonEmptyString(value) {
-  return typeof value === 'string' && value.trim().length > 0;
-}
-
-function normalizeDisplay(value) {
-  return nonEmptyString(value) ? value.trim().replace(/\s+/g, ' ') : null;
-}
-
-function loadInputs() {
-  const contract = readJson(CONTRACT_PATH);
-  return {
-    contract,
-    canonical: readJson(contract.sources.canonicalSoldierList.path),
-    lower: readJson(contract.sources.lowerTierPresentation.path),
-    provisional: readJson(contract.sources.tier3ProvisionalPresentation.path),
-    boundaryValidation: readJson(contract.sources.tier3ProvisionalValidation.path),
-  };
-}
-
-function isExplicitNormalSpPair(records, canonicalIndex) {
-  if (records.length !== 2) return false;
-  const [left, right] = records.map((record) => canonicalIndex.map.get(record.soldierId));
-  if (!left || !right || left.isSp === right.isSp) return false;
-  const normal = left.isSp ? right : left;
-  const sp = left.isSp ? left : right;
-  return normal.spSoldierId === sp.soldierId && sp.normalSoldierId === normal.soldierId;
-}
-
-function auditSoldierLocalization(input = loadInputs()) {
-  const { contract, canonical, lower, provisional, boundaryValidation } = input;
-  const errors = [];
-  const reviews = [];
-
-  if (
-    contract.schemaId !== 'localization-audit-contract/v1' ||
-    contract.stage !== '0' ||
-    contract.status !== 'FROZEN' ||
-    contract.scope?.mode !== 'READ_ONLY_AUDIT' ||
-    contract.scope?.initialEntity !== 'Soldier'
-  ) {
-    errors.push(fail('CONTRACT_MISMATCH', 'Stage 0 localization audit contract is not the expected frozen Soldier read-only contract.'));
-  }
-
-  const canonicalRecords = Array.isArray(canonical.records) ? canonical.records : [];
-  const lowerRecords = Array.isArray(lower.records) ? lower.records : [];
-  const provisionalRecords = Array.isArray(provisional.records) ? provisional.records : [];
-
-  const canonicalIndex = uniqueBy(canonicalRecords, 'soldierId');
-  const lowerIndex = uniqueBy(lowerRecords, 'soldierId');
-  const provisionalIndex = uniqueBy(provisionalRecords, 'soldierId');
-  const boundaryTargetIds = new Set(
-    Array.isArray(boundaryValidation.targets)
-      ? boundaryValidation.targets.map((record) => record.soldierId)
-      : [],
-  );
-
-  const expectedCanonicalCount = contract.sources.canonicalSoldierList.expectedRecordCount;
-  if (canonicalRecords.length !== expectedCanonicalCount) {
-    errors.push(fail('CANONICAL_COUNT_MISMATCH', `Canonical Soldier count ${canonicalRecords.length} != ${expectedCanonicalCount}.`));
-  }
-  if (canonicalIndex.duplicates.length) {
-    errors.push(fail('DUPLICATE_CANONICAL_ID', 'Canonical Soldier IDs are not unique.', { soldierIds: canonicalIndex.duplicates }));
-  }
-
-  let canonicalStateConflicts = 0;
-  for (const record of canonicalRecords) {
-    const hasKr = nonEmptyString(record.nameKr);
-    const isConfirmed = record.nameKrStatus === 'confirmed';
-    if ((hasKr && !isConfirmed) || (!hasKr && isConfirmed)) {
-      canonicalStateConflicts += 1;
-      errors.push(fail('CANONICAL_LOCALIZATION_STATE_CONFLICT', `Canonical Korean name/status mismatch for Soldier ${record.soldierId}.`, {
-        soldierId: record.soldierId,
-        nameKr: record.nameKr,
-        nameKrStatus: record.nameKrStatus,
-        validationStatus: record.validationStatus,
-      }));
-    }
-  }
-
-  const expectedLowerCount = contract.sources.lowerTierPresentation.expectedRecordCount;
-  if (
-    lower.status !== contract.sources.lowerTierPresentation.expectedStatus ||
-    lower.scope !== contract.sources.lowerTierPresentation.expectedScope ||
-    lower.source?.identityMutation !== false ||
-    lowerRecords.length !== expectedLowerCount
-  ) {
-    errors.push(fail('LOWER_TIER_SOURCE_CONTRACT_MISMATCH', 'Tier 1-2 Korean presentation source does not match the frozen contract.'));
-  }
-  if (lowerIndex.duplicates.length) {
-    errors.push(fail('DUPLICATE_PRESENTATION_ID', 'Tier 1-2 presentation source contains duplicate Soldier IDs.', { soldierIds: lowerIndex.duplicates }));
-  }
-
-  let staleConfirmedOverlayCount = 0;
-  for (const record of lowerRecords) {
-    const base = canonicalIndex.map.get(record.soldierId);
-    if (!base) {
-      errors.push(fail('UNKNOWN_CANONICAL_ID', `Tier 1-2 presentation Soldier ${record.soldierId} does not exist in canonical Soldier list.`));
-      continue;
-    }
-    if (
-      base.isSp ||
-      (base.tier !== 1 && base.tier !== 2) ||
-      record.tier !== base.tier ||
-      record.nameCn !== base.nameCn
-    ) {
-      errors.push(fail('IDENTITY_MISMATCH', `Tier 1-2 presentation identity mismatch for Soldier ${record.soldierId}.`, {
-        canonical: { tier: base.tier, nameCn: base.nameCn, isSp: base.isSp },
-        presentation: { tier: record.tier, nameCn: record.nameCn },
-      }));
-    }
-    if (!nonEmptyString(record.nameKr)) {
-      errors.push(fail('MISSING_DISPLAY', `Tier 1-2 presentation Soldier ${record.soldierId} has an empty Korean display name.`));
-    }
-    if (nonEmptyString(base.nameKr) && base.nameKrStatus === 'confirmed') {
-      staleConfirmedOverlayCount += 1;
-      reviews.push(review('STALE_CONFIRMED_OVERLAY', `Tier 1-2 Soldier ${record.soldierId} has both a confirmed canonical Korean name and a presentation backfill.`, {
-        soldierId: record.soldierId,
-        canonicalNameKr: base.nameKr,
-        presentationNameKr: record.nameKr,
-      }));
-    }
-  }
-
-  const lowerCanonicalCount = canonicalRecords.filter(
-    (record) => !record.isSp && (record.tier === 1 || record.tier === 2),
-  ).length;
-  if (lowerCanonicalCount !== expectedLowerCount) {
-    errors.push(fail('LOWER_TIER_CANONICAL_COVERAGE_MISMATCH', `Canonical tier 1-2 Soldier count ${lowerCanonicalCount} != ${expectedLowerCount}.`));
-  }
-  for (const base of canonicalRecords) {
-    if (!base.isSp && (base.tier === 1 || base.tier === 2) && !lowerIndex.map.has(base.soldierId)) {
-      errors.push(fail('MISSING_DISPLAY', `Missing required tier 1-2 Korean presentation mapping for Soldier ${base.soldierId}.`));
-    }
-  }
-
-  const expectedProvisionalCount = contract.sources.tier3ProvisionalPresentation.expectedRecordCount;
-  if (
-    provisional.status !== contract.sources.tier3ProvisionalPresentation.expectedStatus ||
-    provisional.scope !== contract.sources.tier3ProvisionalPresentation.expectedScope ||
-    provisional.source?.officialKoreanNameConfirmed !== false ||
-    provisional.source?.identityMutation !== false ||
-    provisionalRecords.length !== expectedProvisionalCount
-  ) {
-    errors.push(fail('PROVISIONAL_SOURCE_CONTRACT_MISMATCH', 'Tier 3 provisional Korean presentation source does not match the frozen contract.'));
-  }
-  if (provisionalIndex.duplicates.length) {
-    errors.push(fail('DUPLICATE_PRESENTATION_ID', 'Tier 3 provisional presentation source contains duplicate Soldier IDs.', { soldierIds: provisionalIndex.duplicates }));
-  }
-
-  let invalidPromotionCount = 0;
-  let staleProvisionalCount = 0;
-  for (const record of provisionalRecords) {
-    const base = canonicalIndex.map.get(record.soldierId);
-    if (!base) {
-      errors.push(fail('UNKNOWN_CANONICAL_ID', `Tier 3 provisional Soldier ${record.soldierId} does not exist in canonical Soldier list.`));
-      continue;
-    }
-    if (
-      base.isSp ||
-      base.tier !== 3 ||
-      record.tier !== 3 ||
-      record.nameCn !== base.nameCn ||
-      record.armyType !== base.armyType ||
-      record.status !== contract.sources.tier3ProvisionalPresentation.requiredRecordStatus
-    ) {
-      errors.push(fail('IDENTITY_MISMATCH', `Tier 3 provisional presentation identity mismatch for Soldier ${record.soldierId}.`, {
-        canonical: { tier: base.tier, nameCn: base.nameCn, armyType: base.armyType, isSp: base.isSp },
-        presentation: { tier: record.tier, nameCn: record.nameCn, armyType: record.armyType, status: record.status },
-      }));
-    }
-    if (!nonEmptyString(record.displayNameKr)) {
-      errors.push(fail('MISSING_DISPLAY', `Tier 3 provisional Soldier ${record.soldierId} has an empty Korean display name.`));
-    }
-
-    const stillUnresolved =
-      base.nameKr === null &&
-      base.nameKrStatus === 'unreleased' &&
-      base.validationStatus === 'REVIEW';
-    const looksOfficiallyConfirmed =
-      nonEmptyString(base.nameKr) &&
-      base.nameKrStatus === 'confirmed' &&
-      base.validationStatus === 'PASS';
-
-    if (stillUnresolved) {
-      reviews.push(review('PROVISIONAL_UNRESOLVED', `Tier 3 Soldier ${record.soldierId} uses an approved provisional Korean display name while the official Korean server name remains unresolved.`, {
-        soldierId: record.soldierId,
-        nameCn: record.nameCn,
-        displayNameKr: record.displayNameKr,
-      }));
-    } else if (looksOfficiallyConfirmed && !boundaryTargetIds.has(record.soldierId)) {
-      staleProvisionalCount += 1;
-      reviews.push(review('STALE_PROVISIONAL', `Tier 3 Soldier ${record.soldierId} is canonically confirmed but a provisional presentation overlay still remains.`, {
-        soldierId: record.soldierId,
-        canonicalNameKr: base.nameKr,
-        provisionalDisplayNameKr: record.displayNameKr,
-      }));
-    } else {
-      invalidPromotionCount += 1;
-      errors.push(fail('INVALID_PROMOTION', `Tier 3 provisional Soldier ${record.soldierId} left the frozen null/unreleased/REVIEW canonical boundary without an approved transition.`, {
-        soldierId: record.soldierId,
-        nameKr: base.nameKr,
-        nameKrStatus: base.nameKrStatus,
-        validationStatus: base.validationStatus,
-      }));
-    }
-  }
-
-  const overlayCollisions = lowerRecords
-    .map((record) => record.soldierId)
-    .filter((soldierId) => provisionalIndex.map.has(soldierId));
-  if (overlayCollisions.length) {
-    errors.push(fail('OVERLAY_COLLISION', 'A Soldier ID appears in both presentation overlays.', { soldierIds: overlayCollisions }));
-  }
-
-  const expectedTier3Confirmed = contract.baseline?.tier3ConfirmedKoreanNames;
-  const tier3ConfirmedCanonical = canonicalRecords.filter(
-    (record) => !record.isSp && record.tier === 3 && nonEmptyString(record.nameKr) && record.nameKrStatus === 'confirmed',
-  ).length;
-  if (Number.isInteger(expectedTier3Confirmed) && tier3ConfirmedCanonical !== expectedTier3Confirmed) {
-    errors.push(fail('T3_CONFIRMED_COVERAGE_MISMATCH', `Confirmed canonical tier-3 Korean names ${tier3ConfirmedCanonical} != ${expectedTier3Confirmed}.`));
-  }
-
-  const effectiveRecords = canonicalRecords.map((base) => {
-    const lowerPresentation = lowerIndex.map.get(base.soldierId);
-    const provisionalPresentation = provisionalIndex.map.get(base.soldierId);
-    const displayNameKr = lowerPresentation?.nameKr ?? provisionalPresentation?.displayNameKr ?? base.nameKr ?? null;
-    const displayStatus = lowerPresentation
-      ? contract.sources.lowerTierPresentation.effectiveDisplayStatus
-      : provisionalPresentation
-        ? contract.sources.tier3ProvisionalPresentation.effectiveDisplayStatus
-        : base.nameKrStatus;
-    return {
-      soldierId: base.soldierId,
-      nameCn: base.nameCn,
-      displayNameKr,
-      displayStatus,
-      source: lowerPresentation ? 'lower-tier-presentation' : provisionalPresentation ? 'tier3-provisional-presentation' : 'canonical',
-    };
+function runNode(script, args = []) {
+  const run = spawnSync(process.execPath, [script, ...args], {
+    cwd: ROOT,
+    encoding: 'utf8',
   });
-
-  const missingEffectiveDisplay = effectiveRecords.filter((record) => !nonEmptyString(record.displayNameKr));
-  if (missingEffectiveDisplay.length) {
-    errors.push(fail('MISSING_DISPLAY', 'One or more canonical Soldiers have no effective Korean display name.', {
-      soldierIds: missingEffectiveDisplay.map((record) => record.soldierId),
-    }));
-  }
-
-  const displayGroups = new Map();
-  for (const record of effectiveRecords) {
-    const normalized = normalizeDisplay(record.displayNameKr);
-    if (!normalized) continue;
-    if (!displayGroups.has(normalized)) displayGroups.set(normalized, []);
-    displayGroups.get(normalized).push(record);
-  }
-
-  const allDuplicateKrGroups = [...displayGroups.entries()]
-    .filter(([, records]) => records.length > 1)
-    .map(([nameKr, records]) => ({
-      nameKr,
-      records,
-      soldierIds: records.map((record) => record.soldierId).sort((a, b) => a - b),
-      sources: records.map((record) => record.source),
-    }));
-  const expectedSpDuplicateGroups = allDuplicateKrGroups.filter((group) => isExplicitNormalSpPair(group.records, canonicalIndex));
-  const duplicateKrGroups = allDuplicateKrGroups
-    .filter((group) => !isExplicitNormalSpPair(group.records, canonicalIndex))
-    .map(({ records: _records, ...group }) => group)
-    .sort((a, b) => a.nameKr.localeCompare(b.nameKr, 'ko'));
-  for (const group of duplicateKrGroups) {
-    reviews.push(review('DUPLICATE_KR_NAME', `Multiple unrelated Soldier IDs resolve to the same effective Korean display name: ${group.nameKr}.`, group));
-  }
-
-  if (boundaryValidation.status !== contract.sources.tier3ProvisionalValidation.expectedStatus) {
-    errors.push(fail('BOUNDARY_VALIDATION_MISMATCH', 'Existing tier-3 provisional boundary validation is not PASS.'));
-  }
-
-  const checks = {
-    contractFrozen: contract.status === 'FROZEN',
-    canonicalCountMatches: canonicalRecords.length === expectedCanonicalCount,
-    canonicalIdsUnique: canonicalIndex.duplicates.length === 0,
-    canonicalLocalizationStateConflicts: canonicalStateConflicts,
-    lowerTierCoverageMatches: lowerRecords.length === expectedLowerCount && lowerCanonicalCount === expectedLowerCount,
-    lowerTierIdsUnique: lowerIndex.duplicates.length === 0,
-    staleConfirmedOverlayCount,
-    provisionalCoverageMatches: provisionalRecords.length === expectedProvisionalCount,
-    provisionalIdsUnique: provisionalIndex.duplicates.length === 0,
-    invalidPromotionCount,
-    staleProvisionalCount,
-    overlayCollisionCount: overlayCollisions.length,
-    tier3ConfirmedCanonical,
-    effectiveDisplayCount: effectiveRecords.length - missingEffectiveDisplay.length,
-    missingEffectiveDisplayCount: missingEffectiveDisplay.length,
-    expectedNormalSpDuplicateNameGroups: expectedSpDuplicateGroups.length,
-    duplicateKrNameGroups: duplicateKrGroups.length,
-    provisionalBoundaryValidationPass: boundaryValidation.status === contract.sources.tier3ProvisionalValidation.expectedStatus,
-    readOnlyExecution: true,
+  return {
+    status: run.status ?? 1,
+    stdout: run.stdout ?? '',
+    stderr: run.stderr ?? '',
   };
+}
 
-  const status = errors.length > 0 ? 'FAIL' : reviews.length > 0 ? 'PASS_WITH_REVIEW' : 'PASS';
+function loadStage4() {
+  const check = runNode(STAGE4_SCRIPT, ['--check']);
+  if (check.status !== 0) {
+    throw new Error(`Stage 4 audit gate failed before Stage 5 formalization.\n${check.stdout}${check.stderr}`);
+  }
+
+  const json = runNode(STAGE4_SCRIPT, ['--json']);
+  if (json.status !== 0) {
+    throw new Error(`Stage 4 machine result failed before Stage 5 formalization.\n${json.stdout}${json.stderr}`);
+  }
+
+  return JSON.parse(json.stdout);
+}
+
+function fileExists(relativePath) {
+  return fs.existsSync(path.join(ROOT, relativePath));
+}
+
+function buildResult(stage4 = loadStage4()) {
+  const contract = readJson(CONTRACT_PATH);
+  const packageJson = readJson('package.json');
+  const stage2_1Source = readText(contract.historicalCompatibility.stage2_1Runner);
+  const ciSource = readText(contract.ci.workflow);
+  const errors = [];
+
+  const contractFrozen =
+    contract.schemaId === 'localization-audit-stage5-contract/v1' &&
+    contract.stage === 5 &&
+    contract.status === 'FROZEN' &&
+    contract.scope?.mode === 'READ_ONLY_AUDIT';
+  if (!contractFrozen) {
+    errors.push(fail('STAGE5_CONTRACT_MISMATCH', 'Stage 5 localization audit contract is not the expected frozen read-only contract.'));
+  }
+
+  const stage4SchemaMatches = stage4.schemaId === contract.inheritance.requiredSchemaId && stage4.stage === contract.inheritance.requiredStage;
+  if (!stage4SchemaMatches) {
+    errors.push(fail('STAGE4_INHERITANCE_MISMATCH', 'Stage 4 schema/stage does not match the frozen Stage 5 inheritance contract.'));
+  }
+
+  const stage4StatusAccepted = contract.inheritance.allowedStatuses.includes(stage4.status);
+  if (!stage4StatusAccepted) {
+    errors.push(fail('STAGE4_GATE_NOT_ACCEPTED', `Stage 4 status ${stage4.status} is not accepted by Stage 5.`));
+  }
+
+  const baseline = contract.inheritance.expectedBaseline;
+  const stage4Baseline = {
+    soldierRecords: stage4.effectiveDisplay?.soldier?.records ?? null,
+    heroRecords: stage4.effectiveDisplay?.hero?.listRecords ?? null,
+    equipmentRecords: stage4.effectiveDisplay?.equipment?.canonicalRecords ?? null,
+    equipmentPublicRecords: stage4.effectiveDisplay?.equipment?.admittedRecords ?? null,
+    errors: stage4.summary?.errors ?? null,
+    reviews: stage4.summary?.reviews ?? null,
+    frontendLocalizationLeakErrors: stage4.summary?.frontendLocalizationLeakErrors ?? null,
+  };
+  const baselineMatches = JSON.stringify(stable(stage4Baseline)) === JSON.stringify(stable(baseline));
+  if (!baselineMatches) {
+    errors.push(fail('STAGE4_BASELINE_MISMATCH', 'Stage 4 baseline no longer matches the frozen Stage 5 adoption baseline.', {
+      expected: baseline,
+      actual: stage4Baseline,
+    }));
+  }
+
+  const packageScriptExact = packageJson.scripts?.[contract.command.packageScript] === contract.command.packageCommand;
+  if (!packageScriptExact) {
+    errors.push(fail('FORMAL_COMMAND_MISMATCH', `package.json must define ${contract.command.packageScript} exactly as ${contract.command.packageCommand}.`));
+  }
+
+  const historicalStage2RunnerExists = fileExists(contract.historicalCompatibility.stage2Runner);
+  if (!historicalStage2RunnerExists) {
+    errors.push(fail('HISTORICAL_STAGE2_RUNNER_MISSING', 'Preserved Stage 2 localization audit runner is missing.'));
+  }
+
+  const stage2_1UsesPreservedStage2 = stage2_1Source.includes(`const STAGE2_SCRIPT = '${contract.historicalCompatibility.requiredStage2_1Reference}';`);
+  if (!stage2_1UsesPreservedStage2) {
+    errors.push(fail('HISTORICAL_STAGE2_BRIDGE_MISMATCH', 'Stage 2.1 does not point to the preserved Stage 2 runner.'));
+  }
+
+  const requiredCiMarkers = [
+    'name: Localization Audit',
+    'pull_request:',
+    'push:',
+    'workflow_dispatch:',
+    'npm run audit:localization -- --check --report',
+    'npm run audit:localization -- --self-test',
+    contract.ci.reportArtifact,
+  ];
+  const permanentCiDeclared = requiredCiMarkers.every((marker) => ciSource.includes(marker));
+  if (!permanentCiDeclared) {
+    errors.push(fail('PERMANENT_CI_MISMATCH', 'Permanent localization audit CI does not match the Stage 5 contract.'));
+  }
+
+  const status = errors.length > 0 ? 'FAIL' : stage4.status;
 
   return {
     version: 1,
-    schemaId: 'localization-audit-soldier-stage2/v1',
-    stage: 2,
-    entity: 'Soldier',
+    schemaId: 'localization-audit-stage5/v1',
+    stage: 5,
     status,
     mode: 'READ_ONLY_AUDIT',
+    purpose: 'formalize the completed localization audit as one package command, deterministic machine report, and permanent CI gate',
     sources: {
       contract: CONTRACT_PATH,
-      canonical: contract.sources.canonicalSoldierList.path,
-      lowerTierPresentation: contract.sources.lowerTierPresentation.path,
-      tier3ProvisionalPresentation: contract.sources.tier3ProvisionalPresentation.path,
-      tier3ProvisionalValidation: contract.sources.tier3ProvisionalValidation.path,
+      inheritedStage4Runner: STAGE4_SCRIPT,
+      inheritedStage4Snapshot: contract.inheritance.snapshot,
+      packageJson: 'package.json',
+      ciWorkflow: contract.ci.workflow,
+      historicalStage2Runner: contract.historicalCompatibility.stage2Runner,
+      stage2_1Runner: contract.historicalCompatibility.stage2_1Runner,
+    },
+    command: {
+      packageScript: contract.command.packageScript,
+      packageCommand: contract.command.packageCommand,
+      entrypoint: contract.command.entrypoint,
+      supportedOptions: contract.command.supportedOptions,
+    },
+    inheritedStage4: {
+      schemaId: stage4.schemaId,
+      status: stage4.status,
+      soldierRecords: stage4Baseline.soldierRecords,
+      soldierEffectiveKoreanDisplays: stage4.effectiveDisplay?.soldier?.effectiveKoreanDisplays ?? null,
+      heroRecords: stage4Baseline.heroRecords,
+      heroEffectiveKoreanDisplays: stage4.effectiveDisplay?.hero?.effectiveKoreanDisplays ?? null,
+      equipmentRecords: stage4Baseline.equipmentRecords,
+      equipmentPublicRecords: stage4Baseline.equipmentPublicRecords,
+      equipmentEffectiveKoreanDisplays: stage4.effectiveDisplay?.equipment?.effectiveKoreanDisplays ?? null,
+      equipmentNonPublicAdmitted: stage4.effectiveDisplay?.equipment?.nonPublicAdmitted ?? null,
+      frontendFilesChecked: stage4.frontendBoundary?.filesChecked ?? null,
+      errors: stage4Baseline.errors,
+      reviews: stage4Baseline.reviews,
+      frontendLocalizationLeakErrors: stage4Baseline.frontendLocalizationLeakErrors,
+    },
+    machineReport: {
+      schemaId: contract.machineReport.schemaId,
+      format: contract.machineReport.format,
+      stdoutFlag: contract.machineReport.stdoutFlag,
+      fileFlag: contract.machineReport.fileFlag,
+      deterministic: contract.machineReport.deterministic,
+      repositoryInputMutationAllowed: contract.machineReport.repositoryInputMutationAllowed,
+    },
+    ci: {
+      workflow: contract.ci.workflow,
+      permanent: contract.ci.permanent,
+      triggers: contract.ci.triggers,
+      reportArtifact: contract.ci.reportArtifact,
+    },
+    checks: {
+      contractFrozen,
+      stage4SnapshotGatePassed: true,
+      stage4SchemaMatches,
+      stage4StatusAccepted,
+      baselineMatches,
+      packageScriptExact,
+      historicalStage2RunnerExists,
+      stage2_1UsesPreservedStage2,
+      permanentCiDeclared,
+      readOnlyExecution: true,
     },
     summary: {
-      canonicalRecords: canonicalRecords.length,
-      canonicalUniqueIds: canonicalIndex.map.size,
-      normalRecords: canonical.summary?.normalCount ?? null,
-      spRecords: canonical.summary?.spCount ?? null,
-      normalTier3Records: canonical.summary?.normalTier3Count ?? null,
-      tier3ConfirmedCanonical,
-      lowerTierCanonicalRecords: lowerCanonicalCount,
-      lowerTierPresentationRecords: lowerRecords.length,
-      tier3ProvisionalPresentationRecords: provisionalRecords.length,
-      effectiveKoreanDisplayRecords: effectiveRecords.length - missingEffectiveDisplay.length,
-      canonicalStateConflicts,
-      staleConfirmedOverlays: staleConfirmedOverlayCount,
-      invalidPromotions: invalidPromotionCount,
-      staleProvisionals: staleProvisionalCount,
-      overlayCollisions: overlayCollisions.length,
-      expectedNormalSpDuplicateNameGroups: expectedSpDuplicateGroups.length,
-      duplicateKrNameGroups: duplicateKrGroups.length,
-      errors: errors.length,
-      reviews: reviews.length,
+      errors: (stage4Baseline.errors ?? 0) + errors.length,
+      reviews: stage4Baseline.reviews,
+      frontendLocalizationLeakErrors: stage4Baseline.frontendLocalizationLeakErrors,
+      soldierRecords: stage4Baseline.soldierRecords,
+      heroRecords: stage4Baseline.heroRecords,
+      equipmentRecords: stage4Baseline.equipmentRecords,
+      equipmentPublicRecords: stage4Baseline.equipmentPublicRecords,
     },
-    checks,
     errors,
-    reviews,
+    readOnlyExecution: true,
   };
 }
 
-function hasIssue(result, severity, code) {
-  const bucket = severity === 'FAIL' ? result.errors : result.reviews;
-  return bucket.some((issue) => issue.code === code);
+function writeReport(outputPath, result) {
+  const resolved = path.resolve(ROOT, outputPath);
+  fs.mkdirSync(path.dirname(resolved), { recursive: true });
+  fs.writeFileSync(resolved, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+  return resolved;
 }
 
-function runSelfTests() {
-  const base = loadInputs();
+function runSelfTest() {
+  const inheritedRun = runNode(STAGE4_SCRIPT, ['--self-test']);
+  const inheritedText = `${inheritedRun.stdout}\n${inheritedRun.stderr}`;
+  const inheritedMatch = inheritedText.match(/PASS\s*\((\d+)\/(\d+)\)/u);
+  const inheritedPassed = inheritedRun.status === 0 && inheritedMatch ? Number(inheritedMatch[1]) : 0;
+  const inheritedTotal = inheritedMatch ? Number(inheritedMatch[2]) : 23;
+
+  const stage4 = loadStage4();
+  const baseline = buildResult(stage4);
+  const contract = readJson(CONTRACT_PATH);
   const tests = [];
 
-  const invalidPromotion = clone(base);
-  const promoted = invalidPromotion.canonical.records.find((record) => record.soldierId === 136);
-  promoted.nameKr = '잿빛 호위대';
-  promoted.nameKrStatus = 'confirmed';
-  promoted.validationStatus = 'PASS';
   tests.push({
-    name: 'invalid-promotion',
-    pass: hasIssue(auditSoldierLocalization(invalidPromotion), 'FAIL', 'INVALID_PROMOTION'),
+    name: 'formal-package-command',
+    passed: baseline.checks.packageScriptExact,
+  });
+  tests.push({
+    name: 'historical-stage2-bridge',
+    passed: baseline.checks.historicalStage2RunnerExists && baseline.checks.stage2_1UsesPreservedStage2,
+  });
+  tests.push({
+    name: 'permanent-ci-contract',
+    passed: baseline.checks.permanentCiDeclared,
+  });
+  tests.push({
+    name: 'deterministic-machine-report',
+    passed: JSON.stringify(stable(baseline)) === JSON.stringify(stable(buildResult(stage4))),
   });
 
-  const identityMismatch = clone(base);
-  identityMismatch.lower.records[0].nameCn = '__BROKEN_CN__';
-  tests.push({
-    name: 'identity-mismatch',
-    pass: hasIssue(auditSoldierLocalization(identityMismatch), 'FAIL', 'IDENTITY_MISMATCH'),
-  });
-
-  const duplicateId = clone(base);
-  duplicateId.lower.records.push(clone(duplicateId.lower.records[0]));
-  duplicateId.contract.sources.lowerTierPresentation.expectedRecordCount += 1;
-  tests.push({
-    name: 'duplicate-presentation-id',
-    pass: hasIssue(auditSoldierLocalization(duplicateId), 'FAIL', 'DUPLICATE_PRESENTATION_ID'),
-  });
-
-  const missingDisplay = clone(base);
-  missingDisplay.lower.records[0].nameKr = '';
-  tests.push({
-    name: 'missing-display',
-    pass: hasIssue(auditSoldierLocalization(missingDisplay), 'FAIL', 'MISSING_DISPLAY'),
-  });
-
-  const stateConflict = clone(base);
-  const stateTarget = stateConflict.canonical.records.find((record) => record.nameKrStatus === 'confirmed' && nonEmptyString(record.nameKr));
-  stateTarget.nameKrStatus = 'pending';
-  tests.push({
-    name: 'canonical-state-conflict',
-    pass: hasIssue(auditSoldierLocalization(stateConflict), 'FAIL', 'CANONICAL_LOCALIZATION_STATE_CONFLICT'),
-  });
-
-  const duplicateName = clone(base);
-  duplicateName.lower.records[1].nameKr = duplicateName.lower.records[0].nameKr;
-  tests.push({
-    name: 'duplicate-korean-name',
-    pass: hasIssue(auditSoldierLocalization(duplicateName), 'REVIEW', 'DUPLICATE_KR_NAME'),
-  });
-
-  const failed = tests.filter((test) => !test.pass);
-  return { status: failed.length ? 'FAIL' : 'PASS', total: tests.length, passed: tests.length - failed.length, failed };
-}
-
-function stable(value) {
-  if (Array.isArray(value)) return value.map(stable);
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stable(value[key])]));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'localization-audit-stage5-'));
+  const tempReport = path.join(tempDir, 'report.json');
+  let reportRoundTrip = false;
+  try {
+    writeReport(tempReport, baseline);
+    reportRoundTrip = JSON.stringify(stable(readJson(path.relative(ROOT, tempReport)))) === JSON.stringify(stable(baseline));
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
   }
-  return value;
+  tests.push({ name: 'machine-report-file-roundtrip', passed: reportRoundTrip });
+
+  const failedStage4 = clone(stage4);
+  failedStage4.status = 'FAIL';
+  tests.push({
+    name: 'inherited-fail-propagation',
+    passed: buildResult(failedStage4).status === 'FAIL',
+  });
+
+  const additionsPassed = tests.filter((test) => test.passed).length;
+  const additionsTotal = tests.length;
+  const inheritedOk = inheritedRun.status === 0 && inheritedPassed === inheritedTotal;
+  const status = inheritedOk && additionsPassed === additionsTotal ? 'PASS' : 'FAIL';
+
+  return {
+    status,
+    passed: inheritedPassed + additionsPassed,
+    total: inheritedTotal + additionsTotal,
+    inherited: { passed: inheritedPassed, total: inheritedTotal },
+    additions: { passed: additionsPassed, total: additionsTotal, tests },
+    contractSchemaId: contract.schemaId,
+  };
 }
 
-const args = new Set(process.argv.slice(2));
+function parseCli(argv) {
+  const options = {
+    check: false,
+    json: false,
+    selfTest: false,
+    reportPath: null,
+  };
 
-if (args.has('--self-test')) {
-  const selfTest = runSelfTests();
-  console.log(`Localization Audit Stage 2 self-test: ${selfTest.status} (${selfTest.passed}/${selfTest.total})`);
-  if (selfTest.failed.length) console.error(JSON.stringify(selfTest.failed, null, 2));
-  if (selfTest.status === 'FAIL') process.exit(1);
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--check') options.check = true;
+    else if (arg === '--json') options.json = true;
+    else if (arg === '--self-test') options.selfTest = true;
+    else if (arg === '--report') {
+      const next = argv[index + 1];
+      if (!next || next.startsWith('--')) throw new Error('--report requires an output path.');
+      options.reportPath = next;
+      index += 1;
+    } else {
+      throw new Error(`Unknown localization audit option: ${arg}`);
+    }
+  }
+  return options;
+}
+
+let options;
+try {
+  options = parseCli(process.argv.slice(2));
+} catch (error) {
+  console.error(error.message);
+  process.exit(2);
+}
+
+if (options.selfTest) {
+  const selfTest = runSelfTest();
+  console.log(`Localization Audit Stage 5 self-test: ${selfTest.status} (${selfTest.passed}/${selfTest.total})`);
+  console.log(`Inherited Stage 4: ${selfTest.inherited.passed}/${selfTest.inherited.total}; Stage 5 additions: ${selfTest.additions.passed}/${selfTest.additions.total}`);
+  if (selfTest.status !== 'PASS') {
+    for (const test of selfTest.additions.tests.filter((row) => !row.passed)) console.error(`FAILED ${test.name}`);
+    process.exit(1);
+  }
   process.exit(0);
 }
 
-const result = auditSoldierLocalization();
+let result;
+try {
+  result = buildResult();
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
+}
 
-if (args.has('--check')) {
-  const expected = readJson(EXPECTED_PATH);
+let reportPath = null;
+if (options.reportPath) {
+  reportPath = writeReport(options.reportPath, result);
+}
+
+if (result.status === 'FAIL') {
+  console.error('Localization Audit Stage 5: FAIL');
+  for (const row of result.errors) console.error(`${row.code}: ${row.message}`);
+  process.exit(1);
+}
+
+if (options.check) {
+  const expected = readJson(SNAPSHOT_PATH);
   if (JSON.stringify(stable(result)) !== JSON.stringify(stable(expected))) {
-    console.error('Localization audit Stage 2 snapshot mismatch.');
+    console.error('Localization Audit Stage 5 snapshot mismatch.');
     console.error(JSON.stringify(result, null, 2));
     process.exit(1);
   }
-  console.log(`Localization Audit Stage 2: ${result.status}`);
-  console.log(`Soldier ${result.summary.canonicalRecords}, display ${result.summary.effectiveKoreanDisplayRecords}, errors ${result.summary.errors}, reviews ${result.summary.reviews}`);
-} else if (args.has('--json')) {
+  console.log(`Localization Audit Stage 5: ${result.status}`);
+  console.log(`Soldier ${result.summary.soldierRecords}, Hero ${result.summary.heroRecords}, Equipment ${result.summary.equipmentRecords} / public ${result.summary.equipmentPublicRecords}`);
+  console.log(`errors ${result.summary.errors}, reviews ${result.summary.reviews}, frontend leaks ${result.summary.frontendLocalizationLeakErrors}`);
+  if (reportPath) console.log(`machine report: ${reportPath}`);
+} else if (options.json) {
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
 } else {
-  console.log(`LOCALIZATION AUDIT — ${result.entity} / Stage 2`);
+  console.log('LOCALIZATION AUDIT — Stage 5 / formal project gate');
   console.log(`status: ${result.status}`);
-  console.log(`canonical: ${result.summary.canonicalRecords}`);
-  console.log(`effective Korean display: ${result.summary.effectiveKoreanDisplayRecords}`);
-  console.log(`T3 confirmed canonical: ${result.summary.tier3ConfirmedCanonical}`);
-  console.log(`lower-tier presentation: ${result.summary.lowerTierPresentationRecords}`);
-  console.log(`T3 provisional presentation: ${result.summary.tier3ProvisionalPresentationRecords}`);
+  console.log(`Soldier: ${result.inheritedStage4.soldierEffectiveKoreanDisplays}/${result.inheritedStage4.soldierRecords}`);
+  console.log(`Hero: ${result.inheritedStage4.heroEffectiveKoreanDisplays}/${result.inheritedStage4.heroRecords}`);
+  console.log(`Equipment public: ${result.inheritedStage4.equipmentEffectiveKoreanDisplays}/${result.inheritedStage4.equipmentPublicRecords}`);
   console.log(`errors: ${result.summary.errors}`);
   console.log(`reviews: ${result.summary.reviews}`);
+  if (reportPath) console.log(`machine report: ${reportPath}`);
 }
-
-if (result.status === 'FAIL') process.exit(1);
