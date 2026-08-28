@@ -19,7 +19,10 @@ const records = summary.unresolved.map(u => {
   if (!d) throw new Error(`Missing display metadata for ${u.equipmentId}`);
   return {
     equipmentId: Number(u.equipmentId),
-    nameZh: d.name ?? d.Name ?? d.displayName ?? null,
+    nameCn: d.nameCn ?? null,
+    nameKr: d.nameKr ?? d.nameKrCandidate ?? null,
+    acquisitionClass: d.acquisitionClass ?? null,
+    pageReady: d.pageReady ?? null,
     sourceIconPath: u.sourceIconPath,
     sourceBasename: u.sourceBasename,
     holdStatus: u.status,
@@ -40,5 +43,6 @@ const out = {
   records,
 };
 if (records.length !== 29) throw new Error(`Expected 29 holds, got ${records.length}`);
+if (records.some(r => !r.nameCn)) throw new Error('Every hold must resolve a frozen Chinese equipment name');
 fs.writeFileSync(path.join(root, 'data/generated/equipment-image-stage2-hold29-index.v1.json'), JSON.stringify(out, null, 2) + '\n');
 console.log(JSON.stringify(out, null, 2));
