@@ -1,0 +1,50 @@
+name: Smart Regression SR-9 Doctor Input Prep
+
+on:
+  push:
+    branches:
+      - work/smart-regression-sr9-doctor-input
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/smart-regression-project-doctor-sr9a.v1.json'
+      - 'data/contracts/regression-bindings.sr3.v1.json'
+      - 'data/contracts/regression-fallback-policy.sr4.v1.json'
+      - 'data/contracts/regression-partial-replacement.sr8.v1.json'
+      - 'data/checkpoints/smart-regression-sr5-fixtures.v1.json'
+      - 'data/checkpoints/smart-regression-sr6-shadow.v1.json'
+      - 'data/checkpoints/smart-regression-sr7-history.v1.json'
+      - 'data/checkpoints/smart-regression-sr8-partial-replacement.v1.json'
+      - 'data/generated/smart-regression-project-doctor-input.v1.json'
+      - 'scripts/collect-smart-regression-project-doctor-input.mjs'
+      - 'package.json'
+      - '.github/workflows/smart-regression-sr9-doctor-input.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-doctor-input-prep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Syntax check collector
+        run: node --check scripts/collect-smart-regression-project-doctor-input.mjs
+
+      - name: Verify generated Doctor input is fresh
+        run: node scripts/collect-smart-regression-project-doctor-input.mjs --check
+
+      - name: Record preparation boundary
+        run: |
+          {
+            echo '## Smart Regression SR-9A~C'
+            echo
+            echo '- contract: frozen'
+            echo '- collector: syntax checked'
+            echo '- generated Doctor input: fresh'
+            echo '- Project Doctor implementation wiring: deferred'
+            echo '- Project Doctor end-to-end validation: deferred'
+          } >> "$GITHUB_STEP_SUMMARY"
