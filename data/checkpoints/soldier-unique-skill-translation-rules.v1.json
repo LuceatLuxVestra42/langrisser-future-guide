@@ -30,6 +30,7 @@
     {"cn":"友军","kr":"아군"},
     {"cn":"生命","kr":"생명"},
     {"cn":"生命值","kr":"생명"},
+    {"cn":"生命值百分比","kr":"생명 비율"},
     {"cn":"最大生命","kr":"최대 생명"},
     {"cn":"生命上限","kr":"최대 생명"},
     {"cn":"当前生命","kr":"현재 생명"},
@@ -77,10 +78,12 @@
     {"cn":"被远程攻击进入战斗时","kr":"원거리 공격을 받아 전투 진입 시"},
     {"cn":"被攻击进入战斗前","kr":"공격받아 전투 진입 전"},
     {"cn":"进入战斗前","kr":"전투 진입 전"},
+    {"cn":"近战攻击进入战斗时","kr":"근접 공격으로 전투 진입 시"},
     {"cn":"进入战斗时","kr":"전투 진입 시"},
     {"cn":"主动攻击时","kr":"공격 시"},
     {"cn":"被攻击时","kr":"공격받을 시"},
     {"cn":"被远程攻击时","kr":"원거리 공격을 받을 시"},
+    {"cn":"被攻击时有X%的几率","kr":"공격받을 시 X% 확률로"},
     {"cn":"行动结束时","kr":"행동 종료 시"},
     {"cn":"战斗后","kr":"전투 후"},
     {"cn":"战后","kr":"전투 후"},
@@ -97,12 +100,20 @@
     {"cn":"遭受魔法伤害降低X%","kr":"받는 마법 피해 X% 감소"},
     {"cn":"造成伤害提升X%","kr":"주는 피해 X% 증가"},
     {"cn":"士兵造成伤害增加X%","kr":"병사가 주는 피해 X% 증가"},
+    {"cn":"造成对方部队生命上限X%伤害","kr":"상대 부대 최대 생명의 X%만큼 피해"},
     {"cn":"部队伤害降低X%","kr":"부대가 주는 피해 X% 감소"},
     {"cn":"士兵遭受治疗效果提升X%","kr":"병사가 받는 치료 효과 X% 증가"},
     {"cn":"恢复士兵X%的生命","kr":"병사 생명 X% 회복"},
+    {"cn":"损失部队当前生命的X%","kr":"부대 현재 생명의 X%를 잃음"},
     {"cn":"反弹受到伤害的X%","kr":"받은 피해의 X% 반사"},
+    {"cn":"可以随英雄远程攻击一起战斗","kr":"영웅의 원거리 공격에도 함께 전투에 참여"},
+    {"cn":"攻击生命值百分比低于本部队的敌军时","kr":"생명 비율이 본 부대보다 낮은 적군을 공격할 시"},
+    {"cn":"攻击生命值百分比低于或等于本部队的敌军时","kr":"생명 비율이 본 부대의 생명 비율 이하인 적군을 공격할 시"},
+    {"cn":"攻击生命值百分比高于本部队的敌军时","kr":"생명 비율이 본 부대의 생명 비율을 초과하는 적군을 공격할 시"},
+    {"cn":"各提升X%","kr":"각각 X% 증가"},
     {"cn":"目标拥有弱化效果","kr":"대상에게 약화 효과가 있을 시"},
     {"cn":"效果翻倍","kr":"효과 2배"},
+    {"cn":"以上所有效果翻倍","kr":"위 모든 효과 2배"},
     {"cn":"施加「X」","kr":"「X」 부여"},
     {"cn":"无视X","kr":"X 무시"}
   ],
@@ -115,13 +126,15 @@
     {"cn":"高于 / 大于","kr":"초과"},
     {"cn":"低于 / 小于","kr":"미만"},
     {"cn":"大于等于 / 不低于","kr":"이상"},
-    {"cn":"小于等于 / 不高于","kr":"이하"}
+    {"cn":"小于等于 / 不高于","kr":"이하"},
+    {"cn":"低于或等于","kr":"이하"}
   ],
   "reviewQueueRules": [
     "Text inside 「」 or other named-effect labels is reviewed separately instead of being translated by generic word replacement.",
     "Skill-specific proper nouns and named mechanics such as 灼烧, 倒刺, 亡者苏生, 炼狱魔核 require individual Korean naming review.",
     "Mechanics whose official Korean wording can materially affect interpretation, including 致命一击 and 近战伤害减免, require per-record review.",
-    "Unusual generation/revival wording such as 获得N个士兵 or 士兵全部阵亡 requires sentence-level review even when its component terms are fixed."
+    "Unusual generation/revival wording such as 获得N个士兵 or 士兵全部阵亡 requires sentence-level review even when its component terms are fixed.",
+    "Reflection or damage percentages reused as a separate recovery percentage require sentence-level mechanic review."
   ],
   "validatedExamples": [
     {
@@ -147,10 +160,15 @@
     "phrasesAdded": ["被远程攻击时", "被远程攻击进入战斗时", "被攻击进入战斗前", "进入战斗前", "每移动一格", "每有1点移动力", "目标拥有弱化效果", "效果翻倍"],
     "namedEffectReviewTerms": ["先制打击", "空海奇袭", "水战强化", "水灵加护", "水中", "防具技能失效"]
   },
+  "batch3ObservedAdditions": {
+    "genericTermsAdded": ["生命值百分比"],
+    "phrasesAdded": ["攻击生命值百分比低于本部队的敌军时", "攻击生命值百分比低于或等于本部队的敌军时", "攻击生命值百分比高于本部队的敌军时", "造成对方部队生命上限X%伤害", "损失部队当前生命的X%", "可以随英雄远程攻击一起战斗", "以上所有效果翻倍", "被攻击时有X%的几率", "近战攻击进入战斗时", "各提升X%"],
+    "mechanicReviewTerms": ["反弹部队受到伤害...恢复最大生命百分比"]
+  },
   "completion": {
     "coreRulesFrozen": true,
     "autoTranslationEligible": "common terms, conditions, stats, damage/recovery, timing, range and inequality expressions",
     "reviewRequired": "named effects, skill-specific proper nouns and mechanics with potentially official Korean terminology",
-    "nextStartPoint": "Continue after soldierId 216 using data/presentation/soldier-unique-skill-kr.v1.json; collect only newly encountered exceptions."
+    "nextStartPoint": "Continue after soldierId 249 using data/presentation/soldier-unique-skill-kr.v1.json; collect only newly encountered exceptions."
   }
 }
