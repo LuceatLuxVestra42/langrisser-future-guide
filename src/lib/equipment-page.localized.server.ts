@@ -4,6 +4,11 @@ import {
   readExclusiveEquipmentPageData as readBaseExclusiveEquipmentPageData,
   readGeneralEquipmentPageData as readBaseGeneralEquipmentPageData,
 } from "./equipment-page.server";
+import type {
+  EquipmentDetailPageData,
+  ExclusiveEquipmentDetailPageData,
+  GeneralEquipmentDetailPageData,
+} from "./equipment-page.server";
 
 type EquipmentNameKrProjection = {
   byEquipmentId: Record<
@@ -54,14 +59,32 @@ export function readExclusiveEquipmentPageData() {
   };
 }
 
-export function readEquipmentDetailPageData(equipmentId: number) {
+export function readEquipmentDetailPageData(
+  equipmentId: number,
+): EquipmentDetailPageData | null {
   const data = readBaseEquipmentDetailPageData(equipmentId);
   if (!data) return null;
 
+  if (data.kind === "general") {
+    const identity = data.detail.identity;
+    const nameKr = resolveNameKr(equipmentId, identity.nameCn, identity.nameKr);
+    const localized: GeneralEquipmentDetailPageData = {
+      ...data,
+      displayName: nameKr ?? identity.nameCn,
+      detail: {
+        ...data.detail,
+        identity: {
+          ...identity,
+          nameKr,
+        },
+      },
+    };
+    return localized;
+  }
+
   const identity = data.detail.identity;
   const nameKr = resolveNameKr(equipmentId, identity.nameCn, identity.nameKr);
-
-  return {
+  const localized: ExclusiveEquipmentDetailPageData = {
     ...data,
     displayName: nameKr ?? identity.nameCn,
     detail: {
@@ -72,4 +95,5 @@ export function readEquipmentDetailPageData(equipmentId: number) {
       },
     },
   };
+  return localized;
 }

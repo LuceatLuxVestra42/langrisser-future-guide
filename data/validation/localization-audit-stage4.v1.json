@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-stage4/v1",
+  "stage": 4,
+  "status": "PASS_WITH_REVIEW",
+  "mode": "READ_ONLY_AUDIT",
+  "sources": {
+    "contract": "data/contracts/localization-audit-stage4.v1.json",
+    "inheritedStage3Snapshot": "data/validation/localization-audit-stage3.v1.json",
+    "frontendCriteria": "프론트엔드 사전검증 및 GitHub Pages Hosted QA 운용 기준.txt / Preflight production-boundary rules"
+  },
+  "stage3": {
+    "status": "PASS_WITH_REVIEW",
+    "errors": 0,
+    "reviews": 2,
+    "soldierRecords": 224,
+    "heroRecords": 267,
+    "equipmentRecords": 390
+  },
+  "frontendBoundary": {
+    "filesChecked": 15,
+    "rawConfigRuntimeReads": 0,
+    "forbiddenNameJoins": 0,
+    "routeRuntimeServerBypasses": 0,
+    "wiringMismatchCount": 0,
+    "policyMismatchCount": 0,
+    "equipmentBuildPreparation": true,
+    "semanticSignatureFingerprintAlgorithm": "sha256",
+    "semanticSignatureFingerprint": "3cec40f3a627b604baa9b2da5884387cda207fb071aedea29d141564382f1831"
+  },
+  "effectiveDisplay": {
+    "soldier": {
+      "records": 224,
+      "effectiveKoreanDisplays": 224,
+      "canonicalKoreanDisplays": 183,
+      "lowerTierPresentationDisplays": 39,
+      "tier3ProvisionalDisplays": 2,
+      "chineseFallbackDisplays": 0,
+      "overlayCollisions": 0,
+      "fingerprintAlgorithm": "sha256",
+      "fingerprintSort": "soldierId-ascending",
+      "fingerprintFields": [
+        "soldierId",
+        "effectiveDisplayName",
+        "displaySource",
+        "displayStatus"
+      ],
+      "fingerprint": "88191a34afaa97b70de12e8df0906bde9e9767dcde3bf1bf622e0d39582bbc84"
+    },
+    "hero": {
+      "listRecords": 267,
+      "detailManifestRecords": 267,
+      "effectiveKoreanDisplays": 267,
+      "chineseFallbackDisplays": 0,
+      "detailIdentityMismatchCount": 0,
+      "missingDetailShardCount": 0,
+      "fingerprintAlgorithm": "sha256",
+      "fingerprintSort": "heroId-ascending",
+      "fingerprintFields": [
+        "heroId",
+        "effectiveDisplayName",
+        "displaySource",
+        "detailNameKr",
+        "detailNameCn",
+        "detailNameEn"
+      ],
+      "fingerprint": "f2609239dd0e2fb28c07f285da1baa82d7100af48bf24192da87045cfe62472b"
+    },
+    "equipment": {
+      "canonicalRecords": 390,
+      "admittedRecords": 373,
+      "generalRecords": 206,
+      "exclusiveRecords": 167,
+      "effectiveKoreanDisplays": 373,
+      "chineseFallbackDisplays": 0,
+      "nonPublicRecords": 17,
+      "nonPublicAdmitted": 0,
+      "nonPublicAbsent": 17,
+      "identityMismatchCount": 0,
+      "listDetailMismatchCount": 0,
+      "productionJoinKey": "equipmentId",
+      "runtimeNameJoin": false,
+      "tempWorkspaceBuild": true,
+      "fingerprintAlgorithm": "sha256",
+      "fingerprintSort": "equipmentId-ascending",
+      "fingerprintFields": [
+        "equipmentId",
+        "effectiveDisplayName",
+        "displaySource",
+        "frontendKind",
+        "detailNameCn"
+      ],
+      "fingerprint": "528b8a3351e919a6ec83f5c109705c821b5b56bf7c9bb86b23a18f0e0cc9639b"
+    }
+  },
+  "summary": {
+    "errors": 0,
+    "reviews": 2,
+    "frontendLocalizationLeakErrors": 0
+  },
+  "errors": [],
+  "readOnlyExecution": true
+}

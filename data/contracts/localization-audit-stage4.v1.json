@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-stage4-contract/v1",
+  "stage": "4",
+  "status": "FROZEN",
+  "mode": "READ_ONLY_AUDIT",
+  "purpose": "Verify frontend localization consumer wiring and effective display behavior for Soldier, Hero, and Equipment without reopening frozen semantics.",
+  "inheritedStage3": {
+    "command": "node scripts/audit-localization-stage3.mjs --check",
+    "expectedStatus": "PASS_WITH_REVIEW"
+  },
+  "scope": {
+    "gate": "FRONTEND_PREFLIGHT_LOCALIZATION_BOUNDARY",
+    "entities": ["Soldier", "Hero", "Equipment"],
+    "includes": [
+      "production source boundary",
+      "effective Korean display precedence",
+      "list/detail identity parity",
+      "public admission localization parity",
+      "frontend name-join/raw-ConfigData leak checks"
+    ],
+    "excludes": [
+      "frontend visual redesign",
+      "hosted deployment QA",
+      "browser interaction QA",
+      "permanent CI wiring",
+      "automatic localization edits"
+    ]
+  },
+  "soldier": {
+    "expectedRecords": 224,
+    "expectedLowerTierPresentation": 39,
+    "expectedTier3Provisional": 2,
+    "server": "src/lib/soldier-page.server.ts",
+    "functions": "src/lib/soldier-page.functions.ts",
+    "routes": [
+      "src/routes/soldiers.tsx",
+      "src/routes/soldiers.$soldierId.tsx"
+    ],
+    "canonical": "data/generated/soldier-list-stage5-8.v1.json",
+    "lowerTierPresentation": "data/presentation/soldier-lower-tier-name-kr.v1.json",
+    "tier3ProvisionalPresentation": "data/presentation/soldier-t3-provisional-name-kr.v1.json",
+    "frontendPrecedence": ["lowerTierPresentation", "tier3ProvisionalPresentation", "canonical"],
+    "effectiveFallback": "nameKr ?? nameCn"
+  },
+  "hero": {
+    "expectedRecords": 267,
+    "listServer": "src/lib/hero-list.server.ts",
+    "detailServer": "src/lib/hero-detail-stage5.server.ts",
+    "functions": "src/lib/hero-list.functions.ts",
+    "routes": [
+      "src/routes/heroes.tsx",
+      "src/routes/heroes_.$heroId.tsx"
+    ],
+    "listConsumer": "data/generated/hero-list-stage1.v1.json",
+    "detailManifest": "data/generated/hero-detail.v1.json",
+    "effectiveFallback": "identity.nameKr ?? identity.nameCn"
+  },
+  "equipment": {
+    "expectedCanonical": 390,
+    "expectedPublic": 373,
+    "expectedGeneral": 206,
+    "expectedExclusive": 167,
+    "expectedNonPublic": 17,
+    "baseServer": "src/lib/equipment-page.server.ts",
+    "localizedServer": "src/lib/equipment-page.localized.server.ts",
+    "functions": "src/lib/equipment-page.functions.ts",
+    "routes": [
+      "src/routes/equipment.tsx",
+      "src/routes/equipment_.$equipmentId.tsx",
+      "src/routes/equipment_.exclusive.tsx"
+    ],
+    "canonical": "data/generated/equipment_stage3_2_display_metadata.json",
+    "generalList": "data/generated/equipment_stage3_3_general_list.json",
+    "generalDetail": "data/generated/equipment_stage3_4_general_detail.json",
+    "exclusiveConsumer": "data/generated/equipment_stage3_5_exclusive_consumer.json",
+    "builder": "scripts/build-equipment-name-kr-presentation.mjs",
+    "builderSources": [
+      "data/localization/equipment-name-kr/weapon.tsv",
+      "data/localization/equipment-name-kr/armor.tsv",
+      "data/localization/equipment-name-kr/headgear.tsv",
+      "data/localization/equipment-name-kr/accessory.tsv"
+    ],
+    "generatedPresentation": "data/generated/equipment-name-kr-user-approved.v1.json",
+    "generatedValidation": "data/validation/equipment-name-kr-user-approved-summary.v1.json",
+    "packageJson": "package.json",
+    "productionJoinKey": "equipmentId",
+    "runtimeNameJoin": false,
+    "effectiveFallback": "localized.nameKr ?? base.nameKr ?? nameCn"
+  },
+  "productionBoundary": {
+    "forbiddenRuntimeImportFragments": [
+      "data/configdata/",
+      "ConfigData"
+    ],
+    "forbiddenJoinModes": [
+      "nameCn runtime join",
+      "nameKr runtime join",
+      "record order join",
+      "ID arithmetic inference"
+    ],
+    "routeRuntimeServerBypass": false,
+    "silentFallback": false
+  },
+  "issueCodes": [
+    "FRONTEND_LOCALIZATION_LEAK",
+    "FRONTEND_CONSUMER_WIRING_MISMATCH",
+    "FRONTEND_EFFECTIVE_DISPLAY_POLICY_MISMATCH",
+    "FRONTEND_NAME_JOIN",
+    "EFFECTIVE_DISPLAY_MISMATCH",
+    "NONPUBLIC_FRONTEND_ADMISSION",
+    "EQUIPMENT_BUILD_PREP_MISSING"
+  ],
+  "completionGate": {
+    "stage3Passes": true,
+    "rawConfigRuntimeReads": 0,
+    "forbiddenNameJoins": 0,
+    "routeRuntimeServerBypasses": 0,
+    "soldierEffectiveDisplay224": true,
+    "heroListDetailIdentityParity267": true,
+    "equipmentPublicDisplay373": true,
+    "equipmentNonPublicAdmission0": true,
+    "semanticWiringFingerprintFrozen": true,
+    "effectiveDisplayFingerprintsFrozen": true,
+    "selfTestsPass": true
+  }
+}
