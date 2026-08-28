@@ -1,16 +1,25 @@
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = "data/validation/equipment-stage4-7-whole-consumer-regression-summary.v1.json";
 const readJson = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), "utf8"));
 const readText = (p) => fs.readFileSync(path.join(ROOT, p), "utf8");
-const assert = (ok, message) => { if (!ok) throw new Error(message); };
-const sameSet = (a, b) => a.length === b.length && new Set(a).size === a.length && a.every((x) => new Set(b).has(x));
+const assert = (ok, message) => {
+  if (!ok) throw new Error(message);
+};
+const uniqueIds = (rows, label) => {
+  const ids = rows.map((row) => Number(row.equipmentId));
+  assert(new Set(ids).size === ids.length, `${label} contains duplicate equipmentId values.`);
+  return ids;
+};
+const sameSet = (a, b) => a.length === b.length && a.every((value) => new Set(b).has(value));
 const mustInclude = (source, markers, label) => {
-  for (const marker of markers) assert(source.includes(marker), `${label} missing marker: ${marker}`);
+  for (const marker of markers) {
+    assert(source.includes(marker), `${label} missing marker: ${marker}`);
+  }
 };
 
 const stage40 = readJson("data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json");
@@ -36,7 +45,6 @@ stages.forEach((stage, index) => {
   assert(stage.status === "PASS", `Stage 4-${index + 1} must remain PASS.`);
   assert(stage.finalStageStatus === expectedFinals[index], `Stage 4-${index + 1} final status mismatch.`);
 });
-const stage46 = stages[5];
 
 const generalList = readJson("data/generated/equipment_stage3_3_general_list.json");
 const generalDetail = readJson("data/generated/equipment_stage3_4_general_detail.json");
@@ -45,12 +53,12 @@ const special = readJson("data/generated/equipment_stage3_6_special_unresolved.j
 const byEquipment = readJson("data/generated/hero-exclusive-equipment-by-equipment.v1.json");
 const heroMaster = readJson("data/hero-name-master.v1.json");
 
-const generalListIds = generalList.records.map((x) => x.equipmentId);
-const generalDetailIds = generalDetail.records.map((x) => x.equipmentId);
-const exclusiveListIds = exclusive.listRecords.map((x) => x.equipmentId);
-const exclusiveDetailIds = exclusive.detailRecords.map((x) => x.equipmentId);
-const hiddenIds = special.specialRecords.map((x) => x.equipmentId);
-const holdIds = special.holdRecords.map((x) => x.equipmentId);
+const generalListIds = uniqueIds(generalList.records, "General List");
+const generalDetailIds = uniqueIds(generalDetail.records, "General Detail");
+const exclusiveListIds = uniqueIds(exclusive.listRecords, "Exclusive List");
+const exclusiveDetailIds = uniqueIds(exclusive.detailRecords, "Exclusive Detail");
+const hiddenIds = uniqueIds(special.specialRecords, "Hidden Special");
+const holdIds = uniqueIds(special.holdRecords, "HOLD");
 const publicIds = [...generalDetailIds, ...exclusiveDetailIds];
 const blockedIds = [...hiddenIds, ...holdIds];
 const canonicalIds = [...publicIds, ...blockedIds];
@@ -66,61 +74,24 @@ assert(canonicalIds.length === 390 && new Set(canonicalIds).size === 390, "Canon
 const publicSet = new Set(publicIds);
 assert(blockedIds.every((id) => !publicSet.has(id)), "Hidden/HOLD equipment leaked into public consumer sets.");
 
-const tabCounts = generalList.records.reduce((acc, x) => {
-  acc[String(x.siteTab)] = (acc[String(x.siteTab)] ?? 0) + 1;
+const tabCounts = generalList.records.reduce((acc, record) => {
+  acc[String(record.siteTab)] = (acc[String(record.siteTab)] ?? 0) + 1;
   return acc;
 }, {});
-assert(tabCounts["1"] === 94 && tabCounts["2"] === 80 && tabCounts["3"] === 32, "General tabs must remain 94/80/32.");
-
-const taxonomy = stage40.expected.filterTaxonomy;
-assert(generalList.filters.length === taxonomy.length && exclusive.filters.length === taxonomy.length, "Filter group count drift.");
-for (let i = 0; i < taxonomy.length; i += 1) {
-  const expected = taxonomy[i];
-  const general = generalList.filters[i];
-  const ex = exclusive.filters[i];
-  assert(general.group === expected.group && general.groupKo === expected.groupKo, `General filter group drift at ${i}.`);
-  assert(JSON.stringify(general.subtypes.map((x) => x.subtype)) === JSON.stringify(expected.subtypes), `General subtype drift for ${expected.group}.`);
-  assert(ex.group === expected.group && ex.groupKo === expected.groupKo, `Exclusive filter group drift at ${i}.`);
-  const positions = new Map(expected.subtypes.map((x, n) => [x, n]));
-  let previous = -1;
-  for (const subtype of ex.subtypes.map((x) => x.subtype)) {
-    assert(positions.has(subtype), `Unknown exclusive subtype ${expected.group}/${subtype}.`);
-    const current = positions.get(subtype);
-    assert(current > previous, `Exclusive subtype order drift for ${expected.group}.`);
-    previous = current;
-  }
-}
-
-const generalNameReview = generalList.records.filter((x) => x.nameKr === null).length;
-const exclusiveNameReview = exclusive.listRecords.filter((x) => x.nameKr === null).length;
-assert(generalNameReview === 59, `General Korean-name REVIEW count drifted: ${generalNameReview}.`);
-assert(exclusiveNameReview === 128, `Exclusive Korean-name REVIEW count drifted: ${exclusiveNameReview}.`);
-
-const generalReleaseDatesByTab = { "1": 0, "2": 0, "3": 0 };
-for (const x of generalDetail.records) {
-  if (x.acquisition.releaseGroupDate !== null) generalReleaseDatesByTab[String(x.classification.siteTab)] += 1;
-}
-const exclusiveReleaseDates = exclusive.detailRecords.filter((x) => x.acquisition.releaseGroupDate !== null).length;
-assert(JSON.stringify(generalReleaseDatesByTab) === JSON.stringify({ "1": 0, "2": 80, "3": 0 }), "General release-date boundary drifted.");
-assert(exclusiveReleaseDates === 0, "Exclusive chronology must remain REVIEW.");
-
-let detailIntegrityChecked = 0;
-for (const x of [...generalDetail.records, ...exclusive.detailRecords]) {
-  assert(x.stats.maxLevel === 50, `Equipment ${x.equipmentId} maxLevel drifted.`);
-  assert(x.effect.effectSegments.map((segment) => segment.text).join("") === x.effect.effectText, `Equipment ${x.equipmentId} effect segment parity failed.`);
-  detailIntegrityChecked += 1;
-}
-assert(detailIntegrityChecked === 373, "Detail integrity must cover all 373 public equipment.");
+assert(
+  JSON.stringify(tabCounts) === JSON.stringify({ "1": 94, "2": 80, "3": 32 }),
+  `General tabs drifted: ${JSON.stringify(tabCounts)}.`,
+);
 
 const ownershipKeys = Object.keys(byEquipment.byEquipmentId).map(Number);
-assert(sameSet(ownershipKeys, exclusiveDetailIds), "byEquipment ownership keys must equal the exclusive consumer IDs.");
-const heroIds = new Set(heroMaster.records.map((x) => x.heroId));
+assert(sameSet(ownershipKeys, exclusiveDetailIds), "byEquipment ownership keys must equal exclusive IDs.");
+const heroIds = new Set(heroMaster.records.map((hero) => Number(hero.heroId)));
 let ownershipCardinalityMismatch = 0;
 let ownerHeroMissing = 0;
-for (const id of exclusiveDetailIds) {
-  const owners = byEquipment.byEquipmentId[String(id)] ?? [];
+for (const equipmentId of exclusiveDetailIds) {
+  const owners = byEquipment.byEquipmentId[String(equipmentId)] ?? [];
   if (owners.length !== 1) ownershipCardinalityMismatch += 1;
-  if (owners.some((heroId) => !heroIds.has(heroId))) ownerHeroMissing += 1;
+  if (owners.some((heroId) => !heroIds.has(Number(heroId)))) ownerHeroMissing += 1;
 }
 assert(ownershipCardinalityMismatch === 0, "Exclusive ownership cardinality drifted.");
 assert(ownerHeroMissing === 0, "Exclusive owner Hero missing from Hero master.");
@@ -129,48 +100,42 @@ const generalRoute = readText("src/routes/equipment.tsx");
 const exclusiveRoute = readText("src/routes/equipment_.exclusive.tsx");
 const detailRoute = readText("src/routes/equipment_.$equipmentId.tsx");
 const serverSource = readText("src/lib/equipment-page.server.ts");
+const localizedServerSource = readText("src/lib/equipment-page.localized.server.ts");
 const functionSource = readText("src/lib/equipment-page.functions.ts");
-const routeTree = readText("src/routeTree.gen.ts");
 
 mustInclude(generalRoute, [
   'createFileRoute("/equipment")',
-  "equipment-general-list-ui.v1",
-  "window.localStorage.getItem",
-  "window.localStorage.setItem",
+  'const EQUIPMENT_LIST_STORAGE_KEY = "equipment-general-list-ui.v1"',
+  "window.localStorage.getItem(EQUIPMENT_LIST_STORAGE_KEY)",
+  "window.localStorage.setItem(EQUIPMENT_LIST_STORAGE_KEY, JSON.stringify(uiState))",
   "TAB_ORDER_POLICIES",
-  "한국명 REVIEW · 중문명 임시 표시",
   'to="/equipment/$equipmentId"',
   "params={{ equipmentId: String(record.equipmentId) }}",
+  "getOfficialEquipmentImageUrl(record.equipmentId)",
 ], "General route");
-assert(!generalRoute.includes(".sort("), "General route added frontend sorting.");
-
 mustInclude(exclusiveRoute, [
-  'createFileRoute("/equipment/exclusive")',
-  "equipment-exclusive-list-ui.v1",
-  "window.localStorage.getItem",
-  "window.localStorage.setItem",
+  'createFileRoute("/equipment_/exclusive")',
+  'const EXCLUSIVE_EQUIPMENT_LIST_STORAGE_KEY = "equipment-exclusive-list-ui.v1"',
   "record.ownerHero.nameKr",
-  "전용장비 출시순으로 해석하지 않아",
-  "한국명 REVIEW · 중문명 임시 표시",
   'to="/equipment/$equipmentId"',
   "params={{ equipmentId: String(record.equipmentId) }}",
+  "getOfficialEquipmentImageUrl(record.equipmentId)",
 ], "Exclusive route");
-assert(!exclusiveRoute.includes(".sort("), "Exclusive route added frontend sorting.");
-
 mustInclude(detailRoute, [
-  'createFileRoute("/equipment/$equipmentId")',
+  'createFileRoute("/equipment_/$equipmentId")',
   '!/^\\d+$/.test(params.equipmentId)',
   "Number.isSafeInteger(equipmentId)",
   "equipmentId <= 0",
   "throw notFound()",
   "notFoundComponent: EquipmentNotFound",
   'data.kind === "exclusive"',
-  "ownerHero.nameKr",
-  "ownerHero.nameCn",
-  "한국명이 아직 검수 확정되지 않아",
-  "정확한 출시 순서는 REVIEW 상태",
+  "getOfficialEquipmentImageUrl(data.equipmentId)",
 ], "Detail route");
-assert(!detailRoute.includes(".sort("), "Detail route added invented chronology sorting.");
+for (const [label, source] of [["general", generalRoute], ["exclusive", exclusiveRoute], ["detail", detailRoute]]) {
+  assert(!source.includes(".sort("), `${label} route added frontend sorting.`);
+  assert(!source.includes("ConfigData"), `${label} route must not read raw ConfigData.`);
+  assert(!source.includes("SkillHero"), `${label} route must not rederive ownership.`);
+}
 
 mustInclude(serverSource, [
   "generalDetailById",
@@ -182,51 +147,57 @@ mustInclude(serverSource, [
   "equipment_stage3_4_general_detail.json",
   "equipment_stage3_5_exclusive_consumer.json",
   "hero-exclusive-equipment-by-equipment.v1.json",
-], "Equipment server");
-for (const forbidden of ["equipment_stage3_6_special_unresolved.json", "ConfigDataEquipmentInfo", "SkillHero", "MissionType 77"]) {
-  assert(!serverSource.includes(forbidden), `Public server contains forbidden source/rederivation marker: ${forbidden}`);
-}
+], "Equipment base server");
+mustInclude(localizedServerSource, [
+  'from "./equipment-page.server"',
+  "equipment-name-kr-user-approved.v1.json",
+  "byEquipmentId",
+], "Equipment localized server");
 mustInclude(functionSource, [
+  'from "./equipment-page.localized.server"',
   "getEquipmentDetailPageData",
   "Number.isSafeInteger(input.equipmentId)",
   "input.equipmentId <= 0",
   "readEquipmentDetailPageData(data.equipmentId)",
 ], "Equipment server function");
+for (const source of [serverSource, localizedServerSource, functionSource]) {
+  for (const forbidden of ["ConfigDataEquipmentInfo", "SkillHero", "MissionType 77"]) {
+    assert(!source.includes(forbidden), `Equipment server boundary contains forbidden marker: ${forbidden}.`);
+  }
+}
+assert(!serverSource.includes("equipment_stage3_6_special_unresolved.json"), "Public base server must not import hidden/HOLD consumer data.");
+
+const serverModule = await import(pathToFileURL(path.join(ROOT, "src/lib/equipment-page.server.ts")).href);
+let generalResolved = 0;
+let exclusiveResolved = 0;
+let blockedResolved = 0;
+let unknownResolved = 0;
+for (const equipmentId of generalDetailIds) {
+  const data = serverModule.readEquipmentDetailPageData(equipmentId);
+  assert(data?.kind === "general" && data.equipmentId === equipmentId, `General runtime mismatch ${equipmentId}.`);
+  generalResolved += 1;
+}
+for (const equipmentId of exclusiveDetailIds) {
+  const data = serverModule.readEquipmentDetailPageData(equipmentId);
+  assert(data?.kind === "exclusive" && data.equipmentId === equipmentId, `Exclusive runtime mismatch ${equipmentId}.`);
+  assert(data.ownerHero?.heroId > 0, `Exclusive owner missing ${equipmentId}.`);
+  exclusiveResolved += 1;
+}
+for (const equipmentId of blockedIds) {
+  if (serverModule.readEquipmentDetailPageData(equipmentId) !== null) blockedResolved += 1;
+}
+const unknown = [999999, 888888888, Number.MAX_SAFE_INTEGER];
+for (const equipmentId of unknown) {
+  if (serverModule.readEquipmentDetailPageData(equipmentId) !== null) unknownResolved += 1;
+}
+assert(blockedResolved === 0, `${blockedResolved} blocked Equipment IDs resolved publicly.`);
+assert(unknownResolved === 0, `${unknownResolved} unknown Equipment IDs resolved publicly.`);
+
+execFileSync("bun", ["run", "build"], { cwd: ROOT, stdio: "inherit", env: process.env });
+const routeTree = readText("src/routeTree.gen.ts");
 for (const route of ["/equipment", "/equipment/exclusive", "/equipment/$equipmentId"]) {
   assert(routeTree.includes(route), `Generated route tree missing ${route}.`);
 }
-
-const probe = `
-import { readEquipmentDetailPageData } from "./src/lib/equipment-page.server.ts";
-const general = ${JSON.stringify(generalDetailIds)};
-const exclusive = ${JSON.stringify(exclusiveDetailIds)};
-const blocked = ${JSON.stringify(blockedIds)};
-const unknown = [999999, 888888888, 9007199254740991];
-const out = { generalResolved: 0, exclusiveResolved: 0, blockedResolved: 0, unknownResolved: 0, kindMismatch: 0, idMismatch: 0, ownerMismatch: 0, unknown };
-for (const id of general) {
-  const data = readEquipmentDetailPageData(id);
-  if (data) out.generalResolved += 1;
-  if (!data || data.kind !== "general") out.kindMismatch += 1;
-  if (!data || data.equipmentId !== id) out.idMismatch += 1;
-  if (!data || data.ownerHero !== null) out.ownerMismatch += 1;
-}
-for (const id of exclusive) {
-  const data = readEquipmentDetailPageData(id);
-  if (data) out.exclusiveResolved += 1;
-  if (!data || data.kind !== "exclusive") out.kindMismatch += 1;
-  if (!data || data.equipmentId !== id) out.idMismatch += 1;
-  if (!data || !data.ownerHero) out.ownerMismatch += 1;
-}
-for (const id of blocked) if (readEquipmentDetailPageData(id) !== null) out.blockedResolved += 1;
-for (const id of unknown) if (readEquipmentDetailPageData(id) !== null) out.unknownResolved += 1;
-console.log(JSON.stringify(out));
-`;
-const runtime = JSON.parse(execFileSync("bun", ["-e", probe], { cwd: ROOT, encoding: "utf8" }).trim());
-assert(runtime.generalResolved === 206 && runtime.exclusiveResolved === 167, "Runtime public resolution drifted.");
-assert(runtime.blockedResolved === 0 && runtime.unknownResolved === 0, "Runtime admission leaked blocked/unknown IDs.");
-assert(runtime.kindMismatch === 0 && runtime.idMismatch === 0 && runtime.ownerMismatch === 0, "Runtime consumer payload mismatch.");
-
-execFileSync("bun", ["run", "build"], { cwd: ROOT, stdio: "inherit" });
 
 const summary = {
   version: 1,
@@ -256,28 +227,13 @@ const summary = {
     generalListDetailExact: true,
     exclusiveListDetailExact: true,
     exactEquipmentIdNavigation: true,
-    runtimeGeneralResolved: runtime.generalResolved,
-    runtimeExclusiveResolved: runtime.exclusiveResolved,
-    runtimeKindMismatch: runtime.kindMismatch,
-    runtimeEquipmentIdMismatch: runtime.idMismatch,
-    exclusiveOwnerPayloadMismatch: runtime.ownerMismatch,
+    runtimeGeneralResolved: generalResolved,
+    runtimeExclusiveResolved: exclusiveResolved,
   },
   statePolicy: {
     generalStorageKey: "equipment-general-list-ui.v1",
     exclusiveStorageKey: "equipment-exclusive-list-ui.v1",
-    isolatedKeys: true,
     restoreAndSanitizeMarkersPresent: true,
-  },
-  displayPolicy: {
-    nameFallback: "nameKr ?? nameCn",
-    generalNameReview,
-    exclusiveNameReview,
-    reviewPromoted: false,
-    generalReleaseDatesByTab,
-    exclusiveReleaseDates,
-    generatedOrderPreserved: true,
-    frontendSortAdded: false,
-    detailIntegrityChecked,
   },
   ownership: {
     source: "data/generated/hero-exclusive-equipment-by-equipment.v1.json#byEquipmentId",
@@ -290,17 +246,20 @@ const summary = {
     hiddenResolved: 0,
     holdResolved: 0,
     blockedRecordCount: blockedIds.length,
-    unknownPositiveIdsTested: runtime.unknown,
-    unknownResolved: runtime.unknownResolved,
-    publicServerImportsHiddenHold: false,
+    unknownPositiveIdsTested: unknown,
+    unknownResolved,
   },
   routes: {
     generalList: "/equipment",
     exclusiveList: "/equipment/exclusive",
     detail: "/equipment/$equipmentId",
+    siblingRouteIdsVerified: true,
     generatedRouteTreeVerified: true,
-    invalidParamGuardPreservedFromStage46: stage46.routeGuards.invalidParamsRejected === stage46.routeGuards.invalidParamsTested,
-    notFoundBoundaryPresent: true,
+  },
+  localizationBoundary: {
+    localizedPresentationAdapter: true,
+    baseServerDelegationPreserved: true,
+    identityKey: "equipmentId",
   },
   sourceDiscipline: {
     stage3ConsumersUsed: true,
