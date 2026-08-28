@@ -1,0 +1,18 @@
+name: Equipment Image Stage 2 BWiki Mirror Probe
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-hold29
+    paths:
+      - 'scripts/probe-equipment-bwiki-mirror.mjs'
+      - '.github/workflows/equipment-image-stage2-bwiki-mirror-probe.yml'
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe BWiki raw mirror against frozen Drive SHA
+        run: node scripts/probe-equipment-bwiki-mirror.mjs
