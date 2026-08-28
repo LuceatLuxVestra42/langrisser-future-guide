@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_4",
+  "status": "CANONICAL_OVERLAY_MANIFEST_MATERIALIZED",
+  "contract": "data/contracts/configdata-lookup-stage4-canonical-overlay-contract.v1.json",
+  "predecessor": {
+    "stage3Contract": "data/contracts/configdata-lookup-stage3-reverse-reference-contract.v1.json",
+    "stage3ContractSha256": "2752d3d85bcf90f0432244114d5391c624ddd1ce860ce33702bc7798a1724843",
+    "stage3Summary": "data/validation/configdata-lookup-stage3-summary.v1.json",
+    "stage3SummarySha256": "12c6d6dc01211a44d6d8253d0efa1ed9d1d4c8109dabe3a373579e27adc113cd"
+  },
+  "canonicalInputs": {
+    "heroSoldierByHero": {
+      "path": "data/generated/hero-soldier-by-hero.v1.json",
+      "sha256": "afe5c54a4091752b97863207d2cb1c78e59d28737e027a5d2abd0743edf1e8d9",
+      "schemaId": "hero-soldier-by-hero/v1",
+      "relationSet": {
+        "path": "data/generated/hero-soldier-relations.v1.json",
+        "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "edgeCount": 5977
+      },
+      "keyCount": 267,
+      "relationCount": 5977
+    },
+    "heroSoldierBySoldier": {
+      "path": "data/generated/hero-soldier-by-soldier.v1.json",
+      "sha256": "619336743c747cca50482a779a303e6b330727f6d627794807ac4501fa80f2fa",
+      "schemaId": "hero-soldier-by-soldier/v1",
+      "relationSet": {
+        "path": "data/generated/hero-soldier-relations.v1.json",
+        "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "edgeCount": 5977
+      },
+      "keyCount": 224,
+      "relationCount": 5977
+    },
+    "exclusiveEquipmentByHero": {
+      "path": "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+      "sha256": "893d5398dfc5c261400154fe7c6efa3396cb7edebe0f03efced39222b0a18db6",
+      "schemaId": "hero-exclusive-equipment-by-hero/v1",
+      "relationSet": {
+        "path": "data/generated/hero-exclusive-equipment-relations.v1.json",
+        "gitBlobSha": "33caa16212a5a71195015e05c815024fb62e6be6",
+        "edgeCount": 167
+      },
+      "keyCount": 167,
+      "relationCount": 167
+    },
+    "exclusiveEquipmentByEquipment": {
+      "path": "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+      "sha256": "f7f868f97355a4751241bf20dcbaf5bb27fc18137f5d7cc59b2dd1ff6811abfb",
+      "schemaId": "hero-exclusive-equipment-by-equipment/v1",
+      "relationSet": {
+        "path": "data/generated/hero-exclusive-equipment-relations.v1.json",
+        "gitBlobSha": "33caa16212a5a71195015e05c815024fb62e6be6",
+        "edgeCount": 167
+      },
+      "keyCount": 167,
+      "relationCount": 167
+    }
+  },
+  "canonicalRelationCount": 2,
+  "canonicalEdgeCount": 6144,
+  "directionalProjectionCount": 4,
+  "directionalReferenceCount": 12288,
+  "domains": {
+    "Hero": {
+      "path": "data/index/overlay/hero.v1.json",
+      "sourceCount": 2,
+      "keyCount": 267,
+      "referenceCount": 6144
+    },
+    "Soldier": {
+      "path": "data/index/overlay/soldier.v1.json",
+      "sourceCount": 1,
+      "keyCount": 224,
+      "referenceCount": 5977
+    },
+    "Equipment": {
+      "path": "data/index/overlay/equipment.v1.json",
+      "sourceCount": 1,
+      "keyCount": 167,
+      "referenceCount": 167
+    }
+  }
+}
