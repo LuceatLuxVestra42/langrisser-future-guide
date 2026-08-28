@@ -143,7 +143,7 @@ function integrateDetailRoute() {
         <div className="flex shrink-0 items-center justify-center self-start rounded-2xl border border-border bg-muted/25 p-2">
           <img
             src={imageUrl}
-            alt={\`${displayName} 장비 이미지\`}
+            alt={displayName + " 장비 이미지"}
             decoding="async"
             className="h-28 w-28 object-contain sm:h-32 sm:w-32"
           />
