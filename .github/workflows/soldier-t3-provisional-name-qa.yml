@@ -1,0 +1,81 @@
+name: Soldier T3 Provisional Name QA
+
+on:
+  push:
+    branches:
+      - fix/soldier-t3-provisional-display-names
+    paths:
+      - '.github/workflows/soldier-t3-provisional-name-qa.yml'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'data/generated/soldier-detail-stage5-2.v1.json'
+      - 'public/data/soldier-detail-stage5-6.v1.json'
+      - 'data/presentation/soldier-t3-provisional-name-kr.v1.json'
+      - 'src/lib/soldier-page.server.ts'
+  workflow_dispatch:
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate canonical unresolved and provisional presentation split
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const list = JSON.parse(fs.readFileSync('data/generated/soldier-list-stage5-8.v1.json','utf8'));
+          const detail = JSON.parse(fs.readFileSync('data/generated/soldier-detail-stage5-2.v1.json','utf8'));
+          const publicDetail = JSON.parse(fs.readFileSync('public/data/soldier-detail-stage5-6.v1.json','utf8'));
+          const overlay = JSON.parse(fs.readFileSync('data/presentation/soldier-t3-provisional-name-kr.v1.json','utf8'));
+          const expected = new Map([
+            [136, ['烬色卫队','잿빛 호위대','LANCER']],
+            [1039, ['断罪修女','단죄의 수녀','DEMON']],
+          ]);
+
+          if (list.records.length !== 224 || list.summary.normalCount !== 168 || list.summary.spCount !== 56 || list.summary.normalTier3Count !== 129) {
+            throw new Error('canonical Soldier cardinality changed');
+          }
+          if (list.summary.nonPassIdentityMetadataCount !== 41) throw new Error(`expected nonPassIdentityMetadataCount 41, got ${list.summary.nonPassIdentityMetadataCount}`);
+
+          const t3 = list.records.filter(r => !r.isSp && r.tier === 3);
+          const confirmed = t3.filter(r => r.nameKr && r.nameKrStatus === 'confirmed');
+          if (t3.length !== 129 || confirmed.length !== 127) throw new Error(`T3 confirmed coverage ${confirmed.length}/${t3.length}`);
+
+          for (const [id,[cn,display,army]] of expected) {
+            const row = list.records.find(r => r.soldierId === id);
+            if (!row || row.nameCn !== cn || row.armyType !== army || row.tier !== 3) throw new Error(`list identity mismatch ${id}`);
+            if (row.nameKr !== null || row.nameKrStatus !== 'unreleased' || row.validationStatus !== 'REVIEW') throw new Error(`list canonical name boundary mismatch ${id}`);
+
+            const d = detail.records.find(r => r.soldierId === id);
+            const p = publicDetail.records.find(r => r.soldierId === id);
+            for (const [label, rec] of [['detail', d], ['public', p]]) {
+              if (!rec || rec.identity.nameCn !== cn || rec.identity.nameKr !== null || rec.identity.nameKrStatus !== 'unreleased' || rec.identity.validationStatus !== 'REVIEW') {
+                throw new Error(`${label} canonical name boundary mismatch ${id}`);
+              }
+            }
+
+            const o = overlay.records.find(r => r.soldierId === id);
+            if (!o || o.nameCn !== cn || o.displayNameKr !== display || o.armyType !== army || o.status !== 'provisional-display') {
+              throw new Error(`presentation overlay mismatch ${id}`);
+            }
+          }
+
+          if (overlay.status !== 'PASS' || overlay.scope !== 'frontend-presentation-only' || overlay.source.officialKoreanNameConfirmed !== false || overlay.source.identityMutation !== false) {
+            throw new Error('overlay contract mismatch');
+          }
+          if (overlay.coverage.recordCount !== 2 || overlay.coverage.provisionalCount !== 2 || overlay.coverage.officialNameUnresolvedCount !== 2) {
+            throw new Error('overlay coverage mismatch');
+          }
+
+          console.log('PASS: canonical T3 names 127 confirmed + 2 unresolved; frontend provisional display 2');
+          NODE
+
+      - name: Production build gate
+        run: bun run build
