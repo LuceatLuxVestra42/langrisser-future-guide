@@ -119,7 +119,7 @@ for (const equipmentId of [generalDetail.records[0].equipmentId, exclusive.detai
 }
 
 const requiredDetailRouteMarkers = [
-  'createFileRoute("/equipment/$equipmentId")',
+  'createFileRoute("/equipment_/$equipmentId")',
   "if (!/^\\d+$/.test(params.equipmentId))",
   "Number.isSafeInteger(equipmentId) || equipmentId <= 0",
   "getEquipmentDetailPageData",
