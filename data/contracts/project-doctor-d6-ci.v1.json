@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-d6-ci/v1",
+  "stage": "D6",
+  "checkpoint": "PROJECT_DOCTOR_D6_CI_RUNTIME_PROOF",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Run the integrated Project Doctor in a real GitHub Actions checkout and preserve D4/D5 fail-closed boundaries without granting repository write access.",
+  "workflow": ".github/workflows/project-doctor-d6.yml",
+  "targetBranch": "work/project-doctor-closeout",
+  "runtime": {
+    "runner": "ubuntu-latest",
+    "nodeVersion": "22",
+    "packageManager": "bun",
+    "install": "bun install --frozen-lockfile",
+    "checkoutFetchDepth": 0
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "requiredSteps": [
+    "npm run doctor:freshness:self-test",
+    "npm run doctor:closeout:validate",
+    "npm run doctor:freshness:validate",
+    "npm run doctor -- --dry-run --paths package.json",
+    "npm run doctor -- --paths package.json"
+  ],
+  "proofPolicy": {
+    "workflowMustActuallyRun": true,
+    "allRequiredStepsMustSucceed": true,
+    "syntheticFixturesAloneAreNotRuntimeProof": true,
+    "freshnessResealInCI": false,
+    "repositoryWritesInCI": false,
+    "selectedCheckExecutionRequired": true,
+    "representativeChangedPath": "package.json",
+    "representativePathReason": "package.json is an already-approved D2 mapping that exercises shared-build plus Project Doctor checks without introducing an unmapped workflow-self-change into D3 during the branch proof run."
+  },
+  "boundaries": {
+    "rawConfigDataSemanticRecomputationAdded": false,
+    "canonicalMutation": false,
+    "frontendMutation": false,
+    "freshnessAutoReseal": false,
+    "missingOwningValidatorInvented": false,
+    "githubActionsRepositoryWritePermission": false
+  },
+  "completionRule": "D6 is COMPLETE only after a GitHub Actions run for this workflow is observed with conclusion=success and the job steps prove both dry-run and actual selected-check execution.",
+  "nextStage": "D7",
+  "nextStageGoal": "Use the proven CI path to add merge/PR-facing guard policy and final release/integration boundary checks without broadening validator scope."
+}

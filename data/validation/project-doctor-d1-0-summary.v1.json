@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "stage": "D1-0",
+  "checkpoint": "PROJECT_DOCTOR_D1_0_CONTRACT_FREEZE",
+  "status": "PASS_PROJECT_DOCTOR_D1_0_CONTRACT",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/project-doctor-d1-0-contract.v1.json",
+  "branch": "work/project-doctor-d1",
+  "designedAgainstMainCommit": "15125cb6c77386a726dfaeaa9ba674c0b320eaa9",
+  "purpose": "Record the manual contract audit for the read-only Project Doctor D1-0 design. No validators are executed and no canonical/generated production data is modified in this stage.",
+  "checks": {
+    "domainCount": {
+      "expected": 6,
+      "actual": 6,
+      "pass": true
+    },
+    "primaryStatusSources": {
+      "expected": 6,
+      "found": 6,
+      "missing": [],
+      "pass": true
+    },
+    "supplementalStatusSources": {
+      "expected": 5,
+      "found": 5,
+      "missing": [],
+      "pass": true
+    },
+    "lifecycleHealthSeparated": true,
+    "canonicalAndPresentationFacetsSeparated": true,
+    "reviewReconciliationPolicyDefined": true,
+    "rawConfigDataStatusReadForbidden": true,
+    "canonicalRelationRecomputationForbidden": true,
+    "statusMutationForbidden": true,
+    "nextWorkInferenceForbidden": true,
+    "sourceFileWriteCount": 0,
+    "productionDataWriteCount": 0
+  },
+  "canonicalBaselines": {
+    "hero": {
+      "canonicalHeroCount": 267
+    },
+    "soldier": {
+      "canonicalSoldierCount": 224,
+      "normalSoldierCount": 168,
+      "spSoldierCount": 56
+    },
+    "heroSoldier": {
+      "canonicalPairCount": 5977
+    },
+    "equipment": {
+      "canonicalCount": 390,
+      "publicCount": 373,
+      "generalCount": 206,
+      "exclusiveCount": 167
+    },
+    "banner": {
+      "definitionCount": 77,
+      "occurrenceCount": 94
+    },
+    "skin": {
+      "canonicalSkinCount": 540,
+      "canonicalHeroCount": 267,
+      "stage32Status": "READY_FOR_ASSET_EVIDENCE"
+    }
+  },
+  "sourceEvidence": [
+    {
+      "path": "data/validation/hero-stage6-4-final.v1.json",
+      "role": "hero canonical lifecycle",
+      "sha": "9ae03d2dcc0660aae9c28900345212426b2a4dd1"
+    },
+    {
+      "path": "data/validation/hero-list-stage4.v1.json",
+      "role": "hero route/asset preflight facet",
+      "sha": "4727bab2309286de8afe5f0a2f3a33d95d4714e8"
+    },
+    {
+      "path": "data/validation/hero-list-stage5.v1.json",
+      "role": "hero detail frontend projection facet",
+      "sha": "0bfdb045654e027e6f32c5005928d7e4729a7f82"
+    },
+    {
+      "path": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "role": "soldier canonical lifecycle",
+      "sha": "c1f9253ddea94e9f7a4f9c7e1aee9163c3abc3bb"
+    },
+    {
+      "path": "data/validation/soldier-portrait-stage3j-frontend-full.v1.json",
+      "role": "soldier current portrait/frontend asset facet",
+      "sha": "095018693a24d77adf6e38ec0c53a22ad1d52d61"
+    },
+    {
+      "path": "data/validation/soldier-t3-provisional-name-presentation.v1.json",
+      "role": "soldier current localization/presentation review facet",
+      "sha": "f18db7d9bb143de4e009052bb2ff677faa19bc16"
+    },
+    {
+      "path": "data/validation/equipment-stage4-final.v1.json",
+      "role": "equipment canonical lifecycle",
+      "sha": "9396fc925242e52d13c2149d2472e1923ef44de3"
+    },
+    {
+      "path": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+      "role": "hero-soldier shared relation lifecycle",
+      "sha": "db39e1a9fb59a3e07493afe8f66c88b6db7a802d"
+    },
+    {
+      "path": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+      "role": "banner canonical/frontend freeze lifecycle",
+      "sha": "fd162c3e5d29ac9239ff5b7a2a3b2f0f223e4f52"
+    },
+    {
+      "path": "data/validation/skin-stage3-2-readiness.v1.json",
+      "role": "skin current active-stage lifecycle",
+      "sha": "c29862a6488eaa7d2b1830af7add9e0b9cf82998"
+    },
+    {
+      "path": "data/validation/skin-stage3-1-final.v1.json",
+      "role": "skin frozen Stage 3-1 population baseline",
+      "sha": "0b1ee0f20d701978209c1e690c84d0b1d35948be"
+    }
+  ],
+  "keyDecisions": [
+    "Canonical lifecycle and current health are separate dimensions.",
+    "Primary frozen/final checkpoints own canonical lifecycle; supplemental sources own only explicitly scoped frontend/presentation facets.",
+    "Later evidence does not clear an older review unless the contract explicitly declares exact review-code supersession.",
+    "A current in-progress evidence blocker such as Skin Stage 3-2 is REVIEW/IN_PROGRESS, not an automatic FAIL.",
+    "D1-0 never reads raw ConfigData to decide project status and never recalculates canonical relationships.",
+    "D1-0 does not invent a next task; only explicit nextAction/nextStartPoint/nextStage values may be passed through later."
+  ],
+  "knownNonBlockingNotes": [
+    "Hero Stage 5 proves 267-Hero detail projection and 5,977 Soldier-edge parity but is not treated as proof of all hosted/mobile/artwork QA.",
+    "Soldier Stage 3J proves current portrait coverage 224/224 including SP 56/56; it does not alter canonical identity or chronology/localization reviews.",
+    "Two Tier-3 Soldier Korean names remain provisional presentation metadata in the current repository and are not canonical mutations.",
+    "Skin Stage 3-2 has 45/45 readiness checks passing but still lacks authoritative asset evidence."
+  ],
+  "errors": [],
+  "hardErrorCount": 0,
+  "nextStage": "D1-1",
+  "nextStageGoal": "Implement the read-only collector that consumes this contract and normalizes the six domain status records without running validators."
+}

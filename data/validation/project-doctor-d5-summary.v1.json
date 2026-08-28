@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-d5-summary/v1",
+  "stage": "D5",
+  "checkpoint": "PROJECT_DOCTOR_D5_FRESHNESS_GUARD",
+  "status": "PASS_PROJECT_DOCTOR_D5_FRESHNESS_GUARD",
+  "completion": "COMPLETE_WITH_LIVE_REPOSITORY_EXECUTION_GAP",
+  "contract": "data/contracts/project-doctor-d5-freshness.v1.json",
+  "implementation": {
+    "refreshRunner": "scripts/run-project-doctor-d5-refresh.mjs",
+    "freshnessValidator": "scripts/validate-project-doctor-d5.mjs",
+    "freshnessSelfTest": "scripts/validate-project-doctor-d5-fixtures.mjs",
+    "manifest": "data/generated/project-doctor-d5-freshness.v1.json",
+    "doctorStatusEntrypoint": "node scripts/run-project-doctor-d1-3.mjs",
+    "explicitResealEntrypoint": "node scripts/run-project-doctor-d5-refresh.mjs",
+    "integratedDoctorEntrypoint": "node scripts/run-project-doctor-closeout.mjs"
+  },
+  "freshnessModel": {
+    "authoritativeSourceDiscovery": "DYNAMIC_FROM_D1_CONTRACT",
+    "authoritativeSourceCount": 11,
+    "monitoredInputCount": 19,
+    "monitoredOutputCount": 3,
+    "hashAlgorithm": "git-blob-sha1",
+    "mtimeUsed": false,
+    "tracksD1Contracts": true,
+    "tracksD1ProducerScripts": true,
+    "tracksD5FreshnessScripts": true,
+    "tracksD1AuthoritativePrimaryAndSupplementalSources": true,
+    "tracksD1GeneratedHealthOutputs": true,
+    "beforeAfterInputStabilityCheckOnExplicitRefresh": true,
+    "sourceChangeDuringRefreshBlocksManifestWrite": true,
+    "outputTamperDetected": true,
+    "sourceSetChangeDetected": true,
+    "producerChangeDetected": true,
+    "normalDoctorRunAutoReseals": false
+  },
+  "repositoryManifest": {
+    "status": "FRESH_SNAPSHOT",
+    "seedMethod": "CURRENT_GITHUB_BLOB_SHA_BASELINE",
+    "liveRefreshCommandExecuted": false,
+    "reason": "The GitHub connector cannot execute npm commands in the live checkout, so the initial manifest was seeded from the exact current Git blob SHAs for all monitored inputs and outputs. Runtime refresh remains an explicit command only.",
+    "staleExitCode": 4,
+    "sourceChangedDuringRefreshExitCode": 5
+  },
+  "isolatedVerification": {
+    "status": "PASS_PROJECT_DOCTOR_D5_FIXTURES",
+    "fixtureCount": 7,
+    "fixturePassCount": 7,
+    "fixtures": [
+      "FRESH_AFTER_REFRESH",
+      "SOURCE_CHANGE_STALE",
+      "OUTPUT_TAMPER_STALE",
+      "RACE_CHANGE_BLOCKED",
+      "MISSING_OUTPUT_BLOCKED",
+      "SOURCE_SET_CHANGE_STALE",
+      "PRODUCER_CHANGE_STALE"
+    ],
+    "hashAlgorithmVerification": "RE-RUN_AFTER_GIT_BLOB_SHA_MIGRATION",
+    "actualRepositoryChildCommandExecutionCount": 0
+  },
+  "integratedCloseoutVerification": {
+    "status": "PASS_PROJECT_DOCTOR_CLOSEOUT_FIXTURES",
+    "fixtureCount": 6,
+    "fixturePassCount": 6,
+    "stepOrder": [
+      "d1-status",
+      "d5-freshness",
+      "d5-self-test",
+      "d4-self-test",
+      "d4-run"
+    ],
+    "d5StaleExitCodePreserved": 4,
+    "d4ExitCodePreserved": true,
+    "actualRepositoryCommandExecutionCount": 0
+  },
+  "integratedFlow": [
+    "D1 collector and D1 health gate regenerate deterministic current status outputs",
+    "D5 validates the existing freshness manifest against current authoritative sources, D1/D5 producer inputs, and D1 outputs without resealing",
+    "D5 stops the integrated Doctor with exit 4 when any monitored content or source set is stale",
+    "D5 synthetic freshness fixtures run only after the freshness seal passes",
+    "D4 execution fixtures run next",
+    "Only then may the integrated Doctor continue to the D3-selected D4 execution plan",
+    "A new freshness seal is written only by the explicit doctor:freshness:refresh command after stable successful D1 regeneration"
+  ],
+  "boundaries": {
+    "rawConfigDataReadAdded": false,
+    "semanticRecomputationAdded": false,
+    "domainValidatorInvented": false,
+    "productionSourceMutationAdded": false,
+    "canonicalDataMutationAdded": false,
+    "frontendSourceMutationAdded": false,
+    "githubActionsAdded": false
+  },
+  "nextStage": "D6",
+  "nextStageGoal": "Obtain live repository command proof for the integrated Doctor and then add GitHub Actions automation without weakening D5 freshness or D4 manual-review boundaries."
+}

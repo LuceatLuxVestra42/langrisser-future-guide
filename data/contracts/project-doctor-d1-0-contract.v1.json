@@ -1,0 +1,478 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-d1-0-contract/v1",
+  "stage": "D1-0",
+  "checkpoint": "PROJECT_DOCTOR_D1_0_CONTRACT",
+  "status": "DESIGN_FROZEN",
+  "designedAgainst": {
+    "branch": "main",
+    "commit": "15125cb6c77386a726dfaeaa9ba674c0b320eaa9"
+  },
+  "purpose": "Freeze the read-only Project Doctor diagnosis contract: authoritative status sources, normalized output fields, source-layer reconciliation rules, and status interpretation rules. D1-0 does not execute validators, recalculate canonical semantics, or modify production data.",
+  "scope": {
+    "domains": [
+      "hero",
+      "soldier",
+      "equipment",
+      "hero-soldier",
+      "banner",
+      "skin"
+    ],
+    "included": [
+      "authoritative canonical/lifecycle source selection",
+      "current frontend/presentation supplemental source selection",
+      "normalized lifecycle/health model",
+      "population and hard-error extraction contract",
+      "review/blocker handling policy",
+      "review freshness and supersession policy",
+      "next-work passthrough policy"
+    ],
+    "excludedUntilLaterStages": [
+      "validator execution",
+      "git diff impact analysis",
+      "dependency graph evaluation",
+      "stale-output hash comparison",
+      "frontend boundary source scanning",
+      "package.json CLI wiring",
+      "GitHub Actions integration",
+      "automatic repository modification"
+    ]
+  },
+  "operatingRules": {
+    "readOnlyDiagnosis": true,
+    "preferFinalOrFrozenCheckpoint": true,
+    "primaryStatusSourceOwnsCanonicalLifecycle": true,
+    "supplementalSourceCannotRewriteCanonicalLifecycle": true,
+    "doNotReadRawConfigDataForStatus": true,
+    "doNotRecomputeCanonicalRelations": true,
+    "doNotInferStatusFromFileNamesAlone": true,
+    "doNotInferMissingFields": true,
+    "presentationReviewDoesNotReopenFrozenSemantics": true,
+    "inProgressBlockerDoesNotEqualFailedCheckpoint": true,
+    "generatedArtifactsAreIntegrityEvidenceNotSemanticAuthority": true,
+    "historicalCheckpointsAreNotPrimaryStatusSources": true
+  },
+  "sourceAuthorityOrder": [
+    "domain primaryStatusSource for canonical lifecycle and canonical population",
+    "domain supplementalSources explicitly listed in this contract for scoped current frontend/presentation health",
+    "generated/manifest artifacts referenced by an accepted checkpoint for existence or integrity only",
+    "historical checkpoints for provenance only"
+  ],
+  "forbiddenStatusSources": [
+    "data/configdata/**",
+    "name-based JOIN results",
+    "ID arithmetic inference",
+    "frontend runtime recomputation",
+    "unlisted historical validation checkpoints"
+  ],
+  "normalizedModel": {
+    "lifecycleValues": [
+      "FROZEN",
+      "COMPLETE",
+      "IN_PROGRESS",
+      "UNKNOWN"
+    ],
+    "healthValues": [
+      "PASS",
+      "REVIEW",
+      "FAIL",
+      "MISSING",
+      "INCONSISTENT",
+      "UNKNOWN"
+    ],
+    "facets": [
+      "canonical",
+      "relation",
+      "frontend",
+      "asset",
+      "localization",
+      "chronology",
+      "source-evidence"
+    ],
+    "reviewScopes": [
+      "semantic",
+      "identity",
+      "presentation",
+      "localization",
+      "asset",
+      "frontend",
+      "chronology",
+      "source-evidence",
+      "unknown"
+    ],
+    "domainRecordFields": [
+      "domain",
+      "lifecycle",
+      "health",
+      "rawStatus",
+      "rawCompletion",
+      "rawFreezeState",
+      "population",
+      "hardErrorCount",
+      "reviewCount",
+      "reviews",
+      "blockers",
+      "facets",
+      "primarySource",
+      "supplementalSources",
+      "nextWork",
+      "notes"
+    ],
+    "hardErrorCountType": "integer-or-null"
+  },
+  "globalHealthPrecedence": [
+    {
+      "order": 1,
+      "health": "MISSING",
+      "when": "primaryStatusSource does not exist or cannot be read"
+    },
+    {
+      "order": 2,
+      "health": "FAIL",
+      "when": "an explicit hard error, failed required check, blocking semantic failure, or failed admission gate is present"
+    },
+    {
+      "order": 3,
+      "health": "INCONSISTENT",
+      "when": "primary source parses but required contract fields are missing, expected canonical population mismatches, or mutually authoritative values conflict without an explicit failed gate"
+    },
+    {
+      "order": 4,
+      "health": "REVIEW",
+      "when": "no FAIL condition exists and a current source explicitly reports non-blocking reviews, deferred non-errors, unresolved presentation metadata, or an expected evidence blocker for an in-progress stage"
+    },
+    {
+      "order": 5,
+      "health": "PASS",
+      "when": "the accepted checkpoint reports success and no current review/blocker signal remains"
+    },
+    {
+      "order": 6,
+      "health": "UNKNOWN",
+      "when": "the available source does not support a safe classification"
+    }
+  ],
+  "reviewPolicy": {
+    "blockingReview": "A review is blocking only when the authoritative source explicitly marks it blocking or the owning stage contract classifies it as a hard gate.",
+    "nonBlockingReview": "Presentation/localization/asset/frontend/chronology reviews remain REVIEW and must not mutate canonical identity, membership, ownership, or frozen lifecycle.",
+    "reviewCountMeaning": "reviewCount counts current review entries, not the sum of affected records, unless a future contract explicitly asks for affected-record totals.",
+    "unknownReviewScope": "If a review code cannot be classified safely, preserve it with scope=unknown instead of guessing."
+  },
+  "reviewReconciliationPolicy": {
+    "rule": "A later supplemental source may supersede a primary-source review only when this contract explicitly lists the exact review code in supersedesPrimaryReviewCodes and the supplemental source directly verifies that scope.",
+    "default": "PRESERVE_PRIMARY_REVIEW",
+    "noImplicitFreshnessByCommitDate": true,
+    "noImplicitSupersessionByStageNumber": true,
+    "partialFrontendEvidence": "A PASS for one frontend facet such as list/detail projection or portrait coverage does not automatically clear unrelated route, hosted, mobile, localization, or asset reviews.",
+    "resolvedReviewHandling": "A superseded review is omitted from current reviews but retained in provenance notes as historical/resolved."
+  },
+  "nextWorkPolicy": {
+    "mode": "PASSTHROUGH_ONLY",
+    "rule": "D1 reads nextAction/nextStartPoint/nextStage only when explicitly present in an authoritative source. It must not invent a recommendation in D1-0/D1-1."
+  },
+  "domains": {
+    "hero": {
+      "primaryStatusSource": "data/validation/hero-stage6-4-final.v1.json",
+      "primaryFacet": "canonical",
+      "expected": {
+        "canonicalHeroCount": 267
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawCompletion": "/completion",
+        "rawFreezeState": "/heroDataPipelineStatus",
+        "canonicalHeroCount": "/summary/canonicalHeroCount",
+        "hardErrorCount": "/summary/hardErrorCount"
+      },
+      "reviewSelectors": [
+        "/nonBlockingReviews"
+      ],
+      "nextWorkSelectors": [
+        "/nextStartPoint"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/heroDataPipelineStatus == FINAL_FROZEN",
+          "lifecycle": "FROZEN"
+        },
+        {
+          "when": "/completion == COMPLETE",
+          "lifecycle": "COMPLETE"
+        }
+      ],
+      "supplementalSources": [
+        {
+          "path": "data/validation/hero-list-stage4.v1.json",
+          "role": "CURRENT_HERO_ROUTE_ASSET_PREFLIGHT",
+          "facet": "frontend",
+          "selectors": {
+            "rawStatus": "/status",
+            "rawCompletion": "/completion",
+            "heroCount": "/summary/heroCount",
+            "resolvedArtworkCount": "/summary/resolvedArtworkCount",
+            "pendingArtworkCount": "/summary/pendingArtworkCount",
+            "hardErrorCount": "/summary/hardErrorCount",
+            "failures": "/failures"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "This proves list/detail route shell and Stage 4 preflight only. Because artwork remains pending in this checkpoint, it does not clear the broader FRONTEND_ASSET_ROUTE_INTEGRATION_PENDING review."
+        },
+        {
+          "path": "data/validation/hero-list-stage5.v1.json",
+          "role": "CURRENT_HERO_DETAIL_FRONTEND_PROJECTION",
+          "facet": "frontend",
+          "selectors": {
+            "rawStatus": "/status",
+            "rawCompletion": "/completion",
+            "heroCount": "/summary/heroCount",
+            "soldierEdgeCount": "/summary/soldierEdgeCount",
+            "missingShardCount": "/summary/missingShardCount",
+            "parityMismatchCount": "/summary/parityMismatchCount"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "This proves 267-Hero detail projection and 5,977 Soldier-edge parity but does not by itself prove final artwork, hosted, or mobile QA."
+        }
+      ]
+    },
+    "soldier": {
+      "primaryStatusSource": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "primaryFacet": "canonical",
+      "expected": {
+        "canonicalSoldiers": 224,
+        "normalSoldiers": 168,
+        "spSoldiers": 56,
+        "heroSoldierRelations": 5977
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawCompletion": "/admissionStatus",
+        "canonicalSoldiers": "/coverage/canonicalSoldiers",
+        "normalSoldiers": "/coverage/normalSoldiers",
+        "spSoldiers": "/coverage/spSoldiers",
+        "heroSoldierRelations": "/coverage/heroSoldierRelations",
+        "hardErrorCount": "/checks/admissionGateFailures"
+      },
+      "zeroRequiredSelectors": [
+        "/checks/upstreamStatusFailures",
+        "/checks/sourceSnapshotMismatches",
+        "/checks/coverageMismatches",
+        "/checks/recordFailCount",
+        "/checks/undeclaredReviewCodes",
+        "/checks/representativeFailedFixtures",
+        "/checks/filterFailedTests",
+        "/checks/reciprocalPagePairMismatch",
+        "/checks/expansionPreservationFailures",
+        "/checks/documentationMissing",
+        "/checks/admissionGateFailures"
+      ],
+      "reviewSelectors": [
+        "/reviews"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/status == PASS AND /admissionStatus == READY_WITH_REVIEW",
+          "lifecycle": "COMPLETE"
+        }
+      ],
+      "supplementalSources": [
+        {
+          "path": "data/validation/soldier-portrait-stage3j-frontend-full.v1.json",
+          "role": "CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE",
+          "facet": "asset",
+          "selectors": {
+            "rawStatus": "/status",
+            "canonicalSoldierCount": "/coverage/canonicalSoldierCount",
+            "portraitRecordCount": "/coverage/portraitRecordCount",
+            "normalPortraitCount": "/coverage/normalPortraitCount",
+            "spPortraitCount": "/coverage/spPortraitCount",
+            "missingPortraitCount": "/coverage/missingPortraitCount",
+            "verifiedAssetFileCount": "/coverage/verifiedAssetFileCount"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Current repository evidence proves portrait coverage 224/224 including SP 56/56. It does not change canonical Soldier identity, release chronology, or localization reviews."
+        },
+        {
+          "path": "data/validation/soldier-t3-provisional-name-presentation.v1.json",
+          "role": "CURRENT_PRESENTATION_REVIEW",
+          "facet": "localization",
+          "selectors": {
+            "rawStatus": "/status",
+            "normalTier3Count": "/canonical/normalTier3Count",
+            "officialNameUnresolvedCount": "/canonical/officialNameUnresolvedCount",
+            "provisionalDisplayCount": "/presentation/provisionalDisplayCount",
+            "targets": "/targets"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Presentation-only provisional names may add current REVIEW items but cannot downgrade canonical Soldier identity/relation semantics to FAIL."
+        }
+      ]
+    },
+    "equipment": {
+      "primaryStatusSource": "data/validation/equipment-stage4-final.v1.json",
+      "primaryFacet": "canonical",
+      "expected": {
+        "canonical": 390,
+        "public": 373,
+        "general": 206,
+        "exclusive": 167
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawCompletion": "/completion",
+        "rawFreezeState": "/pipelineStatus",
+        "canonical": "/population/canonical",
+        "public": "/population/public",
+        "general": "/population/general",
+        "exclusive": "/population/exclusive",
+        "hardErrorCount": "/hardErrorCount"
+      },
+      "reviewSelectors": [
+        "/nonBlockingReviews"
+      ],
+      "nextWorkSelectors": [
+        "/nextStartPoint"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/pipelineStatus == FINAL_FROZEN",
+          "lifecycle": "FROZEN"
+        },
+        {
+          "when": "/completion == COMPLETE",
+          "lifecycle": "COMPLETE"
+        }
+      ],
+      "supplementalSources": []
+    },
+    "hero-soldier": {
+      "primaryStatusSource": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+      "primaryFacet": "relation",
+      "expected": {
+        "heroCount": 267,
+        "soldierCount": 224,
+        "canonicalPairCount": 5977
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawCompletion": "/completion",
+        "rawFreezeState": "/pipelineStatus",
+        "heroCount": "/summary/heroCount",
+        "soldierCount": "/summary/soldierCount",
+        "canonicalPairCount": "/summary/canonicalPairCount",
+        "hardErrorCount": "/summary/hardErrorCount"
+      },
+      "zeroRequiredSelectors": [
+        "/summary/c1AllPairDifferences",
+        "/summary/c1UnknownOrDuplicateIdentityErrors",
+        "/summary/c2StructuralIdentityErrors",
+        "/summary/c3SemanticFixtureFailures",
+        "/summary/c4BoundaryViolations",
+        "/summary/failedCheckCount",
+        "/summary/hardErrorCount"
+      ],
+      "reviewSelectors": [
+        "/nonBlockingReviews"
+      ],
+      "nextWorkSelectors": [
+        "/nextStartPoint"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/pipelineStatus == FINAL_FROZEN",
+          "lifecycle": "FROZEN"
+        },
+        {
+          "when": "/completion == COMPLETE",
+          "lifecycle": "COMPLETE"
+        }
+      ],
+      "supplementalSources": [],
+      "policy": "Hero and Soldier frontend PASS evidence must not silently clear C-stage cross-page click/back/404/mobile review unless a later shared integration checkpoint explicitly verifies that exact scope."
+    },
+    "banner": {
+      "primaryStatusSource": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+      "primaryFacet": "canonical",
+      "expected": {
+        "definitions": 77,
+        "occurrences": 94
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawFreezeState": "/freezeState",
+        "definitions": "/canonicalPopulation/definitions",
+        "occurrences": "/canonicalPopulation/occurrences",
+        "errors": "/errors"
+      },
+      "reviewSelectors": [
+        "/knownDeferredNonErrors"
+      ],
+      "nextWorkSelectors": [
+        "/nextStage"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/freezeState == BANNER_STAGE3_FROZEN",
+          "lifecycle": "FROZEN"
+        }
+      ],
+      "supplementalSources": []
+    },
+    "skin": {
+      "primaryStatusSource": "data/validation/skin-stage3-2-readiness.v1.json",
+      "primaryFacet": "source-evidence",
+      "expected": {
+        "skinCount": 540,
+        "heroCount": 267,
+        "stage31FailedCheckCount": 0,
+        "stage32FailedCheckCount": 0
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawCompletion": "/completion",
+        "stage32FailedCheckCount": "/metrics/failedCheckCount",
+        "evidencePresent": "/evidence/present",
+        "blocker": "/evidence/blocker"
+      },
+      "reviewSelectors": [
+        "/evidence"
+      ],
+      "nextWorkSelectors": [
+        "/nextAction"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/status == READY_FOR_ASSET_EVIDENCE AND /completion == null",
+          "lifecycle": "IN_PROGRESS"
+        }
+      ],
+      "supplementalSources": [
+        {
+          "path": "data/validation/skin-stage3-1-final.v1.json",
+          "role": "FROZEN_STAGE3_1_POPULATION_BASELINE",
+          "facet": "asset",
+          "selectors": {
+            "rawStatus": "/status",
+            "rawCompletion": "/completion",
+            "skinCount": "/metrics/skinCount",
+            "heroCount": "/metrics/heroCount",
+            "failedCheckCount": "/metrics/failedCheckCount"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Use only as the completed Stage 3-1 population/inventory baseline. D1 must not rerun Stage 3-1 or infer Stage 3-2 evidence from it."
+        }
+      ]
+    }
+  },
+  "d1_0CompletionCriteria": [
+    "exactly six initial diagnosis domains are defined",
+    "each domain has one canonical/lifecycle primaryStatusSource",
+    "all listed primary and supplemental source files exist on the designed-against repository state",
+    "expected canonical populations are explicit where supported",
+    "lifecycle and health are separate normalized dimensions",
+    "canonical lifecycle and scoped frontend/presentation facets are separated",
+    "raw ConfigData and semantic recomputation are explicitly forbidden",
+    "review freshness, supersession, and blocker behavior are explicit",
+    "D1-1 can implement collection without inventing new semantic rules"
+  ],
+  "nextStage": "D1-1"
+}
