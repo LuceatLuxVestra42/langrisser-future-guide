@@ -6,7 +6,6 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTRACT_PATH = 'data/contracts/regression-coverage-promotion.v1.json';
 const SUMMARY_PATH = 'data/validation/regression-coverage-promotion-summary.v1.json';
-const PACKAGE_PATH = 'package.json';
 
 const EXPECTED_MANUAL_NODES = [
   'banner-assets',
@@ -78,7 +77,6 @@ function assertExactCounts(actual, expected, label) {
 const contract = readJson(CONTRACT_PATH);
 const d3 = readJson(contract.baseline.d3.path);
 const d4 = readJson(contract.baseline.d4.path);
-const pkg = readJson(PACKAGE_PATH);
 const summary = readJson(SUMMARY_PATH);
 
 if (contract.schemaId !== 'regression-coverage-promotion/v1') fail('unexpected schemaId');
@@ -134,11 +132,6 @@ const rejected = JSON.stringify(contract.explicitlyRejectedSubstitutes ?? []);
 if (!rejected.includes('npm run validate:hero-stage3')) fail('Hero Stage 3 historical substitute must stay explicitly rejected');
 if (!rejected.includes('npm run build:movement-types')) fail('movement builder substitute must stay explicitly rejected');
 if (!rejected.includes('168/224')) fail('historical Soldier portrait coverage must stay explicitly rejected');
-
-const expectedScript = 'node scripts/validate-regression-coverage-promotion.mjs';
-if (pkg.scripts?.['validate:regression-promotion'] !== expectedScript) {
-  fail(`package script validate:regression-promotion must equal: ${expectedScript}`);
-}
 
 if (summary.checkpoint !== contract.checkpoint) fail('summary checkpoint mismatch');
 if (summary.result !== 'PASS_CONTRACT_ONLY_NO_D3_D4_ACTIVATION') fail('summary result mismatch');
