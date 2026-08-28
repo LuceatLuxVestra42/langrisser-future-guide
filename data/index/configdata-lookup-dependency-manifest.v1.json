@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_6",
+  "status": "DEPENDENCY_MANIFEST_MATERIALIZED",
+  "contract": "data/contracts/configdata-lookup-stage6-incremental-rebuild-contract.v1.json",
+  "contracts": {
+    "Stage1": {
+      "path": "data/contracts/configdata-lookup-stage1-id-index-contract.v1.json",
+      "sha256": "a78e57426ad0b0c079dfedad3df62f0747763606ff5ce29d86cf8c515704a432"
+    },
+    "Stage2": {
+      "path": "data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json",
+      "sha256": "9cee0ae295228922d7f798e27cb11897ea98d9821c73a9a5d3975a83e999d69a"
+    },
+    "Stage3": {
+      "path": "data/contracts/configdata-lookup-stage3-reverse-reference-contract.v1.json",
+      "sha256": "2752d3d85bcf90f0432244114d5391c624ddd1ce860ce33702bc7798a1724843"
+    },
+    "Stage4": {
+      "path": "data/contracts/configdata-lookup-stage4-canonical-overlay-contract.v1.json",
+      "sha256": "e8341a134a9022a6c998af72d410d1d31f2c8c0d3966db2051d28dba48ebfcdf"
+    },
+    "Stage5": {
+      "path": "data/contracts/configdata-lookup-stage5-cli-contract.v1.json",
+      "sha256": "ef567de6ae33c7d483e08ed97510fa349b43bbce2dad2fdf6f32ea4fbbedf99d"
+    },
+    "Stage6": {
+      "path": "data/contracts/configdata-lookup-stage6-incremental-rebuild-contract.v1.json",
+      "sha256": "e4e21117f1887f692e09de0d937e55548b658baf4570322da39925bc1dfc08a6"
+    }
+  },
+  "rawSources": {
+    "data/configdata/ConfigDataEquipmentInfo.json": "b4e4a27c68a7038c1b282140b82a634c9d18c348f79b9e6d411840c7ffe54e70",
+    "data/configdata/ConfigDataHeroInfo.json": "2385599493d2598aa3f7d6b2c76ecdfd8615d91f19b6241933986282fcb17f7b",
+    "data/configdata/ConfigDataJobConnectionInfo.json": "990009e6d751920173a7ec5aea47a8c89954aa7dacb7ef13c9ab40bbc6b6bb3a",
+    "data/configdata/ConfigDataJobInfo.json": "2e522fc464549cfe7ed1f5974e166b3952fa7398e07d0610ec2a90b950e094cf",
+    "data/configdata/ConfigDataSkillInfo.json": "2ff6d67e8c010037597928bccd2dc7b4b9abc0d2a78c9705d816c8218df3e741",
+    "data/configdata/ConfigDataSoldierInfo.json": "8a73b178be5b2f15ebcc84e83741d42e242ea4650f1d590fb2c1bcee8b8bbcc4",
+    "data/configdata/ConfigDataTrainingTechInfo.json": "dd871099d14a32be0bb7f0658420a3f1a0190dc32627989f6d7b9c6f63ddc6c2",
+    "data/configdata/ConfigDataTrainingTechLevelInfo.json": "4d4afb874c0540bf4999cd5aa7c2f8a6ce5d3fa5838a7522c343365e165e8905"
+  },
+  "layers": {
+    "stage1": {
+      "entities": {
+        "Hero": {
+          "source": "data/configdata/ConfigDataHeroInfo.json",
+          "sourceSha256": "2385599493d2598aa3f7d6b2c76ecdfd8615d91f19b6241933986282fcb17f7b",
+          "output": "data/index/hero.v1.json",
+          "outputSha256": "25a6aa512f27c2e62e2e7e98b8cc4c0eaaf1677a219e9f408fb7fc0cb5122255"
+        },
+        "Soldier": {
+          "source": "data/configdata/ConfigDataSoldierInfo.json",
+          "sourceSha256": "8a73b178be5b2f15ebcc84e83741d42e242ea4650f1d590fb2c1bcee8b8bbcc4",
+          "output": "data/index/soldier.v1.json",
+          "outputSha256": "5296cb460b1696c44fbd250ce280f36d4216f9d755acc33eb69eb1f07bdeb121"
+        },
+        "Skill": {
+          "source": "data/configdata/ConfigDataSkillInfo.json",
+          "sourceSha256": "2ff6d67e8c010037597928bccd2dc7b4b9abc0d2a78c9705d816c8218df3e741",
+          "output": "data/index/skill.v1.json",
+          "outputSha256": "8d0af55600bcb0faa0210c26b9cb6ea8caceb2f27baac137f5651776b9ff521b"
+        },
+        "Equipment": {
+          "source": "data/configdata/ConfigDataEquipmentInfo.json",
+          "sourceSha256": "b4e4a27c68a7038c1b282140b82a634c9d18c348f79b9e6d411840c7ffe54e70",
+          "output": "data/index/equipment.v1.json",
+          "outputSha256": "ff4ef88dbb9e015337d10339678e6bb996bc4cd31c738c629a43d1ebc47dcd91"
+        }
+      },
+      "summary": {
+        "path": "data/validation/configdata-lookup-stage1-summary.v1.json",
+        "sha256": "945e13b1d1739490d6add89affbdcd659478bf11f26df0806d0b33c9844fda06"
+      }
+    },
+    "stage2": {
+      "domains": {
+        "Hero": {
+          "sourceTypes": [
+            "Hero",
+            "Skill",
+            "JobConnection",
+            "Job"
+          ],
+          "sourceHashes": {
+            "Hero": "2385599493d2598aa3f7d6b2c76ecdfd8615d91f19b6241933986282fcb17f7b",
+            "Skill": "2ff6d67e8c010037597928bccd2dc7b4b9abc0d2a78c9705d816c8218df3e741",
+            "JobConnection": "990009e6d751920173a7ec5aea47a8c89954aa7dacb7ef13c9ab40bbc6b6bb3a",
+            "Job": "2e522fc464549cfe7ed1f5974e166b3952fa7398e07d0610ec2a90b950e094cf"
+          },
+          "output": "data/index/forward/hero.v1.json",
+          "outputSha256": "1dd164aa6d31b2b2c765619adc4541b9242bc3b0f6790ab7500af2abcec716c6"
+        },
+        "Soldier": {
+          "sourceTypes": [
+            "Soldier",
+            "Skill",
+            "TrainingTech",
+            "TrainingTechLevel"
+          ],
+          "sourceHashes": {
+            "Soldier": "8a73b178be5b2f15ebcc84e83741d42e242ea4650f1d590fb2c1bcee8b8bbcc4",
+            "Skill": "2ff6d67e8c010037597928bccd2dc7b4b9abc0d2a78c9705d816c8218df3e741",
+            "TrainingTech": "dd871099d14a32be0bb7f0658420a3f1a0190dc32627989f6d7b9c6f63ddc6c2",
+            "TrainingTechLevel": "4d4afb874c0540bf4999cd5aa7c2f8a6ce5d3fa5838a7522c343365e165e8905"
+          },
+          "output": "data/index/forward/soldier.v1.json",
+          "outputSha256": "e6dfd7eb26001f8498068f6fd2a9eca1396ab7c4ff83efbd6d8dcab82a5a8e50"
+        },
+        "Equipment": {
+          "sourceTypes": [
+            "Equipment",
+            "Skill"
+          ],
+          "sourceHashes": {
+            "Equipment": "b4e4a27c68a7038c1b282140b82a634c9d18c348f79b9e6d411840c7ffe54e70",
+            "Skill": "2ff6d67e8c010037597928bccd2dc7b4b9abc0d2a78c9705d816c8218df3e741"
+          },
+          "output": "data/index/forward/equipment.v1.json",
+          "outputSha256": "404272e41cfc0711591e18c8c5e64d110db10c1143452c850d5492e65b518720"
+        }
+      },
+      "summary": {
+        "path": "data/validation/configdata-lookup-stage2-summary.v1.json",
+        "sha256": "431e8a4bf8b9c636a3cc3834df2a36b84a0de967b2b16b3c96ea09dccff1f1f1"
+      }
+    },
+    "stage3": {
+      "inputs": {
+        "Hero": {
+          "path": "data/index/forward/hero.v1.json",
+          "sha256": "1dd164aa6d31b2b2c765619adc4541b9242bc3b0f6790ab7500af2abcec716c6"
+        },
+        "Soldier": {
+          "path": "data/index/forward/soldier.v1.json",
+          "sha256": "e6dfd7eb26001f8498068f6fd2a9eca1396ab7c4ff83efbd6d8dcab82a5a8e50"
+        },
+        "Equipment": {
+          "path": "data/index/forward/equipment.v1.json",
+          "sha256": "404272e41cfc0711591e18c8c5e64d110db10c1143452c850d5492e65b518720"
+        }
+      },
+      "targets": {
+        "Skill": {
+          "path": "data/index/reverse/skill.v1.json",
+          "sha256": "d891aa8229b684f2b20867bba9b057c2aadfbf42e63ae9f3fdf133f6ee1efd02"
+        },
+        "JobConnection": {
+          "path": "data/index/reverse/job-connection.v1.json",
+          "sha256": "2c9b8b3f889e928ac830f4a5251b0d032238cf885584147bc7220c5860fc5f4b"
+        },
+        "Job": {
+          "path": "data/index/reverse/job.v1.json",
+          "sha256": "e169539fd517156764fd1111ce452b610ae25e0f749c127d1d028a9c2b319788"
+        },
+        "TrainingTech": {
+          "path": "data/index/reverse/training-tech.v1.json",
+          "sha256": "423a7e67b608ce1699867b9bbe6fa2923384a8584e875f88a491243fb955b194"
+        },
+        "Soldier": {
+          "path": "data/index/reverse/soldier.v1.json",
+          "sha256": "281728be004d2a239300ed9e4c69755ade4f766fd03c05ee78423a81a5b3fe9e"
+        },
+        "TrainingTechLevel": {
+          "path": "data/index/reverse/training-tech-level.v1.json",
+          "sha256": "ee9945eceac748c0a6d78b4da89fd8e1b8c567fb1d6afd5b1b5cc475800f7f92"
+        }
+      },
+      "manifest": {
+        "path": "data/index/reverse/manifest.v1.json",
+        "sha256": "f34199ac6972d5db301a300ed16430d50999fc512b1e0371e3c19beb297f84fd"
+      },
+      "summary": {
+        "path": "data/validation/configdata-lookup-stage3-summary.v1.json",
+        "sha256": "12c6d6dc01211a44d6d8253d0efa1ed9d1d4c8109dabe3a373579e27adc113cd"
+      }
+    },
+    "stage4": {
+      "canonicalInputs": {
+        "heroSoldierByHero": {
+          "path": "data/generated/hero-soldier-by-hero.v1.json",
+          "sha256": "afe5c54a4091752b97863207d2cb1c78e59d28737e027a5d2abd0743edf1e8d9"
+        },
+        "heroSoldierBySoldier": {
+          "path": "data/generated/hero-soldier-by-soldier.v1.json",
+          "sha256": "619336743c747cca50482a779a303e6b330727f6d627794807ac4501fa80f2fa"
+        },
+        "exclusiveEquipmentByHero": {
+          "path": "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+          "sha256": "893d5398dfc5c261400154fe7c6efa3396cb7edebe0f03efced39222b0a18db6"
+        },
+        "exclusiveEquipmentByEquipment": {
+          "path": "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+          "sha256": "f7f868f97355a4751241bf20dcbaf5bb27fc18137f5d7cc59b2dd1ff6811abfb"
+        }
+      },
+      "domains": {
+        "Hero": {
+          "path": "data/index/overlay/hero.v1.json",
+          "sha256": "c8460223f86f3c62c8c2cc54a1dc14ebcd4b13ea43091872d746e6101316ea58"
+        },
+        "Soldier": {
+          "path": "data/index/overlay/soldier.v1.json",
+          "sha256": "45d3400689cbae827e815798edd5b6332f4b1240f63402382b3a6a92f9e73482"
+        },
+        "Equipment": {
+          "path": "data/index/overlay/equipment.v1.json",
+          "sha256": "493544d7132d9696751ac063f51513444c9364781ef5f6a7fea19d22d572635a"
+        }
+      },
+      "manifest": {
+        "path": "data/index/overlay/manifest.v1.json",
+        "sha256": "7eacd784e0a72c3973d17a2e9e5f9e2bcac4aea6805844ad7945b0b03ba14ab1"
+      },
+      "summary": {
+        "path": "data/validation/configdata-lookup-stage4-summary.v1.json",
+        "sha256": "27479101b4a6fd5ae7cd0f139b40e825d5f456e38a8d4229472a7cae24b7a76c"
+      }
+    },
+    "stage5": {
+      "summary": {
+        "path": "data/validation/configdata-lookup-stage5-summary.v1.json",
+        "sha256": "2df2bf64892b1dcc34ef9eae85c4338cd3fe8568735344a7ed9742ddd53c64bf"
+      }
+    }
+  },
+  "dependencyPolicy": {
+    "rawBytesHashedWithoutFullRelationRecomputation": true,
+    "stage1Granularity": "ENTITY",
+    "stage2Granularity": "DOMAIN",
+    "stage3Granularity": "CONTENT_DIFF_TARGET_FILE",
+    "stage4Granularity": "CONTENT_DIFF_DOMAIN_FILE",
+    "stage5Granularity": "SUMMARY_ONLY",
+    "writesOnlyChangedArtifacts": true
+  }
+}
