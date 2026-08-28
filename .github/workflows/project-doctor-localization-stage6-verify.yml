@@ -33,7 +33,7 @@ jobs:
         run: npm run doctor:pr-guard:validate
       - name: Validate Stage 5 frozen gate
         run: npm run audit:localization:check
-      - name: Print Stage 6 baseline
-        run: node scripts/validate-localization-audit-stage6.mjs --json
+      - name: Validate Stage 6 frozen snapshot
+        run: node scripts/validate-localization-audit-stage6.mjs --check
       - name: Stage 6 self-test
         run: node scripts/validate-localization-audit-stage6.mjs --self-test
