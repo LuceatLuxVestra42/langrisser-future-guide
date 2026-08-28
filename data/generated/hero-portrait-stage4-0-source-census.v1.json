@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-0-source-mapping-census",
+  "schemaId": "hero-portrait-stage4-0-source-census/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "representation": "AGGREGATE_CENSUS_PLUS_FIVE_ANCHORS_NO_267_ROW_DUPLICATION",
+  "summary": {
+    "canonicalHeroCount": 267,
+    "structuredDriveHeroFolderCount": 244,
+    "structuredDriveCandidateUpperBound": 244,
+    "structuredDriveCountGap": 23,
+    "explicitAdmittedSourceCount": 5,
+    "anchoredStructuredFolderCount": 5,
+    "unanchoredStructuredFolderCount": 239,
+    "pendingCanonicalSourceMappingCount": 262,
+    "materializedTargetCount": 0,
+    "bulk267Ready": false,
+    "hardErrorCount": 0
+  },
+  "rarityCensus": [
+    {"rarity": "LLR", "canonical": 6, "driveFolders": 5, "countGap": 1},
+    {"rarity": "SSR", "canonical": 213, "driveFolders": 191, "countGap": 22},
+    {"rarity": "SR", "canonical": 33, "driveFolders": 33, "countGap": 0},
+    {"rarity": "R", "canonical": 12, "driveFolders": 12, "countGap": 0},
+    {"rarity": "N", "canonical": 3, "driveFolders": 3, "countGap": 0}
+  ],
+  "driveHierarchy": {
+    "rootFolderId": "1nYFa63uq00adpod_M1oDPPqGV4II5n5V",
+    "characterFolderId": "1KmGu-BvWBw8JUttdhr7hW5mgzsjSS9e1",
+    "pcFolderId": "1vDto8eUsfFodINXI1FIP2ccK9sGnreB0",
+    "rarityIndexFolderId": "1VnqgFr_gulnKFjMxVEwBTj3z5c0xw3US",
+    "rarityFolderIds": {
+      "LLR": "1_ohdOz7yowi98AE7MuyORMAFkxeGk5GV",
+      "SSR": "1LZou2oXpeOwtt2uBHWpesKN4uyMUGoOe",
+      "SR": "15Z_wf0wrfX3Bn56WU_Y7vqDvPcS_i8MN",
+      "R": "1KIqnv-LEEO2RBYzdF1dr5oGUbfriUPgG",
+      "N": "1ShOmvsheoRWl9yeneaMRoXXid6wIrGhX"
+    },
+    "observedBasePortraitPath": "rarity root -> Hero folder -> 스킨 -> 기본 -> PNG"
+  },
+  "stage2AnchorContinuity": {
+    "expected": 5,
+    "matched": 5,
+    "result": "PASS",
+    "records": [
+      {
+        "heroId": 5,
+        "nameKr": "크리스",
+        "rarity": "SR",
+        "heroFolderId": "1ROJpIva5u-oRHy2YbokbXsPpUwbEIXjw",
+        "skinFolderId": "1mKUfpv93zdciLvihV6siyoCQICorByb8",
+        "baseFolderId": "1jODbQrKRl4ok0Kb2GGM7BaeL5N5lE4fF",
+        "sourceFileId": "1DO0Dk_7O0cV5h2Tsp9I1KYFQtlTbCYhK",
+        "sourceFileName": "Chris_idle_Normal_default.png",
+        "exactStage2PointerMatch": true
+      },
+      {
+        "heroId": 6,
+        "nameKr": "레온",
+        "rarity": "SSR",
+        "heroFolderId": "1DhLELxrR71mMhtG1zoVhNRP9v9sR2gbJ",
+        "skinFolderId": "1LmsIFaxK3TcwI-HypkdJeIbw1o5qnv06",
+        "baseFolderId": "1eS7m4IWwkRL5TXfK_KGkv22XVpNo_CGg",
+        "sourceFileId": "1oPTSwW5O4UWxY6idqHDJ_smjPTm2Wsq1",
+        "sourceFileName": "Leon_Animation_FIN_idle_Normal_default.png",
+        "exactStage2PointerMatch": true
+      },
+      {
+        "heroId": 8,
+        "nameKr": "라나",
+        "rarity": "SSR",
+        "heroFolderId": "13pjWo7oA8gJENnRl34jS7xmH_n5cq5fx",
+        "skinFolderId": "1yNTUsAUYzhkPkO--YfYALUPBrv4DisAB",
+        "baseFolderId": "156D1L7JCC4Cj7gkuGFXl8xkjueXMT4Ze",
+        "sourceFileId": "1sPf2YNf5DhW3vLMNcEhkCDSJpxdLTvgw",
+        "sourceFileName": "Lana_idle_Normal_default.png",
+        "exactStage2PointerMatch": true,
+        "observedPngSiblingCount": 2,
+        "selectionCounterexample": {
+          "otherFileId": "1FPBZ2g-C8yP8wx-ohX7c3LaQE40FB8rc",
+          "otherFileName": "Lana_idle_Normal_default_CH.png",
+          "meaning": "A 기본 folder can contain more than one plausible portrait PNG; folder membership alone cannot select the canonical source file."
+        }
+      },
+      {
+        "heroId": 12,
+        "nameKr": "엘윈",
+        "rarity": "SSR",
+        "heroFolderId": "1W_E9lxvdfISeJLR1JMs97alHiDgAuoMV",
+        "skinFolderId": "1aRM2iIX5d4tKqBuaxurTZZUtjWhovMHi",
+        "baseFolderId": "1_zAbXeSJiHsGWHhW3BWT0vPWEXGe9J8X",
+        "sourceFileId": "1S0Mftmvm4Lu-pdHPvzkant9zfyFGAXNE",
+        "sourceFileName": "Elwin_idle_Normal_default.png",
+        "exactStage2PointerMatch": true
+      },
+      {
+        "heroId": 15,
+        "nameKr": "리아나",
+        "rarity": "SSR",
+        "heroFolderId": "1_eLresPeOijkMLBWNZBzmijQEc8Al290",
+        "skinFolderId": "1y1vIFc2Vf4tKkVF0eSpfg6ZVYbtcgXvH",
+        "baseFolderId": "1bQ3z6pAIlQhnw8GhMfPVDTt6OWbDhMOL",
+        "sourceFileId": "1cOdLxGc46d9oqJ7Epk7GDZ8wqsZIiF2p",
+        "sourceFileName": "Riana_idle_Normal_default.png",
+        "exactStage2PointerMatch": true
+      }
+    ]
+  },
+  "interpretation": {
+    "sameSourceFamilyAsStage2": true,
+    "driveFolderCensusIsCanonicalHeroMapping": false,
+    "reason": "The hierarchy is source-family evidence, but folder titles do not provide an approved Hero ID ownership bridge under the Stage 3 contract.",
+    "minimumCanonicalHeroesOutsideStructuredTreeByCount": 23,
+    "exactMissingHeroIdsIdentified": false,
+    "structuredCandidateFoldersMayBeAutoAdmitted": false
+  },
+  "admissionStateAfterCensus": {
+    "ADMITTED_SOURCE": 5,
+    "PENDING_SOURCE_MAPPING": 262,
+    "STRUCTURED_FOLDER_CANDIDATE_UNANCHORED": 239,
+    "COUNT_LEVEL_STRUCTURED_TREE_GAP": 23,
+    "note": "The 239 candidate folders are a subset of the 262 pending canonical mappings only after an explicit Hero-ID bridge is proven; Stage 4-0 does not perform that bridge."
+  },
+  "bulkGate": {
+    "requiredAdmitted": 267,
+    "actualAdmitted": 5,
+    "result": "BLOCKED_EXPECTED",
+    "reason": "The Drive tree has only 244 Hero folders and 239 of those remain unanchored to canonical Hero IDs; at least 23 canonical Heroes also require another proven source path."
+  }
+}
