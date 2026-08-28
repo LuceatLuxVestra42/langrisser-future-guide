@@ -12,7 +12,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Print Stage 2 audit result
-        run: node scripts/audit-localization.mjs --json
+      - name: Verify frozen Stage 2 audit snapshot
+        run: node scripts/audit-localization.mjs --check
       - name: Verify contamination self-tests
         run: node scripts/audit-localization.mjs --self-test
