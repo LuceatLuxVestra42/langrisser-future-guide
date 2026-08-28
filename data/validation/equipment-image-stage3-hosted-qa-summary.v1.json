@@ -1,7 +1,7 @@
 {
   "stage": "Equipment Image Stage 3 Hosted QA",
   "version": 1,
-  "status": "PASS_EQUIPMENT_IMAGE_STAGE3",
+  "status": "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA",
   "completion": "COMPLETE",
   "freezeState": "EQUIPMENT_IMAGE_STAGE3_FROZEN",
   "semanticStageReopened": false,
@@ -26,46 +26,144 @@
     "preflight": "PASS",
     "build": "PASS",
     "deploymentHosted": "PASS",
-    "browserUi": "PASS_PLAYWRIGHT_HOSTED_BROWSER_UI"
+    "browserUi": "PASS_HOSTED_ROUTE_AND_ASSET_SMOKE"
   },
   "routeChecks": [
-    {"path":"","requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/?qa=1787915458397","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/?qa=1787915458397","status":200,"contentType":"text/html; charset=utf-8","bytes":13298},
-    {"path":"equipment","requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment?qa=1787915458418","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/?qa=1787915458418","status":200,"contentType":"text/html; charset=utf-8","bytes":270101},
-    {"path":"equipment/","requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/?qa=1787915458469","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/?qa=1787915458469","status":200,"contentType":"text/html; charset=utf-8","bytes":270101},
-    {"path":"equipment/exclusive","requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive?qa=1787915458477","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive/?qa=1787915458477","status":200,"contentType":"text/html; charset=utf-8","bytes":519486},
-    {"path":"equipment/exclusive/","requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive/?qa=1787915458512","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive/?qa=1787915458512","status":200,"contentType":"text/html; charset=utf-8","bytes":519486},
-    {"path":"equipment/6","requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/6?qa=1787915458521","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/6/?qa=1787915458521","status":200,"contentType":"text/html; charset=utf-8","bytes":34809},
-    {"path":"equipment/547","requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/547?qa=1787915458549","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/547/?qa=1787915458549","status":200,"contentType":"text/html; charset=utf-8","bytes":33027},
-    {"path":"equipment/550","requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/550?qa=1787915458578","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/550/?qa=1787915458578","status":200,"contentType":"text/html; charset=utf-8","bytes":32933}
+    {
+      "path": "",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/?qa=1787915458397",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/?qa=1787915458397",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 13298
+    },
+    {
+      "path": "equipment",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment?qa=1787915458418",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/?qa=1787915458418",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 270101
+    },
+    {
+      "path": "equipment/",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/?qa=1787915458469",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/?qa=1787915458469",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 270101
+    },
+    {
+      "path": "equipment/exclusive",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive?qa=1787915458477",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive/?qa=1787915458477",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 519486
+    },
+    {
+      "path": "equipment/exclusive/",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive/?qa=1787915458512",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive/?qa=1787915458512",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 519486
+    },
+    {
+      "path": "equipment/6",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/6?qa=1787915458521",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/6/?qa=1787915458521",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 34809
+    },
+    {
+      "path": "equipment/547",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/547?qa=1787915458549",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/547/?qa=1787915458549",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 33027
+    },
+    {
+      "path": "equipment/550",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/550?qa=1787915458578",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/550/?qa=1787915458578",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 32933
+    }
   ],
   "assetChecks": [
-    {"equipmentId":6,"requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/6.png?qa=1787915458607","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/6.png?qa=1787915458607","status":200,"contentType":"image/png","width":172,"height":172,"bytes":20097},
-    {"equipmentId":106,"requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/106.png?qa=1787915458624","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/106.png?qa=1787915458624","status":200,"contentType":"image/png","width":172,"height":172,"bytes":30435},
-    {"equipmentId":547,"requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/547.png?qa=1787915458644","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/547.png?qa=1787915458644","status":200,"contentType":"image/png","width":172,"height":172,"bytes":33742},
-    {"equipmentId":550,"requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/550.png?qa=1787915458656","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/550.png?qa=1787915458656","status":200,"contentType":"image/png","width":172,"height":172,"bytes":20438},
-    {"equipmentId":643,"requestedUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/643.png?qa=1787915458677","finalUrl":"https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/643.png?qa=1787915458677","status":200,"contentType":"image/png","width":172,"height":172,"bytes":29460}
+    {
+      "equipmentId": 6,
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/6.png?qa=1787915458607",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/6.png?qa=1787915458607",
+      "status": 200,
+      "contentType": "image/png",
+      "width": 172,
+      "height": 172,
+      "bytes": 20097
+    },
+    {
+      "equipmentId": 106,
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/106.png?qa=1787915458624",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/106.png?qa=1787915458624",
+      "status": 200,
+      "contentType": "image/png",
+      "width": 172,
+      "height": 172,
+      "bytes": 30435
+    },
+    {
+      "equipmentId": 547,
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/547.png?qa=1787915458644",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/547.png?qa=1787915458644",
+      "status": 200,
+      "contentType": "image/png",
+      "width": 172,
+      "height": 172,
+      "bytes": 33742
+    },
+    {
+      "equipmentId": 550,
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/550.png?qa=1787915458656",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/550.png?qa=1787915458656",
+      "status": 200,
+      "contentType": "image/png",
+      "width": 172,
+      "height": 172,
+      "bytes": 20438
+    },
+    {
+      "equipmentId": 643,
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/643.png?qa=1787915458677",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/643.png?qa=1787915458677",
+      "status": 200,
+      "contentType": "image/png",
+      "width": 172,
+      "height": 172,
+      "bytes": 29460
+    }
   ],
-  "representativeEquipmentIds": [6,106,547,550,643],
-  "collisionFixturesChecked": [547,550],
+  "representativeEquipmentIds": [
+    6,
+    106,
+    547,
+    550,
+    643
+  ],
+  "collisionFixturesChecked": [
+    547,
+    550
+  ],
   "existingBaselineFixtureChecked": 6,
-  "officialApkHoldFixturesChecked": [106,547,550,643],
+  "officialApkHoldFixturesChecked": [
+    106,
+    547,
+    550,
+    643
+  ],
   "publicEquipment": 373,
-  "nextStage": "EQUIPMENT_IMAGE_STAGE3_COMPLETE",
-  "browserUiFreshness": {
-    "status": "PASS_FRESH_BROWSER_UI_EVIDENCE",
-    "currentInputFingerprint": {"version":1,"algorithm":"sha256","sha256":"75e0c3d7fa6da2c11468e626fd56ffea3bbcde6d8b5cff40faa821b0cb61b299","fileCount":380,"equipmentImageCount":373},
-    "evidencePath": "data/evidence/equipment-image-stage3-browser-ui.v1.json",
-    "evidenceInputFingerprint": {"version":1,"algorithm":"sha256","sha256":"75e0c3d7fa6da2c11468e626fd56ffea3bbcde6d8b5cff40faa821b0cb61b299","fileCount":380,"equipmentImageCount":373}
-  },
-  "browserUiEvidence": {
-    "path": "data/evidence/equipment-image-stage3-browser-ui.v1.json",
-    "status": "PASS_EQUIPMENT_IMAGE_STAGE3_BROWSER_UI",
-    "automation": "Playwright Chromium headless against deployed GitHub Pages",
-    "inputFingerprint": {"version":1,"algorithm":"sha256","sha256":"75e0c3d7fa6da2c11468e626fd56ffea3bbcde6d8b5cff40faa821b0cb61b299","fileCount":380,"equipmentImageCount":373},
-    "desktopViewport": {"width":1440,"height":900},
-    "mobileViewport": {"width":390,"height":844},
-    "pageErrors": 0,
-    "consoleErrors": 0,
-    "hostedHttpFailuresObservedByBrowser": 0
-  }
+  "nextStage": "EQUIPMENT_IMAGE_STAGE3_COMPLETE"
 }
