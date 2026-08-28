@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "stage": "SMART_REGRESSION_SR9ABC",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "PREP_COMPLETE_DOCTOR_WIRING_DEFERRED",
+  "branch": "work/smart-regression-sr9-doctor-input",
+  "baseStage": "SMART_REGRESSION_SR8",
+  "scope": {
+    "completed": [
+      "SR-9A integration contract freeze",
+      "SR-9B Smart Regression status collector",
+      "SR-9C generated Project Doctor diagnostic input",
+      "independent freshness and syntax validation"
+    ],
+    "deferred": [
+      "Project Doctor implementation wiring",
+      "Project Doctor command or UI changes",
+      "Project Doctor domain health/lifecycle reconciliation changes",
+      "end-to-end Doctor integration validation"
+    ]
+  },
+  "artifacts": {
+    "contract": "data/contracts/smart-regression-project-doctor-sr9a.v1.json",
+    "collector": "scripts/collect-smart-regression-project-doctor-input.mjs",
+    "generatedInput": "data/generated/smart-regression-project-doctor-input.v1.json",
+    "prepWorkflow": ".github/workflows/smart-regression-sr9-doctor-input.yml",
+    "collectionCommand": "bun run collect:smart-regression:doctor-input",
+    "freshnessCheckCommand": "bun run check:smart-regression:doctor-input"
+  },
+  "integrationBoundary": {
+    "doctorIntegrationRole": "SUPPLEMENTAL_OPERATIONAL_EVIDENCE",
+    "doctorFacet": "source-evidence",
+    "canonicalLifecycleAuthority": false,
+    "canonicalPopulationAuthority": false,
+    "semanticHealthAuthority": false,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "projectDoctorImplementationModified": false,
+    "frozenSemanticPipelinesReopened": false
+  },
+  "generatedDiagnostic": {
+    "status": "COLLECTED",
+    "operationalHealth": "REVIEW",
+    "boundGateCount": 4,
+    "unresolvedGateCount": 10,
+    "safeFallbackMemberCount": 16,
+    "canonicalOwnerRuleCount": 8,
+    "replacementClassCount": 1,
+    "broadReplacementAllowed": false,
+    "reviews": [
+      "UNRESOLVED_GATE_BINDINGS",
+      "BROAD_CI_REPLACEMENT_DISABLED"
+    ]
+  },
+  "safetyEvidence": {
+    "sr5RepresentativeCaseCount": 17,
+    "sr5PassedCaseCount": 17,
+    "sr5FalseNegativeCount": 0,
+    "sr7HistoricalCaseCount": 5,
+    "sr7PassedCaseCount": 5,
+    "sr7ObservedFalseNegativeCount": 0,
+    "sr7ReplayErrorCount": 0,
+    "sr8CaseCount": 5,
+    "sr8PassedCaseCount": 5,
+    "sr8FailedCaseCount": 0,
+    "sr8ActualReplacementExecutionCount": 1
+  },
+  "verifiedRun": {
+    "runId": 33144410693,
+    "jobId": 98762199428,
+    "headSha": "95497d9c3a453881de651d7c75c93c7ae85f0638",
+    "jobConclusion": "success",
+    "collectorSyntaxCheckConclusion": "success",
+    "generatedInputFreshnessCheckConclusion": "success",
+    "observed": {
+      "operationalHealth": "REVIEW",
+      "boundGateCount": 4,
+      "unresolvedGateCount": 10,
+      "sr5FalseNegativeCount": 0,
+      "sr7ObservedFalseNegativeCount": 0,
+      "sr8ActualReplacementExecutionCount": 1,
+      "replacementClassCount": 1
+    }
+  },
+  "projectDoctorCompatibility": {
+    "referenceBranchInspected": "work/project-doctor-d1",
+    "referenceContract": "data/contracts/project-doctor-d1-0-contract.v1.json",
+    "referenceOnly": true,
+    "reason": "The older D1 branch is substantially behind current main. Only its read-only/supplemental-source authority model was used as compatibility guidance; no stale Doctor implementation was merged or modified.",
+    "usesExistingDoctorFacet": "source-evidence",
+    "respectsPrimaryStatusSourceOwnership": true,
+    "respectsNoRawConfigDataStatusRule": true,
+    "respectsNoSemanticRecomputationRule": true
+  },
+  "reviews": [
+    {
+      "code": "PROJECT_DOCTOR_WIRING_DEFERRED",
+      "blockingSR9ABCCompletion": false,
+      "blockingFullSR9Completion": true,
+      "effect": "The generated input is ready, but actual Doctor ingestion must wait until the active Project Doctor implementation is available."
+    },
+    {
+      "code": "UNRESOLVED_GATE_BINDINGS_REMAIN",
+      "blockingSR9ABCCompletion": false,
+      "effect": "Ten gates remain intentionally unbound. The generated Doctor input reports this as operational REVIEW and preserves fail-closed behavior."
+    }
+  ],
+  "nextStartPoint": "When Project Doctor implementation is ready, begin SR-9D by registering data/generated/smart-regression-project-doctor-input.v1.json as supplemental source-evidence only. Do not grant it canonical lifecycle authority, and then perform SR-9E end-to-end integration validation."
+}
