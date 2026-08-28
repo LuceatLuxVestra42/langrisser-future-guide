@@ -3,7 +3,7 @@ import fs from "node:fs";
 const TARGETS = [
   { path: "src/routes/equipment.tsx", expected: 2 },
   { path: "src/routes/equipment_.exclusive.tsx", expected: 2 },
-  { path: "src/routes/equipment_.$equipmentId.tsx", expected: 6 },
+  { path: "src/routes/equipment_.$equipmentId.tsx", expected: 7 },
 ];
 
 for (const target of TARGETS) {
