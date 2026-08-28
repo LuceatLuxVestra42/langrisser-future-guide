@@ -1,0 +1,87 @@
+name: Equipment Image Stage 2 Final 373
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-final373
+    paths:
+      - scripts/finalize-equipment-image-stage2-hold29.py
+      - .github/workflows/equipment-image-stage2-final373.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install official APK extraction dependencies
+        run: python -m pip install --disable-pip-version-check UnityPy Pillow
+
+      - name: Resolve HOLD29 from official APK and finalize 373
+        run: python scripts/finalize-equipment-image-stage2-hold29.py
+
+      - name: Require final Stage 2 PASS
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          summary = json.loads(Path('data/validation/equipment-image-stage2-final-summary.v1.json').read_text())
+          assert summary['status'] == 'PASS_EQUIPMENT_IMAGE_STAGE2', summary
+          assert summary['completion'] == 'COMPLETE', summary
+          assert summary['freezeState'] == 'EQUIPMENT_IMAGE_STAGE2_FROZEN', summary
+          assert summary['counts']['publicEquipment'] == 373, summary
+          assert summary['counts']['verifiedRepositoryAssets'] == 373, summary
+          assert summary['counts']['heldResolved'] == 29, summary
+          assert summary['counts']['representativePixelParity'] == 5, summary
+          assert summary['counts']['existingAssetsChanged'] == 0, summary
+          assert summary['counts']['missing'] == 0, summary
+          assert summary['counts']['invalidPng'] == 0, summary
+          assert summary['counts']['hardErrors'] == 0, summary
+          assert summary['finalStage2Complete'] is True, summary
+          print(json.dumps(summary, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Re-run Stage 1 representative validator
+        run: node scripts/validate-equipment-image-stage1.mjs
+
+      - name: Re-run frozen Equipment admission QA
+        run: bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
+
+      - name: Commit final verified Equipment assets and evidence
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            public/images/equipment \
+            data/evidence/equipment-image-stage2-final373-official-apk.v1.json \
+            data/validation/equipment-image-stage2-final-summary.v1.json \
+            data/checkpoints/equipment-image-stage2-final.v1.json \
+            data/validation/equipment-image-stage1-summary.v1.json \
+            data/checkpoints/equipment-image-stage1.v1.json
+          if git diff --cached --quiet; then
+            echo 'Equipment Stage 2 final 373 assets already current.'
+          else
+            git commit -m 'Finalize Equipment Image Stage 2 at 373/373 [skip ci]'
+            git push origin HEAD:work/equipment-image-stage2-final373
+          fi
