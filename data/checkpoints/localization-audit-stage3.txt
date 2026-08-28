@@ -1,0 +1,94 @@
+Localization Audit Stage 3 checkpoint
+Date: 2026-08-28
+Status: PASS_WITH_REVIEW / COMPLETE
+
+Purpose
+- Extend the proven Soldier localization audit model to Hero and Equipment only.
+- Preserve entity-specific authoritative source contracts and exact numeric ID joins.
+- Keep execution read-only against repository inputs; no translation, canonical mutation, relation recomputation, or provisional promotion.
+
+Inherited Soldier gate
+- Stage 2.1 remains authoritative and unchanged.
+- canonical Soldier: 224
+- effective Korean display: 224
+- errors: 0
+- reviews: 2 approved PROVISIONAL_UNRESOLVED records
+- lower-tier fingerprint: 316e905bc409fa337f79baa72a676872998c1f1546ee994e00267b2948d42e28
+
+Hero contract and baseline
+- Master: data/hero-name-master.v1.json
+- Frozen consumer: data/generated/hero-list-stage1.v1.json
+- JOIN: exact numeric heroId only.
+- Master records: 267
+- Consumer records: 267
+- Unique heroId: 267
+- verified records: 267
+- complete CN/KR/EN identity display: 267
+- identity mismatches: 0
+- fingerprint fields: heroId, nameCn, nameKr, nameEn, status
+- fingerprint: 2227c7949dc1ec0c146a8cd8adfa152fc8806a47e94fc8697f97969ae5cb4d5a
+
+Equipment contract and baseline
+- Canonical: data/generated/equipment_stage3_2_display_metadata.json
+- Existing builder: scripts/build-equipment-name-kr-presentation.mjs
+- Localization sources: weapon.tsv / armor.tsv / headgear.tsv / accessory.tsv under data/localization/equipment-name-kr/.
+- The builder is copied with only required inputs to an OS temporary workspace and executed there. Generated files are read from the temporary workspace and then deleted. Repository inputs are not written by the audit.
+- Final audit JOIN: exact numeric equipmentId only.
+- Canonical records: 390
+- Derived presentation records: 390
+- Unique equipmentId: 390
+- Public records: 373
+- Public Korean displays: 373
+- Non-public records: 17
+- Non-public unresolved/null: 17
+- Identity mismatches: 0
+- pageReady mismatches: 0
+- runtimeNameJoin: false
+- productionJoinKey: equipmentId
+- fingerprint fields: equipmentId, nameCn, nameKr, pageReady, status, note
+- fingerprint: bdfde87013955d9e3c509de35ce6e3afa1e7ce3e62b7b02a3681e9c62c10f2cf
+
+Issue boundaries added
+- HERO_COUNT_MISMATCH
+- HERO_CONSUMER_CONTRACT_MISMATCH
+- DUPLICATE_HERO_ID
+- HERO_STATUS_MISMATCH
+- HERO_MISSING_DISPLAY
+- HERO_IDENTITY_MISMATCH
+- HERO_CONFIRMED_PRESENTATION_DRIFT
+- EQUIPMENT_COUNT_MISMATCH
+- DUPLICATE_EQUIPMENT_ID
+- EQUIPMENT_PRESENTATION_CONTRACT_MISMATCH
+- EQUIPMENT_IDENTITY_MISMATCH
+- EQUIPMENT_PAGE_READY_MISMATCH
+- EQUIPMENT_MISSING_DISPLAY
+- EQUIPMENT_NONPUBLIC_LOCALIZATION_LEAK
+- EQUIPMENT_PUBLIC_COVERAGE_MISMATCH
+- EQUIPMENT_NONPUBLIC_COVERAGE_MISMATCH
+- EQUIPMENT_APPROVED_PRESENTATION_DRIFT
+
+Self-test
+- Inherited Stage 2.1 tests: 7/7 PASS.
+- Stage 3 additions: 6/6 PASS.
+- Combined: 13/13 PASS.
+- Stage 3 mutation cases cover Hero identity mismatch, Hero missing display, Hero status mismatch, Equipment identity mismatch, Equipment public missing display, Equipment non-public localization leak.
+
+Final live verification
+- GitHub Actions run: 33156713718
+- Job: 98801110513
+- Verified implementation head: e76fcba81902174bb760c83383db54c0e998ec89
+- Baseline --check: PASS_WITH_REVIEW
+- Baseline summary: Soldier 224 / Hero 267 / Equipment 390 / Hero display 267 / Equipment public display 373 / errors 0 / reviews 2.
+- Self-test: PASS 13/13.
+- Hero live drift mutation: first verified Korean Hero name received a trailing whitespace; audit rejected it with HERO_CONFIRMED_PRESENTATION_DRIFT. Mutated fingerprint: 239829d457a95c3d69dfb847a1a6e01935630ea58a7b37b76fb03c742615d223. Source restored and baseline passed again.
+- Equipment live drift mutation: 屠龙剑格拉姆 Korean display `용살검 그람` -> `용살검그람`; audit rejected it with EQUIPMENT_APPROVED_PRESENTATION_DRIFT. Mutated fingerprint: 9eb3f38205226afac26f955b67b28d0f3b7f9f8ddd4edead81e5f3338a120663. Source restored and baseline passed again.
+- Temporary workflow is removed before merge.
+
+Scope boundary
+- Stage 3 does not scan frontend import/leak behavior; that remains Stage 4.
+- Stage 3 does not add the permanent npm command or CI gate; that remains Stage 5.
+- Stage 3 does not integrate Project Doctor; that remains Stage 6.
+- Existing Soldier Stage 0/1/2/2.1 historical snapshots are not overwritten.
+
+Next start
+- STOP after Stage 3 completion. Stage 4 is frontend leak/effective-display consumer validation and should begin only when explicitly requested.
