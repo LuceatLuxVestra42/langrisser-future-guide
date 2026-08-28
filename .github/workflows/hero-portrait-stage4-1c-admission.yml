@@ -28,6 +28,19 @@ jobs:
       - name: Install validation dependencies
         run: python -m pip install 'gdown==6.1.0' 'Pillow==11.3.0'
 
+      - name: Apply pinned gdown API compatibility fix
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/hero_portrait_stage4_1c_validate_admission.py')
+          s = p.read_text(encoding='utf-8')
+          old = 'gdown.download(id=file_id, output=str(target), quiet=True, fuzzy=False)'
+          new = 'gdown.download(id=file_id, output=str(target), quiet=True)'
+          if old not in s:
+              raise SystemExit('expected gdown compatibility target not found')
+          p.write_text(s.replace(old, new), encoding='utf-8')
+          PY
+
       - name: Download mapped sources and apply Stage 3 technical gates
         run: |
           python scripts/hero_portrait_stage4_1c_validate_admission.py \
@@ -50,7 +63,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/validation/hero-portrait-stage4-1c-technical-admission.v1.json data/validation/hero-portrait-stage4-1c-technical-admission-summary.v1.json
+          git add scripts/hero_portrait_stage4_1c_validate_admission.py data/validation/hero-portrait-stage4-1c-technical-admission.v1.json data/validation/hero-portrait-stage4-1c-technical-admission-summary.v1.json
           if git diff --cached --quiet; then
             echo 'No generated changes to commit.'
           else
