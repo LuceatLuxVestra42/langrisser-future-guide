@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download and fingerprint official installer
+      - name: Download and verify current official installer against CDN metadata
         run: |
           set -euo pipefail
           URL='https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/DownLoad-MZ-PC.exe'
@@ -24,12 +24,15 @@ jobs:
           tail -n 40 /tmp/download.headers
           SIZE="$(stat -c %s /tmp/DownLoad-MZ-PC.exe)"
           MD5="$(md5sum /tmp/DownLoad-MZ-PC.exe | awk '{print $1}')"
+          CDN_MD5="$(grep -i '^x-cos-meta-md5:' /tmp/download.headers | tail -1 | cut -d: -f2- | tr -d ' \r\n')"
           SHA256="$(sha256sum /tmp/DownLoad-MZ-PC.exe | awk '{print $1}')"
           echo "size=$SIZE"
           echo "md5=$MD5"
+          echo "cdn-md5=$CDN_MD5"
           echo "sha256=$SHA256"
           file /tmp/DownLoad-MZ-PC.exe
-          test "$MD5" = '31a6db4f224374185e2c498287d3d3f3'
+          test -n "$CDN_MD5"
+          test "$MD5" = "$CDN_MD5"
       - name: Extract only url.txt and launcher
         run: |
           set -euo pipefail
