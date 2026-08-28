@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-extraction-pilot",
+  "schemaId": "hero-portrait-stage4-extraction-pilot-checkpoint/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "freezeState": "HERO_PORTRAIT_STAGE4_EXTRACTION_PILOT_FROZEN",
+  "branch": "work/hero-portrait-stage4-extraction-pilot",
+  "baseCommit": "c74fb57c02545cfc7331530838599e082a0c591c",
+  "script": "scripts/materialize-hero-portrait-admitted.py",
+  "result": "data/generated/hero-portrait-stage4-extraction-pilot.v1.json",
+  "checks": [
+    {"id": "explicit-admitted-input-count", "expected": 5, "actual": 5, "result": "PASS"},
+    {"id": "source-byte-length-match", "expected": 5, "actual": 5, "result": "PASS"},
+    {"id": "source-sha256-match", "expected": 5, "actual": 5, "result": "PASS"},
+    {"id": "source-png-signature", "expected": 5, "actual": 5, "result": "PASS"},
+    {"id": "local-materialized-count", "expected": 5, "actual": 5, "result": "PASS"},
+    {"id": "post-copy-sha256-identity", "expected": 5, "actual": 5, "result": "PASS"},
+    {"id": "crop-or-resize", "expected": 0, "actual": 0, "result": "PASS"},
+    {"id": "reencode", "expected": 0, "actual": 0, "result": "PASS"},
+    {"id": "repository-binary-install", "expected": 0, "actual": 0, "result": "PASS_WITH_TOOLING_BOUNDARY"},
+    {"id": "bulk-267-complete", "expected": false, "actual": false, "result": "PASS"}
+  ],
+  "completedScope": [
+    "revalidate all five Stage 2/3 admitted PNG source bytes against frozen byte length and SHA-256",
+    "materialize those five admitted PNGs locally at the canonical public/images/heroes/cards/{heroId}.png paths",
+    "verify PNG signatures and post-copy SHA-256 byte identity",
+    "freeze a deterministic repository materializer that reads the Stage 3 admitted records instead of inferring filenames or Hero ownership",
+    "package the five materialized PNGs plus validation manifest as a local extraction artifact"
+  ],
+  "reviewBoundary": {
+    "canonicalHeroCount": 267,
+    "locallyMaterializedCount": 5,
+    "repositoryBinaryInstalledCount": 0,
+    "pendingCanonicalSourceMappingCount": 262,
+    "stage4BulkExtractionComplete": false,
+    "meaning": "The extraction mechanism is proven for all currently admitted sources. Population-wide Stage 4 remains blocked by source coverage, not by the copy/validation rule."
+  },
+  "toolingBoundary": {
+    "connectedGitHubBinaryUploadAvailable": false,
+    "actionTaken": "Do not serialize multi-megabyte PNG base64 through the conversational GitHub blob payload. Commit the deterministic materializer and exact extraction result metadata instead.",
+    "localPackage": "/mnt/data/hero-portrait-stage4-extraction-pilot.zip"
+  },
+  "notCompletedScope": [
+    "bind the 239 unanchored structured Drive folders to canonical Hero IDs and exact PNG file IDs",
+    "resolve the minimum 23-Hero structured Drive coverage gap",
+    "materialize the remaining 262 canonical Hero PNGs",
+    "install binary PNGs into the GitHub branch",
+    "declare Stage 4 bulk extraction 267/267 complete",
+    "frontend resolver or Hosted/UI QA"
+  ],
+  "verdict": {
+    "pilotComplete": true,
+    "pilotPassCount": 5,
+    "hardErrors": 0,
+    "extractionRuleProven": true,
+    "populationSourceCoverageReady": false,
+    "stage4BulkExtractionComplete": false
+  },
+  "nextStart": {
+    "primary": "HERO_PORTRAIT_STAGE4_1_STRUCTURED_DRIVE_MAPPING_BRIDGE_PROOF",
+    "secondary": "HERO_PORTRAIT_STAGE4_2_UNCOVERED_SOURCE_FALLBACK_PROOF",
+    "bulkResumeCondition": "Explicit admitted source mappings reach 267/267; then run scripts/materialize-hero-portrait-admitted.py and validate 267 output hashes."
+  }
+}
