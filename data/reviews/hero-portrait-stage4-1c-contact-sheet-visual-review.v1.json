@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-1c-mapped-source-admission",
+  "reviewType": "BATCH_CONTACT_SHEET_VISUAL_REVIEW",
+  "status": "PASS",
+  "coverage": {
+    "technicalPassHeroCount": 203,
+    "reviewedHeroCount": 203,
+    "contactSheetCount": 7,
+    "reviewedHeroIdsOrderedCsvSha256": "7c12daa2aa3087573e4970924590152c250b1faa9bca319632343816a2800ca3",
+    "artifact": {
+      "name": "hero-stage4-1c-contact-sheets",
+      "artifactId": 9674556399,
+      "artifactDigest": "sha256:a1e05c490cbcb46294616f46375905ddaa01478f0f1d953fa9837bff381d0e56",
+      "sourceWorkflowRunId": 33142660690
+    }
+  },
+  "reviewBasis": {
+    "sourceImages": "Exact Drive-ID downloaded PNG bytes that passed Stage 4-1C technical validation",
+    "baseDefaultProvenance": "Stage 4-1B exact Hero ownership plus same Hero group structured 스킨/기본 path; visual appearance and filename tokens are not used to establish ownership",
+    "contactSheetPurpose": "Detect obvious baked UI decoration, rarity/SP/faction badges, card frames/background cards, unrelated image contamination, or grossly malformed artwork",
+    "characterEffectsPolicy": "Character illustration effects such as aura, magic circles, summons, companions, weapon effects, or pose effects are not treated as UI decoration when they are part of the transparent character artwork"
+  },
+  "checks": {
+    "allSevenSheetsReviewed": "PASS",
+    "obviousRarityBadgeContamination": "PASS_NONE_OBSERVED",
+    "obviousSpBadgeContamination": "PASS_NONE_OBSERVED",
+    "obviousFactionBadgeContamination": "PASS_NONE_OBSERVED",
+    "cardFrameContamination": "PASS_NONE_OBSERVED",
+    "backgroundCardContamination": "PASS_NONE_OBSERVED",
+    "unrelatedImageContamination": "PASS_NONE_OBSERVED",
+    "grossMalformedArtwork": "PASS_NONE_OBSERVED"
+  },
+  "limitations": {
+    "visualReviewDoesNotRecomputeHeroOwnership": true,
+    "visualReviewDoesNotInferBaseStatusFromCostumeOrFilename": true,
+    "ownershipAndBaseStatusRemainBoundToFrozenStructuralProvenance": true
+  },
+  "verdict": {
+    "visualGate": "PASS_203_OF_203",
+    "eligibleForFinalStage3Admission": 203,
+    "visualReviewExceptions": 0
+  }
+}
