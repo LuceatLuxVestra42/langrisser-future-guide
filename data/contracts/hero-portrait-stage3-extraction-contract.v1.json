@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage3-extraction-contract-freeze",
+  "schemaId": "hero-portrait-stage3-extraction-contract/v1",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Freeze a deterministic, no-guess Hero portrait source-admission and lossless materialization contract before any 267-Hero bulk install.",
+  "frozenInputs": {
+    "stage0Contract": {
+      "path": "data/contracts/hero-portrait-stage0-input-freeze.v1.json",
+      "gitBlobSha": "cf559f0d529d95f836a43b681d9951798c379852",
+      "role": "267-Hero identity and public target path contract"
+    },
+    "stage1Inventory": {
+      "path": "data/generated/hero-portrait-stage1-locator-inventory.v1.json",
+      "gitBlobSha": "2163f02dde989afdc3c29f98af99d631e05528d6",
+      "role": "source-family and locator safety boundary"
+    },
+    "stage2Proof": {
+      "path": "data/generated/hero-portrait-stage2-representative-resolution-proof.v1.json",
+      "role": "five-Hero direct PNG proof"
+    },
+    "leonFilenameReview": {
+      "path": "data/reviews/hero-portrait-stage2-leon-animation-filename-review.v1.json",
+      "gitBlobSha": "7b2c07ce6fdf1f1c7e48176fe06d42acf5edfd62",
+      "role": "filename-token non-authority clarification"
+    }
+  },
+  "identityContract": {
+    "canonicalHeroCount": 267,
+    "identityKey": "heroId",
+    "ownershipJoin": "EXPLICIT_HERO_ID_MAPPING_ONLY",
+    "targetRoot": "public/images/heroes/cards",
+    "targetPattern": "public/images/heroes/cards/{heroId}.png",
+    "targetFormat": "PNG"
+  },
+  "sourceAdmissionPrecedence": [
+    {
+      "priority": 1,
+      "sourceKind": "GOOGLE_DRIVE_BASE_SKIN_PNG",
+      "status": "ENABLED",
+      "admission": "An immutable explicit Hero ID -> Drive file ID mapping must exist and the fetched bytes must pass all byte/format/provenance checks.",
+      "filenameRole": "NON_AUTHORITATIVE_METADATA_ONLY"
+    },
+    {
+      "priority": 2,
+      "sourceKind": "UNITY_HERO_PAINTING_PREFAB_RESOLUTION",
+      "status": "DISABLED_PENDING_SEPARATE_PROOF",
+      "reason": "sourceArtworkPath coverage is 267/267 but a prefab locator is not bitmap dependency proof.",
+      "enableCondition": "A separate representative dependency-resolution proof must establish an explicit prefab -> texture/sprite -> exported PNG chain and the same admission QA before this source kind can be used."
+    }
+  ],
+  "noSourceFallback": {
+    "status": "ACTIVE",
+    "resultWhenNoEnabledExplicitSourceExists": "PENDING_SOURCE_MAPPING",
+    "allowFuzzyFallback": false,
+    "allowCrossHeroReuse": false,
+    "allowWebSearchImageSubstitution": false,
+    "allowGeneratedOrEditedReplacement": false
+  },
+  "sourceMappingRecordRequiredFields": [
+    "heroId",
+    "sourceKind",
+    "sourceImmutableId",
+    "sourceFileName",
+    "mimeType",
+    "byteLength",
+    "sha256",
+    "width",
+    "height",
+    "alpha"
+  ],
+  "sourceAdmissionChecks": [
+    "heroId belongs to the frozen canonical 267-Hero population",
+    "exactly one enabled explicit source mapping is selected for the Hero",
+    "source bytes are directly readable by the immutable source identifier",
+    "MIME type and PNG signature identify a PNG",
+    "decoded width and height are positive",
+    "RGBA/alpha is present and real transparency is preserved",
+    "SHA-256 and byteLength are calculated and frozen at admission",
+    "source provenance identifies the base/default character appearance rather than a Skin/SP/alternate appearance",
+    "no rarity, SP, faction, frame, background-card, or other UI decoration is baked into the source",
+    "unusual filename tokens are never used alone to accept or reject a source",
+    "cross-Hero exact-byte duplicates become REVIEW unless an explicit shared-source exception is approved"
+  ],
+  "filenamePolicy": {
+    "ownershipInferenceAllowed": false,
+    "baseAppearanceInferenceAllowed": false,
+    "tokensSuchAsDefaultOrIdleAreSufficient": false,
+    "tokensSuchAsAnimationFinAreDisqualifying": false,
+    "rule": "Filename tokens may support investigation but never establish canonical ownership or base/special status by themselves."
+  },
+  "materializationRule": {
+    "mode": "LOSSLESS_SOURCE_PNG_BYTE_COPY",
+    "crop": "FORBIDDEN_UNLESS_A_FUTURE_VERSIONED_CONTRACT_PROVES_A_NEED",
+    "resize": "FORBIDDEN",
+    "reencode": "FORBIDDEN",
+    "alphaFlatten": "FORBIDDEN",
+    "colorAdjustment": "FORBIDDEN",
+    "aiOrSyntheticEditing": "FORBIDDEN",
+    "destinationNaming": "HERO_ID_ONLY",
+    "existingTargetConflict": "FAIL_IF_EXISTING_TARGET_SHA256_DIFFERS_FROM_ADMITTED_SOURCE",
+    "existingTargetExactMatch": "IDEMPOTENT_PASS"
+  },
+  "admissionStates": [
+    "ADMITTED_SOURCE",
+    "PENDING_SOURCE_MAPPING",
+    "REVIEW_SOURCE_IDENTITY",
+    "REJECTED_SOURCE"
+  ],
+  "bulk267Gate": {
+    "requiredBeforeAnyPopulationWideMaterialization": true,
+    "requirements": {
+      "canonicalHeroCount": 267,
+      "explicitAdmittedSourceCount": 267,
+      "uniqueHeroMappingCount": 267,
+      "pendingSourceMappingCount": 0,
+      "reviewSourceIdentityCount": 0,
+      "rejectedSourceCount": 0,
+      "duplicateHeroIdCount": 0,
+      "invalidTargetPathCount": 0
+    },
+    "currentStatus": "BLOCKED_UNTIL_POPULATION_MAPPING_IS_PROVEN"
+  },
+  "forbidden": [
+    "name-based portrait ownership JOIN",
+    "filename similarity ownership inference",
+    "Hero ID arithmetic inference",
+    "Unity prefab path to web path transformation",
+    "treating a prefab locator as exported bitmap proof",
+    "selecting Skin/SP/alternate appearance because it has a similar Hero filename",
+    "treating Animation_FIN or any filename token as awakening-skill evidence by itself",
+    "starting a 267-Hero copy with unresolved/review mappings",
+    "mutating FINAL_FROZEN Hero semantics during asset work"
+  ],
+  "completionCondition": "The source precedence, admission states, byte/format/provenance checks, immutable Hero-ID target naming, lossless materialization behavior, conflict behavior, and population-wide bulk gate are deterministic and frozen without claiming unproven 267-source coverage.",
+  "nextStage": "HERO_PORTRAIT_STAGE4_BULK_EXTRACTION_WITH_STAGE4_0_MAPPING_GATE"
+}
