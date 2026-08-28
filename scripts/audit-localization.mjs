@@ -52,6 +52,15 @@ function loadInputs() {
   };
 }
 
+function isExplicitNormalSpPair(records, canonicalIndex) {
+  if (records.length !== 2) return false;
+  const [left, right] = records.map((record) => canonicalIndex.map.get(record.soldierId));
+  if (!left || !right || left.isSp === right.isSp) return false;
+  const normal = left.isSp ? right : left;
+  const sp = left.isSp ? left : right;
+  return normal.spSoldierId === sp.soldierId && sp.normalSoldierId === normal.soldierId;
+}
+
 function auditSoldierLocalization(input = loadInputs()) {
   const { contract, canonical, lower, provisional, boundaryValidation } = input;
   const errors = [];
@@ -278,16 +287,22 @@ function auditSoldierLocalization(input = loadInputs()) {
     if (!displayGroups.has(normalized)) displayGroups.set(normalized, []);
     displayGroups.get(normalized).push(record);
   }
-  const duplicateKrGroups = [...displayGroups.entries()]
+
+  const allDuplicateKrGroups = [...displayGroups.entries()]
     .filter(([, records]) => records.length > 1)
     .map(([nameKr, records]) => ({
       nameKr,
+      records,
       soldierIds: records.map((record) => record.soldierId).sort((a, b) => a - b),
       sources: records.map((record) => record.source),
-    }))
+    }));
+  const expectedSpDuplicateGroups = allDuplicateKrGroups.filter((group) => isExplicitNormalSpPair(group.records, canonicalIndex));
+  const duplicateKrGroups = allDuplicateKrGroups
+    .filter((group) => !isExplicitNormalSpPair(group.records, canonicalIndex))
+    .map(({ records: _records, ...group }) => group)
     .sort((a, b) => a.nameKr.localeCompare(b.nameKr, 'ko'));
   for (const group of duplicateKrGroups) {
-    reviews.push(review('DUPLICATE_KR_NAME', `Multiple Soldier IDs resolve to the same effective Korean display name: ${group.nameKr}.`, group));
+    reviews.push(review('DUPLICATE_KR_NAME', `Multiple unrelated Soldier IDs resolve to the same effective Korean display name: ${group.nameKr}.`, group));
   }
 
   if (boundaryValidation.status !== contract.sources.tier3ProvisionalValidation.expectedStatus) {
@@ -310,6 +325,7 @@ function auditSoldierLocalization(input = loadInputs()) {
     tier3ConfirmedCanonical,
     effectiveDisplayCount: effectiveRecords.length - missingEffectiveDisplay.length,
     missingEffectiveDisplayCount: missingEffectiveDisplay.length,
+    expectedNormalSpDuplicateNameGroups: expectedSpDuplicateGroups.length,
     duplicateKrNameGroups: duplicateKrGroups.length,
     provisionalBoundaryValidationPass: boundaryValidation.status === contract.sources.tier3ProvisionalValidation.expectedStatus,
     readOnlyExecution: true,
@@ -347,6 +363,7 @@ function auditSoldierLocalization(input = loadInputs()) {
       invalidPromotions: invalidPromotionCount,
       staleProvisionals: staleProvisionalCount,
       overlayCollisions: overlayCollisions.length,
+      expectedNormalSpDuplicateNameGroups: expectedSpDuplicateGroups.length,
       duplicateKrNameGroups: duplicateKrGroups.length,
       errors: errors.length,
       reviews: reviews.length,
