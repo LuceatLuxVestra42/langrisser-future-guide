@@ -1,0 +1,18 @@
+name: Equipment Image Stage 2 Official PC Probe
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-hold29
+    paths:
+      - 'scripts/probe-equipment-official-pc-distribution.mjs'
+      - '.github/workflows/equipment-image-stage2-official-pc-probe.yml'
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe official PC distribution
+        run: node scripts/probe-equipment-official-pc-distribution.mjs
