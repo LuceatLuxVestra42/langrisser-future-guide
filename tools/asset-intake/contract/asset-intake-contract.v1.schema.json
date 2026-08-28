@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "asset-intake-contract.v1.schema.json",
+  "title": "Asset Intake Contract v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contractVersion", "domain", "records"],
+  "properties": {
+    "contractVersion": { "const": "asset-intake/v1" },
+    "domain": { "type": "string", "minLength": 1 },
+    "sourceContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "status"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "stage": { "type": "string", "minLength": 1 },
+        "substage": { "type": "string", "minLength": 1 },
+        "checkpoint": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "minLength": 1 }
+      }
+    },
+    "records": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/record" }
+    }
+  },
+  "$defs": {
+    "canonicalKey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "value": {
+          "oneOf": [
+            { "type": "integer" },
+            { "type": "string", "minLength": 1 }
+          ]
+        }
+      }
+    },
+    "expectedLocator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assetRole", "locatorKind", "value"],
+      "properties": {
+        "assetRole": { "type": "string", "minLength": 1 },
+        "locatorKind": {
+          "enum": [
+            "FULL_PATH",
+            "EXACT_FILENAME",
+            "RESOURCE_ID",
+            "STATIC_PATH",
+            "SPINE_PATH"
+          ]
+        },
+        "value": {
+          "oneOf": [
+            { "type": "integer" },
+            { "type": "string", "minLength": 1 }
+          ]
+        },
+        "approvedRoot": { "type": "string", "minLength": 1 }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "repositoryPath": { "type": "string", "minLength": 1 },
+        "webPath": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expectedLocatorIndex",
+        "sourcePath",
+        "relativePath",
+        "basename",
+        "extension",
+        "byteSize",
+        "signature",
+        "sha256"
+      ],
+      "properties": {
+        "expectedLocatorIndex": { "type": "integer", "minimum": 0 },
+        "sourceArtifact": { "type": "string", "minLength": 1 },
+        "sourcePath": { "type": "string", "minLength": 1 },
+        "relativePath": { "type": "string", "minLength": 1 },
+        "basename": { "type": "string", "minLength": 1 },
+        "extension": { "type": "string", "minLength": 1 },
+        "byteSize": { "type": "integer", "minimum": 0 },
+        "signature": { "type": "string", "minLength": 1 },
+        "width": { "type": ["integer", "null"], "minimum": 1 },
+        "height": { "type": ["integer", "null"], "minimum": 1 },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "exactDuplicateGroup": { "type": ["string", "null"] },
+        "basenameCollisionGroup": { "type": ["string", "null"] }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonicalKey",
+        "domainNativeStatus",
+        "normalizedResolutionClass",
+        "expectedLocators",
+        "evidence"
+      ],
+      "properties": {
+        "canonicalKey": { "$ref": "#/$defs/canonicalKey" },
+        "domainNativeStatus": { "type": "string", "minLength": 1 },
+        "normalizedResolutionClass": {
+          "enum": ["RESOLVED", "PENDING", "AMBIGUOUS", "REJECTED", "INVALID"]
+        },
+        "expectedLocators": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/expectedLocator" }
+        },
+        "target": { "$ref": "#/$defs/target" },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "normalizedResolutionClass": { "const": "RESOLVED" }
+            },
+            "required": ["normalizedResolutionClass"]
+          },
+          "then": {
+            "properties": {
+              "evidence": { "minItems": 1 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "normalizedResolutionClass": { "const": "PENDING" }
+            },
+            "required": ["normalizedResolutionClass"]
+          },
+          "then": {
+            "properties": {
+              "evidence": { "maxItems": 0 }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
