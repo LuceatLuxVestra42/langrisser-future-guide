@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 export const CLOSEOUT_STEPS = [
-  { id: 'd1-status', script: 'scripts/run-project-doctor-d1-3.mjs', passthrough: false },
+  { id: 'd5-fresh-status', script: 'scripts/run-project-doctor-d5-refresh.mjs', passthrough: false },
   { id: 'd4-self-test', script: 'scripts/validate-project-doctor-d4.mjs', passthrough: false },
   { id: 'd4-run', script: 'scripts/run-project-doctor-d4.mjs', passthrough: true },
 ];
@@ -28,7 +28,7 @@ const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve
 if (isMain) {
   if (process.argv.includes('--help') || process.argv.includes('-h')) {
     console.log('Usage: npm run doctor -- [--dry-run] [--json] [D3/D4 changed-file source options]');
-    console.log('Runs D1 status refresh, D4 execution fixtures, then the D3-selected D4 execution plan.');
+    console.log('Runs D1 status refresh with D5 freshness proof, D4 execution fixtures, then the D3-selected D4 execution plan.');
     process.exit(0);
   }
   const result = executeCloseout({ argv: process.argv.slice(2) });
