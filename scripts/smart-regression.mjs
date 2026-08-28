@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,10 +9,13 @@ import { fileURLToPath } from 'node:url';
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..');
 const defaultMapPath = path.join(repoRoot, 'data', 'contracts', 'regression-impact-map.v1.json');
+const defaultBindingsPath = path.join(repoRoot, 'data', 'contracts', 'regression-bindings.sr3.v1.json');
 const BLOCKED_EXIT_CODE = 2;
+const VALIDATOR_FAILED_EXIT_CODE = 1;
+const MAX_CHILD_BUFFER = 50 * 1024 * 1024;
 
 function usage() {
-  return `Smart Regression Runner — SR-2 dry-run selector\n\nUsage:\n  node scripts/smart-regression.mjs --dry-run [--base <ref>] [--head <ref>]\n  node scripts/smart-regression.mjs --dry-run --file <path> [--file <path> ...]\n  node scripts/smart-regression.mjs --dry-run --files <path1,path2,...>\n\nOptions:\n  --base <ref>       Git diff base. Defaults to SMART_REGRESSION_BASE,\n                     origin/$GITHUB_BASE_REF, or HEAD~1.\n  --head <ref>       Git diff head. Defaults to SMART_REGRESSION_HEAD or HEAD.\n  --file <path>      Analyze one explicit changed path. Repeatable.\n  --files <csv>      Analyze comma-separated changed paths.\n  --map <path>       Override impact-map path.\n  --json             Print machine-readable JSON only.\n  --dry-run          Explicitly request selector-only mode (default in SR-2).\n  --help             Show this help.\n\nSR-2 never executes validator commands. Unknown paths and required unbound gates\nfail closed with exit code ${BLOCKED_EXIT_CODE}.`;
+  return `Smart Regression Runner — SR-3 selector + executor\n\nUsage:\n  node scripts/smart-regression.mjs --dry-run [--base <ref>] [--head <ref>]\n  node scripts/smart-regression.mjs --execute [--base <ref>] [--head <ref>]\n  node scripts/smart-regression.mjs --dry-run --file <path> [--file <path> ...]\n  node scripts/smart-regression.mjs --execute --files <path1,path2,...>\n\nOptions:\n  --base <ref>       Git diff base. Defaults to SMART_REGRESSION_BASE,\n                     origin/$GITHUB_BASE_REF, or HEAD~1.\n  --head <ref>       Git diff head. Defaults to SMART_REGRESSION_HEAD or HEAD.\n  --file <path>      Analyze one explicit changed path. Repeatable.\n  --files <csv>      Analyze comma-separated changed paths.\n  --map <path>       Override impact-map path.\n  --bindings <path>  Override SR-3 bindings path.\n  --json             Print machine-readable JSON report.\n  --dry-run          Select/report only. This is the default.\n  --execute          Execute the fully-bound selected command plan.\n  --help             Show this help.\n\nSafety:\n  Unknown paths and selected unresolved gates block before any command runs.\n  Validator failure stops the remaining command plan immediately.`;
 }
 
 function parseArgs(argv) {
@@ -19,9 +23,11 @@ function parseArgs(argv) {
     base: null,
     head: null,
     mapPath: defaultMapPath,
+    bindingsPath: defaultBindingsPath,
     files: [],
     json: false,
-    dryRun: true,
+    mode: 'dry-run',
+    explicitMode: null,
     help: false,
   };
 
@@ -34,38 +40,28 @@ function parseArgs(argv) {
     };
 
     switch (token) {
-      case '--base':
-        args.base = next();
-        break;
-      case '--head':
-        args.head = next();
-        break;
-      case '--map':
-        args.mapPath = path.resolve(process.cwd(), next());
-        break;
-      case '--file':
-        args.files.push(next());
-        break;
-      case '--files':
-        args.files.push(...next().split(',').map((value) => value.trim()).filter(Boolean));
-        break;
-      case '--json':
-        args.json = true;
-        break;
+      case '--base': args.base = next(); break;
+      case '--head': args.head = next(); break;
+      case '--map': args.mapPath = path.resolve(process.cwd(), next()); break;
+      case '--bindings': args.bindingsPath = path.resolve(process.cwd(), next()); break;
+      case '--file': args.files.push(next()); break;
+      case '--files': args.files.push(...next().split(',').map((value) => value.trim()).filter(Boolean)); break;
+      case '--json': args.json = true; break;
       case '--dry-run':
-        args.dryRun = true;
+        if (args.explicitMode && args.explicitMode !== 'dry-run') throw new Error('Use only one of --dry-run or --execute.');
+        args.mode = 'dry-run';
+        args.explicitMode = 'dry-run';
         break;
       case '--execute':
-        throw new Error('SR-2 is dry-run only. Validator execution is introduced in SR-3.');
-      case '--help':
-      case '-h':
-        args.help = true;
+        if (args.explicitMode && args.explicitMode !== 'execute') throw new Error('Use only one of --dry-run or --execute.');
+        args.mode = 'execute';
+        args.explicitMode = 'execute';
         break;
-      default:
-        throw new Error(`Unknown argument: ${token}`);
+      case '--help':
+      case '-h': args.help = true; break;
+      default: throw new Error(`Unknown argument: ${token}`);
     }
   }
-
   return args;
 }
 
@@ -74,7 +70,6 @@ function normalizeRepoPath(value) {
 }
 
 const globCache = new Map();
-
 function globToRegExp(glob) {
   let source = '^';
   for (let i = 0; i < glob.length; i += 1) {
@@ -88,9 +83,7 @@ function globToRegExp(glob) {
           source += '.*';
           i += 1;
         }
-      } else {
-        source += '[^/]*';
-      }
+      } else source += '[^/]*';
       continue;
     }
     if (char === '?') {
@@ -103,25 +96,19 @@ function globToRegExp(glob) {
   source += '$';
   return new RegExp(source);
 }
-
 function matchesGlob(file, glob) {
   if (!globCache.has(glob)) globCache.set(glob, globToRegExp(glob));
   return globCache.get(glob).test(file);
 }
+function matchesAny(file, globs = []) { return globs.some((glob) => matchesGlob(file, glob)); }
+function uniqueSorted(values) { return [...new Set(values)].sort((a, b) => a.localeCompare(b)); }
 
-function matchesAny(file, globs = []) {
-  return globs.some((glob) => matchesGlob(file, glob));
-}
-
-function uniqueSorted(values) {
-  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
-}
-
-async function loadImpactMap(mapPath) {
-  const raw = await readFile(mapPath, 'utf8');
-  const map = JSON.parse(raw);
-  validateImpactMap(map);
-  return map;
+async function loadJson(filePath, label) {
+  let raw;
+  try { raw = await readFile(filePath, 'utf8'); }
+  catch (error) { throw new Error(`${label} read failed at ${filePath}: ${error.message}`); }
+  try { return JSON.parse(raw); }
+  catch (error) { throw new Error(`${label} JSON parse failed at ${filePath}: ${error.message}`); }
 }
 
 function validateImpactMap(map) {
@@ -129,26 +116,67 @@ function validateImpactMap(map) {
   if (map.schemaVersion !== 1) throw new Error(`Unsupported impact-map schemaVersion: ${String(map.schemaVersion)}`);
   if (!map.gates || typeof map.gates !== 'object') throw new Error('Impact map is missing gates.');
   if (!Array.isArray(map.rules)) throw new Error('Impact map is missing rules.');
-
   const gateIds = new Set(Object.keys(map.gates));
   const assertGate = (gateId, owner) => {
     if (!gateIds.has(gateId)) throw new Error(`${owner} references unknown gate: ${gateId}`);
   };
-
   for (const [gateId, gate] of Object.entries(map.gates)) {
     if (gate.members !== undefined) {
       if (!Array.isArray(gate.members) || gate.members.length === 0) throw new Error(`Composite gate ${gateId} must have non-empty members.`);
       for (const member of gate.members) assertGate(member, `gate ${gateId}`);
     }
   }
-
   for (const rule of map.rules) {
     if (!rule.id || !Array.isArray(rule.match) || !Array.isArray(rule.select)) throw new Error(`Invalid rule shape: ${JSON.stringify(rule)}`);
     for (const gateId of rule.select) assertGate(gateId, `rule ${rule.id}`);
     for (const gateId of rule.doNotSelect ?? []) assertGate(gateId, `rule ${rule.id}`);
   }
-
   for (const gateId of map.fallback?.unknownPath ?? []) assertGate(gateId, 'fallback.unknownPath');
+}
+
+function validateAndApplyBindings(originalMap, bindings) {
+  if (!bindings || typeof bindings !== 'object') throw new Error('SR-3 bindings must be a JSON object.');
+  if (bindings.schemaVersion !== 1) throw new Error(`Unsupported bindings schemaVersion: ${String(bindings.schemaVersion)}`);
+  if (bindings.impactMapId !== originalMap.id) throw new Error(`Bindings impactMapId ${bindings.impactMapId} != ${originalMap.id}`);
+  if (!bindings.bindings || typeof bindings.bindings !== 'object' || Array.isArray(bindings.bindings)) throw new Error('SR-3 bindings.bindings must be an object.');
+  if (!Array.isArray(bindings.unresolvedGateIds)) throw new Error('SR-3 bindings.unresolvedGateIds must be an array.');
+
+  const sr1Unbound = Object.entries(originalMap.gates)
+    .filter(([, gate]) => gate?.resolutionStatus === 'REQUIRES_SR2_BINDING' && gate?.executable !== true)
+    .map(([gateId]) => gateId).sort();
+  const boundIds = Object.keys(bindings.bindings).sort();
+  const unresolvedIds = [...new Set(bindings.unresolvedGateIds)].sort();
+  const overlap = boundIds.filter((gateId) => unresolvedIds.includes(gateId));
+  if (overlap.length) throw new Error(`Bindings overlap bound/unresolved gates: ${overlap.join(', ')}`);
+  const accounted = [...new Set([...boundIds, ...unresolvedIds])].sort();
+  if (JSON.stringify(accounted) !== JSON.stringify(sr1Unbound)) {
+    const missing = sr1Unbound.filter((gateId) => !accounted.includes(gateId));
+    const extra = accounted.filter((gateId) => !sr1Unbound.includes(gateId));
+    throw new Error(`SR-3 binding coverage drift. missing=[${missing.join(', ')}] extra=[${extra.join(', ')}]`);
+  }
+
+  const map = JSON.parse(JSON.stringify(originalMap));
+  for (const [gateId, binding] of Object.entries(bindings.bindings)) {
+    const gate = map.gates[gateId];
+    if (!gate) throw new Error(`Binding references unknown gate: ${gateId}`);
+    if (Array.isArray(gate.members)) throw new Error(`Cannot bind composite gate to command: ${gateId}`);
+    if (typeof binding.command !== 'string' || !binding.command.trim()) throw new Error(`Binding ${gateId} is missing command.`);
+    gate.command = binding.command.trim();
+    gate.executable = true;
+    gate.resolutionStatus = 'SR3_VERIFIED_BINDING';
+    gate.bindingId = bindings.id;
+    gate.bindingEvidence = binding.evidence ?? null;
+    gate.bindingScope = binding.scope ?? null;
+  }
+  return {
+    map,
+    bindingMeta: {
+      id: bindings.id ?? null,
+      status: bindings.status ?? null,
+      boundGateIds: boundIds,
+      unresolvedGateIds: unresolvedIds,
+    },
+  };
 }
 
 function resolveDiffRefs(args) {
@@ -156,7 +184,6 @@ function resolveDiffRefs(args) {
   const head = args.head ?? process.env.SMART_REGRESSION_HEAD ?? 'HEAD';
   return { base, head };
 }
-
 function readChangedFilesFromGit(base, head) {
   const diffSpec = `${base}...${head}`;
   const result = spawnSync('git', ['diff', '--name-only', '--diff-filter=ACMRD', '--relative', diffSpec], {
@@ -176,7 +203,6 @@ function expandRequestedGates(requestedGateIds, gates) {
   const compositeIds = [];
   const seenLeaf = new Set();
   const seenComposite = new Set();
-
   const visit = (gateId, stack = []) => {
     if (stack.includes(gateId)) throw new Error(`Composite gate cycle: ${[...stack, gateId].join(' -> ')}`);
     const gate = gates[gateId];
@@ -194,21 +220,33 @@ function expandRequestedGates(requestedGateIds, gates) {
       leafIds.push(gateId);
     }
   };
-
   for (const gateId of requestedGateIds) visit(gateId);
   return { leafIds, compositeIds };
 }
 
 function analyzeChanges(files, map, meta) {
   const changedFiles = uniqueSorted(files.map(normalizeRepoPath).filter(Boolean));
-  if (changedFiles.length === 0) {
-    return { ...meta, dryRun: true, status: 'PASS_NO_CHANGES', changedFiles, docsOnly: false, affectedDomains: [], matchedRules: [], unknownPaths: [], requestedGates: [], compositeGates: [], leafGates: [], executableGates: [], unboundGates: [], skippedByRule: [], note: 'No validator commands were executed.' };
-  }
+  const emptyBase = {
+    ...meta,
+    changedFiles,
+    docsOnly: false,
+    affectedDomains: [],
+    matchedRules: [],
+    unknownPaths: [],
+    requestedGates: [],
+    compositeGates: [],
+    leafGates: [],
+    executableGates: [],
+    unboundGates: [],
+    skippedByRule: [],
+    execution: null,
+  };
+  if (changedFiles.length === 0) return { ...emptyBase, status: 'PASS_NO_CHANGES', note: 'No validator commands selected.' };
 
   const docsOnlyGlobs = map.docsOnly?.globs ?? [];
   const docsOnly = docsOnlyGlobs.length > 0 && changedFiles.every((file) => matchesAny(file, docsOnlyGlobs));
   if (docsOnly) {
-    return { ...meta, dryRun: true, status: 'PASS_DOCS_ONLY', changedFiles, docsOnly: true, affectedDomains: [], matchedRules: [], unknownPaths: [], requestedGates: map.docsOnly?.selectedGates ?? [], compositeGates: [], leafGates: [], executableGates: [], unboundGates: [], skippedByRule: [], note: 'Documentation-only bypass applied. No validator commands were executed.' };
+    return { ...emptyBase, status: 'PASS_DOCS_ONLY', docsOnly: true, requestedGates: map.docsOnly?.selectedGates ?? [], note: 'Documentation-only bypass applied.' };
   }
 
   const matchedRuleIds = [];
@@ -216,7 +254,6 @@ function analyzeChanges(files, map, meta) {
   const requestedGateIds = [];
   const doNotSelectCandidates = [];
   const unknownPaths = [];
-
   for (const file of changedFiles) {
     const rules = map.rules.filter((rule) => matchesAny(file, rule.match));
     if (rules.length === 0) {
@@ -230,7 +267,6 @@ function analyzeChanges(files, map, meta) {
       doNotSelectCandidates.push(...(rule.doNotSelect ?? []));
     }
   }
-
   if (unknownPaths.length > 0) {
     requestedGateIds.push(...(map.fallback?.unknownPath ?? []));
     domains.push('global');
@@ -240,10 +276,16 @@ function analyzeChanges(files, map, meta) {
   const { leafIds, compositeIds } = expandRequestedGates(requestedGates, map.gates);
   const executableGates = [];
   const unboundGates = [];
-
   for (const gateId of leafIds) {
     const gate = map.gates[gateId];
-    const entry = { id: gateId, domain: gate.domain ?? null, kind: gate.kind ?? null, command: gate.command ?? null, resolutionStatus: gate.resolutionStatus ?? null };
+    const entry = {
+      id: gateId,
+      domain: gate.domain ?? null,
+      kind: gate.kind ?? null,
+      command: gate.command ?? null,
+      resolutionStatus: gate.resolutionStatus ?? null,
+      bindingId: gate.bindingId ?? null,
+    };
     if (gate.domain) domains.push(gate.domain);
     if (gate.executable === true && typeof gate.command === 'string' && gate.command.trim()) executableGates.push(entry);
     else unboundGates.push(entry);
@@ -254,22 +296,109 @@ function analyzeChanges(files, map, meta) {
   let status = 'PASS';
   if (unknownPaths.length > 0) status = 'BLOCKED_UNKNOWN_PATH';
   else if (unboundGates.length > 0) status = 'BLOCKED_UNBOUND';
+  return {
+    ...emptyBase,
+    status,
+    affectedDomains: uniqueSorted(domains),
+    matchedRules: uniqueSorted(matchedRuleIds),
+    unknownPaths: uniqueSorted(unknownPaths),
+    requestedGates,
+    compositeGates: compositeIds,
+    leafGates: leafIds,
+    executableGates,
+    unboundGates,
+    skippedByRule,
+    note: 'Selection complete.',
+  };
+}
 
-  return { ...meta, dryRun: true, status, changedFiles, docsOnly: false, affectedDomains: uniqueSorted(domains), matchedRules: uniqueSorted(matchedRuleIds), unknownPaths: uniqueSorted(unknownPaths), requestedGates, compositeGates: compositeIds, leafGates: leafIds, executableGates, unboundGates, skippedByRule, note: 'SR-2 selection only. Validator commands were not executed.' };
+function buildExecutionPlan(executableGates) {
+  const byCommand = new Map();
+  const plan = [];
+  for (const gate of executableGates) {
+    const command = gate.command.trim();
+    if (!byCommand.has(command)) {
+      const step = { command, gateIds: [gate.id] };
+      byCommand.set(command, step);
+      plan.push(step);
+    } else byCommand.get(command).gateIds.push(gate.id);
+  }
+  return plan;
+}
+function commandTargetPreflight(command) {
+  const match = command.match(/^(?:node|python|python3)\s+((?:scripts|tools)\/[^\s]+)$/);
+  if (!match) return { checked: false, ok: true, target: null };
+  const target = path.join(repoRoot, match[1]);
+  return { checked: true, ok: existsSync(target), target: match[1] };
+}
+
+function executeSelected(report, jsonMode) {
+  const plan = buildExecutionPlan(report.executableGates);
+  const execution = {
+    mode: 'execute',
+    policy: 'FAIL_FAST',
+    commandDeduplication: 'EXACT_COMMAND_STRING',
+    plannedCommandCount: plan.length,
+    results: [],
+  };
+  if (report.status.startsWith('BLOCKED_')) {
+    execution.blockedBeforeExecution = true;
+    execution.blockReason = report.status;
+    return { ...report, execution };
+  }
+  if (report.status === 'PASS_NO_CHANGES' || report.status === 'PASS_DOCS_ONLY') {
+    execution.blockedBeforeExecution = false;
+    return { ...report, execution };
+  }
+
+  for (let index = 0; index < plan.length; index += 1) {
+    const step = plan[index];
+    const preflight = commandTargetPreflight(step.command);
+    if (!preflight.ok) {
+      execution.results.push({ ...step, status: 'FAIL', exitCode: null, error: `Command target missing: ${preflight.target}` });
+      for (const remaining of plan.slice(index + 1)) execution.results.push({ ...remaining, status: 'NOT_RUN', exitCode: null, reason: 'FAIL_FAST' });
+      return { ...report, status: 'FAILED_VALIDATOR', execution };
+    }
+    if (!jsonMode) process.stdout.write(`\n>>> ${step.gateIds.join(', ')}\n$ ${step.command}\n`);
+    const child = spawnSync(step.command, {
+      cwd: repoRoot,
+      shell: true,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      maxBuffer: MAX_CHILD_BUFFER,
+    });
+    if (!jsonMode) {
+      if (child.stdout) process.stdout.write(child.stdout);
+      if (child.stderr) process.stderr.write(child.stderr);
+    }
+    const exitCode = Number.isInteger(child.status) ? child.status : 1;
+    const passed = !child.error && exitCode === 0;
+    execution.results.push({
+      ...step,
+      status: passed ? 'PASS' : 'FAIL',
+      exitCode,
+      signal: child.signal ?? null,
+      error: child.error?.message ?? null,
+      stderrTail: passed ? null : (child.stderr ?? '').slice(-4000),
+    });
+    if (!passed) {
+      for (const remaining of plan.slice(index + 1)) execution.results.push({ ...remaining, status: 'NOT_RUN', exitCode: null, reason: 'FAIL_FAST' });
+      return { ...report, status: 'FAILED_VALIDATOR', execution };
+    }
+  }
+  return { ...report, status: 'PASS_EXECUTED', execution };
 }
 
 function printSection(title, items, formatter = (value) => value) {
   console.log(`\n${title} (${items.length})`);
-  if (items.length === 0) {
-    console.log('  - none');
-    return;
-  }
+  if (items.length === 0) return console.log('  - none');
   for (const item of items) console.log(`  - ${formatter(item)}`);
 }
-
 function printHuman(report) {
-  console.log('SMART REGRESSION RUNNER — SR-2 DRY RUN');
+  console.log('SMART REGRESSION RUNNER — SR-3');
+  console.log(`MODE: ${report.mode}`);
   console.log(`MAP: ${report.mapId} / ${report.mapStatus}`);
+  console.log(`BINDINGS: ${report.bindingId} / ${report.bindingStatus}`);
   console.log(`SOURCE: ${report.changeSource}`);
   if (report.base) console.log(`BASE: ${report.base}`);
   if (report.head) console.log(`HEAD: ${report.head}`);
@@ -286,11 +415,23 @@ function printHuman(report) {
   printSection('REQUESTED GATES', report.requestedGates);
   printSection('COMPOSITE GATES', report.compositeGates);
   printSection('EXPANDED LEAF GATES', report.leafGates);
-  printSection('EXECUTABLE GATES (NOT EXECUTED)', report.executableGates, (gate) => `${gate.id} :: ${gate.command}`);
+  printSection('EXECUTABLE GATES', report.executableGates, (gate) => `${gate.id} :: ${gate.command}`);
   printSection('UNBOUND GATES', report.unboundGates, (gate) => `${gate.id} :: ${gate.resolutionStatus ?? 'UNRESOLVED'}`);
   printSection('SKIPPED BY MATCHED RULE', report.skippedByRule);
-  console.log('\nEXECUTION: none (SR-2 dry-run only)');
+  if (report.execution) {
+    printSection('EXECUTION RESULTS', report.execution.results, (result) => {
+      const gates = result.gateIds?.join(', ') ?? 'unknown';
+      const code = result.exitCode == null ? '' : ` exit=${result.exitCode}`;
+      return `${result.status}${code} :: ${gates} :: ${result.command}`;
+    });
+    if (report.execution.blockedBeforeExecution) console.log(`\nEXECUTION: blocked before command start (${report.execution.blockReason})`);
+  } else console.log('\nEXECUTION: none (dry-run)');
   console.log(`RESULT: ${report.status}`);
+}
+function exitCodeFor(report) {
+  if (report.status.startsWith('BLOCKED_')) return BLOCKED_EXIT_CODE;
+  if (report.status === 'FAILED_VALIDATOR') return VALIDATOR_FAILED_EXIT_CODE;
+  return 0;
 }
 
 async function main() {
@@ -299,22 +440,34 @@ async function main() {
     console.log(usage());
     return 0;
   }
-  const map = await loadImpactMap(args.mapPath);
+  const originalMap = await loadJson(args.mapPath, 'Impact map');
+  validateImpactMap(originalMap);
+  const bindings = await loadJson(args.bindingsPath, 'SR-3 bindings');
+  const { map, bindingMeta } = validateAndApplyBindings(originalMap, bindings);
+  validateImpactMap(map);
+
   const explicitFiles = uniqueSorted(args.files.map(normalizeRepoPath).filter(Boolean));
   const refs = resolveDiffRefs(args);
   const changedFiles = explicitFiles.length > 0 ? explicitFiles : readChangedFilesFromGit(refs.base, refs.head);
   const changeSource = explicitFiles.length > 0 ? 'explicit-files' : 'git-diff';
-  const report = analyzeChanges(changedFiles, map, {
+  let report = analyzeChanges(changedFiles, map, {
+    mode: args.mode,
     mapId: map.id ?? null,
     mapStatus: map.status ?? null,
     mapPath: path.relative(repoRoot, args.mapPath).replaceAll('\\', '/'),
+    bindingId: bindingMeta.id,
+    bindingStatus: bindingMeta.status,
+    bindingPath: path.relative(repoRoot, args.bindingsPath).replaceAll('\\', '/'),
+    globallyBoundGateIds: bindingMeta.boundGateIds,
+    globallyUnresolvedGateIds: bindingMeta.unresolvedGateIds,
     changeSource,
     base: changeSource === 'git-diff' ? refs.base : null,
     head: changeSource === 'git-diff' ? refs.head : null,
   });
+  if (args.mode === 'execute') report = executeSelected(report, args.json);
   if (args.json) console.log(JSON.stringify(report, null, 2));
   else printHuman(report);
-  return report.status.startsWith('BLOCKED_') ? BLOCKED_EXIT_CODE : 0;
+  return exitCodeFor(report);
 }
 
 main().then((code) => { process.exitCode = code; }).catch((error) => {
