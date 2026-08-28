@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-d7-summary/v1",
+  "stage": "D7",
+  "checkpoint": "PROJECT_DOCTOR_D7_PR_RUNTIME_GUARD",
+  "status": "PASS_PROJECT_DOCTOR_D7_PR_RUNTIME_GUARD",
+  "completion": "COMPLETE_WITH_ADMIN_ENFORCEMENT_GAP",
+  "contract": "data/contracts/project-doctor-d7-pr-guard.v1.json",
+  "workflow": ".github/workflows/project-doctor-d7-pr-guard.yml",
+  "branch": "work/project-doctor-closeout",
+  "requiredStatusCheckCandidate": "Project Doctor PR Guard / pr-guard",
+  "pushProof": {
+    "workflowRunId": 33149542668,
+    "jobId": 98778080327,
+    "conclusion": "success",
+    "realDiffComparison": "origin/main...HEAD",
+    "allWorkflowStepsPassed": true
+  },
+  "actualPullRequestProof": {
+    "pullRequestNumber": 116,
+    "draft": true,
+    "baseBranch": "main",
+    "baseSha": "ffa767a24ccf3c7dcb198bdfc385708a21685156",
+    "headBranch": "work/project-doctor-closeout",
+    "headSha": "ced7ef2c91796b40a79c175b3d110a3d2820ae4a",
+    "mergeRefSha": "5f70e75260f7cbe57395c5730bdfa96af85a3470",
+    "workflowRunId": 33149632015,
+    "jobId": 98778360191,
+    "conclusion": "success",
+    "checkoutUsedPullRequestMergeRef": true,
+    "exactBaseHeadComparisonUsed": true,
+    "changedFileCount": 41,
+    "dryRun": {
+      "status": "PASS_DRY_RUN",
+      "checksQueued": 4,
+      "checksRun": 0
+    },
+    "actualExecution": {
+      "status": "PASS_EXECUTED",
+      "checksQueued": 4,
+      "checksRun": 4,
+      "checks": [
+        "production-build: npm run build",
+        "doctor-health-gate: npm run doctor:validate",
+        "doctor-impact-self-test: npm run doctor:impact:validate",
+        "doctor-plan-self-test: npm run doctor:plan:validate"
+      ]
+    }
+  },
+  "runtimeChecks": {
+    "d7GuardContract": "PASS_28_OF_28",
+    "d2ImpactFixtures": "PASS_13_OF_13",
+    "d5FreshnessBeforeD1Regeneration": "FRESH",
+    "d1StatusRegeneration": "PASS",
+    "committedD1OutputsDeterministic": "PASS_GIT_DIFF_EXIT_0",
+    "d5FreshnessAfterD1Regeneration": "FRESH",
+    "productionBuild": "PASS",
+    "doctorHealthGate": "PASS_PROJECT_DOCTOR_D1_2_HEALTH_GATE",
+    "doctorImpact": "PASS_PROJECT_DOCTOR_D2_IMPACT",
+    "doctorPlan": "PASS_PROJECT_DOCTOR_D3_PLAN"
+  },
+  "securityBoundaries": {
+    "workflowContentsPermission": "read",
+    "metadataPermission": "read",
+    "pullRequestTargetUsed": false,
+    "repositoryWritePermission": false,
+    "freshnessResealInWorkflow": false,
+    "secretsRequired": false,
+    "manualReviewRemainsNonPassing": true,
+    "unknownPathFanoutAdded": false,
+    "semanticValidatorScopeBroadened": false
+  },
+  "repositoryEnforcement": {
+    "rulesetsObserved": 0,
+    "branchProtectionRead": "CONNECTOR_403_RESOURCE_NOT_ACCESSIBLE_BY_INTEGRATION",
+    "requiredStatusCheckConfiguredByD7": false,
+    "connectorAdminMutationAvailable": false,
+    "gapStatus": "OPEN_ADMIN_CONFIGURATION",
+    "meaning": "The PR guard itself is proven and produces a stable non-passing result on Doctor failure, but GitHub repository settings have not been changed to require this check before merge."
+  },
+  "branchIntegrationObservation": {
+    "observedAfterPrimaryPrProof": true,
+    "mainSha": "ffa767a24ccf3c7dcb198bdfc385708a21685156",
+    "aheadBy": 75,
+    "behindBy": 25,
+    "status": "DIVERGED",
+    "prMergeRefAgainstCurrentMainBuiltAndValidated": true,
+    "branchSyncRequiredBeforeFinalMerge": true,
+    "note": "The actual pull_request workflow checked GitHub's merge ref and exact current PR base/head pair, so D7 runtime compatibility with the observed main state is proven even though the source branch itself has not absorbed the 25 main-only commits."
+  },
+  "checkpointReplay": {
+    "requiredAfterThisSummaryCommit": true,
+    "purpose": "Confirm the pull_request synchronize event still passes after checkpoint-only D7 closeout commits."
+  },
+  "boundaries": {
+    "rawConfigDataSemanticRecomputationAdded": false,
+    "canonicalDataMutationAdded": false,
+    "frontendSourceMutationAdded": false,
+    "productionSourceMutationAdded": false,
+    "missingOwningValidatorsInvented": false
+  },
+  "nextStage": "D7-ADMIN",
+  "nextStageGoal": "Optionally configure Project Doctor PR Guard / pr-guard as a required status check on main using an authorized repository-admin surface, then synchronize the branch with current main before final merge."
+}
