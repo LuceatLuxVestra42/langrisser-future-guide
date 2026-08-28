@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "stage": "SKIN_STAGE_3_3_BULK_RESOLUTION",
+  "substage": "3-3-0",
+  "status": "READY_FOR_FROZEN_INVENTORY_JOIN",
+  "completedScope": [
+    "Representative Stage 3-2 proof is frozen and reused; no representative relation/evidence recomputation.",
+    "Authoritative ConfigDataModelSkinResourceInfo source index materialized: 977 source records.",
+    "Raw source/canonical boundary measured: 565 raw HeroSkinInfo rows / 814 raw resource IDs versus 540 frozen Skin / 789 frozen resource IDs.",
+    "Relevant ExportAssetBundle filename catalog reduced from the uploaded full list to Skin-relevant bundle families."
+  ],
+  "frozenInputs": {
+    "assetInventory": "data/generated/skin-stage3-1-asset-inventory.v1.json",
+    "representativeEvidence": "data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json",
+    "modelSourceIndex": "data/evidence/skin-stage3-3-model-resource-source-index.v1.json",
+    "bundleCatalog": "data/evidence/skin-stage3-3-export-bundle-catalog.v1.json"
+  },
+  "targetCounts": {
+    "skin": 540,
+    "staticPaths": 540,
+    "charSpinePaths": 540,
+    "modelBindingEdges": 2277,
+    "uniqueModelResourceIds": 789
+  },
+  "sourceCounts": {
+    "modelResourceSourceRows": 977,
+    "rawHeroSkinRows": 565,
+    "rawHeroSkinBindingEdges": 2319,
+    "rawHeroSkinUniqueModelResourceIds": 814
+  },
+  "nextCompletionCondition": "Build a deterministic bulk plan by exact-joining the 789 frozen model resource IDs into the 977-row source index, classify all 540 static/Char paths into exact bundle candidate sets, and report candidate-set missing/ambiguous/nonstandard cases without opening any .b payloads.",
+  "blockedOnAssetBytes": false,
+  "requiresAdditionalBundleUploadsNow": false,
+  "guardrails": [
+    "Do not select canonical Skin IDs from raw ConfigDataHeroSkinInfo.",
+    "Do not recompute Hero↔Skin ownership or sourceOrder.",
+    "Do not infer begin/non-begin membership.",
+    "Do not treat bundle filename presence as asset resolution.",
+    "Keep nonstandard Spine/Bust/Soldier roots explicit rather than coercing them into General/Char naming rules."
+  ]
+}
