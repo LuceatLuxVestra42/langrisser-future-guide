@@ -44,6 +44,9 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Validate Status Source Promotion self-tests
+        run: npm run doctor:source:promote:self-test
+
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
 
@@ -89,6 +92,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Validate Status Source Promotion self-tests
+        run: npm run doctor:source:promote:self-test
 
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
