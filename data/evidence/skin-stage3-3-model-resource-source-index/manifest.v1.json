@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-3-0",
+  "artifactClass": "AUTHORITATIVE_CONFIGDATA_MODEL_RESOURCE_SOURCE_INDEX",
+  "status": "SOURCE_INDEX_MANIFEST_COMPLETE_NOT_CANONICAL_SELECTION",
+  "purpose": "Persist a lightweight authoritative source index for ConfigDataModelSkinResourceInfo so Stage 3-3 bulk planning can join the frozen Stage 3-1 inventory without repeatedly parsing the 102 MB CAB or re-deriving Skin canonical membership.",
+  "source": {
+    "bundleFileName": "begin_configdata_configdata_abs.b",
+    "bundleSizeBytes": 28433225,
+    "bundleSha256": "b9735115b7a7b370647e69d87640fb6f77b729df2be9776f834deba176cff818",
+    "embeddedCabFileName": "begin_configdata_configdata_abs.cab",
+    "embeddedCabSizeBytes": 106200004,
+    "embeddedCabSha256": "a203ad713bbf39c3a9da72384d1a35dc000d8385fed27f279d4515909bbd6e16",
+    "unityRevision": "2022.3.62f2",
+    "configObject": "ConfigDataModelSkinResourceInfo",
+    "pathID": 3900753103676195192,
+    "serializedObjectByteStart": 71297704,
+    "serializedObjectByteSize": 82336,
+    "payloadByteSize": 82227,
+    "extractionMethod": "validated ConfigData object boundary; duplicate payload-size header; variable-width big-endian record length; protobuf field parser; field 2 resource ID; field 4 primary Prefab path; additional UTF-8 .prefab fields preserved without semantic relabeling"
+  },
+  "counts": {
+    "sourceRecordCount": 977,
+    "uniqueSkinResourceIdCount": 977,
+    "duplicateSkinResourceIdCount": 0,
+    "primaryPrefabPathCount": 977,
+    "uniquePrimaryPrefabPathCount": 965,
+    "recordsWithAdditionalPrefabPaths": 96
+  },
+  "selectionBoundary": {
+    "frozenBulkTarget": "data/generated/skin-stage3-1-asset-inventory.v1.json",
+    "frozenSkinCount": 540,
+    "frozenModelBindingEdgeCount": 2277,
+    "frozenUniqueModelResourceIdCount": 789,
+    "rawHeroSkinInfoRecordCount": 565,
+    "rawHeroSkinInfoModelBindingEdgeCount": 2319,
+    "rawHeroSkinInfoUniqueModelResourceIdCount": 814,
+    "rule": "Do not treat all source-index records or all raw HeroSkinInfo records as canonical. Stage 3-3 must select model resource IDs only from the frozen Stage 3-1 inventory and then exact-join those IDs into this source index."
+  },
+  "shards": [
+    {
+      "path": "data/evidence/skin-stage3-3-model-resource-source-index/model-resource-0000-0199.v1.json",
+      "startZeroBased": 0,
+      "endZeroBasedInclusive": 199,
+      "recordCount": 200
+    },
+    {
+      "path": "data/evidence/skin-stage3-3-model-resource-source-index/model-resource-0200-0399.v1.json",
+      "startZeroBased": 200,
+      "endZeroBasedInclusive": 399,
+      "recordCount": 200
+    },
+    {
+      "path": "data/evidence/skin-stage3-3-model-resource-source-index/model-resource-0400-0599.v1.json",
+      "startZeroBased": 400,
+      "endZeroBasedInclusive": 599,
+      "recordCount": 200
+    },
+    {
+      "path": "data/evidence/skin-stage3-3-model-resource-source-index/model-resource-0600-0799.v1.json",
+      "startZeroBased": 600,
+      "endZeroBasedInclusive": 799,
+      "recordCount": 200
+    },
+    {
+      "path": "data/evidence/skin-stage3-3-model-resource-source-index/model-resource-0800-0976.v1.json",
+      "startZeroBased": 800,
+      "endZeroBasedInclusive": 976,
+      "recordCount": 177
+    }
+  ]
+}
