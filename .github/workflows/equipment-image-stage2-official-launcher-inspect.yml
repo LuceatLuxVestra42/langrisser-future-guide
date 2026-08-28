@@ -1,0 +1,51 @@
+name: Equipment Image Stage 2 Official Launcher Inspect
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-hold29
+    paths:
+      - '.github/workflows/equipment-image-stage2-official-launcher-inspect.yml'
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download verified official installer
+        run: |
+          set -euo pipefail
+          URL='https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/DownLoad-MZ-PC.exe'
+          REF='https://mz.zlongame.com/jx/mzdownload/20180731/5473.html'
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0 Safari/537.36'
+          curl --http1.1 -fL --retry 2 -A "$UA" -e "$REF" -o /tmp/DownLoad-MZ-PC.exe "$URL"
+          test "$(stat -c %s /tmp/DownLoad-MZ-PC.exe)" = '308744656'
+          test "$(md5sum /tmp/DownLoad-MZ-PC.exe | awk '{print $1}')" = '31a6db4f224374185e2c498287d3d3f3'
+      - name: Extract only url.txt and launcher
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/launcher
+          7z e -y -o/tmp/launcher /tmp/DownLoad-MZ-PC.exe url.txt Langrisser.exe >/tmp/7z-extract.log
+          cat /tmp/7z-extract.log
+          echo '=== url.txt ==='
+          cat /tmp/launcher/url.txt
+          echo
+          echo '=== launcher metadata ==='
+          stat -c '%n bytes=%s' /tmp/launcher/Langrisser.exe
+          sha256sum /tmp/launcher/Langrisser.exe
+          file /tmp/launcher/Langrisser.exe
+      - name: Scan launcher strings for updater endpoints
+        run: |
+          set +e
+          echo '=== URL-like strings ==='
+          strings -a -n 6 /tmp/launcher/Langrisser.exe \
+            | grep -Eai 'https?://|ftp://|patch|update|manifest|version|cdn|assetbundle|exportassetbundle|\.ini|\.json|\.xml|\.txt' \
+            | sort -u \
+            | head -n 800
+          echo '=== UTF-16LE URL-like strings ==='
+          strings -el -n 6 /tmp/launcher/Langrisser.exe \
+            | grep -Eai 'https?://|patch|update|manifest|version|cdn|assetbundle|exportassetbundle|\.ini|\.json|\.xml|\.txt' \
+            | sort -u \
+            | head -n 800
+          exit 0
