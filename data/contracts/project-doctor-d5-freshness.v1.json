@@ -4,7 +4,7 @@
   "stage": "D5",
   "checkpoint": "PROJECT_DOCTOR_D5_FRESHNESS_GUARD",
   "status": "DESIGN_FROZEN",
-  "purpose": "Prevent Project Doctor status outputs from being trusted when their authoritative sources, producer scripts, contracts, or generated health outputs have changed since the last successful D1 refresh.",
+  "purpose": "Prevent Project Doctor status outputs from being trusted when their authoritative sources, producer scripts, contracts, or generated health outputs have changed since the last explicit successful D1 refresh seal.",
   "d1Contract": "data/contracts/project-doctor-d1-0-contract.v1.json",
   "d1HealthGateContract": "data/contracts/project-doctor-d1-2-health-gate.v1.json",
   "d1StatusRunner": "scripts/run-project-doctor-d1-3.mjs",
@@ -48,8 +48,10 @@
     "filenameInference": false
   },
   "refreshPolicy": {
+    "explicitRefreshOnly": true,
     "runD1BeforeSnapshotCommit": true,
-    "hashAlgorithm": "sha256",
+    "hashAlgorithm": "git-blob-sha1",
+    "hashDefinition": "SHA1 over UTF-8/raw file bytes prefixed with Git blob header: blob <byteLength>\\0",
     "hashContentNotMtime": true,
     "verifyInputsStableBeforeAndAfterD1": true,
     "abortIfInputChangesDuringRefresh": true,
@@ -64,6 +66,8 @@
     "requireInputHashesMatch": true,
     "requireOutputHashesMatch": true,
     "requireOutputStatusesMatch": true,
+    "missingInputOrOutputIsStale": true,
+    "normalDoctorRunNeverAutoReseals": true,
     "staleDoesNotRewriteCanonicalData": true
   },
   "exitPolicy": {
