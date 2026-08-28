@@ -107,6 +107,16 @@
       "requiredUnboundGates": ["shared.contract", "soldier.final.consumer", "skin.stage3.asset"]
     },
     {
+      "id": "generic-shared-contract-broad-fallback",
+      "files": ["data/contracts/new-cross-domain-contract.v1.json"],
+      "expectedStatus": "BLOCKED_UNBOUND",
+      "expectedExitCode": 2,
+      "requiredRequestedGates": ["global.safe-fallback"],
+      "requiredCompositeGates": ["global.safe-fallback", "banner.stage3.full"],
+      "requiredLeafGates": ["shared.contract", "hero.final.consumer", "soldier.final.consumer", "hero-soldier.pair-parity", "equipment.final.consumer", "banner.stage3.freeze", "skin.stage3.asset", "global.build"],
+      "requiredUnboundGates": ["shared.contract", "soldier.final.consumer", "skin.stage3.asset"]
+    },
+    {
       "id": "unknown-path-broad-fallback",
       "files": ["ops/custom-regression.flag"],
       "expectedStatus": "BLOCKED_UNKNOWN_PATH",
