@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage0-input-freeze",
+  "schemaId": "hero-portrait-stage0-input-freeze-checkpoint/v1",
+  "status": "PASS_HERO_PORTRAIT_STAGE0_INPUT_FREEZE",
+  "completion": "COMPLETE",
+  "freezeState": "HERO_PORTRAIT_STAGE0_FROZEN",
+  "frozenBase": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "mainCommit": "15125cb6c77386a726dfaeaa9ba674c0b320eaa9"
+  },
+  "contract": "data/contracts/hero-portrait-stage0-input-freeze.v1.json",
+  "validationMode": "FROZEN_UPSTREAM_ARTIFACT_CROSSCHECK",
+  "evidence": {
+    "heroProduction": {
+      "path": "data/generated/hero-detail.v1.json",
+      "gitBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66",
+      "status": "PASS_WITH_REVIEW",
+      "completion": "COMPLETE",
+      "pipelineStatus": "FINAL_FROZEN",
+      "canonicalHeroCount": 267
+    },
+    "heroArtworkIndex": {
+      "path": "data/generated/hero-card-artwork-stage4.v1.json",
+      "gitBlobSha": "dba8d63e4d865d5949383fcf5189cad43ed73c47",
+      "status": "PASS",
+      "completion": "RESOLVER_READY",
+      "heroCount": 267,
+      "uniqueHeroCount": 267,
+      "resolvedCount": 0,
+      "pendingCount": 267,
+      "stage6MissingCount": 0,
+      "routeMismatchCount": 0,
+      "sourceLocatorMissingCount": 0,
+      "hardErrorCount": 0
+    }
+  },
+  "checks": [
+    {
+      "id": "canonical-hero-population",
+      "expected": 267,
+      "actual": 267,
+      "result": "PASS"
+    },
+    {
+      "id": "unique-hero-artwork-records",
+      "expected": 267,
+      "actual": 267,
+      "result": "PASS"
+    },
+    {
+      "id": "source-artwork-locator-coverage",
+      "expected": 267,
+      "actual": 267,
+      "result": "PASS"
+    },
+    {
+      "id": "stage6-admission-missing",
+      "expected": 0,
+      "actual": 0,
+      "result": "PASS"
+    },
+    {
+      "id": "artwork-route-mismatch",
+      "expected": 0,
+      "actual": 0,
+      "result": "PASS"
+    },
+    {
+      "id": "source-locator-missing",
+      "expected": 0,
+      "actual": 0,
+      "result": "PASS"
+    },
+    {
+      "id": "artwork-hard-errors",
+      "expected": 0,
+      "actual": 0,
+      "result": "PASS"
+    },
+    {
+      "id": "target-web-asset-pattern",
+      "expected": "public/images/heroes/cards/{heroId}.png",
+      "actual": "public/images/heroes/cards/{heroId}.png",
+      "result": "PASS"
+    }
+  ],
+  "scopeBoundary": {
+    "completedHere": [
+      "freeze canonical Hero population input",
+      "freeze Hero ID to sourceArtworkPath locator input",
+      "freeze expected PNG destination contract",
+      "freeze Stage 1 handoff boundary"
+    ],
+    "notPerformedHere": [
+      "Unity asset dependency resolution",
+      "portrait Texture2D or Sprite selection",
+      "PNG extraction",
+      "image byte or visual identity validation",
+      "bulk web asset installation",
+      "frontend resolver status mutation"
+    ]
+  },
+  "currentPngContract": {
+    "resolved": 0,
+    "pending": 267,
+    "interpretation": "Expected baseline before authoritative PNG supply; not a Stage 0 failure."
+  },
+  "representation": "REFERENCE_MANIFEST_NO_LARGE_DATA_DUPLICATION",
+  "failedChecks": 0,
+  "hardErrors": 0,
+  "nextStage": {
+    "id": "HERO_PORTRAIT_STAGE1_ASSET_LOCATOR_INVENTORY",
+    "startFrom": "data/generated/hero-card-artwork-stage4.v1.json#records",
+    "rule": "Classify and resolve sourceArtworkPath locator families without reopening canonical Hero semantics."
+  }
+}
