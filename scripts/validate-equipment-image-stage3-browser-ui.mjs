@@ -126,9 +126,17 @@ async function assertNoHorizontalOverflow(page, label) {
 }
 
 async function assertDiagnosticsClean(diagnostics) {
-  assert(diagnostics.pageErrors.length === 0, `${diagnostics.label} page errors: ${JSON.stringify(diagnostics.pageErrors)}`);
-  assert(diagnostics.consoleErrors.length === 0, `${diagnostics.label} console errors: ${JSON.stringify(diagnostics.consoleErrors)}`);
-  assert(diagnostics.badResponses.length === 0, `${diagnostics.label} hosted HTTP failures: ${JSON.stringify(diagnostics.badResponses)}`);
+  if (
+    diagnostics.pageErrors.length > 0 ||
+    diagnostics.consoleErrors.length > 0 ||
+    diagnostics.badResponses.length > 0
+  ) {
+    throw new Error(`${diagnostics.label} browser diagnostics failed: ${JSON.stringify({
+      pageErrors: diagnostics.pageErrors,
+      consoleErrors: diagnostics.consoleErrors,
+      badResponses: diagnostics.badResponses,
+    })}`);
+  }
 }
 
 const hostedSummary = JSON.parse(fs.readFileSync(HOSTED_SUMMARY_PATH, "utf8"));
