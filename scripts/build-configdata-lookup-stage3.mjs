@@ -3,6 +3,7 @@ import {
   loadStage2Artifacts,
   loadStage3Contract,
   renderJson,
+  renderReverseIndex,
   writeText,
 } from './lib/configdata-lookup-stage3.mjs';
 
@@ -14,7 +15,7 @@ async function main() {
   for (const targetType of contract.targetTypeOrder) {
     const index = targetIndexes[targetType];
     const outputPath = contract.outputs.targets[targetType];
-    await writeText(outputPath, renderJson(index));
+    await writeText(outputPath, renderReverseIndex(index));
     console.log(`${targetType}: ${index.targetCount} targets / ${index.referenceCount} refs -> ${outputPath}`);
   }
 
