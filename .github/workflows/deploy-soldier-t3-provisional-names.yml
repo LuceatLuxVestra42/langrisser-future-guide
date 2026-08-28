@@ -1,0 +1,114 @@
+name: Deploy Soldier T3 Provisional Names
+
+on:
+  push:
+    branches:
+      - deploy/soldier-t3-provisional-names-20260828
+    paths:
+      - '.github/workflows/deploy-soldier-t3-provisional-names.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Preflight canonical and presentation boundary
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const list = JSON.parse(fs.readFileSync('data/generated/soldier-list-stage5-8.v1.json','utf8'));
+          const overlay = JSON.parse(fs.readFileSync('data/presentation/soldier-t3-provisional-name-kr.v1.json','utf8'));
+          const expected = new Map([
+            [136, ['烬色卫队','잿빛 호위대','LANCER']],
+            [1039, ['断罪修女','단죄의 수녀','DEMON']],
+          ]);
+          const t3 = list.records.filter(r => !r.isSp && r.tier === 3);
+          const confirmed = t3.filter(r => r.nameKr && r.nameKrStatus === 'confirmed');
+          if (list.records.length !== 224 || t3.length !== 129 || confirmed.length !== 127) throw new Error(`Soldier/T3 coverage mismatch ${list.records.length} / ${confirmed.length}/${t3.length}`);
+          if (list.summary.nonPassIdentityMetadataCount !== 41) throw new Error('nonPassIdentityMetadataCount must be 41');
+          for (const [id,[cn,display,army]] of expected) {
+            const row = list.records.find(r => r.soldierId === id);
+            const p = overlay.records.find(r => r.soldierId === id);
+            if (!row || row.nameCn !== cn || row.armyType !== army || row.nameKr !== null || row.nameKrStatus !== 'unreleased' || row.validationStatus !== 'REVIEW') throw new Error(`canonical mismatch ${id}`);
+            if (!p || p.nameCn !== cn || p.displayNameKr !== display || p.armyType !== army || p.status !== 'provisional-display') throw new Error(`overlay mismatch ${id}`);
+          }
+          if (overlay.status !== 'PASS' || overlay.scope !== 'frontend-presentation-only' || overlay.source.officialKoreanNameConfirmed !== false || overlay.source.identityMutation !== false) throw new Error('overlay contract mismatch');
+          console.log('PASS: T3 127 confirmed + 2 canonical unresolved + 2 provisional display labels');
+          NODE
+
+          test -f public/images/soldiers-webp/136.webp
+          test -f public/images/soldiers-webp/1039.webp
+          test "$(find public/images/soldiers-webp -maxdepth 1 -type f -name '*.webp' | wc -l | tr -d ' ')" -eq 224
+          test "$(find public/images/heroes/portrait-samples -maxdepth 1 -type f -name '*.webp' | wc -l | tr -d ' ')" -eq 5
+
+      - name: Reuse proven GitHub Pages static config
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
+          git show FETCH_HEAD:vite.config.ts > vite.config.ts
+          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
+          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
+          grep -q 'nitro: false' vite.config.ts
+          grep -q 'outputPath: `/soldiers/${soldierId}/index.html`' vite.config.ts
+          grep -q 'outputPath: `/heroes/${heroId}/index.html`' vite.config.ts
+
+      - name: Build GitHub Pages static site
+        run: bun run build
+
+      - name: Static candidate gate
+        run: |
+          set -euo pipefail
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          HERO_DETAIL_COUNT="$(find dist/client/heroes -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/heroes/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
+          test "$HERO_DETAIL_COUNT" -eq 267
+          test "$(find dist/client/images/soldiers-webp -maxdepth 1 -type f -name '*.webp' | wc -l | tr -d ' ')" -eq 224
+          test "$(find dist/client/images/heroes/portrait-samples -maxdepth 1 -type f -name '*.webp' | wc -l | tr -d ' ')" -eq 5
+
+          node <<'NODE'
+          const fs = require('fs');
+          const checks = [
+            ['dist/client/soldiers/index.html', ['잿빛 호위대','단죄의 수녀','/langrisser-future-guide/']],
+            ['dist/client/soldiers/136/index.html', ['잿빛 호위대','/langrisser-future-guide/images/soldiers-webp/136.webp']],
+            ['dist/client/soldiers/1039/index.html', ['단죄의 수녀','/langrisser-future-guide/images/soldiers-webp/1039.webp']],
+            ['dist/client/heroes/index.html', ['/langrisser-future-guide/images/heroes/portrait-samples/6.webp']],
+          ];
+          for (const [file,tokens] of checks) {
+            const html = fs.readFileSync(file,'utf8');
+            for (const token of tokens) if (!html.includes(token)) throw new Error(`${file} missing ${token}`);
+          }
+          console.log('PASS: static candidate renders two provisional Korean labels and preserves Soldier/Hero assets');
+          NODE
+
+          printf '%s\n' '15125cb6c77386a726dfaeaa9ba674c0b320eaa9' > dist/client/qa-main-source.txt
+          printf '%s\n' 'soldier-t3-provisional-display-2' > dist/client/qa-surface.txt
+
+      - name: Publish to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy T3 provisional Soldier names ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
