@@ -1,0 +1,139 @@
+name: Equipment Image Stage 3 Browser UI QA
+
+on:
+  push:
+    branches:
+      - qa/equipment-image-stage3-browser-ui-20260828
+    paths:
+      - '.github/workflows/equipment-image-stage3-browser-ui.yml'
+      - 'scripts/validate-equipment-image-stage3-browser-ui.mjs'
+      - 'scripts/apply-equipment-stage3-pages-document-navigation.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: equipment-image-stage3-browser-ui
+  cancel-in-progress: false
+
+jobs:
+  browser-ui-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install project dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Apply GitHub Pages document navigation boundary
+        run: |
+          set -euo pipefail
+          node scripts/apply-equipment-stage3-pages-document-navigation.mjs
+          test "$(grep -R -l 'reloadDocument' src/routes/equipment.tsx src/routes/equipment_.exclusive.tsx 'src/routes/equipment_.$equipmentId.tsx' | wc -l | tr -d ' ')" -eq 3
+
+      - name: Reuse proven GitHub Pages static config
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
+          git show FETCH_HEAD:vite.config.ts > vite.config.ts
+          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
+          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
+          grep -q 'outputPath: `/equipment/${equipmentId}/index.html`' vite.config.ts
+
+      - name: Build hosted candidate
+        run: bun run build
+
+      - name: Require static candidate PASS
+        run: |
+          set -euo pipefail
+          test -f dist/client/equipment/index.html
+          test -f dist/client/equipment/exclusive/index.html
+          EQUIPMENT_DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$EQUIPMENT_DETAIL_COUNT" -eq 373
+          test "$(find dist/client/images/equipment -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" -eq 373
+          grep -q '/langrisser-future-guide/images/equipment/6.png' dist/client/equipment/6/index.html
+          grep -q '/langrisser-future-guide/images/equipment/273.png' dist/client/equipment/273/index.html
+          grep -q '/langrisser-future-guide/images/equipment/547.png' dist/client/equipment/547/index.html
+          grep -q '/langrisser-future-guide/images/equipment/550.png' dist/client/equipment/550/index.html
+
+      - name: Publish Browser UI candidate to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Equipment Stage 3 Browser UI candidate ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run hosted Browser UI QA
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: |
+          set -o pipefail
+          node scripts/validate-equipment-image-stage3-browser-ui.mjs 2>&1 | tee equipment-stage3-browser-ui.log
+
+      - name: Upload Browser UI failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: equipment-stage3-browser-ui-failure-${{ github.run_id }}
+          path: equipment-stage3-browser-ui.log
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Require final Stage 3 Browser UI PASS
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const summary = JSON.parse(fs.readFileSync('data/validation/equipment-image-stage3-hosted-qa-summary.v1.json','utf8'));
+          const evidence = JSON.parse(fs.readFileSync('data/evidence/equipment-image-stage3-browser-ui.v1.json','utf8'));
+          const checkpoint = JSON.parse(fs.readFileSync('data/checkpoints/equipment-image-stage3-final.v1.json','utf8'));
+          if (summary.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3' || summary.completion !== 'COMPLETE' || summary.freezeState !== 'EQUIPMENT_IMAGE_STAGE3_FROZEN') throw new Error('Final Stage 3 summary mismatch');
+          if (summary.gates.preflight !== 'PASS' || summary.gates.build !== 'PASS' || summary.gates.deploymentHosted !== 'PASS' || summary.gates.browserUi !== 'PASS_PLAYWRIGHT_HOSTED_BROWSER_UI') throw new Error('Four-gate Stage 3 closeout mismatch');
+          if (evidence.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3_BROWSER_UI' || evidence.productionJoinKey !== 'equipmentId' || evidence.publicEquipment !== 373) throw new Error('Browser UI evidence mismatch');
+          if (checkpoint.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3' || checkpoint.browserUi !== 'PASS_PLAYWRIGHT_HOSTED_BROWSER_UI' || checkpoint.semanticStageReopened !== false) throw new Error('Final checkpoint mismatch');
+          console.log('PASS: Equipment Image Stage 3 four-gate closeout');
+          NODE
+
+      - name: Persist source fix, Browser UI evidence, and final freeze
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routes/equipment.tsx \
+                  src/routes/equipment_.exclusive.tsx \
+                  'src/routes/equipment_.$equipmentId.tsx' \
+                  data/validation/equipment-image-stage3-hosted-qa-summary.v1.json \
+                  data/evidence/equipment-image-stage3-browser-ui.v1.json \
+                  data/checkpoints/equipment-image-stage3-final.v1.json
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit.'
+            exit 0
+          fi
+          git commit -m "Freeze Equipment Image Stage 3 Browser UI QA [skip ci]"
+          git push origin HEAD:qa/equipment-image-stage3-browser-ui-20260828
