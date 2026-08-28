@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_3",
+  "status": "REVERSE_REFERENCE_MANIFEST_MATERIALIZED",
+  "contract": "data/contracts/configdata-lookup-stage3-reverse-reference-contract.v1.json",
+  "predecessor": {
+    "stage2Contract": "data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json",
+    "stage2ContractSha256": "9cee0ae295228922d7f798e27cb11897ea98d9821c73a9a5d3975a83e999d69a",
+    "stage2Summary": "data/validation/configdata-lookup-stage2-summary.v1.json",
+    "stage2SummarySha256": "431e8a4bf8b9c636a3cc3834df2a36b84a0de967b2b16b3c96ea09dccff1f1f1"
+  },
+  "inputs": {
+    "Hero": {
+      "path": "data/index/forward/hero.v1.json",
+      "sha256": "1dd164aa6d31b2b2c765619adc4541b9242bc3b0f6790ab7500af2abcec716c6",
+      "relationCount": 7,
+      "edgeCount": 134349
+    },
+    "Soldier": {
+      "path": "data/index/forward/soldier.v1.json",
+      "sha256": "e6dfd7eb26001f8498068f6fd2a9eca1396ab7c4ff83efbd6d8dcab82a5a8e50",
+      "relationCount": 5,
+      "edgeCount": 6006
+    },
+    "Equipment": {
+      "path": "data/index/forward/equipment.v1.json",
+      "sha256": "404272e41cfc0711591e18c8c5e64d110db10c1143452c850d5492e65b518720",
+      "relationCount": 1,
+      "edgeCount": 2367
+    }
+  },
+  "targetTypeOrder": [
+    "Skill",
+    "JobConnection",
+    "Job",
+    "TrainingTech",
+    "Soldier",
+    "TrainingTechLevel"
+  ],
+  "relationCount": 13,
+  "totalTargetCount": 51064,
+  "totalReferenceCount": 142722,
+  "targets": {
+    "Skill": {
+      "path": "data/index/reverse/skill.v1.json",
+      "relationCount": 5,
+      "relationNames": [
+        "hero.skills",
+        "hero.castingLawSkill",
+        "jobConnection.talentSkills",
+        "soldier.skills",
+        "equipment.skillStages"
+      ],
+      "targetCount": 14518,
+      "referenceCount": 77875
+    },
+    "JobConnection": {
+      "path": "data/index/reverse/job-connection.v1.json",
+      "relationCount": 3,
+      "relationNames": [
+        "hero.baseJobConnection",
+        "hero.usableJobConnections",
+        "jobConnection.predecessors"
+      ],
+      "targetCount": 29862,
+      "referenceCount": 31240
+    },
+    "Job": {
+      "path": "data/index/reverse/job.v1.json",
+      "relationCount": 1,
+      "relationNames": [
+        "jobConnection.job"
+      ],
+      "targetCount": 3258,
+      "referenceCount": 30066
+    },
+    "TrainingTech": {
+      "path": "data/index/reverse/training-tech.v1.json",
+      "relationCount": 2,
+      "relationNames": [
+        "soldier.unlockTrainingTech",
+        "trainingTech.preTech"
+      ],
+      "targetCount": 268,
+      "referenceCount": 379
+    },
+    "Soldier": {
+      "path": "data/index/reverse/soldier.v1.json",
+      "relationCount": 1,
+      "relationNames": [
+        "trainingTech.soldiers"
+      ],
+      "targetCount": 213,
+      "referenceCount": 217
+    },
+    "TrainingTechLevel": {
+      "path": "data/index/reverse/training-tech-level.v1.json",
+      "relationCount": 1,
+      "relationNames": [
+        "trainingTech.levels"
+      ],
+      "targetCount": 2945,
+      "referenceCount": 2945
+    }
+  }
+}
