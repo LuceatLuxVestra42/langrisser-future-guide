@@ -1,0 +1,38 @@
+name: Equipment Page Stage 3-0 Input Freeze
+
+on:
+  push:
+    paths:
+      - '.github/workflows/equipment-page-stage3-0-input-freeze.yml'
+      - 'scripts/validate-equipment-page-stage3-0-input.mjs'
+      - 'data/contracts/equipment-page-stage3-0-input-contract.v1.json'
+      - 'data/generated/equipment_stage2_1_census.json'
+      - 'data/generated/equipment_stage2_2_basic_join.json'
+      - 'data/generated/equipment_stage2_3_filter_map.json'
+      - 'data/generated/equipment_stage2_4_stats.json'
+      - 'data/generated/equipment_stage2_5_effects.json'
+      - 'data/generated/equipment_stage2_6_restrictions.json'
+      - 'data/generated/equipment_stage2_7_acquisition.json'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate frozen Equipment Stage 2 inputs for Equipment Page Stage 3
+        run: node scripts/validate-equipment-page-stage3-0-input.mjs
+      - name: Persist Equipment Page Stage 3-0 validation checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/equipment-page-stage3-0-input-summary.v1.json
+          git add data/checkpoints/equipment-page-stage3-0-input-freeze.v1.json
+          if git diff --cached --quiet; then
+            echo "No Equipment Page Stage 3-0 validation changes"
+            exit 0
+          fi
+          git commit -m "Freeze Equipment Page Stage 3-0 input checkpoint [skip ci]"
+          git push
