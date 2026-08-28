@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-contract/v1",
+  "stage": "0",
+  "status": "FROZEN",
+  "purpose": "Freeze the read-only localization audit boundary before implementing the executable audit. Localization audit validates canonical identity, Korean presentation overlays, and effective frontend display without translating, mutating, or re-deriving canonical data.",
+  "scope": {
+    "mode": "READ_ONLY_AUDIT",
+    "initialEntity": "Soldier",
+    "stage0Implementation": "contract-and-source-boundary-only",
+    "futureExpansion": [
+      "Hero",
+      "Equipment"
+    ],
+    "outOfScope": [
+      "automatic translation",
+      "canonical name mutation",
+      "relation recomputation",
+      "release metadata mutation",
+      "frontend rendering changes",
+      "CI gating"
+    ]
+  },
+  "canonicalKey": {
+    "entity": "Soldier",
+    "field": "soldierId",
+    "comparison": "exact numeric ID equality",
+    "rule": "Localization sources may validate nameCn, tier, armyType, or status after soldierId resolution, but names, aliases, file order, and numeric patterns are never JOIN keys."
+  },
+  "sources": {
+    "canonicalSoldierList": {
+      "path": "data/generated/soldier-list-stage5-8.v1.json",
+      "schemaId": "soldier-list-release/v1",
+      "role": "canonical identity and canonical Korean-name state",
+      "expectedRecordCount": 224,
+      "key": "soldierId",
+      "fields": [
+        "soldierId",
+        "siteId",
+        "nameKr",
+        "nameCn",
+        "nameKrStatus",
+        "tier",
+        "armyId",
+        "armyType",
+        "uiGroup",
+        "isSp",
+        "normalSoldierId",
+        "spSoldierId",
+        "validationStatus",
+        "sortBucket"
+      ]
+    },
+    "lowerTierPresentation": {
+      "path": "data/presentation/soldier-lower-tier-name-kr.v1.json",
+      "schemaId": "soldier-lower-tier-name-kr-presentation/v1",
+      "role": "confirmed Korean frontend presentation for canonical tier 1-2 Soldiers",
+      "expectedStatus": "PASS",
+      "expectedScope": "frontend-presentation-only",
+      "expectedRecordCount": 39,
+      "join": {
+        "primary": "soldierId",
+        "requiredExactChecks": [
+          "tier",
+          "nameCn"
+        ]
+      },
+      "displayField": "nameKr",
+      "effectiveDisplayStatus": "confirmed-presentation",
+      "identityMutationAllowed": false
+    },
+    "tier3ProvisionalPresentation": {
+      "path": "data/presentation/soldier-t3-provisional-name-kr.v1.json",
+      "schemaId": "soldier-t3-provisional-name-kr-presentation/v1",
+      "role": "provisional Korean frontend presentation for tier-3 Soldiers whose exact Korean server name is unresolved",
+      "expectedStatus": "PASS",
+      "expectedScope": "frontend-presentation-only",
+      "expectedRecordCount": 2,
+      "join": {
+        "primary": "soldierId",
+        "requiredExactChecks": [
+          "tier",
+          "armyType",
+          "nameCn"
+        ]
+      },
+      "displayField": "displayNameKr",
+      "requiredRecordStatus": "provisional-display",
+      "effectiveDisplayStatus": "provisional-display",
+      "officialKoreanNameConfirmed": false,
+      "identityMutationAllowed": false
+    },
+    "tier3ProvisionalValidation": {
+      "path": "data/validation/soldier-t3-provisional-name-presentation.v1.json",
+      "role": "existing evidence for the canonical-versus-provisional boundary",
+      "expectedStatus": "PASS"
+    },
+    "frontendResolver": {
+      "path": "src/lib/soldier-page.server.ts",
+      "role": "current effective Soldier presentation resolver",
+      "auditOnly": true
+    }
+  },
+  "layerModel": [
+    {
+      "order": 1,
+      "layer": "canonical-identity",
+      "owner": "data/generated/soldier-list-stage5-8.v1.json",
+      "mayMutateByAudit": false
+    },
+    {
+      "order": 2,
+      "layer": "confirmed-presentation-overlay",
+      "owner": "data/presentation/soldier-lower-tier-name-kr.v1.json",
+      "mayMutateByAudit": false
+    },
+    {
+      "order": 3,
+      "layer": "provisional-presentation-overlay",
+      "owner": "data/presentation/soldier-t3-provisional-name-kr.v1.json",
+      "mayMutateByAudit": false
+    },
+    {
+      "order": 4,
+      "layer": "effective-frontend-display",
+      "owner": "src/lib/soldier-page.server.ts",
+      "mayMutateByAudit": false
+    }
+  ],
+  "effectiveDisplayPolicy": {
+    "resolverPrecedence": [
+      "lowerTierPresentation",
+      "tier3ProvisionalPresentation",
+      "canonicalSoldierList"
+    ],
+    "rules": [
+      "A lower-tier presentation record may replace only the effective frontend nameKr and effective nameKrStatus; canonical Stage 5-8 identity remains unchanged.",
+      "A tier-3 provisional presentation record may replace only the effective frontend nameKr and effective nameKrStatus; canonical Stage 5-8 nameKr must remain null until the official Korean server name is confirmed.",
+      "When no presentation overlay applies, effective frontend localization falls through to the canonical Soldier record.",
+      "Presentation overlays never change soldierId, nameCn, tier, armyType, isSp, relations, combat data, release metadata, or canonical validationStatus."
+    ]
+  },
+  "canonicalLocalizationStates": {
+    "confirmedCanonical": {
+      "condition": "nameKr is a non-empty string and nameKrStatus is confirmed",
+      "meaning": "Korean name is stored in canonical Soldier identity"
+    },
+    "lowerTierPresentationBackfill": {
+      "condition": "canonical tier is 1 or 2 and an exact lowerTierPresentation record exists",
+      "meaning": "confirmed Korean display name is presentation-only and does not require canonical mutation"
+    },
+    "tier3Provisional": {
+      "condition": "exact tier3ProvisionalPresentation record exists",
+      "requiredCanonicalState": {
+        "nameKr": null,
+        "nameKrStatus": "unreleased",
+        "validationStatus": "REVIEW",
+        "isSp": false,
+        "tier": 3
+      },
+      "meaning": "frontend may show the provisional Korean label, but it is not a confirmed canonical Korean name"
+    }
+  },
+  "stage1AuditMinimum": {
+    "requiredChecks": [
+      "canonical Soldier record count is 224",
+      "canonical Soldier IDs are unique",
+      "all presentation Soldier IDs resolve exactly once in the canonical list",
+      "lower-tier presentation coverage is 39 with exact tier and nameCn parity",
+      "tier-3 provisional presentation coverage is 2 with exact tier, armyType, and nameCn parity",
+      "no Soldier ID appears in both presentation overlays",
+      "tier-3 provisional canonical state remains null/unreleased/REVIEW",
+      "all presentation Korean display labels are non-empty",
+      "audit execution performs no writes"
+    ],
+    "resultModel": [
+      "PASS",
+      "PASS_WITH_REVIEW",
+      "FAIL"
+    ]
+  },
+  "plannedIssueCodes": [
+    "MISSING_DISPLAY",
+    "IDENTITY_MISMATCH",
+    "DUPLICATE_PRESENTATION_ID",
+    "OVERLAY_COLLISION",
+    "INVALID_PROMOTION",
+    "STALE_PROVISIONAL",
+    "FRONTEND_LOCALIZATION_LEAK"
+  ],
+  "severityPolicy": {
+    "FAIL": [
+      "unknown canonical ID",
+      "identity mismatch after ID resolution",
+      "duplicate presentation ID",
+      "overlay collision",
+      "provisional label promoted into canonical confirmed state without approved source transition",
+      "missing required lower-tier presentation mapping"
+    ],
+    "REVIEW": [
+      "approved provisional display name remains unresolved",
+      "future stale provisional candidate pending official-name confirmation review"
+    ]
+  },
+  "forbidden": [
+    "Translate Chinese names automatically",
+    "Write localization results back into canonical Soldier data",
+    "Promote provisional display labels to confirmed canonical names automatically",
+    "Join by nameKr, nameCn, alias, array position, filename similarity, or ID arithmetic",
+    "Treat frontend display coverage as proof that canonical localization is confirmed",
+    "Treat canonical REVIEW caused by unresolved Korean naming as a semantic Soldier identity failure",
+    "Recompute Hero-Soldier relations or any non-localization semantics",
+    "Modify presentation files during audit execution"
+  ],
+  "baseline": {
+    "canonicalSoldiers": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "normalTier3Soldiers": 129,
+    "lowerTierPresentation": 39,
+    "tier3ConfirmedKoreanNames": 127,
+    "tier3ProvisionalKoreanDisplayNames": 2,
+    "tier3FrontendKoreanDisplayCoverage": 129,
+    "tier3ProvisionalStoredAsCanonical": 0
+  },
+  "completion": "Stage 0 is complete when the authoritative canonical source, presentation overlays, exact-ID matching rules, provisional-name boundary, frontend display precedence, read-only policy, Stage 1 minimum checks, and failure/review semantics are frozen without modifying existing localization or canonical data."
+}
