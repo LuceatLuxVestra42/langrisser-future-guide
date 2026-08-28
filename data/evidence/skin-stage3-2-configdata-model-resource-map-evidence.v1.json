@@ -3,8 +3,8 @@
   "stage": "skin-page-3",
   "substage": "3-2",
   "evidenceClass": "AUTHORITATIVE_CONFIGDATA_RESOURCE_MAP_EVIDENCE",
-  "status": "RESOURCE_ID_TO_PREFAB_PATH_MAP_COMPLETE_ASSET_ENTRY_PENDING",
-  "purpose": "Record authoritative ConfigData source proof for representative Skin model resource IDs without inferring bundle membership or treating a resource-path map as extracted model bytes.",
+  "status": "RESOURCE_ID_TO_PREFAB_PATH_MAP_COMPLETE_ASSET_ENTRY_VERIFIED",
+  "purpose": "Record authoritative ConfigData source proof for representative Skin model resource IDs without inferring bundle membership or treating a resource-path map by itself as extracted model proof; actual bundle-entry closure is linked separately.",
   "source": {
     "sourceType": "USER_SUPPLIED_PC_CLIENT_EXPORT_ASSET_BUNDLE",
     "sourceLocation": "Langrisser_Data/StreamingAssets/ExportAssetBundle",
@@ -87,7 +87,7 @@
         {"skinResourceId": 1024, "modelSkinResourceInfoRecordIndexZeroBased": 193, "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_4/Mathew_Skin01_4_Prefab.prefab"}
       ],
       "resourceMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
-      "assetEntryStatus": "PENDING"
+      "assetEntryStatus": "CONFIRMED_IN_LINKED_BUNDLE_EVIDENCE"
     },
     {
       "canonicalKey": "1901",
@@ -103,7 +103,7 @@
         {"skinResourceId": 1901, "modelSkinResourceInfoRecordIndexZeroBased": 700, "prefabPath": "Spine/General/Lista_ABS/Lista_Skin01/Lista_Skin01_Prefab.prefab"}
       ],
       "resourceMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
-      "assetEntryStatus": "PENDING"
+      "assetEntryStatus": "CONFIRMED_IN_LINKED_BUNDLE_EVIDENCE"
     },
     {
       "canonicalKey": "3701",
@@ -124,37 +124,47 @@
         {"skinResourceId": 3701, "modelSkinResourceInfoRecordIndexZeroBased": 269, "prefabPath": "Spine/General/Zigodlla_ABS/Zigodlla_Skin01/Zigodlla_Skin01_Prefab.prefab"}
       ],
       "resourceMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
-      "assetEntryStatus": "PENDING"
+      "assetEntryStatus": "CONFIRMED_IN_LINKED_BUNDLE_EVIDENCE"
     }
   ],
   "coverage": {
     "representativeCount": 3,
     "modelResourceIdsExpected": 7,
     "modelResourceIdsMappedToPrefabPath": 7,
-    "modelResourceIdsAuthoritativeAssetEntryResolved": 0,
-    "finalNormalizedResolvedRecords": 0
+    "modelResourceIdsAuthoritativeAssetEntryResolved": 7,
+    "finalNormalizedResolvedRecords": 3
   },
-  "exactBundleFilenameCandidatesFromUploadedBundleList": {
-    "Mathew_ABS": ["begin_spine_general_mathew_abs.b", "spine_general_mathew_abs.b"],
-    "Lista_ABS": ["begin_spine_general_lista_abs.b", "spine_general_lista_abs.b"],
-    "Zigodlla_ABS": ["spine_general_zigodlla_abs.b"],
-    "status": "CANDIDATE_SET_ONLY_NOT_ASSET_ENTRY_PROOF",
-    "note": "These filenames exist in the user-supplied ExportAssetBundle file list. Exact membership of each mapped Prefab path must be confirmed from bundle contents; no begin/non-begin assignment is inferred."
+  "verifiedBundleMembership": {
+    "Mathew_ABS": {
+      "primaryBundle": "begin_spine_general_mathew_abs.b",
+      "primaryResourceIds": [102, 1021, 1022, 1023, 1024],
+      "supplementalBundle": "spine_general_mathew_abs.b",
+      "supplementalEvidence": "1023 alternate air Prefab"
+    },
+    "Lista_ABS": {
+      "primaryBundle": "spine_general_lista_abs.b",
+      "primaryResourceIds": [1901],
+      "negativeInspectedCandidate": "begin_spine_general_lista_abs.b"
+    },
+    "Zigodlla_ABS": {
+      "primaryBundle": "spine_general_zigodlla_abs.b",
+      "primaryResourceIds": [3701]
+    },
+    "evidence": "data/evidence/skin-stage3-2-model-prefab-bundle-evidence.v1.json"
   },
   "verifiedFacts": [
     "All seven representative skinResourceId values are present exactly once as field 2 values in ConfigDataModelSkinResourceInfo.",
     "Each of the seven IDs has an explicit field 4 Prefab path under Spine/General, so no numeric ID-to-path inference is required.",
     "ConfigDataHeroSkinInfo in the same authoritative bundle reproduces the frozen representative jobConnectionId + skinResourceId bindings.",
-    "ConfigDataCharImageSkinResourceInfo in the same authoritative bundle reproduces the frozen representative static and character-Spine locators."
+    "ConfigDataCharImageSkinResourceInfo in the same authoritative bundle reproduces the frozen representative static and character-Spine locators.",
+    "The seven ConfigData-mapped primary Prefab paths are now separately confirmed as exact entries in authoritative uploaded Spine/General bundle CAB content."
   ],
-  "blockers": [
-    "AUTHORITATIVE_MODEL_PREFAB_BUNDLE_ENTRY_OR_BYTES_REQUIRED"
-  ],
+  "blockers": [],
   "guardrails": [
-    "Do not treat ConfigData resource-path mapping alone as extracted model asset bytes.",
-    "Do not infer begin/non-begin bundle membership from filename conventions.",
+    "ConfigData resource-path mapping remains a distinct proof layer from actual model bundle-entry evidence.",
+    "Do not infer begin/non-begin bundle membership from filename conventions; use the linked inspected bundle evidence.",
     "Do not use fuzzy matching, numeric ID arithmetic, or cross-root fallback.",
-    "Do not claim final normalized RESOLVED until the mapped Spine/General Prefab paths are verified in authoritative bundle contents and final contract evidence is generated."
+    "Do not extrapolate representative resolution to the full Skin population without bulk evidence."
   ],
-  "nextStartPoint": "Inspect the exact uploaded bundle-list candidates for Spine/General/Mathew_ABS, Spine/General/Lista_ABS, and Spine/General/Zigodlla_ABS. Confirm the seven mapped Prefab paths in bundle contents, then generate final representative Stage 3-2 evidence."
+  "nextStartPoint": "Reuse this exact ConfigData map together with data/evidence/skin-stage3-2-model-prefab-bundle-evidence.v1.json and the final representative evidence as the frozen basis for bulk Skin asset resolution."
 }
