@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-d6-summary/v1",
+  "stage": "D6",
+  "checkpoint": "PROJECT_DOCTOR_D6_CI_RUNTIME_PROOF",
+  "status": "PASS_PROJECT_DOCTOR_D6_CI_RUNTIME_PROOF",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/project-doctor-d6-ci.v1.json",
+  "workflow": ".github/workflows/project-doctor-d6.yml",
+  "branch": "work/project-doctor-closeout",
+  "actualRuntimeProof": {
+    "workflowRunId": 33147644692,
+    "jobId": 98772124007,
+    "headSha": "c37ae00120e5b5314ff7b97ef1c9d74e9e3199f0",
+    "event": "push",
+    "status": "completed",
+    "conclusion": "success",
+    "runner": "ubuntu-24.04",
+    "node": "22.23.2",
+    "npm": "10.9.8",
+    "bun": "1.4.0",
+    "permissions": {
+      "contents": "read",
+      "metadata": "read"
+    }
+  },
+  "runtimeChecks": {
+    "frozenDependencyInstall": "PASS",
+    "d5FreshnessFixtures": "7/7 PASS",
+    "closeoutIntegrationFixtures": "6/6 PASS",
+    "committedFreshnessBeforeD1Regeneration": "FRESH",
+    "d1StatusRegeneration": "PASS",
+    "committedD1OutputsDeterministic": "PASS_GIT_DIFF_EXIT_0",
+    "freshnessAfterD1Regeneration": "FRESH",
+    "dryRun": {
+      "status": "PASS_DRY_RUN",
+      "changedFileCount": 1,
+      "representativePath": "package.json",
+      "checksQueued": 4,
+      "checksRun": 0
+    },
+    "actualExecution": {
+      "status": "PASS_EXECUTED",
+      "changedFileCount": 1,
+      "checksQueued": 4,
+      "checksRun": 4,
+      "checks": [
+        "production-build: npm run build",
+        "doctor-health-gate: npm run doctor:validate",
+        "doctor-impact-self-test: npm run doctor:impact:validate",
+        "doctor-plan-self-test: npm run doctor:plan:validate"
+      ]
+    },
+    "productionBuild": "PASS",
+    "doctorHealthGate": "PASS_PROJECT_DOCTOR_D1_2_HEALTH_GATE",
+    "doctorImpact": "PASS_PROJECT_DOCTOR_D2_IMPACT",
+    "doctorPlan": "PASS_PROJECT_DOCTOR_D3_PLAN"
+  },
+  "doctorSnapshotObservedInCI": {
+    "projectHealth": "REVIEW",
+    "knownHardErrorTotal": 0,
+    "reviewTotal": 33,
+    "blockerTotal": 1,
+    "domains": {
+      "hero": { "lifecycle": "FROZEN", "health": "REVIEW", "canonicalHeroCount": 267 },
+      "soldier": { "lifecycle": "COMPLETE", "health": "REVIEW", "canonicalSoldiers": 224, "normalSoldiers": 168, "spSoldiers": 56, "heroSoldierRelations": 5977 },
+      "equipment": { "lifecycle": "FROZEN", "health": "REVIEW", "canonical": 390, "public": 373, "general": 206, "exclusive": 167 },
+      "hero-soldier": { "lifecycle": "FROZEN", "health": "REVIEW", "heroCount": 267, "soldierCount": 224, "canonicalPairCount": 5977 },
+      "banner": { "lifecycle": "FROZEN", "health": "REVIEW", "definitions": 77, "occurrences": 94 },
+      "skin": { "lifecycle": "IN_PROGRESS", "health": "REVIEW", "skinCount": 540, "heroCount": 267 }
+    }
+  },
+  "freshnessRepairHistory": {
+    "initialRuntimeProofDetectedStaleCommittedD1Outputs": true,
+    "initialFailedRunId": 33147448872,
+    "diagnosticArtifactRunId": 33147514536,
+    "oneTimeRepairRunId": 33147601916,
+    "repairConclusion": "success",
+    "repairMethod": "Explicit npm run doctor:freshness:refresh in a temporary contents-write workflow, followed by freshness validation and commit of only regenerated Project Doctor D1 outputs and D5 seal.",
+    "repairCommitShortSha": "d53d7fb",
+    "temporaryRepairWorkflowRemoved": true,
+    "temporaryRepairWorkflowRemovalCommit": "9bc66c1057e52e3b18a41ffd4cb7a9d39079b30a",
+    "finalRuntimeProofReadOnly": true
+  },
+  "boundaries": {
+    "finalWorkflowContentsWrite": false,
+    "finalWorkflowFreshnessReseal": false,
+    "rawConfigDataSemanticRecomputationAdded": false,
+    "canonicalDataMutationAdded": false,
+    "frontendSourceMutationAdded": false,
+    "productionSourceMutationAdded": false,
+    "missingOwningValidatorsInvented": false,
+    "manualReviewBoundaryPreserved": true
+  },
+  "nextStage": "D7",
+  "nextStageGoal": "Promote the proven read-only Doctor runtime into PR/merge-facing guard policy and final integration checks without broadening validator scope or weakening D5 freshness and D4 manual-review boundaries."
+}
