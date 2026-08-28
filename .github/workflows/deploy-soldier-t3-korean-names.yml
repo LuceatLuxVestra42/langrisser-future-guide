@@ -1,0 +1,95 @@
+name: Deploy Soldier T3 Korean Names
+
+on:
+  push:
+    branches:
+      - deploy/soldier-t3-kr-names-20260828
+    paths:
+      - '.github/workflows/deploy-soldier-t3-korean-names.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Preflight exact localization and preserved surfaces
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const list = JSON.parse(fs.readFileSync('data/generated/soldier-list-stage5-8.v1.json','utf8'));
+          const expected = new Map([
+            [136, ['烬色卫队','잿빛 호위대','LANCER']],
+            [1039, ['断罪修女','단죄의 수녀','DEMON']],
+          ]);
+          for (const [id,[cn,kr,army]] of expected) {
+            const row = list.records.find(r => r.soldierId === id);
+            if (!row || row.nameCn !== cn || row.nameKr !== kr || row.armyType !== army || row.tier !== 3 || row.nameKrStatus !== 'confirmed' || row.validationStatus !== 'PASS') {
+              throw new Error(`Localization contract failed for ${id}`);
+            }
+          }
+          const t3 = list.records.filter(r => !r.isSp && r.tier === 3);
+          const missing = t3.filter(r => !r.nameKr || r.nameKrStatus !== 'confirmed');
+          if (list.records.length !== 224 || t3.length !== 129 || missing.length !== 0) throw new Error('T3 Korean coverage contract failed');
+          const web = JSON.parse(fs.readFileSync('data/generated/soldier-portrait-web-manifest.v1.json','utf8'));
+          if (web.status !== 'PASS' || !web.assetsReady || web.records.length !== 224 || web.coverage.resolvedSpCount !== 56) throw new Error('Soldier WebP contract regressed');
+          const heroes = fs.readFileSync('src/routes/heroes.tsx','utf8');
+          const sampleCount = (heroes.match(/redpanda7301\.github\.io\/langrisser\/img\/card\//g) ?? []).length;
+          if (sampleCount !== 5) throw new Error(`Hero portrait samples changed: ${sampleCount}`);
+          console.log('PASS Preflight: T3 Korean 129/129, WebP 224/224, Hero samples 5');
+          NODE
+
+      - name: Build GitHub Pages static site
+        run: bun run build
+
+      - name: Static candidate gate
+        run: |
+          set -euo pipefail
+          test -f dist/client/soldiers/index.html
+          test -f dist/client/soldiers/136/index.html
+          test -f dist/client/soldiers/1039/index.html
+          SOLDIER_DETAIL_COUNT="$(find dist/client/soldiers -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/soldiers/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$SOLDIER_DETAIL_COUNT" -eq 224
+          WEBP_COUNT="$(find dist/client/images/soldiers-webp -maxdepth 1 -type f -name '*.webp' | wc -l | tr -d ' ')"
+          test "$WEBP_COUNT" -eq 224
+          node <<'NODE'
+          const fs = require('fs');
+          const checks = [
+            ['dist/client/soldiers/index.html', ['잿빛 호위대','단죄의 수녀']],
+            ['dist/client/soldiers/136/index.html', ['잿빛 호위대']],
+            ['dist/client/soldiers/1039/index.html', ['단죄의 수녀']],
+          ];
+          for (const [file,tokens] of checks) {
+            const html=fs.readFileSync(file,'utf8');
+            for (const token of tokens) if (!html.includes(token)) throw new Error(`${file} missing ${token}`);
+          }
+          console.log('PASS Static candidate: both Korean names rendered in list and detail');
+          NODE
+          printf '%s\n' '8acd069006f9fc7eceb1292965aa514c0e57169c' > dist/client/qa-main-source.txt
+          printf '%s\n' 'soldier-t3-korean-names-136-1039' > dist/client/qa-surface.txt
+
+      - name: Publish to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy T3 Soldier Korean names ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
