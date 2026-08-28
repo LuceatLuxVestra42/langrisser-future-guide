@@ -1,0 +1,36 @@
+name: Equipment Stage 4 Final Regression Temp
+
+on:
+  push:
+    branches:
+      - fix/equipment-stage4-regression-closure-20260828
+    paths:
+      - '.github/workflows/equipment-stage4-final-regression-temp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Equipment Stage 4-1
+        run: node scripts/validate-equipment-stage4-1-route-loader.mjs
+      - name: Equipment Stage 4-2
+        run: node scripts/validate-equipment-stage4-2-general-list-ui.mjs
+      - name: Equipment Stage 4-3
+        run: node scripts/validate-equipment-stage4-3-general-detail-ui.mjs
+      - name: Equipment Stage 4-4
+        run: node scripts/validate-equipment-stage4-4-exclusive-ui-ownership.mjs
+      - name: Equipment Stage 4-5
+        run: node scripts/validate-equipment-stage4-5-display-state-policy.mjs
+      - name: Equipment Stage 4-6
+        run: bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
+      - name: Equipment Stage 4-7
+        run: bun scripts/validate-equipment-stage4-7-whole-consumer-regression.mjs
