@@ -1,6 +1,7 @@
 import soldierCombatJson from "../../data/generated/soldier-detail-stage5-2.v1.json";
 import soldierListJson from "../../data/generated/soldier-list-stage5-8.v1.json";
 import soldierLowerTierNameKrJson from "../../data/presentation/soldier-lower-tier-name-kr.v1.json";
+import soldierT3ProvisionalNameKrJson from "../../data/presentation/soldier-t3-provisional-name-kr.v1.json";
 
 export type SoldierUiGroup =
   | "INFANTRY"
@@ -92,9 +93,32 @@ type SoldierLowerTierNameKrSource = {
   }>;
 };
 
+type SoldierT3ProvisionalNameKrSource = {
+  status: string;
+  scope: string;
+  source: {
+    officialKoreanNameConfirmed: boolean;
+    identityMutation: boolean;
+  };
+  coverage: {
+    recordCount: number;
+    provisionalCount: number;
+    officialNameUnresolvedCount: number;
+  };
+  records: Array<{
+    soldierId: number;
+    tier: number;
+    armyType: string;
+    nameCn: string;
+    displayNameKr: string;
+    status: string;
+  }>;
+};
+
 const soldierList = soldierListJson as unknown as SoldierListSource;
 const soldierCombat = soldierCombatJson as unknown as SoldierCombatSource;
 const soldierLowerTierNameKr = soldierLowerTierNameKrJson as unknown as SoldierLowerTierNameKrSource;
+const soldierT3ProvisionalNameKr = soldierT3ProvisionalNameKrJson as unknown as SoldierT3ProvisionalNameKrSource;
 const combatById = new Map(
   soldierCombat.records.map((record) => [record.soldierId, record.combat]),
 );
@@ -147,6 +171,48 @@ for (const presentation of soldierLowerTierNameKr.records) {
   }
 }
 
+if (
+  soldierT3ProvisionalNameKr.status !== "PASS" ||
+  soldierT3ProvisionalNameKr.scope !== "frontend-presentation-only" ||
+  soldierT3ProvisionalNameKr.source.officialKoreanNameConfirmed !== false ||
+  soldierT3ProvisionalNameKr.source.identityMutation !== false ||
+  soldierT3ProvisionalNameKr.coverage.recordCount !== 2 ||
+  soldierT3ProvisionalNameKr.coverage.provisionalCount !== 2 ||
+  soldierT3ProvisionalNameKr.coverage.officialNameUnresolvedCount !== 2
+) {
+  throw new Error("T3 provisional Korean Soldier presentation source contract mismatch.");
+}
+
+const t3ProvisionalNameKrById = new Map(
+  soldierT3ProvisionalNameKr.records.map((record) => [record.soldierId, record]),
+);
+
+if (t3ProvisionalNameKrById.size !== soldierT3ProvisionalNameKr.records.length) {
+  throw new Error("T3 provisional Korean Soldier presentation source contains duplicate Soldier IDs.");
+}
+
+for (const presentation of soldierT3ProvisionalNameKr.records) {
+  const base = soldierList.records.find((record) => record.soldierId === presentation.soldierId);
+  if (
+    !base ||
+    base.isSp ||
+    base.tier !== 3 ||
+    presentation.tier !== 3 ||
+    presentation.nameCn !== base.nameCn ||
+    presentation.armyType !== base.armyType ||
+    presentation.status !== "provisional-display" ||
+    !presentation.displayNameKr.trim() ||
+    base.nameKr !== null ||
+    base.nameKrStatus !== "unreleased" ||
+    base.validationStatus !== "REVIEW"
+  ) {
+    throw new Error(`T3 provisional Korean presentation mapping mismatch for Soldier ${presentation.soldierId}.`);
+  }
+  if (lowerTierNameKrById.has(presentation.soldierId)) {
+    throw new Error(`Soldier ${presentation.soldierId} is mapped by both lower-tier and T3 provisional presentation sources.`);
+  }
+}
+
 const BUCKET_ORDER: Record<string, number> = {
   SP: 0,
   NORMAL_TIER3_CONFIRMED_RELEASE: 1,
@@ -178,13 +244,20 @@ export function readSoldierPrototypePageData() {
     }
 
     const lowerTierNameKr = lowerTierNameKrById.get(record.soldierId);
+    const t3ProvisionalNameKr = t3ProvisionalNameKrById.get(record.soldierId);
     const presentationRecord = lowerTierNameKr
       ? {
           ...record,
           nameKr: lowerTierNameKr.nameKr,
           nameKrStatus: "confirmed-presentation",
         }
-      : record;
+      : t3ProvisionalNameKr
+        ? {
+            ...record,
+            nameKr: t3ProvisionalNameKr.displayNameKr,
+            nameKrStatus: "provisional-display",
+          }
+        : record;
 
     return {
       ...presentationRecord,
