@@ -16,11 +16,17 @@
   },
   "source": {
     "authority": "ConfigDataEquipmentInfo.Icon",
-    "iconRootPrefix": "UI/Icon/Equip_ABS/",
+    "allowedIconRootPrefixes": [
+      "UI/Icon/Equip_ABS/",
+      "UI/Icon/Item04_ABS/"
+    ],
+    "fullIconPathIsAuthority": true,
     "expectedFormat": "PNG locator",
     "basenameOnlyResolutionForbidden": true,
     "filenameSimilarityResolutionForbidden": true,
-    "crossRootFallbackForbidden": true
+    "crossRootFallbackForbidden": true,
+    "sharedSourceIconPathAllowed": true,
+    "sharedSourceIconDoesNotMergeEquipmentIdentity": true
   },
   "web": {
     "repositoryRoot": "public/images/equipment",
@@ -37,7 +43,7 @@
       "PENDING_ASSET_BYTES",
       "RESOLVED"
     ],
-    "purpose": "Freeze all 390 canonical source icon locators, public/non-public boundary, and collision-safe equipmentId web paths before representative extraction."
+    "purpose": "Freeze all 390 canonical full source icon locators, public/non-public boundary, and collision-safe equipmentId web paths before representative extraction."
   },
   "stage1Admission": {
     "representativeGroups": [
@@ -49,7 +55,7 @@
     ],
     "requiredEvidence": [
       "authoritative source bytes",
-      "exact source locator match",
+      "exact full source locator match",
       "PNG signature",
       "SHA-256",
       "width and height",
