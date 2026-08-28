@@ -1,0 +1,95 @@
+name: ConfigData Lookup Stage 1
+
+on:
+  push:
+    branches:
+      - main
+      - work/configdata-lookup-stage1-id-index
+    paths:
+      - 'data/contracts/configdata-lookup-stage0-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage1-id-index-contract.v1.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSkillInfo.json'
+      - 'data/configdata/ConfigDataEquipmentInfo.json'
+      - 'scripts/lib/configdata-lookup-stage1.mjs'
+      - 'scripts/build-configdata-lookup-stage1.mjs'
+      - 'scripts/validate-configdata-lookup-stage1.mjs'
+      - 'package.json'
+      - '.github/workflows/configdata-lookup-stage1.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/configdata-lookup-stage0-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage1-id-index-contract.v1.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSkillInfo.json'
+      - 'data/configdata/ConfigDataEquipmentInfo.json'
+      - 'data/index/hero.v1.json'
+      - 'data/index/soldier.v1.json'
+      - 'data/index/skill.v1.json'
+      - 'data/index/equipment.v1.json'
+      - 'data/validation/configdata-lookup-stage1-summary.v1.json'
+      - 'scripts/lib/configdata-lookup-stage1.mjs'
+      - 'scripts/build-configdata-lookup-stage1.mjs'
+      - 'scripts/validate-configdata-lookup-stage1.mjs'
+      - 'package.json'
+      - '.github/workflows/configdata-lookup-stage1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Stage 0 predecessor
+        run: npm run validate:configdata-lookup-stage0
+
+      - name: Materialize Stage 1 indexes
+        run: npm run build:configdata-lookup-stage1
+
+      - name: Validate Stage 1 indexes
+        run: npm run validate:configdata-lookup-stage1
+
+      - name: Commit materialized indexes on Stage 1 work branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage1-id-index'
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/index/hero.v1.json \
+            data/index/soldier.v1.json \
+            data/index/skill.v1.json \
+            data/index/equipment.v1.json \
+            data/validation/configdata-lookup-stage1-summary.v1.json
+          if git diff --cached --quiet; then
+            echo 'Materialized Stage 1 indexes are already current.'
+          else
+            git commit -m 'Materialize ConfigData Lookup Stage 1 indexes [skip ci]'
+            git push origin HEAD:work/configdata-lookup-stage1-id-index
+          fi
+
+      - name: Require committed indexes outside materialization branch
+        if: "!(github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage1-id-index')"
+        shell: bash
+        run: |
+          git diff --exit-code -- \
+            data/index/hero.v1.json \
+            data/index/soldier.v1.json \
+            data/index/skill.v1.json \
+            data/index/equipment.v1.json \
+            data/validation/configdata-lookup-stage1-summary.v1.json
