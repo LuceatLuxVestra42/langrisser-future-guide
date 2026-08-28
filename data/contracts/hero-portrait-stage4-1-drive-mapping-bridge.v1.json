@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-1-drive-mapping-bridge",
+  "schemaId": "hero-portrait-stage4-1-drive-mapping-bridge-contract/v1",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Freeze a non-display-name bridge from canonical Hero ID to a structured Google Drive Hero folder and its exact base portrait file ID.",
+  "baseCheckpoint": "data/checkpoints/hero-portrait-stage4-0-source-mapping-census.v1.json",
+  "canonicalSources": {
+    "heroArtwork": "data/generated/hero-card-artwork-stage4.v1.json",
+    "skinForwardRelation": "data/generated/skin-stage2-1-forward-relation.v1.json",
+    "skinAssetInventory": "data/generated/skin-stage3-1-asset-inventory.v1.json"
+  },
+  "identityPolicy": {
+    "canonicalKey": "heroId",
+    "displayNameJoinAllowed": false,
+    "fuzzyFilenameJoinAllowed": false,
+    "normalizedNameJoinAllowed": false,
+    "folderTitleAsOwnershipProofAllowed": false,
+    "exactSkinRuntimeAssetBridgeRequired": true
+  },
+  "driveOwnershipProof": {
+    "step1": "Start from a canonical heroId.",
+    "step2": "Read one or more explicitly related Skin records for that heroId from the frozen Skin relation/inventory.",
+    "step3": "Derive the runtime skin stem only by stripping the literal _Prefab.prefab suffix from an explicit sourceSpinePath basename; do not normalize spelling.",
+    "step4": "A structured Drive Hero folder is owned by that heroId only when a non-basic skin descendant contains an image/png whose filename begins with the exact runtime skin stem followed by an underscore.",
+    "step5": "The exact matched Skin asset must be unique to that heroId under the frozen Skin relation; collision or multiple Hero ownership is REVIEW.",
+    "step6": "After folder ownership is proven, use the sibling structural folder titled exactly 기본 only as a role locator, never as Hero identity evidence."
+  },
+  "basePortraitSelection": {
+    "requiredMimeType": "image/png",
+    "requiredExactSuffix": "_idle_Normal_default.png",
+    "allowAdditionalTokensBeforeIdle": true,
+    "examplesAllowed": ["Leon_Animation_FIN_idle_Normal_default.png"],
+    "examplesRejectedBySuffix": ["Lana_idle_Normal_default_CH.png"],
+    "backgroundFilesRejected": true,
+    "candidateCountRequired": 1,
+    "zeroCandidateState": "REVIEW_NO_BASE_PNG",
+    "multipleCandidateState": "REVIEW_AMBIGUOUS_BASE_PNG",
+    "note": "Filename structure selects a file role only after folder ownership is proven; it never proves Hero ownership."
+  },
+  "admissionBoundary": {
+    "bridgeProofIsSourceAdmission": false,
+    "bridgeProofMayRecordExactDriveFileId": true,
+    "byteHashDimensionAlphaValidationStillRequiredForAdmission": true,
+    "visualOrEquivalentIdentityQAStillRequiredWhereNotAlreadyFrozen": true
+  },
+  "representativeCoverageRequirement": {
+    "driveRarityRoots": ["LLR", "SSR", "SR", "R", "N"],
+    "requiredRootCoverage": 5,
+    "aliasCasesRequired": true,
+    "multiFileBasicFolderCounterexampleRetained": true
+  },
+  "populationApplicationGate": {
+    "structuredCandidateCountFromStage4_0": 244,
+    "previouslyAdmittedCount": 5,
+    "previouslyUnanchoredCount": 239,
+    "fullPopulationBridgeApplicationIsSeparateWorkUnit": true,
+    "noBulkAutoAdmissionFromRepresentativeProof": true
+  },
+  "forbidden": [
+    "Korean or other display-name matching as ownership proof",
+    "fuzzy or edit-distance filename matching",
+    "assuming HeroPainting asset spelling equals Drive runtime spelling",
+    "assuming 스킨 1 equals Skin sourceOrder 1 without exact asset evidence",
+    "choosing the first PNG in 기본",
+    "choosing _CH or _BG variants by guess",
+    "promoting bridge-proven files to admitted source without Stage 3 admission validation"
+  ],
+  "nextWhenProofPasses": "HERO_PORTRAIT_STAGE4_1B_STRUCTURED_DRIVE_BULK_MAPPING_APPLICATION"
+}
