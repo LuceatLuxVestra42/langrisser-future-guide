@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_8",
+  "status": "PROJECT_DOCTOR_EXPANSION_CONTRACT_FROZEN",
+  "purpose": "Extend the frozen Stage 7 Project Doctor without changing Stage 7 semantics: admit Banner as an explicit production page validation domain and expose Equipment Hosted QA as a deployment-dependent target. Skin remains deferred until its production evidence boundary is complete.",
+  "predecessor": {
+    "contract": "data/contracts/configdata-lookup-stage7-smart-regression-contract.v1.json",
+    "summary": "data/validation/configdata-lookup-stage7-summary.v1.json",
+    "requiredStatus": "PASS_CONFIGDATA_LOOKUP_STAGE7_SMART_REGRESSION"
+  },
+  "pipelineExtensions": {
+    "Banner": {
+      "kind": "PAGE_VALIDATION",
+      "domain": "Banner",
+      "command": ["node", "scripts/validate-banner-stage3-8-regression-freeze.mjs"],
+      "workflow": ".github/workflows/banner-stage3-8-regression-freeze.yml",
+      "requiresBunDependencies": true,
+      "manifest": "data/generated/banner-stage3-production-manifest.v1.json",
+      "requiredManifestStatus": "BANNER_STAGE3_FROZEN_READY",
+      "finalSummary": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+      "requiredFinalStatus": "PASS_BANNER_STAGE3_8_REGRESSION_FREEZE",
+      "ownedPathSources": ["manifest.stageCheckpoints[].path", "manifest.productionArtifacts[].path"],
+      "extraOwnedPaths": [
+        "data/generated/banner-stage3-production-manifest.v1.json",
+        "scripts/finalize-banner-stage3-8-regression-freeze.mjs",
+        "scripts/validate-banner-stage3-8-regression-freeze.mjs",
+        ".github/workflows/banner-stage3-8-regression-freeze.yml"
+      ],
+      "ownedPrefixes": [
+        "data/contracts/banner-stage3-",
+        "scripts/validate-banner-stage3-"
+      ]
+    }
+  },
+  "hostedQaTargets": {
+    "EquipmentHostedQA": {
+      "kind": "HOSTED_QA_TARGET",
+      "domain": "Equipment",
+      "command": ["node", "scripts/validate-equipment-image-stage3-hosted.mjs"],
+      "workflow": ".github/workflows/equipment-image-stage3-hosted-qa.yml",
+      "supportingSummary": "data/validation/equipment-image-stage3-hosted-qa-summary.v1.json",
+      "requiredSupportingStatus": "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA",
+      "ownedPaths": [
+        ".github/workflows/equipment-image-stage3-hosted-qa.yml",
+        "public/equipment-image-stage3-ready.json",
+        "src/lib/equipment-image-assets.ts",
+        "src/routes/equipment.tsx",
+        "src/routes/equipment_.exclusive.tsx",
+        "src/routes/equipment_.$equipmentId.tsx",
+        "scripts/validate-equipment-image-stage3-hosted.mjs",
+        "data/validation/equipment-image-stage3-frontend-summary.v1.json"
+      ],
+      "ownedPrefixes": ["public/images/equipment/"],
+      "projectDoctorExecutes": false,
+      "deferReason": "HOSTED_QA_REQUIRES_DEPLOYED_GITHUB_PAGES_STATE"
+    }
+  },
+  "deferredDomains": {
+    "Skin": {
+      "status": "DEFERRED_NOT_ADMITTED",
+      "reasonCode": "SKIN_STAGE3_2_AUTHORITATIVE_ASSET_EVIDENCE_PENDING",
+      "admissionRequirements": [
+        "complete authoritative static/Spine/model asset evidence",
+        "freeze a production page validator and workflow",
+        "freeze explicit owned input/output paths before impact selection"
+      ]
+    }
+  },
+  "selectionPolicy": {
+    "baseStage7": "Reuse the Stage 7 selector result exactly; do not reinterpret ConfigData ownership.",
+    "banner": "Select Banner only from the frozen Banner Stage 3 manifest-owned paths or explicit Stage 3 contract/validator prefixes declared here.",
+    "hostedQa": "Select a hosted QA target only from its explicit workflow-owned paths/prefixes; never infer it transitively from a page-domain selection.",
+    "skin": "Do not select Skin until its deferred admission requirements are satisfied by a new frozen contract.",
+    "pipelineOrder": ["ConfigDataLookup", "Hero", "Soldier", "Equipment", "Banner"],
+    "targetOrder": ["EquipmentHostedQA"]
+  },
+  "executionPolicy": {
+    "validationOnly": true,
+    "workflowDispatch": false,
+    "semanticRebuild": false,
+    "allowlistedCommandsOnly": true,
+    "hostedQaExecutedByProjectDoctor": false,
+    "hostedQaSelectionIsDeferredTarget": true,
+    "shellCommandConstructionFromChangedPath": false
+  },
+  "semanticBoundary": {
+    "stage7SemanticChange": false,
+    "newRelationDiscovery": false,
+    "canonicalRelationRecomputation": false,
+    "rawConfigDataMutation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "transitiveImpactInference": false,
+    "skinPrematureAdmission": false,
+    "wallClockMetadata": false
+  },
+  "outputs": {
+    "summary": "data/validation/configdata-lookup-stage8-summary.v1.json"
+  },
+  "validation": {
+    "validator": "scripts/validate-configdata-lookup-stage8.mjs",
+    "passStatus": "PASS_CONFIGDATA_LOOKUP_STAGE8_PROJECT_DOCTOR_EXPANSION"
+  }
+}

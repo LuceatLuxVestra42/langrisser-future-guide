@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_8",
+  "status": "PASS_CONFIGDATA_LOOKUP_STAGE8_PROJECT_DOCTOR_EXPANSION",
+  "contract": "data/contracts/configdata-lookup-stage8-project-doctor-expansion-contract.v1.json",
+  "predecessorStatus": "PASS_CONFIGDATA_LOOKUP_STAGE7_SMART_REGRESSION",
+  "executablePipelineCount": 5,
+  "domainPipelineCount": 4,
+  "domainPipelines": [
+    "Hero",
+    "Soldier",
+    "Equipment",
+    "Banner"
+  ],
+  "hostedQaTargetCount": 1,
+  "hostedQaTargets": [
+    "EquipmentHostedQA"
+  ],
+  "deferredDomains": [
+    "Skin"
+  ],
+  "banner": {
+    "manifestStatus": "BANNER_STAGE3_FROZEN_READY",
+    "freezeState": "BANNER_STAGE3_FROZEN",
+    "finalStatus": "PASS_BANNER_STAGE3_8_REGRESSION_FREEZE",
+    "canonicalDefinitions": 77,
+    "canonicalOccurrences": 94,
+    "ownedExactPathCount": 23,
+    "ownedPrefixCount": 2
+  },
+  "hostedQa": {
+    "equipmentStatus": "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA",
+    "equipmentFreezeState": "EQUIPMENT_IMAGE_STAGE3_FROZEN",
+    "explicitPathCount": 8,
+    "explicitPrefixCount": 1,
+    "projectDoctorExecutes": false
+  },
+  "executionMode": "VALIDATION_ONLY_WITH_DEFERRED_HOSTED_TARGETS",
+  "semanticBoundary": {
+    "stage7ReusedWithoutSemanticChange": true,
+    "explicitOwnershipOnly": true,
+    "hostedQaTransitiveInference": false,
+    "hostedQaWorkflowDispatch": false,
+    "skinAdmitted": false,
+    "semanticRebuild": false,
+    "newRelationDiscovery": false,
+    "canonicalRelationRecomputation": false,
+    "rawConfigDataMutation": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false,
+    "wallClockMetadataUsed": false
+  }
+}
