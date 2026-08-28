@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage2-representative-resolution-proof",
+  "schemaId": "hero-portrait-stage2-representative-resolution-proof-contract/v1",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Prove that the existing explicit Google Drive base-skin PNG source family is directly readable, byte-identical to the frozen five-Hero sample manifest, visually clean, and suitable as the representative canonical PNG source candidate before any population-wide expansion.",
+  "upstream": {
+    "stage1Checkpoint": "data/checkpoints/hero-portrait-stage1-asset-locator-inventory.v1.json",
+    "sampleManifest": "data/generated/hero-portrait-presentation-sample.v1.json",
+    "artworkIndex": "data/generated/hero-card-artwork-stage4.v1.json"
+  },
+  "proofSet": {
+    "heroIds": [5, 6, 8, 12, 15],
+    "count": 5,
+    "selectionReason": "All five already have explicit Drive file IDs, source hashes, dimensions, alpha policy, and clean-character-art provenance in the frozen sample manifest."
+  },
+  "sourceAdmissionRules": [
+    "Use only a frozen explicit Drive file ID or a separately proven explicit Hero ID to source mapping.",
+    "Generic Hero-name or filename-similarity search is not authoritative and cannot admit a source file.",
+    "Drive readback MIME type must be image/png.",
+    "Live byte length, SHA-256, dimensions, and alpha properties must match frozen evidence when frozen evidence exists.",
+    "The image must contain the intended Hero's clean character artwork with transparency and without baked rarity, SP, faction-buff, or other UI decoration.",
+    "Base-skin admission requires provenance consistent with GOOGLE_DRIVE_BASE_SKIN_PNG; SkinNN or otherwise ambiguous variants are not admitted by inference."
+  ],
+  "representativeOutputRule": {
+    "candidateMode": "LOSSLESS_SOURCE_PNG_BYTES",
+    "targetPattern": "public/images/heroes/cards/{heroId}.png",
+    "crop": "NONE_IN_STAGE2",
+    "resize": "NONE_IN_STAGE2",
+    "reencode": "NONE_IN_STAGE2",
+    "frontendInstallation": false,
+    "note": "Stage 2 proves source suitability only. The population-wide deterministic extraction/materialization contract remains Stage 3 work."
+  },
+  "completionCondition": "All five proof-set source PNGs are directly readable by explicit Drive ID and pass byte identity, PNG decode, dimensions, RGBA/alpha, Hero identity, base-skin provenance, and decoration-contamination checks with zero hard errors.",
+  "forbidden": [
+    "267-Hero bulk Drive search",
+    "fuzzy filename ownership inference",
+    "SkinNN source substitution",
+    "Unity locator to web path inference",
+    "public/images/heroes/cards installation during Stage 2",
+    "claiming 267-Hero Drive coverage from the five-Hero proof set"
+  ],
+  "nextStage": "HERO_PORTRAIT_STAGE3_EXTRACTION_CONTRACT_FREEZE"
+}
