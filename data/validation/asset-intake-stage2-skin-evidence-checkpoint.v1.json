@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "stage": "ASSET_INTAKE_STAGE_2_REAL_EVIDENCE",
-  "status": "REPRESENTATIVE_PATH_EVIDENCE_COMPLETE_RESOURCE_ID_PENDING",
+  "status": "RESOURCE_ID_MAP_COMPLETE_MODEL_ASSET_ENTRY_PENDING",
   "canonicalType": "Skin",
   "representatives": [
     "102",
@@ -17,13 +17,15 @@
   "confirmedSourceLineage": {
     "staticAndSpineLocatorSource": "data/configdata/ConfigDataCharImageSkinResourceInfo.json",
     "modelBindingIdSource": "data/configdata/ConfigDataHeroSkinInfo.json",
+    "authoritativeModelResourcePathMap": "begin_configdata_configdata_abs.b::ConfigDataModelSkinResourceInfo",
     "note": "Reuse Stage 1/3-1 generated metadata. Do not re-derive Hero-Skin ownership, sourceOrder, locator strings, or model binding IDs."
   },
   "evidenceSources": {
     "legacyStaticRawBytes": "data/evidence/skin-stage3-2-static-source-evidence.v1.json",
     "unityBundlePathEvidence": "data/evidence/skin-stage3-2-unity-bundle-evidence.v1.json",
     "skin102BeginStaticEvidence": "data/evidence/skin-stage3-2-mathew-begin-static-evidence.v1.json",
-    "skin102BeginSpineEvidence": "data/evidence/skin-stage3-2-mathew-begin-spine-evidence.v1.json"
+    "skin102BeginSpineEvidence": "data/evidence/skin-stage3-2-mathew-begin-spine-evidence.v1.json",
+    "authoritativeModelResourceMap": "data/evidence/skin-stage3-2-configdata-model-resource-map-evidence.v1.json"
   },
   "coverage": {
     "representativeExpected": 3,
@@ -35,6 +37,8 @@
     "spineAuthoritativePathResolved": 3,
     "recordsWithStaticAndSpinePathResolved": 3,
     "modelResourceIdsExpected": 7,
+    "modelResourceIdsMappedToPrefabPath": 7,
+    "modelResourceIdsAuthoritativeAssetEntryResolved": 0,
     "modelResourceIdsResolved": 0,
     "finalNormalizedResolvedRecords": 0
   },
@@ -44,24 +48,27 @@
       "static": "UI/Icon/HeroSkin_ABS/Skin/Skin_Matthew_01.png",
       "spine": "Spine/Char/Mathew_ABS/Mathew_Skin01_Prefab.prefab",
       "pathEvidenceStatus": "CONFIRMED",
+      "resourceIdMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
       "normalizedResolutionClass": "PENDING",
-      "pendingReason": "RESOURCE_ID_EVIDENCE_NOT_YET_MAPPED"
+      "pendingReason": "MODEL_PREFAB_BUNDLE_ENTRY_NOT_YET_VERIFIED"
     },
     {
       "canonicalKey": "1901",
       "static": "UI/Icon/HeroSkin2_ABS/Skin/Skin_Lista_Skin01.png",
       "spine": "Spine/Char/Lista_ABS/Lista_Skin01_Prefab.prefab",
       "pathEvidenceStatus": "CONFIRMED",
+      "resourceIdMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
       "normalizedResolutionClass": "PENDING",
-      "pendingReason": "RESOURCE_ID_EVIDENCE_NOT_YET_MAPPED"
+      "pendingReason": "MODEL_PREFAB_BUNDLE_ENTRY_NOT_YET_VERIFIED"
     },
     {
       "canonicalKey": "3701",
       "static": "UI/Icon/HeroSkin_ABS/Skin/Skin_Zigodlla_01.png",
       "spine": "Spine/Char/Zigodlla_ABS/Zigodlla_Skin01_Prefab.prefab",
       "pathEvidenceStatus": "CONFIRMED",
+      "resourceIdMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
       "normalizedResolutionClass": "PENDING",
-      "pendingReason": "RESOURCE_ID_EVIDENCE_NOT_YET_MAPPED"
+      "pendingReason": "MODEL_PREFAB_BUNDLE_ENTRY_NOT_YET_VERIFIED"
     }
   ],
   "modelResourceIds": [
@@ -73,23 +80,69 @@
     1901,
     3701
   ],
+  "modelResourcePrefabMap": [
+    {
+      "skinResourceId": 102,
+      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01/Mathew_Skin01_Prefab.prefab"
+    },
+    {
+      "skinResourceId": 1021,
+      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_1/Mathew_Skin01_1_Prefab.prefab"
+    },
+    {
+      "skinResourceId": 1022,
+      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_2/Mathew_Skin01_2_Prefab.prefab"
+    },
+    {
+      "skinResourceId": 1023,
+      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_3/Mathew_Skin01_3_Prefab.prefab",
+      "alternateAirPrefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_3/Mathew_Skin01_3_air_Prefab.prefab"
+    },
+    {
+      "skinResourceId": 1024,
+      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_4/Mathew_Skin01_4_Prefab.prefab"
+    },
+    {
+      "skinResourceId": 1901,
+      "prefabPath": "Spine/General/Lista_ABS/Lista_Skin01/Lista_Skin01_Prefab.prefab"
+    },
+    {
+      "skinResourceId": 3701,
+      "prefabPath": "Spine/General/Zigodlla_ABS/Zigodlla_Skin01/Zigodlla_Skin01_Prefab.prefab"
+    }
+  ],
+  "nextBundleCandidateSet": {
+    "Mathew_ABS": [
+      "begin_spine_general_mathew_abs.b",
+      "spine_general_mathew_abs.b"
+    ],
+    "Lista_ABS": [
+      "begin_spine_general_lista_abs.b",
+      "spine_general_lista_abs.b"
+    ],
+    "Zigodlla_ABS": [
+      "spine_general_zigodlla_abs.b"
+    ],
+    "status": "EXACT_FILENAMES_PRESENT_IN_UPLOADED_BUNDLE_LIST_MEMBERSHIP_NOT_YET_VERIFIED"
+  },
   "verifiedFacts": [
-    "Skin 102 static frozen locator is reproduced by the embedded runtime path assets/gameproject/runtimeassets/ui/icon/heroskin_abs/skin/skin_matthew_01.png in begin_ui_icon_heroskin_abs.b, modulo path casing only.",
-    "Skin 102 Spine frozen locator is reproduced by the embedded runtime path assets/gameproject/runtimeassets/spine/char/mathew_abs/mathew_skin01_prefab.prefab in begin_spine_char_mathew_abs.b, modulo path casing only.",
-    "Skin 1901 static and Spine frozen locators are reproduced by embedded runtime paths in ui_icon_heroskin2_abs.b and spine_char_lista_abs.b respectively, modulo path casing only.",
-    "Skin 3701 static and Spine frozen locators are reproduced by embedded runtime paths in ui_icon_heroskin_abs.b and spine_char_zigodlla_abs.b respectively, modulo path casing only.",
-    "All three representative records now have authoritative static and Spine path evidence from UnityFS bundle contents.",
-    "The earlier Mathew Skin01 Range prefab is retained as a separate nearby variant and is not used as the exact Skin 102 Spine proof.",
-    "No authoritative file-path or byte mapping has yet been verified for model resource IDs 102, 1021, 1022, 1023, 1024, 1901, or 3701."
+    "All three representative records have authoritative static and character-Spine path evidence from UnityFS bundle contents.",
+    "The user-supplied begin_configdata_configdata_abs.b is UnityFS 2022.3.62f2 and contains ConfigDataHeroSkinInfo, ConfigDataCharImageSkinResourceInfo, and ConfigDataModelSkinResourceInfo.",
+    "ConfigDataHeroSkinInfo reproduces the frozen jobConnectionId + skinResourceId bindings for Skin 102, 1901, and 3701.",
+    "ConfigDataCharImageSkinResourceInfo reproduces the frozen static and character-Spine locators for Skin 102, 1901, and 3701.",
+    "ConfigDataModelSkinResourceInfo maps all seven representative model resource IDs exactly once to explicit Spine/General Prefab paths.",
+    "No numeric resource ID arithmetic, fuzzy matching, or inferred ID-to-path conversion was used.",
+    "The mapped model Prefab paths have not yet been verified as actual entries or bytes inside the corresponding Spine/General bundles, so final normalized RESOLVED remains blocked."
   ],
   "blockers": [
-    "AUTHORITATIVE_MODEL_RESOURCE_MAP_OR_SOURCE_REQUIRED"
+    "AUTHORITATIVE_MODEL_PREFAB_BUNDLE_ENTRY_OR_BYTES_REQUIRED"
   ],
   "rejectedShortcuts": [
-    "Do not derive model asset paths from numeric resource IDs.",
+    "Do not treat ConfigData resource-path mapping alone as extracted model asset bytes.",
+    "Do not infer begin/non-begin bundle membership from filename conventions.",
     "Do not use ID arithmetic or cross-root fallback.",
     "Do not use fuzzy filename matching.",
-    "Do not claim normalized RESOLVED for any representative until its RESOURCE_ID evidence requirement is satisfied."
+    "Do not claim normalized RESOLVED for any representative until its mapped model Prefab path is verified in authoritative bundle contents."
   ],
-  "nextStartPoint": "Acquire an explicit source map or equivalent authoritative evidence for model resource IDs 102, 1021, 1022, 1023, 1024, 1901, and 3701. Then generate the final representative evidence without recomputing frozen Skin ownership, sourceOrder, static locators, or Spine locators."
+  "nextStartPoint": "Inspect begin_spine_general_mathew_abs.b and spine_general_mathew_abs.b for the five Mathew mapped Prefab paths; inspect begin_spine_general_lista_abs.b and spine_general_lista_abs.b for Lista 1901; inspect spine_general_zigodlla_abs.b for Zigodlla 3701. Confirm exact bundle entries/bytes, then generate the final representative evidence without recomputing frozen Skin ownership, sourceOrder, static locators, Spine locators, model bindings, or resource-path mappings."
 }
