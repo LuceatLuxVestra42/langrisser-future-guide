@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "stage": "D1-1",
+  "checkpoint": "PROJECT_DOCTOR_D1_1_COLLECTOR",
+  "status": "PASS_PROJECT_DOCTOR_D1_1_COLLECTOR",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/project-doctor-d1-0-contract.v1.json",
+  "output": "data/generated/project-doctor-d1-1-status.v1.json",
+  "projectHealth": "REVIEW",
+  "checks": {
+    "contractFrozen": true,
+    "domainCount": {
+      "expected": 6,
+      "actual": 6,
+      "pass": true
+    },
+    "missingDomainCount": 0,
+    "inconsistentDomainCount": 0,
+    "failedDomainCount": 0,
+    "sourceReadIssueCount": 0,
+    "validatorExecutionCount": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "productionDataWriteCount": 0
+  },
+  "healthCounts": {
+    "PASS": 0,
+    "REVIEW": 6,
+    "FAIL": 0,
+    "MISSING": 0,
+    "INCONSISTENT": 0,
+    "UNKNOWN": 0
+  },
+  "lifecycleCounts": {
+    "FROZEN": 4,
+    "COMPLETE": 1,
+    "IN_PROGRESS": 1,
+    "UNKNOWN": 0
+  },
+  "knownHardErrorTotal": 0,
+  "reviewTotal": 31,
+  "blockerTotal": 1,
+  "domainStates": {
+    "hero": {
+      "lifecycle": "FROZEN",
+      "health": "REVIEW",
+      "rawStatus": "PASS_WITH_REVIEW",
+      "population": {
+        "canonicalHeroCount": 267
+      },
+      "hardErrorCount": 0,
+      "reviewCount": 2,
+      "blockerCount": 0
+    },
+    "soldier": {
+      "lifecycle": "COMPLETE",
+      "health": "REVIEW",
+      "rawStatus": "PASS",
+      "population": {
+        "canonicalSoldiers": 224,
+        "normalSoldiers": 168,
+        "spSoldiers": 56,
+        "heroSoldierRelations": 5977
+      },
+      "hardErrorCount": 0,
+      "reviewCount": 12,
+      "blockerCount": 0
+    },
+    "equipment": {
+      "lifecycle": "FROZEN",
+      "health": "REVIEW",
+      "rawStatus": "PASS_WITH_REVIEW",
+      "population": {
+        "canonical": 390,
+        "public": 373,
+        "general": 206,
+        "exclusive": 167
+      },
+      "hardErrorCount": 0,
+      "reviewCount": 3,
+      "blockerCount": 0
+    },
+    "hero-soldier": {
+      "lifecycle": "FROZEN",
+      "health": "REVIEW",
+      "rawStatus": "PASS_WITH_REVIEW",
+      "population": {
+        "heroCount": 267,
+        "soldierCount": 224,
+        "canonicalPairCount": 5977
+      },
+      "hardErrorCount": 0,
+      "reviewCount": 5,
+      "blockerCount": 0
+    },
+    "banner": {
+      "lifecycle": "FROZEN",
+      "health": "REVIEW",
+      "rawStatus": "PASS_BANNER_STAGE3_8_REGRESSION_FREEZE",
+      "population": {
+        "definitions": 77,
+        "occurrences": 94
+      },
+      "hardErrorCount": 0,
+      "reviewCount": 8,
+      "blockerCount": 0
+    },
+    "skin": {
+      "lifecycle": "IN_PROGRESS",
+      "health": "REVIEW",
+      "rawStatus": "READY_FOR_ASSET_EVIDENCE",
+      "population": {
+        "skinCount": 540,
+        "heroCount": 267
+      },
+      "hardErrorCount": null,
+      "reviewCount": 1,
+      "blockerCount": 1
+    }
+  },
+  "nextStage": null
+}

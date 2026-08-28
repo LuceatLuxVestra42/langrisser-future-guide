@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-d5-freshness/v1",
+  "stage": "D5",
+  "checkpoint": "PROJECT_DOCTOR_D5_FRESHNESS_GUARD",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Prevent Project Doctor status outputs from being trusted when their authoritative sources, producer scripts, contracts, or generated health outputs have changed since the last explicit successful D1 refresh seal.",
+  "d1Contract": "data/contracts/project-doctor-d1-0-contract.v1.json",
+  "d1HealthGateContract": "data/contracts/project-doctor-d1-2-health-gate.v1.json",
+  "d1StatusRunner": "scripts/run-project-doctor-d1-3.mjs",
+  "manifestPath": "data/generated/project-doctor-d5-freshness.v1.json",
+  "coreInputPaths": [
+    "data/contracts/project-doctor-d1-0-contract.v1.json",
+    "data/contracts/project-doctor-d1-2-health-gate.v1.json",
+    "scripts/collect-project-doctor-d1-1.mjs",
+    "scripts/validate-project-doctor-d1-2.mjs",
+    "scripts/run-project-doctor-d1-3.mjs",
+    "scripts/run-project-doctor-d5-refresh.mjs",
+    "scripts/validate-project-doctor-d5.mjs"
+  ],
+  "outputPaths": [
+    "data/generated/project-doctor-d1-1-status.v1.json",
+    "data/validation/project-doctor-d1-1-summary.v1.json",
+    "data/validation/project-doctor-d1-2-summary.v1.json"
+  ],
+  "outputStatusRules": [
+    {
+      "path": "data/generated/project-doctor-d1-1-status.v1.json",
+      "field": "status",
+      "equals": "COLLECTED"
+    },
+    {
+      "path": "data/validation/project-doctor-d1-1-summary.v1.json",
+      "field": "status",
+      "equals": "PASS_PROJECT_DOCTOR_D1_1_COLLECTOR"
+    },
+    {
+      "path": "data/validation/project-doctor-d1-2-summary.v1.json",
+      "field": "status",
+      "equals": "PASS_PROJECT_DOCTOR_D1_2_HEALTH_GATE"
+    }
+  ],
+  "sourceDiscovery": {
+    "mode": "D1_CONTRACT_DYNAMIC",
+    "primary": "domains.*.primaryStatusSource",
+    "supplemental": "domains.*.supplementalSources[].path",
+    "rawConfigDataReads": false,
+    "filenameInference": false
+  },
+  "refreshPolicy": {
+    "explicitRefreshOnly": true,
+    "runD1BeforeSnapshotCommit": true,
+    "hashAlgorithm": "git-blob-sha1",
+    "hashDefinition": "SHA1 over UTF-8/raw file bytes prefixed with Git blob header: blob <byteLength>\\0",
+    "hashContentNotMtime": true,
+    "verifyInputsStableBeforeAndAfterD1": true,
+    "abortIfInputChangesDuringRefresh": true,
+    "requireAllOutputsAfterD1": true,
+    "writeManifestOnlyAfterStableSuccessfulD1": true,
+    "validateImmediatelyAfterManifestWrite": true
+  },
+  "validationPolicy": {
+    "requireExactAuthoritativeSourceSet": true,
+    "requireExactInputPathSet": true,
+    "requireExactOutputPathSet": true,
+    "requireInputHashesMatch": true,
+    "requireOutputHashesMatch": true,
+    "requireOutputStatusesMatch": true,
+    "missingInputOrOutputIsStale": true,
+    "normalDoctorRunNeverAutoReseals": true,
+    "staleDoesNotRewriteCanonicalData": true
+  },
+  "exitPolicy": {
+    "FRESH": 0,
+    "STALE": 4,
+    "INVALID_INPUT": 2,
+    "SOURCE_CHANGED_DURING_REFRESH": 5
+  },
+  "boundaries": {
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "domainValidatorExecutionAdded": false,
+    "productionMutation": false,
+    "canonicalMutation": false,
+    "frontendMutation": false,
+    "githubActions": false
+  },
+  "nextStage": "D6",
+  "nextStageGoal": "Run the integrated Project Doctor freshness and changed-file execution chain in CI or another executable repository environment, then add GitHub Actions only after live command proof is available."
+}

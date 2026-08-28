@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "stage": "D2-IMPACT",
+  "checkpoint": "PROJECT_DOCTOR_D2_IMPACT_ANALYZER",
+  "status": "PASS_PROJECT_DOCTOR_D2_IMPACT",
+  "completion": "COMPLETE",
+  "branch": "work/project-doctor-closeout",
+  "contract": "data/contracts/project-doctor-d2-impact-contract.v1.json",
+  "baseMap": "data/contracts/project-doctor-d2-dependency-map.v1.json",
+  "analyzer": "scripts/analyze-project-doctor-d2-impact.mjs",
+  "validator": "scripts/validate-project-doctor-d2-impact.mjs",
+  "scope": {
+    "changedFileInputResolution": true,
+    "pathNormalization": true,
+    "dependencyPropagation": true,
+    "domainProjection": true,
+    "gitDiffInspection": false,
+    "validatorSelection": false,
+    "validatorExecution": false,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "githubActions": false
+  },
+  "inputModes": {
+    "argv": "npm run doctor:impact -- <repository-relative-path...>",
+    "stdinLines": "newline-delimited repository-relative paths with --stdin",
+    "stdinJson": "JSON array of repository-relative path strings with --stdin"
+  },
+  "exitPolicy": {
+    "MAPPED": 0,
+    "MANUAL_REVIEW": 3,
+    "INVALID_INPUT": 2
+  },
+  "counts": {
+    "fixtureCount": 13,
+    "fixturePassCount": 13,
+    "fixtureFailureCount": 0,
+    "pathRuleOverlayCount": 2
+  },
+  "verifiedBehaviors": [
+    "repository-relative argv path input",
+    "newline-delimited stdin input",
+    "JSON-array stdin input",
+    "leading ./ normalization",
+    "Windows backslash normalization",
+    "duplicate normalized path deduplication",
+    "all matching path rules unioned",
+    "transitive propagation through explicit D2-MAP edges only",
+    "aggregate impact-node and domain projection across multiple changed files",
+    "unknown ConfigData remains MANUAL_REVIEW",
+    "parent traversal is INVALID_INPUT",
+    "Soldier WebP post-map asset path maps to soldier-assets without reopening canonical semantics",
+    "Project Doctor workflow path maps to project-doctor tooling only without semantic domain fanout"
+  ],
+  "postMapOverlays": [
+    {
+      "id": "soldier-webp-assets-post-map",
+      "pattern": "public/images/soldiers-webp/**",
+      "directNode": "soldier-assets",
+      "domains": ["soldier"],
+      "canonicalSemanticsReopened": false
+    },
+    {
+      "id": "project-doctor-workflow-post-map",
+      "pattern": ".github/workflows/project-doctor-*.yml",
+      "directNode": "project-doctor",
+      "domains": [],
+      "canonicalSemanticsReopened": false
+    }
+  ],
+  "verificationEvidence": {
+    "isolatedFunctionalExpectation": "PASS_13_OF_13",
+    "githubActionsPullRequestRunId": 33149632015,
+    "githubActionsPullRequestJobId": 98778360191,
+    "githubActionsValidatorResult": "PASS_PROJECT_DOCTOR_D2_IMPACT",
+    "githubActionsExecutionConclusion": "success",
+    "stdinLineParsing": "PASS",
+    "stdinJsonParsing": "PASS"
+  },
+  "keyBoundaries": [
+    "Only D2-MAP explicit propagation edges may expand impact.",
+    "Unmatched paths remain MANUAL_REVIEW; no all-domain fanout or filename-similarity inference is allowed.",
+    "Soldier WebP and Project Doctor workflow families are explicit post-map path-rule overlays only.",
+    "Project Doctor workflow files affect Doctor tooling only and do not reopen Hero, Soldier, Equipment, Banner, Skin, or Hero-Soldier semantics.",
+    "D2-IMPACT itself does not select or execute validators; D3 and D4 retain those responsibilities."
+  ],
+  "failures": [],
+  "hardErrorCount": 0,
+  "nextStage": "D3",
+  "nextStageGoal": "Feed real git/PR changed-file sets into D2-IMPACT and select only approved validators from affected nodes."
+}

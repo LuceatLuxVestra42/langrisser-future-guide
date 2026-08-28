@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-d4-execution/v1",
+  "stage": "D4",
+  "checkpoint": "PROJECT_DOCTOR_D4_EXECUTION",
+  "status": "DESIGN_FROZEN",
+  "d3Contract": "data/contracts/project-doctor-d3-validator-plan.v1.json",
+  "purpose": "Execute only the checks selected by the frozen D3 plan after validating the entire queue against the exact D3 catalog. D4 does not invent owning validators or reinterpret manual review gaps.",
+  "scope": {
+    "d3PlanConsumption": true,
+    "fullQueuePreflight": true,
+    "selectedCheckExecution": true,
+    "failFast": true,
+    "dryRun": true,
+    "rawConfigDataReadByRunner": false,
+    "semanticRecomputationByRunner": false,
+    "owningValidatorDiscovery": false,
+    "githubActions": false
+  },
+  "allowedCheckIds": [
+    "configdata-integrity",
+    "production-build",
+    "doctor-health-gate",
+    "doctor-impact-self-test",
+    "doctor-plan-self-test"
+  ],
+  "executionPolicy": {
+    "preflightEntireQueueBeforeExecution": true,
+    "commandMustExactlyMatchD3Catalog": true,
+    "phaseMustExactlyMatchD3Catalog": true,
+    "allowedCommandShape": "npm run <verified-script-name>",
+    "shell": false,
+    "sortByPhaseThenId": true,
+    "failFastOnFirstNonZero": true,
+    "executeSafeChecksWhenManualReviewExists": true,
+    "manualReviewSurvivesSuccessfulChecks": true,
+    "unknownOrTamperedCheckExecutesNothing": true,
+    "doNotInventMissingCommands": true
+  },
+  "resultStatus": {
+    "PASS_EXECUTED": 0,
+    "PASS_DRY_RUN": 0,
+    "PASS_NO_CHANGES": 0,
+    "FAIL_CHECK": 1,
+    "INVALID_PLAN": 2,
+    "REVIEW_MANUAL": 3
+  },
+  "sideEffectBoundary": {
+    "runnerDirectWrites": [],
+    "runnerDirectSemanticWrites": false,
+    "childCommandsMayWriteTheirOwnGeneratedArtifacts": true,
+    "note": "D4 inherits the documented behavior of selected repository commands. For example, the current production build runs the Equipment KR presentation generator before Vite build. D4 does not treat child-command generated output as a semantic authority change."
+  },
+  "manualReviewBoundary": "All D3 manual-review nodes remain unresolved unless a later frozen contract explicitly promotes their owning validator. Successful execution of build or generic integrity checks does not clear those reviews.",
+  "outOfScope": [
+    "GitHub Actions wiring",
+    "stale-output or source-freshness proof",
+    "automatic promotion of historical or partial validators",
+    "hosted/browser/mobile QA",
+    "raw ConfigData semantic recomputation"
+  ],
+  "nextStage": "D5",
+  "nextStageGoal": "Add stale-output and source-freshness guards so successful validators cannot accept outdated derived checkpoints."
+}

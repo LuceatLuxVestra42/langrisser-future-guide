@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "stage": "D2-MAP",
+  "checkpoint": "PROJECT_DOCTOR_D2_DEPENDENCY_MAP",
+  "status": "PASS_PROJECT_DOCTOR_D2_DEPENDENCY_MAP",
+  "completion": "COMPLETE",
+  "branch": "work/project-doctor-d1",
+  "map": "data/contracts/project-doctor-d2-dependency-map.v1.json",
+  "validator": "scripts/validate-project-doctor-d2-map.mjs",
+  "scope": {
+    "dependencyMapOnly": true,
+    "gitDiffInspection": false,
+    "validatorSelection": false,
+    "validatorExecution": false,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "githubActions": false
+  },
+  "counts": {
+    "doctorDomains": 6,
+    "impactNodes": 20,
+    "pathRules": 37,
+    "propagationEdges": 16,
+    "fixtures": 11,
+    "fixturePass": 11,
+    "fixtureFail": 0
+  },
+  "keyPolicies": [
+    "Frontend-only and asset-only changes never reopen canonical semantics by propagation.",
+    "All path-rule matches are unioned; only explicit propagation edges expand impact.",
+    "Unknown paths are MANUAL_REVIEW rather than all-domain fanout.",
+    "Unknown ConfigData files are MANUAL_REVIEW; ConfigData rules are exact filenames only.",
+    "Hero-Soldier and Hero-Equipment shared relations are represented as separate impact nodes.",
+    "Shared frontend/build changes affect only currently integrated production page domains: Hero, Soldier, Equipment, Banner."
+  ],
+  "representativeMappings": [
+    {
+      "path": "src/routes/heroes_.$heroId.tsx",
+      "direct": ["hero-frontend"],
+      "domains": ["hero"]
+    },
+    {
+      "path": "public/images/soldiers/5102.png",
+      "direct": ["soldier-assets"],
+      "domains": ["soldier"]
+    },
+    {
+      "path": "data/configdata/ConfigDataSoldierInfo.json",
+      "direct": ["soldier-canonical"],
+      "domains": ["soldier", "hero-soldier", "hero"]
+    },
+    {
+      "path": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+      "direct": ["hero-soldier-relation"],
+      "domains": ["hero-soldier", "hero", "soldier"]
+    },
+    {
+      "path": "data/validation/equipment-image-stage0-summary.v1.json",
+      "direct": ["equipment-assets"],
+      "domains": ["equipment"]
+    },
+    {
+      "path": "data/validation/skin-stage3-2-readiness.v1.json",
+      "direct": ["skin-assets"],
+      "domains": ["skin"]
+    },
+    {
+      "path": "data/configdata/ConfigDataUnknownFutureTable.json",
+      "direct": [],
+      "domains": [],
+      "unmatched": "MANUAL_REVIEW"
+    }
+  ],
+  "verificationEvidence": {
+    "isolatedNodeSyntaxCheck": "PASS",
+    "isolatedMapValidation": "PASS_11_OF_11_FIXTURES",
+    "unknownConfigDataFallback": "PASS_MANUAL_REVIEW",
+    "repositoryLiveValidatorExecution": "NOT_RUN_NO_REPOSITORY_EXECUTION_CONNECTOR"
+  },
+  "mainDriftBoundary": {
+    "mapCreatedBeforeBranchSync": true,
+    "knownMainOnlyFamilyIncluded": "Equipment Image Stage 0",
+    "branchSyncRequiredBeforeMerge": true
+  },
+  "hardErrorCount": 0,
+  "failures": [],
+  "nextStage": "D2-IMPACT",
+  "nextStageGoal": "Implement changed-file input resolution against this frozen map. Do not select or execute validators yet."
+}

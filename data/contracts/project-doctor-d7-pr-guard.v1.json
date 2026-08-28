@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-d7-pr-guard/v1",
+  "stage": "D7",
+  "checkpoint": "PROJECT_DOCTOR_D7_PR_MERGE_GUARD",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Promote the proven read-only Project Doctor runtime into a pull-request-facing merge guard that evaluates the real PR diff against the current target branch, preserves D4 manual-review fail-closed behavior, and never reseals D5 freshness in CI.",
+  "workflow": ".github/workflows/project-doctor-d7-pr-guard.yml",
+  "targetBaseBranch": "main",
+  "checkIdentity": {
+    "workflowName": "Project Doctor PR Guard",
+    "jobName": "pr-guard",
+    "requiredStatusCheckCandidate": "Project Doctor PR Guard / pr-guard"
+  },
+  "events": {
+    "pull_request": {
+      "branches": ["main"],
+      "types": ["opened", "synchronize", "reopened", "ready_for_review"]
+    },
+    "pushProofBranch": "work/project-doctor-closeout",
+    "workflowDispatch": true,
+    "pullRequestTargetForbidden": true
+  },
+  "runtime": {
+    "runner": "ubuntu-latest",
+    "nodeVersion": "22",
+    "packageManager": "bun",
+    "install": "bun install --frozen-lockfile",
+    "checkoutFetchDepth": 0
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "changedFilePolicy": {
+    "pullRequestBase": "origin/${github.event.pull_request.base.ref}",
+    "pullRequestBaseResolution": "fetch target branch at workflow runtime and compare against its remote-tracking ref",
+    "pullRequestHead": "github.event.pull_request.head.sha",
+    "comparison": "base...head",
+    "pushProofBase": "origin/main",
+    "pushProofHead": "HEAD",
+    "useRealChangedFiles": true,
+    "representativePathOverride": false,
+    "staleEventBaseShaForbidden": true,
+    "unmappedPathBehavior": "MANUAL_REVIEW",
+    "manualReviewExitCode": 3,
+    "manualReviewMustFailWorkflow": true
+  },
+  "requiredSteps": [
+    "npm run doctor:pr-guard:validate",
+    "npm run doctor:freshness:validate",
+    "npm run doctor:status",
+    "git diff --exit-code -- data/generated/project-doctor-d1-1-status.v1.json data/validation/project-doctor-d1-1-summary.v1.json data/validation/project-doctor-d1-2-summary.v1.json",
+    "npm run doctor:freshness:validate",
+    "git fetch --no-tags origin $PR_BASE_REF",
+    "npm run doctor -- --dry-run --base $DOCTOR_BASE --head $DOCTOR_HEAD",
+    "npm run doctor -- --base $DOCTOR_BASE --head $DOCTOR_HEAD"
+  ],
+  "securityPolicy": {
+    "repositoryWritePermission": false,
+    "freshnessRefreshInWorkflow": false,
+    "pullRequestTarget": false,
+    "secretsRequired": false,
+    "forkCodeRunsWithWriteToken": false
+  },
+  "mergePolicy": {
+    "workflowFailureBlocksRequiredCheckWhenConfigured": true,
+    "manualReviewIsNonPassing": true,
+    "staleFreshnessIsNonPassing": true,
+    "validatorFailureIsNonPassing": true,
+    "requiredStatusCheckConfigurationIsRepositoryAdminState": true
+  },
+  "repositoryEnforcement": {
+    "rulesetObservedAtDesignTime": "NONE",
+    "branchProtectionRead": "CONNECTOR_403",
+    "requiredStatusCheckConfiguredByThisStage": false,
+    "reason": "Repository-admin enforcement is external state. D7 proves the PR check and its fail-closed runtime behavior without changing branch protection."
+  },
+  "boundaries": {
+    "rawConfigDataSemanticRecomputationAdded": false,
+    "canonicalMutation": false,
+    "frontendMutation": false,
+    "freshnessAutoReseal": false,
+    "missingOwningValidatorInvented": false,
+    "validatorScopeBroadened": false
+  },
+  "completionRule": "D7 runtime guard proof requires an actual pull_request-triggered workflow run against main whose pr-guard job succeeds using the current fetched target branch and PR head comparison. Repository required-check enforcement is recorded separately because it is admin configuration, not workflow runtime proof.",
+  "nextStage": "D7-ADMIN",
+  "nextStageGoal": "Keep the proven status check required on main and retain current-target-branch diff semantics as main advances."
+}

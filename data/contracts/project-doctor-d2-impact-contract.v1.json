@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-d2-impact-contract/v1",
+  "stage": "D2-IMPACT",
+  "checkpoint": "PROJECT_DOCTOR_D2_IMPACT_CONTRACT",
+  "status": "DESIGN_FROZEN",
+  "baseMap": "data/contracts/project-doctor-d2-dependency-map.v1.json",
+  "purpose": "Resolve an explicit list of changed repository paths into direct impact nodes, transitive explicit dependencies, and Project Doctor domains without selecting or executing validators.",
+  "scope": {
+    "changedFileInputResolution": true,
+    "pathNormalization": true,
+    "dependencyPropagation": true,
+    "domainProjection": true,
+    "gitDiffInspection": false,
+    "validatorSelection": false,
+    "validatorExecution": false,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "githubActions": false
+  },
+  "inputModes": {
+    "argv": "npm run doctor:impact -- <repository-relative-path...>",
+    "stdinLines": "newline-delimited repository-relative paths with --stdin",
+    "stdinJson": "JSON array of repository-relative path strings with --stdin"
+  },
+  "normalizationPolicy": {
+    "stripLeadingDotSlash": true,
+    "convertBackslashToSlash": true,
+    "collapseRepeatedSlash": true,
+    "deduplicateNormalizedPaths": true,
+    "rejectAbsolutePaths": true,
+    "rejectParentTraversal": true
+  },
+  "statusPolicy": {
+    "MAPPED": "Every normalized changed path maps to one or more direct impact nodes.",
+    "MANUAL_REVIEW": "At least one valid repository-relative path has no approved map rule. Do not fan out to all domains or guess by filename similarity.",
+    "INVALID_INPUT": "At least one supplied path is absolute, empty after normalization, or contains parent traversal."
+  },
+  "exitPolicy": {
+    "MAPPED": 0,
+    "MANUAL_REVIEW": 3,
+    "INVALID_INPUT": 2
+  },
+  "pathRuleOverlays": [
+    {
+      "id": "soldier-webp-assets-post-map",
+      "patterns": [
+        "public/images/soldiers-webp/**"
+      ],
+      "excludePatterns": [],
+      "directNodes": [
+        "soldier-assets"
+      ],
+      "changeClass": "asset",
+      "reason": "Post-map Soldier frontend closeout serves 224/224 lossless WebP derivatives while retaining PNG as authoritative source evidence. This is presentation-only and must not reopen Soldier canonical semantics."
+    },
+    {
+      "id": "project-doctor-workflow-post-map",
+      "patterns": [
+        ".github/workflows/project-doctor-*.yml"
+      ],
+      "excludePatterns": [],
+      "directNodes": [
+        "project-doctor"
+      ],
+      "changeClass": "tooling",
+      "reason": "Project Doctor CI/PR workflow changes affect Doctor tooling only. They must be validated by Doctor self-tests but must not fan out into semantic domain recomputation."
+    }
+  ],
+  "overlayPolicy": {
+    "reason": "The base dependency map remains frozen. Post-map repository evolution is admitted only through explicit evidenced path families: Soldier WebP presentation assets and Project Doctor workflow files used by D6/D7 runtime integration.",
+    "mayAddPathRulesOnly": true,
+    "mayAddImpactNodes": false,
+    "mayAddPropagationEdges": false,
+    "mayRewriteBaseRules": false
+  },
+  "fixtures": [
+    {
+      "id": "HERO_FRONTEND_ROUTE",
+      "paths": ["src/routes/heroes_.$heroId.tsx"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["hero-frontend"],
+      "expectedDomains": ["hero"]
+    },
+    {
+      "id": "HERO_ASSET_NORMALIZED_DOT_SLASH",
+      "paths": ["./public/images/heroes/cards/6.png"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["hero-assets"],
+      "expectedDomains": ["hero"]
+    },
+    {
+      "id": "SOLDIER_WEBP_POST_MAP_OVERLAY",
+      "paths": ["public/images/soldiers-webp/5102.webp"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["soldier-assets"],
+      "expectedDomains": ["soldier"]
+    },
+    {
+      "id": "PROJECT_DOCTOR_WORKFLOW_POST_MAP_OVERLAY",
+      "paths": [".github/workflows/project-doctor-d7-pr-guard.yml"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["project-doctor"],
+      "expectedDomains": []
+    },
+    {
+      "id": "SOLDIER_CONFIGDATA_PROPAGATION",
+      "paths": ["data/configdata/ConfigDataSoldierInfo.json"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["soldier-canonical"],
+      "expectedDomains": ["hero", "hero-soldier", "soldier"]
+    },
+    {
+      "id": "HERO_SOLDIER_SHARED_RELATION",
+      "paths": ["data/validation/hero-soldier-integration-stageC-final.v1.json"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["hero-soldier-relation"],
+      "expectedDomains": ["hero", "hero-soldier", "soldier"]
+    },
+    {
+      "id": "EQUIPMENT_IMAGE_ASSET_PIPELINE",
+      "paths": ["data/validation/equipment-image-stage0-summary.v1.json"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["equipment-assets"],
+      "expectedDomains": ["equipment"]
+    },
+    {
+      "id": "UNKNOWN_CONFIGDATA_REQUIRES_REVIEW",
+      "paths": ["data/configdata/ConfigDataUnknownFutureTable.json"],
+      "expectedStatus": "MANUAL_REVIEW",
+      "expectedDirectNodes": [],
+      "expectedDomains": []
+    },
+    {
+      "id": "PACKAGE_UNION_RULE",
+      "paths": ["package.json"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["project-doctor", "shared-build"],
+      "expectedDomains": ["banner", "equipment", "hero", "soldier"]
+    },
+    {
+      "id": "DUPLICATE_NORMALIZED_INPUT_DEDUPED",
+      "paths": ["./src/routes/heroes.tsx", "src/routes/heroes.tsx"],
+      "expectedStatus": "MAPPED",
+      "expectedChangedFileCount": 1,
+      "expectedDirectNodes": ["hero-frontend"],
+      "expectedDomains": ["hero"]
+    },
+    {
+      "id": "WINDOWS_PATH_NORMALIZATION",
+      "paths": ["public\\images\\soldiers\\5102.png"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["soldier-assets"],
+      "expectedDomains": ["soldier"]
+    },
+    {
+      "id": "INVALID_PARENT_TRAVERSAL",
+      "paths": ["../package.json"],
+      "expectedStatus": "INVALID_INPUT",
+      "expectedDirectNodes": [],
+      "expectedDomains": []
+    },
+    {
+      "id": "MULTI_FILE_AGGREGATE",
+      "paths": ["public/images/heroes/cards/6.png", "data/validation/equipment-image-stage0-summary.v1.json"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["equipment-assets", "hero-assets"],
+      "expectedDomains": ["equipment", "hero"]
+    }
+  ],
+  "nextStage": "D3",
+  "nextStageGoal": "Use git diff or PR changed-file lists as input to D2-IMPACT, then select validators from affected nodes without executing unrelated validators."
+}
