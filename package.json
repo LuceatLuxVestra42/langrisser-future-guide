@@ -23,8 +23,10 @@
     "investigate:hero-display-stats": "node scripts/investigate_hero_display_stats.cjs",
     "finalize:hero-pages": "node scripts/finalize_hero_pages_stage34.cjs",
     "build:movement-types": "node scripts/build_shared_movement_types.mjs",
-    "validate:changed:dry": "node scripts/smart-regression.mjs --dry-run",
-    "validate:changed": "node scripts/smart-regression.mjs --execute"
+    "validate:changed:sr3:dry": "node scripts/smart-regression.mjs --dry-run",
+    "validate:changed:sr3": "node scripts/smart-regression.mjs --execute",
+    "validate:changed:dry": "node scripts/smart-regression-sr4.mjs --dry-run",
+    "validate:changed": "node scripts/smart-regression-sr4.mjs --execute"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -89,8 +91,8 @@
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.5.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
+    "eslint-plugin-react-hooks": "^6.1.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^15.15.0",
     "prettier": "^3.7.3",
     "typescript": "^5.8.3",
