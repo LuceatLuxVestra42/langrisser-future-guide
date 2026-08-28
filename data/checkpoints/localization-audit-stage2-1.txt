@@ -1,6 +1,6 @@
 Localization Audit Stage 2.1 checkpoint
 Date: 2026-08-28
-Status: PASS_WITH_REVIEW / COMPLETE pending final verification
+Status: PASS_WITH_REVIEW / COMPLETE
 
 Purpose
 - Close the Stage 2 gap where exact confirmed Korean presentation text could change without changing the Stage 2 structural snapshot.
@@ -34,14 +34,27 @@ Baseline
 - Stage 2 errors: 0
 - Stage 2 reviews: 2 (approved provisional unresolved records)
 - Lower-tier confirmed presentation: 39
-- Stage 2.1 self-test: PASS (7/7) in initial baseline run 33155074237 / job 98795805083.
+- Stage 2.1 self-test: PASS (7/7).
+
+Final verification
+- GitHub Actions run: 33155166624
+- Job: 98796106378
+- Verified head: f19a53042ec23c1441ba19b85e9ad6e512c55546
+- Baseline --check: PASS_WITH_REVIEW / Soldier 224 / display 224 / errors 0 / reviews 2.
+- Baseline fingerprint: 316e905bc409fa337f79baa72a676872998c1f1546ee994e00267b2948d42e28.
+- Self-test: PASS (7/7).
+- Temporary mutation: Soldier 101 `정예 창병` -> `정예창병`.
+- Mutated fingerprint: 81fc45e698f32a4b21ffd1b02ff8143085895cc48b627c60ae9d6fb8ddaa76f0.
+- Mutation result: FAIL with CONFIRMED_PRESENTATION_DRIFT, as required.
+- Source restored in the verification job and baseline --check returned PASS_WITH_REVIEW again.
+- No production localization data was committed or changed by the mutation test.
 
 Completion gate
-- Baseline --check must PASS.
-- Stage 2.1 self-test must PASS 7/7.
-- A temporary spacing mutation must make --check FAIL specifically with CONFIRMED_PRESENTATION_DRIFT.
-- Restore source before completion; production data must remain unchanged.
-- Remove temporary workflow before merge.
+- Baseline --check PASS: COMPLETE.
+- Stage 2.1 self-test PASS 7/7: COMPLETE.
+- Spacing-only mutation rejected with CONFIRMED_PRESENTATION_DRIFT: COMPLETE.
+- Source restored: COMPLETE.
+- Temporary workflow must be removed before merge.
 
 Next start after completion
 - Stop. Do not enter Stage 3 automatically. Use Stage 2.1 in the next real localization change and evaluate the audit behavior before deciding on Hero + Equipment expansion.
