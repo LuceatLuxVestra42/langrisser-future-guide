@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 
 const CONTRACT_PATH = "data/contracts/equipment-image-stage3-frontend-integration.v1.json";
 const PREDECESSOR_PATH = "data/validation/equipment-image-stage2-final-summary.v3.json";
+const STAGE2_HOLD_EVIDENCE_PATH = "data/evidence/equipment-image-stage2-final373-official-apk.v3.json";
 const GENERAL_LIST_PATH = "data/generated/equipment_stage3_3_general_list.json";
 const EXCLUSIVE_PATH = "data/generated/equipment_stage3_5_exclusive_consumer.json";
 const HELPER_PATH = "src/lib/equipment-image-assets.ts";
@@ -34,20 +35,21 @@ function inspectPng(path) {
   const bytes = fs.readFileSync(path);
   assert(bytes.length >= 24, `${path}: PNG too small`);
   assert(bytes.subarray(0, 8).toString("hex") === "89504e470d0a1a0a", `${path}: invalid PNG signature`);
-  return {
-    width: bytes.readUInt32BE(16),
-    height: bytes.readUInt32BE(20),
-    size: bytes.length,
-  };
+  const width = bytes.readUInt32BE(16);
+  const height = bytes.readUInt32BE(20);
+  assert(width > 0 && height > 0, `${path}: invalid PNG dimensions ${width}x${height}`);
+  return { width, height, size: bytes.length };
 }
 
 const contract = readJson(CONTRACT_PATH);
 const predecessor = readJson(PREDECESSOR_PATH);
+const stage2HoldEvidence = readJson(STAGE2_HOLD_EVIDENCE_PATH);
 const general = readJson(GENERAL_LIST_PATH);
 const exclusive = readJson(EXCLUSIVE_PATH);
 
 assert(contract.productionJoinKey === "equipmentId", "Stage 3 contract must keep equipmentId as production join key");
 assert(contract.predecessor.path === PREDECESSOR_PATH, "Stage 3 predecessor path mismatch");
+assert(contract.predecessor.officialApkHoldEvidencePath === STAGE2_HOLD_EVIDENCE_PATH, "Stage 2 HOLD29 evidence path mismatch");
 assert(gitBlobSha(PREDECESSOR_PATH) === contract.predecessor.gitBlobSha, "STALE_FROZEN_DEPENDENCY: Stage 2 final summary blob changed");
 assert(predecessor.status === "PASS_EQUIPMENT_IMAGE_STAGE2", "Stage 2 predecessor status is not PASS");
 assert(predecessor.completion === "COMPLETE", "Stage 2 predecessor is not complete");
@@ -64,6 +66,9 @@ assert(predecessor.counts.missing === 0, "Stage 2 missing assets must be zero");
 assert(predecessor.counts.invalidPng === 0, "Stage 2 invalid PNG count must be zero");
 assert(predecessor.counts.ambiguousLocator === 0, "Stage 2 ambiguous locator count must be zero");
 assert(predecessor.counts.hardErrors === 0, "Stage 2 hard errors must be zero");
+assert(stage2HoldEvidence.status === "PASS_EQUIPMENT_IMAGE_STAGE2_OFFICIAL_APK_HOLD29", "Stage 2 HOLD29 evidence is not PASS");
+assert(stage2HoldEvidence.heldResolvedCount === 29, "Stage 2 HOLD29 evidence must contain 29 resolved records");
+assert(Array.isArray(stage2HoldEvidence.records) && stage2HoldEvidence.records.length === 29, "Stage 2 HOLD29 records must contain 29 entries");
 
 assert(Array.isArray(general.records), "General equipment list records missing");
 assert(Array.isArray(exclusive.listRecords), "Exclusive equipment list records missing");
@@ -80,18 +85,40 @@ assert(!uniquePublicIds.has(2013), "equipmentId 2013 admission HOLD must not ent
 
 let verifiedAssets = 0;
 let totalBytes = 0;
-const invalidDimensions = [];
+const sourceNativeNon172 = [];
+const pngByEquipmentId = new Map();
 for (const equipmentId of [...uniquePublicIds].sort((a, b) => a - b)) {
   const path = `public/images/equipment/${equipmentId}.png`;
   assert(fs.existsSync(path), `Missing public equipment image: ${path}`);
   const png = inspectPng(path);
+  pngByEquipmentId.set(equipmentId, png);
   if (png.width !== 172 || png.height !== 172) {
-    invalidDimensions.push({ equipmentId, width: png.width, height: png.height });
+    sourceNativeNon172.push({ equipmentId, width: png.width, height: png.height });
   }
   totalBytes += png.size;
   verifiedAssets += 1;
 }
-assert(invalidDimensions.length === 0, `Equipment image dimensions must be 172x172: ${JSON.stringify(invalidDimensions)}`);
+
+const officialHoldDimensionsMismatched = [];
+for (const record of stage2HoldEvidence.records) {
+  assert(uniquePublicIds.has(record.equipmentId), `Stage 2 HOLD29 equipmentId ${record.equipmentId} is not in public 373`);
+  const png = pngByEquipmentId.get(record.equipmentId);
+  if (
+    record.width !== 172 ||
+    record.height !== 172 ||
+    png?.width !== 172 ||
+    png?.height !== 172
+  ) {
+    officialHoldDimensionsMismatched.push({
+      equipmentId: record.equipmentId,
+      evidenceWidth: record.width,
+      evidenceHeight: record.height,
+      repositoryWidth: png?.width,
+      repositoryHeight: png?.height,
+    });
+  }
+}
+assert(officialHoldDimensionsMismatched.length === 0, `Official APK HOLD29 dimensions changed: ${JSON.stringify(officialHoldDimensionsMismatched)}`);
 
 const helperSource = fs.readFileSync(HELPER_PATH, "utf8");
 const generalSource = fs.readFileSync(GENERAL_ROUTE, "utf8");
@@ -110,7 +137,7 @@ for (const [label, source] of [
   ["exclusive", exclusiveSource],
   ["detail", detailSource],
 ]) {
-  assert(source.includes('getOfficialEquipmentImageUrl'), `${label} route does not consume the official Equipment image resolver`);
+  assert(source.includes("getOfficialEquipmentImageUrl"), `${label} route does not consume the official Equipment image resolver`);
 }
 assert(generalSource.includes("src={imageUrl}"), "General equipment image card is not wired to resolved image URL");
 assert(generalSource.includes('loading="lazy"'), "General equipment image list must lazy-load images");
@@ -118,8 +145,8 @@ assert(!generalSource.includes("Crown, Gem, Shield, Swords"), "Legacy general Eq
 assert(exclusiveSource.includes("src={getOfficialEquipmentImageUrl(record.equipmentId)}"), "Exclusive equipment cards are not wired to equipmentId images");
 assert(detailSource.includes("const imageUrl = getOfficialEquipmentImageUrl(equipmentId);"), "Equipment detail header is not wired to equipmentId image");
 assert(detailSource.includes("장비 이미지"), "Equipment detail image accessible alt text missing");
-assert(routeTreeSource.includes('/equipment/exclusive'), "Generated route tree missing /equipment/exclusive");
-assert(routeTreeSource.includes('/equipment/$equipmentId'), "Generated route tree missing /equipment/$equipmentId");
+assert(routeTreeSource.includes("/equipment/exclusive"), "Generated route tree missing /equipment/exclusive");
+assert(routeTreeSource.includes("/equipment/$equipmentId"), "Generated route tree missing /equipment/$equipmentId");
 
 const buildGatePass = process.env.EQUIPMENT_STAGE3_BUILD_PASS === "1";
 const summary = {
@@ -135,6 +162,8 @@ const summary = {
     path: PREDECESSOR_PATH,
     gitBlobSha: gitBlobSha(PREDECESSOR_PATH),
     sha256: sha256(PREDECESSOR_PATH),
+    holdEvidencePath: STAGE2_HOLD_EVIDENCE_PATH,
+    holdEvidenceSha256: sha256(STAGE2_HOLD_EVIDENCE_PATH),
     status: predecessor.status,
     freezeState: predecessor.freezeState,
   },
@@ -144,14 +173,19 @@ const summary = {
     exclusiveEquipment: exclusiveIds.length,
     uniqueEquipmentIds: uniquePublicIds.size,
     verifiedAssets,
-    invalidDimensions: invalidDimensions.length,
+    officialApkHoldAssets172x172: stage2HoldEvidence.records.length,
+    officialApkHoldDimensionMismatches: officialHoldDimensionsMismatched.length,
+    sourceNativeNon172Assets: sourceNativeNon172.length,
     missingAssets: 0,
     totalAssetBytes: totalBytes,
   },
+  sourceNativeNon172,
   assetContract: {
     sourceStage: "Equipment Image Stage 2",
     resolver: "equipmentId -> import.meta.env.BASE_URL + images/equipment/{equipmentId}.png",
-    expectedDimensions: "172x172",
+    repositoryAcceptance: "preserve frozen Stage 2 verified assets without Stage 3 resizing",
+    officialApkHold29Dimensions: "172x172",
+    legacyExistingDimensions: "source-native",
     basePathAware: true,
     rootRelativeAssetPathForbidden: true,
   },
@@ -179,6 +213,7 @@ fs.writeFileSync(
       productionJoinKey: "equipmentId",
       verifiedAssets,
       publicEquipment: publicIds.length,
+      sourceNativeNon172Assets: sourceNativeNon172.length,
       routes: summary.routes,
       hostedQaRequired: true,
       nextStart: "GitHub Pages deployment freshness -> hosted route/direct-entry/asset smoke -> final Stage 3 freeze",
