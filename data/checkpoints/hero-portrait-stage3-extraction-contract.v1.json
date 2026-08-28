@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage3-extraction-contract-freeze",
+  "schemaId": "hero-portrait-stage3-extraction-contract-checkpoint/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "freezeState": "HERO_PORTRAIT_STAGE3_EXTRACTION_CONTRACT_FROZEN",
+  "branch": "work/hero-portrait-stage3-extraction-contract",
+  "contract": "data/contracts/hero-portrait-stage3-extraction-contract.v1.json",
+  "admissionState": "data/generated/hero-portrait-stage3-admission-state.v1.json",
+  "frozenEvidence": {
+    "stage2Checkpoint": {
+      "path": "data/checkpoints/hero-portrait-stage2-representative-resolution-proof.v1.json",
+      "gitBlobSha": "3a6a4dfeebfc7893505bd4969cebcacdde1062a7",
+      "result": "PASS_5_OF_5"
+    },
+    "stage1Inventory": {
+      "path": "data/generated/hero-portrait-stage1-locator-inventory.v1.json",
+      "gitBlobSha": "2163f02dde989afdc3c29f98af99d631e05528d6"
+    },
+    "stage0Contract": {
+      "path": "data/contracts/hero-portrait-stage0-input-freeze.v1.json",
+      "gitBlobSha": "cf559f0d529d95f836a43b681d9951798c379852"
+    },
+    "leonFilenameReview": {
+      "path": "data/reviews/hero-portrait-stage2-leon-animation-filename-review.v1.json",
+      "gitBlobSha": "7b2c07ce6fdf1f1c7e48176fe06d42acf5edfd62",
+      "result": "PASS_CLARIFIED"
+    }
+  },
+  "checks": [
+    {
+      "id": "canonical-identity-boundary",
+      "expected": 267,
+      "actual": 267,
+      "result": "PASS"
+    },
+    {
+      "id": "target-path-contract",
+      "expected": "public/images/heroes/cards/{heroId}.png",
+      "actual": "public/images/heroes/cards/{heroId}.png",
+      "result": "PASS"
+    },
+    {
+      "id": "enabled-source-kind-count",
+      "expected": 1,
+      "actual": 1,
+      "result": "PASS"
+    },
+    {
+      "id": "stage2-proven-explicit-source-count",
+      "expected": 5,
+      "actual": 5,
+      "result": "PASS"
+    },
+    {
+      "id": "lossless-byte-copy-rule",
+      "expected": "FROZEN",
+      "actual": "FROZEN",
+      "result": "PASS"
+    },
+    {
+      "id": "crop-resize-reencode",
+      "expected": "FORBIDDEN",
+      "actual": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "id": "filename-authority",
+      "expected": false,
+      "actual": false,
+      "result": "PASS"
+    },
+    {
+      "id": "unity-prefab-bitmap-fallback-enabled",
+      "expected": false,
+      "actual": false,
+      "result": "PASS"
+    },
+    {
+      "id": "population-wide-source-coverage-claimed",
+      "expected": false,
+      "actual": false,
+      "result": "PASS"
+    },
+    {
+      "id": "materialized-target-count",
+      "expected": 0,
+      "actual": 0,
+      "result": "PASS"
+    },
+    {
+      "id": "bulk-267-gate-open",
+      "expected": false,
+      "actual": false,
+      "result": "PASS"
+    }
+  ],
+  "completedScope": [
+    "freeze Hero ID as the only portrait ownership key",
+    "freeze exact PNG target path naming by Hero ID",
+    "freeze GOOGLE_DRIVE_BASE_SKIN_PNG as the only currently enabled source family",
+    "freeze no-source behavior as PENDING_SOURCE_MAPPING rather than guessing",
+    "freeze Unity prefab resolution as disabled until a separate dependency proof exists",
+    "freeze PNG/alpha/hash/dimension/provenance admission checks",
+    "freeze filename tokens as non-authoritative, including the Leon Animation_FIN clarification",
+    "freeze lossless source-PNG byte copy with no crop, resize, reencode, alpha flatten, color edit, or synthetic editing",
+    "freeze idempotent exact-hash target behavior and conflicting-hash fail behavior",
+    "freeze a 267/267 explicit-admission gate before population-wide materialization"
+  ],
+  "reviewBoundary": {
+    "explicitAdmittedSourceCount": 5,
+    "pendingSourceMappingCount": 262,
+    "populationWideCoverageProven": false,
+    "bulk267Ready": false,
+    "meaning": "These are expected Stage 3 handoff conditions, not a Stage 3 contract failure."
+  },
+  "notCompletedScope": [
+    "discover or prove explicit source mappings for the remaining 262 Heroes",
+    "prove Unity prefab -> texture/sprite -> bitmap dependency resolution",
+    "copy any Hero PNG into public/images/heroes/cards",
+    "generate a 267-row source manifest",
+    "frontend resolver state changes",
+    "browser/Hosted/UI QA"
+  ],
+  "verdict": {
+    "stage3Complete": true,
+    "contractDeterministic": true,
+    "hardErrors": 0,
+    "bulk267Ready": false,
+    "bulkBlockReason": "262 canonical Heroes still require enabled explicit source admission; no guessing fallback is allowed."
+  },
+  "nextStart": {
+    "stage": "HERO_PORTRAIT_STAGE4_BULK_EXTRACTION",
+    "firstGate": "STAGE4_0_EXPLICIT_SOURCE_MAPPING_CENSUS",
+    "requiredInput": "Stage 3 frozen contract plus the five admitted source records",
+    "completionRequiredBeforeCopy": "267 admitted explicit mappings / pending 0 / review 0 / rejected 0",
+    "rule": "If population-wide explicit mapping cannot be proven from the approved source family, stop bulk copy and open a separate Unity dependency-resolution proof instead of guessing."
+  }
+}
