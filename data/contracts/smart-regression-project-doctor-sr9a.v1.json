@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "id": "smart-regression-project-doctor-sr9a-v1",
+  "stage": "SMART_REGRESSION_SR9A",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Define a read-only Smart Regression diagnostic envelope that Project Doctor can consume later without gaining authority to rewrite frozen domain lifecycle or semantics.",
+  "integrationBoundary": {
+    "doctorIntegrationRole": "SUPPLEMENTAL_OPERATIONAL_EVIDENCE",
+    "doctorFacet": "source-evidence",
+    "canonicalLifecycleAuthority": false,
+    "canonicalPopulationAuthority": false,
+    "semanticHealthAuthority": false,
+    "validatorExecutionRequiredForCollection": false,
+    "rawConfigDataReadAllowed": false,
+    "semanticRecomputationAllowed": false,
+    "projectDoctorImplementationModifiedInSR9ABC": false
+  },
+  "sourcePolicy": {
+    "readOnly": true,
+    "preferFrozenSmartRegressionContractsAndCheckpoints": true,
+    "doNotInferMissingEvidence": true,
+    "doNotPromoteUnboundGateToBound": true,
+    "doNotTreatFailClosedBlockingAsSemanticFailure": true,
+    "doNotTreatPartialReplacementAsBroadReplacement": true,
+    "doNotReopenFrozenSemanticPipelines": true
+  },
+  "sources": {
+    "bindings": "data/contracts/regression-bindings.sr3.v1.json",
+    "fallbackPolicy": "data/contracts/regression-fallback-policy.sr4.v1.json",
+    "sr5Checkpoint": "data/checkpoints/smart-regression-sr5-fixtures.v1.json",
+    "sr6Checkpoint": "data/checkpoints/smart-regression-sr6-shadow.v1.json",
+    "sr7Checkpoint": "data/checkpoints/smart-regression-sr7-history.v1.json",
+    "sr8Policy": "data/contracts/regression-partial-replacement.sr8.v1.json",
+    "sr8Checkpoint": "data/checkpoints/smart-regression-sr8-partial-replacement.v1.json"
+  },
+  "normalizedOutput": {
+    "schemaId": "smart-regression-project-doctor-input/v1",
+    "requiredTopLevelFields": [
+      "version",
+      "schemaId",
+      "stage",
+      "status",
+      "integrationRole",
+      "doctorFacet",
+      "operationalHealth",
+      "readOnly",
+      "authority",
+      "bindings",
+      "fallback",
+      "evidence",
+      "replacement",
+      "reviews",
+      "sourceProvenance"
+    ],
+    "operationalHealthValues": ["PASS", "REVIEW", "FAIL", "MISSING", "INCONSISTENT", "UNKNOWN"],
+    "reviewRecordFields": ["code", "scope", "blocking", "source", "detail"]
+  },
+  "healthRules": [
+    {
+      "order": 1,
+      "health": "MISSING",
+      "when": "one or more required Smart Regression source files cannot be read"
+    },
+    {
+      "order": 2,
+      "health": "FAIL",
+      "when": "a frozen Smart Regression checkpoint reports FAIL, observed false negatives are greater than zero, or SR-8 execution evidence reports a failed replacement validator"
+    },
+    {
+      "order": 3,
+      "health": "INCONSISTENT",
+      "when": "binding counts, replacement evidence, checkpoint metrics, or source IDs contradict one another"
+    },
+    {
+      "order": 4,
+      "health": "REVIEW",
+      "when": "safety evidence passes but unresolved gates remain or broad replacement is intentionally disabled"
+    },
+    {
+      "order": 5,
+      "health": "PASS",
+      "when": "all safety evidence passes, no unresolved gates remain, and the intended replacement scope is fully admitted"
+    },
+    {
+      "order": 6,
+      "health": "UNKNOWN",
+      "when": "available evidence does not support a safe classification"
+    }
+  ],
+  "requiredEvidence": {
+    "sr5": {
+      "status": "PASS_WITH_REVIEW",
+      "completion": "COMPLETE",
+      "falseNegativeCount": 0,
+      "runtimeProofFromSR6Required": true
+    },
+    "sr6": {
+      "status": "PASS_WITH_REVIEW",
+      "completion": "COMPLETE",
+      "mode": "SHADOW_ACTIVE",
+      "runtimeFixtureFalseNegativeCount": 0
+    },
+    "sr7": {
+      "status": "PASS_WITH_REVIEW",
+      "completion": "COMPLETE",
+      "observedFalseNegativeCount": 0
+    },
+    "sr8": {
+      "status": "PASS_WITH_REVIEW",
+      "completion": "COMPLETE",
+      "broadReplacementAllowed": false,
+      "actualReplacementExecutionObserved": true
+    }
+  },
+  "handoffPolicy": {
+    "generatedArtifact": "data/generated/smart-regression-project-doctor-input.v1.json",
+    "collector": "scripts/collect-smart-regression-project-doctor-input.mjs",
+    "collectionCommand": "bun run collect:smart-regression:doctor-input",
+    "freshnessCheckCommand": "bun run check:smart-regression:doctor-input",
+    "projectDoctorConsumerMayReadGeneratedArtifact": true,
+    "projectDoctorConsumerMayMutateGeneratedArtifact": false,
+    "actualDoctorWiringDeferred": true,
+    "finalEndToEndDoctorValidationDeferred": true
+  }
+}
