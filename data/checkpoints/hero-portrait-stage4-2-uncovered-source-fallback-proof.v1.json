@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-2-uncovered-source-fallback-proof",
+  "schemaId": "hero-portrait-stage4-2-uncovered-source-fallback-proof-checkpoint/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "freezeState": "HERO_PORTRAIT_STAGE4_2_FALLBACK_BOUNDARY_FROZEN",
+  "source": "data/generated/hero-portrait-stage4-2-fallback-admission.v1.json",
+  "summary": {
+    "canonicalHeroCount": 267,
+    "previousAdmittedSourceCount": 208,
+    "stage42NewAdmissionCount": 1,
+    "canonicalAdmittedSourceCount": 209,
+    "pendingCanonicalSourceCount": 58,
+    "knownOwnershipReviewCount": 5,
+    "knownOwnershipNoPngCount": 1,
+    "structuredOwnershipUnresolvedRowCount": 29,
+    "structuredTreeCountGap": 23,
+    "locatorConcordanceRowsDiscoveryOnly": 22,
+    "reviewSourceIdentityCount": 5,
+    "rejectedSourceCount": 0,
+    "duplicateHeroIdCount": 0,
+    "duplicateImmutableSourceIdCount": 0,
+    "duplicateShaGroupCount": 0,
+    "materializedTargetCount": 0,
+    "unityFallbackEnabled": false,
+    "bulk267Ready": false,
+    "hardErrorCount": 0
+  },
+  "checks": {
+    "previous208AdmissionContinuity": "PASS",
+    "stage42Sagny99199Admission": "PASS",
+    "combinedRegistry209UniqueHeroIds": "PASS",
+    "combinedRegistry209UniqueImmutableSourceIds": "PASS",
+    "combinedRegistry209UniqueSha256": "PASS",
+    "knownOwnershipMultipleRoleCasesRemainReview": "PASS_5_NOT_GUESSED",
+    "knownOwnershipNonPngCaseRemainsBlocked": "PASS_1_NOT_CONVERTED",
+    "unresolvedOwnershipRowsNotNameJoined": "PASS_29",
+    "structuredTreeCountGapNotInvented": "PASS_23",
+    "unityFallbackEnabledWithoutDependencyProof": false,
+    "materializationPerformed": false,
+    "bulk267Ready": false
+  },
+  "sourceAvailabilityBoundary": {
+    "repositoryHeroPaintingDependencyIndexLocated": false,
+    "driveHeroPaintingFolderSearchLocated": false,
+    "drivePrefabFolderSearchLocated": false,
+    "driveSpineFolderSearchLocated": false,
+    "driveSearchAbsenceProvesNonexistence": false,
+    "reason": "Current accessible sources do not provide the explicit prefab dependency chain required by the frozen Stage3 contract; Drive search absence is not treated as proof because Drive search is non-authoritative for this dataset."
+  },
+  "nextStart": {
+    "primary": "HERO_PORTRAIT_STAGE4_2B_EXPLICIT_FALLBACK_SOURCE_ACQUISITION",
+    "goal": "Resolve the remaining 58 without reopening the 209 frozen admissions.",
+    "acceptableInputA": "explicit Hero ID -> immutable base PNG source mapping with Stage3 byte/provenance QA",
+    "acceptableInputB": "actual Unity HeroPainting prefab dependency data proving prefab -> texture/sprite -> exported PNG",
+    "forbidden": [
+      "name join",
+      "filename similarity ownership inference",
+      "locator-string-only ownership",
+      "web image substitution",
+      "PNG conversion/re-encode to satisfy source gate"
+    ],
+    "bulkMaterializationBlockedUntil": "ADMITTED_SOURCE_267_OF_267"
+  }
+}
