@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "stage": "D1-3",
+  "checkpoint": "PROJECT_DOCTOR_D1_3_CLI",
+  "status": "PASS_PROJECT_DOCTOR_D1_3_CLI",
+  "completion": "COMPLETE",
+  "branch": "work/project-doctor-d1",
+  "purpose": "Expose the D1-1 read-only collector and D1-2 health gate through stable repository CLI commands without adding GitHub Actions or reopening canonical data pipelines.",
+  "entryPoint": "scripts/run-project-doctor-d1-3.mjs",
+  "packageCommands": {
+    "doctor": "node scripts/run-project-doctor-d1-3.mjs",
+    "doctor:collect": "node scripts/collect-project-doctor-d1-1.mjs",
+    "doctor:validate": "node scripts/validate-project-doctor-d1-2.mjs"
+  },
+  "executionOrder": [
+    "D1-1 collect",
+    "D1-2 validate",
+    "print normalized Project Doctor summary"
+  ],
+  "exitPolicy": {
+    "exit0": [
+      "PASS",
+      "REVIEW"
+    ],
+    "exit1": [
+      "MISSING",
+      "FAIL",
+      "INCONSISTENT",
+      "UNKNOWN"
+    ],
+    "rule": "Non-blocking REVIEW must remain usable for development and review workflows. Missing, failed, inconsistent, or unclassifiable project health blocks the CLI with a non-zero exit code."
+  },
+  "outputFields": [
+    "domain",
+    "lifecycle",
+    "health",
+    "population",
+    "projectHealth",
+    "knownHardErrorTotal",
+    "reviewTotal",
+    "blockerTotal"
+  ],
+  "verificationEvidence": {
+    "wrapperNodeSyntaxCheck": "PASS",
+    "isolatedWrapperExecution": "PASS",
+    "isolatedNpmRunDoctorExecution": "PASS_EXIT_0_FOR_REVIEW",
+    "d11CollectorInvokedBeforeD12": true,
+    "d12GateRequiredToPassBeforeSummary": true,
+    "blockingHealthReturnsNonZero": true,
+    "packageScriptsWired": true,
+    "repositoryLiveCliExecution": "NOT_RUN_NO_REPOSITORY_EXECUTION_CONNECTOR",
+    "githubActionsExecution": "OUT_OF_SCOPE"
+  },
+  "mainDriftAudit": {
+    "branchDivergedFromMain": true,
+    "mainCommitsSinceD10Baseline": 8,
+    "mainChangedScope": "Equipment Image Stage 0 only",
+    "d10PrimaryStatusSourceChanged": false,
+    "d10ListedSupplementalSourceChanged": false,
+    "canonicalBaselineInvalidated": false,
+    "note": "Main added Equipment Image Stage 0 with 390 canonical locator records and repositoryResolved=0. This advances equipment asset preparation but does not resolve the existing Equipment icon-binding review or reopen Equipment canonical semantics. The Doctor branch should be synchronized with main before later integration/merge work."
+  },
+  "scope": {
+    "newRuntimeDependencies": 0,
+    "newDevDependencies": 0,
+    "rawConfigDataReadAdded": false,
+    "semanticRecomputationAdded": false,
+    "domainValidatorExecutionAdded": false,
+    "productionDataMutationAdded": false,
+    "githubActionsAdded": false
+  },
+  "currentExpectedDoctorState": {
+    "projectHealth": "REVIEW",
+    "knownHardErrorTotal": 0,
+    "reviewTotal": 33,
+    "blockerTotal": 1,
+    "healthCounts": {
+      "PASS": 0,
+      "REVIEW": 6,
+      "FAIL": 0,
+      "MISSING": 0,
+      "INCONSISTENT": 0,
+      "UNKNOWN": 0
+    },
+    "lifecycleCounts": {
+      "FROZEN": 4,
+      "COMPLETE": 1,
+      "IN_PROGRESS": 1,
+      "UNKNOWN": 0
+    }
+  },
+  "d1Completion": {
+    "d1_0Contract": "COMPLETE",
+    "d1_1Collector": "COMPLETE",
+    "d1_2HealthGate": "COMPLETE",
+    "d1_3Cli": "COMPLETE",
+    "projectDoctorStage1": "COMPLETE"
+  },
+  "importantBoundary": "D1-3 is a local repository CLI integration only. GitHub Actions automation, changed-file impact analysis, selective validator execution, dependency mapping, stale-output hash checks, and branch synchronization remain later work.",
+  "failures": [],
+  "hardErrorCount": 0,
+  "nextStage": "D2",
+  "nextStageGoal": "Synchronize the Doctor branch with main, then build the dependency map that translates changed repository paths into affected Project Doctor domains without running unrelated validators."
+}
