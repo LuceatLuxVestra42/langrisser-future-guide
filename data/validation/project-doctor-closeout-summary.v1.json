@@ -1,16 +1,16 @@
 {
   "version": 1,
   "schemaId": "project-doctor-closeout-summary/v1",
-  "checkpoint": "PROJECT_DOCTOR_D1_D4_CLOSEOUT",
+  "checkpoint": "PROJECT_DOCTOR_D1_D5_CLOSEOUT",
   "status": "PASS_PROJECT_DOCTOR_CLOSEOUT_REPOSITORY_INTEGRATION",
   "completion": "COMPLETE_WITH_LIVE_REPOSITORY_EXECUTION_GAP",
   "branch": "work/project-doctor-closeout",
   "base": "main",
   "baseSha": "5a241e7a9ffe0a87fa23260ca9a179138af95dc9",
-  "repositoryStateBeforeThisSummary": {
-    "aheadBy": 37,
+  "repositoryStateBeforeThisSummaryUpdate": {
+    "aheadBy": 58,
     "behindBy": 0,
-    "changedFileCount": 28,
+    "changedFileCount": 35,
     "productionCanonicalFrontendSourceChangeCount": 0
   },
   "closeoutSteps": {
@@ -18,8 +18,9 @@
     "closeout2_d2ImpactIntegration": "COMPLETE",
     "closeout3_d3InputIntegration": "COMPLETE",
     "closeout4_d4ExecutionRunner": "COMPLETE",
-    "closeout5_integratedDoctorEntrypoint": "COMPLETE",
-    "closeout6_finalDiffInspection": "COMPLETE"
+    "closeout5_d5FreshnessGuard": "COMPLETE",
+    "closeout6_integratedDoctorEntrypoint": "COMPLETE",
+    "closeout7_finalDiffInspection": "COMPLETE"
   },
   "integrationFacts": {
     "mainBasedCloseoutBranch": true,
@@ -31,24 +32,42 @@
     "d4FullQueuePreflight": true,
     "d4FailFast": true,
     "d4ManualReviewPreserved": true,
+    "d5DynamicAuthoritativeSourceDiscovery": true,
+    "d5ContentHashNotMtime": true,
+    "d5HashAlgorithm": "git-blob-sha1",
+    "d5NormalDoctorAutoReseal": false,
+    "d5ExplicitRefreshOnly": true,
+    "d5StaleExitCode": 4,
     "doctorEntrypoint": "node scripts/run-project-doctor-closeout.mjs",
     "doctorStatusEntrypoint": "node scripts/run-project-doctor-d1-3.mjs",
+    "doctorFreshnessEntrypoint": "node scripts/validate-project-doctor-d5.mjs",
+    "doctorFreshnessRefreshEntrypoint": "node scripts/run-project-doctor-d5-refresh.mjs",
     "doctorExecutionEntrypoint": "node scripts/run-project-doctor-d4.mjs"
   },
   "packageCommands": {
-    "doctor": "integrated D1 status refresh -> D4 self-test -> D3-selected D4 execution",
-    "doctor:status": "D1 status collector + health gate summary",
+    "doctor": "D1 status refresh -> D5 freshness validation -> D5 self-test -> D4 self-test -> D3-selected D4 execution",
+    "doctor:status": "D1 status collector + health gate summary without freshness reseal",
     "doctor:impact": "D2 explicit-path impact analysis",
     "doctor:plan": "D3 changed-file collection and check planning",
     "doctor:run": "D4 selected-check execution",
+    "doctor:freshness:validate": "D5 fail-closed freshness validation",
+    "doctor:freshness:refresh": "Explicit D1 refresh and D5 manifest reseal",
+    "doctor:freshness:self-test": "D5 synthetic freshness fixtures",
     "doctor:closeout:validate": "integrated runner synthetic fixtures"
   },
   "isolatedVerification": {
-    "d4RunnerSyntax": "PASS",
     "d4ExecutionFixtures": "8/8 PASS",
-    "closeoutRunnerSyntax": "PASS",
-    "closeoutIntegrationFixtures": "4/4 PASS",
+    "d5FreshnessFixtures": "7/7 PASS",
+    "closeoutIntegrationFixtures": "6/6 PASS",
     "actualRepositoryChildCommandExecutionCount": 0
+  },
+  "freshnessManifest": {
+    "status": "FRESH_SNAPSHOT",
+    "authoritativeSourceCount": 11,
+    "monitoredInputCount": 19,
+    "monitoredOutputCount": 3,
+    "seedMethod": "CURRENT_GITHUB_BLOB_SHA_BASELINE",
+    "liveRefreshCommandExecuted": false
   },
   "liveExecutionGap": {
     "status": "OPEN",
@@ -62,9 +81,9 @@
     "canonicalDataMutationAdded": false,
     "frontendSourceMutationAdded": false,
     "githubActionsAdded": false,
-    "staleOutputFreshnessGuardImplemented": false,
+    "staleOutputFreshnessGuardImplemented": true,
     "missingOwningValidatorsInvented": false
   },
-  "nextStage": "D5",
-  "nextStageGoal": "Implement stale-output and source-freshness guards, then run the integrated Doctor in an executable repository environment before any CI automation stage."
+  "nextStage": "D6",
+  "nextStageGoal": "Obtain live repository command proof for the integrated Doctor, then add GitHub Actions automation without weakening D5 freshness or D4 manual-review boundaries."
 }
