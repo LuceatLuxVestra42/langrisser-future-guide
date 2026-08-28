@@ -1,0 +1,82 @@
+name: ConfigData Lookup Stage 4
+
+on:
+  push:
+    branches:
+      - main
+      - work/configdata-lookup-stage4-canonical-overlay
+    paths:
+      - 'data/contracts/configdata-lookup-stage3-reverse-reference-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage4-canonical-overlay-contract.v1.json'
+      - 'data/validation/configdata-lookup-stage3-summary.v1.json'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/hero-soldier-by-soldier.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'scripts/lib/configdata-lookup-stage4.mjs'
+      - 'scripts/build-configdata-lookup-stage4.mjs'
+      - 'scripts/validate-configdata-lookup-stage4.mjs'
+      - '.github/workflows/configdata-lookup-stage4.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/configdata-lookup-stage3-reverse-reference-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage4-canonical-overlay-contract.v1.json'
+      - 'data/validation/configdata-lookup-stage3-summary.v1.json'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/hero-soldier-by-soldier.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/index/overlay/**'
+      - 'data/validation/configdata-lookup-stage4-summary.v1.json'
+      - 'scripts/lib/configdata-lookup-stage4.mjs'
+      - 'scripts/build-configdata-lookup-stage4.mjs'
+      - 'scripts/validate-configdata-lookup-stage4.mjs'
+      - '.github/workflows/configdata-lookup-stage4.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Stage 3 predecessor
+        run: node scripts/validate-configdata-lookup-stage3.mjs
+
+      - name: Materialize Stage 4 canonical overlay
+        run: node scripts/build-configdata-lookup-stage4.mjs
+
+      - name: Validate Stage 4 canonical overlay
+        run: node scripts/validate-configdata-lookup-stage4.mjs
+
+      - name: Commit materialized Stage 4 overlay on work branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage4-canonical-overlay'
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/index/overlay/ data/validation/configdata-lookup-stage4-summary.v1.json
+          if git diff --cached --quiet; then
+            echo 'Materialized Stage 4 overlay is already current.'
+          else
+            git commit -m 'Materialize ConfigData Lookup Stage 4 canonical overlay [skip ci]'
+            git push origin HEAD:work/configdata-lookup-stage4-canonical-overlay
+          fi
+
+      - name: Require committed Stage 4 overlay outside materialization branch
+        if: "!(github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage4-canonical-overlay')"
+        shell: bash
+        run: |
+          git diff --exit-code -- data/index/overlay/ data/validation/configdata-lookup-stage4-summary.v1.json
