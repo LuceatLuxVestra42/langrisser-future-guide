@@ -1,0 +1,110 @@
+name: ConfigData Lookup Stage 7 Smart Regression
+
+on:
+  push:
+    branches:
+      - main
+      - 'work/**'
+    paths:
+      - 'data/contracts/configdata-lookup-stage7-smart-regression-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage4-canonical-overlay-contract.v1.json'
+      - 'data/index/configdata-lookup-dependency-manifest.v1.json'
+      - 'data/validation/configdata-lookup-stage6-summary.v1.json'
+      - 'data/validation/configdata-lookup-stage7-summary.v1.json'
+      - 'data/configdata/ConfigData*.json'
+      - 'data/index/forward/**'
+      - 'data/index/reverse/**'
+      - 'data/index/overlay/**'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/hero-soldier-by-soldier.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'scripts/configdata-lookup-stage7.mjs'
+      - 'scripts/lib/configdata-lookup-stage7.mjs'
+      - 'scripts/validate-configdata-lookup-stage7.mjs'
+      - '.github/workflows/configdata-lookup-stage7.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/configdata-lookup-stage7-smart-regression-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage4-canonical-overlay-contract.v1.json'
+      - 'data/index/configdata-lookup-dependency-manifest.v1.json'
+      - 'data/validation/configdata-lookup-stage6-summary.v1.json'
+      - 'data/validation/configdata-lookup-stage7-summary.v1.json'
+      - 'data/configdata/ConfigData*.json'
+      - 'data/index/forward/**'
+      - 'data/index/reverse/**'
+      - 'data/index/overlay/**'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/hero-soldier-by-soldier.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'scripts/configdata-lookup-stage7.mjs'
+      - 'scripts/lib/configdata-lookup-stage7.mjs'
+      - 'scripts/validate-configdata-lookup-stage7.mjs'
+      - '.github/workflows/configdata-lookup-stage7.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  project-doctor-smart-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Stage 7 selector contract
+        run: node scripts/validate-configdata-lookup-stage7.mjs
+
+      - name: Resolve comparison range
+        id: range
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            BEFORE="${{ github.event.before }}"
+            if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+              BEFORE="$(git rev-parse HEAD^)"
+            fi
+            echo "base=$BEFORE" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Select affected pipelines
+        id: impact
+        run: |
+          node scripts/configdata-lookup-stage7.mjs plan \
+            --base "${{ steps.range.outputs.base }}" \
+            --head "${{ steps.range.outputs.head }}" \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Setup Bun for Equipment gate
+        if: steps.impact.outputs.equipment == 'true'
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies for Equipment gate
+        if: steps.impact.outputs.equipment == 'true'
+        run: bun install --frozen-lockfile
+
+      - name: Run selected validation-only regression
+        run: |
+          node scripts/configdata-lookup-stage7.mjs run \
+            --base "${{ steps.range.outputs.base }}" \
+            --head "${{ steps.range.outputs.head }}" \
+            --json
+
+      - name: Require frozen Stage 7 summary
+        run: git diff --exit-code -- data/validation/configdata-lookup-stage7-summary.v1.json
