@@ -4,6 +4,7 @@ import {
   loadStage2Artifacts,
   loadStage3Contract,
   renderJson,
+  renderReverseIndex,
 } from './lib/configdata-lookup-stage3.mjs';
 
 function assert(condition, message) {
@@ -56,7 +57,7 @@ async function main() {
     const expected = targetIndexes[targetType];
     const outputPath = contract.outputs.targets[targetType];
     const actualText = await fs.readFile(outputPath, 'utf8');
-    assert(actualText === renderJson(expected), `${targetType}: generated reverse index is stale or non-deterministic`);
+    assert(actualText === renderReverseIndex(expected), `${targetType}: generated reverse index is stale or non-deterministic`);
     generatedReferenceCount += expected.referenceCount;
     console.log(`${targetType}: PASS (${expected.targetCount} targets / ${expected.referenceCount} refs)`);
   }
