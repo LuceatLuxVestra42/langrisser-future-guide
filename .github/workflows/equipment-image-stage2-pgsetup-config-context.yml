@@ -1,0 +1,61 @@
+name: Equipment Image Stage 2 PGSetup Config Context
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-hold29
+    paths:
+      - '.github/workflows/equipment-image-stage2-pgsetup-config-context.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download current official PGSetup
+        run: |
+          set -euo pipefail
+          URL='https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/DownLoad-MZ-PC.exe'
+          REF='https://mz.zlongame.com/jx/mzdownload/20180731/5473.html'
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0 Safari/537.36'
+          curl --http1.1 -fL --retry 2 -A "$UA" -e "$REF" -D /tmp/headers -o /tmp/pgsetup.exe "$URL"
+          ACTUAL="$(md5sum /tmp/pgsetup.exe | awk '{print $1}')"
+          CDN="$(grep -i '^x-cos-meta-md5:' /tmp/headers | tail -1 | cut -d: -f2- | tr -d ' \r\n')"
+          test "$ACTUAL" = "$CDN"
+      - name: Extract narrow application config context
+        run: |
+          set -euo pipefail
+          strings -el -n 4 -td /tmp/pgsetup.exe > /tmp/utf16.txt
+          strings -a -n 4 -td /tmp/pgsetup.exe > /tmp/ascii.txt
+          mkdir -p data/evidence
+          python3 - <<'PY'
+          from pathlib import Path
+          out=[]
+          for label,p in [('UTF16','/tmp/utf16.txt'),('ASCII','/tmp/ascii.txt')]:
+              lines=Path(p).read_text(errors='replace').splitlines()
+              hits=[i for i,x in enumerate(lines) if any(k.lower() in x.lower() for k in [
+                  'laucherres.zlongame.com','GameRegPath','PGLauncher_SingleInstanceMutex','SOFTWARE\\zlongame\\MHMNZ'
+              ])]
+              out.append(f'=== {label} CONTEXT ===')
+              seen=set()
+              for i in hits:
+                  a=max(0,i-120); b=min(len(lines),i+121)
+                  key=(a,b)
+                  if key in seen: continue
+                  seen.add(key)
+                  out.extend(lines[a:b])
+                  out.append('---')
+          Path('data/evidence/equipment-image-stage2-official-pgsetup-config-context.v1.txt').write_text('\n'.join(out)+'\n')
+          PY
+          wc -l data/evidence/equipment-image-stage2-official-pgsetup-config-context.v1.txt
+      - name: Persist compact config context
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/evidence/equipment-image-stage2-official-pgsetup-config-context.v1.txt
+          git commit -m 'Capture official PGSetup config context [skip ci]'
+          git push
