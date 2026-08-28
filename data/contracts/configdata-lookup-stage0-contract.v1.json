@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_0",
+  "status": "CONTRACT_FROZEN",
+  "purpose": "Freeze the source authority, semantic boundary, deterministic output rules, MVP entity scope, and fail-closed policies for the ConfigData Lookup Index before any index materialization begins.",
+  "authority": {
+    "rawSourceRoot": "data/configdata",
+    "rawSourceFormat": "UnityDataTool parsed ConfigData JSON",
+    "rawSourceRole": "authoritative source for explicit ConfigData fields and direct ID references only",
+    "canonicalSourceRole": "existing FINAL_FROZEN / PASS_ACCEPTED generated consumers and frozen relation artifacts remain authoritative for project-level canonical semantics",
+    "lookupIndexRole": "derived read-optimization layer only; it does not own or redefine canonical semantics"
+  },
+  "sourcePriority": [
+    "existing FINAL_FROZEN / PASS_ACCEPTED canonical consumer for already-resolved project semantics",
+    "existing generated checkpoint or lightweight derived artifact when it already answers the lookup",
+    "ConfigData Lookup Index",
+    "targeted data/configdata record lookup",
+    "broader raw ConfigData scan only when no smaller authoritative source can answer the question"
+  ],
+  "semanticBoundary": {
+    "rawLookupMayExpose": [
+      "exact source file",
+      "exact record primary key",
+      "source record fields",
+      "explicit direct ID references present in the source record",
+      "source locator metadata needed to retrieve the record"
+    ],
+    "canonicalLookupMayExpose": [
+      "already-frozen canonical identity",
+      "already-frozen canonical relation membership",
+      "already-frozen projection or consumer metadata",
+      "provenance path to the frozen artifact"
+    ],
+    "mustRemainSeparated": [
+      "RAW_CONFIGDATA",
+      "PROJECT_CANONICAL"
+    ]
+  },
+  "mvpEntities": {
+    "Hero": {
+      "source": "data/configdata/ConfigDataHeroInfo.json",
+      "primaryKey": "ID"
+    },
+    "Soldier": {
+      "source": "data/configdata/ConfigDataSoldierInfo.json",
+      "primaryKey": "ID"
+    },
+    "Skill": {
+      "source": "data/configdata/ConfigDataSkillInfo.json",
+      "primaryKey": "ID"
+    },
+    "Equipment": {
+      "source": "data/configdata/ConfigDataEquipmentInfo.json",
+      "primaryKey": "ID"
+    }
+  },
+  "indexPolicy": {
+    "outputRoot": "data/index",
+    "stage1PlannedOutputs": [
+      "data/index/hero.v1.json",
+      "data/index/soldier.v1.json",
+      "data/index/skill.v1.json",
+      "data/index/equipment.v1.json"
+    ],
+    "storeMinimalLocatorMetadata": true,
+    "duplicateFullSourceRecordsByDefault": false,
+    "nameSearchIsDiscoveryOnly": true,
+    "nameSearchMayEstablishCanonicalJoin": false,
+    "primaryJoinKeyPolicy": "Use explicit source IDs and approved frozen canonical IDs only."
+  },
+  "forbiddenOperations": [
+    "recompute FINAL_FROZEN Hero-Soldier membership from raw ConfigData",
+    "recompute frozen Hero-Skin ownership or source order from raw ConfigData",
+    "recompute frozen Banner identity, grouping, Hero relations, or recurrence semantics",
+    "recompute frozen exclusive Equipment ownership",
+    "name-based canonical JOIN",
+    "fuzzy-name canonical JOIN",
+    "ID arithmetic inference",
+    "numeric-pattern semantic inference",
+    "filename-similarity semantic inference",
+    "silent patching of missing canonical pairs or IDs",
+    "treat every numeric field as an ID reference",
+    "promote a raw direct reference into a project-level canonical relation without an approved semantic contract"
+  ],
+  "reverseReferencePolicy": {
+    "stage": "DEFERRED_TO_STAGE_3",
+    "allowlistRequired": true,
+    "genericNumericFieldScanningAllowed": false,
+    "note": "Reverse references must be generated only from explicitly approved reference-field schemas."
+  },
+  "determinism": {
+    "wallClockTimestampInFrozenOutput": false,
+    "stableOrderingRequired": true,
+    "sameSourceSameContractMustProduceByteStableSemanticContent": true,
+    "sourceFreshnessMetadata": [
+      "source path",
+      "source content hash or repository commit when available",
+      "contract version"
+    ]
+  },
+  "failurePolicy": {
+    "unknownEntity": "FAIL_CLOSED",
+    "missingPrimaryKey": "FAIL",
+    "duplicatePrimaryKey": "FAIL",
+    "missingDeclaredSource": "FAIL",
+    "ambiguousReferenceMeaning": "REVIEW_OR_DEFER",
+    "missingCanonicalOverlay": "REPORT_UNAVAILABLE_DO_NOT_SYNTHESIZE"
+  },
+  "stage0Validation": {
+    "validator": "scripts/validate-configdata-lookup-stage0.mjs",
+    "command": "npm run validate:configdata-lookup-stage0",
+    "requiredChecks": [
+      "contract parses as JSON",
+      "all four MVP source files exist",
+      "all four MVP entities use ID as the primary key",
+      "raw and canonical result classes are explicitly separated",
+      "lookup layer is declared non-authoritative for canonical semantics",
+      "forbidden inference and recomputation policies are present",
+      "Stage 1 output paths are unique and rooted under data/index"
+    ],
+    "passStatus": "PASS_CONFIGDATA_LOOKUP_STAGE0_CONTRACT"
+  },
+  "outOfScope": [
+    "materializing the four MVP indexes",
+    "forward JOIN graph generation",
+    "reverse-reference generation",
+    "canonical overlay materialization",
+    "CLI lookup implementation",
+    "incremental rebuild or dependency impact analysis"
+  ],
+  "nextStage": {
+    "stage": "CONFIGDATA_LOOKUP_STAGE_1",
+    "goal": "Materialize minimal deterministic ID lookup indexes for Hero, Soldier, Skill, and Equipment without duplicating full ConfigData blobs or creating new semantic relations."
+  }
+}
