@@ -171,9 +171,15 @@ export function buildStage3Artifacts(contract, artifacts) {
 
   for (const targetType of contract.targetTypeOrder) {
     const targetMap = reverseMaps[targetType];
-    const relationNames = orderedRelations
-      .filter(({ spec }) => spec.targetType === targetType)
-      .map(({ spec }) => spec.name);
+    const relationEntries = orderedRelations.filter(({ spec }) => spec.targetType === targetType);
+    const relationCatalog = relationEntries.map(({ spec }, slot) => ({
+      slot,
+      relation: spec.name,
+      sourceType: spec.sourceType,
+      semanticStatus: spec.semanticStatus,
+    }));
+    const relationSlotByName = new Map(relationCatalog.map((entry) => [entry.relation, entry.slot]));
+    const relationNames = relationCatalog.map((entry) => entry.relation);
     const byTargetId = {};
     let referenceCount = 0;
 
@@ -183,12 +189,7 @@ export function buildStage3Artifacts(contract, artifacts) {
         .map((group) => {
           const sourceIds = [...group.sourceIds].sort(compareIds);
           referenceCount += sourceIds.length;
-          return {
-            relation: group.relation,
-            sourceType: group.sourceType,
-            semanticStatus: group.semanticStatus,
-            sourceIds,
-          };
+          return [relationSlotByName.get(group.relation), sourceIds];
         });
       byTargetId[targetId] = groups;
     }
@@ -200,13 +201,12 @@ export function buildStage3Artifacts(contract, artifacts) {
       targetType,
       contract: STAGE3_CONTRACT_PATH,
       predecessor: {
-        stage2Contract: artifacts.stage2Contract.path,
         stage2ContractSha256: artifacts.stage2Contract.sha256,
-        stage2Summary: artifacts.stage2Summary.path,
         stage2SummarySha256: artifacts.stage2Summary.sha256,
       },
-      relationCount: relationNames.length,
-      relationNames,
+      tupleFormat: '[relationSlot, sourceIds]',
+      relationCount: relationCatalog.length,
+      relationCatalog,
       targetCount: Object.keys(byTargetId).length,
       referenceCount,
       byTargetId,
@@ -220,7 +220,7 @@ export function buildStage3Artifacts(contract, artifacts) {
     manifestTargets[targetType] = {
       path: contract.outputs.targets[targetType],
       relationCount: index.relationCount,
-      relationNames: index.relationNames,
+      relationNames: index.relationCatalog.map((entry) => entry.relation),
       targetCount: index.targetCount,
       referenceCount: index.referenceCount,
     };
@@ -271,7 +271,15 @@ export function buildStage3Artifacts(contract, artifacts) {
     },
   };
 
+  if (totalReferenceCount !== summary.totalReferenceCount) {
+    throw new Error(`internal reverse reference total mismatch ${totalReferenceCount} != ${summary.totalReferenceCount}`);
+  }
+
   return { targetIndexes, manifest, summary };
+}
+
+export function renderReverseIndex(value) {
+  return `${JSON.stringify(value)}\n`;
 }
 
 export function renderJson(value) {
