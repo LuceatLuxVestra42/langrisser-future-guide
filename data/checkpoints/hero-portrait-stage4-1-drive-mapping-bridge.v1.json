@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-1-drive-mapping-bridge",
+  "schemaId": "hero-portrait-stage4-1-drive-mapping-bridge-checkpoint/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "freezeState": "HERO_PORTRAIT_STAGE4_1_DRIVE_MAPPING_BRIDGE_PROOF_FROZEN",
+  "branch": "work/hero-portrait-stage4-1-drive-mapping-bridge",
+  "baseCommit": "c74fb57c02545cfc7331530838599e082a0c591c",
+  "contract": "data/contracts/hero-portrait-stage4-1-drive-mapping-bridge.v1.json",
+  "proof": "data/generated/hero-portrait-stage4-1-drive-mapping-bridge-proof.v1.json",
+  "checks": [
+    {"id": "canonical-hero-key-remains-heroId", "expected": true, "actual": true, "result": "PASS"},
+    {"id": "display-name-ownership-join", "expected": 0, "actual": 0, "result": "PASS"},
+    {"id": "exact-skin-relation-available", "expected": 540, "actual": 540, "result": "PASS"},
+    {"id": "skin-inventory-hero-coverage", "expected": 267, "actual": 267, "result": "PASS"},
+    {"id": "representative-rarity-root-coverage", "expected": 5, "actual": 5, "result": "PASS"},
+    {"id": "new-exact-folder-ownership-proofs", "expected": 4, "actual": 4, "result": "PASS"},
+    {"id": "new-exact-base-file-id-mappings", "expected": 4, "actual": 4, "result": "PASS"},
+    {"id": "alias-case-matthew-mathew", "expected": true, "actual": true, "result": "PASS"},
+    {"id": "alias-case-lester-lista", "expected": true, "actual": true, "result": "PASS"},
+    {"id": "lana-ch-variant-counterexample-retained", "expected": true, "actual": true, "result": "PASS"},
+    {"id": "heaven-defier-bg-exclusion-counterexample", "expected": true, "actual": true, "result": "PASS"},
+    {"id": "full-239-bridge-application", "expected": false, "actual": false, "result": "PASS_WITH_REVIEW"},
+    {"id": "new-source-admission", "expected": 0, "actual": 0, "result": "PASS"},
+    {"id": "bulk-267-ready", "expected": false, "actual": false, "result": "PASS"}
+  ],
+  "completedScope": [
+    "reuse the frozen Skin ID -> Hero ID EXACTLY_ONE relation instead of display-name joins",
+    "reuse the 267-Hero Skin asset inventory as explicit runtime asset evidence",
+    "freeze exact sourceSpinePath runtime stem matching as the Drive folder ownership bridge",
+    "prove the bridge on representative Drive roots LLR, SSR, SR, R and N",
+    "prove alias-safe mapping where HeroPainting spelling differs from Drive runtime spelling",
+    "prove four previously unanchored structured Drive folders to exact Hero IDs",
+    "resolve four exact base portrait Drive file IDs without using Korean folder names as identity evidence",
+    "freeze deterministic base-role selection after folder ownership proof",
+    "retain the Lana _CH and HeavenDefier _BG counterexamples as ambiguity guards"
+  ],
+  "newExactMappings": [
+    {"heroId": 1, "driveBasePngId": "1M5tPVnjasucNwHT5pEIQImoPfaTPwFV7", "state": "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED"},
+    {"heroId": 17, "driveBasePngId": "1SIvmkqn98OHDrzw63h0NmhtwLw7hw9fy", "state": "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED"},
+    {"heroId": 19, "driveBasePngId": "1B0lDSqO4uFcGDbCNF7uAuUG_6-SDYGJU", "state": "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED"},
+    {"heroId": 99264, "driveBasePngId": "1IS3mVbkYNW_7zREPCcvEkTgJpTSlW9kr", "state": "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED"}
+  ],
+  "reviewBoundary": {
+    "previouslyAdmittedCount": 5,
+    "newBridgeMappedNotAdmittedCount": 4,
+    "knownExactDriveFileIdMappingCount": 9,
+    "remainingUnanchoredStructuredFolderCount": 235,
+    "minimumStructuredTreeCountGap": 23,
+    "pendingCanonicalSourceAdmissionCount": 262,
+    "populationBridgeApplicationComplete": false,
+    "meaning": "The non-name bridge is proven and frozen, but it has not been bulk-applied to all 235 remaining structured folders. The four new exact Drive file IDs are mappings only, not admitted source bytes."
+  },
+  "notCompletedScope": [
+    "bulk-apply the frozen bridge rule to the remaining 235 structured Drive folders",
+    "download and byte/hash/dimension/alpha validate the four new base PNG mappings for source admission",
+    "resolve the minimum 23-Hero structured-tree gap",
+    "materialize additional canonical Hero PNGs",
+    "declare Stage 4 bulk extraction complete"
+  ],
+  "verdict": {
+    "stage4_1BridgeProofComplete": true,
+    "bridgeRuleFrozen": true,
+    "newExactMappingCount": 4,
+    "knownExactDriveMappingCount": 9,
+    "representativeRootCoverage": "5_OF_5",
+    "hardErrors": 0,
+    "populationBridgeApplicationComplete": false,
+    "bulk267Ready": false
+  },
+  "nextStart": {
+    "primary": "HERO_PORTRAIT_STAGE4_1B_STRUCTURED_DRIVE_BULK_MAPPING_APPLICATION",
+    "primaryGoal": "Apply the frozen exact Skin-runtime-stem bridge to the remaining 235 structured Drive candidate folders and emit Hero ID -> exact base Drive file ID rows with ambiguity states.",
+    "secondary": "HERO_PORTRAIT_STAGE4_2_UNCOVERED_SOURCE_FALLBACK_PROOF",
+    "secondaryGoal": "Resolve the minimum 23-Hero structured-tree gap after the structured Drive mapping application is exhausted.",
+    "admissionBoundary": "Mapped Drive file IDs remain non-admitted until Stage 3 byte/image admission checks are executed."
+  }
+}
