@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-translation-batch/v1",
+  "date": "2026-08-28",
+  "batch": 3,
+  "status": "PASS_WITH_REVIEW",
+  "source": "data/generated/soldier-detail-stage5-3.v1.json",
+  "presentation": "data/presentation/soldier-unique-skill-kr.v1.json",
+  "processedSoldierIds": [219,225,231,237,244,245,246,247,248,249],
+  "summary": {
+    "batchCount": 10,
+    "passCount": 9,
+    "reviewCount": 1,
+    "cumulativeTranslatedCount": 30,
+    "cumulativePassCount": 25,
+    "cumulativeReviewCount": 5,
+    "remainingCount": 155,
+    "lastCompletedSoldierId": 249,
+    "nextKnownRecord": 250
+  },
+  "reusableRules": [
+    {"cn":"生命值百分比","kr":"생명 비율"},
+    {"cn":"攻击生命值百分比低于本部队的敌军时","kr":"생명 비율이 본 부대보다 낮은 적군을 공격할 시"},
+    {"cn":"攻击生命值百分比低于或等于本部队的敌军时","kr":"생명 비율이 본 부대의 생명 비율 이하인 적군을 공격할 시"},
+    {"cn":"攻击生命值百分比高于本部队的敌军时","kr":"생명 비율이 본 부대의 생명 비율을 초과하는 적군을 공격할 시"},
+    {"cn":"造成对方部队生命上限X%伤害","kr":"상대 부대 최대 생명의 X%만큼 피해"},
+    {"cn":"损失部队当前生命的X%","kr":"부대 현재 생명의 X%를 잃음"},
+    {"cn":"可以随英雄远程攻击一起战斗","kr":"영웅의 원거리 공격에도 함께 전투에 참여"},
+    {"cn":"以上所有效果翻倍","kr":"위 모든 효과 2배"},
+    {"cn":"被攻击时有X%的几率","kr":"공격받을 시 X% 확률로"},
+    {"cn":"近战攻击进入战斗时","kr":"근접 공격으로 전투 진입 시"},
+    {"cn":"各提升X%","kr":"각각 X% 증가"}
+  ],
+  "reviewQueue": [
+    {
+      "soldierId": 249,
+      "nameKr": "상아 부대",
+      "termCn": "反弹部队受到伤害...恢复最大生命百分比",
+      "status": "REVIEW_MECHANIC",
+      "reason": "Reflection percentage is reused as a post-battle max-HP recovery percentage; structure is translated but final Korean presentation wording should be verified as one mechanic."
+    }
+  ],
+  "nextStartPoint": {
+    "afterSoldierId": 249,
+    "nextKnownRecord": 250,
+    "batchSize": 10
+  }
+}
