@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-stage3/v1",
+  "stage": 3,
+  "status": "PASS_WITH_REVIEW",
+  "mode": "READ_ONLY_AUDIT",
+  "sources": {
+    "contract": "data/contracts/localization-audit-stage3.v1.json",
+    "soldierGate": "data/validation/localization-audit-soldier-stage2-1.v1.json",
+    "heroMaster": "data/hero-name-master.v1.json",
+    "heroConsumer": "data/generated/hero-list-stage1.v1.json",
+    "equipmentCanonical": "data/generated/equipment_stage3_2_display_metadata.json",
+    "equipmentBuilder": "scripts/build-equipment-name-kr-presentation.mjs",
+    "equipmentLocalizationSources": [
+      "data/localization/equipment-name-kr/weapon.tsv",
+      "data/localization/equipment-name-kr/armor.tsv",
+      "data/localization/equipment-name-kr/headgear.tsv",
+      "data/localization/equipment-name-kr/accessory.tsv"
+    ]
+  },
+  "soldier": {
+    "status": "PASS_WITH_REVIEW",
+    "canonicalRecords": 224,
+    "effectiveKoreanDisplayRecords": 224,
+    "errors": 0,
+    "reviews": 2,
+    "lowerTierFingerprint": "316e905bc409fa337f79baa72a676872998c1f1546ee994e00267b2948d42e28"
+  },
+  "hero": {
+    "masterRecords": 267,
+    "consumerRecords": 267,
+    "uniqueHeroIds": 267,
+    "verifiedRecords": 267,
+    "completeIdentityDisplays": 267,
+    "identityMismatchCount": 0,
+    "fingerprintAlgorithm": "sha256",
+    "fingerprintSort": "heroId-ascending",
+    "fingerprintFields": [
+      "heroId",
+      "nameCn",
+      "nameKr",
+      "nameEn",
+      "status"
+    ],
+    "fingerprint": "2227c7949dc1ec0c146a8cd8adfa152fc8806a47e94fc8697f97969ae5cb4d5a"
+  },
+  "equipment": {
+    "canonicalRecords": 390,
+    "derivedPresentationRecords": 390,
+    "uniqueEquipmentIds": 390,
+    "publicRecords": 373,
+    "publicKoreanDisplays": 373,
+    "nonPublicRecords": 17,
+    "unresolvedNonPublic": 17,
+    "identityMismatchCount": 0,
+    "pageReadyMismatchCount": 0,
+    "runtimeNameJoin": false,
+    "productionJoinKey": "equipmentId",
+    "repositoryWritesDuringAudit": false,
+    "tempWorkspaceBuild": true,
+    "fingerprintAlgorithm": "sha256",
+    "fingerprintSort": "equipmentId-ascending",
+    "fingerprintFields": [
+      "equipmentId",
+      "nameCn",
+      "nameKr",
+      "pageReady",
+      "status",
+      "note"
+    ],
+    "fingerprint": "bdfde87013955d9e3c509de35ce6e3afa1e7ce3e62b7b02a3681e9c62c10f2cf"
+  },
+  "summary": {
+    "errors": 0,
+    "reviews": 2
+  },
+  "errors": []
+}
