@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-soldier-stage2/v1",
+  "stage": 2,
+  "entity": "Soldier",
+  "status": "PASS_WITH_REVIEW",
+  "mode": "READ_ONLY_AUDIT",
+  "sources": {
+    "contract": "data/contracts/localization-audit.v1.json",
+    "canonical": "data/generated/soldier-list-stage5-8.v1.json",
+    "lowerTierPresentation": "data/presentation/soldier-lower-tier-name-kr.v1.json",
+    "tier3ProvisionalPresentation": "data/presentation/soldier-t3-provisional-name-kr.v1.json",
+    "tier3ProvisionalValidation": "data/validation/soldier-t3-provisional-name-presentation.v1.json"
+  },
+  "summary": {
+    "canonicalRecords": 224,
+    "canonicalUniqueIds": 224,
+    "normalRecords": 168,
+    "spRecords": 56,
+    "normalTier3Records": 129,
+    "tier3ConfirmedCanonical": 127,
+    "lowerTierCanonicalRecords": 39,
+    "lowerTierPresentationRecords": 39,
+    "tier3ProvisionalPresentationRecords": 2,
+    "effectiveKoreanDisplayRecords": 224,
+    "canonicalStateConflicts": 0,
+    "staleConfirmedOverlays": 0,
+    "invalidPromotions": 0,
+    "staleProvisionals": 0,
+    "overlayCollisions": 0,
+    "expectedNormalSpDuplicateNameGroups": 56,
+    "duplicateKrNameGroups": 0,
+    "errors": 0,
+    "reviews": 2
+  },
+  "checks": {
+    "contractFrozen": true,
+    "canonicalCountMatches": true,
+    "canonicalIdsUnique": true,
+    "canonicalLocalizationStateConflicts": 0,
+    "lowerTierCoverageMatches": true,
+    "lowerTierIdsUnique": true,
+    "staleConfirmedOverlayCount": 0,
+    "provisionalCoverageMatches": true,
+    "provisionalIdsUnique": true,
+    "invalidPromotionCount": 0,
+    "staleProvisionalCount": 0,
+    "overlayCollisionCount": 0,
+    "tier3ConfirmedCanonical": 127,
+    "effectiveDisplayCount": 224,
+    "missingEffectiveDisplayCount": 0,
+    "expectedNormalSpDuplicateNameGroups": 56,
+    "duplicateKrNameGroups": 0,
+    "provisionalBoundaryValidationPass": true,
+    "readOnlyExecution": true
+  },
+  "errors": [],
+  "reviews": [
+    {
+      "severity": "REVIEW",
+      "code": "PROVISIONAL_UNRESOLVED",
+      "message": "Tier 3 Soldier 136 uses an approved provisional Korean display name while the official Korean server name remains unresolved.",
+      "context": {
+        "soldierId": 136,
+        "nameCn": "烬色卫队",
+        "displayNameKr": "잿빛 호위대"
+      }
+    },
+    {
+      "severity": "REVIEW",
+      "code": "PROVISIONAL_UNRESOLVED",
+      "message": "Tier 3 Soldier 1039 uses an approved provisional Korean display name while the official Korean server name remains unresolved.",
+      "context": {
+        "soldierId": 1039,
+        "nameCn": "断罪修女",
+        "displayNameKr": "단죄의 수녀"
+      }
+    }
+  ]
+}
