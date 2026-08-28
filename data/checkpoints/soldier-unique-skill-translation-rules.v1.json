@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-translation-rules/v1",
+  "date": "2026-08-28",
+  "status": "PASS_WITH_REVIEW",
+  "scope": {
+    "source": "data/generated/soldier-detail-stage5-3.v1.json",
+    "targetCount": 185,
+    "normalTier3Count": 129,
+    "spCount": 56,
+    "excludedLowerTierCount": 39,
+    "normalSourcePath": "ability.finalDescription",
+    "spSourcePath": "sp.finalDescription"
+  },
+  "principles": [
+    "Canonical/generated source text remains read-only; Korean text is a presentation-layer translation.",
+    "Preserve explicit subject distinctions: 士兵=병사, 部队=부대, 英雄=영웅. Do not insert a subject when the Chinese source omits it unless Korean grammar requires it without changing scope.",
+    "Preserve condition order, effect order, numerical values, percentages, plus signs, and duration exactly.",
+    "Preserve inequality semantics exactly: 高于/大于=초과, 低于/小于=미만, 大于等于/不低于=이상, 小于等于/不高于=이하.",
+    "Keep <color=#DC143C>...</color> markup attached to the same numeric value and preserve meaningful line breaks.",
+    "Use concise Korean game-UI wording; prefer 증가/감소/회복/발동 over explanatory paraphrase.",
+    "Named effects and skill-specific proper nouns are not auto-translated by the core dictionary; they enter the review queue."
+  ],
+  "coreTerms": [
+    {"cn":"全属性","kr":"모든 능력치"},
+    {"cn":"士兵","kr":"병사"},
+    {"cn":"部队","kr":"부대"},
+    {"cn":"英雄","kr":"영웅"},
+    {"cn":"敌军","kr":"적군"},
+    {"cn":"友军","kr":"아군"},
+    {"cn":"生命","kr":"생명"},
+    {"cn":"生命值","kr":"생명"},
+    {"cn":"最大生命","kr":"최대 생명"},
+    {"cn":"生命上限","kr":"최대 생명"},
+    {"cn":"当前生命","kr":"현재 생명"},
+    {"cn":"攻击","kr":"공격"},
+    {"cn":"防御","kr":"방어"},
+    {"cn":"魔防","kr":"마방"},
+    {"cn":"攻防","kr":"공격/방어"},
+    {"cn":"暴击率","kr":"치명타율"},
+    {"cn":"射程","kr":"사거리"},
+    {"cn":"移动力","kr":"이동력"},
+    {"cn":"移动距离","kr":"이동 거리"},
+    {"cn":"提升","kr":"증가"},
+    {"cn":"降低","kr":"감소"},
+    {"cn":"额外","kr":"추가"},
+    {"cn":"恢复","kr":"회복"},
+    {"cn":"概率","kr":"확률"},
+    {"cn":"触发","kr":"발동"},
+    {"cn":"持续","kr":"지속"},
+    {"cn":"回合","kr":"턴"},
+    {"cn":"格","kr":"칸"},
+    {"cn":"范围内","kr":"범위 내"},
+    {"cn":"弱化效果","kr":"약화 효과"},
+    {"cn":"强力弱化效果","kr":"강력한 약화 효과"},
+    {"cn":"驱散","kr":"제거"},
+    {"cn":"免疫","kr":"면역"},
+    {"cn":"无法免疫","kr":"면역 불가"},
+    {"cn":"不可驱散","kr":"제거 불가"},
+    {"cn":"固定伤害","kr":"고정 피해"},
+    {"cn":"物理伤害","kr":"물리 피해"},
+    {"cn":"魔法伤害","kr":"마법 피해"},
+    {"cn":"普通攻击","kr":"일반 공격"},
+    {"cn":"飞行","kr":"비행"},
+    {"cn":"防御地形","kr":"방어 지형"}
+  ],
+  "fixedPhrases": [
+    {"cn":"主动进入战斗时","kr":"공격하여 전투 진입 시"},
+    {"cn":"被攻击进入战斗时","kr":"공격받아 전투 진입 시"},
+    {"cn":"进入战斗时","kr":"전투 진입 시"},
+    {"cn":"主动攻击时","kr":"공격 시"},
+    {"cn":"被攻击时","kr":"공격받을 시"},
+    {"cn":"行动结束时","kr":"행동 종료 시"},
+    {"cn":"战斗后","kr":"전투 후"},
+    {"cn":"战后","kr":"전투 후"},
+    {"cn":"下一次进入战斗时","kr":"다음 전투 진입 시"},
+    {"cn":"周围N格","kr":"주위 N칸"},
+    {"cn":"N格内","kr":"N칸 이내"},
+    {"cn":"持续N回合","kr":"N턴 지속"},
+    {"cn":"每场战斗最多触发一次","kr":"전투당 최대 1회 발동"},
+    {"cn":"遭受伤害降低X%","kr":"받는 피해 X% 감소"},
+    {"cn":"遭受物理伤害降低X%","kr":"받는 물리 피해 X% 감소"},
+    {"cn":"遭受魔法伤害降低X%","kr":"받는 마법 피해 X% 감소"},
+    {"cn":"造成伤害提升X%","kr":"주는 피해 X% 증가"},
+    {"cn":"部队伤害降低X%","kr":"부대가 주는 피해 X% 감소"},
+    {"cn":"恢复士兵X%的生命","kr":"병사 생명 X% 회복"},
+    {"cn":"反弹受到伤害的X%","kr":"받은 피해의 X% 반사"},
+    {"cn":"施加「X」","kr":"「X」 부여"},
+    {"cn":"无视X","kr":"X 무시"}
+  ],
+  "statListStyle": {
+    "twoStats": "공격 및 방어",
+    "threeOrMoreStats": "공격, 방어, 마방",
+    "note": "和/与 connecting two stats is rendered as 및; longer stat lists use commas."
+  },
+  "inequalities": [
+    {"cn":"高于 / 大于","kr":"초과"},
+    {"cn":"低于 / 小于","kr":"미만"},
+    {"cn":"大于等于 / 不低于","kr":"이상"},
+    {"cn":"小于等于 / 不高于","kr":"이하"}
+  ],
+  "reviewQueueRules": [
+    "Text inside 「」 or other named-effect labels is reviewed separately instead of being translated by generic word replacement.",
+    "Skill-specific proper nouns and named mechanics such as 灼烧, 倒刺, 亡者苏生, 炼狱魔核 require individual Korean naming review.",
+    "Mechanics whose official Korean wording can materially affect interpretation, including 致命一击 and 近战伤害减免, require per-record review.",
+    "Unusual generation/revival wording such as 获得N个士兵 or 士兵全部阵亡 requires sentence-level review even when its component terms are fixed."
+  ],
+  "validatedExamples": [
+    {
+      "cn":"全属性<color=#DC143C>+30%</color>\n遭受物理伤害降低<color=#DC143C>30%</color>。",
+      "kr":"모든 능력치 <color=#DC143C>+30%</color>\n받는 물리 피해 <color=#DC143C>30%</color> 감소."
+    },
+    {
+      "cn":"主动进入战斗时，攻击提升<color=#DC143C>30%</color>，<color=#DC143C>75%</color>概率使敌军防御降低<color=#DC143C>20%</color>，持续<color=#DC143C>1</color>回合。",
+      "kr":"공격하여 전투 진입 시 공격 <color=#DC143C>30%</color> 증가, <color=#DC143C>75%</color> 확률로 적군의 방어 <color=#DC143C>20%</color> 감소, <color=#DC143C>1</color>턴 지속."
+    },
+    {
+      "cn":"被攻击进入战斗时，攻击和防御提升<color=#DC143C>30%</color>。",
+      "kr":"공격받아 전투 진입 시 공격 및 방어 <color=#DC143C>30%</color> 증가."
+    }
+  ],
+  "completion": {
+    "coreRulesFrozen": true,
+    "autoTranslationEligible": "common terms, conditions, stats, damage/recovery, timing, range and inequality expressions",
+    "reviewRequired": "named effects, skill-specific proper nouns and mechanics with potentially official Korean terminology",
+    "nextStartPoint": "Translate the 185 final descriptions in batches using this checkpoint, collecting only newly encountered exceptions."
+  }
+}
