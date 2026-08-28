@@ -44,25 +44,17 @@
   "pathRuleOverlays": [
     {
       "id": "soldier-webp-assets-post-map",
-      "patterns": [
-        "public/images/soldiers-webp/**"
-      ],
+      "patterns": ["public/images/soldiers-webp/**"],
       "excludePatterns": [],
-      "directNodes": [
-        "soldier-assets"
-      ],
+      "directNodes": ["soldier-assets"],
       "changeClass": "asset",
       "reason": "Post-map Soldier frontend closeout serves 224/224 lossless WebP derivatives while retaining PNG as authoritative source evidence. This is presentation-only and must not reopen Soldier canonical semantics."
     },
     {
       "id": "project-doctor-workflow-post-map",
-      "patterns": [
-        ".github/workflows/project-doctor-*.yml"
-      ],
+      "patterns": [".github/workflows/project-doctor-*.yml"],
       "excludePatterns": [],
-      "directNodes": [
-        "project-doctor"
-      ],
+      "directNodes": ["project-doctor"],
       "changeClass": "tooling",
       "reason": "Project Doctor CI/PR workflow changes affect Doctor tooling only. They must be validated by Doctor self-tests but must not fan out into semantic domain recomputation."
     },
@@ -72,14 +64,13 @@
         "scripts/build-project-status.mjs",
         ".github/workflows/project-status-sync.yml",
         "data/generated/project-status.v1.json",
-        "PROJECT_STATUS.md"
+        "PROJECT_STATUS.md",
+        "data/status-sources/**"
       ],
       "excludePatterns": [],
-      "directNodes": [
-        "project-doctor"
-      ],
+      "directNodes": ["project-doctor"],
       "changeClass": "tooling",
-      "reason": "Project Status is a deterministic read-only projection of Project Doctor D1. Its builder, sync workflow, generated JSON, and human-readable Markdown are Doctor tooling only and must not reopen domain semantics."
+      "reason": "Project Status and Active Source Registry declarations are deterministic read-only Project Doctor tooling. Registry declarations select already validated status authorities through explicit successor rules and must not reopen or recompute domain semantics."
     },
     {
       "id": "regression-coverage-promotion-v1-meta-contract",
@@ -89,15 +80,13 @@
         "scripts/validate-regression-coverage-promotion.mjs"
       ],
       "excludePatterns": [],
-      "directNodes": [
-        "project-doctor"
-      ],
+      "directNodes": ["project-doctor"],
       "changeClass": "tooling",
       "reason": "Regression Coverage Promotion V1 is a Doctor meta-contract admission surface only. Mapping these exact V1 files to project-doctor does not promote or broaden any domain owning validator."
     }
   ],
   "overlayPolicy": {
-    "reason": "The base dependency map remains frozen. Post-map repository evolution is admitted only through explicit evidenced path families: Soldier WebP presentation assets, Project Doctor workflow files used by D6/D7 runtime integration, deterministic Project Status derived-sync tooling, and the exact Regression Coverage Promotion V1 meta-contract admission surface.",
+    "reason": "The base dependency map remains frozen. Post-map repository evolution is admitted only through explicit evidenced path families: Soldier WebP presentation assets, Project Doctor workflow files, deterministic Project Status and Active Source Registry tooling, and the exact Regression Coverage Promotion V1 meta-contract admission surface.",
     "mayAddPathRulesOnly": true,
     "mayAddImpactNodes": false,
     "mayAddPropagationEdges": false,
@@ -138,10 +127,11 @@
         "scripts/build-project-status.mjs",
         ".github/workflows/project-status-sync.yml",
         "data/generated/project-status.v1.json",
-        "PROJECT_STATUS.md"
+        "PROJECT_STATUS.md",
+        "data/status-sources/baseline.v1.json"
       ],
       "expectedStatus": "MAPPED",
-      "expectedChangedFileCount": 4,
+      "expectedChangedFileCount": 5,
       "expectedDirectNodes": ["project-doctor"],
       "expectedDomains": []
     },
