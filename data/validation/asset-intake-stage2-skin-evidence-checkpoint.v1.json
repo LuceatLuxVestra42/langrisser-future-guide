@@ -21,14 +21,15 @@
   },
   "evidenceSources": {
     "legacyStaticRawBytes": "data/evidence/skin-stage3-2-static-source-evidence.v1.json",
-    "unityBundlePathEvidence": "data/evidence/skin-stage3-2-unity-bundle-evidence.v1.json"
+    "unityBundlePathEvidence": "data/evidence/skin-stage3-2-unity-bundle-evidence.v1.json",
+    "skin102BeginStaticEvidence": "data/evidence/skin-stage3-2-mathew-begin-static-evidence.v1.json"
   },
   "coverage": {
     "representativeExpected": 3,
     "staticExpected": 3,
     "staticExactBasenameCandidates": 3,
     "staticRawBytesVerified": 3,
-    "staticAuthoritativeUnityPathResolved": 2,
+    "staticAuthoritativeUnityPathResolved": 3,
     "spineExpected": 3,
     "spineAuthoritativePathResolved": 2,
     "recordsWithStaticAndSpinePathResolved": 2,
@@ -59,13 +60,17 @@
       "canonicalKey": "102",
       "static": {
         "frozenLocator": "UI/Icon/HeroSkin_ABS/Skin/Skin_Matthew_01.png",
-        "status": "AUTHORITATIVE_PATH_NOT_YET_FOUND"
+        "observedInternalPath": "assets/gameproject/runtimeassets/ui/icon/heroskin_abs/skin/skin_matthew_01.png",
+        "bundle": "begin_ui_icon_heroskin_abs.b",
+        "status": "AUTHORITATIVE_PATH_CONFIRMED"
       },
       "spine": {
         "frozenLocator": "Spine/Char/Mathew_ABS/Mathew_Skin01_Prefab.prefab",
         "observedNearbyVariant": "assets/gameproject/runtimeassets/spine/char/mathew_abs/mathew_skin01_range_prefab.prefab",
         "status": "NEARBY_RANGE_VARIANT_NOT_ACCEPTED_AS_EXACT"
-      }
+      },
+      "normalizedResolutionClass": "PENDING",
+      "pendingReason": "EXACT_FROZEN_SPINE_AND_RESOURCE_ID_EVIDENCE_REQUIRED"
     }
   ],
   "modelResourceIds": [
@@ -78,24 +83,25 @@
     3701
   ],
   "verifiedFacts": [
-    "All five user-supplied .b files are UnityFS bundles built with Unity revision 2022.3.62f2 and have raw-byte SHA-256 provenance recorded in the Unity bundle evidence file.",
+    "The previously supplied five .b files are UnityFS bundles built with Unity revision 2022.3.62f2 and have raw-byte SHA-256 provenance recorded in the Unity bundle evidence file.",
     "Skin 1901 static and Spine frozen locators are reproduced by embedded runtime paths in ui_icon_heroskin2_abs.b and spine_char_lista_abs.b respectively, modulo path casing only.",
     "Skin 3701 static and Spine frozen locators are reproduced by embedded runtime paths in ui_icon_heroskin_abs.b and spine_char_zigodlla_abs.b respectively, modulo path casing only.",
-    "Skin 102 static frozen locator was not found in ui_icon_heroskin_abs.b, and spine_char_mathew_abs.b contains Mathew_Skin01_Range_Prefab rather than the frozen Mathew_Skin01_Prefab; the Range variant is not promoted to an exact match.",
-    "The legacy Drive raw PNG evidence remains supporting byte evidence for all three representatives but does not override missing Unity path evidence for Skin 102.",
+    "Skin 102 static frozen locator is reproduced by the embedded runtime path assets/gameproject/runtimeassets/ui/icon/heroskin_abs/skin/skin_matthew_01.png in begin_ui_icon_heroskin_abs.b, modulo path casing only.",
+    "The uploaded begin_spine_char_lista_abs.b contains Lista base Spine assets and does not satisfy the frozen Mathew Spine locator.",
+    "spine_char_mathew_abs.b contains Mathew_Skin01_Range_Prefab rather than the frozen Mathew_Skin01_Prefab; the Range variant is not promoted to an exact match.",
     "No authoritative file-path or byte mapping has yet been verified for model resource IDs 102, 1021, 1022, 1023, 1024, 1901, or 3701."
   ],
   "blockers": [
-    "SKIN_102_AUTHORITATIVE_STATIC_PATH_PROOF_REQUIRED",
     "SKIN_102_EXACT_FROZEN_SPINE_PREFAB_REQUIRED",
     "AUTHORITATIVE_MODEL_RESOURCE_MAP_OR_SOURCE_REQUIRED"
   ],
   "rejectedShortcuts": [
     "Do not treat Mathew Skin01 Range as the frozen Mathew Skin01 prefab.",
+    "Do not substitute Lista begin Spine evidence for Mathew Spine evidence.",
     "Do not use fuzzy filename matching.",
     "Do not derive model asset paths from numeric resource IDs.",
     "Do not use ID arithmetic or cross-root fallback.",
-    "Do not claim normalized RESOLVED for 1901 or 3701 until their RESOURCE_ID evidence requirement is satisfied."
+    "Do not claim normalized RESOLVED for any representative until its RESOURCE_ID evidence requirement is satisfied."
   ],
-  "nextStartPoint": "Inspect begin_ui_icon_heroskin_abs.b and begin_spine_char_mathew_abs.b first for the missing Skin 102 frozen static and Spine paths. Separately acquire an explicit source map or equivalent authoritative evidence for the seven frozen model resource IDs before generating final normalized RESOLVED evidence."
+  "nextStartPoint": "Inspect begin_spine_char_mathew_abs.b for the missing frozen Skin 102 Spine prefab. After that, acquire an explicit source map or equivalent authoritative evidence for model resource IDs 102, 1021, 1022, 1023, 1024, 1901, and 3701 before generating final normalized RESOLVED evidence."
 }
