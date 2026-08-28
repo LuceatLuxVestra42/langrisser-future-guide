@@ -1,17 +1,18 @@
 {
   "version": 1,
   "schemaId": "project-doctor-closeout-summary/v1",
-  "checkpoint": "PROJECT_DOCTOR_D1_D5_CLOSEOUT",
-  "status": "PASS_PROJECT_DOCTOR_CLOSEOUT_REPOSITORY_INTEGRATION",
-  "completion": "COMPLETE_WITH_LIVE_REPOSITORY_EXECUTION_GAP",
+  "checkpoint": "PROJECT_DOCTOR_D1_D6_CLOSEOUT",
+  "status": "PASS_PROJECT_DOCTOR_CLOSEOUT_RUNTIME_INTEGRATION",
+  "completion": "COMPLETE",
   "branch": "work/project-doctor-closeout",
   "base": "main",
   "baseSha": "5a241e7a9ffe0a87fa23260ca9a179138af95dc9",
   "repositoryStateBeforeThisSummaryUpdate": {
-    "aheadBy": 58,
+    "aheadBy": 67,
     "behindBy": 0,
-    "changedFileCount": 35,
-    "productionCanonicalFrontendSourceChangeCount": 0
+    "changedFileCount": 38,
+    "productionCanonicalFrontendSourceChangeCount": 0,
+    "temporaryRepairWorkflowPresent": false
   },
   "closeoutSteps": {
     "closeout1_mainBasedBranchAndImport": "COMPLETE",
@@ -19,8 +20,9 @@
     "closeout3_d3InputIntegration": "COMPLETE",
     "closeout4_d4ExecutionRunner": "COMPLETE",
     "closeout5_d5FreshnessGuard": "COMPLETE",
-    "closeout6_integratedDoctorEntrypoint": "COMPLETE",
-    "closeout7_finalDiffInspection": "COMPLETE"
+    "closeout6_d6LiveRuntimeProof": "COMPLETE",
+    "closeout7_readOnlyGitHubActionsIntegration": "COMPLETE",
+    "closeout8_finalDiffInspection": "COMPLETE"
   },
   "integrationFacts": {
     "mainBasedCloseoutBranch": true,
@@ -38,6 +40,10 @@
     "d5NormalDoctorAutoReseal": false,
     "d5ExplicitRefreshOnly": true,
     "d5StaleExitCode": 4,
+    "d6Workflow": ".github/workflows/project-doctor-d6.yml",
+    "d6FinalWorkflowContentsReadOnly": true,
+    "d6FinalWorkflowAutoReseal": false,
+    "d6LiveRuntimeProof": true,
     "doctorEntrypoint": "node scripts/run-project-doctor-closeout.mjs",
     "doctorStatusEntrypoint": "node scripts/run-project-doctor-d1-3.mjs",
     "doctorFreshnessEntrypoint": "node scripts/validate-project-doctor-d5.mjs",
@@ -55,35 +61,55 @@
     "doctor:freshness:self-test": "D5 synthetic freshness fixtures",
     "doctor:closeout:validate": "integrated runner synthetic fixtures"
   },
-  "isolatedVerification": {
+  "verification": {
     "d4ExecutionFixtures": "8/8 PASS",
     "d5FreshnessFixtures": "7/7 PASS",
     "closeoutIntegrationFixtures": "6/6 PASS",
-    "actualRepositoryChildCommandExecutionCount": 0
+    "actualGitHubActionsRunId": 33147644692,
+    "actualGitHubActionsJobId": 98772124007,
+    "actualGitHubActionsHeadSha": "c37ae00120e5b5314ff7b97ef1c9d74e9e3199f0",
+    "actualGitHubActionsConclusion": "success",
+    "actualRepositoryChildCommandExecutionProven": true,
+    "d1GeneratedOutputsDeterministicInCI": true,
+    "freshnessBeforeAndAfterD1Regeneration": "FRESH",
+    "integratedDryRun": "PASS_DRY_RUN",
+    "integratedActualRun": "PASS_EXECUTED",
+    "actualSelectedCheckCount": 4,
+    "productionBuildInCI": "PASS"
   },
   "freshnessManifest": {
     "status": "FRESH_SNAPSHOT",
     "authoritativeSourceCount": 11,
     "monitoredInputCount": 19,
     "monitoredOutputCount": 3,
-    "seedMethod": "CURRENT_GITHUB_BLOB_SHA_BASELINE",
-    "liveRefreshCommandExecuted": false
+    "seedMethod": "EXPLICIT_RUNTIME_REFRESH_AFTER_CI_DETECTED_STALE_BASELINE",
+    "liveRefreshCommandExecuted": true
   },
-  "liveExecutionGap": {
-    "status": "OPEN",
-    "reason": "The GitHub connector can read/write/compare repository content but cannot execute npm commands in the live checkout.",
-    "requiredBeforeClaimingRuntimeProof": "Run npm run doctor:closeout:validate and npm run doctor -- --dry-run in an executable checkout or CI environment.",
-    "doesNotInvalidateRepositoryIntegration": true
+  "runtimeGap": {
+    "status": "CLOSED",
+    "closedBy": "GitHub Actions Project Doctor D6 Runtime Proof run 33147644692",
+    "proof": "Read-only CI regenerated D1 outputs deterministically, kept D5 FRESH, passed integrated dry-run, executed all four D3-selected checks, and completed the production build."
+  },
+  "repairHistory": {
+    "initialD6RunCaughtStaleBaseline": true,
+    "initialFailedRunId": 33147448872,
+    "diagnosticRunId": 33147514536,
+    "oneTimeRepairRunId": 33147601916,
+    "oneTimeRepairConclusion": "success",
+    "temporaryContentsWriteWorkflowRemoved": true,
+    "finalWorkflowContentsWritePermission": false
   },
   "boundaries": {
     "rawConfigDataSemanticRecomputationAdded": false,
     "productionSourceMutationAdded": false,
     "canonicalDataMutationAdded": false,
     "frontendSourceMutationAdded": false,
-    "githubActionsAdded": false,
+    "githubActionsAdded": true,
+    "finalProjectDoctorWorkflowReadOnly": true,
     "staleOutputFreshnessGuardImplemented": true,
-    "missingOwningValidatorsInvented": false
+    "missingOwningValidatorsInvented": false,
+    "manualReviewBoundaryPreserved": true
   },
-  "nextStage": "D6",
-  "nextStageGoal": "Obtain live repository command proof for the integrated Doctor, then add GitHub Actions automation without weakening D5 freshness or D4 manual-review boundaries."
+  "nextStage": "D7",
+  "nextStageGoal": "Promote the proven read-only Doctor workflow into PR/merge-facing guard policy and final integration checks without broadening validator scope or weakening D5 freshness and D4 manual-review boundaries."
 }
