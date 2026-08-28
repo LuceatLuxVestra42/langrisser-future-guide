@@ -88,6 +88,7 @@ assert(ownerHeroMissing === 0, `owner Hero missing ${ownerHeroMissing}`);
 
 const sourceFiles = {
   serverData: read(contract.implementation.serverDataModule),
+  localizedServer: read("src/lib/equipment-page.localized.server.ts"),
   serverFunctions: read(contract.implementation.serverFunctionsModule),
   generalRoute: read(contract.implementation.routes.general.file),
   exclusiveRoute: read(contract.implementation.routes.exclusive.file),
@@ -113,8 +114,20 @@ assert(
   "equipment server functions do not use createServerFn",
 );
 assert(
-  sourceFiles.serverFunctions.includes("./equipment-page.server"),
-  "server functions do not delegate to .server module",
+  sourceFiles.serverFunctions.includes("./equipment-page.localized.server"),
+  "server functions do not delegate to localized server adapter",
+);
+assert(
+  sourceFiles.localizedServer.includes("./equipment-page.server") &&
+    sourceFiles.localizedServer.includes("readBaseGeneralEquipmentPageData") &&
+    sourceFiles.localizedServer.includes("readBaseExclusiveEquipmentPageData") &&
+    sourceFiles.localizedServer.includes("readBaseEquipmentDetailPageData"),
+  "localized server adapter does not preserve base Equipment server delegation",
+);
+assert(
+  sourceFiles.localizedServer.includes("equipment-name-kr-user-approved.v1.json") &&
+    sourceFiles.localizedServer.includes("byEquipmentId"),
+  "localized server adapter does not use the approved equipmentId-keyed Korean-name projection",
 );
 assert(
   sourceFiles.serverData.includes("equipment_stage3_3_general_list.json") &&
@@ -203,6 +216,8 @@ const summary = {
   },
   sourceDiscipline: {
     createServerFnBoundary: true,
+    localizedPresentationAdapter: true,
+    baseServerDelegationPreserved: true,
     rawGeneratedJsonOnlyInServerModule: true,
     directConfigDataReads: false,
     directSkillHeroOwnershipReads: false,
