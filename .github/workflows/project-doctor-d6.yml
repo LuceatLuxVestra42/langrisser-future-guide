@@ -44,8 +44,24 @@ jobs:
       - name: Integrated closeout fixtures
         run: npm run doctor:closeout:validate
 
-      - name: Validate existing freshness seal
+      - name: Validate committed freshness seal
         run: npm run doctor:freshness:validate
+
+      - name: Regenerate D1 status outputs
+        run: npm run doctor:status
+
+      - name: Upload regenerated D1 outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-doctor-d6-d1-runtime-outputs
+          path: |
+            data/generated/project-doctor-d1-1-status.v1.json
+            data/validation/project-doctor-d1-1-summary.v1.json
+            data/validation/project-doctor-d1-2-summary.v1.json
+          if-no-files-found: error
+
+      - name: Require committed D1 outputs to match runtime regeneration
+        run: git diff --exit-code -- data/generated/project-doctor-d1-1-status.v1.json data/validation/project-doctor-d1-1-summary.v1.json data/validation/project-doctor-d1-2-summary.v1.json
 
       - name: Integrated Doctor dry run
         run: npm run doctor -- --dry-run --paths package.json
