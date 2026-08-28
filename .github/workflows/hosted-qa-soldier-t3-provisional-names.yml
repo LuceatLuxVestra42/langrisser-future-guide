@@ -1,0 +1,118 @@
+name: Hosted QA Soldier T3 Provisional Names
+
+on:
+  push:
+    branches:
+      - deploy/soldier-t3-provisional-names-20260828
+    paths:
+      - '.github/workflows/hosted-qa-soldier-t3-provisional-names.yml'
+  workflow_dispatch:
+
+jobs:
+  hosted-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Hosted Gate - freshness, canonical unresolved, provisional rendered labels
+        run: |
+          python - <<'PY'
+          import json, time, urllib.request
+          BASE='https://luceatluxvestra42.github.io/langrisser-future-guide/'
+          EXPECTED_MAIN='15125cb6c77386a726dfaeaa9ba674c0b320eaa9'
+          EXPECTED_SURFACE='soldier-t3-provisional-display-2'
+          EXPECTED={
+              136: ('烬色卫队','잿빛 호위대'),
+              1039: ('断罪修女','단죄의 수녀'),
+          }
+
+          def get(path, attempts=10):
+              url=BASE+path
+              last=None
+              for _ in range(attempts):
+                  try:
+                      with urllib.request.urlopen(url, timeout=30) as r:
+                          body=r.read()
+                          if r.status == 200:
+                              return body
+                          last=f'HTTP {r.status}'
+                  except Exception as e:
+                      last=repr(e)
+                  time.sleep(5)
+              raise RuntimeError(f'GET failed {url}: {last}')
+
+          main_source=get('qa-main-source.txt').decode().strip()
+          surface=get('qa-surface.txt').decode().strip()
+          if main_source != EXPECTED_MAIN: raise RuntimeError(f'stale main source: {main_source}')
+          if surface != EXPECTED_SURFACE: raise RuntimeError(f'stale surface: {surface}')
+
+          list_html=get('soldiers/').decode('utf-8')
+          if '/langrisser-future-guide/' not in list_html: raise RuntimeError('base path missing')
+          for sid,(_,display) in EXPECTED.items():
+              if display not in list_html: raise RuntimeError(f'list missing provisional display {sid} {display}')
+              detail=get(f'soldiers/{sid}/').decode('utf-8')
+              if display not in detail: raise RuntimeError(f'detail missing provisional display {sid} {display}')
+              direct=get(f'soldiers/{sid}').decode('utf-8')
+              if display not in direct: raise RuntimeError(f'direct entry missing provisional display {sid} {display}')
+
+          public_detail=json.loads(get('data/soldier-detail-stage5-6.v1.json'))
+          by_id={r['soldierId']: r for r in public_detail['records']}
+          for sid,(cn,display) in EXPECTED.items():
+              identity=by_id[sid]['identity']
+              if identity['nameCn'] != cn: raise RuntimeError(f'public canonical CN mismatch {sid}')
+              if identity['nameKr'] is not None: raise RuntimeError(f'public canonical nameKr must be null {sid}: {identity["nameKr"]}')
+              if identity['nameKrStatus'] != 'unreleased': raise RuntimeError(f'public canonical nameKrStatus mismatch {sid}')
+              if identity['validationStatus'] != 'REVIEW': raise RuntimeError(f'public canonical validationStatus mismatch {sid}')
+
+          # Preserved web surfaces/assets from prior work.
+          for path in ['images/soldiers-webp/136.webp','images/soldiers-webp/1039.webp','images/heroes/portrait-samples/6.webp']:
+              if not get(path): raise RuntimeError(f'empty asset {path}')
+
+          print('PASS Hosted Gate: fresh deployment; canonical names unresolved; provisional Korean labels render; assets preserved')
+          PY
+
+      - name: Prepare Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Browser UI Gate - search, detail, refresh, mobile
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const base = 'https://luceatluxvestra42.github.io/langrisser-future-guide/';
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+            await page.goto(base + 'soldiers/', { waitUntil: 'networkidle' });
+
+            for (const [name,id] of [['잿빛 호위대',136],['단죄의 수녀',1039]]) {
+              const search = page.getByPlaceholder('검색');
+              await search.fill(name);
+              const link = page.getByRole('link', { name: `${name} 상세 보기`, exact: true });
+              if (!(await link.isVisible())) throw new Error(`search/display failed: ${name}`);
+              await link.click();
+              await page.locator('#soldier-detail-title').waitFor();
+              if ((await page.locator('#soldier-detail-title').textContent())?.trim() !== name) throw new Error(`detail title mismatch ${id}`);
+              await page.reload({ waitUntil: 'networkidle' });
+              if ((await page.locator('#soldier-detail-title').textContent())?.trim() !== name) throw new Error(`refresh title mismatch ${id}`);
+              const img = page.locator(`img[src*="/images/soldiers-webp/${id}.webp"]`).first();
+              if (!(await img.isVisible())) throw new Error(`WebP portrait not visible ${id}`);
+              await page.goto(base + 'soldiers/', { waitUntil: 'networkidle' });
+            }
+
+            const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+            await mobile.goto(base + 'soldiers/', { waitUntil: 'networkidle' });
+            await mobile.getByPlaceholder('검색').fill('단죄의 수녀');
+            if (!(await mobile.getByRole('link', { name: '단죄의 수녀 상세 보기', exact: true }).isVisible())) throw new Error('mobile provisional search failed');
+            const overflow = await mobile.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+            if (overflow > 2) throw new Error(`mobile horizontal overflow ${overflow}px`);
+
+            await browser.close();
+            console.log('PASS Browser/UI Gate: provisional search/detail/direct refresh/mobile and WebP portrait');
+          })().catch((e) => { console.error(e); process.exit(1); });
+          NODE
