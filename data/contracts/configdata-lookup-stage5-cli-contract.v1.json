@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_5",
+  "status": "CLI_CONTRACT_FROZEN",
+  "purpose": "Expose read-only lookup, reverse-reference, and bounded discovery CLI commands over the already-materialized Stage 1-4 indexes without reading raw ConfigData or creating new semantic relations.",
+  "predecessor": {
+    "contract": "data/contracts/configdata-lookup-stage4-canonical-overlay-contract.v1.json",
+    "summary": "data/validation/configdata-lookup-stage4-summary.v1.json",
+    "requiredStatus": "PASS_CONFIGDATA_LOOKUP_STAGE4_CANONICAL_OVERLAY"
+  },
+  "inputs": {
+    "idLocator": {
+      "Hero": "data/index/hero.v1.json",
+      "Soldier": "data/index/soldier.v1.json",
+      "Skill": "data/index/skill.v1.json",
+      "Equipment": "data/index/equipment.v1.json"
+    },
+    "forward": {
+      "Hero": "data/index/forward/hero.v1.json",
+      "Soldier": "data/index/forward/soldier.v1.json",
+      "Equipment": "data/index/forward/equipment.v1.json"
+    },
+    "forwardSourceDomain": {
+      "Hero": "Hero",
+      "JobConnection": "Hero",
+      "Soldier": "Soldier",
+      "TrainingTech": "Soldier",
+      "Equipment": "Equipment"
+    },
+    "reverse": {
+      "Skill": "data/index/reverse/skill.v1.json",
+      "JobConnection": "data/index/reverse/job-connection.v1.json",
+      "Job": "data/index/reverse/job.v1.json",
+      "TrainingTech": "data/index/reverse/training-tech.v1.json",
+      "Soldier": "data/index/reverse/soldier.v1.json",
+      "TrainingTechLevel": "data/index/reverse/training-tech-level.v1.json"
+    },
+    "canonicalOverlay": {
+      "Hero": "data/index/overlay/hero.v1.json",
+      "Soldier": "data/index/overlay/soldier.v1.json",
+      "Equipment": "data/index/overlay/equipment.v1.json"
+    }
+  },
+  "canonicalProjectionTargetType": {
+    "canonical.heroSoldiers": "Soldier",
+    "canonical.heroExclusiveEquipment": "Equipment",
+    "canonical.soldierHeroes": "Hero",
+    "canonical.exclusiveEquipmentHero": "Hero"
+  },
+  "commands": {
+    "lookup": {
+      "npm": "npm run lookup -- <Entity> <ID> [--json]",
+      "supportedEntityTypes": ["Hero", "Soldier", "Skill", "Equipment", "JobConnection", "TrainingTech"],
+      "sections": ["idLocator", "stage2DirectForwardRefs", "stage4CanonicalOverlay"]
+    },
+    "refs": {
+      "npm": "npm run refs -- <Entity> <ID> [--json]",
+      "supportedEntityTypes": ["Hero", "Soldier", "Skill", "Equipment", "JobConnection", "Job", "TrainingTech", "TrainingTechLevel"],
+      "sections": ["stage3IncomingRawRefs", "stage4CanonicalOverlay"]
+    },
+    "find": {
+      "npm": "npm run find -- <Entity> <literal> [--limit=N] [--json]",
+      "supportedEntityTypes": ["Soldier", "Equipment"],
+      "matching": "CASE_SENSITIVE_LITERAL_SUBSTRING_OVER_STAGE1_DISCOVERY_LABEL_ONLY",
+      "defaultLimit": 20,
+      "maxLimit": 100
+    }
+  },
+  "cliPolicy": {
+    "readOnly": true,
+    "rawConfigDataRead": false,
+    "rawConfigDataMutation": false,
+    "idLocatorMeaning": "Return only Stage 1 source path/hash/container/recordIndex and optional copied discovery label; do not load the source record.",
+    "forwardMeaning": "Show only Stage 2 materialized direct edges whose sourceType equals the requested entity type.",
+    "reverseMeaning": "Show only Stage 3 materialized incoming references for the requested target type and ID.",
+    "canonicalMeaning": "Show the Stage 4 frozen canonical overlay attached to the requested entity ID as a separate section.",
+    "nameDiscoveryMayJoin": false,
+    "transitiveExpansion": false,
+    "newRelationDiscovery": false,
+    "canonicalRelationRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "humanDisplayMaxIdsPerRelation": 50,
+    "jsonModeReturnsFullIds": true,
+    "entityTypeMatching": "ASCII_CASE_INSENSITIVE_TO_DECLARED_CANONICAL_TYPE",
+    "idEncoding": "POSITIVE_INTEGER_STRING"
+  },
+  "outputs": {
+    "summary": "data/validation/configdata-lookup-stage5-summary.v1.json"
+  },
+  "validation": {
+    "builder": "scripts/build-configdata-lookup-stage5.mjs",
+    "validator": "scripts/validate-configdata-lookup-stage5.mjs",
+    "cli": "scripts/configdata-lookup-cli.mjs",
+    "requiredChecks": [
+      "Stage 4 predecessor remains PASS",
+      "all declared CLI input paths are materialized index paths rather than raw ConfigData paths",
+      "Stage 1 locator inputs have the expected entity/status and resolve sample IDs without reading source records",
+      "Stage 2 forward inputs have the expected domain/status and only same-sourceType direct edges are displayed",
+      "Stage 3 reverse inputs have the expected targetType/status and are addressed directly by target ID",
+      "Stage 4 overlay inputs have the expected domain/status and remain a separate canonical section",
+      "Soldier/Equipment find uses only the preserved Stage 1 discovery label with literal case-sensitive substring matching",
+      "CLI library exposes no transitive expansion, name JOIN, ID arithmetic, canonical recomputation, or write path",
+      "package scripts expose lookup, refs, find, Stage 5 build, and Stage 5 validation commands",
+      "regeneration produces a byte-identical Stage 5 summary"
+    ],
+    "passStatus": "PASS_CONFIGDATA_LOOKUP_STAGE5_CLI"
+  },
+  "nextStage": {
+    "stage": "CONFIGDATA_LOOKUP_STAGE_6",
+    "goal": "Add dependency-aware stale/source-hash checks and bounded incremental rebuild orchestration over the materialized lookup layers."
+  }
+}

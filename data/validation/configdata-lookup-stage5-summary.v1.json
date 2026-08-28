@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_5",
+  "status": "PASS_CONFIGDATA_LOOKUP_STAGE5_CLI",
+  "contract": "data/contracts/configdata-lookup-stage5-cli-contract.v1.json",
+  "predecessorStatus": "PASS_CONFIGDATA_LOOKUP_STAGE4_CANONICAL_OVERLAY",
+  "commandCount": 3,
+  "commands": {
+    "lookup": {
+      "npm": "npm run lookup -- <Entity> <ID> [--json]",
+      "entityTypeCount": 6,
+      "supportedEntityTypes": [
+        "Hero",
+        "Soldier",
+        "Skill",
+        "Equipment",
+        "JobConnection",
+        "TrainingTech"
+      ]
+    },
+    "refs": {
+      "npm": "npm run refs -- <Entity> <ID> [--json]",
+      "entityTypeCount": 8,
+      "supportedEntityTypes": [
+        "Hero",
+        "Soldier",
+        "Skill",
+        "Equipment",
+        "JobConnection",
+        "Job",
+        "TrainingTech",
+        "TrainingTechLevel"
+      ]
+    },
+    "find": {
+      "npm": "npm run find -- <Entity> <literal> [--limit=N] [--json]",
+      "entityTypeCount": 2,
+      "supportedEntityTypes": [
+        "Soldier",
+        "Equipment"
+      ]
+    }
+  },
+  "inputLayers": {
+    "idLocatorEntityCount": 4,
+    "forwardDomainCount": 3,
+    "reverseTargetTypeCount": 6,
+    "canonicalOverlayDomainCount": 3
+  },
+  "semanticBoundary": {
+    "readOnly": true,
+    "rawConfigDataRead": false,
+    "rawConfigDataMutation": false,
+    "locatorOnlySourceAccess": true,
+    "stage2DirectEdgesOnly": true,
+    "stage3MaterializedReverseOnly": true,
+    "stage4FrozenCanonicalOnly": true,
+    "transitiveExpansion": false,
+    "newRelationsDiscovered": false,
+    "canonicalRelationsRecomputed": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false
+  }
+}

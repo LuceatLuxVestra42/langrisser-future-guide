@@ -1,0 +1,92 @@
+name: ConfigData Lookup Stage 5
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - work/configdata-lookup-stage5-cli
+    paths:
+      - 'data/contracts/configdata-lookup-stage5-cli-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage4-canonical-overlay-contract.v1.json'
+      - 'data/index/*.v1.json'
+      - 'data/index/forward/**'
+      - 'data/index/reverse/**'
+      - 'data/index/overlay/**'
+      - 'data/validation/configdata-lookup-stage4-summary.v1.json'
+      - 'data/validation/configdata-lookup-stage5-summary.v1.json'
+      - 'scripts/lib/configdata-lookup-stage5.mjs'
+      - 'scripts/configdata-lookup-cli.mjs'
+      - 'scripts/build-configdata-lookup-stage5.mjs'
+      - 'scripts/validate-configdata-lookup-stage5.mjs'
+      - 'package.json'
+      - '.github/workflows/configdata-lookup-stage5.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/configdata-lookup-stage5-cli-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage4-canonical-overlay-contract.v1.json'
+      - 'data/index/*.v1.json'
+      - 'data/index/forward/**'
+      - 'data/index/reverse/**'
+      - 'data/index/overlay/**'
+      - 'data/validation/configdata-lookup-stage4-summary.v1.json'
+      - 'data/validation/configdata-lookup-stage5-summary.v1.json'
+      - 'scripts/lib/configdata-lookup-stage5.mjs'
+      - 'scripts/configdata-lookup-cli.mjs'
+      - 'scripts/build-configdata-lookup-stage5.mjs'
+      - 'scripts/validate-configdata-lookup-stage5.mjs'
+      - 'package.json'
+      - '.github/workflows/configdata-lookup-stage5.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cli-and-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Stage 4 predecessor
+        run: node scripts/validate-configdata-lookup-stage4.mjs
+
+      - name: Regenerate Stage 5 summary
+        run: npm run build:configdata-lookup-stage5
+
+      - name: Validate Stage 5 CLI
+        run: npm run validate:configdata-lookup-stage5
+
+      - name: Smoke lookup commands
+        shell: bash
+        run: |
+          npm run lookup -- Hero 6
+          npm run lookup -- Soldier 102 --json > /dev/null
+          npm run refs -- Hero 6
+
+      - name: Commit Stage 5 summary on work branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage5-cli'
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/configdata-lookup-stage5-summary.v1.json
+          if git diff --cached --quiet; then
+            echo 'Stage 5 summary is already current.'
+          else
+            git commit -m 'Refresh ConfigData Lookup Stage 5 summary [skip ci]'
+            git push origin HEAD:work/configdata-lookup-stage5-cli
+          fi
+
+      - name: Require committed Stage 5 summary outside materialization branch
+        if: "!(github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage5-cli')"
+        run: git diff --exit-code -- data/validation/configdata-lookup-stage5-summary.v1.json
