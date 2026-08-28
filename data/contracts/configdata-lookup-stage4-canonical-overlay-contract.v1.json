@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_4",
+  "status": "CANONICAL_OVERLAY_CONTRACT_FROZEN",
+  "purpose": "Overlay only already-frozen canonical/project relationship projections beside ConfigData lookup data without recomputing their semantics.",
+  "predecessor": {
+    "contract": "data/contracts/configdata-lookup-stage3-reverse-reference-contract.v1.json",
+    "summary": "data/validation/configdata-lookup-stage3-summary.v1.json",
+    "requiredStatus": "PASS_CONFIGDATA_LOOKUP_STAGE3_REVERSE_REFS"
+  },
+  "canonicalInputs": {
+    "heroSoldierByHero": {
+      "path": "data/generated/hero-soldier-by-hero.v1.json",
+      "schemaId": "hero-soldier-by-hero/v1",
+      "mapField": "byHeroId",
+      "requiredKeyCount": 267,
+      "requiredRelationCount": 5977,
+      "relationSetPath": "data/generated/hero-soldier-relations.v1.json",
+      "relationSetGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    },
+    "heroSoldierBySoldier": {
+      "path": "data/generated/hero-soldier-by-soldier.v1.json",
+      "schemaId": "hero-soldier-by-soldier/v1",
+      "mapField": "bySoldierId",
+      "requiredKeyCount": 224,
+      "requiredRelationCount": 5977,
+      "relationSetPath": "data/generated/hero-soldier-relations.v1.json",
+      "relationSetGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+    },
+    "exclusiveEquipmentByHero": {
+      "path": "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+      "schemaId": "hero-exclusive-equipment-by-hero/v1",
+      "mapField": "byHeroId",
+      "requiredKeyCount": 167,
+      "requiredRelationCount": 167,
+      "relationSetPath": "data/generated/hero-exclusive-equipment-relations.v1.json",
+      "relationSetGitBlobSha": "33caa16212a5a71195015e05c815024fb62e6be6"
+    },
+    "exclusiveEquipmentByEquipment": {
+      "path": "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+      "schemaId": "hero-exclusive-equipment-by-equipment/v1",
+      "mapField": "byEquipmentId",
+      "requiredKeyCount": 167,
+      "requiredRelationCount": 167,
+      "relationSetPath": "data/generated/hero-exclusive-equipment-relations.v1.json",
+      "relationSetGitBlobSha": "33caa16212a5a71195015e05c815024fb62e6be6"
+    }
+  },
+  "outputs": {
+    "domains": {
+      "Hero": "data/index/overlay/hero.v1.json",
+      "Soldier": "data/index/overlay/soldier.v1.json",
+      "Equipment": "data/index/overlay/equipment.v1.json"
+    },
+    "manifest": "data/index/overlay/manifest.v1.json",
+    "summary": "data/validation/configdata-lookup-stage4-summary.v1.json"
+  },
+  "overlayPolicy": {
+    "sourceOfTruth": "FROZEN_CANONICAL_PROJECTIONS_ONLY",
+    "rawConfigDataScan": false,
+    "stage2ForwardIndexScan": false,
+    "stage3ReverseIndexScan": false,
+    "newRelationDiscovery": false,
+    "transitiveExpansion": false,
+    "canonicalRelationRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "rawLookupMutation": false,
+    "stableOrdering": "domain, numeric entity ID, source slot, numeric target ID",
+    "domainFileEncoding": "MINIFIED_JSON",
+    "manifestAndSummaryEncoding": "PRETTY_JSON"
+  },
+  "validation": {
+    "validator": "scripts/validate-configdata-lookup-stage4.mjs",
+    "requiredChecks": [
+      "Stage 3 predecessor remains PASS",
+      "all four admitted canonical projections match their frozen schema/count/relation-set identity",
+      "Hero-Soldier byHero and bySoldier projections are exact reciprocals across 5977 edges",
+      "Hero-ExclusiveEquipment byHero and byEquipment projections are exact reciprocals across 167 edges",
+      "only admitted frozen projection files are consumed as canonical relation input",
+      "all overlay files, manifest, and summary are byte-identical after regeneration",
+      "no raw ConfigData, Stage 2 forward index, Stage 3 reverse index, transitive, name-based, or ID-arithmetic relation is consumed or emitted"
+    ],
+    "passStatus": "PASS_CONFIGDATA_LOOKUP_STAGE4_CANONICAL_OVERLAY"
+  },
+  "nextStage": {
+    "stage": "CONFIGDATA_LOOKUP_STAGE_5",
+    "goal": "Expose basic lookup and reverse-reference CLI commands over the materialized lookup indexes and canonical overlay."
+  }
+}
