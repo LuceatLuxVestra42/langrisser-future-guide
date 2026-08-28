@@ -1,0 +1,39 @@
+name: Hero portrait Stage 4-2C official source representative probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - work/hero-portrait-stage4-2c-current-unity-source-proof
+    paths:
+      - scripts/hero_portrait_stage4_2c_official_source_probe.py
+      - .github/workflows/hero-portrait-stage4-2c-official-source-probe.yml
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'requests==2.32.5' 'Pillow==11.3.0' 'gdown==5.2.0'
+      - name: Run representative byte proof
+        run: python scripts/hero_portrait_stage4_2c_official_source_probe.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hero-stage4-2c-official-source-review
+          path: /tmp/hero42c_official/hero-stage4-2c-current-official-source-review.jpg
+          if-no-files-found: error
+          retention-days: 7
+      - name: Commit validation result
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/hero-portrait-stage4-2c-current-official-source-representative-proof.v1.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Validate Stage 4-2C official source representative'
+          git push
