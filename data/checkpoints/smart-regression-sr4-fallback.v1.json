@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "stage": "SMART_REGRESSION_SR4",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "branch": "work/smart-regression-sr4-fallback",
+  "baseBranch": "work/smart-regression-sr3-execution",
+  "purpose": "Harden unknown/shared/canonical fallback selection while preserving SR-3 execution and frozen semantic boundaries.",
+  "artifacts": {
+    "sr1ImpactMap": "data/contracts/regression-impact-map.v1.json",
+    "sr3Bindings": "data/contracts/regression-bindings.sr3.v1.json",
+    "sr3Executor": "scripts/smart-regression.mjs",
+    "sr4FallbackPolicy": "data/contracts/regression-fallback-policy.sr4.v1.json",
+    "sr4OverlayRunner": "scripts/smart-regression-sr4.mjs"
+  },
+  "confirmed": {
+    "specificRuleSuppressesCatchAllForSameFile": true,
+    "canonicalRuleCountsAsSpecificOwner": true,
+    "heroSoldierConfigDataNoLongerForcedIntoGenericRawConfigFallback": true,
+    "genericSharedContractUsesBroadSafeFallback": true,
+    "genericRawConfigDataUsesBroadSafeFallback": true,
+    "genericSourceUsesBuildFallback": true,
+    "unknownPathUsesBroadSafeFallback": true,
+    "unresolvedFallbackGateBlocksBeforeExecution": true,
+    "sr3ExecutorReused": true,
+    "sr3DirectCommandsPreservedForComparison": true,
+    "frozenSemanticPipelineReopened": false
+  },
+  "canonicalOwnerRuleCount": 8,
+  "broadSafeFallback": {
+    "gateCount": 16,
+    "behaviorToday": "FAIL_CLOSED_WHEN_ANY_SELECTED_REQUIRED_GATE_IS_UNBOUND",
+    "note": "This is intentional. SR-4 does not invent missing validators or weaken unresolved coverage."
+  },
+  "verification": {
+    "syntheticControlLogic": "PASS",
+    "checkedCases": [
+      "specific Hero ConfigData suppresses generic raw ConfigData fallback",
+      "generic ConfigData receives broad fallback",
+      "Hero final generated artifact receives canonical owner rule",
+      "Equipment frontend suppresses generic src fallback",
+      "generic src change receives global build fallback",
+      "wrapper syntax check passed before repository write"
+    ],
+    "repositoryDiff": {
+      "base": "work/smart-regression-sr3-execution",
+      "changedFiles": [
+        "data/contracts/regression-fallback-policy.sr4.v1.json",
+        "scripts/smart-regression-sr4.mjs",
+        "package.json"
+      ],
+      "dependencyDrift": false
+    },
+    "fullProjectValidatorExecutionClaimed": false,
+    "reason": "SR-4 is control/fallback hardening. Representative project fixtures and branch-history comparison belong to SR-5/SR-7."
+  },
+  "packageCommands": {
+    "validate:changed:dry": "node scripts/smart-regression-sr4.mjs --dry-run",
+    "validate:changed": "node scripts/smart-regression-sr4.mjs --execute",
+    "validate:changed:sr3:dry": "node scripts/smart-regression.mjs --dry-run",
+    "validate:changed:sr3": "node scripts/smart-regression.mjs --execute"
+  },
+  "reviews": [
+    {
+      "code": "UNRESOLVED_GATE_BINDINGS_REMAIN",
+      "blockingSR4Completion": false,
+      "effect": "Broad unknown/shared fallback currently blocks rather than partially executing when unresolved required gates are selected."
+    }
+  ],
+  "nextStartPoint": "SR-5 representative fixture matrix. Validate specific/catch-all precedence, multi-domain unions, unknown fallback, canonical-owner expansion, command deduplication, and zero false negatives before GitHub Actions shadow mode."
+}
