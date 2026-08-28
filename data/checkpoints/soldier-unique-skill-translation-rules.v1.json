@@ -42,6 +42,7 @@
     {"cn":"移动力","kr":"이동력"},
     {"cn":"移动距离","kr":"이동 거리"},
     {"cn":"提升","kr":"증가"},
+    {"cn":"增加","kr":"증가"},
     {"cn":"降低","kr":"감소"},
     {"cn":"额外","kr":"추가"},
     {"cn":"恢复","kr":"회복"},
@@ -60,13 +61,17 @@
     {"cn":"固定伤害","kr":"고정 피해"},
     {"cn":"物理伤害","kr":"물리 피해"},
     {"cn":"魔法伤害","kr":"마법 피해"},
+    {"cn":"所有伤害","kr":"모든 피해"},
+    {"cn":"治疗效果","kr":"치료 효과"},
     {"cn":"普通攻击","kr":"일반 공격"},
     {"cn":"飞行","kr":"비행"},
-    {"cn":"防御地形","kr":"방어 지형"}
+    {"cn":"防御地形","kr":"방어 지형"},
+    {"cn":"兵种克制","kr":"병종 상성"}
   ],
   "fixedPhrases": [
     {"cn":"主动进入战斗时","kr":"공격하여 전투 진입 시"},
     {"cn":"被攻击进入战斗时","kr":"공격받아 전투 진입 시"},
+    {"cn":"被魔法攻击进入战斗时","kr":"마법 공격을 받아 전투 진입 시"},
     {"cn":"进入战斗时","kr":"전투 진입 시"},
     {"cn":"主动攻击时","kr":"공격 시"},
     {"cn":"被攻击时","kr":"공격받을 시"},
@@ -79,10 +84,13 @@
     {"cn":"持续N回合","kr":"N턴 지속"},
     {"cn":"每场战斗最多触发一次","kr":"전투당 최대 1회 발동"},
     {"cn":"遭受伤害降低X%","kr":"받는 피해 X% 감소"},
+    {"cn":"遭受所有伤害降低X%","kr":"받는 모든 피해 X% 감소"},
     {"cn":"遭受物理伤害降低X%","kr":"받는 물리 피해 X% 감소"},
     {"cn":"遭受魔法伤害降低X%","kr":"받는 마법 피해 X% 감소"},
     {"cn":"造成伤害提升X%","kr":"주는 피해 X% 증가"},
+    {"cn":"士兵造成伤害增加X%","kr":"병사가 주는 피해 X% 증가"},
     {"cn":"部队伤害降低X%","kr":"부대가 주는 피해 X% 감소"},
+    {"cn":"士兵遭受治疗效果提升X%","kr":"병사가 받는 치료 효과 X% 증가"},
     {"cn":"恢复士兵X%的生命","kr":"병사 생명 X% 회복"},
     {"cn":"反弹受到伤害的X%","kr":"받은 피해의 X% 반사"},
     {"cn":"施加「X」","kr":"「X」 부여"},
@@ -119,10 +127,15 @@
       "kr":"공격받아 전투 진입 시 공격 및 방어 <color=#DC143C>30%</color> 증가."
     }
   ],
+  "batch1ObservedAdditions": {
+    "genericTermsAdded": ["增加", "所有伤害", "治疗效果", "兵种克制"],
+    "phrasesAdded": ["被魔法攻击进入战斗时", "遭受所有伤害降低X%", "士兵造成伤害增加X%", "士兵遭受治疗效果提升X%"],
+    "namedEffectReviewTerms": ["灼烧", "倒刺"]
+  },
   "completion": {
     "coreRulesFrozen": true,
     "autoTranslationEligible": "common terms, conditions, stats, damage/recovery, timing, range and inequality expressions",
     "reviewRequired": "named effects, skill-specific proper nouns and mechanics with potentially official Korean terminology",
-    "nextStartPoint": "Translate the 185 final descriptions in batches using this checkpoint, collecting only newly encountered exceptions."
+    "nextStartPoint": "Continue after soldierId 130 using data/presentation/soldier-unique-skill-kr.v1.json; collect only newly encountered exceptions."
   }
 }
