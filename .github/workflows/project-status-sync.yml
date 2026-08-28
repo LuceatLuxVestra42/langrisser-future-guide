@@ -47,6 +47,9 @@ jobs:
       - name: Validate Status Source Promotion self-tests
         run: npm run doctor:source:promote:self-test
 
+      - name: Validate Status Source Producer Gate self-tests
+        run: node scripts/validate-project-doctor-status-source-producers.mjs
+
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
 
@@ -95,6 +98,9 @@ jobs:
 
       - name: Validate Status Source Promotion self-tests
         run: npm run doctor:source:promote:self-test
+
+      - name: Validate Status Source Producer Gate self-tests
+        run: node scripts/validate-project-doctor-status-source-producers.mjs
 
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
