@@ -1,0 +1,66 @@
+{
+  "contract": "equipment-image-stage2-public-assets-v1",
+  "stage": "Equipment Image Stage 2",
+  "purpose": "Expand the Stage 1 exact-source asset intake rule to all 373 public Equipment records without reopening Equipment semantics.",
+  "inputs": {
+    "stage0Inventory": "data/generated/equipment-image-stage0-locator-inventory.v1.json",
+    "stage1Summary": "data/validation/equipment-image-stage1-summary.v1.json",
+    "requiredStage1Status": "PASS_EQUIPMENT_IMAGE_STAGE1",
+    "requiredStage1FreezeState": "EQUIPMENT_IMAGE_STAGE1_FROZEN"
+  },
+  "scope": {
+    "canonical": 390,
+    "public": 373,
+    "nonPublic": 17,
+    "importScope": "public-only"
+  },
+  "identity": {
+    "primaryKey": "equipmentId",
+    "sourceLocatorAuthority": "ConfigDataEquipmentInfo.Icon full path",
+    "nameJoinForbidden": true,
+    "idArithmeticForbidden": true,
+    "basenameOnlyResolutionForbidden": true,
+    "filenameSimilarityResolutionForbidden": true,
+    "crossRootFallbackForbidden": true,
+    "sourceAssetEqualityDoesNotMergeEquipment": true
+  },
+  "source": {
+    "legacyEquipmentFolderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+    "allowedIconRootPrefixes": [
+      "UI/Icon/Equip_ABS/",
+      "UI/Icon/Item04_ABS/"
+    ],
+    "metadataResolution": "parent-scoped exact filename only",
+    "basenameCollisionRequiresSeparateExact-pathEvidence": true
+  },
+  "assetEvidence": {
+    "required": [
+      "exact source locator relation",
+      "raw source bytes",
+      "PNG signature and IHDR",
+      "positive width and height",
+      "SHA-256",
+      "source-to-repository SHA-256 parity"
+    ],
+    "destructiveTransformForbidden": true
+  },
+  "web": {
+    "repositoryRoot": "public/images/equipment",
+    "repositoryPathTemplate": "public/images/equipment/{equipmentId}.png",
+    "urlPathTemplate": "/images/equipment/{equipmentId}.png"
+  },
+  "publicationBoundary": {
+    "nonPublicAssetImportForbidden": true,
+    "assetPresenceMustNotChangeRouteAdmission": true,
+    "runtimeNameJoinForbidden": true,
+    "rawConfigDataRuntimeReadForbidden": true
+  },
+  "completion": {
+    "requiredPublicEquipment": 373,
+    "requiredRepositoryAssets": 373,
+    "requiredVerifiedEvidence": 373,
+    "requiredShaParity": 373,
+    "hardErrors": 0,
+    "nextStage": "STAGE3_EQUIPMENT_ASSET_FRONTEND_INTEGRATION_QA"
+  }
+}
