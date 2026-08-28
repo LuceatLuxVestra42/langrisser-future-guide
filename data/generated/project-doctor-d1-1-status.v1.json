@@ -24,7 +24,7 @@
     "UNKNOWN": 0
   },
   "knownHardErrorTotal": 0,
-  "reviewTotal": 33,
+  "reviewTotal": 31,
   "blockerTotal": 1,
   "domains": [
     {
@@ -466,32 +466,19 @@
         "exclusive": 167
       },
       "hardErrorCount": 0,
-      "reviewCount": 5,
+      "reviewCount": 3,
       "reviews": [
         {
-          "code": "GENERAL_KR_NAME_REVIEW",
+          "code": "KR_NAME_FALLBACK_REVIEW",
           "scope": "unknown",
           "source": "data/validation/equipment-stage4-final.v1.json",
           "selector": "/nonBlockingReviews",
           "index": 0,
           "raw": {
-            "code": "GENERAL_KR_NAME_REVIEW",
-            "count": 59,
+            "code": "KR_NAME_FALLBACK_REVIEW",
+            "count": null,
             "blocking": false,
-            "rule": "Keep nameKr ?? nameCn fallback and REVIEW labeling until Korean names are verified."
-          }
-        },
-        {
-          "code": "EXCLUSIVE_KR_NAME_REVIEW",
-          "scope": "unknown",
-          "source": "data/validation/equipment-stage4-final.v1.json",
-          "selector": "/nonBlockingReviews",
-          "index": 1,
-          "raw": {
-            "code": "EXCLUSIVE_KR_NAME_REVIEW",
-            "count": 128,
-            "blocking": false,
-            "rule": "Keep nameKr ?? nameCn fallback and REVIEW labeling until Korean names are verified."
+            "rule": "Any Equipment name still unresolved by the current localization adapter must remain fallback-only and must not change equipmentId membership or route identity."
           }
         },
         {
@@ -499,46 +486,30 @@
           "scope": "unknown",
           "source": "data/validation/equipment-stage4-final.v1.json",
           "selector": "/nonBlockingReviews",
-          "index": 2,
+          "index": 1,
           "raw": {
             "code": "RELEASE_CHRONOLOGY_REVIEW",
             "count": null,
             "blocking": false,
             "rule": "Do not interpret generated order as exact release chronology where Stage 4 display policy marks chronology unverified.",
             "evidence": {
-              "generalReleaseDatesByTab": {
-                "1": 0,
-                "2": 80,
-                "3": 0
-              },
-              "exclusiveReleaseDates": 0
+              "generalTab1ChronologyClaimed": false,
+              "generalTab3ChronologyReviewExplicit": true,
+              "exclusiveChronologyReviewExplicit": true
             }
           }
         },
         {
-          "code": "EQUIPMENT_ICON_BINDING_DEFERRED",
+          "code": "MOBILE_PIXEL_POLISH_FOLLOWUP",
           "scope": "unknown",
           "source": "data/validation/equipment-stage4-final.v1.json",
           "selector": "/nonBlockingReviews",
-          "index": 3,
+          "index": 2,
           "raw": {
-            "code": "EQUIPMENT_ICON_BINDING_DEFERRED",
-            "count": 373,
-            "blocking": false,
-            "rule": "No web-served Equipment icon asset set exists in the repository at Stage 4-2; broken/fabricated mappings are intentionally avoided."
-          }
-        },
-        {
-          "code": "BROWSER_PIXEL_MOBILE_QA_FOLLOWUP",
-          "scope": "unknown",
-          "source": "data/validation/equipment-stage4-final.v1.json",
-          "selector": "/nonBlockingReviews",
-          "index": 4,
-          "raw": {
-            "code": "BROWSER_PIXEL_MOBILE_QA_FOLLOWUP",
+            "code": "MOBILE_PIXEL_POLISH_FOLLOWUP",
             "count": null,
             "blocking": false,
-            "rule": "Stage 4 validates data/consumer/build boundaries; browser screenshot, pixel polish, and mobile interaction QA remain follow-up review work."
+            "rule": "Hosted route and Equipment asset smoke QA is frozen as PASS; remaining pixel-polish and mobile interaction review is non-blocking UI follow-up."
           }
         }
       ],
@@ -580,7 +551,7 @@
         {
           "source": "data/validation/equipment-stage4-final.v1.json",
           "selector": "/nextStartPoint",
-          "value": "PC-first review and UI polish follow-up. Do not reopen Stage 2/3 semantics or Stage B ownership unless a concrete regression contradicts a frozen checkpoint."
+          "value": "PC-first review and UI polish follow-up. Equipment Stage 4 and Equipment Image Stage 3 are frozen; do not reopen Stage 2/3 semantics or Stage B ownership unless a concrete regression contradicts a frozen checkpoint."
         }
       ],
       "notes": []
