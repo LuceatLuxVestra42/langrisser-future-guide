@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-0-source-mapping-census",
+  "schemaId": "hero-portrait-stage4-0-source-mapping-census-contract/v1",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Census explicit and structured Google Drive portrait-source coverage before any Hero portrait bulk materialization, while preserving the Stage 3 no-inference admission boundary.",
+  "frozenInputs": {
+    "stage3Admission": {
+      "path": "data/generated/hero-portrait-stage3-admission-state.v1.json",
+      "gitBlobSha": "bd0c2040bddb41eb1f9df9d3639ba29bf672a1ef",
+      "canonicalHeroCount": 267,
+      "explicitAdmittedSourceCount": 5,
+      "pendingSourceMappingCount": 262
+    },
+    "canonicalRarityPopulation": {
+      "source": "frozen Hero list consumer",
+      "LLR": 6,
+      "SSR": 213,
+      "SR": 33,
+      "R": 12,
+      "N": 3,
+      "total": 267
+    }
+  },
+  "approvedDriveHierarchy": {
+    "root": {"title": "랑그릿사 모바일", "folderId": "1nYFa63uq00adpod_M1oDPPqGV4II5n5V"},
+    "character": {"title": "캐릭터", "folderId": "1KmGu-BvWBw8JUttdhr7hW5mgzsjSS9e1"},
+    "pc": {"title": "PC", "folderId": "1vDto8eUsfFodINXI1FIP2ccK9sGnreB0"},
+    "byRarity": {"title": "등급별", "folderId": "1VnqgFr_gulnKFjMxVEwBTj3z5c0xw3US"},
+    "rarityRoots": {
+      "LLR": "1_ohdOz7yowi98AE7MuyORMAFkxeGk5GV",
+      "SSR": "1LZou2oXpeOwtt2uBHWpesKN4uyMUGoOe",
+      "SR": "15Z_wf0wrfX3Bn56WU_Y7vqDvPcS_i8MN",
+      "R": "1KIqnv-LEEO2RBYzdF1dr5oGUbfriUPgG",
+      "N": "1ShOmvsheoRWl9yeneaMRoXXid6wIrGhX"
+    },
+    "observedPortraitSubtree": ["<Hero folder>", "스킨", "기본", "<portrait PNG>"]
+  },
+  "censusClasses": {
+    "ADMITTED_SOURCE": "A canonical Hero ID is already bound to an immutable source file ID and passed the Stage 2/3 source admission requirements.",
+    "STRUCTURED_FOLDER_CANDIDATE": "A direct Hero-like child folder exists under an approved rarity root, but no authoritative Hero ID to Drive folder/file bridge has been proven. It is not admitted.",
+    "NO_STRUCTURED_FOLDER_COVERAGE": "The Drive rarity-tree folder population is numerically smaller than the canonical Hero population for that rarity, so this hierarchy cannot cover all canonical Heroes even under an ideal one-to-one bridge."
+  },
+  "admissionRules": [
+    "Hero ID remains the only portrait ownership key.",
+    "A Drive Hero-folder title must not be converted into Hero ID ownership by name equality, translation, alias, or fuzzy similarity.",
+    "A filename or basename must not be converted into Hero ID ownership by similarity.",
+    "Presence under a folder titled 기본 is source-family evidence only; it is not sufficient to select a PNG.",
+    "Do not select the first, newest, largest, shortest-named, or only apparent portrait PNG in a 기본 folder without an explicit selection bridge.",
+    "Locale or variant siblings such as *_CH.png must not be silently preferred or discarded by filename inference.",
+    "The five Stage 2 immutable Drive file IDs remain admitted because their Hero ID ownership and file bytes were separately proven.",
+    "No source file is copied to public/images/heroes/cards during Stage 4-0."
+  ],
+  "completionCondition": "Freeze parent-ID-based Drive folder counts, 5-of-5 Stage 2 hierarchy continuity, the structured-tree population gap, and a bulk-readiness verdict without promoting unanchored folder or filename evidence into canonical Hero ownership.",
+  "bulkGate": {
+    "requiredExplicitAdmitted": 267,
+    "requiredPending": 0,
+    "stage4_0MayOpenBulk": false
+  },
+  "nextOnIncompleteCoverage": [
+    "Prove an explicit Hero ID to structured Drive folder/file bridge for candidate folders without using name-only ownership inference.",
+    "Prove another authoritative source family or Unity prefab dependency-resolution path for canonical Heroes not covered by the structured Drive tree.",
+    "Only after combined explicit admission reaches 267/267 may bulk PNG materialization begin."
+  ]
+}
