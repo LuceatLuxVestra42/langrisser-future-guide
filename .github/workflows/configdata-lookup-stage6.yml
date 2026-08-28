@@ -121,7 +121,7 @@ jobs:
           if git diff --cached --quiet; then
             echo 'Stage 6 materialization is already current.'
           else
-            git commit -m 'Refresh ConfigData Lookup Stage 6 materialization [skip ci]'
+            git commit -m 'Refresh ConfigData Lookup Stage 6 materialization'
             git push origin HEAD:work/configdata-lookup-stage6-incremental
           fi
 
