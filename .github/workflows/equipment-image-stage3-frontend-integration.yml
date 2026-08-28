@@ -1,0 +1,88 @@
+name: Equipment Image Stage 3 Frontend Integration
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage3-frontend-integration
+    paths:
+      - '.github/workflows/equipment-image-stage3-frontend-integration.yml'
+      - 'data/contracts/equipment-image-stage3-frontend-integration.v1.json'
+      - 'data/validation/equipment-image-stage2-final-summary.v3.json'
+      - 'data/generated/equipment_stage3_3_general_list.json'
+      - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
+      - 'public/images/equipment/**'
+      - 'public/equipment-image-stage3-ready.json'
+      - 'scripts/apply-equipment-image-stage3-frontend.mjs'
+      - 'scripts/validate-equipment-image-stage3-frontend.mjs'
+      - 'src/lib/equipment-image-assets.ts'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.exclusive.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: equipment-image-stage3-frontend-integration
+  cancel-in-progress: false
+
+jobs:
+  integrate-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Apply Equipment image frontend integration
+        run: node scripts/apply-equipment-image-stage3-frontend.mjs
+
+      - name: Revalidate frozen Equipment Image Stage 1 fixtures
+        run: node scripts/validate-equipment-image-stage1.mjs
+
+      - name: Revalidate frozen Equipment Stage 4-6 admission and routes
+        run: bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
+
+      - name: Equipment Image Stage 3 Preflight Gate
+        run: node scripts/validate-equipment-image-stage3-frontend.mjs
+
+      - name: Equipment Image Stage 3 Build Gate
+        run: bun run build
+
+      - name: Freeze predeployment Stage 3 validation after build PASS
+        env:
+          EQUIPMENT_STAGE3_BUILD_PASS: '1'
+        run: node scripts/validate-equipment-image-stage3-frontend.mjs
+
+      - name: Verify route tree and integration markers
+        run: |
+          grep -q '/equipment/exclusive' src/routeTree.gen.ts
+          grep -q '/equipment/\$equipmentId' src/routeTree.gen.ts
+          grep -q 'getOfficialEquipmentImageUrl' src/routes/equipment.tsx
+          grep -q 'getOfficialEquipmentImageUrl' src/routes/equipment_.exclusive.tsx
+          grep -q 'getOfficialEquipmentImageUrl' 'src/routes/equipment_.$equipmentId.tsx'
+          git diff --check
+
+      - name: Persist Equipment Image Stage 3 predeployment freeze
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/routes/equipment.tsx \
+            src/routes/equipment_.exclusive.tsx \
+            'src/routes/equipment_.$equipmentId.tsx' \
+            src/routeTree.gen.ts \
+            data/validation/equipment-image-stage3-frontend-summary.v1.json \
+            data/checkpoints/equipment-image-stage3-frontend.v1.json
+          if git diff --cached --quiet; then
+            echo "No Equipment Image Stage 3 integration changes"
+            exit 0
+          fi
+          git commit -m "Freeze Equipment Image Stage 3 frontend integration [skip ci]"
+          git push
