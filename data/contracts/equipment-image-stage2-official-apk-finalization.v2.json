@@ -1,0 +1,73 @@
+{
+  "contract": "equipment-image-stage2-official-apk-finalization-v2",
+  "stage": "Equipment Image Stage 2 finalization",
+  "purpose": "Resolve the frozen 29 public Equipment image holds from the current official CN APK without reopening Equipment semantics or changing the existing verified 344 assets.",
+  "predecessor": {
+    "existingExactSourceAssets": 344,
+    "heldPublicEquipment": 29,
+    "requiredPublicEquipment": 373,
+    "productionJoinKey": "equipmentId",
+    "sourceLocatorAuthority": "ConfigDataEquipmentInfo.Icon full path"
+  },
+  "officialApk": {
+    "page": "https://mz.zlongame.com/main.shtml",
+    "apk": "https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/mz-client-formal-cn.apk",
+    "readMethod": "HTTP Range ZIP entry reads; full APK download not required",
+    "authoritativeBundles": {
+      "UI/Icon/Equip_ABS/": "assets/ExportAssetBundle/begin_ui_icon_equip_abs.b",
+      "UI/Icon/Item04_ABS/": "assets/ExportAssetBundle/begin_ui_icon_item04_abs.b"
+    }
+  },
+  "representativeProof": {
+    "fixtures": 5,
+    "required": [
+      "full source root resolves exactly",
+      "exact Texture2D stem exists in the authoritative root bundle",
+      "Texture2D dimensions are 172x172",
+      "TextureFormat code is 47 (ETC2_RGBA8)",
+      "mip count is 1",
+      "decoded image is RGBA with alpha",
+      "legacy frozen PNG comparison is recorded",
+      "normalized RGBA mean absolute byte difference is <= 0.02"
+    ],
+    "legacyExactPixelParityRequired": false,
+    "reason": "The current official APK stores these icons as ETC2_RGBA8 GPU-compressed Texture2D data. Exact decoded pixel/hash parity against legacy uncompressed PNG exports is not a valid invariant. Legacy comparison is validation-only and must never choose or JOIN an asset.",
+    "identityStillDeterminedBy": "equipmentId -> full ConfigData icon locator -> authoritative root bundle -> exact Texture2D stem"
+  },
+  "hold29": {
+    "stagingRequired": true,
+    "publicPromotionOnlyAfterAll29Pass": true,
+    "requiredTextureFormatCode": 47,
+    "requiredDecodedSize": [172, 172],
+    "requiredAlpha": true,
+    "stagedPngToRepositoryShaParityRequired": true,
+    "collisionFixtures": [547, 550],
+    "item04Fixtures": [549, 550]
+  },
+  "immutability": {
+    "existing344Changed": 0,
+    "unexpectedDeleted": 0,
+    "unexpectedAddedOutsideHold29": 0
+  },
+  "forbidden": [
+    "name JOIN",
+    "basename-only JOIN",
+    "filename similarity resolution",
+    "visual similarity resolution",
+    "cross-root fallback",
+    "ID arithmetic",
+    "canonical Equipment reclassification",
+    "raw ConfigData runtime read"
+  ],
+  "completion": {
+    "repositoryAssets": 373,
+    "verifiedEvidence": 373,
+    "heldResolved": 29,
+    "missing": 0,
+    "invalidPng": 0,
+    "ambiguousLocator": 0,
+    "existing344Changed": 0,
+    "hardErrors": 0,
+    "nextStage": "STAGE3_EQUIPMENT_FRONTEND_IMAGE_INTEGRATION_QA"
+  }
+}
