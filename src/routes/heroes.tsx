@@ -21,18 +21,23 @@ export const Route = createFileRoute("/heroes")({
 
 const ALL_RARITIES = "ALL";
 
-// Presentation-only sample set for portrait layout QA.
-// Canonical artwork resolution remains owned by hero-card-artwork-stage4 and
-// public/images/heroes/cards/{heroId}.png. Remove this override once local assets land.
-const SAMPLE_HERO_CARD_URLS: Readonly<Record<number, string>> = {
-  5: "https://redpanda7301.github.io/langrisser/img/card/%ED%81%AC%EB%A6%AC%EC%8A%A4.webp",
-  6: "https://redpanda7301.github.io/langrisser/img/card/%EB%A0%88%EC%98%A8%EC%B4%88%EC%A0%88SP.webp",
-  8: "https://redpanda7301.github.io/langrisser/img/card/%EB%9D%BC%EB%82%98SP.webp",
-  12: "https://redpanda7301.github.io/langrisser/img/card/%EC%97%98%EC%9C%88%EC%B4%88%EC%A0%88SP.webp",
-  15: "https://redpanda7301.github.io/langrisser/img/card/%EB%A6%AC%EC%95%84%EB%82%98.webp",
+// Presentation-only portrait sample set.
+// Each file is a WebP derivative generated from a clean base-skin PNG source.
+// The source PNGs remain outside the website repository; no rarity/SP/super-buff
+// decoration is baked into these portrait assets.
+const SAMPLE_HERO_CARD_PATHS: Readonly<Record<number, string>> = {
+  5: "/images/heroes/portrait-samples/5.webp",
+  6: "/images/heroes/portrait-samples/6.webp",
+  8: "/images/heroes/portrait-samples/8.webp",
+  12: "/images/heroes/portrait-samples/12.webp",
+  15: "/images/heroes/portrait-samples/15.webp",
 };
 
-const SAMPLE_HERO_CARD_COUNT = Object.keys(SAMPLE_HERO_CARD_URLS).length;
+// Presentation-only sample projection from frozen Hero detail shards.
+// Hero 6 and 12 each have a skill whose displayType is `超绝强化`.
+const SAMPLE_SUPER_BUFF_HERO_IDS = new Set<number>([6, 12]);
+
+const SAMPLE_HERO_CARD_COUNT = Object.keys(SAMPLE_HERO_CARD_PATHS).length;
 
 function normalizeSearch(value: string) {
   return value.trim().toLocaleLowerCase();
@@ -49,6 +54,19 @@ function matchesHeroSearch(hero: HeroListRecord, normalizedQuery: string) {
 function resolvePublicAssetUrl(webAssetPath: string) {
   const base = import.meta.env.BASE_URL || "/";
   return `${base.replace(/\/$/, "")}${webAssetPath}`;
+}
+
+function getRarityBorderClass(baseLabel: string) {
+  switch (baseLabel) {
+    case "SSR":
+      return "border-amber-400/90";
+    case "SR":
+      return "border-violet-400/90";
+    case "R":
+      return "border-sky-400/90";
+    default:
+      return "border-border";
+  }
 }
 
 function HeroGridPage() {
@@ -230,9 +248,14 @@ function FilterButton({
 
 function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
   const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
+  const sampleAssetPath = SAMPLE_HERO_CARD_PATHS[hero.heroId];
   const imageUrl = hero.card.webAssetPath
     ? resolvePublicAssetUrl(hero.card.webAssetPath)
-    : SAMPLE_HERO_CARD_URLS[hero.heroId] ?? null;
+    : sampleAssetPath
+      ? resolvePublicAssetUrl(sampleAssetPath)
+      : null;
+  const rarityBorderClass = getRarityBorderClass(hero.rarity.baseLabel);
+  const hasSampleSuperBuff = SAMPLE_SUPER_BUFF_HERO_IDS.has(hero.heroId);
 
   return (
     <Link
@@ -241,7 +264,9 @@ function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
       aria-label={`${displayName} ${hero.rarity.baseLabel} 상세 보기`}
       className="group block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2"
     >
-      <article className="relative aspect-square overflow-hidden rounded-md border border-border bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
+      <article
+        className={`relative aspect-square overflow-hidden rounded-md border-2 ${rarityBorderClass} bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md`}
+      >
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -259,20 +284,14 @@ function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
           </div>
         )}
 
-        <div className="absolute left-1.5 top-1.5 flex items-center gap-1">
-          <span className="rounded bg-black/75 px-1.5 py-0.5 text-[10px] font-bold text-white sm:text-[11px]">
-            {hero.rarity.baseLabel}
+        {hasSampleSuperBuff ? (
+          <span
+            className="absolute right-1 top-1 origin-top-right scale-[0.8] rounded bg-black/75 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm"
+            title="초절 강화 보유"
+          >
+            초절
           </span>
-          {hero.hasSp ? (
-            <span
-              className="inline-flex items-center gap-0.5 rounded border border-foreground/20 bg-background/90 px-1.5 py-0.5 text-[10px] font-bold text-foreground backdrop-blur-sm sm:text-[11px]"
-              title="SP 해금 영웅"
-            >
-              <Sparkles className="h-3 w-3" aria-hidden="true" />
-              SP
-            </span>
-          ) : null}
-        </div>
+        ) : null}
 
         <div className="absolute inset-x-0 bottom-0 bg-black/60 px-2 py-1.5 text-center backdrop-blur-[1px]">
           <span className="line-clamp-1 text-[11px] font-bold leading-tight text-white sm:text-xs">
