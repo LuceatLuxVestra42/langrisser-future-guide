@@ -1,0 +1,13 @@
+name: Project Doctor Required Check PASS Probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Project Doctor required-check PASS probe"
