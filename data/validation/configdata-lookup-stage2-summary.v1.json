@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_2",
+  "status": "PASS_CONFIGDATA_LOOKUP_STAGE2_FORWARD_JOINS",
+  "contract": "data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json",
+  "domainCount": 3,
+  "relationCount": 13,
+  "totalEdgeCount": 142722,
+  "totalDuplicateRawReferenceCount": 3334,
+  "totalOmittedEmptyReferenceCount": 0,
+  "domains": {
+    "Hero": {
+      "output": "data/index/forward/hero.v1.json",
+      "relationCount": 7,
+      "totalEdgeCount": 134349,
+      "totalDuplicateRawReferenceCount": 3317,
+      "totalOmittedEmptyReferenceCount": 0,
+      "relations": {
+        "hero.skills": {
+          "edgeCount": 53468,
+          "sourceRecordsWithField": 21266,
+          "sourceRecordsWithEdges": 21266,
+          "duplicateRawReferenceCount": 15,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_DIRECT_REFERENCE"
+        },
+        "hero.baseJobConnection": {
+          "edgeCount": 28789,
+          "sourceRecordsWithField": 28789,
+          "sourceRecordsWithEdges": 28789,
+          "duplicateRawReferenceCount": 0,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_DIRECT_REFERENCE"
+        },
+        "hero.usableJobConnections": {
+          "edgeCount": 1255,
+          "sourceRecordsWithField": 300,
+          "sourceRecordsWithEdges": 300,
+          "duplicateRawReferenceCount": 0,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_DIRECT_REFERENCE"
+        },
+        "hero.castingLawSkill": {
+          "edgeCount": 166,
+          "sourceRecordsWithField": 166,
+          "sourceRecordsWithEdges": 166,
+          "duplicateRawReferenceCount": 0,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_DIRECT_REFERENCE"
+        },
+        "jobConnection.job": {
+          "edgeCount": 30066,
+          "sourceRecordsWithField": 30066,
+          "sourceRecordsWithEdges": 30066,
+          "duplicateRawReferenceCount": 0,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_DIRECT_REFERENCE"
+        },
+        "jobConnection.predecessors": {
+          "edgeCount": 1196,
+          "sourceRecordsWithField": 1196,
+          "sourceRecordsWithEdges": 1196,
+          "duplicateRawReferenceCount": 0,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_DIRECT_REFERENCE"
+        },
+        "jobConnection.talentSkills": {
+          "edgeCount": 19409,
+          "sourceRecordsWithField": 12856,
+          "sourceRecordsWithEdges": 12856,
+          "duplicateRawReferenceCount": 3302,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_DIRECT_REFERENCE"
+        }
+      }
+    },
+    "Soldier": {
+      "output": "data/index/forward/soldier.v1.json",
+      "relationCount": 5,
+      "totalEdgeCount": 6006,
+      "totalDuplicateRawReferenceCount": 0,
+      "totalOmittedEmptyReferenceCount": 0,
+      "relations": {
+        "soldier.skills": {
+          "edgeCount": 2465,
+          "sourceRecordsWithField": 647,
+          "sourceRecordsWithEdges": 647,
+          "duplicateRawReferenceCount": 0,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_DIRECT_REFERENCE"
+        },
+        "soldier.unlockTrainingTech": {
+          "edgeCount": 110,
+          "sourceRecordsWithField": 110,
+          "sourceRecordsWithEdges": 110,
+          "duplicateRawReferenceCount": 0,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "AUXILIARY_DIRECT_REFERENCE_NOT_COMPLETE"
+        },
+        "trainingTech.soldiers": {
+          "edgeCount": 217,
+          "sourceRecordsWithField": 161,
+          "sourceRecordsWithEdges": 161,
+          "duplicateRawReferenceCount": 0,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_CANDIDATE_MEMBERSHIP_NOT_GROWTH_PATH"
+        },
+        "trainingTech.preTech": {
+          "edgeCount": 269,
+          "sourceRecordsWithField": 252,
+          "sourceRecordsWithEdges": 252,
+          "duplicateRawReferenceCount": 0,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_DIRECT_REFERENCE"
+        },
+        "trainingTech.levels": {
+          "edgeCount": 2945,
+          "sourceRecordsWithField": 287,
+          "sourceRecordsWithEdges": 287,
+          "duplicateRawReferenceCount": 0,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_DIRECT_REFERENCE"
+        }
+      }
+    },
+    "Equipment": {
+      "output": "data/index/forward/equipment.v1.json",
+      "relationCount": 1,
+      "totalEdgeCount": 2367,
+      "totalDuplicateRawReferenceCount": 17,
+      "totalOmittedEmptyReferenceCount": 0,
+      "relations": {
+        "equipment.skillStages": {
+          "edgeCount": 2367,
+          "sourceRecordsWithField": 484,
+          "sourceRecordsWithEdges": 484,
+          "duplicateRawReferenceCount": 17,
+          "omittedEmptyReferenceCount": 0,
+          "semanticStatus": "RAW_DIRECT_REFERENCE"
+        }
+      }
+    }
+  },
+  "semanticBoundary": {
+    "directAllowlistedReferencesOnly": true,
+    "inverseRelationsGenerated": false,
+    "transitiveRelationsGenerated": false,
+    "canonicalRelationsRecomputed": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false,
+    "soldierGrowthPathSelected": false,
+    "equipmentMaxSkillSelected": false
+  }
+}
