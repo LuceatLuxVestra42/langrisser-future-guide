@@ -1,7 +1,7 @@
 {
   "stage": "Equipment Image Stage 3 Hosted QA",
   "version": 1,
-  "status": "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA",
+  "status": "PASS_EQUIPMENT_IMAGE_STAGE3",
   "completion": "COMPLETE",
   "freezeState": "EQUIPMENT_IMAGE_STAGE3_FROZEN",
   "semanticStageReopened": false,
@@ -26,7 +26,7 @@
     "preflight": "PASS",
     "build": "PASS",
     "deploymentHosted": "PASS",
-    "browserUi": "PASS_HOSTED_ROUTE_AND_ASSET_SMOKE"
+    "browserUi": "PASS_PLAYWRIGHT_HOSTED_BROWSER_UI"
   },
   "routeChecks": [
     {
@@ -165,5 +165,46 @@
     643
   ],
   "publicEquipment": 373,
-  "nextStage": "EQUIPMENT_IMAGE_STAGE3_COMPLETE"
+  "nextStage": "EQUIPMENT_IMAGE_STAGE3_COMPLETE",
+  "browserUiFreshness": {
+    "status": "PASS_FRESH_BROWSER_UI_EVIDENCE",
+    "currentInputFingerprint": {
+      "version": 1,
+      "algorithm": "sha256",
+      "sha256": "75e0c3d7fa6da2c11468e626fd56ffea3bbcde6d8b5cff40faa821b0cb61b299",
+      "fileCount": 380,
+      "equipmentImageCount": 373
+    },
+    "evidencePath": "data/evidence/equipment-image-stage3-browser-ui.v1.json",
+    "evidenceInputFingerprint": {
+      "version": 1,
+      "algorithm": "sha256",
+      "sha256": "75e0c3d7fa6da2c11468e626fd56ffea3bbcde6d8b5cff40faa821b0cb61b299",
+      "fileCount": 380,
+      "equipmentImageCount": 373
+    }
+  },
+  "browserUiEvidence": {
+    "path": "data/evidence/equipment-image-stage3-browser-ui.v1.json",
+    "status": "PASS_EQUIPMENT_IMAGE_STAGE3_BROWSER_UI",
+    "automation": "Playwright Chromium headless against deployed GitHub Pages",
+    "inputFingerprint": {
+      "version": 1,
+      "algorithm": "sha256",
+      "sha256": "75e0c3d7fa6da2c11468e626fd56ffea3bbcde6d8b5cff40faa821b0cb61b299",
+      "fileCount": 380,
+      "equipmentImageCount": 373
+    },
+    "desktopViewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "mobileViewport": {
+      "width": 390,
+      "height": 844
+    },
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "hostedHttpFailuresObservedByBrowser": 0
+  }
 }
