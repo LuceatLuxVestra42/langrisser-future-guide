@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-2",
+  "evidenceClass": "FINAL_REPRESENTATIVE_ASSET_RESOLUTION_EVIDENCE",
+  "status": "PASS_SKIN_STAGE3_2_REPRESENTATIVE_ASSET_RESOLUTION",
+  "canonicalType": "Skin",
+  "purpose": "Close the frozen Stage 3-2 representative proof for Skin 102, 1901, and 3701 by combining authoritative static and character-Spine locator proof, authoritative ConfigData model resource mapping, and exact Spine/General model Prefab bundle-entry proof.",
+  "frozenSources": {
+    "fixtures": "data/fixtures/skin-stage3-2-resolution-fixtures.v1.json",
+    "assetInventory": "data/generated/skin-stage3-1-asset-inventory.v1.json",
+    "sourceMetadata": "data/generated/skin-stage1-source-metadata.v1.json"
+  },
+  "evidenceSources": {
+    "legacyStaticRawBytes": "data/evidence/skin-stage3-2-static-source-evidence.v1.json",
+    "representativeUnityBundlePaths": "data/evidence/skin-stage3-2-unity-bundle-evidence.v1.json",
+    "skin102BeginStatic": "data/evidence/skin-stage3-2-mathew-begin-static-evidence.v1.json",
+    "skin102BeginSpine": "data/evidence/skin-stage3-2-mathew-begin-spine-evidence.v1.json",
+    "authoritativeModelResourceMap": "data/evidence/skin-stage3-2-configdata-model-resource-map-evidence.v1.json",
+    "authoritativeModelPrefabBundleEntries": "data/evidence/skin-stage3-2-model-prefab-bundle-evidence.v1.json"
+  },
+  "resolutionPolicy": {
+    "reuseFrozenLocators": true,
+    "reuseFrozenModelBindingIds": true,
+    "ownershipRecomputed": false,
+    "sourceOrderRecomputed": false,
+    "fuzzyMatching": false,
+    "numericIdArithmetic": false,
+    "crossRootFallback": false,
+    "caseNormalizationOnlyForUnityRuntimePrefixAndPathCasing": true
+  },
+  "records": [
+    {
+      "canonicalKey": "102",
+      "heroId": 1,
+      "static": {
+        "frozenLocator": "UI/Icon/HeroSkin_ABS/Skin/Skin_Matthew_01.png",
+        "authoritativeUnityPathResolved": true,
+        "authoritativeEvidence": "data/evidence/skin-stage3-2-mathew-begin-static-evidence.v1.json",
+        "supportingRawBytesEvidence": "data/evidence/skin-stage3-2-static-source-evidence.v1.json"
+      },
+      "spine": {
+        "frozenLocator": "Spine/Char/Mathew_ABS/Mathew_Skin01_Prefab.prefab",
+        "authoritativeUnityPathResolved": true,
+        "authoritativeEvidence": "data/evidence/skin-stage3-2-mathew-begin-spine-evidence.v1.json"
+      },
+      "modelResources": [
+        {
+          "skinResourceId": 102,
+          "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01/Mathew_Skin01_Prefab.prefab",
+          "authoritativeBundleEntryResolved": true
+        },
+        {
+          "skinResourceId": 1021,
+          "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_1/Mathew_Skin01_1_Prefab.prefab",
+          "authoritativeBundleEntryResolved": true
+        },
+        {
+          "skinResourceId": 1022,
+          "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_2/Mathew_Skin01_2_Prefab.prefab",
+          "authoritativeBundleEntryResolved": true
+        },
+        {
+          "skinResourceId": 1023,
+          "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_3/Mathew_Skin01_3_Prefab.prefab",
+          "alternateAirPrefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_3/Mathew_Skin01_3_air_Prefab.prefab",
+          "authoritativeBundleEntryResolved": true,
+          "alternateAirBundleEntryResolved": true
+        },
+        {
+          "skinResourceId": 1024,
+          "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_4/Mathew_Skin01_4_Prefab.prefab",
+          "authoritativeBundleEntryResolved": true
+        }
+      ],
+      "modelResourceMapEvidence": "data/evidence/skin-stage3-2-configdata-model-resource-map-evidence.v1.json",
+      "modelBundleEntryEvidence": "data/evidence/skin-stage3-2-model-prefab-bundle-evidence.v1.json",
+      "normalizedResolutionClass": "RESOLVED",
+      "resolutionReason": "All frozen representative locator classes have concrete authoritative path or bundle-entry evidence."
+    },
+    {
+      "canonicalKey": "1901",
+      "heroId": 19,
+      "static": {
+        "frozenLocator": "UI/Icon/HeroSkin2_ABS/Skin/Skin_Lista_Skin01.png",
+        "authoritativeUnityPathResolved": true,
+        "authoritativeEvidence": "data/evidence/skin-stage3-2-unity-bundle-evidence.v1.json",
+        "supportingRawBytesEvidence": "data/evidence/skin-stage3-2-static-source-evidence.v1.json"
+      },
+      "spine": {
+        "frozenLocator": "Spine/Char/Lista_ABS/Lista_Skin01_Prefab.prefab",
+        "authoritativeUnityPathResolved": true,
+        "authoritativeEvidence": "data/evidence/skin-stage3-2-unity-bundle-evidence.v1.json"
+      },
+      "modelResources": [
+        {
+          "skinResourceId": 1901,
+          "prefabPath": "Spine/General/Lista_ABS/Lista_Skin01/Lista_Skin01_Prefab.prefab",
+          "authoritativeBundleEntryResolved": true
+        }
+      ],
+      "modelResourceMapEvidence": "data/evidence/skin-stage3-2-configdata-model-resource-map-evidence.v1.json",
+      "modelBundleEntryEvidence": "data/evidence/skin-stage3-2-model-prefab-bundle-evidence.v1.json",
+      "normalizedResolutionClass": "RESOLVED",
+      "resolutionReason": "All frozen representative locator classes have concrete authoritative path or bundle-entry evidence."
+    },
+    {
+      "canonicalKey": "3701",
+      "heroId": 37,
+      "static": {
+        "frozenLocator": "UI/Icon/HeroSkin_ABS/Skin/Skin_Zigodlla_01.png",
+        "authoritativeUnityPathResolved": true,
+        "authoritativeEvidence": "data/evidence/skin-stage3-2-unity-bundle-evidence.v1.json",
+        "supportingRawBytesEvidence": "data/evidence/skin-stage3-2-static-source-evidence.v1.json"
+      },
+      "spine": {
+        "frozenLocator": "Spine/Char/Zigodlla_ABS/Zigodlla_Skin01_Prefab.prefab",
+        "authoritativeUnityPathResolved": true,
+        "authoritativeEvidence": "data/evidence/skin-stage3-2-unity-bundle-evidence.v1.json"
+      },
+      "modelResources": [
+        {
+          "skinResourceId": 3701,
+          "prefabPath": "Spine/General/Zigodlla_ABS/Zigodlla_Skin01/Zigodlla_Skin01_Prefab.prefab",
+          "authoritativeBundleEntryResolved": true
+        }
+      ],
+      "modelResourceMapEvidence": "data/evidence/skin-stage3-2-configdata-model-resource-map-evidence.v1.json",
+      "modelBundleEntryEvidence": "data/evidence/skin-stage3-2-model-prefab-bundle-evidence.v1.json",
+      "normalizedResolutionClass": "RESOLVED",
+      "resolutionReason": "All frozen representative locator classes have concrete authoritative path or bundle-entry evidence."
+    }
+  ],
+  "coverage": {
+    "representativeExpected": 3,
+    "representativeResolved": 3,
+    "staticAuthoritativeUnityPathResolved": 3,
+    "spineAuthoritativePathResolved": 3,
+    "modelResourceIdsExpected": 7,
+    "modelResourceIdsMappedToPrefabPath": 7,
+    "modelResourceIdsAuthoritativeAssetEntryResolved": 7,
+    "finalNormalizedResolvedRecords": 3,
+    "pendingRepresentativeRecords": 0
+  },
+  "blockers": [],
+  "conclusion": "Representative Stage 3-2 proof is complete. This file closes only the three frozen representative records; it does not claim bulk resolution for all 540 Skin records.",
+  "nextStartPoint": "Use the frozen representative rules and evidence shape for bulk Skin asset extraction/resolution. Preserve Stage 2 ownership and sourceOrder, and expand by exact locator/resource-ID evidence rather than inference."
+}
