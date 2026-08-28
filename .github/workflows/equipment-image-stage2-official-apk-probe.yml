@@ -1,0 +1,40 @@
+name: Equipment Image Stage 2 Official APK Probe
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-hold29
+    paths:
+      - '.github/workflows/equipment-image-stage2-official-apk-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe current official Android package
+        run: |
+          set -euo pipefail
+          URL='https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/mz-client-formal-cn.apk'
+          REF='https://mz.zlongame.com/main.shtml'
+          UA='Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 Chrome/140.0 Mobile Safari/537.36'
+          curl --http1.1 -fL -A "$UA" -e "$REF" -H 'Range: bytes=0-1023' -D /tmp/headers -o /tmp/range.bin "$URL"
+          mkdir -p data/evidence
+          {
+            echo "sourceUrl=$URL"
+            echo "rangeBytes=$(stat -c %s /tmp/range.bin)"
+            grep -Ei '^(HTTP/|last-modified|etag|content-length|content-range|content-type|x-cos-meta-md5):' /tmp/headers | tr -d '\r' || true
+            echo "prefix=$(xxd -p -l 16 /tmp/range.bin)"
+          } > data/evidence/equipment-image-stage2-official-apk-probe.v1.txt
+          cat data/evidence/equipment-image-stage2-official-apk-probe.v1.txt
+      - name: Persist probe evidence
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/evidence/equipment-image-stage2-official-apk-probe.v1.txt
+          git commit -m 'Probe current official Android package [skip ci]'
+          git push
