@@ -1,0 +1,55 @@
+name: Equipment Image Stage 2 Plan
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-public-assets
+    paths:
+      - data/contracts/equipment-image-stage2-public-assets.v1.json
+      - scripts/build-equipment-image-stage2-plan.mjs
+      - .github/workflows/equipment-image-stage2-plan.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Equipment image Stage 2 plan
+        run: node scripts/build-equipment-image-stage2-plan.mjs
+
+      - name: Require Stage 2 plan PASS
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const summary = JSON.parse(fs.readFileSync('data/validation/equipment-image-stage2-plan-summary.v1.json', 'utf8'));
+          if (summary.status !== 'PASS_EQUIPMENT_IMAGE_STAGE2_PLAN') throw new Error(summary.status);
+          if (summary.counts.publicEquipment !== 373) throw new Error('public equipment drift');
+          if (summary.productionJoinKey !== 'equipmentId') throw new Error('join key drift');
+          if (summary.semanticStageReopened !== false || summary.canonicalIdentityChanged !== false) throw new Error('semantic boundary changed');
+          console.log(JSON.stringify(summary, null, 2));
+          NODE
+
+      - name: Re-run frozen Equipment admission QA
+        run: bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
+
+      - name: Persist Stage 2 plan outputs
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/generated/equipment-image-stage2-public-plan.v1.json \
+            data/generated/equipment-image-stage2-drive-query-batches.v1.json \
+            data/validation/equipment-image-stage2-plan-summary.v1.json \
+            data/checkpoints/equipment-image-stage2-plan.v1.json
+          if git diff --cached --quiet; then
+            echo 'Stage 2 plan outputs already current.'
+          else
+            git commit -m 'Materialize Equipment image Stage 2 plan [skip ci]'
+            git push origin HEAD:work/equipment-image-stage2-public-assets
+          fi
