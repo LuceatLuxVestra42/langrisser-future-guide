@@ -36,7 +36,7 @@ def download_one(row: dict, out_dir: Path, attempts: int = 3) -> dict:
         try:
             if target.exists():
                 target.unlink()
-            result = gdown.download(id=file_id, output=str(target), quiet=True, fuzzy=False)
+            result = gdown.download(id=file_id, output=str(target), quiet=True)
             if result and target.exists() and target.stat().st_size > 0:
                 return {
                     "heroId": hero_id,
