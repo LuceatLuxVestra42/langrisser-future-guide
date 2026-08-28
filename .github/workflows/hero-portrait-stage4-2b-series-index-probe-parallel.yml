@@ -1,0 +1,33 @@
+name: Hero portrait Stage 4-2B series-index parallel probe
+
+on:
+  push:
+    branches:
+      - work/hero-portrait-stage4-2b-explicit-fallback-source-acquisition
+    paths:
+      - scripts/hero_portrait_stage4_2b_series_index_probe_parallel.py
+      - .github/workflows/hero-portrait-stage4-2b-series-index-probe-parallel.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'gdown==6.1.0'
+      - name: Parallel series-index probe
+        run: python scripts/hero_portrait_stage4_2b_series_index_probe_parallel.py
+      - name: Commit result
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/hero-portrait-stage4-2b-series-index-probe-parallel.v1.json
+          if git diff --cached --quiet; then echo 'No changes.'; else git commit -m 'Probe Hero portrait Stage 4-2B series index in parallel'; git push; fi
