@@ -48,7 +48,7 @@
     }
   },
   "runtimeChecks": {
-    "d7GuardContract": "PASS_28_OF_28",
+    "d7GuardContract": "PASS_31_OF_31_AFTER_LIVE_BASE_FIX",
     "d2ImpactFixtures": "PASS_13_OF_13",
     "d5FreshnessBeforeD1Regeneration": "FRESH",
     "d1StatusRegeneration": "PASS",
@@ -80,27 +80,25 @@
     "meaning": "The PR guard itself is proven and produces a stable non-passing result on Doctor failure, but the available authorized surfaces cannot configure GitHub rulesets or branch protection to require this check before merge."
   },
   "branchIntegrationObservation": {
-    "mainSha": "ffa767a24ccf3c7dcb198bdfc385708a21685156",
-    "preSyncStatus": "DIVERGED",
-    "preSyncAheadBy": 77,
-    "preSyncBehindBy": 25,
-    "validatedSyntheticMergeCommitSha": "d11951ac5b5d2b134864b8d7c1c3b443ab05d99c",
-    "validatedSyntheticMergeTreeSha": "e813009e09aacfe465bb903fc54d4e228fa5c5c4",
-    "actualSyncCommitSha": "b10d1fb14b2fb4672bec5f1c5f7e798907a8ae06",
-    "syncMethod": "CREATE_REAL_MERGE_COMMIT_FROM_VALIDATED_PR_SYNTHETIC_MERGE_TREE",
-    "forceRefUpdateUsed": false,
-    "postSyncStatus": "AHEAD",
-    "postSyncAheadBy": 78,
-    "postSyncBehindBy": 0,
-    "branchSyncRequiredBeforeFinalMerge": false,
-    "postSyncPullRequestGuardRunId": 33150268095,
-    "postSyncPullRequestGuardJobId": 98780371452,
-    "postSyncPullRequestGuardConclusion": "success",
-    "allPostSyncGuardStepsPassed": true
+    "mainShaAtPriorSync": "ffa767a24ccf3c7dcb198bdfc385708a21685156",
+    "priorActualSyncCommitSha": "b10d1fb14b2fb4672bec5f1c5f7e798907a8ae06",
+    "latestObservedMainSha": "49a307302bdb975fd021b827fa1b93d5768b3664",
+    "latestPreFixBehindBy": 35,
+    "latestCurrentMainDiffFileCount": 42,
+    "latestCurrentMainDiffScope": "PROJECT_DOCTOR_ONLY",
+    "failedRunId": 33158244528,
+    "failedRunReason": "MANUAL_REVIEW_FROM_STALE_PR_EVENT_BASE_COMPARISON",
+    "failedRunChangedFileCount": 143,
+    "failedRunManualReviewCount": 53,
+    "automatedChecksPassedBeforeManualReview": 4,
+    "liveBaseFixHeadSha": "dfdce610f2abf53d6591735f07745ef1726354ef",
+    "liveBaseFixPolicy": "FETCH_PR_BASE_REF_AT_RUNTIME_AND_COMPARE_ORIGIN_BASE_TO_EVENT_HEAD",
+    "staleEventBaseShaForbidden": true,
+    "forceRefUpdateUsed": false
   },
   "checkpointReplay": {
-    "requiredAfterSyncCheckpointCommit": true,
-    "purpose": "Confirm the pull_request synchronize event remains green after the final checkpoint-only updates."
+    "requiredAfterLiveBaseDiagnosticCommit": true,
+    "purpose": "Prove the PR guard now evaluates the live main ref rather than a stale pull_request base SHA and eliminates unrelated manual-review fanout."
   },
   "boundaries": {
     "rawConfigDataSemanticRecomputationAdded": false,
@@ -109,6 +107,6 @@
     "productionSourceMutationAdded": false,
     "missingOwningValidatorsInvented": false
   },
-  "nextStage": "D7-ADMIN-MANUAL",
-  "nextStageGoal": "Configure Project Doctor PR Guard / pr-guard as a required status check on main using a GitHub repository-admin surface. No code or branch synchronization work remains."
+  "nextStage": "D7-LIVE-BASE-REPLAY",
+  "nextStageGoal": "Confirm the current pull_request run compares against live origin/main and returns a passing Doctor result for the Project Doctor-only diff."
 }
