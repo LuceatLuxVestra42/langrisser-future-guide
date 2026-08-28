@@ -33,31 +33,12 @@
     "exclusiveListDetailExact": true,
     "exactEquipmentIdNavigation": true,
     "runtimeGeneralResolved": 206,
-    "runtimeExclusiveResolved": 167,
-    "runtimeKindMismatch": 0,
-    "runtimeEquipmentIdMismatch": 0,
-    "exclusiveOwnerPayloadMismatch": 0
+    "runtimeExclusiveResolved": 167
   },
   "statePolicy": {
     "generalStorageKey": "equipment-general-list-ui.v1",
     "exclusiveStorageKey": "equipment-exclusive-list-ui.v1",
-    "isolatedKeys": true,
     "restoreAndSanitizeMarkersPresent": true
-  },
-  "displayPolicy": {
-    "nameFallback": "nameKr ?? nameCn",
-    "generalNameReview": 59,
-    "exclusiveNameReview": 128,
-    "reviewPromoted": false,
-    "generalReleaseDatesByTab": {
-      "1": 0,
-      "2": 80,
-      "3": 0
-    },
-    "exclusiveReleaseDates": 0,
-    "generatedOrderPreserved": true,
-    "frontendSortAdded": false,
-    "detailIntegrityChecked": 373
   },
   "ownership": {
     "source": "data/generated/hero-exclusive-equipment-by-equipment.v1.json#byEquipmentId",
@@ -75,16 +56,19 @@
       888888888,
       9007199254740991
     ],
-    "unknownResolved": 0,
-    "publicServerImportsHiddenHold": false
+    "unknownResolved": 0
   },
   "routes": {
     "generalList": "/equipment",
     "exclusiveList": "/equipment/exclusive",
     "detail": "/equipment/$equipmentId",
-    "generatedRouteTreeVerified": true,
-    "invalidParamGuardPreservedFromStage46": true,
-    "notFoundBoundaryPresent": true
+    "siblingRouteIdsVerified": true,
+    "generatedRouteTreeVerified": true
+  },
+  "localizationBoundary": {
+    "localizedPresentationAdapter": true,
+    "baseServerDelegationPreserved": true,
+    "identityKey": "equipmentId"
   },
   "sourceDiscipline": {
     "stage3ConsumersUsed": true,

@@ -7,6 +7,7 @@ on:
       - '.github/workflows/equipment-stage4-7-whole-consumer-regression.yml'
       - 'scripts/validate-equipment-stage4-7-whole-consumer-regression.mjs'
       - 'src/lib/equipment-page.server.ts'
+      - 'src/lib/equipment-page.localized.server.ts'
       - 'src/lib/equipment-page.functions.ts'
       - 'src/routes/equipment.tsx'
       - 'src/routes/equipment_.exclusive.tsx'
@@ -24,6 +25,7 @@ on:
       - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
       - 'data/generated/equipment_stage3_6_special_unresolved.json'
       - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/generated/equipment-name-kr-user-approved.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'data/generated/equipment_stage2_6_restrictions.json'
       - 'data/generated/equipment_stage2_6_job_index.json'
@@ -47,11 +49,12 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Validate Equipment Stage 4-7 whole consumer regression
-        run: node scripts/validate-equipment-stage4-7-whole-consumer-regression.mjs
+        run: bun scripts/validate-equipment-stage4-7-whole-consumer-regression.mjs
 
       - name: Persist Stage 4-7 checkpoint
         run: |
           OUTPUT='data/validation/equipment-stage4-7-whole-consumer-regression-summary.v1.json'
+          TARGET_BRANCH="${GITHUB_REF_NAME}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$OUTPUT"
@@ -67,11 +70,11 @@ jobs:
           git reset --hard HEAD
 
           for attempt in 1 2 3; do
-            git pull --rebase origin main
-            if git push origin HEAD:main; then
+            git pull --rebase origin "$TARGET_BRANCH"
+            if git push origin "HEAD:$TARGET_BRANCH"; then
               exit 0
             fi
-            echo "Push raced with another main update; retrying without force."
+            echo "Push raced with another $TARGET_BRANCH update; retrying without force."
             sleep 2
           done
 
