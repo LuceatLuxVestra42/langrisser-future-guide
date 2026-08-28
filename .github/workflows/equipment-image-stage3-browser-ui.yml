@@ -92,7 +92,18 @@ jobs:
       - name: Run hosted Browser UI QA
         env:
           HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
-        run: node scripts/validate-equipment-image-stage3-browser-ui.mjs
+        run: |
+          set -o pipefail
+          node scripts/validate-equipment-image-stage3-browser-ui.mjs 2>&1 | tee equipment-stage3-browser-ui.log
+
+      - name: Upload Browser UI failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: equipment-stage3-browser-ui-failure-${{ github.run_id }}
+          path: equipment-stage3-browser-ui.log
+          if-no-files-found: warn
+          retention-days: 3
 
       - name: Require final Stage 3 Browser UI PASS
         run: |
