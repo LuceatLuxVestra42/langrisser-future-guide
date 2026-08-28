@@ -1,0 +1,78 @@
+name: ConfigData Lookup Stage 3
+
+on:
+  push:
+    branches:
+      - main
+      - work/configdata-lookup-stage3-reverse-refs
+    paths:
+      - 'data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage3-reverse-reference-contract.v1.json'
+      - 'data/index/forward/**'
+      - 'data/validation/configdata-lookup-stage2-summary.v1.json'
+      - 'scripts/lib/configdata-lookup-stage3.mjs'
+      - 'scripts/build-configdata-lookup-stage3.mjs'
+      - 'scripts/validate-configdata-lookup-stage3.mjs'
+      - 'package.json'
+      - '.github/workflows/configdata-lookup-stage3.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage3-reverse-reference-contract.v1.json'
+      - 'data/index/forward/**'
+      - 'data/index/reverse/**'
+      - 'data/validation/configdata-lookup-stage2-summary.v1.json'
+      - 'data/validation/configdata-lookup-stage3-summary.v1.json'
+      - 'scripts/lib/configdata-lookup-stage3.mjs'
+      - 'scripts/build-configdata-lookup-stage3.mjs'
+      - 'scripts/validate-configdata-lookup-stage3.mjs'
+      - 'package.json'
+      - '.github/workflows/configdata-lookup-stage3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Stage 2 predecessor
+        run: npm run validate:configdata-lookup-stage2
+
+      - name: Materialize Stage 3 reverse references
+        run: npm run build:configdata-lookup-stage3
+
+      - name: Validate Stage 3 reverse references
+        run: npm run validate:configdata-lookup-stage3
+
+      - name: Commit materialized Stage 3 indexes on work branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage3-reverse-refs'
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/index/reverse/ data/validation/configdata-lookup-stage3-summary.v1.json
+          if git diff --cached --quiet; then
+            echo 'Materialized Stage 3 indexes are already current.'
+          else
+            git commit -m 'Materialize ConfigData Lookup Stage 3 reverse references [skip ci]'
+            git push origin HEAD:work/configdata-lookup-stage3-reverse-refs
+          fi
+
+      - name: Require committed Stage 3 indexes outside materialization branch
+        if: "!(github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage3-reverse-refs')"
+        shell: bash
+        run: |
+          git diff --exit-code -- data/index/reverse/ data/validation/configdata-lookup-stage3-summary.v1.json
