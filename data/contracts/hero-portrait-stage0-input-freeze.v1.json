@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage0-input-freeze",
+  "schemaId": "hero-portrait-stage0-input-freeze/v1",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Freeze the authoritative Hero portrait input boundary for the 267 canonical Heroes without duplicating the full Hero population.",
+  "frozenBase": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "branch": "main",
+    "commit": "15125cb6c77386a726dfaeaa9ba674c0b320eaa9"
+  },
+  "authoritativeInputs": {
+    "heroProduction": {
+      "path": "data/generated/hero-detail.v1.json",
+      "gitBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66",
+      "role": "FINAL_FROZEN canonical Hero population authority"
+    },
+    "heroArtworkIndex": {
+      "path": "data/generated/hero-card-artwork-stage4.v1.json",
+      "gitBlobSha": "dba8d63e4d865d5949383fcf5189cad43ed73c47",
+      "role": "authoritative Hero ID to source artwork locator and expected web PNG path index"
+    }
+  },
+  "frozenPopulation": {
+    "canonicalHeroCount": 267,
+    "uniqueHeroCount": 267,
+    "sourceArtworkLocatorCount": 267,
+    "stage6MissingCount": 0
+  },
+  "currentAssetSnapshot": {
+    "pngContractResolvedCount": 0,
+    "pngContractPendingCount": 267,
+    "invalidArtworkRecordCount": 0,
+    "hardErrorCount": 0,
+    "note": "This snapshot describes the canonical public/images/heroes/cards/{heroId}.png contract. Separate presentation/demo assets do not change this count."
+  },
+  "targetAssetContract": {
+    "format": "png",
+    "assetRoot": "public/images/heroes/cards",
+    "filePattern": "{heroId}.png",
+    "expectedFilePathPattern": "public/images/heroes/cards/{heroId}.png",
+    "identityKey": "heroId"
+  },
+  "requiredInvariants": [
+    "Hero population remains exactly 267 canonical Heroes.",
+    "Every canonical Hero has exactly one non-empty sourceArtworkPath locator in the frozen artwork index.",
+    "Every artwork record Hero ID is unique and Stage 6 admitted.",
+    "Every expectedFilePath equals public/images/heroes/cards/{heroId}.png.",
+    "sourceArtworkPath is a locator only and is not transformed into a web URL by inference.",
+    "Asset work does not change Hero identity, Hero naming, Hero-Soldier relations, or any FINAL_FROZEN semantic data."
+  ],
+  "forbidden": [
+    "raw ConfigData re-derivation of the Hero population",
+    "name-based JOIN for portrait ownership",
+    "Hero ID arithmetic inference",
+    "filename-similarity ownership inference",
+    "Unity source path to web path inference",
+    "duplicating all 267 Hero records into this Stage 0 contract"
+  ],
+  "representation": "REFERENCE_MANIFEST_NO_LARGE_DATA_DUPLICATION",
+  "completionCondition": "The two authoritative inputs and the 267-Hero/source-locator/expected-PNG-path invariants are frozen with no semantic reinterpretation.",
+  "nextStage": "HERO_PORTRAIT_STAGE1_ASSET_LOCATOR_INVENTORY"
+}
