@@ -1,0 +1,16 @@
+name: Localization Audit Stage 1 Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verify read-only Soldier localization audit snapshot
+        run: node scripts/audit-localization.mjs --check
