@@ -6,17 +6,18 @@
   "source": "data/generated/soldier-detail-stage5-3.v1.json",
   "targetCount": 185,
   "progress": {
-    "translatedCount": 70,
-    "passCount": 53,
-    "reviewCount": 17,
-    "remainingCount": 115,
-    "lastCompletedSoldierId": 516,
-    "nextKnownRecord": 517,
+    "translatedCount": 90,
+    "passCount": 67,
+    "reviewCount": 23,
+    "remainingCount": 95,
+    "lastCompletedSoldierId": 644,
+    "nextKnownRecord": 645,
     "batchSize": 20
   },
   "translationSources": [
     {"path":"data/presentation/soldier-unique-skill-kr.v1.json","recordCount":50,"range":"through soldierId 403","role":"consolidated-base"},
-    {"path":"data/checkpoints/soldier-unique-skill-translation-batch5.v1.json","recordCount":20,"range":"soldierId 410 through 516 with lower tiers skipped","role":"append-only-batch"}
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch5.v1.json","recordCount":20,"range":"soldierId 410 through 516 with lower tiers skipped","role":"append-only-batch"},
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch6.v1.json","recordCount":20,"range":"soldierId 517 through 644 with lower tiers skipped","role":"append-only-batch"}
   ],
   "writeStrategy": {
     "mode": "checkpoint-sharded-during-bulk-translation",
@@ -27,11 +28,12 @@
   "reviewQueueCounts": {
     "existingThroughBatch4": 11,
     "newInBatch5": 6,
-    "total": 17
+    "newInBatch6": 6,
+    "total": 23
   },
   "nextStartPoint": {
-    "afterSoldierId": 516,
-    "nextKnownRecord": 517,
+    "afterSoldierId": 644,
+    "nextKnownRecord": 645,
     "batchSize": 20
   }
 }
