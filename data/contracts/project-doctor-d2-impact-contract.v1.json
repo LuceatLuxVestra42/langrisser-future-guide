@@ -53,10 +53,22 @@
       ],
       "changeClass": "asset",
       "reason": "Post-map Soldier frontend closeout serves 224/224 lossless WebP derivatives while retaining PNG as authoritative source evidence. This is presentation-only and must not reopen Soldier canonical semantics."
+    },
+    {
+      "id": "project-doctor-workflow-post-map",
+      "patterns": [
+        ".github/workflows/project-doctor-*.yml"
+      ],
+      "excludePatterns": [],
+      "directNodes": [
+        "project-doctor"
+      ],
+      "changeClass": "tooling",
+      "reason": "Project Doctor CI/PR workflow changes affect Doctor tooling only. They must be validated by Doctor self-tests but must not fan out into semantic domain recomputation."
     }
   ],
   "overlayPolicy": {
-    "reason": "The base dependency map was frozen before the 2026-08-28 Soldier WebP delivery closeout. Preserve the frozen base map and add only this explicitly evidenced post-map path family in D2-IMPACT. Fold it into a future map version after branch synchronization.",
+    "reason": "The base dependency map remains frozen. Post-map repository evolution is admitted only through explicit evidenced path families: Soldier WebP presentation assets and Project Doctor workflow files used by D6/D7 runtime integration.",
     "mayAddPathRulesOnly": true,
     "mayAddImpactNodes": false,
     "mayAddPropagationEdges": false,
@@ -83,6 +95,13 @@
       "expectedStatus": "MAPPED",
       "expectedDirectNodes": ["soldier-assets"],
       "expectedDomains": ["soldier"]
+    },
+    {
+      "id": "PROJECT_DOCTOR_WORKFLOW_POST_MAP_OVERLAY",
+      "paths": [".github/workflows/project-doctor-d7-pr-guard.yml"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["project-doctor"],
+      "expectedDomains": []
     },
     {
       "id": "SOLDIER_CONFIGDATA_PROPAGATION",
