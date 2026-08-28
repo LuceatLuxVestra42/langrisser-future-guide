@@ -1,0 +1,52 @@
+name: Hero portrait Stage 4-2B validate role rescues
+on:
+  push:
+    branches:
+      - work/hero-portrait-stage4-2b-explicit-fallback-source-acquisition
+    paths:
+      - .github/workflows/hero-portrait-stage4-2b-validate-role-rescues.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'gdown==6.1.0' 'Pillow==11.3.0'
+      - name: Validate 3 unique exact runtime role candidates
+        run: |
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          import gdown
+          from PIL import Image,ImageDraw
+          root=Path('.');p=json.loads((root/'data/validation/hero-portrait-stage4-2b-base-role-probe.v1.json').read_text())
+          rows=[r for r in p['records'] if r['result']=='UNIQUE_EXACT_BASE_RUNTIME_ROLE_CANDIDATE']
+          assert len(rows)==3
+          wd=Path('/tmp/role3');wd.mkdir(exist_ok=True);out=[];tiles=[]
+          for r in rows:
+            c=r['exactBaseRuntimeStemFileMatches'][0];f=wd/f"{r['heroId']}.png";gdown.download(id=c['driveFileId'],output=str(f),quiet=True);d=f.read_bytes()
+            tech={'byteLength':len(d),'sha256':hashlib.sha256(d).hexdigest(),'pngSignature':d.startswith(b'\x89PNG\r\n\x1a\n')}
+            with Image.open(f) as im:
+              im.load();tech.update(decodedFormat=im.format,width=im.width,height=im.height,mode=im.mode,alpha='A' in im.getbands())
+              ex=im.getchannel('A').getextrema() if tech['alpha'] else (255,255);tech['alphaExtrema']=list(ex);tech['realTransparency']=ex[0]<255;tech['visiblePixels']=ex[1]>0
+              tech['technicalPass']=all([tech['pngSignature'],tech['decodedFormat']=='PNG',tech['width']>0,tech['height']>0,tech['alpha'],tech['realTransparency'],tech['visiblePixels']])
+              x=im.convert('RGBA');canvas=Image.new('RGBA',(360,440),(245,245,245,255));x.thumbnail((340,370));canvas.alpha_composite(x,((360-x.width)//2,5+(370-x.height)//2));dr=ImageDraw.Draw(canvas);dr.text((8,380),f"Hero {r['heroId']} | {r['baseRuntimeStem']}",fill=(0,0,0,255));dr.text((8,405),c['fileName'][:48],fill=(0,0,0,255));tiles.append(canvas.convert('RGB'))
+            out.append({'heroId':r['heroId'],'baseRuntimeStem':r['baseRuntimeStem'],'sourceImmutableId':c['driveFileId'],'sourceFileName':c['fileName'],'technical':tech})
+          sh=Image.new('RGB',(1080,440),(255,255,255));[sh.paste(t,(i*360,0)) for i,t in enumerate(tiles)];Path('/tmp/role3-review').mkdir(exist_ok=True);sh.save('/tmp/role3-review/role3.jpg',quality=92)
+          doc={'version':1,'stage':'hero-portrait-stage4-2b-explicit-fallback-source-acquisition','phase':'UNIQUE_BASE_RUNTIME_ROLE_SOURCE_VALIDATION','status':'PASS_TECHNICAL_VISUAL_REVIEW_PENDING','summary':{'inputCount':3,'technicalPassCount':sum(r['technical']['technicalPass'] for r in out),'duplicateShaGroupCount':len(out)-len({r['technical']['sha256'] for r in out}),'finalAdmissionPerformed':False},'records':out}
+          Path('data/validation/hero-portrait-stage4-2b-role-rescue-validation.v1.json').write_text(json.dumps(doc,ensure_ascii=False,indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hero-stage4-2b-role-rescue-review
+          path: /tmp/role3-review/
+          retention-days: 7
+      - run: |
+          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/hero-portrait-stage4-2b-role-rescue-validation.v1.json
+          if git diff --cached --quiet; then echo no-change; else git commit -m 'Validate Hero portrait Stage 4-2B role rescues'; git push; fi
