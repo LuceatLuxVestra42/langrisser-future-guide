@@ -1,0 +1,86 @@
+name: Equipment Image Stage 2 APK Central Directory
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-hold29
+    paths:
+      - '.github/workflows/equipment-image-stage2-apk-central-directory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read remote APK ZIP central directory by HTTP Range only
+        run: |
+          python3 - <<'PY'
+          import re, struct, urllib.request
+          from pathlib import Path
+
+          URL='https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/mz-client-formal-cn.apk'
+          REF='https://mz.zlongame.com/main.shtml'
+          UA='Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 Chrome/140.0 Mobile Safari/537.36'
+          TOTAL=2085438199
+
+          def get_range(a,b):
+              req=urllib.request.Request(URL, headers={'User-Agent':UA,'Referer':REF,'Range':f'bytes={a}-{b}'})
+              with urllib.request.urlopen(req, timeout=90) as r:
+                  data=r.read()
+                  if len(data)!=(b-a+1): raise RuntimeError((a,b,len(data),r.status,r.headers.get('Content-Range')))
+                  return data
+
+          tail_start=max(0,TOTAL-1024*1024)
+          tail=get_range(tail_start,TOTAL-1)
+          sig=b'PK\x05\x06'
+          pos=tail.rfind(sig)
+          if pos<0: raise RuntimeError('EOCD not found in 1MiB tail')
+          eocd_off=tail_start+pos
+          e=tail[pos:pos+22]
+          disk,cd_disk,disk_entries,total_entries,cd_size32,cd_off32,comment_len=struct.unpack_from('<HHHHIIH',e,4)
+          cd_size,cd_off,entries=cd_size32,cd_off32,total_entries
+          zip64=(total_entries==0xffff or cd_size32==0xffffffff or cd_off32==0xffffffff)
+          if zip64:
+              loc_off=eocd_off-20
+              loc=get_range(loc_off,eocd_off-1)
+              if loc[:4]!=b'PK\x06\x07': raise RuntimeError('Zip64 locator not found')
+              _,zip64_disk,zip64_eocd_off,total_disks=struct.unpack('<IIQI',loc)
+              z=get_range(zip64_eocd_off,zip64_eocd_off+55)
+              if z[:4]!=b'PK\x06\x06': raise RuntimeError('Zip64 EOCD not found')
+              entries=struct.unpack_from('<Q',z,32)[0]
+              cd_size=struct.unpack_from('<Q',z,40)[0]
+              cd_off=struct.unpack_from('<Q',z,48)[0]
+          if cd_size>200*1024*1024: raise RuntimeError(f'central directory unexpectedly huge: {cd_size}')
+          cd=get_range(cd_off,cd_off+cd_size-1)
+          names=[]; i=0
+          while i+46<=len(cd):
+              if cd[i:i+4]!=b'PK\x01\x02':
+                  raise RuntimeError(f'central header signature mismatch at {i}: {cd[i:i+4]!r}')
+              fn,ex,cm=struct.unpack_from('<HHH',cd,i+28)
+              raw=cd[i+46:i+46+fn]
+              try: name=raw.decode('utf-8')
+              except UnicodeDecodeError: name=raw.decode('cp437','replace')
+              names.append(name)
+              i+=46+fn+ex+cm
+          keywords=re.compile(r'(streamingassets|exportassetbundle|assetbundle|patch|manifest|version|configdata|catalog|bundle|addressable|resversion|filelist)',re.I)
+          relevant=[n for n in names if keywords.search(n)]
+          exactish=[n for n in names if re.search(r'(Equip_ABS|Item04_ABS|Equip_(?:MetalHelmet|Dagger|Spear|MetalArmor|Hat|Attackgem|Wand|Sword|LeatherArmor|LeatherHelmet|Ring))',n,re.I)]
+          Path('data/evidence').mkdir(parents=True,exist_ok=True)
+          out=[]
+          out += [f'url={URL}',f'totalBytes={TOTAL}',f'zip64={zip64}',f'centralDirectoryOffset={cd_off}',f'centralDirectoryBytes={cd_size}',f'entryCountHeader={entries}',f'entryCountParsed={len(names)}',f'relevantCount={len(relevant)}',f'equipmentNameLikeCount={len(exactish)}','']
+          out.append('=== RELEVANT ENTRIES ==='); out.extend(relevant[:10000]); out.append('')
+          out.append('=== EQUIPMENT-NAME-LIKE ENTRIES ==='); out.extend(exactish[:5000])
+          Path('data/evidence/equipment-image-stage2-official-apk-central-directory.v1.txt').write_text('\n'.join(out)+'\n')
+          print('\n'.join(out[:120]))
+          PY
+      - name: Persist central directory evidence
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/evidence/equipment-image-stage2-official-apk-central-directory.v1.txt
+          git commit -m 'Index official APK central directory [skip ci]'
+          git push
