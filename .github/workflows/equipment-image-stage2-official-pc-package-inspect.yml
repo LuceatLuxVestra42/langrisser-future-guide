@@ -13,12 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download official PC package once
+      - name: Verify official CDN anti-hotlink request with 1KB range
         run: |
           set -euo pipefail
-          curl -fL --retry 3 --retry-delay 2 \
-            -o /tmp/DownLoad-MZ-PC.exe \
-            'https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/DownLoad-MZ-PC.exe'
+          URL='https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/DownLoad-MZ-PC.exe'
+          REF='https://mz.zlongame.com/jx/mzdownload/20180731/5473.html'
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0 Safari/537.36'
+          curl --http1.1 -fL -A "$UA" -e "$REF" -H 'Range: bytes=0-1023' -D /tmp/range.headers -o /tmp/range.bin "$URL"
+          cat /tmp/range.headers
+          stat -c 'range-bytes=%s' /tmp/range.bin
+          xxd -l 32 /tmp/range.bin
+      - name: Download official PC package once with accepted browser headers
+        run: |
+          set -euo pipefail
+          URL='https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/DownLoad-MZ-PC.exe'
+          REF='https://mz.zlongame.com/jx/mzdownload/20180731/5473.html'
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0 Safari/537.36'
+          curl --http1.1 -fL --retry 2 -A "$UA" -e "$REF" -o /tmp/DownLoad-MZ-PC.exe "$URL"
           stat -c 'bytes=%s' /tmp/DownLoad-MZ-PC.exe
           md5sum /tmp/DownLoad-MZ-PC.exe
           sha256sum /tmp/DownLoad-MZ-PC.exe
