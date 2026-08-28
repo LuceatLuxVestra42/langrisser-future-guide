@@ -4,10 +4,14 @@ on:
   push:
     branches:
       - qa/equipment-image-stage3-browser-ui-20260828
+      - fix/equipment-stage4-regression-closure-20260828
     paths:
       - '.github/workflows/equipment-image-stage3-browser-ui.yml'
       - 'scripts/validate-equipment-image-stage3-browser-ui.mjs'
       - 'scripts/apply-equipment-stage3-pages-document-navigation.mjs'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.exclusive.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
   workflow_dispatch:
 
 permissions:
