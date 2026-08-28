@@ -22,14 +22,14 @@
     "baseBranch": "main",
     "baseSha": "ffa767a24ccf3c7dcb198bdfc385708a21685156",
     "headBranch": "work/project-doctor-closeout",
-    "headSha": "ced7ef2c91796b40a79c175b3d110a3d2820ae4a",
-    "mergeRefSha": "5f70e75260f7cbe57395c5730bdfa96af85a3470",
-    "workflowRunId": 33149632015,
-    "jobId": 98778360191,
-    "conclusion": "success",
+    "initialHeadSha": "ced7ef2c91796b40a79c175b3d110a3d2820ae4a",
+    "initialMergeRefSha": "5f70e75260f7cbe57395c5730bdfa96af85a3470",
+    "initialWorkflowRunId": 33149632015,
+    "initialJobId": 98778360191,
+    "initialConclusion": "success",
     "checkoutUsedPullRequestMergeRef": true,
     "exactBaseHeadComparisonUsed": true,
-    "changedFileCount": 41,
+    "initialChangedFileCount": 41,
     "dryRun": {
       "status": "PASS_DRY_RUN",
       "checksQueued": 4,
@@ -75,22 +75,32 @@
     "branchProtectionRead": "CONNECTOR_403_RESOURCE_NOT_ACCESSIBLE_BY_INTEGRATION",
     "requiredStatusCheckConfiguredByD7": false,
     "connectorAdminMutationAvailable": false,
+    "installableAdminPluginFound": false,
     "gapStatus": "OPEN_ADMIN_CONFIGURATION",
-    "meaning": "The PR guard itself is proven and produces a stable non-passing result on Doctor failure, but GitHub repository settings have not been changed to require this check before merge."
+    "meaning": "The PR guard itself is proven and produces a stable non-passing result on Doctor failure, but the available authorized surfaces cannot configure GitHub rulesets or branch protection to require this check before merge."
   },
   "branchIntegrationObservation": {
-    "observedAfterPrimaryPrProof": true,
     "mainSha": "ffa767a24ccf3c7dcb198bdfc385708a21685156",
-    "aheadBy": 75,
-    "behindBy": 25,
-    "status": "DIVERGED",
-    "prMergeRefAgainstCurrentMainBuiltAndValidated": true,
-    "branchSyncRequiredBeforeFinalMerge": true,
-    "note": "The actual pull_request workflow checked GitHub's merge ref and exact current PR base/head pair, so D7 runtime compatibility with the observed main state is proven even though the source branch itself has not absorbed the 25 main-only commits."
+    "preSyncStatus": "DIVERGED",
+    "preSyncAheadBy": 77,
+    "preSyncBehindBy": 25,
+    "validatedSyntheticMergeCommitSha": "d11951ac5b5d2b134864b8d7c1c3b443ab05d99c",
+    "validatedSyntheticMergeTreeSha": "e813009e09aacfe465bb903fc54d4e228fa5c5c4",
+    "actualSyncCommitSha": "b10d1fb14b2fb4672bec5f1c5f7e798907a8ae06",
+    "syncMethod": "CREATE_REAL_MERGE_COMMIT_FROM_VALIDATED_PR_SYNTHETIC_MERGE_TREE",
+    "forceRefUpdateUsed": false,
+    "postSyncStatus": "AHEAD",
+    "postSyncAheadBy": 78,
+    "postSyncBehindBy": 0,
+    "branchSyncRequiredBeforeFinalMerge": false,
+    "postSyncPullRequestGuardRunId": 33150268095,
+    "postSyncPullRequestGuardJobId": 98780371452,
+    "postSyncPullRequestGuardConclusion": "success",
+    "allPostSyncGuardStepsPassed": true
   },
   "checkpointReplay": {
-    "requiredAfterThisSummaryCommit": true,
-    "purpose": "Confirm the pull_request synchronize event still passes after checkpoint-only D7 closeout commits."
+    "requiredAfterSyncCheckpointCommit": true,
+    "purpose": "Confirm the pull_request synchronize event remains green after the final checkpoint-only updates."
   },
   "boundaries": {
     "rawConfigDataSemanticRecomputationAdded": false,
@@ -99,6 +109,6 @@
     "productionSourceMutationAdded": false,
     "missingOwningValidatorsInvented": false
   },
-  "nextStage": "D7-ADMIN",
-  "nextStageGoal": "Optionally configure Project Doctor PR Guard / pr-guard as a required status check on main using an authorized repository-admin surface, then synchronize the branch with current main before final merge."
+  "nextStage": "D7-ADMIN-MANUAL",
+  "nextStageGoal": "Configure Project Doctor PR Guard / pr-guard as a required status check on main using a GitHub repository-admin surface. No code or branch synchronization work remains."
 }
