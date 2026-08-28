@@ -1,0 +1,82 @@
+{
+  "contract": "equipment-image-stage1-representative-proof-v1",
+  "stage": "Equipment Image Stage 1",
+  "purpose": "Prove authoritative source bytes for five representative Equipment icons before any bulk asset import.",
+  "stage0Input": {
+    "summary": "data/validation/equipment-image-stage0-summary.v1.json",
+    "checkpoint": "data/checkpoints/equipment-image-stage0.v1.json",
+    "requiredStatus": "PASS_EQUIPMENT_IMAGE_STAGE0",
+    "requiredFreezeState": "EQUIPMENT_IMAGE_STAGE0_FROZEN"
+  },
+  "identity": {
+    "primaryKey": "equipmentId",
+    "sourceLocatorAuthority": "ConfigDataEquipmentInfo.Icon full path",
+    "nameJoinForbidden": true,
+    "basenameOnlyResolutionForbidden": true,
+    "filenameSimilarityResolutionForbidden": true,
+    "crossRootFallbackForbidden": true,
+    "sourceAssetEqualityDoesNotMergeEquipment": true
+  },
+  "representatives": [
+    {
+      "label": "weapon",
+      "equipmentId": 6,
+      "sourceIconPath": "UI/Icon/Equip_ABS/Equip_Dagger6.png",
+      "targetRepositoryPath": "public/images/equipment/6.png",
+      "targetUrlPath": "/images/equipment/6.png"
+    },
+    {
+      "label": "armor",
+      "equipmentId": 59,
+      "sourceIconPath": "UI/Icon/Equip_ABS/Equip_MetalArmor6.png",
+      "targetRepositoryPath": "public/images/equipment/59.png",
+      "targetUrlPath": "/images/equipment/59.png"
+    },
+    {
+      "label": "headgear",
+      "equipmentId": 80,
+      "sourceIconPath": "UI/Icon/Equip_ABS/Equip_MetalHelmet6.png",
+      "targetRepositoryPath": "public/images/equipment/80.png",
+      "targetUrlPath": "/images/equipment/80.png"
+    },
+    {
+      "label": "accessory",
+      "equipmentId": 99,
+      "sourceIconPath": "UI/Icon/Equip_ABS/Equip_Boots4.png",
+      "targetRepositoryPath": "public/images/equipment/99.png",
+      "targetUrlPath": "/images/equipment/99.png"
+    },
+    {
+      "label": "exclusive-equipment",
+      "equipmentId": 273,
+      "sourceIconPath": "UI/Icon/Equip_ABS/Equip_Sword13.png",
+      "targetRepositoryPath": "public/images/equipment/273.png",
+      "targetUrlPath": "/images/equipment/273.png"
+    }
+  ],
+  "requiredEvidence": {
+    "sourceLocatorExactMatch": true,
+    "sourceEvidenceStatus": "VERIFIED_EXACT_SOURCE_EXPORT",
+    "pngSignature": true,
+    "sha256": true,
+    "widthAndHeight": true,
+    "sourceAndRepositorySha256Parity": true
+  },
+  "allowedPendingStatus": "PENDING_AUTHORITATIVE_BYTES",
+  "web": {
+    "root": "public/images/equipment",
+    "urlTemplate": "/images/equipment/{equipmentId}.png"
+  },
+  "admission": {
+    "representativePassCountRequired": 5,
+    "bulkImportBeforeRepresentativePassForbidden": true,
+    "nextStageAfterPass": "STAGE2_PUBLIC_373_ASSET_EXPANSION"
+  },
+  "productionBoundary": {
+    "semanticStageReopened": false,
+    "canonicalIdentityChanged": false,
+    "runtimeNameJoinForbidden": true,
+    "rawConfigDataRuntimeReadForbidden": true,
+    "nonPublicEquipmentMustNotGainPublicRouteFromAssetPresence": true
+  }
+}
