@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage1-asset-locator-inventory",
+  "schemaId": "hero-portrait-stage1-asset-locator-inventory-checkpoint/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "freezeState": "HERO_PORTRAIT_STAGE1_LOCATOR_INVENTORY_FROZEN",
+  "contract": "data/contracts/hero-portrait-stage1-asset-locator-inventory.v1.json",
+  "inventory": "data/generated/hero-portrait-stage1-locator-inventory.v1.json",
+  "checks": [
+    {
+      "id": "stage0-population-reused",
+      "expected": 267,
+      "actual": 267,
+      "result": "PASS"
+    },
+    {
+      "id": "unity-source-locator-coverage",
+      "expected": 267,
+      "actual": 267,
+      "result": "PASS"
+    },
+    {
+      "id": "known-clean-png-source-family",
+      "expected": "PROVEN",
+      "actual": "GOOGLE_DRIVE_BASE_SKIN_PNG / 5 manifest records",
+      "result": "PASS"
+    },
+    {
+      "id": "direct-source-readback",
+      "expected": "AT_LEAST_1",
+      "actual": "Hero 6 / Leon / MATCH",
+      "result": "PASS"
+    },
+    {
+      "id": "fuzzy-name-mapping-prohibited",
+      "expected": true,
+      "actual": true,
+      "result": "PASS"
+    },
+    {
+      "id": "population-drive-coverage-not-overstated",
+      "expected": "UNKNOWN_UNTIL_PROVEN",
+      "actual": "UNKNOWN_NOT_PROVEN_IN_STAGE1",
+      "result": "PASS"
+    },
+    {
+      "id": "bulk-png-extraction",
+      "expected": "NOT_PERFORMED",
+      "actual": "NOT_PERFORMED",
+      "result": "PASS"
+    }
+  ],
+  "representativeEvidence": {
+    "existingManifestHeroIds": [
+      5,
+      6,
+      8,
+      12,
+      15
+    ],
+    "directReadbackHeroId": 6,
+    "directReadbackFileName": "Leon_Animation_FIN_idle_Normal_default.png",
+    "directReadbackSha256": "8d04d4858d8bbb8021cef1439183018293ff28659f42e486ae1306d8c5f616d1",
+    "directReadbackDimensions": [
+      1443,
+      2112
+    ],
+    "directReadbackAlpha": true
+  },
+  "scopeBoundary": {
+    "completedHere": [
+      "classify frozen Unity locator as locator-only",
+      "identify existing proven Google Drive clean PNG source family",
+      "prove one Drive source remains directly readable and byte-identical to the frozen sample manifest",
+      "classify existing WebP files as presentation derivatives",
+      "freeze anti-inference/mis-mapping rules",
+      "freeze Stage 2 representative-proof set"
+    ],
+    "notCompletedHere": [
+      "267-Hero Drive PNG mapping",
+      "267-Hero Unity dependency resolution",
+      "267-Hero PNG extraction",
+      "visual identity proof for all five samples",
+      "frontend installation or resolver mutation"
+    ]
+  },
+  "verdict": {
+    "stage1Complete": true,
+    "whyPassWithReview": "Locator/source taxonomy and safe resolution policy are complete, but population-wide direct PNG coverage is intentionally unproven and deferred.",
+    "hardErrors": 0
+  },
+  "nextStart": {
+    "stage": "HERO_PORTRAIT_STAGE2_REPRESENTATIVE_RESOLUTION_PROOF",
+    "heroIds": [
+      5,
+      6,
+      8,
+      12,
+      15
+    ]
+  }
+}
