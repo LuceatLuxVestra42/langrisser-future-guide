@@ -11,38 +11,39 @@
   "indexFormat": {
     "schemaVersion": 1,
     "keyEncoding": "STRINGIFIED_EXPLICIT_SOURCE_ID",
-    "recordLocator": "source.containerPath + byId[id].recordIndex",
+    "entryTuple": ["id", "recordIndex", "label?"],
+    "recordLocator": "source.containerPath + entry[1]",
     "sourceHash": "SHA-256 of exact UTF-8 source file bytes",
     "storeFullSourceRecord": false,
     "storeDirectRelations": false,
     "storeCanonicalRelations": false,
-    "nameFieldsAreDiscoveryMetadataOnly": true,
-    "ordering": "deterministic ID ordering; source record order is preserved only through recordIndex"
+    "singleLabelIsDiscoveryMetadataOnly": true,
+    "ordering": "deterministic ID ordering; one compact tuple per line; source record order is preserved only through recordIndex"
   },
   "entities": {
     "Hero": {
       "source": "data/configdata/ConfigDataHeroInfo.json",
       "primaryKey": "ID",
       "output": "data/index/hero.v1.json",
-      "searchLabelFields": ["Name", "Name_Eng"]
+      "searchLabelField": "Name"
     },
     "Soldier": {
       "source": "data/configdata/ConfigDataSoldierInfo.json",
       "primaryKey": "ID",
       "output": "data/index/soldier.v1.json",
-      "searchLabelFields": ["Name"]
+      "searchLabelField": "Name"
     },
     "Skill": {
       "source": "data/configdata/ConfigDataSkillInfo.json",
       "primaryKey": "ID",
       "output": "data/index/skill.v1.json",
-      "searchLabelFields": ["Name"]
+      "searchLabelField": "Name"
     },
     "Equipment": {
       "source": "data/configdata/ConfigDataEquipmentInfo.json",
       "primaryKey": "ID",
       "output": "data/index/equipment.v1.json",
-      "searchLabelFields": ["Name"]
+      "searchLabelField": "Name"
     }
   },
   "acceptedSourceContainers": [
@@ -52,11 +53,17 @@
     "items"
   ],
   "labelPolicy": {
-    "copyOnlyExactStringFieldsListedByEntity": true,
-    "omitMissingOrEmptyLabels": true,
-    "labelsMayBeUsedForCanonicalJoin": false,
+    "copyOnlyExactSingleStringFieldDeclaredByEntity": true,
+    "omitMissingOrEmptyLabel": true,
+    "labelMayBeUsedForCanonicalJoin": false,
     "fuzzyMatching": false,
     "normalizationBeyondStringPreservation": false
+  },
+  "sizePolicy": {
+    "avoidRepeatedObjectKeysPerRecord": true,
+    "avoidDuplicateIdListAndIdMap": true,
+    "oneEntryPerLineForTargetedInspection": true,
+    "goal": "Keep the ID locator substantially smaller than the raw ConfigData source and practical for targeted repository inspection."
   },
   "failurePolicy": {
     "missingSource": "FAIL",
@@ -86,7 +93,7 @@
       "generated source hash matches current source bytes",
       "generated ID set exactly equals current source ID set",
       "each generated recordIndex resolves back to the same source ID",
-      "only approved search label fields are copied",
+      "only the approved single discovery label is copied",
       "full ConfigData records are not duplicated into the index",
       "regeneration produces byte-identical index and summary content"
     ],
