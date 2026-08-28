@@ -8,6 +8,7 @@ on:
       - 'data/validation/**'
       - 'data/checkpoints/**'
       - 'data/generated/**'
+      - 'data/status-sources/**'
       - 'data/contracts/project-doctor-*.json'
       - 'scripts/*project-doctor*'
       - 'scripts/build-project-status.mjs'
@@ -19,6 +20,7 @@ on:
       - 'data/validation/**'
       - 'data/checkpoints/**'
       - 'data/generated/**'
+      - 'data/status-sources/**'
       - 'data/contracts/project-doctor-*.json'
       - 'scripts/*project-doctor*'
       - 'scripts/build-project-status.mjs'
@@ -52,6 +54,8 @@ jobs:
         shell: bash
         run: |
           STATUS_PATHS=(
+            data/generated/project-doctor-active-source-registry.v1.json
+            data/validation/project-doctor-active-source-registry-summary.v1.json
             data/generated/project-doctor-d1-1-status.v1.json
             data/validation/project-doctor-d1-1-summary.v1.json
             data/validation/project-doctor-d1-2-summary.v1.json
@@ -92,9 +96,11 @@ jobs:
       - name: Verify Project Status projection is current
         run: node scripts/build-project-status.mjs --check
 
-      - name: Verify committed Doctor D1 outputs are current
+      - name: Verify committed Doctor and registry outputs are current
         run: >-
           git diff --exit-code --
+          data/generated/project-doctor-active-source-registry.v1.json
+          data/validation/project-doctor-active-source-registry-summary.v1.json
           data/generated/project-doctor-d1-1-status.v1.json
           data/validation/project-doctor-d1-1-summary.v1.json
           data/validation/project-doctor-d1-2-summary.v1.json
