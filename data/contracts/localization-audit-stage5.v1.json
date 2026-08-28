@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-stage5-contract/v1",
+  "stage": 5,
+  "status": "FROZEN",
+  "purpose": "Formalize the completed Stage 4 localization audit as one stable project command, one deterministic machine-readable report, and one permanent CI gate without changing canonical localization semantics.",
+  "scope": {
+    "mode": "READ_ONLY_AUDIT",
+    "includes": [
+      "formal package command",
+      "latest audit entrypoint",
+      "deterministic machine-readable report",
+      "permanent pull-request and main-branch CI",
+      "historical Stage 2 runner compatibility"
+    ],
+    "excludes": [
+      "automatic translation",
+      "canonical or presentation mutation",
+      "relation recomputation",
+      "automatic provisional promotion",
+      "Project Doctor integration",
+      "frontend visual changes",
+      "deployment or hosted browser QA"
+    ]
+  },
+  "inheritance": {
+    "requiredStage": 4,
+    "runner": "scripts/audit-localization-stage4.mjs",
+    "snapshot": "data/validation/localization-audit-stage4.v1.json",
+    "requiredSchemaId": "localization-audit-stage4/v1",
+    "allowedStatuses": ["PASS", "PASS_WITH_REVIEW"],
+    "expectedBaseline": {
+      "soldierRecords": 224,
+      "heroRecords": 267,
+      "equipmentRecords": 390,
+      "equipmentPublicRecords": 373,
+      "errors": 0,
+      "reviews": 2,
+      "frontendLocalizationLeakErrors": 0
+    }
+  },
+  "command": {
+    "packageScript": "audit:localization",
+    "packageCommand": "node scripts/audit-localization.mjs",
+    "entrypoint": "scripts/audit-localization.mjs",
+    "supportedOptions": [
+      "--check",
+      "--json",
+      "--report <path>",
+      "--self-test"
+    ],
+    "defaultBehavior": "human-readable summary with nonzero exit only on FAIL"
+  },
+  "historicalCompatibility": {
+    "stage2Runner": "scripts/audit-localization-stage2.mjs",
+    "stage2_1Runner": "scripts/audit-localization-stage2-1.mjs",
+    "requiredStage2_1Reference": "scripts/audit-localization-stage2.mjs",
+    "rule": "Stage 2.1 and all inherited Stage 3/4 checks must continue using the preserved Stage 2 implementation; the formal entrypoint must not rewrite historical Stage 2 semantics."
+  },
+  "machineReport": {
+    "schemaId": "localization-audit-stage5/v1",
+    "format": "JSON",
+    "stdoutFlag": "--json",
+    "fileFlag": "--report <path>",
+    "repositoryInputMutationAllowed": false,
+    "ciOutputLocation": "runner temporary directory",
+    "deterministic": true
+  },
+  "ci": {
+    "workflow": ".github/workflows/localization-audit.yml",
+    "permanent": true,
+    "triggers": ["pull_request:main", "push:main", "workflow_dispatch"],
+    "requiredCommands": [
+      "npm run audit:localization -- --check --report",
+      "npm run audit:localization -- --self-test"
+    ],
+    "reportArtifact": "localization-audit-stage5-report"
+  },
+  "minimumChecks": [
+    "Stage 4 --check passes before Stage 5 result is accepted",
+    "package.json audit:localization command is exact",
+    "historical Stage 2 runner exists",
+    "Stage 2.1 points to the preserved Stage 2 runner",
+    "machine report can be emitted to stdout and an explicit file path",
+    "machine report is deterministic for the same inputs",
+    "permanent CI workflow invokes the formal package command",
+    "audit does not mutate canonical, presentation, generated, frontend, or historical validation inputs"
+  ],
+  "resultModel": ["PASS", "PASS_WITH_REVIEW", "FAIL"],
+  "nextStage": {
+    "stage": 6,
+    "scope": "Project Doctor integration",
+    "includedHere": false
+  }
+}
