@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-1c-mapped-source-admission",
+  "schemaId": "hero-portrait-stage4-1c-mapped-source-admission-checkpoint/v1",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "HERO_PORTRAIT_STAGE4_1C_MAPPED_SOURCE_ADMISSION_FROZEN",
+  "source": "data/generated/hero-portrait-stage4-1c-mapped-source-admission.v1.json",
+  "summary": {
+    "canonicalHeroCount": 267,
+    "previousAdmittedSourceCount": 5,
+    "stage41cNewAdmissionCount": 203,
+    "canonicalAdmittedSourceCount": 208,
+    "pendingCanonicalSourceCount": 59,
+    "reviewSourceIdentityCount": 0,
+    "rejectedSourceCount": 0,
+    "duplicateHeroIdCount": 0,
+    "duplicateImmutableSourceIdCount": 0,
+    "duplicateShaGroupCount": 0,
+    "materializedTargetCount": 0,
+    "bulk267Ready": false,
+    "hardErrorCount": 0
+  },
+  "checks": {
+    "stage41cTechnical203Of203": "PASS",
+    "stage41cVisual203Of203": "PASS",
+    "stage2AdmittedContinuity5Of5": "PASS",
+    "combinedRegistry208UniqueHeroIds": "PASS",
+    "combinedRegistry208UniqueImmutableSourceIds": "PASS",
+    "crossHeroDuplicateSha": "PASS_NONE",
+    "materializationPerformed": false,
+    "bulk267Ready": false
+  },
+  "nextStart": {
+    "primary": "HERO_PORTRAIT_STAGE4_2_UNCOVERED_SOURCE_FALLBACK_PROOF",
+    "goal": "Resolve the remaining 59 canonical Heroes without structured exact admitted Drive sources: 36 structured-tree exceptions plus the 23-Hero structured-tree count gap, without changing the 208 frozen admissions.",
+    "bulkMaterializationBlockedUntil": "ADMITTED_SOURCE_267_OF_267"
+  }
+}
