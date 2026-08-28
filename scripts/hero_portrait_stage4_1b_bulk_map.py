@@ -17,6 +17,10 @@ EXPECTED_RARITY_COUNTS = {"LLR": 5, "SSR": 191, "SR": 33, "R": 12, "N": 3}
 EXPECTED_STRUCTURED_COUNT = 244
 CANONICAL_HERO_COUNT = 267
 ADMITTED_HERO_IDS = {5, 6, 8, 12, 15}
+EXACT_MAPPING_STATES = {
+    "BRIDGE_PROVEN_MAPPING_ALREADY_ADMITTED",
+    "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED",
+}
 
 
 def drive_id_from_url(url: str) -> str | None:
@@ -79,7 +83,6 @@ def main() -> int:
         for entry in entries:
             rel = entry["path"].replace("\\", "/")
             parts = [p for p in rel.split("/") if p]
-            # gdown folder listing may include the rarity root name or start directly below it.
             if rarity in parts:
                 idx = parts.index(rarity)
                 if len(parts) <= idx + 1:
@@ -110,7 +113,6 @@ def main() -> int:
     summary_states = defaultdict(int)
     hero_to_group_keys = defaultdict(list)
     base_id_to_hero = defaultdict(list)
-
     stems_sorted = sorted(stem_to_heroes.keys(), key=len, reverse=True)
 
     for (rarity, group_path), entries in sorted(groups.items()):
@@ -121,7 +123,6 @@ def main() -> int:
         for entry in entries:
             parts = entry["partsAfterHero"]
             name = entry["name"]
-            # Ownership evidence must come from a non-base file under a Skin container.
             if "스킨" not in parts or "기본" in parts:
                 continue
             for stem in stems_sorted:
@@ -157,7 +158,11 @@ def main() -> int:
         if hero_id is None:
             mapping_state = ownership_state
         elif len(base_candidates) == 1:
-            mapping_state = "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED"
+            mapping_state = (
+                "BRIDGE_PROVEN_MAPPING_ALREADY_ADMITTED"
+                if hero_id in ADMITTED_HERO_IDS
+                else "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED"
+            )
         elif len(base_candidates) == 0:
             mapping_state = "OWNERSHIP_PROVEN_BASE_PNG_MISSING"
         else:
@@ -180,12 +185,16 @@ def main() -> int:
             "baseCandidates": base_candidates,
         })
 
-    mapped_records = [r for r in records if r["mappingState"] == "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED"]
+    mapped_records = [r for r in records if r["mappingState"] in EXACT_MAPPING_STATES]
     mapped_by_hero = defaultdict(list)
     for rec in mapped_records:
         mapped_by_hero[rec["heroId"]].append(rec)
 
-    duplicate_hero_mappings = {str(k): [r["driveGroupPath"] for r in v] for k, v in mapped_by_hero.items() if len(v) > 1}
+    duplicate_hero_mappings = {
+        str(k): [r["driveGroupPath"] for r in v]
+        for k, v in mapped_by_hero.items()
+        if len(v) > 1
+    }
     duplicate_base_ids = {k: v for k, v in base_id_to_hero.items() if len(set(v)) > 1}
 
     continuity = []
@@ -212,13 +221,41 @@ def main() -> int:
     mapped_hero_ids = sorted(mapped_by_hero.keys())
     exact_mapping_count = len(mapped_records)
     unique_exact_hero_count = len(mapped_hero_ids)
+    already_admitted_count = sum(
+        1 for r in mapped_records if r["mappingState"] == "BRIDGE_PROVEN_MAPPING_ALREADY_ADMITTED"
+    )
+    mapped_not_admitted_count = sum(
+        1 for r in mapped_records if r["mappingState"] == "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED"
+    )
     hard_errors = continuity_mismatch + len(duplicate_hero_mappings) + len(duplicate_base_ids)
     structured_count = len(records)
 
     if structured_count != EXPECTED_STRUCTURED_COUNT:
         hard_errors += 1
+    if already_admitted_count != len(ADMITTED_HERO_IDS):
+        hard_errors += 1
 
     status = "PASS" if hard_errors == 0 and exact_mapping_count == EXPECTED_STRUCTURED_COUNT else "PASS_WITH_REVIEW"
+
+    summary = {
+        "canonicalHeroCount": CANONICAL_HERO_COUNT,
+        "expectedStructuredDriveHeroFolderCount": EXPECTED_STRUCTURED_COUNT,
+        "observedStructuredDriveHeroFolderCount": structured_count,
+        "exactBaseMappingRecordCount": exact_mapping_count,
+        "uniqueExactMappedHeroCount": unique_exact_hero_count,
+        "alreadyAdmittedExactMappingCount": already_admitted_count,
+        "mappedNotAdmittedExactMappingCount": mapped_not_admitted_count,
+        "previousKnownExactMappingCount": len(known_exact),
+        "newExactMappedHeroCountRelativeToStage41": len(set(mapped_hero_ids) - set(known_exact)),
+        "remainingCanonicalWithoutStructuredExactMapping": CANONICAL_HERO_COUNT - unique_exact_hero_count,
+        "canonicalAdmittedSourceCount": len(ADMITTED_HERO_IDS),
+        "pendingCanonicalSourceAdmissionCount": CANONICAL_HERO_COUNT - len(ADMITTED_HERO_IDS),
+        "hardErrorCount": hard_errors,
+        "continuityMismatchCount": continuity_mismatch,
+        "duplicateHeroMappingCount": len(duplicate_hero_mappings),
+        "duplicateBaseFileIdCount": len(duplicate_base_ids),
+        "bulk267Ready": False,
+    }
 
     out = {
         "version": 1,
@@ -227,29 +264,16 @@ def main() -> int:
         "status": status,
         "completion": "COMPLETE",
         "sourcePolicy": {
-            "driveListingTool": "gdown-6.1.0 --folder --json",
+            "driveListingTool": "gdown-6.1.0 pinned _parse_embedded_folder_view selected-path crawler",
             "downloadImageBodies": False,
+            "recursiveFullTreeTraversal": False,
             "displayNameOwnershipJoin": False,
             "ownershipRule": "exact canonical Skin sourceSpinePath runtime stem prefix in a non-base file under the same Drive Hero group",
             "baseSelectionRule": "same proven Hero group; under 스킨/기본; unique filename ending _idle_Normal_default.png",
             "filenameTokensAloneEstablishHeroOwnership": False,
             "sourceAdmissionPerformed": False,
         },
-        "summary": {
-            "canonicalHeroCount": CANONICAL_HERO_COUNT,
-            "expectedStructuredDriveHeroFolderCount": EXPECTED_STRUCTURED_COUNT,
-            "observedStructuredDriveHeroFolderCount": structured_count,
-            "exactBaseMappingRecordCount": exact_mapping_count,
-            "uniqueExactMappedHeroCount": unique_exact_hero_count,
-            "previousKnownExactMappingCount": len(known_exact),
-            "newExactMappedHeroCountRelativeToStage41": len(set(mapped_hero_ids) - set(known_exact)),
-            "remainingCanonicalWithoutStructuredExactMapping": CANONICAL_HERO_COUNT - unique_exact_hero_count,
-            "hardErrorCount": hard_errors,
-            "continuityMismatchCount": continuity_mismatch,
-            "duplicateHeroMappingCount": len(duplicate_hero_mappings),
-            "duplicateBaseFileIdCount": len(duplicate_base_ids),
-            "bulk267Ready": False,
-        },
+        "summary": summary,
         "rarityObserved": rarity_observed,
         "rarityExpected": EXPECTED_RARITY_COUNTS,
         "rarityCountMismatches": rarity_count_mismatches,
@@ -272,20 +296,23 @@ def main() -> int:
         "completion": "COMPLETE",
         "freezeState": "HERO_PORTRAIT_STAGE4_1B_STRUCTURED_DRIVE_BULK_MAPPING_COMPLETE",
         "source": str(generated_path.relative_to(repo)),
-        "summary": out["summary"],
+        "summary": summary,
         "mappingStateCounts": out["mappingStateCounts"],
         "rarityObserved": rarity_observed,
         "checks": [
             {"id": "structured-folder-count", "expected": EXPECTED_STRUCTURED_COUNT, "actual": structured_count, "result": "PASS" if structured_count == EXPECTED_STRUCTURED_COUNT else "FAIL"},
             {"id": "known-exact-continuity", "expected": 0, "actual": continuity_mismatch, "result": "PASS" if continuity_mismatch == 0 else "FAIL"},
+            {"id": "already-admitted-mapping-continuity", "expected": len(ADMITTED_HERO_IDS), "actual": already_admitted_count, "result": "PASS" if already_admitted_count == len(ADMITTED_HERO_IDS) else "FAIL"},
             {"id": "duplicate-hero-mapping", "expected": 0, "actual": len(duplicate_hero_mappings), "result": "PASS" if not duplicate_hero_mappings else "FAIL"},
             {"id": "duplicate-base-file-id", "expected": 0, "actual": len(duplicate_base_ids), "result": "PASS" if not duplicate_base_ids else "FAIL"},
-            {"id": "source-admission-performed", "expected": False, "actual": False, "result": "PASS"},
+            {"id": "new-source-admission-performed", "expected": False, "actual": False, "result": "PASS"},
             {"id": "bulk-267-ready", "expected": False, "actual": False, "result": "PASS"},
         ],
         "nextStart": {
-            "primary": "HERO_PORTRAIT_STAGE4_2_UNCOVERED_SOURCE_FALLBACK_PROOF",
-            "condition": "Begin only after reviewing unresolved/ambiguous Stage 4-1B rows and admitting any newly mapped Drive files through Stage 3 byte/image gates.",
+            "primary": "HERO_PORTRAIT_STAGE4_1C_MAPPED_SOURCE_ADMISSION",
+            "primaryGoal": "Apply Stage 3 byte/image admission gates to the exact mapped-but-not-admitted Drive sources without repeating the ownership census.",
+            "secondary": "HERO_PORTRAIT_STAGE4_2_UNCOVERED_SOURCE_FALLBACK_PROOF",
+            "secondaryCondition": "Begin fallback proof after the 36 structured-tree exceptions are reviewed and the mapped Drive admission batch is checkpointed.",
         },
     }
     checkpoint_path = repo / "data/checkpoints/hero-portrait-stage4-1b-structured-drive-bulk-mapping.v1.json"
@@ -295,17 +322,27 @@ def main() -> int:
     summary_path.write_text(json.dumps({
         "version": 1,
         "status": status,
-        "summary": out["summary"],
+        "summary": summary,
         "rarityObserved": rarity_observed,
         "rarityExpected": EXPECTED_RARITY_COUNTS,
         "mappingStateCounts": out["mappingStateCounts"],
         "unresolvedRows": [
-            {"rarity": r["rarity"], "driveGroupPath": r["driveGroupPath"], "driveHeroFolderLabel": r["driveHeroFolderLabel"], "ownershipState": r["ownershipState"], "mappingState": r["mappingState"]}
-            for r in records if r["mappingState"] != "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED"
+            {
+                "rarity": r["rarity"],
+                "driveGroupPath": r["driveGroupPath"],
+                "driveHeroFolderLabel": r["driveHeroFolderLabel"],
+                "ownershipState": r["ownershipState"],
+                "mappingState": r["mappingState"],
+            }
+            for r in records if r["mappingState"] not in EXACT_MAPPING_STATES
         ],
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    print(json.dumps({"status": status, **out["summary"], "mappingStateCounts": out["mappingStateCounts"]}, ensure_ascii=False, indent=2))
+    print(json.dumps({
+        "status": status,
+        **summary,
+        "mappingStateCounts": out["mappingStateCounts"],
+    }, ensure_ascii=False, indent=2))
     return 0
 
 
