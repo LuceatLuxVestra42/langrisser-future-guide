@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "stage": "ASSET_INTAKE_STAGE_2_REAL_EVIDENCE",
-  "status": "PARTIAL_REAL_EVIDENCE",
+  "status": "REPRESENTATIVE_PATH_EVIDENCE_COMPLETE_RESOURCE_ID_PENDING",
   "canonicalType": "Skin",
   "representatives": [
     "102",
@@ -19,19 +19,51 @@
     "modelBindingIdSource": "data/configdata/ConfigDataHeroSkinInfo.json",
     "note": "Reuse Stage 1/3-1 generated metadata. Do not re-derive Hero-Skin ownership, sourceOrder, locator strings, or model binding IDs."
   },
+  "evidenceSources": {
+    "legacyStaticRawBytes": "data/evidence/skin-stage3-2-static-source-evidence.v1.json",
+    "unityBundlePathEvidence": "data/evidence/skin-stage3-2-unity-bundle-evidence.v1.json",
+    "skin102BeginStaticEvidence": "data/evidence/skin-stage3-2-mathew-begin-static-evidence.v1.json",
+    "skin102BeginSpineEvidence": "data/evidence/skin-stage3-2-mathew-begin-spine-evidence.v1.json"
+  },
   "coverage": {
     "representativeExpected": 3,
     "staticExpected": 3,
     "staticExactBasenameCandidates": 3,
     "staticRawBytesVerified": 3,
-    "staticAuthoritativeUnityPathResolved": 0,
+    "staticAuthoritativeUnityPathResolved": 3,
     "spineExpected": 3,
-    "spineAuthoritativePathResolved": 0,
+    "spineAuthoritativePathResolved": 3,
+    "recordsWithStaticAndSpinePathResolved": 3,
     "modelResourceIdsExpected": 7,
     "modelResourceIdsResolved": 0,
     "finalNormalizedResolvedRecords": 0
   },
-  "staticEvidence": "data/evidence/skin-stage3-2-static-source-evidence.v1.json",
+  "pathResolvedRecords": [
+    {
+      "canonicalKey": "102",
+      "static": "UI/Icon/HeroSkin_ABS/Skin/Skin_Matthew_01.png",
+      "spine": "Spine/Char/Mathew_ABS/Mathew_Skin01_Prefab.prefab",
+      "pathEvidenceStatus": "CONFIRMED",
+      "normalizedResolutionClass": "PENDING",
+      "pendingReason": "RESOURCE_ID_EVIDENCE_NOT_YET_MAPPED"
+    },
+    {
+      "canonicalKey": "1901",
+      "static": "UI/Icon/HeroSkin2_ABS/Skin/Skin_Lista_Skin01.png",
+      "spine": "Spine/Char/Lista_ABS/Lista_Skin01_Prefab.prefab",
+      "pathEvidenceStatus": "CONFIRMED",
+      "normalizedResolutionClass": "PENDING",
+      "pendingReason": "RESOURCE_ID_EVIDENCE_NOT_YET_MAPPED"
+    },
+    {
+      "canonicalKey": "3701",
+      "static": "UI/Icon/HeroSkin_ABS/Skin/Skin_Zigodlla_01.png",
+      "spine": "Spine/Char/Zigodlla_ABS/Zigodlla_Skin01_Prefab.prefab",
+      "pathEvidenceStatus": "CONFIRMED",
+      "normalizedResolutionClass": "PENDING",
+      "pendingReason": "RESOURCE_ID_EVIDENCE_NOT_YET_MAPPED"
+    }
+  ],
   "modelResourceIds": [
     102,
     1021,
@@ -42,24 +74,22 @@
     3701
   ],
   "verifiedFacts": [
-    "All three frozen static-image basenames were found as exact parent-scoped filename matches in the project-known legacy asset Drive folder.",
-    "Raw PNG bytes were fetched for all three matches and locally verified for PNG signature, dimensions, byte size, and SHA-256.",
-    "The legacy Drive folder does not preserve the frozen Unity relative path and is therefore supporting evidence, not an authoritative Unity extraction root.",
-    "The frozen source metadata identifies ConfigDataHeroSkinInfo.json as the model-binding ID source and ConfigDataCharImageSkinResourceInfo.json as the static/Spine locator source.",
-    "No exact selected Spine prefab file was found in the currently accessible project Drive sources.",
-    "No authoritative file-path or byte mapping has been verified for model resource IDs 102, 1021, 1022, 1023, 1024, 1901, or 3701."
+    "Skin 102 static frozen locator is reproduced by the embedded runtime path assets/gameproject/runtimeassets/ui/icon/heroskin_abs/skin/skin_matthew_01.png in begin_ui_icon_heroskin_abs.b, modulo path casing only.",
+    "Skin 102 Spine frozen locator is reproduced by the embedded runtime path assets/gameproject/runtimeassets/spine/char/mathew_abs/mathew_skin01_prefab.prefab in begin_spine_char_mathew_abs.b, modulo path casing only.",
+    "Skin 1901 static and Spine frozen locators are reproduced by embedded runtime paths in ui_icon_heroskin2_abs.b and spine_char_lista_abs.b respectively, modulo path casing only.",
+    "Skin 3701 static and Spine frozen locators are reproduced by embedded runtime paths in ui_icon_heroskin_abs.b and spine_char_zigodlla_abs.b respectively, modulo path casing only.",
+    "All three representative records now have authoritative static and Spine path evidence from UnityFS bundle contents.",
+    "The earlier Mathew Skin01 Range prefab is retained as a separate nearby variant and is not used as the exact Skin 102 Spine proof.",
+    "No authoritative file-path or byte mapping has yet been verified for model resource IDs 102, 1021, 1022, 1023, 1024, 1901, or 3701."
   ],
   "blockers": [
-    "AUTHORITATIVE_STATIC_UNITY_PATH_PROOF_REQUIRED",
-    "AUTHORITATIVE_SPINE_OR_EQUIVALENT_SOURCE_REQUIRED",
     "AUTHORITATIVE_MODEL_RESOURCE_MAP_OR_SOURCE_REQUIRED"
   ],
   "rejectedShortcuts": [
-    "Do not promote exact-basename legacy Drive matches to authoritative Unity path matches without directory-preserving or equivalent provenance.",
-    "Do not use fuzzy filename matching.",
     "Do not derive model asset paths from numeric resource IDs.",
     "Do not use ID arithmetic or cross-root fallback.",
-    "Do not write partial evidence into a normalized PENDING record or claim RESOLVED before the Stage 1 fail-closed evidence contract is satisfied."
+    "Do not use fuzzy filename matching.",
+    "Do not claim normalized RESOLVED for any representative until its RESOURCE_ID evidence requirement is satisfied."
   ],
-  "nextStartPoint": "Acquire a directory-preserving Unity extraction root or equivalently reviewable extraction manifest for the frozen static/Spine locators and an explicit source map for the seven frozen model resource IDs. Then generate the final representative evidence without recomputing Stage 1 or Stage 2 relations."
+  "nextStartPoint": "Acquire an explicit source map or equivalent authoritative evidence for model resource IDs 102, 1021, 1022, 1023, 1024, 1901, and 3701. Then generate the final representative evidence without recomputing frozen Skin ownership, sourceOrder, static locators, or Spine locators."
 }
