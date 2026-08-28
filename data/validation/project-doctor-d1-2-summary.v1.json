@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "stage": "D1-2",
+  "checkpoint": "PROJECT_DOCTOR_D1_2_HEALTH_GATE",
+  "status": "PASS_PROJECT_DOCTOR_D1_2_HEALTH_GATE",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/project-doctor-d1-0-contract.v1.json",
+  "gateContract": "data/contracts/project-doctor-d1-2-health-gate.v1.json",
+  "input": "data/generated/project-doctor-d1-1-status.v1.json",
+  "validator": "scripts/validate-project-doctor-d1-2.mjs",
+  "verificationEvidence": {
+    "repositorySnapshotInspection": "PASS",
+    "currentDomainStateReplay": "PASS_6_OF_6",
+    "localNodeSyntaxCheck": "PASS",
+    "localSyntheticGateExecution": "PASS_9_OF_9",
+    "repositoryCliExecution": "DEFERRED_TO_D1_3",
+    "githubActionsExecution": "OUT_OF_SCOPE"
+  },
+  "scope": {
+    "classificationOnly": true,
+    "domainValidatorExecutionCount": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "staleOutputHashCheckCount": 0,
+    "productionDataWriteCount": 0
+  },
+  "healthPrecedence": [
+    "MISSING",
+    "FAIL",
+    "INCONSISTENT",
+    "REVIEW",
+    "PASS",
+    "UNKNOWN"
+  ],
+  "checks": {
+    "d10ContractFrozen": true,
+    "d11CollectorStatusCollected": true,
+    "domainCount": {
+      "expected": 6,
+      "actual": 6,
+      "pass": true
+    },
+    "domainHealthReproduction": {
+      "expected": 6,
+      "actual": 6,
+      "pass": true
+    },
+    "aggregateHealthCountsMatch": true,
+    "aggregateLifecycleCountsMatch": true,
+    "aggregateReviewTotalMatch": true,
+    "aggregateBlockerTotalMatch": true,
+    "aggregateKnownHardErrorTotalMatch": true,
+    "projectHealthPrecedenceMatch": true,
+    "classificationFixtureCount": 9,
+    "classificationFixturePassCount": 9,
+    "classificationFixtureFailureCount": 0
+  },
+  "currentSnapshot": {
+    "projectHealth": "REVIEW",
+    "healthCounts": {
+      "PASS": 0,
+      "REVIEW": 6,
+      "FAIL": 0,
+      "MISSING": 0,
+      "INCONSISTENT": 0,
+      "UNKNOWN": 0
+    },
+    "lifecycleCounts": {
+      "FROZEN": 4,
+      "COMPLETE": 1,
+      "IN_PROGRESS": 1,
+      "UNKNOWN": 0
+    },
+    "knownHardErrorTotal": 0,
+    "reviewTotal": 33,
+    "blockerTotal": 1
+  },
+  "domainStates": {
+    "hero": {
+      "lifecycle": "FROZEN",
+      "health": "REVIEW",
+      "canonicalHeroCount": 267,
+      "hardErrorCount": 0
+    },
+    "soldier": {
+      "lifecycle": "COMPLETE",
+      "health": "REVIEW",
+      "canonicalSoldierCount": 224,
+      "heroSoldierRelationCount": 5977,
+      "hardErrorCount": 0
+    },
+    "equipment": {
+      "lifecycle": "FROZEN",
+      "health": "REVIEW",
+      "canonicalEquipmentCount": 390,
+      "publicEquipmentCount": 373,
+      "hardErrorCount": 0
+    },
+    "hero-soldier": {
+      "lifecycle": "FROZEN",
+      "health": "REVIEW",
+      "canonicalPairCount": 5977,
+      "hardErrorCount": 0
+    },
+    "banner": {
+      "lifecycle": "FROZEN",
+      "health": "REVIEW",
+      "definitionCount": 77,
+      "occurrenceCount": 94,
+      "hardErrorCount": 0
+    },
+    "skin": {
+      "lifecycle": "IN_PROGRESS",
+      "health": "REVIEW",
+      "skinCount": 540,
+      "heroCount": 267,
+      "blockerCount": 1,
+      "blocker": "ASSET_BYTES_OR_AUTHENTIC_RESOLUTION_EVIDENCE_NOT_AVAILABLE_IN_REPOSITORY"
+    }
+  },
+  "classificationFixtures": [
+    {"id":"PASS_ACCEPTED","expected":"PASS","actual":"PASS","pass":true},
+    {"id":"REVIEW_NON_BLOCKING","expected":"REVIEW","actual":"REVIEW","pass":true},
+    {"id":"REVIEW_IN_PROGRESS_BLOCKER","expected":"REVIEW","actual":"REVIEW","pass":true},
+    {"id":"FAIL_HARD_ERROR","expected":"FAIL","actual":"FAIL","pass":true},
+    {"id":"FAIL_RAW_STATUS","expected":"FAIL","actual":"FAIL","pass":true},
+    {"id":"INCONSISTENT_CONTRACT","expected":"INCONSISTENT","actual":"INCONSISTENT","pass":true},
+    {"id":"MISSING_PRIMARY","expected":"MISSING","actual":"MISSING","pass":true},
+    {"id":"FAIL_PRECEDES_INCONSISTENT_AND_REVIEW","expected":"FAIL","actual":"FAIL","pass":true},
+    {"id":"UNKNOWN_UNCLASSIFIED","expected":"UNKNOWN","actual":"UNKNOWN","pass":true}
+  ],
+  "importantBoundary": "D1-2 deliberately does not implement stale-output hash detection because D1-0 explicitly excludes stale-output hash comparison from this stage family. That remains a later operating-hardening task.",
+  "failures": [],
+  "hardErrorCount": 0,
+  "nextStage": "D1-3",
+  "nextStageGoal": "Wire the D1-1 collector and D1-2 health gate into stable repository CLI commands without adding GitHub Actions yet."
+}
