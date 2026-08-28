@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-d5-summary/v1",
+  "stage": "D5",
+  "checkpoint": "PROJECT_DOCTOR_D5_FRESHNESS_GUARD",
+  "status": "PASS_PROJECT_DOCTOR_D5_FRESHNESS_GUARD",
+  "completion": "COMPLETE_WITH_LIVE_REPOSITORY_EXECUTION_GAP",
+  "contract": "data/contracts/project-doctor-d5-freshness.v1.json",
+  "implementation": {
+    "refreshRunner": "scripts/run-project-doctor-d5-refresh.mjs",
+    "freshnessValidator": "scripts/validate-project-doctor-d5.mjs",
+    "manifest": "data/generated/project-doctor-d5-freshness.v1.json",
+    "doctorStatusEntrypoint": "node scripts/run-project-doctor-d5-refresh.mjs",
+    "integratedDoctorEntrypoint": "node scripts/run-project-doctor-closeout.mjs"
+  },
+  "freshnessModel": {
+    "authoritativeSourceDiscovery": "DYNAMIC_FROM_D1_CONTRACT",
+    "hashAlgorithm": "sha256",
+    "mtimeUsed": false,
+    "tracksD1Contracts": true,
+    "tracksD1ProducerScripts": true,
+    "tracksD5FreshnessScripts": true,
+    "tracksD1AuthoritativePrimaryAndSupplementalSources": true,
+    "tracksD1GeneratedHealthOutputs": true,
+    "beforeAfterInputStabilityCheck": true,
+    "sourceChangeDuringRefreshBlocksManifestWrite": true,
+    "outputTamperDetected": true,
+    "sourceSetChangeDetected": true,
+    "producerChangeDetected": true
+  },
+  "isolatedVerification": {
+    "status": "PASS_D5_FIXTURES",
+    "fixtureCount": 7,
+    "fixturePassCount": 7,
+    "fixtures": [
+      "FRESH_AFTER_REFRESH",
+      "SOURCE_CHANGE_STALE",
+      "OUTPUT_TAMPER_STALE",
+      "RACE_CHANGE_BLOCKED",
+      "MISSING_OUTPUT_BLOCKED",
+      "SOURCE_SET_CHANGE_STALE",
+      "PRODUCER_CHANGE_STALE"
+    ],
+    "actualRepositoryChildCommandExecutionCount": 0
+  },
+  "runtimeBootstrap": {
+    "manifestStatusInRepository": "UNINITIALIZED",
+    "reason": "The GitHub connector cannot execute npm commands in the live checkout.",
+    "bootstrapCommand": "npm run doctor:status",
+    "expectedSuccessfulManifestStatus": "FRESH_SNAPSHOT",
+    "validatorFreshStatus": "FRESH",
+    "staleExitCode": 4,
+    "sourceChangedDuringRefreshExitCode": 5
+  },
+  "integratedFlow": [
+    "D5 snapshots authoritative inputs before D1 refresh",
+    "D1 collector and D1 health gate regenerate current status outputs",
+    "D5 snapshots authoritative inputs again and blocks if any changed during refresh",
+    "D5 hashes current inputs and D1 outputs into the freshness manifest",
+    "D5 immediately validates the manifest against the current repository working tree",
+    "Only then may the integrated Doctor continue to D4 self-test and selected-check execution"
+  ],
+  "boundaries": {
+    "rawConfigDataReadAdded": false,
+    "semanticRecomputationAdded": false,
+    "domainValidatorInvented": false,
+    "productionSourceMutationAdded": false,
+    "canonicalDataMutationAdded": false,
+    "frontendSourceMutationAdded": false,
+    "githubActionsAdded": false
+  },
+  "nextStage": "D6",
+  "nextStageGoal": "Obtain live repository command proof for the integrated Doctor and then add GitHub Actions automation without weakening D5 freshness or D4 manual-review boundaries."
+}
