@@ -1,0 +1,49 @@
+name: Hero portrait Stage 4-2 known ownership rescue
+
+on:
+  push:
+    branches:
+      - work/hero-portrait-stage4-2-uncovered-source-fallback-proof
+    paths:
+      - scripts/hero_portrait_stage4_2_rescue_known_ownership.py
+      - .github/workflows/hero-portrait-stage4-2-known-ownership-rescue.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rescue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install 'gdown==6.1.0' 'Pillow==11.3.0' 'requests>=2.31' 'urllib3>=2.2'
+      - name: Evaluate all direct base-folder files for the 7 frozen ownership cases
+        run: |
+          python scripts/hero_portrait_stage4_2_rescue_known_ownership.py \
+            --repo-root . \
+            --work-dir /tmp/hero-stage4-2-known-png \
+            --review-dir /tmp/hero-stage4-2-known-review
+      - name: Upload review sheet
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-stage4-2-known-ownership-rescue-review
+          path: /tmp/hero-stage4-2-known-review/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Commit validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/hero-portrait-stage4-2-known-ownership-rescue.v1.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Validate Hero portrait Stage 4-2 ownership rescue'
+            git push
+          fi
