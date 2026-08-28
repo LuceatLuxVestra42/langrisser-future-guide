@@ -6,6 +6,11 @@ export const DEFAULT_D7_CONTRACT_PATH = 'data/contracts/project-doctor-d7-pr-gua
 const WORKFLOW_PATH = '.github/workflows/project-doctor-d7-pr-guard.yml';
 const D2_IMPACT_CONTRACT_PATH = 'data/contracts/project-doctor-d2-impact-contract.v1.json';
 const PACKAGE_PATH = 'package.json';
+const PROMOTION_V1_PATHS = [
+  'data/contracts/regression-coverage-promotion.v1.json',
+  'data/validation/regression-coverage-promotion-summary.v1.json',
+  'scripts/validate-regression-coverage-promotion.mjs',
+];
 
 const readJson = filePath => JSON.parse(fs.readFileSync(filePath, 'utf8'));
 const readText = filePath => fs.readFileSync(filePath, 'utf8');
@@ -18,7 +23,8 @@ export const validateD7 = ({
   packageJson = readJson(PACKAGE_PATH),
 } = {}) => {
   const failures = [];
-  const check = (condition, code) => { if (!condition) failures.push(code); };
+  let checkCount = 0;
+  const check = (condition, code) => { checkCount += 1; if (!condition) failures.push(code); };
 
   check(contract.stage === 'D7', 'CONTRACT_STAGE');
   check(contract.status === 'DESIGN_FROZEN', 'CONTRACT_STATUS');
@@ -53,6 +59,14 @@ export const validateD7 = ({
     (rule.patterns ?? []).includes('.github/workflows/project-doctor-*.yml'));
   check(Boolean(workflowOverlay), 'D2_WORKFLOW_MAPPING_PRESENT');
   check(sameSet(workflowOverlay?.directNodes ?? [], ['project-doctor']), 'D2_WORKFLOW_MAPPING_NODE');
+
+  const promotionOverlay = (d2ImpactContract.pathRuleOverlays ?? []).find(rule => rule.id === 'regression-coverage-promotion-v1-meta-contract');
+  check(Boolean(promotionOverlay), 'D2_PROMOTION_V1_MAPPING_PRESENT');
+  check(sameSet(promotionOverlay?.patterns ?? [], PROMOTION_V1_PATHS), 'D2_PROMOTION_V1_MAPPING_PATHS');
+  check(sameSet(promotionOverlay?.directNodes ?? [], ['project-doctor']), 'D2_PROMOTION_V1_MAPPING_NODE');
+  check(workflowText.includes('Validate Regression Coverage Promotion V1 admission'), 'PROMOTION_V1_ADMISSION_STEP');
+  check(workflowText.includes('node scripts/validate-regression-coverage-promotion.mjs'), 'PROMOTION_V1_VALIDATOR_COMMAND');
+  check(PROMOTION_V1_PATHS.every(value => workflowText.includes(value)), 'PROMOTION_V1_EXACT_PATH_GATE');
   check(packageJson.scripts?.['doctor:pr-guard:validate'] === 'node scripts/validate-project-doctor-d7.mjs', 'PACKAGE_COMMAND');
 
   return {
@@ -61,7 +75,7 @@ export const validateD7 = ({
     stage: 'D7',
     status: failures.length === 0 ? 'PASS_PROJECT_DOCTOR_D7_GUARD_CONTRACT' : 'FAIL_PROJECT_DOCTOR_D7_GUARD_CONTRACT',
     exitCode: failures.length === 0 ? 0 : 1,
-    checkCount: 31,
+    checkCount,
     failureCount: failures.length,
     failures,
   };

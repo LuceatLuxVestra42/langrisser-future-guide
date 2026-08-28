@@ -70,6 +70,24 @@ jobs:
             echo "DOCTOR_HEAD=HEAD" >> "$GITHUB_ENV"
           fi
 
+      - name: Validate Regression Coverage Promotion V1 admission
+        shell: bash
+        run: |
+          PROMOTION_CHANGED=0
+          while IFS= read -r path; do
+            case "$path" in
+              data/contracts/regression-coverage-promotion.v1.json|data/validation/regression-coverage-promotion-summary.v1.json|scripts/validate-regression-coverage-promotion.mjs)
+                PROMOTION_CHANGED=1
+                ;;
+            esac
+          done < <(git diff --name-only --diff-filter=ACMRD "${DOCTOR_BASE}...${DOCTOR_HEAD}" --)
+          if [[ "$PROMOTION_CHANGED" -eq 1 ]]; then
+            test -f data/contracts/regression-coverage-promotion.v1.json
+            test -f data/validation/regression-coverage-promotion-summary.v1.json
+            test -f scripts/validate-regression-coverage-promotion.mjs
+            node scripts/validate-regression-coverage-promotion.mjs
+          fi
+
       - name: Integrated Doctor real-diff dry run
         run: npm run doctor -- --dry-run --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
 
