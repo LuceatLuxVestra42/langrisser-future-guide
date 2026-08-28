@@ -73,6 +73,7 @@ function EquipmentGalleryPage() {
           </div>
 
           <Link
+            reloadDocument
             to="/equipment/exclusive"
             className="shrink-0 rounded-lg border-2 border-foreground bg-background px-4 py-2 text-sm font-bold text-foreground transition hover:bg-foreground hover:text-background sm:text-base"
           >
@@ -202,6 +203,7 @@ function EquipmentImageCard({ record }: { record: EquipmentListRecord }) {
 
   return (
     <Link
+      reloadDocument
       to="/equipment/$equipmentId"
       params={{ equipmentId: String(record.equipmentId) }}
       title={`${displayName} · ${tabLabel}`}
