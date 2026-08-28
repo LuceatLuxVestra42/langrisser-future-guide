@@ -1,0 +1,122 @@
+Localization Audit Stage 4 checkpoint
+Date: 2026-08-28
+Status: PASS_WITH_REVIEW / COMPLETE
+
+Purpose
+- Extend the completed localization audit into the frontend Preflight boundary for Soldier, Hero, and Equipment.
+- Verify approved frozen-source wiring, effective Korean display behavior, list/detail identity parity, public admission boundaries, and runtime localization leak rules.
+- Audit execution remains read-only. No automatic translation, canonical mutation, relation recomputation, or provisional promotion is performed.
+
+Inherited gate
+- Localization Audit Stage 3: PASS_WITH_REVIEW.
+- Inherited records: Soldier 224 / Hero 267 / Equipment 390.
+- Inherited errors: 0.
+- Inherited reviews: 2, both existing Soldier provisional unresolved records.
+
+Frontend Preflight baseline
+- Frontend source files checked: 15.
+- Raw ConfigData runtime reads: 0.
+- Forbidden runtime name joins: 0.
+- Route-to-server boundary bypasses: 0.
+- Consumer wiring mismatches: 0.
+- Effective-display policy mismatches: 0.
+- Equipment localization build preparation: true.
+- Semantic wiring SHA-256: 3cec40f3a627b604baa9b2da5884387cda207fb071aedea29d141564382f1831.
+
+Effective display baseline
+Soldier
+- Records: 224.
+- Effective Korean display: 224.
+- Canonical Korean display: 183.
+- Lower-tier confirmed presentation: 39.
+- Tier-3 provisional presentation: 2.
+- Chinese fallback: 0.
+- Overlay collision: 0.
+- Effective display SHA-256: 88191a34afaa97b70de12e8df0906bde9e9767dcde3bf1bf622e0d39582bbc84.
+
+Hero
+- List records: 267.
+- Detail manifest records: 267.
+- Effective Korean display: 267.
+- Chinese fallback: 0.
+- List/detail identity mismatch: 0.
+- Missing detail shard: 0.
+- Effective display/detail parity SHA-256: f2609239dd0e2fb28c07f285da1baa82d7100af48bf24192da87045cfe62472b.
+
+Equipment
+- Canonical records: 390.
+- Frontend admitted public records: 373 = general 206 + exclusive 167.
+- Effective Korean display: 373.
+- Chinese fallback: 0.
+- Non-public records: 17.
+- Non-public admitted: 0.
+- Non-public absent from frontend admission: 17.
+- Canonical/localized identity mismatch: 0.
+- List/detail identity mismatch: 0.
+- Production join key: equipmentId.
+- Runtime name join: false.
+- Equipment Korean presentation builder is executed only in an OS temporary workspace during audit.
+- Effective display/admission SHA-256: 528b8a3351e919a6ec83f5c109705c821b5b56bf7c9bb86b23a18f0e0cc9639b.
+
+Detector calibration
+- Initial verification run 33158308953 / job 98806336043 reported FRONTEND_NAME_JOIN in src/lib/soldier-page.server.ts.
+- Investigation showed this was an audit false positive: the Soldier implementation filters and resolves by soldierId and only validates nameCn/tier/armyType after the ID match.
+- The broad detector was replaced by a narrow detector that requires the display name to participate in the same runtime lookup expression.
+- Corrected baseline reports forbiddenNameJoins=0.
+
+Stage 4 self-test
+- Final result: PASS 23/23.
+- Inherited Stage 3 tests: 13/13.
+- Stage 4 additions: 10/10.
+- Added cases cover Soldier precedence bypass, route server bypass, raw ConfigData leak, Hero fallback removal, Equipment localized-wrapper bypass, runtime name join, build-preparation loss, effective-display drift, and non-public Equipment admission.
+
+Live mutation verification
+- Hero detail shard mutation: Hero 1 detail nameKr had whitespace appended while the Hero list remained unchanged.
+- Result: Stage 4 --check failed with FRONTEND_EFFECTIVE_DISPLAY_POLICY_MISMATCH for the Hero effective-display/list-detail fingerprint, as required.
+- Source restored; baseline returned PASS_WITH_REVIEW.
+- Equipment route mutation: src/routes/equipment.tsx was changed temporarily from @/lib/equipment-page.functions to @/lib/equipment-page.localized.server.
+- Result: audit status FAIL with FRONTEND_LOCALIZATION_LEAK, as required.
+- Source restored; baseline returned PASS_WITH_REVIEW.
+
+Build / type gate
+- Final verification run: 33158984763.
+- Job: 98808562094.
+- Baseline --check: PASS_WITH_REVIEW / Soldier 224 / Hero 267 / Equipment public 373 / frontend leaks 0 / errors 0 / reviews 2.
+- Self-test: PASS 23/23.
+- bun install --frozen-lockfile: PASS.
+- bun run build: PASS.
+- Equipment build-time Korean presentation generation: PASS canonical=390 public=373 publicNameKr=373 unresolvedNonPublic=17.
+- bunx tsc --noEmit after generated artifacts: PASS.
+
+Frontend type boundary finding and correction
+- A first TypeScript gate exposed that src/lib/equipment-page.localized.server.ts widened the general/exclusive detail discriminated union while applying localized identity fields.
+- Production build itself already passed, but tsc correctly rejected the widened return type at the equipment detail route.
+- The localized wrapper was minimally corrected to preserve EquipmentDetailPageData and branch explicitly on data.kind before reconstructing the localized detail record.
+- No localization string, canonical identity, route admission, semantic relation, or visual behavior was changed by this correction.
+- After correction, both production build and TypeScript gate pass.
+
+Existing repository QA drift observed during Stage 4
+- Two pre-existing repository workflows also ran on the Stage 4 PR and reported failures unrelated to the Stage 4 localization changes.
+- Equipment Korean Name Frontend QA: localization builder and projection contract both PASS, then the legacy admission-route validator rejects the current detail route because it still requires literal createFileRoute("/equipment/$equipmentId"). Current main already uses createFileRoute("/equipment_/$equipmentId"). Stage 4 does not change that route literal, so this is stale validator drift outside the Stage 4 completion scope.
+- Hero-Soldier Stage C-4 Production Boundary: the actual production-boundary validation PASSes with canonical 5977, Hero 267, Soldier 224, blocked path/name/arithmetic/reconstruction counts all 0. The workflow fails only when requiring the regenerated validation file to remain byte-clean; current regeneration reports frontendSourceFileCount 82 while the old frozen snapshot on main records 63. Stage 4 does not reopen or rewrite the FINAL_FROZEN Hero-Soldier C-stage checkpoint.
+- These legacy workflow drifts are not counted as Stage 4 localization errors and are intentionally left for separate validator/checkpoint maintenance rather than silently changing frozen historical stages here.
+
+Frontend QA interpretation
+- Stage 4 covers the Preflight production/localization boundary and Build Gate relevant to this audit.
+- No visual frontend behavior was intentionally changed; hosted deployment/browser UI validation is therefore not used as the evidence source for this localization-audit stage.
+- The repository-level frontend QA operating source remains the authority when a later task changes visible frontend behavior or deployment output.
+
+Completion
+- Stage 4 contract frozen: complete.
+- Stage 3 inherited gate: pass.
+- Frontend localization leak scan: pass.
+- Effective display coverage/parity: pass.
+- Semantic wiring snapshot: frozen.
+- Live leak/drift mutations: pass.
+- Production build: pass.
+- TypeScript gate after required generation: pass.
+- Temporary verification workflow removed before merge.
+
+Next stage
+- Stage 5 may formalize the localization audit command/report and permanent CI wiring.
+- Stage 5 is not included in this Stage 4 change.
