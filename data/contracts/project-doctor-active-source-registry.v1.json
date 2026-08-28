@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-active-source-registry-contract/v1",
+  "stage": "PROJECT-STATUS-STAGE2",
+  "checkpoint": "PROJECT_DOCTOR_ACTIVE_SOURCE_REGISTRY",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Select each Project Doctor domain's current authoritative primary status source only through explicit, validated successor declarations. Never infer authority from filenames, stage numbers, timestamps, or repository ordering.",
+  "d1Contract": "data/contracts/project-doctor-d1-0-contract.v1.json",
+  "entryDirectory": "data/status-sources",
+  "outputPath": "data/generated/project-doctor-active-source-registry.v1.json",
+  "policy": {
+    "allowedDomainsFromD1Contract": true,
+    "allowedSourcePrefixes": [
+      "data/validation/",
+      "data/checkpoints/"
+    ],
+    "entryStateRequired": "APPROVED",
+    "exactlyOneRootPerDomain": true,
+    "rootMustMatchD1PrimarySource": true,
+    "successorMustReferenceExistingEntry": true,
+    "successorMustRemainInSameDomain": true,
+    "atMostOneApprovedSuccessorPerEntry": true,
+    "cyclesForbidden": true,
+    "selectedSourceIsTerminalApprovedEntry": true,
+    "sourceMustExistAndParseAsJson": true,
+    "allAdmissionRulesMustPass": true,
+    "noFilenameInference": true,
+    "noStageNumberInference": true,
+    "noTimestampInference": true,
+    "noCommitDateInference": true,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "canonicalJoinRecomputation": false,
+    "failedPromotionBlocksRegistry": true
+  },
+  "entrySchema": {
+    "required": [
+      "id",
+      "domain",
+      "state",
+      "sourcePath",
+      "successorOf",
+      "admission"
+    ],
+    "optional": [
+      "facet",
+      "projectionOverride",
+      "note"
+    ],
+    "projectionOverrideAllowedKeys": [
+      "primaryFacet",
+      "expected",
+      "requiredSelectors",
+      "zeroRequiredSelectors",
+      "reviewSelectors",
+      "nextWorkSelectors",
+      "lifecycleRules",
+      "supplementalSources",
+      "policy"
+    ]
+  },
+  "admissionOperators": [
+    "equals",
+    "in"
+  ],
+  "outputRules": {
+    "includeLineage": true,
+    "includeEffectiveDomainSpecs": true,
+    "includeSourceEntryFile": true,
+    "includeAdmissionEvidence": true,
+    "deterministicOrdering": true,
+    "writeFailureOutputBeforeExit": true
+  },
+  "boundaries": {
+    "doesNotRewriteD1Contract": true,
+    "doesNotRewriteDomainValidation": true,
+    "doesNotPromoteGeneratedArtifactAsSemanticAuthority": true,
+    "doesNotReopenFrozenSemantics": true
+  }
+}

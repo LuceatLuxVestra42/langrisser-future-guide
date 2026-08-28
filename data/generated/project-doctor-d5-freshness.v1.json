@@ -19,9 +19,11 @@
     "data/validation/soldier-t3-provisional-name-presentation.v1.json"
   ],
   "inputPaths": [
+    "data/contracts/project-doctor-active-source-registry.v1.json",
     "data/contracts/project-doctor-d1-0-contract.v1.json",
     "data/contracts/project-doctor-d1-2-health-gate.v1.json",
     "data/contracts/project-doctor-d5-freshness.v1.json",
+    "data/status-sources/baseline.v1.json",
     "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
     "data/validation/equipment-stage4-final.v1.json",
     "data/validation/hero-list-stage4.v1.json",
@@ -33,18 +35,30 @@
     "data/validation/soldier-portrait-stage3j-frontend-full.v1.json",
     "data/validation/soldier-stage6-7-site-admission.v1.json",
     "data/validation/soldier-t3-provisional-name-presentation.v1.json",
+    "scripts/build-project-doctor-active-source-registry.mjs",
+    "scripts/collect-project-doctor-d1-1-active.mjs",
     "scripts/collect-project-doctor-d1-1.mjs",
     "scripts/run-project-doctor-d1-3.mjs",
+    "scripts/run-project-doctor-d5-refresh-active.mjs",
     "scripts/run-project-doctor-d5-refresh.mjs",
+    "scripts/validate-project-doctor-active-source-registry.mjs",
+    "scripts/validate-project-doctor-d1-2-active.mjs",
     "scripts/validate-project-doctor-d1-2.mjs",
+    "scripts/validate-project-doctor-d5-active.mjs",
     "scripts/validate-project-doctor-d5.mjs"
   ],
   "outputPaths": [
+    "data/generated/project-doctor-active-source-registry.v1.json",
     "data/generated/project-doctor-d1-1-status.v1.json",
+    "data/validation/project-doctor-active-source-registry-summary.v1.json",
     "data/validation/project-doctor-d1-1-summary.v1.json",
     "data/validation/project-doctor-d1-2-summary.v1.json"
   ],
   "inputs": {
+    "data/contracts/project-doctor-active-source-registry.v1.json": {
+      "exists": true,
+      "gitBlobSha": "18e34913e5d0743e24776d14864a185f00ce8b58"
+    },
     "data/contracts/project-doctor-d1-0-contract.v1.json": {
       "exists": true,
       "gitBlobSha": "2cab75eae62dab0474bfc8cd19b164645acd4140"
@@ -55,7 +69,11 @@
     },
     "data/contracts/project-doctor-d5-freshness.v1.json": {
       "exists": true,
-      "gitBlobSha": "a7ee1380dffc87a91b4bd8a6356f7d0484729b3f"
+      "gitBlobSha": "8119dea9b66d52bf3ff8b3db88bdf54036c4737e"
+    },
+    "data/status-sources/baseline.v1.json": {
+      "exists": true,
+      "gitBlobSha": "a696db9ede66146aa6e7b67c6e38a1c052b8193c"
     },
     "data/validation/banner-stage3-8-regression-freeze-summary.v1.json": {
       "exists": true,
@@ -101,39 +119,71 @@
       "exists": true,
       "gitBlobSha": "f18db7d9bb143de4e009052bb2ff677faa19bc16"
     },
+    "scripts/build-project-doctor-active-source-registry.mjs": {
+      "exists": true,
+      "gitBlobSha": "e063d60a5387a26a673d36ce0153e5907082d480"
+    },
+    "scripts/collect-project-doctor-d1-1-active.mjs": {
+      "exists": true,
+      "gitBlobSha": "ae4755047c0c0041d9c5f723338f4485d5d420a9"
+    },
     "scripts/collect-project-doctor-d1-1.mjs": {
       "exists": true,
-      "gitBlobSha": "8f13e5f5bb93646bc4357f6064e5c1e98c0666fe"
+      "gitBlobSha": "e950e9a12c23e540618ed1d12b11e961f997206f"
     },
     "scripts/run-project-doctor-d1-3.mjs": {
       "exists": true,
-      "gitBlobSha": "5bc72e5082d77efa64b9f01362b4cfd31907c7ea"
+      "gitBlobSha": "13e9f6fff99789386070126015ef6be0785fba9a"
+    },
+    "scripts/run-project-doctor-d5-refresh-active.mjs": {
+      "exists": true,
+      "gitBlobSha": "eb92c7372d76b559c48e3f808d605ec52665e72c"
     },
     "scripts/run-project-doctor-d5-refresh.mjs": {
       "exists": true,
-      "gitBlobSha": "c1a29bfcbd334d2ba72a31537eca1d24d4811afb"
+      "gitBlobSha": "e67d84411f7db76b7aa9bb948cb44d9eefdc34cc"
+    },
+    "scripts/validate-project-doctor-active-source-registry.mjs": {
+      "exists": true,
+      "gitBlobSha": "539e87cacf9e0c689c46e460b0bba71ac7e53298"
+    },
+    "scripts/validate-project-doctor-d1-2-active.mjs": {
+      "exists": true,
+      "gitBlobSha": "398aad7e4b0a3ae8d10d629ea62fdfd94a6df28b"
     },
     "scripts/validate-project-doctor-d1-2.mjs": {
       "exists": true,
-      "gitBlobSha": "47d695d843849a252508be6229941218e03e637d"
+      "gitBlobSha": "6d42e89ecd8b9f69a58c33309b106ccec5fa1519"
+    },
+    "scripts/validate-project-doctor-d5-active.mjs": {
+      "exists": true,
+      "gitBlobSha": "bc932163c0cc3af3daeb595caa81d7c28a2432e3"
     },
     "scripts/validate-project-doctor-d5.mjs": {
       "exists": true,
-      "gitBlobSha": "090c7c8b932b70092f65d79036956bd836aff610"
+      "gitBlobSha": "cdf435db9e5e58a52fd55808fd3c4ff31b22d2f0"
     }
   },
   "outputs": {
+    "data/generated/project-doctor-active-source-registry.v1.json": {
+      "exists": true,
+      "gitBlobSha": "6f12e2b4ccc4f25d4b9e91a77af29c0d8878b1f1"
+    },
     "data/generated/project-doctor-d1-1-status.v1.json": {
       "exists": true,
-      "gitBlobSha": "e92c67885f87672171de03a825b4d553a8453388"
+      "gitBlobSha": "86ea604aedb843b958eb31b633133921ac219316"
+    },
+    "data/validation/project-doctor-active-source-registry-summary.v1.json": {
+      "exists": true,
+      "gitBlobSha": "3023a721d4458ad86a859058fd6f0608bdc87591"
     },
     "data/validation/project-doctor-d1-1-summary.v1.json": {
       "exists": true,
-      "gitBlobSha": "f2e648664049fccf15ce4415e7056bf6d31f2ae4"
+      "gitBlobSha": "a4049b79544d6a048f59d1608ed069887e2a0a5c"
     },
     "data/validation/project-doctor-d1-2-summary.v1.json": {
       "exists": true,
-      "gitBlobSha": "e3bf9f06acac6ed9dec8b74e0a34801d99a97218"
+      "gitBlobSha": "1344d92483af7b83bcbe8e7f27244e604bca2dc4"
     }
   }
 }
