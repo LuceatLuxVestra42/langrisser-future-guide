@@ -1,0 +1,76 @@
+name: Equipment Image Stage 1 Acquire
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage1-assets
+    paths:
+      - scripts/acquire-equipment-image-stage1-representatives.mjs
+      - .github/workflows/equipment-image-stage1-acquire.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  acquire-and-prove:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Acquire five exact Equipment source PNGs
+        run: node scripts/acquire-equipment-image-stage1-representatives.mjs
+
+      - name: Validate Equipment image Stage 1
+        run: node scripts/validate-equipment-image-stage1.mjs
+
+      - name: Require frozen Stage 1 PASS
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const summary = JSON.parse(fs.readFileSync('data/validation/equipment-image-stage1-summary.v1.json', 'utf8'));
+          if (summary.status !== 'PASS_EQUIPMENT_IMAGE_STAGE1') throw new Error(`Stage 1 did not PASS: ${summary.status}`);
+          if (summary.completion !== 'COMPLETE') throw new Error(`completion drift: ${summary.completion}`);
+          if (summary.freezeState !== 'EQUIPMENT_IMAGE_STAGE1_FROZEN') throw new Error(`freeze drift: ${summary.freezeState}`);
+          if (summary.counts.passedRepresentatives !== 5) throw new Error(`representative PASS ${summary.counts.passedRepresentatives}/5`);
+          if (summary.counts.repositoryAssetsPresent !== 5) throw new Error(`repository assets ${summary.counts.repositoryAssetsPresent}/5`);
+          if (summary.counts.verifiedSourceEvidence !== 5) throw new Error(`source evidence ${summary.counts.verifiedSourceEvidence}/5`);
+          if (summary.counts.hardErrors !== 0) throw new Error(`hard errors: ${summary.counts.hardErrors}`);
+          if (summary.bulkImportAllowed !== true) throw new Error('bulk import gate did not open');
+          if (summary.nextStage !== 'STAGE2_PUBLIC_373_ASSET_EXPANSION') throw new Error(`unexpected next stage: ${summary.nextStage}`);
+          console.log(JSON.stringify(summary, null, 2));
+          NODE
+
+      - name: Re-run frozen Equipment admission QA
+        run: bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
+
+      - name: Commit verified representative assets and evidence
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            public/images/equipment/6.png \
+            public/images/equipment/59.png \
+            public/images/equipment/80.png \
+            public/images/equipment/99.png \
+            public/images/equipment/273.png \
+            data/evidence/equipment-image-stage1-source-evidence.v1.json \
+            data/validation/equipment-image-stage1-summary.v1.json \
+            data/checkpoints/equipment-image-stage1.v1.json
+          if git diff --cached --quiet; then
+            echo 'Representative assets/evidence already current.'
+          else
+            git commit -m 'Verify Equipment image Stage 1 representatives [skip ci]'
+            git push origin HEAD:work/equipment-image-stage1-assets
+          fi
