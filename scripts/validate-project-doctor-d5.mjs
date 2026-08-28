@@ -8,8 +8,16 @@ export const DEFAULT_D5_CONTRACT_PATH = 'data/contracts/project-doctor-d5-freshn
 const readJson = filePath => JSON.parse(fs.readFileSync(filePath, 'utf8'));
 const uniqSorted = values => [...new Set(values.filter(Boolean))].sort();
 const stableEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const safeRelative = value => typeof value === 'string'
+  && value.length > 0
+  && !path.isAbsolute(value)
+  && !value.split(/[\\/]+/).includes('..');
 
-export const sha256File = filePath => crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
+export const gitBlobSha = buffer => crypto
+  .createHash('sha1')
+  .update(`blob ${buffer.length}\0`)
+  .update(buffer)
+  .digest('hex');
 
 export const collectAuthoritativeSourcePaths = d1Contract => uniqSorted(
   Object.values(d1Contract.domains ?? {}).flatMap(spec => [
@@ -29,12 +37,14 @@ export const buildExpectedPathSets = ({ d5Contract, d1Contract, contractPath }) 
 });
 
 export const snapshotPaths = paths => Object.fromEntries(paths.map(filePath => {
+  if (!safeRelative(filePath)) return [filePath, { exists: false, gitBlobSha: null, invalidPath: true }];
   try {
     const stat = fs.statSync(filePath);
-    if (!stat.isFile()) return [filePath, { exists: false, sha256: null, size: null }];
-    return [filePath, { exists: true, sha256: sha256File(filePath), size: stat.size }];
+    if (!stat.isFile()) return [filePath, { exists: false, gitBlobSha: null }];
+    const buffer = fs.readFileSync(filePath);
+    return [filePath, { exists: true, gitBlobSha: gitBlobSha(buffer) }];
   } catch {
-    return [filePath, { exists: false, sha256: null, size: null }];
+    return [filePath, { exists: false, gitBlobSha: null }];
   }
 }));
 
@@ -67,6 +77,11 @@ const verifyOutputStatuses = d5Contract => {
   return failures;
 };
 
+const unsafePaths = expected => uniqSorted([
+  ...expected.inputPaths,
+  ...expected.outputPaths,
+]).filter(filePath => !safeRelative(filePath));
+
 export const validateFreshness = ({ contractPath = DEFAULT_D5_CONTRACT_PATH } = {}) => {
   let d5Contract;
   let d1Contract;
@@ -96,6 +111,18 @@ export const validateFreshness = ({ contractPath = DEFAULT_D5_CONTRACT_PATH } = 
   }
 
   const expected = buildExpectedPathSets({ d5Contract, d1Contract, contractPath });
+  const invalidPaths = unsafePaths(expected);
+  if (invalidPaths.length > 0) {
+    return {
+      status: 'INVALID_INPUT',
+      exitCode: 2,
+      error: 'D5 path sets must contain repository-relative paths without parent traversal.',
+      invalidPaths,
+      staleReasonCount: 0,
+      reasons: [],
+    };
+  }
+
   const currentInputs = snapshotPaths(expected.inputPaths);
   const currentOutputs = snapshotPaths(expected.outputPaths);
   const reasons = [];
@@ -121,6 +148,7 @@ export const validateFreshness = ({ contractPath = DEFAULT_D5_CONTRACT_PATH } = 
     stage: 'D5',
     status: stale ? 'STALE' : 'FRESH',
     exitCode: stale ? 4 : 0,
+    hashAlgorithm: 'git-blob-sha1',
     authoritativeSourceCount: expected.authoritativeSourcePaths.length,
     monitoredInputCount: expected.inputPaths.length,
     monitoredOutputCount: expected.outputPaths.length,
