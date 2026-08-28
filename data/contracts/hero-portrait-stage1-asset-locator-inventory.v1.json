@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage1-asset-locator-inventory",
+  "schemaId": "hero-portrait-stage1-asset-locator-inventory-contract/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "purpose": "Classify frozen Hero portrait locator/source families without reopening canonical Hero semantics or performing bulk PNG extraction.",
+  "frozenInput": {
+    "checkpoint": "data/checkpoints/hero-portrait-stage0-input-freeze.v1.json",
+    "artworkIndex": "data/generated/hero-card-artwork-stage4.v1.json",
+    "canonicalHeroCount": 267,
+    "sourceArtworkLocatorCount": 267
+  },
+  "rules": {
+    "heroIdIsCanonicalJoinKey": true,
+    "sourceArtworkPathIsUnityLocatorOnly": true,
+    "inferWebPathFromUnityLocator": false,
+    "inferDriveFileFromHeroNameOrFilename": false,
+    "basePortraitAndSkinAssetsMustRemainDistinct": true,
+    "authoritativePngRequiresDirectSourceEvidence": true,
+    "presentationDerivativeIsNotAuthoritativeSourcePng": true,
+    "bulkExtractionForbiddenInStage1": true,
+    "unprovenPopulationCoverageRemainsUnknown": true
+  },
+  "sourceClasses": {
+    "UNITY_HERO_PAINTING_PREFAB_LOCATOR": {
+      "role": "FROZEN_CONFIG_LOCATOR",
+      "inputField": "sourceArtworkPath",
+      "expectedShapeObserved": "UI/HeroPainting/<rarity-family>/Prefab/<asset-name>.prefab",
+      "webAssetEligibleDirectly": false,
+      "byteSourceProvenByStage1": false
+    },
+    "GOOGLE_DRIVE_BASE_SKIN_PNG": {
+      "role": "PROVEN_CLEAN_PNG_SOURCE_FAMILY",
+      "requiredEvidence": [
+        "driveFileId",
+        "fileName",
+        "mimeType=image/png",
+        "byteLength",
+        "sha256",
+        "width",
+        "height",
+        "alpha=true",
+        "CLEAN_CHARACTER_ART_ONLY"
+      ],
+      "matchPolicy": "EXPLICIT_ID_OR_PROVEN_MAPPING_ONLY",
+      "nameSearchAsAuthority": false
+    },
+    "WEBP_PRESENTATION_DERIVATIVE": {
+      "role": "PRESENTATION_ONLY_DERIVATIVE",
+      "authoritativeSource": false,
+      "publicationTargetForStage4Cards": false
+    }
+  },
+  "stage1PassCriteria": [
+    "Stage 0 frozen population remains 267 with 267 sourceArtworkPath locators",
+    "at least one authoritative clean PNG source family is proven by existing manifest and direct readback",
+    "source classes and anti-inference rules are frozen",
+    "population-wide direct PNG coverage is not overstated",
+    "Stage 2 representative-proof handoff is explicit"
+  ],
+  "stage1NonGoals": [
+    "resolve Unity prefab dependencies for all 267 Heroes",
+    "prove Google Drive PNG coverage for all 267 Heroes",
+    "extract or convert all 267 PNGs",
+    "install files into public/images/heroes/cards",
+    "change frontend resolver status"
+  ]
+}
