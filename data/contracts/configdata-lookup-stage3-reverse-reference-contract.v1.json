@@ -43,8 +43,11 @@
     "canonicalRelationRecomputation": false,
     "nameJoin": false,
     "idArithmetic": false,
-    "reverseMeaning": "For each approved Stage 2 edge sourceId -> targetId, record targetId <- sourceId with its original relation name and source type.",
-    "grouping": "targetType -> targetId -> relation/sourceType -> sorted unique sourceIds",
+    "reverseMeaning": "For each approved Stage 2 edge sourceId -> targetId, record targetId <- sourceId with its original relation provenance.",
+    "grouping": "targetType -> targetId -> [relationSlot, sorted unique sourceIds]",
+    "relationCatalog": "Each target file stores relation/sourceType/semanticStatus metadata once and references it by a local relation slot.",
+    "targetFileEncoding": "MINIFIED_JSON",
+    "manifestAndSummaryEncoding": "PRETTY_JSON",
     "stableOrdering": "targetTypeOrder, numeric target ID, Stage 2 relation contract order, numeric source ID"
   },
   "validation": {
@@ -58,7 +61,7 @@
       "every Stage 2 direct edge appears exactly once in the reverse indexes",
       "no reverse entry exists without a Stage 2 direct edge",
       "total reverse reference count equals Stage 2 total edge count",
-      "all target files and manifest are byte-identical after regeneration",
+      "all target files, manifest, and summary are byte-identical after regeneration",
       "no transitive, canonical, name-based, or ID-arithmetic relation is emitted"
     ],
     "passStatus": "PASS_CONFIGDATA_LOOKUP_STAGE3_REVERSE_REFS"
