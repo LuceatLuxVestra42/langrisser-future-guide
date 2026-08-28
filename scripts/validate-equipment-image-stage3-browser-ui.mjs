@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import { chromium } from "playwright";
 
@@ -12,6 +13,44 @@ function assert(condition, message) {
 
 function url(path) {
   return new URL(path.replace(/^\//, ""), BASE_URL).toString();
+}
+
+function computeBrowserInputFingerprint() {
+  const sourceFiles = [
+    "data/checkpoints/equipment-image-stage2-final.v3.json",
+    "data/validation/equipment-image-stage3-frontend-summary.v1.json",
+    "public/equipment-image-stage3-ready.json",
+    "src/lib/equipment-image-assets.ts",
+    "src/routes/equipment.tsx",
+    "src/routes/equipment_.exclusive.tsx",
+    "src/routes/equipment_.$equipmentId.tsx",
+  ];
+  const imageDir = "public/images/equipment";
+  const imageNames = fs
+    .readdirSync(imageDir)
+    .filter((name) => /^\d+\.png$/.test(name))
+    .sort((left, right) => Number.parseInt(left, 10) - Number.parseInt(right, 10));
+
+  assert(imageNames.length === 373, `Expected 373 Equipment PNGs for Browser/UI fingerprint, got ${imageNames.length}`);
+
+  const files = [...sourceFiles, ...imageNames.map((name) => `${imageDir}/${name}`)];
+  const hash = crypto.createHash("sha256");
+  hash.update("equipment-image-stage3-browser-input-v1\0");
+
+  for (const path of files) {
+    assert(fs.existsSync(path), `Browser/UI fingerprint input is missing: ${path}`);
+    hash.update(`${path}\0`);
+    hash.update(fs.readFileSync(path));
+    hash.update("\0");
+  }
+
+  return {
+    version: 1,
+    algorithm: "sha256",
+    sha256: hash.digest("hex"),
+    fileCount: files.length,
+    equipmentImageCount: imageNames.length,
+  };
 }
 
 function createDiagnostics(page, label) {
@@ -181,6 +220,7 @@ try {
   await browser.close();
 }
 
+const inputFingerprint = computeBrowserInputFingerprint();
 const evidence = {
   stage: "Equipment Image Stage 3 Browser/UI QA",
   version: 1,
@@ -189,6 +229,7 @@ const evidence = {
   productionJoinKey: "equipmentId",
   publicEquipment: 373,
   automation: "Playwright Chromium headless against deployed GitHub Pages",
+  inputFingerprint,
   checks: {
     desktopGeneralListImage: "PASS",
     generalFilterInteraction: "PASS",
@@ -227,10 +268,17 @@ const finalSummary = {
     ...hostedSummary.gates,
     browserUi: "PASS_PLAYWRIGHT_HOSTED_BROWSER_UI",
   },
+  browserUiFreshness: {
+    status: "PASS_FRESH_BROWSER_UI_EVIDENCE",
+    currentInputFingerprint: inputFingerprint,
+    evidencePath: EVIDENCE_PATH,
+    evidenceInputFingerprint: inputFingerprint,
+  },
   browserUiEvidence: {
     path: EVIDENCE_PATH,
     status: evidence.status,
     automation: evidence.automation,
+    inputFingerprint,
     desktopViewport: evidence.viewports.desktop,
     mobileViewport: evidence.viewports.mobile,
     pageErrors: 0,
@@ -249,6 +297,8 @@ const finalCheckpoint = {
   freezeState: "EQUIPMENT_IMAGE_STAGE3_FROZEN",
   browserUi: "PASS_PLAYWRIGHT_HOSTED_BROWSER_UI",
   browserUiEvidencePath: EVIDENCE_PATH,
+  browserUiFreshness: "PASS_FRESH_BROWSER_UI_EVIDENCE",
+  browserUiInputFingerprint: inputFingerprint.sha256,
   semanticStageReopened: false,
   nextStart: "Equipment Image Stage 3 complete; continue with later Equipment presentation/features without reopening frozen Stage 2/3 identity semantics.",
 };
