@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "stage": "SMART_REGRESSION_SR7",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "branch": "work/smart-regression-sr7-history",
+  "baseStage": "SMART_REGRESSION_SR6",
+  "purpose": "Replay the current Smart Regression selector against real historical project diffs with actual legacy GitHub Actions evidence and require zero observed false negatives before any SR-8 CI replacement decision.",
+  "artifacts": {
+    "historyMatrix": "data/fixtures/smart-regression-sr7-history.v1.json",
+    "historyRunner": "scripts/test-smart-regression-history.mjs",
+    "packageCommand": "test:smart-regression:history",
+    "shadowWorkflow": ".github/workflows/smart-regression-shadow.yml"
+  },
+  "acceptancePolicy": {
+    "falseNegativeDefinition": "A change-relevant gate corroborated by historical validation evidence is absent from Smart Regression selection.",
+    "blockedUnknownOrUnboundIsConservativeNotFalseNegative": true,
+    "preexistingFailureOnByteIdenticalUnchangedInputIsExcluded": true,
+    "legacyEvidenceFrozenInFixture": true,
+    "historicalValidatorsReexecuted": false,
+    "currentSelectorReplayedAgainstHistoricalDiffs": true
+  },
+  "verifiedRun": {
+    "runId": 33142961426,
+    "jobId": 98757663413,
+    "headSha": "8c55daeeef105ddf66fac8bfc5e724e1004ea334",
+    "jobConclusion": "success",
+    "sr5FixtureStepConclusion": "success",
+    "sr7HistoryStepConclusion": "success",
+    "shadowObservationStepConclusion": "success",
+    "artifactUploadConclusion": "success",
+    "artifact": {
+      "id": 9674654253,
+      "name": "smart-regression-shadow-33142961426",
+      "sizeBytes": 7045,
+      "digest": "sha256:e95c1b53729c44f562096214f804e03de15437d02ea053a44677cdf6eec4a9ef",
+      "expiresAt": "2026-09-11T04:50:40Z"
+    }
+  },
+  "metrics": {
+    "historicalCaseCount": 5,
+    "passedCaseCount": 5,
+    "failedCaseCount": 0,
+    "observedFalseNegativeCount": 0,
+    "replayErrorCount": 0,
+    "preexistingUnchangedInputFailureCount": 1,
+    "directPassCaseCount": 1,
+    "conservativeBlockedCaseCount": 4
+  },
+  "cases": [
+    {
+      "id": "hero-stage6-4-final-freeze",
+      "legacyRunId": 32923518639,
+      "legacyConclusion": "success",
+      "smartStatus": "BLOCKED_UNKNOWN_PATH",
+      "requiredCoverage": ["hero.final.consumer"],
+      "missingRequiredCoverage": [],
+      "decision": "PASS_CONSERVATIVE"
+    },
+    {
+      "id": "hero-soldier-stagec1-pr",
+      "legacyRunId": 32926066075,
+      "legacyEvent": "pull_request",
+      "legacyConclusion": "success",
+      "legacyPairCount": 5977,
+      "smartStatus": "PASS",
+      "requiredCoverage": ["hero-soldier.pair-parity"],
+      "missingRequiredCoverage": [],
+      "decision": "PASS_DIRECT"
+    },
+    {
+      "id": "banner-stage3-8-regression-freeze",
+      "legacyRunId": 32960437326,
+      "legacyConclusion": "success",
+      "smartStatus": "BLOCKED_UNKNOWN_PATH",
+      "requiredCoverage": ["banner.stage3.full", "banner.stage3.freeze", "global.build"],
+      "missingRequiredCoverage": [],
+      "decision": "PASS_CONSERVATIVE"
+    },
+    {
+      "id": "equipment-image-stage1-representative-proof",
+      "legacyRunId": 33136866408,
+      "legacyConclusion": "success",
+      "smartStatus": "BLOCKED_UNBOUND",
+      "requiredCoverage": ["equipment.asset.consumer", "equipment.frontend"],
+      "missingRequiredCoverage": [],
+      "decision": "PASS_CONSERVATIVE"
+    },
+    {
+      "id": "soldier-224-frontend-and-portraits",
+      "legacyCommit": "4428d59d42133054c512283e5e67ce6fd1124ba3",
+      "smartStatus": "BLOCKED_UNKNOWN_PATH",
+      "requiredCoverage": ["soldier.portrait.integrity", "soldier.frontend.route", "global.build"],
+      "missingRequiredCoverage": [],
+      "relatedLegacyFailure": {
+        "workflow": "Equipment Stage 4-7 Whole Consumer Regression",
+        "runId": 33082895727,
+        "classification": "PREEXISTING_UNCHANGED_INPUT",
+        "input": "src/routes/equipment.tsx",
+        "beforeBlobSha": "b992a214925efd6d809abe1adfb0e22c99481c2f",
+        "afterBlobSha": "b992a214925efd6d809abe1adfb0e22c99481c2f",
+        "countsAsFalseNegative": false
+      },
+      "decision": "PASS_CONSERVATIVE"
+    }
+  ],
+  "confirmed": {
+    "sr5StillPasses17Of17": true,
+    "sr5FalseNegativeCount": 0,
+    "realHistoricalCasesPass5Of5": true,
+    "observedHistoricalFalseNegativeCount": 0,
+    "actualPullRequestHistoryIncluded": true,
+    "heroSoldierPairParityDirectlySelectedOnRealPRHistory": true,
+    "preexistingLegacyFailureSeparatedFromDiffCausality": true,
+    "existingFrozenSemanticPipelinesReopened": false
+  },
+  "reviews": [
+    {
+      "code": "HISTORICAL_PRECISION_IS_STILL_CONSERVATIVE",
+      "blockingSR7Completion": false,
+      "blockingBroadSR8Replacement": true,
+      "effect": "Four of five historical cases selected all required coverage but remained BLOCKED_UNKNOWN_PATH or BLOCKED_UNBOUND. This is safe for false negatives but too broad for wholesale CI replacement."
+    },
+    {
+      "code": "PARTIAL_GATE_BINDINGS_REMAIN",
+      "blockingSR7Completion": false,
+      "blockingBroadSR8Replacement": true,
+      "effect": "Unbound asset/route/final gates still force conservative blocking in broad fallback scenarios."
+    }
+  ],
+  "sr8Admission": {
+    "broadReplacementAllowed": false,
+    "partialReplacementEvaluationAllowed": true,
+    "initialCandidate": "Narrow, fully executable selectors with direct historical/fixture proof such as Hero-Soldier pair parity and other no-unknown/no-unbound cases.",
+    "mustRemainShadow": "Unknown-path, broad-fallback, or selected-unbound cases until precision/binding is improved."
+  },
+  "nextStartPoint": "SR-8 partial CI replacement. Classify selector outcomes into replacement-eligible versus shadow-only classes, replace only proven narrow full-executable cases, and retain existing legacy/full validation for unknown, broad-fallback, or unbound selections."
+}
