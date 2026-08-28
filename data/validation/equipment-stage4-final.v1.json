@@ -14,7 +14,8 @@
     "stage44": "STAGE4_4_EXCLUSIVE_UI_AND_OWNERSHIP_READY",
     "stage45": "STAGE4_5_DISPLAY_STATE_POLICY_HARDENED",
     "stage46": "STAGE4_6_ADMISSION_ROUTE_QA_READY",
-    "stage47": "STAGE4_7_WHOLE_CONSUMER_REGRESSION_READY"
+    "stage47": "STAGE4_7_WHOLE_CONSUMER_REGRESSION_READY",
+    "imageStage3Hosted": "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA"
   },
   "population": {
     "canonical": 390,
@@ -41,9 +42,9 @@
     "homepageEntryVerified": true,
     "generalListDetailExact": true,
     "exclusiveListDetailExact": true,
-    "runtimeKindMismatch": 0,
-    "runtimeEquipmentIdMismatch": 0,
-    "exclusiveOwnerPayloadMismatch": 0
+    "runtimeGeneralResolved": 206,
+    "runtimeExclusiveResolved": 167,
+    "notFoundBoundaryVerified": true
   },
   "finalAdmissionBoundary": {
     "hiddenSpecial": 16,
@@ -58,8 +59,8 @@
   "statePolicy": {
     "generalStorageKey": "equipment-general-list-ui.v1",
     "exclusiveStorageKey": "equipment-exclusive-list-ui.v1",
-    "isolatedKeys": true,
-    "restoreAndSanitizeMarkersPresent": true
+    "restoreAndSanitizeMarkersPresent": true,
+    "isolatedKeys": true
   },
   "ownership": {
     "source": "data/generated/hero-exclusive-equipment-by-equipment.v1.json#byEquipmentId",
@@ -68,8 +69,24 @@
     "ownerHeroMissing": 0,
     "rederived": false
   },
+  "imageIntegration": {
+    "status": "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA",
+    "completion": "COMPLETE",
+    "freezeState": "EQUIPMENT_IMAGE_STAGE3_FROZEN",
+    "productionJoinKey": "equipmentId",
+    "publicEquipment": 373,
+    "hostedBaseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+    "gates": {
+      "preflight": "PASS",
+      "build": "PASS",
+      "deploymentHosted": "PASS",
+      "browserUi": "PASS_HOSTED_ROUTE_AND_ASSET_SMOKE"
+    },
+    "representativeAssetChecks": 5
+  },
   "sourceDiscipline": {
     "finalCloseoutReadsFrozenStage4Checkpoints": true,
+    "finalCloseoutReadsFrozenImageStage3HostedQa": true,
     "rawConfigDataReads": false,
     "stage3SemanticRecomputation": false,
     "ownershipRederivation": false,
@@ -83,16 +100,10 @@
   "hardErrorCount": 0,
   "nonBlockingReviews": [
     {
-      "code": "GENERAL_KR_NAME_REVIEW",
-      "count": 59,
+      "code": "KR_NAME_FALLBACK_REVIEW",
+      "count": null,
       "blocking": false,
-      "rule": "Keep nameKr ?? nameCn fallback and REVIEW labeling until Korean names are verified."
-    },
-    {
-      "code": "EXCLUSIVE_KR_NAME_REVIEW",
-      "count": 128,
-      "blocking": false,
-      "rule": "Keep nameKr ?? nameCn fallback and REVIEW labeling until Korean names are verified."
+      "rule": "Any Equipment name still unresolved by the current localization adapter must remain fallback-only and must not change equipmentId membership or route identity."
     },
     {
       "code": "RELEASE_CHRONOLOGY_REVIEW",
@@ -100,28 +111,19 @@
       "blocking": false,
       "rule": "Do not interpret generated order as exact release chronology where Stage 4 display policy marks chronology unverified.",
       "evidence": {
-        "generalReleaseDatesByTab": {
-          "1": 0,
-          "2": 80,
-          "3": 0
-        },
-        "exclusiveReleaseDates": 0
+        "generalTab1ChronologyClaimed": false,
+        "generalTab3ChronologyReviewExplicit": true,
+        "exclusiveChronologyReviewExplicit": true
       }
     },
     {
-      "code": "EQUIPMENT_ICON_BINDING_DEFERRED",
-      "count": 373,
-      "blocking": false,
-      "rule": "No web-served Equipment icon asset set exists in the repository at Stage 4-2; broken/fabricated mappings are intentionally avoided."
-    },
-    {
-      "code": "BROWSER_PIXEL_MOBILE_QA_FOLLOWUP",
+      "code": "MOBILE_PIXEL_POLISH_FOLLOWUP",
       "count": null,
       "blocking": false,
-      "rule": "Stage 4 validates data/consumer/build boundaries; browser screenshot, pixel polish, and mobile interaction QA remain follow-up review work."
+      "rule": "Hosted route and Equipment asset smoke QA is frozen as PASS; remaining pixel-polish and mobile interaction review is non-blocking UI follow-up."
     }
   ],
-  "nonBlockingReviewCount": 5,
-  "decision": "Equipment Stage 4 closes as PASS_WITH_REVIEW / COMPLETE / FINAL_FROZEN. All public consumer, ownership, state, route, admission, homepage-entry, and production-build hard gates pass. Remaining items are presentation/review follow-ups and do not block PC-first review.",
-  "nextStartPoint": "PC-first review and UI polish follow-up. Do not reopen Stage 2/3 semantics or Stage B ownership unless a concrete regression contradicts a frozen checkpoint."
+  "nonBlockingReviewCount": 3,
+  "decision": "Equipment Stage 4 closes as PASS_WITH_REVIEW / COMPLETE / FINAL_FROZEN. Public consumer, ownership, state, route, admission, homepage-entry, production-build, and frozen Hosted Equipment image QA hard gates pass. Remaining items are presentation/review follow-ups and do not block PC-first review.",
+  "nextStartPoint": "PC-first review and UI polish follow-up. Equipment Stage 4 and Equipment Image Stage 3 are frozen; do not reopen Stage 2/3 semantics or Stage B ownership unless a concrete regression contradicts a frozen checkpoint."
 }
