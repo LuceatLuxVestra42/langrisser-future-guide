@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-stage6/v1",
+  "stage": 6,
+  "status": "PASS_WITH_REVIEW",
+  "mode": "PROJECT_DOCTOR_INTEGRATION",
+  "predecessor": {
+    "stage5Status": "PASS_WITH_REVIEW",
+    "stage5ContractGitBlobSha": "108d44c9070c4907f24881445ac5fb1f8c87ce28",
+    "stage5SnapshotGitBlobSha": "3c4e6dbee30a2b9cf50fbec0b5e24e6786f60024",
+    "errors": 0,
+    "reviews": 2
+  },
+  "doctor": {
+    "d2SchemaId": "project-doctor-d2-impact-contract/v2",
+    "d3SchemaId": "project-doctor-d3-validator-plan/v2",
+    "d4SchemaId": "project-doctor-d4-execution/v2",
+    "d7SchemaId": "project-doctor-d7-pr-guard/v2",
+    "packageAlias": "audit:localization:check",
+    "checkId": "localization-audit",
+    "phase": 4,
+    "manualReviewNodeCount": 13,
+    "selectionCases": [
+      {
+        "id": "soldierPresentation",
+        "status": "PLAN_READY",
+        "selected": true,
+        "expected": true,
+        "checks": ["localization-audit", "production-build"],
+        "manualNodes": []
+      },
+      {
+        "id": "equipmentFrontend",
+        "status": "PLAN_READY",
+        "selected": true,
+        "expected": true,
+        "checks": ["localization-audit", "production-build"],
+        "manualNodes": []
+      },
+      {
+        "id": "localizationTooling",
+        "status": "PLAN_READY",
+        "selected": true,
+        "expected": true,
+        "checks": ["localization-audit", "doctor-health-gate", "doctor-impact-self-test", "doctor-plan-self-test"],
+        "manualNodes": []
+      },
+      {
+        "id": "assetOnly",
+        "status": "MANUAL_REVIEW",
+        "selected": false,
+        "expected": false,
+        "checks": ["production-build"],
+        "manualNodes": ["soldier-assets"]
+      },
+      {
+        "id": "sharedFrontendOnly",
+        "status": "PLAN_READY",
+        "selected": false,
+        "expected": false,
+        "checks": ["production-build"],
+        "manualNodes": []
+      }
+    ]
+  },
+  "historical": {
+    "d3V1GitBlobSha": "a7f2029931fcb4f0101923365373bcf50fb875c3",
+    "d4V1GitBlobSha": "407568d89111577cf8dc824c6c0d8b46122e4107",
+    "promotionV1Validation": "PASS"
+  },
+  "checks": {
+    "stage5LiveGate": true,
+    "promotionV1LiveGate": true,
+    "stage5BytesPreserved": true,
+    "doctorV1BytesPreserved": true,
+    "d2OverlayReady": true,
+    "d3SelectionReady": true,
+    "d4ExecutionReady": true,
+    "d7GuardReady": true,
+    "readOnlyLocalizationSemantics": true
+  },
+  "summary": {
+    "errors": 0,
+    "reviews": 2,
+    "selectionCaseCount": 5,
+    "selectionCasePassCount": 5
+  },
+  "errors": [],
+  "readOnlyExecution": true
+}

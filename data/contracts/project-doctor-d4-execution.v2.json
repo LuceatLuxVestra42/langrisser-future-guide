@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "schemaId": "project-doctor-d4-execution/v2",
+  "stage": "D4",
+  "checkpoint": "PROJECT_DOCTOR_D4_EXECUTION_V2",
+  "status": "DESIGN_FROZEN",
+  "supersedes": "data/contracts/project-doctor-d4-execution.v1.json",
+  "d3Contract": "data/contracts/project-doctor-d3-validator-plan.v2.json",
+  "purpose": "Execute only D3 v2 selected checks after exact preflight. Add the frozen Localization Audit Stage 5 gate as a phase-4 owning localization validator without changing any canonical/relation/asset manual-review boundary.",
+  "scope": {"d3PlanConsumption":true,"fullQueuePreflight":true,"selectedCheckExecution":true,"failFast":true,"dryRun":true,"rawConfigDataReadByRunner":false,"semanticRecomputationByRunner":false,"owningValidatorDiscovery":false,"githubActions":false,"localizationAuditExecution":true},
+  "allowedCheckIds": ["configdata-integrity","localization-audit","production-build","doctor-health-gate","doctor-impact-self-test","doctor-plan-self-test"],
+  "executionPolicy": {"preflightEntireQueueBeforeExecution":true,"commandMustExactlyMatchD3Catalog":true,"phaseMustExactlyMatchD3Catalog":true,"allowedCommandShape":"npm run <verified-script-name>","shell":false,"sortByPhaseThenId":true,"failFastOnFirstNonZero":true,"executeSafeChecksWhenManualReviewExists":true,"manualReviewSurvivesSuccessfulChecks":true,"unknownOrTamperedCheckExecutesNothing":true,"doNotInventMissingCommands":true,"localizationFailureBlocksLaterBuild":true},
+  "resultStatus": {"PASS_EXECUTED":0,"PASS_DRY_RUN":0,"PASS_NO_CHANGES":0,"FAIL_CHECK":1,"INVALID_PLAN":2,"REVIEW_MANUAL":3},
+  "sideEffectBoundary": {"runnerDirectWrites":[],"runnerDirectSemanticWrites":false,"childCommandsMayWriteTheirOwnGeneratedArtifacts":true,"localizationAuditReadOnly":true,"note":"Localization Audit Stage 5 is read-only. Other child commands retain their documented behavior; D4 v2 does not promote their outputs to semantic authority."},
+  "manualReviewBoundary": "All D3 manual-review nodes remain unresolved unless a later frozen contract explicitly promotes their owning validator. Localization Audit success does not clear canonical, relation, or asset MANUAL_REVIEW nodes.",
+  "historicalBoundary": {"d4V1":"data/contracts/project-doctor-d4-execution.v1.json","promotionV1":"data/contracts/regression-coverage-promotion.v1.json","v1BytesMustRemainUnchanged":true},
+  "outOfScope": ["automatic localization mutation","automatic promotion of provisional names","hosted/browser/mobile QA","raw ConfigData semantic recomputation","clearing Regression Coverage Promotion V1 blocked owners"],
+  "nextStage": "D7-V2",
+  "nextStageGoal": "Prove the v2 selection/execution chain against a real PR diff under the required Project Doctor pr-guard."
+}
