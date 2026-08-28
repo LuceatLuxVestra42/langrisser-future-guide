@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_7",
+  "status": "SMART_REGRESSION_CONTRACT_FROZEN",
+  "purpose": "Expose the Stage 6 dependency manifest to a bounded Project Doctor / Smart Regression selector so changed ConfigData and admitted frozen canonical inputs choose only the affected validation/page pipelines.",
+  "predecessor": {
+    "contract": "data/contracts/configdata-lookup-stage6-incremental-rebuild-contract.v1.json",
+    "summary": "data/validation/configdata-lookup-stage6-summary.v1.json",
+    "manifest": "data/index/configdata-lookup-dependency-manifest.v1.json",
+    "requiredStatus": "PASS_CONFIGDATA_LOOKUP_STAGE6_INCREMENTAL_REBUILD"
+  },
+  "supportingContracts": {
+    "stage2": "data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json",
+    "stage4": "data/contracts/configdata-lookup-stage4-canonical-overlay-contract.v1.json"
+  },
+  "pipelines": {
+    "ConfigDataLookup": {
+      "kind": "LOOKUP_INTEGRITY",
+      "command": [
+        "node",
+        "scripts/validate-configdata-lookup-stage6.mjs"
+      ],
+      "workflow": ".github/workflows/configdata-lookup-stage6.yml"
+    },
+    "Hero": {
+      "kind": "PAGE_VALIDATION",
+      "domain": "Hero",
+      "command": [
+        "node",
+        "scripts/validate_hero_stage6_4_site_consumer.cjs"
+      ],
+      "workflow": ".github/workflows/hero-stage6-4-site-consumer.yml"
+    },
+    "Soldier": {
+      "kind": "PAGE_VALIDATION",
+      "domain": "Soldier",
+      "command": [
+        "node",
+        "scripts/finalize-soldier-stage6-7-site-admission.cjs"
+      ],
+      "workflow": ".github/workflows/soldier-stage6-7-site-admission.yml"
+    },
+    "Equipment": {
+      "kind": "PAGE_VALIDATION",
+      "domain": "Equipment",
+      "command": [
+        "node",
+        "scripts/validate-equipment-stage4-final.mjs"
+      ],
+      "workflow": ".github/workflows/equipment-stage4-final.yml",
+      "requiresBunDependencies": true
+    }
+  },
+  "canonicalImpact": {
+    "heroSoldierByHero": [
+      "Hero"
+    ],
+    "heroSoldierBySoldier": [
+      "Soldier"
+    ],
+    "exclusiveEquipmentByHero": [
+      "Hero"
+    ],
+    "exclusiveEquipmentByEquipment": [
+      "Equipment"
+    ]
+  },
+  "selectionPolicy": {
+    "rawConfigData": "Resolve the exact source path through the frozen Stage 2 sourceTypes table, then select only Stage 6 Stage 2 domains that explicitly list that source type.",
+    "stage2DomainArtifact": "Select its owning domain from the Stage 6 manifest.",
+    "stage4CanonicalInput": "Select only the explicitly allowlisted domains in canonicalImpact.",
+    "stage4DomainArtifact": "Select its owning domain from the Stage 6 manifest.",
+    "otherLookupArtifact": "Run ConfigData Lookup integrity only unless an owning page domain is explicitly known.",
+    "unknownConfigDataFile": "FAIL_CLOSED_SELECT_ALL_KNOWN_DOMAINS",
+    "untrackedPath": "NO_CONFIGDATA_IMPACT",
+    "pipelineOrder": [
+      "ConfigDataLookup",
+      "Hero",
+      "Soldier",
+      "Equipment"
+    ]
+  },
+  "executionPolicy": {
+    "validationOnly": true,
+    "workflowDispatch": false,
+    "semanticRebuild": false,
+    "allowlistedCommandsOnly": true,
+    "stage6StaleBehavior": "DEFER_DOWNSTREAM_UNTIL_STAGE6_MATERIALIZES",
+    "shellCommandConstructionFromChangedPath": false
+  },
+  "semanticBoundary": {
+    "newRelationDiscovery": false,
+    "canonicalRelationRecomputation": false,
+    "rawConfigDataMutation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "transitiveExpansion": false,
+    "wallClockMetadata": false
+  },
+  "outputs": {
+    "summary": "data/validation/configdata-lookup-stage7-summary.v1.json"
+  },
+  "validation": {
+    "validator": "scripts/validate-configdata-lookup-stage7.mjs",
+    "requiredChecks": [
+      "Stage 6 predecessor remains PASS and its manifest is present",
+      "Stage 2 sourceTypes exactly cover the Stage 6 tracked raw ConfigData source paths",
+      "Stage 4 canonical inputs are all mapped to explicit known domains",
+      "all selected pipeline commands and workflow files exist",
+      "fixture impact plans cover Hero-only, Soldier-only, Equipment-only, shared Skill, canonical overlay, lookup-only, no-impact, and unknown-ConfigData fail-closed cases",
+      "pipeline execution is validation-only and command argv comes only from this frozen contract",
+      "no name JOIN, ID arithmetic, transitive relation discovery, canonical recomputation, or wall-clock metadata is introduced"
+    ],
+    "passStatus": "PASS_CONFIGDATA_LOOKUP_STAGE7_SMART_REGRESSION"
+  },
+  "nextStage": {
+    "stage": "OPTIONAL_PROJECT_DOCTOR_EXPANSION",
+    "goal": "Add further page domains or hosted QA targets only when their dependency ownership is explicitly frozen; do not infer new impact edges from filenames or names."
+  }
+}

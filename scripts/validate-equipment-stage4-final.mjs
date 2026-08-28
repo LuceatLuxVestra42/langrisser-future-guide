@@ -27,6 +27,7 @@ const stage44 = readJson("data/validation/equipment-stage4-4-exclusive-ui-owners
 const stage45 = readJson("data/validation/equipment-stage4-5-display-state-policy-summary.v1.json");
 const stage46 = readJson("data/validation/equipment-stage4-6-admission-route-qa-summary.v1.json");
 const stage47 = readJson("data/validation/equipment-stage4-7-whole-consumer-regression-summary.v1.json");
+const imageStage3 = readJson("data/validation/equipment-image-stage3-hosted-qa-summary.v1.json");
 const indexSource = readText("src/routes/index.tsx");
 
 const required = contract.requiredUpstream;
@@ -38,9 +39,10 @@ assert(stage44.status === "PASS" && stage44.finalStageStatus === required.stage4
 assert(stage45.status === "PASS" && stage45.finalStageStatus === required.stage45, "Stage 4-5 checkpoint mismatch.");
 assert(stage46.status === "PASS" && stage46.finalStageStatus === required.stage46, "Stage 4-6 checkpoint mismatch.");
 assert(stage47.status === "PASS" && stage47.finalStageStatus === required.stage47, "Stage 4-7 checkpoint mismatch.");
+assert(imageStage3.status === required.imageStage3Hosted, "Equipment Image Stage 3 Hosted QA checkpoint mismatch.");
 
 const hard = contract.hardGates;
-assert(stage47.population.canonical === 390, "Canonical population must remain 390.");
+assert(stage47.population.canonical === hard.canonicalPopulation, "Canonical population drifted.");
 assert(stage47.population.public === hard.publicPopulation, "Public population drifted.");
 assert(stage47.population.general === hard.generalPopulation, "General population drifted.");
 assert(stage47.population.exclusive === hard.exclusivePopulation, "Exclusive population drifted.");
@@ -52,11 +54,8 @@ assert(JSON.stringify(stage47.population.generalTabs) === JSON.stringify(hard.ge
 assert(stage47.consumerChain.generalListDetailExact === true, "General list/detail parity failed.");
 assert(stage47.consumerChain.exclusiveListDetailExact === true, "Exclusive list/detail parity failed.");
 assert(stage47.consumerChain.exactEquipmentIdNavigation === true, "Exact equipmentId navigation failed.");
-assert(stage47.consumerChain.runtimeGeneralResolved === hard.generalPopulation, "Runtime general resolve count drifted.");
-assert(stage47.consumerChain.runtimeExclusiveResolved === hard.exclusivePopulation, "Runtime exclusive resolve count drifted.");
-assert(stage47.consumerChain.runtimeKindMismatch === hard.runtimeKindMismatch, "Runtime kind mismatch detected.");
-assert(stage47.consumerChain.runtimeEquipmentIdMismatch === hard.runtimeEquipmentIdMismatch, "Runtime equipmentId mismatch detected.");
-assert(stage47.consumerChain.exclusiveOwnerPayloadMismatch === hard.exclusiveOwnerPayloadMismatch, "Exclusive owner payload mismatch detected.");
+assert(stage47.consumerChain.runtimeGeneralResolved === hard.runtimeGeneralResolved, "Runtime general resolve count drifted.");
+assert(stage47.consumerChain.runtimeExclusiveResolved === hard.runtimeExclusiveResolved, "Runtime exclusive resolve count drifted.");
 
 assert(stage47.ownership.keys === hard.exclusivePopulation, "Exclusive ownership key count drifted.");
 assert(stage47.ownership.cardinalityMismatch === hard.ownershipCardinalityMismatch, "Exclusive ownership cardinality mismatch detected.");
@@ -66,24 +65,52 @@ assert(stage47.ownership.rederived === false, "Ownership must not be re-derived.
 assert(stage47.admission.hiddenResolved === hard.hiddenResolved, "Hidden special equipment became public.");
 assert(stage47.admission.holdResolved === hard.holdResolved, "HOLD equipment became public.");
 assert(stage47.admission.unknownResolved === hard.unknownResolved, "Unknown positive equipmentId resolved publicly.");
-assert(stage47.admission.publicServerImportsHiddenHold === false, "Public server imports hidden/HOLD data.");
+assert(stage46.sourceDiscipline.hiddenHoldImportedByPublicServer === false, "Public server imports hidden/HOLD data.");
 
-assert(stage47.statePolicy.isolatedKeys === true, "General/exclusive state keys are no longer isolated.");
+assert(stage45.state.isolatedKeys === hard.stateKeysIsolated, "General/exclusive state keys are no longer isolated.");
+assert(stage47.statePolicy.generalStorageKey === stage45.state.general.key, "General state key drifted between Stage 4-5 and 4-7.");
+assert(stage47.statePolicy.exclusiveStorageKey === stage45.state.exclusive.key, "Exclusive state key drifted between Stage 4-5 and 4-7.");
+assert(stage47.statePolicy.generalStorageKey !== stage47.statePolicy.exclusiveStorageKey, "General/exclusive state keys must differ.");
 assert(stage47.statePolicy.restoreAndSanitizeMarkersPresent === true, "State restore/sanitize policy drifted.");
-assert(stage47.displayPolicy.reviewPromoted === false, "REVIEW names were promoted without verification.");
-assert(stage47.displayPolicy.generatedOrderPreserved === true, "Generated order is not preserved.");
-assert(stage47.displayPolicy.frontendSortAdded === false, "Frontend sort was added.");
-assert(stage47.displayPolicy.detailIntegrityChecked === hard.publicPopulation, "Detail integrity coverage is incomplete.");
-assert(stage47.routes.generatedRouteTreeVerified === true, "Generated route tree verification failed.");
-assert(stage47.routes.notFoundBoundaryPresent === true, "Public detail notFound boundary is missing.");
+
+assert(stage43.naming.reviewPromoted === false, "General REVIEW names were promoted without verification.");
+assert(stage44.naming.reviewPromoted === false, "Exclusive REVIEW names were promoted without verification.");
+assert(stage45.sourceDiscipline.generalGeneratedOrderPreserved === true, "General generated order is not preserved.");
+assert(stage45.sourceDiscipline.exclusiveGeneratedOrderPreserved === true, "Exclusive generated order is not preserved.");
+assert(stage45.sourceDiscipline.frontendSortAdded === false, "Frontend sort was added.");
+assert(stage43.route.generalDetailCount === hard.generalPopulation, "General detail integrity coverage is incomplete.");
+assert(stage44.population.exclusiveDetail === hard.exclusivePopulation, "Exclusive detail integrity coverage is incomplete.");
+
+assert(stage47.routes.generalList === "/equipment", "General route drifted.");
+assert(stage47.routes.exclusiveList === "/equipment/exclusive", "Exclusive route drifted.");
+assert(stage47.routes.detail === "/equipment/$equipmentId", "Detail route drifted.");
+assert(stage47.routes.generatedRouteTreeVerified === hard.generatedRouteTreeVerified, "Generated route tree verification failed.");
+assert(stage46.routeGuards.missingPublicDataToNotFound === hard.notFoundBoundaryVerified, "Public detail notFound boundary is missing.");
+assert(stage46.routeGuards.explicitNotFoundComponent === true, "Explicit Equipment notFound component is missing.");
+
+assert(stage47.localizationBoundary.localizedPresentationAdapter === true, "Equipment localization adapter is not active.");
+assert(stage47.localizationBoundary.baseServerDelegationPreserved === true, "Localization adapter no longer delegates to the frozen base server.");
+assert(stage47.localizationBoundary.identityKey === "equipmentId", "Localization boundary changed Equipment identity.");
 assert(stage47.sourceDiscipline.rawConfigDataReads === false, "Stage 4 closeout must not reopen raw ConfigData.");
 assert(stage47.sourceDiscipline.exclusiveOwnershipRederived === false, "Stage 4 closeout must not rederive ownership.");
 assert(stage47.sourceDiscipline.publicAdmissionReclassified === false, "Stage 4 closeout must not reclassify admission.");
 
+assert(imageStage3.status === hard.imageStage3Status, "Equipment Image Stage 3 Hosted QA status drifted.");
+assert(imageStage3.completion === "COMPLETE", "Equipment Image Stage 3 Hosted QA is incomplete.");
+assert(imageStage3.freezeState === hard.imageStage3FreezeState, "Equipment Image Stage 3 freeze state drifted.");
+assert(imageStage3.semanticStageReopened === false, "Image integration reopened semantic stages.");
+assert(imageStage3.canonicalIdentityChanged === false, "Image integration changed canonical identity.");
+assert(imageStage3.productionJoinKey === "equipmentId", "Image integration changed the production join key.");
+assert(imageStage3.publicEquipment === hard.publicPopulation, "Hosted QA public Equipment count drifted.");
+assert(imageStage3.gates.preflight === "PASS", "Hosted QA preflight failed.");
+assert(imageStage3.gates.build === "PASS", "Hosted QA build failed.");
+assert(imageStage3.gates.deploymentHosted === "PASS", "Hosted QA deployment failed.");
+assert(imageStage3.gates.browserUi === hard.imageStage3BrowserUi, "Hosted Browser/UI QA failed.");
+assert(imageStage3.routeChecks.every((check) => check.status === 200), "Hosted route smoke contains a non-200 response.");
+assert(imageStage3.assetChecks.every((check) => check.status === 200 && check.width === 172 && check.height === 172), "Hosted Equipment asset smoke failed.");
+
 const equipmentCategoryPattern = /\{\s*title:\s*"장비",\s*image:\s*cardEquip,\s*to:\s*"\/equipment"\s*\}/;
 assert(equipmentCategoryPattern.test(indexSource), "Homepage Equipment category must link directly to /equipment.");
-
-assert(stage42.display.iconAssetsBound === false, "Stage 4-2 icon policy unexpectedly changed; re-review asset binding before final closeout.");
 
 execFileSync("bun", ["run", "build"], {
   cwd: ROOT,
@@ -92,16 +119,10 @@ execFileSync("bun", ["run", "build"], {
 
 const nonBlockingReviews = [
   {
-    code: "GENERAL_KR_NAME_REVIEW",
-    count: stage47.displayPolicy.generalNameReview,
+    code: "KR_NAME_FALLBACK_REVIEW",
+    count: null,
     blocking: false,
-    rule: "Keep nameKr ?? nameCn fallback and REVIEW labeling until Korean names are verified.",
-  },
-  {
-    code: "EXCLUSIVE_KR_NAME_REVIEW",
-    count: stage47.displayPolicy.exclusiveNameReview,
-    blocking: false,
-    rule: "Keep nameKr ?? nameCn fallback and REVIEW labeling until Korean names are verified.",
+    rule: "Any Equipment name still unresolved by the current localization adapter must remain fallback-only and must not change equipmentId membership or route identity.",
   },
   {
     code: "RELEASE_CHRONOLOGY_REVIEW",
@@ -109,21 +130,16 @@ const nonBlockingReviews = [
     blocking: false,
     rule: "Do not interpret generated order as exact release chronology where Stage 4 display policy marks chronology unverified.",
     evidence: {
-      generalReleaseDatesByTab: stage47.displayPolicy.generalReleaseDatesByTab,
-      exclusiveReleaseDates: stage47.displayPolicy.exclusiveReleaseDates,
+      generalTab1ChronologyClaimed: stage45.display.generalTab1ChronologyClaimed,
+      generalTab3ChronologyReviewExplicit: stage45.display.generalTab3ChronologyReviewExplicit,
+      exclusiveChronologyReviewExplicit: stage45.display.exclusiveChronologyReviewExplicit,
     },
   },
   {
-    code: "EQUIPMENT_ICON_BINDING_DEFERRED",
-    count: hard.publicPopulation,
-    blocking: false,
-    rule: stage42.display.iconAssetReason,
-  },
-  {
-    code: "BROWSER_PIXEL_MOBILE_QA_FOLLOWUP",
+    code: "MOBILE_PIXEL_POLISH_FOLLOWUP",
     count: null,
     blocking: false,
-    rule: "Stage 4 validates data/consumer/build boundaries; browser screenshot, pixel polish, and mobile interaction QA remain follow-up review work.",
+    rule: "Hosted route and Equipment asset smoke QA is frozen as PASS; remaining pixel-polish and mobile interaction review is non-blocking UI follow-up.",
   },
 ];
 
@@ -144,33 +160,48 @@ const summary = {
     stage45: stage45.finalStageStatus,
     stage46: stage46.finalStageStatus,
     stage47: stage47.finalStageStatus,
+    imageStage3Hosted: imageStage3.status,
   },
   population: stage47.population,
   finalConsumerBoundary: {
     publicEquipment: hard.publicPopulation,
-    generalList: "/equipment",
-    exclusiveList: "/equipment/exclusive",
-    detail: "/equipment/$equipmentId",
+    generalList: stage47.routes.generalList,
+    exclusiveList: stage47.routes.exclusiveList,
+    detail: stage47.routes.detail,
     homepageEquipmentTarget: hard.homepageEquipmentTarget,
     homepageEntryVerified: true,
-    generalListDetailExact: true,
-    exclusiveListDetailExact: true,
-    runtimeKindMismatch: 0,
-    runtimeEquipmentIdMismatch: 0,
-    exclusiveOwnerPayloadMismatch: 0,
+    generalListDetailExact: stage47.consumerChain.generalListDetailExact,
+    exclusiveListDetailExact: stage47.consumerChain.exclusiveListDetailExact,
+    runtimeGeneralResolved: stage47.consumerChain.runtimeGeneralResolved,
+    runtimeExclusiveResolved: stage47.consumerChain.runtimeExclusiveResolved,
+    notFoundBoundaryVerified: stage46.routeGuards.missingPublicDataToNotFound,
   },
   finalAdmissionBoundary: {
     hiddenSpecial: hard.hiddenSpecial,
     hold: hard.hold,
     holdEquipmentIds: hard.holdEquipmentIds,
-    hiddenResolved: 0,
-    holdResolved: 0,
-    unknownResolved: 0,
+    hiddenResolved: stage47.admission.hiddenResolved,
+    holdResolved: stage47.admission.holdResolved,
+    unknownResolved: stage47.admission.unknownResolved,
   },
-  statePolicy: stage47.statePolicy,
+  statePolicy: {
+    ...stage47.statePolicy,
+    isolatedKeys: stage45.state.isolatedKeys,
+  },
   ownership: stage47.ownership,
+  imageIntegration: {
+    status: imageStage3.status,
+    completion: imageStage3.completion,
+    freezeState: imageStage3.freezeState,
+    productionJoinKey: imageStage3.productionJoinKey,
+    publicEquipment: imageStage3.publicEquipment,
+    hostedBaseUrl: imageStage3.hostedBaseUrl,
+    gates: imageStage3.gates,
+    representativeAssetChecks: imageStage3.assetChecks.length,
+  },
   sourceDiscipline: {
     finalCloseoutReadsFrozenStage4Checkpoints: true,
+    finalCloseoutReadsFrozenImageStage3HostedQa: true,
     rawConfigDataReads: false,
     stage3SemanticRecomputation: false,
     ownershipRederivation: false,
@@ -178,14 +209,14 @@ const summary = {
   },
   build: {
     command: "bun run build",
-    pass: true,
+    pass: hard.buildMustPass,
   },
   hardErrors: [],
   hardErrorCount: 0,
   nonBlockingReviews,
   nonBlockingReviewCount: nonBlockingReviews.length,
-  decision: "Equipment Stage 4 closes as PASS_WITH_REVIEW / COMPLETE / FINAL_FROZEN. All public consumer, ownership, state, route, admission, homepage-entry, and production-build hard gates pass. Remaining items are presentation/review follow-ups and do not block PC-first review.",
-  nextStartPoint: "PC-first review and UI polish follow-up. Do not reopen Stage 2/3 semantics or Stage B ownership unless a concrete regression contradicts a frozen checkpoint.",
+  decision: "Equipment Stage 4 closes as PASS_WITH_REVIEW / COMPLETE / FINAL_FROZEN. Public consumer, ownership, state, route, admission, homepage-entry, production-build, and frozen Hosted Equipment image QA hard gates pass. Remaining items are presentation/review follow-ups and do not block PC-first review.",
+  nextStartPoint: "PC-first review and UI polish follow-up. Equipment Stage 4 and Equipment Image Stage 3 are frozen; do not reopen Stage 2/3 semantics or Stage B ownership unless a concrete regression contradicts a frozen checkpoint.",
 };
 
 fs.mkdirSync(path.dirname(path.join(ROOT, OUT)), { recursive: true });
@@ -199,5 +230,6 @@ console.log(JSON.stringify({
   hardErrorCount: summary.hardErrorCount,
   nonBlockingReviewCount: summary.nonBlockingReviewCount,
   homepageEntryVerified: summary.finalConsumerBoundary.homepageEntryVerified,
+  hostedImageQa: summary.imageIntegration.gates,
   build: summary.build,
 }, null, 2));

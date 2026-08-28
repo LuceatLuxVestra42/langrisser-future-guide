@@ -14,6 +14,7 @@ on:
       - 'data/validation/equipment-stage4-5-display-state-policy-summary.v1.json'
       - 'data/validation/equipment-stage4-6-admission-route-qa-summary.v1.json'
       - 'data/validation/equipment-stage4-7-whole-consumer-regression-summary.v1.json'
+      - 'data/validation/equipment-image-stage3-hosted-qa-summary.v1.json'
       - 'scripts/validate-equipment-stage4-final.mjs'
       - 'src/routes/index.tsx'
       - '.github/workflows/equipment-stage4-final.yml'
@@ -30,6 +31,7 @@ on:
       - 'data/validation/equipment-stage4-5-display-state-policy-summary.v1.json'
       - 'data/validation/equipment-stage4-6-admission-route-qa-summary.v1.json'
       - 'data/validation/equipment-stage4-7-whole-consumer-regression-summary.v1.json'
+      - 'data/validation/equipment-image-stage3-hosted-qa-summary.v1.json'
       - 'scripts/validate-equipment-stage4-final.mjs'
       - 'src/routes/index.tsx'
       - '.github/workflows/equipment-stage4-final.yml'
@@ -53,7 +55,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Validate Equipment Stage 4 final closeout
-        run: node scripts/validate-equipment-stage4-final.mjs
+        run: bun scripts/validate-equipment-stage4-final.mjs
 
       - name: Persist Equipment Stage 4 final checkpoint
         if: github.event_name == 'push' && success()

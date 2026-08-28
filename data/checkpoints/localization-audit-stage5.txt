@@ -1,0 +1,101 @@
+Localization Audit Stage 5 checkpoint
+Date: 2026-08-28
+Status: PASS_WITH_REVIEW / COMPLETE
+
+Purpose
+- Formalize the completed Stage 4 localization audit as one stable project command, one deterministic machine-readable report, and one permanent CI gate.
+- Preserve all historical Stage 2 -> 2.1 -> 3 -> 4 semantics while promoting scripts/audit-localization.mjs to the current project entrypoint.
+- Keep audit execution read-only with respect to canonical, presentation, generated, frontend, and historical validation inputs.
+
+Formal command
+- package script: audit:localization
+- exact command: node scripts/audit-localization.mjs
+- supported options:
+  - --check
+  - --json
+  - --report <path>
+  - --self-test
+- default behavior: human-readable Stage 5 summary; nonzero exit only on FAIL.
+
+Historical compatibility migration
+- Original Stage 2 runner preserved byte-for-byte as scripts/audit-localization-stage2.mjs.
+- scripts/audit-localization-stage2-1.mjs now points to scripts/audit-localization-stage2.mjs.
+- Stage 3 still inherits Stage 2.1; Stage 4 still inherits Stage 3.
+- Therefore Stage 5 promotion of scripts/audit-localization.mjs does not rewrite historical Stage 2 semantics.
+
+Inherited Stage 4 baseline
+- status: PASS_WITH_REVIEW
+- Soldier records: 224
+- Soldier effective Korean display: 224
+- Hero records: 267
+- Hero effective Korean display: 267
+- Equipment canonical records: 390
+- Equipment public records: 373
+- Equipment effective Korean display: 373
+- Equipment non-public admitted: 0
+- frontend files checked: 15
+- errors: 0
+- reviews: 2
+- frontend localization leaks: 0
+
+Stage 5 machine report
+- schema: localization-audit-stage5/v1
+- stdout: --json
+- file output: --report <path>
+- deterministic for identical repository inputs.
+- CI report target is RUNNER_TEMP, not the repository working tree.
+- report file is emitted before frozen Stage 5 snapshot comparison so CI retains the machine result when a Stage 5 snapshot mismatch occurs after Stage 4 succeeds.
+
+Permanent CI
+- workflow: .github/workflows/localization-audit.yml
+- triggers: pull_request(main), push(main), workflow_dispatch
+- permission: contents read
+- runner: ubuntu-latest
+- checkout: actions/checkout@v5
+- Node: actions/setup-node@v5 / Node 22
+- artifact upload: actions/upload-artifact@v7
+- required commands:
+  - npm run audit:localization -- --check --report "$RUNNER_TEMP/localization-audit-stage5-report.json"
+  - npm run audit:localization -- --self-test
+
+Final live verification before closeout
+- PR: #133 Formalize Localization Audit Stage 5 CI gate
+- branch head at verification: a2176cbaeca82b2365d6939532259029922cb366
+- workflow: Localization Audit
+- run ID: 33165126877
+- job ID: 98828586983
+- runner OS: Ubuntu 24.04.4
+- Node: v22.23.2
+- Stage 5 --check: PASS_WITH_REVIEW
+- output: Soldier 224, Hero 267, Equipment 390 / public 373
+- output: errors 0, reviews 2, frontend leaks 0
+- Stage 5 self-test: PASS 29/29
+- inherited Stage 4 self-tests: 23/23
+- Stage 5 additions: 6/6
+- machine report artifact: localization-audit-stage5-report
+- artifact ID: 9683251793
+- artifact size: 1062 bytes
+- artifact SHA-256 digest: 01ddb5e74fd61c3e0488d8d4d377af9bd700862ca26f964946e3ac24ad42361d
+- all workflow steps: success
+
+Stage 5 addition self-test classes
+1. formal package command exactness
+2. historical Stage 2 bridge preservation
+3. permanent CI contract presence
+4. deterministic machine report
+5. machine report file round-trip
+6. inherited Stage 4 FAIL propagation
+
+Completion
+- Stage 5 contract frozen: complete.
+- Historical Stage 2 compatibility: preserved.
+- Formal package command: complete.
+- Current project entrypoint: complete.
+- Deterministic machine report: complete.
+- Frozen Stage 5 validation snapshot: complete.
+- Permanent CI: complete.
+- Machine report artifact: verified.
+- Project Doctor integration: not included.
+
+Next start point
+- Stage 6 only: integrate the Stage 5 localization audit result into Project Doctor without changing localization semantics or reopening Stage 0-5.

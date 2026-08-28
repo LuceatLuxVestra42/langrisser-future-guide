@@ -1,0 +1,141 @@
+name: ConfigData Lookup Stage 8 Project Doctor Expansion
+
+on:
+  push:
+    branches:
+      - main
+      - 'work/**'
+    paths:
+      - 'data/contracts/configdata-lookup-stage8-project-doctor-expansion-contract.v1.json'
+      - 'data/validation/configdata-lookup-stage8-summary.v1.json'
+      - 'data/contracts/configdata-lookup-stage7-smart-regression-contract.v1.json'
+      - 'data/validation/configdata-lookup-stage7-summary.v1.json'
+      - 'data/index/configdata-lookup-dependency-manifest.v1.json'
+      - 'data/configdata/ConfigData*.json'
+      - 'data/index/forward/**'
+      - 'data/index/reverse/**'
+      - 'data/index/overlay/**'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/hero-soldier-by-soldier.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/contracts/banner-stage3-*.json'
+      - 'data/generated/banner-stage2-production-manifest.v1.json'
+      - 'data/generated/banner-stage3-*.json'
+      - 'data/validation/banner-stage3-*.json'
+      - 'scripts/validate-banner-stage3-*.mjs'
+      - 'scripts/finalize-banner-stage3-8-regression-freeze.mjs'
+      - 'src/routes/banners.tsx'
+      - 'src/lib/banner-page.server.ts'
+      - 'src/lib/banner-page.functions.ts'
+      - 'public/equipment-image-stage3-ready.json'
+      - 'public/images/equipment/**'
+      - 'src/lib/equipment-image-assets.ts'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.exclusive.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - 'scripts/validate-equipment-image-stage3-hosted.mjs'
+      - 'data/validation/equipment-image-stage3-frontend-summary.v1.json'
+      - 'data/validation/equipment-image-stage3-hosted-qa-summary.v1.json'
+      - 'scripts/configdata-lookup-stage8.mjs'
+      - 'scripts/lib/configdata-lookup-stage8.mjs'
+      - 'scripts/validate-configdata-lookup-stage8.mjs'
+      - '.github/workflows/configdata-lookup-stage8.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/configdata-lookup-stage8-project-doctor-expansion-contract.v1.json'
+      - 'data/validation/configdata-lookup-stage8-summary.v1.json'
+      - 'data/contracts/configdata-lookup-stage7-smart-regression-contract.v1.json'
+      - 'data/validation/configdata-lookup-stage7-summary.v1.json'
+      - 'data/index/configdata-lookup-dependency-manifest.v1.json'
+      - 'data/configdata/ConfigData*.json'
+      - 'data/index/forward/**'
+      - 'data/index/reverse/**'
+      - 'data/index/overlay/**'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/hero-soldier-by-soldier.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/contracts/banner-stage3-*.json'
+      - 'data/generated/banner-stage2-production-manifest.v1.json'
+      - 'data/generated/banner-stage3-*.json'
+      - 'data/validation/banner-stage3-*.json'
+      - 'scripts/validate-banner-stage3-*.mjs'
+      - 'scripts/finalize-banner-stage3-8-regression-freeze.mjs'
+      - 'src/routes/banners.tsx'
+      - 'src/lib/banner-page.server.ts'
+      - 'src/lib/banner-page.functions.ts'
+      - 'public/equipment-image-stage3-ready.json'
+      - 'public/images/equipment/**'
+      - 'src/lib/equipment-image-assets.ts'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.exclusive.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - 'scripts/validate-equipment-image-stage3-hosted.mjs'
+      - 'data/validation/equipment-image-stage3-frontend-summary.v1.json'
+      - 'data/validation/equipment-image-stage3-hosted-qa-summary.v1.json'
+      - 'scripts/configdata-lookup-stage8.mjs'
+      - 'scripts/lib/configdata-lookup-stage8.mjs'
+      - 'scripts/validate-configdata-lookup-stage8.mjs'
+      - '.github/workflows/configdata-lookup-stage8.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  project-doctor-expansion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Stage 7 predecessor
+        run: node scripts/validate-configdata-lookup-stage7.mjs
+      - name: Validate Stage 8 expansion contract
+        run: node scripts/validate-configdata-lookup-stage8.mjs
+      - name: Resolve comparison range
+        id: range
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            BEFORE="${{ github.event.before }}"
+            if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+              BEFORE="$(git rev-parse HEAD^)"
+            fi
+            echo "base=$BEFORE" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Select expanded Project Doctor impact
+        id: impact
+        run: |
+          node scripts/configdata-lookup-stage8.mjs plan \
+            --base "${{ steps.range.outputs.base }}" \
+            --head "${{ steps.range.outputs.head }}" \
+            --github-output "$GITHUB_OUTPUT"
+      - name: Setup Bun for selected page validation
+        if: steps.impact.outputs.needs_bun == 'true'
+        uses: oven-sh/setup-bun@v2
+      - name: Install dependencies for selected page validation
+        if: steps.impact.outputs.needs_bun == 'true'
+        run: bun install --frozen-lockfile
+      - name: Run selected validation-only expansion
+        run: |
+          node scripts/configdata-lookup-stage8.mjs run \
+            --base "${{ steps.range.outputs.base }}" \
+            --head "${{ steps.range.outputs.head }}" \
+            --json
+      - name: Report deferred Hosted QA targets
+        if: steps.impact.outputs.equipment_hosted_qa == 'true'
+        run: echo 'EquipmentHostedQA selected; execution remains owned by the deployed GitHub Pages hosted-QA workflow.'
+      - name: Require frozen Stage 8 summary
+        run: git diff --exit-code -- data/validation/configdata-lookup-stage8-summary.v1.json

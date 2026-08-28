@@ -5,7 +5,7 @@ import process from 'node:process';
 import { spawnSync } from 'node:child_process';
 
 const ROOT = process.cwd();
-const STAGE2_SCRIPT = 'scripts/audit-localization.mjs';
+const STAGE2_SCRIPT = 'scripts/audit-localization-stage2.mjs';
 const LOWER_PATH = 'data/presentation/soldier-lower-tier-name-kr.v1.json';
 const EXPECTED_PATH = 'data/validation/localization-audit-soldier-stage2-1.v1.json';
 

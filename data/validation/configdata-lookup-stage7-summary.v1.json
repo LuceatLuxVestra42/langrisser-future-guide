@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_7",
+  "status": "PASS_CONFIGDATA_LOOKUP_STAGE7_SMART_REGRESSION",
+  "contract": "data/contracts/configdata-lookup-stage7-smart-regression-contract.v1.json",
+  "predecessorStatus": "PASS_CONFIGDATA_LOOKUP_STAGE6_INCREMENTAL_REBUILD",
+  "dependencyManifestStatus": "DEPENDENCY_MANIFEST_MATERIALIZED",
+  "pipelineCount": 4,
+  "domainPipelineCount": 3,
+  "domainPipelines": [
+    "Hero",
+    "Soldier",
+    "Equipment"
+  ],
+  "trackedRawSourceCount": 8,
+  "canonicalInputCount": 4,
+  "executionMode": "VALIDATION_ONLY",
+  "semanticBoundary": {
+    "dependencyManifestDriven": true,
+    "explicitDomainOwnershipOnly": true,
+    "unknownConfigDataFailsClosed": true,
+    "allowlistedCommandsOnly": true,
+    "workflowDispatch": false,
+    "semanticRebuild": false,
+    "newRelationDiscovery": false,
+    "canonicalRelationRecomputation": false,
+    "rawConfigDataMutation": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false,
+    "transitiveExpansion": false,
+    "wallClockMetadataUsed": false
+  }
+}

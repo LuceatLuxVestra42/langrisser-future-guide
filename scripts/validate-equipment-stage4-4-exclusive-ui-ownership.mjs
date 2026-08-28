@@ -131,10 +131,11 @@ assert(restrictions.semantics.status === "structural-inference", "Restriction se
 assert(restrictions.semantics.confidence === 0.99, "Restriction semantic confidence must remain 0.99.");
 
 const requiredExclusiveRouteMarkers = [
-  'createFileRoute("/equipment/exclusive")',
+  'createFileRoute("/equipment_/exclusive")',
   "data.filters.map",
   "record.ownerHero.nameKr",
   'to="/equipment/$equipmentId"',
+  "getOfficialEquipmentImageUrl",
   "deterministic order",
   "전용장비 출시순으로 해석하지 않아",
 ];
@@ -243,8 +244,9 @@ const summary = {
     chronologyInvented: false,
   },
   assets: {
-    equipmentIconBound: false,
-    reason: "No web-served Equipment icon asset set exists yet; Stage 4-4 preserves icon metadata without fabricating a public asset mapping.",
+    equipmentIconBound: true,
+    resolver: "getOfficialEquipmentImageUrl(equipmentId)",
+    identityKey: "equipmentId",
   },
   sourceDiscipline: {
     stage35DisplayDetailOnly: true,
