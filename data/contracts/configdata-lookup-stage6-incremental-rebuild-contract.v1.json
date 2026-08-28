@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_6",
+  "status": "INCREMENTAL_REBUILD_CONTRACT_FROZEN",
+  "purpose": "Detect stale ConfigData Lookup artifacts through dependency-aware hashes, rebuild only affected bounded layers, and write only artifacts whose deterministic content changed.",
+  "predecessor": {
+    "contract": "data/contracts/configdata-lookup-stage5-cli-contract.v1.json",
+    "summary": "data/validation/configdata-lookup-stage5-summary.v1.json",
+    "requiredStatus": "PASS_CONFIGDATA_LOOKUP_STAGE5_CLI"
+  },
+  "outputs": {
+    "manifest": "data/index/configdata-lookup-dependency-manifest.v1.json",
+    "summary": "data/validation/configdata-lookup-stage6-summary.v1.json"
+  },
+  "commands": {
+    "check": "npm run check:configdata-lookup-stage6",
+    "rebuild": "npm run rebuild:configdata-lookup-stage6",
+    "validate": "npm run validate:configdata-lookup-stage6"
+  },
+  "stalePolicy": {
+    "stage1": "Compare each current raw source SHA-256 with the source hash embedded in its Stage 1 entity index; rebuild only dirty entities.",
+    "stage2": "Compare current raw source SHA-256 values with source hashes embedded in each Stage 2 domain index; parse only source types required by dirty domains.",
+    "stage3": "Compare current Stage 2 forward artifact hashes and predecessor hashes with the Stage 3 manifest; rebuild from materialized Stage 2 edges and write only target files whose deterministic bytes changed.",
+    "stage4": "Compare frozen canonical input hashes and Stage 3 predecessor hashes with the Stage 4 manifest; rebuild from admitted frozen projections and write only domain files whose deterministic bytes changed.",
+    "stage5": "Recompute only the Stage 5 summary from the Stage 5 contract and Stage 4 predecessor summary; no raw ConfigData read is allowed.",
+    "contractHashBaseline": "The Stage 6 dependency manifest records Stage 1-6 contract hashes. A changed owning contract dirties that owning materialization layer; downstream layers advance only when their actual inputs change.",
+    "missingOutput": "FAIL_CLOSED_AND_REBUILD_OWNING_LAYER",
+    "writePolicy": "WRITE_ONLY_IF_DETERMINISTIC_CONTENT_CHANGED"
+  },
+  "dependencyGranularity": {
+    "stage1": "ENTITY",
+    "stage2": "DOMAIN",
+    "stage3": "CONTENT_DIFF_TARGET_FILE",
+    "stage4": "CONTENT_DIFF_DOMAIN_FILE",
+    "stage5": "SUMMARY_ONLY"
+  },
+  "semanticBoundary": {
+    "newRelationDiscovery": false,
+    "transitiveExpansion": false,
+    "canonicalRelationRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "rawConfigDataMutation": false,
+    "rawSourceHashingMayReadBytes": true,
+    "rawSourceParsingOnlyForDirtyStage1OrStage2Scope": true,
+    "stage3ConsumesStage2ArtifactsOnly": true,
+    "stage4ConsumesFrozenCanonicalInputsOnly": true,
+    "wallClockMetadata": false
+  },
+  "validation": {
+    "orchestrator": "scripts/configdata-lookup-stage6.mjs",
+    "library": "scripts/lib/configdata-lookup-stage6.mjs",
+    "validator": "scripts/validate-configdata-lookup-stage6.mjs",
+    "workflow": ".github/workflows/configdata-lookup-stage6.yml",
+    "requiredChecks": [
+      "Stage 5 predecessor validator remains PASS",
+      "clean repository state reports CLEAN_CONFIGDATA_LOOKUP_STAGE6",
+      "Stage 1 stale detection is source-hash based per entity",
+      "Stage 2 stale detection is source-hash based per domain",
+      "Stage 2 rebuild loads only source types required by dirty domains",
+      "Stage 3 stale detection uses Stage 2 artifact hashes rather than raw ConfigData scans",
+      "Stage 4 stale detection uses frozen canonical input hashes and predecessor hashes",
+      "Stage 5 refresh remains summary-only and does not read raw ConfigData",
+      "incremental rebuild writes only byte-changed artifacts",
+      "dependency manifest and summary are byte-identical after regeneration",
+      "no wall-clock timestamp enters generated artifacts",
+      "package scripts expose check, rebuild, and validation commands"
+    ],
+    "passStatus": "PASS_CONFIGDATA_LOOKUP_STAGE6_INCREMENTAL_REBUILD"
+  },
+  "nextStage": {
+    "stage": "CONFIGDATA_LOOKUP_STAGE_7",
+    "goal": "Expose the dependency manifest to Project Doctor / Smart Regression so changed ConfigData inputs can select only the downstream validators and page pipelines that are actually affected."
+  }
+}

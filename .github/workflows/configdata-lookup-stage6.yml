@@ -1,0 +1,146 @@
+name: ConfigData Lookup Stage 6
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - work/configdata-lookup-stage6-incremental
+    paths:
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataJobConnectionInfo.json'
+      - 'data/configdata/ConfigDataJobInfo.json'
+      - 'data/configdata/ConfigDataSkillInfo.json'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechLevelInfo.json'
+      - 'data/configdata/ConfigDataEquipmentInfo.json'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/hero-soldier-by-soldier.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/contracts/configdata-lookup-stage*.json'
+      - 'data/index/hero.v1.json'
+      - 'data/index/soldier.v1.json'
+      - 'data/index/skill.v1.json'
+      - 'data/index/equipment.v1.json'
+      - 'data/index/forward/**'
+      - 'data/index/reverse/**'
+      - 'data/index/overlay/**'
+      - 'data/index/configdata-lookup-dependency-manifest.v1.json'
+      - 'data/validation/configdata-lookup-stage*-summary.v1.json'
+      - 'scripts/lib/configdata-lookup-stage*.mjs'
+      - 'scripts/build-configdata-lookup-stage*.mjs'
+      - 'scripts/validate-configdata-lookup-stage*.mjs'
+      - 'scripts/configdata-lookup*.mjs'
+      - 'package.json'
+      - '.github/workflows/configdata-lookup-stage6.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataJobConnectionInfo.json'
+      - 'data/configdata/ConfigDataJobInfo.json'
+      - 'data/configdata/ConfigDataSkillInfo.json'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechLevelInfo.json'
+      - 'data/configdata/ConfigDataEquipmentInfo.json'
+      - 'data/generated/hero-soldier-by-hero.v1.json'
+      - 'data/generated/hero-soldier-by-soldier.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/contracts/configdata-lookup-stage*.json'
+      - 'data/index/hero.v1.json'
+      - 'data/index/soldier.v1.json'
+      - 'data/index/skill.v1.json'
+      - 'data/index/equipment.v1.json'
+      - 'data/index/forward/**'
+      - 'data/index/reverse/**'
+      - 'data/index/overlay/**'
+      - 'data/index/configdata-lookup-dependency-manifest.v1.json'
+      - 'data/validation/configdata-lookup-stage*-summary.v1.json'
+      - 'scripts/lib/configdata-lookup-stage*.mjs'
+      - 'scripts/build-configdata-lookup-stage*.mjs'
+      - 'scripts/validate-configdata-lookup-stage*.mjs'
+      - 'scripts/configdata-lookup*.mjs'
+      - 'package.json'
+      - '.github/workflows/configdata-lookup-stage6.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  incremental-rebuild-and-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Stage 5 predecessor
+        run: node scripts/validate-configdata-lookup-stage5.mjs
+
+      - name: Rebuild stale lookup layers incrementally
+        run: npm run rebuild:configdata-lookup-stage6
+
+      - name: Validate Stage 6
+        run: npm run validate:configdata-lookup-stage6
+
+      - name: Require clean stale plan
+        run: npm run check:configdata-lookup-stage6
+
+      - name: Commit Stage 6 materialization on work branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage6-incremental'
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/index/hero.v1.json \
+            data/index/soldier.v1.json \
+            data/index/skill.v1.json \
+            data/index/equipment.v1.json \
+            data/index/forward \
+            data/index/reverse \
+            data/index/overlay \
+            data/index/configdata-lookup-dependency-manifest.v1.json \
+            data/validation/configdata-lookup-stage1-summary.v1.json \
+            data/validation/configdata-lookup-stage2-summary.v1.json \
+            data/validation/configdata-lookup-stage3-summary.v1.json \
+            data/validation/configdata-lookup-stage4-summary.v1.json \
+            data/validation/configdata-lookup-stage5-summary.v1.json \
+            data/validation/configdata-lookup-stage6-summary.v1.json
+          if git diff --cached --quiet; then
+            echo 'Stage 6 materialization is already current.'
+          else
+            git commit -m 'Refresh ConfigData Lookup Stage 6 materialization'
+            git push origin HEAD:work/configdata-lookup-stage6-incremental
+          fi
+
+      - name: Require committed generated state outside materialization branch
+        if: "!(github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage6-incremental')"
+        shell: bash
+        run: |
+          git diff --exit-code -- \
+            data/index/hero.v1.json \
+            data/index/soldier.v1.json \
+            data/index/skill.v1.json \
+            data/index/equipment.v1.json \
+            data/index/forward \
+            data/index/reverse \
+            data/index/overlay \
+            data/index/configdata-lookup-dependency-manifest.v1.json \
+            data/validation/configdata-lookup-stage1-summary.v1.json \
+            data/validation/configdata-lookup-stage2-summary.v1.json \
+            data/validation/configdata-lookup-stage3-summary.v1.json \
+            data/validation/configdata-lookup-stage4-summary.v1.json \
+            data/validation/configdata-lookup-stage5-summary.v1.json \
+            data/validation/configdata-lookup-stage6-summary.v1.json
