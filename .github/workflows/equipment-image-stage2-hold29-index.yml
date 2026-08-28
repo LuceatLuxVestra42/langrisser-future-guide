@@ -1,0 +1,35 @@
+name: Equipment Image Stage 2 Hold29 Index
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-hold29
+    paths:
+      - 'scripts/build-equipment-image-stage2-hold29-index.mjs'
+      - 'data/validation/equipment-image-stage2-acquisition-summary.v1.json'
+      - 'data/generated/equipment_stage3_2_display_metadata.json'
+      - 'data/generated/equipment_stage2_3_filter_map.json'
+      - '.github/workflows/equipment-image-stage2-hold29-index.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build hold29 index
+        run: node scripts/build-equipment-image-stage2-hold29-index.mjs
+      - name: Persist hold29 index
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/generated/equipment-image-stage2-hold29-index.v1.json
+          if git diff --cached --quiet; then
+            echo 'No index changes.'
+          else
+            git commit -m 'Build Equipment Stage 2 hold29 index [skip ci]'
+            git push
+          fi
