@@ -1,0 +1,76 @@
+name: Project Doctor PR Guard
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+  push:
+    branches:
+      - work/project-doctor-closeout
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-doctor-pr-guard-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pr-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate D7 guard contract
+        run: npm run doctor:pr-guard:validate
+
+      - name: Validate committed freshness seal
+        run: npm run doctor:freshness:validate
+
+      - name: Regenerate D1 status outputs
+        run: npm run doctor:status
+
+      - name: Prove committed D1 outputs are deterministic
+        run: git diff --exit-code -- data/generated/project-doctor-d1-1-status.v1.json data/validation/project-doctor-d1-1-summary.v1.json data/validation/project-doctor-d1-2-summary.v1.json
+
+      - name: Revalidate freshness after D1 regeneration
+        run: npm run doctor:freshness:validate
+
+      - name: Resolve changed-file comparison
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "DOCTOR_BASE=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_ENV"
+            echo "DOCTOR_HEAD=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
+          else
+            echo "DOCTOR_BASE=origin/main" >> "$GITHUB_ENV"
+            echo "DOCTOR_HEAD=HEAD" >> "$GITHUB_ENV"
+          fi
+
+      - name: Integrated Doctor real-diff dry run
+        run: npm run doctor -- --dry-run --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
+
+      - name: Integrated Doctor real-diff execution
+        run: npm run doctor -- --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
