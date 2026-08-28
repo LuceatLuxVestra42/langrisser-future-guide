@@ -1,0 +1,68 @@
+Localization Audit Stage 1 — Soldier read-only audit
+
+Status: PASS_WITH_REVIEW / COMPLETE
+
+Scope:
+- executable audit for Soldier only
+- reads frozen Stage 0 contract
+- reads canonical/presentation/validation sources only
+- does not translate or mutate localization/canonical/frontend data
+
+Implemented:
+- scripts/audit-localization.mjs
+- data/validation/localization-audit-soldier-stage1.v1.json
+
+Validated baseline:
+- canonical Soldier: 224
+- canonical unique Soldier IDs: 224
+- normal Soldier: 168
+- SP Soldier: 56
+- normal tier 3 Soldier: 129
+- tier 1-2 canonical/presentation coverage: 39 / 39
+- tier 3 provisional presentation: 2
+- overlay collision: 0
+- hard error: 0
+- REVIEW: 2 approved provisional Korean display names
+
+Provisional REVIEW targets:
+- Soldier 136 / 烬色卫队 / 잿빛 호위대
+- Soldier 1039 / 断罪修女 / 단죄의 수녀
+
+Canonical boundary for both provisional records remains:
+- nameKr = null
+- nameKrStatus = unreleased
+- validationStatus = REVIEW
+
+Executed validation evidence:
+- GitHub Actions run: 33149228796
+- job: 98777097318
+- verified PR head: 3d58b7f84894b457041c2d5294be702c49d71e60
+- command: node scripts/audit-localization.mjs --check
+- output: Localization Audit Stage 1: PASS_WITH_REVIEW
+- output: Soldier 224, errors 0, reviews 2
+- job conclusion: success
+
+Failure boundaries implemented:
+- canonical count mismatch
+- duplicate canonical ID
+- unknown presentation Soldier ID
+- lower-tier source contract mismatch
+- lower-tier identity mismatch
+- missing lower-tier Korean display
+- duplicate presentation ID
+- provisional source contract mismatch
+- provisional identity mismatch
+- provisional empty Korean display
+- provisional canonical invalid promotion
+- overlay collision
+- existing provisional boundary validation regression
+
+Stage 1 does not yet include:
+- Stage 2 expanded conflict/status issue classification
+- Hero audit
+- Equipment audit
+- frontend localization leak scan
+- permanent npm command / CI gate
+
+Next start point:
+Localization Audit Stage 2 — strengthen status/conflict contamination checks on top of this frozen Soldier executable baseline.

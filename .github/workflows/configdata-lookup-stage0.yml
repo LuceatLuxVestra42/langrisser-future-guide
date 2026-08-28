@@ -1,0 +1,40 @@
+name: ConfigData Lookup Stage 0
+
+on:
+  pull_request:
+    paths:
+      - 'data/contracts/configdata-lookup-stage0-contract.v1.json'
+      - 'scripts/validate-configdata-lookup-stage0.mjs'
+      - 'package.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSkillInfo.json'
+      - 'data/configdata/ConfigDataEquipmentInfo.json'
+      - '.github/workflows/configdata-lookup-stage0.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/configdata-lookup-stage0-contract.v1.json'
+      - 'scripts/validate-configdata-lookup-stage0.mjs'
+      - 'package.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataSkillInfo.json'
+      - 'data/configdata/ConfigDataEquipmentInfo.json'
+      - '.github/workflows/configdata-lookup-stage0.yml'
+
+jobs:
+  validate-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate Stage 0 contract
+        run: npm run validate:configdata-lookup-stage0

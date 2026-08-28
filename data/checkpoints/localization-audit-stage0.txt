@@ -1,0 +1,81 @@
+Localization Audit Stage 0 — FROZEN
+
+Scope
+- Read-only localization audit contract only.
+- No translation, canonical mutation, presentation mutation, frontend modification, or CI gating in Stage 0.
+- Initial audited entity: Soldier.
+
+Frozen canonical source
+- data/generated/soldier-list-stage5-8.v1.json
+- key: soldierId exact equality
+- baseline: 224 Soldier = 168 normal + 56 SP
+- normal tier 3: 129
+
+Frozen presentation sources
+1) data/presentation/soldier-lower-tier-name-kr.v1.json
+   - frontend-presentation-only
+   - 39 records = tier 1 12 + tier 2 27
+   - exact checks after soldierId resolution: tier + nameCn
+   - effective status: confirmed-presentation
+
+2) data/presentation/soldier-t3-provisional-name-kr.v1.json
+   - frontend-presentation-only
+   - 2 records
+   - Soldier 136 / 烬色卫队 / 잿빛 호위대
+   - Soldier 1039 / 断罪修女 / 단죄의 수녀
+   - exact checks after soldierId resolution: tier + armyType + nameCn
+   - effective status: provisional-display
+   - officialKoreanNameConfirmed=false
+   - identityMutation=false
+
+Existing provisional boundary evidence
+- data/validation/soldier-t3-provisional-name-presentation.v1.json
+- canonical tier3 confirmed Korean names: 127 / 129
+- provisional display: 2 / 129
+- provisional stored as canonical: 0
+- frontend Korean display coverage: 129 / 129
+
+Frontend effective display resolver
+- src/lib/soldier-page.server.ts
+- precedence:
+  lower-tier confirmed presentation overlay
+  -> tier-3 provisional presentation overlay
+  -> canonical Soldier name
+
+Critical frozen boundary
+- presentation overlay may change effective frontend nameKr/nameKrStatus only.
+- audit never changes canonical identity.
+- provisional display name is not a confirmed canonical Korean name.
+- Soldier 136 and 1039 must remain canonical nameKr=null / nameKrStatus=unreleased / validationStatus=REVIEW until exact Korean server names are confirmed.
+- nameCn, nameKr, aliases, file order, filename similarity, and numeric ID patterns are not JOIN keys.
+- canonical JOIN key is soldierId only.
+
+Stage 1 minimum audit checks
+- canonical count 224
+- unique Soldier IDs
+- every presentation ID resolves exactly once
+- lower-tier overlay coverage 39 with exact tier/nameCn parity
+- T3 provisional coverage 2 with exact tier/armyType/nameCn parity
+- no cross-overlay duplicate Soldier ID
+- provisional canonical state preserved
+- non-empty Korean display labels
+- no writes during audit
+
+Planned result model
+- PASS
+- PASS_WITH_REVIEW
+- FAIL
+
+Planned issue codes
+- MISSING_DISPLAY
+- IDENTITY_MISMATCH
+- DUPLICATE_PRESENTATION_ID
+- OVERLAY_COLLISION
+- INVALID_PROMOTION
+- STALE_PROVISIONAL
+- FRONTEND_LOCALIZATION_LEAK
+
+Stage 0 completion
+- PASS / COMPLETE / FROZEN
+- contract: data/contracts/localization-audit.v1.json
+- next start point: Stage 1 Soldier read-only executable audit
