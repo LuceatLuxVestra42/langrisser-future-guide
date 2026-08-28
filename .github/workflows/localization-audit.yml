@@ -30,7 +30,7 @@ jobs:
 
       - name: Upload localization audit machine report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: localization-audit-stage5-report
           path: ${{ runner.temp }}/localization-audit-stage5-report.json
