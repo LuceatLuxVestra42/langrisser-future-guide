@@ -128,8 +128,10 @@ async function main() {
   }
 
   const libraryText = await fs.readFile('scripts/lib/configdata-lookup-stage5.mjs', 'utf8');
+  const cliText = await fs.readFile('scripts/configdata-lookup-cli.mjs', 'utf8');
   assert(!libraryText.includes('data/configdata/'), 'Stage 5 library must not hard-code a raw ConfigData path');
-  assert(!libraryText.includes('writeFile('), 'Stage 5 library must not mutate lookup data directly');
+  assert(!cliText.includes('writeFile('), 'Stage 5 CLI entrypoint must not mutate files');
+  assert(!cliText.includes('writeText('), 'Stage 5 CLI entrypoint must not invoke summary writes');
 
   const expectedSummary = buildStage5Summary(contract, predecessor.summary);
   const actualSummaryText = await fs.readFile(contract.outputs.summary, 'utf8');
