@@ -1,0 +1,73 @@
+name: Equipment Image Stage 2 PGSetup Evidence
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-hold29
+    paths:
+      - '.github/workflows/equipment-image-stage2-pgsetup-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download current official PGSetup and validate CDN MD5
+        run: |
+          set -euo pipefail
+          URL='https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/DownLoad-MZ-PC.exe'
+          REF='https://mz.zlongame.com/jx/mzdownload/20180731/5473.html'
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0 Safari/537.36'
+          curl --http1.1 -fL --retry 2 -A "$UA" -e "$REF" -D /tmp/headers -o /tmp/pgsetup.exe "$URL"
+          ACTUAL_MD5="$(md5sum /tmp/pgsetup.exe | awk '{print $1}')"
+          CDN_MD5="$(grep -i '^x-cos-meta-md5:' /tmp/headers | tail -1 | cut -d: -f2- | tr -d ' \r\n')"
+          test -n "$CDN_MD5"
+          test "$ACTUAL_MD5" = "$CDN_MD5"
+          mkdir -p data/evidence
+          {
+            echo "sourceUrl=$URL"
+            echo "bytes=$(stat -c %s /tmp/pgsetup.exe)"
+            echo "md5=$ACTUAL_MD5"
+            echo "sha256=$(sha256sum /tmp/pgsetup.exe | awk '{print $1}')"
+            grep -Ei '^(last-modified|etag|content-length|x-cos-meta-md5):' /tmp/headers | tr -d '\r' || true
+          } > /tmp/meta.txt
+      - name: Extract only compact endpoint and resource evidence
+        run: |
+          set -euo pipefail
+          {
+            echo '=== CURRENT OFFICIAL PGSETUP ==='
+            cat /tmp/meta.txt
+            echo
+            echo '=== PE/ARCHIVE RESOURCE NAMES ==='
+            7z l -ba /tmp/pgsetup.exe 2>/dev/null \
+              | grep -Eai 'resources|\.pak|\.bin|\.js|\.html|\.json|\.xml|\.ini|\.cfg|\.dat|manifest|config|update|patch|version|download' \
+              | head -n 500 || true
+            echo
+            echo '=== ASCII FILTERED STRINGS ==='
+            strings -a -n 6 /tmp/pgsetup.exe \
+              | grep -Eai 'https?://|mhmnz|langrisser|mz\.zlongame|zlongame|patch|update|manifest|version|cdn|clientdown|download|pgsetup|api/|launcher|gameid|productid|resource|package|config' \
+              | grep -Eva 'chromium|google|mozilla|certificate|crashpad|widevine|spellcheck|devtools|angle|unicode|icu' \
+              | sort -u | head -n 1200 || true
+            echo
+            echo '=== UTF16LE FILTERED STRINGS ==='
+            strings -el -n 6 /tmp/pgsetup.exe \
+              | grep -Eai 'https?://|mhmnz|langrisser|mz\.zlongame|zlongame|patch|update|manifest|version|cdn|clientdown|download|pgsetup|api/|launcher|gameid|productid|resource|package|config' \
+              | grep -Eva 'chromium|google|mozilla|certificate|crashpad|widevine|spellcheck|devtools|angle|unicode|icu' \
+              | sort -u | head -n 1200 || true
+            echo
+            echo '=== EMBEDDED ARCHIVE SIGNATURE OFFSETS ==='
+            grep -abo $'7z\xbc\xaf\x27\x1c' /tmp/pgsetup.exe | head -n 100 || true
+            grep -abo $'PK\x03\x04' /tmp/pgsetup.exe | head -n 100 || true
+          } > data/evidence/equipment-image-stage2-official-pgsetup-endpoints.v1.txt
+          wc -l data/evidence/equipment-image-stage2-official-pgsetup-endpoints.v1.txt
+      - name: Persist compact evidence
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/evidence/equipment-image-stage2-official-pgsetup-endpoints.v1.txt
+          git commit -m 'Capture official PGSetup endpoint evidence [skip ci]'
+          git push
