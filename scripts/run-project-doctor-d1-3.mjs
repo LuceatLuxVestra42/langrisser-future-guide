@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 const STATUS_PATH = 'data/generated/project-doctor-d1-1-status.v1.json';
 const GATE_PATH = 'data/validation/project-doctor-d1-2-summary.v1.json';
 const steps = [
+  ['active-source-registry', 'scripts/validate-project-doctor-active-source-registry.mjs'],
   ['collect', 'scripts/collect-project-doctor-d1-1.mjs'],
   ['validate', 'scripts/validate-project-doctor-d1-2.mjs'],
 ];
