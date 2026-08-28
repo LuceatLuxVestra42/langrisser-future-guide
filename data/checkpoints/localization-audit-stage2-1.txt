@@ -1,0 +1,47 @@
+Localization Audit Stage 2.1 checkpoint
+Date: 2026-08-28
+Status: PASS_WITH_REVIEW / COMPLETE pending final verification
+
+Purpose
+- Close the Stage 2 gap where exact confirmed Korean presentation text could change without changing the Stage 2 structural snapshot.
+- Keep the audit read-only. Do not translate, auto-fix, mutate canonical identity, or promote provisional names.
+- Preserve the historical Stage 2 script/snapshot unchanged; Stage 2.1 is an additive guard.
+
+Scope
+- Entity: Soldier only.
+- Source: data/presentation/soldier-lower-tier-name-kr.v1.json
+- Records: 39 confirmed lower-tier presentation records.
+- Identity and source rules remain governed by the frozen Stage 0 contract and Stage 2 audit.
+
+Fingerprint rule
+- Sort records by soldierId ascending.
+- Fingerprint exact tuple values: soldierId, tier, nameCn, nameKr.
+- Serialize the tuple array with JSON.stringify and hash UTF-8 bytes using SHA-256.
+- Baseline fingerprint: 316e905bc409fa337f79baa72a676872998c1f1546ee994e00267b2948d42e28
+- Exact whitespace is intentionally significant. A change such as `정예 창병` -> `정예창병` must change the fingerprint.
+
+Execution model
+- Command: node scripts/audit-localization-stage2-1.mjs --check
+- Stage 2.1 first requires the existing Stage 2 snapshot check to pass.
+- It then compares the current lower-tier presentation fingerprint against data/validation/localization-audit-soldier-stage2-1.v1.json.
+- Fingerprint mismatch exits 1 with CONFIRMED_PRESENTATION_DRIFT.
+- Approved intentional localization edits require human review followed by an explicit Stage 2.1 snapshot update.
+
+Baseline
+- Stage 2 status: PASS_WITH_REVIEW
+- Soldier canonical: 224
+- Effective Korean display: 224
+- Stage 2 errors: 0
+- Stage 2 reviews: 2 (approved provisional unresolved records)
+- Lower-tier confirmed presentation: 39
+- Stage 2.1 self-test: PASS (7/7) in initial baseline run 33155074237 / job 98795805083.
+
+Completion gate
+- Baseline --check must PASS.
+- Stage 2.1 self-test must PASS 7/7.
+- A temporary spacing mutation must make --check FAIL specifically with CONFIRMED_PRESENTATION_DRIFT.
+- Restore source before completion; production data must remain unchanged.
+- Remove temporary workflow before merge.
+
+Next start after completion
+- Stop. Do not enter Stage 3 automatically. Use Stage 2.1 in the next real localization change and evaluate the audit behavior before deciding on Hero + Equipment expansion.
