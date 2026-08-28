@@ -1,0 +1,70 @@
+name: Equipment Image Stage 3 Browser UI QA
+
+on:
+  push:
+    branches:
+      - qa/equipment-image-stage3-browser-ui-20260828
+    paths:
+      - '.github/workflows/equipment-image-stage3-browser-ui.yml'
+      - 'scripts/validate-equipment-image-stage3-browser-ui.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: equipment-image-stage3-browser-ui
+  cancel-in-progress: false
+
+jobs:
+  browser-ui-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run hosted Browser UI QA
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-equipment-image-stage3-browser-ui.mjs
+
+      - name: Require final Stage 3 Browser UI PASS
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const summary = JSON.parse(fs.readFileSync('data/validation/equipment-image-stage3-hosted-qa-summary.v1.json','utf8'));
+          const evidence = JSON.parse(fs.readFileSync('data/evidence/equipment-image-stage3-browser-ui.v1.json','utf8'));
+          const checkpoint = JSON.parse(fs.readFileSync('data/checkpoints/equipment-image-stage3-final.v1.json','utf8'));
+          if (summary.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3' || summary.completion !== 'COMPLETE' || summary.freezeState !== 'EQUIPMENT_IMAGE_STAGE3_FROZEN') throw new Error('Final Stage 3 summary mismatch');
+          if (summary.gates.preflight !== 'PASS' || summary.gates.build !== 'PASS' || summary.gates.deploymentHosted !== 'PASS' || summary.gates.browserUi !== 'PASS_PLAYWRIGHT_HOSTED_BROWSER_UI') throw new Error('Four-gate Stage 3 closeout mismatch');
+          if (evidence.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3_BROWSER_UI' || evidence.productionJoinKey !== 'equipmentId' || evidence.publicEquipment !== 373) throw new Error('Browser UI evidence mismatch');
+          if (checkpoint.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3' || checkpoint.browserUi !== 'PASS_PLAYWRIGHT_HOSTED_BROWSER_UI' || checkpoint.semanticStageReopened !== false) throw new Error('Final checkpoint mismatch');
+          console.log('PASS: Equipment Image Stage 3 four-gate closeout');
+          NODE
+
+      - name: Persist Browser UI evidence and final freeze
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/equipment-image-stage3-hosted-qa-summary.v1.json \
+                  data/evidence/equipment-image-stage3-browser-ui.v1.json \
+                  data/checkpoints/equipment-image-stage3-final.v1.json
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit.'
+            exit 0
+          fi
+          git commit -m "Freeze Equipment Image Stage 3 Browser UI QA [skip ci]"
+          git push origin HEAD:qa/equipment-image-stage3-browser-ui-20260828
