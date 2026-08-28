@@ -7,54 +7,285 @@
   "contract": "data/contracts/project-doctor-d1-0-contract.v1.json",
   "gateContract": "data/contracts/project-doctor-d1-2-health-gate.v1.json",
   "input": "data/generated/project-doctor-d1-1-status.v1.json",
-  "validator": "scripts/validate-project-doctor-d1-2.mjs",
-  "verificationEvidence": {
-    "repositorySnapshotInspection": "PASS",
-    "currentDomainStateReplay": "PASS_6_OF_6",
-    "localNodeSyntaxCheck": "PASS",
-    "localSyntheticGateExecution": "PASS_9_OF_9",
-    "repositoryCliExecution": "DEFERRED_TO_D1_3",
-    "githubActionsExecution": "OUT_OF_SCOPE"
-  },
   "scope": {
     "classificationOnly": true,
-    "domainValidatorExecutionCount": 0,
-    "rawConfigDataReadCount": 0,
-    "semanticRecomputationCount": 0,
-    "staleOutputHashCheckCount": 0,
-    "productionDataWriteCount": 0
+    "validatorExecution": false,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "staleOutputHashCheck": false,
+    "repositoryMutation": false
   },
-  "healthPrecedence": [
-    "MISSING",
-    "FAIL",
-    "INCONSISTENT",
-    "REVIEW",
-    "PASS",
-    "UNKNOWN"
+  "checks": [
+    {
+      "name": "D1-0 contract frozen",
+      "pass": true,
+      "detail": "DESIGN_FROZEN"
+    },
+    {
+      "name": "D1-1 input collected",
+      "pass": true,
+      "detail": "COLLECTED"
+    },
+    {
+      "name": "D1-1 input read-only",
+      "pass": true
+    },
+    {
+      "name": "D1-1 validator execution remains zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "D1-1 raw ConfigData reads remain zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "D1-1 semantic recomputation remains zero",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "domain count exact",
+      "pass": true,
+      "detail": {
+        "expected": 6,
+        "actual": 6
+      }
+    },
+    {
+      "name": "domain names exact",
+      "pass": true,
+      "detail": {
+        "expected": [
+          "hero",
+          "soldier",
+          "equipment",
+          "hero-soldier",
+          "banner",
+          "skin"
+        ],
+        "actual": [
+          "hero",
+          "soldier",
+          "equipment",
+          "hero-soldier",
+          "banner",
+          "skin"
+        ]
+      }
+    },
+    {
+      "name": "domain names unique",
+      "pass": true
+    },
+    {
+      "name": "health counts exact",
+      "pass": true,
+      "detail": {
+        "input": {
+          "PASS": 0,
+          "REVIEW": 6,
+          "FAIL": 0,
+          "MISSING": 0,
+          "INCONSISTENT": 0,
+          "UNKNOWN": 0
+        },
+        "recomputed": {
+          "PASS": 0,
+          "REVIEW": 6,
+          "FAIL": 0,
+          "MISSING": 0,
+          "INCONSISTENT": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "name": "lifecycle counts exact",
+      "pass": true,
+      "detail": {
+        "input": {
+          "FROZEN": 4,
+          "COMPLETE": 1,
+          "IN_PROGRESS": 1,
+          "UNKNOWN": 0
+        },
+        "recomputed": {
+          "FROZEN": 4,
+          "COMPLETE": 1,
+          "IN_PROGRESS": 1,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "name": "project health precedence exact",
+      "pass": true,
+      "detail": {
+        "input": "REVIEW",
+        "recomputed": "REVIEW",
+        "precedence": [
+          "MISSING",
+          "FAIL",
+          "INCONSISTENT",
+          "REVIEW",
+          "PASS",
+          "UNKNOWN"
+        ]
+      }
+    },
+    {
+      "name": "known hard error total exact",
+      "pass": true,
+      "detail": {
+        "input": 0,
+        "recomputed": 0
+      }
+    },
+    {
+      "name": "review total exact",
+      "pass": true,
+      "detail": {
+        "input": 33,
+        "recomputed": 33
+      }
+    },
+    {
+      "name": "blocker total exact",
+      "pass": true,
+      "detail": {
+        "input": 1,
+        "recomputed": 1
+      }
+    }
   ],
-  "checks": {
-    "d10ContractFrozen": true,
-    "d11CollectorStatusCollected": true,
-    "domainCount": {
-      "expected": 6,
-      "actual": 6,
+  "domainChecks": [
+    {
+      "domain": "hero",
+      "pass": true,
+      "derivedHealth": "REVIEW",
+      "actualHealth": "REVIEW",
+      "lifecycle": "FROZEN",
+      "missingFields": [],
+      "populationMismatches": [],
+      "primarySourceMatchesContract": true,
+      "reviewCountMatches": true
+    },
+    {
+      "domain": "soldier",
+      "pass": true,
+      "derivedHealth": "REVIEW",
+      "actualHealth": "REVIEW",
+      "lifecycle": "COMPLETE",
+      "missingFields": [],
+      "populationMismatches": [],
+      "primarySourceMatchesContract": true,
+      "reviewCountMatches": true
+    },
+    {
+      "domain": "equipment",
+      "pass": true,
+      "derivedHealth": "REVIEW",
+      "actualHealth": "REVIEW",
+      "lifecycle": "FROZEN",
+      "missingFields": [],
+      "populationMismatches": [],
+      "primarySourceMatchesContract": true,
+      "reviewCountMatches": true
+    },
+    {
+      "domain": "hero-soldier",
+      "pass": true,
+      "derivedHealth": "REVIEW",
+      "actualHealth": "REVIEW",
+      "lifecycle": "FROZEN",
+      "missingFields": [],
+      "populationMismatches": [],
+      "primarySourceMatchesContract": true,
+      "reviewCountMatches": true
+    },
+    {
+      "domain": "banner",
+      "pass": true,
+      "derivedHealth": "REVIEW",
+      "actualHealth": "REVIEW",
+      "lifecycle": "FROZEN",
+      "missingFields": [],
+      "populationMismatches": [],
+      "primarySourceMatchesContract": true,
+      "reviewCountMatches": true
+    },
+    {
+      "domain": "skin",
+      "pass": true,
+      "derivedHealth": "REVIEW",
+      "actualHealth": "REVIEW",
+      "lifecycle": "IN_PROGRESS",
+      "missingFields": [],
+      "populationMismatches": [],
+      "primarySourceMatchesContract": true,
+      "reviewCountMatches": true
+    }
+  ],
+  "classificationFixtures": [
+    {
+      "id": "PASS_ACCEPTED",
+      "expectedHealth": "PASS",
+      "actualHealth": "PASS",
       "pass": true
     },
-    "domainHealthReproduction": {
-      "expected": 6,
-      "actual": 6,
+    {
+      "id": "REVIEW_NON_BLOCKING",
+      "expectedHealth": "REVIEW",
+      "actualHealth": "REVIEW",
       "pass": true
     },
-    "aggregateHealthCountsMatch": true,
-    "aggregateLifecycleCountsMatch": true,
-    "aggregateReviewTotalMatch": true,
-    "aggregateBlockerTotalMatch": true,
-    "aggregateKnownHardErrorTotalMatch": true,
-    "projectHealthPrecedenceMatch": true,
-    "classificationFixtureCount": 9,
-    "classificationFixturePassCount": 9,
-    "classificationFixtureFailureCount": 0
-  },
+    {
+      "id": "REVIEW_IN_PROGRESS_BLOCKER",
+      "expectedHealth": "REVIEW",
+      "actualHealth": "REVIEW",
+      "pass": true
+    },
+    {
+      "id": "FAIL_HARD_ERROR",
+      "expectedHealth": "FAIL",
+      "actualHealth": "FAIL",
+      "pass": true
+    },
+    {
+      "id": "FAIL_RAW_STATUS",
+      "expectedHealth": "FAIL",
+      "actualHealth": "FAIL",
+      "pass": true
+    },
+    {
+      "id": "INCONSISTENT_CONTRACT",
+      "expectedHealth": "INCONSISTENT",
+      "actualHealth": "INCONSISTENT",
+      "pass": true
+    },
+    {
+      "id": "MISSING_PRIMARY",
+      "expectedHealth": "MISSING",
+      "actualHealth": "MISSING",
+      "pass": true
+    },
+    {
+      "id": "FAIL_PRECEDES_INCONSISTENT_AND_REVIEW",
+      "expectedHealth": "FAIL",
+      "actualHealth": "FAIL",
+      "pass": true
+    },
+    {
+      "id": "UNKNOWN_UNCLASSIFIED",
+      "expectedHealth": "UNKNOWN",
+      "actualHealth": "UNKNOWN",
+      "pass": true
+    }
+  ],
+  "fixtureCount": 9,
+  "fixturePassCount": 9,
   "currentSnapshot": {
     "projectHealth": "REVIEW",
     "healthCounts": {
@@ -75,63 +306,8 @@
     "reviewTotal": 33,
     "blockerTotal": 1
   },
-  "domainStates": {
-    "hero": {
-      "lifecycle": "FROZEN",
-      "health": "REVIEW",
-      "canonicalHeroCount": 267,
-      "hardErrorCount": 0
-    },
-    "soldier": {
-      "lifecycle": "COMPLETE",
-      "health": "REVIEW",
-      "canonicalSoldierCount": 224,
-      "heroSoldierRelationCount": 5977,
-      "hardErrorCount": 0
-    },
-    "equipment": {
-      "lifecycle": "FROZEN",
-      "health": "REVIEW",
-      "canonicalEquipmentCount": 390,
-      "publicEquipmentCount": 373,
-      "hardErrorCount": 0
-    },
-    "hero-soldier": {
-      "lifecycle": "FROZEN",
-      "health": "REVIEW",
-      "canonicalPairCount": 5977,
-      "hardErrorCount": 0
-    },
-    "banner": {
-      "lifecycle": "FROZEN",
-      "health": "REVIEW",
-      "definitionCount": 77,
-      "occurrenceCount": 94,
-      "hardErrorCount": 0
-    },
-    "skin": {
-      "lifecycle": "IN_PROGRESS",
-      "health": "REVIEW",
-      "skinCount": 540,
-      "heroCount": 267,
-      "blockerCount": 1,
-      "blocker": "ASSET_BYTES_OR_AUTHENTIC_RESOLUTION_EVIDENCE_NOT_AVAILABLE_IN_REPOSITORY"
-    }
-  },
-  "classificationFixtures": [
-    {"id":"PASS_ACCEPTED","expected":"PASS","actual":"PASS","pass":true},
-    {"id":"REVIEW_NON_BLOCKING","expected":"REVIEW","actual":"REVIEW","pass":true},
-    {"id":"REVIEW_IN_PROGRESS_BLOCKER","expected":"REVIEW","actual":"REVIEW","pass":true},
-    {"id":"FAIL_HARD_ERROR","expected":"FAIL","actual":"FAIL","pass":true},
-    {"id":"FAIL_RAW_STATUS","expected":"FAIL","actual":"FAIL","pass":true},
-    {"id":"INCONSISTENT_CONTRACT","expected":"INCONSISTENT","actual":"INCONSISTENT","pass":true},
-    {"id":"MISSING_PRIMARY","expected":"MISSING","actual":"MISSING","pass":true},
-    {"id":"FAIL_PRECEDES_INCONSISTENT_AND_REVIEW","expected":"FAIL","actual":"FAIL","pass":true},
-    {"id":"UNKNOWN_UNCLASSIFIED","expected":"UNKNOWN","actual":"UNKNOWN","pass":true}
-  ],
-  "importantBoundary": "D1-2 deliberately does not implement stale-output hash detection because D1-0 explicitly excludes stale-output hash comparison from this stage family. That remains a later operating-hardening task.",
   "failures": [],
   "hardErrorCount": 0,
   "nextStage": "D1-3",
-  "nextStageGoal": "Wire the D1-1 collector and D1-2 health gate into stable repository CLI commands without adding GitHub Actions yet."
+  "nextStageGoal": "Wire the read-only collector/health gate into a stable CLI entry point without adding GitHub Actions yet."
 }
