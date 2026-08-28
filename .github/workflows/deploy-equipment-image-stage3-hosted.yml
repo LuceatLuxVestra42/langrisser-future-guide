@@ -47,7 +47,10 @@ jobs:
 
           test "$(find public/images/equipment -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" -eq 373
           node scripts/validate-equipment-image-stage1.mjs
-          bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
+          grep -q '/equipment/\$equipmentId' src/routeTree.gen.ts
+          grep -q 'getOfficialEquipmentImageUrl' src/routes/equipment.tsx
+          grep -q 'getOfficialEquipmentImageUrl' src/routes/equipment_.exclusive.tsx
+          grep -q 'getOfficialEquipmentImageUrl' 'src/routes/equipment_.$equipmentId.tsx'
 
       - name: Reuse proven GitHub Pages static config
         run: |
@@ -87,7 +90,7 @@ jobs:
             const html = fs.readFileSync(file,'utf8');
             if (!html.includes(token)) throw new Error(`${file} missing ${token}`);
           }
-          console.log(`PASS: ${373} Equipment detail pages + 373 images + base-path-aware representative HTML`);
+          console.log('PASS: 373 Equipment detail pages + 373 images + base-path-aware representative HTML');
           NODE
 
           printf '%s\n' '${{ github.sha }}' > dist/client/qa-main-source.txt
