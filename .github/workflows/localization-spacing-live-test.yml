@@ -1,0 +1,20 @@
+name: Localization Spacing Live Test
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run Stage 2 snapshot check
+        run: node scripts/audit-localization.mjs --check
+      - name: Print Stage 2 audit result
+        run: node scripts/audit-localization.mjs --json
+      - name: Run contamination self-tests
+        run: node scripts/audit-localization.mjs --self-test
