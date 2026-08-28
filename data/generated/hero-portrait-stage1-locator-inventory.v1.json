@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage1-asset-locator-inventory",
+  "schemaId": "hero-portrait-stage1-locator-inventory/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "representation": "LIGHTWEIGHT_REFERENCE_INVENTORY_NO_267_ROW_DUPLICATION",
+  "sources": [
+    {
+      "path": "data/checkpoints/hero-portrait-stage0-input-freeze.v1.json",
+      "role": "FROZEN_STAGE0_INPUT"
+    },
+    {
+      "path": "data/generated/hero-card-artwork-stage4.v1.json",
+      "gitBlobSha": "dba8d63e4d865d5949383fcf5189cad43ed73c47",
+      "role": "FROZEN_UNITY_LOCATOR_INDEX"
+    },
+    {
+      "path": "data/generated/hero-portrait-presentation-sample.v1.json",
+      "role": "PROVEN_CLEAN_PNG_SAMPLE_MANIFEST"
+    },
+    {
+      "path": ".github/workflows/deploy-hero-clean-portraits.yml",
+      "role": "EXISTING_SAMPLE_ASSET_GATE"
+    }
+  ],
+  "population": {
+    "canonicalHeroCount": 267,
+    "unityLocatorCoverage": 267,
+    "unityLocatorMissing": 0,
+    "directPngPopulationCoverage": "UNKNOWN_NOT_PROVEN_IN_STAGE1"
+  },
+  "locatorFamilies": [
+    {
+      "id": "UNITY_HERO_PAINTING_PREFAB_LOCATOR",
+      "populationCoverage": 267,
+      "evidenceLevel": "FIELD_COVERAGE_PROVEN_STRUCTURE_PARTIALLY_OBSERVED",
+      "observedPathExamples": [
+        "UI/HeroPainting/SSR_ABS/Prefab/Matthew.prefab",
+        "UI/HeroPainting/SR_ABS/Prefab/Chris.prefab",
+        "UI/HeroPainting/R_ABS/Prefab/Lester.prefab",
+        "UI/HeroPainting/SSR_ABS/Prefab/Leon.prefab"
+      ],
+      "observedRarityFamilies": [
+        "SSR_ABS",
+        "SR_ABS",
+        "R_ABS"
+      ],
+      "populationWideRarityFamilyCensus": "NOT_CLAIMED",
+      "role": "LOCATOR_ONLY_NOT_BITMAP_PROOF",
+      "directWebTransform": false
+    },
+    {
+      "id": "GOOGLE_DRIVE_BASE_SKIN_PNG",
+      "provenRecordCount": 5,
+      "provenHeroIds": [
+        5,
+        6,
+        8,
+        12,
+        15
+      ],
+      "evidenceLevel": "MANIFEST_PROVEN",
+      "sourcePolicy": {
+        "cleanPngOnly": true,
+        "alpha": true,
+        "decorationPolicy": "CLEAN_CHARACTER_ART_ONLY",
+        "bakedRarityBadge": false,
+        "bakedSpBadge": false,
+        "bakedFactionBuffBadge": false
+      },
+      "directReadbackProof": {
+        "heroId": 6,
+        "nameKr": "레온",
+        "driveFileId": "1oPTSwW5O4UWxY6idqHDJ_smjPTm2Wsq1",
+        "fileName": "Leon_Animation_FIN_idle_Normal_default.png",
+        "mimeType": "image/png",
+        "byteLength": 1316695,
+        "sha256": "8d04d4858d8bbb8021cef1439183018293ff28659f42e486ae1306d8c5f616d1",
+        "width": 1443,
+        "height": 2112,
+        "alpha": true,
+        "readbackResult": "MATCH_EXISTING_MANIFEST"
+      },
+      "populationCoverage": "UNKNOWN_NOT_PROVEN_IN_STAGE1",
+      "searchSafety": {
+        "genericFilenameSearchAuthoritative": false,
+        "reason": "Drive search can surface SkinNN variants and can fail to return a file that remains directly readable by known file ID.",
+        "requiredMapping": "driveFileId or separately proven explicit mapping"
+      }
+    },
+    {
+      "id": "WEBP_PRESENTATION_DERIVATIVE",
+      "provenRecordCount": 5,
+      "provenHeroIds": [
+        5,
+        6,
+        8,
+        12,
+        15
+      ],
+      "role": "EXISTING_WEB_SAMPLE_ONLY",
+      "format": "WEBP",
+      "quality": 90,
+      "authoritativeSourcePng": false,
+      "targetCardsContractReplacement": false
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "Keep sourceArtworkPath as a provenance/locator axis, not as a web path or bitmap proof."
+    },
+    {
+      "id": "D2",
+      "decision": "Use GOOGLE_DRIVE_BASE_SKIN_PNG as the first Stage 2 authoritative PNG source candidate because five clean PNG records already have hashes/dimensions and one was directly re-read and matched."
+    },
+    {
+      "id": "D3",
+      "decision": "Do not map by Hero name or fuzzy filename. Skin variants make fuzzy matching unsafe."
+    },
+    {
+      "id": "D4",
+      "decision": "Do not claim 267/267 Drive coverage until a separate explicit-ID/mapping inventory proves it."
+    }
+  ],
+  "openItems": [
+    "Confirm direct source readback for the remaining four proven sample Hero IDs.",
+    "Establish a deterministic Hero ID -> Drive base PNG mapping discovery path beyond the existing five records.",
+    "Determine whether Unity prefab dependency resolution is needed as fallback/provenance for Heroes without Drive mapping.",
+    "Run a population-wide locator rarity-family census only when a script-accessible source is available; do not infer it from partial output."
+  ],
+  "hardErrors": 0,
+  "reviewItems": 4,
+  "nextStage": {
+    "id": "HERO_PORTRAIT_STAGE2_REPRESENTATIVE_RESOLUTION_PROOF",
+    "primaryProofSet": [
+      5,
+      6,
+      8,
+      12,
+      15
+    ],
+    "minimumActions": [
+      "direct-read all five source PNGs by proven Drive file ID",
+      "verify PNG signature, byteLength, SHA-256, dimensions, alpha",
+      "verify base-character-only identity and exclude skin/SP/decoration contamination",
+      "freeze the exact source-to-output rule before any 267-Hero bulk operation"
+    ]
+  }
+}
