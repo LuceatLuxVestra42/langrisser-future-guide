@@ -51,10 +51,74 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validate C-1 final cross-consumer pair parity
+      - name: Resolve validation refs
+        id: refs
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            base="${{ github.event.before }}"
+            head="${{ github.sha }}"
+            if [[ -z "$base" || "$base" =~ ^0+$ ]]; then
+              base="$(git rev-parse HEAD^)"
+            fi
+          else
+            base="$(git rev-parse HEAD^)"
+            head="$(git rev-parse HEAD)"
+          fi
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+          echo "head=$head" >> "$GITHUB_OUTPUT"
+          echo "Resolved C-1 validation diff: $base...$head"
+
+      - name: Validate C-1 with SR-8 partial replacement
         id: validate
         continue-on-error: true
-        run: node scripts/validate-hero-soldier-stageC-1-pair-parity.cjs
+        shell: bash
+        run: |
+          set +e
+          node scripts/smart-regression-sr8-admission.mjs \
+            --execute \
+            --json \
+            --base "${{ steps.refs.outputs.base }}" \
+            --head "${{ steps.refs.outputs.head }}" \
+            > smart-regression-sr8-c1.json \
+            2> smart-regression-sr8-c1.stderr.log
+          sr8_code=$?
+          set -e
+
+          cat smart-regression-sr8-c1.json || true
+          if [[ -s smart-regression-sr8-c1.stderr.log ]]; then
+            cat smart-regression-sr8-c1.stderr.log >&2
+          fi
+
+          decision="$(node - <<'NODE'
+          const fs = require('fs');
+          try {
+            const value = JSON.parse(fs.readFileSync('smart-regression-sr8-c1.json', 'utf8'));
+            process.stdout.write(value.decision || 'ADMISSION_ERROR');
+          } catch {
+            process.stdout.write('ADMISSION_ERROR');
+          }
+          NODE
+          )"
+          echo "sr8_decision=$decision" >> "$GITHUB_OUTPUT"
+          echo "SR-8 decision: $decision (exit=$sr8_code)"
+
+          if [[ "$sr8_code" -eq 0 && "$decision" == "REPLACEMENT_EXECUTED" ]]; then
+            echo 'C-1 validated through Smart Regression replacement path.'
+            exit 0
+          fi
+
+          if [[ "$sr8_code" -eq 3 && "$decision" == "LEGACY_REQUIRED" ]]; then
+            echo 'SR-8 admission was not narrow/safe enough; running unchanged legacy C-1 validator.'
+            node scripts/validate-hero-soldier-stageC-1-pair-parity.cjs
+            exit $?
+          fi
+
+          echo 'SR-8 admission/execution failed unexpectedly; do not silently fall back.' >&2
+          exit "$sr8_code"
 
       - name: Show C-1 summary
         if: always() && hashFiles('data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json') != ''
@@ -76,7 +140,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: hero-soldier-stageC-1-pair-parity
-          path: data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json
+          path: |
+            data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json
+            smart-regression-sr8-c1.json
+            smart-regression-sr8-c1.stderr.log
+          if-no-files-found: warn
 
       - name: Freeze C-1 output on work branch
         if: steps.validate.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/hero-soldier-stageC-1')
