@@ -9,6 +9,7 @@
   "implementation": {
     "refreshRunner": "scripts/run-project-doctor-d5-refresh.mjs",
     "freshnessValidator": "scripts/validate-project-doctor-d5.mjs",
+    "freshnessSelfTest": "scripts/validate-project-doctor-d5-fixtures.mjs",
     "manifest": "data/generated/project-doctor-d5-freshness.v1.json",
     "doctorStatusEntrypoint": "node scripts/run-project-doctor-d5-refresh.mjs",
     "integratedDoctorEntrypoint": "node scripts/run-project-doctor-closeout.mjs"
@@ -29,7 +30,7 @@
     "producerChangeDetected": true
   },
   "isolatedVerification": {
-    "status": "PASS_D5_FIXTURES",
+    "status": "PASS_PROJECT_DOCTOR_D5_FIXTURES",
     "fixtureCount": 7,
     "fixturePassCount": 7,
     "fixtures": [
@@ -41,6 +42,7 @@
       "SOURCE_SET_CHANGE_STALE",
       "PRODUCER_CHANGE_STALE"
     ],
+    "repositorySelfTestCommandAdded": "npm run doctor:freshness:self-test",
     "actualRepositoryChildCommandExecutionCount": 0
   },
   "runtimeBootstrap": {
@@ -58,7 +60,8 @@
     "D5 snapshots authoritative inputs again and blocks if any changed during refresh",
     "D5 hashes current inputs and D1 outputs into the freshness manifest",
     "D5 immediately validates the manifest against the current repository working tree",
-    "Only then may the integrated Doctor continue to D4 self-test and selected-check execution"
+    "D5 synthetic freshness fixtures run before D4 execution fixtures",
+    "Only then may the integrated Doctor continue to D3-selected D4 execution"
   ],
   "boundaries": {
     "rawConfigDataReadAdded": false,
