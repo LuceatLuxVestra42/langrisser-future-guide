@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_1",
+  "status": "ID_INDEX_CONTRACT_FROZEN",
+  "purpose": "Materialize deterministic minimal ID lookup indexes for Hero, Soldier, Skill, and Equipment without duplicating full ConfigData records or creating new semantic relations.",
+  "predecessor": {
+    "contract": "data/contracts/configdata-lookup-stage0-contract.v1.json",
+    "requiredStatus": "CONTRACT_FROZEN",
+    "requiredPassStatus": "PASS_CONFIGDATA_LOOKUP_STAGE0_CONTRACT"
+  },
+  "indexFormat": {
+    "schemaVersion": 1,
+    "keyEncoding": "STRINGIFIED_EXPLICIT_SOURCE_ID",
+    "recordLocator": "source.containerPath + byId[id].recordIndex",
+    "sourceHash": "SHA-256 of exact UTF-8 source file bytes",
+    "storeFullSourceRecord": false,
+    "storeDirectRelations": false,
+    "storeCanonicalRelations": false,
+    "nameFieldsAreDiscoveryMetadataOnly": true,
+    "ordering": "deterministic ID ordering; source record order is preserved only through recordIndex"
+  },
+  "entities": {
+    "Hero": {
+      "source": "data/configdata/ConfigDataHeroInfo.json",
+      "primaryKey": "ID",
+      "output": "data/index/hero.v1.json",
+      "searchLabelFields": ["Name", "Name_Eng"]
+    },
+    "Soldier": {
+      "source": "data/configdata/ConfigDataSoldierInfo.json",
+      "primaryKey": "ID",
+      "output": "data/index/soldier.v1.json",
+      "searchLabelFields": ["Name"]
+    },
+    "Skill": {
+      "source": "data/configdata/ConfigDataSkillInfo.json",
+      "primaryKey": "ID",
+      "output": "data/index/skill.v1.json",
+      "searchLabelFields": ["Name"]
+    },
+    "Equipment": {
+      "source": "data/configdata/ConfigDataEquipmentInfo.json",
+      "primaryKey": "ID",
+      "output": "data/index/equipment.v1.json",
+      "searchLabelFields": ["Name"]
+    }
+  },
+  "acceptedSourceContainers": [
+    "ROOT_ARRAY",
+    "records",
+    "data",
+    "items"
+  ],
+  "labelPolicy": {
+    "copyOnlyExactStringFieldsListedByEntity": true,
+    "omitMissingOrEmptyLabels": true,
+    "labelsMayBeUsedForCanonicalJoin": false,
+    "fuzzyMatching": false,
+    "normalizationBeyondStringPreservation": false
+  },
+  "failurePolicy": {
+    "missingSource": "FAIL",
+    "unsupportedSourceContainer": "FAIL",
+    "missingPrimaryKey": "FAIL",
+    "nullOrEmptyPrimaryKey": "FAIL",
+    "duplicatePrimaryKey": "FAIL",
+    "generatedSourceHashMismatch": "FAIL",
+    "generatedIdSetMismatch": "FAIL",
+    "generatedRecordLocatorMismatch": "FAIL",
+    "unexpectedFullRecordCopy": "FAIL"
+  },
+  "generation": {
+    "library": "scripts/lib/configdata-lookup-stage1.mjs",
+    "generator": "scripts/build-configdata-lookup-stage1.mjs",
+    "command": "npm run build:configdata-lookup-stage1",
+    "summary": "data/validation/configdata-lookup-stage1-summary.v1.json"
+  },
+  "validation": {
+    "validator": "scripts/validate-configdata-lookup-stage1.mjs",
+    "command": "npm run validate:configdata-lookup-stage1",
+    "requiredChecks": [
+      "Stage 0 predecessor contract remains frozen",
+      "all four source files parse through an explicitly accepted container",
+      "every source record has a non-empty explicit ID",
+      "source IDs are unique per entity",
+      "generated source hash matches current source bytes",
+      "generated ID set exactly equals current source ID set",
+      "each generated recordIndex resolves back to the same source ID",
+      "only approved search label fields are copied",
+      "full ConfigData records are not duplicated into the index",
+      "regeneration produces byte-identical index and summary content"
+    ],
+    "passStatus": "PASS_CONFIGDATA_LOOKUP_STAGE1_ID_INDEX"
+  },
+  "outOfScope": [
+    "forward JOIN graph generation",
+    "reverse-reference generation",
+    "canonical overlay materialization",
+    "runtime CLI lookup",
+    "name-based canonical JOIN",
+    "ID arithmetic inference",
+    "project-level relation recomputation",
+    "incremental rebuild dependency graph"
+  ],
+  "nextStage": {
+    "stage": "CONFIGDATA_LOOKUP_STAGE_2",
+    "goal": "Add explicitly approved forward JOIN indexes for the first high-value Hero, Soldier, and Equipment lookup paths without changing canonical semantics."
+  }
+}
