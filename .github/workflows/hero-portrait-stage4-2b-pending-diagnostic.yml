@@ -1,0 +1,27 @@
+name: Hero portrait Stage 4-2B pending diagnostic
+
+on:
+  push:
+    branches:
+      - work/hero-portrait-stage4-2b-explicit-fallback-source-acquisition
+    paths:
+      - scripts/hero_portrait_stage4_2b_pending_diagnostic.py
+      - .github/workflows/hero-portrait-stage4-2b-pending-diagnostic.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/hero_portrait_stage4_2b_pending_diagnostic.py
+      - run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/hero-portrait-stage4-2b-pending-diagnostic.v1.json
+          if git diff --cached --quiet; then echo 'No changes.'; else git commit -m 'Diagnose remaining Hero portrait Stage 4-2B sources'; git push; fi
