@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "stage": "SMART_REGRESSION_SR6",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "mode": "SHADOW_ACTIVE",
+  "branch": "work/smart-regression-sr6-shadow",
+  "latestMainAtRebase": "5a241e7a9ffe0a87fa23260ca9a179138af95dc9",
+  "rebasePolicy": {
+    "sr5HadDivergedFromMain": true,
+    "sr5AheadByAtDetection": 17,
+    "sr5BehindByAtDetection": 25,
+    "action": "Rebuilt SR-6 from latest main and reused only confirmed SR-1 through SR-5 Smart Regression blobs plus package script additions.",
+    "unrelatedMainChangesOverwritten": false
+  },
+  "artifacts": {
+    "workflow": ".github/workflows/smart-regression-shadow.yml",
+    "impactMap": "data/contracts/regression-impact-map.v1.json",
+    "bindings": "data/contracts/regression-bindings.sr3.v1.json",
+    "fallbackPolicy": "data/contracts/regression-fallback-policy.sr4.v1.json",
+    "fixtureMatrix": "data/fixtures/smart-regression-sr5-cases.v1.json",
+    "fixtureRunner": "scripts/test-smart-regression-fixtures.mjs"
+  },
+  "workflowPolicy": {
+    "triggers": ["push:main", "push:work/smart-regression-sr6-shadow", "pull_request:main", "workflow_dispatch"],
+    "permissions": "contents:read",
+    "fixtureFailureFailsWorkflow": true,
+    "smartRegressionDryRunIsMergeGate": false,
+    "blockedDryRunFailsWorkflow": false,
+    "evidenceArtifactRetentionDays": 14,
+    "existingLegacyOrFullWorkflowsModified": false
+  },
+  "verifiedRun": {
+    "runId": 33141569520,
+    "jobId": 98753341365,
+    "event": "push",
+    "headSha": "7c0ba62421b1a2b5bf21e406398a2318fa993109",
+    "jobConclusion": "success",
+    "fixtureStepConclusion": "success",
+    "shadowStepConclusion": "success",
+    "artifactUploadConclusion": "success",
+    "artifact": {
+      "id": 9674127811,
+      "name": "smart-regression-shadow-33141569520",
+      "sizeBytes": 3449,
+      "digest": "sha256:49613e86fd0d71735a7dcba3a2ccd3c61b68267e35bda84fafcac4f676c5edf7",
+      "expiresAt": "2026-09-11T04:21:36Z"
+    }
+  },
+  "sr5RuntimeProof": {
+    "command": "bun run test:smart-regression:fixtures",
+    "status": "PASS",
+    "completion": "SR5_REPRESENTATIVE_FIXTURES_COMPLETE",
+    "representativeCaseCount": 17,
+    "passedCaseCount": 17,
+    "failedCaseCount": 0,
+    "falseNegativeCount": 0,
+    "executorControlChecksPassed": true,
+    "dedupe": "PASS_EXECUTED / plannedCommandCount=1 for two gates sharing one command",
+    "failFast": "PASS / failing command exit 7 and following command NOT_RUN"
+  },
+  "shadowObservation": {
+    "comparisonBase": "9e30aac242ebac6b1b3e7a6aaf9a18c91f520c09",
+    "comparisonHead": "7c0ba62421b1a2b5bf21e406398a2318fa993109",
+    "changedFiles": [".github/workflows/smart-regression-shadow.yml"],
+    "reportStatus": "BLOCKED_UNBOUND",
+    "matchedRules": ["workflow-changes"],
+    "requestedGates": ["global.safe-fallback"],
+    "unknownPaths": [],
+    "interpretation": "Expected shadow evidence. Workflow changes intentionally expand to broad safe fallback, and unresolved gates remain fail-closed inside the Smart Regression report while the shadow workflow records the result without becoming a merge gate."
+  },
+  "reviews": [
+    {
+      "code": "PARTIAL_GATE_BINDINGS_REMAIN",
+      "blockingSR6Completion": false,
+      "effect": "Broad fallback observations can remain BLOCKED_UNBOUND until remaining domain validators are safely bound."
+    },
+    {
+      "code": "ACTION_RUNTIME_DEPRECATION_WARNING",
+      "blockingSR6Completion": false,
+      "effect": "GitHub emitted Node 20 deprecation warnings for actions/checkout@v4 and actions/upload-artifact@v4 while forcing Node 24. The run still completed successfully; action-version maintenance can be handled separately."
+    }
+  ],
+  "nextStartPoint": "SR-7 real branch/PR comparison. Collect shadow observations from representative real changes and compare selected gates/results against the existing legacy/full validation outcomes. Require zero observed false negatives before any SR-8 CI replacement decision."
+}
