@@ -1,0 +1,443 @@
+{
+  "schemaVersion": 1,
+  "id": "smart-regression-impact-map-v1",
+  "status": "SR1_FROZEN",
+  "baseCommit": "2bff93e5c9a02d87e2e22a3e1a74d60362f969e6",
+  "purpose": "Map changed repository paths to existing validation gates without reopening frozen semantics unnecessarily.",
+  "pathMatching": {
+    "syntax": "minimatch-compatible-glob",
+    "evaluation": "ALL_MATCHING_RULES",
+    "specificRulesDoNotSuppressGlobalRules": true,
+    "docsOnlyBypassUnknownFallback": true
+  },
+  "policy": {
+    "unknownChange": "SAFE_FALLBACK",
+    "frontendChangesDoNotReopenFrozenSemantics": true,
+    "presentationChangesDoNotReopenFrozenSemantics": true,
+    "rawConfigChangesUseImpactSentinelsBeforeFrozenStageReopen": true,
+    "docsOnlyDefault": "NO_HEAVY_REGRESSION",
+    "neverSilentlySkipUnknownPaths": true,
+    "unboundGateBehavior": "REPORT_UNRESOLVED_AND_FAIL_CLOSED_IN_SR2"
+  },
+  "docsOnly": {
+    "globs": ["**/*.md", "**/*.txt"],
+    "selectedGates": [],
+    "note": "Documentation-only changes skip heavy regression unless a later SR2 override marks a document as a machine-readable input."
+  },
+  "domains": {
+    "hero": {"frozenSemantics": true},
+    "soldier": {"frozenSemantics": true},
+    "soldier-asset": {"frozenSemantics": false},
+    "hero-soldier": {"frozenSemantics": true},
+    "equipment": {"frozenSemantics": true},
+    "banner": {"frozenSemantics": true},
+    "skin": {"frozenSemantics": true},
+    "shared": {"frozenSemantics": false},
+    "global": {"frozenSemantics": false}
+  },
+  "reopenPolicies": {
+    "heroSoldierC": {
+      "default": "DO_NOT_REOPEN",
+      "reopenWhen": [
+        "A_STAGE_CANONICAL_RELATION_SNAPSHOT_CHANGED",
+        "FINAL_CONSUMER_PAIR_PARITY_BROKEN",
+        "C0_TO_C4_FROZEN_CHECKPOINT_OR_CONTRACT_VERSION_CHANGED",
+        "CANONICAL_HERO_OR_SOLDIER_ID_SYSTEM_CHANGED"
+      ],
+      "notReopenReasons": [
+        "FRONTEND_STYLE_CHANGE",
+        "IMAGE_CHANGE",
+        "KOREAN_NAME_PRESENTATION_CHANGE"
+      ]
+    }
+  },
+  "gates": {
+    "global.build": {
+      "domain": "global",
+      "kind": "GLOBAL",
+      "command": "bun run build",
+      "executable": true,
+      "resolutionStatus": "VERIFIED_EXECUTABLE"
+    },
+    "shared.contract": {
+      "domain": "shared",
+      "kind": "GLOBAL",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING",
+      "reason": "Shared contract validation exists conceptually, but SR1 does not guess a command name."
+    },
+    "hero.asset.integrity": {
+      "domain": "hero",
+      "kind": "DOMAIN",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING"
+    },
+    "hero.frontend.route": {
+      "domain": "hero",
+      "kind": "DOMAIN",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING"
+    },
+    "hero.final.consumer": {
+      "domain": "hero",
+      "kind": "FROZEN_SENTINEL",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING"
+    },
+    "soldier.portrait.integrity": {
+      "domain": "soldier-asset",
+      "kind": "DOMAIN",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING",
+      "baseline": {
+        "canonicalSoldier": 224,
+        "normalSoldier": 168,
+        "spSoldier": 56,
+        "portraitSourceCoverage": "224/224",
+        "webpDeliveryCoverage": "224/224"
+      }
+    },
+    "soldier.frontend.route": {
+      "domain": "soldier",
+      "kind": "DOMAIN",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING"
+    },
+    "soldier.final.consumer": {
+      "domain": "soldier",
+      "kind": "FROZEN_SENTINEL",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING"
+    },
+    "hero-soldier.pair-parity": {
+      "domain": "hero-soldier",
+      "kind": "FROZEN_SENTINEL",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING",
+      "baseline": {"hero": 267, "soldier": 224, "reciprocalPairs": 5977}
+    },
+    "hero-soldier.impact-sentinel": {
+      "domain": "hero-soldier",
+      "kind": "FROZEN_SENTINEL",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING",
+      "reason": "Raw Hero/Soldier ConfigData changes must prove downstream impact before reopening C."
+    },
+    "equipment.asset.consumer": {
+      "domain": "equipment",
+      "kind": "DOMAIN",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING"
+    },
+    "equipment.frontend": {
+      "domain": "equipment",
+      "kind": "DOMAIN",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING"
+    },
+    "equipment.final.consumer": {
+      "domain": "equipment",
+      "kind": "FROZEN_SENTINEL",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING"
+    },
+    "skin.stage3.asset": {
+      "domain": "skin",
+      "kind": "DOMAIN",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING",
+      "reason": "Asset work must not recompute frozen Hero-Skin ownership/sourceOrder."
+    },
+    "skin.frontend": {
+      "domain": "skin",
+      "kind": "DOMAIN",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "REQUIRES_SR2_BINDING"
+    },
+    "banner.stage3.input": {
+      "domain": "banner",
+      "kind": "LEAF",
+      "command": "node scripts/validate-banner-stage3-0-input-contract.mjs",
+      "executable": true,
+      "resolutionStatus": "VERIFIED_EXECUTABLE"
+    },
+    "banner.stage3.asset": {
+      "domain": "banner",
+      "kind": "LEAF",
+      "command": "node scripts/validate-banner-stage3-1-asset-relation.mjs",
+      "executable": true,
+      "resolutionStatus": "VERIFIED_EXECUTABLE"
+    },
+    "banner.stage3.display": {
+      "domain": "banner",
+      "kind": "LEAF",
+      "command": "node scripts/validate-banner-stage3-2-display-metadata.mjs",
+      "executable": true,
+      "resolutionStatus": "VERIFIED_EXECUTABLE"
+    },
+    "banner.stage3.basic-table": {
+      "domain": "banner",
+      "kind": "LEAF",
+      "command": "node scripts/validate-banner-stage3-3-basic-table-consumer.mjs",
+      "executable": true,
+      "resolutionStatus": "VERIFIED_EXECUTABLE"
+    },
+    "banner.stage3.wish": {
+      "domain": "banner",
+      "kind": "LEAF",
+      "command": "node scripts/validate-banner-stage3-4-wish-consumer.mjs",
+      "executable": true,
+      "resolutionStatus": "VERIFIED_EXECUTABLE"
+    },
+    "banner.stage3.cp-event": {
+      "domain": "banner",
+      "kind": "LEAF",
+      "command": "node scripts/validate-banner-stage3-5-cp-event-consumer.mjs",
+      "executable": true,
+      "resolutionStatus": "VERIFIED_EXECUTABLE"
+    },
+    "banner.stage3.recurrence": {
+      "domain": "banner",
+      "kind": "LEAF",
+      "command": "node scripts/validate-banner-stage3-6-recurrence-pickup-log-consumer.mjs",
+      "executable": true,
+      "resolutionStatus": "VERIFIED_EXECUTABLE"
+    },
+    "banner.stage3.frontend": {
+      "domain": "banner",
+      "kind": "LEAF",
+      "command": "node scripts/validate-banner-stage3-7-frontend-integration.mjs",
+      "executable": true,
+      "resolutionStatus": "VERIFIED_EXECUTABLE"
+    },
+    "banner.stage3.freeze": {
+      "domain": "banner",
+      "kind": "FROZEN_SENTINEL",
+      "command": "node scripts/validate-banner-stage3-8-regression-freeze.mjs",
+      "executable": true,
+      "resolutionStatus": "VERIFIED_EXECUTABLE"
+    },
+    "banner.stage3.full": {
+      "domain": "banner",
+      "kind": "COMPOSITE",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "VIRTUAL_COMPOSITE",
+      "members": [
+        "banner.stage3.input",
+        "banner.stage3.asset",
+        "banner.stage3.display",
+        "banner.stage3.basic-table",
+        "banner.stage3.wish",
+        "banner.stage3.cp-event",
+        "banner.stage3.recurrence",
+        "banner.stage3.frontend",
+        "global.build",
+        "banner.stage3.freeze"
+      ]
+    },
+    "global.safe-fallback": {
+      "domain": "global",
+      "kind": "COMPOSITE",
+      "command": null,
+      "executable": false,
+      "resolutionStatus": "VIRTUAL_COMPOSITE",
+      "members": ["shared.contract", "global.build"]
+    }
+  },
+  "rules": [
+    {
+      "id": "hero-assets",
+      "domain": "hero",
+      "match": ["public/images/heroes/**"],
+      "select": ["hero.asset.integrity", "hero.frontend.route", "global.build"],
+      "doNotSelect": ["hero-soldier.pair-parity"],
+      "reason": "Hero image changes are presentation-only unless canonical contracts also changed."
+    },
+    {
+      "id": "hero-frontend",
+      "domain": "hero",
+      "match": ["src/routes/heroes/**", "src/routes/heroes*", "src/lib/hero*.ts", "src/lib/hero*.tsx"],
+      "select": ["hero.frontend.route", "global.build"],
+      "reason": "Frontend-only Hero changes do not reopen frozen Hero or Hero-Soldier semantics."
+    },
+    {
+      "id": "soldier-portrait-source",
+      "domain": "soldier-asset",
+      "match": ["public/images/soldiers/**"],
+      "select": ["soldier.portrait.integrity", "soldier.frontend.route", "global.build"],
+      "doNotSelect": ["hero-soldier.pair-parity"],
+      "reason": "Authoritative PNG portrait changes validate asset integrity and frontend only."
+    },
+    {
+      "id": "soldier-portrait-webp",
+      "domain": "soldier-asset",
+      "match": ["public/images/soldiers-webp/**"],
+      "select": ["soldier.portrait.integrity", "soldier.frontend.route", "global.build"],
+      "doNotSelect": ["hero-soldier.pair-parity"],
+      "reason": "Lossless WebP delivery changes must preserve the 224/224 portrait contract."
+    },
+    {
+      "id": "soldier-frontend",
+      "domain": "soldier",
+      "match": ["src/routes/soldiers/**", "src/routes/soldiers*", "src/lib/soldier*.ts", "src/lib/soldier*.tsx"],
+      "select": ["soldier.frontend.route", "global.build"],
+      "reason": "Soldier presentation/navigation changes do not reopen canonical relation stages."
+    },
+    {
+      "id": "soldier-configdata",
+      "domain": "soldier",
+      "match": ["data/configdata/ConfigDataSoldierInfo.json", "data/configdata/ConfigDataSPSoldierInfo.json"],
+      "select": ["soldier.final.consumer", "hero-soldier.impact-sentinel", "hero-soldier.pair-parity"],
+      "reopen": "CONDITIONAL",
+      "reason": "Run impact/parity sentinels first; C is reopened only when its explicit reopen conditions become true."
+    },
+    {
+      "id": "hero-configdata",
+      "domain": "hero",
+      "match": ["data/configdata/ConfigDataHeroInfo.json", "data/configdata/ConfigDataSPHeroInfo.json"],
+      "select": ["hero.final.consumer", "hero-soldier.impact-sentinel", "hero-soldier.pair-parity"],
+      "reopen": "CONDITIONAL",
+      "reason": "Hero identity/relation source changes require downstream impact checks, not automatic frozen-stage reopening."
+    },
+    {
+      "id": "hero-soldier-frozen-consumers",
+      "domain": "hero-soldier",
+      "match": [
+        "data/generated/**/*hero*soldier*.json",
+        "data/generated/**/*soldier*hero*.json",
+        "data/contracts/**/*hero*soldier*.json",
+        "data/contracts/**/*soldier*hero*.json",
+        "data/validation/**/*hero*soldier*.json",
+        "data/validation/**/*soldier*hero*.json"
+      ],
+      "select": ["hero-soldier.pair-parity"],
+      "reopen": "CONDITIONAL",
+      "reason": "Frozen relation artifacts must preserve 5,977 reciprocal pair parity."
+    },
+    {
+      "id": "equipment-assets",
+      "domain": "equipment",
+      "match": ["public/images/equipment/**"],
+      "select": ["equipment.asset.consumer", "equipment.frontend", "global.build"],
+      "reason": "Equipment asset changes stay in the consumer/presentation layer."
+    },
+    {
+      "id": "equipment-frontend",
+      "domain": "equipment",
+      "match": ["src/routes/equipment/**", "src/routes/equipment*", "src/lib/equipment*.ts", "src/lib/equipment*.tsx"],
+      "select": ["equipment.frontend", "global.build"]
+    },
+    {
+      "id": "equipment-configdata",
+      "domain": "equipment",
+      "match": ["data/configdata/ConfigDataEquipmentInfo.json"],
+      "select": ["equipment.final.consumer"],
+      "reason": "Canonical equipment input changes require the frozen consumer sentinel."
+    },
+    {
+      "id": "banner-assets",
+      "domain": "banner",
+      "match": ["public/images/banners/**"],
+      "select": ["banner.stage3.asset", "banner.stage3.display", "banner.stage3.frontend", "global.build", "banner.stage3.freeze"],
+      "reason": "Banner asset changes consume frozen Stage 2 identity and validate only Stage 3 presentation/integration surfaces."
+    },
+    {
+      "id": "banner-frontend",
+      "domain": "banner",
+      "match": ["src/routes/banners.tsx", "src/lib/banner-page.server.ts", "src/lib/banner-page.functions.ts"],
+      "select": ["banner.stage3.frontend", "global.build", "banner.stage3.freeze"]
+    },
+    {
+      "id": "banner-stage3-contracts",
+      "domain": "banner",
+      "match": [
+        "data/contracts/banner-stage3-*.json",
+        "data/generated/banner-stage3-*.json",
+        "data/validation/banner-stage3-*.json",
+        "scripts/validate-banner-stage3-*.mjs"
+      ],
+      "select": ["banner.stage3.full"],
+      "reason": "Stage 3 contract/generated/validator changes require the complete frozen Stage 3 validation chain."
+    },
+    {
+      "id": "skin-assets",
+      "domain": "skin",
+      "match": ["public/images/skins/**"],
+      "select": ["skin.stage3.asset", "skin.frontend", "global.build"],
+      "reason": "Skin asset work must not recompute frozen 540 Skin to 267 Hero ownership/sourceOrder."
+    },
+    {
+      "id": "skin-stage3-artifacts",
+      "domain": "skin",
+      "match": ["data/contracts/skin-stage3-*.json", "data/generated/skin-stage3-*.json", "data/validation/skin-stage3-*.json"],
+      "select": ["skin.stage3.asset"],
+      "reason": "Stage 3 is an asset-resolution layer over frozen Stage 2 ownership."
+    },
+    {
+      "id": "shared-build-config",
+      "domain": "global",
+      "match": ["package.json", "bun.lock", "vite.config.*", "tsconfig*.json", "src/routeTree.gen.ts"],
+      "select": ["global.build"]
+    },
+    {
+      "id": "workflow-changes",
+      "domain": "global",
+      "match": [".github/workflows/**"],
+      "select": ["global.safe-fallback"],
+      "reason": "Workflow edits can alter validation execution and use a conservative fallback."
+    },
+    {
+      "id": "shared-contract-changes",
+      "domain": "shared",
+      "match": ["data/contracts/**"],
+      "select": ["shared.contract", "global.build"],
+      "reason": "Unclassified contract changes are treated conservatively."
+    },
+    {
+      "id": "raw-configdata-fallback",
+      "domain": "shared",
+      "match": ["data/configdata/ConfigData*.json"],
+      "select": ["shared.contract", "global.build"],
+      "reason": "Unclassified raw ConfigData changes must not silently skip validation."
+    },
+    {
+      "id": "shared-source-fallback",
+      "domain": "shared",
+      "match": ["src/**"],
+      "select": ["global.build"],
+      "reason": "Unclassified source changes always receive at least a production build gate."
+    }
+  ],
+  "fallback": {
+    "unknownPath": ["global.safe-fallback"],
+    "reason": "Unknown paths must never silently skip regression. SR2 expands the safe fallback and fails closed when required gates are still unbound."
+  },
+  "sr2Handoff": {
+    "nextArtifact": "scripts/smart-regression.mjs",
+    "requiredCapabilities": [
+      "compute changed files from base/head",
+      "match all applicable rules",
+      "expand composite gates",
+      "deduplicate selected gates",
+      "report selected/skipped/unbound gates",
+      "support dry-run",
+      "fail closed on unknown paths or unresolved required gates",
+      "bind REQUIRES_SR2_BINDING gates only to verified existing commands"
+    ]
+  }
+}

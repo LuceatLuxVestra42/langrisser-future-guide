@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "id": "smart-regression-fallback-policy-sr4-v1",
+  "status": "SR4_FROZEN",
+  "impactMapId": "smart-regression-impact-map-v1",
+  "purpose": "Apply catch-all rules only when no specific/canonical owner rule matches, add deterministic canonical-consumer rules, and widen unknown/shared fallback without silently weakening unresolved coverage.",
+  "catchAllRuleIds": [
+    "shared-contract-changes",
+    "raw-configdata-fallback",
+    "shared-source-fallback"
+  ],
+  "catchAllSelectOverrides": {
+    "shared-contract-changes": ["global.safe-fallback"],
+    "raw-configdata-fallback": ["global.safe-fallback"]
+  },
+  "safeFallbackMembers": [
+    "shared.contract",
+    "hero.asset.integrity",
+    "hero.frontend.route",
+    "hero.final.consumer",
+    "soldier.portrait.integrity",
+    "soldier.frontend.route",
+    "soldier.final.consumer",
+    "hero-soldier.pair-parity",
+    "hero-soldier.impact-sentinel",
+    "equipment.asset.consumer",
+    "equipment.frontend",
+    "equipment.final.consumer",
+    "banner.stage3.full",
+    "skin.stage3.asset",
+    "skin.frontend",
+    "global.build"
+  ],
+  "unknownPathGates": ["global.safe-fallback"],
+  "unknownPathReason": "Unknown paths expand to the broad SR-4 safe fallback. The run remains fail-closed when any required domain gate is still unresolved.",
+  "canonicalRules": [
+    {
+      "id": "sr4-hero-final-consumer-artifacts",
+      "domain": "hero",
+      "match": [
+        "data/generated/hero-detail.v1.json",
+        "data/generated/hero-detail-shared.v1.json",
+        "data/generated/hero-detail/by-id/**"
+      ],
+      "select": ["hero.final.consumer"],
+      "reason": "Final Hero publication artifacts are validated by the frozen Stage 6-4 consumer sentinel."
+    },
+    {
+      "id": "sr4-hero-canonical-identity",
+      "domain": "hero",
+      "match": ["data/hero-name-master.v1.json"],
+      "select": [
+        "hero.final.consumer",
+        "hero-soldier.impact-sentinel",
+        "hero-soldier.pair-parity"
+      ],
+      "reason": "Hero canonical identity changes require downstream Hero publication and Hero-Soldier impact/parity checks before any frozen relation is reopened."
+    },
+    {
+      "id": "sr4-soldier-final-consumer-artifacts",
+      "domain": "soldier",
+      "match": [
+        "data/generated/soldier-list-stage5-8.v1.json",
+        "data/generated/soldier-stage6-*.v1.json",
+        "data/generated/soldier-detail-stage5-*.v1.json"
+      ],
+      "select": ["soldier.final.consumer"],
+      "reason": "Final Soldier publication/consumer artifacts use the frozen Soldier final-consumer sentinel."
+    },
+    {
+      "id": "sr4-soldier-canonical-identity",
+      "domain": "soldier",
+      "match": ["data/generated/soldier-master.v1.json"],
+      "select": [
+        "soldier.final.consumer",
+        "hero-soldier.impact-sentinel",
+        "hero-soldier.pair-parity"
+      ],
+      "reason": "Soldier canonical identity changes require Soldier final validation plus Hero-Soldier impact/parity checks."
+    },
+    {
+      "id": "sr4-soldier-portrait-manifests",
+      "domain": "soldier-asset",
+      "match": ["data/generated/soldier-portrait-*.json"],
+      "select": [
+        "soldier.portrait.integrity",
+        "soldier.frontend.route",
+        "global.build"
+      ],
+      "reason": "Portrait manifest changes are asset/presentation changes and do not reopen frozen Hero-Soldier semantics."
+    },
+    {
+      "id": "sr4-equipment-stage3-consumers",
+      "domain": "equipment",
+      "match": ["data/generated/equipment_stage3_*.json"],
+      "select": ["equipment.final.consumer", "equipment.frontend"],
+      "reason": "Frozen Equipment Stage 3 consumer payload changes require both Stage 3 parity and Stage 4 frontend-consumer regression."
+    },
+    {
+      "id": "sr4-exclusive-equipment-ownership-consumers",
+      "domain": "equipment",
+      "match": [
+        "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+        "data/generated/hero-exclusive-equipment-by-equipment.v1.json",
+        "data/generated/hero-exclusive-equipment-consumer-admission.v1.json"
+      ],
+      "select": ["hero.final.consumer", "equipment.frontend"],
+      "reason": "Frozen exclusive-equipment ownership indexes are consumed by both Hero and Equipment publication boundaries."
+    },
+    {
+      "id": "sr4-skin-frozen-ownership-artifacts",
+      "domain": "skin",
+      "match": [
+        "data/generated/skin-stage1-canonical.v1.json",
+        "data/generated/skin-stage2-*.json"
+      ],
+      "select": ["skin.stage3.asset"],
+      "reason": "Skin canonical/ownership relation changes must flow through the Stage 3 asset layer without re-deriving ownership in frontend code."
+    }
+  ],
+  "completionPolicy": {
+    "specificRuleSuppressesCatchAllForSameFile": true,
+    "canonicalRuleCountsAsSpecificOwner": true,
+    "genericSharedContractUsesBroadFallback": true,
+    "genericRawConfigDataUsesBroadFallback": true,
+    "genericSourceUsesBuildFallback": true,
+    "unknownUsesBroadFallback": true,
+    "unresolvedBroadFallbackStillBlocksBeforeExecution": true
+  }
+}

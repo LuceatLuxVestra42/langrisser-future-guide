@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "id": "smart-regression-bindings-sr3-v1",
+  "status": "SR3_VERIFIED_PARTIAL_BINDING",
+  "impactMapId": "smart-regression-impact-map-v1",
+  "purpose": "Bind only SR-1 gates that have an exact, existing repository validator whose scope matches the gate. Keep all weaker or ambiguous candidates unresolved so execution fails closed.",
+  "bindings": {
+    "hero.final.consumer": {
+      "command": "node scripts/validate_hero_stage6_4_site_consumer.cjs",
+      "evidence": "scripts/validate_hero_stage6_4_site_consumer.cjs",
+      "scope": "Hero Stage 6-4 final site-consumer/frozen payload integrity"
+    },
+    "hero-soldier.pair-parity": {
+      "command": "node scripts/validate-hero-soldier-stageC-1-pair-parity.cjs",
+      "evidence": "scripts/validate-hero-soldier-stageC-1-pair-parity.cjs",
+      "scope": "Frozen Hero-Soldier reciprocal pair parity"
+    },
+    "equipment.frontend": {
+      "command": "node scripts/validate-equipment-stage4-7-whole-consumer-regression.mjs",
+      "evidence": "scripts/validate-equipment-stage4-7-whole-consumer-regression.mjs",
+      "scope": "Equipment list/detail/exclusive frontend consumer, route tree, runtime admission and production build regression"
+    },
+    "equipment.final.consumer": {
+      "command": "node scripts/validate-equipment-stage3-7-whole-stage.mjs",
+      "evidence": "scripts/validate-equipment-stage3-7-whole-stage.mjs",
+      "scope": "Equipment frozen Stage 3 consumer population, partition, route-key and display-integrity parity"
+    }
+  },
+  "unresolvedGateIds": [
+    "shared.contract",
+    "hero.asset.integrity",
+    "hero.frontend.route",
+    "soldier.portrait.integrity",
+    "soldier.frontend.route",
+    "soldier.final.consumer",
+    "hero-soldier.impact-sentinel",
+    "equipment.asset.consumer",
+    "skin.stage3.asset",
+    "skin.frontend"
+  ],
+  "rejectedWeakBindings": [
+    {
+      "gateId": "equipment.asset.consumer",
+      "candidate": "node scripts/validate-equipment-image-stage1.mjs",
+      "reason": "The validator proves five representative assets, not arbitrary public/images/equipment/** coverage."
+    },
+    {
+      "gateId": "skin.stage3.asset",
+      "candidate": "node scripts/validate-skin-stage3-1-asset-inventory.mjs",
+      "reason": "The validator checks the generated 540-record source inventory and reverse indexes, not repository web-asset bytes."
+    },
+    {
+      "gateId": "skin.stage3.asset",
+      "candidate": "node scripts/validate-skin-stage3-2-resolution-proof.mjs",
+      "reason": "The validator checks representative authoritative-resolution evidence when supplied; it does not validate arbitrary public/images/skins/** byte changes."
+    }
+  ],
+  "policy": {
+    "allowCommandGuessing": false,
+    "allowPartialScopeBinding": false,
+    "unresolvedSelection": "BLOCK_BEFORE_EXECUTION",
+    "commandFailure": "FAIL_FAST",
+    "commandDeduplication": "EXACT_COMMAND_STRING"
+  }
+}

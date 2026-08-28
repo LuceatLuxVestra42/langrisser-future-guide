@@ -22,7 +22,12 @@
     "inspect:hero-combat": "node scripts/prepare_hero_basic_combat_stage45.cjs",
     "investigate:hero-display-stats": "node scripts/investigate_hero_display_stats.cjs",
     "finalize:hero-pages": "node scripts/finalize_hero_pages_stage34.cjs",
-    "build:movement-types": "node scripts/build_shared_movement_types.mjs"
+    "build:movement-types": "node scripts/build_shared_movement_types.mjs",
+    "validate:changed:sr3:dry": "node scripts/smart-regression.mjs --dry-run",
+    "validate:changed:sr3": "node scripts/smart-regression.mjs --execute",
+    "validate:changed:dry": "node scripts/smart-regression-sr4.mjs --dry-run",
+    "validate:changed": "node scripts/smart-regression-sr4.mjs --execute",
+    "test:smart-regression:fixtures": "node scripts/test-smart-regression-fixtures.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

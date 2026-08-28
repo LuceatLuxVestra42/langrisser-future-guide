@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "stage": "SMART_REGRESSION_SR5",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "branch": "work/smart-regression-sr5-fixtures",
+  "baseBranch": "work/smart-regression-sr4-fallback",
+  "purpose": "Freeze a representative changed-file fixture matrix and an automated regression harness with a zero-false-negative completion criterion before GitHub Actions shadow mode.",
+  "artifacts": {
+    "fixtureMatrix": "data/fixtures/smart-regression-sr5-cases.v1.json",
+    "fixtureRunner": "scripts/test-smart-regression-fixtures.mjs",
+    "packageCommand": "test:smart-regression:fixtures"
+  },
+  "metrics": {
+    "representativeCaseCount": 17,
+    "selectionOraclePassedCaseCount": 17,
+    "selectionOracleFailedCaseCount": 0,
+    "falseNegativeCount": 0,
+    "executorControlCaseCount": 2
+  },
+  "representativeCoverage": [
+    "documentation-only bypass",
+    "shared build configuration",
+    "Hero presentation asset without frozen relation reopen",
+    "Soldier portrait presentation without frozen relation reopen",
+    "Hero ConfigData specific-owner precedence",
+    "Soldier ConfigData specific-owner precedence",
+    "Hero-Soldier frozen 5,977 pair parity",
+    "Equipment frontend specific-owner precedence",
+    "generic src build fallback",
+    "generic raw ConfigData broad fallback",
+    "generic shared contract broad fallback",
+    "unknown path broad fallback",
+    "Hero final canonical consumer owner",
+    "Soldier canonical identity owner",
+    "multi-domain gate union",
+    "Banner Stage 3 contract composite expansion",
+    "workflow broad fallback"
+  ],
+  "executorControlCoverage": [
+    "exact-command deduplication: two gates sharing one command plan exactly one execution",
+    "fail-fast: failing validator marks following validator NOT_RUN"
+  ],
+  "confirmed": {
+    "specificOwnerSuppressesCatchAll": true,
+    "canonicalOwnerSuppressesCatchAll": true,
+    "unknownNeverSilentlySkips": true,
+    "genericSharedAndRawChangesUseBroadFallback": true,
+    "presentationChangesDoNotReopenHeroSoldierFrozenSemantics": true,
+    "multiDomainSelectionUsesUnion": true,
+    "requiredGateFalseNegativeCount": 0,
+    "dependencyDriftFromSR4": false
+  },
+  "verification": {
+    "deterministicSelectionOracle": "PASS_17_OF_17_FALSE_NEGATIVE_0",
+    "oracleMethod": "Replayed SR-4 glob matching, owner-vs-catch-all precedence, composite expansion and SR-3 binding executable/unbound state against every declared fixture.",
+    "exactRepositoryFixtureCommandExecutedInCurrentEnvironment": false,
+    "reason": "The current container could not resolve github.com, so the branch could not be sparse-cloned for direct Node execution. The repository fixture command is committed and is the first required command for SR-6 shadow CI.",
+    "noFullProjectValidatorExecutionClaimed": true
+  },
+  "review": {
+    "code": "DIRECT_BRANCH_RUNTIME_PENDING",
+    "blockingSR5Completion": false,
+    "blockingSR6Admission": true,
+    "resolution": "Run `npm run test:smart-regression:fixtures` (or equivalent package runner) in GitHub Actions shadow mode and require status PASS with falseNegativeCount=0."
+  },
+  "nextStartPoint": "SR-6 GitHub Actions shadow mode. Run the SR-5 fixture command first, then run Smart Regression dry-run beside existing full/legacy validation without using it as a merge gate yet."
+}
