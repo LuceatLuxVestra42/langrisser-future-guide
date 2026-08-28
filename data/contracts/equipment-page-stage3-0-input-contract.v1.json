@@ -1,0 +1,90 @@
+{
+  "schemaId": "equipment-page-stage3-0-input-contract/v1",
+  "version": 1,
+  "stage": "EQUIPMENT_PAGE_STAGE3_0",
+  "checkpoint": "EQUIPMENT_PAGE_STAGE3_0_INPUT_FREEZE",
+  "status": "FROZEN_INPUT_CONTRACT",
+  "purpose": "Freeze the already-approved Equipment Stage 2 outputs as the only semantic input for Equipment Page Stage 3. Stage 3 may reshape these values for presentation but must not silently reinterpret them.",
+  "canonicalIdentity": {
+    "joinKey": "equipmentId",
+    "sourceField": "ConfigDataEquipmentInfo.ID",
+    "canonicalPopulation": 390
+  },
+  "inputs": [
+    {
+      "path": "data/generated/equipment_stage2_1_census.json",
+      "role": "raw-ssr-census-provenance",
+      "gitBlobSha": "5bd157c89c86d5670af2c2316807f79f970a75ff"
+    },
+    {
+      "path": "data/generated/equipment_stage2_2_basic_join.json",
+      "role": "identity-and-basic-metadata-proof",
+      "gitBlobSha": "a952f13b5f2a1440c491baa33352685f442af39c"
+    },
+    {
+      "path": "data/generated/equipment_stage2_3_filter_map.json",
+      "role": "page-filter-map",
+      "gitBlobSha": "9fb4505628e75fbc0b5da0b8df65912a72478835"
+    },
+    {
+      "path": "data/generated/equipment_stage2_4_stats.json",
+      "role": "level50-stats",
+      "gitBlobSha": "6cdd18213349314c1b72eaffd8e59d01ca3a585b"
+    },
+    {
+      "path": "data/generated/equipment_stage2_5_effects.json",
+      "role": "level50-effects",
+      "gitBlobSha": "649bdc7b4181ee119ffbd8416bc96e276d1b864b"
+    },
+    {
+      "path": "data/generated/equipment_stage2_6_restrictions.json",
+      "role": "equip-restrictions",
+      "gitBlobSha": "8ce53e9de1038e698510d4846a3e13502732e578"
+    },
+    {
+      "path": "data/generated/equipment_stage2_7_acquisition.json",
+      "role": "acquisition-and-release-grouping",
+      "gitBlobSha": "9933a2406fa026e1b340e31a080587a0828db8bc"
+    }
+  ],
+  "inputFingerprint": {
+    "version": 1,
+    "algorithm": "sha256",
+    "namespace": "equipment-page-stage3-0-input-v1",
+    "fileCount": 7,
+    "sha256": "4bd55b5bd5fdabbc94c2d73b28196e0365997e711a5d07cdd2b1c5239a22fdbc"
+  },
+  "expected": {
+    "rawEquipmentRecords": 548,
+    "rawRank4SsrRecords": 398,
+    "canonicalPopulation": 390,
+    "basicMetadataComplete": 390,
+    "filterUnclassified": 0,
+    "generalEquipment": 206,
+    "exclusiveEquipment": 167,
+    "soulSpecialEquipment": 16,
+    "unresolvedNoPathEquipment": 1,
+    "unresolvedNoPathEquipmentIds": [
+      2013
+    ],
+    "restrictionSemantics": {
+      "status": "structural-inference",
+      "confidence": 0.99,
+      "missingArmyRefs": 0,
+      "missingJobRefs": 0
+    }
+  },
+  "policy": {
+    "semanticReanalysisAllowed": false,
+    "configDataReparseRequired": false,
+    "stage2MeaningMayBeSilentlyChanged": false,
+    "stage3SchemaReshapingAllowed": true,
+    "id2013MustRemainExplicitUnresolvedNoPath": true,
+    "restrictionInferenceStatusMustBePreserved": true,
+    "productionPublicEligibilityFrozenHere": false,
+    "equipmentImagePopulationFrozenHere": false,
+    "equipmentImageStage2PublicPopulation": 373,
+    "publicPopulationBoundaryStage": "EQUIPMENT_PAGE_STAGE3_2"
+  },
+  "nextStage": "EQUIPMENT_PAGE_STAGE3_1_PRODUCTION_SCHEMA"
+}
