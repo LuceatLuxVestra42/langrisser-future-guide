@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-2-uncovered-source-fallback-proof",
+  "reviewType": "KNOWN_OWNERSHIP_BASE_FOLDER_CANDIDATE_VISUAL_REVIEW",
+  "status": "PASS_WITH_REVIEW",
+  "sourceValidation": "data/validation/hero-portrait-stage4-2-known-ownership-rescue.v1.json",
+  "artifact": {
+    "name": "hero-stage4-2-known-ownership-rescue-review",
+    "artifactId": 9675007824,
+    "digest": "sha256:04550d1fa530c07630c33f0f91573907f735219f0e85f52f0905eaa8e2d91da1",
+    "workflowRunId": 33143848055
+  },
+  "policy": {
+    "heroOwnershipRecomputed": false,
+    "filenameTokensAuthoritative": false,
+    "visualAppearanceEstablishesBaseRole": false,
+    "uniqueCleanTechnicalCandidateMayPassWhenOwnershipAndBaseFolderAreAlreadyFrozen": true,
+    "multiplePlausibleCharacterCandidatesRemainReview": true
+  },
+  "records": [
+    {"heroId": 99225, "verdict": "REVIEW_MULTIPLE_PLAUSIBLE_BASE_FORM_CANDIDATES", "reason": "multiple technically valid background/form/character assets remain in the frozen base folder; visual review cannot establish one canonical source role"},
+    {"heroId": 99242, "verdict": "REVIEW_MULTIPLE_PLAUSIBLE_BASE_FORM_CANDIDATES", "reason": "background plus multiple technically valid character-form assets remain; no dependency-role proof selects one"},
+    {"heroId": 99221, "verdict": "REVIEW_MULTIPLE_PLAUSIBLE_BASE_FORM_CANDIDATES", "reason": "multiple technically valid character variants remain in the frozen base folder"},
+    {"heroId": 125, "verdict": "REVIEW_MULTIPLE_PLAUSIBLE_BASE_FORM_CANDIDATES", "reason": "multiple technically valid normal/special/TW/red variants remain; filename tokens and appearance are non-authoritative"},
+    {"heroId": 99199, "verdict": "PASS_UNIQUE_CLEAN_PNG_CANDIDATE", "reason": "exact Hero ownership is already frozen; the base folder exposes exactly one Stage3-technical-pass candidate and visual review observes clean transparent character artwork without UI/card contamination"},
+    {"heroId": 99193, "verdict": "REVIEW_MULTIPLE_PLAUSIBLE_BASE_FORM_CANDIDATES", "reason": "multiple technically valid solo/combined/companion-form character assets remain; no dependency-role proof selects one"},
+    {"heroId": 122, "verdict": "BLOCKED_NO_STAGE3_PNG_CANDIDATE", "reason": "the visible base asset does not pass the frozen PNG technical gate; re-encoding/conversion is forbidden"}
+  ],
+  "summary": {
+    "reviewedHeroCount": 7,
+    "admissionEligibleHeroCount": 1,
+    "reviewHeroCount": 5,
+    "blockedTechnicalHeroCount": 1,
+    "admissionEligibleHeroIds": [99199]
+  }
+}
