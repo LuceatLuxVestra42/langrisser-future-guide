@@ -94,7 +94,27 @@ jobs:
           HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
         run: |
           set -o pipefail
-          node scripts/validate-equipment-image-stage3-browser-ui.mjs 2>&1 | tee equipment-stage3-browser-ui.log
+          : > equipment-stage3-browser-ui.log
+          for attempt in 1 2 3; do
+            attempt_log="equipment-stage3-browser-ui-attempt-${attempt}.log"
+            echo "=== Browser UI attempt ${attempt}/3 ===" | tee -a equipment-stage3-browser-ui.log
+            if node scripts/validate-equipment-image-stage3-browser-ui.mjs 2>&1 | tee "$attempt_log"; then
+              cat "$attempt_log" >> equipment-stage3-browser-ui.log
+              exit 0
+            fi
+            cat "$attempt_log" >> equipment-stage3-browser-ui.log
+            if ! grep -Eq '"status":50[234]' "$attempt_log"; then
+              echo "Browser UI failure is not a retryable hosted 502/503/504 response." | tee -a equipment-stage3-browser-ui.log
+              exit 1
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Browser UI transient hosted failure persisted for all 3 attempts." | tee -a equipment-stage3-browser-ui.log
+              exit 1
+            fi
+            echo "Retrying the complete Browser/UI scenario after transient hosted failure." | tee -a equipment-stage3-browser-ui.log
+            sleep 5
+          done
+          exit 1
 
       - name: Upload Browser UI failure diagnostics
         if: failure()
