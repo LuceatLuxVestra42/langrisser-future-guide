@@ -1,0 +1,41 @@
+name: Equipment Image Stage 2 Official PC Package Inspect
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-hold29
+    paths:
+      - '.github/workflows/equipment-image-stage2-official-pc-package-inspect.yml'
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download official PC package once
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 --retry-delay 2 \
+            -o /tmp/DownLoad-MZ-PC.exe \
+            'https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/DownLoad-MZ-PC.exe'
+          stat -c 'bytes=%s' /tmp/DownLoad-MZ-PC.exe
+          md5sum /tmp/DownLoad-MZ-PC.exe
+          sha256sum /tmp/DownLoad-MZ-PC.exe
+          file /tmp/DownLoad-MZ-PC.exe
+      - name: Inspect archive table without extraction
+        run: |
+          set +e
+          echo '=== 7z archive summary ==='
+          7z l /tmp/DownLoad-MZ-PC.exe | head -n 120
+          echo '=== likely updater/config members ==='
+          7z l -ba /tmp/DownLoad-MZ-PC.exe | grep -Eai 'patch|update|version|manifest|config|setting|url|cdn|asset|bundle|\.ini$|\.xml$|\.json$|\.cfg$|\.config$|\.txt$' | head -n 300
+          exit 0
+      - name: Scan embedded strings for update endpoints
+        run: |
+          set +e
+          echo '=== URL / patch strings ==='
+          strings -a -n 8 /tmp/DownLoad-MZ-PC.exe \
+            | grep -Eai 'https?://|patchinfo|patch|manifest|cdn|ExportAssetBundle|assetbundle|version' \
+            | head -n 500
+          exit 0
