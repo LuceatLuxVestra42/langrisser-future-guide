@@ -13,15 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download verified official installer
+      - name: Download and fingerprint official installer
         run: |
           set -euo pipefail
           URL='https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/DownLoad-MZ-PC.exe'
           REF='https://mz.zlongame.com/jx/mzdownload/20180731/5473.html'
           UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0 Safari/537.36'
-          curl --http1.1 -fL --retry 2 -A "$UA" -e "$REF" -o /tmp/DownLoad-MZ-PC.exe "$URL"
-          test "$(stat -c %s /tmp/DownLoad-MZ-PC.exe)" = '308744656'
-          test "$(md5sum /tmp/DownLoad-MZ-PC.exe | awk '{print $1}')" = '31a6db4f224374185e2c498287d3d3f3'
+          curl --http1.1 -fL --retry 2 -A "$UA" -e "$REF" -D /tmp/download.headers -o /tmp/DownLoad-MZ-PC.exe "$URL"
+          echo '=== response headers ==='
+          tail -n 40 /tmp/download.headers
+          SIZE="$(stat -c %s /tmp/DownLoad-MZ-PC.exe)"
+          MD5="$(md5sum /tmp/DownLoad-MZ-PC.exe | awk '{print $1}')"
+          SHA256="$(sha256sum /tmp/DownLoad-MZ-PC.exe | awk '{print $1}')"
+          echo "size=$SIZE"
+          echo "md5=$MD5"
+          echo "sha256=$SHA256"
+          file /tmp/DownLoad-MZ-PC.exe
+          test "$MD5" = '31a6db4f224374185e2c498287d3d3f3'
       - name: Extract only url.txt and launcher
         run: |
           set -euo pipefail
