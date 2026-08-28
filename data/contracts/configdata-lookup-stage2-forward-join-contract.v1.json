@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_2",
+  "status": "FORWARD_JOIN_CONTRACT_FROZEN",
+  "purpose": "Materialize only explicitly allowlisted direct ConfigData ID references for high-value Hero, Soldier/TrainingTech, and Equipment lookup paths. Do not collapse multi-hop paths into inferred canonical relations.",
+  "predecessor": {
+    "contract": "data/contracts/configdata-lookup-stage1-id-index-contract.v1.json",
+    "summary": "data/validation/configdata-lookup-stage1-summary.v1.json",
+    "requiredStatus": "PASS_CONFIGDATA_LOOKUP_STAGE1_ID_INDEX"
+  },
+  "sourceTypes": {
+    "Hero": "data/configdata/ConfigDataHeroInfo.json",
+    "JobConnection": "data/configdata/ConfigDataJobConnectionInfo.json",
+    "Job": "data/configdata/ConfigDataJobInfo.json",
+    "Skill": "data/configdata/ConfigDataSkillInfo.json",
+    "Soldier": "data/configdata/ConfigDataSoldierInfo.json",
+    "TrainingTech": "data/configdata/ConfigDataTrainingTechInfo.json",
+    "TrainingTechLevel": "data/configdata/ConfigDataTrainingTechLevelInfo.json",
+    "Equipment": "data/configdata/ConfigDataEquipmentInfo.json"
+  },
+  "outputs": {
+    "Hero": "data/index/forward/hero.v1.json",
+    "Soldier": "data/index/forward/soldier.v1.json",
+    "Equipment": "data/index/forward/equipment.v1.json",
+    "summary": "data/validation/configdata-lookup-stage2-summary.v1.json"
+  },
+  "relationPolicy": {
+    "sourcePrimaryKey": "ID",
+    "referenceEncoding": "positive integer ID rendered as string",
+    "missingField": "ZERO_EDGES",
+    "nullOrZeroReference": "OMIT_AS_EMPTY_REFERENCE",
+    "wrongFieldShape": "FAIL",
+    "missingPositiveTarget": "FAIL",
+    "duplicateRawReference": "DEDUPE_EDGE_AND_REPORT_COUNT",
+    "stableOrdering": "relation contract order, then numeric source ID, then numeric target ID",
+    "transitiveEdgeMaterialization": false,
+    "inverseEdgeMaterialization": false,
+    "canonicalFiltering": false,
+    "canonicalRelationRecomputation": false
+  },
+  "relations": [
+    {
+      "name": "hero.skills",
+      "domain": "Hero",
+      "sourceType": "Hero",
+      "sourceField": "Skills_ID",
+      "cardinality": "MANY",
+      "targetType": "Skill",
+      "semanticStatus": "RAW_DIRECT_REFERENCE"
+    },
+    {
+      "name": "hero.baseJobConnection",
+      "domain": "Hero",
+      "sourceType": "Hero",
+      "sourceField": "JobConnection_ID",
+      "cardinality": "ONE",
+      "targetType": "JobConnection",
+      "semanticStatus": "RAW_DIRECT_REFERENCE"
+    },
+    {
+      "name": "hero.usableJobConnections",
+      "domain": "Hero",
+      "sourceType": "Hero",
+      "sourceField": "UseableJobConnections_ID",
+      "cardinality": "MANY",
+      "targetType": "JobConnection",
+      "semanticStatus": "RAW_DIRECT_REFERENCE"
+    },
+    {
+      "name": "hero.castingLawSkill",
+      "domain": "Hero",
+      "sourceType": "Hero",
+      "sourceField": "CastingLawSkill_ID",
+      "cardinality": "ONE",
+      "targetType": "Skill",
+      "semanticStatus": "RAW_DIRECT_REFERENCE"
+    },
+    {
+      "name": "jobConnection.job",
+      "domain": "Hero",
+      "sourceType": "JobConnection",
+      "sourceField": "Job_ID",
+      "cardinality": "ONE",
+      "targetType": "Job",
+      "semanticStatus": "RAW_DIRECT_REFERENCE"
+    },
+    {
+      "name": "jobConnection.predecessors",
+      "domain": "Hero",
+      "sourceType": "JobConnection",
+      "sourceField": "PreJobConnectionList",
+      "cardinality": "MANY",
+      "targetType": "JobConnection",
+      "semanticStatus": "RAW_DIRECT_REFERENCE"
+    },
+    {
+      "name": "jobConnection.talentSkills",
+      "domain": "Hero",
+      "sourceType": "JobConnection",
+      "sourceField": "TalentSkill_IDs",
+      "cardinality": "MANY",
+      "targetType": "Skill",
+      "semanticStatus": "RAW_DIRECT_REFERENCE"
+    },
+    {
+      "name": "soldier.skills",
+      "domain": "Soldier",
+      "sourceType": "Soldier",
+      "sourceField": "Skills_ID",
+      "cardinality": "MANY",
+      "targetType": "Skill",
+      "semanticStatus": "RAW_DIRECT_REFERENCE"
+    },
+    {
+      "name": "soldier.unlockTrainingTech",
+      "domain": "Soldier",
+      "sourceType": "Soldier",
+      "sourceField": "GetSoldierTechId",
+      "cardinality": "ONE",
+      "targetType": "TrainingTech",
+      "semanticStatus": "AUXILIARY_DIRECT_REFERENCE_NOT_COMPLETE",
+      "note": "Do not treat GetSoldierTechId as the complete Soldier growth-tech JOIN. Some valid Soldier growth paths exist when this field is 0/missing."
+    },
+    {
+      "name": "trainingTech.soldiers",
+      "domain": "Soldier",
+      "sourceType": "TrainingTech",
+      "sourceField": "SoldierIDRelated",
+      "cardinality": "MANY",
+      "targetType": "Soldier",
+      "semanticStatus": "RAW_CANDIDATE_MEMBERSHIP_NOT_GROWTH_PATH",
+      "note": "This explicit relation can include common passive/status tech. Selecting a Soldier Lv1-10 growth path is out of scope for Stage 2."
+    },
+    {
+      "name": "trainingTech.preTech",
+      "domain": "Soldier",
+      "sourceType": "TrainingTech",
+      "sourceField": "PreTechIDs",
+      "cardinality": "MANY",
+      "targetType": "TrainingTech",
+      "semanticStatus": "RAW_DIRECT_REFERENCE"
+    },
+    {
+      "name": "trainingTech.levels",
+      "domain": "Soldier",
+      "sourceType": "TrainingTech",
+      "sourceField": "TechLevelupInfoList",
+      "cardinality": "MANY",
+      "targetType": "TrainingTechLevel",
+      "semanticStatus": "RAW_DIRECT_REFERENCE"
+    },
+    {
+      "name": "equipment.skillStages",
+      "domain": "Equipment",
+      "sourceType": "Equipment",
+      "sourceField": "SkillIds",
+      "cardinality": "MANY",
+      "targetType": "Skill",
+      "semanticStatus": "RAW_DIRECT_REFERENCE",
+      "note": "Stage 2 stores every explicit SkillIds reference. Selecting SkillIds[-1] as the max-level display effect remains an existing Equipment consumer rule, not a new Lookup semantic."
+    }
+  ],
+  "explicitExclusions": [
+    "EquipmentInfo.SkillHero ownership edges: canonical exclusive-equipment ownership is already frozen elsewhere and must not be recomputed here",
+    "Hero-to-Job transitive collapse through JobConnection",
+    "Hero-to-unlock-Skill transitive collapse through JobConnection/JobLevel",
+    "Soldier-to-TrainingTech inverse candidate index from SoldierIDRelated; generic/inverse refs remain Stage 3",
+    "selecting the unique SoldierSkillLevelup 1..10 growth path",
+    "SP-specific semantic expansion",
+    "name-based JOIN",
+    "ID arithmetic"
+  ],
+  "validation": {
+    "validator": "scripts/validate-configdata-lookup-stage2.mjs",
+    "command": "npm run validate:configdata-lookup-stage2",
+    "requiredChecks": [
+      "Stage 1 predecessor summary remains PASS",
+      "all allowlisted source and target files parse as root arrays",
+      "all source and target IDs are unique positive explicit IDs",
+      "every positive referenced target exists in the declared target type",
+      "wrong scalar/array field shapes fail closed",
+      "generated relation set exactly matches the contract allowlist",
+      "no inverse or transitive relations are emitted",
+      "regeneration produces byte-identical indexes and summary"
+    ],
+    "passStatus": "PASS_CONFIGDATA_LOOKUP_STAGE2_FORWARD_JOINS"
+  },
+  "nextStage": {
+    "stage": "CONFIGDATA_LOOKUP_STAGE_3",
+    "goal": "Build allowlist-driven reverse-reference indexes by inverting approved Stage 2 direct edges only, without scanning arbitrary numeric fields."
+  }
+}
