@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-closeout-summary/v1",
+  "checkpoint": "PROJECT_DOCTOR_D1_D4_CLOSEOUT",
+  "status": "PASS_PROJECT_DOCTOR_CLOSEOUT_REPOSITORY_INTEGRATION",
+  "completion": "COMPLETE_WITH_LIVE_REPOSITORY_EXECUTION_GAP",
+  "branch": "work/project-doctor-closeout",
+  "base": "main",
+  "baseSha": "5a241e7a9ffe0a87fa23260ca9a179138af95dc9",
+  "repositoryStateBeforeThisSummary": {
+    "aheadBy": 37,
+    "behindBy": 0,
+    "changedFileCount": 28,
+    "productionCanonicalFrontendSourceChangeCount": 0
+  },
+  "closeoutSteps": {
+    "closeout1_mainBasedBranchAndImport": "COMPLETE",
+    "closeout2_d2ImpactIntegration": "COMPLETE",
+    "closeout3_d3InputIntegration": "COMPLETE",
+    "closeout4_d4ExecutionRunner": "COMPLETE",
+    "closeout5_integratedDoctorEntrypoint": "COMPLETE",
+    "closeout6_finalDiffInspection": "COMPLETE"
+  },
+  "integrationFacts": {
+    "mainBasedCloseoutBranch": true,
+    "oldDivergedBranchUsedOnlyAsDoctorChangeSource": true,
+    "currentMainPackageWasPreserved": true,
+    "d2IntermediateGeneratedImpactArtifactRequired": false,
+    "d3CallsD2AnalyzerInMemory": true,
+    "d4ExecutesOnlyExactD3CatalogChecks": true,
+    "d4FullQueuePreflight": true,
+    "d4FailFast": true,
+    "d4ManualReviewPreserved": true,
+    "doctorEntrypoint": "node scripts/run-project-doctor-closeout.mjs",
+    "doctorStatusEntrypoint": "node scripts/run-project-doctor-d1-3.mjs",
+    "doctorExecutionEntrypoint": "node scripts/run-project-doctor-d4.mjs"
+  },
+  "packageCommands": {
+    "doctor": "integrated D1 status refresh -> D4 self-test -> D3-selected D4 execution",
+    "doctor:status": "D1 status collector + health gate summary",
+    "doctor:impact": "D2 explicit-path impact analysis",
+    "doctor:plan": "D3 changed-file collection and check planning",
+    "doctor:run": "D4 selected-check execution",
+    "doctor:closeout:validate": "integrated runner synthetic fixtures"
+  },
+  "isolatedVerification": {
+    "d4RunnerSyntax": "PASS",
+    "d4ExecutionFixtures": "8/8 PASS",
+    "closeoutRunnerSyntax": "PASS",
+    "closeoutIntegrationFixtures": "4/4 PASS",
+    "actualRepositoryChildCommandExecutionCount": 0
+  },
+  "liveExecutionGap": {
+    "status": "OPEN",
+    "reason": "The GitHub connector can read/write/compare repository content but cannot execute npm commands in the live checkout.",
+    "requiredBeforeClaimingRuntimeProof": "Run npm run doctor:closeout:validate and npm run doctor -- --dry-run in an executable checkout or CI environment.",
+    "doesNotInvalidateRepositoryIntegration": true
+  },
+  "boundaries": {
+    "rawConfigDataSemanticRecomputationAdded": false,
+    "productionSourceMutationAdded": false,
+    "canonicalDataMutationAdded": false,
+    "frontendSourceMutationAdded": false,
+    "githubActionsAdded": false,
+    "staleOutputFreshnessGuardImplemented": false,
+    "missingOwningValidatorsInvented": false
+  },
+  "nextStage": "D5",
+  "nextStageGoal": "Implement stale-output and source-freshness guards, then run the integrated Doctor in an executable repository environment before any CI automation stage."
+}
