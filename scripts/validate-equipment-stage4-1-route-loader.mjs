@@ -100,12 +100,12 @@ assert(
   "general route path missing",
 );
 assert(
-  sourceFiles.exclusiveRoute.includes('createFileRoute("/equipment/exclusive")'),
-  "exclusive route path missing",
+  sourceFiles.exclusiveRoute.includes('createFileRoute("/equipment_/exclusive")'),
+  "exclusive sibling route id missing",
 );
 assert(
-  sourceFiles.detailRoute.includes('createFileRoute("/equipment/$equipmentId")'),
-  "detail route path missing",
+  sourceFiles.detailRoute.includes('createFileRoute("/equipment_/$equipmentId")'),
+  "detail sibling route id missing",
 );
 assert(sourceFiles.detailRoute.includes("throw notFound()"), "detail public notFound gate missing");
 assert(
