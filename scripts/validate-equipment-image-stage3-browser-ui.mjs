@@ -93,7 +93,11 @@ async function assertDiagnosticsClean(diagnostics) {
 }
 
 const hostedSummary = JSON.parse(fs.readFileSync(HOSTED_SUMMARY_PATH, "utf8"));
-assert(hostedSummary.status === "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA", "Hosted QA predecessor is not PASS");
+const acceptedHostedSummaryStatuses = new Set([
+  "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA",
+  "PASS_EQUIPMENT_IMAGE_STAGE3",
+]);
+assert(acceptedHostedSummaryStatuses.has(hostedSummary.status), "Hosted QA predecessor/final state is not PASS");
 assert(hostedSummary.completion === "COMPLETE", "Hosted QA predecessor is not complete");
 assert(hostedSummary.gates.preflight === "PASS", "Preflight gate is not PASS");
 assert(hostedSummary.gates.build === "PASS", "Build gate is not PASS");
