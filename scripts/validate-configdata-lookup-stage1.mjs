@@ -5,6 +5,7 @@ import {
   loadStage0Contract,
   loadStage1Contract,
   readJson,
+  renderIndexJson,
   renderJson,
 } from './lib/configdata-lookup-stage1.mjs';
 
@@ -21,28 +22,25 @@ function validateIndexShape(entity, spec, actual) {
   assert(actual.entity === entity, `${entity}: entity mismatch`);
   assert(actual.source?.path === spec.source, `${entity}: source path mismatch`);
   assert(actual.source?.primaryKey === spec.primaryKey, `${entity}: primary key mismatch`);
-  assert(Array.isArray(actual.index?.ids), `${entity}: index.ids must be an array`);
-  assert(actual.index?.byId && typeof actual.index.byId === 'object', `${entity}: index.byId missing`);
-  assert(actual.index.entryCount === actual.index.ids.length, `${entity}: entry count mismatch`);
-  assert(Object.keys(actual.index.byId).length === actual.index.ids.length, `${entity}: byId count mismatch`);
+  assert(Array.isArray(actual.index?.entries), `${entity}: index.entries must be an array`);
+  assert(actual.index.entryCount === actual.index.entries.length, `${entity}: entry count mismatch`);
+  assert(actual.index.labelField === (spec.searchLabelField ?? null), `${entity}: label field mismatch`);
 
-  const allowedLabels = new Set(spec.searchLabelFields ?? []);
-  for (const id of actual.index.ids) {
-    const entry = actual.index.byId[id];
-    assert(entry && typeof entry === 'object' && !Array.isArray(entry), `${entity} ${id}: invalid index entry`);
-    const entryKeys = Object.keys(entry);
-    assert(entryKeys.every((key) => key === 'recordIndex' || key === 'labels'), `${entity} ${id}: unexpected entry field`);
-    assert(Number.isInteger(entry.recordIndex) && entry.recordIndex >= 0, `${entity} ${id}: invalid recordIndex`);
-    assert(!Object.hasOwn(entry, 'record'), `${entity} ${id}: full source record copy is forbidden`);
-
-    if (entry.labels !== undefined) {
-      assert(entry.labels && typeof entry.labels === 'object' && !Array.isArray(entry.labels), `${entity} ${id}: invalid labels`);
-      for (const [field, value] of Object.entries(entry.labels)) {
-        assert(allowedLabels.has(field), `${entity} ${id}: unapproved label field ${field}`);
-        assert(typeof value === 'string' && value.length > 0, `${entity} ${id}: invalid label value`);
-      }
+  const seen = new Set();
+  for (const tuple of actual.index.entries) {
+    assert(Array.isArray(tuple) && (tuple.length === 2 || tuple.length === 3), `${entity}: invalid entry tuple`);
+    const [id, recordIndex, label] = tuple;
+    assert(typeof id === 'string' && id.length > 0, `${entity}: invalid tuple ID`);
+    assert(!seen.has(id), `${entity}: duplicate tuple ID ${id}`);
+    seen.add(id);
+    assert(Number.isInteger(recordIndex) && recordIndex >= 0, `${entity} ${id}: invalid recordIndex`);
+    if (tuple.length === 3) {
+      assert(typeof label === 'string' && label.length > 0, `${entity} ${id}: invalid discovery label`);
     }
   }
+
+  const serialized = JSON.stringify(actual);
+  assert(!serialized.includes('"record":'), `${entity}: full source record copy is forbidden`);
 }
 
 async function main() {
@@ -61,7 +59,7 @@ async function main() {
     const { text: actualText, value: actual } = await readJson(spec.output);
 
     validateIndexShape(entity, spec, actual);
-    assert(actualText === renderJson(expected), `${entity}: generated index is stale or non-deterministic`);
+    assert(actualText === renderIndexJson(expected), `${entity}: generated index is stale or non-deterministic`);
 
     built[entity] = expected;
     console.log(`${entity}: PASS (${expected.index.entryCount} IDs, ${expected.source.sha256.slice(0, 12)}...)`);
