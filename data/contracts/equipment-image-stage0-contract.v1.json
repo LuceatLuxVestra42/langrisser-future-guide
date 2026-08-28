@@ -1,0 +1,68 @@
+{
+  "contract": "equipment-image-stage0-v1",
+  "scope": "locator-and-web-path-freeze",
+  "semanticStageReopened": false,
+  "canonicalIdentityChanged": false,
+  "expected": {
+    "canonical": 390,
+    "public": 373,
+    "nonPublic": 17
+  },
+  "identity": {
+    "primaryKey": "equipmentId",
+    "nameJoinForbidden": true,
+    "idArithmeticForbidden": true,
+    "sourceAssetEqualityDoesNotMergeEquipment": true
+  },
+  "source": {
+    "authority": "ConfigDataEquipmentInfo.Icon",
+    "iconRootPrefix": "UI/Icon/Equip_ABS/",
+    "expectedFormat": "PNG locator",
+    "basenameOnlyResolutionForbidden": true,
+    "filenameSimilarityResolutionForbidden": true,
+    "crossRootFallbackForbidden": true
+  },
+  "web": {
+    "repositoryRoot": "public/images/equipment",
+    "urlRoot": "/images/equipment",
+    "repositoryPathTemplate": "public/images/equipment/{equipmentId}.png",
+    "urlPathTemplate": "/images/equipment/{equipmentId}.png",
+    "namingKey": "equipmentId",
+    "extension": ".png"
+  },
+  "stage0": {
+    "importsAssetBytes": false,
+    "requiresRepositoryWebAssets": false,
+    "allowedRepositoryAssetStatus": [
+      "PENDING_ASSET_BYTES",
+      "RESOLVED"
+    ],
+    "purpose": "Freeze all 390 canonical source icon locators, public/non-public boundary, and collision-safe equipmentId web paths before representative extraction."
+  },
+  "stage1Admission": {
+    "representativeGroups": [
+      "weapon",
+      "armor",
+      "headgear",
+      "accessory",
+      "exclusive-equipment"
+    ],
+    "requiredEvidence": [
+      "authoritative source bytes",
+      "exact source locator match",
+      "PNG signature",
+      "SHA-256",
+      "width and height",
+      "equipmentId target path",
+      "frontend list/detail rendering after integration"
+    ],
+    "bulkImportBeforeRepresentativePassForbidden": true
+  },
+  "productionBoundary": {
+    "frontendConsumesEquipmentIdAssetResolver": true,
+    "rawConfigDataRuntimeReadForbidden": true,
+    "runtimeNameJoinForbidden": true,
+    "sourceIconPathMayBeRetainedAsProvenance": true,
+    "nonPublicEquipmentMustNotGainPublicRouteFromAssetPresence": true
+  }
+}
