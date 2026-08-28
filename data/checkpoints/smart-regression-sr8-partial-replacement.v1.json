@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "stage": "SMART_REGRESSION_SR8",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "branch": "work/smart-regression-sr8-partial-replacement",
+  "baseStage": "SMART_REGRESSION_SR7",
+  "purpose": "Replace only historically proven, fully executable narrow CI orchestration with Smart Regression while preserving legacy validation for unknown, broad-fallback, or unbound selections.",
+  "artifacts": {
+    "partialReplacementPolicy": "data/contracts/regression-partial-replacement.sr8.v1.json",
+    "admissionController": "scripts/smart-regression-sr8-admission.mjs",
+    "admissionTests": "scripts/test-smart-regression-sr8.mjs",
+    "packageCommand": "test:smart-regression:sr8",
+    "shadowWorkflow": ".github/workflows/smart-regression-shadow.yml",
+    "partiallyReplacedWorkflow": ".github/workflows/hero-soldier-stageC-1-pair-parity.yml"
+  },
+  "replacementPolicy": {
+    "broadCIReplacementAllowed": false,
+    "defaultDecision": "LEGACY_REQUIRED",
+    "fallbackExitCode": 3,
+    "unexpectedAdmissionOrExecutionFailureFallsBackSilently": false,
+    "semanticValidatorReimplemented": false,
+    "semanticPipelineReopened": false,
+    "initialReplacementClassCount": 1,
+    "initialReplacementClass": "hero-soldier-pair-parity",
+    "eligibility": {
+      "selectorStatus": "PASS",
+      "unknownPathsMustBeEmpty": true,
+      "unboundGatesMustBeEmpty": true,
+      "globalSafeFallbackForbidden": true,
+      "exactLeafGates": ["hero-soldier.pair-parity"],
+      "allowedDomains": ["hero-soldier"]
+    }
+  },
+  "c1Orchestration": {
+    "legacyValidator": "node scripts/validate-hero-soldier-stageC-1-pair-parity.cjs",
+    "smartReplacementPath": "SR-8 admission -> SR-4 selector -> existing C-1 pair-parity validator",
+    "legacyFallbackPath": "If admission returns LEGACY_REQUIRED, execute the unchanged existing C-1 validator directly.",
+    "unexpectedFailurePolicy": "Fail closed; do not silently convert admission/execution errors into a legacy PASS.",
+    "frozenRelationBaseline": {
+      "heroes": 267,
+      "soldiers": 224,
+      "pairs": 5977
+    }
+  },
+  "verifiedRun": {
+    "runId": 33143449181,
+    "jobId": 98759232247,
+    "headSha": "2d0b9b9177d4c1ff545c4d6e9fb18d0af54efe07",
+    "jobConclusion": "success",
+    "sr5FixtureStepConclusion": "success",
+    "sr7HistoryStepConclusion": "success",
+    "sr8AdmissionStepConclusion": "success",
+    "currentDiffShadowStepConclusion": "success",
+    "artifactUploadConclusion": "success",
+    "artifact": {
+      "id": 9674843070,
+      "name": "smart-regression-shadow-33143449181",
+      "sizeBytes": 9318,
+      "digest": "sha256:eb2a4a1a9c61bacd1b704694e4f749b3fb095cabfe4ed22bd9320318b0092217",
+      "expiresAt": "2026-09-11T05:00:46Z"
+    }
+  },
+  "sr8Tests": {
+    "caseCount": 5,
+    "passedCaseCount": 5,
+    "failedCaseCount": 0,
+    "eligibleAdmissionCaseCount": 3,
+    "actualReplacementExecutionCount": 1,
+    "legacyRequiredCaseCount": 2,
+    "actualReplacementExecution": {
+      "case": "historical-c1-pr-executes-through-smart-runner",
+      "decision": "REPLACEMENT_EXECUTED",
+      "selectorStatus": "PASS",
+      "leafGates": ["hero-soldier.pair-parity"],
+      "unknownPaths": [],
+      "unboundGates": [],
+      "executionStatus": "PASS_EXECUTED",
+      "plannedCommandCount": 1,
+      "command": "node scripts/validate-hero-soldier-stageC-1-pair-parity.cjs",
+      "commandExitCode": 0
+    },
+    "conservativeControls": [
+      {
+        "case": "soldier-224-history-remains-legacy",
+        "expectedDecision": "LEGACY_REQUIRED",
+        "observedDecision": "LEGACY_REQUIRED",
+        "reason": "BLOCKED_UNKNOWN_PATH / broad-unbound selection"
+      },
+      {
+        "case": "docs-only-remains-nonreplacement",
+        "expectedDecision": "LEGACY_REQUIRED",
+        "observedDecision": "LEGACY_REQUIRED",
+        "reason": "No allowlisted replacement class applies"
+      }
+    ]
+  },
+  "regressionEvidence": {
+    "sr5": {
+      "representativeCaseCount": 17,
+      "passedCaseCount": 17,
+      "falseNegativeCount": 0,
+      "executorControlChecksPassed": true
+    },
+    "sr7": {
+      "historicalCaseCount": 5,
+      "passedCaseCount": 5,
+      "observedFalseNegativeCount": 0,
+      "replayErrorCount": 0
+    }
+  },
+  "reviews": [
+    {
+      "code": "ONLY_ONE_REPLACEMENT_CLASS_IS_ADMITTED",
+      "blockingSR8Completion": false,
+      "effect": "SR-8 intentionally replaces only the directly proven Hero-Soldier pair-parity orchestration. Other domains remain legacy/shadow until equivalent evidence and complete bindings exist."
+    },
+    {
+      "code": "BROAD_FALLBACK_AND_UNBOUND_REMAIN_LEGACY",
+      "blockingSR8Completion": false,
+      "effect": "Unknown-path, global safe-fallback, or selected-unbound outcomes are not replacement-eligible and continue through legacy/full validation."
+    }
+  ],
+  "confirmed": {
+    "firstRealPartialCIReplacementImplemented": true,
+    "existingFrozenPairParityValidatorReused": true,
+    "sr8TestsPass5Of5": true,
+    "actualReplacementExecutionObserved": true,
+    "legacyRequiredControlObserved": true,
+    "sr5StillPasses17Of17": true,
+    "sr5FalseNegativeCount": 0,
+    "sr7StillPasses5Of5": true,
+    "sr7ObservedFalseNegativeCount": 0,
+    "broadCIReplacementAllowed": false,
+    "frozenSemanticPipelinesReopened": false
+  },
+  "nextStartPoint": "SR-9 Project Doctor integration. Expose Smart Regression state, replacement eligibility, unresolved bindings, fallback usage, and SR-5/SR-7/SR-8 evidence through Project Doctor without duplicating validator semantics."
+}
