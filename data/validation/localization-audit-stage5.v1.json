@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-stage5/v1",
+  "stage": 5,
+  "status": "PASS_WITH_REVIEW",
+  "mode": "READ_ONLY_AUDIT",
+  "purpose": "formalize the completed localization audit as one package command, deterministic machine report, and permanent CI gate",
+  "sources": {
+    "contract": "data/contracts/localization-audit-stage5.v1.json",
+    "inheritedStage4Runner": "scripts/audit-localization-stage4.mjs",
+    "inheritedStage4Snapshot": "data/validation/localization-audit-stage4.v1.json",
+    "packageJson": "package.json",
+    "ciWorkflow": ".github/workflows/localization-audit.yml",
+    "historicalStage2Runner": "scripts/audit-localization-stage2.mjs",
+    "stage2_1Runner": "scripts/audit-localization-stage2-1.mjs"
+  },
+  "command": {
+    "packageScript": "audit:localization",
+    "packageCommand": "node scripts/audit-localization.mjs",
+    "entrypoint": "scripts/audit-localization.mjs",
+    "supportedOptions": [
+      "--check",
+      "--json",
+      "--report <path>",
+      "--self-test"
+    ]
+  },
+  "inheritedStage4": {
+    "schemaId": "localization-audit-stage4/v1",
+    "status": "PASS_WITH_REVIEW",
+    "soldierRecords": 224,
+    "soldierEffectiveKoreanDisplays": 224,
+    "heroRecords": 267,
+    "heroEffectiveKoreanDisplays": 267,
+    "equipmentRecords": 390,
+    "equipmentPublicRecords": 373,
+    "equipmentEffectiveKoreanDisplays": 373,
+    "equipmentNonPublicAdmitted": 0,
+    "frontendFilesChecked": 15,
+    "errors": 0,
+    "reviews": 2,
+    "frontendLocalizationLeakErrors": 0
+  },
+  "machineReport": {
+    "schemaId": "localization-audit-stage5/v1",
+    "format": "JSON",
+    "stdoutFlag": "--json",
+    "fileFlag": "--report <path>",
+    "deterministic": true,
+    "repositoryInputMutationAllowed": false
+  },
+  "ci": {
+    "workflow": ".github/workflows/localization-audit.yml",
+    "permanent": true,
+    "triggers": [
+      "pull_request:main",
+      "push:main",
+      "workflow_dispatch"
+    ],
+    "reportArtifact": "localization-audit-stage5-report"
+  },
+  "checks": {
+    "contractFrozen": true,
+    "stage4SnapshotGatePassed": true,
+    "stage4SchemaMatches": true,
+    "stage4StatusAccepted": true,
+    "baselineMatches": true,
+    "packageScriptExact": true,
+    "historicalStage2RunnerExists": true,
+    "stage2_1UsesPreservedStage2": true,
+    "permanentCiDeclared": true,
+    "readOnlyExecution": true
+  },
+  "summary": {
+    "errors": 0,
+    "reviews": 2,
+    "frontendLocalizationLeakErrors": 0,
+    "soldierRecords": 224,
+    "heroRecords": 267,
+    "equipmentRecords": 390,
+    "equipmentPublicRecords": 373
+  },
+  "errors": [],
+  "readOnlyExecution": true
+}

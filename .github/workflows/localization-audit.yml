@@ -1,0 +1,37 @@
+name: Localization Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Verify frozen localization audit and emit machine report
+        run: npm run audit:localization -- --check --report "$RUNNER_TEMP/localization-audit-stage5-report.json"
+
+      - name: Run localization audit self-tests
+        run: npm run audit:localization -- --self-test
+
+      - name: Upload localization audit machine report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: localization-audit-stage5-report
+          path: ${{ runner.temp }}/localization-audit-stage5-report.json
+          if-no-files-found: error
