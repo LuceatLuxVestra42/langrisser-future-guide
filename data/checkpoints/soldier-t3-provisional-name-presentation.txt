@@ -1,0 +1,30 @@
+Soldier T3 Korean Name Boundary — PASS
+
+Scope: Korean naming/presentation only. Canonical Soldier identity, relations, combat data, release metadata, and assets are unchanged.
+
+Canonical T3 state:
+- normal T3 Soldier: 129
+- confirmed Korean name: 127
+- official Korean name unresolved: 2
+- provisional Korean name stored as canonical: 0
+
+Presentation overlay:
+- 136 / 烬色卫队 / LANCER -> 잿빛 호위대 [provisional-display]
+- 1039 / 断罪修女 / DEMON -> 단죄의 수녀 [provisional-display]
+- frontend Korean display coverage: 129 / 129
+
+Canonical target state for both records:
+- nameKr = null
+- nameKrStatus = unreleased
+- validationStatus = REVIEW
+
+Presentation source:
+- data/presentation/soldier-t3-provisional-name-kr.v1.json
+- source TXT: 랑그릿사_3티어_용병_한섭명_매핑_127확정_2임시.txt
+
+Boundary:
+- do not promote either provisional display label to confirmed canonical name until the exact Korean server name is confirmed.
+- when confirmed, update canonical nameKr/nameKrStatus and retire the corresponding provisional overlay record.
+
+T3_CONFIRMED_127_PROVISIONAL_2
+FRONTEND_KOREAN_DISPLAY_129_OF_129
