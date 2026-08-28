@@ -1,0 +1,503 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-active-source-registry/v1",
+  "stage": "PROJECT-STATUS-STAGE2",
+  "checkpoint": "PROJECT_DOCTOR_ACTIVE_SOURCE_REGISTRY",
+  "status": "PASS_PROJECT_DOCTOR_ACTIVE_SOURCE_REGISTRY",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/project-doctor-active-source-registry.v1.json",
+  "derivedOnly": true,
+  "rawConfigDataReadCount": 0,
+  "semanticRecomputationCount": 0,
+  "canonicalJoinRecomputationCount": 0,
+  "entryCount": 6,
+  "selectedCount": 6,
+  "domains": {
+    "hero": {
+      "rootId": "hero-stage6-4-final",
+      "selectedId": "hero-stage6-4-final",
+      "sourcePath": "data/validation/hero-stage6-4-final.v1.json",
+      "facet": "canonical",
+      "sourceEntryFile": "data/status-sources/baseline.v1.json",
+      "lineage": [
+        "hero-stage6-4-final"
+      ],
+      "admissionEvidence": {
+        "readable": true,
+        "admission": [
+          {
+            "pass": true,
+            "pointer": "/status",
+            "operator": "equals",
+            "expected": "PASS_WITH_REVIEW",
+            "actual": "PASS_WITH_REVIEW"
+          },
+          {
+            "pass": true,
+            "pointer": "/completion",
+            "operator": "equals",
+            "expected": "COMPLETE",
+            "actual": "COMPLETE"
+          },
+          {
+            "pass": true,
+            "pointer": "/heroDataPipelineStatus",
+            "operator": "equals",
+            "expected": "FINAL_FROZEN",
+            "actual": "FINAL_FROZEN"
+          }
+        ]
+      }
+    },
+    "soldier": {
+      "rootId": "soldier-stage6-7-site-admission",
+      "selectedId": "soldier-stage6-7-site-admission",
+      "sourcePath": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "facet": "canonical",
+      "sourceEntryFile": "data/status-sources/baseline.v1.json",
+      "lineage": [
+        "soldier-stage6-7-site-admission"
+      ],
+      "admissionEvidence": {
+        "readable": true,
+        "admission": [
+          {
+            "pass": true,
+            "pointer": "/status",
+            "operator": "equals",
+            "expected": "PASS",
+            "actual": "PASS"
+          },
+          {
+            "pass": true,
+            "pointer": "/admissionStatus",
+            "operator": "equals",
+            "expected": "READY_WITH_REVIEW",
+            "actual": "READY_WITH_REVIEW"
+          }
+        ]
+      }
+    },
+    "equipment": {
+      "rootId": "equipment-stage4-final",
+      "selectedId": "equipment-stage4-final",
+      "sourcePath": "data/validation/equipment-stage4-final.v1.json",
+      "facet": "canonical",
+      "sourceEntryFile": "data/status-sources/baseline.v1.json",
+      "lineage": [
+        "equipment-stage4-final"
+      ],
+      "admissionEvidence": {
+        "readable": true,
+        "admission": [
+          {
+            "pass": true,
+            "pointer": "/status",
+            "operator": "equals",
+            "expected": "PASS_WITH_REVIEW",
+            "actual": "PASS_WITH_REVIEW"
+          },
+          {
+            "pass": true,
+            "pointer": "/completion",
+            "operator": "equals",
+            "expected": "COMPLETE",
+            "actual": "COMPLETE"
+          },
+          {
+            "pass": true,
+            "pointer": "/pipelineStatus",
+            "operator": "equals",
+            "expected": "FINAL_FROZEN",
+            "actual": "FINAL_FROZEN"
+          }
+        ]
+      }
+    },
+    "hero-soldier": {
+      "rootId": "hero-soldier-stageC-final",
+      "selectedId": "hero-soldier-stageC-final",
+      "sourcePath": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+      "facet": "relation",
+      "sourceEntryFile": "data/status-sources/baseline.v1.json",
+      "lineage": [
+        "hero-soldier-stageC-final"
+      ],
+      "admissionEvidence": {
+        "readable": true,
+        "admission": [
+          {
+            "pass": true,
+            "pointer": "/status",
+            "operator": "equals",
+            "expected": "PASS_WITH_REVIEW",
+            "actual": "PASS_WITH_REVIEW"
+          },
+          {
+            "pass": true,
+            "pointer": "/completion",
+            "operator": "equals",
+            "expected": "COMPLETE",
+            "actual": "COMPLETE"
+          },
+          {
+            "pass": true,
+            "pointer": "/pipelineStatus",
+            "operator": "equals",
+            "expected": "FINAL_FROZEN",
+            "actual": "FINAL_FROZEN"
+          }
+        ]
+      }
+    },
+    "banner": {
+      "rootId": "banner-stage3-8-regression-freeze",
+      "selectedId": "banner-stage3-8-regression-freeze",
+      "sourcePath": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+      "facet": "canonical",
+      "sourceEntryFile": "data/status-sources/baseline.v1.json",
+      "lineage": [
+        "banner-stage3-8-regression-freeze"
+      ],
+      "admissionEvidence": {
+        "readable": true,
+        "admission": [
+          {
+            "pass": true,
+            "pointer": "/status",
+            "operator": "equals",
+            "expected": "PASS_BANNER_STAGE3_8_REGRESSION_FREEZE",
+            "actual": "PASS_BANNER_STAGE3_8_REGRESSION_FREEZE"
+          },
+          {
+            "pass": true,
+            "pointer": "/freezeState",
+            "operator": "equals",
+            "expected": "BANNER_STAGE3_FROZEN",
+            "actual": "BANNER_STAGE3_FROZEN"
+          }
+        ]
+      }
+    },
+    "skin": {
+      "rootId": "skin-stage3-2-readiness",
+      "selectedId": "skin-stage3-2-readiness",
+      "sourcePath": "data/validation/skin-stage3-2-readiness.v1.json",
+      "facet": "asset",
+      "sourceEntryFile": "data/status-sources/baseline.v1.json",
+      "lineage": [
+        "skin-stage3-2-readiness"
+      ],
+      "admissionEvidence": {
+        "readable": true,
+        "admission": [
+          {
+            "pass": true,
+            "pointer": "/status",
+            "operator": "equals",
+            "expected": "READY_FOR_ASSET_EVIDENCE",
+            "actual": "READY_FOR_ASSET_EVIDENCE"
+          }
+        ]
+      }
+    }
+  },
+  "effectiveDomains": {
+    "hero": {
+      "primaryStatusSource": "data/validation/hero-stage6-4-final.v1.json",
+      "primaryFacet": "canonical",
+      "expected": {
+        "canonicalHeroCount": 267
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawCompletion": "/completion",
+        "rawFreezeState": "/heroDataPipelineStatus",
+        "canonicalHeroCount": "/summary/canonicalHeroCount",
+        "hardErrorCount": "/summary/hardErrorCount"
+      },
+      "reviewSelectors": [
+        "/nonBlockingReviews"
+      ],
+      "nextWorkSelectors": [
+        "/nextStartPoint"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/heroDataPipelineStatus == FINAL_FROZEN",
+          "lifecycle": "FROZEN"
+        },
+        {
+          "when": "/completion == COMPLETE",
+          "lifecycle": "COMPLETE"
+        }
+      ],
+      "supplementalSources": [
+        {
+          "path": "data/validation/hero-list-stage4.v1.json",
+          "role": "CURRENT_HERO_ROUTE_ASSET_PREFLIGHT",
+          "facet": "frontend",
+          "selectors": {
+            "rawStatus": "/status",
+            "rawCompletion": "/completion",
+            "heroCount": "/summary/heroCount",
+            "resolvedArtworkCount": "/summary/resolvedArtworkCount",
+            "pendingArtworkCount": "/summary/pendingArtworkCount",
+            "hardErrorCount": "/summary/hardErrorCount",
+            "failures": "/failures"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "This proves list/detail route shell and Stage 4 preflight only. Because artwork remains pending in this checkpoint, it does not clear the broader FRONTEND_ASSET_ROUTE_INTEGRATION_PENDING review."
+        },
+        {
+          "path": "data/validation/hero-list-stage5.v1.json",
+          "role": "CURRENT_HERO_DETAIL_FRONTEND_PROJECTION",
+          "facet": "frontend",
+          "selectors": {
+            "rawStatus": "/status",
+            "rawCompletion": "/completion",
+            "heroCount": "/summary/heroCount",
+            "soldierEdgeCount": "/summary/soldierEdgeCount",
+            "missingShardCount": "/summary/missingShardCount",
+            "parityMismatchCount": "/summary/parityMismatchCount"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "This proves 267-Hero detail projection and 5,977 Soldier-edge parity but does not by itself prove final artwork, hosted, or mobile QA."
+        }
+      ]
+    },
+    "soldier": {
+      "primaryStatusSource": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "primaryFacet": "canonical",
+      "expected": {
+        "canonicalSoldiers": 224,
+        "normalSoldiers": 168,
+        "spSoldiers": 56,
+        "heroSoldierRelations": 5977
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawCompletion": "/admissionStatus",
+        "canonicalSoldiers": "/coverage/canonicalSoldiers",
+        "normalSoldiers": "/coverage/normalSoldiers",
+        "spSoldiers": "/coverage/spSoldiers",
+        "heroSoldierRelations": "/coverage/heroSoldierRelations",
+        "hardErrorCount": "/checks/admissionGateFailures"
+      },
+      "zeroRequiredSelectors": [
+        "/checks/upstreamStatusFailures",
+        "/checks/sourceSnapshotMismatches",
+        "/checks/coverageMismatches",
+        "/checks/recordFailCount",
+        "/checks/undeclaredReviewCodes",
+        "/checks/representativeFailedFixtures",
+        "/checks/filterFailedTests",
+        "/checks/reciprocalPagePairMismatch",
+        "/checks/expansionPreservationFailures",
+        "/checks/documentationMissing",
+        "/checks/admissionGateFailures"
+      ],
+      "reviewSelectors": [
+        "/reviews"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/status == PASS AND /admissionStatus == READY_WITH_REVIEW",
+          "lifecycle": "COMPLETE"
+        }
+      ],
+      "supplementalSources": [
+        {
+          "path": "data/validation/soldier-portrait-stage3j-frontend-full.v1.json",
+          "role": "CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE",
+          "facet": "asset",
+          "selectors": {
+            "rawStatus": "/status",
+            "canonicalSoldierCount": "/coverage/canonicalSoldierCount",
+            "portraitRecordCount": "/coverage/portraitRecordCount",
+            "normalPortraitCount": "/coverage/normalPortraitCount",
+            "spPortraitCount": "/coverage/spPortraitCount",
+            "missingPortraitCount": "/coverage/missingPortraitCount",
+            "verifiedAssetFileCount": "/coverage/verifiedAssetFileCount"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Current repository evidence proves portrait coverage 224/224 including SP 56/56. It does not change canonical Soldier identity, release chronology, or localization reviews."
+        },
+        {
+          "path": "data/validation/soldier-t3-provisional-name-presentation.v1.json",
+          "role": "CURRENT_PRESENTATION_REVIEW",
+          "facet": "localization",
+          "selectors": {
+            "rawStatus": "/status",
+            "normalTier3Count": "/canonical/normalTier3Count",
+            "officialNameUnresolvedCount": "/canonical/officialNameUnresolvedCount",
+            "provisionalDisplayCount": "/presentation/provisionalDisplayCount",
+            "targets": "/targets"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Presentation-only provisional names may add current REVIEW items but cannot downgrade canonical Soldier identity/relation semantics to FAIL."
+        }
+      ]
+    },
+    "equipment": {
+      "primaryStatusSource": "data/validation/equipment-stage4-final.v1.json",
+      "primaryFacet": "canonical",
+      "expected": {
+        "canonical": 390,
+        "public": 373,
+        "general": 206,
+        "exclusive": 167
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawCompletion": "/completion",
+        "rawFreezeState": "/pipelineStatus",
+        "canonical": "/population/canonical",
+        "public": "/population/public",
+        "general": "/population/general",
+        "exclusive": "/population/exclusive",
+        "hardErrorCount": "/hardErrorCount"
+      },
+      "reviewSelectors": [
+        "/nonBlockingReviews"
+      ],
+      "nextWorkSelectors": [
+        "/nextStartPoint"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/pipelineStatus == FINAL_FROZEN",
+          "lifecycle": "FROZEN"
+        },
+        {
+          "when": "/completion == COMPLETE",
+          "lifecycle": "COMPLETE"
+        }
+      ],
+      "supplementalSources": []
+    },
+    "hero-soldier": {
+      "primaryStatusSource": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+      "primaryFacet": "relation",
+      "expected": {
+        "heroCount": 267,
+        "soldierCount": 224,
+        "canonicalPairCount": 5977
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawCompletion": "/completion",
+        "rawFreezeState": "/pipelineStatus",
+        "heroCount": "/summary/heroCount",
+        "soldierCount": "/summary/soldierCount",
+        "canonicalPairCount": "/summary/canonicalPairCount",
+        "hardErrorCount": "/summary/hardErrorCount"
+      },
+      "zeroRequiredSelectors": [
+        "/summary/c1AllPairDifferences",
+        "/summary/c1UnknownOrDuplicateIdentityErrors",
+        "/summary/c2StructuralIdentityErrors",
+        "/summary/c3SemanticFixtureFailures",
+        "/summary/c4BoundaryViolations",
+        "/summary/failedCheckCount",
+        "/summary/hardErrorCount"
+      ],
+      "reviewSelectors": [
+        "/nonBlockingReviews"
+      ],
+      "nextWorkSelectors": [
+        "/nextStartPoint"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/pipelineStatus == FINAL_FROZEN",
+          "lifecycle": "FROZEN"
+        },
+        {
+          "when": "/completion == COMPLETE",
+          "lifecycle": "COMPLETE"
+        }
+      ],
+      "supplementalSources": [],
+      "policy": "Hero and Soldier frontend PASS evidence must not silently clear C-stage cross-page click/back/404/mobile review unless a later shared integration checkpoint explicitly verifies that exact scope."
+    },
+    "banner": {
+      "primaryStatusSource": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+      "primaryFacet": "canonical",
+      "expected": {
+        "definitions": 77,
+        "occurrences": 94
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawFreezeState": "/freezeState",
+        "definitions": "/canonicalPopulation/definitions",
+        "occurrences": "/canonicalPopulation/occurrences",
+        "errors": "/errors"
+      },
+      "reviewSelectors": [
+        "/knownDeferredNonErrors"
+      ],
+      "nextWorkSelectors": [
+        "/nextStage"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/freezeState == BANNER_STAGE3_FROZEN",
+          "lifecycle": "FROZEN"
+        }
+      ],
+      "supplementalSources": []
+    },
+    "skin": {
+      "primaryStatusSource": "data/validation/skin-stage3-2-readiness.v1.json",
+      "primaryFacet": "asset",
+      "expected": {
+        "skinCount": 540,
+        "heroCount": 267,
+        "stage31FailedCheckCount": 0,
+        "stage32FailedCheckCount": 0
+      },
+      "requiredSelectors": {
+        "rawStatus": "/status",
+        "rawCompletion": "/completion",
+        "stage32FailedCheckCount": "/metrics/failedCheckCount",
+        "evidencePresent": "/evidence/present",
+        "blocker": "/evidence/blocker"
+      },
+      "reviewSelectors": [
+        "/evidence"
+      ],
+      "nextWorkSelectors": [
+        "/nextAction"
+      ],
+      "lifecycleRules": [
+        {
+          "when": "/status == READY_FOR_ASSET_EVIDENCE AND /completion == null",
+          "lifecycle": "IN_PROGRESS"
+        }
+      ],
+      "supplementalSources": [
+        {
+          "path": "data/validation/skin-stage3-1-final.v1.json",
+          "role": "FROZEN_STAGE3_1_POPULATION_BASELINE",
+          "facet": "asset",
+          "selectors": {
+            "rawStatus": "/status",
+            "rawCompletion": "/completion",
+            "skinCount": "/metrics/skinCount",
+            "heroCount": "/metrics/heroCount",
+            "failedCheckCount": "/metrics/failedCheckCount"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Use only as the completed Stage 3-1 population/inventory baseline. D1 must not rerun Stage 3-1 or infer Stage 3-2 evidence from it."
+        }
+      ]
+    }
+  },
+  "failures": [],
+  "hardErrorCount": 0,
+  "entryFiles": [
+    "data/status-sources/baseline.v1.json"
+  ]
+}
