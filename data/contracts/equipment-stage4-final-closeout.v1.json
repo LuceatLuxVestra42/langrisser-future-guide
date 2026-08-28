@@ -1,7 +1,7 @@
 {
   "version": 1,
   "stage": "4-FINAL",
-  "purpose": "Close Equipment Stage 4 from frozen Stage 4 checkpoints and current public entrypoint only, without reopening Equipment semantics or raw ConfigData.",
+  "purpose": "Close Equipment Stage 4 from frozen Stage 4 checkpoints, current public entrypoint, and frozen Equipment Image Stage 3 Hosted QA without reopening Equipment semantics or raw ConfigData.",
   "requiredUpstream": {
     "stage40": "FROZEN",
     "stage41": "STAGE4_1_ROUTE_LOADER_SCAFFOLD_READY",
@@ -10,9 +10,11 @@
     "stage44": "STAGE4_4_EXCLUSIVE_UI_AND_OWNERSHIP_READY",
     "stage45": "STAGE4_5_DISPLAY_STATE_POLICY_HARDENED",
     "stage46": "STAGE4_6_ADMISSION_ROUTE_QA_READY",
-    "stage47": "STAGE4_7_WHOLE_CONSUMER_REGRESSION_READY"
+    "stage47": "STAGE4_7_WHOLE_CONSUMER_REGRESSION_READY",
+    "imageStage3Hosted": "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA"
   },
   "hardGates": {
+    "canonicalPopulation": 390,
     "publicPopulation": 373,
     "generalPopulation": 206,
     "exclusivePopulation": 167,
@@ -20,15 +22,20 @@
     "hold": 1,
     "holdEquipmentIds": [2013],
     "generalTabs": {"1": 94, "2": 80, "3": 32},
-    "runtimeKindMismatch": 0,
-    "runtimeEquipmentIdMismatch": 0,
-    "exclusiveOwnerPayloadMismatch": 0,
+    "runtimeGeneralResolved": 206,
+    "runtimeExclusiveResolved": 167,
     "hiddenResolved": 0,
     "holdResolved": 0,
     "unknownResolved": 0,
     "ownershipCardinalityMismatch": 0,
     "ownerHeroMissing": 0,
+    "stateKeysIsolated": true,
+    "generatedRouteTreeVerified": true,
+    "notFoundBoundaryVerified": true,
     "homepageEquipmentTarget": "/equipment",
+    "imageStage3Status": "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA",
+    "imageStage3FreezeState": "EQUIPMENT_IMAGE_STAGE3_FROZEN",
+    "imageStage3BrowserUi": "PASS_HOSTED_ROUTE_AND_ASSET_SMOKE",
     "buildMustPass": true
   },
   "finalStatusPolicy": {
@@ -39,13 +46,13 @@
     "reviewReadiness": "PC_FIRST_REVIEW_READY"
   },
   "nonBlockingReviewPolicy": [
-    "Korean display names still marked REVIEW remain fallback-only and do not alter membership or route identity.",
+    "Any Korean display name still unresolved by the current localization adapter must remain fallback-only and must not alter membership or route identity.",
     "Exact release chronology that is not verified must remain explicitly non-chronological or REVIEW in presentation.",
-    "Equipment icon binding remains deferred while no verified web-served Equipment icon asset set is available; fabricated paths are forbidden.",
-    "Browser/pixel/mobile QA is outside Stage 4 closeout and belongs to public review/UI polish follow-up."
+    "Hosted browser route and Equipment asset smoke QA is frozen as PASS; remaining pixel-polish and mobile interaction review is non-blocking UI follow-up."
   ],
   "sourceDiscipline": {
     "readFrozenStage4Checkpoints": true,
+    "readFrozenImageStage3HostedQa": true,
     "readCurrentHomepageEntrypoint": true,
     "rawConfigDataRead": false,
     "stage3SemanticRecomputation": false,
