@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-soldier-stage2-1/v1",
+  "stage": "2.1",
+  "entity": "Soldier",
+  "status": "PASS_WITH_REVIEW",
+  "mode": "READ_ONLY_AUDIT",
+  "purpose": "freeze exact confirmed lower-tier Korean presentation strings so silent spacing or wording drift requires explicit snapshot approval",
+  "stage2": {
+    "schemaId": "localization-audit-soldier-stage2/v1",
+    "status": "PASS_WITH_REVIEW",
+    "canonicalRecords": 224,
+    "effectiveKoreanDisplayRecords": 224,
+    "errors": 0,
+    "reviews": 2
+  },
+  "lowerTierPresentation": {
+    "path": "data/presentation/soldier-lower-tier-name-kr.v1.json",
+    "recordCount": 39,
+    "fingerprintAlgorithm": "sha256",
+    "fingerprintSort": "soldierId-ascending",
+    "fingerprintFields": [
+      "soldierId",
+      "tier",
+      "nameCn",
+      "nameKr"
+    ],
+    "fingerprint": "316e905bc409fa337f79baa72a676872998c1f1546ee994e00267b2948d42e28"
+  },
+  "readOnlyExecution": true
+}
