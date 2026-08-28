@@ -1,0 +1,55 @@
+name: Hero portrait Stage 4-2B base-model structure probe
+on:
+  push:
+    branches:
+      - work/hero-portrait-stage4-2b-explicit-fallback-source-acquisition
+    paths:
+      - .github/workflows/hero-portrait-stage4-2b-base-model-structure-probe.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe representative explicit model relations
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def load(n): return json.loads(Path('data/configdata',n).read_text())
+          hero=load('ConfigDataHeroInfo.json'); job=load('ConfigDataJobConnectionInfo.json'); model=load('ConfigDataModelSkinResourceInfo.json'); char=load('ConfigDataCharImageInfo.json')
+          def getid(r): return r.get('ID',r.get('Id',r.get('id')))
+          H={int(getid(r)):r for r in hero if getid(r) is not None}; J={int(getid(r)):r for r in job if getid(r) is not None}; M={int(getid(r)):r for r in model if getid(r) is not None}; C={int(getid(r)):r for r in char if getid(r) is not None}
+          reps=[5,24,69,99265]
+          out={'version':1,'tableCounts':{'hero':len(H),'jobConnection':len(J),'modelSkinResource':len(M),'charImage':len(C)},'records':[]}
+          for hid in reps:
+              hr=H.get(hid,{})
+              interesting={k:v for k,v in hr.items() if any(x in k.lower() for x in ['job','model','image','resource','skin'])}
+              ids=[]
+              def walk(v):
+                  if isinstance(v,int) and v in J: ids.append(v)
+                  elif isinstance(v,list):
+                      for x in v: walk(x)
+                  elif isinstance(v,dict):
+                      for x in v.values(): walk(x)
+              walk(interesting)
+              jobs=[]
+              for jid in sorted(set(ids)):
+                  jr=J[jid]
+                  ji={k:v for k,v in jr.items() if any(x in k.lower() for x in ['model','resource','skin','image','hero','job']) or k in ['ID']}
+                  referenced=[]
+                  for k,v in ji.items():
+                      if isinstance(v,int):
+                          if v in M: referenced.append({'field':k,'value':v,'table':'ModelSkinResource','record':M[v]})
+                          if v in C: referenced.append({'field':k,'value':v,'table':'CharImage','record':C[v]})
+                  jobs.append({'jobConnectionId':jid,'fields':ji,'directReferencedRecords':referenced})
+              out['records'].append({'heroId':hid,'heroInterestingFields':interesting,'jobConnectionCandidates':jobs})
+          Path('data/validation/hero-portrait-stage4-2b-base-model-structure-probe.v1.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(out,ensure_ascii=False,indent=2)[:50000])
+          PY
+      - run: |
+          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/hero-portrait-stage4-2b-base-model-structure-probe.v1.json
+          if git diff --cached --quiet; then echo no-change; else git commit -m 'Probe Hero base model source relations'; git push; fi
