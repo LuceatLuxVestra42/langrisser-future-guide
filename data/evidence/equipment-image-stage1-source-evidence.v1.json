@@ -1,60 +1,101 @@
 {
   "evidence": "equipment-image-stage1-source-evidence-v1",
   "stage": "Equipment Image Stage 1",
-  "status": "PENDING_AUTHORITATIVE_BYTES",
+  "status": "VERIFIED_EXACT_SOURCE_EXPORT",
   "discovery": {
-    "connectedSource": "Korean legacy sheet asset Google Drive",
-    "method": "exact filename image search",
+    "connectedSource": "Korean legacy sheet asset Google Drive / 장비 folder",
+    "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+    "method": "parent-scoped exact filename metadata search followed by raw file download",
     "searchedAt": "2026-08-28",
     "results": [
-      {"fileName": "Equip_Dagger6.png", "matchCount": 0},
-      {"fileName": "Equip_MetalArmor6.png", "matchCount": 0},
-      {"fileName": "Equip_MetalHelmet6.png", "matchCount": 0},
-      {"fileName": "Equip_Boots4.png", "matchCount": 0},
-      {"fileName": "Equip_Sword13.png", "matchCount": 0}
+      {
+        "fileName": "Equip_Dagger6.png",
+        "matchCount": 1,
+        "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+        "driveFileId": "1cVKDb30uIqCQ-P52LXKWyv2CG6Xtk5Il"
+      },
+      {
+        "fileName": "Equip_MetalArmor6.png",
+        "matchCount": 1,
+        "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+        "driveFileId": "1lH5FpBU5wkwY3JSv9f7fJfPY2ibwGOj5"
+      },
+      {
+        "fileName": "Equip_MetalHelmet6.png",
+        "matchCount": 1,
+        "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+        "driveFileId": "1mvvsBEsd-puHPk8sccCxRIRwgCaO1cKG"
+      },
+      {
+        "fileName": "Equip_Boots4.png",
+        "matchCount": 1,
+        "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+        "driveFileId": "1eWi_PDFTtMOJ_0rXRiil7-RHcEGk55Uh"
+      },
+      {
+        "fileName": "Equip_Sword13.png",
+        "matchCount": 1,
+        "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+        "driveFileId": "16O7zSzTqVerxftMnghdjkwwGjmVAU7TC"
+      }
     ],
-    "interpretation": "No exact representative source filenames are available in the connected Drive. Similar filenames, translated names, or inferred aliases are not accepted as evidence."
+    "interpretation": "All five frozen ConfigDataEquipmentInfo.Icon basenames were resolved as exact filenames inside the dedicated legacy Equipment asset folder. Raw bytes were admitted only after byte-length, PNG signature/IHDR, 172x172 dimensions, and pre-recorded SHA-256 checks passed."
   },
   "records": [
     {
       "label": "weapon",
       "equipmentId": 6,
       "sourceLocator": "UI/Icon/Equip_ABS/Equip_Dagger6.png",
-      "sourceEvidenceStatus": "PENDING_AUTHORITATIVE_BYTES",
-      "sourceArtifact": null,
-      "sourceSha256": null
+      "sourceEvidenceStatus": "VERIFIED_EXACT_SOURCE_EXPORT",
+      "sourceArtifact": "google-drive:file:1cVKDb30uIqCQ-P52LXKWyv2CG6Xtk5Il;folder:1VDnmXeLilTogokXV-5UW-RinS2vMtVVp;name:Equip_Dagger6.png",
+      "sourceSha256": "4a58142e159ae0df9b941e1182e006a197ae299ba031c6acca93d679227f566d",
+      "sourceBytes": 20097,
+      "sourceWidth": 172,
+      "sourceHeight": 172
     },
     {
       "label": "armor",
       "equipmentId": 59,
       "sourceLocator": "UI/Icon/Equip_ABS/Equip_MetalArmor6.png",
-      "sourceEvidenceStatus": "PENDING_AUTHORITATIVE_BYTES",
-      "sourceArtifact": null,
-      "sourceSha256": null
+      "sourceEvidenceStatus": "VERIFIED_EXACT_SOURCE_EXPORT",
+      "sourceArtifact": "google-drive:file:1lH5FpBU5wkwY3JSv9f7fJfPY2ibwGOj5;folder:1VDnmXeLilTogokXV-5UW-RinS2vMtVVp;name:Equip_MetalArmor6.png",
+      "sourceSha256": "d7a8b62a6d7c09daa5ee01aa1686c12eaada9fa8e767b23739c2a2ef59f82699",
+      "sourceBytes": 29003,
+      "sourceWidth": 172,
+      "sourceHeight": 172
     },
     {
       "label": "headgear",
       "equipmentId": 80,
       "sourceLocator": "UI/Icon/Equip_ABS/Equip_MetalHelmet6.png",
-      "sourceEvidenceStatus": "PENDING_AUTHORITATIVE_BYTES",
-      "sourceArtifact": null,
-      "sourceSha256": null
+      "sourceEvidenceStatus": "VERIFIED_EXACT_SOURCE_EXPORT",
+      "sourceArtifact": "google-drive:file:1mvvsBEsd-puHPk8sccCxRIRwgCaO1cKG;folder:1VDnmXeLilTogokXV-5UW-RinS2vMtVVp;name:Equip_MetalHelmet6.png",
+      "sourceSha256": "773e1ba326105eba3e47e64363bf417d86402cffc95eb7e4aba87f2fbefa71c8",
+      "sourceBytes": 33866,
+      "sourceWidth": 172,
+      "sourceHeight": 172
     },
     {
       "label": "accessory",
       "equipmentId": 99,
       "sourceLocator": "UI/Icon/Equip_ABS/Equip_Boots4.png",
-      "sourceEvidenceStatus": "PENDING_AUTHORITATIVE_BYTES",
-      "sourceArtifact": null,
-      "sourceSha256": null
+      "sourceEvidenceStatus": "VERIFIED_EXACT_SOURCE_EXPORT",
+      "sourceArtifact": "google-drive:file:1eWi_PDFTtMOJ_0rXRiil7-RHcEGk55Uh;folder:1VDnmXeLilTogokXV-5UW-RinS2vMtVVp;name:Equip_Boots4.png",
+      "sourceSha256": "b1d0c0a7ce6f45c6391b75b36a1c3be39ea9021ae57778a734053a5be9cf1828",
+      "sourceBytes": 29291,
+      "sourceWidth": 172,
+      "sourceHeight": 172
     },
     {
       "label": "exclusive-equipment",
       "equipmentId": 273,
       "sourceLocator": "UI/Icon/Equip_ABS/Equip_Sword13.png",
-      "sourceEvidenceStatus": "PENDING_AUTHORITATIVE_BYTES",
-      "sourceArtifact": null,
-      "sourceSha256": null
+      "sourceEvidenceStatus": "VERIFIED_EXACT_SOURCE_EXPORT",
+      "sourceArtifact": "google-drive:file:16O7zSzTqVerxftMnghdjkwwGjmVAU7TC;folder:1VDnmXeLilTogokXV-5UW-RinS2vMtVVp;name:Equip_Sword13.png",
+      "sourceSha256": "fff84e6beaf9793017abea71b6cfddf0cca73cd8256cb22a6f840c1187f38f82",
+      "sourceBytes": 19383,
+      "sourceWidth": 172,
+      "sourceHeight": 172
     }
   ]
 }

@@ -1,48 +1,59 @@
 {
   "stage": "Equipment Image Stage 1",
-  "status": "READY_FOR_ASSET_EVIDENCE",
-  "completion": "PARTIAL_EVIDENCE_PENDING",
-  "freezeState": "EQUIPMENT_IMAGE_STAGE1_PROOF_READY",
+  "status": "PASS_EQUIPMENT_IMAGE_STAGE1",
+  "completion": "COMPLETE",
+  "freezeState": "EQUIPMENT_IMAGE_STAGE1_FROZEN",
   "semanticStageReopened": false,
   "canonicalIdentityChanged": false,
   "productionJoinKey": "equipmentId",
-  "bulkImportAllowed": false,
+  "bulkImportAllowed": true,
   "counts": {
     "requiredRepresentatives": 5,
     "evaluatedRepresentatives": 5,
-    "passedRepresentatives": 0,
-    "repositoryAssetsPresent": 0,
-    "verifiedSourceEvidence": 0,
+    "passedRepresentatives": 5,
+    "repositoryAssetsPresent": 5,
+    "verifiedSourceEvidence": 5,
     "hardErrors": 0,
-    "reviews": 5
+    "reviews": 0
   },
   "discovery": {
-    "connectedSource": "Korean legacy sheet asset Google Drive",
-    "method": "exact filename image search",
+    "connectedSource": "Korean legacy sheet asset Google Drive / 장비 folder",
+    "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+    "method": "parent-scoped exact filename metadata search followed by raw file download",
     "searchedAt": "2026-08-28",
     "results": [
       {
         "fileName": "Equip_Dagger6.png",
-        "matchCount": 0
+        "matchCount": 1,
+        "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+        "driveFileId": "1cVKDb30uIqCQ-P52LXKWyv2CG6Xtk5Il"
       },
       {
         "fileName": "Equip_MetalArmor6.png",
-        "matchCount": 0
+        "matchCount": 1,
+        "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+        "driveFileId": "1lH5FpBU5wkwY3JSv9f7fJfPY2ibwGOj5"
       },
       {
         "fileName": "Equip_MetalHelmet6.png",
-        "matchCount": 0
+        "matchCount": 1,
+        "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+        "driveFileId": "1mvvsBEsd-puHPk8sccCxRIRwgCaO1cKG"
       },
       {
         "fileName": "Equip_Boots4.png",
-        "matchCount": 0
+        "matchCount": 1,
+        "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+        "driveFileId": "1eWi_PDFTtMOJ_0rXRiil7-RHcEGk55Uh"
       },
       {
         "fileName": "Equip_Sword13.png",
-        "matchCount": 0
+        "matchCount": 1,
+        "folderId": "1VDnmXeLilTogokXV-5UW-RinS2vMtVVp",
+        "driveFileId": "16O7zSzTqVerxftMnghdjkwwGjmVAU7TC"
       }
     ],
-    "interpretation": "No exact representative source filenames are available in the connected Drive. Similar filenames, translated names, or inferred aliases are not accepted as evidence."
+    "interpretation": "All five frozen ConfigDataEquipmentInfo.Icon basenames were resolved as exact filenames inside the dedicated legacy Equipment asset folder. Raw bytes were admitted only after byte-length, PNG signature/IHDR, 172x172 dimensions, and pre-recorded SHA-256 checks passed."
   },
   "representativeResults": [
     {
@@ -51,20 +62,20 @@
       "sourceIconPath": "UI/Icon/Equip_ABS/Equip_Dagger6.png",
       "targetRepositoryPath": "public/images/equipment/6.png",
       "targetUrlPath": "/images/equipment/6.png",
-      "sourceEvidenceStatus": "PENDING_AUTHORITATIVE_BYTES",
-      "sourceArtifact": null,
-      "sourceSha256": null,
-      "repositoryAssetExists": false,
+      "sourceEvidenceStatus": "VERIFIED_EXACT_SOURCE_EXPORT",
+      "sourceArtifact": "google-drive:file:1cVKDb30uIqCQ-P52LXKWyv2CG6Xtk5Il;folder:1VDnmXeLilTogokXV-5UW-RinS2vMtVVp;name:Equip_Dagger6.png",
+      "sourceSha256": "4a58142e159ae0df9b941e1182e006a197ae299ba031c6acca93d679227f566d",
+      "repositoryAssetExists": true,
       "repositoryAsset": {
-        "bytes": null,
-        "pngSignatureValid": null,
-        "ihdrValid": null,
-        "width": null,
-        "height": null,
-        "sha256": null
+        "bytes": 20097,
+        "pngSignatureValid": true,
+        "ihdrValid": true,
+        "width": 172,
+        "height": 172,
+        "sha256": "4a58142e159ae0df9b941e1182e006a197ae299ba031c6acca93d679227f566d"
       },
-      "sourceRepositorySha256Parity": null,
-      "passed": false
+      "sourceRepositorySha256Parity": true,
+      "passed": true
     },
     {
       "label": "armor",
@@ -72,20 +83,20 @@
       "sourceIconPath": "UI/Icon/Equip_ABS/Equip_MetalArmor6.png",
       "targetRepositoryPath": "public/images/equipment/59.png",
       "targetUrlPath": "/images/equipment/59.png",
-      "sourceEvidenceStatus": "PENDING_AUTHORITATIVE_BYTES",
-      "sourceArtifact": null,
-      "sourceSha256": null,
-      "repositoryAssetExists": false,
+      "sourceEvidenceStatus": "VERIFIED_EXACT_SOURCE_EXPORT",
+      "sourceArtifact": "google-drive:file:1lH5FpBU5wkwY3JSv9f7fJfPY2ibwGOj5;folder:1VDnmXeLilTogokXV-5UW-RinS2vMtVVp;name:Equip_MetalArmor6.png",
+      "sourceSha256": "d7a8b62a6d7c09daa5ee01aa1686c12eaada9fa8e767b23739c2a2ef59f82699",
+      "repositoryAssetExists": true,
       "repositoryAsset": {
-        "bytes": null,
-        "pngSignatureValid": null,
-        "ihdrValid": null,
-        "width": null,
-        "height": null,
-        "sha256": null
+        "bytes": 29003,
+        "pngSignatureValid": true,
+        "ihdrValid": true,
+        "width": 172,
+        "height": 172,
+        "sha256": "d7a8b62a6d7c09daa5ee01aa1686c12eaada9fa8e767b23739c2a2ef59f82699"
       },
-      "sourceRepositorySha256Parity": null,
-      "passed": false
+      "sourceRepositorySha256Parity": true,
+      "passed": true
     },
     {
       "label": "headgear",
@@ -93,20 +104,20 @@
       "sourceIconPath": "UI/Icon/Equip_ABS/Equip_MetalHelmet6.png",
       "targetRepositoryPath": "public/images/equipment/80.png",
       "targetUrlPath": "/images/equipment/80.png",
-      "sourceEvidenceStatus": "PENDING_AUTHORITATIVE_BYTES",
-      "sourceArtifact": null,
-      "sourceSha256": null,
-      "repositoryAssetExists": false,
+      "sourceEvidenceStatus": "VERIFIED_EXACT_SOURCE_EXPORT",
+      "sourceArtifact": "google-drive:file:1mvvsBEsd-puHPk8sccCxRIRwgCaO1cKG;folder:1VDnmXeLilTogokXV-5UW-RinS2vMtVVp;name:Equip_MetalHelmet6.png",
+      "sourceSha256": "773e1ba326105eba3e47e64363bf417d86402cffc95eb7e4aba87f2fbefa71c8",
+      "repositoryAssetExists": true,
       "repositoryAsset": {
-        "bytes": null,
-        "pngSignatureValid": null,
-        "ihdrValid": null,
-        "width": null,
-        "height": null,
-        "sha256": null
+        "bytes": 33866,
+        "pngSignatureValid": true,
+        "ihdrValid": true,
+        "width": 172,
+        "height": 172,
+        "sha256": "773e1ba326105eba3e47e64363bf417d86402cffc95eb7e4aba87f2fbefa71c8"
       },
-      "sourceRepositorySha256Parity": null,
-      "passed": false
+      "sourceRepositorySha256Parity": true,
+      "passed": true
     },
     {
       "label": "accessory",
@@ -114,20 +125,20 @@
       "sourceIconPath": "UI/Icon/Equip_ABS/Equip_Boots4.png",
       "targetRepositoryPath": "public/images/equipment/99.png",
       "targetUrlPath": "/images/equipment/99.png",
-      "sourceEvidenceStatus": "PENDING_AUTHORITATIVE_BYTES",
-      "sourceArtifact": null,
-      "sourceSha256": null,
-      "repositoryAssetExists": false,
+      "sourceEvidenceStatus": "VERIFIED_EXACT_SOURCE_EXPORT",
+      "sourceArtifact": "google-drive:file:1eWi_PDFTtMOJ_0rXRiil7-RHcEGk55Uh;folder:1VDnmXeLilTogokXV-5UW-RinS2vMtVVp;name:Equip_Boots4.png",
+      "sourceSha256": "b1d0c0a7ce6f45c6391b75b36a1c3be39ea9021ae57778a734053a5be9cf1828",
+      "repositoryAssetExists": true,
       "repositoryAsset": {
-        "bytes": null,
-        "pngSignatureValid": null,
-        "ihdrValid": null,
-        "width": null,
-        "height": null,
-        "sha256": null
+        "bytes": 29291,
+        "pngSignatureValid": true,
+        "ihdrValid": true,
+        "width": 172,
+        "height": 172,
+        "sha256": "b1d0c0a7ce6f45c6391b75b36a1c3be39ea9021ae57778a734053a5be9cf1828"
       },
-      "sourceRepositorySha256Parity": null,
-      "passed": false
+      "sourceRepositorySha256Parity": true,
+      "passed": true
     },
     {
       "label": "exclusive-equipment",
@@ -135,29 +146,23 @@
       "sourceIconPath": "UI/Icon/Equip_ABS/Equip_Sword13.png",
       "targetRepositoryPath": "public/images/equipment/273.png",
       "targetUrlPath": "/images/equipment/273.png",
-      "sourceEvidenceStatus": "PENDING_AUTHORITATIVE_BYTES",
-      "sourceArtifact": null,
-      "sourceSha256": null,
-      "repositoryAssetExists": false,
+      "sourceEvidenceStatus": "VERIFIED_EXACT_SOURCE_EXPORT",
+      "sourceArtifact": "google-drive:file:16O7zSzTqVerxftMnghdjkwwGjmVAU7TC;folder:1VDnmXeLilTogokXV-5UW-RinS2vMtVVp;name:Equip_Sword13.png",
+      "sourceSha256": "fff84e6beaf9793017abea71b6cfddf0cca73cd8256cb22a6f840c1187f38f82",
+      "repositoryAssetExists": true,
       "repositoryAsset": {
-        "bytes": null,
-        "pngSignatureValid": null,
-        "ihdrValid": null,
-        "width": null,
-        "height": null,
-        "sha256": null
+        "bytes": 19383,
+        "pngSignatureValid": true,
+        "ihdrValid": true,
+        "width": 172,
+        "height": 172,
+        "sha256": "fff84e6beaf9793017abea71b6cfddf0cca73cd8256cb22a6f840c1187f38f82"
       },
-      "sourceRepositorySha256Parity": null,
-      "passed": false
+      "sourceRepositorySha256Parity": true,
+      "passed": true
     }
   ],
   "hardErrors": [],
-  "reviews": [
-    "representative weapon (6) awaits authoritative PNG bytes",
-    "representative armor (59) awaits authoritative PNG bytes",
-    "representative headgear (80) awaits authoritative PNG bytes",
-    "representative accessory (99) awaits authoritative PNG bytes",
-    "representative exclusive-equipment (273) awaits authoritative PNG bytes"
-  ],
-  "nextStage": "WAIT_FOR_AUTHORITATIVE_REPRESENTATIVE_BYTES"
+  "reviews": [],
+  "nextStage": "STAGE2_PUBLIC_373_ASSET_EXPANSION"
 }
