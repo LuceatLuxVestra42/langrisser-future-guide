@@ -59,13 +59,10 @@ function compareIds(a, b) {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-function copyLabels(record, fields) {
-  const labels = {};
-  for (const field of fields) {
-    const value = record?.[field];
-    if (typeof value === 'string' && value.length > 0) labels[field] = value;
-  }
-  return labels;
+function getLabel(record, field) {
+  if (!field) return null;
+  const value = record?.[field];
+  return typeof value === 'string' && value.length > 0 ? value : null;
 }
 
 export async function loadStage1Contract() {
@@ -97,20 +94,17 @@ export async function buildEntityIndex(entity, spec, contract) {
     rows.push({
       id,
       recordIndex,
-      labels: copyLabels(record, spec.searchLabelFields ?? []),
+      label: getLabel(record, spec.searchLabelField),
     });
   }
 
   rows.sort((a, b) => compareIds(a.id, b.id));
 
-  const ids = [];
-  const byId = {};
-  for (const row of rows) {
-    ids.push(row.id);
-    const entry = { recordIndex: row.recordIndex };
-    if (Object.keys(row.labels).length > 0) entry.labels = row.labels;
-    byId[row.id] = entry;
-  }
+  const entries = rows.map((row) => {
+    const tuple = [row.id, row.recordIndex];
+    if (row.label !== null) tuple.push(row.label);
+    return tuple;
+  });
 
   return {
     schemaVersion: 1,
@@ -127,9 +121,10 @@ export async function buildEntityIndex(entity, spec, contract) {
     },
     index: {
       keyEncoding: 'STRINGIFIED_EXPLICIT_SOURCE_ID',
-      entryCount: rows.length,
-      ids,
-      byId,
+      entryTuple: ['id', 'recordIndex', 'label?'],
+      labelField: spec.searchLabelField ?? null,
+      entryCount: entries.length,
+      entries,
     },
   };
 }
@@ -138,9 +133,30 @@ export function renderJson(value) {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
 
+export function renderIndexJson(value) {
+  const entries = value.index.entries;
+  const shell = {
+    ...value,
+    index: {
+      ...value.index,
+      entries: '__CONFIGDATA_LOOKUP_ENTRY_LINES__',
+    },
+  };
+  const entryLines = entries.map((entry) => `      ${JSON.stringify(entry)}`).join(',\n');
+  return `${JSON.stringify(shell, null, 2).replace(
+    '"__CONFIGDATA_LOOKUP_ENTRY_LINES__"',
+    `[\n${entryLines}\n    ]`,
+  )}\n`;
+}
+
 export async function writeJson(filePath, value) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, renderJson(value), 'utf8');
+}
+
+export async function writeIndexJson(filePath, value) {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, renderIndexJson(value), 'utf8');
 }
 
 export async function buildSummary(contract, built) {
@@ -155,6 +171,7 @@ export async function buildSummary(contract, built) {
       sourceRecordCount: index.source.recordCount,
       indexEntryCount: index.index.entryCount,
       containerPath: index.source.containerPath,
+      labelField: index.index.labelField,
     };
     totalEntries += index.index.entryCount;
   }
