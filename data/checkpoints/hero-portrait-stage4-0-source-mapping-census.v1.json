@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-0-source-mapping-census",
+  "schemaId": "hero-portrait-stage4-0-source-mapping-census-checkpoint/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "freezeState": "HERO_PORTRAIT_STAGE4_0_SOURCE_MAPPING_CENSUS_FROZEN",
+  "branch": "work/hero-portrait-stage4-0-source-mapping-census",
+  "contract": "data/contracts/hero-portrait-stage4-0-source-mapping-census.v1.json",
+  "census": "data/generated/hero-portrait-stage4-0-source-census.v1.json",
+  "checks": [
+    {"id": "canonical-hero-population", "expected": 267, "actual": 267, "result": "PASS"},
+    {"id": "structured-drive-folder-census-total", "expected": 244, "actual": 244, "result": "PASS"},
+    {"id": "structured-drive-rarity-sum", "expected": 244, "actual": 244, "result": "PASS"},
+    {"id": "stage2-anchor-hierarchy-continuity", "expected": 5, "actual": 5, "result": "PASS"},
+    {"id": "stage2-explicit-admission-retained", "expected": 5, "actual": 5, "result": "PASS"},
+    {"id": "name-folder-auto-admission", "expected": 0, "actual": 0, "result": "PASS"},
+    {"id": "structured-folder-unanchored-count", "expected": 239, "actual": 239, "result": "PASS"},
+    {"id": "count-level-structured-tree-gap", "expected": 23, "actual": 23, "result": "PASS"},
+    {"id": "llr-count-gap", "expected": 1, "actual": 1, "result": "PASS"},
+    {"id": "ssr-count-gap", "expected": 22, "actual": 22, "result": "PASS"},
+    {"id": "basic-folder-multi-png-counterexample-captured", "expected": true, "actual": true, "result": "PASS"},
+    {"id": "materialized-target-count", "expected": 0, "actual": 0, "result": "PASS"},
+    {"id": "bulk-267-gate-open", "expected": false, "actual": false, "result": "PASS"}
+  ],
+  "completedScope": [
+    "locate the structured Google Drive Hero asset hierarchy by immutable folder IDs",
+    "enumerate direct Hero-folder candidates under LLR/SSR/SR/R/N rarity roots by parent-folder queries",
+    "freeze Drive folder counts as LLR 5 / SSR 191 / SR 33 / R 12 / N 3 / total 244",
+    "compare those counts to the frozen canonical rarity population 6 / 213 / 33 / 12 / 3 / total 267",
+    "prove that all five Stage 2 admitted source file IDs occur under the same structured Hero-folder -> 스킨 -> 기본 hierarchy",
+    "retain all five Stage 2 explicit Hero-ID admissions unchanged",
+    "record the Lana 기본-folder two-PNG case as a concrete counterexample to automatic folder/file selection",
+    "freeze 239 non-admitted structured folders as candidates only",
+    "freeze a minimum structured-tree coverage gap of 23 canonical Heroes",
+    "keep bulk materialization blocked"
+  ],
+  "reviewBoundary": {
+    "explicitAdmittedSourceCount": 5,
+    "pendingCanonicalSourceMappingCount": 262,
+    "structuredDriveHeroFolderCount": 244,
+    "unanchoredStructuredFolderCount": 239,
+    "minimumCanonicalHeroesOutsideStructuredTreeByCount": 23,
+    "exactMissingHeroIdsIdentified": false,
+    "bulk267Ready": false,
+    "meaning": "Stage 4-0 successfully censused the currently accessible source hierarchy. Candidate folder coverage is not canonical Hero ownership until an explicit Hero-ID bridge is proven."
+  },
+  "notCompletedScope": [
+    "bind the 239 unanchored structured Drive folders to canonical Hero IDs",
+    "select and admit exact portrait file IDs from those unanchored folders",
+    "identify the exact 23-or-more canonical Hero IDs absent from the structured Drive tree",
+    "prove another authoritative source family for uncovered Heroes",
+    "prove Unity HeroPainting prefab dependency resolution",
+    "copy any PNG into public/images/heroes/cards",
+    "frontend resolver mutation or Hosted/UI QA"
+  ],
+  "verdict": {
+    "stage4_0Complete": true,
+    "censusFrozen": true,
+    "hardErrors": 0,
+    "explicitAdmittedSourceCount": 5,
+    "structuredDriveCandidateUpperBound": 244,
+    "unanchoredStructuredFolderCount": 239,
+    "structuredDriveCountGap": 23,
+    "bulk267Ready": false,
+    "bulkBlockReason": "The approved Drive hierarchy cannot cover all 267 Heroes by count, and its non-anchor folders lack an approved Hero-ID/file-ID bridge."
+  },
+  "nextStart": {
+    "primary": "HERO_PORTRAIT_STAGE4_1_STRUCTURED_DRIVE_MAPPING_BRIDGE_PROOF",
+    "primaryGoal": "Create a non-name-inference Hero ID -> Drive Hero folder -> exact base portrait file ID bridge for the 239 unanchored structured candidates.",
+    "secondary": "HERO_PORTRAIT_STAGE4_2_UNCOVERED_SOURCE_FALLBACK_PROOF",
+    "secondaryGoal": "Resolve at least the 23-count structured-tree gap through another explicit source family or a separately proven Unity prefab dependency path.",
+    "bulkStartCondition": "Combined explicit admitted source mappings reach 267/267 with pending 0, review 0, rejected 0."
+  }
+}
