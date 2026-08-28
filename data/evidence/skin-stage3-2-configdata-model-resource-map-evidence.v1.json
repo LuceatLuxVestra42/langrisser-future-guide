@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-2",
+  "evidenceClass": "AUTHORITATIVE_CONFIGDATA_RESOURCE_MAP_EVIDENCE",
+  "status": "RESOURCE_ID_TO_PREFAB_PATH_MAP_COMPLETE_ASSET_ENTRY_PENDING",
+  "purpose": "Record authoritative ConfigData source proof for representative Skin model resource IDs without inferring bundle membership or treating a resource-path map as extracted model bytes.",
+  "source": {
+    "sourceType": "USER_SUPPLIED_PC_CLIENT_EXPORT_ASSET_BUNDLE",
+    "sourceLocation": "Langrisser_Data/StreamingAssets/ExportAssetBundle",
+    "primaryBundle": {
+      "fileName": "begin_configdata_configdata_abs.b",
+      "sizeBytes": 28433225,
+      "sha256": "b9735115b7a7b370647e69d87640fb6f77b729df2be9776f834deba176cff818",
+      "bundleFormat": "UnityFS",
+      "unityRevision": "2022.3.62f2",
+      "embeddedCab": "CAB-fd2c960b6c5f1e1517ca19e24ad06412",
+      "embeddedCabSizeBytes": 106200004
+    },
+    "companionBundle": {
+      "fileName": "configdata_configdata_abs.b",
+      "sizeBytes": 2786,
+      "sha256": "dc5343fd437fffbfd5f983f597a0c79324de7ad1c841281cb7fb36d9bd745a37",
+      "bundleFormat": "UnityFS",
+      "unityRevision": "2022.3.62f2",
+      "note": "Supplied together with the primary bundle. The representative resource map evidence below is sourced from begin_configdata_configdata_abs.b."
+    },
+    "acquisitionMethod": "local raw-byte SHA-256; UnityFS block decompression; Unity SerializedFile object-table parsing; exact ConfigData object selection; length-prefixed protobuf record parsing"
+  },
+  "embeddedConfigObjects": [
+    {
+      "name": "ConfigDataHeroSkinInfo",
+      "pathID": 1445889483218886811,
+      "serializedObjectByteStart": 67312056,
+      "serializedObjectByteSize": 217944,
+      "payloadByteSize": 217844,
+      "payloadMD5": "86072BA9C628D649907EA05C47523506",
+      "recordCount": 565,
+      "role": "authoritative Skin model binding source"
+    },
+    {
+      "name": "ConfigDataCharImageSkinResourceInfo",
+      "pathID": 1788329893368848577,
+      "serializedObjectByteStart": 67933848,
+      "serializedObjectByteSize": 78460,
+      "payloadByteSize": 78347,
+      "payloadMD5": "EA94AE2DDA8AD311F28AC6B049B551B7",
+      "recordCount": 566,
+      "role": "authoritative Skin static and character-Spine locator source"
+    },
+    {
+      "name": "ConfigDataModelSkinResourceInfo",
+      "pathID": 3900753103676195192,
+      "serializedObjectByteStart": 71297704,
+      "serializedObjectByteSize": 82336,
+      "payloadByteSize": 82227,
+      "payloadMD5": "3E47F48E6E5D30608CCB608A071B4C7A",
+      "recordCount": 977,
+      "role": "authoritative model skin resource ID to Prefab path map"
+    }
+  ],
+  "records": [
+    {
+      "canonicalKey": "102",
+      "heroSkinInfoRecordIndexZeroBased": 32,
+      "charImageSkinResourceInfoRecordIndexZeroBased": 33,
+      "static": "UI/Icon/HeroSkin_ABS/Skin/Skin_Matthew_01.png",
+      "spine": "Spine/Char/Mathew_ABS/Mathew_Skin01_Prefab.prefab",
+      "modelBindings": [
+        {"jobConnectionId": 18, "skinResourceId": 102},
+        {"jobConnectionId": 13, "skinResourceId": 102},
+        {"jobConnectionId": 21, "skinResourceId": 1021},
+        {"jobConnectionId": 16, "skinResourceId": 1021},
+        {"jobConnectionId": 17, "skinResourceId": 1022},
+        {"jobConnectionId": 12, "skinResourceId": 1022},
+        {"jobConnectionId": 19, "skinResourceId": 1023},
+        {"jobConnectionId": 14, "skinResourceId": 1023},
+        {"jobConnectionId": 20, "skinResourceId": 1024},
+        {"jobConnectionId": 15, "skinResourceId": 1024},
+        {"jobConnectionId": 22, "skinResourceId": 102}
+      ],
+      "modelResources": [
+        {"skinResourceId": 102, "modelSkinResourceInfoRecordIndexZeroBased": 189, "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01/Mathew_Skin01_Prefab.prefab"},
+        {"skinResourceId": 1021, "modelSkinResourceInfoRecordIndexZeroBased": 190, "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_1/Mathew_Skin01_1_Prefab.prefab"},
+        {"skinResourceId": 1022, "modelSkinResourceInfoRecordIndexZeroBased": 191, "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_2/Mathew_Skin01_2_Prefab.prefab"},
+        {"skinResourceId": 1023, "modelSkinResourceInfoRecordIndexZeroBased": 192, "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_3/Mathew_Skin01_3_Prefab.prefab", "alternateAirPrefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_3/Mathew_Skin01_3_air_Prefab.prefab"},
+        {"skinResourceId": 1024, "modelSkinResourceInfoRecordIndexZeroBased": 193, "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_4/Mathew_Skin01_4_Prefab.prefab"}
+      ],
+      "resourceMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
+      "assetEntryStatus": "PENDING"
+    },
+    {
+      "canonicalKey": "1901",
+      "heroSkinInfoRecordIndexZeroBased": 379,
+      "charImageSkinResourceInfoRecordIndexZeroBased": 380,
+      "static": "UI/Icon/HeroSkin2_ABS/Skin/Skin_Lista_Skin01.png",
+      "spine": "Spine/Char/Lista_ABS/Lista_Skin01_Prefab.prefab",
+      "modelBindings": [
+        {"jobConnectionId": 192, "skinResourceId": 1901},
+        {"jobConnectionId": 194, "skinResourceId": 1901}
+      ],
+      "modelResources": [
+        {"skinResourceId": 1901, "modelSkinResourceInfoRecordIndexZeroBased": 700, "prefabPath": "Spine/General/Lista_ABS/Lista_Skin01/Lista_Skin01_Prefab.prefab"}
+      ],
+      "resourceMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
+      "assetEntryStatus": "PENDING"
+    },
+    {
+      "canonicalKey": "3701",
+      "heroSkinInfoRecordIndexZeroBased": 75,
+      "charImageSkinResourceInfoRecordIndexZeroBased": 76,
+      "static": "UI/Icon/HeroSkin_ABS/Skin/Skin_Zigodlla_01.png",
+      "spine": "Spine/Char/Zigodlla_ABS/Zigodlla_Skin01_Prefab.prefab",
+      "modelBindings": [
+        {"jobConnectionId": 371, "skinResourceId": 3701},
+        {"jobConnectionId": 372, "skinResourceId": 3701},
+        {"jobConnectionId": 373, "skinResourceId": 3701},
+        {"jobConnectionId": 374, "skinResourceId": 3701},
+        {"jobConnectionId": 375, "skinResourceId": 3701},
+        {"jobConnectionId": 376, "skinResourceId": 3701},
+        {"jobConnectionId": 377, "skinResourceId": 3701}
+      ],
+      "modelResources": [
+        {"skinResourceId": 3701, "modelSkinResourceInfoRecordIndexZeroBased": 269, "prefabPath": "Spine/General/Zigodlla_ABS/Zigodlla_Skin01/Zigodlla_Skin01_Prefab.prefab"}
+      ],
+      "resourceMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
+      "assetEntryStatus": "PENDING"
+    }
+  ],
+  "coverage": {
+    "representativeCount": 3,
+    "modelResourceIdsExpected": 7,
+    "modelResourceIdsMappedToPrefabPath": 7,
+    "modelResourceIdsAuthoritativeAssetEntryResolved": 0,
+    "finalNormalizedResolvedRecords": 0
+  },
+  "exactBundleFilenameCandidatesFromUploadedBundleList": {
+    "Mathew_ABS": ["begin_spine_general_mathew_abs.b", "spine_general_mathew_abs.b"],
+    "Lista_ABS": ["begin_spine_general_lista_abs.b", "spine_general_lista_abs.b"],
+    "Zigodlla_ABS": ["spine_general_zigodlla_abs.b"],
+    "status": "CANDIDATE_SET_ONLY_NOT_ASSET_ENTRY_PROOF",
+    "note": "These filenames exist in the user-supplied ExportAssetBundle file list. Exact membership of each mapped Prefab path must be confirmed from bundle contents; no begin/non-begin assignment is inferred."
+  },
+  "verifiedFacts": [
+    "All seven representative skinResourceId values are present exactly once as field 2 values in ConfigDataModelSkinResourceInfo.",
+    "Each of the seven IDs has an explicit field 4 Prefab path under Spine/General, so no numeric ID-to-path inference is required.",
+    "ConfigDataHeroSkinInfo in the same authoritative bundle reproduces the frozen representative jobConnectionId + skinResourceId bindings.",
+    "ConfigDataCharImageSkinResourceInfo in the same authoritative bundle reproduces the frozen representative static and character-Spine locators."
+  ],
+  "blockers": [
+    "AUTHORITATIVE_MODEL_PREFAB_BUNDLE_ENTRY_OR_BYTES_REQUIRED"
+  ],
+  "guardrails": [
+    "Do not treat ConfigData resource-path mapping alone as extracted model asset bytes.",
+    "Do not infer begin/non-begin bundle membership from filename conventions.",
+    "Do not use fuzzy matching, numeric ID arithmetic, or cross-root fallback.",
+    "Do not claim final normalized RESOLVED until the mapped Spine/General Prefab paths are verified in authoritative bundle contents and final contract evidence is generated."
+  ],
+  "nextStartPoint": "Inspect the exact uploaded bundle-list candidates for Spine/General/Mathew_ABS, Spine/General/Lista_ABS, and Spine/General/Zigodlla_ABS. Confirm the seven mapped Prefab paths in bundle contents, then generate final representative Stage 3-2 evidence."
+}
