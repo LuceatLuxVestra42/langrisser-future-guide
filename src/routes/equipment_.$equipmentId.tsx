@@ -9,13 +9,14 @@ import {
   UserRound,
 } from "lucide-react";
 
+import { getOfficialEquipmentImageUrl } from "@/lib/equipment-image-assets";
 import { getEquipmentDetailPageData } from "@/lib/equipment-page.functions";
 import type {
   ExclusiveEquipmentDetailPageData,
   GeneralEquipmentDetailPageData,
 } from "@/lib/equipment-page.server";
 
-export const Route = createFileRoute("/equipment/$equipmentId")({
+export const Route = createFileRoute("/equipment_/$equipmentId")({
   loader: async ({ params }) => {
     if (!/^\d+$/.test(params.equipmentId)) {
       throw notFound();
@@ -248,10 +249,21 @@ function EquipmentHeader({
   secondaryBadge: string;
   equipmentId: number;
 }) {
+  const imageUrl = getOfficialEquipmentImageUrl(equipmentId);
+
   return (
     <header className="mt-5 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       <div className="flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-        <div className="min-w-0">
+        <div className="flex shrink-0 items-center justify-center self-start rounded-2xl border border-border bg-muted/25 p-2">
+          <img
+            src={imageUrl}
+            alt={displayName + " 장비 이미지"}
+            decoding="async"
+            className="h-28 w-28 object-contain sm:h-32 sm:w-32"
+          />
+        </div>
+
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-md bg-primary px-2 py-1 text-[11px] font-bold tracking-wide text-primary-foreground">
               {badge}

@@ -2,9 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ChevronRight, RotateCcw, UserRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+import { getOfficialEquipmentImageUrl } from "@/lib/equipment-image-assets";
 import { getExclusiveEquipmentPageData } from "@/lib/equipment-page.functions";
 
-export const Route = createFileRoute("/equipment/exclusive")({
+export const Route = createFileRoute("/equipment_/exclusive")({
   loader: () => getExclusiveEquipmentPageData(),
   head: () => ({
     meta: [
@@ -254,6 +255,16 @@ function ExclusiveEquipmentPage() {
                       size={17}
                       aria-hidden="true"
                       className="text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-center border-b border-border bg-muted/20 px-4 py-4">
+                    <img
+                      src={getOfficialEquipmentImageUrl(record.equipmentId)}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-28 w-28 object-contain transition duration-200 group-hover:scale-[1.03]"
                     />
                   </div>
 
