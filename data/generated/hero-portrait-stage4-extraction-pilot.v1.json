@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-extraction-pilot",
+  "schemaId": "hero-portrait-stage4-extraction-pilot/v1",
+  "status": "PASS",
+  "scope": "EXPLICIT_ADMITTED_SOURCE_ONLY",
+  "sourceAdmissionState": "data/generated/hero-portrait-stage3-admission-state.v1.json",
+  "materializationRule": "LOSSLESS_SOURCE_PNG_BYTES_TO_HERO_ID_NAMED_TARGET",
+  "summary": {
+    "canonicalHeroCount": 267,
+    "explicitAdmittedInputCount": 5,
+    "locallyMaterializedCount": 5,
+    "repositoryBinaryInstalledCount": 0,
+    "pendingCanonicalSourceMappingCount": 262,
+    "bulk267Complete": false,
+    "hardErrorCount": 0
+  },
+  "execution": {
+    "environment": "CURRENT_CHAT_CONTAINER",
+    "sourceBytesRevalidatedBeforeCopy": true,
+    "checks": [
+      "frozen byte length",
+      "frozen SHA-256",
+      "PNG signature",
+      "post-copy SHA-256 identity"
+    ],
+    "crop": false,
+    "resize": false,
+    "reencode": false,
+    "alphaFlatten": false,
+    "binaryRepositoryWritePerformed": false,
+    "binaryRepositoryWriteReason": "The connected GitHub write surface exposes text-file writes and Git blob creation but no mounted-file binary upload action. Multi-megabyte PNG bytes were not serialized through the conversational tool payload."
+  },
+  "records": [
+    {
+      "heroId": 5,
+      "nameKr": "크리스",
+      "sourceImmutableId": "1DO0Dk_7O0cV5h2Tsp9I1KYFQtlTbCYhK",
+      "sourceFileName": "Chris_idle_Normal_default.png",
+      "targetPath": "public/images/heroes/cards/5.png",
+      "byteLength": 571355,
+      "sha256": "986970116beedf2b7a300228e63f82ce07a9526032637d082374ff8db04a8b17",
+      "result": "PASS"
+    },
+    {
+      "heroId": 6,
+      "nameKr": "레온",
+      "sourceImmutableId": "1oPTSwW5O4UWxY6idqHDJ_smjPTm2Wsq1",
+      "sourceFileName": "Leon_Animation_FIN_idle_Normal_default.png",
+      "targetPath": "public/images/heroes/cards/6.png",
+      "byteLength": 1316695,
+      "sha256": "8d04d4858d8bbb8021cef1439183018293ff28659f42e486ae1306d8c5f616d1",
+      "result": "PASS"
+    },
+    {
+      "heroId": 8,
+      "nameKr": "라나",
+      "sourceImmutableId": "1sPf2YNf5DhW3vLMNcEhkCDSJpxdLTvgw",
+      "sourceFileName": "Lana_idle_Normal_default.png",
+      "targetPath": "public/images/heroes/cards/8.png",
+      "byteLength": 831066,
+      "sha256": "77adbeab95391254c1de7600f7de020125e1515372c98b23ae319596ba2f186a",
+      "result": "PASS"
+    },
+    {
+      "heroId": 12,
+      "nameKr": "엘윈",
+      "sourceImmutableId": "1S0Mftmvm4Lu-pdHPvzkant9zfyFGAXNE",
+      "sourceFileName": "Elwin_idle_Normal_default.png",
+      "targetPath": "public/images/heroes/cards/12.png",
+      "byteLength": 1050023,
+      "sha256": "fc7d6c625d76e69e367b323cf6bd36af96d64e68cc36f50c922ad5cc69d8bcb9",
+      "result": "PASS"
+    },
+    {
+      "heroId": 15,
+      "nameKr": "리아나",
+      "sourceImmutableId": "1cOdLxGc46d9oqJ7Epk7GDZ8wqsZIiF2p",
+      "sourceFileName": "Riana_idle_Normal_default.png",
+      "targetPath": "public/images/heroes/cards/15.png",
+      "byteLength": 674091,
+      "sha256": "1fe078b3bb4bf51843bceb23d627015091c4d4bddaf657b0c4ae9be5c1911a22",
+      "result": "PASS"
+    }
+  ],
+  "localPackage": {
+    "path": "/mnt/data/hero-portrait-stage4-extraction-pilot.zip",
+    "contains": [
+      "public/images/heroes/cards/5.png",
+      "public/images/heroes/cards/6.png",
+      "public/images/heroes/cards/8.png",
+      "public/images/heroes/cards/12.png",
+      "public/images/heroes/cards/15.png",
+      "hero-portrait-stage4-extraction-pilot.v1.json"
+    ]
+  },
+  "boundary": {
+    "stage4BulkExtractionComplete": false,
+    "reason": "Only five canonical Heroes have explicit admitted source mappings. The remaining 262 must not be guessed or materialized until source mapping/fallback proof is completed."
+  }
+}
