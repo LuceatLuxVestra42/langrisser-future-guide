@@ -116,8 +116,10 @@ jobs:
           if (summary.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3' || summary.completion !== 'COMPLETE' || summary.freezeState !== 'EQUIPMENT_IMAGE_STAGE3_FROZEN') throw new Error('Final Stage 3 summary mismatch');
           if (summary.gates.preflight !== 'PASS' || summary.gates.build !== 'PASS' || summary.gates.deploymentHosted !== 'PASS' || summary.gates.browserUi !== 'PASS_PLAYWRIGHT_HOSTED_BROWSER_UI') throw new Error('Four-gate Stage 3 closeout mismatch');
           if (evidence.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3_BROWSER_UI' || evidence.productionJoinKey !== 'equipmentId' || evidence.publicEquipment !== 373) throw new Error('Browser UI evidence mismatch');
-          if (checkpoint.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3' || checkpoint.browserUi !== 'PASS_PLAYWRIGHT_HOSTED_BROWSER_UI' || checkpoint.semanticStageReopened !== false) throw new Error('Final checkpoint mismatch');
-          console.log('PASS: Equipment Image Stage 3 four-gate closeout');
+          if (!evidence.inputFingerprint || evidence.inputFingerprint.version !== 1 || evidence.inputFingerprint.algorithm !== 'sha256' || !/^[0-9a-f]{64}$/.test(evidence.inputFingerprint.sha256) || evidence.inputFingerprint.equipmentImageCount !== 373) throw new Error('Browser UI input fingerprint mismatch');
+          if (summary.browserUiFreshness?.status !== 'PASS_FRESH_BROWSER_UI_EVIDENCE' || summary.browserUiFreshness?.currentInputFingerprint?.sha256 !== evidence.inputFingerprint.sha256) throw new Error('Browser UI freshness summary mismatch');
+          if (checkpoint.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3' || checkpoint.browserUi !== 'PASS_PLAYWRIGHT_HOSTED_BROWSER_UI' || checkpoint.browserUiInputFingerprint !== evidence.inputFingerprint.sha256 || checkpoint.semanticStageReopened !== false) throw new Error('Final checkpoint mismatch');
+          console.log('PASS: Equipment Image Stage 3 four-gate closeout with fresh Browser/UI fingerprint');
           NODE
 
       - name: Persist source fix, Browser UI evidence, and final freeze
