@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "id": "smart-regression-sr7-history-v1",
+  "status": "SR7_HISTORY_MATRIX",
+  "goal": "Replay the current Smart Regression selector against real historical diffs and require every change-relevant legacy validation domain to remain covered with zero observed false negatives.",
+  "falseNegativePolicy": {
+    "definition": "A false negative occurs only when a gate required by the changed files and corroborated by historical validation evidence is absent from the Smart Regression selection.",
+    "blockedIsConservative": true,
+    "preexistingUnchangedInputFailureIsFalseNegative": false,
+    "legacyNetworkLookupsAtTestTime": false
+  },
+  "cases": [
+    {
+      "id": "hero-stage6-4-final-freeze",
+      "domain": "hero",
+      "base": "552cf9b7634f0fc05a7868ee601f6178f950e013",
+      "head": "3908ef4442887d3c097ae5768b9b9b59041ed6a2",
+      "legacyEvidence": {
+        "workflow": "Hero Stage 6-4 Site Consumer Final Freeze",
+        "runId": 32923518639,
+        "event": "push",
+        "conclusion": "success"
+      },
+      "requiredLeafGates": ["hero.final.consumer"],
+      "allowedStatuses": ["PASS", "BLOCKED_UNBOUND", "BLOCKED_UNKNOWN_PATH"],
+      "reason": "The historical change froze the final Hero site-consumer boundary; current selection must include the verified Hero final-consumer sentinel even when workflow changes cause conservative broad fallback."
+    },
+    {
+      "id": "hero-soldier-stagec1-pr",
+      "domain": "hero-soldier",
+      "base": "4b3deac6fbd4ed08ba71af947d49e1d1cd4cf420",
+      "head": "6cb318c51db6ac44e799d378619d90fe06d1aea4",
+      "legacyEvidence": {
+        "workflow": "Hero-Soldier Stage C-1 Pair Parity",
+        "runId": 32926066075,
+        "event": "pull_request",
+        "conclusion": "success",
+        "observedCanonicalPairs": 5977,
+        "observedHeroPairs": 5977,
+        "observedSoldierPairs": 5977,
+        "observedMismatchCount": 0
+      },
+      "requiredLeafGates": ["hero-soldier.pair-parity"],
+      "allowedStatuses": ["PASS", "BLOCKED_UNBOUND", "BLOCKED_UNKNOWN_PATH"],
+      "reason": "A real PR froze C-1 pair parity. Missing hero-soldier.pair-parity is a direct observed false negative."
+    },
+    {
+      "id": "banner-stage3-8-regression-freeze",
+      "domain": "banner",
+      "base": "901900af34db591ce910df1f268dd823af5b7db9",
+      "head": "dd1f7dfb32311826e40185d715b316edf5849863",
+      "legacyEvidence": {
+        "workflow": "Banner Stage 3-8 Regression Freeze",
+        "runId": 32960437326,
+        "event": "push",
+        "conclusion": "success"
+      },
+      "requiredCompositeGates": ["banner.stage3.full"],
+      "requiredLeafGates": ["banner.stage3.freeze", "global.build"],
+      "allowedStatuses": ["PASS", "BLOCKED_UNBOUND", "BLOCKED_UNKNOWN_PATH"],
+      "reason": "The historical freeze explicitly reran Stage 3-0 through 3-7, built production frontend and validated Stage 3-8. Current selection must retain the Banner composite/freeze coverage."
+    },
+    {
+      "id": "equipment-image-stage1-representative-proof",
+      "domain": "equipment",
+      "base": "2d9c07f0b345975a46c096d5d11919d1cb28f8dd",
+      "head": "1cc59b4f8262ac553a323371656e9d4a9cea6fff",
+      "legacyEvidence": {
+        "workflow": "Equipment Image Stage 1",
+        "runId": 33136866408,
+        "event": "push",
+        "conclusion": "success",
+        "legacyChecks": ["equipment image representative proof", "Equipment Stage 4-6 admission QA"]
+      },
+      "requiredLeafGates": ["equipment.asset.consumer", "equipment.frontend"],
+      "allowedStatuses": ["PASS", "BLOCKED_UNBOUND", "BLOCKED_UNKNOWN_PATH"],
+      "reason": "The real asset QA change must never silently skip Equipment asset/frontend coverage. equipment.asset.consumer may remain unbound, but fail-closed selection is conservative rather than a false negative."
+    },
+    {
+      "id": "soldier-224-frontend-and-portraits",
+      "domain": "soldier",
+      "base": "e736d4d031e0a20bde28ece6a8460935e0b477f0",
+      "head": "4428d59d42133054c512283e5e67ce6fd1124ba3",
+      "legacyEvidence": {
+        "commitPurpose": "Integrate complete Soldier frontend and 224 portraits",
+        "soldierPortraitCoverage": "224/224",
+        "normalPortraitCoverage": "168/168",
+        "spPortraitCoverage": "56/56",
+        "buildGate": "PASS",
+        "relatedLegacyFailure": {
+          "workflow": "Equipment Stage 4-7 Whole Consumer Regression",
+          "runId": 33082895727,
+          "conclusion": "failure",
+          "error": "General route missing marker: equipment-general-list-ui.v1",
+          "classification": "PREEXISTING_UNCHANGED_INPUT",
+          "unchangedInput": "src/routes/equipment.tsx",
+          "beforeBlobSha": "b992a214925efd6d809abe1adfb0e22c99481c2f",
+          "afterBlobSha": "b992a214925efd6d809abe1adfb0e22c99481c2f",
+          "countsAsFalseNegative": false
+        }
+      },
+      "requiredLeafGates": ["soldier.portrait.integrity", "soldier.frontend.route", "global.build"],
+      "allowedStatuses": ["PASS", "BLOCKED_UNBOUND", "BLOCKED_UNKNOWN_PATH"],
+      "reason": "The historical Soldier integration changed Soldier presentation/assets and build surfaces. An unrelated Equipment validator failure is excluded because its asserted route input was byte-identical before and after this diff."
+    }
+  ]
+}
