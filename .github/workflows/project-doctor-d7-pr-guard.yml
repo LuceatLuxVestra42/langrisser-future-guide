@@ -62,7 +62,8 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "DOCTOR_BASE=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_ENV"
+            git fetch --no-tags origin "${{ github.event.pull_request.base.ref }}"
+            echo "DOCTOR_BASE=origin/${{ github.event.pull_request.base.ref }}" >> "$GITHUB_ENV"
             echo "DOCTOR_HEAD=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
           else
             echo "DOCTOR_BASE=origin/main" >> "$GITHUB_ENV"
