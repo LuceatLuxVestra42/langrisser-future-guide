@@ -1,0 +1,53 @@
+name: Equipment Image Stage 3 Hosted QA
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/equipment-image-stage3-hosted-qa.yml'
+      - 'public/equipment-image-stage3-ready.json'
+      - 'public/images/equipment/**'
+      - 'src/lib/equipment-image-assets.ts'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.exclusive.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - 'scripts/validate-equipment-image-stage3-hosted.mjs'
+      - 'data/validation/equipment-image-stage3-frontend-summary.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: equipment-image-stage3-hosted-qa
+  cancel-in-progress: false
+
+jobs:
+  hosted-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate GitHub Pages deployment and Equipment routes/assets
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-equipment-image-stage3-hosted.mjs
+
+      - name: Persist final Stage 3 hosted QA freeze
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/equipment-image-stage3-hosted-qa-summary.v1.json data/checkpoints/equipment-image-stage3-final.v1.json
+          if git diff --cached --quiet; then
+            echo "No Equipment Image Stage 3 hosted QA checkpoint changes"
+            exit 0
+          fi
+          git commit -m "Freeze Equipment Image Stage 3 hosted QA [skip ci]"
+          git push
