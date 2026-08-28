@@ -54,7 +54,7 @@ jobs:
           NODE
 
       - name: Re-run frozen Equipment admission QA
-        run: node scripts/validate-equipment-stage4-6-admission-route-qa.mjs
+        run: bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
 
       - name: Persist Stage 0 generated checkpoint
         run: |
