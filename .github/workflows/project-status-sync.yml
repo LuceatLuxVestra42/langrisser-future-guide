@@ -51,24 +51,22 @@ jobs:
       - name: Commit refreshed status when changed
         shell: bash
         run: |
-          if git diff --quiet -- \
-            data/generated/project-doctor-d1-1-status.v1.json \
-            data/validation/project-doctor-d1-1-summary.v1.json \
-            data/validation/project-doctor-d1-2-summary.v1.json \
-            data/generated/project-status.v1.json \
-            PROJECT_STATUS.md; then
+          STATUS_PATHS=(
+            data/generated/project-doctor-d1-1-status.v1.json
+            data/validation/project-doctor-d1-1-summary.v1.json
+            data/validation/project-doctor-d1-2-summary.v1.json
+            data/generated/project-status.v1.json
+            PROJECT_STATUS.md
+          )
+
+          if [ -z "$(git status --porcelain -- "${STATUS_PATHS[@]}")" ]; then
             echo 'Project status is already current.'
             exit 0
           fi
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add \
-            data/generated/project-doctor-d1-1-status.v1.json \
-            data/validation/project-doctor-d1-1-summary.v1.json \
-            data/validation/project-doctor-d1-2-summary.v1.json \
-            data/generated/project-status.v1.json \
-            PROJECT_STATUS.md
+          git add "${STATUS_PATHS[@]}"
           git commit -m 'chore: refresh project status'
           git push origin HEAD:"${GITHUB_REF_NAME}"
 
