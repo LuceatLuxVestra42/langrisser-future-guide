@@ -42,6 +42,7 @@ const contract = readJson(CONTRACT_PATH);
 const displayRecords = Array.isArray(display.records) ? display.records : [];
 const filterRecords = Array.isArray(filterMap.records) ? filterMap.records : [];
 const filterById = new Map(filterRecords.map((record) => [Number(record.id), record]));
+const allowedRoots = contract.source.allowedIconRootPrefixes ?? [];
 
 const hardErrors = [];
 const reviews = [];
@@ -52,11 +53,15 @@ if (displayRecords.length !== contract.expected.canonical) {
 if (filterRecords.length !== contract.expected.canonical) {
   hardErrors.push(`filter canonical count ${filterRecords.length} != ${contract.expected.canonical}`);
 }
+if (allowedRoots.length === 0) {
+  hardErrors.push('no allowed icon roots configured');
+}
 
 const seenIds = new Set();
 const seenWebPaths = new Set();
 const iconPathToIds = new Map();
 const basenameToPaths = new Map();
+const sourceRootCounts = new Map(allowedRoots.map((root) => [root, 0]));
 const records = [];
 
 for (const record of displayRecords) {
@@ -81,8 +86,11 @@ for (const record of displayRecords) {
   if (record.iconStatus !== 'VERIFIED_DIRECT') {
     hardErrors.push(`icon not VERIFIED_DIRECT for ${equipmentId}: ${record.iconStatus}`);
   }
-  if (!sourceIconPath.startsWith(contract.source.iconRootPrefix)) {
-    hardErrors.push(`icon root mismatch for ${equipmentId}: ${sourceIconPath}`);
+  const matchedRoot = allowedRoots.find((root) => sourceIconPath.startsWith(root)) ?? null;
+  if (!matchedRoot) {
+    hardErrors.push(`icon root outside allowlist for ${equipmentId}: ${sourceIconPath}`);
+  } else {
+    sourceRootCounts.set(matchedRoot, (sourceRootCounts.get(matchedRoot) ?? 0) + 1);
   }
   if (!sourceIconPath.toLowerCase().endsWith('.png')) {
     hardErrors.push(`icon is not PNG locator for ${equipmentId}: ${sourceIconPath}`);
@@ -135,6 +143,7 @@ for (const record of displayRecords) {
     source: {
       authority: 'ConfigDataEquipmentInfo.Icon',
       iconPath: sourceIconPath,
+      root: matchedRoot,
       basename: sourceBasename,
       status: record.iconStatus,
     },
@@ -165,7 +174,7 @@ if (duplicateIconPaths.length > 0) {
   reviews.push(`${duplicateIconPaths.length} source icon path(s) are shared by multiple equipment IDs; keep equipmentId-based web paths.`);
 }
 if (duplicateBasenamesAcrossDifferentPaths.length > 0) {
-  reviews.push(`${duplicateBasenamesAcrossDifferentPaths.length} basename collision(s) exist across source paths; basename-only resolution is forbidden.`);
+  reviews.push(`${duplicateBasenamesAcrossDifferentPaths.length} basename collision(s) exist across source paths; exact full Icon path is required.`);
 }
 
 const resolvedRepositoryAssets = records.filter((record) => record.web.status === 'RESOLVED');
@@ -185,6 +194,7 @@ function chooseRepresentative(predicate, label) {
     group: chosen.group,
     subtype: chosen.subtype,
     sourceIconPath: chosen.source.iconPath,
+    sourceRoot: chosen.source.root,
     sourceBasename: chosen.source.basename,
     targetRepositoryPath: chosen.web.repositoryPath,
     targetUrlPath: chosen.web.urlPath,
@@ -199,11 +209,12 @@ const representativeFixtures = [
   chooseRepresentative((record) => record.acquisitionClass === 'exclusive-equipment', 'exclusive-equipment'),
 ].filter(Boolean);
 
+const sourceRootCountObject = Object.fromEntries([...sourceRootCounts.entries()]);
 const status = hardErrors.length === 0 ? 'PASS_EQUIPMENT_IMAGE_STAGE0' : 'FAIL_EQUIPMENT_IMAGE_STAGE0';
 const inventory = {
   stage: 'Equipment Image Stage 0',
   status,
-  purpose: 'Freeze canonical equipment icon locators and equipmentId-based web asset contract without importing or inferring asset bytes.',
+  purpose: 'Freeze canonical equipment full icon locators and equipmentId-based web asset contract without importing or inferring asset bytes.',
   sources: {
     displayMetadata: 'data/generated/equipment_stage3_2_display_metadata.json',
     filterMap: 'data/generated/equipment_stage2_3_filter_map.json',
@@ -216,6 +227,8 @@ const inventory = {
     nonPublic: nonPublicRecords.length,
     uniqueSourceIconPaths: iconPathToIds.size,
     duplicateSourceIconPaths: duplicateIconPaths.length,
+    duplicateBasenamesAcrossDifferentPaths: duplicateBasenamesAcrossDifferentPaths.length,
+    sourceRootCounts: sourceRootCountObject,
     uniqueWebPaths: seenWebPaths.size,
     repositoryResolved: resolvedRepositoryAssets.length,
     repositoryPending: pendingRepositoryAssets.length,
@@ -233,7 +246,7 @@ const summary = {
   semanticStageReopened: false,
   canonicalIdentityChanged: false,
   runtimeNameJoinRequired: false,
-  sourceLocator: 'ConfigDataEquipmentInfo.Icon',
+  sourceLocator: 'ConfigDataEquipmentInfo.Icon full path',
   productionJoinKey: 'equipmentId',
   webPathTemplate: contract.web.urlPathTemplate,
   counts: inventory.counts,
@@ -252,12 +265,16 @@ const checkpoint = {
   canonicalEquipment: records.length,
   publicEquipment: publicRecords.length,
   nonPublicEquipment: nonPublicRecords.length,
+  uniqueSourceIconPaths: iconPathToIds.size,
+  sourceRootCounts: sourceRootCountObject,
+  sharedSourceIconPathGroups: duplicateIconPaths.length,
+  basenameCollisionGroups: duplicateBasenamesAcrossDifferentPaths.length,
   resolvedWebAssetsAtFreeze: resolvedRepositoryAssets.length,
   pendingWebAssetsAtFreeze: pendingRepositoryAssets.length,
-  sourceLocatorAuthority: 'ConfigDataEquipmentInfo.Icon',
+  sourceLocatorAuthority: 'ConfigDataEquipmentInfo.Icon full path',
   productionJoinKey: 'equipmentId',
   webAssetRoot: contract.web.repositoryRoot,
-  nextStartPoint: 'Resolve authoritative bytes for the five representative fixtures, verify PNG/hash/dimensions, then expand to public 373.',
+  nextStartPoint: 'Resolve authoritative bytes for the five representative fixtures, verify exact full locator/PNG/hash/dimensions, then expand to public 373.',
   reopenConditions: [
     'canonical equipment ID population changes',
     'ConfigDataEquipmentInfo.Icon locator contract changes',
