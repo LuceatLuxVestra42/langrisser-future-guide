@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "schemaId": "smart-regression-project-doctor-input/v1",
+  "stage": "SMART_REGRESSION_SR9C",
+  "status": "COLLECTED",
+  "integrationRole": "SUPPLEMENTAL_OPERATIONAL_EVIDENCE",
+  "doctorFacet": "source-evidence",
+  "operationalHealth": "REVIEW",
+  "readOnly": true,
+  "authority": {
+    "canonicalLifecycleAuthority": false,
+    "canonicalPopulationAuthority": false,
+    "semanticHealthAuthority": false,
+    "mayReopenFrozenSemantics": false
+  },
+  "bindings": {
+    "contractId": "smart-regression-bindings-sr3-v1",
+    "status": "SR3_VERIFIED_PARTIAL_BINDING",
+    "boundGateCount": 4,
+    "boundGateIds": [
+      "equipment.final.consumer",
+      "equipment.frontend",
+      "hero-soldier.pair-parity",
+      "hero.final.consumer"
+    ],
+    "unresolvedGateCount": 10,
+    "unresolvedGateIds": [
+      "equipment.asset.consumer",
+      "hero-soldier.impact-sentinel",
+      "hero.asset.integrity",
+      "hero.frontend.route",
+      "shared.contract",
+      "skin.frontend",
+      "skin.stage3.asset",
+      "soldier.final.consumer",
+      "soldier.frontend.route",
+      "soldier.portrait.integrity"
+    ],
+    "rejectedWeakBindingCount": 3,
+    "unresolvedSelectionPolicy": "BLOCK_BEFORE_EXECUTION"
+  },
+  "fallback": {
+    "policyId": "smart-regression-fallback-policy-sr4-v1",
+    "status": "SR4_FROZEN",
+    "catchAllRuleCount": 3,
+    "canonicalOwnerRuleCount": 8,
+    "safeFallbackMemberCount": 16,
+    "unknownPathGates": [
+      "global.safe-fallback"
+    ],
+    "specificOwnerSuppressesCatchAll": true,
+    "unresolvedBroadFallbackBlocksBeforeExecution": true
+  },
+  "evidence": {
+    "sr5": {
+      "status": "PASS_WITH_REVIEW",
+      "representativeCaseCount": 17,
+      "passedCaseCount": 17,
+      "falseNegativeCount": 0,
+      "executorControlChecksPassed": true,
+      "runtimeProof": true
+    },
+    "sr6": {
+      "status": "PASS_WITH_REVIEW",
+      "mode": "SHADOW_ACTIVE",
+      "verifiedRunConclusion": "success",
+      "shadowDryRunIsMergeGate": false
+    },
+    "sr7": {
+      "status": "PASS_WITH_REVIEW",
+      "historicalCaseCount": 5,
+      "passedCaseCount": 5,
+      "observedFalseNegativeCount": 0,
+      "replayErrorCount": 0,
+      "directPassCaseCount": 1,
+      "conservativeBlockedCaseCount": 4
+    },
+    "sr8": {
+      "status": "PASS_WITH_REVIEW",
+      "caseCount": 5,
+      "passedCaseCount": 5,
+      "failedCaseCount": 0,
+      "actualReplacementExecutionCount": 1,
+      "actualReplacementExecutionObserved": true
+    }
+  },
+  "replacement": {
+    "policyId": "smart-regression-partial-replacement-sr8-v1",
+    "status": "SR8_PARTIAL_REPLACEMENT",
+    "broadReplacementAllowed": false,
+    "defaultDecision": "LEGACY_REQUIRED",
+    "fallbackExitCode": 3,
+    "classCount": 1,
+    "classIds": [
+      "hero-soldier-pair-parity"
+    ],
+    "legacyFallbackRetained": true
+  },
+  "reviews": [
+    {
+      "code": "UNRESOLVED_GATE_BINDINGS",
+      "scope": "source-evidence",
+      "blocking": false,
+      "source": "data/contracts/regression-bindings.sr3.v1.json",
+      "detail": "10 Smart Regression gates remain intentionally unbound and fail closed when selected."
+    },
+    {
+      "code": "BROAD_CI_REPLACEMENT_DISABLED",
+      "scope": "source-evidence",
+      "blocking": false,
+      "source": "data/checkpoints/smart-regression-sr8-partial-replacement.v1.json",
+      "detail": "Only explicitly allowlisted narrow replacement classes may replace legacy orchestration; broad replacement remains disabled."
+    }
+  ],
+  "sourceProvenance": [
+    {
+      "role": "bindings",
+      "source": "data/contracts/regression-bindings.sr3.v1.json"
+    },
+    {
+      "role": "fallbackPolicy",
+      "source": "data/contracts/regression-fallback-policy.sr4.v1.json"
+    },
+    {
+      "role": "sr5Checkpoint",
+      "source": "data/checkpoints/smart-regression-sr5-fixtures.v1.json"
+    },
+    {
+      "role": "sr6Checkpoint",
+      "source": "data/checkpoints/smart-regression-sr6-shadow.v1.json"
+    },
+    {
+      "role": "sr7Checkpoint",
+      "source": "data/checkpoints/smart-regression-sr7-history.v1.json"
+    },
+    {
+      "role": "sr8Policy",
+      "source": "data/contracts/regression-partial-replacement.sr8.v1.json"
+    },
+    {
+      "role": "sr8Checkpoint",
+      "source": "data/checkpoints/smart-regression-sr8-partial-replacement.v1.json"
+    }
+  ],
+  "handoff": {
+    "projectDoctorImplementationModified": false,
+    "doctorWiringDeferred": true,
+    "finalEndToEndDoctorValidationDeferred": true,
+    "nextStartPoint": "After Project Doctor implementation is ready, wire this generated artifact as supplemental source-evidence without changing domain canonical lifecycle authority."
+  }
+}
