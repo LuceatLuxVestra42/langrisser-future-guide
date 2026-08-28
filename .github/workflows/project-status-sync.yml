@@ -1,0 +1,102 @@
+name: Project Status Sync
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - 'data/validation/**'
+      - 'data/checkpoints/**'
+      - 'data/generated/**'
+      - 'data/contracts/project-doctor-*.json'
+      - 'scripts/*project-doctor*'
+      - 'scripts/build-project-status.mjs'
+      - '.github/workflows/project-status-sync.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/validation/**'
+      - 'data/checkpoints/**'
+      - 'data/generated/**'
+      - 'data/contracts/project-doctor-*.json'
+      - 'scripts/*project-doctor*'
+      - 'scripts/build-project-status.mjs'
+      - 'PROJECT_STATUS.md'
+      - '.github/workflows/project-status-sync.yml'
+
+jobs:
+  sync-branch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Regenerate Project Doctor D1 status
+        run: npm run doctor:status
+
+      - name: Regenerate Project Status projection
+        run: node scripts/build-project-status.mjs
+
+      - name: Commit refreshed status when changed
+        shell: bash
+        run: |
+          if git diff --quiet -- \
+            data/generated/project-doctor-d1-1-status.v1.json \
+            data/validation/project-doctor-d1-1-summary.v1.json \
+            data/validation/project-doctor-d1-2-summary.v1.json \
+            data/generated/project-status.v1.json \
+            PROJECT_STATUS.md; then
+            echo 'Project status is already current.'
+            exit 0
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/generated/project-doctor-d1-1-status.v1.json \
+            data/validation/project-doctor-d1-1-summary.v1.json \
+            data/validation/project-doctor-d1-2-summary.v1.json \
+            data/generated/project-status.v1.json \
+            PROJECT_STATUS.md
+          git commit -m 'chore: refresh project status'
+          git push origin HEAD:"${GITHUB_REF_NAME}"
+
+  verify-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout PR merge result
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Regenerate Project Doctor D1 status
+        run: npm run doctor:status
+
+      - name: Verify Project Status projection is current
+        run: node scripts/build-project-status.mjs --check
+
+      - name: Verify committed Doctor D1 outputs are current
+        run: >-
+          git diff --exit-code --
+          data/generated/project-doctor-d1-1-status.v1.json
+          data/validation/project-doctor-d1-1-summary.v1.json
+          data/validation/project-doctor-d1-2-summary.v1.json
