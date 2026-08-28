@@ -4,7 +4,7 @@
   "stage": "D7",
   "checkpoint": "PROJECT_DOCTOR_D7_PR_MERGE_GUARD",
   "status": "DESIGN_FROZEN",
-  "purpose": "Promote the proven read-only Project Doctor runtime into a pull-request-facing merge guard that evaluates the real PR diff, preserves D4 manual-review fail-closed behavior, and never reseals D5 freshness in CI.",
+  "purpose": "Promote the proven read-only Project Doctor runtime into a pull-request-facing merge guard that evaluates the real PR diff against the current target branch, preserves D4 manual-review fail-closed behavior, and never reseals D5 freshness in CI.",
   "workflow": ".github/workflows/project-doctor-d7-pr-guard.yml",
   "targetBaseBranch": "main",
   "checkIdentity": {
@@ -32,13 +32,15 @@
     "contents": "read"
   },
   "changedFilePolicy": {
-    "pullRequestBase": "github.event.pull_request.base.sha",
+    "pullRequestBase": "origin/${github.event.pull_request.base.ref}",
+    "pullRequestBaseResolution": "fetch target branch at workflow runtime and compare against its remote-tracking ref",
     "pullRequestHead": "github.event.pull_request.head.sha",
     "comparison": "base...head",
     "pushProofBase": "origin/main",
     "pushProofHead": "HEAD",
     "useRealChangedFiles": true,
     "representativePathOverride": false,
+    "staleEventBaseShaForbidden": true,
     "unmappedPathBehavior": "MANUAL_REVIEW",
     "manualReviewExitCode": 3,
     "manualReviewMustFailWorkflow": true
@@ -49,6 +51,7 @@
     "npm run doctor:status",
     "git diff --exit-code -- data/generated/project-doctor-d1-1-status.v1.json data/validation/project-doctor-d1-1-summary.v1.json data/validation/project-doctor-d1-2-summary.v1.json",
     "npm run doctor:freshness:validate",
+    "git fetch --no-tags origin $PR_BASE_REF",
     "npm run doctor -- --dry-run --base $DOCTOR_BASE --head $DOCTOR_HEAD",
     "npm run doctor -- --base $DOCTOR_BASE --head $DOCTOR_HEAD"
   ],
@@ -70,7 +73,7 @@
     "rulesetObservedAtDesignTime": "NONE",
     "branchProtectionRead": "CONNECTOR_403",
     "requiredStatusCheckConfiguredByThisStage": false,
-    "reason": "The available GitHub connector supports ruleset and branch-protection reads only; no ruleset or branch-protection mutation action is exposed. D7 can prove the PR check but cannot silently change repository admin enforcement settings."
+    "reason": "Repository-admin enforcement is external state. D7 proves the PR check and its fail-closed runtime behavior without changing branch protection."
   },
   "boundaries": {
     "rawConfigDataSemanticRecomputationAdded": false,
@@ -80,7 +83,7 @@
     "missingOwningValidatorInvented": false,
     "validatorScopeBroadened": false
   },
-  "completionRule": "D7 runtime guard proof requires an actual pull_request-triggered workflow run against main whose pr-guard job succeeds using the PR base/head comparison. Repository required-check enforcement is recorded separately because it is admin configuration, not workflow runtime proof.",
+  "completionRule": "D7 runtime guard proof requires an actual pull_request-triggered workflow run against main whose pr-guard job succeeds using the current fetched target branch and PR head comparison. Repository required-check enforcement is recorded separately because it is admin configuration, not workflow runtime proof.",
   "nextStage": "D7-ADMIN",
-  "nextStageGoal": "If desired, configure the proven status check as required on main through repository ruleset or branch protection using an authorized admin surface."
+  "nextStageGoal": "Keep the proven status check required on main and retain current-target-branch diff semantics as main advances."
 }
