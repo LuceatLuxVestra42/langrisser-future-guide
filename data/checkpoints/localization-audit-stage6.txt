@@ -1,6 +1,6 @@
 Localization Audit Stage 6 checkpoint
 Date: 2026-08-28
-Status: PASS_WITH_REVIEW / COMPLETE
+Status: PASS_WITH_REVIEW / COMPLETE / MERGED
 
 Purpose
 - Integrate the frozen Localization Audit Stage 5 into Project Doctor as an exact selected/executed owning localization validator.
@@ -169,3 +169,22 @@ Operational result
 - Localization Audit is now both a standalone permanent CI gate and a Project Doctor-selected phase-4 validator for localization-relevant changes.
 - Asset-only or unrelated shared-frontend changes do not cause localization audit fanout.
 - Existing canonical/relation/asset manual-review boundaries remain unresolved unless their own final validator is explicitly promoted.
+
+Final merge closeout
+- PR #152 final head after synchronizing latest then-main (#153 Active Source Registry): 03bf3b6c5849d72f6a0943fabb23864aa2dfffb0
+- final required Project Doctor PR Guard run: 33188888715
+- final required pr-guard job: 98908960278
+- final run conclusion: SUCCESS
+- final run passed D7 contract validation, committed freshness validation, D1 deterministic regeneration proof, Regression Coverage Promotion V1 admission, real-diff dry run, and real-diff execution.
+- PR #152 mergeable immediately before merge: true
+- PR #152 merged: true
+- final merge commit: e63c09c1e4ca197098c4485a3a9118379926ee81
+- merge parents: 02d5b853058a1db22c663aa4dcbdda7cfd41f456 and 03bf3b6c5849d72f6a0943fabb23864aa2dfffb0
+- post-merge comparison against 02d5b853... showed exactly the 15 Stage 6 files added/modified; Active Source Registry changes were preserved.
+- later main progression through Project Status Stage 3 / guarded Status Source Promotion (#156), main 70e4282af7a85ca4bc5c2bab33e797cf35e74051, keeps Stage 6 snapshot and Doctor v2 command surface present.
+
+Operational next-start
+- Do not reopen Stage 6 semantics for ordinary localization work.
+- On the next legitimate Hero/Soldier/Equipment localization-relevant PR, use the normal Project Doctor PR Guard and confirm localization-audit is selected by the real diff.
+- For asset-only or unrelated shared-frontend-only PRs, localization-audit should remain unselected unless their change class legitimately crosses the frozen localization boundary.
+- Any future expansion to Skin/Banner localization, or promotion of canonical/relation/asset owning validators, is a separate scoped task and must not be inferred from Stage 6 completion.
