@@ -1,0 +1,104 @@
+name: Hosted QA Soldier T3 Korean Names
+
+on:
+  push:
+    branches:
+      - deploy/soldier-t3-kr-names-20260828
+    paths:
+      - '.github/workflows/hosted-qa-soldier-t3-korean-names.yml'
+  workflow_dispatch:
+
+jobs:
+  hosted-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Hosted freshness and text gate
+        run: |
+          python - <<'PY'
+          import time, urllib.request
+          base='https://luceatluxvestra42.github.io/langrisser-future-guide/'
+          expected_main='8acd069006f9fc7eceb1292965aa514c0e57169c'
+          expected_surface='soldier-t3-korean-names-136-1039'
+          def get(path):
+              req=urllib.request.Request(base+path, headers={'User-Agent':'langrisser-hosted-qa'})
+              with urllib.request.urlopen(req, timeout=45) as r:
+                  return r.status, r.read().decode('utf-8', errors='replace')
+          for i in range(15):
+              try:
+                  _,main=get('qa-main-source.txt')
+                  _,surface=get('qa-surface.txt')
+                  if main.strip()==expected_main and surface.strip()==expected_surface: break
+              except Exception: pass
+              if i==14: raise RuntimeError('Pages freshness marker did not converge')
+              time.sleep(5)
+          checks={
+              'soldiers/':['잿빛 호위대','단죄의 수녀'],
+              'soldiers/136/':['잿빛 호위대'],
+              'soldiers/1039/':['단죄의 수녀'],
+          }
+          for path,tokens in checks.items():
+              status,html=get(path)
+              if status!=200: raise RuntimeError(f'{path} HTTP {status}')
+              for token in tokens:
+                  if token not in html: raise RuntimeError(f'{path} missing {token}')
+          print('PASS Hosted Gate: fresh deployment and exact Korean labels visible in static HTML')
+          PY
+
+      - name: Prepare Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Browser UI gate
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const base='https://luceatluxvestra42.github.io/langrisser-future-guide/';
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            const page=await browser.newPage({viewport:{width:1280,height:900}});
+            const legacyPng=[];
+            page.on('request',req=>{ const u=new URL(req.url()); if(/\/images\/soldiers\/\d+\.png$/.test(u.pathname)) legacyPng.push(req.url()); });
+
+            await page.goto(base+'soldiers/',{waitUntil:'networkidle'});
+            const cards=page.locator('a[aria-label$="상세 보기"]');
+            if(await cards.count()!==224) throw new Error(`Soldier cards ${await cards.count()} != 224`);
+            for(const name of ['잿빛 호위대','단죄의 수녀']){
+              const card=page.locator(`a[aria-label="${name} 상세 보기"]`);
+              if(await card.count()!==1) throw new Error(`list label missing: ${name}`);
+            }
+            await page.getByRole('button',{name:'SP'}).click();
+            if(await cards.count()!==56) throw new Error(`SP cards ${await cards.count()} != 56`);
+
+            for(const [id,name] of [[136,'잿빛 호위대'],[1039,'단죄의 수녀']]){
+              await page.goto(base+`soldiers/${id}/`,{waitUntil:'networkidle'});
+              const title=page.locator('#soldier-detail-title');
+              await title.waitFor();
+              if(!(await title.innerText()).includes(name)) throw new Error(`detail title mismatch ${id}`);
+              const portrait=page.locator(`img[src$="/images/soldiers-webp/${id}.webp"]`);
+              if(await portrait.count()<1) throw new Error(`WebP portrait missing ${id}`);
+              await portrait.first().waitFor({state:'visible'});
+              const decoded=await portrait.first().evaluate(img=>img.complete && img.naturalWidth>0 && img.naturalHeight>0);
+              if(!decoded) throw new Error(`WebP portrait not decoded ${id}`);
+              await page.reload({waitUntil:'networkidle'});
+              if(!(await page.locator('#soldier-detail-title').innerText()).includes(name)) throw new Error(`refresh title mismatch ${id}`);
+            }
+            if(legacyPng.length) throw new Error(`legacy Soldier PNG requested: ${legacyPng.slice(0,3)}`);
+
+            const heroes=await browser.newPage({viewport:{width:1280,height:900}});
+            await heroes.goto(base+'heroes/',{waitUntil:'networkidle'});
+            const heroSamples=heroes.locator('img[src*="redpanda7301.github.io/langrisser/img/card/"]');
+            if(await heroSamples.count()!==5) throw new Error(`Hero samples ${await heroSamples.count()} != 5`);
+
+            const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+            await mobile.goto(base+'soldiers/',{waitUntil:'networkidle'});
+            for(const name of ['잿빛 호위대','단죄의 수녀']) if(await mobile.locator(`a[aria-label="${name} 상세 보기"]`).count()!==1) throw new Error(`mobile label missing ${name}`);
+            const overflow=await mobile.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+            if(overflow>2) throw new Error(`mobile horizontal overflow ${overflow}px`);
+
+            await browser.close();
+            console.log('PASS Browser/UI Gate: both Korean names, direct detail+refresh, SP56, WebP preserved, Hero samples5, mobile PASS');
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
