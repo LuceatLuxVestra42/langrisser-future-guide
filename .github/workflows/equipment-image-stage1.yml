@@ -1,0 +1,76 @@
+name: Equipment Image Stage 1
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage1
+    paths:
+      - data/contracts/equipment-image-stage1-representative-proof.v1.json
+      - data/evidence/equipment-image-stage1-source-evidence.v1.json
+      - scripts/validate-equipment-image-stage1.mjs
+      - public/images/equipment/**
+      - .github/workflows/equipment-image-stage1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  representative-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate Equipment image Stage 1
+        run: node scripts/validate-equipment-image-stage1.mjs
+
+      - name: Validate Stage 1 state contract
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const summary = JSON.parse(fs.readFileSync('data/validation/equipment-image-stage1-summary.v1.json', 'utf8'));
+          const allowed = new Set(['READY_FOR_ASSET_EVIDENCE', 'PASS_EQUIPMENT_IMAGE_STAGE1']);
+          if (!allowed.has(summary.status)) throw new Error(`unexpected Stage 1 status: ${summary.status}`);
+          if (summary.counts.requiredRepresentatives !== 5) throw new Error('required representative count drift');
+          if (summary.counts.evaluatedRepresentatives !== 5) throw new Error('evaluated representative count drift');
+          if (summary.counts.hardErrors !== 0) throw new Error(`hard errors: ${summary.counts.hardErrors}`);
+          if (summary.productionJoinKey !== 'equipmentId') throw new Error('production join key drift');
+          if (summary.semanticStageReopened !== false) throw new Error('semantic stage reopened');
+          if (summary.canonicalIdentityChanged !== false) throw new Error('canonical identity changed');
+          if (summary.status === 'READY_FOR_ASSET_EVIDENCE' && summary.bulkImportAllowed !== false) {
+            throw new Error('bulk import must remain blocked while representative evidence is pending');
+          }
+          if (summary.status === 'PASS_EQUIPMENT_IMAGE_STAGE1') {
+            if (summary.counts.passedRepresentatives !== 5) throw new Error('Stage 1 PASS without 5/5 representatives');
+            if (summary.bulkImportAllowed !== true) throw new Error('bulk import should be admitted after Stage 1 PASS');
+          }
+          console.log(JSON.stringify(summary, null, 2));
+          NODE
+
+      - name: Re-run frozen Equipment admission QA
+        run: bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
+
+      - name: Persist Stage 1 generated checkpoint
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/validation/equipment-image-stage1-summary.v1.json \
+            data/checkpoints/equipment-image-stage1.v1.json
+          if git diff --cached --quiet; then
+            echo 'Stage 1 outputs already current.'
+          else
+            git commit -m 'Materialize Equipment image Stage 1 checkpoint [skip ci]'
+            git push origin HEAD:work/equipment-image-stage1
+          fi
