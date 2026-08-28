@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_3",
+  "status": "PASS_CONFIGDATA_LOOKUP_STAGE3_REVERSE_REFS",
+  "contract": "data/contracts/configdata-lookup-stage3-reverse-reference-contract.v1.json",
+  "predecessorStatus": "PASS_CONFIGDATA_LOOKUP_STAGE2_FORWARD_JOINS",
+  "predecessorRelationCount": 13,
+  "predecessorEdgeCount": 142722,
+  "targetTypeCount": 6,
+  "relationCount": 13,
+  "totalTargetCount": 51064,
+  "totalReferenceCount": 142722,
+  "targets": {
+    "Skill": {
+      "path": "data/index/reverse/skill.v1.json",
+      "relationCount": 5,
+      "relationNames": [
+        "hero.skills",
+        "hero.castingLawSkill",
+        "jobConnection.talentSkills",
+        "soldier.skills",
+        "equipment.skillStages"
+      ],
+      "targetCount": 14518,
+      "referenceCount": 77875
+    },
+    "JobConnection": {
+      "path": "data/index/reverse/job-connection.v1.json",
+      "relationCount": 3,
+      "relationNames": [
+        "hero.baseJobConnection",
+        "hero.usableJobConnections",
+        "jobConnection.predecessors"
+      ],
+      "targetCount": 29862,
+      "referenceCount": 31240
+    },
+    "Job": {
+      "path": "data/index/reverse/job.v1.json",
+      "relationCount": 1,
+      "relationNames": [
+        "jobConnection.job"
+      ],
+      "targetCount": 3258,
+      "referenceCount": 30066
+    },
+    "TrainingTech": {
+      "path": "data/index/reverse/training-tech.v1.json",
+      "relationCount": 2,
+      "relationNames": [
+        "soldier.unlockTrainingTech",
+        "trainingTech.preTech"
+      ],
+      "targetCount": 268,
+      "referenceCount": 379
+    },
+    "Soldier": {
+      "path": "data/index/reverse/soldier.v1.json",
+      "relationCount": 1,
+      "relationNames": [
+        "trainingTech.soldiers"
+      ],
+      "targetCount": 213,
+      "referenceCount": 217
+    },
+    "TrainingTechLevel": {
+      "path": "data/index/reverse/training-tech-level.v1.json",
+      "relationCount": 1,
+      "relationNames": [
+        "trainingTech.levels"
+      ],
+      "targetCount": 2945,
+      "referenceCount": 2945
+    }
+  },
+  "semanticBoundary": {
+    "stage2ApprovedEdgesOnly": true,
+    "rawConfigDataScanned": false,
+    "arbitraryNumericFieldsScanned": false,
+    "newRelationsDiscovered": false,
+    "transitiveRelationsGenerated": false,
+    "canonicalRelationsRecomputed": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false
+  }
+}

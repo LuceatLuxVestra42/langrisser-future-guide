@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "stage": "CONFIGDATA_LOOKUP_STAGE_3",
+  "status": "REVERSE_REFERENCE_CONTRACT_FROZEN",
+  "purpose": "Invert only the explicit direct-reference edges already approved and materialized by ConfigData Lookup Stage 2. Stage 3 is a lookup projection, not a new semantic interpreter.",
+  "predecessor": {
+    "contract": "data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json",
+    "summary": "data/validation/configdata-lookup-stage2-summary.v1.json",
+    "requiredStatus": "PASS_CONFIGDATA_LOOKUP_STAGE2_FORWARD_JOINS",
+    "requiredRelationCount": 13
+  },
+  "inputs": {
+    "Hero": "data/index/forward/hero.v1.json",
+    "Soldier": "data/index/forward/soldier.v1.json",
+    "Equipment": "data/index/forward/equipment.v1.json"
+  },
+  "targetTypeOrder": [
+    "Skill",
+    "JobConnection",
+    "Job",
+    "TrainingTech",
+    "Soldier",
+    "TrainingTechLevel"
+  ],
+  "outputs": {
+    "manifest": "data/index/reverse/manifest.v1.json",
+    "targets": {
+      "Skill": "data/index/reverse/skill.v1.json",
+      "JobConnection": "data/index/reverse/job-connection.v1.json",
+      "Job": "data/index/reverse/job.v1.json",
+      "TrainingTech": "data/index/reverse/training-tech.v1.json",
+      "Soldier": "data/index/reverse/soldier.v1.json",
+      "TrainingTechLevel": "data/index/reverse/training-tech-level.v1.json"
+    },
+    "summary": "data/validation/configdata-lookup-stage3-summary.v1.json"
+  },
+  "reversePolicy": {
+    "sourceOfTruth": "STAGE2_MATERIALIZED_ALLOWLISTED_DIRECT_EDGES_ONLY",
+    "rawConfigDataScan": false,
+    "arbitraryNumericFieldScan": false,
+    "newRelationDiscovery": false,
+    "transitiveExpansion": false,
+    "canonicalRelationRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "reverseMeaning": "For each approved Stage 2 edge sourceId -> targetId, record targetId <- sourceId with its original relation provenance.",
+    "grouping": "targetType -> targetId -> [relationSlot, sorted unique sourceIds]",
+    "relationCatalog": "Each target file stores relation/sourceType/semanticStatus metadata once and references it by a local relation slot.",
+    "targetFileEncoding": "MINIFIED_JSON",
+    "manifestAndSummaryEncoding": "PRETTY_JSON",
+    "stableOrdering": "targetTypeOrder, numeric target ID, Stage 2 relation contract order, numeric source ID"
+  },
+  "validation": {
+    "validator": "scripts/validate-configdata-lookup-stage3.mjs",
+    "command": "npm run validate:configdata-lookup-stage3",
+    "requiredChecks": [
+      "Stage 2 predecessor validator remains PASS",
+      "Stage 2 summary status and relation count match this contract",
+      "Stage 2 relation set/order exactly matches the frozen Stage 2 contract",
+      "only Stage 2 materialized forward index files are consumed as edge input",
+      "every Stage 2 direct edge appears exactly once in the reverse indexes",
+      "no reverse entry exists without a Stage 2 direct edge",
+      "total reverse reference count equals Stage 2 total edge count",
+      "all target files, manifest, and summary are byte-identical after regeneration",
+      "no transitive, canonical, name-based, or ID-arithmetic relation is emitted"
+    ],
+    "passStatus": "PASS_CONFIGDATA_LOOKUP_STAGE3_REVERSE_REFS"
+  },
+  "nextStage": {
+    "stage": "CONFIGDATA_LOOKUP_STAGE_4",
+    "goal": "Overlay frozen canonical/project consumers beside raw ConfigData lookup references without recomputing their semantics."
+  }
+}
