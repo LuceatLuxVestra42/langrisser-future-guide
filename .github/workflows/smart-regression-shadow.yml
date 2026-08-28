@@ -1,4 +1,4 @@
-# SR-7 shadow mode: fixture gate + real-history comparison + non-blocking Smart Regression observation.
+# SR-8 shadow mode: fixture gate + real-history comparison + partial-replacement admission + non-blocking current-diff observation.
 name: Smart Regression Shadow
 
 on:
@@ -7,15 +7,18 @@ on:
       - main
       - work/smart-regression-sr6-shadow
       - work/smart-regression-sr7-history
+      - work/smart-regression-sr8-partial-replacement
     paths-ignore:
       - 'data/checkpoints/smart-regression-sr6-shadow.v1.json'
       - 'data/checkpoints/smart-regression-sr7-history.v1.json'
+      - 'data/checkpoints/smart-regression-sr8-partial-replacement.v1.json'
   pull_request:
     branches:
       - main
     paths-ignore:
       - 'data/checkpoints/smart-regression-sr6-shadow.v1.json'
       - 'data/checkpoints/smart-regression-sr7-history.v1.json'
+      - 'data/checkpoints/smart-regression-sr8-partial-replacement.v1.json'
   workflow_dispatch:
 
 permissions:
@@ -50,6 +53,12 @@ jobs:
         run: |
           set -o pipefail
           bun run test:smart-regression:history | tee smart-regression-history.json
+
+      - name: Run SR-8 partial replacement admission tests
+        shell: bash
+        run: |
+          set -o pipefail
+          bun run test:smart-regression:sr8 | tee smart-regression-sr8.json
 
       - name: Resolve comparison refs
         id: refs
@@ -98,8 +107,8 @@ jobs:
             echo
             echo "- diff: \`${{ steps.refs.outputs.base }}...${{ steps.refs.outputs.head }}\`"
             echo "- dry-run exit code: \`$code\`"
-            echo '- mode: observation only; this dry-run result is not a merge gate'
-            echo '- SR-5 fixtures and SR-7 historical comparison are acceptance checks'
+            echo '- mode: observation only; this current-diff dry-run result is not a merge gate'
+            echo '- SR-5 fixtures, SR-7 history, and SR-8 replacement admission tests are acceptance checks'
             echo
             echo '<details><summary>Dry-run JSON</summary>'
             echo
@@ -109,8 +118,8 @@ jobs:
             echo '</details>'
           } >> "$GITHUB_STEP_SUMMARY"
 
-          # Shadow policy: BLOCKED_UNBOUND / BLOCKED_UNKNOWN_PATH are evidence,
-          # not CI failures yet. SR-7 history replay separately enforces zero observed false negatives.
+          # Current-diff shadow policy: BLOCKED_UNBOUND / BLOCKED_UNKNOWN_PATH are evidence,
+          # not CI failures. SR-8 only replaces allowlisted, fully executable narrow selections.
           exit 0
 
       - name: Upload shadow evidence
@@ -121,6 +130,7 @@ jobs:
           path: |
             smart-regression-fixtures.json
             smart-regression-history.json
+            smart-regression-sr8.json
             smart-regression-shadow.json
             smart-regression-shadow.stderr.log
           if-no-files-found: warn
