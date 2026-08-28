@@ -45,22 +45,36 @@ async function gotoChecked(page, path) {
 }
 
 async function ensureEquipmentImage(page, equipmentId) {
-  const locator = page.locator(`img[src$="/images/equipment/${equipmentId}.png"]`).first();
-  assert((await locator.count()) > 0, `Equipment image ${equipmentId} is missing from rendered DOM at ${page.url()}`);
-  await locator.scrollIntoViewIfNeeded();
-  await locator.waitFor({ state: "visible", timeout: 15_000 });
-  const image = await locator.evaluate((element) => ({
-    complete: element.complete,
-    naturalWidth: element.naturalWidth,
-    naturalHeight: element.naturalHeight,
-    clientWidth: element.clientWidth,
-    clientHeight: element.clientHeight,
-    src: element.currentSrc || element.src,
-  }));
-  assert(image.complete, `Equipment image ${equipmentId} did not complete loading`);
-  assert(image.naturalWidth > 0 && image.naturalHeight > 0, `Equipment image ${equipmentId} is broken`);
-  assert(image.clientWidth > 0 && image.clientHeight > 0, `Equipment image ${equipmentId} has no rendered box`);
-  return image;
+  const selector = `img[src$="/images/equipment/${equipmentId}.png"]`;
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= 4; attempt += 1) {
+    try {
+      const locator = page.locator(selector).first();
+      assert((await locator.count()) > 0, `Equipment image ${equipmentId} is missing from rendered DOM at ${page.url()}`);
+      await locator.waitFor({ state: "visible", timeout: 15_000 });
+      await locator.scrollIntoViewIfNeeded({ timeout: 5_000 });
+      await locator.waitFor({ state: "visible", timeout: 5_000 });
+      const image = await locator.evaluate((element) => ({
+        complete: element.complete,
+        naturalWidth: element.naturalWidth,
+        naturalHeight: element.naturalHeight,
+        clientWidth: element.clientWidth,
+        clientHeight: element.clientHeight,
+        src: element.currentSrc || element.src,
+      }));
+      assert(image.complete, `Equipment image ${equipmentId} did not complete loading`);
+      assert(image.naturalWidth > 0 && image.naturalHeight > 0, `Equipment image ${equipmentId} is broken`);
+      assert(image.clientWidth > 0 && image.clientHeight > 0, `Equipment image ${equipmentId} has no rendered box`);
+      return { ...image, hydrationSafeAttempts: attempt };
+    } catch (error) {
+      lastError = error;
+      if (attempt === 4) break;
+      await page.waitForTimeout(250);
+    }
+  }
+
+  throw lastError;
 }
 
 async function assertNoHorizontalOverflow(page, label) {
