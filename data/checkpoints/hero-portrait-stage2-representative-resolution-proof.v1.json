@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage2-representative-resolution-proof",
+  "schemaId": "hero-portrait-stage2-representative-resolution-proof-checkpoint/v1",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "HERO_PORTRAIT_STAGE2_REPRESENTATIVE_PROOF_FROZEN",
+  "branch": "work/hero-portrait-stage2-representative-proof",
+  "contract": "data/contracts/hero-portrait-stage2-representative-resolution-proof.v1.json",
+  "proof": "data/generated/hero-portrait-stage2-representative-resolution-proof.v1.json",
+  "proofSet": [5, 6, 8, 12, 15],
+  "checks": [
+    {
+      "id": "explicit-drive-id-direct-readback",
+      "expected": 5,
+      "actual": 5,
+      "result": "PASS"
+    },
+    {
+      "id": "png-signature",
+      "expected": 5,
+      "actual": 5,
+      "result": "PASS"
+    },
+    {
+      "id": "frozen-byte-length-match",
+      "expected": 5,
+      "actual": 5,
+      "result": "PASS"
+    },
+    {
+      "id": "frozen-sha256-match",
+      "expected": 5,
+      "actual": 5,
+      "result": "PASS"
+    },
+    {
+      "id": "frozen-dimension-match",
+      "expected": 5,
+      "actual": 5,
+      "result": "PASS"
+    },
+    {
+      "id": "rgba-transparent-alpha",
+      "expected": 5,
+      "actual": 5,
+      "result": "PASS"
+    },
+    {
+      "id": "hero-visual-identity",
+      "expected": 5,
+      "actual": 5,
+      "result": "PASS"
+    },
+    {
+      "id": "base-skin-provenance",
+      "expected": 5,
+      "actual": 5,
+      "result": "PASS"
+    },
+    {
+      "id": "ui-decoration-contamination",
+      "expected": 0,
+      "actual": 0,
+      "result": "PASS"
+    },
+    {
+      "id": "population-wide-drive-coverage",
+      "expected": "NOT_CLAIMED_IN_STAGE2",
+      "actual": "NOT_CLAIMED_IN_STAGE2",
+      "result": "PASS"
+    },
+    {
+      "id": "frontend-card-installation",
+      "expected": "NOT_PERFORMED",
+      "actual": "NOT_PERFORMED",
+      "result": "PASS"
+    }
+  ],
+  "completedScope": [
+    "direct-read all five proven source PNGs by explicit Drive file ID",
+    "verify PNG decode/signature, byte length, SHA-256, dimensions, RGBA alpha, and real transparency",
+    "verify the intended five Hero identities visually",
+    "confirm byte-identical continuity with the frozen GOOGLE_DRIVE_BASE_SKIN_PNG sample manifest",
+    "confirm no baked rarity, SP, faction-buff, or other UI decoration is visible",
+    "establish lossless source PNG bytes as the representative canonical PNG candidate rule"
+  ],
+  "notCompletedScope": [
+    "267-Hero explicit Drive mapping inventory",
+    "population-wide fallback to Unity prefab dependency resolution",
+    "public/images/heroes/cards bulk installation",
+    "frontend resolver mutation",
+    "Stage 3 deterministic extraction/materialization contract"
+  ],
+  "verdict": {
+    "stage2Complete": true,
+    "representativeProof": "PASS_5_OF_5",
+    "hardErrors": 0,
+    "populationWideCoverageProven": false
+  },
+  "nextStart": {
+    "stage": "HERO_PORTRAIT_STAGE3_EXTRACTION_CONTRACT_FREEZE",
+    "primarySourceFamily": "GOOGLE_DRIVE_BASE_SKIN_PNG",
+    "candidateOutputMode": "LOSSLESS_SOURCE_PNG_BYTES",
+    "requiredBoundary": "Do not begin 267-Hero bulk materialization until deterministic explicit Hero ID to source mapping and fallback rules are frozen."
+  }
+}
