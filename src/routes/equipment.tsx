@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Crown, Gem, Shield, Swords } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 
+import { getOfficialEquipmentImageUrl } from "@/lib/equipment-image-assets";
 import { getGeneralEquipmentPageData } from "@/lib/equipment-page.functions";
 import type { EquipmentListRecord } from "@/lib/equipment-page.server";
 
@@ -219,19 +219,17 @@ function EquipmentImageCard({ record }: { record: EquipmentListRecord }) {
 }
 
 function EquipmentPlaceholder({ record }: { record: EquipmentListRecord }) {
-  const iconClass = "h-10 w-10 sm:h-12 sm:w-12";
+  const imageUrl = getOfficialEquipmentImageUrl(record.equipmentId);
 
   return (
-    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-6 text-muted-foreground transition group-hover:text-foreground">
-      {record.group === "weapon" ? (
-        <Swords className={iconClass} strokeWidth={1.35} aria-hidden="true" />
-      ) : record.group === "armor" ? (
-        <Shield className={iconClass} strokeWidth={1.35} aria-hidden="true" />
-      ) : record.group === "headgear" ? (
-        <Crown className={iconClass} strokeWidth={1.35} aria-hidden="true" />
-      ) : (
-        <Gem className={iconClass} strokeWidth={1.35} aria-hidden="true" />
-      )}
+    <div className="flex h-full w-full items-center justify-center bg-muted/35 pb-6">
+      <img
+        src={imageUrl}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-contain p-1 pb-2 transition duration-200 group-hover:scale-[1.03]"
+      />
     </div>
   );
 }
