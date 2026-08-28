@@ -62,19 +62,25 @@
     {"cn":"物理伤害","kr":"물리 피해"},
     {"cn":"魔法伤害","kr":"마법 피해"},
     {"cn":"所有伤害","kr":"모든 피해"},
+    {"cn":"远程伤害","kr":"원거리 피해"},
     {"cn":"治疗效果","kr":"치료 효과"},
     {"cn":"普通攻击","kr":"일반 공격"},
     {"cn":"飞行","kr":"비행"},
     {"cn":"防御地形","kr":"방어 지형"},
+    {"cn":"非防御地形","kr":"비방어 지형"},
     {"cn":"兵种克制","kr":"병종 상성"}
   ],
   "fixedPhrases": [
     {"cn":"主动进入战斗时","kr":"공격하여 전투 진입 시"},
     {"cn":"被攻击进入战斗时","kr":"공격받아 전투 진입 시"},
     {"cn":"被魔法攻击进入战斗时","kr":"마법 공격을 받아 전투 진입 시"},
+    {"cn":"被远程攻击进入战斗时","kr":"원거리 공격을 받아 전투 진입 시"},
+    {"cn":"被攻击进入战斗前","kr":"공격받아 전투 진입 전"},
+    {"cn":"进入战斗前","kr":"전투 진입 전"},
     {"cn":"进入战斗时","kr":"전투 진입 시"},
     {"cn":"主动攻击时","kr":"공격 시"},
     {"cn":"被攻击时","kr":"공격받을 시"},
+    {"cn":"被远程攻击时","kr":"원거리 공격을 받을 시"},
     {"cn":"行动结束时","kr":"행동 종료 시"},
     {"cn":"战斗后","kr":"전투 후"},
     {"cn":"战后","kr":"전투 후"},
@@ -82,6 +88,8 @@
     {"cn":"周围N格","kr":"주위 N칸"},
     {"cn":"N格内","kr":"N칸 이내"},
     {"cn":"持续N回合","kr":"N턴 지속"},
+    {"cn":"每移动一格","kr":"1칸 이동할 때마다"},
+    {"cn":"每有1点移动力","kr":"이동력 1당"},
     {"cn":"每场战斗最多触发一次","kr":"전투당 최대 1회 발동"},
     {"cn":"遭受伤害降低X%","kr":"받는 피해 X% 감소"},
     {"cn":"遭受所有伤害降低X%","kr":"받는 모든 피해 X% 감소"},
@@ -93,6 +101,8 @@
     {"cn":"士兵遭受治疗效果提升X%","kr":"병사가 받는 치료 효과 X% 증가"},
     {"cn":"恢复士兵X%的生命","kr":"병사 생명 X% 회복"},
     {"cn":"反弹受到伤害的X%","kr":"받은 피해의 X% 반사"},
+    {"cn":"目标拥有弱化效果","kr":"대상에게 약화 효과가 있을 시"},
+    {"cn":"效果翻倍","kr":"효과 2배"},
     {"cn":"施加「X」","kr":"「X」 부여"},
     {"cn":"无视X","kr":"X 무시"}
   ],
@@ -132,10 +142,15 @@
     "phrasesAdded": ["被魔法攻击进入战斗时", "遭受所有伤害降低X%", "士兵造成伤害增加X%", "士兵遭受治疗效果提升X%"],
     "namedEffectReviewTerms": ["灼烧", "倒刺"]
   },
+  "batch2ObservedAdditions": {
+    "genericTermsAdded": ["远程伤害", "非防御地形"],
+    "phrasesAdded": ["被远程攻击时", "被远程攻击进入战斗时", "被攻击进入战斗前", "进入战斗前", "每移动一格", "每有1点移动力", "目标拥有弱化效果", "效果翻倍"],
+    "namedEffectReviewTerms": ["先制打击", "空海奇袭", "水战强化", "水灵加护", "水中", "防具技能失效"]
+  },
   "completion": {
     "coreRulesFrozen": true,
     "autoTranslationEligible": "common terms, conditions, stats, damage/recovery, timing, range and inequality expressions",
     "reviewRequired": "named effects, skill-specific proper nouns and mechanics with potentially official Korean terminology",
-    "nextStartPoint": "Continue after soldierId 130 using data/presentation/soldier-unique-skill-kr.v1.json; collect only newly encountered exceptions."
+    "nextStartPoint": "Continue after soldierId 216 using data/presentation/soldier-unique-skill-kr.v1.json; collect only newly encountered exceptions."
   }
 }
