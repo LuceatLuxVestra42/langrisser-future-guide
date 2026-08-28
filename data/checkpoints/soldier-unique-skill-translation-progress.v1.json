@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-translation-progress/v1",
+  "date": "2026-08-29",
+  "status": "IN_PROGRESS_WITH_REVIEW",
+  "source": "data/generated/soldier-detail-stage5-3.v1.json",
+  "targetCount": 185,
+  "progress": {
+    "translatedCount": 70,
+    "passCount": 53,
+    "reviewCount": 17,
+    "remainingCount": 115,
+    "lastCompletedSoldierId": 516,
+    "nextKnownRecord": 517,
+    "batchSize": 20
+  },
+  "translationSources": [
+    {"path":"data/presentation/soldier-unique-skill-kr.v1.json","recordCount":50,"range":"through soldierId 403","role":"consolidated-base"},
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch5.v1.json","recordCount":20,"range":"soldierId 410 through 516 with lower tiers skipped","role":"append-only-batch"}
+  ],
+  "writeStrategy": {
+    "mode": "checkpoint-sharded-during-bulk-translation",
+    "reason": "Avoid repeated whole-file replacement of the growing presentation overlay during bulk translation. Preserve completed batches as immutable checkpoints and consolidate once after translation/review stabilizes.",
+    "canonicalGeneratedSourceReadOnly": true,
+    "finalConsolidationRequired": true
+  },
+  "reviewQueueCounts": {
+    "existingThroughBatch4": 11,
+    "newInBatch5": 6,
+    "total": 17
+  },
+  "nextStartPoint": {
+    "afterSoldierId": 516,
+    "nextKnownRecord": 517,
+    "batchSize": 20
+  }
+}
