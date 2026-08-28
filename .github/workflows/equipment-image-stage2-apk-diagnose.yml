@@ -1,0 +1,26 @@
+name: Equipment Image Stage 2 APK Diagnose
+
+on:
+  push:
+    branches:
+      - work/equipment-image-stage2-final373
+    paths:
+      - scripts/inspect-equipment-image-stage2-apk-bundles.py
+      - .github/workflows/equipment-image-stage2-apk-diagnose.yml
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install UnityPy
+        run: python -m pip install --disable-pip-version-check UnityPy
+      - name: Inspect Equipment root bundle candidates
+        run: python scripts/inspect-equipment-image-stage2-apk-bundles.py
