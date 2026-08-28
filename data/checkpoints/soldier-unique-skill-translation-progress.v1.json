@@ -6,18 +6,19 @@
   "source": "data/generated/soldier-detail-stage5-3.v1.json",
   "targetCount": 185,
   "progress": {
-    "translatedCount": 90,
-    "passCount": 67,
-    "reviewCount": 23,
-    "remainingCount": 95,
-    "lastCompletedSoldierId": 644,
-    "nextKnownRecord": 645,
+    "translatedCount": 110,
+    "passCount": 76,
+    "reviewCount": 34,
+    "remainingCount": 75,
+    "lastCompletedSoldierId": 1031,
+    "nextKnownRecord": 1032,
     "batchSize": 20
   },
   "translationSources": [
     {"path":"data/presentation/soldier-unique-skill-kr.v1.json","recordCount":50,"range":"through soldierId 403","role":"consolidated-base"},
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch5.v1.json","recordCount":20,"range":"soldierId 410 through 516 with lower tiers skipped","role":"append-only-batch"},
-    {"path":"data/checkpoints/soldier-unique-skill-translation-batch6.v1.json","recordCount":20,"range":"soldierId 517 through 644 with lower tiers skipped","role":"append-only-batch"}
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch6.v1.json","recordCount":20,"range":"soldierId 517 through 644 with lower tiers skipped","role":"append-only-batch"},
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch7.v1.json","recordCount":20,"range":"soldierId 645 through 1031 with lower tiers skipped","role":"append-only-batch"}
   ],
   "writeStrategy": {
     "mode": "checkpoint-sharded-during-bulk-translation",
@@ -29,11 +30,12 @@
     "existingThroughBatch4": 11,
     "newInBatch5": 6,
     "newInBatch6": 6,
-    "total": 23
+    "newInBatch7": 11,
+    "total": 34
   },
   "nextStartPoint": {
-    "afterSoldierId": 644,
-    "nextKnownRecord": 645,
+    "afterSoldierId": 1031,
+    "nextKnownRecord": 1032,
     "batchSize": 20
   }
 }
