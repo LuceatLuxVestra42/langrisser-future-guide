@@ -8,23 +8,38 @@ const TARGETS = [
 
 for (const target of TARGETS) {
   const source = fs.readFileSync(target.path, "utf8");
+  let equipmentLinks = 0;
   let replacements = 0;
-  const patched = source.replace(/<Link\n(\s+)to="(\/equipment[^"]*)"/g, (match, indent, to) => {
+  let alreadyPatched = 0;
+
+  const patched = source.replace(/<Link\b[\s\S]*?>/g, (openingTag) => {
+    if (!/\bto="\/equipment[^"]*"/.test(openingTag)) return openingTag;
+
+    equipmentLinks += 1;
+    if (/\breloadDocument\b/.test(openingTag)) {
+      alreadyPatched += 1;
+      return openingTag;
+    }
+
+    const indentMatch = openingTag.match(/^<Link\n(\s+)/);
+    if (!indentMatch) {
+      throw new Error(`${target.path}: unsupported Equipment Link formatting: ${openingTag}`);
+    }
+
     replacements += 1;
-    return `<Link\n${indent}reloadDocument\n${indent}to="${to}"`;
+    const indent = indentMatch[1];
+    return openingTag.replace(/^<Link\n(\s+)/, `<Link\n${indent}reloadDocument\n${indent}`);
   });
 
-  const alreadyPatched = (source.match(/<Link\n\s+reloadDocument\n\s+to="\/equipment[^"]*"/g) ?? []).length;
-  const totalCovered = replacements + alreadyPatched;
-  if (totalCovered !== target.expected) {
-    throw new Error(`${target.path}: expected ${target.expected} Equipment document-navigation links, found ${totalCovered}`);
+  if (equipmentLinks !== target.expected) {
+    throw new Error(`${target.path}: expected ${target.expected} Equipment document-navigation links, found ${equipmentLinks}`);
   }
 
   if (replacements > 0) {
     fs.writeFileSync(target.path, patched);
   }
 
-  console.log(`${target.path}: ${replacements} added, ${alreadyPatched} already present`);
+  console.log(`${target.path}: ${replacements} added, ${alreadyPatched} already present, ${equipmentLinks} covered`);
 }
 
 console.log("PASS: Equipment routes use reloadDocument for all cross-page Equipment navigation links.");
