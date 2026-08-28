@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-translation-batch/v1",
+  "date": "2026-08-28",
+  "batch": 2,
+  "status": "PASS_WITH_REVIEW",
+  "source": "data/generated/soldier-detail-stage5-3.v1.json",
+  "presentation": "data/presentation/soldier-unique-skill-kr.v1.json",
+  "processedSoldierIds": [131,132,133,134,135,136,202,203,210,216],
+  "batchSummary": {
+    "translated": 10,
+    "pass": 8,
+    "review": 2,
+    "cumulativeTranslated": 20,
+    "cumulativePass": 16,
+    "cumulativeReview": 4,
+    "remaining": 165,
+    "lastCompletedSoldierId": 216,
+    "nextKnownRecord": 219
+  },
+  "observedReusableRules": [
+    {"cn":"被远程攻击时","kr":"원거리 공격을 받을 시"},
+    {"cn":"被远程攻击进入战斗时","kr":"원거리 공격을 받아 전투 진입 시"},
+    {"cn":"被攻击进入战斗前","kr":"공격받아 전투 진입 전"},
+    {"cn":"进入战斗前","kr":"전투 진입 전"},
+    {"cn":"每移动一格","kr":"1칸 이동할 때마다"},
+    {"cn":"每有1点移动力","kr":"이동력 1당"},
+    {"cn":"远程伤害","kr":"원거리 피해"},
+    {"cn":"非防御地形","kr":"비방어 지형"},
+    {"cn":"效果翻倍","kr":"효과 2배"},
+    {"cn":"目标拥有弱化效果","kr":"대상에게 약화 효과가 있을 시"}
+  ],
+  "reviewQueue": [
+    {"soldierId":134,"terms":["先制打击","空海奇袭","水战强化","水灵加护","水中"],"reason":"Named technologies and quoted terrain label; repository has no authoritative Korean labels."},
+    {"soldierId":136,"terms":["防具技能失效"],"reason":"Quoted named mechanic; repository has no authoritative Korean label."}
+  ],
+  "excludedBetweenProcessedRecords": [
+    {"soldierId":200,"reason":"tier 1; unique-skill translation target excluded"},
+    {"soldierId":201,"reason":"tier 2; unique-skill translation target excluded"},
+    {"soldierId":213,"reason":"tier 2; unique-skill translation target excluded"}
+  ],
+  "nextStartPoint": "Continue from soldierId 219; translate the next 10 eligible final descriptions and append only new exceptions."
+}
