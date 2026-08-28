@@ -1,0 +1,169 @@
+{
+  "stage": "Equipment Image Stage 3 Hosted QA",
+  "version": 1,
+  "status": "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA",
+  "completion": "COMPLETE",
+  "freezeState": "EQUIPMENT_IMAGE_STAGE3_FROZEN",
+  "semanticStageReopened": false,
+  "canonicalIdentityChanged": false,
+  "productionJoinKey": "equipmentId",
+  "hostedBaseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+  "deploymentSentinel": {
+    "status": "PASS",
+    "attempts": 1,
+    "payload": {
+      "stage": "Equipment Image Stage 3 Frontend Integration",
+      "version": 1,
+      "status": "READY_FOR_HOSTED_QA",
+      "productionJoinKey": "equipmentId",
+      "publicEquipment": 373,
+      "generalEquipment": 206,
+      "exclusiveEquipment": 167,
+      "assetPath": "images/equipment/{equipmentId}.png"
+    }
+  },
+  "gates": {
+    "preflight": "PASS",
+    "build": "PASS",
+    "deploymentHosted": "PASS",
+    "browserUi": "PASS_HOSTED_ROUTE_AND_ASSET_SMOKE"
+  },
+  "routeChecks": [
+    {
+      "path": "",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/?qa=1787906735431",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/?qa=1787906735431",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 13298
+    },
+    {
+      "path": "equipment",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment?qa=1787906735669",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/?qa=1787906735669",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 271221
+    },
+    {
+      "path": "equipment/",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/?qa=1787906736025",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/?qa=1787906736025",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 271221
+    },
+    {
+      "path": "equipment/exclusive",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive?qa=1787906736271",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive/?qa=1787906736271",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 519486
+    },
+    {
+      "path": "equipment/exclusive/",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive/?qa=1787906736601",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/exclusive/?qa=1787906736601",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 519486
+    },
+    {
+      "path": "equipment/6",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/6?qa=1787906736979",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/6/?qa=1787906736979",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 34809
+    },
+    {
+      "path": "equipment/547",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/547?qa=1787906737287",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/547/?qa=1787906737287",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 33027
+    },
+    {
+      "path": "equipment/550",
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/550?qa=1787906737608",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/equipment/550/?qa=1787906737608",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 32933
+    }
+  ],
+  "assetChecks": [
+    {
+      "equipmentId": 6,
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/6.png?qa=1787906737923",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/6.png?qa=1787906737923",
+      "status": 200,
+      "contentType": "image/png",
+      "width": 172,
+      "height": 172,
+      "bytes": 20097
+    },
+    {
+      "equipmentId": 106,
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/106.png?qa=1787906738154",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/106.png?qa=1787906738154",
+      "status": 200,
+      "contentType": "image/png",
+      "width": 172,
+      "height": 172,
+      "bytes": 30435
+    },
+    {
+      "equipmentId": 547,
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/547.png?qa=1787906738232",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/547.png?qa=1787906738232",
+      "status": 200,
+      "contentType": "image/png",
+      "width": 172,
+      "height": 172,
+      "bytes": 33742
+    },
+    {
+      "equipmentId": 550,
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/550.png?qa=1787906738464",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/550.png?qa=1787906738464",
+      "status": 200,
+      "contentType": "image/png",
+      "width": 172,
+      "height": 172,
+      "bytes": 20438
+    },
+    {
+      "equipmentId": 643,
+      "requestedUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/643.png?qa=1787906738543",
+      "finalUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/images/equipment/643.png?qa=1787906738543",
+      "status": 200,
+      "contentType": "image/png",
+      "width": 172,
+      "height": 172,
+      "bytes": 29460
+    }
+  ],
+  "representativeEquipmentIds": [
+    6,
+    106,
+    547,
+    550,
+    643
+  ],
+  "collisionFixturesChecked": [
+    547,
+    550
+  ],
+  "existingBaselineFixtureChecked": 6,
+  "officialApkHoldFixturesChecked": [
+    106,
+    547,
+    550,
+    643
+  ],
+  "publicEquipment": 373,
+  "nextStage": "EQUIPMENT_IMAGE_STAGE3_COMPLETE"
+}
