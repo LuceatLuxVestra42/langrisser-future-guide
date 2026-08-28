@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "smart-regression-partial-replacement-sr8-v1",
+  "status": "SR8_PARTIAL_REPLACEMENT",
+  "selector": "scripts/smart-regression-sr4.mjs",
+  "fallbackExitCode": 3,
+  "defaultDecision": "LEGACY_REQUIRED",
+  "principles": [
+    "Partial replacement is allowed only for a selector result with no unknown paths, no unbound gates, no safe fallback, and an exact allowlisted executable leaf-gate set.",
+    "A blocked, unknown, broad-fallback, or unbound result must remain on the legacy/full-validation path.",
+    "SR-8 changes orchestration only. It does not reimplement or weaken frozen semantic validators."
+  ],
+  "classes": [
+    {
+      "id": "hero-soldier-pair-parity",
+      "legacyWorkflow": ".github/workflows/hero-soldier-stageC-1-pair-parity.yml",
+      "allowedSelectorStatuses": ["PASS"],
+      "exactLeafGates": ["hero-soldier.pair-parity"],
+      "allowedDomains": ["hero-soldier"],
+      "forbidRequestedGates": ["global.safe-fallback"],
+      "forbidCompositeGates": ["global.safe-fallback"],
+      "requireUnknownPathsEmpty": true,
+      "requireUnboundGatesEmpty": true,
+      "evidence": {
+        "sr5Fixture": "hero-soldier-frozen-pair",
+        "sr7HistoricalCase": "hero-soldier-stagec1-pr",
+        "sr7LegacyRunId": 32926066075,
+        "observedPairs": 5977,
+        "observedMismatchCount": 0
+      },
+      "replacementBehavior": "Execute the Smart Regression selected pair-parity gate. If admission fails, run the unchanged legacy C-1 validator instead."
+    }
+  ]
+}
