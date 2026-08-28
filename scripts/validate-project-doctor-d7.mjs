@@ -29,6 +29,7 @@ export const validateD7 = ({
   check(contract.permissions?.contents === 'read', 'CONTENTS_READ_CONTRACT');
   check(contract.changedFilePolicy?.useRealChangedFiles === true && contract.changedFilePolicy?.representativePathOverride === false, 'REAL_DIFF_CONTRACT');
   check(contract.changedFilePolicy?.manualReviewMustFailWorkflow === true && contract.changedFilePolicy?.manualReviewExitCode === 3, 'MANUAL_REVIEW_FAIL_CLOSED');
+  check(contract.changedFilePolicy?.staleEventBaseShaForbidden === true, 'STALE_EVENT_BASE_SHA_FORBIDDEN');
   check(contract.securityPolicy?.freshnessRefreshInWorkflow === false && contract.securityPolicy?.repositoryWritePermission === false, 'NO_RESEAL_NO_WRITE_CONTRACT');
 
   check(/^name:\s*Project Doctor PR Guard\s*$/m.test(workflowText), 'WORKFLOW_NAME');
@@ -36,7 +37,9 @@ export const validateD7 = ({
   check(/branches:\s*\n\s*- main/m.test(workflowText), 'WORKFLOW_MAIN_TARGET');
   check(/permissions:\s*\n\s*contents:\s*read/m.test(workflowText) && !/contents:\s*write/.test(workflowText), 'WORKFLOW_READ_ONLY');
   check(/fetch-depth:\s*0/.test(workflowText), 'FULL_HISTORY_CHECKOUT');
-  check(workflowText.includes('github.event.pull_request.base.sha') && workflowText.includes('github.event.pull_request.head.sha'), 'PR_SHA_COMPARISON');
+  check(workflowText.includes('github.event.pull_request.base.ref') && workflowText.includes('github.event.pull_request.head.sha'), 'PR_LIVE_BASE_REF_COMPARISON');
+  check(workflowText.includes('git fetch --no-tags origin') && workflowText.includes('origin/${{ github.event.pull_request.base.ref }}'), 'PR_BASE_FETCHED_AT_RUNTIME');
+  check(!workflowText.includes('github.event.pull_request.base.sha'), 'STALE_PR_BASE_SHA_NOT_USED');
   check(workflowText.includes('origin/main') && workflowText.includes('DOCTOR_BASE') && workflowText.includes('DOCTOR_HEAD'), 'PUSH_PROOF_COMPARISON');
   check(!workflowText.includes('doctor:freshness:refresh'), 'NO_FRESHNESS_REFRESH_COMMAND');
   check(workflowText.includes('npm run doctor:pr-guard:validate'), 'D7_SELF_TEST_STEP');
@@ -58,7 +61,7 @@ export const validateD7 = ({
     stage: 'D7',
     status: failures.length === 0 ? 'PASS_PROJECT_DOCTOR_D7_GUARD_CONTRACT' : 'FAIL_PROJECT_DOCTOR_D7_GUARD_CONTRACT',
     exitCode: failures.length === 0 ? 0 : 1,
-    checkCount: 28,
+    checkCount: 31,
     failureCount: failures.length,
     failures,
   };
