@@ -12,9 +12,13 @@
     "observedStructuredDriveHeroFolderCount": 244,
     "exactBaseMappingRecordCount": 208,
     "uniqueExactMappedHeroCount": 208,
+    "alreadyAdmittedExactMappingCount": 5,
+    "mappedNotAdmittedExactMappingCount": 203,
     "previousKnownExactMappingCount": 9,
     "newExactMappedHeroCountRelativeToStage41": 199,
     "remainingCanonicalWithoutStructuredExactMapping": 59,
+    "canonicalAdmittedSourceCount": 5,
+    "pendingCanonicalSourceAdmissionCount": 262,
     "hardErrorCount": 0,
     "continuityMismatchCount": 0,
     "duplicateHeroMappingCount": 0,
@@ -22,7 +26,8 @@
     "bulk267Ready": false
   },
   "mappingStateCounts": {
-    "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED": 208,
+    "BRIDGE_PROVEN_MAPPING_ALREADY_ADMITTED": 5,
+    "BRIDGE_PROVEN_MAPPING_NOT_ADMITTED": 203,
     "OWNERSHIP_PROVEN_BASE_PNG_AMBIGUOUS": 3,
     "OWNERSHIP_PROVEN_BASE_PNG_MISSING": 4,
     "UNRESOLVED_NO_EXACT_RUNTIME_STEM_EVIDENCE": 29
@@ -48,6 +53,12 @@
       "result": "PASS"
     },
     {
+      "id": "already-admitted-mapping-continuity",
+      "expected": 5,
+      "actual": 5,
+      "result": "PASS"
+    },
+    {
       "id": "duplicate-hero-mapping",
       "expected": 0,
       "actual": 0,
@@ -60,7 +71,7 @@
       "result": "PASS"
     },
     {
-      "id": "source-admission-performed",
+      "id": "new-source-admission-performed",
       "expected": false,
       "actual": false,
       "result": "PASS"
@@ -73,7 +84,9 @@
     }
   ],
   "nextStart": {
-    "primary": "HERO_PORTRAIT_STAGE4_2_UNCOVERED_SOURCE_FALLBACK_PROOF",
-    "condition": "Begin only after reviewing unresolved/ambiguous Stage 4-1B rows and admitting any newly mapped Drive files through Stage 3 byte/image gates."
+    "primary": "HERO_PORTRAIT_STAGE4_1C_MAPPED_SOURCE_ADMISSION",
+    "primaryGoal": "Apply Stage 3 byte/image admission gates to the exact mapped-but-not-admitted Drive sources without repeating the ownership census.",
+    "secondary": "HERO_PORTRAIT_STAGE4_2_UNCOVERED_SOURCE_FALLBACK_PROOF",
+    "secondaryCondition": "Begin fallback proof after the 36 structured-tree exceptions are reviewed and the mapped Drive admission batch is checkpointed."
   }
 }
