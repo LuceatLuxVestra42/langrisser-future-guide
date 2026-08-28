@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "stage": "ASSET_INTAKE_STAGE_2_REAL_EVIDENCE",
-  "status": "RESOURCE_ID_MAP_COMPLETE_MODEL_ASSET_ENTRY_PENDING",
+  "status": "REPRESENTATIVE_ASSET_RESOLUTION_COMPLETE",
   "canonicalType": "Skin",
   "representatives": [
     "102",
@@ -18,14 +18,17 @@
     "staticAndSpineLocatorSource": "data/configdata/ConfigDataCharImageSkinResourceInfo.json",
     "modelBindingIdSource": "data/configdata/ConfigDataHeroSkinInfo.json",
     "authoritativeModelResourcePathMap": "begin_configdata_configdata_abs.b::ConfigDataModelSkinResourceInfo",
-    "note": "Reuse Stage 1/3-1 generated metadata. Do not re-derive Hero-Skin ownership, sourceOrder, locator strings, or model binding IDs."
+    "authoritativeModelBundleEntryEvidence": "data/evidence/skin-stage3-2-model-prefab-bundle-evidence.v1.json",
+    "note": "Reuse Stage 1/3-1 generated metadata. Do not re-derive Hero-Skin ownership, sourceOrder, locator strings, model binding IDs, or ConfigData model resource paths."
   },
   "evidenceSources": {
     "legacyStaticRawBytes": "data/evidence/skin-stage3-2-static-source-evidence.v1.json",
     "unityBundlePathEvidence": "data/evidence/skin-stage3-2-unity-bundle-evidence.v1.json",
     "skin102BeginStaticEvidence": "data/evidence/skin-stage3-2-mathew-begin-static-evidence.v1.json",
     "skin102BeginSpineEvidence": "data/evidence/skin-stage3-2-mathew-begin-spine-evidence.v1.json",
-    "authoritativeModelResourceMap": "data/evidence/skin-stage3-2-configdata-model-resource-map-evidence.v1.json"
+    "authoritativeModelResourceMap": "data/evidence/skin-stage3-2-configdata-model-resource-map-evidence.v1.json",
+    "authoritativeModelPrefabBundleEntries": "data/evidence/skin-stage3-2-model-prefab-bundle-evidence.v1.json",
+    "finalRepresentativeResolution": "data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json"
   },
   "coverage": {
     "representativeExpected": 3,
@@ -38,9 +41,9 @@
     "recordsWithStaticAndSpinePathResolved": 3,
     "modelResourceIdsExpected": 7,
     "modelResourceIdsMappedToPrefabPath": 7,
-    "modelResourceIdsAuthoritativeAssetEntryResolved": 0,
-    "modelResourceIdsResolved": 0,
-    "finalNormalizedResolvedRecords": 0
+    "modelResourceIdsAuthoritativeAssetEntryResolved": 7,
+    "modelResourceIdsResolved": 7,
+    "finalNormalizedResolvedRecords": 3
   },
   "pathResolvedRecords": [
     {
@@ -49,8 +52,8 @@
       "spine": "Spine/Char/Mathew_ABS/Mathew_Skin01_Prefab.prefab",
       "pathEvidenceStatus": "CONFIRMED",
       "resourceIdMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
-      "normalizedResolutionClass": "PENDING",
-      "pendingReason": "MODEL_PREFAB_BUNDLE_ENTRY_NOT_YET_VERIFIED"
+      "modelPrefabBundleEntryStatus": "AUTHORITATIVE_ENTRY_COMPLETE",
+      "normalizedResolutionClass": "RESOLVED"
     },
     {
       "canonicalKey": "1901",
@@ -58,8 +61,8 @@
       "spine": "Spine/Char/Lista_ABS/Lista_Skin01_Prefab.prefab",
       "pathEvidenceStatus": "CONFIRMED",
       "resourceIdMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
-      "normalizedResolutionClass": "PENDING",
-      "pendingReason": "MODEL_PREFAB_BUNDLE_ENTRY_NOT_YET_VERIFIED"
+      "modelPrefabBundleEntryStatus": "AUTHORITATIVE_ENTRY_COMPLETE",
+      "normalizedResolutionClass": "RESOLVED"
     },
     {
       "canonicalKey": "3701",
@@ -67,8 +70,8 @@
       "spine": "Spine/Char/Zigodlla_ABS/Zigodlla_Skin01_Prefab.prefab",
       "pathEvidenceStatus": "CONFIRMED",
       "resourceIdMapStatus": "AUTHORITATIVE_MAP_COMPLETE",
-      "normalizedResolutionClass": "PENDING",
-      "pendingReason": "MODEL_PREFAB_BUNDLE_ENTRY_NOT_YET_VERIFIED"
+      "modelPrefabBundleEntryStatus": "AUTHORITATIVE_ENTRY_COMPLETE",
+      "normalizedResolutionClass": "RESOLVED"
     }
   ],
   "modelResourceIds": [
@@ -83,66 +86,93 @@
   "modelResourcePrefabMap": [
     {
       "skinResourceId": 102,
-      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01/Mathew_Skin01_Prefab.prefab"
+      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01/Mathew_Skin01_Prefab.prefab",
+      "bundle": "begin_spine_general_mathew_abs.b",
+      "assetEntryStatus": "CONFIRMED"
     },
     {
       "skinResourceId": 1021,
-      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_1/Mathew_Skin01_1_Prefab.prefab"
+      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_1/Mathew_Skin01_1_Prefab.prefab",
+      "bundle": "begin_spine_general_mathew_abs.b",
+      "assetEntryStatus": "CONFIRMED"
     },
     {
       "skinResourceId": 1022,
-      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_2/Mathew_Skin01_2_Prefab.prefab"
+      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_2/Mathew_Skin01_2_Prefab.prefab",
+      "bundle": "begin_spine_general_mathew_abs.b",
+      "assetEntryStatus": "CONFIRMED"
     },
     {
       "skinResourceId": 1023,
       "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_3/Mathew_Skin01_3_Prefab.prefab",
-      "alternateAirPrefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_3/Mathew_Skin01_3_air_Prefab.prefab"
+      "alternateAirPrefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_3/Mathew_Skin01_3_air_Prefab.prefab",
+      "bundle": "begin_spine_general_mathew_abs.b",
+      "alternateAirBundle": "spine_general_mathew_abs.b",
+      "assetEntryStatus": "CONFIRMED",
+      "alternateAirAssetEntryStatus": "CONFIRMED"
     },
     {
       "skinResourceId": 1024,
-      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_4/Mathew_Skin01_4_Prefab.prefab"
+      "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_4/Mathew_Skin01_4_Prefab.prefab",
+      "bundle": "begin_spine_general_mathew_abs.b",
+      "assetEntryStatus": "CONFIRMED"
     },
     {
       "skinResourceId": 1901,
-      "prefabPath": "Spine/General/Lista_ABS/Lista_Skin01/Lista_Skin01_Prefab.prefab"
+      "prefabPath": "Spine/General/Lista_ABS/Lista_Skin01/Lista_Skin01_Prefab.prefab",
+      "bundle": "spine_general_lista_abs.b",
+      "assetEntryStatus": "CONFIRMED"
     },
     {
       "skinResourceId": 3701,
-      "prefabPath": "Spine/General/Zigodlla_ABS/Zigodlla_Skin01/Zigodlla_Skin01_Prefab.prefab"
+      "prefabPath": "Spine/General/Zigodlla_ABS/Zigodlla_Skin01/Zigodlla_Skin01_Prefab.prefab",
+      "bundle": "spine_general_zigodlla_abs.b",
+      "assetEntryStatus": "CONFIRMED"
     }
   ],
-  "nextBundleCandidateSet": {
-    "Mathew_ABS": [
-      "begin_spine_general_mathew_abs.b",
-      "spine_general_mathew_abs.b"
-    ],
-    "Lista_ABS": [
-      "begin_spine_general_lista_abs.b",
-      "spine_general_lista_abs.b"
-    ],
-    "Zigodlla_ABS": [
-      "spine_general_zigodlla_abs.b"
-    ],
-    "status": "EXACT_FILENAMES_PRESENT_IN_UPLOADED_BUNDLE_LIST_MEMBERSHIP_NOT_YET_VERIFIED"
+  "verifiedBundleSet": {
+    "begin_spine_general_mathew_abs.b": {
+      "role": "PRIMARY_MATCH",
+      "resourceIds": [102, 1021, 1022, 1023, 1024]
+    },
+    "spine_general_mathew_abs.b": {
+      "role": "SUPPLEMENTAL_MATCH",
+      "resourceIds": [1023],
+      "note": "Contains the explicit ConfigData alternate air Prefab for resource 1023."
+    },
+    "begin_spine_general_lista_abs.b": {
+      "role": "INSPECTED_NEGATIVE_CANDIDATE",
+      "resourceIds": []
+    },
+    "spine_general_lista_abs.b": {
+      "role": "PRIMARY_MATCH",
+      "resourceIds": [1901]
+    },
+    "spine_general_zigodlla_abs.b": {
+      "role": "PRIMARY_MATCH",
+      "resourceIds": [3701]
+    }
   },
   "verifiedFacts": [
     "All three representative records have authoritative static and character-Spine path evidence from UnityFS bundle contents.",
-    "The user-supplied begin_configdata_configdata_abs.b is UnityFS 2022.3.62f2 and contains ConfigDataHeroSkinInfo, ConfigDataCharImageSkinResourceInfo, and ConfigDataModelSkinResourceInfo.",
     "ConfigDataHeroSkinInfo reproduces the frozen jobConnectionId + skinResourceId bindings for Skin 102, 1901, and 3701.",
     "ConfigDataCharImageSkinResourceInfo reproduces the frozen static and character-Spine locators for Skin 102, 1901, and 3701.",
     "ConfigDataModelSkinResourceInfo maps all seven representative model resource IDs exactly once to explicit Spine/General Prefab paths.",
-    "No numeric resource ID arithmetic, fuzzy matching, or inferred ID-to-path conversion was used.",
-    "The mapped model Prefab paths have not yet been verified as actual entries or bytes inside the corresponding Spine/General bundles, so final normalized RESOLVED remains blocked."
+    "All seven mapped primary model Prefab paths occur exactly once in the inspected authoritative Spine/General bundle CAB content.",
+    "Mathew primary resources 102, 1021, 1022, 1023, and 1024 are in begin_spine_general_mathew_abs.b; the explicit 1023 air alternate is in spine_general_mathew_abs.b.",
+    "Lista 1901 is in spine_general_lista_abs.b and is absent from the inspected begin_spine_general_lista_abs.b candidate.",
+    "Zigodlla 3701 is in spine_general_zigodlla_abs.b.",
+    "No numeric resource ID arithmetic, fuzzy matching, inferred bundle membership, or cross-root fallback was used.",
+    "The three frozen representative records satisfy their Static, Char Spine, and model RESOURCE_ID evidence requirements and are promoted to normalized RESOLVED."
   ],
-  "blockers": [
-    "AUTHORITATIVE_MODEL_PREFAB_BUNDLE_ENTRY_OR_BYTES_REQUIRED"
-  ],
+  "blockers": [],
   "rejectedShortcuts": [
-    "Do not treat ConfigData resource-path mapping alone as extracted model asset bytes.",
+    "Do not treat ConfigData resource-path mapping alone as extracted model asset proof.",
     "Do not infer begin/non-begin bundle membership from filename conventions.",
     "Do not use ID arithmetic or cross-root fallback.",
     "Do not use fuzzy filename matching.",
-    "Do not claim normalized RESOLVED for any representative until its mapped model Prefab path is verified in authoritative bundle contents."
+    "Do not extrapolate the three representative RESOLVED results to all 540 Skin records without bulk evidence."
   ],
-  "nextStartPoint": "Inspect begin_spine_general_mathew_abs.b and spine_general_mathew_abs.b for the five Mathew mapped Prefab paths; inspect begin_spine_general_lista_abs.b and spine_general_lista_abs.b for Lista 1901; inspect spine_general_zigodlla_abs.b for Zigodlla 3701. Confirm exact bundle entries/bytes, then generate the final representative evidence without recomputing frozen Skin ownership, sourceOrder, static locators, Spine locators, model bindings, or resource-path mappings."
+  "completedScope": "Skin Stage 3-2 representative proof: 3/3 records, 7/7 model resource IDs, all representative locator classes resolved.",
+  "nextStartPoint": "Begin bulk Skin asset extraction/resolution from the frozen Stage 3-1 inventory using the representative exact-path and exact-resource-ID rules. Build or reuse lightweight bundle/path indexes instead of repeatedly scanning large bundles, then run full missing/duplicate/alias QA before any 540-record release claim."
 }
