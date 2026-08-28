@@ -1,0 +1,109 @@
+name: Deploy Equipment Image Stage 3 Hosted
+
+on:
+  push:
+    branches:
+      - deploy/equipment-image-stage3-hosted-20260828
+    paths:
+      - '.github/workflows/deploy-equipment-image-stage3-hosted.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-equipment-image-stage3-hosted
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Preflight frozen Equipment image integration
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const stage2 = JSON.parse(fs.readFileSync('data/validation/equipment-image-stage2-final-summary.v3.json','utf8'));
+          const stage3 = JSON.parse(fs.readFileSync('data/validation/equipment-image-stage3-frontend-summary.v1.json','utf8'));
+          const sentinel = JSON.parse(fs.readFileSync('public/equipment-image-stage3-ready.json','utf8'));
+          if (stage2.status !== 'PASS_EQUIPMENT_IMAGE_STAGE2' || stage2.freezeState !== 'EQUIPMENT_IMAGE_STAGE2_FROZEN' || stage2.counts.verifiedRepositoryAssets !== 373) throw new Error('Stage 2 frozen predecessor mismatch');
+          if (stage3.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3_FRONTEND' || stage3.completion !== 'PREDEPLOY_COMPLETE' || stage3.freezeState !== 'EQUIPMENT_IMAGE_STAGE3_PREDEPLOY_FROZEN') throw new Error('Stage 3 predeploy freeze mismatch');
+          if (stage3.productionJoinKey !== 'equipmentId' || stage3.counts.publicEquipment !== 373 || stage3.counts.verifiedAssets !== 373 || stage3.counts.missingAssets !== 0) throw new Error('Stage 3 public asset contract mismatch');
+          if (sentinel.status !== 'READY_FOR_HOSTED_QA' || sentinel.productionJoinKey !== 'equipmentId' || sentinel.publicEquipment !== 373) throw new Error('Hosted sentinel mismatch');
+          console.log('PASS: frozen Stage 2 + Stage 3 predeploy + hosted sentinel');
+          NODE
+
+          test "$(find public/images/equipment -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" -eq 373
+          node scripts/validate-equipment-image-stage1.mjs
+          bun scripts/validate-equipment-stage4-6-admission-route-qa.mjs
+
+      - name: Reuse proven GitHub Pages static config
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
+          git show FETCH_HEAD:vite.config.ts > vite.config.ts
+          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
+          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
+          grep -q 'nitro: false' vite.config.ts
+          grep -q 'outputPath: `/equipment/${equipmentId}/index.html`' vite.config.ts
+
+      - name: Build GitHub Pages static site
+        run: bun run build
+
+      - name: Static Equipment candidate gate
+        run: |
+          set -euo pipefail
+          test -f dist/client/index.html
+          test -f dist/client/equipment/index.html
+          test -f dist/client/equipment/exclusive/index.html
+          test -f dist/client/equipment-image-stage3-ready.json
+
+          EQUIPMENT_DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$EQUIPMENT_DETAIL_COUNT" -eq 373
+          test "$(find dist/client/images/equipment -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" -eq 373
+
+          node <<'NODE'
+          const fs = require('fs');
+          const sentinel = JSON.parse(fs.readFileSync('dist/client/equipment-image-stage3-ready.json','utf8'));
+          if (sentinel.status !== 'READY_FOR_HOSTED_QA' || sentinel.publicEquipment !== 373) throw new Error('Built sentinel mismatch');
+          const checks = [
+            ['dist/client/equipment/6/index.html', '/langrisser-future-guide/images/equipment/6.png'],
+            ['dist/client/equipment/547/index.html', '/langrisser-future-guide/images/equipment/547.png'],
+            ['dist/client/equipment/550/index.html', '/langrisser-future-guide/images/equipment/550.png'],
+          ];
+          for (const [file, token] of checks) {
+            const html = fs.readFileSync(file,'utf8');
+            if (!html.includes(token)) throw new Error(`${file} missing ${token}`);
+          }
+          console.log(`PASS: ${373} Equipment detail pages + 373 images + base-path-aware representative HTML`);
+          NODE
+
+          printf '%s\n' '${{ github.sha }}' > dist/client/qa-main-source.txt
+          printf '%s\n' 'equipment-image-stage3-hosted' > dist/client/qa-surface.txt
+
+      - name: Publish to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Equipment Image Stage 3 ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
