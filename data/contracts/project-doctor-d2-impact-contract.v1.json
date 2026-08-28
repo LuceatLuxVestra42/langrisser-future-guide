@@ -67,6 +67,21 @@
       "reason": "Project Doctor CI/PR workflow changes affect Doctor tooling only. They must be validated by Doctor self-tests but must not fan out into semantic domain recomputation."
     },
     {
+      "id": "project-status-derived-sync",
+      "patterns": [
+        "scripts/build-project-status.mjs",
+        ".github/workflows/project-status-sync.yml",
+        "data/generated/project-status.v1.json",
+        "PROJECT_STATUS.md"
+      ],
+      "excludePatterns": [],
+      "directNodes": [
+        "project-doctor"
+      ],
+      "changeClass": "tooling",
+      "reason": "Project Status is a deterministic read-only projection of Project Doctor D1. Its builder, sync workflow, generated JSON, and human-readable Markdown are Doctor tooling only and must not reopen domain semantics."
+    },
+    {
       "id": "regression-coverage-promotion-v1-meta-contract",
       "patterns": [
         "data/contracts/regression-coverage-promotion.v1.json",
@@ -82,7 +97,7 @@
     }
   ],
   "overlayPolicy": {
-    "reason": "The base dependency map remains frozen. Post-map repository evolution is admitted only through explicit evidenced path families: Soldier WebP presentation assets, Project Doctor workflow files used by D6/D7 runtime integration, and the exact Regression Coverage Promotion V1 meta-contract admission surface.",
+    "reason": "The base dependency map remains frozen. Post-map repository evolution is admitted only through explicit evidenced path families: Soldier WebP presentation assets, Project Doctor workflow files used by D6/D7 runtime integration, deterministic Project Status derived-sync tooling, and the exact Regression Coverage Promotion V1 meta-contract admission surface.",
     "mayAddPathRulesOnly": true,
     "mayAddImpactNodes": false,
     "mayAddPropagationEdges": false,
@@ -114,6 +129,19 @@
       "id": "PROJECT_DOCTOR_WORKFLOW_POST_MAP_OVERLAY",
       "paths": [".github/workflows/project-doctor-d7-pr-guard.yml"],
       "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["project-doctor"],
+      "expectedDomains": []
+    },
+    {
+      "id": "PROJECT_STATUS_DERIVED_SYNC_OVERLAY",
+      "paths": [
+        "scripts/build-project-status.mjs",
+        ".github/workflows/project-status-sync.yml",
+        "data/generated/project-status.v1.json",
+        "PROJECT_STATUS.md"
+      ],
+      "expectedStatus": "MAPPED",
+      "expectedChangedFileCount": 4,
       "expectedDirectNodes": ["project-doctor"],
       "expectedDomains": []
     },
