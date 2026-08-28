@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "review": "hero-portrait-stage2-leon-animation-filename",
+  "status": "PASS_CLARIFIED",
+  "heroId": 6,
+  "nameKr": "레온",
+  "reviewReason": "The source filename Leon_Animation_FIN_idle_Normal_default.png uniquely contains Animation_FIN among the five Stage 2 representative PNGs, raising concern that it could be an awakening-skill or other special-animation asset rather than the canonical base portrait.",
+  "frozenSource": {
+    "driveFileId": "1oPTSwW5O4UWxY6idqHDJ_smjPTm2Wsq1",
+    "fileName": "Leon_Animation_FIN_idle_Normal_default.png",
+    "sha256": "8d04d4858d8bbb8021cef1439183018293ff28659f42e486ae1306d8c5f616d1",
+    "width": 1443,
+    "height": 2112
+  },
+  "reviewEvidence": {
+    "localVisualReadback": "The PNG shows Leon's classic blue-and-gold base outfit and the same full-body pose used as his standard mobile illustration.",
+    "externalCrossCheck": {
+      "source": "Bilibili Langrisser Wiki - 皮肤/利昂",
+      "url": "https://wiki.biligame.com/langrisser/%E7%9A%AE%E8%82%A4/%E5%88%A9%E6%98%82",
+      "relevantStatement": "The page labels the illustration as 默认 and 初始时装，经典造型！ and separately exposes 利昂加载动画 controls for that default appearance."
+    },
+    "spContrast": "The separate Leon SP illustration is visually distinct and is not the reviewed PNG."
+  },
+  "interpretation": {
+    "animationFinMeansAwakeningSkill": false,
+    "safeInterpretation": "Animation_FIN is treated as an internal/default portrait-animation or loading-animation resource qualifier for this file, not evidence of awakening-skill ownership.",
+    "basePortraitCandidateRemainsValid": true,
+    "confidence": 0.98
+  },
+  "policy": [
+    "Do not classify a Hero portrait as base/special from filename tokens alone.",
+    "For unusual filename qualifiers, require visual identity plus explicit default/base appearance evidence.",
+    "Keep the existing Hero 6 Stage 2 representative PASS; no Stage 2 population or source mapping is changed by this review."
+  ],
+  "stage2Impact": "NO_CHANGE_PASS_RETAINED"
+}
