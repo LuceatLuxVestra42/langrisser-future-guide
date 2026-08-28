@@ -20,43 +20,32 @@ jobs:
           REF='https://mz.zlongame.com/jx/mzdownload/20180731/5473.html'
           UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0 Safari/537.36'
           curl --http1.1 -fL --retry 2 -A "$UA" -e "$REF" -D /tmp/download.headers -o /tmp/DownLoad-MZ-PC.exe "$URL"
-          echo '=== response headers ==='
-          tail -n 40 /tmp/download.headers
-          SIZE="$(stat -c %s /tmp/DownLoad-MZ-PC.exe)"
           MD5="$(md5sum /tmp/DownLoad-MZ-PC.exe | awk '{print $1}')"
           CDN_MD5="$(grep -i '^x-cos-meta-md5:' /tmp/download.headers | tail -1 | cut -d: -f2- | tr -d ' \r\n')"
-          SHA256="$(sha256sum /tmp/DownLoad-MZ-PC.exe | awk '{print $1}')"
-          echo "size=$SIZE"
-          echo "md5=$MD5"
-          echo "cdn-md5=$CDN_MD5"
-          echo "sha256=$SHA256"
-          file /tmp/DownLoad-MZ-PC.exe
+          echo "size=$(stat -c %s /tmp/DownLoad-MZ-PC.exe) md5=$MD5 cdn-md5=$CDN_MD5"
+          grep -Ei '^(Last-Modified|Etag|Content-Length|x-cos-meta-md5):' /tmp/download.headers || true
           test -n "$CDN_MD5"
           test "$MD5" = "$CDN_MD5"
-      - name: Extract only url.txt and launcher
-        run: |
-          set -euo pipefail
-          mkdir -p /tmp/launcher
-          7z e -y -o/tmp/launcher /tmp/DownLoad-MZ-PC.exe url.txt Langrisser.exe >/tmp/7z-extract.log
-          cat /tmp/7z-extract.log
-          echo '=== url.txt ==='
-          cat /tmp/launcher/url.txt
-          echo
-          echo '=== launcher metadata ==='
-          stat -c '%n bytes=%s' /tmp/launcher/Langrisser.exe
-          sha256sum /tmp/launcher/Langrisser.exe
-          file /tmp/launcher/Langrisser.exe
-      - name: Scan launcher strings for updater endpoints
+      - name: Inspect current PGSetup PE resources
         run: |
           set +e
-          echo '=== URL-like strings ==='
-          strings -a -n 6 /tmp/launcher/Langrisser.exe \
-            | grep -Eai 'https?://|ftp://|patch|update|manifest|version|cdn|assetbundle|exportassetbundle|\.ini|\.json|\.xml|\.txt' \
+          echo '=== PE archive/resource listing ==='
+          7z l -ba /tmp/DownLoad-MZ-PC.exe | head -n 300
+          echo '=== embedded archive signatures ==='
+          grep -abo $'7z\xbc\xaf\x27\x1c' /tmp/DownLoad-MZ-PC.exe | head -n 100 || true
+          grep -abo $'PK\x03\x04' /tmp/DownLoad-MZ-PC.exe | head -n 100 || true
+          exit 0
+      - name: Scan current PGSetup strings for distribution endpoints
+        run: |
+          set +e
+          echo '=== ASCII endpoints/config strings ==='
+          strings -a -n 6 /tmp/DownLoad-MZ-PC.exe \
+            | grep -Eai 'https?://|mhmnz|zlongame|patch|update|manifest|version|cdn|download|clientdown|assetbundle|exportassetbundle|\.ini|\.json|\.xml|\.txt|api/' \
             | sort -u \
-            | head -n 800
-          echo '=== UTF-16LE URL-like strings ==='
-          strings -el -n 6 /tmp/launcher/Langrisser.exe \
-            | grep -Eai 'https?://|patch|update|manifest|version|cdn|assetbundle|exportassetbundle|\.ini|\.json|\.xml|\.txt' \
+            | head -n 1500
+          echo '=== UTF-16LE endpoints/config strings ==='
+          strings -el -n 6 /tmp/DownLoad-MZ-PC.exe \
+            | grep -Eai 'https?://|mhmnz|zlongame|patch|update|manifest|version|cdn|download|clientdown|assetbundle|exportassetbundle|\.ini|\.json|\.xml|\.txt|api/' \
             | sort -u \
-            | head -n 800
+            | head -n 1500
           exit 0
