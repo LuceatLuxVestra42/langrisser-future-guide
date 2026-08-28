@@ -7,7 +7,8 @@
     "gitBlobSha": "4fde14fc3ae1b17ce08908c217279a0e26c7ac42",
     "requiredStatus": "PASS_EQUIPMENT_IMAGE_STAGE2",
     "requiredFreezeState": "EQUIPMENT_IMAGE_STAGE2_FROZEN",
-    "requiredVerifiedRepositoryAssets": 373
+    "requiredVerifiedRepositoryAssets": 373,
+    "officialApkHoldEvidencePath": "data/evidence/equipment-image-stage2-final373-official-apk.v3.json"
   },
   "productionJoinKey": "equipmentId",
   "publicPopulation": {
@@ -21,8 +22,10 @@
     "browserUrl": "import.meta.env.BASE_URL + images/equipment/{equipmentId}.png",
     "requiresBasePathAwareness": true,
     "forbidDomainRootRelativePath": true,
-    "expectedWidth": 172,
-    "expectedHeight": 172
+    "repositoryAcceptance": "preserve all 373 assets already verified and frozen by Equipment Image Stage 2",
+    "legacyExisting344Dimensions": "source-native; do not normalize in Stage 3",
+    "officialApkHold29ExpectedWidth": 172,
+    "officialApkHold29ExpectedHeight": 172
   },
   "productionRoutes": [
     "/equipment",
@@ -42,6 +45,7 @@
     "equipmentId arithmetic",
     "visual similarity image selection",
     "semantic admission reclassification",
+    "resizing or replacing frozen Stage 2 repository assets during Stage 3",
     "root-relative /images/equipment paths that bypass the GitHub Pages repository base"
   ],
   "gates": [
