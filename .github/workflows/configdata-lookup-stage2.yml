@@ -1,0 +1,98 @@
+name: ConfigData Lookup Stage 2
+
+on:
+  push:
+    branches:
+      - main
+      - work/configdata-lookup-stage2-forward-joins
+    paths:
+      - 'data/contracts/configdata-lookup-stage1-id-index-contract.v1.json'
+      - 'data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json'
+      - 'data/validation/configdata-lookup-stage1-summary.v1.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataJobConnectionInfo.json'
+      - 'data/configdata/ConfigDataJobInfo.json'
+      - 'data/configdata/ConfigDataSkillInfo.json'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechLevelInfo.json'
+      - 'data/configdata/ConfigDataEquipmentInfo.json'
+      - 'scripts/lib/configdata-lookup-stage2.mjs'
+      - 'scripts/build-configdata-lookup-stage2.mjs'
+      - 'scripts/validate-configdata-lookup-stage2.mjs'
+      - 'package.json'
+      - '.github/workflows/configdata-lookup-stage2.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json'
+      - 'data/index/forward/**'
+      - 'data/validation/configdata-lookup-stage2-summary.v1.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataJobConnectionInfo.json'
+      - 'data/configdata/ConfigDataJobInfo.json'
+      - 'data/configdata/ConfigDataSkillInfo.json'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechInfo.json'
+      - 'data/configdata/ConfigDataTrainingTechLevelInfo.json'
+      - 'data/configdata/ConfigDataEquipmentInfo.json'
+      - 'scripts/lib/configdata-lookup-stage2.mjs'
+      - 'scripts/build-configdata-lookup-stage2.mjs'
+      - 'scripts/validate-configdata-lookup-stage2.mjs'
+      - 'package.json'
+      - '.github/workflows/configdata-lookup-stage2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Stage 1 predecessor
+        run: npm run validate:configdata-lookup-stage1
+
+      - name: Materialize Stage 2 forward joins
+        run: npm run build:configdata-lookup-stage2
+
+      - name: Validate Stage 2 forward joins
+        run: npm run validate:configdata-lookup-stage2
+
+      - name: Commit materialized Stage 2 indexes on work branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage2-forward-joins'
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/index/forward/hero.v1.json \
+            data/index/forward/soldier.v1.json \
+            data/index/forward/equipment.v1.json \
+            data/validation/configdata-lookup-stage2-summary.v1.json
+          if git diff --cached --quiet; then
+            echo 'Materialized Stage 2 indexes are already current.'
+          else
+            git commit -m 'Materialize ConfigData Lookup Stage 2 forward joins [skip ci]'
+            git push origin HEAD:work/configdata-lookup-stage2-forward-joins
+          fi
+
+      - name: Require committed Stage 2 indexes outside materialization branch
+        if: "!(github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage2-forward-joins')"
+        shell: bash
+        run: |
+          git diff --exit-code -- \
+            data/index/forward/hero.v1.json \
+            data/index/forward/soldier.v1.json \
+            data/index/forward/equipment.v1.json \
+            data/validation/configdata-lookup-stage2-summary.v1.json
