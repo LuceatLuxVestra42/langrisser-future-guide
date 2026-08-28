@@ -12,7 +12,49 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Print Stage 3 baseline
-        run: node scripts/audit-localization-stage3.mjs --json
+      - name: Verify Stage 3 baseline snapshot
+        run: node scripts/audit-localization-stage3.mjs --check
       - name: Run Stage 3 self-tests
         run: node scripts/audit-localization-stage3.mjs --self-test
+      - name: Verify Hero spacing drift is rejected
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = 'data/hero-name-master.v1.json';
+          const data = JSON.parse(fs.readFileSync(p, 'utf8'));
+          if (!data.records?.[0]?.nameKr) throw new Error('Hero baseline missing');
+          data.records[0].nameKr = `${data.records[0].nameKr} `;
+          fs.writeFileSync(p, `${JSON.stringify(data, null, 2)}\n`);
+          NODE
+          if node scripts/audit-localization-stage3.mjs --check >/tmp/hero-drift.log 2>&1; then
+            cat /tmp/hero-drift.log
+            echo 'Expected Hero presentation drift to fail, but audit passed.' >&2
+            exit 1
+          fi
+          cat /tmp/hero-drift.log
+          grep -q 'HERO_CONFIRMED_PRESENTATION_DRIFT' /tmp/hero-drift.log
+          git checkout -- data/hero-name-master.v1.json
+          node scripts/audit-localization-stage3.mjs --check
+      - name: Verify Equipment spacing drift is rejected
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('data/localization/equipment-name-kr/weapon.tsv')
+          text = p.read_text()
+          old = '屠龙剑格拉姆\t용살검 그람'
+          new = '屠龙剑格拉姆\t용살검그람'
+          if old not in text:
+              raise SystemExit('Equipment baseline mapping missing')
+          p.write_text(text.replace(old, new, 1))
+          PY
+          if node scripts/audit-localization-stage3.mjs --check >/tmp/equipment-drift.log 2>&1; then
+            cat /tmp/equipment-drift.log
+            echo 'Expected Equipment presentation drift to fail, but audit passed.' >&2
+            exit 1
+          fi
+          cat /tmp/equipment-drift.log
+          grep -q 'EQUIPMENT_APPROVED_PRESENTATION_DRIFT' /tmp/equipment-drift.log
+          git checkout -- data/localization/equipment-name-kr/weapon.tsv
+          node scripts/audit-localization-stage3.mjs --check
