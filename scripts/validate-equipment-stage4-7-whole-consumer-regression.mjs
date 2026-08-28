@@ -129,7 +129,8 @@ mustInclude(detailRoute, [
   "throw notFound()",
   "notFoundComponent: EquipmentNotFound",
   'data.kind === "exclusive"',
-  "getOfficialEquipmentImageUrl(data.equipmentId)",
+  "getOfficialEquipmentImageUrl(equipmentId)",
+  "src={imageUrl}",
 ], "Detail route");
 for (const [label, source] of [["general", generalRoute], ["exclusive", exclusiveRoute], ["detail", detailRoute]]) {
   assert(!source.includes(".sort("), `${label} route added frontend sorting.`);
