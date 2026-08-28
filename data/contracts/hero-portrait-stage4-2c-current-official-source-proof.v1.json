@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "stage": "hero-portrait-stage4-2c-current-unity-source-proof",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Evaluate current official Zlongame hero-art PNGs as a candidate fallback source family for the 30 Heroes not covered by the frozen 237-source registry.",
+  "frozenInput": {
+    "canonicalHeroCount": 267,
+    "admittedSourceCount": 237,
+    "pendingHeroCount": 30,
+    "admissionRegistry": "data/generated/hero-portrait-stage4-2b-237-admission.v1.json",
+    "pendingKeyInventory": "data/validation/hero-portrait-stage4-2c-pending-current-asset-key-inventory.v1.json"
+  },
+  "sourceFamilyCandidate": {
+    "sourceKind": "ZLONGAME_OFFICIAL_HERO_ART_PNG",
+    "state": "DISABLED_PENDING_REPRESENTATIVE_IDENTITY_AND_ROLE_PROOF",
+    "publisherSite": "https://mz.zlongame.com/main.shtml",
+    "assetHost": "media.zlongame.com",
+    "legacyAnchorHost": "mz.zlongame.com",
+    "publisherAuthority": "OFFICIAL_CHINESE_PUBLISHER_SITE",
+    "currentSiteVersionObserved": "8.4.0",
+    "currentSiteUpdateDateObserved": "2026-08-13"
+  },
+  "identityPolicy": {
+    "canonicalOwnershipKey": "heroId",
+    "nameOnlyJoinAllowed": false,
+    "currentConfigDataKeysRequired": [
+      "ConfigDataHeroInfo.ID",
+      "ConfigDataHeroInfo.CharImage_ID",
+      "ConfigDataCharImageInfo.ID",
+      "ConfigDataCharImageInfo.HeroPainting",
+      "ConfigDataCharImageInfo.Spine"
+    ],
+    "representativeOfficialIdentityConcordanceMayBeRecorded": true,
+    "representativeOfficialIdentityConcordanceDoesNotOpenPopulationAdmission": true,
+    "populationMappingRequiresSeparateExplicitMappingReview": true
+  },
+  "roleProofPolicy": {
+    "representativeKnownAnchorRequired": true,
+    "knownAnchor": {
+      "heroId": 6,
+      "sourceImmutableId": "1oPTSwW5O4UWxY6idqHDJ_smjPTm2Wsq1",
+      "sourceFileName": "Leon_Animation_FIN_idle_Normal_default.png",
+      "sha256": "8d04d4858d8bbb8021cef1439183018293ff28659f42e486ae1306d8c5f616d1",
+      "width": 1443,
+      "height": 2112
+    },
+    "currentPendingRepresentative": {
+      "heroId": 99265,
+      "heroPaintingStem": "Reiga",
+      "baseSpineStem": "Reiga",
+      "officialCombatDataLabel": "黎加(Reiga)",
+      "officialAssetPrefixObserved": "h209"
+    },
+    "candidateVariants": ["a1", "a2", "a3", "big"],
+    "requiredTechnicalChecks": [
+      "HTTP direct byte read",
+      "PNG signature and decode",
+      "positive dimensions",
+      "alpha channel and transparency",
+      "SHA-256 freeze"
+    ],
+    "requiredVisualChecks": [
+      "known-anchor role comparison",
+      "clean full-character artwork versus SD or combat sprite",
+      "no card frame or UI badge",
+      "base/default role plausibility"
+    ]
+  },
+  "admissionBoundary": {
+    "officialSourceAdmissionPerformedByThisContract": false,
+    "legacyKoreanDriveIsCurrentSourceAuthority": false,
+    "bwWikiRole": "CURRENT_IDENTITY_AND_DEFAULT-ART_CROSSCHECK_ONLY",
+    "unityPrefabDependencyStillPreferredIfActualCurrentClientBinaryBecomesAvailable": true,
+    "bulk267GateOpened": false
+  }
+}
