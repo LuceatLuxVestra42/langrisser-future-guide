@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "id": "smart-regression-sr5-cases-v1",
+  "status": "SR5_FIXTURE_MATRIX",
+  "goal": "Prove representative changed-file selection has zero false negatives while preserving frozen-stage non-reopen rules.",
+  "cases": [
+    {
+      "id": "docs-only",
+      "files": ["README.md"],
+      "expectedStatus": "PASS_DOCS_ONLY",
+      "expectedExitCode": 0,
+      "requiredRequestedGates": [],
+      "forbiddenLeafGates": ["global.build", "hero-soldier.pair-parity"]
+    },
+    {
+      "id": "shared-build-config",
+      "files": ["package.json"],
+      "expectedStatus": "PASS",
+      "expectedExitCode": 0,
+      "requiredMatchedRules": ["shared-build-config"],
+      "requiredLeafGates": ["global.build"],
+      "requiredExecutableGates": ["global.build"],
+      "forbiddenLeafGates": ["shared.contract", "hero-soldier.pair-parity"]
+    },
+    {
+      "id": "hero-asset-presentation-only",
+      "files": ["public/images/heroes/cards/6.png"],
+      "expectedStatus": "BLOCKED_UNBOUND",
+      "expectedExitCode": 2,
+      "requiredMatchedRules": ["hero-assets"],
+      "requiredLeafGates": ["hero.asset.integrity", "hero.frontend.route", "global.build"],
+      "requiredUnboundGates": ["hero.asset.integrity", "hero.frontend.route"],
+      "forbiddenLeafGates": ["hero-soldier.pair-parity", "hero.final.consumer"]
+    },
+    {
+      "id": "soldier-portrait-presentation-only",
+      "files": ["public/images/soldiers/1001.png"],
+      "expectedStatus": "BLOCKED_UNBOUND",
+      "expectedExitCode": 2,
+      "requiredMatchedRules": ["soldier-portrait-source"],
+      "requiredLeafGates": ["soldier.portrait.integrity", "soldier.frontend.route", "global.build"],
+      "requiredUnboundGates": ["soldier.portrait.integrity", "soldier.frontend.route"],
+      "forbiddenLeafGates": ["hero-soldier.pair-parity", "soldier.final.consumer"]
+    },
+    {
+      "id": "hero-configdata-specific-owner",
+      "files": ["data/configdata/ConfigDataHeroInfo.json"],
+      "expectedStatus": "BLOCKED_UNBOUND",
+      "expectedExitCode": 2,
+      "requiredMatchedRules": ["hero-configdata"],
+      "requiredLeafGates": ["hero.final.consumer", "hero-soldier.impact-sentinel", "hero-soldier.pair-parity"],
+      "requiredExecutableGates": ["hero.final.consumer", "hero-soldier.pair-parity"],
+      "requiredUnboundGates": ["hero-soldier.impact-sentinel"],
+      "forbiddenLeafGates": ["shared.contract"],
+      "forbiddenMatchedRules": ["raw-configdata-fallback"]
+    },
+    {
+      "id": "soldier-configdata-specific-owner",
+      "files": ["data/configdata/ConfigDataSoldierInfo.json"],
+      "expectedStatus": "BLOCKED_UNBOUND",
+      "expectedExitCode": 2,
+      "requiredMatchedRules": ["soldier-configdata"],
+      "requiredLeafGates": ["soldier.final.consumer", "hero-soldier.impact-sentinel", "hero-soldier.pair-parity"],
+      "requiredExecutableGates": ["hero-soldier.pair-parity"],
+      "requiredUnboundGates": ["soldier.final.consumer", "hero-soldier.impact-sentinel"],
+      "forbiddenLeafGates": ["shared.contract"],
+      "forbiddenMatchedRules": ["raw-configdata-fallback"]
+    },
+    {
+      "id": "hero-soldier-frozen-pair",
+      "files": ["data/generated/hero-soldier-by-hero.v1.json"],
+      "expectedStatus": "PASS",
+      "expectedExitCode": 0,
+      "requiredMatchedRules": ["hero-soldier-frozen-consumers"],
+      "requiredLeafGates": ["hero-soldier.pair-parity"],
+      "requiredExecutableGates": ["hero-soldier.pair-parity"],
+      "forbiddenLeafGates": ["hero-soldier.impact-sentinel", "shared.contract"]
+    },
+    {
+      "id": "equipment-frontend-specific-owner",
+      "files": ["src/routes/equipment.tsx"],
+      "expectedStatus": "PASS",
+      "expectedExitCode": 0,
+      "requiredMatchedRules": ["equipment-frontend"],
+      "requiredLeafGates": ["equipment.frontend", "global.build"],
+      "requiredExecutableGates": ["equipment.frontend", "global.build"],
+      "forbiddenMatchedRules": ["shared-source-fallback"],
+      "forbiddenLeafGates": ["shared.contract", "equipment.final.consumer"]
+    },
+    {
+      "id": "generic-source-fallback",
+      "files": ["src/lib/new-shared-helper.ts"],
+      "expectedStatus": "PASS",
+      "expectedExitCode": 0,
+      "requiredLeafGates": ["global.build"],
+      "requiredExecutableGates": ["global.build"],
+      "forbiddenLeafGates": ["shared.contract", "hero.final.consumer", "soldier.final.consumer"]
+    },
+    {
+      "id": "generic-raw-configdata-broad-fallback",
+      "files": ["data/configdata/ConfigDataFutureMode.json"],
+      "expectedStatus": "BLOCKED_UNBOUND",
+      "expectedExitCode": 2,
+      "requiredRequestedGates": ["global.safe-fallback"],
+      "requiredCompositeGates": ["global.safe-fallback", "banner.stage3.full"],
+      "requiredLeafGates": ["shared.contract", "hero.final.consumer", "soldier.final.consumer", "hero-soldier.pair-parity", "equipment.final.consumer", "banner.stage3.freeze", "skin.stage3.asset", "global.build"],
+      "requiredUnboundGates": ["shared.contract", "soldier.final.consumer", "skin.stage3.asset"]
+    },
+    {
+      "id": "unknown-path-broad-fallback",
+      "files": ["ops/custom-regression.flag"],
+      "expectedStatus": "BLOCKED_UNKNOWN_PATH",
+      "expectedExitCode": 2,
+      "requiredUnknownPaths": ["ops/custom-regression.flag"],
+      "requiredRequestedGates": ["global.safe-fallback"],
+      "requiredCompositeGates": ["global.safe-fallback", "banner.stage3.full"],
+      "requiredLeafGates": ["shared.contract", "hero.final.consumer", "soldier.final.consumer", "hero-soldier.pair-parity", "equipment.final.consumer", "skin.stage3.asset", "global.build"]
+    },
+    {
+      "id": "hero-final-canonical-owner",
+      "files": ["data/generated/hero-detail.v1.json"],
+      "expectedStatus": "PASS",
+      "expectedExitCode": 0,
+      "requiredMatchedRules": ["sr4-hero-final-consumer-artifacts"],
+      "requiredLeafGates": ["hero.final.consumer"],
+      "requiredExecutableGates": ["hero.final.consumer"],
+      "forbiddenLeafGates": ["shared.contract", "hero-soldier.pair-parity"]
+    },
+    {
+      "id": "soldier-canonical-owner",
+      "files": ["data/generated/soldier-master.v1.json"],
+      "expectedStatus": "BLOCKED_UNBOUND",
+      "expectedExitCode": 2,
+      "requiredMatchedRules": ["sr4-soldier-canonical-identity"],
+      "requiredLeafGates": ["soldier.final.consumer", "hero-soldier.impact-sentinel", "hero-soldier.pair-parity"],
+      "requiredUnboundGates": ["soldier.final.consumer", "hero-soldier.impact-sentinel"],
+      "forbiddenLeafGates": ["shared.contract"]
+    },
+    {
+      "id": "multi-domain-union",
+      "files": ["public/images/heroes/cards/6.png", "src/routes/equipment.tsx"],
+      "expectedStatus": "BLOCKED_UNBOUND",
+      "expectedExitCode": 2,
+      "requiredDomains": ["hero", "equipment", "global"],
+      "requiredLeafGates": ["hero.asset.integrity", "hero.frontend.route", "equipment.frontend", "global.build"],
+      "requiredUnboundGates": ["hero.asset.integrity", "hero.frontend.route"],
+      "requiredExecutableGates": ["equipment.frontend", "global.build"],
+      "forbiddenLeafGates": ["hero-soldier.pair-parity"]
+    },
+    {
+      "id": "banner-contract-specific-owner",
+      "files": ["data/contracts/banner-stage3-0-input-contract.v1.json"],
+      "expectedStatus": "PASS",
+      "expectedExitCode": 0,
+      "requiredMatchedRules": ["banner-stage3-contracts"],
+      "requiredCompositeGates": ["banner.stage3.full"],
+      "requiredLeafGates": ["banner.stage3.input", "banner.stage3.asset", "banner.stage3.display", "banner.stage3.basic-table", "banner.stage3.wish", "banner.stage3.cp-event", "banner.stage3.recurrence", "banner.stage3.frontend", "global.build", "banner.stage3.freeze"],
+      "forbiddenLeafGates": ["shared.contract"]
+    },
+    {
+      "id": "workflow-change-broad-fallback",
+      "files": [".github/workflows/smart-regression-shadow.yml"],
+      "expectedStatus": "BLOCKED_UNBOUND",
+      "expectedExitCode": 2,
+      "requiredMatchedRules": ["workflow-changes"],
+      "requiredRequestedGates": ["global.safe-fallback"],
+      "requiredLeafGates": ["shared.contract", "hero.final.consumer", "soldier.final.consumer", "hero-soldier.pair-parity", "equipment.final.consumer", "skin.stage3.asset", "global.build"]
+    }
+  ]
+}
