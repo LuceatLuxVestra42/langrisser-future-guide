@@ -7,8 +7,8 @@
   "targetCount": 185,
   "progress": {
     "translatedCount": 185,
-    "passCount": 130,
-    "reviewCount": 55,
+    "passCount": 137,
+    "reviewCount": 48,
     "remainingCount": 0,
     "lastCompletedSoldierId": 6113,
     "nextKnownRecord": null,
@@ -21,7 +21,7 @@
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch7.v1.json","recordCount":20,"range":"soldierId 645 through 1031 with lower tiers skipped","role":"append-only-batch"},
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch8.v1.json","recordCount":35,"range":"soldierId 1032 through 5308 with lower tiers skipped; normal + SP","role":"append-only-batch"},
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch9.v1.json","recordCount":40,"range":"soldierId 5311 through 6113; final SP records","role":"append-only-batch"},
-    {"path":"data/presentation/soldier-unique-skill-review-overrides.v1.json","recordCount":21,"range":"249, 250, 326, 333, 334, 336, 341, 512, 513, 514, 515, 602, 635, 637, 647, 811, 814, 815, 1034, 1105, 1113","role":"evidence-backed-review-overrides"}
+    {"path":"data/presentation/soldier-unique-skill-review-overrides.v1.json","recordCount":28,"range":"112, 118, 249, 250, 326, 333, 334, 336, 341, 512, 513, 514, 515, 602, 635, 637, 647, 811, 814, 815, 818, 1006, 1009, 1015, 1034, 1104, 1105, 1113","role":"evidence-backed-review-overrides"}
   ],
   "writeStrategy": {
     "mode": "checkpoint-sharded-authoring-with-deterministic-final-consolidation-and-review-overrides",
@@ -32,8 +32,8 @@
   },
   "reviewQueueCounts": {
     "sourceReviewMarks": 76,
-    "resolvedByReviewOverrides": 21,
-    "remaining": 55
+    "resolvedByReviewOverrides": 28,
+    "remaining": 48
   },
   "reviewResolution": {
     "evidenceCheckpoints": [
@@ -41,7 +41,8 @@
       "data/checkpoints/soldier-unique-skill-review-evidence-batch2.v1.json",
       "data/checkpoints/soldier-unique-skill-review-evidence-batch3.v1.json",
       "data/checkpoints/soldier-unique-skill-review-evidence-batch4.v1.json",
-      "data/checkpoints/soldier-unique-skill-review-evidence-batch5.v1.json"
+      "data/checkpoints/soldier-unique-skill-review-evidence-batch5.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-evidence-batch6.v1.json"
     ],
     "overridePath": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
     "resolutionCheckpoints": [
@@ -49,22 +50,23 @@
       "data/checkpoints/soldier-unique-skill-review-resolution-batch2.v1.json",
       "data/checkpoints/soldier-unique-skill-review-resolution-batch3.v1.json",
       "data/checkpoints/soldier-unique-skill-review-resolution-batch4.v1.json",
-      "data/checkpoints/soldier-unique-skill-review-resolution-batch5.v1.json"
+      "data/checkpoints/soldier-unique-skill-review-resolution-batch5.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-resolution-batch6.v1.json"
     ],
-    "resolvedSoldierIds": [249,250,326,333,334,336,341,512,513,514,515,602,635,637,647,811,814,815,1034,1105,1113],
-    "status": "BATCH5_BUILD_VERIFIED"
+    "resolvedSoldierIds": [112,118,249,250,326,333,334,336,341,512,513,514,515,602,635,637,647,811,814,815,818,1006,1009,1015,1034,1104,1105,1113],
+    "status": "BATCH6_BUILD_PENDING"
   },
   "buildVerification": {
-    "status": "PASS",
-    "workflow": "Equipment Korean Name Frontend QA",
-    "checkpointRunId": 33228025075,
-    "checkpointJobId": 99035436083,
-    "finalHeadRunId": 33228186636,
-    "finalHeadJobId": 99035896779,
-    "finalHeadSha": "8a86daf9276eb412271fa1c0b835b7b28bf4f89e",
-    "observed": {"records":185,"pass":130,"review":55,"overrides":21,"missing":0,"extra":0,"public":185},
-    "productionBuild": "SUCCESS",
-    "frontendLocalizationBoundary": "PASS"
+    "status": "PENDING",
+    "workflow": null,
+    "checkpointRunId": null,
+    "checkpointJobId": null,
+    "finalHeadRunId": null,
+    "finalHeadJobId": null,
+    "finalHeadSha": null,
+    "observed": null,
+    "productionBuild": "PENDING",
+    "frontendLocalizationBoundary": "PENDING"
   },
   "completion": {
     "translationTargetComplete": true,
@@ -77,7 +79,7 @@
     "validationPath": "data/validation/soldier-unique-skill-kr-final.v1.json",
     "frontendConsumerIntegrated": true,
     "frontendCheckpoint": "data/checkpoints/soldier-unique-skill-frontend-localization.v1.json",
-    "frontendBuildGateStatus": "PASS",
+    "frontendBuildGateStatus": "PENDING_BATCH6_VERIFY",
     "frontendHostedQaStatus": "PENDING",
     "reviewResolutionRequired": true
   }
