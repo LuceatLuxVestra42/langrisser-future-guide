@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Search, Sparkles, UserRound } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -56,6 +56,12 @@ function resolvePublicAssetUrl(webAssetPath: string) {
   return `${base.replace(/\/$/, "")}${webAssetPath}`;
 }
 
+function resolveStaticRouteUrl(path = "") {
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  const normalizedPath = path.replace(/^\/+|\/+$/g, "");
+  return normalizedPath ? `${base}/${normalizedPath}/` : `${base}/`;
+}
+
 function getRarityBorderClass(baseLabel: string) {
   switch (baseLabel) {
     case "SSR":
@@ -99,12 +105,12 @@ function HeroGridPage() {
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
         <div>
-          <Link
-            to="/"
+          <a
+            href={resolveStaticRouteUrl()}
             className="text-xs font-semibold text-muted-foreground transition hover:text-foreground"
           >
             ← 메인으로
-          </Link>
+          </a>
           <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             영웅
           </h1>
@@ -258,9 +264,8 @@ function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
   const hasSampleSuperBuff = SAMPLE_SUPER_BUFF_HERO_IDS.has(hero.heroId);
 
   return (
-    <Link
-      to="/heroes/$heroId"
-      params={{ heroId: String(hero.heroId) }}
+    <a
+      href={resolveStaticRouteUrl(`heroes/${hero.heroId}`)}
       aria-label={`${displayName} ${hero.rarity.baseLabel} 상세 보기`}
       className="group block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2"
     >
@@ -299,6 +304,6 @@ function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
           </span>
         </div>
       </article>
-    </Link>
+    </a>
   );
 }
