@@ -2,12 +2,12 @@
   "version": 3,
   "schemaId": "project-doctor-d4-execution/v3",
   "stage": "D4",
-  "checkpoint": "PROJECT_DOCTOR_D4_EXECUTION_V3_REGRESSION_ADMISSION",
+  "checkpoint": "PROJECT_DOCTOR_D4_EXECUTION_V3_REGRESSION_AND_EQUIPMENT_IMAGE_ADMISSION",
   "status": "DESIGN_FROZEN",
   "supersedes": "data/contracts/project-doctor-d4-execution.v2.json",
   "d3Contract": "data/contracts/project-doctor-d3-validator-plan.v3.json",
-  "purpose": "Execute D3 V3 selected checks through the existing strict npm-run preflight, adding the nine Promotion V2 owning validators and the Promotion V2 admission audit without changing fail-fast or remaining manual-review semantics.",
-  "scope": {"d3PlanConsumption":true,"fullQueuePreflight":true,"selectedCheckExecution":true,"failFast":true,"dryRun":true,"rawConfigDataReadByRunner":false,"semanticRecomputationByRunner":false,"owningValidatorDiscovery":false,"githubActions":false,"regressionCoverageV2Admission":true},
+  "purpose": "Execute D3 V3 selected checks through the existing strict npm-run preflight, preserving the nine Promotion V2 owners and adding the deterministic Equipment Image final owner without changing fail-fast behavior or the three remaining manual asset scopes.",
+  "scope": {"d3PlanConsumption":true,"fullQueuePreflight":true,"selectedCheckExecution":true,"failFast":true,"dryRun":true,"rawConfigDataReadByRunner":false,"semanticRecomputationByRunner":false,"owningValidatorDiscovery":false,"githubActions":false,"regressionCoverageV2Admission":true,"equipmentImageFinalOwnerExecution":true},
   "allowedCheckIds": [
     "configdata-integrity",
     "coverage-hero-canonical",
@@ -19,6 +19,7 @@
     "coverage-skin-relation",
     "coverage-shared-movement",
     "coverage-soldier-assets",
+    "equipment-image-final",
     "regression-coverage-promotion-v2",
     "localization-audit",
     "production-build",
@@ -26,12 +27,12 @@
     "doctor-impact-self-test",
     "doctor-plan-self-test"
   ],
-  "executionPolicy": {"preflightEntireQueueBeforeExecution":true,"commandMustExactlyMatchD3Catalog":true,"phaseMustExactlyMatchD3Catalog":true,"allowedCommandShape":"npm run <verified-script-name>","shell":false,"sortByPhaseThenId":true,"failFastOnFirstNonZero":true,"executeSafeChecksWhenManualReviewExists":true,"manualReviewSurvivesSuccessfulChecks":true,"unknownOrTamperedCheckExecutesNothing":true,"doNotInventMissingCommands":true,"localizationFailureBlocksLaterBuild":true},
+  "executionPolicy": {"preflightEntireQueueBeforeExecution":true,"commandMustExactlyMatchD3Catalog":true,"phaseMustExactlyMatchD3Catalog":true,"allowedCommandShape":"npm run <verified-script-name>","shell":false,"sortByPhaseThenId":true,"failFastOnFirstNonZero":true,"executeSafeChecksWhenManualReviewExists":true,"manualReviewSurvivesSuccessfulChecks":true,"unknownOrTamperedCheckExecutesNothing":true,"doNotInventMissingCommands":true,"equipmentImageFailureBlocksLaterChecks":true,"localizationFailureBlocksLaterBuild":true},
   "resultStatus": {"PASS_EXECUTED":0,"PASS_DRY_RUN":0,"PASS_NO_CHANGES":0,"FAIL_CHECK":1,"INVALID_PLAN":2,"REVIEW_MANUAL":3},
-  "sideEffectBoundary": {"runnerDirectWrites":[],"runnerDirectSemanticWrites":false,"childCommandsMayWriteTheirOwnGeneratedArtifacts":true,"note":"D4 only dispatches admitted npm aliases. Owning validators retain their frozen read-only/fail behavior; production build retains its documented generated-route side effects."},
-  "manualReviewBoundary": "Only hero-assets, equipment-assets, banner-assets, and skin-assets remain explicit D3 manual-review nodes after Promotion V2 owner admission.",
+  "sideEffectBoundary": {"runnerDirectWrites":[],"runnerDirectSemanticWrites":false,"childCommandsMayWriteTheirOwnGeneratedArtifacts":true,"equipmentImageFinalOwnerReadOnly":true,"note":"D4 only dispatches admitted npm aliases. Equipment Image final owner is read-only; other admitted validators retain their frozen behavior and production build retains its documented generated-route side effects."},
+  "manualReviewBoundary": "Only hero-assets, banner-assets, and skin-assets remain explicit D3 manual-review nodes after the Equipment Image final-owner admission.",
   "historicalBoundary": {"d4V1":"data/contracts/project-doctor-d4-execution.v1.json","d4V2":"data/contracts/project-doctor-d4-execution.v2.json","promotionV1":"data/contracts/regression-coverage-promotion.v1.json","v1V2BytesMustRemainUnchanged":true},
-  "outOfScope": ["promoting the four remaining asset scopes","hosted/browser/mobile QA","raw ConfigData semantic recomputation by the runner","canonical mutation","automatic data repair"],
+  "outOfScope": ["promoting Hero/Banner/Skin asset scopes","running live hosted/browser/mobile QA inside Project Doctor","raw ConfigData semantic recomputation by the runner","canonical mutation","automatic data repair"],
   "nextStage": "D7-V3",
-  "nextStageGoal": "Prove the V3 selection/execution chain under the required pr-guard, then rebase Promotion V2 onto the admitted main runtime."
+  "nextStageGoal": "Prove the ten-owner selection/execution chain under the required real-diff pr-guard."
 }
