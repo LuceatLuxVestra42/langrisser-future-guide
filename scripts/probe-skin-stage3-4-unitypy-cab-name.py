@@ -22,6 +22,13 @@ def basename(value: str) -> str:
     return Path(value.replace("\\", "/")).name
 
 
+def resolve_container_object(value):
+    deref = getattr(value, "deref", None)
+    if callable(deref):
+        return deref(), "container_value.deref"
+    return value, "direct_container_object"
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description="Probe one real Stage 3-4 request for UnityPy serialized-file/CAB ownership exposure.")
     p.add_argument("plan", type=Path)
@@ -52,10 +59,11 @@ def main() -> int:
 
     env = UnityPy.load(str(bundle_path))
     target = normalized(request["runtimePath"])
-    matches = [(path, obj) for path, obj in env.container.items() if isinstance(path, str) and normalized(path) == target]
+    matches = [(path, value) for path, value in env.container.items() if isinstance(path, str) and normalized(path) == target]
     if len(matches) != 1:
         raise RuntimeError(f"exact runtime path match count: {len(matches)}")
-    actual_container_path, obj = matches[0]
+    actual_container_path, container_value = matches[0]
+    obj, container_resolution = resolve_container_object(container_value)
 
     assets_file = getattr(obj, "assets_file", None)
     direct_name = getattr(assets_file, "name", None)
@@ -87,6 +95,9 @@ def main() -> int:
         "bundle": source["bundle"],
         "runtimePath": request["runtimePath"],
         "actualContainerPath": actual_container_path,
+        "containerEntryType": type(container_value).__name__,
+        "containerResolution": container_resolution,
+        "resolvedObjectType": type(obj).__name__,
         "expectedEmbeddedCab": expected,
         "assetsFileDirectName": direct_name,
         "parentIdentityKeys": parent_identity_keys,
