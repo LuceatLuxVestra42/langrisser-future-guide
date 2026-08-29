@@ -1,0 +1,134 @@
+name: Route Hosted QA Stage 2 Browser Proof
+
+on:
+  push:
+    branches:
+      - work/route-hosted-qa-stage2-playwright-browser
+    paths:
+      - 'data/contracts/project-doctor-route-hosted-qa-stage*.json'
+      - 'data/validation/project-doctor-route-hosted-qa-stage*.json'
+      - 'scripts/*project-doctor-route-hosted-qa-stage*.mjs'
+      - 'tests/route-hosted-browser/**'
+      - 'playwright.route-hosted.config.ts'
+      - 'src/routes/**'
+      - 'src/components/**'
+      - 'src/lib/**'
+      - '.github/workflows/project-doctor-route-hosted-qa-stage2-browser-proof.yml'
+      - 'package.json'
+      - 'bun.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: route-hosted-qa-stage2-browser-proof
+  cancel-in-progress: true
+
+jobs:
+  browser-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install dependencies from frozen lockfile
+        run: bun install --frozen-lockfile
+
+      - name: Validate QA-0, QA-1 and QA-2 contracts
+        run: |
+          bun run qa:hosted:stage0:validate
+          bun run qa:hosted:validate
+          bun run qa:browser:validate
+
+      - name: Reuse proven GitHub Pages static build config
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
+          git show FETCH_HEAD:vite.config.ts > vite.config.ts
+          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
+          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
+          grep -q 'nitro: false' vite.config.ts
+
+      - name: Build static GitHub Pages candidate
+        run: bun run build
+
+      - name: Static Browser proof preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in \
+            dist/client/index.html \
+            dist/client/banners/index.html \
+            dist/client/heroes/index.html \
+            dist/client/heroes/6/index.html \
+            dist/client/soldiers/index.html \
+            dist/client/soldiers/102/index.html \
+            dist/client/equipment/index.html \
+            dist/client/equipment/13/index.html; do
+            test -f "$path"
+          done
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-main-source.txt
+          printf '%s\n' 'route-hosted-qa-stage2-playwright-browser' > dist/client/qa-surface.txt
+
+      - name: Publish QA-2 candidate to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Route Hosted QA Stage2 ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
+
+      - name: Require QA-1 strict Hosted Gate before Browser UI
+        shell: bash
+        run: |
+          set -euo pipefail
+          passed=0
+          for attempt in $(seq 1 12); do
+            echo "Hosted prerequisite attempt ${attempt}"
+            if bun run qa:hosted -- --expected-sha "$GITHUB_SHA" --output route-hosted-qa-stage2-hosted-prerequisite.json; then
+              passed=1
+              break
+            fi
+            sleep 10
+          done
+          test "$passed" -eq 1
+
+      - name: Install Chromium and Linux dependencies
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run Browser UI Gate on actual GitHub Pages
+        env:
+          ROUTE_HOSTED_QA_EXPECTED_SOURCE_SHA: ${{ github.sha }}
+          ROUTE_HOSTED_QA_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: bun run qa:browser
+
+      - name: Upload Browser UI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-hosted-qa-stage2-browser
+          path: |
+            test-results/route-hosted-qa-stage2.json
+            test-results/route-hosted-qa-stage2-artifacts
+            route-hosted-qa-stage2-hosted-prerequisite.json
+          if-no-files-found: warn
