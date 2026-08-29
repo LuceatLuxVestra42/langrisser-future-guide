@@ -1,8 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   BriefcaseBusiness,
+  ChevronLeft,
+  ChevronRight,
   Database,
   HeartHandshake,
   ImageOff,
@@ -40,7 +42,9 @@ export const Route = createFileRoute("/heroes/$heroId")({
 
 function resolvePublicAssetUrl(webAssetPath: string) {
   const base = import.meta.env.BASE_URL || "/";
-  return `${base.replace(/\/$/, "")}${webAssetPath}`;
+  const basePrefix = base === "/" ? "" : base.replace(/\/$/, "");
+  const normalizedPath = webAssetPath.startsWith("/") ? webAssetPath : `/${webAssetPath}`;
+  return `${basePrefix}${normalizedPath}`;
 }
 
 function stripConfigMarkup(value: string | null) {
@@ -48,10 +52,37 @@ function stripConfigMarkup(value: string | null) {
   return value.replace(/<color=[^>]+>/g, "").replace(/<\/color>/g, "");
 }
 
+type HeroVisual = {
+  kind: "hero" | "skin";
+  src: string;
+  label: string;
+  skinId: number | null;
+  sourceOrder: number | null;
+};
+
 function HeroDetailPage() {
   const { hero, stage6, detail, exclusiveEquipment } = Route.useLoaderData();
   const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
+  const visuals: HeroVisual[] = [];
+  if (imageUrl) visuals.push({ kind: "hero", src: imageUrl, label: "대표 일러스트", skinId: null, sourceOrder: null });
+  for (const skin of detail.presentation.skins) {
+    visuals.push({
+      kind: "skin",
+      src: resolvePublicAssetUrl(skin.publicPath),
+      label: `스킨 ${skin.sourceOrder}`,
+      skinId: skin.skinId,
+      sourceOrder: skin.sourceOrder,
+    });
+  }
+
+  const [visualIndex, setVisualIndex] = useState(0);
+  useEffect(() => setVisualIndex(0), [hero.heroId]);
+  const activeVisual = visuals[visualIndex] ?? null;
+  const moveVisual = (delta: number) => {
+    if (visuals.length <= 1) return;
+    setVisualIndex((current) => (current + delta + visuals.length) % visuals.length);
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -64,18 +95,37 @@ function HeroDetailPage() {
           <div className="grid lg:grid-cols-[minmax(300px,0.82fr)_minmax(0,1.18fr)]">
             <div className="relative min-h-[420px] overflow-hidden border-b border-border bg-muted/25 sm:min-h-[520px] lg:min-h-[620px] lg:border-b-0 lg:border-r">
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
-              {imageUrl ? (
-                <img src={imageUrl} alt={`${displayName} 대표 일러스트`} className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6" />
+              {activeVisual ? (
+                <img src={activeVisual.src} alt={`${displayName} ${activeVisual.label}`} className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6" />
               ) : (
                 <div className="flex h-full min-h-[420px] flex-col items-center justify-center gap-3 text-muted-foreground">
                   <UserRound className="h-20 w-20" strokeWidth={1.05} aria-hidden="true" />
                   <span className="inline-flex items-center gap-1 text-xs font-semibold"><ImageOff className="h-3.5 w-3.5" aria-hidden="true" />이미지 연결 대기</span>
                 </div>
               )}
+
+              {visuals.length > 1 ? (
+                <>
+                  <button type="button" onClick={() => moveVisual(-1)} aria-label="이전 일러스트" className="absolute left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-background/90 text-foreground shadow-sm backdrop-blur transition hover:bg-background sm:left-4">
+                    <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                  <button type="button" onClick={() => moveVisual(1)} aria-label="다음 일러스트" className="absolute right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-background/90 text-foreground shadow-sm backdrop-blur transition hover:bg-background sm:right-4">
+                    <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                </>
+              ) : null}
+
               <div className="absolute bottom-4 left-4 z-20 flex flex-wrap gap-2 sm:bottom-5 sm:left-5">
                 <span className="rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur">{hero.rarity.baseLabel}</span>
                 {detail.systems.spReleased ? <span className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur"><Sparkles className="h-3.5 w-3.5" aria-hidden="true" />SP</span> : null}
               </div>
+
+              {activeVisual ? (
+                <div className="absolute bottom-4 right-4 z-20 rounded-full border border-border/80 bg-background/90 px-3 py-1.5 text-right text-[11px] font-semibold text-foreground shadow-sm backdrop-blur sm:bottom-5 sm:right-5">
+                  <div>{activeVisual.kind === "hero" ? "대표 일러스트" : `스킨 ${activeVisual.sourceOrder} · ID ${activeVisual.skinId}`}</div>
+                  <div className="mt-0.5 text-muted-foreground">{visualIndex + 1} / {visuals.length}</div>
+                </div>
+              ) : null}
             </div>
 
             <div className="flex min-w-0 flex-col justify-center p-5 sm:p-8 lg:p-10">
@@ -133,149 +183,61 @@ function HeroDetailPage() {
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle icon={<Swords className="h-4 w-4" aria-hidden="true" />} title="스킬" />
           <p className="mt-2 text-sm text-muted-foreground">Stage 6의 기본 보유 스킬과 전직 습득 스킬을 합치지 않고 source group 그대로 표시해.</p>
-
           <div className="mt-5">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-bold text-foreground">기본 보유 스킬</h3>
-              <span className="text-xs font-semibold text-muted-foreground">{detail.skills.heroDirectSkills.length}개</span>
-            </div>
-            {detail.skills.heroDirectSkills.length > 0 ? (
-              <div className="mt-3 grid gap-3 lg:grid-cols-2">
-                {detail.skills.heroDirectSkills.map((skill) => <SkillCard key={`direct-${skill.skillId}`} skill={skill} sourceLabel="Hero 직접 보유" />)}
-              </div>
-            ) : (
-              <p className="mt-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">기본 보유 스킬 없음</p>
-            )}
+            <div className="flex items-center justify-between gap-3"><h3 className="text-sm font-bold text-foreground">기본 보유 스킬</h3><span className="text-xs font-semibold text-muted-foreground">{detail.skills.heroDirectSkills.length}개</span></div>
+            {detail.skills.heroDirectSkills.length > 0 ? <div className="mt-3 grid gap-3 lg:grid-cols-2">{detail.skills.heroDirectSkills.map((skill) => <SkillCard key={`direct-${skill.skillId}`} skill={skill} sourceLabel="Hero 직접 보유" />)}</div> : <p className="mt-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">기본 보유 스킬 없음</p>}
           </div>
-
           <div className="mt-7 border-t border-border pt-5">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-bold text-foreground">전직 습득 스킬</h3>
-              <span className="text-xs font-semibold text-muted-foreground">{detail.skills.jobLevelAcquisitions.length}개</span>
-            </div>
-            {detail.skills.jobLevelAcquisitions.length > 0 ? (
-              <div className="mt-3 grid gap-3 lg:grid-cols-2">
-                {detail.skills.jobLevelAcquisitions.map((row) => (
-                  <SkillCard key={`job-${row.acquisitionOrder ?? "x"}-${row.skillId}`} skill={row.skill} sourceLabel={`${row.jobNameCn ?? `Job ${row.jobId ?? "?"}`} · Hero Lv.${row.jobLevelUpHeroLevel ?? "-"}`} />
-                ))}
-              </div>
-            ) : (
-              <p className="mt-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">전직 습득 스킬 없음</p>
-            )}
+            <div className="flex items-center justify-between gap-3"><h3 className="text-sm font-bold text-foreground">전직 습득 스킬</h3><span className="text-xs font-semibold text-muted-foreground">{detail.skills.jobLevelAcquisitions.length}개</span></div>
+            {detail.skills.jobLevelAcquisitions.length > 0 ? <div className="mt-3 grid gap-3 lg:grid-cols-2">{detail.skills.jobLevelAcquisitions.map((row) => <SkillCard key={`job-${row.acquisitionOrder ?? "x"}-${row.skillId}`} skill={row.skill} sourceLabel={`${row.jobNameCn ?? `Job ${row.jobId ?? "?"}`} · Hero Lv.${row.jobLevelUpHeroLevel ?? "-"}`} />)}</div> : <p className="mt-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">전직 습득 스킬 없음</p>}
           </div>
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <SectionTitle icon={<BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />} title="직업 트리 · 최종 스탯" />
-              <p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 분기 구조를 순서 그대로 시각화해. 관계를 다시 계산하지 않아.</p>
-            </div>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">분기 {detail.jobs.branchCount}</span>
-              <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">연결 {detail.jobs.connectionCount}</span>
-            </div>
+            <div><SectionTitle icon={<BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />} title="직업 트리 · 최종 스탯" /><p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 분기 구조를 순서 그대로 시각화해. 관계를 다시 계산하지 않아.</p></div>
+            <div className="flex flex-wrap gap-2 text-xs"><span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">분기 {detail.jobs.branchCount}</span><span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">연결 {detail.jobs.connectionCount}</span></div>
           </div>
-
           <div className="mt-5 space-y-4">
             {detail.jobs.branches.map((branch) => (
               <article key={branch.branchIndex} className="overflow-hidden rounded-2xl border border-border bg-muted/20">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/70 px-4 py-3 sm:px-5">
-                  <h3 className="text-sm font-bold text-foreground">전직 분기 {branch.branchIndex}</h3>
-                  <span className="text-xs font-semibold text-muted-foreground">직업 {branch.jobs.length}개</span>
-                </div>
-                <div className="overflow-x-auto px-4 py-5 sm:px-5">
-                  <div className="flex min-w-max items-stretch">
-                    {branch.jobs.map((job, jobIndex) => (
-                      <div key={`${branch.branchIndex}-${job.jobId ?? jobIndex}`} className="flex items-center">
-                        {jobIndex > 0 ? <div className="mx-2 flex w-8 items-center sm:mx-3 sm:w-12" aria-hidden="true"><div className="h-px flex-1 bg-border" /><span className="ml-1 text-sm font-bold text-muted-foreground">→</span></div> : null}
-                        <div className="flex min-h-24 w-36 flex-col justify-between rounded-xl border border-border bg-background p-3 shadow-sm sm:w-40">
-                          <div><p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">단계 {jobIndex + 1}</p><p className="mt-2 text-sm font-bold text-foreground">{job.nameCn ?? `Job ${job.jobId ?? "?"}`}</p></div>
-                          <p className="mt-3 text-[11px] font-semibold text-muted-foreground">Job #{job.jobId ?? "-"}</p>
-                        </div>
-                      </div>
-                    ))}
-                    {branch.jobs.length === 0 ? <p className="text-sm text-muted-foreground">직업 정보 없음</p> : null}
-                  </div>
-                </div>
-                {branch.capstone ? (
-                  <div className="border-t border-border px-4 py-4 sm:px-5">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div><p className="text-[11px] font-bold text-muted-foreground">최종 직업 검증 스탯</p><p className="mt-1 text-sm font-bold text-foreground">{branch.capstone.nameCn ?? `Job ${branch.capstone.jobId ?? "?"}`}</p></div>
-                      <div className="flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
-                        {branch.capstone.heroLevel != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">Lv.{branch.capstone.heroLevel}</span> : null}
-                        {branch.capstone.star != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">{branch.capstone.star}성</span> : null}
-                        {branch.capstone.statStatus ? <span className="rounded-md bg-background px-2 py-1 font-semibold">{branch.capstone.statStatus}</span> : null}
-                      </div>
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/70 px-4 py-3 sm:px-5"><h3 className="text-sm font-bold text-foreground">전직 분기 {branch.branchIndex}</h3><span className="text-xs font-semibold text-muted-foreground">직업 {branch.jobs.length}개</span></div>
+                <div className="overflow-x-auto px-4 py-5 sm:px-5"><div className="flex min-w-max items-stretch">
+                  {branch.jobs.map((job, jobIndex) => (
+                    <div key={`${branch.branchIndex}-${job.jobId ?? jobIndex}`} className="flex items-center">
+                      {jobIndex > 0 ? <div className="mx-2 flex w-8 items-center sm:mx-3 sm:w-12" aria-hidden="true"><div className="h-px flex-1 bg-border" /><span className="ml-1 text-sm font-bold text-muted-foreground">→</span></div> : null}
+                      <div className="flex min-h-24 w-36 flex-col justify-between rounded-xl border border-border bg-background p-3 shadow-sm sm:w-40"><div><p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">단계 {jobIndex + 1}</p><p className="mt-2 text-sm font-bold text-foreground">{job.nameCn ?? `Job ${job.jobId ?? "?"}`}</p></div><p className="mt-3 text-[11px] font-semibold text-muted-foreground">Job #{job.jobId ?? "-"}</p></div>
                     </div>
-                    <StatGrid stats={branch.capstone.finalStats} />
-                  </div>
-                ) : null}
+                  ))}
+                  {branch.jobs.length === 0 ? <p className="text-sm text-muted-foreground">직업 정보 없음</p> : null}
+                </div></div>
+                {branch.capstone ? <div className="border-t border-border px-4 py-4 sm:px-5"><div className="flex flex-wrap items-center justify-between gap-2"><div><p className="text-[11px] font-bold text-muted-foreground">최종 직업 검증 스탯</p><p className="mt-1 text-sm font-bold text-foreground">{branch.capstone.nameCn ?? `Job ${branch.capstone.jobId ?? "?"}`}</p></div><div className="flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">{branch.capstone.heroLevel != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">Lv.{branch.capstone.heroLevel}</span> : null}{branch.capstone.star != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">{branch.capstone.star}성</span> : null}{branch.capstone.statStatus ? <span className="rounded-md bg-background px-2 py-1 font-semibold">{branch.capstone.statStatus}</span> : null}</div></div><StatGrid stats={branch.capstone.finalStats} /></div> : null}
               </article>
             ))}
           </div>
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <SectionTitle icon={<HeartHandshake className="h-4 w-4" aria-hidden="true" />} title="유대" />
-              <p className="mt-2 text-sm text-muted-foreground">Stage 6 frozen 유대 행과 이미 해석된 해금 조건만 표시해.</p>
-            </div>
-            <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">{detail.bonds.count}개</span>
-          </div>
-          {detail.bonds.rows.length > 0 ? (
-            <div className="mt-5 grid gap-3 lg:grid-cols-2">
-              {detail.bonds.rows.map((bond) => (
-                <article key={`${bond.order}-${bond.fetterId ?? "x"}`} className="rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div><p className="text-[11px] font-bold text-muted-foreground">유대 {bond.order + 1}</p><h3 className="mt-1 font-bold text-foreground">{bond.nameCn ?? `Fetter ${bond.fetterId ?? "?"}`}</h3></div>
-                    <div className="flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
-                      {bond.maxLevel != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">최대 Lv.{bond.maxLevel}</span> : null}
-                      {bond.fetterId != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">#{bond.fetterId}</span> : null}
-                    </div>
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    {bond.completionConditions.map((condition, conditionIndex) => (
-                      <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="rounded-lg border border-border bg-background px-3 py-3">
-                        <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
-                        {condition.semanticStatus ? <p className="mt-1 text-[10px] font-semibold text-muted-foreground">{condition.semanticStatus}</p> : null}
-                      </div>
-                    ))}
-                    {bond.completionConditions.length === 0 ? <p className="text-sm text-muted-foreground">표시 가능한 해금 조건 없음</p> : null}
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 정보가 없어.</p>}
+          <div className="flex flex-wrap items-start justify-between gap-3"><div><SectionTitle icon={<HeartHandshake className="h-4 w-4" aria-hidden="true" />} title="유대" /><p className="mt-2 text-sm text-muted-foreground">Stage 6 frozen 유대 행과 이미 해석된 해금 조건만 표시해.</p></div><span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">{detail.bonds.count}개</span></div>
+          {detail.bonds.rows.length > 0 ? <div className="mt-5 grid gap-3 lg:grid-cols-2">{detail.bonds.rows.map((bond) => (
+            <article key={`${bond.order}-${bond.fetterId ?? "x"}`} className="rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-[11px] font-bold text-muted-foreground">유대 {bond.order + 1}</p><h3 className="mt-1 font-bold text-foreground">{bond.nameCn ?? `Fetter ${bond.fetterId ?? "?"}`}</h3></div><div className="flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">{bond.maxLevel != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">최대 Lv.{bond.maxLevel}</span> : null}{bond.fetterId != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">#{bond.fetterId}</span> : null}</div></div>
+              <div className="mt-4 space-y-2">{bond.completionConditions.map((condition, conditionIndex) => <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="rounded-lg border border-border bg-background px-3 py-3"><p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>{condition.semanticStatus ? <p className="mt-1 text-[10px] font-semibold text-muted-foreground">{condition.semanticStatus}</p> : null}</div>)}{bond.completionConditions.length === 0 ? <p className="text-sm text-muted-foreground">표시 가능한 해금 조건 없음</p> : null}</div>
+            </article>
+          ))}</div> : <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 정보가 없어.</p>}
         </section>
 
         <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
 
         <section className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-            <SectionTitle icon={<UsersRound className="h-4 w-4" aria-hidden="true" />} title="사용 가능 병종" />
-            <p className="mt-2 text-sm text-muted-foreground">A단계 확정 관계 기준 {detail.soldiers.count}종</p>
-            <div className="mt-4 flex flex-wrap gap-2">{detail.soldiers.ids.map((soldierId) => <span key={soldierId} className="rounded-md border border-border bg-muted/20 px-2.5 py-1.5 text-xs font-semibold text-foreground">Soldier {soldierId}</span>)}</div>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-            <SectionTitle icon={<ShieldCheck className="h-4 w-4" aria-hidden="true" />} title="확정 시스템 연결" />
-            <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-              <StatusChip label="유대" value={`${detail.systems.bondRowCount}개`} active={detail.systems.bondRowCount > 0} />
-              <StatusChip label="전용장비" value={exclusiveEquipment.status} active={exclusiveEquipment.released} />
-              <StatusChip label="중앙율정" value={detail.systems.centralDisciplineStatus ?? "-"} active={detail.systems.centralDisciplineReleased} />
-              <StatusChip label="SP" value={detail.systems.spStatus ?? "-"} active={detail.systems.spReleased} />
-              <StatusChip label="스킨" value={`${detail.presentation.skinCount}개`} active={detail.presentation.skinCount > 0} />
-            </div>
-          </div>
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"><SectionTitle icon={<UsersRound className="h-4 w-4" aria-hidden="true" />} title="사용 가능 병종" /><p className="mt-2 text-sm text-muted-foreground">A단계 확정 관계 기준 {detail.soldiers.count}종</p><div className="mt-4 flex flex-wrap gap-2">{detail.soldiers.ids.map((soldierId) => <span key={soldierId} className="rounded-md border border-border bg-muted/20 px-2.5 py-1.5 text-xs font-semibold text-foreground">Soldier {soldierId}</span>)}</div></div>
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"><SectionTitle icon={<ShieldCheck className="h-4 w-4" aria-hidden="true" />} title="확정 시스템 연결" /><div className="mt-4 grid grid-cols-2 gap-2 text-xs"><StatusChip label="유대" value={`${detail.systems.bondRowCount}개`} active={detail.systems.bondRowCount > 0} /><StatusChip label="전용장비" value={exclusiveEquipment.status} active={exclusiveEquipment.released} /><StatusChip label="중앙율정" value={detail.systems.centralDisciplineStatus ?? "-"} active={detail.systems.centralDisciplineReleased} /><StatusChip label="SP" value={detail.systems.spStatus ?? "-"} active={detail.systems.spReleased} /><StatusChip label="스킨" value={`${detail.presentation.skinCount}개`} active={detail.presentation.skinCount > 0} /></div></div>
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle icon={<Database className="h-4 w-4" aria-hidden="true" />} title="상세 데이터 상태" />
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">Hero 본문은 FINAL_FROZEN Stage 6 개별 shard 하나만 읽고, 전용장비는 별도 frozen B-5 byHero 소유권과 Equipment Stage 3-5 메타데이터를 조합해. 원본 ConfigData 관계 재계산이나 이름·ID 추론은 하지 않아.</p>
-          <div className="mt-4 flex flex-wrap gap-2 text-xs">
-            <span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">Stage 6 · {stage6.admissionStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">구조 {detail.validation.structuralStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">게시 {detail.validation.publicationStatus ?? "-"}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">review {detail.validation.reviewCount}</span>
-          </div>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">Hero 본문은 FINAL_FROZEN Stage 6 개별 shard 하나만 읽고, 스킨은 frozen Stage 2 관계와 Stage 3-5 public asset map을, 전용장비는 별도 frozen B-5 byHero 소유권과 Equipment Stage 3-5 메타데이터를 조합해. 원본 ConfigData 관계 재계산이나 이름·ID 추론은 하지 않아.</p>
+          <div className="mt-4 flex flex-wrap gap-2 text-xs"><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">Stage 6 · {stage6.admissionStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">구조 {detail.validation.structuralStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">게시 {detail.validation.publicationStatus ?? "-"}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">review {detail.validation.reviewCount}</span></div>
         </section>
       </div>
     </main>
