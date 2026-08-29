@@ -101,6 +101,7 @@ jobs:
               },
               "authoritativeSource": "data/metadata/soldier-name-kr-tier3.v1.json",
               "synchronizedFiles": [str(path) for path in projection_paths],
+              "auditBaseline": "data/validation/localization-audit-stage4.v1.json",
               "invariants": {
                   "soldierIdUnchanged": True,
                   "chineseNameUnchanged": True,
@@ -130,6 +131,9 @@ jobs:
               "- data/generated/soldier-list-stage5-8.v1.json",
               "- data/generated/soldier-detail-stage5-2.v1.json",
               "- public/data/soldier-detail-stage5-6.v1.json",
+              "",
+              "Audit baseline refreshed:",
+              "- data/validation/localization-audit-stage4.v1.json (Soldier effective-display fingerprint only)",
               "",
               "Completed scope:",
               "- Korean localization correction only",
@@ -169,6 +173,32 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Refresh intentional Soldier effective-display fingerprint
+        shell: bash
+        run: |
+          node scripts/audit-localization-stage4.mjs --json > "$RUNNER_TEMP/localization-stage4-current.json"
+          python - "$RUNNER_TEMP/localization-stage4-current.json" <<'PY'
+          import copy
+          import json
+          import sys
+          from pathlib import Path
+
+          snapshot_path = Path("data/validation/localization-audit-stage4.v1.json")
+          current = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          expected = json.loads(snapshot_path.read_text(encoding="utf-8"))
+
+          old_fp = expected["effectiveDisplay"]["soldier"]["fingerprint"]
+          new_fp = current["effectiveDisplay"]["soldier"]["fingerprint"]
+          assert old_fp != new_fp, "Soldier fingerprint unexpectedly unchanged"
+
+          normalized = copy.deepcopy(expected)
+          normalized["effectiveDisplay"]["soldier"]["fingerprint"] = new_fp
+          assert normalized == current, "Stage 4 snapshot changed outside Soldier effective-display fingerprint"
+
+          snapshot_path.write_text(json.dumps(normalized, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          print(f"Soldier effective-display fingerprint: {old_fp} -> {new_fp}")
+          PY
+
       - name: Localization audit
         run: npm run audit:localization -- --check
 
@@ -185,6 +215,7 @@ jobs:
                   data/generated/soldier-list-stage5-8.v1.json \
                   data/generated/soldier-detail-stage5-2.v1.json \
                   public/data/soldier-detail-stage5-6.v1.json \
+                  data/validation/localization-audit-stage4.v1.json \
                   data/validation/soldier-t3-korean-name-640.v1.json \
                   data/checkpoints/soldier-t3-korean-name-640.txt
           git diff --cached --check
