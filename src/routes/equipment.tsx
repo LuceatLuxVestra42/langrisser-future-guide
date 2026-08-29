@@ -65,7 +65,7 @@ const TAB_DEFINITIONS: ReadonlyArray<{
 const TAB_ORDER_POLICIES: Record<TabId, string> = {
   1: "표시 순서는 확정된 역사적 출시순이 아니라 Stage 3의 deterministic presentation order야.",
   2: "검증된 출시 그룹 단위만 반영하며 같은 그룹 안의 개별 출시순은 확정하지 않았어.",
-  3: "정확한 출시 순서는 REVIEW 상태라 현재 순서를 최신순이나 출시순으로 해석하지 않아.",
+  3: "장비 종류·세부 타입 순서를 유지하고, 같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순이야. 같은 출시 그룹 안의 개별 순서는 별도 출시순 의미가 없어.",
 };
 
 const SORT_LABELS: Record<EquipmentSortMode, string> = {
