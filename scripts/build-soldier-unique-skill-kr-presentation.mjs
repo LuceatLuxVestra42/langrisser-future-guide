@@ -10,6 +10,7 @@ const checkOnly = process.argv.includes('--check');
 const canonicalPath = 'data/generated/soldier-detail-stage5-3.v1.json';
 const progressPath = 'data/checkpoints/soldier-unique-skill-translation-progress.v1.json';
 const outputPath = 'data/generated/soldier-unique-skill-kr-final.v1.json';
+const publicOutputPath = 'public/data/soldier-unique-skill-kr.v1.json';
 const validationPath = 'data/validation/soldier-unique-skill-kr-final.v1.json';
 
 const shardSpecs = [
@@ -162,6 +163,35 @@ const finalPresentation = {
   reviewQueue,
 };
 
+const publicProjection = {
+  version: 1,
+  schemaId: 'soldier-unique-skill-kr-public/v1',
+  date: '2026-08-29',
+  status: 'PASS_WITH_REVIEW',
+  counts: {
+    records: normalizedRecords.length,
+    pass: passCount,
+    review: reviewCount,
+  },
+  policy: {
+    joinKey: 'soldierId',
+    runtimeNameJoin: false,
+    canonicalChineseFallbackForTarget: false,
+    reviewIsNonBlockingTranslationReview: true,
+  },
+  bySoldierId: Object.fromEntries(
+    normalizedRecords.map((record) => [
+      String(record.soldierId),
+      {
+        descriptionKr: record.descriptionKr,
+        translationStatus: record.translationStatus,
+      },
+    ]),
+  ),
+};
+
+assert(Object.keys(publicProjection.bySoldierId).length === 185, 'public projection must contain 185 unique soldierId keys');
+
 const validation = {
   version: 1,
   schemaId: 'soldier-unique-skill-kr-final-validation/v1',
@@ -175,10 +205,12 @@ const validation = {
   },
   output: {
     path: outputPath,
+    publicPath: publicOutputPath,
     recordCount: normalizedRecords.length,
     passCount,
     reviewCount,
     reviewQueueCount: reviewQueue.length,
+    publicRecordCount: Object.keys(publicProjection.bySoldierId).length,
   },
   checks: {
     canonicalTargetCount185: true,
@@ -191,6 +223,9 @@ const validation = {
     nameCnCanonicalParity: true,
     progressParity: true,
     canonicalChineseReadOnly: true,
+    publicProjectionCoverage185: Object.keys(publicProjection.bySoldierId).length === 185,
+    publicProjectionRuntimeNameJoinDisabled: publicProjection.policy.runtimeNameJoin === false,
+    publicProjectionCanonicalChineseFallbackDisabled: publicProjection.policy.canonicalChineseFallbackForTarget === false,
   },
   hardErrorCount: 0,
   reviewCount,
@@ -198,10 +233,12 @@ const validation = {
 
 if (!checkOnly) {
   fs.mkdirSync(path.dirname(path.join(root, outputPath)), { recursive: true });
+  fs.mkdirSync(path.dirname(path.join(root, publicOutputPath)), { recursive: true });
   fs.mkdirSync(path.dirname(path.join(root, validationPath)), { recursive: true });
   fs.writeFileSync(path.join(root, outputPath), stableJson(finalPresentation));
+  fs.writeFileSync(path.join(root, publicOutputPath), stableJson(publicProjection));
   fs.writeFileSync(path.join(root, validationPath), stableJson(validation));
 }
 
 console.log(`[soldier-skill-kr] ${checkOnly ? 'CHECK' : 'BUILD'} PASS_WITH_REVIEW`);
-console.log(`[soldier-skill-kr] records=${normalizedRecords.length} pass=${passCount} review=${reviewCount} missing=${missingIds.length} extra=${extraIds.length}`);
+console.log(`[soldier-skill-kr] records=${normalizedRecords.length} pass=${passCount} review=${reviewCount} missing=${missingIds.length} extra=${extraIds.length} public=${Object.keys(publicProjection.bySoldierId).length}`);
