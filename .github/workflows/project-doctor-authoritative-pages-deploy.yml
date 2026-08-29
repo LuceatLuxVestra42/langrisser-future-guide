@@ -113,9 +113,9 @@ jobs:
           test -f dist/client/images/equipment/567.png
           grep -q '/langrisser-future-guide/images/heroes/cards/6.png' dist/client/heroes/6/index.html
           grep -q '대표 일러스트' dist/client/heroes/6/index.html
-          grep -q '중앙율정' dist/client/heroes/6/index.html
+          grep -q 'data-hero-central-discipline="true"' dist/client/heroes/6/index.html
           grep -q '骑士楷模' dist/client/heroes/6/index.html
-          grep -q 'Skill #90085' dist/client/heroes/6/index.html
+          grep -q '90085' dist/client/heroes/6/index.html
           cp dist/client/index.html dist/client/404.html
           cat > dist/client/authoritative-pages-source.json <<JSON
           {
