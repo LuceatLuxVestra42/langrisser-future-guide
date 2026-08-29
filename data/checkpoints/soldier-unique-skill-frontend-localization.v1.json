@@ -3,7 +3,7 @@
   "schemaId": "soldier-unique-skill-frontend-localization/v1",
   "date": "2026-08-29",
   "stage": "FRONTEND_CONSUMER_INTEGRATION",
-  "status": "BUILD_PASS_HOSTED_PENDING",
+  "status": "BUILD_RECHECK_PENDING_HOSTED_PENDING",
   "scope": {
     "target": "normal Tier3 and SP Soldier unique-skill final descriptions",
     "targetCount": 185,
@@ -29,23 +29,18 @@
     "lowerTierUsesExistingRichDetailBehavior": true
   },
   "reviewResolution": {
-    "appliedBatches": 3,
-    "resolvedSoldierIds": [250,326,333,334,336,341,602,811,814],
-    "passCount": 118,
-    "reviewCount": 67,
+    "appliedBatches": 4,
+    "resolvedSoldierIds": [250,326,333,334,336,341,512,513,514,515,602,635,637,811,814,815],
+    "passCount": 125,
+    "reviewCount": 60,
     "overridePath": "data/presentation/soldier-unique-skill-review-overrides.v1.json"
   },
   "buildGate": {
-    "status": "PASS",
-    "workflow": "Equipment Korean Name Frontend QA",
-    "runId": 33225369273,
-    "jobId": 99027877133,
-    "conclusion": "SUCCESS",
-    "observedGeneratorSummary": "records=185 pass=118 review=67 overrides=9 missing=0 extra=0 public=185",
-    "productionBuild": "SUCCESS"
+    "status": "PENDING_RECHECK_AFTER_REVIEW_BATCH4",
+    "expectedGeneratorSummary": "records=185 pass=125 review=60 overrides=16 missing=0 extra=0 public=185"
   },
   "reviewBoundary": {
-    "reviewCount": 67,
+    "reviewCount": 60,
     "reviewItemsAreMissingTranslations": false,
     "reviewItemsBlockFrontendProjection": false,
     "reviewResolutionRequiredBeforeTranslationCloseout": true
@@ -58,8 +53,8 @@
   },
   "completion": {
     "frontendConsumerIntegrated": true,
-    "buildGateComplete": true,
+    "buildGateComplete": false,
     "hostedQaComplete": false
   },
-  "nextStep": "Continue evidence-based review resolution from the remaining 67 items. Hosted QA remains pending until deployment contains the current projection."
+  "nextStep": "Re-run Build Gate at 125 PASS / 60 REVIEW, then continue evidence-based review resolution. Hosted QA remains pending until deployment contains the current projection."
 }
