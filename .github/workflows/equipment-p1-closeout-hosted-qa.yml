@@ -85,27 +85,28 @@ jobs:
             assert(count > 0, 'Exclusive Equipment 273 owner Hero link is missing');
 
             let heroLink = null;
-            let heroUrl = null;
+            let heroId = null;
             for (let index = 0; index < count; index += 1) {
               const candidate = heroLinks.nth(index);
               const href = await candidate.getAttribute('href');
               if (!href) continue;
-              const resolved = new URL(href, page.url());
-              if (/\/heroes\/\d+\/?$/.test(resolved.pathname)) {
+              const match = href.match(/\/heroes\/(\d+)\/?$/);
+              if (match) {
                 heroLink = candidate;
-                heroUrl = resolved;
+                heroId = match[1];
                 break;
               }
             }
 
-            assert(heroLink && heroUrl, 'No numeric owner Hero detail route was found for Equipment 273');
-            const heroPath = heroUrl.pathname;
+            assert(heroLink && heroId, 'No numeric owner Hero detail route was found for Equipment 273');
+            const heroRoutePattern = new RegExp(`/heroes/${heroId}/?$`);
 
             await Promise.all([
-              page.waitForURL((url) => url.pathname === heroPath, { timeout: 30_000 }),
+              page.waitForURL((url) => heroRoutePattern.test(url.pathname), { timeout: 30_000 }),
               heroLink.click(),
             ]);
-            assert(new URL(page.url()).pathname === heroPath, `Hero click did not reach ${heroPath}: ${page.url()}`);
+            const heroPath = new URL(page.url()).pathname;
+            assert(heroRoutePattern.test(heroPath), `Hero click did not reach Hero ${heroId}: ${page.url()}`);
 
             const heroHeading = page.locator('h1').first();
             await heroHeading.waitFor({ state: 'visible', timeout: 15_000 });
@@ -126,6 +127,7 @@ jobs:
             console.log(JSON.stringify({
               status: 'PASS_EQUIPMENT_PRESENTATION_P1_HOSTED_CLOSEOUT',
               equipmentId: 273,
+              heroId,
               heroPath,
               heroHeading: headingBeforeRefresh,
               clickNavigation: 'PASS',
