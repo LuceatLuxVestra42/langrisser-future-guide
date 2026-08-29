@@ -6,11 +6,13 @@ on:
       - main
     paths:
       - '.github/workflows/hero-asset-launcher-probe.yml'
+      - 'scripts/probe-hero-launcher.ps1'
   push:
     branches:
       - work/hero-asset-launcher-probe
     paths:
       - '.github/workflows/hero-asset-launcher-probe.yml'
+      - 'scripts/probe-hero-launcher.ps1'
   workflow_dispatch:
 
 permissions:
@@ -19,214 +21,20 @@ permissions:
 jobs:
   static-probe:
     runs-on: windows-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
+      - name: Checkout probe script
+        uses: actions/checkout@v4
+
       - name: Probe official launcher without executing it
         shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $ProgressPreference = 'SilentlyContinue'
-          $root = Join-Path $env:RUNNER_TEMP 'langrisser-launcher-probe'
-          New-Item -ItemType Directory -Force -Path $root | Out-Null
-          $reportDir = Join-Path $root 'report'
-          New-Item -ItemType Directory -Force -Path $reportDir | Out-Null
-
-          $pcPage = 'https://mz.zlongame.com/jx/mzdownload/20180731/5473.html'
-          $htmlPath = Join-Path $reportDir 'official-pc-page.html'
-          try {
-            $page = Invoke-WebRequest -Uri $pcPage -UseBasicParsing -MaximumRedirection 10 -TimeoutSec 30
-            $page.Content | Set-Content -LiteralPath $htmlPath -Encoding UTF8
-            "PC_PAGE_STATUS=$($page.StatusCode)"
-          } catch {
-            "PC_PAGE_FETCH_FAILED=$($_.Exception.Message)"
-            '' | Set-Content -LiteralPath $htmlPath -Encoding UTF8
-          }
-
-          $html = Get-Content -LiteralPath $htmlPath -Raw
-          $candidateList = [System.Collections.Generic.List[string]]::new()
-
-          if ($html) {
-            $urlPattern = '(?i)(?:https?:)?//[^\"''<>\s]+?\.(?:exe|zip)(?:\?[^\"''<>\s]*)?'
-            foreach ($m in [regex]::Matches($html, $urlPattern)) {
-              $u = $m.Value
-              if ($u.StartsWith('//')) { $u = 'https:' + $u }
-              $candidateList.Add($u)
-            }
-
-            $domainTokenPattern = '(?i)mhmnzdownload\.zlongame\.com/[^\"''<>\s]+?\.(?:exe|zip)(?:\?[^\"''<>\s]*)?'
-            foreach ($m in [regex]::Matches($html, $domainTokenPattern)) {
-              $candidateList.Add('https://' + $m.Value)
-            }
-          }
-
-          $candidateList.Add('https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/DownLoad-MZ-PC.exe')
-          $candidateList.Add('https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/Langrisser_DownLoad_PC.exe')
-
-          $candidates = $candidateList | Select-Object -Unique
-          $candidates | Set-Content -LiteralPath (Join-Path $reportDir 'download-candidates.txt') -Encoding UTF8
-          'DOWNLOAD CANDIDATES:'
-          $candidates | ForEach-Object { "  $_" }
-
-          $downloaded = $null
-          $downloadUrl = $null
-          $probeRows = @()
-
-          foreach ($u in $candidates) {
-            $safeName = ([IO.Path]::GetFileName(([Uri]$u).AbsolutePath))
-            if (-not $safeName) { $safeName = 'launcher.bin' }
-            $target = Join-Path $root $safeName
-            $row = [ordered]@{ url = $u; headStatus = $null; contentLength = $null; download = 'NOT_ATTEMPTED'; error = $null }
-
-            try {
-              $head = Invoke-WebRequest -Uri $u -Method Head -UseBasicParsing -MaximumRedirection 10 -TimeoutSec 20
-              $row.headStatus = [int]$head.StatusCode
-              $lenHeader = $head.Headers['Content-Length']
-              if ($lenHeader) { $row.contentLength = [int64]$lenHeader }
-            } catch {
-              $row.error = "HEAD: $($_.Exception.Message)"
-            }
-
-            if ($row.contentLength -and $row.contentLength -gt 100MB) {
-              $row.download = 'SKIPPED_OVER_100MB'
-              $probeRows += [pscustomobject]$row
-              continue
-            }
-
-            try {
-              Invoke-WebRequest -Uri $u -OutFile $target -UseBasicParsing -MaximumRedirection 10 -TimeoutSec 120
-              $size = (Get-Item -LiteralPath $target).Length
-              if ($size -lt 100KB) {
-                $row.download = "REJECTED_TOO_SMALL_$size"
-                Remove-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue
-              } else {
-                $row.download = 'SUCCESS'
-                $row.contentLength = $size
-                $downloaded = $target
-                $downloadUrl = $u
-                $probeRows += [pscustomobject]$row
-                break
-              }
-            } catch {
-              $row.download = 'FAILED'
-              $row.error = (($row.error + ' | GET: ' + $_.Exception.Message).Trim(' ','|'))
-            }
-            $probeRows += [pscustomobject]$row
-          }
-
-          $probeRows | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $reportDir 'candidate-probe.json') -Encoding UTF8
-
-          if (-not $downloaded) {
-            [ordered]@{
-              status = 'DOWNLOAD_FAILED'
-              officialPcPage = $pcPage
-              candidates = $candidates
-              probes = $probeRows
-            } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $reportDir 'launcher-probe-summary.json') -Encoding UTF8
-            'LAUNCHER_DOWNLOAD_FAILED'
-            exit 0
-          }
-
-          $item = Get-Item -LiteralPath $downloaded
-          $md5 = (Get-FileHash -LiteralPath $downloaded -Algorithm MD5).Hash
-          $sha256 = (Get-FileHash -LiteralPath $downloaded -Algorithm SHA256).Hash
-          $sig = Get-AuthenticodeSignature -FilePath $downloaded
-          $vi = $item.VersionInfo
-
-          $bytes = [IO.File]::ReadAllBytes($downloaded)
-          $machine = $null
-          $machineLabel = 'UNKNOWN'
-          if ($bytes.Length -gt 0x40 -and $bytes[0] -eq 0x4D -and $bytes[1] -eq 0x5A) {
-            $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
-            if ($peOffset -ge 0 -and ($peOffset + 6) -lt $bytes.Length) {
-              $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
-              switch ($machine) {
-                0x014c { $machineLabel = 'x86' }
-                0x8664 { $machineLabel = 'x64' }
-                0xAA64 { $machineLabel = 'ARM64' }
-                default { $machineLabel = ('0x{0:X4}' -f $machine) }
-              }
-            }
-          }
-
-          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
-          $utf16 = [Text.Encoding]::Unicode.GetString($bytes)
-          $printablePattern = '[ -~]{4,}'
-          $strings = [System.Collections.Generic.List[string]]::new()
-          foreach ($m in [regex]::Matches($ascii, $printablePattern)) { $strings.Add($m.Value) }
-          foreach ($m in [regex]::Matches($utf16, $printablePattern)) { $strings.Add($m.Value) }
-
-          $interestPattern = '(?i)(https?://|zlongame|mhmnz|patch|update|manifest|version|cdn|assetbundle|streamingassets|exportassetbundle|\.ini\b|\.json\b|\.xml\b|\.zip\b|\.exe\b|\.b\b)'
-          $interesting = $strings | Where-Object { $_ -match $interestPattern } | Sort-Object -Unique
-          $interesting | Select-Object -First 2000 | Set-Content -LiteralPath (Join-Path $reportDir 'interesting-strings.txt') -Encoding UTF8
-
-          $urls = [System.Collections.Generic.List[string]]::new()
-          foreach ($s in $strings) {
-            foreach ($m in [regex]::Matches($s, '(?i)https?://[A-Za-z0-9._~:/?#\[\]@!$&''()*+,;=%-]+')) {
-              $urls.Add($m.Value.TrimEnd('.',',',';',')',']','}'))
-            }
-          }
-          $uniqueUrls = $urls | Sort-Object -Unique
-          $uniqueUrls | Set-Content -LiteralPath (Join-Path $reportDir 'embedded-urls.txt') -Encoding UTF8
-
-          $domains = [System.Collections.Generic.List[string]]::new()
-          foreach ($s in $strings) {
-            foreach ($m in [regex]::Matches($s, '(?i)(?:[a-z0-9-]+\.)+(?:zlongame\.com|qyzlgame\.com)')) {
-              $domains.Add($m.Value.ToLowerInvariant())
-            }
-          }
-          $uniqueDomains = $domains | Sort-Object -Unique
-          $uniqueDomains | Set-Content -LiteralPath (Join-Path $reportDir 'embedded-domains.txt') -Encoding UTF8
-
-          $sevenZip = Get-Command 7z -ErrorAction SilentlyContinue
-          if ($sevenZip) {
-            & 7z l $downloaded 2>&1 | Out-File -LiteralPath (Join-Path $reportDir '7z-listing.txt') -Encoding UTF8
-          } else {
-            '7z not found on runner' | Set-Content -LiteralPath (Join-Path $reportDir '7z-listing.txt') -Encoding UTF8
-          }
-
-          $summary = [ordered]@{
-            status = 'STATIC_PROBE_COMPLETE'
-            officialPcPage = $pcPage
-            downloadUrl = $downloadUrl
-            fileName = $item.Name
-            sizeBytes = $item.Length
-            md5 = $md5
-            expectedMd5FromOfficialPage = '31A6DB4F224374185E2C498287D3D3F3'
-            md5MatchesOfficialPage = ($md5 -eq '31A6DB4F224374185E2C498287D3D3F3')
-            sha256 = $sha256
-            peMachine = $machineLabel
-            signatureStatus = [string]$sig.Status
-            signerSubject = if ($sig.SignerCertificate) { $sig.SignerCertificate.Subject } else { $null }
-            signerIssuer = if ($sig.SignerCertificate) { $sig.SignerCertificate.Issuer } else { $null }
-            productName = $vi.ProductName
-            productVersion = $vi.ProductVersion
-            fileDescription = $vi.FileDescription
-            companyName = $vi.CompanyName
-            fileVersion = $vi.FileVersion
-            embeddedUrlCount = @($uniqueUrls).Count
-            embeddedDomainCount = @($uniqueDomains).Count
-            interestingStringCount = @($interesting).Count
-            candidateProbes = $probeRows
-            executionPolicy = 'STATIC_ONLY_EXECUTABLE_NOT_RUN'
-          }
-          $summary | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $reportDir 'launcher-probe-summary.json') -Encoding UTF8
-
-          '=== LAUNCHER SUMMARY ==='
-          $summary | ConvertTo-Json -Depth 5
-          '=== EMBEDDED DOMAINS ==='
-          $uniqueDomains
-          '=== EMBEDDED URLS (first 100) ==='
-          $uniqueUrls | Select-Object -First 100
-          '=== INTERESTING STRINGS (first 200) ==='
-          $interesting | Select-Object -First 200
-
-          Remove-Item -LiteralPath $downloaded -Force -ErrorAction SilentlyContinue
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/probe-hero-launcher.ps1
 
       - name: Upload static probe report only
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: hero-asset-launcher-probe-report
-          path: ${{ runner.temp }}/langrisser-launcher-probe/report
+          path: ${{ runner.temp }}/langrisser-launcher-probe-v2/report
           if-no-files-found: error
           retention-days: 3
