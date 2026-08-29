@@ -42,13 +42,27 @@ def normalized_container_path(value: str) -> str:
     return value.replace("\\", "/").strip().lower()
 
 
+def resolve_container_object(value) -> tuple[object, str]:
+    """Resolve a UnityPy container value to its exact ObjectReader.
+
+    UnityPy 1.25.x exposes AssetBundle container entries as PPtr instances.
+    PPtr.deref() is the library-owned exact pointer resolution using m_FileID and
+    m_PathID. Direct ObjectReader-like values are retained for compatibility and
+    for the synthetic runner self-test. No filename/path guessing is performed.
+    """
+    deref = getattr(value, "deref", None)
+    if callable(deref):
+        return deref(), "container_value.deref"
+    return value, "direct_container_object"
+
+
 def actual_serialized_file_name(obj) -> tuple[str | None, str | None]:
     """Resolve the owning serialized-file/CAB name without inventing provenance.
 
-    UnityPy normally exposes ObjectReader.assets_file.name, but some real bundle
-    loads expose an empty name while retaining the exact child key in
-    assets_file.parent.files. The parent mapping is authoritative because
-    UnityPy's bundle reader stores each parsed child under its bundle node path.
+    After the container entry is dereferenced to ObjectReader, UnityPy normally
+    exposes ObjectReader.assets_file.name. Some loads may retain the exact child
+    key only in assets_file.parent.files, so object identity is an admitted
+    compatibility fallback. Both sources must agree when both are present.
     """
     assets_file = getattr(obj, "assets_file", None)
     if assets_file is None:
@@ -145,13 +159,14 @@ def load_unitypy():
     return UnityPy
 
 
-def exact_container_index(env) -> dict[str, list[tuple[str, object]]]:
-    index: dict[str, list[tuple[str, object]]] = {}
-    for container_path, obj in env.container.items():
+def exact_container_index(env) -> dict[str, list[tuple[str, object, str]]]:
+    index: dict[str, list[tuple[str, object, str]]] = {}
+    for container_path, container_value in env.container.items():
         if not isinstance(container_path, str):
             continue
+        obj, resolution = resolve_container_object(container_value)
         key = normalized_container_path(container_path)
-        index.setdefault(key, []).append((container_path, obj))
+        index.setdefault(key, []).append((container_path, obj, resolution))
     return index
 
 
@@ -251,7 +266,7 @@ def main() -> int:
                 records_by_id[request["requestId"]] = {
                     "requestId": request["requestId"],
                     "status": "ERROR",
-                    "reason": f"UnityPy load failed for {bundle_name}: {exc}",
+                    "reason": f"UnityPy load/container dereference failed for {bundle_name}: {exc}",
                 }
             continue
 
@@ -265,12 +280,11 @@ def main() -> int:
                     fail(
                         f"exact runtime path container match count must be 1, got {len(matches)}: {runtime_path}"
                     )
-                actual_container_path, obj = matches[0]
+                actual_container_path, obj, container_resolution = matches[0]
                 actual_cab, cab_resolution = actual_serialized_file_name(obj)
                 if actual_cab is None:
                     fail(
-                        "UnityPy did not expose the owning serialized-file/CAB name via "
-                        "assets_file.name or assets_file.parent.files identity"
+                        "UnityPy did not expose the owning serialized-file/CAB name after exact container dereference"
                     )
                 if actual_cab.lower() != source["embeddedCab"].lower():
                     fail(
@@ -294,6 +308,7 @@ def main() -> int:
                     "kind": kind,
                     "runtimePath": request["runtimePath"],
                     "actualContainerPath": actual_container_path,
+                    "containerResolution": container_resolution,
                     "actualEmbeddedCab": actual_cab,
                     "cabResolution": cab_resolution,
                     "source": source,
@@ -361,6 +376,7 @@ def main() -> int:
         },
         "boundaries": {
             "exactRuntimePathOnly": True,
+            "unityPyContainerPointerDereferenced": True,
             "bundleSha256VerifiedBeforeLoad": True,
             "embeddedCabNameVerified": True,
             "runtimePathSubstringOffsetUsedAsAssetOffset": False,
