@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "route-hosted-qa-stage2-validation.v1",
+  "stage": "QA-2",
+  "status": "PASS_ROUTE_HOSTED_QA_STAGE2_CONTRACT",
+  "completion": "COMPLETE",
+  "summary": {
+    "checkCount": 12,
+    "passed": 12,
+    "failed": 0,
+    "playwrightVersion": "1.62.1",
+    "browser": "chromium",
+    "projectCount": 2,
+    "browserUiCheckCount": 12
+  },
+  "failureBoundary": {
+    "browserUi": "BROWSER_UI_FAIL",
+    "semanticReopenAllowed": false,
+    "hostedFailureOwner": "QA-1 / deployment-hosting",
+    "browserFailureOwner": "frontend interaction / responsive / hydration"
+  },
+  "checks": [
+    { "id": "CONTRACT_IDENTITY", "pass": true },
+    { "id": "QA1_PREDECESSOR_FROZEN", "pass": true },
+    { "id": "PLAYWRIGHT_PINNED", "pass": true },
+    { "id": "PACKAGE_COMMANDS", "pass": true },
+    { "id": "CHROMIUM_ONLY_PROJECTS", "pass": true },
+    { "id": "VIEWPORTS_AND_EVIDENCE", "pass": true },
+    { "id": "HOSTED_FRESHNESS_PRECONDITION", "pass": true },
+    { "id": "INTERACTION_COVERAGE", "pass": true },
+    { "id": "STATE_SCROLL_COVERAGE", "pass": true },
+    { "id": "NOT_FOUND_UI_COVERAGE", "pass": true },
+    { "id": "RUNTIME_ERROR_COVERAGE", "pass": true },
+    { "id": "FAILURE_BOUNDARY", "pass": true }
+  ]
+}
