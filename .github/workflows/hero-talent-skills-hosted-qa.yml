@@ -1,116 +1,16 @@
-name: Hero Talent Skills Hosted Browser QA
+name: Hero Talent Skills Hosted Browser QA (Retired Publisher)
 
 on:
-  push:
-    branches:
-      - qa/hero-talent-skills-hosted
-    paths:
-      - '.github/workflows/hero-talent-skills-hosted-qa.yml'
-      - 'scripts/validate-hero-talent-skills-hosted-qa.mjs'
   workflow_dispatch:
 
 permissions:
-  contents: write
-
-concurrency:
-  group: hero-talent-skills-hosted-browser-qa
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  hosted-browser-qa:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
-      - name: Checkout QA candidate
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Setup Node 22
-        uses: actions/setup-node@v7
-        with:
-          node-version: '22'
-
-      - name: Install frozen dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Reconfirm Hero Stage 4 preflight
+      - name: Legacy publisher retired
         run: |
-          node scripts/generate_hero_list_stage4_artwork.cjs
-          node scripts/validate_hero_list_stage4.cjs
-
-      - name: Reuse proven GitHub Pages static build config
-        shell: bash
-        run: |
-          set -euo pipefail
-          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
-          git show FETCH_HEAD:vite.config.ts > vite.config.ts
-          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
-          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
-          grep -q 'nitro: false' vite.config.ts
-
-      - name: Build static GitHub Pages candidate
-        run: bun run build
-
-      - name: TypeScript gate
-        run: bunx tsc --noEmit
-
-      - name: Static Talent Skills gate
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f dist/client/heroes/6/index.html
-          test -f dist/client/images/heroes/cards/6.png
-          grep -q 'title="재능"' /dev/null 2>/dev/null || true
-          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-main-source.txt
-          printf '%s\n' '30f19aab6215301b3f110f1890495564fda725d8' > dist/client/qa-production-main-source.txt
-          cp dist/client/index.html dist/client/404.html
-          echo 'PASS static route and Hero 6 asset; rendered talent/skill content belongs to Browser gate'
-
-      - name: Publish QA candidate to gh-pages
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          cd dist/client
-          touch .nojekyll
-          git init
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b gh-pages
-          git add -A
-          git commit -m "Hero Talent Skills Hosted QA: deploy ${GITHUB_SHA}"
-          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
-
-      - name: Install Chromium QA runtime
-        run: |
-          npm install --no-save playwright
-          npx playwright install --with-deps chromium
-
-      - name: Run actual Hosted Browser UI gate
-        env:
-          HERO_TALENT_SKILL_QA_EXPECTED_SOURCE_SHA: ${{ github.sha }}
-          HERO_TALENT_SKILL_QA_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
-        run: node scripts/validate-hero-talent-skills-hosted-qa.mjs
-
-      - name: Print concise result
-        if: always()
-        shell: bash
-        run: |
-          if [ -f test-results/hero-talent-skills-hosted-qa/report.json ]; then
-            node -e "const fs=require('fs');const r=JSON.parse(fs.readFileSync('test-results/hero-talent-skills-hosted-qa/report.json','utf8'));console.log(JSON.stringify({status:r.status,error:r.error??null,summary:r.summary,hosted:r.hosted,browser:r.browser,failedChecks:(r.checks??[]).filter(x=>!x.pass)},null,2));"
-          fi
-
-      - name: Upload Hero talent skill QA evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: hero-talent-skills-hosted-browser-qa
-          path: test-results/hero-talent-skills-hosted-qa
-          if-no-files-found: warn
-          retention-days: 5
+          echo "This legacy Hosted QA no longer publishes gh-pages."
+          echo "Use .github/workflows/authoritative-pages-deploy.yml on main for production publication and hosted verification."
