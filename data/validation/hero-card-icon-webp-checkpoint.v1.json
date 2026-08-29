@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "status": "PASS_WITH_HOSTED_PENDING",
+  "status": "PASS_COMPLETE",
   "scope": "hero-card-icon-web-delivery",
   "authoritativeSource": "data/generated/hero-card-icon-assets.v1.json",
   "sourceFreezeState": "HERO_CARD_ICON_ASSETS_FROZEN",
@@ -15,6 +15,10 @@
   "webDeliveryFormat": "LOSSLESS_WEBP",
   "pngAuthoritativeSourceRetained": true,
   "semanticStageReopened": false,
+  "mergedProductSourceSha": "9a10f4cc0a3cc8fa819e45bf0189bcf0b16830eb",
+  "authoritativePagesRunId": 33278896290,
+  "authoritativePagesStatus": "SUCCESS",
+  "hostedSourceMarker": "gh-pages/authoritative-pages-source.json",
   "completed": [
     "source PNG integrity validation 267/267",
     "lossless WebP materialization 267/267",
@@ -23,13 +27,14 @@
     "Hero card-icon frontend validator PASS",
     "production build PASS",
     "TypeScript gate PASS",
-    "authoritative Pages static and hosted validators updated"
+    "authoritative Pages static candidate validation PASS",
+    "authoritative Pages publish PASS",
+    "hosted Chromium QA PASS",
+    "hosted Hero card-icon WebP MIME validation PASS"
   ],
-  "review": [
-    "authoritative GitHub Pages hosted verification after merge"
-  ],
+  "review": [],
   "blocker": [],
-  "nextStart": "merge PR after current PR guards pass, then verify authoritative Pages source marker and hosted WebP MIME",
+  "nextStart": "reuse the frozen WebP delivery and current hosted marker; reopen only if a listed condition is met",
   "reopenConditions": [
     "frozen Hero card-icon source manifest changes",
     "canonical Hero population changes",
