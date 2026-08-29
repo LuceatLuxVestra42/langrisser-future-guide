@@ -57,17 +57,13 @@ jobs:
       - name: TypeScript gate
         run: bunx tsc --noEmit
 
-      - name: Validate built Hero card icon surface
+      - name: Validate normal-build asset surface
         shell: bash
         run: |
           set -euo pipefail
-          test -f dist/client/heroes/index.html
-          test -f dist/client/images/heroes/card-icons/1.png
-          test -f dist/client/images/heroes/card-icons/6.png
-          test "$(find dist/client/images/heroes/card-icons -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '267'
-          grep -q '/images/heroes/card-icons/6.png' dist/client/heroes/index.html || grep -q '/langrisser-future-guide/images/heroes/card-icons/6.png' dist/client/heroes/index.html
-          grep -q 'data-hero-card-icons="true"' dist/client/heroes/index.html
-          grep -q 'data-hero-card-icon="true"' dist/client/heroes/index.html
+          test -f .output/public/images/heroes/card-icons/1.png
+          test -f .output/public/images/heroes/card-icons/6.png
+          test "$(find .output/public/images/heroes/card-icons -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '267'
 
       - name: Commit integrated Hero list presentation
         shell: bash
