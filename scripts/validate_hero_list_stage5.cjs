@@ -99,7 +99,7 @@ if (serverSource.includes("ConfigData")) fail("Stage 5 server must not read raw 
 if (!serverSource.includes("fullDatasetRuntimeRead: false")) fail("Stage 5 must declare no full Stage 6 dataset runtime read.");
 if (!functionsSource.includes("getHeroDetailRouteStage5Data")) fail("Stage 5 server function is not exposed.");
 if (!routeSource.includes("getHeroDetailRouteStage5Data")) fail("Hero detail route is not consuming Stage 5.");
-if (!routeSource.includes("직업 트리 · 최종 스탯") || !routeSource.includes("사용 가능 병종")) fail("Stage 5 required detail blocks are missing.");
+if (!routeSource.includes("직업 트리 · 최종 스탯") || !routeSource.includes('data-hero-soldier-cards="true"')) fail("Stage 5 required detail blocks are missing.");
 
 for (const witness of [1, 6]) {
   const meta = manifest.storage.byHeroId[String(witness)];
