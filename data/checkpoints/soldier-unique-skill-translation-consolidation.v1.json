@@ -48,19 +48,21 @@
     "descriptionCoverage": "PASS",
     "statusReviewTermContract": "PASS",
     "nameCnCanonicalParity": "PASS",
-    "progressParity": "PENDING_BUILD_VERIFY",
-    "productionBuild": "PENDING",
-    "frontendConsumerBuild": "PENDING",
+    "progressParity": "PASS",
+    "productionBuild": "SUCCESS",
+    "frontendConsumerBuild": "PASS",
     "hostedQa": "PENDING"
   },
   "verification": {
-    "status": "PENDING",
-    "workflow": null,
-    "runId": null,
-    "jobId": null,
-    "summary": "expected records=185 pass=137 review=48 overrides=28 missing=0 extra=0 public=185",
-    "productionViteNitroBuild": "PENDING",
-    "frontendLocalizationBoundary": "PENDING"
+    "status": "PASS",
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33229241040,
+    "jobId": 99038918516,
+    "verifiedImplementationHeadSha": "58fbb2b2fda2eff0a8cfe81e15d1f4f4d96a72d2",
+    "summary": "records=185 pass=137 review=48 overrides=28 missing=0 extra=0 public=185",
+    "productionViteNitroBuild": "SUCCESS",
+    "frontendLocalizationBoundary": "PASS",
+    "note": "Final metadata-only closeout HEAD is checked read-only after all writes and is not persisted here to avoid changing the verified HEAD again."
   },
   "reviewBoundary": {
     "translationCoverage": "185/185",
@@ -82,5 +84,5 @@
     "hostedQaRequired": true,
     "hostedQaComplete": false
   },
-  "nextStep": "Verify review batch 6 through the deterministic build and production frontend gates; keep the remaining 48 REVIEW items unchanged without record-level Korean evidence."
+  "nextStep": "Keep the remaining 48 REVIEW records unchanged until record-level Korean evidence is found; run Hosted QA only after deployment of the current projection."
 }
