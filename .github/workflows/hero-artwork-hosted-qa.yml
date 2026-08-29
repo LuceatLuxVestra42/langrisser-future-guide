@@ -7,7 +7,9 @@ on:
     paths:
       - '.github/workflows/hero-artwork-hosted-qa.yml'
       - 'scripts/validate-hero-artwork-hosted-qa.mjs'
+      - 'scripts/apply-hero-artwork-pages-document-navigation.mjs'
       - 'src/routes/heroes.tsx'
+      - 'src/routes/heroes_.$heroId.tsx'
   workflow_dispatch:
 
 permissions:
@@ -45,6 +47,14 @@ jobs:
           set -euo pipefail
           node scripts/generate_hero_list_stage4_artwork.cjs
           node scripts/validate_hero_list_stage4.cjs
+
+      - name: Apply GitHub Pages Hero document-navigation boundary
+        run: |
+          set -euo pipefail
+          node scripts/apply-hero-artwork-pages-document-navigation.mjs
+          test "$(grep -R -l 'reloadDocument' src/routes/heroes.tsx 'src/routes/heroes_.$heroId.tsx' | wc -l | tr -d ' ')" -eq 2
+          test "$(grep -o 'reloadDocument' src/routes/heroes.tsx | wc -l | tr -d ' ')" -eq 1
+          test "$(grep -o 'reloadDocument' 'src/routes/heroes_.$heroId.tsx' | wc -l | tr -d ' ')" -eq 2
 
       - name: Reuse proven GitHub Pages static build config
         run: |
@@ -85,7 +95,6 @@ jobs:
             echo "PASS ${label}"
           }
 
-          # GitHub Pages SPA/direct-route fallback follows the already-proven hosted QA pattern.
           require_file dist/client/index.html
           cp dist/client/index.html dist/client/404.html
           require_file dist/client/404.html
@@ -181,15 +190,28 @@ jobs:
             summary: report.summary,
           };
           fs.writeFileSync('data/validation/hero-artwork-hosted-qa.v1.json', JSON.stringify(validation, null, 2) + '\n');
-          const checkpoint = `Hero Artwork Hosted / Browser QA checkpoint\n기준일: 2026-08-29\n\nstatus: ${validation.status}\ncompletion: ${validation.completion}\nH-A6 predecessor: ${validation.hA6Predecessor}\nQA source SHA: ${sourceSha}\ngh-pages deployment SHA: ${ghPagesSha}\nhosted base: ${validation.hostedBase}\nresolver/assets: 267 / 267\nHosted PNG HEAD: ${validation.hostedAssetHeadPassCount} / 267\nrepresentative final Hero: 6 (레온)\nrepresentative begin Hero: 99204 (타탈리아)\nDesktop list/detail/direct/reload: PASS\nMobile list/detail/no-horizontal-overflow: PASS\n\nOwning layer: presentation / deployment / browser QA\nSemantic recomputation: none\n\n다시 열리는 조건:\n- H-A6 actual PNG 또는 resolver contract 변경\n- GitHub Pages base/path architecture 변경\n- hosted asset HTTP coverage 파손\n- representative Browser/UI regression\n\n다음 시작점:\n- H-A5/H-A6 main promotion은 Project Doctor hero-assets MANUAL_REVIEW 정책과 별도로 처리\n- Hosted QA PASS 자체를 semantic stage 재검토 사유로 사용하지 않음\n`;
+          const checkpoint = `Hero Artwork Hosted / Browser QA checkpoint\n기준일: 2026-08-29\n\nstatus: ${validation.status}\ncompletion: ${validation.completion}\nH-A6 predecessor: ${validation.hA6Predecessor}\nQA source SHA: ${sourceSha}\ngh-pages deployment SHA: ${ghPagesSha}\nhosted base: ${validation.hostedBase}\nresolver/assets: 267 / 267\nHosted PNG HEAD: ${validation.hostedAssetHeadPassCount} / 267\nrepresentative final Hero: 6 (레온)\nrepresentative begin Hero: 99204 (타탈리아)\nDesktop list/detail/direct/reload: PASS\nMobile list/detail/no-horizontal-overflow: PASS\nHero Pages document-navigation: PASS reloadDocument\n\nOwning layer: presentation / deployment / browser QA\nSemantic recomputation: none\n\n다시 열리는 조건:\n- H-A6 actual PNG 또는 resolver contract 변경\n- GitHub Pages base/path architecture 변경\n- hosted asset HTTP coverage 파손\n- representative Browser/UI regression\n\n다음 시작점:\n- H-A5/H-A6 main promotion은 Project Doctor hero-assets MANUAL_REVIEW 정책과 별도로 처리\n- Hosted QA PASS 자체를 semantic stage 재검토 사유로 사용하지 않음\n`;
           fs.writeFileSync('data/checkpoints/hero-artwork-hosted-qa.txt', checkpoint);
           NODE
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routes/heroes.tsx 'src/routes/heroes_.$heroId.tsx'
           git add data/validation/hero-artwork-hosted-qa.v1.json data/checkpoints/hero-artwork-hosted-qa.txt
           git commit -m "Record Hero artwork Hosted Browser QA checkpoint"
           git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Print concise Hosted Browser QA result
+        if: always()
+        shell: bash
+        run: |
+          if [ -f test-results/hero-artwork-hosted-qa/report.json ]; then
+            node - <<'NODE'
+            const fs = require('fs');
+            const r = JSON.parse(fs.readFileSync('test-results/hero-artwork-hosted-qa/report.json','utf8'));
+            console.log(JSON.stringify({ status:r.status, error:r.error ?? null, summary:r.summary, hosted:r.hosted, browser:r.browser, failedChecks:(r.checks ?? []).filter(x=>!x.pass) }, null, 2));
+            NODE
+          fi
 
       - name: Upload Hosted Browser QA evidence
         if: always()
