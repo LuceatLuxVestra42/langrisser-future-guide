@@ -6,6 +6,7 @@ const EXPECTED_SOURCE_SHA = process.env.EXPECTED_SOURCE_SHA ?? '';
 const SUMMARY_PATH = 'data/validation/skin-stage3-6-hosted-summary.v1.json';
 const EVIDENCE_PATH = 'data/evidence/skin-stage3-6-hosted.v1.json';
 const CHECKPOINT_PATH = 'data/checkpoints/skin-stage3-6-hosted.v1.json';
+const AUTHORITATIVE_SENTINEL = 'authoritative-pages-source.json';
 
 function assert(condition, message) { if (!condition) throw new Error(message); }
 function readJson(path) { return JSON.parse(fs.readFileSync(path, 'utf8')); }
@@ -29,21 +30,23 @@ async function waitForCurrentDeployment() {
   let lastError = 'not requested';
   for (let attempt = 1; attempt <= 30; attempt += 1) {
     try {
-      const { response } = await fetchNoStore(`skin-stage3-6-hosted-ready.json?qa=${Date.now()}-${attempt}`);
+      const { response } = await fetchNoStore(`${AUTHORITATIVE_SENTINEL}?qa=${Date.now()}-${attempt}`);
       if (response.ok) {
         const payload = await response.json();
         if (
-          payload?.status === 'READY_FOR_SKIN_STAGE3_6_HOSTED_QA' &&
+          payload?.status === 'AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT' &&
           payload?.sourceSha === EXPECTED_SOURCE_SHA &&
-          payload?.heroDetailPageCount === 267 &&
-          payload?.skinPngCount === 540
+          /^[0-9a-f]{40}$/i.test(payload?.skinRuntimeRef ?? '') &&
+          payload?.skinPngCount === 540 &&
+          payload?.semanticStageReopened === false &&
+          payload?.publisher === '.github/workflows/project-doctor-authoritative-pages-deploy.yml'
         ) return { attempt, payload };
-        lastError = `sentinel payload mismatch: ${JSON.stringify(payload)}`;
-      } else lastError = `sentinel HTTP ${response.status}`;
+        lastError = `authoritative sentinel payload mismatch: ${JSON.stringify(payload)}`;
+      } else lastError = `authoritative sentinel HTTP ${response.status}`;
     } catch (error) { lastError = String(error); }
     await new Promise((resolve) => setTimeout(resolve, 10_000));
   }
-  throw new Error(`DEPLOYMENT_HOSTING_FAIL: current Skin deployment did not become visible: ${lastError}`);
+  throw new Error(`DEPLOYMENT_HOSTING_FAIL: authoritative Skin deployment did not become visible: ${lastError}`);
 }
 
 async function checkRoute(path) {
@@ -90,6 +93,7 @@ const skinHero = heroIds
   .sort((a, b) => b.skinIds.length - a.skinIds.length || a.heroId - b.heroId)[0];
 const zeroSkinHeroId = heroIds.find((heroId) => (relation.byHeroId[String(heroId)] ?? []).length === 0);
 assert(skinHero?.skinIds?.length > 0 && Number.isSafeInteger(zeroSkinHeroId), 'Hosted representative Hero selection failed');
+assert(heroIds.length === 267, `Hosted Hero population changed: ${heroIds.length}`);
 
 const routePaths = ['', 'heroes', 'heroes/', `heroes/${skinHero.heroId}`, `heroes/${skinHero.heroId}/`, `heroes/${zeroSkinHeroId}`, `heroes/${zeroSkinHeroId}/`];
 const routes = [];
@@ -106,11 +110,11 @@ const evidence = {
   schemaVersion: 1,
   stage: 'skin-page-3',
   substage: '3-6-2',
-  evidenceClass: 'GITHUB_PAGES_HOSTED_ROUTE_ASSET_EVIDENCE',
+  evidenceClass: 'AUTHORITATIVE_GITHUB_PAGES_HOSTED_ROUTE_ASSET_EVIDENCE',
   status: 'PASS_SKIN_STAGE3_6_HOSTED_QA',
   sourceSha: EXPECTED_SOURCE_SHA,
   hostedBaseUrl: BASE_URL,
-  deploymentSentinel: { status: 'PASS', attempts: sentinel.attempt, payload: sentinel.payload },
+  deploymentSentinel: { status: 'PASS', type: 'AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT', attempts: sentinel.attempt, payload: sentinel.payload },
   routeChecks: routes,
   assetChecks: assets,
   representatives: {
@@ -127,6 +131,7 @@ const evidence = {
   },
   boundaries: {
     exactDeployedSourceShaVerified: true,
+    authoritativePublisherVerified: true,
     hostedAssetSha256Verified: true,
     semanticOwnershipRecomputed: false,
     sourceOrderRecomputed: false,
@@ -141,6 +146,8 @@ const summary = {
   status: evidence.status,
   finalReady: true,
   sourceSha: EXPECTED_SOURCE_SHA,
+  skinRuntimeRef: sentinel.payload.skinRuntimeRef,
+  authoritativePublisher: sentinel.payload.publisher,
   gates: {
     preflight: 'PASS',
     build: 'PASS',
@@ -148,7 +155,7 @@ const summary = {
     browserUi: 'PENDING',
   },
   counts: evidence.counts,
-  nextStartPoint: 'Run hosted Browser/UI Skin carousel, image ratio/crop, responsive, navigation, and console/page-error QA without reopening frozen Skin semantics.',
+  nextStartPoint: 'Run hosted Browser/UI Skin carousel, image ratio/crop, responsive, navigation, and console/page-error QA against the same authoritative Pages deployment without reopening frozen Skin semantics.',
 };
 
 const checkpoint = {
@@ -156,6 +163,8 @@ const checkpoint = {
   status: evidence.status,
   finalReady: true,
   sourceSha: EXPECTED_SOURCE_SHA,
+  skinRuntimeRef: sentinel.payload.skinRuntimeRef,
+  authoritativePublisher: sentinel.payload.publisher,
   preflight: 'PASS_SKIN_STAGE3_6_HERO_DETAIL_CONSUMER_PREFLIGHT',
   build: 'PASS_SKIN_STAGE3_6_STATIC_CANDIDATE',
   hosted: evidence.status,
