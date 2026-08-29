@@ -1,0 +1,138 @@
+name: Equipment Presentation P2 Hosted Browser UI QA
+
+on:
+  push:
+    branches:
+      - qa/equipment-p2-hosted-browser-ui-20260829
+    paths:
+      - '.github/workflows/equipment-p2-hosted-browser-ui.yml'
+      - 'scripts/validate-equipment-p2-hosted-browser-ui.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: equipment-p2-hosted-browser-ui
+  cancel-in-progress: false
+
+jobs:
+  hosted-browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install project dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate P2 source boundary
+        run: |
+          set -euo pipefail
+          grep -q 'placeholder="장비명·효과·ID 검색"' src/routes/equipment.tsx
+          grep -q 'placeholder="장비명·영웅명·효과·ID 검색"' src/routes/equipment_.exclusive.tsx
+          grep -q '<option value="default">기본 표시순</option>' src/routes/equipment.tsx
+          grep -q '<option value="name">이름순</option>' src/routes/equipment.tsx
+          grep -q '<option value="id">장비 ID순</option>' src/routes/equipment.tsx
+          grep -q '<option value="id">장비 ID순</option>' src/routes/equipment_.exclusive.tsx
+          grep -q '출시순 의미를 갖지 않아' src/routes/equipment.tsx
+          grep -q '출시순 의미를 갖지 않아' src/routes/equipment_.exclusive.tsx
+
+      - name: Reuse proven GitHub Pages static config
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
+          git show FETCH_HEAD:vite.config.ts > vite.config.ts
+          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
+          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
+          grep -q 'outputPath: `/equipment/${equipmentId}/index.html`' vite.config.ts
+
+      - name: Build hosted candidate
+        run: bun run build
+
+      - name: Require static candidate coverage
+        run: |
+          set -euo pipefail
+          test -f dist/client/equipment/index.html
+          test -f dist/client/equipment/exclusive/index.html
+          EQUIPMENT_DETAIL_COUNT="$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          HERO_DETAIL_COUNT="$(find dist/client/heroes -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/heroes/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
+          test "$EQUIPMENT_DETAIL_COUNT" -eq 373
+          test "$HERO_DETAIL_COUNT" -eq 267
+          test "$(find dist/client/images/equipment -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" -eq 373
+          echo "PASS_STATIC_COVERAGE equipment=${EQUIPMENT_DETAIL_COUNT} heroes=${HERO_DETAIL_COUNT} images=373"
+
+      - name: Publish hosted candidate to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Equipment P2 hosted QA ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run existing Equipment Browser regression
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: |
+          set -o pipefail
+          : > equipment-p2-regression.log
+          for attempt in 1 2 3; do
+            attempt_log="equipment-p2-regression-attempt-${attempt}.log"
+            echo "=== Equipment regression attempt ${attempt}/3 ===" | tee -a equipment-p2-regression.log
+            if node scripts/validate-equipment-image-stage3-browser-ui.mjs 2>&1 | tee "$attempt_log"; then
+              cat "$attempt_log" >> equipment-p2-regression.log
+              exit 0
+            fi
+            cat "$attempt_log" >> equipment-p2-regression.log
+            if ! grep -Eq '"status":50[234]' "$attempt_log"; then
+              echo "Regression failure is not a retryable hosted 502/503/504 response." | tee -a equipment-p2-regression.log
+              exit 1
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              exit 1
+            fi
+            sleep 5
+          done
+          exit 1
+
+      - name: Run P2 search sort persistence Browser QA
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-equipment-p2-hosted-browser-ui.mjs
+
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: equipment-p2-hosted-browser-failure-${{ github.run_id }}
+          path: |
+            equipment-p2-regression.log
+            equipment-p2-regression-attempt-*.log
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Final P2 PASS
+        run: echo 'PASS_EQUIPMENT_PRESENTATION_P2_HOSTED_BROWSER_UI'
