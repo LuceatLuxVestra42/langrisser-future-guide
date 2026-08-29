@@ -85,7 +85,7 @@ filename으로 고르지 않고 rendered pixel area를 사용했다.
 
 manifest:
 - data/generated/hero-artwork-h-a5-index.v1/manifest.json
-- SHA256: 83C2229A3B3090F178348D1D748923596E6AD4122C843E1E038DF2D7F9F3376C
+- SHA256: AC08E7A03B033A10269E330F4E60D3B6A72D68AC6C68EFED37F48372E4E462F6
 
 layout:
 - owning bundle 기준 12 shard
@@ -147,3 +147,26 @@ hash basis: repository UTF-8 LF bytes
 - manifest SHA-256과 final validation을 현재 repository bytes 기준으로 동기화했다.
 
 이 유지보수는 manifest/freshness 계층 수정이며 H-A5 extraction 의미를 다시 여는 작업이 아니다.
+
+
+============================================================
+9. H-A5 hash metadata maintenance revision 2 — 2026-08-29
+============================================================
+
+status: PASS_H_A5_HASH_METADATA_REPAIRED
+revision: 2
+semantic data changed: false
+row data changed: false
+shard hash entry changes: 12
+previous manifest SHA256: 83C2229A3B3090F178348D1D748923596E6AD4122C843E1E038DF2D7F9F3376C
+current manifest SHA256: AC08E7A03B033A10269E330F4E60D3B6A72D68AC6C68EFED37F48372E4E462F6
+shard hash basis: Git repository blob bytes
+manifest hash basis: UTF-8 LF bytes written to Git
+
+Revision 1에서 manifest 자체는 repository LF 기준으로 교정됐지만,
+12 shard descriptor는 Windows checkout working-tree bytes를 hash해 CRLF 영향을 받았다.
+Revision 2는 shard descriptor를 `git show HEAD:<path>`의 canonical Git blob bytes로 다시 고정한다.
+
+extraction/index row는 재생성하지 않았다.
+267 Hero pathId / dimensions / PNG·RGBA hash / ownership / selectionStatus는 변경하지 않았다.
+이 작업은 manifest/freshness 계층 유지보수만 수행한다.
