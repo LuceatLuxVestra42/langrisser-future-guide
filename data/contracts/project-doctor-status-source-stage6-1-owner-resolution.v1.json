@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-status-source-stage6-1-owner-resolution/v1",
+  "stage": "PROJECT-STATUS-STAGE6-1",
+  "checkpoint": "PROJECT_DOCTOR_STATUS_SOURCE_OWNER_RESOLUTION_HERO_SOLDIER",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Resolve the current main-branch Hero and Soldier completion workflows, commands, frozen status artifacts, and safe post-freeze automation hook points before enabling automatic Stage 5 bridge application.",
+  "sourceMainHead": "04a234377e990c9a3feb43923d31fdb6fdf654e4",
+  "policy": {
+    "mainBranchEvidenceRequired": true,
+    "exactWorkflowPathRequired": true,
+    "exactCompletionCommandRequired": true,
+    "exactFrozenArtifactRequired": true,
+    "hookOnlyAfterFrozenOutputVerification": true,
+    "unmergedOwnerDefinitionsAreNonAuthoritative": true,
+    "filenameInference": false,
+    "stageNumberInference": false,
+    "chronologyInference": false,
+    "automaticPromotionEnabledInThisStage": false,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "canonicalJoinRecomputation": false
+  },
+  "pipelines": [
+    {
+      "pipelineId": "hero",
+      "domain": "hero",
+      "producerId": "hero-final",
+      "activeEntryId": "hero-stage6-4-final",
+      "activeSourcePath": "data/validation/hero-stage6-4-final.v1.json",
+      "expectedSourceState": {
+        "status": "PASS_WITH_REVIEW",
+        "completion": "COMPLETE",
+        "heroDataPipelineStatus": "FINAL_FROZEN"
+      },
+      "completionWorkflow": {
+        "path": ".github/workflows/hero-stage6-4-site-consumer.yml",
+        "name": "Hero Stage 6-4 Site Consumer Final Freeze",
+        "jobId": "site-consumer-final-freeze",
+        "completionCommand": "node scripts/validate_hero_stage6_4_site_consumer.cjs",
+        "commandRole": "MATERIALIZING_FINAL_VALIDATOR",
+        "frozenVerificationStep": "Verify frozen Stage 6-4 outputs on PR or main",
+        "automationHookPoint": "AFTER_FROZEN_OUTPUT_VERIFICATION_SUCCESS"
+      },
+      "stage5Bridge": {
+        "pipeline": "hero",
+        "defaultMode": "CHECK_ONLY",
+        "futureApplyAllowedOnlyAfterHook": true
+      },
+      "nonAuthoritativeEvidence": {
+        "draftPullRequest": 157,
+        "candidateRegressionOwner": "scripts/validate_hero_stage4_final.cjs",
+        "candidateOwnerRole": "READ_ONLY_CANONICAL_REGRESSION_OWNER",
+        "admittedForStage6Automation": false,
+        "reason": "PR #157 is still open/draft and is not main-branch authority. Stage 6-1 therefore resolves the existing Stage 6-4 completion workflow as the automation source event."
+      }
+    },
+    {
+      "pipelineId": "soldier",
+      "domain": "soldier",
+      "producerId": "soldier-final",
+      "activeEntryId": "soldier-stage6-7-site-admission",
+      "activeSourcePath": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "expectedSourceState": {
+        "status": "PASS",
+        "admissionStatus": "READY_WITH_REVIEW"
+      },
+      "completionWorkflow": {
+        "path": ".github/workflows/soldier-stage6-7-site-admission.yml",
+        "name": "Soldier Stage 6-7 Site Admission",
+        "jobId": "site-admission",
+        "completionCommand": "node scripts/finalize-soldier-stage6-7-site-admission.cjs",
+        "commandRole": "MATERIALIZING_FINALIZER",
+        "frozenVerificationStep": "Verify frozen Stage 6-7 artifacts on main or PR",
+        "automationHookPoint": "AFTER_FROZEN_OUTPUT_VERIFICATION_SUCCESS"
+      },
+      "stage5Bridge": {
+        "pipeline": "soldier",
+        "defaultMode": "CHECK_ONLY",
+        "futureApplyAllowedOnlyAfterHook": true
+      },
+      "nonAuthoritativeEvidence": {
+        "draftPullRequest": 157,
+        "candidateRegressionOwner": "scripts/validate-soldier-stage6-7-final.mjs",
+        "candidateOwnerRole": "READ_ONLY_FINAL_ADMISSION_VALIDATOR",
+        "admittedForStage6Automation": false,
+        "reason": "PR #157 runtime-proved the wrapper but it is still open/draft and the script is not main-branch authority. The historical Stage 4-8 validator is not substituted here."
+      }
+    }
+  ],
+  "resolvedDecision": {
+    "hero": "Use Hero Stage 6-4 Site Consumer Final Freeze success as the completion event; attach automatic bridge logic only after its frozen-output verification succeeds.",
+    "soldier": "Use Soldier Stage 6-7 Site Admission success as the completion event; attach automatic bridge logic only after its frozen-output verification succeeds.",
+    "shared": "Do not re-run or replace the materializing completion command from the bridge. Stage 6 automation consumes the already-verified frozen artifact and delegates it through Stage 5 -> Stage 4 -> Stage 3."
+  },
+  "nextStep": {
+    "stage": "PROJECT-STATUS-STAGE6-2",
+    "goal": "Add check-only automatic bridge hooks for Hero and Soldier immediately after each completion workflow's frozen-output verification, then prove failure/review blocking before enabling apply."
+  }
+}
