@@ -71,5 +71,6 @@ jobs:
             exit 0
           fi
           git commit -m 'Freeze reviewed Soldier Stage 4-8 transition outputs'
+          git reset --hard HEAD
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
