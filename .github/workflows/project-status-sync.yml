@@ -12,6 +12,8 @@ on:
       - 'data/contracts/project-doctor-*.json'
       - 'scripts/*project-doctor*'
       - 'scripts/build-project-status.mjs'
+      - '.github/workflows/hero-stage6-4-site-consumer.yml'
+      - '.github/workflows/soldier-stage6-7-site-admission.yml'
       - '.github/workflows/project-status-sync.yml'
   pull_request:
     branches:
@@ -25,6 +27,8 @@ on:
       - 'scripts/*project-doctor*'
       - 'scripts/build-project-status.mjs'
       - 'PROJECT_STATUS.md'
+      - '.github/workflows/hero-stage6-4-site-consumer.yml'
+      - '.github/workflows/soldier-stage6-7-site-admission.yml'
       - '.github/workflows/project-status-sync.yml'
 
 jobs:
@@ -52,6 +56,9 @@ jobs:
 
       - name: Validate Status Source Artifact Bridge self-tests
         run: node scripts/validate-project-doctor-status-source-artifact-bridge.mjs
+
+      - name: Validate Stage 6-2 check-only completion hooks
+        run: node scripts/validate-project-doctor-status-source-stage6-2-check-hooks.mjs
 
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
@@ -107,6 +114,9 @@ jobs:
 
       - name: Validate Status Source Artifact Bridge self-tests
         run: node scripts/validate-project-doctor-status-source-artifact-bridge.mjs
+
+      - name: Validate Stage 6-2 check-only completion hooks
+        run: node scripts/validate-project-doctor-status-source-stage6-2-check-hooks.mjs
 
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
