@@ -1,0 +1,105 @@
+name: Hero Card Icon WebP Diagnostic
+
+on:
+  push:
+    branches:
+      - diag/hero-card-icon-webp-20260830
+    paths:
+      - '.github/workflows/hero-card-icon-webp-diagnostic.yml'
+      - 'public/images/heroes/card-icons/**'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check --quiet Pillow
+      - name: Benchmark PNG vs WebP
+        shell: python
+        run: |
+          import io, json, pathlib, statistics
+          from PIL import Image
+
+          root = pathlib.Path('public/images/heroes/card-icons')
+          files = sorted(root.glob('*.png'))
+          if len(files) != 267:
+              raise SystemExit(f'expected 267 PNGs, found {len(files)}')
+
+          rows = []
+          total_png = 0
+          total_lossless = 0
+          total_q90 = 0
+          png_magic_ok = 0
+          alpha_count = 0
+          dims = {}
+
+          for path in files:
+              raw = path.read_bytes()
+              total_png += len(raw)
+              if raw[:8] == b'\x89PNG\r\n\x1a\n':
+                  png_magic_ok += 1
+              with Image.open(io.BytesIO(raw)) as im:
+                  im.load()
+                  dims[f'{im.width}x{im.height}'] = dims.get(f'{im.width}x{im.height}', 0) + 1
+                  has_alpha = im.mode in ('RGBA','LA') or ('transparency' in im.info)
+                  alpha_count += int(has_alpha)
+
+                  b1 = io.BytesIO()
+                  im.save(b1, format='WEBP', lossless=True, method=6)
+                  lossless_bytes = len(b1.getvalue())
+                  total_lossless += lossless_bytes
+
+                  b2 = io.BytesIO()
+                  im.save(b2, format='WEBP', quality=90, method=6)
+                  q90_bytes = len(b2.getvalue())
+                  total_q90 += q90_bytes
+
+                  rows.append({
+                      'file': path.name,
+                      'png': len(raw),
+                      'webpLossless': lossless_bytes,
+                      'webpQ90': q90_bytes,
+                      'width': im.width,
+                      'height': im.height,
+                      'mode': im.mode,
+                      'alpha': has_alpha,
+                  })
+
+          def pct(new, old):
+              return round((new / old - 1) * 100, 2)
+
+          report = {
+              'status': 'PASS_HERO_CARD_ICON_WEBP_DIAGNOSTIC',
+              'fileCount': len(files),
+              'pngMagicOk': png_magic_ok,
+              'alphaCount': alpha_count,
+              'dimensionCounts': dims,
+              'png': {
+                  'totalBytes': total_png,
+                  'totalMiB': round(total_png/1024/1024, 3),
+                  'medianBytes': int(statistics.median(r['png'] for r in rows)),
+                  'minBytes': min(r['png'] for r in rows),
+                  'maxBytes': max(r['png'] for r in rows),
+              },
+              'webpLossless': {
+                  'totalBytes': total_lossless,
+                  'totalMiB': round(total_lossless/1024/1024, 3),
+                  'deltaPercent': pct(total_lossless, total_png),
+                  'smallerCount': sum(r['webpLossless'] < r['png'] for r in rows),
+              },
+              'webpQ90': {
+                  'totalBytes': total_q90,
+                  'totalMiB': round(total_q90/1024/1024, 3),
+                  'deltaPercent': pct(total_q90, total_png),
+                  'smallerCount': sum(r['webpQ90'] < r['png'] for r in rows),
+              },
+              'representative': [r for r in rows if r['file'] in {'1.png','6.png','25.png','69.png','99284.png'}],
+          }
+          print(json.dumps(report, ensure_ascii=False, indent=2))
