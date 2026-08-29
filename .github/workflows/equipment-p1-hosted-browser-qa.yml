@@ -35,7 +35,14 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/apply-equipment-stage3-pages-document-navigation.mjs
-          grep -A4 'to="/heroes/\$heroId"' 'src/routes/equipment_.$equipmentId.tsx' | grep -q reloadDocument
+          node <<'NODE'
+          const fs = require('fs');
+          const source = fs.readFileSync('src/routes/equipment_.$equipmentId.tsx', 'utf8');
+          if (!/<Link\s+[\s\S]*?reloadDocument[\s\S]*?to="\/heroes\/\$heroId"[\s\S]*?>/.test(source)) {
+            throw new Error('Equipment exclusive Hero link is missing reloadDocument');
+          }
+          console.log('PASS_EQUIPMENT_P1_HERO_DOCUMENT_NAVIGATION_BOUNDARY');
+          NODE
 
       - name: Reuse proven GitHub Pages static config
         run: |
