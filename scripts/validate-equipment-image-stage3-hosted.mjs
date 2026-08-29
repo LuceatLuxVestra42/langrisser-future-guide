@@ -212,11 +212,6 @@ const hostedSummary = {
 const summary = browserEvidenceFresh
   ? {
       ...hostedSummary,
-      status: "PASS_EQUIPMENT_IMAGE_STAGE3",
-      gates: {
-        ...hostedSummary.gates,
-        browserUi: "PASS_PLAYWRIGHT_HOSTED_BROWSER_UI",
-      },
       browserUiEvidence: {
         path: BROWSER_EVIDENCE_PATH,
         status: priorBrowserEvidence.status,
@@ -235,7 +230,7 @@ fs.writeFileSync(SUMMARY_PATH, `${JSON.stringify(summary, null, 2)}\n`);
 
 const checkpoint = {
   checkpoint: "equipment-image-stage3-final-v1",
-  status: summary.status,
+  status: browserEvidenceFresh ? "PASS_EQUIPMENT_IMAGE_STAGE3" : summary.status,
   completion: summary.completion,
   freezeState: summary.freezeState,
   productionJoinKey: "equipmentId",
