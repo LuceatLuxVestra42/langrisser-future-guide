@@ -1,0 +1,59 @@
+name: Hero Artwork H-A6 Materialize
+
+on:
+  push:
+    branches:
+      - work/hero-artwork-h-a6-materialize-v2
+    paths:
+      - scripts/materialize-hero-artwork-h-a6.py
+      - .github/workflows/hero-artwork-h-a6-materialize.yml
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Install frozen extraction runtime
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check --quiet UnityPy==1.25.3
+          python -c "import UnityPy, PIL; print('UnityPy', UnityPy.__version__); print('Pillow', PIL.__version__)"
+
+      - name: Materialize and verify 267 Hero PNG assets
+        shell: pwsh
+        run: python scripts/materialize-hero-artwork-h-a6.py
+
+      - name: Commit exact verified Hero PNG assets
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/images/heroes/cards
+          git add data/generated/hero-artwork-h-a6-web-assets.v1.json
+          git add data/validation/hero-artwork-h-a6-materialization.v1.json
+          git add data/checkpoints/hero-artwork-h-a6.txt
+          if git diff --cached --quiet; then
+            echo "No H-A6 materialization changes to commit."
+          else
+            git commit -m "Materialize 267 Hero artwork PNG assets"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Upload H-A6 verification reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-artwork-h-a6-materialization-report
+          path: |
+            data/generated/hero-artwork-h-a6-web-assets.v1.json
+            data/validation/hero-artwork-h-a6-materialization.v1.json
+            data/checkpoints/hero-artwork-h-a6.txt
+          if-no-files-found: warn
+          retention-days: 5
