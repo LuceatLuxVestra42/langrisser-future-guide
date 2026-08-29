@@ -6,6 +6,7 @@ on:
       - work/hero-artwork-h-a5-bulk-index
     paths:
       - scripts/build-hero-artwork-h-a5-index.py
+      - scripts/build-hero-artwork-h-a5-index-v2.py
       - .github/workflows/hero-artwork-h-a5-bulk-index.yml
 
 permissions:
@@ -22,7 +23,7 @@ jobs:
         run: python -m pip install --disable-pip-version-check --quiet UnityPy
       - name: Build 267 Hero artwork extraction index
         shell: pwsh
-        run: python scripts/build-hero-artwork-h-a5-index.py
+        run: python scripts/build-hero-artwork-h-a5-index-v2.py
       - name: Upload H-A5 reports
         if: always()
         uses: actions/upload-artifact@v4
