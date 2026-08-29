@@ -35,7 +35,7 @@ on:
       - '.github/workflows/soldier-stage4-7-domain-fixtures.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   validate-domain-fixtures:
@@ -56,15 +56,3 @@ jobs:
         with:
           name: soldier-stage4-7-domain-fixtures
           path: data/validation/soldier-stage4-7-domain-fixtures.v1.json
-      - name: Freeze PASS validation on PR branch
-        if: github.event_name == 'pull_request'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/validation/soldier-stage4-7-domain-fixtures.v1.json
-          if git diff --cached --quiet; then
-            echo "Stage 4-7 validation already frozen."
-          else
-            git commit -m "freeze Soldier stage 4-7 domain fixture PASS"
-            git push origin HEAD:${{ github.head_ref }}
-          fi
