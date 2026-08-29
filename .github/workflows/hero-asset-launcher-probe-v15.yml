@@ -1,0 +1,30 @@
+name: Hero Asset Launcher Probe v15
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/probe-hero-launcher-v15.ps1'
+      - '.github/workflows/hero-asset-launcher-probe-v15.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  leon-owning-bundle:
+    if: github.event.pull_request.head.ref == 'work/hero-asset-launcher-probe'
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Resolve Leon owning bundle without full package download
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/probe-hero-launcher-v15.ps1
+      - name: Upload text reports only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-asset-launcher-probe-v15-report
+          path: ${{ runner.temp }}/langrisser-launcher-probe-v15/report
+          if-no-files-found: warn
+          retention-days: 3
