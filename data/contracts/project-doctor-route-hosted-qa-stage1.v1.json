@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-route-hosted-qa-stage1/v1",
+  "stage": "QA-1",
+  "status": "DESIGN_FROZEN",
+  "toolingNamespace": "project-doctor-route-hosted-qa",
+  "predecessor": {
+    "contract": "data/contracts/project-doctor-route-hosted-qa-stage0.v1.json",
+    "validation": "data/validation/project-doctor-route-hosted-qa-stage0.v1.json",
+    "requiredStatus": "PASS"
+  },
+  "purpose": "Implement a Node HTTP Hosted Route Runner for the frozen QA-0 route/base/fixture contract without Playwright or Browser/UI interaction.",
+  "runtime": {
+    "entry": "scripts/run-project-doctor-route-hosted-qa-stage1.mjs",
+    "packageCommand": "qa:hosted",
+    "nodeMinimumMajor": 22,
+    "httpMethod": "GET",
+    "redirectPolicy": "follow-for-canonical-resolution",
+    "cachePolicy": "no-store-plus-unique-query",
+    "requestTimeoutMs": 15000,
+    "maxAssetRequests": 60
+  },
+  "modes": {
+    "strict": {
+      "requiresExpectedSourceSha": true,
+      "expectedShaSources": ["--expected-sha", "HOSTED_EXPECTED_SHA", "GITHUB_SHA"],
+      "passStatus": "PASS_ROUTE_HOSTED_QA_STAGE1_HTTP"
+    },
+    "probeCurrent": {
+      "flag": "--probe-current",
+      "purpose": "Prove live HTTP transport and route/asset checks against the currently deployed gh-pages source without claiming candidate freshness.",
+      "passStatus": "PASS_ROUTE_HOSTED_QA_STAGE1_CURRENT_DEPLOYED_PROBE",
+      "strictFreshnessClaim": false
+    }
+  },
+  "freshness": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "deployBranch": "gh-pages",
+    "githubBranchApi": "https://api.github.com/repos/LuceatLuxVestra42/langrisser-future-guide/branches/gh-pages",
+    "sourceShaStrategy": "GH_PAGES_COMMIT_MESSAGE_TRAILING_40_HEX",
+    "strictRequirement": "deployed source SHA must equal caller-provided expected source SHA"
+  },
+  "checks": {
+    "DEPLOYED_COMMIT_FRESHNESS": "Resolve source SHA from gh-pages commit message and compare in strict mode; probe-current never upgrades this to a strict candidate-freshness claim.",
+    "REPOSITORY_BASE_PATH": "Every same-origin emitted asset/shell reference must stay under /langrisser-future-guide/ except no explicit exception.",
+    "PUBLIC_ROUTE_RESOLUTION": "GET all QA-0 required public routes in canonical trailing-slash form and require HTTP 200 HTML.",
+    "DETAIL_DIRECT_ENTRY": "GET all representative Hero/Soldier/Equipment detail fixtures directly and require HTTP 200 HTML.",
+    "REFRESH_EQUIVALENT_GET": "Repeat direct-entry GET with a new cache-busting query and require a second successful HTML response.",
+    "TRAILING_SLASH_POLICY": "GET non-slash public/detail directory URLs and require the final followed URL pathname to resolve to trailing slash.",
+    "ASSET_AND_CHUNK_RESOLUTION": "Extract shell scripts, stylesheets, preload/modulepreload/icon references plus a bounded representative image sample; exact emitted URLs must return 2xx.",
+    "FILENAME_CASE_SENSITIVITY": "Treat exact emitted asset URL 404 as failure; no case-insensitive fallback or filename similarity repair.",
+    "ROUTE_TREE_HOSTED_PARITY": "Require every frozen public route and representative detail pattern to have a live hosted success fixture.",
+    "STALE_DEPLOY_OR_CACHE": "Use no-store headers and unique query values and combine them with the gh-pages source-SHA check."
+  },
+  "negativeId": 999999999,
+  "negativeExpectedStatus": 404,
+  "assetPolicy": {
+    "sameOriginOnly": true,
+    "repositoryBaseRequired": true,
+    "prioritize": ["script", "stylesheet", "modulepreload", "preload", "icon", "representative-image"],
+    "noCrossRootFallback": true,
+    "noFilenameSimilarity": true
+  },
+  "failurePolicy": {
+    "failedStatus": "FAIL_ROUTE_HOSTED_QA_STAGE1_HTTP",
+    "classification": "DEPLOYMENT_HOSTING_FAIL",
+    "semanticReopenAllowed": false,
+    "invalidInvocationExitCode": 2,
+    "hostedFailureExitCode": 1
+  },
+  "browserBoundary": {
+    "playwrightInstalled": false,
+    "browserLaunched": false,
+    "interactionChecks": false,
+    "deferredTo": "QA-2+"
+  },
+  "validation": {
+    "script": "scripts/validate-project-doctor-route-hosted-qa-stage1.mjs",
+    "artifact": "data/validation/project-doctor-route-hosted-qa-stage1.v1.json",
+    "mockSuccessAndFailureFixturesRequired": true
+  },
+  "liveProof": {
+    "workflow": ".github/workflows/project-doctor-route-hosted-qa-stage1.yml",
+    "probeCurrentIsNonBlocking": true,
+    "strictCandidateFreshnessDeferredToDeploymentAwareInvocation": true
+  }
+}
