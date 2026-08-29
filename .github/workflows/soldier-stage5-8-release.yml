@@ -74,3 +74,5 @@ jobs:
       - name: Verify frozen artifacts on main or PR
         if: github.event_name != 'push' || github.ref == 'refs/heads/main'
         run: git diff --exit-code -- data/generated/soldier-release-metadata.v1.json data/generated/soldier-list-stage5-8.v1.json data/validation/soldier-stage5-8-release.v1.json
+
+# dragoonia downstream freshness retrigger 5-8
