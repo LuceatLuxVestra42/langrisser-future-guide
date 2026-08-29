@@ -63,8 +63,8 @@ jobs:
           set -euo pipefail
           node scripts/plan-project-doctor-d3.mjs \
             --contract data/contracts/project-doctor-d3-validator-plan.v4.json \
-            --paths public/images/skins/1401.png \
-            --json > /tmp/skin-plan.json
+            --json \
+            --paths public/images/skins/1401.png > /tmp/skin-plan.json
           node <<'NODE'
           const fs = require('fs');
           const plan = JSON.parse(fs.readFileSync('/tmp/skin-plan.json','utf8'));
