@@ -1,0 +1,58 @@
+HERO TALENT / SKILLS HOSTED BROWSER QA CHECKPOINT
+
+status:
+PASS_HERO_TALENT_SKILLS_HOSTED_BROWSER_QA
+
+current state:
+- Hero Talent/Skills production presentation is merged on main.
+- Production main SHA: 30f19aab6215301b3f110f1890495564fda725d8
+- QA selector repair SHA: fd2cdfc9c746094840b09c700a95cc6714308bf5
+- GitHub Pages deployment SHA: b228901d8309c8245337e7eea8478148bcdc4ee8
+- Workflow run: 33241098891
+- Job: 99070468277
+
+validated authoritative predecessor:
+- FINAL_FROZEN Hero Stage 6 per-Hero shard/projection
+- Existing Hero representative artwork/web-path contract
+- Existing GitHub Pages static document-navigation boundary
+
+completed scope:
+- Hosted /heroes/ HTTP 200
+- Hosted /heroes/6/ HTTP 200
+- Hosted Hero 6 artwork HTTP 200
+- Hero 6 talent cards: 6
+- Hero 6 skill cards: 9
+- basic/direct skill group visible
+- job-level acquisition group visible
+- direct skill sample 突击 visible
+- job skill sample 帝国冲锋 visible
+- raw ConfigData <color> markup absent
+- desktop page errors: 0
+- mobile horizontal overflow: 0
+- mobile page errors: 0
+- overall checks: 14/14 PASS
+
+failure resolved:
+- owner: QA selector only
+- production data/UI were already present
+- non-exact getByText matched both explanatory copy and the group heading
+- repaired the two group assertions with exact text matching
+- semantic recomputation: none
+- production code change for repair: none
+
+remaining REVIEW:
+- Final visual polish across the full 267 Hero population remains presentation review, not a blocker for this checkpoint.
+
+BLOCKER:
+- none for Talent/Skills Hosted Browser QA
+
+next start:
+- Hero detail: final job-tree visualization
+- Reuse detail.jobs.branches, detail.jobs.connectionCount, and existing verified capstone stats.
+- Do not reopen ConfigData/JOIN/Stage 6 semantics solely for visualization.
+
+reopen only if:
+- Hero Stage 6 frozen Talent/Skills projection contract changes
+- Hero detail route rendering contract changes
+- GitHub Pages base/path architecture changes
+- Hosted/browser regression breaks the validated Talent/Skills surface
