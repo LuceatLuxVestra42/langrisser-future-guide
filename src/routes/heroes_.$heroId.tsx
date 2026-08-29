@@ -13,6 +13,7 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import { HeroCentralDisciplineSection } from "@/components/hero-central-discipline-section";
 import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
@@ -176,7 +177,6 @@ function HeroDetailPage() {
               <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">연결 {detail.jobs.connectionCount}</span>
             </div>
           </div>
-
           <div className="mt-5 space-y-4">
             {detail.jobs.branches.map((branch) => (
               <article key={branch.branchIndex} className="overflow-hidden rounded-2xl border border-border bg-muted/20">
@@ -251,6 +251,7 @@ function HeroDetailPage() {
         </section>
 
         <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
+        <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
 
         <section className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
