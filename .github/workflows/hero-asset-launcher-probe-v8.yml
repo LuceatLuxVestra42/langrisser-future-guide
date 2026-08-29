@@ -1,0 +1,32 @@
+name: Hero Asset Launcher Probe v8
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/parse-pe-resource-index.py'
+      - 'scripts/probe-hero-launcher-v8.ps1'
+      - '.github/workflows/hero-asset-launcher-probe-v8.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  resource-index:
+    if: github.event.pull_request.head.ref == 'work/hero-asset-launcher-probe'
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout probe branch
+        uses: actions/checkout@v5
+      - name: Parse current official launcher PE resource index
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/probe-hero-launcher-v8.ps1
+      - name: Upload resource index reports only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-asset-launcher-probe-v8-report
+          path: ${{ runner.temp }}/langrisser-launcher-probe-v8/report
+          if-no-files-found: warn
+          retention-days: 3
