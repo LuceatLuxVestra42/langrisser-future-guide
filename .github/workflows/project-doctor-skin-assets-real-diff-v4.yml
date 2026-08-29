@@ -1,0 +1,78 @@
+name: Project Doctor Skin Assets Real Diff V4
+
+on:
+  push:
+    branches:
+      - work/skin-stage3-3-bulk-plan
+    paths:
+      - '.github/workflows/project-doctor-skin-assets-real-diff-v4.yml'
+      - 'package.json'
+      - 'scripts/validate-skin-assets-final.mjs'
+      - 'scripts/validate-project-doctor-d2-impact-v4.mjs'
+      - 'scripts/validate-project-doctor-d3-v4.mjs'
+      - 'scripts/run-project-doctor-d4-v4.mjs'
+      - 'scripts/validate-project-doctor-d4-v4.mjs'
+      - 'scripts/validate-project-doctor-d7-v4.mjs'
+      - 'scripts/run-project-doctor-closeout.mjs'
+      - 'data/contracts/project-doctor-d2-impact-contract.v4.json'
+      - 'data/contracts/project-doctor-d3-validator-plan.v4.json'
+      - 'data/contracts/project-doctor-d4-execution.v4.json'
+      - 'data/contracts/project-doctor-d7-pr-guard.v4.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-doctor-skin-assets-real-diff-v4
+  cancel-in-progress: false
+
+jobs:
+  real-diff-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout current Skin admission head
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate Project Doctor V4 guard contract
+        run: npm run doctor:pr-guard:validate
+
+      - name: Require frozen D5 freshness before real diff
+        run: npm run doctor:freshness:validate
+
+      - name: Recompute D1 status and require no tracked drift
+        run: |
+          set -euo pipefail
+          npm run doctor:status
+          git diff --exit-code -- \
+            data/generated/project-doctor-d1-1-status.v1.json \
+            data/validation/project-doctor-d1-1-summary.v1.json \
+            data/validation/project-doctor-d1-2-summary.v1.json
+
+      - name: Recheck D5 freshness after D1 status
+        run: npm run doctor:freshness:validate
+
+      - name: Fetch current main for exact real diff
+        run: git fetch --no-tags origin main
+
+      - name: Dry-run exact current main...HEAD Project Doctor plan
+        run: npm run doctor -- --dry-run --base origin/main --head HEAD
+
+      - name: Execute exact current main...HEAD Project Doctor plan
+        run: npm run doctor -- --base origin/main --head HEAD
