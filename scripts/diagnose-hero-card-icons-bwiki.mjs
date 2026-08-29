@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import path from 'node:path';
 
 const heroList = JSON.parse(fs.readFileSync('data/generated/hero-list-stage1.v1.json', 'utf8'));
 if (heroList.status !== 'PASS' || heroList.completion !== 'COMPLETE' || heroList.summary?.generatedRecordCount !== 267 || heroList.summary?.hardErrorCount !== 0) {
@@ -9,11 +8,12 @@ if (heroList.status !== 'PASS' || heroList.completion !== 'COMPLETE' || heroList
 const API = 'https://wiki.biligame.com/langrisser/api.php';
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function fetchJsonWithRetry(url, attempts = 4) {
+async function fetchJsonWithRetry(url, attempts = 2) {
   let lastError;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
       const response = await fetch(url, {
+        signal: AbortSignal.timeout(8000),
         headers: {
           'user-agent': 'langrisser-future-guide/hero-card-icon-diagnostic',
           accept: 'application/json',
@@ -23,7 +23,7 @@ async function fetchJsonWithRetry(url, attempts = 4) {
       return await response.json();
     } catch (error) {
       lastError = error;
-      if (attempt < attempts) await sleep(750 * attempt);
+      if (attempt < attempts) await sleep(500 * attempt);
     }
   }
   throw lastError;
@@ -79,7 +79,7 @@ async function resolveOne(hero) {
 }
 
 const records = [];
-const concurrency = 8;
+const concurrency = 16;
 for (let offset = 0; offset < heroList.records.length; offset += concurrency) {
   const batch = heroList.records.slice(offset, offset + concurrency);
   records.push(...await Promise.all(batch.map(resolveOne)));
@@ -90,7 +90,13 @@ const resolved = records.filter((row) => row.status === 'RESOLVED');
 const missing = records.filter((row) => row.status === 'MISSING');
 const errors = records.filter((row) => row.status === 'ERROR');
 const invalidShape = resolved.filter((row) => !Number.isFinite(row.width) || !Number.isFinite(row.height) || row.width <= 0 || row.height <= 0 || Math.abs(row.width - row.height) > 8);
-const duplicateSourceUrls = [...new Map(resolved.map((row) => [row.sourceUrl, resolved.filter((other) => other.sourceUrl === row.sourceUrl)])).values()]
+const bySource = new Map();
+for (const row of resolved) {
+  const group = bySource.get(row.sourceUrl) ?? [];
+  group.push(row);
+  bySource.set(row.sourceUrl, group);
+}
+const duplicateSourceUrls = [...bySource.values()]
   .filter((group) => group.length > 1)
   .map((group) => group.map((row) => ({ heroId: row.heroId, nameCn: row.nameCn, sourceUrl: row.sourceUrl })));
 
