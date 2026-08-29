@@ -39,18 +39,23 @@ jobs:
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
-          const url = `${process.env.HOSTED_SENTINEL_URL}?hosted=${Date.now()}`;
-          const response = await fetch(url, { headers: { 'cache-control': 'no-cache', pragma: 'no-cache' } });
-          if (!response.ok) throw new Error(`authoritative sentinel HTTP ${response.status}`);
-          const payload = await response.json();
-          if (payload.status !== 'AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT') throw new Error(`unexpected authoritative status ${payload.status}`);
-          if (!/^[0-9a-f]{40}$/.test(payload.sourceSha ?? '')) throw new Error(`invalid sourceSha ${payload.sourceSha}`);
-          if (!/^[0-9a-f]{40}$/.test(payload.skinRuntimeRef ?? '')) throw new Error(`invalid skinRuntimeRef ${payload.skinRuntimeRef}`);
-          if (payload.skinPngCount !== 540 || payload.semanticStageReopened !== false) throw new Error('authoritative Skin boundary mismatch');
-          if (payload.publisher !== '.github/workflows/project-doctor-authoritative-pages-deploy.yml') throw new Error(`unexpected publisher ${payload.publisher}`);
-          fs.appendFileSync(process.env.GITHUB_ENV, `EXPECTED_SOURCE_SHA=${payload.sourceSha}\n`);
-          fs.appendFileSync(process.env.GITHUB_ENV, `EXPECTED_SKIN_RUNTIME_REF=${payload.skinRuntimeRef}\n`);
-          console.log(JSON.stringify(payload, null, 2));
+          (async () => {
+            const url = `${process.env.HOSTED_SENTINEL_URL}?hosted=${Date.now()}`;
+            const response = await fetch(url, { headers: { 'cache-control': 'no-cache', pragma: 'no-cache' } });
+            if (!response.ok) throw new Error(`authoritative sentinel HTTP ${response.status}`);
+            const payload = await response.json();
+            if (payload.status !== 'AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT') throw new Error(`unexpected authoritative status ${payload.status}`);
+            if (!/^[0-9a-f]{40}$/.test(payload.sourceSha ?? '')) throw new Error(`invalid sourceSha ${payload.sourceSha}`);
+            if (!/^[0-9a-f]{40}$/.test(payload.skinRuntimeRef ?? '')) throw new Error(`invalid skinRuntimeRef ${payload.skinRuntimeRef}`);
+            if (payload.skinPngCount !== 540 || payload.semanticStageReopened !== false) throw new Error('authoritative Skin boundary mismatch');
+            if (payload.publisher !== '.github/workflows/project-doctor-authoritative-pages-deploy.yml') throw new Error(`unexpected publisher ${payload.publisher}`);
+            fs.appendFileSync(process.env.GITHUB_ENV, `EXPECTED_SOURCE_SHA=${payload.sourceSha}\n`);
+            fs.appendFileSync(process.env.GITHUB_ENV, `EXPECTED_SKIN_RUNTIME_REF=${payload.skinRuntimeRef}\n`);
+            console.log(JSON.stringify(payload, null, 2));
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
           NODE
 
       - name: Validate authoritative Hosted Skin routes and hashes
