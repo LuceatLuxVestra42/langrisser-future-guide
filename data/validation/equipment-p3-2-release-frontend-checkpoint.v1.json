@@ -3,7 +3,7 @@
   "stage": "Equipment P3-2 Release Metadata Frontend Integration",
   "status": "PASS",
   "completion": "EQUIPMENT_P3_2_RELEASE_FRONTEND_FROZEN",
-  "closeout": "COMPLETE_MERGED_POST_MERGE_VERIFIED",
+  "closeout": "COMPLETE_MERGED_HOSTED_VERIFIED",
   "authoritativeSource": {
     "p3_1Projection": "data/presentation/equipment-p3-1-release-metadata.v1.json",
     "frozenGeneralList": "data/generated/equipment_stage3_3_general_list.json",
@@ -14,11 +14,12 @@
   "implementationState": {
     "sourcePr": 201,
     "sourceHeadSha": "aebbb8fb26097068c02d790da23a2251aed1355b",
-    "sourceMergeSha": "9623984674cc897adf2de6bcab0628bdcbc0af07",
+    "sourceMergeSha": "1b4838b81752a2cb3ae8d91fc1ec1e3ddc5a7271",
     "typeBoundaryFollowupPr": 202,
     "typeBoundaryHeadSha": "1d9314b47f33aa72be710d03243449f43b8d25ea",
     "typeBoundaryMergeSha": "d3973d6b9300497809a2f8b37bb6c7caa26991b2",
     "currentMainAtCloseoutStart": "30f19aab6215301b3f110f1890495564fda725d8",
+    "currentMainAtFinalFreeze": "2cd2c69eeb57f388cb0688b49de48a6ce8f2d0a7",
     "qaBranchRefreshMergeSha": "0753ce7e9b34b94d129b0ae1584862da4f70a2af",
     "freshnessFromPriorEquipmentMain": {
       "baseSha": "4e3743306c4d13e9fe5a9c3867e257f3b171bf3b",
@@ -26,6 +27,14 @@
       "equipmentFilesChanged": false,
       "changedFiles": [
         "src/lib/hero-detail-stage5.server.ts",
+        "src/routes/heroes_.$heroId.tsx"
+      ]
+    },
+    "freshnessAfterCloseoutMerge": {
+      "baseSha": "94fa1b41bd673a255d486397aa8b08e810c70593",
+      "headSha": "2cd2c69eeb57f388cb0688b49de48a6ce8f2d0a7",
+      "equipmentFilesChanged": false,
+      "changedFiles": [
         "src/routes/heroes_.$heroId.tsx"
       ]
     },
@@ -45,10 +54,31 @@
     "projectStatusSyncConclusion": "SUCCESS",
     "productOrSemanticFilesChanged": false
   },
+  "deploymentRecovery": {
+    "owningLayer": "hosting-deployment",
+    "rootCause": "The shared gh-pages branch was being force-published by independent hosted QA workflows, so the deployed site could be newer or older than the Equipment P3-2 source independently of main.",
+    "skinStage3_6BaselineSha": "8ad8b238f33253f87cb903fbdf56fa563dde77c3",
+    "equipmentOverlayFiles": [
+      "data/presentation/equipment-p3-1-release-metadata.v1.json",
+      "src/lib/equipment-page.localized.server.ts",
+      "src/routes/equipment.tsx"
+    ],
+    "equipmentOverlayCommitSha": "523c10d5a0e68eee0ca3d0ae069426b78dec8313",
+    "combinedStaticSourceSha": "724675f92573c5df3ada20cf4890aeef88467b4d",
+    "ghPagesDeploymentCommitSha": "9b740f65cff19dc0f0365d961d0d147d65832e4b",
+    "skinHostedRunId": 33242121361,
+    "skinHostedJobId": 99073128149,
+    "skinHostedConclusion": "SUCCESS",
+    "skinStaticBuild": "PASS",
+    "skin540ArtifactValidation": "PASS",
+    "skinHostedRepresentativeRoutes": "PASS",
+    "ghPagesTipVerifiedAfterEquipmentQa": true,
+    "semanticStageReopened": false
+  },
   "hostedCloseoutEvidence": {
-    "runId": 33241222878,
-    "jobId": 99070791925,
-    "headSha": "e65f5aaa64197279cffefd4597df301b7f206bc5",
+    "runId": 33242356571,
+    "jobId": 99073735036,
+    "headSha": "0209e5d39657cf9b6401f2e096ba845fb684edcb",
     "conclusion": "SUCCESS",
     "hostedBaseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
     "p3_2Chronology": {
@@ -91,11 +121,13 @@
     "hostedEquipmentImageRegression": "PASS",
     "hostedP2Regression": "PASS",
     "hostedP1Regression": "PASS",
+    "skinHostedSurfacePreserved": true,
     "closeoutArtifactsMerged": true
   },
   "review": [
     "Equipment 265-268 retain secondary source tier until a primary official archive is found.",
-    "Individual order among equipment sharing one releaseGroupDate is not asserted; deterministic tie-breakers do not imply chronology."
+    "Individual order among equipment sharing one releaseGroupDate is not asserted; deterministic tie-breakers do not imply chronology.",
+    "GitHub Pages publication is currently a shared last-writer-wins gh-pages branch across independent hosted QA workflows. Future hosted jobs can replace the composed static candidate; treat that as a hosting/deployment maintenance REVIEW unless product-source mismatch is independently proven."
   ],
   "blockers": [],
   "nextStart": {
