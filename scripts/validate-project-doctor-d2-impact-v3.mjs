@@ -17,10 +17,12 @@ const check=(name,ok,detail=null)=>{const row={name,pass:Boolean(ok),...(detail=
 check('v3 contract frozen',contract.schemaId==='project-doctor-d2-impact-contract/v3'&&contract.status==='DESIGN_FROZEN');
 check('v2 preserved',contract.supersedes==='data/contracts/project-doctor-d2-impact-contract.v2.json');
 check('base map preserved',contract.baseMap==='data/contracts/project-doctor-d2-dependency-map.v1.json'&&baseMap.status==='DESIGN_FROZEN');
-check('overlay count',contract.pathRuleOverlays?.length===7,contract.pathRuleOverlays?.map(r=>r.id));
-for(const id of ['soldier-webp-assets-post-map','project-doctor-workflow-post-map','project-status-derived-sync','regression-coverage-promotion-v1-meta-contract','localization-audit-stage6-integration','project-doctor-v3-regression-admission-tooling','regression-coverage-promotion-v2-admission']) check(`overlay:${id}`,contract.pathRuleOverlays?.some(r=>r.id===id));
+check('overlay count',contract.pathRuleOverlays?.length===8,contract.pathRuleOverlays?.map(r=>r.id));
+for(const id of ['soldier-webp-assets-post-map','project-doctor-workflow-post-map','project-status-derived-sync','regression-coverage-promotion-v1-meta-contract','localization-audit-stage6-integration','project-doctor-v3-regression-admission-tooling','regression-coverage-promotion-v2-admission','equipment-image-final-owner']) check(`overlay:${id}`,contract.pathRuleOverlays?.some(r=>r.id===id));
 const admission=contract.pathRuleOverlays?.find(r=>r.id==='regression-coverage-promotion-v2-admission');
 check('promotion v2 overlay tooling-only',admission?.changeClass==='regression-coverage-promotion-v2'&&same(sorted(admission?.directNodes??[]),['project-doctor']));
+const equipmentImage=contract.pathRuleOverlays?.find(r=>r.id==='equipment-image-final-owner');
+check('equipment image overlay scoped',equipmentImage?.changeClass==='asset-pipeline'&&same(sorted(equipmentImage?.directNodes??[]),['equipment-assets']));
 check('no graph mutation',contract.overlayPolicy?.mayAddImpactNodes===false&&contract.overlayPolicy?.mayAddPropagationEdges===false&&contract.overlayPolicy?.mayRewriteBaseRules===false);
 
 const fixtureResults=[];

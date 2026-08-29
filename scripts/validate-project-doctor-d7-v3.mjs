@@ -30,21 +30,29 @@ check(workflow.includes('Validate Regression Coverage Promotion V1 admission')&&
 check(d2.schemaId==='project-doctor-d2-impact-contract/v3','D2_V3');
 const v2Overlay=(d2.pathRuleOverlays??[]).find(r=>r.id==='regression-coverage-promotion-v2-admission');
 check(v2Overlay?.changeClass==='regression-coverage-promotion-v2'&&sameSet(v2Overlay?.directNodes,['project-doctor']),'PROMOTION_V2_D2_OVERLAY');
+const equipmentOverlay=(d2.pathRuleOverlays??[]).find(r=>r.id==='equipment-image-final-owner');
+check(equipmentOverlay?.changeClass==='asset-pipeline'&&sameSet(equipmentOverlay?.directNodes,['equipment-assets']),'EQUIPMENT_IMAGE_D2_OVERLAY');
 check(d3.schemaId==='project-doctor-d3-validator-plan/v3','D3_V3');
 check(d4.schemaId==='project-doctor-d4-execution/v3','D4_V3');
-const expectedNodes=contract.promotionV2Admission.requiredOwnerNodes;
-const expectedManual=contract.promotionV2Admission.remainingManualNodes;
+const promotionV2Nodes=contract.promotionV2Admission.requiredOwnerNodes;
+const equipmentNode=contract.equipmentImageFinalOwnerAdmission.node;
+const expectedNodes=[...promotionV2Nodes,equipmentNode];
+const expectedManual=contract.equipmentImageFinalOwnerAdmission.remainingManualNodes;
 check(sameSet((d3.admittedOwners??[]).map(x=>x.node),expectedNodes),'OWNER_NODE_SET');
 check(sameSet(Object.keys(d3.manualReviewNodes??{}),expectedManual),'MANUAL_NODE_SET');
-check((d3.admittedOwners??[]).length===9&&contract.promotionV2Admission.ownerCount===9,'OWNER_COUNT');
+check((d3.admittedOwners??[]).length===10&&contract.promotionV2Admission.ownerCount===9&&contract.equipmentImageFinalOwnerAdmission.ownerCountAfterAdmission===10,'OWNER_COUNT');
 for(const row of d3.admittedOwners??[]){
   const catalog=(d3.checkCatalog??[]).find(x=>x.id===row.checkId);
-  check(Boolean(catalog&&catalog.phase===2&&catalog.triggerNodes?.includes(row.node)&&catalog.command===`npm run ${row.packageCommand}`),`OWNER_CATALOG_${row.node}`);
+  const expectedPhase=row.node==='equipment-assets'?3:2;
+  check(Boolean(catalog&&catalog.phase===expectedPhase&&catalog.triggerNodes?.includes(row.node)&&catalog.command===`npm run ${row.packageCommand}`),`OWNER_CATALOG_${row.node}`);
   check(Boolean(pkg.scripts?.[row.packageCommand]),`OWNER_PACKAGE_ALIAS_${row.node}`);
 }
 const audit=(d3.checkCatalog??[]).find(x=>x.id===contract.promotionV2Admission.v2AuditCheckId);
 check(audit?.command===`npm run ${contract.promotionV2Admission.v2AuditPackageAlias}`&&audit?.phase===3,'PROMOTION_V2_AUDIT_CATALOG');
 check(Boolean(pkg.scripts?.[contract.promotionV2Admission.v2AuditPackageAlias]),'PROMOTION_V2_AUDIT_ALIAS');
+const equipmentCheck=(d3.checkCatalog??[]).find(x=>x.id===contract.equipmentImageFinalOwnerAdmission.checkId);
+check(equipmentCheck?.command===`npm run ${contract.equipmentImageFinalOwnerAdmission.packageAlias}`&&equipmentCheck?.phase===3&&equipmentCheck?.triggerNodes?.includes('equipment-assets'),'EQUIPMENT_IMAGE_CATALOG');
+check(pkg.scripts?.[contract.equipmentImageFinalOwnerAdmission.packageAlias]==='node scripts/validate-equipment-image-final.mjs','EQUIPMENT_IMAGE_PACKAGE_ALIAS');
 check((d4.allowedCheckIds??[]).includes(contract.promotionV2Admission.v2AuditCheckId)&&d3.admittedOwners.every(x=>d4.allowedCheckIds.includes(x.checkId)),'D4_V3_ALLOWLIST');
 
 check(pkg.scripts?.['doctor:impact']==='node scripts/analyze-project-doctor-d2-impact.mjs --contract data/contracts/project-doctor-d2-impact-contract.v3.json','DOCTOR_IMPACT_V3');
