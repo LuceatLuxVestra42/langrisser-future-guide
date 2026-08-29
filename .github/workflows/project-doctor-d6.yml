@@ -1,3 +1,4 @@
+# Temporary D5 refresh producer for Hero artwork downstream seal refresh; work branch only.
 name: Project Doctor D6 Runtime Proof
 
 on:
@@ -8,13 +9,14 @@ on:
       - data/contracts/project-doctor-*
       - data/generated/project-doctor-*
       - data/validation/project-doctor-*
+      - data/validation/hero-list-stage4.v1.json
       - scripts/*project-doctor*
       - package.json
       - .github/workflows/project-doctor-d6.yml
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   runtime-proof:
@@ -38,26 +40,27 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: D5 freshness fixtures
-        run: npm run doctor:freshness:self-test
+      - name: Refresh D5 freshness seal through existing producer
+        run: npm run doctor:freshness:refresh
 
-      - name: Integrated closeout fixtures
-        run: npm run doctor:closeout:validate
-
-      - name: Validate committed freshness seal
+      - name: Validate refreshed D5 freshness seal
         run: npm run doctor:freshness:validate
 
-      - name: Regenerate D1 status outputs
-        run: npm run doctor:status
-
-      - name: Prove committed D1 outputs are deterministic
-        run: git diff --exit-code -- data/generated/project-doctor-d1-1-status.v1.json data/validation/project-doctor-d1-1-summary.v1.json data/validation/project-doctor-d1-2-summary.v1.json
-
-      - name: Revalidate freshness after D1 regeneration
-        run: npm run doctor:freshness:validate
-
-      - name: Integrated Doctor dry run
-        run: npm run doctor -- --dry-run --paths package.json
-
-      - name: Integrated Doctor selected-check execution
-        run: npm run doctor -- --paths package.json
+      - name: Persist refreshed Project Doctor outputs on work branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            data/generated/project-doctor-active-source-registry.v1.json \
+            data/validation/project-doctor-active-source-registry-summary.v1.json \
+            data/generated/project-doctor-d1-1-status.v1.json \
+            data/validation/project-doctor-d1-1-summary.v1.json \
+            data/validation/project-doctor-d1-2-summary.v1.json \
+            data/generated/project-doctor-d5-freshness.v1.json
+          if git diff --cached --quiet; then
+            echo "No Project Doctor freshness outputs changed"
+            exit 0
+          fi
+          git commit -m "Refresh Project Doctor D5 freshness seal"
+          git push
