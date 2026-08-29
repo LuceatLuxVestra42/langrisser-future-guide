@@ -31,6 +31,49 @@ type Stage6JobTree = {
   connections?: Stage6JobConnection[];
 };
 
+type Stage6Skill = {
+  skillId?: number;
+  nameCn?: string | null;
+  desc?: string | null;
+  iconPath?: string | null;
+  displayType?: string | null;
+  cooldown?: string | null;
+  range?: string | null;
+  areaOrTarget?: string | null;
+};
+
+type Stage6SkillAcquisition = {
+  acquisitionOrder?: number;
+  skillId?: number;
+  skill?: Stage6Skill | null;
+  jobConnectionId?: number;
+  jobId?: number;
+  jobNameCn?: string | null;
+  jobNameEn?: string | null;
+  connectionDepth?: number;
+  connectionOrder?: number;
+  jobLevelId?: number;
+  jobLevelSequence?: number;
+  rankCode?: number;
+  jobLevelUpHeroLevel?: number;
+};
+
+type Stage6Skills = {
+  jobLevelAcquisitions?: Stage6SkillAcquisition[] | null;
+  heroDirectSkills?: Stage6Skill[] | null;
+};
+
+type Stage6Talent = {
+  status?: string | null;
+  selectionRule?: string | null;
+  initialStar?: number | null;
+  starProgression?: Array<{
+    star?: number;
+    skillId?: number;
+    skill?: Stage6Skill | null;
+  }> | null;
+};
+
 type FeatureBlock = {
   status?: string | null;
 } | null | undefined;
@@ -56,6 +99,8 @@ type Stage6HeroShard = {
       rank?: number | null;
     } | null;
     jobTree?: Stage6JobTree | null;
+    skills?: Stage6Skills | null;
+    talent?: Stage6Talent | null;
   } | null;
   bonds?: unknown[] | null;
   exclusiveEquipment?: FeatureBlock;
@@ -77,6 +122,20 @@ const stage6ShardModules = import.meta.glob<Stage6HeroShard>(
 
 function isReleased(value: FeatureBlock): boolean {
   return value?.status === "RELEASED";
+}
+
+function projectSkill(skill: Stage6Skill | null | undefined) {
+  if (!skill || !Number.isInteger(skill.skillId)) return null;
+  return {
+    skillId: Number(skill.skillId),
+    nameCn: skill.nameCn ?? null,
+    desc: skill.desc ?? null,
+    iconPath: skill.iconPath ?? null,
+    displayType: skill.displayType ?? null,
+    cooldown: skill.cooldown ?? null,
+    range: skill.range ?? null,
+    areaOrTarget: skill.areaOrTarget ?? null,
+  };
 }
 
 function projectJobBranches(jobTree: Stage6JobTree | null | undefined) {
@@ -142,6 +201,47 @@ function projectStage6Shard(shard: Stage6HeroShard) {
   const soldierIds = Array.isArray(shard.soldiers?.ids) ? shard.soldiers.ids : [];
   const skins = Array.isArray(shard.presentation?.skins) ? shard.presentation.skins : [];
   const reviewCodes = Array.isArray(validation.reviewCodes) ? validation.reviewCodes : [];
+  const jobLevelAcquisitions = Array.isArray(shard.normal?.skills?.jobLevelAcquisitions)
+    ? shard.normal.skills.jobLevelAcquisitions
+        .map((row) => {
+          const skill = projectSkill(row.skill);
+          if (!skill) return null;
+          return {
+            acquisitionOrder: row.acquisitionOrder ?? null,
+            skillId: row.skillId ?? skill.skillId,
+            skill,
+            jobConnectionId: row.jobConnectionId ?? null,
+            jobId: row.jobId ?? null,
+            jobNameCn: row.jobNameCn ?? null,
+            jobNameEn: row.jobNameEn ?? null,
+            connectionDepth: row.connectionDepth ?? null,
+            connectionOrder: row.connectionOrder ?? null,
+            jobLevelId: row.jobLevelId ?? null,
+            jobLevelSequence: row.jobLevelSequence ?? null,
+            rankCode: row.rankCode ?? null,
+            jobLevelUpHeroLevel: row.jobLevelUpHeroLevel ?? null,
+          };
+        })
+        .filter((row): row is NonNullable<typeof row> => row !== null)
+    : [];
+  const heroDirectSkills = Array.isArray(shard.normal?.skills?.heroDirectSkills)
+    ? shard.normal.skills.heroDirectSkills
+        .map(projectSkill)
+        .filter((skill): skill is NonNullable<typeof skill> => skill !== null)
+    : [];
+  const talentProgression = Array.isArray(shard.normal?.talent?.starProgression)
+    ? shard.normal.talent.starProgression
+        .map((row) => {
+          const skill = projectSkill(row.skill);
+          if (!skill || !Number.isInteger(row.star)) return null;
+          return {
+            star: Number(row.star),
+            skillId: row.skillId ?? skill.skillId,
+            skill,
+          };
+        })
+        .filter((row): row is NonNullable<typeof row> => row !== null)
+    : [];
 
   return {
     identity: {
@@ -158,6 +258,16 @@ function projectStage6Shard(shard: Stage6HeroShard) {
     base: {
       initialStar: shard.normal?.heroMeta?.initialStar ?? null,
       rank: shard.normal?.heroMeta?.rank ?? null,
+    },
+    talent: {
+      status: shard.normal?.talent?.status ?? null,
+      selectionRule: shard.normal?.talent?.selectionRule ?? null,
+      initialStar: shard.normal?.talent?.initialStar ?? null,
+      starProgression: talentProgression,
+    },
+    skills: {
+      heroDirectSkills,
+      jobLevelAcquisitions,
     },
     jobs: {
       branchCount: branches.length,
