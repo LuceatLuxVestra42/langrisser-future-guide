@@ -1,0 +1,75 @@
+name: Project Doctor Skin Assets Admission V4
+
+on:
+  push:
+    branches:
+      - work/skin-stage3-3-bulk-plan
+    paths:
+      - '.github/workflows/project-doctor-skin-assets-admission-v4.yml'
+      - 'package.json'
+      - 'scripts/validate-skin-assets-final.mjs'
+      - 'scripts/validate-project-doctor-d2-impact-v4.mjs'
+      - 'scripts/validate-project-doctor-d3-v4.mjs'
+      - 'scripts/run-project-doctor-d4-v4.mjs'
+      - 'scripts/validate-project-doctor-d4-v4.mjs'
+      - 'scripts/validate-project-doctor-d7-v4.mjs'
+      - 'scripts/run-project-doctor-closeout.mjs'
+      - 'data/contracts/project-doctor-d2-impact-contract.v4.json'
+      - 'data/contracts/project-doctor-d3-validator-plan.v4.json'
+      - 'data/contracts/project-doctor-d4-execution.v4.json'
+      - 'data/contracts/project-doctor-d7-pr-guard.v4.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  admission-self-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate deterministic Skin final owner
+        run: npm run validate:skin-assets-final
+
+      - name: Validate Project Doctor V4 impact map
+        run: npm run doctor:impact:validate
+
+      - name: Validate Project Doctor V4 plan
+        run: npm run doctor:plan:validate
+
+      - name: Validate Project Doctor V4 execution fixtures
+        run: npm run doctor:run:validate
+
+      - name: Validate Project Doctor V4 PR guard contract
+        run: npm run doctor:pr-guard:validate
+
+      - name: Prove representative Skin asset planning is no longer manual
+        run: |
+          set -euo pipefail
+          node scripts/plan-project-doctor-d3.mjs \
+            --contract data/contracts/project-doctor-d3-validator-plan.v4.json \
+            --paths public/images/skins/1401.png \
+            --json > /tmp/skin-plan.json
+          node <<'NODE'
+          const fs = require('fs');
+          const plan = JSON.parse(fs.readFileSync('/tmp/skin-plan.json','utf8'));
+          if (plan.status !== 'PLAN_READY') throw new Error(`Skin representative plan status: ${plan.status}`);
+          if (!plan.selectedChecks.some(row => row.id === 'skin-assets-final')) throw new Error('skin-assets-final was not selected');
+          if (plan.manualReviews.some(row => row.node === 'skin-assets')) throw new Error('skin-assets remains manual');
+          console.log('PASS: representative skin-assets path selects skin-assets-final with no skin manual review');
+          NODE
