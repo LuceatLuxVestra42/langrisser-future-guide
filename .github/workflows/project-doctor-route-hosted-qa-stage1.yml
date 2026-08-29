@@ -36,9 +36,7 @@ jobs:
       - name: Probe current deployed GitHub Pages
         id: live_probe
         continue-on-error: true
-        env:
-          GITHUB_SHA: ''
-        run: npm run qa:hosted -- --probe-current --output route-hosted-qa-stage1-live.json
+        run: env -u GITHUB_SHA npm run qa:hosted -- --probe-current --output route-hosted-qa-stage1-live.json
 
       - name: Publish live probe summary
         if: always()
