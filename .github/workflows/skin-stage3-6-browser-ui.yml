@@ -25,6 +25,7 @@ concurrency:
   group: skin-stage3-6-browser-ui
   cancel-in-progress: false
 
+# Browser/UI is intentionally pinned to the frozen Hosted sourceSha; QA-only workflow commits do not redeploy the site.
 jobs:
   browser-ui-qa:
     runs-on: ubuntu-latest
