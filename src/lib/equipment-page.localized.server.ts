@@ -19,7 +19,8 @@ type EquipmentNameKrProjectionRecord = {
   nameCn: string;
   nameKr: string | null;
   pageReady: boolean;
-  status: EquipmentNameKrPresentationStatus;
+  status: "USER_APPROVED_DISPLAY" | "UNRESOLVED_NON_PUBLIC";
+  nameKrStatus: EquipmentNameKrPresentationStatus;
 };
 
 type EquipmentNameKrProjection = {
@@ -61,7 +62,7 @@ function resolveNameKr(
   const localized = resolveLocalization(equipmentId, nameCn);
   return {
     nameKr: localized.nameKr ?? fallback,
-    status: localized.status,
+    status: localized.nameKrStatus,
   };
 }
 
