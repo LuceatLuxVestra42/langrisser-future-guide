@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-frontend-localization/v1",
+  "date": "2026-08-29",
+  "stage": "FRONTEND_CONSUMER_INTEGRATION",
+  "status": "BUILD_PASS_HOSTED_PENDING",
+  "scope": {
+    "target": "normal Tier3 and SP Soldier unique-skill final descriptions",
+    "targetCount": 185,
+    "lowerTierBehaviorPreserved": true,
+    "canonicalSoldierDataReopened": false
+  },
+  "inputs": {
+    "authoringConsumer": "data/generated/soldier-unique-skill-kr-final.v1.json",
+    "publicProjection": "public/data/soldier-unique-skill-kr.v1.json",
+    "richDetail": "public/data/soldier-detail-stage5-6.v1.json"
+  },
+  "implementation": {
+    "generator": "scripts/build-soldier-unique-skill-kr-presentation.mjs",
+    "component": "src/components/soldier-detail-modal.tsx",
+    "joinKey": "soldierId",
+    "publicProjectionCount": 185,
+    "runtimeNameJoin": false,
+    "canonicalChineseFallbackForTarget": false,
+    "skillLoadStateSeparatedFromRichDetailLoadState": true,
+    "normalTier3UsesKoreanProjection": true,
+    "spUsesKoreanProjection": true,
+    "lowerTierUsesExistingRichDetailBehavior": true
+  },
+  "buildGate": {
+    "status": "PASS",
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33224438352,
+    "jobId": 99025150355,
+    "conclusion": "SUCCESS",
+    "observedGeneratorSummary": "records=185 pass=109 review=76 missing=0 extra=0 public=185",
+    "productionBuild": "SUCCESS"
+  },
+  "reviewBoundary": {
+    "reviewCount": 76,
+    "reviewItemsAreMissingTranslations": false,
+    "reviewItemsBlockFrontendProjection": false,
+    "reviewResolutionRequiredBeforeTranslationCloseout": true
+  },
+  "hostedQa": {
+    "status": "PENDING",
+    "reason": "Build Gate passed. Hosted-browser verification must use an actually deployed static environment according to the project QA rules; no hosted runtime result is claimed by this checkpoint."
+  },
+  "completion": {
+    "frontendConsumerIntegrated": true,
+    "buildGateComplete": true,
+    "hostedQaComplete": false
+  },
+  "nextStep": "Run Hosted QA on a deployed preview or GitHub Pages environment, then continue evidence-based resolution of the 76 review items without reopening canonical Soldier data."
+}
