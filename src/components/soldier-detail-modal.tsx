@@ -62,6 +62,27 @@ type SoldierRichSource = {
   records: SoldierRichRecord[];
 };
 
+type SoldierSkillKrRecord = {
+  descriptionKr: string;
+  translationStatus: string;
+};
+
+type SoldierSkillKrSource = {
+  schemaId: string;
+  status: string;
+  counts: {
+    records: number;
+    pass: number;
+    review: number;
+  };
+  policy: {
+    joinKey: string;
+    runtimeNameJoin: boolean;
+    canonicalChineseFallbackForTarget: boolean;
+  };
+  bySoldierId: Record<string, SoldierSkillKrRecord>;
+};
+
 type LoadState = "loading" | "ready" | "error";
 
 type ArmyMeta = {
@@ -83,6 +104,7 @@ const ARMY_META = new Map<string, ArmyMeta>([
 ]);
 
 let soldierRichSourcePromise: Promise<SoldierRichSource> | null = null;
+let soldierSkillKrSourcePromise: Promise<SoldierSkillKrSource> | null = null;
 
 function loadSoldierRichSource() {
   if (!soldierRichSourcePromise) {
@@ -97,10 +119,38 @@ function loadSoldierRichSource() {
   return soldierRichSourcePromise;
 }
 
+function loadSoldierSkillKrSource() {
+  if (!soldierSkillKrSourcePromise) {
+    const url = `${import.meta.env.BASE_URL}data/soldier-unique-skill-kr.v1.json`;
+    soldierSkillKrSourcePromise = fetch(url).then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Soldier Korean skill data request failed: ${response.status}`);
+      }
+
+      const source = (await response.json()) as SoldierSkillKrSource;
+      if (
+        source.schemaId !== "soldier-unique-skill-kr-public/v1" ||
+        source.counts?.records !== 185 ||
+        source.policy?.joinKey !== "soldierId" ||
+        source.policy?.runtimeNameJoin !== false ||
+        source.policy?.canonicalChineseFallbackForTarget !== false ||
+        Object.keys(source.bySoldierId ?? {}).length !== 185
+      ) {
+        throw new Error("Soldier Korean skill presentation contract mismatch.");
+      }
+      return source;
+    });
+  }
+  return soldierSkillKrSourcePromise;
+}
+
 export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord }) {
   const [detail, setDetail] = useState<SoldierRichRecord | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("loading");
+  const [skillKr, setSkillKr] = useState<SoldierSkillKrRecord | null>(null);
+  const [skillLoadState, setSkillLoadState] = useState<LoadState>("loading");
   const displayName = record.nameKr ?? record.nameCn;
+  const requiresLocalizedSkill = record.isSp || record.tier === 3;
 
   useEffect(() => {
     let active = true;
@@ -124,19 +174,47 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
     };
   }, [record.soldierId]);
 
-  const abilityEffect = useMemo(() => {
-    if (!detail) return null;
+  useEffect(() => {
+    let active = true;
+    setSkillKr(null);
 
-    if (record.isSp) {
-      return detail.sp?.finalDescription ?? null;
+    if (!requiresLocalizedSkill) {
+      setSkillLoadState("ready");
+      return () => {
+        active = false;
+      };
     }
+
+    setSkillLoadState("loading");
+    loadSoldierSkillKrSource()
+      .then((source) => {
+        if (!active) return;
+        const matched = source.bySoldierId[String(record.soldierId)] ?? null;
+        setSkillKr(matched);
+        setSkillLoadState(matched ? "ready" : "error");
+      })
+      .catch(() => {
+        if (!active) return;
+        setSkillKr(null);
+        setSkillLoadState("error");
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [record.soldierId, requiresLocalizedSkill]);
+
+  const abilityEffect = useMemo(() => {
+    if (skillKr) return skillKr.descriptionKr;
+    if (requiresLocalizedSkill || !detail) return null;
 
     return (
       detail.ability.levels.find((level) => level.level === 10)?.description ??
       detail.ability.finalDescription
     );
-  }, [detail, record.isSp]);
+  }, [detail, requiresLocalizedSkill, skillKr]);
 
+  const abilityLoadState = requiresLocalizedSkill ? skillLoadState : loadState;
   const abilityTitle = record.isSp ? "SP 고유기" : "10레벨 효과";
 
   return (
@@ -155,9 +233,9 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
             <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-background p-3 sm:h-full sm:p-4">
               <p className="shrink-0 text-sm font-black text-foreground">{abilityTitle}</p>
               <div className="mt-2 min-h-0 flex-1 overflow-y-auto pr-1 text-sm leading-6 text-foreground sm:mt-3">
-                {loadState === "loading" ? (
+                {abilityLoadState === "loading" ? (
                   <LoadingText />
-                ) : loadState === "error" ? (
+                ) : abilityLoadState === "error" ? (
                   <p className="text-muted-foreground">{abilityTitle} 데이터를 불러오지 못했어.</p>
                 ) : abilityEffect ? (
                   <ConfigText text={abilityEffect} />
