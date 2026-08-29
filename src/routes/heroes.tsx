@@ -343,7 +343,7 @@ function HeroGridCard({
               data-hero-fusion-power-mark="true"
               data-hero-id={hero.heroId}
               data-target-faction-id={fusionPower?.targetFactionId}
-              className="absolute right-1 top-1 block h-7 w-7 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] sm:h-8 sm:w-8"
+              className="absolute right-1.5 top-1.5 block h-[36px] w-[36px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] sm:h-[42px] sm:w-[42px]"
               title={`초절강화: ${factionName}`}
               aria-label={`초절강화 진영: ${factionName}`}
             >
