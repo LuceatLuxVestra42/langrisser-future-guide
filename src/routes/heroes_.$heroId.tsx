@@ -21,7 +21,7 @@ import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 
-export const Route = createFileRoute("/heroes/$heroId")({
+export const Route = createFileRoute("/heroes_/$heroId")({
   loader: async ({ params }) => {
     if (!/^\d+$/.test(params.heroId)) throw notFound();
     const heroId = Number(params.heroId);

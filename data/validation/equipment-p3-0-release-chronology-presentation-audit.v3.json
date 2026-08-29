@@ -1,0 +1,78 @@
+{
+  "version": 3,
+  "stage": "Equipment P3-0 Release Chronology Evidence Audit",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "EQUIPMENT_P3_0_CHRONOLOGY_MEMBERSHIP_SPLIT_FROZEN",
+  "supersedesActiveInterpretation": "data/validation/equipment-p3-0-release-chronology-presentation-audit.v2.json",
+  "historicalV1V2Preserved": true,
+  "predecessor": {
+    "p3_0_v2": "data/validation/equipment-p3-0-release-chronology-presentation-audit.v2.json",
+    "publicAdmissionCorrection": "data/presentation/equipment-public-admission-correction.v1.json",
+    "displayCollection": "data/presentation/equipment-display-collection.v1.json"
+  },
+  "changeReason": {
+    "type": "CONCRETE_PRESENTATION_REGRESSION_CORRECTION",
+    "receivedDate": "2026-08-30",
+    "summary": "The frozen technical current-additional/siteTab 3 population was incorrectly promoted to the user-facing 장비패스 collection. The chronology evidence remains valid, while public admission and display membership are corrected in their owning downstream layers."
+  },
+  "chronologyEvidenceDisposition": {
+    "v2ReleaseEvidenceChanged": false,
+    "releaseDatesRecomputed": false,
+    "identityContinuityReopened": false,
+    "technicalTargetCount": 32,
+    "releaseDateResolved": 32,
+    "releaseDateUnresolved": 0,
+    "primaryOfficialForge": 24,
+    "primaryDateWithUserIdentityContinuity": 4,
+    "secondaryArchive": 4
+  },
+  "classificationCorrection": {
+    "technicalPopulation": "CURRENT_ADDITIONAL_SITE_TAB_3",
+    "technicalPopulationCount": 32,
+    "technicalMeaningChanged": false,
+    "chronologyDefinesDisplayMembership": false,
+    "displayMembershipSource": "data/presentation/equipment-display-collection.v1.json",
+    "semanticStageReopened": false
+  },
+  "populationPartition": {
+    "publicExcludedTechnicalSiteTab3": {
+      "equipmentIds": [265, 266, 267, 268],
+      "count": 4,
+      "reason": "IMPLEMENTATION_EXCLUDED_DUPLICATE"
+    },
+    "publicCurrentAdditionalNonPass": {
+      "equipmentIds": [299, 400, 401, 402],
+      "count": 4,
+      "displayCollection": "previousAdditional"
+    },
+    "publicEquipmentPass": {
+      "equipmentIds": [
+        599, 600, 601, 602,
+        607, 608, 609, 610,
+        615, 616, 617, 618,
+        623, 624, 625, 626,
+        630, 631, 632, 633,
+        639, 640, 641, 642
+      ],
+      "count": 24,
+      "membershipMode": "EXPLICIT_EQUIPMENT_ID"
+    }
+  },
+  "nonChronologyPublicExclusions": {
+    "equipmentIds": [288, 289, 290, 291],
+    "technicalSiteTab": 2,
+    "note": "These four implementation-excluded historical duplicate records are outside the 32-record technical current-additional chronology population and therefore are not used to balance that partition."
+  },
+  "invariants": [
+    "32 = 4 public-excluded technical siteTab 3 + 4 public non-Pass technical siteTab 3 + 24 explicit Equipment Pass",
+    "releaseGroupDate, releaseFamily, sourceId, and technical siteTab do not imply Equipment Pass membership",
+    "the 2019 identity-continuity evidence for Equipment 299/400/401/402 remains valid chronology evidence without making those records Equipment Pass",
+    "Equipment 265-268 may retain chronology evidence while being excluded from public admission"
+  ],
+  "review": [
+    "Equipment 265-268 retain SECONDARY_ARCHIVE_COPY provenance until a primary official archive is found; their 2019-02-07 date remains usable for chronology.",
+    "Individual order inside one shared releaseGroupDate is not asserted."
+  ],
+  "blockers": [],
+  "nextStage": "Equipment P3-1 Release Chronology Metadata V2"
+}

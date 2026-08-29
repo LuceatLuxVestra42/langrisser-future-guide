@@ -26,7 +26,7 @@
     "UNKNOWN": 0
   },
   "knownHardErrorTotal": 0,
-  "reviewTotal": 31,
+  "reviewTotal": 29,
   "blockerTotal": 1,
   "domains": [
     {
@@ -103,20 +103,56 @@
       "freezeState": "FINAL_FROZEN",
       "population": {
         "canonical": 390,
-        "public": 373,
-        "general": 206,
-        "exclusive": 167
+        "public": 365,
+        "general": 198,
+        "exclusive": 167,
+        "admissionStatus": "FROZEN",
+        "admissionGeneral": 198,
+        "admissionExcluded": 8,
+        "displayStatus": "FROZEN",
+        "displayInitial": 94,
+        "displayPreviousAdditional": 80,
+        "displayPass": 24,
+        "displayTotal": 198,
+        "chronologyAuditStatus": "PASS_WITH_REVIEW",
+        "chronologyAuditMembership": false,
+        "chronologyContractStatus": "FROZEN",
+        "chronologyTechnicalTarget": 32,
+        "chronologyPublicCount": 28,
+        "chronologyPassCount": 24,
+        "chronologyContractMembership": false
       },
       "hardErrorCount": 0,
-      "reviewCount": 3,
+      "reviewCount": 1,
       "blockerCount": 0,
-      "activeSource": "data/validation/equipment-stage4-final.v1.json",
-      "supplementalSources": [],
+      "activeSource": "data/validation/equipment-public-presentation-correction-final.v1.json",
+      "supplementalSources": [
+        {
+          "path": "data/presentation/equipment-public-admission-correction.v1.json",
+          "role": "CURRENT_EQUIPMENT_PUBLIC_ADMISSION_CORRECTION",
+          "facet": "admission"
+        },
+        {
+          "path": "data/presentation/equipment-display-collection.v1.json",
+          "role": "CURRENT_EQUIPMENT_DISPLAY_COLLECTION",
+          "facet": "presentation"
+        },
+        {
+          "path": "data/validation/equipment-p3-0-release-chronology-presentation-audit.v3.json",
+          "role": "CURRENT_EQUIPMENT_P3_CHRONOLOGY_AUDIT",
+          "facet": "presentation"
+        },
+        {
+          "path": "data/presentation/equipment-p3-1-release-metadata.v2.json",
+          "role": "CURRENT_EQUIPMENT_P3_CHRONOLOGY_CONTRACT",
+          "facet": "presentation"
+        }
+      ],
       "nextWork": [
         {
-          "source": "data/validation/equipment-stage4-final.v1.json",
+          "source": "data/validation/equipment-public-presentation-correction-final.v1.json",
           "selector": "/nextStartPoint",
-          "value": "PC-first review and UI polish follow-up. Equipment Stage 4 and Equipment Image Stage 3 are frozen; do not reopen Stage 2/3 semantics or Stage B ownership unless a concrete regression contradicts a frozen checkpoint."
+          "value": "Promote this checkpoint as the Equipment Project Doctor active source with corrected expected population 390/365/198/167, then run Project Doctor frontend Preflight."
         }
       ]
     },
