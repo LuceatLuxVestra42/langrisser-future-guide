@@ -1,0 +1,36 @@
+import fs from 'node:fs';
+const C='data/contracts/project-doctor-d7-pr-guard.v5.json',W='.github/workflows/project-doctor-d7-pr-guard.yml',P='package.json',R='scripts/run-project-doctor-closeout.mjs';
+const read=p=>JSON.parse(fs.readFileSync(p,'utf8')),text=p=>fs.readFileSync(p,'utf8'),same=(a=[],b=[])=>JSON.stringify([...a].sort())===JSON.stringify([...b].sort());
+const c=read(C),w=text(W),pkg=read(P),close=text(R),d2=read(c.doctorRuntime.d2Contract),d3=read(c.doctorRuntime.d3Contract),d4=read(c.doctorRuntime.d4Contract);
+const f=[];let n=0;const check=(ok,id)=>{n++;if(!ok)f.push(id)};
+check(c.schemaId==='project-doctor-d7-pr-guard/v5'&&c.status==='DESIGN_FROZEN','CONTRACT');
+check(c.supersedes==='data/contracts/project-doctor-d7-pr-guard.v4.json','SUPERSEDES');
+check(c.targetBaseBranch==='main','BASE');check(c.permissions?.contents==='read','READ_ONLY');
+check(c.changedFilePolicy?.manualReviewMustFailWorkflow===true&&c.changedFilePolicy?.manualReviewExitCode===3,'FAIL_CLOSED');
+check(c.securityPolicy?.freshnessRefreshInWorkflow===false,'NO_RESEAL');
+check(/^name:\s*Project Doctor PR Guard\s*$/m.test(w),'WORKFLOW_NAME');
+check(/\bpull_request:\s*\n/.test(w)&&!/\bpull_request_target:\s*\n/.test(w),'SAFE_EVENT');
+check(/permissions:\s*\n\s*contents:\s*read/m.test(w)&&!/contents:\s*write/.test(w),'WORKFLOW_PERMISSIONS');
+check(w.includes('github.event.pull_request.base.ref')&&w.includes('github.event.pull_request.head.sha'),'REAL_DIFF');
+check(!w.includes('doctor:freshness:refresh'),'NO_WORKFLOW_RESEAL');
+check(d2.schemaId==='project-doctor-d2-impact-contract/v5','D2_V5');check(d3.schemaId==='project-doctor-d3-validator-plan/v5','D3_V5');check(d4.schemaId==='project-doctor-d4-execution/v5','D4_V5');
+const hero=d2.pathRuleOverlays.find(x=>x.id==='hero-artwork-final-owner');const skin=d2.pathRuleOverlays.find(x=>x.id==='skin-assets-final-owner');
+check(hero?.changeClass==='asset-pipeline'&&same(hero.directNodes,['hero-assets']),'HERO_D2');check(skin?.changeClass==='asset-pipeline'&&same(skin.directNodes,['skin-assets']),'SKIN_D2');
+const owners=(d3.admittedOwners??[]).map(x=>x.node);check(owners.length===12&&owners.includes('hero-assets')&&owners.includes('skin-assets'),'OWNER_SET');
+check(same(Object.keys(d3.manualReviewNodes??{}),['banner-assets']),'MANUAL_BOUNDARY');
+for(const [id,node,alias] of [['hero-artwork-final','hero-assets','validate:hero-artwork-final'],['skin-assets-final','skin-assets','validate:skin-assets-final']]){
+  const row=d3.checkCatalog.find(x=>x.id===id);check(row?.phase===3&&row?.triggerNodes?.includes(node)&&row.command===`npm run ${alias}`,`CATALOG_${id}`);check(Boolean(pkg.scripts?.[alias]),`ALIAS_${alias}`);check(d4.allowedCheckIds.includes(id),`D4_${id}`);
+}
+check(pkg.scripts?.['doctor:impact']==='node scripts/analyze-project-doctor-d2-impact.mjs --contract data/contracts/project-doctor-d2-impact-contract.v5.json','IMPACT_V5');
+check(pkg.scripts?.['doctor:impact:validate']==='node scripts/validate-project-doctor-d2-impact-v5.mjs','IMPACT_TEST_V5');
+check(pkg.scripts?.['doctor:plan']==='node scripts/plan-project-doctor-d3.mjs --contract data/contracts/project-doctor-d3-validator-plan.v5.json','PLAN_V5');
+check(pkg.scripts?.['doctor:plan:validate']==='node scripts/validate-project-doctor-d3-v5.mjs','PLAN_TEST_V5');
+check(pkg.scripts?.['doctor:run']==='node scripts/run-project-doctor-d4-v5.mjs','RUN_V5');
+check(pkg.scripts?.['doctor:run:validate']==='node scripts/validate-project-doctor-d4-v5.mjs','RUN_TEST_V5');
+check(pkg.scripts?.['doctor:pr-guard:validate']==='node scripts/validate-project-doctor-d7-v5.mjs','D7_V5');
+check(close.includes("script: 'scripts/validate-project-doctor-d4-v5.mjs'")&&close.includes("script: 'scripts/run-project-doctor-d4-v5.mjs'"),'CLOSEOUT_V5');
+const s=c.skinAssetFinalOwnerAdmission;check(s.ownerCountAfterAdmission===12&&same(s.remainingManualNodes,['banner-assets']),'SKIN_OWNER_COUNT');
+check(s.canonicalSkinCount===540&&s.canonicalHeroCount===267&&s.publicSkinPngCount===540&&s.verifiedPublicHashCount===540,'SKIN_POPULATION');
+check(s.browserUi==='PASS_SKIN_STAGE3_6_BROWSER_UI'&&s.semanticStageReopened===false&&s.sourceOrderRecomputed===false,'SKIN_BOUNDARIES');
+check(c.boundaries?.heroAssetsPromoted===true&&c.boundaries?.skinAssetsPromoted===true&&c.boundaries?.bannerAssetsPromoted===false,'PROMOTION_SCOPE');
+const out={version:5,schemaId:'project-doctor-d7-validation-result/v5',status:f.length?'FAIL_PROJECT_DOCTOR_D7_GUARD_V5':'PASS_PROJECT_DOCTOR_D7_GUARD_V5',exitCode:f.length?1:0,checkCount:n,failureCount:f.length,failures:f};console.log(JSON.stringify(out,null,2));process.exitCode=out.exitCode;
