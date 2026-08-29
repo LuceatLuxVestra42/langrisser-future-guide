@@ -1,0 +1,65 @@
+name: Hero CardHead Frontend
+
+on:
+  push:
+    branches:
+      - work/hero-cardhead-assets-20260830
+    paths:
+      - .github/workflows/hero-cardhead-frontend.yml
+      - scripts/apply-hero-cardhead-frontend.py
+      - public/images/heroes/card-head/**
+      - data/generated/hero-cardhead-web-assets.v1.json
+      - data/validation/hero-cardhead-materialization.v1.json
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Apply Hero CardHead consumer
+        run: python3 scripts/apply-hero-cardhead-frontend.py
+      - name: Validate CardHead materialization contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find public/images/heroes/card-head -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '267'
+          node - <<'NODE'
+          const fs = require('fs');
+          const v = JSON.parse(fs.readFileSync('data/validation/hero-cardhead-materialization.v1.json','utf8'));
+          if (v.status !== 'PASS_HERO_CARDHEAD_MATERIALIZATION' || v.materializedCount !== 267 || v.fileCount !== 267 || v.distinctSourcePathCount !== 267 || v.distinctSpriteIdentityCount !== 267 || v.semanticStageReopened !== false) {
+            throw new Error(`CardHead validation mismatch: ${JSON.stringify(v)}`);
+          }
+          NODE
+          grep -Fq '/images/heroes/card-head/${hero.heroId}.png' src/routes/heroes.tsx
+          ! grep -q 'hero.card.webAssetPath' src/routes/heroes.tsx
+          ! grep -q 'SAMPLE_HERO_CARD_PATHS' src/routes/heroes.tsx
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+      - name: Production build
+        run: bun run build
+      - name: TypeScript gate
+        run: bunx tsc --noEmit
+      - name: Commit frontend consumer
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routes/heroes.tsx
+          if git diff --cached --quiet; then
+            echo "No frontend changes."
+          else
+            git commit -m "Use exact Hero CardHead icons in list"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
