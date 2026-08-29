@@ -1,0 +1,45 @@
+{
+  "status": "PASS_HERO_TALENT_SKILLS_HOSTED_BROWSER_QA",
+  "validatedAt": "2026-08-29",
+  "productionMainSha": "30f19aab6215301b3f110f1890495564fda725d8",
+  "qaSourceSha": "fd2cdfc9c746094840b09c700a95cc6714308bf5",
+  "ghPagesDeploymentSha": "b228901d8309c8245337e7eea8478148bcdc4ee8",
+  "workflowRunId": 33241098891,
+  "workflowJobId": 99070468277,
+  "hostedBase": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+  "fixtureHeroId": 6,
+  "checks": {
+    "hostedRoutes": {
+      "heroes": 200,
+      "heroDetail6": 200,
+      "heroArtwork6": 200
+    },
+    "desktop": {
+      "talentCards": 6,
+      "skillCards": 9,
+      "directSkillGroup": true,
+      "jobSkillGroup": true,
+      "directSkillSample": "突击",
+      "jobSkillSample": "帝国冲锋",
+      "rawConfigColorMarkupAbsent": true,
+      "pageErrors": []
+    },
+    "mobile": {
+      "horizontalOverflow": 0,
+      "pageErrors": []
+    },
+    "summary": {
+      "checkCount": 14,
+      "passed": 14,
+      "failed": 0
+    }
+  },
+  "failureResolution": {
+    "owningLayer": "QA_SELECTOR",
+    "semanticDataChanged": false,
+    "productionCodeChanged": false,
+    "cause": "The explanatory paragraph and the group heading both contained the same group label, while the validator required a non-exact text locator count of exactly one.",
+    "fix": "Use exact text matching for the two skill group heading assertions."
+  },
+  "semanticRecomputationPerformed": false
+}
