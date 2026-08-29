@@ -51,38 +51,43 @@ function HeroDetailPage() {
           <ArrowLeft className="h-4 w-4" aria-hidden="true" /> 영웅 목록
         </Link>
 
-        <section className="mt-5 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <div className="grid gap-0 md:grid-cols-[220px_minmax(0,1fr)]">
-            <div className="aspect-[4/5] bg-muted/40 md:aspect-auto md:min-h-[275px]">
+        <section className="mt-5 overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+          <div className="grid lg:grid-cols-[minmax(300px,0.82fr)_minmax(0,1.18fr)]">
+            <div className="relative min-h-[420px] overflow-hidden border-b border-border bg-muted/25 sm:min-h-[520px] lg:min-h-[620px] lg:border-b-0 lg:border-r">
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
               {imageUrl ? (
-                <img src={imageUrl} alt="" className="h-full w-full object-cover object-top" />
+                <img src={imageUrl} alt={`${displayName} 대표 일러스트`} className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6" />
               ) : (
-                <div className="flex h-full min-h-[250px] flex-col items-center justify-center gap-3 text-muted-foreground">
-                  <UserRound className="h-16 w-16" strokeWidth={1.15} aria-hidden="true" />
+                <div className="flex h-full min-h-[420px] flex-col items-center justify-center gap-3 text-muted-foreground">
+                  <UserRound className="h-20 w-20" strokeWidth={1.05} aria-hidden="true" />
                   <span className="inline-flex items-center gap-1 text-xs font-semibold"><ImageOff className="h-3.5 w-3.5" aria-hidden="true" />이미지 연결 대기</span>
                 </div>
               )}
+              <div className="absolute bottom-4 left-4 z-20 flex flex-wrap gap-2 sm:bottom-5 sm:left-5">
+                <span className="rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur">{hero.rarity.baseLabel}</span>
+                {detail.systems.spReleased ? <span className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur"><Sparkles className="h-3.5 w-3.5" aria-hidden="true" />SP</span> : null}
+              </div>
             </div>
 
-            <div className="p-5 sm:p-7">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-md bg-foreground px-2 py-1 text-xs font-bold text-background">{hero.rarity.baseLabel}</span>
-                {detail.systems.spReleased ? (
-                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-xs font-bold text-foreground"><Sparkles className="h-3.5 w-3.5" aria-hidden="true" />SP</span>
-                ) : null}
-              </div>
-              <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{displayName}</h1>
-              <div className="mt-2 space-y-0.5 text-sm text-muted-foreground">
-                <p>중문명 {hero.identity.nameCn}</p>
-                {hero.identity.nameEn ? <p>영문명 {hero.identity.nameEn}</p> : null}
-                <p>Hero ID {hero.heroId}</p>
+            <div className="flex min-w-0 flex-col justify-center p-5 sm:p-8 lg:p-10">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Hero #{hero.heroId}</p>
+              <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{displayName}</h1>
+              <div className="mt-3 space-y-0.5 text-sm text-muted-foreground">
+                <p>{hero.identity.nameCn}</p>
+                {hero.identity.nameEn ? <p>{hero.identity.nameEn}</p> : null}
               </div>
 
-              <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="mt-7 grid gap-3 sm:grid-cols-2">
                 <InfoBlock title="진영"><div className="flex flex-wrap gap-1.5">{hero.factions.map((faction) => <span key={faction.factionId} className="rounded-md border border-border bg-background px-2 py-1 text-xs font-semibold text-foreground">{faction.nameKr ?? faction.nameCn}</span>)}</div></InfoBlock>
                 <InfoBlock title="출전작"><p className="font-semibold text-foreground">{hero.origin.nameKr ?? hero.origin.nameCn}</p><p className="mt-1 text-xs text-muted-foreground">{hero.origin.category}</p></InfoBlock>
                 <InfoBlock title="기본 정보"><p className="font-semibold text-foreground">초기 별 {detail.base.initialStar ?? "-"}</p><p className="mt-1 text-xs text-muted-foreground">등급 코드 {detail.base.rank ?? "-"}</p></InfoBlock>
                 <InfoBlock title="성우"><p className="font-semibold text-foreground">{detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-"}</p><p className="mt-1 text-xs text-muted-foreground">{detail.presentation.cvState ?? "-"}</p></InfoBlock>
+              </div>
+
+              <div className="mt-5 flex flex-wrap gap-2 text-xs">
+                <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">직업 분기 {detail.jobs.branchCount}</span>
+                <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">용병 {detail.soldiers.count}</span>
+                <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">스킨 {detail.presentation.skinCount}</span>
               </div>
             </div>
           </div>
