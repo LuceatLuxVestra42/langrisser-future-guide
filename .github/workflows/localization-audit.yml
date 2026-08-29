@@ -25,6 +25,10 @@ jobs:
       - name: Verify frozen localization audit and emit machine report
         run: npm run audit:localization -- --check --report "$RUNNER_TEMP/localization-audit-stage5-report.json"
 
+      - name: Emit Stage 4 diagnostic JSON
+        if: always()
+        run: node scripts/audit-localization-stage4.mjs --json || true
+
       - name: Run localization audit self-tests
         run: npm run audit:localization -- --self-test
 
