@@ -1,5 +1,6 @@
 import soldierCombatJson from "../../data/generated/soldier-detail-stage5-2.v1.json";
 import soldierListJson from "../../data/generated/soldier-list-stage5-8.v1.json";
+import soldierConfirmedNameCorrectionsJson from "../../data/presentation/soldier-confirmed-name-corrections.v1.json";
 import soldierLowerTierNameKrJson from "../../data/presentation/soldier-lower-tier-name-kr.v1.json";
 import soldierT3ProvisionalNameKrJson from "../../data/presentation/soldier-t3-provisional-name-kr.v1.json";
 
@@ -76,6 +77,17 @@ type SoldierCombatSource = {
   }>;
 };
 
+type SoldierConfirmedNameCorrectionsSource = {
+  status: string;
+  scope: string;
+  records: Array<{
+    soldierId: number;
+    nameCn: string;
+    nameKr: string;
+    nameKrStatus: string;
+  }>;
+};
+
 type SoldierLowerTierNameKrSource = {
   status: string;
   scope: string;
@@ -117,11 +129,41 @@ type SoldierT3ProvisionalNameKrSource = {
 
 const soldierList = soldierListJson as unknown as SoldierListSource;
 const soldierCombat = soldierCombatJson as unknown as SoldierCombatSource;
+const soldierConfirmedNameCorrections = soldierConfirmedNameCorrectionsJson as unknown as SoldierConfirmedNameCorrectionsSource;
 const soldierLowerTierNameKr = soldierLowerTierNameKrJson as unknown as SoldierLowerTierNameKrSource;
 const soldierT3ProvisionalNameKr = soldierT3ProvisionalNameKrJson as unknown as SoldierT3ProvisionalNameKrSource;
 const combatById = new Map(
   soldierCombat.records.map((record) => [record.soldierId, record.combat]),
 );
+
+if (
+  soldierConfirmedNameCorrections.status !== "PASS" ||
+  soldierConfirmedNameCorrections.scope !== "frontend-presentation-only"
+) {
+  throw new Error("Confirmed Korean Soldier name correction source contract mismatch.");
+}
+
+const confirmedNameCorrectionById = new Map(
+  soldierConfirmedNameCorrections.records.map((record) => [record.soldierId, record]),
+);
+
+if (confirmedNameCorrectionById.size !== soldierConfirmedNameCorrections.records.length) {
+  throw new Error("Confirmed Korean Soldier name correction source contains duplicate Soldier IDs.");
+}
+
+for (const correction of soldierConfirmedNameCorrections.records) {
+  const base = soldierList.records.find((record) => record.soldierId === correction.soldierId);
+  if (
+    !base ||
+    base.tier !== 3 ||
+    correction.nameCn !== base.nameCn ||
+    correction.nameKrStatus !== "confirmed" ||
+    base.nameKrStatus !== "confirmed" ||
+    !correction.nameKr.trim()
+  ) {
+    throw new Error(`Confirmed Korean name correction mismatch for Soldier ${correction.soldierId}.`);
+  }
+}
 
 if (
   soldierLowerTierNameKr.status !== "PASS" ||
@@ -243,21 +285,28 @@ export function readSoldierPrototypePageData() {
       throw new Error(`Soldier ${record.soldierId} is missing Stage 5-2 combat data.`);
     }
 
+    const confirmedNameCorrection = confirmedNameCorrectionById.get(record.soldierId);
     const lowerTierNameKr = lowerTierNameKrById.get(record.soldierId);
     const t3ProvisionalNameKr = t3ProvisionalNameKrById.get(record.soldierId);
-    const presentationRecord = lowerTierNameKr
+    const presentationRecord = confirmedNameCorrection
       ? {
           ...record,
-          nameKr: lowerTierNameKr.nameKr,
-          nameKrStatus: "confirmed-presentation",
+          nameKr: confirmedNameCorrection.nameKr,
+          nameKrStatus: "confirmed",
         }
-      : t3ProvisionalNameKr
+      : lowerTierNameKr
         ? {
             ...record,
-            nameKr: t3ProvisionalNameKr.displayNameKr,
-            nameKrStatus: "provisional-display",
+            nameKr: lowerTierNameKr.nameKr,
+            nameKrStatus: "confirmed-presentation",
           }
-        : record;
+        : t3ProvisionalNameKr
+          ? {
+              ...record,
+              nameKr: t3ProvisionalNameKr.displayNameKr,
+              nameKrStatus: "provisional-display",
+            }
+          : record;
 
     return {
       ...presentationRecord,
