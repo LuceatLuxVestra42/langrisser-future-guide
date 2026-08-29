@@ -53,7 +53,6 @@ def imm_xrefs(va):
   outx.append({'codeRaw':raw,'codeVa':text_raw_to_va(raw),'nearestPrologueVa':text_raw_to_va(pro) if pro is not None else None})
   start=pos+1
  return outx
-# Raw offsets frozen from v13 string map. Resolve through PE sections rather than assuming a delta.
 targets={
  'PatchInfoTempName':0x320368,
  'CyPtCryptCpp':0x32053C,
@@ -74,7 +73,6 @@ for name,raw in targets.items():
  rows.append({'target':name,'raw':raw,'rva':rva,'va':va,'xrefs':xs})
  for x in xs:
   if x['nearestPrologueVa']: starts.add(x['nearestPrologueVa'])
-# Keep only small code windows around proven xref-owning functions.
 wins=[]
 for va in sorted(starts):
  raw=va_to_raw(va)
@@ -86,8 +84,11 @@ summary={'status':'CYPTCRYPT_XREFS_MAPPED','imageBase':imagebase,'targets':rows,
 (out/'crypt-function-windows.json').write_text(json.dumps(wins),encoding='utf-8')
 with (out/'crypt-xrefs.txt').open('w',encoding='utf-8') as f:
  for r in rows:
-  f.write(f"[{r['target']}] raw=0x{r['raw']:X} va={(f'0x{r[\"va\"]:08X}' if r['va'] is not None else 'none')} xrefs={len(r['xrefs'])}\n")
-  for x in r['xrefs']: f.write(f"  code=0x{x['codeVa']:08X} prologue={(f'0x{x[\"nearestPrologueVa\"]:08X}' if x['nearestPrologueVa'] else 'none')}\n")
+  va_text='0x{:08X}'.format(r['va']) if r['va'] is not None else 'none'
+  f.write('[{}] raw=0x{:X} va={} xrefs={}\n'.format(r['target'],r['raw'],va_text,len(r['xrefs'])))
+  for x in r['xrefs']:
+   pro_text='0x{:08X}'.format(x['nearestPrologueVa']) if x['nearestPrologueVa'] is not None else 'none'
+   f.write('  code=0x{:08X} prologue={}\n'.format(x['codeVa'],pro_text))
 print(json.dumps({'status':summary['status'],'windowCount':len(wins),'targets':[{'name':r['target'],'xrefs':len(r['xrefs'])} for r in rows]}))
 '@|Set-Content (Join-Path $root 'tracecrypt.py') -Encoding UTF8
 python (Join-Path $root 'tracecrypt.py') $pg $report
