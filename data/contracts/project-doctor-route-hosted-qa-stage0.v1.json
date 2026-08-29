@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "route-hosted-qa-stage0.v1",
+  "stage": "QA-0",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Freeze the Route/Hosted QA scope, hosted repository-base policy, representative route fixtures, and failure boundaries before any HTTP or browser runner implementation.",
+  "toolingNamespace": "project-doctor-route-hosted-qa",
+  "baseline": {
+    "mainCommit": "35d162768f7de2ac766454d0ee1bb7d46f4ebca6",
+    "routeTree": "src/routeTree.gen.ts",
+    "heroFixtureSource": "data/generated/hero-list-stage1.v1.json",
+    "soldierFixtureSource": "data/generated/soldier-list-stage5-8.v1.json",
+    "equipmentFixtureSource": "data/generated/equipment_stage3_3_general_list.json"
+  },
+  "hostedTarget": {
+    "origin": "https://luceatluxvestra42.github.io",
+    "repositoryBase": "/langrisser-future-guide/",
+    "baseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+    "canonicalDirectoryStyle": "TRAILING_SLASH"
+  },
+  "requiredPublicRoutes": ["/", "/banners", "/equipment", "/equipment/exclusive", "/heroes", "/soldiers"],
+  "requiredDetailRoutePatterns": ["/equipment/$equipmentId", "/heroes/$heroId", "/soldiers/$soldierId"],
+  "excludedFromRequiredPublicGate": [
+    {"route": "/equipment-prototype", "reason": "Prototype route exists in the generated route tree but is not part of the required production-surface gate."},
+    {"route": "/soldiers-prototype", "reason": "Prototype route exists in the generated route tree but is not part of the required production-surface gate."}
+  ],
+  "representativeFixtures": {"heroes": [6], "soldiers": [300, 1000, 102, 5621], "equipment": [13]},
+  "hostedGateChecks": [
+    "DEPLOYED_COMMIT_FRESHNESS",
+    "REPOSITORY_BASE_PATH",
+    "PUBLIC_ROUTE_RESOLUTION",
+    "DETAIL_DIRECT_ENTRY",
+    "REFRESH_EQUIVALENT_GET",
+    "TRAILING_SLASH_POLICY",
+    "ASSET_AND_CHUNK_RESOLUTION",
+    "FILENAME_CASE_SENSITIVITY",
+    "ROUTE_TREE_HOSTED_PARITY",
+    "STALE_DEPLOY_OR_CACHE"
+  ],
+  "negativeCases": [
+    {"kind": "UNKNOWN_HERO_ID", "pathTemplate": "/heroes/{invalidId}/", "expected": "NOT_FOUND"},
+    {"kind": "UNKNOWN_SOLDIER_ID", "pathTemplate": "/soldiers/{invalidId}/", "expected": "NOT_FOUND"},
+    {"kind": "UNKNOWN_EQUIPMENT_ID", "pathTemplate": "/equipment/{invalidId}/", "expected": "NOT_FOUND"}
+  ],
+  "stageBoundaries": {
+    "qa0Owns": ["route scope contract", "hosted base contract", "representative fixture contract", "failure classification boundary"],
+    "deferredToQa1": ["actual HTTP requests", "deployed commit freshness resolution", "hosted status-code checks", "hosted asset/chunk crawling"],
+    "deferredToQa2Plus": ["Playwright installation", "hydration and interaction checks", "back/forward navigation", "scroll restoration", "desktop/mobile responsive checks", "touch and keyboard checks", "console and pageerror checks"]
+  },
+  "failureClassification": {
+    "hosted": "DEPLOYMENT_HOSTING_FAIL",
+    "browser": "BROWSER_UI_FAIL",
+    "semanticReopenAllowed": false,
+    "note": "Hosted or Browser/UI failures do not reopen frozen canonical/ConfigData semantics unless a separate semantic or consumer parity validator fails."
+  },
+  "completionCriteria": [
+    "required public routes are present in the generated route tree",
+    "required detail route patterns are present in the generated route tree",
+    "prototype routes are explicitly excluded from the required public gate",
+    "all representative fixture IDs resolve in their frozen frontend consumers",
+    "repository base and trailing-slash policy are explicit",
+    "Hosted and Browser/UI failure boundaries remain separated"
+  ]
+}
