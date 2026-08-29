@@ -2,31 +2,33 @@
   "version": 1,
   "schemaId": "soldier-unique-skill-translation-progress/v1",
   "date": "2026-08-29",
-  "status": "IN_PROGRESS_WITH_REVIEW",
+  "status": "TRANSLATION_COMPLETE_WITH_REVIEW",
   "source": "data/generated/soldier-detail-stage5-3.v1.json",
   "targetCount": 185,
   "progress": {
-    "translatedCount": 145,
-    "passCount": 94,
-    "reviewCount": 51,
-    "remainingCount": 40,
-    "lastCompletedSoldierId": 5308,
-    "nextKnownRecord": 5311,
-    "batchSize": 40
+    "translatedCount": 185,
+    "passCount": 109,
+    "reviewCount": 76,
+    "remainingCount": 0,
+    "lastCompletedSoldierId": 6113,
+    "nextKnownRecord": null,
+    "batchSize": 0
   },
   "translationSources": [
     {"path":"data/presentation/soldier-unique-skill-kr.v1.json","recordCount":50,"range":"through soldierId 403","role":"consolidated-base"},
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch5.v1.json","recordCount":20,"range":"soldierId 410 through 516 with lower tiers skipped","role":"append-only-batch"},
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch6.v1.json","recordCount":20,"range":"soldierId 517 through 644 with lower tiers skipped","role":"append-only-batch"},
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch7.v1.json","recordCount":20,"range":"soldierId 645 through 1031 with lower tiers skipped","role":"append-only-batch"},
-    {"path":"data/checkpoints/soldier-unique-skill-translation-batch8.v1.json","recordCount":35,"range":"soldierId 1032 through 5308 with lower tiers skipped; normal + SP","role":"append-only-batch"}
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch8.v1.json","recordCount":35,"range":"soldierId 1032 through 5308 with lower tiers skipped; normal + SP","role":"append-only-batch"},
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch9.v1.json","recordCount":40,"range":"soldierId 5311 through 6113; final SP records","role":"append-only-batch"}
   ],
   "writeStrategy": {
     "mode": "checkpoint-sharded-during-bulk-translation",
     "reason": "Avoid repeated whole-file replacement of the growing presentation overlay during bulk translation. Preserve completed batches as immutable checkpoints and consolidate once after translation/review stabilizes.",
     "canonicalGeneratedSourceReadOnly": true,
     "finalConsolidationRequired": true,
-    "batch8RecordSourceMode": "canonical-by-soldierId"
+    "batch8RecordSourceMode": "canonical-by-soldierId",
+    "batch9RecordSourceMode": "canonical-by-soldierId"
   },
   "reviewQueueCounts": {
     "existingThroughBatch4": 11,
@@ -34,11 +36,18 @@
     "newInBatch6": 6,
     "newInBatch7": 11,
     "newInBatch8": 17,
-    "total": 51
+    "newInBatch9": 25,
+    "total": 76
   },
   "nextStartPoint": {
-    "afterSoldierId": 5308,
-    "nextKnownRecord": 5311,
-    "batchSize": 40
+    "afterSoldierId": 6113,
+    "nextKnownRecord": null,
+    "batchSize": 0
+  },
+  "completion": {
+    "translationTargetComplete": true,
+    "translatedCoverage": "185/185",
+    "finalConsolidationRequired": true,
+    "reviewResolutionRequired": true
   }
 }
