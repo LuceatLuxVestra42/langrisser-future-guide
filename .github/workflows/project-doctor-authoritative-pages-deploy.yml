@@ -81,6 +81,7 @@ jobs:
           node scripts/project-doctor-compose-authoritative-pages-runtime.mjs
           node scripts/validate-skin-stage3-6-hero-detail-consumer.mjs
           node scripts/validate-hero-card-icon-frontend.mjs
+          node scripts/validate-hero-fusion-power-frontend.mjs
           grep -q 'equipment-p3-1-release-metadata.v1.json' src/lib/equipment-page.localized.server.ts
           grep -q '같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순' src/routes/equipment.tsx
 
@@ -116,9 +117,15 @@ jobs:
           test "$(find dist/client/images/heroes/card-icons -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '267'
           test -f dist/client/images/heroes/card-icons-webp/6.webp
           test "$(find dist/client/images/heroes/card-icons-webp -maxdepth 1 -type f -name '*.webp' | wc -l | tr -d ' ')" = '267'
+          test -f dist/client/images/factions/4.png
+          test "$(find dist/client/images/factions -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '12'
           test -f dist/client/images/equipment/567.png
           test -f dist/client/images/soldiers-webp/101.webp
           grep -q '/langrisser-future-guide/images/heroes/card-icons-webp/6.webp' dist/client/heroes/index.html
+          grep -q '/langrisser-future-guide/images/factions/4.png' dist/client/heroes/index.html
+          grep -q 'data-hero-fusion-power-marks="true"' dist/client/heroes/index.html
+          grep -q 'data-hero-fusion-power-mark="true"' dist/client/heroes/index.html
+          grep -q 'data-target-faction-id="4"' dist/client/heroes/index.html
           if grep -q '/langrisser-future-guide/images/heroes/card-icons/6.png' dist/client/heroes/index.html; then
             echo 'Hero list still consumes PNG source instead of WebP delivery' >&2
             exit 1
@@ -151,6 +158,10 @@ jobs:
             "heroCardIconWebDeliveryCount": 267,
             "heroCardIconWebDeliveryFreezeState": "HERO_CARD_ICON_WEB_DELIVERY_FROZEN",
             "heroCardIconWebDeliveryFormat": "LOSSLESS_WEBP",
+            "heroFusionPowerResolvedCount": 35,
+            "heroFusionPowerFreezeState": "HERO_FUSION_POWER_PRESENTATION_FROZEN",
+            "heroFusionFactionAssetCount": 12,
+            "heroFusionFactionAssetFreezeState": "HERO_FUSION_FACTION_ASSETS_FROZEN",
             "semanticStageReopened": false,
             "publisher": ".github/workflows/project-doctor-authoritative-pages-deploy.yml"
           }
@@ -199,4 +210,8 @@ jobs:
           printf 'heroCardIconWebDeliveryCount=267\n'
           printf 'heroCardIconWebDeliveryFreezeState=HERO_CARD_ICON_WEB_DELIVERY_FROZEN\n'
           printf 'heroCardIconWebDeliveryFormat=LOSSLESS_WEBP\n'
+          printf 'heroFusionPowerResolvedCount=35\n'
+          printf 'heroFusionPowerFreezeState=HERO_FUSION_POWER_PRESENTATION_FROZEN\n'
+          printf 'heroFusionFactionAssetCount=12\n'
+          printf 'heroFusionFactionAssetFreezeState=HERO_FUSION_FACTION_ASSETS_FROZEN\n'
           printf 'semanticStageReopened=false\n'
