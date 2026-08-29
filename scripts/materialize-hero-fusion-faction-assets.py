@@ -10,8 +10,8 @@ import zlib
 import UnityPy
 
 VER = "1.1.113"
-PACKAGE_NUMBER = 61
-BUNDLE_NAME = "ui_icon_keyword_abs.b"
+PACKAGE_NUMBER = 27
+BUNDLE_NAME = "begin_ui_icon_keyword_abs.b"
 BASE = f"http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{VER}"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36"
 PROJECTION = pathlib.Path("data/generated/hero-fusion-power-presentation.v1.json")
@@ -141,6 +141,11 @@ for faction_id in range(1, 13):
         )
     container_path, sprite_obj = sprites[0]
     sprite = sprite_obj.read()
+    expected_sprite_name = pathlib.PurePosixPath(source["iconSourcePath"]).stem
+    if getattr(sprite, "m_Name", None) != expected_sprite_name:
+        raise RuntimeError(
+            f"faction {faction_id} exact Sprite name mismatch: expected={expected_sprite_name} actual={getattr(sprite, 'm_Name', None)}"
+        )
     image = sprite.image
     if image is None:
         raise RuntimeError(f"faction {faction_id} Sprite has no image")
@@ -153,6 +158,7 @@ for faction_id in range(1, 13):
             "sourcePackageNumber": PACKAGE_NUMBER,
             "sourcePackageName": package["name"],
             "sourceBundleName": BUNDLE_NAME,
+            "sourceBundleLayer": "BEGIN",
             "containerPath": container_path,
             "spriteName": getattr(sprite, "m_Name", None),
             "spritePathId": int(getattr(sprite_obj, "path_id", 0)),
@@ -180,9 +186,16 @@ manifest = {
     "freezeState": "HERO_FUSION_FACTION_ASSETS_FROZEN",
     "sourceFreezeState": projection["freezeState"],
     "gameVersion": VER,
+    "source": {
+        "packageNumber": PACKAGE_NUMBER,
+        "packageName": package["name"],
+        "bundleName": BUNDLE_NAME,
+        "bundleLayer": "BEGIN",
+    },
     "sourcePolicy": {
         "exactConfigDataFactionIconPath": True,
         "exactBundleContainerPath": True,
+        "exactSpriteNameParity": True,
         "remoteRuntimeHotlink": False,
         "nameJoin": False,
         "idArithmetic": False,
@@ -203,6 +216,7 @@ validation = {
     "sourceGameVersion": VER,
     "packageNumber": PACKAGE_NUMBER,
     "bundleName": BUNDLE_NAME,
+    "bundleLayer": "BEGIN",
     "targetFactionCount": 12,
     "materializedCount": 12,
     "fileCount": 12,
