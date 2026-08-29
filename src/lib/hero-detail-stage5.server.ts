@@ -1,3 +1,4 @@
+import { readHeroSkinPresentation } from "./skin-detail.server";
 import { readHeroDetailRouteStage4Data } from "./hero-list.server";
 
 type Stage6JobConnection = {
@@ -186,11 +187,17 @@ function projectStage6Shard(shard: Stage6HeroShard) {
 export async function readHeroDetailRouteStage5Data(heroId: number) {
   const shell = readHeroDetailRouteStage4Data(heroId);
   if (!shell) return null;
+  const skinPresentation = readHeroSkinPresentation(heroId);
+  if (!skinPresentation) return null;
   const moduleKey = `../../data/generated/hero-detail/by-id/${heroId}.json`;
   const loadShard = stage6ShardModules[moduleKey];
   if (!loadShard) return null;
   const shard = await loadShard();
   if (!shard || shard.heroId !== heroId) throw new Error(`Hero ${heroId} Stage 6 shard identity mismatch.`);
+  const detail = projectStage6Shard(shard);
+  if (detail.presentation.skinCount !== skinPresentation.items.length) {
+    throw new Error(`Hero ${heroId} Stage 6/Skin frozen relation count mismatch.`);
+  }
   return {
     ...shell,
     stage6: {
@@ -199,6 +206,13 @@ export async function readHeroDetailRouteStage5Data(heroId: number) {
       singleShardRuntimeRead: true,
       fullDatasetRuntimeRead: false,
     },
-    detail: projectStage6Shard(shard),
+    detail: {
+      ...detail,
+      presentation: {
+        ...detail.presentation,
+        skins: skinPresentation.items,
+        skinSource: skinPresentation.source,
+      },
+    },
   };
 }
