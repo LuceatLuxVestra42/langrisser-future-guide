@@ -1,0 +1,81 @@
+{
+  "version": 4,
+  "schemaId": "project-doctor-d2-impact-contract/v4",
+  "stage": "D2-IMPACT",
+  "checkpoint": "PROJECT_DOCTOR_D2_IMPACT_CONTRACT_V4_SKIN_ASSET_OWNER_ADMISSION",
+  "status": "DESIGN_FROZEN",
+  "supersedes": "data/contracts/project-doctor-d2-impact-contract.v3.json",
+  "baseMap": "data/contracts/project-doctor-d2-dependency-map.v1.json",
+  "purpose": "Preserve the Project Doctor V3 owner graph and overlays, then add only exact Skin final-asset and Skin Hero-detail consumer path overlays. No semantic node or propagation edge is added or rewritten.",
+  "scope": {
+    "changedFileInputResolution": true,
+    "pathNormalization": true,
+    "dependencyPropagation": true,
+    "domainProjection": true,
+    "gitDiffInspection": false,
+    "validatorSelection": false,
+    "validatorExecution": false,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "githubActions": false,
+    "v3OwnerAdmissionPreserved": true,
+    "skinAssetFinalOwnerOverlay": true
+  },
+  "inputModes": {
+    "argv": "npm run doctor:impact -- <repository-relative-path...>",
+    "stdinLines": "newline-delimited repository-relative paths with --stdin",
+    "stdinJson": "JSON array of repository-relative path strings with --stdin"
+  },
+  "normalizationPolicy": {
+    "stripLeadingDotSlash": true,
+    "convertBackslashToSlash": true,
+    "collapseRepeatedSlash": true,
+    "deduplicateNormalizedPaths": true,
+    "rejectAbsolutePaths": true,
+    "rejectParentTraversal": true
+  },
+  "statusPolicy": {
+    "MAPPED": "Every normalized changed path maps to one or more direct impact nodes.",
+    "MANUAL_REVIEW": "At least one valid repository-relative path has no approved map rule.",
+    "INVALID_INPUT": "At least one supplied path is absolute, empty after normalization, or contains parent traversal."
+  },
+  "exitPolicy": {"MAPPED": 0, "MANUAL_REVIEW": 3, "INVALID_INPUT": 2},
+  "pathRuleOverlays": [
+    {"id":"soldier-webp-assets-post-map","patterns":["public/images/soldiers-webp/**"],"excludePatterns":[],"directNodes":["soldier-assets"],"changeClass":"asset","reason":"Carry forward D2 v3 Soldier WebP overlay."},
+    {"id":"project-doctor-workflow-post-map","patterns":[".github/workflows/project-doctor-*.yml"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"tooling","reason":"Carry forward Project Doctor workflow tooling overlay."},
+    {"id":"project-status-derived-sync","patterns":["scripts/build-project-status.mjs",".github/workflows/project-status-sync.yml","data/generated/project-status.v1.json","PROJECT_STATUS.md"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"tooling","reason":"Carry forward deterministic Project Status tooling overlay."},
+    {"id":"regression-coverage-promotion-v1-meta-contract","patterns":["data/contracts/regression-coverage-promotion.v1.json","data/validation/regression-coverage-promotion-summary.v1.json","scripts/validate-regression-coverage-promotion.mjs"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"tooling","reason":"Carry forward frozen Promotion V1 meta-contract overlay."},
+    {"id":"localization-audit-stage6-integration","patterns":["data/contracts/localization-audit-*","data/validation/localization-audit-*","data/checkpoints/localization-audit-*","scripts/audit-localization*","scripts/validate-localization-audit-stage6.mjs",".github/workflows/localization-audit.yml"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"localization-tooling","reason":"Carry forward Localization Audit tooling overlay."},
+    {"id":"project-doctor-v3-regression-admission-tooling","patterns":["data/contracts/project-doctor-d2-impact-contract.v3.json","data/contracts/project-doctor-d3-validator-plan.v3.json","data/contracts/project-doctor-d4-execution.v3.json","data/contracts/project-doctor-d7-pr-guard.v3.json","scripts/validate-project-doctor-d2-impact-v3.mjs","scripts/validate-project-doctor-d3-v3.mjs","scripts/run-project-doctor-d4-v3.mjs","scripts/validate-project-doctor-d4-v3.mjs","scripts/validate-project-doctor-d7-v3.mjs"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"tooling","reason":"Preserve the completed V3 Equipment Image admission surface as Doctor tooling."},
+    {"id":"regression-coverage-promotion-v2-admission","patterns":["data/contracts/regression-coverage-promotion.v2.json","data/validation/regression-coverage-promotion-summary.v2.json","scripts/validate-regression-coverage-promotion-v2.mjs","scripts/validate-soldier-stage6-7-final.mjs","scripts/validate-shared-movement-type-index-final.mjs","scripts/validate-soldier-portrait-v9-final.mjs",".github/workflows/regression-coverage-promotion-v2.yml"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"regression-coverage-promotion-v2","reason":"Carry forward Promotion V2 runtime-proof admission surface without altering its nine admitted owners."},
+    {"id":"equipment-image-final-owner","patterns":["data/evidence/equipment-image-*","data/checkpoints/equipment-image-stage3-final.v1.json","data/validation/equipment-image-stage3-hosted-qa-summary.v1.json","scripts/validate-equipment-image-final.mjs","scripts/validate-equipment-image-stage3-browser-ui.mjs","scripts/validate-equipment-image-stage3-hosted.mjs",".github/workflows/equipment-image-stage3-browser-ui.yml"],"excludePatterns":[],"directNodes":["equipment-assets"],"changeClass":"asset-pipeline","reason":"Carry forward the V3 deterministic Equipment Image final owner."},
+    {"id":"skin-assets-final-owner","patterns":["public/images/skins/**","data/generated/skin-stage2-3-bidirectional-relation.v1.json","data/generated/skin-stage3-5-static-web-asset-map.v1.json","data/validation/skin-stage3-5-static-web-asset-map.v1.json","data/evidence/skin-stage3-6-browser-ui.v1.json","data/validation/skin-stage3-6-hosted-summary.v1.json","data/validation/skin-stage3-6-browser-ui-summary.v1.json","data/checkpoints/skin-stage3-6-hosted.v1.json","data/checkpoints/skin-stage3-6-final.v1.json","scripts/validate-skin-assets-final.mjs"],"excludePatterns":[],"directNodes":["skin-assets"],"changeClass":"asset-pipeline","reason":"Skin Stage 3-5 exact public PNGs and fresh Stage 3-6 Hosted/Browser evidence are the deterministic final skin-assets owner surface."},
+    {"id":"skin-hero-detail-consumer","patterns":["src/lib/skin-detail.server.ts","src/lib/hero-detail-stage5.server.ts","src/routes/heroes_.$heroId.tsx"],"excludePatterns":[],"directNodes":["skin-assets","hero-frontend"],"changeClass":"frontend","reason":"These exact Hero-detail consumer inputs participate in the Skin Browser/UI fingerprint and must revalidate both Skin asset ownership and the Hero production consumer."}
+  ],
+  "overlayPolicy": {
+    "mayAddPathRulesOnly": true,
+    "mayAddImpactNodes": false,
+    "mayAddPropagationEdges": false,
+    "mayRewriteBaseRules": false,
+    "historicalV1Preserved": true,
+    "historicalV2Preserved": true,
+    "historicalV3Preserved": true
+  },
+  "fixtures": [
+    {"id":"REGRESSION_V2_META","paths":["data/contracts/regression-coverage-promotion.v2.json",".github/workflows/regression-coverage-promotion-v2.yml"],"expectedStatus":"MAPPED","expectedChangedFileCount":2,"expectedDirectNodes":["project-doctor"],"expectedDomains":[]},
+    {"id":"EQUIPMENT_IMAGE_BROWSER_EVIDENCE","paths":["data/evidence/equipment-image-stage3-browser-ui.v1.json"],"expectedStatus":"MAPPED","expectedDirectNodes":["equipment-assets"],"expectedDomains":["equipment"]},
+    {"id":"SKIN_PUBLIC_ASSET_FINAL_OWNER","paths":["public/images/skins/1401.png"],"expectedStatus":"MAPPED","expectedDirectNodes":["skin-assets"],"expectedDomains":["skin"]},
+    {"id":"SKIN_FINAL_BROWSER_EVIDENCE","paths":["data/evidence/skin-stage3-6-browser-ui.v1.json"],"expectedStatus":"MAPPED","expectedDirectNodes":["skin-assets"],"expectedDomains":["skin"]},
+    {"id":"SKIN_RELATION_ALSO_REVALIDATES_ASSETS","paths":["data/generated/skin-stage2-3-bidirectional-relation.v1.json"],"expectedStatus":"MAPPED","expectedDirectNodes":["skin-assets","skin-relation"],"expectedDomains":["hero","skin"]},
+    {"id":"SKIN_HERO_DETAIL_CONSUMER","paths":["src/lib/skin-detail.server.ts"],"expectedStatus":"MAPPED","expectedDirectNodes":["hero-frontend","skin-assets"],"expectedDomains":["hero","skin"]},
+    {"id":"UNKNOWN_CONFIGDATA_REQUIRES_REVIEW","paths":["data/configdata/ConfigDataUnknownFutureTable.json"],"expectedStatus":"MANUAL_REVIEW","expectedDirectNodes":[],"expectedDomains":[]}
+  ],
+  "historicalBoundary": {
+    "d2V1": "data/contracts/project-doctor-d2-impact-contract.v1.json",
+    "d2V2": "data/contracts/project-doctor-d2-impact-contract.v2.json",
+    "d2V3": "data/contracts/project-doctor-d2-impact-contract.v3.json",
+    "v1V2V3RemainUnmodified": true
+  },
+  "nextStage": "D3-V4",
+  "nextStageGoal": "Admit one deterministic Skin assets final owner while preserving all V3 owners and leaving Hero/Banner asset scopes manual."
+}
