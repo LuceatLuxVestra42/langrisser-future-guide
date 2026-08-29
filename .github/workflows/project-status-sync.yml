@@ -33,6 +33,10 @@ on:
       - '.github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml'
       - '.github/workflows/project-status-sync.yml'
 
+concurrency:
+  group: project-status-write-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
   sync-branch:
     if: github.event_name == 'push'
@@ -43,6 +47,7 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - name: Setup Node 22
@@ -64,6 +69,9 @@ jobs:
 
       - name: Validate Stage 6-3 explicit apply handoff
         run: node scripts/validate-project-doctor-status-source-stage6-3-apply-handoff.mjs
+
+      - name: Validate Stage 6-4 producer declarations
+        run: node scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs
 
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
@@ -125,6 +133,9 @@ jobs:
 
       - name: Validate Stage 6-3 explicit apply handoff
         run: node scripts/validate-project-doctor-status-source-stage6-3-apply-handoff.mjs
+
+      - name: Validate Stage 6-4 producer declarations
+        run: node scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs
 
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status

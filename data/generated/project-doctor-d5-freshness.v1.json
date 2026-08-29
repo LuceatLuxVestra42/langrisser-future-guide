@@ -19,7 +19,10 @@
     "data/validation/soldier-t3-provisional-name-presentation.v1.json"
   ],
   "inputPaths": [
+    ".github/workflows/hero-stage6-4-site-consumer.yml",
     ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+    ".github/workflows/project-status-sync.yml",
+    ".github/workflows/soldier-stage6-7-site-admission.yml",
     "data/contracts/project-doctor-active-source-registry.v1.json",
     "data/contracts/project-doctor-d1-0-contract.v1.json",
     "data/contracts/project-doctor-d1-2-health-gate.v1.json",
@@ -28,6 +31,9 @@
     "data/contracts/project-doctor-status-source-producers.v1.json",
     "data/contracts/project-doctor-status-source-promotion.v1.json",
     "data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json",
     "data/status-sources/baseline.v1.json",
     "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
     "data/validation/equipment-stage4-final.v1.json",
@@ -46,6 +52,7 @@
     "scripts/collect-project-doctor-d1-1-active.mjs",
     "scripts/collect-project-doctor-d1-1.mjs",
     "scripts/promote-project-doctor-status-source.mjs",
+    "scripts/resolve-project-doctor-status-source-declaration.mjs",
     "scripts/run-project-doctor-d1-3.mjs",
     "scripts/run-project-doctor-d5-refresh-active.mjs",
     "scripts/run-project-doctor-d5-refresh.mjs",
@@ -58,7 +65,8 @@
     "scripts/validate-project-doctor-status-source-artifact-bridge.mjs",
     "scripts/validate-project-doctor-status-source-producers.mjs",
     "scripts/validate-project-doctor-status-source-promotion.mjs",
-    "scripts/validate-project-doctor-status-source-stage6-3-apply-handoff.mjs"
+    "scripts/validate-project-doctor-status-source-stage6-3-apply-handoff.mjs",
+    "scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs"
   ],
   "outputPaths": [
     "data/generated/project-doctor-active-source-registry.v1.json",
@@ -68,9 +76,21 @@
     "data/validation/project-doctor-d1-2-summary.v1.json"
   ],
   "inputs": {
+    ".github/workflows/hero-stage6-4-site-consumer.yml": {
+      "exists": true,
+      "gitBlobSha": "d8025a24ebf783074823ba4a08b29f9463ba0791"
+    },
     ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml": {
       "exists": true,
-      "gitBlobSha": "08ac1f1ec3d401615258035c108beafbedf1c6d6"
+      "gitBlobSha": "f63a53b36430948aca48b57326ae497f231bae0e"
+    },
+    ".github/workflows/project-status-sync.yml": {
+      "exists": true,
+      "gitBlobSha": "5c8677a511b66f37cfde6098bccd469e3f18b58d"
+    },
+    ".github/workflows/soldier-stage6-7-site-admission.yml": {
+      "exists": true,
+      "gitBlobSha": "0d8e97ed9f49653c906065d5822db128df3b5aa9"
     },
     "data/contracts/project-doctor-active-source-registry.v1.json": {
       "exists": true,
@@ -86,7 +106,7 @@
     },
     "data/contracts/project-doctor-d5-freshness.v1.json": {
       "exists": true,
-      "gitBlobSha": "19afcf62f1b4592c59d03483e75d7e18209e10c2"
+      "gitBlobSha": "7a2327f8be459638f9b7ef176984ef9f6daa710a"
     },
     "data/contracts/project-doctor-status-source-artifact-bridge.v1.json": {
       "exists": true,
@@ -103,6 +123,18 @@
     "data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json": {
       "exists": true,
       "gitBlobSha": "ea2f3463b1b4ff8d98475f0766c43611a59343e8"
+    },
+    "data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json": {
+      "exists": true,
+      "gitBlobSha": "813f39a2eed89289dfaaa5341a88ab6c59d7f0f2"
+    },
+    "data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json": {
+      "exists": true,
+      "gitBlobSha": "3dfa8daa953a438422d84a865a57d695b155688e"
+    },
+    "data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json": {
+      "exists": true,
+      "gitBlobSha": "641feea4fb9105f81ac651564ef6f89bd3bf4545"
     },
     "data/status-sources/baseline.v1.json": {
       "exists": true,
@@ -176,6 +208,10 @@
       "exists": true,
       "gitBlobSha": "8b6c15b5bba2201c4566e5d6bd150dddf017fb07"
     },
+    "scripts/resolve-project-doctor-status-source-declaration.mjs": {
+      "exists": true,
+      "gitBlobSha": "b852e3bc2c7ef4c2ce55ac63c605f41b70be6256"
+    },
     "scripts/run-project-doctor-d1-3.mjs": {
       "exists": true,
       "gitBlobSha": "13e9f6fff99789386070126015ef6be0785fba9a"
@@ -227,6 +263,10 @@
     "scripts/validate-project-doctor-status-source-stage6-3-apply-handoff.mjs": {
       "exists": true,
       "gitBlobSha": "f9bf0a27b929fa14ca1b284bf47aba2983237c3b"
+    },
+    "scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs": {
+      "exists": true,
+      "gitBlobSha": "afe4c21c71d001cbdaa81ae47e60abcc33974887"
     }
   },
   "outputs": {

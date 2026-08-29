@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-status-source-stage6-4-producer-declarations/v1",
+  "stage": "PROJECT-STATUS-STAGE6-4",
+  "checkpoint": "PROJECT_DOCTOR_STATUS_SOURCE_PRODUCER_DECLARATION_AUTOMATIC_HANDOFF_HERO_SOLDIER",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Allow the resolved Hero and Soldier owning completion workflows to emit explicit, retained producer declarations into the dedicated Stage 6-3 apply handoff on work branches without inferring candidate authority.",
+  "stage6_3Contract": "data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json",
+  "activeRegistry": "data/generated/project-doctor-active-source-registry.v1.json",
+  "resolverScript": "scripts/resolve-project-doctor-status-source-declaration.mjs",
+  "selfTestScript": "scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs",
+  "reusableHandoffWorkflow": ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+  "policy": {
+    "declarationState": "APPROVED_FOR_AUTOMATIC_HANDOFF",
+    "declarationMustBeRetainedAndCommitted": true,
+    "declarationMustBeOwnedByRegisteredProducer": true,
+    "pipelineMustBeExplicit": true,
+    "domainMustBeExplicit": true,
+    "producerIdMustBeExplicit": true,
+    "predecessorIdMustBeExplicit": true,
+    "entryIdMustBeExplicit": true,
+    "sourcePathMustBeExplicit": true,
+    "predecessorMustEqualCurrentSelectedId": true,
+    "compareAndSwapDelegatesToStage6_3Again": true,
+    "candidateSourceMustBeCommittedAndClean": true,
+    "automaticDispatchWorkBranchOnly": true,
+    "pullRequestAndMainRemainCheckOnlyAtOwningWorkflow": true,
+    "owningWorkflowMustNotContainDirectApplyFlag": true,
+    "applyMustRunOnlyThroughDedicatedStage6_3Workflow": true,
+    "owningCompletionWorkflowsSerializedPerBranch": true,
+    "futureSuccessorRequiresExplicitDeclarationChange": true,
+    "realSuccessorPromotionInThisStage": false,
+    "currentDeclarationsAreIdempotentBaselineProof": true,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "canonicalJoinRecomputation": false,
+    "filenameAuthorityInference": false,
+    "stageNumberAuthorityInference": false,
+    "chronologyAuthorityInference": false
+  },
+  "pipelines": [
+    {
+      "pipelineId": "hero",
+      "domain": "hero",
+      "producerId": "hero-final",
+      "completionWorkflow": ".github/workflows/hero-stage6-4-site-consumer.yml",
+      "completionJob": "site-consumer-final-freeze",
+      "handoffJob": "project-status-handoff",
+      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json"
+    },
+    {
+      "pipelineId": "soldier",
+      "domain": "soldier",
+      "producerId": "soldier-final",
+      "completionWorkflow": ".github/workflows/soldier-stage6-7-site-admission.yml",
+      "completionJob": "site-admission",
+      "handoffJob": "project-status-handoff",
+      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json"
+    }
+  ],
+  "runtimeProof": {
+    "baselineDeclarationsResolveWithoutMutation": true,
+    "stalePredecessorMustBlockBeforeStage6_3": true,
+    "unapprovedDeclarationMustBlock": true,
+    "uncommittedCandidateMustBlock": true,
+    "owningWorkflowsEmitOnlyExplicitDeclarationFields": true,
+    "owningCompletionWorkflowsMustSerializeBeforeWriterHandoff": true,
+    "reusableStage6_3WorkflowMustSupportWorkflowCall": true,
+    "projectStatusWritersMustShareBranchConcurrencyGroup": true,
+    "currentSelectedAuthorityMustRemainUnchanged": true
+  },
+  "boundaries": {
+    "productionMutation": false,
+    "canonicalMutation": false,
+    "frontendMutation": false,
+    "newSuccessorDeclaration": false,
+    "directMainPush": false
+  },
+  "nextStep": {
+    "stage": "PROJECT-STATUS-STAGE6-5",
+    "goal": "After Stage 6-4 runtime proof, decide whether producer finalizers should generate declaration updates from an explicit closeout request object; never derive successor authority from the newest artifact."
+  }
+}
