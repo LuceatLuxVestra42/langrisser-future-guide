@@ -4,13 +4,17 @@ import { analyzePaths, buildEffectiveMap } from './analyze-project-doctor-d2-imp
 const CONTRACT_PATH='data/contracts/project-doctor-d2-impact-contract.v4.json';
 const OUTPUT_PATH='data/validation/project-doctor-d2-impact-summary.v4.json';
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
-const same=(a,b)=>JSON.stringify([...a].sort())===JSON.stringify([...b].sort());
+const same=(a=[],b=[])=>JSON.stringify([...a].sort())===JSON.stringify([...b].sort());
 const c=read(CONTRACT_PATH),base=read(c.baseMap),map=buildEffectiveMap(base,c);const failures=[];const results=[];
 if(c.schemaId!=='project-doctor-d2-impact-contract/v4'||c.status!=='DESIGN_FROZEN') failures.push('CONTRACT');
 if(c.supersedes!=='data/contracts/project-doctor-d2-impact-contract.v3.json') failures.push('SUPERSEDES');
 const hero=c.pathRuleOverlays.find(x=>x.id==='hero-artwork-final-owner');
 if(!hero||hero.changeClass!=='asset-pipeline'||!same(hero.directNodes,['hero-assets'])) failures.push('HERO_OVERLAY');
-if(c.overlayPolicy?.mayAddImpactNodes!==false||c.overlayPolicy?.mayAddPropagationEdges!==false||c.overlayPolicy?.mayRewriteBaseRules!==false) failures.push('GRAPH_MUTATION');
+const suppress=(c.baseRuleExcludeOverlays??[]).find(x=>x.ruleId==='hero-data-family');
+if(!suppress||!(suppress.excludePatterns??[]).includes('data/validation/hero-artwork-hosted-qa.v1.json')||!(suppress.excludePatterns??[]).includes('scripts/validate-hero-artwork-final.mjs')) failures.push('HERO_SEMANTIC_SUPPRESSION');
+if(c.overlayPolicy?.mayAddImpactNodes!==false||c.overlayPolicy?.mayAddPropagationEdges!==false||c.overlayPolicy?.mayRewriteBaseRulePatterns!==false||c.overlayPolicy?.mayAddScopedBaseRuleExclusions!==true||c.overlayPolicy?.baseRuleExclusionsMayRemoveDirectNodes!==false) failures.push('GRAPH_OR_RULE_POLICY');
+const originalHeroRule=base.pathRules.find(x=>x.id==='hero-data-family');
+if(!originalHeroRule||originalHeroRule.excludePatterns?.includes('data/validation/hero-artwork-hosted-qa.v1.json')) failures.push('BASE_MAP_MUTATED');
 for(const f of c.fixtures??[]){const r=analyzePaths(f.paths,map);const pass=r.status===f.expectedStatus&&same(r.directNodes,f.expectedDirectNodes??[])&&same(r.domains,f.expectedDomains??[]);results.push({id:f.id,pass,status:r.status,directNodes:r.directNodes,domains:r.domains});if(!pass) failures.push(`FIXTURE:${f.id}`)}
-const pass=failures.length===0;const out={version:4,schemaId:'project-doctor-d2-impact-summary/v4',status:pass?'PASS_PROJECT_DOCTOR_D2_IMPACT_V4':'FAIL_PROJECT_DOCTOR_D2_IMPACT_V4',completion:pass?'COMPLETE':'BLOCKED',fixtureCount:results.length,fixturePassCount:results.filter(x=>x.pass).length,failures,results};
+const pass=failures.length===0;const out={version:4,schemaId:'project-doctor-d2-impact-summary/v4',status:pass?'PASS_PROJECT_DOCTOR_D2_IMPACT_V4':'FAIL_PROJECT_DOCTOR_D2_IMPACT_V4',completion:pass?'COMPLETE':'BLOCKED',fixtureCount:results.length,fixturePassCount:results.filter(x=>x.pass).length,heroArtworkSemanticSuppression:true,baseMapMutated:false,failures,results};
 fs.mkdirSync(path.dirname(OUTPUT_PATH),{recursive:true});fs.writeFileSync(OUTPUT_PATH,`${JSON.stringify(out,null,2)}\n`);console.log(out.status);if(!pass)process.exitCode=1;
