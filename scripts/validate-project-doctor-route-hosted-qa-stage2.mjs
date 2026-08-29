@@ -171,8 +171,11 @@ if (check) {
   if (!fs.existsSync(outputPath)) {
     throw new Error(`Missing frozen validation artifact: ${path.relative(root, outputPath)}. Run with --write first.`);
   }
-  const current = fs.readFileSync(outputPath, "utf8");
-  assert(current === serialized, "Frozen QA-2 validation artifact is stale or non-deterministic");
+  const current = readJson(outputPath);
+  assert(
+    JSON.stringify(current) === JSON.stringify(result),
+    "Frozen QA-2 validation artifact is stale or structurally non-deterministic",
+  );
 }
 
 if (failed.length > 0) {
