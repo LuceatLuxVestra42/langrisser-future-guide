@@ -259,6 +259,7 @@ function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
 
   return (
     <Link
+      reloadDocument
       to="/heroes/$heroId"
       params={{ heroId: String(hero.heroId) }}
       aria-label={`${displayName} ${hero.rarity.baseLabel} 상세 보기`}
