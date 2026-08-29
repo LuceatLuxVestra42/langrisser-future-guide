@@ -1,0 +1,39 @@
+name: Hero Card Bundle Ownership
+
+on:
+  push:
+    branches:
+      - work/hero-cardhead-assets-20260830
+    paths:
+      - .github/workflows/hero-card-bundle-ownership.yml
+      - scripts/discover-all-hero-card-bundles.py
+
+permissions:
+  contents: write
+
+jobs:
+  discover:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Discover all Hero card bundle package owners
+        shell: pwsh
+        run: python scripts/discover-all-hero-card-bundles.py
+      - name: Commit ownership evidence
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/hero-card-bundle-ownership.v1.json
+          if git diff --cached --quiet; then
+            echo "No ownership changes."
+          else
+            git commit -m "Record Hero card bundle ownership"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
