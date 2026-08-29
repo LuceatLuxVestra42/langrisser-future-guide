@@ -1,0 +1,51 @@
+name: Hero Provisional Localization Stage 3
+
+on:
+  pull_request:
+    paths:
+      - data/contracts/localization-audit-stage7.v1.json
+      - data/validation/localization-audit-stage7.v1.json
+      - data/presentation/hero-provisional-name-kr.v1.json
+      - data/validation/hero-provisional-localization-stage2.v1.json
+      - src/lib/hero-list.server.ts
+      - src/routes/heroes.tsx
+      - src/routes/heroes_.$heroId.tsx
+      - scripts/audit-localization-stage7.mjs
+      - package.json
+      - .github/workflows/hero-provisional-localization-stage3.yml
+  push:
+    branches:
+      - main
+    paths:
+      - data/contracts/localization-audit-stage7.v1.json
+      - data/validation/localization-audit-stage7.v1.json
+      - data/presentation/hero-provisional-name-kr.v1.json
+      - data/validation/hero-provisional-localization-stage2.v1.json
+      - src/lib/hero-list.server.ts
+      - src/routes/heroes.tsx
+      - src/routes/heroes_.$heroId.tsx
+      - scripts/audit-localization-stage7.mjs
+      - package.json
+      - .github/workflows/hero-provisional-localization-stage3.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Validate Hero provisional localization Stage 2 predecessor
+        run: npm run validate:hero-provisional-localization-stage2
+
+      - name: Validate Localization Audit Stage 7 successor
+        run: npm run audit:localization:stage7:check
