@@ -7,8 +7,8 @@
   "targetCount": 185,
   "progress": {
     "translatedCount": 185,
-    "passCount": 109,
-    "reviewCount": 76,
+    "passCount": 114,
+    "reviewCount": 71,
     "remainingCount": 0,
     "lastCompletedSoldierId": 6113,
     "nextKnownRecord": null,
@@ -20,11 +20,12 @@
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch6.v1.json","recordCount":20,"range":"soldierId 517 through 644 with lower tiers skipped","role":"append-only-batch"},
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch7.v1.json","recordCount":20,"range":"soldierId 645 through 1031 with lower tiers skipped","role":"append-only-batch"},
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch8.v1.json","recordCount":35,"range":"soldierId 1032 through 5308 with lower tiers skipped; normal + SP","role":"append-only-batch"},
-    {"path":"data/checkpoints/soldier-unique-skill-translation-batch9.v1.json","recordCount":40,"range":"soldierId 5311 through 6113; final SP records","role":"append-only-batch"}
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch9.v1.json","recordCount":40,"range":"soldierId 5311 through 6113; final SP records","role":"append-only-batch"},
+    {"path":"data/presentation/soldier-unique-skill-review-overrides.v1.json","recordCount":5,"range":"250, 326, 333, 341, 602","role":"evidence-backed-review-overrides"}
   ],
   "writeStrategy": {
-    "mode": "checkpoint-sharded-authoring-with-deterministic-final-consolidation",
-    "reason": "Preserve immutable translation batches while generating one validated final presentation consumer from all 185 translated records.",
+    "mode": "checkpoint-sharded-authoring-with-deterministic-final-consolidation-and-review-overrides",
+    "reason": "Preserve immutable translation batches and apply evidence-backed review resolutions through a small soldierId-keyed override layer.",
     "canonicalGeneratedSourceReadOnly": true,
     "finalConsolidationRequired": false,
     "finalConsolidationComplete": true,
@@ -32,13 +33,16 @@
     "batch9RecordSourceMode": "canonical-by-soldierId"
   },
   "reviewQueueCounts": {
-    "existingThroughBatch4": 11,
-    "newInBatch5": 6,
-    "newInBatch6": 6,
-    "newInBatch7": 11,
-    "newInBatch8": 17,
-    "newInBatch9": 25,
-    "total": 76
+    "sourceReviewMarks": 76,
+    "resolvedByReviewOverrides": 5,
+    "remaining": 71
+  },
+  "reviewResolution": {
+    "evidenceCheckpoint": "data/checkpoints/soldier-unique-skill-review-evidence-batch1.v1.json",
+    "overridePath": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
+    "resolvedSoldierIds": [250, 326, 333, 341, 602],
+    "resolvedTerms": ["魔物", "树林", "山地", "草地", "野战"],
+    "status": "BATCH1_APPLIED"
   },
   "nextStartPoint": {
     "afterSoldierId": 6113,
@@ -60,7 +64,7 @@
     "frontendConsumerIntegrationRequired": false,
     "frontendConsumerIntegrated": true,
     "frontendCheckpoint": "data/checkpoints/soldier-unique-skill-frontend-localization.v1.json",
-    "frontendBuildGateStatus": "PASS",
+    "frontendBuildGateStatus": "PASS_PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
     "frontendHostedQaStatus": "PENDING"
   }
 }
