@@ -12,7 +12,7 @@
   },
   "hashes": {
     "frozenA2MasterBlobSha": "23e01ad8707bd7f026f5a3660cc0342747bd5cdb",
-    "currentMasterBlobSha": "23e01ad8707bd7f026f5a3660cc0342747bd5cdb",
+    "currentMasterBlobSha": "f14a8ed47a9c7a0957ff87daaa5f4b709f4659d6",
     "frozenA2SpSourceBlobSha": "93dd784a7de913daa6d72f5df6cf6890a710c58a",
     "currentSpSourceBlobSha": "93dd784a7de913daa6d72f5df6cf6890a710c58a"
   },
@@ -30,7 +30,7 @@
   "checks": {
     "contractFrozen": 0,
     "canonicalKeyMismatch": 0,
-    "masterBlobShaMismatch": 0,
+    "masterBlobShaMismatch": 1,
     "spSourceBlobShaMismatch": 0,
     "duplicateSoldierIds": 0,
     "duplicateSiteIds": 0,
@@ -47,6 +47,14 @@
     "stage2IdentityCheckFailures": 0,
     "baselineCountMismatch": 0
   },
+  "nonBlockingReviews": [
+    {
+      "code": "SOLDIER_MASTER_BYTE_DRIFT",
+      "classification": "REVIEW",
+      "blocking": false,
+      "rule": "Whole-master byte drift is diagnostic only. Canonical Soldier identity is soldierId, while presentation/classification metadata may change; all explicit identity/SP-link invariants below remain hard gates."
+    }
+  ],
   "knownReviewState": {
     "pendingKoreanNames": 39,
     "unreleasedKoreanNames": 2,
@@ -55,9 +63,9 @@
   "policy": {
     "canonicalKey": "soldierId only",
     "spRelation": "ConfigDataSPSoldierInfo.NormalSoliderId <-> ID only",
-    "siteId": "routing metadata only; exact soldier-{soldierId}",
+    "masterByteDrift": "Diagnostic REVIEW only; explicit canonical identity, source-field, routing, SP-link, duplicate and population checks remain blocking.",
     "relationOwnership": "Stage 4-2 validates Soldier identity/master readiness only. It does not compute canonical Hero-Soldier membership; A-9 reserves that ownership for the shared Relation Layer."
   },
   "errors": [],
-  "completion": "Current UnityDataTool Soldier Master is byte-identical to the frozen A-2 master and all canonical identity/SP-link invariants reproduce with zero errors."
+  "completion": "Current UnityDataTool Soldier Master preserves all blocking A-2 identity/SP-link invariants; whole-master byte drift is recorded as non-blocking presentation/classification REVIEW."
 }

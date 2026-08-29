@@ -1,6 +1,7 @@
 name: Soldier Stage 4-8 Baseline Freeze
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - 'scripts/lib/configdata-direct.cjs'
@@ -57,10 +58,10 @@ on:
       - '.github/workflows/soldier-stage4-8-baseline.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  regenerate-and-freeze:
+  validate-baseline:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -72,18 +73,107 @@ jobs:
         with:
           node-version: 22
 
+      - name: Resolve Stage 4-8 validation mode
+        id: mode
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          CHANGED="$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")"
+          printf '%s\n' "$CHANGED"
+          if printf '%s\n' "$CHANGED" | grep -Eq '^(scripts/validate-soldier-stage4-8-baseline\.cjs|data/validation/soldier-stage4-8-baseline\.v1\.json|\.github/workflows/soldier-stage4-8-baseline\.yml)$'; then
+            echo 'full_regen=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'full_regen=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check frozen Stage 4-8 snapshot freshness on PR
+        if: github.event_name == 'pull_request' && steps.mode.outputs.full_regen != 'true'
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const cp = require('child_process');
+          const baselinePath = 'data/validation/soldier-stage4-8-baseline.v1.json';
+          const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+          const mismatches = [];
+
+          function gitBlobSha(p) {
+            try {
+              return cp.execFileSync('git', ['hash-object', p], { encoding: 'utf8' }).trim();
+            } catch {
+              return null;
+            }
+          }
+          function stripVolatile(value) {
+            if (Array.isArray(value)) return value.map(stripVolatile);
+            if (value && typeof value === 'object') {
+              const out = {};
+              for (const key of Object.keys(value).sort()) {
+                if (key === 'generatedAt' || /blobsha$/i.test(key)) continue;
+                out[key] = stripVolatile(value[key]);
+              }
+              return out;
+            }
+            return value;
+          }
+          function semanticDigest(p) {
+            try {
+              const parsed = JSON.parse(fs.readFileSync(p, 'utf8'));
+              return crypto.createHash('sha256').update(JSON.stringify(stripVolatile(parsed))).digest('hex');
+            } catch {
+              return null;
+            }
+          }
+
+          if (baseline.status !== 'PASS') {
+            mismatches.push({ scope: 'baseline', path: baselinePath, expected: 'PASS', actual: baseline.status ?? null });
+          }
+          for (const scope of ['dataInputs', 'contracts', 'pipeline']) {
+            for (const [p, expected] of Object.entries(baseline.snapshots?.[scope] || {})) {
+              const actual = gitBlobSha(p);
+              if (actual !== expected.gitBlobSha) mismatches.push({ scope, path: p, expected: expected.gitBlobSha, actual });
+            }
+          }
+          for (const scope of ['artifacts', 'validations']) {
+            for (const [name, expected] of Object.entries(baseline.snapshots?.[scope] || {})) {
+              const actual = semanticDigest(expected.path);
+              if (actual !== expected.semanticSha256) mismatches.push({ scope, name, path: expected.path, expected: expected.semanticSha256, actual });
+            }
+          }
+
+          if (mismatches.length) {
+            console.error('SOLDIER STAGE 4-8 FROZEN FRESHNESS: STALE');
+            console.error(JSON.stringify({ mismatchCount: mismatches.length, mismatches: mismatches.slice(0, 100) }, null, 2));
+            console.error('Run the explicit Stage 4-8 full-regeneration producer and commit its reviewed frozen baseline before merging this change.');
+            process.exit(1);
+          }
+          console.log('SOLDIER STAGE 4-8 FROZEN FRESHNESS: PASS');
+          console.log(JSON.stringify({
+            baselineSourceRevision: baseline.sourceRevision,
+            dataInputCount: Object.keys(baseline.snapshots?.dataInputs || {}).length,
+            contractCount: Object.keys(baseline.snapshots?.contracts || {}).length,
+            pipelineCount: Object.keys(baseline.snapshots?.pipeline || {}).length,
+            artifactCount: Object.keys(baseline.snapshots?.artifacts || {}).length,
+            validationCount: Object.keys(baseline.snapshots?.validations || {}).length,
+          }, null, 2));
+          NODE
+
       - name: Validate UnityDataTool direct inputs
+        if: github.event_name != 'pull_request' || steps.mode.outputs.full_regen == 'true'
         run: node scripts/validate-soldier-stage4-1-input.cjs
 
       - name: Regenerate Soldier Master and validate 4-2
+        if: github.event_name != 'pull_request' || steps.mode.outputs.full_regen == 'true'
         run: |
           node scripts/finalize-soldier-stage2.cjs
           node scripts/validate-soldier-stage4-2-master.cjs
 
       - name: Extract pre-4-1 Stage3 regression baseline
+        if: github.event_name != 'pull_request' || steps.mode.outputs.full_regen == 'true'
         run: git show c2276d1162dae52a1762e6381e7dd195c917da2f:data/generated/soldier-stage3.v1.json > "$RUNNER_TEMP/soldier-stage3-pre-4-1.json"
 
       - name: Regenerate Soldier Stage 3 and validate 4-3 through 4-5
+        if: github.event_name != 'pull_request' || steps.mode.outputs.full_regen == 'true'
         env:
           BASELINE_STAGE3_PATH: ${{ runner.temp }}/soldier-stage3-pre-4-1.json
         run: |
@@ -94,34 +184,30 @@ jobs:
           node scripts/validate-soldier-stage4-5-sp-hero-reward.cjs
 
       - name: Regenerate legacy 3-12 relation baseline
+        if: github.event_name != 'pull_request' || steps.mode.outputs.full_regen == 'true'
         run: node scripts/finalize-soldier-stage3-12.cjs
 
       - name: Regenerate shared Hero-Soldier Relation Layer and validate 4-6
+        if: github.event_name != 'pull_request' || steps.mode.outputs.full_regen == 'true'
         run: |
           node scripts/finalize-hero-soldier-relation-layer.cjs
           node scripts/validate-soldier-stage4-6-relation-consumer.cjs
 
       - name: Validate representative Soldier fixtures 4-7
+        if: github.event_name != 'pull_request' || steps.mode.outputs.full_regen == 'true'
         run: node scripts/validate-soldier-stage4-7-domain-fixtures.cjs
 
       - name: Freeze Stage 4-8 baseline
+        if: github.event_name != 'pull_request' || steps.mode.outputs.full_regen == 'true'
         run: node scripts/validate-soldier-stage4-8-baseline.cjs
 
-      - name: Upload Stage 4-8 baseline evidence
+      - name: Upload Stage 4-8 regeneration evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: soldier-stage4-8-baseline
-          path: data/validation/soldier-stage4-8-baseline.v1.json
-
-      - name: Commit PASS baseline on PR branch
-        if: github.event_name == 'pull_request'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/validation/soldier-stage4-8-baseline.v1.json
-          if git diff --cached --quiet; then
-            echo "Stage 4-8 baseline is already current."
-          else
-            git commit -m "freeze Soldier stage 4-8 baseline PASS"
-            git push origin HEAD:${{ github.head_ref }}
-          fi
+          path: |
+            data/validation/soldier-stage4-8-baseline.v1.json
+            data/generated/soldier-master.v1.json
+            data/generated/soldier-hero-relations.v1.json
+            data/validation/soldier-stage4-2-master.v1.json
