@@ -36,13 +36,15 @@
     "overridePath": "data/presentation/soldier-unique-skill-review-overrides.v1.json"
   },
   "buildGate": {
-    "status": "PENDING_BATCH6_VERIFY",
-    "workflow": null,
-    "runId": null,
-    "jobId": null,
-    "generatorSummary": "expected records=185 pass=137 review=48 overrides=28 missing=0 extra=0 public=185",
-    "productionViteNitroBuild": "PENDING",
-    "frontendLocalizationBoundary": "PENDING"
+    "status": "PASS",
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33229241040,
+    "jobId": 99038918516,
+    "verifiedImplementationHeadSha": "58fbb2b2fda2eff0a8cfe81e15d1f4f4d96a72d2",
+    "generatorSummary": "records=185 pass=137 review=48 overrides=28 missing=0 extra=0 public=185",
+    "productionViteNitroBuild": "SUCCESS",
+    "frontendLocalizationBoundary": "PASS",
+    "note": "Final metadata-only closeout HEAD is verified read-only after all checkpoint writes and intentionally not written back into this checkpoint."
   },
   "reviewBoundary": {
     "reviewCount": 48,
@@ -58,8 +60,8 @@
   },
   "completion": {
     "frontendConsumerIntegrated": true,
-    "buildGateComplete": false,
+    "buildGateComplete": true,
     "hostedQaComplete": false
   },
-  "nextStep": "Verify review batch 6 through the build gate; keep the remaining 48 REVIEW items until record-level Korean evidence is available."
+  "nextStep": "Keep the remaining 48 REVIEW items until record-level Korean evidence is available; Hosted QA follows after deployment."
 }
