@@ -1,0 +1,42 @@
+name: Hero CardHead Materialize
+
+on:
+  push:
+    branches:
+      - work/hero-cardhead-assets-20260830
+    paths:
+      - .github/workflows/hero-cardhead-materialize.yml
+      - scripts/materialize-hero-cardhead-assets.py
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install extraction runtime
+        shell: pwsh
+        run: python -m pip install --disable-pip-version-check --quiet UnityPy==1.25.3 Pillow
+      - name: Materialize exact CardHeadImage assets
+        shell: pwsh
+        run: python scripts/materialize-hero-cardhead-assets.py
+      - name: Commit verified CardHead assets
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/images/heroes/card-head data/generated/hero-cardhead-web-assets.v1.json data/validation/hero-cardhead-materialization.v1.json
+          if git diff --cached --quiet; then
+            echo "No CardHead changes."
+          else
+            git commit -m "Materialize 267 exact Hero CardHead assets"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
