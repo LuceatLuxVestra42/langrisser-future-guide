@@ -86,3 +86,5 @@ jobs:
       - name: Verify frozen Stage 6-6 artifacts on PR
         if: github.event_name == 'pull_request'
         run: git diff --exit-code -- data/generated/soldier-stage6-6-expansion-basis.v1.json data/validation/soldier-stage6-6-expansion-basis.v1.json
+
+# refresh trigger: 2026-08-30 stage6-6 after 6-5 freeze
