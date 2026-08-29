@@ -130,11 +130,10 @@ function buildResult() {
     detailRoute.includes('data-name-source-authority={hero.localization.sourceAuthority}');
   if (!detailDisplayMigrated) errors.push(fail('HERO_DETAIL_DISPLAY_MIGRATION_MISSING', 'Hero detail route/head is not localization-first.'));
 
+  const routeRuntimeText = `${listRoute}\n${detailRoute}`.replace(/import\s+type[\s\S]*?;/gu, "");
   const noRouteServerBypass =
-    !listRoute.includes('.server"') &&
-    !listRoute.includes(".server'") &&
-    !detailRoute.includes('.server"') &&
-    !detailRoute.includes(".server'");
+    !routeRuntimeText.includes('.server"') &&
+    !routeRuntimeText.includes(".server'");
   if (!noRouteServerBypass) errors.push(fail('HERO_ROUTE_SERVER_BYPASS', 'Hero routes bypass the approved server-function boundary.'));
 
   const productionBoundaryPreserved =
