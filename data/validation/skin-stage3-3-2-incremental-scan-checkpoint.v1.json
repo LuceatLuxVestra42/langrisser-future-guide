@@ -30,9 +30,23 @@
   "tooling": {
     "batchScanner": "scripts/skin-stage3-3-bulk-scan.mjs",
     "batchMerger": "scripts/skin-stage3-3-merge-scan-results.mjs",
+    "batchMergeValidator": "scripts/validate-skin-stage3-3-merge-scan-results.mjs",
     "unityFsScanner": "scripts/unityfs-exact-path-scan.mjs",
     "singleBatchCommand": "node scripts/skin-stage3-3-bulk-scan.mjs <batch-dir> <batch-output.json> --catalog <bundle-file-list.txt> --allow-incomplete",
-    "mergeCommand": "node scripts/skin-stage3-3-merge-scan-results.mjs <merged-output.json> <scan-a.json> <scan-b.json> [scan-c.json ...] --allow-incomplete"
+    "mergeCommand": "node scripts/skin-stage3-3-merge-scan-results.mjs <merged-output.json> <scan-a.json> <scan-b.json> [scan-c.json ...] --allow-incomplete",
+    "validatorCommand": "node scripts/validate-skin-stage3-3-merge-scan-results.mjs"
+  },
+  "batchMergeSelfTest": {
+    "status": "PASS_SKIN_STAGE3_3_2_BATCH_MERGE_VALIDATION",
+    "checkCount": 4,
+    "passedCount": 4,
+    "failedCount": 0,
+    "checks": [
+      "DISJOINT_BATCHES_RESOLVE_EXACT",
+      "UNSCANNED_CANDIDATE_REMAINS_BLOCKED",
+      "CATALOG_HASH_MISMATCH_FAILS_CLOSED",
+      "REPEATED_BUNDLE_CONFLICT_FAILS_CLOSED"
+    ]
   },
   "mergeAdmission": {
     "sameStageAndSubstageRequired": true,
