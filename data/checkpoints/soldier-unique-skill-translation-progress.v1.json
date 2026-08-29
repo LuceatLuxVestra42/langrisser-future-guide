@@ -23,10 +23,11 @@
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch9.v1.json","recordCount":40,"range":"soldierId 5311 through 6113; final SP records","role":"append-only-batch"}
   ],
   "writeStrategy": {
-    "mode": "checkpoint-sharded-during-bulk-translation",
-    "reason": "Avoid repeated whole-file replacement of the growing presentation overlay during bulk translation. Preserve completed batches as immutable checkpoints and consolidate once after translation/review stabilizes.",
+    "mode": "checkpoint-sharded-authoring-with-deterministic-final-consolidation",
+    "reason": "Preserve immutable translation batches while generating one validated final presentation consumer from all 185 translated records.",
     "canonicalGeneratedSourceReadOnly": true,
-    "finalConsolidationRequired": true,
+    "finalConsolidationRequired": false,
+    "finalConsolidationComplete": true,
     "batch8RecordSourceMode": "canonical-by-soldierId",
     "batch9RecordSourceMode": "canonical-by-soldierId"
   },
@@ -47,7 +48,12 @@
   "completion": {
     "translationTargetComplete": true,
     "translatedCoverage": "185/185",
-    "finalConsolidationRequired": true,
-    "reviewResolutionRequired": true
+    "finalConsolidationRequired": false,
+    "finalConsolidationComplete": true,
+    "consolidationCheckpoint": "data/checkpoints/soldier-unique-skill-translation-consolidation.v1.json",
+    "finalConsumerPath": "data/generated/soldier-unique-skill-kr-final.v1.json",
+    "validationPath": "data/validation/soldier-unique-skill-kr-final.v1.json",
+    "reviewResolutionRequired": true,
+    "frontendConsumerIntegrationRequired": true
   }
 }
