@@ -1,0 +1,143 @@
+name: Equipment P1 Hosted Closeout QA
+
+on:
+  push:
+    branches:
+      - main
+      - qa/equipment-p1-closeout-20260829
+    paths:
+      - '.github/workflows/equipment-p1-closeout-hosted-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: equipment-p1-hosted-closeout
+  cancel-in-progress: false
+
+jobs:
+  hosted-closeout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Require frozen P1 product navigation source
+        run: |
+          set -euo pipefail
+          grep -q 'to="/heroes/$heroId"' 'src/routes/equipment_.$equipmentId.tsx'
+          grep -q 'reloadDocument' 'src/routes/equipment_.$equipmentId.tsx'
+
+      - name: Install Playwright Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Re-run existing Equipment hosted Browser regression
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-equipment-image-stage3-browser-ui.mjs
+
+      - name: Verify P1 Exclusive Equipment to Hero hosted navigation
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+
+          const base = (process.env.HOSTED_BASE_URL ?? '').replace(/\/?$/, '/');
+          const assert = (condition, message) => {
+            if (!condition) throw new Error(message);
+          };
+
+          const browser = await chromium.launch({ headless: true });
+          const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+          const page = await context.newPage();
+          const consoleErrors = [];
+          const pageErrors = [];
+          const badResponses = [];
+
+          page.on('console', (message) => {
+            if (message.type() === 'error') consoleErrors.push(message.text());
+          });
+          page.on('pageerror', (error) => pageErrors.push(String(error)));
+          page.on('response', (response) => {
+            if (response.url().startsWith(base) && response.status() >= 400) {
+              badResponses.push({ url: response.url(), status: response.status() });
+            }
+          });
+
+          try {
+            const detailUrl = new URL('equipment/273/', base).toString();
+            const response = await page.goto(detailUrl, { waitUntil: 'networkidle', timeout: 45_000 });
+            assert(response && response.status() < 400, `Equipment 273 detail failed: ${response?.status()}`);
+
+            await page.getByRole('heading', { name: '전용 영웅', exact: true }).waitFor({ state: 'visible', timeout: 15_000 });
+
+            const heroLinks = page.locator('a[href*="/heroes/"]');
+            const count = await heroLinks.count();
+            assert(count > 0, 'Exclusive Equipment 273 owner Hero link is missing');
+
+            let heroLink = null;
+            let heroId = null;
+            for (let index = 0; index < count; index += 1) {
+              const candidate = heroLinks.nth(index);
+              const href = await candidate.getAttribute('href');
+              if (!href) continue;
+              const match = href.match(/\/heroes\/(\d+)\/?$/);
+              if (match) {
+                heroLink = candidate;
+                heroId = match[1];
+                break;
+              }
+            }
+
+            assert(heroLink && heroId, 'No numeric owner Hero detail route was found for Equipment 273');
+            const heroRoutePattern = new RegExp(`/heroes/${heroId}/?$`);
+
+            await Promise.all([
+              page.waitForURL((url) => heroRoutePattern.test(url.pathname), { timeout: 30_000 }),
+              heroLink.click(),
+            ]);
+            const heroPath = new URL(page.url()).pathname;
+            assert(heroRoutePattern.test(heroPath), `Hero click did not reach Hero ${heroId}: ${page.url()}`);
+
+            const heroHeading = page.locator('h1').first();
+            await heroHeading.waitFor({ state: 'visible', timeout: 15_000 });
+            const headingBeforeRefresh = (await heroHeading.innerText()).trim();
+            assert(headingBeforeRefresh.length > 0, 'Hero detail h1 is empty after Equipment navigation');
+
+            const refreshResponse = await page.reload({ waitUntil: 'networkidle', timeout: 45_000 });
+            assert(refreshResponse && refreshResponse.status() < 400, `Hero detail refresh failed: ${refreshResponse?.status()}`);
+            assert(new URL(page.url()).pathname === heroPath, `Hero detail refresh changed route: ${page.url()}`);
+
+            const headingAfterRefresh = (await page.locator('h1').first().innerText()).trim();
+            assert(headingAfterRefresh === headingBeforeRefresh, 'Hero detail identity changed after direct refresh');
+
+            assert(pageErrors.length === 0, `pageerror detected: ${JSON.stringify(pageErrors)}`);
+            assert(consoleErrors.length === 0, `console error detected: ${JSON.stringify(consoleErrors)}`);
+            assert(badResponses.length === 0, `hosted HTTP failure detected: ${JSON.stringify(badResponses)}`);
+
+            console.log(JSON.stringify({
+              status: 'PASS_EQUIPMENT_PRESENTATION_P1_HOSTED_CLOSEOUT',
+              equipmentId: 273,
+              heroId,
+              heroPath,
+              heroHeading: headingBeforeRefresh,
+              clickNavigation: 'PASS',
+              directRefresh: 'PASS',
+              pageErrors: 0,
+              consoleErrors: 0,
+              hostedHttpFailures: 0,
+              semanticStageReopened: false
+            }, null, 2));
+          } finally {
+            await browser.close();
+          }
+          NODE
