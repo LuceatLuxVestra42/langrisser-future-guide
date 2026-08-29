@@ -3,7 +3,7 @@
   "schemaId": "soldier-unique-skill-review-resolution/v1",
   "date": "2026-08-29",
   "batch": 5,
-  "status": "APPLIED_BUILD_RECHECK_PENDING",
+  "status": "PASS",
   "evidence": "data/checkpoints/soldier-unique-skill-review-evidence-batch5.v1.json",
   "overrides": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
   "before": {"passCount":125,"reviewCount":60,"overrideCount":16},
@@ -13,12 +13,21 @@
     "recordLevelDecision": "PASS",
     "reason": "Korean Soldier-effect references reproduce every review-blocking mechanic/status wording for these five records; partial named-effect evidence remains REVIEW."
   },
-  "afterExpected": {"passCount":130,"reviewCount":55,"overrideCount":21,"translatedCount":185,"remainingTranslationCount":0},
+  "after": {"passCount":130,"reviewCount":55,"overrideCount":21,"translatedCount":185,"remainingTranslationCount":0},
+  "verification": {
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33228025075,
+    "jobId": 99035436083,
+    "result": "SUCCESS",
+    "observed": {"records":185,"passCount":130,"reviewCount":55,"overrideCount":21,"missing":0,"extra":0,"public":185},
+    "productionBuild": "SUCCESS",
+    "frontendLocalizationBoundary": "PASS"
+  },
   "safety": {
     "canonicalSoldierDataReopened": false,
     "baseTranslationShardsMutated": false,
     "reviewResolutionAppliedBySmallOverrideLayer": true,
     "blanketMechanicPromotion": false
   },
-  "nextStep": "Confirm deterministic generator and production build at 185 records / 130 PASS / 55 REVIEW / 21 overrides."
+  "nextStep": "Continue record-level evidence resolution from the remaining 55 REVIEW items; keep partial or named-effect-only evidence in REVIEW."
 }
