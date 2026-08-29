@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-3-3",
+  "checkpoint": "SKIN_STAGE3_3_3_RESOLUTION_QA_READINESS",
+  "status": "READY_WAITING_FOR_STAGE3_3_2_COMPLETE_SCAN",
+  "finalFreezeReady": false,
+  "contract": "data/contracts/skin-stage3-3-3-resolution-qa.v1.json",
+  "validator": "scripts/validate-skin-stage3-3-3-resolution-qa.mjs",
+  "selfTest": {
+    "script": "scripts/validate-skin-stage3-3-3-resolution-qa-selftest.mjs",
+    "status": "PASS_SKIN_STAGE3_3_3_RESOLUTION_QA_SELFTEST",
+    "checkCount": 7,
+    "passedCount": 7,
+    "failedCount": 0,
+    "checks": [
+      "SINGLE_EXACT_FINAL_PASS",
+      "IDENTICAL_CAB_ALIAS_ACCEPTED",
+      "NONIDENTICAL_CAB_REVIEW",
+      "UNSCANNED_REMAINS_PENDING",
+      "ALL_CANDIDATES_NOT_FOUND_FAILS",
+      "DUPLICATE_OCCURRENCE_REVIEW",
+      "FROZEN_COUNT_TAMPER_BLOCKED"
+    ]
+  },
+  "frozenBaseline": {
+    "skinCount": 540,
+    "requiredTargetCount": 1869,
+    "staticTargetCount": 540,
+    "charSpineTargetCount": 540,
+    "modelPrimaryTargetCount": 789,
+    "supplementalTargetCount": 81,
+    "modelSourceIndexRecordCount": 977,
+    "bundleCatalogLineCount": 3047,
+    "bundleCatalogSha256": "424b64fefe0adfb6797e13053e3049e257838185c51e215eae22d8ee2d9c7188",
+    "authoritativeCandidateBundleCount": 536
+  },
+  "currentStage3_3_2Evidence": {
+    "manifest": "data/evidence/skin-stage3-3-current-subset/manifest.v1.json",
+    "candidateBundlesInspected": 13,
+    "candidateBundlesUnscanned": 523,
+    "requiredResolvedExact": 369,
+    "requiredPendingUnscannedCandidate": 1500,
+    "supplementalResolvedExact": 4,
+    "bundleScanErrors": 0,
+    "fullyInspectedNotFound": 0,
+    "duplicateOccurrence": 0,
+    "ambiguousMultipleBundles": 0
+  },
+  "qaPolicy": {
+    "singleExactBundle": "PASS",
+    "multipleExactBundlesSameEmbeddedCabSha256": "PASS_AS_SAFE_ALIAS_WITH_ALL_PROVENANCE_RETAINED",
+    "multipleExactBundlesDifferentEmbeddedCabSha256": "REVIEW",
+    "duplicateExactOccurrenceInsideBundle": "REVIEW",
+    "allCandidatesScannedAndNotFound": "FAIL",
+    "scanError": "FAIL",
+    "unscannedCandidate": "PENDING",
+    "automaticBeginCurrentPreference": false
+  },
+  "finalFreezeConditions": {
+    "candidateBundlesAccountedFor": 536,
+    "bundleScanErrors": 0,
+    "requiredTargetsAccepted": 1869,
+    "pendingRequiredTargets": 0,
+    "failedRequiredTargets": 0,
+    "reviewRequiredTargets": 0,
+    "staticCoverage": 540,
+    "charSpineCoverage": 540,
+    "modelPrimaryCoverage": 789,
+    "skinCoverage": 540
+  },
+  "boundaries": {
+    "canonicalSkinRecomputed": false,
+    "heroSkinOwnershipRecomputed": false,
+    "sourceOrderRecomputed": false,
+    "modelResourceSelectionRecomputed": false,
+    "projectDoctorSkinAssetOwnerPromoted": false,
+    "stage3_4ExtractionStarted": false
+  },
+  "blocker": {
+    "code": "STAGE3_3_2_REMAINING_BUNDLE_BYTES_NOT_AVAILABLE",
+    "remainingCandidateBundleCount": 523,
+    "note": "3-3-3 QA implementation is ready, but final QA/freeze cannot be executed until the Stage 3-3-2 merged scan accounts for all catalog-confirmed candidates."
+  },
+  "nextStartPoint": "Continue resumable Stage 3-3-2 batch scanning for any available subset of the remaining 523 bundles. Merge scan outputs, then run validate-skin-stage3-3-3-resolution-qa.mjs on the merged result. If finalFreezeReady=true, freeze 3-3-3 and proceed to Stage 3-4 selective extraction."
+}
