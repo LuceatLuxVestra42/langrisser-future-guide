@@ -1,0 +1,58 @@
+name: Soldier Unique Skill Korean Hosted QA
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/soldier-unique-skill-hosted-qa.yml'
+      - 'scripts/validate-soldier-unique-skill-hosted.mjs'
+      - 'scripts/build-soldier-unique-skill-kr-presentation.mjs'
+      - 'data/checkpoints/soldier-unique-skill-frontend-localization.v1.json'
+      - 'data/checkpoints/soldier-unique-skill-translation-progress.v1.json'
+      - 'data/checkpoints/soldier-unique-skill-translation-consolidation.v1.json'
+      - 'data/presentation/soldier-unique-skill-kr.v1.json'
+      - 'data/checkpoints/soldier-unique-skill-translation-batch5.v1.json'
+      - 'data/checkpoints/soldier-unique-skill-translation-batch6.v1.json'
+      - 'data/checkpoints/soldier-unique-skill-translation-batch7.v1.json'
+      - 'data/checkpoints/soldier-unique-skill-translation-batch8.v1.json'
+      - 'data/checkpoints/soldier-unique-skill-translation-batch9.v1.json'
+      - 'src/components/soldier-detail-modal.tsx'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: soldier-unique-skill-hosted-qa
+  cancel-in-progress: false
+
+jobs:
+  hosted-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate GitHub Pages Soldier Korean unique skills
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-soldier-unique-skill-hosted.mjs
+
+      - name: Persist Soldier Korean hosted QA checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/soldier-unique-skill-hosted-qa-summary.v1.json data/checkpoints/soldier-unique-skill-frontend-localization.v1.json
+          if git diff --cached --quiet; then
+            echo "No Soldier Korean hosted QA checkpoint changes"
+            exit 0
+          fi
+          git commit -m "Freeze Soldier Korean hosted QA [skip ci]"
+          git push
