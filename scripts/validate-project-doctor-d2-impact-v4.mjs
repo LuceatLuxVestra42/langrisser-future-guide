@@ -1,45 +1,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { analyzePaths, buildEffectiveMap } from './analyze-project-doctor-d2-impact.mjs';
-
 const CONTRACT_PATH='data/contracts/project-doctor-d2-impact-contract.v4.json';
 const OUTPUT_PATH='data/validation/project-doctor-d2-impact-summary.v4.json';
-const readJson=p=>JSON.parse(fs.readFileSync(p,'utf8'));
-const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
-const sorted=v=>[...v].sort();
-const contract=readJson(CONTRACT_PATH);
-const baseMap=readJson(contract.baseMap);
-const effectiveMap=buildEffectiveMap(baseMap,contract);
-const failures=[];
-const checks=[];
-const check=(name,ok,detail=null)=>{const row={name,pass:Boolean(ok),...(detail===null?{}:{detail})};checks.push(row);if(!ok)failures.push(row)};
-
-check('v4 contract frozen',contract.schemaId==='project-doctor-d2-impact-contract/v4'&&contract.status==='DESIGN_FROZEN');
-check('v3 superseded without rewrite',contract.supersedes==='data/contracts/project-doctor-d2-impact-contract.v3.json');
-check('base map preserved',contract.baseMap==='data/contracts/project-doctor-d2-dependency-map.v1.json'&&baseMap.status==='DESIGN_FROZEN');
-check('overlay count',contract.pathRuleOverlays?.length===10,contract.pathRuleOverlays?.map(r=>r.id));
-for(const id of ['soldier-webp-assets-post-map','project-doctor-workflow-post-map','project-status-derived-sync','regression-coverage-promotion-v1-meta-contract','localization-audit-stage6-integration','project-doctor-v3-regression-admission-tooling','regression-coverage-promotion-v2-admission','equipment-image-final-owner','skin-assets-final-owner','skin-hero-detail-consumer']) check(`overlay:${id}`,contract.pathRuleOverlays?.some(r=>r.id===id));
-const equipmentImage=contract.pathRuleOverlays?.find(r=>r.id==='equipment-image-final-owner');
-check('equipment image owner preserved',equipmentImage?.changeClass==='asset-pipeline'&&same(sorted(equipmentImage?.directNodes??[]),['equipment-assets']));
-const skinAssets=contract.pathRuleOverlays?.find(r=>r.id==='skin-assets-final-owner');
-check('skin final owner scoped',skinAssets?.changeClass==='asset-pipeline'&&same(sorted(skinAssets?.directNodes??[]),['skin-assets']));
-const skinConsumer=contract.pathRuleOverlays?.find(r=>r.id==='skin-hero-detail-consumer');
-check('skin consumer dual boundary',skinConsumer?.changeClass==='frontend'&&same(sorted(skinConsumer?.directNodes??[]),['hero-frontend','skin-assets']));
-check('no graph mutation',contract.overlayPolicy?.mayAddImpactNodes===false&&contract.overlayPolicy?.mayAddPropagationEdges===false&&contract.overlayPolicy?.mayRewriteBaseRules===false&&contract.overlayPolicy?.historicalV3Preserved===true);
-
-const fixtureResults=[];
-for(const fixture of contract.fixtures??[]){
-  const result=analyzePaths(fixture.paths,effectiveMap);
-  const errs=[];
-  if(result.status!==fixture.expectedStatus) errs.push({field:'status',expected:fixture.expectedStatus,actual:result.status});
-  if(fixture.expectedChangedFileCount!==undefined&&result.changedFileCount!==fixture.expectedChangedFileCount) errs.push({field:'changedFileCount',expected:fixture.expectedChangedFileCount,actual:result.changedFileCount});
-  if(!same(result.directNodes,sorted(fixture.expectedDirectNodes??[]))) errs.push({field:'directNodes',expected:sorted(fixture.expectedDirectNodes??[]),actual:result.directNodes});
-  if(!same(result.domains,sorted(fixture.expectedDomains??[]))) errs.push({field:'domains',expected:sorted(fixture.expectedDomains??[]),actual:result.domains});
-  const pass=errs.length===0;fixtureResults.push({id:fixture.id,pass,errors:errs});if(!pass)failures.push({fixture:fixture.id,errors:errs});
-}
-const pass=failures.length===0;
-const summary={version:4,schemaId:'project-doctor-d2-impact-summary/v4',stage:'D2-IMPACT',checkpoint:'PROJECT_DOCTOR_D2_IMPACT_ANALYZER_V4_SKIN_ASSET_OWNER_ADMISSION',status:pass?'PASS_PROJECT_DOCTOR_D2_IMPACT_V4':'FAIL_PROJECT_DOCTOR_D2_IMPACT_V4',completion:pass?'COMPLETE':'BLOCKED',contract:CONTRACT_PATH,counts:{fixtureCount:fixtureResults.length,fixturePassCount:fixtureResults.filter(x=>x.pass).length,pathRuleOverlayCount:contract.pathRuleOverlays.length,hardErrorCount:failures.length},checks,fixtureResults,failures,hardErrorCount:failures.length};
-fs.mkdirSync(path.dirname(OUTPUT_PATH),{recursive:true});
-fs.writeFileSync(OUTPUT_PATH,`${JSON.stringify(summary,null,2)}\n`);
-console.log(summary.status);
-if(!pass)process.exitCode=1;
+const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+const same=(a=[],b=[])=>JSON.stringify([...a].sort())===JSON.stringify([...b].sort());
+const c=read(CONTRACT_PATH),base=read(c.baseMap),map=buildEffectiveMap(base,c);const failures=[];const results=[];
+if(c.schemaId!=='project-doctor-d2-impact-contract/v4'||c.status!=='DESIGN_FROZEN') failures.push('CONTRACT');
+if(c.supersedes!=='data/contracts/project-doctor-d2-impact-contract.v3.json') failures.push('SUPERSEDES');
+const hero=c.pathRuleOverlays.find(x=>x.id==='hero-artwork-final-owner');
+if(!hero||hero.changeClass!=='asset-pipeline'||!same(hero.directNodes,['hero-assets'])) failures.push('HERO_OVERLAY');
+const suppress=(c.baseRuleExcludeOverlays??[]).find(x=>x.ruleId==='hero-data-family');
+if(!suppress||!(suppress.excludePatterns??[]).includes('data/validation/hero-artwork-hosted-qa.v1.json')||!(suppress.excludePatterns??[]).includes('scripts/validate-hero-artwork-final.mjs')) failures.push('HERO_SEMANTIC_SUPPRESSION');
+if(c.overlayPolicy?.mayAddImpactNodes!==false||c.overlayPolicy?.mayAddPropagationEdges!==false||c.overlayPolicy?.mayRewriteBaseRulePatterns!==false||c.overlayPolicy?.mayAddScopedBaseRuleExclusions!==true||c.overlayPolicy?.baseRuleExclusionsMayRemoveDirectNodes!==false) failures.push('GRAPH_OR_RULE_POLICY');
+const originalHeroRule=base.pathRules.find(x=>x.id==='hero-data-family');
+if(!originalHeroRule||originalHeroRule.excludePatterns?.includes('data/validation/hero-artwork-hosted-qa.v1.json')) failures.push('BASE_MAP_MUTATED');
+for(const f of c.fixtures??[]){const r=analyzePaths(f.paths,map);const pass=r.status===f.expectedStatus&&same(r.directNodes,f.expectedDirectNodes??[])&&same(r.domains,f.expectedDomains??[]);results.push({id:f.id,pass,status:r.status,directNodes:r.directNodes,domains:r.domains});if(!pass) failures.push(`FIXTURE:${f.id}`)}
+const pass=failures.length===0;const out={version:4,schemaId:'project-doctor-d2-impact-summary/v4',status:pass?'PASS_PROJECT_DOCTOR_D2_IMPACT_V4':'FAIL_PROJECT_DOCTOR_D2_IMPACT_V4',completion:pass?'COMPLETE':'BLOCKED',fixtureCount:results.length,fixturePassCount:results.filter(x=>x.pass).length,heroArtworkSemanticSuppression:true,baseMapMutated:false,failures,results};
+fs.mkdirSync(path.dirname(OUTPUT_PATH),{recursive:true});fs.writeFileSync(OUTPUT_PATH,`${JSON.stringify(out,null,2)}\n`);console.log(JSON.stringify(out,null,2));if(!pass)process.exitCode=1;

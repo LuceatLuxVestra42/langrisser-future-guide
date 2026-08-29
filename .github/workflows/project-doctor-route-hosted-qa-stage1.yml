@@ -1,0 +1,60 @@
+name: Route Hosted QA Stage 1 Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'data/contracts/project-doctor-route-hosted-qa-stage*.json'
+      - 'data/generated/project-doctor-route-hosted-qa-*'
+      - 'data/validation/project-doctor-route-hosted-qa-stage*.json'
+      - 'scripts/*project-doctor-route-hosted-qa-stage*.mjs'
+      - '.github/workflows/project-doctor-route-hosted-qa-stage1.yml'
+      - '.github/workflows/project-doctor-route-hosted-qa-stage1-hosted-proof.yml'
+      - 'src/routes/__root.tsx'
+      - 'src/lib/banner-page.functions.ts'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Validate frozen QA-0 contract
+        run: npm run qa:hosted:stage0:validate
+
+      - name: Validate QA-1 deterministic fixtures
+        run: npm run qa:hosted:validate
+
+      - name: Probe current deployed GitHub Pages
+        id: live_probe
+        continue-on-error: true
+        run: env -u GITHUB_SHA npm run qa:hosted -- --probe-current --output route-hosted-qa-stage1-live.json
+
+      - name: Publish live probe summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f route-hosted-qa-stage1-live.json ]; then
+            node -e 'const fs=require("fs");const r=JSON.parse(fs.readFileSync("route-hosted-qa-stage1-live.json","utf8"));console.log(`Live probe status: ${r.status}`);console.log(`Failed checks: ${r.checks.filter(x=>!x.pass).map(x=>x.id).join(", ")||"none"}`);console.log(`Deployed source SHA: ${r.deployment.deployedSourceSha||"unresolved"}`);'
+          else
+            echo 'Live probe did not produce a result file.'
+          fi
+
+      - name: Upload live probe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-hosted-qa-stage1-live
+          path: route-hosted-qa-stage1-live.json
+          if-no-files-found: warn

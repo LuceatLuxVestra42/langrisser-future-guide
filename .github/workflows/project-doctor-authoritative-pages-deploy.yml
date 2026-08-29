@@ -1,0 +1,139 @@
+name: Authoritative GitHub Pages Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: authoritative-github-pages-production
+  cancel-in-progress: true
+
+env:
+  SKIN_RUNTIME_REF: 8ad8b238f33253f87cb903fbdf56fa563dde77c3
+  HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+
+jobs:
+  deploy-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact product source
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Overlay frozen Skin runtime only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "$SKIN_RUNTIME_REF"
+          git checkout "$SKIN_RUNTIME_REF" -- \
+            data/generated/skin-stage2-3-bidirectional-relation.v1.json \
+            data/generated/skin-stage3-5-static-web-asset-map.v1.json \
+            data/validation/skin-stage3-5-static-web-asset-map.v1.json \
+            public/images/skins \
+            src/lib/skin-detail.server.ts \
+            scripts/validate-skin-stage3-6-hero-detail-consumer.mjs \
+            scripts/validate-skin-stage3-6-static-candidate.mjs
+          test "$(find public/images/skins -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '540'
+
+      - name: Compose latest product with frozen Skin presentation
+        run: |
+          set -euo pipefail
+          node scripts/project-doctor-compose-authoritative-pages-runtime.mjs
+          node scripts/validate-skin-stage3-6-hero-detail-consumer.mjs
+          grep -q 'equipment-p3-1-release-metadata.v1.json' src/lib/equipment-page.localized.server.ts
+          grep -q '같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순' src/routes/equipment.tsx
+
+      - name: Reuse proven GitHub Pages static build config
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
+          git show FETCH_HEAD:vite.config.ts > vite.config.ts
+          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
+          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
+          grep -q 'nitro: false' vite.config.ts
+
+      - name: Build authoritative static candidate
+        run: bun run build
+
+      - name: TypeScript gate
+        run: bunx tsc --noEmit
+
+      - name: Validate composed static surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/validate-skin-stage3-6-static-candidate.mjs
+          test -f dist/client/equipment/index.html
+          test -f dist/client/equipment/642/index.html
+          test -f dist/client/equipment/299/index.html
+          test -f dist/client/heroes/index.html
+          test -f dist/client/heroes/6/index.html
+          test -f dist/client/images/equipment/567.png
+          cp dist/client/index.html dist/client/404.html
+          cat > dist/client/authoritative-pages-source.json <<JSON
+          {
+            "status": "AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT",
+            "sourceSha": "${GITHUB_SHA}",
+            "sourceRef": "${GITHUB_REF_NAME}",
+            "skinRuntimeRef": "${SKIN_RUNTIME_REF}",
+            "skinPngCount": 540,
+            "semanticStageReopened": false,
+            "publisher": ".github/workflows/project-doctor-authoritative-pages-deploy.yml"
+          }
+          JSON
+
+      - name: Publish authoritative candidate to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Authoritative Pages deploy ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
+
+      - name: Install Chromium QA runtime
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Verify actual hosted composed surface
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+          EXPECTED_SKIN_REF: ${{ env.SKIN_RUNTIME_REF }}
+          HOSTED_BASE_URL: ${{ env.HOSTED_BASE_URL }}
+        run: node scripts/project-doctor-validate-authoritative-pages-hosted.mjs
+
+      - name: Print authoritative deployment source
+        if: always()
+        run: |
+          printf 'productSource=%s\n' "$GITHUB_SHA"
+          printf 'skinRuntimeRef=%s\n' "$SKIN_RUNTIME_REF"
+          printf 'semanticStageReopened=false\n'

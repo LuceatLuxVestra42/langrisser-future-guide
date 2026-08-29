@@ -13,7 +13,7 @@
     "audit:localization": "node scripts/audit-localization.mjs",
     "audit:localization:check": "node scripts/audit-localization.mjs --check",
     "validate:equipment-image-final": "node scripts/validate-equipment-image-final.mjs",
-    "validate:skin-assets-final": "node scripts/validate-skin-assets-final.mjs",
+    "validate:hero-artwork-final": "node scripts/validate-hero-artwork-final.mjs",
     "doctor": "node scripts/run-project-doctor-closeout.mjs",
     "doctor:status": "node scripts/run-project-doctor-d1-3.mjs",
     "doctor:collect": "node scripts/collect-project-doctor-d1-1.mjs",
@@ -72,7 +72,10 @@
     "validate:coverage:skin-relation": "python3 scripts/validate-skin-stage2-5-final.py",
     "validate:coverage:shared-movement": "node scripts/validate-shared-movement-type-index-final.mjs",
     "validate:coverage:soldier-assets": "node scripts/validate-soldier-portrait-v9-final.mjs",
-    "validate:regression-coverage-promotion:v2": "node scripts/validate-regression-coverage-promotion-v2.mjs"
+    "validate:regression-coverage-promotion:v2": "node scripts/validate-regression-coverage-promotion-v2.mjs",
+    "qa:hosted": "node scripts/run-project-doctor-route-hosted-qa-stage1.mjs",
+    "qa:hosted:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage1.mjs --check",
+    "qa:hosted:stage0:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage0.mjs --check"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

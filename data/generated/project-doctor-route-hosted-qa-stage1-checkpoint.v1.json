@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-route-hosted-qa-stage1-checkpoint/v1",
+  "stage": "QA-1",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "ROUTE_HOSTED_QA_STAGE1_HTTP_FROZEN",
+  "toolingNamespace": "project-doctor-route-hosted-qa",
+  "branch": "work/route-hosted-qa-stage1-http-runner",
+  "pullRequest": 185,
+  "predecessor": {
+    "stage": "QA-0",
+    "contract": "data/contracts/project-doctor-route-hosted-qa-stage0.v1.json",
+    "status": "PASS"
+  },
+  "implementation": {
+    "contract": "data/contracts/project-doctor-route-hosted-qa-stage1.v1.json",
+    "runner": "scripts/run-project-doctor-route-hosted-qa-stage1.mjs",
+    "validator": "scripts/validate-project-doctor-route-hosted-qa-stage1.mjs",
+    "validation": "data/validation/project-doctor-route-hosted-qa-stage1.v1.json",
+    "validationWorkflow": ".github/workflows/project-doctor-route-hosted-qa-stage1.yml",
+    "strictHostedProofWorkflow": ".github/workflows/project-doctor-route-hosted-qa-stage1-hosted-proof.yml",
+    "packageCommand": "npm run qa:hosted"
+  },
+  "deterministicValidation": {
+    "status": "PASS",
+    "checks": 12,
+    "passed": 12,
+    "failed": 0,
+    "successFixtureHostedChecks": 10,
+    "failureFixture": {
+      "kind": "DOMAIN_ROOT_FAVICON",
+      "expectedFailedChecks": [
+        "REPOSITORY_BASE_PATH",
+        "ASSET_AND_CHUNK_RESOLUTION",
+        "FILENAME_CASE_SENSITIVITY"
+      ]
+    }
+  },
+  "initialLiveProbe": {
+    "status": "FAIL_ROUTE_HOSTED_QA_STAGE1_HTTP",
+    "classification": "DEPLOYMENT_HOSTING_FAIL",
+    "semanticStageReopened": false,
+    "checksPassed": 7,
+    "checksFailed": 3,
+    "routeBehaviorPassed": true,
+    "discoveredRegressions": [
+      {
+        "kind": "FAVICON_DOMAIN_ROOT_PATH",
+        "source": "src/routes/__root.tsx",
+        "fixCommit": "5b92cc6724d29f90a244bb5d7bfc5279725f16c5"
+      },
+      {
+        "kind": "BANNER_IMAGE_DOMAIN_ROOT_PATH",
+        "source": "src/lib/banner-page.functions.ts",
+        "fixCommit": "e4be1953ef10e80377787905b2f3b9632059a23b"
+      }
+    ]
+  },
+  "strictHostedProof": {
+    "workflowRunId": 33228284108,
+    "jobId": 99036180035,
+    "artifactId": 9707623249,
+    "artifactName": "route-hosted-qa-stage1-strict",
+    "artifactDigest": "sha256:7d10a79ddaec517b7b8d3a941d95bd6cf49e8bfd867259dd86e244c9a9a26aaf",
+    "status": "PASS_ROUTE_HOSTED_QA_STAGE1_HTTP",
+    "candidateSourceSha": "e9b861d1a8c39a3a453edcdf783fd73e5c838d5e",
+    "deployedSourceSha": "e9b861d1a8c39a3a453edcdf783fd73e5c838d5e",
+    "ghPagesCommitSha": "28330745dc0fa9a715830147ba129b05d97997dd",
+    "checks": 10,
+    "passed": 10,
+    "failed": 0,
+    "publicRoutes": 6,
+    "detailFixtures": 6,
+    "refreshFixtures": 6,
+    "trailingSlashChecks": 11,
+    "negativeChecks": 3,
+    "sameOriginAssetsDiscovered": 327,
+    "assetsChecked": 60,
+    "repositoryBaseViolations": 0,
+    "semanticStageReopened": false
+  },
+  "failureBoundary": {
+    "hosted": "DEPLOYMENT_HOSTING_FAIL",
+    "browser": "BROWSER_UI_FAIL",
+    "semanticReopenAllowed": false
+  },
+  "browserBoundary": {
+    "playwrightInstalled": false,
+    "browserAutomation": false,
+    "deferredTo": "QA-2"
+  },
+  "nextStage": "QA-2",
+  "nextStageGoal": "Install Playwright Chromium and add Browser/UI interaction smoke tests without changing frozen Hosted or semantic contracts."
+}

@@ -1,0 +1,40 @@
+name: Hero Artwork H-A5 Hash Metadata Repair
+
+on:
+  push:
+    branches:
+      - work/hero-artwork-h-a5-bulk-index
+    paths:
+      - scripts/repair-hero-artwork-h-a5-index-hashes.py
+      - .github/workflows/hero-artwork-h-a5-hash-repair.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Repair H-A5 hash metadata against repository bytes
+        shell: pwsh
+        run: python scripts/repair-hero-artwork-h-a5-index-hashes.py
+
+      - name: Commit repaired H-A5 hash metadata
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/hero-artwork-h-a5-index.v1/manifest.json
+          git add data/validation/hero-artwork-h-a5-final.v1.json
+          git add data/checkpoints/hero-artwork-h-a5.txt
+          if git diff --cached --quiet; then
+            echo "No H-A5 hash metadata changes to commit."
+          else
+            git commit -m "Repair H-A5 index hash metadata"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

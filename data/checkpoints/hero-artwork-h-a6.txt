@@ -1,0 +1,93 @@
+Hero Artwork Asset Pipeline — H-A6 actual PNG materialization checkpoint
+기준일: 2026-08-29
+
+============================================================
+1. 최종 판정
+============================================================
+
+status: PASS_H_A6_HERO_ARTWORK_MATERIALIZATION
+completion: COMPLETE
+canonical Hero: 267 / 267
+materialized PNG: 267 / 267
+exact PNG SHA-256 match: 267 / 267
+exact RGBA SHA-256 match: 267 / 267
+exact dimensions match: 267 / 267
+missing asset: 0
+extra asset: 0
+render bundle: 12
+package: 3
+target web contract: public/images/heroes/cards/{heroId}.png
+
+============================================================
+2. authoritative predecessor
+============================================================
+
+H-A5 commit: 68ab3c9c1e49fdc2f0bf2b0da324ac53da12b2fb
+H-A5 validation: PASS_H_A5_BULK_EXTRACTION_INDEX_FINAL
+H-A5 hash repair: PASS_H_A5_HASH_METADATA_REPAIRED
+H-A5 manifest: data/generated/hero-artwork-h-a5-index.v1/manifest.json
+H-A5 manifest SHA256: AC08E7A03B033A10269E330F4E60D3B6A72D68AC6C68EFED37F48372E4E462F6
+
+H-A5의 exact Sprite pathId / dependency bundle / dimensions / PNG·RGBA hash를 그대로 소비했다.
+sourceArtworkPath 재탐색, prefab PPtr 재순회, filename similarity, name JOIN, ID arithmetic은 수행하지 않았다.
+
+============================================================
+3. materialization 규칙
+============================================================
+
+- UNIQUE_REFERENCED_SPRITE: 237
+- DOMINANT_REFERENCED_SPRITE: 23
+- EXTERNAL_DEPENDENCY_SPRITE_FILEID1: 7
+
+normal/dominant record:
+H-A5 bundleName -> exact spritePathId -> Sprite.image -> PNG
+
+external dependency 7:
+H-A5 dependencyBundleName -> exact spritePathId -> Sprite.image -> PNG
+
+각 render bundle은 이 run에서 1회 fetch/decompress/decode했다.
+각 PNG는 H-A5 width/height, PNG SHA-256, RGBA SHA-256 모두 일치해야만 admission했다.
+
+============================================================
+4. generated / validation
+============================================================
+
+web manifest: data/generated/hero-artwork-h-a6-web-assets.v1.json
+web manifest SHA256: D9B949AA3BA97CF8E89CB27517CE2E47FAE1CE20E5790EFA6E1A5C0F65BFD40B
+validation: data/validation/hero-artwork-h-a6-materialization.v1.json
+actual binaries: public/images/heroes/cards/{heroId}.png
+PNG total bytes: 117700583
+
+============================================================
+5. 다시 열지 않는 범위
+============================================================
+
+다음은 H-A5/H-A6 upstream evidence 변경 없이는 재조사하지 않는다.
+- canonical Hero 267 artwork locator
+- 7 family / 12 bundle extraction mapping
+- H-A4 prefab ownership final 240 / begin 27
+- H-A5 exact Sprite/Texture path IDs
+- dominant 23 selection rule
+- external dependency 7 relation
+- 267 PNG bytes/hash materialization
+
+============================================================
+6. 다시 열리는 조건
+============================================================
+
+- H-A5 frozen index manifest/row 내용 변경
+- canonical Hero population 또는 ID 변경
+- official package/bundle provenance가 frozen hash와 불일치
+- committed PNG가 H-A5 width/PNG hash/RGBA hash 검증 실패
+- Hero artwork web-path contract 변경
+
+============================================================
+7. 다음 시작점
+============================================================
+
+Hero frontend에서 canonical artwork resolver의 267/267 RESOLVED coverage를 검증한다.
+그 뒤 presentation 계층으로만 진행한다.
+
+Preflight -> Build -> Deployment/Hosted -> Browser/UI
+
+asset/frontend 문제만으로 Hero FINAL_FROZEN semantic stages는 다시 열지 않는다.

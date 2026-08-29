@@ -1,0 +1,58 @@
+name: Equipment P3-1 Release Presentation
+
+on:
+  pull_request:
+    paths:
+      - 'data/presentation/equipment-p3-1-release-metadata.v1.json'
+      - 'data/validation/equipment-p3-0-release-chronology-presentation-audit.v2.json'
+      - 'data/validation/equipment-p3-1-release-presentation-checkpoint.v1.json'
+      - 'scripts/validate-equipment-p3-1-presentation.mjs'
+      - '.github/workflows/equipment-p3-1-release-presentation.yml'
+  push:
+    branches:
+      - main
+      - feature/equipment-p3-1-release-metadata-20260829
+    paths:
+      - 'data/presentation/equipment-p3-1-release-metadata.v1.json'
+      - 'data/validation/equipment-p3-0-release-chronology-presentation-audit.v2.json'
+      - 'data/validation/equipment-p3-1-release-presentation-checkpoint.v1.json'
+      - 'scripts/validate-equipment-p3-1-presentation.mjs'
+      - '.github/workflows/equipment-p3-1-release-presentation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: equipment-p3-1-release-presentation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Validate P3-1 release metadata projection
+        run: node scripts/validate-equipment-p3-1-presentation.mjs
+
+      - name: Confirm frozen Stage 3 source was not edited by P3-1
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BASE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          BASE_SHA="$PR_BASE_SHA"
+          if [ -z "$BASE_SHA" ]; then BASE_SHA="$PUSH_BASE_SHA"; fi
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "No comparable base SHA for this event; projection validator already checks the frozen source contract."
+            exit 0
+          fi
+          test "$(git diff --name-only "$BASE_SHA" "${{ github.sha }}" -- data/generated/equipment_stage3_3_general_list.json | wc -l)" -eq 0

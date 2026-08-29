@@ -21,10 +21,8 @@ export const Route = createFileRoute("/heroes")({
 
 const ALL_RARITIES = "ALL";
 
-// Presentation-only portrait sample set.
-// Each file is a WebP derivative generated from a clean base-skin PNG source.
-// The source PNGs remain outside the website repository; no rarity/SP/super-buff
-// decoration is baked into these portrait assets.
+// Presentation-only portrait sample set kept as a defensive fallback.
+// The canonical resolver now covers all 267 Hero card artwork paths first.
 const SAMPLE_HERO_CARD_PATHS: Readonly<Record<number, string>> = {
   5: "/images/heroes/portrait-samples/5.webp",
   6: "/images/heroes/portrait-samples/6.webp",
@@ -36,8 +34,6 @@ const SAMPLE_HERO_CARD_PATHS: Readonly<Record<number, string>> = {
 // Presentation-only sample projection from frozen Hero detail shards.
 // Hero 6 and 12 each have a skill whose displayType is `超绝强化`.
 const SAMPLE_SUPER_BUFF_HERO_IDS = new Set<number>([6, 12]);
-
-const SAMPLE_HERO_CARD_COUNT = Object.keys(SAMPLE_HERO_CARD_PATHS).length;
 
 function normalizeSearch(value: string) {
   return value.trim().toLocaleLowerCase();
@@ -191,7 +187,7 @@ function HeroGridPage() {
             <span className="text-muted-foreground"> / {data.summary.total}명</span>
           </p>
           <p className="hidden text-xs text-muted-foreground sm:block">
-            초상화 샘플 {SAMPLE_HERO_CARD_COUNT}명 연결 · 나머지는 placeholder
+            공식 초상화 267명 연결
           </p>
         </div>
 
@@ -259,6 +255,7 @@ function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
 
   return (
     <Link
+      reloadDocument
       to="/heroes/$heroId"
       params={{ heroId: String(hero.heroId) }}
       aria-label={`${displayName} ${hero.rarity.baseLabel} 상세 보기`}

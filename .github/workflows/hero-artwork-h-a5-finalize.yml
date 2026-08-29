@@ -1,0 +1,53 @@
+name: Hero Artwork H-A5 Finalize Index
+
+on:
+  push:
+    branches:
+      - work/hero-artwork-h-a5-bulk-index
+    paths:
+      - scripts/finalize-hero-artwork-h-a5-index.py
+      - .github/workflows/hero-artwork-h-a5-finalize.yml
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  finalize-index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download frozen H-A5 evidence artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api -H 'Accept: application/vnd.github+json' \
+            /repos/${GITHUB_REPOSITORY}/actions/artifacts/9707998242/zip > "$RUNNER_TEMP/h-a5-bulk-v2.zip"
+          gh api -H 'Accept: application/vnd.github+json' \
+            /repos/${GITHUB_REPOSITORY}/actions/artifacts/9708066772/zip > "$RUNNER_TEMP/h-a5-seven-resolve.zip"
+      - name: Assemble and validate final 267 Hero index
+        run: python scripts/finalize-hero-artwork-h-a5-index.py "$RUNNER_TEMP/h-a5-bulk-v2.zip" "$RUNNER_TEMP/h-a5-seven-resolve.zip"
+      - name: Commit bundle-sharded index and checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/generated/hero-artwork-h-a5-index.v1 data/validation/hero-artwork-h-a5-final.v1.json data/checkpoints/hero-artwork-h-a5.txt
+          git diff --cached --quiet && { echo 'No generated change'; exit 0; }
+          git commit -m 'Finalize Hero artwork H-A5 bulk extraction index'
+          git push origin HEAD:work/hero-artwork-h-a5-bulk-index
+      - name: Upload final text index evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-artwork-h-a5-final-index-report
+          path: |
+            data/generated/hero-artwork-h-a5-index.v1
+            data/validation/hero-artwork-h-a5-final.v1.json
+            data/checkpoints/hero-artwork-h-a5.txt
+          if-no-files-found: warn
+          retention-days: 7

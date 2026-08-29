@@ -1,0 +1,133 @@
+name: Route Hosted QA Stage 1 Hosted Proof
+
+on:
+  push:
+    branches:
+      - work/route-hosted-qa-stage1-http-runner
+    paths:
+      - 'data/contracts/project-doctor-route-hosted-qa-stage*.json'
+      - 'data/validation/project-doctor-route-hosted-qa-stage*.json'
+      - 'scripts/*project-doctor-route-hosted-qa-stage*.mjs'
+      - 'src/routes/__root.tsx'
+      - 'src/lib/banner-page.functions.ts'
+      - '.github/workflows/project-doctor-route-hosted-qa-stage1-hosted-proof.yml'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: route-hosted-qa-stage1-hosted-proof
+  cancel-in-progress: true
+
+jobs:
+  hosted-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate Route Hosted QA contracts
+        run: |
+          npm run qa:hosted:stage0:validate
+          npm run qa:hosted:validate
+
+      - name: Reuse proven GitHub Pages static build config
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
+          git show FETCH_HEAD:vite.config.ts > vite.config.ts
+          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
+          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
+          grep -q 'nitro: false' vite.config.ts
+
+      - name: Build static GitHub Pages candidate
+        run: bun run build
+
+      - name: Static Hosted path gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in \
+            dist/client/index.html \
+            dist/client/banners/index.html \
+            dist/client/heroes/index.html \
+            dist/client/heroes/6/index.html \
+            dist/client/soldiers/index.html \
+            dist/client/soldiers/102/index.html \
+            dist/client/equipment/index.html \
+            dist/client/equipment/13/index.html \
+            dist/client/equipment/exclusive/index.html; do
+            test -f "$path"
+          done
+
+          grep -q 'href="/langrisser-future-guide/favicon.ico"' dist/client/index.html
+          ! grep -q 'href="/favicon.ico"' dist/client/index.html
+          ! grep -q 'src="/images/banners/' dist/client/banners/index.html
+          grep -q '/langrisser-future-guide/images/banners/' dist/client/banners/index.html
+
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-main-source.txt
+          printf '%s\n' 'route-hosted-qa-stage1-http-runner' > dist/client/qa-surface.txt
+          echo 'PASS: static candidate uses repository-base-aware favicon and Banner image paths'
+
+      - name: Publish QA candidate to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Route Hosted QA Stage1 ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
+
+      - name: Strict Hosted QA against candidate source SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          passed=0
+          for attempt in $(seq 1 12); do
+            echo "Strict hosted probe attempt ${attempt}"
+            if npm run qa:hosted -- --expected-sha "$GITHUB_SHA" --output route-hosted-qa-stage1-strict.json; then
+              passed=1
+              break
+            fi
+            sleep 10
+          done
+          test "$passed" -eq 1
+
+      - name: Publish strict proof summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f route-hosted-qa-stage1-strict.json ]; then
+            node -e 'const fs=require("fs");const r=JSON.parse(fs.readFileSync("route-hosted-qa-stage1-strict.json","utf8"));console.log(`Strict status: ${r.status}`);console.log(`Passed: ${r.summary.passed}/${r.summary.checkCount}`);console.log(`Failed checks: ${r.checks.filter(x=>!x.pass).map(x=>x.id).join(", ")||"none"}`);console.log(`Deployed source SHA: ${r.deployment.deployedSourceSha||"unresolved"}`);'
+          fi
+
+      - name: Upload strict Hosted QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-hosted-qa-stage1-strict
+          path: route-hosted-qa-stage1-strict.json
+          if-no-files-found: warn
