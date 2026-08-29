@@ -68,7 +68,9 @@
   },
   "review": [
     "Route components still consume the historical identity.nameKr fallback; migration to localization.displayName is Stage 3 scope.",
-    "Frozen Localization Audit contracts remain unchanged in Stage 2 and require a successor in Stage 3."
+    "Frozen Localization Audit contracts remain unchanged in Stage 2 and require a successor in Stage 3.",
+    "Legacy Hero List Stage 2 workflow still asserts the historical Stage-2-only server/artwork boundary and therefore fails after the already-completed Stage 4 consumer evolution; the current Hero List Stage 4 workflow, production build, and TypeScript gate pass.",
+    "Legacy Hero List Stage 3 workflow still asserts that detail/artwork remain deferred and therefore fails against the already-completed Stage 4/5 frontend; this is a superseded workflow review, not a Stage 2 localization blocker."
   ],
   "blockers": [],
   "nextStartPoint": "Stage 3 route consumer migration and Localization Audit successor"
