@@ -1,7 +1,7 @@
 Soldier 819 Korean name spacing — source correction checkpoint
 Date: 2026-08-29
 
-status: SOURCE_CORRECTION_APPLIED
+status: DOWNSTREAM_REFRESH_IN_PROGRESS
 scope: localization / presentation metadata
 
 Target:
@@ -23,17 +23,27 @@ Automated downstream observed:
 - Soldier Stage 2 Final Validation: PASS
 - data/generated/soldier-master.v1.json regenerated with corrected nameKr
 - data/validation/soldier-stage2-final.v1.json regenerated
+- Soldier Stage 4-2 Master Regression: PASS after refreshing only the frozen master blob freshness pointer
+- Soldier Stage 4-3 TrainingTech Regression: PASS
+- Soldier Stage 4-6 Shared Relation Adoption: PASS
+- hero-soldier shared relation artifacts refreshed only for source/freshness hashes; relation validation remains PASS
+- Localization Audit: PASS
+
+Failure ownership confirmed:
+- earlier Stage 4-2 failure was STALE_FROZEN_DEPENDENCY only (masterBlobShaMismatch=1; identity/relation mismatches=0)
+- Stage 5 PR runs generated PASS outputs but could not freeze them because freeze is intentionally enabled only on push to work/** branches
+- this work/** continuation exists so existing producers can freeze downstream artifacts through their normal push workflow
 
 Semantic boundary:
 - Soldier canonical ID unchanged
 - nameCn unchanged
 - tier / armyType unchanged
-- Hero↔Soldier relation unchanged
+- Hero↔Soldier relation cardinality/membership unchanged
 - no name JOIN or ID arithmetic introduced
 
 Remaining at this checkpoint:
-- downstream Soldier consumer propagation / validation
-- Localization Audit / Project Doctor PR Guard
+- freeze Stage 5/6 downstream artifacts through existing producers
+- Project Doctor PR Guard
 - production build and merge to main
 
 Reopen source correction only if:
