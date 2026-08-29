@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-route-hosted-qa-stage0-checkpoint/v1",
+  "stage": "QA-0",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "ROUTE_HOSTED_QA_STAGE0_DESIGN_FROZEN",
+  "toolingNamespace": "project-doctor-route-hosted-qa",
+  "baselineMainCommit": "c7fc2ad4ef76f0910742ee9b14a1d1d3e69d8d6c",
+  "contract": "data/contracts/project-doctor-route-hosted-qa-stage0.v1.json",
+  "validator": "scripts/validate-project-doctor-route-hosted-qa-stage0.mjs",
+  "validation": "data/validation/project-doctor-route-hosted-qa-stage0.v1.json",
+  "hostedBaseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+  "repositoryBase": "/langrisser-future-guide/",
+  "requiredPublicRouteCount": 6,
+  "requiredDetailRoutePatternCount": 3,
+  "representativeFixtures": {"hero":[6],"soldier":[300,1000,102,5621],"equipment":[13]},
+  "validationSummary": {"checks":10,"passed":10,"failed":0},
+  "failureClassification": {"hosted":"DEPLOYMENT_HOSTING_FAIL","browser":"BROWSER_UI_FAIL","semanticReopenAllowed":false},
+  "projectDoctorBoundary": {"pathClass":"tooling","d3D4ExecutionIntegration":false,"semanticOwnerChanged":false},
+  "nextStage": "QA-1",
+  "nextStageGoal": "Implement the HTTP Hosted Route Runner using the frozen QA-0 contract; keep Playwright and Browser/UI interaction deferred."
+}
