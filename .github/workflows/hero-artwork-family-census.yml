@@ -1,0 +1,29 @@
+name: Hero Artwork Family Census
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/probe-hero-artwork-family-census.py'
+      - '.github/workflows/hero-artwork-family-census.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  family-census:
+    if: github.event.pull_request.head.ref == 'work/hero-asset-launcher-probe'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Count canonical Hero artwork path families
+        run: python scripts/probe-hero-artwork-family-census.py
+      - name: Upload census report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-artwork-family-census-report
+          path: ${{ runner.temp }}/langrisser-hero-artwork-family-census/report
+          if-no-files-found: warn
+          retention-days: 3
