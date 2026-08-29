@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-5-0",
+  "evidenceClass": "STATIC_WEB_ASSET_MAPPING_READINESS",
+  "status": "IMPLEMENTATION_READY_LOCAL_MATERIALIZATION_PENDING",
+  "completedScope": [
+    "Stage 3-5-0 contract freezes STATIC-only web materialization boundary",
+    "builder validates Stage 3-4 final PASS before consuming local extraction artifacts",
+    "builder maps exactly 540 frozen STATIC skinId requests to public/images/skins/{skinId}.png",
+    "builder copies exact PNG bytes without re-encoding and preserves Stage 2 heroId/sourceOrder",
+    "validator re-hashes all public PNG files and rejects missing/hash/path/extra-file drift",
+    "exact-byte duplicate content is reported without merging Skin identity",
+    "synthetic self-test covers 540 Skin and 1,869-request predecessor cardinality"
+  ],
+  "executionBoundary": {
+    "stage35MaterializationExecuted": false,
+    "stage35FinalPassClaimed": false,
+    "requiresLocalInputs": [
+      ".skin-stage3-4-work-v2/skin-stage3-4-extraction-plan.json",
+      ".skin-stage3-4-work-v2/skin-stage3-4-extraction-result.json",
+      ".skin-stage3-4-work-v2/skin-stage3-4-validation.json",
+      ".skin-stage3-4-work-v2/extracted"
+    ],
+    "generatedTargets": [
+      "public/images/skins/{skinId}.png (540 files)",
+      "data/generated/skin-stage3-5-static-web-asset-map.v1.json",
+      "data/validation/skin-stage3-5-static-web-asset-map.v1.json"
+    ]
+  },
+  "preservedBoundaries": {
+    "stage2HeroSkinRelationReopened": false,
+    "rawConfigDataRead": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "runtimePathInference": false,
+    "pngReencoding": false,
+    "charSpineWebConversion": false,
+    "modelPrimaryWebConversion": false,
+    "projectDoctorSkinAssetsPromoted": false
+  },
+  "nextStartPoint": "Run scripts/run-skin-stage3-5-static-web-assets.ps1 on the same local repository that contains the already-validated Stage 3-4 work directory. Do not rerun Stage 3-3 or Stage 3-4 extraction."
+}
