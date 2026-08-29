@@ -43,8 +43,7 @@ function Get-InterestingStringsFromFile([string]$Path, [int64]$MaxBytes = 335544
 }
 
 # Normal public-page session only. The executable is never run.
-$session = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
-$pageResp = Invoke-WebRequest -Uri $pcPage -WebSession $session -UserAgent $ua -UseBasicParsing -TimeoutSec 30
+$pageResp = Invoke-WebRequest -Uri $pcPage -SessionVariable session -UserAgent $ua -UseBasicParsing -TimeoutSec 30
 $pageHtml = [string]$pageResp.Content
 $sourceLinkPresent = ($pageHtml -match '(?i)//mhmnzdownload\.zlongame\.com/MHMNZ/Clientdown/DownLoad-MZ-PC\.exe')
 
