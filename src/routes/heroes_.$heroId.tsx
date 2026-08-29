@@ -166,27 +166,65 @@ function HeroDetailPage() {
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <SectionTitle icon={<BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />} title="직업 트리 · 최종 스탯" />
-          <p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 직업 분기 {detail.jobs.branchCount}개 · 연결 노드 {detail.jobs.connectionCount}개</p>
-          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <SectionTitle icon={<BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />} title="직업 트리 · 최종 스탯" />
+              <p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 분기 구조를 순서 그대로 시각화해. 관계를 다시 계산하지 않아.</p>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">분기 {detail.jobs.branchCount}</span>
+              <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">연결 {detail.jobs.connectionCount}</span>
+            </div>
+          </div>
+
+          <div className="mt-5 space-y-4">
             {detail.jobs.branches.map((branch) => (
-              <div key={branch.branchIndex} className="rounded-xl border border-border bg-muted/20 p-4">
-                <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-foreground">
-                  <span>분기 {branch.branchIndex}</span><span className="text-muted-foreground">·</span>
-                  <span>{branch.jobs.map((job) => job.nameCn ?? `Job ${job.jobId ?? "?"}`).join(" → ") || "직업 정보 없음"}</span>
+              <article key={branch.branchIndex} className="overflow-hidden rounded-2xl border border-border bg-muted/20">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/70 px-4 py-3 sm:px-5">
+                  <h3 className="text-sm font-bold text-foreground">전직 분기 {branch.branchIndex}</h3>
+                  <span className="text-xs font-semibold text-muted-foreground">직업 {branch.jobs.length}개</span>
                 </div>
+
+                <div className="overflow-x-auto px-4 py-5 sm:px-5">
+                  <div className="flex min-w-max items-stretch">
+                    {branch.jobs.map((job, jobIndex) => (
+                      <div key={`${branch.branchIndex}-${job.jobId ?? jobIndex}`} className="flex items-center">
+                        {jobIndex > 0 ? (
+                          <div className="mx-2 flex w-8 items-center sm:mx-3 sm:w-12" aria-hidden="true">
+                            <div className="h-px flex-1 bg-border" />
+                            <span className="ml-1 text-sm font-bold text-muted-foreground">→</span>
+                          </div>
+                        ) : null}
+                        <div className="flex min-h-24 w-36 flex-col justify-between rounded-xl border border-border bg-background p-3 shadow-sm sm:w-40">
+                          <div>
+                            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">단계 {jobIndex + 1}</p>
+                            <p className="mt-2 text-sm font-bold text-foreground">{job.nameCn ?? `Job ${job.jobId ?? "?"}`}</p>
+                          </div>
+                          <p className="mt-3 text-[11px] font-semibold text-muted-foreground">Job #{job.jobId ?? "-"}</p>
+                        </div>
+                      </div>
+                    ))}
+                    {branch.jobs.length === 0 ? <p className="text-sm text-muted-foreground">직업 정보 없음</p> : null}
+                  </div>
+                </div>
+
                 {branch.capstone ? (
-                  <div className="mt-4">
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                      <span>최종 직업 {branch.capstone.nameCn ?? branch.capstone.jobId ?? "-"}</span>
-                      {branch.capstone.heroLevel != null ? <span>Lv.{branch.capstone.heroLevel}</span> : null}
-                      {branch.capstone.star != null ? <span>{branch.capstone.star}성 기준</span> : null}
-                      {branch.capstone.statStatus ? <span>{branch.capstone.statStatus}</span> : null}
+                  <div className="border-t border-border px-4 py-4 sm:px-5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <p className="text-[11px] font-bold text-muted-foreground">최종 직업 검증 스탯</p>
+                        <p className="mt-1 text-sm font-bold text-foreground">{branch.capstone.nameCn ?? `Job ${branch.capstone.jobId ?? "?"}`}</p>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
+                        {branch.capstone.heroLevel != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">Lv.{branch.capstone.heroLevel}</span> : null}
+                        {branch.capstone.star != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">{branch.capstone.star}성</span> : null}
+                        {branch.capstone.statStatus ? <span className="rounded-md bg-background px-2 py-1 font-semibold">{branch.capstone.statStatus}</span> : null}
+                      </div>
                     </div>
                     <StatGrid stats={branch.capstone.finalStats} />
                   </div>
                 ) : null}
-              </div>
+              </article>
             ))}
           </div>
         </section>
