@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ChevronRight, RotateCcw, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowUpDown, ChevronRight, RotateCcw, Search, UserRound, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { getOfficialEquipmentImageUrl } from "@/lib/equipment-image-assets";
@@ -19,9 +19,13 @@ export const Route = createFileRoute("/equipment_/exclusive")({
   component: ExclusiveEquipmentPage,
 });
 
+type EquipmentSortMode = "default" | "name" | "id";
+
 type ExclusiveEquipmentListUiState = {
   group: string | null;
   subtype: string | null;
+  query: string;
+  sort: EquipmentSortMode;
 };
 
 const EXCLUSIVE_EQUIPMENT_LIST_STORAGE_KEY = "equipment-exclusive-list-ui.v1";
@@ -29,7 +33,19 @@ const EXCLUSIVE_EQUIPMENT_LIST_STORAGE_KEY = "equipment-exclusive-list-ui.v1";
 const DEFAULT_EXCLUSIVE_UI_STATE: ExclusiveEquipmentListUiState = {
   group: null,
   subtype: null,
+  query: "",
+  sort: "default",
 };
+
+const SORT_LABELS: Record<EquipmentSortMode, string> = {
+  default: "기본 표시순",
+  name: "이름순",
+  id: "장비 ID순",
+};
+
+function isEquipmentSortMode(value: unknown): value is EquipmentSortMode {
+  return value === "default" || value === "name" || value === "id";
+}
 
 function ExclusiveEquipmentPage() {
   const data = Route.useLoaderData();
@@ -56,8 +72,10 @@ function ExclusiveEquipmentPage() {
             ? parsed.subtype
             : null
           : null;
+      const query = typeof parsed.query === "string" ? parsed.query.slice(0, 80) : "";
+      const sort = isEquipmentSortMode(parsed.sort) ? parsed.sort : DEFAULT_EXCLUSIVE_UI_STATE.sort;
 
-      setUiState({ group, subtype });
+      setUiState({ group, subtype, query, sort });
     } catch {
       setUiState(DEFAULT_EXCLUSIVE_UI_STATE);
     } finally {
@@ -76,21 +94,51 @@ function ExclusiveEquipmentPage() {
   }, [persistenceReady, uiState]);
 
   const activeFilter = data.filters.find((filter) => filter.group === uiState.group) ?? null;
-  const filteredRecords = useMemo(
-    () =>
-      data.records.filter((record) => {
-        if (uiState.group && record.group !== uiState.group) return false;
-        if (uiState.subtype && record.subtype !== uiState.subtype) return false;
-        return true;
-      }),
-    [data.records, uiState],
-  );
+  const filteredRecords = useMemo(() => {
+    const normalizedQuery = uiState.query.trim().toLocaleLowerCase();
+    const records = data.records.filter((record) => {
+      if (uiState.group && record.group !== uiState.group) return false;
+      if (uiState.subtype && record.subtype !== uiState.subtype) return false;
+
+      if (normalizedQuery) {
+        const searchableText = [
+          record.nameKr,
+          record.nameCn,
+          record.effectName,
+          record.effectText,
+          record.ownerHero.nameKr,
+          record.ownerHero.nameCn,
+          String(record.equipmentId),
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLocaleLowerCase();
+        if (!searchableText.includes(normalizedQuery)) return false;
+      }
+
+      return true;
+    });
+
+    if (uiState.sort === "name") {
+      return records.sort((left, right) => {
+        const leftName = left.nameKr ?? left.nameCn;
+        const rightName = right.nameKr ?? right.nameCn;
+        return leftName.localeCompare(rightName, "ko", { numeric: true, sensitivity: "base" }) || left.equipmentId - right.equipmentId;
+      });
+    }
+
+    if (uiState.sort === "id") {
+      return records.sort((left, right) => left.equipmentId - right.equipmentId);
+    }
+
+    return records;
+  }, [data.records, uiState]);
 
   const selectGroup = (nextGroup: string) => {
     setUiState((current) =>
       current.group === nextGroup
-        ? { group: null, subtype: null }
-        : { group: nextGroup, subtype: null },
+        ? { ...current, group: null, subtype: null }
+        : { ...current, group: nextGroup, subtype: null },
     );
   };
 
@@ -102,8 +150,17 @@ function ExclusiveEquipmentPage() {
   };
 
   const resetFilters = () => {
+    setUiState((current) => ({ ...current, group: null, subtype: null }));
+  };
+
+  const resetDiscovery = () => {
     setUiState(DEFAULT_EXCLUSIVE_UI_STATE);
   };
+
+  const orderPolicy =
+    uiState.sort === "default"
+      ? "현재 순서는 표시용 deterministic order이며 전용장비 출시순으로 해석하지 않아."
+      : `${SORT_LABELS[uiState.sort]}으로 표시 중이야. 이 정렬은 출시순 의미를 갖지 않아.`;
 
   return (
     <main className="min-h-screen bg-background">
@@ -128,7 +185,60 @@ function ExclusiveEquipmentPage() {
         </div>
 
         <section className="mt-8 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="grid gap-3 border-b border-border pb-4 md:grid-cols-[minmax(0,1fr)_14rem]">
+            <label className="relative block">
+              <span className="sr-only">전용장비 검색</span>
+              <Search
+                size={17}
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
+              <input
+                type="search"
+                value={uiState.query}
+                maxLength={80}
+                onChange={(event) => setUiState((current) => ({ ...current, query: event.target.value }))}
+                placeholder="장비명·영웅명·효과·ID 검색"
+                className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-10 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-ring/30"
+              />
+              {uiState.query && (
+                <button
+                  type="button"
+                  aria-label="검색어 지우기"
+                  onClick={() => setUiState((current) => ({ ...current, query: "" }))}
+                  className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                >
+                  <X size={15} aria-hidden="true" />
+                </button>
+              )}
+            </label>
+
+            <label className="relative flex h-11 items-center rounded-xl border border-border bg-background">
+              <ArrowUpDown size={16} aria-hidden="true" className="ml-3 shrink-0 text-muted-foreground" />
+              <span className="sr-only">전용장비 정렬</span>
+              <select
+                value={uiState.sort}
+                onChange={(event) =>
+                  setUiState((current) => ({
+                    ...current,
+                    sort: event.target.value as EquipmentSortMode,
+                  }))
+                }
+                className="h-full min-w-0 flex-1 appearance-none bg-transparent px-2 pr-8 text-sm font-medium text-foreground outline-none"
+              >
+                <option value="default">기본 표시순</option>
+                <option value="name">이름순</option>
+                <option value="id">장비 ID순</option>
+              </select>
+              <ChevronRight
+                size={14}
+                aria-hidden="true"
+                className="pointer-events-none absolute right-3 rotate-90 text-muted-foreground"
+              />
+            </label>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               장비 종류
             </span>
@@ -219,12 +329,10 @@ function ExclusiveEquipmentPage() {
             <p className="text-sm text-muted-foreground">
               전체 {data.total}개 중 <span className="font-semibold text-foreground">{filteredRecords.length}개</span> 표시
             </p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              현재 순서는 표시용 deterministic order이며 전용장비 출시순으로 해석하지 않아.
-            </p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">{orderPolicy}</p>
           </div>
           <p className="text-xs text-muted-foreground sm:text-right">
-            선택한 장비 종류 필터는 다음 방문에도 유지돼.
+            선택한 필터·검색·정렬은 다음 방문에도 유지돼.
           </p>
         </div>
 
@@ -310,10 +418,10 @@ function ExclusiveEquipmentPage() {
             <p className="font-semibold text-foreground">조건에 맞는 전용장비가 없어.</p>
             <button
               type="button"
-              onClick={resetFilters}
+              onClick={resetDiscovery}
               className="mt-3 text-sm font-medium text-primary hover:underline"
             >
-              장비 종류 필터 초기화
+              검색·필터 초기화
             </button>
           </section>
         )}
