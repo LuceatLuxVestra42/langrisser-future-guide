@@ -3,7 +3,7 @@
   "schemaId": "soldier-unique-skill-frontend-localization/v1",
   "date": "2026-08-29",
   "stage": "FRONTEND_CONSUMER_INTEGRATION",
-  "status": "BUILD_RECHECK_PENDING_HOSTED_PENDING",
+  "status": "BUILD_PASS_HOSTED_PENDING",
   "scope": {
     "target": "normal Tier3 and SP Soldier unique-skill final descriptions",
     "targetCount": 185,
@@ -30,19 +30,19 @@
   },
   "reviewResolution": {
     "appliedBatches": 2,
-    "resolvedSoldierIds": [250, 326, 333, 334, 336, 341, 602],
-    "expectedPassCount": 116,
-    "expectedReviewCount": 69,
+    "resolvedSoldierIds": [250,326,333,334,336,341,602],
+    "passCount": 116,
+    "reviewCount": 69,
     "overridePath": "data/presentation/soldier-unique-skill-review-overrides.v1.json"
   },
   "buildGate": {
-    "status": "PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
-    "previousWorkflow": "Equipment Korean Name Frontend QA",
-    "previousRunId": 33224438352,
-    "previousJobId": 99025150355,
-    "previousConclusion": "SUCCESS",
-    "previousObservedGeneratorSummary": "records=185 pass=109 review=76 missing=0 extra=0 public=185",
-    "expectedNextGeneratorSummary": "records=185 pass=116 review=69 overrides=7 missing=0 extra=0 public=185"
+    "status": "PASS",
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33225056338,
+    "jobId": 99026928013,
+    "conclusion": "SUCCESS",
+    "observedGeneratorSummary": "records=185 pass=116 review=69 overrides=7 missing=0 extra=0 public=185",
+    "productionBuild": "SUCCESS"
   },
   "reviewBoundary": {
     "reviewCount": 69,
@@ -58,8 +58,8 @@
   },
   "completion": {
     "frontendConsumerIntegrated": true,
-    "buildGateComplete": false,
+    "buildGateComplete": true,
     "hostedQaComplete": false
   },
-  "nextStep": "Re-run Build Gate at 116 PASS / 69 REVIEW. Hosted QA remains pending until deployment contains this projection."
+  "nextStep": "Continue evidence-based review resolution from the remaining 69 items. Hosted QA remains pending until deployment contains the current projection."
 }
