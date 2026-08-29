@@ -1,0 +1,70 @@
+name: Skin Stage 3-6 Hero Detail Preflight
+
+on:
+  push:
+    branches:
+      - work/skin-stage3-3-bulk-plan
+    paths:
+      - "data/generated/skin-stage2-3-bidirectional-relation.v1.json"
+      - "data/generated/skin-stage3-5-static-web-asset-map.v1.json"
+      - "data/validation/skin-stage3-5-static-web-asset-map.v1.json"
+      - "public/images/skins/**"
+      - "src/lib/skin-detail.server.ts"
+      - "src/lib/hero-detail-stage5.server.ts"
+      - "src/routes/heroes_.$heroId.tsx"
+      - "scripts/validate-skin-stage3-5-static-web-assets.mjs"
+      - "scripts/validate-skin-stage3-6-hero-detail-consumer.mjs"
+      - ".github/workflows/skin-stage3-6-hero-detail-preflight.yml"
+  pull_request:
+    paths:
+      - "data/generated/skin-stage2-3-bidirectional-relation.v1.json"
+      - "data/generated/skin-stage3-5-static-web-asset-map.v1.json"
+      - "data/validation/skin-stage3-5-static-web-asset-map.v1.json"
+      - "public/images/skins/**"
+      - "src/lib/skin-detail.server.ts"
+      - "src/lib/hero-detail-stage5.server.ts"
+      - "src/routes/heroes_.$heroId.tsx"
+      - "scripts/validate-skin-stage3-5-static-web-assets.mjs"
+      - "scripts/validate-skin-stage3-6-hero-detail-consumer.mjs"
+      - ".github/workflows/skin-stage3-6-hero-detail-preflight.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Re-hash committed Skin public surface
+        run: |
+          node scripts/validate-skin-stage3-5-static-web-assets.mjs \
+            data/generated/skin-stage3-5-static-web-asset-map.v1.json \
+            --repo-root . \
+            --relation data/generated/skin-stage2-3-bidirectional-relation.v1.json \
+            --write /tmp/skin-stage3-5-static-web-asset-map.v1.json
+          cmp /tmp/skin-stage3-5-static-web-asset-map.v1.json data/validation/skin-stage3-5-static-web-asset-map.v1.json
+
+      - name: Validate Hero detail Skin consumer boundary
+        run: node scripts/validate-skin-stage3-6-hero-detail-consumer.mjs
+
+      - name: Production build
+        run: bun run build
