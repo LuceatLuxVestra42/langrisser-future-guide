@@ -222,7 +222,7 @@ function EquipmentGeneralListPage() {
               SSR 장비
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-              일반 SSR 장비 206개를 획득 계열과 장비 종류로 나눠 확인할 수 있어.
+              일반 SSR 장비 {data.records.length}개를 획득 계열과 장비 종류로 나눠 확인할 수 있어.
             </p>
           </div>
 
