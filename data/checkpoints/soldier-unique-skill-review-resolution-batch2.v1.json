@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-review-resolution/v1",
+  "date": "2026-08-29",
+  "batch": 2,
+  "status": "APPLIED_BUILD_RECHECK_PENDING",
+  "evidence": "data/checkpoints/soldier-unique-skill-review-evidence-batch2.v1.json",
+  "overrides": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
+  "before": {"passCount":114,"reviewCount":71},
+  "applied": {
+    "recordCount": 2,
+    "soldierIds": [334, 336],
+    "recordLevelDecision": "PASS",
+    "reason": "Korean references reproduce the corresponding terrain labels and movement-cost exemption closely enough to remove the only remaining review blocker for these records."
+  },
+  "afterExpected": {"passCount":116,"reviewCount":69,"translatedCount":185,"remainingTranslationCount":0},
+  "safety": {
+    "canonicalSoldierDataReopened": false,
+    "baseTranslationShardsMutated": false,
+    "reviewResolutionAppliedBySmallOverrideLayer": true
+  },
+  "nextStep": "Confirm deterministic generator and production build at 185 records / 116 PASS / 69 REVIEW."
+}
