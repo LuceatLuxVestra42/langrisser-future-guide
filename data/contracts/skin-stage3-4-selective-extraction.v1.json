@@ -45,7 +45,17 @@
     "dependenciesMayBeExported": true,
     "actualExportedArtifactHashVerificationRequired": true,
     "legacyDriveStaticAssetMayReplaceAuthoritativeUnityObject": false,
-    "legacyDriveStaticAssetRole": "Optional post-extraction cross-check only."
+    "legacyDriveStaticAssetRole": "Optional post-extraction cross-check only.",
+    "admittedRuntimeExtractor": {
+      "implementation": "scripts/skin-stage3-4-extract-unitypy.py",
+      "engine": "UnityPy",
+      "exactContainerRuntimePathRequired": true,
+      "bundleSha256VerificationRequiredBeforeLoad": true,
+      "embeddedCabNameVerificationRequired": true,
+      "staticPrimaryArtifact": "PNG exported from admitted Texture2D/Sprite object",
+      "prefabPrimaryArtifact": "exact raw serialized GameObject bytes",
+      "dependencyExportRequiredForStage3_4Pass": false
+    }
   },
   "resultRecordContract": {
     "requiredFields": [
