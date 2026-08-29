@@ -115,6 +115,26 @@ type FeatureBlock = {
   status?: string | null;
 } | null | undefined;
 
+type Stage6CentralDiscipline = {
+  status?: string | null;
+  skillId?: number | null;
+  nameCn?: string | null;
+  descCn?: string | null;
+  icon?: string | null;
+  templates?: number[] | null;
+  unlock?: {
+    equipmentLevel?: number | null;
+    heroStarLevel?: number | null;
+    castingLawLevel?: number | null;
+    materials?: Array<{
+      GoodsType?: number;
+      Id?: number;
+      Count?: number;
+    }> | null;
+  } | null;
+  resolver?: string | null;
+} | null | undefined;
+
 type Stage6HeroShard = {
   heroId: number;
   identity?: {
@@ -141,7 +161,7 @@ type Stage6HeroShard = {
   } | null;
   bonds?: Stage6Bond[] | null;
   exclusiveEquipment?: FeatureBlock;
-  centralDiscipline?: FeatureBlock;
+  centralDiscipline?: Stage6CentralDiscipline;
   soldiers?: { ids?: number[] } | null;
   sp?: FeatureBlock;
   validation?: {
@@ -274,6 +294,35 @@ function projectBonds(bonds: Stage6Bond[] | null | undefined) {
   }));
 }
 
+function projectCentralDiscipline(centralDiscipline: Stage6CentralDiscipline) {
+  const materials = Array.isArray(centralDiscipline?.unlock?.materials)
+    ? centralDiscipline.unlock.materials.map((material) => ({
+        goodsType: Number.isInteger(material.GoodsType) ? Number(material.GoodsType) : null,
+        sourceId: Number.isInteger(material.Id) ? Number(material.Id) : null,
+        count: Number.isInteger(material.Count) ? Number(material.Count) : null,
+      }))
+    : [];
+
+  return {
+    status: centralDiscipline?.status ?? null,
+    released: isReleased(centralDiscipline),
+    skillId: Number.isInteger(centralDiscipline?.skillId) ? Number(centralDiscipline?.skillId) : null,
+    nameCn: centralDiscipline?.nameCn ?? null,
+    descCn: centralDiscipline?.descCn ?? null,
+    iconPath: centralDiscipline?.icon ?? null,
+    templateIds: Array.isArray(centralDiscipline?.templates)
+      ? centralDiscipline.templates.filter((value): value is number => Number.isInteger(value)).map(Number)
+      : [],
+    unlock: {
+      equipmentLevel: Number.isInteger(centralDiscipline?.unlock?.equipmentLevel) ? Number(centralDiscipline?.unlock?.equipmentLevel) : null,
+      heroStarLevel: Number.isInteger(centralDiscipline?.unlock?.heroStarLevel) ? Number(centralDiscipline?.unlock?.heroStarLevel) : null,
+      castingLawLevel: Number.isInteger(centralDiscipline?.unlock?.castingLawLevel) ? Number(centralDiscipline?.unlock?.castingLawLevel) : null,
+      materials,
+    },
+    resolver: centralDiscipline?.resolver ?? null,
+  };
+}
+
 function projectStage6Shard(shard: Stage6HeroShard) {
   const validation = shard.validation;
   if (!validation || validation.structuralStatus !== "PASS" || validation.siteUsable !== true) {
@@ -284,6 +333,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
   const branches = projectJobBranches(jobTree);
   const connections = Array.isArray(jobTree?.connections) ? jobTree.connections : [];
   const bonds = projectBonds(shard.bonds);
+  const centralDiscipline = projectCentralDiscipline(shard.centralDiscipline);
   const soldierIds = Array.isArray(shard.soldiers?.ids) ? shard.soldiers.ids : [];
   const skins = Array.isArray(shard.presentation?.skins) ? shard.presentation.skins : [];
   const reviewCodes = Array.isArray(validation.reviewCodes) ? validation.reviewCodes : [];
@@ -364,13 +414,14 @@ function projectStage6Shard(shard: Stage6HeroShard) {
       count: bonds.length,
       rows: bonds,
     },
+    centralDiscipline,
     soldiers: { count: soldierIds.length, ids: soldierIds },
     systems: {
       bondRowCount: bonds.length,
       exclusiveEquipmentStatus: shard.exclusiveEquipment?.status ?? null,
       exclusiveEquipmentReleased: isReleased(shard.exclusiveEquipment),
-      centralDisciplineStatus: shard.centralDiscipline?.status ?? null,
-      centralDisciplineReleased: isReleased(shard.centralDiscipline),
+      centralDisciplineStatus: centralDiscipline.status,
+      centralDisciplineReleased: centralDiscipline.released,
       spStatus: shard.sp?.status ?? null,
       spReleased: isReleased(shard.sp),
     },
