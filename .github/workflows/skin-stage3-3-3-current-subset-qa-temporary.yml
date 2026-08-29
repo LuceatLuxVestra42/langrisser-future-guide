@@ -1,0 +1,31 @@
+name: Skin Stage 3-3-3 Current Subset QA Temporary
+
+on:
+  push:
+    branches:
+      - work/skin-stage3-3-bulk-plan
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Validate current retained subset through Stage 3-3-3 QA
+        run: node scripts/validate-skin-stage3-3-3-current-subset-qa.mjs
+      - name: Commit compact partial QA checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/skin-stage3-3-3-current-subset-qa.v1.json
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git commit -m "Generate Skin Stage 3-3-3 current subset QA checkpoint"
+          git pull --rebase origin work/skin-stage3-3-bulk-plan
+          git push origin HEAD:work/skin-stage3-3-bulk-plan
