@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { getHeroCardIconIndex } from "@/lib/hero-card-icon-assets.functions";
 import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
 import { getHeroListStage4Data } from "@/lib/hero-list.functions";
-import type { HeroListRecord, HeroListStage4Record } from "@/lib/hero-list.server";
+import type { HeroListStage4Record } from "@/lib/hero-list.server";
 
 export const Route = createFileRoute("/heroes")({
   loader: async () => {
@@ -52,10 +52,17 @@ function normalizeSearch(value: string) {
   return value.trim().toLocaleLowerCase();
 }
 
-function matchesHeroSearch(hero: HeroListRecord, normalizedQuery: string) {
+function matchesHeroSearch(hero: HeroListStage4Record, normalizedQuery: string) {
   if (!normalizedQuery) return true;
 
-  return [hero.identity.nameKr, hero.identity.nameCn, hero.identity.nameEn]
+  return [
+    hero.localization.displayName,
+    hero.localization.displayNameKr,
+    hero.localization.officialNameKr,
+    hero.identity.nameKr,
+    hero.identity.nameCn,
+    hero.identity.nameEn,
+  ]
     .filter((name): name is string => Boolean(name))
     .some((name) => name.toLocaleLowerCase().includes(normalizedQuery));
 }
@@ -285,7 +292,7 @@ function HeroGridCard({
       }
     | undefined;
 }) {
-  const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
+  const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const imageUrl = cardIcon?.assetStatus === "RESOLVED"
     ? resolvePublicAssetUrl(cardIcon.webAssetPath)
     : null;
@@ -302,7 +309,13 @@ function HeroGridCard({
       aria-label={displayName + " 상세 보기"}
       className="group block rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2"
     >
-      <article data-hero-card="true" data-hero-id={hero.heroId} className="overflow-hidden rounded-lg border border-border/70 bg-card p-1 shadow-sm transition duration-200 group-hover:-translate-y-0.5 group-hover:border-foreground/25 group-hover:shadow-md">
+      <article
+        data-hero-card="true"
+        data-hero-id={hero.heroId}
+        data-name-kr-status={hero.localization.nameKrStatus}
+        data-name-source-authority={hero.localization.sourceAuthority}
+        className="overflow-hidden rounded-lg border border-border/70 bg-card p-1 shadow-sm transition duration-200 group-hover:-translate-y-0.5 group-hover:border-foreground/25 group-hover:shadow-md"
+      >
         <div className="relative aspect-square overflow-hidden rounded-md bg-muted/20">
           {imageUrl ? (
             <img
