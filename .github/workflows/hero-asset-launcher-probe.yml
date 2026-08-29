@@ -1,6 +1,11 @@
 name: Hero Asset Launcher Probe
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/hero-asset-launcher-probe.yml'
   push:
     branches:
       - work/hero-asset-launcher-probe
@@ -54,7 +59,6 @@ jobs:
             }
           }
 
-          # Current filename/path observed during the official-site investigation, plus the historical official PC path.
           $candidateList.Add('https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/DownLoad-MZ-PC.exe')
           $candidateList.Add('https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/Langrisser_DownLoad_PC.exe')
 
@@ -216,7 +220,6 @@ jobs:
           '=== INTERESTING STRINGS (first 200) ==='
           $interesting | Select-Object -First 200
 
-          # Do not persist or upload the executable itself.
           Remove-Item -LiteralPath $downloaded -Force -ErrorAction SilentlyContinue
 
       - name: Upload static probe report only
