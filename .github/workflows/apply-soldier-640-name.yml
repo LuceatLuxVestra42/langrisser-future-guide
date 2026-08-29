@@ -115,40 +115,41 @@ jobs:
           validation_path = Path("data/validation/soldier-t3-korean-name-640.v1.json")
           validation_path.write_text(json.dumps(validation, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-          checkpoint = """Soldier 640 Korean Name Correction — PASS
-
-Current state:
-- 640 / 仙灵预言者 / MAGE
-- nameKr: 요정 예언자 -> 신령 예언자
-- nameKrStatus: confirmed (unchanged)
-
-Authoritative source:
-- data/metadata/soldier-name-kr-tier3.v1.json
-
-Synchronized production projections:
-- data/generated/soldier-list-stage5-8.v1.json
-- data/generated/soldier-detail-stage5-2.v1.json
-- public/data/soldier-detail-stage5-6.v1.json
-
-Completed scope:
-- Korean localization correction only
-- Soldier ID, Chinese name, tier, army type, release metadata, combat data, relations, and assets unchanged
-
-REVIEW:
-- none
-
-BLOCKER:
-- none
-
-Next start point:
-- normal localization maintenance flow / Project Doctor PR guard
-
-Reopen conditions:
-- authoritative Korean name changes again
-- Soldier 640 identity changes
-- production projection parity breaks
-"""
-          Path("data/checkpoints/soldier-t3-korean-name-640.txt").write_text(checkpoint, encoding="utf-8")
+          checkpoint_lines = [
+              "Soldier 640 Korean Name Correction — PASS",
+              "",
+              "Current state:",
+              "- 640 / 仙灵预言者 / MAGE",
+              "- nameKr: 요정 예언자 -> 신령 예언자",
+              "- nameKrStatus: confirmed (unchanged)",
+              "",
+              "Authoritative source:",
+              "- data/metadata/soldier-name-kr-tier3.v1.json",
+              "",
+              "Synchronized production projections:",
+              "- data/generated/soldier-list-stage5-8.v1.json",
+              "- data/generated/soldier-detail-stage5-2.v1.json",
+              "- public/data/soldier-detail-stage5-6.v1.json",
+              "",
+              "Completed scope:",
+              "- Korean localization correction only",
+              "- Soldier ID, Chinese name, tier, army type, release metadata, combat data, relations, and assets unchanged",
+              "",
+              "REVIEW:",
+              "- none",
+              "",
+              "BLOCKER:",
+              "- none",
+              "",
+              "Next start point:",
+              "- normal localization maintenance flow / Project Doctor PR guard",
+              "",
+              "Reopen conditions:",
+              "- authoritative Korean name changes again",
+              "- Soldier 640 identity changes",
+              "- production projection parity breaks",
+          ]
+          Path("data/checkpoints/soldier-t3-korean-name-640.txt").write_text("\n".join(checkpoint_lines) + "\n", encoding="utf-8")
 
           assert OLD not in metadata_path.read_text(encoding="utf-8")
           for path in projection_paths:
@@ -169,6 +170,7 @@ Reopen conditions:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git rm .github/workflows/apply-soldier-640-name.yml
+          git rm .github/soldier640-run-trigger.txt
           git add data/metadata/soldier-name-kr-tier3.v1.json \
                   data/generated/soldier-list-stage5-8.v1.json \
                   data/generated/soldier-detail-stage5-2.v1.json \
