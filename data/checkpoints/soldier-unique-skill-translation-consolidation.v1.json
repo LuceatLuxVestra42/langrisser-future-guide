@@ -14,7 +14,8 @@
       {"path":"data/checkpoints/soldier-unique-skill-translation-batch7.v1.json","recordCount":20},
       {"path":"data/checkpoints/soldier-unique-skill-translation-batch8.v1.json","recordCount":35},
       {"path":"data/checkpoints/soldier-unique-skill-translation-batch9.v1.json","recordCount":40}
-    ]
+    ],
+    "reviewOverrides": {"path":"data/presentation/soldier-unique-skill-review-overrides.v1.json","recordCount":5}
   },
   "implementation": {
     "generator": "scripts/build-soldier-unique-skill-kr-presentation.mjs",
@@ -26,19 +27,20 @@
       "build": "npm run prepare:soldier-skill-kr",
       "check": "npm run validate:soldier-skill-kr"
     },
-    "mode": "deterministic-build-generated",
+    "mode": "deterministic-build-generated-with-review-overrides",
     "joinKey": "soldierId",
     "canonicalChineseReadOnly": true,
     "sourceChineseDuplicatedInFinalConsumer": false,
     "sourceTypeDerivedFromCanonicalIdentity": true,
     "idArithmeticInference": false
   },
-  "verified": {
+  "expectedAfterReviewBatch1": {
     "canonicalTargetCount": 185,
     "authoringRecordCount": 185,
+    "reviewOverrideCount": 5,
     "uniqueSoldierIdCount": 185,
-    "passCount": 109,
-    "reviewCount": 76,
+    "passCount": 114,
+    "reviewCount": 71,
     "missingCount": 0,
     "extraCount": 0,
     "publicProjectionCount": 185
@@ -50,12 +52,12 @@
     "descriptionCoverage": "PASS",
     "statusReviewTermContract": "PASS",
     "nameCnCanonicalParity": "PASS",
-    "progressParity": "PASS",
-    "productionBuild": "PASS",
-    "frontendConsumerBuild": "PASS",
+    "progressParity": "PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
+    "productionBuild": "PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
+    "frontendConsumerBuild": "PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
     "hostedQa": "PENDING"
   },
-  "verification": {
+  "previousVerification": {
     "consolidationWorkflow": {
       "workflow": "Equipment Korean Name Frontend QA",
       "runId": 33223795560,
@@ -74,19 +76,19 @@
   },
   "reviewBoundary": {
     "translationCoverage": "185/185",
-    "reviewQueueCount": 76,
+    "sourceReviewQueueCount": 76,
+    "resolvedByReviewOverrides": 5,
+    "reviewQueueCount": 71,
+    "resolvedSoldierIds": [250, 326, 333, 341, 602],
     "reviewItemsAreMissingTranslations": false,
     "reviewResolutionRequired": true,
-    "reviewResolutionBlocksConsolidation": false,
-    "reviewResolutionBlocksFrontendBuild": false
+    "reviewResolutionBlocksConsolidation": false
   },
   "completion": {
     "finalConsolidationComplete": true,
     "finalConsumerReady": true,
     "publicConsumerReady": true,
     "progressIndexUpdated": true,
-    "progressConsolidationStatus": "PASS_WITH_REVIEW",
-    "progressIndexFrozen": true,
     "canonicalSemanticStageReopened": false,
     "frontendConsumerIntegrationRequired": false,
     "frontendConsumerIntegrated": true,
@@ -94,5 +96,5 @@
     "hostedQaRequired": true,
     "hostedQaComplete": false
   },
-  "nextStep": "Run Hosted QA against an actually deployed static environment and resolve or explicitly accept the 76 review items without reopening canonical Soldier data."
+  "nextStep": "Re-run Build Gate for the 5 evidence-backed review overrides, then run Hosted QA only after an actually deployed static environment contains the updated projection; continue resolving the remaining 71 reviews without reopening canonical Soldier data."
 }
