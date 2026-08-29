@@ -1,0 +1,88 @@
+name: Hero Fusion Faction Diagnostic
+
+on:
+  push:
+    branches:
+      - work/hero-fusion-faction-marks-20260830
+    paths:
+      - '.github/workflows/hero-fusion-faction-diagnostic.yml'
+      - 'data/validation/hero-fusion-faction-diagnostic.trigger'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Enumerate frozen fusion-power candidates and inspect exact SkillInfo records
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const shardDir = 'data/generated/hero-detail/by-id';
+          const candidates = [];
+          const byHeroSkill = new Set();
+
+          for (const name of fs.readdirSync(shardDir).filter((x) => /^\d+\.json$/.test(x))) {
+            const shard = JSON.parse(fs.readFileSync(path.join(shardDir, name), 'utf8'));
+            const sources = [];
+            for (const row of shard.normal?.skills?.jobLevelAcquisitions ?? []) {
+              if (row?.skill?.displayType === '超绝强化') sources.push({ source: 'job-level', skill: row.skill, jobLevelId: row.jobLevelId ?? null });
+            }
+            for (const skill of shard.normal?.skills?.heroDirectSkills ?? []) {
+              if (skill?.displayType === '超绝强化') sources.push({ source: 'hero-direct', skill, jobLevelId: null });
+            }
+            if (shard.normal?.awakening?.skill?.displayType === '超绝强化') {
+              sources.push({ source: 'awakening', skill: shard.normal.awakening.skill, jobLevelId: null });
+            }
+            for (const row of sources) {
+              const skillId = Number(row.skill.skillId);
+              const key = `${shard.heroId}:${skillId}`;
+              if (!Number.isInteger(skillId) || byHeroSkill.has(key)) continue;
+              byHeroSkill.add(key);
+              candidates.push({
+                heroId: shard.heroId,
+                heroNameCn: shard.identity?.nameCn ?? null,
+                skillId,
+                skillNameCn: row.skill.nameCn ?? null,
+                skillIconPath: row.skill.iconPath ?? null,
+                source: row.source,
+                jobLevelId: row.jobLevelId,
+                factions: (shard.presentation?.factions ?? []).map((f) => ({ factionId: f.factionId, nameCn: f.nameCn, iconSourcePath: f.iconSourcePath })),
+              });
+            }
+          }
+          candidates.sort((a,b) => a.heroId-b.heroId || a.skillId-b.skillId);
+
+          const skillInfo = JSON.parse(fs.readFileSync('data/configdata/ConfigDataSkillInfo.json', 'utf8'));
+          const skillById = new Map(skillInfo.map((row, index) => [Number(row.ID), { index, row }]));
+          const rawSkillRecords = candidates.map((candidate) => {
+            const found = skillById.get(candidate.skillId);
+            if (!found) throw new Error(`missing SkillInfo ${candidate.skillId}`);
+            return {
+              heroId: candidate.heroId,
+              skillId: candidate.skillId,
+              recordIndex: found.index,
+              record: found.row,
+            };
+          });
+
+          const heroInfo = JSON.parse(fs.readFileSync('data/configdata/ConfigDataHeroInfo.json', 'utf8'));
+          const heroById = new Map(heroInfo.map((row, index) => [Number(row.ID), { index, row }]));
+          const sampleHeroRecords = [6,12].map((heroId) => ({heroId, ...heroById.get(heroId)}));
+
+          console.log('=== FUSION_CANDIDATES ===');
+          console.log(JSON.stringify({candidateHeroSkillCount: candidates.length, uniqueHeroCount: new Set(candidates.map((r)=>r.heroId)).size, uniqueSkillCount: new Set(candidates.map((r)=>r.skillId)).size, candidates}, null, 2));
+          console.log('=== RAW_SKILLINFO_RECORDS ===');
+          console.log(JSON.stringify(rawSkillRecords, null, 2));
+          console.log('=== SAMPLE_HEROINFO_RECORDS ===');
+          console.log(JSON.stringify(sampleHeroRecords, null, 2));
+          NODE
