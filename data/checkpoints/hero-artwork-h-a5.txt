@@ -1,0 +1,124 @@
+Hero Artwork Asset Pipeline — H-A5 bulk extraction index checkpoint
+기준일: 2026-08-29
+
+============================================================
+1. 최종 판정
+============================================================
+
+status: H_A5_BULK_EXTRACTION_INDEX_COMPLETE
+validation: PASS_H_A5_BULK_EXTRACTION_INDEX_FINAL
+canonical Hero: 267 / 267
+unresolved: 0
+owning bundle shard: 12
+H-A4 ownership: final 240 / begin 27 유지
+web contract: public/images/heroes/cards/{heroId}.png
+binary image commit: 아직 하지 않음
+
+selection mode:
+- UNIQUE_REFERENCED_SPRITE: 237
+- DOMINANT_REFERENCED_SPRITE: 23
+- EXTERNAL_DEPENDENCY_SPRITE_FILEID1: 7
+
+============================================================
+2. 입력 / 재사용 경계
+============================================================
+
+H-A4의 exact prefab extraction ownership을 그대로 재사용했다.
+- FINAL_ONLY 240
+- BEGIN_ONLY 27
+- BOTH 0
+- NONE 0
+
+final/begin을 클라이언트 런타임 의미상 baseline/patch로 해석하지 않는다.
+H-A5는 asset extraction provenance/index 계층이다.
+
+대량 재실행 대신 이미 검증된 artifact를 재사용했다.
+- bulk v2 run 33229409769 / artifact 9707998242
+  - unique referenced Sprite 237
+  - dominant referenced Sprite 23
+  - review 7
+- seven dependency diagnostic run 33229565366 / artifact 9708038712
+- seven resolver run 33229642787 / artifact 9708066772
+  - 7 / 7 PASS
+
+============================================================
+3. 7개 dependency 예외
+============================================================
+
+대상 Hero:
+- 17 에그베르트
+- 42 디오스
+- 48 아론
+- 54 리스틸
+- 58 세레나
+- 66 클라렛
+- 80 칸자키 스미레
+
+확정 chain:
+exact final prefab
+-> MonoBehaviour.m_Sprite PPtr (fileID=1)
+-> final AssetBundle m_Dependencies[0]의 동일 family begin_ bundle
+-> exact Sprite pathId
+-> Sprite.m_RD.texture (fileID=0)
+-> Texture2D
+
+즉 7명은 prefab 소유권은 final이지만 Sprite image dependency는 begin_ bundle에 있다.
+이 관계는 serialized PPtr와 AssetBundle dependency 직접 증거로 확정했으며 filename 유사도 선택을 사용하지 않았다.
+
+============================================================
+4. dominant Sprite 규칙
+============================================================
+
+23명은 prefab PPtr graph가 복수 Sprite를 참조했다.
+filename으로 고르지 않고 rendered pixel area를 사용했다.
+
+자동 선택 조건:
+- 가장 큰 referenced image의 pixel area >= 250,000
+- 동시에 두 번째 후보의 pixel area 대비 >= 3배
+
+이 규칙을 통과한 23명만 DOMINANT_REFERENCED_SPRITE로 확정했다.
+나머지는 자동 추정하지 않는 정책을 유지한다.
+
+============================================================
+5. 최종 index 구조
+============================================================
+
+manifest:
+- data/generated/hero-artwork-h-a5-index.v1/manifest.json
+- SHA256: 6A32E5491B2AA1B647EDBFE0BF82463A200C5028F18C59A8873E3947154D80D8
+
+layout:
+- owning bundle 기준 12 shard
+- 각 Hero record에 heroId / sourceArtworkPath / owning package+bundle+hash / prefab pathId / Sprite pathId / Texture2D pathId / dimensions / PNG SHA256 / RGBA SHA256 / targetWebPath / selectionStatus 기록
+- 7 dependency 예외는 dependencyBundleName / dependencyBundleSha256 / externalFileId 추가 기록
+
+validation:
+- data/validation/hero-artwork-h-a5-final.v1.json
+
+============================================================
+6. 다시 열지 않는 범위
+============================================================
+
+다음은 새 asset snapshot 또는 명확한 contradiction 없이는 재조사하지 않는다.
+- canonical Hero 267 sourceArtworkPath census
+- 7 family 구분
+- H-A4 final 240 / begin 27 prefab ownership
+- 12 owning bundle provenance
+- Prefab -> Sprite -> Texture2D 기본 규칙
+- 복수 referenced Sprite 23명의 dominant-area 선택 규칙
+- 7명의 final prefab -> begin dependency Sprite 관계
+- 267 target web path mapping
+
+============================================================
+7. 다음 시작점
+============================================================
+
+다음 단계는 index를 사용한 실제 이미지 materialization이다.
+
+원칙:
+1. bundle shard 단위로 처리한다.
+2. index에 기록된 exact pathId만 사용한다.
+3. filename similarity / name JOIN / sourceArtworkPath URL 추론을 하지 않는다.
+4. PNG를 public/images/heroes/cards/{heroId}.png 계약에 맞춰 생성한다.
+5. 생성 PNG hash가 index pngSha256와 일치하는지 검증한다.
+6. 실제 binary commit과 frontend resolver 전환은 H-A5 index와 분리된 후속 단계로 처리한다.
