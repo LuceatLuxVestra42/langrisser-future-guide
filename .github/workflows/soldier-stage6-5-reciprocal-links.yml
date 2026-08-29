@@ -86,3 +86,5 @@ jobs:
       - name: Verify frozen Stage 6-5 artifacts on main or PR
         if: github.event_name != 'push' || github.ref == 'refs/heads/main'
         run: git diff --exit-code -- data/generated/hero-soldier-page-links-stage6-5.v1.json data/validation/soldier-stage6-5-reciprocal-links.v1.json
+
+# dragoonia downstream freshness trigger 6-5
