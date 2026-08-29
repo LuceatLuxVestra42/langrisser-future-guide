@@ -42,6 +42,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: project-status-owner-${{ github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
   site-consumer-final-freeze:
     runs-on: ubuntu-latest

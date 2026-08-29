@@ -24,6 +24,7 @@ add('STAGE6_3_FROZEN', stage6_3.status === 'DESIGN_FROZEN');
 add('NO_REAL_SUCCESSOR_IN_STAGE6_4_POLICY', contract.policy?.realSuccessorPromotionInThisStage === false);
 add('EXPLICIT_DECLARATION_REQUIRED', contract.policy?.predecessorIdMustBeExplicit === true && contract.policy?.entryIdMustBeExplicit === true && contract.policy?.sourcePathMustBeExplicit === true);
 add('WORK_BRANCH_AUTOMATION_ONLY', contract.policy?.automaticDispatchWorkBranchOnly === true && contract.policy?.pullRequestAndMainRemainCheckOnlyAtOwningWorkflow === true);
+add('OWNER_SERIALIZATION_REQUIRED', contract.policy?.owningCompletionWorkflowsSerializedPerBranch === true);
 
 for (const pipeline of contract.pipelines ?? []) {
   const upper = pipeline.pipelineId.toUpperCase();
@@ -47,6 +48,7 @@ for (const pipeline of contract.pipelines ?? []) {
   add(`WORKFLOW_DIRECT_APPLY_ABSENT_${upper}`, !workflow.includes('--apply'));
   add(`WORKFLOW_WORK_BRANCH_ONLY_HANDOFF_${upper}`, workflow.includes("github.event_name == 'push'") && workflow.includes("startsWith(github.ref, 'refs/heads/work/')"));
   add(`WORKFLOW_PR_MAIN_CHECK_ONLY_PRESERVED_${upper}`, workflow.includes(`bridge-project-doctor-status-source.mjs --pipeline ${pipeline.pipelineId} --check`));
+  add(`OWNER_WORKFLOW_SHARED_CONCURRENCY_${upper}`, workflow.includes('group: project-status-owner-${{ github.ref_name }}') && workflow.includes('cancel-in-progress: false'));
 }
 
 const heroPipeline = contract.pipelines.find(item => item.pipelineId === 'hero');
