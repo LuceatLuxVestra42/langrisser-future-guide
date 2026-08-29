@@ -2,6 +2,10 @@ import equipmentNameKrJson from "../../data/generated/equipment-name-kr-user-app
 import equipmentPublicAdmissionCorrectionJson from "../../data/presentation/equipment-public-admission-correction.v1.json";
 import equipmentReleaseProjectionJson from "../../data/presentation/equipment-p3-1-release-metadata.v1.json";
 import {
+  EQUIPMENT_DISPLAY_COLLECTION_EXPECTED_COUNTS,
+  resolveEquipmentDisplayCollection,
+} from "./equipment-display-collection";
+import {
   readEquipmentDetailPageData as readBaseEquipmentDetailPageData,
   readExclusiveEquipmentPageData as readBaseExclusiveEquipmentPageData,
   readGeneralEquipmentPageData as readBaseGeneralEquipmentPageData,
@@ -189,7 +193,7 @@ function applyGeneralReleasePresentation(records: EquipmentListRecord[]) {
   });
 }
 
-function countPublicTabs(records: EquipmentListRecord[]) {
+function countTabs(records: EquipmentListRecord[]) {
   return Object.fromEntries(
     [1, 2, 3].map((tab) => [
       String(tab),
@@ -213,12 +217,12 @@ export function readGeneralEquipmentPageData() {
     );
   }
 
-  const publicTabs = countPublicTabs(publicRecords);
+  const technicalTabs = countTabs(publicRecords);
   for (const [tab, expected] of Object.entries(
     equipmentPublicAdmissionCorrection.expectedPublicProjection.technicalTabCountsAfterAdmissionOnly,
   )) {
-    if (publicTabs[tab] !== expected) {
-      throw new Error(`Equipment public tab ${tab} mismatch: ${publicTabs[tab]} !== ${expected}.`);
+    if (technicalTabs[tab] !== expected) {
+      throw new Error(`Equipment public technical tab ${tab} mismatch: ${technicalTabs[tab]} !== ${expected}.`);
     }
   }
 
@@ -226,11 +230,33 @@ export function readGeneralEquipmentPageData() {
     ...record,
     nameKr: resolveNameKr(record.equipmentId, record.nameCn, record.nameKr),
   }));
+  const releasePresentedRecords = applyGeneralReleasePresentation(localizedRecords);
+  const presentationRecords = releasePresentedRecords.map((record) => {
+    const technicalSiteTab = record.siteTab;
+    const displayCollection = resolveEquipmentDisplayCollection(record.equipmentId, technicalSiteTab);
+    return {
+      ...record,
+      technicalSiteTab,
+      displayCollection,
+      siteTab: displayCollection,
+    };
+  });
+  const presentationTabs = countTabs(presentationRecords);
+
+  for (const tab of [1, 2, 3] as const) {
+    const expected = EQUIPMENT_DISPLAY_COLLECTION_EXPECTED_COUNTS[tab];
+    if (presentationTabs[String(tab)] !== expected) {
+      throw new Error(
+        `Equipment display collection ${tab} mismatch: ${presentationTabs[String(tab)]} !== ${expected}.`,
+      );
+    }
+  }
 
   return {
     ...data,
-    records: applyGeneralReleasePresentation(localizedRecords),
-    tabs: publicTabs,
+    records: presentationRecords,
+    tabs: presentationTabs,
+    technicalTabs,
   };
 }
 
@@ -255,12 +281,14 @@ export function readEquipmentDetailPageData(
 
   if (data.kind === "general") {
     const identity = data.detail.identity;
+    const technicalSiteTab = data.detail.classification.siteTab;
+    const displayCollection = resolveEquipmentDisplayCollection(equipmentId, technicalSiteTab);
     const nameKr = resolveNameKr(equipmentId, identity.nameCn, identity.nameKr);
     const release =
-      data.detail.classification.siteTab === equipmentReleaseProjection.scope.siteTab
+      technicalSiteTab === equipmentReleaseProjection.scope.siteTab
         ? requireReleaseProjection(equipmentId, identity.nameCn)
         : null;
-    const localized: GeneralEquipmentDetailPageData = {
+    const localized = {
       ...data,
       displayName: nameKr ?? identity.nameCn,
       detail: {
@@ -268,6 +296,12 @@ export function readEquipmentDetailPageData(
         identity: {
           ...identity,
           nameKr,
+        },
+        classification: {
+          ...data.detail.classification,
+          technicalSiteTab,
+          displayCollection,
+          siteTab: displayCollection,
         },
         acquisition: release
           ? {
