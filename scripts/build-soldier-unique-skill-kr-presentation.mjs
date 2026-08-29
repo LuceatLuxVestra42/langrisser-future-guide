@@ -26,24 +26,14 @@ const shardSpecs = [
 function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(root, relativePath), 'utf8'));
 }
-
-function fail(message) {
-  throw new Error(`[soldier-skill-kr] ${message}`);
-}
-
-function assert(condition, message) {
-  if (!condition) fail(message);
-}
-
-function stableJson(value) {
-  return `${JSON.stringify(value, null, 2)}\n`;
-}
+function fail(message) { throw new Error(`[soldier-skill-kr] ${message}`); }
+function assert(condition, message) { if (!condition) fail(message); }
+function stableJson(value) { return `${JSON.stringify(value, null, 2)}\n`; }
 
 const canonical = readJson(canonicalPath);
 const progress = readJson(progressPath);
 const reviewOverrides = readJson(reviewOverridePath);
 const shards = shardSpecs.map((spec) => ({ ...spec, data: readJson(spec.path) }));
-
 assert(Array.isArray(canonical.records), 'canonical records must be an array');
 assert(reviewOverrides?.schemaId === 'soldier-unique-skill-review-overrides/v1', 'review override schema mismatch');
 assert(Array.isArray(reviewOverrides.records), 'review override records must be an array');
@@ -52,7 +42,6 @@ const canonicalTargets = canonical.records.filter((record) => {
   if (record?.identity?.isSp === true) return typeof record?.sp?.finalDescription === 'string' && record.sp.finalDescription.length > 0;
   return record?.identity?.tier === 3 && typeof record?.ability?.finalDescription === 'string' && record.ability.finalDescription.length > 0;
 });
-
 const canonicalById = new Map(canonicalTargets.map((record) => [record.soldierId, record]));
 assert(canonicalTargets.length === 185, `canonical target count must be 185, got ${canonicalTargets.length}`);
 assert(canonicalById.size === canonicalTargets.length, 'canonical target soldierIds must be unique');
@@ -67,7 +56,7 @@ for (const override of reviewOverrides.records) {
   assert(typeof override.descriptionKr === 'string' && override.descriptionKr.trim().length > 0, `review override ${override.soldierId}: descriptionKr required`);
   overrideById.set(override.soldierId, override);
 }
-assert(overrideById.size === 5, `expected 5 review overrides, got ${overrideById.size}`);
+assert(overrideById.size === 7, `expected 7 review overrides, got ${overrideById.size}`);
 
 const reviewReasonById = new Map();
 const authoringRecords = [];
@@ -75,16 +64,12 @@ for (const shard of shards) {
   assert(Array.isArray(shard.data.records), `${shard.path}: records must be an array`);
   assert(shard.data.records.length === shard.expected, `${shard.path}: expected ${shard.expected} records, got ${shard.data.records.length}`);
   authoringRecords.push(...shard.data.records.map((record) => ({ ...record, __shard: shard.path })));
-
   if (Array.isArray(shard.data.reviewQueue)) {
     for (const item of shard.data.reviewQueue) {
-      if (Number.isInteger(item?.soldierId) && typeof item?.reason === 'string' && item.reason.length > 0) {
-        reviewReasonById.set(item.soldierId, item.reason);
-      }
+      if (Number.isInteger(item?.soldierId) && typeof item?.reason === 'string' && item.reason.length > 0) reviewReasonById.set(item.soldierId, item.reason);
     }
   }
 }
-
 assert(authoringRecords.length === 185, `authoring record count must be 185, got ${authoringRecords.length}`);
 
 const seen = new Set();
@@ -95,24 +80,14 @@ for (const record of authoringRecords) {
   assert(Number.isInteger(id), `${record.__shard}: soldierId must be an integer`);
   assert(!seen.has(id), `duplicate translated soldierId ${id}`);
   seen.add(id);
-
   const source = canonicalById.get(id);
   assert(source, `translated soldierId ${id} is not in canonical target set`);
   assert(record.nameCn === source.identity.nameCn, `soldierId ${id}: nameCn mismatch (${record.nameCn} != ${source.identity.nameCn})`);
 
   const override = overrideById.get(id);
   if (override) appliedOverrideIds.add(id);
-  const effective = override
-    ? {
-        ...record,
-        translationStatus: override.translationStatus,
-        reviewTerms: override.reviewTerms,
-        descriptionKr: override.descriptionKr,
-      }
-    : record;
-
+  const effective = override ? { ...record, translationStatus: override.translationStatus, reviewTerms: override.reviewTerms, descriptionKr: override.descriptionKr } : record;
   assert(typeof effective.descriptionKr === 'string' && effective.descriptionKr.trim().length > 0, `soldierId ${id}: empty descriptionKr`);
-
   const status = effective.translationStatus;
   const reviewTerms = Array.isArray(effective.reviewTerms) ? effective.reviewTerms : [];
   assert(status === 'PASS' || (typeof status === 'string' && status.startsWith('REVIEW_')), `soldierId ${id}: unsupported translationStatus ${status}`);
@@ -129,7 +104,6 @@ for (const record of authoringRecords) {
     descriptionKr: effective.descriptionKr,
   });
 }
-
 assert(appliedOverrideIds.size === overrideById.size, `not all review overrides were applied (${appliedOverrideIds.size}/${overrideById.size})`);
 normalizedRecords.sort((a, b) => a.soldierId - b.soldierId);
 
@@ -143,25 +117,22 @@ assert(JSON.stringify(translatedIds) === JSON.stringify(canonicalTargetIds), 'tr
 
 const passCount = normalizedRecords.filter((record) => record.translationStatus === 'PASS').length;
 const reviewCount = normalizedRecords.length - passCount;
-assert(passCount === 114, `PASS count must be 114, got ${passCount}`);
-assert(reviewCount === 71, `REVIEW count must be 71, got ${reviewCount}`);
-
+assert(passCount === 116, `PASS count must be 116, got ${passCount}`);
+assert(reviewCount === 69, `REVIEW count must be 69, got ${reviewCount}`);
 assert(progress?.targetCount === 185, `progress targetCount must be 185, got ${progress?.targetCount}`);
 assert(progress?.progress?.translatedCount === 185, `progress translatedCount must be 185, got ${progress?.progress?.translatedCount}`);
 assert(progress?.progress?.passCount === passCount, 'progress PASS count mismatch');
 assert(progress?.progress?.reviewCount === reviewCount, 'progress REVIEW count mismatch');
 assert(progress?.progress?.remainingCount === 0, 'progress remainingCount must be 0');
 
-const reviewQueue = normalizedRecords
-  .filter((record) => record.translationStatus !== 'PASS')
-  .map((record) => ({
-    soldierId: record.soldierId,
-    nameKr: record.nameKr,
-    nameCn: record.nameCn,
-    translationStatus: record.translationStatus,
-    terms: record.reviewTerms,
-    reason: reviewReasonById.get(record.soldierId) ?? 'Translation is complete; authoritative Korean terminology or mechanic wording still requires review.',
-  }));
+const reviewQueue = normalizedRecords.filter((record) => record.translationStatus !== 'PASS').map((record) => ({
+  soldierId: record.soldierId,
+  nameKr: record.nameKr,
+  nameCn: record.nameCn,
+  translationStatus: record.translationStatus,
+  terms: record.reviewTerms,
+  reason: reviewReasonById.get(record.soldierId) ?? 'Translation is complete; authoritative Korean terminology or mechanic wording still requires review.',
+}));
 
 const finalPresentation = {
   version: 1,
@@ -174,14 +145,7 @@ const finalPresentation = {
     authoringShards: shardSpecs.map(({ path: shardPath, expected, role }) => ({ path: shardPath, recordCount: expected, role })),
     reviewOverrides: { path: reviewOverridePath, recordCount: overrideById.size },
   },
-  counts: {
-    target: 185,
-    records: normalizedRecords.length,
-    pass: passCount,
-    review: reviewCount,
-    missing: missingIds.length,
-    extra: extraIds.length,
-  },
+  counts: { target: 185, records: normalizedRecords.length, pass: passCount, review: reviewCount, missing: missingIds.length, extra: extraIds.length },
   policy: {
     canonicalChineseReadOnly: true,
     joinKey: 'soldierId',
@@ -200,28 +164,10 @@ const publicProjection = {
   schemaId: 'soldier-unique-skill-kr-public/v1',
   date: '2026-08-29',
   status: 'PASS_WITH_REVIEW',
-  counts: {
-    records: normalizedRecords.length,
-    pass: passCount,
-    review: reviewCount,
-  },
-  policy: {
-    joinKey: 'soldierId',
-    runtimeNameJoin: false,
-    canonicalChineseFallbackForTarget: false,
-    reviewIsNonBlockingTranslationReview: true,
-  },
-  bySoldierId: Object.fromEntries(
-    normalizedRecords.map((record) => [
-      String(record.soldierId),
-      {
-        descriptionKr: record.descriptionKr,
-        translationStatus: record.translationStatus,
-      },
-    ]),
-  ),
+  counts: { records: normalizedRecords.length, pass: passCount, review: reviewCount },
+  policy: { joinKey: 'soldierId', runtimeNameJoin: false, canonicalChineseFallbackForTarget: false, reviewIsNonBlockingTranslationReview: true },
+  bySoldierId: Object.fromEntries(normalizedRecords.map((record) => [String(record.soldierId), { descriptionKr: record.descriptionKr, translationStatus: record.translationStatus }])),
 };
-
 assert(Object.keys(publicProjection.bySoldierId).length === 185, 'public projection must contain 185 unique soldierId keys');
 
 const validation = {
@@ -229,23 +175,8 @@ const validation = {
   schemaId: 'soldier-unique-skill-kr-final-validation/v1',
   date: '2026-08-29',
   status: 'PASS_WITH_REVIEW',
-  input: {
-    canonical: canonicalPath,
-    canonicalTargetCount: canonicalTargets.length,
-    authoringShardCount: shardSpecs.length,
-    authoringRecordCount: authoringRecords.length,
-    reviewOverridePath,
-    reviewOverrideCount: overrideById.size,
-  },
-  output: {
-    path: outputPath,
-    publicPath: publicOutputPath,
-    recordCount: normalizedRecords.length,
-    passCount,
-    reviewCount,
-    reviewQueueCount: reviewQueue.length,
-    publicRecordCount: Object.keys(publicProjection.bySoldierId).length,
-  },
+  input: { canonical: canonicalPath, canonicalTargetCount: canonicalTargets.length, authoringShardCount: shardSpecs.length, authoringRecordCount: authoringRecords.length, reviewOverridePath, reviewOverrideCount: overrideById.size },
+  output: { path: outputPath, publicPath: publicOutputPath, recordCount: normalizedRecords.length, passCount, reviewCount, reviewQueueCount: reviewQueue.length, publicRecordCount: Object.keys(publicProjection.bySoldierId).length },
   checks: {
     canonicalTargetCount185: true,
     shardCountsExact: true,
