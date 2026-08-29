@@ -76,9 +76,6 @@ jobs:
       - name: Validate Stage 6-5 closeout requests
         run: node scripts/validate-project-doctor-status-source-stage6-5-closeout-requests.mjs
 
-      - name: Validate Stage 6-6 all-domain closeout
-        run: node scripts/validate-project-doctor-status-source-stage6-6-all-domain-closeout.mjs
-
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
 
@@ -145,9 +142,6 @@ jobs:
 
       - name: Validate Stage 6-5 closeout requests
         run: node scripts/validate-project-doctor-status-source-stage6-5-closeout-requests.mjs
-
-      - name: Validate Stage 6-6 all-domain closeout
-        run: node scripts/validate-project-doctor-status-source-stage6-6-all-domain-closeout.mjs
 
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
