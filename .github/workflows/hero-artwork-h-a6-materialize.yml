@@ -6,6 +6,7 @@ on:
       - work/hero-artwork-h-a6-materialize
     paths:
       - scripts/materialize-hero-artwork-h-a6.py
+      - scripts/materialize-hero-artwork-h-a6-v2.py
       - .github/workflows/hero-artwork-h-a6-materialize.yml
 
 permissions:
@@ -18,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Install frozen extraction runtime
         shell: pwsh
@@ -28,7 +29,7 @@ jobs:
 
       - name: Materialize and verify 267 Hero PNG assets
         shell: pwsh
-        run: python scripts/materialize-hero-artwork-h-a6.py
+        run: python scripts/materialize-hero-artwork-h-a6-v2.py
 
       - name: Commit exact verified Hero PNG assets
         shell: bash
