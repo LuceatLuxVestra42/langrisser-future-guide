@@ -72,3 +72,5 @@ jobs:
       - name: Verify frozen artifacts on main or PR
         if: github.event_name != 'push' || github.ref == 'refs/heads/main'
         run: git diff --exit-code -- data/generated/soldier-detail-stage5-2.v1.json data/validation/soldier-stage5-2-combat.v1.json
+
+# temporary downstream-freeze trigger for Soldier 819 localization refresh
