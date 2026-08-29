@@ -56,7 +56,7 @@ for (const override of reviewOverrides.records) {
   assert(typeof override.descriptionKr === 'string' && override.descriptionKr.trim().length > 0, `review override ${override.soldierId}: descriptionKr required`);
   overrideById.set(override.soldierId, override);
 }
-assert(overrideById.size === 7, `expected 7 review overrides, got ${overrideById.size}`);
+assert(overrideById.size === 9, `expected 9 review overrides, got ${overrideById.size}`);
 
 const reviewReasonById = new Map();
 const authoringRecords = [];
@@ -117,8 +117,8 @@ assert(JSON.stringify(translatedIds) === JSON.stringify(canonicalTargetIds), 'tr
 
 const passCount = normalizedRecords.filter((record) => record.translationStatus === 'PASS').length;
 const reviewCount = normalizedRecords.length - passCount;
-assert(passCount === 116, `PASS count must be 116, got ${passCount}`);
-assert(reviewCount === 69, `REVIEW count must be 69, got ${reviewCount}`);
+assert(passCount === 118, `PASS count must be 118, got ${passCount}`);
+assert(reviewCount === 67, `REVIEW count must be 67, got ${reviewCount}`);
 assert(progress?.targetCount === 185, `progress targetCount must be 185, got ${progress?.targetCount}`);
 assert(progress?.progress?.translatedCount === 185, `progress translatedCount must be 185, got ${progress?.progress?.translatedCount}`);
 assert(progress?.progress?.passCount === passCount, 'progress PASS count mismatch');
