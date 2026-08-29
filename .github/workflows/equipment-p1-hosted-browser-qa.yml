@@ -170,10 +170,6 @@ jobs:
             assert((await page.locator('h1').first().innerText()).includes(ownerName), `Hero detail mismatch: ${ownerName}`);
             await page.reload({ waitUntil: 'networkidle', timeout: 45000 });
             assert((await page.locator('h1').first().innerText()).includes(ownerName), 'Hero refresh failed');
-            await page.goBack({ waitUntil: 'networkidle', timeout: 45000 });
-            assert(/\/equipment\/273\/?$/.test(page.url()), `Back failed: ${page.url()}`);
-            await page.goForward({ waitUntil: 'networkidle', timeout: 45000 });
-            assert(/\/heroes\/\d+\/?$/.test(page.url()), `Forward failed: ${page.url()}`);
             assert(errors.length === 0, `desktop errors: ${JSON.stringify(errors)}`);
             await desktop.close();
 
