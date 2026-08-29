@@ -1,3 +1,84 @@
 {
-  "version": 1
+  "version": 1,
+  "schemaId": "soldier-unique-skill-translation-progress/v1",
+  "date": "2026-08-29",
+  "status": "TRANSLATION_COMPLETE_WITH_REVIEW",
+  "source": "data/generated/soldier-detail-stage5-3.v1.json",
+  "targetCount": 185,
+  "progress": {
+    "translatedCount": 185,
+    "passCount": 130,
+    "reviewCount": 55,
+    "remainingCount": 0,
+    "lastCompletedSoldierId": 6113,
+    "nextKnownRecord": null,
+    "batchSize": 0
+  },
+  "translationSources": [
+    {"path":"data/presentation/soldier-unique-skill-kr.v1.json","recordCount":50,"range":"through soldierId 403","role":"consolidated-base"},
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch5.v1.json","recordCount":20,"range":"soldierId 410 through 516 with lower tiers skipped","role":"append-only-batch"},
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch6.v1.json","recordCount":20,"range":"soldierId 517 through 644 with lower tiers skipped","role":"append-only-batch"},
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch7.v1.json","recordCount":20,"range":"soldierId 645 through 1031 with lower tiers skipped","role":"append-only-batch"},
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch8.v1.json","recordCount":35,"range":"soldierId 1032 through 5308 with lower tiers skipped; normal + SP","role":"append-only-batch"},
+    {"path":"data/checkpoints/soldier-unique-skill-translation-batch9.v1.json","recordCount":40,"range":"soldierId 5311 through 6113; final SP records","role":"append-only-batch"},
+    {"path":"data/presentation/soldier-unique-skill-review-overrides.v1.json","recordCount":21,"range":"249, 250, 326, 333, 334, 336, 341, 512, 513, 514, 515, 602, 635, 637, 647, 811, 814, 815, 1034, 1105, 1113","role":"evidence-backed-review-overrides"}
+  ],
+  "writeStrategy": {
+    "mode": "checkpoint-sharded-authoring-with-deterministic-final-consolidation-and-review-overrides",
+    "reason": "Preserve immutable translation batches and apply evidence-backed review resolutions through a small soldierId-keyed override layer.",
+    "canonicalGeneratedSourceReadOnly": true,
+    "finalConsolidationRequired": false,
+    "finalConsolidationComplete": true
+  },
+  "reviewQueueCounts": {
+    "sourceReviewMarks": 76,
+    "resolvedByReviewOverrides": 21,
+    "remaining": 55
+  },
+  "reviewResolution": {
+    "evidenceCheckpoints": [
+      "data/checkpoints/soldier-unique-skill-review-evidence-batch1.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-evidence-batch2.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-evidence-batch3.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-evidence-batch4.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-evidence-batch5.v1.json"
+    ],
+    "overridePath": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
+    "resolutionCheckpoints": [
+      "data/checkpoints/soldier-unique-skill-review-resolution-batch1.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-resolution-batch2.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-resolution-batch3.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-resolution-batch4.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-resolution-batch5.v1.json"
+    ],
+    "resolvedSoldierIds": [249,250,326,333,334,336,341,512,513,514,515,602,635,637,647,811,814,815,1034,1105,1113],
+    "status": "BATCH5_BUILD_VERIFIED"
+  },
+  "buildVerification": {
+    "status": "PASS",
+    "workflow": "Equipment Korean Name Frontend QA",
+    "checkpointRunId": 33228025075,
+    "checkpointJobId": 99035436083,
+    "finalHeadRunId": 33228186636,
+    "finalHeadJobId": 99035896779,
+    "finalHeadSha": "8a86daf9276eb412271fa1c0b835b7b28bf4f89e",
+    "observed": {"records":185,"pass":130,"review":55,"overrides":21,"missing":0,"extra":0,"public":185},
+    "productionBuild": "SUCCESS",
+    "frontendLocalizationBoundary": "PASS"
+  },
+  "completion": {
+    "translationTargetComplete": true,
+    "translatedCoverage": "185/185",
+    "finalConsolidationComplete": true,
+    "consolidationStatus": "PASS_WITH_REVIEW",
+    "consolidationCheckpoint": "data/checkpoints/soldier-unique-skill-translation-consolidation.v1.json",
+    "finalConsumerPath": "data/generated/soldier-unique-skill-kr-final.v1.json",
+    "publicConsumerPath": "public/data/soldier-unique-skill-kr.v1.json",
+    "validationPath": "data/validation/soldier-unique-skill-kr-final.v1.json",
+    "frontendConsumerIntegrated": true,
+    "frontendCheckpoint": "data/checkpoints/soldier-unique-skill-frontend-localization.v1.json",
+    "frontendBuildGateStatus": "PASS",
+    "frontendHostedQaStatus": "PENDING",
+    "reviewResolutionRequired": true
+  }
 }
