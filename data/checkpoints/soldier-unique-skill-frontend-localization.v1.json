@@ -29,11 +29,11 @@
     "lowerTierUsesExistingRichDetailBehavior": true
   },
   "reviewResolution": {
-    "batch": 1,
-    "resolvedSoldierIds": [250, 326, 333, 341, 602],
-    "expectedPassCount": 114,
-    "expectedReviewCount": 71,
-    "evidenceCheckpoint": "data/checkpoints/soldier-unique-skill-review-evidence-batch1.v1.json"
+    "appliedBatches": 2,
+    "resolvedSoldierIds": [250, 326, 333, 334, 336, 341, 602],
+    "expectedPassCount": 116,
+    "expectedReviewCount": 69,
+    "overridePath": "data/presentation/soldier-unique-skill-review-overrides.v1.json"
   },
   "buildGate": {
     "status": "PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
@@ -42,10 +42,10 @@
     "previousJobId": 99025150355,
     "previousConclusion": "SUCCESS",
     "previousObservedGeneratorSummary": "records=185 pass=109 review=76 missing=0 extra=0 public=185",
-    "expectedNextGeneratorSummary": "records=185 pass=114 review=71 overrides=5 missing=0 extra=0 public=185"
+    "expectedNextGeneratorSummary": "records=185 pass=116 review=69 overrides=7 missing=0 extra=0 public=185"
   },
   "reviewBoundary": {
-    "reviewCount": 71,
+    "reviewCount": 69,
     "reviewItemsAreMissingTranslations": false,
     "reviewItemsBlockFrontendProjection": false,
     "reviewResolutionRequiredBeforeTranslationCloseout": true
@@ -54,12 +54,12 @@
     "status": "PENDING",
     "workflow": ".github/workflows/soldier-unique-skill-hosted-qa.yml",
     "validator": "scripts/validate-soldier-unique-skill-hosted.mjs",
-    "reason": "Hosted QA must run only after an actually deployed static environment contains the current 185-record projection. The existing main Pages site is not treated as evidence for this unmerged branch."
+    "reason": "Hosted QA must run only after an actually deployed static environment contains the current projection. The existing main Pages site is not treated as evidence for this unmerged branch."
   },
   "completion": {
     "frontendConsumerIntegrated": true,
     "buildGateComplete": false,
     "hostedQaComplete": false
   },
-  "nextStep": "Re-run Build Gate for review override batch 1. Hosted QA remains pending until deployment contains the current branch result; continue evidence-based review resolution afterward."
+  "nextStep": "Re-run Build Gate at 116 PASS / 69 REVIEW. Hosted QA remains pending until deployment contains this projection."
 }
