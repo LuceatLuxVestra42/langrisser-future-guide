@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-status-source-stage6-3-apply-handoff/v1",
+  "stage": "PROJECT-STATUS-STAGE6-3",
+  "checkpoint": "PROJECT_DOCTOR_STATUS_SOURCE_EXPLICIT_APPLY_HANDOFF_HERO_SOLDIER",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Provide an explicit, guarded apply-mode handoff for Hero and Soldier status sources after Stage 6-2 proved check-only completion hooks, while preserving branch protection and D5 explicit freshness reseal semantics.",
+  "stage6_2Contract": "data/contracts/project-doctor-status-source-stage6-2-check-hooks.v1.json",
+  "bridgeContract": "data/contracts/project-doctor-status-source-artifact-bridge.v1.json",
+  "activeRegistry": "data/generated/project-doctor-active-source-registry.v1.json",
+  "d5Contract": "data/contracts/project-doctor-d5-freshness.v1.json",
+  "workflowPath": ".github/workflows/project-status-stage6-3-apply-handoff.yml",
+  "command": "node scripts/apply-project-doctor-status-source-handoff.mjs --pipeline <hero|soldier> --expected-predecessor <active-entry-id> --id <entry-id> --source <validated-json> [--note text] [--check|--apply]",
+  "policy": {
+    "completionWorkflowsRemainCheckOnly": true,
+    "applyRunsOnlyInDedicatedHandoff": true,
+    "pipelineMustBeStage6_2Registered": true,
+    "candidateIdMustBeExplicit": true,
+    "candidateSourceMustBeExplicit": true,
+    "expectedPredecessorMustBeExplicit": true,
+    "compareAndSwapRequired": true,
+    "compareAndSwapCheckedBeforePreview": true,
+    "compareAndSwapRecheckedBeforeApply": true,
+    "candidateSourceMustExist": true,
+    "candidateSourceMustBeCommittedAndClean": true,
+    "stage5CheckMustPassBeforeApply": true,
+    "stage5ApplyDelegatesThroughStage4AndStage3": true,
+    "d5RefreshIsExplicitPartOfApplyHandoff": true,
+    "d5MustBeFreshAfterApply": true,
+    "projectStatusMustBeCurrentAfterApply": true,
+    "failedApplyOrResealMustRollbackWorkingTree": true,
+    "workflowMustRejectMainRef": true,
+    "workflowCommitsOnlyOnWorkBranch": true,
+    "mainAdmissionRequiresPullRequest": true,
+    "automaticApplyFromHeroSoldierCompletionWorkflow": false,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "canonicalJoinRecomputation": false,
+    "filenameAuthorityInference": false,
+    "stageNumberAuthorityInference": false,
+    "chronologyAuthorityInference": false
+  },
+  "pipelines": [
+    {
+      "pipelineId": "hero",
+      "domain": "hero",
+      "producerId": "hero-final",
+      "completionWorkflow": ".github/workflows/hero-stage6-4-site-consumer.yml"
+    },
+    {
+      "pipelineId": "soldier",
+      "domain": "soldier",
+      "producerId": "soldier-final",
+      "completionWorkflow": ".github/workflows/soldier-stage6-7-site-admission.yml"
+    }
+  ],
+  "mutablePaths": [
+    "data/generated/project-doctor-active-source-registry.v1.json",
+    "data/validation/project-doctor-active-source-registry-summary.v1.json",
+    "data/generated/project-doctor-d1-1-status.v1.json",
+    "data/validation/project-doctor-d1-1-summary.v1.json",
+    "data/validation/project-doctor-d1-2-summary.v1.json",
+    "data/generated/project-status.v1.json",
+    "PROJECT_STATUS.md",
+    "data/generated/project-doctor-d5-freshness.v1.json"
+  ],
+  "workflowCommitPaths": [
+    "data/status-sources",
+    "data/generated/project-doctor-active-source-registry.v1.json",
+    "data/validation/project-doctor-active-source-registry-summary.v1.json",
+    "data/generated/project-doctor-d1-1-status.v1.json",
+    "data/validation/project-doctor-d1-1-summary.v1.json",
+    "data/validation/project-doctor-d1-2-summary.v1.json",
+    "data/generated/project-status.v1.json",
+    "PROJECT_STATUS.md",
+    "data/generated/project-doctor-d5-freshness.v1.json"
+  ],
+  "runtimeProof": {
+    "checkModePerformsNoApply": true,
+    "stalePredecessorBlocksBeforeBridge": true,
+    "validApplyRunsCheckThenApply": true,
+    "refreshFailureRollsBack": true,
+    "uncommittedSourceBlocks": true,
+    "completionHooksStillContainCheckAndNoApply": true,
+    "workflowRejectsMainAndCommitsOnlyAfterFreshValidation": true
+  },
+  "boundaries": {
+    "productionMutation": false,
+    "canonicalMutation": false,
+    "frontendMutation": false,
+    "completionWorkflowApplyMutation": false,
+    "directMainPush": false
+  },
+  "nextStep": {
+    "stage": "PROJECT-STATUS-STAGE6-4",
+    "goal": "Consider producer-emitted handoff declarations or automatic dispatch only after the explicit branch-scoped apply handoff has stable runtime proof; do not infer candidate authority."
+  }
+}
