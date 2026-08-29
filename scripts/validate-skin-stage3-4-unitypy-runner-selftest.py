@@ -81,8 +81,15 @@ from pathlib import Path
 __version__ = "selftest"
 class Type:
     def __init__(self, name): self.name = name
+class Parent:
+    def __init__(self): self.files = {}
 class AssetsFile:
-    def __init__(self, name): self.name = name
+    def __init__(self, cab):
+        # Reproduce the real-runtime compatibility case: direct name is empty,
+        # but the parent bundle retains the exact child key.
+        self.name = ""
+        self.parent = Parent()
+        self.parent.files[cab] = self
 class FakeImage:
     def save(self, path, format=None): Path(path).write_bytes(b"\\x89PNG\\r\\n\\x1a\\nSELFTEST")
 class Parsed:
@@ -131,7 +138,7 @@ def load(bundle_path):
                     raise RuntimeError(f"artifact hash/size fail: {record.get('requestId')} {artifact['relativePath']}")
 
         print("PASS_SKIN_STAGE3_4_UNITYPY_RUNNER_SELFTEST")
-        print(json.dumps({"checks": 6, "failures": 0, "requests": 1869, "byKind": EXPECTED}, indent=2))
+        print(json.dumps({"checks": 6, "failures": 0, "requests": 1869, "byKind": EXPECTED, "cabNameFallback": "parent.files identity"}, indent=2))
         return 0
 
 if __name__ == "__main__":
