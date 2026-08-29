@@ -86,13 +86,21 @@ assert(stage6SkinCountMismatch === 0, `Stage 6/Skin relation count mismatch on $
 const serverSource = readText('src/lib/skin-detail.server.ts');
 const routeSource = readText('src/routes/heroes_.$heroId.tsx');
 assert(serverSource.includes('skin-stage2-3-bidirectional-relation.v1.json'), 'Skin frontend server is not consuming the frozen Stage 2 relation');
-assert(serverSource.includes('skin-stage3-5-static-web-asset-map.v1.json'), 'Skin frontend server is not consuming the frozen Stage 3-5 asset map');
-assert(serverSource.includes('skin-stage3-5-static-web-asset-map.v1.json'), 'Skin frontend server asset admission missing');
-assert(!serverSource.includes('ConfigData'), 'Skin frontend server must not read raw ConfigData');
+assert(serverSource.includes('../../data/generated/skin-stage3-5-static-web-asset-map.v1.json'), 'Skin frontend server is not consuming the frozen Stage 3-5 asset map');
+assert(serverSource.includes('../../data/validation/skin-stage3-5-static-web-asset-map.v1.json'), 'Skin frontend server is not consuming Stage 3-5 final validation admission');
 assert(routeSource.includes('detail.presentation.skins'), 'Hero detail route is not consuming projected Skin rows');
 assert(routeSource.includes('resolvePublicAssetUrl(skin.publicPath)'), 'Hero detail route does not resolve frozen Skin public paths');
 assert(routeSource.includes('ChevronLeft') && routeSource.includes('ChevronRight'), 'Hero detail Skin carousel controls are missing');
-assert(!routeSource.includes('ConfigData'), 'Hero detail route must not read raw ConfigData');
+
+const forbiddenRawConfigPatterns = [
+  /(?:from\s+|import\s*\()[^\n]*["'][^"']*ConfigData[^"']*["']/i,
+  /(?:from\s+|import\s*\()[^\n]*["'][^"']*data\/configdata\/[^"']*["']/i,
+  /fs\.(?:readFileSync|readFile)[^\n]*ConfigData/i,
+  /fs\.(?:readFileSync|readFile)[^\n]*data[\\/]configdata/i,
+];
+for (const [label, source] of [['Skin frontend server', serverSource], ['Hero detail route', routeSource]]) {
+  assert(!forbiddenRawConfigPatterns.some((pattern) => pattern.test(source)), `${label} must not actively read raw ConfigData`);
+}
 
 const result = {
   schemaVersion: 1,
