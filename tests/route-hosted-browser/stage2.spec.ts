@@ -9,7 +9,10 @@ function hostedUrl(path = "") {
   return new URL(path.replace(/^\/+/, ""), BASE_URL).toString();
 }
 
-function installRuntimeGuard(page: Page) {
+function installRuntimeGuard(
+  page: Page,
+  options: { allowExpectedDocument404?: boolean } = {},
+) {
   const issues: string[] = [];
 
   page.on("pageerror", (error) => {
@@ -17,9 +20,16 @@ function installRuntimeGuard(page: Page) {
   });
 
   page.on("console", (message) => {
-    if (message.type() === "error") {
-      issues.push(`console.error: ${message.text()}`);
+    if (message.type() !== "error") return;
+    const text = message.text();
+    if (
+      options.allowExpectedDocument404 &&
+      text.includes("Failed to load resource") &&
+      text.includes("status of 404")
+    ) {
+      return;
     }
+    issues.push(`console.error: ${text}`);
   });
 
   page.on("requestfailed", (request) => {
@@ -96,6 +106,7 @@ test("desktop: hero search hydrates and history back/forward remains usable", as
   test.skip(testInfo.project.name !== "chromium-desktop");
   const guard = installRuntimeGuard(page);
 
+  await expectBrowserEdgeFresh(page);
   await page.goto(hostedUrl("heroes/"), { waitUntil: "domcontentloaded" });
   const search = page.getByLabel("이름 검색");
   await expect(search).toBeVisible();
@@ -127,6 +138,7 @@ test("desktop: Soldier modal preserves parent filter state and scroll position",
   test.skip(testInfo.project.name !== "chromium-desktop");
   const guard = installRuntimeGuard(page);
 
+  await expectBrowserEdgeFresh(page);
   await page.goto(hostedUrl("soldiers/"), { waitUntil: "domcontentloaded" });
   const search = page.getByPlaceholder("검색");
   await search.fill("중장 창병");
@@ -166,8 +178,9 @@ test("desktop: unknown IDs render the intended application not-found UI", async 
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium-desktop");
-  const guard = installRuntimeGuard(page);
+  const guard = installRuntimeGuard(page, { allowExpectedDocument404: true });
 
+  await expectBrowserEdgeFresh(page);
   const cases = [
     ["heroes/999999/", "영웅을 찾을 수 없어."],
     ["soldiers/999999/", "용병을 찾을 수 없어"],
@@ -194,6 +207,7 @@ test("mobile: responsive layout supports touch and keyboard interactions", async
   test.skip(testInfo.project.name !== "chromium-mobile");
   const guard = installRuntimeGuard(page);
 
+  await expectBrowserEdgeFresh(page);
   await page.goto(hostedUrl("soldiers/"), { waitUntil: "domcontentloaded" });
   await expectNoHorizontalOverflow(page);
 
