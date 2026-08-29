@@ -1,0 +1,33 @@
+name: Hero Artwork H-A5 Seven Hero Resolve
+
+on:
+  push:
+    branches:
+      - work/hero-artwork-h-a5-bulk-index
+    paths:
+      - scripts/resolve-hero-artwork-h-a5-seven.py
+      - .github/workflows/hero-artwork-h-a5-seven-resolve.yml
+
+permissions:
+  contents: read
+
+jobs:
+  seven-resolve:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install UnityPy
+        shell: pwsh
+        run: python -m pip install --disable-pip-version-check --quiet UnityPy
+      - name: Resolve seven external dependency sprites
+        shell: pwsh
+        run: python scripts/resolve-hero-artwork-h-a5-seven.py
+      - name: Upload resolution report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-artwork-h-a5-seven-resolve-report
+          path: ${{ runner.temp }}/hero-artwork-h-a5-seven-resolve/report
+          if-no-files-found: warn
+          retention-days: 5

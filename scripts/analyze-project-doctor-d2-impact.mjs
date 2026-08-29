@@ -39,15 +39,32 @@ const matchesAny = (repositoryPath, patterns = []) => patterns.some(pattern => g
 
 export const buildEffectiveMap = (baseMap, impactContract) => {
   const overlayRules = impactContract.pathRuleOverlays ?? [];
+  const exclusionOverlays = impactContract.baseRuleExcludeOverlays ?? [];
   const knownNodes = new Set(Object.keys(baseMap.impactNodes ?? {}));
+  const knownRuleIds = new Set((baseMap.pathRules ?? []).map(rule => rule.id));
   for (const rule of overlayRules) {
     for (const node of rule.directNodes ?? []) {
       if (!knownNodes.has(node)) throw new Error(`Impact overlay ${rule.id} references unknown node: ${node}`);
     }
   }
+  for (const overlay of exclusionOverlays) {
+    if (!knownRuleIds.has(overlay.ruleId)) throw new Error(`Base-rule exclusion overlay references unknown rule: ${overlay.ruleId}`);
+    if (!Array.isArray(overlay.excludePatterns) || overlay.excludePatterns.length === 0) {
+      throw new Error(`Base-rule exclusion overlay ${overlay.ruleId} requires excludePatterns.`);
+    }
+  }
+  const exclusionsByRule = new Map();
+  for (const overlay of exclusionOverlays) {
+    const current = exclusionsByRule.get(overlay.ruleId) ?? [];
+    exclusionsByRule.set(overlay.ruleId, [...current, ...overlay.excludePatterns]);
+  }
+  const baseRules = (baseMap.pathRules ?? []).map(rule => ({
+    ...rule,
+    excludePatterns: [...(rule.excludePatterns ?? []), ...(exclusionsByRule.get(rule.id) ?? [])],
+  }));
   return {
     ...baseMap,
-    pathRules: [...(baseMap.pathRules ?? []), ...overlayRules],
+    pathRules: [...baseRules, ...overlayRules],
   };
 };
 
@@ -220,32 +237,16 @@ const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve
 if (isMain) {
   const options = parseCli(process.argv.slice(2));
   if (options.help) {
-    console.log('Usage: node scripts/analyze-project-doctor-d2-impact.mjs [--json] [--stdin] [--contract PATH] <changed-path...>');
-    console.log('Example: npm run doctor:impact -- public/images/heroes/cards/6.png src/routes/heroes.tsx');
+    console.log('Usage: npm run doctor:impact -- [--json] [--stdin] [--contract <path>] [repository paths...]');
     process.exit(0);
   }
-
   const contract = JSON.parse(fs.readFileSync(options.contractPath, 'utf8'));
-  if (contract.status !== 'DESIGN_FROZEN') {
-    console.error(`[doctor:impact] impact contract is not frozen: ${contract.status}`);
-    process.exit(2);
-  }
   const baseMap = JSON.parse(fs.readFileSync(contract.baseMap, 'utf8'));
-  if (baseMap.status !== 'DESIGN_FROZEN') {
-    console.error(`[doctor:impact] dependency map is not frozen: ${baseMap.status}`);
-    process.exit(2);
-  }
-  const effectiveMap = buildEffectiveMap(baseMap, contract);
-  const stdinPaths = options.stdin ? parseStdinText(fs.readFileSync(0, 'utf8')) : [];
-  const inputs = [...options.paths, ...stdinPaths];
-  if (inputs.length === 0) {
-    console.error('[doctor:impact] no changed paths supplied. Pass repository-relative paths or use --stdin.');
-    process.exit(2);
-  }
-
-  const result = analyzePaths(inputs, effectiveMap);
+  const map = buildEffectiveMap(baseMap, contract);
+  const stdinText = options.stdin ? fs.readFileSync(0, 'utf8') : '';
+  const inputPaths = [...options.paths, ...(options.stdin ? parseStdinText(stdinText) : [])];
+  const result = analyzePaths(inputPaths, map);
   if (options.json) console.log(JSON.stringify(result, null, 2));
   else printHuman(result);
-  if (result.status === 'INVALID_INPUT') process.exitCode = contract.exitPolicy?.INVALID_INPUT ?? 2;
-  else if (result.status === 'MANUAL_REVIEW') process.exitCode = contract.exitPolicy?.MANUAL_REVIEW ?? 3;
+  process.exitCode = contract.exitPolicy?.[result.status] ?? (result.status === 'MAPPED' ? 0 : 1);
 }

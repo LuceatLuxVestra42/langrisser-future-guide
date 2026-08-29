@@ -1,0 +1,56 @@
+{
+  "version": 4,
+  "schemaId": "project-doctor-d2-impact-contract/v4",
+  "stage": "D2-IMPACT",
+  "checkpoint": "PROJECT_DOCTOR_D2_IMPACT_CONTRACT_V4_HERO_ARTWORK_ADMISSION",
+  "status": "DESIGN_FROZEN",
+  "supersedes": "data/contracts/project-doctor-d2-impact-contract.v3.json",
+  "baseMap": "data/contracts/project-doctor-d2-dependency-map.v1.json",
+  "purpose": "Preserve V3 mappings and add only the deterministic Hero artwork final-owner pipeline paths to hero-assets. The V4-only exclusion overlay prevents those exact asset-pipeline paths from also matching the older broad hero-data-family rule; no semantic node or propagation edge is changed.",
+  "scope": {"changedFileInputResolution":true,"pathNormalization":true,"dependencyPropagation":true,"domainProjection":true,"validatorSelection":false,"validatorExecution":false,"rawConfigDataRead":false,"semanticRecomputation":false,"heroArtworkFinalOwnerOverlay":true,"scopedBaseRuleExclusionOverlay":true},
+  "inputModes": {"argv":"repository-relative paths","stdinLines":"newline-delimited paths","stdinJson":"JSON array paths"},
+  "normalizationPolicy": {"stripLeadingDotSlash":true,"convertBackslashToSlash":true,"collapseRepeatedSlash":true,"deduplicateNormalizedPaths":true,"rejectAbsolutePaths":true,"rejectParentTraversal":true},
+  "statusPolicy": {"MAPPED":"Every path maps to approved nodes.","MANUAL_REVIEW":"At least one valid path is unmapped.","INVALID_INPUT":"Invalid path input."},
+  "exitPolicy": {"MAPPED":0,"MANUAL_REVIEW":3,"INVALID_INPUT":2},
+  "baseRuleExcludeOverlays": [
+    {
+      "ruleId": "hero-data-family",
+      "excludePatterns": [
+        "data/generated/hero-artwork-h-a5-index.v1/**",
+        "data/generated/hero-artwork-h-a6-web-assets.v1.json",
+        "data/validation/hero-artwork-h-a5-*.json",
+        "data/validation/hero-artwork-h-a6-materialization.v1.json",
+        "data/validation/hero-artwork-hosted-qa.v1.json",
+        "scripts/validate-hero-artwork-final.mjs",
+        "scripts/probe-hero-artwork-*.py",
+        "scripts/materialize-hero-artwork-*.py",
+        ".github/workflows/hero-artwork-*.yml"
+      ],
+      "reason": "These paths are already frozen Hero artwork extraction/materialization/QA presentation evidence. They must not reopen the broad Hero semantic data owner."
+    }
+  ],
+  "pathRuleOverlays": [
+    {"id":"soldier-webp-assets-post-map","patterns":["public/images/soldiers-webp/**"],"excludePatterns":[],"directNodes":["soldier-assets"],"changeClass":"asset","reason":"Preserve V3 Soldier WebP overlay."},
+    {"id":"project-doctor-workflow-post-map","patterns":[".github/workflows/project-doctor-*.yml"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"tooling","reason":"Project Doctor workflow tooling."},
+    {"id":"project-status-derived-sync","patterns":["scripts/build-project-status.mjs",".github/workflows/project-status-sync.yml","data/generated/project-status.v1.json","PROJECT_STATUS.md"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"tooling","reason":"Project Status tooling."},
+    {"id":"regression-coverage-promotion-v1-meta-contract","patterns":["data/contracts/regression-coverage-promotion.v1.json","data/validation/regression-coverage-promotion-summary.v1.json","scripts/validate-regression-coverage-promotion.mjs"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"tooling","reason":"Promotion V1 metadata."},
+    {"id":"localization-audit-stage6-integration","patterns":["data/contracts/localization-audit-*","data/validation/localization-audit-*","data/checkpoints/localization-audit-*","scripts/audit-localization*","scripts/validate-localization-audit-stage6.mjs",".github/workflows/localization-audit.yml"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"localization-tooling","reason":"Localization tooling."},
+    {"id":"project-doctor-v3-regression-admission-tooling","patterns":["data/contracts/project-doctor-d2-impact-contract.v3.json","data/contracts/project-doctor-d3-validator-plan.v3.json","data/contracts/project-doctor-d4-execution.v3.json","data/contracts/project-doctor-d7-pr-guard.v3.json","scripts/validate-project-doctor-d2-impact-v3.mjs","scripts/validate-project-doctor-d3-v3.mjs","scripts/run-project-doctor-d4-v3.mjs","scripts/validate-project-doctor-d4-v3.mjs","scripts/validate-project-doctor-d7-v3.mjs"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"tooling","reason":"Historical V3 admission tooling."},
+    {"id":"regression-coverage-promotion-v2-admission","patterns":["data/contracts/regression-coverage-promotion.v2.json","data/validation/regression-coverage-promotion-summary.v2.json","scripts/validate-regression-coverage-promotion-v2.mjs","scripts/validate-soldier-stage6-7-final.mjs","scripts/validate-shared-movement-type-index-final.mjs","scripts/validate-soldier-portrait-v9-final.mjs",".github/workflows/regression-coverage-promotion-v2.yml"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"regression-coverage-promotion-v2","reason":"Promotion V2 surface."},
+    {"id":"equipment-image-final-owner","patterns":["data/evidence/equipment-image-*","data/checkpoints/equipment-image-stage3-final.v1.json","data/validation/equipment-image-stage3-hosted-qa-summary.v1.json","scripts/validate-equipment-image-final.mjs","scripts/validate-equipment-image-stage3-browser-ui.mjs","scripts/validate-equipment-image-stage3-hosted.mjs",".github/workflows/equipment-image-stage3-browser-ui.yml"],"excludePatterns":[],"directNodes":["equipment-assets"],"changeClass":"asset-pipeline","reason":"Preserve Equipment Image final owner."},
+    {"id":"project-doctor-v4-hero-artwork-admission-tooling","patterns":["data/contracts/project-doctor-d2-impact-contract.v4.json","data/contracts/project-doctor-d3-validator-plan.v4.json","data/contracts/project-doctor-d4-execution.v4.json","data/contracts/project-doctor-d7-pr-guard.v4.json","scripts/validate-project-doctor-d2-impact-v4.mjs","scripts/validate-project-doctor-d3-v4.mjs","scripts/run-project-doctor-d4-v4.mjs","scripts/validate-project-doctor-d4-v4.mjs","scripts/validate-project-doctor-d7-v4.mjs","scripts/analyze-project-doctor-d2-impact.mjs"],"excludePatterns":[],"directNodes":["project-doctor"],"changeClass":"tooling","reason":"V4 Hero artwork admission tooling only."},
+    {"id":"hero-artwork-final-owner","patterns":["data/generated/hero-artwork-h-a5-index.v1/**","data/generated/hero-artwork-h-a6-web-assets.v1.json","data/validation/hero-artwork-h-a5-*.json","data/validation/hero-artwork-h-a6-materialization.v1.json","data/validation/hero-artwork-hosted-qa.v1.json","data/checkpoints/hero-artwork-*.txt","scripts/validate-hero-artwork-final.mjs","scripts/probe-hero-artwork-*.py","scripts/materialize-hero-artwork-*.py",".github/workflows/hero-artwork-*.yml"],"excludePatterns":[],"directNodes":["hero-assets"],"changeClass":"asset-pipeline","reason":"Frozen H-A5/H-A6 provenance, materialization, and Hosted/Browser QA evidence belong to hero-assets only."}
+  ],
+  "overlayPolicy": {"mayAddPathRulesOnly":true,"mayAddScopedBaseRuleExclusions":true,"baseRuleExclusionsMayRemoveDirectNodes":false,"baseRuleExclusionsMayOnlyPreventKnownBroadRuleMatches":true,"mayAddImpactNodes":false,"mayAddPropagationEdges":false,"mayRewriteBaseRulePatterns":false,"historicalV1Preserved":true,"historicalV2Preserved":true,"historicalV3Preserved":true},
+  "fixtures": [
+    {"id":"HERO_ARTWORK_EVIDENCE","paths":["data/validation/hero-artwork-hosted-qa.v1.json"],"expectedStatus":"MAPPED","expectedDirectNodes":["hero-assets"],"expectedDomains":["hero"]},
+    {"id":"HERO_ARTWORK_OWNER_SCRIPT","paths":["scripts/validate-hero-artwork-final.mjs"],"expectedStatus":"MAPPED","expectedDirectNodes":["hero-assets"],"expectedDomains":["hero"]},
+    {"id":"HERO_ARTWORK_BINARY","paths":["public/images/heroes/cards/6.png"],"expectedStatus":"MAPPED","expectedDirectNodes":["hero-assets"],"expectedDomains":["hero"]},
+    {"id":"ORDINARY_HERO_DATA_STAYS_SEMANTIC","paths":["data/generated/hero-stage4-master.json"],"expectedStatus":"MAPPED","expectedDirectNodes":["hero-canonical"],"expectedDomains":["hero","hero-soldier","soldier"]},
+    {"id":"EQUIPMENT_IMAGE_EVIDENCE","paths":["data/evidence/equipment-image-stage3-browser-ui.v1.json"],"expectedStatus":"MAPPED","expectedDirectNodes":["equipment-assets"],"expectedDomains":["equipment"]},
+    {"id":"V4_TOOLING","paths":["scripts/validate-project-doctor-d3-v4.mjs"],"expectedStatus":"MAPPED","expectedDirectNodes":["project-doctor"],"expectedDomains":[]},
+    {"id":"UNKNOWN_CONFIGDATA_REQUIRES_REVIEW","paths":["data/configdata/ConfigDataUnknownFutureTable.json"],"expectedStatus":"MANUAL_REVIEW","expectedDirectNodes":[],"expectedDomains":[]}
+  ],
+  "historicalBoundary": {"d2V1":"data/contracts/project-doctor-d2-impact-contract.v1.json","d2V2":"data/contracts/project-doctor-d2-impact-contract.v2.json","d2V3":"data/contracts/project-doctor-d2-impact-contract.v3.json","previousBytesMustRemainUnchanged":true},
+  "nextStage": "D3-V4"
+}
