@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-review-resolution/v1",
+  "date": "2026-08-29",
+  "batch": 3,
+  "status": "APPLIED_BUILD_RECHECK_PENDING",
+  "evidence": "data/checkpoints/soldier-unique-skill-review-evidence-batch3.v1.json",
+  "overrides": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
+  "before": {"passCount":116,"reviewCount":69},
+  "applied": {
+    "recordCount": 2,
+    "soldierIds": [811,814],
+    "recordLevelDecision": "PASS",
+    "reason": "Korean references directly reproduce the Exorcist class condition and the Penitent lethal-damage survival / recovery / max-life reduction sequence, resolving every listed blocker for these two records."
+  },
+  "afterExpected": {"passCount":118,"reviewCount":67,"translatedCount":185,"remainingTranslationCount":0},
+  "safety": {
+    "canonicalSoldierDataReopened": false,
+    "baseTranslationShardsMutated": false,
+    "reviewResolutionAppliedBySmallOverrideLayer": true
+  },
+  "nextStep": "Confirm deterministic generator and production build at 185 records / 118 PASS / 67 REVIEW."
+}
