@@ -26,10 +26,7 @@ if(-not $seven){throw '7-Zip not available'}
 & $seven l -slt $pkg | Set-Content (Join-Path $report 'package29-listing.txt') -Encoding UTF8
 if($LASTEXITCODE -ne 0){throw '7-Zip listing failed'}
 
-# Extract only the one bundle identified from the decrypted patchinfo. Never expand the whole package.
-& $seven x $pkg '-oui_extract_placeholder' -y | Out-Null
-# The first extraction call above deliberately goes to a disposable literal directory only if wildcard handling varies.
-Remove-Item 'ui_extract_placeholder' -Recurse -Force -ErrorAction SilentlyContinue
+# Extract only the one bundle identified from the decrypted patchinfo; do not expand the whole package.
 & $seven x $pkg ("-o$extract") '*ui_heropainting3_ssr_abs.b*' -r -y | Set-Content (Join-Path $report 'target-extract-log.txt') -Encoding UTF8
 if($LASTEXITCODE -ne 0){throw 'HeroPainting target extraction failed'}
 
@@ -38,8 +35,12 @@ $rows=@()
 foreach($f in $targets){
   $bytes=[System.IO.File]::ReadAllBytes($f.FullName)
   $headLen=[Math]::Min(64,$bytes.Length)
-  $head=($bytes[0..($headLen-1)] | ForEach-Object {$_.ToString('X2')}) -join ''
-  $ascii=-join ($bytes[0..($headLen-1)] | ForEach-Object {if($_ -ge 32 -and $_ -lt 127){[char]$_}else{'.'}})
+  $head='';$ascii=''
+  if($headLen -gt 0){
+    $slice=$bytes[0..($headLen-1)]
+    $head=($slice | ForEach-Object {$_.ToString('X2')}) -join ''
+    $ascii=-join ($slice | ForEach-Object {if($_ -ge 32 -and $_ -lt 127){[char]$_}else{'.'}})
+  }
   $rows += [pscustomobject]@{
     relativePath=$f.FullName.Substring($extract.Length).TrimStart('\')
     bytes=$f.Length
