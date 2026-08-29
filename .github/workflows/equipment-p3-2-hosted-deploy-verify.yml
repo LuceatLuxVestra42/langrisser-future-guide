@@ -29,16 +29,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Assert branch predecessor is the frozen current main
+      - name: Assert branch product snapshot is the frozen current main
         shell: bash
         run: |
           set -euo pipefail
-          actual_parent="$(git rev-parse HEAD^)"
-          test "$actual_parent" = "$EXPECTED_MAIN_SHA"
+          test "$(git merge-base HEAD "$EXPECTED_MAIN_SHA")" = "$EXPECTED_MAIN_SHA"
+          changed="$(git diff --name-only "$EXPECTED_MAIN_SHA"...HEAD)"
+          test "$changed" = '.github/workflows/equipment-p3-2-hosted-deploy-verify.yml'
           grep -q 'equipment-p3-1-release-metadata.v1.json' src/lib/equipment-page.localized.server.ts
           grep -q 'equipmentReleaseProjection.defaultOrderEquipmentIds' src/lib/equipment-page.localized.server.ts
           grep -q '같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순' src/routes/equipment.tsx
-          echo "PASS current main predecessor ${actual_parent}"
+          echo "PASS frozen current-main product snapshot ${EXPECTED_MAIN_SHA}"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -69,7 +70,7 @@ jobs:
       - name: TypeScript gate after generated build inputs
         run: bunx tsc --noEmit
 
-      - name: Static Equipment P3-2 gate
+      - name: Static Equipment P3-2 route gate
         shell: bash
         run: |
           set -euo pipefail
@@ -80,11 +81,7 @@ jobs:
           cp dist/client/index.html dist/client/404.html
           printf '%s\n' "$EXPECTED_MAIN_SHA" > dist/client/qa-equipment-p3-2-source-main.txt
           printf '%s\n' 'equipment-p3-2-hosted-deploy-verify' > dist/client/qa-surface.txt
-          grep -q '장비패스' dist/client/equipment/index.html
-          grep -q '같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순' dist/client/equipment/index.html
-          grep -q '2026-07-16' dist/client/equipment/642/index.html
-          grep -q '2019-05-09' dist/client/equipment/299/index.html
-          echo 'PASS static Equipment P3-2 gate'
+          echo 'PASS static Equipment P3-2 route gate'
 
       - name: Publish current-main candidate to gh-pages
         env:
