@@ -1,0 +1,31 @@
+name: Hero Asset Launcher Probe v7
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/probe-hero-launcher-v7.ps1'
+      - '.github/workflows/hero-asset-launcher-probe-v7.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  range-static-scan:
+    if: github.event.pull_request.head.ref == 'work/hero-asset-launcher-probe'
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout probe branch
+        uses: actions/checkout@v5
+      - name: Range-scan current official launcher without execution
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/probe-hero-launcher-v7.ps1
+      - name: Upload text reports only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-asset-launcher-probe-v7-report
+          path: ${{ runner.temp }}/langrisser-launcher-probe-v6/report
+          if-no-files-found: warn
+          retention-days: 3
