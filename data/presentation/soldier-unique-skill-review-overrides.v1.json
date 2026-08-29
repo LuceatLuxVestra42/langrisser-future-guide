@@ -3,7 +3,10 @@
   "schemaId": "soldier-unique-skill-review-overrides/v1",
   "date": "2026-08-29",
   "status": "PASS",
-  "sourceEvidence": "data/checkpoints/soldier-unique-skill-review-evidence-batch1.v1.json",
+  "sourceEvidence": [
+    "data/checkpoints/soldier-unique-skill-review-evidence-batch1.v1.json",
+    "data/checkpoints/soldier-unique-skill-review-evidence-batch2.v1.json"
+  ],
   "policy": {
     "joinKey": "soldierId",
     "canonicalChineseReadOnly": true,
@@ -11,40 +14,12 @@
     "partialTermResolutionDoesNotPromoteRecord": true
   },
   "records": [
-    {
-      "soldierId": 250,
-      "translationStatus": "PASS",
-      "reviewTerms": [],
-      "descriptionKr": "모든 능력치 <color=#DC143C>+30%</color>\n전투 진입 시 병사 공격, 방어 <color=#DC143C>25%</color> 증가. 「숲」, 「산지」, 「초원」에서 전투 시 공격 추가 <color=#DC143C>20%</color> 증가, 전투 전 병사 생명 <color=#DC143C>30%</color> 회복.",
-      "resolvedTerms": {"树林":"숲","山地":"산지","草地":"초원"}
-    },
-    {
-      "soldierId": 326,
-      "translationStatus": "PASS",
-      "reviewTerms": [],
-      "descriptionKr": "모든 능력치 <color=#DC143C>+30%</color>\n「마물」과 전투 시 공격 및 방어 <color=#DC143C>45%</color> 증가. 마방 <color=#DC143C>45%</color> 증가.",
-      "resolvedTerms": {"魔物":"마물"}
-    },
-    {
-      "soldierId": 333,
-      "translationStatus": "PASS",
-      "reviewTerms": [],
-      "descriptionKr": "모든 능력치 <color=#DC143C>+30%</color>\n일반 공격으로 주는 「물리 피해」를 모두 「마법 피해」로 간주. 부대 이동 방식이 「야전」으로 변경. 「숲」, 「산지」, 「초원」에서 전투 시 공격, 마방 <color=#DC143C>30%</color> 증가.",
-      "resolvedTerms": {"野战":"야전","树林":"숲","山地":"산지","草地":"초원"}
-    },
-    {
-      "soldierId": 341,
-      "translationStatus": "PASS",
-      "reviewTerms": [],
-      "descriptionKr": "모든 능력치 <color=#DC143C>+30%</color>\n병사 공격 <color=#DC143C>30%</color> 증가. 「숲」, 「산지」, 「초원」에 있는 적군과 전투 시 공격 및 주는 피해 <color=#DC143C>10%</color> 증가. 전투 후 대상 이동력 <color=#DC143C>-2</color> 및 호위 불가, <color=#DC143C>1</color>턴 지속.",
-      "resolvedTerms": {"树林":"숲","山地":"산지","草地":"초원"}
-    },
-    {
-      "soldierId": 602,
-      "translationStatus": "PASS",
-      "reviewTerms": [],
-      "descriptionKr": "모든 능력치 <color=#DC143C>+30%</color>\n「숲」 및 「산지」에 있을 시 공격 및 방어 <color=#DC143C>30%</color> 증가.",
-      "resolvedTerms": {"树林":"숲","山地":"산지"}
-    }
+    {"soldierId":250,"translationStatus":"PASS","reviewTerms":[],"descriptionKr":"모든 능력치 <color=#DC143C>+30%</color>\n전투 진입 시 병사 공격, 방어 <color=#DC143C>25%</color> 증가. 「숲」, 「산지」, 「초원」에서 전투 시 공격 추가 <color=#DC143C>20%</color> 증가, 전투 전 병사 생명 <color=#DC143C>30%</color> 회복.","resolvedTerms":{"树林":"숲","山地":"산지","草地":"초원"}},
+    {"soldierId":326,"translationStatus":"PASS","reviewTerms":[],"descriptionKr":"모든 능력치 <color=#DC143C>+30%</color>\n「마물」과 전투 시 공격 및 방어 <color=#DC143C>45%</color> 증가. 마방 <color=#DC143C>45%</color> 증가.","resolvedTerms":{"魔物":"마물"}},
+    {"soldierId":333,"translationStatus":"PASS","reviewTerms":[],"descriptionKr":"모든 능력치 <color=#DC143C>+30%</color>\n일반 공격으로 주는 「물리 피해」를 모두 「마법 피해」로 간주. 부대 이동 방식이 「야전」으로 변경. 「숲」, 「산지」, 「초원」에서 전투 시 공격, 마방 <color=#DC143C>30%</color> 증가.","resolvedTerms":{"野战":"야전","树林":"숲","山地":"산지","草地":"초원"}},
+    {"soldierId":334,"translationStatus":"PASS","reviewTerms":[],"descriptionKr":"모든 능력치 <color=#DC143C>+30%</color>\n공격 시 병사 공격 <color=#DC143C>15%</color> 증가, 치명타율 <color=#DC143C>30%</color> 증가. 「사막」, 「사구」, 「동굴」에서 전투 시 받는 피해 <color=#DC143C>30%</color> 감소.","resolvedTerms":{"沙漠":"사막","沙丘":"사구","洞穴":"동굴"}},
+    {"soldierId":336,"translationStatus":"PASS","reviewTerms":[],"descriptionKr":"모든 능력치 <color=#DC143C>+30%</color>\n병사 생명 <color=#DC143C>80%</color> 이상일 때 방어 지형 통과 시 이동력을 소모하지 않고 이동 가능(최대 <color=#DC143C>2</color>칸).","resolvedTerms":{"防御地形通过时2格免除移动力降低":"방어 지형 통과 시 이동력을 소모하지 않고 이동 가능(최대 2칸)"}},
+    {"soldierId":341,"translationStatus":"PASS","reviewTerms":[],"descriptionKr":"모든 능력치 <color=#DC143C>+30%</color>\n병사 공격 <color=#DC143C>30%</color> 증가. 「숲」, 「산지」, 「초원」에 있는 적군과 전투 시 공격 및 주는 피해 <color=#DC143C>10%</color> 증가. 전투 후 대상 이동력 <color=#DC143C>-2</color> 및 호위 불가, <color=#DC143C>1</color>턴 지속.","resolvedTerms":{"树林":"숲","山地":"산지","草地":"초원"}},
+    {"soldierId":602,"translationStatus":"PASS","reviewTerms":[],"descriptionKr":"모든 능력치 <color=#DC143C>+30%</color>\n「숲」 및 「산지」에 있을 시 공격 및 방어 <color=#DC143C>30%</color> 증가.","resolvedTerms":{"树林":"숲","山地":"산지"}}
   ]
 }
