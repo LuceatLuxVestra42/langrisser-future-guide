@@ -10,7 +10,7 @@
   "rawConfigDataReadCount": 0,
   "semanticRecomputationCount": 0,
   "canonicalJoinRecomputationCount": 0,
-  "entryCount": 6,
+  "entryCount": 7,
   "selectedCount": 6,
   "domains": {
     "hero": {
@@ -80,12 +80,13 @@
     },
     "equipment": {
       "rootId": "equipment-stage4-final",
-      "selectedId": "equipment-stage4-final",
-      "sourcePath": "data/validation/equipment-stage4-final.v1.json",
+      "selectedId": "equipment-public-presentation-correction-final",
+      "sourcePath": "data/validation/equipment-public-presentation-correction-final.v1.json",
       "facet": "canonical",
-      "sourceEntryFile": "data/status-sources/baseline.v1.json",
+      "sourceEntryFile": "data/status-sources/promotion.equipment.equipment-public-presentation-correction-final.v1.json",
       "lineage": [
-        "equipment-stage4-final"
+        "equipment-stage4-final",
+        "equipment-public-presentation-correction-final"
       ],
       "admissionEvidence": {
         "readable": true,
@@ -340,13 +341,28 @@
       ]
     },
     "equipment": {
-      "primaryStatusSource": "data/validation/equipment-stage4-final.v1.json",
+      "primaryStatusSource": "data/validation/equipment-public-presentation-correction-final.v1.json",
       "primaryFacet": "canonical",
       "expected": {
         "canonical": 390,
-        "public": 373,
-        "general": 206,
-        "exclusive": 167
+        "public": 365,
+        "general": 198,
+        "exclusive": 167,
+        "admissionStatus": "FROZEN",
+        "admissionGeneral": 198,
+        "admissionExcluded": 8,
+        "displayStatus": "FROZEN",
+        "displayInitial": 94,
+        "displayPreviousAdditional": 80,
+        "displayPass": 24,
+        "displayTotal": 198,
+        "chronologyAuditStatus": "PASS_WITH_REVIEW",
+        "chronologyAuditMembership": false,
+        "chronologyContractStatus": "FROZEN",
+        "chronologyTechnicalTarget": 32,
+        "chronologyPublicCount": 28,
+        "chronologyPassCount": 24,
+        "chronologyContractMembership": false
       },
       "requiredSelectors": {
         "rawStatus": "/status",
@@ -374,7 +390,60 @@
           "lifecycle": "COMPLETE"
         }
       ],
-      "supplementalSources": []
+      "supplementalSources": [
+        {
+          "path": "data/presentation/equipment-public-admission-correction.v1.json",
+          "role": "CURRENT_EQUIPMENT_PUBLIC_ADMISSION_CORRECTION",
+          "facet": "admission",
+          "selectors": {
+            "admissionStatus": "/status",
+            "admissionGeneral": "/expectedPublicProjection/generalEquipmentCount",
+            "admissionExcluded": "/expectedPublicProjection/excludedCount"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Owns public general-equipment admission correction only. It does not mutate canonical identity, technical acquisition classification, or exclusive Equipment."
+        },
+        {
+          "path": "data/presentation/equipment-display-collection.v1.json",
+          "role": "CURRENT_EQUIPMENT_DISPLAY_COLLECTION",
+          "facet": "presentation",
+          "selectors": {
+            "displayStatus": "/status",
+            "displayInitial": "/expectedPresentationCounts/initial",
+            "displayPreviousAdditional": "/expectedPresentationCounts/previousAdditional",
+            "displayPass": "/expectedPresentationCounts/equipmentPass",
+            "displayTotal": "/expectedPresentationCounts/total"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Owns user-facing Equipment collection membership. Technical siteTab remains upstream provenance and must not define Equipment Pass membership."
+        },
+        {
+          "path": "data/validation/equipment-p3-0-release-chronology-presentation-audit.v3.json",
+          "role": "CURRENT_EQUIPMENT_P3_CHRONOLOGY_AUDIT",
+          "facet": "presentation",
+          "selectors": {
+            "chronologyAuditStatus": "/status",
+            "chronologyAuditMembership": "/classificationCorrection/chronologyDefinesDisplayMembership"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Preserves the frozen 32-record chronology evidence while explicitly superseding the historical interpretation that chronology/current-additional implied Equipment Pass membership."
+        },
+        {
+          "path": "data/presentation/equipment-p3-1-release-metadata.v2.json",
+          "role": "CURRENT_EQUIPMENT_P3_CHRONOLOGY_CONTRACT",
+          "facet": "presentation",
+          "selectors": {
+            "chronologyContractStatus": "/status",
+            "chronologyTechnicalTarget": "/scope/technicalTargetCount",
+            "chronologyPublicCount": "/scope/publicChronologyCount",
+            "chronologyPassCount": "/scope/equipmentPassCount",
+            "chronologyContractMembership": "/scope/chronologyDefinesDisplayMembership"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Uses P3-1 V1 only as immutable chronology data and delegates display membership to equipment-display-collection.v1.json."
+        }
+      ],
+      "policy": "Equipment Project Doctor successor projection after the 2026-08-30 public-admission and Equipment Pass presentation correction. Canonical 390 and exclusive 167 remain frozen; active public/general expectations become 365/198."
     },
     "hero-soldier": {
       "primaryStatusSource": "data/validation/hero-soldier-integration-stageC-final.v1.json",
@@ -498,6 +567,7 @@
   "failures": [],
   "hardErrorCount": 0,
   "entryFiles": [
-    "data/status-sources/baseline.v1.json"
+    "data/status-sources/baseline.v1.json",
+    "data/status-sources/promotion.equipment.equipment-public-presentation-correction-final.v1.json"
   ]
 }

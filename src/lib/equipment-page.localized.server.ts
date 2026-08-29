@@ -1,6 +1,11 @@
 import equipmentNameKrJson from "../../data/generated/equipment-name-kr-user-approved.v1.json";
 import equipmentPublicAdmissionCorrectionJson from "../../data/presentation/equipment-public-admission-correction.v1.json";
-import equipmentReleaseProjectionJson from "../../data/presentation/equipment-p3-1-release-metadata.v1.json";
+import equipmentReleaseChronologyJson from "../../data/presentation/equipment-p3-1-release-metadata.v1.json";
+import equipmentReleaseContractJson from "../../data/presentation/equipment-p3-1-release-metadata.v2.json";
+import {
+  EQUIPMENT_DISPLAY_COLLECTION_EXPECTED_COUNTS,
+  resolveEquipmentDisplayCollection,
+} from "./equipment-display-collection";
 import {
   readEquipmentDetailPageData as readBaseEquipmentDetailPageData,
   readExclusiveEquipmentPageData as readBaseExclusiveEquipmentPageData,
@@ -10,7 +15,6 @@ import type {
   EquipmentDetailPageData,
   EquipmentListRecord,
   ExclusiveEquipmentDetailPageData,
-  GeneralEquipmentDetailPageData,
 } from "./equipment-page.server";
 
 type EquipmentNameKrProjection = {
@@ -34,7 +38,7 @@ type EquipmentReleaseProjectionRecord = {
   releaseFamily: string;
 };
 
-type EquipmentReleaseProjection = {
+type EquipmentReleaseChronology = {
   scope: {
     siteTab: number;
     targetCount: number;
@@ -45,6 +49,45 @@ type EquipmentReleaseProjection = {
   };
   defaultOrderEquipmentIds: number[];
   byEquipmentId: Record<string, EquipmentReleaseProjectionRecord>;
+};
+
+type EquipmentReleaseContract = {
+  status: string;
+  completion: string;
+  predecessor: {
+    chronologyDataSource: string;
+    displayCollection: string;
+  };
+  scope: {
+    technicalSiteTab: number;
+    chronologyPopulationMode: string;
+    technicalTargetCount: number;
+    releaseDateCoverage: number;
+    publicChronologyCount: number;
+    publicExcludedTechnicalEquipmentIds: number[];
+    chronologyDefinesDisplayMembership: boolean;
+    displayMembershipSource: string;
+    equipmentPassCount: number;
+    semanticStageReopened: boolean;
+    stage2AcquisitionClassificationChanged: boolean;
+  };
+  dataReuse: {
+    mode: string;
+    joinKey: string;
+    defaultOrderRecomputed: boolean;
+    releaseDatesRecomputed: boolean;
+    evidenceStatusesRecomputed: boolean;
+    sourceIdsRecomputed: boolean;
+    releaseFamiliesRecomputed: boolean;
+    identityContinuityRecomputed: boolean;
+  };
+  consumerPolicy: {
+    chronologyJoinKey: string;
+    publicConsumerUsesPublicSubsetOnly: boolean;
+    technicalSiteTabMustBePreservedBeforeDisplayMapping: boolean;
+    displayCollectionMustNotBeDerivedFromChronology: boolean;
+    releaseFamilyMustNotBeUsedAsMembershipRule: boolean;
+  };
 };
 
 type EquipmentPublicAdmissionCorrection = {
@@ -69,14 +112,18 @@ type EquipmentPublicAdmissionCorrection = {
 };
 
 const equipmentNameKr = equipmentNameKrJson as EquipmentNameKrProjection;
-const equipmentReleaseProjection = equipmentReleaseProjectionJson as EquipmentReleaseProjection;
+const equipmentReleaseChronology = equipmentReleaseChronologyJson as EquipmentReleaseChronology;
+const equipmentReleaseContract = equipmentReleaseContractJson as EquipmentReleaseContract;
 const equipmentPublicAdmissionCorrection =
   equipmentPublicAdmissionCorrectionJson as EquipmentPublicAdmissionCorrection;
 const equipmentReleaseOrder = new Map(
-  equipmentReleaseProjection.defaultOrderEquipmentIds.map((equipmentId, index) => [equipmentId, index]),
+  equipmentReleaseChronology.defaultOrderEquipmentIds.map((equipmentId, index) => [equipmentId, index]),
 );
 const publicExcludedEquipmentIds = new Set(
   equipmentPublicAdmissionCorrection.excludedEquipmentIds,
+);
+const publicExcludedChronologyIds = new Set(
+  equipmentReleaseContract.scope.publicExcludedTechnicalEquipmentIds,
 );
 
 if (
@@ -96,6 +143,57 @@ for (const record of equipmentPublicAdmissionCorrection.records) {
   }
 }
 
+if (
+  equipmentReleaseContract.status !== "FROZEN" ||
+  equipmentReleaseContract.completion !== "EQUIPMENT_P3_1_RELEASE_CHRONOLOGY_V2_FROZEN" ||
+  equipmentReleaseContract.predecessor.chronologyDataSource !==
+    "data/presentation/equipment-p3-1-release-metadata.v1.json" ||
+  equipmentReleaseContract.predecessor.displayCollection !==
+    "data/presentation/equipment-display-collection.v1.json" ||
+  equipmentReleaseContract.scope.chronologyDefinesDisplayMembership !== false ||
+  equipmentReleaseContract.scope.displayMembershipSource !==
+    "data/presentation/equipment-display-collection.v1.json" ||
+  equipmentReleaseContract.dataReuse.mode !== "REUSE_FROZEN_V1_CHRONOLOGY_RECORDS" ||
+  equipmentReleaseContract.dataReuse.joinKey !== "equipmentId" ||
+  equipmentReleaseContract.consumerPolicy.chronologyJoinKey !== "equipmentId" ||
+  equipmentReleaseContract.consumerPolicy.displayCollectionMustNotBeDerivedFromChronology !== true ||
+  equipmentReleaseContract.consumerPolicy.releaseFamilyMustNotBeUsedAsMembershipRule !== true
+) {
+  throw new Error("Equipment P3-1 chronology V2 contract is inconsistent.");
+}
+
+if (
+  equipmentReleaseContract.dataReuse.defaultOrderRecomputed ||
+  equipmentReleaseContract.dataReuse.releaseDatesRecomputed ||
+  equipmentReleaseContract.dataReuse.evidenceStatusesRecomputed ||
+  equipmentReleaseContract.dataReuse.sourceIdsRecomputed ||
+  equipmentReleaseContract.dataReuse.releaseFamiliesRecomputed ||
+  equipmentReleaseContract.dataReuse.identityContinuityRecomputed
+) {
+  throw new Error("Equipment P3-1 chronology V2 must reuse the frozen V1 chronology without recomputation.");
+}
+
+if (
+  equipmentReleaseChronology.scope.siteTab !== equipmentReleaseContract.scope.technicalSiteTab ||
+  equipmentReleaseChronology.scope.targetCount !== equipmentReleaseContract.scope.technicalTargetCount ||
+  equipmentReleaseChronology.scope.releaseDateCoverage !== equipmentReleaseContract.scope.releaseDateCoverage ||
+  equipmentReleaseChronology.policy.joinKey !== equipmentReleaseContract.dataReuse.joinKey
+) {
+  throw new Error("Equipment P3-1 chronology V1 data and V2 active contract diverge.");
+}
+
+if (
+  publicExcludedChronologyIds.size !==
+  equipmentReleaseContract.scope.publicExcludedTechnicalEquipmentIds.length
+) {
+  throw new Error("Equipment P3-1 V2 public-excluded chronology membership contains duplicates.");
+}
+for (const equipmentId of publicExcludedChronologyIds) {
+  if (!publicExcludedEquipmentIds.has(equipmentId)) {
+    throw new Error(`Equipment ${equipmentId} is chronology-excluded but not public-admission excluded.`);
+  }
+}
+
 function resolveNameKr(equipmentId: number, nameCn: string, fallback: string | null) {
   const localized = equipmentNameKr.byEquipmentId[String(equipmentId)];
   if (!localized) {
@@ -109,10 +207,10 @@ function resolveNameKr(equipmentId: number, nameCn: string, fallback: string | n
   return localized.nameKr ?? fallback;
 }
 
-function requireReleaseProjection(equipmentId: number, nameCn: string) {
-  const projected = equipmentReleaseProjection.byEquipmentId[String(equipmentId)];
+function requireReleaseChronology(equipmentId: number, nameCn: string) {
+  const projected = equipmentReleaseChronology.byEquipmentId[String(equipmentId)];
   if (!projected) {
-    throw new Error(`Missing P3-1 release presentation record for Equipment ${equipmentId}.`);
+    throw new Error(`Missing P3-1 release chronology record for Equipment ${equipmentId}.`);
   }
   if (projected.equipmentId !== equipmentId || projected.nameCn !== nameCn) {
     throw new Error(
@@ -125,47 +223,38 @@ function requireReleaseProjection(equipmentId: number, nameCn: string) {
   return projected;
 }
 
-function applyGeneralReleasePresentation(records: EquipmentListRecord[]) {
-  if (equipmentReleaseProjection.policy.joinKey !== "equipmentId") {
-    throw new Error("Equipment P3-1 release projection join key must remain equipmentId.");
-  }
-
-  const targetTab = equipmentReleaseProjection.scope.siteTab;
-  const projectedIds = equipmentReleaseProjection.defaultOrderEquipmentIds;
+function applyGeneralReleaseChronology(records: EquipmentListRecord[]) {
+  const targetTab = equipmentReleaseContract.scope.technicalSiteTab;
+  const projectedIds = equipmentReleaseChronology.defaultOrderEquipmentIds;
   const projectedIdSet = new Set(projectedIds);
 
   if (
-    projectedIds.length !== equipmentReleaseProjection.scope.targetCount ||
+    projectedIds.length !== equipmentReleaseContract.scope.technicalTargetCount ||
     projectedIdSet.size !== projectedIds.length ||
-    Object.keys(equipmentReleaseProjection.byEquipmentId).length !== projectedIds.length
+    Object.keys(equipmentReleaseChronology.byEquipmentId).length !== projectedIds.length
   ) {
-    throw new Error("Equipment P3-1 release projection population contract is inconsistent.");
+    throw new Error("Equipment P3-1 release chronology population contract is inconsistent.");
   }
 
-  const projectedRecords = records.map((record) => {
+  const chronologyPresentedRecords = records.map((record) => {
     if (record.siteTab !== targetTab) return record;
-    const release = requireReleaseProjection(record.equipmentId, record.nameCn);
+    const release = requireReleaseChronology(record.equipmentId, record.nameCn);
     return {
       ...record,
       releaseGroupDate: release.releaseGroupDate,
     };
   });
 
-  const targetRecords = projectedRecords.filter((record) => record.siteTab === targetTab);
-  const excludedProjectedTargetCount = projectedIds.filter((equipmentId) =>
-    publicExcludedEquipmentIds.has(equipmentId),
-  ).length;
-  const expectedPublicTargetCount =
-    equipmentReleaseProjection.scope.targetCount - excludedProjectedTargetCount;
-  if (targetRecords.length !== expectedPublicTargetCount) {
+  const targetRecords = chronologyPresentedRecords.filter((record) => record.siteTab === targetTab);
+  if (targetRecords.length !== equipmentReleaseContract.scope.publicChronologyCount) {
     throw new Error(
-      `Equipment P3-1 public target population mismatch: ${targetRecords.length} !== ${expectedPublicTargetCount}.`,
+      `Equipment P3-1 public chronology population mismatch: ${targetRecords.length} !== ${equipmentReleaseContract.scope.publicChronologyCount}.`,
     );
   }
 
   for (const record of targetRecords) {
     if (!projectedIdSet.has(record.equipmentId)) {
-      throw new Error(`Equipment ${record.equipmentId} is missing from the frozen P3-1 default order.`);
+      throw new Error(`Equipment ${record.equipmentId} is missing from the frozen P3-1 chronology order.`);
     }
   }
 
@@ -173,23 +262,23 @@ function applyGeneralReleasePresentation(records: EquipmentListRecord[]) {
     const leftRank = equipmentReleaseOrder.get(left.equipmentId);
     const rightRank = equipmentReleaseOrder.get(right.equipmentId);
     if (leftRank === undefined || rightRank === undefined) {
-      throw new Error("Equipment P3-1 default order rank is missing.");
+      throw new Error("Equipment P3-1 chronology order rank is missing.");
     }
     return leftRank - rightRank;
   });
 
   let targetCursor = 0;
-  return projectedRecords.map((record) => {
+  return chronologyPresentedRecords.map((record) => {
     if (record.siteTab !== targetTab) return record;
     const replacement = sortedTargetRecords[targetCursor++];
     if (!replacement) {
-      throw new Error("Equipment P3-1 ordered target record is missing.");
+      throw new Error("Equipment P3-1 ordered chronology record is missing.");
     }
     return replacement;
   });
 }
 
-function countPublicTabs(records: EquipmentListRecord[]) {
+function countTabs(records: EquipmentListRecord[]) {
   return Object.fromEntries(
     [1, 2, 3].map((tab) => [
       String(tab),
@@ -213,12 +302,12 @@ export function readGeneralEquipmentPageData() {
     );
   }
 
-  const publicTabs = countPublicTabs(publicRecords);
+  const technicalTabs = countTabs(publicRecords);
   for (const [tab, expected] of Object.entries(
     equipmentPublicAdmissionCorrection.expectedPublicProjection.technicalTabCountsAfterAdmissionOnly,
   )) {
-    if (publicTabs[tab] !== expected) {
-      throw new Error(`Equipment public tab ${tab} mismatch: ${publicTabs[tab]} !== ${expected}.`);
+    if (technicalTabs[tab] !== expected) {
+      throw new Error(`Equipment public technical tab ${tab} mismatch: ${technicalTabs[tab]} !== ${expected}.`);
     }
   }
 
@@ -226,11 +315,33 @@ export function readGeneralEquipmentPageData() {
     ...record,
     nameKr: resolveNameKr(record.equipmentId, record.nameCn, record.nameKr),
   }));
+  const chronologyPresentedRecords = applyGeneralReleaseChronology(localizedRecords);
+  const presentationRecords = chronologyPresentedRecords.map((record) => {
+    const technicalSiteTab = record.siteTab;
+    const displayCollection = resolveEquipmentDisplayCollection(record.equipmentId, technicalSiteTab);
+    return {
+      ...record,
+      technicalSiteTab,
+      displayCollection,
+      siteTab: displayCollection,
+    };
+  });
+  const presentationTabs = countTabs(presentationRecords);
+
+  for (const tab of [1, 2, 3] as const) {
+    const expected = EQUIPMENT_DISPLAY_COLLECTION_EXPECTED_COUNTS[tab];
+    if (presentationTabs[String(tab)] !== expected) {
+      throw new Error(
+        `Equipment display collection ${tab} mismatch: ${presentationTabs[String(tab)]} !== ${expected}.`,
+      );
+    }
+  }
 
   return {
     ...data,
-    records: applyGeneralReleasePresentation(localizedRecords),
-    tabs: publicTabs,
+    records: presentationRecords,
+    tabs: presentationTabs,
+    technicalTabs,
   };
 }
 
@@ -255,12 +366,14 @@ export function readEquipmentDetailPageData(
 
   if (data.kind === "general") {
     const identity = data.detail.identity;
+    const technicalSiteTab = data.detail.classification.siteTab;
+    const displayCollection = resolveEquipmentDisplayCollection(equipmentId, technicalSiteTab);
     const nameKr = resolveNameKr(equipmentId, identity.nameCn, identity.nameKr);
     const release =
-      data.detail.classification.siteTab === equipmentReleaseProjection.scope.siteTab
-        ? requireReleaseProjection(equipmentId, identity.nameCn)
+      technicalSiteTab === equipmentReleaseContract.scope.technicalSiteTab
+        ? requireReleaseChronology(equipmentId, identity.nameCn)
         : null;
-    const localized: GeneralEquipmentDetailPageData = {
+    return {
       ...data,
       displayName: nameKr ?? identity.nameCn,
       detail: {
@@ -268,6 +381,12 @@ export function readEquipmentDetailPageData(
         identity: {
           ...identity,
           nameKr,
+        },
+        classification: {
+          ...data.detail.classification,
+          technicalSiteTab,
+          displayCollection,
+          siteTab: displayCollection,
         },
         acquisition: release
           ? {
@@ -277,7 +396,6 @@ export function readEquipmentDetailPageData(
           : data.detail.acquisition,
       },
     };
-    return localized;
   }
 
   const identity = data.detail.identity;
