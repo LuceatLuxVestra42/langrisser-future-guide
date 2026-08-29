@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-review-evidence/v1",
+  "date": "2026-08-29",
+  "batch": 1,
+  "status": "EVIDENCE_COLLECTED_NO_STATUS_PROMOTION",
+  "scope": {
+    "reviewQueueBefore": 76,
+    "reviewQueueAfter": 76,
+    "translationStatusesChanged": false,
+    "descriptionsChanged": false,
+    "canonicalSoldierDataReopened": false,
+    "purpose": "Freeze Korean terminology evidence before applying any record-level review resolution."
+  },
+  "sourcePolicy": {
+    "projectSourceIndex": "관련 사이트 URL주소 정리.txt",
+    "legacyKoreanReference": "https://redpanda7301.github.io/langrisser/",
+    "secondaryKoreanReferences": [
+      "https://lunavenia.tistory.com/",
+      "https://goniblog.com/",
+      "https://readonly.wiki/"
+    ],
+    "rule": "Evidence may resolve display terminology, but a record remains REVIEW when sentence-level mechanic semantics or another unresolved named term remains."
+  },
+  "terms": [
+    {
+      "sourceTerm": "魔物",
+      "candidateKr": "마물",
+      "disposition": "VERIFIED_KR_TERM",
+      "evidence": [
+        {
+          "url": "https://redpanda7301.github.io/langrisser/classup.html",
+          "note": "Legacy Korean Langrisser reference uses 병종 표기 '승려 마물' and '마물 종합 훈련'."
+        }
+      ],
+      "knownReviewExamples": [326],
+      "recordPromotionAllowedByThisEvidenceAlone": false,
+      "reason": "Term is supported, but each record must still be checked for other unresolved terms/mechanics."
+    },
+    {
+      "sourceTerm": "树林",
+      "candidateKr": "숲",
+      "disposition": "VERIFIED_CROSS_SOURCE_TERM",
+      "evidence": [
+        {
+          "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EB%94%94%ED%95%98%EB%A5%B4%ED%8A%B8sp-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+          "note": "Korean Soldier descriptions use quoted terrain label '숲'."
+        },
+        {
+          "url": "https://readonly.wiki/w/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC(%EB%AA%A8%EB%B0%94%EC%9D%BC%20%EA%B2%8C%EC%9E%84)/%EB%B3%91%EC%A2%85",
+          "note": "Korean troop reference uses '숲 또는 산지'."
+        }
+      ],
+      "knownReviewExamples": [250, 333, 341, 602, 637],
+      "recordPromotionAllowedByThisEvidenceAlone": false
+    },
+    {
+      "sourceTerm": "山地",
+      "candidateKr": "산지",
+      "disposition": "VERIFIED_CROSS_SOURCE_TERM",
+      "evidence": [
+        {
+          "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EC%97%98%EB%9D%BC%EC%8A%A4%ED%83%80-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+          "note": "Korean Soldier descriptions use quoted terrain label '산지'."
+        },
+        {
+          "url": "https://readonly.wiki/w/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC(%EB%AA%A8%EB%B0%94%EC%9D%BC%20%EA%B2%8C%EC%9E%84)/%EB%B3%91%EC%A2%85",
+          "note": "Korean troop reference uses '숲 또는 산지'."
+        }
+      ],
+      "knownReviewExamples": [250, 333, 341, 602, 637],
+      "recordPromotionAllowedByThisEvidenceAlone": false
+    },
+    {
+      "sourceTerm": "草地",
+      "candidateKr": "초원",
+      "disposition": "VERIFIED_CROSS_SOURCE_TERM",
+      "evidence": [
+        {
+          "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EB%94%94%ED%95%98%EB%A5%B4%ED%8A%B8sp-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+          "note": "Korean Soldier descriptions use quoted terrain label '초원'."
+        },
+        {
+          "url": "https://lunavenia.tistory.com/714",
+          "note": "Korean skill descriptions repeatedly use '숲, 초원 지형'."
+        }
+      ],
+      "knownReviewExamples": [250, 333, 341, 637],
+      "recordPromotionAllowedByThisEvidenceAlone": false
+    },
+    {
+      "sourceTerm": "水中",
+      "candidateKr": "물속",
+      "disposition": "VERIFIED_PRESENTATION_LABEL",
+      "evidence": [
+        {
+          "url": "https://lunavenia.tistory.com/381",
+          "note": "Korean skill text repeatedly uses quoted terrain/state label '물속' and phrase '물 속에 있을 때'."
+        },
+        {
+          "url": "https://readonly.wiki/w/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC(%EB%AA%A8%EB%B0%94%EC%9D%BC%20%EA%B2%8C%EC%9E%84)/%EB%B3%91%EC%A2%85",
+          "note": "Korean troop descriptions predominantly use '물속에서'; one explanatory entry also uses '수중', so record context must be preserved."
+        }
+      ],
+      "knownReviewExamples": [134, 512, 515, 643],
+      "recordPromotionAllowedByThisEvidenceAlone": false
+    },
+    {
+      "sourceTerm": "野战",
+      "candidateKr": "야전",
+      "disposition": "VERIFIED_KR_TERM",
+      "evidence": [
+        {
+          "url": "https://redpanda7301.github.io/langrisser/troop/%EB%B3%B4%EB%B3%91.html",
+          "note": "Legacy Korean troop page uses movement label '야전이동'."
+        },
+        {
+          "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EB%94%94%ED%95%98%EB%A5%B4%ED%8A%B8sp-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+          "note": "Korean Soldier description uses '부대의 이동 방식이 야전으로 변한다'."
+        }
+      ],
+      "knownReviewExamples": [333],
+      "recordPromotionAllowedByThisEvidenceAlone": false
+    },
+    {
+      "sourceTerm": "防御地形",
+      "candidateKr": "방어 지형",
+      "disposition": "VERIFIED_CROSS_SOURCE_TERM",
+      "evidence": [
+        {
+          "url": "https://lunavenia.tistory.com/69",
+          "note": "Korean hero skill guide uses exact expression '방어 지형'."
+        },
+        {
+          "url": "https://namu.moe/w/%EB%B2%A0%EB%A5%B4%EB%84%88(%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC%20RE%3A%20%EC%9D%B8%EC%B9%B4%EB%84%A4%EC%9D%B4%EC%85%98)",
+          "note": "Korean skill description uses '방어 지형 통과 시 이동력 감소 1칸 면제'."
+        }
+      ],
+      "knownReviewExamples": [336],
+      "recordPromotionAllowedByThisEvidenceAlone": false
+    },
+    {
+      "sourceTerm": "防御增强地形",
+      "candidateKr": "방어 상승 효과가 있는 지형",
+      "disposition": "SUPPORTED_CONTEXTUAL_RENDERING",
+      "evidence": [
+        {
+          "url": "https://lunavenia.tistory.com/69",
+          "note": "Korean Elasta skill description renders the concept as '방어 상승 효과가 있는 지형'."
+        }
+      ],
+      "knownReviewExamples": [643],
+      "recordPromotionAllowedByThisEvidenceAlone": false,
+      "reason": "Evidence supports the phrase, but this is a contextual rendering rather than a globally frozen one-token label."
+    },
+    {
+      "sourceTerm": "近战伤害减免",
+      "candidateKr": "근접피해감면효과",
+      "alternateNaturalKr": "근접 피해 감소",
+      "disposition": "SUPPORTED_MECHANIC_TERM_STYLE_UNRESOLVED",
+      "evidence": [
+        {
+          "url": "https://lunavenia.tistory.com/69",
+          "note": "Korean guide uses '근접피해감면효과에 영향을 받지 않고'."
+        },
+        {
+          "url": "https://www.namu.moe/w/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC(%EB%AA%A8%EB%B0%94%EC%9D%BC%20%EA%B2%8C%EC%9E%84)/%EC%9E%A5%EB%B9%84",
+          "note": "Korean equipment text uses '근접피해감면 효과'."
+        }
+      ],
+      "knownReviewExamples": [512, 513, 514, 515, 516, 517, 637],
+      "recordPromotionAllowedByThisEvidenceAlone": false,
+      "reason": "Mechanic meaning is supported, but final project UI style must choose between compact game jargon and existing naturalized wording before global replacement."
+    }
+  ],
+  "unresolvedFromKnownEarlyQueue": [
+    "灼烧",
+    "倒刺",
+    "先制打击",
+    "空海奇袭",
+    "水战强化",
+    "水灵加护",
+    "防具技能失效",
+    "reflection/recovery percentage reuse semantics",
+    "沙漠",
+    "沙丘",
+    "洞穴",
+    "英雄的技能选取形式全部变为直线型",
+    "扣除士兵当前生命10%并造成数值150%的固定伤害"
+  ],
+  "nextStep": "Apply only evidence-backed terminology through a small review-override layer keyed by soldierId, keeping records in REVIEW when any mechanic or named-effect uncertainty remains."
+}
