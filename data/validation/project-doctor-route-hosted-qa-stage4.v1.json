@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "route-hosted-qa-stage4-validation.v1",
+  "stage": "QA-4",
+  "status": "PASS_ROUTE_HOSTED_QA_STAGE4_ORCHESTRATION_CONTRACT",
+  "summary": {
+    "checks": 12,
+    "passed": 12,
+    "failed": 0
+  },
+  "checks": [
+    {
+      "id": "STAGE4_CONTRACT_FROZEN",
+      "status": "PASS",
+      "detail": "QA-4 contract schema and frozen status are exact."
+    },
+    {
+      "id": "STAGE3_PREDECESSOR_FROZEN",
+      "status": "PASS",
+      "detail": "QA-4 reuses the frozen QA-3 checkpoint and proven runtime proof."
+    },
+    {
+      "id": "STRICT_EXPECTED_SHA_REQUIRED",
+      "status": "PASS",
+      "detail": "The integrated gate requires an explicit deployed source SHA in strict mode."
+    },
+    {
+      "id": "PREFLIGHT_REUSES_EXISTING_VALIDATORS",
+      "status": "PASS",
+      "detail": "QA-4 calls predecessor validators instead of reimplementing their semantics."
+    },
+    {
+      "id": "HOSTED_STABILITY_SEQUENCE",
+      "status": "PASS",
+      "detail": "QA-1 strict Hosted Gate requires three consecutive passes and keeps hosting ownership."
+    },
+    {
+      "id": "QA2_REUSED_AS_BROWSER_PREDECESSOR",
+      "status": "PASS",
+      "detail": "QA-2 Browser/UI proof is invoked as an existing predecessor gate."
+    },
+    {
+      "id": "QA3_ZERO_FLAKY_BLOCKING",
+      "status": "PASS",
+      "detail": "QA-3 remains the zero-unexpected/zero-flaky blocking navigation-history gate."
+    },
+    {
+      "id": "QA2_FLAKY_IS_REVIEW_NOT_BLOCKER",
+      "status": "PASS",
+      "detail": "Historical QA-2 flakiness is surfaced as REVIEW without weakening QA-3."
+    },
+    {
+      "id": "FAILURE_OWNERSHIP_SEPARATED",
+      "status": "PASS",
+      "detail": "Preflight, hosting, and browser failures remain owned by separate layers."
+    },
+    {
+      "id": "NO_SEMANTIC_RECOMPUTATION",
+      "status": "PASS",
+      "detail": "QA-4 adds orchestration only and does not reopen semantic or ConfigData layers."
+    },
+    {
+      "id": "WORKFLOW_BUILDS_PUBLISHES_THEN_RUNS_INTEGRATED_GATE",
+      "status": "PASS",
+      "detail": "The proof workflow builds and publishes the candidate before running the integrated command."
+    },
+    {
+      "id": "MACHINE_READABLE_EVIDENCE",
+      "status": "PASS",
+      "detail": "QA-4 emits and uploads a machine-readable integrated summary."
+    }
+  ],
+  "semanticStageReopened": false
+}
