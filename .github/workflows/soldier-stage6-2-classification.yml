@@ -76,3 +76,5 @@ jobs:
       - name: Verify frozen artifacts on main or PR
         if: github.event_name != 'push' || github.ref == 'refs/heads/main'
         run: git diff --exit-code -- data/generated/soldier-stage6-2-classification.v1.json data/validation/soldier-stage6-2-classification.v1.json
+
+# refresh trigger: 2026-08-30 stage6-2 after 6-1 freeze
