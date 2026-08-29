@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-review-evidence/v1",
+  "date": "2026-08-29",
+  "batch": 4,
+  "status": "EVIDENCE_CONFIRMED",
+  "scope": {
+    "candidateSoldierIds": [512, 513, 514, 515, 635, 637, 815],
+    "recordCount": 7,
+    "rule": "Promote only when Korean material reproduces every review-blocking mechanic/label for the record; preserve canonical Chinese semantics and numbers."
+  },
+  "sources": [
+    {
+      "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EB%A7%88%ED%81%AC%EB%A0%8C-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "supports": [512, 513],
+      "observedKorean": ["심해의 해적: 물속, 근접 피해 감면 패널티를 받지 않음, 버프 1개 약탈", "빙하의 정령: 물속, 근접 피해 감면 패널티를 받지 않음"]
+    },
+    {
+      "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EB%A3%A8%EA%B7%B8%EB%84%88-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "supports": [514],
+      "observedKorean": ["바다제사장: 물속, 공격/마방/치료 효과, 근접 피해 감면 패널티를 받지 않음"]
+    },
+    {
+      "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EB%84%A4%EB%AF%B8%EC%95%84-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "supports": [515, 635],
+      "observedKorean": ["군도의 특사: 물에 있을 시 효과 2배 및 근접전 패널티 무효화", "드워프 모험가: 영웅의 스킬 범위를 직선형태로 변경, 부대 피해 증가"]
+    },
+    {
+      "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EB%94%94%ED%95%98%EB%A5%B4%ED%8A%B8sp-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "supports": [637],
+      "observedKorean": ["엘프 궁기병: 숲/초원/산지 전투 효과 및 부대 근접전 패널티 무효화"]
+    },
+    {
+      "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EB%A7%88%EB%A6%AC%EC%95%88%EB%8D%B8-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "supports": [815],
+      "observedKorean": ["영종의 투승: 공격 받을 시 근접 패널티 무효, 영웅이 같은 신관 클래스일 경우 병사 공격 증가"]
+    }
+  ],
+  "decisions": [
+    {"soldierId":512,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["近战伤害减免","水中","偷取强化效果"]},
+    {"soldierId":513,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["近战伤害减免"]},
+    {"soldierId":514,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["近战伤害减免"]},
+    {"soldierId":515,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["水中","近战伤害减免"]},
+    {"soldierId":635,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["英雄的技能选取形式全部变为直线型"]},
+    {"soldierId":637,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["树林","草地","山地","近战伤害减免"]},
+    {"soldierId":815,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["近战伤害减免","僧侣"]}
+  ],
+  "keptInReview": [516, 517, 816],
+  "note": "Similar mechanics without record-level Korean evidence remain REVIEW; no blanket promotion is applied."
+}
