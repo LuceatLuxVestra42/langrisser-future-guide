@@ -68,3 +68,5 @@ jobs:
       - name: Verify frozen QA artifact on main or PR
         if: github.event_name != 'push' || github.ref == 'refs/heads/main'
         run: git diff --exit-code -- data/validation/soldier-stage6-4-filter-qa.v1.json
+
+# dragoonia downstream freshness trigger 6-4
