@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-3",
+  "artifactClass": "BULK_PLAN_SUMMARY",
+  "status": "BULK_PLAN_COMPLETE_READY_FOR_CONTENT_SCAN",
+  "frozenJoin": {
+    "skinCount": 540,
+    "selectedUniqueModelResourceIds": 789,
+    "mappedUniqueModelResourceIds": 789,
+    "missingUniqueModelResourceIds": 0,
+    "uniqueSelectedPrimaryPrefabPaths": 789,
+    "duplicateSelectedPrimaryPathGroupCount": 0,
+    "modelRootCounts": {"GENERAL": 789, "SOLDIER": 0, "BUST": 0, "OTHER": 0}
+  },
+  "bundleCatalog": {
+    "sourceLineCount": 3047,
+    "sourceSha256": "424b64fefe0adfb6797e13053e3049e257838185c51e215eae22d8ee2d9c7188",
+    "candidateBundleCount": 536,
+    "staticCandidateBundleCount": 4,
+    "charCandidateBundleCount": 264,
+    "modelGeneralCandidateBundleCount": 268,
+    "locallyMountedCandidateBundleCount": 13,
+    "notLocallyMountedCandidateBundleCount": 523
+  },
+  "candidateCoverage": {
+    "static": {"singleCandidate": 0, "beginAndCurrentCandidates": 540, "missing": 0},
+    "char": {"singleCandidate": 440, "beginAndCurrentCandidates": 100, "missing": 0},
+    "modelPrimary": {"singleCandidate": 625, "beginAndCurrentCandidates": 164, "missing": 0}
+  },
+  "rootGroups": {
+    "static": {"total": 2, "singleCandidate": 0, "beginAndCurrentCandidates": 2},
+    "char": {"total": 235, "singleCandidate": 206, "beginAndCurrentCandidates": 29},
+    "modelGeneral": {"total": 235, "singleCandidate": 202, "beginAndCurrentCandidates": 33}
+  },
+  "nextStage": {
+    "substage": "3-3-2",
+    "goal": "Scan candidate UnityFS bundle contents and resolve each frozen runtime path by exact case-normalized full-path evidence.",
+    "requiredCandidateBundleCount": 536,
+    "requiredTargetCount": 1869,
+    "supplementalTargetCount": 81,
+    "completionRule": "Every required target must resolve to exactly one authoritative candidate bundle with exactly one occurrence in its embedded CAB content; duplicate, missing, malformed, or unsupported bundles remain review blockers."
+  },
+  "currentSubsetScan": {
+    "inspectedCandidateBundleCount": 13,
+    "requiredResolvedExact": 369,
+    "requiredRemainingBecauseCatalogCandidateUnscanned": 1500,
+    "supplementalResolvedExact": 4,
+    "unscannedCandidateBundleCount": 523,
+    "fullyInspectedFailureCounts": {"notFound": 0, "duplicateOccurrence": 0, "ambiguousMultipleBundles": 0, "bundleScanError": 0},
+    "evidence": "data/evidence/skin-stage3-3-current-subset/manifest.v1.json"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-3",
+  "artifactClass": "BULK_SCAN_CHECKPOINT",
+  "status": "BULK_PLAN_COMPLETE_PARTIAL_CONTENT_EVIDENCE_READY_FOR_FULL_DIRECTORY_SCAN",
+  "frozenInputs": {
+    "assetInventory": "data/generated/skin-stage3-1-asset-inventory.v1.json",
+    "modelSourceIndex": "data/evidence/skin-stage3-3-model-resource-source-index/manifest.v1.json",
+    "skinCount": 540,
+    "modelBindingEdgeCount": 2277,
+    "uniqueModelResourceIdCount": 789
+  },
+  "confirmedJoin": {
+    "sourceIndexRecordCount": 977,
+    "selectedUniqueModelResourceIds": 789,
+    "mappedUniqueModelResourceIds": 789,
+    "missingUniqueModelResourceIds": 0,
+    "uniqueSelectedPrimaryPrefabPaths": 789,
+    "duplicateSelectedPrimaryPathGroupCount": 0,
+    "selectedModelRootCounts": {"GENERAL": 789, "SOLDIER": 0, "BUST": 0, "OTHER": 0}
+  },
+  "bundleCatalog": {
+    "sourceFile": "bundle-file-list.txt",
+    "lineCount": 3047,
+    "sha256": "424b64fefe0adfb6797e13053e3049e257838185c51e215eae22d8ee2d9c7188",
+    "candidateBundleCount": 536,
+    "static": 4,
+    "char": 264,
+    "modelGeneral": 268
+  },
+  "currentSubsetEvidence": {
+    "evidence": "data/evidence/skin-stage3-3-current-subset/manifest.v1.json",
+    "inspectedCandidateBundleCount": 13,
+    "requiredResolvedExact": 369,
+    "requiredRemainingDueToUnscannedCandidates": 1500,
+    "unscannedCandidateBundleCount": 523,
+    "bundleScanErrors": 0,
+    "fullyInspectedMissing": 0,
+    "fullyInspectedDuplicate": 0,
+    "fullyInspectedAmbiguous": 0
+  },
+  "scanner": {
+    "entrypoint": "scripts/skin-stage3-3-bulk-scan.mjs",
+    "unityFsHelper": "scripts/unityfs-exact-path-scan.mjs",
+    "supportedCompressionTypes": ["UNCOMPRESSED", "LZ4", "LZ4HC"],
+    "unsupportedCompressionTypes": ["LZMA_FAILS_CLOSED"],
+    "comparisonRule": "assets/gameproject/runtimeassets/ + frozen locator, ASCII case-normalized, exact full runtime-path byte match only"
+  },
+  "completionRule": "All 1869 required targets (540 static + 540 Char Spine + 789 model primary Prefabs) must be RESOLVED_EXACT after every catalog-confirmed candidate bundle for each target is inspected. Supplemental model paths are QA evidence but do not replace required primary paths.",
+  "rejectedShortcuts": [
+    "Do not promote a target while a catalog-confirmed alternate candidate bundle remains unscanned.",
+    "Do not infer begin/current membership from naming.",
+    "Do not use fuzzy path matching, numeric resource-ID arithmetic, alternate-path substitution, or cross-root fallback.",
+    "Do not extrapolate the 369 current exact resolutions to the remaining 1500 required targets."
+  ],
+  "completedScope": "Stage 3-3-0 source index 977/977; Stage 3-3-1 frozen 789/789 exact JOIN and 536-bundle demand plan; Stage 3-3-2 scanner implementation validated on 13 current bundles with 369 required exact resolutions.",
+  "nextStartPoint": "Run the scanner on the complete Langrisser_Data/StreamingAssets/ExportAssetBundle directory using the catalog hash above. Expected same-snapshot candidate coverage is 536/536. Review missing/duplicate/ambiguous/scan-error targets only after that full run."
+}

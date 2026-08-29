@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-3-2",
+  "evidenceClass": "CURRENT_SUBSET_AUTHORITATIVE_UNITYFS_EXACT_PATH_EVIDENCE",
+  "status": "PARTIAL_BULK_EVIDENCE_369_OF_1869_REQUIRED_TARGETS_RESOLVED",
+  "source": {
+    "sourceType": "PC_CLIENT_EXPORT_ASSET_BUNDLE_SUBSET_WITH_FILENAME_CATALOG",
+    "bundleFilenameCatalog": {
+      "lineCount": 3047,
+      "uniqueNameCount": 3047,
+      "sha256": "424b64fefe0adfb6797e13053e3049e257838185c51e215eae22d8ee2d9c7188"
+    },
+    "method": "raw bundle SHA-256; UnityFS decompression; embedded CAB; exact case-normalized full runtime-path byte search"
+  },
+  "guardrails": {
+    "fuzzyMatching": false,
+    "numericIdArithmetic": false,
+    "inferredBundleMembership": false,
+    "crossRootFallback": false,
+    "alternatePathSubstitution": false,
+    "runtimePrefix": "assets/gameproject/runtimeassets/",
+    "candidateFilenameMembership": "EXACT_BASENAME_IN_SOURCE_DIRECTORY"
+  },
+  "coverage": {
+    "requiredTotal": 1869,
+    "requiredResolvedExact": 369,
+    "requiredPendingUnscannedCandidate": 1500,
+    "supplementalTotal": 81,
+    "supplementalResolvedExact": 4,
+    "candidateBundlesCatalog": 536,
+    "candidateBundlesInspected": 13,
+    "candidateBundlesUnscanned": 523,
+    "staticResolvedExact": 335,
+    "charSpineResolvedExact": 9,
+    "modelPrimaryResolvedExact": 25,
+    "fullyInspectedNotFound": 0,
+    "duplicateOccurrence": 0,
+    "ambiguousMultipleBundles": 0,
+    "bundleScanErrors": 0
+  },
+  "artifacts": {
+    "bundleProvenance": "data/evidence/skin-stage3-3-current-subset/bundle-provenance.v1.json",
+    "resolvedStatic": "data/evidence/skin-stage3-3-current-subset/resolved-static.v1.json",
+    "resolvedChar": "data/evidence/skin-stage3-3-current-subset/resolved-char.v1.json",
+    "resolvedModel": "data/evidence/skin-stage3-3-current-subset/resolved-model.v1.json",
+    "unscannedBundleDemandShards": [
+      "data/evidence/skin-stage3-3-current-subset/unscanned-bundle-demand-0000-0299.v1.json",
+      "data/evidence/skin-stage3-3-current-subset/unscanned-bundle-demand-0300-0522.v1.json"
+    ]
+  },
+  "blockers": [
+    "523 catalog-confirmed candidate bundles remain unscanned; 1500 required targets are pending only for that reason."
+  ],
+  "nextStartPoint": "Run scripts/skin-stage3-3-bulk-scan.mjs against the complete ExportAssetBundle directory with the same filename catalog; review only required targets not RESOLVED_EXACT."
+}
