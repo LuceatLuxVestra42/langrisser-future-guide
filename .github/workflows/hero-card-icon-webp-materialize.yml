@@ -104,13 +104,13 @@ jobs:
       - name: TypeScript gate
         run: bunx tsc --noEmit
 
-      - name: Clean temporary migration tooling
+      - name: Restore non-owned build outputs and deploy workflow
         shell: bash
         run: |
-          rm -f .github/workflows/hero-card-icon-webp-diagnostic.yml
-          rm -f .github/workflows/hero-card-icon-webp-materialize.yml
-          rm -f scripts/generate-hero-card-icon-webp.py
-          rm -f scripts/apply-hero-card-icon-webp-consumer.py
+          set -euo pipefail
+          git restore -- .github/workflows/project-doctor-authoritative-pages-deploy.yml
+          rm -f data/generated/equipment-name-kr-user-approved.v1.json
+          rm -f data/validation/equipment-name-kr-user-approved-summary.v1.json
 
       - name: Commit verified WebP delivery
         env:
@@ -120,7 +120,12 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add data/generated/hero-card-icon-web-delivery.v1.json
+          git add public/images/heroes/card-icons-webp
+          git add src/lib/hero-card-icon-assets.server.ts
+          git add scripts/validate-hero-card-icon-frontend.mjs
+          git add scripts/validate-hero-card-icons-hosted.mjs
+          git add scripts/generate-hero-card-icon-web-delivery.py
           if git diff --cached --quiet; then
             echo 'No WebP delivery changes to commit.'
             exit 0
