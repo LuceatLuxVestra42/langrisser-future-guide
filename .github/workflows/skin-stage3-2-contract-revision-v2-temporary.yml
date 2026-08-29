@@ -1,0 +1,31 @@
+name: Skin Stage 3-2 Contract Revision V2 Temporary
+
+on:
+  push:
+    branches:
+      - work/skin-stage3-2-contract-revision-v2
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Validate Skin Stage 3-2 v2 completion contract
+        run: node scripts/validate-skin-stage3-2-resolution-proof-v2.mjs
+      - name: Commit generated final checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/skin-stage3-2-final.v2.json
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git commit -m "Generate Skin Stage 3-2 v2 final checkpoint"
+          git pull --rebase origin work/skin-stage3-2-contract-revision-v2
+          git push origin HEAD:work/skin-stage3-2-contract-revision-v2
