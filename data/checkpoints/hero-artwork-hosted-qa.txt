@@ -1,0 +1,29 @@
+Hero Artwork Hosted / Browser QA checkpoint
+기준일: 2026-08-29
+
+status: PASS_HERO_ARTWORK_HOSTED_BROWSER_QA
+completion: COMPLETE
+H-A6 predecessor: 44e04bb3fd0657f82690efe39ae3395e36980ba6
+QA source SHA: 54e0e8192f47a150a6a14346fea799a0347b1b19
+gh-pages deployment SHA: 78cf8f99bb58018832f375e3a32c39a445357ca2
+hosted base: https://luceatluxvestra42.github.io/langrisser-future-guide/
+resolver/assets: 267 / 267
+Hosted PNG HEAD: 267 / 267
+representative final Hero: 6 (레온)
+representative begin Hero: 99204 (타탈리아)
+Desktop list/detail/direct/reload: PASS
+Mobile list/detail/no-horizontal-overflow: PASS
+Hero Pages document-navigation: PASS reloadDocument
+
+Owning layer: presentation / deployment / browser QA
+Semantic recomputation: none
+
+다시 열리는 조건:
+- H-A6 actual PNG 또는 resolver contract 변경
+- GitHub Pages base/path architecture 변경
+- hosted asset HTTP coverage 파손
+- representative Browser/UI regression
+
+다음 시작점:
+- H-A5/H-A6 main promotion은 Project Doctor hero-assets MANUAL_REVIEW 정책과 별도로 처리
+- Hosted QA PASS 자체를 semantic stage 재검토 사유로 사용하지 않음
