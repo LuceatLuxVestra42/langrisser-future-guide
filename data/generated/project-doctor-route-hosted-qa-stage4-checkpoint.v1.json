@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-route-hosted-qa-stage4-checkpoint/v1",
+  "stage": "QA-4",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "ROUTE_HOSTED_QA_STAGE4_INTEGRATED_ORCHESTRATION_FROZEN",
+  "predecessor": {
+    "stage": "QA-3",
+    "checkpointHeadSha": "aa2397d8948faa0c98f7024614c6768b10fcf49c",
+    "provenRuntimeHeadSha": "8b999c481b10edda9956d09772e894e80dbc5260",
+    "proofRunId": 33231297508,
+    "freezeState": "ROUTE_HOSTED_QA_STAGE3_NAVIGATION_HISTORY_CONSOLE_FROZEN"
+  },
+  "proof": {
+    "headSha": "70826ba8ed9371d1dddf7379706e2e5ec653f740",
+    "workflowRunId": 33233254559,
+    "jobId": 99049645934,
+    "workflowConclusion": "success",
+    "artifact": {
+      "id": 9709155755,
+      "name": "route-hosted-qa-stage4-integrated",
+      "digest": "sha256:eab05aa800dc02a668e7f7e065c4cd610bb756fbbf3ee9f83bdafaf18317c291"
+    }
+  },
+  "deterministicValidation": {
+    "status": "PASS_ROUTE_HOSTED_QA_STAGE4_ORCHESTRATION_CONTRACT",
+    "checks": 12,
+    "passed": 12,
+    "failed": 0
+  },
+  "integratedRunner": {
+    "status": "PASS_ROUTE_HOSTED_QA_STAGE4_INTEGRATED",
+    "expectedSourceSha": "70826ba8ed9371d1dddf7379706e2e5ec653f740",
+    "baseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+    "preflightContracts": {
+      "passed": 5,
+      "failed": 0,
+      "stages": ["QA-0", "QA-1", "QA-2", "QA-3", "QA-4"]
+    },
+    "hosted": {
+      "status": "PASS",
+      "requiredConsecutivePasses": 3,
+      "attemptsUsed": 3,
+      "attemptResults": ["PASS", "PASS", "PASS"]
+    },
+    "qa2": {
+      "status": "PASS",
+      "expected": 5,
+      "skipped": 5,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "qa3": {
+      "status": "PASS",
+      "expected": 4,
+      "skipped": 4,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "review": []
+  },
+  "orchestrationContract": {
+    "orderedPhases": [
+      "PREFLIGHT_CONTRACTS",
+      "HOSTED_STABILITY",
+      "BROWSER_UI_PREDECESSOR",
+      "NAVIGATION_HISTORY_CONSOLE"
+    ],
+    "predecessorValidatorsReused": true,
+    "predecessorSemanticsReimplemented": false,
+    "machineReadableSummary": "route-hosted-qa-stage4-summary.v1"
+  },
+  "failureBoundary": {
+    "preflightFailure": "PREFLIGHT_FAIL",
+    "hostedFailure": "DEPLOYMENT_HOSTING_FAIL",
+    "browserFailure": "BROWSER_UI_FAIL",
+    "semanticStageReopened": false,
+    "canonicalRelationChanged": false,
+    "rawConfigDataReadAdded": false,
+    "runtimeRelationRecomputationAdded": false
+  },
+  "scope": {
+    "browser": "Chromium",
+    "desktop": "1440x1000",
+    "mobile": "390x844",
+    "hostedBase": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+    "repositoryBase": "/langrisser-future-guide/"
+  },
+  "completionStatement": "QA-4 integrated Route/Hosted orchestration is complete and frozen. One runner now preserves the existing Preflight, QA-1 Hosted, QA-2 Browser/UI, and QA-3 navigation/history/console ownership boundaries while producing a single machine-readable result. The checkpoint-only commit does not change the proven hosted runtime.",
+  "nextStartPoint": {
+    "stage": "QA-5",
+    "scope": "Post-merge mainline proof after the stacked QA-1 -> QA-2 -> QA-3 -> QA-4 PR chain is merged. Do not deepen the stack before predecessor merge state is resolved."
+  },
+  "reopenConditions": [
+    "QA-3 predecessor checkpoint or proof freshness changes",
+    "QA-1 Hosted contract changes",
+    "QA-2 Browser/UI contract changes",
+    "QA-3 navigation/history contract changes",
+    "GitHub Pages repository-base or deployment architecture changes",
+    "new authoritative evidence shows the integrated runner misclassifies an owning layer",
+    "QA-4 proof no longer matches the deployed candidate source SHA"
+  ]
+}
