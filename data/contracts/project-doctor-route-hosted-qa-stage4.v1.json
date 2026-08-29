@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "route-hosted-qa-stage4.v1",
+  "stage": "QA-4",
+  "status": "INTEGRATED_ORCHESTRATION_CONTRACT_FROZEN",
+  "predecessor": {
+    "stage": "QA-3",
+    "checkpoint": "data/generated/project-doctor-route-hosted-qa-stage3-checkpoint.v1.json",
+    "requiredFreezeState": "ROUTE_HOSTED_QA_STAGE3_NAVIGATION_HISTORY_CONSOLE_FROZEN",
+    "checkpointHeadSha": "aa2397d8948faa0c98f7024614c6768b10fcf49c",
+    "provenRuntimeHeadSha": "8b999c481b10edda9956d09772e894e80dbc5260",
+    "proofRunId": 33231297508
+  },
+  "purpose": "Integrate existing Route/Hosted QA gates into one ordered command without changing the owning layer or semantic meaning of any predecessor gate.",
+  "command": {
+    "runner": "scripts/run-project-doctor-route-hosted-qa-stage4.mjs",
+    "validationScript": "scripts/validate-project-doctor-route-hosted-qa-stage4.mjs --check",
+    "requiresExpectedShaForStrictMode": true
+  },
+  "orderedPhases": [
+    {
+      "id": "PREFLIGHT_CONTRACTS",
+      "owner": "preflight/contracts",
+      "commands": [
+        "qa:hosted:stage0:validate",
+        "qa:hosted:validate",
+        "qa:browser:validate",
+        "validate-project-doctor-route-hosted-qa-stage3.mjs --check",
+        "validate-project-doctor-route-hosted-qa-stage4.mjs --check"
+      ]
+    },
+    {
+      "id": "HOSTED_STABILITY",
+      "owner": "QA-1 / deployment-hosting",
+      "command": "qa:hosted -- --expected-sha <sha>",
+      "requiredConsecutivePasses": 3,
+      "maxAttempts": 18
+    },
+    {
+      "id": "BROWSER_UI_PREDECESSOR",
+      "owner": "QA-2 / browser-ui",
+      "command": "qa:browser"
+    },
+    {
+      "id": "NAVIGATION_HISTORY_CONSOLE",
+      "owner": "QA-3 / frontend navigation-history-runtime",
+      "command": "playwright test -c playwright.route-hosted-stage3.config.ts"
+    }
+  ],
+  "resultPolicy": {
+    "passStatus": "PASS_ROUTE_HOSTED_QA_STAGE4_INTEGRATED",
+    "qa2UnexpectedMustBeZero": true,
+    "qa2Flaky": "NON_BLOCKING_REVIEW",
+    "qa3UnexpectedMustBeZero": true,
+    "qa3FlakyMustBeZero": true,
+    "writeMachineReadableSummary": true
+  },
+  "failureOwnership": {
+    "preflight": "PREFLIGHT_FAIL",
+    "hosted": "DEPLOYMENT_HOSTING_FAIL",
+    "browser": "BROWSER_UI_FAIL",
+    "semanticReopenAllowed": false
+  },
+  "semanticBoundary": {
+    "canonicalRelationChanged": false,
+    "rawConfigDataRuntimeReadAllowed": false,
+    "nameJoinAllowed": false,
+    "idArithmeticAllowed": false,
+    "runtimeRelationRecomputationAllowed": false
+  },
+  "workflow": {
+    "file": ".github/workflows/project-doctor-route-hosted-qa-stage4-integrated-proof.yml",
+    "candidateBuildBeforeRuntimeCommand": true,
+    "candidatePublishBeforeRuntimeCommand": true,
+    "chromiumInstallBeforeRuntimeCommand": true,
+    "evidenceArtifact": "route-hosted-qa-stage4-integrated"
+  },
+  "deferred": [
+    "VISUAL_SNAPSHOT_PIXEL_DIFF",
+    "FIREFOX_WEBKIT_CROSS_BROWSER",
+    "SKIN_CAROUSEL_UNTIL_PRODUCTION_SURFACE",
+    "RECONNECT_STORAGE_PERSISTENCE_UNTIL_SHARED_UI_STATE_CONTRACT",
+    "HERO_SOLDIER_CROSS_LINK_UNTIL_NAVIGATION_SURFACE_EXISTS",
+    "EQUIPMENT_HERO_CROSS_LINK_UNTIL_NAVIGATION_SURFACE_EXISTS"
+  ]
+}

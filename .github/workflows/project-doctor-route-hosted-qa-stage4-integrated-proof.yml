@@ -1,0 +1,130 @@
+name: Route Hosted QA Stage 4 Integrated Proof
+
+on:
+  push:
+    branches:
+      - main
+      - qa/route-hosted-mainline-integration-20260829
+    paths:
+      - 'data/contracts/project-doctor-route-hosted-qa-stage*.json'
+      - 'data/generated/project-doctor-route-hosted-qa-stage3-checkpoint.v1.json'
+      - 'data/validation/project-doctor-route-hosted-qa-stage*.json'
+      - 'scripts/*project-doctor-route-hosted-qa-stage*.mjs'
+      - 'tests/route-hosted-browser/**'
+      - 'playwright.route-hosted*.config.ts'
+      - 'vite.route-hosted-pages.config.ts'
+      - 'public/404.html'
+      - 'src/routes/**'
+      - 'src/components/**'
+      - 'src/lib/**'
+      - '.github/workflows/project-doctor-route-hosted-qa-stage4-integrated-proof.yml'
+      - 'package.json'
+      - 'bun.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: route-hosted-qa-stage4-integrated-proof
+  cancel-in-progress: true
+
+jobs:
+  integrated-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install dependencies from frozen lockfile
+        run: bun install --frozen-lockfile
+
+      - name: Validate QA-4 orchestration contract
+        run: node scripts/validate-project-doctor-route-hosted-qa-stage4.mjs --check
+
+      - name: Reuse proven GitHub Pages static build config
+        run: |
+          set -euo pipefail
+          cp vite.route-hosted-pages.config.ts vite.config.ts
+          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
+          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
+          grep -q 'nitro: false' vite.config.ts
+
+      - name: Build static GitHub Pages candidate
+        run: bun run build
+
+      - name: Integrated static preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in \
+            dist/client/index.html \
+            dist/client/404.html \
+            dist/client/banners/index.html \
+            dist/client/equipment/index.html \
+            dist/client/equipment/13/index.html \
+            dist/client/heroes/index.html \
+            dist/client/heroes/6/index.html \
+            dist/client/soldiers/index.html \
+            dist/client/soldiers/102/index.html; do
+            test -f "$path"
+          done
+          grep -q '/langrisser-future-guide/heroes/' dist/client/index.html
+          grep -q '/langrisser-future-guide/soldiers/' dist/client/index.html
+          grep -q '/langrisser-future-guide/equipment/' dist/client/index.html
+          grep -q '/langrisser-future-guide/heroes/6/' dist/client/heroes/index.html
+          grep -q '영웅을 찾을 수 없어.' dist/client/404.html
+          grep -q '/langrisser-future-guide/' dist/client/404.html
+          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-main-source.txt
+          printf '%s\n' 'route-hosted-qa-stage4-integrated-orchestration' > dist/client/qa-surface.txt
+
+      - name: Publish QA-4 candidate to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Route Hosted QA Stage4 ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
+
+      - name: Install Chromium and Linux dependencies
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run integrated Route Hosted QA gate
+        env:
+          ROUTE_HOSTED_QA_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: |
+          node scripts/run-project-doctor-route-hosted-qa-stage4.mjs --expected-sha "$GITHUB_SHA" \
+            --output route-hosted-qa-stage4-summary.json
+
+      - name: Upload QA-4 integrated evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-hosted-qa-stage4-integrated
+          path: |
+            route-hosted-qa-stage4-summary.json
+            test-results/route-hosted-qa-stage4-hosted-attempt-*.json
+            test-results/route-hosted-qa-stage2.json
+            test-results/route-hosted-qa-stage2-artifacts
+            test-results/route-hosted-qa-stage3.json
+            test-results/route-hosted-qa-stage3-artifacts
+          if-no-files-found: warn

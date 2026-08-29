@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "route-hosted-qa-stage3-validation.v1",
+  "stage": "QA-3",
+  "status": "PASS_ROUTE_HOSTED_QA_STAGE3_CONTRACT",
+  "completion": "COMPLETE",
+  "summary": {
+    "checkCount": 9,
+    "passed": 9,
+    "failed": 0,
+    "playwrightVersion": "1.62.1",
+    "browser": "chromium",
+    "projectCount": 2,
+    "navigationCheckCount": 10
+  },
+  "predecessorProof": {
+    "stage": "QA-2",
+    "contract": "data/contracts/project-doctor-route-hosted-qa-stage2.v1.json",
+    "requiredStatus": "BROWSER_UI_CONTRACT_FROZEN",
+    "proofHeadSha": "3f0dea6065059cab63d28b5705d93c7b6544df14",
+    "proofRunId": 33229809974,
+    "proofConclusion": "success"
+  },
+  "failureBoundary": {
+    "browserUi": "BROWSER_UI_FAIL",
+    "semanticReopenAllowed": false,
+    "hostedFailureOwner": "QA-1 / deployment-hosting",
+    "browserFailureOwner": "frontend navigation / history / runtime interaction"
+  },
+  "checks": [
+    { "id": "CONTRACT_IDENTITY", "pass": true },
+    { "id": "QA2_PREDECESSOR_PROOF", "pass": true },
+    { "id": "PLAYWRIGHT_REUSED", "pass": true },
+    { "id": "DEEP_HISTORY_COVERAGE", "pass": true },
+    { "id": "SOLDIER_MODAL_HISTORY_COVERAGE", "pass": true },
+    { "id": "UNKNOWN_ID_RECOVERY_COVERAGE", "pass": true },
+    { "id": "NETWORK_AND_RUNTIME_GUARD", "pass": true },
+    { "id": "REPOSITORY_BASE_AND_MOBILE", "pass": true },
+    { "id": "FAILURE_BOUNDARY", "pass": true }
+  ]
+}
