@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-3-3",
+  "checkpoint": "SKIN_STAGE3_3_3_CURRENT_SUBSET_QA_CHECKPOINT",
+  "status": "PASS_CURRENT_SUBSET_QA_PENDING_EXTERNAL_BUNDLES",
+  "completion": null,
+  "finalFreezeReady": false,
+  "validationMethod": "RECONSTRUCT_FROZEN_CURRENT_SUBSET_FROM_COMPACT_EVIDENCE_THEN_RUN_STAGE3_3_3_QA",
+  "sources": {
+    "inventory": "data/generated/skin-stage3-1-asset-inventory.v1.json",
+    "modelSourceIndex": "data/evidence/skin-stage3-3-model-resource-source-index/model-resource-*.v1.json",
+    "bundleProvenance": "data/evidence/skin-stage3-3-current-subset/bundle-provenance.v1.json",
+    "resolvedStatic": "data/evidence/skin-stage3-3-current-subset/resolved-static.v1.json",
+    "resolvedChar": "data/evidence/skin-stage3-3-current-subset/resolved-char.v1.json",
+    "resolvedModel": "data/evidence/skin-stage3-3-current-subset/resolved-model.v1.json",
+    "unscannedDemand": [
+      "data/evidence/skin-stage3-3-current-subset/unscanned-bundle-demand-0000-0299.v1.json",
+      "data/evidence/skin-stage3-3-current-subset/unscanned-bundle-demand-0300-0522.v1.json"
+    ],
+    "qaContract": "data/contracts/skin-stage3-3-3-resolution-qa.v1.json",
+    "qaValidator": "scripts/validate-skin-stage3-3-3-resolution-qa.mjs"
+  },
+  "normalizedStage3_3_2": {
+    "requiredResolvedExact": 369,
+    "supplementalResolvedExact": 4,
+    "presentCandidateBundles": 13,
+    "unscannedCandidateBundles": 523,
+    "bundleScanErrors": 0
+  },
+  "qa": {
+    "status": "WAITING_FOR_STAGE3_3_2_FULL_SCAN",
+    "acceptedRequiredTargets": 369,
+    "pendingRequiredTargets": 1500,
+    "failedRequiredTargets": 0,
+    "reviewRequiredTargets": 0,
+    "acceptedSkinCoverage": 337,
+    "acceptedStatic": 335,
+    "acceptedCharSpine": 9,
+    "acceptedModelPrimary": 25,
+    "safeAliasTargets": 0,
+    "accountedCandidateBundles": 13,
+    "unscannedCandidateBundles": 523,
+    "bundleScanErrors": 0,
+    "qaClassCounts": {
+      "RESOLVED_EXACT_SINGLE_BUNDLE": 369,
+      "PENDING_UNSCANNED_CANDIDATE": 1500
+    }
+  },
+  "boundaries": {
+    "newAssetEvidenceIntroduced": false,
+    "compactEvidenceNormalizedOnly": true,
+    "canonicalSkinRecomputed": false,
+    "heroSkinOwnershipRecomputed": false,
+    "sourceOrderRecomputed": false,
+    "modelResourceSelectionRecomputed": false,
+    "beginCurrentPreferredByName": false,
+    "stage3_3_3CompletionClaimed": false,
+    "stage3_4ExtractionStarted": false
+  },
+  "blocker": {
+    "code": "STAGE3_3_2_REMAINING_BUNDLE_BYTES_NOT_AVAILABLE",
+    "remainingCandidateBundleCount": 523,
+    "requiredPendingTargetCount": 1500
+  },
+  "nextStartPoint": "Scan any available subset of the remaining 523 catalog-confirmed candidate .b files, merge it with the retained Stage 3-3-2 evidence, and rerun Stage 3-3-3 QA. Final freeze remains prohibited until pending/fail/review are all zero."
+}
