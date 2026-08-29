@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-review-resolution/v1",
+  "date": "2026-08-29",
+  "batch": 4,
+  "status": "APPLIED_BUILD_RECHECK_PENDING",
+  "evidence": "data/checkpoints/soldier-unique-skill-review-evidence-batch4.v1.json",
+  "overrides": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
+  "before": {"passCount":118,"reviewCount":67,"overrideCount":9},
+  "applied": {
+    "recordCount": 7,
+    "soldierIds": [512,513,514,515,635,637,815],
+    "recordLevelDecision": "PASS",
+    "reason": "Korean Soldier-effect references reproduce every review-blocking water/melee-penalty/linear-skill-range/class wording for these seven records; records without record-level evidence remain REVIEW."
+  },
+  "afterExpected": {"passCount":125,"reviewCount":60,"overrideCount":16,"translatedCount":185,"remainingTranslationCount":0},
+  "safety": {
+    "canonicalSoldierDataReopened": false,
+    "baseTranslationShardsMutated": false,
+    "reviewResolutionAppliedBySmallOverrideLayer": true,
+    "blanketMechanicPromotion": false
+  },
+  "nextStep": "Confirm deterministic generator and production build at 185 records / 125 PASS / 60 REVIEW / 16 overrides."
+}
