@@ -1,0 +1,69 @@
+name: Refresh Soldier 640 frozen list reference
+
+on:
+  push:
+    branches:
+      - fix/soldier-640-name-kr
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Refresh exact Stage 6-7 frozen list reference
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path("data/generated/soldier-stage6-7-site-admission.v1.json")
+          old = '"gitBlobSha": "96df08f5c53ea0ef66922ca6b9d7a274cb599aff"'
+          new = '"gitBlobSha": "0a4623b5034b888ef124620346fb1e1e92d3bddc"'
+          text = path.read_text(encoding="utf-8")
+          assert text.count(old) == 1, text.count(old)
+          path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          print("Stage 6-7 list frozen ref refreshed")
+
+      - name: Prepare net branch commit without temporary runner
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/refresh-soldier640-frozen-ref.yml
+          git rm .github/soldier640-frozen-ref-trigger.txt
+          git add data/generated/soldier-stage6-7-site-admission.v1.json
+          git diff --cached --check
+          git commit -m "Refresh Soldier 640 frozen list reference"
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate Soldier final admission
+        run: npm run validate:coverage:soldier-canonical
+
+      - name: Re-run Localization Audit
+        run: npm run audit:localization -- --check
+
+      - name: Run Project Doctor on local refreshed HEAD
+        run: npm run doctor -- --base origin/main --head HEAD
+
+      - name: Production build
+        run: npm run build
+
+      - name: Push validated branch
+        run: git push origin HEAD:fix/soldier-640-name-kr
