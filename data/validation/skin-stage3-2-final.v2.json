@@ -1,0 +1,528 @@
+{
+  "version": 2,
+  "stage": "skin-page-3",
+  "substage": "3-2",
+  "checkpoint": "representative-asset-resolution-proof-final-v2",
+  "status": "PASS",
+  "completion": "SKIN_STAGE3_2_COMPLETE",
+  "freezeState": "SKIN_STAGE3_2_REPRESENTATIVE_PROOF_FROZEN",
+  "downstreamGate": "STAGE3_3_BULK_RESOLUTION_ALLOWED",
+  "legacyReadiness": {
+    "path": "data/validation/skin-stage3-2-readiness.v1.json",
+    "status": "READY_FOR_ASSET_EVIDENCE",
+    "authority": "HISTORICAL_PRE_EVIDENCE_ONLY"
+  },
+  "evidence": {
+    "path": "data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json",
+    "status": "PASS_SKIN_STAGE3_2_REPRESENTATIVE_ASSET_RESOLUTION",
+    "representativeResolved": 3,
+    "blockers": []
+  },
+  "stage33Handoff": {
+    "allowed": true,
+    "purpose": "Expand the frozen representative resolution rules to exact bulk asset resolution without reopening Skin identity/relation semantics.",
+    "requiredTargetCounts": {
+      "static": 540,
+      "charSpine": 540,
+      "modelPrimaryPrefab": 789,
+      "total": 1869
+    },
+    "bulkRules": [
+      "reuse Stage 3-1 frozen locators and model resource IDs",
+      "use lightweight ConfigDataModelSkinResourceInfo index instead of rereading large raw ConfigData",
+      "scan exact candidate bundles only",
+      "require exact runtime-path evidence",
+      "do not prefer begin/current bundle by naming alone",
+      "do not extrapolate partial scan results",
+      "do not claim 540-Skin bulk completion until all candidate coverage is resolved or explicitly classified"
+    ]
+  },
+  "metrics": {
+    "checkCount": 65,
+    "passedCheckCount": 65,
+    "failedCheckCount": 0,
+    "representativeSkinCount": 3,
+    "representativeStaticResolved": 3,
+    "representativeSpineResolved": 3,
+    "representativeModelResourceExpected": 7,
+    "representativeModelResourceResolved": 7
+  },
+  "checks": [
+    {
+      "name": "v2 contract ACCEPTED",
+      "pass": true,
+      "detail": "ACCEPTED"
+    },
+    {
+      "name": "v2 contract version 2",
+      "pass": true,
+      "detail": 2
+    },
+    {
+      "name": "v2 contract substage 3-2",
+      "pass": true,
+      "detail": "3-2"
+    },
+    {
+      "name": "legacy v1 contract preserved",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "legacy readiness preserved as pre-evidence state",
+      "pass": true,
+      "detail": {
+        "status": "READY_FOR_ASSET_EVIDENCE",
+        "completion": null
+      }
+    },
+    {
+      "name": "legacy readiness authority downgraded only by v2 contract",
+      "pass": true,
+      "detail": "HISTORICAL_PRE_EVIDENCE_ONLY"
+    },
+    {
+      "name": "historical files preserved",
+      "pass": true,
+      "detail": {
+        "historicalContract": "data/contracts/skin-stage3-2-resolution-proof.v1.json",
+        "historicalReadiness": "data/validation/skin-stage3-2-readiness.v1.json",
+        "historicalAuthority": "HISTORICAL_PRE_EVIDENCE_ONLY",
+        "preserveHistoricalFiles": true,
+        "replaceHistoricalFilesInPlace": false
+      }
+    },
+    {
+      "name": "Stage 3-1 PASS",
+      "pass": true,
+      "detail": "PASS"
+    },
+    {
+      "name": "Stage 3-1 complete",
+      "pass": true,
+      "detail": "SKIN_STAGE3_1_COMPLETE"
+    },
+    {
+      "name": "Stage 3-1 frozen metric skinCount",
+      "pass": true,
+      "detail": {
+        "expected": 540,
+        "actual": 540
+      }
+    },
+    {
+      "name": "Stage 3-1 frozen metric uniqueStaticPathCount",
+      "pass": true,
+      "detail": {
+        "expected": 540,
+        "actual": 540
+      }
+    },
+    {
+      "name": "Stage 3-1 frozen metric uniqueSpinePathCount",
+      "pass": true,
+      "detail": {
+        "expected": 540,
+        "actual": 540
+      }
+    },
+    {
+      "name": "Stage 3-1 frozen metric modelBindingEdgeCount",
+      "pass": true,
+      "detail": {
+        "expected": 2277,
+        "actual": 2277
+      }
+    },
+    {
+      "name": "Stage 3-1 frozen metric uniqueModelResourceIdCount",
+      "pass": true,
+      "detail": {
+        "expected": 789,
+        "actual": 789
+      }
+    },
+    {
+      "name": "inventory records 540",
+      "pass": true,
+      "detail": 540
+    },
+    {
+      "name": "representative fixture IDs exact",
+      "pass": true,
+      "detail": {
+        "expected": [
+          102,
+          1901,
+          3701
+        ],
+        "actual": [
+          102,
+          1901,
+          3701
+        ]
+      }
+    },
+    {
+      "name": "representative fixture count exact",
+      "pass": true,
+      "detail": 3
+    },
+    {
+      "name": "final representative evidence status PASS",
+      "pass": true,
+      "detail": "PASS_SKIN_STAGE3_2_REPRESENTATIVE_ASSET_RESOLUTION"
+    },
+    {
+      "name": "final representative evidence class",
+      "pass": true,
+      "detail": "FINAL_REPRESENTATIVE_ASSET_RESOLUTION_EVIDENCE"
+    },
+    {
+      "name": "final representative evidence has no blockers",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "evidence coverage representativeExpected",
+      "pass": true,
+      "detail": {
+        "expected": 3,
+        "actual": 3
+      }
+    },
+    {
+      "name": "evidence coverage representativeResolved",
+      "pass": true,
+      "detail": {
+        "expected": 3,
+        "actual": 3
+      }
+    },
+    {
+      "name": "evidence coverage staticAuthoritativeUnityPathResolved",
+      "pass": true,
+      "detail": {
+        "expected": 3,
+        "actual": 3
+      }
+    },
+    {
+      "name": "evidence coverage spineAuthoritativePathResolved",
+      "pass": true,
+      "detail": {
+        "expected": 3,
+        "actual": 3
+      }
+    },
+    {
+      "name": "evidence coverage modelResourceIdsExpected",
+      "pass": true,
+      "detail": {
+        "expected": 7,
+        "actual": 7
+      }
+    },
+    {
+      "name": "evidence coverage modelResourceIdsMappedToPrefabPath",
+      "pass": true,
+      "detail": {
+        "expected": 7,
+        "actual": 7
+      }
+    },
+    {
+      "name": "evidence coverage modelResourceIdsAuthoritativeAssetEntryResolved",
+      "pass": true,
+      "detail": {
+        "expected": 7,
+        "actual": 7
+      }
+    },
+    {
+      "name": "evidence coverage pendingRepresentativeRecords",
+      "pass": true,
+      "detail": {
+        "expected": 0,
+        "actual": 0
+      }
+    },
+    {
+      "name": "evidence representative IDs exact",
+      "pass": true,
+      "detail": {
+        "expected": [
+          102,
+          1901,
+          3701
+        ],
+        "actual": [
+          102,
+          1901,
+          3701
+        ]
+      }
+    },
+    {
+      "name": "evidence 102 has frozen fixture",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "evidence 102 static authoritative locator exact",
+      "pass": true,
+      "detail": {
+        "expected": "UI/Icon/HeroSkin_ABS/Skin/Skin_Matthew_01.png",
+        "actual": "UI/Icon/HeroSkin_ABS/Skin/Skin_Matthew_01.png",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 102 char Spine authoritative locator exact",
+      "pass": true,
+      "detail": {
+        "expected": "Spine/Char/Mathew_ABS/Mathew_Skin01_Prefab.prefab",
+        "actual": "Spine/Char/Mathew_ABS/Mathew_Skin01_Prefab.prefab",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 102 model resource IDs exact",
+      "pass": true,
+      "detail": {
+        "expected": [
+          102,
+          1021,
+          1022,
+          1023,
+          1024
+        ],
+        "actual": [
+          102,
+          1021,
+          1022,
+          1023,
+          1024
+        ]
+      }
+    },
+    {
+      "name": "evidence 102/102 model Prefab authoritative",
+      "pass": true,
+      "detail": {
+        "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01/Mathew_Skin01_Prefab.prefab",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 102/1021 model Prefab authoritative",
+      "pass": true,
+      "detail": {
+        "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_1/Mathew_Skin01_1_Prefab.prefab",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 102/1022 model Prefab authoritative",
+      "pass": true,
+      "detail": {
+        "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_2/Mathew_Skin01_2_Prefab.prefab",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 102/1023 model Prefab authoritative",
+      "pass": true,
+      "detail": {
+        "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_3/Mathew_Skin01_3_Prefab.prefab",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 102/1024 model Prefab authoritative",
+      "pass": true,
+      "detail": {
+        "prefabPath": "Spine/General/Mathew_ABS/Mathew_Skin01_4/Mathew_Skin01_4_Prefab.prefab",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 102 normalized RESOLVED",
+      "pass": true,
+      "detail": "RESOLVED"
+    },
+    {
+      "name": "evidence 1901 has frozen fixture",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "evidence 1901 static authoritative locator exact",
+      "pass": true,
+      "detail": {
+        "expected": "UI/Icon/HeroSkin2_ABS/Skin/Skin_Lista_Skin01.png",
+        "actual": "UI/Icon/HeroSkin2_ABS/Skin/Skin_Lista_Skin01.png",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 1901 char Spine authoritative locator exact",
+      "pass": true,
+      "detail": {
+        "expected": "Spine/Char/Lista_ABS/Lista_Skin01_Prefab.prefab",
+        "actual": "Spine/Char/Lista_ABS/Lista_Skin01_Prefab.prefab",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 1901 model resource IDs exact",
+      "pass": true,
+      "detail": {
+        "expected": [
+          1901
+        ],
+        "actual": [
+          1901
+        ]
+      }
+    },
+    {
+      "name": "evidence 1901/1901 model Prefab authoritative",
+      "pass": true,
+      "detail": {
+        "prefabPath": "Spine/General/Lista_ABS/Lista_Skin01/Lista_Skin01_Prefab.prefab",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 1901 normalized RESOLVED",
+      "pass": true,
+      "detail": "RESOLVED"
+    },
+    {
+      "name": "evidence 3701 has frozen fixture",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "evidence 3701 static authoritative locator exact",
+      "pass": true,
+      "detail": {
+        "expected": "UI/Icon/HeroSkin_ABS/Skin/Skin_Zigodlla_01.png",
+        "actual": "UI/Icon/HeroSkin_ABS/Skin/Skin_Zigodlla_01.png",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 3701 char Spine authoritative locator exact",
+      "pass": true,
+      "detail": {
+        "expected": "Spine/Char/Zigodlla_ABS/Zigodlla_Skin01_Prefab.prefab",
+        "actual": "Spine/Char/Zigodlla_ABS/Zigodlla_Skin01_Prefab.prefab",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 3701 model resource IDs exact",
+      "pass": true,
+      "detail": {
+        "expected": [
+          3701
+        ],
+        "actual": [
+          3701
+        ]
+      }
+    },
+    {
+      "name": "evidence 3701/3701 model Prefab authoritative",
+      "pass": true,
+      "detail": {
+        "prefabPath": "Spine/General/Zigodlla_ABS/Zigodlla_Skin01/Zigodlla_Skin01_Prefab.prefab",
+        "resolved": true
+      }
+    },
+    {
+      "name": "evidence 3701 normalized RESOLVED",
+      "pass": true,
+      "detail": "RESOLVED"
+    },
+    {
+      "name": "computed representative static resolved 3",
+      "pass": true,
+      "detail": 3
+    },
+    {
+      "name": "computed representative Spine resolved 3",
+      "pass": true,
+      "detail": 3
+    },
+    {
+      "name": "computed representative model expected 7",
+      "pass": true,
+      "detail": 7
+    },
+    {
+      "name": "computed representative model resolved 7",
+      "pass": true,
+      "detail": 7
+    },
+    {
+      "name": "frozen locator reuse enforced",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "frozen model IDs reused",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "ownership not recomputed",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "sourceOrder not recomputed",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "fuzzy matching disabled",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "numeric ID arithmetic disabled",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "cross-root fallback disabled",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "Stage 3-3 handoff allowed",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "Stage 3-3 target arithmetic 1869",
+      "pass": true,
+      "detail": {
+        "static": 540,
+        "charSpine": 540,
+        "modelPrimaryPrefab": 789,
+        "total": 1869
+      }
+    },
+    {
+      "name": "representative completion does not claim bulk completion",
+      "pass": true,
+      "detail": "Representative completion does not claim final resolution for all 540 Skin records."
+    }
+  ],
+  "failures": [],
+  "conclusion": "Skin Stage 3-2 representative authoritative asset resolution is complete and frozen. The historical READY_FOR_ASSET_EVIDENCE checkpoint is retained only as pre-evidence history. Stage 3-3 bulk resolution is allowed without reopening Skin identity, ownership, or sourceOrder."
+}
