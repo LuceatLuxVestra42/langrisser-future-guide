@@ -1,156 +1,16 @@
-name: Deploy Hero Clean WebP Portrait Samples
+name: Deploy Hero Clean WebP Portrait Samples (Retired Publisher)
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/deploy-hero-clean-portraits.yml'
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  deploy:
+  retired:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Source and asset gate
-        shell: bash
+      - name: Legacy publisher retired
         run: |
-          set -euo pipefail
-          node <<'NODE'
-          const fs = require('fs');
-          const list = require('./data/generated/hero-list-stage1.v1.json');
-          const artwork = require('./data/generated/hero-card-artwork-stage4.v1.json');
-          const detail = require('./data/generated/hero-detail.v1.json');
-          const portraits = require('./data/generated/hero-portrait-presentation-sample.v1.json');
-
-          if (list.status !== 'PASS' || list.completion !== 'COMPLETE' || list.summary.generatedRecordCount !== 267 || list.summary.hardErrorCount !== 0) throw new Error('Hero list frozen consumer mismatch');
-          if (artwork.status !== 'PASS' || artwork.summary.heroCount !== 267 || artwork.summary.hardErrorCount !== 0) throw new Error('Hero artwork consumer mismatch');
-          if (detail.status !== 'PASS_WITH_REVIEW' || detail.completion !== 'COMPLETE' || detail.summary.siteUsableCount !== 267 || detail.summary.hardErrorCount !== 0) throw new Error('Hero detail consumer mismatch');
-
-          if (portraits.status !== 'PASS' || portraits.summary.heroCount !== 5 || portraits.summary.webpCount !== 5 || portraits.summary.hardErrorCount !== 0) throw new Error('Hero portrait sample manifest mismatch');
-          const policy = portraits.sourcePolicy;
-          if (policy.cleanPngOnly !== true || policy.bakedRarityBadge !== false || policy.bakedSpBadge !== false || policy.bakedFactionBuffBadge !== false || policy.sourcePngPublishedToWebsite !== false || policy.webDerivativeFormat !== 'WEBP') throw new Error('Hero portrait source policy mismatch');
-
-          const ids = portraits.records.map((record) => record.heroId);
-          if (JSON.stringify(ids) !== JSON.stringify([5, 6, 8, 12, 15])) throw new Error(`Unexpected portrait sample IDs: ${ids.join(',')}`);
-          for (const record of portraits.records) {
-            if (record.source.mimeType !== 'image/png' || record.source.alpha !== true || record.source.decorationPolicy !== 'CLEAN_CHARACTER_ART_ONLY') throw new Error(`Hero ${record.heroId}: invalid source contract`);
-            if (record.web.mimeType !== 'image/webp' || record.web.quality !== 90) throw new Error(`Hero ${record.heroId}: invalid WebP derivative contract`);
-            const diskPath = `public${record.web.path}`;
-            if (!fs.existsSync(diskPath)) throw new Error(`Hero ${record.heroId}: missing WebP ${diskPath}`);
-            const bytes = fs.readFileSync(diskPath);
-            if (bytes.subarray(0, 4).toString('ascii') !== 'RIFF' || bytes.subarray(8, 12).toString('ascii') !== 'WEBP') throw new Error(`Hero ${record.heroId}: invalid WebP header`);
-          }
-          console.log('PASS: frozen Hero consumers 267/267 and clean portrait sample manifest 5/5');
-          NODE
-
-          test "$(find public/images/heroes/portrait-samples -maxdepth 1 -type f -name '*.webp' | wc -l | tr -d ' ')" -eq 5
-          test "$(find public/images/heroes/portrait-samples -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" -eq 0
-
-          grep -q 'SAMPLE_HERO_CARD_PATHS' src/routes/heroes.tsx
-          grep -q '/images/heroes/portrait-samples/6.webp' src/routes/heroes.tsx
-          grep -q 'SAMPLE_SUPER_BUFF_HERO_IDS = new Set<number>(\[6, 12\])' src/routes/heroes.tsx
-          grep -q 'scale-\[0.8\]' src/routes/heroes.tsx
-          grep -q 'right-1 top-1' src/routes/heroes.tsx
-          grep -q 'border-amber-400/90' src/routes/heroes.tsx
-          grep -q 'border-violet-400/90' src/routes/heroes.tsx
-          grep -q 'border-sky-400/90' src/routes/heroes.tsx
-          grep -q 'bg-black/60' src/routes/heroes.tsx
-          grep -q 'aspect-square' src/routes/heroes.tsx
-          grep -q '\.reverse()' src/routes/heroes.tsx
-          ! grep -q 'redpanda7301.github.io/langrisser/img/card' src/routes/heroes.tsx
-          ! grep -q 'title="SP 해금 영웅"' src/routes/heroes.tsx
-          ! grep -q '레온초절SP' src/routes/heroes.tsx
-          ! grep -q '엘윈초절SP' src/routes/heroes.tsx
-          echo 'PASS: Hero card uses local clean WebP derivatives with presentation-only overlays'
-
-      - name: Reuse proven GitHub Pages static config
-        run: |
-          set -euo pipefail
-          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
-          git show FETCH_HEAD:vite.config.ts > vite.config.ts
-          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
-          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
-          grep -q 'nitro: false' vite.config.ts
-          grep -q 'outputPath: `/heroes/${heroId}/index.html`' vite.config.ts
-
-      - name: Build GitHub Pages static site
-        run: bun run build
-
-      - name: Hosted artifact gate
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f dist/client/heroes/index.html
-          HERO_DETAIL_COUNT="$(find dist/client/heroes -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/heroes/[0-9]+/index\.html$' | wc -l | tr -d ' ')"
-          test "$HERO_DETAIL_COUNT" -eq 267
-
-          for id in 5 6 8 12 15; do
-            test -f "dist/client/images/heroes/portrait-samples/${id}.webp"
-          done
-          test "$(find dist/client/images/heroes/portrait-samples -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" -eq 0
-
-          node <<'NODE'
-          const fs = require('fs');
-          const html = fs.readFileSync('dist/client/heroes/index.html', 'utf8');
-          const required = [
-            '/langrisser-future-guide/',
-            '/langrisser-future-guide/heroes/99287',
-            '/langrisser-future-guide/images/heroes/portrait-samples/5.webp',
-            '/langrisser-future-guide/images/heroes/portrait-samples/6.webp',
-            '/langrisser-future-guide/images/heroes/portrait-samples/8.webp',
-            '/langrisser-future-guide/images/heroes/portrait-samples/12.webp',
-            '/langrisser-future-guide/images/heroes/portrait-samples/15.webp',
-            '마검의 화신',
-            '검색 결과',
-            'aspect-square',
-            'border-amber-400/90',
-            'scale-[0.8]',
-            '초절'
-          ];
-          for (const token of required) {
-            if (!html.includes(token)) throw new Error(`Hero static output missing: ${token}`);
-          }
-          const forbidden = [
-            'redpanda7301.github.io/langrisser/img/card',
-            '레온초절SP',
-            '엘윈초절SP',
-            'title="SP 해금 영웅"'
-          ];
-          for (const token of forbidden) {
-            if (html.includes(token)) throw new Error(`Hero static output contains forbidden token: ${token}`);
-          }
-          console.log('PASS: static Hero page contains clean local WebP assets and simplified overlays');
-          NODE
-
-          printf '%s\n' "$GITHUB_SHA" > dist/client/qa-main-source.txt
-          printf '%s\n' 'hero-clean-png-webp-overlay-cleanup' > dist/client/qa-surface.txt
-          echo "PASS: Hero static routes ${HERO_DETAIL_COUNT}, WebP samples 5/5"
-
-      - name: Publish to gh-pages
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          cd dist/client
-          touch .nojekyll
-          git init
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b gh-pages
-          git add -A
-          git commit -m "Deploy clean Hero WebP portrait samples ${GITHUB_SHA}"
-          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
+          echo "This legacy workflow no longer publishes gh-pages."
+          echo "Use .github/workflows/authoritative-pages-deploy.yml on main for production publication and hosted verification."
