@@ -15,7 +15,7 @@
       {"path":"data/checkpoints/soldier-unique-skill-translation-batch8.v1.json","recordCount":35},
       {"path":"data/checkpoints/soldier-unique-skill-translation-batch9.v1.json","recordCount":40}
     ],
-    "reviewOverrides": {"path":"data/presentation/soldier-unique-skill-review-overrides.v1.json","recordCount":16}
+    "reviewOverrides": {"path":"data/presentation/soldier-unique-skill-review-overrides.v1.json","recordCount":21}
   },
   "implementation": {
     "generator": "scripts/build-soldier-unique-skill-kr-presentation.mjs",
@@ -30,13 +30,13 @@
     "sourceTypeDerivedFromCanonicalIdentity": true,
     "idArithmeticInference": false
   },
-  "verifiedAfterReviewBatch4": {
+  "expectedAfterReviewBatch5": {
     "canonicalTargetCount": 185,
     "authoringRecordCount": 185,
-    "reviewOverrideCount": 16,
+    "reviewOverrideCount": 21,
     "uniqueSoldierIdCount": 185,
-    "passCount": 125,
-    "reviewCount": 60,
+    "passCount": 130,
+    "reviewCount": 55,
     "missingCount": 0,
     "extraCount": 0,
     "publicProjectionCount": 185
@@ -48,25 +48,21 @@
     "descriptionCoverage": "PASS",
     "statusReviewTermContract": "PASS",
     "nameCnCanonicalParity": "PASS",
-    "progressParity": "PASS",
-    "productionBuild": "PASS",
-    "frontendConsumerBuild": "PASS",
+    "progressParity": "RECHECK_PENDING",
+    "productionBuild": "RECHECK_PENDING",
+    "frontendConsumerBuild": "RECHECK_PENDING",
     "hostedQa": "PENDING"
   },
   "verification": {
-    "workflow": "Equipment Korean Name Frontend QA",
-    "runId": 33227415992,
-    "jobId": 99033722534,
-    "conclusion": "SUCCESS",
-    "productionBuild": "SUCCESS",
-    "observedSummary": "records=185 pass=125 review=60 overrides=16 missing=0 extra=0 public=185"
+    "status": "PENDING",
+    "expectedSummary": "records=185 pass=130 review=55 overrides=21 missing=0 extra=0 public=185"
   },
   "reviewBoundary": {
     "translationCoverage": "185/185",
     "sourceReviewQueueCount": 76,
-    "resolvedByReviewOverrides": 16,
-    "reviewQueueCount": 60,
-    "resolvedSoldierIds": [250,326,333,334,336,341,512,513,514,515,602,635,637,811,814,815],
+    "resolvedByReviewOverrides": 21,
+    "reviewQueueCount": 55,
+    "resolvedSoldierIds": [249,250,326,333,334,336,341,512,513,514,515,602,635,637,647,811,814,815,1034,1105,1113],
     "reviewItemsAreMissingTranslations": false,
     "reviewResolutionRequired": true,
     "reviewResolutionBlocksConsolidation": false
@@ -78,9 +74,8 @@
     "progressIndexUpdated": true,
     "canonicalSemanticStageReopened": false,
     "frontendConsumerIntegrated": true,
-    "frontendCheckpoint": "data/checkpoints/soldier-unique-skill-frontend-localization.v1.json",
     "hostedQaRequired": true,
     "hostedQaComplete": false
   },
-  "nextStep": "Continue evidence-based review resolution from the remaining 60 items. Hosted QA remains pending until an actually deployed static environment contains the current projection."
+  "nextStep": "Verify review batch 5 at 185 records / 130 PASS / 55 REVIEW / 21 overrides, then continue evidence-based resolution from the remaining 55 items."
 }
