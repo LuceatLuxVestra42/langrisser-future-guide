@@ -14,7 +14,6 @@ on:
       - 'data/localization/equipment-name-kr/**'
       - 'scripts/build-equipment-name-kr-presentation.mjs'
       - 'scripts/validate-equipment-display-collection.mjs'
-      - 'scripts/validate-equipment-public-admission-correction.mjs'
       - 'src/lib/equipment-display-collection.ts'
       - 'src/lib/equipment-page.localized.server.ts'
       - 'src/lib/equipment-page.functions.ts'
@@ -32,7 +31,6 @@ on:
       - 'data/localization/equipment-name-kr/**'
       - 'scripts/build-equipment-name-kr-presentation.mjs'
       - 'scripts/validate-equipment-display-collection.mjs'
-      - 'scripts/validate-equipment-public-admission-correction.mjs'
       - 'src/lib/equipment-display-collection.ts'
       - 'src/lib/equipment-page.localized.server.ts'
       - 'src/lib/equipment-page.functions.ts'
@@ -60,10 +58,7 @@ jobs:
       - name: Build Korean equipment-name presentation projection
         run: node scripts/build-equipment-name-kr-presentation.mjs
 
-      - name: Revalidate public admission predecessor
-        run: bun scripts/validate-equipment-public-admission-correction.mjs
-
-      - name: Validate explicit display collection membership
+      - name: Validate explicit display collection and public admission
         run: bun scripts/validate-equipment-display-collection.mjs
 
       - name: Production build
