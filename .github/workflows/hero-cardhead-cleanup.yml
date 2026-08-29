@@ -1,0 +1,49 @@
+name: Hero CardHead Cleanup
+
+on:
+  push:
+    branches:
+      - work/hero-cardhead-assets-20260830
+    paths:
+      - .github/workflows/hero-cardhead-cleanup.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+      - name: Remove temporary investigation tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm \
+            .github/workflows/hero-cardhead-cleanup.yml \
+            .github/workflows/hero-cardhead-asset-discovery.yml \
+            .github/workflows/hero-cardhead-materialize.yml \
+            .github/workflows/hero-cardhead-materialize-v2.yml \
+            .github/workflows/hero-cardhead-materialize-v3.yml \
+            .github/workflows/hero-cardhead-sprite-diagnostic.yml \
+            .github/workflows/hero-cardhead-sprite-diagnostic-v2.yml \
+            .github/workflows/hero-card-bundle-ownership.yml \
+            .github/workflows/hero-cardhead-materialize-final.yml \
+            .github/workflows/hero-cardhead-frontend.yml \
+            scripts/discover-hero-cardhead-assets.py \
+            scripts/materialize-hero-cardhead-assets.py \
+            scripts/materialize-hero-cardhead-assets-v2.py \
+            scripts/materialize-hero-cardhead-assets-v3.py \
+            scripts/diagnose-hero-cardhead-sprites.py \
+            scripts/discover-all-hero-card-bundles.py \
+            scripts/apply-hero-cardhead-frontend.py \
+            data/validation/hero-cardhead-asset-discovery.v1.json
+          if test -d public/images/heroes/card-head-diagnostic; then
+            git rm -r public/images/heroes/card-head-diagnostic
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Clean Hero CardHead investigation tooling"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
