@@ -42,12 +42,47 @@ def normalized_container_path(value: str) -> str:
     return value.replace("\\", "/").strip().lower()
 
 
-def actual_serialized_file_name(obj) -> str | None:
+def actual_serialized_file_name(obj) -> tuple[str | None, str | None]:
+    """Resolve the owning serialized-file/CAB name without inventing provenance.
+
+    UnityPy normally exposes ObjectReader.assets_file.name, but some real bundle
+    loads expose an empty name while retaining the exact child key in
+    assets_file.parent.files. The parent mapping is authoritative because
+    UnityPy's bundle reader stores each parsed child under its bundle node path.
+    """
     assets_file = getattr(obj, "assets_file", None)
-    name = getattr(assets_file, "name", None)
-    if not isinstance(name, str) or not name:
-        return None
-    return Path(name.replace("\\", "/")).name
+    if assets_file is None:
+        return None, None
+
+    candidates: list[tuple[str, str]] = []
+
+    def add_candidate(source: str, value) -> None:
+        if not isinstance(value, str) or not value:
+            return
+        name = Path(value.replace("\\", "/")).name
+        if name:
+            candidates.append((source, name))
+
+    add_candidate("assets_file.name", getattr(assets_file, "name", None))
+
+    parent = getattr(assets_file, "parent", None)
+    parent_files = getattr(parent, "files", None)
+    if hasattr(parent_files, "items"):
+        for key, value in parent_files.items():
+            if value is assets_file:
+                add_candidate("assets_file.parent.files_identity_key", key)
+
+    unique: dict[str, tuple[str, str]] = {}
+    for source, name in candidates:
+        unique.setdefault(name.lower(), (source, name))
+
+    if not unique:
+        return None, None
+    if len(unique) != 1:
+        detail = ", ".join(f"{source}={name}" for source, name in candidates)
+        fail(f"conflicting owning serialized-file/CAB names from UnityPy: {detail}")
+    source, name = next(iter(unique.values()))
+    return name, source
 
 
 def parse_args() -> argparse.Namespace:
@@ -231,9 +266,12 @@ def main() -> int:
                         f"exact runtime path container match count must be 1, got {len(matches)}: {runtime_path}"
                     )
                 actual_container_path, obj = matches[0]
-                actual_cab = actual_serialized_file_name(obj)
+                actual_cab, cab_resolution = actual_serialized_file_name(obj)
                 if actual_cab is None:
-                    fail("UnityPy did not expose the owning serialized-file/CAB name")
+                    fail(
+                        "UnityPy did not expose the owning serialized-file/CAB name via "
+                        "assets_file.name or assets_file.parent.files identity"
+                    )
                 if actual_cab.lower() != source["embeddedCab"].lower():
                     fail(
                         f"embedded CAB mismatch: expected {source['embeddedCab']}, got {actual_cab}"
@@ -256,6 +294,8 @@ def main() -> int:
                     "kind": kind,
                     "runtimePath": request["runtimePath"],
                     "actualContainerPath": actual_container_path,
+                    "actualEmbeddedCab": actual_cab,
+                    "cabResolution": cab_resolution,
                     "source": source,
                     "unityObject": metadata,
                     "note": "Prefab primary artifacts are exact raw serialized GameObject bytes; dependency export is intentionally deferred to later presentation/web conversion stages unless explicitly required.",
