@@ -27,6 +27,19 @@ const stepBlock = (workflow, name) => {
 if (contract.status === 'DESIGN_FROZEN') pass('CONTRACT_FROZEN');
 else fail('CONTRACT_FROZEN', contract.status);
 
+const missingRuntimePrerequisites = (contract.runtimePrerequisites?.requiredPaths ?? [])
+  .filter(filePath => !fs.existsSync(filePath));
+if ((contract.runtimePrerequisites?.requiredPaths ?? []).length > 0 && missingRuntimePrerequisites.length === 0) {
+  pass('ADMITTED_V2_RUNTIME_PREREQUISITES_PRESENT', {
+    requiredPathCount: contract.runtimePrerequisites.requiredPaths.length
+  });
+} else {
+  fail('ADMITTED_V2_RUNTIME_PREREQUISITES_PRESENT', {
+    requiredPaths: contract.runtimePrerequisites?.requiredPaths ?? [],
+    missingRuntimePrerequisites
+  });
+}
+
 if (contract.policy?.hookMode === 'CHECK_ONLY' && contract.policy?.automaticApplyEnabled === false) {
   pass('CHECK_ONLY_POLICY');
 } else {
