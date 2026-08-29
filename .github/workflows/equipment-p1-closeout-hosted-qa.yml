@@ -3,6 +3,7 @@ name: Equipment P1 Hosted Closeout QA
 on:
   push:
     branches:
+      - main
       - qa/equipment-p1-closeout-20260829
     paths:
       - '.github/workflows/equipment-p1-closeout-hosted-qa.yml'
@@ -104,7 +105,7 @@ jobs:
               page.waitForURL((url) => url.pathname === heroPath, { timeout: 30_000 }),
               heroLink.click(),
             ]);
-            assert(page.url().includes(heroPath), `Hero click did not reach ${heroPath}: ${page.url()}`);
+            assert(new URL(page.url()).pathname === heroPath, `Hero click did not reach ${heroPath}: ${page.url()}`);
 
             const heroHeading = page.locator('h1').first();
             await heroHeading.waitFor({ state: 'visible', timeout: 15_000 });
