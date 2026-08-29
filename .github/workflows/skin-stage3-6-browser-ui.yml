@@ -26,6 +26,7 @@ concurrency:
   group: skin-stage3-6-browser-ui
   cancel-in-progress: false
 
+# QA-only trigger refresh for the current authoritative Hosted checkpoint.
 # Browser/UI consumes the frozen Hosted checkpoint and the current authoritative Pages deployment sentinel; it never publishes or mutates the hosted site.
 jobs:
   browser-ui-qa:
