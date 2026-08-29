@@ -1,0 +1,131 @@
+name: Skin Stage 3-6 Browser UI QA
+
+on:
+  push:
+    branches:
+      - work/skin-stage3-3-bulk-plan
+    paths:
+      - '.github/workflows/skin-stage3-6-browser-ui.yml'
+      - 'scripts/validate-skin-stage3-6-browser-ui.mjs'
+      - 'data/validation/skin-stage3-6-hosted-summary.v1.json'
+      - 'data/checkpoints/skin-stage3-6-hosted.v1.json'
+      - 'data/generated/skin-stage2-3-bidirectional-relation.v1.json'
+      - 'data/generated/skin-stage3-5-static-web-asset-map.v1.json'
+      - 'data/validation/skin-stage3-5-static-web-asset-map.v1.json'
+      - 'public/images/skins/**'
+      - 'src/lib/skin-detail.server.ts'
+      - 'src/lib/hero-detail-stage5.server.ts'
+      - 'src/routes/heroes_.$heroId.tsx'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: skin-stage3-6-browser-ui
+  cancel-in-progress: false
+
+jobs:
+  browser-ui-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout current Skin QA branch
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Validate Hosted predecessor and exact deployment sentinel
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const summary = JSON.parse(fs.readFileSync('data/validation/skin-stage3-6-hosted-summary.v1.json','utf8'));
+          const checkpoint = JSON.parse(fs.readFileSync('data/checkpoints/skin-stage3-6-hosted.v1.json','utf8'));
+          if (summary.status !== 'PASS_SKIN_STAGE3_6_HOSTED_QA' || summary.finalReady !== true) throw new Error('Hosted predecessor is not final PASS');
+          if (summary.gates.preflight !== 'PASS' || summary.gates.build !== 'PASS' || summary.gates.deploymentHosted !== 'PASS' || summary.gates.browserUi !== 'PENDING') throw new Error('Hosted gate boundary changed');
+          if (!/^[0-9a-f]{40}$/.test(summary.sourceSha)) throw new Error('Hosted source SHA is invalid');
+          if (checkpoint.status !== summary.status || checkpoint.sourceSha !== summary.sourceSha || checkpoint.browserUi !== 'PENDING') throw new Error('Hosted checkpoint mismatch');
+          console.log(`Hosted predecessor pinned to ${summary.sourceSha}`);
+          NODE
+
+      - name: Install Playwright Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run hosted Skin Browser UI QA
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: |
+          set -o pipefail
+          : > skin-stage3-6-browser-ui.log
+          for attempt in 1 2 3; do
+            attempt_log="skin-stage3-6-browser-ui-attempt-${attempt}.log"
+            echo "=== Skin Browser/UI attempt ${attempt}/3 ===" | tee -a skin-stage3-6-browser-ui.log
+            if node scripts/validate-skin-stage3-6-browser-ui.mjs 2>&1 | tee "$attempt_log"; then
+              cat "$attempt_log" >> skin-stage3-6-browser-ui.log
+              exit 0
+            fi
+            cat "$attempt_log" >> skin-stage3-6-browser-ui.log
+            if ! grep -Eq 'HTTP 50[234]|"status":50[234]' "$attempt_log"; then
+              echo "Browser/UI failure is not a retryable hosted 502/503/504 response." | tee -a skin-stage3-6-browser-ui.log
+              exit 1
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Browser/UI transient hosted failure persisted for all 3 attempts." | tee -a skin-stage3-6-browser-ui.log
+              exit 1
+            fi
+            echo "Retrying complete Skin Browser/UI scenario after transient hosted failure." | tee -a skin-stage3-6-browser-ui.log
+            sleep 5
+          done
+          exit 1
+
+      - name: Upload Browser UI failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-stage3-6-browser-ui-failure-${{ github.run_id }}
+          path: skin-stage3-6-browser-ui.log
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Require final Skin Browser UI PASS
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const evidence = JSON.parse(fs.readFileSync('data/evidence/skin-stage3-6-browser-ui.v1.json','utf8'));
+          const summary = JSON.parse(fs.readFileSync('data/validation/skin-stage3-6-browser-ui-summary.v1.json','utf8'));
+          const checkpoint = JSON.parse(fs.readFileSync('data/checkpoints/skin-stage3-6-final.v1.json','utf8'));
+          if (evidence.status !== 'PASS_SKIN_STAGE3_6_BROWSER_UI' || evidence.finalReady !== true) throw new Error('Browser/UI evidence is not final PASS');
+          if (evidence.checks.pageErrors !== 0 || evidence.checks.consoleErrors !== 0 || evidence.checks.hostedHttpFailuresObservedByBrowser !== 0) throw new Error('Browser diagnostics are not clean');
+          if (summary.status !== 'PASS_SKIN_STAGE3_6_FRONTEND_QA' || summary.completion !== 'COMPLETE' || summary.finalReady !== true) throw new Error('Frontend QA summary mismatch');
+          if (summary.gates.preflight !== 'PASS' || summary.gates.build !== 'PASS' || summary.gates.deploymentHosted !== 'PASS' || summary.gates.browserUi !== 'PASS_PLAYWRIGHT_HOSTED_BROWSER_UI') throw new Error('Frontend QA gate mismatch');
+          if (checkpoint.status !== summary.status || checkpoint.completion !== 'COMPLETE' || checkpoint.browserUi !== 'PASS_SKIN_STAGE3_6_BROWSER_UI' || checkpoint.semanticStageReopened !== false || checkpoint.projectDoctorSkinAssetsPromoted !== false) throw new Error('Final Skin Stage 3-6 checkpoint mismatch');
+          if (checkpoint.blocker.length !== 0) throw new Error('Final Skin Stage 3-6 checkpoint still has blockers');
+          console.log('PASS: Skin Stage 3-6 Preflight → Build → Hosted → Browser/UI gates complete');
+          NODE
+
+      - name: Persist Browser UI evidence and final Stage 3-6 checkpoint
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/evidence/skin-stage3-6-browser-ui.v1.json \
+                  data/validation/skin-stage3-6-browser-ui-summary.v1.json \
+                  data/checkpoints/skin-stage3-6-final.v1.json
+          if git diff --cached --quiet; then
+            echo 'No Browser/UI evidence changes to commit.'
+            exit 0
+          fi
+          git commit -m "Freeze Skin Stage 3-6 Browser UI QA [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
