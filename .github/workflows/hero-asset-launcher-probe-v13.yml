@@ -1,0 +1,30 @@
+name: Hero Asset Launcher Probe v13
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/probe-hero-launcher-v13.ps1'
+      - '.github/workflows/hero-asset-launcher-probe-v13.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  protocol-context-map:
+    if: github.event.pull_request.head.ref == 'work/hero-asset-launcher-probe'
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Map PGLauncher protocol string contexts without execution
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/probe-hero-launcher-v13.ps1
+      - name: Upload text reports only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-asset-launcher-probe-v13-report
+          path: ${{ runner.temp }}/langrisser-launcher-probe-v13/report
+          if-no-files-found: warn
+          retention-days: 3
