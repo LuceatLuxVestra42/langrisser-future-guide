@@ -9,6 +9,7 @@ const checkOnly = process.argv.includes('--check');
 
 const canonicalPath = 'data/generated/soldier-detail-stage5-3.v1.json';
 const progressPath = 'data/checkpoints/soldier-unique-skill-translation-progress.v1.json';
+const reviewOverridePath = 'data/presentation/soldier-unique-skill-review-overrides.v1.json';
 const outputPath = 'data/generated/soldier-unique-skill-kr-final.v1.json';
 const publicOutputPath = 'public/data/soldier-unique-skill-kr.v1.json';
 const validationPath = 'data/validation/soldier-unique-skill-kr-final.v1.json';
@@ -40,9 +41,12 @@ function stableJson(value) {
 
 const canonical = readJson(canonicalPath);
 const progress = readJson(progressPath);
+const reviewOverrides = readJson(reviewOverridePath);
 const shards = shardSpecs.map((spec) => ({ ...spec, data: readJson(spec.path) }));
 
 assert(Array.isArray(canonical.records), 'canonical records must be an array');
+assert(reviewOverrides?.schemaId === 'soldier-unique-skill-review-overrides/v1', 'review override schema mismatch');
+assert(Array.isArray(reviewOverrides.records), 'review override records must be an array');
 
 const canonicalTargets = canonical.records.filter((record) => {
   if (record?.identity?.isSp === true) return typeof record?.sp?.finalDescription === 'string' && record.sp.finalDescription.length > 0;
@@ -52,6 +56,18 @@ const canonicalTargets = canonical.records.filter((record) => {
 const canonicalById = new Map(canonicalTargets.map((record) => [record.soldierId, record]));
 assert(canonicalTargets.length === 185, `canonical target count must be 185, got ${canonicalTargets.length}`);
 assert(canonicalById.size === canonicalTargets.length, 'canonical target soldierIds must be unique');
+
+const overrideById = new Map();
+for (const override of reviewOverrides.records) {
+  assert(Number.isInteger(override?.soldierId), 'review override soldierId must be an integer');
+  assert(!overrideById.has(override.soldierId), `duplicate review override soldierId ${override.soldierId}`);
+  assert(canonicalById.has(override.soldierId), `review override soldierId ${override.soldierId} is outside canonical targets`);
+  assert(override.translationStatus === 'PASS' || String(override.translationStatus).startsWith('REVIEW_'), `review override ${override.soldierId}: invalid status`);
+  assert(Array.isArray(override.reviewTerms), `review override ${override.soldierId}: reviewTerms must be an array`);
+  assert(typeof override.descriptionKr === 'string' && override.descriptionKr.trim().length > 0, `review override ${override.soldierId}: descriptionKr required`);
+  overrideById.set(override.soldierId, override);
+}
+assert(overrideById.size === 5, `expected 5 review overrides, got ${overrideById.size}`);
 
 const reviewReasonById = new Map();
 const authoringRecords = [];
@@ -72,6 +88,7 @@ for (const shard of shards) {
 assert(authoringRecords.length === 185, `authoring record count must be 185, got ${authoringRecords.length}`);
 
 const seen = new Set();
+const appliedOverrideIds = new Set();
 const normalizedRecords = [];
 for (const record of authoringRecords) {
   const id = record?.soldierId;
@@ -82,10 +99,22 @@ for (const record of authoringRecords) {
   const source = canonicalById.get(id);
   assert(source, `translated soldierId ${id} is not in canonical target set`);
   assert(record.nameCn === source.identity.nameCn, `soldierId ${id}: nameCn mismatch (${record.nameCn} != ${source.identity.nameCn})`);
-  assert(typeof record.descriptionKr === 'string' && record.descriptionKr.trim().length > 0, `soldierId ${id}: empty descriptionKr`);
 
-  const status = record.translationStatus;
-  const reviewTerms = Array.isArray(record.reviewTerms) ? record.reviewTerms : [];
+  const override = overrideById.get(id);
+  if (override) appliedOverrideIds.add(id);
+  const effective = override
+    ? {
+        ...record,
+        translationStatus: override.translationStatus,
+        reviewTerms: override.reviewTerms,
+        descriptionKr: override.descriptionKr,
+      }
+    : record;
+
+  assert(typeof effective.descriptionKr === 'string' && effective.descriptionKr.trim().length > 0, `soldierId ${id}: empty descriptionKr`);
+
+  const status = effective.translationStatus;
+  const reviewTerms = Array.isArray(effective.reviewTerms) ? effective.reviewTerms : [];
   assert(status === 'PASS' || (typeof status === 'string' && status.startsWith('REVIEW_')), `soldierId ${id}: unsupported translationStatus ${status}`);
   if (status === 'PASS') assert(reviewTerms.length === 0, `soldierId ${id}: PASS must have empty reviewTerms`);
   else assert(reviewTerms.length > 0, `soldierId ${id}: REVIEW must have reviewTerms`);
@@ -97,10 +126,11 @@ for (const record of authoringRecords) {
     sourceType: source.identity.isSp === true ? 'sp' : 'normal-tier3',
     translationStatus: status,
     reviewTerms,
-    descriptionKr: record.descriptionKr,
+    descriptionKr: effective.descriptionKr,
   });
 }
 
+assert(appliedOverrideIds.size === overrideById.size, `not all review overrides were applied (${appliedOverrideIds.size}/${overrideById.size})`);
 normalizedRecords.sort((a, b) => a.soldierId - b.soldierId);
 
 const canonicalTargetIds = [...canonicalById.keys()].sort((a, b) => a - b);
@@ -113,8 +143,8 @@ assert(JSON.stringify(translatedIds) === JSON.stringify(canonicalTargetIds), 'tr
 
 const passCount = normalizedRecords.filter((record) => record.translationStatus === 'PASS').length;
 const reviewCount = normalizedRecords.length - passCount;
-assert(passCount === 109, `PASS count must be 109, got ${passCount}`);
-assert(reviewCount === 76, `REVIEW count must be 76, got ${reviewCount}`);
+assert(passCount === 114, `PASS count must be 114, got ${passCount}`);
+assert(reviewCount === 71, `REVIEW count must be 71, got ${reviewCount}`);
 
 assert(progress?.targetCount === 185, `progress targetCount must be 185, got ${progress?.targetCount}`);
 assert(progress?.progress?.translatedCount === 185, `progress translatedCount must be 185, got ${progress?.progress?.translatedCount}`);
@@ -142,6 +172,7 @@ const finalPresentation = {
     canonical: canonicalPath,
     progress: progressPath,
     authoringShards: shardSpecs.map(({ path: shardPath, expected, role }) => ({ path: shardPath, recordCount: expected, role })),
+    reviewOverrides: { path: reviewOverridePath, recordCount: overrideById.size },
   },
   counts: {
     target: 185,
@@ -158,6 +189,7 @@ const finalPresentation = {
     idArithmeticInference: false,
     sourceChineseDuplicatedInPresentation: false,
     reviewIsNonBlockingTranslationReview: true,
+    reviewOverridesEvidenceBacked: true,
   },
   records: normalizedRecords,
   reviewQueue,
@@ -202,6 +234,8 @@ const validation = {
     canonicalTargetCount: canonicalTargets.length,
     authoringShardCount: shardSpecs.length,
     authoringRecordCount: authoringRecords.length,
+    reviewOverridePath,
+    reviewOverrideCount: overrideById.size,
   },
   output: {
     path: outputPath,
@@ -223,6 +257,7 @@ const validation = {
     nameCnCanonicalParity: true,
     progressParity: true,
     canonicalChineseReadOnly: true,
+    reviewOverridesApplied: appliedOverrideIds.size === overrideById.size,
     publicProjectionCoverage185: Object.keys(publicProjection.bySoldierId).length === 185,
     publicProjectionRuntimeNameJoinDisabled: publicProjection.policy.runtimeNameJoin === false,
     publicProjectionCanonicalChineseFallbackDisabled: publicProjection.policy.canonicalChineseFallbackForTarget === false,
@@ -241,4 +276,4 @@ if (!checkOnly) {
 }
 
 console.log(`[soldier-skill-kr] ${checkOnly ? 'CHECK' : 'BUILD'} PASS_WITH_REVIEW`);
-console.log(`[soldier-skill-kr] records=${normalizedRecords.length} pass=${passCount} review=${reviewCount} missing=${missingIds.length} extra=${extraIds.length} public=${Object.keys(publicProjection.bySoldierId).length}`);
+console.log(`[soldier-skill-kr] records=${normalizedRecords.length} pass=${passCount} review=${reviewCount} overrides=${overrideById.size} missing=${missingIds.length} extra=${extraIds.length} public=${Object.keys(publicProjection.bySoldierId).length}`);
