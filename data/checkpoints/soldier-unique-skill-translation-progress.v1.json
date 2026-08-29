@@ -54,19 +54,21 @@
       "data/checkpoints/soldier-unique-skill-review-resolution-batch6.v1.json"
     ],
     "resolvedSoldierIds": [112,118,249,250,326,333,334,336,341,512,513,514,515,602,635,637,647,811,814,815,818,1006,1009,1015,1034,1104,1105,1113],
-    "status": "BATCH6_BUILD_PENDING"
+    "status": "PASS_WITH_REVIEW"
   },
   "buildVerification": {
-    "status": "PENDING",
-    "workflow": null,
-    "checkpointRunId": null,
-    "checkpointJobId": null,
+    "status": "PASS",
+    "workflow": "Equipment Korean Name Frontend QA",
+    "checkpointRunId": 33229241040,
+    "checkpointJobId": 99038918516,
+    "verifiedImplementationHeadSha": "58fbb2b2fda2eff0a8cfe81e15d1f4f4d96a72d2",
     "finalHeadRunId": null,
     "finalHeadJobId": null,
     "finalHeadSha": null,
-    "observed": null,
-    "productionBuild": "PENDING",
-    "frontendLocalizationBoundary": "PENDING"
+    "observed": "records=185 pass=137 review=48 overrides=28 missing=0 extra=0 public=185",
+    "productionBuild": "SUCCESS",
+    "frontendLocalizationBoundary": "PASS",
+    "note": "The metadata-only final closeout HEAD is verified read-only after all writes. Final-head identifiers are intentionally not persisted, because persisting them would create another HEAD and invalidate the recorded final head."
   },
   "completion": {
     "translationTargetComplete": true,
@@ -79,7 +81,7 @@
     "validationPath": "data/validation/soldier-unique-skill-kr-final.v1.json",
     "frontendConsumerIntegrated": true,
     "frontendCheckpoint": "data/checkpoints/soldier-unique-skill-frontend-localization.v1.json",
-    "frontendBuildGateStatus": "PENDING_BATCH6_VERIFY",
+    "frontendBuildGateStatus": "PASS",
     "frontendHostedQaStatus": "PENDING",
     "reviewResolutionRequired": true
   }
