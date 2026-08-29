@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "schemaId": "hero-provisional-localization-stage2-validation/v1",
+  "stage": "hero-provisional-localization-stage2",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "summary": {
+    "canonicalHeroCount": 267,
+    "provisionalHeroCount": 5,
+    "officialNameUnresolvedCount": 5,
+    "identityParityMismatchCount": 0,
+    "duplicateHeroIdCount": 0,
+    "serverProjectionMismatchCount": 0,
+    "hardErrorCount": 0
+  },
+  "targets": [
+    {
+      "heroId": 99273,
+      "nameCn": "初真泽瑞达",
+      "officialNameKr": null,
+      "displayNameKr": "태초의 젤다",
+      "nameKrStatus": "provisional-display",
+      "sourceAuthority": "CN"
+    },
+    {
+      "heroId": 99281,
+      "nameCn": "骁浪驭虹使",
+      "officialNameKr": null,
+      "displayNameKr": "효랑어홍사",
+      "nameKrStatus": "provisional-display",
+      "sourceAuthority": "CN"
+    },
+    {
+      "heroId": 99282,
+      "nameCn": "狺",
+      "officialNameKr": null,
+      "displayNameKr": "은(밴시)",
+      "nameKrStatus": "provisional-display",
+      "sourceAuthority": "CN"
+    },
+    {
+      "heroId": 99283,
+      "nameCn": "阿云",
+      "officialNameKr": null,
+      "displayNameKr": "아윈(쿠모)",
+      "nameKrStatus": "provisional-display",
+      "sourceAuthority": "CN"
+    },
+    {
+      "heroId": 99287,
+      "nameCn": "魔骸剑使",
+      "officialNameKr": null,
+      "displayNameKr": "마검의 화신",
+      "nameKrStatus": "provisional-display",
+      "sourceAuthority": "CN"
+    }
+  ],
+  "invariants": {
+    "heroPopulationChanged": false,
+    "heroIdsChanged": false,
+    "chineseNamesChanged": false,
+    "englishNamesChanged": false,
+    "combatDataChanged": false,
+    "relationsChanged": false,
+    "rawConfigDataRead": false,
+    "stage6Regenerated": false,
+    "heroListStage1Regenerated": false
+  },
+  "review": [
+    "Route components still consume the historical identity.nameKr fallback; migration to localization.displayName is Stage 3 scope.",
+    "Frozen Localization Audit contracts remain unchanged in Stage 2 and require a successor in Stage 3."
+  ],
+  "blockers": [],
+  "nextStartPoint": "Stage 3 route consumer migration and Localization Audit successor"
+}
