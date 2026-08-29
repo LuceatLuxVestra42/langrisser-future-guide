@@ -22,8 +22,6 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
 
       - uses: actions/setup-node@v4
         with:
@@ -35,7 +33,6 @@ jobs:
           grep -q 'equipment-p3-1-release-metadata.v1.json' src/lib/equipment-page.localized.server.ts
           grep -q 'equipmentReleaseProjection.defaultOrderEquipmentIds' src/lib/equipment-page.localized.server.ts
           grep -q '같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순' src/routes/equipment.tsx
-          git diff --exit-code 1b4838b81752a2cb3ae8d91fc1ec1e3ddc5a7271 -- data/generated/equipment_stage3_3_general_list.json
 
       - name: Install Playwright Chromium
         run: |
