@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-status-source-stage6-5-closeout-requests/v1",
+  "stage": "PROJECT-STATUS-STAGE6-5",
+  "checkpoint": "PROJECT_DOCTOR_STATUS_SOURCE_EXPLICIT_CLOSEOUT_REQUEST_TO_DECLARATION",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Render Stage 6-4 producer declarations only from retained, explicit Hero/Soldier closeout request objects. The request is the authority decision; Stage 6-5 performs deterministic projection only and never selects a candidate from repository chronology or filename patterns.",
+  "stage6_4Contract": "data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json",
+  "activeRegistry": "data/generated/project-doctor-active-source-registry.v1.json",
+  "rendererScript": "scripts/render-project-doctor-status-source-closeout-request.mjs",
+  "selfTestScript": "scripts/validate-project-doctor-status-source-stage6-5-closeout-requests.mjs",
+  "policy": {
+    "requestState": "APPROVED_FOR_DECLARATION",
+    "requestMustBeRetainedAndCommitted": true,
+    "requestMustBeOwnedByRegisteredPipeline": true,
+    "pipelineMustBeExplicit": true,
+    "domainMustBeExplicit": true,
+    "producerIdMustBeExplicit": true,
+    "requestedByWorkflowMustBeExplicit": true,
+    "predecessorIdMustBeExplicit": true,
+    "entryIdMustBeExplicit": true,
+    "sourcePathMustBeExplicit": true,
+    "declarationPathMustBeExplicit": true,
+    "declarationNoteMustBeExplicit": true,
+    "predecessorMustEqualCurrentSelectedId": true,
+    "candidateSourceMustBeCommittedAndClean": true,
+    "requestFileMustBeCommittedAndClean": true,
+    "declarationProjectionMustBeDeterministic": true,
+    "declarationAuthorityDecision": "EXPLICIT_PRODUCER_DECLARATION",
+    "explicitWriteFlagRequired": true,
+    "workBranchMayRenderAndCommitDeclaration": true,
+    "pullRequestAndMainRemainCheckOnly": true,
+    "stage6_4MustRevalidateRenderedDeclaration": true,
+    "stage6_3MustRemainOnlyApplyPath": true,
+    "futureSuccessorRequiresExplicitRequestChange": true,
+    "realSuccessorPromotionInThisStage": false,
+    "currentRequestsAreIdempotentBaselineProof": true,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "canonicalJoinRecomputation": false,
+    "filenameAuthorityInference": false,
+    "stageNumberAuthorityInference": false,
+    "chronologyAuthorityInference": false
+  },
+  "pipelines": [
+    {
+      "pipelineId": "hero",
+      "domain": "hero",
+      "producerId": "hero-final",
+      "completionWorkflow": ".github/workflows/hero-stage6-4-site-consumer.yml",
+      "requestPath": "data/contracts/project-doctor-status-source-stage6-5-hero-closeout-request.v1.json",
+      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json"
+    },
+    {
+      "pipelineId": "soldier",
+      "domain": "soldier",
+      "producerId": "soldier-final",
+      "completionWorkflow": ".github/workflows/soldier-stage6-7-site-admission.yml",
+      "requestPath": "data/contracts/project-doctor-status-source-stage6-5-soldier-closeout-request.v1.json",
+      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json"
+    }
+  ],
+  "runtimeProof": {
+    "baselineRequestsProjectByteEquivalentDeclarations": true,
+    "stalePredecessorMustBlockBeforeDeclarationWrite": true,
+    "unapprovedRequestMustBlock": true,
+    "uncommittedRequestMustBlock": true,
+    "uncommittedCandidateMustBlock": true,
+    "crossPipelineBindingMustBlock": true,
+    "staleDeclarationMustFailCheckMode": true,
+    "writeModeMayOnlyWriteBoundDeclarationPath": true,
+    "stage6_4ResolverMustRemainDownstream": true,
+    "currentSelectedAuthorityMustRemainUnchanged": true
+  },
+  "boundaries": {
+    "productionMutation": false,
+    "canonicalMutation": false,
+    "frontendMutation": false,
+    "newSuccessorRequest": false,
+    "directMainPush": false
+  },
+  "nextStep": {
+    "stage": "PROJECT-STATUS-STAGE6-6",
+    "goal": "Use the explicit closeout-request path for a real reviewed successor only when a domain produces one, then consider extending the same contract to additional owning pipelines without inferring authority."
+  }
+}
