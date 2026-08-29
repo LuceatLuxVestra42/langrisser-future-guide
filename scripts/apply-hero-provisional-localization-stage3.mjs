@@ -66,4 +66,11 @@ changed += Number(replaceOrVerify(
   '    "validate:hero-provisional-localization-stage2": "node scripts/validate-hero-provisional-localization-stage2.mjs --check",\n    "audit:localization:stage7": "node scripts/audit-localization-stage7.mjs",\n    "audit:localization:stage7:check": "node scripts/audit-localization-stage7.mjs --check",\n    "validate:hero-provisional-localization-stage3": "node scripts/audit-localization-stage7.mjs --check",',
 ));
 
+const stage7Audit = 'scripts/audit-localization-stage7.mjs';
+changed += Number(replaceOrVerify(
+  stage7Audit,
+  '  const noRouteServerBypass =\n    !listRoute.includes(\'.server"\') &&\n    !listRoute.includes(".server\'") &&\n    !detailRoute.includes(\'.server"\') &&\n    !detailRoute.includes(".server\'");',
+  '  const routeRuntimeText = `${listRoute}\\n${detailRoute}`.replace(/import\\s+type[\\s\\S]*?;/gu, "");\n  const noRouteServerBypass =\n    !routeRuntimeText.includes(\'.server"\') &&\n    !routeRuntimeText.includes(".server\'");',
+));
+
 console.log(`Hero provisional localization Stage 3 patch: ${changed === 0 ? 'already applied' : `applied ${changed} replacements`}`);
