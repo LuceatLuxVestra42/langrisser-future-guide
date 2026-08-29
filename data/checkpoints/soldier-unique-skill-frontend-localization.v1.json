@@ -3,7 +3,7 @@
   "schemaId": "soldier-unique-skill-frontend-localization/v1",
   "date": "2026-08-29",
   "stage": "FRONTEND_CONSUMER_INTEGRATION",
-  "status": "BUILD_RECHECK_PENDING_HOSTED_PENDING",
+  "status": "BUILD_PASS_HOSTED_PENDING",
   "scope": {
     "target": "normal Tier3 and SP Soldier unique-skill final descriptions",
     "targetCount": 185,
@@ -36,8 +36,13 @@
     "overridePath": "data/presentation/soldier-unique-skill-review-overrides.v1.json"
   },
   "buildGate": {
-    "status": "PENDING_RECHECK_AFTER_REVIEW_BATCH4",
-    "expectedGeneratorSummary": "records=185 pass=125 review=60 overrides=16 missing=0 extra=0 public=185"
+    "status": "PASS",
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33227415992,
+    "jobId": 99033722534,
+    "conclusion": "SUCCESS",
+    "observedGeneratorSummary": "records=185 pass=125 review=60 overrides=16 missing=0 extra=0 public=185",
+    "productionBuild": "SUCCESS"
   },
   "reviewBoundary": {
     "reviewCount": 60,
@@ -53,8 +58,8 @@
   },
   "completion": {
     "frontendConsumerIntegrated": true,
-    "buildGateComplete": false,
+    "buildGateComplete": true,
     "hostedQaComplete": false
   },
-  "nextStep": "Re-run Build Gate at 125 PASS / 60 REVIEW, then continue evidence-based review resolution. Hosted QA remains pending until deployment contains the current projection."
+  "nextStep": "Continue evidence-based review resolution from the remaining 60 items. Hosted QA remains pending until deployment contains the current projection."
 }
