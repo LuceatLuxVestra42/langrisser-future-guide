@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "schemaId": "regression-coverage-promotion/v1",
+  "checkpoint": "REGRESSION_COVERAGE_PROMOTION_V1",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Record Regression Coverage Audit promotion eligibility separately from live Project Doctor D3/D4 activation. This contract does not mutate D1-D7, does not clear D3 MANUAL_REVIEW nodes, and does not substitute historical, partial-stage, build-only, or unregistered validators for a missing final owning validator.",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "sourceBranch": "work/project-doctor-closeout",
+    "sourceHead": "a174ee2ff2d2b90d2c63ea6c572f040dce72eafa",
+    "doctorReuse": "D1_D7_REUSED_UNCHANGED",
+    "d3": {
+      "path": "data/contracts/project-doctor-d3-validator-plan.v1.json",
+      "checkpoint": "PROJECT_DOCTOR_D3_VALIDATOR_PLAN",
+      "status": "DESIGN_FROZEN",
+      "gitBlobSha": "a7f2029931fcb4f0101923365373bcf50fb875c3"
+    },
+    "d4": {
+      "path": "data/contracts/project-doctor-d4-execution.v1.json",
+      "checkpoint": "PROJECT_DOCTOR_D4_EXECUTION",
+      "status": "DESIGN_FROZEN",
+      "gitBlobSha": "407568d89111577cf8dc824c6c0d8b46122e4107"
+    },
+    "activation": "NOT_WIRED_TO_D3_D4",
+    "mainDivergence": {
+      "status": "SYNCHRONIZED",
+      "observedDifference": "Project Doctor baseline contains the current main ConfigData Lookup and Localization command surface after synchronization.",
+      "effect": "Promotion V1 still does not borrow or activate commands unless an exact final owning validator is explicitly registered."
+    }
+  },
+  "promotionPolicy": {
+    "auditEligibilityIsNotActivation": true,
+    "currentFinalOwningValidatorRequired": true,
+    "registeredPackageCommandRequired": true,
+    "nonZeroFailureRequired": true,
+    "historicalValidatorAllowed": false,
+    "partialStageValidatorAllowed": false,
+    "buildOnlyCountsAsOwningValidator": false,
+    "unreferencedOneOffScriptAllowed": false,
+    "unknownConsumerValidatorAllowed": false,
+    "missingAuthoritativeEvidenceBlocksPromotion": true,
+    "implicitD3D4MutationAllowed": false,
+    "manualReviewClearedByThisContract": false
+  },
+  "counts": {
+    "d3ManualReviewNodes": 13,
+    "auditPromotionReady": 8,
+    "auditPromotionReadyWithScope": 1,
+    "auditPartialAutomationOnly": 3,
+    "auditKeepManual": 1,
+    "activationReady": 0,
+    "activationBlockedByFinalOwner": 9,
+    "activationPartialAutomationOnly": 3,
+    "activationKeepManual": 1
+  },
+  "nodes": [
+    {
+      "id": "hero-canonical",
+      "auditDisposition": "PROMOTION_READY",
+      "activationDisposition": "BLOCKED_BY_FINAL_OWNER",
+      "candidateValidator": null,
+      "reason": "The baseline exposes validate:hero-stage3 only. A Stage 3 validator is not promoted as the final frozen Hero semantic owner."
+    },
+    {
+      "id": "soldier-canonical",
+      "auditDisposition": "PROMOTION_READY",
+      "activationDisposition": "BLOCKED_BY_FINAL_OWNER",
+      "candidateValidator": null,
+      "reason": "Final Soldier canonical evidence exists, but no registered final owning semantic validator command is present on the Doctor baseline."
+    },
+    {
+      "id": "equipment-canonical",
+      "auditDisposition": "PROMOTION_READY",
+      "activationDisposition": "BLOCKED_BY_FINAL_OWNER",
+      "candidateValidator": null,
+      "reason": "No registered final owning Equipment canonical validator command is present on the Doctor baseline."
+    },
+    {
+      "id": "hero-soldier-relation",
+      "auditDisposition": "PROMOTION_READY",
+      "activationDisposition": "BLOCKED_BY_FINAL_OWNER",
+      "candidateValidator": null,
+      "reason": "The frozen Hero-Soldier relation must be checked by its own final relation validator; D3 generic integrity/build checks are not semantic ownership."
+    },
+    {
+      "id": "hero-equipment-relation",
+      "auditDisposition": "PROMOTION_READY",
+      "activationDisposition": "BLOCKED_BY_FINAL_OWNER",
+      "candidateValidator": null,
+      "reason": "The frozen Hero-Equipment ownership relation has no registered final owning validator command on the Doctor baseline."
+    },
+    {
+      "id": "banner-data",
+      "auditDisposition": "PROMOTION_READY",
+      "activationDisposition": "BLOCKED_BY_FINAL_OWNER",
+      "candidateValidator": null,
+      "evidence": [
+        "data/validation/banner-stage3-8-regression-freeze-summary.v1.json"
+      ],
+      "reason": "Banner Stage 3-8 frozen evidence exists, but no registered final Banner owning regression validator command is present on the Doctor baseline."
+    },
+    {
+      "id": "skin-relation",
+      "auditDisposition": "PROMOTION_READY",
+      "activationDisposition": "BLOCKED_BY_FINAL_OWNER",
+      "candidateValidator": null,
+      "evidence": [
+        "data/generated/skin-stage2-3-bidirectional-relation.v1.json"
+      ],
+      "reason": "Skin Stage 2 relation evidence exists, but no registered final relation validator command is present on the Doctor baseline."
+    },
+    {
+      "id": "shared-movement",
+      "auditDisposition": "PROMOTION_READY",
+      "activationDisposition": "BLOCKED_BY_FINAL_OWNER",
+      "candidateValidator": null,
+      "reason": "build:movement-types is a generator/builder and cannot be promoted as an owning validator."
+    },
+    {
+      "id": "soldier-assets",
+      "auditDisposition": "PROMOTION_READY_WITH_SCOPE",
+      "activationDisposition": "BLOCKED_BY_FINAL_OWNER",
+      "candidateValidator": null,
+      "scope": {
+        "requiredManifest": "data/generated/soldier-portrait-manifest.v9.json",
+        "requiredCoverage": "224/224",
+        "forbidHistoricalCoverage": "168/224",
+        "requireSourceAndDerivativeSeparation": true
+      },
+      "evidence": [
+        "data/generated/soldier-portrait-manifest.v9.json",
+        "data/validation/soldier-portrait-v9-source-audit.json"
+      ],
+      "reason": "Latest v9/224-of-224 evidence is the only acceptable scope, but no registered final owning asset validator command is present on the Doctor baseline."
+    },
+    {
+      "id": "hero-assets",
+      "auditDisposition": "PARTIAL_AUTOMATION_ONLY",
+      "activationDisposition": "PARTIAL_AUTOMATION_ONLY",
+      "candidateValidator": null,
+      "reason": "Production build can cover frontend integrity, but final asset provenance/resolution ownership remains outside the current verified catalog."
+    },
+    {
+      "id": "equipment-assets",
+      "auditDisposition": "PARTIAL_AUTOMATION_ONLY",
+      "activationDisposition": "PARTIAL_AUTOMATION_ONLY",
+      "candidateValidator": null,
+      "reason": "Build coverage does not prove Equipment asset locator/resolution/provenance semantics."
+    },
+    {
+      "id": "banner-assets",
+      "auditDisposition": "PARTIAL_AUTOMATION_ONLY",
+      "activationDisposition": "PARTIAL_AUTOMATION_ONLY",
+      "candidateValidator": null,
+      "reason": "Banner frozen data regression evidence exists, but asset provenance/resolution still includes a contracted manual exception and is not fully auto-promoted."
+    },
+    {
+      "id": "skin-assets",
+      "auditDisposition": "KEEP_MANUAL",
+      "activationDisposition": "KEEP_MANUAL",
+      "candidateValidator": null,
+      "reason": "Authoritative Skin Stage 3 asset bytes/evidence are not complete enough for a final owning asset validator promotion."
+    }
+  ],
+  "explicitlyRejectedSubstitutes": [
+    {
+      "command": "npm run validate:hero-stage3",
+      "reason": "Historical/partial Hero Stage 3 scope is not the current final Hero semantic owner."
+    },
+    {
+      "command": "npm run build:movement-types",
+      "reason": "Builder/generator is not an owning validator."
+    },
+    {
+      "pattern": "soldier portrait 168/224",
+      "reason": "Historical incomplete Soldier portrait coverage must never replace the latest v9 224/224 scope."
+    }
+  ],
+  "futurePromotionGate": {
+    "requiresFrozenContractRevision": true,
+    "requiresExactOwningCommand": true,
+    "requiresBaselinePresence": true,
+    "requiresD3CatalogChangeOnlyAfterExplicitApproval": true,
+    "thisVersionActivatesChecks": false
+  },
+  "nextIntegrationOrder": [
+    "ConfigData Lookup Index",
+    "Asset Intake/Resolver",
+    "Localization Audit",
+    "Hosted QA"
+  ]
+}

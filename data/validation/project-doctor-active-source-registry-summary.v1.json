@@ -1,0 +1,214 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-active-source-registry-validation/v1",
+  "stage": "PROJECT-STATUS-STAGE2",
+  "status": "PASS_PROJECT_DOCTOR_ACTIVE_SOURCE_REGISTRY_VALIDATION",
+  "completion": "COMPLETE",
+  "checkCount": 10,
+  "passCount": 10,
+  "failureCount": 0,
+  "checks": [
+    {
+      "name": "actual registry passes",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "six domains selected",
+      "pass": true,
+      "detail": 6
+    },
+    {
+      "name": "no raw ConfigData reads",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "no semantic recomputation",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "no canonical JOIN recomputation",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "explicit successor promotes terminal entry",
+      "pass": true,
+      "detail": {
+        "rootId": "hero-stage6-4-final",
+        "selectedId": "fixture-hero-approved-successor",
+        "sourcePath": "data/validation/hero-stage6-4-final.v1.json",
+        "facet": "canonical",
+        "sourceEntryFile": "fixture.json",
+        "lineage": [
+          "hero-stage6-4-final",
+          "fixture-hero-approved-successor"
+        ],
+        "admissionEvidence": {
+          "readable": true,
+          "admission": [
+            {
+              "pass": true,
+              "pointer": "/status",
+              "operator": "equals",
+              "expected": "PASS_WITH_REVIEW",
+              "actual": "PASS_WITH_REVIEW"
+            },
+            {
+              "pass": true,
+              "pointer": "/completion",
+              "operator": "equals",
+              "expected": "COMPLETE",
+              "actual": "COMPLETE"
+            },
+            {
+              "pass": true,
+              "pointer": "/heroDataPipelineStatus",
+              "operator": "equals",
+              "expected": "FINAL_FROZEN",
+              "actual": "FINAL_FROZEN"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "multiple successors are blocked",
+      "pass": true,
+      "detail": [
+        {
+          "type": "MULTIPLE_SUCCESSORS",
+          "parentId": "hero-stage6-4-final",
+          "children": [
+            "fixture-hero-approved-successor",
+            "fixture-hero-second-successor"
+          ]
+        },
+        {
+          "type": "UNREACHABLE_APPROVED_ENTRY",
+          "entryId": "fixture-hero-approved-successor",
+          "domain": "hero"
+        },
+        {
+          "type": "UNREACHABLE_APPROVED_ENTRY",
+          "entryId": "fixture-hero-second-successor",
+          "domain": "hero"
+        }
+      ]
+    },
+    {
+      "name": "failed admission blocks promotion",
+      "pass": true,
+      "detail": [
+        {
+          "type": "ADMISSION_FAILED",
+          "entryId": "fixture-hero-approved-successor",
+          "sourcePath": "data/validation/hero-stage6-4-final.v1.json",
+          "admission": [
+            {
+              "pass": false,
+              "pointer": "/status",
+              "operator": "equals",
+              "expected": "THIS_STATUS_MUST_NOT_EXIST",
+              "actual": "PASS_WITH_REVIEW"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cross-domain successor is blocked",
+      "pass": true,
+      "detail": [
+        {
+          "type": "CROSS_DOMAIN_SUCCESSOR",
+          "entryId": "fixture-hero-approved-successor",
+          "successorOf": "hero-stage6-4-final"
+        },
+        {
+          "type": "UNREACHABLE_APPROVED_ENTRY",
+          "entryId": "fixture-hero-approved-successor",
+          "domain": "soldier"
+        }
+      ]
+    },
+    {
+      "name": "approved projection override is explicit and inherited",
+      "pass": true,
+      "detail": {
+        "primaryStatusSource": "data/validation/hero-stage6-4-final.v1.json",
+        "primaryFacet": "canonical",
+        "expected": {
+          "canonicalHeroCount": 267
+        },
+        "requiredSelectors": {
+          "rawStatus": "/status",
+          "rawCompletion": "/completion",
+          "rawFreezeState": "/heroDataPipelineStatus",
+          "canonicalHeroCount": "/summary/canonicalHeroCount",
+          "hardErrorCount": "/summary/hardErrorCount"
+        },
+        "reviewSelectors": [
+          "/nonBlockingReviews"
+        ],
+        "nextWorkSelectors": [
+          "/nextStartPoint"
+        ],
+        "lifecycleRules": [
+          {
+            "when": "/heroDataPipelineStatus == FINAL_FROZEN",
+            "lifecycle": "FROZEN"
+          },
+          {
+            "when": "/completion == COMPLETE",
+            "lifecycle": "COMPLETE"
+          }
+        ],
+        "supplementalSources": [
+          {
+            "path": "data/validation/hero-list-stage4.v1.json",
+            "role": "CURRENT_HERO_ROUTE_ASSET_PREFLIGHT",
+            "facet": "frontend",
+            "selectors": {
+              "rawStatus": "/status",
+              "rawCompletion": "/completion",
+              "heroCount": "/summary/heroCount",
+              "resolvedArtworkCount": "/summary/resolvedArtworkCount",
+              "pendingArtworkCount": "/summary/pendingArtworkCount",
+              "hardErrorCount": "/summary/hardErrorCount",
+              "failures": "/failures"
+            },
+            "supersedesPrimaryReviewCodes": [],
+            "policy": "This proves list/detail route shell and Stage 4 preflight only. Because artwork remains pending in this checkpoint, it does not clear the broader FRONTEND_ASSET_ROUTE_INTEGRATION_PENDING review."
+          },
+          {
+            "path": "data/validation/hero-list-stage5.v1.json",
+            "role": "CURRENT_HERO_DETAIL_FRONTEND_PROJECTION",
+            "facet": "frontend",
+            "selectors": {
+              "rawStatus": "/status",
+              "rawCompletion": "/completion",
+              "heroCount": "/summary/heroCount",
+              "soldierEdgeCount": "/summary/soldierEdgeCount",
+              "missingShardCount": "/summary/missingShardCount",
+              "parityMismatchCount": "/summary/parityMismatchCount"
+            },
+            "supersedesPrimaryReviewCodes": [],
+            "policy": "This proves 267-Hero detail projection and 5,977 Soldier-edge parity but does not by itself prove final artwork, hosted, or mobile QA."
+          }
+        ]
+      }
+    }
+  ],
+  "failures": [],
+  "hardErrorCount": 0,
+  "boundaries": {
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "filenameInference": false,
+    "stageNumberInference": false,
+    "timestampInference": false
+  }
+}

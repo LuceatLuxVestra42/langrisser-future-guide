@@ -1,0 +1,209 @@
+Localization Audit Stage 6 checkpoint
+Date: 2026-08-28
+Status: PASS_WITH_REVIEW / COMPLETE / MERGED
+
+Purpose
+- Integrate the frozen Localization Audit Stage 5 into Project Doctor as an exact selected/executed owning localization validator.
+- Preserve Stage 0-5 localization semantics and historical Project Doctor v1 contracts.
+- Do not create a seventh Project Doctor domain; localization remains a cross-domain facet/validator.
+- Do not clear canonical/relation/asset MANUAL_REVIEW nodes with localization success.
+
+Latest integration base
+- latest main synchronized before implementation: 50a4dfd2cc7783da507572f513740b56b9918204
+- main change carried forward during synchronization: Project Status automatic derived sync (#151)
+- D2 v2 therefore carries all four accepted current-main overlays plus the Stage 6 localization overlay.
+
+Frozen predecessor preservation
+- Stage 5 contract: data/contracts/localization-audit-stage5.v1.json
+- Stage 5 contract git blob SHA: 108d44c9070c4907f24881445ac5fb1f8c87ce28
+- Stage 5 snapshot: data/validation/localization-audit-stage5.v1.json
+- Stage 5 snapshot git blob SHA: 3c4e6dbee30a2b9cf50fbec0b5e24e6786f60024
+- Stage 5 baseline: PASS_WITH_REVIEW / Soldier 224 / Hero 267 / Equipment 390 / public 373 / errors 0 / reviews 2 / frontend leaks 0
+- D3 v1 git blob SHA preserved: a7f2029931fcb4f0101923365373bcf50fb875c3
+- D4 v1 git blob SHA preserved: 407568d89111577cf8dc824c6c0d8b46122e4107
+- Regression Coverage Promotion V1 remains PASS and still activates zero of its blocked canonical/relation/asset owning validators.
+
+Doctor v2 integration
+D2 v2
+- contract: data/contracts/project-doctor-d2-impact-contract.v2.json
+- base dependency map remains project-doctor-d2-dependency-map.v1.json
+- existing impact nodes/propagation edges are unchanged
+- overlay count: 5
+  1) soldier-webp-assets-post-map
+  2) project-doctor-workflow-post-map
+  3) project-status-derived-sync
+  4) regression-coverage-promotion-v1-meta-contract
+  5) localization-audit-stage6-integration
+- localization tooling maps only to project-doctor with changeClass=localization-tooling.
+
+D3 v2
+- contract: data/contracts/project-doctor-d3-validator-plan.v2.json
+- exact check id: localization-audit
+- exact command: npm run audit:localization:check
+- phase: 4
+- trigger change classes:
+  - localization-tooling
+  - presentation
+  - frontend
+  - frontend-consumer-data
+  - semantic-data
+  - raw-configdata
+- all historical 13 manual-review nodes remain present.
+- localization PASS never clears canonical/relation/asset manual review.
+
+D4 v2
+- contract: data/contracts/project-doctor-d4-execution.v2.json
+- localization-audit is allowlisted.
+- strict command shape remains npm run <verified-script-name>.
+- localization phase 4 executes before production build phase 5.
+- localization failure is fail-fast and prevents later build execution.
+- D4 v2 execution self-test: 10/10 PASS.
+
+D7 v2
+- contract: data/contracts/project-doctor-d7-pr-guard.v2.json
+- current required Project Doctor PR Guard workflow remains read-only and uses real PR diff.
+- freshness validation and D1 deterministic regeneration remain unchanged.
+- Regression Coverage Promotion V1 admission gate remains present.
+- D7 v2 contract validation: 36 checks / 0 failures.
+
+Formal command
+- Stage 5 public command preserved: audit:localization = node scripts/audit-localization.mjs
+- Doctor strict alias added: audit:localization:check = node scripts/audit-localization.mjs --check
+- current Doctor command surface points impact/plan/run/PR-guard validation to v2 contracts/runners.
+- Project Doctor closeout runs D4 v2 self-test and D4 v2 execution.
+
+Selection-boundary validation
+- Soldier presentation change -> localization selected: PASS
+- Equipment localized frontend change -> localization selected: PASS
+- Localization tooling change -> localization selected: PASS
+- Soldier asset-only change -> localization not selected: PASS
+- Shared frontend-only change -> localization not selected: PASS
+- selection boundary: 5/5 PASS
+
+Stage 6 snapshot
+- data/validation/localization-audit-stage6.v1.json
+- schema: localization-audit-stage6/v1
+- status: PASS_WITH_REVIEW
+- errors: 0
+- reviews: 2
+- selection cases: 5/5
+- historical v1 hash preservation: PASS
+- Stage 5 live gate: PASS
+- Regression Promotion V1 live gate: PASS
+- readOnlyExecution: true
+
+Temporary live verification
+- PR: #152 Integrate Localization Audit Stage 6 with Project Doctor
+- temporary workflow: Project Doctor Localization Stage 6 Verify
+- baseline run ID: 33181340756 / job 98883004563
+- frozen-snapshot run ID: 33181610253 / job 98883930947
+- frozen-snapshot run results:
+  - Regression Coverage Promotion V1: PASS
+  - Doctor D2 v2: PASS_PROJECT_DOCTOR_D2_IMPACT_V2
+  - Doctor D3 v2: PASS_PROJECT_DOCTOR_D3_PLAN_V2
+  - Doctor D4 v2: 10/10 PASS
+  - Doctor D7 v2: 36/36 PASS
+  - Stage 5 --check: PASS_WITH_REVIEW
+  - Stage 6 --check: PASS_WITH_REVIEW
+  - Stage 6 self-test: PASS 7/7
+- temporary verification workflow removed before merge.
+
+Required real PR Guard proof
+- workflow: Project Doctor PR Guard / pr-guard
+- live proof run ID: 33181340834
+- job ID: 98883006172
+- actual PR comparison used: origin/main...78e2a3e280e76da82dff942eb0c0c0ae6e82289b
+- plan: PLAN_READY
+- changed files observed: 14
+- dry run: PASS_DRY_RUN / checks queued 5 / checks run 0
+- actual execution: PASS_EXECUTED / checks queued 5 / checks run 5
+- exact executed queue:
+  1) localization-audit: npm run audit:localization:check
+  2) production-build: npm run build
+  3) doctor-health-gate: npm run doctor:validate
+  4) doctor-impact-self-test: npm run doctor:impact:validate
+  5) doctor-plan-self-test: npm run doctor:plan:validate
+- localization Stage 5 output inside Doctor execution:
+  - PASS_WITH_REVIEW
+  - Soldier 224 / Hero 267 / Equipment 390 / public 373
+  - errors 0 / reviews 2 / frontend leaks 0
+- production build after localization gate: PASS
+- Project Doctor D5 freshness: FRESH
+- required pr-guard: SUCCESS
+
+Stage 6 self-test
+- total: 7/7 PASS
+  1) Stage 5 frozen --check
+  2) Regression Coverage Promotion V1 validation
+  3) Doctor D2 v2 validation
+  4) Doctor D3 v2 validation
+  5) Doctor D4 v2 execution fixtures
+  6) Doctor D7 v2 contract validation
+  7) formal audit:localization:check alias
+
+Boundaries preserved
+- no canonical localization mutation
+- no presentation auto-fix
+- no automatic translation
+- no provisional-name promotion
+- no raw ConfigData semantic recomputation by Doctor integration
+- no new Project Doctor domain
+- no new impact node or propagation edge
+- no historical D3/D4 v1 mutation
+- no Regression Coverage Promotion V1 blocked-owner promotion
+- standalone Localization Audit CI remains active
+
+Completion
+- Stage 6 contract: frozen
+- Stage 5 semantics: preserved
+- Project Doctor v2 selection: complete
+- Project Doctor v2 execution: complete
+- strict Doctor localization alias: complete
+- selection boundary fixtures: complete
+- real PR diff execution proof: complete
+- frozen Stage 6 snapshot: complete
+- Stage 6 self-test: complete
+- temporary workflow cleanup: complete
+
+Operational result
+- Localization Audit is now both a standalone permanent CI gate and a Project Doctor-selected phase-4 validator for localization-relevant changes.
+- Asset-only or unrelated shared-frontend changes do not cause localization audit fanout.
+- Existing canonical/relation/asset manual-review boundaries remain unresolved unless their own final validator is explicitly promoted.
+
+Final merge closeout
+- PR #152 final head after synchronizing latest then-main (#153 Active Source Registry): 03bf3b6c5849d72f6a0943fabb23864aa2dfffb0
+- final required Project Doctor PR Guard run: 33188888715
+- final required pr-guard job: 98908960278
+- final run conclusion: SUCCESS
+- final run passed D7 contract validation, committed freshness validation, D1 deterministic regeneration proof, Regression Coverage Promotion V1 admission, real-diff dry run, and real-diff execution.
+- PR #152 mergeable immediately before merge: true
+- PR #152 merged: true
+- final merge commit: e63c09c1e4ca197098c4485a3a9118379926ee81
+- merge parents: 02d5b853058a1db22c663aa4dcbdda7cfd41f456 and 03bf3b6c5849d72f6a0943fabb23864aa2dfffb0
+- post-merge comparison against 02d5b853... showed exactly the 15 Stage 6 files added/modified; Active Source Registry changes were preserved.
+- later main progression through Project Status Stage 3 / guarded Status Source Promotion (#156), main 70e4282af7a85ca4bc5c2bab33e797cf35e74051, keeps Stage 6 snapshot and Doctor v2 command surface present.
+
+First post-merge operational proof
+- follow-up PR: #158 Finalize Localization Audit Stage 6 checkpoint
+- proof head: 85e00a23fe0f0f438bdec465d220f8986c627841
+- changed files: exactly 1 (this Stage 6 checkpoint)
+- classification path is covered by localization-audit-stage6-integration and therefore exercises localization-tooling selection without changing production localization data.
+- standalone Localization Audit run: 33191634450 / SUCCESS
+- Project Doctor PR Guard run: 33191634427
+- pr-guard job: 98918297425 / SUCCESS
+- Project Doctor dry run: PLAN_READY / changed files 1 / checks queued 4 / checks run 0
+- Project Doctor execution: PASS_EXECUTED / changed files 1 / checks queued 4 / checks run 4
+- executed checks:
+  1) localization-audit: npm run audit:localization:check
+  2) doctor-health-gate: npm run doctor:validate
+  3) doctor-impact-self-test: npm run doctor:impact:validate
+  4) doctor-plan-self-test: npm run doctor:plan:validate
+- Localization Audit Stage 5 inside Doctor: PASS_WITH_REVIEW / Soldier 224 / Hero 267 / Equipment 390 / public 373 / errors 0 / reviews 2 / frontend leaks 0
+- D5 freshness during proof: FRESH
+- result: first legitimate post-merge localization-tooling change correctly selected and executed localization-audit through the normal required PR Guard.
+
+Operational next-start
+- Do not reopen Stage 6 semantics for ordinary localization work.
+- On future legitimate Hero/Soldier/Equipment localization-relevant PRs, use the normal Project Doctor PR Guard; the post-merge checkpoint proof above confirms localization-audit selection/execution is operational.
+- For asset-only or unrelated shared-frontend-only PRs, localization-audit should remain unselected unless their change class legitimately crosses the frozen localization boundary.
+- Any future expansion to Skin/Banner localization, or promotion of canonical/relation/asset owning validators, is a separate scoped task and must not be inferred from Stage 6 completion.

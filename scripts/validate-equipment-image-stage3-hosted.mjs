@@ -1,8 +1,10 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 
 const BASE_URL = (process.env.HOSTED_BASE_URL ?? "https://luceatluxvestra42.github.io/langrisser-future-guide/").replace(/\/?$/, "/");
 const SUMMARY_PATH = "data/validation/equipment-image-stage3-hosted-qa-summary.v1.json";
 const CHECKPOINT_PATH = "data/checkpoints/equipment-image-stage3-final.v1.json";
+const BROWSER_EVIDENCE_PATH = "data/evidence/equipment-image-stage3-browser-ui.v1.json";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -10,6 +12,49 @@ function assert(condition, message) {
 
 function resolveUrl(path) {
   return new URL(path.replace(/^\//, ""), BASE_URL).toString();
+}
+
+function readJsonIfExists(path) {
+  if (!fs.existsSync(path)) return null;
+  return JSON.parse(fs.readFileSync(path, "utf8"));
+}
+
+function computeBrowserInputFingerprint() {
+  const sourceFiles = [
+    "data/checkpoints/equipment-image-stage2-final.v3.json",
+    "data/validation/equipment-image-stage3-frontend-summary.v1.json",
+    "public/equipment-image-stage3-ready.json",
+    "src/lib/equipment-image-assets.ts",
+    "src/routes/equipment.tsx",
+    "src/routes/equipment_.exclusive.tsx",
+    "src/routes/equipment_.$equipmentId.tsx",
+  ];
+  const imageDir = "public/images/equipment";
+  const imageNames = fs
+    .readdirSync(imageDir)
+    .filter((name) => /^\d+\.png$/.test(name))
+    .sort((left, right) => Number.parseInt(left, 10) - Number.parseInt(right, 10));
+
+  assert(imageNames.length === 373, `Expected 373 Equipment PNGs for Browser/UI fingerprint, got ${imageNames.length}`);
+
+  const files = [...sourceFiles, ...imageNames.map((name) => `${imageDir}/${name}`)];
+  const hash = crypto.createHash("sha256");
+  hash.update("equipment-image-stage3-browser-input-v1\0");
+
+  for (const path of files) {
+    assert(fs.existsSync(path), `Browser/UI fingerprint input is missing: ${path}`);
+    hash.update(`${path}\0`);
+    hash.update(fs.readFileSync(path));
+    hash.update("\0");
+  }
+
+  return {
+    version: 1,
+    algorithm: "sha256",
+    sha256: hash.digest("hex"),
+    fileCount: files.length,
+    equipmentImageCount: imageNames.length,
+  };
 }
 
 async function fetchNoStore(path) {
@@ -116,7 +161,18 @@ for (const equipmentId of representativeIds) {
   assets.push(await checkPng(equipmentId));
 }
 
-const summary = {
+const browserInputFingerprint = computeBrowserInputFingerprint();
+const priorBrowserEvidence = readJsonIfExists(BROWSER_EVIDENCE_PATH);
+const browserEvidenceFresh = Boolean(
+  priorBrowserEvidence?.status === "PASS_EQUIPMENT_IMAGE_STAGE3_BROWSER_UI" &&
+    priorBrowserEvidence?.productionJoinKey === "equipmentId" &&
+    priorBrowserEvidence?.publicEquipment === 373 &&
+    priorBrowserEvidence?.inputFingerprint?.version === browserInputFingerprint.version &&
+    priorBrowserEvidence?.inputFingerprint?.algorithm === browserInputFingerprint.algorithm &&
+    priorBrowserEvidence?.inputFingerprint?.sha256 === browserInputFingerprint.sha256,
+);
+
+const hostedSummary = {
   stage: "Equipment Image Stage 3 Hosted QA",
   version: 1,
   status: "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA",
@@ -144,30 +200,59 @@ const summary = {
   existingBaselineFixtureChecked: 6,
   officialApkHoldFixturesChecked: [106, 547, 550, 643],
   publicEquipment: 373,
-  nextStage: "EQUIPMENT_IMAGE_STAGE3_COMPLETE",
+  browserUiFreshness: {
+    status: browserEvidenceFresh ? "PASS_FRESH_BROWSER_UI_EVIDENCE" : "REQUIRES_BROWSER_UI_REVALIDATION",
+    currentInputFingerprint: browserInputFingerprint,
+    evidencePath: BROWSER_EVIDENCE_PATH,
+    evidenceInputFingerprint: priorBrowserEvidence?.inputFingerprint ?? null,
+  },
+  nextStage: browserEvidenceFresh ? "EQUIPMENT_IMAGE_STAGE3_COMPLETE" : "EQUIPMENT_IMAGE_STAGE3_BROWSER_UI_QA",
 };
 
+const summary = browserEvidenceFresh
+  ? {
+      ...hostedSummary,
+      browserUiEvidence: {
+        path: BROWSER_EVIDENCE_PATH,
+        status: priorBrowserEvidence.status,
+        automation: priorBrowserEvidence.automation,
+        inputFingerprint: priorBrowserEvidence.inputFingerprint,
+        desktopViewport: priorBrowserEvidence.viewports?.desktop ?? null,
+        mobileViewport: priorBrowserEvidence.viewports?.mobile ?? null,
+        pageErrors: priorBrowserEvidence.checks?.pageErrors ?? null,
+        consoleErrors: priorBrowserEvidence.checks?.consoleErrors ?? null,
+        hostedHttpFailuresObservedByBrowser: priorBrowserEvidence.checks?.hostedHttpFailuresObservedByBrowser ?? null,
+      },
+    }
+  : hostedSummary;
+
 fs.writeFileSync(SUMMARY_PATH, `${JSON.stringify(summary, null, 2)}\n`);
-fs.writeFileSync(
-  CHECKPOINT_PATH,
-  `${JSON.stringify(
-    {
-      checkpoint: "equipment-image-stage3-final-v1",
-      status: summary.status,
-      completion: summary.completion,
-      freezeState: summary.freezeState,
-      productionJoinKey: "equipmentId",
-      publicEquipment: 373,
-      hostedBaseUrl: BASE_URL,
-      routeCount: routes.length,
-      representativeAssetCount: assets.length,
-      collisionFixturesChecked: [547, 550],
-      semanticStageReopened: false,
-      nextStart: "Equipment image Stage 3 is complete; continue only with later Equipment UI/presentation work without reopening frozen semantics.",
-    },
-    null,
-    2,
-  )}\n`,
-);
+
+const checkpoint = {
+  checkpoint: "equipment-image-stage3-final-v1",
+  status: browserEvidenceFresh ? "PASS_EQUIPMENT_IMAGE_STAGE3" : summary.status,
+  completion: summary.completion,
+  freezeState: summary.freezeState,
+  productionJoinKey: "equipmentId",
+  publicEquipment: 373,
+  hostedBaseUrl: BASE_URL,
+  routeCount: routes.length,
+  representativeAssetCount: assets.length,
+  collisionFixturesChecked: [547, 550],
+  semanticStageReopened: false,
+  browserUiFreshness: summary.browserUiFreshness.status,
+  browserUiInputFingerprint: browserEvidenceFresh ? browserInputFingerprint.sha256 : null,
+  ...(browserEvidenceFresh
+    ? {
+        browserUi: "PASS_PLAYWRIGHT_HOSTED_BROWSER_UI",
+        browserUiEvidencePath: BROWSER_EVIDENCE_PATH,
+        nextStart: "Equipment Image Stage 3 complete; continue with later Equipment presentation/features without reopening frozen Stage 2/3 identity semantics.",
+      }
+    : {
+        nextStart: "Equipment Image Stage 3 Hosted QA passed, but Browser/UI evidence is stale or unproven for the current frontend/assets; rerun Browser/UI QA without reopening frozen Stage 2 identity semantics.",
+      }),
+};
+
+fs.writeFileSync(CHECKPOINT_PATH, `${JSON.stringify(checkpoint, null, 2)}\n`);
 
 console.log(JSON.stringify(summary, null, 2));

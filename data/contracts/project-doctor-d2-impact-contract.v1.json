@@ -44,31 +44,49 @@
   "pathRuleOverlays": [
     {
       "id": "soldier-webp-assets-post-map",
-      "patterns": [
-        "public/images/soldiers-webp/**"
-      ],
+      "patterns": ["public/images/soldiers-webp/**"],
       "excludePatterns": [],
-      "directNodes": [
-        "soldier-assets"
-      ],
+      "directNodes": ["soldier-assets"],
       "changeClass": "asset",
       "reason": "Post-map Soldier frontend closeout serves 224/224 lossless WebP derivatives while retaining PNG as authoritative source evidence. This is presentation-only and must not reopen Soldier canonical semantics."
     },
     {
       "id": "project-doctor-workflow-post-map",
-      "patterns": [
-        ".github/workflows/project-doctor-*.yml"
-      ],
+      "patterns": [".github/workflows/project-doctor-*.yml"],
       "excludePatterns": [],
-      "directNodes": [
-        "project-doctor"
-      ],
+      "directNodes": ["project-doctor"],
       "changeClass": "tooling",
       "reason": "Project Doctor CI/PR workflow changes affect Doctor tooling only. They must be validated by Doctor self-tests but must not fan out into semantic domain recomputation."
+    },
+    {
+      "id": "project-status-derived-sync",
+      "patterns": [
+        "scripts/build-project-status.mjs",
+        ".github/workflows/project-status-sync.yml",
+        "data/generated/project-status.v1.json",
+        "PROJECT_STATUS.md",
+        "data/status-sources/**"
+      ],
+      "excludePatterns": [],
+      "directNodes": ["project-doctor"],
+      "changeClass": "tooling",
+      "reason": "Project Status and Active Source Registry declarations are deterministic read-only Project Doctor tooling. Registry declarations select already validated status authorities through explicit successor rules and must not reopen or recompute domain semantics."
+    },
+    {
+      "id": "regression-coverage-promotion-v1-meta-contract",
+      "patterns": [
+        "data/contracts/regression-coverage-promotion.v1.json",
+        "data/validation/regression-coverage-promotion-summary.v1.json",
+        "scripts/validate-regression-coverage-promotion.mjs"
+      ],
+      "excludePatterns": [],
+      "directNodes": ["project-doctor"],
+      "changeClass": "tooling",
+      "reason": "Regression Coverage Promotion V1 is a Doctor meta-contract admission surface only. Mapping these exact V1 files to project-doctor does not promote or broaden any domain owning validator."
     }
   ],
   "overlayPolicy": {
-    "reason": "The base dependency map remains frozen. Post-map repository evolution is admitted only through explicit evidenced path families: Soldier WebP presentation assets and Project Doctor workflow files used by D6/D7 runtime integration.",
+    "reason": "The base dependency map remains frozen. Post-map repository evolution is admitted only through explicit evidenced path families: Soldier WebP presentation assets, Project Doctor workflow files, deterministic Project Status and Active Source Registry tooling, and the exact Regression Coverage Promotion V1 meta-contract admission surface.",
     "mayAddPathRulesOnly": true,
     "mayAddImpactNodes": false,
     "mayAddPropagationEdges": false,
@@ -100,6 +118,20 @@
       "id": "PROJECT_DOCTOR_WORKFLOW_POST_MAP_OVERLAY",
       "paths": [".github/workflows/project-doctor-d7-pr-guard.yml"],
       "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["project-doctor"],
+      "expectedDomains": []
+    },
+    {
+      "id": "PROJECT_STATUS_DERIVED_SYNC_OVERLAY",
+      "paths": [
+        "scripts/build-project-status.mjs",
+        ".github/workflows/project-status-sync.yml",
+        "data/generated/project-status.v1.json",
+        "PROJECT_STATUS.md",
+        "data/status-sources/baseline.v1.json"
+      ],
+      "expectedStatus": "MAPPED",
+      "expectedChangedFileCount": 5,
       "expectedDirectNodes": ["project-doctor"],
       "expectedDomains": []
     },
@@ -166,6 +198,14 @@
       "expectedStatus": "MAPPED",
       "expectedDirectNodes": ["equipment-assets", "hero-assets"],
       "expectedDomains": ["equipment", "hero"]
+    },
+    {
+      "id": "REGRESSION_COVERAGE_PROMOTION_V1_META_CONTRACT",
+      "paths": ["data/contracts/regression-coverage-promotion.v1.json", "data/validation/regression-coverage-promotion-summary.v1.json", "scripts/validate-regression-coverage-promotion.mjs"],
+      "expectedStatus": "MAPPED",
+      "expectedChangedFileCount": 3,
+      "expectedDirectNodes": ["project-doctor"],
+      "expectedDomains": []
     }
   ],
   "nextStage": "D3",

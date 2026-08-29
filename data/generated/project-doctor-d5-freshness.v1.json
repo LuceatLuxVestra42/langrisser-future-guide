@@ -19,9 +19,25 @@
     "data/validation/soldier-t3-provisional-name-presentation.v1.json"
   ],
   "inputPaths": [
+    ".github/workflows/hero-stage6-4-site-consumer.yml",
+    ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+    ".github/workflows/project-status-sync.yml",
+    ".github/workflows/soldier-stage6-7-site-admission.yml",
+    "data/contracts/project-doctor-active-source-registry.v1.json",
     "data/contracts/project-doctor-d1-0-contract.v1.json",
     "data/contracts/project-doctor-d1-2-health-gate.v1.json",
     "data/contracts/project-doctor-d5-freshness.v1.json",
+    "data/contracts/project-doctor-status-source-artifact-bridge.v1.json",
+    "data/contracts/project-doctor-status-source-producers.v1.json",
+    "data/contracts/project-doctor-status-source-promotion.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-5-closeout-requests.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-5-hero-closeout-request.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-5-soldier-closeout-request.v1.json",
+    "data/status-sources/baseline.v1.json",
     "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
     "data/validation/equipment-stage4-final.v1.json",
     "data/validation/hero-list-stage4.v1.json",
@@ -33,18 +49,58 @@
     "data/validation/soldier-portrait-stage3j-frontend-full.v1.json",
     "data/validation/soldier-stage6-7-site-admission.v1.json",
     "data/validation/soldier-t3-provisional-name-presentation.v1.json",
+    "scripts/apply-project-doctor-status-source-handoff.mjs",
+    "scripts/bridge-project-doctor-status-source.mjs",
+    "scripts/build-project-doctor-active-source-registry.mjs",
+    "scripts/collect-project-doctor-d1-1-active.mjs",
     "scripts/collect-project-doctor-d1-1.mjs",
+    "scripts/promote-project-doctor-status-source.mjs",
+    "scripts/render-project-doctor-status-source-closeout-request.mjs",
+    "scripts/resolve-project-doctor-status-source-declaration.mjs",
     "scripts/run-project-doctor-d1-3.mjs",
+    "scripts/run-project-doctor-d5-refresh-active.mjs",
     "scripts/run-project-doctor-d5-refresh.mjs",
+    "scripts/submit-project-doctor-status-source.mjs",
+    "scripts/validate-project-doctor-active-source-registry.mjs",
+    "scripts/validate-project-doctor-d1-2-active.mjs",
     "scripts/validate-project-doctor-d1-2.mjs",
-    "scripts/validate-project-doctor-d5.mjs"
+    "scripts/validate-project-doctor-d5-active.mjs",
+    "scripts/validate-project-doctor-d5.mjs",
+    "scripts/validate-project-doctor-status-source-artifact-bridge.mjs",
+    "scripts/validate-project-doctor-status-source-producers.mjs",
+    "scripts/validate-project-doctor-status-source-promotion.mjs",
+    "scripts/validate-project-doctor-status-source-stage6-3-apply-handoff.mjs",
+    "scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs",
+    "scripts/validate-project-doctor-status-source-stage6-5-closeout-requests.mjs"
   ],
   "outputPaths": [
+    "data/generated/project-doctor-active-source-registry.v1.json",
     "data/generated/project-doctor-d1-1-status.v1.json",
+    "data/validation/project-doctor-active-source-registry-summary.v1.json",
     "data/validation/project-doctor-d1-1-summary.v1.json",
     "data/validation/project-doctor-d1-2-summary.v1.json"
   ],
   "inputs": {
+    ".github/workflows/hero-stage6-4-site-consumer.yml": {
+      "exists": true,
+      "gitBlobSha": "969e45b16492d5af557eeb1433e4e41c2cd0ff69"
+    },
+    ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml": {
+      "exists": true,
+      "gitBlobSha": "f63a53b36430948aca48b57326ae497f231bae0e"
+    },
+    ".github/workflows/project-status-sync.yml": {
+      "exists": true,
+      "gitBlobSha": "3134dc6d0d9a5dbdabaa9174dc54c4394a1fd784"
+    },
+    ".github/workflows/soldier-stage6-7-site-admission.yml": {
+      "exists": true,
+      "gitBlobSha": "ebcb56e7a9fabbbd5dff71ab7da9254789b81c82"
+    },
+    "data/contracts/project-doctor-active-source-registry.v1.json": {
+      "exists": true,
+      "gitBlobSha": "18e34913e5d0743e24776d14864a185f00ce8b58"
+    },
     "data/contracts/project-doctor-d1-0-contract.v1.json": {
       "exists": true,
       "gitBlobSha": "2cab75eae62dab0474bfc8cd19b164645acd4140"
@@ -55,7 +111,51 @@
     },
     "data/contracts/project-doctor-d5-freshness.v1.json": {
       "exists": true,
-      "gitBlobSha": "a7ee1380dffc87a91b4bd8a6356f7d0484729b3f"
+      "gitBlobSha": "5b95cab443655a5446a6b212597ece2a73f31ed2"
+    },
+    "data/contracts/project-doctor-status-source-artifact-bridge.v1.json": {
+      "exists": true,
+      "gitBlobSha": "25faed1f87de757de0bd5289a037f0baeeb47421"
+    },
+    "data/contracts/project-doctor-status-source-producers.v1.json": {
+      "exists": true,
+      "gitBlobSha": "9e45a8cd5079234604ce6ad85f81bfd14f04a8fa"
+    },
+    "data/contracts/project-doctor-status-source-promotion.v1.json": {
+      "exists": true,
+      "gitBlobSha": "74e87fa163a36e971de24138bcfe94c746eddf0a"
+    },
+    "data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json": {
+      "exists": true,
+      "gitBlobSha": "ea2f3463b1b4ff8d98475f0766c43611a59343e8"
+    },
+    "data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json": {
+      "exists": true,
+      "gitBlobSha": "813f39a2eed89289dfaaa5341a88ab6c59d7f0f2"
+    },
+    "data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json": {
+      "exists": true,
+      "gitBlobSha": "3dfa8daa953a438422d84a865a57d695b155688e"
+    },
+    "data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json": {
+      "exists": true,
+      "gitBlobSha": "641feea4fb9105f81ac651564ef6f89bd3bf4545"
+    },
+    "data/contracts/project-doctor-status-source-stage6-5-closeout-requests.v1.json": {
+      "exists": true,
+      "gitBlobSha": "3b1cb8139234cb80a0fcda206c8ed70b5f3adc51"
+    },
+    "data/contracts/project-doctor-status-source-stage6-5-hero-closeout-request.v1.json": {
+      "exists": true,
+      "gitBlobSha": "b1f3a30c5c3ca3118434d10c99a6cf6378214278"
+    },
+    "data/contracts/project-doctor-status-source-stage6-5-soldier-closeout-request.v1.json": {
+      "exists": true,
+      "gitBlobSha": "91d8858eb90cecbc26f3c54c05fb241b3b718f40"
+    },
+    "data/status-sources/baseline.v1.json": {
+      "exists": true,
+      "gitBlobSha": "a696db9ede66146aa6e7b67c6e38a1c052b8193c"
     },
     "data/validation/banner-stage3-8-regression-freeze-summary.v1.json": {
       "exists": true,
@@ -101,39 +201,119 @@
       "exists": true,
       "gitBlobSha": "f18db7d9bb143de4e009052bb2ff677faa19bc16"
     },
+    "scripts/apply-project-doctor-status-source-handoff.mjs": {
+      "exists": true,
+      "gitBlobSha": "5b58c92cfe4b6d87462fa4fa75fe9117dc4ecd77"
+    },
+    "scripts/bridge-project-doctor-status-source.mjs": {
+      "exists": true,
+      "gitBlobSha": "bb876bd64d132d98ff3b905cdae84b565c74d865"
+    },
+    "scripts/build-project-doctor-active-source-registry.mjs": {
+      "exists": true,
+      "gitBlobSha": "e063d60a5387a26a673d36ce0153e5907082d480"
+    },
+    "scripts/collect-project-doctor-d1-1-active.mjs": {
+      "exists": true,
+      "gitBlobSha": "ae4755047c0c0041d9c5f723338f4485d5d420a9"
+    },
     "scripts/collect-project-doctor-d1-1.mjs": {
       "exists": true,
-      "gitBlobSha": "8f13e5f5bb93646bc4357f6064e5c1e98c0666fe"
+      "gitBlobSha": "e950e9a12c23e540618ed1d12b11e961f997206f"
+    },
+    "scripts/promote-project-doctor-status-source.mjs": {
+      "exists": true,
+      "gitBlobSha": "8b6c15b5bba2201c4566e5d6bd150dddf017fb07"
+    },
+    "scripts/render-project-doctor-status-source-closeout-request.mjs": {
+      "exists": true,
+      "gitBlobSha": "49537eb288bab6ff652e164e50ef14a4169fbf48"
+    },
+    "scripts/resolve-project-doctor-status-source-declaration.mjs": {
+      "exists": true,
+      "gitBlobSha": "b852e3bc2c7ef4c2ce55ac63c605f41b70be6256"
     },
     "scripts/run-project-doctor-d1-3.mjs": {
       "exists": true,
-      "gitBlobSha": "5bc72e5082d77efa64b9f01362b4cfd31907c7ea"
+      "gitBlobSha": "13e9f6fff99789386070126015ef6be0785fba9a"
+    },
+    "scripts/run-project-doctor-d5-refresh-active.mjs": {
+      "exists": true,
+      "gitBlobSha": "eb92c7372d76b559c48e3f808d605ec52665e72c"
     },
     "scripts/run-project-doctor-d5-refresh.mjs": {
       "exists": true,
-      "gitBlobSha": "c1a29bfcbd334d2ba72a31537eca1d24d4811afb"
+      "gitBlobSha": "e67d84411f7db76b7aa9bb948cb44d9eefdc34cc"
+    },
+    "scripts/submit-project-doctor-status-source.mjs": {
+      "exists": true,
+      "gitBlobSha": "a0d545fcc10772cfa07b1b24802c9f12e75d79b5"
+    },
+    "scripts/validate-project-doctor-active-source-registry.mjs": {
+      "exists": true,
+      "gitBlobSha": "539e87cacf9e0c689c46e460b0bba71ac7e53298"
+    },
+    "scripts/validate-project-doctor-d1-2-active.mjs": {
+      "exists": true,
+      "gitBlobSha": "398aad7e4b0a3ae8d10d629ea62fdfd94a6df28b"
     },
     "scripts/validate-project-doctor-d1-2.mjs": {
       "exists": true,
-      "gitBlobSha": "47d695d843849a252508be6229941218e03e637d"
+      "gitBlobSha": "6d42e89ecd8b9f69a58c33309b106ccec5fa1519"
+    },
+    "scripts/validate-project-doctor-d5-active.mjs": {
+      "exists": true,
+      "gitBlobSha": "bc932163c0cc3af3daeb595caa81d7c28a2432e3"
     },
     "scripts/validate-project-doctor-d5.mjs": {
       "exists": true,
-      "gitBlobSha": "090c7c8b932b70092f65d79036956bd836aff610"
+      "gitBlobSha": "cdf435db9e5e58a52fd55808fd3c4ff31b22d2f0"
+    },
+    "scripts/validate-project-doctor-status-source-artifact-bridge.mjs": {
+      "exists": true,
+      "gitBlobSha": "bd1af4b34dd94ceb86ef3dadedef1aef481b0ecd"
+    },
+    "scripts/validate-project-doctor-status-source-producers.mjs": {
+      "exists": true,
+      "gitBlobSha": "af9bee6de4df1208ec1ae78f6c2079b6ff4ee797"
+    },
+    "scripts/validate-project-doctor-status-source-promotion.mjs": {
+      "exists": true,
+      "gitBlobSha": "7c2fd7599217524089900dec7d4e278df2f91178"
+    },
+    "scripts/validate-project-doctor-status-source-stage6-3-apply-handoff.mjs": {
+      "exists": true,
+      "gitBlobSha": "f9bf0a27b929fa14ca1b284bf47aba2983237c3b"
+    },
+    "scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs": {
+      "exists": true,
+      "gitBlobSha": "afe4c21c71d001cbdaa81ae47e60abcc33974887"
+    },
+    "scripts/validate-project-doctor-status-source-stage6-5-closeout-requests.mjs": {
+      "exists": true,
+      "gitBlobSha": "69e4bb3bf0882a7e735cf1cd81f9236b1827a082"
     }
   },
   "outputs": {
+    "data/generated/project-doctor-active-source-registry.v1.json": {
+      "exists": true,
+      "gitBlobSha": "6f12e2b4ccc4f25d4b9e91a77af29c0d8878b1f1"
+    },
     "data/generated/project-doctor-d1-1-status.v1.json": {
       "exists": true,
-      "gitBlobSha": "e92c67885f87672171de03a825b4d553a8453388"
+      "gitBlobSha": "86ea604aedb843b958eb31b633133921ac219316"
+    },
+    "data/validation/project-doctor-active-source-registry-summary.v1.json": {
+      "exists": true,
+      "gitBlobSha": "3023a721d4458ad86a859058fd6f0608bdc87591"
     },
     "data/validation/project-doctor-d1-1-summary.v1.json": {
       "exists": true,
-      "gitBlobSha": "f2e648664049fccf15ce4415e7056bf6d31f2ae4"
+      "gitBlobSha": "a4049b79544d6a048f59d1608ed069887e2a0a5c"
     },
     "data/validation/project-doctor-d1-2-summary.v1.json": {
       "exists": true,
-      "gitBlobSha": "e3bf9f06acac6ed9dec8b74e0a34801d99a97218"
+      "gitBlobSha": "1344d92483af7b83bcbe8e7f27244e604bca2dc4"
     }
   }
 }

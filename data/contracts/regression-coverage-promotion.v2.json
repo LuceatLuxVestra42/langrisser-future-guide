@@ -1,0 +1,171 @@
+{
+  "version": 2,
+  "schemaId": "regression-coverage-promotion/v2",
+  "checkpoint": "REGRESSION_COVERAGE_PROMOTION_V2",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Resolve the nine V1 BLOCKED_BY_FINAL_OWNER nodes to exact current/final owning validators without activating Project Doctor D3/D4. Existing final validators are promoted only after runtime proof; stale or missing owners receive dedicated read-only validators.",
+  "baseline": {
+    "v1Contract": "data/contracts/regression-coverage-promotion.v1.json",
+    "v1Checkpoint": "REGRESSION_COVERAGE_PROMOTION_V1",
+    "v1GitBlobSha": "0ab7b8ee1382c6d3687aeaa87d7d75b8e3f51cd0",
+    "sourceMainHead": "70e4282af7a85ca4bc5c2bab33e797cf35e74051"
+  },
+  "admissionPolicy": {
+    "currentFinalOwningValidatorRequired": true,
+    "registeredPackageCommandRequired": true,
+    "nonZeroFailureRequired": true,
+    "historicalValidatorDisallowed": true,
+    "partialStageSubstituteDisallowed": true,
+    "buildOnlySubstituteDisallowed": true,
+    "readOnlyWrapperPreferredWhenFinalizerMutatesArtifacts": true,
+    "runtimeProofRequired": true,
+    "d3d4MutationAllowedInThisStage": false,
+    "forbiddenOwnerCommands": [
+      "validate:hero-stage3",
+      "build:movement-types"
+    ],
+    "forbiddenOwnerScripts": [
+      "scripts/validate-soldier-stage4-8-baseline.cjs"
+    ]
+  },
+  "ownerResolutions": [
+    {
+      "nodeId": "hero-canonical",
+      "resolution": "PROMOTE_EXISTING",
+      "ownerScript": "scripts/validate_hero_stage4_final.cjs",
+      "packageCommand": "validate:coverage:hero-canonical",
+      "commandValue": "node scripts/validate_hero_stage4_final.cjs",
+      "failureSignal": "process.exitCode = 1",
+      "runtimeEvidence": "V2 CI run 33190508808: PASS before Soldier owner failure",
+      "evidence": ["data/validation/hero-basic-combat-stage4-5-summary.v1.json", "data/validation/hero-stage4-a-boundary.v1.json"]
+    },
+    {
+      "nodeId": "soldier-canonical",
+      "resolution": "NEW_OWNING_VALIDATOR",
+      "ownerScript": "scripts/validate-soldier-stage6-7-final.mjs",
+      "packageCommand": "validate:coverage:soldier-canonical",
+      "commandValue": "node scripts/validate-soldier-stage6-7-final.mjs",
+      "failureSignal": "process.exit(1)",
+      "rejectedHistoricalOwner": "scripts/validate-soldier-stage4-8-baseline.cjs",
+      "rejectionEvidence": "V2 CI run 33190508808: Stage4-8 owner failed while Hero owner passed; latest main changes contained no Soldier pipeline files.",
+      "evidence": ["data/generated/soldier-stage6-7-site-admission.v1.json", "data/validation/soldier-stage6-7-site-admission.v1.json", "data/validation/soldier-stage6-0-checkpoint.v1.json"]
+    },
+    {
+      "nodeId": "equipment-canonical",
+      "resolution": "PROMOTE_EXISTING",
+      "ownerScript": "scripts/validate-equipment-stage4-final.mjs",
+      "packageCommand": "validate:coverage:equipment-canonical",
+      "commandValue": "node scripts/validate-equipment-stage4-final.mjs",
+      "failureSignal": "throw new Error",
+      "evidence": ["data/validation/equipment-stage4-final.v1.json"]
+    },
+    {
+      "nodeId": "hero-soldier-relation",
+      "resolution": "PROMOTE_EXISTING",
+      "ownerScript": "scripts/validate-hero-soldier-stageC-5-final.cjs",
+      "packageCommand": "validate:coverage:hero-soldier-relation",
+      "commandValue": "node scripts/validate-hero-soldier-stageC-5-final.cjs",
+      "failureSignal": "process.exit(1)",
+      "evidence": ["data/validation/hero-soldier-integration-stageC-final.v1.json"]
+    },
+    {
+      "nodeId": "hero-equipment-relation",
+      "resolution": "PROMOTE_EXISTING",
+      "ownerScript": "scripts/validate_hero_exclusive_equipment_relation_stageB6.cjs",
+      "packageCommand": "validate:coverage:hero-equipment-relation",
+      "commandValue": "node scripts/validate_hero_exclusive_equipment_relation_stageB6.cjs",
+      "failureSignal": "process.exitCode=1",
+      "evidence": ["data/validation/hero-exclusive-equipment-relation-stageB6-consumer-summary.v1.json"]
+    },
+    {
+      "nodeId": "banner-data",
+      "resolution": "PROMOTE_EXISTING",
+      "ownerScript": "scripts/validate-banner-stage3-8-regression-freeze.mjs",
+      "packageCommand": "validate:coverage:banner-data",
+      "commandValue": "node scripts/validate-banner-stage3-8-regression-freeze.mjs",
+      "failureSignal": "throw new Error",
+      "evidence": ["data/validation/banner-stage3-8-regression-freeze-summary.v1.json"]
+    },
+    {
+      "nodeId": "skin-relation",
+      "resolution": "PROMOTE_EXISTING",
+      "ownerScript": "scripts/validate-skin-stage2-5-final.py",
+      "packageCommand": "validate:coverage:skin-relation",
+      "commandValue": "python3 scripts/validate-skin-stage2-5-final.py",
+      "failureSignal": "raise SystemExit(1)",
+      "evidence": ["data/validation/skin-stage2-5-final.v1.json", "data/generated/skin-stage2-3-bidirectional-relation.v1.json"]
+    },
+    {
+      "nodeId": "shared-movement",
+      "resolution": "NEW_OWNING_VALIDATOR",
+      "ownerScript": "scripts/validate-shared-movement-type-index-final.mjs",
+      "packageCommand": "validate:coverage:shared-movement",
+      "commandValue": "node scripts/validate-shared-movement-type-index-final.mjs",
+      "failureSignal": "process.exit(1)",
+      "rejectedSubstitute": "build:movement-types",
+      "evidence": ["data/generated/shared-movement-type-index.v1.json", "data/validation/shared-movement-type-index-final.v1.json"]
+    },
+    {
+      "nodeId": "soldier-assets",
+      "resolution": "NEW_OWNING_VALIDATOR",
+      "ownerScript": "scripts/validate-soldier-portrait-v9-final.mjs",
+      "packageCommand": "validate:coverage:soldier-assets",
+      "commandValue": "node scripts/validate-soldier-portrait-v9-final.mjs",
+      "failureSignal": "process.exit(1)",
+      "historicalScopeRejected": "168/224",
+      "evidence": ["data/generated/soldier-portrait-manifest.v9.json", "data/validation/soldier-portrait-v9-source-audit.json"]
+    }
+  ],
+  "expectedResolutionCounts": {
+    "total": 9,
+    "promoteExisting": 6,
+    "newOwningValidator": 3,
+    "unresolved": 0
+  },
+  "specialGates": {
+    "soldierCanonical": {
+      "stage": "6-7",
+      "canonicalCount": 224,
+      "normalCount": 168,
+      "spCount": 56,
+      "normalTier3Count": 129,
+      "failRecordCount": 0,
+      "representativeQa": "6/6",
+      "filterQa": "15/15",
+      "heroKeyCount": 267,
+      "soldierKeyCount": 224,
+      "relationCount": 5977,
+      "reciprocalMismatchCount": 0,
+      "acceptedAdmissionStatuses": ["READY", "READY_WITH_REVIEW"],
+      "allAdmissionGatesMustPass": true,
+      "frozenSourceSnapshotsMustMatchHead": true
+    },
+    "sharedMovement": {
+      "definitionCount": 5,
+      "canonicalHeroCount": 267,
+      "heroJobCount": 804,
+      "soldierCount": 224,
+      "hardErrorCount": 0,
+      "builderCannotOwnRegressionGate": true
+    },
+    "soldierAssets": {
+      "manifestVersion": 9,
+      "canonicalCount": 224,
+      "normalCount": 168,
+      "spCount": 56,
+      "resolvedCount": 224,
+      "unresolvedCount": 0,
+      "sourceDerivativeSeparationRequired": true,
+      "generatedImageUsed": false,
+      "backgroundRemovalUsed": false,
+      "syntheticEditingUsed": false
+    }
+  },
+  "unchangedV1ManualScope": {
+    "hero-assets": "PARTIAL",
+    "equipment-assets": "PARTIAL",
+    "banner-assets": "PARTIAL",
+    "skin-assets": "KEEP_MANUAL"
+  },
+  "nextStage": "Run all nine owner commands and the V2 audit. Only after a clean runtime PASS may a separate Doctor admission change update D3/D4."
+}

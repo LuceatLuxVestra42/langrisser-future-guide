@@ -131,7 +131,7 @@ function GeneralEquipmentDetail({ data }: { data: GeneralEquipmentDetailPageData
           </div>
         </div>
 
-        <div className="mt-8 flex justify-between border-t border-border pt-6">
+        <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <Link
             reloadDocument
             to="/equipment"
@@ -185,13 +185,29 @@ function ExclusiveEquipmentDetail({ data }: { data: ExclusiveEquipmentDetailPage
             <UserRound size={18} aria-hidden="true" className="text-primary" />
             <h2 className="text-lg font-bold text-foreground">전용 영웅</h2>
           </div>
-          <div className="mt-4 rounded-xl border border-border bg-muted/35 p-4">
-            <p className="text-xl font-bold text-foreground">{ownerHero.nameKr}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{ownerHero.nameCn}</p>
-            <p className="mt-3 text-xs leading-5 text-muted-foreground">
-              이 관계는 Stage B에서 확정한 equipmentId → heroIds 인덱스를 그대로 소비해. 장비명이나 출시순으로 소유 영웅을 추정하지 않아.
-            </p>
-          </div>
+          <Link
+            reloadDocument
+            to="/heroes/$heroId"
+            params={{ heroId: String(ownerHero.heroId) }}
+            className="group mt-4 flex items-center justify-between gap-4 rounded-xl border border-border bg-muted/35 p-4 transition hover:border-primary/35 hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <div className="min-w-0">
+              <p className="truncate text-xl font-bold text-foreground">{ownerHero.nameKr}</p>
+              <p className="mt-1 truncate text-sm text-muted-foreground">{ownerHero.nameCn}</p>
+              <p className="mt-2 text-[11px] text-muted-foreground">Hero ID {ownerHero.heroId}</p>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-primary">
+              영웅 상세
+              <ChevronRight
+                size={15}
+                aria-hidden="true"
+                className="transition-transform group-hover:translate-x-0.5"
+              />
+            </span>
+          </Link>
+          <p className="mt-3 text-xs leading-5 text-muted-foreground">
+            이 관계는 Stage B에서 확정한 equipmentId → heroIds 인덱스를 그대로 소비해. 장비명이나 출시순으로 소유 영웅을 추정하지 않아.
+          </p>
         </section>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
@@ -215,7 +231,7 @@ function ExclusiveEquipmentDetail({ data }: { data: ExclusiveEquipmentDetailPage
           </div>
         </div>
 
-        <div className="mt-8 flex justify-between border-t border-border pt-6">
+        <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <Link
             reloadDocument
             to="/equipment/exclusive"
@@ -259,8 +275,8 @@ function EquipmentHeader({
 
   return (
     <header className="mt-5 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-      <div className="flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex shrink-0 items-center justify-center self-start rounded-2xl border border-border bg-muted/25 p-2">
+      <div className="flex flex-col gap-5 p-5 sm:p-7 md:flex-row md:items-center md:gap-7 lg:p-8">
+        <div className="flex shrink-0 items-center justify-center self-center rounded-2xl border border-border bg-muted/25 p-2.5 md:self-auto">
           <img
             src={imageUrl}
             alt={displayName + " 장비 이미지"}
@@ -269,8 +285,8 @@ function EquipmentHeader({
           />
         </div>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="min-w-0 flex-1 text-center md:text-left">
+          <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
             <span className="rounded-md bg-primary px-2 py-1 text-[11px] font-bold tracking-wide text-primary-foreground">
               {badge}
             </span>
@@ -282,11 +298,11 @@ function EquipmentHeader({
             </span>
           </div>
 
-          <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h1 className="mt-4 break-keep text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             {displayName}
           </h1>
           {nameKr === null ? (
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
               한국명이 아직 검수 확정되지 않아 중문명 <span className="font-medium text-foreground">{nameCn}</span>을 임시 표시하고 있어.
             </p>
           ) : (
@@ -294,8 +310,8 @@ function EquipmentHeader({
           )}
         </div>
 
-        <div className="rounded-xl border border-border bg-muted/35 px-4 py-3 text-sm text-muted-foreground">
-          equipmentId <span className="font-semibold text-foreground">{equipmentId}</span>
+        <div className="w-full rounded-xl border border-border bg-muted/35 px-4 py-3 text-center text-sm text-muted-foreground md:w-auto md:text-left">
+          equipmentId <span className="font-semibold tabular-nums text-foreground">{equipmentId}</span>
         </div>
       </div>
     </header>

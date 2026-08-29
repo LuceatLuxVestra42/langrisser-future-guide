@@ -4,26 +4,71 @@
   "stage": "D5",
   "checkpoint": "PROJECT_DOCTOR_D5_FRESHNESS_GUARD",
   "status": "DESIGN_FROZEN",
-  "purpose": "Prevent Project Doctor status outputs from being trusted when their authoritative sources, producer scripts, contracts, or generated health outputs have changed since the last explicit successful D1 refresh seal.",
+  "purpose": "Prevent Project Doctor status outputs from being trusted when their authoritative sources, Active Source Registry declarations, producer/artifact-bridge/apply-handoff/producer-declaration/closeout-request tooling, contracts, workflows, or generated health outputs have changed since the last explicit successful D1 refresh seal.",
   "d1Contract": "data/contracts/project-doctor-d1-0-contract.v1.json",
   "d1HealthGateContract": "data/contracts/project-doctor-d1-2-health-gate.v1.json",
+  "activeSourceRegistryContract": "data/contracts/project-doctor-active-source-registry.v1.json",
   "d1StatusRunner": "scripts/run-project-doctor-d1-3.mjs",
   "manifestPath": "data/generated/project-doctor-d5-freshness.v1.json",
   "coreInputPaths": [
     "data/contracts/project-doctor-d1-0-contract.v1.json",
     "data/contracts/project-doctor-d1-2-health-gate.v1.json",
+    "data/contracts/project-doctor-status-source-promotion.v1.json",
+    "data/contracts/project-doctor-status-source-producers.v1.json",
+    "data/contracts/project-doctor-status-source-artifact-bridge.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-5-closeout-requests.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-5-hero-closeout-request.v1.json",
+    "data/contracts/project-doctor-status-source-stage6-5-soldier-closeout-request.v1.json",
+    "scripts/build-project-doctor-active-source-registry.mjs",
+    "scripts/validate-project-doctor-active-source-registry.mjs",
+    "scripts/promote-project-doctor-status-source.mjs",
+    "scripts/validate-project-doctor-status-source-promotion.mjs",
+    "scripts/submit-project-doctor-status-source.mjs",
+    "scripts/validate-project-doctor-status-source-producers.mjs",
+    "scripts/bridge-project-doctor-status-source.mjs",
+    "scripts/validate-project-doctor-status-source-artifact-bridge.mjs",
+    "scripts/apply-project-doctor-status-source-handoff.mjs",
+    "scripts/validate-project-doctor-status-source-stage6-3-apply-handoff.mjs",
+    "scripts/resolve-project-doctor-status-source-declaration.mjs",
+    "scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs",
+    "scripts/render-project-doctor-status-source-closeout-request.mjs",
+    "scripts/validate-project-doctor-status-source-stage6-5-closeout-requests.mjs",
+    ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+    ".github/workflows/project-status-sync.yml",
+    ".github/workflows/hero-stage6-4-site-consumer.yml",
+    ".github/workflows/soldier-stage6-7-site-admission.yml",
     "scripts/collect-project-doctor-d1-1.mjs",
+    "scripts/collect-project-doctor-d1-1-active.mjs",
     "scripts/validate-project-doctor-d1-2.mjs",
+    "scripts/validate-project-doctor-d1-2-active.mjs",
     "scripts/run-project-doctor-d1-3.mjs",
     "scripts/run-project-doctor-d5-refresh.mjs",
-    "scripts/validate-project-doctor-d5.mjs"
+    "scripts/run-project-doctor-d5-refresh-active.mjs",
+    "scripts/validate-project-doctor-d5.mjs",
+    "scripts/validate-project-doctor-d5-active.mjs"
   ],
   "outputPaths": [
+    "data/generated/project-doctor-active-source-registry.v1.json",
+    "data/validation/project-doctor-active-source-registry-summary.v1.json",
     "data/generated/project-doctor-d1-1-status.v1.json",
     "data/validation/project-doctor-d1-1-summary.v1.json",
     "data/validation/project-doctor-d1-2-summary.v1.json"
   ],
   "outputStatusRules": [
+    {
+      "path": "data/generated/project-doctor-active-source-registry.v1.json",
+      "field": "status",
+      "equals": "PASS_PROJECT_DOCTOR_ACTIVE_SOURCE_REGISTRY"
+    },
+    {
+      "path": "data/validation/project-doctor-active-source-registry-summary.v1.json",
+      "field": "status",
+      "equals": "PASS_PROJECT_DOCTOR_ACTIVE_SOURCE_REGISTRY_VALIDATION"
+    },
     {
       "path": "data/generated/project-doctor-d1-1-status.v1.json",
       "field": "status",
@@ -41,11 +86,17 @@
     }
   ],
   "sourceDiscovery": {
-    "mode": "D1_CONTRACT_DYNAMIC",
-    "primary": "domains.*.primaryStatusSource",
-    "supplemental": "domains.*.supplementalSources[].path",
+    "mode": "ACTIVE_SOURCE_REGISTRY_PLUS_D1_SUPPLEMENTALS",
+    "selectedPrimary": "data/generated/project-doctor-active-source-registry.v1.json#/domains/*/sourcePath",
+    "declaredCandidates": "data/status-sources/*.json#/entries/*/sourcePath",
+    "supplemental": "data/contracts/project-doctor-d1-0-contract.v1.json#/domains/*/supplementalSources/*/path",
+    "registryDeclarationsAreMonitoredInputs": true,
+    "declaredCandidateSourcesAreMonitoredInputs": true,
+    "registryOutputIsGeneratedOutput": true,
     "rawConfigDataReads": false,
-    "filenameInference": false
+    "filenameInference": false,
+    "stageNumberInference": false,
+    "timestampInference": false
   },
   "refreshPolicy": {
     "explicitRefreshOnly": true,
@@ -54,6 +105,7 @@
     "hashDefinition": "SHA1 over UTF-8/raw file bytes prefixed with Git blob header: blob <byteLength>\\0",
     "hashContentNotMtime": true,
     "verifyInputsStableBeforeAndAfterD1": true,
+    "allowRegistrySelectedAuthorityToChangeOnlyAsD1OutputOfStableDeclarations": true,
     "abortIfInputChangesDuringRefresh": true,
     "requireAllOutputsAfterD1": true,
     "writeManifestOnlyAfterStableSuccessfulD1": true,
@@ -86,5 +138,5 @@
     "githubActions": false
   },
   "nextStage": "D6",
-  "nextStageGoal": "Run the integrated Project Doctor freshness and changed-file execution chain in CI or another executable repository environment, then add GitHub Actions only after live command proof is available."
+  "nextStageGoal": "Run the integrated Project Doctor freshness and changed-file execution chain in CI or another executable repository environment."
 }

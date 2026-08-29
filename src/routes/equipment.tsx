@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowUpDown, ChevronRight, RotateCcw, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { getOfficialEquipmentImageUrl } from "@/lib/equipment-image-assets";
@@ -20,11 +20,14 @@ export const Route = createFileRoute("/equipment")({
 });
 
 type TabId = 1 | 2 | 3;
+type EquipmentSortMode = "default" | "name" | "id";
 
 type EquipmentListUiState = {
   tab: TabId;
   group: string | null;
   subtype: string | null;
+  query: string;
+  sort: EquipmentSortMode;
 };
 
 const EQUIPMENT_LIST_STORAGE_KEY = "equipment-general-list-ui.v1";
@@ -33,6 +36,8 @@ const DEFAULT_UI_STATE: EquipmentListUiState = {
   tab: 1,
   group: null,
   subtype: null,
+  query: "",
+  sort: "default",
 };
 
 const TAB_DEFINITIONS: ReadonlyArray<{
@@ -63,8 +68,18 @@ const TAB_ORDER_POLICIES: Record<TabId, string> = {
   3: "정확한 출시 순서는 REVIEW 상태라 현재 순서를 최신순이나 출시순으로 해석하지 않아.",
 };
 
+const SORT_LABELS: Record<EquipmentSortMode, string> = {
+  default: "기본 표시순",
+  name: "이름순",
+  id: "장비 ID순",
+};
+
 function isTabId(value: unknown): value is TabId {
   return value === 1 || value === 2 || value === 3;
+}
+
+function isEquipmentSortMode(value: unknown): value is EquipmentSortMode {
+  return value === "default" || value === "name" || value === "id";
 }
 
 function EquipmentGeneralListPage() {
@@ -93,8 +108,10 @@ function EquipmentGeneralListPage() {
             ? parsed.subtype
             : null
           : null;
+      const query = typeof parsed.query === "string" ? parsed.query.slice(0, 80) : "";
+      const sort = isEquipmentSortMode(parsed.sort) ? parsed.sort : DEFAULT_UI_STATE.sort;
 
-      setUiState({ tab, group, subtype });
+      setUiState({ tab, group, subtype, query, sort });
     } catch {
       setUiState(DEFAULT_UI_STATE);
     } finally {
@@ -114,16 +131,44 @@ function EquipmentGeneralListPage() {
 
   const activeFilter = data.filters.find((filter) => filter.group === uiState.group) ?? null;
 
-  const filteredRecords = useMemo(
-    () =>
-      data.records.filter((record) => {
-        if (record.siteTab !== uiState.tab) return false;
-        if (uiState.group && record.group !== uiState.group) return false;
-        if (uiState.subtype && record.subtype !== uiState.subtype) return false;
-        return true;
-      }),
-    [data.records, uiState],
-  );
+  const filteredRecords = useMemo(() => {
+    const normalizedQuery = uiState.query.trim().toLocaleLowerCase();
+    const records = data.records.filter((record) => {
+      if (record.siteTab !== uiState.tab) return false;
+      if (uiState.group && record.group !== uiState.group) return false;
+      if (uiState.subtype && record.subtype !== uiState.subtype) return false;
+
+      if (normalizedQuery) {
+        const searchableText = [
+          record.nameKr,
+          record.nameCn,
+          record.effectName,
+          record.effectText,
+          String(record.equipmentId),
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLocaleLowerCase();
+        if (!searchableText.includes(normalizedQuery)) return false;
+      }
+
+      return true;
+    });
+
+    if (uiState.sort === "name") {
+      return records.sort((left, right) => {
+        const leftName = left.nameKr ?? left.nameCn;
+        const rightName = right.nameKr ?? right.nameCn;
+        return leftName.localeCompare(rightName, "ko", { numeric: true, sensitivity: "base" }) || left.equipmentId - right.equipmentId;
+      });
+    }
+
+    if (uiState.sort === "id") {
+      return records.sort((left, right) => left.equipmentId - right.equipmentId);
+    }
+
+    return records;
+  }, [data.records, uiState]);
 
   const currentTabCount = data.tabs[String(uiState.tab)] ?? 0;
 
@@ -145,6 +190,21 @@ function EquipmentGeneralListPage() {
   const resetFilters = () => {
     setUiState((current) => ({ ...current, group: null, subtype: null }));
   };
+
+  const resetDiscovery = () => {
+    setUiState((current) => ({
+      ...current,
+      group: null,
+      subtype: null,
+      query: "",
+      sort: "default",
+    }));
+  };
+
+  const orderPolicy =
+    uiState.sort === "default"
+      ? TAB_ORDER_POLICIES[uiState.tab]
+      : `${SORT_LABELS[uiState.sort]}으로 표시 중이야. 이 정렬은 출시순 의미를 갖지 않아.`;
 
   return (
     <main className="min-h-screen bg-background">
@@ -209,6 +269,59 @@ function EquipmentGeneralListPage() {
           </div>
 
           <div className="space-y-4 p-4 sm:p-5">
+            <div className="grid gap-3 border-b border-border pb-4 md:grid-cols-[minmax(0,1fr)_14rem]">
+              <label className="relative block">
+                <span className="sr-only">장비 검색</span>
+                <Search
+                  size={17}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                />
+                <input
+                  type="search"
+                  value={uiState.query}
+                  maxLength={80}
+                  onChange={(event) => setUiState((current) => ({ ...current, query: event.target.value }))}
+                  placeholder="장비명·효과·ID 검색"
+                  className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-10 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-ring/30"
+                />
+                {uiState.query && (
+                  <button
+                    type="button"
+                    aria-label="검색어 지우기"
+                    onClick={() => setUiState((current) => ({ ...current, query: "" }))}
+                    className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  >
+                    <X size={15} aria-hidden="true" />
+                  </button>
+                )}
+              </label>
+
+              <label className="relative flex h-11 items-center rounded-xl border border-border bg-background">
+                <ArrowUpDown size={16} aria-hidden="true" className="ml-3 shrink-0 text-muted-foreground" />
+                <span className="sr-only">장비 정렬</span>
+                <select
+                  value={uiState.sort}
+                  onChange={(event) =>
+                    setUiState((current) => ({
+                      ...current,
+                      sort: event.target.value as EquipmentSortMode,
+                    }))
+                  }
+                  className="h-full min-w-0 flex-1 appearance-none bg-transparent px-2 pr-8 text-sm font-medium text-foreground outline-none"
+                >
+                  <option value="default">기본 표시순</option>
+                  <option value="name">이름순</option>
+                  <option value="id">장비 ID순</option>
+                </select>
+                <ChevronRight
+                  size={14}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute right-3 rotate-90 text-muted-foreground"
+                />
+              </label>
+            </div>
+
             <div className="flex flex-wrap items-center gap-2">
               <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 장비 종류
@@ -301,12 +414,10 @@ function EquipmentGeneralListPage() {
             <p className="text-sm text-muted-foreground">
               현재 탭 {currentTabCount}개 중 <span className="font-semibold text-foreground">{filteredRecords.length}개</span> 표시
             </p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              {TAB_ORDER_POLICIES[uiState.tab]}
-            </p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">{orderPolicy}</p>
           </div>
           <p className="text-xs text-muted-foreground sm:text-right">
-            선택한 탭과 필터는 다음 방문에도 유지돼.
+            선택한 탭·필터·검색·정렬은 다음 방문에도 유지돼.
           </p>
         </div>
 
@@ -325,51 +436,55 @@ function EquipmentGeneralListPage() {
                   key={record.equipmentId}
                   to="/equipment/$equipmentId"
                   params={{ equipmentId: String(record.equipmentId) }}
-                  className="group flex min-h-64 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="group flex min-h-[22rem] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className="flex items-center justify-between gap-3 border-b border-border bg-muted/40 px-4 py-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex min-w-0 items-center gap-2">
                       <span className="rounded-md bg-primary px-2 py-1 text-[11px] font-bold tracking-wide text-primary-foreground">
                         SSR
                       </span>
-                      <span className="text-xs font-medium text-muted-foreground">
+                      <span className="truncate text-xs font-medium text-muted-foreground">
                         {record.groupKo} · {record.subtypeKo}
                       </span>
                     </div>
                     <ChevronRight
                       size={17}
                       aria-hidden="true"
-                      className="text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
+                      className="shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
                     />
                   </div>
 
-                  <div className="flex items-center justify-center border-b border-border bg-muted/25 p-4">
+                  <div className="relative flex min-h-52 items-center justify-center border-b border-border bg-muted/20 px-4 pb-16 pt-4 sm:min-h-56">
                     <img
                       src={imageUrl}
                       alt=""
                       loading="lazy"
                       decoding="async"
-                      className="h-36 w-36 object-contain transition duration-200 group-hover:scale-[1.03]"
+                      className="h-32 w-32 object-contain transition duration-200 group-hover:scale-[1.03] sm:h-36 sm:w-36"
                     />
+                    <div className="absolute inset-x-0 bottom-0 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm">
+                      <h2 className="line-clamp-2 text-base font-bold leading-snug text-foreground sm:text-lg">
+                        {displayName}
+                      </h2>
+                      {record.nameKr === null && (
+                        <p className="mt-0.5 text-[11px] text-muted-foreground">
+                          한국명 REVIEW · 중문명 임시 표시
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex flex-1 flex-col p-4">
-                    <h2 className="text-lg font-bold leading-snug text-foreground">{displayName}</h2>
-                    {record.nameKr === null && (
-                      <p className="mt-1 text-[11px] text-muted-foreground">
-                        한국명 REVIEW · 중문명 임시 표시
-                      </p>
-                    )}
-
-                    <div className="mt-4 rounded-xl bg-muted/55 p-3">
+                    <div className="rounded-xl bg-muted/55 p-3">
                       <p className="text-xs font-semibold text-foreground">{record.effectName}</p>
                       <p className="mt-1 line-clamp-4 text-xs leading-5 text-muted-foreground">
                         {record.effectText}
                       </p>
                     </div>
 
-                    <div className="mt-auto pt-4 text-[11px] text-muted-foreground">
-                      장비 ID {record.equipmentId}
+                    <div className="mt-auto flex items-center justify-between gap-3 pt-4 text-[11px] text-muted-foreground">
+                      <span>{record.groupKo} · {record.subtypeKo}</span>
+                      <span className="tabular-nums">ID {record.equipmentId}</span>
                     </div>
                   </div>
                 </Link>
@@ -381,10 +496,10 @@ function EquipmentGeneralListPage() {
             <p className="font-semibold text-foreground">조건에 맞는 장비가 없어.</p>
             <button
               type="button"
-              onClick={resetFilters}
+              onClick={resetDiscovery}
               className="mt-3 text-sm font-medium text-primary hover:underline"
             >
-              장비 종류 필터 초기화
+              검색·필터 초기화
             </button>
           </section>
         )}

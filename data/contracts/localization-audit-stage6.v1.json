@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-stage6-contract/v1",
+  "stage": 6,
+  "status": "FROZEN",
+  "purpose": "Integrate the frozen Localization Audit Stage 5 as a Project Doctor selected/executed owning localization validator without changing localization semantics, canonical identity, relation ownership, or historical Doctor v1 contracts.",
+  "predecessor": {
+    "stage5Contract": "data/contracts/localization-audit-stage5.v1.json",
+    "stage5Snapshot": "data/validation/localization-audit-stage5.v1.json",
+    "requiredStatus": "FROZEN",
+    "requiredSnapshotStatus": "PASS_WITH_REVIEW",
+    "contractGitBlobSha": "108d44c9070c4907f24881445ac5fb1f8c87ce28",
+    "snapshotGitBlobSha": "3c4e6dbee30a2b9cf50fbec0b5e24e6786f60024",
+    "formalCommand": "node scripts/audit-localization.mjs"
+  },
+  "doctorIntegration": {
+    "d2Contract": "data/contracts/project-doctor-d2-impact-contract.v2.json",
+    "d3Contract": "data/contracts/project-doctor-d3-validator-plan.v2.json",
+    "d4Contract": "data/contracts/project-doctor-d4-execution.v2.json",
+    "d7Contract": "data/contracts/project-doctor-d7-pr-guard.v2.json",
+    "packageAlias": "audit:localization:check",
+    "packageCommand": "node scripts/audit-localization.mjs --check",
+    "d3CheckId": "localization-audit",
+    "phase": 4,
+    "selectionChangeClasses": ["localization-tooling","presentation","frontend","frontend-consumer-data","semantic-data","raw-configdata"],
+    "d4Allowed": true,
+    "realPrGuardProofRequired": true
+  },
+  "historicalPreservation": {
+    "d3V1": "data/contracts/project-doctor-d3-validator-plan.v1.json",
+    "d3V1GitBlobSha": "a7f2029931fcb4f0101923365373bcf50fb875c3",
+    "d4V1": "data/contracts/project-doctor-d4-execution.v1.json",
+    "d4V1GitBlobSha": "407568d89111577cf8dc824c6c0d8b46122e4107",
+    "regressionPromotionV1": "data/contracts/regression-coverage-promotion.v1.json",
+    "rule": "D3/D4 v1 and Promotion V1 remain byte-identical; Stage 6 activates localization only through versioned v2 contracts."
+  },
+  "selectionBoundary": {
+    "included": ["localization audit tooling/contract/snapshot/workflow changes","Hero/Soldier/Equipment presentation changes","Hero/Soldier/Equipment frontend consumer changes","Hero/Soldier/Equipment semantic-data changes that can change effective localization inputs","relevant raw ConfigData changes"],
+    "excluded": ["asset-only changes","shared-frontend-only changes without a localization-owned consumer path","canonical/relation manual-review promotion","Skin/Banner localization expansion not covered by Stage 5","automatic translation or mutation"]
+  },
+  "executionBoundary": {"readOnlyLocalizationAudit":true,"snapshotGateRequired":true,"phaseBeforeProductionBuild":true,"failFastOnLocalizationFailure":true,"manualReviewSurvivesLocalizationPass":true,"standaloneLocalizationCiPreserved":true},
+  "minimumChecks": ["Stage 5 contract/snapshot hashes unchanged","Regression Coverage Promotion V1 still validates D3/D4 v1 bytes","D2 v2 maps localization tooling without adding nodes/edges","D3 v2 selects exact audit:localization:check command for relevant changes only","D4 v2 allowlists localization-audit and preserves strict npm-run command parsing","Project Doctor closeout uses D4 v2 runner/self-test","D7 v2 validates current PR guard wiring","real pull_request pr-guard executes selected localization-audit","Stage 5 standalone CI remains present"],
+  "resultModel": ["PASS","PASS_WITH_REVIEW","FAIL"],
+  "completion": "COMPLETE_AFTER_REAL_PR_GUARD_PROOF"
+}

@@ -28,10 +28,12 @@ check('impact contract frozen', contract.status === 'DESIGN_FROZEN', contract.st
 check('base map frozen', baseMap.status === 'DESIGN_FROZEN', baseMap.status);
 check('base map schema expected', baseMap.schemaId === 'project-doctor-d2-dependency-map/v1', baseMap.schemaId);
 check('overlay adds path rules only', (contract.pathRuleOverlays ?? []).every(rule => Array.isArray(rule.directNodes) && !('propagationEdges' in rule)));
-check('overlay count exact', (contract.pathRuleOverlays ?? []).length === 2, (contract.pathRuleOverlays ?? []).length);
+check('overlay count exact', (contract.pathRuleOverlays ?? []).length === 4, (contract.pathRuleOverlays ?? []).length);
 check('overlay ids unique', new Set((contract.pathRuleOverlays ?? []).map(rule => rule.id)).size === (contract.pathRuleOverlays ?? []).length);
 check('soldier WebP overlay present', (contract.pathRuleOverlays ?? []).some(rule => rule.id === 'soldier-webp-assets-post-map'));
 check('Project Doctor workflow overlay present', (contract.pathRuleOverlays ?? []).some(rule => rule.id === 'project-doctor-workflow-post-map'));
+check('Project Status derived-sync overlay present', (contract.pathRuleOverlays ?? []).some(rule => rule.id === 'project-status-derived-sync'));
+check('Regression Coverage Promotion V1 overlay present', (contract.pathRuleOverlays ?? []).some(rule => rule.id === 'regression-coverage-promotion-v1-meta-contract'));
 
 const fixtureResults = [];
 for (const fixture of contract.fixtures ?? []) {
@@ -82,6 +84,8 @@ const summary = {
     'Unmatched paths remain MANUAL_REVIEW; no all-domain fanout or filename-similarity inference is allowed.',
     'Soldier WebP delivery is a presentation-only post-map overlay and does not reopen Soldier canonical semantics.',
     'Project Doctor workflow files map to the project-doctor tooling node only and do not reopen semantic domain pipelines.',
+    'Project Status builder/workflow/generated views map to project-doctor tooling only; they remain deterministic D1 projections and do not reopen semantic domain pipelines.',
+    'Regression Coverage Promotion V1 contract/summary/validator paths map to project-doctor tooling only; candidate domain validators remain unpromoted.',
     'No validators are selected or executed in D2-IMPACT.'
   ],
   verificationEvidence: {

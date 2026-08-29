@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "checkpoint": "REGRESSION_COVERAGE_PROMOTION_V1",
+  "result": "PASS_CONTRACT_ONLY_NO_D3_D4_ACTIVATION",
+  "baseline": {
+    "sourceBranch": "work/project-doctor-closeout",
+    "sourceHead": "a174ee2ff2d2b90d2c63ea6c572f040dce72eafa",
+    "projectDoctor": "D1_D7_REUSED_UNCHANGED",
+    "d3": "PROJECT_DOCTOR_D3_VALIDATOR_PLAN / DESIGN_FROZEN",
+    "d4": "PROJECT_DOCTOR_D4_EXECUTION / DESIGN_FROZEN"
+  },
+  "doctorContractsModified": false,
+  "d3D4ActivationModified": false,
+  "audit": {
+    "manualReviewNodes": 13,
+    "promotionReady": 8,
+    "promotionReadyWithScope": 1,
+    "partialAutomationOnly": 3,
+    "keepManual": 1
+  },
+  "activation": {
+    "ready": 0,
+    "blockedByFinalOwner": 9,
+    "partialAutomationOnly": 3,
+    "keepManual": 1
+  },
+  "blockedByFinalOwner": [
+    "hero-canonical",
+    "soldier-canonical",
+    "equipment-canonical",
+    "hero-soldier-relation",
+    "hero-equipment-relation",
+    "banner-data",
+    "skin-relation",
+    "shared-movement",
+    "soldier-assets"
+  ],
+  "partialAutomationOnly": [
+    "hero-assets",
+    "equipment-assets",
+    "banner-assets"
+  ],
+  "keepManual": [
+    "skin-assets"
+  ],
+  "confirmedEvidenceOnDoctorBaseline": {
+    "soldierAssets": "data/generated/soldier-portrait-manifest.v9.json",
+    "bannerData": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+    "skinRelation": "data/generated/skin-stage2-3-bidirectional-relation.v1.json"
+  },
+  "rejectedSubstitutions": [
+    "validate:hero-stage3 is historical/partial and is not a final Hero owning validator",
+    "build:movement-types is a builder and is not an owning validator",
+    "Soldier portrait 168/224 coverage is historical and cannot replace v9 224/224 scope"
+  ],
+  "baselineDivergence": {
+    "status": "RESOLVED_BY_SYNC",
+    "detail": "Project Doctor baseline was synchronized with current main before this clean promotion rebuild.",
+    "decision": "Keep activation at 0 until exact final owning validators are explicitly registered on the synchronized Doctor baseline."
+  },
+  "nextIntegrationOrder": [
+    "ConfigData Lookup Index",
+    "Asset Intake/Resolver",
+    "Localization Audit",
+    "Hosted QA"
+  ],
+  "nextStart": "Implement exact final owning validators one domain at a time. Only a later explicitly frozen promotion revision may wire those commands into D3/D4."
+}

@@ -6,6 +6,7 @@
   "completion": "COMPLETE",
   "contract": "data/contracts/project-doctor-d1-0-contract.v1.json",
   "gateContract": "data/contracts/project-doctor-d1-2-health-gate.v1.json",
+  "activeSourceRegistry": "data/generated/project-doctor-active-source-registry.v1.json",
   "input": "data/generated/project-doctor-d1-1-status.v1.json",
   "scope": {
     "classificationOnly": true,
@@ -22,9 +23,24 @@
       "detail": "DESIGN_FROZEN"
     },
     {
+      "name": "Active Source Registry passed",
+      "pass": true,
+      "detail": "PASS_PROJECT_DOCTOR_ACTIVE_SOURCE_REGISTRY"
+    },
+    {
+      "name": "Active Source Registry selected six domains",
+      "pass": true,
+      "detail": 6
+    },
+    {
       "name": "D1-1 input collected",
       "pass": true,
       "detail": "COLLECTED"
+    },
+    {
+      "name": "D1-1 references Active Source Registry",
+      "pass": true,
+      "detail": "data/generated/project-doctor-active-source-registry.v1.json"
     },
     {
       "name": "D1-1 input read-only",
@@ -169,7 +185,8 @@
       "lifecycle": "FROZEN",
       "missingFields": [],
       "populationMismatches": [],
-      "primarySourceMatchesContract": true,
+      "primarySourceMatchesRegistry": true,
+      "activeSourceIdMatchesRegistry": true,
       "reviewCountMatches": true
     },
     {
@@ -180,7 +197,8 @@
       "lifecycle": "COMPLETE",
       "missingFields": [],
       "populationMismatches": [],
-      "primarySourceMatchesContract": true,
+      "primarySourceMatchesRegistry": true,
+      "activeSourceIdMatchesRegistry": true,
       "reviewCountMatches": true
     },
     {
@@ -191,7 +209,8 @@
       "lifecycle": "FROZEN",
       "missingFields": [],
       "populationMismatches": [],
-      "primarySourceMatchesContract": true,
+      "primarySourceMatchesRegistry": true,
+      "activeSourceIdMatchesRegistry": true,
       "reviewCountMatches": true
     },
     {
@@ -202,7 +221,8 @@
       "lifecycle": "FROZEN",
       "missingFields": [],
       "populationMismatches": [],
-      "primarySourceMatchesContract": true,
+      "primarySourceMatchesRegistry": true,
+      "activeSourceIdMatchesRegistry": true,
       "reviewCountMatches": true
     },
     {
@@ -213,7 +233,8 @@
       "lifecycle": "FROZEN",
       "missingFields": [],
       "populationMismatches": [],
-      "primarySourceMatchesContract": true,
+      "primarySourceMatchesRegistry": true,
+      "activeSourceIdMatchesRegistry": true,
       "reviewCountMatches": true
     },
     {
@@ -224,7 +245,8 @@
       "lifecycle": "IN_PROGRESS",
       "missingFields": [],
       "populationMismatches": [],
-      "primarySourceMatchesContract": true,
+      "primarySourceMatchesRegistry": true,
+      "activeSourceIdMatchesRegistry": true,
       "reviewCountMatches": true
     }
   ],
@@ -309,5 +331,5 @@
   "failures": [],
   "hardErrorCount": 0,
   "nextStage": "D1-3",
-  "nextStageGoal": "Wire the read-only collector/health gate into a stable CLI entry point without adding GitHub Actions yet."
+  "nextStageGoal": "Wire the registry-backed read-only collector/health gate into the stable CLI entry point."
 }

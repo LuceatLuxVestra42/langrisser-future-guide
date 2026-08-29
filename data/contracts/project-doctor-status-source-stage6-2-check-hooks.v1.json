@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-status-source-stage6-2-check-hooks/v1",
+  "stage": "PROJECT-STATUS-STAGE6-2",
+  "checkpoint": "PROJECT_DOCTOR_STATUS_SOURCE_CHECK_ONLY_COMPLETION_HOOKS_HERO_SOLDIER",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Attach the existing Stage 5 status-source artifact bridge to the resolved Hero and Soldier completion workflows only after frozen-output verification succeeds, while keeping the integration check-only and non-mutating.",
+  "ownerResolutionContract": "data/contracts/project-doctor-status-source-stage6-1-owner-resolution.v1.json",
+  "bridgeContract": "data/contracts/project-doctor-status-source-artifact-bridge.v1.json",
+  "activeRegistry": "data/generated/project-doctor-active-source-registry.v1.json",
+  "projectStatusWorkflow": ".github/workflows/project-status-sync.yml",
+  "runtimePrerequisites": {
+    "purpose": "Project Doctor V3 may select admitted Regression Coverage Promotion V2 owners when the Hero or Soldier completion workflows change. The admitted runtime surface must therefore exist before Stage 6-2 can be considered operationally safe.",
+    "requiredPaths": [
+      "data/contracts/regression-coverage-promotion.v2.json",
+      "scripts/validate-soldier-stage6-7-final.mjs",
+      "scripts/validate-shared-movement-type-index-final.mjs",
+      "scripts/validate-soldier-portrait-v9-final.mjs",
+      "scripts/validate-regression-coverage-promotion-v2.mjs",
+      ".github/workflows/regression-coverage-promotion-v2.yml"
+    ]
+  },
+  "policy": {
+    "hookMode": "CHECK_ONLY",
+    "hookMustFollowFrozenOutputVerification": true,
+    "hookRequiresPriorWorkflowSuccess": true,
+    "hookRunsOnlyForPullRequestOrMain": true,
+    "automaticApplyEnabled": false,
+    "failedSourceMustBlock": true,
+    "reviewStatusMustBePreserved": true,
+    "reviewStatusIsNotSilentlyUpgraded": true,
+    "bridgeMustNotRerunOwningFinalizer": true,
+    "bridgeMustDelegateThroughStage4AndStage3": true,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "canonicalJoinRecomputation": false,
+    "filenameAuthorityInference": false,
+    "stageNumberAuthorityInference": false,
+    "chronologyAuthorityInference": false
+  },
+  "pipelines": [
+    {
+      "pipelineId": "hero",
+      "producerId": "hero-final",
+      "workflowPath": ".github/workflows/hero-stage6-4-site-consumer.yml",
+      "jobId": "site-consumer-final-freeze",
+      "frozenVerificationStep": "Verify frozen Stage 6-4 outputs on PR or main",
+      "hookStep": "Check Project Status source bridge after frozen Hero output",
+      "hookCommand": "node scripts/bridge-project-doctor-status-source.mjs --pipeline hero --check",
+      "activeEntryId": "hero-stage6-4-final",
+      "activeSourcePath": "data/validation/hero-stage6-4-final.v1.json",
+      "expectedSourceState": {
+        "status": "PASS_WITH_REVIEW",
+        "completion": "COMPLETE",
+        "heroDataPipelineStatus": "FINAL_FROZEN"
+      }
+    },
+    {
+      "pipelineId": "soldier",
+      "domain": "soldier",
+      "producerId": "soldier-final",
+      "workflowPath": ".github/workflows/soldier-stage6-7-site-admission.yml",
+      "jobId": "site-admission",
+      "frozenVerificationStep": "Verify frozen Stage 6-7 artifacts on main or PR",
+      "hookStep": "Check Project Status source bridge after frozen Soldier output",
+      "hookCommand": "node scripts/bridge-project-doctor-status-source.mjs --pipeline soldier --check",
+      "activeEntryId": "soldier-stage6-7-site-admission",
+      "activeSourcePath": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "expectedSourceState": {
+        "status": "PASS",
+        "admissionStatus": "READY_WITH_REVIEW"
+      }
+    }
+  ],
+  "runtimeProof": {
+    "currentBaselineBridgeCheckMustPass": true,
+    "currentReviewStateMustRemainReview": true,
+    "syntheticFailStatusMustBeRejectedByD1Preflight": true,
+    "writePerformedMustRemainFalse": true,
+    "applyFlagMustBeAbsentFromCompletionHooks": true,
+    "admittedV2RuntimeSurfaceMustExist": true
+  },
+  "boundaries": {
+    "productionMutation": false,
+    "canonicalMutation": false,
+    "frontendMutation": false,
+    "statusSourceMutation": false,
+    "freshnessReseal": false
+  },
+  "nextStep": {
+    "stage": "PROJECT-STATUS-STAGE6-3",
+    "goal": "Evaluate explicit apply-mode automation only after check-only hooks are stable in real Hero and Soldier completion PR/main runs; do not silently auto-reseal D5 freshness."
+  }
+}
