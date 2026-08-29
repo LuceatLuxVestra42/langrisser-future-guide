@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-3-2",
+  "checkpoint": "SKIN_STAGE3_3_2_INCREMENTAL_BATCH_SCAN_READY",
+  "status": "READY_FOR_REMAINING_BUNDLE_BYTES",
+  "purpose": "Allow the frozen 536-candidate Skin bulk scan to resume across multiple local bundle batches without rescanning already proven bundles or requiring all PC client bundle bytes in one directory at one time.",
+  "frozenBaseline": {
+    "skinCount": 540,
+    "uniqueModelResourceIdCount": 789,
+    "modelSourceIndexRecordCount": 977,
+    "requiredTargetCount": 1869,
+    "supplementalTargetCount": 81,
+    "bundleCatalogLineCount": 3047,
+    "bundleCatalogSha256": "424b64fefe0adfb6797e13053e3049e257838185c51e215eae22d8ee2d9c7188",
+    "authoritativeCandidateBundleCount": 536
+  },
+  "retainedEvidence": {
+    "manifest": "data/evidence/skin-stage3-3-current-subset/manifest.v1.json",
+    "candidateBundlesInspected": 13,
+    "candidateBundlesUnscanned": 523,
+    "requiredResolvedExact": 369,
+    "requiredPendingUnscannedCandidate": 1500,
+    "supplementalResolvedExact": 4,
+    "bundleScanErrors": 0,
+    "fullyInspectedNotFound": 0,
+    "duplicateOccurrence": 0,
+    "ambiguousMultipleBundles": 0
+  },
+  "tooling": {
+    "batchScanner": "scripts/skin-stage3-3-bulk-scan.mjs",
+    "batchMerger": "scripts/skin-stage3-3-merge-scan-results.mjs",
+    "unityFsScanner": "scripts/unityfs-exact-path-scan.mjs",
+    "singleBatchCommand": "node scripts/skin-stage3-3-bulk-scan.mjs <batch-dir> <batch-output.json> --catalog <bundle-file-list.txt> --allow-incomplete",
+    "mergeCommand": "node scripts/skin-stage3-3-merge-scan-results.mjs <merged-output.json> <scan-a.json> <scan-b.json> [scan-c.json ...] --allow-incomplete"
+  },
+  "mergeAdmission": {
+    "sameStageAndSubstageRequired": true,
+    "sameFrozenCountsRequired": true,
+    "sameCatalogHashRequired": true,
+    "sameAuthoritativeCandidateBundleListRequired": true,
+    "sameTargetIdentityRequired": true,
+    "repeatedBundleReportMustBeIdentical": true,
+    "repeatedCandidateResultMustBeIdentical": true,
+    "conflictPolicy": "FAIL_CLOSED"
+  },
+  "resolutionPolicy": {
+    "candidateMembership": "CATALOG_CONFIRMED_EXACT_BASENAME_ONLY",
+    "runtimePathMatch": "EXACT_CASE_NORMALIZED_FULL_RUNTIME_PATH_BYTES",
+    "fuzzyMatching": false,
+    "numericIdArithmetic": false,
+    "beginCurrentInference": false,
+    "crossRootFallback": false,
+    "alternatePathSubstitution": false,
+    "unscannedCandidatePreventsPromotion": true
+  },
+  "completionRule": {
+    "requiredResolvedExact": 1869,
+    "candidateBundlesAccountedFor": 536,
+    "bundleScanErrors": 0,
+    "allowedRequiredStatusesAtCloseout": ["RESOLVED_EXACT"],
+    "note": "After all catalog-confirmed candidates are scanned, NOT_FOUND, DUPLICATE, AMBIGUOUS, or SCAN_ERROR remain explicit review/failure classes and are not inferred away."
+  },
+  "externalInput": {
+    "required": true,
+    "reason": "The Project/Conversation and Git repository do not contain the remaining 523 local PC client .b bundle bytes.",
+    "acceptedForm": "Any one or more local directories containing previously unscanned catalog-confirmed candidate .b files; batches may be scanned independently and merged.",
+    "remainingCandidateBundleCount": 523
+  },
+  "nextStartPoint": "Scan any available subset of the remaining 523 candidate bundles with the frozen 3,047-name catalog, then merge that result with prior batch scan output. Repeat until 536/536 candidates are accounted for; only then evaluate final missing/duplicate/ambiguous classes."
+}
