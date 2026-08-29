@@ -1,0 +1,90 @@
+{
+  "stage": "Project Doctor Authoritative Pages Deployment",
+  "status": "PASS",
+  "completion": "PROJECT_DOCTOR_AUTHORITATIVE_PAGES_DEPLOYMENT_FINAL_FROZEN",
+  "closeout": "COMPLETE_MERGED_HOSTED_VERIFIED",
+  "target": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "sourceBranch": "main",
+    "deploymentBranch": "gh-pages",
+    "deploymentPath": "/langrisser-future-guide/"
+  },
+  "source": {
+    "producerMergePr": 214,
+    "producerMergeSha": "38cf19b1caad0fefb786a4f89bac7b73a61644b0",
+    "authoritativeMainSha": "9b8858fea8a092282b13367d10f27923c70b0882",
+    "ghPagesDeploymentCommit": "e8a5abce44c4fbfdf2d98da3f5f180be344cc45d",
+    "ghPagesDeploymentSourceSha": "9b8858fea8a092282b13367d10f27923c70b0882",
+    "workflowRunId": 33246673997,
+    "workflowJobId": 99085256800,
+    "workflow": ".github/workflows/project-doctor-authoritative-pages-deploy.yml",
+    "composer": "scripts/project-doctor-compose-authoritative-pages-runtime.mjs",
+    "hostedValidator": "scripts/project-doctor-validate-authoritative-pages-hosted.mjs"
+  },
+  "contract": {
+    "publisherOwner": "Project Doctor Authoritative Pages Deployment",
+    "productionDeploymentBranch": "gh-pages",
+    "productionBuildSource": "main plus explicitly composed frozen/generated runtime inputs",
+    "deploymentFreshnessKey": "deployment-manifest.json.sourceSha",
+    "hostedValidationRequiresExactSourceSha": true,
+    "concurrencyGroup": "project-doctor-authoritative-pages-deploy",
+    "cancelInProgress": true,
+    "semanticStageReopened": false
+  },
+  "completedScope": [
+    "Central authoritative publisher merged via PR #214.",
+    "Production publisher triggers on main push and workflow_dispatch only.",
+    "Current gh-pages deployment identifies the exact authoritative main source SHA.",
+    "Authoritative deployment completed static build, runtime composition, deployment-manifest write, gh-pages publication, Chromium installation, and Hosted Browser validation successfully.",
+    "Hosted Browser validation covered Hero, Skin, Equipment, exclusive Equipment, and Hero exclusive-equipment surfaces with zero page errors, console errors, and HTTP failures.",
+    "Equipment frozen Stage 2/3/P3-1/P3-2 semantics were not reopened.",
+    "Skin, Equipment, and Hero composed runtime guards remained internally consistent in the deployed candidate."
+  ],
+  "validation": {
+    "workflowRunId": 33246673997,
+    "workflowJobId": 99085256800,
+    "workflowConclusion": "success",
+    "validateStep": "Validate authoritative deployed surface",
+    "validateStepConclusion": "success",
+    "hostedStatus": "PASS_PROJECT_DOCTOR_AUTHORITATIVE_PAGES_HOSTED",
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "httpFailures": 0,
+    "representativeRoutes": {
+      "hero": "/langrisser-future-guide/hero/1-102",
+      "skin": "/langrisser-future-guide/skin/1-170",
+      "equipment": "/langrisser-future-guide/equipment",
+      "equipmentDetail": "/langrisser-future-guide/equipment/642",
+      "exclusiveEquipment": "/langrisser-future-guide/equipment/exclusive",
+      "exclusiveEquipmentDetail": "/langrisser-future-guide/equipment/692",
+      "heroExclusiveEquipmentLink": "/langrisser-future-guide/equipment/423"
+    },
+    "postMergeVerification": {
+      "required": true,
+      "recordedOutsideArtifact": true,
+      "reason": "Avoid recursive checkpoint commits: verify the checkpoint merge SHA through the authoritative deployment workflow after merge."
+    }
+  },
+  "review": [
+    "gh-pages remains an unprotected deployment branch; publisher ownership is enforced operationally by the authoritative workflow and must not be bypassed by reintroducing independent full-site force-publishers.",
+    "The composer intentionally consumes existing frozen/generated runtime inputs needed to preserve current cross-feature parity; migrate those inputs only through their owning feature workflow/checkpoint.",
+    "Future main pushes may cancel an older in-progress authoritative deployment; only the latest main SHA run should be used for closeout and freshness."
+  ],
+  "blockers": [],
+  "nextStart": {
+    "state": "Authoritative Pages deployment ownership complete after post-merge verification.",
+    "nextTask": "Select the next explicit unmet product or presentation requirement from current authoritative specifications; do not reopen frozen Equipment semantics from deployment activity.",
+    "doNotResume": [
+      "Do not create Equipment P3-3 solely because P3-2 is complete.",
+      "Do not use independent feature QA workflows as production gh-pages publishers.",
+      "Do not reopen canonical relations from Hosted/Browser-only failures."
+    ]
+  },
+  "reopenConditions": [
+    "Current gh-pages deployment cannot be traced to the latest authoritative main source SHA.",
+    "An independent workflow again becomes a full-site production gh-pages publisher.",
+    "Authoritative Hosted Browser validation fails consistently on a product/source mismatch rather than transient service availability.",
+    "The authoritative composer changes its frozen/generated input contract.",
+    "A deployed representative Hero, Skin, Equipment, exclusive Equipment, or Hero exclusive-equipment surface loses parity with its current frozen/generated source."
+  ]
+}
