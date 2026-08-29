@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/probe-hero-artwork-family-texture-rule.py'
+      - 'scripts/probe-hero-artwork-family-texture-rule-v2.py'
       - '.github/workflows/hero-artwork-family-texture-rule.yml'
 
 permissions:
@@ -22,7 +23,7 @@ jobs:
         run: python -m pip install --disable-pip-version-check --quiet UnityPy
       - name: Validate representative Prefab to Sprite to Texture2D chains
         shell: pwsh
-        run: python scripts/probe-hero-artwork-family-texture-rule.py
+        run: python scripts/probe-hero-artwork-family-texture-rule-v2.py
       - name: Upload validation report
         if: always()
         uses: actions/upload-artifact@v4
