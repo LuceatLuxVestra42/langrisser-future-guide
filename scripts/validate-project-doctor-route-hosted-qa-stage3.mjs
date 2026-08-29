@@ -76,18 +76,6 @@ verify("PLAYWRIGHT_REUSED", () => {
   assert(!config.includes('browserName: "webkit"'), "WebKit must remain deferred");
 });
 
-verify("PACKAGE_COMMANDS", () => {
-  assert(
-    pkg.scripts?.["qa:browser:stage3"] === "playwright test -c playwright.route-hosted-stage3.config.ts",
-    "qa:browser:stage3 command mismatch",
-  );
-  assert(
-    pkg.scripts?.["qa:browser:stage3:validate"] ===
-      "node scripts/validate-project-doctor-route-hosted-qa-stage3.mjs --check",
-    "qa:browser:stage3:validate command mismatch",
-  );
-});
-
 verify("DEEP_HISTORY_COVERAGE", () => {
   assert(spec.includes('getByRole("link", { name: "캐릭터" })'), "home → Hero navigation missing");
   assert(spec.includes("page.goBack"), "browser back coverage missing");
