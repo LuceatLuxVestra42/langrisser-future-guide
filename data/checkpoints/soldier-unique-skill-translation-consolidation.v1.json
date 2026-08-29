@@ -30,7 +30,7 @@
     "sourceTypeDerivedFromCanonicalIdentity": true,
     "idArithmeticInference": false
   },
-  "expectedAfterReviewBatch5": {
+  "verifiedAfterReviewBatch5": {
     "canonicalTargetCount": 185,
     "authoringRecordCount": 185,
     "reviewOverrideCount": 21,
@@ -48,14 +48,19 @@
     "descriptionCoverage": "PASS",
     "statusReviewTermContract": "PASS",
     "nameCnCanonicalParity": "PASS",
-    "progressParity": "RECHECK_PENDING",
-    "productionBuild": "RECHECK_PENDING",
-    "frontendConsumerBuild": "RECHECK_PENDING",
+    "progressParity": "PASS",
+    "productionBuild": "PASS",
+    "frontendConsumerBuild": "PASS",
     "hostedQa": "PENDING"
   },
   "verification": {
-    "status": "PENDING",
-    "expectedSummary": "records=185 pass=130 review=55 overrides=21 missing=0 extra=0 public=185"
+    "status": "PASS",
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33228025075,
+    "jobId": 99035436083,
+    "summary": "records=185 pass=130 review=55 overrides=21 missing=0 extra=0 public=185",
+    "productionViteNitroBuild": "SUCCESS",
+    "frontendLocalizationBoundary": "PASS"
   },
   "reviewBoundary": {
     "translationCoverage": "185/185",
@@ -77,5 +82,5 @@
     "hostedQaRequired": true,
     "hostedQaComplete": false
   },
-  "nextStep": "Verify review batch 5 at 185 records / 130 PASS / 55 REVIEW / 21 overrides, then continue evidence-based resolution from the remaining 55 items."
+  "nextStep": "Continue record-level evidence resolution from the remaining 55 REVIEW items; Hosted QA remains pending until the current projection is actually deployed."
 }
