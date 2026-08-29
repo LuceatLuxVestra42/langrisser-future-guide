@@ -1,0 +1,134 @@
+{
+  "stage": "QA-0",
+  "schemaVersion": "route-hosted-qa-stage0-validation.v1",
+  "contractVersion": "route-hosted-qa-stage0.v1",
+  "status": "PASS",
+  "baseline": {
+    "mainCommit": "c7fc2ad4ef76f0910742ee9b14a1d1d3e69d8d6c",
+    "routeTree": "src/routeTree.gen.ts",
+    "repositoryBase": "/langrisser-future-guide/"
+  },
+  "summary": {
+    "checks": 10,
+    "passed": 10,
+    "failed": 0,
+    "requiredPublicRoutes": 6,
+    "detailRoutePatterns": 3,
+    "heroFixtures": 1,
+    "soldierFixtures": 4,
+    "equipmentFixtures": 1
+  },
+  "checks": [
+    {
+      "id": "contract-identity",
+      "pass": true,
+      "details": {
+        "schemaVersion": "route-hosted-qa-stage0.v1",
+        "stage": "QA-0",
+        "status": "DESIGN_FROZEN",
+        "toolingNamespace": "project-doctor-route-hosted-qa"
+      }
+    },
+    {
+      "id": "required-public-routes-present",
+      "pass": true,
+      "details": {
+        "count": 6,
+        "routes": [
+          "/",
+          "/banners",
+          "/equipment",
+          "/equipment/exclusive",
+          "/heroes",
+          "/soldiers"
+        ]
+      }
+    },
+    {
+      "id": "detail-route-patterns-present",
+      "pass": true,
+      "details": {
+        "count": 3,
+        "routes": [
+          "/equipment/$equipmentId",
+          "/heroes/$heroId",
+          "/soldiers/$soldierId"
+        ]
+      }
+    },
+    {
+      "id": "prototype-routes-explicitly-excluded",
+      "pass": true,
+      "details": {
+        "count": 2,
+        "routes": [
+          "/equipment-prototype",
+          "/soldiers-prototype"
+        ]
+      }
+    },
+    {
+      "id": "hero-fixtures-resolve",
+      "pass": true,
+      "details": {
+        "fixtures": [6],
+        "sourceRecordCount": 267
+      }
+    },
+    {
+      "id": "soldier-fixtures-resolve",
+      "pass": true,
+      "details": {
+        "fixtures": [300, 1000, 102, 5621],
+        "sourceRecordCount": 224
+      }
+    },
+    {
+      "id": "equipment-fixtures-resolve",
+      "pass": true,
+      "details": {
+        "fixtures": [13],
+        "sourceRecordCount": 206
+      }
+    },
+    {
+      "id": "repository-base-contract",
+      "pass": true,
+      "details": {
+        "origin": "https://luceatluxvestra42.github.io",
+        "repositoryBase": "/langrisser-future-guide/",
+        "baseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+        "canonicalDirectoryStyle": "TRAILING_SLASH"
+      }
+    },
+    {
+      "id": "hosted-gate-scope-complete",
+      "pass": true,
+      "details": {
+        "count": 10,
+        "checks": [
+          "DEPLOYED_COMMIT_FRESHNESS",
+          "REPOSITORY_BASE_PATH",
+          "PUBLIC_ROUTE_RESOLUTION",
+          "DETAIL_DIRECT_ENTRY",
+          "REFRESH_EQUIVALENT_GET",
+          "TRAILING_SLASH_POLICY",
+          "ASSET_AND_CHUNK_RESOLUTION",
+          "FILENAME_CASE_SENSITIVITY",
+          "ROUTE_TREE_HOSTED_PARITY",
+          "STALE_DEPLOY_OR_CACHE"
+        ]
+      }
+    },
+    {
+      "id": "failure-boundary-separated",
+      "pass": true,
+      "details": {
+        "hosted": "DEPLOYMENT_HOSTING_FAIL",
+        "browser": "BROWSER_UI_FAIL",
+        "semanticReopenAllowed": false,
+        "note": "Hosted or Browser/UI failures do not reopen frozen canonical/ConfigData semantics unless a separate semantic or consumer parity validator fails."
+      }
+    }
+  ]
+}
