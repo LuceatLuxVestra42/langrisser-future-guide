@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "stage": "Equipment P3-2 Release Metadata Frontend Integration",
+  "status": "PENDING_HOSTED_QA",
+  "completion": "EQUIPMENT_P3_2_RELEASE_FRONTEND_CLOSEOUT_PENDING",
+  "closeout": "HOSTED_QA_PENDING",
+  "authoritativeSource": {
+    "p3_1Projection": "data/presentation/equipment-p3-1-release-metadata.v1.json",
+    "frozenGeneralList": "data/generated/equipment_stage3_3_general_list.json",
+    "localizedConsumer": "src/lib/equipment-page.localized.server.ts",
+    "generalRoute": "src/routes/equipment.tsx",
+    "hostedWorkflow": ".github/workflows/equipment-p3-2-closeout-hosted-qa.yml"
+  },
+  "implementationState": {
+    "sourcePr": 201,
+    "sourceHeadSha": "aebbb8fb26097068c02d790da23a2251aed1355b",
+    "sourceMergeSha": "9623984674cc897adf2de6bcab0628bdcbc0af07",
+    "typeBoundaryFollowupPr": 202,
+    "typeBoundaryHeadSha": "1d9314b47f33aa72be710d03243449f43b8d25ea",
+    "typeBoundaryMergeSha": "d3973d6b9300497809a2f8b37bb6c7caa26991b2",
+    "currentMainAtCloseoutStart": "30f19aab6215301b3f110f1890495564fda725d8",
+    "qaBranchRefreshMergeSha": "0753ce7e9b34b94d129b0ae1584862da4f70a2af",
+    "requiredProjectDoctorGuard": "SUCCESS_ON_IMPLEMENTATION_PRS",
+    "equipmentFrontendQa": "SUCCESS_ON_IMPLEMENTATION_PRS",
+    "localizationAudit": "SUCCESS_ON_IMPLEMENTATION_PRS",
+    "hostedCloseoutQa": "PENDING"
+  },
+  "frozenIdentity": {
+    "joinKey": "equipmentId",
+    "canonicalEquipment": 390,
+    "publicEquipment": 373,
+    "generalEquipment": 206,
+    "exclusiveEquipment": 167,
+    "siteTab3Population": 32,
+    "siteTab3PresentationLabel": "장비패스",
+    "semanticStageReopened": false,
+    "stage2ClassificationChanged": false,
+    "frozenStage3SourceMutated": false
+  },
+  "completedScope": {
+    "p3_1ProjectionConsumed": true,
+    "siteTab3DefaultOrderProjected": true,
+    "siteTab3ReleaseGroupDateProjected": true,
+    "generalDetailReleaseGroupDateProjected": true,
+    "p2NameIdSortBehaviorPreserved": true,
+    "siteTab3ReviewCopyRemoved": true,
+    "hostedRegressionSuite": "PENDING"
+  },
+  "review": [
+    "Equipment 265-268 retain secondary source tier until a primary official archive is found.",
+    "Individual order among equipment sharing one releaseGroupDate is not asserted; deterministic tie-breakers do not imply chronology."
+  ],
+  "blockers": [
+    "Hosted closeout QA has not yet passed on the current-main-derived QA branch."
+  ],
+  "nextStart": {
+    "stage": "Equipment P3-2 Hosted Closeout",
+    "instructions": [
+      "Run the current hosted closeout workflow against the deployed GitHub Pages site.",
+      "Verify exact 32-record 장비패스 default-order parity and representative detail release dates.",
+      "Re-run frozen Equipment Image, P2 sort persistence, and P1 navigation hosted regressions.",
+      "On PASS, freeze this checkpoint and merge only closeout artifacts; do not reopen semantic stages."
+    ]
+  },
+  "reopenConditions": [
+    "Frozen siteTab 3 population or equipmentId identity changes.",
+    "P3-1 release projection contract changes.",
+    "The intended 장비패스 presentation grouping changes.",
+    "Hosted regression demonstrates a product-source mismatch rather than deployment freshness."
+  ]
+}
