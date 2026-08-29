@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-review-resolution/v1",
+  "date": "2026-08-29",
+  "batch": 5,
+  "status": "APPLIED_BUILD_RECHECK_PENDING",
+  "evidence": "data/checkpoints/soldier-unique-skill-review-evidence-batch5.v1.json",
+  "overrides": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
+  "before": {"passCount":125,"reviewCount":60,"overrideCount":16},
+  "applied": {
+    "recordCount": 5,
+    "soldierIds": [249,647,1034,1105,1113],
+    "recordLevelDecision": "PASS",
+    "reason": "Korean Soldier-effect references reproduce every review-blocking mechanic/status wording for these five records; partial named-effect evidence remains REVIEW."
+  },
+  "afterExpected": {"passCount":130,"reviewCount":55,"overrideCount":21,"translatedCount":185,"remainingTranslationCount":0},
+  "safety": {
+    "canonicalSoldierDataReopened": false,
+    "baseTranslationShardsMutated": false,
+    "reviewResolutionAppliedBySmallOverrideLayer": true,
+    "blanketMechanicPromotion": false
+  },
+  "nextStep": "Confirm deterministic generator and production build at 185 records / 130 PASS / 55 REVIEW / 21 overrides."
+}
