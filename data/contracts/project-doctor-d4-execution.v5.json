@@ -1,0 +1,19 @@
+{
+  "version": 5,
+  "schemaId": "project-doctor-d4-execution/v5",
+  "stage": "D4",
+  "checkpoint": "PROJECT_DOCTOR_D4_EXECUTION_V5_HERO_AND_SKIN_ASSET_ADMISSION",
+  "status": "DESIGN_FROZEN",
+  "supersedes": "data/contracts/project-doctor-d4-execution.v4.json",
+  "d3Contract": "data/contracts/project-doctor-d3-validator-plan.v5.json",
+  "purpose": "Execute D3 V5 selected checks with the existing strict npm-run preflight, preserving the V4 Hero artwork final owner and adding the deterministic Skin final owner.",
+  "scope": {"d3PlanConsumption":true,"fullQueuePreflight":true,"selectedCheckExecution":true,"failFast":true,"dryRun":true,"rawConfigDataReadByRunner":false,"semanticRecomputationByRunner":false,"heroArtworkFinalOwnerExecution":true,"skinAssetFinalOwnerExecution":true},
+  "allowedCheckIds": ["configdata-integrity","coverage-hero-canonical","coverage-soldier-canonical","coverage-equipment-canonical","coverage-hero-soldier-relation","coverage-hero-equipment-relation","coverage-banner-data","coverage-skin-relation","coverage-shared-movement","coverage-soldier-assets","equipment-image-final","hero-artwork-final","skin-assets-final","regression-coverage-promotion-v2","localization-audit","production-build","doctor-health-gate","doctor-impact-self-test","doctor-plan-self-test"],
+  "executionPolicy": {"preflightEntireQueueBeforeExecution":true,"commandMustExactlyMatchD3Catalog":true,"phaseMustExactlyMatchD3Catalog":true,"allowedCommandShape":"npm run <verified-script-name>","shell":false,"sortByPhaseThenId":true,"failFastOnFirstNonZero":true,"executeSafeChecksWhenManualReviewExists":true,"manualReviewSurvivesSuccessfulChecks":true,"unknownOrTamperedCheckExecutesNothing":true,"doNotInventMissingCommands":true,"heroArtworkFailureBlocksLaterChecks":true,"skinAssetFailureBlocksLaterChecks":true},
+  "resultStatus": {"PASS_EXECUTED":0,"PASS_DRY_RUN":0,"PASS_NO_CHANGES":0,"FAIL_CHECK":1,"INVALID_PLAN":2,"REVIEW_MANUAL":3},
+  "sideEffectBoundary": {"runnerDirectWrites":[],"runnerDirectSemanticWrites":false,"childCommandsMayWriteTheirOwnGeneratedArtifacts":true,"heroArtworkFinalOwnerReadOnly":true,"skinAssetFinalOwnerReadOnly":true},
+  "manualReviewBoundary": "Only banner-assets remains an explicit D3 manual-review node after combined Hero+Skin admission.",
+  "historicalBoundary": {"d4V1":"data/contracts/project-doctor-d4-execution.v1.json","d4V2":"data/contracts/project-doctor-d4-execution.v2.json","d4V3":"data/contracts/project-doctor-d4-execution.v3.json","d4V4":"data/contracts/project-doctor-d4-execution.v4.json","previousBytesMustRemainUnchanged":true},
+  "outOfScope": ["promoting Banner asset scope","live hosted/browser execution inside Project Doctor","raw ConfigData semantic recomputation","canonical mutation","automatic data repair"],
+  "nextStage": "D7-V5"
+}
