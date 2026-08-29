@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-3-3",
+  "checkpoint": "SKIN_STAGE3_3_3_RESOLUTION_QA_CONTRACT",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Validate a complete or incremental Stage 3-3-2 UnityFS exact-runtime-path scan without reopening frozen Skin identity, ownership, sourceOrder, or model-resource selection. Final freeze admission is allowed only after all catalog-confirmed candidate bundles are accounted for and every required target has an accepted exact-evidence class.",
+  "frozenBaseline": {
+    "skinCount": 540,
+    "staticTargetCount": 540,
+    "charSpineTargetCount": 540,
+    "modelPrimaryTargetCount": 789,
+    "requiredTargetCount": 1869,
+    "supplementalTargetCount": 81,
+    "modelSourceIndexRecordCount": 977,
+    "bundleCatalogLineCount": 3047,
+    "bundleCatalogSha256": "424b64fefe0adfb6797e13053e3049e257838185c51e215eae22d8ee2d9c7188",
+    "authoritativeCandidateBundleCount": 536
+  },
+  "acceptedRequiredEvidenceClasses": [
+    "RESOLVED_EXACT_SINGLE_BUNDLE",
+    "RESOLVED_EXACT_IDENTICAL_CAB_ALIAS"
+  ],
+  "qaClasses": {
+    "RESOLVED_EXACT_SINGLE_BUNDLE": "Exactly one catalog-confirmed bundle contains exactly one exact full runtime-path occurrence.",
+    "RESOLVED_EXACT_IDENTICAL_CAB_ALIAS": "More than one catalog-confirmed bundle contains the exact runtime path, every hit occurs once, and every matched embedded CAB is byte-identical by SHA-256. Preserve all provenance; do not infer begin/current ownership.",
+    "PENDING_UNSCANNED_CANDIDATE": "At least one catalog-confirmed candidate bundle for this target has not been scanned yet.",
+    "FAIL_NOT_FOUND": "All catalog-confirmed candidates were scanned and no exact full runtime-path occurrence was found.",
+    "REVIEW_DUPLICATE_OCCURRENCE_IN_BUNDLE": "An exact runtime path occurs more than once inside one scanned candidate; exact path bytes alone are insufficient to collapse occurrences.",
+    "REVIEW_MULTIPLE_NONIDENTICAL_CABS": "The exact runtime path occurs in multiple candidate bundles but matched embedded CAB SHA-256 values are not all identical.",
+    "FAIL_SCAN_ERROR": "One or more required candidate bundles failed UnityFS/CAB scanning.",
+    "FAIL_CANDIDATE_COVERAGE": "The target has no authoritative catalog-confirmed candidate bundle or the frozen candidate surface changed.",
+    "FAIL_INVALID_SCAN_EVIDENCE": "The scan result violates frozen counts, identity, or evidence invariants."
+  },
+  "aliasPolicy": {
+    "sameRuntimePathAloneIsNotAliasProof": true,
+    "sameBundleFilenameIsNotAliasProof": true,
+    "sameEmbeddedCabSha256AcrossAllExactHitsIsAcceptedAliasProof": true,
+    "differentEmbeddedCabSha256RequiresReview": true,
+    "automaticBeginCurrentPreference": false,
+    "selectedBundleRequiredForAlias": false,
+    "preserveAllAliasBundleProvenance": true
+  },
+  "guardrails": {
+    "fuzzyMatching": false,
+    "numericIdArithmetic": false,
+    "filenameSimilarityJoin": false,
+    "crossRootFallback": false,
+    "alternatePathSubstitution": false,
+    "canonicalSkinRecomputation": false,
+    "heroSkinOwnershipRecomputation": false,
+    "sourceOrderRecomputation": false,
+    "modelResourceSelectionRecomputation": false
+  },
+  "finalFreezeConditions": {
+    "candidateBundlesAccountedFor": 536,
+    "bundleScanErrors": 0,
+    "requiredTargetsAccepted": 1869,
+    "pendingRequiredTargets": 0,
+    "failedRequiredTargets": 0,
+    "reviewRequiredTargets": 0,
+    "skinCoverage": 540,
+    "staticCoverage": 540,
+    "charSpineCoverage": 540,
+    "modelPrimaryCoverage": 789,
+    "beginCurrentUnresolved": 0
+  },
+  "currentBoundary": {
+    "stage3_3_2MayBeIncremental": true,
+    "stage3_3_3MayRunOnPartialInput": true,
+    "partialInputMayNotFreeze": true,
+    "projectDoctorSkinAssetOwnerAdmissionDeferredUntilFinalFreeze": true
+  },
+  "nextStageAfterFinalFreeze": "3-4 selective actual asset extraction"
+}
