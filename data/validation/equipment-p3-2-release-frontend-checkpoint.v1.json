@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "stage": "Equipment P3-2 Release Metadata Frontend Integration",
+  "status": "PASS",
+  "completion": "EQUIPMENT_P3_2_RELEASE_FRONTEND_HOSTED_VERIFIED",
+  "closeout": "HOSTED_VERIFIED_PENDING_ARTIFACT_MERGE",
+  "authoritativeSource": {
+    "p3_1Projection": "data/presentation/equipment-p3-1-release-metadata.v1.json",
+    "frozenGeneralList": "data/generated/equipment_stage3_3_general_list.json",
+    "localizedConsumer": "src/lib/equipment-page.localized.server.ts",
+    "generalRoute": "src/routes/equipment.tsx",
+    "hostedWorkflow": ".github/workflows/equipment-p3-2-closeout-hosted-qa.yml"
+  },
+  "implementationState": {
+    "sourcePr": 201,
+    "sourceHeadSha": "aebbb8fb26097068c02d790da23a2251aed1355b",
+    "sourceMergeSha": "9623984674cc897adf2de6bcab0628bdcbc0af07",
+    "typeBoundaryFollowupPr": 202,
+    "typeBoundaryHeadSha": "1d9314b47f33aa72be710d03243449f43b8d25ea",
+    "typeBoundaryMergeSha": "d3973d6b9300497809a2f8b37bb6c7caa26991b2",
+    "currentMainAtCloseoutStart": "30f19aab6215301b3f110f1890495564fda725d8",
+    "qaBranchRefreshMergeSha": "0753ce7e9b34b94d129b0ae1584862da4f70a2af",
+    "freshnessFromPriorEquipmentMain": {
+      "baseSha": "4e3743306c4d13e9fe5a9c3867e257f3b171bf3b",
+      "headSha": "30f19aab6215301b3f110f1890495564fda725d8",
+      "equipmentFilesChanged": false,
+      "changedFiles": [
+        "src/lib/hero-detail-stage5.server.ts",
+        "src/routes/heroes_.$heroId.tsx"
+      ]
+    },
+    "requiredProjectDoctorGuard": "SUCCESS_ON_IMPLEMENTATION_PRS",
+    "equipmentFrontendQa": "SUCCESS_ON_IMPLEMENTATION_PRS",
+    "localizationAudit": "SUCCESS_ON_IMPLEMENTATION_PRS"
+  },
+  "hostedCloseoutEvidence": {
+    "runId": 33241222878,
+    "jobId": 99070791925,
+    "headSha": "e65f5aaa64197279cffefd4597df301b7f206bc5",
+    "conclusion": "SUCCESS",
+    "hostedBaseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+    "p3_2Chronology": {
+      "status": "PASS_EQUIPMENT_P3_2_HOSTED_CHRONOLOGY",
+      "siteTab3Count": 32,
+      "defaultOrderParity": "PASS",
+      "detailDates": {
+        "642": "2026-07-16",
+        "299": "2019-05-09"
+      },
+      "policyCopy": "PASS",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "hostedHttpFailures": 0
+    },
+    "equipmentImageRegression": "PASS_EQUIPMENT_IMAGE_STAGE3_BROWSER_UI",
+    "p2SearchSortPersistenceRegression": "PASS_EQUIPMENT_PRESENTATION_P2_HOSTED_CLOSEOUT",
+    "p1NavigationRegression": "PASS_EQUIPMENT_PRESENTATION_P1_HOSTED_CLOSEOUT"
+  },
+  "frozenIdentity": {
+    "joinKey": "equipmentId",
+    "canonicalEquipment": 390,
+    "publicEquipment": 373,
+    "generalEquipment": 206,
+    "exclusiveEquipment": 167,
+    "siteTab3Population": 32,
+    "siteTab3PresentationLabel": "장비패스",
+    "semanticStageReopened": false,
+    "stage2ClassificationChanged": false,
+    "frozenStage3SourceMutated": false
+  },
+  "completedScope": {
+    "p3_1ProjectionConsumed": true,
+    "siteTab3DefaultOrderProjected": true,
+    "siteTab3ReleaseGroupDateProjected": true,
+    "generalDetailReleaseGroupDateProjected": true,
+    "p2NameIdSortBehaviorPreserved": true,
+    "siteTab3ReviewCopyRemoved": true,
+    "hostedChronology": "PASS",
+    "hostedEquipmentImageRegression": "PASS",
+    "hostedP2Regression": "PASS",
+    "hostedP1Regression": "PASS"
+  },
+  "review": [
+    "Equipment 265-268 retain secondary source tier until a primary official archive is found.",
+    "Individual order among equipment sharing one releaseGroupDate is not asserted; deterministic tie-breakers do not imply chronology."
+  ],
+  "blockers": [],
+  "nextStart": {
+    "stage": "Equipment P3-2 Closeout Artifact Merge",
+    "instructions": [
+      "Merge only the hosted closeout workflow and this checkpoint into main through the required pr-guard.",
+      "After merge, update this checkpoint with the closeout PR and merge SHA.",
+      "Do not create a new semantic P3 stage unless an explicit unmet Equipment requirement or authoritative contradiction is identified."
+    ]
+  },
+  "reopenConditions": [
+    "Frozen siteTab 3 population or equipmentId identity changes.",
+    "P3-1 release projection contract changes.",
+    "The intended 장비패스 presentation grouping changes.",
+    "Hosted regression demonstrates a product-source mismatch rather than deployment freshness."
+  ]
+}
