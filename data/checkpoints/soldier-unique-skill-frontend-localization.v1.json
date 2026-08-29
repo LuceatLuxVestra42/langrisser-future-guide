@@ -3,7 +3,7 @@
   "schemaId": "soldier-unique-skill-frontend-localization/v1",
   "date": "2026-08-29",
   "stage": "FRONTEND_CONSUMER_INTEGRATION",
-  "status": "BUILD_PASS_HOSTED_PENDING",
+  "status": "BUILD_RECHECK_PENDING_HOSTED_PENDING",
   "scope": {
     "target": "normal Tier3 and SP Soldier unique-skill final descriptions",
     "targetCount": 185,
@@ -29,23 +29,19 @@
     "lowerTierUsesExistingRichDetailBehavior": true
   },
   "reviewResolution": {
-    "appliedBatches": 4,
-    "resolvedSoldierIds": [250,326,333,334,336,341,512,513,514,515,602,635,637,811,814,815],
-    "passCount": 125,
-    "reviewCount": 60,
+    "appliedBatches": 5,
+    "resolvedSoldierIds": [249,250,326,333,334,336,341,512,513,514,515,602,635,637,647,811,814,815,1034,1105,1113],
+    "passCount": 130,
+    "reviewCount": 55,
     "overridePath": "data/presentation/soldier-unique-skill-review-overrides.v1.json"
   },
   "buildGate": {
-    "status": "PASS",
+    "status": "RECHECK_PENDING",
     "workflow": "Equipment Korean Name Frontend QA",
-    "runId": 33227415992,
-    "jobId": 99033722534,
-    "conclusion": "SUCCESS",
-    "observedGeneratorSummary": "records=185 pass=125 review=60 overrides=16 missing=0 extra=0 public=185",
-    "productionBuild": "SUCCESS"
+    "expectedGeneratorSummary": "records=185 pass=130 review=55 overrides=21 missing=0 extra=0 public=185"
   },
   "reviewBoundary": {
-    "reviewCount": 60,
+    "reviewCount": 55,
     "reviewItemsAreMissingTranslations": false,
     "reviewItemsBlockFrontendProjection": false,
     "reviewResolutionRequiredBeforeTranslationCloseout": true
@@ -58,8 +54,8 @@
   },
   "completion": {
     "frontendConsumerIntegrated": true,
-    "buildGateComplete": true,
+    "buildGateComplete": false,
     "hostedQaComplete": false
   },
-  "nextStep": "Continue evidence-based review resolution from the remaining 60 items. Hosted QA remains pending until deployment contains the current projection."
+  "nextStep": "Verify review batch 5 build gate, then continue evidence-based resolution from the remaining 55 items."
 }
