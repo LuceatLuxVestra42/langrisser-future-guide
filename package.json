@@ -74,7 +74,9 @@
     "validate:regression-coverage-promotion:v2": "node scripts/validate-regression-coverage-promotion-v2.mjs",
     "qa:hosted": "node scripts/run-project-doctor-route-hosted-qa-stage1.mjs",
     "qa:hosted:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage1.mjs --check",
-    "qa:hosted:stage0:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage0.mjs --check"
+    "qa:hosted:stage0:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage0.mjs --check",
+    "qa:browser": "playwright test -c playwright.route-hosted.config.ts",
+    "qa:browser:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage2.mjs --check"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
