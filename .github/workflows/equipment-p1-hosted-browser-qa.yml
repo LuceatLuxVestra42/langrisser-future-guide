@@ -1,0 +1,194 @@
+name: Equipment P1 Hosted Browser QA
+
+on:
+  push:
+    branches:
+      - qa/equipment-image-stage3-browser-ui-20260828
+    paths:
+      - '.github/workflows/equipment-p1-hosted-browser-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: equipment-p1-hosted-browser-qa
+  cancel-in-progress: false
+
+jobs:
+  hosted-browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install project dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Apply GitHub Pages document navigation boundary
+        run: |
+          set -euo pipefail
+          node scripts/apply-equipment-stage3-pages-document-navigation.mjs
+          grep -A4 'to="/heroes/\$heroId"' 'src/routes/equipment_.$equipmentId.tsx' | grep -q reloadDocument
+
+      - name: Reuse proven GitHub Pages static config
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
+          git show FETCH_HEAD:vite.config.ts > vite.config.ts
+          grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
+          grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
+
+      - name: Build hosted candidate
+        run: bun run build
+
+      - name: Require static candidate coverage
+        run: |
+          set -euo pipefail
+          test -f dist/client/equipment/index.html
+          test -f dist/client/equipment/exclusive/index.html
+          test -f dist/client/equipment/273/index.html
+          test "$(find dist/client/equipment -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/equipment/[0-9]+/index\.html$' | wc -l | tr -d ' ')" -eq 373
+          test "$(find dist/client/images/equipment -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" -eq 373
+          test "$(find dist/client/heroes -mindepth 2 -maxdepth 2 -type f -name index.html | grep -E '/heroes/[0-9]+/index\.html$' | wc -l | tr -d ' ')" -eq 267
+
+      - name: Publish candidate to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy Equipment P1 hosted QA ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run existing Equipment Browser UI suite
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: |
+          set -o pipefail
+          for attempt in 1 2 3; do
+            log="equipment-browser-attempt-${attempt}.log"
+            if node scripts/validate-equipment-image-stage3-browser-ui.mjs 2>&1 | tee "$log"; then
+              exit 0
+            fi
+            if ! grep -Eq '"status":50[234]' "$log"; then
+              exit 1
+            fi
+            test "$attempt" -lt 3
+            sleep 5
+          done
+          exit 1
+
+      - name: Run Equipment P1 hosted interaction QA
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const base = process.env.HOSTED_BASE_URL.replace(/\/?$/, '/');
+          const url = (path) => new URL(path.replace(/^\//, ''), base).toString();
+          const assert = (condition, message) => { if (!condition) throw new Error(message); };
+
+          async function goto(page, path) {
+            const response = await page.goto(url(path), { waitUntil: 'networkidle', timeout: 45000 });
+            assert(response && response.status() < 400, `${path} failed: ${response?.status()}`);
+          }
+
+          async function noOverflow(page, label) {
+            const m = await page.evaluate(() => ({ innerWidth: window.innerWidth, scrollWidth: document.documentElement.scrollWidth }));
+            assert(m.scrollWidth <= m.innerWidth + 1, `${label} horizontal overflow: ${JSON.stringify(m)}`);
+          }
+
+          async function cardHierarchy(page, equipmentId, label) {
+            const card = page.locator(`a[href$="/equipment/${equipmentId}"]`).first();
+            await card.waitFor({ state: 'visible', timeout: 15000 });
+            const image = card.locator(`img[src$="/images/equipment/${equipmentId}.png"]`);
+            const heading = card.locator('h2');
+            await image.waitFor({ state: 'visible', timeout: 15000 });
+            await heading.waitFor({ state: 'visible', timeout: 15000 });
+            assert((await heading.innerText()).trim().length > 0, `${label}: empty name`);
+            assert(await image.evaluate((el) => Boolean(el.parentElement?.querySelector('h2'))), `${label}: image/name hierarchy split`);
+          }
+
+          const browser = await chromium.launch({ headless: true });
+          try {
+            const desktop = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+            const page = await desktop.newPage();
+            const errors = [];
+            page.on('pageerror', e => errors.push(`pageerror:${e}`));
+            page.on('console', m => { if (m.type() === 'error') errors.push(`console:${m.text()}`); });
+            page.on('response', r => { if (r.url().startsWith(base) && r.status() >= 400) errors.push(`http:${r.status()}:${r.url()}`); });
+
+            await goto(page, 'equipment/');
+            await cardHierarchy(page, 6, 'desktop general 6');
+            await goto(page, 'equipment/exclusive/');
+            await cardHierarchy(page, 273, 'desktop exclusive 273');
+            await goto(page, 'equipment/273/');
+
+            const ownerSection = page.locator('section').filter({ has: page.getByRole('heading', { name: '전용 영웅', exact: true }) }).first();
+            const heroLink = ownerSection.locator('a[href*="/heroes/"]').first();
+            await heroLink.waitFor({ state: 'visible', timeout: 15000 });
+            const ownerName = (await heroLink.locator('p').first().innerText()).trim();
+            const heroHref = await heroLink.getAttribute('href');
+            assert(heroHref && /\/heroes\/\d+\/?$/.test(heroHref), `invalid Hero href ${heroHref}`);
+
+            await Promise.all([
+              page.waitForURL(/\/langrisser-future-guide\/heroes\/\d+\/?$/, { timeout: 30000 }),
+              heroLink.click(),
+            ]);
+            await page.locator('h1').first().waitFor({ state: 'visible', timeout: 15000 });
+            assert((await page.locator('h1').first().innerText()).includes(ownerName), `Hero detail mismatch: ${ownerName}`);
+            await page.reload({ waitUntil: 'networkidle', timeout: 45000 });
+            assert((await page.locator('h1').first().innerText()).includes(ownerName), 'Hero refresh failed');
+            await page.goBack({ waitUntil: 'networkidle', timeout: 45000 });
+            assert(/\/equipment\/273\/?$/.test(page.url()), `Back failed: ${page.url()}`);
+            await page.goForward({ waitUntil: 'networkidle', timeout: 45000 });
+            assert(/\/heroes\/\d+\/?$/.test(page.url()), `Forward failed: ${page.url()}`);
+            assert(errors.length === 0, `desktop errors: ${JSON.stringify(errors)}`);
+            await desktop.close();
+
+            const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true });
+            const mp = await mobile.newPage();
+            const mobileErrors = [];
+            mp.on('pageerror', e => mobileErrors.push(`pageerror:${e}`));
+            mp.on('console', m => { if (m.type() === 'error') mobileErrors.push(`console:${m.text()}`); });
+            mp.on('response', r => { if (r.url().startsWith(base) && r.status() >= 400) mobileErrors.push(`http:${r.status()}:${r.url()}`); });
+            await goto(mp, 'equipment/');
+            await cardHierarchy(mp, 6, 'mobile general 6');
+            await noOverflow(mp, 'mobile general list');
+            await goto(mp, 'equipment/exclusive/');
+            await cardHierarchy(mp, 273, 'mobile exclusive 273');
+            await noOverflow(mp, 'mobile exclusive list');
+            await goto(mp, 'equipment/273/');
+            await noOverflow(mp, 'mobile exclusive detail');
+            await mp.locator('section').filter({ has: mp.getByRole('heading', { name: '전용 영웅', exact: true }) }).first().locator('a[href*="/heroes/"]').first().waitFor({ state: 'visible', timeout: 15000 });
+            assert(mobileErrors.length === 0, `mobile errors: ${JSON.stringify(mobileErrors)}`);
+            await mobile.close();
+          } finally {
+            await browser.close();
+          }
+          console.log('PASS_EQUIPMENT_PRESENTATION_P1_HOSTED_BROWSER_UI');
+          NODE
