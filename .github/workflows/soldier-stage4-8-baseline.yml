@@ -201,9 +201,13 @@ jobs:
         if: github.event_name != 'pull_request' || steps.mode.outputs.full_regen == 'true'
         run: node scripts/validate-soldier-stage4-8-baseline.cjs
 
-      - name: Upload Stage 4-8 baseline evidence
+      - name: Upload Stage 4-8 regeneration evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: soldier-stage4-8-baseline
-          path: data/validation/soldier-stage4-8-baseline.v1.json
+          path: |
+            data/validation/soldier-stage4-8-baseline.v1.json
+            data/generated/soldier-master.v1.json
+            data/generated/soldier-hero-relations.v1.json
+            data/validation/soldier-stage4-2-master.v1.json
