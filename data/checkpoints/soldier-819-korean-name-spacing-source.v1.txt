@@ -1,0 +1,41 @@
+Soldier 819 Korean name spacing — source correction checkpoint
+Date: 2026-08-29
+
+status: SOURCE_CORRECTION_APPLIED
+scope: localization / presentation metadata
+
+Target:
+- soldierId: 819
+- nameCn: 山罡救援队
+- previous nameKr: 산별구조대
+- corrected nameKr: 산별 구조대
+- nameKrStatus: confirmed
+
+Authoritative evidence:
+- user-provided consolidated Soldier-name mapping: 용병명_통합.txt
+- confirmed mapping: 山罡救援队 = 산별 구조대
+
+Repository source updates:
+- data/metadata/soldier-name-kr-tier3.v1.json
+- data/soldier-release-source.v1.json (expectedNameKr review evidence only)
+
+Automated downstream observed:
+- Soldier Stage 2 Final Validation: PASS
+- data/generated/soldier-master.v1.json regenerated with corrected nameKr
+- data/validation/soldier-stage2-final.v1.json regenerated
+
+Semantic boundary:
+- Soldier canonical ID unchanged
+- nameCn unchanged
+- tier / armyType unchanged
+- Hero↔Soldier relation unchanged
+- no name JOIN or ID arithmetic introduced
+
+Remaining at this checkpoint:
+- downstream Soldier consumer propagation / validation
+- Localization Audit / Project Doctor PR Guard
+- production build and merge to main
+
+Reopen source correction only if:
+- authoritative Korean name evidence contradicts 산별 구조대
+- Soldier 819 identity/nameCn changes in an authoritative source
