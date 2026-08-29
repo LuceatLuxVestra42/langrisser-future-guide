@@ -7,6 +7,7 @@ on:
     paths:
       - scripts/materialize-hero-artwork-h-a6.py
       - scripts/materialize-hero-artwork-h-a6-v2.py
+      - scripts/materialize-hero-artwork-h-a6-v3.py
       - .github/workflows/hero-artwork-h-a6-materialize.yml
 
 permissions:
@@ -29,7 +30,7 @@ jobs:
 
       - name: Materialize and verify 267 Hero PNG assets
         shell: pwsh
-        run: python scripts/materialize-hero-artwork-h-a6-v2.py
+        run: python scripts/materialize-hero-artwork-h-a6-v3.py
 
       - name: Commit exact verified Hero PNG assets
         shell: bash
