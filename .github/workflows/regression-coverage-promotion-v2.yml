@@ -1,0 +1,91 @@
+name: Regression Coverage Promotion V2
+
+on:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'scripts/validate-shared-movement-type-index-final.mjs'
+      - 'scripts/validate-soldier-stage6-7-final.mjs'
+      - 'scripts/validate-soldier-portrait-v9-final.mjs'
+      - 'scripts/validate-regression-coverage-promotion-v2.mjs'
+      - 'data/contracts/regression-coverage-promotion.v2.json'
+      - '.github/workflows/regression-coverage-promotion-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v2-owners:
+    name: validate-v2-owners
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Hero canonical owner
+        run: bun run validate:coverage:hero-canonical
+
+      - name: Soldier canonical owner
+        run: bun run validate:coverage:soldier-canonical
+
+      - name: Equipment canonical owner
+        run: bun run validate:coverage:equipment-canonical
+
+      - name: Hero-Soldier relation owner
+        run: bun run validate:coverage:hero-soldier-relation
+
+      - name: Hero-Equipment relation owner
+        run: bun run validate:coverage:hero-equipment-relation
+
+      - name: Banner data owner
+        run: bun run validate:coverage:banner-data
+
+      - name: Skin relation owner
+        run: bun run validate:coverage:skin-relation
+
+      - name: Shared movement owner
+        run: bun run validate:coverage:shared-movement
+
+      - name: Soldier assets owner
+        run: bun run validate:coverage:soldier-assets
+
+      - name: V2 admission audit
+        run: bun run validate:regression-coverage-promotion:v2
+
+      - name: Upload V2 audit summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-coverage-promotion-v2-summary
+          path: data/validation/regression-coverage-promotion-summary.v2.json
+          if-no-files-found: warn
+
+      - name: Ensure validators do not dirty frozen tracked outputs
+        if: always()
+        run: |
+          dirty="$(git diff --name-only)"
+          if [ -n "$dirty" ]; then
+            echo "Tracked runtime side effects:"
+            printf '%s\n' "$dirty"
+          fi
+          git diff --exit-code -- \
+            data/contracts \
+            data/generated \
+            data/validation \
+            scripts \
+            package.json \
+            .github/workflows
