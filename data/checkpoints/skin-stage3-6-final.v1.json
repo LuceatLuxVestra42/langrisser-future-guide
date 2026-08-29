@@ -1,0 +1,28 @@
+{
+  "checkpoint": "skin-stage3-6-final-v1",
+  "status": "PASS_SKIN_STAGE3_6_FRONTEND_QA",
+  "completion": "COMPLETE",
+  "finalReady": true,
+  "sourceSha": "30d9c9e188b4acfa32f3825c58b722173d27e15c",
+  "predecessorHostedCheckpoint": "data/checkpoints/skin-stage3-6-hosted.v1.json",
+  "preflight": "PASS_SKIN_STAGE3_6_HERO_DETAIL_CONSUMER_PREFLIGHT",
+  "build": "PASS_SKIN_STAGE3_6_STATIC_CANDIDATE",
+  "hosted": "PASS_SKIN_STAGE3_6_HOSTED_QA",
+  "browserUi": "PASS_SKIN_STAGE3_6_BROWSER_UI",
+  "browserUiEvidencePath": "data/evidence/skin-stage3-6-browser-ui.v1.json",
+  "browserUiInputFingerprint": "0b29609d0edc0fb11161206b467f42891bd3688fea5597d0816a50925b8d43e3",
+  "semanticStageReopened": false,
+  "projectDoctorSkinAssetsPromoted": false,
+  "review": [
+    "Korean Skin display names and release/acquisition presentation metadata remain a separate presentation/localization review and were not synthesized in this gate.",
+    "CHAR_SPINE and MODEL_PRIMARY web presentation remains deferred from Stage 3-5 static-image scope."
+  ],
+  "blocker": [],
+  "nextStart": "Freeze Stage 3-6 frontend presentation checkpoint, then evaluate Project Doctor skin-assets admission without weakening the manual-review guard.",
+  "reopenConditions": [
+    "canonical Skin/Hero population or Stage 2 relation changes",
+    "Stage 3-5 public asset manifest/hash validation changes",
+    "Hero detail Skin consumer contract changes",
+    "hosted route/asset or Browser/UI regression occurs"
+  ]
+}

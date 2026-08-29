@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-6",
+  "status": "PASS_SKIN_STAGE3_6_FRONTEND_QA",
+  "completion": "COMPLETE",
+  "finalReady": true,
+  "sourceSha": "30d9c9e188b4acfa32f3825c58b722173d27e15c",
+  "gates": {
+    "preflight": "PASS",
+    "build": "PASS",
+    "deploymentHosted": "PASS",
+    "browserUi": "PASS_PLAYWRIGHT_HOSTED_BROWSER_UI"
+  },
+  "counts": {
+    "canonicalHeroCount": 267,
+    "canonicalSkinCount": 540,
+    "heroesWithSkinCount": 235,
+    "zeroSkinHeroCount": 32
+  },
+  "browserUiFreshness": {
+    "status": "PASS_FRESH_BROWSER_UI_EVIDENCE",
+    "inputFingerprint": {
+      "version": 1,
+      "algorithm": "sha256",
+      "sha256": "0b29609d0edc0fb11161206b467f42891bd3688fea5597d0816a50925b8d43e3",
+      "fileCount": 546,
+      "skinImageCount": 540,
+      "deployedSourceSha": "30d9c9e188b4acfa32f3825c58b722173d27e15c"
+    },
+    "evidencePath": "data/evidence/skin-stage3-6-browser-ui.v1.json",
+    "deployedSourceSha": "30d9c9e188b4acfa32f3825c58b722173d27e15c"
+  },
+  "boundaries": {
+    "semanticOwnershipRecomputed": false,
+    "sourceOrderRecomputed": false,
+    "releaseMetadataSynthesized": false,
+    "acquisitionMethodSynthesized": false,
+    "hostedDeploymentMutatedByBrowserGate": false
+  },
+  "nonBlockingReview": [
+    "Korean Skin display names and release/acquisition presentation metadata remain a separate presentation/localization review and were not synthesized in this gate.",
+    "CHAR_SPINE and MODEL_PRIMARY web presentation remains deferred from Stage 3-5 static-image scope."
+  ],
+  "nextStartPoint": "Freeze Stage 3-6 frontend presentation checkpoint, then evaluate Project Doctor skin-assets admission without weakening the manual-review guard."
+}
