@@ -1,0 +1,33 @@
+name: Hero Artwork Bundle Ownership
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/probe-hero-artwork-bundle-ownership.py'
+      - '.github/workflows/hero-artwork-bundle-ownership.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  bundle-ownership:
+    if: github.event.pull_request.head.ref == 'work/hero-asset-launcher-probe'
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install UnityPy
+        shell: pwsh
+        run: python -m pip install --disable-pip-version-check --quiet UnityPy
+      - name: Resolve final and begin Hero artwork bundle coverage
+        shell: pwsh
+        run: python scripts/probe-hero-artwork-bundle-ownership.py
+      - name: Upload ownership reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-artwork-bundle-ownership-report
+          path: ${{ runner.temp }}/langrisser-hero-artwork-bundle-ownership/report
+          if-no-files-found: warn
+          retention-days: 3
