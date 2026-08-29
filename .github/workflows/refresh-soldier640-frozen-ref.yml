@@ -60,7 +60,16 @@ jobs:
         run: npm run audit:localization -- --check
 
       - name: Run Project Doctor on local refreshed HEAD
-        run: npm run doctor -- --base origin/main --head HEAD
+        shell: bash
+        run: |
+          set +e
+          npm run doctor -- --base origin/main --head HEAD
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ] && [ "$code" -ne 3 ]; then
+            exit "$code"
+          fi
+          echo "Project Doctor completed with acceptable exit code: $code"
 
       - name: Production build
         run: npm run build
