@@ -12,8 +12,9 @@ on:
       - 'data/generated/project-doctor-d1-1-status.v1.json'
       - 'data/validation/project-doctor-d1-1-summary.v1.json'
       - 'data/validation/project-doctor-d1-2-summary.v1.json'
-      - 'data/validation/project-doctor-d1-3-freshness.v1.json'
-      - 'data/project-status.v1.json'
+      - 'data/validation/project-doctor-d5-summary.v1.json'
+      - 'data/generated/project-status.v1.json'
+      - 'PROJECT_STATUS.md'
       - 'scripts/validate-equipment-public-presentation-correction-final.mjs'
       - '.github/workflows/equipment-active-source-correction.yml'
   pull_request:
@@ -25,8 +26,9 @@ on:
       - 'data/generated/project-doctor-d1-1-status.v1.json'
       - 'data/validation/project-doctor-d1-1-summary.v1.json'
       - 'data/validation/project-doctor-d1-2-summary.v1.json'
-      - 'data/validation/project-doctor-d1-3-freshness.v1.json'
-      - 'data/project-status.v1.json'
+      - 'data/validation/project-doctor-d5-summary.v1.json'
+      - 'data/generated/project-status.v1.json'
+      - 'PROJECT_STATUS.md'
       - 'scripts/validate-equipment-public-presentation-correction-final.mjs'
       - '.github/workflows/equipment-active-source-correction.yml'
   workflow_dispatch:
@@ -86,21 +88,17 @@ jobs:
           --projection-file data/checkpoints/equipment-public-presentation-correction-projection.v1.json
           --note "2026-08-30 Equipment public-admission and explicit display-collection correction; canonical 390 and exclusive 167 remain frozen."
 
-      - name: Validate active source registry
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        run: npm run doctor:active-sources:validate
-
       - name: Refresh Project Doctor freshness seal
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        run: npm run doctor:freshness
+        run: npm run doctor:freshness:refresh
 
       - name: Validate Project Doctor freshness seal
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: npm run doctor:freshness:validate
 
-      - name: Run Project Doctor preflight
+      - name: Run integrated Project Doctor preflight
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        run: npm run doctor:preflight
+        run: npm run doctor -- --dry-run --base origin/fix/equipment-p3-chronology-supersede --head HEAD
 
       - name: Production build
         run: bun run build
