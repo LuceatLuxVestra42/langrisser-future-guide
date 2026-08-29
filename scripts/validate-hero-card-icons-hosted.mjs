@@ -36,7 +36,7 @@ async function verifyList(page, label) {
 
   const sources = await icons.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("src") || ""));
   check(new Set(sources).size === 267, `Hero list ${label} card icon sources are not unique`);
-  check(sources.every((src) => src.includes("/images/heroes/card-icons/") && src.endsWith(".png")), `Hero list ${label} contains a non-card-icon source`);
+  check(sources.every((src) => src.includes("/images/heroes/card-icons-webp/") && src.endsWith(".webp")), `Hero list ${label} contains a non-WebP card-icon source`);
   check(sources.every((src) => !src.includes("/images/heroes/cards/")), `Hero list ${label} still consumes detail artwork`);
 
   const hero6 = page.locator('img[data-hero-card-icon="true"][data-hero-id="6"]');
@@ -51,7 +51,7 @@ async function verifyList(page, label) {
     naturalWidth: image.naturalWidth,
     naturalHeight: image.naturalHeight,
   }));
-  check(hero6State.src.includes("/images/heroes/card-icons/6.png"), `Hero 6 ${label} source mismatch: ${hero6State.src}`);
+  check(hero6State.src.includes("/images/heroes/card-icons-webp/6.webp"), `Hero 6 ${label} source mismatch: ${hero6State.src}`);
   check(hero6State.naturalWidth >= 100 && hero6State.naturalHeight >= 100, `Hero 6 ${label} card icon failed intrinsic-size check`);
   check(Math.abs(hero6State.naturalWidth - hero6State.naturalHeight) <= 8, `Hero 6 ${label} card icon is not square`);
 
@@ -68,7 +68,7 @@ async function verifyDetailArtwork(page) {
   check(await artwork.count() === 1, "Hero 6 detail representative artwork missing or duplicated");
   const src = await artwork.getAttribute("src");
   check(src?.includes("/images/heroes/cards/6.png"), `Hero 6 detail artwork source changed unexpectedly: ${src}`);
-  check(!src?.includes("/images/heroes/card-icons/"), "Hero detail incorrectly consumes list card icon asset");
+  check(!src?.includes("/images/heroes/card-icons-webp/"), "Hero detail incorrectly consumes list card icon WebP asset");
   return src;
 }
 
@@ -96,15 +96,17 @@ try {
   check(mobileConsoleErrors.length === 0, `mobile console errors: ${JSON.stringify(mobileConsoleErrors)}`);
   await mobileContext.close();
 
-  const representativeAssetResponse = await fetch(url(`images/heroes/card-icons/6.png?qa=${Date.now()}`), { cache: "no-store" });
-  check(representativeAssetResponse.ok, `Hosted Hero 6 card icon HTTP failed: ${representativeAssetResponse.status}`);
-  check((representativeAssetResponse.headers.get("content-type") || "").includes("image/png"), "Hosted Hero 6 card icon content type is not PNG");
+  const representativeAssetResponse = await fetch(url(`images/heroes/card-icons-webp/6.webp?qa=${Date.now()}`), { cache: "no-store" });
+  check(representativeAssetResponse.ok, `Hosted Hero 6 WebP card icon HTTP failed: ${representativeAssetResponse.status}`);
+  check((representativeAssetResponse.headers.get("content-type") || "").includes("image/webp"), "Hosted Hero 6 card icon content type is not WebP");
 
   console.log(JSON.stringify({
     status: "PASS_HERO_CARD_ICONS_HOSTED_BROWSER_QA",
     sourceSha: expectedSourceSha,
     heroCardIconCount: 267,
     localFrozenAssets: true,
+    losslessWebpDelivery: true,
+    authoritativePngSourceRetained: true,
     remoteRuntimeHotlink: false,
     listDetailArtworkSeparated: true,
     semanticStageReopened: false,

@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "status": "PASS_WITH_HOSTED_PENDING",
+  "scope": "hero-card-icon-web-delivery",
+  "authoritativeSource": "data/generated/hero-card-icon-assets.v1.json",
+  "sourceFreezeState": "HERO_CARD_ICON_ASSETS_FROZEN",
+  "deliveryManifest": "data/generated/hero-card-icon-web-delivery.v1.json",
+  "deliveryFreezeState": "HERO_CARD_ICON_WEB_DELIVERY_FROZEN",
+  "canonicalHeroCount": 267,
+  "sourcePngCount": 267,
+  "webDeliveryCount": 267,
+  "sourcePngTotalBytes": 8990485,
+  "webDeliveryTotalBytes": 5772910,
+  "webDeliverySavingsPercent": 35.79,
+  "webDeliveryFormat": "LOSSLESS_WEBP",
+  "pngAuthoritativeSourceRetained": true,
+  "semanticStageReopened": false,
+  "completed": [
+    "source PNG integrity validation 267/267",
+    "lossless WebP materialization 267/267",
+    "delivery hash and dimensions validation 267/267",
+    "frontend consumer migration to WebP delivery paths",
+    "Hero card-icon frontend validator PASS",
+    "production build PASS",
+    "TypeScript gate PASS",
+    "authoritative Pages static and hosted validators updated"
+  ],
+  "review": [
+    "authoritative GitHub Pages hosted verification after merge"
+  ],
+  "blocker": [],
+  "nextStart": "merge PR after current PR guards pass, then verify authoritative Pages source marker and hosted WebP MIME",
+  "reopenConditions": [
+    "frozen Hero card-icon source manifest changes",
+    "canonical Hero population changes",
+    "delivery manifest/source hash parity breaks",
+    "hosted WebP MIME or asset availability fails"
+  ]
+}
