@@ -1,8 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   BriefcaseBusiness,
+  ChevronLeft,
+  ChevronRight,
   Database,
   ImageOff,
   ShieldCheck,
@@ -36,53 +38,108 @@ export const Route = createFileRoute("/heroes/$heroId")({
 
 function resolvePublicAssetUrl(webAssetPath: string) {
   const base = import.meta.env.BASE_URL || "/";
-  return `${base.replace(/\/$/, "")}${webAssetPath}`;
+  const basePrefix = base === "/" ? "" : base.replace(/\/$/, "");
+  const normalizedPath = webAssetPath.startsWith("/") ? webAssetPath : `/${webAssetPath}`;
+  return `${basePrefix}${normalizedPath}`;
 }
+
+type HeroVisual = {
+  kind: "hero" | "skin";
+  src: string;
+  label: string;
+  skinId: number | null;
+  sourceOrder: number | null;
+};
 
 function HeroDetailPage() {
   const { hero, stage6, detail } = Route.useLoaderData();
   const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
+  const visuals: HeroVisual[] = [];
+  if (imageUrl) {
+    visuals.push({ kind: "hero", src: imageUrl, label: "대표 일러스트", skinId: null, sourceOrder: null });
+  }
+  for (const skin of detail.presentation.skins) {
+    visuals.push({
+      kind: "skin",
+      src: resolvePublicAssetUrl(skin.publicPath),
+      label: `스킨 ${skin.sourceOrder}`,
+      skinId: skin.skinId,
+      sourceOrder: skin.sourceOrder,
+    });
+  }
+
+  const [visualIndex, setVisualIndex] = useState(0);
+  useEffect(() => setVisualIndex(0), [hero.heroId]);
+  const activeVisual = visuals[visualIndex] ?? null;
+  const moveVisual = (delta: number) => {
+    if (visuals.length <= 1) return;
+    setVisualIndex((current) => (current + delta + visuals.length) % visuals.length);
+  };
 
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 lg:px-8 lg:py-10">
-        <Link to="/heroes" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
+        <Link reloadDocument to="/heroes" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
           <ArrowLeft className="h-4 w-4" aria-hidden="true" /> 영웅 목록
         </Link>
 
-        <section className="mt-5 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <div className="grid gap-0 md:grid-cols-[220px_minmax(0,1fr)]">
-            <div className="aspect-[4/5] bg-muted/40 md:aspect-auto md:min-h-[275px]">
-              {imageUrl ? (
-                <img src={imageUrl} alt="" className="h-full w-full object-cover object-top" />
+        <section className="mt-5 overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+          <div className="grid lg:grid-cols-[minmax(300px,0.82fr)_minmax(0,1.18fr)]">
+            <div className="relative min-h-[420px] overflow-hidden border-b border-border bg-muted/25 sm:min-h-[520px] lg:min-h-[620px] lg:border-b-0 lg:border-r">
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
+              {activeVisual ? (
+                <img src={activeVisual.src} alt={`${displayName} ${activeVisual.label}`} className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6" />
               ) : (
-                <div className="flex h-full min-h-[250px] flex-col items-center justify-center gap-3 text-muted-foreground">
-                  <UserRound className="h-16 w-16" strokeWidth={1.15} aria-hidden="true" />
+                <div className="flex h-full min-h-[420px] flex-col items-center justify-center gap-3 text-muted-foreground">
+                  <UserRound className="h-20 w-20" strokeWidth={1.05} aria-hidden="true" />
                   <span className="inline-flex items-center gap-1 text-xs font-semibold"><ImageOff className="h-3.5 w-3.5" aria-hidden="true" />이미지 연결 대기</span>
                 </div>
               )}
+
+              {visuals.length > 1 ? (
+                <>
+                  <button type="button" onClick={() => moveVisual(-1)} aria-label="이전 일러스트" className="absolute left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-background/90 text-foreground shadow-sm backdrop-blur transition hover:bg-background sm:left-4">
+                    <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                  <button type="button" onClick={() => moveVisual(1)} aria-label="다음 일러스트" className="absolute right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-background/90 text-foreground shadow-sm backdrop-blur transition hover:bg-background sm:right-4">
+                    <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                </>
+              ) : null}
+
+              <div className="absolute bottom-4 left-4 z-20 flex flex-wrap gap-2 sm:bottom-5 sm:left-5">
+                <span className="rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur">{hero.rarity.baseLabel}</span>
+                {detail.systems.spReleased ? <span className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur"><Sparkles className="h-3.5 w-3.5" aria-hidden="true" />SP</span> : null}
+              </div>
+
+              {activeVisual ? (
+                <div className="absolute bottom-4 right-4 z-20 rounded-full border border-border/80 bg-background/90 px-3 py-1.5 text-right text-[11px] font-semibold text-foreground shadow-sm backdrop-blur sm:bottom-5 sm:right-5">
+                  <div>{activeVisual.kind === "hero" ? "대표 일러스트" : `스킨 ${activeVisual.sourceOrder} · ID ${activeVisual.skinId}`}</div>
+                  <div className="mt-0.5 text-muted-foreground">{visualIndex + 1} / {visuals.length}</div>
+                </div>
+              ) : null}
             </div>
 
-            <div className="p-5 sm:p-7">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-md bg-foreground px-2 py-1 text-xs font-bold text-background">{hero.rarity.baseLabel}</span>
-                {detail.systems.spReleased ? (
-                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-xs font-bold text-foreground"><Sparkles className="h-3.5 w-3.5" aria-hidden="true" />SP</span>
-                ) : null}
-              </div>
-              <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{displayName}</h1>
-              <div className="mt-2 space-y-0.5 text-sm text-muted-foreground">
-                <p>중문명 {hero.identity.nameCn}</p>
-                {hero.identity.nameEn ? <p>영문명 {hero.identity.nameEn}</p> : null}
-                <p>Hero ID {hero.heroId}</p>
+            <div className="flex min-w-0 flex-col justify-center p-5 sm:p-8 lg:p-10">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Hero #{hero.heroId}</p>
+              <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{displayName}</h1>
+              <div className="mt-3 space-y-0.5 text-sm text-muted-foreground">
+                <p>{hero.identity.nameCn}</p>
+                {hero.identity.nameEn ? <p>{hero.identity.nameEn}</p> : null}
               </div>
 
-              <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="mt-7 grid gap-3 sm:grid-cols-2">
                 <InfoBlock title="진영"><div className="flex flex-wrap gap-1.5">{hero.factions.map((faction) => <span key={faction.factionId} className="rounded-md border border-border bg-background px-2 py-1 text-xs font-semibold text-foreground">{faction.nameKr ?? faction.nameCn}</span>)}</div></InfoBlock>
                 <InfoBlock title="출전작"><p className="font-semibold text-foreground">{hero.origin.nameKr ?? hero.origin.nameCn}</p><p className="mt-1 text-xs text-muted-foreground">{hero.origin.category}</p></InfoBlock>
                 <InfoBlock title="기본 정보"><p className="font-semibold text-foreground">초기 별 {detail.base.initialStar ?? "-"}</p><p className="mt-1 text-xs text-muted-foreground">등급 코드 {detail.base.rank ?? "-"}</p></InfoBlock>
                 <InfoBlock title="성우"><p className="font-semibold text-foreground">{detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-"}</p><p className="mt-1 text-xs text-muted-foreground">{detail.presentation.cvState ?? "-"}</p></InfoBlock>
+              </div>
+
+              <div className="mt-5 flex flex-wrap gap-2 text-xs">
+                <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">직업 분기 {detail.jobs.branchCount}</span>
+                <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">용병 {detail.soldiers.count}</span>
+                <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">스킨 {detail.presentation.skinCount}</span>
               </div>
             </div>
           </div>
@@ -135,11 +192,12 @@ function HeroDetailPage() {
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle icon={<Database className="h-4 w-4" aria-hidden="true" />} title="상세 데이터 상태" />
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">이 페이지는 FINAL_FROZEN Stage 6 전체 묶음을 읽지 않고 현재 Hero의 개별 shard 하나만 읽어 표시용 데이터로 투영해. 원본 ConfigData 관계 재계산이나 이름·ID 추론은 하지 않아.</p>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">이 페이지는 FINAL_FROZEN Stage 6 전체 묶음을 읽지 않고 현재 Hero의 개별 shard 하나와 frozen Skin public-asset consumer만 읽어 표시용 데이터로 투영해. 원본 ConfigData 관계 재계산이나 이름·ID 추론은 하지 않아.</p>
           <div className="mt-4 flex flex-wrap gap-2 text-xs">
             <span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">Stage 6 · {stage6.admissionStatus}</span>
             <span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">구조 {detail.validation.structuralStatus}</span>
             <span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">게시 {detail.validation.publicationStatus ?? "-"}</span>
+            <span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">Skin assets · {detail.presentation.skinSource.publicArtifactHashVerified ? "HASH PASS" : "대기"}</span>
             <span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">review {detail.validation.reviewCount}</span>
           </div>
         </section>
@@ -161,5 +219,5 @@ function StatusChip({ label, value, active }: { label: string; value: string; ac
 }
 
 function HeroNotFound() {
-  return <main className="min-h-screen bg-background"><div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-4 text-center"><Swords className="mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="text-2xl font-bold text-foreground">영웅을 찾을 수 없어.</h1><p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 Hero 목록에 존재하지 않는 주소야.</p><Link to="/heroes" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground underline underline-offset-4"><ArrowLeft className="h-4 w-4" aria-hidden="true" />영웅 목록으로</Link></div></main>;
+  return <main className="min-h-screen bg-background"><div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-4 text-center"><Swords className="mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="text-2xl font-bold text-foreground">영웅을 찾을 수 없어.</h1><p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 Hero 목록에 존재하지 않는 주소야.</p><Link reloadDocument to="/heroes" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground underline underline-offset-4"><ArrowLeft className="h-4 w-4" aria-hidden="true" />영웅 목록으로</Link></div></main>;
 }
