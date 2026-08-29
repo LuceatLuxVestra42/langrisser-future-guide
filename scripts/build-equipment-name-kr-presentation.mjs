@@ -154,7 +154,8 @@ for (const source of sourceRecords) {
     pageReady,
     sourceGroup: source.sourceGroup,
     sourceLine: source.sourceLine,
-    status: source.status,
+    status: pageReady ? "USER_APPROVED_DISPLAY" : "UNRESOLVED_NON_PUBLIC",
+    nameKrStatus: source.status,
     note: source.note,
   });
 }
@@ -177,10 +178,10 @@ const publicRecords = resolved.filter((record) => record.pageReady);
 const nonPublicRecords = resolved.filter((record) => !record.pageReady);
 const missingPublicNames = publicRecords.filter((record) => !record.nameKr);
 const namedNonPublicRecords = nonPublicRecords.filter((record) => record.nameKr);
-const provisionalRecords = resolved.filter((record) => record.status === SOURCE_STATUS.PROVISIONAL);
-const duplicateRecords = resolved.filter((record) => record.status === SOURCE_STATUS.DUPLICATE);
-const confirmedRecords = resolved.filter((record) => record.status === SOURCE_STATUS.CONFIRMED);
-const unresolvedRecords = resolved.filter((record) => record.status === SOURCE_STATUS.UNRESOLVED);
+const provisionalRecords = resolved.filter((record) => record.nameKrStatus === SOURCE_STATUS.PROVISIONAL);
+const duplicateRecords = resolved.filter((record) => record.nameKrStatus === SOURCE_STATUS.DUPLICATE);
+const confirmedRecords = resolved.filter((record) => record.nameKrStatus === SOURCE_STATUS.CONFIRMED);
+const unresolvedRecords = resolved.filter((record) => record.nameKrStatus === SOURCE_STATUS.UNRESOLVED);
 
 if (publicRecords.length !== 373) {
   fail(`public equipment count must be 373; got ${publicRecords.length}`);
@@ -216,6 +217,7 @@ const byEquipmentId = Object.fromEntries(
       sourceGroup: record.sourceGroup,
       sourceLine: record.sourceLine,
       status: record.status,
+      nameKrStatus: record.nameKrStatus,
       note: record.note,
     },
   ]),
@@ -230,6 +232,8 @@ const output = {
     runtimeNameJoin: false,
     semanticStageReopened: false,
     confirmedAndProvisionalSeparated: true,
+    compatibilityStatusPreservedForFrozenAudit: true,
+    authoritativeNameKrStatusField: "nameKrStatus",
     provisionalDisplayDoesNotMutateCanonicalNameKr: true,
     unresolvedNonPublicRemainsNull: true,
   },
