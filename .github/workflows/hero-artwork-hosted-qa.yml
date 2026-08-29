@@ -65,29 +65,68 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for path in \
-            dist/client/index.html \
-            dist/client/404.html \
-            dist/client/heroes/index.html \
-            dist/client/heroes/6/index.html \
-            dist/client/heroes/99204/index.html \
-            dist/client/images/heroes/cards/6.png \
-            dist/client/images/heroes/cards/99204.png; do
-            test -f "$path"
-          done
+
+          require_file() {
+            if [ ! -f "$1" ]; then
+              echo "::error::missing static output: $1"
+              exit 1
+            fi
+            echo "PASS file $1"
+          }
+
+          require_grep() {
+            local pattern="$1"
+            local file="$2"
+            local label="$3"
+            if ! grep -q "$pattern" "$file"; then
+              echo "::error::${label}: pattern not found in ${file}: ${pattern}"
+              exit 1
+            fi
+            echo "PASS ${label}"
+          }
+
+          # GitHub Pages SPA/direct-route fallback follows the already-proven hosted QA pattern.
+          require_file dist/client/index.html
+          cp dist/client/index.html dist/client/404.html
+          require_file dist/client/404.html
+
+          require_file dist/client/heroes/index.html
+          require_file dist/client/heroes/6/index.html
+          require_file dist/client/heroes/99204/index.html
+          require_file dist/client/images/heroes/cards/6.png
+          require_file dist/client/images/heroes/cards/99204.png
 
           count=$(find dist/client/images/heroes/cards -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')
-          test "$count" = '267'
-          cmp public/images/heroes/cards/6.png dist/client/images/heroes/cards/6.png
-          cmp public/images/heroes/cards/99204.png dist/client/images/heroes/cards/99204.png
-          grep -q '/langrisser-future-guide/images/heroes/cards/' dist/client/heroes/index.html
-          grep -q '공식 초상화 267명 연결' dist/client/heroes/index.html
-          ! grep -q '나머지는 placeholder' dist/client/heroes/index.html
+          if [ "$count" != '267' ]; then
+            echo "::error::Hero PNG static count mismatch: ${count} != 267"
+            exit 1
+          fi
+          echo "PASS Hero PNG static count=${count}"
+
+          if ! cmp -s public/images/heroes/cards/6.png dist/client/images/heroes/cards/6.png; then
+            echo "::error::Hero 6 static PNG bytes differ from H-A6 source"
+            exit 1
+          fi
+          echo "PASS Hero 6 static PNG bytes"
+
+          if ! cmp -s public/images/heroes/cards/99204.png dist/client/images/heroes/cards/99204.png; then
+            echo "::error::Hero 99204 static PNG bytes differ from H-A6 source"
+            exit 1
+          fi
+          echo "PASS Hero 99204 static PNG bytes"
+
+          require_grep '/langrisser-future-guide/images/heroes/cards/' dist/client/heroes/index.html 'Hero base-path artwork URLs'
+          require_grep '공식 초상화 267명 연결' dist/client/heroes/index.html 'Hero 267 artwork copy'
+          if grep -q '나머지는 placeholder' dist/client/heroes/index.html; then
+            echo "::error::stale placeholder copy remains in prerendered Hero list"
+            exit 1
+          fi
+          echo "PASS stale placeholder copy absent"
 
           printf '%s\n' "$GITHUB_SHA" > dist/client/qa-main-source.txt
           printf '%s\n' 'hero-artwork-hosted-browser-qa' > dist/client/qa-surface.txt
           printf '%s\n' '44e04bb3fd0657f82690efe39ae3395e36980ba6' > dist/client/qa-hero-artwork-h-a6-predecessor.txt
-          echo "PASS static Hero artwork count=${count}"
+          echo "PASS static Hero artwork gate"
 
       - name: Publish Hero artwork QA candidate to gh-pages
         env:
