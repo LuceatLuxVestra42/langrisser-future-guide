@@ -18,8 +18,8 @@ async function validateDesktop(browser) {
   const heading = page.getByRole('heading', { level: 2, name: '유대' }); await heading.waitFor(); const section = heading.locator('xpath=ancestor::section[1]');
   const cards = section.locator('article'); check('desktop-bond-card-count', await cards.count() === 5, `count=${await cards.count()}`);
   check('desktop-favorability-condition', await section.getByText('레온 호감도 Lv.25', { exact: true }).count() === 1, 'favorability condition visible');
-  check('desktop-required-hero-lyatt', await section.getByText(/레아드와 함께/).count() === 1, 'Lyatt requirement visible');
-  check('desktop-required-hero-elwin', await section.getByText(/엘윈과 함께/).count() === 1, 'Elwin requirement visible');
+  check('desktop-required-hero-lyatt', await section.getByText('레아드와 함께 · 破碎的王子', { exact: true }).count() === 1, 'Lyatt requirement visible');
+  check('desktop-required-hero-elwin', await section.getByText('엘윈와 함께 · 救赎与约定', { exact: true }).count() === 1, 'Elwin requirement visible');
   check('desktop-bond-name', await section.getByText('英雄羁绊·力', { exact: true }).count() === 1, 'bond name visible');
   check('desktop-page-errors', pageErrors.length === 0, JSON.stringify(pageErrors));
   await page.screenshot({ path: path.join(outDir, 'desktop-hero-6-bonds.png'), fullPage: true }); result.browser.desktop = { bondCards: 5, pageErrors }; await context.close();
