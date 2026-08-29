@@ -1,0 +1,54 @@
+name: Equipment P2 Hosted Closeout QA
+
+on:
+  push:
+    branches:
+      - main
+      - qa/equipment-p2-closeout-20260829
+    paths:
+      - 'scripts/validate-equipment-p2-browser-ui.mjs'
+      - '.github/workflows/equipment-p2-closeout-hosted-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: equipment-p2-hosted-closeout
+  cancel-in-progress: false
+
+jobs:
+  hosted-closeout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Require merged P2 product source
+        run: |
+          set -euo pipefail
+          grep -q 'type EquipmentSortMode = "default" | "name" | "id";' src/routes/equipment.tsx
+          grep -q 'placeholder="장비명·효과·ID 검색"' src/routes/equipment.tsx
+          grep -q 'placeholder="장비명·영웅명·효과·ID 검색"' src/routes/equipment_.exclusive.tsx
+          grep -q 'equipment-general-list-ui.v1' src/routes/equipment.tsx
+          grep -q 'equipment-exclusive-list-ui.v1' src/routes/equipment_.exclusive.tsx
+
+      - name: Install Playwright Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Re-run existing Equipment hosted Browser regression
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-equipment-image-stage3-browser-ui.mjs
+
+      - name: Verify P2 search sort persistence and mobile UX
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-equipment-p2-browser-ui.mjs
