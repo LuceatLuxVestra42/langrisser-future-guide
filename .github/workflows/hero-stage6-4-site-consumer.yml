@@ -9,6 +9,7 @@ on:
     paths:
       - 'data/contracts/hero-stage6-4-site-consumer.v1.json'
       - 'data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json'
+      - 'data/contracts/project-doctor-status-source-stage6-5-hero-closeout-request.v1.json'
       - 'data/generated/hero-detail.v1.json'
       - 'data/generated/hero-detail-shared.v1.json'
       - 'data/generated/hero-detail/by-id/**'
@@ -24,6 +25,7 @@ on:
     paths:
       - 'data/contracts/hero-stage6-4-site-consumer.v1.json'
       - 'data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json'
+      - 'data/contracts/project-doctor-status-source-stage6-5-hero-closeout-request.v1.json'
       - 'data/generated/hero-detail.v1.json'
       - 'data/generated/hero-detail-shared.v1.json'
       - 'data/generated/hero-detail/by-id/**'
@@ -120,6 +122,29 @@ jobs:
             git status --short -- $TARGETS
             exit 1
           fi
+
+      - name: Render Project Status declaration from approved closeout request
+        if: success() && steps.validate.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
+        run: node scripts/render-project-doctor-status-source-closeout-request.mjs --pipeline hero --write
+
+      - name: Commit Stage 6-5 Project Status declaration on work branch
+        if: success() && steps.validate.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
+        run: |
+          DECLARATION='data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json'
+          if [ -z "$(git status --porcelain -- "$DECLARATION")" ]; then
+            echo 'Hero Project Status declaration is already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$DECLARATION"
+          git commit -m 'Render Hero Project Status declaration from closeout request'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Verify Stage 6-5 closeout request projection on PR or main
+        if: success() && steps.validate.outcome == 'success' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
+        run: node scripts/render-project-doctor-status-source-closeout-request.mjs --pipeline hero --check
 
       - name: Check Project Status source bridge after frozen Hero output
         if: success() && steps.validate.outcome == 'success' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
