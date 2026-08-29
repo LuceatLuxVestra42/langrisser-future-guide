@@ -3,34 +3,87 @@
   "stage": "skin-page-3",
   "substage": "3-4",
   "checkpoint": "SKIN_STAGE3_4_SELECTIVE_EXTRACTION_READINESS",
-  "status": "DESIGN_AND_VALIDATION_READY_PREDECESSOR_BLOCKED",
+  "status": "IMPLEMENTATION_COMPLETE_EXECUTION_BLOCKED_ON_EXTERNAL_BUNDLE_BYTES",
   "completedScope": [
     "Stage 3-4 extraction contract design frozen.",
     "Extraction-plan generator implemented; it refuses any Stage 3-3-3 input that is not finalFreezeReady PASS.",
     "Byte-identical CAB aliases preserve every provenance and use only a deterministic transport representative for physical extraction.",
     "Extraction-result validator verifies selected source provenance and re-hashes actual exported files under an explicit extraction root.",
-    "Synthetic self-test passes 5/5: single source, identical alias, predecessor blocking, non-identical alias blocking, artifact hash/source validation."
+    "Original Stage 3-4 plan/validator synthetic self-test passes 5/5.",
+    "UnityPy runtime extractor implemented with exact runtime-path container lookup, frozen bundle SHA-256 verification, embedded-CAB name verification, and no fuzzy/source fallback.",
+    "Static requests export the admitted Unity Texture2D/Sprite object to PNG; Char/Model Prefab requests export the admitted GameObject's exact raw serialized object bytes as the primary artifact.",
+    "Full-size UnityPy runner synthetic self-test passes 6/6 across all 1,869 required requests: STATIC 540, CHAR_SPINE 540, MODEL_PRIMARY 789, with primary-artifact cardinality and actual file size/SHA-256 verification.",
+    "One-command Windows closeout runner implemented to chain full Stage 3-3-2 scan, Stage 3-3-3 QA, 1,869-request plan generation, UnityPy extraction, and Stage 3-4 artifact re-hash validation."
   ],
   "predecessorState": {
     "stage3_3_1": "COMPLETE",
     "stage3_3_2": "13_OF_536_CANDIDATE_BUNDLES_SCANNED",
     "stage3_3_3": "QA_READY_NOT_FINAL_FROZEN",
     "remainingCandidateBundleBytes": 523,
-    "remainingRequiredTargets": 1500
+    "remainingRequiredTargets": 1500,
+    "bundleScanErrors": 0,
+    "failedRequiredTargets": 0,
+    "reviewRequiredTargets": 0
   },
   "tooling": {
     "planBuilder": "scripts/skin-stage3-4-build-extraction-plan.mjs",
+    "runtimeExtractor": "scripts/skin-stage3-4-extract-unitypy.py",
     "resultValidator": "scripts/validate-skin-stage3-4-extraction-result.mjs",
-    "selfTest": "scripts/validate-skin-stage3-4-selective-extraction-selftest.mjs",
-    "contract": "data/contracts/skin-stage3-4-selective-extraction.v1.json"
+    "planValidatorSelfTest": "scripts/validate-skin-stage3-4-selective-extraction-selftest.mjs",
+    "runtimeExtractorSelfTest": "scripts/validate-skin-stage3-4-unitypy-runner-selftest.py",
+    "closeoutRunner": "scripts/run-skin-stage3-4-closeout.ps1",
+    "contract": "data/contracts/skin-stage3-4-selective-extraction.v1.json",
+    "requiredExternalPythonPackage": "UnityPy"
   },
-  "commandsAfterStage3_3_3Pass": {
-    "buildPlan": "node scripts/skin-stage3-4-build-extraction-plan.mjs <stage3-3-3-qa.json> <stage3-3-2-full-scan.json> <extraction-plan.json>",
-    "validateExtraction": "node scripts/validate-skin-stage3-4-extraction-result.mjs <extraction-plan.json> <extraction-result.json> --root <extracted-dir> --write <validation.json>"
+  "runtimeExtractorSelfTest": {
+    "status": "PASS_SKIN_STAGE3_4_UNITYPY_RUNNER_SELFTEST",
+    "checks": 6,
+    "failures": 0,
+    "requestCount": 1869,
+    "byKind": {
+      "STATIC": 540,
+      "CHAR_SPINE": 540,
+      "MODEL_PRIMARY": 789
+    }
+  },
+  "closeoutAdmission": {
+    "frozenBundleCatalogSha256": "424b64fefe0adfb6797e13053e3049e257838185c51e215eae22d8ee2d9c7188",
+    "frozenBundleCatalogLineCount": 3047,
+    "stage3_3_3FinalFreezeReadyRequired": true,
+    "requiredAcceptedTargetCount": 1869,
+    "candidateBundleCount": 536,
+    "requiredFinalExtractionCounts": {
+      "total": 1869,
+      "STATIC": 540,
+      "CHAR_SPINE": 540,
+      "MODEL_PRIMARY": 789
+    },
+    "finalBlockerCount": 0
+  },
+  "commands": {
+    "installRuntimeExtractor": "python -m pip install UnityPy",
+    "fullWindowsCloseout": "powershell -ExecutionPolicy Bypass -File scripts/run-skin-stage3-4-closeout.ps1 -ExportAssetBundleDir \"<Langrisser_Data\\StreamingAssets\\ExportAssetBundle>\" -CatalogFile \"<bundle-file-list.txt>\""
   },
   "currentBlockers": [
-    "Stage 3-3-3 cannot reach finalFreezeReady until the remaining 523 catalog-confirmed bundle bytes are scanned and the remaining 1500 required targets are classified.",
-    "The repository currently has no Unity serialized-object extraction dependency/adapter; Stage 3-4 intentionally does not misinterpret runtime-path string offsets as object byte ranges."
+    "The remaining 523 catalog-confirmed candidate .b bundle bytes are not accessible from the repository, current Project attachments, connected Drive, or this execution environment, so Stage 3-3-3 cannot reach finalFreezeReady here.",
+    "The exact frozen bundle-file-list.txt source bytes (3,047 unique names, SHA-256 424b64fefe0adfb6797e13053e3049e257838185c51e215eae22d8ee2d9c7188) are not stored as a full repository artifact and must be supplied alongside the local ExportAssetBundle directory for fail-closed closeout."
   ],
-  "nextStartPoint": "Finish Stage 3-3-2/3-3-3. Once QA is finalFreezeReady, generate the 1869-request selective extraction plan, run a dedicated Unity serialized-object extractor against only the admitted bundle/CAB sources, then validate every exported artifact by actual file SHA-256/size."
+  "sourceAcquisitionChecks": {
+    "repositoryAndProject": "No remaining candidate .b bytes available.",
+    "connectedDrive": "Legacy/static Skin PNG assets and extraction instructions are available, but direct .b/.skel/.atlas source bundles required by the frozen Stage 3-4 provenance contract were not found.",
+    "executionEnvironment": "Direct official-client/APK binary acquisition was attempted but binary download/network access is unavailable in this runtime."
+  },
+  "boundaries": {
+    "canonicalSkinRecomputed": false,
+    "heroSkinOwnershipRecomputed": false,
+    "sourceOrderRecomputed": false,
+    "modelResourceSelectionRecomputed": false,
+    "runtimePathSubstringOffsetUsedAsAssetOffset": false,
+    "fuzzyMatching": false,
+    "filenameSimilarityJoin": false,
+    "partialStage3_3_3InputMayGenerateExtractionPlan": false,
+    "stage3_4CompletionClaimed": false,
+    "projectDoctorSkinAssetOwnerPromoted": false
+  },
+  "nextStartPoint": "On a machine that has the matching PC client ExportAssetBundle directory and the frozen bundle-file-list.txt, install UnityPy and run scripts/run-skin-stage3-4-closeout.ps1. Do not mark Stage 3-4 PASS until the final validator reports PASS_SKIN_STAGE3_4_SELECTIVE_EXTRACTION with 1,869/1,869 accepted and blockerCount 0."
 }
