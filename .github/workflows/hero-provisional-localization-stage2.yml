@@ -1,0 +1,33 @@
+name: Hero Provisional Localization Stage 2
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'data/presentation/hero-provisional-name-kr.v1.json'
+      - 'data/contracts/hero-provisional-localization-stage2.v1.json'
+      - 'data/validation/hero-provisional-localization-stage2.v1.json'
+      - 'scripts/validate-hero-provisional-localization-stage2.mjs'
+      - 'src/lib/hero-list.server.ts'
+      - 'data/generated/hero-list-stage1.v1.json'
+      - 'package.json'
+      - '.github/workflows/hero-provisional-localization-stage2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Validate Hero provisional localization Stage 2
+        run: npm run validate:hero-provisional-localization-stage2
