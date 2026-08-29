@@ -72,3 +72,5 @@ jobs:
       - name: Verify frozen artifacts on main or PR
         if: github.event_name != 'push' || github.ref == 'refs/heads/main'
         run: git diff --exit-code -- data/generated/soldier-detail-stage5-4.v1.json data/validation/soldier-stage5-4-training.v1.json
+
+# temporary regeneration trigger; remove after Stage 5 refresh
