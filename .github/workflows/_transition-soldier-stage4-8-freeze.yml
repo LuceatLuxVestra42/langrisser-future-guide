@@ -1,0 +1,75 @@
+name: Transition Soldier Stage 4-8 Freeze
+
+on:
+  push:
+    branches:
+      - maintenance/soldier-stage4-8-pr-freshness
+
+permissions:
+  contents: write
+
+jobs:
+  freeze-transition:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate UnityDataTool direct inputs
+        run: node scripts/validate-soldier-stage4-1-input.cjs
+
+      - name: Regenerate Soldier Master and validate 4-2
+        run: |
+          node scripts/finalize-soldier-stage2.cjs
+          node scripts/validate-soldier-stage4-2-master.cjs
+
+      - name: Extract pre-4-1 Stage3 regression baseline
+        run: git show c2276d1162dae52a1762e6381e7dd195c917da2f:data/generated/soldier-stage3.v1.json > "$RUNNER_TEMP/soldier-stage3-pre-4-1.json"
+
+      - name: Regenerate Soldier Stage 3 and validate 4-3 through 4-5
+        env:
+          BASELINE_STAGE3_PATH: ${{ runner.temp }}/soldier-stage3-pre-4-1.json
+        run: |
+          node scripts/finalize-soldier-stage3.cjs
+          node scripts/finalize-soldier-stage3-postprocess.cjs
+          node scripts/validate-soldier-stage4-3-trainingtech.cjs
+          node scripts/validate-soldier-stage4-4-sp-mission.cjs
+          node scripts/validate-soldier-stage4-5-sp-hero-reward.cjs
+
+      - name: Regenerate legacy 3-12 relation baseline
+        run: node scripts/finalize-soldier-stage3-12.cjs
+
+      - name: Regenerate shared Hero-Soldier Relation Layer and validate 4-6
+        run: |
+          node scripts/finalize-hero-soldier-relation-layer.cjs
+          node scripts/validate-soldier-stage4-6-relation-consumer.cjs
+
+      - name: Validate representative Soldier fixtures 4-7
+        run: node scripts/validate-soldier-stage4-7-domain-fixtures.cjs
+
+      - name: Freeze Stage 4-8 baseline
+        run: node scripts/validate-soldier-stage4-8-baseline.cjs
+
+      - name: Commit reviewed transition outputs
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/generated/soldier-master.v1.json \
+            data/generated/soldier-hero-relations.v1.json \
+            data/validation/soldier-stage4-2-master.v1.json \
+            data/validation/soldier-stage4-8-baseline.v1.json
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo 'Transition outputs already frozen.'
+            exit 0
+          fi
+          git commit -m 'Freeze reviewed Soldier Stage 4-8 transition outputs'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
