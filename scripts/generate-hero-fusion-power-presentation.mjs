@@ -9,7 +9,7 @@ const OUTPUT_PATH = 'data/generated/hero-fusion-power-presentation.v1.json';
 const heroList = JSON.parse(fs.readFileSync(HERO_LIST_PATH, 'utf8'));
 const skillInfo = JSON.parse(fs.readFileSync(SKILL_INFO_PATH, 'utf8'));
 
-if (heroList?.freezeState !== 'HERO_LIST_STAGE1_FROZEN' || heroList?.summary?.heroCount !== 267 || heroList?.records?.length !== 267) {
+if (heroList?.freezeState !== 'HERO_LIST_STAGE1_FROZEN' || heroList?.summary?.canonicalHeroCount !== 267 || heroList?.summary?.generatedRecordCount !== 267 || heroList?.records?.length !== 267) {
   throw new Error('Hero fusion projection requires frozen Hero List Stage 1 (267/267).');
 }
 
