@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-4",
+  "checkpoint": "SKIN_STAGE3_4_SELECTIVE_EXTRACTION_READINESS",
+  "status": "DESIGN_AND_VALIDATION_READY_PREDECESSOR_BLOCKED",
+  "completedScope": [
+    "Stage 3-4 extraction contract design frozen.",
+    "Extraction-plan generator implemented; it refuses any Stage 3-3-3 input that is not finalFreezeReady PASS.",
+    "Byte-identical CAB aliases preserve every provenance and use only a deterministic transport representative for physical extraction.",
+    "Extraction-result validator verifies selected source provenance and re-hashes actual exported files under an explicit extraction root.",
+    "Synthetic self-test passes 5/5: single source, identical alias, predecessor blocking, non-identical alias blocking, artifact hash/source validation."
+  ],
+  "predecessorState": {
+    "stage3_3_1": "COMPLETE",
+    "stage3_3_2": "13_OF_536_CANDIDATE_BUNDLES_SCANNED",
+    "stage3_3_3": "QA_READY_NOT_FINAL_FROZEN",
+    "remainingCandidateBundleBytes": 523,
+    "remainingRequiredTargets": 1500
+  },
+  "tooling": {
+    "planBuilder": "scripts/skin-stage3-4-build-extraction-plan.mjs",
+    "resultValidator": "scripts/validate-skin-stage3-4-extraction-result.mjs",
+    "selfTest": "scripts/validate-skin-stage3-4-selective-extraction-selftest.mjs",
+    "contract": "data/contracts/skin-stage3-4-selective-extraction.v1.json"
+  },
+  "commandsAfterStage3_3_3Pass": {
+    "buildPlan": "node scripts/skin-stage3-4-build-extraction-plan.mjs <stage3-3-3-qa.json> <stage3-3-2-full-scan.json> <extraction-plan.json>",
+    "validateExtraction": "node scripts/validate-skin-stage3-4-extraction-result.mjs <extraction-plan.json> <extraction-result.json> --root <extracted-dir> --write <validation.json>"
+  },
+  "currentBlockers": [
+    "Stage 3-3-3 cannot reach finalFreezeReady until the remaining 523 catalog-confirmed bundle bytes are scanned and the remaining 1500 required targets are classified.",
+    "The repository currently has no Unity serialized-object extraction dependency/adapter; Stage 3-4 intentionally does not misinterpret runtime-path string offsets as object byte ranges."
+  ],
+  "nextStartPoint": "Finish Stage 3-3-2/3-3-3. Once QA is finalFreezeReady, generate the 1869-request selective extraction plan, run a dedicated Unity serialized-object extractor against only the admitted bundle/CAB sources, then validate every exported artifact by actual file SHA-256/size."
+}
