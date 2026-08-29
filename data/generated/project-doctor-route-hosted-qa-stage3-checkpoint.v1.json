@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "schemaId": "project-doctor-route-hosted-qa-stage3-checkpoint/v1",
+  "stage": "QA-3",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "ROUTE_HOSTED_QA_STAGE3_NAVIGATION_HISTORY_CONSOLE_FROZEN",
+  "predecessor": {
+    "stage": "QA-2",
+    "proofHeadSha": "3f0dea6065059cab63d28b5705d93c7b6544df14",
+    "proofRunId": 33229809974,
+    "proofConclusion": "success"
+  },
+  "proof": {
+    "headSha": "8b999c481b10edda9956d09772e894e80dbc5260",
+    "workflowRunId": 33231297508,
+    "jobId": 99044502884,
+    "workflowConclusion": "success",
+    "artifact": {
+      "id": 9708598352,
+      "name": "route-hosted-qa-stage3-navigation",
+      "digest": "sha256:3f6906e5adc41d2902651b0919ae6847c5a779404259b544d04b0a011e0968d9"
+    }
+  },
+  "deterministicValidation": {
+    "status": "PASS_ROUTE_HOSTED_QA_STAGE3_CONTRACT",
+    "checks": 9,
+    "passed": 9,
+    "failed": 0
+  },
+  "hostedPrerequisite": {
+    "status": "PASS_ROUTE_HOSTED_QA_STAGE1_HTTP",
+    "checks": 10,
+    "passed": 10,
+    "failed": 0,
+    "stableConsecutivePassesRequired": 3,
+    "expectedSourceSha": "8b999c481b10edda9956d09772e894e80dbc5260",
+    "deployedSourceSha": "8b999c481b10edda9956d09772e894e80dbc5260"
+  },
+  "qa2SameCandidateRegression": {
+    "workflowStep": "SUCCESS",
+    "expected": 3,
+    "skipped": 5,
+    "unexpected": 0,
+    "flaky": 2,
+    "review": [
+      {
+        "id": "QA2_TRANSIENT_HOSTED_503_RETRY",
+        "blocking": false,
+        "classification": "DEPLOYMENT_HOSTING_TRANSIENT_REVIEW",
+        "detail": "One QA-2 public-surface attempt observed a transient GitHub Pages 503 and passed on retry after the QA-1 strict Hosted prerequisite had already passed. QA-3 itself completed cleanly and this does not reopen semantic stages."
+      },
+      {
+        "id": "QA2_SOLDIER_HYDRATION_RETRY",
+        "blocking": false,
+        "classification": "BROWSER_TEST_TIMING_REVIEW",
+        "detail": "The historical QA-2 Soldier filter test interacted before hydration on one attempt and passed on retry. QA-3 adds explicit hydration readiness and failOnFlakyTests in CI."
+      }
+    ]
+  },
+  "qa3BrowserProof": {
+    "expected": 4,
+    "skipped": 4,
+    "unexpected": 0,
+    "flaky": 0,
+    "ciFailsOnFlakyTests": true,
+    "checks": [
+      "HOSTED_FRESHNESS_PRECONDITION",
+      "HOME_HERO_DETAIL_DOCUMENT_HISTORY",
+      "HERO_BACK_FORWARD_CONTENT_PARITY",
+      "SOLDIER_MODAL_BROWSER_HISTORY",
+      "SOLDIER_MODAL_FILTER_STATE_HISTORY",
+      "UNKNOWN_ID_RECOVERY_HISTORY",
+      "REPOSITORY_BASE_NAVIGATION_TARGETS",
+      "NO_FETCH_XHR_HTTP_ERROR_LEAK",
+      "CONSOLE_PAGEERROR_CLEAN_ACROSS_NAVIGATION",
+      "MOBILE_BROWSER_HISTORY"
+    ]
+  },
+  "resolvedDuringStage": [
+    {
+      "id": "QA3_SOLDIER_HYDRATION_RACE",
+      "initialState": "INTERMEDIATE_PROOF_FLAKY",
+      "resolution": "Wait for Soldier surface network idle before history interaction and make CI fail on flaky tests.",
+      "finalState": "RESOLVED_ZERO_FLAKY"
+    }
+  ],
+  "failureBoundary": {
+    "browserFailure": "BROWSER_UI_FAIL",
+    "semanticStageReopened": false,
+    "canonicalRelationChanged": false,
+    "rawConfigDataReadAdded": false,
+    "runtimeRelationRecomputationAdded": false
+  },
+  "scope": {
+    "desktop": "1440x1000",
+    "mobile": "390x844",
+    "browser": "Chromium",
+    "hostedBase": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+    "repositoryBase": "/langrisser-future-guide/"
+  },
+  "completionStatement": "QA-3 navigation/history/console Browser UI proof is complete and frozen on the proven runtime head. The checkpoint-only commit is intentionally outside the QA-3 hosted proof trigger and does not change the deployed frontend runtime.",
+  "nextStartPoint": {
+    "stage": "QA-4",
+    "scope": "Integrated qa:route-hosted orchestration while preserving separate HTTP Hosted and Browser/UI failure ownership."
+  },
+  "reopenConditions": [
+    "QA-2 predecessor browser contract changes",
+    "repository base or GitHub Pages hosting architecture changes",
+    "navigation/history contract changes",
+    "new authoritative evidence shows a real runtime interaction regression",
+    "QA-3 proof or checkpoint freshness no longer matches its predecessor contract"
+  ]
+}
