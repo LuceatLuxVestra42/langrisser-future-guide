@@ -40,12 +40,11 @@ jobs:
       - name: Install frozen project dependencies
         run: bun install --frozen-lockfile
 
-      - name: Reconfirm Hero resolver and type gates
+      - name: Reconfirm Hero resolver gate
         run: |
           set -euo pipefail
           node scripts/generate_hero_list_stage4_artwork.cjs
           node scripts/validate_hero_list_stage4.cjs
-          bunx tsc --noEmit
 
       - name: Reuse proven GitHub Pages static build config
         run: |
@@ -58,6 +57,9 @@ jobs:
 
       - name: Build static GitHub Pages candidate
         run: bun run build
+
+      - name: TypeScript gate after generated build inputs
+        run: bunx tsc --noEmit
 
       - name: Static Hero artwork gate
         shell: bash
