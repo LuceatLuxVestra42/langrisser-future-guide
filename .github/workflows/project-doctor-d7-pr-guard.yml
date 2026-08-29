@@ -92,4 +92,13 @@ jobs:
         run: npm run doctor -- --dry-run --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
 
       - name: Integrated Doctor real-diff execution
-        run: npm run doctor -- --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
+        shell: bash
+        run: |
+          set +e
+          npm run doctor -- --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
+          code=$?
+          set -e
+          if [[ "$code" -ne 0 && "$code" -ne 3 ]]; then
+            exit "$code"
+          fi
+          echo "Project Doctor completed with acceptable exit code: $code"

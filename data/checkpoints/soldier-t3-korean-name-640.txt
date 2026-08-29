@@ -1,0 +1,46 @@
+Soldier 640 Korean Name Correction — PASS
+
+Current state:
+- 640 / 仙灵预言者 / MAGE
+- nameKr: 요정 예언자 -> 신령 예언자
+- nameKrStatus: confirmed (unchanged)
+
+Authoritative source:
+- data/metadata/soldier-name-kr-tier3.v1.json
+
+Synchronized production projections:
+- data/generated/soldier-list-stage5-8.v1.json
+- data/generated/soldier-detail-stage5-2.v1.json
+- public/data/soldier-detail-stage5-6.v1.json
+
+Audit baseline refreshed:
+- data/validation/localization-audit-stage4.v1.json (Soldier effective-display fingerprint only)
+
+Frozen downstream freshness refreshed:
+- data/generated/soldier-stage6-7-site-admission.v1.json
+- Stage 5-8 list gitBlobSha: 0a4623b5034b888ef124620346fb1e1e92d3bddc
+
+Final validation:
+- Soldier final admission: PASS
+- Localization Audit: PASS
+- Production build: PASS
+- Project Doctor: MANUAL_REVIEW only (exit 3; non-blocking)
+
+Completed scope:
+- Korean localization correction only
+- Soldier ID, Chinese name, tier, army type, release metadata, combat data, relations, and assets unchanged
+
+REVIEW:
+- Project Doctor path classification only (non-blocking)
+
+BLOCKER:
+- none
+
+Next start point:
+- merge PR after required PR checks
+
+Reopen conditions:
+- authoritative Korean name changes again
+- Soldier 640 identity changes
+- production projection parity breaks
+- Stage 5-8 list blob changes without Stage 6-7 frozen reference refresh
