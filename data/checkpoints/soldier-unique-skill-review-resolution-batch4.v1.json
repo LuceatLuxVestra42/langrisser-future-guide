@@ -3,7 +3,7 @@
   "schemaId": "soldier-unique-skill-review-resolution/v1",
   "date": "2026-08-29",
   "batch": 4,
-  "status": "APPLIED_BUILD_RECHECK_PENDING",
+  "status": "BUILD_VERIFIED",
   "evidence": "data/checkpoints/soldier-unique-skill-review-evidence-batch4.v1.json",
   "overrides": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
   "before": {"passCount":118,"reviewCount":67,"overrideCount":9},
@@ -13,12 +13,27 @@
     "recordLevelDecision": "PASS",
     "reason": "Korean Soldier-effect references reproduce every review-blocking water/melee-penalty/linear-skill-range/class wording for these seven records; records without record-level evidence remain REVIEW."
   },
-  "afterExpected": {"passCount":125,"reviewCount":60,"overrideCount":16,"translatedCount":185,"remainingTranslationCount":0},
+  "verified": {
+    "passCount": 125,
+    "reviewCount": 60,
+    "overrideCount": 16,
+    "translatedCount": 185,
+    "remainingTranslationCount": 0,
+    "missingCount": 0,
+    "extraCount": 0,
+    "publicProjectionCount": 185,
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33227415992,
+    "jobId": 99033722534,
+    "conclusion": "SUCCESS",
+    "productionBuild": "SUCCESS",
+    "observedSummary": "records=185 pass=125 review=60 overrides=16 missing=0 extra=0 public=185"
+  },
   "safety": {
     "canonicalSoldierDataReopened": false,
     "baseTranslationShardsMutated": false,
     "reviewResolutionAppliedBySmallOverrideLayer": true,
     "blanketMechanicPromotion": false
   },
-  "nextStep": "Confirm deterministic generator and production build at 185 records / 125 PASS / 60 REVIEW / 16 overrides."
+  "nextStep": "Continue evidence-based review resolution from the remaining 60 records. Hosted QA remains pending until an actually deployed static environment contains this projection."
 }
