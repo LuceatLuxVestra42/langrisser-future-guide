@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-review-resolution/v1",
+  "date": "2026-08-29",
+  "batch": 6,
+  "status": "PENDING_BUILD_VERIFICATION",
+  "evidence": "data/checkpoints/soldier-unique-skill-review-evidence-batch6.v1.json",
+  "overrides": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
+  "before": {"passCount":130,"reviewCount":55,"overrideCount":21},
+  "applied": {
+    "recordCount": 7,
+    "soldierIds": [112,118,818,1006,1009,1015,1104],
+    "recordLevelDecision": "PASS",
+    "reason": "Korean Soldier-effect references reproduce every review-blocking named effect or mechanic for these seven records. Earlier batch-5 deferral for 亡者苏生 is superseded only for records with newly found direct Korean evidence."
+  },
+  "after": {"passCount":137,"reviewCount":48,"overrideCount":28,"translatedCount":185,"remainingTranslationCount":0},
+  "verification": {
+    "workflow": null,
+    "runId": null,
+    "jobId": null,
+    "result": "PENDING",
+    "observed": null,
+    "productionBuild": "PENDING",
+    "frontendLocalizationBoundary": "PENDING"
+  },
+  "safety": {
+    "canonicalSoldierDataReopened": false,
+    "baseTranslationShardsMutated": false,
+    "reviewResolutionAppliedBySmallOverrideLayer": true,
+    "blanketMechanicPromotion": false,
+    "olderNormalRecordUsedForChangedSpPromotion": false
+  },
+  "nextStep": "Run the deterministic Soldier Korean presentation build and production frontend gates; keep the remaining 48 records in REVIEW until record-level Korean evidence is available."
+}
