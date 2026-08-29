@@ -196,11 +196,11 @@ for (const key of ["desktopGeneralListImage","generalFilterInteraction","keyboar
   assert(browser.checks?.[key] === "PASS", `Browser check ${key}`);
 }
 
-assert(hosted.status === "PASS_EQUIPMENT_IMAGE_STAGE3", "Stage 3 final summary status");
-assert(hosted.completion === "COMPLETE" && hosted.freezeState === "EQUIPMENT_IMAGE_STAGE3_FROZEN", "Stage 3 final summary freeze");
-assert(hosted.semanticStageReopened === false && hosted.canonicalIdentityChanged === false, "Stage 3 final summary semantic boundary");
-assert(hosted.productionJoinKey === "equipmentId" && hosted.publicEquipment === 373, "Stage 3 final summary identity/coverage");
-assert(hosted.gates?.preflight === "PASS" && hosted.gates?.build === "PASS" && hosted.gates?.deploymentHosted === "PASS" && hosted.gates?.browserUi === "PASS_PLAYWRIGHT_HOSTED_BROWSER_UI", "Stage 3 four-gate closeout");
+assert(hosted.status === "PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA", "Stage 3 Hosted QA summary status");
+assert(hosted.completion === "COMPLETE" && hosted.freezeState === "EQUIPMENT_IMAGE_STAGE3_FROZEN", "Stage 3 Hosted QA summary freeze");
+assert(hosted.semanticStageReopened === false && hosted.canonicalIdentityChanged === false, "Stage 3 Hosted QA summary semantic boundary");
+assert(hosted.productionJoinKey === "equipmentId" && hosted.publicEquipment === 373, "Stage 3 Hosted QA summary identity/coverage");
+assert(hosted.gates?.preflight === "PASS" && hosted.gates?.build === "PASS" && hosted.gates?.deploymentHosted === "PASS" && hosted.gates?.browserUi === "PASS_HOSTED_ROUTE_AND_ASSET_SMOKE", "Stage 3 Hosted QA gates");
 assert(hosted.browserUiFreshness?.status === "PASS_FRESH_BROWSER_UI_EVIDENCE", "Stage 3 Browser freshness status");
 assert(hosted.browserUiFreshness?.currentInputFingerprint?.sha256 === fingerprint.sha256, "Stage 3 summary fingerprint drift");
 assert(hosted.browserUiEvidence?.path === STAGE3_BROWSER && hosted.browserUiEvidence?.status === browser.status, "Stage 3 Browser evidence reference");
