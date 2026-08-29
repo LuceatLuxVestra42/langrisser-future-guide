@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-review-resolution/v1",
+  "date": "2026-08-29",
+  "batch": 1,
+  "status": "APPLIED_BUILD_RECHECK_PENDING",
+  "evidence": "data/checkpoints/soldier-unique-skill-review-evidence-batch1.v1.json",
+  "overrides": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
+  "before": {
+    "passCount": 109,
+    "reviewCount": 76
+  },
+  "applied": {
+    "recordCount": 5,
+    "soldierIds": [250, 326, 333, 341, 602],
+    "resolvedTerms": ["魔物", "树林", "山地", "草地", "野战"],
+    "recordLevelDecision": "PASS",
+    "reason": "For these five records, the listed Korean terminology was the only review blocker. Cross-source or legacy Korean evidence resolved every listed review term without changing combat semantics."
+  },
+  "afterExpected": {
+    "passCount": 114,
+    "reviewCount": 71,
+    "translatedCount": 185,
+    "remainingTranslationCount": 0
+  },
+  "notResolvedByThisBatch": {
+    "水中": "Evidence supports '물속', but known records may contain additional named technologies or mechanic wording and therefore remain record-level REVIEW until inspected individually.",
+    "防御地形": "Term evidence is strong, but soldierId 336 remains a sentence-level movement-cost mechanic review.",
+    "防御增强地形": "Contextual Korean rendering is supported, but record-level resolution remains pending.",
+    "近战伤害减免": "Korean mechanic terminology is supported, but final compact-vs-natural UI wording remains unresolved and affected records stay REVIEW."
+  },
+  "safety": {
+    "canonicalSoldierDataReopened": false,
+    "baseTranslationShardsMutated": false,
+    "reviewResolutionAppliedBySmallOverrideLayer": true,
+    "runtimeNameJoinIntroduced": false
+  },
+  "nextStep": "Confirm deterministic generator and production build at 185 records / 114 PASS / 71 REVIEW. Then continue record-level review resolution from the remaining 71 items."
+}
