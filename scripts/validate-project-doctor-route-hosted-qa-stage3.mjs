@@ -72,6 +72,7 @@ verify("PLAYWRIGHT_REUSED", () => {
   assert(contract.runtime?.version === "1.62.1", "QA-3 Playwright version mismatch");
   assert(contract.runtime?.browser === "chromium", "QA-3 browser must remain Chromium");
   assert(config.includes('browserName: "chromium"'), "Chromium config missing");
+  assert(config.includes("failOnFlakyTests: Boolean(process.env.CI)"), "QA-3 CI must fail on flaky tests");
   assert(!config.includes('browserName: "firefox"'), "Firefox must remain deferred");
   assert(!config.includes('browserName: "webkit"'), "WebKit must remain deferred");
 });
@@ -87,6 +88,7 @@ verify("SOLDIER_MODAL_HISTORY_COVERAGE", () => {
   assert(spec.includes('name: "중장 창병 상세 보기"'), "Soldier 102 navigation fixture missing");
   assert(spec.includes('getByRole("dialog")'), "Soldier modal assertion missing");
   assert(spec.includes('toHaveValue("중장 창병")'), "Soldier filter history preservation missing");
+  assert(spec.includes('hostedUrl("soldiers/"), { waitUntil: "networkidle" }'), "Soldier hydration wait missing");
 });
 
 verify("UNKNOWN_ID_RECOVERY_COVERAGE", () => {
@@ -107,6 +109,7 @@ verify("REPOSITORY_BASE_AND_MOBILE", () => {
   assert(spec.includes('REPOSITORY_BASE = "/langrisser-future-guide/"'), "repository-base guard missing");
   assert(spec.includes('testInfo.project.name !== "chromium-mobile"'), "mobile project coverage missing");
   assert(spec.includes(".tap()"), "mobile touch navigation missing");
+  assert(spec.includes('waitForLoadState("networkidle")'), "mobile hydration wait missing");
 });
 
 verify("FAILURE_BOUNDARY", () => {
