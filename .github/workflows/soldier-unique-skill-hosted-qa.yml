@@ -19,6 +19,8 @@ on:
       - 'data/checkpoints/soldier-unique-skill-review-resolution-batch3.v1.json'
       - 'data/checkpoints/soldier-unique-skill-review-evidence-batch4.v1.json'
       - 'data/checkpoints/soldier-unique-skill-review-resolution-batch4.v1.json'
+      - 'data/checkpoints/soldier-unique-skill-review-evidence-batch5.v1.json'
+      - 'data/checkpoints/soldier-unique-skill-review-resolution-batch5.v1.json'
       - 'data/presentation/soldier-unique-skill-kr.v1.json'
       - 'data/presentation/soldier-unique-skill-review-overrides.v1.json'
       - 'data/checkpoints/soldier-unique-skill-translation-batch5.v1.json'
@@ -57,7 +59,7 @@ jobs:
       - name: Persist Soldier Korean hosted QA checkpoint
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.email "4189822+github-actions[bot]@users.noreply.github.com"
           git add data/validation/soldier-unique-skill-hosted-qa-summary.v1.json data/checkpoints/soldier-unique-skill-frontend-localization.v1.json
           if git diff --cached --quiet; then
             echo "No Soldier Korean hosted QA checkpoint changes"
