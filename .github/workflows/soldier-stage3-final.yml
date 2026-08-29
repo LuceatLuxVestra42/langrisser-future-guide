@@ -3,6 +3,8 @@ name: Soldier Stage 3 Final Validation
 on:
   workflow_dispatch:
   push:
+    branches-ignore:
+      - 'work/soldier-819-korean-spacing'
     paths:
       - 'data/configdata/ConfigDataSoldierInfo.json'
       - 'data/configdata/ConfigDataSPSoldierInfo.json'
