@@ -24,8 +24,8 @@ async function waitForKoreanProjection() {
           payload?.schemaId === "soldier-unique-skill-kr-public/v1" &&
           payload?.status === "PASS_WITH_REVIEW" &&
           payload?.counts?.records === 185 &&
-          payload?.counts?.pass === 130 &&
-          payload?.counts?.review === 55 &&
+          payload?.counts?.pass === 137 &&
+          payload?.counts?.review === 48 &&
           payload?.policy?.joinKey === "soldierId" &&
           payload?.policy?.runtimeNameJoin === false &&
           payload?.policy?.canonicalChineseFallbackForTarget === false &&
@@ -49,7 +49,7 @@ async function checkRoute(relativePath) {
 
 const projection = await waitForKoreanProjection();
 const bySoldierId = projection.payload.bySoldierId;
-const representativeIds = [249,250,334,336,512,513,514,515,602,635,637,647,811,814,815,1034,1105,1113,5311,6113];
+const representativeIds = [112,118,249,250,334,336,512,513,514,515,602,635,637,647,811,814,815,818,1006,1009,1015,1034,1104,1105,1113,5311,6113];
 const representativeRecords = representativeIds.map((soldierId) => {
   const item = bySoldierId[String(soldierId)];
   assert(item, `Hosted Korean projection missing representative soldierId ${soldierId}`);
@@ -58,11 +58,11 @@ const representativeRecords = representativeIds.map((soldierId) => {
   return { soldierId, translationStatus: item.translationStatus, descriptionBytes: Buffer.byteLength(item.descriptionKr) };
 });
 
-const resolvedIds = [249,250,326,333,334,336,341,512,513,514,515,602,635,637,647,811,814,815,1034,1105,1113];
+const resolvedIds = [112,118,249,250,326,333,334,336,341,512,513,514,515,602,635,637,647,811,814,815,818,1006,1009,1015,1034,1104,1105,1113];
 for (const resolvedId of resolvedIds) assert(bySoldierId[String(resolvedId)]?.translationStatus === "PASS", `Hosted review override was not applied for soldierId ${resolvedId}`);
 
 const routes = [];
-for (const relativePath of ["soldiers", "soldiers/249", "soldiers/250", "soldiers/334", "soldiers/336", "soldiers/512", "soldiers/515", "soldiers/602", "soldiers/637", "soldiers/647", "soldiers/815", "soldiers/1034", "soldiers/1105", "soldiers/1113", "soldiers/5311", "soldiers/6113"]) routes.push(await checkRoute(relativePath));
+for (const relativePath of ["soldiers", "soldiers/112", "soldiers/118", "soldiers/249", "soldiers/250", "soldiers/334", "soldiers/336", "soldiers/512", "soldiers/515", "soldiers/602", "soldiers/637", "soldiers/647", "soldiers/815", "soldiers/818", "soldiers/1006", "soldiers/1009", "soldiers/1015", "soldiers/1034", "soldiers/1104", "soldiers/1105", "soldiers/1113", "soldiers/5311", "soldiers/6113"]) routes.push(await checkRoute(relativePath));
 
 const summary = {
   stage: "Soldier Unique Skill Korean Hosted QA",
@@ -86,14 +86,14 @@ const summary = {
   representativeRecords,
   routeChecks: routes,
   gates: { deploymentHosted: "PASS", publicProjectionContract: "PASS", reviewOverridesApplied: "PASS", representativeKoreanDescriptions: "PASS", hostedRouteSmoke: "PASS" },
-  reviewBoundary: { reviewCount: 55, reviewItemsAreMissingTranslations: false, reviewResolutionRequired: true }
+  reviewBoundary: { reviewCount: 48, reviewItemsAreMissingTranslations: false, reviewResolutionRequired: true }
 };
 
 const checkpoint = JSON.parse(fs.readFileSync(CHECKPOINT_PATH, "utf8"));
 checkpoint.status = "PASS_WITH_REVIEW";
-checkpoint.hostedQa = { status: "PASS", hostedBaseUrl: BASE_URL, projectionRecordCount: 185, passCount: 130, reviewCount: 55, representativeSoldierIds: representativeIds, routeCount: routes.length };
+checkpoint.hostedQa = { status: "PASS", hostedBaseUrl: BASE_URL, projectionRecordCount: 185, passCount: 137, reviewCount: 48, representativeSoldierIds: representativeIds, routeCount: routes.length };
 checkpoint.completion = { ...(checkpoint.completion ?? {}), frontendConsumerIntegrated: true, buildGateComplete: true, hostedQaComplete: true };
-checkpoint.nextStep = "Continue evidence-based resolution or explicit acceptance of the remaining 55 review items without reopening canonical Soldier data.";
+checkpoint.nextStep = "Continue evidence-based resolution or explicit acceptance of the remaining 48 review items without reopening canonical Soldier data.";
 
 fs.writeFileSync(SUMMARY_PATH, `${JSON.stringify(summary, null, 2)}\n`);
 fs.writeFileSync(CHECKPOINT_PATH, `${JSON.stringify(checkpoint, null, 2)}\n`);
