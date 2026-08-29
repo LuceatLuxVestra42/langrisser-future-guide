@@ -1,0 +1,188 @@
+name: Equipment P3-2 Hosted Closeout QA
+
+on:
+  push:
+    branches:
+      - qa/equipment-p3-2-closeout-20260829
+    paths:
+      - '.github/workflows/equipment-p3-2-closeout-hosted-qa.yml'
+      - 'data/validation/equipment-p3-2-release-frontend-checkpoint.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: equipment-p3-2-hosted-closeout
+  cancel-in-progress: false
+
+jobs:
+  hosted-closeout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Require merged P3-2 product source
+        run: |
+          set -euo pipefail
+          grep -q 'equipment-p3-1-release-metadata.v1.json' src/lib/equipment-page.localized.server.ts
+          grep -q 'equipmentReleaseProjection.defaultOrderEquipmentIds' src/lib/equipment-page.localized.server.ts
+          grep -q '같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순' src/routes/equipment.tsx
+          git diff --exit-code 1b4838b81752a2cb3ae8d91fc1ec1e3ddc5a7271 -- data/generated/equipment_stage3_3_general_list.json
+
+      - name: Install Playwright Chromium
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Verify hosted P3-2 deployment and chronology projection
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          import { chromium } from 'playwright';
+
+          const projection = JSON.parse(readFileSync('data/presentation/equipment-p3-1-release-metadata.v1.json', 'utf8'));
+          const expectedPolicy = '장비 종류·세부 타입 순서를 유지하고, 같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순이야. 같은 출시 그룹 안의 개별 순서는 별도 출시순 의미가 없어.';
+          const base = (process.env.HOSTED_BASE_URL ?? '').replace(/\/?$/, '/');
+          const assert = (condition, message) => {
+            if (!condition) throw new Error(message);
+          };
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+          const browser = await chromium.launch({ headless: true });
+          const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+          const page = await context.newPage();
+          const pageErrors = [];
+          const consoleErrors = [];
+          const badResponses = [];
+          page.on('pageerror', (error) => pageErrors.push(String(error)));
+          page.on('console', (message) => {
+            if (message.type() === 'error') consoleErrors.push(message.text());
+          });
+          page.on('response', (response) => {
+            if (response.url().startsWith(base) && response.status() >= 400) {
+              badResponses.push({ url: response.url(), status: response.status() });
+            }
+          });
+
+          try {
+            let deploymentReady = false;
+            let lastReason = 'not checked';
+            for (let attempt = 1; attempt <= 30; attempt += 1) {
+              try {
+                const response = await page.goto(new URL('equipment/', base).toString(), {
+                  waitUntil: 'networkidle',
+                  timeout: 45_000,
+                });
+                assert(response && response.status() < 400, `Equipment list failed: ${response?.status()}`);
+                await page.getByRole('button', { name: /장비패스/ }).click();
+                await page.getByText(expectedPolicy, { exact: true }).waitFor({ state: 'visible', timeout: 4_000 });
+                deploymentReady = true;
+                break;
+              } catch (error) {
+                lastReason = String(error);
+                if (attempt < 30) await sleep(10_000);
+              }
+            }
+            assert(deploymentReady, `Hosted P3-2 deployment did not become visible: ${lastReason}`);
+
+            const cardLinks = page.locator('section[aria-label="SSR 장비 이미지 목록"] a[href]');
+            const cardCount = await cardLinks.count();
+            assert(cardCount === projection.scope.targetCount, `Tab3 card count mismatch: ${cardCount}`);
+
+            const actualIds = [];
+            for (let index = 0; index < cardCount; index += 1) {
+              const href = await cardLinks.nth(index).getAttribute('href');
+              const match = href?.match(/\/equipment\/(\d+)\/?$/);
+              assert(match, `Unexpected Equipment card href: ${href}`);
+              actualIds.push(Number(match[1]));
+            }
+            assert(
+              JSON.stringify(actualIds) === JSON.stringify(projection.defaultOrderEquipmentIds),
+              `Tab3 default order mismatch: ${JSON.stringify(actualIds)}`,
+            );
+
+            for (const [equipmentId, expectedDate] of [[642, '2026-07-16'], [299, '2019-05-09']]) {
+              const response = await page.goto(new URL(`equipment/${equipmentId}/`, base).toString(), {
+                waitUntil: 'networkidle',
+                timeout: 45_000,
+              });
+              assert(response && response.status() < 400, `Equipment ${equipmentId} detail failed: ${response?.status()}`);
+              const acquisitionSection = page.locator('section').filter({
+                has: page.getByRole('heading', { name: '획득 계열', exact: true }),
+              }).first();
+              await acquisitionSection.getByText('확인된 출시 그룹 날짜', { exact: true }).waitFor({ state: 'visible', timeout: 15_000 });
+              await acquisitionSection.getByText(expectedDate, { exact: true }).waitFor({ state: 'visible', timeout: 15_000 });
+              const acquisitionText = await acquisitionSection.innerText();
+              assert(!acquisitionText.includes('REVIEW'), `Equipment ${equipmentId} acquisition still exposes REVIEW copy`);
+            }
+
+            assert(pageErrors.length === 0, `pageerror detected: ${JSON.stringify(pageErrors)}`);
+            assert(consoleErrors.length === 0, `console error detected: ${JSON.stringify(consoleErrors)}`);
+            assert(badResponses.length === 0, `hosted HTTP failure detected: ${JSON.stringify(badResponses)}`);
+
+            console.log(JSON.stringify({
+              status: 'PASS_EQUIPMENT_P3_2_HOSTED_CHRONOLOGY',
+              hostedBaseUrl: base,
+              tab3Count: cardCount,
+              defaultOrderParity: 'PASS',
+              detailDates: { 642: '2026-07-16', 299: '2019-05-09' },
+              policyCopy: 'PASS',
+              pageErrors: 0,
+              consoleErrors: 0,
+              hostedHttpFailures: 0,
+              semanticStageReopened: false,
+            }, null, 2));
+          } finally {
+            await browser.close();
+          }
+          NODE
+
+      - name: Re-run Equipment Image hosted Browser regression
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-equipment-image-stage3-browser-ui.mjs
+
+      - name: Re-run Equipment P2 hosted search sort persistence regression
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-equipment-p2-browser-ui.mjs
+
+      - name: Re-run Equipment P1 hosted navigation regression from frozen workflow
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: |
+          node --input-type=module <<'RUNNER'
+          import { readFileSync } from 'node:fs';
+          import { spawnSync } from 'node:child_process';
+
+          const workflow = readFileSync('.github/workflows/equipment-p1-closeout-hosted-qa.yml', 'utf8');
+          const marker = "node --input-type=module <<'NODE'";
+          const markerIndex = workflow.indexOf(marker);
+          if (markerIndex < 0) throw new Error('P1 hosted navigation regression source marker is missing');
+          const start = workflow.indexOf('\n', markerIndex) + 1;
+          const end = workflow.indexOf('\n          NODE', start);
+          if (end < 0) throw new Error('P1 hosted navigation regression terminator is missing');
+          const code = workflow
+            .slice(start, end)
+            .split('\n')
+            .map((line) => line.replace(/^          /, ''))
+            .join('\n');
+
+          const child = spawnSync(process.execPath, ['--input-type=module'], {
+            input: code,
+            encoding: 'utf8',
+            env: process.env,
+          });
+          process.stdout.write(child.stdout ?? '');
+          process.stderr.write(child.stderr ?? '');
+          if (child.status !== 0) process.exit(child.status ?? 1);
+          RUNNER
