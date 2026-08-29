@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-review-evidence/v1",
+  "date": "2026-08-29",
+  "batch": 5,
+  "status": "EVIDENCE_CONFIRMED",
+  "scope": {
+    "candidateSoldierIds": [249, 647, 1034, 1105, 1113],
+    "recordCount": 5,
+    "rule": "Promote only when Korean material reproduces every review-blocking mechanic/label for the record; preserve canonical Chinese semantics and numbers."
+  },
+  "sources": [
+    {
+      "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EB%B9%84%EC%95%99%EC%B9%B4-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "supports": [249],
+      "observedKorean": ["상아 부대: 근접 공격 시 받은 피해의 20%를 반사하고, 전투 후 이번 전투의 반사 비율과 같은 비율만큼 최대 HP를 회복하는 구조를 명시한다."]
+    },
+    {
+      "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%ED%9B%94%EB%B0%94%EB%B0%94-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "supports": [647],
+      "observedKorean": ["금지된 숲의 영령술사: 받는 피해 증가, 액티브 스킬 사용 불가, 치료 불가를 해당 용병 효과로 함께 명시한다."]
+    },
+    {
+      "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EB%A6%AC%EC%98%A4%EB%B2%A1-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "supports": [1034],
+      "observedKorean": ["안개의 유령: 전투 후 병사가 전멸했을 경우 생명을 회복하는 효과를 명시한다."]
+    },
+    {
+      "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EC%B8%A0%EB%B0%94%EB%A9%94-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+      "supports": [1105, 1113],
+      "observedKorean": ["닌자: 치명타 후 적에게 부대 최대 생명 비율 기반 피해를 주는 구조를 명시한다.", "얼굴 없는 자: 전투 진입 전 적이 치명타를 받을 확률이 증가하는 효과를 명시한다."]
+    }
+  ],
+  "decisions": [
+    {"soldierId":249,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["反弹部队受到伤害后恢复最大生命百分比"]},
+    {"soldierId":647,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["遭受伤害提升","无法使用主动技能","无法遭受治疗"]},
+    {"soldierId":1034,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["士兵全部阵亡则恢复生命"]},
+    {"soldierId":1105,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["暴击后对敌军造成部队生命上限百分比伤害"]},
+    {"soldierId":1113,"decision":"PASS_CANDIDATE","resolvedReviewTerms":["遭受暴击率提升"]}
+  ],
+  "keptInReview": [1006, 1015],
+  "keptInReviewReason": "Korean material reproduces their effect structure but does not establish an authoritative Korean presentation label for the named effect 亡者苏生; the record-level review therefore remains unresolved.",
+  "note": "No blanket promotion is applied. Similar mechanics and partially evidenced named effects remain REVIEW."
+}
