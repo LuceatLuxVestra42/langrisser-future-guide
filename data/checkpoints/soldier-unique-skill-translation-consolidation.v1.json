@@ -3,7 +3,7 @@
   "schemaId": "soldier-unique-skill-translation-consolidation/v1",
   "date": "2026-08-29",
   "stage": "FINAL_CONSOLIDATION",
-  "status": "IMPLEMENTED_AWAITING_CI",
+  "status": "PASS_WITH_REVIEW",
   "source": {
     "canonical": "data/generated/soldier-detail-stage5-3.v1.json",
     "progress": "data/checkpoints/soldier-unique-skill-translation-progress.v1.json",
@@ -32,7 +32,7 @@
     "sourceTypeDerivedFromCanonicalIdentity": true,
     "idArithmeticInference": false
   },
-  "expected": {
+  "verified": {
     "canonicalTargetCount": 185,
     "authoringRecordCount": 185,
     "uniqueSoldierIdCount": 185,
@@ -42,14 +42,23 @@
     "extraCount": 0
   },
   "gates": {
-    "canonicalTargetParity": "PENDING_EXECUTION",
-    "shardCountParity": "PENDING_EXECUTION",
-    "uniqueIdParity": "PENDING_EXECUTION",
-    "descriptionCoverage": "PENDING_EXECUTION",
-    "statusReviewTermContract": "PENDING_EXECUTION",
-    "nameCnCanonicalParity": "PENDING_EXECUTION",
-    "progressParity": "PENDING_EXECUTION",
-    "productionBuild": "PENDING_CI"
+    "canonicalTargetParity": "PASS",
+    "shardCountParity": "PASS",
+    "uniqueIdParity": "PASS",
+    "descriptionCoverage": "PASS",
+    "statusReviewTermContract": "PASS",
+    "nameCnCanonicalParity": "PASS",
+    "progressParity": "PASS",
+    "productionBuild": "PASS"
+  },
+  "verification": {
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33223795560,
+    "jobId": 99023248137,
+    "conclusion": "SUCCESS",
+    "generatorExecutionCountObserved": 2,
+    "observedSummary": "records=185 pass=109 review=76 missing=0 extra=0",
+    "productionBuild": "SUCCESS"
   },
   "reviewBoundary": {
     "translationCoverage": "185/185",
@@ -58,5 +67,11 @@
     "reviewResolutionRequired": true,
     "reviewResolutionBlocksConsolidation": false
   },
-  "nextStep": "Verify the deterministic consolidator through PR CI/build, then mark consolidation PASS_WITH_REVIEW and proceed to review-resolution/frontend consumption without reopening canonical Soldier data."
+  "completion": {
+    "finalConsolidationComplete": true,
+    "finalConsumerReady": true,
+    "canonicalSemanticStageReopened": false,
+    "frontendConsumerIntegrationRequired": true
+  },
+  "nextStep": "Resolve or explicitly accept the 76 review items and connect frontend presentation to data/generated/soldier-unique-skill-kr-final.v1.json without reopening canonical Soldier data."
 }
