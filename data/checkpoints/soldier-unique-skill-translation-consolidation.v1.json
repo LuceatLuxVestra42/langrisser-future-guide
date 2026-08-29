@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-translation-consolidation/v1",
+  "date": "2026-08-29",
+  "stage": "FINAL_CONSOLIDATION",
+  "status": "IMPLEMENTED_AWAITING_CI",
+  "source": {
+    "canonical": "data/generated/soldier-detail-stage5-3.v1.json",
+    "progress": "data/checkpoints/soldier-unique-skill-translation-progress.v1.json",
+    "authoringShards": [
+      {"path":"data/presentation/soldier-unique-skill-kr.v1.json","recordCount":50},
+      {"path":"data/checkpoints/soldier-unique-skill-translation-batch5.v1.json","recordCount":20},
+      {"path":"data/checkpoints/soldier-unique-skill-translation-batch6.v1.json","recordCount":20},
+      {"path":"data/checkpoints/soldier-unique-skill-translation-batch7.v1.json","recordCount":20},
+      {"path":"data/checkpoints/soldier-unique-skill-translation-batch8.v1.json","recordCount":35},
+      {"path":"data/checkpoints/soldier-unique-skill-translation-batch9.v1.json","recordCount":40}
+    ]
+  },
+  "implementation": {
+    "generator": "scripts/build-soldier-unique-skill-kr-presentation.mjs",
+    "finalConsumer": "data/generated/soldier-unique-skill-kr-final.v1.json",
+    "validationOutput": "data/validation/soldier-unique-skill-kr-final.v1.json",
+    "packageBuildIntegrated": true,
+    "commands": {
+      "build": "npm run prepare:soldier-skill-kr",
+      "check": "npm run validate:soldier-skill-kr"
+    },
+    "mode": "deterministic-build-generated",
+    "joinKey": "soldierId",
+    "canonicalChineseReadOnly": true,
+    "sourceChineseDuplicatedInFinalConsumer": false,
+    "sourceTypeDerivedFromCanonicalIdentity": true,
+    "idArithmeticInference": false
+  },
+  "expected": {
+    "canonicalTargetCount": 185,
+    "authoringRecordCount": 185,
+    "uniqueSoldierIdCount": 185,
+    "passCount": 109,
+    "reviewCount": 76,
+    "missingCount": 0,
+    "extraCount": 0
+  },
+  "gates": {
+    "canonicalTargetParity": "PENDING_EXECUTION",
+    "shardCountParity": "PENDING_EXECUTION",
+    "uniqueIdParity": "PENDING_EXECUTION",
+    "descriptionCoverage": "PENDING_EXECUTION",
+    "statusReviewTermContract": "PENDING_EXECUTION",
+    "nameCnCanonicalParity": "PENDING_EXECUTION",
+    "progressParity": "PENDING_EXECUTION",
+    "productionBuild": "PENDING_CI"
+  },
+  "reviewBoundary": {
+    "translationCoverage": "185/185",
+    "reviewQueueCount": 76,
+    "reviewItemsAreMissingTranslations": false,
+    "reviewResolutionRequired": true,
+    "reviewResolutionBlocksConsolidation": false
+  },
+  "nextStep": "Verify the deterministic consolidator through PR CI/build, then mark consolidation PASS_WITH_REVIEW and proceed to review-resolution/frontend consumption without reopening canonical Soldier data."
+}
