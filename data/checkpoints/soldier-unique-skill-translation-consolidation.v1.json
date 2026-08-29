@@ -19,6 +19,7 @@
   "implementation": {
     "generator": "scripts/build-soldier-unique-skill-kr-presentation.mjs",
     "finalConsumer": "data/generated/soldier-unique-skill-kr-final.v1.json",
+    "publicConsumer": "public/data/soldier-unique-skill-kr.v1.json",
     "validationOutput": "data/validation/soldier-unique-skill-kr-final.v1.json",
     "packageBuildIntegrated": true,
     "commands": {
@@ -39,7 +40,8 @@
     "passCount": 109,
     "reviewCount": 76,
     "missingCount": 0,
-    "extraCount": 0
+    "extraCount": 0,
+    "publicProjectionCount": 185
   },
   "gates": {
     "canonicalTargetParity": "PASS",
@@ -49,32 +51,48 @@
     "statusReviewTermContract": "PASS",
     "nameCnCanonicalParity": "PASS",
     "progressParity": "PASS",
-    "productionBuild": "PASS"
+    "productionBuild": "PASS",
+    "frontendConsumerBuild": "PASS",
+    "hostedQa": "PENDING"
   },
   "verification": {
-    "workflow": "Equipment Korean Name Frontend QA",
-    "runId": 33223795560,
-    "jobId": 99023248137,
-    "conclusion": "SUCCESS",
-    "generatorExecutionCountObserved": 2,
-    "observedSummary": "records=185 pass=109 review=76 missing=0 extra=0",
-    "productionBuild": "SUCCESS"
+    "consolidationWorkflow": {
+      "workflow": "Equipment Korean Name Frontend QA",
+      "runId": 33223795560,
+      "jobId": 99023248137,
+      "conclusion": "SUCCESS",
+      "observedSummary": "records=185 pass=109 review=76 missing=0 extra=0"
+    },
+    "frontendWorkflow": {
+      "workflow": "Equipment Korean Name Frontend QA",
+      "runId": 33224438352,
+      "jobId": 99025150355,
+      "conclusion": "SUCCESS",
+      "observedSummary": "records=185 pass=109 review=76 missing=0 extra=0 public=185",
+      "productionBuild": "SUCCESS"
+    }
   },
   "reviewBoundary": {
     "translationCoverage": "185/185",
     "reviewQueueCount": 76,
     "reviewItemsAreMissingTranslations": false,
     "reviewResolutionRequired": true,
-    "reviewResolutionBlocksConsolidation": false
+    "reviewResolutionBlocksConsolidation": false,
+    "reviewResolutionBlocksFrontendBuild": false
   },
   "completion": {
     "finalConsolidationComplete": true,
     "finalConsumerReady": true,
+    "publicConsumerReady": true,
     "progressIndexUpdated": true,
     "progressConsolidationStatus": "PASS_WITH_REVIEW",
     "progressIndexFrozen": true,
     "canonicalSemanticStageReopened": false,
-    "frontendConsumerIntegrationRequired": true
+    "frontendConsumerIntegrationRequired": false,
+    "frontendConsumerIntegrated": true,
+    "frontendCheckpoint": "data/checkpoints/soldier-unique-skill-frontend-localization.v1.json",
+    "hostedQaRequired": true,
+    "hostedQaComplete": false
   },
-  "nextStep": "Resolve or explicitly accept the 76 review items and connect frontend presentation to data/generated/soldier-unique-skill-kr-final.v1.json without reopening canonical Soldier data."
+  "nextStep": "Run Hosted QA against an actually deployed static environment and resolve or explicitly accept the 76 review items without reopening canonical Soldier data."
 }
