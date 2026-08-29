@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-stage7/v1",
+  "stage": 7,
+  "status": "PASS_WITH_REVIEW",
+  "mode": "HERO_ROUTE_LOCALIZATION_ADOPTION",
+  "sources": {
+    "contract": "data/contracts/localization-audit-stage7.v1.json",
+    "stage6Snapshot": "data/validation/localization-audit-stage6.v1.json",
+    "stage5LiveRunner": "scripts/audit-localization.mjs",
+    "heroStage2Validation": "data/validation/hero-provisional-localization-stage2.v1.json",
+    "heroPresentation": "data/presentation/hero-provisional-name-kr.v1.json",
+    "heroListServer": "src/lib/hero-list.server.ts",
+    "heroListRoute": "src/routes/heroes.tsx",
+    "heroDetailRoute": "src/routes/heroes_.$heroId.tsx"
+  },
+  "predecessor": {
+    "stage6Status": "PASS_WITH_REVIEW",
+    "stage6Errors": 0,
+    "stage6Reviews": 2,
+    "stage5LiveStatus": "PASS_WITH_REVIEW",
+    "heroStage2Status": "PASS"
+  },
+  "hero": {
+    "canonicalHeroCount": 267,
+    "provisionalCount": 5,
+    "officialNameUnresolvedCount": 5,
+    "targetHeroIds": [99273, 99281, 99282, 99283, 99287],
+    "joinKey": "heroId",
+    "displayPolicy": "localization.displayName first; frozen identity fallback only as compatibility fallback",
+    "searchPolicy": "localization display first plus frozen Korean/Chinese/English identity aliases"
+  },
+  "checks": {
+    "contractFrozen": true,
+    "stage6Accepted": true,
+    "stage5LiveAccepted": true,
+    "stage2Accepted": true,
+    "presentationAccepted": true,
+    "serverProjectionAccepted": true,
+    "listDisplayMigrated": true,
+    "listSearchMigrated": true,
+    "detailDisplayMigrated": true,
+    "noRouteServerBypass": true,
+    "productionBoundaryPreserved": true,
+    "reviewAccountingAccepted": true
+  },
+  "summary": {
+    "errors": 0,
+    "reviews": 7,
+    "heroRecords": 267,
+    "provisionalHeroRecords": 5,
+    "officialNameUnresolvedRecords": 5,
+    "migratedRouteCount": 2,
+    "migratedSearchCount": 1,
+    "hardErrorCount": 0
+  },
+  "errors": [],
+  "readOnlyExecution": true,
+  "nextStartPoint": "merge/deploy then authoritative hosted/browser QA for the five effective Hero display names"
+}
