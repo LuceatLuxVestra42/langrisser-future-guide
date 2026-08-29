@@ -3,7 +3,7 @@
   "schemaId": "soldier-unique-skill-frontend-localization/v1",
   "date": "2026-08-29",
   "stage": "FRONTEND_CONSUMER_INTEGRATION",
-  "status": "BUILD_PASS_HOSTED_PENDING",
+  "status": "BUILD_RECHECK_PENDING_HOSTED_PENDING",
   "scope": {
     "target": "normal Tier3 and SP Soldier unique-skill final descriptions",
     "targetCount": 185,
@@ -12,6 +12,7 @@
   },
   "inputs": {
     "authoringConsumer": "data/generated/soldier-unique-skill-kr-final.v1.json",
+    "reviewOverrides": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
     "publicProjection": "public/data/soldier-unique-skill-kr.v1.json",
     "richDetail": "public/data/soldier-detail-stage5-6.v1.json"
   },
@@ -27,29 +28,38 @@
     "spUsesKoreanProjection": true,
     "lowerTierUsesExistingRichDetailBehavior": true
   },
+  "reviewResolution": {
+    "batch": 1,
+    "resolvedSoldierIds": [250, 326, 333, 341, 602],
+    "expectedPassCount": 114,
+    "expectedReviewCount": 71,
+    "evidenceCheckpoint": "data/checkpoints/soldier-unique-skill-review-evidence-batch1.v1.json"
+  },
   "buildGate": {
-    "status": "PASS",
-    "workflow": "Equipment Korean Name Frontend QA",
-    "runId": 33224438352,
-    "jobId": 99025150355,
-    "conclusion": "SUCCESS",
-    "observedGeneratorSummary": "records=185 pass=109 review=76 missing=0 extra=0 public=185",
-    "productionBuild": "SUCCESS"
+    "status": "PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
+    "previousWorkflow": "Equipment Korean Name Frontend QA",
+    "previousRunId": 33224438352,
+    "previousJobId": 99025150355,
+    "previousConclusion": "SUCCESS",
+    "previousObservedGeneratorSummary": "records=185 pass=109 review=76 missing=0 extra=0 public=185",
+    "expectedNextGeneratorSummary": "records=185 pass=114 review=71 overrides=5 missing=0 extra=0 public=185"
   },
   "reviewBoundary": {
-    "reviewCount": 76,
+    "reviewCount": 71,
     "reviewItemsAreMissingTranslations": false,
     "reviewItemsBlockFrontendProjection": false,
     "reviewResolutionRequiredBeforeTranslationCloseout": true
   },
   "hostedQa": {
     "status": "PENDING",
-    "reason": "Build Gate passed. Hosted-browser verification must use an actually deployed static environment according to the project QA rules; no hosted runtime result is claimed by this checkpoint."
+    "workflow": ".github/workflows/soldier-unique-skill-hosted-qa.yml",
+    "validator": "scripts/validate-soldier-unique-skill-hosted.mjs",
+    "reason": "Hosted QA must run only after an actually deployed static environment contains the current 185-record projection. The existing main Pages site is not treated as evidence for this unmerged branch."
   },
   "completion": {
     "frontendConsumerIntegrated": true,
-    "buildGateComplete": true,
+    "buildGateComplete": false,
     "hostedQaComplete": false
   },
-  "nextStep": "Run Hosted QA on a deployed preview or GitHub Pages environment, then continue evidence-based resolution of the 76 review items without reopening canonical Soldier data."
+  "nextStep": "Re-run Build Gate for review override batch 1. Hosted QA remains pending until deployment contains the current branch result; continue evidence-based review resolution afterward."
 }
