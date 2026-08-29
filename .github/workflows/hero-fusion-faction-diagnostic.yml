@@ -20,69 +20,60 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
-      - name: Enumerate frozen fusion-power candidates and inspect exact SkillInfo records
+      - name: Confirm explicit fusion target relation
         shell: bash
         run: |
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
-
           const shardDir = 'data/generated/hero-detail/by-id';
+          const skillInfo = JSON.parse(fs.readFileSync('data/configdata/ConfigDataSkillInfo.json', 'utf8'));
+          const skillById = new Map(skillInfo.map((row) => [Number(row.ID), row]));
           const candidates = [];
-          const byHeroSkill = new Set();
-
           for (const name of fs.readdirSync(shardDir).filter((x) => /^\d+\.json$/.test(x))) {
             const shard = JSON.parse(fs.readFileSync(path.join(shardDir, name), 'utf8'));
-            const sources = [];
-            for (const row of shard.normal?.skills?.jobLevelAcquisitions ?? []) {
-              if (row?.skill?.displayType === '超绝强化') sources.push({ source: 'job-level', skill: row.skill, jobLevelId: row.jobLevelId ?? null });
-            }
-            for (const skill of shard.normal?.skills?.heroDirectSkills ?? []) {
-              if (skill?.displayType === '超绝强化') sources.push({ source: 'hero-direct', skill, jobLevelId: null });
-            }
-            if (shard.normal?.awakening?.skill?.displayType === '超绝强化') {
-              sources.push({ source: 'awakening', skill: shard.normal.awakening.skill, jobLevelId: null });
-            }
-            for (const row of sources) {
-              const skillId = Number(row.skill.skillId);
-              const key = `${shard.heroId}:${skillId}`;
-              if (!Number.isInteger(skillId) || byHeroSkill.has(key)) continue;
-              byHeroSkill.add(key);
-              candidates.push({
-                heroId: shard.heroId,
-                heroNameCn: shard.identity?.nameCn ?? null,
-                skillId,
-                skillNameCn: row.skill.nameCn ?? null,
-                skillIconPath: row.skill.iconPath ?? null,
-                source: row.source,
-                jobLevelId: row.jobLevelId,
-                factions: (shard.presentation?.factions ?? []).map((f) => ({ factionId: f.factionId, nameCn: f.nameCn, iconSourcePath: f.iconSourcePath })),
-              });
+            for (const acquisition of shard.normal?.skills?.jobLevelAcquisitions ?? []) {
+              if (acquisition?.skill?.displayType !== '超绝强化') continue;
+              const raw = skillById.get(Number(acquisition.skill.skillId));
+              if (!raw) throw new Error(`missing SkillInfo ${acquisition.skill.skillId}`);
+              if (raw.SkillType !== 14 || raw.SkillTypeParam1 !== 2 || !Number.isInteger(raw.SkillTypeParam2)) {
+                throw new Error(`invalid fusion relation SkillInfo ${raw.ID}`);
+              }
+              const target = (shard.presentation?.factions ?? []).find((f) => Number(f.factionId) === raw.SkillTypeParam2);
+              if (!target) throw new Error(`Hero ${shard.heroId} fusion target ${raw.SkillTypeParam2} not in frozen faction rows`);
+              candidates.push({heroId: shard.heroId, skillId: raw.ID, targetFactionId: raw.SkillTypeParam2, targetFactionNameCn: target.nameCn, iconSourcePath: target.iconSourcePath});
             }
           }
-          candidates.sort((a,b) => a.heroId-b.heroId || a.skillId-b.skillId);
-
-          const skillInfo = JSON.parse(fs.readFileSync('data/configdata/ConfigDataSkillInfo.json', 'utf8'));
-          const skillById = new Map(skillInfo.map((row, index) => [Number(row.ID), { index, row }]));
-          const rawSkillRecords = candidates.map((candidate) => {
-            const found = skillById.get(candidate.skillId);
-            if (!found) throw new Error(`missing SkillInfo ${candidate.skillId}`);
-            return {
-              heroId: candidate.heroId,
-              skillId: candidate.skillId,
-              recordIndex: found.index,
-              record: found.row,
-            };
-          });
-
-          const heroInfo = JSON.parse(fs.readFileSync('data/configdata/ConfigDataHeroInfo.json', 'utf8'));
-          const heroById = new Map(heroInfo.map((row, index) => [Number(row.ID), { index, row }]));
-          const sampleHeroRecords = [6,12].map((heroId) => ({heroId, ...heroById.get(heroId)}));
-
-          console.log('=== FUSION_CANDIDATES ===');
-          console.log(JSON.stringify({candidateHeroSkillCount: candidates.length, uniqueHeroCount: new Set(candidates.map((r)=>r.heroId)).size, uniqueSkillCount: new Set(candidates.map((r)=>r.skillId)).size, candidates}, null, 2));
-          console.log('=== RAW_SKILLINFO_RECORDS ===');
-          console.log(JSON.stringify(rawSkillRecords, null, 2));
-          console.log('=== SAMPLE_HEROINFO_RECORDS ===');
-          console.log(JSON.stringify(sampleHeroRecords, null, 2));
+          if (candidates.length !== 35 || new Set(candidates.map((r)=>r.heroId)).size !== 35 || new Set(candidates.map((r)=>r.targetFactionId)).size !== 12) {
+            throw new Error(`fusion population mismatch ${JSON.stringify({count:candidates.length, heroes:new Set(candidates.map((r)=>r.heroId)).size, factions:new Set(candidates.map((r)=>r.targetFactionId)).size})}`);
+          }
+          console.log(JSON.stringify({status:'PASS_EXPLICIT_FUSION_TARGET_RELATION', candidateCount:35, uniqueFactionCount:12, representative:candidates.filter((r)=>[6,12,25,55,110].includes(r.heroId))}, null, 2));
           NODE
+      - name: Locate official faction icon bundle by ZIP central directory
+        shell: python
+        run: |
+          import struct, urllib.request
+          VER='1.1.113'
+          BASE=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{VER}'
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36'
+          def req(url,start=None,end=None,method=None):
+              h={'User-Agent':UA,'Accept-Encoding':'identity'}
+              if start is not None: h['Range']=f'bytes={start}-{end}'
+              with urllib.request.urlopen(urllib.request.Request(url,headers=h,method=method),timeout=45) as r:
+                  return r.read(), dict(r.headers)
+          hits=[]
+          for n in range(58,65):
+              url=f'{BASE}/InstallPage_{VER}_{n}.zip'
+              _,heads=req(url,method='HEAD'); size=int(heads['Content-Length']); ts=min(1024*1024,size)
+              tail,_=req(url,size-ts,size-1); e=tail.rfind(b'PK\x05\x06')
+              if e<0: continue
+              _,_,_,_,cs,co,_=struct.unpack_from('<HHHHIIH',tail,e+4)
+              central,_=req(url,co,co+cs-1); off=0
+              while off+46<=len(central) and central[off:off+4]==b'PK\x01\x02':
+                  flags=struct.unpack_from('<H',central,off+8)[0]; fl,el,cl=struct.unpack_from('<HHH',central,off+28)
+                  raw=central[off+46:off+46+fl]; name=raw.decode('utf-8' if flags&0x800 else 'cp437','replace')
+                  low=name.lower()
+                  if 'keyword' in low or 'key_word' in low or 'key word' in low: hits.append((n,name))
+                  off += 46+fl+el+cl
+          print({'packages':list(range(58,65)),'hits':hits})
+          if not hits: raise SystemExit('no keyword bundle in scoped package range')
