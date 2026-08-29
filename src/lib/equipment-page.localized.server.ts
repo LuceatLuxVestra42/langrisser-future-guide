@@ -5,43 +5,26 @@ import {
   readGeneralEquipmentPageData as readBaseGeneralEquipmentPageData,
 } from "./equipment-page.server";
 import type {
-  ExclusiveEquipmentDetailPageData as BaseExclusiveEquipmentDetailPageData,
-  GeneralEquipmentDetailPageData as BaseGeneralEquipmentDetailPageData,
+  EquipmentDetailPageData,
+  ExclusiveEquipmentDetailPageData,
+  GeneralEquipmentDetailPageData,
 } from "./equipment-page.server";
 
-export type EquipmentNameKrPresentationStatus =
-  | "confirmed"
-  | "provisional-display"
-  | "duplicate-non-display"
-  | "unresolved-non-public";
-
-type EquipmentNameKrProjectionRecord = {
-  nameCn: string;
-  nameKr: string | null;
-  pageReady: boolean;
-  status: "USER_APPROVED_DISPLAY" | "UNRESOLVED_NON_PUBLIC";
-  nameKrStatus: EquipmentNameKrPresentationStatus;
-};
-
 type EquipmentNameKrProjection = {
-  byEquipmentId: Record<string, EquipmentNameKrProjectionRecord>;
+  byEquipmentId: Record<
+    string,
+    {
+      nameCn: string;
+      nameKr: string | null;
+      pageReady: boolean;
+      status: string;
+    }
+  >;
 };
-
-export type GeneralEquipmentDetailPageData = BaseGeneralEquipmentDetailPageData & {
-  nameKrPresentationStatus: EquipmentNameKrPresentationStatus;
-};
-
-export type ExclusiveEquipmentDetailPageData = BaseExclusiveEquipmentDetailPageData & {
-  nameKrPresentationStatus: EquipmentNameKrPresentationStatus;
-};
-
-export type EquipmentDetailPageData =
-  | GeneralEquipmentDetailPageData
-  | ExclusiveEquipmentDetailPageData;
 
 const equipmentNameKr = equipmentNameKrJson as EquipmentNameKrProjection;
 
-function resolveLocalization(equipmentId: number, nameCn: string) {
+function resolveNameKr(equipmentId: number, nameCn: string, fallback: string | null) {
   const localized = equipmentNameKr.byEquipmentId[String(equipmentId)];
   if (!localized) {
     throw new Error(`Missing Korean equipment presentation record for ${equipmentId}.`);
@@ -51,33 +34,17 @@ function resolveLocalization(equipmentId: number, nameCn: string) {
       `Equipment ${equipmentId} Korean presentation identity mismatch: ${localized.nameCn} !== ${nameCn}.`,
     );
   }
-  return localized;
-}
-
-function resolveNameKr(
-  equipmentId: number,
-  nameCn: string,
-  fallback: string | null,
-): { nameKr: string | null; status: EquipmentNameKrPresentationStatus } {
-  const localized = resolveLocalization(equipmentId, nameCn);
-  return {
-    nameKr: localized.nameKr ?? fallback,
-    status: localized.nameKrStatus,
-  };
+  return localized.nameKr ?? fallback;
 }
 
 export function readGeneralEquipmentPageData() {
   const data = readBaseGeneralEquipmentPageData();
   return {
     ...data,
-    records: data.records.map((record) => {
-      const localized = resolveNameKr(record.equipmentId, record.nameCn, record.nameKr);
-      return {
-        ...record,
-        nameKr: localized.nameKr,
-        nameKrPresentationStatus: localized.status,
-      };
-    }),
+    records: data.records.map((record) => ({
+      ...record,
+      nameKr: resolveNameKr(record.equipmentId, record.nameCn, record.nameKr),
+    })),
   };
 }
 
@@ -85,14 +52,10 @@ export function readExclusiveEquipmentPageData() {
   const data = readBaseExclusiveEquipmentPageData();
   return {
     ...data,
-    records: data.records.map((record) => {
-      const localized = resolveNameKr(record.equipmentId, record.nameCn, record.nameKr);
-      return {
-        ...record,
-        nameKr: localized.nameKr,
-        nameKrPresentationStatus: localized.status,
-      };
-    }),
+    records: data.records.map((record) => ({
+      ...record,
+      nameKr: resolveNameKr(record.equipmentId, record.nameCn, record.nameKr),
+    })),
   };
 }
 
@@ -104,33 +67,33 @@ export function readEquipmentDetailPageData(
 
   if (data.kind === "general") {
     const identity = data.detail.identity;
-    const localized = resolveNameKr(equipmentId, identity.nameCn, identity.nameKr);
-    return {
+    const nameKr = resolveNameKr(equipmentId, identity.nameCn, identity.nameKr);
+    const localized: GeneralEquipmentDetailPageData = {
       ...data,
-      nameKrPresentationStatus: localized.status,
-      displayName: localized.nameKr ?? identity.nameCn,
+      displayName: nameKr ?? identity.nameCn,
       detail: {
         ...data.detail,
         identity: {
           ...identity,
-          nameKr: localized.nameKr,
+          nameKr,
         },
       },
     };
+    return localized;
   }
 
   const identity = data.detail.identity;
-  const localized = resolveNameKr(equipmentId, identity.nameCn, identity.nameKr);
-  return {
+  const nameKr = resolveNameKr(equipmentId, identity.nameCn, identity.nameKr);
+  const localized: ExclusiveEquipmentDetailPageData = {
     ...data,
-    nameKrPresentationStatus: localized.status,
-    displayName: localized.nameKr ?? identity.nameCn,
+    displayName: nameKr ?? identity.nameCn,
     detail: {
       ...data.detail,
       identity: {
         ...identity,
-        nameKr: localized.nameKr,
+        nameKr,
       },
     },
   };
+  return localized;
 }
