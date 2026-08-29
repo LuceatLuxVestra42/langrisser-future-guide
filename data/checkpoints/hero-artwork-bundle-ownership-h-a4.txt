@@ -1,0 +1,216 @@
+Hero Artwork Asset Pipeline — H-A4 bundle ownership checkpoint
+기준일: 2026-08-29
+
+============================================================
+1. 최종 판정
+============================================================
+
+status: H_A4_BUNDLE_OWNERSHIP_RESOLVED
+canonical Hero: 267
+artwork family: 7
+final bundle exact prefab: 240
+begin_ bundle exact prefab: 27
+union: 267 / 267
+BOTH: 0
+NONE: 0
+
+즉 현재 canonical sourceArtworkPath 267건은 다음 두 계층으로 완전히 분리된다.
+- FINAL_ONLY: 240
+- BEGIN_ONLY: 27
+
+이번 결과는 exact canonical prefab container path 존재 여부를 기준으로 한 extraction ownership이다.
+`begin_ = baseline`, `final = patch` 같은 클라이언트 런타임 병합 의미를 확정한 것이 아니다.
+
+============================================================
+2. family별 확정 범위
+============================================================
+
+UI/HeroPainting/R_ABS/Prefab
+- total 12
+- final 10: ui_heropainting_r_abs.b
+- begin 2: begin_ui_heropainting_r_abs.b
+
+UI/HeroPainting/SR_ABS/Prefab
+- total 33
+- final 31: ui_heropainting_sr_abs.b
+- begin 2: begin_ui_heropainting_sr_abs.b
+
+UI/HeroPainting/SSR_ABS/Prefab
+- total 130
+- final 115: ui_heropainting_ssr_abs.b
+- begin 15: begin_ui_heropainting_ssr_abs.b
+
+UI/HeroPainting01/SSR_ABS/Prefab
+- total 2
+- final 2: ui_heropainting01_ssr_abs.b
+- begin 0
+- begin_ui_heropainting01_ssr_abs.b 자체는 manifest에 존재하지만 canonical 2건은 final에만 존재
+
+UI/HeroPainting2/SR_ABS/Prefab
+- total 1
+- final 1: ui_heropainting2_sr_abs.b
+- begin 0
+- matching begin bundle은 manifest에 없음
+
+UI/HeroPainting2/SSR_ABS/Prefab
+- total 68
+- final 64: ui_heropainting2_ssr_abs.b
+- begin 4: begin_ui_heropainting2_ssr_abs.b
+
+UI/HeroPainting3/SSR_ABS/Prefab
+- total 21
+- final 17: ui_heropainting3_ssr_abs.b
+- begin 4: begin_ui_heropainting3_ssr_abs.b
+
+============================================================
+3. BEGIN_ONLY Hero 27
+============================================================
+
+R_ABS
+- 24 스코트 / Scott
+- 45 키스 / Keith
+
+SR_ABS
+- 16 란스 / Lance
+- 35 안젤리카 / Angelica
+
+SSR_ABS
+- 1 매튜 / Matthew
+- 3 그레니어 / Grenier
+- 4 아멜다 / Aimeeda
+- 28 젤다 / Zalrahda
+- 88 엘라스타 / Alustriel
+- 89 유리아 / Yulia
+- 92 환생 제시카 / Prime Jessica
+- 105 뮤 / Mu
+- 109 화이트 시시 / SissiWhite
+- 99169 켈티스 / Kertesz
+- 99171 방주의 성녀 / TheSaintOfArk
+- 99176 캐롤리안 / Carolian
+- 99181 줄리안 / Julian
+- 99188 리오벡 / RioBec
+- 99193 요아&코니 / Yoa&Conna
+
+HeroPainting2 SSR_ABS
+- 99204 타탈리아 / Tatalia
+- 99206 이리스 / Iris
+- 99207 롤랑 / Roland
+- 99232 빛의 소환사 / Brightsummoner
+
+HeroPainting3 SSR_ABS
+- 99276 아이바 미유키 / Miyuki
+- 99277 D-BOY / D-Boy
+- 99278 아이바 신야 / Shinya
+- 99281 효랑어홍사 / TidalVindicator
+
+============================================================
+4. package / bundle provenance
+============================================================
+
+begin_ family bundles는 모두 Package25에 위치한다.
+- package: InstallPage_1.1.113_26.zip
+- package bytes: 113636260
+
+begin_ui_heropainting_r_abs.b
+- bytes 509982
+- MD5 9D18E3360DE378C6FB8F5758F507D1A8
+- SHA256 71A830A444269E9611D74D8F9E880783FFEF291E2F2D9E34F29EF1CB0E21AB49
+
+begin_ui_heropainting_sr_abs.b
+- bytes 542747
+- MD5 28C0FF4A9DD4B9E0E32CECDCFEB65465
+- SHA256 93D7B9BF9B51D4150AB99002AD5DC9BEDEE774BFCE03A9E0FF3CFC600E350654
+
+begin_ui_heropainting_ssr_abs.b
+- bytes 3710837
+- MD5 16CF10B79FF22F3CE1BF78B45D05DFA8
+- SHA256 7C1551C8A4626CAA0BAB5E83A6A5BC4B3EF804E831D570C724D94193C4569F8A
+
+begin_ui_heropainting01_ssr_abs.b
+- bytes 523603
+- MD5 D56E03CE435430C7C19AD4E668A8CCA3
+- SHA256 EA70B0A3967A9A177EACEF434C015EEECB0582FD0FF41BFBDE4B1AF0E1F21520
+
+begin_ui_heropainting2_ssr_abs.b
+- bytes 2199501
+- MD5 A147491BCABEA405E11C6B38CE341414
+- SHA256 60DEE0C7B95366FAA2A72FCB307674C0DF86CBD4334813A2831520C070C6E422
+
+begin_ui_heropainting3_ssr_abs.b
+- bytes 1185839
+- MD5 497DA317E1BEF7118265BE556BC71C94
+- SHA256 EC8FB4D57ACDEEBC724AEBC183FA4A6B5AB2E7F08F196AA11536C24B7C33A1E1
+
+final bundles는 기존 H-A3 checkpoint와 동일하다.
+- Package59 / InstallPage_1.1.113_60.zip:
+  ui_heropainting01_ssr_abs.b
+  ui_heropainting2_sr_abs.b
+  ui_heropainting2_ssr_abs.b
+- Package60 / InstallPage_1.1.113_61.zip:
+  ui_heropainting_r_abs.b
+  ui_heropainting_sr_abs.b
+  ui_heropainting_ssr_abs.b
+  ui_heropainting3_ssr_abs.b
+
+============================================================
+5. 실행 evidence
+============================================================
+
+clean branch:
+- work/hero-artwork-bundle-ownership
+- base main: 99603ab515e3715890dd5ceab7ed07f0e7051d2d
+- workflow commit: b0488e3d5fe572300f37a470337a6c629ff393f5
+
+GitHub Actions:
+- run: 33228904673
+- job: 99037951263
+- conclusion: SUCCESS
+
+artifact:
+- id: 9707819489
+- name: hero-artwork-bundle-ownership-clean-report
+- zip SHA256: 7d6ec0bd10fc81005296cef99a108d58e121f12443700cfc8bcd5385d37fd2b7
+
+artifact contents:
+- hero-artwork-bundle-ownership-compact.json
+- hero-artwork-bundle-ownership-index.json
+- hero-artwork-bundle-ownership-summary.json
+- hero-artwork-bundle-provenance.json
+
+============================================================
+6. 다시 열지 않는 범위
+============================================================
+
+다음은 재조사하지 않는다.
+- canonical Hero 267 sourceArtworkPath family census
+- 7 family 구분
+- Leon owning final bundle
+- Prefab -> Sprite -> Texture2D 규칙
+- final bundle exact prefab coverage 240
+- begin-only Hero 27 목록
+- final + begin union 267 / 267
+- begin bundle package/bundle hashes
+
+============================================================
+7. 다음 시작점
+============================================================
+
+다음 작업은 H-A5 bulk extraction index 구축이다.
+
+원칙:
+1. 이 checkpoint의 exact bundle assignment를 입력으로 사용한다.
+2. final 240과 begin 27을 다시 탐색하지 않는다.
+3. 각 owning bundle은 한 번만 fetch/decode한다.
+4. 한 bundle 안의 대상 Hero를 묶어서 일괄 추출한다.
+5. 각 Hero에 대해 다음을 기록한다.
+   - heroId
+   - sourceArtworkPath
+   - packageName / bundleName / bundle hash
+   - prefab pathId
+   - Sprite pathId(s)
+   - Texture2D pathId(s)
+   - image dimensions
+   - exported image hash
+   - target web path
+6. 한 Hero에서 여러 Sprite가 연결될 수 있으므로 filename 추측이나 Sprite 1개 고정 규칙을 사용하지 않는다.
+7. 실제 web asset commit은 extraction index가 완성된 뒤 별도 단계로 분리한다.
