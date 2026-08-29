@@ -110,6 +110,10 @@ jobs:
             exit 1
           fi
 
+      - name: Check Project Status source bridge after frozen Hero output
+        if: success() && steps.validate.outcome == 'success' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
+        run: node scripts/bridge-project-doctor-status-source.mjs --pipeline hero --check
+
       - name: Enforce Stage 6-4 gate
         if: always() && steps.validate.outcome != 'success'
         run: exit 1
