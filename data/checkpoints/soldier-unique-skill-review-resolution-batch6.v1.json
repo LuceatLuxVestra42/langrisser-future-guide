@@ -3,7 +3,7 @@
   "schemaId": "soldier-unique-skill-review-resolution/v1",
   "date": "2026-08-29",
   "batch": 6,
-  "status": "PENDING_BUILD_VERIFICATION",
+  "status": "PASS",
   "evidence": "data/checkpoints/soldier-unique-skill-review-evidence-batch6.v1.json",
   "overrides": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
   "before": {"passCount":130,"reviewCount":55,"overrideCount":21},
@@ -15,13 +15,15 @@
   },
   "after": {"passCount":137,"reviewCount":48,"overrideCount":28,"translatedCount":185,"remainingTranslationCount":0},
   "verification": {
-    "workflow": null,
-    "runId": null,
-    "jobId": null,
-    "result": "PENDING",
-    "observed": null,
-    "productionBuild": "PENDING",
-    "frontendLocalizationBoundary": "PENDING"
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33229241040,
+    "jobId": 99038918516,
+    "result": "SUCCESS",
+    "verifiedImplementationHeadSha": "58fbb2b2fda2eff0a8cfe81e15d1f4f4d96a72d2",
+    "observed": "records=185 pass=137 review=48 overrides=28 missing=0 extra=0 public=185",
+    "productionBuild": "SUCCESS",
+    "frontendLocalizationBoundary": "PASS",
+    "note": "Final metadata-only closeout HEAD is verified read-only after all checkpoint writes; its run ID is intentionally not persisted to avoid a self-invalidating metadata loop."
   },
   "safety": {
     "canonicalSoldierDataReopened": false,
@@ -30,5 +32,5 @@
     "blanketMechanicPromotion": false,
     "olderNormalRecordUsedForChangedSpPromotion": false
   },
-  "nextStep": "Run the deterministic Soldier Korean presentation build and production frontend gates; keep the remaining 48 records in REVIEW until record-level Korean evidence is available."
+  "nextStep": "Keep the remaining 48 records in REVIEW until new record-level Korean evidence is available; Hosted QA remains pending until the current projection is actually deployed."
 }
