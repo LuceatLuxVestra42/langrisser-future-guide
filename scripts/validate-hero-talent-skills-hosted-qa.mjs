@@ -62,8 +62,8 @@ async function validateDesktop(browser) {
   const skillSection = skillHeading.locator('xpath=ancestor::section[1]');
   const skillCards = skillSection.locator('article');
   check('desktop-skill-card-count', await skillCards.count() === 9, `count=${await skillCards.count()}`);
-  check('desktop-direct-skill-group', await skillSection.getByText('기본 보유 스킬').count() === 1, 'direct group visible');
-  check('desktop-job-skill-group', await skillSection.getByText('전직 습득 스킬').count() === 1, 'job group visible');
+  check('desktop-direct-skill-group', await skillSection.getByText('기본 보유 스킬', { exact: true }).count() === 1, 'direct group visible');
+  check('desktop-job-skill-group', await skillSection.getByText('전직 습득 스킬', { exact: true }).count() === 1, 'job group visible');
   check('desktop-leon-direct-skill', await skillSection.getByText('突击', { exact: true }).count() >= 1, 'direct skill 突击 visible');
   check('desktop-leon-super-buff', await skillSection.getByText('帝国冲锋', { exact: true }).count() >= 1, 'job skill 帝国冲锋 visible');
 
