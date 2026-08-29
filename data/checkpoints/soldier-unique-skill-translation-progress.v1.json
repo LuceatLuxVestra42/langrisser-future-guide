@@ -7,8 +7,8 @@
   "targetCount": 185,
   "progress": {
     "translatedCount": 185,
-    "passCount": 114,
-    "reviewCount": 71,
+    "passCount": 116,
+    "reviewCount": 69,
     "remainingCount": 0,
     "lastCompletedSoldierId": 6113,
     "nextKnownRecord": null,
@@ -21,50 +21,46 @@
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch7.v1.json","recordCount":20,"range":"soldierId 645 through 1031 with lower tiers skipped","role":"append-only-batch"},
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch8.v1.json","recordCount":35,"range":"soldierId 1032 through 5308 with lower tiers skipped; normal + SP","role":"append-only-batch"},
     {"path":"data/checkpoints/soldier-unique-skill-translation-batch9.v1.json","recordCount":40,"range":"soldierId 5311 through 6113; final SP records","role":"append-only-batch"},
-    {"path":"data/presentation/soldier-unique-skill-review-overrides.v1.json","recordCount":5,"range":"250, 326, 333, 341, 602","role":"evidence-backed-review-overrides"}
+    {"path":"data/presentation/soldier-unique-skill-review-overrides.v1.json","recordCount":7,"range":"250, 326, 333, 334, 336, 341, 602","role":"evidence-backed-review-overrides"}
   ],
   "writeStrategy": {
     "mode": "checkpoint-sharded-authoring-with-deterministic-final-consolidation-and-review-overrides",
     "reason": "Preserve immutable translation batches and apply evidence-backed review resolutions through a small soldierId-keyed override layer.",
     "canonicalGeneratedSourceReadOnly": true,
     "finalConsolidationRequired": false,
-    "finalConsolidationComplete": true,
-    "batch8RecordSourceMode": "canonical-by-soldierId",
-    "batch9RecordSourceMode": "canonical-by-soldierId"
+    "finalConsolidationComplete": true
   },
   "reviewQueueCounts": {
     "sourceReviewMarks": 76,
-    "resolvedByReviewOverrides": 5,
-    "remaining": 71
+    "resolvedByReviewOverrides": 7,
+    "remaining": 69
   },
   "reviewResolution": {
-    "evidenceCheckpoint": "data/checkpoints/soldier-unique-skill-review-evidence-batch1.v1.json",
+    "evidenceCheckpoints": [
+      "data/checkpoints/soldier-unique-skill-review-evidence-batch1.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-evidence-batch2.v1.json"
+    ],
     "overridePath": "data/presentation/soldier-unique-skill-review-overrides.v1.json",
-    "resolvedSoldierIds": [250, 326, 333, 341, 602],
-    "resolvedTerms": ["魔物", "树林", "山地", "草地", "野战"],
-    "status": "BATCH1_APPLIED"
-  },
-  "nextStartPoint": {
-    "afterSoldierId": 6113,
-    "nextKnownRecord": null,
-    "batchSize": 0
+    "resolutionCheckpoints": [
+      "data/checkpoints/soldier-unique-skill-review-resolution-batch1.v1.json",
+      "data/checkpoints/soldier-unique-skill-review-resolution-batch2.v1.json"
+    ],
+    "resolvedSoldierIds": [250, 326, 333, 334, 336, 341, 602],
+    "status": "BATCH2_APPLIED"
   },
   "completion": {
     "translationTargetComplete": true,
     "translatedCoverage": "185/185",
-    "finalConsolidationRequired": false,
     "finalConsolidationComplete": true,
-    "consolidationStatus": "PASS_WITH_REVIEW",
+    "consolidationStatus": "PASS_WITH_REVIEW_PENDING_BUILD_RECHECK",
     "consolidationCheckpoint": "data/checkpoints/soldier-unique-skill-translation-consolidation.v1.json",
     "finalConsumerPath": "data/generated/soldier-unique-skill-kr-final.v1.json",
     "publicConsumerPath": "public/data/soldier-unique-skill-kr.v1.json",
     "validationPath": "data/validation/soldier-unique-skill-kr-final.v1.json",
-    "finalConsumerReady": true,
-    "reviewResolutionRequired": true,
-    "frontendConsumerIntegrationRequired": false,
     "frontendConsumerIntegrated": true,
     "frontendCheckpoint": "data/checkpoints/soldier-unique-skill-frontend-localization.v1.json",
-    "frontendBuildGateStatus": "PASS_PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
-    "frontendHostedQaStatus": "PENDING"
+    "frontendBuildGateStatus": "PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
+    "frontendHostedQaStatus": "PENDING",
+    "reviewResolutionRequired": true
   }
 }
