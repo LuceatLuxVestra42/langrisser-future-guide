@@ -87,6 +87,7 @@ jobs:
           grep -q '용병을 찾을 수 없어' dist/client/404.html
           grep -q '공개 장비를 찾을 수 없습니다.' dist/client/404.html
           grep -q '/langrisser-future-guide/' dist/client/404.html
+          grep -q '/langrisser-future-guide/heroes/6/' dist/client/heroes/index.html
           printf '%s\n' "$GITHUB_SHA" > dist/client/qa-main-source.txt
           printf '%s\n' 'route-hosted-qa-stage2-playwright-browser' > dist/client/qa-surface.txt
 
@@ -105,20 +106,24 @@ jobs:
           git commit -m "Deploy Route Hosted QA Stage2 ${GITHUB_SHA}"
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
 
-      - name: Require QA-1 strict Hosted Gate before Browser UI
+      - name: Require stable QA-1 strict Hosted Gate before Browser UI
         shell: bash
         run: |
           set -euo pipefail
-          passed=0
-          for attempt in $(seq 1 12); do
-            echo "Hosted prerequisite attempt ${attempt}"
+          stable=0
+          for attempt in $(seq 1 18); do
+            echo "Hosted stability attempt ${attempt} (consecutive=${stable})"
             if bun run qa:hosted -- --expected-sha "$GITHUB_SHA" --output route-hosted-qa-stage2-hosted-prerequisite.json; then
-              passed=1
-              break
+              stable=$((stable + 1))
+              if [ "$stable" -ge 3 ]; then
+                break
+              fi
+            else
+              stable=0
             fi
-            sleep 10
+            sleep 5
           done
-          test "$passed" -eq 1
+          test "$stable" -ge 3
 
       - name: Install Chromium and Linux dependencies
         run: bunx playwright install --with-deps chromium
