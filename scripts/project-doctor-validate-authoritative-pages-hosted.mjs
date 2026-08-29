@@ -44,10 +44,12 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
 }
 check(manifest, `authoritative deployment manifest did not reach source=${expectedSourceSha} skin=${expectedSkinRef}`);
 check(manifest.semanticStageReopened === false, "deployment manifest reopened semantic stage");
+check(manifest.heroArtworkResolvedCount === 267, `deployment Hero artwork resolved count mismatch: ${manifest.heroArtworkResolvedCount}`);
 
 for (const path of ["", "heroes/", "heroes/6/", "equipment/", "equipment/642/", "equipment/299/"]) {
   await fetchWithRetry(path || "index.html");
 }
+await fetchWithRetry("images/heroes/cards/6.png");
 await fetchWithRetry("images/equipment/416.png");
 await fetchWithRetry("images/equipment/567.png");
 
@@ -60,6 +62,10 @@ const firstSkinId = skinHero.skinIds[0];
 const secondSkinId = skinHero.skinIds[1];
 await fetchWithRetry(`images/skins/${firstSkinId}.png`);
 await fetchWithRetry(`images/skins/${secondSkinId}.png`);
+
+const hero6SkinIds = Array.isArray(relation.byHeroId?.["6"]) ? relation.byHeroId["6"].map(Number) : [];
+check(hero6SkinIds.length === 6, `Hero 6 frozen Skin count mismatch: ${hero6SkinIds.length}`);
+const hero6VisualCount = hero6SkinIds.length + 1;
 
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -103,6 +109,20 @@ try {
 
   response = await page.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
   check(response && response.status() < 400, `Hero 6 detail failed: ${response?.status()}`);
+  await page.getByText("Hero #6", { exact: true }).waitFor();
+  await page.getByText("대표 일러스트", { exact: true }).waitFor();
+  await page.getByText(`1 / ${hero6VisualCount}`, { exact: true }).waitFor();
+  const heroArtworkImage = page.locator('img[alt="레온 대표 일러스트"]');
+  check(await heroArtworkImage.count() === 1, "Hero 6 representative artwork image missing or duplicated");
+  check((await heroArtworkImage.getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 representative artwork source mismatch");
+  const hero6Next = page.getByRole("button", { name: "다음 일러스트" });
+  check(await hero6Next.count() === 1, "Hero 6 next artwork control missing or duplicated");
+  await hero6Next.click();
+  await page.waitForTimeout(100);
+  await page.getByText(`스킨 1 · ID ${hero6SkinIds[0]}`, { exact: true }).waitFor();
+  const hero6FirstSkinImage = page.locator(`img[src*="/images/skins/${hero6SkinIds[0]}.png"]`);
+  check(await hero6FirstSkinImage.count() === 1, "Hero 6 first Skin did not follow representative artwork");
+
   const exclusiveHeading = page.getByRole("heading", { name: "전용장비", exact: true });
   await exclusiveHeading.waitFor();
   const exclusiveSection = exclusiveHeading.locator("xpath=ancestor::section[1]");
@@ -167,6 +187,11 @@ try {
   try {
     response = await mobilePage.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
     check(response && response.status() < 400, `Hero 6 mobile detail failed: ${response?.status()}`);
+    await mobilePage.getByText("대표 일러스트", { exact: true }).waitFor();
+    await mobilePage.getByText(`1 / ${hero6VisualCount}`, { exact: true }).waitFor();
+    const mobileHeroArtwork = mobilePage.locator('img[alt="레온 대표 일러스트"]');
+    check(await mobileHeroArtwork.count() === 1, "Hero 6 mobile representative artwork missing or duplicated");
+    check((await mobileHeroArtwork.getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 mobile representative artwork source mismatch");
     const mobileHeading = mobilePage.getByRole("heading", { name: "전용장비", exact: true });
     await mobileHeading.waitFor();
     const mobileSection = mobileHeading.locator("xpath=ancestor::section[1]");
@@ -183,6 +208,14 @@ try {
     status: "PASS_AUTHORITATIVE_GITHUB_PAGES_HOSTED",
     sourceSha: expectedSourceSha,
     skinRuntimeRef: expectedSkinRef,
+    heroArtwork: {
+      resolvedCount: 267,
+      heroId: 6,
+      webAssetPath: "/images/heroes/cards/6.png",
+      visualCount: hero6VisualCount,
+      desktop: "PASS",
+      mobile: "PASS",
+    },
     skinRepresentative: { heroId: skinHero.heroId, firstSkinId, secondSkinId },
     heroExclusiveEquipment: {
       heroId: 6,
@@ -194,6 +227,7 @@ try {
       mobileOverflow: 0,
     },
     equipmentP3_2: { tab3Count: cardCount, defaultOrderParity: "PASS", details: { 642: "2026-07-16", 299: "2019-05-09" } },
+    heroArtwork6: "HTTP_PASS_WITH_RETRY_POLICY",
     equipmentImage416: "HTTP_PASS_WITH_RETRY_POLICY",
     equipmentImage567: "HTTP_PASS_WITH_RETRY_POLICY",
     pageErrors: 0,
