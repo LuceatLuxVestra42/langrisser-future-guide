@@ -45,24 +45,45 @@ async function expectNoHorizontalOverflow(page: Page) {
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
 }
 
+async function expectBrowserEdgeFresh(page: Page) {
+  if (!EXPECTED_SOURCE_SHA) return;
+
+  await expect
+    .poll(
+      async () => {
+        const sentinel = new URL(hostedUrl("qa-main-source.txt"));
+        sentinel.searchParams.set("qa2-browser-freshness", `${Date.now()}`);
+        const response = await page.request.get(sentinel.toString(), {
+          headers: { "cache-control": "no-cache" },
+        });
+        if (!response.ok()) return `HTTP_${response.status()}`;
+        return (await response.text()).trim();
+      },
+      {
+        message: "Browser edge must expose the same deployed source SHA before UI assertions",
+        timeout: 60_000,
+        intervals: [1_000, 2_000, 5_000, 5_000, 10_000],
+      },
+    )
+    .toBe(EXPECTED_SOURCE_SHA);
+}
+
 test("desktop: hosted freshness precondition and public surfaces render cleanly", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium-desktop");
   const guard = installRuntimeGuard(page);
 
-  if (EXPECTED_SOURCE_SHA) {
-    const response = await page.request.get(hostedUrl("qa-main-source.txt"));
-    expect(response.ok()).toBeTruthy();
-    expect((await response.text()).trim()).toBe(EXPECTED_SOURCE_SHA);
-  }
+  await expectBrowserEdgeFresh(page);
 
   const surfaces = ["", "banners/", "equipment/", "heroes/", "soldiers/"];
   for (const surface of surfaces) {
     const response = await page.goto(hostedUrl(surface), { waitUntil: "domcontentloaded" });
     expect(response, `missing response for ${surface || "/"}`).not.toBeNull();
     expect(response!.status(), `unexpected status for ${surface || "/"}`).toBeLessThan(400);
-    await expect(page.locator("main").first()).toBeVisible();
+    await expect(page.locator("body")).toBeVisible();
+    const bodyText = (await page.locator("body").innerText()).trim();
+    expect(bodyText.length, `empty rendered body for ${surface || "/"}`).toBeGreaterThan(20);
     await expectNoHorizontalOverflow(page);
   }
 
@@ -81,7 +102,7 @@ test("desktop: hero search hydrates and history back/forward remains usable", as
   await search.focus();
   await page.keyboard.type("레온");
 
-  await expect(page.getByText(/검색 결과/)).toContainText("1 / 267명");
+  await expect(page.getByText(/검색 결과/)).toHaveText(/검색 결과 [1-9]\d* \/ 267명/);
   const leonLink = page.getByRole("link", { name: /레온 SSR 상세 보기/ });
   await expect(leonLink).toHaveCount(1);
   await leonLink.click();
@@ -158,6 +179,10 @@ test("desktop: unknown IDs render the intended application not-found UI", async 
     expect(response, `missing response for ${path}`).not.toBeNull();
     expect(response!.status(), `unknown-id status for ${path}`).toBe(404);
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+    await expect(page.getByRole("link", { name: "메인으로 돌아가기" })).toHaveAttribute(
+      "href",
+      "/langrisser-future-guide/",
+    );
   }
 
   guard.assertClean();
@@ -190,7 +215,8 @@ test("mobile: responsive layout supports touch and keyboard interactions", async
   const heroSearch = page.getByLabel("이름 검색");
   await heroSearch.focus();
   await page.keyboard.type("레온");
-  await expect(page.getByText(/검색 결과/)).toContainText("1 / 267명");
+  await expect(page.getByText(/검색 결과/)).toHaveText(/검색 결과 [1-9]\d* \/ 267명/);
+  await expect(page.getByRole("link", { name: /레온 SSR 상세 보기/ })).toHaveCount(1);
 
   guard.assertClean();
 });
