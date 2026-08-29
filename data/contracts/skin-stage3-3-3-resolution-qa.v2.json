@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "stage": "skin-page-3",
+  "substage": "3-3-3",
+  "checkpoint": "SKIN_STAGE3_3_3_RESOLUTION_QA_CONTRACT_V2",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Validate Stage 3-3-2 UnityFS exact-runtime-path evidence without reopening frozen Skin identity, ownership, sourceOrder, or model-resource selection. V2 preserves the historical 3,047-name catalog admission when available and adds an exact retained-candidate-surface admission when the original catalog bytes are unavailable but the frozen 536-candidate set can be reconstructed exactly from retained Stage 3-3-2 evidence.",
+  "frozenBaseline": {
+    "skinCount": 540,
+    "staticTargetCount": 540,
+    "charSpineTargetCount": 540,
+    "modelPrimaryTargetCount": 789,
+    "requiredTargetCount": 1869,
+    "supplementalTargetCount": 81,
+    "modelSourceIndexRecordCount": 977,
+    "proposedCandidateFilenameCount": 944,
+    "bundleCatalogLineCount": 3047,
+    "bundleCatalogSha256": "424b64fefe0adfb6797e13053e3049e257838185c51e215eae22d8ee2d9c7188",
+    "authoritativeCandidateBundleCount": 536
+  },
+  "candidateSurfaceAdmission": {
+    "acceptedModes": [
+      "FROZEN_CATALOG_EXACT",
+      "RETAINED_CANDIDATE_SURFACE_EXACT"
+    ],
+    "retainedSources": {
+      "unscannedDemandShards": [
+        "data/evidence/skin-stage3-3-current-subset/unscanned-bundle-demand-0000-0299.v1.json",
+        "data/evidence/skin-stage3-3-current-subset/unscanned-bundle-demand-0300-0522.v1.json"
+      ],
+      "scannedBundleProvenance": "data/evidence/skin-stage3-3-current-subset/bundle-provenance.v1.json",
+      "expectedUnscannedDemandCount": 523,
+      "expectedScannedProvenanceCount": 13,
+      "expectedUnionCount": 536
+    },
+    "directoryModeRequirements": {
+      "scanSourceType": "PC_CLIENT_EXPORT_ASSET_BUNDLE_DIRECTORY",
+      "exactRetainedCandidateSetRequired": true,
+      "fullClientDirectoryFileCountIsNotSemanticAdmission": true,
+      "historicalCatalogMismatchOutsideFrozenCandidateSetDoesNotChangeSkinCandidateSemantics": true
+    }
+  },
+  "acceptedRequiredEvidenceClasses": [
+    "RESOLVED_EXACT_SINGLE_BUNDLE",
+    "RESOLVED_EXACT_IDENTICAL_CAB_ALIAS"
+  ],
+  "qaClasses": {
+    "RESOLVED_EXACT_SINGLE_BUNDLE": "Exactly one admitted frozen-candidate bundle contains exactly one exact full runtime-path occurrence.",
+    "RESOLVED_EXACT_IDENTICAL_CAB_ALIAS": "More than one admitted frozen-candidate bundle contains the exact runtime path, every hit occurs once, and every matched embedded CAB is byte-identical by SHA-256. Preserve all provenance; do not infer begin/current ownership.",
+    "PENDING_UNSCANNED_CANDIDATE": "At least one admitted frozen candidate bundle for this target has not been scanned yet.",
+    "FAIL_NOT_FOUND": "All admitted frozen candidates were scanned and no exact full runtime-path occurrence was found.",
+    "REVIEW_DUPLICATE_OCCURRENCE_IN_BUNDLE": "An exact runtime path occurs more than once inside one scanned candidate; exact path bytes alone are insufficient to collapse occurrences.",
+    "REVIEW_MULTIPLE_NONIDENTICAL_CABS": "The exact runtime path occurs in multiple candidate bundles but matched embedded CAB SHA-256 values are not all identical.",
+    "FAIL_SCAN_ERROR": "One or more required candidate bundles failed UnityFS/CAB scanning.",
+    "FAIL_CANDIDATE_COVERAGE": "The target has no admitted frozen candidate bundle or the exact retained candidate surface changed.",
+    "FAIL_INVALID_SCAN_EVIDENCE": "The scan result violates frozen counts, identity, candidate-surface, or evidence invariants."
+  },
+  "aliasPolicy": {
+    "sameRuntimePathAloneIsNotAliasProof": true,
+    "sameBundleFilenameIsNotAliasProof": true,
+    "sameEmbeddedCabSha256AcrossAllExactHitsIsAcceptedAliasProof": true,
+    "differentEmbeddedCabSha256RequiresReview": true,
+    "automaticBeginCurrentPreference": false,
+    "selectedBundleRequiredForAlias": false,
+    "preserveAllAliasBundleProvenance": true
+  },
+  "guardrails": {
+    "fuzzyMatching": false,
+    "numericIdArithmetic": false,
+    "filenameSimilarityJoin": false,
+    "crossRootFallback": false,
+    "alternatePathSubstitution": false,
+    "canonicalSkinRecomputation": false,
+    "heroSkinOwnershipRecomputation": false,
+    "sourceOrderRecomputation": false,
+    "modelResourceSelectionRecomputation": false,
+    "syntheticCatalogMetadata": false,
+    "silentCatalogRegeneration": false
+  },
+  "finalFreezeConditions": {
+    "candidateBundlesAccountedFor": 536,
+    "bundleScanErrors": 0,
+    "requiredTargetsAccepted": 1869,
+    "pendingRequiredTargets": 0,
+    "failedRequiredTargets": 0,
+    "reviewRequiredTargets": 0,
+    "skinCoverage": 540,
+    "staticCoverage": 540,
+    "charSpineCoverage": 540,
+    "modelPrimaryCoverage": 789,
+    "beginCurrentUnresolved": 0
+  },
+  "currentBoundary": {
+    "v1HistoricalContractPreserved": true,
+    "stage3_3_2MayBeIncremental": true,
+    "stage3_3_3MayRunOnPartialInput": true,
+    "partialInputMayNotFreeze": true,
+    "projectDoctorSkinAssetOwnerAdmissionDeferredUntilFinalFreeze": true
+  },
+  "nextStageAfterFinalFreeze": "3-4 selective actual asset extraction"
+}
