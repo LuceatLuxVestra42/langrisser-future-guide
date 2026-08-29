@@ -149,7 +149,7 @@ test("desktop: Soldier modal follows browser back/forward and preserves parent f
   const audit = installNavigationAudit(page);
 
   await expectBrowserEdgeFresh(page);
-  await page.goto(hostedUrl("soldiers/"), { waitUntil: "domcontentloaded" });
+  await page.goto(hostedUrl("soldiers/"), { waitUntil: "networkidle" });
   const search = page.getByPlaceholder("검색");
   await search.fill("중장 창병");
   await expect(page.getByText("1개 표시")).toBeVisible();
@@ -217,6 +217,7 @@ test("mobile: Soldier detail history works with touch navigation", async ({
   await expect(soldierCategory).toHaveAttribute("href", "/langrisser-future-guide/soldiers/");
   await soldierCategory.tap();
   await expect(page).toHaveURL(/\/langrisser-future-guide\/soldiers\/?$/);
+  await page.waitForLoadState("networkidle");
 
   const search = page.getByPlaceholder("검색");
   await search.fill("중장 창병");
