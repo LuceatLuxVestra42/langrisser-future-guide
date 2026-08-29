@@ -21,15 +21,6 @@ export const Route = createFileRoute("/heroes")({
 
 const ALL_RARITIES = "ALL";
 
-// Presentation-only portrait sample set kept as a defensive fallback.
-// The canonical resolver now covers all 267 Hero card artwork paths first.
-const SAMPLE_HERO_CARD_PATHS: Readonly<Record<number, string>> = {
-  5: "/images/heroes/portrait-samples/5.webp",
-  6: "/images/heroes/portrait-samples/6.webp",
-  8: "/images/heroes/portrait-samples/8.webp",
-  12: "/images/heroes/portrait-samples/12.webp",
-  15: "/images/heroes/portrait-samples/15.webp",
-};
 
 // Presentation-only sample projection from frozen Hero detail shards.
 // Hero 6 and 12 each have a skill whose displayType is `超绝强化`.
@@ -55,13 +46,13 @@ function resolvePublicAssetUrl(webAssetPath: string) {
 function getRarityFrameClass(baseLabel: string) {
   switch (baseLabel) {
     case "SSR":
-      return "from-amber-200 via-amber-400 to-yellow-700";
+      return "border-amber-400/80";
     case "SR":
-      return "from-violet-200 via-violet-400 to-fuchsia-700";
+      return "border-violet-400/80";
     case "R":
-      return "from-sky-200 via-sky-400 to-cyan-700";
+      return "border-sky-400/80";
     default:
-      return "from-zinc-200 via-zinc-400 to-zinc-700";
+      return "border-border";
   }
 }
 
@@ -187,7 +178,7 @@ function HeroGridPage() {
             <span className="text-muted-foreground"> / {data.summary.total}명</span>
           </p>
           <p className="hidden text-xs text-muted-foreground sm:block">
-            공식 초상화 267명 연결
+            공식 CardHead 아이콘 267명 연결
           </p>
         </div>
 
@@ -244,12 +235,7 @@ function FilterButton({
 
 function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
   const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
-  const sampleAssetPath = SAMPLE_HERO_CARD_PATHS[hero.heroId];
-  const imageUrl = hero.card.webAssetPath
-    ? resolvePublicAssetUrl(hero.card.webAssetPath)
-    : sampleAssetPath
-      ? resolvePublicAssetUrl(sampleAssetPath)
-      : null;
+  const imageUrl = resolvePublicAssetUrl(`/images/heroes/card-head/${hero.heroId}.png`);
   const rarityFrameClass = getRarityFrameClass(hero.rarity.baseLabel);
   const hasSampleSuperBuff = SAMPLE_SUPER_BUFF_HERO_IDS.has(hero.heroId);
 
@@ -259,75 +245,40 @@ function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
       to="/heroes/$heroId"
       params={{ heroId: String(hero.heroId) }}
       aria-label={`${displayName} ${hero.rarity.baseLabel} 상세 보기`}
-      className="group block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2"
+      className="group block rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2"
     >
       <article
-        className={`relative aspect-square rounded-xl bg-gradient-to-br p-[3px] ${rarityFrameClass} shadow-sm transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-lg`}
+        className={`overflow-hidden rounded-lg border-2 bg-card shadow-sm transition duration-200 ${rarityFrameClass} group-hover:-translate-y-0.5 group-hover:shadow-md`}
       >
-        <div className="relative h-full w-full overflow-hidden rounded-[9px] border border-white/30 bg-card shadow-inner">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt=""
-              className="h-full w-full object-cover object-[center_20%] transition duration-200 group-hover:scale-[1.025]"
-              loading="lazy"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted text-muted-foreground">
-              <UserRound
-                className="h-12 w-12 transition group-hover:text-foreground sm:h-14 sm:w-14"
-                strokeWidth={1.25}
-                aria-hidden="true"
-              />
-            </div>
-          )}
-
-          <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/25"
-            aria-hidden="true"
+        <div className="relative aspect-square overflow-hidden bg-muted/40">
+          <img
+            src={imageUrl}
+            alt=""
+            className="h-full w-full object-contain transition duration-200 group-hover:scale-[1.025]"
+            loading="lazy"
           />
-          <span
-            className="pointer-events-none absolute left-1 top-1 h-3 w-3 rounded-tl-sm border-l-2 border-t-2 border-white/70"
-            aria-hidden="true"
-          />
-          <span
-            className="pointer-events-none absolute right-1 top-1 h-3 w-3 rounded-tr-sm border-r-2 border-t-2 border-white/70"
-            aria-hidden="true"
-          />
-          <span
-            className="pointer-events-none absolute bottom-1 left-1 h-3 w-3 rounded-bl-sm border-b-2 border-l-2 border-white/50"
-            aria-hidden="true"
-          />
-          <span
-            className="pointer-events-none absolute bottom-1 right-1 h-3 w-3 rounded-br-sm border-b-2 border-r-2 border-white/50"
-            aria-hidden="true"
-          />
-
-          <span className="absolute left-1.5 top-1.5 rounded border border-white/25 bg-black/65 px-1.5 py-0.5 text-[9px] font-black leading-none tracking-wide text-white shadow-sm sm:text-[10px]">
-            {hero.rarity.baseLabel}
-          </span>
 
           <div className="absolute right-1.5 top-1.5 flex flex-col items-end gap-1">
             {hero.hasSp ? (
-              <span className="rounded border border-fuchsia-200/50 bg-fuchsia-950/80 px-1.5 py-0.5 text-[9px] font-black leading-none text-fuchsia-100 shadow-sm sm:text-[10px]">
+              <span className="rounded border border-fuchsia-200/50 bg-fuchsia-950/85 px-1.5 py-0.5 text-[9px] font-black leading-none text-fuchsia-100 shadow-sm sm:text-[10px]">
                 SP
               </span>
             ) : null}
             {hasSampleSuperBuff ? (
               <span
-                className="rounded border border-white/25 bg-black/70 px-1.5 py-0.5 text-[9px] font-bold leading-none text-white shadow-sm sm:text-[10px]"
+                className="rounded border border-white/25 bg-black/75 px-1.5 py-0.5 text-[9px] font-bold leading-none text-white shadow-sm sm:text-[10px]"
                 title="초절 강화 보유"
               >
                 초절
               </span>
             ) : null}
           </div>
+        </div>
 
-          <div className="absolute inset-x-1.5 bottom-1.5 rounded-md border border-white/20 bg-black/70 px-1.5 py-1 text-center shadow-lg backdrop-blur-[2px]">
-            <span className="line-clamp-1 text-[11px] font-bold leading-tight text-white sm:text-xs">
-              {displayName}
-            </span>
-          </div>
+        <div className="border-t border-border/70 bg-card px-1.5 py-1.5 text-center">
+          <span className="line-clamp-1 text-[11px] font-bold leading-tight text-foreground sm:text-xs">
+            {displayName}
+          </span>
         </div>
       </article>
     </Link>
