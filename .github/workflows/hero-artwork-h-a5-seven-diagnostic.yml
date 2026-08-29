@@ -1,0 +1,33 @@
+name: Hero Artwork H-A5 Seven Hero Diagnostic
+
+on:
+  push:
+    branches:
+      - work/hero-artwork-h-a5-bulk-index
+    paths:
+      - scripts/probe-hero-artwork-h-a5-seven.py
+      - .github/workflows/hero-artwork-h-a5-seven-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  seven-diagnostic:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install UnityPy
+        shell: pwsh
+        run: python -m pip install --disable-pip-version-check --quiet UnityPy
+      - name: Trace seven unresolved Hero prefab dependencies
+        shell: pwsh
+        run: python scripts/probe-hero-artwork-h-a5-seven.py
+      - name: Upload diagnostic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-artwork-h-a5-seven-diagnostic-report
+          path: ${{ runner.temp }}/hero-artwork-h-a5-seven/report
+          if-no-files-found: warn
+          retention-days: 5
