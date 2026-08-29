@@ -80,11 +80,9 @@ jobs:
           count=$(find dist/client/images/heroes/cards -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')
           test "$count" = '267'
           cmp -s public/images/heroes/cards/6.png dist/client/images/heroes/cards/6.png
-          grep -q '/langrisser-future-guide/images/heroes/cards/6.png' dist/client/heroes/6/index.html
-          grep -q 'Hero #6' dist/client/heroes/6/index.html
-          grep -q '공식 초상화 267명 연결' dist/client/heroes/index.html
           printf '%s\n' "$GITHUB_SHA" > dist/client/qa-main-source.txt
           printf '%s\n' '4e3743306c4d13e9fe5a9c3867e257f3b171bf3b' > dist/client/qa-production-main-source.txt
+          echo "PASS static Hero header files/count/hash; rendered content is owned by Browser UI gate"
 
       - name: Publish QA candidate to gh-pages
         env:
@@ -117,11 +115,7 @@ jobs:
         shell: bash
         run: |
           if [ -f test-results/hero-detail-header-hosted-qa/report.json ]; then
-            node - <<'NODE'
-            const fs = require('fs');
-            const r = JSON.parse(fs.readFileSync('test-results/hero-detail-header-hosted-qa/report.json','utf8'));
-            console.log(JSON.stringify({ status:r.status, error:r.error ?? null, summary:r.summary, hosted:r.hosted, browser:r.browser, failedChecks:(r.checks ?? []).filter(x=>!x.pass) }, null, 2));
-            NODE
+            node -e "const fs=require('fs');const r=JSON.parse(fs.readFileSync('test-results/hero-detail-header-hosted-qa/report.json','utf8'));console.log(JSON.stringify({status:r.status,error:r.error??null,summary:r.summary,hosted:r.hosted,browser:r.browser,failedChecks:(r.checks??[]).filter(x=>!x.pass)},null,2));"
           fi
 
       - name: Upload Hero detail header QA evidence
