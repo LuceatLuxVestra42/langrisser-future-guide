@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "stage": "Equipment P3-1 Release Metadata Projection",
+  "status": "PASS",
+  "completion": "EQUIPMENT_P3_1_RELEASE_PRESENTATION_FROZEN",
+  "authoritativeSource": {
+    "predecessorMainSha": "c99625c5acc34e2705103aa26c90a85d426648ab",
+    "p3_0_v2": "data/validation/equipment-p3-0-release-chronology-presentation-audit.v2.json",
+    "frozenGeneralList": "data/generated/equipment_stage3_3_general_list.json",
+    "projection": "data/presentation/equipment-p3-1-release-metadata.v1.json"
+  },
+  "frozenIdentity": {
+    "joinKey": "equipmentId",
+    "canonicalEquipment": 390,
+    "publicEquipment": 373,
+    "generalEquipment": 206,
+    "exclusiveEquipment": 167,
+    "siteTab3Population": 32,
+    "siteTab3TechnicalClass": "current-additional",
+    "siteTab3PresentationLabel": "장비패스",
+    "semanticStageReopened": false,
+    "stage2ClassificationChanged": false,
+    "productionConsumerChanged": false
+  },
+  "completedScope": {
+    "siteTab3ReleaseDateResolved": 32,
+    "siteTab3ReleaseDateUnresolved": 0,
+    "officialForgeRecords": 24,
+    "identityContinuityCorrectedRecords": 4,
+    "secondaryProvenanceRecords": 4,
+    "orderingPolicy": [
+      "groupOrder asc",
+      "subtypeOrder asc",
+      "releaseGroupDate desc",
+      "sortIndex asc deterministic tie-break only",
+      "equipmentId asc deterministic tie-break only"
+    ],
+    "historicalP3_0_v1Preserved": true
+  },
+  "review": [
+    "Equipment 265-268 retain secondary source tier until a primary official archive is found.",
+    "Individual order among equipment sharing one releaseGroupDate is not asserted; deterministic tie-breakers do not imply chronology."
+  ],
+  "blockers": [],
+  "nextStart": {
+    "stage": "Equipment P3-2 Release Metadata Frontend Integration",
+    "instructions": [
+      "Consume only data/presentation/equipment-p3-1-release-metadata.v1.json keyed by equipmentId.",
+      "Do not mutate data/generated/equipment_stage3_3_general_list.json or Stage 2-7 acquisition outputs.",
+      "For siteTab 3 default display, preserve groupOrder/subtypeOrder and apply releaseGroupDate descending within each subtype.",
+      "Keep P2 user-selected name/id sorting behavior unchanged.",
+      "Update the siteTab 3 order-policy wording so it no longer claims chronology is REVIEW.",
+      "Project releaseGroupDate into general Equipment detail presentation where appropriate.",
+      "Reuse Equipment P1/P2 and Equipment Image browser regressions for Hosted closeout."
+    ]
+  },
+  "reopenConditions": [
+    "Frozen siteTab 3 population or equipmentId identity changes.",
+    "New authoritative evidence contradicts a recorded releaseGroupDate.",
+    "New authoritative evidence contradicts the 2019-05-09 identity continuity for Equipment 299/400/401/402.",
+    "The intended 장비패스 presentation grouping changes."
+  ]
+}
