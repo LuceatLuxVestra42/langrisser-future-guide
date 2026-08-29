@@ -130,9 +130,14 @@ function applyGeneralReleasePresentation(records: EquipmentListRecord[]) {
   });
 
   let targetCursor = 0;
-  return projectedRecords.map((record) =>
-    record.siteTab === targetTab ? sortedTargetRecords[targetCursor++] : record,
-  );
+  return projectedRecords.map((record) => {
+    if (record.siteTab !== targetTab) return record;
+    const replacement = sortedTargetRecords[targetCursor++];
+    if (!replacement) {
+      throw new Error("Equipment P3-1 ordered target record is missing.");
+    }
+    return replacement;
+  });
 }
 
 export function readGeneralEquipmentPageData() {
