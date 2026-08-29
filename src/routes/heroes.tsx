@@ -191,7 +191,7 @@ function HeroGridPage() {
             <span className="text-muted-foreground"> / {data.summary.total}명</span>
           </p>
           <p className="hidden text-xs text-muted-foreground sm:block">
-            초상화 샘플 {SAMPLE_HERO_CARD_COUNT}명 연결 · 나머지는 placeholder
+            공식 초상화 267명 연결 · 샘플 fallback {SAMPLE_HERO_CARD_COUNT}명 보유
           </p>
         </div>
 
