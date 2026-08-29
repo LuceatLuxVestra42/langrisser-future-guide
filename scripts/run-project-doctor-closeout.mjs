@@ -6,8 +6,8 @@ export const CLOSEOUT_STEPS = [
   { id: 'd1-status', script: 'scripts/run-project-doctor-d1-3.mjs', passthrough: false },
   { id: 'd5-freshness', script: 'scripts/validate-project-doctor-d5.mjs', passthrough: false },
   { id: 'd5-self-test', script: 'scripts/validate-project-doctor-d5-fixtures.mjs', passthrough: false },
-  { id: 'd4-self-test', script: 'scripts/validate-project-doctor-d4-v4.mjs', passthrough: false },
-  { id: 'd4-run', script: 'scripts/run-project-doctor-d4-v4.mjs', passthrough: true },
+  { id: 'd4-self-test', script: 'scripts/validate-project-doctor-d4-v5.mjs', passthrough: false },
+  { id: 'd4-run', script: 'scripts/run-project-doctor-d4-v5.mjs', passthrough: true },
 ];
 
 const defaultExecutor = (step, args) => spawnSync(process.execPath, [step.script, ...args], { stdio: 'inherit', shell: false });
@@ -28,7 +28,7 @@ const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve
 if (isMain) {
   if (process.argv.includes('--help') || process.argv.includes('-h')) {
     console.log('Usage: npm run doctor -- [--dry-run] [--json] [D3/D4 changed-file source options]');
-    console.log('Runs D1 status refresh, validates D5 freshness without resealing, runs D5 and current D4 v4 self-tests, then executes the D3 v4-selected D4 v4 plan.');
+    console.log('Runs D1 status refresh, validates D5 freshness without resealing, runs D5 and current D4 v5 self-tests, then executes the D3 v5-selected D4 v5 plan.');
     process.exit(0);
   }
   const result = executeCloseout({ argv: process.argv.slice(2) });
