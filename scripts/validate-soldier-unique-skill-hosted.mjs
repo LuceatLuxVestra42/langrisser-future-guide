@@ -36,8 +36,8 @@ async function waitForKoreanProjection() {
           payload?.schemaId === "soldier-unique-skill-kr-public/v1" &&
           payload?.status === "PASS_WITH_REVIEW" &&
           payload?.counts?.records === 185 &&
-          payload?.counts?.pass === 109 &&
-          payload?.counts?.review === 76 &&
+          payload?.counts?.pass === 114 &&
+          payload?.counts?.review === 71 &&
           payload?.policy?.joinKey === "soldierId" &&
           payload?.policy?.runtimeNameJoin === false &&
           payload?.policy?.canonicalChineseFallbackForTarget === false &&
@@ -74,7 +74,7 @@ async function checkRoute(relativePath) {
 
 const projection = await waitForKoreanProjection();
 const bySoldierId = projection.payload.bySoldierId;
-const representativeIds = [410, 512, 5311, 6113];
+const representativeIds = [250, 326, 410, 512, 602, 5311, 6113];
 const representativeRecords = representativeIds.map((soldierId) => {
   const item = bySoldierId[String(soldierId)];
   assert(item, `Hosted Korean projection missing representative soldierId ${soldierId}`);
@@ -87,8 +87,12 @@ const representativeRecords = representativeIds.map((soldierId) => {
   };
 });
 
+for (const resolvedId of [250, 326, 333, 341, 602]) {
+  assert(bySoldierId[String(resolvedId)]?.translationStatus === "PASS", `Hosted review override was not applied for soldierId ${resolvedId}`);
+}
+
 const routes = [];
-for (const relativePath of ["soldiers", "soldiers/410", "soldiers/512", "soldiers/5311", "soldiers/6113"]) {
+for (const relativePath of ["soldiers", "soldiers/250", "soldiers/410", "soldiers/512", "soldiers/602", "soldiers/5311", "soldiers/6113"]) {
   routes.push(await checkRoute(relativePath));
 }
 
@@ -110,16 +114,21 @@ const summary = {
     runtimeNameJoin: projection.payload.policy.runtimeNameJoin,
     canonicalChineseFallbackForTarget: projection.payload.policy.canonicalChineseFallbackForTarget,
   },
+  reviewOverrides: {
+    resolvedSoldierIds: [250, 326, 333, 341, 602],
+    status: "PASS",
+  },
   representativeRecords,
   routeChecks: routes,
   gates: {
     deploymentHosted: "PASS",
     publicProjectionContract: "PASS",
+    reviewOverridesApplied: "PASS",
     representativeKoreanDescriptions: "PASS",
     hostedRouteSmoke: "PASS",
   },
   reviewBoundary: {
-    reviewCount: 76,
+    reviewCount: 71,
     reviewItemsAreMissingTranslations: false,
     reviewResolutionRequired: true,
   },
@@ -131,6 +140,8 @@ checkpoint.hostedQa = {
   status: "PASS",
   hostedBaseUrl: BASE_URL,
   projectionRecordCount: 185,
+  passCount: 114,
+  reviewCount: 71,
   representativeSoldierIds: representativeIds,
   routeCount: routes.length,
 };
@@ -140,7 +151,7 @@ checkpoint.completion = {
   buildGateComplete: true,
   hostedQaComplete: true,
 };
-checkpoint.nextStep = "Continue evidence-based resolution or explicit acceptance of the 76 review items without reopening canonical Soldier data.";
+checkpoint.nextStep = "Continue evidence-based resolution or explicit acceptance of the remaining 71 review items without reopening canonical Soldier data.";
 
 fs.writeFileSync(SUMMARY_PATH, `${JSON.stringify(summary, null, 2)}\n`);
 fs.writeFileSync(CHECKPOINT_PATH, `${JSON.stringify(checkpoint, null, 2)}\n`);
