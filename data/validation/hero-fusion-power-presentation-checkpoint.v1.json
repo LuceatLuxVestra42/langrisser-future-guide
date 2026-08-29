@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "status": "PASS_WITH_HOSTED_PENDING",
+  "scope": "hero-list-fusion-faction-mark-presentation",
+  "authoritativePredecessorMainSha": "57e97fa8d2f9cb54750a5b86ddc8506b067c7b2a",
+  "heroPopulationFreezeState": "HERO_LIST_STAGE1_FROZEN",
+  "canonicalHeroCount": 267,
+  "fusionPowerPresentation": {
+    "manifest": "data/generated/hero-fusion-power-presentation.v1.json",
+    "freezeState": "HERO_FUSION_POWER_PRESENTATION_FROZEN",
+    "fusionPowerHeroCount": 35,
+    "uniqueSkillCount": 35,
+    "uniqueTargetFactionCount": 12,
+    "relationSource": "ConfigDataSkillInfo.SkillTypeParam2",
+    "requiredSkillType": 14,
+    "requiredSkillTypeParam1": 2,
+    "descriptionParsing": false,
+    "skillNameInference": false,
+    "skillIconNameInference": false,
+    "heroNameJoin": false,
+    "idArithmetic": false
+  },
+  "factionAssets": {
+    "manifest": "data/generated/hero-fusion-faction-assets.v1.json",
+    "validation": "data/validation/hero-fusion-faction-assets.v1.json",
+    "freezeState": "HERO_FUSION_FACTION_ASSETS_FROZEN",
+    "gameVersion": "1.1.113",
+    "packageNumber": 27,
+    "bundleName": "begin_ui_icon_keyword_abs.b",
+    "bundleLayer": "BEGIN",
+    "resolvedCount": 12,
+    "localAssetRoot": "public/images/factions",
+    "remoteRuntimeHotlink": false
+  },
+  "presentation": {
+    "heroCardSpTextBadgeRemoved": true,
+    "heroCardFusionTextBadgeRemoved": true,
+    "heroCardFusionFactionMarkEnabled": true,
+    "heroCardRarityTextRemoved": true,
+    "rarityFilterRetained": true,
+    "spFilterRetained": true,
+    "heroDetailArtworkChanged": false
+  },
+  "verification": {
+    "materializeRunId": 33280096082,
+    "materializeAndAssetValidation": "PASS",
+    "productionBuild": "PASS",
+    "typeScriptGate": "PASS",
+    "frontendPreflightRunId": 33280150093,
+    "fusionPowerFrontendValidator": "PASS",
+    "heroCardIconRegressionValidator": "PASS"
+  },
+  "semanticStageReopened": false,
+  "completed": [
+    "explicit fusion target relation frozen for 35 Heroes via SkillTypeParam2",
+    "official faction mark assets materialized 12/12 from exact ConfigData paths and exact bundle container paths",
+    "SP text badge removed from Hero cards",
+    "초절 text badge removed from Hero cards",
+    "fusion-power Heroes render the exact target faction mark asset",
+    "rarity text removed from below Hero names",
+    "production build PASS",
+    "TypeScript gate PASS",
+    "scoped frontend validator PASS",
+    "existing Hero card-icon regression validator PASS"
+  ],
+  "review": [
+    "authoritative GitHub Pages static candidate verification after merge",
+    "hosted Chromium desktop/mobile verification after merge",
+    "hosted faction-mark PNG MIME and availability verification after merge"
+  ],
+  "blocker": [],
+  "nextStart": "open and merge the scoped PR after guards pass, then validate the authoritative Pages source marker and hosted browser surface",
+  "reopenConditions": [
+    "canonical Hero population changes",
+    "ConfigDataSkillInfo fusion relation contract changes",
+    "frozen fusion-power projection parity breaks",
+    "frozen faction asset manifest or exact source path parity breaks",
+    "hosted faction mark availability or browser QA fails"
+  ]
+}
