@@ -50,6 +50,9 @@ jobs:
       - name: Validate Status Source Producer Gate self-tests
         run: node scripts/validate-project-doctor-status-source-producers.mjs
 
+      - name: Validate Status Source Artifact Bridge self-tests
+        run: node scripts/validate-project-doctor-status-source-artifact-bridge.mjs
+
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
 
@@ -101,6 +104,9 @@ jobs:
 
       - name: Validate Status Source Producer Gate self-tests
         run: node scripts/validate-project-doctor-status-source-producers.mjs
+
+      - name: Validate Status Source Artifact Bridge self-tests
+        run: node scripts/validate-project-doctor-status-source-artifact-bridge.mjs
 
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
