@@ -129,7 +129,8 @@ verify("NOT_FOUND_UI_COVERAGE", () => {
 
 verify("RUNTIME_ERROR_COVERAGE", () => {
   assert(spec.includes('page.on("pageerror"'), "pageerror guard missing");
-  assert(spec.includes('message.type() === "error"'), "console.error guard missing");
+  assert(spec.includes('message.type() !== "error"'), "console.error guard missing");
+  assert(spec.includes('allowExpectedDocument404'), "expected 404 console boundary missing");
   assert(spec.includes('page.on("requestfailed"'), "critical request failure guard missing");
 });
 
