@@ -13,6 +13,8 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";
+import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 
 export const Route = createFileRoute("/heroes/$heroId")({
@@ -22,7 +24,8 @@ export const Route = createFileRoute("/heroes/$heroId")({
     if (!Number.isSafeInteger(heroId) || heroId <= 0) throw notFound();
     const data = await getHeroDetailRouteStage5Data({ data: { heroId } });
     if (!data) throw notFound();
-    return data;
+    const exclusiveEquipment = await getHeroExclusiveEquipmentPresentation({ data: { heroId } });
+    return { ...data, exclusiveEquipment };
   },
   head: ({ loaderData }) => ({
     meta: [{
@@ -46,7 +49,7 @@ function stripConfigMarkup(value: string | null) {
 }
 
 function HeroDetailPage() {
-  const { hero, stage6, detail } = Route.useLoaderData();
+  const { hero, stage6, detail, exclusiveEquipment } = Route.useLoaderData();
   const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
 
@@ -247,6 +250,8 @@ function HeroDetailPage() {
           ) : <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 정보가 없어.</p>}
         </section>
 
+        <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
+
         <section className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
             <SectionTitle icon={<UsersRound className="h-4 w-4" aria-hidden="true" />} title="사용 가능 병종" />
@@ -257,7 +262,7 @@ function HeroDetailPage() {
             <SectionTitle icon={<ShieldCheck className="h-4 w-4" aria-hidden="true" />} title="확정 시스템 연결" />
             <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
               <StatusChip label="유대" value={`${detail.systems.bondRowCount}개`} active={detail.systems.bondRowCount > 0} />
-              <StatusChip label="전용장비" value={detail.systems.exclusiveEquipmentStatus ?? "-"} active={detail.systems.exclusiveEquipmentReleased} />
+              <StatusChip label="전용장비" value={exclusiveEquipment.status} active={exclusiveEquipment.released} />
               <StatusChip label="중앙율정" value={detail.systems.centralDisciplineStatus ?? "-"} active={detail.systems.centralDisciplineReleased} />
               <StatusChip label="SP" value={detail.systems.spStatus ?? "-"} active={detail.systems.spReleased} />
               <StatusChip label="스킨" value={`${detail.presentation.skinCount}개`} active={detail.presentation.skinCount > 0} />
@@ -267,7 +272,7 @@ function HeroDetailPage() {
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle icon={<Database className="h-4 w-4" aria-hidden="true" />} title="상세 데이터 상태" />
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">이 페이지는 FINAL_FROZEN Stage 6 전체 묶음을 읽지 않고 현재 Hero의 개별 shard 하나만 읽어 표시용 데이터로 투영해. 원본 ConfigData 관계 재계산이나 이름·ID 추론은 하지 않아.</p>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">Hero 본문은 FINAL_FROZEN Stage 6 개별 shard 하나만 읽고, 전용장비는 별도 frozen B-5 byHero 소유권과 Equipment Stage 3-5 메타데이터를 조합해. 원본 ConfigData 관계 재계산이나 이름·ID 추론은 하지 않아.</p>
           <div className="mt-4 flex flex-wrap gap-2 text-xs">
             <span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">Stage 6 · {stage6.admissionStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">구조 {detail.validation.structuralStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">게시 {detail.validation.publicationStatus ?? "-"}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">review {detail.validation.reviewCount}</span>
           </div>
