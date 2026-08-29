@@ -186,6 +186,7 @@ function ExclusiveEquipmentDetail({ data }: { data: ExclusiveEquipmentDetailPage
             <h2 className="text-lg font-bold text-foreground">전용 영웅</h2>
           </div>
           <Link
+            reloadDocument
             to="/heroes/$heroId"
             params={{ heroId: String(ownerHero.heroId) }}
             className="group mt-4 flex items-center justify-between gap-4 rounded-xl border border-border bg-muted/35 p-4 transition hover:border-primary/35 hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
