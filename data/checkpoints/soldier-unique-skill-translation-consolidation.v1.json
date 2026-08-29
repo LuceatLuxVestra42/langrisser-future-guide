@@ -30,7 +30,7 @@
     "sourceTypeDerivedFromCanonicalIdentity": true,
     "idArithmeticInference": false
   },
-  "expectedAfterReviewBatch4": {
+  "verifiedAfterReviewBatch4": {
     "canonicalTargetCount": 185,
     "authoringRecordCount": 185,
     "reviewOverrideCount": 16,
@@ -48,14 +48,18 @@
     "descriptionCoverage": "PASS",
     "statusReviewTermContract": "PASS",
     "nameCnCanonicalParity": "PASS",
-    "progressParity": "PENDING_RECHECK",
-    "productionBuild": "PENDING_RECHECK",
-    "frontendConsumerBuild": "PENDING_RECHECK",
+    "progressParity": "PASS",
+    "productionBuild": "PASS",
+    "frontendConsumerBuild": "PASS",
     "hostedQa": "PENDING"
   },
   "verification": {
-    "status": "PENDING_RECHECK_AFTER_REVIEW_BATCH4",
-    "expectedSummary": "records=185 pass=125 review=60 overrides=16 missing=0 extra=0 public=185"
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33227415992,
+    "jobId": 99033722534,
+    "conclusion": "SUCCESS",
+    "productionBuild": "SUCCESS",
+    "observedSummary": "records=185 pass=125 review=60 overrides=16 missing=0 extra=0 public=185"
   },
   "reviewBoundary": {
     "translationCoverage": "185/185",
@@ -78,5 +82,5 @@
     "hostedQaRequired": true,
     "hostedQaComplete": false
   },
-  "nextStep": "Re-run Build Gate for review batch 4, then continue evidence-based resolution from the remaining 60 items. Hosted QA remains pending until an actually deployed static environment contains the current projection."
+  "nextStep": "Continue evidence-based review resolution from the remaining 60 items. Hosted QA remains pending until an actually deployed static environment contains the current projection."
 }
