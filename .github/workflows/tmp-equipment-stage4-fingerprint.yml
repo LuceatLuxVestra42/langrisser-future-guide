@@ -1,0 +1,20 @@
+name: Temporary Equipment Stage4 Fingerprint
+
+on:
+  push:
+    branches:
+      - equipment-name-source-2026-08-29
+
+permissions:
+  contents: read
+
+jobs:
+  fingerprint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Emit Stage 4 localization snapshot candidate
+        run: node scripts/audit-localization-stage4.mjs --json
