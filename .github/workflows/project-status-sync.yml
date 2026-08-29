@@ -73,6 +73,9 @@ jobs:
       - name: Validate Stage 6-4 producer declarations
         run: node scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs
 
+      - name: Validate Stage 6-5 closeout requests
+        run: node scripts/validate-project-doctor-status-source-stage6-5-closeout-requests.mjs
+
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
 
@@ -136,6 +139,9 @@ jobs:
 
       - name: Validate Stage 6-4 producer declarations
         run: node scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs
+
+      - name: Validate Stage 6-5 closeout requests
+        run: node scripts/validate-project-doctor-status-source-stage6-5-closeout-requests.mjs
 
       - name: Regenerate Project Doctor D1 status
         run: npm run doctor:status
