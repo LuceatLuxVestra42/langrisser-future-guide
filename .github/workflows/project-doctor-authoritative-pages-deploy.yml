@@ -80,6 +80,7 @@ jobs:
           set -euo pipefail
           node scripts/project-doctor-compose-authoritative-pages-runtime.mjs
           node scripts/validate-skin-stage3-6-hero-detail-consumer.mjs
+          node scripts/validate-hero-card-icon-frontend.mjs
           grep -q 'equipment-p3-1-release-metadata.v1.json' src/lib/equipment-page.localized.server.ts
           grep -q '같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순' src/routes/equipment.tsx
 
@@ -111,8 +112,17 @@ jobs:
           test -f dist/client/heroes/6/index.html
           test -f dist/client/soldiers/101/index.html
           test -f dist/client/images/heroes/cards/6.png
+          test -f dist/client/images/heroes/card-icons/6.png
+          test "$(find dist/client/images/heroes/card-icons -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '267'
           test -f dist/client/images/equipment/567.png
           test -f dist/client/images/soldiers-webp/101.webp
+          grep -q '/langrisser-future-guide/images/heroes/card-icons/6.png' dist/client/heroes/index.html
+          grep -q 'data-hero-card-icons="true"' dist/client/heroes/index.html
+          grep -q 'data-hero-card-icon="true"' dist/client/heroes/index.html
+          if grep -q '/langrisser-future-guide/images/heroes/cards/6.png' dist/client/heroes/index.html; then
+            echo 'Hero list still contains detail artwork path for Hero 6' >&2
+            exit 1
+          fi
           grep -q '/langrisser-future-guide/images/heroes/cards/6.png' dist/client/heroes/6/index.html
           grep -q '대표 일러스트' dist/client/heroes/6/index.html
           grep -q 'data-hero-central-discipline="true"' dist/client/heroes/6/index.html
@@ -130,6 +140,8 @@ jobs:
             "skinRuntimeRef": "${SKIN_RUNTIME_REF}",
             "skinPngCount": 540,
             "heroArtworkResolvedCount": 267,
+            "heroCardIconResolvedCount": 267,
+            "heroCardIconFreezeState": "HERO_CARD_ICON_ASSETS_FROZEN",
             "semanticStageReopened": false,
             "publisher": ".github/workflows/project-doctor-authoritative-pages-deploy.yml"
           }
@@ -165,6 +177,7 @@ jobs:
           node scripts/project-doctor-validate-authoritative-pages-hosted.mjs
           node scripts/validate-hero-central-discipline-hosted.mjs
           node scripts/validate-hero-soldier-cards-hosted.mjs
+          node scripts/validate-hero-card-icons-hosted.mjs
 
       - name: Print authoritative deployment source
         if: always()
@@ -172,4 +185,6 @@ jobs:
           printf 'productSource=%s\n' "$GITHUB_SHA"
           printf 'skinRuntimeRef=%s\n' "$SKIN_RUNTIME_REF"
           printf 'heroArtworkResolvedCount=267\n'
+          printf 'heroCardIconResolvedCount=267\n'
+          printf 'heroCardIconFreezeState=HERO_CARD_ICON_ASSETS_FROZEN\n'
           printf 'semanticStageReopened=false\n'
