@@ -1,0 +1,30 @@
+name: Hero Asset Launcher Probe v12
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/probe-hero-launcher-v12.ps1'
+      - '.github/workflows/hero-asset-launcher-probe-v12.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  sautopatch-probe:
+    if: github.event.pull_request.head.ref == 'work/hero-asset-launcher-probe'
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Probe sAutoPatch public paths
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/probe-hero-launcher-v12.ps1
+      - name: Upload text reports only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-asset-launcher-probe-v12-report
+          path: ${{ runner.temp }}/langrisser-launcher-probe-v12/report
+          if-no-files-found: warn
+          retention-days: 3
