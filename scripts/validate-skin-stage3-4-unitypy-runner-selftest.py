@@ -85,8 +85,6 @@ class Parent:
     def __init__(self): self.files = {}
 class AssetsFile:
     def __init__(self, cab):
-        # Reproduce the real-runtime compatibility case: direct name is empty,
-        # but the parent bundle retains the exact child key.
         self.name = ""
         self.parent = Parent()
         self.parent.files[cab] = self
@@ -102,6 +100,9 @@ class Obj:
         self.byte_size = 16
     def parse_as_object(self): return Parsed()
     def get_raw_data(self): return b"SERIALIZED_OBJECT"
+class PPtr:
+    def __init__(self, obj): self._obj = obj
+    def deref(self): return self._obj
 class Env:
     def __init__(self, container): self.container = container
 def load(bundle_path):
@@ -112,7 +113,8 @@ def load(bundle_path):
     for req in plan["requests"]:
         src = req["selectedExtractionSource"]
         if src["bundle"] != bundle: continue
-        container[req["runtimePath"]] = Obj(req["kind"], src["embeddedCab"], path_id)
+        # Real UnityPy 1.25.x container entries are PPtr values, not ObjectReader.
+        container[req["runtimePath"]] = PPtr(Obj(req["kind"], src["embeddedCab"], path_id))
         path_id += 1
     return Env(container)
 '''
@@ -126,6 +128,8 @@ def load(bundle_path):
         result = json.loads(result_path.read_text(encoding="utf-8"))
         if result.get("finalReadyForValidation") is not True or result.get("counts", {}).get("extractedCount") != 1869 or result.get("counts", {}).get("errorCount") != 0 or result.get("counts", {}).get("extractedByKind") != EXPECTED:
             raise RuntimeError(f"unexpected result summary: {result.get('counts')}")
+        if result.get("boundaries", {}).get("unityPyContainerPointerDereferenced") is not True:
+            raise RuntimeError("container PPtr dereference boundary missing")
         for record in result["records"]:
             if record.get("status") != "EXTRACTED":
                 raise RuntimeError(f"non-extracted record: {record.get('requestId')}")
@@ -138,7 +142,7 @@ def load(bundle_path):
                     raise RuntimeError(f"artifact hash/size fail: {record.get('requestId')} {artifact['relativePath']}")
 
         print("PASS_SKIN_STAGE3_4_UNITYPY_RUNNER_SELFTEST")
-        print(json.dumps({"checks": 6, "failures": 0, "requests": 1869, "byKind": EXPECTED, "cabNameFallback": "parent.files identity"}, indent=2))
+        print(json.dumps({"checks": 6, "failures": 0, "requests": 1869, "byKind": EXPECTED, "containerEntry": "PPtr.deref", "cabNameFallback": "parent.files identity"}, indent=2))
         return 0
 
 if __name__ == "__main__":
