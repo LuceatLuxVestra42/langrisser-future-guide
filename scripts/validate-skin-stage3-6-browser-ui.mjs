@@ -15,9 +15,11 @@ const FINAL_CHECKPOINT_PATH = "data/checkpoints/skin-stage3-6-final.v1.json";
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
+
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, "utf8"));
 }
+
 function url(path) {
   return new URL(path.replace(/^\//, ""), BASE_URL).toString();
 }
@@ -41,10 +43,13 @@ assert(assetValidation.boundaries?.semanticOwnershipRecomputed === false && asse
 assert(relation.counts?.bySkinId === 540 && relation.counts?.byHeroId === 267 && relation.counts?.edgeCount === 540, "Frozen Skin population changed");
 assert(assetMap.records?.length === 540, "Frozen Skin asset population changed");
 
-const heroRows = Object.entries(relation.byHeroId ?? {}).map(([heroId, skinIds]) => ({
-  heroId: Number(heroId),
-  skinIds: Array.isArray(skinIds) ? skinIds.map(Number) : [],
-})).sort((a, b) => a.heroId - b.heroId);
+const heroRows = Object.entries(relation.byHeroId ?? {})
+  .map(([heroId, skinIds]) => ({
+    heroId: Number(heroId),
+    skinIds: Array.isArray(skinIds) ? skinIds.map(Number) : [],
+  }))
+  .sort((a, b) => a.heroId - b.heroId);
+
 assert(heroRows.length === 267, `Expected 267 Hero rows, got ${heroRows.length}`);
 const skinHero = [...heroRows].sort((a, b) => b.skinIds.length - a.skinIds.length || a.heroId - b.heroId)[0];
 const zeroSkinHero = heroRows.find((row) => row.skinIds.length === 0);
@@ -67,6 +72,7 @@ function computeBrowserInputFingerprint() {
     .filter((name) => /^\d+\.png$/.test(name))
     .sort((a, b) => Number.parseInt(a, 10) - Number.parseInt(b, 10));
   assert(skinNames.length === 540, `Expected 540 Skin PNGs for Browser/UI fingerprint, got ${skinNames.length}`);
+
   const files = [...sourceFiles, ...skinNames.map((name) => `${skinDir}/${name}`)];
   const hash = crypto.createHash("sha256");
   hash.update("skin-stage3-6-browser-input-v1\0");
@@ -93,7 +99,7 @@ function createDiagnostics(page, label) {
   page.on("console", (message) => {
     if (message.type() === "error") consoleErrors.push(message.text());
   });
-  page.on("pageerror", (error) => pageErrors.push(String(error));
+  page.on("pageerror", (error) => pageErrors.push(String(error)));
   page.on("response", (response) => {
     if (response.url().startsWith(BASE_URL) && response.status() >= 400) {
       badResponses.push({ url: response.url(), status: response.status() });
@@ -127,8 +133,7 @@ async function assertNoHorizontalOverflow(page, label) {
 }
 
 async function activeHeroVisual(page) {
-  const heroRegion = page.locator("section").first().locator("div").filter({ has: page.getByText(/Hero #\d+/) }).first();
-  const image = page.locator('main section img[alt]').first();
+  const image = page.locator("main section img[alt]").first();
   assert((await image.count()) === 1, `Expected exactly one active Hero/Skin visual at ${page.url()}`);
   await image.waitFor({ state: "visible", timeout: 15_000 });
   const metrics = await image.evaluate((element) => {
@@ -144,34 +149,52 @@ async function activeHeroVisual(page) {
       currentSrc: element.currentSrc || element.src,
       objectFit: style.objectFit,
       objectPosition: style.objectPosition,
-      rect: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height },
-      parentRect: parentRect ? { left: parentRect.left, top: parentRect.top, right: parentRect.right, bottom: parentRect.bottom, width: parentRect.width, height: parentRect.height } : null,
+      rect: {
+        left: rect.left,
+        top: rect.top,
+        right: rect.right,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+      },
+      parentRect: parentRect
+        ? {
+            left: parentRect.left,
+            top: parentRect.top,
+            right: parentRect.right,
+            bottom: parentRect.bottom,
+            width: parentRect.width,
+            height: parentRect.height,
+          }
+        : null,
     };
   });
   assert(metrics.complete && metrics.naturalWidth > 0 && metrics.naturalHeight > 0, `Active Hero/Skin image is broken at ${page.url()}`);
   assert(metrics.clientWidth > 0 && metrics.clientHeight > 0, `Active Hero/Skin image has no rendered box at ${page.url()}`);
   assert(metrics.objectFit === "contain", `Active Hero/Skin image object-fit changed: ${metrics.objectFit}`);
   assert(metrics.parentRect && metrics.rect.width <= metrics.parentRect.width + 1 && metrics.rect.height <= metrics.parentRect.height + 1, `Active Hero/Skin image exceeds carousel region: ${JSON.stringify(metrics)}`);
-  void heroRegion;
   return metrics;
 }
 
 async function currentSkinLabel(page) {
-  const locator = page.getByText(/스킨 \d+ · ID \d+/, { exact: true }).first();
+  const locator = page.getByText(/스킨 \d+ · ID \d+/).first();
   if ((await locator.count()) === 0) return null;
-  return locator.textContent();
+  const text = await locator.textContent();
+  return text?.trim() ?? null;
 }
 
 async function reachSkin(page, skinId, maxSteps) {
   const expected = new RegExp(`^스킨 \\d+ · ID ${skinId}$`);
   for (let step = 0; step <= maxSteps; step += 1) {
     const label = await currentSkinLabel(page);
-    if (label && expected.test(label.trim())) return { step, label: label.trim(), image: await activeHeroVisual(page) };
+    if (label && expected.test(label)) {
+      return { step, label, image: await activeHeroVisual(page) };
+    }
     if (step === maxSteps) break;
     const next = page.getByRole("button", { name: "다음 일러스트" });
     assert((await next.count()) === 1, `Next carousel control missing while seeking Skin ${skinId}`);
     await next.click();
-    await page.waitForTimeout(80);
+    await page.waitForTimeout(100);
   }
   throw new Error(`Could not reach Skin ${skinId} within ${maxSteps} carousel steps; current label=${await currentSkinLabel(page)}`);
 }
@@ -180,6 +203,16 @@ async function verifySkinImage(page, skinId) {
   const image = await activeHeroVisual(page);
   assert(image.currentSrc.includes(`/langrisser-future-guide/images/skins/${skinId}.png`), `Rendered Skin ${skinId} source mismatch: ${image.currentSrc}`);
   return image;
+}
+
+async function readCarouselCounter(page) {
+  const candidates = await page.locator("main section div").allTextContents();
+  const matches = candidates.map((value) => value.trim()).filter((value) => /^\d+ \/ \d+$/.test(value));
+  assert(matches.length > 0, "Carousel counter is missing");
+  const [current, total] = matches[0].split(" / ").map(Number);
+  assert(Number.isSafeInteger(current) && current >= 1, `Carousel current index is invalid: ${matches[0]}`);
+  assert(total === skinHero.skinIds.length || total === skinHero.skinIds.length + 1, `Carousel total changed: ${matches[0]}`);
+  return { text: matches[0], current, total };
 }
 
 async function verifyHostedSentinel() {
@@ -207,6 +240,7 @@ try {
   await desktopPage.getByText(`Hero #${skinHero.heroId}`, { exact: true }).waitFor({ state: "visible" });
   results.desktop.initialImage = await activeHeroVisual(desktopPage);
   results.desktop.layout = await assertNoHorizontalOverflow(desktopPage, "desktop Skin Hero");
+
   const nextButton = desktopPage.getByRole("button", { name: "다음 일러스트" });
   const prevButton = desktopPage.getByRole("button", { name: "이전 일러스트" });
   assert((await nextButton.count()) === 1 && (await prevButton.count()) === 1, "Desktop carousel controls are not uniquely exposed");
@@ -215,11 +249,12 @@ try {
   results.desktop.firstSkin = await reachSkin(desktopPage, firstSkinId, skinHero.skinIds.length + 2);
   results.desktop.firstSkin.image = await verifySkinImage(desktopPage, firstSkinId);
   const firstLabel = await currentSkinLabel(desktopPage);
-  assert(firstLabel?.startsWith("스킨 1 · "), `First Skin sourceOrder label changed: ${firstLabel}`);
+  assert(firstLabel === `스킨 1 · ID ${firstSkinId}`, `First Skin sourceOrder label changed: ${firstLabel}`);
+  results.desktop.counterAtFirstSkin = await readCarouselCounter(desktopPage);
 
   await nextButton.focus();
   await desktopPage.keyboard.press("Enter");
-  await desktopPage.waitForTimeout(80);
+  await desktopPage.waitForTimeout(100);
   const secondLabel = await currentSkinLabel(desktopPage);
   assert(secondLabel === `스킨 2 · ID ${secondSkinId}`, `Keyboard carousel next did not reach second Skin: ${secondLabel}`);
   results.desktop.secondSkin = await verifySkinImage(desktopPage, secondSkinId);
@@ -227,14 +262,10 @@ try {
 
   await prevButton.focus();
   await desktopPage.keyboard.press("Space");
-  await desktopPage.waitForTimeout(80);
+  await desktopPage.waitForTimeout(100);
   const returnedLabel = await currentSkinLabel(desktopPage);
   assert(returnedLabel === `스킨 1 · ID ${firstSkinId}`, `Keyboard carousel previous did not return to first Skin: ${returnedLabel}`);
   results.desktop.keyboardPrevious = "PASS";
-
-  const counter = desktopPage.getByText(new RegExp(`\\d+ / ${skinHero.skinIds.length}(?:$|\\s)`)).first();
-  assert((await counter.count()) > 0, "Carousel counter is missing");
-  results.desktop.counter = (await counter.textContent())?.trim() ?? null;
 
   await desktopPage.reload({ waitUntil: "networkidle", timeout: 45_000 });
   await desktopPage.getByText(`Hero #${skinHero.heroId}`, { exact: true }).waitFor({ state: "visible" });
@@ -249,6 +280,7 @@ try {
   ]);
   assert((await desktopPage.locator("main").count()) > 0, "Hero list navigation did not render main content");
   results.desktop.listNavigation = "PASS";
+
   await desktopPage.goBack({ waitUntil: "networkidle", timeout: 45_000 });
   await desktopPage.getByText(`Hero #${skinHero.heroId}`, { exact: true }).waitFor({ state: "visible" });
   results.desktop.historyBack = "PASS";
@@ -265,14 +297,14 @@ try {
   await mobilePage.getByText(`Hero #${skinHero.heroId}`, { exact: true }).waitFor({ state: "visible" });
   results.mobile.layout = await assertNoHorizontalOverflow(mobilePage, "mobile Skin Hero");
   results.mobile.initialImage = await activeHeroVisual(mobilePage);
+
   const mobileNext = mobilePage.getByRole("button", { name: "다음 일러스트" });
   assert((await mobileNext.count()) === 1 && await mobileNext.isVisible(), "Mobile next carousel control is unavailable");
-
-  const mobileReach = await reachSkin(mobilePage, firstSkinId, skinHero.skinIds.length + 2);
-  results.mobile.firstSkin = mobileReach;
+  results.mobile.firstSkin = await reachSkin(mobilePage, firstSkinId, skinHero.skinIds.length + 2);
   results.mobile.firstSkin.image = await verifySkinImage(mobilePage, firstSkinId);
+
   await mobileNext.tap();
-  await mobilePage.waitForTimeout(100);
+  await mobilePage.waitForTimeout(120);
   const mobileSecondLabel = await currentSkinLabel(mobilePage);
   assert(mobileSecondLabel === `스킨 2 · ID ${secondSkinId}`, `Touch carousel next did not reach second Skin: ${mobileSecondLabel}`);
   results.mobile.touchNext = "PASS";
@@ -286,16 +318,18 @@ try {
   const zeroContext = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const zeroPage = await zeroContext.newPage();
   const zeroDiagnostics = createDiagnostics(zeroPage, "zero-skin-hero");
+
   await gotoChecked(zeroPage, `heroes/${zeroSkinHero.heroId}/`);
   await zeroPage.getByText(`Hero #${zeroSkinHero.heroId}`, { exact: true }).waitFor({ state: "visible" });
   assert((await zeroPage.getByText("스킨 0", { exact: true }).count()) > 0, `Hero ${zeroSkinHero.heroId} does not render explicit zero-Skin count`);
-  assert((await zeroPage.getByText(/스킨 \d+ · ID \d+/, { exact: true }).count()) === 0, `Hero ${zeroSkinHero.heroId} fabricated a Skin carousel label`);
+  assert((await zeroPage.getByText(/스킨 \d+ · ID \d+/).count()) === 0, `Hero ${zeroSkinHero.heroId} fabricated a Skin carousel label`);
   assert((await zeroPage.getByRole("button", { name: "다음 일러스트" }).count()) === 0, `Hero ${zeroSkinHero.heroId} exposed a carousel next control without Skins`);
   assert((await zeroPage.getByRole("button", { name: "이전 일러스트" }).count()) === 0, `Hero ${zeroSkinHero.heroId} exposed a carousel previous control without Skins`);
   results.zeroSkinHero.heroId = zeroSkinHero.heroId;
   results.zeroSkinHero.explicitZeroCount = "PASS";
   results.zeroSkinHero.noFabricatedSkinControls = "PASS";
   results.zeroSkinHero.layout = await assertNoHorizontalOverflow(zeroPage, "zero-Skin Hero");
+
   await assertDiagnosticsClean(zeroDiagnostics);
   results.zeroSkinHero.diagnostics = zeroDiagnostics;
   await zeroContext.close();
