@@ -93,3 +93,7 @@ jobs:
             echo 'Stage 6-7 frozen artifacts differ from regenerated output.'
             exit 1
           fi
+
+      - name: Check Project Status source bridge after frozen Soldier output
+        if: success() && (github.event_name == 'pull_request' || github.ref_name == 'main')
+        run: node scripts/bridge-project-doctor-status-source.mjs --pipeline soldier --check
