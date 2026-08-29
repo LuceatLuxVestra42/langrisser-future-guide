@@ -39,6 +39,11 @@ function resolvePublicAssetUrl(webAssetPath: string) {
   return `${base.replace(/\/$/, "")}${webAssetPath}`;
 }
 
+function stripConfigMarkup(value: string | null) {
+  if (!value) return "-";
+  return value.replace(/<color=[^>]+>/g, "").replace(/<\/color>/g, "");
+}
+
 function HeroDetailPage() {
   const { hero, stage6, detail } = Route.useLoaderData();
   const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
@@ -90,6 +95,73 @@ function HeroDetailPage() {
                 <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">스킨 {detail.presentation.skinCount}</span>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <SectionTitle icon={<Sparkles className="h-4 w-4" aria-hidden="true" />} title="재능" />
+              <p className="mt-2 text-sm text-muted-foreground">별 단계별 확정 재능 효과를 그대로 표시해.</p>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs">
+              {detail.talent.status ? <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">{detail.talent.status}</span> : null}
+              {detail.talent.initialStar != null ? <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">초기 {detail.talent.initialStar}성</span> : null}
+            </div>
+          </div>
+          {detail.talent.starProgression.length > 0 ? (
+            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {detail.talent.starProgression.map((row) => (
+                <article key={`${row.star}-${row.skillId}`} className="rounded-xl border border-border bg-muted/20 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="font-bold text-foreground">{row.star}성 · {row.skill.nameCn ?? `Skill ${row.skillId}`}</h3>
+                    <span className="shrink-0 rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{row.skillId}</span>
+                  </div>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(row.skill.desc)}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 재능 progression이 없어.</p>
+          )}
+        </section>
+
+        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+          <SectionTitle icon={<Swords className="h-4 w-4" aria-hidden="true" />} title="스킬" />
+          <p className="mt-2 text-sm text-muted-foreground">Stage 6의 기본 보유 스킬과 전직 습득 스킬을 합치지 않고 source group 그대로 표시해.</p>
+
+          <div className="mt-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-bold text-foreground">기본 보유 스킬</h3>
+              <span className="text-xs font-semibold text-muted-foreground">{detail.skills.heroDirectSkills.length}개</span>
+            </div>
+            {detail.skills.heroDirectSkills.length > 0 ? (
+              <div className="mt-3 grid gap-3 lg:grid-cols-2">
+                {detail.skills.heroDirectSkills.map((skill) => <SkillCard key={`direct-${skill.skillId}`} skill={skill} sourceLabel="Hero 직접 보유" />)}
+              </div>
+            ) : (
+              <p className="mt-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">기본 보유 스킬 없음</p>
+            )}
+          </div>
+
+          <div className="mt-7 border-t border-border pt-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-bold text-foreground">전직 습득 스킬</h3>
+              <span className="text-xs font-semibold text-muted-foreground">{detail.skills.jobLevelAcquisitions.length}개</span>
+            </div>
+            {detail.skills.jobLevelAcquisitions.length > 0 ? (
+              <div className="mt-3 grid gap-3 lg:grid-cols-2">
+                {detail.skills.jobLevelAcquisitions.map((row) => (
+                  <SkillCard
+                    key={`job-${row.acquisitionOrder ?? "x"}-${row.skillId}`}
+                    skill={row.skill}
+                    sourceLabel={`${row.jobNameCn ?? `Job ${row.jobId ?? "?"}`} · Hero Lv.${row.jobLevelUpHeroLevel ?? "-"}`}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">전직 습득 스킬 없음</p>
+            )}
           </div>
         </section>
 
@@ -150,6 +222,38 @@ function HeroDetailPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+type SkillView = {
+  skillId: number;
+  nameCn: string | null;
+  desc: string | null;
+  iconPath: string | null;
+  displayType: string | null;
+  cooldown: string | null;
+  range: string | null;
+  areaOrTarget: string | null;
+};
+
+function SkillCard({ skill, sourceLabel }: { skill: SkillView; sourceLabel: string }) {
+  return (
+    <article className="rounded-xl border border-border bg-muted/20 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-bold text-muted-foreground">{sourceLabel}</p>
+          <h4 className="mt-1 font-bold text-foreground">{skill.nameCn ?? `Skill ${skill.skillId}`}</h4>
+        </div>
+        <span className="rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{skill.skillId}</span>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-1.5 text-[11px]">
+        {skill.displayType ? <span className="rounded-md border border-border bg-background px-2 py-1 font-semibold text-foreground">{skill.displayType}</span> : null}
+        {skill.cooldown ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">쿨 {skill.cooldown}</span> : null}
+        {skill.range ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">사거리 {skill.range}</span> : null}
+        {skill.areaOrTarget ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">대상 {skill.areaOrTarget}</span> : null}
+      </div>
+      <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.desc)}</p>
+    </article>
   );
 }
 
