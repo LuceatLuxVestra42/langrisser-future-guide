@@ -1,0 +1,60 @@
+Hero Job Tree Visualization — closeout checkpoint
+Date: 2026-08-29
+
+STATUS
+- PASS
+- completion: COMPLETE
+- owning layer: presentation/frontend
+- semantic recomputation: NONE
+
+AUTHORITATIVE PREDECESSOR
+- main predecessor: 94fa1b41bd673a255d486397aa8b08e810c70593
+- Hero detail consumer: existing FINAL_FROZEN Stage 6 shard projection
+- consumed fields only: detail.jobs.branchCount, detail.jobs.connectionCount, detail.jobs.branches, branch.jobs, branch.capstone
+
+IMPLEMENTATION
+- production PR: #207 Visualize Hero job progression branches
+- production head: f7f88f7606d48aca529923b80b124a48777c5390
+- merge commit: 2cd2c69eeb57f388cb0688b49de48a6ce8f2d0a7
+- changed production file: src/routes/heroes_.$heroId.tsx
+- each frozen branch is rendered as an ordered progression track
+- existing verified capstone stats are preserved
+- mobile uses branch-local horizontal scrolling; no page-wide horizontal overflow
+
+AUTOMATED GATES
+- Project Doctor PR Guard run 33241918994: SUCCESS
+- Hero List Stage 4 run 33241919022: SUCCESS
+- Hero List Stage 5 run 33241919044: SUCCESS
+- Localization Audit run 33241919002: SUCCESS
+- Hero-Soldier C-4 relation validation step itself: SUCCESS; historical PR frozen-output verification is non-owning and did not change semantic state
+
+HOSTED / BROWSER QA
+- QA branch: qa/hero-job-tree-hosted
+- QA source SHA: 032effd85fd041763e28bf6ba477942ccce5b897
+- workflow run: 33242000453
+- job: 99072815392
+- status: PASS_HERO_JOB_TREE_HOSTED_BROWSER_QA
+- checks: 11 / 11 PASS
+- hosted /heroes/: 200
+- hosted /heroes/6/: 200
+- hosted Hero 6 artwork: 200
+- desktop Hero 6 rendered branch count: 3
+- stage node visible: PASS
+- capstone verified stats visible: PASS
+- Job ID provenance visible: PASS
+- desktop page errors: 0
+- mobile page horizontal overflow: 0
+- mobile page errors: 0
+- gh-pages deployment SHA: ee6ee77074a831da5d3fc9ac0ed9dcae97250f83
+
+BOUNDARY
+Do not reopen Hero job topology, verified stats, canonical Hero identity, Hero-Soldier relation, or raw ConfigData because of this presentation work.
+
+REOPEN ONLY IF
+- FINAL_FROZEN Hero jobs schema/branch contract changes
+- branch.jobs or branch.capstone projection changes
+- Hero detail route contract changes
+- hosted/browser regression occurs in this section
+
+NEXT START
+Continue Hero detail presentation from the next incomplete area after talent, skills, and job-tree visualization. Candidate next owning scope: bond detail UI, exclusive-equipment detail UI, central-discipline detail UI, Soldier visual card integration, then SP presentation.
