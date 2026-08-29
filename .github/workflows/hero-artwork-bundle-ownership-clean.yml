@@ -1,0 +1,35 @@
+name: Hero Artwork Bundle Ownership Clean
+
+on:
+  push:
+    branches:
+      - work/hero-artwork-bundle-ownership
+    paths:
+      - '.github/workflows/hero-artwork-bundle-ownership-clean.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  bundle-ownership:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install UnityPy
+        shell: pwsh
+        run: python -m pip install --disable-pip-version-check --quiet UnityPy
+      - name: Reuse frozen ownership probe implementation
+        shell: pwsh
+        run: |
+          $url='https://raw.githubusercontent.com/LuceatLuxVestra42/langrisser-future-guide/1abed2894b4089e14b98b3d6cc5243592c7e68b6/scripts/probe-hero-artwork-bundle-ownership.py'
+          Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile scripts/probe-hero-artwork-bundle-ownership.py
+          python scripts/probe-hero-artwork-bundle-ownership.py
+      - name: Upload ownership reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-artwork-bundle-ownership-clean-report
+          path: ${{ runner.temp }}/langrisser-hero-artwork-bundle-ownership/report
+          if-no-files-found: warn
+          retention-days: 3
