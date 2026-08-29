@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "stage": "Equipment P3-0 Release Chronology Evidence Audit",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "EQUIPMENT_P3_0_RELEASE_CHRONOLOGY_AUDIT_COMPLETE",
+  "authoritativeSource": {
+    "predecessorMainSha": "8c4b78057e2bae7894c5eef4a988dd591b9441ec",
+    "generalList": "data/generated/equipment_stage3_3_general_list.json",
+    "acquisition": "data/generated/equipment_stage2_7_acquisition.json",
+    "acquisitionContract": "data/contracts/equipment-stage2-7-acquisition-reference.v1.json",
+    "auditArtifact": "data/validation/equipment-p3-0-release-chronology-audit.v1.json"
+  },
+  "frozenIdentity": {
+    "joinKey": "equipmentId",
+    "canonicalEquipment": 390,
+    "publicEquipment": 373,
+    "generalEquipment": 206,
+    "exclusiveEquipment": 167,
+    "siteTab3Population": 32,
+    "siteTab3AcquisitionClass": "current-additional",
+    "semanticStageReopened": false,
+    "productionConsumerChanged": false
+  },
+  "completedScope": {
+    "targetAudited": 32,
+    "primaryOfficialDateResolved": 24,
+    "secondaryDateResolved": 4,
+    "dateResolvedTotal": 28,
+    "exactDateUnresolved": 4,
+    "classificationFinding": "current-additional is the canonical generic complement after launch and legacy-additional exclusions; it is not direct Equipment Pass membership evidence"
+  },
+  "review": [
+    "Equipment 299 斩魔刀 exact standard-counterpart release date",
+    "Equipment 400 逆矢外壳 exact standard-counterpart release date",
+    "Equipment 401 鲜花礼帽 exact standard-counterpart release date",
+    "Equipment 402 Q巨拉 exact standard-counterpart release date",
+    "Equipment 265-268 use contemporaneous secondary announcement evidence until a primary official archive is found",
+    "The frontend label 장비패스 is stronger than the frozen Stage 2-7 evidence for all 32 siteTab 3 records and must be refined in presentation metadata rather than by reopening Stage 2 semantics"
+  ],
+  "blockers": [],
+  "nextStart": {
+    "stage": "Equipment P3-1 Release Metadata Projection",
+    "instructions": [
+      "Keep Stage 2-7 acquisition classification frozen",
+      "Create equipmentId-keyed presentation-only release/acquisition-family metadata",
+      "Keep releaseGroupDate null for Equipment 299/400/401/402 until exact evidence exists",
+      "Do not treat all siteTab 3 records as Equipment Pass or 永焰锻炉 members",
+      "Update frontend wording/order only after the projection is frozen",
+      "Reuse Equipment P1/P2 regression QA"
+    ]
+  },
+  "reopenConditions": [
+    "predecessor main or frozen siteTab 3 population changes",
+    "Stage 2-7 current-additional classification contract changes",
+    "exact authoritative standard-counterpart release evidence is found for Equipment 299/400/401/402",
+    "primary official archive evidence is found for Equipment 265-268",
+    "new authoritative evidence contradicts a recorded release date"
+  ],
+  "nonReopenExamples": [
+    "CSS or layout changes",
+    "image delivery changes",
+    "localization-only changes",
+    "frontend wording changes that do not alter frozen acquisition identity"
+  ]
+}
