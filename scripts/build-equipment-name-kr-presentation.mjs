@@ -21,45 +21,53 @@ const validationPath = path.join(
   "data/validation/equipment-name-kr-user-approved-summary.v1.json",
 );
 
+const SOURCE_STATUS = {
+  CONFIRMED: "confirmed",
+  PROVISIONAL: "provisional-display",
+  DUPLICATE: "duplicate-non-display",
+  UNRESOLVED: "unresolved-non-public",
+};
+const allowedStatuses = new Set(Object.values(SOURCE_STATUS));
+const expectedStatusCounts = {
+  [SOURCE_STATUS.CONFIRMED]: 349,
+  [SOURCE_STATUS.PROVISIONAL]: 16,
+  [SOURCE_STATUS.DUPLICATE]: 8,
+  [SOURCE_STATUS.UNRESOLVED]: 17,
+};
+
 function fail(message) {
   console.error(`[equipment-name-kr] FAIL: ${message}`);
   process.exit(1);
 }
 
-function parseDisplayText(rawValue) {
-  const raw = rawValue.trim();
-  if (!raw) fail("empty Korean display value");
-
-  if (raw.startsWith("미확정")) {
-    return {
-      nameKr: null,
-      status: "UNRESOLVED_NON_PUBLIC",
-      note: raw,
-    };
+function parseSourceRow(relativePath, line, lineNumber) {
+  const columns = line.split("\t");
+  if (columns.length < 3) {
+    fail(`${relativePath}:${lineNumber} must contain CN, KR, and status columns`);
   }
 
-  let display = raw;
-  const notes = [];
+  const nameCn = columns[0]?.trim() ?? "";
+  const rawKr = columns[1]?.trim() ?? "";
+  const status = columns[2]?.trim() ?? "";
+  const note = columns.slice(3).join("\t").trim() || null;
 
-  const duplicateNoteMatch = display.match(/^(.*?)(\([^)]*동일 아이템[^)]*\))$/u);
-  if (duplicateNoteMatch) {
-    display = duplicateNoteMatch[1].trim();
-    notes.push(duplicateNoteMatch[2]);
+  if (!nameCn) fail(`${relativePath}:${lineNumber} has an empty Chinese name`);
+  if (!allowedStatuses.has(status)) {
+    fail(`${relativePath}:${lineNumber} has unsupported status: ${status}`);
   }
 
-  const ownerNoteMatch = display.match(/^(.*),\s*([^,]+ 전용장비)$/u);
-  if (ownerNoteMatch) {
-    display = ownerNoteMatch[1].trim();
-    notes.push(ownerNoteMatch[2].trim());
+  if (status === SOURCE_STATUS.UNRESOLVED) {
+    if (rawKr !== "미확정") {
+      fail(`${relativePath}:${lineNumber} unresolved non-public rows must use 미확정`);
+    }
+    return { nameCn, nameKr: null, rawKr, status, note };
   }
 
-  if (!display) fail(`empty approved display text after note stripping: ${raw}`);
+  if (!rawKr || rawKr.startsWith("미확정")) {
+    fail(`${relativePath}:${lineNumber} ${status} rows require a Korean display name`);
+  }
 
-  return {
-    nameKr: display,
-    status: "USER_APPROVED_DISPLAY",
-    note: notes.length > 0 ? notes.join("; ") : null,
-  };
+  return { nameCn, nameKr: rawKr, rawKr, status, note };
 }
 
 function readSourceRecords() {
@@ -71,22 +79,11 @@ function readSourceRecords() {
 
     const lines = fs.readFileSync(absolutePath, "utf8").split(/\r?\n/u);
     lines.forEach((line, index) => {
-      if (!line.trim()) return;
-
-      const columns = line.split("\t").map((value) => value.trim()).filter(Boolean);
-      if (columns.length < 2) {
-        fail(`${relativePath}:${index + 1} must contain CN and KR columns`);
-      }
-
-      const nameCn = columns[0];
-      const rawKr = columns.slice(1).join("\t");
-      const parsed = parseDisplayText(rawKr);
+      if (!line.trim() || line.trimStart().startsWith("#")) return;
       records.push({
         sourceGroup,
         sourceLine: index + 1,
-        nameCn,
-        rawKr,
-        ...parsed,
+        ...parseSourceRow(relativePath, line, index + 1),
       });
     });
   }
@@ -107,6 +104,18 @@ if (canonicalRecords.length !== 390) {
 }
 if (sourceRecords.length !== 390) {
   fail(`user localization source count must be 390; got ${sourceRecords.length}`);
+}
+
+const sourceStatusCounts = Object.fromEntries(
+  [...allowedStatuses].map((status) => [
+    status,
+    sourceRecords.filter((record) => record.status === status).length,
+  ]),
+);
+for (const [status, expected] of Object.entries(expectedStatusCounts)) {
+  if (sourceStatusCounts[status] !== expected) {
+    fail(`source status ${status} must contain ${expected} rows; got ${sourceStatusCounts[status]}`);
+  }
 }
 
 const canonicalByNameCn = new Map();
@@ -130,11 +139,19 @@ for (const source of sourceRecords) {
     fail(`localization source has no canonical equipment match: ${source.nameCn}`);
   }
 
+  const pageReady = canonical.pageReady === true;
+  if (source.status === SOURCE_STATUS.UNRESOLVED && pageReady) {
+    fail(`unresolved non-public source row is pageReady in canonical metadata: ${source.nameCn}`);
+  }
+  if (source.status !== SOURCE_STATUS.UNRESOLVED && !pageReady) {
+    fail(`named source row is non-public in canonical metadata: ${source.nameCn}`);
+  }
+
   resolved.push({
     equipmentId: canonical.equipmentId,
     nameCn: canonical.nameCn,
     nameKr: source.nameKr,
-    pageReady: canonical.pageReady === true,
+    pageReady,
     sourceGroup: source.sourceGroup,
     sourceLine: source.sourceLine,
     status: source.status,
@@ -160,6 +177,10 @@ const publicRecords = resolved.filter((record) => record.pageReady);
 const nonPublicRecords = resolved.filter((record) => !record.pageReady);
 const missingPublicNames = publicRecords.filter((record) => !record.nameKr);
 const namedNonPublicRecords = nonPublicRecords.filter((record) => record.nameKr);
+const provisionalRecords = resolved.filter((record) => record.status === SOURCE_STATUS.PROVISIONAL);
+const duplicateRecords = resolved.filter((record) => record.status === SOURCE_STATUS.DUPLICATE);
+const confirmedRecords = resolved.filter((record) => record.status === SOURCE_STATUS.CONFIRMED);
+const unresolvedRecords = resolved.filter((record) => record.status === SOURCE_STATUS.UNRESOLVED);
 
 if (publicRecords.length !== 373) {
   fail(`public equipment count must be 373; got ${publicRecords.length}`);
@@ -181,6 +202,9 @@ if (namedNonPublicRecords.length > 0) {
       .join(", ")}`,
   );
 }
+if (confirmedRecords.length !== 349 || provisionalRecords.length !== 16 || duplicateRecords.length !== 8 || unresolvedRecords.length !== 17) {
+  fail("resolved localization status counts changed unexpectedly");
+}
 
 const byEquipmentId = Object.fromEntries(
   resolved.map((record) => [
@@ -198,21 +222,26 @@ const byEquipmentId = Object.fromEntries(
 );
 
 const output = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   status: "PASS_USER_APPROVED_EQUIPMENT_KR_PRESENTATION",
   policy: {
     identityResolution: "build-time exact nameCn match against frozen Stage 3-2 metadata",
     productionJoinKey: "equipmentId",
     runtimeNameJoin: false,
     semanticStageReopened: false,
+    confirmedAndProvisionalSeparated: true,
+    provisionalDisplayDoesNotMutateCanonicalNameKr: true,
     unresolvedNonPublicRemainsNull: true,
   },
   counts: {
     canonical: resolved.length,
     public: publicRecords.length,
     publicNameKr: publicRecords.filter((record) => record.nameKr).length,
+    confirmed: confirmedRecords.length,
+    provisionalDisplay: provisionalRecords.length,
+    duplicateNonDisplay: duplicateRecords.length,
     nonPublic: nonPublicRecords.length,
-    unresolvedNonPublic: nonPublicRecords.filter((record) => !record.nameKr).length,
+    unresolvedNonPublic: unresolvedRecords.length,
   },
   byEquipmentId,
 };
@@ -222,15 +251,20 @@ const validation = {
   sourceRows: sourceRecords.length,
   canonicalRows: canonicalRecords.length,
   resolvedRows: resolved.length,
+  sourceStatusCounts,
   duplicateSourceNameCn: 0,
   duplicateEquipmentId: 0,
   missingCanonicalMatch: 0,
   publicCount: publicRecords.length,
   publicMissingNameKr: missingPublicNames.length,
+  confirmedCount: confirmedRecords.length,
+  provisionalDisplayCount: provisionalRecords.length,
+  duplicateNonDisplayCount: duplicateRecords.length,
   nonPublicCount: nonPublicRecords.length,
   nonPublicUnexpectedNameKr: namedNonPublicRecords.length,
   runtimeNameJoin: false,
   productionJoinKey: "equipmentId",
+  semanticStageReopened: false,
 };
 
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
@@ -239,5 +273,5 @@ fs.writeFileSync(outputPath, `${JSON.stringify(output, null, 2)}\n`);
 fs.writeFileSync(validationPath, `${JSON.stringify(validation, null, 2)}\n`);
 
 console.log(
-  `[equipment-name-kr] PASS canonical=${resolved.length} public=${publicRecords.length} publicNameKr=${output.counts.publicNameKr} unresolvedNonPublic=${output.counts.unresolvedNonPublic}`,
+  `[equipment-name-kr] PASS canonical=${resolved.length} public=${publicRecords.length} confirmed=${confirmedRecords.length} provisional=${provisionalRecords.length} duplicate=${duplicateRecords.length} unresolvedNonPublic=${unresolvedRecords.length}`,
 );
