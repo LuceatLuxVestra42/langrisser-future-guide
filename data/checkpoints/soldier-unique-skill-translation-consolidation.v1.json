@@ -30,7 +30,7 @@
     "sourceTypeDerivedFromCanonicalIdentity": true,
     "idArithmeticInference": false
   },
-  "expectedAfterReviewBatch2": {
+  "verifiedAfterReviewBatch2": {
     "canonicalTargetCount": 185,
     "authoringRecordCount": 185,
     "reviewOverrideCount": 7,
@@ -48,17 +48,25 @@
     "descriptionCoverage": "PASS",
     "statusReviewTermContract": "PASS",
     "nameCnCanonicalParity": "PASS",
-    "progressParity": "PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
-    "productionBuild": "PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
-    "frontendConsumerBuild": "PENDING_RECHECK_AFTER_REVIEW_OVERRIDE",
+    "progressParity": "PASS",
+    "productionBuild": "PASS",
+    "frontendConsumerBuild": "PASS",
     "hostedQa": "PENDING"
+  },
+  "verification": {
+    "workflow": "Equipment Korean Name Frontend QA",
+    "runId": 33225056338,
+    "jobId": 99026928013,
+    "conclusion": "SUCCESS",
+    "productionBuild": "SUCCESS",
+    "observedSummary": "records=185 pass=116 review=69 overrides=7 missing=0 extra=0 public=185"
   },
   "reviewBoundary": {
     "translationCoverage": "185/185",
     "sourceReviewQueueCount": 76,
     "resolvedByReviewOverrides": 7,
     "reviewQueueCount": 69,
-    "resolvedSoldierIds": [250, 326, 333, 334, 336, 341, 602],
+    "resolvedSoldierIds": [250,326,333,334,336,341,602],
     "reviewItemsAreMissingTranslations": false,
     "reviewResolutionRequired": true,
     "reviewResolutionBlocksConsolidation": false
@@ -74,5 +82,5 @@
     "hostedQaRequired": true,
     "hostedQaComplete": false
   },
-  "nextStep": "Re-run Build Gate at 116 PASS / 69 REVIEW. Hosted QA remains gated on an actually deployed static environment containing this projection; continue evidence-based review resolution afterward."
+  "nextStep": "Continue evidence-based review resolution from the remaining 69 items. Hosted QA remains pending until an actually deployed static environment contains the current projection."
 }
