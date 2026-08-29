@@ -8,6 +8,7 @@ on:
       - 'work/**'
     paths:
       - 'data/contracts/hero-stage6-4-site-consumer.v1.json'
+      - 'data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json'
       - 'data/generated/hero-detail.v1.json'
       - 'data/generated/hero-detail-shared.v1.json'
       - 'data/generated/hero-detail/by-id/**'
@@ -22,6 +23,7 @@ on:
   pull_request:
     paths:
       - 'data/contracts/hero-stage6-4-site-consumer.v1.json'
+      - 'data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json'
       - 'data/generated/hero-detail.v1.json'
       - 'data/generated/hero-detail-shared.v1.json'
       - 'data/generated/hero-detail/by-id/**'
@@ -43,6 +45,11 @@ permissions:
 jobs:
   site-consumer-final-freeze:
     runs-on: ubuntu-latest
+    outputs:
+      handoff_pipeline: ${{ steps.handoff_declaration.outputs.pipeline }}
+      handoff_expected_predecessor: ${{ steps.handoff_declaration.outputs.expected_predecessor }}
+      handoff_entry_id: ${{ steps.handoff_declaration.outputs.entry_id }}
+      handoff_source_path: ${{ steps.handoff_declaration.outputs.source_path }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -114,6 +121,23 @@ jobs:
         if: success() && steps.validate.outcome == 'success' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
         run: node scripts/bridge-project-doctor-status-source.mjs --pipeline hero --check
 
+      - name: Resolve explicit Project Status handoff declaration
+        id: handoff_declaration
+        if: success() && steps.validate.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
+        run: node scripts/resolve-project-doctor-status-source-declaration.mjs --pipeline hero --github-output
+
       - name: Enforce Stage 6-4 gate
         if: always() && steps.validate.outcome != 'success'
         run: exit 1
+
+  project-status-handoff:
+    needs: site-consumer-final-freeze
+    if: needs.site-consumer-final-freeze.result == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
+    permissions:
+      contents: write
+    uses: ./.github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml
+    with:
+      pipeline: ${{ needs.site-consumer-final-freeze.outputs.handoff_pipeline }}
+      expected_predecessor: ${{ needs.site-consumer-final-freeze.outputs.handoff_expected_predecessor }}
+      entry_id: ${{ needs.site-consumer-final-freeze.outputs.handoff_entry_id }}
+      source_path: ${{ needs.site-consumer-final-freeze.outputs.handoff_source_path }}
