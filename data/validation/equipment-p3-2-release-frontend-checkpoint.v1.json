@@ -2,8 +2,8 @@
   "version": 1,
   "stage": "Equipment P3-2 Release Metadata Frontend Integration",
   "status": "PASS",
-  "completion": "EQUIPMENT_P3_2_RELEASE_FRONTEND_HOSTED_VERIFIED",
-  "closeout": "HOSTED_VERIFIED_PENDING_ARTIFACT_MERGE",
+  "completion": "EQUIPMENT_P3_2_RELEASE_FRONTEND_FROZEN",
+  "closeout": "COMPLETE_MERGED_POST_MERGE_VERIFIED",
   "authoritativeSource": {
     "p3_1Projection": "data/presentation/equipment-p3-1-release-metadata.v1.json",
     "frozenGeneralList": "data/generated/equipment_stage3_3_general_list.json",
@@ -32,6 +32,18 @@
     "requiredProjectDoctorGuard": "SUCCESS_ON_IMPLEMENTATION_PRS",
     "equipmentFrontendQa": "SUCCESS_ON_IMPLEMENTATION_PRS",
     "localizationAudit": "SUCCESS_ON_IMPLEMENTATION_PRS"
+  },
+  "mergedState": {
+    "closeoutPr": 205,
+    "closeoutHeadSha": "f224d5359f45ca769993542ed8cd8e54fd8cf545",
+    "closeoutMergeSha": "94fa1b41bd673a255d486397aa8b08e810c70593",
+    "requiredProjectDoctorRun": 33241337343,
+    "requiredProjectDoctorConclusion": "SUCCESS",
+    "localizationAuditRun": 33241337352,
+    "localizationAuditConclusion": "SUCCESS",
+    "projectStatusSyncRun": 33241337342,
+    "projectStatusSyncConclusion": "SUCCESS",
+    "productOrSemanticFilesChanged": false
   },
   "hostedCloseoutEvidence": {
     "runId": 33241222878,
@@ -78,7 +90,8 @@
     "hostedChronology": "PASS",
     "hostedEquipmentImageRegression": "PASS",
     "hostedP2Regression": "PASS",
-    "hostedP1Regression": "PASS"
+    "hostedP1Regression": "PASS",
+    "closeoutArtifactsMerged": true
   },
   "review": [
     "Equipment 265-268 retain secondary source tier until a primary official archive is found.",
@@ -86,11 +99,11 @@
   ],
   "blockers": [],
   "nextStart": {
-    "stage": "Equipment P3-2 Closeout Artifact Merge",
+    "stage": "Equipment next work item selection",
     "instructions": [
-      "Merge only the hosted closeout workflow and this checkpoint into main through the required pr-guard.",
-      "After merge, update this checkpoint with the closeout PR and merge SHA.",
-      "Do not create a new semantic P3 stage unless an explicit unmet Equipment requirement or authoritative contradiction is identified."
+      "Compare the current Mk.1 Equipment requirements against current main and select only an explicit unmet requirement, if any.",
+      "Do not create Equipment P3-3 merely because P3-2 is complete.",
+      "Preserve the frozen Stage 2/3 semantics and P3-1 release projection unless a reopen condition is met."
     ]
   },
   "reopenConditions": [
