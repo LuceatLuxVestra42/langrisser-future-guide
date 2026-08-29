@@ -74,6 +74,43 @@ type Stage6Talent = {
   }> | null;
 };
 
+type Stage6BondCondition = {
+  conditionType?: number;
+  semanticStatus?: string | null;
+  requiredHero?: {
+    heroId?: number;
+    nameKr?: string | null;
+    nameCn?: string | null;
+    nameEn?: string | null;
+  } | null;
+  mission?: {
+    missionId?: number;
+    title?: string | null;
+    desc?: string | null;
+    missionType?: number;
+  } | null;
+  stage?: {
+    stageId?: number;
+    nameCn?: string | null;
+  } | null;
+  favorability?: {
+    targetHeroId?: number;
+    targetHeroNameKr?: string | null;
+    targetHeroNameCn?: string | null;
+    targetHeroNameEn?: string | null;
+    requiredLevel?: number;
+  } | null;
+};
+
+type Stage6Bond = {
+  order?: number;
+  fetterId?: number;
+  sourceResolved?: boolean;
+  nameCn?: string | null;
+  maxLevel?: number;
+  completionConditions?: Stage6BondCondition[] | null;
+};
+
 type FeatureBlock = {
   status?: string | null;
 } | null | undefined;
@@ -102,7 +139,7 @@ type Stage6HeroShard = {
     skills?: Stage6Skills | null;
     talent?: Stage6Talent | null;
   } | null;
-  bonds?: unknown[] | null;
+  bonds?: Stage6Bond[] | null;
   exclusiveEquipment?: FeatureBlock;
   centralDiscipline?: FeatureBlock;
   soldiers?: { ids?: number[] } | null;
@@ -189,6 +226,54 @@ function projectJobBranches(jobTree: Stage6JobTree | null | undefined) {
   });
 }
 
+function projectBonds(bonds: Stage6Bond[] | null | undefined) {
+  if (!Array.isArray(bonds)) return [];
+  return bonds.map((bond, index) => ({
+    order: Number.isInteger(bond.order) ? Number(bond.order) : index,
+    fetterId: Number.isInteger(bond.fetterId) ? Number(bond.fetterId) : null,
+    sourceResolved: bond.sourceResolved === true,
+    nameCn: bond.nameCn ?? null,
+    maxLevel: Number.isInteger(bond.maxLevel) ? Number(bond.maxLevel) : null,
+    completionConditions: Array.isArray(bond.completionConditions)
+      ? bond.completionConditions.map((condition) => ({
+          conditionType: Number.isInteger(condition.conditionType) ? Number(condition.conditionType) : null,
+          semanticStatus: condition.semanticStatus ?? null,
+          requiredHero: condition.requiredHero
+            ? {
+                heroId: Number.isInteger(condition.requiredHero.heroId) ? Number(condition.requiredHero.heroId) : null,
+                nameKr: condition.requiredHero.nameKr ?? null,
+                nameCn: condition.requiredHero.nameCn ?? null,
+                nameEn: condition.requiredHero.nameEn ?? null,
+              }
+            : null,
+          mission: condition.mission
+            ? {
+                missionId: Number.isInteger(condition.mission.missionId) ? Number(condition.mission.missionId) : null,
+                title: condition.mission.title ?? null,
+                desc: condition.mission.desc ?? null,
+                missionType: Number.isInteger(condition.mission.missionType) ? Number(condition.mission.missionType) : null,
+              }
+            : null,
+          stage: condition.stage
+            ? {
+                stageId: Number.isInteger(condition.stage.stageId) ? Number(condition.stage.stageId) : null,
+                nameCn: condition.stage.nameCn ?? null,
+              }
+            : null,
+          favorability: condition.favorability
+            ? {
+                targetHeroId: Number.isInteger(condition.favorability.targetHeroId) ? Number(condition.favorability.targetHeroId) : null,
+                targetHeroNameKr: condition.favorability.targetHeroNameKr ?? null,
+                targetHeroNameCn: condition.favorability.targetHeroNameCn ?? null,
+                targetHeroNameEn: condition.favorability.targetHeroNameEn ?? null,
+                requiredLevel: Number.isInteger(condition.favorability.requiredLevel) ? Number(condition.favorability.requiredLevel) : null,
+              }
+            : null,
+        }))
+      : [],
+  }));
+}
+
 function projectStage6Shard(shard: Stage6HeroShard) {
   const validation = shard.validation;
   if (!validation || validation.structuralStatus !== "PASS" || validation.siteUsable !== true) {
@@ -198,6 +283,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
   const jobTree = shard.normal?.jobTree;
   const branches = projectJobBranches(jobTree);
   const connections = Array.isArray(jobTree?.connections) ? jobTree.connections : [];
+  const bonds = projectBonds(shard.bonds);
   const soldierIds = Array.isArray(shard.soldiers?.ids) ? shard.soldiers.ids : [];
   const skins = Array.isArray(shard.presentation?.skins) ? shard.presentation.skins : [];
   const reviewCodes = Array.isArray(validation.reviewCodes) ? validation.reviewCodes : [];
@@ -274,9 +360,13 @@ function projectStage6Shard(shard: Stage6HeroShard) {
       connectionCount: connections.length,
       branches,
     },
+    bonds: {
+      count: bonds.length,
+      rows: bonds,
+    },
     soldiers: { count: soldierIds.length, ids: soldierIds },
     systems: {
-      bondRowCount: Array.isArray(shard.bonds) ? shard.bonds.length : 0,
+      bondRowCount: bonds.length,
       exclusiveEquipmentStatus: shard.exclusiveEquipment?.status ?? null,
       exclusiveEquipmentReleased: isReleased(shard.exclusiveEquipment),
       centralDisciplineStatus: shard.centralDiscipline?.status ?? null,
