@@ -15,8 +15,11 @@ import {
 
 import { HeroCentralDisciplineSection } from "@/components/hero-central-discipline-section";
 import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";
+import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
+import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
+import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 
 export const Route = createFileRoute("/heroes/$heroId")({
   loader: async ({ params }) => {
@@ -26,7 +29,27 @@ export const Route = createFileRoute("/heroes/$heroId")({
     const data = await getHeroDetailRouteStage5Data({ data: { heroId } });
     if (!data) throw notFound();
     const exclusiveEquipment = await getHeroExclusiveEquipmentPresentation({ data: { heroId } });
-    return { ...data, exclusiveEquipment };
+    const soldierPage = getSoldierPrototypePageData();
+    const soldierById = new Map(soldierPage.records.map((record) => [record.soldierId, record]));
+    const soldierCards = data.detail.soldiers.ids.map((soldierId) => {
+      const record = soldierById.get(soldierId);
+      if (!record) {
+        throw new Error(`Hero ${heroId} references Soldier ${soldierId}, but the frozen Soldier frontend consumer does not contain it.`);
+      }
+      return {
+        soldierId: record.soldierId,
+        nameKr: record.nameKr,
+        nameCn: record.nameCn,
+        nameKrStatus: record.nameKrStatus,
+        tier: record.tier,
+        armyType: record.armyType,
+        isSp: record.isSp,
+      };
+    });
+    if (soldierCards.length !== data.detail.soldiers.count) {
+      throw new Error(`Hero ${heroId} Soldier card count mismatch: ${soldierCards.length} != ${data.detail.soldiers.count}.`);
+    }
+    return { ...data, exclusiveEquipment, soldierCards };
   },
   head: ({ loaderData }) => ({
     meta: [{
@@ -50,7 +73,7 @@ function stripConfigMarkup(value: string | null) {
 }
 
 function HeroDetailPage() {
-  const { hero, stage6, detail, exclusiveEquipment } = Route.useLoaderData();
+  const { hero, stage6, detail, exclusiveEquipment, soldierCards } = Route.useLoaderData();
   const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
 
@@ -254,10 +277,17 @@ function HeroDetailPage() {
         <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
 
         <section className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-            <SectionTitle icon={<UsersRound className="h-4 w-4" aria-hidden="true" />} title="사용 가능 병종" />
-            <p className="mt-2 text-sm text-muted-foreground">A단계 확정 관계 기준 {detail.soldiers.count}종</p>
-            <div className="mt-4 flex flex-wrap gap-2">{detail.soldiers.ids.map((soldierId) => <span key={soldierId} className="rounded-md border border-border bg-muted/20 px-2.5 py-1.5 text-xs font-semibold text-foreground">Soldier {soldierId}</span>)}</div>
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-soldier-cards="true">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <SectionTitle icon={<UsersRound className="h-4 w-4" aria-hidden="true" />} title="사용 가능 용병" />
+                <p className="mt-2 text-sm text-muted-foreground">A단계 확정 관계의 Soldier ID를 기존 224종 frontend consumer와 ID lookup으로 연결해. 관계를 다시 계산하지 않아.</p>
+              </div>
+              <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">{soldierCards.length}종</span>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 xl:grid-cols-5">
+              {soldierCards.map((record) => <HeroSoldierCard key={record.soldierId} record={record} />)}
+            </div>
           </div>
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
             <SectionTitle icon={<ShieldCheck className="h-4 w-4" aria-hidden="true" />} title="확정 시스템 연결" />
@@ -273,7 +303,7 @@ function HeroDetailPage() {
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle icon={<Database className="h-4 w-4" aria-hidden="true" />} title="상세 데이터 상태" />
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">Hero 본문은 FINAL_FROZEN Stage 6 개별 shard 하나만 읽고, 전용장비는 별도 frozen B-5 byHero 소유권과 Equipment Stage 3-5 메타데이터를 조합해. 원본 ConfigData 관계 재계산이나 이름·ID 추론은 하지 않아.</p>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">Hero 본문은 FINAL_FROZEN Stage 6 개별 shard 하나만 읽고, 전용장비는 별도 frozen B-5 byHero 소유권과 Equipment Stage 3-5 메타데이터를 조합해. 용병 카드는 Stage 6의 확정 Soldier ID를 기존 frozen Soldier frontend consumer에 ID lookup만 하고, 원본 ConfigData 관계 재계산이나 이름·ID 추론은 하지 않아.</p>
           <div className="mt-4 flex flex-wrap gap-2 text-xs">
             <span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">Stage 6 · {stage6.admissionStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">구조 {detail.validation.structuralStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">게시 {detail.validation.publicationStatus ?? "-"}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">review {detail.validation.reviewCount}</span>
           </div>
@@ -284,6 +314,69 @@ function HeroDetailPage() {
 }
 
 type SkillView = { skillId: number; nameCn: string | null; desc: string | null; iconPath: string | null; displayType: string | null; cooldown: string | null; range: string | null; areaOrTarget: string | null };
+type HeroSoldierCardView = { soldierId: number; nameKr: string | null; nameCn: string; nameKrStatus: string; tier: number; armyType: string; isSp: boolean };
+
+const SOLDIER_ARMY_LABELS: Record<string, string> = {
+  INFANTRY: "보병",
+  LANCER: "창병",
+  CAVALRY: "기병",
+  FLYING: "비병",
+  WATER: "수병",
+  ARCHER: "궁병",
+  ASSASSIN: "암살자",
+  MAGE: "마법사",
+  HOLY: "승병",
+  DEMON: "마족",
+};
+
+function HeroSoldierCard({ record }: { record: HeroSoldierCardView }) {
+  const displayName = record.nameKr ?? record.nameCn;
+  const portraitUrl = getOfficialSoldierPortraitUrl(record.soldierId);
+  const armyIconUrl = getOfficialArmyIconUrl(record.armyType);
+  const armyLabel = SOLDIER_ARMY_LABELS[record.armyType] ?? record.armyType;
+
+  return (
+    <Link
+      reloadDocument
+      to="/soldiers/$soldierId"
+      params={{ soldierId: String(record.soldierId) }}
+      aria-label={`${displayName} 용병 상세 보기`}
+      title={`${displayName} · Soldier ${record.soldierId}`}
+      className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-8 text-muted-foreground transition group-hover:text-foreground">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-current/20 bg-background/70 sm:h-16 sm:w-16">
+          <span className="text-base font-black tracking-tight sm:text-lg">{armyLabel.slice(0, 1)}</span>
+        </div>
+        {portraitUrl ? (
+          <img
+            src={portraitUrl}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-contain object-bottom px-1 pb-7 pt-2 transition-transform duration-200 group-hover:scale-[1.02]"
+            onError={(event) => { event.currentTarget.style.display = "none"; }}
+          />
+        ) : null}
+      </div>
+
+      <div className="absolute left-1.5 top-1.5 flex gap-1">
+        <span className="rounded bg-black/65 px-1.5 py-0.5 text-[12px] font-bold leading-none text-white sm:text-[13px]">
+          {record.isSp ? "SP" : `T${record.tier}`}
+        </span>
+        {record.nameKrStatus === "provisional-display" ? <span className="rounded bg-black/65 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">임시</span> : null}
+      </div>
+
+      <div className="absolute right-1.5 top-1.5 flex h-6 min-w-6 items-center justify-center rounded bg-background/80 px-1 shadow-sm backdrop-blur" title={armyLabel}>
+        {armyIconUrl ? <img src={armyIconUrl} alt="" aria-hidden="true" className="h-5 w-5 object-contain" onError={(event) => { event.currentTarget.style.display = "none"; }} /> : <span className="text-[10px] font-bold text-foreground">{armyLabel.slice(0, 1)}</span>}
+        <span className="sr-only">{armyLabel}</span>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 bg-black/75 px-1.5 py-1.5 text-center backdrop-blur-[1px]">
+        <span className="line-clamp-2 text-[11px] font-bold leading-tight text-white sm:text-xs">{displayName}</span>
+      </div>
+    </Link>
+  );
+}
 
 function SkillCard({ skill, sourceLabel }: { skill: SkillView; sourceLabel: string }) {
   return <article className="rounded-xl border border-border bg-muted/20 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-[11px] font-bold text-muted-foreground">{sourceLabel}</p><h4 className="mt-1 font-bold text-foreground">{skill.nameCn ?? `Skill ${skill.skillId}`}</h4></div><span className="rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{skill.skillId}</span></div><div className="mt-3 flex flex-wrap gap-1.5 text-[11px]">{skill.displayType ? <span className="rounded-md border border-border bg-background px-2 py-1 font-semibold text-foreground">{skill.displayType}</span> : null}{skill.cooldown ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">쿨 {skill.cooldown}</span> : null}{skill.range ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">사거리 {skill.range}</span> : null}{skill.areaOrTarget ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">대상 {skill.areaOrTarget}</span> : null}</div><p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.desc)}</p></article>;
