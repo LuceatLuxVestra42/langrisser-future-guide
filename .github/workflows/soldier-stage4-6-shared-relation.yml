@@ -41,7 +41,7 @@ on:
       - '.github/workflows/soldier-stage4-6-shared-relation.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build-validate-adopt:
@@ -72,21 +72,3 @@ jobs:
             data/generated/hero-soldier-by-soldier.v1.json
             data/validation/hero-soldier-relation-validation.v1.json
             data/validation/soldier-stage4-6-relation-consumer.v1.json
-
-      - name: Freeze generated artifacts on PR branch
-        if: github.event_name == 'pull_request'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            data/generated/hero-soldier-relations.v1.json \
-            data/generated/hero-soldier-by-hero.v1.json \
-            data/generated/hero-soldier-by-soldier.v1.json \
-            data/validation/hero-soldier-relation-validation.v1.json \
-            data/validation/soldier-stage4-6-relation-consumer.v1.json
-          if git diff --cached --quiet; then
-            echo "Generated relation artifacts are already frozen for this snapshot."
-          else
-            git commit -m "generate A-10 shared Hero-Soldier relation artifacts"
-            git push origin HEAD:${{ github.event.pull_request.head.ref }}
-          fi
