@@ -14,83 +14,51 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Locate begin/current keyword bundles in scoped installer ranges
-        shell: python
-        run: |
-          import struct, urllib.request, pathlib
-          VER='1.1.113'
-          BASE=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{VER}'
-          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36'
-          def req(url,start=None,end=None,method=None):
-              h={'User-Agent':UA,'Accept-Encoding':'identity'}
-              if start is not None: h['Range']=f'bytes={start}-{end}'
-              with urllib.request.urlopen(urllib.request.Request(url,headers=h,method=method),timeout=45) as r:
-                  data=r.read()
-                  if start is not None and len(data)!=end-start+1: raise RuntimeError('range mismatch')
-                  return data,dict(r.headers)
-          def names(n):
-              url=f'{BASE}/InstallPage_{VER}_{n}.zip'
-              try: _,heads=req(url,method='HEAD')
-              except Exception as exc: return []
-              size=int(heads['Content-Length']); ts=min(1024*1024,size)
-              tail,_=req(url,size-ts,size-1); e=tail.rfind(b'PK\x05\x06')
-              if e<0:return []
-              _,_,_,_,cs,co,_=struct.unpack_from('<HHHHIIH',tail,e+4)
-              central,_=req(url,co,co+cs-1); out=[]; off=0
-              while off+46<=len(central) and central[off:off+4]==b'PK\x01\x02':
-                  flags=struct.unpack_from('<H',central,off+8)[0]; fl,el,cl=struct.unpack_from('<HHH',central,off+28)
-                  raw=central[off+46:off+46+fl]; name=raw.decode('utf-8' if flags&0x800 else 'cp437','replace')
-                  if 'keyword' in name.lower(): out.append(name)
-                  off += 46+fl+el+cl
-              return out
-          hits=[]
-          for n in list(range(20,31))+list(range(58,65)):
-              found=names(n)
-              if found: hits.extend((n,name) for name in found)
-          print({'scanned':list(range(20,31))+list(range(58,65)),'hits':hits})
-          if not hits: raise SystemExit('no keyword bundles found')
-      - name: Inspect package 26 keyword bundle assets
+      - name: Inspect package 27 begin keyword bundle exact faction assets
         shell: bash
         run: |
           python -m pip install --disable-pip-version-check --quiet UnityPy Pillow
           python <<'PY'
           import struct, urllib.request, zlib, pathlib
           import UnityPy
-          VER='1.1.113'; N=26
+          VER='1.1.113'; N=27; BUNDLE='begin_ui_icon_keyword_abs.b'
           BASE=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{VER}'; URL=f'{BASE}/InstallPage_{VER}_{N}.zip'
           UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36'
           def req(start=None,end=None,method=None):
               h={'User-Agent':UA,'Accept-Encoding':'identity'}
               if start is not None:h['Range']=f'bytes={start}-{end}'
-              with urllib.request.urlopen(urllib.request.Request(URL,headers=h,method=method),timeout=60) as r:return r.read(),dict(r.headers)
+              with urllib.request.urlopen(urllib.request.Request(URL,headers=h,method=method),timeout=60) as r:
+                  data=r.read()
+                  if start is not None and len(data)!=end-start+1: raise RuntimeError('range mismatch')
+                  return data,dict(r.headers)
           _,heads=req(method='HEAD'); size=int(heads['Content-Length']); ts=min(1024*1024,size); tail,_=req(size-ts,size-1); e=tail.rfind(b'PK\x05\x06')
-          _,_,_,_,cs,co,_=struct.unpack_from('<HHHHIIH',tail,e+4); central,_=req(co,co+cs-1); entries=[]; off=0
+          _,_,_,_,cs,co,_=struct.unpack_from('<HHHHIIH',tail,e+4); central,_=req(co,co+cs-1); entry=None; off=0
           while off+46<=len(central) and central[off:off+4]==b'PK\x01\x02':
               flags,method=struct.unpack_from('<HH',central,off+8); csz,usz=struct.unpack_from('<II',central,off+20); fl,el,cl=struct.unpack_from('<HHH',central,off+28); lo=struct.unpack_from('<I',central,off+42)[0]
               raw=central[off+46:off+46+fl]; name=raw.decode('utf-8' if flags&0x800 else 'cp437','replace')
-              if 'keyword' in name.lower(): entries.append((name,method,csz,usz,lo))
+              if pathlib.PurePosixPath(name).name.lower()==BUNDLE:entry=(name,method,csz,usz,lo)
               off += 46+fl+el+cl
-          print('ENTRIES',[(e[0],e[2],e[3]) for e in entries])
-          expected={'icon_group_lead','icon_group_light','icon_group_origin','icon_group_empire','icon_group_dark','icon_group_princess','icon_group_wisdomandcourage','icon_group_meteor','icon_group_crystal','icon_group_spacetimehub','icon_group_transcendency','icon_group_incarnation'}
-          for name,method,csz,usz,lo in entries:
-              header,_=req(lo,lo+4095); actual=struct.unpack_from('<H',header,8)[0]; fl,el=struct.unpack_from('<HH',header,26); ds=lo+30+fl+el; comp,_=req(ds,ds+csz-1); blob=comp if actual==0 else zlib.decompress(comp,-15)
-              env=UnityPy.load(blob)
-              def typ(obj):return getattr(getattr(obj,'type',None),'name',None)
-              matches=[]
-              for key,obj in env.container.items():
-                  k=str(key); stem=pathlib.PurePosixPath(k).stem.lower()
-                  if stem in expected: matches.append({'container':k,'type':typ(obj),'pathId':int(getattr(obj,'path_id',0)),'stem':stem})
-              sprite_matches=[]
-              for obj in env.objects:
-                  if typ(obj)!='Sprite':continue
-                  try:nm=str(getattr(obj.read(),'m_Name',''))
-                  except Exception:continue
-                  if nm.lower() in expected: sprite_matches.append({'name':nm,'pathId':int(getattr(obj,'path_id',0))})
-              print('BUNDLE',name,'bytes',len(blob),'containerCount',len(env.container),'objectCount',len(env.objects),'MATCHES',matches,'SPRITES',sprite_matches)
+          if not entry:raise SystemExit('begin keyword bundle missing in package 27')
+          name,method,csz,usz,lo=entry; header,_=req(lo,lo+4095); actual=struct.unpack_from('<H',header,8)[0]; fl,el=struct.unpack_from('<HH',header,26); ds=lo+30+fl+el; comp,_=req(ds,ds+csz-1); blob=comp if actual==0 else zlib.decompress(comp,-15)
+          env=UnityPy.load(blob)
+          def typ(obj):return getattr(getattr(obj,'type',None),'name',None)
+          expected=['icon_group_lead','icon_group_light','icon_group_origin','icon_group_empire','icon_group_dark','icon_group_princess','icon_group_wisdomandcourage','icon_group_meteor','icon_group_crystal','icon_group_spacetimehub','icon_group_transcendency','icon_group_incarnation']
+          container_matches=[]
+          for key,obj in env.container.items():
+              k=str(key); stem=pathlib.PurePosixPath(k).stem.lower()
+              if stem in expected:container_matches.append({'stem':stem,'container':k,'type':typ(obj),'pathId':int(getattr(obj,'path_id',0))})
+          sprite_matches=[]
+          for obj in env.objects:
+              if typ(obj)!='Sprite':continue
+              try:nm=str(getattr(obj.read(),'m_Name',''))
+              except Exception:continue
+              if nm.lower() in expected:sprite_matches.append({'name':nm,'pathId':int(getattr(obj,'path_id',0))})
+          print({'bundle':name,'bytes':len(blob),'containerCount':len(env.container),'objectCount':len(env.objects),'containerMatches':container_matches,'spriteMatches':sprite_matches})
+          if len(container_matches)!=12 or len(sprite_matches)!=12:raise SystemExit(f'expected 12 exact faction marks, got container={len(container_matches)} sprite={len(sprite_matches)}')
           PY
