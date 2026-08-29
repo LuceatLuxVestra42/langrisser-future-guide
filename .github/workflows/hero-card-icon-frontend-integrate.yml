@@ -1,0 +1,84 @@
+name: Hero Card Icon Frontend Integrate
+
+on:
+  push:
+    branches:
+      - asset/hero-card-icons-bwiki-20260830
+    paths:
+      - '.github/workflows/hero-card-icon-frontend-integrate.yml'
+      - 'scripts/apply-hero-card-icon-frontend.mjs'
+      - 'scripts/validate-hero-card-icon-frontend.mjs'
+      - 'src/lib/hero-card-icon-assets.server.ts'
+      - 'src/lib/hero-card-icon-assets.functions.ts'
+      - 'data/generated/hero-card-icon-assets.v1.json'
+      - 'data/validation/hero-card-icon-assets.v1.json'
+      - 'public/images/heroes/card-icons/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hero-card-icon-frontend-integrate
+  cancel-in-progress: true
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact branch source
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Apply presentation-only Hero card icon integration
+        run: node scripts/apply-hero-card-icon-frontend.mjs
+
+      - name: Validate local Hero card icon consumer
+        run: node scripts/validate-hero-card-icon-frontend.mjs
+
+      - name: Production build gate
+        run: bun run build
+
+      - name: TypeScript gate
+        run: bunx tsc --noEmit
+
+      - name: Validate built Hero card icon surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f dist/client/heroes/index.html
+          test -f dist/client/images/heroes/card-icons/1.png
+          test -f dist/client/images/heroes/card-icons/6.png
+          test "$(find dist/client/images/heroes/card-icons -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '267'
+          grep -q '/images/heroes/card-icons/6.png' dist/client/heroes/index.html || grep -q '/langrisser-future-guide/images/heroes/card-icons/6.png' dist/client/heroes/index.html
+          grep -q 'data-hero-card-icons="true"' dist/client/heroes/index.html
+          grep -q 'data-hero-card-icon="true"' dist/client/heroes/index.html
+
+      - name: Commit integrated Hero list presentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/routes/heroes.tsx
+          if git diff --cached --quiet; then
+            echo 'No frontend patch changes.'
+            exit 0
+          fi
+          git commit -m 'Use exact local Hero card icon assets'
+          git push origin HEAD:asset/hero-card-icons-bwiki-20260830
