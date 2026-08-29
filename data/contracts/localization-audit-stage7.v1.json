@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "schemaId": "localization-audit-stage7-contract/v1",
+  "stage": 7,
+  "status": "FROZEN",
+  "purpose": "Adopt the five CN-authority Hero provisional Korean labels at the frontend route/search boundary while preserving Stage 6 Doctor integration and frozen Hero semantics.",
+  "predecessor": {
+    "stage6Snapshot": "data/validation/localization-audit-stage6.v1.json",
+    "requiredSchemaId": "localization-audit-stage6/v1",
+    "requiredStatus": "PASS_WITH_REVIEW",
+    "stage5LiveRunner": "scripts/audit-localization.mjs",
+    "stage2HeroValidation": "data/validation/hero-provisional-localization-stage2.v1.json"
+  },
+  "hero": {
+    "presentationSource": "data/presentation/hero-provisional-name-kr.v1.json",
+    "listServer": "src/lib/hero-list.server.ts",
+    "listRoute": "src/routes/heroes.tsx",
+    "detailRoute": "src/routes/heroes_.$heroId.tsx",
+    "canonicalHeroCount": 267,
+    "provisionalCount": 5,
+    "officialNameUnresolvedCount": 5,
+    "joinKey": "heroId",
+    "displayPolicy": "localization.displayName first; frozen identity fallback only as compatibility fallback",
+    "searchPolicy": "localization display first plus frozen Korean/Chinese/English identity aliases",
+    "targets": [
+      {"heroId": 99273, "nameCn": "初真泽瑞达", "displayNameKr": "태초의 젤다"},
+      {"heroId": 99281, "nameCn": "骁浪驭虹使", "displayNameKr": "효랑어홍사"},
+      {"heroId": 99282, "nameCn": "狺", "displayNameKr": "은(밴시)"},
+      {"heroId": 99283, "nameCn": "阿云", "displayNameKr": "아윈(쿠모)"},
+      {"heroId": 99287, "nameCn": "魔骸剑使", "displayNameKr": "마검의 화신"}
+    ]
+  },
+  "productionBoundary": {
+    "rawConfigDataRead": false,
+    "stage6Regeneration": false,
+    "heroListStage1Regeneration": false,
+    "identityMutation": false,
+    "relationshipRederivation": false,
+    "nameJoin": false,
+    "routeServerBypass": false
+  },
+  "reviewAccounting": {
+    "inheritedReviews": 2,
+    "heroProvisionalReviews": 5,
+    "expectedReviews": 7
+  },
+  "completion": "COMPLETE_AFTER_ROUTE_BUILD_AND_DOCTOR_GATES",
+  "nextStartPoint": "merge/deploy then authoritative hosted/browser QA for the five effective Hero display names"
+}

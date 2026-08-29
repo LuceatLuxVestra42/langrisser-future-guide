@@ -54,7 +54,7 @@ export const Route = createFileRoute("/heroes/$heroId")({
   head: ({ loaderData }) => ({
     meta: [{
       title: loaderData
-        ? `${loaderData.hero.identity.nameKr ?? loaderData.hero.identity.nameCn} | 랑그릿사 모바일 영웅`
+        ? `${loaderData.hero.localization.displayName || (loaderData.hero.identity.nameKr ?? loaderData.hero.identity.nameCn)} | 랑그릿사 모바일 영웅`
         : "영웅 | 랑그릿사 모바일 미래시 정보",
     }],
   }),
@@ -74,11 +74,15 @@ function stripConfigMarkup(value: string | null) {
 
 function HeroDetailPage() {
   const { hero, stage6, detail, exclusiveEquipment, soldierCards } = Route.useLoaderData();
-  const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
+  const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
 
   return (
-    <main className="min-h-screen bg-background">
+    <main
+      data-name-kr-status={hero.localization.nameKrStatus}
+      data-name-source-authority={hero.localization.sourceAuthority}
+      className="min-h-screen bg-background"
+    >
       <div className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 lg:px-8 lg:py-10">
         <Link reloadDocument to="/heroes" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
           <ArrowLeft className="h-4 w-4" aria-hidden="true" /> 영웅 목록

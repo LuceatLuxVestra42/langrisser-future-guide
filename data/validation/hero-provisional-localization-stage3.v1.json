@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "schemaId": "hero-provisional-localization-stage3-validation/v1",
+  "stage": "hero-provisional-localization-stage3",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "predecessor": {
+    "branch": "hero-provisional-localization-stage2",
+    "headSha": "0778f7aca2c6210c2bb8f425f33de17636ab4427",
+    "validation": "data/validation/hero-provisional-localization-stage2.v1.json",
+    "requiredStatus": "PASS",
+    "requiredCompletion": "COMPLETE"
+  },
+  "authoritativeSources": {
+    "heroFrozenConsumer": "data/generated/hero-list-stage1.v1.json",
+    "heroProvisionalPresentation": "data/presentation/hero-provisional-name-kr.v1.json",
+    "localizationAuditStage6": "data/validation/localization-audit-stage6.v1.json",
+    "localizationAuditStage7Contract": "data/contracts/localization-audit-stage7.v1.json",
+    "localizationAuditStage7Validation": "data/validation/localization-audit-stage7.v1.json"
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "provisionalHeroCount": 5,
+    "officialNameUnresolvedCount": 5,
+    "migratedListRouteCount": 1,
+    "migratedDetailRouteCount": 1,
+    "migratedSearchCount": 1,
+    "localizationAuditErrors": 0,
+    "localizationAuditReviews": 7,
+    "semanticMutationCount": 0,
+    "hardErrorCount": 0
+  },
+  "targets": [
+    {"heroId": 99273, "nameCn": "初真泽瑞达", "displayNameKr": "태초의 젤다", "officialNameKr": null, "nameKrStatus": "provisional-display", "sourceAuthority": "CN"},
+    {"heroId": 99281, "nameCn": "骁浪驭虹使", "displayNameKr": "효랑어홍사", "officialNameKr": null, "nameKrStatus": "provisional-display", "sourceAuthority": "CN"},
+    {"heroId": 99282, "nameCn": "狺", "displayNameKr": "은(밴시)", "officialNameKr": null, "nameKrStatus": "provisional-display", "sourceAuthority": "CN"},
+    {"heroId": 99283, "nameCn": "阿云", "displayNameKr": "아윈(쿠모)", "officialNameKr": null, "nameKrStatus": "provisional-display", "sourceAuthority": "CN"},
+    {"heroId": 99287, "nameCn": "魔骸剑使", "displayNameKr": "마검의 화신", "officialNameKr": null, "nameKrStatus": "provisional-display", "sourceAuthority": "CN"}
+  ],
+  "implementation": {
+    "listDisplayPolicy": "localization.displayName first; frozen identity fallback only for compatibility",
+    "detailDisplayPolicy": "localization.displayName first; frozen identity fallback only for compatibility",
+    "searchPolicy": "effective localization plus frozen Korean/Chinese/English identity aliases",
+    "domQaMetadata": ["data-name-kr-status", "data-name-source-authority"],
+    "joinKey": "heroId"
+  },
+  "validation": {
+    "heroStage2Predecessor": "PASS",
+    "localizationAuditStage7": "PASS_WITH_REVIEW",
+    "heroStage4Boundary": "PASS",
+    "heroStage5Boundary": "PASS",
+    "productionBuild": "PASS",
+    "typeScript": "PASS",
+    "diffCheck": "PASS",
+    "stage4ProofRunId": 33279800996,
+    "stage5ProofRunId": 33279726979
+  },
+  "invariants": {
+    "heroPopulationChanged": false,
+    "heroIdsChanged": false,
+    "chineseNamesChanged": false,
+    "englishNamesChanged": false,
+    "combatDataChanged": false,
+    "relationsChanged": false,
+    "rawConfigDataRead": false,
+    "stage6Regenerated": false,
+    "heroListStage1Regenerated": false,
+    "identityMutation": false,
+    "nameJoinIntroduced": false
+  },
+  "review": [
+    "The five target Heroes remain official-Korean-name unresolved and therefore stay REVIEW as provisional CN-authority display labels.",
+    "Localization Audit Stage 6 already owns Project Doctor integration; Hero route adoption is recorded as the Stage 7 successor instead of overwriting Stage 6.",
+    "Legacy Hero List Stage 2/3 workflows still assert superseded historical frontend boundaries and may remain red without indicating a Stage 3 localization regression.",
+    "Stage 2 PR #237 must integrate before or together with this stacked Stage 3 PR; this is an integration-order condition, not a semantic blocker."
+  ],
+  "blockers": [],
+  "nextStartPoint": "Integrate Stage 2 then Stage 3, deploy authoritative GitHub Pages output, and run hosted/browser QA for all five effective Hero display names and localization status metadata.",
+  "reopenConditions": [
+    "an authoritative official Korean server name is confirmed for any target Hero",
+    "target heroId/nameCn parity changes",
+    "the Hero localization projection contract changes",
+    "route/search effective-display parity regresses"
+  ]
+}
