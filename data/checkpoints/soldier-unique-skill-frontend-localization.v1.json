@@ -3,7 +3,7 @@
   "schemaId": "soldier-unique-skill-frontend-localization/v1",
   "date": "2026-08-29",
   "stage": "FRONTEND_CONSUMER_INTEGRATION",
-  "status": "BUILD_RECHECK_PENDING_HOSTED_PENDING",
+  "status": "PASS_WITH_REVIEW_HOSTED_PENDING",
   "scope": {
     "target": "normal Tier3 and SP Soldier unique-skill final descriptions",
     "targetCount": 185,
@@ -36,9 +36,13 @@
     "overridePath": "data/presentation/soldier-unique-skill-review-overrides.v1.json"
   },
   "buildGate": {
-    "status": "RECHECK_PENDING",
+    "status": "PASS",
     "workflow": "Equipment Korean Name Frontend QA",
-    "expectedGeneratorSummary": "records=185 pass=130 review=55 overrides=21 missing=0 extra=0 public=185"
+    "runId": 33228025075,
+    "jobId": 99035436083,
+    "generatorSummary": "records=185 pass=130 review=55 overrides=21 missing=0 extra=0 public=185",
+    "productionViteNitroBuild": "SUCCESS",
+    "frontendLocalizationBoundary": "PASS"
   },
   "reviewBoundary": {
     "reviewCount": 55,
@@ -54,8 +58,8 @@
   },
   "completion": {
     "frontendConsumerIntegrated": true,
-    "buildGateComplete": false,
+    "buildGateComplete": true,
     "hostedQaComplete": false
   },
-  "nextStep": "Verify review batch 5 build gate, then continue evidence-based resolution from the remaining 55 items."
+  "nextStep": "Continue record-level evidence resolution from the remaining 55 REVIEW items and run Hosted QA only after deployment of the current projection."
 }
