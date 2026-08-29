@@ -52,12 +52,16 @@
       "data/checkpoints/soldier-unique-skill-review-resolution-batch5.v1.json"
     ],
     "resolvedSoldierIds": [249,250,326,333,334,336,341,512,513,514,515,602,635,637,647,811,814,815,1034,1105,1113],
-    "status": "BATCH5_APPLIED_BUILD_RECHECK_PENDING"
+    "status": "BATCH5_BUILD_VERIFIED"
   },
   "buildVerification": {
-    "status": "PENDING",
+    "status": "PASS",
     "workflow": "Equipment Korean Name Frontend QA",
-    "expectedCounts": {"records":185,"pass":130,"review":55,"overrides":21,"missing":0,"extra":0,"public":185}
+    "runId": 33228025075,
+    "jobId": 99035436083,
+    "observed": {"records":185,"pass":130,"review":55,"overrides":21,"missing":0,"extra":0,"public":185},
+    "productionBuild": "SUCCESS",
+    "frontendLocalizationBoundary": "PASS"
   },
   "completion": {
     "translationTargetComplete": true,
@@ -70,7 +74,7 @@
     "validationPath": "data/validation/soldier-unique-skill-kr-final.v1.json",
     "frontendConsumerIntegrated": true,
     "frontendCheckpoint": "data/checkpoints/soldier-unique-skill-frontend-localization.v1.json",
-    "frontendBuildGateStatus": "RECHECK_PENDING",
+    "frontendBuildGateStatus": "PASS",
     "frontendHostedQaStatus": "PENDING",
     "reviewResolutionRequired": true
   }
