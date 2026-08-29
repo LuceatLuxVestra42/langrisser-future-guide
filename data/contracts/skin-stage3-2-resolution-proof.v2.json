@@ -1,0 +1,88 @@
+{
+  "version": 2,
+  "stage": "skin-page-3",
+  "substage": "3-2",
+  "checkpoint": "representative-asset-resolution-proof-contract-v2",
+  "status": "ACCEPTED",
+  "revisionReason": "Authoritative representative Unity asset evidence now exists. The former READY_FOR_ASSET_EVIDENCE checkpoint remains historical pre-evidence state and must no longer block Stage 3-3.",
+  "supersession": {
+    "historicalContract": "data/contracts/skin-stage3-2-resolution-proof.v1.json",
+    "historicalReadiness": "data/validation/skin-stage3-2-readiness.v1.json",
+    "historicalAuthority": "HISTORICAL_PRE_EVIDENCE_ONLY",
+    "preserveHistoricalFiles": true,
+    "replaceHistoricalFilesInPlace": false
+  },
+  "inputs": {
+    "stage31Validation": "data/validation/skin-stage3-1-final.v1.json",
+    "inventory": "data/generated/skin-stage3-1-asset-inventory.v1.json",
+    "fixtures": "data/fixtures/skin-stage3-2-resolution-fixtures.v1.json",
+    "finalEvidence": "data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json"
+  },
+  "output": "data/validation/skin-stage3-2-final.v2.json",
+  "frozenExpected": {
+    "skinCount": 540,
+    "uniqueStaticPathCount": 540,
+    "uniqueSpinePathCount": 540,
+    "modelBindingEdgeCount": 2277,
+    "uniqueModelResourceIdCount": 789,
+    "fixtureSkinIds": [102, 1901, 3701],
+    "representativeExpected": 3,
+    "representativeResolved": 3,
+    "staticAuthoritativeUnityPathResolved": 3,
+    "spineAuthoritativePathResolved": 3,
+    "modelResourceIdsExpected": 7,
+    "modelResourceIdsMappedToPrefabPath": 7,
+    "modelResourceIdsAuthoritativeAssetEntryResolved": 7,
+    "pendingRepresentativeRecords": 0
+  },
+  "authorityPolicy": {
+    "skinIdentityOwner": "Stage 1 canonical + Stage 2 frozen relation",
+    "ownerAndOrderRecomputed": false,
+    "locatorOwner": "Stage 3-1 frozen asset inventory",
+    "representativeResolutionOwner": "data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json",
+    "modelResourceMapping": "explicit ConfigDataModelSkinResourceInfo mapping preserved by evidence",
+    "bundleResolution": "exact authoritative runtime path or exact bundle entry evidence",
+    "supportingStaticRawBytes": "allowed as supporting provenance but not as a substitute for authoritative Unity path resolution"
+  },
+  "requiredProof": {
+    "static": "Each representative frozen sourceImagePath has authoritative Unity path evidence.",
+    "spine": "Each representative frozen sourceSpinePath has authoritative Unity path evidence.",
+    "model": "All seven representative skinResourceId values map explicitly to model Prefab paths and are resolved as authoritative bundle entries.",
+    "boundary": "No ownership/sourceOrder recomputation, fuzzy matching, numeric ID arithmetic, inferred bundle membership, or cross-root fallback."
+  },
+  "completionPolicy": {
+    "passStatus": "PASS_SKIN_STAGE3_2_REPRESENTATIVE_ASSET_RESOLUTION",
+    "completion": "SKIN_STAGE3_2_COMPLETE",
+    "freezeState": "SKIN_STAGE3_2_REPRESENTATIVE_PROOF_FROZEN",
+    "downstreamGate": "STAGE3_3_BULK_RESOLUTION_ALLOWED",
+    "bulkClaim": "Representative completion does not claim final resolution for all 540 Skin records."
+  },
+  "stage33Handoff": {
+    "allowed": true,
+    "purpose": "Expand the frozen representative resolution rules to exact bulk asset resolution without reopening Skin identity/relation semantics.",
+    "requiredTargetCounts": {
+      "static": 540,
+      "charSpine": 540,
+      "modelPrimaryPrefab": 789,
+      "total": 1869
+    },
+    "bulkRules": [
+      "reuse Stage 3-1 frozen locators and model resource IDs",
+      "use lightweight ConfigDataModelSkinResourceInfo index instead of rereading large raw ConfigData",
+      "scan exact candidate bundles only",
+      "require exact runtime-path evidence",
+      "do not prefer begin/current bundle by naming alone",
+      "do not extrapolate partial scan results",
+      "do not claim 540-Skin bulk completion until all candidate coverage is resolved or explicitly classified"
+    ]
+  },
+  "prohibitedInference": [
+    "asset existence or resolution success may not define release status",
+    "asset filename/path may not redefine heroId or sourceOrder",
+    "name similarity may not establish asset identity",
+    "numeric overlap may not establish model-resource semantics",
+    "begin/current bundle membership may not be inferred from filename",
+    "partial bulk scan results may not be extrapolated to unscanned candidates",
+    "release/localization/acquisition enrichment is outside this completion contract"
+  ]
+}
