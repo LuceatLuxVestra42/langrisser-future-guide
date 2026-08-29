@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "schemaId": "soldier-unique-skill-review-evidence/v1",
+  "date": "2026-08-29",
+  "batch": 3,
+  "status": "DIRECT_RECORD_EVIDENCE_READY",
+  "scope": {
+    "candidateSoldierIds": [811, 814],
+    "canonicalSoldierDataReopened": false,
+    "purpose": "Resolve record-level blockers only where Korean references reproduce the corresponding Soldier effect semantics."
+  },
+  "records": [
+    {
+      "soldierId": 811,
+      "nameKr": "퇴마사",
+      "nameCn": "驱魔师",
+      "reviewTerms": ["魔物"],
+      "resolvedTerms": {"魔物":"마물"},
+      "disposition": "RESOLVE_TO_PASS",
+      "evidence": [
+        {
+          "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%ED%81%B4%EB%A1%9C%ED%85%8C%EB%A5%B4-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+          "note": "Korean Soldier effect reproduces the same condition: attack +30% versus 마물, defense +30% versus non-마물 targets."
+        },
+        {
+          "url": "https://readonly.wiki/w/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC(%EB%AA%A8%EB%B0%94%EC%9D%BC%20%EA%B2%8C%EC%9E%84)/%EB%B3%91%EC%A2%85",
+          "note": "Independent Korean troop reference lists 퇴마사 with the same 마물/non-마물 effect."
+        }
+      ]
+    },
+    {
+      "soldierId": 814,
+      "nameKr": "속죄자",
+      "nameCn": "洗罪者",
+      "reviewTerms": ["致命一击", "触发后士兵最大生命降低"],
+      "resolvedRenderingKr": "자신에게 약화 효과가 없을 시 부대가 치명적인 피해를 받아도 사망하지 않고 생명 20% 회복. 발동 후 병사 최대 생명 20% 감소(전투당 최대 1회 발동).",
+      "disposition": "RESOLVE_TO_PASS",
+      "evidence": [
+        {
+          "url": "https://goniblog.com/%EB%9E%91%EA%B7%B8%EB%A6%BF%EC%82%AC-%EB%9D%BC%EB%82%98sp-%ED%8F%89%EA%B0%80-%EC%A0%84%EC%A7%81-%EC%9E%A5%EB%B9%84-%EC%8A%A4%ED%82%AC-%ED%8B%B0%EC%96%B4-%EA%B3%B5%EB%9E%B5/",
+          "note": "Korean Soldier effect directly confirms the same sequence: no debuff -> death prevention/recovery to 20% life -> Soldier max-life reduction after trigger -> maximum once. This resolves both mechanic blockers without changing the canonical Chinese source."
+        }
+      ]
+    }
+  ],
+  "nextStep": "Apply soldierId 811 and 814 through the review override layer and validate the final projection at 118 PASS / 67 REVIEW."
+}
