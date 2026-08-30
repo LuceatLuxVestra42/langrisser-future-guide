@@ -1,0 +1,66 @@
+name: Route Hosted QA Step 3 Lock Refresh
+
+on:
+  push:
+    branches:
+      - work/route-hosted-qa-mainline-integration
+    paths:
+      - package.json
+      - .github/workflows/route-hosted-qa-step3-lock-refresh.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: route-hosted-qa-step3-lock-refresh
+  cancel-in-progress: true
+
+jobs:
+  refresh-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout integration branch
+        uses: actions/checkout@v5
+        with:
+          ref: work/route-hosted-qa-mainline-integration
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Regenerate lock from current package graph
+        run: bun install --lockfile-only
+
+      - name: Verify frozen install and Playwright pin
+        run: |
+          set -euo pipefail
+          bun install --frozen-lockfile
+          test "$(bunx playwright --version)" = "Version 1.62.1"
+          node - <<'NODE'
+          const pkg = require('./package.json');
+          if (pkg.scripts['qa:browser'] !== 'playwright test -c playwright.route-hosted.config.ts') process.exit(1);
+          if (pkg.scripts['qa:browser:validate'] !== 'node scripts/validate-project-doctor-route-hosted-qa-stage2.mjs --check') process.exit(1);
+          if (pkg.devDependencies['@playwright/test'] !== '1.62.1') process.exit(1);
+          NODE
+
+      - name: Commit regenerated lockfile
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- bun.lock; then
+            echo "bun.lock already matches package graph"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bun.lock
+          git commit -m "Regenerate bun lock for Route Hosted QA browser runtime"
+          git push origin HEAD:work/route-hosted-qa-mainline-integration
