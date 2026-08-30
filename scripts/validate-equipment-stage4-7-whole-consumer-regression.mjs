@@ -21,6 +21,7 @@ const mustInclude = (source, markers, label) => {
     assert(source.includes(marker), `${label} missing marker: ${marker}`);
   }
 };
+const countOccurrences = (source, marker) => source.split(marker).length - 1;
 
 const stage40 = readJson("data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json");
 const stages = [
@@ -132,8 +133,30 @@ mustInclude(detailRoute, [
   "getOfficialEquipmentImageUrl(equipmentId)",
   "src={imageUrl}",
 ], "Detail route");
+
+const approvedListSortMarkers = [
+  'type EquipmentSortMode = "default" | "name" | "id";',
+  "const SORT_LABELS: Record<EquipmentSortMode, string> = {",
+  'return value === "default" || value === "name" || value === "id";',
+  "const records = data.records.filter((record) => {",
+  'if (uiState.sort === "name") {',
+  "return records.sort((left, right) => {",
+  'leftName.localeCompare(rightName, "ko", { numeric: true, sensitivity: "base" }) || left.equipmentId - right.equipmentId',
+  'if (uiState.sort === "id") {',
+  "return records.sort((left, right) => left.equipmentId - right.equipmentId);",
+  "return records;",
+];
+for (const [label, source] of [["general", generalRoute], ["exclusive", exclusiveRoute]]) {
+  mustInclude(source, approvedListSortMarkers, `${label} route approved presentation sorting`);
+  assert(
+    countOccurrences(source, ".sort(") === 2,
+    `${label} route must contain exactly the two approved presentation sort operations.`,
+  );
+  assert(!source.includes("data.records.sort("), `${label} route must not mutate loader records in place.`);
+}
+assert(!detailRoute.includes(".sort("), "detail route must not add frontend sorting.");
+
 for (const [label, source] of [["general", generalRoute], ["exclusive", exclusiveRoute], ["detail", detailRoute]]) {
-  assert(!source.includes(".sort("), `${label} route added frontend sorting.`);
   assert(!source.includes("ConfigData"), `${label} route must not read raw ConfigData.`);
   assert(!source.includes("SkillHero"), `${label} route must not rederive ownership.`);
 }
