@@ -1,0 +1,86 @@
+{
+  "stage": "Asset Intake Stage 4 - Repository Integration",
+  "status": "PASS_ASSET_INTAKE_STAGE4_REPOSITORY_INTEGRATION",
+  "completion": "COMPLETE",
+  "contractVersion": "asset-intake/v1",
+  "baseMainCommit": "f618238c6ec0ba9463e935240a4028f281f322a0",
+  "implementationScope": {
+    "repositoryCliInstalled": true,
+    "explicitNpmEntryInstalled": true,
+    "repositoryValidatorInstalled": true,
+    "projectDoctorD2V5MappingInstalled": true,
+    "projectDoctorD3V5CheckInstalled": true,
+    "projectDoctorD4V5ExecutionInstalled": true,
+    "projectDoctorD7V5GuardContractInstalled": true,
+    "projectDoctorCurrentPointersMovedToV5": true,
+    "devBuildHookInstalled": false,
+    "frontendChanged": false,
+    "assetBytesChanged": false,
+    "semanticRecomputationAdded": false,
+    "skinAssetOwnerPromoted": false
+  },
+  "repositoryEntries": {
+    "cli": "npm run asset:intake -- <scan|skin> ...",
+    "validator": "npm run asset:intake:validate",
+    "doctorOwningNode": "project-doctor",
+    "doctorChangeClass": "asset-intake-tooling",
+    "doctorCheckId": "asset-intake-self-test"
+  },
+  "preservedManualReviewNodes": [
+    "banner-assets",
+    "skin-assets"
+  ],
+  "repositoryValidator": {
+    "status": "PASS_ASSET_INTAKE_STAGE4_REPOSITORY_VALIDATION",
+    "checks": 16,
+    "passed": 16,
+    "failed": 0,
+    "hardErrors": 0,
+    "representativeRecords": 3,
+    "representativeLocators": 13,
+    "representativeEvidence": 13,
+    "syntheticRepositoryExecution": true,
+    "authoritativeProjectAssetClaim": false,
+    "resourceIdRequiresExplicitConfirmedMap": true,
+    "missingResourceMapFailsClosedToPending": true
+  },
+  "firstAdmissionEvidence": {
+    "pullRequest": 257,
+    "headSha": "08d33c62406563e9dafd27acba4d35919d5fca8a",
+    "projectDoctorPrGuardRunId": 33285465140,
+    "event": "pull_request",
+    "conclusion": "success",
+    "planStatus": "PLAN_READY",
+    "changedFileCount": 15,
+    "checksQueued": 5,
+    "checksRun": 5,
+    "selectedChecks": [
+      { "id": "asset-intake-self-test", "exitCode": 0 },
+      { "id": "production-build", "exitCode": 0 },
+      { "id": "doctor-health-gate", "exitCode": 0 },
+      { "id": "doctor-impact-self-test", "exitCode": 0 },
+      { "id": "doctor-plan-self-test", "exitCode": 0 }
+    ],
+    "manualReviewOrUnmappedBoundaryReached": false
+  },
+  "finalHeadPolicy": {
+    "checkpointCommitChangesPrHead": true,
+    "finalPrHeadMustRepeatProjectDoctorPrGuard": true,
+    "requiredConclusion": "success",
+    "requiredPlanStatus": "PLAN_READY",
+    "requiredManualReviews": [],
+    "requiredUnmappedPaths": [],
+    "requiredSelectedCheck": "asset-intake-self-test",
+    "requiredEverySelectedCheckExitCode": 0,
+    "evidenceLocation": "PR #257 Project Doctor PR Guard on final head"
+  },
+  "nextStage": "ASSET_INTAKE_STAGE5_OPERATIONAL_ROUTING",
+  "reopenConditions": [
+    "Asset Intake repository CLI or contract changes",
+    "Asset Intake tooling owning node/changeClass changes",
+    "Project Doctor V5 current runtime changes",
+    "asset-intake-self-test stops being selected or exits nonzero",
+    "Asset Intake tooling paths become unmapped/manual review",
+    "Skin asset owner is promoted under a separate explicit admission change"
+  ]
+}
