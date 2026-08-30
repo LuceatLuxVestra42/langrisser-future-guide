@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage5-banner-duplicate-review-summary/v1",
+  "stage": "ASSET_HYGIENE_5_1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "freezeState": "ASSET_HYGIENE_STAGE5_BANNER_DUPLICATE_REVIEW_FROZEN",
+  "targetGroupCount": 1,
+  "targetAssetCount": 2,
+  "exactByteEquality": true,
+  "currentReferenceCount": 0,
+  "currentBannerResolvedRelationCount": 0,
+  "sameImportBatch": true,
+  "semanticIdentityProven": false,
+  "roleEquivalenceProven": false,
+  "ownerEquivalenceProven": false,
+  "deleteEligible": false,
+  "deleteApproved": false,
+  "decision": "RETAIN_PENDING_ROLE_OR_OWNER_EQUIVALENCE_EVIDENCE",
+  "reviews": [
+    {
+      "code": "BANNER_DUPLICATE_ROLE_OR_OWNER_EQUIVALENCE_NOT_PROVEN",
+      "count": 1,
+      "blocking": false
+    }
+  ],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "forbiddenOperationCounts": {
+    "assetDelete": 0,
+    "assetMove": 0,
+    "assetRename": 0,
+    "consumerRewrite": 0,
+    "resolverRewrite": 0,
+    "semanticRelationRecomputation": 0,
+    "filenameRoleInference": 0,
+    "byteEqualityToSemanticIdentityInference": 0,
+    "sameImportBatchToRoleEquivalenceInference": 0,
+    "unreferencedToUnusedInference": 0
+  },
+  "nextStartPoint": "ASSET_HYGIENE_5_2_BANNER_UNREFERENCED_REVIEW"
+}
