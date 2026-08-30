@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage2-reference-sources/v1",
+  "stage": "ASSET_HYGIENE_2_SOURCE_FREEZE",
+  "status": "PASS_ASSET_HYGIENE_STAGE2_SOURCE_FREEZE",
+  "completion": "COMPLETE",
+  "referenceBaselineCommit": "f5e828e6f163dc70e0ead7a912acd5dcf6467bc2",
+  "physicalInventoryBaselineCommit": "73db96444d2016d044042630955486fd9b3d9036",
+  "inventoryRecordCount": 2188,
+  "assetDeltaGate": {
+    "status": "PASS_NO_TRACKED_IMAGE_ASSET_DELTA",
+    "changedImageAssetPathCount": 0,
+    "inventoryReuse": true,
+    "latestMainDeltaNote": "The final main advancement from 3f5ac26 to f5e828e changed only the authoritative Pages deployment workflow and did not modify tracked image assets or the Active Source Registry."
+  },
+  "activeSourceRegistry": {
+    "path": "data/generated/project-doctor-active-source-registry.v1.json",
+    "blob": "43d6c70ad87b45d27582da84c059dfac8b6998b7",
+    "status": "PASS_PROJECT_DOCTOR_ACTIVE_SOURCE_REGISTRY",
+    "completion": "COMPLETE",
+    "selectedDomainCount": 6
+  },
+  "domains": {
+    "hero": {
+      "selectedId": "hero-stage6-4-final",
+      "primaryStatusSource": "data/validation/hero-stage6-4-final.v1.json",
+      "facet": "canonical",
+      "supplementalSources": [
+        {
+          "path": "data/validation/hero-list-stage4.v1.json",
+          "role": "CURRENT_HERO_ROUTE_ASSET_PREFLIGHT",
+          "facet": "frontend"
+        },
+        {
+          "path": "data/validation/hero-list-stage5.v1.json",
+          "role": "CURRENT_HERO_DETAIL_FRONTEND_PROJECTION",
+          "facet": "frontend"
+        }
+      ],
+      "assetCollectorStatus": "PENDING_EXACT_PATH_COLLECTION"
+    },
+    "soldier": {
+      "selectedId": "soldier-stage6-7-site-admission",
+      "primaryStatusSource": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "facet": "canonical",
+      "registrySupplementalSources": [
+        {
+          "path": "data/validation/soldier-portrait-stage3j-frontend-full.v1.json",
+          "role": "CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE",
+          "facet": "asset",
+          "note": "Registry supplemental evidence names portrait manifest v8; AH-2 records it as current coverage evidence but uses the active frontend resolver chain to identify current source/delivery manifests."
+        },
+        {
+          "path": "data/validation/soldier-t3-provisional-name-presentation.v1.json",
+          "role": "CURRENT_PRESENTATION_REVIEW",
+          "facet": "localization"
+        }
+      ],
+      "currentExactAssetChain": {
+        "resolver": "src/lib/soldier-portrait-assets.ts",
+        "resolverBlob": "aa9ada213112545d6d81912f8da705f59ec66814",
+        "deliveryManifest": "data/generated/soldier-portrait-web-manifest.v1.json",
+        "deliveryManifestBlob": "4f790f40643e5f2d8be47db028acb2f9d5a2d213",
+        "deliveryRoot": "public/images/soldiers-webp",
+        "deliveryRecordCount": 224,
+        "sourceManifest": "data/generated/soldier-portrait-manifest.v9.json",
+        "sourceManifestBlob": "10037dfb97d73b1fd8e664bf19b94512bb9b8c21",
+        "sourceRoot": "public/images/soldiers",
+        "sourceRecordCount": 224,
+        "derivativeRelation": "LOSSLESS_WEBP_PIXEL_EXACT_FROM_CANONICAL_V9_PNG",
+        "decodedPixelExact": true,
+        "sourcePngPreserved": true,
+        "ah1RootCountParity": true
+      },
+      "fixtureStatus": "SOURCE_DERIVATIVE_RESOLVER_CHAIN_CONFIRMED"
+    },
+    "equipment": {
+      "selectedId": "equipment-public-presentation-correction-final",
+      "rootId": "equipment-stage4-final",
+      "primaryStatusSource": "data/validation/equipment-public-presentation-correction-final.v1.json",
+      "facet": "canonical",
+      "supplementalSources": [
+        {
+          "path": "data/presentation/equipment-public-admission-correction.v1.json",
+          "role": "CURRENT_EQUIPMENT_PUBLIC_ADMISSION_CORRECTION",
+          "facet": "admission"
+        },
+        {
+          "path": "data/presentation/equipment-display-collection.v1.json",
+          "role": "CURRENT_EQUIPMENT_DISPLAY_COLLECTION",
+          "facet": "presentation"
+        },
+        {
+          "path": "data/validation/equipment-p3-0-release-chronology-presentation-audit.v3.json",
+          "role": "CURRENT_EQUIPMENT_P3_CHRONOLOGY_AUDIT",
+          "facet": "presentation"
+        },
+        {
+          "path": "data/presentation/equipment-p3-1-release-metadata.v2.json",
+          "role": "CURRENT_EQUIPMENT_P3_CHRONOLOGY_CONTRACT",
+          "facet": "presentation"
+        }
+      ],
+      "assetCollectorStatus": "PENDING_EXACT_PATH_COLLECTION"
+    },
+    "hero-soldier": {
+      "selectedId": "hero-soldier-stageC-final",
+      "primaryStatusSource": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+      "facet": "relation",
+      "supplementalSources": [],
+      "assetCollectorStatus": "NO_SEPARATE_ASSET_OWNERSHIP_INFERRED"
+    },
+    "banner": {
+      "selectedId": "banner-stage3-8-regression-freeze",
+      "primaryStatusSource": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+      "facet": "canonical",
+      "assetRelationSource": "data/generated/banner-stage3-1-asset-relations.v1.json",
+      "assetRelationBlob": "515eed1b9c6545ff4d3330ff20d11d863b54389a",
+      "assetValidationSource": "data/validation/banner-stage3-1-asset-summary.v1.json",
+      "approvedRoots": [
+        "public/images/banners/Banner",
+        "public/images/banners/Picture_Notice"
+      ],
+      "repositoryAssetCount": 501,
+      "resolvedOccurrenceCount": 93,
+      "uniqueResolvedPathCount": 70,
+      "missingReferencedFileCount": 0,
+      "ambiguousReferencedFileCount": 0,
+      "exactLookupPolicy": "exact basename inside the root selected by occurrence.display.imageType",
+      "crossRootFallbackAllowed": false,
+      "filenameSimilarityAllowed": false,
+      "perceptualImageEquivalence": false,
+      "ah1RootCountParity": true,
+      "fixtureStatus": "ROOT_COUNT_AND_EXACT_PATH_RELATION_STRUCTURE_CONFIRMED"
+    },
+    "skin": {
+      "selectedId": "skin-stage3-2-readiness",
+      "primaryStatusSource": "data/validation/skin-stage3-2-readiness.v1.json",
+      "facet": "asset",
+      "supplementalSources": [
+        {
+          "path": "data/validation/skin-stage3-1-final.v1.json",
+          "role": "FROZEN_STAGE3_1_POPULATION_BASELINE",
+          "facet": "asset"
+        }
+      ],
+      "state": "READY_FOR_ASSET_EVIDENCE",
+      "evidencePresent": false,
+      "blocker": "ASSET_BYTES_OR_AUTHENTIC_RESOLUTION_EVIDENCE_NOT_AVAILABLE_IN_REPOSITORY",
+      "hygienePolicy": "Do not convert missing authoritative Skin bytes into UNVERIFIED_EXTERNAL, broken asset, or unreferenced-file conclusions. Preserve the upstream readiness state until authoritative evidence exists."
+    }
+  },
+  "fixtureChecks": {
+    "soldierSourceRootInventoryCount": 224,
+    "soldierSourceManifestCount": 224,
+    "soldierDeliveryRootInventoryCount": 224,
+    "soldierDeliveryManifestCount": 224,
+    "soldierRootCountParity": true,
+    "bannerRootInventoryCount": 501,
+    "bannerFrozenRepositoryCensusCount": 501,
+    "bannerRootCountParity": true,
+    "bannerExactPathStructureObserved": true
+  },
+  "forbiddenOperationCounts": {
+    "assetMutation": 0,
+    "frontendMutation": 0,
+    "externalFetch": 0,
+    "rawConfigDataRead": 0,
+    "semanticRecomputation": 0,
+    "classification": 0
+  },
+  "next": "ASSET_HYGIENE_2_REFERENCE_MAP_COLLECTION"
+}

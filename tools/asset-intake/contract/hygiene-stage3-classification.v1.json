@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage3-classification/v1",
+  "stage": "ASSET_HYGIENE_3",
+  "status": "DESIGN_FROZEN",
+  "predecessors": {
+    "inventory": "tools/asset-intake/hygiene/generated/asset-hygiene-inventory.v1.json",
+    "referenceMap": "tools/asset-intake/hygiene/generated/asset-hygiene-reference-map.v1.json",
+    "stage2Summary": "data/validation/asset-intake-hygiene-stage2-reference-crosscheck-summary.v1.json"
+  },
+  "population": {
+    "expectedRecordCount": 2188,
+    "classificationCoverageRequiredPercent": 100,
+    "unclassifiedAllowed": 0
+  },
+  "primaryClasses": [
+    "ACTIVE_VERIFIED",
+    "EVIDENCE_ONLY",
+    "GENERATED_DERIVATIVE",
+    "SUPERSEDED",
+    "UNREFERENCED",
+    "PROVENANCE_UNKNOWN"
+  ],
+  "classificationPriority": [
+    {
+      "primaryClass": "ACTIVE_VERIFIED",
+      "rule": "references contains ACTIVE_PRODUCTION_REF",
+      "note": "AH-2 only emits ACTIVE_PRODUCTION_REF from current verified/frozen resolver or consumer chains."
+    },
+    {
+      "primaryClass": "EVIDENCE_ONLY",
+      "rule": "no ACTIVE_PRODUCTION_REF and references contains SOURCE_EVIDENCE_REF or MANIFEST_REF"
+    },
+    {
+      "primaryClass": "GENERATED_DERIVATIVE",
+      "rule": "no active/evidence/manifest reference and references contains DERIVATIVE_REF"
+    },
+    {
+      "primaryClass": "SUPERSEDED",
+      "rule": "explicit superseded evidence exists",
+      "note": "v1 AH-2 current-reference map does not infer supersession from filenames or recency; absent explicit evidence this class remains unused."
+    },
+    {
+      "primaryClass": "UNREFERENCED",
+      "rule": "references array is empty"
+    },
+    {
+      "primaryClass": "PROVENANCE_UNKNOWN",
+      "rule": "references exist but none establish verified active/evidence/derivative provenance"
+    }
+  ],
+  "flags": [
+    "EXACT_DUPLICATE",
+    "BASENAME_COLLISION",
+    "RESOLVER_COLLISION",
+    "UNVERIFIED_EXTERNAL",
+    "REVIEW_REQUIRED"
+  ],
+  "flagRules": {
+    "EXACT_DUPLICATE": "AH-1 exactDuplicateGroup is non-null",
+    "BASENAME_COLLISION": "AH-1 basenameCollisionGroup is non-null; this is not resolver collision by itself",
+    "RESOLVER_COLLISION": "only explicit AH-2 resolver ambiguity may set this flag",
+    "UNVERIFIED_EXTERNAL": "only explicit external provenance without verified ingest may set this flag",
+    "REVIEW_REQUIRED": "PROVENANCE_UNKNOWN, UNREFERENCED, explicit resolver collision, unverified external, or exact duplicate candidate"
+  },
+  "traits": {
+    "activeProduction": "references contains ACTIVE_PRODUCTION_REF",
+    "explicitDerivative": "references contains DERIVATIVE_REF",
+    "currentFrontendReference": "references contains FRONTEND_REF",
+    "verifiedEvidence": "references contains SOURCE_EVIDENCE_REF or MANIFEST_REF or ACTIVE_PRODUCTION_REF or DERIVATIVE_REF"
+  },
+  "reviewPriorities": [
+    "P0_RESOLVER_COLLISION",
+    "P1_CURRENT_FRONTEND_PROVENANCE_UNKNOWN",
+    "P1_UNVERIFIED_EXTERNAL_PRODUCTION_REF",
+    "P2_SUPERSEDED_STILL_ACTIVE",
+    "P3_EXACT_DUPLICATE",
+    "P4_UNREFERENCED"
+  ],
+  "verifiedEvidenceIndex": {
+    "includePrimaryClasses": ["ACTIVE_VERIFIED", "EVIDENCE_ONLY", "GENERATED_DERIVATIVE"],
+    "canonicalIdentityPolicy": "Use only canonicalKey already present in AH-2 references. Never derive IDs from filenames or path arithmetic.",
+    "pathFallbackPolicy": "When a verified asset lacks an explicit canonicalKey, index it as REPOSITORY_PATH_ONLY without inventing semantic identity.",
+    "productionAdoption": false
+  },
+  "forbidden": {
+    "assetMutation": true,
+    "assetMove": true,
+    "assetDelete": true,
+    "assetRename": true,
+    "formatConversion": true,
+    "frontendMutation": true,
+    "productionConsumerRewrite": true,
+    "externalFetch": true,
+    "rawConfigDataRead": true,
+    "semanticRecomputation": true,
+    "canonicalRelationRecomputation": true,
+    "nameJoin": true,
+    "idArithmetic": true,
+    "filenameSupersedeInference": true,
+    "basenameCollisionToResolverCollisionInference": true
+  },
+  "outputs": {
+    "classification": "tools/asset-intake/hygiene/generated/asset-hygiene-classification.v1.json",
+    "reviewQueue": "tools/asset-intake/hygiene/generated/asset-hygiene-review-queue.v1.json",
+    "verifiedEvidenceIndex": "tools/asset-intake/hygiene/generated/asset-hygiene-verified-evidence-index.v1.json",
+    "summary": "data/validation/asset-intake-hygiene-stage3-classification-summary.v1.json",
+    "checkpoint": "docs/checkpoints/asset-intake-hygiene-stage3-classification.md"
+  },
+  "finalState": {
+    "status": "PASS_WITH_REVIEW",
+    "completion": "COMPLETE",
+    "freezeState": "ASSET_HYGIENE_BASELINE_FROZEN",
+    "stopAfterStage3": true
+  }
+}
