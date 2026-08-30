@@ -9,6 +9,7 @@ on:
       - 'data/contracts/project-tooling-status-source-r1.v1.json'
       - 'data/contracts/project-tooling-status-source-r1-2.v1.json'
       - 'data/contracts/project-tooling-status-source-r1-3.v1.json'
+      - 'data/contracts/project-tooling-status-source-r1-4.v1.json'
       - 'data/contracts/project-tooling-migration-r0.v1.json'
       - 'data/status-sources/**'
       - '.github/workflows/project-tooling-r1-status-source.yml'
@@ -40,6 +41,9 @@ jobs:
       - name: Run independent Status Source producer gate parity and delegation self-test
         run: node tools/status-source/test/producer-gate-parity.mjs
 
+      - name: Run independent Status Source artifact bridge parity and delegation self-test
+        run: node tools/status-source/test/artifact-bridge-parity.mjs
+
       - name: Print selected sources
         run: node tools/status-source/cli/select.mjs
 
@@ -56,3 +60,6 @@ jobs:
           --producer equipment-final
           --id equipment-public-presentation-correction-final
           --source data/validation/equipment-public-presentation-correction-final.v1.json
+
+      - name: Prove artifact bridge CLI delegates to check-only on the active Equipment pipeline
+        run: node tools/status-source/cli/bridge.mjs --pipeline equipment
