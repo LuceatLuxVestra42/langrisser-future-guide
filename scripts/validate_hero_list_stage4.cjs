@@ -20,6 +20,7 @@ const server = readText('src/lib/hero-list.server.ts');
 const functions = readText('src/lib/hero-list.functions.ts');
 const listRoute = readText('src/routes/heroes.tsx');
 const detailRoute = readText('src/routes/heroes_.$heroId.tsx');
+const routeTree = readText('src/routeTree.gen.ts');
 
 const failures = [];
 const checks = [];
@@ -88,8 +89,14 @@ check(
 );
 check(
   'detail-route-shell',
-  detailRoute.includes('createFileRoute("/heroes/$heroId")') && detailRoute.includes('getHeroDetailRouteStage5Data') && detailRoute.includes('notFound') && detailRoute.includes('Stage 6') && detailRoute.includes('webAssetPath'),
-  '267-Hero detail route shell consumes current Stage 5 projection with Stage 4 artwork resolver',
+  detailRoute.includes('createFileRoute("/heroes_/$heroId")') &&
+    routeTree.includes("id: '/heroes_/$heroId'") &&
+    routeTree.includes("path: '/heroes/$heroId'") &&
+    detailRoute.includes('getHeroDetailRouteStage5Data') &&
+    detailRoute.includes('notFound') &&
+    detailRoute.includes('Stage 6') &&
+    detailRoute.includes('webAssetPath'),
+  '267-Hero detail route shell keeps the current non-nested route ID while exposing /heroes/$heroId and consuming the Stage 5 projection with Stage 4 artwork resolver',
 );
 
 const result = {
