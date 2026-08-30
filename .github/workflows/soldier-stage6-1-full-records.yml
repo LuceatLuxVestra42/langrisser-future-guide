@@ -68,8 +68,32 @@ jobs:
             data/generated/soldier-stage6-1-full-records.v1.json
             data/validation/soldier-stage6-1-full-records.v1.json
 
-      - name: Verify frozen artifacts on main or PR
-        run: git diff --exit-code -- data/generated/soldier-stage6-1-full-records.v1.json data/validation/soldier-stage6-1-full-records.v1.json
+      - name: Verify frozen Stage 6-1 content on main or PR
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const { execFileSync } = require('node:child_process');
+
+          const paths = [
+            'data/generated/soldier-stage6-1-full-records.v1.json',
+            'data/validation/soldier-stage6-1-full-records.v1.json',
+          ];
+
+          let failed = false;
+          for (const path of paths) {
+            const regenerated = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const committed = JSON.parse(execFileSync('git', ['show', `HEAD:${path}`], { encoding: 'utf8' }));
+            delete regenerated.generatedAt;
+            delete committed.generatedAt;
+            if (JSON.stringify(regenerated) !== JSON.stringify(committed)) {
+              console.error(`${path} differs from the committed frozen content beyond generatedAt.`);
+              failed = true;
+            }
+          }
+          if (failed) process.exit(1);
+          console.log('Soldier Stage 6-1 frozen content matches after excluding generatedAt metadata.');
+          NODE
 
   explicit-producer:
     if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
