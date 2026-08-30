@@ -14,22 +14,33 @@ on:
       - 'src/routes/equipment_.$equipmentId.tsx'
       - 'scripts/validate-equipment-image-stage3-hosted.mjs'
       - 'data/validation/equipment-image-stage3-frontend-summary.v1.json'
+      - 'data/validation/equipment-image-stage3-hosted-qa-summary.v1.json'
+      - 'data/checkpoints/equipment-image-stage3-final.v1.json'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/equipment-image-stage3-hosted-qa.yml'
+      - 'scripts/validate-equipment-image-stage3-hosted.mjs'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: equipment-image-stage3-hosted-qa
+  group: equipment-image-stage3-hosted-qa-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   hosted-qa:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -40,14 +51,32 @@ jobs:
           HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
         run: node scripts/validate-equipment-image-stage3-hosted.mjs
 
-      - name: Persist final Stage 3 hosted QA freeze
+      - name: Report downstream Browser/UI freshness
+        shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/validation/equipment-image-stage3-hosted-qa-summary.v1.json data/checkpoints/equipment-image-stage3-final.v1.json
-          if git diff --cached --quiet; then
-            echo "No Equipment Image Stage 3 hosted QA checkpoint changes"
-            exit 0
-          fi
-          git commit -m "Freeze Equipment Image Stage 3 hosted QA [skip ci]"
-          git push
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const summary = JSON.parse(fs.readFileSync('data/validation/equipment-image-stage3-hosted-qa-summary.v1.json', 'utf8'));
+          if (summary.status !== 'PASS_EQUIPMENT_IMAGE_STAGE3_HOSTED_QA') {
+            throw new Error(`Hosted QA status is not PASS: ${summary.status}`);
+          }
+          if (summary.gates?.preflight !== 'PASS' || summary.gates?.build !== 'PASS' || summary.gates?.deploymentHosted !== 'PASS') {
+            throw new Error(`Hosted-owned gate is not PASS: ${JSON.stringify(summary.gates)}`);
+          }
+          if (summary.semanticStageReopened !== false) {
+            throw new Error('Hosted QA unexpectedly reopened the semantic stage.');
+          }
+          console.log(`Hosted QA PASS; Browser/UI freshness=${summary.browserUiFreshness?.status ?? 'UNKNOWN'}`);
+          if (summary.browserUiFreshness?.status !== 'PASS_FRESH_BROWSER_UI_EVIDENCE') {
+            console.log('Browser/UI evidence requires revalidation in the Browser/UI owning layer; Hosted QA remains PASS.');
+          }
+          NODE
+
+      - name: Prove routine Hosted QA is repository read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git checkout -- data/validation/equipment-image-stage3-hosted-qa-summary.v1.json data/checkpoints/equipment-image-stage3-final.v1.json
+          git diff --exit-code -- .
+          echo 'Hosted QA completed without repository persistence.'
