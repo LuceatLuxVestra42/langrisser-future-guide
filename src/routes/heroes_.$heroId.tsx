@@ -21,7 +21,7 @@ import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 
-export const Route = createFileRoute("/heroes/$heroId")({
+export const Route = createFileRoute("/heroes_/$heroId")({
   loader: async ({ params }) => {
     if (!/^\d+$/.test(params.heroId)) throw notFound();
     const heroId = Number(params.heroId);
@@ -304,6 +304,8 @@ function HeroDetailPage() {
           </div>
         </section>
 
+        <HeroSpSection sp={detail.sp} />
+
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle icon={<Database className="h-4 w-4" aria-hidden="true" />} title="상세 데이터 상태" />
           <p className="mt-3 text-sm leading-6 text-muted-foreground">Hero 본문은 FINAL_FROZEN Stage 6 개별 shard 하나만 읽고, 전용장비는 별도 frozen B-5 byHero 소유권과 Equipment Stage 3-5 메타데이터를 조합해. 용병 카드는 Stage 6의 확정 Soldier ID를 기존 frozen Soldier frontend consumer에 ID lookup만 하고, 원본 ConfigData 관계 재계산이나 이름·ID 추론은 하지 않아.</p>
@@ -315,6 +317,22 @@ function HeroDetailPage() {
     </main>
   );
 }
+
+type HeroSpView = {
+  status: string | null;
+  released: boolean;
+  job: { jobConnectionId: number | null; jobId: number | null; nameCn: string | null } | null;
+  missions: {
+    firstStage: Array<{ missionId: number | null; stage: string | null; titleCn: string | null; descCn: string | null; missionType: number | null; conditionKind: string | null; materials: Array<{ goodsType: number | null; sourceId: number | null; count: number | null }> }>;
+    secondStage: Array<{ missionId: number | null; stage: string | null; titleCn: string | null; descCn: string | null; missionType: number | null; conditionKind: string | null; materials: Array<{ goodsType: number | null; sourceId: number | null; count: number | null }> }>;
+    totalCount: number;
+  };
+  secondStageRewards: {
+    buff: { buffId: number | null; nameCn: string | null; descCn: string | null } | null;
+    skills: Array<{ skillId: number | null; nameCn: string | null; descCn: string | null }>;
+    soldiers: Array<{ soldierId: number | null; nameKr: string | null; nameCn: string | null }>;
+  };
+};
 
 type SkillView = { skillId: number; nameCn: string | null; desc: string | null; iconPath: string | null; displayType: string | null; cooldown: string | null; range: string | null; areaOrTarget: string | null };
 type HeroSoldierCardView = { soldierId: number; nameKr: string | null; nameCn: string; nameKrStatus: string; tier: number; armyType: string; isSp: boolean };
@@ -380,6 +398,99 @@ function HeroSoldierCard({ record }: { record: HeroSoldierCardView }) {
         <span className="line-clamp-2 text-[11px] font-bold leading-tight text-white sm:text-xs">{displayName}</span>
       </div>
     </Link>
+  );
+}
+
+function HeroSpSection({ sp }: { sp: HeroSpView }) {
+  if (!sp.released) return null;
+  const groups = [
+    { key: "first", title: "SP 1부", rows: sp.missions.firstStage },
+    { key: "second", title: "SP 2부", rows: sp.missions.secondStage },
+  ] as const;
+
+  return (
+    <section data-hero-sp-detail="true" className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <SectionTitle icon={<Sparkles className="h-4 w-4" aria-hidden="true" />} title="SP 전직" />
+          <p className="mt-2 text-sm text-muted-foreground">Stage 6 frozen SP 블록의 전직, 미션, 2단계 보상을 그대로 표시해. MissionType이나 Goods ID 의미를 새로 추론하지 않아.</p>
+        </div>
+        <div className="flex flex-wrap gap-2 text-xs">
+          <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">미션 {sp.missions.totalCount}개</span>
+          {sp.job?.nameCn ? <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">{sp.job.nameCn}</span> : null}
+        </div>
+      </div>
+
+      {sp.job ? (
+        <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4">
+          <p className="text-[11px] font-bold text-muted-foreground">SP 직업</p>
+          <p className="mt-1 font-bold text-foreground">{sp.job.nameCn ?? ("Job " + (sp.job.jobId ?? "?"))}</p>
+          <p className="mt-1 text-xs text-muted-foreground">Job #{sp.job.jobId ?? "-"} · Connection #{sp.job.jobConnectionId ?? "-"}</p>
+        </div>
+      ) : null}
+
+      <div className="mt-5 grid gap-4 xl:grid-cols-2">
+        {groups.map((group) => (
+          <div key={group.key} className="rounded-2xl border border-border bg-muted/10 p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="font-bold text-foreground">{group.title}</h3>
+              <span className="text-xs font-semibold text-muted-foreground">{group.rows.length}개</span>
+            </div>
+            <div className="mt-3 space-y-2">
+              {group.rows.map((mission, index) => (
+                <article key={group.key + "-" + (mission.missionId ?? index)} className="rounded-xl border border-border bg-background p-3.5">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{index + 1}단계</p>
+                      <h4 className="mt-1 text-sm font-bold text-foreground">{mission.titleCn ?? ("Mission " + (mission.missionId ?? "?"))}</h4>
+                    </div>
+                    {mission.missionId != null ? <span className="rounded-md bg-muted px-2 py-1 text-[10px] font-bold text-muted-foreground">#{mission.missionId}</span> : null}
+                  </div>
+                  {mission.descCn ? <p className="mt-2 whitespace-pre-line text-xs leading-5 text-muted-foreground">{stripConfigMarkup(mission.descCn)}</p> : null}
+                  {mission.materials.length > 0 ? (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {mission.materials.map((material, materialIndex) => (
+                        <span key={(mission.missionId ?? index) + "-material-" + materialIndex} className="rounded-md border border-border bg-muted/30 px-2 py-1 text-[10px] font-semibold text-muted-foreground">
+                          GoodsType {material.goodsType ?? "?"}{material.sourceId != null ? " / ID " + material.sourceId : ""} ×{material.count ?? "?"}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-border bg-muted/10 p-4 sm:p-5">
+        <h3 className="font-bold text-foreground">SP 2부 보상</h3>
+        <div className="mt-3 grid gap-3 lg:grid-cols-2">
+          {sp.secondStageRewards.buff ? (
+            <article className="rounded-xl border border-border bg-background p-4">
+              <p className="text-[11px] font-bold text-muted-foreground">보상 버프</p>
+              <p className="mt-1 font-bold text-foreground">{sp.secondStageRewards.buff.nameCn ?? ("Buff " + (sp.secondStageRewards.buff.buffId ?? "?"))}</p>
+              {sp.secondStageRewards.buff.descCn ? <p className="mt-2 text-sm leading-6 text-muted-foreground">{stripConfigMarkup(sp.secondStageRewards.buff.descCn)}</p> : null}
+            </article>
+          ) : null}
+          {sp.secondStageRewards.skills.map((skill, index) => (
+            <article key={"sp-reward-skill-" + (skill.skillId ?? index)} className="rounded-xl border border-border bg-background p-4">
+              <p className="text-[11px] font-bold text-muted-foreground">보상 스킬</p>
+              <p className="mt-1 font-bold text-foreground">{skill.nameCn ?? ("Skill " + (skill.skillId ?? "?"))}</p>
+              {skill.descCn ? <p className="mt-2 text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.descCn)}</p> : null}
+            </article>
+          ))}
+        </div>
+        {sp.secondStageRewards.soldiers.length > 0 ? (
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <span className="font-bold text-muted-foreground">추가 용병</span>
+            {sp.secondStageRewards.soldiers.map((soldier, index) => (
+              <span key={"sp-reward-soldier-" + (soldier.soldierId ?? index)} className="rounded-md bg-background px-2 py-1 font-semibold text-foreground">{soldier.nameKr ?? soldier.nameCn ?? ("Soldier " + (soldier.soldierId ?? "?"))}</span>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </section>
   );
 }
 

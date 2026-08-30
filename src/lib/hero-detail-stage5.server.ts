@@ -115,6 +115,52 @@ type FeatureBlock = {
   status?: string | null;
 } | null | undefined;
 
+type Stage6SpMission = {
+  id?: number;
+  stage?: string | null;
+  titleCn?: string | null;
+  descCn?: string | null;
+  missionType?: number | null;
+  condition?: {
+    kind?: string | null;
+    items?: Array<{
+      GoodsType?: number;
+      Id?: number;
+      Count?: number;
+    }> | null;
+  } | null;
+};
+
+type Stage6Sp = {
+  status?: string | null;
+  job?: {
+    jobConnectionId?: number | null;
+    jobId?: number | null;
+    nameCn?: string | null;
+  } | null;
+  missions?: {
+    firstStage?: Stage6SpMission[] | null;
+    secondStage?: Stage6SpMission[] | null;
+  } | null;
+  secondStageRewards?: {
+    buff?: {
+      buffId?: number | null;
+      nameCn?: string | null;
+      descCn?: string | null;
+    } | null;
+    skills?: Array<{
+      skillId?: number | null;
+      nameCn?: string | null;
+      descCn?: string | null;
+    }> | null;
+    soldiers?: Array<{
+      soldierId?: number | null;
+      nameKr?: string | null;
+      nameCn?: string | null;
+    }> | null;
+  } | null;
+} | null | undefined;
+
 type Stage6CentralDiscipline = {
   status?: string | null;
   skillId?: number | null;
@@ -163,7 +209,7 @@ type Stage6HeroShard = {
   exclusiveEquipment?: FeatureBlock;
   centralDiscipline?: Stage6CentralDiscipline;
   soldiers?: { ids?: number[] } | null;
-  sp?: FeatureBlock;
+  sp?: Stage6Sp;
   validation?: {
     structuralStatus?: string | null;
     publicationStatus?: string | null;
@@ -323,6 +369,69 @@ function projectCentralDiscipline(centralDiscipline: Stage6CentralDiscipline) {
   };
 }
 
+function projectSp(sp: Stage6Sp) {
+  const projectMission = (mission: Stage6SpMission) => ({
+    missionId: Number.isInteger(mission.id) ? Number(mission.id) : null,
+    stage: mission.stage ?? null,
+    titleCn: mission.titleCn ?? null,
+    descCn: mission.descCn ?? null,
+    missionType: Number.isInteger(mission.missionType) ? Number(mission.missionType) : null,
+    conditionKind: mission.condition?.kind ?? null,
+    materials: Array.isArray(mission.condition?.items)
+      ? mission.condition.items.map((item) => ({
+          goodsType: Number.isInteger(item.GoodsType) ? Number(item.GoodsType) : null,
+          sourceId: Number.isInteger(item.Id) ? Number(item.Id) : null,
+          count: Number.isInteger(item.Count) ? Number(item.Count) : null,
+        }))
+      : [],
+  });
+  const firstStage = Array.isArray(sp?.missions?.firstStage) ? sp.missions.firstStage.map(projectMission) : [];
+  const secondStage = Array.isArray(sp?.missions?.secondStage) ? sp.missions.secondStage.map(projectMission) : [];
+  const rewardSkills = Array.isArray(sp?.secondStageRewards?.skills)
+    ? sp.secondStageRewards.skills.map((skill) => ({
+        skillId: Number.isInteger(skill.skillId) ? Number(skill.skillId) : null,
+        nameCn: skill.nameCn ?? null,
+        descCn: skill.descCn ?? null,
+      }))
+    : [];
+  const rewardSoldiers = Array.isArray(sp?.secondStageRewards?.soldiers)
+    ? sp.secondStageRewards.soldiers.map((soldier) => ({
+        soldierId: Number.isInteger(soldier.soldierId) ? Number(soldier.soldierId) : null,
+        nameKr: soldier.nameKr ?? null,
+        nameCn: soldier.nameCn ?? null,
+      }))
+    : [];
+  const buff = sp?.secondStageRewards?.buff;
+
+  return {
+    status: sp?.status ?? null,
+    released: isReleased(sp),
+    job: sp?.job
+      ? {
+          jobConnectionId: Number.isInteger(sp.job.jobConnectionId) ? Number(sp.job.jobConnectionId) : null,
+          jobId: Number.isInteger(sp.job.jobId) ? Number(sp.job.jobId) : null,
+          nameCn: sp.job.nameCn ?? null,
+        }
+      : null,
+    missions: {
+      firstStage,
+      secondStage,
+      totalCount: firstStage.length + secondStage.length,
+    },
+    secondStageRewards: {
+      buff: buff
+        ? {
+            buffId: Number.isInteger(buff.buffId) ? Number(buff.buffId) : null,
+            nameCn: buff.nameCn ?? null,
+            descCn: buff.descCn ?? null,
+          }
+        : null,
+      skills: rewardSkills,
+      soldiers: rewardSoldiers,
+    },
+  };
+}
+
 function projectStage6Shard(shard: Stage6HeroShard) {
   const validation = shard.validation;
   if (!validation || validation.structuralStatus !== "PASS" || validation.siteUsable !== true) {
@@ -334,6 +443,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
   const connections = Array.isArray(jobTree?.connections) ? jobTree.connections : [];
   const bonds = projectBonds(shard.bonds);
   const centralDiscipline = projectCentralDiscipline(shard.centralDiscipline);
+  const sp = projectSp(shard.sp);
   const soldierIds = Array.isArray(shard.soldiers?.ids) ? shard.soldiers.ids : [];
   const skins = Array.isArray(shard.presentation?.skins) ? shard.presentation.skins : [];
   const reviewCodes = Array.isArray(validation.reviewCodes) ? validation.reviewCodes : [];
@@ -415,6 +525,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
       rows: bonds,
     },
     centralDiscipline,
+    sp,
     soldiers: { count: soldierIds.length, ids: soldierIds },
     systems: {
       bondRowCount: bonds.length,
@@ -422,8 +533,8 @@ function projectStage6Shard(shard: Stage6HeroShard) {
       exclusiveEquipmentReleased: isReleased(shard.exclusiveEquipment),
       centralDisciplineStatus: centralDiscipline.status,
       centralDisciplineReleased: centralDiscipline.released,
-      spStatus: shard.sp?.status ?? null,
-      spReleased: isReleased(shard.sp),
+      spStatus: sp.status,
+      spReleased: sp.released,
     },
     validation: {
       structuralStatus: validation.structuralStatus,
