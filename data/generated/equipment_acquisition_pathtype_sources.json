@@ -88,9 +88,29 @@
       "firstSnippet": "et(resourceId); if (!r) { errors.push({ heroId, type: 'MISSING_SKIN_RESOURCE', skinId, resourceId }); return null; } const typeCode = Number.isInteger(s.GetPathType) ? s.GetPathType : null; const labels = typeCode === null ? null : acquisitionLabels[typeCode]; if (typeCode !== null && !labels) errors.push({ heroId, type: 'UNKNOWN_GET_PATH_TYPE', skinId, typeCode }); return { skinId, order: index + 1, nameCn: typeof s.Name === 'string' ? s.Name : null, nameKr: null, sourceImagePath: typeof r.Image === 'string'"
     },
     {
+      "file": "scripts/build_hero_stage5_2_exclusive_central.cjs",
+      "size": 13269,
+      "firstSnippet": "q.equipmentType ?? null, effectSkillIds: Array.isArray(ex.raw.SkillIds) ? ex.raw.SkillIds.map(Number) : [], acquisitionClass: ex.acq.acquisitionClass, acquisitionPathTypes: Array.isArray(ex.raw.GetPathList) ? ex.raw.GetPathList.map(x => Number(x.PathType)).filter(Number.isFinite) : [] } : { status: 'NOT_RELEASED', equipmentId: null, ownerHeroId: heroId }, centralDiscipline: centralSkillId ? { status: centralSkill ? 'RELEASED' : 'BROKEN_REF', skillId: centralSkillId, nameCn: centralSkill?.Name ?? null, d"
+    },
+    {
+      "file": "scripts/build_hero_stage6_1_detail.cjs",
+      "size": 18296,
+      "firstSnippet": "ocking presentation REVIEW from Stage 5-3.`); if (skinUnencodedCount) inheritedReviews.push(`${skinUnencodedCount} regular skins remain UNENCODED for acquisition because source GetPathType is omitted.`); const records = []; let locatorMismatchCount = 0; for (const hero of heroes) { const heroId = Number(hero.heroId); const sourceIndexes = { normal: i4.indexById.get(heroId), bonds: i51.indexById.get(heroId), exclusiveCentral: i52.indexById.get(heroId), sp: i54.indexById.get(heroId), header: i55.indexById.get(heroId), }; const resolvers = [ [i"
+    },
+    {
       "file": "scripts/derive-equipment-stage2-7-candidates.mjs",
       "size": 2027,
       "firstSnippet": "r=>ids.has(Number(r.ID))); const pathKey=r=>JSON.stringify(r.GetPathList??null); const isSecret=r=>Array.isArray(r.GetPathList)&&r.GetPathList.length===1&&Number(r.GetPathList[0]?.PathType)===46; const isSoul=r=>!r.GetPathList && /^魂·/.test(String(r.Name??'')); const generic=rows.filter(r=>!isSecret(r)&&!isSoul(r)); const byPath={}; for(const r of rows){const k=pathKey(r);byPath[k]=(byPath[k]??0)+1;} const compact=r=>({id:Number(r.ID),name:r.Name??null,slot:r.EquipmentType==null?0:Number(r.EquipmentType),label:r.Label??null,sortIndex:r.SortIndex??null,paths:r.GetPathList??n"
+    },
+    {
+      "file": "scripts/finalize-equipment-stage2-7-acquisition.mjs",
+      "size": 7184,
+      "firstSnippet": " contract.semanticDecisions.id2013.confidencePercent; classificationBasis = 'empty-GetPathList-no-global-meaning-inferred'; } else if (paths.length === 1 && Number(paths[0]?.PathType) === 46) { acquisitionClass = 'exclusive-equipment'; confidencePercent = contract.semanticDecisions.pathType46.confidencePercent; classificationBasis = 'PathType46-only-and-exclusive-sheet-sentinel-match'; } else if (paths.length === 0 && /^魂·/.test(String(row.Name ?? ''))) { acquisitionClass = 'soul-special'; confidencePercent = contract.semanticDecisions.emptyPathS"
+    },
+    {
+      "file": "scripts/finalize-equipment-stage3-5-exclusive-consumer.mjs",
+      "size": 7688,
+      "firstSnippet": "; assert(paths.length === contract.admission.requiredAcquisitionEvidence.getPathListCount, `exclusive equipment ${id} path count ${paths.length}`); assert(Number(paths[0]?.PathType) === contract.admission.requiredAcquisitionEvidence.pathType, `exclusive equipment ${id} PathType ${paths[0]?.PathType}`); assert(a.classificationBasis === contract.admission.requiredAcquisitionEvidence.classificationBasis, `exclusive equipment ${id} classificationBasis ${a.classificationBasis}`); assert(d.iconStatus === 'VERIFIED_DIRECT' && typeof d.icon === 'string' && d.ic"
     },
     {
       "file": "scripts/focus-equipment-stage2-7.mjs",
@@ -118,6 +138,16 @@
       "firstSnippet": "ule:ts.acquisition.missingRule, validation:ts.validation }; c.unresolvedSemanticFields=[]; c.dataCompletionIssues=[{ field:'skins.acquisition', issue:'ConfigDataHeroSkinInfo.GetPathType omitted', canonicalSkinCount:ts.acquisition.unencodedSkinCount, policy:'Keep null/UNENCODED unless a separately verified supplemental acquisition dictionary is supplied.' }]; c.readyForDisplayEnrichment=true; c.nextAction='Integrate the confirmed Stage 5-5-2 mappings. Build a supplemental acquisition-history dictionary only if exact acquisition text is required for the 176 skins with om"
     },
     {
+      "file": "scripts/validate-equipment-stage2-7-acquisition.mjs",
+      "size": 5140,
+      "firstSnippet": "ontract.canonicalExpectations.unresolvedNoPathIds.length, 'unresolved no-path count mismatch'); check(countClass('exclusive-equipment') === contract.canonicalExpectations.exclusivePathType46Count, 'exclusive count mismatch'); check(countClass('soul-special') === contract.canonicalExpectations.soulNoPathCount, 'soul count mismatch'); const launch = records.filter(r => r.acquisitionClass === 'launch'); check(Math.max(...launch.map(r => r.equipmentId)) === contract.launch.derivedCanonicalBoundary.maxEquipmentId, 'launch boundary mismatch'); for (const sourceSheet of contract."
+    },
+    {
+      "file": "scripts/validate-equipment-stage3-5-exclusive-consumer.mjs",
+      "size": 10523,
+      "firstSnippet": "w?.getPathList) ? a.raw.getPathList : []; assert(paths.length === contract.admission.requiredAcquisitionEvidence.getPathListCount, `path count ${id}`); assert(Number(paths[0]?.PathType) === contract.admission.requiredAcquisitionEvidence.pathType, `PathType ${id}`); assert(a.classificationBasis === contract.admission.requiredAcquisitionEvidence.classificationBasis, `classificationBasis ${id}`); pathType46Verified++; for (const field of requiredListFields) assert(Object.prototype.hasOwnProperty.call(l, field), `list ${id} missing ${field}`); const expectedNameKr"
+    },
+    {
       "file": "scripts/validate_hero_page_stage5_5_2.cjs",
       "size": 14126,
       "firstSnippet": "alizedEmptyHeroIds = []; const skinNoRefsHeroIds = []; const unresolvedSkinRefs = []; const specifiedHeroMismatches = []; const duplicateSkinRecordIds = []; const skinGetPathTypeMissingIds = new Set(); const skinImagePointerMissingIds = new Set(); const referencedSkinOwners = new Map(); let originPointerValues = 0; let artworkPointerHeroes = 0; let totalSkinRefs = 0; let resolvedSkinRefs = 0; for (const [skinId, rows] of skinById.entries()) if (rows.length > 1) duplicateSkinRecordIds.push(skinId); for (const row of canonicalHeroInfoRows) { co"
@@ -134,8 +164,28 @@
     },
     {
       "file": "scripts/validate_hero_stage5_integration.cjs",
-      "size": 10019,
+      "size": 12854,
       "firstSnippet": "pending/missing Korean display names.', blockingStage5Integration: false, }, { owner: '5-5 presentation metadata', issue: '176 regular skins have source-omitted GetPathType and remain UNENCODED by policy.', blockingStage5Integration: false, }, { owner: '5-5 localization', issue: 'CV/faction/origin/skin Korean localization may be layered later without reopening source semantics.', blockingStage5Integration: false, }, { owner: 'asset pipeline', issue: 'Source asset paths still require extraction/web-delivery conversion outside S"
+    },
+    {
+      "file": "data/contracts/equipment-stage2-7-acquisition-reference.v1.json",
+      "size": 3371,
+      "firstSnippet": ": 207, \"launchCount\": 94, \"legacyAdditionalCount\": 80, \"postLegacyRemainderCount\": 33, \"currentStandardCount\": 32, \"unresolvedNoPathIds\": [2013], \"exclusivePathType46Count\": 167, \"soulNoPathCount\": 16 }, \"semanticDecisions\": { \"pathType46\": { \"class\": \"exclusive-equipment\", \"confidencePercent\": 99, \"basis\": \"The PathType 46-only population aligns with the separate exclusive-equipment population; sentinel rows beginning with IDs 273-277 match the opening rows of the legacy 전용장비 sheet.\" }, \"emptyPathSoulPrefix\": { "
+    },
+    {
+      "file": "data/contracts/equipment-stage3-5-exclusive-consumer.v1.json",
+      "size": 3947,
+      "firstSnippet": "ve-equipment\", \"expectedTotal\": 167, \"siteTab\": null, \"requiredAcquisitionEvidence\": { \"getPathListCount\": 1, \"pathType\": 46, \"classificationBasis\": \"PathType46-only-and-exclusive-sheet-sentinel-match\" } }, \"listPolicy\": { \"schema\": \"equipment-stage3-1-page-schema.v1.json#listRecord\", \"nameKr\": \"Copy only Stage 3-2 VERIFIED_REFERENCE_MATCH nameKr. REVIEW candidates must not leak; unresolved nameKr stays null.\", \"icon\": \"Must copy Stage 3-2 VERIFIED_DIRECT icon for all 167 records.\", \"effect\": \"Copy Stage 2-5 effectName/e"
+    },
+    {
+      "file": "data/contracts/hero-exclusive-equipment-relation-fixture-contract.v1.json",
+      "size": 7144,
+      "firstSnippet": " }, \"equipment\": { \"equipmentId\": 404, \"nameCn\": \"■■■■\", \"equipmentType\": 0, \"acquisitionClass\": \"exclusive-equipment\", \"acquisitionPathTypes\": [46] }, \"ownership\": { \"ownerHeroId\": 4, \"ownerResolver\": \"ConfigDataEquipmentInfo.SkillHero\", \"expectedPair\": [4, 404] }, \"diagnosticCorroboration\": { \"ownerNamePresentInDescription\": true, \"productionAuthority\": false }, \"expectedStatus\": \"VERIFIED\" }, { \"fixtureId\": \"armor-leon-416\", \"her"
+    },
+    {
+      "file": "data/contracts/hero-exclusive-equipment-relation-source-contract.v1.json",
+      "size": 6568,
+      "firstSnippet": " \"EXCLUSIVE_POPULATION_PATH46\": { \"class\": \"SUPPORT_ONLY\", \"productionEdgeAllowed\": false, \"source\": \"Equipment acquisition / GetPathList\", \"meaning\": \"PathType 46 supports identification of the frozen exclusive-equipment population.\", \"boundary\": \"PathType 46 does not identify an owner Hero and must never create a Hero-Equipment ownership edge.\" }, \"MISSION_TYPE_77\": { \"class\": \"CROSS_VALIDATION_ONLY\", \"productionEdgeAllowed\": false, \"source\": \"ConfigDataMissionInfo\", \"meaning\": \"For verified SP-Hero fixture"
     },
     {
       "file": "data/contracts/hero-page-stage5-5-3-output-contract.v1.json",
@@ -143,9 +193,49 @@
       "firstSnippet": "DataCharImageSkinResourceInfo.SpineAssetPath\", \"acquisition\": { \"state\": \"enum ENCODED|UNENCODED\", \"typeCode\": \"integer|null; ConfigDataHeroSkinInfo.GetPathType\", \"labelCn\": \"string|null; 2=光之回响, 3=命运星织, 4=英雄皮肤商店\", \"labelKr\": \"string|null; 2=광휘의 메아리, 3=운명의 별짜기, 4=영웅 스킨 상점\" } } ] }, \"originCategoryRule\": { \"ORIGINAL\": { \"productionIds\": [4, 5, 6, 7, 8, 9, 25, 30], \"meaning\": \"Langrisser I-V, Reincarnation, Millennium WS, Millennium DC\" }, \"MOBILE_ORIGINAL\": { \"productionIds\": "
     },
     {
+      "file": "data/contracts/hero-stage6-1-detail-integration.v1.json",
+      "size": 6389,
+      "firstSnippet": "ership from ConfigData\", \"Recalculate Hero-exclusive Equipment ownership in Stage 6-1\", \"Infer exclusive Equipment ownership from names, descriptions, icons, restrictions, PathType, IDs, or release order\", \"Recompute Stage 4 stat/talent/job/skill formulas\", \"Re-resolve Stage 5 bond or SP Mission semantics\", \"Invent Korean localization, acquisition metadata, release dates, or asset delivery paths\" ], \"hardValidationRules\": [ \"Hero Stage 5 integration checkpoint must be PASS / STAGE_5_COMPLETE with zero blockers and zero hard errors\", \"Hero mas"
+    },
+    {
+      "file": "data/contracts/skin-stage1-acquisition-policy.v1.json",
+      "size": 2017,
+      "firstSnippet": "{ \"version\": 1, \"stage\": \"skin-page-1\", \"substage\": \"1-4\", \"checkpoint\": \"acquisition-policy\", \"status\": \"ACCEPTED\", \"authoritativeField\": \"ConfigDataHeroSkinInfo.GetPathType\", \"states\": { \"ENCODED\": \"GetPathType is explicitly present and is one of the accepted canonical codes 2, 3 or 4.\", \"UNENCODED\": \"GetPathType is omitted. This is a source-data gap and must not be replaced by inference.\" }, \"encodedMappings\": { \"2\": {\"labelCn\": \"光之回响\", \"labelKr\": \"광휘의 메아리\", \"expectedCount\": 197}, \"3\": {\"labelCn\": \"命运星织\", \"labelKr\": \"운명의 별짜기\", \"expecte"
+    },
+    {
+      "file": "data/contracts/skin-stage1-input-contract.v1.json",
+      "size": 6022,
+      "firstSnippet": "ovenSpecialAssets\": \"Do not admit assets merely because filenames or folders contain skin-like terms.\" } }, \"acquisitionPolicy\": { \"source\": \"ConfigDataHeroSkinInfo.GetPathType\", \"encodedMappings\": { \"2\": \"광휘의 메아리\", \"3\": \"운명의 별짜기\", \"4\": \"영웅 스킨 상점\" }, \"missingValueState\": \"UNENCODED\", \"rule\": \"Missing GetPathType is a source-data gap, not an acquisition category. Do not infer event/store/acquisition history in Stage 1.\" }, \"ownershipBoundaries\": { \"skinStage1\": \"Canonical population admission and Skin-domain checkpointing"
+    },
+    {
+      "file": "data/contracts/skin-stage1-release-deferral-policy.v1.json",
+      "size": 3087,
+      "firstSnippet": "seDate\", \"krFuture\", \"isFutureSkin\", \"futureEligible\", \"displayTarget\" ], \"nonAuthorities\": [ \"skinId numeric order or pattern\", \"sourceOrder\", \"GetPathType or GetPathDesc\", \"Score\", \"asset path or filename\", \"presence of model bindings\", \"Hero release chronology without a validated skin-release relation\" ], \"downstreamBoundary\": { \"stage3\": \"May inventory/extract/map assets but must not classify release state from asset presence or filenames.\", \"stage4\": \"Owns CN/KR release evidence, matching rules, Korean skin na"
+    },
+    {
       "file": "data/metadata/dump.cs",
       "size": 54916284,
       "firstSnippet": " 0, int timeCrusadeCityId = 0, int timeCrusadeStrongholdId = 0, UIIntent fromIntent) { } // RVA: 0x2DF45D0 Offset: 0x2DF33D0 VA: 0x182DF45D0 private void StartGuildSubUITask(GetPathType UIName, UIIntent fromIntent) { } // RVA: 0x2DF48A0 Offset: 0x2DF36A0 VA: 0x182DF48A0 private void StartMailUITask() { } // RVA: 0x2DF4B30 Offset: 0x2DF3930 VA: 0x182DF4B30 private void MailUITask_OnLoadAllResCompleted() { } // RVA: 0x2DD3520 Offset: 0x2DD2320 VA: 0x182DD3520 private void StartRankingUITask() { } // RVA: 0x2DF4C40 Offset: 0x2DF3A40 VA: 0x182DF4C40 private void "
+    },
+    {
+      "file": "data/validation/hero-continuity-audit-final.v1.json",
+      "size": 6313,
+      "firstSnippet": "nonBlockingReviews\": [ \"41 referenced Soldier records retain pending/missing Korean presentation names.\", \"176 regular skins retain UNENCODED acquisition because source GetPathType is omitted.\", \"Some CV/faction/origin/skin Korean localization remains presentation-layer follow-up.\", \"Source asset paths still require web-delivery conversion and final responsive frontend rendering.\" ], \"reopenPolicy\": \"Do not reopen Stage 1-5, Hero-Soldier relation semantics, or Hero-exclusive Equipment ownership because of old chat discontinuity alone. Reopen only when a "
+    },
+    {
+      "file": "data/validation/hero-exclusive-equipment-relation-stageB1-source-summary.v1.json",
+      "size": 2750,
+      "firstSnippet": "quipmentInfo.SkillHero -> canonical Hero ID\", \"scope\": \"frozen exclusive-equipment 167 only\", \"confidencePercent\": 100, \"status\": \"FROZEN\" }, \"supportOnly\": [ \"PathType 46 / acquisitionClass exclusive-equipment identifies the admitted equipment population but does not resolve owner Hero.\", \"MissionType 77 is retained for representative fixture cross-validation only.\", \"Owner-name text in Equipment Desc is diagnostic corroboration only.\" ], \"explicitlyRejected\": [ \"ArmyIds / JobIds equipability\", \"name similarity\", \"description par"
+    },
+    {
+      "file": "data/validation/hero-page-stage5-1-type1-dump-symbols.txt",
+      "size": 249236,
+      "firstSnippet": "nctionType_CollectionActivityScenario = 99; 621317: [OriginalName(\"GameFunctionType_CollectionActivityChallenge\")] ===== hit lines: 621678, 621679 ===== 621675: public const GetPathType GetPathType_Drill1 = 14; 621676: [OriginalName(\"GetPathType_Drill2\")] 621677: public const GetPathType GetPathType_Drill2 = 15; 621678: [OriginalName(\"GetPathType_Fetter\")] 621679: public const GetPathType GetPathType_Fetter = 16; 621680: [OriginalName(\"GetPathType_World\")] 621681: public const GetPathType GetPathType_World = 17; 621682: [OriginalName(\"GetPathType_Arena\")] ===== h"
+    },
+    {
+      "file": "data/validation/hero-page-stage5-2-final.v1.json",
+      "size": 3848,
+      "firstSnippet": ": { \"expected\": 167, \"actual\": 167, \"pass\": true }, \"exclusiveOwnerUniqueness\": { \"duplicateOwnerCount\": 0, \"pass\": true }, \"exclusivePathType46\": { \"pass\": true }, \"centralDisciplineSkillResolution\": { \"releasedCount\": 166, \"resolvedCount\": 166, \"pass\": true }, \"hardErrors\": { \"expected\": 0, \"actual\": 0, \"pass\": true } }, \"ownershipEvidence\": { \"resolver\": \"ConfigDataEquipmentInfo.SkillHero -> canonical Hero ID\", \"resolvedExclusiveCount\": 167, \"resolv"
     },
     {
       "file": "data/validation/hero-page-stage5-5-2-coverage.v1.json",
@@ -184,8 +274,43 @@
     },
     {
       "file": "data/validation/hero-page-stage5-integration-review.v1.json",
-      "size": 5338,
+      "size": 6641,
       "firstSnippet": " Korean display names.\", \"blockingStage5Integration\": false }, { \"owner\": \"5-5 presentation metadata\", \"issue\": \"176 regular skins have source-omitted GetPathType and remain UNENCODED by policy.\", \"blockingStage5Integration\": false }, { \"owner\": \"5-5 localization\", \"issue\": \"CV/faction/origin/skin Korean localization may be layered later without reopening source semantics.\", \"blockingStage5Integration\": false }, { \"owner\": \"asset pipeline\", \"issue\": \"Source asset paths still require extraction/web"
+    },
+    {
+      "file": "data/validation/hero-stage6-1-final.v1.json",
+      "size": 4226,
+      "firstSnippet": "nership.\", \"41 Soldier Korean display names remain non-blocking presentation REVIEW from Stage 5-3.\", \"176 regular skins remain UNENCODED for acquisition because source GetPathType is omitted.\" ], \"stageBParityMismatches\": [], \"hardErrors\": [], \"decision\": \"Hero Stage 6-1 is COMPLETE. A normalized 267-Hero composition index resolves all frozen Stage 4/5 blocks without duplicating their payloads or re-deriving semantics. Stage B ownership adoption remains an explicit parallel dependency only while its shared relation artifact is unavailable.\" } "
+    },
+    {
+      "file": "data/validation/hero-stage6-3-final.v1.json",
+      "size": 5428,
+      "firstSnippet": " Korean display names.\", \"blockingStage5Integration\": false }, { \"owner\": \"5-5 presentation metadata\", \"issue\": \"176 regular skins have source-omitted GetPathType and remain UNENCODED by policy.\", \"blockingStage5Integration\": false }, { \"owner\": \"5-5 localization\", \"issue\": \"CV/faction/origin/skin Korean localization may be layered later without reopening source semantics.\", \"blockingStage5Integration\": false }, { \"owner\": \"asset pipeline\", \"issue\": \"Source asset paths still require extraction/web"
+    },
+    {
+      "file": "data/validation/skin-stage1-0-input-summary.v1.json",
+      "size": 2295,
+      "firstSnippet": ".CharImageSkinResource_ID -> ConfigDataCharImageSkinResourceInfo.ID\", \"ordering\": \"ConfigDataHeroInfo.Skins_ID[] array position\", \"acquisition\": \"ConfigDataHeroSkinInfo.GetPathType; missing values remain UNENCODED\" }, \"scope\": { \"included\": \"REGULAR_HERO_SKIN\", \"baseHeroArtwork\": \"OUT_OF_SCOPE\", \"spHeroIllustration\": \"OUT_OF_SCOPE\", \"soldierSkins\": \"OUT_OF_SCOPE\", \"releaseEligibility\": \"DEFERRED_TO_SKIN_STAGE4\", \"assetExport\": \"DEFERRED_TO_SKIN_STAGE3\" }, \"checks\": [ {\"name\":\"reuse canonical Hero identity\",\"pass\":true,\"detail\":\"26"
+    },
+    {
+      "file": "data/validation/skin-stage1-2-parity.v1.json",
+      "size": 4697,
+      "firstSnippet": "inResource_ID -> ConfigDataCharImageSkinResourceInfo.ID\", \"orderingSource\": \"ConfigDataHeroInfo.Skins_ID[] array position\", \"acquisitionSource\": \"ConfigDataHeroSkinInfo.GetPathType\" }, \"metrics\": { \"canonicalHeroCount\": 267, \"heroesWithSkins\": 235, \"heroesWithNoSkins\": 32, \"upstreamSkinCount\": 540, \"canonicalSkinCount\": 540, \"distinctCanonicalSkinIdCount\": 540, \"acquisitionEncodedCount\": 364, \"acquisitionUnencodedCount\": 176, \"missingSkinIdCount\": 0, \"extraSkinIdCount\": 0, \"upstreamDuplicateSkinIdCount\": 0, \"canoni"
+    },
+    {
+      "file": "data/validation/skin-stage1-3-final.v1.json",
+      "size": 2724,
+      "firstSnippet": "ount\": 540, \"charImageSkinResourceResolvedCount\": 540, \"modelBindingSkinCount\": 540, \"modelBindingTotalCount\": 2277, \"uniqueModelSkinResourceIdCount\": 789, \"getPathTypePresentCount\": 364, \"getPathDescPresentCount\": 512, \"displayFieldCoverage\": { \"nameCn\": 540, \"descCn\": 540, \"iconPath\": 540, \"roundHeadImagePath\": 540, \"smallHeadImagePath\": 540, \"cardHeadImagePath\": 540, \"enablePreview\": 454 }, \"criticalFailureCount\": 0 }, \"checks\": { \"stage12ParityPass\": true, \"canonicalSkinCount540\": "
+    },
+    {
+      "file": "data/validation/skin-stage1-4-final.v1.json",
+      "size": 5147,
+      "firstSnippet": " 1601, 1701, 2001, 2101, 2102, 2201, 2702, 3002, 3101, 3301, 5202, 5902 ] }, \"rulesFrozen\": [ \"GetPathType is the sole Stage 1 authority for ENCODED versus UNENCODED acquisition state.\", \"Only canonical GetPathType codes 2, 3 and 4 are admitted as ENCODED in the 540-skin population.\", \"A missing GetPathType remains UNENCODED even when GetPathDesc contains descriptive acquisition text.\", \"GetPathDesc is preserved verbatim as supplemental evidence and is not parsed into a category in"
+    },
+    {
+      "file": "data/validation/skin-stage1-6-final.v1.json",
+      "size": 7237,
+      "firstSnippet": "preserved; web export deferred to Skin Stage 3\", \"sourceMetadata\": \"Explicit HeroSkinInfo/resource metadata carried forward without semantic invention\", \"acquisition\": \"GetPathType authority frozen as ENCODED 364 / UNENCODED 176; raw GetPathDesc is supplemental evidence only\", \"releaseSelection\": \"No CN/KR/future classification and no displayTarget in Stage 1; authority deferred to Skin Stage 4\" }, \"outOfScopeAfterClosure\": [ \"Asset extraction/export/web-path mapping (Skin Stage 3)\", \"CN/KR release evidence and deterministic matching (Skin Stage 4)\","
     }
   ]
 }
