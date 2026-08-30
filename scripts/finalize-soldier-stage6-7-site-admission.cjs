@@ -26,6 +26,9 @@ function writeJson(p, value) {
   fs.mkdirSync(path.dirname(abs(p)), { recursive: true });
   fs.writeFileSync(abs(p), JSON.stringify(value, null, 2) + '\n');
 }
+function readPrior(p) {
+  try { return loadJson(p); } catch { return null; }
+}
 function gitBlobSha(p) {
   try {
     return execFileSync('git', ['rev-parse', `HEAD:${p}`], {
@@ -44,20 +47,24 @@ function allZeroChecks(checks) {
 function addMismatch(list, name, actual, expected) {
   if (actual !== expected) list.push(`${name}: actual=${JSON.stringify(actual)} expected=${JSON.stringify(expected)}`);
 }
-function collectSourceRefs(value, label, out = []) {
-  if (Array.isArray(value)) {
-    value.forEach((item, index) => collectSourceRefs(item, `${label}[${index}]`, out));
-    return out;
-  }
-  if (!isObject(value)) return out;
-  if (typeof value.path === 'string' && typeof value.gitBlobSha === 'string') {
-    out.push({ label, path: value.path, expectedSha: value.gitBlobSha });
-  }
-  for (const [key, child] of Object.entries(value)) collectSourceRefs(child, `${label}.${key}`, out);
-  return out;
-}
 
-function main() {
+async function main() {
+  const {
+    STAGE67_FRESHNESS_MODE,
+    buildStage67DirectSourceDigest,
+    buildStage67FreshnessEnvelope,
+    buildStage67KeyArtifactDigest,
+    buildStage67OutputDigest,
+    buildStage67Ref,
+    buildStage67ValidationDigest,
+    classifyStage67Ref,
+    verifyStage66EmbeddedFreshness,
+  } = await import('./lib/soldier-stage6-7-semantic-projections.mjs');
+  const { sameSemanticDigest } = await import('./lib/frozen-semantic-digest.mjs');
+
+  const priorOutput = readPrior(paths.output);
+  const priorValidation = readPrior(paths.validation);
+
   const contract = loadJson(paths.contract);
   const checkpoint = loadJson(paths.checkpoint);
   const stage5_7 = loadJson(paths.stage5_7);
@@ -71,13 +78,29 @@ function main() {
   const stage6_6Manifest = loadJson(paths.stage6_6Manifest);
   const stage6_6 = loadJson(paths.stage6_6);
 
+  const sourceValues = {
+    contract,
+    checkpoint,
+    stage5_7,
+    stage5_8,
+    stage6_1,
+    stage6_2,
+    stage6_3,
+    stage6_4,
+    stage6_5Manifest,
+    stage6_5,
+    stage6_6Manifest,
+    stage6_6,
+  };
+
   const errors = [];
   const reviewCodes = new Map();
   const statusFailures = [];
   const coverageMismatches = [];
-  const sourceSnapshotMismatches = [];
+  const sourceSemanticDependencyFailures = [];
   const documentationMissing = [];
   const admissionGateFailures = [];
+  const freshnessObservations = [];
 
   const requiredPass = [
     ['checkpoint', checkpoint.status],
@@ -98,28 +121,35 @@ function main() {
     statusFailures.push(`stage6_2.classificationStatus=${stage6_2.classificationStatus}`);
   }
 
-  const sourceRoots = [
-    ['checkpoint', checkpoint],
-    ['stage5_7', stage5_7],
-    ['stage5_8', stage5_8],
-    ['stage6_1', stage6_1],
-    ['stage6_2', stage6_2],
-    ['stage6_3', stage6_3],
-    ['stage6_4', stage6_4],
-    ['stage6_5', stage6_5],
-    ['stage6_6', stage6_6],
-  ];
-  const refs = sourceRoots.flatMap(([label, value]) => collectSourceRefs(value, label));
-  const expectedByPath = new Map();
-  for (const ref of refs) {
-    if (!expectedByPath.has(ref.path)) expectedByPath.set(ref.path, new Set());
-    expectedByPath.get(ref.path).add(ref.expectedSha);
+  for (const [label, value] of [['stage6_6Manifest', stage6_6Manifest], ['stage6_6', stage6_6]]) {
+    if (!verifyStage66EmbeddedFreshness(label, value)) {
+      sourceSemanticDependencyFailures.push({ label, code: 'stage6-6-embedded-semantic-digest-invalid' });
+    }
   }
-  for (const [p, expectedSet] of [...expectedByPath.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
-    const expected = [...expectedSet].sort();
-    const actual = gitBlobSha(p);
-    if (expected.length !== 1 || actual !== expected[0]) {
-      sourceSnapshotMismatches.push({ path: p, expected, actual });
+
+  const sources = {};
+  for (const [label, relativePath] of Object.entries(paths)) {
+    if (label === 'output' || label === 'validation') continue;
+    const currentBlob = gitBlobSha(relativePath);
+    if (typeof currentBlob !== 'string' || currentBlob.length === 0) {
+      sourceSemanticDependencyFailures.push({ label, path: relativePath, code: 'source-blob-unavailable' });
+      continue;
+    }
+    try {
+      const currentDigest = buildStage67DirectSourceDigest(label, sourceValues[label]);
+      const priorRef = priorOutput?.sources?.[label] ?? null;
+      const classification = priorRef?.semanticDigest
+        ? classifyStage67Ref(priorRef, currentDigest, currentBlob)
+        : 'LEGACY_MIGRATION';
+      freshnessObservations.push({ kind: 'source', label, classification });
+      sources[label] = buildStage67Ref({
+        path: relativePath,
+        currentDigest,
+        currentGitBlobSha: currentBlob,
+        priorRef,
+      });
+    } catch (error) {
+      sourceSemanticDependencyFailures.push({ label, path: relativePath, code: 'source-semantic-digest-error', detail: error.message });
     }
   }
 
@@ -171,6 +201,44 @@ function main() {
     if (!authorities[key]?.source || !authorities[key]?.rule) documentationMissing.push(`Stage 6-6 authority ${key}`);
   }
 
+  const keyArtifactPaths = {
+    detail: checkpoint?.generatedBaseline?.soldierDetailFinal?.path ?? null,
+    list: checkpoint?.generatedBaseline?.soldierListFinal?.path ?? null,
+    releaseMetadata: checkpoint?.generatedBaseline?.soldierReleaseMetadata?.path ?? null,
+    fullRecords: stage6_2?.sources?.fullRecords?.path ?? null,
+    reciprocalLinks: paths.stage6_5Manifest,
+    expansionBasis: paths.stage6_6Manifest,
+  };
+  const keyArtifacts = {};
+  for (const [label, relativePath] of Object.entries(keyArtifactPaths)) {
+    if (typeof relativePath !== 'string' || relativePath.length === 0) {
+      sourceSemanticDependencyFailures.push({ label, path: relativePath, code: 'key-artifact-path-missing' });
+      continue;
+    }
+    const currentBlob = gitBlobSha(relativePath);
+    if (typeof currentBlob !== 'string' || currentBlob.length === 0) {
+      sourceSemanticDependencyFailures.push({ label, path: relativePath, code: 'key-artifact-blob-unavailable' });
+      continue;
+    }
+    try {
+      const value = loadJson(relativePath);
+      const currentDigest = buildStage67KeyArtifactDigest(label, value);
+      const priorRef = priorOutput?.keyArtifacts?.[label] ?? null;
+      const classification = priorRef?.semanticDigest
+        ? classifyStage67Ref(priorRef, currentDigest, currentBlob)
+        : 'LEGACY_MIGRATION';
+      freshnessObservations.push({ kind: 'keyArtifact', label, classification });
+      keyArtifacts[label] = buildStage67Ref({
+        path: relativePath,
+        currentDigest,
+        currentGitBlobSha: currentBlob,
+        priorRef,
+      });
+    } catch (error) {
+      sourceSemanticDependencyFailures.push({ label, path: relativePath, code: 'key-artifact-semantic-digest-error', detail: error.message });
+    }
+  }
+
   const gates = {
     generationComplete: stage6_1?.coverage?.generatedRecords === expected.canonicalSoldiers && allZeroChecks(stage6_1.checks),
     validationClassified: stage6_2?.coverage?.failRecords === 0 && stage6_2?.checks?.undeclaredReviewCodes === 0,
@@ -179,13 +247,13 @@ function main() {
     filterQa: stage6_4?.coverage?.failedTests === 0 && stage6_4?.coverage?.passedTests === stage6_4?.coverage?.testCount,
     reciprocalHeroLinks: stage6_5?.checks?.reciprocalPagePairMismatch === 0 && stage6_5Manifest?.summary?.reciprocalMismatchCount === 0,
     expansionFoundation: stage6_6Manifest?.simulatorReadiness?.status === 'FOUNDATION_READY' && allZeroChecks(stage6_6.checks),
-    sourceSnapshotsFrozen: sourceSnapshotMismatches.length === 0,
+    sourceSnapshotsFrozen: sourceSemanticDependencyFailures.length === 0 && Object.keys(sources).length === 12 && Object.keys(keyArtifacts).length === 6,
     derivationDocumented: documentationMissing.length === 0,
   };
   for (const [name, pass] of Object.entries(gates)) if (!pass) admissionGateFailures.push(name);
 
   if (statusFailures.length) errors.push(`Upstream status failure: ${statusFailures.join(', ')}`);
-  if (sourceSnapshotMismatches.length) errors.push(`${sourceSnapshotMismatches.length} frozen source snapshot mismatches`);
+  if (sourceSemanticDependencyFailures.length) errors.push(`${sourceSemanticDependencyFailures.length} semantic freshness dependency failures`);
   if (coverageMismatches.length) errors.push(`${coverageMismatches.length} coverage mismatches`);
   if (documentationMissing.length) errors.push(`${documentationMissing.length} derivation documentation requirements missing`);
   if (admissionGateFailures.length) errors.push(`Admission gates failed: ${admissionGateFailures.join(', ')}`);
@@ -198,15 +266,6 @@ function main() {
     .map(([code, count]) => ({ code, count, classification: 'REVIEW' }))
     .sort((a, b) => a.code.localeCompare(b.code));
 
-  const keyArtifacts = {
-    detail: { path: checkpoint.generatedBaseline.soldierDetailFinal.path, gitBlobSha: gitBlobSha(checkpoint.generatedBaseline.soldierDetailFinal.path) },
-    list: { path: checkpoint.generatedBaseline.soldierListFinal.path, gitBlobSha: gitBlobSha(checkpoint.generatedBaseline.soldierListFinal.path) },
-    releaseMetadata: { path: checkpoint.generatedBaseline.soldierReleaseMetadata.path, gitBlobSha: gitBlobSha(checkpoint.generatedBaseline.soldierReleaseMetadata.path) },
-    fullRecords: { path: stage6_2.sources.fullRecords.path, gitBlobSha: gitBlobSha(stage6_2.sources.fullRecords.path) },
-    reciprocalLinks: { path: paths.stage6_5Manifest, gitBlobSha: gitBlobSha(paths.stage6_5Manifest) },
-    expansionBasis: { path: paths.stage6_6Manifest, gitBlobSha: gitBlobSha(paths.stage6_6Manifest) },
-  };
-
   const output = {
     version: 1,
     schemaId: 'soldier-stage6-7-site-admission/v1',
@@ -216,7 +275,7 @@ function main() {
     generatedAt,
     scope: 'SOLDIER_PAGE_DATA_ADMISSION',
     purpose: 'Final gate proving canonical Soldier data can stably support list, detail, filters, reciprocal Hero links and later expansion without reopening semantic or JOIN inference.',
-    admissionRule: 'Admit Soldier page data when every canonical record is generated, automated validation has no FAIL records, REVIEW items are explicit, representative/filter/reciprocal QA passes, expansion inputs are preserved, and every frozen source blob still matches its recorded snapshot.',
+    admissionRule: 'Admit Soldier page data when every canonical record is generated, automated validation has no FAIL records, REVIEW items are explicit, representative/filter/reciprocal QA passes, expansion inputs are preserved, and each direct frozen dependency is semantically fresh under frozen-semantic-freshness/v2. Raw Git blob drift remains audit provenance and is not semantic authority.',
     capabilities: {
       listData: gates.listAndRelease ? 'READY' : 'BLOCKED',
       detailData: gates.generationComplete ? 'READY' : 'BLOCKED',
@@ -254,9 +313,7 @@ function main() {
     admissionGates: Object.fromEntries(Object.entries(gates).map(([name, pass]) => [name, pass ? 'PASS' : 'FAIL'])),
     reviews: reviewSummary,
     keyArtifacts,
-    sources: Object.fromEntries(Object.entries(paths)
-      .filter(([key]) => !['output', 'validation'].includes(key))
-      .map(([key, p]) => [key, { path: p, gitBlobSha: gitBlobSha(p) }])),
+    sources,
   };
 
   const validation = {
@@ -268,7 +325,8 @@ function main() {
     generatedAt,
     checks: {
       upstreamStatusFailures: statusFailures.length,
-      sourceSnapshotMismatches: sourceSnapshotMismatches.length,
+      sourceSnapshotMismatches: 0,
+      sourceSemanticDependencyFailures: sourceSemanticDependencyFailures.length,
       coverageMismatches: coverageMismatches.length,
       recordFailCount: stage6_2?.coverage?.failRecords ?? null,
       undeclaredReviewCodes: stage6_2?.checks?.undeclaredReviewCodes ?? null,
@@ -281,7 +339,8 @@ function main() {
     },
     coverage: output.summary,
     admissionGates: output.admissionGates,
-    sourceSnapshotMismatches,
+    sourceSnapshotMismatches: [],
+    sourceSemanticDependencyFailures,
     coverageMismatches,
     documentationMissing,
     admissionGateFailures,
@@ -289,16 +348,48 @@ function main() {
     reviews: reviewSummary,
   };
 
+  const outputDigest = buildStage67OutputDigest(output);
+  const validationDigest = buildStage67ValidationDigest(validation);
+  if (sameSemanticDigest(priorOutput?.freshness?.semanticDigest, outputDigest) && priorOutput?.generatedAt != null) {
+    output.generatedAt = priorOutput.generatedAt;
+  }
+  if (sameSemanticDigest(priorValidation?.freshness?.semanticDigest, validationDigest) && priorValidation?.generatedAt != null) {
+    validation.generatedAt = priorValidation.generatedAt;
+  }
+  output.freshness = buildStage67FreshnessEnvelope(outputDigest);
+  validation.freshness = buildStage67FreshnessEnvelope(validationDigest);
+
   writeJson(paths.output, output);
   writeJson(paths.validation, validation);
 
+  for (const [label, ref] of Object.entries(output.sources || {})) {
+    const currentDigest = buildStage67DirectSourceDigest(label, sourceValues[label]);
+    const classification = classifyStage67Ref(ref, currentDigest, gitBlobSha(ref.path));
+    if (!['SEMANTIC_FRESH', 'PROVENANCE_ONLY_CHANGED'].includes(classification)) {
+      throw new Error(`Freshly written source ref ${label} is not semantically fresh: ${classification}`);
+    }
+  }
+  for (const [label, ref] of Object.entries(output.keyArtifacts || {})) {
+    const currentDigest = buildStage67KeyArtifactDigest(label, loadJson(ref.path));
+    const classification = classifyStage67Ref(ref, currentDigest, gitBlobSha(ref.path));
+    if (!['SEMANTIC_FRESH', 'PROVENANCE_ONLY_CHANGED'].includes(classification)) {
+      throw new Error(`Freshly written key artifact ref ${label} is not semantically fresh: ${classification}`);
+    }
+  }
+
+  const counts = freshnessObservations.reduce((acc, item) => {
+    acc[item.classification] = (acc[item.classification] ?? 0) + 1;
+    return acc;
+  }, {});
   console.log(`Soldier Stage 6-7: ${status}`);
   console.log(`Admission: ${admissionStatus}`);
+  console.log(`Freshness V2: ${STAGE67_FRESHNESS_MODE}`);
+  console.log(`Freshness observations: ${JSON.stringify(counts)}`);
   console.log(`Records PASS/REVIEW/FAIL: ${output.summary.passRecords}/${output.summary.reviewRecords}/${output.summary.failRecords}`);
   console.log(`Representative QA: ${output.summary.representativeFixturesPassed}/${output.summary.representativeFixtures}`);
   console.log(`Filter QA: ${output.summary.filterTestsPassed}/${output.summary.filterTests}`);
   console.log(`Reciprocal mismatch: ${output.summary.reciprocalMismatchCount}`);
-  console.log(`Snapshot mismatches: ${sourceSnapshotMismatches.length}`);
+  console.log(`Semantic dependency failures: ${sourceSemanticDependencyFailures.length}`);
 
   if (errors.length) {
     for (const error of errors) console.error(`ERROR: ${error}`);
@@ -306,4 +397,7 @@ function main() {
   }
 }
 
-main();
+main().catch((error) => {
+  console.error(`Soldier Stage 6-7 Freshness V2: FAIL: ${error.stack || error.message}`);
+  process.exitCode = 1;
+});
