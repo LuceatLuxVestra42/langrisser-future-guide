@@ -8,6 +8,7 @@ on:
       - 'tools/status-source/**'
       - 'data/contracts/project-tooling-status-source-r1.v1.json'
       - 'data/contracts/project-tooling-status-source-r1-2.v1.json'
+      - 'data/contracts/project-tooling-status-source-r1-3.v1.json'
       - 'data/contracts/project-tooling-migration-r0.v1.json'
       - 'data/status-sources/**'
       - '.github/workflows/project-tooling-r1-status-source.yml'
@@ -36,6 +37,9 @@ jobs:
       - name: Run independent Status Source promotion parity and rollback self-test
         run: node tools/status-source/test/promotion-parity.mjs
 
+      - name: Run independent Status Source producer gate parity and delegation self-test
+        run: node tools/status-source/test/producer-gate-parity.mjs
+
       - name: Print selected sources
         run: node tools/status-source/cli/select.mjs
 
@@ -43,5 +47,12 @@ jobs:
         run: >-
           node tools/status-source/cli/promote.mjs
           --domain equipment
+          --id equipment-public-presentation-correction-final
+          --source data/validation/equipment-public-presentation-correction-final.v1.json
+
+      - name: Prove producer submit CLI delegates to check-only on the active Equipment source
+        run: >-
+          node tools/status-source/cli/submit.mjs
+          --producer equipment-final
           --id equipment-public-presentation-correction-final
           --source data/validation/equipment-public-presentation-correction-final.v1.json
