@@ -1,0 +1,65 @@
+name: Equipment Display Collection
+
+on:
+  push:
+    branches:
+      - fix/equipment-pass-membership
+    paths:
+      - 'data/presentation/equipment-display-collection.v1.json'
+      - 'data/presentation/equipment-public-admission-correction.v1.json'
+      - 'data/presentation/equipment-p3-1-release-metadata.v1.json'
+      - 'data/generated/equipment_stage3_3_general_list.json'
+      - 'data/generated/equipment_stage3_4_general_detail.json'
+      - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
+      - 'data/localization/equipment-name-kr/**'
+      - 'scripts/build-equipment-name-kr-presentation.mjs'
+      - 'scripts/validate-equipment-display-collection.mjs'
+      - 'src/lib/equipment-display-collection.ts'
+      - 'src/lib/equipment-page.localized.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - '.github/workflows/equipment-display-collection.yml'
+  pull_request:
+    paths:
+      - 'data/presentation/equipment-display-collection.v1.json'
+      - 'data/presentation/equipment-public-admission-correction.v1.json'
+      - 'data/presentation/equipment-p3-1-release-metadata.v1.json'
+      - 'data/generated/equipment_stage3_3_general_list.json'
+      - 'data/generated/equipment_stage3_4_general_detail.json'
+      - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
+      - 'data/localization/equipment-name-kr/**'
+      - 'scripts/build-equipment-name-kr-presentation.mjs'
+      - 'scripts/validate-equipment-display-collection.mjs'
+      - 'src/lib/equipment-display-collection.ts'
+      - 'src/lib/equipment-page.localized.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - '.github/workflows/equipment-display-collection.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Korean equipment-name presentation projection
+        run: node scripts/build-equipment-name-kr-presentation.mjs
+
+      - name: Validate explicit display collection and public admission
+        run: bun scripts/validate-equipment-display-collection.mjs
+
+      - name: Production build
+        run: bun run build

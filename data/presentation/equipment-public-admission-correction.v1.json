@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "stage": "equipment-public-admission-correction",
+  "status": "FROZEN",
+  "source": {
+    "basis": "User-confirmed implementation-excluded duplicate equipment correction",
+    "confirmedDate": "2026-08-30",
+    "predecessorMainSha": "7a5f18f5c2898b56734f02c2488e97f5d0f0deeb",
+    "technicalPopulation": "data/generated/equipment_stage3_3_general_list.json",
+    "technicalDetailPopulation": "data/generated/equipment_stage3_4_general_detail.json"
+  },
+  "policy": {
+    "joinKey": "equipmentId",
+    "scope": "Public general-equipment admission only",
+    "stage2AcquisitionClassificationChanged": false,
+    "canonicalIdentityChanged": false,
+    "exclusiveEquipmentChanged": false,
+    "reason": "These records are historical/collaboration duplicate implementations and must not resolve as independent public equipment entries. Preserve upstream technical identities, but exclude them from the public general list and public general detail route."
+  },
+  "excludedEquipmentIds": [265, 266, 267, 268, 288, 289, 290, 291],
+  "records": [
+    {
+      "equipmentId": 265,
+      "nameCn": "噬岩者",
+      "duplicateOfEquipmentId": 282,
+      "duplicateOfNameCn": "均衡之刃",
+      "reason": "IMPLEMENTATION_EXCLUDED_DUPLICATE"
+    },
+    {
+      "equipmentId": 266,
+      "nameCn": "魔导杖",
+      "duplicateOfEquipmentId": 283,
+      "duplicateOfNameCn": "苍白之杖",
+      "reason": "IMPLEMENTATION_EXCLUDED_DUPLICATE"
+    },
+    {
+      "equipmentId": 267,
+      "nameCn": "家用晾衣杆",
+      "duplicateOfEquipmentId": 284,
+      "duplicateOfNameCn": "鸡毛掸",
+      "reason": "IMPLEMENTATION_EXCLUDED_DUPLICATE"
+    },
+    {
+      "equipmentId": 268,
+      "nameCn": "游击士勋章",
+      "duplicateOfEquipmentId": 285,
+      "duplicateOfNameCn": "铸剑者勋章",
+      "reason": "IMPLEMENTATION_EXCLUDED_DUPLICATE"
+    },
+    {
+      "equipmentId": 288,
+      "nameCn": "灵剑荒鹰",
+      "duplicateOfEquipmentId": 299,
+      "duplicateOfNameCn": "斩魔刀",
+      "reason": "IMPLEMENTATION_EXCLUDED_DUPLICATE"
+    },
+    {
+      "equipmentId": 289,
+      "nameCn": "华击团制服",
+      "duplicateOfEquipmentId": 400,
+      "duplicateOfNameCn": "逆矢外壳",
+      "reason": "IMPLEMENTATION_EXCLUDED_DUPLICATE"
+    },
+    {
+      "equipmentId": 290,
+      "nameCn": "红色缎带",
+      "duplicateOfEquipmentId": 401,
+      "duplicateOfNameCn": "鲜花礼帽",
+      "reason": "IMPLEMENTATION_EXCLUDED_DUPLICATE"
+    },
+    {
+      "equipmentId": 291,
+      "nameCn": "小熊玩偶",
+      "duplicateOfEquipmentId": 402,
+      "duplicateOfNameCn": "Q巨拉",
+      "reason": "IMPLEMENTATION_EXCLUDED_DUPLICATE"
+    }
+  ],
+  "expectedPublicProjection": {
+    "generalEquipmentCount": 198,
+    "technicalTabCountsAfterAdmissionOnly": {
+      "1": 94,
+      "2": 76,
+      "3": 28
+    },
+    "excludedCount": 8
+  },
+  "nextStartPoint": "Build explicit displayCollection/equipment-pass membership independently from Stage 2 acquisitionClass/siteTab. Do not reinterpret these admission exclusions as the final tab membership contract."
+}
