@@ -1,0 +1,70 @@
+name: Asset Hygiene Stage 1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/asset-intake/contract/hygiene-scope.v1.json'
+      - 'tools/asset-intake/contract/hygiene-stage1-inventory.v1.json'
+      - 'tools/asset-intake/core/engine-v1.mjs'
+      - 'tools/asset-intake/cli/run-hygiene-stage1-v1.mjs'
+      - 'tools/asset-intake/cli/validate-hygiene-stage1-v1.mjs'
+      - 'tools/asset-intake/hygiene/generated/**'
+      - 'data/validation/asset-intake-hygiene-stage1-*'
+      - 'docs/checkpoints/asset-intake-hygiene-stage1-*'
+      - '.github/workflows/asset-intake-hygiene-stage1.yml'
+  workflow_dispatch:
+  push:
+    branches:
+      - work/asset-intake-hygiene-stage1-inventory-v1
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Validate frozen Stage 1 inventory
+        run: node tools/asset-intake/cli/validate-hygiene-stage1-v1.mjs
+
+  explicit-producer:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/work/asset-intake-hygiene-stage1-inventory-v1' && contains(github.event.head_commit.message, '[asset-hygiene-produce]'))
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Generate Stage 1 frozen inventory
+        run: node tools/asset-intake/cli/run-hygiene-stage1-v1.mjs
+      - name: Freeze generated inventory on explicit producer branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            tools/asset-intake/hygiene/generated/asset-hygiene-inventory.v1.json \
+            tools/asset-intake/hygiene/generated/asset-hygiene-duplicate-groups.v1.json \
+            tools/asset-intake/hygiene/generated/asset-hygiene-basename-groups.v1.json \
+            data/validation/asset-intake-hygiene-stage1-inventory-summary.v1.json \
+            docs/checkpoints/asset-intake-hygiene-stage1-repository-inventory.md
+          git commit -m "Freeze Asset Hygiene Stage 1 inventory"
+      - name: Validate committed Stage 1 inventory
+        run: node tools/asset-intake/cli/validate-hygiene-stage1-v1.mjs
+      - name: Push frozen Stage 1 artifacts
+        run: git push origin HEAD:${{ github.ref_name }}
