@@ -2,13 +2,16 @@
   "schemaVersion": "project-doctor-route-hosted-qa-mainline-integration-baseline.v1",
   "status": "BASELINE_FROZEN",
   "recordedAt": "2026-08-30",
+  "refreshedAt": "2026-08-30",
   "owningLayer": "runner/tooling-mainline-integration",
   "authoritativeSource": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
     "branch": "main",
-    "headSha": "73db96444d2016d044042630955486fd9b3d9036",
-    "headMerge": "PR #268",
-    "integrationBranch": "work/route-hosted-qa-mainline-integration"
+    "previousHeadSha": "73db96444d2016d044042630955486fd9b3d9036",
+    "headSha": "fdb5bea0c097d5ba23846eca22982896a6a6bcd3",
+    "headChange": "Make Soldier Stage 5 producers explicit",
+    "integrationBranch": "work/route-hosted-qa-mainline-integration",
+    "integrationRefreshMergeCommit": "a314c1f5cb583dcac9b403bc5e23748aff99d1d3"
   },
   "routeHostedQa": {
     "qa0": "REUSE_FROZEN",
@@ -44,19 +47,21 @@
     "preserveCurrentAuthoritativePagesComposition": true
   },
   "completedScope": [
-    "rechecked current main HEAD",
-    "created a fresh integration branch from exact current main HEAD",
-    "verified the integration branch points to the same baseline SHA",
+    "rechecked current main HEAD before first QA runner port",
+    "detected main advancement from 73db9644 to fdb5bea0",
+    "classified the advancement as workflow producer maintenance rather than semantic relation change",
+    "merged exact latest main into the integration branch while preserving the baseline checkpoint",
+    "confirmed the integration branch now contains latest main before dependency closure porting",
     "confirmed QA-2 old PR remains non-mergeable to main",
     "confirmed QA-3 and QA-4 remain stacked on old predecessor branches",
-    "confirmed current main has newer frontend/package/Pages composition changes that must not be overwritten"
+    "confirmed current frontend/package/Pages composition changes must not be overwritten"
   ],
   "nextStartPoint": {
     "step": "DEPENDENCY_CLOSURE_INVENTORY",
     "rule": "Classify QA-2 through QA-4 files as REUSE, PORT, REGENERATE, or DO_NOT_COPY before modifying runtime files."
   },
   "reopenConditions": [
-    "main advances before the first integration commit that ports QA runner files",
+    "main advances again before the first integration commit that ports QA runner files",
     "new authoritative Route/Hosted QA contract supersedes QA-4 reference tree",
     "current main shows an actual semantic or consumer parity regression"
   ]
