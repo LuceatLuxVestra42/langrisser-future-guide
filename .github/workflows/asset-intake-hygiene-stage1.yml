@@ -15,9 +15,6 @@ on:
       - 'docs/checkpoints/asset-intake-hygiene-stage1-*'
       - '.github/workflows/asset-intake-hygiene-stage1.yml'
   workflow_dispatch:
-  push:
-    branches:
-      - work/asset-intake-hygiene-stage1-inventory-v1
 
 permissions:
   contents: read
@@ -36,10 +33,17 @@ jobs:
       - name: Validate frozen Stage 1 inventory
         run: node tools/asset-intake/cli/validate-hygiene-stage1-v1.mjs
 
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Reject protected main as producer target
+        run: |
+          echo 'Asset Hygiene Stage 1 producer runs must target an explicit non-main branch.'
+          exit 1
+
   explicit-producer:
-    if: >-
-      (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main') ||
-      (github.event_name == 'push' && github.ref == 'refs/heads/work/asset-intake-hygiene-stage1-inventory-v1' && contains(github.event.head_commit.message, '[asset-hygiene-produce]'))
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -63,7 +67,11 @@ jobs:
             tools/asset-intake/hygiene/generated/asset-hygiene-basename-groups.v1.json \
             data/validation/asset-intake-hygiene-stage1-inventory-summary.v1.json \
             docs/checkpoints/asset-intake-hygiene-stage1-repository-inventory.md
-          git commit -m "Freeze Asset Hygiene Stage 1 inventory"
+          if git diff --cached --quiet; then
+            echo 'Stage 1 inventory already matches the frozen baseline.'
+          else
+            git commit -m "Freeze Asset Hygiene Stage 1 inventory"
+          fi
       - name: Validate committed Stage 1 inventory
         run: node tools/asset-intake/cli/validate-hygiene-stage1-v1.mjs
       - name: Push frozen Stage 1 artifacts
