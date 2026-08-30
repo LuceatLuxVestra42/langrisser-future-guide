@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage2-source-freeze-summary/v1",
+  "stage": "ASSET_HYGIENE_2",
+  "substage": "SOURCE_FREEZE",
+  "checkpoint": "ASSET_HYGIENE_STAGE2_SOURCE_FREEZE",
+  "status": "PASS_ASSET_HYGIENE_STAGE2_SOURCE_FREEZE",
+  "completion": "COMPLETE",
+  "stage2Completion": "IN_PROGRESS",
+  "contract": "tools/asset-intake/contract/hygiene-stage2-reference-crosscheck.v1.json",
+  "predecessor": "tools/asset-intake/contract/hygiene-stage1-inventory.v1.json",
+  "physicalBaseline": {
+    "commit": "73db96444d2016d044042630955486fd9b3d9036",
+    "tree": "f19194edbf6e71f1c3d6fcf0ccabb0b9c6474df8",
+    "inventoryRecordCount": 2188,
+    "inventoryReused": true
+  },
+  "referenceBaseline": {
+    "commit": "f5e828e6f163dc70e0ead7a912acd5dcf6467bc2",
+    "activeSourceRegistryPath": "data/generated/project-doctor-active-source-registry.v1.json",
+    "activeSourceRegistryBlob": "43d6c70ad87b45d27582da84c059dfac8b6998b7",
+    "selectedDomainCount": 6
+  },
+  "assetDeltaGate": {
+    "status": "PASS_NO_TRACKED_IMAGE_ASSET_DELTA",
+    "changedImageAssetPathCount": 0,
+    "baselineMigrationRequired": false
+  },
+  "fixtureChecks": {
+    "soldier": {
+      "sourceInventoryCount": 224,
+      "sourceManifestCount": 224,
+      "deliveryInventoryCount": 224,
+      "deliveryManifestCount": 224,
+      "sourceDeliveryRootCountParity": true,
+      "currentResolver": "src/lib/soldier-portrait-assets.ts",
+      "currentDeliveryManifest": "data/generated/soldier-portrait-web-manifest.v1.json",
+      "currentSourceManifest": "data/generated/soldier-portrait-manifest.v9.json",
+      "explicitDerivativeRelation": true,
+      "decodedPixelExact": true,
+      "status": "PASS"
+    },
+    "banner": {
+      "inventoryCount": 501,
+      "frozenRepositoryCensusCount": 501,
+      "rootCountParity": true,
+      "resolvedOccurrenceCount": 93,
+      "uniqueResolvedPathCount": 70,
+      "missingReferencedFileCount": 0,
+      "ambiguousReferencedFileCount": 0,
+      "exactPathRelationStructureObserved": true,
+      "crossRootFallbackAllowed": false,
+      "filenameSimilarityAllowed": false,
+      "perceptualImageEquivalence": false,
+      "status": "PASS"
+    },
+    "skin": {
+      "upstreamState": "READY_FOR_ASSET_EVIDENCE",
+      "evidencePresent": false,
+      "upstreamBlocker": "ASSET_BYTES_OR_AUTHENTIC_RESOLUTION_EVIDENCE_NOT_AVAILABLE_IN_REPOSITORY",
+      "hygieneFailureInvented": false,
+      "status": "PRESERVED_UPSTREAM_STATE"
+    }
+  },
+  "checks": {
+    "activeSourceRegistryReadable": true,
+    "activeSourceRegistryHardErrorCount": 0,
+    "inventoryReuseGatePassed": true,
+    "soldierFixturePassed": true,
+    "bannerFixturePassed": true,
+    "skinBoundaryPreserved": true,
+    "assetMutationCount": 0,
+    "frontendMutationCount": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "classificationCount": 0,
+    "hardErrorCount": 0
+  },
+  "reviews": [
+    {
+      "code": "SOLDIER_REGISTRY_SUPPLEMENTAL_MANIFEST_POINTER_LAGS_CURRENT_RESOLVER_CHAIN",
+      "blocking": false,
+      "detail": "The Registry-selected Soldier portrait coverage validation still names manifest v8, while the current frontend resolver consumes soldier-portrait-web-manifest.v1.json whose explicit source is soldier-portrait-manifest.v9.json. AH-2 preserves the Registry evidence role but uses the exact current resolver chain for asset reference collection."
+    }
+  ],
+  "blockers": [],
+  "outputs": {
+    "sourceFreeze": "tools/asset-intake/hygiene/generated/asset-hygiene-stage2-reference-sources.v1.json"
+  },
+  "nextStartPoint": "ASSET_HYGIENE_2_REFERENCE_MAP_COLLECTION"
+}
