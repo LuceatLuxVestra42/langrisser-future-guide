@@ -71,23 +71,27 @@ jobs:
       - name: Verify frozen Stage 6-1 content on main or PR
         shell: bash
         run: |
-          node <<'NODE'
+          set -euo pipefail
+          committed_generated="$RUNNER_TEMP/soldier-stage6-1-full-records.committed.json"
+          committed_validation="$RUNNER_TEMP/soldier-stage6-1-full-records-validation.committed.json"
+          git show HEAD:data/generated/soldier-stage6-1-full-records.v1.json > "$committed_generated"
+          git show HEAD:data/validation/soldier-stage6-1-full-records.v1.json > "$committed_validation"
+          COMMITTED_GENERATED="$committed_generated" COMMITTED_VALIDATION="$committed_validation" node <<'NODE'
           const fs = require('node:fs');
-          const { execFileSync } = require('node:child_process');
 
-          const paths = [
-            'data/generated/soldier-stage6-1-full-records.v1.json',
-            'data/validation/soldier-stage6-1-full-records.v1.json',
+          const pairs = [
+            [process.env.COMMITTED_GENERATED, 'data/generated/soldier-stage6-1-full-records.v1.json'],
+            [process.env.COMMITTED_VALIDATION, 'data/validation/soldier-stage6-1-full-records.v1.json'],
           ];
 
           let failed = false;
-          for (const path of paths) {
-            const regenerated = JSON.parse(fs.readFileSync(path, 'utf8'));
-            const committed = JSON.parse(execFileSync('git', ['show', `HEAD:${path}`], { encoding: 'utf8' }));
-            delete regenerated.generatedAt;
+          for (const [committedPath, regeneratedPath] of pairs) {
+            const committed = JSON.parse(fs.readFileSync(committedPath, 'utf8'));
+            const regenerated = JSON.parse(fs.readFileSync(regeneratedPath, 'utf8'));
             delete committed.generatedAt;
-            if (JSON.stringify(regenerated) !== JSON.stringify(committed)) {
-              console.error(`${path} differs from the committed frozen content beyond generatedAt.`);
+            delete regenerated.generatedAt;
+            if (JSON.stringify(committed) !== JSON.stringify(regenerated)) {
+              console.error(`${regeneratedPath} differs from the committed frozen content beyond generatedAt.`);
               failed = true;
             }
           }
