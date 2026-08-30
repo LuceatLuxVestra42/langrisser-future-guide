@@ -30,10 +30,14 @@ const expectedSubscopes = {
   SRC_ASSETS_ROOT: 9,
   SPINE_RENDERER_INPUT_ROOT: 1,
 };
-check(JSON.stringify(summary.physicalSubscopeCounts) === JSON.stringify(expectedSubscopes), `physical subscope counts ${JSON.stringify(summary.physicalSubscopeCounts)}`);
+check(Object.keys(summary.physicalSubscopeCounts).length === Object.keys(expectedSubscopes).length, `physical subscope key count ${Object.keys(summary.physicalSubscopeCounts).length}`);
+for (const [subscope, expected] of Object.entries(expectedSubscopes)) {
+  check(summary.physicalSubscopeCounts[subscope] === expected, `physical subscope ${subscope} count ${summary.physicalSubscopeCounts[subscope]}`);
+}
 check(summary.evidenceCounts.currentToolExactRequiredInput === 1, `tool exact input count ${summary.evidenceCounts.currentToolExactRequiredInput}`);
 check(summary.evidenceCounts.movementContractIdentifierMatch === 5, `movement identifier match count ${summary.evidenceCounts.movementContractIdentifierMatch}`);
 check(summary.evidenceCounts.movementRepositoryDeliveryBindingProven === 0, `movement delivery binding inference ${summary.evidenceCounts.movementRepositoryDeliveryBindingProven}`);
+check(summary.evidenceCounts.sameStemCurrentFrontendSibling === 8, `same-stem current frontend sibling count ${summary.evidenceCounts.sameStemCurrentFrontendSibling}`);
 check((summary.decisionCounts.RETAIN_CURRENT_TOOL_INPUT ?? 0) === 1, 'current tooling input decision must cover exactly 1 asset');
 check((summary.decisionCounts.RETAIN_PENDING_MOVEMENT_ASSET_DELIVERY_BINDING ?? 0) === 5, 'movement pending binding decision must cover exactly 5 assets');
 check((summary.decisionCounts.RETAIN_REVIEW_ONLY_UNREFERENCED ?? 0) === 20, 'default non-Banner review decision must cover exactly 20 assets');
