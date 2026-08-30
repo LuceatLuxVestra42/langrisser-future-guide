@@ -126,3 +126,5 @@ jobs:
       - name: Enforce Stage 6-3 build gate
         if: always() && steps.build.outcome != 'success'
         run: exit 1
+
+# Temporary work-branch trigger for downstream freshness refresh; never merge this comment.
