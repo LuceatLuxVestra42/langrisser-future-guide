@@ -3,7 +3,8 @@
   "schemaId": "project-tooling-migration-r0/v1",
   "stage": "R0",
   "checkpoint": "PROJECT_TOOLING_MIGRATION_R0_BOUNDARY",
-  "status": "R0_COMPLETE",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
   "purpose": "Freeze the current Project Doctor/tooling ownership inventory and prevent the legacy Project Doctor from becoming the producer or architectural authority for its own replacement.",
   "designedAgainst": {
     "branch": "main",
@@ -206,6 +207,73 @@
     "expectedLegacyManualReviewDuringShadow": "EXPECTED_LEGACY_DOCTOR_MISMATCH",
     "mergeBlockingRequiredGuardTransition": "DEFERRED_TO_CUTOVER"
   },
+  "legacyResultClassificationPolicy": {
+    "classificationOwnedBy": "migration-side tooling/checkpoint only; legacy Project Doctor must not be modified to implement this policy",
+    "expectedLegacyDoctorMismatch": {
+      "classification": "EXPECTED_LEGACY_DOCTOR_MISMATCH",
+      "allRequiredConditions": [
+        "current diff is limited to migration namespaces or migration-only workflow/checkpoint files",
+        "legacy Doctor failure is UNKNOWN or MANUAL_REVIEW caused by unmapped migration path",
+        "legacy D1/status integrity passes",
+        "legacy D5 freshness passes",
+        "legacy D7 guard/runtime integrity passes",
+        "no selected independent validator reports a current-diff regression",
+        "no frozen/canonical population or relation parity failure is present"
+      ]
+    },
+    "actualSelectedValidatorFailure": "OWNING_SCOPE_FAILURE",
+    "canonicalOrFrozenParityFailure": "BLOCKER",
+    "unrelatedFailureAlsoPresentOnBaseMain": "REVIEW_EXISTING_DRIFT",
+    "blanketIgnoreLegacyFailure": false
+  },
+  "r1CompletionGate": {
+    "scope": "Independent Status Source selection core before promotion/submit/bridge migration",
+    "required": [
+      "tools/status-source/** exists",
+      "current status declarations can be consumed as frozen fixtures",
+      "current active-source selection result parity passes for all six domains",
+      "legacy Project Doctor runtime imports = 0",
+      "legacy project-doctor generated status dependencies = 0",
+      "D1 dependencies = 0",
+      "D2 dependencies = 0",
+      "D3 dependencies = 0",
+      "D4 dependencies = 0",
+      "D5 dependencies = 0",
+      "D7 dependencies = 0",
+      "semantic recomputation count = 0",
+      "domain validator execution count = 0",
+      "legacy state mutation count = 0",
+      "raw ConfigData read count = 0"
+    ],
+    "parityPolicy": "Require result parity, not implementation parity. Legacy implementation is a comparison oracle only and is never a runtime predecessor."
+  },
+  "cutoverBlockers": [
+    {
+      "code": "LEGACY_REQUIRED_PR_GUARD_STILL_ACTIVE",
+      "appliesAt": "CUTOVER_ONLY",
+      "blocksR0": false,
+      "blocksR1": false,
+      "blocksR2": false,
+      "blocksR3Shadow": false,
+      "resolution": "After new Project Check produces a proven passing check context and regression fixtures pass, remove old pr-guard from required checks and make the new Project Check context required before cutover merge."
+    }
+  ],
+  "migrationLineagePolicy": {
+    "allowStackedMigrationWork": true,
+    "preferredOrder": [
+      "R0 boundary",
+      "R1 Status Source",
+      "R2 Project Status",
+      "R3 Project Check",
+      "shadow comparison and regression fixtures",
+      "required-check cutover",
+      "legacy Doctor disable",
+      "legacy Doctor delete"
+    ],
+    "doNotExpandLegacyDoctorToGreenIntermediateMigrationPrs": true,
+    "doNotAdmitMigrationNamespaceIntoLegacyD2D3D4D5D7": true,
+    "intermediateLegacyManualReviewIsComparisonEvidence": true
+  },
   "openLegacyRepairPrs": [
     {
       "pr": 301,
@@ -223,7 +291,7 @@
     "domain data regeneration",
     "raw ConfigData investigation",
     "frontend feature changes",
-    "branch-protection required-check switch",
+    "branch-protection required-check switch before Project Check is proven",
     "legacy Project Doctor deletion",
     "legacy Doctor repair PR merge"
   ],
@@ -233,19 +301,23 @@
     "statusSourceBoundaryFrozen": true,
     "projectStatusBoundaryFrozen": true,
     "projectCheckBoundaryFrozen": true,
+    "legacyResultClassificationHardened": true,
+    "r1CompletionGateFrozen": true,
+    "cutoverBlockerSeparatedFromCurrentStage": true,
+    "migrationLineageFrozen": true,
     "legacyFilesModified": false,
     "domainFilesModified": false
   },
   "blockers": [],
   "reviews": [
     "Route/Hosted QA still carries Project Doctor naming and must be rehomed as an independent QA tool in a later migration step.",
-    "The required pr-guard cannot be removed or renamed until the replacement Project Check guard exists and branch protection is switched during cutover.",
-    "Legacy Doctor may report MANUAL_REVIEW for new migration paths during shadow mode; this is comparison evidence, not permission to extend D2/D3/D4/D5/D7."
+    "LEGACY_REQUIRED_PR_GUARD_STILL_ACTIVE is a CUTOVER_BLOCKER, not an R0/R1 blocker.",
+    "Legacy Doctor may report MANUAL_REVIEW for new migration paths during shadow mode only when the strict EXPECTED_LEGACY_DOCTOR_MISMATCH conditions hold; this is comparison evidence, not permission to extend D2/D3/D4/D5/D7."
   ],
-  "nextStartPoint": "R1: implement Status Source in tools/status-source using the two current status-source declarations as frozen fixtures. Do not modify or admit the new namespace into legacy Project Doctor routing.",
+  "nextStartPoint": "R1: implement the independent Status Source selection core in tools/status-source using the two current status-source declarations and their explicitly referenced authoritative source files. Do not import or execute legacy Project Doctor runtime code.",
   "reopenConditions": [
     "main changes data/status-sources declarations",
-    "main changes the active-source registry contract",
+    "main changes the active-source registry contract in a way that changes current selection semantics",
     "main changes Project Status Sync ownership or write paths",
     "main changes package-level Project Doctor entry points in a way that changes this inventory",
     "main changes branch protection required check from pr-guard",
