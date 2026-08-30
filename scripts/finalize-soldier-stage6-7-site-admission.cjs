@@ -20,6 +20,11 @@ const paths = {
   validation: 'data/validation/soldier-stage6-7-site-admission.v1.json',
 };
 
+const TRANSITIVE_STAGE3 = {
+  'data/generated/soldier-stage3.v1.json': { key: 'stage3Generated', label: 'stage3Generated' },
+  'data/validation/soldier-stage3-final.v1.json': { key: 'stage3Validation', label: 'stage3Validation' },
+};
+
 function abs(p) { return path.join(rootDir, p); }
 function loadJson(p) { return JSON.parse(fs.readFileSync(abs(p), 'utf8')); }
 function writeJson(p, value) {
@@ -88,9 +93,11 @@ async function main() {
   const {
     STAGE67_FRESHNESS_MODE,
     buildStage67Stage66Digest,
+    buildStage67Stage3Digest,
     buildStage67V2Ref,
     classifyStage67Ref,
     proveLegacyStage67Migration,
+    proveLegacyStage67Stage3Migration,
     verifyStage66EmbeddedFreshness,
   } = await import('./lib/soldier-stage6-7-semantic-freshness.mjs');
 
@@ -138,9 +145,9 @@ async function main() {
     statusFailures.push(`stage6_2.classificationStatus=${stage6_2.classificationStatus}`);
   }
 
-  // Keep all pre-P4 upstream snapshot checks as legacy exact-SHA checks, except
-  // Stage 6-6 itself. Stage 6-6 is a separately owned V2 producer and is consumed
-  // atomically here through its registered output/validation semantic digests.
+  // Keep legacy exact-SHA behavior for every transitive dependency that P4 has
+  // not explicitly registered. The two Stage 3 refs below are consumer-local V2
+  // exceptions because current Git history proves their raw drift was generatedAt-only.
   const legacySourceRoots = [
     ['checkpoint', checkpoint],
     ['stage5_7', stage5_7],
@@ -153,11 +160,9 @@ async function main() {
   ];
   const refs = legacySourceRoots.flatMap(([label, value]) => collectLegacySourceRefs(value, label));
   const expectedByPath = new Map();
+  const transitiveStage3LegacyRefs = new Map();
   for (const ref of refs) {
     if (ref.v2Descriptor) {
-      // P4 does not invent projection dispatch for unrelated V2 descriptors.
-      // If such a descriptor appears in a legacy-owned subtree, fail closed until
-      // its owning projection is explicitly registered for this consumer.
       sourceSemanticDependencyFailures.push({
         label: ref.label,
         path: ref.path,
@@ -166,6 +171,14 @@ async function main() {
       });
       continue;
     }
+
+    const stage3Registration = TRANSITIVE_STAGE3[ref.path];
+    if (stage3Registration) {
+      if (!transitiveStage3LegacyRefs.has(stage3Registration.key)) transitiveStage3LegacyRefs.set(stage3Registration.key, []);
+      transitiveStage3LegacyRefs.get(stage3Registration.key).push(ref);
+      continue;
+    }
+
     if (!expectedByPath.has(ref.path)) expectedByPath.set(ref.path, new Set());
     expectedByPath.get(ref.path).add(ref.expectedSha);
   }
@@ -176,6 +189,90 @@ async function main() {
       sourceSnapshotMismatches.push({ path: p, expected, actual });
     }
   }
+
+  const migrateStage3Dependency = (key, label, relativePath) => {
+    const legacyRefs = transitiveStage3LegacyRefs.get(key) ?? [];
+    const legacyShaSet = [...new Set(legacyRefs.map((ref) => ref.expectedSha))].sort();
+    if (legacyRefs.length === 0 || legacyShaSet.length !== 1) {
+      sourceSemanticDependencyFailures.push({
+        label,
+        path: relativePath,
+        code: 'stage3-legacy-anchor-ambiguous',
+        legacyRefCount: legacyRefs.length,
+        legacyShaSet,
+      });
+      return null;
+    }
+
+    const currentBlob = gitBlobSha(relativePath);
+    if (typeof currentBlob !== 'string' || currentBlob.length === 0) {
+      sourceSemanticDependencyFailures.push({ label, path: relativePath, code: 'source-blob-unavailable' });
+      return null;
+    }
+
+    let currentValue;
+    try {
+      currentValue = loadJson(relativePath);
+    } catch (error) {
+      sourceSemanticDependencyFailures.push({ label, path: relativePath, code: 'source-json-unavailable', detail: error.message });
+      return null;
+    }
+
+    const priorV2 = priorOutput?.semanticDependencies?.[key] ?? null;
+    if (priorV2?.semanticDigest && priorV2.gitBlobSha !== legacyShaSet[0]) {
+      sourceSemanticDependencyFailures.push({
+        label,
+        path: relativePath,
+        code: 'stage3-v2-anchor-mismatch',
+        legacyAnchor: legacyShaSet[0],
+        v2Anchor: priorV2.gitBlobSha,
+      });
+      return null;
+    }
+
+    const migrationBaseRef = priorV2?.semanticDigest
+      ? priorV2
+      : { path: relativePath, gitBlobSha: legacyShaSet[0] };
+    const proof = proveLegacyStage67Stage3Migration({
+      label,
+      path: relativePath,
+      currentValue,
+      currentGitBlobSha: currentBlob,
+      priorRef: migrationBaseRef,
+      readHistoricalJson,
+    });
+    freshnessObservations.push({ label, classification: proof.classification, reason: proof.reason });
+    if (!proof.ok) {
+      sourceSemanticDependencyFailures.push({
+        label,
+        path: relativePath,
+        code: proof.classification,
+        reason: proof.reason,
+      });
+      return null;
+    }
+
+    return buildStage67V2Ref({
+      path: relativePath,
+      currentDigest: proof.currentDigest,
+      currentGitBlobSha: currentBlob,
+      priorRef: priorV2?.semanticDigest ? priorV2 : null,
+      stickyGitBlobSha: legacyShaSet[0],
+    });
+  };
+
+  const semanticDependencies = {
+    stage3Generated: migrateStage3Dependency(
+      'stage3Generated',
+      'stage3Generated',
+      'data/generated/soldier-stage3.v1.json',
+    ),
+    stage3Validation: migrateStage3Dependency(
+      'stage3Validation',
+      'stage3Validation',
+      'data/validation/soldier-stage3-final.v1.json',
+    ),
+  };
 
   const migrateStage66Ref = (label, relativePath, value, priorRef) => {
     const currentBlob = gitBlobSha(relativePath);
@@ -345,7 +442,7 @@ async function main() {
     generatedAt,
     scope: 'SOLDIER_PAGE_DATA_ADMISSION',
     purpose: 'Final gate proving canonical Soldier data can stably support list, detail, filters, reciprocal Hero links and later expansion without reopening semantic or JOIN inference.',
-    admissionRule: 'Admit Soldier page data when every canonical record is generated, automated validation has no FAIL records, REVIEW items are explicit, representative/filter/reciprocal QA passes, expansion inputs are preserved, legacy frozen dependencies retain exact SHA parity, and migrated Stage 6-6 dependencies are semantically fresh under frozen-semantic-freshness/v2. Provenance-only drift remains visible but is not semantic failure.',
+    admissionRule: 'Admit Soldier page data when every canonical record is generated, automated validation has no FAIL records, REVIEW items are explicit, representative/filter/reciprocal QA passes, expansion inputs are preserved, legacy frozen dependencies retain exact SHA parity, and explicitly registered V2 semantic dependencies are fresh. Provenance-only drift remains visible but is not semantic failure.',
     capabilities: {
       listData: gates.listAndRelease ? 'READY' : 'BLOCKED',
       detailData: gates.generationComplete ? 'READY' : 'BLOCKED',
@@ -384,6 +481,7 @@ async function main() {
     reviews: reviewSummary,
     keyArtifacts,
     sources,
+    semanticDependencies,
   };
 
   const validation = {
@@ -431,6 +529,16 @@ async function main() {
     const classification = classifyStage67Ref(ref, currentDigest, gitBlobSha(ref.path));
     if (!['SEMANTIC_FRESH', 'PROVENANCE_ONLY_CHANGED'].includes(classification)) {
       throw new Error(`Freshly written Stage 6-7 V2 ref ${label} is not semantically fresh: ${classification}`);
+    }
+  }
+
+  for (const [label, ref] of Object.entries(output.semanticDependencies || {})) {
+    if (!ref) continue;
+    const currentValue = loadJson(ref.path);
+    const currentDigest = buildStage67Stage3Digest(label, currentValue);
+    const classification = classifyStage67Ref(ref, currentDigest, gitBlobSha(ref.path));
+    if (!['SEMANTIC_FRESH', 'PROVENANCE_ONLY_CHANGED'].includes(classification)) {
+      throw new Error(`Freshly written Stage 6-7 transitive V2 ref ${label} is not semantically fresh: ${classification}`);
     }
   }
 
