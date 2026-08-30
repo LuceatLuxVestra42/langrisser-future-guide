@@ -1,0 +1,71 @@
+{
+  "stage": "Asset Intake Stage 3 - Skin Adapter",
+  "status": "PASS_ASSET_INTAKE_STAGE3_SKIN_ADAPTER_V1",
+  "completion": "DOMAIN_ADAPTER_COMPLETE",
+  "contractVersion": "asset-intake/v1",
+  "mainBaseCommit": "3dcfc5e8dfb3f83ed652950f8af05016944a9704",
+  "predecessors": {
+    "stage1ContractFixture": "tools/asset-intake/fixtures/skin-stage1-contract-fixtures.v1.json",
+    "stage2SharedEngine": "tools/asset-intake/core/engine-v1.mjs",
+    "currentMainSupportingStaticEvidence": "data/evidence/skin-stage3-2-static-source-evidence.v1.json"
+  },
+  "implementationScope": {
+    "skinDomainAdapter": true,
+    "frozenSkinContractConsumption": true,
+    "stage2InventoryConsumption": true,
+    "explicitModelResourceMapConsumption": true,
+    "recordLevelFailClosedAggregation": true,
+    "deterministicContractSerialization": true,
+    "diagnosticResolutionReport": true,
+    "canonicalSemanticRecomputation": false,
+    "packageScriptInstalled": false,
+    "devBuildHookInstalled": false,
+    "projectDoctorIntegrated": false,
+    "frontendChanged": false,
+    "assetBytesChanged": false
+  },
+  "resolutionPolicy": {
+    "allLocatorsResolvedRequiredForRecordResolved": true,
+    "anyAmbiguousLocatorMakesRecordAmbiguous": true,
+    "otherwiseRecordPending": true,
+    "pendingRecordEmitsPartialContractEvidence": false,
+    "ambiguousRecordEmitsPartialContractEvidence": false,
+    "resourceIdRequiresExplicitConfirmedMap": true,
+    "nameJoin": false,
+    "filenameSimilarity": false,
+    "idArithmetic": false,
+    "crossRootFallback": false
+  },
+  "selfTest": {
+    "checks": 19,
+    "passed": 19,
+    "failed": 0,
+    "hardErrors": 0,
+    "positiveSyntheticFixture": {
+      "representativeRecords": 3,
+      "locatorCount": 13,
+      "resolvedRecords": 3,
+      "resolvedLocators": 13,
+      "evidenceCount": 13,
+      "authoritativeProjectClaim": false
+    },
+    "currentMainLegacyEvidenceProbe": {
+      "representativeRecords": 3,
+      "normalizedResolvedRecords": 0,
+      "pendingRecords": 3,
+      "contractEvidenceCount": 0,
+      "reason": "Legacy Drive evidence proves raw PNG bytes and exact basenames but not the frozen Unity full path or the remaining locator classes."
+    }
+  },
+  "historicalEvidenceBoundary": {
+    "reviewedBranches": [
+      "work/asset-intake-stage2-path-evidence-complete",
+      "work/asset-intake-stage2-resource-map"
+    ],
+    "strongerPathAndResourceEvidenceExists": true,
+    "silentlyPromotedToMain": false,
+    "sharedContractResolvedClaimImported": false,
+    "reason": "Historical domain evidence is preserved as reviewable predecessor evidence, but Asset Intake v1 normalized evidence requires file-level byte metadata/SHA for emitted evidence records."
+  },
+  "nextStage": "ASSET_INTAKE_STAGE4_REPOSITORY_INTEGRATION"
+}
