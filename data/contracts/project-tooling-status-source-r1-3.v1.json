@@ -3,8 +3,8 @@
   "schemaId": "project-tooling-status-source-r1-3/v1",
   "stage": "R1-3",
   "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_3_PRODUCER_GATE",
-  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
-  "completion": "R1_3_PRODUCER_GATE_IMPLEMENTED",
+  "status": "PASS",
+  "completion": "R1_3_PRODUCER_GATE_COMPLETE",
   "purpose": "Replace the legacy Project Doctor producer submit gate with an independent Status Source gate that validates explicit producer/domain/source ownership and delegates all promotion behavior to the completed R1-2 promotion implementation.",
   "predecessor": {
     "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_2_PROMOTION",
@@ -21,6 +21,7 @@
     "runtimeDependency": false
   },
   "implementation": {
+    "implementationCommit": "a94fa7e52b14a3bdd328ddbc585b034072245df2",
     "producerContract": "tools/status-source/contracts/producer-gate.v1.json",
     "producerLibrary": "tools/status-source/lib/submit-status-source.mjs",
     "cli": "tools/status-source/cli/submit.mjs",
@@ -112,6 +113,39 @@
     "synthetic explicit APPLY delegates and writes exactly one promotion declaration",
     "legacy runtime dependency scan remains zero"
   ],
+  "validationEvidence": {
+    "shadowWorkflow": {
+      "runId": 33342644467,
+      "jobId": 99340941962,
+      "headSha": "a94fa7e52b14a3bdd328ddbc585b034072245df2",
+      "conclusion": "success",
+      "selectionParityAndIsolationSelfTest": "PASS",
+      "promotionParityAndRollbackSelfTest": "PASS",
+      "producerGateParityAndDelegationSelfTest": "PASS",
+      "selectedSourceCli": "PASS",
+      "activeEquipmentPromotionCheckCli": "PASS",
+      "activeEquipmentProducerSubmitCheckCli": "PASS"
+    },
+    "currentProducerParity": {
+      "registered": 6,
+      "enabled": 6,
+      "currentSelectedSourceFamiliesAccepted": 6,
+      "equipmentProjectionSubset": {
+        "canonical": 390,
+        "public": 365,
+        "general": 198,
+        "exclusive": 167
+      }
+    },
+    "mutationProof": {
+      "currentEquipmentCheckDeclarationWrites": 0,
+      "syntheticCheckDeclarationWrites": 0,
+      "syntheticApplyDeclarationWrites": 1,
+      "legacyRuntimeDependencies": 0,
+      "rawConfigDataReads": 0,
+      "semanticRecomputations": 0
+    }
+  },
   "completionGate": {
     "producerContractImplemented": true,
     "producerLibraryImplemented": true,
@@ -121,20 +155,23 @@
     "checkDefaultImplemented": true,
     "explicitApplyDelegationImplemented": true,
     "selfTestImplemented": true,
-    "shadowWorkflowUpdated": false,
-    "shadowCiPass": false
+    "shadowWorkflowUpdated": true,
+    "shadowCiPass": true,
+    "currentProducerRegistryParity": true,
+    "currentSelectedSourceFamilyParity": true,
+    "legacyRuntimeDependencyCountZero": true
   },
   "blockers": [],
   "reviews": [
     "R1-4 artifact bridge and later handoff/declaration/closeout behavior remain legacy-only and are outside this checkpoint.",
     "Legacy required pr-guard remains a CUTOVER_ONLY blocker and must not be repaired by admitting migration paths into legacy D2-D7."
   ],
-  "nextStartPoint": "Update the independent R1 Status Source shadow workflow to execute the producer gate parity test and a current Equipment producer CHECK submission. If PASS, freeze R1-3 and continue with the artifact bridge as the next independent substep.",
+  "nextStartPoint": "R1-4: migrate the artifact bridge so domain completion pipelines can submit through the completed R1-3 producer gate. Keep it check-only by default and do not execute or infer domain validators inside the bridge.",
   "reopenConditions": [
     "R1-2 promotion behavior changes",
     "the producer registry changes authoritatively",
     "producer output-family rules change authoritatively",
     "a current selected source no longer fits its registered producer family",
-    "shadow self-test exposes a producer ownership or delegation mismatch"
+    "new authoritative evidence contradicts the R1-3 producer ownership or delegation parity"
   ]
 }
