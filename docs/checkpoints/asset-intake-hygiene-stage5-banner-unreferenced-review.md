@@ -23,6 +23,7 @@ current reference edges: 0
 current Banner resolved relations: 0
 path history coverage: 431/431
 introduction evidence coverage: 431/431
+post-introduction changed paths: 8
 ```
 
 Physical family only:
@@ -46,6 +47,8 @@ resolved + unreferenced: 501
 
 - `e8d63e15179636461c795f94336a231020de3893` — 431 files — add banner assets
 
+431개 모두 같은 최초 import batch에 속한다. 그중 8개는 이후 path-level Git 변경 이력이 추가로 있으며 해당 post-introduction history를 개별 record에 보존했다. 이 변경 이력도 semantic role, owner equivalence, supersession, delete safety로 해석하지 않는다.
+
 ## 5. decisions
 
 ```text
@@ -61,6 +64,7 @@ AH-5-1 duplicate 2개는 기존 retain 판정을 그대로 상속했다. 나머�
 
 REVIEW:
 - `BANNER_UNREFERENCED_RETAINS_REVIEW_ONLY`: 431
+- `BANNER_PATH_CHANGED_AFTER_INTRODUCTION_REVIEW_ONLY`: 8
 
 BLOCKER:
 - 없음
@@ -75,6 +79,7 @@ semantic relation recomputation
 canonical relation recomputation
 filename role inference
 import batch role/owner inference
+post-introduction Git change -> semantic role inference
 unreferenced -> unused inference
 reference absence -> delete safety inference
 ```
@@ -91,4 +96,4 @@ Banner 431개 review는 여기서 frozen한다. 다음 작업은 AH-5-0에 남�
 - explicit Banner asset owner/successor/supersession evidence 추가
 - repository Banner asset population 변경
 - AH-5-1 duplicate decision 변경
-- authoritative path provenance contradiction 발견
+- frozen path provenance baseline 변경 또는 contradiction 발견
