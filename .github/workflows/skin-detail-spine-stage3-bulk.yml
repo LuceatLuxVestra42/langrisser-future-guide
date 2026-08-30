@@ -6,6 +6,7 @@ on:
       - research/skin-detail-spine-stage2-20260830
     paths:
       - scripts/run-skin-detail-spine-stage3-bulk.py
+      - scripts/run-skin-detail-spine-stage3-bulk-v2.py
       - scripts/spine-stage2-geometry-export.cs
       - scripts/render-spine-stage2-geometry.py
       - scripts/probe-skin-detail-spine-stage2.py
@@ -57,7 +58,7 @@ jobs:
           dotnet build /tmp/spine33bulk/Spine33Bulk.csproj -c Release
       - name: Render and classify canonical Skin 540
         run: >-
-          python scripts/run-skin-detail-spine-stage3-bulk.py
+          python scripts/run-skin-detail-spine-stage3-bulk-v2.py
           --geometry-project /tmp/spine33bulk/Spine33Bulk.csproj
           --work-dir /tmp/skin-detail-spine-stage3-bulk
       - name: Print bulk classification
