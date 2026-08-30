@@ -1,0 +1,56 @@
+name: Soldier Training Material Frontend
+
+on:
+  push:
+    branches:
+      - soldier-training-material-assets
+    paths:
+      - src/lib/soldier-training-material-assets.ts
+      - scripts/patch-soldier-training-material-frontend.py
+      - scripts/validate-soldier-training-material-frontend.mjs
+      - .github/workflows/soldier-training-material-frontend.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  preflight-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply exact frontend consumer patch
+        run: python scripts/patch-soldier-training-material-frontend.py
+
+      - name: Soldier material production preflight
+        run: node scripts/validate-soldier-training-material-frontend.mjs
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit frontend consumer and preflight freeze
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/components/soldier-detail-modal.tsx \
+            data/validation/soldier-training-material-frontend-preflight.v1.json
+          if git diff --cached --quiet; then
+            echo "No frontend changes to commit"
+          else
+            git commit -m "Display validated Soldier training material icons"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
