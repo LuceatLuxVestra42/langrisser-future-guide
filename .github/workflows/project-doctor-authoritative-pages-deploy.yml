@@ -85,13 +85,15 @@ jobs:
           grep -q 'equipment-p3-1-release-metadata.v1.json' src/lib/equipment-page.localized.server.ts
           grep -q '같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순' src/routes/equipment.tsx
 
-      - name: Reuse proven GitHub Pages static build config
+      - name: Use admission-aware GitHub Pages static build config
         shell: bash
         run: |
           set -euo pipefail
-          git fetch --depth=1 origin deploy/soldier-lower-tier-kr-names-20260828
-          git show FETCH_HEAD:vite.config.ts > vite.config.ts
+          test -f vite.github-pages.config.ts
+          cp vite.github-pages.config.ts vite.config.ts
           grep -q 'GitHub Pages deployment-only static build config' vite.config.ts
+          grep -q 'equipment-public-admission-correction.v1.json' vite.config.ts
+          grep -q 'Expected 365 unique public Equipment IDs' vite.config.ts
           grep -q 'base: "/langrisser-future-guide/"' vite.config.ts
           grep -q 'nitro: false' vite.config.ts
 
@@ -109,6 +111,12 @@ jobs:
           test -f dist/client/equipment/index.html
           test -f dist/client/equipment/642/index.html
           test -f dist/client/equipment/299/index.html
+          for excluded_id in 265 266 267 268 288 289 290 291; do
+            if test -e "dist/client/equipment/${excluded_id}/index.html"; then
+              echo "Implementation-excluded Equipment ${excluded_id} leaked into the static candidate" >&2
+              exit 1
+            fi
+          done
           test -f dist/client/heroes/index.html
           test -f dist/client/heroes/6/index.html
           test -f dist/client/soldiers/101/index.html
