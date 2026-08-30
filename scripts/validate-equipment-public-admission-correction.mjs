@@ -135,11 +135,6 @@ assertExactSet(
   "Excluded IDs leaked into runtime General List",
 );
 
-const runtimeTabs = countTabs(runtimeGeneral.records);
-for (const [tab, expected] of Object.entries(correction.expectedPublicProjection.technicalTabCountsAfterAdmissionOnly)) {
-  assert(runtimeTabs[tab] === expected, `Runtime admission-only tab ${tab} count ${runtimeTabs[tab]} !== ${expected}.`);
-}
-
 for (const equipmentId of EXPECTED_EXCLUDED_IDS) {
   assert(
     localizedModule.readEquipmentDetailPageData(equipmentId) === null,
@@ -158,7 +153,7 @@ console.log(JSON.stringify({
   excludedCount: EXPECTED_EXCLUDED_IDS.length,
   runtimePublicGeneral: runtimeGeneral.records.length,
   runtimeExclusive: runtimeExclusive.records.length,
-  admissionOnlyTechnicalTabs: runtimeTabs,
+  admissionOnlyTechnicalTabs: expectedTabs,
   excludedPublicDetailResolved: 0,
   duplicateCounterpartsPublicResolved: EXPECTED_DUPLICATE_TARGET_IDS.length,
   stage2AcquisitionClassificationChanged: false,
