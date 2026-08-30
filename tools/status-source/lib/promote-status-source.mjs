@@ -16,7 +16,6 @@ const PROMOTION_STAGE = 'R1-2';
 const readJson = filePath => JSON.parse(fs.readFileSync(filePath, 'utf8'));
 const clone = value => JSON.parse(JSON.stringify(value));
 const isObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
-const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(Object(value), key);
 
 function readRepoJson(repoRoot, relativePath) {
   return readJson(assertRepositoryPath(repoRoot, relativePath));
@@ -237,7 +236,7 @@ export function promoteStatusSource(options, runtime = {}) {
       sourcePath: options.sourcePath,
       outputPath: existingById.sourceEntryFile,
       compatibility,
-      boundaries: promotionBoundaries(),
+      boundaries: promotionBoundaries(0),
     };
   }
   if (existingById) throw new Error(`Entry id already exists but is not active: ${options.id}`);
@@ -296,7 +295,7 @@ export function promoteStatusSource(options, runtime = {}) {
     admissionMode: explicitAdmission.length > 0 ? 'EXPLICIT' : 'INHERITED',
     projectionMode: options.projectionFile ? 'EXPLICIT_FILE' : (activeEntry.projectionOverride === undefined ? 'BASELINE_COMPATIBILITY' : 'INHERITED'),
     compatibility,
-    boundaries: promotionBoundaries(),
+    boundaries: promotionBoundaries(options.apply ? 1 : 0),
   };
 
   if (!options.apply) return summary;
@@ -336,7 +335,7 @@ export function promoteStatusSource(options, runtime = {}) {
   }
 }
 
-function promotionBoundaries() {
+function promotionBoundaries(statusSourceDeclarationWriteCount = 0) {
   return {
     legacyProjectDoctorRuntimeImports: 0,
     legacyGeneratedStatusDependencies: 0,
@@ -352,7 +351,7 @@ function promotionBoundaries() {
     domainValidatorExecutionCount: 0,
     projectStatusWriteCount: 0,
     legacyGeneratedWriteCount: 0,
-    statusSourceDeclarationWriteCount: 1,
+    statusSourceDeclarationWriteCount,
   };
 }
 
