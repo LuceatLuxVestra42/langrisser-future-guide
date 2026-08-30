@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "schemaId": "frozen-semantic-freshness-v2-fixtures/v1",
+  "status": "FROZEN",
+  "contract": "frozen-semantic-freshness/v2",
+  "purpose": "Deterministic contract fixtures proving semantic digests ignore audit-only provenance drift while remaining fail-closed for semantic mutations.",
+  "cases": [
+    {
+      "id": "generated-at-only",
+      "projection": "fixture/soldier-record/v1",
+      "expect": "SAME",
+      "left": {
+        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"identity":{"nameKr":"테스트 병사"},"combat":{"hp":100,"atk":50}}]},
+        "audit": {"generatedAt":"2026-08-30T00:00:00.000Z","sources":{"master":{"path":"data/generated/soldier-master.v1.json","gitBlobSha":"1111111111111111111111111111111111111111"}}}
+      },
+      "right": {
+        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"identity":{"nameKr":"테스트 병사"},"combat":{"hp":100,"atk":50}}]},
+        "audit": {"generatedAt":"2026-08-30T01:00:00.000Z","sources":{"master":{"path":"data/generated/soldier-master.v1.json","gitBlobSha":"1111111111111111111111111111111111111111"}}}
+      }
+    },
+    {
+      "id": "nested-git-blob-sha-only",
+      "projection": "fixture/soldier-record/v1",
+      "expect": "SAME",
+      "left": {
+        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"identity":{"nameKr":"테스트 병사"},"combat":{"hp":100,"atk":50}}]},
+        "audit": {"sources":{"stage5":{"path":"data/generated/stage5.json","gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","nested":{"path":"data/validation/stage4.json","gitBlobSha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}}}}
+      },
+      "right": {
+        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"identity":{"nameKr":"테스트 병사"},"combat":{"hp":100,"atk":50}}]},
+        "audit": {"sources":{"stage5":{"path":"data/generated/stage5.json","gitBlobSha":"cccccccccccccccccccccccccccccccccccccccc","nested":{"path":"data/validation/stage4.json","gitBlobSha":"dddddddddddddddddddddddddddddddddddddddd"}}}}
+      }
+    },
+    {
+      "id": "object-key-order-only",
+      "projection": "fixture/soldier-record/v1",
+      "expect": "SAME",
+      "left": {
+        "semanticPayload": {"schemaId":"fixture-soldier/v1","summary":{"normal":168,"sp":56},"records":[{"soldierId":1,"combat":{"hp":100,"atk":50}}]},
+        "audit": {}
+      },
+      "right": {
+        "semanticPayload": {"records":[{"combat":{"atk":50,"hp":100},"soldierId":1}],"summary":{"sp":56,"normal":168},"schemaId":"fixture-soldier/v1"},
+        "audit": {}
+      }
+    },
+    {
+      "id": "name-kr-semantic-change",
+      "projection": "fixture/soldier-record/v1",
+      "expect": "DIFFERENT",
+      "left": {
+        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"identity":{"nameKr":"드래고니아"}}]},
+        "audit": {}
+      },
+      "right": {
+        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"identity":{"nameKr":"드래고니아 나이트"}}]},
+        "audit": {}
+      }
+    },
+    {
+      "id": "combat-semantic-change",
+      "projection": "fixture/soldier-record/v1",
+      "expect": "DIFFERENT",
+      "left": {
+        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"combat":{"hp":100,"atk":50}}]},
+        "audit": {}
+      },
+      "right": {
+        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"combat":{"hp":101,"atk":50}}]},
+        "audit": {}
+      }
+    }
+  ],
+  "relationCases": [
+    {
+      "id": "relation-pair-change",
+      "expectMembership": "DIFFERENT",
+      "expectSemantic": "DIFFERENT",
+      "left": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_HERO_SOLDIER","sourceId":100,"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]},
+      "right": {"edges":[{"heroId":10,"soldierId":21,"provenance":[{"sourceKind":"BASE_HERO_SOLDIER","sourceId":100,"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]}
+    },
+    {
+      "id": "relation-audit-blob-only",
+      "expectMembership": "SAME",
+      "expectSemantic": "SAME",
+      "left": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_HERO_SOLDIER","sourceId":100,"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]},
+      "right": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_HERO_SOLDIER","sourceId":100,"gitBlobSha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}]}]}
+    },
+    {
+      "id": "relation-semantic-provenance-change",
+      "expectMembership": "SAME",
+      "expectSemantic": "DIFFERENT",
+      "left": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_HERO_SOLDIER","sourceId":100,"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]},
+      "right": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"SP_HERO_REWARD","sourceId":100,"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]}
+    }
+  ],
+  "negativeCases": [
+    {"id":"non-finite-number","kind":"NON_FINITE_NUMBER"},
+    {"id":"undefined-object-value","kind":"UNDEFINED_OBJECT_VALUE"},
+    {"id":"projection-mismatch","kind":"PROJECTION_MISMATCH"}
+  ]
+}
