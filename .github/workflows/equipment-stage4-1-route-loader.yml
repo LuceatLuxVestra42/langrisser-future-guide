@@ -20,28 +20,96 @@ on:
       - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
       - 'data/generated/equipment-name-kr-user-approved.v1.json'
       - 'data/hero-name-master.v1.json'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/equipment-stage4-1-route-loader.yml'
+      - 'data/contracts/equipment-stage4-1-route-loader.v1.json'
+      - 'scripts/validate-equipment-stage4-1-route-loader.mjs'
+      - 'src/lib/equipment-page.server.ts'
+      - 'src/lib/equipment-page.localized.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.exclusive.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - 'tsconfig.json'
+      - 'data/generated/equipment_stage3_3_general_list.json'
+      - 'data/generated/equipment_stage3_4_general_detail.json'
+      - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
+      - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
+      - 'data/generated/equipment-name-kr-user-approved.v1.json'
+      - 'data/hero-name-master.v1.json'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  validate:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Equipment Stage 4-1 producer runs must target a non-main branch. Freeze there, then open a normal PR.'
+          exit 1
+
+  validate:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Validate Equipment Stage 4-1 routes and loaders
         run: node scripts/validate-equipment-stage4-1-route-loader.mjs
-      - name: Persist generated route tree and Stage 4-1 checkpoint
+      - name: Verify frozen Stage 4-1 checkpoint
+        shell: bash
         run: |
+          set -euo pipefail
+          targets=(
+            src/routeTree.gen.ts
+            data/validation/equipment-stage4-1-route-loader-summary.v1.json
+          )
+          if ! git diff --exit-code -- "${targets[@]}"; then
+            echo 'Equipment Stage 4-1 frozen checkpoint is stale. Run this workflow explicitly on a non-main producer branch and open a normal PR with the refreshed checkpoint.'
+            exit 1
+          fi
+          echo 'Equipment Stage 4-1 frozen checkpoint matches validation output.'
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout explicit producer target
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+      - uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Validate Equipment Stage 4-1 routes and loaders
+        run: node scripts/validate-equipment-stage4-1-route-loader.mjs
+      - name: Freeze Stage 4-1 checkpoint on explicit producer branch
+        shell: bash
+        run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src/routeTree.gen.ts data/validation/equipment-stage4-1-route-loader-summary.v1.json
           if git diff --cached --quiet; then
-            echo "No Stage 4-1 generated changes"
-            exit 0
+            echo 'Equipment Stage 4-1 frozen checkpoint is already current.'
+          else
+            git commit -m 'Freeze Equipment Stage 4-1 route-loader checkpoint'
+            git push origin HEAD:${{ github.ref_name }}
           fi
-          git commit -m "Freeze Equipment Stage 4-1 route-loader checkpoint"
-          git push
