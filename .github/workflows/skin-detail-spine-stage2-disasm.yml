@@ -34,7 +34,13 @@ jobs:
             'ReadAttachment 0x1849E59A0 0x1849E6400' \
             'ReadVertices 0x1849E6400 0x1849E67F0' \
             'ReadFloatArray 0x1849E67F0 0x1849E6910' \
-            'ReadShortArray 0x1849E6910 0x1849E6A10'; do
+            'ReadShortArray 0x1849E6910 0x1849E6A10' \
+            'ReadSByte 0x1849E85F0 0x1849E8660' \
+            'ReadBoolean 0x1849E8660 0x1849E8690' \
+            'ReadFloat 0x1849E8690 0x1849E87D0' \
+            'ReadInt 0x1849E87D0 0x1849E8880' \
+            'ReadVarint 0x1849E8880 0x1849E8970' \
+            'ReadString 0x1849E8970 0x1849E8B00'; do
             set -- $spec
             name=$1; start=$2; stop=$3
             echo >> "$out"
