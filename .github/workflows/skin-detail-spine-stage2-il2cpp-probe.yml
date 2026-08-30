@@ -42,8 +42,10 @@ jobs:
           rc=$?
           set -e
           test -s /tmp/skin-stage2-il2cpp-dump/dump.cs || exit "$rc"
+          export DUMPER_RC="$rc"
           python - <<'PY'
-          import json, pathlib
+          import json, os, pathlib
+          rc=int(os.environ['DUMPER_RC'])
           root=pathlib.Path('/tmp/skin-stage2-il2cpp-dump')
           dump=(root/'dump.cs').read_text('utf-8', errors='replace')
           lines=dump.splitlines()
@@ -64,7 +66,7 @@ jobs:
                           if any(n.lower() in text.lower() for n in ('SkeletonBinary','ReadShortArray','ReadVertices','ReadAttachment','ReadSkin')):
                               script.append(row)
           out={
-              'schemaVersion':2,
+              'schemaVersion':3,
               'stage':'skin-detail-spine-stage2',
               'substage':'authoritative-il2cpp-spine-symbols',
               'status':'PASS',
