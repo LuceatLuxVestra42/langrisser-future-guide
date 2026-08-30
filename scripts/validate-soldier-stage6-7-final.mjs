@@ -2,11 +2,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import {
+  buildStage67Stage66Digest,
+  classifyStage67Ref,
+  verifyStage66EmbeddedFreshness,
+} from './lib/soldier-stage6-7-semantic-freshness.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = (relativePath) => JSON.parse(fs.readFileSync(path.join(ROOT, relativePath), 'utf8'));
 const exists = (relativePath) => fs.existsSync(path.join(ROOT, relativePath));
 const errors = [];
+const provenanceDrift = [];
 const fail = (code, detail = null) => errors.push({ code, detail });
 
 const paths = {
@@ -26,18 +32,68 @@ function headBlob(relativePath) {
   }
 }
 
-function verifyFrozenRef(label, ref) {
+function verifyFrozenRef(kind, label, ref) {
   if (!ref || typeof ref.path !== 'string' || typeof ref.gitBlobSha !== 'string') {
-    fail('invalid-frozen-ref', { label, ref: ref ?? null });
+    fail('invalid-frozen-ref', { kind, label, ref: ref ?? null });
     return;
   }
   if (!exists(ref.path)) {
-    fail('frozen-ref-missing', { label, path: ref.path });
+    fail('frozen-ref-missing', { kind, label, path: ref.path });
     return;
   }
-  const actual = headBlob(ref.path);
-  if (actual !== ref.gitBlobSha) {
-    fail('frozen-ref-sha-mismatch', { label, path: ref.path, expected: ref.gitBlobSha, actual });
+
+  const actualBlob = headBlob(ref.path);
+  if (ref.semanticDigest) {
+    if (!['stage6_6Manifest', 'stage6_6', 'expansionBasis'].includes(label)) {
+      fail('unregistered-v2-frozen-ref', {
+        kind,
+        label,
+        path: ref.path,
+        projection: ref.semanticDigest?.projection ?? null,
+      });
+      return;
+    }
+
+    let value;
+    let currentDigest;
+    try {
+      value = readJson(ref.path);
+      currentDigest = buildStage67Stage66Digest(label, value);
+    } catch (error) {
+      fail('frozen-ref-semantic-digest-error', { kind, label, path: ref.path, detail: error.message });
+      return;
+    }
+
+    const stage66Label = label === 'stage6_6' ? 'stage6_6' : 'stage6_6Manifest';
+    if (!verifyStage66EmbeddedFreshness(stage66Label, value)) {
+      fail('stage6-6-embedded-semantic-digest-invalid', { kind, label, path: ref.path });
+      return;
+    }
+
+    const classification = classifyStage67Ref(ref, currentDigest, actualBlob);
+    if (classification === 'SEMANTIC_STALE' || classification === 'SEMANTIC_UNKNOWN') {
+      fail('frozen-ref-semantic-freshness', { kind, label, path: ref.path, classification });
+      return;
+    }
+    if (classification === 'PROVENANCE_ONLY_CHANGED') {
+      provenanceDrift.push({
+        kind,
+        label,
+        path: ref.path,
+        frozen: ref.gitBlobSha,
+        current: actualBlob,
+        classification,
+      });
+    }
+    return;
+  }
+
+  if (actualBlob == null) {
+    fail('frozen-ref-head-blob-missing', { kind, label, path: ref.path });
+    return;
+  }
+  if (actualBlob !== ref.gitBlobSha) {
+    fail('frozen-ref-sha-mismatch', { kind, label, path: ref.path, expected: ref.gitBlobSha, actual: actualBlob });
   }
 }
 
@@ -102,14 +158,20 @@ for (const [key, value] of Object.entries(validation?.checks || {})) {
 if (!validation?.checks || Object.keys(validation.checks).length === 0) fail('validation-checks-missing', null);
 if (!Array.isArray(validation?.errors) || validation.errors.length !== 0) fail('validation-errors', validation?.errors ?? null);
 if (!Array.isArray(validation?.sourceSnapshotMismatches) || validation.sourceSnapshotMismatches.length !== 0) fail('source-snapshot-mismatches', validation?.sourceSnapshotMismatches ?? null);
+if (!Array.isArray(validation?.sourceSemanticDependencyFailures) || validation.sourceSemanticDependencyFailures.length !== 0) fail('source-semantic-dependency-failures', validation?.sourceSemanticDependencyFailures ?? null);
 if (!Array.isArray(validation?.coverageMismatches) || validation.coverageMismatches.length !== 0) fail('coverage-mismatches', validation?.coverageMismatches ?? null);
 if (!Array.isArray(validation?.documentationMissing) || validation.documentationMissing.length !== 0) fail('documentation-missing', validation?.documentationMissing ?? null);
 if (!Array.isArray(validation?.admissionGateFailures) || validation.admissionGateFailures.length !== 0) fail('admission-gate-failures', validation?.admissionGateFailures ?? null);
 
-for (const [label, ref] of Object.entries(generated?.sources || {})) verifyFrozenRef(`source:${label}`, ref);
-for (const [label, ref] of Object.entries(generated?.keyArtifacts || {})) verifyFrozenRef(`keyArtifact:${label}`, ref);
+for (const [label, ref] of Object.entries(generated?.sources || {})) verifyFrozenRef('source', label, ref);
+for (const [label, ref] of Object.entries(generated?.keyArtifacts || {})) verifyFrozenRef('keyArtifact', label, ref);
 if (Object.keys(generated?.sources || {}).length !== 12) fail('source-ref-count', Object.keys(generated?.sources || {}).length);
 if (Object.keys(generated?.keyArtifacts || {}).length !== 6) fail('key-artifact-count', Object.keys(generated?.keyArtifacts || {}).length);
+
+for (const label of ['stage6_6Manifest', 'stage6_6']) {
+  if (!generated?.sources?.[label]?.semanticDigest) fail('stage6-6-v2-source-ref-missing', label);
+}
+if (!generated?.keyArtifacts?.expansionBasis?.semanticDigest) fail('stage6-6-v2-key-artifact-ref-missing', 'expansionBasis');
 
 const generatedReviews = Array.isArray(generated?.reviews) ? generated.reviews : [];
 const validationReviews = Array.isArray(validation?.reviews) ? validation.reviews : [];
@@ -140,4 +202,9 @@ console.log(JSON.stringify({
   reviewCodeCount: generatedReviewCodes.length,
   frozenSourceRefs: 12,
   frozenKeyArtifacts: 6,
+  provenanceOnlyChanged: provenanceDrift.length,
 }, null, 2));
+if (provenanceDrift.length) {
+  console.log('PROVENANCE_ONLY_CHANGED');
+  for (const item of provenanceDrift) console.log(JSON.stringify(item));
+}
