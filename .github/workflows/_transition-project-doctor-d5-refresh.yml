@@ -1,0 +1,44 @@
+name: Transition Project Doctor D5 Refresh
+
+on:
+  push:
+    branches:
+      - maintenance/soldier-stage6-7-explicit-producer
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-d5:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: maintenance/soldier-stage6-7-explicit-producer
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Refresh Project Doctor D5 freshness
+        run: node scripts/run-project-doctor-d5-refresh.mjs
+
+      - name: Commit authoritative D5 refresh outputs
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/generated/project-doctor-active-source-registry.v1.json \
+            data/generated/project-doctor-d1-1-status.v1.json \
+            data/validation/project-doctor-active-source-registry-summary.v1.json \
+            data/validation/project-doctor-d1-1-summary.v1.json \
+            data/validation/project-doctor-d1-2-summary.v1.json \
+            data/generated/project-doctor-d5-freshness.v1.json
+          if git diff --cached --quiet; then
+            echo 'Project Doctor D5 outputs already current.'
+          else
+            git commit -m 'Final reseal Project Doctor D5 for Soldier Stage 6-7 transport'
+            git push origin HEAD:maintenance/soldier-stage6-7-explicit-producer
+          fi
