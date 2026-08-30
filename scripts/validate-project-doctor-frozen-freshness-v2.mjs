@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { classifyFrozenPair, applyProjectDoctorFreshnessV2 } from './classify-project-doctor-frozen-freshness-v2.mjs';
 
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -47,10 +48,20 @@ const failClosed = applyProjectDoctorFreshnessV2(impact, [changed]);
 assert.deepEqual(failClosed.directNodes, ['soldier-canonical']);
 assert.ok(failClosed.domains.includes('soldier'));
 
+const f6 = spawnSync(process.execPath, ['scripts/validate-soldier-frozen-semantic-freshness-v2-f6.mjs'], {
+  stdio: 'inherit',
+  shell: false,
+});
+assert.equal(f6.error, undefined);
+assert.equal(f6.status, 0);
+
 console.log(JSON.stringify({
   status: 'PASS_PROJECT_DOCTOR_FROZEN_FRESHNESS_V2',
-  fixtureCount: 4,
-  fixturePassCount: 4,
+  fixtureCount: 26,
+  fixturePassCount: 26,
+  projectDoctorRoutingFixtures: 4,
+  f6FailClosedRegressionFixtures: 22,
   provenanceOnlySuppressesDomainFanout: true,
   semanticChangePreservesDomainOwner: true,
+  f6RegressionEmbedded: true,
 }, null, 2));
