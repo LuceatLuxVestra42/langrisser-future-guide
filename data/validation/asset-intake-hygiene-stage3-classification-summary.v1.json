@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage3-classification-summary/v1",
+  "stage": "ASSET_HYGIENE_3",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "freezeState": "ASSET_HYGIENE_BASELINE_FROZEN",
+  "predecessors": {
+    "inventory": "tools/asset-intake/hygiene/generated/asset-hygiene-inventory.v1.json",
+    "referenceMap": "tools/asset-intake/hygiene/generated/asset-hygiene-reference-map.v1.json",
+    "stage2Summary": "data/validation/asset-intake-hygiene-stage2-reference-crosscheck-summary.v1.json"
+  },
+  "coverage": {
+    "inputRecordCount": 2188,
+    "classifiedRecordCount": 2188,
+    "unclassifiedRecordCount": 0,
+    "classificationCoveragePercent": 100
+  },
+  "primaryClassCounts": {
+    "ACTIVE_VERIFIED": 1223,
+    "EVIDENCE_ONLY": 491,
+    "PROVENANCE_UNKNOWN": 17,
+    "UNREFERENCED": 457
+  },
+  "flagCounts": {
+    "BASENAME_COLLISION": 784,
+    "EXACT_DUPLICATE": 2,
+    "RESOLVER_COLLISION": 0,
+    "REVIEW_REQUIRED": 474,
+    "UNVERIFIED_EXTERNAL": 0
+  },
+  "traitCounts": {
+    "activeProduction": 1223,
+    "explicitDerivative": 491,
+    "currentFrontendReference": 17,
+    "verifiedEvidence": 1714
+  },
+  "reviewQueueCounts": {
+    "P1_CURRENT_FRONTEND_PROVENANCE_UNKNOWN": 17,
+    "P3_EXACT_DUPLICATE": 1,
+    "P4_UNREFERENCED": 6
+  },
+  "verifiedEvidenceIndex": {
+    "canonicalEntryCount": 780,
+    "pathEntryCount": 443,
+    "assetMembershipCount": 1714,
+    "productionAdoption": false
+  },
+  "reviews": [
+    {
+      "code": "PROVENANCE_UNKNOWN_PRESENT",
+      "count": 17
+    },
+    {
+      "code": "UNREFERENCED_PRESENT",
+      "count": 457
+    },
+    {
+      "code": "EXACT_DUPLICATE_CANDIDATES_PRESENT",
+      "count": 2
+    },
+    {
+      "code": "BASENAME_COLLISION_CANDIDATES_PRESENT",
+      "count": 784
+    }
+  ],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "forbiddenOperationCounts": {
+    "assetMutation": 0,
+    "frontendMutation": 0,
+    "externalFetch": 0,
+    "rawConfigDataRead": 0,
+    "semanticRecomputation": 0,
+    "consumerRewrite": 0
+  },
+  "stopAfterStage3": true,
+  "nextStartPoint": "STOP_AH3_FROZEN__AH4_SEPARATE_WORK"
+}
