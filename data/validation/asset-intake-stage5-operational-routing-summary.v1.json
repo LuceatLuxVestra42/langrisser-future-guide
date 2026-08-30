@@ -1,0 +1,43 @@
+{
+  "stage": "Asset Intake Stage 5 - Operational Routing",
+  "status": "PASS_ASSET_INTAKE_STAGE5_OPERATIONAL_ROUTING",
+  "completion": "COMPLETE",
+  "contractVersion": "asset-intake-operational-routing/v1",
+  "baseMainCommit": "0233493f86c86a9e84f4bc119c95a1296c607672",
+  "predecessor": "docs/checkpoints/asset-intake-stage4-repository-integration.md",
+  "routing": {
+    "projectVerifiedEvidenceFirst": true,
+    "assetIntakeBeforeExternalSearch": true,
+    "externalSearchOnlyAfterPending": true,
+    "externalCandidateDirectUse": false,
+    "verifiedExternalCandidateReturnsToAssetIntake": true,
+    "allSourcesExhaustedState": "BLOCKED_NO_VERIFIED_ASSET"
+  },
+  "externalSourcePriority": [
+    "BILIBILI_WIKI_PUBLIC_ORIGINAL",
+    "LEGACY_KR_SHEET_ASSET_DRIVE",
+    "OTHER_EXTERNAL_IMAGE_SOURCE"
+  ],
+  "repositoryEntries": {
+    "routeCli": "npm run asset:intake:route -- --request <file>",
+    "genericCli": "npm run asset:intake -- route --request <file>",
+    "validator": "npm run asset:intake:validate"
+  },
+  "projectDoctor": {
+    "contractVersion": "V5",
+    "newVersionRequired": false,
+    "reason": "Stage 4 already maps tools/asset-intake/**, asset-intake validation summaries, and asset-intake checkpoints to project-doctor tooling and selects asset-intake-self-test.",
+    "expectedSelectedCheck": "asset-intake-self-test"
+  },
+  "preservedBoundaries": {
+    "skinAssetsManual": true,
+    "bannerAssetsManual": true,
+    "semanticRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "fuzzyFilenameMatching": false,
+    "rawConfigDataAssetFallback": false,
+    "frontendChanged": false,
+    "assetBytesChanged": false
+  }
+}
