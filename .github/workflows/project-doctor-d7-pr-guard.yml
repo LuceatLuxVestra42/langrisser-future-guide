@@ -92,4 +92,20 @@ jobs:
         run: npm run doctor -- --dry-run --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
 
       - name: Integrated Doctor real-diff execution
-        run: npm run doctor -- --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
+        shell: bash
+        run: |
+          set +e
+          npm run doctor -- --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
+          doctor_exit=$?
+          set -e
+
+          if [[ "$doctor_exit" -eq 0 ]]; then
+            exit 0
+          fi
+
+          if [[ "$doctor_exit" -eq 3 ]]; then
+            echo "::warning::Project Doctor completed with manual review items and no hard check failures."
+            exit 0
+          fi
+
+          exit "$doctor_exit"
