@@ -1,0 +1,42 @@
+name: Diagnose Project Doctor PR275 Routing
+
+on:
+  push:
+    branches:
+      - diag/project-doctor-pr275-routing
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Analyze each PR 275 changed path
+        shell: bash
+        run: |
+          set +e
+          paths=(
+            'data/checkpoints/hero-stage6-3-full-generation.json'
+            'data/generated/hero-detail-stage6-1.v1.json'
+            'data/generated/hero-detail.v1.json'
+            'data/generated/hero-list-stage1.v1.json'
+            'data/generated/hero-stage6-2-representative-fixtures.v1.json'
+            'data/generated/project-doctor-d5-freshness.v1.json'
+            'data/validation/hero-stage6-1-final.v1.json'
+            'data/validation/hero-stage6-2-final.v1.json'
+            'data/validation/hero-stage6-3-final.v1.json'
+            'data/validation/hero-stage6-4-final.v1.json'
+          )
+          for p in "${paths[@]}"; do
+            echo "===== PATH: $p ====="
+            node scripts/analyze-project-doctor-d2-impact.mjs \
+              --contract data/contracts/project-doctor-d2-impact-contract.v5.json \
+              --json "$p"
+            echo "exit=$?"
+          done
+          exit 0
