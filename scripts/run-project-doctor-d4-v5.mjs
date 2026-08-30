@@ -1,0 +1,30 @@
+import { parseD4Cli, runD4 } from './run-project-doctor-d4.mjs';
+
+const CONTRACT_PATH = 'data/contracts/project-doctor-d4-execution.v5.json';
+const argv = process.argv.slice(2);
+if (argv.includes('--help') || argv.includes('-h')) {
+  console.log(`Uses frozen execution contract: ${CONTRACT_PATH}`);
+  process.exit(0);
+}
+let options;
+try {
+  options = parseD4Cli(['--execution-contract', CONTRACT_PATH, ...argv]);
+  const output = runD4({ options });
+  if (options.json) console.log(JSON.stringify(output, null, 2));
+  else {
+    console.log('PROJECT DOCTOR EXECUTION — D4 V5');
+    console.log(`Plan status   : ${output.plan.status}`);
+    console.log(`Changed files : ${output.plan.changedFileCount}`);
+    console.log(`Run status    : ${output.result.status}`);
+    console.log(`Checks queued : ${output.result.preflight?.queue?.length ?? 0}`);
+    console.log(`Checks run    : ${output.result.executions.length}`);
+    for (const item of output.result.executions) console.log(`  [${item.exitCode}] ${item.id}: ${item.command}`);
+    if (output.result.manualReviews?.length) console.log(`Manual review : ${output.result.manualReviews.length}`);
+  }
+  process.exitCode = output.result.exitCode;
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  if (options?.json) console.log(JSON.stringify({ stage: 'D4-V5', status: 'INVALID_PLAN', error: message }, null, 2));
+  else console.error(`[doctor:run:v5] ${message}`);
+  process.exitCode = 2;
+}
