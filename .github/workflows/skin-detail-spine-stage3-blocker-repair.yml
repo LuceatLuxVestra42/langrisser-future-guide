@@ -1,0 +1,119 @@
+name: Skin Detail Spine Stage 3 Blocker Repair
+
+on:
+  push:
+    branches:
+      - research/skin-detail-spine-stage2-20260830
+    paths:
+      - scripts/repair-skin-detail-spine-stage3-blockers.py
+      - scripts/diagnose-skin-detail-spine-stage3-ledin.py
+      - scripts/spine-stage3-visibility-diagnostic.cs
+      - scripts/spine-stage2-geometry-export.cs
+      - scripts/render-spine-stage2-geometry.py
+      - scripts/run-skin-detail-spine-stage3-bulk.py
+      - scripts/probe-skin-detail-spine-stage2.py
+      - scripts/run-skin-detail-spine-stage2-contract-probe.py
+      - .github/workflows/skin-detail-spine-stage3-blocker-repair.yml
+
+permissions:
+  contents: read
+
+jobs:
+  repair-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+      - name: Install pinned dependencies
+        run: python -m pip install UnityPy==1.25.3 Pillow==12.3.0 numpy==2.5.2
+      - name: Fetch exact Spine runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/spine-runtimes /tmp/spine33repair /tmp/spine33visibility
+          git init -q /tmp/spine-runtimes
+          git -C /tmp/spine-runtimes remote add origin https://github.com/EsotericSoftware/spine-runtimes.git
+          git -C /tmp/spine-runtimes fetch -q --depth=1 origin 1c1936532527900f74cfb58f7002998bf157b254
+          git -C /tmp/spine-runtimes checkout -q FETCH_HEAD
+          test "$(git -C /tmp/spine-runtimes rev-parse HEAD)" = "1c1936532527900f74cfb58f7002998bf157b254"
+      - name: Build frozen geometry exporter
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/spine33repair
+          cat > /tmp/spine33repair/Spine33Repair.csproj <<EOF
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net8.0</TargetFramework>
+              <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+              <ImplicitUsings>disable</ImplicitUsings>
+              <Nullable>disable</Nullable>
+            </PropertyGroup>
+            <ItemGroup>
+              <Compile Include="${GITHUB_WORKSPACE}/scripts/spine-stage2-geometry-export.cs" />
+              <Compile Include="/tmp/spine-runtimes/spine-csharp/src/**/*.cs" />
+            </ItemGroup>
+          </Project>
+          EOF
+          dotnet build /tmp/spine33repair/Spine33Repair.csproj -c Release
+      - name: Build visibility diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/spine33visibility
+          cat > /tmp/spine33visibility/Spine33Visibility.csproj <<EOF
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net8.0</TargetFramework>
+              <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+              <ImplicitUsings>disable</ImplicitUsings>
+              <Nullable>disable</Nullable>
+            </PropertyGroup>
+            <ItemGroup>
+              <Compile Include="${GITHUB_WORKSPACE}/scripts/spine-stage3-visibility-diagnostic.cs" />
+              <Compile Include="/tmp/spine-runtimes/spine-csharp/src/**/*.cs" />
+            </ItemGroup>
+          </Project>
+          EOF
+          dotnet build /tmp/spine33visibility/Spine33Visibility.csproj -c Release
+      - name: Probe eight cross-bundle blockers only
+        run: >-
+          python scripts/repair-skin-detail-spine-stage3-blockers.py
+          --geometry-project /tmp/spine33repair/Spine33Repair.csproj
+          --work-dir /tmp/skin-spine-blocker-repair
+      - name: Diagnose Skin 1001 visibility only
+        run: >-
+          python scripts/diagnose-skin-detail-spine-stage3-ledin.py
+          --visibility-project /tmp/spine33visibility/Spine33Visibility.csproj
+          --work-dir /tmp/skin-spine-ledin-diagnostic
+      - name: Print repair summary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('skin-detail-spine-stage3-blocker-repair.json')
+          if p.exists():
+              x=json.loads(p.read_text(encoding='utf-8'))
+              print(json.dumps({'repair':[(r['skinId'],r['status']) for r in x['records']]},ensure_ascii=False))
+          p=pathlib.Path('skin-detail-spine-stage3-ledin-diagnostic.json')
+          if p.exists():
+              x=json.loads(p.read_text(encoding='utf-8'))
+              v=x.get('visibilityProbe',{}).get('result') or {}
+              print(json.dumps({'ledinReturnCode':x.get('visibilityProbe',{}).get('returnCode'),'defaultSkin':v.get('defaultSkinName'),'skins':v.get('skins'),'requestedAnimationDuration':v.get('requestedAnimationDuration')},ensure_ascii=False))
+          PY
+      - name: Upload targeted repair evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-detail-spine-stage3-blocker-repair
+          path: |
+            skin-detail-spine-stage3-blocker-repair.json
+            skin-detail-spine-stage3-ledin-diagnostic.json
+            skin-detail-spine-stage3-bulk-artifacts/renders/*.png
+          if-no-files-found: warn
+          compression-level: 6
