@@ -1,0 +1,46 @@
+name: Skin Detail Spine Stage 2 Runtime Probe
+
+on:
+  push:
+    branches:
+      - research/skin-detail-spine-stage2-20260830
+    paths:
+      - scripts/probe-skin-detail-projectlplugins.py
+      - .github/workflows/skin-detail-spine-stage2-runtime-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Locate exact ProjectLPlugins assembly in official install packages
+        run: python scripts/probe-skin-detail-projectlplugins.py
+      - name: Inspect managed assembly metadata if located
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          dlls=(/tmp/skin-stage2-runtime/*ProjectLPlugins.dll)
+          if [ ${#dlls[@]} -eq 0 ]; then
+            echo 'No exact ProjectLPlugins.dll found in package catalog.'
+            exit 0
+          fi
+          for dll in "${dlls[@]}"; do
+            echo "=== $dll ==="
+            file "$dll"
+            sha256sum "$dll"
+            strings -a "$dll" | grep -E 'SkeletonBinary|Spine\.Unity|SkeletonDataAsset|ProjectLPlugins|3\.3\.' | head -n 120 || true
+          done
+      - name: Upload runtime catalog only
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-detail-spine-stage2-runtime-catalog
+          path: skin-detail-spine-stage2-runtime-catalog.json
+          if-no-files-found: error
