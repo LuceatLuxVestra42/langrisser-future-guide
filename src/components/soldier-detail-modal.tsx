@@ -3,6 +3,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
+import {
+  getSoldierTrainingMaterialAsset,
+  getSoldierTrainingMaterialUrl,
+} from "@/lib/soldier-training-material-assets";
 import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
 
 type MaterialCost = {
@@ -605,17 +609,52 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
         </div>
 
         <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-          {totals.materials.map((material) => (
-            <div
-              key={`${material.goodsType}:${material.itemId}`}
-              className="rounded-lg border border-border bg-background px-2.5 py-2"
-            >
-              <p className="truncate text-[10px] font-semibold text-muted-foreground">
-                아이템 #{material.itemId}
-              </p>
-              <p className="mt-0.5 text-base font-black tabular-nums text-foreground">× {material.count}</p>
-            </div>
-          ))}
+          {totals.materials.map((material) => {
+            const asset = material.goodsType === 6
+              ? getSoldierTrainingMaterialAsset(material.itemId)
+              : null;
+            const imageUrl = material.goodsType === 6
+              ? getSoldierTrainingMaterialUrl(material.itemId)
+              : null;
+            const label = asset?.name ?? `아이템 #${material.itemId}`;
+
+            return (
+              <div
+                key={`${material.goodsType}:${material.itemId}`}
+                className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-background px-2.5 py-2"
+              >
+                {imageUrl && asset ? (
+                  <img
+                    src={imageUrl}
+                    alt=""
+                    aria-hidden="true"
+                    width={asset.width}
+                    height={asset.height}
+                    loading="lazy"
+                    className="h-10 w-10 shrink-0 object-contain sm:h-11 sm:w-11"
+                  />
+                ) : (
+                  <div
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-black text-muted-foreground sm:h-11 sm:w-11"
+                    aria-hidden="true"
+                  >
+                    #
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p
+                    className="truncate text-[10px] font-semibold text-muted-foreground"
+                    title={label}
+                  >
+                    {label}
+                  </p>
+                  <p className="mt-0.5 text-base font-black tabular-nums text-foreground">
+                    × {formatNumber(material.count)}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
