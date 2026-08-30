@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "schemaId": "hero-provisional-localization-hosted-browser-qa/v1",
+  "stage": "hero-provisional-localization-hosted-browser-qa",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "authoritativeSource": {
+    "branch": "main",
+    "sourceSha": "60d47ea0c7f2a3dcb651baffbe6a6ae63514ad61",
+    "deploymentManifest": "gh-pages/authoritative-pages-source.json",
+    "deployedGhPagesCommit": "94f31de81796fa30a8bcbbbac156e6ff389a6873",
+    "authoritativeDeployWorkflow": ".github/workflows/project-doctor-authoritative-pages-deploy.yml",
+    "authoritativeDeployRunId": 33282405159,
+    "authoritativeDeployConclusion": "success",
+    "focusedBrowserRunId": 33282741515,
+    "focusedBrowserConclusion": "success"
+  },
+  "targets": [
+    {"heroId": 99273, "nameCn": "初真泽瑞达", "displayNameKr": "태초의 젤다", "nameEn": "PureZalrahda", "nameKrStatus": "provisional-display", "sourceAuthority": "CN"},
+    {"heroId": 99281, "nameCn": "骁浪驭虹使", "displayNameKr": "효랑어홍사", "nameEn": "TidalVindicator", "nameKrStatus": "provisional-display", "sourceAuthority": "CN"},
+    {"heroId": 99282, "nameCn": "狺", "displayNameKr": "은(밴시)", "nameEn": "Banshee", "nameKrStatus": "provisional-display", "sourceAuthority": "CN"},
+    {"heroId": 99283, "nameCn": "阿云", "displayNameKr": "아윈(쿠모)", "nameEn": "Kumo", "nameKrStatus": "provisional-display", "sourceAuthority": "CN"},
+    {"heroId": 99287, "nameCn": "魔骸剑使", "displayNameKr": "마검의 화신", "nameEn": "Necroblade", "nameKrStatus": "provisional-display", "sourceAuthority": "CN"}
+  ],
+  "summary": {
+    "targetHeroCount": 5,
+    "koreanDisplaySearchPassCount": 5,
+    "chineseAliasSearchPassCount": 5,
+    "englishAliasSearchPassCount": 5,
+    "cardMetadataPassCount": 5,
+    "detailNavigationPassCount": 5,
+    "detailDisplayPassCount": 5,
+    "detailMetadataPassCount": 5,
+    "mobileKoreanSearchPassCount": 5,
+    "horizontalOverflowErrorCount": 0,
+    "pageErrorCount": 0,
+    "hardErrorCount": 0
+  },
+  "checks": {
+    "latestMainSourceDeployed": true,
+    "authoritativeHostedPipelinePassed": true,
+    "koreanDisplaySearch5Of5": true,
+    "chineseAliasSearch5Of5": true,
+    "englishAliasSearch5Of5": true,
+    "cardStatusAndAuthority5Of5": true,
+    "detailNavigation5Of5": true,
+    "detailTitleAndH1Display5Of5": true,
+    "detailStatusAndAuthority5Of5": true,
+    "mobileKoreanSearch5Of5": true,
+    "semanticStageReopened": false
+  },
+  "invariants": {
+    "canonicalHeroCount": 267,
+    "provisionalHeroCount": 5,
+    "officialKoreanNameUnresolvedCount": 5,
+    "identityMutation": false,
+    "rawConfigDataRead": false,
+    "relationshipRederivation": false,
+    "heroSemanticStageReopened": false
+  },
+  "review": [
+    "The five target Heroes remain official-Korean-name unresolved by design and therefore remain CN-authority provisional display labels.",
+    "An earlier authoritative Hosted attempt encountered a transient HTTP 503 in the Hero-Soldier hosted-resource validator; rerunning the same source completed successfully and did not reproduce the error.",
+    "The first focused browser-QA attempt failed only because the QA branch had not installed the Playwright Node package; after matching the authoritative Playwright 1.55.0 runtime setup, the focused browser checks passed.",
+    "After the first focused pass, main advanced only through Hero fusion-faction mark size/position CSS. The latest main source was then deployed and the full focused five-Hero browser suite was rerun successfully against that exact source."
+  ],
+  "blockers": [],
+  "nextStartPoint": "Localization hosted/browser verification is closed. Revisit only when an authoritative official Korean name is confirmed or the Hero localization/search/display contract changes.",
+  "reopenConditions": [
+    "an authoritative official Korean server name is confirmed for any target Hero",
+    "target heroId/nameCn parity changes",
+    "the Hero localization projection or route/search display contract changes",
+    "hosted Korean display/search/status-authority parity regresses"
+  ]
+}
