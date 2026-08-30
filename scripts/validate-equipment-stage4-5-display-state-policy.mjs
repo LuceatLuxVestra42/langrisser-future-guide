@@ -114,7 +114,13 @@ const generalMarkers = [
   "장비 종류·세부 타입 순서를 유지하고, 같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순이야. 같은 출시 그룹 안의 개별 순서는 별도 출시순 의미가 없어.",
   "한국명 REVIEW · 중문명 임시 표시",
   "filteredRecords.length > 0",
-  "장비 종류 필터 초기화",
+  "const resetFilters = () => {",
+  "setUiState((current) => ({ ...current, group: null, subtype: null }));",
+  "onClick={resetFilters}",
+  "const resetDiscovery = () => {",
+  'query: "",',
+  'sort: "default",',
+  "onClick={resetDiscovery}",
   'to="/equipment/$equipmentId"',
 ];
 for (const marker of generalMarkers) {
@@ -128,11 +134,15 @@ const exclusiveMarkers = [
   "persistenceReady",
   "selectedGroup?.subtypes.some",
   "한국명 REVIEW · 중문명 임시 표시",
-  "선택한 장비 종류 필터는 다음 방문에도 유지돼.",
   "현재 순서는 표시용 deterministic order이며 전용장비 출시순으로 해석하지 않아.",
   "filteredRecords.length > 0",
   "조건에 맞는 전용장비가 없어.",
-  "장비 종류 필터 초기화",
+  "const resetFilters = () => {",
+  "setUiState((current) => ({ ...current, group: null, subtype: null }));",
+  "onClick={resetFilters}",
+  "const resetDiscovery = () => {",
+  "setUiState(DEFAULT_EXCLUSIVE_UI_STATE);",
+  "onClick={resetDiscovery}",
   'to="/equipment/$equipmentId"',
 ];
 for (const marker of exclusiveMarkers) {
