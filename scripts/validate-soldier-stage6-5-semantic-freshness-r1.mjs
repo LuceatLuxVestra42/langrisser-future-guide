@@ -3,7 +3,7 @@ import {
   buildStage65MembershipDigest,
   classifyStage65Snapshot,
   normalizeMembershipPairs,
-} from './lib/soldier-stage6-5-semantic-projections.mjs';
+} from './soldier-stage6-5-semantic-projections.mjs';
 
 const canonicalPairs = [
   { heroId: 1, soldierId: 100 },
