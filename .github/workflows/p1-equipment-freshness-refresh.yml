@@ -1,0 +1,66 @@
+name: P1 Equipment Freshness Refresh (temporary)
+
+on:
+  push:
+    branches:
+      - maintenance/p1-equipment-persistence-hardening
+    paths:
+      - '.github/workflows/p1-equipment-freshness-refresh.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout P1 branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: maintenance/p1-equipment-persistence-hardening
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Refresh deterministic Equipment acquisition outputs
+        run: |
+          node scripts/analyze-equipment-acquisition.mjs
+          node scripts/scan-acquisition-pathtype-sources.mjs
+          node scripts/sample-acquisition-pathtypes.mjs
+
+      - name: Refresh Hosted predecessor summary against authoritative Pages
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-equipment-image-stage3-hosted.mjs
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Revalidate Browser/UI against authoritative Pages
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-equipment-image-stage3-browser-ui.mjs
+
+      - name: Persist refreshed frozen evidence on P1 branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/generated/equipment_acquisition_path_analysis.json \
+            data/generated/equipment_acquisition_pathtype_sources.json \
+            data/generated/equipment_acquisition_pathtype_samples.json \
+            data/validation/equipment-image-stage3-hosted-qa-summary.v1.json \
+            data/evidence/equipment-image-stage3-browser-ui.v1.json \
+            data/checkpoints/equipment-image-stage3-final.v1.json
+          if git diff --cached --quiet; then
+            echo 'No P1 freshness changes to persist.'
+            exit 0
+          fi
+          git commit -m 'Refresh P1 Equipment frozen evidence'
+          git push origin HEAD:maintenance/p1-equipment-persistence-hardening
