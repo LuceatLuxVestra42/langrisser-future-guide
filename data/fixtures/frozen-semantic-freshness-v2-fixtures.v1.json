@@ -3,7 +3,7 @@
   "schemaId": "frozen-semantic-freshness-v2-fixtures/v1",
   "status": "FROZEN",
   "contract": "frozen-semantic-freshness/v2",
-  "purpose": "Deterministic contract fixtures proving semantic digests ignore audit-only provenance drift while remaining fail-closed for semantic mutations.",
+  "purpose": "Deterministic contract fixtures proving semantic digests ignore audit-only provenance drift while remaining fail-closed for semantic mutations under explicit projection rules.",
   "cases": [
     {
       "id": "generated-at-only",
@@ -35,40 +35,36 @@
       "id": "object-key-order-only",
       "projection": "fixture/soldier-record/v1",
       "expect": "SAME",
-      "left": {
-        "semanticPayload": {"schemaId":"fixture-soldier/v1","summary":{"normal":168,"sp":56},"records":[{"soldierId":1,"combat":{"hp":100,"atk":50}}]},
-        "audit": {}
-      },
-      "right": {
-        "semanticPayload": {"records":[{"combat":{"atk":50,"hp":100},"soldierId":1}],"summary":{"sp":56,"normal":168},"schemaId":"fixture-soldier/v1"},
-        "audit": {}
-      }
+      "left": {"semanticPayload":{"schemaId":"fixture-soldier/v1","summary":{"normal":168,"sp":56},"records":[{"soldierId":1,"combat":{"hp":100,"atk":50}}]},"audit":{}},
+      "right": {"semanticPayload":{"records":[{"combat":{"atk":50,"hp":100},"soldierId":1}],"summary":{"sp":56,"normal":168},"schemaId":"fixture-soldier/v1"},"audit":{}}
+    },
+    {
+      "id": "array-order-semantic",
+      "projection": "fixture/soldier-record/v1",
+      "expect": "DIFFERENT",
+      "left": {"semanticPayload":{"records":[{"soldierId":1},{"soldierId":2}]},"audit":{}},
+      "right": {"semanticPayload":{"records":[{"soldierId":2},{"soldierId":1}]},"audit":{}}
     },
     {
       "id": "name-kr-semantic-change",
       "projection": "fixture/soldier-record/v1",
       "expect": "DIFFERENT",
-      "left": {
-        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"identity":{"nameKr":"드래고니아"}}]},
-        "audit": {}
-      },
-      "right": {
-        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"identity":{"nameKr":"드래고니아 나이트"}}]},
-        "audit": {}
-      }
+      "left": {"semanticPayload":{"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"identity":{"nameKr":"드래고니아"}}]},"audit":{}},
+      "right": {"semanticPayload":{"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"identity":{"nameKr":"드래고니아 나이트"}}]},"audit":{}}
+    },
+    {
+      "id": "soldier-id-semantic-change",
+      "projection": "fixture/soldier-record/v1",
+      "expect": "DIFFERENT",
+      "left": {"semanticPayload":{"records":[{"soldierId":1,"combat":{"hp":100}}]},"audit":{}},
+      "right": {"semanticPayload":{"records":[{"soldierId":2,"combat":{"hp":100}}]},"audit":{}}
     },
     {
       "id": "combat-semantic-change",
       "projection": "fixture/soldier-record/v1",
       "expect": "DIFFERENT",
-      "left": {
-        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"combat":{"hp":100,"atk":50}}]},
-        "audit": {}
-      },
-      "right": {
-        "semanticPayload": {"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"combat":{"hp":101,"atk":50}}]},
-        "audit": {}
-      }
+      "left": {"semanticPayload":{"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"combat":{"hp":100,"atk":50}}]},"audit":{}},
+      "right": {"semanticPayload":{"schemaId":"fixture-soldier/v1","records":[{"soldierId":1,"combat":{"hp":101,"atk":50}}]},"audit":{}}
     }
   ],
   "relationCases": [
@@ -76,27 +72,43 @@
       "id": "relation-pair-change",
       "expectMembership": "DIFFERENT",
       "expectSemantic": "DIFFERENT",
-      "left": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_HERO_SOLDIER","sourceId":100,"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]},
-      "right": {"edges":[{"heroId":10,"soldierId":21,"provenance":[{"sourceKind":"BASE_HERO_SOLDIER","sourceId":100,"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]}
+      "left": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_SOLDIER_HERO","sourceClass":"DIRECT","origin":{"table":"ConfigDataSoldierInfo","recordId":20,"recordKeyField":"ID","field":"GetSoldierHeros_ID"},"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]},
+      "right": {"edges":[{"heroId":10,"soldierId":21,"provenance":[{"sourceKind":"BASE_SOLDIER_HERO","sourceClass":"DIRECT","origin":{"table":"ConfigDataSoldierInfo","recordId":21,"recordKeyField":"ID","field":"GetSoldierHeros_ID"},"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]}
     },
     {
       "id": "relation-audit-blob-only",
       "expectMembership": "SAME",
       "expectSemantic": "SAME",
-      "left": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_HERO_SOLDIER","sourceId":100,"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]},
-      "right": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_HERO_SOLDIER","sourceId":100,"gitBlobSha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}]}]}
+      "left": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_SOLDIER_HERO","sourceClass":"DIRECT","origin":{"table":"ConfigDataSoldierInfo","recordId":20,"recordKeyField":"ID","field":"GetSoldierHeros_ID"},"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]},
+      "right": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_SOLDIER_HERO","sourceClass":"DIRECT","origin":{"table":"ConfigDataSoldierInfo","recordId":20,"recordKeyField":"ID","field":"GetSoldierHeros_ID"},"gitBlobSha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}]}]}
     },
     {
-      "id": "relation-semantic-provenance-change",
+      "id": "relation-semantic-source-kind-change",
       "expectMembership": "SAME",
       "expectSemantic": "DIFFERENT",
-      "left": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_HERO_SOLDIER","sourceId":100,"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]},
-      "right": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"SP_HERO_REWARD","sourceId":100,"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]}
+      "left": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_SOLDIER_HERO","sourceClass":"DIRECT","origin":{"table":"ConfigDataSoldierInfo","recordId":20,"recordKeyField":"ID","field":"GetSoldierHeros_ID"},"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]},
+      "right": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"SP_HERO_REWARD","sourceClass":"DIRECT","origin":{"table":"ConfigDataSPHeroInfo","recordId":10,"recordKeyField":"ID","field":"SecondStageRewardSoldiers"},"gitBlobSha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}]}
+    },
+    {
+      "id": "relation-semantic-origin-change",
+      "expectMembership": "SAME",
+      "expectSemantic": "DIFFERENT",
+      "left": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_SOLDIER_HERO","sourceClass":"DIRECT","origin":{"table":"ConfigDataSoldierInfo","recordId":20,"recordKeyField":"ID","field":"GetSoldierHeros_ID"}}]}]},
+      "right": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_SOLDIER_HERO","sourceClass":"DIRECT","origin":{"table":"ConfigDataSoldierInfo","recordId":20,"recordKeyField":"ID","field":"DifferentSemanticField"}}]}]}
+    },
+    {
+      "id": "relation-unregistered-audit-field-only",
+      "expectMembership": "SAME",
+      "expectSemantic": "SAME",
+      "left": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_SOLDIER_HERO","sourceClass":"DIRECT","origin":{"table":"ConfigDataSoldierInfo","recordId":20,"recordKeyField":"ID","field":"GetSoldierHeros_ID"},"workflowRunId":100}]}]},
+      "right": {"edges":[{"heroId":10,"soldierId":20,"provenance":[{"sourceKind":"BASE_SOLDIER_HERO","sourceClass":"DIRECT","origin":{"table":"ConfigDataSoldierInfo","recordId":20,"recordKeyField":"ID","field":"GetSoldierHeros_ID"},"workflowRunId":101}]}]}
     }
   ],
   "negativeCases": [
     {"id":"non-finite-number","kind":"NON_FINITE_NUMBER"},
     {"id":"undefined-object-value","kind":"UNDEFINED_OBJECT_VALUE"},
-    {"id":"projection-mismatch","kind":"PROJECTION_MISMATCH"}
+    {"id":"projection-mismatch","kind":"PROJECTION_MISMATCH"},
+    {"id":"duplicate-relation-pair","kind":"DUPLICATE_RELATION_PAIR"},
+    {"id":"malformed-relation-provenance","kind":"MALFORMED_RELATION_PROVENANCE"}
   ]
 }
