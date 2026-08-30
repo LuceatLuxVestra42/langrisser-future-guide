@@ -40,7 +40,7 @@ const admission = readJson("data/presentation/equipment-public-admission-correct
 const display = readJson("data/presentation/equipment-display-collection.v1.json");
 const chronologyAudit = readJson("data/validation/equipment-p3-0-release-chronology-presentation-audit.v3.json");
 const chronologyContract = readJson("data/presentation/equipment-p3-1-release-metadata.v2.json");
-const projection = readJson("data/checkpoints/equipment-public-presentation-correction-projection.v1.json");
+const projection = readJson("data/contracts/project-doctor-equipment-public-presentation-correction-projection.v1.json");
 
 assert(stage4.population.canonical === 390, "Stage4 canonical predecessor changed.");
 assert(stage4.population.public === 373, "Stage4 public predecessor changed.");
