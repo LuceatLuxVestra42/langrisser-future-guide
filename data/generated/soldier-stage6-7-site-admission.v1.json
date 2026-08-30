@@ -7,7 +7,7 @@
   "generatedAt": "2026-08-30T00:48:09.761Z",
   "scope": "SOLDIER_PAGE_DATA_ADMISSION",
   "purpose": "Final gate proving canonical Soldier data can stably support list, detail, filters, reciprocal Hero links and later expansion without reopening semantic or JOIN inference.",
-  "admissionRule": "Admit Soldier page data when every canonical record is generated, automated validation has no FAIL records, REVIEW items are explicit, representative/filter/reciprocal QA passes, expansion inputs are preserved, and every frozen source blob still matches its recorded snapshot.",
+  "admissionRule": "Admit Soldier page data when every canonical record is generated, automated validation has no FAIL records, REVIEW items are explicit, representative/filter/reciprocal QA passes, expansion inputs are preserved, legacy frozen dependencies retain exact SHA parity, and explicitly registered V2 semantic dependencies are fresh. Provenance-only drift remains visible but is not semantic failure.",
   "capabilities": {
     "listData": "READY",
     "detailData": "READY",
@@ -138,7 +138,14 @@
     },
     "expansionBasis": {
       "path": "data/generated/soldier-stage6-6-expansion-basis.v1.json",
-      "gitBlobSha": "9016a35d1b02e451fb8bc714d200cbb6aba6acc6"
+      "gitBlobSha": "9016a35d1b02e451fb8bc714d200cbb6aba6acc6",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-6-expansion-basis/semantic-v1",
+        "digest": "sha256:13fa35aef09bd70699810a81e95553e988b9b127ccad002968d03157f4ae18da"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     }
   },
   "sources": {
@@ -184,11 +191,49 @@
     },
     "stage6_6Manifest": {
       "path": "data/generated/soldier-stage6-6-expansion-basis.v1.json",
-      "gitBlobSha": "9016a35d1b02e451fb8bc714d200cbb6aba6acc6"
+      "gitBlobSha": "9016a35d1b02e451fb8bc714d200cbb6aba6acc6",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-6-expansion-basis/semantic-v1",
+        "digest": "sha256:13fa35aef09bd70699810a81e95553e988b9b127ccad002968d03157f4ae18da"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_6": {
       "path": "data/validation/soldier-stage6-6-expansion-basis.v1.json",
-      "gitBlobSha": "b2d17cad53eb2cc23ab354f60d12978437d57556"
+      "gitBlobSha": "b2d17cad53eb2cc23ab354f60d12978437d57556",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-6-expansion-validation/semantic-v1",
+        "digest": "sha256:4620c059609bf3521607c7b408fb5e97f3eb0aee9021a624c17cbba5e7257f7c"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
+    }
+  },
+  "semanticDependencies": {
+    "stage3Generated": {
+      "path": "data/generated/soldier-stage3.v1.json",
+      "gitBlobSha": "afaebae396017391689c78a1b76c244e06067011",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7/transitive-stage3-generated/v1",
+        "digest": "sha256:6557e529f88da29342cb46fd1a40c5764a97dd2fb32462b0741c78b81b76fe46"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
+    },
+    "stage3Validation": {
+      "path": "data/validation/soldier-stage3-final.v1.json",
+      "gitBlobSha": "e1aa89d12d07edd513f993458be3e08e7ec57e03",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7/transitive-stage3-validation/v1",
+        "digest": "sha256:22f9a9d666d0e613f3a2c404349a6b10e0fe01d9ac11182c29d3c118e274b667"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     }
   }
 }
