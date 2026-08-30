@@ -1,0 +1,324 @@
+{
+  "version": 2,
+  "schemaId": "frozen-semantic-freshness-contract/v2",
+  "status": "FROZEN",
+  "contract": "frozen-semantic-freshness/v2",
+  "purpose": "Separate semantic freshness from Git provenance drift for frozen Soldier closeout artifacts while preserving fail-closed behavior for real semantic change and unresolved legacy drift.",
+  "scope": {
+    "owned": [
+      "semantic digest envelope and comparison rules",
+      "semantic/provenance freshness classification",
+      "legacy gitBlobSha compatibility during incremental migration",
+      "projection identities for Soldier Stage 6-6 and shared Hero-Soldier relation consumers"
+    ],
+    "notOwned": [
+      ".github/workflows/**",
+      "producer transport or branch protection",
+      "Project Doctor pass/exit policy",
+      "Hero or Soldier canonical identity research",
+      "Hero-Soldier relation regeneration",
+      "production frozen artifact bulk migration"
+    ]
+  },
+  "digestContract": {
+    "algorithm": "sha256",
+    "representation": "sha256:<64-lowercase-hex>",
+    "identityFields": [
+      "contract",
+      "algorithm",
+      "projection",
+      "digest"
+    ],
+    "canonicalization": {
+      "objectKeys": "recursive lexicographic sort",
+      "arrayOrder": "preserved unless the named projection explicitly defines semantic sorting before canonicalization",
+      "strings": "exact; no implicit Unicode normalization",
+      "negativeZero": "canonicalize to 0",
+      "nonFiniteNumbers": "fail-closed",
+      "undefinedValues": "fail-closed",
+      "cyclicValues": "fail-closed",
+      "nonPlainObjects": "fail-closed"
+    },
+    "helperCompatibility": {
+      "module": "scripts/lib/frozen-semantic-digest.mjs",
+      "buildFunction": "buildSemanticDigest",
+      "comparisonFunction": "sameSemanticDigest",
+      "rule": "The helper receives an explicit semantic payload. It must not perform generic recursive metadata stripping."
+    }
+  },
+  "descriptorContract": {
+    "legacy": {
+      "required": [
+        "path",
+        "gitBlobSha"
+      ],
+      "meaning": "Exact repository-byte provenance only. It proves freshness when current and recorded blob SHAs still match."
+    },
+    "v2": {
+      "required": [
+        "path",
+        "gitBlobSha",
+        "semanticDigest"
+      ],
+      "semanticDigestShape": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "non-empty registered projection id",
+        "digest": "sha256:<64-lowercase-hex>"
+      },
+      "meaning": "gitBlobSha remains audit provenance; semanticDigest is the semantic freshness authority for the registered projection."
+    }
+  },
+  "freshnessAxes": {
+    "semanticState": [
+      "SEMANTIC_FRESH",
+      "SEMANTIC_STALE",
+      "SEMANTIC_UNKNOWN"
+    ],
+    "provenanceState": [
+      "PROVENANCE_MATCH",
+      "PROVENANCE_CHANGED",
+      "PROVENANCE_UNKNOWN"
+    ]
+  },
+  "classification": {
+    "states": {
+      "SEMANTIC_FRESH": {
+        "blocking": false,
+        "rule": "Recorded and current semantic digests match under the same contract, algorithm and projection; provenance may match or be unavailable."
+      },
+      "PROVENANCE_ONLY_CHANGED": {
+        "blocking": false,
+        "rule": "Recorded and current semantic digests match, but current gitBlobSha differs from recorded gitBlobSha."
+      },
+      "SEMANTIC_STALE": {
+        "blocking": true,
+        "rule": "A valid recorded V2 semantic digest and a valid current digest under the same projection differ."
+      },
+      "SEMANTIC_UNKNOWN": {
+        "blocking": true,
+        "rule": "Semantic equality cannot be proven because digest data is missing/invalid, projection identity is incompatible, or legacy bytes changed without a V2 semantic digest."
+      }
+    },
+    "precedence": [
+      "SEMANTIC_STALE",
+      "SEMANTIC_UNKNOWN",
+      "PROVENANCE_ONLY_CHANGED",
+      "SEMANTIC_FRESH"
+    ]
+  },
+  "legacyMigrationCompatibility": {
+    "rules": [
+      {
+        "condition": "legacy descriptor has no semanticDigest and current gitBlobSha equals recorded gitBlobSha",
+        "semanticState": "SEMANTIC_FRESH",
+        "provenanceState": "PROVENANCE_MATCH",
+        "classification": "SEMANTIC_FRESH",
+        "blocking": false,
+        "reason": "Byte identity is stronger than semantic equality and permits incremental migration without bulk resealing."
+      },
+      {
+        "condition": "legacy descriptor has no semanticDigest and current gitBlobSha differs from recorded gitBlobSha",
+        "semanticState": "SEMANTIC_UNKNOWN",
+        "provenanceState": "PROVENANCE_CHANGED",
+        "classification": "SEMANTIC_UNKNOWN",
+        "blocking": true,
+        "reason": "Without a registered semantic digest, changed bytes cannot be safely interpreted as metadata-only drift."
+      },
+      {
+        "condition": "legacy descriptor has no semanticDigest and either recorded or current gitBlobSha is unavailable",
+        "semanticState": "SEMANTIC_UNKNOWN",
+        "provenanceState": "PROVENANCE_UNKNOWN",
+        "classification": "SEMANTIC_UNKNOWN",
+        "blocking": true,
+        "reason": "Neither exact-byte nor semantic equality can be proven."
+      }
+    ]
+  },
+  "v2ComparisonRules": [
+    "Contract, algorithm and projection identity must match before digest bytes are comparable.",
+    "Projection mismatch is SEMANTIC_UNKNOWN, never semantic equality.",
+    "Current semantic digest must be recomputed from the current artifact using the registered projection; consumers must not trust an embedded digest alone.",
+    "Valid semantic match plus raw SHA drift is PROVENANCE_ONLY_CHANGED and remains visible in audit/review output without blocking semantic admission.",
+    "Semantic mismatch is blocking even when raw SHA matches or is unavailable.",
+    "Unknown or malformed V2 digest data is fail-closed SEMANTIC_UNKNOWN."
+  ],
+  "projectionPolicy": {
+    "explicitPayloadOnly": true,
+    "genericMetadataBlacklistForbidden": true,
+    "unknownFields": "not silently included; projection code explicitly maps semantic fields and bumps projection id when semantic shape changes",
+    "ordering": "Each projection declares whether array order is semantic or normalized before digesting."
+  },
+  "projections": {
+    "soldier-stage6-6-expansion-basis/semantic-v1": {
+      "sourceSchemaId": "soldier-stage6-6-expansion-basis/v1",
+      "purpose": "Semantic identity of the Stage 6-6 expansion-basis manifest without audit timestamps, provenance snapshots or prose-only documentation.",
+      "payload": {
+        "version": "source.version",
+        "schemaId": "source.schemaId",
+        "stage": "source.stage",
+        "status": "source.status",
+        "simulatorReadiness": [
+          "status",
+          "scope"
+        ],
+        "authorities": {
+          "fullStats": [
+            "source",
+            "field"
+          ],
+          "normalTraitLevels": [
+            "source",
+            "field",
+            "scope"
+          ],
+          "trainingCosts": [
+            "source",
+            "field",
+            "scope"
+          ],
+          "spExpansion": [
+            "source",
+            "field",
+            "scope"
+          ],
+          "heroEligibilityProvenance": [
+            "source",
+            "field"
+          ]
+        },
+        "summary": "source.summary exact JSON value"
+      },
+      "excludedByConstruction": [
+        "generatedAt",
+        "sources",
+        "purpose",
+        "simulatorReadiness.implementedNow",
+        "simulatorReadiness.deferred",
+        "authorities.*.rule"
+      ]
+    },
+    "soldier-stage6-6-expansion-validation/semantic-v1": {
+      "sourceSchemaId": "soldier-stage6-6-expansion-basis-validation/v1",
+      "purpose": "Semantic identity of Stage 6-6 validation results while ignoring audit snapshots and prose wording.",
+      "payload": {
+        "version": "source.version",
+        "schemaId": "source.schemaId",
+        "stage": "source.stage",
+        "status": "source.status",
+        "checks": "source.checks exact JSON value",
+        "coverage": "source.coverage exact JSON value",
+        "reviews": "map each review to {code, classification, count?}; sort by code then classification"
+      },
+      "excludedByConstruction": [
+        "generatedAt",
+        "sources",
+        "errors prose",
+        "reviews[].rule prose"
+      ]
+    },
+    "hero-soldier-membership/v1": {
+      "sourceSchemaId": "hero-soldier-relation-set/v1",
+      "purpose": "Canonical Hero-Soldier pair membership only.",
+      "payload": "relation.edges -> {heroId, soldierId}, sorted by heroId then soldierId",
+      "validation": [
+        "heroId and soldierId must be integers",
+        "duplicate pairs are fail-closed",
+        "relation provenance and raw gitBlobSha are excluded"
+      ]
+    },
+    "hero-soldier-relation/semantic-v1": {
+      "sourceSchemaId": "hero-soldier-relation-set/v1",
+      "purpose": "Canonical pair identity plus semantic relation provenance.",
+      "payload": {
+        "edgeIdentity": [
+          "heroId",
+          "soldierId"
+        ],
+        "provenance": {
+          "required": [
+            "sourceKind",
+            "sourceClass",
+            "origin"
+          ],
+          "origin": [
+            "table",
+            "recordId",
+            "recordKeyField",
+            "field"
+          ],
+          "optionalParentEdge": [
+            "heroId",
+            "soldierId",
+            "parentSourceKind"
+          ],
+          "optionalSupportRelation": [
+            "kind",
+            "table",
+            "recordId",
+            "normalSoldierId",
+            "spSoldierId"
+          ]
+        }
+      },
+      "excludedByConstruction": [
+        "relation.generatedAt",
+        "relation.inputs",
+        "relation.contracts",
+        "any raw gitBlobSha audit field"
+      ],
+      "ordering": "Sort edges by heroId then soldierId; normalize each provenance object to the explicit field shape and sort provenance entries by canonical JSON."
+    }
+  },
+  "consumerMapping": {
+    "soldier-stage4-6-relation-consumer": {
+      "currentMode": "RAW_SHA_FRESHNESS_CONSUMER",
+      "v2Target": [
+        "hero-soldier-relation/semantic-v1 for canonical relation meaning",
+        "hero-soldier-membership/v1 for index pair parity"
+      ],
+      "migrationRule": "Do not weaken existing semantic/index parity checks; replace raw-SHA-only freshness decisions only when the required projection digest is available."
+    },
+    "soldier-stage6-5-reciprocal-links": {
+      "currentMode": "RAW_SHA_FRESHNESS_CONSUMER",
+      "v2Target": [
+        "hero-soldier-membership/v1"
+      ],
+      "reason": "Stage 6-5 owns reciprocal page membership parity, not provenance-source interpretation."
+    },
+    "soldier-stage6-7-site-admission": {
+      "currentMode": "RAW_SHA_FRESHNESS_CONSUMER",
+      "v2Target": [
+        "prefer registered V2 semanticDigest comparison",
+        "use legacy exact-SHA compatibility for unmigrated refs",
+        "block SEMANTIC_STALE and SEMANTIC_UNKNOWN",
+        "report but do not block PROVENANCE_ONLY_CHANGED"
+      ]
+    }
+  },
+  "literalPinPolicy": {
+    "owner": "scripts/finalize-hero-soldier-relation-layer.cjs",
+    "checks": [
+      "fixturePlanBlobMismatch",
+      "spSoldierFixtureSnapshotBlobMismatch"
+    ],
+    "status": "BYTE_PIN_FAIL_CLOSED",
+    "rule": "P1 does not reinterpret these literal SHA-256 gates as provenance-only. They remain blocking byte-authority pins until a separate evidence-backed contract revision explicitly migrates them."
+  },
+  "migrationOrder": [
+    "P3: add Stage 6-6 manifest/validation semantic digests using the two Stage 6-6 projections; retain existing gitBlobSha fields.",
+    "P4: update Stage 6-7 to evaluate V2 refs first and legacy exact-SHA refs second using this contract.",
+    "Later: migrate Stage 6-5 and Stage 4-6 relation consumers to registered relation projections only after dedicated regression coverage.",
+    "Do not bulk-migrate Stage 5/6 producers solely to satisfy P3/P4."
+  ],
+  "forbidden": [
+    "Treat raw gitBlobSha drift alone as semantic corruption when a valid matching V2 digest proves semantic equality.",
+    "Treat a legacy raw-SHA mismatch as provenance-only without a semantic digest.",
+    "Trust an embedded semanticDigest without recomputing the current projection.",
+    "Use a generic recursive field blacklist to build production semantic payloads.",
+    "Compare digests across different projection IDs.",
+    "Silently migrate literal relation pin gates.",
+    "Change workflow transport, branch protection or pr-guard exit policy in P1."
+  ],
+  "completion": "P1 is complete when the V2 digest envelope, freshness classifications, legacy fallback, Stage 6-6 pilot projections, relation projections, consumer mapping and literal-pin boundary are frozen without modifying production frozen artifacts or workflow transport."
+}
