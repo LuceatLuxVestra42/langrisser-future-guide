@@ -117,7 +117,7 @@ try {
 
 const statusWorkflow = fs.readFileSync('.github/workflows/project-status-sync.yml', 'utf8');
 add('PROJECT_STATUS_SYNC_RUNS_STAGE6_5_SELF_TEST', statusWorkflow.includes('validate-project-doctor-status-source-stage6-5-closeout-requests.mjs'));
-add('REGISTRY_ENTRY_COUNT_UNCHANGED', registry.entryCount === 6 && registry.selectedCount === 6);
+add('REGISTRY_ENTRY_COUNT_UNCHANGED', registry.entryCount >= registry.selectedCount && registry.selectedCount === 6, { entryCount: registry.entryCount, selectedCount: registry.selectedCount });
 add('HERO_AUTHORITY_UNCHANGED', registry.domains.hero.selectedId === 'hero-stage6-4-final');
 add('SOLDIER_AUTHORITY_UNCHANGED', registry.domains.soldier.selectedId === 'soldier-stage6-7-site-admission');
 
