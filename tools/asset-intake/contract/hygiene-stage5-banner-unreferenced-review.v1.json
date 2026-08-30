@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage5-banner-unreferenced-review-contract/v1",
+  "stage": "ASSET_HYGIENE_5_2",
+  "purpose": "Review the frozen 431-file Banner unreferenced population using current reference absence, current Banner relation absence, physical root membership, exact-duplicate predecessor decisions, and Git path-history provenance only. Do not infer semantic role, canonical ownership, supersession, or deletion safety from filenames, byte equality, import batches, or reference absence.",
+  "predecessors": {
+    "stage5ScopeFreeze": {
+      "status": "PASS_WITH_REVIEW",
+      "completion": "COMPLETE",
+      "freezeState": "ASSET_HYGIENE_STAGE5_DESTRUCTIVE_SCOPE_FROZEN"
+    },
+    "stage5BannerDuplicateReview": {
+      "status": "PASS_WITH_REVIEW",
+      "completion": "COMPLETE",
+      "freezeState": "ASSET_HYGIENE_STAGE5_BANNER_DUPLICATE_REVIEW_FROZEN",
+      "deleteApproved": false
+    }
+  },
+  "target": {
+    "root": "public/images/banners/",
+    "expectedAssetCount": 431,
+    "physicalFamilies": [
+      "Banner",
+      "Picture_Notice"
+    ]
+  },
+  "bannerCurrentBoundary": {
+    "expectedPhysicalAssetCount": 501,
+    "expectedCurrentResolvedUniquePathCount": 70,
+    "canonicalAssetOwner": false,
+    "assetMayMergeBannerDefinitions": false,
+    "crossRootFallbackAllowed": false,
+    "filenameSimilarityAllowed": false,
+    "perceptualImageEquivalence": false
+  },
+  "reviewPolicy": {
+    "currentReferenceMustRemainAbsent": true,
+    "currentBannerResolvedRelationMustRemainAbsent": true,
+    "gitPathHistoryRequired": true,
+    "currentPathIntroductionEvidenceRequired": true,
+    "introductionBatchMeaning": "PATH_PROVENANCE_ONLY_NOT_SEMANTIC_ROLE_OR_OWNER_IDENTITY",
+    "duplicatePredecessorDecision": "RETAIN_PENDING_ROLE_OR_OWNER_EQUIVALENCE_EVIDENCE",
+    "defaultSingletonDecision": "RETAIN_REVIEW_ONLY_UNREFERENCED",
+    "deleteEligible": false,
+    "deleteApproved": false
+  },
+  "forbiddenInferences": [
+    "UNREFERENCED_TO_UNUSED",
+    "FILENAME_TO_BANNER_ROLE",
+    "FILENAME_TO_CANONICAL_IDENTITY",
+    "IMPORT_BATCH_TO_ROLE_EQUIVALENCE",
+    "IMPORT_BATCH_TO_OWNER_EQUIVALENCE",
+    "BYTE_EQUALITY_TO_SEMANTIC_IDENTITY",
+    "CURRENT_REFERENCE_ABSENCE_TO_DELETE_SAFETY",
+    "PATH_ORDER_OR_NAME_PATTERN_TO_SUPERSESSION"
+  ],
+  "forbiddenOperations": [
+    "ASSET_DELETE",
+    "ASSET_MOVE",
+    "ASSET_RENAME",
+    "FORMAT_CONVERSION",
+    "FRONTEND_MUTATION",
+    "CONSUMER_REWRITE",
+    "RESOLVER_REWRITE",
+    "SEMANTIC_RELATION_RECOMPUTATION",
+    "CANONICAL_RELATION_RECOMPUTATION"
+  ],
+  "finalState": {
+    "status": "PASS_WITH_REVIEW",
+    "completion": "COMPLETE",
+    "freezeState": "ASSET_HYGIENE_STAGE5_BANNER_UNREFERENCED_REVIEW_FROZEN",
+    "nextStartPoint": "ASSET_HYGIENE_5_3_NON_BANNER_UNREFERENCED_REVIEW"
+  }
+}
