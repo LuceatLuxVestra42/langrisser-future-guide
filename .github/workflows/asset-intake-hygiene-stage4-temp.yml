@@ -1,0 +1,43 @@
+name: Asset Hygiene Stage 4 Temporary Producer
+
+on:
+  push:
+    branches:
+      - work/asset-intake-hygiene-stage4-production-admission-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  explicit-producer:
+    if: >-
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[asset-hygiene-stage4-produce]'))
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Generate Stage 4 production admission
+        run: node tools/asset-intake/cli/run-hygiene-stage4-v1.mjs
+      - name: Freeze generated Stage 4 artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            tools/asset-intake/hygiene/generated/asset-hygiene-production-admission-index.v1.json \
+            tools/asset-intake/hygiene/generated/asset-hygiene-production-quarantine-index.v1.json \
+            data/validation/asset-intake-hygiene-stage4-production-admission-summary.v1.json \
+            docs/checkpoints/asset-intake-hygiene-stage4-production-admission.md
+          git commit -m "Freeze Asset Hygiene Stage 4 production admission"
+      - name: Validate committed Stage 4 production admission
+        run: node tools/asset-intake/cli/validate-hygiene-stage4-v1.mjs
+      - name: Push frozen Stage 4 artifacts
+        run: git push origin HEAD:${{ github.ref_name }}
