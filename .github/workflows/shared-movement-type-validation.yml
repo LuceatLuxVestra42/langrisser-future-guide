@@ -10,25 +10,103 @@ on:
       - 'data/configdata/ConfigDataSoldierInfo.json'
       - 'data/generated/hero-job-links.v1.json'
       - 'data/generated/soldier-master.v1.json'
+      - 'data/generated/shared-movement-type-index.v1.json'
+      - 'data/validation/shared-movement-type-index-final.v1.json'
+      - 'scripts/build_shared_movement_types.mjs'
+      - 'package.json'
+      - '.github/workflows/shared-movement-type-validation.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/hero-soldier-movement-type-presentation.v1.json'
+      - 'data/configdata/ConfigDataJobInfo.json'
+      - 'data/configdata/ConfigDataSoldierInfo.json'
+      - 'data/generated/hero-job-links.v1.json'
+      - 'data/generated/soldier-master.v1.json'
+      - 'data/generated/shared-movement-type-index.v1.json'
+      - 'data/validation/shared-movement-type-index-final.v1.json'
       - 'scripts/build_shared_movement_types.mjs'
       - 'package.json'
       - '.github/workflows/shared-movement-type-validation.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  validate:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit shared movement producer runs must target a non-main branch. Select the branch/ref to freeze, then open a normal PR.'
+          exit 1
+
+  validate:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Build and validate shared movement types
         run: npm run build:movement-types
       - name: Show validation summary
         run: cat data/validation/shared-movement-type-index-final.v1.json
-      - name: Persist generated shared movement outputs
+      - name: Verify frozen shared movement outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          committed_generated="$RUNNER_TEMP/shared-movement-type-index.committed.json"
+          committed_validation="$RUNNER_TEMP/shared-movement-type-validation.committed.json"
+          git show HEAD:data/generated/shared-movement-type-index.v1.json > "$committed_generated"
+          git show HEAD:data/validation/shared-movement-type-index-final.v1.json > "$committed_validation"
+          COMMITTED_GENERATED="$committed_generated" COMMITTED_VALIDATION="$committed_validation" node <<'NODE'
+          const fs = require('node:fs');
+
+          const pairs = [
+            [process.env.COMMITTED_GENERATED, 'data/generated/shared-movement-type-index.v1.json'],
+            [process.env.COMMITTED_VALIDATION, 'data/validation/shared-movement-type-index-final.v1.json'],
+          ];
+
+          let failed = false;
+          for (const [committedPath, regeneratedPath] of pairs) {
+            const committed = JSON.parse(fs.readFileSync(committedPath, 'utf8'));
+            const regenerated = JSON.parse(fs.readFileSync(regeneratedPath, 'utf8'));
+            delete committed.generatedAt;
+            delete regenerated.generatedAt;
+            if (JSON.stringify(committed) !== JSON.stringify(regenerated)) {
+              console.error(`${regeneratedPath} differs from the committed frozen content beyond generatedAt.`);
+              failed = true;
+            }
+          }
+          if (failed) process.exit(1);
+          console.log('Shared movement frozen content matches after excluding generatedAt metadata.');
+          NODE
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout explicit producer target
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+      - name: Build and validate shared movement types
+        run: npm run build:movement-types
+      - name: Show validation summary
+        run: cat data/validation/shared-movement-type-index-final.v1.json
+      - name: Freeze generated shared movement outputs on explicit producer branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -36,6 +114,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Shared movement outputs are already current."
           else
-            git commit -m "Generate shared movement type index"
-            git push
+            git commit -m "Freeze shared movement type index"
+            git push origin HEAD:${{ github.ref_name }}
           fi
