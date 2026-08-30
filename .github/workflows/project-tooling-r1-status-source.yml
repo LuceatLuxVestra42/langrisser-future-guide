@@ -29,8 +29,18 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Run independent Status Source parity and isolation self-test
+      - name: Run independent Status Source selection parity and isolation self-test
         run: node tools/status-source/test/current-main-parity.mjs
+
+      - name: Run independent Status Source promotion parity and rollback self-test
+        run: node tools/status-source/test/promotion-parity.mjs
 
       - name: Print selected sources
         run: node tools/status-source/cli/select.mjs
+
+      - name: Prove promotion CLI defaults to check-only on the active Equipment source
+        run: >-
+          node tools/status-source/cli/promote.mjs
+          --domain equipment
+          --id equipment-public-presentation-correction-final
+          --source data/validation/equipment-public-presentation-correction-final.v1.json
