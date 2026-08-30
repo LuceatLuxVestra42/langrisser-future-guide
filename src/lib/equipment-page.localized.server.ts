@@ -6,15 +6,16 @@ import {
   EQUIPMENT_DISPLAY_COLLECTION_EXPECTED_COUNTS,
   resolveEquipmentDisplayCollection,
 } from "./equipment-display-collection";
+import type { EquipmentDisplayCollection } from "./equipment-display-collection";
 import {
   readEquipmentDetailPageData as readBaseEquipmentDetailPageData,
   readExclusiveEquipmentPageData as readBaseExclusiveEquipmentPageData,
   readGeneralEquipmentPageData as readBaseGeneralEquipmentPageData,
 } from "./equipment-page.server";
 import type {
-  EquipmentDetailPageData,
   EquipmentListRecord,
   ExclusiveEquipmentDetailPageData,
+  GeneralEquipmentDetailPageData,
 } from "./equipment-page.server";
 
 type EquipmentNameKrProjection = {
@@ -110,6 +111,22 @@ type EquipmentPublicAdmissionCorrection = {
     excludedCount: number;
   };
 };
+
+type LocalizedGeneralEquipmentDetailPageData = Omit<
+  GeneralEquipmentDetailPageData,
+  "detail"
+> & {
+  detail: Omit<GeneralEquipmentDetailPageData["detail"], "classification"> & {
+    classification: GeneralEquipmentDetailPageData["detail"]["classification"] & {
+      technicalSiteTab: number;
+      displayCollection: EquipmentDisplayCollection;
+    };
+  };
+};
+
+type LocalizedEquipmentDetailPageData =
+  | LocalizedGeneralEquipmentDetailPageData
+  | ExclusiveEquipmentDetailPageData;
 
 const equipmentNameKr = equipmentNameKrJson as EquipmentNameKrProjection;
 const equipmentReleaseChronology = equipmentReleaseChronologyJson as EquipmentReleaseChronology;
@@ -318,6 +335,9 @@ export function readGeneralEquipmentPageData() {
   const chronologyPresentedRecords = applyGeneralReleaseChronology(localizedRecords);
   const presentationRecords = chronologyPresentedRecords.map((record) => {
     const technicalSiteTab = record.siteTab;
+    if (technicalSiteTab == null) {
+      throw new Error(`Public general Equipment ${record.equipmentId} is missing technical siteTab.`);
+    }
     const displayCollection = resolveEquipmentDisplayCollection(record.equipmentId, technicalSiteTab);
     return {
       ...record,
@@ -358,7 +378,7 @@ export function readExclusiveEquipmentPageData() {
 
 export function readEquipmentDetailPageData(
   equipmentId: number,
-): EquipmentDetailPageData | null {
+): LocalizedEquipmentDetailPageData | null {
   if (publicExcludedEquipmentIds.has(equipmentId)) return null;
 
   const data = readBaseEquipmentDetailPageData(equipmentId);
@@ -373,7 +393,7 @@ export function readEquipmentDetailPageData(
       technicalSiteTab === equipmentReleaseContract.scope.technicalSiteTab
         ? requireReleaseChronology(equipmentId, identity.nameCn)
         : null;
-    return {
+    const localized: LocalizedGeneralEquipmentDetailPageData = {
       ...data,
       displayName: nameKr ?? identity.nameCn,
       detail: {
@@ -396,6 +416,7 @@ export function readEquipmentDetailPageData(
           : data.detail.acquisition,
       },
     };
+    return localized;
   }
 
   const identity = data.detail.identity;
