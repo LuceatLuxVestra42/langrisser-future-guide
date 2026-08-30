@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
   buildStage67Stage66Digest,
+  buildStage67Stage3Digest,
   classifyStage67Ref,
   verifyStage66EmbeddedFreshness,
 } from './lib/soldier-stage6-7-semantic-freshness.mjs';
@@ -30,6 +31,18 @@ function headBlob(relativePath) {
   } catch {
     return null;
   }
+}
+
+function recordProvenanceDrift(kind, label, ref, actualBlob, classification) {
+  if (classification !== 'PROVENANCE_ONLY_CHANGED') return;
+  provenanceDrift.push({
+    kind,
+    label,
+    path: ref.path,
+    frozen: ref.gitBlobSha,
+    current: actualBlob,
+    classification,
+  });
 }
 
 function verifyFrozenRef(kind, label, ref) {
@@ -75,16 +88,7 @@ function verifyFrozenRef(kind, label, ref) {
       fail('frozen-ref-semantic-freshness', { kind, label, path: ref.path, classification });
       return;
     }
-    if (classification === 'PROVENANCE_ONLY_CHANGED') {
-      provenanceDrift.push({
-        kind,
-        label,
-        path: ref.path,
-        frozen: ref.gitBlobSha,
-        current: actualBlob,
-        classification,
-      });
-    }
+    recordProvenanceDrift(kind, label, ref, actualBlob, classification);
     return;
   }
 
@@ -95,6 +99,37 @@ function verifyFrozenRef(kind, label, ref) {
   if (actualBlob !== ref.gitBlobSha) {
     fail('frozen-ref-sha-mismatch', { kind, label, path: ref.path, expected: ref.gitBlobSha, actual: actualBlob });
   }
+}
+
+function verifySemanticDependency(label, ref) {
+  if (!['stage3Generated', 'stage3Validation'].includes(label)) {
+    fail('unregistered-semantic-dependency', { label, ref: ref ?? null });
+    return;
+  }
+  if (!ref || typeof ref.path !== 'string' || typeof ref.gitBlobSha !== 'string' || !ref.semanticDigest) {
+    fail('invalid-semantic-dependency', { label, ref: ref ?? null });
+    return;
+  }
+  if (!exists(ref.path)) {
+    fail('semantic-dependency-missing', { label, path: ref.path });
+    return;
+  }
+
+  const actualBlob = headBlob(ref.path);
+  let currentDigest;
+  try {
+    currentDigest = buildStage67Stage3Digest(label, readJson(ref.path));
+  } catch (error) {
+    fail('semantic-dependency-digest-error', { label, path: ref.path, detail: error.message });
+    return;
+  }
+
+  const classification = classifyStage67Ref(ref, currentDigest, actualBlob);
+  if (classification === 'SEMANTIC_STALE' || classification === 'SEMANTIC_UNKNOWN') {
+    fail('semantic-dependency-freshness', { label, path: ref.path, classification });
+    return;
+  }
+  recordProvenanceDrift('semanticDependency', label, ref, actualBlob, classification);
 }
 
 const generated = readJson(paths.generated);
@@ -165,13 +200,18 @@ if (!Array.isArray(validation?.admissionGateFailures) || validation.admissionGat
 
 for (const [label, ref] of Object.entries(generated?.sources || {})) verifyFrozenRef('source', label, ref);
 for (const [label, ref] of Object.entries(generated?.keyArtifacts || {})) verifyFrozenRef('keyArtifact', label, ref);
+for (const [label, ref] of Object.entries(generated?.semanticDependencies || {})) verifySemanticDependency(label, ref);
 if (Object.keys(generated?.sources || {}).length !== 12) fail('source-ref-count', Object.keys(generated?.sources || {}).length);
 if (Object.keys(generated?.keyArtifacts || {}).length !== 6) fail('key-artifact-count', Object.keys(generated?.keyArtifacts || {}).length);
+if (Object.keys(generated?.semanticDependencies || {}).length !== 2) fail('semantic-dependency-count', Object.keys(generated?.semanticDependencies || {}).length);
 
 for (const label of ['stage6_6Manifest', 'stage6_6']) {
   if (!generated?.sources?.[label]?.semanticDigest) fail('stage6-6-v2-source-ref-missing', label);
 }
 if (!generated?.keyArtifacts?.expansionBasis?.semanticDigest) fail('stage6-6-v2-key-artifact-ref-missing', 'expansionBasis');
+for (const label of ['stage3Generated', 'stage3Validation']) {
+  if (!generated?.semanticDependencies?.[label]?.semanticDigest) fail('stage3-v2-semantic-dependency-missing', label);
+}
 
 const generatedReviews = Array.isArray(generated?.reviews) ? generated.reviews : [];
 const validationReviews = Array.isArray(validation?.reviews) ? validation.reviews : [];
@@ -202,6 +242,7 @@ console.log(JSON.stringify({
   reviewCodeCount: generatedReviewCodes.length,
   frozenSourceRefs: 12,
   frozenKeyArtifacts: 6,
+  semanticDependencies: 2,
   provenanceOnlyChanged: provenanceDrift.length,
 }, null, 2));
 if (provenanceDrift.length) {
