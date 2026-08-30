@@ -1,0 +1,69 @@
+name: Apply Hero SP Detail Presentation Once
+
+on:
+  push:
+    branches:
+      - ui/hero-sp-detail-presentation-20260830
+    paths:
+      - scripts/apply-hero-sp-detail-presentation-once.mjs
+      - .github/workflows/apply-hero-sp-detail-presentation-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v5
+        with:
+          ref: ui/hero-sp-detail-presentation-20260830
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Apply exact scoped patch
+        run: node scripts/apply-hero-sp-detail-presentation-once.mjs
+
+      - name: Validate Hero SP presentation boundary
+        run: node scripts/validate-hero-sp-detail-presentation.mjs
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Production build
+        run: bun run build
+
+      - name: Enforce changed-file boundary
+        run: |
+          allowed='^(src/lib/hero-detail-stage5\.server\.ts|src/routes/heroes_\.\$heroId\.tsx|scripts/apply-hero-sp-detail-presentation-once\.mjs|\.github/workflows/apply-hero-sp-detail-presentation-once\.yml|data/validation/hero-sp-detail-presentation\.v1\.json|data/checkpoints/hero-sp-detail-presentation\.v1\.json)$'
+          bad="$(git status --short | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
+          if [ -n "$bad" ]; then
+            echo 'Unexpected files changed:' >&2
+            printf '%s\n' "$bad" >&2
+            exit 1
+          fi
+          if git diff -- src/lib/hero-detail-stage5.server.ts src/routes/heroes_.'$heroId'.tsx | grep -E 'hero-fusion|fusion-power|Icon_Occupation|data-target-class|targetType.*CLASS' >/dev/null; then
+            echo 'Class fusion-power mark scope was touched unexpectedly.' >&2
+            exit 1
+          fi
+
+      - name: Remove one-off patch transport
+        run: |
+          rm scripts/apply-hero-sp-detail-presentation-once.mjs
+          rm .github/workflows/apply-hero-sp-detail-presentation-once.yml
+
+      - name: Commit verified implementation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/lib/hero-detail-stage5.server.ts src/routes/heroes_.'$heroId'.tsx scripts/validate-hero-sp-detail-presentation.mjs data/validation/hero-sp-detail-presentation.v1.json data/checkpoints/hero-sp-detail-presentation.v1.json scripts/apply-hero-sp-detail-presentation-once.mjs .github/workflows/apply-hero-sp-detail-presentation-once.yml
+          git commit -m 'Add Hero SP detail presentation'
+          git push origin HEAD:ui/hero-sp-detail-presentation-20260830
