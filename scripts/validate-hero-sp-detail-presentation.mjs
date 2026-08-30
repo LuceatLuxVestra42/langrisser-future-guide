@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+// Keep this validator standalone after the one-off patch transport is removed so normal user-authored PR commits can re-run the final gates.
 const root = process.cwd();
 const readJson = (rel) => JSON.parse(fs.readFileSync(path.join(root, rel), "utf8"));
 const readText = (rel) => fs.readFileSync(path.join(root, rel), "utf8");
