@@ -1,0 +1,47 @@
+{
+  "version": 6,
+  "schemaId": "project-doctor-d3-validator-plan/v6",
+  "stage": "D3",
+  "checkpoint": "PROJECT_DOCTOR_D3_VALIDATOR_PLAN_V6_FROZEN_FRESHNESS_CLASSIFICATION",
+  "status": "DESIGN_FROZEN",
+  "extends": "data/contracts/project-doctor-d3-validator-plan.v5.json",
+  "impactContract": "data/contracts/project-doctor-d2-impact-contract.v6.json",
+  "purpose": "Preserve D3 V5 check catalog and manual-review boundaries while classifying supported frozen Soldier artifacts as semantic-data or provenance-data before final check selection.",
+  "freshnessV2Classification": {
+    "enabled": true,
+    "classifier": "scripts/classify-project-doctor-frozen-freshness-v2.mjs",
+    "supportedArtifacts": [
+      "data/generated/soldier-stage6-6-expansion-basis.v1.json",
+      "data/validation/soldier-stage6-6-expansion-basis.v1.json",
+      "data/generated/soldier-stage6-7-site-admission.v1.json",
+      "data/validation/soldier-stage6-7-site-admission.v1.json"
+    ],
+    "provenanceOnlyChangeClass": "provenance-data",
+    "provenanceOnlyOwningNode": "project-doctor",
+    "semanticChangeKeepsCandidateOwner": true,
+    "missingOrInvalidSideIsSemanticChange": true
+  },
+  "addedCheckCatalog": [
+    {
+      "id": "frozen-freshness-v2-self-test",
+      "type": "validator",
+      "phase": 3,
+      "command": "npm run doctor:freshness:v2:self-test",
+      "triggerChangeClasses": ["freshness-tooling", "provenance-data"],
+      "triggerNodes": [],
+      "coverage": "Fail-closed Semantic Freshness V2 classification: provenance-only suppresses domain fan-out, semantic changes preserve candidate domain owners."
+    }
+  ],
+  "selectionPolicyV6": {
+    "d2CandidateOwnerFirst": true,
+    "freshnessClassificationBeforeCheckSelection": true,
+    "provenanceOnlyDoesNotFanOutToDomainOwners": true,
+    "semanticChangeRemainsFailClosed": true,
+    "manualReviewExitPolicyUnchanged": true
+  },
+  "historicalBoundary": {
+    "d3V5": "data/contracts/project-doctor-d3-validator-plan.v5.json",
+    "previousContractsRemainUnmodified": true
+  },
+  "nextStage": "D4-V6"
+}
