@@ -7,12 +7,20 @@ on:
     paths:
       - scripts/apply-hero-sp-detail-presentation-once.mjs
       - .github/workflows/apply-hero-sp-detail-presentation-once.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - scripts/apply-hero-sp-detail-presentation-once.mjs
+      - .github/workflows/apply-hero-sp-detail-presentation-once.yml
+      - scripts/validate-hero-sp-detail-presentation.mjs
 
 permissions:
   contents: write
 
 jobs:
   apply-and-verify:
+    if: github.event_name == 'push' || github.event.pull_request.head.ref == 'ui/hero-sp-detail-presentation-20260830'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
