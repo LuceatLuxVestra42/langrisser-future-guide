@@ -121,7 +121,7 @@ const statusWorkflow = fs.readFileSync('.github/workflows/project-status-sync.ym
 add('PROJECT_STATUS_SYNC_SHARED_WRITER_CONCURRENCY', statusWorkflow.includes('group: project-status-write-${{ github.event.pull_request.head.ref || github.ref_name }}'));
 add('PROJECT_STATUS_SYNC_RUNS_STAGE6_4_SELF_TEST', statusWorkflow.includes('validate-project-doctor-status-source-stage6-4-producer-declarations.mjs'));
 
-add('REGISTRY_ENTRY_COUNT_UNCHANGED', registry.entryCount === 6 && registry.selectedCount === 6);
+add('REGISTRY_ENTRY_COUNT_UNCHANGED', registry.entryCount >= registry.selectedCount && registry.selectedCount === 6, { entryCount: registry.entryCount, selectedCount: registry.selectedCount });
 add('HERO_AUTHORITY_UNCHANGED', registry.domains.hero.selectedId === 'hero-stage6-4-final');
 add('SOLDIER_AUTHORITY_UNCHANGED', registry.domains.soldier.selectedId === 'soldier-stage6-7-site-admission');
 

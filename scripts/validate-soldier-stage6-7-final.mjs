@@ -2,11 +2,21 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { sameSemanticDigest } from './lib/frozen-semantic-digest.mjs';
+import {
+  STAGE67_FRESHNESS_MODE,
+  buildStage67DirectSourceDigest,
+  buildStage67KeyArtifactDigest,
+  buildStage67OutputDigest,
+  buildStage67ValidationDigest,
+  verifyStage66EmbeddedFreshness,
+} from './lib/soldier-stage6-7-semantic-projections.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = (relativePath) => JSON.parse(fs.readFileSync(path.join(ROOT, relativePath), 'utf8'));
 const exists = (relativePath) => fs.existsSync(path.join(ROOT, relativePath));
 const errors = [];
+const provenanceDrift = [];
 const fail = (code, detail = null) => errors.push({ code, detail });
 
 const paths = {
@@ -26,18 +36,60 @@ function headBlob(relativePath) {
   }
 }
 
-function verifyFrozenRef(label, ref) {
-  if (!ref || typeof ref.path !== 'string' || typeof ref.gitBlobSha !== 'string') {
-    fail('invalid-frozen-ref', { label, ref: ref ?? null });
+function verifyFrozenDependencyV2(kind, label, ref) {
+  if (
+    !ref
+      || typeof ref.path !== 'string'
+      || typeof ref.gitBlobSha !== 'string'
+      || ref.freshnessMode !== STAGE67_FRESHNESS_MODE
+      || !ref.semanticDigest
+  ) {
+    fail('invalid-frozen-ref-v2', { kind, label, ref: ref ?? null });
     return;
   }
   if (!exists(ref.path)) {
-    fail('frozen-ref-missing', { label, path: ref.path });
+    fail('frozen-ref-missing', { kind, label, path: ref.path });
     return;
   }
-  const actual = headBlob(ref.path);
-  if (actual !== ref.gitBlobSha) {
-    fail('frozen-ref-sha-mismatch', { label, path: ref.path, expected: ref.gitBlobSha, actual });
+
+  let value;
+  let currentDigest;
+  try {
+    value = readJson(ref.path);
+    currentDigest = kind === 'source'
+      ? buildStage67DirectSourceDigest(label, value)
+      : buildStage67KeyArtifactDigest(label, value);
+  } catch (error) {
+    fail('frozen-ref-semantic-digest-error', { kind, label, path: ref.path, detail: error.message });
+    return;
+  }
+
+  if (!sameSemanticDigest(ref.semanticDigest, currentDigest)) {
+    fail('frozen-ref-semantic-mismatch', {
+      kind,
+      label,
+      path: ref.path,
+      expected: ref.semanticDigest,
+      actual: currentDigest,
+    });
+    return;
+  }
+
+  if (label === 'stage6_6Manifest' || label === 'stage6_6' || label === 'expansionBasis') {
+    const stage66Label = label === 'stage6_6' ? 'stage6_6' : 'stage6_6Manifest';
+    if (!verifyStage66EmbeddedFreshness(stage66Label, value)) {
+      fail('stage6-6-embedded-semantic-digest-invalid', { kind, label, path: ref.path });
+      return;
+    }
+  }
+
+  const actualBlob = headBlob(ref.path);
+  if (actualBlob == null) {
+    fail('frozen-ref-head-blob-missing', { kind, label, path: ref.path });
+    return;
+  }
+  if (actualBlob !== ref.gitBlobSha) {
+    provenanceDrift.push({ kind, label, path: ref.path, frozen: ref.gitBlobSha, current: actualBlob });
   }
 }
 
@@ -57,6 +109,21 @@ if (!['READY', 'READY_WITH_REVIEW'].includes(generated?.admissionStatus) || gene
   fail('admission-status', { generated: generated?.admissionStatus ?? null, validation: validation?.admissionStatus ?? null });
 }
 if (generated?.scope !== 'SOLDIER_PAGE_DATA_ADMISSION') fail('scope', generated?.scope ?? null);
+
+const expectedGeneratedDigest = buildStage67OutputDigest(generated);
+const expectedValidationDigest = buildStage67ValidationDigest(validation);
+if (
+  generated?.freshness?.freshnessMode !== STAGE67_FRESHNESS_MODE
+    || !sameSemanticDigest(generated?.freshness?.semanticDigest, expectedGeneratedDigest)
+) {
+  fail('generated-semantic-digest', { expected: expectedGeneratedDigest, actual: generated?.freshness ?? null });
+}
+if (
+  validation?.freshness?.freshnessMode !== STAGE67_FRESHNESS_MODE
+    || !sameSemanticDigest(validation?.freshness?.semanticDigest, expectedValidationDigest)
+) {
+  fail('validation-semantic-digest', { expected: expectedValidationDigest, actual: validation?.freshness ?? null });
+}
 
 const expectedCoverage = {
   canonicalSoldiers: 224,
@@ -102,12 +169,13 @@ for (const [key, value] of Object.entries(validation?.checks || {})) {
 if (!validation?.checks || Object.keys(validation.checks).length === 0) fail('validation-checks-missing', null);
 if (!Array.isArray(validation?.errors) || validation.errors.length !== 0) fail('validation-errors', validation?.errors ?? null);
 if (!Array.isArray(validation?.sourceSnapshotMismatches) || validation.sourceSnapshotMismatches.length !== 0) fail('source-snapshot-mismatches', validation?.sourceSnapshotMismatches ?? null);
+if (!Array.isArray(validation?.sourceSemanticDependencyFailures) || validation.sourceSemanticDependencyFailures.length !== 0) fail('source-semantic-dependency-failures', validation?.sourceSemanticDependencyFailures ?? null);
 if (!Array.isArray(validation?.coverageMismatches) || validation.coverageMismatches.length !== 0) fail('coverage-mismatches', validation?.coverageMismatches ?? null);
 if (!Array.isArray(validation?.documentationMissing) || validation.documentationMissing.length !== 0) fail('documentation-missing', validation?.documentationMissing ?? null);
 if (!Array.isArray(validation?.admissionGateFailures) || validation.admissionGateFailures.length !== 0) fail('admission-gate-failures', validation?.admissionGateFailures ?? null);
 
-for (const [label, ref] of Object.entries(generated?.sources || {})) verifyFrozenRef(`source:${label}`, ref);
-for (const [label, ref] of Object.entries(generated?.keyArtifacts || {})) verifyFrozenRef(`keyArtifact:${label}`, ref);
+for (const [label, ref] of Object.entries(generated?.sources || {})) verifyFrozenDependencyV2('source', label, ref);
+for (const [label, ref] of Object.entries(generated?.keyArtifacts || {})) verifyFrozenDependencyV2('keyArtifact', label, ref);
 if (Object.keys(generated?.sources || {}).length !== 12) fail('source-ref-count', Object.keys(generated?.sources || {}).length);
 if (Object.keys(generated?.keyArtifacts || {}).length !== 6) fail('key-artifact-count', Object.keys(generated?.keyArtifacts || {}).length);
 
@@ -140,4 +208,9 @@ console.log(JSON.stringify({
   reviewCodeCount: generatedReviewCodes.length,
   frozenSourceRefs: 12,
   frozenKeyArtifacts: 6,
+  provenanceOnlyChanged: provenanceDrift.length,
 }, null, 2));
+if (provenanceDrift.length) {
+  console.log('PROVENANCE_ONLY_CHANGED');
+  for (const item of provenanceDrift) console.log(JSON.stringify(item));
+}

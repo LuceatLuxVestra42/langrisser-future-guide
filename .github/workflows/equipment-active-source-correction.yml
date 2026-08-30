@@ -1,0 +1,118 @@
+name: Equipment Active Source Correction
+
+on:
+  push:
+    branches:
+      - fix/equipment-active-source-correction
+    paths:
+      - 'data/validation/equipment-public-presentation-correction-final.v1.json'
+      - 'data/contracts/project-doctor-equipment-public-presentation-correction-projection.v1.json'
+      - 'data/status-sources/**'
+      - 'data/generated/project-doctor-active-source-registry.v1.json'
+      - 'data/generated/project-doctor-d1-1-status.v1.json'
+      - 'data/validation/project-doctor-d1-1-summary.v1.json'
+      - 'data/validation/project-doctor-d1-2-summary.v1.json'
+      - 'data/validation/project-doctor-d5-summary.v1.json'
+      - 'data/generated/project-status.v1.json'
+      - 'PROJECT_STATUS.md'
+      - 'scripts/validate-equipment-public-presentation-correction-final.mjs'
+      - '.github/workflows/equipment-active-source-correction.yml'
+  pull_request:
+    paths:
+      - 'data/validation/equipment-public-presentation-correction-final.v1.json'
+      - 'data/contracts/project-doctor-equipment-public-presentation-correction-projection.v1.json'
+      - 'data/status-sources/**'
+      - 'data/generated/project-doctor-active-source-registry.v1.json'
+      - 'data/generated/project-doctor-d1-1-status.v1.json'
+      - 'data/validation/project-doctor-d1-1-summary.v1.json'
+      - 'data/validation/project-doctor-d1-2-summary.v1.json'
+      - 'data/validation/project-doctor-d5-summary.v1.json'
+      - 'data/generated/project-status.v1.json'
+      - 'PROJECT_STATUS.md'
+      - 'scripts/validate-equipment-public-presentation-correction-final.mjs'
+      - '.github/workflows/equipment-active-source-correction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote-and-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Korean equipment-name presentation projection
+        run: node scripts/build-equipment-name-kr-presentation.mjs
+
+      - name: Revalidate display collection predecessor
+        run: bun scripts/validate-equipment-display-collection.mjs
+
+      - name: Revalidate P3 chronology supersede predecessor
+        run: bun scripts/validate-equipment-p3-chronology-supersede.mjs
+
+      - name: Validate correction final checkpoint
+        run: bun scripts/validate-equipment-public-presentation-correction-final.mjs
+
+      - name: Check guarded Project Doctor promotion
+        run: >-
+          npm run doctor:source:promote --
+          --domain equipment
+          --id equipment-public-presentation-correction-final
+          --source data/validation/equipment-public-presentation-correction-final.v1.json
+          --projection-file data/contracts/project-doctor-equipment-public-presentation-correction-projection.v1.json
+          --note "2026-08-30 Equipment public-admission and explicit display-collection correction; canonical 390 and exclusive 167 remain frozen."
+          --check
+
+      - name: Apply guarded Project Doctor promotion
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: >-
+          npm run doctor:source:promote --
+          --domain equipment
+          --id equipment-public-presentation-correction-final
+          --source data/validation/equipment-public-presentation-correction-final.v1.json
+          --projection-file data/contracts/project-doctor-equipment-public-presentation-correction-projection.v1.json
+          --note "2026-08-30 Equipment public-admission and explicit display-collection correction; canonical 390 and exclusive 167 remain frozen."
+
+      - name: Refresh Project Doctor freshness seal
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: npm run doctor:freshness:refresh
+
+      - name: Validate Project Doctor freshness seal
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: npm run doctor:freshness:validate
+
+      - name: Run integrated Project Doctor preflight
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: npm run doctor -- --dry-run --base origin/fix/equipment-p3-chronology-supersede --head HEAD
+
+      - name: Production build
+        run: bun run build
+
+      - name: Commit guarded promotion outputs
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          if git diff --quiet && [[ -z "$(git status --porcelain --untracked-files=all)" ]]; then
+            echo "No promotion output changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Promote corrected Equipment active source"
+          git push origin HEAD:${GITHUB_REF_NAME}

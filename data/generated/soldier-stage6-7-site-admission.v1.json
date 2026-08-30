@@ -7,7 +7,7 @@
   "generatedAt": "2026-08-30T00:48:09.761Z",
   "scope": "SOLDIER_PAGE_DATA_ADMISSION",
   "purpose": "Final gate proving canonical Soldier data can stably support list, detail, filters, reciprocal Hero links and later expansion without reopening semantic or JOIN inference.",
-  "admissionRule": "Admit Soldier page data when every canonical record is generated, automated validation has no FAIL records, REVIEW items are explicit, representative/filter/reciprocal QA passes, expansion inputs are preserved, and every frozen source blob still matches its recorded snapshot.",
+  "admissionRule": "Admit Soldier page data when every canonical record is generated, automated validation has no FAIL records, REVIEW items are explicit, representative/filter/reciprocal QA passes, expansion inputs are preserved, and each direct frozen dependency is semantically fresh under frozen-semantic-freshness/v2. Raw Git blob drift remains audit provenance and is not semantic authority.",
   "capabilities": {
     "listData": "READY",
     "detailData": "READY",
@@ -118,77 +118,213 @@
   "keyArtifacts": {
     "detail": {
       "path": "data/generated/soldier-detail-stage5-6.v1.json",
-      "gitBlobSha": "760aac7b162b47b36fe5e36763b38fdcd03bd70d"
+      "gitBlobSha": "760aac7b162b47b36fe5e36763b38fdcd03bd70d",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-key-artifact/detail/v2",
+        "digest": "sha256:36806c089f90ff15b7046dd00db69ab294120ef57558c99ef822c8fa0a134999"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "list": {
       "path": "data/generated/soldier-list-stage5-8.v1.json",
-      "gitBlobSha": "3c3304ac5122649e94ad4c0489d51ee154988d12"
+      "gitBlobSha": "3c3304ac5122649e94ad4c0489d51ee154988d12",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-key-artifact/list/v2",
+        "digest": "sha256:84bbb96d479c25e5336f8a37e36676720420c1843ba5853832ac3130ef85d0b9"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "releaseMetadata": {
       "path": "data/generated/soldier-release-metadata.v1.json",
-      "gitBlobSha": "67572f1e0b4330b544626df577aa4e801b46ad59"
+      "gitBlobSha": "67572f1e0b4330b544626df577aa4e801b46ad59",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-key-artifact/release-metadata/v2",
+        "digest": "sha256:a1d0e2e4c4bd3854b3fc18d59cb6a0bc858eb4e57a7b43bdcdef1280682e8915"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "fullRecords": {
       "path": "data/generated/soldier-stage6-1-full-records.v1.json",
-      "gitBlobSha": "e2415aef365539c4fa7b88819e2d8a865b5d8870"
+      "gitBlobSha": "e2415aef365539c4fa7b88819e2d8a865b5d8870",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-key-artifact/full-records/v2",
+        "digest": "sha256:d3fe0c14838b3a83ce75d613ec1591a413b421a8f63c376eefa632289d24f5b5"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "reciprocalLinks": {
       "path": "data/generated/hero-soldier-page-links-stage6-5.v1.json",
-      "gitBlobSha": "52daf5ea15f37a437f796747eb25a126446a1c96"
+      "gitBlobSha": "52daf5ea15f37a437f796747eb25a126446a1c96",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-key-artifact/reciprocal-links/v2",
+        "digest": "sha256:8a6c79311455fb8b25bed7fbd501b10ea9f2dbcb9680d63289aa4b2fa3e2f5cf"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "expansionBasis": {
       "path": "data/generated/soldier-stage6-6-expansion-basis.v1.json",
-      "gitBlobSha": "9016a35d1b02e451fb8bc714d200cbb6aba6acc6"
+      "gitBlobSha": "283e1b25105f111c6a6a9e8cc076fab0b0063b0e",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-6-expansion-basis/semantic-v1",
+        "digest": "sha256:d2f6c75c3d454bdf72b8c42f1a701c41d3fefe7013e16640132ce66c08f60691"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     }
   },
   "sources": {
     "contract": {
       "path": "data/contracts/soldier-detail-stage5-1-contract.v1.json",
-      "gitBlobSha": "2943af041025c76c647b790661babe784e05f4f2"
+      "gitBlobSha": "2943af041025c76c647b790661babe784e05f4f2",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-source/contract/v2",
+        "digest": "sha256:67a84406a5537d178605e9b7594e484685ce2a811ec583de947523fea4e7562f"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "checkpoint": {
       "path": "data/validation/soldier-stage6-0-checkpoint.v1.json",
-      "gitBlobSha": "2d805415998c44d8f2dd109512b62110100aed3f"
+      "gitBlobSha": "2d805415998c44d8f2dd109512b62110100aed3f",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-source/checkpoint/v2",
+        "digest": "sha256:af52fa9c5be5f4b5d74d9384129780a6392ab5ec332075f98509cd6c581d8cc6"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage5_7": {
       "path": "data/validation/soldier-stage5-7-list.v1.json",
-      "gitBlobSha": "8769f1a4519c6f3abab6012c12e649e5a982c219"
+      "gitBlobSha": "8769f1a4519c6f3abab6012c12e649e5a982c219",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-source/stage5-7-validation/v2",
+        "digest": "sha256:6d191c089fc354128c2610c402fb3a2b411cb3269ae1a718825e0f2b11681ce5"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage5_8": {
       "path": "data/validation/soldier-stage5-8-release.v1.json",
-      "gitBlobSha": "9311c414d1ae90682775614e9cfa65b720236fe5"
+      "gitBlobSha": "9311c414d1ae90682775614e9cfa65b720236fe5",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-source/stage5-8-validation/v2",
+        "digest": "sha256:d12900a290d1bff421cafc6cc7755ad4b8f50f9aafecf54c88136ead3b8c101d"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_1": {
       "path": "data/validation/soldier-stage6-1-full-records.v1.json",
-      "gitBlobSha": "aaf0126baacb2e1286ced8cb9496dc7d280b8c70"
+      "gitBlobSha": "aaf0126baacb2e1286ced8cb9496dc7d280b8c70",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-source/stage6-1-validation/v2",
+        "digest": "sha256:dc923ed1c440f2fda10cea2feb401c7c039573c25034bd4db56a2f98758d62b0"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_2": {
       "path": "data/validation/soldier-stage6-2-classification.v1.json",
-      "gitBlobSha": "732d75f9b5c6828f693a7a22f2a5fe1881eecab7"
+      "gitBlobSha": "732d75f9b5c6828f693a7a22f2a5fe1881eecab7",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-source/stage6-2-validation/v2",
+        "digest": "sha256:dbec9b65e1836ac8d6a5534cd877b631385b4356bcb3b44f8ffbef70635044dc"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_3": {
       "path": "data/validation/soldier-stage6-3-representative-qa.v1.json",
-      "gitBlobSha": "533d702b3c14a39e7aa0d82cd9c3193d4dd4f1b0"
+      "gitBlobSha": "533d702b3c14a39e7aa0d82cd9c3193d4dd4f1b0",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-source/stage6-3-validation/v2",
+        "digest": "sha256:6dd96068d8e047cc843f8daf5f35c845aa23e5689a75a1afa2515ff810b81610"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_4": {
       "path": "data/validation/soldier-stage6-4-filter-qa.v1.json",
-      "gitBlobSha": "0c1affde690d041bfa843e81a3f30c4d08aca305"
+      "gitBlobSha": "0c1affde690d041bfa843e81a3f30c4d08aca305",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-source/stage6-4-validation/v2",
+        "digest": "sha256:20cc3beefbd438481fd087bba33faeb57b09c84c046e5a817c4e032f780b8d0c"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_5Manifest": {
       "path": "data/generated/hero-soldier-page-links-stage6-5.v1.json",
-      "gitBlobSha": "52daf5ea15f37a437f796747eb25a126446a1c96"
+      "gitBlobSha": "52daf5ea15f37a437f796747eb25a126446a1c96",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-source/stage6-5-manifest/v2",
+        "digest": "sha256:8a6c79311455fb8b25bed7fbd501b10ea9f2dbcb9680d63289aa4b2fa3e2f5cf"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_5": {
       "path": "data/validation/soldier-stage6-5-reciprocal-links.v1.json",
-      "gitBlobSha": "bfe299291170aee6a31730a824da7e7a7c8a4b84"
+      "gitBlobSha": "bfe299291170aee6a31730a824da7e7a7c8a4b84",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-7-source/stage6-5-validation/v2",
+        "digest": "sha256:7b84a8b3ad7b1a19c4a1dad6748237439a005916e34f0bc0dfd722910e14f0d1"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_6Manifest": {
       "path": "data/generated/soldier-stage6-6-expansion-basis.v1.json",
-      "gitBlobSha": "9016a35d1b02e451fb8bc714d200cbb6aba6acc6"
+      "gitBlobSha": "283e1b25105f111c6a6a9e8cc076fab0b0063b0e",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-6-expansion-basis/semantic-v1",
+        "digest": "sha256:d2f6c75c3d454bdf72b8c42f1a701c41d3fefe7013e16640132ce66c08f60691"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_6": {
       "path": "data/validation/soldier-stage6-6-expansion-basis.v1.json",
-      "gitBlobSha": "b2d17cad53eb2cc23ab354f60d12978437d57556"
+      "gitBlobSha": "550610055c0272021a67b8826b7e359985c0f097",
+      "semanticDigest": {
+        "contract": "frozen-semantic-freshness/v2",
+        "algorithm": "sha256",
+        "projection": "soldier-stage6-6-expansion-basis-validation/semantic-v1",
+        "digest": "sha256:6f11e531b3581856dd92dd23b494fedcb82f69899eb08e339ef824e1ef3c931d"
+      },
+      "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
+    }
+  },
+  "freshness": {
+    "contract": "frozen-semantic-freshness/v2",
+    "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE",
+    "semanticDigest": {
+      "contract": "frozen-semantic-freshness/v2",
+      "algorithm": "sha256",
+      "projection": "soldier-stage6-7-site-admission/semantic-v2",
+      "digest": "sha256:7c7d14b81e5c31c3145fbd8a35d0dda7ffaf50be9ea9da98ee8c17ab9654888d"
     }
   }
 }

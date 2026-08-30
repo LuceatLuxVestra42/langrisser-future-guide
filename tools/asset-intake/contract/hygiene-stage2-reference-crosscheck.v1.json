@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage2-reference-crosscheck/v1",
+  "stage": "ASSET_HYGIENE_2",
+  "checkpoint": "ASSET_HYGIENE_STAGE2_REFERENCE_CROSSCHECK",
+  "status": "DESIGN_FROZEN",
+  "predecessor": "tools/asset-intake/contract/hygiene-stage1-inventory.v1.json",
+  "purpose": "Attach current project reference/evidence meaning to the frozen AH-1 physical inventory using exact repository paths only. This stage does not classify lifecycle state or mutate assets.",
+  "physicalBaseline": {
+    "commit": "73db96444d2016d044042630955486fd9b3d9036",
+    "tree": "f19194edbf6e71f1c3d6fcf0ccabb0b9c6474df8",
+    "inventory": "tools/asset-intake/hygiene/generated/asset-hygiene-inventory.v1.json",
+    "inventoryRecordCount": 2188,
+    "silentRescanAllowed": false
+  },
+  "referenceBaseline": {
+    "branch": "main",
+    "commit": "f5e828e6f163dc70e0ead7a912acd5dcf6467bc2",
+    "activeSourceRegistry": "data/generated/project-doctor-active-source-registry.v1.json",
+    "activeSourceRegistryBlob": "43d6c70ad87b45d27582da84c059dfac8b6998b7",
+    "selectedDomainCount": 6
+  },
+  "assetDeltaGate": {
+    "base": "73db96444d2016d044042630955486fd9b3d9036",
+    "head": "f5e828e6f163dc70e0ead7a912acd5dcf6467bc2",
+    "changedImageAssetPathCount": 0,
+    "inventoryReuseAllowed": true,
+    "policy": "If a later reference baseline contains a tracked image population change, do not silently rebuild AH-1. Record a scoped delta or perform an explicit baseline migration."
+  },
+  "referencePriority": [
+    "ACTIVE_SOURCE_REGISTRY",
+    "CURRENT_FINAL_FROZEN_OR_PASS_ASSET_MANIFEST",
+    "CURRENT_GENERATED_PRODUCTION_CONSUMER",
+    "CURRENT_ASSET_RESOLVER",
+    "CURRENT_FRONTEND_DIRECT_REFERENCE",
+    "CURRENT_CHECKPOINT_OR_EVIDENCE",
+    "HISTORICAL_ARTIFACT"
+  ],
+  "referenceKinds": [
+    "ACTIVE_PRODUCTION_REF",
+    "SOURCE_EVIDENCE_REF",
+    "DERIVATIVE_REF",
+    "MANIFEST_REF",
+    "RESOLVER_REF",
+    "FRONTEND_REF",
+    "HISTORICAL_REF"
+  ],
+  "exactPathPolicy": {
+    "filenameIdInference": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "fuzzyFilenameMatching": false,
+    "perceptualIdentityInference": false,
+    "mtimeAuthorityInference": false,
+    "oldFinalFilenameSupersedeInference": false
+  },
+  "domainOrder": [
+    "soldier",
+    "banner",
+    "hero",
+    "equipment",
+    "shared-factions-army",
+    "skin"
+  ],
+  "fixturePolicy": {
+    "soldier": "Confirm source PNG -> lossless WebP derivative -> production resolver chain before expanding to all 224 records.",
+    "banner": "Confirm frozen approved roots and 93 resolved occurrences / 70 unique paths against AH-1 inventory before expanding other domains.",
+    "skin": "Preserve READY_FOR_ASSET_EVIDENCE and the current repository evidence blocker. Absence of authoritative bytes is not a Hygiene failure."
+  },
+  "outputs": {
+    "sourceFreeze": "tools/asset-intake/hygiene/generated/asset-hygiene-stage2-reference-sources.v1.json",
+    "referenceMap": "tools/asset-intake/hygiene/generated/asset-hygiene-reference-map.v1.json",
+    "unresolvedReferences": "tools/asset-intake/hygiene/generated/asset-hygiene-unresolved-reference.v1.json",
+    "summary": "data/validation/asset-intake-hygiene-stage2-reference-crosscheck-summary.v1.json",
+    "checkpoint": "docs/checkpoints/asset-intake-hygiene-stage2-reference-crosscheck.md"
+  },
+  "completionRules": {
+    "inventoryCoverageRequired": 2188,
+    "currentReferenceSourceCoveragePercent": 100,
+    "structuralReferenceErrorsMustBeZero": true,
+    "classificationCount": 0,
+    "assetMutationCount": 0,
+    "semanticRecomputationCount": 0
+  },
+  "forbidden": {
+    "assetMutation": true,
+    "assetMove": true,
+    "assetDelete": true,
+    "assetRename": true,
+    "formatConversion": true,
+    "frontendMutation": true,
+    "productionConsumerRewrite": true,
+    "externalFetch": true,
+    "rawConfigDataRead": true,
+    "semanticRecomputation": true,
+    "canonicalRelationRecomputation": true,
+    "classification": true
+  },
+  "nextStage": "ASSET_HYGIENE_3_CLASSIFICATION"
+}

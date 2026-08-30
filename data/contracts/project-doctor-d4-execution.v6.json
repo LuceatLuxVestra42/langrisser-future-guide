@@ -1,0 +1,23 @@
+{
+  "version": 6,
+  "schemaId": "project-doctor-d4-execution/v6",
+  "stage": "D4",
+  "checkpoint": "PROJECT_DOCTOR_D4_EXECUTION_V6_FROZEN_FRESHNESS_CLASSIFICATION",
+  "status": "DESIGN_FROZEN",
+  "extends": "data/contracts/project-doctor-d4-execution.v5.json",
+  "d3Contract": "data/contracts/project-doctor-d3-validator-plan.v6.json",
+  "purpose": "Preserve D4 V5 execution semantics and admit the fail-closed Frozen Freshness V2 classifier self-test selected by D3 V6.",
+  "addedAllowedCheckIds": ["frozen-freshness-v2-self-test"],
+  "executionPolicyV6": {
+    "preflightEntireQueueBeforeExecution": true,
+    "failFastOnFirstNonZero": true,
+    "manualReviewSurvivesSuccessfulChecks": true,
+    "manualReviewExitCode": 3,
+    "unknownOrTamperedCheckExecutesNothing": true
+  },
+  "historicalBoundary": {
+    "d4V5": "data/contracts/project-doctor-d4-execution.v5.json",
+    "previousContractsRemainUnmodified": true
+  },
+  "nextStage": "D7-V8"
+}

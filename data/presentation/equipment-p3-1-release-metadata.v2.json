@@ -1,0 +1,63 @@
+{
+  "version": 2,
+  "stage": "Equipment P3-1 Release Chronology Metadata",
+  "status": "FROZEN",
+  "completion": "EQUIPMENT_P3_1_RELEASE_CHRONOLOGY_V2_FROZEN",
+  "supersedesActiveInterpretation": "data/presentation/equipment-p3-1-release-metadata.v1.json",
+  "historicalV1Preserved": true,
+  "predecessor": {
+    "p3_0_v3": "data/validation/equipment-p3-0-release-chronology-presentation-audit.v3.json",
+    "chronologyDataSource": "data/presentation/equipment-p3-1-release-metadata.v1.json",
+    "publicAdmissionCorrection": "data/presentation/equipment-public-admission-correction.v1.json",
+    "displayCollection": "data/presentation/equipment-display-collection.v1.json"
+  },
+  "scope": {
+    "technicalSiteTab": 3,
+    "chronologyPopulationMode": "TECHNICAL_CURRENT_ADDITIONAL",
+    "technicalTargetCount": 32,
+    "releaseDateCoverage": 32,
+    "publicChronologyCount": 28,
+    "publicExcludedTechnicalEquipmentIds": [265, 266, 267, 268],
+    "chronologyDefinesDisplayMembership": false,
+    "displayMembershipSource": "data/presentation/equipment-display-collection.v1.json",
+    "equipmentPassCount": 24,
+    "semanticStageReopened": false,
+    "stage2AcquisitionClassificationChanged": false
+  },
+  "dataReuse": {
+    "mode": "REUSE_FROZEN_V1_CHRONOLOGY_RECORDS",
+    "joinKey": "equipmentId",
+    "defaultOrderRecomputed": false,
+    "releaseDatesRecomputed": false,
+    "evidenceStatusesRecomputed": false,
+    "sourceIdsRecomputed": false,
+    "releaseFamiliesRecomputed": false,
+    "identityContinuityRecomputed": false
+  },
+  "partition": {
+    "publicExcludedTechnicalSiteTab3": [265, 266, 267, 268],
+    "publicCurrentAdditionalNonPass": [299, 400, 401, 402],
+    "publicEquipmentPass": [
+      599, 600, 601, 602,
+      607, 608, 609, 610,
+      615, 616, 617, 618,
+      623, 624, 625, 626,
+      630, 631, 632, 633,
+      639, 640, 641, 642
+    ]
+  },
+  "consumerPolicy": {
+    "chronologyJoinKey": "equipmentId",
+    "publicConsumerUsesPublicSubsetOnly": true,
+    "technicalSiteTabMustBePreservedBeforeDisplayMapping": true,
+    "displayCollectionMustNotBeDerivedFromChronology": true,
+    "releaseFamilyMustNotBeUsedAsMembershipRule": true
+  },
+  "invariants": [
+    "The V1 32-record chronology dataset remains the frozen data predecessor and is reused without recomputation.",
+    "Chronology metadata may be joined to technical siteTab 3 records by equipmentId before displayCollection mapping.",
+    "Equipment Pass membership is owned exclusively by equipment-display-collection.v1.json.",
+    "No presentation label is assigned by this chronology contract."
+  ],
+  "nextStartPoint": "Update Equipment active-source/freshness checkpoint and run frontend Preflight from the corrected public-admission + display-collection + chronology contracts"
+}

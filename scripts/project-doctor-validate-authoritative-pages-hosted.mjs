@@ -7,11 +7,18 @@ const expectedSkinRef = process.env.EXPECTED_SKIN_REF;
 if (!expectedSourceSha || !expectedSkinRef) throw new Error("EXPECTED_SOURCE_SHA and EXPECTED_SKIN_REF are required");
 
 const relation = JSON.parse(fs.readFileSync("data/generated/skin-stage2-3-bidirectional-relation.v1.json", "utf8"));
-const projection = JSON.parse(fs.readFileSync("data/presentation/equipment-p3-1-release-metadata.v1.json", "utf8"));
+const chronologyProjection = JSON.parse(fs.readFileSync("data/presentation/equipment-p3-1-release-metadata.v1.json", "utf8"));
+const displayCollection = JSON.parse(fs.readFileSync("data/presentation/equipment-display-collection.v1.json", "utf8"));
+const equipmentPass = displayCollection.displayCollections.equipmentPass;
+const equipmentPassIds = new Set(equipmentPass.equipmentIds.map(Number));
+const expectedEquipmentPassOrder = chronologyProjection.defaultOrderEquipmentIds.filter((equipmentId) => equipmentPassIds.has(Number(equipmentId)));
 const expectedPolicy = "장비 종류·세부 타입 순서를 유지하고, 같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순이야. 같은 출시 그룹 안의 개별 순서는 별도 출시순 의미가 없어.";
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 const url = (path) => new URL(path.replace(/^\//, ""), baseUrl).toString();
+
+check(displayCollection.scope.equipmentPassMembershipMode === "EXPLICIT_EQUIPMENT_ID", "Equipment Pass display membership mode mismatch");
+check(expectedEquipmentPassOrder.length === equipmentPass.expectedCount, `Equipment Pass chronology coverage mismatch: ${expectedEquipmentPassOrder.length}`);
 
 async function fetchWithRetry(path, attempts = 5) {
   let last = null;
@@ -156,7 +163,7 @@ try {
   await page.getByText(expectedPolicy, { exact: true }).waitFor({ state: "visible" });
   const cardLinks = page.locator('section[aria-label="SSR 장비 이미지 목록"] a[href]');
   const cardCount = await cardLinks.count();
-  check(cardCount === projection.scope.targetCount, `Equipment tab3 card count mismatch: ${cardCount}`);
+  check(cardCount === equipmentPass.expectedCount, `Equipment Pass card count mismatch: ${cardCount}`);
   const actualIds = [];
   for (let index = 0; index < cardCount; index += 1) {
     const href = await cardLinks.nth(index).getAttribute("href");
@@ -164,7 +171,7 @@ try {
     check(match, `unexpected Equipment href: ${href}`);
     actualIds.push(Number(match[1]));
   }
-  check(JSON.stringify(actualIds) === JSON.stringify(projection.defaultOrderEquipmentIds), "Equipment P3-2 default order parity failed");
+  check(JSON.stringify(actualIds) === JSON.stringify(expectedEquipmentPassOrder), "Equipment Pass display membership/order parity failed");
 
   for (const [equipmentId, expectedDate] of [[642, "2026-07-16"], [299, "2019-05-09"]]) {
     response = await page.goto(url(`equipment/${equipmentId}/`), { waitUntil: "networkidle", timeout: 45000 });
