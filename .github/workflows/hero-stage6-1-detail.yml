@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - 'work/**'
     paths:
       - '.github/workflows/hero-stage6-1-detail.yml'
       - 'scripts/build_hero_stage6_1_detail.cjs'
@@ -33,11 +32,25 @@ on:
       - 'data/validation/hero-exclusive-equipment-relation-validation.v1.json'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  build-validate:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Hero Stage 6-1 producer runs must target a non-main branch. Select the branch/ref to freeze, then open a normal PR.'
+          exit 1
+
+  build-validate:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -75,8 +88,52 @@ jobs:
             data/generated/hero-detail-stage6-1.v1.json
             data/validation/hero-stage6-1-final.v1.json
 
-      - name: Freeze Stage 6-1 outputs on work branch
-        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+      - name: Verify frozen outputs on main or PR
+        run: git diff --exit-code -- data/generated/hero-detail-stage6-1.v1.json data/validation/hero-stage6-1-final.v1.json
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build and validate Hero Stage 6-1
+        run: node scripts/build_hero_stage6_1_detail.cjs
+
+      - name: Show Stage 6-1 summary
+        run: |
+          node - <<'NODE'
+          const r = require('./data/validation/hero-stage6-1-final.v1.json');
+          console.log(JSON.stringify({
+            status: r.status,
+            completion: r.completion,
+            summary: r.summary,
+            checks: r.checks,
+            inheritedReviews: r.inheritedReviews,
+            decision: r.decision
+          }, null, 2));
+          NODE
+
+      - name: Upload Stage 6-1 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-stage6-1-detail
+          path: |
+            data/generated/hero-detail-stage6-1.v1.json
+            data/validation/hero-stage6-1-final.v1.json
+
+      - name: Freeze Stage 6-1 outputs on explicit producer run
         run: |
           TARGETS='data/generated/hero-detail-stage6-1.v1.json data/validation/hero-stage6-1-final.v1.json'
           git config user.name 'github-actions[bot]'
@@ -90,7 +147,3 @@ jobs:
             git rebase "origin/${GITHUB_REF_NAME}"
             git push origin HEAD:${GITHUB_REF_NAME}
           fi
-
-      - name: Verify frozen outputs on main or PR
-        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
-        run: git diff --exit-code -- data/generated/hero-detail-stage6-1.v1.json data/validation/hero-stage6-1-final.v1.json
