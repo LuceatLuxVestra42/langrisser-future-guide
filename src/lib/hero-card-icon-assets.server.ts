@@ -192,13 +192,15 @@ assertFrozenHeroCardIconSource();
 
 export type HeroCardIconIndexRecord = Pick<
   HeroCardIconAssetRecord,
-  "heroId" | "webAssetPath" | "width" | "height" | "assetStatus"
+  "heroId" | "nameKr" | "nameCn" | "webAssetPath" | "width" | "height" | "assetStatus"
 >;
 
 export function readHeroCardIconIndex() {
   return {
     records: source.records.map<HeroCardIconIndexRecord>((row) => ({
       heroId: row.heroId,
+      nameKr: row.nameKr,
+      nameCn: row.nameCn,
       webAssetPath: deliveryByHeroId.get(row.heroId)!.webDeliveryPath,
       width: row.width,
       height: row.height,
