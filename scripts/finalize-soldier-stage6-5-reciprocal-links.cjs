@@ -79,7 +79,7 @@ async function main() {
     pairsFromByHeroArtifact,
     pairsFromBySoldierArtifact,
     pairsFromRelationArtifact,
-  } = await import('./lib/soldier-stage6-5-semantic-projections.mjs');
+  } = await import('./soldier-stage6-5-semantic-projections.mjs');
 
   const relationSet = loadJson(paths.relationSet);
   const relationValidation = loadJson(paths.relationValidation);
