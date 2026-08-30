@@ -34,32 +34,57 @@ const KEY_ARTIFACT_PROJECTIONS = Object.freeze({
   expansionBasis: 'soldier-stage6-6-expansion-basis/semantic-v1',
 });
 
+const AUDIT_ONLY_KEYS = new Set([
+  'gitBlobSha',
+  'blobSha',
+  'canonicalRelationBlobSha',
+  'commitSha',
+  'treeSha',
+  'workflowRunId',
+  'runId',
+  'artifactDigest',
+  'semanticDigest',
+  'freshnessMode',
+]);
+
+function stripAuditProvenanceDeep(value) {
+  if (Array.isArray(value)) return value.map(stripAuditProvenanceDeep);
+  if (!value || typeof value !== 'object') return value;
+
+  const result = {};
+  for (const [key, child] of Object.entries(value)) {
+    if (AUDIT_ONLY_KEYS.has(key)) continue;
+    result[key] = stripAuditProvenanceDeep(child);
+  }
+  return result;
+}
+
 function stripTopLevelFreshnessMetadata(value) {
   const {
     generatedAt: _generatedAt,
     generatedBy: _generatedBy,
+    frozenAt: _frozenAt,
     sources: _sources,
     freshness: _freshness,
     ...semantic
   } = value ?? {};
-  return semantic;
+  return stripAuditProvenanceDeep(semantic);
 }
 
-function projectRefWithoutBlob(ref) {
+function projectRefWithoutAudit(ref) {
   if (!ref || typeof ref !== 'object') return ref ?? null;
-  const { gitBlobSha: _gitBlobSha, semanticDigest: _semanticDigest, freshnessMode: _freshnessMode, ...semantic } = ref;
-  return semantic;
+  return stripAuditProvenanceDeep(ref);
 }
 
 function projectCheckpoint(value) {
   const contracts = Object.fromEntries(
-    Object.entries(value?.contracts ?? {}).map(([key, ref]) => [key, projectRefWithoutBlob(ref)]),
+    Object.entries(value?.contracts ?? {}).map(([key, ref]) => [key, projectRefWithoutAudit(ref)]),
   );
   const generatedBaseline = Object.fromEntries(
-    Object.entries(value?.generatedBaseline ?? {}).map(([key, ref]) => [key, projectRefWithoutBlob(ref)]),
+    Object.entries(value?.generatedBaseline ?? {}).map(([key, ref]) => [key, projectRefWithoutAudit(ref)]),
   );
   const validationBaseline = Object.fromEntries(
-    Object.entries(value?.validationBaseline ?? {}).map(([key, ref]) => [key, projectRefWithoutBlob(ref)]),
+    Object.entries(value?.validationBaseline ?? {}).map(([key, ref]) => [key, projectRefWithoutAudit(ref)]),
   );
 
   return {
@@ -153,12 +178,12 @@ export function projectStage67OutputArtifact(value) {
     freshness: _freshness,
     ...semantic
   } = value ?? {};
-  return semantic;
+  return stripAuditProvenanceDeep(semantic);
 }
 
 export function projectStage67ValidationArtifact(value) {
   const { generatedAt: _generatedAt, freshness: _freshness, ...semantic } = value ?? {};
-  return semantic;
+  return stripAuditProvenanceDeep(semantic);
 }
 
 export function buildStage67OutputDigest(value) {
