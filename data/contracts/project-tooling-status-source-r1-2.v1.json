@@ -3,8 +3,8 @@
   "schemaId": "project-tooling-status-source-r1-2/v1",
   "stage": "R1-2",
   "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_2_PROMOTION",
-  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
-  "completion": "R1_2_PROMOTION_IMPLEMENTED",
+  "status": "PASS",
+  "completion": "R1_2_PROMOTION_COMPLETE",
   "purpose": "Replace legacy Project Doctor status-source promotion with an independent Status Source command that is check-only by default, requires explicit --apply for mutation, and rolls back its declaration if post-write verification fails.",
   "predecessor": {
     "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_SELECTION_CORE",
@@ -95,6 +95,36 @@
     "unsafe entry id blocks before write",
     "legacy runtime dependency scan remains zero"
   ],
+  "validationEvidence": {
+    "implementationCommit": "b914a622571de08ef6ac63f64fb08c28c8dc2f00",
+    "shadowWorkflow": {
+      "runId": 33342125677,
+      "jobId": 99339547047,
+      "conclusion": "success",
+      "selectionParityAndIsolationSelfTest": "PASS",
+      "promotionParityAndRollbackSelfTest": "PASS",
+      "selectedSourceCli": "PASS",
+      "activeEquipmentCheckOnlyCli": "PASS"
+    },
+    "currentCompatibility": {
+      "selectedDomainCount": 6,
+      "equipmentSelectedId": "equipment-public-presentation-correction-final",
+      "equipmentProjectionSubset": {
+        "canonical": 390,
+        "public": 365,
+        "general": 198,
+        "exclusive": 167
+      }
+    },
+    "mutationProof": {
+      "repositoryCheckModeDeclarationWrites": 0,
+      "syntheticApplyDeclarationWrites": 1,
+      "syntheticRollbackVerified": true,
+      "legacyRuntimeDependencies": 0,
+      "rawConfigDataReads": 0,
+      "semanticRecomputations": 0
+    }
+  },
   "completionGate": {
     "compatibilityContractImplemented": true,
     "promotionLibraryImplemented": true,
@@ -103,19 +133,21 @@
     "transactionRollbackImplemented": true,
     "selfTestImplemented": true,
     "shadowWorkflowUpdated": true,
-    "shadowCiPass": false
+    "shadowCiPass": true,
+    "currentCompatibilityParity": true,
+    "rollbackProven": true,
+    "legacyRuntimeDependencyCountZero": true
   },
   "blockers": [],
   "reviews": [
-    "R1-2 is not frozen until the updated Status Source shadow workflow passes on the PR merge result.",
     "R1-3 producer submit and later bridge/handoff behavior remain legacy-only and are outside this checkpoint.",
     "Legacy required pr-guard remains a CUTOVER_ONLY blocker and must not be repaired by admitting these migration paths into legacy D2-D7."
   ],
-  "nextStartPoint": "Run the updated R1 shadow workflow. If PASS, freeze R1-2 and continue R1-3 producer submit using the new promotion command rather than the legacy Project Doctor promotion runtime.",
+  "nextStartPoint": "R1-3: migrate the producer submit gate so it validates producer/domain/source declarations and delegates promotion exclusively to tools/status-source/cli/promote.mjs rather than the legacy Project Doctor promotion runtime.",
   "reopenConditions": [
     "R1-1 selector semantics change",
     "status-source declaration schema changes",
     "promotion compatibility fields change authoritatively",
-    "shadow self-test exposes a parity or rollback failure"
+    "new authoritative evidence contradicts the R1-2 shadow parity or rollback result"
   ]
 }
