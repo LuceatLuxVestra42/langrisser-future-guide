@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-detail-spine-stage2",
+  "substage": "render-contract-freeze",
+  "status": "SKIN_DETAIL_SPINE_RENDER_CONTRACT_FROZEN",
+  "authoritativeSource": {
+    "contract": "data/contracts/skin-detail-spine-render-contract.v1.json",
+    "contractCommit": "7f63961ddafbc3eb33c8ae75b87599e3dc07de36",
+    "representativeCheckpoint": "data/checkpoints/skin-detail-spine-stage2-representative-render.v1.json",
+    "representativeCheckpointCommit": "a349af24086868a27f876541f714ed0f2dae3dd4"
+  },
+  "finalValidation": {
+    "workflowRunId": 33295984276,
+    "workflowHeadSha": "7f63961ddafbc3eb33c8ae75b87599e3dc07de36",
+    "workflowConclusion": "success",
+    "artifactId": 9727429573,
+    "artifactName": "skin-detail-spine-stage2-probe",
+    "artifactDigest": "sha256:f373f0446a99898bc50c215d2cabf7c8b81fad5dafd1f8af4f378c94e1eb82ed",
+    "validator": "scripts/validate-skin-detail-spine-render-contract.py",
+    "validatorStatus": "PASS",
+    "validatorCheckCount": 52,
+    "validatorFailureCount": 0
+  },
+  "frozenContract": {
+    "representativeSkinIds": [102, 1901, 3701],
+    "representativePassCount": 3,
+    "runtimeRole": "RUNTIME_SPINE_CHARACTER_RENDER",
+    "sameStaticIllustrationAssetClassAsHeroPainting": false,
+    "textAssetExtraction": "SERIALIZED_RAW_BYTE_ARRAY",
+    "spineRuntimeCommit": "1c1936532527900f74cfb58f7002998bf157b254",
+    "skeletonVersion": "3.3.05",
+    "pose": "idle_Normal@0",
+    "uvOrientation": "NO_FLIP_V",
+    "targetMaxDimensionPx": 900,
+    "marginWorldRatioOfMaxDimension": 0.06,
+    "transparentBackground": true,
+    "validatedAttachmentTypes": ["RegionAttachment", "MeshAttachment"],
+    "validatedBlendModes": ["normal"],
+    "futureGeneratedNamespace": "data/generated/skin-detail-spine-render-v1"
+  },
+  "completedScope": [
+    "representative 3/3 exact dependency render",
+    "full-body framing verification",
+    "raw TextAsset extraction producer freeze",
+    "runtime and Python dependency pinning",
+    "UV orientation freeze",
+    "canvas and padding normalization freeze",
+    "representative source/render hash regression validator",
+    "final frozen-contract regression pass"
+  ],
+  "review": [
+    "Only single-atlas-page representatives are validated. Multi-atlas-page records must block and be classified during bulk application rather than silently flattened.",
+    "Only normal blend mode is validated. Any other blend mode encountered during bulk application must block the affected record and open a representative extension unit.",
+    "Representative feasibility does not imply 540/540 bulk success until the frozen contract is applied to the full canonical population.",
+    "These outputs are runtime Spine character renders, not the same static illustration asset class as HeroPainting."
+  ],
+  "blocker": [],
+  "nextStart": "Apply the frozen render contract to the canonical 540 Skin population as a separate Stage 3 bulk unit. Reuse frozen Skin/CHAR_SPINE relations and existing bundle provenance; do not recompute semantics. Produce generated outputs plus a manifest, classify and stop affected records on multi-page atlas, non-normal blend, unsupported attachment, missing idle_Normal, or unresolved exact dependency. Do not change public Skin assets or frontend during the bulk unit.",
+  "reopenConditions": [
+    "representative regression mismatch",
+    "authoritative CHAR_SPINE provenance changes",
+    "a bulk record requires a capability outside the frozen contract and a new representative extension proves a revised rule"
+  ],
+  "guardrails": {
+    "canonicalSkinRecomputed": false,
+    "heroSkinRelationChanged": false,
+    "frontendChanged": false,
+    "publicSkinAssetsChanged": false,
+    "bulk540Rendered": false,
+    "classFusionTouched": false
+  }
+}
