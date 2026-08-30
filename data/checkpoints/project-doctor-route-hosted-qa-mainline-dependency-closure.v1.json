@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "project-doctor-route-hosted-qa-mainline-dependency-closure.v1",
+  "status": "PASS_WITH_DEFERRED_PACKAGE_WORKFLOW",
+  "completion": "STEP2_SOURCE_CLOSURE_PORTED",
+  "recordedAt": "2026-08-30",
+  "owningLayer": "runner/tooling-mainline-integration",
+  "authoritativeBaseline": {
+    "mainSha": "fdb5bea0c097d5ba23846eca22982896a6a6bcd3",
+    "integrationBranch": "work/route-hosted-qa-mainline-integration",
+    "referenceFinalTree": "work/route-hosted-qa-stage4-integrated-orchestration",
+    "referencePullRequests": [192, 190, 193]
+  },
+  "verifiedCurrentState": {
+    "qa1Checkpoint": "ROUTE_HOSTED_QA_STAGE1_HTTP_FROZEN",
+    "currentHeroCardAccessibleName": "<displayName> 상세 보기",
+    "currentHeroNavigation": "TanStack Link + reloadDocument",
+    "currentPackageHasPlaywright": false,
+    "currentPublic404SourceFilePresent": false,
+    "preserveCurrentAuthoritativePagesComposition": true,
+    "semanticReopen": false
+  },
+  "classification": [
+    { "path": ".github/workflows/project-doctor-route-hosted-qa-stage2-browser-proof.yml", "action": "PORT_REWRITE_STEP4", "reason": "branch-specific trigger and historical vite.config.ts injection" },
+    { "path": "bun.lock", "action": "REGENERATE_STEP3", "reason": "must derive from current main dependency graph" },
+    { "path": "data/contracts/project-doctor-route-hosted-qa-stage2.v1.json", "action": "PORT_EXACT_STEP2" },
+    { "path": "data/validation/project-doctor-route-hosted-qa-stage2.v1.json", "action": "REGENERATE_AFTER_PACKAGE", "reason": "spec and package context changed" },
+    { "path": "package.json", "action": "SURGICAL_PORT_STEP3", "reason": "current Project Doctor v5/v7 wiring is authoritative" },
+    { "path": "playwright.route-hosted.config.ts", "action": "PORT_EXACT_STEP2" },
+    { "path": "public/404.html", "action": "DO_NOT_COPY", "reason": "current authoritative Pages composition owns generated 404 output" },
+    { "path": "scripts/validate-project-doctor-route-hosted-qa-stage2.mjs", "action": "PORT_EXACT_STEP2" },
+    { "path": "src/routes/heroes.tsx", "action": "DO_NOT_COPY", "reason": "current main frontend is authoritative and uses Link + reloadDocument" },
+    { "path": "tests/route-hosted-browser/stage2.spec.ts", "action": "PORT_ADAPT_CURRENT_UI_STEP2", "reason": "Hero card accessible name changed from historical SSR label to current displayName label" },
+    { "path": ".github/workflows/project-doctor-route-hosted-qa-stage3-navigation-proof.yml", "action": "PORT_REWRITE_STEP4", "reason": "stack-branch trigger and historical vite.config.ts injection" },
+    { "path": "data/contracts/project-doctor-route-hosted-qa-stage3.v1.json", "action": "PORT_EXACT_REFERENCE_STEP2", "reason": "historical predecessor proof remains provenance only" },
+    { "path": "data/generated/project-doctor-route-hosted-qa-stage3-checkpoint.v1.json", "action": "REGENERATE_MAINLINE_PROOF", "reason": "old stacked runtime proof must not represent current mainline" },
+    { "path": "data/validation/project-doctor-route-hosted-qa-stage3.v1.json", "action": "REGENERATE_AFTER_PACKAGE", "reason": "current UI selector and validator changed" },
+    { "path": "playwright.route-hosted-stage3.config.ts", "action": "PORT_EXACT_STEP2" },
+    { "path": "scripts/validate-project-doctor-route-hosted-qa-stage3.mjs", "action": "PORT_ADAPT_STEP2", "reason": "remove fixed old proof SHA/run as current-proof requirement while retaining reference provenance" },
+    { "path": "tests/route-hosted-browser/stage3.spec.ts", "action": "PORT_ADAPT_CURRENT_UI_STEP2", "reason": "Hero card accessible name follows current main" },
+    { "path": ".github/workflows/project-doctor-route-hosted-qa-stage4-integrated-proof.yml", "action": "PORT_REWRITE_STEP4", "reason": "branch-specific deploy workflow and historical static-config injection" },
+    { "path": "data/contracts/project-doctor-route-hosted-qa-stage4.v1.json", "action": "PORT_EXACT_REFERENCE_STEP2", "reason": "ordered gate semantics remain frozen; predecessor proof fields are reference provenance" },
+    { "path": "data/generated/project-doctor-route-hosted-qa-stage4-checkpoint.v1.json", "action": "REGENERATE_MAINLINE_PROOF" },
+    { "path": "data/generated/project-doctor-route-hosted-qa-stage4-closeout.v1.json", "action": "REGENERATE_MAINLINE_PROOF" },
+    { "path": "data/validation/project-doctor-route-hosted-qa-stage4.v1.json", "action": "REGENERATE_AFTER_WORKFLOW", "reason": "mainline validator no longer treats old stacked checkpoint/workflow as current evidence" },
+    { "path": "docs/route-hosted-qa-stage4-integrated-orchestration.md", "action": "REGENERATE_AFTER_MAINLINE_PROOF", "reason": "historical proof document should not be silently reused as current evidence" },
+    { "path": "scripts/run-project-doctor-route-hosted-qa-stage4.mjs", "action": "PORT_EXACT_STEP2" },
+    { "path": "scripts/validate-project-doctor-route-hosted-qa-stage4.mjs", "action": "PORT_ADAPT_STEP2", "reason": "validate frozen orchestration semantics without requiring historical checkpoint/workflow files as current proof" }
+  ],
+  "installedInStep2": [
+    "data/contracts/project-doctor-route-hosted-qa-stage2.v1.json",
+    "playwright.route-hosted.config.ts",
+    "scripts/validate-project-doctor-route-hosted-qa-stage2.mjs",
+    "tests/route-hosted-browser/stage2.spec.ts",
+    "data/contracts/project-doctor-route-hosted-qa-stage3.v1.json",
+    "playwright.route-hosted-stage3.config.ts",
+    "scripts/validate-project-doctor-route-hosted-qa-stage3.mjs",
+    "tests/route-hosted-browser/stage3.spec.ts",
+    "data/contracts/project-doctor-route-hosted-qa-stage4.v1.json",
+    "scripts/run-project-doctor-route-hosted-qa-stage4.mjs",
+    "scripts/validate-project-doctor-route-hosted-qa-stage4.mjs"
+  ],
+  "notModifiedInStep2": [
+    "package.json",
+    "bun.lock",
+    "src/routes/heroes.tsx",
+    "public/404.html",
+    ".github/workflows/**",
+    "data/generated/project-doctor-route-hosted-qa-stage3-checkpoint.v1.json",
+    "data/generated/project-doctor-route-hosted-qa-stage4-checkpoint.v1.json",
+    "data/generated/project-doctor-route-hosted-qa-stage4-closeout.v1.json",
+    "data/validation/project-doctor-route-hosted-qa-stage2.v1.json",
+    "data/validation/project-doctor-route-hosted-qa-stage3.v1.json",
+    "data/validation/project-doctor-route-hosted-qa-stage4.v1.json"
+  ],
+  "deferred": {
+    "step3": ["surgically add qa:browser scripts", "pin @playwright/test 1.62.1", "regenerate bun.lock from current main"],
+    "step4": ["rewrite one mainline integrated workflow", "remove historical branch vite.config.ts injection", "use current authoritative Pages composition"],
+    "proof": ["regenerate QA-2 validation", "regenerate QA-3 validation/checkpoint", "regenerate QA-4 validation/checkpoint/closeout"]
+  },
+  "nextStartPoint": "STEP3_PACKAGE_SURGICAL_MERGE",
+  "reopenConditions": [
+    "main advances before Step 3 package integration",
+    "current Hero or Soldier accessible navigation contract changes",
+    "a new authoritative Route/Hosted QA contract supersedes the QA-4 reference tree"
+  ]
+}

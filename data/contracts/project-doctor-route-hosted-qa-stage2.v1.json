@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "route-hosted-qa-stage2.v1",
+  "stage": "QA-2",
+  "status": "BROWSER_UI_CONTRACT_FROZEN",
+  "predecessor": {
+    "stage": "QA-1",
+    "checkpoint": "data/generated/project-doctor-route-hosted-qa-stage1-checkpoint.v1.json",
+    "requiredStatus": "ROUTE_HOSTED_QA_STAGE1_HTTP_FROZEN",
+    "requiredGate": "Hosted Gate PASS before Browser/UI Gate"
+  },
+  "runtime": {
+    "runner": "@playwright/test",
+    "version": "1.62.1",
+    "browser": "chromium",
+    "nodeMajor": 22,
+    "browserInstallCommand": "bunx playwright install --with-deps chromium"
+  },
+  "hosted": {
+    "baseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+    "sourceShaSentinel": "qa-main-source.txt",
+    "expectedSourceShaEnvironment": "ROUTE_HOSTED_QA_EXPECTED_SOURCE_SHA",
+    "baseUrlEnvironment": "ROUTE_HOSTED_QA_BASE_URL"
+  },
+  "projects": [
+    {
+      "id": "chromium-desktop",
+      "viewport": { "width": 1440, "height": 1000 },
+      "hasTouch": false
+    },
+    {
+      "id": "chromium-mobile",
+      "viewport": { "width": 390, "height": 844 },
+      "hasTouch": true
+    }
+  ],
+  "representativeFixtures": {
+    "heroId": 6,
+    "heroSearch": "레온",
+    "soldierId": 102,
+    "soldierSearch": "중장 창병",
+    "unknownHeroId": 999999,
+    "unknownSoldierId": 999999,
+    "unknownEquipmentId": 999999
+  },
+  "checks": [
+    "BROWSER_BOOTSTRAP",
+    "HOSTED_FRESHNESS_PRECONDITION",
+    "PUBLIC_SURFACE_RENDER",
+    "HYDRATION_INTERACTION",
+    "HERO_SEARCH_FILTER",
+    "HISTORY_BACK_FORWARD",
+    "SOLDIER_MODAL_STATE_PRESERVATION",
+    "SOLDIER_SCROLL_RESTORE",
+    "UNKNOWN_ID_NOT_FOUND_UI",
+    "MOBILE_RESPONSIVE_LAYOUT",
+    "TOUCH_KEYBOARD_INTERACTION",
+    "CONSOLE_PAGEERROR_CLEAN"
+  ],
+  "requiredPublicSurfaces": [
+    "/",
+    "/banners/",
+    "/equipment/",
+    "/heroes/",
+    "/soldiers/"
+  ],
+  "failure": {
+    "browserUi": "BROWSER_UI_FAIL",
+    "semanticReopenAllowed": false,
+    "hostedFailureOwner": "QA-1 / deployment-hosting",
+    "browserFailureOwner": "frontend interaction / responsive / hydration"
+  },
+  "deferred": [
+    "VISUAL_SNAPSHOT_PIXEL_DIFF",
+    "FIREFOX_WEBKIT_CROSS_BROWSER",
+    "SKIN_CAROUSEL_UNTIL_PRODUCTION_SURFACE",
+    "RECONNECT_STORAGE_PERSISTENCE_UNTIL_SHARED_UI_STATE_CONTRACT"
+  ]
+}

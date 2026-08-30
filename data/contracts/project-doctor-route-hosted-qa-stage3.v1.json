@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "route-hosted-qa-stage3.v1",
+  "stage": "QA-3",
+  "status": "NAVIGATION_HISTORY_CONSOLE_CONTRACT_FROZEN",
+  "predecessor": {
+    "stage": "QA-2",
+    "contract": "data/contracts/project-doctor-route-hosted-qa-stage2.v1.json",
+    "requiredStatus": "BROWSER_UI_CONTRACT_FROZEN",
+    "proofHeadSha": "3f0dea6065059cab63d28b5705d93c7b6544df14",
+    "proofRunId": 33229809974,
+    "proofConclusion": "success"
+  },
+  "runtime": {
+    "runner": "@playwright/test",
+    "version": "1.62.1",
+    "browser": "chromium",
+    "nodeMajor": 22,
+    "browserInstallCommand": "bunx playwright install --with-deps chromium"
+  },
+  "hosted": {
+    "baseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+    "repositoryBase": "/langrisser-future-guide/",
+    "sourceShaSentinel": "qa-main-source.txt",
+    "expectedSourceShaEnvironment": "ROUTE_HOSTED_QA_EXPECTED_SOURCE_SHA",
+    "baseUrlEnvironment": "ROUTE_HOSTED_QA_BASE_URL",
+    "requiresStableQa1HostedPasses": 3
+  },
+  "projects": [
+    {
+      "id": "chromium-desktop",
+      "viewport": { "width": 1440, "height": 1000 },
+      "hasTouch": false
+    },
+    {
+      "id": "chromium-mobile",
+      "viewport": { "width": 390, "height": 844 },
+      "hasTouch": true
+    }
+  ],
+  "representativeFixtures": {
+    "heroId": 6,
+    "heroNameKr": "레온",
+    "soldierId": 102,
+    "soldierNameKr": "중장 창병",
+    "unknownHeroId": 999999
+  },
+  "checks": [
+    "HOSTED_FRESHNESS_PRECONDITION",
+    "HOME_HERO_DETAIL_DOCUMENT_HISTORY",
+    "HERO_BACK_FORWARD_CONTENT_PARITY",
+    "SOLDIER_MODAL_BROWSER_HISTORY",
+    "SOLDIER_MODAL_FILTER_STATE_HISTORY",
+    "UNKNOWN_ID_RECOVERY_HISTORY",
+    "REPOSITORY_BASE_NAVIGATION_TARGETS",
+    "NO_FETCH_XHR_HTTP_ERROR_LEAK",
+    "CONSOLE_PAGEERROR_CLEAN_ACROSS_NAVIGATION",
+    "MOBILE_BROWSER_HISTORY"
+  ],
+  "networkPolicy": {
+    "guardResourceTypes": ["document", "fetch", "xhr", "script", "stylesheet"],
+    "failOnHttpStatusAtLeast": 400,
+    "allowExpectedDocument404OnlyInUnknownIdRecovery": true,
+    "serverFunctionRuntimeFallbackAllowed": false
+  },
+  "failure": {
+    "browserUi": "BROWSER_UI_FAIL",
+    "semanticReopenAllowed": false,
+    "hostedFailureOwner": "QA-1 / deployment-hosting",
+    "browserFailureOwner": "frontend navigation / history / runtime interaction"
+  },
+  "deferred": [
+    "VISUAL_SNAPSHOT_PIXEL_DIFF",
+    "FIREFOX_WEBKIT_CROSS_BROWSER",
+    "SKIN_CAROUSEL_UNTIL_PRODUCTION_SURFACE",
+    "RECONNECT_STORAGE_PERSISTENCE_UNTIL_SHARED_UI_STATE_CONTRACT",
+    "HERO_SOLDIER_CROSS_LINK_UNTIL_NAVIGATION_SURFACE_EXISTS",
+    "EQUIPMENT_HERO_CROSS_LINK_UNTIL_NAVIGATION_SURFACE_EXISTS"
+  ]
+}
