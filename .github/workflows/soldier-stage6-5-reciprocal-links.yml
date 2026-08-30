@@ -1,10 +1,10 @@
 name: Soldier Stage 6-5 Reciprocal Links
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-      - 'work/**'
     paths:
       - 'scripts/finalize-soldier-stage6-5-reciprocal-links.cjs'
       - 'data/generated/hero-soldier-relations.v1.json'
@@ -42,11 +42,25 @@ on:
       - '.github/workflows/soldier-stage6-5-reciprocal-links.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  reciprocal-link-qa:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Soldier Stage 6-5 producer runs must target a non-main branch. Select the branch/ref to freeze, then open a normal PR.'
+          exit 1
+
+  reciprocal-link-qa:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -68,8 +82,36 @@ jobs:
             data/generated/hero-soldier-page-links-stage6-5.v1.json
             data/validation/soldier-stage6-5-reciprocal-links.v1.json
 
-      - name: Freeze Stage 6-5 artifacts on work branch
-        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+      - name: Verify frozen Stage 6-5 artifacts on main or PR
+        run: git diff --exit-code -- data/generated/hero-soldier-page-links-stage6-5.v1.json data/validation/soldier-stage6-5-reciprocal-links.v1.json
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run Soldier Stage 6-5 reciprocal link QA
+        run: node scripts/finalize-soldier-stage6-5-reciprocal-links.cjs
+
+      - name: Upload Stage 6-5 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage6-5-reciprocal-links
+          path: |
+            data/generated/hero-soldier-page-links-stage6-5.v1.json
+            data/validation/soldier-stage6-5-reciprocal-links.v1.json
+
+      - name: Freeze Stage 6-5 artifacts on explicit producer run
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -82,7 +124,3 @@ jobs:
             git commit -m "freeze Soldier stage 6-5 reciprocal links PASS"
             git push origin HEAD:${{ github.ref_name }}
           fi
-
-      - name: Verify frozen Stage 6-5 artifacts on main or PR
-        if: github.event_name != 'push' || github.ref == 'refs/heads/main'
-        run: git diff --exit-code -- data/generated/hero-soldier-page-links-stage6-5.v1.json data/validation/soldier-stage6-5-reciprocal-links.v1.json
