@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-detail-spine-stage2",
+  "substage": "representative-render-feasibility",
+  "status": "PASS_REPRESENTATIVE_RENDER_FEASIBILITY",
+  "sourceBranch": "research/skin-detail-spine-stage2-20260830",
+  "predecessorCommit": "a0a70fb8f49f5d86ea58136ec00d0025be085a6b",
+  "authoritativeEvidence": {
+    "workflowRunId": 33295554932,
+    "workflowConclusion": "success",
+    "artifactId": 9727305610,
+    "artifactName": "skin-detail-spine-stage2-probe",
+    "artifactDigest": "sha256:15d394bbf63acabfdf85bc031577a938081b078b426d3151a468cb80a5f9e3cb",
+    "runtimeSourceCommit": "1c1936532527900f74cfb58f7002998bf157b254",
+    "textAssetExtraction": "SERIALIZED_RAW_BYTE_ARRAY",
+    "animation": "idle_Normal",
+    "animationTime": 0
+  },
+  "representatives": [
+    {
+      "skinId": 102,
+      "heroId": 1,
+      "acceptedRender": "render-idle0.png",
+      "rejectedVariant": "render-idle0-flipv.png",
+      "canvas": [495, 900],
+      "alphaBounds": [60, 48, 446, 847],
+      "alphaWidth": 386,
+      "alphaHeight": 799,
+      "alphaCoverageWidthRatio": 0.7798,
+      "alphaCoverageHeightRatio": 0.8878,
+      "drawItemCount": 37,
+      "attachmentTypeCounts": {
+        "MeshAttachment": 24,
+        "RegionAttachment": 13
+      },
+      "skeletonVersion": "3.3.05",
+      "fullBodyFraming": "PASS"
+    },
+    {
+      "skinId": 1901,
+      "heroId": 19,
+      "acceptedRender": "render-idle0.png",
+      "rejectedVariant": "render-idle0-flipv.png",
+      "canvas": [821, 900],
+      "alphaBounds": [77, 66, 767, 825],
+      "alphaWidth": 690,
+      "alphaHeight": 759,
+      "alphaCoverageWidthRatio": 0.8404,
+      "alphaCoverageHeightRatio": 0.8433,
+      "drawItemCount": 65,
+      "attachmentTypeCounts": {
+        "MeshAttachment": 54,
+        "RegionAttachment": 11
+      },
+      "skeletonVersion": "3.3.05",
+      "fullBodyFraming": "PASS"
+    },
+    {
+      "skinId": 3701,
+      "heroId": 37,
+      "acceptedRender": "render-idle0.png",
+      "rejectedVariant": "render-idle0-flipv.png",
+      "canvas": [757, 900],
+      "alphaBounds": [48, 48, 708, 852],
+      "alphaWidth": 660,
+      "alphaHeight": 804,
+      "alphaCoverageWidthRatio": 0.8719,
+      "alphaCoverageHeightRatio": 0.8933,
+      "drawItemCount": 51,
+      "attachmentTypeCounts": {
+        "MeshAttachment": 28,
+        "RegionAttachment": 23
+      },
+      "skeletonVersion": "3.3.05",
+      "fullBodyFraming": "PASS"
+    }
+  ],
+  "conclusion": {
+    "exactDependencyChainResolvable": true,
+    "deterministicCpuRenderFeasible": true,
+    "representativeRenderCount": 3,
+    "representativeRenderPassCount": 3,
+    "fullBodyFramingAcceptableForHeroDetailFeasibility": true,
+    "acceptedTextureCoordinateConvention": "NO_FLIP_V",
+    "flipVRejected": true,
+    "sameStaticIllustrationAssetClassAsHeroPainting": false,
+    "renderRole": "RUNTIME_SPINE_CHARACTER_RENDER",
+    "staticSkinFullArtworkClaimAllowed": false,
+    "bulk540RenderAllowedNow": false,
+    "renderContractFreezeRequiredBeforeBulk": true
+  },
+  "completedScope": [
+    "representative exact CHAR_SPINE dependency resolution",
+    "serialized raw TextAsset byte-array extraction",
+    "Spine 3.3.05 geometry parse",
+    "atlas Texture2D resolution",
+    "CPU composition for Skin 102, 1901, 3701",
+    "normal-vs-flipV orientation decision",
+    "representative full-body framing verification"
+  ],
+  "review": [
+    "Representative feasibility does not prove every one of 540 canonical Skins can render with the same dependency cardinality or framing without exceptions.",
+    "Production output dimensions, padding, animation pose/time, alpha premultiplication and blend handling must be frozen in a render contract before bulk materialization.",
+    "The accepted output is a deterministic render of the runtime Spine character asset and must not be relabeled as the same static illustration class as UI/HeroPainting."
+  ],
+  "blocker": [],
+  "nextStart": "Freeze a Skin CHAR_SPINE render contract from the 3/3 passing representatives. Define exact source provenance, raw TextAsset extraction, Spine runtime revision, animation/pose, UV orientation, canvas/padding normalization, texture/blend handling, output namespace and validator rules. Do not bulk-render 540 until that contract passes representative regression.",
+  "reopenConditions": [
+    "representative regression fails under the frozen render contract",
+    "new authoritative client evidence changes the CHAR_SPINE dependency contract",
+    "a canonical Skin cannot resolve required TextAsset/atlas/Texture2D dependencies under the frozen provenance rules"
+  ],
+  "guardrails": {
+    "heroSkinSemanticReopened": false,
+    "heroSkinRelationChanged": false,
+    "frontendChanged": false,
+    "publicSkinAssetsChanged": false,
+    "bulk540Rendered": false,
+    "classFusionTouched": false
+  }
+}
