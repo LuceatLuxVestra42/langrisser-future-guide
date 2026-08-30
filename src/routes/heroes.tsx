@@ -305,6 +305,8 @@ function HeroGridCard({
   const markAssets = fusionPower?.assetStatus === "RESOLVED"
     ? fusionPower.markAssets.map((asset) => ({ ...asset, url: resolvePublicAssetUrl(asset.webAssetPath) }))
     : [];
+  const primaryMarkAsset = markAssets[0];
+  const secondaryMarkAsset = markAssets[1];
   const fusionLabel = fusionPower?.targetType === "CLASS"
     ? `직업 초절강화: ${fusionPower.targetLabel}`
     : `초절강화 진영: ${fusionPower?.targetLabel ?? "진영"}`;
@@ -346,7 +348,7 @@ function HeroGridCard({
             </div>
           )}
 
-          {fusionPower && markAssets.length > 0 ? (
+          {fusionPower && primaryMarkAsset ? (
             <span
               data-hero-fusion-power-mark="true"
               data-hero-id={hero.heroId}
@@ -358,17 +360,17 @@ function HeroGridCard({
               title={fusionLabel}
               aria-label={fusionLabel}
             >
-              {fusionPower.markKind === "COMPOSITE" && markAssets.length === 2 ? (
+              {fusionPower.markKind === "COMPOSITE" && secondaryMarkAsset ? (
                 <span className="relative block h-full w-full overflow-hidden rounded-full">
                   <img
-                    src={markAssets[0].url}
+                    src={primaryMarkAsset.url}
                     alt=""
                     className="absolute inset-0 h-full w-full object-contain"
                     style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
                     loading="lazy"
                   />
                   <img
-                    src={markAssets[1].url}
+                    src={secondaryMarkAsset.url}
                     alt=""
                     className="absolute inset-0 h-full w-full object-contain"
                     style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }}
@@ -381,10 +383,10 @@ function HeroGridCard({
                 </span>
               ) : (
                 <img
-                  src={markAssets[0].url}
+                  src={primaryMarkAsset.url}
                   alt=""
-                  width={markAssets[0].width}
-                  height={markAssets[0].height}
+                  width={primaryMarkAsset.width}
+                  height={primaryMarkAsset.height}
                   className="h-full w-full object-contain"
                   loading="lazy"
                 />
