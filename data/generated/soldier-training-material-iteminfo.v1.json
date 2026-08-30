@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-material-iteminfo/v1",
+  "status": "PASS",
+  "generatedAt": "2026-08-30T06:25:25.046Z",
+  "scope": "exact ConfigDataItemInfo parity for frozen Soldier training material item IDs",
+  "sources": {
+    "census": {
+      "path": "data/generated/soldier-training-material-census.v1.json",
+      "gitBlobSha": "e53a8e6aff92d843a711462001469830ec1c9fb6",
+      "schemaId": "soldier-training-material-census/v1",
+      "status": "PASS"
+    },
+    "itemInfo": {
+      "path": "data/configdata/ConfigDataItemInfo.json",
+      "gitBlobSha": "fd34c0a83bd403c1fd01d34f3439e4c24a794f5e",
+      "directJsonKeys": {
+        "id": "ID",
+        "name": "Name",
+        "iconPath": "Icon"
+      }
+    }
+  },
+  "method": {
+    "join": "census.uniqueItemIds[] === ConfigDataItemInfo[].ID",
+    "nameField": "Name",
+    "iconPathField": "Icon",
+    "noNameJoin": true,
+    "noIdArithmetic": true,
+    "noRangeAssumption": true
+  },
+  "summary": {
+    "targetItemIdCount": 24,
+    "uniqueTargetItemIdCount": 24,
+    "matchedItemIdCount": 24,
+    "missingItemIdCount": 0,
+    "duplicateItemIdCount": 0,
+    "emptyNameCount": 0,
+    "emptyIconCount": 0
+  },
+  "items": [
+    {
+      "itemId": 6003,
+      "name": "高级步兵教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Sword03.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6006,
+      "name": "高级枪兵教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Spear03.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6009,
+      "name": "高级骑兵教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Ride03.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6012,
+      "name": "高级驯养教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Fly03.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6015,
+      "name": "高级生存教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Bow03.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6018,
+      "name": "高级宗教教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Monk03.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6031,
+      "name": "杠铃",
+      "iconPath": "UI/Icon/Item_ABS/Training_Facility04.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6032,
+      "name": "沙袋",
+      "iconPath": "UI/Icon/Item_ABS/Training_Facility05.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6033,
+      "name": "扩胸器",
+      "iconPath": "UI/Icon/Item_ABS/Training_Facility06.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6034,
+      "name": "健腹轮",
+      "iconPath": "UI/Icon/Item_ABS/Training_Facility01.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6035,
+      "name": "瑜伽垫",
+      "iconPath": "UI/Icon/Item_ABS/Training_Facility03.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6036,
+      "name": "平衡球",
+      "iconPath": "UI/Icon/Item_ABS/Training_Facility02.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6037,
+      "name": "Brown♂精油",
+      "iconPath": "UI/Icon/Item_ABS/Training_Aniki01.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6038,
+      "name": "Dark♂锁链",
+      "iconPath": "UI/Icon/Item_ABS/Training_Aniki02.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6039,
+      "name": "Devout♂手套",
+      "iconPath": "UI/Icon/Item_ABS/Training_Aniki03.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6040,
+      "name": "Pretty♂喷雾",
+      "iconPath": "UI/Icon/Item_ABS/Training_Aniki04.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6041,
+      "name": "Crazy♂短裤",
+      "iconPath": "UI/Icon/Item_ABS/Training_Aniki05.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6042,
+      "name": "Burning♂背带",
+      "iconPath": "UI/Icon/Item_ABS/Training_Aniki06.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6043,
+      "name": "特级步兵教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Sword04.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6044,
+      "name": "特级枪兵教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Spear04.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6045,
+      "name": "特级骑兵教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Ride04.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6046,
+      "name": "特级驯养教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Fly04.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6047,
+      "name": "特级生存教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Bow04.png",
+      "matchCount": 1
+    },
+    {
+      "itemId": 6048,
+      "name": "特级宗教教材",
+      "iconPath": "UI/Icon/Item_ABS/Training_Monk04.png",
+      "matchCount": 1
+    }
+  ]
+}
