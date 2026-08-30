@@ -40,3 +40,5 @@ jobs:
         run: node tools/asset-intake/cli/validate-hygiene-stage5-banner-unreferenced-review-v1.mjs
       - name: Push frozen review artifacts
         run: git push origin HEAD:${{ github.ref_name }}
+
+# temporary producer rerun after freezing post-introduction history baseline
