@@ -6,22 +6,13 @@
   "status": "DESIGN_FROZEN",
   "extends": "data/contracts/project-doctor-d3-validator-plan.v6.json",
   "impactContract": "data/contracts/project-doctor-d2-impact-contract.v7.json",
-  "purpose": "Preserve D3 V6 and select one non-mutating frozen A7 validator whenever the Soldier training-material asset pipeline changes.",
-  "addedCheckCatalog": [
-    {
-      "id": "soldier-training-material-assets-final",
-      "type": "validator",
-      "phase": 3,
-      "command": "npm run validate:soldier-training-material-assets-final",
-      "triggerChangeClasses": ["soldier-training-material-assets"],
-      "triggerNodes": [],
-      "coverage": "Frozen Soldier training-material A6 WebP bytes and A7 itemId consumer integration without semantic recomputation."
-    }
-  ],
+  "purpose": "Preserve the D3 V6 check catalog and consume D2 V7's Soldier training-material asset-owner routing. Existing soldier-assets coverage plus production build remain the Project Doctor checks; the A0-A7 domain workflow retains its own frozen validators.",
+  "addedCheckCatalog": [],
   "selectionPolicyV7": {
     "preserveV6Checks": true,
     "soldierTrainingMaterialAssetOwnerOnly": true,
     "semanticFanoutSuppressedByD2V7": true,
+    "domainPipelineValidatorsRemainOwnedByA0A7Workflow": true,
     "manualReviewExitPolicyUnchanged": true
   },
   "fixtures": [
@@ -29,14 +20,14 @@
       "id": "SOLDIER_TRAINING_MATERIAL_ASSET_PLAN",
       "paths": ["public/images/soldier-training-materials-webp/6003.webp"],
       "expectedStatus": "PLAN_READY",
-      "expectedChecks": ["soldier-training-material-assets-final", "coverage-soldier-assets", "production-build"],
+      "expectedChecks": ["coverage-soldier-assets", "production-build"],
       "expectedManualReviewCount": 0
     },
     {
       "id": "SOLDIER_TRAINING_MATERIAL_FROZEN_INPUT_PLAN",
       "paths": ["data/generated/soldier-training-material-iteminfo.v1.json"],
       "expectedStatus": "PLAN_READY",
-      "expectedChecks": ["soldier-training-material-assets-final", "coverage-soldier-assets", "production-build", "localization-audit"],
+      "expectedChecks": ["coverage-soldier-assets", "production-build", "localization-audit"],
       "expectedManualReviewCount": 0
     }
   ],
