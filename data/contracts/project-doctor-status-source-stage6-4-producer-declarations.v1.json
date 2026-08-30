@@ -4,7 +4,7 @@
   "stage": "PROJECT-STATUS-STAGE6-4",
   "checkpoint": "PROJECT_DOCTOR_STATUS_SOURCE_PRODUCER_DECLARATION_AUTOMATIC_HANDOFF_HERO_SOLDIER",
   "status": "DESIGN_FROZEN",
-  "purpose": "Allow the resolved Hero and Soldier owning completion workflows to emit explicit, retained producer declarations into the dedicated Stage 6-3 apply handoff on work branches without inferring candidate authority.",
+  "purpose": "Allow the resolved Hero and Soldier owning completion workflows to emit explicit, retained producer declarations into the dedicated Stage 6-3 apply handoff only through each pipeline's declared non-main producer transport, without inferring candidate authority.",
   "stage6_3Contract": "data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json",
   "activeRegistry": "data/generated/project-doctor-active-source-registry.v1.json",
   "resolverScript": "scripts/resolve-project-doctor-status-source-declaration.mjs",
@@ -23,7 +23,12 @@
     "predecessorMustEqualCurrentSelectedId": true,
     "compareAndSwapDelegatesToStage6_3Again": true,
     "candidateSourceMustBeCommittedAndClean": true,
-    "automaticDispatchWorkBranchOnly": true,
+    "automaticDispatchWorkBranchOnly": false,
+    "automaticDispatchRequiresDeclaredNonMainTransport": true,
+    "allowedAutomaticHandoffTransportModes": [
+      "WORK_BRANCH_PUSH",
+      "EXPLICIT_NON_MAIN_DISPATCH"
+    ],
     "pullRequestAndMainRemainCheckOnlyAtOwningWorkflow": true,
     "owningWorkflowMustNotContainDirectApplyFlag": true,
     "applyMustRunOnlyThroughDedicatedStage6_3Workflow": true,
@@ -46,16 +51,26 @@
       "completionWorkflow": ".github/workflows/hero-stage6-4-site-consumer.yml",
       "completionJob": "site-consumer-final-freeze",
       "handoffJob": "project-status-handoff",
-      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json"
+      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json",
+      "handoffTransport": {
+        "mode": "WORK_BRANCH_PUSH",
+        "mainAllowed": false,
+        "pullRequestAllowed": false
+      }
     },
     {
       "pipelineId": "soldier",
       "domain": "soldier",
       "producerId": "soldier-final",
       "completionWorkflow": ".github/workflows/soldier-stage6-7-site-admission.yml",
-      "completionJob": "site-admission",
+      "completionJob": "explicit-producer",
       "handoffJob": "project-status-handoff",
-      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json"
+      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json",
+      "handoffTransport": {
+        "mode": "EXPLICIT_NON_MAIN_DISPATCH",
+        "mainAllowed": false,
+        "pullRequestAllowed": false
+      }
     }
   ],
   "runtimeProof": {
@@ -65,6 +80,7 @@
     "uncommittedCandidateMustBlock": true,
     "owningWorkflowsEmitOnlyExplicitDeclarationFields": true,
     "owningCompletionWorkflowsMustSerializeBeforeWriterHandoff": true,
+    "owningWorkflowTransportMustMatchDeclaredMode": true,
     "reusableStage6_3WorkflowMustSupportWorkflowCall": true,
     "projectStatusWritersMustShareBranchConcurrencyGroup": true,
     "currentSelectedAuthorityMustRemainUnchanged": true
