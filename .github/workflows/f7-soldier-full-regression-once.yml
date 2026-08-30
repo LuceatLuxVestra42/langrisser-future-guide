@@ -1,0 +1,60 @@
+name: F7 Soldier Full Regression Once
+
+on:
+  push:
+    branches:
+      - maintenance/frozen-provenance-semantic-freshness-v2-f7
+    paths:
+      - .github/workflows/f7-soldier-full-regression-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  soldier-regression:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout F7 branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Revalidate Stage 6-6 expansion basis
+        run: node scripts/finalize-soldier-stage6-6-expansion-basis.cjs
+
+      - name: Prove Stage 6-6 frozen artifacts unchanged
+        run: git diff --exit-code -- data/generated/soldier-stage6-6-expansion-basis.v1.json data/validation/soldier-stage6-6-expansion-basis.v1.json
+
+      - name: Revalidate Stage 6-7 final admission
+        run: node scripts/finalize-soldier-stage6-7-site-admission.cjs
+
+      - name: Prove Stage 6-7 frozen artifacts unchanged
+        run: |
+          CHANGES="$(git status --porcelain -- data/generated/soldier-stage6-7-site-admission.v1.json data/validation/soldier-stage6-7-site-admission.v1.json)"
+          if [ -n "$CHANGES" ]; then
+            echo "$CHANGES"
+            exit 1
+          fi
+
+      - name: Run authoritative Soldier canonical final validator
+        run: node scripts/validate-soldier-stage6-7-final.mjs
+
+      - name: Revalidate Stage 6-5 closeout request projection
+        run: node scripts/render-project-doctor-status-source-closeout-request.mjs --pipeline soldier --check
+
+      - name: Revalidate Soldier Project Status bridge
+        run: node scripts/bridge-project-doctor-status-source.mjs --pipeline soldier --check
+
+      - name: Run F3 Stage 6-6 freshness baseline fixtures
+        run: node scripts/validate-soldier-stage6-6-freshness-v2-fixtures.mjs
+
+      - name: Run F6 fail-closed freshness matrix
+        run: node scripts/validate-soldier-frozen-semantic-freshness-v2-f6.mjs
+
+      - name: Run integrated Project Doctor freshness V2 self-test
+        run: node scripts/validate-project-doctor-frozen-freshness-v2.mjs
