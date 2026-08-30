@@ -1,0 +1,340 @@
+{
+  "version": 1,
+  "schemaId": "frozen-provenance-v2-p0-inventory/v1",
+  "stage": "P0",
+  "status": "COMPLETE",
+  "nextStage": "P1_READY",
+  "authority": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "branch": "main",
+    "commit": "1a80d5c63baf8fe6ffa42823977572a8ceba5dd1",
+    "inspectionMode": "targeted-current-main-source-inspection",
+    "semanticUpstreamReopened": false
+  },
+  "scope": {
+    "primaryStages": [
+      "soldier-stage5-2",
+      "soldier-stage5-3",
+      "soldier-stage5-4",
+      "soldier-stage5-6",
+      "soldier-stage5-7",
+      "soldier-stage5-8",
+      "soldier-stage6-1",
+      "soldier-stage6-2",
+      "soldier-stage6-3",
+      "soldier-stage6-4",
+      "soldier-stage6-5",
+      "soldier-stage6-6",
+      "soldier-stage6-7",
+      "hero-soldier-relation-authority",
+      "soldier-stage4-6-relation-consumer"
+    ],
+    "discoveredPredecessorsNotReopened": [
+      {
+        "stage": "soldier-stage5-5",
+        "reason": "Observed as an input predecessor of Stage 5-6; not needed to classify the current raw-SHA decision owners."
+      }
+    ],
+    "hardExclusions": [
+      ".github/workflows/** modifications",
+      "producer transport changes",
+      "branch protection changes",
+      "MANUAL_REVIEW or pr-guard exit-policy changes",
+      "Hero or Soldier canonical re-research",
+      "Hero-Soldier relation regeneration",
+      "production frozen artifact migration"
+    ]
+  },
+  "classificationDefinitions": {
+    "PROVENANCE_RECORD_ONLY": "Computes and records path/hash provenance but does not fail solely because a previously recorded hash differs from the current repository blob.",
+    "RAW_SHA_FRESHNESS_CONSUMER": "Compares recorded or snapshot SHA/hash provenance to the current repository/artifact hash and treats mismatch as a blocking validation/freshness error.",
+    "RAW_SHA_PIN_GATE": "Compares a current fixture/source hash to a literal frozen expected hash and treats mismatch as a blocking gate. This is distinct from recorded-provenance freshness.",
+    "CONTENT_SEMANTIC_VALIDATION": "Loads actual records/relations/statuses and validates semantic fields, counts, identities, parity, membership, or other content invariants.",
+    "TRANSPORT_FROZEN_EXACT_DIFF": "Workflow-level exact git diff parity of generated frozen outputs. Recorded for boundary awareness only; workflow transport is outside P0/P1 semantic-freshness ownership."
+  },
+  "entries": [
+    {
+      "stage": "soldier-stage5-2",
+      "ownerScript": "scripts/finalize-soldier-stage5-2-combat.cjs",
+      "currentFreshnessMode": ["PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": false,
+      "semanticContentUsed": true,
+      "observedDependencyPaths": [
+        "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+        "data/generated/soldier-master.v1.json",
+        "data/generated/soldier-stage3.v1.json",
+        "data/validation/soldier-stage3-final.v1.json",
+        "data/validation/soldier-stage4-8-baseline.v1.json"
+      ],
+      "metadataFields": ["sources.*.gitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage5-3", "soldier-stage6-6"]
+    },
+    {
+      "stage": "soldier-stage5-3",
+      "ownerScript": "scripts/finalize-soldier-stage5-3-ability.cjs",
+      "currentFreshnessMode": ["PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": false,
+      "semanticContentUsed": true,
+      "observedDependencyPaths": [
+        "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+        "data/generated/soldier-detail-stage5-2.v1.json",
+        "data/validation/soldier-stage5-2-combat.v1.json",
+        "data/generated/soldier-stage3.v1.json",
+        "data/validation/soldier-stage3-final.v1.json"
+      ],
+      "metadataFields": ["sources.*.gitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage5-4", "soldier-stage6-2", "soldier-stage6-6"]
+    },
+    {
+      "stage": "soldier-stage5-4",
+      "ownerScript": "scripts/finalize-soldier-stage5-4-training.cjs",
+      "currentFreshnessMode": ["PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": false,
+      "semanticContentUsed": true,
+      "observedDependencyPaths": [
+        "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+        "data/generated/soldier-detail-stage5-3.v1.json",
+        "data/validation/soldier-stage5-3-ability.v1.json",
+        "data/generated/soldier-stage3.v1.json",
+        "data/validation/soldier-stage3-final.v1.json"
+      ],
+      "metadataFields": ["sources.*.gitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage5-5", "soldier-stage6-6"]
+    },
+    {
+      "stage": "soldier-stage5-6",
+      "ownerScript": "scripts/finalize-soldier-stage5-6-sp-detail.cjs",
+      "currentFreshnessMode": ["PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": false,
+      "semanticContentUsed": true,
+      "observedDependencyPaths": [
+        "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+        "data/generated/soldier-detail-stage5-5.v1.json",
+        "data/validation/soldier-stage5-5-heroes.v1.json"
+      ],
+      "metadataFields": ["sources.*.gitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage6-1", "soldier-stage6-6"]
+    },
+    {
+      "stage": "soldier-stage5-7",
+      "ownerScript": "scripts/finalize-soldier-stage5-7-list.cjs",
+      "currentFreshnessMode": ["PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": false,
+      "semanticContentUsed": true,
+      "metadataFields": ["sources.*.gitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage5-8"]
+    },
+    {
+      "stage": "soldier-stage5-8",
+      "ownerScript": "scripts/finalize-soldier-stage5-8-release.cjs",
+      "currentFreshnessMode": ["PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": false,
+      "semanticContentUsed": true,
+      "observedDependencyPaths": [
+        "data/contracts/soldier-detail-stage5-1-contract.v1.json",
+        "data/generated/soldier-list-stage5-7.v1.json",
+        "data/validation/soldier-stage5-7-list.v1.json",
+        "data/soldier-release-source.v1.json"
+      ],
+      "metadataFields": ["sources.*.gitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage6-1"]
+    },
+    {
+      "stage": "soldier-stage6-1",
+      "ownerScript": "scripts/finalize-soldier-stage6-1-full-records.cjs",
+      "currentFreshnessMode": ["PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": false,
+      "semanticContentUsed": true,
+      "observedDependencyPaths": [
+        "data/validation/soldier-stage6-0-checkpoint.v1.json",
+        "data/generated/soldier-detail-stage5-6.v1.json",
+        "data/validation/soldier-stage5-6-sp-detail.v1.json",
+        "data/generated/soldier-list-stage5-8.v1.json",
+        "data/validation/soldier-stage5-8-release.v1.json"
+      ],
+      "metadataFields": ["sources.*.gitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage6-2", "soldier-stage6-3", "soldier-stage6-4", "soldier-stage6-6"]
+    },
+    {
+      "stage": "soldier-stage6-2",
+      "ownerScript": "scripts/finalize-soldier-stage6-2-classification.cjs",
+      "currentFreshnessMode": ["PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": false,
+      "semanticContentUsed": true,
+      "observedDependencyPaths": [
+        "data/validation/soldier-stage6-0-checkpoint.v1.json",
+        "data/generated/soldier-stage6-1-full-records.v1.json",
+        "data/validation/soldier-stage6-1-full-records.v1.json",
+        "data/validation/soldier-stage3-final.v1.json",
+        "data/validation/soldier-stage5-3-ability.v1.json"
+      ],
+      "metadataFields": ["sources.*.gitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage6-3", "soldier-stage6-4"]
+    },
+    {
+      "stage": "soldier-stage6-3",
+      "ownerScript": "scripts/finalize-soldier-stage6-3-representative-qa.cjs",
+      "currentFreshnessMode": ["PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": false,
+      "semanticContentUsed": true,
+      "observedDependencyPaths": [
+        "data/generated/soldier-stage6-1-full-records.v1.json",
+        "data/validation/soldier-stage6-1-full-records.v1.json",
+        "data/generated/soldier-stage6-2-classification.v1.json",
+        "data/validation/soldier-stage6-2-classification.v1.json",
+        "data/generated/hero-soldier-relations.v1.json"
+      ],
+      "metadataFields": ["sources.*.gitBlobSha", "sources.*.worktreeBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage6-4"]
+    },
+    {
+      "stage": "soldier-stage6-4",
+      "ownerScript": "scripts/finalize-soldier-stage6-4-filter-qa.cjs",
+      "currentFreshnessMode": ["PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": false,
+      "semanticContentUsed": true,
+      "observedDependencyPaths": [
+        "data/generated/soldier-stage6-1-full-records.v1.json",
+        "data/validation/soldier-stage6-1-full-records.v1.json",
+        "data/validation/soldier-stage6-2-classification.v1.json",
+        "data/fixtures/soldier-stage6-3-fixtures.v1.json",
+        "data/validation/soldier-stage6-3-representative-qa.v1.json"
+      ],
+      "metadataFields": ["sources.*.gitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage6-7"]
+    },
+    {
+      "stage": "soldier-stage6-5",
+      "ownerScript": "scripts/finalize-soldier-stage6-5-reciprocal-links.cjs",
+      "currentFreshnessMode": ["RAW_SHA_FRESHNESS_CONSUMER", "PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": true,
+      "semanticContentUsed": true,
+      "rawShaDecisionDependencies": [
+        "data/generated/hero-soldier-relations.v1.json",
+        "data/validation/hero-soldier-relation-validation.v1.json",
+        "data/generated/hero-soldier-by-hero.v1.json",
+        "data/generated/hero-soldier-by-soldier.v1.json",
+        "data/generated/hero-page-soldiers-stage5-3.v1.json"
+      ],
+      "decisionRule": "Current canonical relation blob SHA is compared with relationValidation/byHero/bySoldier/heroPage recorded relation snapshot SHAs; any mismatch contributes a blocking error.",
+      "metadataFields": ["relationSet.gitBlobSha", "sources.byHero.relationSetGitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage6-6", "soldier-stage6-7"]
+    },
+    {
+      "stage": "soldier-stage6-6",
+      "ownerScript": "scripts/finalize-soldier-stage6-6-expansion-basis.cjs",
+      "currentFreshnessMode": ["PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": false,
+      "semanticContentUsed": true,
+      "observedDependencyPaths": [
+        "data/generated/soldier-stage6-1-full-records.v1.json",
+        "data/validation/soldier-stage6-1-full-records.v1.json",
+        "data/generated/soldier-detail-stage5-2.v1.json",
+        "data/validation/soldier-stage5-2-combat.v1.json",
+        "data/generated/soldier-detail-stage5-3.v1.json",
+        "data/validation/soldier-stage5-3-ability.v1.json",
+        "data/generated/hero-soldier-relations.v1.json"
+      ],
+      "metadataFields": ["sources.*.path", "sources.*.gitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-stage6-7"],
+      "p3Role": "Pilot emitter: add semantic digest alongside retained provenance without changing workflow transport."
+    },
+    {
+      "stage": "soldier-stage6-7",
+      "ownerScript": "scripts/finalize-soldier-stage6-7-site-admission.cjs",
+      "currentFreshnessMode": ["RAW_SHA_FRESHNESS_CONSUMER", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": true,
+      "semanticContentUsed": true,
+      "decisionRule": "Recursively collects frozen {path, gitBlobSha} refs from upstream validations, resolves current HEAD:path blobs, and treats stale/missing refs as blocking final-admission errors.",
+      "metadataFields": ["frozenRefs[].path", "frozenRefs[].gitBlobSha", "generatedAt"],
+      "knownFanoutTargets": ["soldier-final-closeout"],
+      "p4Role": "Final owner for semantic-vs-provenance freshness classification."
+    },
+    {
+      "stage": "hero-soldier-relation-authority",
+      "ownerScript": "scripts/finalize-hero-soldier-relation-layer.cjs",
+      "currentFreshnessMode": ["RAW_SHA_PIN_GATE", "PROVENANCE_RECORD_ONLY", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": true,
+      "semanticContentUsed": true,
+      "pinGates": [
+        {
+          "check": "fixturePlanBlobMismatch",
+          "dependency": "soldier representative fixture plan",
+          "expectedSha256": "a5a7afa566afb49c3ba9a1a659eba27c3468339c7f20976e3fd91121eeadf8ef"
+        },
+        {
+          "check": "spSoldierFixtureSnapshotBlobMismatch",
+          "dependency": "ConfigDataSPSoldierInfo frozen fixture snapshot",
+          "expectedSha256": "e8dd0f53e34685bae0ce5f4ec91cbe0f131ce21a2a57c0668f42d842cd637878"
+        }
+      ],
+      "decisionRule": "Literal pinned SHA-256 mismatches are counted as hard failures. P1 must explicitly decide whether each pin is byte-authority or migrates to semantic-digest authority; default remains fail-closed.",
+      "knownFanoutTargets": ["soldier-stage4-6-relation-consumer", "soldier-stage6-3", "soldier-stage6-5", "soldier-stage6-6"]
+    },
+    {
+      "stage": "soldier-stage4-6-relation-consumer",
+      "ownerScript": "scripts/validate-soldier-stage4-6-relation-consumer.cjs",
+      "currentFreshnessMode": ["RAW_SHA_FRESHNESS_CONSUMER", "CONTENT_SEMANTIC_VALIDATION"],
+      "rawBlobShaUsed": true,
+      "rawShaDecision": true,
+      "semanticContentUsed": true,
+      "decisionRule": "Hashes current generated relation/index artifacts and compares them to gitBlobSha values recorded by relation validation refs; mismatch is blocking.",
+      "knownFanoutTargets": ["shared-relation-admission"]
+    }
+  ],
+  "rawShaDecisionOwners": [
+    {
+      "owner": "hero-soldier-relation-authority",
+      "mode": "RAW_SHA_PIN_GATE"
+    },
+    {
+      "owner": "soldier-stage4-6-relation-consumer",
+      "mode": "RAW_SHA_FRESHNESS_CONSUMER"
+    },
+    {
+      "owner": "soldier-stage6-5",
+      "mode": "RAW_SHA_FRESHNESS_CONSUMER"
+    },
+    {
+      "owner": "soldier-stage6-7",
+      "mode": "RAW_SHA_FRESHNESS_CONSUMER"
+    }
+  ],
+  "transportBoundary": {
+    "mode": "TRANSPORT_FROZEN_EXACT_DIFF",
+    "scope": ".github/workflows/**",
+    "ownership": "OUT_OF_SCOPE",
+    "note": "Exact git diff frozen-output verification remains a workflow/transport concern and is not modified by P0."
+  },
+  "p1StartPoint": {
+    "status": "READY",
+    "requirements": [
+      "Define semanticDigest and artifact/provenance digest roles without deleting gitBlobSha.",
+      "Define semantic projection per dependency class; do not use a broad metadata exclude-list without an explicit contract.",
+      "Cover recorded-provenance consumers at Stage 4-6 relation consumer, Stage 6-5, and Stage 6-7.",
+      "Treat relation-authority literal pin gates separately from recorded-provenance freshness and keep them fail-closed until explicitly contracted.",
+      "Use Stage 6-6 as the first digest-emission pilot, but do not assume that changing 6-6 alone removes earlier Stage 6-5 or relation-consumer SHA blockers.",
+      "Do not modify workflow transport or required pr-guard policy."
+    ]
+  },
+  "review": [
+    "Stage 5-5 was observed as a predecessor but was intentionally not reopened.",
+    "P1 must explicitly classify whether each literal relation fixture pin is semantic authority, byte authority, or migratable provenance.",
+    "Known fanout targets are limited to the targeted P0 closeout graph and are not asserted as a repository-wide dependency index."
+  ],
+  "blockers": []
+}
