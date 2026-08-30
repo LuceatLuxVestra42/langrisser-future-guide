@@ -4,7 +4,7 @@
   "stage": "PROJECT-STATUS-STAGE6-5",
   "checkpoint": "PROJECT_DOCTOR_STATUS_SOURCE_EXPLICIT_CLOSEOUT_REQUEST_TO_DECLARATION",
   "status": "DESIGN_FROZEN",
-  "purpose": "Render Stage 6-4 producer declarations only from retained, explicit Hero/Soldier closeout request objects. The request is the authority decision; Stage 6-5 performs deterministic projection only and never selects a candidate from repository chronology or filename patterns.",
+  "purpose": "Render Stage 6-4 producer declarations only from retained, explicit Hero/Soldier closeout request objects and only through each pipeline's declared non-main producer transport. The request is the authority decision; Stage 6-5 performs deterministic projection only and never selects a candidate from repository chronology or filename patterns.",
   "stage6_4Contract": "data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json",
   "activeRegistry": "data/generated/project-doctor-active-source-registry.v1.json",
   "rendererScript": "scripts/render-project-doctor-status-source-closeout-request.mjs",
@@ -29,6 +29,12 @@
     "declarationAuthorityDecision": "EXPLICIT_PRODUCER_DECLARATION",
     "explicitWriteFlagRequired": true,
     "workBranchMayRenderAndCommitDeclaration": true,
+    "workBranchTransportAppliesOnlyWhenDeclaredPerPipeline": true,
+    "approvedNonMainProducerTransportMayRenderAndCommitDeclaration": true,
+    "allowedDeclarationWriteTransportModes": [
+      "WORK_BRANCH_PUSH",
+      "EXPLICIT_NON_MAIN_DISPATCH"
+    ],
     "pullRequestAndMainRemainCheckOnly": true,
     "stage6_4MustRevalidateRenderedDeclaration": true,
     "stage6_3MustRemainOnlyApplyPath": true,
@@ -49,7 +55,12 @@
       "producerId": "hero-final",
       "completionWorkflow": ".github/workflows/hero-stage6-4-site-consumer.yml",
       "requestPath": "data/contracts/project-doctor-status-source-stage6-5-hero-closeout-request.v1.json",
-      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json"
+      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json",
+      "declarationWriteTransport": {
+        "mode": "EXPLICIT_NON_MAIN_DISPATCH",
+        "mainAllowed": false,
+        "pullRequestAllowed": false
+      }
     },
     {
       "pipelineId": "soldier",
@@ -57,7 +68,12 @@
       "producerId": "soldier-final",
       "completionWorkflow": ".github/workflows/soldier-stage6-7-site-admission.yml",
       "requestPath": "data/contracts/project-doctor-status-source-stage6-5-soldier-closeout-request.v1.json",
-      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json"
+      "declarationPath": "data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json",
+      "declarationWriteTransport": {
+        "mode": "EXPLICIT_NON_MAIN_DISPATCH",
+        "mainAllowed": false,
+        "pullRequestAllowed": false
+      }
     }
   ],
   "runtimeProof": {
@@ -69,6 +85,7 @@
     "crossPipelineBindingMustBlock": true,
     "staleDeclarationMustFailCheckMode": true,
     "writeModeMayOnlyWriteBoundDeclarationPath": true,
+    "declarationWriteTransportMustMatchDeclaredMode": true,
     "stage6_4ResolverMustRemainDownstream": true,
     "currentSelectedAuthorityMustRemainUnchanged": true
   },

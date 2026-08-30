@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - 'work/**'
     paths:
       - 'data/contracts/hero-stage6-4-site-consumer.v1.json'
       - 'data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json'
@@ -22,6 +21,7 @@ on:
       - 'scripts/validate_hero_stage6_4_site_consumer.cjs'
       - '.github/workflows/hero-stage6-4-site-consumer.yml'
   pull_request:
+    branches: [main]
     paths:
       - 'data/contracts/hero-stage6-4-site-consumer.v1.json'
       - 'data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json'
@@ -42,20 +42,29 @@ on:
       - '.github/workflows/hero-stage6-4-site-consumer.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: project-status-owner-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
-  site-consumer-final-freeze:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    outputs:
-      handoff_pipeline: ${{ steps.handoff_declaration.outputs.pipeline }}
-      handoff_expected_predecessor: ${{ steps.handoff_declaration.outputs.expected_predecessor }}
-      handoff_entry_id: ${{ steps.handoff_declaration.outputs.entry_id }}
-      handoff_source_path: ${{ steps.handoff_declaration.outputs.source_path }}
+    permissions:
+      contents: read
+    steps:
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Hero Stage 6-4 producer runs must target a non-main branch. Select the branch/ref to freeze, then open a normal PR.'
+          exit 1
+
+  site-consumer-final-freeze:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -98,23 +107,8 @@ jobs:
             data/checkpoints/hero-stage6-4-site-consumer.json
             data/checkpoints/hero-stage6-4-site-consumer.md
 
-      - name: Commit Stage 6-4 checkpoint on work branch
-        if: steps.validate.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
-        run: |
-          TARGETS='data/validation/hero-stage6-4-final.v1.json data/checkpoints/hero-stage6-4-site-consumer.json data/checkpoints/hero-stage6-4-site-consumer.md'
-          if [ -z "$(git status --porcelain -- $TARGETS)" ]; then
-            echo 'Stage 6-4 outputs already frozen.'
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add $TARGETS
-          git commit -m 'Freeze Hero Stage 6-4 site consumer checkpoint'
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
-
       - name: Verify frozen Stage 6-4 outputs on PR or main
-        if: steps.validate.outcome == 'success' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
+        if: steps.validate.outcome == 'success'
         run: |
           TARGETS='data/validation/hero-stage6-4-final.v1.json data/checkpoints/hero-stage6-4-site-consumer.json data/checkpoints/hero-stage6-4-site-consumer.md'
           if [ -n "$(git status --porcelain -- $TARGETS)" ]; then
@@ -123,36 +117,107 @@ jobs:
             exit 1
           fi
 
-      - name: Render Project Status declaration from approved closeout request
-        if: success() && steps.validate.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
-        run: node scripts/render-project-doctor-status-source-closeout-request.mjs --pipeline hero --write
-
-      - name: Commit Stage 6-5 Project Status declaration on work branch
-        if: success() && steps.validate.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
-        run: |
-          DECLARATION='data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json'
-          if [ -z "$(git status --porcelain -- "$DECLARATION")" ]; then
-            echo 'Hero Project Status declaration is already current.'
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$DECLARATION"
-          git commit -m 'Render Hero Project Status declaration from closeout request'
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
-
       - name: Verify Stage 6-5 closeout request projection on PR or main
-        if: success() && steps.validate.outcome == 'success' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
+        if: success() && steps.validate.outcome == 'success'
         run: node scripts/render-project-doctor-status-source-closeout-request.mjs --pipeline hero --check
 
       - name: Check Project Status source bridge after frozen Hero output
         if: success() && steps.validate.outcome == 'success' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
         run: node scripts/bridge-project-doctor-status-source.mjs --pipeline hero --check
 
+      - name: Enforce Stage 6-4 gate
+        if: always() && steps.validate.outcome != 'success'
+        run: exit 1
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      handoff_pipeline: ${{ steps.handoff_declaration.outputs.pipeline }}
+      handoff_expected_predecessor: ${{ steps.handoff_declaration.outputs.expected_predecessor }}
+      handoff_entry_id: ${{ steps.handoff_declaration.outputs.entry_id }}
+      handoff_source_path: ${{ steps.handoff_declaration.outputs.source_path }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate final Hero site consumer boundary
+        id: validate
+        continue-on-error: true
+        run: node scripts/validate_hero_stage6_4_site_consumer.cjs
+
+      - name: Show Stage 6-4 summary
+        if: always() && hashFiles('data/validation/hero-stage6-4-final.v1.json') != ''
+        run: |
+          node - <<'NODE'
+          const v = require('./data/validation/hero-stage6-4-final.v1.json');
+          console.log(JSON.stringify({
+            status:v.status,
+            completion:v.completion,
+            heroDataPipelineStatus:v.heroDataPipelineStatus,
+            summary:v.summary,
+            hardErrors:v.hardErrors,
+            decision:v.decision
+          }, null, 2));
+          NODE
+
+      - name: Upload Stage 6-4 diagnostics
+        if: always() && hashFiles('data/validation/hero-stage6-4-final.v1.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-stage6-4-diagnostics
+          path: |
+            data/validation/hero-stage6-4-final.v1.json
+            data/checkpoints/hero-stage6-4-site-consumer.json
+            data/checkpoints/hero-stage6-4-site-consumer.md
+
+      - name: Freeze Stage 6-4 outputs on explicit producer run
+        if: steps.validate.outcome == 'success'
+        run: |
+          TARGETS='data/validation/hero-stage6-4-final.v1.json data/checkpoints/hero-stage6-4-site-consumer.json data/checkpoints/hero-stage6-4-site-consumer.md'
+          if [ -z "$(git status --porcelain -- $TARGETS)" ]; then
+            echo 'Stage 6-4 outputs already frozen.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add $TARGETS
+            git commit -m 'Freeze Hero Stage 6-4 site consumer checkpoint'
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Render Project Status declaration from approved closeout request
+        if: steps.validate.outcome == 'success'
+        run: node scripts/render-project-doctor-status-source-closeout-request.mjs --pipeline hero --write
+
+      - name: Commit Stage 6-5 Project Status declaration on explicit producer run
+        if: steps.validate.outcome == 'success'
+        run: |
+          DECLARATION='data/contracts/project-doctor-status-source-stage6-4-hero-declaration.v1.json'
+          if [ -z "$(git status --porcelain -- "$DECLARATION")" ]; then
+            echo 'Hero Project Status declaration is already current.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add "$DECLARATION"
+            git commit -m 'Render Hero Project Status declaration from closeout request'
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
       - name: Resolve explicit Project Status handoff declaration
         id: handoff_declaration
-        if: success() && steps.validate.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
+        if: steps.validate.outcome == 'success'
         run: node scripts/resolve-project-doctor-status-source-declaration.mjs --pipeline hero --github-output
 
       - name: Enforce Stage 6-4 gate
@@ -160,13 +225,13 @@ jobs:
         run: exit 1
 
   project-status-handoff:
-    needs: site-consumer-final-freeze
-    if: needs.site-consumer-final-freeze.result == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
+    needs: explicit-producer
+    if: needs.explicit-producer.result == 'success' && github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
     permissions:
       contents: write
     uses: ./.github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml
     with:
-      pipeline: ${{ needs.site-consumer-final-freeze.outputs.handoff_pipeline }}
-      expected_predecessor: ${{ needs.site-consumer-final-freeze.outputs.handoff_expected_predecessor }}
-      entry_id: ${{ needs.site-consumer-final-freeze.outputs.handoff_entry_id }}
-      source_path: ${{ needs.site-consumer-final-freeze.outputs.handoff_source_path }}
+      pipeline: ${{ needs.explicit-producer.outputs.handoff_pipeline }}
+      expected_predecessor: ${{ needs.explicit-producer.outputs.handoff_expected_predecessor }}
+      entry_id: ${{ needs.explicit-producer.outputs.handoff_entry_id }}
+      source_path: ${{ needs.explicit-producer.outputs.handoff_source_path }}

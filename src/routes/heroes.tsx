@@ -2,11 +2,41 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { RotateCcw, Search, Sparkles, UserRound } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { getHeroCardIconIndex } from "@/lib/hero-card-icon-assets.functions";
+import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
 import { getHeroListStage4Data } from "@/lib/hero-list.functions";
-import type { HeroListRecord, HeroListStage4Record } from "@/lib/hero-list.server";
+import type { HeroListStage4Record } from "@/lib/hero-list.server";
 
 export const Route = createFileRoute("/heroes")({
-  loader: () => getHeroListStage4Data(),
+  loader: async () => {
+    const [data, cardIcons, fusionPowers] = await Promise.all([
+      getHeroListStage4Data(),
+      getHeroCardIconIndex(),
+      getHeroFusionPowerIndex(),
+    ]);
+    if (
+      cardIcons.summary.total !== 267 ||
+      cardIcons.summary.resolved !== 267 ||
+      cardIcons.summary.pending !== 0 ||
+      cardIcons.summary.hardErrors !== 0 ||
+      cardIcons.records.length !== 267
+    ) {
+      throw new Error("Hero card icon frozen index is not production-ready.");
+    }
+    if (
+      fusionPowers.summary.total !== 43 ||
+      fusionPowers.summary.factionTargets !== 41 ||
+      fusionPowers.summary.classTargets !== 2 ||
+      fusionPowers.summary.factionAssets !== 12 ||
+      fusionPowers.summary.classAssets !== 3 ||
+      fusionPowers.summary.pending !== 0 ||
+      fusionPowers.summary.hardErrors !== 0 ||
+      fusionPowers.records.length !== 43
+    ) {
+      throw new Error("Hero expanded fusion-power mark index is not production-ready.");
+    }
+    return { ...data, cardIcons, fusionPowers };
+  },
   head: () => ({
     meta: [
       { title: "영웅 | 랑그릿사 모바일 미래시 정보" },
@@ -21,28 +51,21 @@ export const Route = createFileRoute("/heroes")({
 
 const ALL_RARITIES = "ALL";
 
-// Presentation-only portrait sample set kept as a defensive fallback.
-// The canonical resolver now covers all 267 Hero card artwork paths first.
-const SAMPLE_HERO_CARD_PATHS: Readonly<Record<number, string>> = {
-  5: "/images/heroes/portrait-samples/5.webp",
-  6: "/images/heroes/portrait-samples/6.webp",
-  8: "/images/heroes/portrait-samples/8.webp",
-  12: "/images/heroes/portrait-samples/12.webp",
-  15: "/images/heroes/portrait-samples/15.webp",
-};
-
-// Presentation-only sample projection from frozen Hero detail shards.
-// Hero 6 and 12 each have a skill whose displayType is `超绝强化`.
-const SAMPLE_SUPER_BUFF_HERO_IDS = new Set<number>([6, 12]);
-
 function normalizeSearch(value: string) {
   return value.trim().toLocaleLowerCase();
 }
 
-function matchesHeroSearch(hero: HeroListRecord, normalizedQuery: string) {
+function matchesHeroSearch(hero: HeroListStage4Record, normalizedQuery: string) {
   if (!normalizedQuery) return true;
 
-  return [hero.identity.nameKr, hero.identity.nameCn, hero.identity.nameEn]
+  return [
+    hero.localization.displayName,
+    hero.localization.displayNameKr,
+    hero.localization.officialNameKr,
+    hero.identity.nameKr,
+    hero.identity.nameCn,
+    hero.identity.nameEn,
+  ]
     .filter((name): name is string => Boolean(name))
     .some((name) => name.toLocaleLowerCase().includes(normalizedQuery));
 }
@@ -52,24 +75,19 @@ function resolvePublicAssetUrl(webAssetPath: string) {
   return `${base.replace(/\/$/, "")}${webAssetPath}`;
 }
 
-function getRarityFrameClass(baseLabel: string) {
-  switch (baseLabel) {
-    case "SSR":
-      return "from-amber-200 via-amber-400 to-yellow-700";
-    case "SR":
-      return "from-violet-200 via-violet-400 to-fuchsia-700";
-    case "R":
-      return "from-sky-200 via-sky-400 to-cyan-700";
-    default:
-      return "from-zinc-200 via-zinc-400 to-zinc-700";
-  }
-}
-
 function HeroGridPage() {
   const data = Route.useLoaderData();
   const [query, setQuery] = useState("");
   const [rarity, setRarity] = useState(ALL_RARITIES);
   const [spOnly, setSpOnly] = useState(false);
+  const cardIconByHeroId = useMemo(
+    () => new Map(data.cardIcons.records.map((record) => [record.heroId, record])),
+    [data.cardIcons.records],
+  );
+  const fusionPowerByHeroId = useMemo(
+    () => new Map(data.fusionPowers.records.map((record) => [record.heroId, record])),
+    [data.fusionPowers.records],
+  );
 
   const filteredHeroes = useMemo(() => {
     const normalizedQuery = normalizeSearch(query);
@@ -187,17 +205,24 @@ function HeroGridPage() {
             <span className="text-muted-foreground"> / {data.summary.total}명</span>
           </p>
           <p className="hidden text-xs text-muted-foreground sm:block">
-            공식 초상화 267명 연결
+            공식 카드 아이콘 267명 연결
           </p>
         </div>
 
         {filteredHeroes.length > 0 ? (
           <section
             aria-label="영웅 목록"
+            data-hero-card-icons="true"
+            data-hero-fusion-power-marks="true"
             className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10"
           >
             {filteredHeroes.map((hero) => (
-              <HeroGridCard key={hero.heroId} hero={hero} />
+              <HeroGridCard
+                key={hero.heroId}
+                hero={hero}
+                cardIcon={cardIconByHeroId.get(hero.heroId)}
+                fusionPower={fusionPowerByHeroId.get(hero.heroId)}
+              />
             ))}
           </section>
         ) : (
@@ -242,38 +267,79 @@ function FilterButton({
   );
 }
 
-function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
-  const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
-  const sampleAssetPath = SAMPLE_HERO_CARD_PATHS[hero.heroId];
-  const imageUrl = hero.card.webAssetPath
-    ? resolvePublicAssetUrl(hero.card.webAssetPath)
-    : sampleAssetPath
-      ? resolvePublicAssetUrl(sampleAssetPath)
-      : null;
-  const rarityFrameClass = getRarityFrameClass(hero.rarity.baseLabel);
-  const hasSampleSuperBuff = SAMPLE_SUPER_BUFF_HERO_IDS.has(hero.heroId);
+function HeroGridCard({
+  hero,
+  cardIcon,
+  fusionPower,
+}: {
+  hero: HeroListStage4Record;
+  cardIcon:
+    | {
+        heroId: number;
+        webAssetPath: string;
+        width: number;
+        height: number;
+        assetStatus: string;
+      }
+    | undefined;
+  fusionPower:
+    | {
+        heroId: number;
+        targetType: "FACTION" | "CLASS";
+        targetIds: number[];
+        targetLabel: string;
+        markKind: "SINGLE" | "COMPOSITE";
+        markAssets: Array<{
+          webAssetPath: string;
+          width?: number;
+          height?: number;
+        }>;
+        assetStatus: string;
+      }
+    | undefined;
+}) {
+  const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
+  const imageUrl = cardIcon?.assetStatus === "RESOLVED"
+    ? resolvePublicAssetUrl(cardIcon.webAssetPath)
+    : null;
+  const markAssets = fusionPower?.assetStatus === "RESOLVED"
+    ? fusionPower.markAssets.map((asset) => ({ ...asset, url: resolvePublicAssetUrl(asset.webAssetPath) }))
+    : [];
+  const primaryMarkAsset = markAssets[0];
+  const secondaryMarkAsset = markAssets[1];
+  const fusionLabel = fusionPower?.targetType === "CLASS"
+    ? `직업 초절강화: ${fusionPower.targetLabel}`
+    : `초절강화 진영: ${fusionPower?.targetLabel ?? "진영"}`;
 
   return (
     <Link
       reloadDocument
       to="/heroes/$heroId"
       params={{ heroId: String(hero.heroId) }}
-      aria-label={`${displayName} ${hero.rarity.baseLabel} 상세 보기`}
-      className="group block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2"
+      aria-label={displayName + " 상세 보기"}
+      className="group block rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2"
     >
       <article
-        className={`relative aspect-square rounded-xl bg-gradient-to-br p-[3px] ${rarityFrameClass} shadow-sm transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-lg`}
+        data-hero-card="true"
+        data-hero-id={hero.heroId}
+        data-name-kr-status={hero.localization.nameKrStatus}
+        data-name-source-authority={hero.localization.sourceAuthority}
+        className="overflow-hidden rounded-lg border border-border/70 bg-card p-1 shadow-sm transition duration-200 group-hover:-translate-y-0.5 group-hover:border-foreground/25 group-hover:shadow-md"
       >
-        <div className="relative h-full w-full overflow-hidden rounded-[9px] border border-white/30 bg-card shadow-inner">
+        <div className="relative aspect-square overflow-hidden rounded-md bg-muted/20">
           {imageUrl ? (
             <img
+              data-hero-card-icon="true"
+              data-hero-id={hero.heroId}
               src={imageUrl}
               alt=""
-              className="h-full w-full object-cover object-[center_20%] transition duration-200 group-hover:scale-[1.025]"
+              width={cardIcon?.width}
+              height={cardIcon?.height}
+              className="h-full w-full object-contain transition duration-200 group-hover:scale-[1.015]"
               loading="lazy"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted text-muted-foreground">
+            <div className="flex h-full w-full items-center justify-center bg-muted/30 text-muted-foreground">
               <UserRound
                 className="h-12 w-12 transition group-hover:text-foreground sm:h-14 sm:w-14"
                 strokeWidth={1.25}
@@ -282,52 +348,57 @@ function HeroGridCard({ hero }: { hero: HeroListStage4Record }) {
             </div>
           )}
 
-          <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/25"
-            aria-hidden="true"
-          />
-          <span
-            className="pointer-events-none absolute left-1 top-1 h-3 w-3 rounded-tl-sm border-l-2 border-t-2 border-white/70"
-            aria-hidden="true"
-          />
-          <span
-            className="pointer-events-none absolute right-1 top-1 h-3 w-3 rounded-tr-sm border-r-2 border-t-2 border-white/70"
-            aria-hidden="true"
-          />
-          <span
-            className="pointer-events-none absolute bottom-1 left-1 h-3 w-3 rounded-bl-sm border-b-2 border-l-2 border-white/50"
-            aria-hidden="true"
-          />
-          <span
-            className="pointer-events-none absolute bottom-1 right-1 h-3 w-3 rounded-br-sm border-b-2 border-r-2 border-white/50"
-            aria-hidden="true"
-          />
-
-          <span className="absolute left-1.5 top-1.5 rounded border border-white/25 bg-black/65 px-1.5 py-0.5 text-[9px] font-black leading-none tracking-wide text-white shadow-sm sm:text-[10px]">
-            {hero.rarity.baseLabel}
-          </span>
-
-          <div className="absolute right-1.5 top-1.5 flex flex-col items-end gap-1">
-            {hero.hasSp ? (
-              <span className="rounded border border-fuchsia-200/50 bg-fuchsia-950/80 px-1.5 py-0.5 text-[9px] font-black leading-none text-fuchsia-100 shadow-sm sm:text-[10px]">
-                SP
-              </span>
-            ) : null}
-            {hasSampleSuperBuff ? (
-              <span
-                className="rounded border border-white/25 bg-black/70 px-1.5 py-0.5 text-[9px] font-bold leading-none text-white shadow-sm sm:text-[10px]"
-                title="초절 강화 보유"
-              >
-                초절
-              </span>
-            ) : null}
-          </div>
-
-          <div className="absolute inset-x-1.5 bottom-1.5 rounded-md border border-white/20 bg-black/70 px-1.5 py-1 text-center shadow-lg backdrop-blur-[2px]">
-            <span className="line-clamp-1 text-[11px] font-bold leading-tight text-white sm:text-xs">
-              {displayName}
+          {fusionPower && primaryMarkAsset ? (
+            <span
+              data-hero-fusion-power-mark="true"
+              data-hero-id={hero.heroId}
+              data-target-type={fusionPower.targetType}
+              data-target-faction-id={fusionPower.targetType === "FACTION" ? fusionPower.targetIds[0] : undefined}
+              data-target-class-ids={fusionPower.targetType === "CLASS" ? fusionPower.targetIds.join(",") : undefined}
+              data-mark-kind={fusionPower.markKind}
+              className="absolute right-1.5 top-1.5 block h-[28px] w-[28px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] sm:h-[32px] sm:w-[32px]"
+              title={fusionLabel}
+              aria-label={fusionLabel}
+            >
+              {fusionPower.markKind === "COMPOSITE" && secondaryMarkAsset ? (
+                <span className="relative block h-full w-full overflow-hidden rounded-full">
+                  <img
+                    src={primaryMarkAsset.url}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-contain"
+                    style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
+                    loading="lazy"
+                  />
+                  <img
+                    src={secondaryMarkAsset.url}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-contain"
+                    style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }}
+                    loading="lazy"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute left-1/2 top-1/2 h-[135%] w-px -translate-x-1/2 -translate-y-1/2 rotate-45 bg-white/90 shadow-[0_0_1px_rgba(0,0,0,0.8)]"
+                  />
+                </span>
+              ) : (
+                <img
+                  src={primaryMarkAsset.url}
+                  alt=""
+                  width={primaryMarkAsset.width}
+                  height={primaryMarkAsset.height}
+                  className="h-full w-full object-contain"
+                  loading="lazy"
+                />
+              )}
             </span>
-          </div>
+          ) : null}
+        </div>
+
+        <div className="min-w-0 px-1 pb-1 pt-1.5 text-center">
+          <span className="block truncate text-[11px] font-bold leading-tight text-foreground sm:text-xs">
+            {displayName}
+          </span>
         </div>
       </article>
     </Link>

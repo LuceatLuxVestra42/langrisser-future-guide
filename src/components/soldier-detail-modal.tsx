@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
@@ -62,6 +63,16 @@ type SoldierRichSource = {
   records: SoldierRichRecord[];
 };
 
+type HeroCardIconRecord = {
+  heroId: number;
+  nameKr: string | null;
+  nameCn: string;
+  webAssetPath: string;
+  width: number;
+  height: number;
+  assetStatus: string;
+};
+
 type LoadState = "loading" | "ready" | "error";
 
 type ArmyMeta = {
@@ -97,10 +108,25 @@ function loadSoldierRichSource() {
   return soldierRichSourcePromise;
 }
 
-export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord }) {
+function resolvePublicAssetUrl(webAssetPath: string) {
+  const base = import.meta.env.BASE_URL || "/";
+  return `${base.replace(/\/$/, "")}${webAssetPath}`;
+}
+
+export function SoldierDetailModal({
+  record,
+  heroCardIcons,
+}: {
+  record: SoldierPrototypeRecord;
+  heroCardIcons: HeroCardIconRecord[];
+}) {
   const [detail, setDetail] = useState<SoldierRichRecord | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const displayName = record.nameKr ?? record.nameCn;
+  const heroCardByHeroId = useMemo(
+    () => new Map(heroCardIcons.map((card) => [card.heroId, card])),
+    [heroCardIcons],
+  );
 
   useEffect(() => {
     let active = true;
@@ -135,6 +161,23 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
       detail.ability.levels.find((level) => level.level === 10)?.description ??
       detail.ability.finalDescription
     );
+  }, [detail, record.isSp]);
+
+  const heroGroups = useMemo(() => {
+    if (!detail) {
+      return { baseHeroIds: [] as number[], spUnlockedHeroIds: [] as number[] };
+    }
+
+    const spUnlockedHeroIds = record.isSp ? (detail.sp?.expandedHeroIds ?? []) : [];
+    if (spUnlockedHeroIds.length === 0) {
+      return { baseHeroIds: detail.heroes.finalHeroIds, spUnlockedHeroIds };
+    }
+
+    const spUnlockedHeroIdSet = new Set(spUnlockedHeroIds);
+    return {
+      baseHeroIds: detail.heroes.finalHeroIds.filter((heroId) => !spUnlockedHeroIdSet.has(heroId)),
+      spUnlockedHeroIds,
+    };
   }, [detail, record.isSp]);
 
   const abilityTitle = record.isSp ? "SP 고유기" : "10레벨 효과";
@@ -176,7 +219,7 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
             <SectionHeading id="soldier-heroes-title">사용 가능 영웅</SectionHeading>
             {detail ? (
               <span className="text-xs font-semibold tabular-nums text-muted-foreground">
-                {detail.heroes.finalHeroIds.length}명
+                {heroGroups.baseHeroIds.length}명
               </span>
             ) : null}
           </div>
@@ -190,20 +233,33 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
               사용 가능 영웅 데이터를 불러오지 못했어.
             </div>
           ) : (
-            <div className="mt-2 grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12">
-              {detail.heroes.finalHeroIds.map((heroId) => (
-                <div
-                  key={heroId}
-                  title={`Hero ${heroId}`}
-                  className="flex aspect-square min-w-0 flex-col items-center justify-center rounded-lg border border-border bg-background px-1 text-center"
-                >
-                  <span className="text-base font-black text-foreground">H</span>
-                  <span className="mt-0.5 max-w-full truncate text-[9px] font-semibold tabular-nums text-muted-foreground sm:text-[10px]">
-                    #{heroId}
-                  </span>
+            <>
+              <HeroIdGrid heroIds={heroGroups.baseHeroIds} heroCardByHeroId={heroCardByHeroId} />
+
+              {record.isSp ? (
+                <div className="mt-5 border-t border-border pt-4">
+                  <div className="flex items-end justify-between gap-3">
+                    <p className="text-sm font-black tracking-tight text-foreground sm:text-base">
+                      SP 전직 후 추가 사용 가능 영웅
+                    </p>
+                    <span className="text-xs font-semibold tabular-nums text-muted-foreground">
+                      {heroGroups.spUnlockedHeroIds.length}명
+                    </span>
+                  </div>
+
+                  {heroGroups.spUnlockedHeroIds.length > 0 ? (
+                    <HeroIdGrid
+                      heroIds={heroGroups.spUnlockedHeroIds}
+                      heroCardByHeroId={heroCardByHeroId}
+                    />
+                  ) : (
+                    <div className="mt-2 rounded-xl border border-border bg-background px-4 py-4 text-sm text-muted-foreground">
+                      SP 전직으로 추가되는 사용 가능 영웅이 없어.
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+              ) : null}
+            </>
           )}
         </section>
 
@@ -228,6 +284,63 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
         </section>
       </div>
     </section>
+  );
+}
+
+function HeroIdGrid({
+  heroIds,
+  heroCardByHeroId,
+}: {
+  heroIds: number[];
+  heroCardByHeroId: Map<number, HeroCardIconRecord>;
+}) {
+  return (
+    <div className="mt-2 grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12">
+      {heroIds.map((heroId) => {
+        const card = heroCardByHeroId.get(heroId);
+        const displayName = card?.nameKr ?? card?.nameCn ?? `Hero ${heroId}`;
+        const imageUrl = card?.assetStatus === "RESOLVED"
+          ? resolvePublicAssetUrl(card.webAssetPath)
+          : null;
+
+        return (
+          <Link
+            key={heroId}
+            reloadDocument
+            to="/heroes/$heroId"
+            params={{ heroId: String(heroId) }}
+            title={`${displayName} 상세 보기`}
+            aria-label={`${displayName} 상세 보기`}
+            className="group min-w-0 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2"
+          >
+            <article className="overflow-hidden rounded-lg border border-border bg-background p-1 text-center shadow-sm transition duration-200 group-hover:-translate-y-0.5 group-hover:border-foreground/25 group-hover:shadow-md">
+              <div className="relative aspect-square overflow-hidden rounded-md bg-muted/20">
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    alt=""
+                    width={card?.width}
+                    height={card?.height}
+                    loading="lazy"
+                    className="h-full w-full object-contain transition duration-200 group-hover:scale-[1.015]"
+                  />
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center bg-muted/30 text-muted-foreground">
+                    <span className="text-base font-black text-foreground">H</span>
+                    <span className="mt-0.5 text-[9px] font-semibold tabular-nums sm:text-[10px]">
+                      #{heroId}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <span className="mt-1 block truncate px-0.5 text-[9px] font-bold leading-tight text-foreground sm:text-[10px]">
+                {displayName}
+              </span>
+            </article>
+          </Link>
+        );
+      })}
+    </div>
   );
 }
 

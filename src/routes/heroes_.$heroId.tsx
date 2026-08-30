@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   BriefcaseBusiness,
@@ -54,7 +54,7 @@ export const Route = createFileRoute("/heroes_/$heroId")({
   head: ({ loaderData }) => ({
     meta: [{
       title: loaderData
-        ? `${loaderData.hero.identity.nameKr ?? loaderData.hero.identity.nameCn} | 랑그릿사 모바일 영웅`
+        ? `${loaderData.hero.localization.displayName || (loaderData.hero.identity.nameKr ?? loaderData.hero.identity.nameCn)} | 랑그릿사 모바일 영웅`
         : "영웅 | 랑그릿사 모바일 미래시 정보",
     }],
   }),
@@ -74,11 +74,15 @@ function stripConfigMarkup(value: string | null) {
 
 function HeroDetailPage() {
   const { hero, stage6, detail, exclusiveEquipment, soldierCards } = Route.useLoaderData();
-  const displayName = hero.identity.nameKr ?? hero.identity.nameCn;
+  const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
 
   return (
-    <main className="min-h-screen bg-background">
+    <main
+      data-name-kr-status={hero.localization.nameKrStatus}
+      data-name-source-authority={hero.localization.sourceAuthority}
+      className="min-h-screen bg-background"
+    >
       <div className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 lg:px-8 lg:py-10">
         <Link reloadDocument to="/heroes" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
           <ArrowLeft className="h-4 w-4" aria-hidden="true" /> 영웅 목록
@@ -272,7 +276,6 @@ function HeroDetailPage() {
             </div>
           ) : <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 정보가 없어.</p>}
         </section>
-
         <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
         <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
 
@@ -334,6 +337,7 @@ function HeroSoldierCard({ record }: { record: HeroSoldierCardView }) {
   const portraitUrl = getOfficialSoldierPortraitUrl(record.soldierId);
   const armyIconUrl = getOfficialArmyIconUrl(record.armyType);
   const armyLabel = SOLDIER_ARMY_LABELS[record.armyType] ?? record.armyType;
+  const [portraitFailed, setPortraitFailed] = useState(false);
 
   return (
     <Link
@@ -345,18 +349,19 @@ function HeroSoldierCard({ record }: { record: HeroSoldierCardView }) {
       className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-8 text-muted-foreground transition group-hover:text-foreground">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-current/20 bg-background/70 sm:h-16 sm:w-16">
-          <span className="text-base font-black tracking-tight sm:text-lg">{armyLabel.slice(0, 1)}</span>
-        </div>
-        {portraitUrl ? (
+        {portraitUrl && !portraitFailed ? (
           <img
             src={portraitUrl}
             alt=""
             aria-hidden="true"
             className="absolute inset-0 h-full w-full object-contain object-bottom px-1 pb-7 pt-2 transition-transform duration-200 group-hover:scale-[1.02]"
-            onError={(event) => { event.currentTarget.style.display = "none"; }}
+            onError={() => setPortraitFailed(true)}
           />
-        ) : null}
+        ) : (
+          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-current/20 bg-background/70 sm:h-16 sm:w-16">
+            <span className="text-base font-black tracking-tight sm:text-lg">{armyLabel.slice(0, 1)}</span>
+          </div>
+        )}
       </div>
 
       <div className="absolute left-1.5 top-1.5 flex gap-1">

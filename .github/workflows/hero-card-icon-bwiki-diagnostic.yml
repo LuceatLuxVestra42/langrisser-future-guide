@@ -1,0 +1,62 @@
+name: Hero Card Icon BWIKI Diagnostic
+
+on:
+  push:
+    branches:
+      - asset/hero-card-icons-bwiki-20260830
+    paths:
+      - '.github/workflows/hero-card-icon-bwiki-diagnostic.yml'
+      - 'scripts/diagnose-hero-card-icons-bwiki.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact branch source
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Reconfirm frozen Hero population
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const list = require('./data/generated/hero-list-stage1.v1.json');
+          if (list.status !== 'PASS' || list.completion !== 'COMPLETE' || list.summary.generatedRecordCount !== 267 || list.summary.hardErrorCount !== 0) {
+            throw new Error('Frozen Hero population mismatch');
+          }
+          if (list.sourcePolicy.rawConfigDataRead !== false || list.sourcePolicy.relationshipRederivation !== false || list.sourcePolicy.nameOrIdHeuristics !== false) {
+            throw new Error('Frozen Hero source policy mismatch');
+          }
+          console.log('PASS: Hero frozen population 267/267');
+          NODE
+
+      - name: Resolve exact BWIKI card icons
+        run: node scripts/diagnose-hero-card-icons-bwiki.mjs
+
+      - name: Commit diagnostic report
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f data/validation/hero-card-icon-bwiki-diagnostic.v1.json || exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/validation/hero-card-icon-bwiki-diagnostic.v1.json
+          if git diff --cached --quiet; then
+            echo 'No diagnostic changes.'
+            exit 0
+          fi
+          git commit -m 'Record Hero card icon BWIKI coverage'
+          git push origin HEAD:asset/hero-card-icons-bwiki-20260830

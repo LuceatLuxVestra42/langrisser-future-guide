@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "schemaId": "hero-provisional-localization-stage2-contract/v1",
+  "stage": "hero-provisional-localization-stage2",
+  "status": "FROZEN",
+  "purpose": "Add an ID-keyed Hero Korean provisional presentation layer without reopening FINAL_FROZEN Hero semantics.",
+  "inputs": {
+    "heroList": "data/generated/hero-list-stage1.v1.json",
+    "presentation": "data/presentation/hero-provisional-name-kr.v1.json",
+    "heroListServer": "src/lib/hero-list.server.ts"
+  },
+  "population": {
+    "canonicalHeroCount": 267,
+    "provisionalHeroCount": 5,
+    "officialNameUnresolvedCount": 5
+  },
+  "targets": [
+    { "heroId": 99273, "nameCn": "初真泽瑞达", "displayNameKr": "태초의 젤다" },
+    { "heroId": 99281, "nameCn": "骁浪驭虹使", "displayNameKr": "효랑어홍사" },
+    { "heroId": 99282, "nameCn": "狺", "displayNameKr": "은(밴시)" },
+    { "heroId": 99283, "nameCn": "阿云", "displayNameKr": "아윈(쿠모)" },
+    { "heroId": 99287, "nameCn": "魔骸剑使", "displayNameKr": "마검의 화신" }
+  ],
+  "localizationContract": {
+    "joinKey": "heroId",
+    "joinPolicy": "exact numeric heroId only",
+    "provisionalStatus": "provisional-display",
+    "officialNameStatus": "official-confirmed",
+    "fallbackStatus": "cn-fallback",
+    "provisionalSourceAuthority": "CN",
+    "identityMutation": false,
+    "canonicalKoreanPromotion": false,
+    "runtimeNameJoin": false
+  },
+  "effectiveDisplayPrecedence": [
+    "official Korean name when no provisional override exists",
+    "provisional Korean display for exact overlay heroId",
+    "Chinese name fallback when Korean display is unavailable"
+  ],
+  "invariants": {
+    "heroIdsChanged": false,
+    "chineseNamesChanged": false,
+    "englishNamesChanged": false,
+    "heroPopulationChanged": false,
+    "combatDataChanged": false,
+    "relationsChanged": false,
+    "rawConfigDataRead": false,
+    "stage6RegenerationRequired": false,
+    "heroListStage1RegenerationRequired": false
+  },
+  "completionGate": {
+    "heroListPopulation267": true,
+    "provisionalOverlayCount5": true,
+    "targetSetExact": true,
+    "heroIdAndChineseNameParity": true,
+    "provisionalDisplayMatchesCurrentFrozenBaseValue": true,
+    "serverProjectionExposesLocalizationMetadata": true,
+    "runtimeNameJoinAbsent": true,
+    "rawConfigDataRuntimeReadAbsent": true
+  },
+  "outOfScope": [
+    "route text migration from identity.nameKr to localization.displayName",
+    "Localization Audit frozen-stage successor",
+    "production build",
+    "hosted QA",
+    "browser UI QA"
+  ],
+  "nextStage": {
+    "stage": "hero-provisional-localization-stage3",
+    "scope": "route consumer migration and Localization Audit successor"
+  }
+}

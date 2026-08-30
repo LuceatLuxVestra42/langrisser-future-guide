@@ -2,56 +2,32 @@ name: Hero-Soldier Stage C-2 ID Resolution
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - 'work/hero-soldier-stageC-2'
-    paths:
-      - 'scripts/validate-hero-soldier-stageC-2-id-resolution.cjs'
-      - 'data/contracts/hero-soldier-integration-stageC-0-input.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-0-summary.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json'
-      - 'data/contracts/hero-identity-contract.v1.json'
-      - 'data/contracts/soldier-identity-contract.v1.json'
-      - 'data/hero-name-master.v1.json'
-      - 'data/generated/soldier-master.v1.json'
-      - 'data/generated/hero-detail.v1.json'
-      - 'data/generated/hero-detail-shared.v1.json'
-      - 'data/generated/hero-detail/by-id/**'
-      - 'data/validation/hero-stage6-4-final.v1.json'
-      - 'data/generated/soldier-stage6-1-full-records.v1.json'
-      - 'data/validation/soldier-stage6-7-site-admission.v1.json'
-      - '.github/workflows/hero-soldier-stageC-2-id-resolution.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'scripts/validate-hero-soldier-stageC-2-id-resolution.cjs'
-      - 'data/contracts/hero-soldier-integration-stageC-0-input.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-0-summary.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json'
-      - 'data/contracts/hero-identity-contract.v1.json'
-      - 'data/contracts/soldier-identity-contract.v1.json'
-      - 'data/hero-name-master.v1.json'
-      - 'data/generated/soldier-master.v1.json'
-      - 'data/generated/hero-detail.v1.json'
-      - 'data/generated/hero-detail-shared.v1.json'
-      - 'data/generated/hero-detail/by-id/**'
-      - 'data/validation/hero-stage6-4-final.v1.json'
-      - 'data/generated/soldier-stage6-1-full-records.v1.json'
-      - 'data/validation/soldier-stage6-7-site-admission.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json'
-      - '.github/workflows/hero-soldier-stageC-2-id-resolution.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  validate-id-resolution:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Hero-Soldier Stage C-2 producer runs must target a non-main branch. Select the branch/ref to freeze, then open a normal PR.'
+          exit 1
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - name: Setup Node
@@ -86,8 +62,8 @@ jobs:
           name: hero-soldier-stageC-2-id-resolution
           path: data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json
 
-      - name: Freeze C-2 output on work branch
-        if: steps.validate.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/hero-soldier-stageC-2')
+      - name: Freeze C-2 output on explicit producer run
+        if: steps.validate.outcome == 'success'
         run: |
           TARGET='data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json'
           if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
@@ -100,16 +76,6 @@ jobs:
           git commit -m 'Freeze Hero-Soldier Stage C-2 ID resolution PASS'
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
-
-      - name: Verify frozen C-2 output on PR
-        if: steps.validate.outcome == 'success' && github.event_name == 'pull_request'
-        run: |
-          TARGET='data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json'
-          if [ -n "$(git status --porcelain -- "$TARGET")" ]; then
-            echo 'C-2 output is missing or stale.'
-            git status --short -- "$TARGET"
-            exit 1
-          fi
 
       - name: Enforce C-2 gate
         if: always() && steps.validate.outcome != 'success'

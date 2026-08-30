@@ -1,0 +1,64 @@
+name: Hero Card Icon BWIKI Acquire
+
+on:
+  push:
+    branches:
+      - asset/hero-card-icons-bwiki-20260830
+    paths:
+      - '.github/workflows/hero-card-icon-bwiki-acquire.yml'
+      - 'scripts/acquire-hero-card-icons-bwiki.mjs'
+      - 'data/validation/hero-card-icon-bwiki-diagnostic.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hero-card-icon-bwiki-acquire
+  cancel-in-progress: true
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact branch source
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Acquire exact local Hero card icons
+        run: node scripts/acquire-hero-card-icons-bwiki.mjs
+
+      - name: Validate frozen local asset surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find public/images/heroes/card-icons -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '267'
+          node - <<'NODE'
+          const manifest = require('./data/generated/hero-card-icon-assets.v1.json');
+          const validation = require('./data/validation/hero-card-icon-assets.v1.json');
+          if (manifest.status !== 'PASS' || manifest.completion !== 'COMPLETE' || manifest.freezeState !== 'HERO_CARD_ICON_ASSETS_FROZEN') throw new Error('Hero card icon manifest not frozen-ready');
+          if (manifest.summary.heroCount !== 267 || manifest.summary.resolvedCount !== 267 || manifest.summary.fileCount !== 267 || manifest.summary.hardErrorCount !== 0) throw new Error('Hero card icon summary mismatch');
+          if (manifest.sourcePolicy.rawConfigDataRead !== false || manifest.sourcePolicy.fuzzyMatching !== false || manifest.sourcePolicy.semanticRelationReopened !== false || manifest.sourcePolicy.remoteRuntimeHotlink !== false) throw new Error('Hero card icon production boundary mismatch');
+          if (validation.status !== 'PASS' || validation.hardErrorCount !== 0) throw new Error('Hero card icon validation failed');
+          NODE
+
+      - name: Commit acquired binary assets and manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/images/heroes/card-icons data/generated/hero-card-icon-assets.v1.json data/validation/hero-card-icon-assets.v1.json
+          if git diff --cached --quiet; then
+            echo 'No acquisition changes.'
+            exit 0
+          fi
+          git commit -m 'Acquire exact Hero card icon assets'
+          git push origin HEAD:asset/hero-card-icons-bwiki-20260830

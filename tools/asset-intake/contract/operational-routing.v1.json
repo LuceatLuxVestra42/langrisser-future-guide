@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-operational-routing/v1",
+  "stage": "Asset Intake Stage 5 - Operational Routing",
+  "checkpoint": "ASSET_INTAKE_STAGE5_OPERATIONAL_ROUTING",
+  "status": "DESIGN_FROZEN",
+  "predecessor": "docs/checkpoints/asset-intake-stage4-repository-integration.md",
+  "purpose": "Force asset work through verified project evidence and Asset Intake before any approved external-source search. External candidates are never direct production assets; verified external evidence must re-enter Asset Intake.",
+  "routeOrder": [
+    "CHECK_PROJECT_FROZEN_GENERATED",
+    "RUN_ASSET_INTAKE",
+    "CHECK_APPROVED_EXTERNAL_SOURCE",
+    "INGEST_EXTERNAL_EVIDENCE_TO_ASSET_INTAKE",
+    "USE_ASSET_INTAKE_RESOLVED_ASSET"
+  ],
+  "projectEvidencePolicy": {
+    "requiredFirst": true,
+    "resolvedRequiresProvenanceVerified": true,
+    "resolvedRequiresCanonicalIdEvidenceVerified": true,
+    "description": "Reuse current project provenance+ID-verified frozen/generated asset evidence before doing new acquisition work."
+  },
+  "externalSourcePriority": [
+    {
+      "rank": 1,
+      "sourceKey": "BILIBILI_WIKI_PUBLIC_ORIGINAL",
+      "label": "Bilibili Wiki public original",
+      "role": "public original / provenance cross-check"
+    },
+    {
+      "rank": 2,
+      "sourceKey": "LEGACY_KR_SHEET_ASSET_DRIVE",
+      "label": "legacy Korean sheet asset Drive",
+      "role": "legacy Korean asset provenance cross-check"
+    },
+    {
+      "rank": 3,
+      "sourceKey": "OTHER_EXTERNAL_IMAGE_SOURCE",
+      "label": "other external image source",
+      "role": "last-resort external evidence"
+    }
+  ],
+  "externalCandidatePolicy": {
+    "assetIntakePendingRequiredBeforeSearch": true,
+    "attemptsMustFollowPriorityAsPrefix": true,
+    "candidateRequiresSourceReference": true,
+    "candidateRequiresProvenanceVerified": true,
+    "candidateRequiresCanonicalIdEvidenceVerified": true,
+    "directExternalProductionUse": false,
+    "verifiedCandidateNextAction": "INGEST_EXTERNAL_EVIDENCE_TO_ASSET_INTAKE"
+  },
+  "terminalActions": [
+    "USE_PROJECT_VERIFIED_ASSET",
+    "USE_ASSET_INTAKE_RESOLVED_ASSET",
+    "BLOCKED_NO_VERIFIED_ASSET"
+  ],
+  "forbidden": {
+    "nameJoin": true,
+    "idArithmetic": true,
+    "similarityMatching": true,
+    "fuzzyFilenameMatching": true,
+    "crossRootSilentFallback": true,
+    "rawConfigDataAssetFallback": true,
+    "semanticRelationRecomputation": true,
+    "historicalOutputSilentFallback": true,
+    "externalCandidateDirectUse": true
+  }
+}

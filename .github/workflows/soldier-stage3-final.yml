@@ -58,6 +58,7 @@ jobs:
             data/generated/soldier-stage3.v1.json
             data/validation/soldier-stage3-final.v1.json
       - name: Commit validated outputs
+        if: github.event_name != 'pull_request'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

@@ -1,41 +1,33 @@
 name: Hero-Soldier Stage C-5 Final Closeout
 
 on:
-  push:
-    branches:
-      - work/hero-soldier-stageC-5
-    paths:
-      - 'data/validation/hero-soldier-integration-stageC-0-summary.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-3-special-fixtures.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-final.v1.json'
-      - 'scripts/validate-hero-soldier-stageC-5-final.cjs'
-      - '.github/workflows/hero-soldier-stageC-5-final.yml'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'data/validation/hero-soldier-integration-stageC-0-summary.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-2-id-resolution.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-3-special-fixtures.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-4-production-boundary.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-final.v1.json'
-      - 'scripts/validate-hero-soldier-stageC-5-final.cjs'
-      - '.github/workflows/hero-soldier-stageC-5-final.yml'
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  validate-final-closeout:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Hero-Soldier Stage C-5 producer runs must target a non-main branch. Select the branch/ref to freeze, then open a normal PR.'
+          exit 1
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - name: Setup Node
@@ -61,8 +53,8 @@ jobs:
           path: data/validation/hero-soldier-integration-stageC-final.v1.json
           if-no-files-found: ignore
 
-      - name: Freeze C-FINAL output on work branch
-        if: github.event_name == 'push' && success()
+      - name: Freeze C-FINAL output on explicit producer run
+        if: success()
         run: |
           OUTPUT='data/validation/hero-soldier-integration-stageC-final.v1.json'
           if [ -z "$(git status --porcelain -- "$OUTPUT")" ]; then
@@ -73,11 +65,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$OUTPUT"
           git commit -m 'Freeze Hero-Soldier Stage C-FINAL PASS_WITH_REVIEW'
-          git push
-
-      - name: Verify frozen C-FINAL output on PR
-        if: github.event_name == 'pull_request' && success()
-        run: |
-          OUTPUT='data/validation/hero-soldier-integration-stageC-final.v1.json'
-          test -f "$OUTPUT"
-          test -z "$(git status --porcelain -- "$OUTPUT")"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

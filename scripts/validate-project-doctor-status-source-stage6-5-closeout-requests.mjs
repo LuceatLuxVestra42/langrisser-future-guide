@@ -18,11 +18,33 @@ const expectThrow = (id, fn, needle) => {
   }
 };
 
+const allowedWriteTransportModes = new Set(contract.policy?.allowedDeclarationWriteTransportModes ?? []);
+const writeTransportMatchesWorkflow = (pipeline, workflow) => {
+  const transport = pipeline.declarationWriteTransport ?? {};
+  if (!allowedWriteTransportModes.has(transport.mode)) return false;
+  if (transport.mainAllowed !== false || transport.pullRequestAllowed !== false) return false;
+
+  if (transport.mode === 'WORK_BRANCH_PUSH') {
+    return workflow.includes(`render-project-doctor-status-source-closeout-request.mjs --pipeline ${pipeline.pipelineId} --write`)
+      && workflow.includes("github.event_name == 'push'")
+      && workflow.includes("startsWith(github.ref, 'refs/heads/work/')");
+  }
+  if (transport.mode === 'EXPLICIT_NON_MAIN_DISPATCH') {
+    return workflow.includes(`render-project-doctor-status-source-closeout-request.mjs --pipeline ${pipeline.pipelineId} --write`)
+      && workflow.includes('workflow_dispatch:')
+      && workflow.includes("github.event_name == 'workflow_dispatch'")
+      && workflow.includes("github.ref != 'refs/heads/main'")
+      && !workflow.includes("startsWith(github.ref, 'refs/heads/work/')");
+  }
+  return false;
+};
+
 add('CONTRACT_FROZEN', contract.status === 'DESIGN_FROZEN');
 add('PIPELINES_EXACT_HERO_SOLDIER', (contract.pipelines ?? []).map(item => item.pipelineId).sort().join(',') === 'hero,soldier');
 add('STAGE6_4_FROZEN', stage6_4.status === 'DESIGN_FROZEN');
 add('EXPLICIT_REQUEST_FIELDS_REQUIRED', contract.policy?.predecessorIdMustBeExplicit === true && contract.policy?.entryIdMustBeExplicit === true && contract.policy?.sourcePathMustBeExplicit === true && contract.policy?.declarationPathMustBeExplicit === true);
 add('EXPLICIT_WRITE_REQUIRED', contract.policy?.explicitWriteFlagRequired === true);
+add('DECLARED_NON_MAIN_WRITE_TRANSPORT', contract.policy?.approvedNonMainProducerTransportMayRenderAndCommitDeclaration === true && contract.policy?.workBranchTransportAppliesOnlyWhenDeclaredPerPipeline === true && contract.policy?.pullRequestAndMainRemainCheckOnly === true && allowedWriteTransportModes.has('WORK_BRANCH_PUSH') && allowedWriteTransportModes.has('EXPLICIT_NON_MAIN_DISPATCH'));
 add('NO_REAL_SUCCESSOR_IN_STAGE6_5', contract.policy?.realSuccessorPromotionInThisStage === false);
 add('NO_AUTHORITY_INFERENCE', contract.policy?.filenameAuthorityInference === false && contract.policy?.stageNumberAuthorityInference === false && contract.policy?.chronologyAuthorityInference === false);
 
@@ -44,6 +66,7 @@ for (const pipeline of contract.pipelines ?? []) {
 
   const workflow = fs.readFileSync(pipeline.completionWorkflow, 'utf8');
   add(`WORKFLOW_WRITES_FROM_REQUEST_${upper}`, workflow.includes(`render-project-doctor-status-source-closeout-request.mjs --pipeline ${pipeline.pipelineId} --write`));
+  add(`WORKFLOW_DECLARED_WRITE_TRANSPORT_${upper}`, writeTransportMatchesWorkflow(pipeline, workflow), pipeline.declarationWriteTransport ?? null);
   add(`WORKFLOW_CHECKS_REQUEST_ON_PR_MAIN_${upper}`, workflow.includes(`render-project-doctor-status-source-closeout-request.mjs --pipeline ${pipeline.pipelineId} --check`));
   add(`WORKFLOW_STILL_RESOLVES_STAGE6_4_${upper}`, workflow.includes(`resolve-project-doctor-status-source-declaration.mjs --pipeline ${pipeline.pipelineId} --github-output`));
   add(`WORKFLOW_DIRECT_APPLY_ABSENT_${upper}`, !workflow.includes('--apply'));

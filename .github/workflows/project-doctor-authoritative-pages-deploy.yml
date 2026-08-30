@@ -80,6 +80,8 @@ jobs:
           set -euo pipefail
           node scripts/project-doctor-compose-authoritative-pages-runtime.mjs
           node scripts/validate-skin-stage3-6-hero-detail-consumer.mjs
+          node scripts/validate-hero-card-icon-frontend.mjs
+          node scripts/validate-hero-fusion-power-frontend.mjs
           grep -q 'equipment-p3-1-release-metadata.v1.json' src/lib/equipment-page.localized.server.ts
           grep -q '같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순' src/routes/equipment.tsx
 
@@ -111,8 +113,37 @@ jobs:
           test -f dist/client/heroes/6/index.html
           test -f dist/client/soldiers/101/index.html
           test -f dist/client/images/heroes/cards/6.png
+          test -f dist/client/images/heroes/card-icons/6.png
+          test "$(find dist/client/images/heroes/card-icons -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '267'
+          test -f dist/client/images/heroes/card-icons-webp/6.webp
+          test "$(find dist/client/images/heroes/card-icons-webp -maxdepth 1 -type f -name '*.webp' | wc -l | tr -d ' ')" = '267'
+          test -f dist/client/images/factions/4.png
+          test "$(find dist/client/images/factions -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '12'
+          test -f dist/client/images/army/Icon_Occupation_Monster.png
+          test -f dist/client/images/army/Icon_Occupation_Infantryman.png
+          test -f dist/client/images/army/Icon_Occupation_Monk.png
           test -f dist/client/images/equipment/567.png
           test -f dist/client/images/soldiers-webp/101.webp
+          grep -q '/langrisser-future-guide/images/heroes/card-icons-webp/6.webp' dist/client/heroes/index.html
+          grep -q '/langrisser-future-guide/images/factions/4.png' dist/client/heroes/index.html
+          grep -q '/langrisser-future-guide/images/army/Icon_Occupation_Monster.png' dist/client/heroes/index.html
+          grep -q '/langrisser-future-guide/images/army/Icon_Occupation_Infantryman.png' dist/client/heroes/index.html
+          grep -q '/langrisser-future-guide/images/army/Icon_Occupation_Monk.png' dist/client/heroes/index.html
+          grep -q 'data-hero-fusion-power-marks="true"' dist/client/heroes/index.html
+          grep -q 'data-hero-fusion-power-mark="true"' dist/client/heroes/index.html
+          grep -q 'data-target-faction-id="4"' dist/client/heroes/index.html
+          grep -q 'data-target-class-ids="9"' dist/client/heroes/index.html
+          grep -q 'data-target-class-ids="2,8"' dist/client/heroes/index.html
+          if grep -q '/langrisser-future-guide/images/heroes/card-icons/6.png' dist/client/heroes/index.html; then
+            echo 'Hero list still consumes PNG source instead of WebP delivery' >&2
+            exit 1
+          fi
+          grep -q 'data-hero-card-icons="true"' dist/client/heroes/index.html
+          grep -q 'data-hero-card-icon="true"' dist/client/heroes/index.html
+          if grep -q '/langrisser-future-guide/images/heroes/cards/6.png' dist/client/heroes/index.html; then
+            echo 'Hero list still contains detail artwork path for Hero 6' >&2
+            exit 1
+          fi
           grep -q '/langrisser-future-guide/images/heroes/cards/6.png' dist/client/heroes/6/index.html
           grep -q '대표 일러스트' dist/client/heroes/6/index.html
           grep -q 'data-hero-central-discipline="true"' dist/client/heroes/6/index.html
@@ -121,6 +152,13 @@ jobs:
           grep -q 'data-hero-soldier-cards="true"' dist/client/heroes/6/index.html
           grep -q '/langrisser-future-guide/images/soldiers-webp/101.webp' dist/client/heroes/6/index.html
           grep -q '/langrisser-future-guide/soldiers/101' dist/client/heroes/6/index.html
+          grep -q 'getStaticHeroCardIconIndex' 'src/routes/soldiers.$soldierId.tsx'
+          if grep -q 'from "@/lib/hero-card-icon-assets.functions"' 'src/routes/soldiers.$soldierId.tsx'; then
+            echo 'Soldier detail route still depends on Hero card server-function RPC' >&2
+            exit 1
+          fi
+          grep -q 'readHeroCardIconIndex' src/lib/hero-card-icon-assets.static.ts
+          test -f scripts/validate-soldier-detail-hero-cards-hosted.mjs
           cp dist/client/index.html dist/client/404.html
           cat > dist/client/authoritative-pages-source.json <<JSON
           {
@@ -130,7 +168,22 @@ jobs:
             "skinRuntimeRef": "${SKIN_RUNTIME_REF}",
             "skinPngCount": 540,
             "heroArtworkResolvedCount": 267,
+            "heroCardIconResolvedCount": 267,
+            "heroCardIconFreezeState": "HERO_CARD_ICON_ASSETS_FROZEN",
+            "heroCardIconWebDeliveryCount": 267,
+            "heroCardIconWebDeliveryFreezeState": "HERO_CARD_ICON_WEB_DELIVERY_FROZEN",
+            "heroCardIconWebDeliveryFormat": "LOSSLESS_WEBP",
+            "heroFusionPowerResolvedCount": 43,
+            "heroFusionFactionTargetHeroCount": 41,
+            "heroFusionClassTargetHeroCount": 2,
+            "heroFusionFactionAssetCount": 12,
+            "heroFusionClassAssetCount": 3,
+            "heroFusionPowerFreezeState": "HERO_FUSION_POWER_EXPANDED_FROZEN",
+            "heroFusionPowerBaselineFreezeState": "HERO_FUSION_POWER_PRESENTATION_FROZEN",
+            "heroFusionPowerExceptionFreezeState": "HERO_FUSION_POWER_EXCEPTION_EXPANSION_FROZEN",
+            "heroFusionFactionAssetFreezeState": "HERO_FUSION_FACTION_ASSETS_FROZEN",
             "semanticStageReopened": false,
+            "fusionSemanticExpanded": true,
             "publisher": ".github/workflows/project-doctor-authoritative-pages-deploy.yml"
           }
           JSON
@@ -165,6 +218,8 @@ jobs:
           node scripts/project-doctor-validate-authoritative-pages-hosted.mjs
           node scripts/validate-hero-central-discipline-hosted.mjs
           node scripts/validate-hero-soldier-cards-hosted.mjs
+          node scripts/validate-hero-card-icons-hosted.mjs
+          node scripts/validate-soldier-detail-hero-cards-hosted.mjs
 
       - name: Print authoritative deployment source
         if: always()
@@ -172,4 +227,19 @@ jobs:
           printf 'productSource=%s\n' "$GITHUB_SHA"
           printf 'skinRuntimeRef=%s\n' "$SKIN_RUNTIME_REF"
           printf 'heroArtworkResolvedCount=267\n'
+          printf 'heroCardIconResolvedCount=267\n'
+          printf 'heroCardIconFreezeState=HERO_CARD_ICON_ASSETS_FROZEN\n'
+          printf 'heroCardIconWebDeliveryCount=267\n'
+          printf 'heroCardIconWebDeliveryFreezeState=HERO_CARD_ICON_WEB_DELIVERY_FROZEN\n'
+          printf 'heroCardIconWebDeliveryFormat=LOSSLESS_WEBP\n'
+          printf 'heroFusionPowerResolvedCount=43\n'
+          printf 'heroFusionFactionTargetHeroCount=41\n'
+          printf 'heroFusionClassTargetHeroCount=2\n'
+          printf 'heroFusionPowerFreezeState=HERO_FUSION_POWER_EXPANDED_FROZEN\n'
+          printf 'heroFusionPowerBaselineFreezeState=HERO_FUSION_POWER_PRESENTATION_FROZEN\n'
+          printf 'heroFusionPowerExceptionFreezeState=HERO_FUSION_POWER_EXCEPTION_EXPANSION_FROZEN\n'
+          printf 'heroFusionFactionAssetCount=12\n'
+          printf 'heroFusionClassAssetCount=3\n'
+          printf 'heroFusionFactionAssetFreezeState=HERO_FUSION_FACTION_ASSETS_FROZEN\n'
           printf 'semanticStageReopened=false\n'
+          printf 'fusionSemanticExpanded=true\n'
