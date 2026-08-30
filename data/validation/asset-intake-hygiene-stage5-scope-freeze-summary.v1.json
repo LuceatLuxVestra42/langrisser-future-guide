@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage5-scope-freeze-summary/v1",
+  "stage": "ASSET_HYGIENE_5_0",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "freezeState": "ASSET_HYGIENE_STAGE5_DESTRUCTIVE_SCOPE_FROZEN",
+  "predecessors": {
+    "stage4Admission": "tools/asset-intake/hygiene/generated/asset-hygiene-production-admission-index.v1.json",
+    "stage4Quarantine": "tools/asset-intake/hygiene/generated/asset-hygiene-production-quarantine-index.v1.json",
+    "stage4Summary": "data/validation/asset-intake-hygiene-stage4-production-admission-summary.v1.json",
+    "stage3Classification": "tools/asset-intake/hygiene/generated/asset-hygiene-classification.v1.json",
+    "stage3ReviewQueue": "tools/asset-intake/hygiene/generated/asset-hygiene-review-queue.v1.json",
+    "stage2ReferenceMap": "tools/asset-intake/hygiene/generated/asset-hygiene-reference-map.v1.json"
+  },
+  "coverage": {
+    "recordCount": 2188,
+    "assignedCount": 2188,
+    "protectedCurrentUseCount": 1240,
+    "protectedEvidenceRetentionCount": 491,
+    "unreferencedReviewCandidateCount": 457,
+    "unassignedCount": 0,
+    "deleteEligibleCount": 0,
+    "deleteApprovedCount": 0
+  },
+  "exactDuplicateReview": {
+    "groupCount": 1,
+    "assetCount": 2,
+    "allUnreferencedGroupCount": 1,
+    "semanticIdentityProvenCount": 0,
+    "deleteApprovedGroupCount": 0
+  },
+  "unreferencedByRoot": {
+    "public/": 1,
+    "public/images/banners/": 431,
+    "public/images/heroes/": 5,
+    "public/images/shared/": 10,
+    "src/": 9,
+    "tools/": 1
+  },
+  "reviews": [
+    {
+      "code": "EXACT_DUPLICATE_REQUIRES_SEMANTIC_ROLE_OWNER_REVIEW",
+      "count": 1
+    },
+    {
+      "code": "UNREFERENCED_REQUIRES_DOMAIN_REVIEW",
+      "count": 457
+    }
+  ],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "forbiddenOperationCounts": {
+    "deleteApproval": 0,
+    "assetDelete": 0,
+    "assetMove": 0,
+    "assetRename": 0,
+    "formatConversion": 0,
+    "frontendMutation": 0,
+    "consumerRewrite": 0,
+    "resolverRewrite": 0,
+    "semanticRecomputation": 0,
+    "canonicalRelationRecomputation": 0,
+    "duplicateBytesToSemanticIdentityInference": 0,
+    "unreferencedToUnusedInference": 0
+  },
+  "nextStartPoint": "ASSET_HYGIENE_5_1_BANNER_EXACT_DUPLICATE_REVIEW"
+}
