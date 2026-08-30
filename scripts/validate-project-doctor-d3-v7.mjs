@@ -5,13 +5,10 @@ import { loadProjectDoctorD3V7Context } from './plan-project-doctor-d3-v7.mjs';
 const context = loadProjectDoctorD3V7Context();
 const failures = [];
 const results = [];
-const requiredCheck = 'soldier-training-material-assets-final';
 
 if (context.delta.extends !== 'data/contracts/project-doctor-d3-validator-plan.v6.json') failures.push('PREDECESSOR');
 if (context.predecessor.schemaId !== 'project-doctor-d3-validator-plan/v6') failures.push('V6_PRESERVATION');
-const catalog = context.contract.checkCatalog ?? [];
-const added = catalog.find(item => item.id === requiredCheck);
-if (!added || added.command !== 'npm run validate:soldier-training-material-assets-final') failures.push('ASSET_CHECK_CATALOG');
+if ((context.delta.addedCheckCatalog ?? []).length !== 0) failures.push('UNEXPECTED_NEW_CHECK');
 
 for (const fixture of context.delta.fixtures ?? []) {
   const impact = analyzePaths(fixture.paths, context.effectiveMap);
