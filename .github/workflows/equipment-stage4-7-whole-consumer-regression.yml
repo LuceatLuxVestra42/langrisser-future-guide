@@ -124,7 +124,7 @@ jobs:
         run: |
           set -euo pipefail
           OUTPUT='data/validation/equipment-stage4-7-whole-consumer-regression-summary.v1.json'
-          git config user.name "github-actions[bot]]"
+          git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$OUTPUT"
           if git diff --cached --quiet; then
