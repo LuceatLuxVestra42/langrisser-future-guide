@@ -30,8 +30,10 @@ jobs:
       - name: Install frozen dependencies
         run: bun install --frozen-lockfile
 
-      - name: Install Chromium QA runtime
-        run: npx playwright install --with-deps chromium
+      - name: Install authoritative Chromium QA runtime
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
 
       - name: Verify five provisional Hero names on hosted UI
         env:
