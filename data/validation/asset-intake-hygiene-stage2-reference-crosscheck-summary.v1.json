@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage2-reference-crosscheck-summary/v1",
+  "stage": "ASSET_HYGIENE_2",
+  "status": "PASS_ASSET_HYGIENE_STAGE2_REFERENCE_CROSSCHECK",
+  "completion": "COMPLETE",
+  "freezeState": "ASSET_HYGIENE_STAGE2_REFERENCE_MAP_FROZEN",
+  "predecessor": "tools/asset-intake/hygiene/generated/asset-hygiene-stage2-reference-sources.v1.json",
+  "coverage": {
+    "inventoryRecordCount": 2188,
+    "referenceMapRecordCount": 2188,
+    "referencedAssetCount": 1731,
+    "zeroReferenceAssetCount": 457,
+    "referenceEdgeCount": 3793,
+    "unresolvedReferenceCount": 0
+  },
+  "referenceKinds": {
+    "ACTIVE_PRODUCTION_REF": 1304,
+    "DERIVATIVE_REF": 491,
+    "FRONTEND_REF": 17,
+    "MANIFEST_REF": 1141,
+    "SOURCE_EVIDENCE_REF": 840
+  },
+  "domainChecks": {
+    "soldierSourceCount": 224,
+    "soldierDeliveryCount": 224,
+    "bannerResolvedUniquePathCount": 70,
+    "heroArtworkResolvedCount": 267,
+    "heroCardIconSourceCount": 267,
+    "heroCardIconDeliveryCount": 267,
+    "equipmentPublicTargetCount": 373,
+    "factionAssetCount": 12,
+    "armyAssetCount": 10,
+    "movementDefinitionCount": 5,
+    "skinStatePreserved": true
+  },
+  "reviews": [
+    {
+      "code": "ZERO_CURRENT_REFERENCE_ASSETS_PRESENT",
+      "count": 457,
+      "blocking": false
+    },
+    {
+      "code": "SOLDIER_REGISTRY_SUPPLEMENTAL_MANIFEST_POINTER_LAGS_CURRENT_RESOLVER_CHAIN",
+      "count": 1,
+      "blocking": false
+    }
+  ],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "forbiddenOperationCounts": {
+    "assetMutation": 0,
+    "frontendMutation": 0,
+    "externalFetch": 0,
+    "rawConfigDataRead": 0,
+    "semanticRecomputation": 0,
+    "classification": 0
+  },
+  "nextStartPoint": "ASSET_HYGIENE_3_CLASSIFICATION"
+}
