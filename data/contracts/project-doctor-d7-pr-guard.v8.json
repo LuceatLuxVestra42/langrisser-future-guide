@@ -1,0 +1,56 @@
+{
+  "version": 8,
+  "schemaId": "project-doctor-d7-pr-guard/v8",
+  "stage": "D7",
+  "checkpoint": "PROJECT_DOCTOR_D7_PR_MERGE_GUARD_V8_FROZEN_FRESHNESS_V2",
+  "status": "DESIGN_FROZEN",
+  "supersedes": "data/contracts/project-doctor-d7-pr-guard.v7.json",
+  "purpose": "Preserve required read-only PR Guard and manual-review non-passing policy while moving Project Doctor runtime from D2/D3/D4 V5 to V6 Semantic Freshness classification.",
+  "workflow": ".github/workflows/project-doctor-d7-pr-guard.yml",
+  "targetBaseBranch": "main",
+  "checkIdentity": {
+    "workflowName": "Project Doctor PR Guard",
+    "jobName": "pr-guard",
+    "requiredStatusCheckContext": "pr-guard",
+    "githubActionsAppId": 15368
+  },
+  "permissions": {"contents": "read"},
+  "requiredCheckExitPolicy": {
+    "passingExitCodes": [0],
+    "manualReviewExitCode": 3,
+    "manualReviewIsPassing": false,
+    "propagateDoctorExitCodeDirectly": true
+  },
+  "doctorRuntime": {
+    "d2Contract": "data/contracts/project-doctor-d2-impact-contract.v6.json",
+    "d3Contract": "data/contracts/project-doctor-d3-validator-plan.v6.json",
+    "d4Contract": "data/contracts/project-doctor-d4-execution.v6.json",
+    "closeoutRunner": "scripts/run-project-doctor-closeout-v6.mjs",
+    "d4Runner": "scripts/run-project-doctor-d4-v6.mjs"
+  },
+  "freshnessV2Admission": {
+    "classifier": "scripts/classify-project-doctor-frozen-freshness-v2.mjs",
+    "selfTest": "scripts/validate-project-doctor-frozen-freshness-v2.mjs",
+    "provenanceOnlyChangeClass": "provenance-data",
+    "semanticChangeKeepsDomainOwner": true,
+    "provenanceOnlySuppressesDomainFanout": true,
+    "missingOrInvalidComparisonFailsClosed": true
+  },
+  "securityPolicy": {
+    "repositoryWritePermission": false,
+    "freshnessRefreshInWorkflow": false,
+    "pullRequestTarget": false,
+    "secretsRequired": false
+  },
+  "mergePolicy": {
+    "validatorFailureIsNonPassing": true,
+    "staleFreshnessIsNonPassing": true,
+    "manualReviewIsNonPassing": true,
+    "freshnessClassifierFailureIsNonPassing": true
+  },
+  "historicalBoundary": {
+    "d7V7": "data/contracts/project-doctor-d7-pr-guard.v7.json",
+    "previousContractsRemainUnmodified": true
+  },
+  "completionRule": "Required pr-guard passes only with exit 0. Semantic Freshness V2 may classify supported artifact-only drift as provenance-data, but semantic changes remain routed to existing domain owners and manual review exit 3 remains non-passing."
+}
