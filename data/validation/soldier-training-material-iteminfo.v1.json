@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-material-iteminfo-validation/v1",
+  "status": "PASS",
+  "generatedAt": "2026-08-30T06:25:25.046Z",
+  "sources": {
+    "census": {
+      "path": "data/generated/soldier-training-material-census.v1.json",
+      "gitBlobSha": "e53a8e6aff92d843a711462001469830ec1c9fb6",
+      "schemaId": "soldier-training-material-census/v1",
+      "status": "PASS"
+    },
+    "itemInfo": {
+      "path": "data/configdata/ConfigDataItemInfo.json",
+      "gitBlobSha": "fd34c0a83bd403c1fd01d34f3439e4c24a794f5e",
+      "directJsonKeys": {
+        "id": "ID",
+        "name": "Name",
+        "iconPath": "Icon"
+      }
+    }
+  },
+  "checks": {
+    "censusStatusNotPass": 0,
+    "censusSchemaMismatch": 0,
+    "targetCountMismatch": 0,
+    "duplicateTargetIds": 0,
+    "itemInfoNotArray": 0,
+    "missingItemIds": 0,
+    "duplicateItemIds": 0,
+    "emptyNames": 0,
+    "emptyIcons": 0
+  },
+  "observed": {
+    "targetItemIdCount": 24,
+    "uniqueTargetItemIdCount": 24,
+    "matchedItemIdCount": 24,
+    "missingItemIdCount": 0,
+    "duplicateItemIdCount": 0,
+    "emptyNameCount": 0,
+    "emptyIconCount": 0
+  },
+  "missingItemIds": [],
+  "duplicateItemIds": [],
+  "emptyNameItemIds": [],
+  "emptyIconItemIds": [],
+  "failureCount": 0
+}
