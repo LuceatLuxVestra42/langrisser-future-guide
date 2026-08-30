@@ -211,3 +211,9 @@
     0 1px 2px oklch(0.55 0.05 258 / 0.08),
     0 10px 30px oklch(0.55 0.12 258 / 0.14);
 }
+
+@layer components {
+  [data-hero-soldier-cards="true"] a > div:first-child:has(> img:not([style*="display: none"])) > div:first-child {
+    display: none;
+  }
+}
