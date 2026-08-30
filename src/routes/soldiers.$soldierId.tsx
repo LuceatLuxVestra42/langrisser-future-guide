@@ -3,11 +3,11 @@ import { X } from "lucide-react";
 import { useCallback, useEffect } from "react";
 
 import { SoldierDetailModal } from "@/components/soldier-detail-modal";
-import { getHeroCardIconIndex } from "@/lib/hero-card-icon-assets.functions";
+import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 
 export const Route = createFileRoute("/soldiers/$soldierId")({
-  loader: async ({ params }) => {
+  loader: ({ params }) => {
     if (!/^[1-9]\d*$/.test(params.soldierId)) throw notFound();
     const soldierId = Number(params.soldierId);
     if (!Number.isSafeInteger(soldierId) || soldierId <= 0) throw notFound();
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/soldiers/$soldierId")({
     const record = data.records.find((item) => item.soldierId === soldierId) ?? null;
     if (!record) throw notFound();
 
-    const heroCardIcons = await getHeroCardIconIndex();
+    const heroCardIcons = getStaticHeroCardIconIndex();
     if (
       heroCardIcons.summary.total !== 267 ||
       heroCardIcons.summary.resolved !== 267 ||
