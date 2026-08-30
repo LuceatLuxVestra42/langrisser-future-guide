@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage5-non-banner-unreferenced-review-summary/v1",
+  "stage": "ASSET_HYGIENE_5_3",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "freezeState": "ASSET_HYGIENE_STAGE5_NON_BANNER_UNREFERENCED_REVIEW_FROZEN",
+  "targetAssetCount": 26,
+  "reviewedAssetCount": 26,
+  "targetRootCounts": {
+    "public/": 1,
+    "public/images/heroes/": 5,
+    "public/images/shared/": 10,
+    "src/": 9,
+    "tools/": 1
+  },
+  "physicalSubscopeCounts": {
+    "HERO_PORTRAIT_SAMPLES_ROOT": 5,
+    "PUBLIC_ROOT": 1,
+    "SHARED_MOVEMENT_ROOT": 5,
+    "SHARED_STATS_ROOT": 5,
+    "SPINE_RENDERER_INPUT_ROOT": 1,
+    "SRC_ASSETS_ROOT": 9
+  },
+  "currentReferenceCount": 0,
+  "pathHistoryCoverageCount": 26,
+  "introductionEvidenceCoverageCount": 26,
+  "postIntroductionChangedAssetCount": 0,
+  "introductionBatchCount": 6,
+  "introductionBatches": [
+    {
+      "commit": "0bd9aa357843a1802e5b9586129d2193d9e70fb5",
+      "message": "Add shared movement type icons",
+      "assetCount": 5
+    },
+    {
+      "commit": "3190f7973cc6626912c8de24731514df0608a5d9",
+      "message": "template: tanstack_start_ts_current-58df4fe22702",
+      "assetCount": 1
+    },
+    {
+      "commit": "4428d59d42133054c512283e5e67ce6fd1124ba3",
+      "message": "Integrate complete Soldier frontend and 224 portraits",
+      "assetCount": 5
+    },
+    {
+      "commit": "5700b06549fa16ec88734a99b8f7aaf5da4b3c24",
+      "message": "Changes",
+      "assetCount": 9
+    },
+    {
+      "commit": "9d9e8d3709731e5c1fa1fccb012dfb894f86e57d",
+      "message": "Add clean PNG-derived Hero WebP samples",
+      "assetCount": 5
+    },
+    {
+      "commit": "ecdd605f1ccb0907bfabdce719613b907a90f1ba",
+      "message": "add spine 3.3 runtime and ymir test assets",
+      "assetCount": 1
+    }
+  ],
+  "evidenceCounts": {
+    "currentToolExactRequiredInput": 1,
+    "movementContractIdentifierMatch": 5,
+    "movementRepositoryDeliveryBindingProven": 0,
+    "sameStemCurrentFrontendSibling": 8
+  },
+  "decisionCounts": {
+    "RETAIN_CURRENT_TOOL_INPUT": 1,
+    "RETAIN_PENDING_MOVEMENT_ASSET_DELIVERY_BINDING": 5,
+    "RETAIN_REVIEW_ONLY_UNREFERENCED": 20
+  },
+  "deleteEligibleCount": 0,
+  "deleteApprovedCount": 0,
+  "stage5ReviewClosure": {
+    "totalUnreferencedPopulation": 457,
+    "bannerReviewed": 431,
+    "nonBannerReviewed": 26,
+    "totalReviewed": 457,
+    "deleteApprovedCount": 0,
+    "allFrozenUnreferencedReviewed": true
+  },
+  "reviews": [
+    {
+      "code": "NON_BANNER_RETAIN_REVIEW_ONLY",
+      "count": 20,
+      "blocking": false
+    },
+    {
+      "code": "MOVEMENT_ASSET_DELIVERY_BINDING_PENDING",
+      "count": 5,
+      "blocking": false
+    },
+    {
+      "code": "SRC_SAME_STEM_FRONTEND_SIBLING_NOT_SUPERSESSION",
+      "count": 8,
+      "blocking": false
+    }
+  ],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "forbiddenOperationCounts": {
+    "assetDelete": 0,
+    "assetMove": 0,
+    "assetRename": 0,
+    "formatConversion": 0,
+    "frontendMutation": 0,
+    "consumerRewrite": 0,
+    "resolverRewrite": 0,
+    "semanticRelationRecomputation": 0,
+    "canonicalRelationRecomputation": 0,
+    "unreferencedToUnusedInference": 0,
+    "referenceAbsenceDeleteSafetyInference": 0,
+    "pathNameSemanticRoleInference": 0,
+    "extensionSupersessionInference": 0,
+    "sameStemSiblingEquivalenceInference": 0,
+    "sameStemSiblingSupersessionInference": 0,
+    "movementFilenameVerifiedDeliveryBindingInference": 0,
+    "heroSampleFilenameHeroIdentityInference": 0,
+    "statIconFilenameRuntimeBindingInference": 0,
+    "gitHistoryCanonicalOwnershipInference": 0,
+    "gitHistoryDeleteSafetyInference": 0
+  },
+  "nextStartPoint": "STOP_AH5_REVIEW_FROZEN_NO_DESTRUCTIVE_APPROVALS"
+}
