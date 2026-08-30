@@ -49,6 +49,9 @@ jobs:
       - name: Validate committed freshness seal
         run: npm run doctor:freshness:validate
 
+      - name: Validate R3 fail-closed semantic freshness regression
+        run: node scripts/validate-hero-soldier-semantic-freshness-r3-fail-closed.mjs
+
       - name: Regenerate D1 status outputs
         run: npm run doctor:status
 
