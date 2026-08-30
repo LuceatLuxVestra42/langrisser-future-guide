@@ -96,7 +96,7 @@ check(
     detailRoute.includes('notFound') &&
     detailRoute.includes('Stage 6') &&
     detailRoute.includes('webAssetPath'),
-  '267-Hero detail route shell keeps the current non-nested route ID while exposing /heroes/$heroId and consuming the Stage 5 projection with Stage 4 artwork resolver',
+  '267-Hero detail route shell consumes current Stage 5 projection with Stage 4 artwork resolver',
 );
 
 const result = {
