@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage5-scope-freeze/v1",
+  "stage": "ASSET_HYGIENE_5_0",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Freeze the destructive-review boundary after AH-4 without deleting, moving, renaming, converting, or rewriting any asset or consumer. Separate protected current use, protected evidence retention, and unreferenced review candidates before any destructive decision.",
+  "predecessors": {
+    "stage4Admission": "tools/asset-intake/hygiene/generated/asset-hygiene-production-admission-index.v1.json",
+    "stage4Quarantine": "tools/asset-intake/hygiene/generated/asset-hygiene-production-quarantine-index.v1.json",
+    "stage4Summary": "data/validation/asset-intake-hygiene-stage4-production-admission-summary.v1.json",
+    "stage3Classification": "tools/asset-intake/hygiene/generated/asset-hygiene-classification.v1.json",
+    "stage3ReviewQueue": "tools/asset-intake/hygiene/generated/asset-hygiene-review-queue.v1.json",
+    "stage2ReferenceMap": "tools/asset-intake/hygiene/generated/asset-hygiene-reference-map.v1.json"
+  },
+  "population": {
+    "expectedRecordCount": 2188,
+    "expectedExactDuplicateGroupCount": 1,
+    "expectedUnreferencedCount": 457
+  },
+  "protectionPolicy": {
+    "currentUse": {
+      "rule": "traits.activeProduction == true OR traits.currentFrontendReference == true",
+      "destructiveActionAllowed": false
+    },
+    "verifiedEvidenceRetention": {
+      "rule": "primaryClass in [EVIDENCE_ONLY, GENERATED_DERIVATIVE] when not current use",
+      "destructiveActionAllowed": false,
+      "reason": "Verified evidence and derivative lineage remain upstream/source evidence unless a later explicit replacement/retention contract proves disposal safety."
+    },
+    "riskFlags": {
+      "RESOLVER_COLLISION": "BLOCK_DESTRUCTIVE_ACTION",
+      "UNVERIFIED_EXTERNAL": "BLOCK_DESTRUCTIVE_ACTION"
+    }
+  },
+  "reviewCandidatePolicy": {
+    "automaticCandidatePrimaryClass": "UNREFERENCED",
+    "candidateMeaning": "No current AH-2 reference edge. This is review scope only, not UNUSED, DELETE_ELIGIBLE, or DELETE_APPROVED.",
+    "exactDuplicateMeaning": "Exact bytes only. Does not establish semantic identity, role equivalence, ownership equivalence, or deletion safety.",
+    "deleteEligibleByAutomaticRule": false,
+    "requiredBeforeAnyDelete": [
+      "exact target path",
+      "current-use absence revalidated at destructive commit",
+      "evidence-retention absence or explicit successor/retention decision",
+      "semantic/role equivalence or explicit owner decision when deduplicating",
+      "consumer/resolver/reference parity after proposed removal",
+      "rollback record or source provenance retained"
+    ]
+  },
+  "domainReviewOrder": [
+    "banner_exact_duplicate",
+    "banner_unreferenced",
+    "hero_samples",
+    "shared",
+    "src_assets",
+    "public_root",
+    "tools"
+  ],
+  "destructiveDecisionStates": [
+    "PROTECTED_CURRENT_USE",
+    "PROTECTED_EVIDENCE_RETENTION",
+    "REVIEW_CANDIDATE_UNREFERENCED"
+  ],
+  "forbidden": {
+    "deleteApproval": true,
+    "assetDelete": true,
+    "assetMove": true,
+    "assetRename": true,
+    "formatConversion": true,
+    "frontendMutation": true,
+    "consumerRewrite": true,
+    "resolverRewrite": true,
+    "canonicalRelationRecomputation": true,
+    "semanticRecomputation": true,
+    "nameJoin": true,
+    "idArithmetic": true,
+    "filenameRoleInference": true,
+    "duplicateBytesToSemanticIdentityInference": true,
+    "unreferencedToUnusedInference": true
+  },
+  "outputs": {
+    "scope": "tools/asset-intake/hygiene/generated/asset-hygiene-stage5-destructive-scope.v1.json",
+    "candidateReview": "tools/asset-intake/hygiene/generated/asset-hygiene-stage5-candidate-review.v1.json",
+    "summary": "data/validation/asset-intake-hygiene-stage5-scope-freeze-summary.v1.json",
+    "checkpoint": "docs/checkpoints/asset-intake-hygiene-stage5-scope-freeze.md"
+  },
+  "finalState": {
+    "status": "PASS_WITH_REVIEW",
+    "completion": "COMPLETE",
+    "freezeState": "ASSET_HYGIENE_STAGE5_DESTRUCTIVE_SCOPE_FROZEN",
+    "nextStartPoint": "ASSET_HYGIENE_5_1_BANNER_EXACT_DUPLICATE_REVIEW"
+  }
+}
