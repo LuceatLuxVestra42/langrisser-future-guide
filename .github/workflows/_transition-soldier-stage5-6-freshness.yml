@@ -64,6 +64,34 @@ jobs:
           node scripts/finalize-soldier-stage5-8-release.cjs
           commit_stage "Refresh Soldier stage 5-8 frozen provenance"
 
+          node <<'NODE'
+          const fs = require('fs');
+          const { execFileSync } = require('child_process');
+          const checkpointPath = 'data/validation/soldier-stage6-0-checkpoint.v1.json';
+          const checkpoint = JSON.parse(fs.readFileSync(checkpointPath, 'utf8'));
+          const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
+          const blob = (path) => git('rev-parse', `HEAD:${path}`);
+
+          checkpoint.frozenAt = '2026-08-30';
+          checkpoint.baseline = {
+            commitSha: git('rev-parse', 'HEAD'),
+            treeSha: git('rev-parse', 'HEAD^{tree}'),
+            commitMessage: git('log', '-1', '--format=%s'),
+          };
+
+          for (const sectionName of ['contracts', 'generatedBaseline', 'validationBaseline']) {
+            const section = checkpoint[sectionName] || {};
+            for (const item of Object.values(section)) {
+              if (item && typeof item.path === 'string' && Object.prototype.hasOwnProperty.call(item, 'gitBlobSha')) {
+                item.gitBlobSha = blob(item.path);
+              }
+            }
+          }
+
+          fs.writeFileSync(checkpointPath, JSON.stringify(checkpoint, null, 2) + '\n');
+          NODE
+          commit_stage "Refresh Soldier stage 6-0 QA checkpoint"
+
           node scripts/finalize-soldier-stage6-1-full-records.cjs
           commit_stage "Refresh Soldier stage 6-1 frozen provenance"
 
