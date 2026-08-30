@@ -1,0 +1,71 @@
+{
+  "stage": "Asset Hygiene Stage 0 - Baseline / Scope Freeze",
+  "status": "PASS_ASSET_HYGIENE_STAGE0_SCOPE_FREEZE",
+  "completion": "COMPLETE",
+  "freezeState": "ASSET_HYGIENE_STAGE0_SCOPE_FROZEN",
+  "contract": "tools/asset-intake/contract/hygiene-scope.v1.json",
+  "baselineCommit": "73db96444d2016d044042630955486fd9b3d9036",
+  "baselineTree": "f19194edbf6e71f1c3d6fcf0ccabb0b9c6474df8",
+  "validationMode": "AUTHORITATIVE_SOURCE_AND_CONTRACT_STATIC_FREEZE",
+  "checks": {
+    "checkCount": 13,
+    "failureCount": 0,
+    "items": [
+      {"id":"CURRENT_MAIN_BASELINE_RESOLVED","pass":true},
+      {"id":"ASSET_INTAKE_STAGE5_COMPLETE","pass":true},
+      {"id":"ASSET_INTAKE_OPERATIONAL_ROUTING_FROZEN","pass":true},
+      {"id":"ASSET_INTAKE_ENGINE_REUSABLE_FOR_STAGE1","pass":true},
+      {"id":"ACTIVE_SOURCE_REGISTRY_PASS_COMPLETE","pass":true},
+      {"id":"CURRENT_PR_GUARD_D7_V7_PRESERVES_STAGE5_ADMISSION","pass":true},
+      {"id":"EXISTING_D2_V5_MAPS_HYGIENE_PATH_SURFACE_AS_ASSET_INTAKE_TOOLING","pass":true},
+      {"id":"TRACKED_GIT_TREE_POPULATION_RULE_DEFINED","pass":true},
+      {"id":"PUBLIC_IMAGES_ROOT_ALWAYS_INCLUDED","pass":true},
+      {"id":"REPOSITORY_WIDE_IMAGE_EXTENSION_DISCOVERY_DEFINED","pass":true},
+      {"id":"LFS_AND_SYMLINK_FAIL_CLOSED_POLICY_DEFINED","pass":true},
+      {"id":"SEMANTIC_AND_PRODUCTION_MUTATION_FORBIDDEN","pass":true},
+      {"id":"AH1_OUTPUT_BOUNDARY_DEFINED_WITHOUT_CLASSIFICATION","pass":true}
+    ]
+  },
+  "currentAuthority": {
+    "activeSourceRegistry": "data/generated/project-doctor-active-source-registry.v1.json",
+    "selectedDomainCount": 6,
+    "domains": ["hero","soldier","equipment","hero-soldier","banner","skin"],
+    "semanticRecomputationCount": 0,
+    "canonicalJoinRecomputationCount": 0
+  },
+  "scope": {
+    "scopeId": "REPOSITORY_TRACKED_IMAGE_ASSETS_V1",
+    "population": "tracked regular files in baseline Git tree",
+    "alwaysIncludeRoots": ["public/images/"],
+    "repositoryWideImageExtensionDiscovery": true,
+    "externalFetch": false,
+    "untrackedFilesIncluded": false,
+    "nonImageAssetFamiliesDeferred": true
+  },
+  "mutations": {
+    "assetBytesChanged": false,
+    "assetMoved": false,
+    "assetDeleted": false,
+    "assetRenamed": false,
+    "frontendChanged": false,
+    "productionConsumerChanged": false,
+    "canonicalDataChanged": false,
+    "canonicalRelationChanged": false,
+    "projectDoctorRuntimeChanged": false,
+    "assetIntakeStage5Changed": false
+  },
+  "reviews": [
+    {
+      "code": "AH1_CENSUS_COUNTS_NOT_YET_MATERIALIZED",
+      "blocking": false,
+      "note": "File counts, total bytes, hashes, duplicate groups, collision candidates, LFS pointers, and tracked symlinks belong to AH-1 and were intentionally not computed in AH-0."
+    },
+    {
+      "code": "NON_IMAGE_ASSET_FAMILIES_DEFERRED",
+      "blocking": false,
+      "note": "Spine/model/audio/font/video/Unity bundle hygiene is outside image Hygiene v1 unless explicitly promoted later."
+    }
+  ],
+  "blockers": [],
+  "nextStartPoint": "ASSET_HYGIENE_1_REPOSITORY_INVENTORY: enumerate the frozen baseline Git tree under hygiene-scope.v1, reuse Asset Intake engine hashing/signature logic where applicable, and produce physical inventory only. Do not classify or mutate assets."
+}

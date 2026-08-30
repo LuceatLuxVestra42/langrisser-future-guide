@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage1-inventory/v1",
+  "stage": "ASSET_HYGIENE_1",
+  "checkpoint": "ASSET_HYGIENE_STAGE1_REPOSITORY_INVENTORY",
+  "status": "DESIGN_FROZEN",
+  "predecessor": "tools/asset-intake/contract/hygiene-scope.v1.json",
+  "purpose": "Materialize the AH-0 frozen Git-tree image population as a deterministic read-only physical inventory. This stage computes bytes/signatures/dimensions/hashes and collision candidates only; reference meaning and lifecycle classification remain deferred.",
+  "baseline": {
+    "commit": "73db96444d2016d044042630955486fd9b3d9036",
+    "tree": "f19194edbf6e71f1c3d6fcf0ccabb0b9c6474df8",
+    "scopeId": "REPOSITORY_TRACKED_IMAGE_ASSETS_V1"
+  },
+  "population": {
+    "source": "git ls-tree -r --full-tree <baseline.commit>",
+    "regularFileModes": ["100644", "100755"],
+    "alwaysIncludeRoots": ["public/images/"],
+    "extensionCaseInsensitive": true,
+    "extensionAllowlist": [
+      ".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".avif", ".bmp", ".ico",
+      ".tif", ".tiff", ".tga", ".dds", ".ktx", ".ktx2"
+    ],
+    "trackedOnly": true,
+    "symlinkMode": "120000",
+    "submoduleMode": "160000"
+  },
+  "engineReuse": {
+    "path": "tools/asset-intake/core/engine-v1.mjs",
+    "function": "scanAssetRoot",
+    "method": "Materialize only selected baseline blob bytes into an isolated temporary tree, then scan that tree with the existing Asset Intake engine.",
+    "rawRepositoryRootScan": false,
+    "rawConfigDataRead": false
+  },
+  "outputs": {
+    "inventory": "tools/asset-intake/hygiene/generated/asset-hygiene-inventory.v1.json",
+    "exactDuplicateGroups": "tools/asset-intake/hygiene/generated/asset-hygiene-duplicate-groups.v1.json",
+    "basenameGroups": "tools/asset-intake/hygiene/generated/asset-hygiene-basename-groups.v1.json",
+    "summary": "data/validation/asset-intake-hygiene-stage1-inventory-summary.v1.json",
+    "checkpoint": "docs/checkpoints/asset-intake-hygiene-stage1-repository-inventory.md"
+  },
+  "recordPolicy": {
+    "normalRecordFields": [
+      "repositoryPath", "root", "sourcePath", "relativePath", "basename", "extension", "byteSize",
+      "signature", "width", "height", "sha256", "exactDuplicateGroup", "basenameCollisionGroup"
+    ],
+    "lfsPointer": {
+      "status": "LFS_POINTER_UNRESOLVED",
+      "sha256FromPointerBytesForbidden": true,
+      "reviewRequired": true
+    },
+    "symlink": {
+      "status": "SYMLINK_NOT_FOLLOWED",
+      "targetTraversalForbidden": true,
+      "reviewRequired": true
+    },
+    "unsupportedImageSignature": "Keep the physical record and signature/prefix evidence. Do not silently exclude it."
+  },
+  "groupPolicy": {
+    "exactDuplicateKey": "sha256",
+    "exactDuplicateMinimumSize": 2,
+    "lfsPointersExcludedFromExactDuplicateHashing": true,
+    "basenameCollisionKey": "basename",
+    "basenameCollisionMinimumSize": 2,
+    "basenameCollisionIsCandidateOnly": true,
+    "basenameCollisionDoesNotImplyResolverError": true
+  },
+  "completionRules": {
+    "candidateCoverageMustEqualInventoryPlusSymlinkReviews": true,
+    "regularCandidateCoverageMustEqualInventoryRecords": true,
+    "duplicateGroupMembershipMustMatchInventory": true,
+    "basenameGroupMembershipMustMatchInventoryAndSymlinkReviews": true,
+    "unreadableBlobCountMustBeZero": true,
+    "classificationCount": 0,
+    "assetMutationCount": 0,
+    "semanticRecomputationCount": 0
+  },
+  "forbidden": {
+    "assetMutation": true,
+    "assetMove": true,
+    "assetDelete": true,
+    "assetRename": true,
+    "formatConversion": true,
+    "frontendMutation": true,
+    "productionConsumerRewrite": true,
+    "externalFetch": true,
+    "rawConfigDataRead": true,
+    "semanticRecomputation": true,
+    "canonicalRelationRecomputation": true,
+    "nameJoin": true,
+    "idArithmetic": true,
+    "fuzzyFilenameMatching": true,
+    "perceptualIdentityInference": true,
+    "activeVerifiedClassification": true,
+    "evidenceOnlyClassification": true,
+    "generatedDerivativeClassification": true,
+    "supersededClassification": true,
+    "unreferencedClassification": true,
+    "provenanceUnknownClassification": true
+  },
+  "projectDoctor": {
+    "existingOwner": "project-doctor / asset-intake-tooling",
+    "d2d3d4VersionBump": false,
+    "generatedArtifactsStayUnderToolsAssetIntake": true,
+    "reason": "Keep AH-1 inside the already-mapped shared Asset Intake tooling surface without mutating frozen D2 V5 routing."
+  },
+  "nextStage": "ASSET_HYGIENE_2_REFERENCE_CROSSCHECK"
+}

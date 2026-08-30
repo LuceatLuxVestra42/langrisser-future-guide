@@ -1,10 +1,10 @@
 name: Soldier Stage 6-4 Filter QA
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-      - 'work/**'
     paths:
       - 'scripts/finalize-soldier-stage6-4-filter-qa.cjs'
       - 'data/generated/soldier-stage6-1-full-records.v1.json'
@@ -28,11 +28,25 @@ on:
       - '.github/workflows/soldier-stage6-4-filter-qa.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  filter-qa:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Soldier Stage 6-4 producer runs must target a non-main branch. Select the branch/ref to freeze, then open a normal PR.'
+          exit 1
+
+  filter-qa:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,8 +66,34 @@ jobs:
           name: soldier-stage6-4-filter-qa
           path: data/validation/soldier-stage6-4-filter-qa.v1.json
 
-      - name: Freeze Stage 6-4 QA on work branch
-        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+      - name: Verify frozen QA artifact on main or PR
+        run: git diff --exit-code -- data/validation/soldier-stage6-4-filter-qa.v1.json
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run Soldier Stage 6-4 filter QA
+        run: node scripts/finalize-soldier-stage6-4-filter-qa.cjs
+
+      - name: Upload Stage 6-4 QA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-stage6-4-filter-qa
+          path: data/validation/soldier-stage6-4-filter-qa.v1.json
+
+      - name: Freeze Stage 6-4 QA on explicit producer run
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -64,7 +104,3 @@ jobs:
             git commit -m "freeze Soldier stage 6-4 filter QA PASS"
             git push origin HEAD:${{ github.ref_name }}
           fi
-
-      - name: Verify frozen QA artifact on main or PR
-        if: github.event_name != 'push' || github.ref == 'refs/heads/main'
-        run: git diff --exit-code -- data/validation/soldier-stage6-4-filter-qa.v1.json
