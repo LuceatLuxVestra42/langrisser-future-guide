@@ -3,8 +3,8 @@
   "schemaId": "project-tooling-status-source-r1-4/v1",
   "stage": "R1-4",
   "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_4_ARTIFACT_BRIDGE",
-  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
-  "completion": "R1_4_ARTIFACT_BRIDGE_IMPLEMENTED",
+  "status": "PASS",
+  "completion": "R1_4_ARTIFACT_BRIDGE_COMPLETE",
   "purpose": "Replace the legacy Project Doctor artifact bridge with an independent Status Source bridge that binds explicit domain pipelines to the completed R1-3 producer gate without using the legacy generated active-source registry or executing validators.",
   "predecessor": {
     "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_3_PRODUCER_GATE",
@@ -21,6 +21,7 @@
     "runtimeDependency": false
   },
   "implementation": {
+    "implementationCommit": "1e871f7814c27d79cf645c7f218012ea312e74dc",
     "bridgeContract": "tools/status-source/contracts/artifact-bridge.v1.json",
     "bridgeLibrary": "tools/status-source/lib/bridge-status-source.mjs",
     "cli": "tools/status-source/cli/bridge.mjs",
@@ -113,6 +114,45 @@
     "explicit APPLY flag is forwarded to R1-3 without repository mutation in the R1-4 unit test",
     "legacy active registry and legacy Doctor runtime dependency scan remains zero"
   ],
+  "validationEvidence": {
+    "shadowWorkflow": {
+      "runId": 33342981294,
+      "jobId": 99341834500,
+      "headSha": "1e871f7814c27d79cf645c7f218012ea312e74dc",
+      "conclusion": "success",
+      "selectionParityAndIsolationSelfTest": "PASS",
+      "promotionParityAndRollbackSelfTest": "PASS",
+      "producerGateParityAndDelegationSelfTest": "PASS",
+      "artifactBridgeParityAndDelegationSelfTest": "PASS",
+      "activeEquipmentPromotionCheckCli": "PASS",
+      "activeEquipmentProducerSubmitCheckCli": "PASS",
+      "activeEquipmentArtifactBridgeCheckCli": "PASS"
+    },
+    "currentBridgeParity": {
+      "pipelineCount": 6,
+      "currentBaselineBindingsAccepted": 6,
+      "allPipelineCheckDeclarationWrites": 0,
+      "currentEquipmentCheckDeclarationWrites": 0,
+      "equipmentProjectionSubset": {
+        "canonical": 390,
+        "public": 365,
+        "general": 198,
+        "exclusive": 167
+      }
+    },
+    "delegationProof": {
+      "applyFlagForwardedToR1_3": true,
+      "candidateProducerGateBypassBlocked": true,
+      "unknownPipelineBlocked": true,
+      "baselineDriftBlocked": true,
+      "domainValidatorExecutions": 0,
+      "owningValidatorInferences": 0,
+      "legacyActiveRegistryDependencies": 0,
+      "legacyRuntimeDependencies": 0,
+      "rawConfigDataReads": 0,
+      "semanticRecomputations": 0
+    }
+  },
   "completionGate": {
     "bridgeContractImplemented": true,
     "bridgeLibraryImplemented": true,
@@ -123,15 +163,18 @@
     "checkDefaultImplemented": true,
     "explicitApplyDelegationImplemented": true,
     "selfTestImplemented": true,
-    "shadowWorkflowUpdated": false,
-    "shadowCiPass": false
+    "shadowWorkflowUpdated": true,
+    "shadowCiPass": true,
+    "currentPipelineParity": true,
+    "legacyActiveRegistryDependencyCountZero": true,
+    "legacyRuntimeDependencyCountZero": true
   },
   "blockers": [],
   "reviews": [
     "R1-5 apply handoff / producer declaration / closeout request behavior remains legacy-only and is outside this checkpoint.",
     "Legacy required pr-guard remains a CUTOVER_ONLY blocker and must not be repaired by admitting migration paths into legacy D2-D7."
   ],
-  "nextStartPoint": "Update the independent Status Source shadow workflow to run the R1-4 artifact bridge self-test and a current Equipment bridge CHECK. If PASS, freeze R1-4 and continue with R1-5 handoff/declaration/closeout behavior.",
+  "nextStartPoint": "R1-5: migrate apply handoff, producer declaration, and closeout request behavior onto the completed R1-4 bridge. Keep explicit apply as the only mutation path and do not reintroduce legacy Doctor registry/D1/D5 dependencies.",
   "reopenConditions": [
     "R1-1 selection semantics change",
     "R1-3 producer gate behavior changes",
