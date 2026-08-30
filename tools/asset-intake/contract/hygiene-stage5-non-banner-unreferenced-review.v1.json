@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage5-non-banner-unreferenced-review-contract/v1",
+  "stage": "ASSET_HYGIENE_5_3",
+  "purpose": "Review the frozen 26-file non-Banner unreferenced population using current AH-2 reference absence, exact current tooling requirements, current movement presentation identifiers, same-stem frontend sibling facts, and Git path provenance only. Do not infer unused status, supersession, semantic identity, canonical ownership, or deletion safety from names, extensions, path placement, sibling files, history, or reference absence.",
+  "predecessors": {
+    "stage5ScopeFreeze": {
+      "status": "PASS_WITH_REVIEW",
+      "completion": "COMPLETE",
+      "freezeState": "ASSET_HYGIENE_STAGE5_DESTRUCTIVE_SCOPE_FROZEN"
+    },
+    "stage5BannerUnreferencedReview": {
+      "status": "PASS_WITH_REVIEW",
+      "completion": "COMPLETE",
+      "freezeState": "ASSET_HYGIENE_STAGE5_BANNER_UNREFERENCED_REVIEW_FROZEN",
+      "targetAssetCount": 431,
+      "deleteApprovedCount": 0
+    }
+  },
+  "target": {
+    "expectedAssetCount": 26,
+    "groups": [
+      { "root": "public/", "expectedAssetCount": 1 },
+      { "root": "public/images/heroes/", "expectedAssetCount": 5 },
+      { "root": "public/images/shared/", "expectedAssetCount": 10 },
+      { "root": "src/", "expectedAssetCount": 9 },
+      { "root": "tools/", "expectedAssetCount": 1 }
+    ],
+    "physicalSubscopes": {
+      "PUBLIC_ROOT": 1,
+      "HERO_PORTRAIT_SAMPLES_ROOT": 5,
+      "SHARED_MOVEMENT_ROOT": 5,
+      "SHARED_STATS_ROOT": 5,
+      "SRC_ASSETS_ROOT": 9,
+      "SPINE_RENDERER_INPUT_ROOT": 1
+    }
+  },
+  "evidenceBoundaries": {
+    "movementContract": "data/contracts/hero-soldier-movement-type-presentation.v1.json",
+    "movementIndex": "data/generated/shared-movement-type-index.v1.json",
+    "spineRendererProgram": "tools/spine-renderer/Program.cs",
+    "spineRequiredInputPath": "tools/spine-renderer/input/Ymir_Skin01.png",
+    "spineRequiredInputFileName": "Ymir_Skin01.png"
+  },
+  "reviewPolicy": {
+    "currentReferenceMustRemainAbsent": true,
+    "gitPathHistoryRequired": true,
+    "toolExactRequiredInputDecision": "RETAIN_CURRENT_TOOL_INPUT",
+    "movementIdentifierMatchDecision": "RETAIN_PENDING_MOVEMENT_ASSET_DELIVERY_BINDING",
+    "defaultDecision": "RETAIN_REVIEW_ONLY_UNREFERENCED",
+    "sameStemFrontendSiblingMeaning": "PHYSICAL_SIBLING_SIGNAL_ONLY_NOT_EQUIVALENCE_OR_SUPERSESSION",
+    "gitHistoryMeaning": "PATH_PROVENANCE_ONLY_NOT_SEMANTIC_ROLE_OR_DELETE_SAFETY",
+    "deleteEligible": false,
+    "deleteApproved": false
+  },
+  "forbiddenInferences": [
+    "UNREFERENCED_TO_UNUSED",
+    "REFERENCE_ABSENCE_TO_DELETE_SAFETY",
+    "PATH_OR_DIRECTORY_NAME_TO_SEMANTIC_ROLE",
+    "FILE_EXTENSION_TO_SUCCESSOR_OR_SUPERSESSION",
+    "SAME_STEM_SIBLING_TO_EQUIVALENCE_OR_SUPERSESSION",
+    "MOVEMENT_FILENAME_MATCH_TO_VERIFIED_DELIVERY_BINDING",
+    "GIT_HISTORY_TO_CANONICAL_OWNERSHIP",
+    "GIT_HISTORY_TO_DELETE_SAFETY",
+    "HERO_SAMPLE_FILENAME_TO_HERO_IDENTITY",
+    "STAT_ICON_FILENAME_TO_RUNTIME_BINDING"
+  ],
+  "forbiddenOperations": [
+    "ASSET_DELETE",
+    "ASSET_MOVE",
+    "ASSET_RENAME",
+    "FORMAT_CONVERSION",
+    "FRONTEND_MUTATION",
+    "CONSUMER_REWRITE",
+    "RESOLVER_REWRITE",
+    "SEMANTIC_RELATION_RECOMPUTATION",
+    "CANONICAL_RELATION_RECOMPUTATION"
+  ],
+  "finalState": {
+    "status": "PASS_WITH_REVIEW",
+    "completion": "COMPLETE",
+    "freezeState": "ASSET_HYGIENE_STAGE5_NON_BANNER_UNREFERENCED_REVIEW_FROZEN",
+    "nextStartPoint": "STOP_AH5_REVIEW_FROZEN_NO_DESTRUCTIVE_APPROVALS"
+  }
+}
