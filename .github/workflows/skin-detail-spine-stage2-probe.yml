@@ -7,6 +7,8 @@ on:
     paths:
       - scripts/probe-skin-detail-spine-stage2.py
       - scripts/probe-skin-detail-spine-stage2-textures.py
+      - scripts/spine-stage2-geometry-export.cs
+      - scripts/render-spine-stage2-geometry.py
       - .github/workflows/skin-detail-spine-stage2-probe.yml
 
 permissions:
@@ -14,22 +16,89 @@ permissions:
 
 jobs:
   probe:
-    runs-on: windows-latest
-    timeout-minutes: 25
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install UnityPy
-        shell: pwsh
-        run: python -m pip install UnityPy==1.25.3
+      - name: Install Python diagnostic dependencies
+        run: python -m pip install UnityPy==1.25.3 Pillow numpy
       - name: Probe representative CHAR_SPINE dependencies
-        shell: pwsh
         run: python scripts/probe-skin-detail-spine-stage2.py
       - name: Resolve atlas page textures
-        shell: pwsh
         run: python scripts/probe-skin-detail-spine-stage2-textures.py
+      - name: Fetch exact official Spine 3.3 runtime source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/spine-runtimes /tmp/spine33probe
+          git init -q /tmp/spine-runtimes
+          git -C /tmp/spine-runtimes remote add origin https://github.com/EsotericSoftware/spine-runtimes.git
+          git -C /tmp/spine-runtimes fetch -q --depth=1 origin 1c1936532527900f74cfb58f7002998bf157b254
+          git -C /tmp/spine-runtimes checkout -q FETCH_HEAD
+          test "$(git -C /tmp/spine-runtimes rev-parse HEAD)" = "1c1936532527900f74cfb58f7002998bf157b254"
+          mkdir -p /tmp/spine33probe
+          cat > /tmp/spine33probe/Spine33Probe.csproj <<EOF
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net8.0</TargetFramework>
+              <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+              <ImplicitUsings>disable</ImplicitUsings>
+              <Nullable>disable</Nullable>
+            </PropertyGroup>
+            <ItemGroup>
+              <Compile Include="${GITHUB_WORKSPACE}/scripts/spine-stage2-geometry-export.cs" />
+              <Compile Include="/tmp/spine-runtimes/spine-csharp/src/**/*.cs" />
+            </ItemGroup>
+          </Project>
+          EOF
+          dotnet build /tmp/spine33probe/Spine33Probe.csproj -c Release
+      - name: Export exact Spine geometry and CPU render representatives
+        shell: bash
+        run: |
+          set -euo pipefail
+          for skin in 102 1901 3701; do
+            dir="skin-detail-spine-stage2-artifacts/${skin}"
+            skel="$(find "$dir" -maxdepth 1 -type f -name '*.skel.bin' -print -quit)"
+            atlas="$(find "$dir" -maxdepth 1 -type f -name '*.atlas.bin' -print -quit)"
+            texture="$(find "$dir" -maxdepth 1 -type f -name 'atlas-page-texture2d-*.png' -print -quit)"
+            test -n "$skel" && test -n "$atlas" && test -n "$texture"
+            dotnet run --project /tmp/spine33probe/Spine33Probe.csproj -c Release --no-build -- \
+              "$skel" "$atlas" "$dir/geometry-idle0.json" idle_Normal 0
+            python scripts/render-spine-stage2-geometry.py \
+              "$dir/geometry-idle0.json" "$texture" "$dir/render-idle0.png"
+            python scripts/render-spine-stage2-geometry.py \
+              "$dir/geometry-idle0.json" "$texture" "$dir/render-idle0-flipv.png" --flip-v
+          done
+      - name: Summarize representative render outputs
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          from PIL import Image
+          root=pathlib.Path('skin-detail-spine-stage2-artifacts')
+          rows=[]
+          for sid in ('102','1901','3701'):
+              d=root/sid
+              g=json.loads((d/'geometry-idle0.json').read_text('utf-8'))
+              for name in ('render-idle0.png','render-idle0-flipv.png'):
+                  im=Image.open(d/name).convert('RGBA')
+                  a=im.getchannel('A')
+                  rows.append({
+                      'skinId':int(sid),'render':name,'size':list(im.size),
+                      'alphaBounds':list(a.getbbox()) if a.getbbox() else None,
+                      'drawItemCount':g['drawItemCount'],
+                      'attachmentTypeCounts':g['attachmentTypeCounts'],
+                      'blendModeCounts':g['blendModeCounts'],
+                      'skeletonVersion':g['skeletonVersion'],
+                      'animationName':g['animationName'],
+                  })
+          out={'schemaVersion':1,'stage':'skin-detail-spine-stage2','substage':'representative-render','runtimeSourceCommit':'1c1936532527900f74cfb58f7002998bf157b254','records':rows}
+          pathlib.Path('skin-detail-spine-stage2-render-summary.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n','utf-8')
+          print(json.dumps(out,ensure_ascii=False))
+          PY
       - name: Upload Stage 2 diagnostic evidence
         uses: actions/upload-artifact@v4
         with:
@@ -37,5 +106,6 @@ jobs:
           path: |
             skin-detail-spine-stage2-probe.json
             skin-detail-spine-stage2-texture-probe.json
+            skin-detail-spine-stage2-render-summary.json
             skin-detail-spine-stage2-artifacts/**
           if-no-files-found: error
