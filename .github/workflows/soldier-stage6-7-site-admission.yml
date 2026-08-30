@@ -106,6 +106,7 @@ jobs:
         run: node scripts/render-project-doctor-status-source-closeout-request.mjs --pipeline soldier --check
 
       - name: Check Project Status source bridge after frozen Soldier output
+        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
         run: node scripts/bridge-project-doctor-status-source.mjs --pipeline soldier --check
 
   explicit-producer:
