@@ -2,7 +2,7 @@
 
 기준 main: `f618238c6ec0ba9463e935240a4028f281f322a0`
 
-상태: `READY_FOR_PR_GUARD / IMPLEMENTATION_COMPLETE_ADMISSION_PENDING`
+상태: `PASS_ASSET_INTAKE_STAGE4_REPOSITORY_INTEGRATION / COMPLETE`
 
 ## 목적
 
@@ -18,7 +18,7 @@ Stage 0~3에서 동결한 Asset Intake 경계를 실제 repository 실행 표면
 - `tools/asset-intake/adapters/skin-v1.mjs`
 - `docs/checkpoints/asset-intake-stage2-engine.md`
 - `docs/checkpoints/asset-intake-stage3-skin-adapter.md`
-- Project Doctor V4 contracts are preserved historical predecessors and are not edited.
+- Project Doctor V4 contracts are preserved historical predecessors and were not edited.
 
 ## 설치 범위
 
@@ -36,25 +36,29 @@ CLI는 Stage 2 engine과 Stage 3 Skin adapter를 직접 사용한다.
 
 ### Repository validation
 
-`tools/asset-intake/cli/validate-stage4-v1.mjs`는 다음을 검증한다.
+`tools/asset-intake/cli/validate-stage4-v1.mjs`는 기존 Stage 2/3 self-test를 재사용하고 temporary repository root에서 대표 Skin 102 / 1901 / 3701을 실제 CLI 경로로 검증한다.
 
-1. Stage 2 engine self-test
-2. Stage 3 Skin adapter self-test
-3. temporary repository root의 실제 recursive scan
-4. Skin 102 / 1901 / 3701 frozen contract 소비
-5. 13 locator exact resolution with explicit map
-6. 13 evidence emission
-7. contract validation
-8. canonical key preservation
-9. domain semantic leakage 없음
-10. RESOURCE_ID map 제거 시 3/3 PENDING
-11. PENDING partial evidence 0
+확인 결과:
 
-representative bytes는 synthetic fixture이며 프로젝트 실제 asset authority claim이 아니다.
+```text
+PASS_ASSET_INTAKE_STAGE4_REPOSITORY_VALIDATION
+checks      16
+passed      16
+failed      0
+hardErrors  0
+
+representative records   3
+representative locators  13
+representative evidence  13
+```
+
+대표 bytes는 synthetic fixture이며 프로젝트 실제 asset authority claim이 아니다.
+
+explicit RESOURCE_ID map을 제거한 negative path에서는 3/3 record가 PENDING으로 남고 partial contract evidence는 0이다.
 
 ## Project Doctor V5
 
-기존 V4 파일은 수정하지 않고 V5를 새로 추가한다.
+기존 V4 파일은 수정하지 않고 V5를 새로 추가했다.
 
 ### D2
 
@@ -89,13 +93,75 @@ skin-assets
 
 ### D4
 
-`asset-intake-self-test`를 strict npm-run allowlist에 추가한다.
+`asset-intake-self-test`를 strict npm-run allowlist에 추가했다.
 
 실패하면 이후 check를 실행하지 않는 fail-fast를 유지한다.
 
 ### D7
 
-기존 read-only `pull_request` workflow를 유지하고 현재 Doctor 실행 포인터만 V5로 전환한다.
+기존 read-only `pull_request` workflow를 유지하고 current Doctor runtime을 V5로 전환했다.
+
+## 첫 실제 PR admission evidence
+
+PR: `#257`
+
+검증 HEAD:
+
+```text
+08d33c62406563e9dafd27acba4d35919d5fca8a
+```
+
+Project Doctor PR Guard:
+
+```text
+run id      33285465140
+event       pull_request
+conclusion  success
+```
+
+real-diff dry-run:
+
+```text
+Plan status    PLAN_READY
+Changed files  15
+Checks queued  5
+```
+
+real-diff execution:
+
+```text
+Run status     PASS_EXECUTED
+Checks queued  5
+Checks run     5
+
+[0] asset-intake-self-test
+[0] production-build
+[0] doctor-health-gate
+[0] doctor-impact-self-test
+[0] doctor-plan-self-test
+```
+
+`PLAN_READY`이므로 이 diff에는 unmapped path 또는 manual-review owner가 남지 않았다. `asset-intake-self-test`는 실제 선택·실행되어 exit 0으로 통과했다.
+
+## 최종 HEAD 재검증 규칙
+
+이 checkpoint 자체를 COMPLETE로 갱신하면 PR HEAD가 바뀐다. 따라서 위 첫 admission run은 구현 admission 근거이고, **실제 merge 가능한 최종 증거는 이 checkpoint commit을 포함한 최종 PR HEAD의 새 `pull_request` PR Guard가 동일 조건으로 PASS하는 것**이다.
+
+최종 조건:
+
+```text
+PR Guard conclusion == success
+guarded HEAD == final PR HEAD
+plan.status == PLAN_READY
+manualReviews == []
+unmappedPaths == []
+selectedChecks includes asset-intake-self-test
+asset-intake-self-test exitCode == 0
+checksQueued == checksRun
+every selected check exitCode == 0
+```
+
+최종 run은 PR #257의 check history가 authoritative evidence다. 이 run 결과를 다시 문서에 적어 commit을 추가하지 않는다. 그렇게 하면 HEAD가 다시 바뀌어 무한 재검증 루프가 되기 때문이다.
 
 ## 명시적으로 하지 않은 것
 
@@ -114,35 +180,28 @@ ID arithmetic
 fuzzy filename matching
 ```
 
-## 완료 조건
+## 완료 범위
 
-Stage 4는 코드가 존재하는 것만으로 완료 처리하지 않는다.
+- shared Asset Intake repository CLI 설치
+- explicit npm entry 설치
+- representative repository validator 설치
+- Asset Intake tooling D2 owner mapping
+- dedicated D3/D4 Asset Intake check admission
+- Project Doctor current runtime V5 전환
+- real `pull_request` Doctor execution에서 first admission PASS
+- final checkpoint 동결
 
-실제 Stage 4 PR HEAD의 `pull_request` Project Doctor PR Guard에서 아래가 모두 확인되어야 한다.
-
-```text
-PR Guard conclusion == success
-guarded HEAD == PR HEAD
-plan.status == PLAN_READY
-manualReviews == []
-unmappedPaths == []
-selectedChecks includes asset-intake-self-test
-asset-intake-self-test exitCode == 0
-checksQueued == checksRun
-every selected check exitCode == 0
-```
-
-## 현재 REVIEW / BLOCKER
+## REVIEW / BLOCKER
 
 REVIEW:
-- 없음. 구현 계약은 PR Guard admission 대기 상태다.
+- final checkpoint commit을 포함한 최종 PR HEAD의 PR Guard 재검증만 남는다. 이는 새 semantic/tooling 구현 작업이 아니라 final admission 확인이다.
 
 BLOCKER:
-- 실제 `pull_request` PR Guard execution evidence가 아직 생성되지 않았다.
+- 없음. final PR Guard가 nonzero/manual/unmapped로 회귀하면 해당 owning layer에서만 다시 연다.
 
 ## 다음 시작점
 
-Stage 4 PR을 열고 실제 PR Guard의 dry-run/execution 결과를 검증한다. PASS 후 이 checkpoint와 summary를 최종 `PASS_ASSET_INTAKE_STAGE4_REPOSITORY_INTEGRATION / COMPLETE`로 갱신하고 최종 HEAD의 PR Guard를 한 번 더 통과시킨다.
+최종 PR HEAD의 Project Doctor PR Guard를 확인한다. 동일 조건 PASS 후 PR #257을 병합하고 Stage 5 `Operational Routing`으로 이동한다.
 
 ## 다시 열리는 조건
 
@@ -151,4 +210,5 @@ Stage 4 PR을 열고 실제 PR Guard의 dry-run/execution 결과를 검증한다
 - Project Doctor D2/D3/D4/D7 current runtime 변경
 - repository validator가 Stage 2/3 contract와 불일치
 - Asset Intake tooling diff가 unmapped/manual review로 회귀
-- `asset-intake-self-test`가 실제 Doctor selection/execution에서 누락
+- `asset-intake-self-test`가 실제 Doctor selection/execution에서 누락 또는 nonzero
+- Skin asset owner를 별도 admission 변경으로 승격
