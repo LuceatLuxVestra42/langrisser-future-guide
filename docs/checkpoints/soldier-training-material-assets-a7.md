@@ -40,13 +40,26 @@ Build PASS를 Hosted PASS로 간주하지 않는다. 현재 작업 브랜치는 
 - SP 전직 재료 표현 변경 없음
 - Hosted/Browser 실패가 발생해도 semantic upstream을 자동 재개하지 않음
 
+## A7.3 PR admission
+
+- PR: `#299` (`work/soldier-training-material-assets-stage1` → `main`)
+- PR 생성 시 branch는 `main` 대비 ahead 28 / behind 0
+- 최초 merge 시도는 required status check `pr-guard` 미생성으로 차단됨
+- 원인: 직전 A7 freeze commit이 `[skip ci]`라 PR 생성 직후 required check가 없었음
+- 이 checkpoint commit은 functional/semantic 변경 없이 PR-required CI를 정상 생성하기 위한 admission 기록임
+- `pr-guard` PASS 전 merge하지 않음
+
 ## 실제 BLOCKER
 
-`AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT_NOT_YET_AT_A7_COMMIT`
+`PR_GUARD_REQUIRED_BEFORE_MAIN_MERGE`
 
 ## 다음 시작점
 
-A7.3 Deployment/Hosted Gate against authoritative GitHub Pages commit, then A7.4 Browser/UI Gate.
+1. PR #299의 `pr-guard` PASS 확인
+2. main merge
+3. `Authoritative GitHub Pages Deploy`가 merge 결과 main SHA를 sourceSha로 배포했는지 freshness 확인
+4. A7.3 Hosted Gate 수행
+5. Hosted PASS 후 A7.4 Browser/UI Gate
 
 ## 다시 열리는 조건
 
