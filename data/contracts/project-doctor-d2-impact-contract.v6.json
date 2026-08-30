@@ -6,13 +6,14 @@
   "status": "DESIGN_FROZEN",
   "extends": "data/contracts/project-doctor-d2-impact-contract.v5.json",
   "baseMap": "data/contracts/project-doctor-d2-dependency-map.v1.json",
-  "purpose": "Preserve D2 V5 mappings and add candidate-owner routing for Frozen Provenance / Semantic Freshness V2 tooling and checkpoints. Content-aware semantic/provenance classification remains downstream of D2.",
+  "purpose": "Preserve D2 V5 mappings, add candidate-owner routing for Frozen Provenance / Semantic Freshness V2 tooling and checkpoints, and route Shared Movement validation workflow maintenance to the existing shared-movement owner. Content-aware semantic/provenance classification remains downstream of D2.",
   "scope": {
     "candidateOwnerRouting": true,
     "contentAwareClassification": false,
     "semanticRecomputation": false,
     "rawConfigDataRead": false,
-    "v5MappingsPreserved": true
+    "v5MappingsPreserved": true,
+    "sharedMovementWorkflowRoutingMaintenance": true
   },
   "pathRuleOverlays": [
     {
@@ -57,6 +58,14 @@
       "directNodes": ["project-doctor"],
       "changeClass": "tooling",
       "reason": "Maintenance checkpoints document the active freshness contract without reopening domain semantics."
+    },
+    {
+      "id": "shared-movement-workflow-owner-routing",
+      "patterns": [".github/workflows/shared-movement-type-validation.yml"],
+      "excludePatterns": [],
+      "directNodes": ["shared-movement"],
+      "changeClass": "shared-consumer",
+      "reason": "Shared Movement producer/validation workflow maintenance belongs to the existing shared-movement owner and must route to its admitted final validator without reopening Hero or Soldier canonical semantics."
     }
   ],
   "baseRuleExcludeOverlays": [],
@@ -85,6 +94,12 @@
       "paths": ["docs/checkpoints/frozen-provenance-semantic-freshness-v2-f4.md"],
       "expectedStatus": "MAPPED",
       "expectedDirectNodes": ["project-doctor"]
+    },
+    {
+      "id": "SHARED_MOVEMENT_VALIDATION_WORKFLOW",
+      "paths": [".github/workflows/shared-movement-type-validation.yml"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["shared-movement"]
     }
   ],
   "historicalBoundary": {
