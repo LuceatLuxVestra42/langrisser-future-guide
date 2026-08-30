@@ -18,12 +18,31 @@ const expectThrow = (id, fn, needle) => {
   }
 };
 
+const allowedTransportModes = new Set(contract.policy?.allowedAutomaticHandoffTransportModes ?? []);
+const transportMatchesWorkflow = (pipeline, workflow) => {
+  const transport = pipeline.handoffTransport ?? {};
+  if (!allowedTransportModes.has(transport.mode)) return false;
+  if (transport.mainAllowed !== false || transport.pullRequestAllowed !== false) return false;
+
+  if (transport.mode === 'WORK_BRANCH_PUSH') {
+    return workflow.includes("github.event_name == 'push'")
+      && workflow.includes("startsWith(github.ref, 'refs/heads/work/')");
+  }
+  if (transport.mode === 'EXPLICIT_NON_MAIN_DISPATCH') {
+    return workflow.includes('workflow_dispatch:')
+      && workflow.includes("github.event_name == 'workflow_dispatch'")
+      && workflow.includes("github.ref != 'refs/heads/main'")
+      && !workflow.includes("startsWith(github.ref, 'refs/heads/work/')");
+  }
+  return false;
+};
+
 add('CONTRACT_FROZEN', contract.status === 'DESIGN_FROZEN');
 add('PIPELINES_EXACT_HERO_SOLDIER', (contract.pipelines ?? []).map(item => item.pipelineId).sort().join(',') === 'hero,soldier');
 add('STAGE6_3_FROZEN', stage6_3.status === 'DESIGN_FROZEN');
 add('NO_REAL_SUCCESSOR_IN_STAGE6_4_POLICY', contract.policy?.realSuccessorPromotionInThisStage === false);
 add('EXPLICIT_DECLARATION_REQUIRED', contract.policy?.predecessorIdMustBeExplicit === true && contract.policy?.entryIdMustBeExplicit === true && contract.policy?.sourcePathMustBeExplicit === true);
-add('WORK_BRANCH_AUTOMATION_ONLY', contract.policy?.automaticDispatchWorkBranchOnly === true && contract.policy?.pullRequestAndMainRemainCheckOnlyAtOwningWorkflow === true);
+add('DECLARED_NON_MAIN_AUTOMATION_ONLY', contract.policy?.automaticDispatchWorkBranchOnly === false && contract.policy?.automaticDispatchRequiresDeclaredNonMainTransport === true && contract.policy?.pullRequestAndMainRemainCheckOnlyAtOwningWorkflow === true && allowedTransportModes.has('WORK_BRANCH_PUSH') && allowedTransportModes.has('EXPLICIT_NON_MAIN_DISPATCH'));
 add('OWNER_SERIALIZATION_REQUIRED', contract.policy?.owningCompletionWorkflowsSerializedPerBranch === true);
 
 for (const pipeline of contract.pipelines ?? []) {
@@ -46,7 +65,7 @@ for (const pipeline of contract.pipelines ?? []) {
   add(`WORKFLOW_RESOLVES_DECLARATION_${upper}`, workflow.includes(`resolve-project-doctor-status-source-declaration.mjs --pipeline ${pipeline.pipelineId} --github-output`));
   add(`WORKFLOW_CALLS_REUSABLE_HANDOFF_${upper}`, workflow.includes('uses: ./.github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml'));
   add(`WORKFLOW_DIRECT_APPLY_ABSENT_${upper}`, !workflow.includes('--apply'));
-  add(`WORKFLOW_WORK_BRANCH_ONLY_HANDOFF_${upper}`, workflow.includes("github.event_name == 'push'") && workflow.includes("startsWith(github.ref, 'refs/heads/work/')"));
+  add(`WORKFLOW_DECLARED_NON_MAIN_HANDOFF_${upper}`, transportMatchesWorkflow(pipeline, workflow), pipeline.handoffTransport ?? null);
   add(`WORKFLOW_PR_MAIN_CHECK_ONLY_PRESERVED_${upper}`, workflow.includes(`bridge-project-doctor-status-source.mjs --pipeline ${pipeline.pipelineId} --check`));
   add(`OWNER_WORKFLOW_SHARED_CONCURRENCY_${upper}`, workflow.includes('group: project-status-owner-${{ github.ref_name }}') && workflow.includes('cancel-in-progress: false'));
 }
