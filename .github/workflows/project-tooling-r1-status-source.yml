@@ -1,0 +1,36 @@
+name: Project Tooling R1 Status Source
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/status-source/**'
+      - 'data/contracts/project-tooling-status-source-r1.v1.json'
+      - 'data/contracts/project-tooling-migration-r0.v1.json'
+      - 'data/status-sources/**'
+      - '.github/workflows/project-tooling-r1-status-source.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  status-source-shadow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run independent Status Source parity and isolation self-test
+        run: node tools/status-source/test/current-main-parity.mjs
+
+      - name: Print selected sources
+        run: node tools/status-source/cli/select.mjs

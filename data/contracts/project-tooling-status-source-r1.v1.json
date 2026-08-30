@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-status-source-r1/v1",
+  "stage": "R1",
+  "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_SELECTION_CORE",
+  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
+  "completion": "R1_SELECTION_CORE_IMPLEMENTED",
+  "purpose": "Reimplement active Status Source selection as an independent read-only tool that consumes explicit status-source declarations and their directly referenced authoritative status files without importing or executing legacy Project Doctor runtime layers.",
+  "designedAgainst": {
+    "mainCommit": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "r0Commit": "a1a3986a55d5d97ae4d779ece7c942d262d7458d"
+  },
+  "authoritativeInputs": {
+    "declarationDirectory": "data/status-sources",
+    "declarations": [
+      {
+        "path": "data/status-sources/baseline.v1.json",
+        "gitBlobSha": "a696db9ede66146aa6e7b67c6e38a1c052b8193c"
+      },
+      {
+        "path": "data/status-sources/promotion.equipment.equipment-public-presentation-correction-final.v1.json",
+        "gitBlobSha": "a1c7a4ee2b318dd691f6544b5e2b1fc36bac71d3"
+      }
+    ],
+    "sourceRule": "Every APPROVED declaration must point directly to an existing repository-relative JSON status source under data/validation/ or data/checkpoints/, and all declared admission predicates must pass."
+  },
+  "implementation": {
+    "selector": "tools/status-source/lib/select-active-sources.mjs",
+    "cli": "tools/status-source/cli/select.mjs",
+    "fixture": "tools/status-source/fixtures/current-selection.v1.json",
+    "selfTest": "tools/status-source/test/current-main-parity.mjs",
+    "shadowWorkflow": ".github/workflows/project-tooling-r1-status-source.yml"
+  },
+  "selectionPolicy": {
+    "declarationDiscovery": "deterministic lexicographic scan of data/status-sources/*.json",
+    "rootDefinition": "APPROVED entry with successorOf = null",
+    "exactlyOneApprovedRootPerDomain": true,
+    "successorMustReferenceExistingEntry": true,
+    "successorMustRemainInSameDomain": true,
+    "atMostOneApprovedSuccessorPerEntry": true,
+    "cycleForbidden": true,
+    "selectedEntry": "terminal APPROVED entry reachable from the explicit root",
+    "unreachableApprovedEntryFails": true,
+    "sourceMustExistAndParseAsJson": true,
+    "admissionOperators": ["equals", "in"],
+    "filenameInference": false,
+    "stageNumberInference": false,
+    "timestampInference": false,
+    "commitDateInference": false
+  },
+  "currentExpectedSelection": {
+    "entryCount": 7,
+    "selectedCount": 6,
+    "selectedIds": {
+      "hero": "hero-stage6-4-final",
+      "soldier": "soldier-stage6-7-site-admission",
+      "equipment": "equipment-public-presentation-correction-final",
+      "hero-soldier": "hero-soldier-stageC-final",
+      "banner": "banner-stage3-8-regression-freeze",
+      "skin": "skin-stage3-2-readiness"
+    },
+    "equipmentProjectionSubset": {
+      "canonical": 390,
+      "public": 365,
+      "general": 198,
+      "exclusive": 167
+    }
+  },
+  "independenceBoundary": {
+    "legacyProjectDoctorRuntimeImports": 0,
+    "legacyProjectDoctorGeneratedStatusDependencies": 0,
+    "d1Dependencies": 0,
+    "d2Dependencies": 0,
+    "d3Dependencies": 0,
+    "d4Dependencies": 0,
+    "d5Dependencies": 0,
+    "d7Dependencies": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "domainValidatorExecutionCount": 0,
+    "legacyStateMutationCount": 0,
+    "packageJsonMutation": false,
+    "legacyWorkflowMutation": false
+  },
+  "parityPolicy": {
+    "resultParityRequired": true,
+    "implementationParityRequired": false,
+    "legacyGeneratedRegistryRuntimeRead": false,
+    "legacyComparisonUse": "The current selected IDs/paths were captured into a frozen fixture during migration design; runtime self-test does not read the legacy generated registry."
+  },
+  "nonScope": [
+    "promotion command migration",
+    "producer submit gate migration",
+    "artifact bridge migration",
+    "apply handoff migration",
+    "producer declaration migration",
+    "closeout request migration",
+    "Project Status/D1 replacement",
+    "Project Check implementation",
+    "branch protection changes",
+    "legacy Doctor deletion"
+  ],
+  "completionGate": {
+    "selectorImplemented": true,
+    "cliImplemented": true,
+    "currentFixtureImplemented": true,
+    "runtimeIndependenceSelfTestImplemented": true,
+    "shadowWorkflowImplemented": true,
+    "shadowCiPass": false
+  },
+  "blockers": [],
+  "reviews": [
+    "Legacy pr-guard may remain red because migration-only paths are intentionally not admitted into legacy D2-D7.",
+    "R1 selection core must not be promoted to a final replacement until the shadow workflow passes on the PR merge result.",
+    "Promotion/submit/bridge behavior remains legacy-only for now and will be migrated only after the independent selection core is proven."
+  ],
+  "nextStartPoint": "Run the R1 shadow self-test in CI. If PASS, freeze the selection core result, then migrate Status Source promotion/submit/bridge as separate R1 substeps without importing legacy runtime code.",
+  "reopenConditions": [
+    "data/status-sources declaration set changes",
+    "a declaration admission predicate or selected lineage changes",
+    "an explicitly referenced source file no longer satisfies admission",
+    "new source selection semantics are explicitly approved"
+  ]
+}
