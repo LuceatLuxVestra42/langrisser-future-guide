@@ -1,0 +1,39 @@
+name: Soldier Training Material Census
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - soldier-material-item-census
+    paths:
+      - 'scripts/generate-soldier-training-material-census.cjs'
+      - '.github/workflows/soldier-training-material-census.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate Soldier training material census
+        run: node scripts/generate-soldier-training-material-census.cjs
+
+      - name: Freeze census artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/soldier-training-material-census.v1.json data/validation/soldier-training-material-census.v1.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Freeze Soldier training material census"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
