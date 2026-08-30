@@ -35,6 +35,9 @@
     },
     "data/contracts/hero-exclusive-equipment-relation-scope-contract.v1.json": {
       "gitBlobSha": "84d99070ef272ad4a4d7bbf080b96f973cee18b0"
+    },
+    "data/generated/hero-exclusive-equipment-by-hero.v1.json": {
+      "gitBlobSha": "fcc9deb514755dc9df9de2e40e96685f68d08fba"
     }
   },
   "checks": {
@@ -100,8 +103,8 @@
       "pass": true
     },
     "stageBParallelBoundary": {
-      "state": "PENDING_B_STAGE_NON_BLOCKING",
-      "artifactPresent": false,
+      "state": "PARITY_MATCHED_VALIDATION_PENDING",
+      "artifactPresent": true,
       "validationPresent": false,
       "parityMismatchCount": 0,
       "passForStage61": true
@@ -117,7 +120,7 @@
     "generatedHeroCount": 267,
     "heroSoldierRelationCount": 5977,
     "sharedSoldierMetadataCount": 224,
-    "stageBState": "PENDING_B_STAGE_NON_BLOCKING",
+    "stageBState": "PARITY_MATCHED_VALIDATION_PENDING",
     "stageBParityMismatchCount": 0,
     "sourceLocatorMismatchCount": 0,
     "duplicatedUpstreamPayloadBlocks": false,
@@ -125,7 +128,7 @@
     "hardErrorCount": 0
   },
   "inheritedReviews": [
-    "Stage B shared Hero-exclusive Equipment byHero index is not present yet; Stage 6-1 references the frozen Stage 5-2 snapshot without re-deriving ownership.",
+    "Stage B byHero index is present and matches Stage 5-2, but the dedicated Stage B validation checkpoint is not present yet.",
     "41 Soldier Korean display names remain non-blocking presentation REVIEW from Stage 5-3.",
     "176 regular skins remain UNENCODED for acquisition because source GetPathType is omitted."
   ],
