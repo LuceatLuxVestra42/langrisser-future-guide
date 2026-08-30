@@ -1,0 +1,41 @@
+name: Soldier Training Material Repository Asset Parity
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - soldier-material-item-census
+    paths:
+      - 'scripts/validate-soldier-training-material-repo-assets.cjs'
+      - '.github/workflows/soldier-training-material-repo-assets.yml'
+      - 'data/generated/soldier-training-material-iteminfo.v1.json'
+      - 'public/**'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-freeze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate repository asset parity
+        run: node scripts/validate-soldier-training-material-repo-assets.cjs
+
+      - name: Freeze repository asset parity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/soldier-training-material-repo-assets.v1.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Freeze Soldier material repository asset parity"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
