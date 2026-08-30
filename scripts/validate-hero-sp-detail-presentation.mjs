@@ -57,9 +57,10 @@ const checks = [
   ["released-sp-shape", malformedReleased.length === 0],
   ["stage6-3-sp-parity", Number(stage63?.summary?.releasedSpCount) === 25 && Number(stage63?.summary?.notReleasedSpCount) === 242 && Number(stage63?.summary?.spRelationMismatchCount) === 0],
   ["stage6-4-contract-frozen", contract?.status === "FROZEN" && contract?.stage === "hero-page-6-4"],
-  ["stage6-sp-projection-present", lib.includes("type Stage6Sp =") && lib.includes("function projectSp(") && lib.includes("sp: projectSp(shard.sp)" )],
-  ["hero-sp-section-present", route.includes('data-hero-sp-detail="true"') && route.includes("function HeroSpSection(" )],
-  ["no-raw-configdata-runtime", !lib.includes("data/configdata/") && !route.includes("data/configdata/" )],
+  ["stage6-sp-projection-present", lib.includes("type Stage6Sp =") && lib.includes("function projectSp(") && lib.includes("const sp = projectSp(shard.sp);") && lib.includes("\n    sp,\n")],
+  ["hero-sp-section-present", route.includes('data-hero-sp-detail="true"') && route.includes("function HeroSpSection(")],
+  ["no-raw-configdata-runtime", !lib.includes("data/configdata/") && !route.includes("data/configdata/")],
+  ["class-fusion-mark-scope-untouched", !route.includes("Icon_Occupation_Monster") && !lib.includes("Icon_Occupation_Monster")],
 ];
 
 const failedChecks = checks.filter(([, pass]) => !pass).map(([name]) => name);
