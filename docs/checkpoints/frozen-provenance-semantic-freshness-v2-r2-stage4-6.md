@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: `R2-0_COMPLETE / R2-1_COMPLETE / IMPLEMENTATION_NOT_STARTED`
+Status: `R2-0_COMPLETE / R2-1_COMPLETE / R2-2_COMPLETE / IMPLEMENTATION_NOT_STARTED`
 
 ## R2-0 — authoritative baseline freeze
 
@@ -63,65 +63,156 @@ Current predecessor checks are split into two groups.
 
 These checks represent actual shared-layer readiness, membership parity, identity coverage, duplicate/missing-reference integrity, or frozen 3-12 regression parity. R2 must not weaken them.
 
-### B. Raw Git-blob equality checks that are the R2 freshness-migration candidates
+### B. Three raw Git-blob equality checks identified for ownership review
 
 - `relationBlobMismatchInValidation`
-  - current rule: `validation.relationSet.gitBlobSha === current relation blob`
+  - `validation.relationSet.gitBlobSha === current relation blob`
 - `relationBlobMismatchInIndex`
-  - current rule: `bySoldier.relationSet.gitBlobSha === current relation blob`
+  - `bySoldier.relationSet.gitBlobSha === current relation blob`
 - `bySoldierBlobMismatchInValidation`
-  - current rule: `validation.indexes.bySoldier.gitBlobSha === current bySoldier blob`
+  - `validation.indexes.bySoldier.gitBlobSha === current bySoldier blob`
 
-These three checks currently make exact byte identity a blocking admission condition at the Stage 4-6 consumer boundary.
+R2-1 initially treated these as freshness-migration candidates. R2-2 reclassified their ownership from current authoritative contracts and workflow behavior before any code change.
 
-R2 objective is limited to replacing this downstream freshness interpretation with explicit semantic classification while preserving the recorded `gitBlobSha` values as provenance/audit evidence.
+## R2-2 — Stage 4-6 consumer semantic projection and SHA-check disposition
 
-## R2 semantic-boundary constraint before implementation
+### 1. Consumer semantic payload
 
-R1's `hero-soldier-membership/v1` projection is reusable only if the Stage 4-6 consumer authority being migrated is actually membership-only.
+The A-7 index contract defines `bySoldierId` as:
 
-The richer A-8 relation validator remains authoritative for relation semantics beyond membership, including:
+- `soldierId -> heroIds[]`
+- generated only from canonical A-6 edges
+- not an independent semantic source
+- intended for the Soldier detail usable-Hero section and Soldier-oriented relation queries
+- intentionally excludes provenance/sourceKind and other richer edge evidence
 
-- edge provenance presence and allowed `sourceKind`
-- DIRECT source table/field correctness
-- SP inheritance parent/support relation correctness
+The Stage 4-6 validator likewise states that its production membership source is:
+
+`data/generated/hero-soldier-by-soldier.v1.json#bySoldierId`
+
+and its purpose is adoption of the validated shared relation layer as the sole Soldier -> Hero membership source.
+
+Therefore the Stage 4-6 page-consumer semantic payload is confirmed as exact `(heroId, soldierId)` membership.
+
+### 2. R1 projection reuse decision
+
+Decision: `hero-soldier-membership/v1` is semantically sufficient and reusable for any actual Stage 4-6 downstream freshness classification whose authority is only Soldier -> Hero membership.
+
+No richer Stage 4-6-specific projection is required for consumer membership freshness.
+
+The existing R1 helper already provides deterministic normalization for:
+
+- canonical relation edges -> membership pairs
+- bySoldierId -> membership pairs
+- duplicate/malformed membership fail-closed behavior
+- sorted `(heroId, soldierId)` membership digest
+
+This reuse does not transfer A-stage provenance authority into the page layer.
+
+### 3. Richer semantic predecessor remains A-8
+
+A-6 canonical edges carry both pair identity and provenance. A-8 owns the richer relation invariants, including:
+
+- canonical Hero/Soldier identity
+- duplicate-pair rejection
+- provenance existence
+- allowed sourceKind
+- DIRECT origin table/field correctness
+- SP inheritance parent/support correctness
 - source completeness
-- provenance merge/composition rules
+- composition/provenance merge rules
 - summary integrity
-- bidirectional index parity
-- traceability evidence
+- byHero/bySoldier parity
+- traceability
 
-Therefore R2 must not silently reinterpret the A-stage relation-validation contract as membership-only. The migration applies only to the Stage 4-6 downstream consumer's three byte-equality freshness checks after the predecessor A-8 validation remains PASS.
+A consumer-level membership digest cannot replace these checks.
 
-## Current R2-1 disposition
+### 4. Correction to R2-1: the three SHA checks are not ordinary frozen-freshness checks
 
-Provisional implementation direction:
+Current Stage 4-6 workflow order is:
 
-1. run/preserve the existing shared A-8 validation as the richer semantic predecessor;
-2. preserve all Stage 4-6 non-SHA checks above;
-3. classify relation/bySoldier snapshot drift semantically at the Stage 4-6 consumer boundary;
-4. retain raw `gitBlobSha` in output for provenance/history;
-5. keep semantic stale and semantic unknown fail-closed;
-6. allow provenance-only byte drift only when the consumer-relevant semantic projection remains equal and inherited predecessor semantic evidence remains healthy.
+1. run `scripts/finalize-hero-soldier-relation-layer.cjs`
+2. regenerate current A-6 relation set
+3. regenerate current A-7 byHero/bySoldier indexes
+4. run current A-8 richer validation and write its current relation/index SHA descriptors
+5. run `scripts/validate-soldier-stage4-6-relation-consumer.cjs`
 
-The exact R2 projection is intentionally not frozen in R2-1. It must be confirmed at R2-2 against the Stage 4-6 consumer contract before code changes. `hero-soldier-membership/v1` is the leading reuse candidate because Stage 4-6's stated production membership source is `bySoldierId`, but no richer relation semantic authority may be discarded to obtain that reuse.
+The three SHA comparisons therefore verify that the relation, bySoldier index and A-8 validation consumed in the same run belong to the exact same generated snapshot.
+
+They do not compare an old frozen Stage 4-6 snapshot against a newer semantically-equal relation snapshot.
+
+This distinction is authoritative because:
+
+- A-7 requires derived indexes generated together to reference the exact same relation-set blob SHA.
+- A-8 publication requires PASS for the exact relation-set blob being approved.
+- A-8 traceability explicitly forbids reusing a validation result for a different relation-set blob.
+- the current workflow regenerates A-6/A-7/A-8 immediately before Stage 4-6 validation.
+
+### 5. Final disposition of the three checks
+
+The following checks remain exact-SHA blocking traceability checks and MUST NOT be replaced by membership digest equality:
+
+- `relationBlobMismatchInValidation`
+- `relationBlobMismatchInIndex`
+- `bySoldierBlobMismatchInValidation`
+
+Reason:
+
+`same membership` does not prove that an old A-8 validation result validated the current provenance-bearing relation blob. Replacing these exact-SHA guards with membership equality would permit cross-snapshot reuse that the frozen A-7/A-8 contracts explicitly forbid.
+
+### 6. Semantic Freshness V2 applicability after R2-2
+
+`hero-soldier-membership/v1` remains approved for a separate downstream freshness boundary only if all of the following are true:
+
+1. the compared artifact is a frozen consumer/reference from an earlier snapshot, not a same-run A-7/A-8 traceability descriptor;
+2. the consumer authority is membership-only;
+3. the current A-8 richer semantic predecessor has independently PASSed for the current relation/index snapshot;
+4. malformed or missing evidence remains fail-closed;
+5. raw gitBlobSha remains preserved as provenance/audit evidence.
+
+No such separate Stage 4-6 downstream raw-SHA freshness comparison has been proven in R2-2.
+
+## R2-2 final judgment
+
+- Stage 4-6 consumer semantic projection: `hero-soldier-membership/v1` — CONFIRMED for membership-only freshness use.
+- New richer Stage 4-6 projection: NOT REQUIRED.
+- Existing three Stage 4-6 SHA checks: KEEP EXACT-SHA / TRACEABILITY AUTHORITY.
+- Replacing those three checks with semantic digest equality: REJECTED.
+- Code mutation in R2-2: NONE.
+- Canonical relation rebuild/research: NONE.
+
+This is an evidence-driven correction to the provisional R2-1 migration assumption, not a reopening of A-stage semantics.
+
+## Preserved invariants
+
+- Hero 267
+- Soldier 224
+- Hero-Soldier pair 5,977
+- bySoldier keys 224
+- bySoldier relations 5,977
+- pair mismatch 0
+- duplicate/missing identity errors 0
+- legacy regression mismatch 0
+- A-8 remains the richer semantic owner
+- A-7 indexes remain disposable membership projections
 
 ## REVIEW
 
-- Confirm at R2-2 whether the consumer-level projection can reuse `hero-soldier-membership/v1` unchanged or requires a narrowly richer Stage 4-6 projection.
-- Confirm workflow/exact-diff ownership before freezing any changed validation artifact.
+- R2-3 should locate whether any actual downstream frozen Stage 4-6 consumer/reference compares recorded Stage 4-6 `sharedArtifacts.*.gitBlobSha` to current artifacts outside the same-run A-7/A-8 traceability path.
+- If no such downstream raw-SHA freshness consumer exists, R2 should close as `NO_MIGRATION_REQUIRED` rather than weakening traceability or adding unused semantic machinery.
 
 ## BLOCKER
 
-None for R2-0/R2-1.
+None.
 
 ## Next start
 
-`R2-2 — confirm the Stage 4-6 consumer semantic projection, starting from the existing R1 membership helper and the frozen A-8 predecessor authority.`
+`R2-3 — locate a genuine downstream Stage 4-6 frozen-reference freshness boundary. Do not modify the three same-run A-7/A-8 exact-SHA traceability checks. If no genuine downstream raw-SHA freshness comparison exists, close R2 as NO_MIGRATION_REQUIRED.`
 
-## Reopen R2-0/R2-1 only if
+## Reopen R2-0/R2-1/R2-2 only if
 
-- current `main` moved before R2 implementation and materially changed the Stage 4-6 validator/contract;
-- the Stage 4-6 predecessor output no longer preserves 224 Soldier / 267 Hero / 5,977 pair parity;
-- A-8 relation-validation authority changed;
-- or a new authoritative contradiction shows that one of the three identified SHA checks owns richer semantic meaning than recorded here.
+- current `main` materially changes the Stage 4-6 validator/workflow;
+- A-7 index authority changes from disposable membership projection to richer semantic source;
+- A-8 publication/traceability contract changes;
+- Stage 4-6 begins consuming provenance/sourceKind semantics directly;
+- or authoritative evidence identifies one of the three exact-SHA checks as an old-vs-current frozen freshness comparison rather than same-run traceability.
