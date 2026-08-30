@@ -9,12 +9,23 @@ import zlib
 VERSION = '1.1.113'
 BASE = f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{VERSION}'
 UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36'
-MAX_PACKAGE_PART = 68
 OUT = pathlib.Path('skin-detail-spine-stage2-il2cpp-locator.json')
 TMP = pathlib.Path('/tmp/skin-stage2-il2cpp')
-TARGETS = {
-    'gameAssembly': lambda n: n.endswith('/gameassembly.dll') or n == 'gameassembly.dll',
-    'globalMetadata': lambda n: n.endswith('/global-metadata.dat') or n == 'global-metadata.dat',
+CHECKPOINT = {
+    'gameAssembly': {
+        'part': 1,
+        'entryName': 'Client/GameAssembly.dll',
+        'crc32': '4968A383',
+        'sha256': 'c7f803939dce955991a8e21611b79cbc4005d1152ee7934b903332150e1e8795',
+        'filename': 'GameAssembly.dll',
+    },
+    'globalMetadata': {
+        'part': 66,
+        'entryName': 'Client/Langrisser_Data/il2cpp_data/Metadata/global-metadata.dat',
+        'crc32': 'C19227F5',
+        'sha256': '589b1684b17525edbec53b85c7bf13a05a8da0e38d360a05bee2f2950b76f6a2',
+        'filename': 'global-metadata.dat',
+    },
 }
 
 
@@ -94,48 +105,46 @@ def fetch_entry(package, entry):
 
 
 def main():
-    found = {k: [] for k in TARGETS}
-    package_count = 0
-    for part in range(1, MAX_PACKAGE_PART + 1):
-        pkg = zip_directory(part)
-        package_count += 1
-        for e in pkg['entries']:
-            n = e['normName']
-            for key, pred in TARGETS.items():
-                if pred(n):
-                    found[key].append((pkg, e))
-    if len(found['gameAssembly']) != 1 or len(found['globalMetadata']) != 1:
-        raise RuntimeError({k: [(p['part'], e['name']) for p, e in v] for k, v in found.items()})
-
+    packages = {part: zip_directory(part) for part in sorted({v['part'] for v in CHECKPOINT.values()})}
     TMP.mkdir(parents=True, exist_ok=True)
     rows = {}
-    for key, pairs in found.items():
-        pkg, e = pairs[0]
+    for key, cp in CHECKPOINT.items():
+        pkg = packages[cp['part']]
+        exact = [e for e in pkg['entries'] if e['name'] == cp['entryName']]
+        if len(exact) != 1:
+            raise RuntimeError(f'{key}: checkpoint entry missing or ambiguous')
+        e = exact[0]
+        if e['crc32'] != cp['crc32']:
+            raise RuntimeError(f'{key}: central-directory CRC changed {e["crc32"]} != {cp["crc32"]}')
         raw = fetch_entry(pkg, e)
-        filename = 'GameAssembly.dll' if key == 'gameAssembly' else 'global-metadata.dat'
-        path = TMP / filename
+        sha = hashlib.sha256(raw).hexdigest()
+        if sha != cp['sha256']:
+            raise RuntimeError(f'{key}: SHA changed {sha} != {cp["sha256"]}')
+        path = TMP / cp['filename']
         path.write_bytes(raw)
         rows[key] = {
-            'part': pkg['part'],
+            'part': cp['part'],
             'packageName': pkg['packageName'],
             'entryName': e['name'],
             'uncompressedSize': e['uncompressedSize'],
             'actualSizeBytes': len(raw),
             'crc32': e['crc32'],
-            'sha256': hashlib.sha256(raw).hexdigest(),
+            'sha256': sha,
             'temporaryPath': str(path),
         }
 
     result = {
-        'schemaVersion': 1,
+        'schemaVersion': 2,
         'stage': 'skin-detail-spine-stage2',
         'substage': 'authoritative-il2cpp-runtime-inputs',
         'status': 'PASS',
         'installVersion': VERSION,
-        'packageCountScanned': package_count,
+        'checkpointReused': True,
+        'packageCountScanned': len(packages),
         'inputs': rows,
         'guardrails': {
             'fullConfigDataRead': False,
+            'all68PackageRescan': False,
             'gameBinaryCommitted': False,
             'gameBinaryUploaded': False,
             'frontendMutation': False,
