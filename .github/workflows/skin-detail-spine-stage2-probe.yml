@@ -25,6 +25,19 @@ jobs:
           python-version: '3.12'
       - name: Install Python diagnostic dependencies
         run: python -m pip install UnityPy==1.25.3 Pillow numpy
+      - name: Force exact serialized TextAsset byte-array extraction
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('scripts/probe-skin-detail-spine-stage2.py')
+          s=p.read_text('utf-8')
+          old='''def text_asset_bytes(obj):\n    parsed = obj.read()\n    for attr in ("m_Script", "script"):\n        value = getattr(parsed, attr, None)\n        if isinstance(value, bytes):\n            return value\n        if isinstance(value, bytearray):\n            return bytes(value)\n        if isinstance(value, str):\n            return value.encode("utf-8", "replace")\n    raw = obj.get_raw_data()\n    return bytes(raw)\n'''
+          new='''def text_asset_bytes(obj):\n    # TextAsset.m_Script is an arbitrary byte array for .skel assets. Never\n    # round-trip it through str/UTF-8. Read the serialized byte array directly.\n    raw = bytes(obj.get_raw_data())\n    for endian in ("<", ">"):\n        try:\n            off = 0\n            name_len = struct.unpack_from(endian + "I", raw, off)[0]\n            off += 4\n            if name_len > len(raw) - off:\n                continue\n            name_bytes = raw[off:off + name_len]\n            off += name_len\n            off = (off + 3) & ~3\n            if off + 4 > len(raw):\n                continue\n            script_len = struct.unpack_from(endian + "I", raw, off)[0]\n            off += 4\n            if script_len > len(raw) - off:\n                continue\n            script = raw[off:off + script_len]\n            parsed_name = name_bytes.decode("utf-8", "replace")\n            expected_name = object_name(obj)\n            if expected_name is not None and parsed_name != expected_name:\n                continue\n            return script\n        except Exception:\n            continue\n    parsed = obj.read()\n    for attr in ("m_Script", "script"):\n        value = getattr(parsed, attr, None)\n        if isinstance(value, bytes):\n            return value\n        if isinstance(value, bytearray):\n            return bytes(value)\n    raise RuntimeError("unable to recover exact TextAsset byte array without text transcoding")\n'''
+          if old not in s:
+              raise SystemExit('text_asset_bytes fragment not found')
+          p.write_text(s.replace(old,new,1),'utf-8')
+          PY
       - name: Probe representative CHAR_SPINE dependencies
         run: python scripts/probe-skin-detail-spine-stage2.py
       - name: Resolve atlas page textures
@@ -39,19 +52,6 @@ jobs:
           git -C /tmp/spine-runtimes fetch -q --depth=1 origin 1c1936532527900f74cfb58f7002998bf157b254
           git -C /tmp/spine-runtimes checkout -q FETCH_HEAD
           test "$(git -C /tmp/spine-runtimes rev-parse HEAD)" = "1c1936532527900f74cfb58f7002998bf157b254"
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('/tmp/spine-runtimes/spine-csharp/src/SkeletonBinary.cs')
-          s=p.read_text('utf-8')
-          old='AttachmentType type = (AttachmentType)input.ReadByte();'
-          new='int rawAttachmentType = input.ReadByte();\n\t\t\tAttachmentType type = (AttachmentType)rawAttachmentType;'
-          if old not in s: raise SystemExit('attachment type read fragment missing')
-          s=s.replace(old,new,1)
-          old='\t\t\treturn null;\n\t\t}\n\n\t\tprivate Vertices ReadVertices'
-          new='\t\t\tthrow new Exception("Unsupported attachment type raw=" + rawAttachmentType + " slotIndex=" + slotIndex + " attachmentName=" + attachmentName + " name=" + name + " streamPosition=" + input.Position);\n\t\t}\n\n\t\tprivate Vertices ReadVertices'
-          if old not in s: raise SystemExit('attachment default return fragment missing')
-          p.write_text(s.replace(old,new,1),'utf-8')
-          PY
           mkdir -p /tmp/spine33probe
           cat > /tmp/spine33probe/Spine33Probe.csproj <<EOF
           <Project Sdk="Microsoft.NET.Sdk">
@@ -108,7 +108,7 @@ jobs:
                       'skeletonVersion':g['skeletonVersion'],
                       'animationName':g['animationName'],
                   })
-          out={'schemaVersion':1,'stage':'skin-detail-spine-stage2','substage':'representative-render','runtimeSourceCommit':'1c1936532527900f74cfb58f7002998bf157b254','records':rows}
+          out={'schemaVersion':2,'stage':'skin-detail-spine-stage2','substage':'representative-render','runtimeSourceCommit':'1c1936532527900f74cfb58f7002998bf157b254','textAssetExtraction':'SERIALIZED_RAW_BYTE_ARRAY','records':rows}
           pathlib.Path('skin-detail-spine-stage2-render-summary.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n','utf-8')
           print(json.dumps(out,ensure_ascii=False))
           PY
