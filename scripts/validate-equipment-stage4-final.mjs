@@ -75,9 +75,12 @@ assert(stage47.statePolicy.restoreAndSanitizeMarkersPresent === true, "State res
 
 assert(stage43.naming.reviewPromoted === false, "General REVIEW names were promoted without verification.");
 assert(stage44.naming.reviewPromoted === false, "Exclusive REVIEW names were promoted without verification.");
-assert(stage45.sourceDiscipline.generalGeneratedOrderPreserved === true, "General generated order is not preserved.");
-assert(stage45.sourceDiscipline.exclusiveGeneratedOrderPreserved === true, "Exclusive generated order is not preserved.");
-assert(stage45.sourceDiscipline.frontendSortAdded === false, "Frontend sort was added.");
+assert(stage45.sourceDiscipline.generalGeneratedOrderPreserved === true, "General default mode no longer preserves generated order.");
+assert(stage45.sourceDiscipline.exclusiveGeneratedOrderPreserved === true, "Exclusive default mode no longer preserves generated order.");
+assert(stage45.sourceDiscipline.frontendSortAdded === true, "Approved presentation sorting is missing.");
+assert(stage45.sourceDiscipline.presentationSortOnly === true, "Frontend sorting must remain presentation-only.");
+assert(stage45.sourceDiscipline.releaseOrderSortingAdded === false, "Frontend sorting must not claim or derive release chronology.");
+assert(stage45.sourceDiscipline.loaderRecordsMutated === false, "Presentation sorting must not mutate frozen loader records.");
 assert(stage43.route.generalDetailCount === hard.generalPopulation, "General detail integrity coverage is incomplete.");
 assert(stage44.population.exclusiveDetail === hard.exclusivePopulation, "Exclusive detail integrity coverage is incomplete.");
 
