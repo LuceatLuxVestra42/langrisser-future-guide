@@ -6,7 +6,7 @@ on:
       - fix/equipment-active-source-correction
     paths:
       - 'data/validation/equipment-public-presentation-correction-final.v1.json'
-      - 'data/checkpoints/equipment-public-presentation-correction-projection.v1.json'
+      - 'data/contracts/project-doctor-equipment-public-presentation-correction-projection.v1.json'
       - 'data/status-sources/**'
       - 'data/generated/project-doctor-active-source-registry.v1.json'
       - 'data/generated/project-doctor-d1-1-status.v1.json'
@@ -20,7 +20,7 @@ on:
   pull_request:
     paths:
       - 'data/validation/equipment-public-presentation-correction-final.v1.json'
-      - 'data/checkpoints/equipment-public-presentation-correction-projection.v1.json'
+      - 'data/contracts/project-doctor-equipment-public-presentation-correction-projection.v1.json'
       - 'data/status-sources/**'
       - 'data/generated/project-doctor-active-source-registry.v1.json'
       - 'data/generated/project-doctor-d1-1-status.v1.json'
@@ -74,7 +74,7 @@ jobs:
           --domain equipment
           --id equipment-public-presentation-correction-final
           --source data/validation/equipment-public-presentation-correction-final.v1.json
-          --projection-file data/checkpoints/equipment-public-presentation-correction-projection.v1.json
+          --projection-file data/contracts/project-doctor-equipment-public-presentation-correction-projection.v1.json
           --note "2026-08-30 Equipment public-admission and explicit display-collection correction; canonical 390 and exclusive 167 remain frozen."
           --check
 
@@ -85,7 +85,7 @@ jobs:
           --domain equipment
           --id equipment-public-presentation-correction-final
           --source data/validation/equipment-public-presentation-correction-final.v1.json
-          --projection-file data/checkpoints/equipment-public-presentation-correction-projection.v1.json
+          --projection-file data/contracts/project-doctor-equipment-public-presentation-correction-projection.v1.json
           --note "2026-08-30 Equipment public-admission and explicit display-collection correction; canonical 390 and exclusive 167 remain frozen."
 
       - name: Refresh Project Doctor freshness seal
