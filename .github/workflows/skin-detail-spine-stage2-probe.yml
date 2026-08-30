@@ -1,0 +1,36 @@
+name: Skin Detail Spine Stage 2 Probe
+
+on:
+  push:
+    branches:
+      - research/skin-detail-spine-stage2-20260830
+    paths:
+      - scripts/probe-skin-detail-spine-stage2.py
+      - .github/workflows/skin-detail-spine-stage2-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install UnityPy
+        shell: pwsh
+        run: python -m pip install UnityPy==1.25.3
+      - name: Probe representative CHAR_SPINE dependencies
+        shell: pwsh
+        run: python scripts/probe-skin-detail-spine-stage2.py
+      - name: Upload Stage 2 diagnostic evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-detail-spine-stage2-probe
+          path: |
+            skin-detail-spine-stage2-probe.json
+            skin-detail-spine-stage2-artifacts/**
+          if-no-files-found: error
