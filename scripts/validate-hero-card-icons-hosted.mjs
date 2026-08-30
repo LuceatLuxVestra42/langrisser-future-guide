@@ -23,11 +23,17 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
   if (attempt < 30) await sleep(5000);
 }
 check(deployment, `authoritative deployment manifest did not reach source=${expectedSourceSha}`);
-check(deployment.semanticStageReopened === false, "deployment manifest reopened semantic stage");
+check(deployment.semanticStageReopened === false, "deployment manifest reopened Hero foundation semantic stage");
+check(deployment.fusionSemanticExpanded === true, "deployment manifest did not record fusion semantic expansion");
 check(deployment.heroCardIconResolvedCount === 267, `deployment Hero card icon count mismatch: ${deployment.heroCardIconResolvedCount}`);
-check(deployment.heroFusionPowerResolvedCount === 35, `deployment Hero fusion-power count mismatch: ${deployment.heroFusionPowerResolvedCount}`);
+check(deployment.heroFusionPowerResolvedCount === 43, `deployment Hero fusion-power count mismatch: ${deployment.heroFusionPowerResolvedCount}`);
+check(deployment.heroFusionFactionTargetHeroCount === 41, `deployment faction fusion count mismatch: ${deployment.heroFusionFactionTargetHeroCount}`);
+check(deployment.heroFusionClassTargetHeroCount === 2, `deployment class fusion count mismatch: ${deployment.heroFusionClassTargetHeroCount}`);
 check(deployment.heroFusionFactionAssetCount === 12, `deployment faction-mark asset count mismatch: ${deployment.heroFusionFactionAssetCount}`);
-check(deployment.heroFusionPowerFreezeState === "HERO_FUSION_POWER_PRESENTATION_FROZEN", "deployment fusion-power freeze mismatch");
+check(deployment.heroFusionClassAssetCount === 3, `deployment class-mark asset count mismatch: ${deployment.heroFusionClassAssetCount}`);
+check(deployment.heroFusionPowerFreezeState === "HERO_FUSION_POWER_EXPANDED_FROZEN", "deployment expanded fusion-power freeze mismatch");
+check(deployment.heroFusionPowerBaselineFreezeState === "HERO_FUSION_POWER_PRESENTATION_FROZEN", "deployment baseline fusion freeze mismatch");
+check(deployment.heroFusionPowerExceptionFreezeState === "HERO_FUSION_POWER_EXCEPTION_EXPANSION_FROZEN", "deployment exception fusion freeze mismatch");
 check(deployment.heroFusionFactionAssetFreezeState === "HERO_FUSION_FACTION_ASSETS_FROZEN", "deployment faction-asset freeze mismatch");
 
 async function waitForImage(image, message) {
@@ -38,7 +44,7 @@ async function waitForImage(image, message) {
   })).catch((error) => { throw new Error(`${message}: ${error}`); });
 }
 
-async function verifyList(page, label) {
+async function verifyList(page, label, expectedMarkSize) {
   const navigation = await page.goto(url(`heroes/?qa=${Date.now()}`), { waitUntil: "networkidle", timeout: 45000 });
   check(navigation && navigation.status() < 400, `Hero list ${label} failed: ${navigation?.status()}`);
   await page.locator('[data-hero-card-icons="true"]').waitFor({ state: "visible", timeout: 20000 });
@@ -56,19 +62,58 @@ async function verifyList(page, label) {
   check(sources.every((src) => !src.includes("/images/heroes/cards/")), `Hero list ${label} still consumes detail artwork`);
 
   const fusionMarks = page.locator('[data-hero-fusion-power-mark="true"]');
-  check(await fusionMarks.count() === 35, `Hero list ${label} fusion mark count mismatch: ${await fusionMarks.count()}`);
+  check(await fusionMarks.count() === 43, `Hero list ${label} fusion mark count mismatch: ${await fusionMarks.count()}`);
   const markState = await fusionMarks.evaluateAll((nodes) => nodes.map((node) => ({
     heroId: Number(node.getAttribute("data-hero-id")),
-    factionId: Number(node.getAttribute("data-target-faction-id")),
-    src: node.querySelector("img")?.getAttribute("src") || "",
+    targetType: node.getAttribute("data-target-type") || "",
+    factionId: node.hasAttribute("data-target-faction-id") ? Number(node.getAttribute("data-target-faction-id")) : null,
+    classIds: node.getAttribute("data-target-class-ids") || "",
+    markKind: node.getAttribute("data-mark-kind") || "",
+    srcs: Array.from(node.querySelectorAll("img")).map((image) => image.getAttribute("src") || ""),
     text: node.textContent?.trim() || "",
+    width: Math.round(node.getBoundingClientRect().width),
+    height: Math.round(node.getBoundingClientRect().height),
+    rightInset: Math.round(node.parentElement.getBoundingClientRect().right - node.getBoundingClientRect().right),
+    topInset: Math.round(node.getBoundingClientRect().top - node.parentElement.getBoundingClientRect().top),
   })));
   check(markState.every((row) => Number.isInteger(row.heroId) && row.heroId > 0), `Hero list ${label} has invalid fusion Hero ID`);
-  check(markState.every((row) => Number.isInteger(row.factionId) && row.factionId >= 1 && row.factionId <= 12), `Hero list ${label} has invalid target faction ID`);
-  check(new Set(markState.map((row) => row.heroId)).size === 35, `Hero list ${label} fusion Hero IDs are not unique`);
-  check(new Set(markState.map((row) => row.factionId)).size === 12, `Hero list ${label} must cover 12 faction marks`);
-  check(markState.every((row) => row.src.includes(`/images/factions/${row.factionId}.png`)), `Hero list ${label} faction mark source mismatch`);
+  check(new Set(markState.map((row) => row.heroId)).size === 43, `Hero list ${label} fusion Hero IDs are not unique`);
+  check(markState.every((row) => row.targetType === "FACTION" || row.targetType === "CLASS"), `Hero list ${label} has invalid fusion target type`);
   check(markState.every((row) => row.text === ""), `Hero list ${label} fusion mark contains visible text`);
+  check(markState.every((row) => row.width === expectedMarkSize && row.height === expectedMarkSize), `Hero list ${label} fusion mark responsive size mismatch`);
+  check(markState.every((row) => row.rightInset === 6 && row.topInset === 6), `Hero list ${label} fusion mark inset must remain 6px`);
+
+  const factionMarks = markState.filter((row) => row.targetType === "FACTION");
+  const classMarks = markState.filter((row) => row.targetType === "CLASS");
+  check(factionMarks.length === 41, `Hero list ${label} faction fusion mark count mismatch: ${factionMarks.length}`);
+  check(classMarks.length === 2, `Hero list ${label} class fusion mark count mismatch: ${classMarks.length}`);
+  check(factionMarks.every((row) => Number.isInteger(row.factionId) && row.factionId >= 1 && row.factionId <= 12), `Hero list ${label} has invalid target faction ID`);
+  check(new Set(factionMarks.map((row) => row.factionId)).size === 12, `Hero list ${label} must cover 12 faction marks`);
+  check(factionMarks.every((row) => row.srcs.length === 1 && row.srcs[0].includes(`/images/factions/${row.factionId}.png`)), `Hero list ${label} faction mark source mismatch`);
+
+  const expectedFactionExceptions = new Map([
+    [124, 6],
+    [99197, 10],
+    [99192, 7],
+    [99218, 11],
+    [99237, 9],
+    [99287, 12],
+  ]);
+  for (const [heroId, factionId] of expectedFactionExceptions) {
+    const row = factionMarks.find((candidate) => candidate.heroId === heroId);
+    check(row?.factionId === factionId, `Hero ${heroId} ${label} expanded faction target mismatch`);
+  }
+
+  const heavenDefier = classMarks.find((row) => row.heroId === 99264);
+  check(heavenDefier?.classIds === "9", `HeavenDefier ${label} class target must be Monster(9)`);
+  check(heavenDefier?.markKind === "SINGLE" && heavenDefier.srcs.length === 1, `HeavenDefier ${label} class mark must be single`);
+  check(heavenDefier?.srcs[0]?.includes("/images/army/Icon_Occupation_Monster.png"), `HeavenDefier ${label} must use official Monster class icon`);
+
+  const lightbringer = classMarks.find((row) => row.heroId === 99184);
+  check(lightbringer?.classIds === "2,8", `Lightbringer ${label} class targets must be Infantry(2)+Holy(8)`);
+  check(lightbringer?.markKind === "COMPOSITE" && lightbringer.srcs.length === 2, `Lightbringer ${label} class mark must be a two-icon composite`);
+  check(lightbringer?.srcs[0]?.includes("/images/army/Icon_Occupation_Infantryman.png"), `Lightbringer ${label} composite first half must use official Infantry icon`);
+  check(lightbringer?.srcs[1]?.includes("/images/army/Icon_Occupation_Monk.png"), `Lightbringer ${label} composite second half must use official Monk icon`);
 
   const hero6Mark = page.locator('[data-hero-fusion-power-mark="true"][data-hero-id="6"]');
   check(await hero6Mark.count() === 1, `Hero list ${label} Hero 6 fusion mark missing/duplicated`);
@@ -81,6 +126,10 @@ async function verifyList(page, label) {
   check(await hero12Mark.count() === 1, `Hero list ${label} Hero 12 fusion mark missing/duplicated`);
   check(await hero12Mark.getAttribute("data-target-faction-id") === "2", `Hero 12 ${label} must target Light faction 2`);
   check((await hero12Mark.locator("img").getAttribute("src"))?.includes("/images/factions/2.png"), `Hero 12 ${label} faction mark path mismatch`);
+
+  for (const mark of [page.locator('[data-hero-fusion-power-mark="true"][data-hero-id="99264"] img'), page.locator('[data-hero-fusion-power-mark="true"][data-hero-id="99184"] img').first(), page.locator('[data-hero-fusion-power-mark="true"][data-hero-id="99184"] img').nth(1)]) {
+    await waitForImage(mark, `Hero list ${label} expanded class mark failed`);
+  }
 
   check(await cards.getByText("SP", { exact: true }).count() === 0, `Hero list ${label} still renders SP text on cards`);
   check(await cards.getByText("초절", { exact: true }).count() === 0, `Hero list ${label} still renders 초절 text on cards`);
@@ -104,7 +153,17 @@ async function verifyList(page, label) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   check(overflow <= 1, `Hero list ${label} horizontal overflow=${overflow}`);
 
-  return { iconCount: sources.length, fusionMarkCount: markState.length, uniqueFactionMarks: new Set(markState.map((row) => row.factionId)).size, hero6State, overflow };
+  return {
+    iconCount: sources.length,
+    fusionMarkCount: markState.length,
+    factionFusionMarkCount: factionMarks.length,
+    classFusionMarkCount: classMarks.length,
+    uniqueFactionMarks: new Set(factionMarks.map((row) => row.factionId)).size,
+    markSize: expectedMarkSize,
+    markInset: 6,
+    hero6State,
+    overflow,
+  };
 }
 
 async function verifyDetailArtwork(page) {
@@ -125,7 +184,7 @@ try {
   const desktopConsoleErrors = [];
   desktopPage.on("pageerror", (error) => desktopPageErrors.push(String(error)));
   desktopPage.on("console", (message) => { if (message.type() === "error") desktopConsoleErrors.push(message.text()); });
-  const desktop = await verifyList(desktopPage, "desktop");
+  const desktop = await verifyList(desktopPage, "desktop", 32);
   const detailArtworkSrc = await verifyDetailArtwork(desktopPage);
   check(desktopPageErrors.length === 0, `desktop page errors: ${JSON.stringify(desktopPageErrors)}`);
   check(desktopConsoleErrors.length === 0, `desktop console errors: ${JSON.stringify(desktopConsoleErrors)}`);
@@ -137,7 +196,7 @@ try {
   const mobileConsoleErrors = [];
   mobilePage.on("pageerror", (error) => mobilePageErrors.push(String(error)));
   mobilePage.on("console", (message) => { if (message.type() === "error") mobileConsoleErrors.push(message.text()); });
-  const mobile = await verifyList(mobilePage, "mobile");
+  const mobile = await verifyList(mobilePage, "mobile", 28);
   check(mobilePageErrors.length === 0, `mobile page errors: ${JSON.stringify(mobilePageErrors)}`);
   check(mobileConsoleErrors.length === 0, `mobile console errors: ${JSON.stringify(mobileConsoleErrors)}`);
   await mobileContext.close();
@@ -150,18 +209,26 @@ try {
   check(representativeFactionResponse.ok, `Hosted faction 4 mark HTTP failed: ${representativeFactionResponse.status}`);
   check((representativeFactionResponse.headers.get("content-type") || "").includes("image/png"), "Hosted faction mark content type is not PNG");
 
+  const representativeClassResponse = await fetch(url(`images/army/Icon_Occupation_Monster.png?qa=${Date.now()}`), { cache: "no-store" });
+  check(representativeClassResponse.ok, `Hosted Monster class mark HTTP failed: ${representativeClassResponse.status}`);
+  check((representativeClassResponse.headers.get("content-type") || "").includes("image/png"), "Hosted Monster class mark content type is not PNG");
+
   console.log(JSON.stringify({
-    status: "PASS_HERO_CARD_AND_FUSION_MARKS_HOSTED_BROWSER_QA",
+    status: "PASS_HERO_CARD_AND_EXPANDED_FUSION_MARKS_HOSTED_BROWSER_QA",
     sourceSha: expectedSourceSha,
     heroCardIconCount: 267,
-    fusionPowerHeroCount: 35,
+    fusionPowerHeroCount: 43,
+    factionFusionHeroCount: 41,
+    classFusionHeroCount: 2,
     factionAssetCount: 12,
-    spCardTextBadgeRemoved: true,
-    fusionTextBadgeRemoved: true,
-    rarityCardTextRemoved: true,
+    classAssetCount: 3,
+    fusionMarkMobileSizePx: 28,
+    fusionMarkDesktopSizePx: 32,
+    fusionMarkInsetPx: 6,
     remoteRuntimeHotlink: false,
     listDetailArtworkSeparated: true,
-    semanticStageReopened: false,
+    heroFoundationSemanticStageReopened: false,
+    fusionSemanticExpanded: true,
     desktop,
     mobile,
     detailArtworkSrc,
