@@ -1,0 +1,59 @@
+name: Soldier Training Material Assets
+
+on:
+  push:
+    branches:
+      - soldier-training-material-assets
+    paths:
+      - data/source/soldier-training-material-drive-evidence.v1.json
+      - scripts/ingest-soldier-training-material-assets.mjs
+      - .github/workflows/soldier-training-material-assets.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  asset-intake:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Download, validate, and admit source PNGs
+        run: node scripts/ingest-soldier-training-material-assets.mjs --download --publish
+
+      - name: Confirm admitted coverage
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const v = JSON.parse(fs.readFileSync('data/validation/soldier-training-material-asset-intake.v1.json', 'utf8'));
+          if (v.status !== 'PASS_SOLDIER_TRAINING_MATERIAL_ASSET_INTAKE') throw new Error(`unexpected status: ${v.status}`);
+          if (v.scope.exactResolvedCount !== 24) throw new Error(`resolved=${v.scope.exactResolvedCount}`);
+          if (v.scope.failureCount !== 0) throw new Error(`failures=${v.scope.failureCount}`);
+          console.log(JSON.stringify({status:v.status,resolved:v.scope.exactResolvedCount,uniqueSha256:v.scope.uniqueSha256Count}));
+          NODE
+
+      - name: Commit frozen asset evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            public/images/soldier-training-materials-source \
+            data/generated/soldier-training-material-asset-inventory.v1.json \
+            data/generated/soldier-training-material-asset-intake.v1.json \
+            data/validation/soldier-training-material-asset-intake.v1.json \
+            docs/checkpoints/soldier-training-material-asset-intake.md
+          if git diff --cached --quiet; then
+            echo "No asset-intake changes to commit"
+          else
+            git commit -m "Freeze Soldier training material source assets"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
