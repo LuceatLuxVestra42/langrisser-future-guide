@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "project-doctor-route-hosted-qa-mainline-package-lock.v1",
+  "status": "PASS_STEP3_PACKAGE_LOCK_INTEGRATION",
+  "completion": "COMPLETE",
+  "recordedAt": "2026-08-30",
+  "owningLayer": "runner/tooling-mainline-integration",
+  "authoritativeMainAtCloseout": {
+    "sha": "db6deca6a9b3796f3ed5edf436d207cc38e0f5ec",
+    "integrationMergeCommit": "15141768543e55a868d03a8b32fe75e1882f12f9",
+    "mainAdvanceImpact": "Soldier Stage 6 producer workflow maintenance only; no package, lock, QA source, frontend, canonical relation, or semantic contract changes"
+  },
+  "packageIntegration": {
+    "commit": "3d4b30eb19103827a468b96d7cdc0b3582ac45ee",
+    "blobSha": "6e85431c1b4c7d167f99e2112eb69514b49749fb",
+    "changes": {
+      "scripts": {
+        "qa:browser": "playwright test -c playwright.route-hosted.config.ts",
+        "qa:browser:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage2.mjs --check"
+      },
+      "devDependencies": {
+        "@playwright/test": "1.62.1"
+      }
+    },
+    "preserved": [
+      "Project Doctor closeout v5 wiring",
+      "Project Doctor D2/D3/D4 v5 wiring",
+      "Project Doctor PR Guard v7 wiring",
+      "current localization and asset scripts",
+      "current frontend package dependency graph"
+    ]
+  },
+  "lockRefresh": {
+    "method": "GitHub Actions setup-bun latest -> bun install --lockfile-only -> bun install --frozen-lockfile",
+    "workflowRunId": 33290549870,
+    "jobId": 99201302561,
+    "conclusion": "success",
+    "generatedCommit": "86eda3990eccd098fc754b2cabcadd94df09fad6",
+    "bunLockBlobSha": "15a56d1ae7ce84fd889ef9e355ffc802bb742deb",
+    "diff": {
+      "additions": 11,
+      "deletions": 36,
+      "filesChanged": 1
+    },
+    "verified": [
+      "bun install --lockfile-only succeeded",
+      "bun install --frozen-lockfile succeeded",
+      "bunx playwright --version returned Version 1.62.1",
+      "package qa:browser command matched frozen QA-2 contract",
+      "package qa:browser:validate command matched frozen QA-2 contract"
+    ],
+    "preExistingDriftResolved": [
+      "removed stale vite-tsconfig-paths root lock entry not present in current package.json",
+      "removed stale nitro root lock entry not present in current package.json",
+      "updated eslint-plugin-prettier root lock requirement from ^5.2.6 to current package.json ^5.5.0",
+      "pruned transitive lock entries no longer reachable from the current package graph"
+    ],
+    "playwrightAdded": true
+  },
+  "temporaryTooling": {
+    "workflow": ".github/workflows/route-hosted-qa-step3-lock-refresh.yml",
+    "createdCommit": "c80744be5431a0e67a57bbab0197cf06ebb9b0ea",
+    "removedCommit": "c0cff53af0b9c33d83a0423e15b4c7d22dfe6891",
+    "presentAtCloseout": false
+  },
+  "boundaries": {
+    "semanticReopen": false,
+    "frontendChanged": false,
+    "canonicalRelationChanged": false,
+    "rawConfigDataRuntimeRead": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "historicalQaPackageCopiedWholesale": false,
+    "historicalQaLockCopiedWholesale": false
+  },
+  "completedScope": [
+    "refreshed integration branch to current main before package work",
+    "surgically added QA browser scripts and Playwright pin",
+    "regenerated bun.lock with Bun on GitHub Actions from the current package graph",
+    "verified frozen install succeeds",
+    "verified Playwright 1.62.1 runtime pin",
+    "removed temporary lock refresh workflow",
+    "reconciled a later-discovered main advance affecting only Soldier Stage 6 producer workflows"
+  ],
+  "reviews": [
+    {
+      "id": "PRE_EXISTING_BUN_LOCK_DRIFT",
+      "blocking": false,
+      "owner": "package/lock maintenance",
+      "detail": "The pre-Step3 bun.lock root still contained stale package entries. Bun regeneration removed them while adding Playwright. Frozen install PASS proves the resulting lock matches the current package graph."
+    }
+  ],
+  "blockers": [],
+  "nextStartPoint": "STEP4_MAINLINE_INTEGRATED_WORKFLOW_REWRITE",
+  "reopenConditions": [
+    "main advances before Step 4 workflow authoring and changes package, Pages deployment composition, Route/Hosted QA tooling, or frontend navigation contracts",
+    "package.json or bun.lock changes after this checkpoint",
+    "a new authoritative Route/Hosted QA contract supersedes the QA-4 reference tree"
+  ]
+}
