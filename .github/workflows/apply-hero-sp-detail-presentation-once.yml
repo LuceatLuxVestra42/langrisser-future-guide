@@ -49,6 +49,11 @@ jobs:
       - name: Production build
         run: bun run build
 
+      - name: Restore unrelated deterministic build outputs
+        run: |
+          git checkout -- data/generated/equipment-name-kr-user-approved.v1.json
+          git checkout -- data/validation/equipment-name-kr-user-approved-summary.v1.json
+
       - name: Enforce changed-file boundary
         run: |
           allowed='^(src/lib/hero-detail-stage5\.server\.ts|src/routes/heroes_\.\$heroId\.tsx|scripts/apply-hero-sp-detail-presentation-once\.mjs|\.github/workflows/apply-hero-sp-detail-presentation-once\.yml|data/validation/hero-sp-detail-presentation\.v1\.json|data/checkpoints/hero-sp-detail-presentation\.v1\.json)$'
@@ -58,7 +63,7 @@ jobs:
             printf '%s\n' "$bad" >&2
             exit 1
           fi
-          if git diff -- src/lib/hero-detail-stage5.server.ts src/routes/heroes_.'$heroId'.tsx | grep -E 'hero-fusion|fusion-power|Icon_Occupation|data-target-class|targetType.*CLASS' >/dev/null; then
+          if git diff --unified=0 -- src/lib/hero-detail-stage5.server.ts src/routes/heroes_.'$heroId'.tsx | grep -E '^[+-].*(hero-fusion|fusion-power|Icon_Occupation|data-target-class|targetType.*CLASS)' >/dev/null; then
             echo 'Class fusion-power mark scope was touched unexpectedly.' >&2
             exit 1
           fi
