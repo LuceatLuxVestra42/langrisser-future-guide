@@ -1,0 +1,32 @@
+name: Diagnose Project Doctor D2 Hero Stage 6 Checkpoint
+
+on:
+  push:
+    branches:
+      - diag/project-doctor-hero-stage6-checkpoint-routing
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Analyze exact Hero Stage 6 checkpoint path
+        run: |
+          node scripts/analyze-project-doctor-d2-impact.mjs \
+            --contract data/contracts/project-doctor-d2-impact-contract.v5.json \
+            --json data/checkpoints/hero-stage6-3-full-generation.json
+      - name: Run D2 V5 self-test and print summary
+        shell: bash
+        run: |
+          set +e
+          node scripts/validate-project-doctor-d2-impact-v5.mjs
+          code=$?
+          set -e
+          cat data/validation/project-doctor-d2-impact-summary.v5.json
+          exit "$code"
