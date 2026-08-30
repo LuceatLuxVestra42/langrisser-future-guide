@@ -30,6 +30,7 @@ jobs:
           echo 'GameAssembly SHA256 c7f803939dce955991a8e21611b79cbc4005d1152ee7934b903332150e1e8795' >> "$out"
           echo 'Image base 0x180000000' >> "$out"
           for spec in \
+            'ReadSkeletonData 0x1849E3D90 0x1849E5820' \
             'ReadSkin 0x1849E5820 0x1849E59A0' \
             'ReadAttachment 0x1849E59A0 0x1849E6400' \
             'ReadVertices 0x1849E6400 0x1849E67F0' \
