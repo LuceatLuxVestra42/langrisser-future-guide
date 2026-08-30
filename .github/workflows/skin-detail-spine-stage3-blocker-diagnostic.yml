@@ -1,0 +1,80 @@
+name: Skin Detail Spine Stage 3 Blocker Diagnostic
+
+on:
+  push:
+    branches:
+      - research/skin-detail-spine-stage2-20260830
+    paths:
+      - scripts/diagnose-skin-detail-spine-stage3-blockers.py
+      - scripts/run-skin-detail-spine-stage3-bulk.py
+      - scripts/run-skin-detail-spine-stage3-bulk-v2.py
+      - scripts/spine-stage2-geometry-export.cs
+      - scripts/probe-skin-detail-spine-stage2.py
+      - scripts/run-skin-detail-spine-stage2-contract-probe.py
+      - data/generated/skin-stage3-1-asset-inventory.v1.json
+      - .github/workflows/skin-detail-spine-stage3-blocker-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+      - name: Install pinned diagnostic dependencies
+        run: python -m pip install UnityPy==1.25.3 Pillow==12.3.0 numpy==2.5.2
+      - name: Build frozen Spine 3.3 geometry exporter
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/spine-runtimes /tmp/spine33diag
+          git init -q /tmp/spine-runtimes
+          git -C /tmp/spine-runtimes remote add origin https://github.com/EsotericSoftware/spine-runtimes.git
+          git -C /tmp/spine-runtimes fetch -q --depth=1 origin 1c1936532527900f74cfb58f7002998bf157b254
+          git -C /tmp/spine-runtimes checkout -q FETCH_HEAD
+          test "$(git -C /tmp/spine-runtimes rev-parse HEAD)" = "1c1936532527900f74cfb58f7002998bf157b254"
+          mkdir -p /tmp/spine33diag
+          cat > /tmp/spine33diag/Spine33Diag.csproj <<EOF
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net8.0</TargetFramework>
+              <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+              <ImplicitUsings>disable</ImplicitUsings>
+              <Nullable>disable</Nullable>
+            </PropertyGroup>
+            <ItemGroup>
+              <Compile Include="${GITHUB_WORKSPACE}/scripts/spine-stage2-geometry-export.cs" />
+              <Compile Include="/tmp/spine-runtimes/spine-csharp/src/**/*.cs" />
+            </ItemGroup>
+          </Project>
+          EOF
+          dotnet build /tmp/spine33diag/Spine33Diag.csproj -c Release
+      - name: Diagnose only nine blocked Skin IDs
+        run: >-
+          python scripts/diagnose-skin-detail-spine-stage3-blockers.py
+          --geometry-project /tmp/spine33diag/Spine33Diag.csproj
+          --work-dir /tmp/skin-spine-blocker-diagnostic
+      - name: Print diagnostic summary
+        if: always()
+        run: |
+          if test -f skin-detail-spine-stage3-blocker-diagnostic.json; then
+            python - <<'PY'
+          import json
+          x=json.load(open('skin-detail-spine-stage3-blocker-diagnostic.json',encoding='utf-8'))
+          for r in x['records']:
+              print(json.dumps({'skinId':r['skinId'],'bundles':[(b.get('bundle'),b.get('bulkExtractorStatus'),b.get('bulkExtractorDetail'),(b.get('geometryProbe') or {}).get('returnCode')) for b in r.get('bundleDiagnostics',[])]},ensure_ascii=False))
+          PY
+          fi
+      - name: Upload blocker diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-detail-spine-stage3-blocker-diagnostic
+          path: skin-detail-spine-stage3-blocker-diagnostic.json
+          if-no-files-found: warn
