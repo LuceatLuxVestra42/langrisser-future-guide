@@ -44,7 +44,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Validate D7 guard contract
-        run: npm run doctor:pr-guard:validate
+        run: node scripts/validate-project-doctor-d7-v9.mjs
 
       - name: Validate committed freshness seal
         run: npm run doctor:freshness:validate
@@ -89,7 +89,7 @@ jobs:
           fi
 
       - name: Integrated Doctor real-diff dry run
-        run: npm run doctor -- --dry-run --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
+        run: node scripts/run-project-doctor-closeout-v7.mjs --dry-run --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
 
       - name: Integrated Doctor real-diff execution
-        run: npm run doctor -- --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"
+        run: node scripts/run-project-doctor-closeout-v7.mjs --base "$DOCTOR_BASE" --head "$DOCTOR_HEAD"

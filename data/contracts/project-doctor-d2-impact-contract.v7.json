@@ -1,0 +1,99 @@
+{
+  "version": 7,
+  "schemaId": "project-doctor-d2-impact-contract/v7",
+  "stage": "D2-IMPACT",
+  "checkpoint": "PROJECT_DOCTOR_D2_IMPACT_CONTRACT_V7_SOLDIER_TRAINING_MATERIAL_ASSET_OWNER",
+  "status": "DESIGN_FROZEN",
+  "extends": "data/contracts/project-doctor-d2-impact-contract.v6.json",
+  "baseMap": "data/contracts/project-doctor-d2-dependency-map.v1.json",
+  "purpose": "Preserve D2 V6 and route the completed Soldier training-material asset pipeline to the existing soldier-assets presentation owner instead of the broad Soldier semantic-data rule. This is an asset/presentation admission only and does not reopen Soldier canonical semantics.",
+  "scope": {
+    "soldierTrainingMaterialAssetOwnerAdmission": true,
+    "semanticRecomputation": false,
+    "rawConfigDataRead": false,
+    "newImpactNodes": false,
+    "newPropagationEdges": false,
+    "v6MappingsPreserved": true
+  },
+  "baseRuleExcludeOverlays": [
+    {
+      "ruleId": "soldier-data-family",
+      "excludePatterns": [
+        "data/contracts/soldier-training-material-*",
+        "data/generated/soldier-training-material-*",
+        "data/validation/soldier-training-material-*",
+        "scripts/*soldier-training-material*",
+        ".github/workflows/soldier-training-material-*"
+      ],
+      "reason": "The frozen Soldier training-material A0-A7 chain is a downstream asset/presentation pipeline. Do not fan its changes back into soldier-canonical semantics."
+    }
+  ],
+  "pathRuleOverlays": [
+    {
+      "id": "soldier-training-material-assets-final-owner",
+      "patterns": [
+        ".github/workflows/soldier-training-material-assets-*.yml",
+        "data/contracts/soldier-training-material-*",
+        "data/evidence/soldier-training-material-*",
+        "data/generated/soldier-training-material-*",
+        "data/manifests/soldier-training-material-*",
+        "data/validation/soldier-training-material-*",
+        "docs/checkpoints/soldier-training-material-assets-*",
+        "public/images/soldier-training-materials/**",
+        "public/images/soldier-training-materials-webp/**",
+        "scripts/*soldier-training-material*",
+        "src/lib/soldier-training-material-assets.ts"
+      ],
+      "excludePatterns": [],
+      "directNodes": ["soldier-assets"],
+      "changeClass": "soldier-training-material-assets",
+      "reason": "Frozen A0-A7 Soldier training-material source evidence, repository assets, WebP delivery, domain helper, workflow, validators, manifests, and checkpoints belong to the Soldier asset/presentation owner."
+    }
+  ],
+  "overlayPolicy": {
+    "preservePredecessorEffectiveMap": true,
+    "mayAddPathRulesOnly": true,
+    "mayAddScopedBaseRuleExclusions": true,
+    "baseRuleExclusionsMayOnlyPreventKnownBroadRuleMatches": true,
+    "mayAddImpactNodes": false,
+    "mayAddPropagationEdges": false,
+    "mayRewriteBaseRulePatterns": false
+  },
+  "fixtures": [
+    {
+      "id": "SOLDIER_TRAINING_MATERIAL_WEBP",
+      "paths": ["public/images/soldier-training-materials-webp/6003.webp"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["soldier-assets"]
+    },
+    {
+      "id": "SOLDIER_TRAINING_MATERIAL_EVIDENCE",
+      "paths": ["data/evidence/soldier-training-material-assets-a4-bulk.v1.json"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["soldier-assets"]
+    },
+    {
+      "id": "SOLDIER_TRAINING_MATERIAL_CHECKPOINT",
+      "paths": ["docs/checkpoints/soldier-training-material-assets-a7.md"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["soldier-assets"]
+    },
+    {
+      "id": "SOLDIER_TRAINING_MATERIAL_FROZEN_INPUT",
+      "paths": ["data/generated/soldier-training-material-iteminfo.v1.json"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["soldier-assets"]
+    },
+    {
+      "id": "SOLDIER_TRAINING_MATERIAL_WORKFLOW",
+      "paths": [".github/workflows/soldier-training-material-assets-a7.yml"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["soldier-assets"]
+    }
+  ],
+  "historicalBoundary": {
+    "d2V6": "data/contracts/project-doctor-d2-impact-contract.v6.json",
+    "previousContractsRemainUnmodified": true
+  },
+  "nextStage": "D3-V7"
+}

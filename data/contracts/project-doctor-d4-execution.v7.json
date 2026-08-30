@@ -1,0 +1,23 @@
+{
+  "version": 7,
+  "schemaId": "project-doctor-d4-execution/v7",
+  "stage": "D4",
+  "checkpoint": "PROJECT_DOCTOR_D4_EXECUTION_V7_SOLDIER_TRAINING_MATERIAL_ASSET_OWNER",
+  "status": "DESIGN_FROZEN",
+  "extends": "data/contracts/project-doctor-d4-execution.v6.json",
+  "d3Contract": "data/contracts/project-doctor-d3-validator-plan.v7.json",
+  "purpose": "Preserve D4 V6 execution semantics and consume the routing-only D3 V7 plan. No new executable check is admitted; the existing soldier-assets owner checks remain authoritative in Project Doctor.",
+  "addedAllowedCheckIds": [],
+  "executionPolicyV7": {
+    "preflightEntireQueueBeforeExecution": true,
+    "failFastOnFirstNonZero": true,
+    "manualReviewSurvivesSuccessfulChecks": true,
+    "manualReviewExitCode": 3,
+    "unknownOrTamperedCheckExecutesNothing": true
+  },
+  "historicalBoundary": {
+    "d4V6": "data/contracts/project-doctor-d4-execution.v6.json",
+    "previousContractsRemainUnmodified": true
+  },
+  "nextStage": "D7-V9"
+}

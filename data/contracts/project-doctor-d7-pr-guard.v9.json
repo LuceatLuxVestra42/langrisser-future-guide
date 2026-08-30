@@ -1,0 +1,57 @@
+{
+  "version": 9,
+  "schemaId": "project-doctor-d7-pr-guard/v9",
+  "stage": "D7",
+  "checkpoint": "PROJECT_DOCTOR_D7_PR_MERGE_GUARD_V9_SOLDIER_TRAINING_MATERIAL_ASSET_OWNER",
+  "status": "DESIGN_FROZEN",
+  "supersedes": "data/contracts/project-doctor-d7-pr-guard.v8.json",
+  "purpose": "Preserve the read-only required PR Guard and manual-review non-passing policy while moving the PR admission runtime to D2/D3/D4 V7 for the admitted Soldier training-material asset owner.",
+  "workflow": ".github/workflows/project-doctor-d7-pr-guard.yml",
+  "targetBaseBranch": "main",
+  "checkIdentity": {
+    "workflowName": "Project Doctor PR Guard",
+    "jobName": "pr-guard",
+    "requiredStatusCheckContext": "pr-guard",
+    "githubActionsAppId": 15368
+  },
+  "permissions": {"contents": "read"},
+  "requiredCheckExitPolicy": {
+    "passingExitCodes": [0],
+    "manualReviewExitCode": 3,
+    "manualReviewIsPassing": false,
+    "propagateDoctorExitCodeDirectly": true
+  },
+  "doctorRuntime": {
+    "d2Contract": "data/contracts/project-doctor-d2-impact-contract.v7.json",
+    "d3Contract": "data/contracts/project-doctor-d3-validator-plan.v7.json",
+    "d4Contract": "data/contracts/project-doctor-d4-execution.v7.json",
+    "closeoutRunner": "scripts/run-project-doctor-closeout-v7.mjs",
+    "d4Runner": "scripts/run-project-doctor-d4-v7.mjs"
+  },
+  "soldierTrainingMaterialAdmission": {
+    "owningNode": "soldier-assets",
+    "changeClass": "soldier-training-material-assets",
+    "existingOwnerChecksReused": ["coverage-soldier-assets", "production-build"],
+    "domainPipelineValidatorsRemainOwnedByA0A7Workflow": true,
+    "semanticFanoutSuppressed": true,
+    "rawConfigDataRead": false,
+    "nameJoin": false,
+    "idArithmetic": false
+  },
+  "securityPolicy": {
+    "repositoryWritePermission": false,
+    "freshnessRefreshInWorkflow": false,
+    "pullRequestTarget": false,
+    "secretsRequired": false
+  },
+  "mergePolicy": {
+    "validatorFailureIsNonPassing": true,
+    "staleFreshnessIsNonPassing": true,
+    "manualReviewIsNonPassing": true
+  },
+  "historicalBoundary": {
+    "d7V8": "data/contracts/project-doctor-d7-pr-guard.v8.json",
+    "previousContractsRemainUnmodified": true
+  },
+  "completionRule": "Required pr-guard passes only with exit 0. Soldier training-material asset paths are mapped to the existing soldier-assets presentation owner without reopening Soldier canonical semantics; manual review exit 3 remains non-passing."
+}
