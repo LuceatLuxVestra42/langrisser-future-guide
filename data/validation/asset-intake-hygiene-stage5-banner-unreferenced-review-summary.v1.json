@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage5-banner-unreferenced-review-summary/v1",
+  "stage": "ASSET_HYGIENE_5_2",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "freezeState": "ASSET_HYGIENE_STAGE5_BANNER_UNREFERENCED_REVIEW_FROZEN",
+  "targetAssetCount": 431,
+  "reviewedAssetCount": 431,
+  "targetPhysicalFamilyCounts": {
+    "Banner": 205,
+    "Picture_Notice": 226
+  },
+  "currentReferenceCount": 0,
+  "currentBannerResolvedRelationCount": 0,
+  "bannerCurrentBoundary": {
+    "physicalAssetCount": 501,
+    "currentResolvedUniquePathCount": 70,
+    "currentResolvedPhysicalFamilyCounts": {
+      "Banner": 32,
+      "Picture_Notice": 38
+    },
+    "resolvedPlusUnreferencedCount": 501,
+    "partitionParity": true
+  },
+  "pathHistoryCoverageCount": 431,
+  "introductionEvidenceCoverageCount": 431,
+  "multipleHistoryCommitAssetCount": 8,
+  "introductionBatchCount": 1,
+  "introductionBatches": [
+    {
+      "commit": "e8d63e15179636461c795f94336a231020de3893",
+      "message": "add banner assets",
+      "assetCount": 431
+    }
+  ],
+  "decisionCounts": {
+    "RETAIN_PENDING_ROLE_OR_OWNER_EQUIVALENCE_EVIDENCE": 2,
+    "RETAIN_REVIEW_ONLY_UNREFERENCED": 429
+  },
+  "deleteEligibleCount": 0,
+  "deleteApprovedCount": 0,
+  "reviews": [
+    {
+      "code": "BANNER_UNREFERENCED_RETAINS_REVIEW_ONLY",
+      "count": 431,
+      "blocking": false
+    }
+  ],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "forbiddenOperationCounts": {
+    "assetDelete": 0,
+    "assetMove": 0,
+    "assetRename": 0,
+    "formatConversion": 0,
+    "frontendMutation": 0,
+    "consumerRewrite": 0,
+    "resolverRewrite": 0,
+    "semanticRelationRecomputation": 0,
+    "canonicalRelationRecomputation": 0,
+    "filenameRoleInference": 0,
+    "filenameCanonicalIdentityInference": 0,
+    "importBatchRoleInference": 0,
+    "importBatchOwnerInference": 0,
+    "byteEqualitySemanticIdentityInference": 0,
+    "unreferencedToUnusedInference": 0,
+    "referenceAbsenceDeleteSafetyInference": 0,
+    "pathPatternSupersessionInference": 0
+  },
+  "nextStartPoint": "ASSET_HYGIENE_5_3_NON_BANNER_UNREFERENCED_REVIEW"
+}
