@@ -24,13 +24,16 @@ export const Route = createFileRoute("/heroes")({
       throw new Error("Hero card icon frozen index is not production-ready.");
     }
     if (
-      fusionPowers.summary.total !== 35 ||
+      fusionPowers.summary.total !== 43 ||
+      fusionPowers.summary.factionTargets !== 41 ||
+      fusionPowers.summary.classTargets !== 2 ||
       fusionPowers.summary.factionAssets !== 12 ||
+      fusionPowers.summary.classAssets !== 3 ||
       fusionPowers.summary.pending !== 0 ||
       fusionPowers.summary.hardErrors !== 0 ||
-      fusionPowers.records.length !== 35
+      fusionPowers.records.length !== 43
     ) {
-      throw new Error("Hero fusion-power faction-mark index is not production-ready.");
+      throw new Error("Hero expanded fusion-power mark index is not production-ready.");
     }
     return { ...data, cardIcons, fusionPowers };
   },
@@ -282,12 +285,15 @@ function HeroGridCard({
   fusionPower:
     | {
         heroId: number;
-        targetFactionId: number;
-        factionNameCn: string | null;
-        factionNameKr: string | null;
-        webAssetPath: string;
-        width: number;
-        height: number;
+        targetType: "FACTION" | "CLASS";
+        targetIds: number[];
+        targetLabel: string;
+        markKind: "SINGLE" | "COMPOSITE";
+        markAssets: Array<{
+          webAssetPath: string;
+          width?: number;
+          height?: number;
+        }>;
         assetStatus: string;
       }
     | undefined;
@@ -296,10 +302,12 @@ function HeroGridCard({
   const imageUrl = cardIcon?.assetStatus === "RESOLVED"
     ? resolvePublicAssetUrl(cardIcon.webAssetPath)
     : null;
-  const factionMarkUrl = fusionPower?.assetStatus === "RESOLVED"
-    ? resolvePublicAssetUrl(fusionPower.webAssetPath)
-    : null;
-  const factionName = fusionPower?.factionNameKr ?? fusionPower?.factionNameCn ?? "초절강화 진영";
+  const markAssets = fusionPower?.assetStatus === "RESOLVED"
+    ? fusionPower.markAssets.map((asset) => ({ ...asset, url: resolvePublicAssetUrl(asset.webAssetPath) }))
+    : [];
+  const fusionLabel = fusionPower?.targetType === "CLASS"
+    ? `직업 초절강화: ${fusionPower.targetLabel}`
+    : `초절강화 진영: ${fusionPower?.targetLabel ?? "진영"}`;
 
   return (
     <Link
@@ -338,23 +346,49 @@ function HeroGridCard({
             </div>
           )}
 
-          {factionMarkUrl ? (
+          {fusionPower && markAssets.length > 0 ? (
             <span
               data-hero-fusion-power-mark="true"
               data-hero-id={hero.heroId}
-              data-target-faction-id={fusionPower?.targetFactionId}
-              className="absolute right-1.5 top-1.5 block h-[36px] w-[36px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] sm:h-[42px] sm:w-[42px]"
-              title={`초절강화: ${factionName}`}
-              aria-label={`초절강화 진영: ${factionName}`}
+              data-target-type={fusionPower.targetType}
+              data-target-faction-id={fusionPower.targetType === "FACTION" ? fusionPower.targetIds[0] : undefined}
+              data-target-class-ids={fusionPower.targetType === "CLASS" ? fusionPower.targetIds.join(",") : undefined}
+              data-mark-kind={fusionPower.markKind}
+              className="absolute right-1.5 top-1.5 block h-[28px] w-[28px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] sm:h-[32px] sm:w-[32px]"
+              title={fusionLabel}
+              aria-label={fusionLabel}
             >
-              <img
-                src={factionMarkUrl}
-                alt=""
-                width={fusionPower?.width}
-                height={fusionPower?.height}
-                className="h-full w-full object-contain"
-                loading="lazy"
-              />
+              {fusionPower.markKind === "COMPOSITE" && markAssets.length === 2 ? (
+                <span className="relative block h-full w-full overflow-hidden rounded-full">
+                  <img
+                    src={markAssets[0].url}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-contain"
+                    style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
+                    loading="lazy"
+                  />
+                  <img
+                    src={markAssets[1].url}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-contain"
+                    style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }}
+                    loading="lazy"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute left-1/2 top-1/2 h-[135%] w-px -translate-x-1/2 -translate-y-1/2 rotate-45 bg-white/90 shadow-[0_0_1px_rgba(0,0,0,0.8)]"
+                  />
+                </span>
+              ) : (
+                <img
+                  src={markAssets[0].url}
+                  alt=""
+                  width={markAssets[0].width}
+                  height={markAssets[0].height}
+                  className="h-full w-full object-contain"
+                  loading="lazy"
+                />
+              )}
             </span>
           ) : null}
         </div>

@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "stage": "hero-fusion-power-exceptions",
+  "schemaId": "hero-fusion-power-exceptions/v1",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "HERO_FUSION_POWER_EXCEPTION_EXPANSION_FROZEN",
+  "predecessorFreezeState": "HERO_FUSION_POWER_PRESENTATION_FROZEN",
+  "policy": {
+    "definition": "A Hero is a fusion-power provider when the Hero can independently cause a full-group fusion-power effect for a faction or class target, regardless of whether the trigger is a normal fusion skill, awakening skill, passive, talent, first-action end, kill, death, summon, prophecy, or another Hero-owned combat mechanic.",
+    "baselinePreserved": true,
+    "triggerAgnostic": true,
+    "allowedTargetTypes": ["FACTION", "CLASS"],
+    "groupWideEffectRequired": true,
+    "manualVerifiedExceptionOnly": true,
+    "heroNameJoin": false,
+    "idArithmetic": false,
+    "productionRawConfigFallback": false
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "baselineHeroCount": 35,
+    "exceptionHeroCount": 8,
+    "expandedHeroCount": 43,
+    "factionTargetExceptionCount": 6,
+    "classTargetExceptionCount": 2,
+    "expandedFactionTargetHeroCount": 41,
+    "expandedClassTargetHeroCount": 2,
+    "pendingCount": 0,
+    "hardErrorCount": 0
+  },
+  "records": [
+    {
+      "heroId": 124,
+      "heroNameKr": "크리스티아네",
+      "heroNameCn": "克里斯蒂安妮",
+      "targetType": "FACTION",
+      "targetIds": [6],
+      "targetNamesCn": ["公主联盟"],
+      "targetLabelsKr": ["공주 연맹"],
+      "triggerKinds": ["AWAKENING_SKILL_USE"],
+      "sourceMechanicCn": "绽放的英华",
+      "evidenceStatus": "VERIFIED"
+    },
+    {
+      "heroId": 99197,
+      "heroNameKr": "각성자",
+      "heroNameCn": "醒觉者",
+      "targetType": "FACTION",
+      "targetIds": [10],
+      "targetNamesCn": ["时空枢纽"],
+      "targetLabelsKr": ["시공의 중심"],
+      "triggerKinds": ["FIRST_ACTION_END", "SKILL_USE"],
+      "sourceMechanicCn": "时空陨劫",
+      "evidenceStatus": "VERIFIED"
+    },
+    {
+      "heroId": 99192,
+      "heroNameKr": "그렌실",
+      "heroNameCn": "格伦希尔",
+      "targetType": "FACTION",
+      "targetIds": [7],
+      "targetNamesCn": ["战略大师"],
+      "targetLabelsKr": ["전략의 대가"],
+      "triggerKinds": ["FIRST_ACTION_END", "TARGET_FACTION_ALLY_KILL"],
+      "sourceMechanicCn": "永冬征伐",
+      "evidenceStatus": "VERIFIED"
+    },
+    {
+      "heroId": 99218,
+      "heroNameKr": "이졸데",
+      "heroNameCn": "伊索尔德",
+      "targetType": "FACTION",
+      "targetIds": [11],
+      "targetNamesCn": ["超凡领域"],
+      "targetLabelsKr": ["초월 영역"],
+      "triggerKinds": ["TALENT_WILL_GAIN", "TALENT_EXTRA_ACTION"],
+      "sourceMechanicCn": "佑世的锐意",
+      "evidenceStatus": "VERIFIED"
+    },
+    {
+      "heroId": 99237,
+      "heroNameKr": "엔야",
+      "heroNameCn": "恩雅",
+      "targetType": "FACTION",
+      "targetIds": [9],
+      "targetNamesCn": ["传说彼端"],
+      "targetLabelsKr": ["전설의 저편"],
+      "triggerKinds": ["PROPHECY_FULFILLED"],
+      "sourceMechanicCn": "旷古的传说",
+      "evidenceStatus": "VERIFIED"
+    },
+    {
+      "heroId": 99287,
+      "heroNameKr": "마검의 화신",
+      "heroNameCn": "魔骸剑使",
+      "targetType": "FACTION",
+      "targetIds": [12],
+      "targetNamesCn": ["梦幻转生"],
+      "targetLabelsKr": ["몽환의 전생"],
+      "triggerKinds": ["FIRST_ACTION_END", "SKILL_USE"],
+      "sourceMechanicCn": "寂灭之斩魂",
+      "evidenceStatus": "VERIFIED"
+    },
+    {
+      "heroId": 99264,
+      "heroNameKr": "빛과 어둠의 반역자",
+      "heroNameCn": "辉黯逆命者",
+      "targetType": "CLASS",
+      "targetIds": [9],
+      "targetNamesCn": ["魔物"],
+      "targetLabelsKr": ["마족"],
+      "triggerKinds": ["FIRST_ACTION_END", "ANY_UNIT_DEATH"],
+      "sourceMechanicCn": "魔渊的呼唤",
+      "evidenceStatus": "VERIFIED"
+    },
+    {
+      "heroId": 99184,
+      "heroNameKr": "빛의 수호사도",
+      "heroNameCn": "光佑使徒",
+      "targetType": "CLASS",
+      "targetIds": [2, 8],
+      "targetNamesCn": ["步兵", "僧侣"],
+      "targetLabelsKr": ["보병", "승병"],
+      "triggerKinds": ["SKILL_USE", "CENTRAL_DISCIPLINE_TARGET_EXPANSION"],
+      "sourceMechanicCn": "虔信者之辉",
+      "evidenceStatus": "VERIFIED"
+    }
+  ]
+}

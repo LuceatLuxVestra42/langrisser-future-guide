@@ -1,0 +1,66 @@
+{
+  "version": 5,
+  "schemaId": "project-doctor-d3-validator-plan/v5",
+  "stage": "D3",
+  "checkpoint": "PROJECT_DOCTOR_D3_VALIDATOR_PLAN_V5_ASSET_INTAKE_INTEGRATION",
+  "status": "DESIGN_FROZEN",
+  "supersedes": "data/contracts/project-doctor-d3-validator-plan.v4.json",
+  "impactContract": "data/contracts/project-doctor-d2-impact-contract.v5.json",
+  "purpose": "Preserve all V4 admitted domain owners and add one deterministic Asset Intake shared-tooling validation check. Banner and Skin asset scopes remain fail-closed manual review.",
+  "scope": {"gitChangedFileCollection":true,"explicitPathInput":true,"stdinPathInput":true,"impactResolution":true,"checkSelection":true,"validatorExecution":false,"rawConfigDataRead":false,"semanticRecomputation":false,"assetIntakeToolingAdmission":true,"skinAssetOwnerPromotion":false},
+  "sourceModes": {"compare":"git diff base...head","staged":"git diff --cached","working":"working tree","stdin":"paths","paths":"explicit paths"},
+  "statusPolicy": {"PLAN_READY":"All changed paths are mapped and impacted owner nodes are admitted.","MANUAL_REVIEW":"At least one path is unmapped or an impacted node remains manual.","NO_CHANGES":"No changes.","INVALID_INPUT":"Invalid input."},
+  "exitPolicy": {"PLAN_READY":0,"NO_CHANGES":0,"MANUAL_REVIEW":3,"INVALID_INPUT":2},
+  "checkCatalog": [
+    {"id":"configdata-integrity","type":"validator","phase":1,"command":"npm run check:configdata","triggerChangeClasses":["raw-configdata"],"triggerNodes":[],"coverage":"Parsed ConfigData integrity."},
+    {"id":"coverage-hero-canonical","type":"validator","phase":2,"command":"npm run validate:coverage:hero-canonical","triggerChangeClasses":[],"triggerNodes":["hero-canonical"],"coverage":"Hero canonical owner."},
+    {"id":"coverage-soldier-canonical","type":"validator","phase":2,"command":"npm run validate:coverage:soldier-canonical","triggerChangeClasses":[],"triggerNodes":["soldier-canonical"],"coverage":"Soldier canonical owner."},
+    {"id":"coverage-equipment-canonical","type":"validator","phase":2,"command":"npm run validate:coverage:equipment-canonical","triggerChangeClasses":[],"triggerNodes":["equipment-canonical"],"coverage":"Equipment canonical owner."},
+    {"id":"coverage-hero-soldier-relation","type":"validator","phase":2,"command":"npm run validate:coverage:hero-soldier-relation","triggerChangeClasses":[],"triggerNodes":["hero-soldier-relation"],"coverage":"Hero-Soldier owner."},
+    {"id":"coverage-hero-equipment-relation","type":"validator","phase":2,"command":"npm run validate:coverage:hero-equipment-relation","triggerChangeClasses":[],"triggerNodes":["hero-equipment-relation"],"coverage":"Hero-Equipment owner."},
+    {"id":"coverage-banner-data","type":"validator","phase":2,"command":"npm run validate:coverage:banner-data","triggerChangeClasses":[],"triggerNodes":["banner-data"],"coverage":"Banner data owner."},
+    {"id":"coverage-skin-relation","type":"validator","phase":2,"command":"npm run validate:coverage:skin-relation","triggerChangeClasses":[],"triggerNodes":["skin-relation"],"coverage":"Skin relation owner."},
+    {"id":"coverage-shared-movement","type":"validator","phase":2,"command":"npm run validate:coverage:shared-movement","triggerChangeClasses":[],"triggerNodes":["shared-movement"],"coverage":"Shared movement owner."},
+    {"id":"coverage-soldier-assets","type":"validator","phase":2,"command":"npm run validate:coverage:soldier-assets","triggerChangeClasses":[],"triggerNodes":["soldier-assets"],"coverage":"Soldier portrait owner."},
+    {"id":"asset-intake-self-test","type":"validator","phase":3,"command":"npm run asset:intake:validate","triggerChangeClasses":["asset-intake-tooling"],"triggerNodes":[],"coverage":"Asset Intake contract, shared engine, Skin adapter, repository CLI, fail-closed RESOURCE_ID behavior, and representative repository execution."},
+    {"id":"equipment-image-final","type":"validator","phase":3,"command":"npm run validate:equipment-image-final","triggerChangeClasses":[],"triggerNodes":["equipment-assets"],"coverage":"Equipment image final owner."},
+    {"id":"hero-artwork-final","type":"validator","phase":3,"command":"npm run validate:hero-artwork-final","triggerChangeClasses":[],"triggerNodes":["hero-assets"],"coverage":"H-A5/H-A6 exact official-client artwork hashes plus frozen Hosted/Browser QA evidence for all 267 Hero assets."},
+    {"id":"regression-coverage-promotion-v2","type":"validator","phase":3,"command":"npm run validate:regression-coverage-promotion:v2","triggerChangeClasses":["regression-coverage-promotion-v2"],"triggerNodes":[],"coverage":"Promotion V2 meta audit."},
+    {"id":"localization-audit","type":"validator","phase":4,"command":"npm run audit:localization:check","triggerChangeClasses":["localization-tooling","presentation","frontend","frontend-consumer-data","semantic-data","raw-configdata"],"triggerNodes":[],"coverage":"Localization gate."},
+    {"id":"production-build","type":"build","phase":5,"command":"npm run build","triggerChangeClasses":[],"triggerNodes":["hero-frontend","soldier-frontend","equipment-frontend","banner-frontend","hero-assets","soldier-assets","equipment-assets","banner-assets","shared-movement","shared-frontend","shared-build"],"coverage":"Production build; not provenance proof."},
+    {"id":"doctor-health-gate","type":"doctor","phase":6,"command":"npm run doctor:validate","triggerChangeClasses":[],"triggerNodes":["project-doctor"],"coverage":"Doctor health."},
+    {"id":"doctor-impact-self-test","type":"doctor","phase":6,"command":"npm run doctor:impact:validate","triggerChangeClasses":[],"triggerNodes":["project-doctor"],"coverage":"D2 V5 self-test."},
+    {"id":"doctor-plan-self-test","type":"doctor","phase":6,"command":"npm run doctor:plan:validate","triggerChangeClasses":[],"triggerNodes":["project-doctor"],"coverage":"D3 V5 self-test."}
+  ],
+  "manualReviewNodes": {
+    "banner-assets":"Banner assets remain manual.",
+    "skin-assets":"Skin assets remain manual until final owner admission."
+  },
+  "admittedOwners": [
+    {"node":"hero-canonical","checkId":"coverage-hero-canonical","packageCommand":"validate:coverage:hero-canonical"},
+    {"node":"soldier-canonical","checkId":"coverage-soldier-canonical","packageCommand":"validate:coverage:soldier-canonical"},
+    {"node":"equipment-canonical","checkId":"coverage-equipment-canonical","packageCommand":"validate:coverage:equipment-canonical"},
+    {"node":"hero-soldier-relation","checkId":"coverage-hero-soldier-relation","packageCommand":"validate:coverage:hero-soldier-relation"},
+    {"node":"hero-equipment-relation","checkId":"coverage-hero-equipment-relation","packageCommand":"validate:coverage:hero-equipment-relation"},
+    {"node":"banner-data","checkId":"coverage-banner-data","packageCommand":"validate:coverage:banner-data"},
+    {"node":"skin-relation","checkId":"coverage-skin-relation","packageCommand":"validate:coverage:skin-relation"},
+    {"node":"shared-movement","checkId":"coverage-shared-movement","packageCommand":"validate:coverage:shared-movement"},
+    {"node":"soldier-assets","checkId":"coverage-soldier-assets","packageCommand":"validate:coverage:soldier-assets"},
+    {"node":"equipment-assets","checkId":"equipment-image-final","packageCommand":"validate:equipment-image-final"},
+    {"node":"hero-assets","checkId":"hero-artwork-final","packageCommand":"validate:hero-artwork-final"}
+  ],
+  "toolingAdmissions": [
+    {"node":"project-doctor","changeClass":"asset-intake-tooling","checkId":"asset-intake-self-test","packageCommand":"asset:intake:validate","domainOwnerPromotion":false}
+  ],
+  "selectionPolicy": {"unionAllMatchingChecks":true,"deduplicateByCheckId":true,"sortByPhaseThenId":true,"planOnly":true,"validatorExecutionCount":0,"manualReviewDoesNotFanOut":true,"localizationAuditDoesNotClearManualReview":true,"assetIntakeToolingDoesNotPromoteSkinAssets":true},
+  "fixtures": [
+    {"id":"ASSET_INTAKE_CORE","paths":["tools/asset-intake/core/engine-v1.mjs"],"expectedStatus":"PLAN_READY","expectedChecks":["asset-intake-self-test","doctor-health-gate","doctor-impact-self-test","doctor-plan-self-test"],"expectedManualNodes":[]},
+    {"id":"ASSET_INTAKE_ADAPTER","paths":["tools/asset-intake/adapters/skin-v1.mjs"],"expectedStatus":"PLAN_READY","expectedChecks":["asset-intake-self-test","doctor-health-gate","doctor-impact-self-test","doctor-plan-self-test"],"expectedManualNodes":[]},
+    {"id":"HERO_ASSET_FINAL_OWNER","paths":["public/images/heroes/cards/6.png"],"expectedStatus":"PLAN_READY","expectedChecks":["hero-artwork-final","production-build"],"expectedManualNodes":[]},
+    {"id":"BANNER_ASSET_REMAINS_MANUAL","paths":["public/images/banners/Banner/probe.png"],"expectedStatus":"MANUAL_REVIEW","expectedChecks":["production-build"],"expectedManualNodes":["banner-assets"]},
+    {"id":"SKIN_ASSET_REMAINS_MANUAL","paths":["data/evidence/skin-stage3-2-static-source-evidence.v1.json"],"expectedStatus":"MANUAL_REVIEW","expectedChecks":[],"expectedManualNodes":["skin-assets"]},
+    {"id":"UNKNOWN_CONFIGDATA","paths":["data/configdata/ConfigDataUnknownFutureTable.json"],"expectedStatus":"MANUAL_REVIEW","expectedChecks":[],"expectedManualNodes":[]}
+  ],
+  "historicalBoundary": {"d3V1":"data/contracts/project-doctor-d3-validator-plan.v1.json","d3V2":"data/contracts/project-doctor-d3-validator-plan.v2.json","d3V3":"data/contracts/project-doctor-d3-validator-plan.v3.json","d3V4":"data/contracts/project-doctor-d3-validator-plan.v4.json","previousBytesMustRemainUnchanged":true},
+  "nextStage": "D4-V5"
+}
