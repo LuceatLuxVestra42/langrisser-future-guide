@@ -1,0 +1,63 @@
+name: Equipment Public Admission Correction
+
+on:
+  push:
+    branches:
+      - fix/equipment-public-admission-mainline
+    paths:
+      - 'data/presentation/equipment-public-admission-correction.v1.json'
+      - 'data/presentation/equipment-p3-1-release-metadata.v1.json'
+      - 'data/generated/equipment_stage3_3_general_list.json'
+      - 'data/generated/equipment_stage3_4_general_detail.json'
+      - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
+      - 'data/localization/equipment-name-kr/**'
+      - 'scripts/build-equipment-name-kr-presentation.mjs'
+      - 'scripts/validate-equipment-public-admission-correction.mjs'
+      - 'src/lib/equipment-page.localized.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - '.github/workflows/equipment-public-admission-correction.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/presentation/equipment-public-admission-correction.v1.json'
+      - 'data/presentation/equipment-p3-1-release-metadata.v1.json'
+      - 'data/generated/equipment_stage3_3_general_list.json'
+      - 'data/generated/equipment_stage3_4_general_detail.json'
+      - 'data/generated/equipment_stage3_5_exclusive_consumer.json'
+      - 'data/localization/equipment-name-kr/**'
+      - 'scripts/build-equipment-name-kr-presentation.mjs'
+      - 'scripts/validate-equipment-public-admission-correction.mjs'
+      - 'src/lib/equipment-page.localized.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
+      - 'src/routes/equipment.tsx'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - '.github/workflows/equipment-public-admission-correction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Korean equipment-name presentation projection
+        run: node scripts/build-equipment-name-kr-presentation.mjs
+
+      - name: Validate public admission correction
+        run: bun scripts/validate-equipment-public-admission-correction.mjs
+
+      - name: Production build
+        run: bun run build

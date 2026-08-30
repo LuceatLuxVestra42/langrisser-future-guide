@@ -1,4 +1,5 @@
 import equipmentNameKrJson from "../../data/generated/equipment-name-kr-user-approved.v1.json";
+import equipmentPublicAdmissionCorrectionJson from "../../data/presentation/equipment-public-admission-correction.v1.json";
 import equipmentReleaseProjectionJson from "../../data/presentation/equipment-p3-1-release-metadata.v1.json";
 import {
   readEquipmentDetailPageData as readBaseEquipmentDetailPageData,
@@ -46,11 +47,54 @@ type EquipmentReleaseProjection = {
   byEquipmentId: Record<string, EquipmentReleaseProjectionRecord>;
 };
 
+type EquipmentPublicAdmissionCorrection = {
+  status: string;
+  policy: {
+    joinKey: string;
+    scope: string;
+  };
+  excludedEquipmentIds: number[];
+  records: Array<{
+    equipmentId: number;
+    nameCn: string;
+    duplicateOfEquipmentId: number;
+    duplicateOfNameCn: string;
+    reason: string;
+  }>;
+  expectedPublicProjection: {
+    generalEquipmentCount: number;
+    technicalTabCountsAfterAdmissionOnly: Record<string, number>;
+    excludedCount: number;
+  };
+};
+
 const equipmentNameKr = equipmentNameKrJson as EquipmentNameKrProjection;
 const equipmentReleaseProjection = equipmentReleaseProjectionJson as EquipmentReleaseProjection;
+const equipmentPublicAdmissionCorrection =
+  equipmentPublicAdmissionCorrectionJson as EquipmentPublicAdmissionCorrection;
 const equipmentReleaseOrder = new Map(
   equipmentReleaseProjection.defaultOrderEquipmentIds.map((equipmentId, index) => [equipmentId, index]),
 );
+const publicExcludedEquipmentIds = new Set(
+  equipmentPublicAdmissionCorrection.excludedEquipmentIds,
+);
+
+if (
+  equipmentPublicAdmissionCorrection.status !== "FROZEN" ||
+  equipmentPublicAdmissionCorrection.policy.joinKey !== "equipmentId" ||
+  publicExcludedEquipmentIds.size !== equipmentPublicAdmissionCorrection.expectedPublicProjection.excludedCount ||
+  equipmentPublicAdmissionCorrection.records.length !== publicExcludedEquipmentIds.size
+) {
+  throw new Error("Equipment public admission correction contract is inconsistent.");
+}
+
+for (const record of equipmentPublicAdmissionCorrection.records) {
+  if (!publicExcludedEquipmentIds.has(record.equipmentId)) {
+    throw new Error(
+      `Equipment public admission correction record ${record.equipmentId} is missing from excludedEquipmentIds.`,
+    );
+  }
+}
 
 function resolveNameKr(equipmentId: number, nameCn: string, fallback: string | null) {
   const localized = equipmentNameKr.byEquipmentId[String(equipmentId)];
@@ -108,9 +152,14 @@ function applyGeneralReleasePresentation(records: EquipmentListRecord[]) {
   });
 
   const targetRecords = projectedRecords.filter((record) => record.siteTab === targetTab);
-  if (targetRecords.length !== equipmentReleaseProjection.scope.targetCount) {
+  const excludedProjectedTargetCount = projectedIds.filter((equipmentId) =>
+    publicExcludedEquipmentIds.has(equipmentId),
+  ).length;
+  const expectedPublicTargetCount =
+    equipmentReleaseProjection.scope.targetCount - excludedProjectedTargetCount;
+  if (targetRecords.length !== expectedPublicTargetCount) {
     throw new Error(
-      `Equipment P3-1 target population mismatch: ${targetRecords.length} !== ${equipmentReleaseProjection.scope.targetCount}.`,
+      `Equipment P3-1 public target population mismatch: ${targetRecords.length} !== ${expectedPublicTargetCount}.`,
     );
   }
 
@@ -140,9 +189,40 @@ function applyGeneralReleasePresentation(records: EquipmentListRecord[]) {
   });
 }
 
+function countPublicTabs(records: EquipmentListRecord[]) {
+  return Object.fromEntries(
+    [1, 2, 3].map((tab) => [
+      String(tab),
+      records.filter((record) => record.siteTab === tab).length,
+    ]),
+  );
+}
+
 export function readGeneralEquipmentPageData() {
   const data = readBaseGeneralEquipmentPageData();
-  const localizedRecords = data.records.map((record) => ({
+  const publicRecords = data.records.filter(
+    (record) => !publicExcludedEquipmentIds.has(record.equipmentId),
+  );
+
+  if (
+    publicRecords.length !==
+    equipmentPublicAdmissionCorrection.expectedPublicProjection.generalEquipmentCount
+  ) {
+    throw new Error(
+      `Equipment public general population mismatch: ${publicRecords.length} !== ${equipmentPublicAdmissionCorrection.expectedPublicProjection.generalEquipmentCount}.`,
+    );
+  }
+
+  const publicTabs = countPublicTabs(publicRecords);
+  for (const [tab, expected] of Object.entries(
+    equipmentPublicAdmissionCorrection.expectedPublicProjection.technicalTabCountsAfterAdmissionOnly,
+  )) {
+    if (publicTabs[tab] !== expected) {
+      throw new Error(`Equipment public tab ${tab} mismatch: ${publicTabs[tab]} !== ${expected}.`);
+    }
+  }
+
+  const localizedRecords = publicRecords.map((record) => ({
     ...record,
     nameKr: resolveNameKr(record.equipmentId, record.nameCn, record.nameKr),
   }));
@@ -150,6 +230,7 @@ export function readGeneralEquipmentPageData() {
   return {
     ...data,
     records: applyGeneralReleasePresentation(localizedRecords),
+    tabs: publicTabs,
   };
 }
 
@@ -167,6 +248,8 @@ export function readExclusiveEquipmentPageData() {
 export function readEquipmentDetailPageData(
   equipmentId: number,
 ): EquipmentDetailPageData | null {
+  if (publicExcludedEquipmentIds.has(equipmentId)) return null;
+
   const data = readBaseEquipmentDetailPageData(equipmentId);
   if (!data) return null;
 
