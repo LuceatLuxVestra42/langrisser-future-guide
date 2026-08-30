@@ -16,7 +16,8 @@ Stage 5는 새로운 semantic relation을 만드는 단계가 아니다. 이미 
 - `tools/asset-intake/core/engine-v1.mjs`
 - `tools/asset-intake/adapters/skin-v1.mjs`
 - `tools/asset-intake/cli/run-v1.mjs`
-- Project Doctor V5 Asset Intake tooling admission
+- Project Doctor D2/D3/D4 V5 Asset Intake tooling admission
+- Project Doctor D7 V5 Stage 4 guard contract
 
 Stage 4의 완료된 repository integration을 다시 열지 않는다.
 
@@ -82,17 +83,28 @@ routing request는 최소한 다음 상태를 명시한다.
 
 ## Project Doctor
 
-Stage 5 때문에 Project Doctor V6를 만들지 않는다.
-
-Stage 4 V5가 이미 아래 범위를 `project-doctor / asset-intake-tooling`으로 소유한다.
+D2/D3/D4는 Stage 4 V5를 그대로 재사용한다.
 
 ```text
 tools/asset-intake/**
 data/validation/asset-intake-*
 docs/checkpoints/asset-intake-*
+        ↓
+project-doctor / asset-intake-tooling
+        ↓
+asset-intake-self-test
 ```
 
-따라서 `asset:intake:validate` current pointer만 Stage 5 validator로 올리면 기존 `asset-intake-self-test`가 Stage 5 routing까지 실제 PR Guard에서 검증한다.
+첫 PR Guard에서 D7 V5가 `asset:intake:validate = validate-stage4-v1.mjs` exact alias를 동결하고 있음이 확인됐다. 따라서 V5를 수정하지 않고 **D7 V6만 추가**해 Stage 5 validator pointer를 admission한다.
+
+```text
+D2 V5  유지
+D3 V5  유지
+D4 V5  유지
+D7 V6  Stage 5 validation alias admission
+```
+
+이 변경은 Doctor impact/plan/execution 의미를 다시 설계하는 것이 아니라 PR Guard current validation contract만 Stage 5로 전진시키는 owning-layer 수정이다.
 
 Skin/Banner asset final-owner admission은 이 단계 범위가 아니다.
 
@@ -100,6 +112,7 @@ Skin/Banner asset final-owner admission은 이 단계 범위가 아니다.
 
 ```text
 asset:intake:validate == PASS_ASSET_INTAKE_STAGE5_OPERATIONAL_ROUTING
+doctor:pr-guard:validate == PASS_PROJECT_DOCTOR_D7_GUARD_V6
 Project Doctor PR Guard event == pull_request
 PR Guard conclusion == success
 plan.status == PLAN_READY
@@ -121,7 +134,8 @@ every selected check exitCode == 0
 - Stage 5 fail-closed validator
 - external source priority enforcement
 - external-candidate re-ingest boundary
-- Project Doctor V5 self-test 재사용
+- Project Doctor D2/D3/D4 V5 self-test 재사용
+- Project Doctor D7 V6 Stage 5 validator admission
 
 ## 명시적으로 하지 않은 것
 
@@ -134,6 +148,7 @@ asset bytes 변경
 frontend 변경
 외부 사이트 자동 fetch
 외부 후보 direct production use
+D2/D3/D4 재설계
 ```
 
 ## REVIEW / BLOCKER
@@ -156,3 +171,4 @@ Stage 5 merge 후 Asset Intake shared installation은 `ASSET_INTAKE_INSTALLED`�
 - Stage 5 validator가 Stage 2~4 predecessor와 불일치
 - Project Doctor가 Asset Intake tooling diff를 선택하지 못함
 - `asset-intake-self-test`가 PR Guard에서 누락/nonzero
+- D7 current validator alias가 Stage 5 contract와 불일치
