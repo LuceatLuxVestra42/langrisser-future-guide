@@ -6,6 +6,7 @@ on:
       - research/skin-detail-full-art-stage1-20260830
     paths:
       - scripts/probe-skin-detail-full-art-stage1.py
+      - scripts/probe-skin-detail-full-art-catalog.py
       - .github/workflows/skin-detail-full-art-stage1-probe.yml
 
 permissions:
@@ -26,9 +27,14 @@ jobs:
       - name: Probe frozen HeroPainting bundles
         shell: pwsh
         run: python scripts/probe-skin-detail-full-art-stage1.py
+      - name: Probe official installer bundle catalog
+        shell: pwsh
+        run: python scripts/probe-skin-detail-full-art-catalog.py
       - name: Upload diagnostic evidence
         uses: actions/upload-artifact@v4
         with:
           name: skin-detail-full-art-stage1-probe
-          path: skin-detail-full-art-stage1-probe.json
+          path: |
+            skin-detail-full-art-stage1-probe.json
+            skin-detail-full-art-stage1-catalog.json
           if-no-files-found: error
