@@ -3,12 +3,14 @@
   "schemaId": "project-tooling-status-source-r1/v1",
   "stage": "R1",
   "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_SELECTION_CORE",
-  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
-  "completion": "R1_SELECTION_CORE_IMPLEMENTED",
+  "status": "PASS",
+  "completion": "R1_SELECTION_CORE_COMPLETE",
   "purpose": "Reimplement active Status Source selection as an independent read-only tool that consumes explicit status-source declarations and their directly referenced authoritative status files without importing or executing legacy Project Doctor runtime layers.",
   "designedAgainst": {
     "mainCommit": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
-    "r0Commit": "a1a3986a55d5d97ae4d779ece7c942d262d7458d"
+    "r0Commit": "a1a3986a55d5d97ae4d779ece7c942d262d7458d",
+    "implementationCommit": "145570d55d6a98d9063cf397ff010c2b9d24f1a8",
+    "validatedMergeResult": "8e502c51e49c78f1af381c87b54f740d28f07f45"
   },
   "authoritativeInputs": {
     "declarationDirectory": "data/status-sources",
@@ -88,6 +90,38 @@
     "legacyGeneratedRegistryRuntimeRead": false,
     "legacyComparisonUse": "The current selected IDs/paths were captured into a frozen fixture during migration design; runtime self-test does not read the legacy generated registry."
   },
+  "validationEvidence": {
+    "shadowWorkflow": {
+      "runId": 33341741318,
+      "jobId": 99338493330,
+      "headSha": "145570d55d6a98d9063cf397ff010c2b9d24f1a8",
+      "mergeResultSha": "8e502c51e49c78f1af381c87b54f740d28f07f45",
+      "conclusion": "success",
+      "parityAndIsolationSelfTest": "PASS",
+      "selectedSourceCli": "PASS"
+    },
+    "legacyComparison": {
+      "runId": 33341741214,
+      "jobId": 99338493424,
+      "headSha": "145570d55d6a98d9063cf397ff010c2b9d24f1a8",
+      "conclusion": "failure",
+      "classification": "EXPECTED_LEGACY_DOCTOR_MISMATCH",
+      "evidence": {
+        "d7GuardContract": "PASS",
+        "d5FreshnessBeforeD1": "FRESH",
+        "d1Regeneration": "PASS",
+        "d1DeterministicOutput": "PASS",
+        "d5FreshnessAfterD1": "FRESH",
+        "dryRunPlanStatus": "MANUAL_REVIEW",
+        "changedFiles": 7,
+        "checksQueued": 0,
+        "checksRun": 0,
+        "manualReview": 7,
+        "executionStatus": "REVIEW_MANUAL",
+        "exitCode": 3
+      }
+    }
+  },
   "nonScope": [
     "promotion command migration",
     "producer submit gate migration",
@@ -106,15 +140,16 @@
     "currentFixtureImplemented": true,
     "runtimeIndependenceSelfTestImplemented": true,
     "shadowWorkflowImplemented": true,
-    "shadowCiPass": false
+    "shadowCiPass": true,
+    "currentSelectionResultParity": true,
+    "strictLegacyMismatchClassificationProven": true
   },
   "blockers": [],
   "reviews": [
-    "Legacy pr-guard may remain red because migration-only paths are intentionally not admitted into legacy D2-D7.",
-    "R1 selection core must not be promoted to a final replacement until the shadow workflow passes on the PR merge result.",
-    "Promotion/submit/bridge behavior remains legacy-only for now and will be migrated only after the independent selection core is proven."
+    "Promotion/submit/bridge behavior remains legacy-only for now and must be migrated as separate R1 substeps before Status Source as a whole is ready for cutover.",
+    "Legacy pr-guard remains required and red for migration-only paths; this is a CUTOVER_ONLY blocker and must not be repaired by extending legacy D2-D7."
   ],
-  "nextStartPoint": "Run the R1 shadow self-test in CI. If PASS, freeze the selection core result, then migrate Status Source promotion/submit/bridge as separate R1 substeps without importing legacy runtime code.",
+  "nextStartPoint": "R1-2: migrate Status Source promotion as an independent check-first/apply-explicit tool using the completed R1 selection core as its only Status Source predecessor. Do not import or execute legacy Project Doctor runtime code.",
   "reopenConditions": [
     "data/status-sources declaration set changes",
     "a declaration admission predicate or selected lineage changes",
