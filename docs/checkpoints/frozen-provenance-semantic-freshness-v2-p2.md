@@ -7,12 +7,12 @@
 - Result: `PASS`
 - Work branch: `maintenance/frozen-provenance-semantic-freshness-v2-p2`
 - Predecessor: `P1` contract head `d9da311ff96e9ac5a87856e977d440e3691b7c3e`
-- Latest authoritative `main` observed during P2: `3053daf0b9179ea1544b821b63844938b60ece80`
+- Latest authoritative `main` observed during P2: `3f5ac26ec6fcc3292c1ac078f8a2a651e3531017`
 - P1 semantic contract reopened: `NO`
 - Production frozen artifacts modified: `NO`
 - Workflow transport modified: `NO`
 
-The latest `main` advance after P1 changed only `scripts/validate_hero_list_stage4.cjs` and `src/lib/equipment-page.localized.server.ts`. Those are presentation/deployment-adjacent paths and do not intersect P2-owned digest/fixture files, so P1 remained the direct predecessor instead of reopening unrelated upstream work.
+The `main` advances observed after P1 were presentation/deployment-adjacent only. From P1's base through `3053daf0...`, the changed paths were `scripts/validate_hero_list_stage4.cjs` and `src/lib/equipment-page.localized.server.ts`; the later advance to `3f5ac26e...` changed only `scripts/validate_hero_list_stage4.cjs`. None intersect P2-owned digest/fixture files, so P1 remained the direct predecessor instead of reopening unrelated upstream work.
 
 ## Purpose
 
