@@ -1,0 +1,66 @@
+name: Soldier Training Material WebP
+
+on:
+  push:
+    branches:
+      - soldier-training-material-assets
+    paths:
+      - public/images/soldier-training-materials-source/**
+      - scripts/build-soldier-training-material-webp.py
+      - .github/workflows/soldier-training-material-webp.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-webp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow==11.3.0
+
+      - name: Build and validate lossless WebP delivery
+        run: python scripts/build-soldier-training-material-webp.py
+
+      - name: Confirm WebP coverage and pixel parity
+        run: |
+          python - <<'PY'
+          import json
+          with open('data/validation/soldier-training-material-webp.v1.json', encoding='utf-8') as f:
+              v = json.load(f)
+          assert v['status'] == 'PASS_SOLDIER_TRAINING_MATERIAL_WEBP', v['status']
+          assert v['coverage']['resolvedCount'] == 24, v['coverage']
+          assert v['coverage']['unresolvedCount'] == 0, v['coverage']
+          assert v['checks']['sourceShaParity'] is True
+          assert v['checks']['dimensionsEqual'] is True
+          assert v['checks']['rgbaPixelParity'] is True
+          assert not v['failures'], v['failures']
+          print(json.dumps({'status': v['status'], 'coverage': v['coverage'], 'bytes': v['bytes']}))
+          PY
+
+      - name: Commit WebP derivatives and validation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            public/images/soldier-training-materials-webp \
+            data/generated/soldier-training-material-web-manifest.v1.json \
+            data/validation/soldier-training-material-webp.v1.json \
+            docs/checkpoints/soldier-training-material-webp.md
+          if git diff --cached --quiet; then
+            echo "No WebP changes to commit"
+          else
+            git commit -m "Freeze Soldier training material WebP delivery"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
