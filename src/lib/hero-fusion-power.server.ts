@@ -323,7 +323,8 @@ function assertFrozenFusionPowerPresentation() {
       throw new Error(`Hero ${row.heroId} fusion-power exception evidence/target shape is invalid.`);
     }
     if (row.targetType === "FACTION") {
-      if (row.targetIds.length !== 1 || !factionAssetById.has(row.targetIds[0])) {
+      const factionId = row.targetIds[0];
+      if (row.targetIds.length !== 1 || factionId === undefined || !factionAssetById.has(factionId)) {
         throw new Error(`Hero ${row.heroId} faction fusion-power exception target is invalid.`);
       }
     } else if (row.targetType === "CLASS") {
@@ -379,7 +380,13 @@ const baselineRecords: HeroFusionPowerIndexRecord[] = baseline.records.map((row)
 const exceptionRecords: HeroFusionPowerIndexRecord[] = exceptions.records.map((row) => {
   if (row.targetType === "FACTION") {
     const factionId = row.targetIds[0];
-    const asset = factionAssetById.get(factionId)!;
+    if (factionId === undefined) {
+      throw new Error(`Hero ${row.heroId} faction fusion-power target is missing.`);
+    }
+    const asset = factionAssetById.get(factionId);
+    if (!asset) {
+      throw new Error(`Hero ${row.heroId} faction fusion-power asset ${factionId} is missing.`);
+    }
     return {
       heroId: row.heroId,
       targetType: "FACTION",
