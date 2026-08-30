@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const DECLARATION_SCHEMA = 'project-doctor-active-source-entries/v1';
-const DEFAULT_DECLARATION_DIR = 'data/status-sources';
-const ALLOWED_SOURCE_PREFIXES = ['data/validation/', 'data/checkpoints/'];
+export const STATUS_SOURCE_DECLARATION_SCHEMA = 'project-doctor-active-source-entries/v1';
+export const DEFAULT_DECLARATION_DIR = 'data/status-sources';
+export const ALLOWED_SOURCE_PREFIXES = ['data/validation/', 'data/checkpoints/'];
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -28,7 +28,7 @@ export function getJsonPointer(document, pointer) {
   return value;
 }
 
-function assertRepositoryPath(repoRoot, relativePath) {
+export function assertRepositoryPath(repoRoot, relativePath) {
   if (typeof relativePath !== 'string' || !relativePath.length || path.isAbsolute(relativePath)) {
     throw new Error(`Source path must be repository-relative: ${relativePath}`);
   }
@@ -39,7 +39,7 @@ function assertRepositoryPath(repoRoot, relativePath) {
 }
 
 function normalizeDeclaration(document, sourceEntryFile) {
-  if (document?.schemaId !== DECLARATION_SCHEMA) {
+  if (document?.schemaId !== STATUS_SOURCE_DECLARATION_SCHEMA) {
     throw new Error(`Unsupported declaration schema in ${sourceEntryFile}: ${document?.schemaId ?? 'missing'}`);
   }
   const rows = Array.isArray(document.entries)
@@ -99,17 +99,22 @@ export function discoverStatusSourceDeclarations(repoRoot, declarationDir = DEFA
     .sort();
 }
 
-export function selectActiveSources({ repoRoot = process.cwd(), declarationDir = DEFAULT_DECLARATION_DIR } = {}) {
+export function loadStatusSourceEntries({ repoRoot = process.cwd(), declarationDir = DEFAULT_DECLARATION_DIR } = {}) {
   const declarationFiles = discoverStatusSourceDeclarations(repoRoot, declarationDir);
   const entries = [];
   for (const relativePath of declarationFiles) {
     const document = readJson(assertRepositoryPath(repoRoot, relativePath));
     entries.push(...normalizeDeclaration(document, relativePath));
   }
+  return { declarationFiles, entries };
+}
+
+export function resolveActiveSources({ repoRoot = process.cwd(), entries, declarationFiles = [] } = {}) {
+  if (!Array.isArray(entries)) throw new Error('resolveActiveSources requires an entries array.');
 
   const byId = new Map();
   for (const entry of entries) {
-    if (!entry.id || !entry.domain || !entry.sourcePath) throw new Error(`Malformed status-source entry in ${entry.sourceEntryFile}`);
+    if (!entry.id || !entry.domain || !entry.sourcePath) throw new Error(`Malformed status-source entry in ${entry.sourceEntryFile ?? 'in-memory candidate'}`);
     if (byId.has(entry.id)) throw new Error(`Duplicate status-source entry id: ${entry.id}`);
     byId.set(entry.id, entry);
   }
@@ -165,7 +170,7 @@ export function selectActiveSources({ repoRoot = process.cwd(), declarationDir =
       selectedId: selected.id,
       sourcePath: selected.sourcePath,
       facet: selected.facet ?? null,
-      sourceEntryFile: selected.sourceEntryFile,
+      sourceEntryFile: selected.sourceEntryFile ?? null,
       lineage,
       projectionOverride: selected.projectionOverride ?? null,
       admissionEvidence: admissionEvidence.get(selected.id)
@@ -182,7 +187,7 @@ export function selectActiveSources({ repoRoot = process.cwd(), declarationDir =
     status: 'PASS',
     completion: 'SELECTION_COMPLETE',
     derivedOnly: true,
-    declarationFiles,
+    declarationFiles: [...declarationFiles],
     entryCount: approved.length,
     selectedCount: Object.keys(domains).length,
     rawConfigDataReadCount: 0,
@@ -191,4 +196,9 @@ export function selectActiveSources({ repoRoot = process.cwd(), declarationDir =
     legacyStateMutationCount: 0,
     domains
   };
+}
+
+export function selectActiveSources({ repoRoot = process.cwd(), declarationDir = DEFAULT_DECLARATION_DIR } = {}) {
+  const { declarationFiles, entries } = loadStatusSourceEntries({ repoRoot, declarationDir });
+  return resolveActiveSources({ repoRoot, entries, declarationFiles });
 }
