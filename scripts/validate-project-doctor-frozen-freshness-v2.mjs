@@ -48,6 +48,13 @@ const failClosed = applyProjectDoctorFreshnessV2(impact, [changed]);
 assert.deepEqual(failClosed.directNodes, ['soldier-canonical']);
 assert.ok(failClosed.domains.includes('soldier'));
 
+const a1 = spawnSync(process.execPath, ['scripts/validate-soldier-stage5-semantic-freshness-v2-a1.mjs'], {
+  stdio: 'inherit',
+  shell: false,
+});
+assert.equal(a1.error, undefined);
+assert.equal(a1.status, 0);
+
 const f6 = spawnSync(process.execPath, ['scripts/validate-soldier-frozen-semantic-freshness-v2-f6.mjs'], {
   stdio: 'inherit',
   shell: false,
@@ -57,11 +64,13 @@ assert.equal(f6.status, 0);
 
 console.log(JSON.stringify({
   status: 'PASS_PROJECT_DOCTOR_FROZEN_FRESHNESS_V2',
-  fixtureCount: 26,
-  fixturePassCount: 26,
+  fixtureCount: 38,
+  fixturePassCount: 38,
   projectDoctorRoutingFixtures: 4,
+  a1Stage5FreshnessFixtures: 12,
   f6FailClosedRegressionFixtures: 22,
   provenanceOnlySuppressesDomainFanout: true,
   semanticChangePreservesDomainOwner: true,
+  a1RegressionEmbedded: true,
   f6RegressionEmbedded: true,
 }, null, 2));
