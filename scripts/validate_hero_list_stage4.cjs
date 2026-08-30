@@ -88,7 +88,7 @@ check(
 );
 check(
   'detail-route-shell',
-  detailRoute.includes('createFileRoute("/heroes/$heroId")') && detailRoute.includes('getHeroDetailRouteStage5Data') && detailRoute.includes('notFound') && detailRoute.includes('Stage 6') && detailRoute.includes('webAssetPath'),
+  (detailRoute.includes('createFileRoute("/heroes/$heroId")') || detailRoute.includes('createFileRoute("/heroes_/$heroId")')) && detailRoute.includes('getHeroDetailRouteStage5Data') && detailRoute.includes('notFound') && detailRoute.includes('Stage 6') && detailRoute.includes('webAssetPath'),
   '267-Hero detail route shell consumes current Stage 5 projection with Stage 4 artwork resolver',
 );
 
