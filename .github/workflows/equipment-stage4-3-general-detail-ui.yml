@@ -14,28 +14,88 @@ on:
       - 'data/generated/equipment_stage3_4_general_detail.json'
       - 'data/generated/equipment_stage2_6_restrictions.json'
       - 'data/generated/equipment_stage2_6_job_index.json'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/equipment-stage4-3-general-detail-ui.yml'
+      - 'scripts/validate-equipment-stage4-3-general-detail-ui.mjs'
+      - 'src/lib/equipment-page.server.ts'
+      - 'src/lib/equipment-page.functions.ts'
+      - 'src/routes/equipment_.$equipmentId.tsx'
+      - 'data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json'
+      - 'data/validation/equipment-stage4-2-general-list-ui-summary.v1.json'
+      - 'data/generated/equipment_stage3_4_general_detail.json'
+      - 'data/generated/equipment_stage2_6_restrictions.json'
+      - 'data/generated/equipment_stage2_6_job_index.json'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  validate:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Equipment Stage 4-3 producer runs must target a non-main branch. Freeze there, then open a normal PR.'
+          exit 1
+
+  validate:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Validate Equipment Stage 4-3 general Detail UI
         run: node scripts/validate-equipment-stage4-3-general-detail-ui.mjs
-      - name: Persist Stage 4-3 checkpoint
+      - name: Verify frozen Stage 4-3 checkpoint
+        shell: bash
         run: |
+          set -euo pipefail
+          target='data/validation/equipment-stage4-3-general-detail-ui-summary.v1.json'
+          if ! git diff --exit-code -- "$target"; then
+            echo 'Equipment Stage 4-3 frozen checkpoint is stale. Run this workflow explicitly on a non-main producer branch and open a normal PR with the refreshed checkpoint.'
+            exit 1
+          fi
+          echo 'Equipment Stage 4-3 frozen checkpoint matches validation output.'
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout explicit producer target
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+      - uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Validate Equipment Stage 4-3 general Detail UI
+        run: node scripts/validate-equipment-stage4-3-general-detail-ui.mjs
+      - name: Freeze Stage 4-3 checkpoint on explicit producer branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTPUT='data/validation/equipment-stage4-3-general-detail-ui-summary.v1.json'
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/validation/equipment-stage4-3-general-detail-ui-summary.v1.json
+          git add "$OUTPUT"
           if git diff --cached --quiet; then
-            echo "No Stage 4-3 generated changes"
-            exit 0
+            echo 'Equipment Stage 4-3 frozen checkpoint is already current.'
+          else
+            git commit -m 'Freeze Equipment Stage 4-3 general Detail UI checkpoint'
+            git push origin HEAD:${{ github.ref_name }}
           fi
-          git commit -m "Freeze Equipment Stage 4-3 general Detail UI checkpoint"
-          git push
