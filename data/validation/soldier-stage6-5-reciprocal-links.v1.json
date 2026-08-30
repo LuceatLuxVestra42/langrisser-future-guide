@@ -107,5 +107,80 @@
       "classification": "REVIEW",
       "rule": "Stage 6-5 freezes canonical reciprocal membership and target identity. Concrete UI route components may consume these IDs but must not recalculate membership."
     }
-  ]
+  ],
+  "freshness": {
+    "contract": "frozen-semantic-freshness/v2",
+    "freshnessMode": "SEMANTIC_DIGEST_V2_MEMBERSHIP",
+    "semanticDigest": {
+      "contract": "frozen-semantic-freshness/v2",
+      "algorithm": "sha256",
+      "projection": "hero-soldier-membership/v1",
+      "digest": "sha256:08091d305e73777a893a72af53a53c630852397c08eee59cf614cce10d6f045e"
+    },
+    "snapshotObservations": [
+      {
+        "label": "relationValidation",
+        "path": "data/generated/hero-soldier-relations.v1.json",
+        "recordedGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "currentGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "semanticDigest": {
+          "contract": "frozen-semantic-freshness/v2",
+          "algorithm": "sha256",
+          "projection": "hero-soldier-membership/v1",
+          "digest": "sha256:08091d305e73777a893a72af53a53c630852397c08eee59cf614cce10d6f045e"
+        },
+        "classification": "SEMANTIC_FRESH"
+      },
+      {
+        "label": "byHero",
+        "path": "data/generated/hero-soldier-relations.v1.json",
+        "recordedGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "currentGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "semanticDigest": {
+          "contract": "frozen-semantic-freshness/v2",
+          "algorithm": "sha256",
+          "projection": "hero-soldier-membership/v1",
+          "digest": "sha256:08091d305e73777a893a72af53a53c630852397c08eee59cf614cce10d6f045e"
+        },
+        "classification": "SEMANTIC_FRESH"
+      },
+      {
+        "label": "bySoldier",
+        "path": "data/generated/hero-soldier-relations.v1.json",
+        "recordedGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "currentGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "semanticDigest": {
+          "contract": "frozen-semantic-freshness/v2",
+          "algorithm": "sha256",
+          "projection": "hero-soldier-membership/v1",
+          "digest": "sha256:08091d305e73777a893a72af53a53c630852397c08eee59cf614cce10d6f045e"
+        },
+        "classification": "SEMANTIC_FRESH"
+      },
+      {
+        "label": "heroPage",
+        "path": "data/generated/hero-soldier-relations.v1.json",
+        "recordedGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "currentGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "semanticDigest": {
+          "contract": "frozen-semantic-freshness/v2",
+          "algorithm": "sha256",
+          "projection": "hero-soldier-membership/v1",
+          "digest": "sha256:08091d305e73777a893a72af53a53c630852397c08eee59cf614cce10d6f045e"
+        },
+        "classification": "SEMANTIC_FRESH"
+      }
+    ],
+    "scope": "RECIPROCAL_MEMBERSHIP_ONLY",
+    "projection": "hero-soldier-membership/v1",
+    "rawBlobMismatchCount": 0,
+    "provenanceOnlyChangedCount": 0,
+    "semanticStaleCount": 0,
+    "semanticUnknownCount": 0,
+    "predecessor": {
+      "commit": "10cb5afade8b5650bfb01604232efa8235c57e08",
+      "blob": "29d16d728625168569f3c916e18acd833fd4ea1e",
+      "exitCode": 0
+    }
+  }
 }
