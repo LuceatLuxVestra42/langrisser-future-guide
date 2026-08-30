@@ -14,22 +14,45 @@ on:
       - 'src/routes/equipment_.$equipmentId.tsx'
       - 'scripts/validate-equipment-image-stage3-hosted.mjs'
       - 'data/validation/equipment-image-stage3-frontend-summary.v1.json'
+      - 'data/validation/equipment-image-stage3-hosted-qa-summary.v1.json'
+      - 'data/checkpoints/equipment-image-stage3-final.v1.json'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/equipment-image-stage3-hosted-qa.yml'
+      - 'scripts/validate-equipment-image-stage3-hosted.mjs'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: equipment-image-stage3-hosted-qa
+  group: equipment-image-stage3-hosted-qa-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  hosted-qa:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Equipment Image Stage 3 Hosted QA producer runs must target a non-main branch. Freeze there, then open a normal PR.'
+          exit 1
+
+  hosted-qa:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -40,14 +63,50 @@ jobs:
           HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
         run: node scripts/validate-equipment-image-stage3-hosted.mjs
 
-      - name: Persist final Stage 3 hosted QA freeze
+      - name: Verify frozen final Stage 3 checkpoint
+        shell: bash
         run: |
+          set -euo pipefail
+          if ! git diff --exit-code -- data/checkpoints/equipment-image-stage3-final.v1.json; then
+            echo 'Equipment Image Stage 3 final checkpoint is stale. Run this workflow explicitly on a non-main producer branch and open a normal PR with the refreshed hosted QA freeze.'
+            exit 1
+          fi
+          echo 'Equipment Image Stage 3 final checkpoint matches the current hosted validation result.'
+          echo 'Hosted QA summary is intentionally not byte-compared because request URLs and retry counts are runtime evidence.'
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout explicit producer target
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate GitHub Pages deployment and Equipment routes/assets
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+        run: node scripts/validate-equipment-image-stage3-hosted.mjs
+
+      - name: Freeze hosted QA evidence on explicit producer branch
+        shell: bash
+        run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/validation/equipment-image-stage3-hosted-qa-summary.v1.json data/checkpoints/equipment-image-stage3-final.v1.json
+          git add \
+            data/validation/equipment-image-stage3-hosted-qa-summary.v1.json \
+            data/checkpoints/equipment-image-stage3-final.v1.json
           if git diff --cached --quiet; then
-            echo "No Equipment Image Stage 3 hosted QA checkpoint changes"
-            exit 0
+            echo 'Equipment Image Stage 3 hosted QA freeze is already current.'
+          else
+            git commit -m 'Freeze Equipment Image Stage 3 hosted QA'
+            git push origin HEAD:${{ github.ref_name }}
           fi
-          git commit -m "Freeze Equipment Image Stage 3 hosted QA [skip ci]"
-          git push
