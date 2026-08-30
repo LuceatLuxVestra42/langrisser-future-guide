@@ -94,3 +94,5 @@ jobs:
       - name: Verify frozen outputs on main or PR
         if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
         run: git diff --exit-code -- data/generated/hero-detail-stage6-1.v1.json data/validation/hero-stage6-1-final.v1.json
+
+# Temporary work-branch trigger for downstream freshness refresh; never merge this comment.
