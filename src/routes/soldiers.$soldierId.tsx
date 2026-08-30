@@ -3,27 +3,40 @@ import { X } from "lucide-react";
 import { useCallback, useEffect } from "react";
 
 import { SoldierDetailModal } from "@/components/soldier-detail-modal";
+import { getHeroCardIconIndex } from "@/lib/hero-card-icon-assets.functions";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 
 export const Route = createFileRoute("/soldiers/$soldierId")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     if (!/^[1-9]\d*$/.test(params.soldierId)) throw notFound();
     const soldierId = Number(params.soldierId);
     if (!Number.isSafeInteger(soldierId) || soldierId <= 0) throw notFound();
     const data = getSoldierPrototypePageData();
     const record = data.records.find((item) => item.soldierId === soldierId) ?? null;
     if (!record) throw notFound();
-    return record;
+
+    const heroCardIcons = await getHeroCardIconIndex();
+    if (
+      heroCardIcons.summary.total !== 267 ||
+      heroCardIcons.summary.resolved !== 267 ||
+      heroCardIcons.summary.pending !== 0 ||
+      heroCardIcons.summary.hardErrors !== 0 ||
+      heroCardIcons.records.length !== 267
+    ) {
+      throw new Error("Hero card icon frozen index is not production-ready.");
+    }
+
+    return { record, heroCardIcons: heroCardIcons.records };
   },
   head: ({ loaderData }) => ({
-    meta: [{ title: loaderData ? `${loaderData.nameKr ?? loaderData.nameCn} | 랑그릿사 모바일 용병` : "용병 | 랑그릿사 모바일 미래시 정보" }],
+    meta: [{ title: loaderData ? `${loaderData.record.nameKr ?? loaderData.record.nameCn} | 랑그릿사 모바일 용병` : "용병 | 랑그릿사 모바일 미래시 정보" }],
   }),
   component: SoldierDetailRoute,
   notFoundComponent: SoldierNotFound,
 });
 
 function SoldierDetailRoute() {
-  const record = Route.useLoaderData();
+  const { record, heroCardIcons } = Route.useLoaderData();
   const navigate = useNavigate();
   const closeDetail = useCallback(() => {
     void navigate({ to: "/soldiers", replace: true, resetScroll: false });
@@ -48,7 +61,7 @@ function SoldierDetailRoute() {
         <button type="button" aria-label="상세 창 닫기" onClick={closeDetail} className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/95 text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
-        <SoldierDetailModal key={record.soldierId} record={record} />
+        <SoldierDetailModal key={record.soldierId} record={record} heroCardIcons={heroCardIcons} />
       </div>
     </div>
   );
