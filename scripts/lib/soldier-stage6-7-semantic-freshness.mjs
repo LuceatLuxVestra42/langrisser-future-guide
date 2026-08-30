@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import {
   FROZEN_SEMANTIC_FRESHNESS_CONTRACT,
   FROZEN_SEMANTIC_DIGEST_ALGORITHM,
@@ -13,6 +14,7 @@ export const STAGE67_FRESHNESS_MODE = 'SEMANTIC_DIGEST_V2_STICKY_PROVENANCE';
 
 const STAGE3_GENERATED_PROJECTION = 'soldier-stage6-7/transitive-stage3-generated/v1';
 const STAGE3_VALIDATION_PROJECTION = 'soldier-stage6-7/transitive-stage3-validation/v1';
+const HISTORICAL_BLOB_MAX_BUFFER = 64 * 1024 * 1024;
 
 function validDigestEnvelope(value) {
   return Boolean(
@@ -104,6 +106,15 @@ export function buildStage67V2Ref({ path, currentDigest, currentGitBlobSha, prio
   };
 }
 
+function readHistoricalJsonAfterBufferOverflow(blobSha) {
+  const content = execFileSync('git', ['cat-file', '-p', blobSha], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    maxBuffer: HISTORICAL_BLOB_MAX_BUFFER,
+  });
+  return JSON.parse(content);
+}
+
 function proveLegacyMigrationWithDigestBuilder({
   path,
   currentValue,
@@ -146,12 +157,25 @@ function proveLegacyMigrationWithDigestBuilder({
   try {
     historicalValue = readHistoricalJson(priorRef.gitBlobSha);
   } catch (error) {
-    return {
-      ok: false,
-      classification: 'SEMANTIC_UNKNOWN',
-      reason: `historical-blob-unavailable:${error.message}`,
-      currentDigest,
-    };
+    if (error?.code === 'ENOBUFS') {
+      try {
+        historicalValue = readHistoricalJsonAfterBufferOverflow(priorRef.gitBlobSha);
+      } catch (fallbackError) {
+        return {
+          ok: false,
+          classification: 'SEMANTIC_UNKNOWN',
+          reason: `historical-blob-unavailable:${fallbackError.message}`,
+          currentDigest,
+        };
+      }
+    } else {
+      return {
+        ok: false,
+        classification: 'SEMANTIC_UNKNOWN',
+        reason: `historical-blob-unavailable:${error.message}`,
+        currentDigest,
+      };
+    }
   }
 
   let historicalDigest;
