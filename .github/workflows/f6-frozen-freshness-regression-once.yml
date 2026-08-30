@@ -1,0 +1,26 @@
+name: F6 Frozen Freshness Regression Once
+
+on:
+  push:
+    branches:
+      - maintenance/frozen-provenance-semantic-freshness-v2-f6
+    paths:
+      - .github/workflows/f6-frozen-freshness-regression-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run F3 Stage 6-6 baseline fixtures
+        run: node scripts/validate-soldier-stage6-6-freshness-v2-fixtures.mjs
+      - name: Run F6 fail-closed regression matrix
+        run: node scripts/validate-soldier-frozen-semantic-freshness-v2-f6.mjs
+      - name: Run Project Doctor freshness V2 fixtures
+        run: node scripts/validate-project-doctor-frozen-freshness-v2.mjs
