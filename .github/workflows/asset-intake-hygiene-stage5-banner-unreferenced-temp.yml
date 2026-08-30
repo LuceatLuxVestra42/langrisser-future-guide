@@ -1,0 +1,42 @@
+name: Asset Hygiene Stage 5 Banner Unreferenced Temporary Producer
+
+on:
+  push:
+    branches:
+      - work/asset-intake-hygiene-stage5-banner-unreferenced-review-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  explicit-producer:
+    if: >-
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[asset-hygiene-stage5-banner-unreferenced-produce]'))
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Generate Banner unreferenced review
+        run: node tools/asset-intake/cli/run-hygiene-stage5-banner-unreferenced-review-v1.mjs
+      - name: Freeze generated review artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            tools/asset-intake/hygiene/generated/asset-hygiene-stage5-banner-unreferenced-review.v1.json \
+            data/validation/asset-intake-hygiene-stage5-banner-unreferenced-review-summary.v1.json \
+            docs/checkpoints/asset-intake-hygiene-stage5-banner-unreferenced-review.md
+          git commit -m "Freeze Asset Hygiene Stage 5 Banner unreferenced review"
+      - name: Validate committed Banner unreferenced review
+        run: node tools/asset-intake/cli/validate-hygiene-stage5-banner-unreferenced-review-v1.mjs
+      - name: Push frozen review artifacts
+        run: git push origin HEAD:${{ github.ref_name }}
