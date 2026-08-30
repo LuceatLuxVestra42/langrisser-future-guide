@@ -1,0 +1,67 @@
+name: Soldier Training Material Assets A5
+
+on:
+  push:
+    branches:
+      - work/soldier-training-material-assets-stage1
+    paths:
+      - scripts/admit-soldier-training-material-assets-a5.py
+      - data/evidence/soldier-training-material-assets-a4-bulk.v1.json
+      - .github/workflows/soldier-training-material-assets-a5.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  admit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Drive acquisition dependency
+        run: python -m pip install --disable-pip-version-check gdown==5.2.0
+
+      - name: Admit verified A4 PNG assets into repository
+        run: python scripts/admit-soldier-training-material-assets-a5.py
+
+      - name: Require A5 PASS
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('data/validation/soldier-training-material-assets-a5.v1.json').read_text())
+          assert result['status'] == 'PASS', result
+          assert result['completion'] == 'COMPLETE', result
+          assert result['admissionStatus'] == 'READY_FOR_A6_WEBP_DELIVERY', result
+          c = result['counts']
+          for key in ('target','repositoryPng','exactSourceHashParity','pngVerified','dimensions172x172','rgba8Png','uniqueItemIds','uniqueDriveFileIds','uniqueRepositoryPaths'):
+              assert c[key] == 24, (key, c[key])
+          assert c['missing'] == 0 and c['extras'] == 0 and c['errors'] == 0, result
+          print(json.dumps(result, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Commit admitted PNG assets and A5 checkpoint
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            public/images/soldier-training-materials \
+            data/manifests/soldier-training-material-assets-a5.v1.json \
+            data/validation/soldier-training-material-assets-a5.v1.json \
+            docs/checkpoints/soldier-training-material-assets-a5.md
+          if git diff --cached --quiet; then
+            echo 'Soldier training material A5 repository admission already current.'
+          else
+            git commit -m 'Admit Soldier training material PNG assets A5 [skip ci]'
+            git push origin HEAD:work/soldier-training-material-assets-stage1
+          fi
