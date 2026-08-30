@@ -1,0 +1,39 @@
+name: Diagnose Project Doctor PR275 Plan
+
+on:
+  push:
+    branches:
+      - diag/project-doctor-pr275-routing
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose-plan:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Build exact D3 V5 plan for PR 275 paths
+        shell: bash
+        run: |
+          set +e
+          node scripts/plan-project-doctor-d3.mjs \
+            --contract data/contracts/project-doctor-d3-validator-plan.v5.json \
+            --json \
+            --paths \
+            data/checkpoints/hero-stage6-3-full-generation.json \
+            data/generated/hero-detail-stage6-1.v1.json \
+            data/generated/hero-detail.v1.json \
+            data/generated/hero-list-stage1.v1.json \
+            data/generated/hero-stage6-2-representative-fixtures.v1.json \
+            data/generated/project-doctor-d5-freshness.v1.json \
+            data/validation/hero-stage6-1-final.v1.json \
+            data/validation/hero-stage6-2-final.v1.json \
+            data/validation/hero-stage6-3-final.v1.json \
+            data/validation/hero-stage6-4-final.v1.json
+          code=$?
+          echo "plan_exit=$code"
+          exit 0
