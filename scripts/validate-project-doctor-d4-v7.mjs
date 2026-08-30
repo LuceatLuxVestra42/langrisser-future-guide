@@ -8,7 +8,7 @@ const failures = [];
 
 if (context.delta.extends !== 'data/contracts/project-doctor-d4-execution.v6.json') failures.push('PREDECESSOR');
 if (context.predecessor.schemaId !== 'project-doctor-d4-execution/v6') failures.push('V6_PRESERVATION');
-if (!(context.contract.allowedCheckIds ?? []).includes('soldier-training-material-assets-final')) failures.push('A7_ALLOWLIST');
+if ((context.delta.addedAllowedCheckIds ?? []).length !== 0) failures.push('UNEXPECTED_NEW_ALLOWLIST');
 
 const plan = createPlanV7({
   contractPath: 'data/contracts/project-doctor-d3-validator-plan.v7.json',
@@ -25,7 +25,8 @@ const result = executePlan({
   executor: () => ({ status: 0, error: null }),
 });
 if (result.status !== 'PASS_EXECUTED' || result.exitCode !== 0) failures.push('A7_EXECUTION');
-if (!result.executions.some(item => item.id === 'soldier-training-material-assets-final')) failures.push('A7_CHECK_NOT_EXECUTED');
+if (!result.executions.some(item => item.id === 'coverage-soldier-assets')) failures.push('SOLDIER_ASSET_OWNER_CHECK');
+if (!result.executions.some(item => item.id === 'production-build')) failures.push('PRODUCTION_BUILD_CHECK');
 
 const manualPlan = createPlanV7({
   contractPath: 'data/contracts/project-doctor-d3-validator-plan.v7.json',
