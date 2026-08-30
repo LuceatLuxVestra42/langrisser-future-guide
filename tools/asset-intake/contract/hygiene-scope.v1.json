@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-scope/v1",
+  "stage": "ASSET_HYGIENE_0",
+  "checkpoint": "ASSET_HYGIENE_STAGE0_SCOPE_FREEZE",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Freeze a deterministic, read-only repository image census boundary for legacy Asset Hygiene without reopening Asset Intake Stage 5, domain semantics, or production consumers.",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "branch": "main",
+    "commit": "73db96444d2016d044042630955486fd9b3d9036",
+    "tree": "f19194edbf6e71f1c3d6fcf0ccabb0b9c6474df8",
+    "capturedAt": "2026-08-30",
+    "assetIntakeStage5MergeCommit": "b511a499b0f375f729d97416be191ace41bd719a"
+  },
+  "authoritativePredecessors": [
+    {
+      "path": "docs/checkpoints/asset-intake-stage5-operational-routing.md",
+      "blobSha": "3e1f447d562424c73309990b55119e69e2297d3a",
+      "requiredState": "PASS_ASSET_INTAKE_STAGE5_OPERATIONAL_ROUTING / COMPLETE"
+    },
+    {
+      "path": "tools/asset-intake/contract/operational-routing.v1.json",
+      "blobSha": "45367e73f5557052791062ca6a7686ca943086e9",
+      "requiredStatus": "DESIGN_FROZEN"
+    },
+    {
+      "path": "tools/asset-intake/core/engine-v1.mjs",
+      "blobSha": "80897c1fc3b4dbe57870b2123316371e8ac5e83b",
+      "role": "existing filesystem hash/signature/dimension/duplicate engine reused by AH-1"
+    },
+    {
+      "path": "data/contracts/project-doctor-active-source-registry.v1.json",
+      "blobSha": "18e34913e5d0743e24776d14864a185f00ce8b58",
+      "requiredStatus": "DESIGN_FROZEN"
+    },
+    {
+      "path": "data/generated/project-doctor-active-source-registry.v1.json",
+      "requiredStatus": "PASS_PROJECT_DOCTOR_ACTIVE_SOURCE_REGISTRY",
+      "requiredCompletion": "COMPLETE",
+      "role": "current domain authority locator; Hygiene must not infer authority from filenames or recency"
+    },
+    {
+      "path": "data/contracts/project-doctor-d7-pr-guard.v7.json",
+      "blobSha": "b1e92f74392b51836bc608fb9a4bf77bbe45f391",
+      "requiredStatus": "DESIGN_FROZEN",
+      "role": "current required PR Guard contract; preserves Asset Intake Stage 5 admission"
+    }
+  ],
+  "scope": {
+    "scopeId": "REPOSITORY_TRACKED_IMAGE_ASSETS_V1",
+    "populationSource": "Git tree entries at baseline.commit",
+    "enumerationCommandContract": "git ls-tree -r --full-tree <baseline.commit>",
+    "trackedOnly": true,
+    "regularFileModes": ["100644", "100755"],
+    "candidateSelection": {
+      "alwaysIncludeRoots": [
+        "public/images/"
+      ],
+      "alwaysIncludeRootsRegardlessOfExtension": true,
+      "extensionCaseInsensitive": true,
+      "extensionAllowlist": [
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".webp",
+        ".gif",
+        ".svg",
+        ".avif",
+        ".bmp",
+        ".ico",
+        ".tif",
+        ".tiff",
+        ".tga",
+        ".dds",
+        ".ktx",
+        ".ktx2"
+      ],
+      "outsideKnownRoots": "Include any tracked regular file whose extension matches the allowlist. Do not require a known asset directory name."
+    },
+    "excludedFromPopulation": {
+      "untrackedFiles": true,
+      "ignoredWorkingTreeFiles": true,
+      "externalUrls": true,
+      "remoteDriveObjects": true,
+      "ciArtifactsNotTrackedInGit": true,
+      "runtimeGeneratedFilesNotTrackedInGit": true,
+      "gitSubmoduleEntries": true,
+      "symlinkTargetTraversal": true
+    },
+    "symlinkPolicy": "Do not follow tracked symlink targets as asset bytes. If tracked symlink entries exist in an image candidate location, AH-1 records them separately for REVIEW instead of silently following them.",
+    "gitLfsPolicy": "Do not treat Git LFS pointer text as image bytes. If an included path is an unresolved LFS pointer, AH-1 records LFS_POINTER_UNRESOLVED and does not compute asset identity from pointer bytes.",
+    "deferredNonImageFamilies": [
+      "SPINE",
+      "MODEL",
+      "AUDIO",
+      "FONT",
+      "VIDEO",
+      "UNITY_BUNDLE"
+    ],
+    "deferredPolicy": "Non-image asset-family hygiene is outside v1. A tracked file under public/images remains in the physical census even if its signature is not an image; AH-1 must report it rather than silently discard it."
+  },
+  "boundaries": {
+    "readOnly": true,
+    "assetBytesMutation": false,
+    "assetMove": false,
+    "assetDelete": false,
+    "assetRename": false,
+    "assetConversion": false,
+    "frontendMutation": false,
+    "productionConsumerRewrite": false,
+    "externalFetch": false,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "canonicalRelationRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "fuzzyFilenameMatching": false,
+    "perceptualIdentityInference": false,
+    "domainOwnerPromotion": false
+  },
+  "stage1Contract": {
+    "nextStage": "ASSET_HYGIENE_1_REPOSITORY_INVENTORY",
+    "allowedOutputs": [
+      "physical path inventory",
+      "byte size",
+      "signature",
+      "dimensions when supported",
+      "SHA-256",
+      "exact-byte duplicate groups",
+      "basename collision candidate groups",
+      "root and extension census",
+      "LFS/symlink review records"
+    ],
+    "forbiddenOutputs": [
+      "ACTIVE_VERIFIED classification",
+      "EVIDENCE_ONLY classification",
+      "GENERATED_DERIVATIVE classification",
+      "SUPERSEDED classification",
+      "UNREFERENCED classification",
+      "PROVENANCE_UNKNOWN classification",
+      "delete/move/rename action"
+    ],
+    "classificationOwner": "ASSET_HYGIENE_3"
+  },
+  "projectDoctorRouting": {
+    "reuseExistingD2D3D4V5": true,
+    "newImpactNode": false,
+    "newDomainOwner": false,
+    "intendedPathSurface": [
+      "tools/asset-intake/**",
+      "data/validation/asset-intake-*",
+      "docs/checkpoints/asset-intake-*"
+    ],
+    "changeClass": "asset-intake-tooling"
+  },
+  "reopenConditions": [
+    "Asset Intake Stage 5 operational routing contract changes in a way that changes verified-project-evidence precedence or fail-closed rules.",
+    "The repository image census population rule changes from the frozen Git-tree/extension/root policy.",
+    "A non-image asset family is explicitly promoted into Asset Hygiene v1 scope.",
+    "Git LFS or symlink handling must change because AH-1 finds a case that cannot be represented by this contract.",
+    "Authoritative evidence shows the baseline commit or predecessor references are inconsistent.",
+    "An explicit baseline migration is requested."
+  ],
+  "baselineAdvancePolicy": "Normal main advancement does not silently mutate this frozen baseline. If asset-bearing paths change before AH-3 closeout, record a delta or explicitly version/migrate the Hygiene baseline instead of silently rescanning a different population."
+}
