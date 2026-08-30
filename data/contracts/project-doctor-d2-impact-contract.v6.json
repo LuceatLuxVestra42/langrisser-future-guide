@@ -1,0 +1,95 @@
+{
+  "version": 6,
+  "schemaId": "project-doctor-d2-impact-contract/v6",
+  "stage": "D2-IMPACT",
+  "checkpoint": "PROJECT_DOCTOR_D2_IMPACT_CONTRACT_V6_FROZEN_FRESHNESS_ROUTING",
+  "status": "DESIGN_FROZEN",
+  "extends": "data/contracts/project-doctor-d2-impact-contract.v5.json",
+  "baseMap": "data/contracts/project-doctor-d2-dependency-map.v1.json",
+  "purpose": "Preserve D2 V5 mappings and add candidate-owner routing for Frozen Provenance / Semantic Freshness V2 tooling and checkpoints. Content-aware semantic/provenance classification remains downstream of D2.",
+  "scope": {
+    "candidateOwnerRouting": true,
+    "contentAwareClassification": false,
+    "semanticRecomputation": false,
+    "rawConfigDataRead": false,
+    "v5MappingsPreserved": true
+  },
+  "pathRuleOverlays": [
+    {
+      "id": "frozen-semantic-freshness-v2-soldier-tooling",
+      "patterns": [
+        "scripts/lib/frozen-semantic-digest.mjs",
+        "scripts/lib/soldier-stage6-6-semantic-projections.mjs",
+        "scripts/lib/soldier-stage6-7-semantic-projections.mjs"
+      ],
+      "excludePatterns": [],
+      "directNodes": ["project-doctor", "soldier-canonical"],
+      "changeClass": "freshness-tooling",
+      "reason": "Semantic digest/projection code can change the Soldier freshness boundary; keep both Project Doctor and Soldier final-owner checks fail-closed."
+    },
+    {
+      "id": "frozen-semantic-freshness-v2-doctor-tooling",
+      "patterns": [
+        "scripts/classify-project-doctor-frozen-freshness-v2.mjs",
+        "scripts/analyze-project-doctor-d2-impact-v6.mjs",
+        "scripts/plan-project-doctor-d3-v6.mjs",
+        "scripts/run-project-doctor-d4-v6.mjs",
+        "scripts/run-project-doctor-closeout-v6.mjs",
+        "scripts/validate-project-doctor-d2-impact-v6.mjs",
+        "scripts/validate-project-doctor-d3-v6.mjs",
+        "scripts/validate-project-doctor-d4-v6.mjs",
+        "scripts/validate-project-doctor-frozen-freshness-v2.mjs",
+        "scripts/validate-project-doctor-d7-v8.mjs",
+        "data/contracts/project-doctor-d2-impact-contract.v6.json",
+        "data/contracts/project-doctor-d3-validator-plan.v6.json",
+        "data/contracts/project-doctor-d4-execution.v6.json",
+        "data/contracts/project-doctor-d7-pr-guard.v8.json"
+      ],
+      "excludePatterns": [],
+      "directNodes": ["project-doctor"],
+      "changeClass": "freshness-tooling",
+      "reason": "Project Doctor V6/V8 freshness classification and guard tooling."
+    },
+    {
+      "id": "frozen-semantic-freshness-v2-checkpoints",
+      "patterns": ["docs/checkpoints/frozen-provenance-semantic-freshness-v2-*"],
+      "excludePatterns": [],
+      "directNodes": ["project-doctor"],
+      "changeClass": "tooling",
+      "reason": "Maintenance checkpoints document the active freshness contract without reopening domain semantics."
+    }
+  ],
+  "baseRuleExcludeOverlays": [],
+  "overlayPolicy": {
+    "preservePredecessorEffectiveMap": true,
+    "mayAddImpactNodes": false,
+    "mayAddPropagationEdges": false,
+    "mayRewriteBaseRulePatterns": false,
+    "contentClassificationOwnedDownstream": true
+  },
+  "fixtures": [
+    {
+      "id": "FRESHNESS_SHARED_DIGEST_TOOLING",
+      "paths": ["scripts/lib/frozen-semantic-digest.mjs"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["project-doctor", "soldier-canonical"]
+    },
+    {
+      "id": "FRESHNESS_SOLDIER_PROJECTION_TOOLING",
+      "paths": ["scripts/lib/soldier-stage6-7-semantic-projections.mjs"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["project-doctor", "soldier-canonical"]
+    },
+    {
+      "id": "FRESHNESS_CHECKPOINT",
+      "paths": ["docs/checkpoints/frozen-provenance-semantic-freshness-v2-f4.md"],
+      "expectedStatus": "MAPPED",
+      "expectedDirectNodes": ["project-doctor"]
+    }
+  ],
+  "historicalBoundary": {
+    "d2V5": "data/contracts/project-doctor-d2-impact-contract.v5.json",
+    "previousContractsRemainUnmodified": true
+  },
+  "nextStage": "D3-V6"
+}
