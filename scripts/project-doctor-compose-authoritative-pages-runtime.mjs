@@ -57,7 +57,7 @@ let route = fs.readFileSync(routePath, "utf8");
 if (!route.includes('detail.presentation.skins')) {
   route = replaceOnce(
     route,
-    'import type { ReactNode } from "react";',
+    'import { useState, type ReactNode } from "react";',
     'import { useEffect, useState, type ReactNode } from "react";',
     "Hero route React carousel imports",
   );
