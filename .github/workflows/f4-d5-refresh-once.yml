@@ -26,7 +26,7 @@ jobs:
           node-version: '22'
 
       - name: Run authoritative D5 refresh
-        run: npm run doctor:freshness:refresh:active -- --reason "F4 Stage 6-7 semantic freshness V2 final artifact reseal"
+        run: npm run doctor:freshness:refresh
 
       - name: Commit authoritative refresh outputs
         run: |
