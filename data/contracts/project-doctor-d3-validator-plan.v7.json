@@ -1,0 +1,48 @@
+{
+  "version": 7,
+  "schemaId": "project-doctor-d3-validator-plan/v7",
+  "stage": "D3",
+  "checkpoint": "PROJECT_DOCTOR_D3_VALIDATOR_PLAN_V7_SOLDIER_TRAINING_MATERIAL_ASSET_OWNER",
+  "status": "DESIGN_FROZEN",
+  "extends": "data/contracts/project-doctor-d3-validator-plan.v6.json",
+  "impactContract": "data/contracts/project-doctor-d2-impact-contract.v7.json",
+  "purpose": "Preserve D3 V6 and select one non-mutating frozen A7 validator whenever the Soldier training-material asset pipeline changes.",
+  "addedCheckCatalog": [
+    {
+      "id": "soldier-training-material-assets-final",
+      "type": "validator",
+      "phase": 3,
+      "command": "npm run validate:soldier-training-material-assets-final",
+      "triggerChangeClasses": ["soldier-training-material-assets"],
+      "triggerNodes": [],
+      "coverage": "Frozen Soldier training-material A6 WebP bytes and A7 itemId consumer integration without semantic recomputation."
+    }
+  ],
+  "selectionPolicyV7": {
+    "preserveV6Checks": true,
+    "soldierTrainingMaterialAssetOwnerOnly": true,
+    "semanticFanoutSuppressedByD2V7": true,
+    "manualReviewExitPolicyUnchanged": true
+  },
+  "fixtures": [
+    {
+      "id": "SOLDIER_TRAINING_MATERIAL_ASSET_PLAN",
+      "paths": ["public/images/soldier-training-materials-webp/6003.webp"],
+      "expectedStatus": "PLAN_READY",
+      "expectedChecks": ["soldier-training-material-assets-final", "coverage-soldier-assets", "production-build"],
+      "expectedManualReviewCount": 0
+    },
+    {
+      "id": "SOLDIER_TRAINING_MATERIAL_FROZEN_INPUT_PLAN",
+      "paths": ["data/generated/soldier-training-material-iteminfo.v1.json"],
+      "expectedStatus": "PLAN_READY",
+      "expectedChecks": ["soldier-training-material-assets-final", "coverage-soldier-assets", "production-build", "localization-audit"],
+      "expectedManualReviewCount": 0
+    }
+  ],
+  "historicalBoundary": {
+    "d3V6": "data/contracts/project-doctor-d3-validator-plan.v6.json",
+    "previousContractsRemainUnmodified": true
+  },
+  "nextStage": "D4-V7"
+}
