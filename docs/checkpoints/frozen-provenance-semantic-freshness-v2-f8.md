@@ -3,11 +3,16 @@
 ## Status
 
 - Stage: F8 — Migration / Closeout
-- Status: READY_FOR_REQUIRED_GUARD
+- Status: COMPLETE / PASS / REQUIRED_GUARD_GREEN
 - Predecessor: F7 checkpoint commit `e53d661c9a53b9940318d34639818eabfe29dd5c`
 - F8 branch: `maintenance/frozen-provenance-semantic-freshness-v2-f8`
-- Integration base verified at F8 start: `main` `73afee0e72e475b4bc925ba7c83ee4ee1a9b38b0`
+- Integration PR: `#295` — Close Frozen Semantic Freshness V2 migration
+- Initial F8 head submitted to guard: `b311b4d8a7e95a1179e0aa84d72939fe815411e6`
+- Integration base refreshed at PR creation: `main` `bcaf5b5ef697bd45c64c2dddcb096011794191c2`
 - Required status check: `pr-guard`
+- Required guard run: `33300262276`
+- Required guard job: `99226946882`
+- Required guard result: SUCCESS
 - Semantic research reopened: NO
 - Canonical Soldier population recomputed: NO
 - Hero-Soldier relation recomputed: NO
@@ -46,7 +51,7 @@ Authority:
 - deterministic digest implementation owned by `scripts/lib/frozen-semantic-digest.mjs`
 - `gitBlobSha` retained on source refs as sticky historical freeze provenance
 
-F7 proved:
+F7 proof reused by F8:
 
 - source semantic freshness observations: `SEMANTIC_FRESH = 14`
 - frozen regenerated artifact diff: `0`
@@ -68,7 +73,7 @@ Authority:
 - Stage 6-7 final validator consumes semantic freshness while preserving strict structural/coverage/relation gates
 - raw blob provenance remains recorded for audit/history
 
-F7 proved:
+F7 proof reused by F8:
 
 - Stage 6-7 producer: PASS
 - final validator: PASS
@@ -114,7 +119,7 @@ V2 does not define a global recursive field blacklist.
 
 Each consumer explicitly owns its semantic projection.
 
-Examples already regression-proven:
+Regression-proven examples:
 
 - `generatedAt` is audit-only for the migrated frozen boundary.
 - raw/nested `gitBlobSha` is audit-only for semantic equality.
@@ -144,13 +149,13 @@ Rules:
 
 3. downstream semantic output remains identical after a direct dependency semantic refresh
    - downstream own semantic digest may remain unchanged
-   - the next downstream consumer therefore does not inherit a second-order provenance cascade
+   - the next downstream consumer does not inherit a second-order provenance cascade
 
 ## Legacy V1 / raw-SHA preservation boundary
 
 F8 does not delete or rewrite historical V1 provenance.
 
-The following remain intentionally preserved:
+Intentionally preserved:
 
 - historical `gitBlobSha` fields in frozen/generated/validation artifacts
 - prior checkpoints and frozen history
@@ -180,9 +185,9 @@ Confirmed relation invariant remains `5,977` reciprocal pairs with mismatch `0`.
 
 A future relation-internal V2 migration, if ever needed, is a separate maintenance workstream.
 
-## Required guard policy
+## Required guard evidence
 
-No guard weakening is part of F8.
+No guard weakening was used.
 
 Preserved:
 
@@ -194,7 +199,31 @@ Preserved:
 - no branch-protection relaxation
 - no D5 reseal inside required PR Guard
 
-F8 completion requires the actual integration PR against then-current `main` to pass the required `pr-guard`.
+Integration PR `#295` required guard run `33300262276` completed successfully.
+
+Successful required steps included:
+
+- Validate D7 guard contract
+- Validate committed freshness seal
+- Regenerate D1 status outputs
+- Prove committed D1 outputs are deterministic
+- Revalidate freshness after D1 regeneration
+- Resolve changed-file comparison
+- Validate Regression Coverage Promotion V1 admission
+- Integrated Doctor real-diff dry run
+- Integrated Doctor real-diff execution
+
+The F8 final checkpoint commit is documentation-only and remains inside the already-mapped `docs/checkpoints/frozen-provenance-semantic-freshness-v2-*` Project Doctor boundary; its normal PR guard must remain green before merge.
+
+## Integration-base refresh review
+
+Between initial F8 start and PR creation, `main` advanced from `73afee0e72e475b4bc925ba7c83ee4ee1a9b38b0` to `bcaf5b5ef697bd45c64c2dddcb096011794191c2`.
+
+The intervening change was Asset Hygiene / Banner unreferenced-review work only. It did not modify Soldier Stage 6-6/6-7 artifacts, V2 semantic projection tooling, or freshness contracts.
+
+PR `#295` was re-evaluated as mergeable after GitHub completed mergeability calculation.
+
+No Soldier semantic reopen was required.
 
 ## Frozen invariant matrix
 
@@ -211,7 +240,7 @@ F8 completion requires the actual integration PR against then-current `main` to 
 | Filter QA | 15/15 |
 | Stage 6-6 preservation errors | 0 |
 
-These values are reused from the validated F7 frozen results; F8 does not recompute their semantics from raw sources.
+These values are reused from the validated F7 frozen results; F8 did not recompute their semantics from raw sources.
 
 ## Regression evidence inherited from F6/F7
 
@@ -230,7 +259,7 @@ It also proves missing/legacy refs fail closed.
 
 ## Explicitly out of scope / unchanged
 
-F8 does not modify:
+F8 did not modify:
 
 - canonical Soldier identity/population
 - Hero-Soldier relation semantics
@@ -260,9 +289,7 @@ These are not F8 blockers.
 
 ## BLOCKER
 
-None before integration guard.
-
-The only remaining closeout condition is the required `pr-guard` result on the F8 integration PR against current `main`.
+NONE.
 
 ## Reopen conditions
 
@@ -288,16 +315,21 @@ Do not reopen for:
 - producer transport cleanup
 - provenance-only raw blob drift with equal semantic digest
 
-## Completion procedure
+## Final completion decision
 
-1. open F8 integration PR against current `main`
-2. verify changed-file scope remains the validated Frozen Freshness V2 implementation/checkpoints only
-3. require normal `pr-guard` execution
-4. if `pr-guard` is green, update this checkpoint to `COMPLETE / PASS / REQUIRED_GUARD_GREEN`
-5. record the integration PR/run evidence without reopening semantics
+F8 completion criteria are satisfied:
+
+- active migrated V2 boundary is explicitly documented,
+- V1/raw-SHA historical provenance is preserved,
+- Stage C legacy freeze is preserved without semantic rewrite,
+- fail-closed regression coverage remains intact,
+- final Soldier invariants remain unchanged,
+- Project Doctor routing/classification scope is explicit,
+- actual integration PR required `pr-guard` passed without weakening policy,
+- no semantic research or canonical relation recomputation was needed.
 
 ## Next start after F8
 
 No automatic F9 semantic migration is implied.
 
-After F8 closes, broader Stage 5/6 or Hero-Soldier relation-internal V2 migration should begin only as a separately scoped maintenance task with its own evidence and completion criteria.
+Broader Soldier Stage 5/6 or Hero-Soldier relation-internal V2 migration should begin only as a separately scoped maintenance task with its own evidence and completion criteria.
