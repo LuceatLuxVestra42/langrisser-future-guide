@@ -144,8 +144,13 @@ jobs:
           grep -q 'data-hero-soldier-cards="true"' dist/client/heroes/6/index.html
           grep -q '/langrisser-future-guide/images/soldiers-webp/101.webp' dist/client/heroes/6/index.html
           grep -q '/langrisser-future-guide/soldiers/101' dist/client/heroes/6/index.html
-          grep -q '사용 가능 영웅' dist/client/soldiers/101/index.html
-          grep -q '/langrisser-future-guide/images/heroes/card-icons-webp/' dist/client/soldiers/101/index.html
+          grep -q 'getStaticHeroCardIconIndex' 'src/routes/soldiers.$soldierId.tsx'
+          if grep -q 'from "@/lib/hero-card-icon-assets.functions"' 'src/routes/soldiers.$soldierId.tsx'; then
+            echo 'Soldier detail route still depends on Hero card server-function RPC' >&2
+            exit 1
+          fi
+          grep -q 'readHeroCardIconIndex' src/lib/hero-card-icon-assets.static.ts
+          test -f scripts/validate-soldier-detail-hero-cards-hosted.mjs
           cp dist/client/index.html dist/client/404.html
           cat > dist/client/authoritative-pages-source.json <<JSON
           {
