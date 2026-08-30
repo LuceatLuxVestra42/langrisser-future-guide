@@ -17,6 +17,8 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+const countOccurrences = (source, marker) => source.split(marker).length - 1;
+
 const stage40 = readJson("data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json");
 const stage42 = readJson("data/validation/equipment-stage4-2-general-list-ui-summary.v1.json");
 const stage43 = readJson("data/validation/equipment-stage4-3-general-detail-ui-summary.v1.json");
@@ -109,10 +111,16 @@ const generalMarkers = [
   "TAB_ORDER_POLICIES",
   "표시 순서는 확정된 역사적 출시순이 아니라 Stage 3의 deterministic presentation order야.",
   "검증된 출시 그룹 단위만 반영하며 같은 그룹 안의 개별 출시순은 확정하지 않았어.",
-  "정확한 출시 순서는 REVIEW 상태라 현재 순서를 최신순이나 출시순으로 해석하지 않아.",
+  "장비 종류·세부 타입 순서를 유지하고, 같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순이야. 같은 출시 그룹 안의 개별 순서는 별도 출시순 의미가 없어.",
   "한국명 REVIEW · 중문명 임시 표시",
   "filteredRecords.length > 0",
-  "장비 종류 필터 초기화",
+  "const resetFilters = () => {",
+  "setUiState((current) => ({ ...current, group: null, subtype: null }));",
+  "onClick={resetFilters}",
+  "const resetDiscovery = () => {",
+  'query: "",',
+  'sort: "default",',
+  "onClick={resetDiscovery}",
   'to="/equipment/$equipmentId"',
 ];
 for (const marker of generalMarkers) {
@@ -126,11 +134,15 @@ const exclusiveMarkers = [
   "persistenceReady",
   "selectedGroup?.subtypes.some",
   "한국명 REVIEW · 중문명 임시 표시",
-  "선택한 장비 종류 필터는 다음 방문에도 유지돼.",
   "현재 순서는 표시용 deterministic order이며 전용장비 출시순으로 해석하지 않아.",
   "filteredRecords.length > 0",
   "조건에 맞는 전용장비가 없어.",
-  "장비 종류 필터 초기화",
+  "const resetFilters = () => {",
+  "setUiState((current) => ({ ...current, group: null, subtype: null }));",
+  "onClick={resetFilters}",
+  "const resetDiscovery = () => {",
+  "setUiState(DEFAULT_EXCLUSIVE_UI_STATE);",
+  "onClick={resetDiscovery}",
   'to="/equipment/$equipmentId"',
 ];
 for (const marker of exclusiveMarkers) {
@@ -148,15 +160,33 @@ for (const marker of detailMarkers) {
   assert(detailRoute.includes(marker), `Detail route missing retained display-policy marker: ${marker}`);
 }
 
+const approvedListSortMarkers = [
+  'type EquipmentSortMode = "default" | "name" | "id";',
+  "const SORT_LABELS: Record<EquipmentSortMode, string> = {",
+  'return value === "default" || value === "name" || value === "id";',
+  "const records = data.records.filter((record) => {",
+  'if (uiState.sort === "name") {',
+  "return records.sort((left, right) => {",
+  'leftName.localeCompare(rightName, "ko", { numeric: true, sensitivity: "base" }) || left.equipmentId - right.equipmentId',
+  'if (uiState.sort === "id") {',
+  "return records.sort((left, right) => left.equipmentId - right.equipmentId);",
+  "return records;",
+];
 for (const [label, source] of [
   ["general", generalRoute],
   ["exclusive", exclusiveRoute],
-  ["detail", detailRoute],
 ]) {
-  assert(!source.includes(".sort("), `${label} route must not add frontend release sorting.`);
+  for (const marker of approvedListSortMarkers) {
+    assert(source.includes(marker), `${label} route approved presentation sorting missing marker: ${marker}`);
+  }
+  assert(countOccurrences(source, ".sort(") === 2, `${label} route must contain exactly the two approved presentation sort operations.`);
+  assert(!source.includes("data.records.sort("), `${label} route must not mutate loader records in place.`);
   assert(!source.includes("ConfigData"), `${label} route must not read raw ConfigData.`);
   assert(!source.includes("SkillHero"), `${label} route must not rederive exclusive ownership.`);
 }
+assert(!detailRoute.includes(".sort("), "detail route must not add frontend sorting.");
+assert(!detailRoute.includes("ConfigData"), "detail route must not read raw ConfigData.");
+assert(!detailRoute.includes("SkillHero"), "detail route must not rederive exclusive ownership.");
 
 assert(generalRoute.includes("record.nameKr ?? record.nameCn"), "General name fallback must remain nameKr ?? nameCn.");
 assert(exclusiveRoute.includes("record.nameKr ?? record.nameCn"), "Exclusive name fallback must remain nameKr ?? nameCn.");
@@ -206,7 +236,8 @@ const summary = {
     reviewLabelExplicit: true,
     generalTab1ChronologyClaimed: false,
     generalTab2EqualGroupOrderClaimed: false,
-    generalTab3ChronologyReviewExplicit: true,
+    generalTab3ChronologyReviewExplicit: false,
+    generalTab3VerifiedGroupChronologyExplicit: true,
     exclusiveChronologyReviewExplicit: true,
     emptyStateResetGeneral: true,
     emptyStateResetExclusive: true,
@@ -214,7 +245,10 @@ const summary = {
   sourceDiscipline: {
     generalGeneratedOrderPreserved: true,
     exclusiveGeneratedOrderPreserved: true,
-    frontendSortAdded: false,
+    frontendSortAdded: true,
+    presentationSortOnly: true,
+    releaseOrderSortingAdded: false,
+    loaderRecordsMutated: false,
     directConfigDataReads: false,
     exclusiveOwnershipRederived: false,
   },
