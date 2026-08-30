@@ -137,6 +137,23 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
     );
   }, [detail, record.isSp]);
 
+  const heroGroups = useMemo(() => {
+    if (!detail) {
+      return { baseHeroIds: [] as number[], spUnlockedHeroIds: [] as number[] };
+    }
+
+    const spUnlockedHeroIds = record.isSp ? (detail.sp?.expandedHeroIds ?? []) : [];
+    if (spUnlockedHeroIds.length === 0) {
+      return { baseHeroIds: detail.heroes.finalHeroIds, spUnlockedHeroIds };
+    }
+
+    const spUnlockedHeroIdSet = new Set(spUnlockedHeroIds);
+    return {
+      baseHeroIds: detail.heroes.finalHeroIds.filter((heroId) => !spUnlockedHeroIdSet.has(heroId)),
+      spUnlockedHeroIds,
+    };
+  }, [detail, record.isSp]);
+
   const abilityTitle = record.isSp ? "SP 고유기" : "10레벨 효과";
 
   return (
@@ -176,7 +193,7 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
             <SectionHeading id="soldier-heroes-title">사용 가능 영웅</SectionHeading>
             {detail ? (
               <span className="text-xs font-semibold tabular-nums text-muted-foreground">
-                {detail.heroes.finalHeroIds.length}명
+                {heroGroups.baseHeroIds.length}명
               </span>
             ) : null}
           </div>
@@ -190,20 +207,30 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
               사용 가능 영웅 데이터를 불러오지 못했어.
             </div>
           ) : (
-            <div className="mt-2 grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12">
-              {detail.heroes.finalHeroIds.map((heroId) => (
-                <div
-                  key={heroId}
-                  title={`Hero ${heroId}`}
-                  className="flex aspect-square min-w-0 flex-col items-center justify-center rounded-lg border border-border bg-background px-1 text-center"
-                >
-                  <span className="text-base font-black text-foreground">H</span>
-                  <span className="mt-0.5 max-w-full truncate text-[9px] font-semibold tabular-nums text-muted-foreground sm:text-[10px]">
-                    #{heroId}
-                  </span>
+            <>
+              <HeroIdGrid heroIds={heroGroups.baseHeroIds} />
+
+              {record.isSp ? (
+                <div className="mt-5 border-t border-border pt-4">
+                  <div className="flex items-end justify-between gap-3">
+                    <p className="text-sm font-black tracking-tight text-foreground sm:text-base">
+                      SP 전직 후 추가 사용 가능 영웅
+                    </p>
+                    <span className="text-xs font-semibold tabular-nums text-muted-foreground">
+                      {heroGroups.spUnlockedHeroIds.length}명
+                    </span>
+                  </div>
+
+                  {heroGroups.spUnlockedHeroIds.length > 0 ? (
+                    <HeroIdGrid heroIds={heroGroups.spUnlockedHeroIds} />
+                  ) : (
+                    <div className="mt-2 rounded-xl border border-border bg-background px-4 py-4 text-sm text-muted-foreground">
+                      SP 전직으로 추가되는 사용 가능 영웅이 없어.
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+              ) : null}
+            </>
           )}
         </section>
 
@@ -228,6 +255,25 @@ export function SoldierDetailModal({ record }: { record: SoldierPrototypeRecord 
         </section>
       </div>
     </section>
+  );
+}
+
+function HeroIdGrid({ heroIds }: { heroIds: number[] }) {
+  return (
+    <div className="mt-2 grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12">
+      {heroIds.map((heroId) => (
+        <div
+          key={heroId}
+          title={`Hero ${heroId}`}
+          className="flex aspect-square min-w-0 flex-col items-center justify-center rounded-lg border border-border bg-background px-1 text-center"
+        >
+          <span className="text-base font-black text-foreground">H</span>
+          <span className="mt-0.5 max-w-full truncate text-[9px] font-semibold tabular-nums text-muted-foreground sm:text-[10px]">
+            #{heroId}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }
 
