@@ -1,0 +1,47 @@
+{
+  "stage": "Asset Intake Stage 2 - Shared Engine",
+  "status": "PASS_ASSET_INTAKE_STAGE2_ENGINE_V1",
+  "completion": "SHARED_ENGINE_COMPLETE",
+  "contractVersion": "asset-intake/v1",
+  "mainBaseCommit": "e1ff955addf53e8e5fb6b732273b28a59bcc375f",
+  "implementationScope": {
+    "recursiveSourceRootScan": true,
+    "deterministicRelativePaths": true,
+    "byteSize": true,
+    "signatureDetection": true,
+    "imageDimensions": true,
+    "sha256": true,
+    "exactDuplicateDetection": true,
+    "basenameCollisionDetection": true,
+    "exactPathResolution": true,
+    "approvedRootFilenameResolution": true,
+    "explicitResourceMapResolution": true,
+    "sourceRepositoryByteParity": true,
+    "normalizedEvidenceBuilder": true,
+    "stableInventorySerialization": true,
+    "domainAdapterImplemented": false,
+    "packageScriptInstalled": false,
+    "devBuildHookInstalled": false,
+    "projectDoctorIntegrated": false,
+    "frontendChanged": false
+  },
+  "selfTest": {
+    "checks": 19,
+    "passed": 19,
+    "failed": 0,
+    "hardErrors": 0
+  },
+  "guardrails": {
+    "resourceIdFilenameInference": false,
+    "basenameAmbiguityAutoPick": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "semanticRecomputation": false,
+    "machineSpecificAbsolutePathInStableOutput": false
+  },
+  "nextStage": "STAGE3_DOMAIN_ADAPTER",
+  "notes": [
+    "This completes the shared engine work item only; the historical Skin Stage 2 representative evidence checkpoint remains separate and is not rewritten.",
+    "Existing frozen Skin relations, prior real-evidence checkpoints, Project Doctor contracts, package.json, frontend, and asset bytes are unchanged."
+  ]
+}
