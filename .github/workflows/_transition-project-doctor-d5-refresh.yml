@@ -1,0 +1,62 @@
+name: Transition Project Doctor D5 Refresh
+
+on:
+  push:
+    branches:
+      - maintenance/soldier-stage5-6-freshness-refresh
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-d5:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Refresh Project Doctor D5 freshness seal
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/run-project-doctor-d5-refresh.mjs
+          node scripts/validate-project-doctor-d5.mjs
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add \
+            data/generated/project-doctor-active-source-registry.v1.json \
+            data/validation/project-doctor-active-source-registry-summary.v1.json \
+            data/generated/project-doctor-d1-1-status.v1.json \
+            data/validation/project-doctor-d1-1-summary.v1.json \
+            data/validation/project-doctor-d1-2-summary.v1.json \
+            data/generated/project-doctor-d5-freshness.v1.json
+
+          if git diff --cached --quiet; then
+            echo "Project Doctor D5 refresh produced no tracked changes."
+          else
+            git diff --cached --name-only
+            git commit -m "Refresh Project Doctor D5 freshness seal"
+          fi
+
+          if ! git diff --quiet || ! git diff --cached --quiet; then
+            echo "Unexpected Project Doctor refresh output remains."
+            git status --short
+            exit 1
+          fi
+
+          git push origin HEAD:${GITHUB_REF_NAME}
