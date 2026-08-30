@@ -1,0 +1,50 @@
+name: Skin Detail Spine Stage 2 Parser Disassembly
+
+on:
+  push:
+    branches:
+      - research/skin-detail-spine-stage2-20260830
+    paths:
+      - .github/workflows/skin-detail-spine-stage2-disasm.yml
+
+permissions:
+  contents: read
+
+jobs:
+  disasm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rehydrate verified GameAssembly checkpoint
+        run: python scripts/probe-skin-detail-il2cpp-runtime.py
+      - name: Disassemble only SkeletonBinary parser methods
+        shell: bash
+        run: |
+          set -euo pipefail
+          out=skin-detail-spine-stage2-parser-disasm.txt
+          : > "$out"
+          echo 'GameAssembly SHA256 c7f803939dce955991a8e21611b79cbc4005d1152ee7934b903332150e1e8795' >> "$out"
+          echo 'Image base 0x180000000' >> "$out"
+          for spec in \
+            'ReadSkin 0x1849E5820 0x1849E59A0' \
+            'ReadAttachment 0x1849E59A0 0x1849E6400' \
+            'ReadVertices 0x1849E6400 0x1849E67F0' \
+            'ReadFloatArray 0x1849E67F0 0x1849E6910' \
+            'ReadShortArray 0x1849E6910 0x1849E6A10'; do
+            set -- $spec
+            name=$1; start=$2; stop=$3
+            echo >> "$out"
+            echo "===== $name $start..$stop =====" >> "$out"
+            objdump -d -Mintel --start-address="$start" --stop-address="$stop" /tmp/skin-stage2-il2cpp/GameAssembly.dll >> "$out"
+          done
+          wc -l "$out"
+      - name: Upload text-only parser disassembly
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-detail-spine-stage2-parser-disasm
+          path: skin-detail-spine-stage2-parser-disasm.txt
+          if-no-files-found: error
