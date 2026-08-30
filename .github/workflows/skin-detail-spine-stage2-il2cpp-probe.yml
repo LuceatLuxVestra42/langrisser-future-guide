@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Locate and extract authoritative IL2CPP inputs
+      - name: Rehydrate verified authoritative IL2CPP inputs
         run: python scripts/probe-skin-detail-il2cpp-runtime.py
       - name: Build Linux Il2CppDumper
         shell: bash
@@ -34,12 +34,16 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/skin-stage2-il2cpp-dump
+          set +e
           dotnet /tmp/il2cppdumper/Il2CppDumper.dll \
             /tmp/skin-stage2-il2cpp/GameAssembly.dll \
             /tmp/skin-stage2-il2cpp/global-metadata.dat \
-            /tmp/skin-stage2-il2cpp-dump
+            /tmp/skin-stage2-il2cpp-dump </dev/null
+          rc=$?
+          set -e
+          test -s /tmp/skin-stage2-il2cpp-dump/dump.cs || exit "$rc"
           python - <<'PY'
-          import json, pathlib, re
+          import json, pathlib
           root=pathlib.Path('/tmp/skin-stage2-il2cpp-dump')
           dump=(root/'dump.cs').read_text('utf-8', errors='replace')
           lines=dump.splitlines()
@@ -60,17 +64,19 @@ jobs:
                           if any(n.lower() in text.lower() for n in ('SkeletonBinary','ReadShortArray','ReadVertices','ReadAttachment','ReadSkin')):
                               script.append(row)
           out={
-              'schemaVersion':1,
+              'schemaVersion':2,
               'stage':'skin-detail-spine-stage2',
               'substage':'authoritative-il2cpp-spine-symbols',
               'status':'PASS',
+              'dumperExitCode':rc,
+              'dumpRecoveredDespiteConsoleReadKey':rc != 0,
               'dumpHitCount':len(hits),
               'hits':hits,
               'scriptMethodHits':script,
               'guardrails':{'gameBinaryUploaded':False,'gameBinaryCommitted':False,'frontendMutation':False,'publicSkinAssetMutation':False,'classFusionTouched':False},
           }
           pathlib.Path('skin-detail-spine-stage2-il2cpp-symbols.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n','utf-8')
-          print(json.dumps({'status':out['status'],'dumpHitCount':len(hits),'scriptMethodHitCount':len(script)},ensure_ascii=False))
+          print(json.dumps({'status':out['status'],'dumperExitCode':rc,'dumpHitCount':len(hits),'scriptMethodHitCount':len(script)},ensure_ascii=False))
           PY
       - name: Upload text-only IL2CPP evidence
         uses: actions/upload-artifact@v4
