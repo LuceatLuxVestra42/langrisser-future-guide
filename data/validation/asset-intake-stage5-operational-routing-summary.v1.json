@@ -1,0 +1,45 @@
+{
+  "stage": "Asset Intake Stage 5 - Operational Routing",
+  "status": "PASS_ASSET_INTAKE_STAGE5_OPERATIONAL_ROUTING",
+  "completion": "COMPLETE",
+  "contractVersion": "asset-intake-operational-routing/v1",
+  "baseMainCommit": "0233493f86c86a9e84f4bc119c95a1296c607672",
+  "predecessor": "docs/checkpoints/asset-intake-stage4-repository-integration.md",
+  "routing": {
+    "projectVerifiedEvidenceFirst": true,
+    "assetIntakeBeforeExternalSearch": true,
+    "externalSearchOnlyAfterPending": true,
+    "externalCandidateDirectUse": false,
+    "verifiedExternalCandidateReturnsToAssetIntake": true,
+    "allSourcesExhaustedState": "BLOCKED_NO_VERIFIED_ASSET"
+  },
+  "externalSourcePriority": [
+    "BILIBILI_WIKI_PUBLIC_ORIGINAL",
+    "LEGACY_KR_SHEET_ASSET_DRIVE",
+    "OTHER_EXTERNAL_IMAGE_SOURCE"
+  ],
+  "repositoryEntries": {
+    "routeCli": "npm run asset:intake:route -- --request <file>",
+    "genericCli": "npm run asset:intake -- route --request <file>",
+    "validator": "npm run asset:intake:validate"
+  },
+  "projectDoctor": {
+    "d2ContractVersion": "V5",
+    "d3ContractVersion": "V5",
+    "d4ContractVersion": "V5",
+    "d7ContractVersion": "V6",
+    "reason": "Stage 4 D2/D3/D4 V5 already own and execute Asset Intake tooling. D7 V5 also froze the Stage 4 validation alias, so Stage 5 adds only D7 V6 to admit the Stage 5 validator pointer while preserving D2/D3/D4 V5.",
+    "expectedSelectedCheck": "asset-intake-self-test"
+  },
+  "preservedBoundaries": {
+    "skinAssetsManual": true,
+    "bannerAssetsManual": true,
+    "semanticRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "fuzzyFilenameMatching": false,
+    "rawConfigDataAssetFallback": false,
+    "frontendChanged": false,
+    "assetBytesChanged": false
+  }
+}

@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { scanAssetRoot, stableInventoryJson } from '../core/engine-v1.mjs';
+import { routeAssetRequest, stableRoutingJson } from '../core/route-v1.mjs';
 import {
   adaptSkinContractDocument,
   buildSkinModelResourceMap,
@@ -18,6 +19,7 @@ export function parseAssetIntakeCli(argv) {
     contract: null,
     resourceMap: null,
     sourceArtifact: null,
+    request: null,
     out: null,
     diagnostics: null,
     help: false,
@@ -29,7 +31,7 @@ export function parseAssetIntakeCli(argv) {
   for (let i = 0; i < rest.length; i += 1) {
     const arg = rest[i];
     if (arg === '--help' || arg === '-h') options.help = true;
-    else if (['--root', '--contract', '--resource-map', '--source-artifact', '--out', '--diagnostics'].includes(arg)) {
+    else if (['--root', '--contract', '--resource-map', '--source-artifact', '--request', '--out', '--diagnostics'].includes(arg)) {
       if (!rest[i + 1]) throw new Error(`${arg} requires a value`);
       const key = arg.slice(2).replace(/-([a-z])/g, (_, c) => c.toUpperCase());
       options[key] = rest[++i];
@@ -42,10 +44,14 @@ const usage = () => [
   'Usage:',
   '  npm run asset:intake -- scan --root <dir> [--source-artifact <id>] [--out <file>]',
   '  npm run asset:intake -- skin --root <dir> --contract <file> [--resource-map <file>] [--out <file>] [--diagnostics <file>]',
+  '  npm run asset:intake -- route --request <file> [--out <file>]',
+  '  npm run asset:intake:route -- --request <file> [--out <file>]',
   '',
   'Notes:',
   '  - scan emits deterministic root-relative file evidence.',
   '  - skin consumes an existing frozen asset-intake/v1 Skin contract.',
+  '  - route enforces project evidence -> Asset Intake -> approved external source priority.',
+  '  - verified external candidates must re-enter Asset Intake and are never direct production assets.',
   '  - RESOURCE_ID resolution requires an explicit confirmed resource map.',
   '  - no name join, similarity matching, ID arithmetic, or cross-root fallback is performed.',
 ].join('\n');
@@ -69,9 +75,26 @@ function resourceEntriesFrom(document) {
 export async function runAssetIntakeCli(argv) {
   const options = parseAssetIntakeCli(argv);
   if (options.help) return { status: 'HELP', exitCode: 0, text: `${usage()}\n` };
-  if (!['scan', 'skin'].includes(options.command)) throw new Error(`unsupported command: ${options.command}`);
-  if (!options.root) throw new Error('--root is required');
+  if (!['scan', 'skin', 'route'].includes(options.command)) throw new Error(`unsupported command: ${options.command}`);
 
+  if (options.command === 'route') {
+    if (!options.request) throw new Error('--request is required for route');
+    const request = await readJson(options.request);
+    const routed = routeAssetRequest(request);
+    await writeOrPrint(stableRoutingJson(routed), options.out);
+    if (routed.exitCode !== 0) {
+      return { status: routed.status, exitCode: routed.exitCode, errors: routed.errors ?? [] };
+    }
+    return {
+      status: 'PASS_ASSET_INTAKE_OPERATIONAL_ROUTE',
+      exitCode: 0,
+      action: routed.decision.action,
+      sourceKey: routed.decision.sourceKey,
+      terminal: routed.decision.terminal,
+    };
+  }
+
+  if (!options.root) throw new Error('--root is required');
   const inventory = await scanAssetRoot(options.root, { sourceArtifact: options.sourceArtifact });
   if (options.command === 'scan') {
     await writeOrPrint(stableInventoryJson(inventory), options.out);
