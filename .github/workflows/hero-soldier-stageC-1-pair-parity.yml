@@ -2,33 +2,32 @@ name: Hero-Soldier Stage C-1 Pair Parity
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - 'work/hero-soldier-stageC-1'
-    paths:
-      - 'scripts/validate-hero-soldier-stageC-1-pair-parity.cjs'
-      - 'data/contracts/hero-soldier-integration-stageC-0-input.v1.json'
-      - 'data/validation/hero-soldier-integration-stageC-0-summary.v1.json'
-      - 'data/validation/hero-soldier-relation-stageA-final.v1.json'
-      - 'data/generated/hero-soldier-relations.v1.json'
-      - 'data/generated/hero-detail.v1.json'
-      - 'data/generated/hero-detail/by-id/**'
-      - 'data/validation/hero-stage6-4-final.v1.json'
-      - 'data/generated/soldier-stage6-1-full-records.v1.json'
-      - 'data/validation/soldier-stage6-7-site-admission.v1.json'
-      - '.github/workflows/hero-soldier-stageC-1-pair-parity.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  validate-final-pair-parity:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Hero-Soldier Stage C-1 producer runs must target a non-main branch. Select the branch/ref to freeze, then open a normal PR.'
+          exit 1
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - name: Setup Node
@@ -63,8 +62,8 @@ jobs:
           name: hero-soldier-stageC-1-pair-parity
           path: data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json
 
-      - name: Freeze C-1 output on work branch
-        if: steps.validate.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/hero-soldier-stageC-1')
+      - name: Freeze C-1 output on explicit producer run
+        if: steps.validate.outcome == 'success'
         run: |
           TARGET='data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json'
           if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
@@ -77,16 +76,6 @@ jobs:
           git commit -m 'Freeze Hero-Soldier Stage C-1 pair parity PASS'
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
-
-      - name: Verify frozen C-1 output on PR
-        if: steps.validate.outcome == 'success' && github.event_name == 'pull_request'
-        run: |
-          TARGET='data/validation/hero-soldier-integration-stageC-1-pair-parity.v1.json'
-          if [ -n "$(git status --porcelain -- "$TARGET")" ]; then
-            echo 'C-1 output is missing or stale.'
-            git status --short -- "$TARGET"
-            exit 1
-          fi
 
       - name: Enforce C-1 gate
         if: always() && steps.validate.outcome != 'success'
