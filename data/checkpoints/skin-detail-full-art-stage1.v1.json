@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-detail-full-art-stage1",
+  "status": "SKIN_DETAIL_FULL_ART_STAGE1_COMPLETE_NO_STATIC_SOURCE",
+  "date": "2026-08-30",
+  "scope": "Representative investigation only; determine whether an authoritative static Skin full-art source equivalent to HeroPainting exists before any resolver/materialization/frontend work.",
+  "authoritativePredecessor": {
+    "skinPr": 184,
+    "skinBranch": "work/skin-stage3-3-bulk-plan",
+    "skinHeadSha": "62b9cd3a68a0ce9bde40319e8e2ecb3ee9347522",
+    "skinPopulation": 540,
+    "heroSkinEdges": 540,
+    "currentStaticAssetContract": "public/images/skins/{skinId}.png",
+    "currentStaticSourceFamily": "UI/Icon/HeroSkin*_ABS/Skin/*.png"
+  },
+  "heroFullArtworkPredecessor": {
+    "status": "PASS_H_A5_BULK_EXTRACTION_INDEX_FINAL",
+    "heroPopulation": 267,
+    "sourceFamily": "UI/HeroPainting/*_ABS/Prefab/*.prefab",
+    "selectionChain": "exact Prefab -> serialized referenced Sprite -> Texture2D",
+    "filenameSimilarityUsed": false
+  },
+  "representatives": [
+    {
+      "skinId": 102,
+      "heroId": 1,
+      "knownStaticSource": "UI/Icon/HeroSkin_ABS/Skin/Skin_Matthew_01.png",
+      "knownSpineSource": "Spine/Char/Mathew_ABS/Mathew_Skin01_Prefab.prefab"
+    },
+    {
+      "skinId": 1901,
+      "heroId": 19,
+      "knownStaticSource": "UI/Icon/HeroSkin2_ABS/Skin/Skin_Lista_Skin01.png"
+    },
+    {
+      "skinId": 3701,
+      "heroId": 37,
+      "knownStaticSource": "UI/Icon/HeroSkin_ABS/Skin/Skin_Zigodlla_01.png"
+    }
+  ],
+  "diagnostic": {
+    "installVersion": "1.1.113",
+    "workflowRunId": 33292020134,
+    "workflowHeadSha": "dfc435f6fdf5a62b4265c1b0674aa00ac16121b7",
+    "workflowConclusion": "success",
+    "artifactId": 9726262251,
+    "artifactDigest": "sha256:2dc8165598c5f4b27dd554c4aed6d44233e7a4005665905eb4407d77da17d6a3",
+    "officialInstallerPackageCount": 68,
+    "lastPackagePart": 68,
+    "taggedBundleBasenameCount": 42,
+    "heroPaintingBundleCount": 14,
+    "skinNamedBundleCount": 28,
+    "skinPaintingNamedBundleCount": 0,
+    "frozenH_A5HeroPaintingBundlesScanned": 12,
+    "frozenH_A5SkinNamedContainerCount": 0,
+    "representativeSkinTokenMatchesInFrozenH_A5": {
+      "102": 0,
+      "1901": 0,
+      "3701": 0
+    },
+    "remainingHeroPaintingBundlesScanned": 2,
+    "remainingHeroPaintingSkinNamedContainerCount": 0,
+    "remainingHeroPaintingRepresentativeMatches": {
+      "102": 0,
+      "1901": 0,
+      "3701": 0
+    },
+    "remainingHeroPaintingBundles": [
+      {
+        "bundleName": "begin_ui_heropainting01_ssr_abs.b",
+        "bundleSha256": "EA70B0A3967A9A177EACEF434C015EEECB0582FD0FF41BFBDE4B1AF0E1F21520",
+        "containerCount": 4,
+        "skinNamedContainerCount": 0
+      },
+      {
+        "bundleName": "ui_heropainting01_sr_abs.b",
+        "bundleSha256": "B1116621CADF60F077D6845878BD74906BD088625FFCDCFB345329A07A39BF92",
+        "containerCount": 12,
+        "skinNamedContainerCount": 0
+      }
+    ]
+  },
+  "conclusion": {
+    "authoritativeStaticSkinFullArtworkLocatorConfirmed": false,
+    "heroPaintingEquivalentSkinPrefabConfirmed": false,
+    "currentSkinStaticAssetIsFullArtwork": false,
+    "staticResolverStageAllowed": false,
+    "bulkStaticFullArtworkMaterializationAllowed": false,
+    "semanticReopenRequired": false,
+    "frontendChangeRequiredNow": false,
+    "judgment": "The current official Skin metadata and installer evidence do not establish a separate static full-art source equivalent to HeroPainting. The 204x340-class UI/Icon/HeroSkin static asset remains the only confirmed static Skin image role. Do not stretch or relabel it as Hero-style full artwork."
+  },
+  "review": [
+    "A hypothetical full-art object hidden in an unrelated bundle without any authoritative locator cannot be disproven absolutely, but there is currently no source relation that would justify a repository-wide heuristic scan or resolver inference.",
+    "CHAR_SPINE and MODEL_PRIMARY are separate runtime/renderable asset roles and were not promoted to static illustration in this stage."
+  ],
+  "blocker": "NO_AUTHORITATIVE_STATIC_SKIN_FULL_ART_LOCATOR",
+  "nextStart": "If Hero-style Skin display is still required, open a separate alternative-feasibility unit using the already-frozen CHAR_SPINE source for representative skins. Determine whether exact dependencies can produce an acceptable full-body render without claiming it is the same static illustration asset class.",
+  "reopenConditions": [
+    "new authoritative ConfigData/source field explicitly locating Skin full artwork",
+    "new official client snapshot introduces a Skin full-art/Painting asset family",
+    "direct serialized dependency evidence links canonical Skin IDs to a full-art Sprite/Texture outside the currently proven roles"
+  ],
+  "guardrails": {
+    "skinIdentityChanged": false,
+    "heroSkinRelationChanged": false,
+    "sourceOrderChanged": false,
+    "frontendChanged": false,
+    "publicSkinAssetsChanged": false,
+    "classFusionTouched": false
+  }
+}
