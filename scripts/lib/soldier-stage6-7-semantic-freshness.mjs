@@ -1,6 +1,7 @@
 import {
   FROZEN_SEMANTIC_FRESHNESS_CONTRACT,
   FROZEN_SEMANTIC_DIGEST_ALGORITHM,
+  buildSemanticDigest,
   sameSemanticDigest,
 } from './frozen-semantic-digest.mjs';
 import {
@@ -9,6 +10,9 @@ import {
 } from './soldier-stage6-6-semantic-projections.mjs';
 
 export const STAGE67_FRESHNESS_MODE = 'SEMANTIC_DIGEST_V2_STICKY_PROVENANCE';
+
+const STAGE3_GENERATED_PROJECTION = 'soldier-stage6-7/transitive-stage3-generated/v1';
+const STAGE3_VALIDATION_PROJECTION = 'soldier-stage6-7/transitive-stage3-validation/v1';
 
 function validDigestEnvelope(value) {
   return Boolean(
@@ -32,7 +36,30 @@ function sameDigestIdentity(left, right) {
 export function buildStage67Stage66Digest(label, value) {
   if (label === 'stage6_6') return buildStage66ValidationDigest(value);
   if (label === 'stage6_6Manifest' || label === 'expansionBasis') return buildStage66OutputDigest(value);
-  throw new TypeError(`Unsupported P4 semantic source label: ${label}`);
+  throw new TypeError(`Unsupported P4 Stage 6-6 semantic source label: ${label}`);
+}
+
+export function buildStage67Stage3Digest(label, value) {
+  if (label === 'stage3Generated') {
+    return buildSemanticDigest(STAGE3_GENERATED_PROJECTION, {
+      version: value?.version ?? null,
+      stage: value?.stage ?? null,
+      status: value?.status ?? null,
+      sources: value?.sources ?? null,
+      records: value?.records ?? null,
+      trainingProfiles: value?.trainingProfiles ?? null,
+      spRelations: value?.spRelations ?? null,
+      spHeroRewards: value?.spHeroRewards ?? null,
+    });
+  }
+  if (label === 'stage3Validation') {
+    // Stage 6-2 consumes exactly Stage 3 validation status and checks.
+    return buildSemanticDigest(STAGE3_VALIDATION_PROJECTION, {
+      status: value?.status ?? null,
+      checks: value?.checks ?? null,
+    });
+  }
+  throw new TypeError(`Unsupported P4 Stage 3 semantic source label: ${label}`);
 }
 
 export function verifyStage66EmbeddedFreshness(label, value) {
@@ -61,7 +88,7 @@ export function classifyStage67Ref(ref, currentDigest, currentGitBlobSha) {
   return ref.gitBlobSha === currentGitBlobSha ? 'SEMANTIC_FRESH' : 'PROVENANCE_ONLY_CHANGED';
 }
 
-export function buildStage67V2Ref({ path, currentDigest, currentGitBlobSha, priorRef = null }) {
+export function buildStage67V2Ref({ path, currentDigest, currentGitBlobSha, priorRef = null, stickyGitBlobSha = null }) {
   const priorClassification = classifyStage67Ref(priorRef, currentDigest, currentGitBlobSha);
   const preservePriorBlob = priorRef?.path === path
     && typeof priorRef?.gitBlobSha === 'string'
@@ -69,21 +96,23 @@ export function buildStage67V2Ref({ path, currentDigest, currentGitBlobSha, prio
 
   return {
     path,
-    gitBlobSha: preservePriorBlob ? priorRef.gitBlobSha : currentGitBlobSha,
+    gitBlobSha: preservePriorBlob
+      ? priorRef.gitBlobSha
+      : (typeof stickyGitBlobSha === 'string' ? stickyGitBlobSha : currentGitBlobSha),
     semanticDigest: currentDigest,
     freshnessMode: STAGE67_FRESHNESS_MODE,
   };
 }
 
-export function proveLegacyStage67Migration({
-  label,
+function proveLegacyMigrationWithDigestBuilder({
   path,
   currentValue,
   currentGitBlobSha,
   priorRef,
   readHistoricalJson,
+  buildDigest,
 }) {
-  const currentDigest = buildStage67Stage66Digest(label, currentValue);
+  const currentDigest = buildDigest(currentValue);
 
   if (!priorRef || priorRef.path !== path || typeof priorRef.gitBlobSha !== 'string') {
     return {
@@ -127,7 +156,7 @@ export function proveLegacyStage67Migration({
 
   let historicalDigest;
   try {
-    historicalDigest = buildStage67Stage66Digest(label, historicalValue);
+    historicalDigest = buildDigest(historicalValue);
   } catch (error) {
     return {
       ok: false,
@@ -154,4 +183,40 @@ export function proveLegacyStage67Migration({
     currentDigest,
     historicalDigest,
   };
+}
+
+export function proveLegacyStage67Migration({
+  label,
+  path,
+  currentValue,
+  currentGitBlobSha,
+  priorRef,
+  readHistoricalJson,
+}) {
+  return proveLegacyMigrationWithDigestBuilder({
+    path,
+    currentValue,
+    currentGitBlobSha,
+    priorRef,
+    readHistoricalJson,
+    buildDigest: (value) => buildStage67Stage66Digest(label, value),
+  });
+}
+
+export function proveLegacyStage67Stage3Migration({
+  label,
+  path,
+  currentValue,
+  currentGitBlobSha,
+  priorRef,
+  readHistoricalJson,
+}) {
+  return proveLegacyMigrationWithDigestBuilder({
+    path,
+    currentValue,
+    currentGitBlobSha,
+    priorRef,
+    readHistoricalJson,
+    buildDigest: (value) => buildStage67Stage3Digest(label, value),
+  });
 }
