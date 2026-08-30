@@ -1,0 +1,53 @@
+{
+  "stage": "Asset Intake Stage 4 - Repository Integration",
+  "status": "READY_FOR_PR_GUARD",
+  "completion": "IMPLEMENTATION_COMPLETE_ADMISSION_PENDING",
+  "contractVersion": "asset-intake/v1",
+  "baseMainCommit": "f618238c6ec0ba9463e935240a4028f281f322a0",
+  "implementationScope": {
+    "repositoryCliInstalled": true,
+    "explicitNpmEntryInstalled": true,
+    "repositoryValidatorInstalled": true,
+    "projectDoctorD2V5MappingInstalled": true,
+    "projectDoctorD3V5CheckInstalled": true,
+    "projectDoctorD4V5ExecutionInstalled": true,
+    "projectDoctorD7V5GuardContractInstalled": true,
+    "projectDoctorCurrentPointersMovedToV5": true,
+    "devBuildHookInstalled": false,
+    "frontendChanged": false,
+    "assetBytesChanged": false,
+    "semanticRecomputationAdded": false,
+    "skinAssetOwnerPromoted": false
+  },
+  "repositoryEntries": {
+    "cli": "npm run asset:intake -- <scan|skin> ...",
+    "validator": "npm run asset:intake:validate",
+    "doctorOwningNode": "project-doctor",
+    "doctorChangeClass": "asset-intake-tooling",
+    "doctorCheckId": "asset-intake-self-test"
+  },
+  "preservedManualReviewNodes": [
+    "banner-assets",
+    "skin-assets"
+  ],
+  "representativeValidation": {
+    "records": 3,
+    "locators": 13,
+    "syntheticRepositoryExecution": true,
+    "authoritativeProjectAssetClaim": false,
+    "resourceIdRequiresExplicitConfirmedMap": true,
+    "missingResourceMapFailsClosedToPending": true
+  },
+  "admissionRequired": {
+    "event": "pull_request",
+    "guardedHeadMustMatchPrHead": true,
+    "planStatus": "PLAN_READY",
+    "manualReviews": [],
+    "unmappedPaths": [],
+    "requiredSelectedCheck": "asset-intake-self-test",
+    "requiredCheckExitCode": 0,
+    "allSelectedChecksExitCode": 0,
+    "projectDoctorPrGuardConclusion": "success"
+  },
+  "nextStageAfterAdmission": "ASSET_INTAKE_STAGE5_OPERATIONAL_ROUTING"
+}
