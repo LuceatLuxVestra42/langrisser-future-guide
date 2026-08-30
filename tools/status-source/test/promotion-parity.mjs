@@ -48,6 +48,7 @@ const equipmentAlreadyActive = promoteStatusSource({
 });
 assert.equal(equipmentAlreadyActive.status, 'PASS_STATUS_SOURCE_PROMOTION_ALREADY_ACTIVE');
 assert.equal(equipmentAlreadyActive.writePerformed, false);
+assert.equal(equipmentAlreadyActive.boundaries.statusSourceDeclarationWriteCount, 0);
 assert.deepEqual(
   Object.fromEntries(['canonical', 'public', 'general', 'exclusive'].map(key => [key, equipmentAlreadyActive.compatibility.effectiveExpected[key]])),
   { canonical: 390, public: 365, general: 198, exclusive: 167 },
@@ -128,6 +129,7 @@ try {
   }, runtime);
   assert.equal(checked.status, 'PASS_STATUS_SOURCE_PROMOTION_CHECK');
   assert.equal(checked.writePerformed, false);
+  assert.equal(checked.boundaries.statusSourceDeclarationWriteCount, 0);
   assert.equal(fs.existsSync(path.join(tempRoot, checked.outputPath)), false, 'check mode must not write declaration');
   assert.equal(selectActiveSources({ repoRoot: tempRoot }).domains.hero.selectedId, 'hero-root');
 
@@ -139,6 +141,7 @@ try {
   }, runtime);
   assert.equal(applied.status, 'PASS_STATUS_SOURCE_PROMOTION_APPLY');
   assert.equal(applied.writePerformed, true);
+  assert.equal(applied.boundaries.statusSourceDeclarationWriteCount, 1);
   assert.equal(fs.existsSync(path.join(tempRoot, applied.outputPath)), true, 'apply mode must write one declaration');
   assert.equal(selectActiveSources({ repoRoot: tempRoot }).domains.hero.selectedId, 'hero-next');
 
