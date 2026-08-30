@@ -40,5 +40,16 @@
     "A page projection may attach display or routing metadata, but it must preserve the exact canonical pair set.",
     "Existing REVIEW presentation metadata is non-blocking and must never remove a canonical relation edge.",
     "Any one-direction-only membership, unknown target ID, duplicate pair, or relation snapshot drift is a Stage 6-5 failure."
-  ]
+  ],
+  "freshness": {
+    "contract": "frozen-semantic-freshness/v2",
+    "freshnessMode": "SEMANTIC_DIGEST_V2_MEMBERSHIP",
+    "scope": "RECIPROCAL_MEMBERSHIP_ONLY",
+    "semanticDigest": {
+      "contract": "frozen-semantic-freshness/v2",
+      "algorithm": "sha256",
+      "projection": "hero-soldier-membership/v1",
+      "digest": "sha256:08091d305e73777a893a72af53a53c630852397c08eee59cf614cce10d6f045e"
+    }
+  }
 }
