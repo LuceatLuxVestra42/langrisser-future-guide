@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage4-production-admission/v1",
+  "stage": "ASSET_HYGIENE_4",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Adopt only already-verified current production assets into the Asset Intake project-evidence lookup while preserving all other assets as evidence, review, or quarantine without mutating bytes or reopening semantic relations.",
+  "predecessors": {
+    "stage3Classification": "tools/asset-intake/hygiene/generated/asset-hygiene-classification.v1.json",
+    "stage3VerifiedEvidenceIndex": "tools/asset-intake/hygiene/generated/asset-hygiene-verified-evidence-index.v1.json",
+    "stage3Summary": "data/validation/asset-intake-hygiene-stage3-classification-summary.v1.json",
+    "stage5OperationalRoutingContract": "tools/asset-intake/contract/operational-routing.v1.json",
+    "stage5OperationalRoutingCheckpoint": "docs/checkpoints/asset-intake-stage5-operational-routing.md"
+  },
+  "population": {
+    "expectedClassificationRecordCount": 2188,
+    "expectedCanonicalEntryCount": 780,
+    "expectedPathEntryCount": 443
+  },
+  "admissionPolicy": {
+    "requiredPrimaryClass": "ACTIVE_VERIFIED",
+    "requiresActiveProductionTrait": true,
+    "requiresCanonicalKeyFromStage3": true,
+    "requiresSha256": true,
+    "blockingFlags": [
+      "RESOLVER_COLLISION",
+      "UNVERIFIED_EXTERNAL"
+    ],
+    "nonBlockingCandidateFlags": [
+      "EXACT_DUPLICATE",
+      "BASENAME_COLLISION"
+    ],
+    "oneSelectedAssetPerCanonicalKey": true,
+    "filenameIdentityDerivation": false,
+    "pathIdentityDerivation": false
+  },
+  "pathOnlyPolicy": {
+    "existingProductionUsePreserved": true,
+    "canonicalRouterAutoPromotion": false,
+    "reason": "Stage 3 intentionally preserved these verified assets as REPOSITORY_PATH_ONLY. AH-4 does not invent canonical identity or reopen AH-2/AH-3."
+  },
+  "quarantinePolicy": {
+    "directProductionLookupAllowed": false,
+    "evidenceMayRemainUsableByAssetIntake": true,
+    "primaryClassesNotDirectlyAdmitted": [
+      "EVIDENCE_ONLY",
+      "GENERATED_DERIVATIVE",
+      "SUPERSEDED",
+      "UNREFERENCED",
+      "PROVENANCE_UNKNOWN"
+    ],
+    "riskFlagsForceQuarantine": [
+      "RESOLVER_COLLISION",
+      "UNVERIFIED_EXTERNAL"
+    ],
+    "unreferencedDoesNotMeanDelete": true
+  },
+  "routerCompatibility": {
+    "existingStage5ContractUnchanged": true,
+    "existingRouteStateMachineUnchanged": true,
+    "admittedLookupShape": "projectLookup.status=RESOLVED with provenanceVerified=true, canonicalIdEvidenceVerified=true, evidenceRef",
+    "nonAdmittedLookupShape": "projectLookup.status=NOT_FOUND with lookupDisposition metadata; existing Stage 5 router then requires RUN_ASSET_INTAKE",
+    "externalSourcePriorityUnchanged": true
+  },
+  "adoptionScope": {
+    "assetIntakeProjectEvidenceLookup": true,
+    "frontendConsumerRewrite": false,
+    "existingProductionConsumerRevocation": false,
+    "assetMovement": false
+  },
+  "forbidden": {
+    "assetMutation": true,
+    "assetMove": true,
+    "assetDelete": true,
+    "assetRename": true,
+    "formatConversion": true,
+    "frontendMutation": true,
+    "productionConsumerRewrite": true,
+    "externalFetch": true,
+    "rawConfigDataRead": true,
+    "semanticRecomputation": true,
+    "canonicalRelationRecomputation": true,
+    "nameJoin": true,
+    "idArithmetic": true,
+    "filenameCanonicalInference": true,
+    "pathOnlyCanonicalPromotion": true,
+    "basenameCollisionToResolverCollisionInference": true
+  },
+  "outputs": {
+    "admissionIndex": "tools/asset-intake/hygiene/generated/asset-hygiene-production-admission-index.v1.json",
+    "quarantineIndex": "tools/asset-intake/hygiene/generated/asset-hygiene-production-quarantine-index.v1.json",
+    "summary": "data/validation/asset-intake-hygiene-stage4-production-admission-summary.v1.json",
+    "checkpoint": "docs/checkpoints/asset-intake-hygiene-stage4-production-admission.md"
+  },
+  "finalState": {
+    "status": "PASS_WITH_REVIEW",
+    "completion": "COMPLETE",
+    "freezeState": "ASSET_HYGIENE_STAGE4_PRODUCTION_ADMISSION_FROZEN",
+    "nextStartPoint": "ASSET_HYGIENE_5_DEDUP_MOVE_DELETE_SEPARATE_WORK"
+  }
+}
