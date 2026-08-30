@@ -82,7 +82,9 @@
     "validate:regression-coverage-promotion:v2": "node scripts/validate-regression-coverage-promotion-v2.mjs",
     "qa:hosted": "node scripts/run-project-doctor-route-hosted-qa-stage1.mjs",
     "qa:hosted:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage1.mjs --check",
-    "qa:hosted:stage0:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage0.mjs --check"
+    "qa:hosted:stage0:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage0.mjs --check",
+    "qa:browser": "playwright test -c playwright.route-hosted.config.ts",
+    "qa:browser:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage2.mjs --check"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -140,6 +142,7 @@
   "devDependencies": {
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "^2.15.0",
+    "@playwright/test": "1.62.1",
     "@types/node": "^22.16.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
