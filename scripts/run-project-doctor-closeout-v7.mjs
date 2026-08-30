@@ -5,7 +5,9 @@ export const CLOSEOUT_STEPS_V7 = [
   { id: 'd5-freshness', script: 'scripts/validate-project-doctor-d5.mjs', passthrough: false },
   { id: 'd5-self-test', script: 'scripts/validate-project-doctor-d5-fixtures.mjs', passthrough: false },
   { id: 'frozen-freshness-v2-self-test', script: 'scripts/validate-project-doctor-frozen-freshness-v2.mjs', passthrough: false },
-  { id: 'd4-self-test', script: 'scripts/validate-project-doctor-d4-v7.mjs', passthrough: false },
+  { id: 'd2-v7-self-test', script: 'scripts/validate-project-doctor-d2-impact-v7.mjs', passthrough: false },
+  { id: 'd3-v7-self-test', script: 'scripts/validate-project-doctor-d3-v7.mjs', passthrough: false },
+  { id: 'd4-v7-self-test', script: 'scripts/validate-project-doctor-d4-v7.mjs', passthrough: false },
   { id: 'd4-run', script: 'scripts/run-project-doctor-d4-v7.mjs', passthrough: true },
 ];
 
@@ -24,7 +26,7 @@ export const executeCloseoutV7 = ({ argv = [], executor = defaultExecutor } = {}
 };
 
 if (process.argv.includes('--help') || process.argv.includes('-h')) {
-  console.log('Usage: npm run doctor -- [--dry-run] [--json] [D3/D4 changed-file source options]');
+  console.log('Usage: node scripts/run-project-doctor-closeout-v7.mjs [--dry-run] [--json] [D3/D4 changed-file source options]');
   process.exit(0);
 }
 const result = executeCloseoutV7({ argv: process.argv.slice(2) });
