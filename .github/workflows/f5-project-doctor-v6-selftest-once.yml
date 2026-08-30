@@ -1,0 +1,27 @@
+name: F5 Project Doctor V6 Selftest Once
+
+on:
+  push:
+    branches:
+      - maintenance/frozen-provenance-semantic-freshness-v2-f4
+    paths:
+      - .github/workflows/f5-project-doctor-v6-selftest-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm run doctor:freshness:v2:self-test
+      - run: npm run doctor:impact:validate
+      - run: npm run doctor:plan:validate
+      - run: npm run doctor:run:validate
+      - run: npm run doctor:pr-guard:validate
