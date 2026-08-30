@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "contract": "skin-detail-spine-render",
-  "status": "CANDIDATE_PENDING_REPRESENTATIVE_REGRESSION",
+  "status": "FROZEN_REPRESENTATIVE_REGRESSION_PASS",
   "scope": "CHAR_SPINE runtime character render only",
   "semanticClaims": {
     "sameAssetClassAsHeroPainting": false,
@@ -14,6 +14,16 @@
     "successfulWorkflowRunId": 33295554932,
     "successfulArtifactId": 9727305610,
     "successfulArtifactDigest": "sha256:15d394bbf63acabfdf85bc031577a938081b078b426d3151a468cb80a5f9e3cb"
+  },
+  "freezeEvidence": {
+    "workflowRunId": 33295871489,
+    "workflowHeadSha": "01925439ac8afad06f6141e5cc118b02d88bcf00",
+    "workflowConclusion": "success",
+    "artifactId": 9727396854,
+    "artifactDigest": "sha256:618a96babc192df2ef84285fbf770a858236a0754c2061063108550ebdb6e3f0",
+    "validatorStatus": "PASS",
+    "validatorCheckCount": 52,
+    "validatorFailureCount": 0
   },
   "producer": {
     "baseProbePath": "scripts/probe-skin-detail-spine-stage2.py",
@@ -88,7 +98,9 @@
     "manifestPath": "data/generated/skin-detail-spine-render-v1.manifest.json",
     "publicNamespace": null,
     "frontendConsumptionAllowedAtThisStage": false,
-    "bulk540AllowedUntilRepresentativeRegressionPasses": false
+    "representativeRegressionPassed": true,
+    "bulkContractApplicationAllowed": true,
+    "bulkContractViolationPolicy": "BLOCK_AFFECTED_RECORD_AND_CLASSIFY; do not silently fallback or alter semantic relations"
   },
   "representativeRegression": {
     "requiredSkinIds": [102, 1901, 3701],
