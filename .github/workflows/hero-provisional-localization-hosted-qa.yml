@@ -1,0 +1,40 @@
+name: Hero Provisional Localization Hosted Browser QA
+
+on:
+  push:
+    branches:
+      - qa/hero-provisional-localization-hosted-20260830
+    paths:
+      - scripts/validate-hero-provisional-localization-hosted.mjs
+      - .github/workflows/hero-provisional-localization-hosted-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout QA source
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Chromium QA runtime
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify five provisional Hero names on hosted UI
+        env:
+          HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+          EXPECTED_SOURCE_SHA: 9964b8286ca3cd1bb618cc2a76a86a647aab31ad
+        run: node scripts/validate-hero-provisional-localization-hosted.mjs
