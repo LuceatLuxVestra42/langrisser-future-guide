@@ -1,0 +1,82 @@
+name: Skin Detail Spine Stage 2 IL2CPP Probe
+
+on:
+  push:
+    branches:
+      - research/skin-detail-spine-stage2-20260830
+    paths:
+      - scripts/probe-skin-detail-il2cpp-runtime.py
+      - .github/workflows/skin-detail-spine-stage2-il2cpp-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  il2cpp-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Locate and extract authoritative IL2CPP inputs
+        run: python scripts/probe-skin-detail-il2cpp-runtime.py
+      - name: Build Linux Il2CppDumper
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/Il2CppDumper-linux /tmp/il2cppdumper /tmp/skin-stage2-il2cpp-dump
+          git clone -q --depth=1 https://github.com/VladKalinov/Il2CppDumper-linux.git /tmp/Il2CppDumper-linux
+          dotnet publish /tmp/Il2CppDumper-linux/Il2CppDumper/Il2CppDumper.csproj -c Release -f net8.0 -o /tmp/il2cppdumper
+      - name: Dump IL2CPP metadata and Spine symbols
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/skin-stage2-il2cpp-dump
+          dotnet /tmp/il2cppdumper/Il2CppDumper.dll \
+            /tmp/skin-stage2-il2cpp/GameAssembly.dll \
+            /tmp/skin-stage2-il2cpp/global-metadata.dat \
+            /tmp/skin-stage2-il2cpp-dump
+          python - <<'PY'
+          import json, pathlib, re
+          root=pathlib.Path('/tmp/skin-stage2-il2cpp-dump')
+          dump=(root/'dump.cs').read_text('utf-8', errors='replace')
+          lines=dump.splitlines()
+          hits=[]
+          needles=('ProjectLPlugins','namespace Spine','class SkeletonBinary','ReadShortArray','ReadVertices','ReadAttachment','ReadSkin','SkeletonDataAsset','SkeletonAnimation')
+          for idx,line in enumerate(lines):
+              if any(n in line for n in needles):
+                  lo=max(0,idx-8); hi=min(len(lines),idx+18)
+                  hits.append({'line':idx+1,'match':line.strip(),'context':lines[lo:hi]})
+          script=[]
+          sp=root/'script.json'
+          if sp.exists():
+              data=json.loads(sp.read_text('utf-8'))
+              if isinstance(data,dict):
+                  for key in ('ScriptMethod','ScriptMetadata'):
+                      for row in data.get(key,[]) or []:
+                          text=json.dumps(row,ensure_ascii=False)
+                          if any(n.lower() in text.lower() for n in ('SkeletonBinary','ReadShortArray','ReadVertices','ReadAttachment','ReadSkin')):
+                              script.append(row)
+          out={
+              'schemaVersion':1,
+              'stage':'skin-detail-spine-stage2',
+              'substage':'authoritative-il2cpp-spine-symbols',
+              'status':'PASS',
+              'dumpHitCount':len(hits),
+              'hits':hits,
+              'scriptMethodHits':script,
+              'guardrails':{'gameBinaryUploaded':False,'gameBinaryCommitted':False,'frontendMutation':False,'publicSkinAssetMutation':False,'classFusionTouched':False},
+          }
+          pathlib.Path('skin-detail-spine-stage2-il2cpp-symbols.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n','utf-8')
+          print(json.dumps({'status':out['status'],'dumpHitCount':len(hits),'scriptMethodHitCount':len(script)},ensure_ascii=False))
+          PY
+      - name: Upload text-only IL2CPP evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-detail-spine-stage2-il2cpp-symbols
+          path: |
+            skin-detail-spine-stage2-il2cpp-locator.json
+            skin-detail-spine-stage2-il2cpp-symbols.json
+          if-no-files-found: error
