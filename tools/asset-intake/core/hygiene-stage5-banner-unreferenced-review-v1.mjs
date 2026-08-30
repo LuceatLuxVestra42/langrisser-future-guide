@@ -91,10 +91,17 @@ function currentPathIntroduction(events) {
   return chronological.find((event) => event.status === 'A' || ((event.status.startsWith('R') || event.status.startsWith('C')) && event.pathRole === 'NEW_PATH')) ?? chronological[0] ?? null;
 }
 
+function postIntroductionHistory(events, introduction) {
+  if (!introduction) return [];
+  const index = events.indexOf(introduction);
+  if (index <= 0) return [];
+  return events.slice(0, index);
+}
+
 function checkpointMarkdown(summary) {
   const familyLines = Object.entries(summary.targetPhysicalFamilyCounts).map(([key, count]) => `- \`${key}\`: ${count}`).join('\n');
   const batchLines = summary.introductionBatches.map((item) => `- \`${item.commit}\` — ${item.assetCount} files — ${item.message}`).join('\n');
-  return `# Asset Hygiene Stage 5-2 — Banner Unreferenced Review\n\n기준일: 2026-08-30\n\n상태: \`${summary.status} / ${summary.completion}\`\n\nfreeze: \`${summary.freezeState}\`\n\n## 1. authoritative predecessor\n\n- AH-5-0 destructive scope: \`${PATHS.stage5ScopeSummary}\`\n- AH-5-1 Banner duplicate review: \`${PATHS.stage5DuplicateSummary}\`\n- AH-5-0 Banner unreferenced population: 431\n\nAH-5-0/5-1 결과를 재사용했고 asset bytes, Banner semantic identity, canonical ownership을 다시 만들지 않았다.\n\n## 2. target coverage\n\n\`\`\`text\ntarget Banner unreferenced: ${summary.targetAssetCount}\nreviewed: ${summary.reviewedAssetCount}\ncurrent reference edges: ${summary.currentReferenceCount}\ncurrent Banner resolved relations: ${summary.currentBannerResolvedRelationCount}\npath history coverage: ${summary.pathHistoryCoverageCount}/${summary.targetAssetCount}\nintroduction evidence coverage: ${summary.introductionEvidenceCoverageCount}/${summary.targetAssetCount}\n\`\`\`\n\nPhysical family only:\n${familyLines}\n\n## 3. current Banner census parity\n\n\`\`\`text\nphysical Banner assets: ${summary.bannerCurrentBoundary.physicalAssetCount}\ncurrent resolved unique paths: ${summary.bannerCurrentBoundary.currentResolvedUniquePathCount}\nunreferenced review paths: ${summary.targetAssetCount}\nresolved + unreferenced: ${summary.bannerCurrentBoundary.currentResolvedUniquePathCount + summary.targetAssetCount}\n\`\`\`\n\n501 = 70 + 431 parity를 검증했다. 이 수치는 current reference coverage이며 unused/delete 의미가 아니다.\n\n## 4. Git path provenance\n\n현재 path의 Git history와 introduction batch를 전수 기록했다. introduction commit은 path provenance일 뿐 Banner role, canonical owner, recurrence/source identity 근거로 사용하지 않는다.\n\n${batchLines || '- 없음'}\n\n## 5. decisions\n\n\`\`\`text\nexact duplicate predecessor members: ${summary.decisionCounts.RETAIN_PENDING_ROLE_OR_OWNER_EQUIVALENCE_EVIDENCE ?? 0}\nother unreferenced retain-review: ${summary.decisionCounts.RETAIN_REVIEW_ONLY_UNREFERENCED ?? 0}\ndelete eligible: ${summary.deleteEligibleCount}\ndelete approved: ${summary.deleteApprovedCount}\n\`\`\`\n\nAH-5-1 duplicate 2개는 기존 retain 판정을 그대로 상속했다. 나머지 path도 reference 부재만으로 unused/delete로 승격하지 않았다.\n\n## 6. REVIEW / BLOCKER\n\nREVIEW:\n- \`BANNER_UNREFERENCED_RETAINS_REVIEW_ONLY\`: ${summary.targetAssetCount}\n\nBLOCKER:\n${summary.blockers.length ? summary.blockers.map((item) => `- \`${item.code}\`${item.repositoryPath ? ` — ${item.repositoryPath}` : ''}`).join('\n') : '- 없음'}\n\n## 7. 하지 않은 것\n\n\`\`\`text\nasset delete / move / rename\nformat conversion\nfrontend / consumer / resolver rewrite\nsemantic relation recomputation\ncanonical relation recomputation\nfilename role inference\nimport batch role/owner inference\nunreferenced -> unused inference\nreference absence -> delete safety inference\n\`\`\`\n\n## 8. 다음 시작점\n\n\`${summary.nextStartPoint}\`\n\nBanner 431개 review는 여기서 frozen한다. 다음 작업은 AH-5-0에 남은 non-Banner unreferenced 26개만 별도 domain review로 다룬다.\n\n## 9. 다시 열리는 조건\n\n- current Banner resolved relation/reference population 변경\n- explicit Banner asset owner/successor/supersession evidence 추가\n- repository Banner asset population 변경\n- AH-5-1 duplicate decision 변경\n- authoritative path provenance contradiction 발견\n`;
+  return `# Asset Hygiene Stage 5-2 — Banner Unreferenced Review\n\n기준일: 2026-08-30\n\n상태: \`${summary.status} / ${summary.completion}\`\n\nfreeze: \`${summary.freezeState}\`\n\n## 1. authoritative predecessor\n\n- AH-5-0 destructive scope: \`${PATHS.stage5ScopeSummary}\`\n- AH-5-1 Banner duplicate review: \`${PATHS.stage5DuplicateSummary}\`\n- AH-5-0 Banner unreferenced population: 431\n\nAH-5-0/5-1 결과를 재사용했고 asset bytes, Banner semantic identity, canonical ownership을 다시 만들지 않았다.\n\n## 2. target coverage\n\n\`\`\`text\ntarget Banner unreferenced: ${summary.targetAssetCount}\nreviewed: ${summary.reviewedAssetCount}\ncurrent reference edges: ${summary.currentReferenceCount}\ncurrent Banner resolved relations: ${summary.currentBannerResolvedRelationCount}\npath history coverage: ${summary.pathHistoryCoverageCount}/${summary.targetAssetCount}\nintroduction evidence coverage: ${summary.introductionEvidenceCoverageCount}/${summary.targetAssetCount}\npost-introduction changed paths: ${summary.postIntroductionChangedAssetCount}\n\`\`\`\n\nPhysical family only:\n${familyLines}\n\n## 3. current Banner census parity\n\n\`\`\`text\nphysical Banner assets: ${summary.bannerCurrentBoundary.physicalAssetCount}\ncurrent resolved unique paths: ${summary.bannerCurrentBoundary.currentResolvedUniquePathCount}\nunreferenced review paths: ${summary.targetAssetCount}\nresolved + unreferenced: ${summary.bannerCurrentBoundary.currentResolvedUniquePathCount + summary.targetAssetCount}\n\`\`\`\n\n501 = 70 + 431 parity를 검증했다. 이 수치는 current reference coverage이며 unused/delete 의미가 아니다.\n\n## 4. Git path provenance\n\n현재 path의 Git history와 introduction batch를 전수 기록했다. introduction commit은 path provenance일 뿐 Banner role, canonical owner, recurrence/source identity 근거로 사용하지 않는다.\n\n${batchLines || '- 없음'}\n\n431개 모두 같은 최초 import batch에 속한다. 그중 ${summary.postIntroductionChangedAssetCount}개는 이후 path-level Git 변경 이력이 추가로 있으며 해당 post-introduction history를 개별 record에 보존했다. 이 변경 이력도 semantic role, owner equivalence, supersession, delete safety로 해석하지 않는다.\n\n## 5. decisions\n\n\`\`\`text\nexact duplicate predecessor members: ${summary.decisionCounts.RETAIN_PENDING_ROLE_OR_OWNER_EQUIVALENCE_EVIDENCE ?? 0}\nother unreferenced retain-review: ${summary.decisionCounts.RETAIN_REVIEW_ONLY_UNREFERENCED ?? 0}\ndelete eligible: ${summary.deleteEligibleCount}\ndelete approved: ${summary.deleteApprovedCount}\n\`\`\`\n\nAH-5-1 duplicate 2개는 기존 retain 판정을 그대로 상속했다. 나머지 path도 reference 부재만으로 unused/delete로 승격하지 않았다.\n\n## 6. REVIEW / BLOCKER\n\nREVIEW:\n- \`BANNER_UNREFERENCED_RETAINS_REVIEW_ONLY\`: ${summary.targetAssetCount}\n- \`BANNER_PATH_CHANGED_AFTER_INTRODUCTION_REVIEW_ONLY\`: ${summary.postIntroductionChangedAssetCount}\n\nBLOCKER:\n${summary.blockers.length ? summary.blockers.map((item) => `- \`${item.code}\`${item.repositoryPath ? ` — ${item.repositoryPath}` : ''}`).join('\n') : '- 없음'}\n\n## 7. 하지 않은 것\n\n\`\`\`text\nasset delete / move / rename\nformat conversion\nfrontend / consumer / resolver rewrite\nsemantic relation recomputation\ncanonical relation recomputation\nfilename role inference\nimport batch role/owner inference\npost-introduction Git change -> semantic role inference\nunreferenced -> unused inference\nreference absence -> delete safety inference\n\`\`\`\n\n## 8. 다음 시작점\n\n\`${summary.nextStartPoint}\`\n\nBanner 431개 review는 여기서 frozen한다. 다음 작업은 AH-5-0에 남은 non-Banner unreferenced 26개만 별도 domain review로 다룬다.\n\n## 9. 다시 열리는 조건\n\n- current Banner resolved relation/reference population 변경\n- explicit Banner asset owner/successor/supersession evidence 추가\n- repository Banner asset population 변경\n- AH-5-1 duplicate decision 변경\n- frozen path provenance baseline 변경 또는 contradiction 발견\n`;
 }
 
 export async function buildStage5BannerUnreferencedReview({ write = false } = {}) {
@@ -179,6 +186,7 @@ export async function buildStage5BannerUnreferencedReview({ write = false } = {}
     if (history.length === 0) blockers.push({ code: 'GIT_PATH_HISTORY_MISSING', repositoryPath });
     const introduction = currentPathIntroduction(history);
     if (!introduction) blockers.push({ code: 'CURRENT_PATH_INTRODUCTION_EVIDENCE_MISSING', repositoryPath });
+    const laterHistory = postIntroductionHistory(history, introduction);
 
     const isDuplicatePredecessorMember = duplicateMembers.has(repositoryPath);
     const decision = isDuplicatePredecessorMember
@@ -195,6 +203,8 @@ export async function buildStage5BannerUnreferencedReview({ write = false } = {}
       currentBannerResolvedRelation: false,
       gitPathHistoryCount: history.length,
       currentPathIntroduction: introduction,
+      postIntroductionChangeCount: laterHistory.length,
+      postIntroductionHistory: laterHistory,
       introductionMeaning: contract.reviewPolicy.introductionBatchMeaning,
       exactDuplicatePredecessorMember: isDuplicatePredecessorMember,
       decision,
@@ -218,7 +228,19 @@ export async function buildStage5BannerUnreferencedReview({ write = false } = {}
   const decisionCounts = countBy(records, (record) => record.decision);
   const pathHistoryCoverageCount = records.filter((record) => record.gitPathHistoryCount > 0).length;
   const introductionEvidenceCoverageCount = records.filter((record) => record.currentPathIntroduction).length;
-  const multipleHistoryCommitAssetCount = records.filter((record) => record.gitPathHistoryCount > 1).length;
+  const postIntroductionChangedAssetCount = records.filter((record) => record.postIntroductionChangeCount > 0).length;
+
+  const provenanceBaseline = contract.pathProvenanceBaseline;
+  if (pathHistoryCoverageCount !== provenanceBaseline.expectedPathHistoryCoverageCount) blockers.push({ code: 'PATH_HISTORY_COVERAGE_CHANGED', actual: pathHistoryCoverageCount, expected: provenanceBaseline.expectedPathHistoryCoverageCount });
+  if (introductionEvidenceCoverageCount !== provenanceBaseline.expectedIntroductionEvidenceCoverageCount) blockers.push({ code: 'INTRODUCTION_EVIDENCE_COVERAGE_CHANGED', actual: introductionEvidenceCoverageCount, expected: provenanceBaseline.expectedIntroductionEvidenceCoverageCount });
+  if (introductionBatches.length !== provenanceBaseline.expectedIntroductionBatchCount) blockers.push({ code: 'INTRODUCTION_BATCH_COUNT_CHANGED', actual: introductionBatches.length, expected: provenanceBaseline.expectedIntroductionBatchCount });
+  const expectedBatch = introductionBatches.find((item) => item.commit === provenanceBaseline.expectedIntroductionCommit);
+  if (!expectedBatch || expectedBatch.message !== provenanceBaseline.expectedIntroductionMessage || expectedBatch.assetCount !== provenanceBaseline.expectedIntroductionAssetCount) {
+    blockers.push({ code: 'INTRODUCTION_BATCH_BASELINE_CHANGED', actual: expectedBatch ?? null });
+  }
+  if (postIntroductionChangedAssetCount !== provenanceBaseline.expectedPostIntroductionChangedAssetCount) {
+    blockers.push({ code: 'POST_INTRODUCTION_HISTORY_POPULATION_CHANGED', actual: postIntroductionChangedAssetCount, expected: provenanceBaseline.expectedPostIntroductionChangedAssetCount });
+  }
 
   const hardErrorCount = blockers.length;
   const review = {
@@ -238,15 +260,22 @@ export async function buildStage5BannerUnreferencedReview({ write = false } = {}
     provenanceSummary: {
       pathHistoryCoverageCount,
       introductionEvidenceCoverageCount,
-      multipleHistoryCommitAssetCount,
+      postIntroductionChangedAssetCount,
       introductionBatchCount: introductionBatches.length,
       introductionBatches,
-      meaning: contract.reviewPolicy.introductionBatchMeaning,
+      meaning: provenanceBaseline.meaning,
     },
     decisionCounts,
     deleteEligibleCount: 0,
     deleteApprovedCount: 0,
   };
+
+  const reviews = [
+    { code: 'BANNER_UNREFERENCED_RETAINS_REVIEW_ONLY', count: records.length, blocking: false },
+  ];
+  if (postIntroductionChangedAssetCount > 0) {
+    reviews.push({ code: 'BANNER_PATH_CHANGED_AFTER_INTRODUCTION_REVIEW_ONLY', count: postIntroductionChangedAssetCount, blocking: false });
+  }
 
   const summary = {
     version: 1,
@@ -269,15 +298,13 @@ export async function buildStage5BannerUnreferencedReview({ write = false } = {}
     },
     pathHistoryCoverageCount,
     introductionEvidenceCoverageCount,
-    multipleHistoryCommitAssetCount,
+    postIntroductionChangedAssetCount,
     introductionBatchCount: introductionBatches.length,
     introductionBatches,
     decisionCounts,
     deleteEligibleCount: 0,
     deleteApprovedCount: 0,
-    reviews: [
-      { code: 'BANNER_UNREFERENCED_RETAINS_REVIEW_ONLY', count: records.length, blocking: false },
-    ],
+    reviews,
     blockers,
     hardErrorCount,
     forbiddenOperationCounts: {
@@ -294,6 +321,7 @@ export async function buildStage5BannerUnreferencedReview({ write = false } = {}
       filenameCanonicalIdentityInference: 0,
       importBatchRoleInference: 0,
       importBatchOwnerInference: 0,
+      postIntroductionGitChangeSemanticRoleInference: 0,
       byteEqualitySemanticIdentityInference: 0,
       unreferencedToUnusedInference: 0,
       referenceAbsenceDeleteSafetyInference: 0,
