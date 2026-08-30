@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - 'work/**'
     paths:
       - 'data/contracts/hero-stage6-2-representative-fixture-qa.v1.json'
       - 'data/generated/hero-detail-stage6-1.v1.json'
@@ -35,11 +34,25 @@ on:
       - '.github/workflows/hero-stage6-2-fixture-qa.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  fixture-qa:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Hero Stage 6-2 producer runs must target a non-main branch. Select the branch/ref to freeze, then open a normal PR.'
+          exit 1
+
+  fixture-qa:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -70,8 +83,50 @@ jobs:
             data/generated/hero-stage6-2-representative-fixtures.v1.json
             data/validation/hero-stage6-2-final.v1.json
 
-      - name: Commit generated QA outputs on work branch
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
+      - name: Verify frozen outputs on PR or main
+        run: |
+          if [ -n "$(git status --porcelain -- data/generated/hero-stage6-2-representative-fixtures.v1.json data/validation/hero-stage6-2-final.v1.json)" ]; then
+            echo 'Stage 6-2 generated outputs are not frozen or are stale.'
+            git status --short -- data/generated/hero-stage6-2-representative-fixtures.v1.json data/validation/hero-stage6-2-final.v1.json
+            exit 1
+          fi
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build and validate Stage 6-2 fixtures
+        run: node scripts/build_hero_stage6_2_fixture_qa.cjs
+
+      - name: Show Stage 6-2 summary
+        run: |
+          node - <<'NODE'
+          const v = require('./data/validation/hero-stage6-2-final.v1.json');
+          console.log(JSON.stringify({status:v.status, completion:v.completion, summary:v.summary, selectedFixtures:v.selectedFixtures, hardErrors:v.hardErrors}, null, 2));
+          NODE
+
+      - name: Upload QA artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-stage6-2-representative-fixture-qa
+          path: |
+            data/generated/hero-stage6-2-representative-fixtures.v1.json
+            data/validation/hero-stage6-2-final.v1.json
+
+      - name: Freeze generated QA outputs on explicit producer run
         run: |
           if [ -z "$(git status --porcelain -- data/generated/hero-stage6-2-representative-fixtures.v1.json data/validation/hero-stage6-2-final.v1.json)" ]; then
             echo 'Stage 6-2 outputs already frozen.'
@@ -83,12 +138,3 @@ jobs:
           git commit -m 'Freeze Hero Stage 6-2 representative fixtures'
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
-
-      - name: Verify frozen outputs on PR or main
-        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
-        run: |
-          if [ -n "$(git status --porcelain -- data/generated/hero-stage6-2-representative-fixtures.v1.json data/validation/hero-stage6-2-final.v1.json)" ]; then
-            echo 'Stage 6-2 generated outputs are not frozen or are stale.'
-            git status --short -- data/generated/hero-stage6-2-representative-fixtures.v1.json data/validation/hero-stage6-2-final.v1.json
-            exit 1
-          fi
