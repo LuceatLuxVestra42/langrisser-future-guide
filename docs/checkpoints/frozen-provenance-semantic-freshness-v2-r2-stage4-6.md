@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: `R2-0_COMPLETE / R2-1_COMPLETE / R2-2_COMPLETE / IMPLEMENTATION_NOT_STARTED`
+Status: `R2_COMPLETE / R2-0_COMPLETE / R2-1_COMPLETE / R2-2_COMPLETE / R2-3_COMPLETE / NO_MIGRATION_REQUIRED`
 
 ## R2-0 — authoritative baseline freeze
 
@@ -170,8 +170,6 @@ Reason:
 4. malformed or missing evidence remains fail-closed;
 5. raw gitBlobSha remains preserved as provenance/audit evidence.
 
-No such separate Stage 4-6 downstream raw-SHA freshness comparison has been proven in R2-2.
-
 ## R2-2 final judgment
 
 - Stage 4-6 consumer semantic projection: `hero-soldier-membership/v1` — CONFIRMED for membership-only freshness use.
@@ -183,23 +181,94 @@ No such separate Stage 4-6 downstream raw-SHA freshness comparison has been prov
 
 This is an evidence-driven correction to the provisional R2-1 migration assumption, not a reopening of A-stage semantics.
 
+## R2-3 — genuine downstream frozen-reference freshness inventory
+
+R2-3 checked the current authoritative Soldier downstream chain rather than inferring ownership from historical file names.
+
+### Current downstream authority
+
+Project Doctor selects:
+
+- Soldier primary/active source: `data/validation/soldier-stage6-7-site-admission.v1.json`
+- Hero-Soldier relation active source: `data/validation/hero-soldier-integration-stageC-final.v1.json`
+
+The Stage 4-6 validation output is not a current Project Doctor active source or supplemental Soldier source.
+
+### Stage 6-5 dependency boundary
+
+Current Stage 6-5 reciprocal validation reads the canonical relation layer directly:
+
+- `data/generated/hero-soldier-relations.v1.json`
+- `data/validation/hero-soldier-relation-validation.v1.json`
+- `data/generated/hero-soldier-by-hero.v1.json`
+- `data/generated/hero-soldier-by-soldier.v1.json`
+- Hero-page and Soldier-page membership artifacts
+
+It does not consume `data/validation/soldier-stage4-6-relation-consumer.v1.json` as a freshness source.
+
+R1 has already migrated this genuine old-frozen-vs-current reciprocal-membership boundary to `hero-soldier-membership/v1` semantic freshness while retaining raw Git blob provenance.
+
+### Stage 6-7 final dependency boundary
+
+Current Stage 6-7 explicitly declares its direct frozen dependencies with Semantic Freshness V2 descriptors.
+
+The relation path enters Stage 6-7 through:
+
+- Stage 6-5 reciprocal-links manifest/validation
+- Stage 6-6 expansion-basis manifest/validation
+
+Other direct sources are Stage 5-7, Stage 5-8, Stage 6-1 through Stage 6-4, the Soldier detail/list/release/full-record artifacts, contract and checkpoint.
+
+`data/validation/soldier-stage4-6-relation-consumer.v1.json` is not present in the Stage 6-7 direct source/key-artifact list.
+
+### R2-3 downstream result
+
+No genuine current downstream boundary was found that:
+
+1. consumes the frozen Stage 4-6 validation output or its `sharedArtifacts.*.gitBlobSha` as a freshness authority;
+2. compares those recorded Stage 4-6 SHAs against a later current relation/index snapshot;
+3. and would therefore benefit from replacing raw-SHA freshness with `hero-soldier-membership/v1`.
+
+The only confirmed Stage 4-6 SHA comparisons are the three same-run A-6/A-7/A-8 traceability checks classified in R2-2. Those must remain exact-SHA.
+
+Therefore adding a Stage 4-6 semantic freshness envelope/helper would currently be unused machinery and could only create a risk of weakening exact validation lineage.
+
+## R2 final disposition
+
+R2 closes as:
+
+`NO_MIGRATION_REQUIRED`
+
+Final decisions:
+
+- do not change `scripts/validate-soldier-stage4-6-relation-consumer.cjs`;
+- preserve `relationBlobMismatchInValidation` as exact-SHA blocking traceability;
+- preserve `relationBlobMismatchInIndex` as exact-SHA blocking traceability;
+- preserve `bySoldierBlobMismatchInValidation` as exact-SHA blocking traceability;
+- do not add a Stage 4-6 semantic digest envelope;
+- do not add a new Stage 4-6 projection/helper;
+- keep `hero-soldier-membership/v1` available only if a future genuine membership-only frozen freshness consumer is introduced;
+- do not regenerate A-6 relation semantics, A-7 indexes, canonical Hero/Soldier identity, or raw ConfigData for this closeout.
+
 ## Preserved invariants
 
 - Hero 267
 - Soldier 224
+- normal Soldier 168
+- SP Soldier 56
 - Hero-Soldier pair 5,977
 - bySoldier keys 224
 - bySoldier relations 5,977
-- pair mismatch 0
-- duplicate/missing identity errors 0
-- legacy regression mismatch 0
+- reciprocal mismatch 0
+- Stage 6-5 semantic membership freshness active
+- Stage 6-7 Semantic Freshness V2 active
 - A-8 remains the richer semantic owner
 - A-7 indexes remain disposable membership projections
 
 ## REVIEW
 
-- R2-3 should locate whether any actual downstream frozen Stage 4-6 consumer/reference compares recorded Stage 4-6 `sharedArtifacts.*.gitBlobSha` to current artifacts outside the same-run A-7/A-8 traceability path.
-- If no such downstream raw-SHA freshness consumer exists, R2 should close as `NO_MIGRATION_REQUIRED` rather than weakening traceability or adding unused semantic machinery.
+- The temporary baseline-probe branches created during R2-0 inspection remain non-semantic cleanup only and do not affect `main` or the R2 result.
+- If a future downstream consumer begins comparing Stage 4-6 frozen `sharedArtifacts.*.gitBlobSha` against later relation/index blobs, reassess that new boundary rather than changing same-run A-7/A-8 traceability.
 
 ## BLOCKER
 
@@ -207,12 +276,13 @@ None.
 
 ## Next start
 
-`R2-3 — locate a genuine downstream Stage 4-6 frozen-reference freshness boundary. Do not modify the three same-run A-7/A-8 exact-SHA traceability checks. If no genuine downstream raw-SHA freshness comparison exists, close R2 as NO_MIGRATION_REQUIRED.`
+`R3 — fail-closed relation mutation matrix. Validate that actual membership/provenance/identity/schema mutations cannot be misclassified as provenance-only under the active Semantic Freshness V2 boundaries.`
 
-## Reopen R2-0/R2-1/R2-2 only if
+## Reopen R2 only if
 
-- current `main` materially changes the Stage 4-6 validator/workflow;
-- A-7 index authority changes from disposable membership projection to richer semantic source;
-- A-8 publication/traceability contract changes;
+- Stage 4-6 becomes a current downstream active source or freshness owner;
+- a new consumer starts comparing frozen Stage 4-6 recorded SHAs against later current artifacts;
+- the Stage 4-6 workflow stops regenerating A-6/A-7/A-8 as one same-snapshot chain;
+- A-7 or A-8 exact traceability authority changes;
 - Stage 4-6 begins consuming provenance/sourceKind semantics directly;
-- or authoritative evidence identifies one of the three exact-SHA checks as an old-vs-current frozen freshness comparison rather than same-run traceability.
+- or new authoritative evidence contradicts the R2-3 dependency inventory.
