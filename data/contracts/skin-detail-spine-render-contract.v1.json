@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "contract": "skin-detail-spine-render",
+  "status": "CANDIDATE_PENDING_REPRESENTATIVE_REGRESSION",
+  "scope": "CHAR_SPINE runtime character render only",
+  "semanticClaims": {
+    "sameAssetClassAsHeroPainting": false,
+    "staticSkinFullArtwork": false,
+    "runtimeSpineCharacterRender": true
+  },
+  "authoritativePredecessor": {
+    "checkpoint": "data/checkpoints/skin-detail-spine-stage2-representative-render.v1.json",
+    "checkpointCommit": "a349af24086868a27f876541f714ed0f2dae3dd4",
+    "successfulWorkflowRunId": 33295554932,
+    "successfulArtifactId": 9727305610,
+    "successfulArtifactDigest": "sha256:15d394bbf63acabfdf85bc031577a938081b078b426d3151a468cb80a5f9e3cb"
+  },
+  "producer": {
+    "baseProbePath": "scripts/probe-skin-detail-spine-stage2.py",
+    "baseProbeGitBlobSha": "ae99c68e5a83e89c4e3c729b4423b3cab38535d9",
+    "rawTextAssetWrapperPath": "scripts/run-skin-detail-spine-stage2-contract-probe.py",
+    "rawTextAssetWrapperGitBlobSha": "793dc4c2ad8c2697bc7039b42aa5a2f2a18adcaf",
+    "textureResolverPath": "scripts/probe-skin-detail-spine-stage2-textures.py",
+    "textureResolverGitBlobSha": "c82cef47ae2bf47224d1980132eabb9c7d3fd98a",
+    "geometryExporterPath": "scripts/spine-stage2-geometry-export.cs",
+    "geometryExporterGitBlobSha": "35097afc77992a299b4729b66f5316479cd08689",
+    "cpuRendererPath": "scripts/render-spine-stage2-geometry.py",
+    "cpuRendererGitBlobSha": "ae0101c0c2589591bb0eb7e58430bc7c344be00c"
+  },
+  "runtime": {
+    "spineRuntimeRepository": "EsotericSoftware/spine-runtimes",
+    "spineRuntimeCommit": "1c1936532527900f74cfb58f7002998bf157b254",
+    "expectedSkeletonVersion": "3.3.05",
+    "python": "3.12.14",
+    "pythonPackages": {
+      "UnityPy": "1.25.3",
+      "Pillow": "12.3.0",
+      "numpy": "2.5.2"
+    }
+  },
+  "sourceRules": {
+    "identitySource": "reuse frozen canonical Skin and CHAR_SPINE relations; do not recompute",
+    "textAssetExtraction": "SERIALIZED_RAW_BYTE_ARRAY",
+    "textTranscodingAllowed": false,
+    "nameJoinAllowed": false,
+    "numericIdArithmeticAllowed": false,
+    "bundleSelectionRecomputationAllowed": false,
+    "exactBundleShaRequired": true,
+    "exactPrefabContainerRequired": true,
+    "atlasPageTextureResolution": "exact serialized dependency provenance",
+    "singleAtlasPageValidated": true,
+    "multipleAtlasPagesValidated": false
+  },
+  "poseRules": {
+    "setupPoseFirst": true,
+    "animationName": "idle_Normal",
+    "animationTime": 0,
+    "loop": true,
+    "fallbackAnimationAllowed": false
+  },
+  "geometryRules": {
+    "supportedAttachmentTypesValidated": [
+      "RegionAttachment",
+      "MeshAttachment"
+    ],
+    "unsupportedAttachmentPolicy": "BLOCK",
+    "validatedBlendModes": [
+      "normal"
+    ],
+    "unvalidatedBlendModePolicy": "BLOCK_AND_OPEN_REPRESENTATIVE_EXTENSION"
+  },
+  "rasterRules": {
+    "uvOrientation": "NO_FLIP_V",
+    "flipVAllowed": false,
+    "textureSampling": "nearest-rint",
+    "transparentBackground": true,
+    "worldYAxisToCanvas": "invert",
+    "marginWorldRatioOfMaxDimension": 0.06,
+    "targetMaxDimensionPx": 900,
+    "minimumCanvasDimensionPx": 64,
+    "alphaVisibilityThreshold": 2,
+    "alphaModel": "straight-alpha",
+    "outputFormat": "PNG_RGBA"
+  },
+  "futureMaterialization": {
+    "generatedNamespace": "data/generated/skin-detail-spine-render-v1",
+    "renderPathTemplate": "data/generated/skin-detail-spine-render-v1/{skinId}.png",
+    "manifestPath": "data/generated/skin-detail-spine-render-v1.manifest.json",
+    "publicNamespace": null,
+    "frontendConsumptionAllowedAtThisStage": false,
+    "bulk540AllowedUntilRepresentativeRegressionPasses": false
+  },
+  "representativeRegression": {
+    "requiredSkinIds": [102, 1901, 3701],
+    "expected": {
+      "102": {
+        "skelSha256": "896eefa18d3c8470608e427fa4e2233cda3f6f15b6df83d78104685555d81ea0",
+        "atlasSha256": "ac4ae0ae3a847e69187557b86bbee6b79a9b7f05ba2fe1f3e4f1761163f54c36",
+        "texturePngSha256": "662955065de2f5994e9e7092658375d567bb6de2f54c48f7b701662113b6b293",
+        "canvas": [495, 900],
+        "alphaBounds": [60, 48, 446, 847],
+        "drawItemCount": 37,
+        "attachmentTypeCounts": {"MeshAttachment": 24, "RegionAttachment": 13},
+        "blendModeCounts": {"normal": 37},
+        "rgbaPixelSha256": "5c82eb4f694e3fb47bea5068075748f32966908495aeef3aee93697b9cc6eed9"
+      },
+      "1901": {
+        "skelSha256": "c711df89c5d40498feb891b4ded9f904fc4157bac8c4241bc4435d06a9706c94",
+        "atlasSha256": "6a6136fb258380ebc22ca0c4dae22853dea9a579b1a50194db08d5462f21173b",
+        "texturePngSha256": "219366879a4b4a7a20346e68279a31cafdd6f372303fdff37e0567b1fae9b1d6",
+        "canvas": [821, 900],
+        "alphaBounds": [77, 66, 767, 825],
+        "drawItemCount": 65,
+        "attachmentTypeCounts": {"MeshAttachment": 54, "RegionAttachment": 11},
+        "blendModeCounts": {"normal": 65},
+        "rgbaPixelSha256": "b225edf60c0b9953849b58036f57424cdf67e4af47653ca0d59e60f0164a9fd2"
+      },
+      "3701": {
+        "skelSha256": "6c6091552bc53a8ca4e83bea650de5dd2d39ef5bf850915346991478808c9c9b",
+        "atlasSha256": "7015ca22aee890abe0d6fb9f863f1562fbc6bb932d3f62eeae59b5c96939f7be",
+        "texturePngSha256": "8ced279126446c3ef911d27c57707220be01d7e25abc5fc5085543d9be83e885",
+        "canvas": [757, 900],
+        "alphaBounds": [48, 48, 708, 852],
+        "drawItemCount": 51,
+        "attachmentTypeCounts": {"MeshAttachment": 28, "RegionAttachment": 23},
+        "blendModeCounts": {"normal": 51},
+        "rgbaPixelSha256": "064cd99faf558dcd7311e13362403bddd9909993e8cf3287206fcafe3de28624"
+      }
+    }
+  },
+  "reopenConditions": [
+    "representative regression mismatch",
+    "encountered multi-atlas-page Skin",
+    "encountered non-normal blend mode",
+    "encountered unsupported attachment type",
+    "required idle_Normal animation missing",
+    "new authoritative CHAR_SPINE provenance changes"
+  ],
+  "guardrails": {
+    "heroSkinSemanticReopened": false,
+    "frontendChanged": false,
+    "publicSkinAssetsChanged": false,
+    "bulk540Rendered": false,
+    "classFusionTouched": false
+  }
+}
