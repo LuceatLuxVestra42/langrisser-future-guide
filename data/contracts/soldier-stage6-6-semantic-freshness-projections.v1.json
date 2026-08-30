@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "schemaId": "soldier-stage6-6-semantic-freshness-projections/v1",
+  "status": "FROZEN",
+  "parentContract": "frozen-semantic-freshness/v2",
+  "parentContractPath": "data/contracts/frozen-semantic-freshness.v2.json",
+  "purpose": "Register the Stage 6-6 consumed-input semantic projections required to prevent false semantic equality when the Stage 6-6 manifest summary remains stable but consumed Soldier or relation payload changes.",
+  "reasonForExtension": "P3 demonstrated that the P1 Stage 6-6 manifest projection alone cannot represent combat/ability/training/SP payload values because those values are not embedded in the Stage 6-6 manifest. The P1 core classification contract remains unchanged; this subordinate registry adds only Stage 6-6-local source projection identities.",
+  "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE",
+  "sourceProjections": {
+    "fullRecords": {
+      "projection": "soldier-stage6-6-source/full-records/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status", "records[].soldierId", "records[].identity.isSp", "records[].identity.tier", "records[].combat", "records[].ability", "records[].training", "records[].sp"],
+      "ordering": "records normalized by soldierId because Stage 6-6 consumes them through ID indexes"
+    },
+    "fullValidation": {
+      "projection": "soldier-stage6-6-source/full-validation/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status"]
+    },
+    "stage5_2": {
+      "projection": "soldier-stage6-6-source/stage5-2-combat/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status", "records[].soldierId", "records[].combat"],
+      "ordering": "records normalized by soldierId"
+    },
+    "stage5_2Validation": {
+      "projection": "soldier-stage6-6-source/stage5-2-validation/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status"]
+    },
+    "stage5_3": {
+      "projection": "soldier-stage6-6-source/stage5-3-ability/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status", "records[].soldierId", "records[].ability"],
+      "ordering": "records normalized by soldierId"
+    },
+    "stage5_3Validation": {
+      "projection": "soldier-stage6-6-source/stage5-3-validation/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status"]
+    },
+    "stage5_4": {
+      "projection": "soldier-stage6-6-source/stage5-4-training/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status", "records[].soldierId", "records[].training"],
+      "ordering": "records normalized by soldierId"
+    },
+    "stage5_4Validation": {
+      "projection": "soldier-stage6-6-source/stage5-4-validation/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status"]
+    },
+    "stage5_6": {
+      "projection": "soldier-stage6-6-source/stage5-6-sp/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status", "records[].soldierId", "records[].sp"],
+      "ordering": "records normalized by soldierId"
+    },
+    "stage5_6Validation": {
+      "projection": "soldier-stage6-6-source/stage5-6-validation/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status"]
+    },
+    "relationSet": {
+      "projection": "soldier-stage6-6-source/hero-soldier-relation/v1",
+      "semanticPayload": ["version", "schemaId", "status", "summary.edgeCount", "summary.provenanceCount", "summary.sourceProductionCounts", "edges[].heroId", "edges[].soldierId", "edges[].provenance[].sourceKind"],
+      "ordering": "edges normalized by heroId then soldierId; sourceKind list normalized lexicographically",
+      "scope": "Stage 6-6-local relation consumption only; does not replace the broader hero-soldier-relation/semantic-v1 projection for provenance-sensitive consumers"
+    },
+    "relationValidation": {
+      "projection": "soldier-stage6-6-source/relation-validation/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status", "checks.edgesWithoutProvenance"]
+    },
+    "stage6_5Manifest": {
+      "projection": "soldier-stage6-6-source/stage6-5-manifest/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status", "summary.canonicalRelationCount"]
+    },
+    "stage6_5Validation": {
+      "projection": "soldier-stage6-6-source/stage6-5-validation/v1",
+      "semanticPayload": ["version", "schemaId", "stage", "status"]
+    }
+  },
+  "artifactProjections": {
+    "generated": "soldier-stage6-6-expansion-basis/semantic-v1",
+    "validation": "soldier-stage6-6-expansion-validation/semantic-v1",
+    "authority": "data/contracts/frozen-semantic-freshness.v2.json"
+  },
+  "excludedByConstruction": [
+    "generatedAt",
+    "nested source gitBlobSha values",
+    "unconsumed identity/display fields such as nameKr in the fullRecords source projection",
+    "prose-only purpose/rule text",
+    "workflow run metadata"
+  ],
+  "migration": {
+    "legacyExactShaMatch": "SEMANTIC_FRESH",
+    "legacyShaChangedWithoutDigest": "SEMANTIC_UNKNOWN",
+    "semanticMatchShaMatch": "SEMANTIC_FRESH",
+    "semanticMatchShaChanged": "PROVENANCE_ONLY_CHANGED",
+    "semanticDigestMismatch": "SEMANTIC_STALE",
+    "digestIdentityMismatch": "SEMANTIC_UNKNOWN",
+    "stickyProvenance": "When the registered semantic digest is unchanged, preserve the previously frozen gitBlobSha so metadata-only upstream churn does not rewrite the Stage 6-6 frozen artifact. When semantics change, advance the frozen provenance SHA with the new digest."
+  },
+  "forbidden": [
+    "Use this Stage 6-6-local relation projection as a replacement for broader relation semantic authority",
+    "Treat nameKr as globally non-semantic; it is excluded here only because Stage 6-6 does not consume it",
+    "Drop existing Stage 6-6 semantic checks or baselines",
+    "Change workflow transport or Project Doctor policy in P3"
+  ],
+  "completion": "P3 source projections are complete when Stage 6-6 can distinguish provenance-only source churn from consumed semantic changes while preserving all existing Stage 6-6 semantic validations and exact-diff determinism after the one-time migration freeze."
+}
