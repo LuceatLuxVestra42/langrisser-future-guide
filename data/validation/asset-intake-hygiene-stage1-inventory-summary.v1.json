@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-hygiene-stage1-inventory-summary/v1",
+  "stage": "ASSET_HYGIENE_1",
+  "checkpoint": "ASSET_HYGIENE_STAGE1_REPOSITORY_INVENTORY",
+  "status": "PASS_ASSET_HYGIENE_STAGE1_REPOSITORY_INVENTORY",
+  "completion": "COMPLETE",
+  "freezeState": "ASSET_HYGIENE_STAGE1_INVENTORY_FROZEN",
+  "contract": "tools/asset-intake/contract/hygiene-stage1-inventory.v1.json",
+  "predecessor": "tools/asset-intake/contract/hygiene-scope.v1.json",
+  "baseline": {
+    "commit": "73db96444d2016d044042630955486fd9b3d9036",
+    "tree": "f19194edbf6e71f1c3d6fcf0ccabb0b9c6474df8",
+    "scopeId": "REPOSITORY_TRACKED_IMAGE_ASSETS_V1"
+  },
+  "readOnly": true,
+  "rawConfigDataReadCount": 0,
+  "semanticRecomputationCount": 0,
+  "assetMutationCount": 0,
+  "classificationCount": 0,
+  "coverage": {
+    "trackedTreeEntryCount": 4483,
+    "scopedRegularCandidateCount": 2188,
+    "scopedSymlinkCandidateCount": 0,
+    "inventoryRecordCount": 2188,
+    "resolvedByteRecordCount": 2188,
+    "lfsPointerReviewCount": 0,
+    "symlinkReviewCount": 0,
+    "unreadableBlobCount": 0,
+    "byteSizeMismatchCount": 0,
+    "resolvedAssetByteCount": 310229467,
+    "gitBlobByteCount": 310229467
+  },
+  "groups": {
+    "exactDuplicateGroupCount": 1,
+    "exactDuplicateRecordCount": 2,
+    "basenameCollisionGroupCount": 352,
+    "basenameCollisionMemberCount": 784
+  },
+  "census": {
+    "byRoot": {
+      "public/": 1,
+      "public/images/army/": 10,
+      "public/images/banners/": 501,
+      "public/images/equipment/": 373,
+      "public/images/factions/": 12,
+      "public/images/heroes/": 806,
+      "public/images/shared/": 10,
+      "public/images/soldiers-webp/": 224,
+      "public/images/soldiers/": 224,
+      "src/": 26,
+      "tools/": 1
+    },
+    "byExtension": {
+      ".ico": 1,
+      ".jpg": 8,
+      ".png": 1182,
+      ".webp": 997
+    },
+    "bySignature": {
+      "HEX:0000010001000000": 1,
+      "JPEG": 8,
+      "PNG": 1182,
+      "WEBP": 997
+    },
+    "nonRasterOrUnknownSignatureCount": 1
+  },
+  "diagnostics": {
+    "unreadable": [],
+    "byteSizeMismatches": []
+  },
+  "reviews": [
+    {
+      "code": "EXACT_DUPLICATE_CANDIDATES_PRESENT",
+      "count": 1,
+      "blocking": false
+    },
+    {
+      "code": "BASENAME_COLLISION_CANDIDATES_PRESENT",
+      "count": 352,
+      "blocking": false
+    },
+    {
+      "code": "NON_RASTER_OR_UNKNOWN_SIGNATURE_PRESENT",
+      "count": 1,
+      "blocking": false
+    }
+  ],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "outputs": {
+    "inventory": "tools/asset-intake/hygiene/generated/asset-hygiene-inventory.v1.json",
+    "exactDuplicateGroups": "tools/asset-intake/hygiene/generated/asset-hygiene-duplicate-groups.v1.json",
+    "basenameGroups": "tools/asset-intake/hygiene/generated/asset-hygiene-basename-groups.v1.json",
+    "summary": "data/validation/asset-intake-hygiene-stage1-inventory-summary.v1.json",
+    "checkpoint": "docs/checkpoints/asset-intake-hygiene-stage1-repository-inventory.md"
+  },
+  "nextStartPoint": "ASSET_HYGIENE_2_REFERENCE_CROSSCHECK"
+}
