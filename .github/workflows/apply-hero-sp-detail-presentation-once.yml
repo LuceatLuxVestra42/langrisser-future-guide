@@ -49,10 +49,10 @@ jobs:
       - name: Production build
         run: bun run build
 
-      - name: Restore unrelated deterministic build outputs
+      - name: Remove unrelated deterministic build outputs
         run: |
-          git checkout -- data/generated/equipment-name-kr-user-approved.v1.json
-          git checkout -- data/validation/equipment-name-kr-user-approved-summary.v1.json
+          rm -f data/generated/equipment-name-kr-user-approved.v1.json
+          rm -f data/validation/equipment-name-kr-user-approved-summary.v1.json
 
       - name: Enforce changed-file boundary
         run: |
