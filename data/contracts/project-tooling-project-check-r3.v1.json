@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-r3/v1",
+  "stage": "R3",
+  "checkpoint": "PROJECT_TOOLING_PROJECT_CHECK_R3",
+  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
+  "completion": "R3_PROJECT_CHECK_IMPLEMENTED",
+  "purpose": "Replace legacy Project Doctor D2/D3/D4/D7 PR routing with a minimal independent changed-path to explicit-owner to frozen-validator router, MANUAL_REVIEW fallback, validator execution, and aggregate PASS/REVIEW/BLOCKER semantics.",
+  "predecessors": [
+    {
+      "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_COMPLETE",
+      "contract": "data/contracts/project-tooling-status-source-r1-final.v1.json",
+      "requiredStatus": "PASS"
+    },
+    {
+      "checkpoint": "PROJECT_TOOLING_PROJECT_STATUS_R2",
+      "contract": "data/contracts/project-tooling-project-status-r2.v1.json",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "R2_PROJECT_STATUS_COMPLETE"
+    }
+  ],
+  "authoritativeReferences": {
+    "legacyD2V6": {
+      "path": "data/contracts/project-doctor-d2-impact-contract.v6.json",
+      "gitBlobSha": "a4fc8e218f342381fd428369a171e5fa51ce167c",
+      "referenceUse": "path-rule and fail-closed boundary reference only"
+    },
+    "legacyD3V5": {
+      "path": "data/contracts/project-doctor-d3-validator-plan.v5.json",
+      "gitBlobSha": "9ebee1cf4022d97c9db8a1b1d72c3866be2ec55c",
+      "referenceUse": "existing independent validator command catalog reference only"
+    },
+    "legacyD4V6": {
+      "path": "data/contracts/project-doctor-d4-execution.v6.json",
+      "gitBlobSha": "9cc33eefb9a36310d709535369680f12ba44ef3d",
+      "referenceUse": "preflight, fail-fast, and manual-review persistence reference only"
+    },
+    "runtimeDependency": false
+  },
+  "implementation": {
+    "implementationHead": "fa5fe70020fa9918cceaf313c5e33272b0497ee0",
+    "ownerMap": "tools/project-check/contracts/owners.v1.json",
+    "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
+    "runtime": "tools/project-check/lib/project-check.mjs",
+    "cli": "tools/project-check/cli/check.mjs",
+    "selfTest": "tools/project-check/test/project-check-self-test.mjs",
+    "shadowWorkflow": ".github/workflows/project-tooling-r3-project-check.yml"
+  },
+  "architecture": {
+    "pipeline": [
+      "changed repository paths",
+      "explicit path rules",
+      "explicit owners",
+      "frozen validator ids",
+      "whole-queue preflight",
+      "validator execution",
+      "PASS / REVIEW / BLOCKER aggregation"
+    ],
+    "unmatchedPath": "MANUAL_REVIEW",
+    "manualOwner": "MANUAL_REVIEW",
+    "allMappedAndValidatorsPass": "PASS",
+    "validatorOrPreflightFailure": "BLOCKER",
+    "manualReviewExitCode": 3,
+    "blockerExitCode": 2,
+    "passExitCode": 0,
+    "noChangesExitCode": 0
+  },
+  "routingPolicy": {
+    "unionExplicitMatchingRules": true,
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "frontendDoesNotReopenCanonical": true,
+    "assetDoesNotReopenCanonical": true,
+    "unmatchedConfigDataManualReview": true,
+    "noFilenameSimilarityInference": true,
+    "noNameJoinInference": true,
+    "noIdArithmeticInference": true
+  },
+  "executionPolicy": {
+    "shellExecution": false,
+    "cataloguedArgvOnly": true,
+    "preflightEntireQueueBeforeExecution": true,
+    "failFastOnFirstNonZero": true,
+    "manualReviewSurvivesSuccessfulValidators": true,
+    "deduplicateValidators": true,
+    "sortByPhaseThenId": true
+  },
+  "admittedExistingOwners": [
+    "hero-canonical",
+    "soldier-canonical",
+    "equipment-canonical",
+    "hero-soldier-relation",
+    "hero-equipment-relation",
+    "banner-data",
+    "skin-relation",
+    "shared-movement",
+    "soldier-assets",
+    "equipment-assets",
+    "hero-assets",
+    "asset-intake",
+    "localization",
+    "hero-frontend",
+    "soldier-frontend",
+    "equipment-frontend",
+    "banner-frontend",
+    "shared-frontend",
+    "shared-build",
+    "configdata"
+  ],
+  "manualOwners": {
+    "banner-assets": "No independent final Banner asset validator admitted.",
+    "skin-assets": "No independent final Skin asset owner admitted while authoritative asset evidence is pending."
+  },
+  "newToolingOwners": {
+    "status-source": "R1 self-tests",
+    "project-status": "R2 parity self-test",
+    "project-check": "R3 routing/execution self-test"
+  },
+  "independenceBoundary": {
+    "legacyProjectDoctorRuntimeImports": 0,
+    "legacyD2RuntimeDependencies": 0,
+    "legacyD3RuntimeDependencies": 0,
+    "legacyD4RuntimeDependencies": 0,
+    "legacyD5RuntimeDependencies": 0,
+    "legacyD7RuntimeDependencies": 0,
+    "freshnessResealCount": 0,
+    "statusSourceMutationCount": 0,
+    "projectStatusNormalizationCount": 0,
+    "projectStatusWriteCount": 0,
+    "rawConfigDataSemanticInterpretationCount": 0
+  },
+  "currentShadowExpectation": {
+    "migrationPathsAllExplicitlyMapped": true,
+    "selectedOwners": ["status-source", "project-status", "project-check"],
+    "selectedValidators": [
+      "status-source-selection",
+      "status-source-promotion",
+      "status-source-producer-gate",
+      "status-source-artifact-bridge",
+      "status-source-lifecycle",
+      "project-status-parity",
+      "project-check-self-test"
+    ],
+    "heavyDomainValidatorsExpectedForMigrationOnlyDiff": false
+  },
+  "completionGate": {
+    "ownerMapImplemented": true,
+    "validatorCatalogImplemented": true,
+    "routerImplemented": true,
+    "runnerImplemented": true,
+    "cliImplemented": true,
+    "selfTestImplemented": true,
+    "shadowWorkflowImplemented": true,
+    "shadowCiPass": false,
+    "currentMigrationDiffRoutesWithoutManualReview": false,
+    "selectedValidatorsPass": false,
+    "legacyRuntimeDependencyCountZero": false,
+    "readyForShadowComparison": false
+  },
+  "blockers": [],
+  "cutoverBlockers": ["LEGACY_REQUIRED_PR_GUARD_STILL_ACTIVE"],
+  "reviews": [
+    "The R3 owner map is intentionally minimal and fail-closed. Any repository path not explicitly admitted remains MANUAL_REVIEW rather than inheriting historical Doctor routing by default.",
+    "Banner assets and Skin assets remain manual owner boundaries until independent final validators are explicitly admitted.",
+    "The NEW Project Check shadow context is not required by branch protection yet; required-check cutover remains later."
+  ],
+  "nextStartPoint": "Run R3 shadow workflow against the full migration PR diff. If all migration paths map only to status-source/project-status/project-check and all seven selected independent validators pass, freeze R3 and begin OLD-vs-NEW shadow comparison before required-check cutover.",
+  "reopenConditions": [
+    "an admitted owner validator command changes authoritatively",
+    "a path family changes ownership authoritatively",
+    "R1 or R2 tooling ownership changes",
+    "new evidence shows an explicit R3 mapping causes semantic or presentation ownership fan-out not represented by the contract"
+  ]
+}
