@@ -305,11 +305,22 @@ export async function runRouteHostedQa(options = {}) {
   }
   const prioritized = [...refsByUrl.values()].sort((a, b) => a.priority - b.priority || a.url.localeCompare(b.url));
   const sameOriginRefs = prioritized.filter(ref => new URL(ref.url).origin === contract.hostedTarget.origin);
-  const baseViolations = sameOriginRefs.filter(ref => !underRepositoryBase(ref.url, contract));
-  addCheck('REPOSITORY_BASE_PATH', publicResults.every(entry => entry.pass) && detailResults.every(entry => entry.pass) && baseViolations.length === 0, {
+  const assetBaseViolations = sameOriginRefs.filter(ref => !underRepositoryBase(ref.url, contract));
+  const routeBaseViolations = [...publicResults, ...detailResults]
+    .filter(entry => !underRepositoryBase(entry.finalUrl, contract));
+  const baseViolationCount = routeBaseViolations.length + assetBaseViolations.length;
+  addCheck('REPOSITORY_BASE_PATH', baseViolationCount === 0, {
     baseUrl,
-    baseViolationCount: baseViolations.length,
-    baseViolations: baseViolations.slice(0, 20).map(ref => ({ kind: ref.kind, url: ref.url, sourceDocument: ref.sourceDocument })),
+    baseViolationCount,
+    routeBaseViolations: routeBaseViolations.slice(0, 20).map(entry => ({
+      appPath: entry.appPath,
+      finalUrl: entry.finalUrl,
+    })),
+    assetBaseViolations: assetBaseViolations.slice(0, 20).map(ref => ({
+      kind: ref.kind,
+      url: ref.url,
+      sourceDocument: ref.sourceDocument,
+    })),
   });
 
   const assetResults = [];
@@ -322,7 +333,7 @@ export async function runRouteHostedQa(options = {}) {
       pass: response.status >= 200 && response.status < 300,
     });
   }
-  const assetsPass = assetResults.length > 0 && assetResults.every(entry => entry.pass) && baseViolations.length === 0;
+  const assetsPass = assetResults.length > 0 && assetResults.every(entry => entry.pass) && assetBaseViolations.length === 0;
   addCheck('ASSET_AND_CHUNK_RESOLUTION', assetsPass, {
     discovered: sameOriginRefs.length,
     checked: assetResults.length,
