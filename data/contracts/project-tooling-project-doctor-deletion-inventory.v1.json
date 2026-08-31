@@ -5,29 +5,19 @@
   "checkpoint": "PROJECT_TOOLING_OLD_PROJECT_DOCTOR_DELETION_INVENTORY",
   "status": "PASS",
   "completion": "DELETION_INVENTORY_COMPLETE",
-  "purpose": "Classify OLD Project Doctor files and entrypoints by actual retirement dependency after required-check cutover and OLD PR-trigger shutdown. This inventory does not infer deletion safety from incomplete GitHub code search results.",
+  "purpose": "Classify OLD Project Doctor files and entrypoints by actual retirement dependency after required-check cutover, OLD PR-trigger shutdown, and Status Source writer ownership cutover. This inventory does not infer deletion safety from incomplete code search results.",
   "predecessors": [
-    {
-      "contract": "data/contracts/project-tooling-project-check-cutover.v1.json",
-      "requiredStatus": "PASS",
-      "requiredCompletion": "CUTOVER_COMPLETE"
-    },
-    {
-      "contract": "data/contracts/project-tooling-project-check-old-doctor-off.v1.json",
-      "requiredStatus": "PASS",
-      "requiredCompletion": "OLD_DOCTOR_OFF_COMPLETE"
-    },
-    {
-      "contract": "data/contracts/project-tooling-migration-r0.v1.json",
-      "role": "FROZEN_BOUNDARY_INVENTORY"
-    }
+    {"contract":"data/contracts/project-tooling-project-check-cutover.v1.json","requiredStatus":"PASS","requiredCompletion":"CUTOVER_COMPLETE"},
+    {"contract":"data/contracts/project-tooling-project-check-old-doctor-off.v1.json","requiredStatus":"PASS","requiredCompletion":"OLD_DOCTOR_OFF_COMPLETE"},
+    {"contract":"data/contracts/project-tooling-migration-r0.v1.json","role":"FROZEN_BOUNDARY_INVENTORY"}
   ],
   "authoritativeEvidence": {
     "mainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
     "requiredContext": "project-check",
     "packageJson": "package.json",
     "r0Boundary": "data/contracts/project-tooling-migration-r0.v1.json",
-    "newProjectCheckWorkflow": ".github/workflows/project-tooling-r3-project-check.yml"
+    "newProjectCheckWorkflow": ".github/workflows/project-tooling-r3-project-check.yml",
+    "statusSourceWriterCutover": "data/contracts/project-tooling-status-source-writer-cutover.v1.json"
   },
   "alreadyRetired": {
     "oldPullRequestMergeGateTrigger": {
@@ -42,147 +32,72 @@
       "postRetirementProjectCheckRunId": 33346590913,
       "postRetirementRequiredJobId": 99351778726,
       "postRetirementRequiredJobConclusion": "success"
+    },
+    "legacyStatusSourceWriterTransport": {
+      "workflow": ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+      "state": "RETIRED_READ_ONLY_TOMBSTONE",
+      "writerOffCommit": "f28fb1570d0390a3749a2d6022bec6239679586c",
+      "replacement": ".github/workflows/project-tooling-r1-status-source-writer.yml",
+      "replacementActive": true
     }
   },
   "classifications": {
     "RETIRE_AFTER_ROLLBACK_WINDOW_CLOSES": {
-      "reason": "These are OLD Doctor operational orchestration/impact/planning/guard/freshness entrypoints. NEW Project Check does not import them, but the retained OLD manual rollback workflow still uses the Doctor runtime until final deletion.",
-      "packageEntrypoints": [
-        "doctor",
-        "doctor:impact",
-        "doctor:impact:validate",
-        "doctor:plan",
-        "doctor:plan:validate",
-        "doctor:run",
-        "doctor:run:validate",
-        "doctor:freshness:refresh",
-        "doctor:freshness:validate",
-        "doctor:freshness:self-test",
-        "doctor:freshness:v2:self-test",
-        "doctor:closeout:validate",
-        "doctor:pr-guard:validate"
-      ],
-      "coreRuntimeFamilies": [
-        "scripts/run-project-doctor-closeout-v6.mjs",
-        "scripts/analyze-project-doctor-d2-impact-v6.mjs",
-        "scripts/validate-project-doctor-d2-impact-v6.mjs",
-        "scripts/plan-project-doctor-d3-v6.mjs",
-        "scripts/validate-project-doctor-d3-v6.mjs",
-        "scripts/run-project-doctor-d4-v6.mjs",
-        "scripts/validate-project-doctor-d4-v6.mjs",
-        "scripts/run-project-doctor-d5-refresh.mjs",
-        "scripts/validate-project-doctor-d5.mjs",
-        "scripts/validate-project-doctor-d5-fixtures.mjs",
-        "scripts/validate-project-doctor-frozen-freshness-v2.mjs",
-        "scripts/validate-project-doctor-closeout.mjs",
-        "scripts/validate-project-doctor-d7-v8.mjs"
-      ],
+      "reason": "These are OLD Doctor operational orchestration/impact/planning/guard/freshness entrypoints. NEW Project Check does not import them, but retained rollback/manual observation surfaces remain until final deletion scope is closed.",
+      "packageEntrypoints": ["doctor","doctor:impact","doctor:impact:validate","doctor:plan","doctor:plan:validate","doctor:run","doctor:run:validate","doctor:freshness:refresh","doctor:freshness:validate","doctor:freshness:self-test","doctor:freshness:v2:self-test","doctor:closeout:validate","doctor:pr-guard:validate"],
+      "coreRuntimeFamilies": ["scripts/run-project-doctor-closeout-v6.mjs","scripts/analyze-project-doctor-d2-impact-v6.mjs","scripts/validate-project-doctor-d2-impact-v6.mjs","scripts/plan-project-doctor-d3-v6.mjs","scripts/validate-project-doctor-d3-v6.mjs","scripts/run-project-doctor-d4-v6.mjs","scripts/validate-project-doctor-d4-v6.mjs","scripts/run-project-doctor-d5-refresh.mjs","scripts/validate-project-doctor-d5.mjs","scripts/validate-project-doctor-d5-fixtures.mjs","scripts/validate-project-doctor-frozen-freshness-v2.mjs","scripts/validate-project-doctor-closeout.mjs","scripts/validate-project-doctor-d7-v8.mjs"],
       "workflow": ".github/workflows/project-doctor-d7-pr-guard.yml"
     },
-    "DEFER_UNTIL_STATUS_SOURCE_WRITER_CUTOVER": {
-      "reason": "NEW R1 Status Source runtime is complete but its production writer is still disabled. Deleting OLD status-source writer/lifecycle surfaces before ownership cutover risks leaving no production mutation path.",
-      "packageEntrypoints": [
-        "doctor:source:promote",
-        "doctor:source:promote:self-test",
-        "doctor:source:submit",
-        "doctor:source:submit:self-test",
-        "doctor:source:bridge",
-        "doctor:source:bridge:self-test"
-      ],
-      "scripts": [
-        "scripts/promote-project-doctor-status-source.mjs",
-        "scripts/submit-project-doctor-status-source.mjs",
-        "scripts/bridge-project-doctor-status-source.mjs",
-        "scripts/apply-project-doctor-status-source-handoff.mjs",
-        "scripts/resolve-project-doctor-status-source-declaration.mjs",
-        "scripts/render-project-doctor-status-source-closeout-request.mjs"
-      ],
-      "contracts": [
-        "data/contracts/project-doctor-status-source-promotion.v1.json",
-        "data/contracts/project-doctor-status-source-artifact-bridge.v1.json",
-        "data/contracts/project-doctor-status-source-producers.v1.json",
-        "data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json",
-        "data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json",
-        "data/contracts/project-doctor-status-source-stage6-5-closeout-requests.v1.json"
-      ],
+    "STATUS_SOURCE_WRITER_CUTOVER_COMPLETE_RETIRE_LATER": {
+      "reason": "The NEW R1 production writer now owns Status Source mutation and the OLD handoff workflow is inactive. These OLD source-lifecycle surfaces are no longer needed for active writer ownership, but are retained until the final exact deletion manifest after Project Status writer cutover and rollback-scope closure.",
+      "gateCleared": true,
+      "cutoverContract": "data/contracts/project-tooling-status-source-writer-cutover.v1.json",
+      "packageEntrypoints": ["doctor:source:promote","doctor:source:promote:self-test","doctor:source:submit","doctor:source:submit:self-test","doctor:source:bridge","doctor:source:bridge:self-test"],
+      "scripts": ["scripts/promote-project-doctor-status-source.mjs","scripts/submit-project-doctor-status-source.mjs","scripts/bridge-project-doctor-status-source.mjs","scripts/apply-project-doctor-status-source-handoff.mjs","scripts/resolve-project-doctor-status-source-declaration.mjs","scripts/render-project-doctor-status-source-closeout-request.mjs"],
+      "contracts": ["data/contracts/project-doctor-status-source-promotion.v1.json","data/contracts/project-doctor-status-source-artifact-bridge.v1.json","data/contracts/project-doctor-status-source-producers.v1.json","data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json","data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json","data/contracts/project-doctor-status-source-stage6-5-closeout-requests.v1.json"],
       "generatedCompatibilityOutput": "data/generated/project-doctor-status-sources.v1.json",
       "workflowFamily": ".github/workflows/project-doctor-status-source-*.yml"
     },
     "DEFER_UNTIL_PROJECT_STATUS_WRITER_CUTOVER": {
-      "reason": "NEW R2 Project Status is read-only and its canonical writer remains disabled. OLD generated Project Status outputs must not be removed until NEW writer ownership and downstream consumer compatibility are proven.",
-      "packageEntrypoints": [
-        "doctor:status",
-        "doctor:collect",
-        "doctor:validate"
-      ],
-      "scripts": [
-        "scripts/run-project-doctor-d1-3.mjs",
-        "scripts/collect-project-doctor-d1-1.mjs",
-        "scripts/validate-project-doctor-d1-2.mjs",
-        "scripts/build-project-status.mjs"
-      ],
-      "contracts": [
-        "data/contracts/project-doctor-d1-1-status-collector.v1.json",
-        "data/contracts/project-doctor-d1-2-health-gate.v1.json",
-        "data/contracts/project-doctor-d1-3-freshness-seal.v1.json"
-      ],
-      "outputs": [
-        "data/generated/project-status.v1.json",
-        "PROJECT_STATUS.md"
-      ]
+      "reason": "NEW R2 Project Status remains read-only and its canonical writer is still disabled. OLD generated Project Status outputs must not be removed until NEW writer ownership and downstream consumer compatibility are proven.",
+      "packageEntrypoints": ["doctor:status","doctor:collect","doctor:validate"],
+      "scripts": ["scripts/run-project-doctor-d1-3.mjs","scripts/collect-project-doctor-d1-1.mjs","scripts/validate-project-doctor-d1-2.mjs","scripts/build-project-status.mjs"],
+      "contracts": ["data/contracts/project-doctor-d1-1-status-collector.v1.json","data/contracts/project-doctor-d1-2-health-gate.v1.json","data/contracts/project-doctor-d1-3-freshness-seal.v1.json"],
+      "outputs": ["data/generated/project-status.v1.json","PROJECT_STATUS.md"]
     },
     "RETAIN_HISTORICAL_EVIDENCE": {
-      "reason": "Frozen R0/R1/R2/R3 migration checkpoints cite OLD contracts and validation artifacts as parity/reference evidence. They are no longer runtime predecessors but should remain addressable until an explicit archive policy replaces those references.",
-      "families": [
-        "data/contracts/project-doctor-dependency-map.v*.json",
-        "data/contracts/project-doctor-check-plan.v*.json",
-        "data/contracts/project-doctor-guard.v*.json",
-        "data/contracts/project-doctor-status-sources.v*.json",
-        "data/contracts/project-doctor-d7-pr-guard.v1.json",
-        "data/validation/project-doctor-*.json"
-      ],
+      "reason": "Frozen migration checkpoints cite OLD contracts and validation artifacts as parity/reference evidence. They are no longer runtime predecessors but remain addressable until an explicit archive policy replaces those references.",
+      "families": ["data/contracts/project-doctor-dependency-map.v*.json","data/contracts/project-doctor-check-plan.v*.json","data/contracts/project-doctor-guard.v*.json","data/contracts/project-doctor-status-sources.v*.json","data/contracts/project-doctor-d7-pr-guard.v1.json","data/validation/project-doctor-*.json"],
       "runtimeRole": false
     },
     "PRESERVE_NON_DOCTOR_SHARED_OR_PRESENTATION": {
       "reason": "Names containing project-doctor are not sufficient evidence of OLD Doctor ownership. Hosted QA belongs to frontend/hosted QA and shared domain validators remain independent Project Check validators.",
-      "packageEntrypoints": [
-        "qa:hosted",
-        "qa:hosted:validate",
-        "qa:hosted:stage0:validate"
-      ],
-      "sharedValidatorExamples": [
-        "validate:coverage:hero-canonical",
-        "validate:coverage:soldier-canonical",
-        "validate:coverage:equipment-canonical",
-        "validate:coverage:hero-soldier-relation",
-        "validate:coverage:hero-equipment-relation",
-        "validate:coverage:banner-data",
-        "validate:coverage:skin-relation",
-        "validate:coverage:shared-movement",
-        "validate:coverage:soldier-assets",
-        "validate:regression-coverage-promotion:v2"
-      ]
+      "packageEntrypoints": ["qa:hosted","qa:hosted:validate","qa:hosted:stage0:validate"],
+      "sharedValidatorExamples": ["validate:coverage:hero-canonical","validate:coverage:soldier-canonical","validate:coverage:equipment-canonical","validate:coverage:hero-soldier-relation","validate:coverage:hero-equipment-relation","validate:coverage:banner-data","validate:coverage:skin-relation","validate:coverage:shared-movement","validate:coverage:soldier-assets","validate:regression-coverage-promotion:v2"]
     }
   },
   "deletionSafety": {
     "deleteAllOldDoctorNow": false,
+    "statusSourceWriterGateCleared": true,
+    "projectStatusWriterGateCleared": false,
     "reasons": [
-      "Status Source production writer ownership has not cut over.",
       "Project Status canonical writer ownership has not cut over.",
-      "OLD manual rollback workflow is intentionally retained until final deletion scope is closed.",
+      "Retired OLD Status Source surfaces remain intentionally available until the final exact deletion manifest and rollback window are closed.",
+      "OLD manual rollback/observation implementation is retained until final deletion scope is closed.",
       "Historical parity contracts are referenced by frozen migration checkpoints."
     ],
     "codeSearchUsedAsNegativeEvidence": false
   },
   "blockers": [],
   "reviews": [
-    "GitHub code search returned incomplete_results for exact generated-output reference queries and is therefore not used as evidence that consumers are absent.",
-    "Exact per-file deletion manifest should be generated only after the two writer ownership cutovers, using this classification and the R0 boundary as predecessors.",
-    "Package.json contains current OLD Doctor entrypoints, while qa:hosted* remains explicitly outside OLD Doctor deletion scope."
+    "GitHub code search returned incomplete_results and is not used as negative evidence for consumer absence.",
+    "Exact per-file deletion manifest remains deferred until Project Status writer ownership is cut over and final rollback scope is closed.",
+    "Package.json still contains OLD Doctor entrypoints by design; qa:hosted* remains explicitly outside OLD Doctor deletion scope."
   ],
-  "nextStartPoint": "Status Source writer ownership cutover: identify OLD status-source mutation workflow triggers, define the single NEW production writer transport from R1 lifecycle, prove no dual writer, switch ownership, and freeze before deleting any OLD status-source mutation path.",
+  "nextStartPoint": "Project Status writer ownership cutover: identify the OLD canonical Project Status mutation transport, activate the NEW R2 writer without dual writers, prove downstream compatibility, and freeze before generating the final OLD Doctor deletion manifest.",
   "reopenConditions": [
     "NEW Status Source or Project Status writer design changes",
+    "OLD Status Source writer becomes active again",
     "a downstream consumer is proven to require an item classified for retirement",
     "historical migration checkpoints are rewritten to an archive that no longer needs retained OLD evidence",
     "OLD Doctor automatic pull-request merge-gate execution returns"
