@@ -4,8 +4,8 @@
   "stage": "OLD_PROJECT_DOCTOR_DELETION_MANIFEST",
   "checkpoint": "PROJECT_TOOLING_OLD_PROJECT_DOCTOR_DELETION_MANIFEST",
   "status": "PASS_WITH_REVIEW",
-  "completion": "EXACT_DELETION_MANIFEST_PREPARED",
-  "purpose": "Freeze exact per-file OLD Project Doctor retirement scope before any deletion. Delete only explicitly listed merge-gate runtime/entrypoint surfaces; retain writer rollback surfaces and preserve historical evidence, NEW canonical outputs, hosted QA, and independent validators.",
+  "completion": "OLD_DOCTOR_RETIREMENT_APPLYING",
+  "purpose": "Apply the validated exact OLD Project Doctor retirement scope without broadening deletion ownership. During APPLYING, exact candidates may be partially removed while rollback-retain and protected scopes remain mandatory.",
   "authoritativeEvidence": {
     "preparedFromHead": "8040404de7a81eb723505f5267f94fe16ed4a740",
     "mainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
@@ -31,7 +31,7 @@
     }
   },
   "scope": {
-    "purpose": "retire legacy required-check orchestration only in the next deletion step",
+    "purpose": "retire legacy required-check orchestration only",
     "nonScope": [
       "Status Source semantic or writer redesign",
       "Project Status semantic or writer redesign",
@@ -45,10 +45,10 @@
     "operationalLegacyGuardRetentionRequired": false,
     "reason": "Required-check cutover is complete, OLD automatic PR guard execution is already off, and the current final lineage passed required project-check self-test, routing plan, and owning-validator execution. OLD D2/D3/D4/D7 files are no longer needed as an operational rollback surface.",
     "historicalRecoveryStillPossible": true,
-    "historicalRecoveryMethod": "git history only; no live OLD guard runtime is retained after the next deletion step"
+    "historicalRecoveryMethod": "git history only; no live OLD guard runtime is retained after retirement"
   },
   "applyNextStep": {
-    "state": "READY_AFTER_MANIFEST_VALIDATION",
+    "state": "APPLYING",
     "actualDeletionApplied": false,
     "packageJsonMutated": false,
     "exactPathOnly": true,
@@ -185,6 +185,7 @@
     "owner": "project-check",
     "validator": "project-check-self-test",
     "candidateFilesMustExistBeforeDeletion": true,
+    "phaseAwareCandidateExistence": "PREPARED_PRESENT_APPLYING_PARTIAL_APPLIED_ABSENT",
     "retainedRollbackFilesMustExist": true,
     "packageEntrypointsMustMatchCurrentPackageJson": true,
     "deleteAndRetainSetsMustBeDisjoint": true,
@@ -202,16 +203,28 @@
     "fixtureCount": 22,
     "deletionFileCount": 10,
     "packageScriptRemovalCount": 9,
-    "actualDeletionApplied": false
+    "actualDeletionApplied": false,
+    "applyTransitionSupport": {
+      "headSha": "7316a13d5cf7ca74e289d61c4c1f94f71411fc01",
+      "runId": 33352004193,
+      "jobId": 99367063794,
+      "conclusion": "success",
+      "selfTest": "PASS",
+      "plan": "PASS",
+      "execution": "PASS",
+      "fixtureCount": 24,
+      "retirementPathsExplicitlyOwned": true,
+      "packageJsonOwnedBySharedBuild": true
+    }
   },
   "blockers": [],
   "reviews": [
     "Status Source direct workflow_dispatch live mutation proof remains unavailable from the current connection; its writer rollback surface is therefore retained and this does not block retirement of unrelated D2/D3/D4/D7 merge-gate runtime.",
     "Project Status OLD writer rollback surface is retained even though the NEW R2 writer has successful live non-main push proof; writer rollback closure is a later separate decision.",
     "REVIEW_EXISTING_DRIFT: data/generated/project-doctor-status-sources.v1.json is named by the deletion inventory as a compatibility output but is absent on both main and the current branch; it is not synthesized or included in deletion/rollback sets.",
-    "Historical OLD contracts/validation evidence remain intentionally preserved and are not part of the next deletion step."
+    "Historical OLD contracts/validation evidence remain intentionally preserved and are not part of this retirement apply."
   ],
-  "nextStartPoint": "Apply only applyNextStep.fileDeletions and packageScriptRemovals in a separate OLD Doctor retirement step. Do not touch retainWriterRollback or preserve scopes.",
+  "nextStartPoint": "Delete only the 10 exact fileDeletions and remove only the 9 packageScriptRemovals while staying in APPLYING. Then set APPLIED and require strict absence validation.",
   "reopenConditions": [
     "required project-check ownership or required-context state changes",
     "either NEW writer ownership changes",
