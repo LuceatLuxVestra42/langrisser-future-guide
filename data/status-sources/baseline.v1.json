@@ -78,9 +78,18 @@
       "facet": "asset",
       "successorOf": null,
       "admission": [
-        { "pointer": "/status", "equals": "READY_FOR_ASSET_EVIDENCE" }
+        { "pointer": "/status", "in": ["READY_FOR_ASSET_EVIDENCE", "PASS"] },
+        { "pointer": "/completion", "in": [null, "SKIN_STAGE3_2_COMPLETE"] },
+        { "pointer": "/metrics/failedCheckCount", "equals": 0 }
       ],
-      "note": "Stage 2 baseline root. Must match the frozen D1-0 primary source."
+      "projectionOverride": {
+        "lifecycleRules": [
+          { "when": "/status == PASS AND /completion == SKIN_STAGE3_2_COMPLETE AND /evidence/present == true", "lifecycle": "COMPLETE" },
+          { "when": "/status == READY_FOR_ASSET_EVIDENCE AND /evidence/present == false", "lifecycle": "IN_PROGRESS" }
+        ],
+        "policy": "Accept the same authoritative Stage 3-2 readiness source across its legitimate READY_FOR_ASSET_EVIDENCE -> PASS/SKIN_STAGE3_2_COMPLETE progression without changing Skin semantic authority."
+      },
+      "note": "Skin Stage 3-2 asset-evidence authority. Same source path remains authoritative across readiness and completed evidence states; this does not change frozen Stage 1/2 Skin semantics."
     }
   ]
 }

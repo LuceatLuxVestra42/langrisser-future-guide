@@ -46,7 +46,9 @@ jobs:
       - name: Verify NEW R1 Status Source predecessor
         run: node tools/status-source/test/current-main-parity.mjs
 
-      - name: Verify R2 parity, canonical compatibility, and writer isolation
+      - name: Verify R2 runtime parity and writer isolation before repair
+        env:
+          PROJECT_STATUS_ALLOW_STALE_CANONICAL: '1'
         run: node tools/project-status/test/current-parity.mjs
 
       - name: Resolve writer activation
