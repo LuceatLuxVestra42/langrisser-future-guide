@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-regression-runner-r4-safety/v1",
+  "stage": "RR4",
+  "status": "PASS",
+  "completion": "REGRESSION_RUNNER_RR4_SAFETY_COMPLETE",
+  "purpose": "Harden the RR3 clean-room Regression Runner authority and preflight boundaries, then directly validate negative fixtures and the real current-profile CLI plan-only path before any real nine-validator execution in RR5.",
+  "predecessor": {
+    "checkpoint": "data/contracts/project-tooling-regression-runner-r3-core.v1.json",
+    "completion": "REGRESSION_RUNNER_RR3_CORE_COMPLETE",
+    "head": "b498838b0b941226fdac0d62eb63a5e7375d7a5b"
+  },
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pr": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "headBeforeRr4": "b498838b0b941226fdac0d62eb63a5e7375d7a5b",
+    "candidateHead": "61d6ff4af1e5750868699e2987145861a90e6ed2",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "requiredCheckContext": "project-check"
+  },
+  "changedFiles": [
+    "tools/regression-runner/lib/regression-runner.mjs",
+    "tools/regression-runner/test/fixtures/rr4-negative-cases.v1.json",
+    "tools/regression-runner/test/regression-runner-self-test.mjs"
+  ],
+  "implementationCommits": {
+    "authorityAndPreflightHardening": "d25a1c686b95c8653164399ed5d86c67acf46261",
+    "negativeFixtures": "ba8231fd73ca5518d7ea4178515fcf2abc26a6aa",
+    "safetySelfTest": "61d6ff4af1e5750868699e2987145861a90e6ed2"
+  },
+  "authorityHardening": {
+    "runtimeContractsOverrideAllowed": false,
+    "runtimePlanOverrideAllowed": false,
+    "runtimePreflightOverrideAllowed": false,
+    "authority": "tools/project-check/contracts/validators.v1.json",
+    "profile": "tools/regression-runner/contracts/profiles.v1.json#core-regression-v1",
+    "profileCarriesExecutableOrArgs": false,
+    "catalogOrOwnerChangedInRr4": false,
+    "profileChangedInRr4": false,
+    "dynamicCommandSynthesis": false,
+    "shellExecution": false
+  },
+  "preflightHardening": {
+    "emptyValidatorPlan": "BLOCKER/PLAN_VALIDATORS_INVALID",
+    "unsupportedExecutable": "BLOCKER/EXECUTABLE_NOT_ALLOWED",
+    "missingNodeScript": "BLOCKER/NODE_SCRIPT_MISSING",
+    "nodePathEscape": "BLOCKER/NODE_SCRIPT_PATH_INVALID",
+    "invalidNpmArgv": "BLOCKER/NPM_ARGV_INVALID",
+    "missingPackageScript": "BLOCKER/PACKAGE_SCRIPT_MISSING",
+    "preflightEntireQueueBeforeExecution": true
+  },
+  "negativeFixtureCoverage": {
+    "fixture": "tools/regression-runner/test/fixtures/rr4-negative-cases.v1.json",
+    "contractCases": 6,
+    "preflightCases": 5,
+    "runtimeAuthorityOverrideCases": 3,
+    "negativeCaseCount": 14,
+    "executionSafetyCases": 3,
+    "cliPlanOnlyCases": 1,
+    "unknownValidatorIdBlocks": true,
+    "duplicateProfileValidatorIdBlocks": true,
+    "profileCommandMetadataBlocks": true,
+    "duplicateCatalogValidatorIdBlocks": true,
+    "catalogShellPolicyDriftBlocks": true,
+    "automaticCoverageExpansionBlocks": true,
+    "validatorNonzeroFailsFast": true,
+    "trackedMutationBlocks": true,
+    "planOnlyExecutesValidators": false
+  },
+  "directCurrentProfilePlanProof": {
+    "commandShape": "node tools/regression-runner/cli/check.mjs --plan --profile core-regression-v1",
+    "status": "PASS",
+    "completion": "PLAN_ONLY",
+    "validatorCount": 9,
+    "executionCount": 0,
+    "snapshotCount": 0,
+    "authority": "tools/project-check/contracts/validators.v1.json",
+    "validatorIds": [
+      "banner-data",
+      "equipment-canonical",
+      "hero-canonical",
+      "hero-equipment-relation",
+      "hero-soldier-relation",
+      "shared-movement",
+      "skin-relation",
+      "soldier-canonical",
+      "soldier-assets"
+    ]
+  },
+  "candidateValidation": {
+    "head": "61d6ff4af1e5750868699e2987145861a90e6ed2",
+    "projectCheckRunId": 33357177299,
+    "projectCheckJobId": 99381452278,
+    "conclusion": "success",
+    "steps": {
+      "setupNode22": "PASS",
+      "setupBun": "PASS",
+      "installDependencies": "PASS",
+      "projectCheckSelfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS"
+    },
+    "meaning": "The required Project Check accepted the exact three-file RR4 hardening diff and executed the dedicated regression-runner owner validator successfully. No real nine-validator Regression Runner execution occurred; that remains RR5 scope."
+  },
+  "boundaries": {
+    "operationalRegressionWorkflowCreated": false,
+    "realNineValidatorRunExecuted": false,
+    "validatorCatalogChanged": false,
+    "ownerMapChanged": false,
+    "profileContractChanged": false,
+    "packageJsonChanged": false,
+    "legacyRegressionV2Changed": false,
+    "legacyProjectDoctorChanged": false,
+    "semanticRelationChanged": false,
+    "canonicalDataChanged": false,
+    "frozenDataChanged": false,
+    "generatedDomainDataChanged": false,
+    "statusSourceChanged": false,
+    "projectStatusChanged": false,
+    "frontendChanged": false,
+    "assetChanged": false,
+    "hostedQaChanged": false,
+    "configDataChanged": false,
+    "localizationChanged": false
+  },
+  "completionGate": {
+    "runtimeAuthorityOverrideClosed": true,
+    "nodePathEscapeStructuredAsPreflightBlocker": true,
+    "negativeFixturesInstalled": true,
+    "negativeFixturesPass": true,
+    "currentProfilePlanOnlyPass": true,
+    "currentProfileStillExactNineValidators": true,
+    "candidateRequiredProjectCheckPassed": true,
+    "realValidatorExecutionDeferredToRr5": true,
+    "legacyRunnerUnchanged": true
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_V2_FROZEN_SHA_ADMISSION_DRIFT",
+      "blocking": false,
+      "classification": "REVIEW_EXISTING_DRIFT",
+      "detail": "RR0's exact four legacy Regression Coverage Promotion V2 frozen-SHA admission failures remain frozen expected drift. RR4 neither repairs nor reimplements them."
+    }
+  ],
+  "nextStart": "RR5: execute the real core-regression-v1 nine-validator profile on the current branch head using the NEW Regression Runner, capture per-validator results and tracked-state immutability, and compare the NEW outcome against the RR0/RR4 expected boundary. Do not disable or delete OLD Regression Coverage Promotion V2 and do not cut over an operational workflow until real current-head parity is proven.",
+  "reopenConditions": [
+    "The R3 validator catalog changes any selected core-regression-v1 validator identity, executable or argv authority.",
+    "The core-regression-v1 profile changes its exact nine-validator membership.",
+    "Runtime authority override becomes possible again through injected contracts, plan or preflight state.",
+    "Preflight stops blocking repository path escape or unsupported command shapes.",
+    "Plan-only executes a validator or tracked-state snapshot.",
+    "Regression Runner runtime acquires legacy Project Doctor or Regression Coverage Promotion V2 runtime dependencies.",
+    "New authoritative evidence proves RR0's four known legacy failures represent current semantic corruption."
+  ]
+}
