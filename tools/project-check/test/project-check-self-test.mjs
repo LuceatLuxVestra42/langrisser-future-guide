@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import path from 'node:path';
 import {
   executeProjectCheck,
   loadProjectCheckContracts,
@@ -9,6 +10,7 @@ import {
 
 const repoRoot = process.cwd();
 const contracts = loadProjectCheckContracts({ repoRoot });
+const readJson = relative => JSON.parse(fs.readFileSync(path.join(repoRoot, relative), 'utf8'));
 
 function validatorIds(route) {
   return route.validators.map(item => item.id);
@@ -69,6 +71,11 @@ expectOwners(
 );
 expectOwners(
   'data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json',
+  ['project-check'],
+  ['project-check-self-test'],
+);
+expectOwners(
+  'data/contracts/project-tooling-project-doctor-deletion-manifest.v1.json',
   ['project-check'],
   ['project-check-self-test'],
 );
@@ -211,6 +218,67 @@ for (const runtimePath of runtimePaths) {
   }
 }
 
+const deletionManifest = readJson('data/contracts/project-tooling-project-doctor-deletion-manifest.v1.json');
+assert.equal(deletionManifest.schemaId, 'project-tooling-project-doctor-deletion-manifest/v1');
+assert.equal(deletionManifest.completion, 'EXACT_DELETION_MANIFEST_PREPARED');
+assert.equal(deletionManifest.applyNextStep.actualDeletionApplied, false);
+assert.equal(deletionManifest.applyNextStep.packageJsonMutated, false);
+assert.equal(deletionManifest.applyNextStep.exactPathOnly, true);
+assert.equal(deletionManifest.applyNextStep.filenameSimilarityAllowed, false);
+assert.equal(deletionManifest.requiredCheckRollbackWindow.operationalLegacyGuardRetentionRequired, false);
+
+const deletionFiles = deletionManifest.applyNextStep.fileDeletions;
+const deletionSet = new Set(deletionFiles);
+assert.equal(deletionSet.size, deletionFiles.length, 'deletion manifest file paths must be unique');
+for (const relative of deletionFiles) {
+  assert.equal(/[*?\[\]]/.test(relative), false, `deletion manifest must use exact paths only: ${relative}`);
+  assert.equal(fs.existsSync(path.join(repoRoot, relative)), true, `deletion candidate must exist before apply: ${relative}`);
+}
+
+const retainedRollbackFiles = [
+  ...deletionManifest.retainWriterRollback.workflows,
+  ...deletionManifest.retainWriterRollback.scripts,
+  ...deletionManifest.retainWriterRollback.generatedState,
+];
+const retainedRollbackSet = new Set(retainedRollbackFiles);
+assert.equal(retainedRollbackSet.size, retainedRollbackFiles.length, 'retained rollback paths must be unique');
+for (const relative of retainedRollbackFiles) {
+  assert.equal(fs.existsSync(path.join(repoRoot, relative)), true, `retained rollback path must exist: ${relative}`);
+  assert.equal(deletionSet.has(relative), false, `delete/retain overlap is forbidden: ${relative}`);
+}
+
+for (const protectedPath of deletionManifest.preserve.newCanonicalProjectStatus) {
+  assert.equal(deletionSet.has(protectedPath), false, `NEW canonical Project Status output cannot be deleted: ${protectedPath}`);
+  assert.equal(fs.existsSync(path.join(repoRoot, protectedPath)), true, `NEW canonical Project Status output must exist: ${protectedPath}`);
+}
+for (const prefix of deletionManifest.preserve.historicalEvidencePolicy.protectedPrefixes) {
+  assert.equal(deletionFiles.some(relative => relative.startsWith(prefix)), false, `historical evidence prefix cannot enter deletion set: ${prefix}`);
+}
+for (const prefix of deletionManifest.preserve.newToolingPrefixes) {
+  assert.equal(deletionFiles.some(relative => relative.startsWith(prefix)), false, `NEW tooling prefix cannot enter deletion set: ${prefix}`);
+}
+for (const token of deletionManifest.preserve.hostedQa.protectedPathTokens) {
+  assert.equal(deletionFiles.some(relative => relative.includes(token)), false, `Hosted QA path cannot enter deletion set: ${token}`);
+}
+
+const packageJson = readJson('package.json');
+const packageScripts = packageJson.scripts ?? {};
+const removalKeys = deletionManifest.applyNextStep.packageScriptRemovals;
+const removalSet = new Set(removalKeys);
+assert.equal(removalSet.size, removalKeys.length, 'package script removals must be unique');
+for (const key of removalKeys) {
+  assert.equal(typeof packageScripts[key], 'string', `package removal entrypoint must currently exist: ${key}`);
+}
+const protectedPackageKeys = [
+  ...deletionManifest.retainWriterRollback.packageEntrypoints,
+  ...deletionManifest.preserve.hostedQa.packageEntrypoints,
+  ...deletionManifest.preserve.independentValidators.packageEntrypoints,
+];
+for (const key of protectedPackageKeys) {
+  assert.equal(typeof packageScripts[key], 'string', `protected package entrypoint must currently exist: ${key}`);
+  assert.equal(removalSet.has(key), false, `protected package entrypoint cannot be removed: ${key}`);
+}
+
 assert.throws(
   () => routeProjectCheckPaths(['../outside'], contracts),
   /Invalid repository path/,
@@ -219,9 +287,17 @@ assert.throws(
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'PROJECT_CHECK_R3_SELF_TEST',
-  fixtures: 21,
+  fixtures: 22,
   catalogValidatorCount: contracts.validatorCatalog.validators.length,
   ownerCount: contracts.ownerMap.owners.length,
+  deletionManifest: {
+    status: deletionManifest.status,
+    completion: deletionManifest.completion,
+    deletionFileCount: deletionFiles.length,
+    packageScriptRemovalCount: removalKeys.length,
+    retainedWriterRollbackPathCount: retainedRollbackFiles.length,
+    actualDeletionApplied: deletionManifest.applyNextStep.actualDeletionApplied,
+  },
   boundaries: {
     ownerPropagationCount: 0,
     changeClassFanOutCount: 0,
