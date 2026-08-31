@@ -2,8 +2,8 @@
   "version": 1,
   "schemaId": "configdata-lookup-clr5-writer-separation/v1",
   "stage": "CLR5",
-  "status": "CANDIDATE_VALIDATION_PENDING",
-  "completion": "PENDING_CONFIGDATA_LOOKUP_CLR5_WRITER_SEPARATION",
+  "status": "CANDIDATE_PASS",
+  "completion": "PENDING_FREEZE_HEAD_REVALIDATION",
   "purpose": "Separate automatic/read-only ConfigData Lookup validation from explicit Stage 6 materialization writer authority without changing Stage 0-6 materialization semantics or package CLI authority.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
@@ -46,6 +46,10 @@
       ".github/workflows/configdata-lookup-stage6.yml",
       ".github/workflows/project-tooling-configdata-lookup-writer.yml"
     ],
+    "candidateChangedFileCount": 7,
+    "candidateOwnerCount": 2,
+    "candidateValidatorCount": 2,
+    "manualReviewCount": 0,
     "ownerPropagation": false,
     "changeClassFanOut": false
   },
@@ -70,6 +74,7 @@
   },
   "requiredValidation": {
     "configdataLookupWorkflow": "PASS",
+    "legacyStage6ReadOnlyWorkflow": "PASS",
     "stage5Predecessor": "PASS",
     "stage6Freshness": "CLEAN_CONFIGDATA_LOOKUP_STAGE6",
     "clr3ReadOnlySelfTest": "PASS",
@@ -84,9 +89,36 @@
     "trackedMutationCount": 0
   },
   "validationEvidence": {
-    "candidateHead": null,
-    "configdataLookupWorkflow": null,
-    "projectCheck": null,
+    "candidateHead": "37e3991400aafeb2f72b6a00a0cb06a73f7593bd",
+    "legacyStage6ReadOnlyWorkflow": {
+      "runId": 33394892275,
+      "jobId": 99496953248,
+      "stage5Predecessor": "PASS",
+      "stage6CommittedMaterialization": "PASS",
+      "stage6Freshness": "PASS",
+      "trackedState": "PASS",
+      "conclusion": "success"
+    },
+    "configdataLookupWorkflow": {
+      "runId": 33394892250,
+      "jobId": 99496953357,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "clr3ReadOnlySelfTest": "PASS",
+      "conclusion": "success"
+    },
+    "projectCheck": {
+      "runId": 33394892231,
+      "jobId": 99496952926,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "configdataLookupSelfTestExitCode": 0,
+      "manualReviewCount": 0,
+      "conclusion": "success"
+    },
+    "freezeHead": null,
     "freezeHeadRevalidation": "PENDING"
   },
   "blockers": [],
@@ -107,7 +139,7 @@
       "detail": "The explicit writer is not forced to create a synthetic materialization change while Stage 6 is clean. A future legitimate stale input can exercise it without changing CLR5 completion."
     }
   ],
-  "nextStart": "After CLR5 freeze, begin CLR6 shadow/parity verification between the preserved Stage 0-6 behavior and the NEW ConfigData Lookup surface. Do not cut over package CLI or retire Stage 7/8 authority until CLR7.",
+  "nextStart": "Revalidate this evidence-only freeze head with the read-only Stage 6 workflow, Project Tooling ConfigData Lookup, and required Project Check. If all pass, freeze CLR5 and proceed to CLR6 shadow/parity verification.",
   "reopenConditions": [
     "An automatic or required validation path regains contents:write, rebuild execution, commit, or push authority.",
     "The explicit writer can target main or gh-pages, or can run without workflow_dispatch confirmation and --apply.",
