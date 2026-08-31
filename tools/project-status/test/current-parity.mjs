@@ -7,6 +7,7 @@ import { loadProjectStatusWriterContract, writeProjectStatus } from '../lib/writ
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const readJson = relative => JSON.parse(fs.readFileSync(path.join(repoRoot, relative), 'utf8'));
 const fixture = readJson('tools/project-status/fixtures/current-project-status.v1.json');
+const allowStaleCanonical = process.env.PROJECT_STATUS_ALLOW_STALE_CANONICAL === '1';
 
 const fail = message => { throw new Error(message); };
 const same = (actual, expected, label) => {
@@ -63,32 +64,39 @@ same(
 );
 
 const skin = projected.domains.find(item => item.domain === 'skin');
-if (skin.lifecycle !== 'IN_PROGRESS' || skin.health !== 'REVIEW' || skin.blockerCount !== 1) {
-  fail('Skin asset-evidence blocker must remain IN_PROGRESS/REVIEW with one blocker');
+if (skin.lifecycle !== 'COMPLETE'
+  || skin.health !== 'PASS'
+  || skin.status !== 'PASS'
+  || skin.completion !== 'SKIN_STAGE3_2_COMPLETE'
+  || skin.reviewCount !== 0
+  || skin.blockerCount !== 0) {
+  fail('Skin completed asset-evidence projection must be COMPLETE/PASS with no review or blocker');
 }
 
-const legacyCanonical = readJson('data/generated/project-status.v1.json');
-if (legacyCanonical.schemaId !== 'project-status/v1') fail('legacy canonical Project Status schema must remain project-status/v1 during cutover proof');
-for (const key of [
-  'version',
-  'schemaId',
-  'derivedOnly',
-  'rawConfigDataReadCount',
-  'semanticRecomputationCount',
-  'projectHealth',
-  'healthCounts',
-  'lifecycleCounts',
-  'knownHardErrorTotal',
-  'reviewTotal',
-  'blockerTotal',
-]) {
-  same(projected[key], legacyCanonical[key], `legacy canonical compatibility ${key}`);
-}
-for (const legacyDomain of legacyCanonical.domains ?? []) {
-  const successor = projected.domains.find(item => item.domain === legacyDomain.domain);
-  if (!successor) fail(`NEW Project Status missing legacy domain ${legacyDomain.domain}`);
-  for (const [key, value] of Object.entries(legacyDomain)) {
-    same(successor[key], value, `legacy domain compatibility ${legacyDomain.domain}.${key}`);
+const canonicalProjectStatus = readJson('data/generated/project-status.v1.json');
+if (canonicalProjectStatus.schemaId !== 'project-status/v1') fail('canonical Project Status schema must remain project-status/v1');
+if (!allowStaleCanonical) {
+  for (const key of [
+    'version',
+    'schemaId',
+    'derivedOnly',
+    'rawConfigDataReadCount',
+    'semanticRecomputationCount',
+    'projectHealth',
+    'healthCounts',
+    'lifecycleCounts',
+    'knownHardErrorTotal',
+    'reviewTotal',
+    'blockerTotal',
+  ]) {
+    same(projected[key], canonicalProjectStatus[key], `canonical compatibility ${key}`);
+  }
+  for (const canonicalDomain of canonicalProjectStatus.domains ?? []) {
+    const successor = projected.domains.find(item => item.domain === canonicalDomain.domain);
+    if (!successor) fail(`NEW Project Status missing canonical domain ${canonicalDomain.domain}`);
+    for (const [key, value] of Object.entries(canonicalDomain)) {
+      same(successor[key], value, `canonical domain compatibility ${canonicalDomain.domain}.${key}`);
+    }
   }
 }
 if (projected.source?.authoritySchemaId !== 'status-source-selection/v1') fail('NEW canonical Project Status must identify R1 Status Source authority');
@@ -96,6 +104,7 @@ if (projected.readOnly !== true || projected.canonicalJoinRecomputationCount !==
 
 const writerContract = loadProjectStatusWriterContract({ repoRoot });
 if (!['CUTOVER_DEFERRED', 'ACTIVE'].includes(writerContract.state)) fail(`unexpected writer state ${writerContract.state}`);
+if (allowStaleCanonical && writerContract.state !== 'ACTIVE') fail('stale canonical allowance is valid only for the active writer repair path');
 same(writerContract.canonicalTargets, {
   json: 'data/generated/project-status.v1.json',
   markdown: 'PROJECT_STATUS.md',
@@ -152,7 +161,7 @@ for (const relative of runtimeFiles) {
   const text = fs.readFileSync(path.join(repoRoot, relative), 'utf8');
   if (/from\s+['"][^'"]*project-doctor/i.test(text)) fail(`${relative} imports legacy Project Doctor runtime`);
   if (/data\/generated\/project-doctor/i.test(text)) fail(`${relative} reads legacy Doctor generated state`);
-  if (/data\/generated\/project-status\.v1\.json/.test(text)) fail(`${relative} reads legacy Project Status generated output`);
+  if (/data\/generated\/project-status\.v1\.json/.test(text)) fail(`${relative} reads canonical Project Status generated output`);
   if (/PROJECT_STATUS\.md/.test(text)) fail(`${relative} reads PROJECT_STATUS.md`);
   if (/data\/configdata\//i.test(text)) fail(`${relative} reads raw ConfigData`);
   if (/writeFileSync|appendFileSync|rmSync|unlinkSync|renameSync/.test(text)) fail(`${relative} contains repository writer primitive`);
@@ -190,11 +199,20 @@ console.log(JSON.stringify({
     general: equipment.population.general,
     exclusive: equipment.population.exclusive,
   },
+  skin: {
+    lifecycle: skin.lifecycle,
+    health: skin.health,
+    status: skin.status,
+    completion: skin.completion,
+    blockerCount: skin.blockerCount,
+  },
   writer: {
     state: writerContract.state,
     canonicalTargets: writerCheck.canonicalTargets,
+    changedTargetCount: writerCheck.changedTargetCount,
     checkWrites: writerCheck.boundaries.projectStatusWriteCount,
     syntheticApplyWrites: syntheticApply.boundaries.projectStatusWriteCount,
     maxActiveWriterCount: writerContract.activation.maximumActiveWriterCount,
+    allowStaleCanonical,
   },
 }, null, 2));
