@@ -45,6 +45,9 @@ jobs:
       - name: Run NEW Regression Runner current-head parity
         run: node tools/regression-runner/test/current-parity.mjs
 
+      - name: Verify RR9 retired runtime surfaces
+        run: node tools/regression-runner/test/rr9-retirement.mjs
+
       - name: Ensure operational run leaves tracked state unchanged
         if: always()
         run: git diff --exit-code

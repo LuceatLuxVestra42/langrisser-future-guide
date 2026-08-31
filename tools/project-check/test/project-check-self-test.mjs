@@ -346,7 +346,26 @@ const protectedPackageKeys = [
   ...deletionManifest.preserve.hostedQa.packageEntrypoints,
   ...deletionManifest.preserve.independentValidators.packageEntrypoints,
 ];
+
+const rr9CheckpointPath = 'data/contracts/project-tooling-regression-runner-r9-retirement.v1.json';
+const rr9Checkpoint = fs.existsSync(path.join(repoRoot, rr9CheckpointPath)) ? readJson(rr9CheckpointPath) : null;
+const rr9RetiredPackageKeys = new Set(
+  (rr9Checkpoint?.runtimeRetirementInventory?.removeEntrypoint ?? [])
+    .filter(item => item?.path === 'package.json' && typeof item?.key === 'string')
+    .map(item => item.key.startsWith('scripts.') ? item.key.slice('scripts.'.length) : item.key),
+);
+if (rr9Checkpoint) {
+  assert.equal(rr9Checkpoint.stage, 'RR9');
+  assert.equal(rr9Checkpoint.proof?.rr8ProofConditionSatisfied, true);
+  assert.deepEqual([...rr9RetiredPackageKeys], ['validate:regression-coverage-promotion:v2']);
+}
 for (const key of protectedPackageKeys) {
+  if (rr9RetiredPackageKeys.has(key)) {
+    assert.equal(key, 'validate:regression-coverage-promotion:v2', `unexpected RR9 package retirement: ${key}`);
+    assert.equal(packageScripts[key], undefined, `RR9 retired package entrypoint must be absent: ${key}`);
+    assert.equal(removalSet.has(key), false, `RR9 retirement must not rewrite historical OLD Doctor deletion set: ${key}`);
+    continue;
+  }
   assert.equal(typeof packageScripts[key], 'string', `protected package entrypoint must currently exist: ${key}`);
   assert.equal(removalSet.has(key), false, `protected package entrypoint cannot be removed: ${key}`);
 }
