@@ -117,9 +117,9 @@ async function main() {
 
   const packageJson = JSON.parse(await fs.readFile('package.json', 'utf8'));
   const expectedScripts = {
-    lookup: 'node scripts/configdata-lookup-cli.mjs lookup',
-    refs: 'node scripts/configdata-lookup-cli.mjs refs',
-    find: 'node scripts/configdata-lookup-cli.mjs find',
+    lookup: 'node tools/configdata-lookup/cli/run.mjs lookup',
+    refs: 'node tools/configdata-lookup/cli/run.mjs refs',
+    find: 'node tools/configdata-lookup/cli/run.mjs find',
     'build:configdata-lookup-stage5': 'node scripts/build-configdata-lookup-stage5.mjs',
     'validate:configdata-lookup-stage5': 'node scripts/validate-configdata-lookup-stage5.mjs',
   };
