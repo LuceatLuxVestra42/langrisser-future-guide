@@ -8,8 +8,8 @@ on:
     paths:
       - 'scripts/finalize-soldier-stage6-7-site-admission.cjs'
       - 'data/contracts/soldier-detail-stage5-1-contract.v1.json'
-      - 'data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json'
-      - 'data/contracts/project-doctor-status-source-stage6-5-soldier-closeout-request.v1.json'
+      - 'tools/status-source/declarations/soldier.v1.json'
+      - 'tools/status-source/closeout-requests/soldier.v1.json'
       - 'data/validation/soldier-stage6-0-checkpoint.v1.json'
       - 'data/validation/soldier-stage5-7-list.v1.json'
       - 'data/validation/soldier-stage5-8-release.v1.json'
@@ -29,8 +29,8 @@ on:
     paths:
       - 'scripts/finalize-soldier-stage6-7-site-admission.cjs'
       - 'data/contracts/soldier-detail-stage5-1-contract.v1.json'
-      - 'data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json'
-      - 'data/contracts/project-doctor-status-source-stage6-5-soldier-closeout-request.v1.json'
+      - 'tools/status-source/declarations/soldier.v1.json'
+      - 'tools/status-source/closeout-requests/soldier.v1.json'
       - 'data/validation/soldier-stage6-0-checkpoint.v1.json'
       - 'data/validation/soldier-stage5-7-list.v1.json'
       - 'data/validation/soldier-stage5-8-release.v1.json'
@@ -50,7 +50,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: project-status-owner-${{ github.ref_name }}
+  group: status-source-producer-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -102,23 +102,18 @@ jobs:
             exit 1
           fi
 
-      - name: Verify Stage 6-5 closeout request projection on PR or main
-        run: node scripts/render-project-doctor-status-source-closeout-request.mjs --pipeline soldier --check
+      - name: Verify NEW R1 closeout request projection on PR or main
+        run: node tools/status-source/cli/lifecycle.mjs closeout --pipeline soldier --check
 
-      - name: Check Project Status source bridge after frozen Soldier output
+      - name: Check NEW R1 Status Source bridge after frozen Soldier output
         if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
-        run: node scripts/bridge-project-doctor-status-source.mjs --pipeline soldier --check
+        run: node tools/status-source/cli/bridge.mjs --pipeline soldier
 
   explicit-producer:
     if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    outputs:
-      handoff_pipeline: ${{ steps.handoff_declaration.outputs.pipeline }}
-      handoff_expected_predecessor: ${{ steps.handoff_declaration.outputs.expected_predecessor }}
-      handoff_entry_id: ${{ steps.handoff_declaration.outputs.entry_id }}
-      handoff_source_path: ${{ steps.handoff_declaration.outputs.source_path }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -156,35 +151,31 @@ jobs:
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
 
-      - name: Render Project Status declaration from approved closeout request
-        run: node scripts/render-project-doctor-status-source-closeout-request.mjs --pipeline soldier --write
+      - name: Render NEW R1 producer declaration from approved closeout request
+        run: node tools/status-source/cli/lifecycle.mjs closeout --pipeline soldier --write
 
-      - name: Commit Stage 6-5 Project Status declaration on explicit producer run
+      - name: Commit NEW R1 producer declaration on explicit producer run
         run: |
-          DECLARATION='data/contracts/project-doctor-status-source-stage6-4-soldier-declaration.v1.json'
+          DECLARATION='tools/status-source/declarations/soldier.v1.json'
           if [ -z "$(git status --porcelain -- "$DECLARATION")" ]; then
-            echo 'Soldier Project Status declaration is already current.'
+            echo 'Soldier R1 Status Source declaration is already current.'
           else
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add "$DECLARATION"
-            git commit -m 'Render Soldier Project Status declaration from closeout request'
+            git commit -m 'Render Soldier R1 Status Source declaration from closeout request'
             git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
 
-      - name: Resolve explicit Project Status handoff declaration
-        id: handoff_declaration
-        run: node scripts/resolve-project-doctor-status-source-declaration.mjs --pipeline soldier --github-output
+      - name: Resolve NEW R1 producer declaration
+        run: node tools/status-source/cli/lifecycle.mjs declaration --pipeline soldier
 
-  project-status-handoff:
+  status-source-handoff:
     needs: explicit-producer
     if: needs.explicit-producer.result == 'success' && github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
     permissions:
       contents: write
-    uses: ./.github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml
+    uses: ./.github/workflows/project-tooling-r1-status-source-writer.yml
     with:
-      pipeline: ${{ needs.explicit-producer.outputs.handoff_pipeline }}
-      expected_predecessor: ${{ needs.explicit-producer.outputs.handoff_expected_predecessor }}
-      entry_id: ${{ needs.explicit-producer.outputs.handoff_entry_id }}
-      source_path: ${{ needs.explicit-producer.outputs.handoff_source_path }}
+      pipeline: soldier
