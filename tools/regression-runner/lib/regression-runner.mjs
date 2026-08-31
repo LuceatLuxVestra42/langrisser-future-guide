@@ -119,15 +119,28 @@ export function planRegressionRun({ profileId = DEFAULT_PROFILE_ID, contracts } 
 export function preflightRegressionRun({ repoRoot = process.cwd(), plan } = {}) {
   if (!plan) throw new Error('plan is required');
   const failures = [];
+  const validators = Array.isArray(plan.validators) ? plan.validators : [];
+  if (validators.length === 0) {
+    failures.push({ type: 'PLAN_VALIDATORS_INVALID' });
+    return { pass: false, failures };
+  }
+
   let packageJson = null;
-  for (const validator of plan.validators) {
+  for (const validator of validators) {
     if (!['node', 'npm'].includes(validator.executable)) {
       failures.push({ type: 'EXECUTABLE_NOT_ALLOWED', validatorId: validator.id, executable: validator.executable });
       continue;
     }
     if (validator.executable === 'node') {
       const script = validator.args?.[0];
-      if (!script || !fs.existsSync(repositoryPath(repoRoot, script))) {
+      let scriptPath = null;
+      try {
+        scriptPath = repositoryPath(repoRoot, script);
+      } catch (error) {
+        failures.push({ type: 'NODE_SCRIPT_PATH_INVALID', validatorId: validator.id, script: script ?? null, error: error.message });
+        continue;
+      }
+      if (!script || !fs.existsSync(scriptPath)) {
         failures.push({ type: 'NODE_SCRIPT_MISSING', validatorId: validator.id, script: script ?? null });
       }
     }
@@ -180,10 +193,19 @@ function sameTrackedState(before, after) {
 }
 
 export function executeRegressionRun(runtime = {}) {
+  if (runtime === null || typeof runtime !== 'object' || Array.isArray(runtime)) {
+    throw new Error('Regression Runner runtime options must be an object');
+  }
+  for (const key of ['contracts', 'plan', 'preflight']) {
+    if (Object.hasOwn(runtime, key)) {
+      throw new Error(`RUNTIME_AUTHORITY_OVERRIDE_FORBIDDEN:${key}`);
+    }
+  }
+
   const repoRoot = runtime.repoRoot ?? process.cwd();
-  const contracts = runtime.contracts ?? loadRegressionRunnerContracts({ repoRoot });
-  const plan = runtime.plan ?? planRegressionRun({ profileId: runtime.profileId ?? DEFAULT_PROFILE_ID, contracts });
-  const preflight = runtime.preflight ?? preflightRegressionRun({ repoRoot, plan });
+  const contracts = loadRegressionRunnerContracts({ repoRoot });
+  const plan = planRegressionRun({ profileId: runtime.profileId ?? DEFAULT_PROFILE_ID, contracts });
+  const preflight = preflightRegressionRun({ repoRoot, plan });
   if (!preflight.pass) {
     return {
       version: 1,
