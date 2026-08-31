@@ -3,9 +3,9 @@
   "schemaId": "project-tooling-project-check-old-doctor-off/v1",
   "stage": "OLD_PROJECT_DOCTOR_OFF",
   "checkpoint": "PROJECT_TOOLING_OLD_PROJECT_DOCTOR_OFF",
-  "status": "IMPLEMENTED_PENDING_VERIFICATION",
-  "completion": "OLD_DOCTOR_PR_TRIGGER_REMOVED",
-  "purpose": "Remove OLD Project Doctor automatic pull-request execution after NEW project-check became the required merge gate, while retaining OLD implementation for manual rollback observation.",
+  "status": "PASS",
+  "completion": "OLD_DOCTOR_OFF_COMPLETE",
+  "purpose": "Freeze removal of OLD Project Doctor automatic pull-request execution after NEW project-check became the required merge gate, while retaining OLD implementation for manual rollback observation.",
   "predecessor": {
     "contract": "data/contracts/project-tooling-project-check-cutover.v1.json",
     "requiredStatus": "PASS",
@@ -37,23 +37,30 @@
     "legacyImplementationDeleted": false,
     "legacyRoutingExpanded": false
   },
+  "verification": {
+    "proofCommit": "f78c43200b4f12c25d3fe0bb4df3b4e67543d048",
+    "observedPullRequestWorkflowRunCount": 4,
+    "oldProjectDoctorPullRequestRunPresent": false,
+    "newProjectCheckRunId": 33346354796,
+    "newRequiredJobId": 99351139690,
+    "newRequiredJobConclusion": "success",
+    "mainProtected": true,
+    "mainRequiredContexts": ["project-check"]
+  },
   "boundaries": {
     "statusSourceWriterActivated": false,
     "projectStatusWriterActivated": false,
     "legacyDoctorDeleted": false,
+    "legacyDoctorRuntimeImportedByNewProjectCheck": false,
     "branchProtectionMutationInThisStep": false
   },
-  "verification": {
-    "proofCommit": null,
-    "newProjectCheckRunId": null,
-    "newRequiredJobId": null,
-    "newRequiredJobConclusion": null,
-    "oldProjectDoctorPullRequestRunPresent": null,
-    "mainRequiredContexts": ["project-check"]
-  },
   "blockers": [],
-  "reviews": [],
-  "nextStartPoint": "After proof that a later PR synchronize commit creates project-check but no OLD Project Doctor PR Guard run, freeze this checkpoint PASS. Then inventory OLD Project Doctor deletion scope as a separate task.",
+  "reviews": [
+    "OLD Project Doctor implementation and workflow_dispatch remain available for rollback observation until a separate deletion checkpoint is completed.",
+    "The retained work/project-doctor-closeout push trigger is not a PR merge gate and is preserved only as a legacy rollback/closeout path.",
+    "Status Source production writer and Project Status canonical writer remain disabled."
+  ],
+  "nextStartPoint": "Inventory the exact OLD Project Doctor implementation/contracts/generated outputs/package entrypoints/workflows that are now deletable. Treat deletion as a separate scope; preserve any shared domain validator or non-Doctor artifact still used by NEW tooling.",
   "reopenConditions": [
     "main no longer requires project-check",
     "OLD Project Doctor pull_request trigger returns",
