@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-route-hosted-qa-rh2-admission/v1",
+  "stage": "RH2",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "ROUTE_HOSTED_QA_RH2_ADMISSION_COMPLETE",
+  "purpose": "Explicitly admit future NEW Route/Hosted QA implementation, workflow, and successor checkpoint paths into R3 Project Check routing before clean-room runtime implementation. Prevent MANUAL_REVIEW fallback and unintended owner fan-out while preserving RH1's read-only HTTP Hosted validation boundary.",
+  "predecessors": {
+    "rh0Baseline": "data/contracts/project-tooling-project-check-route-hosted-qa-rh0-baseline.v1.json",
+    "rh0Completion": "ROUTE_HOSTED_QA_RH0_BASELINE_FROZEN",
+    "rh1Boundary": "data/contracts/project-tooling-project-check-route-hosted-qa-rh1-boundary.v1.json",
+    "rh1Completion": "ROUTE_HOSTED_QA_RH1_BOUNDARY_FROZEN"
+  },
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pullRequest": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "headBeforeRh2Checkpoint": "53f7ac2f8ce11c5b8aa73921bda8186c647c9961",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
+    "ownerMap": "tools/project-check/contracts/owners.v1.json",
+    "projectCheckSelfTest": "tools/project-check/test/project-check-self-test.mjs"
+  },
+  "admission": {
+    "ruleId": "route-hosted-qa-preimplementation-admission",
+    "patterns": [
+      "tools/route-hosted-qa/**",
+      "data/contracts/project-tooling-route-hosted-qa-*.json",
+      ".github/workflows/project-tooling-route-hosted-qa.yml"
+    ],
+    "ownerId": "route-hosted-qa",
+    "preimplementationValidators": ["project-check-self-test"],
+    "dedicatedOwnerAdmitted": true,
+    "temporaryBootstrapValidatorUntilRh3": true,
+    "manualReviewFallbackForAdmittedPaths": false,
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "semanticOwnerFanOut": false,
+    "frontendOwnerFanOut": false,
+    "assetOwnerFanOut": false,
+    "deploymentWriterFanOut": false
+  },
+  "selfTestFixtures": [
+    {
+      "path": "tools/route-hosted-qa/lib/hosted-qa.mjs",
+      "expectedOwners": ["route-hosted-qa"],
+      "expectedValidators": ["project-check-self-test"]
+    },
+    {
+      "path": ".github/workflows/project-tooling-route-hosted-qa.yml",
+      "expectedOwners": ["route-hosted-qa"],
+      "expectedValidators": ["project-check-self-test"]
+    },
+    {
+      "path": "data/contracts/project-tooling-route-hosted-qa-rh2-admission.v1.json",
+      "expectedOwners": ["route-hosted-qa"],
+      "expectedValidators": ["project-check-self-test"]
+    }
+  ],
+  "implementationEvidence": {
+    "ownerMapAdmissionCommit": "14c2485f0b69edfd3e9801258e5b32e3d118c85a",
+    "selfTestFixtureCommit": "53f7ac2f8ce11c5b8aa73921bda8186c647c9961",
+    "selfTestFixtureCountAfterRh2": 30,
+    "validatorCatalogChanged": false
+  },
+  "candidateValidation": {
+    "head": "53f7ac2f8ce11c5b8aa73921bda8186c647c9961",
+    "projectCheckRunId": 33362620724,
+    "projectCheckJobId": 99396813670,
+    "conclusion": "success",
+    "steps": {
+      "selfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS"
+    }
+  },
+  "rh3TransitionContract": {
+    "nextOwnerValidatorEvolutionRequired": true,
+    "condition": "When the NEW Route/Hosted QA core and its self-test are introduced, add a dedicated catalogued route-hosted-qa self-test validator and replace the route-hosted-qa owner's temporary project-check-self-test validator with the dedicated validator in the same owning scope.",
+    "noImplementationBeforeAdmission": true,
+    "noIndependentRouteHostedQaValidatorYet": true,
+    "noNewWorkflowExecutionYet": true,
+    "noDeploymentMutation": true,
+    "noDualOperationalWriter": true,
+    "browserUiDeferred": true
+  },
+  "preserve": [
+    "RH0 current OLD QA baseline and exact route/fixture/check inventory.",
+    "RH1 read-only HTTP Hosted validation boundary, strict/probe separation, and Hosted/Browser/Semantic ownership separation.",
+    "OLD QA-0/QA-1 contracts and validation evidence as frozen predecessor evidence only.",
+    "Current R1 Status Source, R2 Project Status, R3 Project Check and Regression Runner behavior.",
+    "Current frontend, semantic, canonical, relation, asset, localization and ConfigData state."
+  ],
+  "nonScope": [
+    "No tools/route-hosted-qa implementation is created in RH2.",
+    "No NEW Route/Hosted QA workflow file is created or executed in RH2.",
+    "No new route-hosted-qa validator is added to the R3 validator catalog in RH2.",
+    "No package.json entrypoint is changed in RH2.",
+    "No OLD Route/Hosted QA workflow, runtime script, package alias, contract, validation artifact, or deployment writer is changed or retired in RH2.",
+    "No GitHub Pages deployment, gh-pages mutation, or force-push is performed in RH2.",
+    "No Browser/Playwright test is added in RH2.",
+    "No semantic, canonical, relation, Status Source, Project Status, frontend, asset, ConfigData, localization or Regression Runner state is mutated in RH2."
+  ],
+  "completionGate": {
+    "dedicatedOwnerAdmitted": true,
+    "corePathAdmitted": true,
+    "workflowPathAdmitted": true,
+    "successorCheckpointNamespaceAdmitted": true,
+    "threeRoutingFixturesPass": true,
+    "candidateProjectCheckPass": true,
+    "manualReviewFallbackRemovedForAdmittedPaths": true,
+    "ownerPropagationCount": 0,
+    "changeClassFanOutCount": 0,
+    "newImplementationStarted": false,
+    "newWorkflowCreated": false,
+    "validatorCatalogChanged": false,
+    "legacyHostedQaChanged": false,
+    "semanticReopen": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "PREIMPLEMENTATION_PROJECT_CHECK_SELF_TEST_BOOTSTRAP",
+      "blocking": false,
+      "classification": "TEMPORARY_ADMISSION_VALIDATOR",
+      "detail": "The dedicated route-hosted-qa owner is admitted, but its validator is intentionally the existing project-check-self-test until RH3 creates the NEW Route/Hosted QA core self-test. RH3 must replace this temporary validator rather than leaving it as the final owner model."
+    },
+    {
+      "id": "LEGACY_HOSTED_PROOF_DEPLOYMENT_WRITER_PRESENT",
+      "blocking": false,
+      "classification": "DEPLOYMENT_WRITER_REVIEW",
+      "detail": "The OLD strict hosted-proof workflow still has a historical deployment-writer role. RH2 does not change or inherit that role; retirement remains a later shadow/cutover/closeout task."
+    }
+  ],
+  "nextStart": "RH3: install the clean-room tools/route-hosted-qa core, contracts, CLI and self-test under the RH1 read-only HTTP boundary; add a dedicated catalogued route-hosted-qa self-test validator and replace the RH2 temporary project-check-self-test owner validator without expanding into deployment writes, Browser/UI, semantic, asset, or frontend ownership.",
+  "reopenConditions": [
+    "RH1 boundary or RH0 predecessor evidence changes before clean-room core installation.",
+    "Any of the three admitted NEW path families routes to MANUAL_REVIEW or an unintended owner.",
+    "R3 owner-map or validator-catalog policy changes before RH3 implementation.",
+    "NEW Route/Hosted QA is required to mutate deployment state, repository state, semantic data, frontend state, or assets.",
+    "Authoritative Hosted QA route, fixture, check-ID, base-path, source-SHA, or failure-ownership contracts change."
+  ]
+}
