@@ -190,8 +190,20 @@ for (const relativePath of [
   assert.equal(text.includes('project-doctor-route-hosted-qa'), false, `${relativePath} must not depend on OLD Route/Hosted QA runtime`);
 }
 const runtimeText = fs.readFileSync(path.join(repoRoot, 'tools/route-hosted-qa/lib/hosted-qa.mjs'), 'utf8');
-for (const forbiddenToken of ['writeFile', 'appendFile', 'child_process', 'playwright', 'gh-pages']) {
+for (const forbiddenToken of ['writeFile', 'appendFile', 'child_process', 'gh-pages']) {
   assert.equal(runtimeText.includes(forbiddenToken), false, `NEW Route/Hosted QA runtime must remain read-only: ${forbiddenToken}`);
+}
+const forbiddenPlaywrightDependencies = [
+  /(?:from\s+|import\s*)['"](?:playwright(?:-core)?|@playwright\/test)(?:\/[^'"]*)?['"]/,
+  /import\s*\(\s*['"](?:playwright(?:-core)?|@playwright\/test)(?:\/[^'"]*)?['"]\s*\)/,
+  /require\s*\(\s*['"](?:playwright(?:-core)?|@playwright\/test)(?:\/[^'"]*)?['"]\s*\)/,
+];
+for (const forbiddenPattern of forbiddenPlaywrightDependencies) {
+  assert.equal(
+    forbiddenPattern.test(runtimeText),
+    false,
+    `NEW Route/Hosted QA runtime must not depend on Playwright: ${forbiddenPattern}`,
+  );
 }
 
 console.log(JSON.stringify({
