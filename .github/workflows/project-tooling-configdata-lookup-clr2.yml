@@ -6,6 +6,7 @@ on:
       - main
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
+      - 'package.json'
       - 'tools/configdata-lookup/**'
       - 'data/contracts/project-tooling-project-check-configdata-lookup-clr2-*.json'
       - 'data/contracts/project-tooling-project-check-configdata-lookup-clr3-*.json'
@@ -45,5 +46,5 @@ jobs:
       - name: Run CLR2 namespace smoke
         run: node tools/configdata-lookup/test/clr2-namespace-smoke.mjs
 
-      - name: Run ConfigData Lookup owner self-test (CLR3 + CLR5 + CLR6)
+      - name: Run ConfigData Lookup owner self-test (CLR3 + CLR5 + CLR6 + CLR7)
         run: node tools/configdata-lookup/test/configdata-lookup-owner-self-test.mjs
