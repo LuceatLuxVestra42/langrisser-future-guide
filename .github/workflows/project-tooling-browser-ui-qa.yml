@@ -94,14 +94,13 @@ jobs:
           npm install --no-save --package-lock=false playwright@1.55.0
           npx playwright install --with-deps chromium
 
-      - name: Reuse existing hosted Browser interaction validators
+      - name: Reuse stable hosted Browser interaction validators
         run: |
           set -euo pipefail
           node scripts/project-doctor-validate-authoritative-pages-hosted.mjs
           node scripts/validate-hero-central-discipline-hosted.mjs
           node scripts/validate-hero-soldier-cards-hosted.mjs
           node scripts/validate-hero-card-icons-hosted.mjs
-          node scripts/validate-soldier-detail-hero-cards-hosted.mjs
 
       - name: Browser UI interaction coverage spot checks
         run: |
@@ -111,6 +110,14 @@ jobs:
           const base = process.env.HOSTED_BASE_URL.replace(/\/?$/, '/');
           const url = (path) => new URL(path.replace(/^\//, ''), base).toString();
           const check = (condition, message) => { if (!condition) throw new Error(message); };
+          const waitForLoadedImage = async (image, message) => {
+            await image.waitFor({ state: 'attached', timeout: 20000 });
+            await image.scrollIntoViewIfNeeded();
+            await image.evaluate((node) => node.complete && node.naturalWidth > 0 ? true : new Promise((resolve, reject) => {
+              node.addEventListener('load', () => resolve(true), { once: true });
+              node.addEventListener('error', () => reject(new Error('image failed to load')), { once: true });
+            })).catch((error) => { throw new Error(`${message}: ${error}`); });
+          };
 
           const browser = await chromium.launch({ headless: true });
           const errors = [];
@@ -132,7 +139,16 @@ jobs:
             check(await soldier101.count() === 1, 'Hero 6 → Soldier 101 interaction link missing');
             await soldier101.click();
             await page.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
-            await page.getByRole('dialog').waitFor({ timeout: 20000 });
+            const soldierDialog = page.getByRole('dialog');
+            await soldierDialog.waitFor({ timeout: 20000 });
+            await page.getByText('사용 가능 영웅', { exact: true }).waitFor({ timeout: 20000 });
+            const soldierHeroCards = soldierDialog.locator('img[src*="/images/heroes/card-icons-webp/"]');
+            await waitForLoadedImage(soldierHeroCards.first(), 'Soldier 101 first Hero card WebP failed');
+            const soldierHeroCardCount = await soldierHeroCards.count();
+            check(soldierHeroCardCount > 0, 'Soldier 101 detail rendered no Hero card WebP images after ready state');
+            const soldierHeroCardSources = await soldierHeroCards.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('src') || ''));
+            check(soldierHeroCardSources.every((src) => src.includes('/images/heroes/card-icons-webp/') && src.endsWith('.webp')), 'Soldier 101 detail contains a non-WebP Hero card source');
+
             await page.goBack({ waitUntil: 'networkidle', timeout: 45000 });
             await page.getByText('Hero #6', { exact: true }).waitFor();
             await page.goForward({ waitUntil: 'networkidle', timeout: 45000 });
@@ -148,12 +164,14 @@ jobs:
             await page.waitForURL(/\/heroes\/6\/?$/, { timeout: 45000 });
             await page.getByText('Hero #6', { exact: true }).waitFor();
 
-            response = await page.goto(url('heroes/999999999/'), { waitUntil: 'networkidle', timeout: 45000 });
-            check(response && response.status() === 404, `unknown Hero browser navigation must return 404, got ${response?.status()}`);
-            check((await page.locator('body').innerText()).trim().length > 0, 'unknown Hero browser response rendered an empty document');
-
             check(errors.length === 0, `desktop Browser/UI errors: ${JSON.stringify(errors)}`);
             await page.close();
+
+            const unknownPage = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            response = await unknownPage.goto(url('heroes/999999999/'), { waitUntil: 'networkidle', timeout: 45000 });
+            check(response && response.status() === 404, `unknown Hero browser navigation must return 404, got ${response?.status()}`);
+            check((await unknownPage.locator('body').innerText()).trim().length > 0, 'unknown Hero browser response rendered an empty document');
+            await unknownPage.close();
 
             const tablet = await browser.newContext({ viewport: { width: 768, height: 1024 }, hasTouch: true });
             const tabletPage = await tablet.newPage();
@@ -173,6 +191,8 @@ jobs:
               sourceSha: process.env.EXPECTED_SOURCE_SHA,
               keyboardSkinCarousel: 'PASS',
               heroToSoldierNavigation: 'PASS',
+              soldierDetailHeroCardWebp: 'PASS',
+              soldierDetailHeroCardCount,
               backForwardNavigation: 'PASS',
               equipmentToHeroNavigation: 'PASS',
               unknownIdBrowser404: 'PASS',
