@@ -1,4 +1,4 @@
-name: Project Tooling Regression Runner Shadow
+name: Project Tooling Regression Runner
 
 on:
   pull_request:
@@ -7,19 +7,23 @@ on:
       - 'tools/project-check/contracts/validators.v1.json'
       - 'data/contracts/project-tooling-regression-runner-*.json'
       - '.github/workflows/project-tooling-regression-runner.yml'
+      - '.github/workflows/regression-coverage-promotion-v2.yml'
       - 'package.json'
+      - 'scripts/validate-shared-movement-type-index-final.mjs'
+      - 'scripts/validate-soldier-stage6-7-final.mjs'
+      - 'scripts/validate-soldier-portrait-v9-final.mjs'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: regression-runner-shadow-${{ github.event.pull_request.number || github.ref }}
+  group: regression-runner-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  regression-runner-shadow:
-    name: regression-runner-shadow
+  regression-runner:
+    name: regression-runner
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -41,6 +45,6 @@ jobs:
       - name: Run NEW Regression Runner current-head parity
         run: node tools/regression-runner/test/current-parity.mjs
 
-      - name: Ensure shadow run leaves tracked state unchanged
+      - name: Ensure operational run leaves tracked state unchanged
         if: always()
         run: git diff --exit-code
