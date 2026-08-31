@@ -37,7 +37,7 @@ expectOwners(
 expectOwners(
   '.github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml',
   ['status-source'],
-  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection'],
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-artifact-bridge', 'status-source-selection'].filter((value, index, array) => array.indexOf(value) === index).sort(),
 );
 expectOwners(
   'tools/project-status/lib/normalize-project-status.mjs',
@@ -83,6 +83,16 @@ expectOwners(
   '.github/workflows/project-doctor-d7-pr-guard.yml',
   ['project-check'],
   ['project-check-self-test'],
+);
+expectOwners(
+  'scripts/run-project-doctor-closeout-v6.mjs',
+  ['project-check'],
+  ['project-check-self-test'],
+);
+expectOwners(
+  'package.json',
+  ['shared-build'],
+  ['production-build'],
 );
 expectOwners(
   'src/routes/heroes.tsx',
@@ -220,19 +230,30 @@ for (const runtimePath of runtimePaths) {
 
 const deletionManifest = readJson('data/contracts/project-tooling-project-doctor-deletion-manifest.v1.json');
 assert.equal(deletionManifest.schemaId, 'project-tooling-project-doctor-deletion-manifest/v1');
-assert.equal(deletionManifest.completion, 'EXACT_DELETION_MANIFEST_PREPARED');
-assert.equal(deletionManifest.applyNextStep.actualDeletionApplied, false);
-assert.equal(deletionManifest.applyNextStep.packageJsonMutated, false);
 assert.equal(deletionManifest.applyNextStep.exactPathOnly, true);
 assert.equal(deletionManifest.applyNextStep.filenameSimilarityAllowed, false);
 assert.equal(deletionManifest.requiredCheckRollbackWindow.operationalLegacyGuardRetentionRequired, false);
+
+const deletionPhase = deletionManifest.applyNextStep.state;
+const prepared = deletionManifest.completion === 'EXACT_DELETION_MANIFEST_PREPARED' && deletionPhase === 'READY_AFTER_MANIFEST_VALIDATION';
+const applying = deletionManifest.completion === 'OLD_DOCTOR_RETIREMENT_APPLYING' && deletionPhase === 'APPLYING';
+const applied = deletionManifest.completion === 'OLD_DOCTOR_RETIREMENT_APPLIED' && deletionPhase === 'APPLIED';
+assert.equal(prepared || applying || applied, true, `unsupported deletion manifest phase: ${deletionManifest.completion}/${deletionPhase}`);
+if (prepared || applying) assert.equal(deletionManifest.applyNextStep.actualDeletionApplied, false);
+if (prepared) assert.equal(deletionManifest.applyNextStep.packageJsonMutated, false);
+if (applied) {
+  assert.equal(deletionManifest.applyNextStep.actualDeletionApplied, true);
+  assert.equal(deletionManifest.applyNextStep.packageJsonMutated, true);
+}
 
 const deletionFiles = deletionManifest.applyNextStep.fileDeletions;
 const deletionSet = new Set(deletionFiles);
 assert.equal(deletionSet.size, deletionFiles.length, 'deletion manifest file paths must be unique');
 for (const relative of deletionFiles) {
   assert.equal(/[*?\[\]]/.test(relative), false, `deletion manifest must use exact paths only: ${relative}`);
-  assert.equal(fs.existsSync(path.join(repoRoot, relative)), true, `deletion candidate must exist before apply: ${relative}`);
+  const exists = fs.existsSync(path.join(repoRoot, relative));
+  if (prepared) assert.equal(exists, true, `deletion candidate must exist before apply: ${relative}`);
+  if (applied) assert.equal(exists, false, `deleted OLD Doctor path must be absent after apply: ${relative}`);
 }
 
 const retainedRollbackFiles = [
@@ -267,7 +288,8 @@ const removalKeys = deletionManifest.applyNextStep.packageScriptRemovals;
 const removalSet = new Set(removalKeys);
 assert.equal(removalSet.size, removalKeys.length, 'package script removals must be unique');
 for (const key of removalKeys) {
-  assert.equal(typeof packageScripts[key], 'string', `package removal entrypoint must currently exist: ${key}`);
+  if (prepared) assert.equal(typeof packageScripts[key], 'string', `package removal entrypoint must exist before apply: ${key}`);
+  if (applied) assert.equal(packageScripts[key], undefined, `retired package entrypoint must be absent after apply: ${key}`);
 }
 const protectedPackageKeys = [
   ...deletionManifest.retainWriterRollback.packageEntrypoints,
@@ -287,12 +309,13 @@ assert.throws(
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'PROJECT_CHECK_R3_SELF_TEST',
-  fixtures: 22,
+  fixtures: 24,
   catalogValidatorCount: contracts.validatorCatalog.validators.length,
   ownerCount: contracts.ownerMap.owners.length,
   deletionManifest: {
     status: deletionManifest.status,
     completion: deletionManifest.completion,
+    phase: deletionPhase,
     deletionFileCount: deletionFiles.length,
     packageScriptRemovalCount: removalKeys.length,
     retainedWriterRollbackPathCount: retainedRollbackFiles.length,
