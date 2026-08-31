@@ -12,6 +12,18 @@ const STAGE4_VALIDATOR = 'tools/asset-intake/cli/validate-stage4-v1.mjs';
 const checks = [];
 const check = (id, fn) => { fn(); checks.push(id); };
 
+function trackedWorktreeSnapshot() {
+  const result = spawnSync('git', ['status', '--porcelain=v1', '--untracked-files=no'], { encoding: 'utf8' });
+  assert.equal(result.status, 0, `${result.stdout ?? ''}\n${result.stderr ?? ''}`);
+  return String(result.stdout ?? '').trimEnd();
+}
+
+function snapshotLineCount(snapshot) {
+  return snapshot ? snapshot.split(/\r?\n/).filter(Boolean).length : 0;
+}
+
+const trackedBefore = trackedWorktreeSnapshot();
+
 const upstream = spawnSync(process.execPath, [STAGE4_VALIDATOR], { encoding: 'utf8' });
 check('UPSTREAM_STAGE4', () => assert.equal(upstream.status, 0, `${upstream.stdout}\n${upstream.stderr}`));
 
@@ -97,6 +109,9 @@ const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 check('PACKAGE_STAGE5_VALIDATOR_ENTRY', () => assert.equal(packageJson.scripts['asset:intake:validate'], 'node tools/asset-intake/cli/validate-stage5-v1.mjs'));
 check('PACKAGE_ROUTE_ENTRY', () => assert.equal(packageJson.scripts['asset:intake:route'], 'node tools/asset-intake/cli/run-v1.mjs route'));
 
+const trackedAfter = trackedWorktreeSnapshot();
+check('TRACKED_WORKTREE_STABLE', () => assert.equal(trackedAfter, trackedBefore));
+
 console.log(JSON.stringify({
   status: 'PASS_ASSET_INTAKE_STAGE5_OPERATIONAL_ROUTING',
   completion: 'OPERATIONAL_ROUTING_VALIDATED',
@@ -111,5 +126,10 @@ console.log(JSON.stringify({
     externalCandidateDirectUse: false,
     verifiedExternalCandidateReturnsToAssetIntake: true,
     semanticRecomputation: false,
+  },
+  executionProof: {
+    trackedBeforeCount: snapshotLineCount(trackedBefore),
+    trackedAfterCount: snapshotLineCount(trackedAfter),
+    trackedMutationCount: 0,
   },
 }, null, 2));
