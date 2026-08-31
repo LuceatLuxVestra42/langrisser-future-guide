@@ -19,7 +19,12 @@ assert.deepEqual(summary.domains, {
   hero: 'hero-final',
   soldier: 'soldier-final',
 });
-assert.equal(summary.productionWriterActivation, 'CUTOVER_DEFERRED');
+assert.equal(summary.productionWriterActivation, 'ACTIVE');
+assert.equal(contract.policy.transport.productionWriterWorkflow, '.github/workflows/project-tooling-r1-status-source-writer.yml');
+assert.equal(contract.policy.transport.legacyWriterWorkflow, '.github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml');
+assert.equal(contract.policy.transport.legacyWriterActive, false);
+assert.equal(contract.policy.transport.mainAllowed, false);
+assert.equal(contract.policy.transport.pullRequestAllowed, false);
 
 const selection = selectActiveSources({ repoRoot });
 assert.equal(selection.status, 'PASS');
@@ -229,13 +234,45 @@ for (const forbidden of [
   assert.equal(runtimeText.includes(forbidden), false, `R1-5 runtime must not depend on legacy status runtime: ${forbidden}`);
 }
 
+const newWriterText = fs.readFileSync(path.join(repoRoot, contract.policy.transport.productionWriterWorkflow), 'utf8');
+assert.equal(newWriterText.includes('tools/status-source/cli/lifecycle.mjs handoff'), true);
+assert.equal(newWriterText.includes('tools/status-source/cli/lifecycle.mjs declaration'), true);
+assert.equal(newWriterText.includes('data/status-sources'), true);
+for (const forbidden of [
+  'scripts/apply-project-doctor-status-source-handoff.mjs',
+  'doctor:freshness',
+  'build-project-status.mjs',
+  'PROJECT_STATUS.md',
+  'data/generated/project-status.v1.json',
+  'data/generated/project-doctor',
+]) {
+  assert.equal(newWriterText.includes(forbidden), false, `NEW writer must not depend on legacy write path: ${forbidden}`);
+}
+
+const legacyWriterText = fs.readFileSync(path.join(repoRoot, contract.policy.transport.legacyWriterWorkflow), 'utf8');
+assert.equal(legacyWriterText.includes('(Retired)'), true);
+assert.equal(legacyWriterText.includes('contents: write'), false);
+assert.equal(legacyWriterText.includes('workflow_call:'), false);
+assert.equal(legacyWriterText.includes('apply-project-doctor-status-source-handoff'), false);
+
+for (const producerPath of [
+  '.github/workflows/hero-stage6-4-site-consumer.yml',
+  '.github/workflows/soldier-stage6-7-site-admission.yml',
+]) {
+  const producerText = fs.readFileSync(path.join(repoRoot, producerPath), 'utf8');
+  assert.equal(producerText.includes('uses: ./.github/workflows/project-tooling-r1-status-source-writer.yml'), true);
+  assert.equal(producerText.includes('project-doctor-status-source-stage6-3-apply-handoff.yml'), false);
+  assert.equal(producerText.includes('scripts/render-project-doctor-status-source-closeout-request.mjs'), false);
+  assert.equal(producerText.includes('scripts/resolve-project-doctor-status-source-declaration.mjs'), false);
+}
+
 assert.equal(contract.boundaries.legacyProjectDoctorRuntimeImports, 0);
 assert.equal(contract.boundaries.legacyActiveRegistryDependencies, 0);
 assert.equal(contract.boundaries.d5RuntimeDependencies, 0);
 assert.equal(contract.boundaries.rawConfigDataReadCount, 0);
 assert.equal(contract.boundaries.semanticRecomputationCount, 0);
 assert.equal(contract.boundaries.domainValidatorExecutionCount, 0);
-assert.equal(contract.boundaries.productionWriterWorkflowActivated, false);
+assert.equal(contract.boundaries.productionWriterWorkflowActivated, true);
 
 console.log(JSON.stringify({
   status: 'PASS_STATUS_SOURCE_R1_5_LIFECYCLE_SELF_TEST',
@@ -254,7 +291,9 @@ console.log(JSON.stringify({
   legacyActiveRegistryDependencies: 0,
   d5RuntimeDependencies: 0,
   projectStatusDependencies: 0,
-  productionWriterWorkflowActivated: false,
+  productionWriterWorkflowActivated: true,
+  legacyWriterActive: false,
+  writerTransportCount: 1,
   rawConfigDataReads: 0,
   semanticRecomputations: 0,
 }, null, 2));
