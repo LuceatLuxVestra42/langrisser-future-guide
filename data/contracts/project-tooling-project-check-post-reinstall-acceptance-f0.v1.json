@@ -1,0 +1,182 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-post-reinstall-acceptance-f0/v1",
+  "stage": "F0",
+  "checkpoint": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_F0_BASELINE",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "F0_BASELINE_FROZEN",
+  "purpose": "Freeze the exact pre-reinstall and post-reinstall comparison baselines, semantic comparison targets, and deferred reviews for final Project Doctor v2 / Project Check acceptance. This checkpoint does not mutate runtime, canonical, generated semantic, frontend, asset, Status Source, or Project Status data.",
+  "beforeBaseline": {
+    "commit": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "meaning": "Last authoritative main state immediately before the R0 project-tooling migration boundary was created.",
+    "evidence": {
+      "r0BoundaryCommit": "2fe2958b773dd7e6ae45f84e7e908ee2ed5ea56b",
+      "r0BoundaryParent": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+      "requiredStatusCheck": "pr-guard",
+      "projectStatusSource": "data/generated/project-doctor-d1-1-status.v1.json"
+    }
+  },
+  "migrationLineage": {
+    "r0Boundary": "2fe2958b773dd7e6ae45f84e7e908ee2ed5ea56b",
+    "r0Hardened": "a1a3986a55d5d97ae4d779ece7c942d262d7458d",
+    "firstR1StatusSourceImplementation": "145570d55d6a98d9063cf397ff010c2b9d24f1a8",
+    "r3ProjectCheckSubBaseline": "3c0b13192b9cd7da4ecccf0397cbee5898f4e2f3",
+    "firstR3ProjectCheckImplementation": "0ed03948dafe8a83ac3a57a4c57c2d7ca529aba0",
+    "note": "The R3 sub-baseline is retained for Project Check-local comparisons only. Whole-reinstall acceptance uses beforeBaseline.commit."
+  },
+  "afterBaseline": {
+    "commit": "c1b31cc315930c8f42782c2aab7895f21e9ab24e",
+    "meaning": "Current main state after Asset Intake installation final freeze.",
+    "requiredStatusCheck": "project-check",
+    "projectStatusSource": "tools/project-status/lib/normalize-project-status.mjs",
+    "assetIntakeInstallation": {
+      "status": "COMPLETE",
+      "state": "FROZEN",
+      "validator": "PASS_24_OF_24",
+      "skinStage3_2EvidenceValidator": "PASS_45_OF_45",
+      "projectCheck": "PASS",
+      "trackedMutationCount": 0,
+      "activeLegacyRuntimeDependency": 0,
+      "semanticRecomputation": 0,
+      "blocker": null,
+      "nextRequiredInstallationWork": null
+    }
+  },
+  "projectStatusBaselineParity": {
+    "beforeAndAfterActiveSourcePathsMatch": true,
+    "beforeAndAfterPopulationProjectionMatch": true,
+    "domains": {
+      "hero": {
+        "population": {"canonicalHeroCount": 267},
+        "activeSource": "data/validation/hero-stage6-4-final.v1.json"
+      },
+      "soldier": {
+        "population": {"canonicalSoldiers": 224, "normalSoldiers": 168, "spSoldiers": 56, "heroSoldierRelations": 5977},
+        "activeSource": "data/validation/soldier-stage6-7-site-admission.v1.json"
+      },
+      "equipment": {
+        "population": {"canonical": 390, "public": 365, "general": 198, "exclusive": 167},
+        "activeSource": "data/validation/equipment-public-presentation-correction-final.v1.json"
+      },
+      "hero-soldier": {
+        "population": {"heroCount": 267, "soldierCount": 224, "canonicalPairCount": 5977},
+        "activeSource": "data/validation/hero-soldier-integration-stageC-final.v1.json"
+      },
+      "banner": {
+        "population": {"definitions": 77, "occurrences": 94},
+        "activeSource": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json"
+      },
+      "skin": {
+        "population": {"skinCount": 540, "heroCount": 267},
+        "activeSource": "data/validation/skin-stage3-2-readiness.v1.json",
+        "semanticParityAuthority": "data/generated/skin-stage2-3-bidirectional-relation.v1.json"
+      }
+    },
+    "note": "Matching Project Status population projections are a baseline locator, not the final F2 proof. F2 must compare canonical ID sets and relation edges where applicable."
+  },
+  "f2SemanticComparisonTargets": [
+    {
+      "domain": "hero",
+      "primary": "data/validation/hero-stage6-4-final.v1.json",
+      "requiredComparison": ["population", "canonical ID set", "identity/frozen contract"]
+    },
+    {
+      "domain": "soldier",
+      "primary": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "requiredComparison": ["population", "canonical ID set", "normal/SP partition", "frozen contract"]
+    },
+    {
+      "domain": "equipment",
+      "primary": "data/validation/equipment-public-presentation-correction-final.v1.json",
+      "requiredComparison": ["canonical/public/general/exclusive population", "canonical ID set", "frozen membership contract"]
+    },
+    {
+      "domain": "hero-soldier",
+      "primary": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+      "requiredComparison": ["hero ID set", "soldier ID set", "relation edge set", "canonicalPairCount"]
+    },
+    {
+      "domain": "banner",
+      "primary": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+      "requiredComparison": ["definition membership", "occurrence membership", "frozen relation/output contract"]
+    },
+    {
+      "domain": "skin",
+      "primary": "data/generated/skin-stage2-3-bidirectional-relation.v1.json",
+      "validatorOutput": "data/validation/skin-stage2-5-final.v1.json",
+      "requiredComparison": ["bySkinId set", "byHeroId set", "540 relation edges", "heroId", "sourceOrder", "32 zero-skin hero entries"],
+      "cardinality": {"skinToHero": "EXACTLY_ONE", "heroToSkin": "ZERO_OR_MANY"}
+    }
+  ],
+  "strictSemanticHashParityExclusions": [
+    {
+      "path": "data/validation/skin-stage3-2-readiness.v1.json",
+      "reason": "Legitimately advanced from READY_FOR_ASSET_EVIDENCE to PASS/SKIN_STAGE3_2_COMPLETE during the completed Asset Intake downstream asset-evidence rollout. It is not the frozen Skin ownership/relation authority."
+    },
+    {
+      "path": "data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json",
+      "reason": "New authoritative downstream asset evidence added during Asset Intake installation; not a pre/post semantic relation parity target."
+    },
+    {
+      "pathClass": "project tooling/status/projection migration artifacts",
+      "reason": "These files were intentionally reimplemented or rehomed; acceptance requires result/authority parity and independence, not byte-for-byte implementation parity."
+    },
+    {
+      "pathClass": "frontend, asset delivery, hosted/browser outputs",
+      "reason": "Only compare in their owning acceptance phase when directly required; presentation changes do not reopen frozen semantic parity."
+    }
+  ],
+  "f1AuthorityComparisonTargets": [
+    "data/status-sources/*.json selection authority",
+    "tools/status-source runtime independence",
+    "tools/project-status read-only normalization/projection",
+    "tools/project-check owner and validator routing",
+    "main branch required status context project-check",
+    "absence of active OLD D1/D2/D3/D4/D5/D7 runtime predecessor edges"
+  ],
+  "reviews": [
+    {
+      "code": "REVIEW_CURRENT_PROJECT_STATUS_SKIN_PROJECTION_STALE_CANDIDATE",
+      "owner": "project-status",
+      "blocking": false,
+      "observedAt": "c1b31cc315930c8f42782c2aab7895f21e9ab24e",
+      "observation": "PROJECT_STATUS.md still projects Skin as READY_FOR_ASSET_EVIDENCE while current data/validation/skin-stage3-2-readiness.v1.json is PASS / SKIN_STAGE3_2_COMPLETE with 45/45 checks and evidence present.",
+      "deferTo": "F1 Authority / Project Status parity inspection",
+      "doNotReopen": ["Asset Intake installation", "Skin Stage 1/2 semantics", "Skin canonical membership", "Hero-Skin ownership/sourceOrder relation"]
+    },
+    {
+      "code": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+      "owner": "status-source",
+      "blocking": false,
+      "observation": "Real non-main workflow_dispatch CAS/apply/commit/push proof remains a scoped rollback-surface review and must wait for a legitimate approved successor.",
+      "deferTo": "Future legitimate Status Source successor",
+      "doNotSynthesize": true
+    }
+  ],
+  "blockers": [],
+  "mutationBoundary": {
+    "runtimeFilesModified": false,
+    "canonicalFilesModified": false,
+    "generatedSemanticFilesModified": false,
+    "statusSourceModified": false,
+    "projectStatusModified": false,
+    "frontendModified": false,
+    "assetModified": false
+  },
+  "f0CompletionGate": {
+    "wholeMigrationBeforeBaselineResolved": true,
+    "currentAfterBaselineResolved": true,
+    "r3SubBaselineResolved": true,
+    "comparisonTargetsFrozen": true,
+    "semanticHashExclusionsDocumented": true,
+    "blockerReviewSeparationRecorded": true
+  },
+  "blocker": null,
+  "nextStartPoint": "F1: inspect current authority/runtime graph from afterBaseline.commit. Confirm NEW Status Source -> Project Status -> Project Check ownership and legacy runtime dependency zero; classify the Skin Project Status projection observation without mutating semantic or Asset Intake scope.",
+  "reopenConditions": [
+    "after baseline main is superseded by a change to Project Check authority before F1 begins",
+    "authoritative evidence shows the R0 designedAgainst/parent lineage is incorrect",
+    "a canonical population, ID set, relation contract, or selected active source changed before F2",
+    "an authoritative source contradicts a comparison target recorded here"
+  ]
+}
