@@ -2,8 +2,8 @@
   "version": 1,
   "schemaId": "configdata-lookup-clr7-cutover/v1",
   "stage": "CLR7",
-  "status": "CANDIDATE_VALIDATION_PENDING",
-  "completion": "PENDING_CONFIGDATA_LOOKUP_CLR7_CUTOVER",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR7_CUTOVER_FROZEN",
   "purpose": "Cut over public package lookup/refs/find authority to the NEW ConfigData Lookup namespace and retire legacy Stage 7/8 Doctor-style selector authority from active package/workflow/runtime surfaces without reopening Stage 0-6 materialization semantics.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
@@ -40,6 +40,7 @@
     "configdataLookupValidator": "configdata-lookup-self-test",
     "packageJsonProjectCheckOwnerRemains": "shared-build",
     "packageJsonLookupValidation": "Project Tooling ConfigData Lookup workflow explicitly triggers on package.json and the aggregate owner self-test asserts exact lookup/refs/find aliases.",
+    "stage7And8RetiredWorkflowOwner": "configdata-lookup",
     "broadPackageOwnerExpansion": false,
     "ownerPropagation": false,
     "changeClassFanOut": false
@@ -47,7 +48,12 @@
   "validationImplementation": {
     "cutoverSelfTest": "tools/configdata-lookup/test/configdata-lookup-clr7-cutover.mjs",
     "aggregateOwnerSelfTest": "tools/configdata-lookup/test/configdata-lookup-owner-self-test.mjs",
+    "currentStage5Validator": "tools/configdata-lookup/test/configdata-lookup-stage5-current-validator.mjs",
+    "currentStage6Validator": "tools/configdata-lookup/test/configdata-lookup-stage6-current-validator.mjs",
+    "activeStage6Workflow": ".github/workflows/configdata-lookup-stage6.yml",
     "generalWorkflow": ".github/workflows/project-tooling-configdata-lookup-clr2.yml",
+    "retiredStage7Workflow": ".github/workflows/configdata-lookup-stage7.yml",
+    "retiredStage8Workflow": ".github/workflows/configdata-lookup-stage8.yml",
     "activeAuthorityScan": "Scan package.json and every .github/workflows YAML for legacy Stage 7/8 selector/validator invocation tokens.",
     "cliParity": "Execute npm run lookup/refs/find through NEW package aliases and compare stdout/stderr/exit status to the preserved legacy CLI for representative positive, find, refs, and absent-ID cases."
   },
@@ -64,6 +70,7 @@
     "configdataLookupOwnerSelfTest": "PASS",
     "projectCheckSelfTest": "PASS",
     "projectCheckOwnershipPlan": "PASS",
+    "projectCheckManualReviewCount": 0,
     "projectCheckOwningValidators": "PASS",
     "productionBuild": "PASS",
     "trackedMutationCount": 0
@@ -84,11 +91,67 @@
     "browserUiMutationCount": 0
   },
   "validationEvidence": {
-    "candidateHead": null,
-    "configdataLookupWorkflow": null,
-    "projectCheck": null,
-    "freezeHead": null,
-    "freezeHeadRevalidation": "PENDING"
+    "candidateHead": "185e84bd4dd6d41fcb2be92d8111bf7d00cf89de",
+    "stage6Workflow": {
+      "runId": 33403017714,
+      "jobId": 99523686356,
+      "currentStage5Predecessor": "PASS",
+      "currentStage6Validator": "PASS",
+      "stage6Freshness": "PASS",
+      "trackedMutationCount": 0,
+      "conclusion": "success"
+    },
+    "configdataLookupWorkflow": {
+      "runId": 33403017753,
+      "jobId": 99523686566,
+      "stage5CurrentValidator": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "ownerSelfTest": "PASS",
+      "clr7Cutover": "PASS",
+      "conclusion": "success"
+    },
+    "projectCheck": {
+      "runId": 33403017873,
+      "jobId": 99523686885,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "manualReviewCount": 0,
+      "owningValidators": "PASS",
+      "productionBuild": "PASS",
+      "conclusion": "success"
+    },
+    "cutoverMetrics": {
+      "legacyAliasCount": 0,
+      "parityCaseCount": 4,
+      "activePackageReferenceCount": 0,
+      "activeWorkflowReferenceCount": 0,
+      "newRuntimeDependencyCount": 0,
+      "stage6StaleCount": 0,
+      "trackedMutationCount": 0
+    },
+    "freezeHead": "185e84bd4dd6d41fcb2be92d8111bf7d00cf89de",
+    "freezeHeadStage6Workflow": {
+      "runId": 33403017714,
+      "jobId": 99523686356,
+      "conclusion": "success"
+    },
+    "freezeHeadConfigdataLookupWorkflow": {
+      "runId": 33403017753,
+      "jobId": 99523686566,
+      "conclusion": "success"
+    },
+    "freezeHeadProjectCheck": {
+      "runId": 33403017873,
+      "jobId": 99523686885,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "manualReviewCount": 0,
+      "owningValidators": "PASS",
+      "productionBuild": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadRevalidation": "PASS"
   },
   "blockers": [],
   "reviews": [
@@ -100,7 +163,13 @@
     {
       "id": "LEGACY_STAGE7_STAGE8_ARTIFACTS_PRESERVED_AS_HISTORY",
       "blocking": false,
-      "detail": "Stage 7/8 contracts, libraries, validators and summaries are not physically deleted because they are completed historical evidence; active package/workflow/NEW runtime authority must remain zero."
+      "detail": "Stage 7/8 contracts, libraries, validators and summaries are not physically deleted because they are completed historical evidence; active package/workflow/NEW runtime authority is zero."
+    },
+    {
+      "id": "HERO_LIST_STAGE2_STAGE3_PRESENTATION_VALIDATOR_DRIFT",
+      "classification": "REVIEW_EXISTING_DRIFT",
+      "blocking": false,
+      "detail": "Legacy Hero List Stage 2/3 workflows reject later completed Hero presentation state. CLR7 changes no Hero source or Hero validator files, so these red checks do not block the ConfigData Lookup cutover and are deferred to the owning presentation-validator maintenance scope."
     }
   ],
   "nextStart": "After CLR7 freeze, begin CLR8 final freeze: inventory final ConfigData Lookup authority/runtime/writer surfaces, verify all CLR0-7 predecessor completions and current Project Check routing, then freeze the reset as complete without reopening Stage 0-6 semantics.",
