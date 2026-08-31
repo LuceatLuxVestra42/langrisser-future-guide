@@ -3,8 +3,8 @@
   "schemaId": "project-tooling-project-status-r2/v1",
   "stage": "R2",
   "checkpoint": "PROJECT_TOOLING_PROJECT_STATUS_R2",
-  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
-  "completion": "R2_PROJECT_STATUS_IMPLEMENTED",
+  "status": "PASS",
+  "completion": "R2_PROJECT_STATUS_COMPLETE",
   "purpose": "Rehome Project Status normalization and projection from legacy Project Doctor D1 into an independent read-only tools/project-status implementation that consumes only NEW R1 Status Source authority.",
   "predecessor": {
     "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_COMPLETE",
@@ -21,6 +21,7 @@
     "runtimeDependency": false
   },
   "implementation": {
+    "implementationHead": "55cd23acf5be65a4dbceb76d9d652fa19dcd7b76",
     "normalizationContract": "tools/project-status/contracts/normalization.v1.json",
     "normalizationRuntime": "tools/project-status/lib/normalize-project-status.mjs",
     "projectionRuntime": "tools/project-status/lib/project-status-view.mjs",
@@ -68,15 +69,33 @@
     "projectStatusMarkdownInput": false,
     "legacyProjectStatusGeneratedInput": false
   },
-  "currentExpectedParity": {
+  "currentParity": {
     "projectHealth": "REVIEW",
     "healthCounts": {"PASS": 0, "REVIEW": 6, "FAIL": 0, "MISSING": 0, "INCONSISTENT": 0, "UNKNOWN": 0},
     "lifecycleCounts": {"FROZEN": 4, "COMPLETE": 1, "IN_PROGRESS": 1, "UNKNOWN": 0},
     "knownHardErrorTotal": 0,
     "reviewTotal": 29,
     "blockerTotal": 1,
+    "selectedDomains": {
+      "hero": "hero-stage6-4-final",
+      "soldier": "soldier-stage6-7-site-admission",
+      "equipment": "equipment-public-presentation-correction-final",
+      "hero-soldier": "hero-soldier-stageC-final",
+      "banner": "banner-stage3-8-regression-freeze",
+      "skin": "skin-stage3-2-readiness"
+    },
     "equipmentProjection": {"canonical": 390, "public": 365, "general": 198, "exclusive": 167},
     "skin": {"lifecycle": "IN_PROGRESS", "health": "REVIEW", "blockerCount": 1}
+  },
+  "validationEvidence": {
+    "shadowRunId": 33343818772,
+    "shadowJobId": 99344105820,
+    "headSha": "55cd23acf5be65a4dbceb76d9d652fa19dcd7b76",
+    "conclusion": "success",
+    "r1StatusSourcePredecessor": "PASS",
+    "projectStatusParityAndIsolationSelfTest": "PASS",
+    "projectStatusJsonProjection": "PASS",
+    "projectStatusMarkdownRender": "PASS"
   },
   "independenceBoundary": {
     "legacyProjectDoctorRuntimeImports": 0,
@@ -106,18 +125,20 @@
     "currentParityFixtureImplemented": true,
     "selfTestImplemented": true,
     "shadowWorkflowImplemented": true,
-    "shadowCiPass": false,
-    "sixDomainParity": false,
-    "aggregateParity": false,
-    "runtimeIndependenceProven": false
+    "shadowCiPass": true,
+    "sixDomainParity": true,
+    "aggregateParity": true,
+    "runtimeIndependenceProven": true,
+    "readyForR3ProjectCheck": true
   },
   "blockers": [],
+  "cutoverBlockers": ["LEGACY_REQUIRED_PR_GUARD_STILL_ACTIVE"],
   "reviews": [
     "Canonical Project Status writer activation remains deferred to cutover to avoid dual-writer authority with the legacy Project Status Sync workflow.",
     "The parity fixture is a migration oracle only; NEW runtime does not read legacy D1 or legacy Project Status outputs.",
     "Legacy required pr-guard remains a CUTOVER_ONLY blocker and must not be repaired by extending legacy D2-D7."
   ],
-  "nextStartPoint": "Run the R2 Project Status shadow workflow. If the NEW normalization/project-status view matches current six-domain parity and remains runtime-independent, freeze R2 as PASS and start R3 Project Check.",
+  "nextStartPoint": "R3 Project Check: implement a minimal tools/project-check path-to-owner and owner-to-existing-validator router with MANUAL_REVIEW fallback, validator execution, exit aggregation, and a shadow PR check. Do not inherit legacy D2/D3/D4/D5/D7 version chains or Status Source/Project Status mutation responsibilities.",
   "reopenConditions": [
     "R1 Status Source selection or projectionOverride semantics change",
     "a selected domain status source changes shape authoritatively",
