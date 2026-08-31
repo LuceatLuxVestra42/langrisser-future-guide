@@ -31,3 +31,6 @@ jobs:
 
       - name: Run changed path owning validators
         run: node tools/project-check/cli/check.mjs --base "origin/${GITHUB_BASE_REF}" --head HEAD
+
+      - name: Compare OLD Doctor and NEW Project Check shadow behavior
+        run: node tools/project-check/shadow/compare-old-new.mjs --base "origin/${GITHUB_BASE_REF}" --head HEAD
