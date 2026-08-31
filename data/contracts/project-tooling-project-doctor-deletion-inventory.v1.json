@@ -18,7 +18,8 @@
     "packageJson":"package.json",
     "r0Boundary":"data/contracts/project-tooling-migration-r0.v1.json",
     "statusSourceWriterCutover":"data/contracts/project-tooling-status-source-writer-cutover.v1.json",
-    "projectStatusWriterCutover":"data/contracts/project-tooling-project-status-writer-cutover.v1.json"
+    "projectStatusWriterCutover":"data/contracts/project-tooling-project-status-writer-cutover.v1.json",
+    "exactDeletionManifest":"data/contracts/project-tooling-project-doctor-deletion-manifest.v1.json"
   },
   "alreadyRetired": {
     "oldPullRequestMergeGateTrigger": {
@@ -88,13 +89,40 @@
       "sharedValidatorExamples":["validate:coverage:hero-canonical","validate:coverage:soldier-canonical","validate:coverage:equipment-canonical","validate:coverage:hero-soldier-relation","validate:coverage:hero-equipment-relation","validate:coverage:banner-data","validate:coverage:skin-relation","validate:coverage:shared-movement","validate:coverage:soldier-assets","validate:regression-coverage-promotion:v2"]
     }
   },
+  "manifestOutcome": {
+    "manifestPrepared": true,
+    "manifestStatus": "PASS_WITH_REVIEW",
+    "manifestCompletion": "EXACT_DELETION_MANIFEST_PREPARED",
+    "validatedHead": "3f7bb8e09cddb59d15a70e590c96d39bf1f1b6d1",
+    "projectCheckRunId": 33351548952,
+    "projectCheckJobId": 99365790200,
+    "projectCheckConclusion": "success",
+    "immediateRetirementFileCount": 10,
+    "packageScriptRemovalCount": 9,
+    "writerRollbackSurfaceRetained": true,
+    "historicalEvidencePreserved": true,
+    "hostedQaPreserved": true,
+    "independentValidatorsPreserved": true,
+    "newCanonicalProjectStatusPreserved": true,
+    "actualDeletionApplied": false,
+    "inventoryDrift": {
+      "classification": "REVIEW_EXISTING_DRIFT",
+      "path": "data/generated/project-doctor-status-sources.v1.json",
+      "presentOnMain": false,
+      "presentOnCurrentBranch": false,
+      "manifestAction": "excluded from delete and retain sets"
+    }
+  },
   "deletionSafety": {
     "deleteAllOldDoctorNow":false,
     "statusSourceWriterGateCleared":true,
     "projectStatusWriterGateCleared":true,
-    "exactDeletionManifestReadyToPrepare":true,
+    "exactDeletionManifestReadyToPrepare":false,
+    "exactDeletionManifestPrepared":true,
+    "nextDeletionStepReady":true,
     "reasons":[
-      "Exact per-file deletion still requires rollback-scope and historical-evidence exclusions.",
+      "Only the validated manifest's exact D2/D3/D4/D7 runtime/workflow paths are ready for retirement.",
+      "Writer rollback surfaces remain retained and are outside the next deletion set.",
       "NEW canonical Project Status outputs must be preserved even though their paths historically originated in OLD tooling.",
       "Historical parity contracts remain referenced by frozen migration checkpoints.",
       "Hosted QA/shared validators remain outside OLD Doctor deletion ownership."
@@ -104,14 +132,16 @@
   "blockers": [],
   "reviews": [
     "GitHub code search results are not used as negative evidence for consumer absence.",
-    "Exact deletion manifest must explicitly exclude NEW canonical Project Status outputs and retained historical evidence.",
-    "Package.json still contains OLD Doctor entrypoints by design until the exact deletion manifest is reviewed and applied."
+    "REVIEW_EXISTING_DRIFT: data/generated/project-doctor-status-sources.v1.json is named here as a generated compatibility output but is absent on both main and the migration branch; the exact manifest does not synthesize it.",
+    "Writer rollback surfaces remain intentionally retained and are not part of the validated immediate retirement set.",
+    "Historical evidence, NEW canonical Project Status outputs, hosted QA, and independent validators are explicitly excluded from the next deletion step."
   ],
-  "nextStartPoint":"Prepare the exact per-file OLD Project Doctor deletion manifest using explicit inventory membership. Preserve NEW canonical Project Status outputs, historical evidence, hosted QA, and independent validators; do not delete by filename similarity.",
+  "nextStartPoint":"Apply the validated exact deletion manifest in a separate OLD Doctor retirement step: delete only the 10 explicit D2/D3/D4/D7 files and remove only the 9 listed package entrypoints. Preserve all retainWriterRollback and preserve scopes from the manifest.",
   "reopenConditions":[
     "NEW Status Source or Project Status writer design changes",
     "either OLD writer becomes automatically active again",
     "a downstream consumer is proven to require an item classified for retirement",
+    "the validated exact deletion manifest changes",
     "historical migration checkpoints are rewritten to an archive that no longer needs retained OLD evidence",
     "OLD Doctor automatic pull-request merge-gate execution returns"
   ]
