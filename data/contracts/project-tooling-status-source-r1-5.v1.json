@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-status-source-r1-5/v1",
+  "stage": "R1-5",
+  "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_5_LIFECYCLE",
+  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
+  "completion": "R1_5_LIFECYCLE_IMPLEMENTED",
+  "purpose": "Rehome explicit apply handoff, retained producer declaration, and explicit closeout-request behavior onto the independent R1-4 Status Source bridge without legacy active-registry, D5 freshness, or Project Status runtime dependencies.",
+  "predecessor": {
+    "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_4_ARTIFACT_BRIDGE",
+    "status": "PASS",
+    "completion": "R1_4_ARTIFACT_BRIDGE_COMPLETE",
+    "contract": "data/contracts/project-tooling-status-source-r1-4.v1.json"
+  },
+  "authoritativeReference": {
+    "legacyStage6_3Contract": {
+      "path": "data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json",
+      "gitBlobSha": "ea2f3463b1b4ff8d98475f0766c43611a59343e8"
+    },
+    "legacyStage6_4Contract": {
+      "path": "data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json",
+      "gitBlobSha": "f73b54e8d70b91ea53a0bc7be5c92d12dc728dc6"
+    },
+    "legacyStage6_5Contract": {
+      "path": "data/contracts/project-doctor-status-source-stage6-5-closeout-requests.v1.json",
+      "gitBlobSha": "bc44a2203e5b97054ccfe269d542b1abc020643a"
+    },
+    "referenceUseOnly": true,
+    "runtimeDependency": false
+  },
+  "implementation": {
+    "lifecycleContract": "tools/status-source/contracts/lifecycle.v1.json",
+    "runtime": "tools/status-source/lib/lifecycle-status-source.mjs",
+    "cli": "tools/status-source/cli/lifecycle.mjs",
+    "selfTest": "tools/status-source/test/lifecycle-parity.mjs",
+    "heroDeclaration": "tools/status-source/declarations/hero.v1.json",
+    "soldierDeclaration": "tools/status-source/declarations/soldier.v1.json",
+    "heroCloseoutRequest": "tools/status-source/closeout-requests/hero.v1.json",
+    "soldierCloseoutRequest": "tools/status-source/closeout-requests/soldier.v1.json",
+    "shadowWorkflow": ".github/workflows/project-tooling-r1-status-source.yml"
+  },
+  "behaviorRehome": {
+    "preserved": [
+      "Hero/Soldier explicit lifecycle pipeline registration",
+      "explicit predecessor compare-and-swap before preview",
+      "compare-and-swap recheck before apply",
+      "candidate entry id and source path must be explicit",
+      "candidate source must be committed and clean",
+      "preview must pass before apply",
+      "retained explicit producer declaration",
+      "retained explicit closeout request as authority decision",
+      "deterministic closeout-request to declaration projection",
+      "explicit write/apply flags",
+      "future successor requires explicit reviewed declaration/request change",
+      "main/pull-request mutation transport remains disabled during shadow"
+    ],
+    "removedFromStatusSourceRuntime": [
+      "legacy generated active-source registry read",
+      "D5 freshness refresh or validation",
+      "Project Doctor D1 regeneration",
+      "PROJECT_STATUS.md read or write",
+      "Project Status projection refresh"
+    ],
+    "reason": "Those removed responsibilities are legacy Doctor/Project Status concerns, not Status Source source-lifecycle authority. R1-5 uses R1-1 selection for CAS and R1-4/R1-3/R1-2 for guarded promotion instead."
+  },
+  "ownershipBoundary": {
+    "r1_5Owns": [
+      "Hero/Soldier lifecycle registration",
+      "explicit producer declaration validation",
+      "explicit closeout request validation",
+      "deterministic declaration rendering",
+      "handoff compare-and-swap",
+      "handoff preview then explicit apply delegation"
+    ],
+    "r1_1Owns": [
+      "current active source selection",
+      "predecessor authority used by compare-and-swap",
+      "post-apply selected source verification"
+    ],
+    "r1_4Owns": [
+      "artifact pipeline bridge",
+      "candidate forwarding into the producer gate"
+    ],
+    "r1_3Owns": [
+      "producer/domain/source-family validation"
+    ],
+    "r1_2Owns": [
+      "promotion compatibility",
+      "status-source declaration mutation",
+      "post-write verification",
+      "promotion rollback"
+    ],
+    "notOwnedByStatusSource": [
+      "Project Status normalization",
+      "D5 freshness seal",
+      "domain validation execution",
+      "semantic recomputation",
+      "branch-protection cutover"
+    ]
+  },
+  "currentLifecycleFixtures": {
+    "pipelineCount": 2,
+    "hero": {
+      "predecessorId": "hero-stage6-4-final",
+      "entryId": "hero-stage6-4-final",
+      "sourcePath": "data/validation/hero-stage6-4-final.v1.json",
+      "idempotentBaseline": true
+    },
+    "soldier": {
+      "predecessorId": "soldier-stage6-7-site-admission",
+      "entryId": "soldier-stage6-7-site-admission",
+      "sourcePath": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "idempotentBaseline": true
+    }
+  },
+  "independenceBoundary": {
+    "legacyProjectDoctorRuntimeImports": 0,
+    "legacyGeneratedStatusDependencies": 0,
+    "legacyActiveRegistryDependencies": 0,
+    "d1RuntimeDependencies": 0,
+    "d2RuntimeDependencies": 0,
+    "d3RuntimeDependencies": 0,
+    "d4RuntimeDependencies": 0,
+    "d5RuntimeDependencies": 0,
+    "d7RuntimeDependencies": 0,
+    "projectStatusRuntimeDependencies": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "canonicalJoinRecomputationCount": 0,
+    "domainValidatorExecutionCount": 0,
+    "productionWriterWorkflowActivated": false
+  },
+  "selfTestCoverage": [
+    "Hero and Soldier producer declarations resolve as current idempotent baselines",
+    "Hero and Soldier closeout requests deterministically match their retained declarations",
+    "Hero and Soldier handoff CHECK runs R1-4 preview with zero status-source writes",
+    "stale predecessor blocks before preview",
+    "predecessor change between preview and apply blocks before apply",
+    "unapproved producer declaration blocks",
+    "unapproved closeout request blocks",
+    "synthetic closeout WRITE may target only the bound producer declaration and writes one declaration",
+    "synthetic handoff APPLY performs preview then apply delegation and rechecks post-selection",
+    "legacy active registry, D5, and Project Status runtime dependency scan remains zero"
+  ],
+  "writerActivation": {
+    "state": "DEFERRED_TO_CUTOVER",
+    "reason": "Activating a second branch-scoped writer during shadow would violate the no-dual-writer migration boundary. R1-5 proves runtime behavior only; workflow ownership switches after NEW Project Check/cutover preparation."
+  },
+  "completionGate": {
+    "lifecycleContractImplemented": true,
+    "retainedDeclarationsImplemented": true,
+    "retainedCloseoutRequestsImplemented": true,
+    "lifecycleRuntimeImplemented": true,
+    "lifecycleCliImplemented": true,
+    "selfTestImplemented": true,
+    "shadowWorkflowUpdated": false,
+    "shadowCiPass": false,
+    "currentLifecycleParity": false,
+    "legacyRuntimeDependencyCountZero": false
+  },
+  "blockers": [],
+  "reviews": [
+    "A real future successor may require an explicit reviewed evolution of the frozen R1-4 baseline binding after promotion; current R1-5 proof is intentionally idempotent Hero/Soldier baseline behavior.",
+    "Production apply/declaration writer workflow activation is deferred to cutover to avoid dual writers.",
+    "Legacy required pr-guard remains a CUTOVER_ONLY blocker and must not be repaired by admitting migration paths into legacy D2-D7."
+  ],
+  "nextStartPoint": "Run R1-5 lifecycle self-test and representative declaration/closeout/handoff CHECK commands in the independent Status Source shadow workflow. If PASS, freeze R1-5 and the complete R1 Status Source migration, then start R2 Project Status.",
+  "reopenConditions": [
+    "R1-1 active selection semantics change",
+    "R1-4 bridge behavior changes",
+    "Hero/Soldier lifecycle ownership or transport changes authoritatively",
+    "the explicit producer declaration or closeout-request schema changes",
+    "new authoritative evidence contradicts R1-5 CAS/declaration/request parity"
+  ]
+}
