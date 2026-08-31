@@ -81,7 +81,7 @@ export function renderProjectStatusMarkdown(projectStatus) {
   const lines = [
     '# Project Status',
     '',
-    '> NEW Status Source authority를 read-only로 정규화/투영한 shadow 결과다. raw ConfigData나 canonical relation 의미를 재계산하지 않는다.',
+    '> NEW Status Source authority를 read-only로 정규화/투영한 canonical Project Status 결과다. raw ConfigData나 canonical relation 의미를 재계산하지 않는다.',
     '',
     `- Project health: **${projectStatus.projectHealth}**`,
     `- Hard errors: **${projectStatus.knownHardErrorTotal}**`,
