@@ -38,6 +38,11 @@ expectOwners(
   ['project-check-self-test'],
 );
 expectOwners(
+  '.github/workflows/project-doctor-d7-pr-guard.yml',
+  ['project-check'],
+  ['project-check-self-test'],
+);
+expectOwners(
   'src/routes/heroes.tsx',
   ['hero-frontend'],
   ['production-build'],
@@ -179,7 +184,7 @@ assert.throws(
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'PROJECT_CHECK_R3_SELF_TEST',
-  fixtures: 13,
+  fixtures: 14,
   catalogValidatorCount: contracts.validatorCatalog.validators.length,
   ownerCount: contracts.ownerMap.owners.length,
   boundaries: {
