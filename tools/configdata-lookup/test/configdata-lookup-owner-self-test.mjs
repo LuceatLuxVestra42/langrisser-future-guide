@@ -1,3 +1,5 @@
+throw new Error('F5_BAIT_ACTUAL_CONFIGDATA_LOOKUP_OWNING_VALIDATOR_FAILURE');
+
 await import('./configdata-lookup-self-test.mjs');
 const { runShadowParity } = await import('./configdata-lookup-shadow-parity.mjs');
 const shadow = await runShadowParity({ emit: true });
