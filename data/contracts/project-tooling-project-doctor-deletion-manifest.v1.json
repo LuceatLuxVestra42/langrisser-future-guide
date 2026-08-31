@@ -191,6 +191,19 @@
     "protectedPrefixesMayNotAppearInDeletionSet": true,
     "noDeletionBeforeValidationPass": true
   },
+  "validationEvidence": {
+    "validatedHead": "3f7bb8e09cddb59d15a70e590c96d39bf1f1b6d1",
+    "projectCheckRunId": 33351548952,
+    "projectCheckJobId": 99365790200,
+    "conclusion": "success",
+    "projectCheckSelfTest": "PASS",
+    "changedPathPlan": "PASS",
+    "owningValidatorExecution": "PASS",
+    "fixtureCount": 22,
+    "deletionFileCount": 10,
+    "packageScriptRemovalCount": 9,
+    "actualDeletionApplied": false
+  },
   "blockers": [],
   "reviews": [
     "Status Source direct workflow_dispatch live mutation proof remains unavailable from the current connection; its writer rollback surface is therefore retained and this does not block retirement of unrelated D2/D3/D4/D7 merge-gate runtime.",
@@ -198,7 +211,7 @@
     "REVIEW_EXISTING_DRIFT: data/generated/project-doctor-status-sources.v1.json is named by the deletion inventory as a compatibility output but is absent on both main and the current branch; it is not synthesized or included in deletion/rollback sets.",
     "Historical OLD contracts/validation evidence remain intentionally preserved and are not part of the next deletion step."
   ],
-  "nextStartPoint": "After this manifest passes Project Check, apply only applyNextStep.fileDeletions and packageScriptRemovals in a separate OLD Doctor retirement step. Do not touch retainWriterRollback or preserve scopes.",
+  "nextStartPoint": "Apply only applyNextStep.fileDeletions and packageScriptRemovals in a separate OLD Doctor retirement step. Do not touch retainWriterRollback or preserve scopes.",
   "reopenConditions": [
     "required project-check ownership or required-context state changes",
     "either NEW writer ownership changes",
