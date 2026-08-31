@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-old-doctor-off/v1",
+  "stage": "OLD_PROJECT_DOCTOR_OFF",
+  "checkpoint": "PROJECT_TOOLING_OLD_PROJECT_DOCTOR_OFF",
+  "status": "IMPLEMENTED_PENDING_VERIFICATION",
+  "completion": "OLD_DOCTOR_PR_TRIGGER_REMOVED",
+  "purpose": "Remove OLD Project Doctor automatic pull-request execution after NEW project-check became the required merge gate, while retaining OLD implementation for manual rollback observation.",
+  "predecessor": {
+    "contract": "data/contracts/project-tooling-project-check-cutover.v1.json",
+    "requiredStatus": "PASS",
+    "requiredCompletion": "CUTOVER_COMPLETE"
+  },
+  "baseline": {
+    "mainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "pullRequest": 309,
+    "migrationBranch": "work/project-tooling-migration-r0-boundary-20260831",
+    "requiredContext": "project-check"
+  },
+  "r3OwnershipEvolution": {
+    "reason": "The legacy guard workflow path was previously unmatched by NEW Project Check and had to be explicitly admitted before its deactivation change.",
+    "path": ".github/workflows/project-doctor-d7-pr-guard.yml",
+    "owner": "project-check",
+    "validator": "project-check-self-test",
+    "ownerMapCommit": "1e24f11e642a47134073f6259a3d5417b4e7c12b",
+    "selfTestCommit": "bfdeb2a8d92f3774a8b7ae2ad6a597238df504a4",
+    "revalidationRunId": 33346264847,
+    "requiredJobId": 99350882486,
+    "requiredJobConclusion": "success"
+  },
+  "implementation": {
+    "commit": "aba161a46ea72e295ba91f94e4b9ea6eb2ac9c7c",
+    "workflow": ".github/workflows/project-doctor-d7-pr-guard.yml",
+    "pullRequestTriggerRemoved": true,
+    "workflowDispatchRetained": true,
+    "rollbackPushTriggerRetained": true,
+    "legacyImplementationDeleted": false,
+    "legacyRoutingExpanded": false
+  },
+  "boundaries": {
+    "statusSourceWriterActivated": false,
+    "projectStatusWriterActivated": false,
+    "legacyDoctorDeleted": false,
+    "branchProtectionMutationInThisStep": false
+  },
+  "verification": {
+    "proofCommit": null,
+    "newProjectCheckRunId": null,
+    "newRequiredJobId": null,
+    "newRequiredJobConclusion": null,
+    "oldProjectDoctorPullRequestRunPresent": null,
+    "mainRequiredContexts": ["project-check"]
+  },
+  "blockers": [],
+  "reviews": [],
+  "nextStartPoint": "After proof that a later PR synchronize commit creates project-check but no OLD Project Doctor PR Guard run, freeze this checkpoint PASS. Then inventory OLD Project Doctor deletion scope as a separate task.",
+  "reopenConditions": [
+    "main no longer requires project-check",
+    "OLD Project Doctor pull_request trigger returns",
+    "OLD Project Doctor is needed for rollback after a NEW Project Check regression",
+    "R3 no longer owns the legacy guard workflow path explicitly"
+  ]
+}
