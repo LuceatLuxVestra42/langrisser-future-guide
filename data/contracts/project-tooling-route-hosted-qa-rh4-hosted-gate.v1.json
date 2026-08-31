@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-route-hosted-qa-rh4-hosted-gate/v1",
+  "stage": "RH4",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "ROUTE_HOSTED_QA_RH4_HOSTED_GATE_FROZEN",
+  "purpose": "Freeze the NEW Route/Hosted QA Hosted Gate after default-branch workflow integration, authoritative GitHub Pages deployment of the exact source SHA, and a read-only STRICT_CANDIDATE proof with all frozen Hosted checks passing. Preserve the RH3 clean-room runtime and keep Browser/UI, semantic, frontend, asset, deployment-writer, Status Source, and OLD Project Doctor authority outside RH4.",
+  "predecessors": {
+    "rh3Implementation": "data/contracts/project-tooling-route-hosted-qa-rh3-implementation.v1.json",
+    "rh3Completion": "ROUTE_HOSTED_QA_RH3_IMPLEMENTATION_FROZEN",
+    "rh4WorkflowIntegration": "data/contracts/project-tooling-route-hosted-qa-rh4-workflow-integration.v1.json",
+    "rh4WorkflowIntegrationCompletion": "ROUTE_HOSTED_QA_RH4_WORKFLOW_INTEGRATION_CHECKPOINTED"
+  },
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "base": "main",
+    "headBeforeRh4Freeze": "262e6aae0988b2579afee9cf46fff3266f360626",
+    "workflow": ".github/workflows/project-tooling-route-hosted-qa.yml",
+    "workflowBlobSha": "98bb85d9ba8d7409356e0341e2a927c89375fac5",
+    "deployedSourceMetadata": "gh-pages:authoritative-pages-source.json",
+    "deployedSourceSha": "262e6aae0988b2579afee9cf46fff3266f360626",
+    "deployedSourceRef": "main",
+    "ghPagesCommitSha": "4fcca9055ed554560936ef11e4d258bda7e7a439",
+    "requiredCheckContexts": ["project-check"],
+    "ownerId": "route-hosted-qa",
+    "ownerValidators": ["route-hosted-qa-self-test"]
+  },
+  "integrationEvidence": {
+    "defaultBranchIntegrationPullRequest": 310,
+    "defaultBranchIntegrationSourceHead": "8dead3e13193654fc2e237a6089e35cc0fedf588",
+    "defaultBranchIntegrationMergeCommit": "bd796a6361b7bbd7715e12714d467b349c56171c",
+    "strictFollowupPullRequest": 311,
+    "strictFollowupSourceHead": "4a4b444f045c61d169612e8bdf8f62c9f6e3463d",
+    "strictFollowupMergeCommit": "262e6aae0988b2579afee9cf46fff3266f360626",
+    "workflowRunStrictFollowup": true,
+    "workflowRunRequiresSuccessfulAuthoritativeDeploy": true,
+    "workflowRunUsesExactDeploymentHeadSha": true,
+    "repositoryMutation": false,
+    "deploymentMutation": false,
+    "browserLaunch": false,
+    "playwrightDependency": false,
+    "semanticAuthority": false,
+    "frontendAuthority": false,
+    "assetAuthority": false
+  },
+  "deploymentEvidence": {
+    "workflow": ".github/workflows/project-doctor-authoritative-pages-deploy.yml",
+    "runId": 33379752457,
+    "runAttempt": 2,
+    "jobId": 99451773692,
+    "headSha": "262e6aae0988b2579afee9cf46fff3266f360626",
+    "conclusion": "success",
+    "publishAuthoritativeCandidate": "PASS",
+    "verifyActualHostedComposedSurface": "PASS",
+    "deployedSourceMetadataStatus": "AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT",
+    "deployedSourceShaMatchesHead": true,
+    "semanticStageReopened": false
+  },
+  "strictHostedEvidence": {
+    "workflow": ".github/workflows/project-tooling-route-hosted-qa.yml",
+    "runId": 33380759765,
+    "jobId": 99452368931,
+    "event": "workflow_run",
+    "headSha": "262e6aae0988b2579afee9cf46fff3266f360626",
+    "expectedSourceSha": "262e6aae0988b2579afee9cf46fff3266f360626",
+    "deployedSourceSha": "262e6aae0988b2579afee9cf46fff3266f360626",
+    "mode": "STRICT_CANDIDATE",
+    "status": "PASS_ROUTE_HOSTED_QA_STRICT_CANDIDATE",
+    "conclusion": "success",
+    "exitCode": 0,
+    "candidateFreshnessClaim": true,
+    "rh3RuntimeSelfTest": "PASS",
+    "strictCandidateInputValidation": "PASS",
+    "probeCurrentDeployed": "SKIPPED_ON_WORKFLOW_RUN",
+    "strictCandidateExecution": "PASS",
+    "summary": {
+      "checkCount": 10,
+      "passed": 10,
+      "failed": 0,
+      "publicRoutes": 6,
+      "detailFixtures": 6,
+      "refreshFixtures": 6,
+      "trailingSlashChecks": 11,
+      "negativeChecks": 3,
+      "discoveredSameOriginAssets": 337,
+      "checkedAssets": 60
+    },
+    "checks": {
+      "DEPLOYED_COMMIT_FRESHNESS": "PASS",
+      "REPOSITORY_BASE_PATH": "PASS",
+      "PUBLIC_ROUTE_RESOLUTION": "PASS",
+      "DETAIL_DIRECT_ENTRY": "PASS",
+      "REFRESH_EQUIVALENT_GET": "PASS",
+      "TRAILING_SLASH_POLICY": "PASS",
+      "ASSET_AND_CHUNK_RESOLUTION": "PASS",
+      "FILENAME_CASE_SENSITIVITY": "PASS",
+      "ROUTE_TREE_HOSTED_PARITY": "PASS",
+      "STALE_DEPLOY_OR_CACHE": "PASS"
+    },
+    "semanticStageReopened": false
+  },
+  "completionGate": {
+    "rh3PredecessorPreserved": true,
+    "rh4WorkflowIntegrationPredecessorPreserved": true,
+    "workflowPresentOnDefaultBranch": true,
+    "authoritativeDeploymentCompleted": true,
+    "deployedSourceShaConfirmed": true,
+    "strictCandidateFreshnessPass": true,
+    "allTenHostedChecksPass": true,
+    "directEntryPass": true,
+    "refreshEquivalentGetPass": true,
+    "repositoryBasePathPass": true,
+    "assetAndChunkResolutionPass": true,
+    "routeTreeHostedParityPass": true,
+    "staleDeployOrCachePass": true,
+    "repositoryMutationIntroduced": false,
+    "deploymentMutationIntroducedByNewRh4Workflow": false,
+    "browserRuntimeIntroduced": false,
+    "semanticReopen": false,
+    "rh4FreezeReady": true
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "AUTHORITATIVE_DEPLOY_FIRST_ATTEMPT_TRANSIENT_HOSTED_VERIFY_FAILURE",
+      "blocking": false,
+      "classification": "DEPLOYMENT_HOSTED_TRANSIENT_RETRY",
+      "detail": "Authoritative deploy run 33379752457 attempt 1 published successfully but job 99449184214 failed at Verify actual hosted composed surface. Exactly one rerun of the failed deploy-and-verify job was performed. Attempt 2 job 99451773692 passed the same hosted verification and the workflow concluded success, so the initial failure was not reproduced and is not classified as an RH4 regression."
+    },
+    {
+      "id": "LEGACY_AUTHORITATIVE_DEPLOYMENT_WRITER_REMAINS_SEPARATE",
+      "blocking": false,
+      "classification": "DEPLOYMENT_WRITER_REVIEW",
+      "detail": "The authoritative Pages deploy workflow remains the deployment-owning writer. The NEW RH4 workflow only consumes its successful completion event and exact head SHA with contents:read permission; RH4 does not inherit deployment writer authority."
+    },
+    {
+      "id": "BROWSER_UI_DEFERRED",
+      "blocking": false,
+      "classification": "SEPARATE_VALIDATION_LAYER",
+      "detail": "RH4 completes the HTTP Hosted Gate only. Browser/Playwright interaction remains the next separate Browser/UI validation stage and must not reopen the completed Hosted semantic or runtime boundary."
+    },
+    {
+      "id": "STATUS_SOURCE_ROLLBACK_CLEANUP_SEPARATE",
+      "blocking": false,
+      "classification": "SEPARATE_OWNING_SCOPE",
+      "detail": "Any remaining Status Source rollback cleanup or live dispatch mutation proof belongs to the separate Status Source owning scope and does not block or reopen RH4 Hosted Gate completion."
+    }
+  ],
+  "nonScope": [
+    "No semantic, canonical, relation, ConfigData, localization, frontend, or asset data is changed by the RH4 freeze.",
+    "No Browser/UI or Playwright runtime is added to the NEW Route/Hosted QA workflow.",
+    "No gh-pages write, repository writer, force-push, Status Source writer, or Project Status writer is added to the NEW Route/Hosted QA workflow.",
+    "No strict freshness assertion is bypassed, weakened, or converted to a probe result.",
+    "No OLD Project Doctor runtime is made authoritative for NEW RH4 Route/Hosted QA execution."
+  ],
+  "nextStart": "Run required project-check on the RH4 freeze commit. If changed-path ownership resolves this checkpoint to route-hosted-qa-self-test and the required Project Check passes, classify RH4 as COMPLETE / HOSTED GATE PASS. Then begin the separate Browser/UI interaction stage without reopening RH3 or RH4 unless an explicit reopen condition is met.",
+  "reopenConditions": [
+    "The RH3 implementation or RH4 workflow-integration predecessor no longer satisfies its frozen completion requirements.",
+    "The authoritative hosted target, repository base, route fixtures, hosted check IDs, strict expected-SHA strategy, or default-branch workflow trigger contract changes.",
+    "The route-hosted-qa owner no longer resolves RH4 paths to the dedicated route-hosted-qa-self-test validator.",
+    "Authoritative evidence shows the NEW RH4 workflow mutates repository or deployment state, launches Browser/Playwright runtime, or depends on OLD Project Doctor runtime authority.",
+    "A current-branch-only Project Check failure is causally owned by the RH4 freeze checkpoint or RH4 integration.",
+    "A legitimate strict-candidate rerun against the same unchanged deployed source reproduces a Hosted Gate failure.",
+    "Hosted, Browser/UI, semantic, frontend, asset, deployment-writer, or Status Source ownership boundaries change."
+  ]
+}
