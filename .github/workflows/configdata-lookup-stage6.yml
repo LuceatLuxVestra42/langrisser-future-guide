@@ -86,7 +86,7 @@ jobs:
           node-version: '22'
 
       - name: Validate Stage 5 predecessor
-        run: node scripts/validate-configdata-lookup-stage5.mjs
+        run: npm run validate:configdata-lookup-stage5
 
       - name: Validate Stage 6 committed materialization
         run: npm run validate:configdata-lookup-stage6
