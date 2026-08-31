@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-clr0-baseline/v1",
+  "stage": "CLR0",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR0_BASELINE_VALIDATED_PENDING_FINAL_PROJECT_CHECK",
+  "purpose": "Freeze the currently validated ConfigData Lookup Stage 0-6 operating baseline before reset work. Reuse the existing materialized indices, canonical overlay, CLI, dependency manifest and validators without semantic recomputation or raw ConfigData investigation.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "base": "main",
+    "sourceHead": "b21919d8f52423cb9513aea4adadedaa4f051595",
+    "stage5Summary": {
+      "path": "data/validation/configdata-lookup-stage5-summary.v1.json",
+      "blobSha": "413360f6107f9ed512740a361dd606f3aff536d8",
+      "requiredStatus": "PASS_CONFIGDATA_LOOKUP_STAGE5_CLI"
+    },
+    "stage6Summary": {
+      "path": "data/validation/configdata-lookup-stage6-summary.v1.json",
+      "blobSha": "817fdb8eea842995c0251c94d81a3eb588da3a2c",
+      "requiredStatus": "PASS_CONFIGDATA_LOOKUP_STAGE6_INCREMENTAL_REBUILD"
+    },
+    "dependencyManifest": {
+      "path": "data/index/configdata-lookup-dependency-manifest.v1.json",
+      "blobSha": "7f8a35ad6cff5decc225ab048f4f0f516a007bae",
+      "requiredStatus": "DEPENDENCY_MANIFEST_MATERIALIZED"
+    }
+  },
+  "frozenPopulation": {
+    "trackedContractCount": 6,
+    "trackedRawSourceCount": 8,
+    "stage1EntityCount": 4,
+    "stage2DomainCount": 3,
+    "stage3TargetTypeCount": 6,
+    "stage4DomainCount": 3
+  },
+  "baselineValidationEvidence": {
+    "candidateHead": "ffbcc6632e97485ac5cee42dc52ba40ea379f4b9",
+    "workflow": "ConfigData Lookup Stage 6",
+    "runId": 33388781330,
+    "jobId": 99477330963,
+    "conclusion": "success",
+    "stage5Validator": "PASS_CONFIGDATA_LOOKUP_STAGE5_CLI",
+    "representativeFixtures": {
+      "lookupHero6": "PASS",
+      "lookupSoldier102": "PASS",
+      "lookupEquipment273": "PASS",
+      "refsSkill3001": "PASS",
+      "findSoldierLiteral": "PASS"
+    },
+    "stage6Rebuild": "PASS_CONFIGDATA_LOOKUP_STAGE6_INCREMENTAL_REBUILD",
+    "changedFilesAfterRebuild": 0,
+    "stage6Validator": "PASS_CONFIGDATA_LOOKUP_STAGE6_INCREMENTAL_REBUILD",
+    "stage6StalePlan": "CLEAN_CONFIGDATA_LOOKUP_STAGE6",
+    "stage6StaleCount": 0,
+    "committedGeneratedDiffCount": 0
+  },
+  "projectCheckEvidence": {
+    "initialCandidateRunId": 33388781371,
+    "initialCandidateJobId": 99477331017,
+    "selfTest": "PASS",
+    "initialPlanStatus": "MANUAL_REVIEW",
+    "initialPlanReason": "The CLR0 checkpoint path was not yet explicitly owned. CLR0 must not prematurely add the future configdata-lookup owner reserved for CLR4.",
+    "resolution": "Move the CLR0 checkpoint into the already-owned Project Check tooling checkpoint namespace without modifying ConfigData Lookup ownership or validator catalogs.",
+    "finalProjectCheckConclusion": "PENDING"
+  },
+  "semanticBoundary": {
+    "rawConfigDataMutation": false,
+    "newRelationDiscovery": false,
+    "canonicalRelationRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "transitiveImpactInference": false,
+    "stage7OrStage8AuthorityChange": false,
+    "domainSemanticReopen": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "PROJECT_CHECK_CONFIGDATA_LOOKUP_OWNER_NOT_YET_ADMITTED",
+      "blocking": false,
+      "detail": "CLR0 intentionally does not add the future dedicated configdata-lookup owner or validator. Dedicated owner admission remains CLR4 scope."
+    },
+    {
+      "id": "LEGACY_STAGE6_WORKFLOW_HAS_WRITE_PERMISSION",
+      "blocking": false,
+      "detail": "The existing Stage 6 workflow still has contents:write and a branch-specific materialization writer path. CLR0 only records the baseline; validation/write separation belongs to CLR5. On this PR baseline run, the materialization commit step was skipped and generated diff remained zero."
+    }
+  ],
+  "nonScope": [
+    "No Stage 0-6 producer, contract, index, manifest, CLI, validator or raw ConfigData is modified in CLR0.",
+    "No Stage 7 smart selector or Stage 8 Project Doctor expansion authority is changed in CLR0.",
+    "No Hero, Soldier, Equipment, Banner, Skin or relation semantic stage is reopened.",
+    "No dedicated ConfigData Lookup Project Check owner admission is performed before CLR4."
+  ],
+  "nextStart": "Complete final Project Check revalidation on the checkpoint-only final head. If Project Check passes with no ConfigData Lookup implementation/data mutation, set completion to CONFIGDATA_LOOKUP_CLR0_BASELINE_FROZEN and begin CLR1 authority/responsibility boundary freeze from this baseline.",
+  "reopenConditions": [
+    "Stage 5 or Stage 6 existing validator fails on the unchanged baseline.",
+    "The Stage 6 stale plan is non-zero on the unchanged baseline.",
+    "The existing incremental rebuild changes committed index/manifest/summary artifacts on the unchanged baseline.",
+    "A representative Stage 5 CLI fixture no longer matches the materialized lookup contract.",
+    "Authoritative evidence shows the Stage 0-6 baseline mutates raw ConfigData or recomputes frozen canonical relations."
+  ]
+}
