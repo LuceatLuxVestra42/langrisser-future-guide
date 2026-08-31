@@ -3,7 +3,7 @@
   "schemaId": "configdata-lookup-clr4-admission/v1",
   "stage": "CLR4",
   "status": "PASS_WITH_REVIEW",
-  "completion": "CONFIGDATA_LOOKUP_CLR4_ADMISSION_VALIDATED_PENDING_FREEZE_HEAD_REVALIDATION",
+  "completion": "CONFIGDATA_LOOKUP_CLR4_PROJECT_CHECK_ADMISSION_FROZEN",
   "purpose": "Promote the frozen CLR3 read-only ConfigData Lookup self-test into NEW Project Check as a dedicated owner/catalog validator, replacing the temporary CLR2 project-check admission without adding semantic fan-out, writer authority, or Stage 7/8 orchestration authority.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
@@ -126,7 +126,26 @@
       "dedicatedValidatorExecuted": true,
       "conclusion": "success"
     },
-    "freezeHeadRevalidation": "PENDING"
+    "freezeHead": "960722de80e7f8b1ef591812dfeb87fff8c58073",
+    "freezeHeadConfigdataLookupWorkflow": {
+      "runId": 33393489832,
+      "jobId": 99492393824,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "clr3ReadOnlySelfTest": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadProjectCheck": {
+      "runId": 33393489811,
+      "jobId": 99492393471,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "dedicatedValidatorExecuted": true,
+      "conclusion": "success"
+    },
+    "freezeHeadRevalidation": "PASS"
   },
   "blockers": [],
   "reviews": [
@@ -146,7 +165,7 @@
       "detail": "Legacy Stage 7/8 orchestration remains unchanged and is not inherited by the dedicated ConfigData Lookup owner."
     }
   ],
-  "nextStart": "Revalidate the evidence-only CLR4 freeze head with both the dedicated ConfigData Lookup workflow and required Project Check. If both pass and Project Check again executes configdata-lookup-self-test through the dedicated owner, freeze CLR4 and proceed to CLR5 validation/writer separation.",
+  "nextStart": "Begin CLR5 from this frozen dedicated admission. Separate read-only validation from explicit Stage 6 rebuild/write operations, keeping Project Check read-only and preserving Stage 0-6 materialization semantics.",
   "reopenConditions": [
     "Project Check cannot route tools/configdata-lookup/** exclusively to the dedicated configdata-lookup owner.",
     "The catalogued configdata-lookup-self-test cannot execute read-only through Project Check.",
