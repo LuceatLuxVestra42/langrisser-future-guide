@@ -83,6 +83,14 @@
       "coverage": "RR3 clean-room profile authority, preflight, fail-fast, tracked-mutation guard and legacy-boundary self-test."
     },
     {
+      "id": "route-hosted-qa-self-test",
+      "phase": 5,
+      "executable": "node",
+      "args": ["tools/route-hosted-qa/test/route-hosted-qa-self-test.mjs"],
+      "owner": "route-hosted-qa",
+      "coverage": "RH3 clean-room read-only HTTP contract, deterministic strict/probe execution, hosted failure boundary and legacy-runtime independence."
+    },
+    {
       "id": "configdata-integrity",
       "phase": 10,
       "executable": "npm",
