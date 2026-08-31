@@ -9,6 +9,7 @@ import { runAssetIntakeCli } from './run-v1.mjs';
 
 const CONTRACT_PATH = 'tools/asset-intake/contract/operational-routing.v1.json';
 const STAGE4_VALIDATOR = 'tools/asset-intake/cli/validate-stage4-v1.mjs';
+const SKIN_STAGE32_ROLLOUT_SELF_TEST = 'tools/asset-intake/cli/self-test-skin-stage3-2-rollout-v1.mjs';
 const checks = [];
 const check = (id, fn) => { fn(); checks.push(id); };
 
@@ -26,6 +27,9 @@ const trackedBefore = trackedWorktreeSnapshot();
 
 const upstream = spawnSync(process.execPath, [STAGE4_VALIDATOR], { encoding: 'utf8' });
 check('UPSTREAM_STAGE4', () => assert.equal(upstream.status, 0, `${upstream.stdout}\n${upstream.stderr}`));
+
+const skinRollout = spawnSync(process.execPath, [SKIN_STAGE32_ROLLOUT_SELF_TEST], { encoding: 'utf8' });
+check('SKIN_STAGE3_2_ROLLOUT', () => assert.equal(skinRollout.status, 0, `${skinRollout.stdout}\n${skinRollout.stderr}`));
 
 const contract = JSON.parse(fs.readFileSync(CONTRACT_PATH, 'utf8'));
 check('CONTRACT_STAGE', () => assert.equal(contract.stage, 'Asset Intake Stage 5 - Operational Routing'));
@@ -126,6 +130,10 @@ console.log(JSON.stringify({
     externalCandidateDirectUse: false,
     verifiedExternalCandidateReturnsToAssetIntake: true,
     semanticRecomputation: false,
+  },
+  rollout: {
+    skinStage32ExecutionPathAdopted: true,
+    currentSkinAuthorityPromoted: false,
   },
   executionProof: {
     trackedBeforeCount: snapshotLineCount(trackedBefore),
