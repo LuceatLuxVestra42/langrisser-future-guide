@@ -2,8 +2,8 @@
   "version": 1,
   "schemaId": "project-tooling-regression-runner-r9-retirement/v1",
   "stage": "RR9",
-  "status": "CANDIDATE",
-  "completion": "REGRESSION_RUNNER_RR9_RETIREMENT_CANDIDATE",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "REGRESSION_RUNNER_RR9_RETIREMENT_FROZEN",
   "purpose": "Close the Regression Runner rollback window after legitimate post-cutover workload proof by physically retiring the OLD manual V2 comparator and its package entrypoint while preserving committed historical V1/V2 evidence and the inert legacy audit script.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
@@ -74,6 +74,56 @@
     "legacyPackageEntrypointCount": 0,
     "runtimeLegacyV2DependencyCount": 0
   },
+  "candidateValidation": {
+    "candidateHead": "f16a7811da6d72b48db0ad27cc55842be1e4fc14",
+    "regressionRunner": {
+      "runId": 33438640085,
+      "jobId": 99641207531,
+      "conclusion": "success",
+      "currentHeadParity": "PASS",
+      "rr9RetirementGuard": "PASS",
+      "trackedStateGuard": "PASS",
+      "validatorCount": 9
+    },
+    "projectCheck": {
+      "runId": 33438640217,
+      "jobId": 99641129179,
+      "conclusion": "success",
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "changedFileCount": 6,
+      "manualReviewCount": 0,
+      "owningValidators": {
+        "production-build": "PASS",
+        "project-check-self-test": "PASS",
+        "regression-runner-self-test": "PASS"
+      }
+    },
+    "trackedMutationCount": 0
+  },
+  "rollbackCloseout": {
+    "window": "CLOSED",
+    "rr9ProofSatisfied": true,
+    "oldComparatorOperationalSurfaceRetired": true,
+    "oldAutomaticRunnerCount": 0,
+    "oldManualRunnerCount": 0,
+    "legacyPackageEntrypointCount": 0,
+    "legacyAuditScriptState": "HISTORICAL_INERT_NO_WORKFLOW_OR_PACKAGE_ENTRYPOINT",
+    "newRunnerOperational": true
+  },
+  "completionGate": {
+    "rr8ProofConditionSatisfied": true,
+    "runtimeInventoryExact": true,
+    "oldManualComparatorDeleted": true,
+    "legacyPackageEntrypointRemoved": true,
+    "historicalContractsPreserved": true,
+    "legacyAuditScriptInert": true,
+    "newRunnerNineValidatorParity": true,
+    "projectCheckPass": true,
+    "productionBuildPass": true,
+    "trackedMutationCount": 0,
+    "rollbackWindowClosed": true
+  },
   "boundaries": {
     "newRunnerCoreChanged": false,
     "profileMembershipChanged": false,
@@ -89,12 +139,6 @@
     "hostedQaChanged": false,
     "configDataChanged": false,
     "localizationChanged": false
-  },
-  "candidateValidation": {
-    "regressionRunner": "PENDING",
-    "projectCheck": "PENDING",
-    "productionBuild": "PENDING",
-    "trackedMutationCount": null
   },
   "blockers": [],
   "reviews": [
@@ -117,5 +161,5 @@
       "detail": "Status Source rollback closure remains independent of Regression Runner RR9 and is not changed by this retirement."
     }
   ],
-  "nextStart": "After candidate and freeze-head validation pass, close the Regression Runner rollback window, merge RR9, and continue to the next independent tooling track such as Asset Intake."
+  "nextStart": "Regression Runner rollback is closed. Continue to the next independent tooling track such as Asset Intake while the separate Status Source live-dispatch proof remains open until a legitimate successor exists."
 }
