@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-shadow-comparison/v1",
+  "stage": "SHADOW_COMPARISON",
+  "checkpoint": "PROJECT_TOOLING_OLD_NEW_SHADOW_COMPARISON",
+  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
+  "completion": "SHADOW_COMPARISON_IMPLEMENTED",
+  "purpose": "Compare OLD Project Doctor and NEW Project Check behavior before required-check cutover without making OLD a predecessor or expanding OLD routing.",
+  "predecessor": {
+    "checkpoint": "PROJECT_TOOLING_PROJECT_CHECK_R3",
+    "contract": "data/contracts/project-tooling-project-check-r3.v1.json",
+    "requiredStatus": "PASS",
+    "requiredCompletion": "R3_PROJECT_CHECK_COMPLETE"
+  },
+  "baseline": {
+    "mainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "legacyRequiredCheck": "pr-guard",
+    "legacyRole": "OBSERVE_AND_COMPARE_ONLY"
+  },
+  "implementation": {
+    "comparisonScript": "tools/project-check/shadow/compare-old-new.mjs",
+    "workflow": ".github/workflows/project-tooling-r3-project-check.yml",
+    "implementationHead": "2637f0ad7879158f861b364cd555dcb8d5905960"
+  },
+  "comparisonPolicy": {
+    "resultParityNotImplementationParity": true,
+    "oldExtraPropagationChecksMayDiffer": true,
+    "oldDirectOwningNodeMustMatchRepresentativeOwningScope": true,
+    "newIndependentOwningValidatorMustMatchRepresentativeOwningScope": true,
+    "migrationOnlyOldManualReviewMayBeExpectedMismatchOnlyUnderStrictR0Policy": true,
+    "oldPlannerInvokedAsSeparateObservationProcess": true,
+    "oldPlannerImportedIntoNewRuntime": false,
+    "oldContractMutationAllowed": false,
+    "oldRoutingExpansionAllowed": false,
+    "requiredCheckCutoverAllowed": false
+  },
+  "fixtures": {
+    "migrationOnly": "full PR diff; NEW PASS and OLD path-local MANUAL_REVIEW expected",
+    "admitted": [
+      "Hero canonical",
+      "Hero-Soldier relation",
+      "Hero asset",
+      "Equipment frontend"
+    ],
+    "manual": [
+      "Banner asset",
+      "Skin asset",
+      "unmatched path"
+    ],
+    "validatorFailure": "NEW owning validator failure must aggregate to BLOCKER / exit 2"
+  },
+  "strictMismatchCurrentHeadEvidence": {
+    "headSha": "b06997499a9cb22dcabd21ded1f6fcee2106e27b",
+    "newProjectCheck": {
+      "runId": 33344396157,
+      "jobId": 99345669415,
+      "conclusion": "success"
+    },
+    "oldProjectDoctor": {
+      "runId": 33344396128,
+      "jobId": 99345675364,
+      "conclusion": "failure",
+      "d7Guard": "PASS",
+      "d5FreshnessBeforeD1": "FRESH",
+      "d1Status": "PASS",
+      "d1DeterministicDiff": "PASS",
+      "d5FreshnessAfterD1": "FRESH",
+      "dryRun": {
+        "planStatus": "MANUAL_REVIEW",
+        "changedFileCount": 47,
+        "checksQueued": 0,
+        "manualReviewCount": 47
+      },
+      "execution": {
+        "planStatus": "MANUAL_REVIEW",
+        "runStatus": "REVIEW_MANUAL",
+        "checksQueued": 0,
+        "checksRun": 0,
+        "manualReviewCount": 47,
+        "exitCode": 3
+      }
+    },
+    "classification": "EXPECTED_LEGACY_DOCTOR_MISMATCH",
+    "reason": "On the same migration-only head, NEW Project Check passed all selected independent validators while OLD D7/D5/D1 integrity remained healthy and OLD failed only because all NEW migration paths were unmapped MANUAL_REVIEW."
+  },
+  "boundaries": {
+    "legacyProjectDoctorRuntimeImportIntoNewProjectCheck": 0,
+    "legacyD2D3D4D5D7PredecessorCount": 0,
+    "legacyContractMutationCount": 0,
+    "legacyRoutingExpansionCount": 0,
+    "statusSourceMutationCount": 0,
+    "projectStatusWriteCount": 0,
+    "requiredCheckChangeCount": 0
+  },
+  "completionGate": {
+    "comparisonScriptImplemented": true,
+    "workflowWired": true,
+    "migrationOnlyStrictMismatchEvidenceAvailable": true,
+    "admittedFixtureComparisonPass": false,
+    "manualBoundaryComparisonPass": false,
+    "validatorFailureAggregationPass": false,
+    "shadowCiPass": false,
+    "readyForCutover": false
+  },
+  "blockers": [],
+  "cutoverBlockers": ["LEGACY_REQUIRED_PR_GUARD_STILL_ACTIVE"],
+  "reviews": [
+    "OLD extra checks caused by historical propagation are comparison context only; NEW does not need implementation parity with those fan-out chains.",
+    "The existing OLD PR Guard failure remains expected only while the strict R0 mismatch conditions continue to hold.",
+    "No branch-protection or writer-ownership change is part of shadow comparison."
+  ],
+  "nextStartPoint": "Run the updated R3 shadow workflow. Freeze shadow comparison only if full migration routing, admitted owner fixtures, manual boundaries, and validator-failure aggregation all pass; then prepare required-check cutover separately.",
+  "reopenConditions": [
+    "R3 Project Check owner or validator contract changes",
+    "main or migration diff gains a non-migration path",
+    "OLD D7/D5/D1 integrity no longer passes on the migration head",
+    "NEW selected independent validator fails",
+    "representative owning-scope comparison reveals a concrete routing mismatch"
+  ]
+}
