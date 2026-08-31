@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-regression-runner-r0-baseline/v1",
+  "stage": "RR0",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "REGRESSION_RUNNER_R0_BASELINE_FROZEN",
+  "purpose": "Freeze the current legacy Regression Coverage Promotion V2 behavior before installing an independent NEW Regression Runner. Preserve canonical/frozen/generated data and all current owning validators; classify the known V2 admission failures without repairing or reinterpreting semantic data in RR0.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pr": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "headBeforeRr0": "91c2279e171559ee7c4c3dc83258838004076af8",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1"
+  },
+  "legacyRunner": {
+    "workflow": ".github/workflows/regression-coverage-promotion-v2.yml",
+    "workflowName": "Regression Coverage Promotion V2",
+    "contract": "data/contracts/regression-coverage-promotion.v2.json",
+    "validator": "scripts/validate-regression-coverage-promotion-v2.mjs",
+    "packageCommand": "validate:regression-coverage-promotion:v2",
+    "roleAfterRr0": "LEGACY_BASELINE_ONLY_PENDING_NEW_INSTALL"
+  },
+  "currentRunEvidence": {
+    "runId": 33353689088,
+    "jobId": 99371700086,
+    "headSha": "91c2279e171559ee7c4c3dc83258838004076af8",
+    "conclusion": "failure",
+    "ownerValidatorSteps": {
+      "heroCanonical": "PASS",
+      "soldierCanonical": "PASS",
+      "equipmentCanonical": "PASS",
+      "heroSoldierRelation": "PASS",
+      "heroEquipmentRelation": "PASS",
+      "bannerData": "PASS",
+      "skinRelation": "PASS",
+      "sharedMovement": "PASS",
+      "soldierAssets": "PASS"
+    },
+    "legacyAdmissionAudit": "FAIL",
+    "summaryArtifact": {
+      "artifactId": 9744437027,
+      "name": "regression-coverage-promotion-v2-summary",
+      "digest": "sha256:76eb2f4d7379043ff707ee6948419419c521c4a6414def891a9da55a35013cf1",
+      "checkCount": 246,
+      "failureCount": 4
+    }
+  },
+  "knownFailures": [
+    {
+      "id": "soldier-frozen-ref-sha:source:stage6_5Manifest",
+      "path": "data/generated/hero-soldier-page-links-stage6-5.v1.json",
+      "legacyExpectedBlob": "52daf5ea15f37a437f796747eb25a126446a1c96",
+      "currentBlob": "72b15555287b89af4ed6ca736bb8d9a6fc5d5407",
+      "classification": "REVIEW_EXISTING_DRIFT"
+    },
+    {
+      "id": "soldier-frozen-ref-sha:source:stage6_5",
+      "path": "data/validation/soldier-stage6-5-reciprocal-links.v1.json",
+      "legacyExpectedBlob": "bfe299291170aee6a31730a824da7e7a7c8a4b84",
+      "currentBlob": "bb3138ab87297e6b559fb15d77fba593f24b5320",
+      "classification": "REVIEW_EXISTING_DRIFT"
+    },
+    {
+      "id": "soldier-frozen-ref-sha:keyArtifact:reciprocalLinks",
+      "path": "data/generated/hero-soldier-page-links-stage6-5.v1.json",
+      "legacyExpectedBlob": "52daf5ea15f37a437f796747eb25a126446a1c96",
+      "currentBlob": "72b15555287b89af4ed6ca736bb8d9a6fc5d5407",
+      "classification": "REVIEW_EXISTING_DRIFT"
+    },
+    {
+      "id": "soldier-frozen-snapshots-match-head",
+      "mismatchCount": 3,
+      "classification": "REVIEW_EXISTING_DRIFT"
+    }
+  ],
+  "baseParityEvidence": {
+    "method": "Compare exact current blob identities for the unique mismatched paths against the authoritative base head; do not infer from workflow absence or code-search absence.",
+    "paths": [
+      {
+        "path": "data/generated/hero-soldier-page-links-stage6-5.v1.json",
+        "baseBlob": "72b15555287b89af4ed6ca736bb8d9a6fc5d5407",
+        "prHeadBlob": "72b15555287b89af4ed6ca736bb8d9a6fc5d5407",
+        "same": true
+      },
+      {
+        "path": "data/validation/soldier-stage6-5-reciprocal-links.v1.json",
+        "baseBlob": "bb3138ab87297e6b559fb15d77fba593f24b5320",
+        "prHeadBlob": "bb3138ab87297e6b559fb15d77fba593f24b5320",
+        "same": true
+      }
+    ],
+    "classification": "REVIEW_EXISTING_DRIFT",
+    "regressionIntroducedByCurrentMigration": false
+  },
+  "rr0Judgement": {
+    "ownerValidatorFailureCount": 0,
+    "legacyAdmissionFailureCount": 4,
+    "semanticDataFailureProvenByThisRun": 0,
+    "unresolvedOwnerCount": 0,
+    "currentMigrationRegressionCount": 0,
+    "meaning": "The legacy V2 workflow is red because its frozen-SHA admission policy is stale relative to blob identities that already exist on base/main. The current owning validators remain green. RR0 freezes this drift; it does not patch the legacy contract or semantic data."
+  },
+  "preserve": [
+    "data/contracts/regression-coverage-promotion.v1.json",
+    "data/contracts/regression-coverage-promotion.v2.json",
+    "historical regression validation summaries and CI evidence",
+    "all nine current owning validators and their canonical/frozen/generated inputs",
+    "current R1/R2/R3 tooling and checkpoints"
+  ],
+  "nonScope": [
+    "No NEW Regression Runner implementation in RR0.",
+    "No R3 owner-map admission for NEW regression-runner paths in RR0.",
+    "No legacy V2 repair or frozen SHA reseal in RR0.",
+    "No canonical, relation, Status Source, Project Status, frontend, asset, hosted QA, ConfigData Lookup, or localization mutation.",
+    "No OLD workflow disablement or deletion in RR0."
+  ],
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_V2_FROZEN_SHA_ADMISSION_DRIFT",
+      "blocking": false,
+      "detail": "Four known legacy admission failures remain intentionally unfixed and are frozen as base-existing drift for NEW-runner parity classification."
+    }
+  ],
+  "completionGate": {
+    "exactFailureIdsFrozen": true,
+    "baseParityConfirmedForUniqueMismatchPaths": true,
+    "ownerValidatorsGreen": true,
+    "semanticReopen": false,
+    "legacyRepairApplied": false,
+    "newRunnerImplementationStarted": false
+  },
+  "nextStart": "RR1/RR2: define the NEW Regression Runner boundary contract and explicitly admit NEW regression-runner paths into R3 before implementing the clean-room runner core.",
+  "reopenConditions": [
+    "A current owning validator fails on the same authoritative head.",
+    "A base/main blob identity for the frozen mismatch paths differs from the RR0 evidence.",
+    "Authoritative validator ownership changes before RR1/RR2 admission.",
+    "New evidence shows the four frozen failures represent semantic corruption rather than legacy admission drift."
+  ]
+}
