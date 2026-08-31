@@ -117,6 +117,17 @@
       "condition": "Only the exact RR0-frozen four failures are treated as known legacy drift. Any additional or changed failure signature requires separate review."
     }
   },
+  "rr1ValidationEvidence": {
+    "candidateCommit": "5405105fa0f25b2163d0c5da1bbf8a440bc44245",
+    "projectCheckRunId": 33355660077,
+    "projectCheckJobId": 99377189564,
+    "conclusion": "success",
+    "steps": {
+      "selfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS"
+    }
+  },
   "preserve": [
     "All nine current owning validators and their authoritative inputs.",
     "Canonical, frozen, generated, relation, asset and presentation data.",
@@ -141,6 +152,7 @@
     "legacyV2RuntimeDependency": false,
     "legacyAdmissionDriftReimplementation": false,
     "semanticWriteAuthority": false,
+    "projectCheckPassed": true,
     "newRunnerImplementationStarted": false,
     "r3AdmissionStarted": false
   },
