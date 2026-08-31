@@ -32,6 +32,9 @@ jobs:
       - name: Run R3 Project Check contract and routing self-test
         run: node tools/project-check/test/project-check-self-test.mjs
 
+      - name: Run post-reinstall Soldier and Asset Intake routing fixtures
+        run: node tools/project-check/test/post-reinstall-routing-fixtures.mjs
+
       - name: Plan changed path ownership and validators
         run: node tools/project-check/cli/check.mjs --base "origin/${GITHUB_BASE_REF}" --head HEAD --plan
 
