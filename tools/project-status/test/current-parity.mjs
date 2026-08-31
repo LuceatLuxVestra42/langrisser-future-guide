@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildProjectStatus } from '../lib/project-status-view.mjs';
+import { loadProjectStatusWriterContract, writeProjectStatus } from '../lib/write-project-status.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const readJson = relative => JSON.parse(fs.readFileSync(path.join(repoRoot, relative), 'utf8'));
@@ -66,6 +67,82 @@ if (skin.lifecycle !== 'IN_PROGRESS' || skin.health !== 'REVIEW' || skin.blocker
   fail('Skin asset-evidence blocker must remain IN_PROGRESS/REVIEW with one blocker');
 }
 
+const legacyCanonical = readJson('data/generated/project-status.v1.json');
+if (legacyCanonical.schemaId !== 'project-status/v1') fail('legacy canonical Project Status schema must remain project-status/v1 during cutover proof');
+for (const key of [
+  'version',
+  'schemaId',
+  'derivedOnly',
+  'rawConfigDataReadCount',
+  'semanticRecomputationCount',
+  'projectHealth',
+  'healthCounts',
+  'lifecycleCounts',
+  'knownHardErrorTotal',
+  'reviewTotal',
+  'blockerTotal',
+]) {
+  same(projected[key], legacyCanonical[key], `legacy canonical compatibility ${key}`);
+}
+for (const legacyDomain of legacyCanonical.domains ?? []) {
+  const successor = projected.domains.find(item => item.domain === legacyDomain.domain);
+  if (!successor) fail(`NEW Project Status missing legacy domain ${legacyDomain.domain}`);
+  for (const [key, value] of Object.entries(legacyDomain)) {
+    same(successor[key], value, `legacy domain compatibility ${legacyDomain.domain}.${key}`);
+  }
+}
+if (projected.source?.authoritySchemaId !== 'status-source-selection/v1') fail('NEW canonical Project Status must identify R1 Status Source authority');
+if (projected.readOnly !== true || projected.canonicalJoinRecomputationCount !== 0) fail('NEW canonical Project Status must add explicit safe projection boundaries');
+
+const writerContract = loadProjectStatusWriterContract({ repoRoot });
+if (!['CUTOVER_DEFERRED', 'ACTIVE'].includes(writerContract.state)) fail(`unexpected writer state ${writerContract.state}`);
+same(writerContract.canonicalTargets, {
+  json: 'data/generated/project-status.v1.json',
+  markdown: 'PROJECT_STATUS.md',
+}, 'writer canonical targets');
+if (writerContract.activation?.maximumActiveWriterCount !== 1) fail('Project Status writer must cap active writer count at one');
+
+const writerCheck = writeProjectStatus({}, { repoRoot, contract: writerContract });
+if (writerCheck.writePerformed !== false || writerCheck.boundaries.projectStatusWriteCount !== 0) fail('Project Status writer CHECK must not mutate repository');
+same(writerCheck.canonicalTargets, ['data/generated/project-status.v1.json', 'PROJECT_STATUS.md'], 'writer check target set');
+
+if (writerContract.state === 'CUTOVER_DEFERRED') {
+  let deferredApplyBlocked = false;
+  try {
+    writeProjectStatus({ apply: true }, {
+      repoRoot,
+      contract: writerContract,
+      readText: () => null,
+      writeText: () => fail('deferred writer must not write'),
+    });
+  } catch (error) {
+    deferredApplyBlocked = String(error).includes('apply is disabled');
+  }
+  if (!deferredApplyBlocked) fail('deferred Project Status writer APPLY must be blocked');
+}
+
+const syntheticWrites = [];
+const syntheticActiveContract = { ...writerContract, state: 'ACTIVE' };
+const syntheticApply = writeProjectStatus({ apply: true }, {
+  repoRoot,
+  contract: syntheticActiveContract,
+  readText: () => 'synthetic-stale',
+  writeText: (targetPath, content) => syntheticWrites.push({ targetPath, content }),
+});
+if (syntheticApply.writePerformed !== true || syntheticApply.boundaries.projectStatusWriteCount !== 2) fail('synthetic active writer must write exactly two canonical targets');
+same(syntheticWrites.map(item => item.targetPath), ['data/generated/project-status.v1.json', 'PROJECT_STATUS.md'], 'synthetic writer target set');
+if (syntheticApply.boundaries.statusSourceMutationCount !== 0
+  || syntheticApply.boundaries.legacyProjectDoctorRuntimeDependencyCount !== 0
+  || syntheticApply.boundaries.legacyD1RuntimeDependencyCount !== 0
+  || syntheticApply.boundaries.legacyD5RuntimeDependencyCount !== 0
+  || syntheticApply.boundaries.legacyGeneratedStatusReadCount !== 0
+  || syntheticApply.boundaries.rawConfigDataReadCount !== 0
+  || syntheticApply.boundaries.semanticRecomputationCount !== 0
+  || syntheticApply.boundaries.canonicalJoinRecomputationCount !== 0
+  || syntheticApply.boundaries.domainValidatorExecutionCount !== 0) {
+  fail('Project Status writer side-effect boundary violated');
+}
+
 const runtimeFiles = [
   'tools/project-status/lib/normalize-project-status.mjs',
   'tools/project-status/lib/project-status-view.mjs',
@@ -81,10 +158,25 @@ for (const relative of runtimeFiles) {
   if (/writeFileSync|appendFileSync|rmSync|unlinkSync|renameSync/.test(text)) fail(`${relative} contains repository writer primitive`);
 }
 
+const writerRuntimeText = [
+  fs.readFileSync(path.join(repoRoot, 'tools/project-status/lib/write-project-status.mjs'), 'utf8'),
+  fs.readFileSync(path.join(repoRoot, 'tools/project-status/cli/write.mjs'), 'utf8'),
+].join('\n');
+for (const forbidden of [
+  'data/generated/project-doctor',
+  'data/configdata/',
+  'scripts/',
+  'doctor:status',
+  'run-project-doctor',
+  'build-project-status.mjs',
+]) {
+  if (writerRuntimeText.includes(forbidden)) fail(`Project Status writer runtime must not depend on ${forbidden}`);
+}
+
 if (!first.markdown.includes('NEW Status Source authority')) fail('markdown must identify NEW Status Source authority');
 if (!first.markdown.includes('raw ConfigData')) fail('markdown must preserve no-raw-ConfigData boundary');
 
-console.log('[project-status-r2] PASS: current parity, deterministic projection, and runtime independence verified.');
+console.log('[project-status-r2] PASS: current parity, canonical compatibility, writer boundary, and runtime independence verified.');
 console.log(JSON.stringify({
   projectHealth: projected.projectHealth,
   healthCounts: projected.healthCounts,
@@ -97,5 +189,12 @@ console.log(JSON.stringify({
     public: equipment.population.public,
     general: equipment.population.general,
     exclusive: equipment.population.exclusive,
+  },
+  writer: {
+    state: writerContract.state,
+    canonicalTargets: writerCheck.canonicalTargets,
+    checkWrites: writerCheck.boundaries.projectStatusWriteCount,
+    syntheticApplyWrites: syntheticApply.boundaries.projectStatusWriteCount,
+    maxActiveWriterCount: writerContract.activation.maximumActiveWriterCount,
   },
 }, null, 2));
