@@ -22,6 +22,7 @@
     "latestDeletionAdmissionValidatedHead": "4ba804b121a35d817215aa0822a45bc99d111d91",
     "latestStatusSourceWriterAdmissionValidatedHead": "7511edab392b2a91dee19aecd2d1f05f895558e4",
     "latestProjectStatusWriterAdmissionValidatedHead": "9232f126e22191dc5fd9b059110ec6b39a0f4fe3",
+    "latestDeletionManifestValidatedHead": "3f7bb8e09cddb59d15a70e590c96d39bf1f1b6d1",
     "ownerMap": "tools/project-check/contracts/owners.v1.json",
     "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
     "runtime": "tools/project-check/lib/project-check.mjs",
@@ -122,17 +123,46 @@
       "semanticReopen":false,
       "domainOwnerExpansion":false,
       "ownerContractLimitedReopen":true
+    },
+    "deletionManifestPreparation": {
+      "classification":"EXACT_DELETION_MANIFEST_VALIDATION",
+      "manifest":"data/contracts/project-tooling-project-doctor-deletion-manifest.v1.json",
+      "initialFailure": {
+        "headSha":"21b906a50508ea3f46707b7073fd687a5380b6fa",
+        "runId":33351471719,
+        "jobId":99365573125,
+        "signature":"retained rollback path must exist: data/generated/project-doctor-status-sources.v1.json",
+        "classification":"REVIEW_EXISTING_DRIFT",
+        "baseMainAlsoMissing":true,
+        "semanticReopen":false
+      },
+      "validatedHead":"3f7bb8e09cddb59d15a70e590c96d39bf1f1b6d1",
+      "runId":33351548952,
+      "jobId":99365790200,
+      "conclusion":"success",
+      "selfTest":"PASS",
+      "plan":"PASS",
+      "execution":"PASS",
+      "fixtureCount":22,
+      "exactDeletionFileCount":10,
+      "packageScriptRemovalCount":9,
+      "retainedWriterRollbackPathCount":34,
+      "actualDeletionApplied":false,
+      "semanticReopen":false,
+      "ownerContractLimitedReopen":true
     }
   },
   "selfTest": {
-    "fixtureCount": 21,
+    "fixtureCount": 22,
     "catalogValidatorCount": 22,
     "ownerCount": 25,
     "manualReviewFallbackProven": true,
     "manualOwnerReviewPersistsAfterPassingValidator": true,
     "validatorFailureBecomesBlocker": true,
     "wholeCatalogTargetPreflight": "PASS",
-    "pathTraversalBlocked": true
+    "pathTraversalBlocked": true,
+    "deletionManifestExactPathValidation": true,
+    "deletionManifestProtectedScopeValidation": true
   },
   "independenceBoundary": {
     "legacyProjectDoctorRuntimeImports": 0,
@@ -163,22 +193,26 @@
     "legacyRuntimeDependencyCountZero": true,
     "deletionCheckpointNamespaceAdmitted": true,
     "statusSourceWriterTransportPathsAdmitted": true,
-    "projectStatusWriterTransportAndOutputsAdmitted": true
+    "projectStatusWriterTransportAndOutputsAdmitted": true,
+    "exactDeletionManifestValidated": true,
+    "deletionApplied": false
   },
   "blockers": [],
   "cutoverBlockers": [],
   "reviews": [
     "The R3 owner map remains intentionally minimal and fail-closed; unmatched repository paths remain MANUAL_REVIEW.",
     "Writer workflow and canonical output admissions are transport/output ownership only and do not reopen domain semantics.",
+    "REVIEW_EXISTING_DRIFT: deletion inventory names data/generated/project-doctor-status-sources.v1.json, but it is absent on main and the migration branch; the exact manifest does not synthesize or delete it.",
     "Banner assets and Skin assets remain manual owner boundaries until independent final validators are explicitly admitted.",
     "Required-check cutover remains complete: main requires project-check, while pr-guard and project-check-shadow are not required."
   ],
-  "nextStartPoint": "Prepare the exact OLD Project Doctor deletion manifest after both writer cutovers. Preserve NEW canonical Project Status outputs and retained historical evidence; do not expand R3 ownership by inference during deletion planning.",
+  "nextStartPoint": "Apply the validated exact OLD Project Doctor retirement manifest in a separate deletion step: delete only the 10 explicit D2/D3/D4/D7 runtime/workflow paths and remove only the 9 listed package entrypoints. Preserve writer rollback surfaces, historical evidence, hosted QA, independent validators, and NEW canonical Project Status outputs.",
   "reopenConditions": [
     "an admitted owner validator command changes authoritatively",
     "a path family changes ownership authoritatively",
     "R1 or R2 tooling ownership changes",
     "Status Source or Project Status writer workflow ownership changes",
+    "the validated exact deletion manifest changes",
     "new evidence shows an explicit R3 mapping causes semantic or presentation ownership fan-out not represented by the contract"
   ]
 }
