@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-post-reinstall-acceptance-f4/v1",
+  "stage": "F4",
+  "checkpoint": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_F4_INDEPENDENT_TOOLS",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "F4_INDEPENDENT_TOOL_MATRIX_FROZEN",
+  "purpose": "Prove that the independent post-reinstall tools and validators execute outside Project Check orchestration, preserve tracked repository state, and remain independently operational. Existing validator drift that reproduces on the exact authoritative main baseline is classified separately instead of being mislabeled as a Doctor v2 regression.",
+  "predecessor": {
+    "path": "data/contracts/project-tooling-project-check-post-reinstall-acceptance-f3.v1.json",
+    "completion": "F3_PROJECT_CHECK_BEHAVIOR_FROZEN",
+    "mainCommit": "6ae0898d12e142f707a8ac9721270d2b4cb3c2ce"
+  },
+  "directMatrixProof": {
+    "disposablePr": 337,
+    "merged": false,
+    "closed": true,
+    "head": "5887cf5cdbe02c1d9e104df42313590b3587215a",
+    "workflowRunId": 33450208393,
+    "jobId": 99678178903,
+    "conclusion": "success",
+    "directValidatorPassCount": 16,
+    "directValidatorIds": [
+      "status-source-selection",
+      "status-source-promotion",
+      "status-source-producer-gate",
+      "status-source-artifact-bridge",
+      "status-source-lifecycle",
+      "project-status-parity",
+      "project-check-self-test",
+      "regression-runner-self-test",
+      "route-hosted-qa-self-test",
+      "configdata-lookup-self-test",
+      "hero-assets",
+      "equipment-assets",
+      "asset-intake",
+      "skin-stage3-2-evidence",
+      "localization-audit",
+      "production-build"
+    ],
+    "regressionRunnerCoreValidatorParityCount": 9,
+    "trackedMutationCount": 0,
+    "postMatrixProjectCheck": {
+      "r3SelfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "trackedStateGuard": "PASS"
+    },
+    "parallelAutomaticWorkflows": {
+      "localizationAudit": {"runId": 33450208458, "conclusion": "success"},
+      "regressionRunner": {"runId": 33450208444, "conclusion": "success"},
+      "configdataLookup": {"runId": 33450208436, "conclusion": "success"}
+    }
+  },
+  "resolvedAcceptanceGap": {
+    "code": "SKIN_STAGE3_2_VALIDATOR_PRODUCER_BOUNDARY_GAP",
+    "classification": "TOOLING_ROLE_BOUNDARY",
+    "owner": "skin-stage3-2-evidence/asset-intake-tooling",
+    "observation": "The catalogued Skin Stage 3-2 evidence validator invoked a script that always rewrote data/validation/skin-stage3-2-readiness.v1.json even when validation passed, conflicting with the post-F3 read-only Project Check execution boundary.",
+    "resolution": {
+      "producerScriptChanged": false,
+      "producerBehaviorPreserved": true,
+      "readOnlyAdapter": "tools/asset-intake/test/skin-stage3-2-evidence-readonly.mjs",
+      "validatorCatalogUsesReadOnlyAdapter": true,
+      "authoritativeCompletionContract": {
+        "status": "PASS",
+        "completion": "SKIN_STAGE3_2_COMPLETE",
+        "checkCount": 45,
+        "passedCheckCount": 45,
+        "failedCheckCount": 0,
+        "fixtureRoleCount": 4,
+        "uniqueFixtureSkinCount": 3,
+        "evidenceIssueCount": 0
+      },
+      "historicalSerializationParityRequired": false,
+      "trackedWriteCount": 0
+    },
+    "semanticReopenRequired": false
+  },
+  "routingCoverageGapClosed": {
+    "permanentFixturePath": "tools/project-check/test/post-reinstall-routing-fixtures.mjs",
+    "fixtures": [
+      {"path": "src/routes/soldiers.tsx", "owner": "soldier-frontend", "validator": "production-build"},
+      {"path": "data/validation/soldier-stage6-7-site-admission.v1.json", "owner": "soldier-canonical", "validator": "soldier-canonical"},
+      {"path": "tools/asset-intake/core/resolve.mjs", "owner": "asset-intake", "validator": "asset-intake"}
+    ],
+    "ownerPropagationCount": 0,
+    "changeClassFanOutCount": 0,
+    "semanticRecomputationCount": 0
+  },
+  "existingDrift": {
+    "code": "CONFIGDATA_INTEGRITY_ARRAY_ROOT_VALIDATOR_DRIFT",
+    "classification": "REVIEW_EXISTING_DRIFT",
+    "blocking": false,
+    "owner": "configdata-validator-maintenance",
+    "controlProof": {
+      "disposablePr": 338,
+      "merged": false,
+      "closed": true,
+      "authoritativeMain": "6ae0898d12e142f707a8ac9721270d2b4cb3c2ce",
+      "workflowRunId": 33449443541,
+      "jobId": 99675789734,
+      "totalJsonFiles": 753,
+      "pass": 0,
+      "suspect": 0,
+      "broken": 753,
+      "signature": "JSON root is not an object"
+    },
+    "causality": "The identical failure reproduces on the exact F3 authoritative main baseline, while F4 changes neither ConfigData nor the validator. It is not caused by the Doctor v2 acceptance diff.",
+    "doNotReopen": [
+      "F2 frozen domain semantics",
+      "canonical identity",
+      "relation membership",
+      "ConfigData semantic interpretation"
+    ]
+  },
+  "result": {
+    "blockingDirectValidatorFailureCount": 0,
+    "directValidatorPassCount": 16,
+    "coreRegressionParityCount": 9,
+    "trackedMutationCount": 0,
+    "resolvedToolingBoundaryGapCount": 1,
+    "existingNonBlockingDriftCount": 1,
+    "newAcceptanceBlockerCount": 0,
+    "decision": "Independent post-reinstall tooling is accepted. The Skin Stage 3-2 validation path is now read-only under Project Check while its producer behavior remains preserved. The ConfigData integrity array-root failure is carried only as pre-existing validator-maintenance review."
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "CONFIGDATA_INTEGRITY_ARRAY_ROOT_VALIDATOR_DRIFT",
+      "blocking": false,
+      "owner": "configdata-validator-maintenance",
+      "classification": "REVIEW_EXISTING_DRIFT"
+    },
+    {
+      "code": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+      "blocking": false,
+      "owner": "status-source",
+      "condition": "Close only when a legitimate future approved successor exists; do not synthesize one for acceptance proof."
+    }
+  ],
+  "boundaries": {
+    "canonicalDataChanged": false,
+    "frozenSemanticDataChanged": false,
+    "relationRecomputed": false,
+    "rawConfigDataSemanticReadAdded": false,
+    "statusSourceAuthorityChanged": false,
+    "projectStatusAuthorityChanged": false,
+    "frontendPresentationChanged": false,
+    "assetBytesChanged": false
+  },
+  "reopenConditions": [
+    "A currently accepted independent validator fails on the same authoritative state for a new owning reason.",
+    "The Skin Stage 3-2 Project Check validator path begins writing tracked state again.",
+    "The existing ConfigData integrity signature changes in a way causally attributable to an acceptance diff.",
+    "New authoritative evidence contradicts this independent-tool proof."
+  ]
+}
