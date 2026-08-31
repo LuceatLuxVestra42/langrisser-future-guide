@@ -75,6 +75,14 @@
       "coverage": "R3 routing, manual-review fallback, preflight and aggregate semantics."
     },
     {
+      "id": "regression-runner-self-test",
+      "phase": 4,
+      "executable": "node",
+      "args": ["tools/regression-runner/test/regression-runner-self-test.mjs"],
+      "owner": "regression-runner",
+      "coverage": "RR3 clean-room profile authority, preflight, fail-fast, tracked-mutation guard and legacy-boundary self-test."
+    },
+    {
       "id": "configdata-integrity",
       "phase": 10,
       "executable": "npm",
