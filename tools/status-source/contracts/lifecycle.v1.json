@@ -52,7 +52,10 @@
       "chronologyAuthorityInference": false
     },
     "transport": {
-      "productionWriterActivation": "CUTOVER_DEFERRED",
+      "productionWriterActivation": "ACTIVE",
+      "productionWriterWorkflow": ".github/workflows/project-tooling-r1-status-source-writer.yml",
+      "legacyWriterWorkflow": ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+      "legacyWriterActive": false,
       "allowedModes": [
         "WORK_BRANCH_PUSH",
         "EXPLICIT_NON_MAIN_DISPATCH"
@@ -104,6 +107,6 @@
     "semanticRecomputationCount": 0,
     "canonicalJoinRecomputationCount": 0,
     "domainValidatorExecutionCount": 0,
-    "productionWriterWorkflowActivated": false
+    "productionWriterWorkflowActivated": true
   }
 }
