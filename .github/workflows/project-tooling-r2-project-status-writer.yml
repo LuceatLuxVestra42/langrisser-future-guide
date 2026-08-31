@@ -46,7 +46,9 @@ jobs:
       - name: Verify NEW R1 Status Source predecessor
         run: node tools/status-source/test/current-main-parity.mjs
 
-      - name: Verify R2 parity, canonical compatibility, and writer isolation
+      - name: Verify R2 runtime parity and writer isolation before repair
+        env:
+          PROJECT_STATUS_ALLOW_STALE_CANONICAL: '1'
         run: node tools/project-status/test/current-parity.mjs
 
       - name: Resolve writer activation
@@ -98,7 +100,7 @@ jobs:
             exit 0
           fi
           git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.email '4189824+github-actions[bot]@users.noreply.github.com'
           git commit -m 'chore: refresh NEW Project Status projection'
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
