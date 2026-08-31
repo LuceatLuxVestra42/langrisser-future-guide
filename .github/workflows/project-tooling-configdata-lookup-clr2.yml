@@ -8,6 +8,7 @@ on:
     paths:
       - 'tools/configdata-lookup/**'
       - 'data/contracts/project-tooling-project-check-configdata-lookup-clr2-*.json'
+      - 'data/contracts/project-tooling-project-check-configdata-lookup-clr3-*.json'
       - 'tools/project-check/contracts/owners.v1.json'
       - '.github/workflows/project-tooling-configdata-lookup-clr2.yml'
   workflow_dispatch:
@@ -39,3 +40,6 @@ jobs:
 
       - name: Run CLR2 namespace smoke
         run: node tools/configdata-lookup/test/clr2-namespace-smoke.mjs
+
+      - name: Run CLR3 read-only self-test
+        run: node tools/configdata-lookup/test/configdata-lookup-self-test.mjs
