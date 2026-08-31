@@ -2,8 +2,8 @@
   "version": 1,
   "schemaId": "configdata-lookup-clr4-admission/v1",
   "stage": "CLR4",
-  "status": "CANDIDATE_VALIDATION_PENDING",
-  "completion": "PENDING_CONFIGDATA_LOOKUP_CLR4_PROJECT_CHECK_ADMISSION",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR4_ADMISSION_VALIDATED_PENDING_FREEZE_HEAD_REVALIDATION",
   "purpose": "Promote the frozen CLR3 read-only ConfigData Lookup self-test into NEW Project Check as a dedicated owner/catalog validator, replacing the temporary CLR2 project-check admission without adding semantic fan-out, writer authority, or Stage 7/8 orchestration authority.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
@@ -44,6 +44,12 @@
     "workflowExpectedOwner": "configdata-lookup",
     "clr4CheckpointExpectedOwner": "configdata-lookup",
     "historicalClr3CheckpointExpectedOwner": "project-check",
+    "candidateChangedFileCount": 5,
+    "candidateOwnerCount": 2,
+    "candidateValidatorCount": 2,
+    "candidateOwners": ["configdata-lookup", "project-check"],
+    "candidateValidators": ["project-check-self-test", "configdata-lookup-self-test"],
+    "manualReviewCount": 0,
     "ownerPropagation": false,
     "changeClassFanOut": false,
     "manualReviewFanOut": false
@@ -98,9 +104,28 @@
     "trackedMutationCount": 0
   },
   "validationEvidence": {
-    "candidateHead": null,
-    "configdataLookupWorkflow": null,
-    "projectCheck": null,
+    "candidateHead": "b58c220ca0a9b86d2b41d0ecfcb34142c922cc0d",
+    "configdataLookupWorkflow": {
+      "name": "Project Tooling ConfigData Lookup",
+      "runId": 33393328541,
+      "jobId": 99491875305,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "clr3ReadOnlySelfTest": "PASS",
+      "conclusion": "success"
+    },
+    "projectCheck": {
+      "runId": 33393328509,
+      "jobId": 99491874180,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "projectCheckSelfTestExitCode": 0,
+      "configdataLookupSelfTestExitCode": 0,
+      "dedicatedValidatorExecuted": true,
+      "conclusion": "success"
+    },
     "freezeHeadRevalidation": "PENDING"
   },
   "blockers": [],
@@ -121,7 +146,7 @@
       "detail": "Legacy Stage 7/8 orchestration remains unchanged and is not inherited by the dedicated ConfigData Lookup owner."
     }
   ],
-  "nextStart": "Run the dedicated ConfigData Lookup workflow and required Project Check on the CLR4 candidate. Require explicit configdata-lookup routing and execution of configdata-lookup-self-test through Project Check. If both pass, freeze CLR4 and proceed to CLR5 validation/writer separation without changing Stage 0-6 producer semantics or package CLI authority.",
+  "nextStart": "Revalidate the evidence-only CLR4 freeze head with both the dedicated ConfigData Lookup workflow and required Project Check. If both pass and Project Check again executes configdata-lookup-self-test through the dedicated owner, freeze CLR4 and proceed to CLR5 validation/writer separation.",
   "reopenConditions": [
     "Project Check cannot route tools/configdata-lookup/** exclusively to the dedicated configdata-lookup owner.",
     "The catalogued configdata-lookup-self-test cannot execute read-only through Project Check.",
