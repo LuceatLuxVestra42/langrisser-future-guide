@@ -5,7 +5,7 @@
   "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_5_LIFECYCLE",
   "status": "PASS",
   "completion": "R1_5_LIFECYCLE_COMPLETE",
-  "purpose": "Rehome explicit apply handoff, retained producer declaration, and explicit closeout-request behavior onto the independent R1-4 Status Source bridge without legacy active-registry, D5 freshness, or Project Status runtime dependencies.",
+  "purpose": "Own explicit closeout, producer declaration, compare-and-swap handoff, and the single active NEW Status Source writer transport on the independent R1-4 bridge without legacy active-registry, D5 freshness, or Project Status runtime dependencies.",
   "predecessor": {
     "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_4_ARTIFACT_BRIDGE",
     "status": "PASS",
@@ -13,23 +13,15 @@
     "contract": "data/contracts/project-tooling-status-source-r1-4.v1.json"
   },
   "authoritativeReference": {
-    "legacyStage6_3Contract": {
-      "path": "data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json",
-      "gitBlobSha": "ea2f3463b1b4ff8d98475f0766c43611a59343e8"
-    },
-    "legacyStage6_4Contract": {
-      "path": "data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json",
-      "gitBlobSha": "f73b54e8d70b91ea53a0bc7be5c92d12dc728dc6"
-    },
-    "legacyStage6_5Contract": {
-      "path": "data/contracts/project-doctor-status-source-stage6-5-closeout-requests.v1.json",
-      "gitBlobSha": "bc44a2203e5b97054ccfe269d542b1abc020643a"
-    },
+    "legacyStage6_3Contract": {"path":"data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json","gitBlobSha":"ea2f3463b1b4ff8d98475f0766c43611a59343e8"},
+    "legacyStage6_4Contract": {"path":"data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json","gitBlobSha":"f73b54e8d70b91ea53a0bc7be5c92d12dc728dc6"},
+    "legacyStage6_5Contract": {"path":"data/contracts/project-doctor-status-source-stage6-5-closeout-requests.v1.json","gitBlobSha":"bc44a2203e5b97054ccfe269d542b1abc020643a"},
     "referenceUseOnly": true,
     "runtimeDependency": false
   },
   "implementation": {
-    "implementationCommit": "b7fd14fd24ff707b74af1b22ffad1aad961be262",
+    "originalLifecycleImplementationCommit": "b7fd14fd24ff707b74af1b22ffad1aad961be262",
+    "writerCutoverValidatedHead": "7511edab392b2a91dee19aecd2d1f05f895558e4",
     "lifecycleContract": "tools/status-source/contracts/lifecycle.v1.json",
     "runtime": "tools/status-source/lib/lifecycle-status-source.mjs",
     "cli": "tools/status-source/cli/lifecycle.mjs",
@@ -38,14 +30,16 @@
     "soldierDeclaration": "tools/status-source/declarations/soldier.v1.json",
     "heroCloseoutRequest": "tools/status-source/closeout-requests/hero.v1.json",
     "soldierCloseoutRequest": "tools/status-source/closeout-requests/soldier.v1.json",
-    "shadowWorkflow": ".github/workflows/project-tooling-r1-status-source.yml"
+    "validationWorkflow": ".github/workflows/project-tooling-r1-status-source.yml",
+    "productionWriterWorkflow": ".github/workflows/project-tooling-r1-status-source-writer.yml",
+    "retiredLegacyWriterWorkflow": ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml"
   },
   "behaviorRehome": {
     "preserved": [
       "Hero/Soldier explicit lifecycle pipeline registration",
       "explicit predecessor compare-and-swap before preview",
       "compare-and-swap recheck before apply",
-      "candidate entry id and source path must be explicit",
+      "candidate entry id and source path derive from a committed approved producer declaration",
       "candidate source must be committed and clean",
       "preview must pass before apply",
       "retained explicit producer declaration",
@@ -53,7 +47,8 @@
       "deterministic closeout-request to declaration projection",
       "explicit write/apply flags",
       "future successor requires explicit reviewed declaration/request change",
-      "main/pull-request mutation transport remains disabled during shadow"
+      "main and pull-request mutation remain forbidden",
+      "production mutation is explicit non-main workflow dispatch only"
     ],
     "removedFromStatusSourceRuntime": [
       "legacy generated active-source registry read",
@@ -61,8 +56,7 @@
       "Project Doctor D1 regeneration",
       "PROJECT_STATUS.md read or write",
       "Project Status projection refresh"
-    ],
-    "reason": "Those removed responsibilities are legacy Doctor/Project Status concerns, not Status Source source-lifecycle authority. R1-5 uses R1-1 selection for CAS and R1-4/R1-3/R1-2 for guarded promotion instead."
+    ]
   },
   "ownershipBoundary": {
     "r1_5Owns": [
@@ -71,48 +65,35 @@
       "explicit closeout request validation",
       "deterministic declaration rendering",
       "handoff compare-and-swap",
-      "handoff preview then explicit apply delegation"
+      "handoff preview then explicit apply delegation",
+      "single NEW production writer transport"
     ],
-    "r1_1Owns": [
-      "current active source selection",
-      "predecessor authority used by compare-and-swap",
-      "post-apply selected source verification"
-    ],
-    "r1_4Owns": [
-      "artifact pipeline bridge",
-      "candidate forwarding into the producer gate"
-    ],
-    "r1_3Owns": [
-      "producer/domain/source-family validation"
-    ],
-    "r1_2Owns": [
-      "promotion compatibility",
-      "status-source declaration mutation",
-      "post-write verification",
-      "promotion rollback"
-    ],
-    "notOwnedByStatusSource": [
-      "Project Status normalization",
-      "D5 freshness seal",
-      "domain validation execution",
-      "semantic recomputation",
-      "branch-protection cutover"
-    ]
+    "r1_1Owns": ["current active source selection","predecessor authority used by compare-and-swap","post-apply selected source verification"],
+    "r1_4Owns": ["artifact pipeline bridge","candidate forwarding into the producer gate"],
+    "r1_3Owns": ["producer/domain/source-family validation"],
+    "r1_2Owns": ["promotion compatibility","status-source declaration mutation","post-write verification","promotion rollback"],
+    "notOwnedByStatusSource": ["Project Status normalization","D5 freshness seal","domain validation execution","semantic recomputation","branch protection"]
   },
   "currentLifecycleFixtures": {
     "pipelineCount": 2,
-    "hero": {
-      "predecessorId": "hero-stage6-4-final",
-      "entryId": "hero-stage6-4-final",
-      "sourcePath": "data/validation/hero-stage6-4-final.v1.json",
-      "idempotentBaseline": true
-    },
-    "soldier": {
-      "predecessorId": "soldier-stage6-7-site-admission",
-      "entryId": "soldier-stage6-7-site-admission",
-      "sourcePath": "data/validation/soldier-stage6-7-site-admission.v1.json",
-      "idempotentBaseline": true
-    }
+    "hero": {"predecessorId":"hero-stage6-4-final","entryId":"hero-stage6-4-final","sourcePath":"data/validation/hero-stage6-4-final.v1.json","idempotentBaseline":true},
+    "soldier": {"predecessorId":"soldier-stage6-7-site-admission","entryId":"soldier-stage6-7-site-admission","sourcePath":"data/validation/soldier-stage6-7-site-admission.v1.json","idempotentBaseline":true}
+  },
+  "writerActivation": {
+    "state": "ACTIVE_NEW_R1_WRITER",
+    "activeWriterCount": 1,
+    "productionWriterWorkflow": ".github/workflows/project-tooling-r1-status-source-writer.yml",
+    "legacyWriterWorkflow": ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+    "legacyWriterActive": false,
+    "oldWriterDisabledBeforeNewWriterActivated": true,
+    "zeroWriterWindowUsed": true,
+    "maxConcurrentActiveWritersDuringCutover": 1,
+    "mainMutationAllowed": false,
+    "pullRequestMutationAllowed": false,
+    "mutationTarget": "data/status-sources/**",
+    "projectStatusWriteCount": 0,
+    "d5WriteCount": 0,
+    "legacyGeneratedWriteCount": 0
   },
   "independenceBoundary": {
     "legacyProjectDoctorRuntimeImports": 0,
@@ -129,48 +110,39 @@
     "semanticRecomputationCount": 0,
     "canonicalJoinRecomputationCount": 0,
     "domainValidatorExecutionCount": 0,
-    "productionWriterWorkflowActivated": false
+    "productionWriterWorkflowActivated": true
   },
   "selfTestCoverage": [
-    "Hero and Soldier producer declarations resolve as current idempotent baselines",
-    "Hero and Soldier closeout requests deterministically match their retained declarations",
-    "Hero and Soldier handoff CHECK runs R1-4 preview with zero status-source writes",
-    "stale predecessor blocks before preview",
-    "predecessor change between preview and apply blocks before apply",
-    "unapproved producer declaration blocks",
-    "unapproved closeout request blocks",
-    "synthetic closeout WRITE may target only the bound producer declaration and writes one declaration",
-    "synthetic handoff APPLY performs preview then apply delegation and rechecks post-selection",
-    "legacy active registry, D5, and Project Status runtime dependency scan remains zero"
+    "Hero and Soldier declarations and closeout requests remain current idempotent baselines",
+    "Hero and Soldier handoff CHECK performs zero writes",
+    "stale predecessor blocks before preview and before apply",
+    "unapproved declaration/request blocks",
+    "synthetic handoff APPLY proves preview-then-apply and transactional Status Source mutation",
+    "NEW writer contains no D5/Project Status/legacy generated write dependency",
+    "OLD writer is a read-only retired tombstone without workflow_call or write permission",
+    "Hero and Soldier producers reference only the NEW writer transport"
   ],
   "validationEvidence": {
-    "shadowWorkflow": {
-      "runId": 33343354887,
-      "jobId": 99342859032,
-      "headSha": "b7fd14fd24ff707b74af1b22ffad1aad961be262",
-      "conclusion": "success",
-      "selectionParityAndIsolationSelfTest": "PASS",
-      "promotionParityAndRollbackSelfTest": "PASS",
-      "producerGateParityAndDelegationSelfTest": "PASS",
-      "artifactBridgeParityAndDelegationSelfTest": "PASS",
+    "originalShadowWorkflow": {"runId":33343354887,"jobId":99342859032,"headSha":"b7fd14fd24ff707b74af1b22ffad1aad961be262","conclusion":"success"},
+    "writerCutoverValidation": {
+      "headSha": "7511edab392b2a91dee19aecd2d1f05f895558e4",
+      "r1RunId": 33348927050,
+      "r1JobId": 99358324979,
+      "r1Conclusion": "success",
       "lifecycleParityAndCasSelfTest": "PASS",
-      "heroProducerDeclarationCli": "PASS",
-      "heroCloseoutCheckCli": "PASS",
-      "heroHandoffCheckCli": "PASS"
+      "heroWorkflowRunId": 33348927228,
+      "heroValidationJobId": 99358325543,
+      "heroCloseoutAndBridgeSteps": "PASS",
+      "soldierWorkflowRunId": 33348927441,
+      "soldierValidationJobId": 99358326503,
+      "soldierConclusion": "success",
+      "soldierCloseoutAndBridgeSteps": "PASS"
     },
-    "mutationProof": {
-      "currentHeroSoldierHandoffCheckWrites": 0,
-      "syntheticCloseoutDeclarationWrites": 1,
-      "syntheticHandoffApplyDelegated": true,
-      "syntheticHandoffStatusSourceWrites": 1,
-      "stalePreviewCasBlocked": true,
-      "staleApplyCasBlocked": true,
-      "productionWriterWorkflowActivated": false
+    "runtimeDispatchProof": {
+      "availableInCurrentConnection": false,
+      "blocking": false,
+      "reason": "The current GitHub connector exposes no workflow-dispatch write action. Transport behavior is covered by lifecycle apply tests plus GitHub parsing/execution of the producer workflows and static writer-boundary assertions."
     }
-  },
-  "writerActivation": {
-    "state": "DEFERRED_TO_CUTOVER",
-    "reason": "Activating a second branch-scoped writer during shadow would violate the no-dual-writer migration boundary. R1-5 proves runtime behavior only; workflow ownership switches after NEW Project Check/cutover preparation."
   },
   "completionGate": {
     "lifecycleContractImplemented": true,
@@ -179,23 +151,25 @@
     "lifecycleRuntimeImplemented": true,
     "lifecycleCliImplemented": true,
     "selfTestImplemented": true,
-    "shadowWorkflowUpdated": true,
-    "shadowCiPass": true,
+    "validationWorkflowUpdated": true,
     "currentLifecycleParity": true,
+    "singleNewWriterActive": true,
+    "legacyWriterInactive": true,
+    "noDualWriterProven": true,
     "legacyRuntimeDependencyCountZero": true
   },
   "blockers": [],
   "reviews": [
-    "A real future successor may require an explicit reviewed evolution of the frozen R1-4 baseline binding after promotion; current R1-5 proof is intentionally idempotent Hero/Soldier baseline behavior.",
-    "Production apply/declaration writer workflow activation is deferred to cutover to avoid dual writers.",
-    "Legacy required pr-guard remains a CUTOVER_ONLY blocker and must not be repaired by admitting migration paths into legacy D2-D7."
+    "A real future successor may require an explicit reviewed evolution of the frozen R1-4 baseline binding after promotion; current lifecycle fixtures remain the existing Hero/Soldier active baselines.",
+    "Direct workflow_dispatch execution proof is unavailable through the current connector; this is non-blocking because the lifecycle apply path is tested and both producer workflows parse and execute the NEW check-only lifecycle paths successfully."
   ],
-  "nextStartPoint": "R1 Status Source is ready to freeze as a complete shadow implementation. Next start R2 Project Status using only the NEW Status Source selection/lifecycle outputs as predecessor authority; do not use OLD D1/D5/PROJECT_STATUS as runtime predecessors.",
+  "nextStartPoint": "Project Status writer ownership cutover. Keep it separate from Status Source writer ownership and from final OLD Project Doctor deletion.",
   "reopenConditions": [
     "R1-1 active selection semantics change",
     "R1-4 bridge behavior changes",
-    "Hero/Soldier lifecycle ownership or transport changes authoritatively",
+    "Hero/Soldier lifecycle ownership or writer transport changes authoritatively",
     "the explicit producer declaration or closeout-request schema changes",
-    "new authoritative evidence contradicts R1-5 CAS/declaration/request parity"
+    "NEW writer gains a D5, Project Status, legacy generated-output, main, or pull-request mutation path",
+    "OLD Status Source writer becomes active again"
   ]
 }
