@@ -70,6 +70,21 @@ expectOwners(
   ['project-check-self-test'],
 );
 expectOwners(
+  'tools/regression-runner/lib/runner.mjs',
+  ['project-check'],
+  ['project-check-self-test'],
+);
+expectOwners(
+  '.github/workflows/project-tooling-regression-runner.yml',
+  ['project-check'],
+  ['project-check-self-test'],
+);
+expectOwners(
+  'data/contracts/project-tooling-regression-runner-r2-admission.v1.json',
+  ['project-check'],
+  ['project-check-self-test'],
+);
+expectOwners(
   'data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json',
   ['project-check'],
   ['project-check-self-test'],
@@ -309,7 +324,7 @@ assert.throws(
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'PROJECT_CHECK_R3_SELF_TEST',
-  fixtures: 24,
+  fixtures: 27,
   catalogValidatorCount: contracts.validatorCatalog.validators.length,
   ownerCount: contracts.ownerMap.owners.length,
   deletionManifest: {
