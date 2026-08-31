@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-route-hosted-qa-rh3-implementation/v1",
+  "stage": "RH3",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "ROUTE_HOSTED_QA_RH3_IMPLEMENTATION_FROZEN",
+  "purpose": "Freeze the clean-room NEW Route/Hosted QA implementation after dedicated owner routing, validator admission, deterministic self-test coverage, and candidate Project Check success. Preserve the RH1 read-only HTTP Hosted boundary without reopening semantic, asset, frontend, Browser/UI, deployment-writer, or OLD Project Doctor runtime authority.",
+  "predecessors": {
+    "rh0Baseline": "data/contracts/project-tooling-project-check-route-hosted-qa-rh0-baseline.v1.json",
+    "rh0Completion": "ROUTE_HOSTED_QA_RH0_BASELINE_FROZEN",
+    "rh1Boundary": "data/contracts/project-tooling-project-check-route-hosted-qa-rh1-boundary.v1.json",
+    "rh1Completion": "ROUTE_HOSTED_QA_RH1_BOUNDARY_FROZEN",
+    "rh2Admission": "data/contracts/project-tooling-route-hosted-qa-rh2-admission.v1.json",
+    "rh2Completion": "ROUTE_HOSTED_QA_RH2_ADMISSION_COMPLETE"
+  },
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pullRequest": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "headBeforeRh3Checkpoint": "916074d6d12361a6e66fb7a2b4bbe8c210209b24",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "requiredCheckContexts": ["project-check"],
+    "runtimeContract": "tools/route-hosted-qa/contracts/hosted.v1.json",
+    "core": "tools/route-hosted-qa/lib/hosted-qa.mjs",
+    "cli": "tools/route-hosted-qa/cli/check.mjs",
+    "selfTest": "tools/route-hosted-qa/test/route-hosted-qa-self-test.mjs",
+    "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
+    "ownerMap": "tools/project-check/contracts/owners.v1.json",
+    "workflow": ".github/workflows/project-tooling-route-hosted-qa.yml"
+  },
+  "implementationState": {
+    "ownerId": "route-hosted-qa",
+    "ownerValidators": ["route-hosted-qa-self-test"],
+    "validatorPhase": 5,
+    "validatorExecutable": "node",
+    "validatorArgs": ["tools/route-hosted-qa/test/route-hosted-qa-self-test.mjs"],
+    "rh2TemporaryProjectCheckSelfTestReplaced": true,
+    "manualReviewFallbackForAdmittedPaths": false,
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "semanticOwnerFanOut": false,
+    "frontendOwnerFanOut": false,
+    "assetOwnerFanOut": false,
+    "deploymentWriterFanOut": false
+  },
+  "frozenRuntimeMeaning": {
+    "role": "READ_ONLY_HTTP_HOSTED_VALIDATION",
+    "hostedTarget": {
+      "origin": "https://luceatluxvestra42.github.io",
+      "repositoryBase": "/langrisser-future-guide/",
+      "baseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+      "canonicalDirectoryStyle": "TRAILING_SLASH"
+    },
+    "publicRouteCount": 6,
+    "detailFixtureCount": 6,
+    "negativeRouteCount": 3,
+    "hostedCheckCount": 10,
+    "executionModes": ["STRICT_CANDIDATE", "PROBE_CURRENT_DEPLOYED"],
+    "strictCandidateFreshnessClaim": true,
+    "probeCurrentCandidateFreshnessClaim": false,
+    "browserLaunch": false,
+    "playwrightDependency": false,
+    "repositoryMutation": false,
+    "deploymentMutation": false,
+    "trackedRuntimeOutputMutation": false,
+    "semanticAuthority": false,
+    "browserUiAuthority": false,
+    "assetAuthority": false,
+    "frontendAuthority": false,
+    "oldProjectDoctorRuntimeDependency": false
+  },
+  "implementationEvidence": {
+    "contractCommit": "39d61e8d567fc5a113eaf414a43e12e7f4933c1e",
+    "coreCommit": "c15f572e6087e5c88e14874d684475aaa7a7b96b",
+    "cliCommit": "2ddb9798af0a5a4f87f6d49905f503699a2de602",
+    "selfTestCommit": "61b93d7616110e65ebaea866adbcee542d4f80f3",
+    "validatorAdmissionCommit": "36e56701558f186dd895d643476659b58a9a07bb",
+    "ownerPromotionCommit": "198128f0a7a74e4ef7aacb3ca47af4ca97d72bc0",
+    "routingPromotionCommit": "b0c6f98b55d122162ed6191a999b4e4ba7758dcc",
+    "failedCheckDiagnosticsCommit": "3d322f0567133f733bf380cffd4fbc98459bd3e2",
+    "basePathOwnershipFixCommit": "2e219f7edd53f23be949346a3613110024f1209a",
+    "playwrightAssertionFixCommit": "916074d6d12361a6e66fb7a2b4bbe8c210209b24",
+    "playwrightAssertionFixScope": ["tools/route-hosted-qa/test/route-hosted-qa-self-test.mjs"],
+    "playwrightAssertionFixMeaning": "Allow the frozen contract property reference contract.runtime.playwright while still forbidding Playwright package imports, dynamic imports, and require dependencies in the NEW runtime."
+  },
+  "candidateValidation": {
+    "head": "916074d6d12361a6e66fb7a2b4bbe8c210209b24",
+    "projectCheckRunId": 33375233422,
+    "projectCheckJobId": 99435099700,
+    "conclusion": "success",
+    "steps": {
+      "setupBun": "PASS",
+      "frozenDependencyInstall": "PASS",
+      "projectCheckSelfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS"
+    }
+  },
+  "completionGate": {
+    "rh0PredecessorPreserved": true,
+    "rh1ReadOnlyHttpBoundaryPreserved": true,
+    "rh2PathAdmissionPreserved": true,
+    "cleanRoomContractInstalled": true,
+    "cleanRoomCoreInstalled": true,
+    "cleanRoomCliInstalled": true,
+    "dedicatedSelfTestInstalled": true,
+    "dedicatedValidatorCatalogued": true,
+    "dedicatedOwnerPromoted": true,
+    "candidateProjectCheckPass": true,
+    "strictAndProbeModesDeterministic": true,
+    "tenHostedChecksPreserved": true,
+    "basePathOwnershipSeparatedFromAssetPass": true,
+    "playwrightBoundaryValidatesDependencyInsteadOfPropertyName": true,
+    "legacyRuntimeDependencyCount": 0,
+    "deploymentMutationCount": 0,
+    "browserLaunchCount": 0,
+    "semanticReopenCount": 0,
+    "manualReviewFallbackForRh3Paths": false,
+    "semanticReopen": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_HOSTED_PROOF_DEPLOYMENT_WRITER_PRESENT",
+      "blocking": false,
+      "classification": "DEPLOYMENT_WRITER_REVIEW",
+      "detail": "The OLD strict hosted-proof workflow remains separate predecessor/legacy evidence with a historical deployment-writer role. RH3 neither inherits nor retires that writer role; any retirement or cutover must be handled as a separate owning task."
+    },
+    {
+      "id": "BROWSER_UI_DEFERRED",
+      "blocking": false,
+      "classification": "SEPARATE_VALIDATION_LAYER",
+      "detail": "RH3 is HTTP Hosted validation only. Browser/Playwright interaction remains a separate Browser/UI stage and is not required to reopen or extend this completed Hosted implementation."
+    }
+  ],
+  "nonScope": [
+    "No semantic, canonical, relation, ConfigData, localization, frontend, or asset data is changed by the RH3 freeze.",
+    "No Browser/UI or Playwright runtime dependency is added to Route/Hosted QA.",
+    "No GitHub Pages deployment, gh-pages mutation, force-push, repository writer, Status Source writer, or Project Status writer is introduced.",
+    "No OLD Route/Hosted QA runtime, workflow, package alias, or historical evidence is made authoritative for NEW RH3 execution.",
+    "No validator is disabled, bypassed, exception-routed, or converted to a false PASS to achieve completion."
+  ],
+  "nextStart": "Run required project-check on the RH3 freeze commit. If self-test, changed-path planning, and owning-validator execution all PASS, classify RH3 as COMPLETE. Reopen RH3 only under the explicit reopen conditions below.",
+  "reopenConditions": [
+    "RH0, RH1, or RH2 predecessor contracts no longer satisfy their frozen completion requirements.",
+    "The authoritative hosted target, repository base, public routes, detail fixtures, negative fixture, hosted check IDs, or source-SHA strategy changes.",
+    "The route-hosted-qa owner no longer resolves RH3 paths exclusively to the dedicated route-hosted-qa-self-test validator.",
+    "Authoritative evidence shows the NEW runtime imports or executes Playwright/browser automation, mutates repository or deployment state, or depends on OLD Project Doctor runtime.",
+    "A current-branch-only Project Check failure is causally owned by RH3 implementation or this RH3 checkpoint path.",
+    "Hosted, Browser/UI, semantic, frontend, asset, or deployment-writer ownership boundaries change."
+  ]
+}
