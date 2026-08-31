@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "schemaId": "project-check-owner-map/v1",
+  "stage": "R3",
+  "status": "DESIGN_FROZEN",
+  "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
+  "purpose": "Map changed paths directly to explicit owners. No transitive propagation, filename similarity, name JOIN, ID arithmetic, semantic recomputation, or legacy Project Doctor routing is allowed.",
+  "policy": {
+    "ruleMatch": "UNION_ALL_MATCHING_RULES",
+    "unmatchedPath": "MANUAL_REVIEW",
+    "unmatchedConfigData": "MANUAL_REVIEW",
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "frontendDoesNotReopenCanonical": true,
+    "assetDoesNotReopenCanonical": true,
+    "manualReviewDoesNotFanOut": true,
+    "noFilenameSimilarityInference": true,
+    "noNameJoinInference": true,
+    "noIdArithmeticInference": true
+  },
+  "owners": [
+    {"id":"status-source","validators":["status-source-selection","status-source-promotion","status-source-producer-gate","status-source-artifact-bridge","status-source-lifecycle"]},
+    {"id":"project-status","validators":["project-status-parity"]},
+    {"id":"project-check","validators":["project-check-self-test"]},
+    {"id":"configdata","validators":["configdata-integrity"]},
+    {"id":"hero-canonical","validators":["hero-canonical"]},
+    {"id":"soldier-canonical","validators":["soldier-canonical"]},
+    {"id":"equipment-canonical","validators":["equipment-canonical"]},
+    {"id":"hero-soldier-relation","validators":["hero-soldier-relation"]},
+    {"id":"hero-equipment-relation","validators":["hero-equipment-relation"]},
+    {"id":"banner-data","validators":["banner-data"]},
+    {"id":"skin-relation","validators":["skin-relation"]},
+    {"id":"shared-movement","validators":["shared-movement"]},
+    {"id":"soldier-assets","validators":["soldier-assets"]},
+    {"id":"equipment-assets","validators":["equipment-assets"]},
+    {"id":"hero-assets","validators":["hero-assets"]},
+    {"id":"asset-intake","validators":["asset-intake"]},
+    {"id":"localization","validators":["localization-audit"]},
+    {"id":"hero-frontend","validators":["production-build"]},
+    {"id":"soldier-frontend","validators":["production-build"]},
+    {"id":"equipment-frontend","validators":["production-build"]},
+    {"id":"banner-frontend","validators":["production-build"]},
+    {"id":"shared-frontend","validators":["production-build"]},
+    {"id":"shared-build","validators":["production-build"]},
+    {"id":"banner-assets","validators":[],"manualReview":"Banner asset ownership remains manual until an independent final asset validator is admitted."},
+    {"id":"skin-assets","validators":[],"manualReview":"Skin asset ownership remains manual until authoritative asset evidence and an independent final owner are admitted."}
+  ],
+  "pathRules": [
+    {
+      "id":"r0-migration-boundary",
+      "patterns":["data/contracts/project-tooling-migration-r0.v1.json"],
+      "owners":["project-check"]
+    },
+    {
+      "id":"status-source-tooling",
+      "patterns":["tools/status-source/**","data/contracts/project-tooling-status-source-*.json",".github/workflows/project-tooling-r1-status-source.yml"],
+      "owners":["status-source"]
+    },
+    {
+      "id":"project-status-tooling",
+      "patterns":["tools/project-status/**","data/contracts/project-tooling-project-status-*.json",".github/workflows/project-tooling-r2-project-status.yml"],
+      "owners":["project-status"]
+    },
+    {
+      "id":"project-check-tooling",
+      "patterns":["tools/project-check/**","data/contracts/project-tooling-project-check-*.json",".github/workflows/project-tooling-r3-project-check.yml"],
+      "owners":["project-check"]
+    },
+    {
+      "id":"hero-soldier-relation",
+      "patterns":["data/generated/hero-soldier-*","data/validation/hero-soldier-*","data/contracts/hero-soldier-*","scripts/*hero-soldier*",".github/workflows/hero-soldier-*"],
+      "owners":["hero-soldier-relation"]
+    },
+    {
+      "id":"hero-equipment-relation",
+      "patterns":["data/generated/hero-exclusive-equipment-*","data/validation/hero-exclusive-equipment-*","data/contracts/hero-exclusive-equipment-*","scripts/*hero-exclusive-equipment*","data/generated/equipment_stage3_5_exclusive_consumer.json",".github/workflows/hero-exclusive-equipment-*"],
+      "owners":["hero-equipment-relation"]
+    },
+    {
+      "id":"hero-frontend-data",
+      "patterns":["data/generated/hero-list-*","data/validation/hero-list-*","data/contracts/hero-list-*","scripts/*hero-list*",".github/workflows/hero-list-*"],
+      "owners":["hero-frontend"]
+    },
+    {
+      "id":"hero-canonical",
+      "patterns":["data/hero-*","data/generated/hero-*","data/validation/hero-*","data/contracts/hero-*","scripts/*hero*",".github/workflows/hero-*"],
+      "excludePatterns":["data/generated/hero-soldier-*","data/validation/hero-soldier-*","data/contracts/hero-soldier-*","scripts/*hero-soldier*",".github/workflows/hero-soldier-*","data/generated/hero-exclusive-equipment-*","data/validation/hero-exclusive-equipment-*","data/contracts/hero-exclusive-equipment-*","scripts/*hero-exclusive-equipment*",".github/workflows/hero-exclusive-equipment-*","data/generated/hero-list-*","data/validation/hero-list-*","data/contracts/hero-list-*","scripts/*hero-list*",".github/workflows/hero-list-*"],
+      "owners":["hero-canonical"]
+    },
+    {
+      "id":"hero-frontend",
+      "patterns":["src/routes/heroes*.tsx","src/lib/hero-*.ts","src/lib/hero-*.tsx"],
+      "owners":["hero-frontend"]
+    },
+    {
+      "id":"hero-assets",
+      "patterns":["public/images/heroes/**"],
+      "owners":["hero-assets","hero-frontend"]
+    },
+    {
+      "id":"soldier-assets",
+      "patterns":["public/images/soldiers/**","data/generated/soldier-portrait-*","data/validation/soldier-portrait-*","data/contracts/soldier-portrait-*","scripts/*soldier-portrait*",".github/workflows/soldier-portrait-*"],
+      "owners":["soldier-assets"]
+    },
+    {
+      "id":"soldier-presentation",
+      "patterns":["data/presentation/soldier-*","data/validation/soldier-*-presentation*","scripts/*soldier*presentation*",".github/workflows/soldier-*-presentation*"],
+      "owners":["soldier-frontend","localization"]
+    },
+    {
+      "id":"soldier-canonical",
+      "patterns":["data/soldier-*","data/generated/soldier-*","data/validation/soldier-*","data/contracts/soldier-*","scripts/*soldier*",".github/workflows/soldier-*"],
+      "excludePatterns":["data/generated/soldier-portrait-*","data/validation/soldier-portrait-*","data/contracts/soldier-portrait-*","scripts/*soldier-portrait*",".github/workflows/soldier-portrait-*","data/presentation/soldier-*","data/validation/soldier-*-presentation*","scripts/*soldier*presentation*",".github/workflows/soldier-*-presentation*"],
+      "owners":["soldier-canonical"]
+    },
+    {
+      "id":"soldier-frontend",
+      "patterns":["src/routes/soldiers*.tsx","src/lib/soldier-*.ts","src/lib/soldier-*.tsx"],
+      "owners":["soldier-frontend"]
+    },
+    {
+      "id":"equipment-image",
+      "patterns":["public/images/equipment/**","data/contracts/equipment-image-*","data/checkpoints/equipment-image-*","data/generated/equipment-image-*","data/validation/equipment-image-*","scripts/*equipment-image*",".github/workflows/equipment-image-*"],
+      "owners":["equipment-assets","equipment-frontend"]
+    },
+    {
+      "id":"equipment-frontend-stage4",
+      "patterns":["data/generated/equipment-stage4-*","data/generated/equipment_stage4_*","data/validation/equipment-stage4-*","data/contracts/equipment-stage4-*","scripts/*equipment-stage4*",".github/workflows/equipment-stage4-*"],
+      "owners":["equipment-frontend"]
+    },
+    {
+      "id":"equipment-presentation",
+      "patterns":["data/presentation/equipment-*","data/validation/equipment-*-presentation*","data/generated/equipment-name-*","scripts/*equipment-name*",".github/workflows/equipment-*-presentation*"],
+      "owners":["equipment-frontend","localization"]
+    },
+    {
+      "id":"equipment-canonical",
+      "patterns":["data/equipment*","data/generated/equipment_*","data/generated/equipment-*","data/validation/equipment-*","data/contracts/equipment-*","scripts/*equipment*",".github/workflows/equipment-*"],
+      "excludePatterns":["data/contracts/equipment-image-*","data/checkpoints/equipment-image-*","data/generated/equipment-image-*","data/validation/equipment-image-*","scripts/*equipment-image*",".github/workflows/equipment-image-*","data/generated/equipment-stage4-*","data/generated/equipment_stage4_*","data/validation/equipment-stage4-*","data/contracts/equipment-stage4-*","scripts/*equipment-stage4*",".github/workflows/equipment-stage4-*","data/presentation/equipment-*","data/validation/equipment-*-presentation*","data/generated/equipment-name-*","scripts/*equipment-name*",".github/workflows/equipment-*-presentation*"],
+      "owners":["equipment-canonical"]
+    },
+    {
+      "id":"equipment-frontend",
+      "patterns":["src/routes/equipment*.tsx","src/lib/equipment-*.ts","src/lib/equipment-*.tsx"],
+      "owners":["equipment-frontend"]
+    },
+    {
+      "id":"banner-data",
+      "patterns":["data/generated/banner-*","data/validation/banner-*","data/contracts/banner-*","scripts/*banner*",".github/workflows/banner-*"],
+      "owners":["banner-data"]
+    },
+    {
+      "id":"banner-frontend",
+      "patterns":["src/routes/banners.tsx","src/lib/banner-*.ts","src/lib/banner-*.tsx"],
+      "owners":["banner-frontend"]
+    },
+    {
+      "id":"banner-assets",
+      "patterns":["public/images/banners/**"],
+      "owners":["banner-assets","banner-frontend"]
+    },
+    {
+      "id":"skin-assets",
+      "patterns":["data/generated/skin-stage3-*","data/validation/skin-stage3-*","data/contracts/skin-stage3-*","data/evidence/skin-stage3-*","scripts/*skin-stage3*",".github/workflows/skin-stage3-*"],
+      "owners":["skin-assets"]
+    },
+    {
+      "id":"skin-relation",
+      "patterns":["data/generated/skin-stage1-*","data/generated/skin-stage2-*","data/validation/skin-stage1-*","data/validation/skin-stage2-*","data/contracts/skin-stage1-*","data/contracts/skin-stage2-*","scripts/*skin-stage1*","scripts/*skin-stage2*"],
+      "owners":["skin-relation"]
+    },
+    {
+      "id":"shared-movement",
+      "patterns":["public/images/shared/stats/**","public/images/shared/movement/**","data/generated/shared-movement-*","data/validation/shared-movement-*","scripts/*movement*",".github/workflows/shared-movement-type-validation.yml"],
+      "owners":["shared-movement"]
+    },
+    {
+      "id":"asset-intake",
+      "patterns":["tools/asset-intake/**"],
+      "owners":["asset-intake"]
+    },
+    {
+      "id":"shared-frontend",
+      "patterns":["src/components/**","src/styles/**","src/routes/__root.tsx","src/routes/index.tsx","src/index.css"],
+      "owners":["shared-frontend"]
+    },
+    {
+      "id":"shared-build",
+      "patterns":["vite.config.*","tsconfig*.json","src/routeTree.gen.ts","package-lock.json","bun.lock","bun.lockb"],
+      "owners":["shared-build"]
+    },
+    {
+      "id":"config-hero-info",
+      "patterns":["data/configdata/ConfigDataHeroInfo.json"],
+      "owners":["configdata","hero-canonical","skin-relation"]
+    },
+    {
+      "id":"config-sp-hero-info",
+      "patterns":["data/configdata/ConfigDataSPHeroInfo.json"],
+      "owners":["configdata","hero-canonical","soldier-canonical"]
+    },
+    {
+      "id":"config-soldier-info",
+      "patterns":["data/configdata/ConfigDataSoldierInfo.json","data/configdata/ConfigDataSPSoldierInfo.json","data/configdata/ConfigDataTrainingTechInfo.json","data/configdata/ConfigDataTrainingTechLevelInfo.json","data/configdata/ConfigDataMissionInfo.json","data/configdata/ConfigDataMissionSumitItemInfo.json"],
+      "owners":["configdata","soldier-canonical"]
+    },
+    {
+      "id":"config-hero-job-skill",
+      "patterns":["data/configdata/ConfigDataJobConnectionInfo.json","data/configdata/ConfigDataJobLevelInfo.json","data/configdata/ConfigDataAwakenInfo.json","data/configdata/ConfigDataHeroStarInfo.json"],
+      "owners":["configdata","hero-canonical"]
+    }
+  ],
+  "boundaries": {
+    "legacyProjectDoctorRuntimeDependency": false,
+    "legacyD2DependencyMapRuntimeDependency": false,
+    "legacyD3PlanRuntimeDependency": false,
+    "legacyD4RuntimeDependency": false,
+    "legacyD5FreshnessDependency": false,
+    "legacyD7GuardDependency": false,
+    "statusSourceMutation": false,
+    "projectStatusNormalization": false
+  }
+}
