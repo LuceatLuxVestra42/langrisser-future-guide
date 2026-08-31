@@ -43,6 +43,26 @@ expectOwners(
   ['project-status-parity'],
 );
 expectOwners(
+  '.github/workflows/project-tooling-r2-project-status-writer.yml',
+  ['project-status'],
+  ['project-status-parity'],
+);
+expectOwners(
+  '.github/workflows/project-status-sync.yml',
+  ['project-status'],
+  ['project-status-parity'],
+);
+expectOwners(
+  'data/generated/project-status.v1.json',
+  ['project-status'],
+  ['project-status-parity'],
+);
+expectOwners(
+  'PROJECT_STATUS.md',
+  ['project-status'],
+  ['project-status-parity'],
+);
+expectOwners(
   'tools/project-check/lib/project-check.mjs',
   ['project-check'],
   ['project-check-self-test'],
@@ -199,7 +219,7 @@ assert.throws(
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'PROJECT_CHECK_R3_SELF_TEST',
-  fixtures: 17,
+  fixtures: 21,
   catalogValidatorCount: contracts.validatorCatalog.validators.length,
   ownerCount: contracts.ownerMap.owners.length,
   boundaries: {
