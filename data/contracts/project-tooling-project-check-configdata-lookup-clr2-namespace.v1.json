@@ -3,7 +3,7 @@
   "schemaId": "configdata-lookup-clr2-namespace/v1",
   "stage": "CLR2",
   "status": "PASS_WITH_REVIEW",
-  "completion": "CONFIGDATA_LOOKUP_CLR2_NAMESPACE_VALIDATED_PENDING_FREEZE_HEAD_REVALIDATION",
+  "completion": "CONFIGDATA_LOOKUP_CLR2_NAMESPACE_FROZEN",
   "purpose": "Install the independent tools/configdata-lookup adapter namespace over the frozen Stage 0-6 lookup implementation without changing Stage 0-6 producers, generated lookup data, package CLI authority, or Stage 7/8 legacy orchestration.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
@@ -44,7 +44,7 @@
   },
   "validationEvidence": {
     "candidateHead": "a5d0ef058759f8230d08efcc29915810c098164e",
-    "clr2Workflow": {
+    "candidateClr2Workflow": {
       "name": "Project Tooling ConfigData Lookup CLR2",
       "runId": 33390746524,
       "jobId": 99483551569,
@@ -53,7 +53,7 @@
       "namespaceSmoke": "PASS",
       "conclusion": "success"
     },
-    "projectCheck": {
+    "candidateProjectCheck": {
       "runId": 33390746549,
       "jobId": 99483551865,
       "selfTest": "PASS",
@@ -61,7 +61,25 @@
       "owningValidators": "PASS",
       "conclusion": "success"
     },
-    "freezeHeadRevalidation": "PENDING"
+    "freezeHead": "f208922407c54786f05ba8dd2049b3e0b53735f0",
+    "freezeHeadClr2Workflow": {
+      "runId": 33390856604,
+      "jobId": 99483895939,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "namespaceSmoke": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadProjectCheck": {
+      "runId": 33390856258,
+      "jobId": 99483894349,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadRevalidation": "PASS",
+    "finalMetadataHeadRevalidation": "PENDING"
   },
   "requiredValidation": {
     "legacyStage5Validator": "PASS_CONFIGDATA_LOOKUP_STAGE5_CLI",
@@ -101,7 +119,7 @@
       "detail": "CLR2 does not expose rebuildIncrementally through the new namespace. Explicit writer separation remains CLR5 scope."
     }
   ],
-  "nextStart": "Revalidate the evidence-only freeze head with both the CLR2 namespace workflow and required Project Check. If both pass, set completion to CONFIGDATA_LOOKUP_CLR2_NAMESPACE_FROZEN, merge the checkpoint, and begin CLR3 dedicated read-only self-test promotion without changing Stage 0-6 producers or package CLI authority.",
+  "nextStart": "After the final metadata-only head passes the CLR2 namespace workflow and required Project Check, merge CLR2 and begin CLR3 dedicated read-only self-test promotion without changing Stage 0-6 producers or package CLI authority.",
   "reopenConditions": [
     "The new namespace cannot preserve the existing Stage 5 query semantics through an adapter.",
     "The new read-only freshness adapter requires rebuild/write behavior.",
