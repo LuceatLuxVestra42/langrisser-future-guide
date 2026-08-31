@@ -91,6 +91,14 @@
       "coverage": "RH3 clean-room read-only HTTP contract, deterministic strict/probe execution, hosted failure boundary and legacy-runtime independence."
     },
     {
+      "id": "configdata-lookup-self-test",
+      "phase": 6,
+      "executable": "node",
+      "args": ["tools/configdata-lookup/test/configdata-lookup-self-test.mjs"],
+      "owner": "configdata-lookup",
+      "coverage": "CLR3 read-only query/CLI parity, Stage 6 freshness, fail-closed input handling, tracked-mutation guard and Stage 7/8/Doctor/writer independence."
+    },
+    {
       "id": "configdata-integrity",
       "phase": 10,
       "executable": "npm",
