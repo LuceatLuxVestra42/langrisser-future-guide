@@ -2,8 +2,8 @@
   "version": 1,
   "schemaId": "configdata-lookup-clr5-writer-separation/v1",
   "stage": "CLR5",
-  "status": "CANDIDATE_PASS",
-  "completion": "PENDING_FREEZE_HEAD_REVALIDATION",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR5_WRITER_SEPARATION_FROZEN",
   "purpose": "Separate automatic/read-only ConfigData Lookup validation from explicit Stage 6 materialization writer authority without changing Stage 0-6 materialization semantics or package CLI authority.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
@@ -118,8 +118,34 @@
       "manualReviewCount": 0,
       "conclusion": "success"
     },
-    "freezeHead": null,
-    "freezeHeadRevalidation": "PENDING"
+    "freezeHead": "8dc6e05034238e5ea3f94957871db065f631bf4f",
+    "freezeHeadLegacyStage6ReadOnlyWorkflow": {
+      "runId": 33395051369,
+      "jobId": 99497466354,
+      "stage5Predecessor": "PASS",
+      "stage6CommittedMaterialization": "PASS",
+      "stage6Freshness": "PASS",
+      "trackedState": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadConfigdataLookupWorkflow": {
+      "runId": 33395051290,
+      "jobId": 99497466463,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "clr3ReadOnlySelfTest": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadProjectCheck": {
+      "runId": 33395051356,
+      "jobId": 99497465905,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadRevalidation": "PASS"
   },
   "blockers": [],
   "reviews": [
@@ -139,7 +165,7 @@
       "detail": "The explicit writer is not forced to create a synthetic materialization change while Stage 6 is clean. A future legitimate stale input can exercise it without changing CLR5 completion."
     }
   ],
-  "nextStart": "Revalidate this evidence-only freeze head with the read-only Stage 6 workflow, Project Tooling ConfigData Lookup, and required Project Check. If all pass, freeze CLR5 and proceed to CLR6 shadow/parity verification.",
+  "nextStart": "Begin CLR6 shadow/parity verification between the preserved Stage 0-6 behavior and the NEW ConfigData Lookup surface. Do not cut over package CLI or retire Stage 7/8 authority until CLR7.",
   "reopenConditions": [
     "An automatic or required validation path regains contents:write, rebuild execution, commit, or push authority.",
     "The explicit writer can target main or gh-pages, or can run without workflow_dispatch confirmation and --apply.",
