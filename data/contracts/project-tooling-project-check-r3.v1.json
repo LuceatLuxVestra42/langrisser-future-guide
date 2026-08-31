@@ -21,13 +21,14 @@
     "validatedHead": "77b6f7ea58d167f7c01d42d0ab76fadbae81ed3c",
     "validatedMergeResult": "267ce386a2cceef1c0e38710afcd6f0c4e2a2ca3",
     "evidenceFreezeCommit": "8666fa9737107a5f8ea51d264a61345bf9d9caac",
-    "latestOwnerAdmissionValidatedHead": "4ba804b121a35d817215aa0822a45bc99d111d91",
+    "latestDeletionAdmissionValidatedHead": "4ba804b121a35d817215aa0822a45bc99d111d91",
+    "latestWriterTransportAdmissionValidatedHead": "7511edab392b2a91dee19aecd2d1f05f895558e4",
     "ownerMap": "tools/project-check/contracts/owners.v1.json",
     "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
     "runtime": "tools/project-check/lib/project-check.mjs",
     "cli": "tools/project-check/cli/check.mjs",
     "selfTest": "tools/project-check/test/project-check-self-test.mjs",
-    "shadowWorkflow": ".github/workflows/project-tooling-r3-project-check.yml"
+    "workflow": ".github/workflows/project-tooling-r3-project-check.yml"
   },
   "architecture": {
     "pipeline": ["changed repository paths","explicit path rules","explicit owners","frozen validator ids","whole-queue preflight","validator execution","PASS / REVIEW / BLOCKER aggregation"],
@@ -71,45 +72,17 @@
     "project-check": "R3 routing/execution self-test"
   },
   "validationEvidence": {
-    "shadowWorkflow": {
+    "originalR3": {
       "runId": 33344192772,
       "jobId": 99345101658,
       "headSha": "77b6f7ea58d167f7c01d42d0ab76fadbae81ed3c",
-      "mergeResultSha": "267ce386a2cceef1c0e38710afcd6f0c4e2a2ca3",
-      "conclusion": "success",
-      "selfTest": "PASS",
-      "plan": "PASS",
-      "execution": "PASS"
-    },
-    "fullMigrationDiff": {
-      "changedFileCount": 47,
-      "routeStatus": "PLAN_READY",
-      "ownerCount": 3,
-      "owners": ["project-check","project-status","status-source"],
-      "validatorCount": 7,
-      "validatorsInExecutionOrder": ["status-source-artifact-bridge","status-source-lifecycle","status-source-producer-gate","status-source-promotion","status-source-selection","project-status-parity","project-check-self-test"],
-      "manualReviewCount": 0,
-      "preflight": "PASS",
-      "allSelectedValidatorExitCodesZero": true,
-      "finalStatus": "PASS",
-      "finalExitCode": 0
-    },
-    "selfTest": {
-      "fixtureCount": 15,
-      "catalogValidatorCount": 22,
-      "ownerCount": 25,
-      "manualReviewFallbackProven": true,
-      "manualOwnerReviewPersistsAfterPassingValidator": true,
-      "validatorFailureBecomesBlocker": true,
-      "wholeCatalogTargetPreflight": "PASS",
-      "pathTraversalBlocked": true
+      "conclusion": "success"
     },
     "deletionCheckpointAdmissionRepair": {
       "classification": "NEW_TOOLING_ADMISSION_GAP",
       "failureHead": "7c016de33e69a0a642c4c48d4f35745b87f41dac",
       "failureRunId": 33346670486,
       "failureJobId": 99351990646,
-      "failureStage": "Plan changed path ownership and validators",
       "unmatchedPath": "data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json",
       "admittedPattern": "data/contracts/project-tooling-project-doctor-deletion-*.json",
       "owner": "project-check",
@@ -118,12 +91,44 @@
       "repairRunId": 33347378943,
       "repairJobId": 99353992370,
       "requiredJobConclusion": "success",
+      "semanticReopen": false,
+      "ownerContractLimitedReopen": true
+    },
+    "statusSourceWriterTransportAdmission": {
+      "classification": "R3_OWNER_TRANSPORT_ADMISSION",
+      "admittedPaths": [
+        ".github/workflows/project-tooling-r1-status-source-writer.yml",
+        ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml"
+      ],
+      "owner": "status-source",
+      "validators": ["status-source-selection","status-source-promotion","status-source-producer-gate","status-source-artifact-bridge","status-source-lifecycle"],
+      "ownerMapCommit": "482a34cb2587ad8c9a14e53fb736522a25f25795",
+      "selfTestCommit": "1dd2b0fee16affe97e4fd67ec42364ce8e5cbe68",
+      "admissionRunId": 33348504957,
+      "admissionJobId": 99357145677,
+      "admissionConclusion": "success",
+      "implementationValidatedHead": "7511edab392b2a91dee19aecd2d1f05f895558e4",
+      "implementationRunId": 33348927042,
+      "implementationJobId": 99358324950,
+      "implementationConclusion": "success",
       "selfTest": "PASS",
       "plan": "PASS",
       "execution": "PASS",
+      "fixtureCount": 17,
       "semanticReopen": false,
+      "domainOwnerExpansion": false,
       "ownerContractLimitedReopen": true
     }
+  },
+  "selfTest": {
+    "fixtureCount": 17,
+    "catalogValidatorCount": 22,
+    "ownerCount": 25,
+    "manualReviewFallbackProven": true,
+    "manualOwnerReviewPersistsAfterPassingValidator": true,
+    "validatorFailureBecomesBlocker": true,
+    "wholeCatalogTargetPreflight": "PASS",
+    "pathTraversalBlocked": true
   },
   "independenceBoundary": {
     "legacyProjectDoctorRuntimeImports": 0,
@@ -148,27 +153,28 @@
     "runnerImplemented": true,
     "cliImplemented": true,
     "selfTestImplemented": true,
-    "shadowWorkflowImplemented": true,
-    "shadowCiPass": true,
+    "workflowImplemented": true,
     "currentMigrationDiffRoutesWithoutManualReview": true,
     "selectedValidatorsPass": true,
     "legacyRuntimeDependencyCountZero": true,
     "deletionCheckpointNamespaceAdmitted": true,
-    "readyForShadowComparison": true
+    "statusSourceWriterTransportPathsAdmitted": true
   },
   "blockers": [],
   "cutoverBlockers": [],
   "reviews": [
-    "The R3 owner map remains intentionally minimal and fail-closed. Any repository path not explicitly admitted remains MANUAL_REVIEW rather than inheriting historical Doctor routing by default.",
-    "The Project Doctor deletion checkpoint namespace is explicitly admitted to project-check ownership after the 7c016de3 admission gap; no domain semantic ownership was expanded.",
+    "The R3 owner map remains intentionally minimal and fail-closed; unmatched repository paths remain MANUAL_REVIEW.",
+    "The Project Doctor deletion checkpoint namespace is explicitly admitted to project-check ownership without domain semantic expansion.",
+    "The NEW and retired OLD Status Source writer workflow paths are explicitly admitted to status-source ownership; this is transport ownership only and does not reopen source semantics.",
     "Banner assets and Skin assets remain manual owner boundaries until independent final validators are explicitly admitted.",
-    "Required-check cutover is complete: main requires project-check, while pr-guard and project-check-shadow are not required."
+    "Required-check cutover remains complete: main requires project-check, while pr-guard and project-check-shadow are not required."
   ],
-  "nextStartPoint": "Resume from the already-created OLD Project Doctor deletion inventory with the admission gap closed. Keep actual OLD Doctor deletion deferred until Status Source writer ownership and Project Status writer ownership are transitioned and proven separately.",
+  "nextStartPoint": "Project Status writer ownership cutover. Status Source writer transport ownership is now complete; keep final OLD Doctor deletion deferred until the Project Status writer is transitioned and proven separately.",
   "reopenConditions": [
     "an admitted owner validator command changes authoritatively",
     "a path family changes ownership authoritatively",
     "R1 or R2 tooling ownership changes",
+    "Status Source writer workflow ownership changes",
     "new evidence shows an explicit R3 mapping causes semantic or presentation ownership fan-out not represented by the contract"
   ]
 }
