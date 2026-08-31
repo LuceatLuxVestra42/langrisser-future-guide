@@ -79,7 +79,24 @@
       "conclusion": "success"
     },
     "freezeHeadRevalidation": "PASS",
-    "finalMetadataHeadRevalidation": "PENDING"
+    "finalMetadataHead": "ad8f81a97e099c94a4dd074ed27719ae855b357d",
+    "finalMetadataClr2Workflow": {
+      "runId": 33390985490,
+      "jobId": 99484298479,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "namespaceSmoke": "PASS",
+      "conclusion": "success"
+    },
+    "finalMetadataProjectCheck": {
+      "runId": 33390985487,
+      "jobId": 99484297635,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "finalMetadataHeadRevalidation": "PASS"
   },
   "requiredValidation": {
     "legacyStage5Validator": "PASS_CONFIGDATA_LOOKUP_STAGE5_CLI",
@@ -119,7 +136,7 @@
       "detail": "CLR2 does not expose rebuildIncrementally through the new namespace. Explicit writer separation remains CLR5 scope."
     }
   ],
-  "nextStart": "After the final metadata-only head passes the CLR2 namespace workflow and required Project Check, merge CLR2 and begin CLR3 dedicated read-only self-test promotion without changing Stage 0-6 producers or package CLI authority.",
+  "nextStart": "Merge CLR2 after the evidence-only final commit passes the CLR2 namespace workflow and required Project Check, then begin CLR3 dedicated read-only self-test promotion without changing Stage 0-6 producers or package CLI authority.",
   "reopenConditions": [
     "The new namespace cannot preserve the existing Stage 5 query semantics through an adapter.",
     "The new read-only freshness adapter requires rebuild/write behavior.",
