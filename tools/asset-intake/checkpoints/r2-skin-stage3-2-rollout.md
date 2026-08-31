@@ -4,7 +4,7 @@
 
 기준 main: `e7e1a4958fa89978adb57d4f98fd9889a3806764`
 
-상태: `PENDING_CI_PROOF`
+상태: `PASS_ASSET_INTAKE_R2_SKIN_STAGE3_2_ROLLOUT / COMPLETE`
 
 ## 목적
 
@@ -31,14 +31,21 @@
 
 따라서 R2는 그 이력을 current authority로 자동 승격하지 않는다.
 
-## scope
+## 적용 범위
 
-1. Skin Stage 3-2 rollout contract 추가
-2. current frozen readiness/normalized contract만 소비하는 전용 runner 추가
-3. synthetic isolated root로 PENDING / RESOLVED execution wiring을 모두 검증하는 self-test 추가
-4. 기존 `asset:intake:validate`가 rollout self-test를 실행하도록 연결
-5. 기존 R1 tracked-worktree mutation guard 유지
-6. Project Check에서 기존 `asset-intake` owner / validator로만 실행되는지 검증
+1. `tools/asset-intake/contract/skin-stage3-2-rollout.v1.json`
+   - current readiness source와 frozen 3 representative / 13 locator contract를 고정한다.
+   - Project Status 자동 승격, historical branch evidence 자동 승격, semantic recomputation을 금지한다.
+2. `tools/asset-intake/cli/run-skin-stage3-2-v1.mjs`
+   - current frozen contract만 실행한다.
+   - `--contract` override를 금지한다.
+   - authoritative root와 explicit resource map을 shared Asset Intake `skin` command로 전달한다.
+3. `tools/asset-intake/cli/self-test-skin-stage3-2-rollout-v1.mjs`
+   - isolated synthetic root에서 PENDING 및 exact RESOLVED wiring을 검증한다.
+   - synthetic result가 Project Status를 승격하지 않는지 검증한다.
+4. `tools/asset-intake/cli/validate-stage5-v1.mjs`
+   - 기존 Stage 5 chain에 Skin rollout self-test만 추가한다.
+   - R1 tracked-worktree mutation guard는 유지한다.
 
 ## non-scope
 
@@ -80,33 +87,102 @@ authoritative root 없이 current main의 Skin 상태를 임의로 RESOLVED로 �
 Synthetic fixture는 execution wiring 증명 전용이며 project asset authority가 아니다.
 
 1. exact synthetic static/spine/model paths를 isolated temp root에 구성한다.
-2. resource map 없이 실행하면 3 records 모두 PENDING / evidence 0이어야 한다.
-3. explicit confirmed resource map을 추가하면 3 records / 13 locators가 exact RESOLVED되어야 한다.
-4. 두 경우 모두 `projectStatusPromoted=false`여야 한다.
-5. `--contract` override는 fail closed 해야 한다.
+2. resource map 없이 실행하면 3 records 모두 PENDING / evidence 0이다.
+3. explicit confirmed resource map을 추가하면 3 records / 13 locators가 exact RESOLVED된다.
+4. 두 경우 모두 `projectStatusPromoted=false`다.
+5. `--contract` override는 fail closed 한다.
+
+## CI execution proof
+
+PR: `#328`
+
+Project Check run:
+
+```text
+runId = 33441883606
+jobId = 99651804557
+conclusion = success
+```
+
+Project Check self-test:
+
+```text
+status = PASS
+checkpoint = PROJECT_CHECK_R3_SELF_TEST
+```
+
+Changed-path plan:
+
+```text
+changedFileCount = 5
+ownerCount = 1
+validatorCount = 1
+owners = [asset-intake]
+validators = [asset-intake]
+manualReviews = []
+route.status = PLAN_READY
+semanticRecomputationCount = 0
+statusSourceMutationCount = 0
+projectStatusMutationCount = 0
+```
+
+Owning validator execution:
+
+```text
+validatorId = asset-intake
+executable = npm
+args = [run, asset:intake:validate]
+exitCode = 0
+```
+
+Asset Intake Stage 5 result:
+
+```text
+status = PASS_ASSET_INTAKE_STAGE5_OPERATIONAL_ROUTING
+checks = 24
+passed = 24
+failed = 0
+hardErrors = 0
+skinStage32ExecutionPathAdopted = true
+currentSkinAuthorityPromoted = false
+trackedBeforeCount = 0
+trackedAfterCount = 0
+trackedMutationCount = 0
+```
+
+Project Check final result:
+
+```text
+status = PASS
+completion = COMPLETE
+exitCode = 0
+legacyProjectDoctorRuntimeImports = 0
+statusSourceMutationCount = 0
+projectStatusNormalizationCount = 0
+```
 
 ## 완료 조건
 
-- [ ] Project Check workflow conclusion = success
-- [ ] Project Check self-test = success
-- [ ] changed-path planning = success
-- [ ] owning validator execution = success
-- [ ] changed paths -> owner `asset-intake` only
-- [ ] selected validator -> `asset-intake` only
-- [ ] manualReviews = []
-- [ ] `asset:intake:validate` = PASS
-- [ ] Skin rollout self-test = PASS
-- [ ] Stage 5 output reports `skinStage32ExecutionPathAdopted=true`
-- [ ] Stage 5 output reports `currentSkinAuthorityPromoted=false`
-- [ ] trackedBeforeCount = 0 in clean CI checkout
-- [ ] trackedAfterCount = 0
-- [ ] trackedMutationCount = 0
-- [ ] current Skin active source remains `READY_FOR_ASSET_EVIDENCE`
-- [ ] no semantic / Project Status / Status Source mutation
+- [x] Project Check workflow conclusion = success
+- [x] Project Check self-test = success
+- [x] changed-path planning = success
+- [x] owning validator execution = success
+- [x] changed paths -> owner `asset-intake` only
+- [x] selected validator -> `asset-intake` only
+- [x] manualReviews = []
+- [x] `asset:intake:validate` = PASS
+- [x] Skin rollout self-test = PASS
+- [x] Stage 5 output reports `skinStage32ExecutionPathAdopted=true`
+- [x] Stage 5 output reports `currentSkinAuthorityPromoted=false`
+- [x] trackedBeforeCount = 0 in clean CI checkout
+- [x] trackedAfterCount = 0
+- [x] trackedMutationCount = 0
+- [x] current Skin active source remains `READY_FOR_ASSET_EVIDENCE`
+- [x] no semantic / Project Status / Status Source mutation
 
 ## BLOCKER
 
-R2 rollout 자체는 CI proof 전까지 `PENDING_CI_PROOF`.
+R2 rollout blocker: 없음.
 
 현재 Skin domain의 실제 evidence blocker는 별도로 유지한다.
 
@@ -118,14 +194,20 @@ AUTHORITATIVE_UNITY_ASSET_ROOT_NOT_PRESENT_ON_CURRENT_MAIN
 
 ## REVIEW
 
-- 과거 work branch의 Stage 3-2 completion 및 Stage 3-3~3-5 evidence는 별도 reconciliation 후보다. current main authority가 아니므로 R2에서 승격하지 않는다.
+- 과거 work branch의 Stage 3-2 completion 및 Stage 3-3~3-5 evidence는 별도 reconciliation 후보다. current main authority가 아니므로 R2에서 승격하지 않았다.
 - Synthetic RESOLVED self-test는 runtime wiring proof일 뿐 project evidence가 아니다.
+- GitHub Actions의 actions/checkout/setup-node Node 20 deprecation warning은 R2 변경 영역이 아니며 현재 Project Check와 Asset Intake validator가 모두 PASS했으므로 non-blocking runner/action maintenance review다.
 
 ## 다음 시작점
 
-R2 PASS 후 Asset Intake 설치/실행/first-domain adoption은 완료된다.
+Asset Intake 설치/독립 실행/first-domain adoption은 완료됐다.
 
-다음 Skin domain 작업은 별도 scope에서 authoritative Unity asset root를 실제 제공하거나, historical work branch evidence를 current main으로 승격 가능한지 provenance/freshness를 재검증하는 것이다. 이때도 Stage 3-1 semantic/locator inventory는 새로운 authoritative contradiction이 없는 한 다시 계산하지 않는다.
+다음 Skin domain 작업은 별도 scope에서 다음 둘 중 authoritative evidence 경로를 확정하는 것이다.
+
+1. authoritative Unity asset root를 실제 제공해 current main frozen contract로 Stage 3-2 evidence를 생성한다.
+2. historical work branch evidence를 current main으로 승격 가능한지 provenance/freshness를 재검증한다.
+
+새로운 authoritative contradiction이 없는 한 Stage 3-1 semantic/locator inventory는 다시 계산하지 않는다.
 
 ## 다시 열리는 조건
 
@@ -136,3 +218,17 @@ R2 PASS 후 Asset Intake 설치/실행/first-domain adoption은 완료된다.
 - Project Check가 asset-intake owner/validator를 선택하지 못함
 - historical completion evidence가 current main authoritative source로 정식 승격됨
 - 새로운 authoritative evidence가 current readiness와 충돌함
+
+## 최종 판정
+
+```text
+ASSET_INTAKE_R2 = COMPLETE
+SKIN_STAGE3_2_EXECUTION_PATH = ADOPTED
+PROJECT_CHECK = PASS
+ASSET_INTAKE_VALIDATOR = PASS_24_OF_24
+TRACKED_MUTATION_COUNT = 0
+CURRENT_SKIN_AUTHORITY_PROMOTED = false
+SKIN_DOMAIN_STATUS = READY_FOR_ASSET_EVIDENCE
+R2_BLOCKER = none
+SKIN_DOMAIN_BLOCKER = AUTHORITATIVE_UNITY_ASSET_ROOT_NOT_PRESENT_ON_CURRENT_MAIN
+```
