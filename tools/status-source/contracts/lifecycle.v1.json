@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "schemaId": "status-source-lifecycle/v1",
+  "stage": "R1-5",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Bind explicit closeout requests to retained producer declarations and explicit compare-and-swap handoff without legacy Project Doctor registry, D5 freshness, or Project Status runtime dependencies.",
+  "bridgeContract": "tools/status-source/contracts/artifact-bridge.v1.json",
+  "policy": {
+    "handoff": {
+      "defaultMode": "CHECK",
+      "mutationRequiresExplicitApplyFlag": true,
+      "expectedPredecessorMustBeExplicit": true,
+      "candidateEntryIdMustBeExplicit": true,
+      "candidateSourceMustBeExplicit": true,
+      "compareAndSwapBeforePreview": true,
+      "compareAndSwapBeforeApply": true,
+      "candidateSourceMustBeCommittedAndClean": true,
+      "previewMustPassBeforeApply": true,
+      "applyDelegatesOnlyToR1_4Bridge": true,
+      "postApplySelectionMustEqualEntryId": true,
+      "r1_2OwnsPromotionRollback": true,
+      "d5FreshnessDependency": false,
+      "projectStatusDependency": false
+    },
+    "producerDeclaration": {
+      "state": "APPROVED_FOR_HANDOFF",
+      "declarationMustBeRetainedAndCommitted": true,
+      "pipelineMustBeExplicit": true,
+      "domainMustBeExplicit": true,
+      "producerIdMustBeExplicit": true,
+      "predecessorIdMustBeExplicit": true,
+      "entryIdMustBeExplicit": true,
+      "sourcePathMustBeExplicit": true,
+      "predecessorMustEqualCurrentR1_1SelectedId": true,
+      "candidateSourceMustBeCommittedAndClean": true,
+      "futureSuccessorRequiresExplicitDeclarationChange": true,
+      "authorityInference": false
+    },
+    "closeoutRequest": {
+      "state": "APPROVED_FOR_DECLARATION",
+      "requestMustBeRetainedAndCommitted": true,
+      "requestIsAuthorityDecision": true,
+      "declarationProjectionMustBeDeterministic": true,
+      "explicitWriteFlagRequired": true,
+      "writeMayOnlyTargetBoundDeclarationPath": true,
+      "predecessorMustEqualCurrentR1_1SelectedId": true,
+      "candidateSourceMustBeCommittedAndClean": true,
+      "producerDeclarationMustRevalidateProjection": true,
+      "promotionPerformed": false,
+      "filenameAuthorityInference": false,
+      "stageNumberAuthorityInference": false,
+      "chronologyAuthorityInference": false
+    },
+    "transport": {
+      "productionWriterActivation": "ACTIVE",
+      "productionWriterWorkflow": ".github/workflows/project-tooling-r1-status-source-writer.yml",
+      "legacyWriterWorkflow": ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+      "legacyWriterActive": false,
+      "allowedModes": [
+        "WORK_BRANCH_PUSH",
+        "EXPLICIT_NON_MAIN_DISPATCH"
+      ],
+      "mainAllowed": false,
+      "pullRequestAllowed": false,
+      "shadowWorkflowMutation": false
+    }
+  },
+  "pipelines": [
+    {
+      "pipelineId": "hero",
+      "domain": "hero",
+      "producerId": "hero-final",
+      "completionWorkflow": ".github/workflows/hero-stage6-4-site-consumer.yml",
+      "declarationPath": "tools/status-source/declarations/hero.v1.json",
+      "closeoutRequestPath": "tools/status-source/closeout-requests/hero.v1.json",
+      "handoffTransport": {
+        "mode": "EXPLICIT_NON_MAIN_DISPATCH",
+        "mainAllowed": false,
+        "pullRequestAllowed": false
+      }
+    },
+    {
+      "pipelineId": "soldier",
+      "domain": "soldier",
+      "producerId": "soldier-final",
+      "completionWorkflow": ".github/workflows/soldier-stage6-7-site-admission.yml",
+      "declarationPath": "tools/status-source/declarations/soldier.v1.json",
+      "closeoutRequestPath": "tools/status-source/closeout-requests/soldier.v1.json",
+      "handoffTransport": {
+        "mode": "EXPLICIT_NON_MAIN_DISPATCH",
+        "mainAllowed": false,
+        "pullRequestAllowed": false
+      }
+    }
+  ],
+  "boundaries": {
+    "legacyProjectDoctorRuntimeImports": 0,
+    "legacyGeneratedStatusDependencies": 0,
+    "legacyActiveRegistryDependencies": 0,
+    "d1RuntimeDependencies": 0,
+    "d2RuntimeDependencies": 0,
+    "d3RuntimeDependencies": 0,
+    "d4RuntimeDependencies": 0,
+    "d5RuntimeDependencies": 0,
+    "d7RuntimeDependencies": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "canonicalJoinRecomputationCount": 0,
+    "domainValidatorExecutionCount": 0,
+    "productionWriterWorkflowActivated": true
+  }
+}

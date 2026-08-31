@@ -1,0 +1,261 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-route-hosted-qa-rh1-boundary/v1",
+  "stage": "RH1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "ROUTE_HOSTED_QA_RH1_BOUNDARY_FROZEN",
+  "purpose": "Define the NEW independent Route/Hosted QA boundary as read-only HTTP hosting validation before R3 admission or clean-room runtime implementation. Preserve the verified QA-0/QA-1 meaning without making OLD Project Doctor runtime, workflows, package aliases, or deployment writers authoritative predecessors of the NEW tool.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pullRequest": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "headBeforeFreeze": "68444c3b0896dd282ef5d74f787ce568e15039c4",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "requiredCheckContexts": ["project-check"]
+  },
+  "predecessorEvidence": {
+    "rh0Checkpoint": {
+      "path": "data/contracts/project-tooling-project-check-route-hosted-qa-rh0-baseline.v1.json",
+      "blobSha": "eb4e95677312acb608c88b990c19b4a9aa98b680",
+      "requiredCompletion": "ROUTE_HOSTED_QA_RH0_BASELINE_FROZEN"
+    },
+    "qa0Contract": {
+      "path": "data/contracts/project-doctor-route-hosted-qa-stage0.v1.json",
+      "blobSha": "35ee4da968ec57b618341574219e9961ba34af15",
+      "role": "FROZEN_PREDECESSOR_EVIDENCE_ONLY"
+    },
+    "qa1Contract": {
+      "path": "data/contracts/project-doctor-route-hosted-qa-stage1.v1.json",
+      "blobSha": "e02b9c1da0a39b66f69f104cfb5d5c6e1d9c40e6",
+      "role": "FROZEN_PREDECESSOR_EVIDENCE_ONLY"
+    },
+    "oldRuntimeAuthority": false,
+    "oldWorkflowAuthority": false,
+    "oldPackageAliasAuthority": false,
+    "oldDeploymentWriterAuthority": false
+  },
+  "newToolIdentity": {
+    "namespace": "route-hosted-qa",
+    "plannedRoot": "tools/route-hosted-qa",
+    "role": "READ_ONLY_HTTP_HOSTED_VALIDATION",
+    "owningLayer": "HOSTING_DEPLOYMENT_PRESENTATION_VALIDATION",
+    "semanticAuthority": false,
+    "deploymentAuthority": false,
+    "browserUiAuthority": false,
+    "assetAuthority": false,
+    "frontendAuthority": false,
+    "writer": false,
+    "legacyProjectDoctorRuntimeDependency": false
+  },
+  "frozenValidationMeaning": {
+    "hostedTarget": {
+      "origin": "https://luceatluxvestra42.github.io",
+      "repositoryBase": "/langrisser-future-guide/",
+      "baseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+      "canonicalDirectoryStyle": "TRAILING_SLASH"
+    },
+    "requiredPublicRoutes": [
+      "/",
+      "/banners",
+      "/equipment",
+      "/equipment/exclusive",
+      "/heroes",
+      "/soldiers"
+    ],
+    "requiredDetailRoutePatterns": [
+      "/equipment/$equipmentId",
+      "/heroes/$heroId",
+      "/soldiers/$soldierId"
+    ],
+    "representativeFixtures": {
+      "hero": [6],
+      "soldier": [300, 1000, 102, 5621],
+      "equipment": [13]
+    },
+    "negativeFixture": {
+      "id": 999999999,
+      "expectedStatus": 404
+    },
+    "hostedCheckIds": [
+      "DEPLOYED_COMMIT_FRESHNESS",
+      "REPOSITORY_BASE_PATH",
+      "PUBLIC_ROUTE_RESOLUTION",
+      "DETAIL_DIRECT_ENTRY",
+      "REFRESH_EQUIVALENT_GET",
+      "TRAILING_SLASH_POLICY",
+      "ASSET_AND_CHUNK_RESOLUTION",
+      "FILENAME_CASE_SENSITIVITY",
+      "ROUTE_TREE_HOSTED_PARITY",
+      "STALE_DEPLOY_OR_CACHE"
+    ],
+    "assetPolicy": {
+      "sameOriginOnly": true,
+      "repositoryBaseRequired": true,
+      "maxAssetRequests": 60,
+      "prioritize": [
+        "script",
+        "stylesheet",
+        "modulepreload",
+        "preload",
+        "icon",
+        "representative-image"
+      ],
+      "noCrossRootFallback": true,
+      "noFilenameSimilarity": true,
+      "noCaseInsensitiveRepair": true
+    },
+    "failureBoundary": {
+      "hosted": "DEPLOYMENT_HOSTING_FAIL",
+      "browser": "BROWSER_UI_FAIL",
+      "semanticReopenAllowed": false
+    }
+  },
+  "runtimeBoundary": {
+    "minimumNodeMajor": 22,
+    "httpMethod": "GET",
+    "redirectPolicy": "FOLLOW_FOR_CANONICAL_RESOLUTION",
+    "cachePolicy": "NO_STORE_PLUS_UNIQUE_QUERY",
+    "requestTimeoutMs": 15000,
+    "browserLaunchAllowed": false,
+    "playwrightDependencyAllowed": false,
+    "repositoryMutationAllowed": false,
+    "deploymentMutationAllowed": false,
+    "ghPagesMutationAllowed": false,
+    "shellCommandSynthesisAllowed": false,
+    "runtimeTrackedOutputMutationAllowed": false,
+    "networkAllowlist": [
+      "https://luceatluxvestra42.github.io",
+      "https://api.github.com/repos/LuceatLuxVestra42/langrisser-future-guide/branches/gh-pages"
+    ]
+  },
+  "executionModes": {
+    "STRICT_CANDIDATE": {
+      "expectedSourceShaRequired": true,
+      "expectedSourceShaMustBeExplicitCallerInput": true,
+      "deployedSourceShaSource": "GH_PAGES_COMMIT_MESSAGE_TRAILING_40_HEX",
+      "passRequirement": "The deployed source SHA must equal the explicit expected source SHA and all ten hosted checks must pass.",
+      "candidateFreshnessClaim": true
+    },
+    "PROBE_CURRENT_DEPLOYED": {
+      "expectedSourceShaRequired": false,
+      "deployedSourceShaSource": "GH_PAGES_COMMIT_MESSAGE_TRAILING_40_HEX",
+      "passRequirement": "All ten hosted checks must pass against the currently deployed source.",
+      "candidateFreshnessClaim": false,
+      "mustNotBeUpgradedToStrictCandidateProof": true
+    }
+  },
+  "resultBoundary": {
+    "aggregateResult": "PASS_OR_FAIL_FROM_EXPLICIT_HOSTED_CHECK_RESULTS_ONLY",
+    "perCheckEvidenceRequired": true,
+    "validatorFailureMustRemainFailure": true,
+    "hostedFailureClassification": "DEPLOYMENT_HOSTING_FAIL",
+    "browserFailureClassification": "BROWSER_UI_FAIL",
+    "semanticFailureClassificationOwnedHere": false,
+    "invalidInvocationMustFail": true,
+    "probeCurrentMayPassWhileCandidateFreshnessIsUnproven": true,
+    "runnerMustNotReinterpretSemanticMeaning": true
+  },
+  "artifactPolicy": {
+    "defaultRuntimeSummary": "CI_ARTIFACT_OR_TEMPORARY_OUTPUT_ONLY",
+    "trackedValidationWriteByDefault": false,
+    "trackedCheckpointWriteByRuntime": false,
+    "historicalFrozenEvidencePreserved": true,
+    "explicitFreezeStageMayCreateTrackedCheckpoint": true
+  },
+  "forbiddenDependenciesAndInference": {
+    "oldProjectDoctorRuntime": true,
+    "oldProjectDoctorRegistry": true,
+    "oldProjectDoctorD2D3D4D5D7": true,
+    "rawConfigDataSemanticInference": true,
+    "nameJoin": true,
+    "idArithmetic": true,
+    "filenameSimilarityRepair": true,
+    "caseInsensitiveAssetRepair": true,
+    "historicalOutputSilentFallback": true,
+    "completedRelationRecalculation": true
+  },
+  "forbiddenWrites": [
+    "gh-pages",
+    "data/status-sources/**",
+    "data/generated/project-status.v1.json",
+    "PROJECT_STATUS.md",
+    "data/configdata/**",
+    "data/hero-*",
+    "data/soldier-*",
+    "data/equipment*",
+    "data/generated/hero-*",
+    "data/generated/soldier-*",
+    "data/generated/equipment-*",
+    "data/generated/banner-*",
+    "data/generated/skin-*",
+    "public/images/**",
+    "src/**"
+  ],
+  "migrationRole": {
+    "oldAutomaticStage1Workflow": "COMPARATOR_ONLY_UNTIL_NEW_SHADOW_AND_CUTOVER",
+    "oldHostedProofWorkflow": "HISTORICAL_STRICT_PROOF_AND_LEGACY_DEPLOYMENT_WRITER_ONLY",
+    "oldPackageAliases": "UNCHANGED_UNTIL_CUTOVER",
+    "oldRuntimeScripts": "UNCHANGED_UNTIL_NEW_PARITY",
+    "dualOperationalWritersAllowed": false,
+    "newToolMayDeploy": false,
+    "newToolMayForcePushGhPages": false,
+    "browserUiDeferred": true
+  },
+  "rh2AdmissionRequirements": {
+    "plannedOwnerId": "route-hosted-qa",
+    "newPathsMustBeExplicitlyAdmittedBeforeCreation": true,
+    "representativeNewPathMustNotResolveToManualReview": true,
+    "projectCheckSelfTestMustProveRouting": true,
+    "requiredProjectCheckMustPass": true,
+    "implementationMustNotStartBeforeAdmission": true,
+    "plannedPathFamilies": [
+      "tools/route-hosted-qa/**",
+      "data/contracts/project-tooling-route-hosted-qa-*.json",
+      ".github/workflows/project-tooling-route-hosted-qa.yml"
+    ]
+  },
+  "nonScope": [
+    "No tools/route-hosted-qa runtime, contract package, CLI, library, fixture, or self-test is created in RH1.",
+    "No route-hosted-qa owner, path rule, or validator is added to R3 in RH1.",
+    "No OLD Route/Hosted QA script, workflow, contract, validation artifact, generated checkpoint, or package alias is changed or retired in RH1.",
+    "No GitHub Pages deployment, gh-pages mutation, or force-push is performed in RH1.",
+    "No Playwright, browser launch, Browser/UI interaction test, screenshot, or visual assertion is added in RH1.",
+    "No semantic, canonical, ConfigData, relation, localization, asset mapping, frontend, Status Source, or Project Status state is changed in RH1.",
+    "No Regression Runner scope expansion or RR9 proof classification is performed in RH1."
+  ],
+  "completionGate": {
+    "rh0PredecessorConfirmed": true,
+    "oldQaContractsUsedAsEvidenceOnly": true,
+    "newReadOnlyHttpRoleDefined": true,
+    "strictAndProbeModesSeparated": true,
+    "tenHostedChecksPreserved": true,
+    "hostedBrowserSemanticBoundariesSeparated": true,
+    "deploymentWriterRoleExcluded": true,
+    "oldDoctorRuntimeDependencyExcluded": true,
+    "runtimeTrackedWritesExcluded": true,
+    "rh2AdmissionRequiredBeforeImplementation": true,
+    "newImplementationStarted": false,
+    "r3AdmissionApplied": false,
+    "semanticReopen": false,
+    "rh1BoundaryFreezeReady": true
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_HOSTED_PROOF_DEPLOYMENT_WRITER_PRESENT",
+      "blocking": false,
+      "classification": "DEPLOYMENT_WRITER_REVIEW",
+      "detail": "The OLD strict hosted-proof workflow still has a historical deployment-writer role. RH1 explicitly excludes that role from the NEW tool; retirement remains a later cutover/closeout task."
+    }
+  ],
+  "nextStart": "RH2: explicitly admit the NEW route-hosted-qa owner and path families into R3, update Project Check self-test fixtures to prove deterministic routing without MANUAL_REVIEW, and pass required project-check before any tools/route-hosted-qa implementation is created.",
+  "reopenConditions": [
+    "RH0 predecessor evidence changes or no longer satisfies its completion gate.",
+    "The authoritative hosted target, repository base, public route set, detail route patterns, representative fixtures, negative fixture, or hosted check IDs change.",
+    "The deployment source-SHA strategy changes from the currently frozen gh-pages commit-message convention.",
+    "Hosted, Browser/UI, and semantic failure ownership boundaries change.",
+    "NEW Route/Hosted QA is required to mutate deployment state, repository state, semantic data, or frontend state.",
+    "Authoritative evidence shows current frozen Hosted QA behavior cannot be reproduced without an OLD Project Doctor runtime dependency."
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-route-hosted-qa-rh4-workflow-integration/v1",
+  "stage": "RH4",
+  "status": "PASS_WITH_BLOCKER",
+  "completion": "ROUTE_HOSTED_QA_RH4_WORKFLOW_INTEGRATION_CHECKPOINTED",
+  "purpose": "Checkpoint the NEW Route/Hosted QA workflow integration after pull-request probe execution and required Project Check success, while recording the legitimate lifecycle prerequisite that blocks strict-candidate proof until the workflow exists on the default branch and the exact source SHA under test is actually deployed to GitHub Pages.",
+  "predecessors": {
+    "rh3Implementation": "data/contracts/project-tooling-route-hosted-qa-rh3-implementation.v1.json",
+    "rh3Completion": "ROUTE_HOSTED_QA_RH3_IMPLEMENTATION_FROZEN"
+  },
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pullRequest": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "headBeforeRh4Checkpoint": "e4a886605cbd360a2578dc743c513ef1f0abd06d",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "deployedPagesBranchHead": "3d1b4c42beb6b15d81edb6daf7e08186c7ae80e7",
+    "deployedSourceSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "workflow": ".github/workflows/project-tooling-route-hosted-qa.yml",
+    "defaultBranchWorkflowPresent": false,
+    "requiredCheckContexts": ["project-check"]
+  },
+  "workflowIntegration": {
+    "workflowAddedCommit": "09261f37b11358708f07a05051afef35c427315e",
+    "pullRequestProbeCommit": "e4a886605cbd360a2578dc743c513ef1f0abd06d",
+    "workflowDispatchModes": ["probe-current", "strict-candidate"],
+    "pullRequestMode": "probe-current",
+    "strictRequiresExplicitExpectedSha": true,
+    "strictExpectedShaFormat": "40_HEX",
+    "repositoryMutation": false,
+    "deploymentMutation": false,
+    "browserLaunch": false,
+    "playwrightDependency": false,
+    "semanticAuthority": false,
+    "frontendAuthority": false,
+    "assetAuthority": false
+  },
+  "candidateValidation": {
+    "head": "e4a886605cbd360a2578dc743c513ef1f0abd06d",
+    "routeHostedQaProbe": {
+      "runId": 33377419578,
+      "jobId": 99441919610,
+      "conclusion": "success",
+      "rh3RuntimeSelfTest": "PASS",
+      "probeCurrentDeployed": "PASS",
+      "strictCandidate": "SKIPPED_ON_PULL_REQUEST"
+    },
+    "projectCheck": {
+      "runId": 33377419727,
+      "jobId": 99441920831,
+      "conclusion": "success",
+      "setupBun": "PASS",
+      "frozenDependencyInstall": "PASS",
+      "projectCheckSelfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS"
+    }
+  },
+  "completionGate": {
+    "rh3PredecessorPreserved": true,
+    "workflowInstalledOnCandidateBranch": true,
+    "pullRequestProbeTriggerInstalled": true,
+    "probeCurrentPass": true,
+    "candidateProjectCheckPass": true,
+    "strictInputValidationInstalled": true,
+    "strictCandidateProofPass": false,
+    "rh4FreezeReady": false,
+    "semanticReopen": false,
+    "deploymentMutationIntroduced": false
+  },
+  "blockers": [
+    {
+      "id": "RH4_STRICT_CANDIDATE_DEFAULT_BRANCH_AND_DEPLOYMENT_PREREQUISITE",
+      "blocking": true,
+      "classification": "HOSTED_DEPLOYMENT_LIFECYCLE_PREREQUISITE",
+      "detail": "The RH4 workflow exists only on the PR branch while main remains at 6356710de7965c5d94c8bbf8a44c41593bd989f1. GitHub Pages currently reports the same main source SHA as the authoritative deployed source. A legitimate strict-candidate proof therefore requires the workflow to exist on the default branch and an exact source SHA to be actually deployed before dispatch. Do not manufacture freshness by passing an undeployed PR head, mutating gh-pages from this checkpoint task, or weakening the strict freshness contract."
+    }
+  ],
+  "reviews": [
+    {
+      "id": "BROWSER_UI_REMAINS_SEPARATE",
+      "blocking": false,
+      "classification": "SEPARATE_VALIDATION_LAYER",
+      "detail": "RH4 remains HTTP Hosted validation. Browser/Playwright interaction remains a separate Browser/UI stage and is not required for this checkpoint."
+    }
+  ],
+  "nonScope": [
+    "No merge to main, pull-request readiness change, or branch-protection mutation is performed by this checkpoint.",
+    "No GitHub Pages deployment, gh-pages write, force-push, repository writer, Status Source writer, or Project Status writer is introduced.",
+    "No semantic, canonical, relation, ConfigData, localization, frontend, asset, or Browser/UI authority is reopened.",
+    "No strict freshness check is bypassed or converted to a false PASS."
+  ],
+  "nextStart": "After the RH4 workflow legitimately exists on the default branch and GitHub Pages has deployed an exact source SHA from that integrated state, re-read main and gh-pages, dispatch strict-candidate with that exact deployed source SHA, require all Hosted checks to PASS, then create the RH4 freeze checkpoint and validate the freeze head with required project-check.",
+  "reopenConditions": [
+    "The RH3 predecessor no longer satisfies its frozen completion requirements.",
+    "The RH4 workflow dispatch modes, strict expected-SHA contract, pull-request probe behavior, hosted target, or source-SHA strategy changes.",
+    "Authoritative main or gh-pages state changes so the strict-candidate lifecycle prerequisite is satisfied.",
+    "A current-branch-only Project Check or Route/Hosted QA probe failure is causally owned by RH4 integration or this checkpoint path.",
+    "Hosted, Browser/UI, semantic, frontend, asset, deployment-writer, or repository-writer ownership boundaries change."
+  ]
+}

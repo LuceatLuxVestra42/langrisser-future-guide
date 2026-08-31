@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "schemaId": "regression-runner-profiles/v1",
+  "stage": "RR3",
+  "status": "DESIGN_FROZEN",
+  "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
+  "purpose": "Select exact R3 validator identities for read-only regression orchestration. Profiles carry validator IDs only; executable and argv authority remains exclusively in the R3 validator catalog.",
+  "policy": {
+    "profileCarriesExecutableOrArgs": false,
+    "unknownValidatorId": "BLOCKER",
+    "duplicateValidatorId": "BLOCKER",
+    "sortByPhaseThenId": true,
+    "preflightEntireQueueBeforeExecution": true,
+    "failFastOnFirstNonZero": true,
+    "shellExecution": false,
+    "trackedMutationByRunnerOrValidator": "BLOCKER",
+    "automaticCoverageExpansion": false,
+    "legacyProjectDoctorRuntimeAllowed": false,
+    "legacyRegressionAdmissionAuditReimplemented": false,
+    "outputPersistenceDefault": "EPHEMERAL_OR_CI_ARTIFACT"
+  },
+  "profiles": [
+    {
+      "id": "core-regression-v1",
+      "scope": "Exact clean-room replacement scope for the nine RR0/RR1 current owning-validator steps.",
+      "validatorIds": [
+        "hero-canonical",
+        "soldier-canonical",
+        "equipment-canonical",
+        "hero-soldier-relation",
+        "hero-equipment-relation",
+        "banner-data",
+        "skin-relation",
+        "shared-movement",
+        "soldier-assets"
+      ]
+    }
+  ],
+  "excludedFromInitialProfile": [
+    "asset-intake",
+    "localization-audit",
+    "production-build",
+    "configdata-integrity"
+  ]
+}

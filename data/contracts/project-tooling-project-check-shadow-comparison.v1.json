@@ -1,0 +1,231 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-shadow-comparison/v1",
+  "stage": "SHADOW_COMPARISON",
+  "checkpoint": "PROJECT_TOOLING_OLD_NEW_SHADOW_COMPARISON",
+  "status": "PASS",
+  "completion": "SHADOW_COMPARISON_COMPLETE",
+  "purpose": "Compare OLD Project Doctor and NEW Project Check behavior before required-check cutover without making OLD a predecessor or expanding OLD routing.",
+  "predecessor": {
+    "checkpoint": "PROJECT_TOOLING_PROJECT_CHECK_R3",
+    "contract": "data/contracts/project-tooling-project-check-r3.v1.json",
+    "requiredStatus": "PASS",
+    "requiredCompletion": "R3_PROJECT_CHECK_COMPLETE"
+  },
+  "baseline": {
+    "mainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "legacyRequiredCheck": "pr-guard",
+    "legacyRole": "OBSERVE_AND_COMPARE_ONLY"
+  },
+  "implementation": {
+    "comparisonScript": "tools/project-check/shadow/compare-old-new.mjs",
+    "workflow": ".github/workflows/project-tooling-r3-project-check.yml",
+    "implementationHead": "2637f0ad7879158f861b364cd555dcb8d5905960",
+    "validatedHead": "d5a0a5b0ed209d5bf492b623fdcf2c5b85cccc88",
+    "validatedMergeResult": "52d417fc1a7e0c6676890566e5fe2b51c37ac5d0"
+  },
+  "comparisonPolicy": {
+    "resultParityNotImplementationParity": true,
+    "oldExtraPropagationChecksMayDiffer": true,
+    "oldDirectOwningNodeMustMatchRepresentativeOwningScope": true,
+    "newIndependentOwningValidatorMustMatchRepresentativeOwningScope": true,
+    "migrationOnlyOldManualReviewMayBeExpectedMismatchOnlyUnderStrictR0Policy": true,
+    "oldPlannerInvokedAsSeparateObservationProcess": true,
+    "oldPlannerImportedIntoNewRuntime": false,
+    "oldContractMutationAllowed": false,
+    "oldRoutingExpansionAllowed": false,
+    "requiredCheckCutoverAllowed": false
+  },
+  "validationEvidence": {
+    "newShadowWorkflow": {
+      "runId": 33344691216,
+      "jobId": 99346477939,
+      "headSha": "d5a0a5b0ed209d5bf492b623fdcf2c5b85cccc88",
+      "mergeResultSha": "52d417fc1a7e0c6676890566e5fe2b51c37ac5d0",
+      "conclusion": "success",
+      "r3SelfTest": "PASS",
+      "fullDiffPlan": "PASS",
+      "owningValidatorExecution": "PASS",
+      "oldNewComparison": "PASS"
+    },
+    "migrationOnly": {
+      "changedFileCount": 49,
+      "new": {
+        "status": "PASS",
+        "exitCode": 0,
+        "owners": ["project-check", "project-status", "status-source"],
+        "validatorCount": 7,
+        "validators": [
+          "status-source-artifact-bridge",
+          "status-source-lifecycle",
+          "status-source-producer-gate",
+          "status-source-promotion",
+          "status-source-selection",
+          "project-status-parity",
+          "project-check-self-test"
+        ],
+        "manualReviewCount": 0,
+        "allSelectedValidatorExitCodesZero": true
+      },
+      "old": {
+        "status": "MANUAL_REVIEW",
+        "exitCode": 3,
+        "selectedCheckCount": 0,
+        "manualReviewCount": 49
+      },
+      "classification": "EXPECTED_LEGACY_DOCTOR_MISMATCH"
+    },
+    "strictLegacyMismatchCurrentHead": {
+      "runId": 33344691141,
+      "jobId": 99346485352,
+      "headSha": "d5a0a5b0ed209d5bf492b623fdcf2c5b85cccc88",
+      "conclusion": "failure",
+      "d7Guard": "PASS",
+      "d7FailureCount": 0,
+      "d5FreshnessBeforeD1": "FRESH",
+      "d1ActiveRegistry": "PASS",
+      "d1Collector": "PASS",
+      "d1HealthGate": "PASS",
+      "d1DeterministicDiff": "PASS",
+      "d5FreshnessAfterD1": "FRESH",
+      "projectHardErrors": 0,
+      "dryRun": {
+        "planStatus": "MANUAL_REVIEW",
+        "changedFileCount": 49,
+        "runStatus": "PASS_DRY_RUN",
+        "checksQueued": 0,
+        "checksRun": 0,
+        "manualReviewCount": 49
+      },
+      "execution": {
+        "planStatus": "MANUAL_REVIEW",
+        "runStatus": "REVIEW_MANUAL",
+        "checksQueued": 0,
+        "checksRun": 0,
+        "manualReviewCount": 49,
+        "exitCode": 3
+      },
+      "strictR0ConditionsMet": true,
+      "classification": "EXPECTED_LEGACY_DOCTOR_MISMATCH"
+    },
+    "admittedFixtures": [
+      {
+        "id": "HERO_CANONICAL",
+        "path": "data/validation/hero-stage6-4-final.v1.json",
+        "newOwners": ["hero-canonical"],
+        "newValidators": ["hero-canonical"],
+        "oldDirectNodes": ["hero-canonical"],
+        "oldOwningChecks": ["coverage-hero-canonical"],
+        "oldAdditionalChecksObserved": ["coverage-hero-soldier-relation", "localization-audit", "production-build"],
+        "result": "PASS"
+      },
+      {
+        "id": "HERO_SOLDIER_RELATION",
+        "path": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+        "newOwners": ["hero-soldier-relation"],
+        "newValidators": ["hero-soldier-relation"],
+        "oldDirectNodes": ["hero-soldier-relation"],
+        "oldOwningChecks": ["coverage-hero-soldier-relation"],
+        "oldAdditionalChecksObserved": ["production-build"],
+        "result": "PASS"
+      },
+      {
+        "id": "HERO_ASSET",
+        "path": "public/images/heroes/cards/6.png",
+        "newOwners": ["hero-assets", "hero-frontend"],
+        "newValidators": ["hero-assets", "production-build"],
+        "oldDirectNodes": ["hero-assets"],
+        "oldOwningChecks": ["hero-artwork-final", "production-build"],
+        "oldAdditionalChecksObserved": [],
+        "result": "PASS"
+      },
+      {
+        "id": "EQUIPMENT_FRONTEND",
+        "path": "src/routes/equipment.tsx",
+        "newOwners": ["equipment-frontend"],
+        "newValidators": ["production-build"],
+        "oldDirectNodes": ["equipment-frontend"],
+        "oldOwningChecks": ["production-build"],
+        "oldAdditionalChecksObserved": ["localization-audit"],
+        "result": "PASS"
+      }
+    ],
+    "manualFixtures": [
+      {
+        "id": "BANNER_ASSET_MANUAL",
+        "newOwners": ["banner-assets", "banner-frontend"],
+        "newValidators": ["production-build"],
+        "newManualReviewCount": 1,
+        "oldDirectNodes": ["banner-assets"],
+        "oldChecks": ["production-build"],
+        "oldManualReviewCount": 1,
+        "result": "PASS"
+      },
+      {
+        "id": "SKIN_ASSET_MANUAL",
+        "newOwners": ["skin-assets"],
+        "newValidators": [],
+        "newManualReviewCount": 1,
+        "oldDirectNodes": ["skin-assets"],
+        "oldChecks": [],
+        "oldManualReviewCount": 1,
+        "result": "PASS"
+      },
+      {
+        "id": "UNMATCHED_PATH",
+        "newOwners": [],
+        "newValidators": [],
+        "newManualReviewCount": 1,
+        "oldDirectNodes": [],
+        "oldChecks": [],
+        "oldManualReviewCount": 1,
+        "result": "PASS"
+      }
+    ],
+    "validatorFailureFixture": {
+      "owner": "hero-canonical",
+      "syntheticValidatorExitCode": 41,
+      "newStatus": "BLOCKER",
+      "newExitCode": 2,
+      "failedValidatorId": "hero-canonical",
+      "result": "PASS"
+    }
+  },
+  "boundaries": {
+    "legacyProjectDoctorRuntimeImportIntoNewProjectCheck": 0,
+    "legacyD2D3D4D5D7PredecessorCount": 0,
+    "legacyContractMutationCount": 0,
+    "legacyRoutingExpansionCount": 0,
+    "statusSourceMutationCount": 0,
+    "projectStatusWriteCount": 0,
+    "requiredCheckChangeCount": 0,
+    "statusSourceWriterActivated": false,
+    "projectStatusWriterActivated": false
+  },
+  "completionGate": {
+    "comparisonScriptImplemented": true,
+    "workflowWired": true,
+    "migrationOnlyStrictMismatchEvidenceAvailable": true,
+    "strictLegacyMismatchCurrentHeadProven": true,
+    "admittedFixtureComparisonPass": true,
+    "manualBoundaryComparisonPass": true,
+    "validatorFailureAggregationPass": true,
+    "shadowCiPass": true,
+    "readyForCutoverPreparation": true
+  },
+  "blockers": [],
+  "cutoverBlockers": ["LEGACY_REQUIRED_PR_GUARD_STILL_ACTIVE"],
+  "reviews": [
+    "OLD extra checks caused by historical propagation are comparison context only; NEW intentionally does not inherit those fan-out chains.",
+    "OLD Project Doctor remains observe-and-compare-only until required-check cutover; it is not a predecessor of NEW Project Check.",
+    "NEW Status Source and Project Status writer ownership remains deferred to cutover to avoid dual writers."
+  ],
+  "nextStartPoint": "Required-check cutover preparation: freeze the NEW required check context and rollback plan, verify a passing NEW Project Check context on the current migration lineage, then switch branch protection from legacy pr-guard to the NEW Project Check only in the dedicated cutover step. Keep Status Source and Project Status writer ownership changes separate from the required-check switch.",
+  "reopenConditions": [
+    "R3 Project Check owner or validator contract changes",
+    "main or migration diff gains a non-migration path",
+    "OLD D7/D5/D1 integrity no longer passes while OLD is still used for comparison",
+    "NEW selected independent validator fails",
+    "representative owning-scope comparison reveals a concrete routing mismatch"
+  ]
+}

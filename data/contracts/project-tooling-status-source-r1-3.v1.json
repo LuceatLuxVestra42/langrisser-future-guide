@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-status-source-r1-3/v1",
+  "stage": "R1-3",
+  "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_3_PRODUCER_GATE",
+  "status": "PASS",
+  "completion": "R1_3_PRODUCER_GATE_COMPLETE",
+  "purpose": "Replace the legacy Project Doctor producer submit gate with an independent Status Source gate that validates explicit producer/domain/source ownership and delegates all promotion behavior to the completed R1-2 promotion implementation.",
+  "predecessor": {
+    "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_2_PROMOTION",
+    "status": "PASS",
+    "completion": "R1_2_PROMOTION_COMPLETE",
+    "contract": "data/contracts/project-tooling-status-source-r1-2.v1.json"
+  },
+  "authoritativeReference": {
+    "legacyContract": "data/contracts/project-doctor-status-source-producers.v1.json",
+    "legacyContractGitBlobSha": "9e45a8cd5079234604ce6ad85f81bfd14f04a8fa",
+    "legacySubmitScript": "scripts/submit-project-doctor-status-source.mjs",
+    "legacySubmitScriptGitBlobSha": "a0d545fcc10772cfa07b1b24802c9f12e75d79b5",
+    "referenceUseOnly": true,
+    "runtimeDependency": false
+  },
+  "implementation": {
+    "implementationCommit": "a94fa7e52b14a3bdd328ddbc585b034072245df2",
+    "producerContract": "tools/status-source/contracts/producer-gate.v1.json",
+    "producerLibrary": "tools/status-source/lib/submit-status-source.mjs",
+    "cli": "tools/status-source/cli/submit.mjs",
+    "selfTest": "tools/status-source/test/producer-gate-parity.mjs",
+    "delegatedPromotionLibrary": "tools/status-source/lib/promote-status-source.mjs",
+    "shadowWorkflow": ".github/workflows/project-tooling-r1-status-source.yml"
+  },
+  "currentProducerRegistry": {
+    "producerCount": 6,
+    "enabledProducerCount": 6,
+    "producerByDomain": {
+      "hero": "hero-final",
+      "soldier": "soldier-final",
+      "equipment": "equipment-final",
+      "hero-soldier": "hero-soldier-final",
+      "banner": "banner-final",
+      "skin": "skin-final"
+    }
+  },
+  "policy": {
+    "producerMustBeRegistered": true,
+    "producerMustBeEnabled": true,
+    "producerDomainIsAuthoritative": true,
+    "sourcePathMustMatchProducerOutputFamily": true,
+    "sourceMustAlreadyExistBeforeDelegation": true,
+    "entryIdMustBeExplicit": true,
+    "defaultMode": "CHECK",
+    "mutationRequiresExplicitApplyFlag": true,
+    "allPromotionBehaviorDelegatesToR1_2": true,
+    "producerCannotBypassAdmission": true,
+    "producerCannotBypassPromotionCompatibility": true,
+    "producerDoesNotInferEntryId": true,
+    "producerDoesNotInferAuthorityFromFilename": true,
+    "producerDoesNotInferAuthorityFromChronology": true
+  },
+  "ownershipBoundary": {
+    "producerGateOwns": [
+      "producer registration",
+      "enabled state",
+      "producer domain authority",
+      "producer output-family path constraint",
+      "explicit entry id requirement",
+      "existing source requirement"
+    ],
+    "r1_2PromotionOwns": [
+      "active predecessor selection",
+      "admission inheritance or explicit override",
+      "projection compatibility",
+      "candidate selection preflight",
+      "check/apply mode",
+      "status-source declaration write",
+      "post-write verification",
+      "rollback"
+    ],
+    "producerGateDoesNotOwn": [
+      "domain validation execution",
+      "semantic recomputation",
+      "canonical join recomputation",
+      "Project Status normalization",
+      "legacy Doctor routing or freshness"
+    ]
+  },
+  "independenceBoundary": {
+    "legacyProjectDoctorRuntimeImports": 0,
+    "legacyGeneratedStatusDependencies": 0,
+    "d1RuntimeDependencies": 0,
+    "d2RuntimeDependencies": 0,
+    "d3RuntimeDependencies": 0,
+    "d4RuntimeDependencies": 0,
+    "d5RuntimeDependencies": 0,
+    "d7RuntimeDependencies": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "canonicalJoinRecomputationCount": 0,
+    "domainValidatorExecutionCount": 0,
+    "legacyStateMutationCount": 0
+  },
+  "selfTestCoverage": [
+    "all six registered producers are enabled and map one-to-one to the six current domains",
+    "all six current selected source paths match their producer output family",
+    "current Equipment producer delegates to R1-2 in CHECK mode with zero writes and preserves 390/365/198/167",
+    "producer domain override is blocked",
+    "unregistered producer is blocked",
+    "disabled producer is blocked",
+    "wrong source family is blocked",
+    "missing source is blocked",
+    "missing explicit entry id is blocked",
+    "synthetic CHECK delegates with zero writes",
+    "synthetic explicit APPLY delegates and writes exactly one promotion declaration",
+    "legacy runtime dependency scan remains zero"
+  ],
+  "validationEvidence": {
+    "shadowWorkflow": {
+      "runId": 33342644467,
+      "jobId": 99340941962,
+      "headSha": "a94fa7e52b14a3bdd328ddbc585b034072245df2",
+      "conclusion": "success",
+      "selectionParityAndIsolationSelfTest": "PASS",
+      "promotionParityAndRollbackSelfTest": "PASS",
+      "producerGateParityAndDelegationSelfTest": "PASS",
+      "selectedSourceCli": "PASS",
+      "activeEquipmentPromotionCheckCli": "PASS",
+      "activeEquipmentProducerSubmitCheckCli": "PASS"
+    },
+    "currentProducerParity": {
+      "registered": 6,
+      "enabled": 6,
+      "currentSelectedSourceFamiliesAccepted": 6,
+      "equipmentProjectionSubset": {
+        "canonical": 390,
+        "public": 365,
+        "general": 198,
+        "exclusive": 167
+      }
+    },
+    "mutationProof": {
+      "currentEquipmentCheckDeclarationWrites": 0,
+      "syntheticCheckDeclarationWrites": 0,
+      "syntheticApplyDeclarationWrites": 1,
+      "legacyRuntimeDependencies": 0,
+      "rawConfigDataReads": 0,
+      "semanticRecomputations": 0
+    }
+  },
+  "completionGate": {
+    "producerContractImplemented": true,
+    "producerLibraryImplemented": true,
+    "producerCliImplemented": true,
+    "producerRegistryParityImplemented": true,
+    "delegationToR1_2Implemented": true,
+    "checkDefaultImplemented": true,
+    "explicitApplyDelegationImplemented": true,
+    "selfTestImplemented": true,
+    "shadowWorkflowUpdated": true,
+    "shadowCiPass": true,
+    "currentProducerRegistryParity": true,
+    "currentSelectedSourceFamilyParity": true,
+    "legacyRuntimeDependencyCountZero": true
+  },
+  "blockers": [],
+  "reviews": [
+    "R1-4 artifact bridge and later handoff/declaration/closeout behavior remain legacy-only and are outside this checkpoint.",
+    "Legacy required pr-guard remains a CUTOVER_ONLY blocker and must not be repaired by admitting migration paths into legacy D2-D7."
+  ],
+  "nextStartPoint": "R1-4: migrate the artifact bridge so domain completion pipelines can submit through the completed R1-3 producer gate. Keep it check-only by default and do not execute or infer domain validators inside the bridge.",
+  "reopenConditions": [
+    "R1-2 promotion behavior changes",
+    "the producer registry changes authoritatively",
+    "producer output-family rules change authoritatively",
+    "a current selected source no longer fits its registered producer family",
+    "new authoritative evidence contradicts the R1-3 producer ownership or delegation parity"
+  ]
+}

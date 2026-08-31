@@ -1,12 +1,12 @@
 # Project Status
 
-> 자동 생성 파일. `data/generated/project-doctor-d1-1-status.v1.json`을 경량 투영하며 canonical 의미를 재계산하지 않는다.
+> NEW Status Source authority를 read-only로 정규화/투영한 canonical Project Status 결과다. raw ConfigData나 canonical relation 의미를 재계산하지 않는다.
 
 - Project health: **REVIEW**
 - Hard errors: **0**
 - Reviews: **29**
 - Blockers: **1**
-- Source: `data/generated/project-doctor-d1-1-status.v1.json`
+- Source: `tools/project-status/lib/normalize-project-status.mjs`
 
 | Domain | Lifecycle | Health | Status | Population | Active source | Next work |
 |---|---|---|---|---|---|---|
@@ -19,8 +19,9 @@
 
 ## 운용 경계
 
-- 이 파일은 Project Doctor D1 상태의 파생 뷰다.
+- source authority는 NEW Status Source selection만 따른다.
+- OLD Project Doctor D1/D5/generated registry를 runtime predecessor로 사용하지 않는다.
 - raw ConfigData를 직접 읽지 않는다.
 - canonical relation, identity, JOIN 의미를 재계산하지 않는다.
-- 상세 근거는 각 domain의 `activeSource`와 Project Doctor 원본 상태를 따른다.
+- supplemental source는 명시된 facet 근거만 제공하며 primary lifecycle을 재작성하지 않는다.
 

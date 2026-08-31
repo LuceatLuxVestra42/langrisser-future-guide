@@ -1,0 +1,326 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-migration-r0/v1",
+  "stage": "R0",
+  "checkpoint": "PROJECT_TOOLING_MIGRATION_R0_BOUNDARY",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "purpose": "Freeze the current Project Doctor/tooling ownership inventory and prevent the legacy Project Doctor from becoming the producer or architectural authority for its own replacement.",
+  "designedAgainst": {
+    "branch": "main",
+    "commit": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "requiredStatusCheck": "pr-guard"
+  },
+  "authoritativeInputs": {
+    "statusSourceDeclarations": [
+      {
+        "path": "data/status-sources/baseline.v1.json",
+        "gitBlobSha": "a696db9ede66146aa6e7b67c6e38a1c052b8193c"
+      },
+      {
+        "path": "data/status-sources/promotion.equipment.equipment-public-presentation-correction-final.v1.json",
+        "gitBlobSha": "a1c7a4ee2b318dd691f6544b5e2b1fc36bac71d3"
+      }
+    ],
+    "activeSourceRegistryContract": {
+      "path": "data/contracts/project-doctor-active-source-registry.v1.json",
+      "gitBlobSha": "18e34913e5d0743e24776d14864a185f00ce8b58"
+    },
+    "projectStatusWorkflow": {
+      "path": ".github/workflows/project-status-sync.yml",
+      "gitBlobSha": "3134dc6d0d9a5dbdabaa9174dc54c4394a1fd784"
+    },
+    "packageJson": {
+      "path": "package.json",
+      "gitBlobSha": "30176e6f3578494e1f2977afc8d72d8b611d8050"
+    }
+  },
+  "currentLegacyDoctor": {
+    "roleDuringMigration": "OBSERVE_AND_COMPARE_ONLY",
+    "mustRemainOperationalUntilCutover": true,
+    "requiredGuard": {
+      "workflow": ".github/workflows/project-doctor-d7-pr-guard.yml",
+      "contract": "data/contracts/project-doctor-d7-pr-guard.v8.json",
+      "requiredContext": "pr-guard"
+    },
+    "activeOrchestration": [
+      {
+        "layer": "D2_IMPACT",
+        "contract": "data/contracts/project-doctor-d2-impact-contract.v6.json",
+        "runner": "scripts/analyze-project-doctor-d2-impact-v6.mjs",
+        "classification": "LEGACY_ORCHESTRATION"
+      },
+      {
+        "layer": "D3_PLAN",
+        "contract": "data/contracts/project-doctor-d3-validator-plan.v6.json",
+        "runner": "scripts/plan-project-doctor-d3-v6.mjs",
+        "classification": "LEGACY_ORCHESTRATION"
+      },
+      {
+        "layer": "D4_EXECUTION",
+        "contract": "data/contracts/project-doctor-d4-execution.v6.json",
+        "runner": "scripts/run-project-doctor-d4-v6.mjs",
+        "classification": "LEGACY_ORCHESTRATION"
+      },
+      {
+        "layer": "D5_FRESHNESS",
+        "contract": "data/contracts/project-doctor-d5-freshness.v1.json",
+        "refreshRunner": "scripts/run-project-doctor-d5-refresh.mjs",
+        "validator": "scripts/validate-project-doctor-d5.mjs",
+        "classification": "LEGACY_DERIVED_FRESHNESS"
+      },
+      {
+        "layer": "D7_PR_GUARD",
+        "contract": "data/contracts/project-doctor-d7-pr-guard.v8.json",
+        "runner": "scripts/run-project-doctor-closeout-v6.mjs",
+        "classification": "LEGACY_REQUIRED_GUARD"
+      }
+    ],
+    "observedStructuralIssue": "The active D2/D3/D4/D7 contracts preserve historical versions through extends/supersedes chains, while D5 monitors status-source tooling, D1 outputs, workflows, and generated health outputs as one freshness seal. This makes small routing/tooling maintenance capable of expanding across multiple Doctor layers."
+  },
+  "ownershipInventory": {
+    "migrateToStatusSource": {
+      "state": "KEEP_BEHAVIOR_REHOME_NAMESPACE",
+      "items": [
+        "data/status-sources/*.json",
+        "data/contracts/project-doctor-active-source-registry.v1.json",
+        "scripts/build-project-doctor-active-source-registry.mjs",
+        "scripts/validate-project-doctor-active-source-registry.mjs",
+        "data/contracts/project-doctor-status-source-promotion.v1.json",
+        "scripts/promote-project-doctor-status-source.mjs",
+        "scripts/validate-project-doctor-status-source-promotion.mjs",
+        "data/contracts/project-doctor-status-source-producers.v1.json",
+        "scripts/submit-project-doctor-status-source.mjs",
+        "scripts/validate-project-doctor-status-source-producers.mjs",
+        "data/contracts/project-doctor-status-source-artifact-bridge.v1.json",
+        "scripts/bridge-project-doctor-status-source.mjs",
+        "scripts/validate-project-doctor-status-source-artifact-bridge.mjs",
+        "data/contracts/project-doctor-status-source-stage6-3-apply-handoff.v1.json",
+        "scripts/apply-project-doctor-status-source-handoff.mjs",
+        "scripts/validate-project-doctor-status-source-stage6-3-apply-handoff.mjs",
+        "data/contracts/project-doctor-status-source-stage6-4-producer-declarations.v1.json",
+        "scripts/resolve-project-doctor-status-source-declaration.mjs",
+        "scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs",
+        "data/contracts/project-doctor-status-source-stage6-5-closeout-requests.v1.json",
+        "scripts/render-project-doctor-status-source-closeout-request.mjs",
+        "scripts/validate-project-doctor-status-source-stage6-5-closeout-requests.mjs"
+      ],
+      "boundary": "Status Source selects and validates explicit source declarations only. It must not perform git-diff impact routing, domain semantic recomputation, or legacy Doctor freshness resealing."
+    },
+    "migrateToProjectStatus": {
+      "state": "KEEP_BEHAVIOR_REHOME_NAMESPACE",
+      "items": [
+        "data/contracts/project-doctor-d1-0-contract.v1.json",
+        "data/contracts/project-doctor-d1-2-health-gate.v1.json",
+        "scripts/collect-project-doctor-d1-1.mjs",
+        "scripts/collect-project-doctor-d1-1-active.mjs",
+        "scripts/validate-project-doctor-d1-2.mjs",
+        "scripts/validate-project-doctor-d1-2-active.mjs",
+        "scripts/run-project-doctor-d1-3.mjs",
+        "scripts/build-project-status.mjs",
+        "data/generated/project-status.v1.json",
+        "PROJECT_STATUS.md",
+        ".github/workflows/project-status-sync.yml"
+      ],
+      "boundary": "Project Status is a read-only projection of explicit active sources. It must not become a semantic owner or execute domain validators."
+    },
+    "replaceWithProjectCheck": {
+      "state": "REIMPLEMENT_MINIMAL_THEN_RETIRE_LEGACY",
+      "legacyItems": [
+        "data/contracts/project-doctor-d2-impact-contract.v1-v6 family",
+        "data/contracts/project-doctor-d3-validator-plan.v1-v6 family",
+        "data/contracts/project-doctor-d4-execution.v1-v6 family",
+        "data/contracts/project-doctor-d7-pr-guard historical family",
+        "scripts/analyze-project-doctor-d2-impact*.mjs",
+        "scripts/plan-project-doctor-d3*.mjs",
+        "scripts/run-project-doctor-d4*.mjs",
+        "scripts/run-project-doctor-closeout*.mjs",
+        "scripts/classify-project-doctor-frozen-freshness-v2.mjs",
+        "scripts/validate-project-doctor-d2-impact*.mjs",
+        "scripts/validate-project-doctor-d3*.mjs",
+        "scripts/validate-project-doctor-d4*.mjs",
+        "scripts/validate-project-doctor-d7*.mjs",
+        ".github/workflows/project-doctor-d7-pr-guard.yml"
+      ],
+      "replacementResponsibility": [
+        "changed path to explicit owner routing",
+        "owner to existing independent validator selection",
+        "unmatched path to MANUAL_REVIEW",
+        "validator execution",
+        "exit-code aggregation",
+        "PR guard"
+      ],
+      "forbiddenInReplacement": [
+        "semantic recomputation",
+        "raw ConfigData reads for status/routing",
+        "status-source promotion",
+        "generated-state mutation",
+        "automatic freshness reseal",
+        "historical D1-D7 version inheritance chains"
+      ]
+    },
+    "keepIndependent": {
+      "state": "KEEP_AS_INDEPENDENT_TOOLS_OR_DOMAIN_OWNERS",
+      "items": [
+        "tools/asset-intake/**",
+        "scripts/audit-localization*.mjs",
+        "scripts/configdata-lookup*.mjs",
+        "scripts/build-configdata-lookup-stage*.mjs",
+        "scripts/validate-configdata-lookup-stage*.mjs",
+        "existing Hero domain validators/producers",
+        "existing Soldier domain validators/producers",
+        "existing Equipment domain validators/producers",
+        "existing Banner domain validators/producers",
+        "existing Skin domain validators/producers",
+        "existing Hero-Soldier relation validators/producers",
+        "existing Hero-Exclusive-Equipment relation validators/producers",
+        "existing shared-movement validator/producer"
+      ],
+      "boundary": "Project Check may invoke these tools, but does not own their semantics or implementation."
+    },
+    "rehomeHostedQa": {
+      "state": "KEEP_BEHAVIOR_REHOME_INDEPENDENTLY",
+      "items": [
+        "scripts/run-project-doctor-route-hosted-qa-stage*.mjs",
+        "scripts/validate-project-doctor-route-hosted-qa-stage*.mjs",
+        "data/contracts/project-doctor-route-hosted-qa-*.json",
+        "related Route/Hosted QA workflows/checkpoints"
+      ],
+      "boundary": "Hosted/browser QA remains a presentation/hosting tool and is not a semantic owner or Project Check internal subsystem."
+    }
+  },
+  "migrationNamespace": {
+    "statusSource": "tools/status-source/**",
+    "projectStatus": "tools/project-status/**",
+    "projectCheck": "tools/project-check/**",
+    "contracts": "data/contracts/project-tooling-*"
+  },
+  "legacyIsolationPolicy": {
+    "legacyDoctorMayRunForComparison": true,
+    "legacyDoctorMayPlanMigration": false,
+    "legacyDoctorMayGenerateReplacementContracts": false,
+    "legacyDoctorMayExtendD2D3D4D5D7ForMigrationPaths": false,
+    "legacyDoctorMayResealFreshnessBecauseOfMigrationFiles": false,
+    "legacyDoctorMayBeReplacementPredecessor": false,
+    "newToolsMayReadLegacyGeneratedStatusAsAuthority": false,
+    "newToolsMayMutateLegacyDoctorGeneratedState": false,
+    "expectedLegacyManualReviewDuringShadow": "EXPECTED_LEGACY_DOCTOR_MISMATCH",
+    "mergeBlockingRequiredGuardTransition": "DEFERRED_TO_CUTOVER"
+  },
+  "legacyResultClassificationPolicy": {
+    "classificationOwnedBy": "migration-side tooling/checkpoint only; legacy Project Doctor must not be modified to implement this policy",
+    "expectedLegacyDoctorMismatch": {
+      "classification": "EXPECTED_LEGACY_DOCTOR_MISMATCH",
+      "allRequiredConditions": [
+        "current diff is limited to migration namespaces or migration-only workflow/checkpoint files",
+        "legacy Doctor failure is UNKNOWN or MANUAL_REVIEW caused by unmapped migration path",
+        "legacy D1/status integrity passes",
+        "legacy D5 freshness passes",
+        "legacy D7 guard/runtime integrity passes",
+        "no selected independent validator reports a current-diff regression",
+        "no frozen/canonical population or relation parity failure is present"
+      ]
+    },
+    "actualSelectedValidatorFailure": "OWNING_SCOPE_FAILURE",
+    "canonicalOrFrozenParityFailure": "BLOCKER",
+    "unrelatedFailureAlsoPresentOnBaseMain": "REVIEW_EXISTING_DRIFT",
+    "blanketIgnoreLegacyFailure": false
+  },
+  "r1CompletionGate": {
+    "scope": "Independent Status Source selection core before promotion/submit/bridge migration",
+    "required": [
+      "tools/status-source/** exists",
+      "current status declarations can be consumed as frozen fixtures",
+      "current active-source selection result parity passes for all six domains",
+      "legacy Project Doctor runtime imports = 0",
+      "legacy project-doctor generated status dependencies = 0",
+      "D1 dependencies = 0",
+      "D2 dependencies = 0",
+      "D3 dependencies = 0",
+      "D4 dependencies = 0",
+      "D5 dependencies = 0",
+      "D7 dependencies = 0",
+      "semantic recomputation count = 0",
+      "domain validator execution count = 0",
+      "legacy state mutation count = 0",
+      "raw ConfigData read count = 0"
+    ],
+    "parityPolicy": "Require result parity, not implementation parity. Legacy implementation is a comparison oracle only and is never a runtime predecessor."
+  },
+  "cutoverBlockers": [
+    {
+      "code": "LEGACY_REQUIRED_PR_GUARD_STILL_ACTIVE",
+      "appliesAt": "CUTOVER_ONLY",
+      "blocksR0": false,
+      "blocksR1": false,
+      "blocksR2": false,
+      "blocksR3Shadow": false,
+      "resolution": "After new Project Check produces a proven passing check context and regression fixtures pass, remove old pr-guard from required checks and make the new Project Check context required before cutover merge."
+    }
+  ],
+  "migrationLineagePolicy": {
+    "allowStackedMigrationWork": true,
+    "preferredOrder": [
+      "R0 boundary",
+      "R1 Status Source",
+      "R2 Project Status",
+      "R3 Project Check",
+      "shadow comparison and regression fixtures",
+      "required-check cutover",
+      "legacy Doctor disable",
+      "legacy Doctor delete"
+    ],
+    "doNotExpandLegacyDoctorToGreenIntermediateMigrationPrs": true,
+    "doNotAdmitMigrationNamespaceIntoLegacyD2D3D4D5D7": true,
+    "intermediateLegacyManualReviewIsComparisonEvidence": true
+  },
+  "openLegacyRepairPrs": [
+    {
+      "pr": 301,
+      "disposition": "REFERENCE_REGRESSION_FIXTURE_DO_NOT_EXPAND_IN_R0",
+      "fixtureIntent": "Soldier training-material paths belong to soldier-assets without soldier-canonical fan-out."
+    },
+    {
+      "pr": 308,
+      "disposition": "REFERENCE_REGRESSION_FIXTURE_DO_NOT_EXPAND_IN_R0",
+      "fixtureIntent": "Soldier training-material paths belong to soldier-assets without soldier-canonical fan-out."
+    }
+  ],
+  "nonScope": [
+    "canonical Hero/Soldier/Equipment/Banner/Skin identity or relation changes",
+    "domain data regeneration",
+    "raw ConfigData investigation",
+    "frontend feature changes",
+    "branch-protection required-check switch before Project Check is proven",
+    "legacy Project Doctor deletion",
+    "legacy Doctor repair PR merge"
+  ],
+  "completion": {
+    "inventoryClassified": true,
+    "legacyOwnerBoundaryFrozen": true,
+    "statusSourceBoundaryFrozen": true,
+    "projectStatusBoundaryFrozen": true,
+    "projectCheckBoundaryFrozen": true,
+    "legacyResultClassificationHardened": true,
+    "r1CompletionGateFrozen": true,
+    "cutoverBlockerSeparatedFromCurrentStage": true,
+    "migrationLineageFrozen": true,
+    "legacyFilesModified": false,
+    "domainFilesModified": false
+  },
+  "blockers": [],
+  "reviews": [
+    "Route/Hosted QA still carries Project Doctor naming and must be rehomed as an independent QA tool in a later migration step.",
+    "LEGACY_REQUIRED_PR_GUARD_STILL_ACTIVE is a CUTOVER_BLOCKER, not an R0/R1 blocker.",
+    "Legacy Doctor may report MANUAL_REVIEW for new migration paths during shadow mode only when the strict EXPECTED_LEGACY_DOCTOR_MISMATCH conditions hold; this is comparison evidence, not permission to extend D2/D3/D4/D5/D7."
+  ],
+  "nextStartPoint": "R1: implement the independent Status Source selection core in tools/status-source using the two current status-source declarations and their explicitly referenced authoritative source files. Do not import or execute legacy Project Doctor runtime code.",
+  "reopenConditions": [
+    "main changes data/status-sources declarations",
+    "main changes the active-source registry contract in a way that changes current selection semantics",
+    "main changes Project Status Sync ownership or write paths",
+    "main changes package-level Project Doctor entry points in a way that changes this inventory",
+    "main changes branch protection required check from pr-guard",
+    "new authoritative evidence shows an item classified here is owned by a different independent domain/tool"
+  ]
+}

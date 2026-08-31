@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "schemaId": "regression-runner-rr4-negative-fixtures/v1",
+  "stage": "RR4",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Exercise authority, preflight, fail-fast, mutation and plan-only safety boundaries without invoking the real nine-validator regression profile.",
+  "contractCases": [
+    {
+      "id": "unknown-validator-id",
+      "mutation": "PROFILE_APPEND_VALIDATOR_ID",
+      "value": "unknown-future-validator",
+      "expectedErrorToken": "UNKNOWN_PROFILE_VALIDATOR_ID"
+    },
+    {
+      "id": "duplicate-profile-validator-id",
+      "mutation": "PROFILE_APPEND_VALIDATOR_ID",
+      "value": "hero-canonical",
+      "expectedErrorToken": "DUPLICATE_PROFILE_VALIDATOR_ID"
+    },
+    {
+      "id": "profile-command-metadata",
+      "mutation": "PROFILE_SET_EXECUTABLE",
+      "value": "node",
+      "expectedErrorToken": "PROFILE_COMMAND_METADATA_FORBIDDEN"
+    },
+    {
+      "id": "duplicate-catalog-validator-id",
+      "mutation": "CATALOG_DUPLICATE_VALIDATOR",
+      "value": "hero-canonical",
+      "expectedErrorToken": "DUPLICATE_CATALOG_VALIDATOR_ID"
+    },
+    {
+      "id": "catalog-shell-policy",
+      "mutation": "CATALOG_SET_SHELL_EXECUTION",
+      "value": true,
+      "expectedErrorToken": "CATALOG_SHELL_EXECUTION_MUST_BE_FALSE"
+    },
+    {
+      "id": "automatic-coverage-expansion",
+      "mutation": "PROFILE_SET_AUTOMATIC_COVERAGE_EXPANSION",
+      "value": true,
+      "expectedErrorToken": "AUTOMATIC_COVERAGE_EXPANSION_MUST_BE_FALSE"
+    }
+  ],
+  "preflightCases": [
+    {
+      "id": "unsupported-executable",
+      "validator": {
+        "id": "fixture-unsupported-executable",
+        "phase": 1,
+        "executable": "bash",
+        "args": ["-lc", "true"],
+        "owner": "fixture"
+      },
+      "expectedFailureType": "EXECUTABLE_NOT_ALLOWED"
+    },
+    {
+      "id": "missing-node-script",
+      "validator": {
+        "id": "fixture-missing-node-script",
+        "phase": 1,
+        "executable": "node",
+        "args": ["tools/regression-runner/test/fixtures/__missing__.mjs"],
+        "owner": "fixture"
+      },
+      "expectedFailureType": "NODE_SCRIPT_MISSING"
+    },
+    {
+      "id": "node-path-escape",
+      "validator": {
+        "id": "fixture-node-path-escape",
+        "phase": 1,
+        "executable": "node",
+        "args": ["../outside-repository.mjs"],
+        "owner": "fixture"
+      },
+      "expectedFailureType": "NODE_SCRIPT_PATH_INVALID"
+    },
+    {
+      "id": "invalid-npm-argv",
+      "validator": {
+        "id": "fixture-invalid-npm-argv",
+        "phase": 1,
+        "executable": "npm",
+        "args": ["test"],
+        "owner": "fixture"
+      },
+      "expectedFailureType": "NPM_ARGV_INVALID"
+    },
+    {
+      "id": "missing-package-script",
+      "validator": {
+        "id": "fixture-missing-package-script",
+        "phase": 1,
+        "executable": "npm",
+        "args": ["run", "__rr4_missing_script__"],
+        "owner": "fixture"
+      },
+      "expectedFailureType": "PACKAGE_SCRIPT_MISSING"
+    }
+  ],
+  "runtimeAuthorityOverrideCases": [
+    {
+      "id": "contracts-override",
+      "key": "contracts",
+      "expectedErrorToken": "RUNTIME_AUTHORITY_OVERRIDE_FORBIDDEN:contracts"
+    },
+    {
+      "id": "plan-override",
+      "key": "plan",
+      "expectedErrorToken": "RUNTIME_AUTHORITY_OVERRIDE_FORBIDDEN:plan"
+    },
+    {
+      "id": "preflight-override",
+      "key": "preflight",
+      "expectedErrorToken": "RUNTIME_AUTHORITY_OVERRIDE_FORBIDDEN:preflight"
+    }
+  ],
+  "executionCases": [
+    {
+      "id": "validator-nonzero",
+      "expectedCompletion": "BLOCKED_VALIDATOR",
+      "expectedExecutionCount": 1
+    },
+    {
+      "id": "tracked-mutation",
+      "expectedCompletion": "BLOCKED_TRACKED_MUTATION",
+      "expectedExecutionCount": 1
+    },
+    {
+      "id": "plan-only",
+      "expectedCompletion": "PLAN_ONLY",
+      "expectedExecutionCount": 0
+    }
+  ],
+  "cliCases": [
+    {
+      "id": "current-profile-plan-only",
+      "args": ["--plan", "--profile", "core-regression-v1"],
+      "expectedStatus": "PASS",
+      "expectedCompletion": "PLAN_ONLY",
+      "expectedValidatorCount": 9,
+      "expectedExecutionCount": 0
+    }
+  ]
+}
