@@ -50,14 +50,14 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validate Stage 5 predecessor
-        run: node scripts/validate-configdata-lookup-stage5.mjs
+      - name: Validate Stage 5 predecessor through current compatibility gate
+        run: npm run validate:configdata-lookup-stage5
 
       - name: Apply incremental materialization
         run: node tools/configdata-lookup/cli/rebuild.mjs --apply --json
 
-      - name: Validate Stage 6 materialization
-        run: npm run validate:configdata-lookup-stage6
+      - name: Validate Stage 6 materialization through current compatibility gate
+        run: node tools/configdata-lookup/test/configdata-lookup-stage6-current-validator.mjs
 
       - name: Require clean stale plan
         run: npm run check:configdata-lookup-stage6

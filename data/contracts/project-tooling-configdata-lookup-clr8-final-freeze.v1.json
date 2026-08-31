@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-clr8-final-freeze/v1",
+  "stage": "CLR8",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR8_FINAL_FREEZE_FROZEN",
+  "purpose": "Freeze the completed ConfigData Lookup reset after CLR0-7 by verifying the final package/runtime/validation/writer/retired-orchestration authority inventory and current Project Check routing without reopening Stage 0-6 materialization semantics.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "base": "main",
+    "sourceHead": "1f6e716f99883625594cff0c19c233ffed17ff33",
+    "predecessor": {
+      "path": "data/contracts/project-tooling-configdata-lookup-clr7-cutover.v1.json",
+      "requiredCompletion": "CONFIGDATA_LOOKUP_CLR7_CUTOVER_FROZEN"
+    }
+  },
+  "predecessorChain": [
+    {"stage":"CLR0","path":"data/contracts/project-tooling-project-check-configdata-lookup-clr0-baseline.v1.json","requiredCompletion":"CONFIGDATA_LOOKUP_CLR0_BASELINE_FROZEN"},
+    {"stage":"CLR1","path":"data/contracts/project-tooling-project-check-configdata-lookup-clr1-boundary.v1.json","requiredCompletion":"CONFIGDATA_LOOKUP_CLR1_BOUNDARY_FROZEN"},
+    {"stage":"CLR2","path":"data/contracts/project-tooling-project-check-configdata-lookup-clr2-namespace.v1.json","requiredCompletion":"CONFIGDATA_LOOKUP_CLR2_NAMESPACE_FROZEN"},
+    {"stage":"CLR3","path":"data/contracts/project-tooling-project-check-configdata-lookup-clr3-self-test.v1.json","requiredCompletion":"CONFIGDATA_LOOKUP_CLR3_READ_ONLY_SELF_TEST_FROZEN"},
+    {"stage":"CLR4","path":"data/contracts/project-tooling-configdata-lookup-clr4-admission.v1.json","requiredCompletion":"CONFIGDATA_LOOKUP_CLR4_PROJECT_CHECK_ADMISSION_FROZEN"},
+    {"stage":"CLR5","path":"data/contracts/project-tooling-configdata-lookup-clr5-writer-separation.v1.json","requiredCompletion":"CONFIGDATA_LOOKUP_CLR5_WRITER_SEPARATION_FROZEN"},
+    {"stage":"CLR6","path":"data/contracts/project-tooling-configdata-lookup-clr6-shadow-parity.v1.json","requiredCompletion":"CONFIGDATA_LOOKUP_CLR6_SHADOW_PARITY_FROZEN"},
+    {"stage":"CLR7","path":"data/contracts/project-tooling-configdata-lookup-clr7-cutover.v1.json","requiredCompletion":"CONFIGDATA_LOOKUP_CLR7_CUTOVER_FROZEN"}
+  ],
+  "finalAuthorityInventory": {
+    "packageCli": {
+      "lookup": "node tools/configdata-lookup/cli/run.mjs lookup",
+      "refs": "node tools/configdata-lookup/cli/run.mjs refs",
+      "find": "node tools/configdata-lookup/cli/run.mjs find"
+    },
+    "runtimeContract": "tools/configdata-lookup/contracts/runtime.v1.json",
+    "validationWorkflow": ".github/workflows/project-tooling-configdata-lookup-clr2.yml",
+    "stage6ValidationWorkflow": ".github/workflows/configdata-lookup-stage6.yml",
+    "writerWorkflow": ".github/workflows/project-tooling-configdata-lookup-writer.yml",
+    "retiredStage7Workflow": ".github/workflows/configdata-lookup-stage7.yml",
+    "retiredStage8Workflow": ".github/workflows/configdata-lookup-stage8.yml",
+    "projectCheckOwner": "configdata-lookup",
+    "projectCheckValidator": "configdata-lookup-self-test"
+  },
+  "writerCompatibility": {
+    "status": "CURRENT_COMPATIBILITY_GATE_ALIGNED",
+    "stage5Validation": "npm run validate:configdata-lookup-stage5",
+    "stage6Validation": "node tools/configdata-lookup/test/configdata-lookup-stage6-current-validator.mjs",
+    "materializationWriter": "node tools/configdata-lookup/cli/rebuild.mjs --apply --json",
+    "writerExecutionRequiredForFreeze": false,
+    "reason": "CLR8 validates the explicit writer contract and current validation chain without executing a synthetic materialization write."
+  },
+  "requiredValidation": {
+    "predecessorFrozenCount": 8,
+    "packageCliAuthority": "NEW_CONFIGDATA_LOOKUP_NAMESPACE",
+    "runtimeReadOnly": true,
+    "validationWorkflowWritePermissionCount": 0,
+    "explicitWriterWorkflowCount": 1,
+    "writerRejectsMainAndGhPages": true,
+    "writerUsesCurrentStage5Validator": true,
+    "writerUsesCurrentStage6Validator": true,
+    "retiredLegacyOrchestrationWorkflowCount": 2,
+    "stage7ActiveAuthorityCount": 0,
+    "stage8ActiveAuthorityCount": 0,
+    "projectCheckOwner": "configdata-lookup",
+    "projectCheckValidator": "configdata-lookup-self-test",
+    "projectCheckManualReviewCount": 0,
+    "configdataLookupOwnerSelfTest": "PASS",
+    "projectCheck": "PASS",
+    "trackedMutationCount": 0
+  },
+  "unchangedScope": {
+    "stage0To6MaterializationAlgorithmMutationCount": 0,
+    "stage0To6GeneratedArtifactMutationCount": 0,
+    "rawConfigDataMutationCount": 0,
+    "semanticMutationCount": 0,
+    "frontendImplementationMutationCount": 0,
+    "assetMutationCount": 0,
+    "hostedQaMutationCount": 0,
+    "browserUiMutationCount": 0,
+    "historicalStage7ContractMutationCount": 0,
+    "historicalStage8ContractMutationCount": 0,
+    "historicalStage7ValidatorMutationCount": 0,
+    "historicalStage8ValidatorMutationCount": 0
+  },
+  "validationImplementation": {
+    "finalFreezeGate": "tools/configdata-lookup/test/configdata-lookup-clr8-final-freeze.mjs",
+    "aggregateOwnerSelfTest": "tools/configdata-lookup/test/configdata-lookup-owner-self-test.mjs"
+  },
+  "validationEvidence": {
+    "candidateHead": "a6737118328c5ed1836c1131ba877e11d613060b",
+    "configdataLookupWorkflow": {
+      "runId": 33407888791,
+      "jobId": 99539904133,
+      "stage5CurrentValidator": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "clr8FinalFreezeReady": "PASS",
+      "ownerSelfTest": "PASS",
+      "conclusion": "success"
+    },
+    "projectCheck": {
+      "runId": 33407888796,
+      "jobId": 99539903363,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "changedFileCount": 5,
+      "ownerCount": 1,
+      "validatorCount": 1,
+      "manualReviewCount": 0,
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "finalFreezeMetrics": {
+      "predecessorFrozenCount": 8,
+      "readOnlyValidationWorkflowCount": 2,
+      "explicitWriterWorkflowCount": 1,
+      "retiredLegacyOrchestrationWorkflowCount": 2,
+      "projectCheckOwnerCount": 1,
+      "projectCheckValidatorCount": 1,
+      "stage7ActiveAuthorityCount": 0,
+      "stage8ActiveAuthorityCount": 0,
+      "semanticMutationCount": 0,
+      "rawConfigDataReadCount": 0,
+      "materializationRebuildCount": 0,
+      "writerExecutionCount": 0,
+      "trackedMutationCount": 0
+    },
+    "freezeHead": "a6737118328c5ed1836c1131ba877e11d613060b",
+    "freezeHeadRevalidation": "PASS"
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_STAGE5_CLI_FILE_PRESERVED",
+      "blocking": false,
+      "detail": "The preserved legacy CLI remains parity/historical evidence and is not package authority."
+    },
+    {
+      "id": "LEGACY_STAGE7_STAGE8_ARTIFACTS_PRESERVED_AS_HISTORY",
+      "blocking": false,
+      "detail": "Frozen Stage 7/8 contracts, libraries, validators and summaries remain historical evidence while active orchestration authority stays retired."
+    },
+    {
+      "id": "HERO_LIST_STAGE2_STAGE3_PRESENTATION_VALIDATOR_DRIFT",
+      "classification": "REVIEW_EXISTING_DRIFT",
+      "blocking": false,
+      "detail": "Existing Hero presentation-validator drift remains outside ConfigData Lookup ownership and does not reopen CLR0-8."
+    }
+  ],
+  "nextStart": "ConfigData Lookup reset is complete after CLR8 freeze. Resume only for a legitimate new ConfigData Lookup requirement or a reopen condition; otherwise continue with the next independent project residual track.",
+  "reopenConditions": [
+    "Any CLR0-7 predecessor completion is invalidated by authoritative evidence.",
+    "Package lookup/refs/find authority diverges from the NEW ConfigData Lookup CLI.",
+    "Read-only runtime begins exposing rebuild, repository mutation, semantic mutation, fan-out, or Project Doctor dependency.",
+    "Validation workflows gain writer authority or the explicit writer can target main/gh-pages without the required confirmation.",
+    "Legacy Stage 7/8 orchestration becomes active again.",
+    "Project Check no longer routes ConfigData Lookup-owned paths to configdata-lookup-self-test.",
+    "Stage 0-6 materialization semantics or generated artifacts are changed by a future owning task."
+  ]
+}
