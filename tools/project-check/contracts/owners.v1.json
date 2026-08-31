@@ -23,6 +23,7 @@
     {"id":"project-status","validators":["project-status-parity"]},
     {"id":"project-check","validators":["project-check-self-test"]},
     {"id":"regression-runner","validators":["regression-runner-self-test"]},
+    {"id":"route-hosted-qa","validators":["project-check-self-test"]},
     {"id":"configdata","validators":["configdata-integrity"]},
     {"id":"hero-canonical","validators":["hero-canonical"]},
     {"id":"soldier-canonical","validators":["soldier-canonical"]},
@@ -71,6 +72,11 @@
       "id":"regression-runner-tooling",
       "patterns":["tools/regression-runner/**","data/contracts/project-tooling-regression-runner-*.json",".github/workflows/project-tooling-regression-runner.yml",".github/workflows/regression-coverage-promotion-v2.yml"],
       "owners":["regression-runner"]
+    },
+    {
+      "id":"route-hosted-qa-preimplementation-admission",
+      "patterns":["tools/route-hosted-qa/**","data/contracts/project-tooling-route-hosted-qa-*.json",".github/workflows/project-tooling-route-hosted-qa.yml"],
+      "owners":["route-hosted-qa"]
     },
     {
       "id":"old-doctor-retirement-apply",
