@@ -21,6 +21,7 @@
     "validatedHead": "77b6f7ea58d167f7c01d42d0ab76fadbae81ed3c",
     "validatedMergeResult": "267ce386a2cceef1c0e38710afcd6f0c4e2a2ca3",
     "evidenceFreezeCommit": "8666fa9737107a5f8ea51d264a61345bf9d9caac",
+    "latestOwnerAdmissionValidatedHead": "4ba804b121a35d817215aa0822a45bc99d111d91",
     "ownerMap": "tools/project-check/contracts/owners.v1.json",
     "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
     "runtime": "tools/project-check/lib/project-check.mjs",
@@ -94,7 +95,7 @@
       "finalExitCode": 0
     },
     "selfTest": {
-      "fixtureCount": 13,
+      "fixtureCount": 15,
       "catalogValidatorCount": 22,
       "ownerCount": 25,
       "manualReviewFallbackProven": true,
@@ -102,6 +103,26 @@
       "validatorFailureBecomesBlocker": true,
       "wholeCatalogTargetPreflight": "PASS",
       "pathTraversalBlocked": true
+    },
+    "deletionCheckpointAdmissionRepair": {
+      "classification": "NEW_TOOLING_ADMISSION_GAP",
+      "failureHead": "7c016de33e69a0a642c4c48d4f35745b87f41dac",
+      "failureRunId": 33346670486,
+      "failureJobId": 99351990646,
+      "failureStage": "Plan changed path ownership and validators",
+      "unmatchedPath": "data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json",
+      "admittedPattern": "data/contracts/project-tooling-project-doctor-deletion-*.json",
+      "owner": "project-check",
+      "validator": "project-check-self-test",
+      "repairHead": "4ba804b121a35d817215aa0822a45bc99d111d91",
+      "repairRunId": 33347378943,
+      "repairJobId": 99353992370,
+      "requiredJobConclusion": "success",
+      "selfTest": "PASS",
+      "plan": "PASS",
+      "execution": "PASS",
+      "semanticReopen": false,
+      "ownerContractLimitedReopen": true
     }
   },
   "independenceBoundary": {
@@ -132,16 +153,18 @@
     "currentMigrationDiffRoutesWithoutManualReview": true,
     "selectedValidatorsPass": true,
     "legacyRuntimeDependencyCountZero": true,
+    "deletionCheckpointNamespaceAdmitted": true,
     "readyForShadowComparison": true
   },
   "blockers": [],
-  "cutoverBlockers": ["LEGACY_REQUIRED_PR_GUARD_STILL_ACTIVE"],
+  "cutoverBlockers": [],
   "reviews": [
-    "The R3 owner map is intentionally minimal and fail-closed. Any repository path not explicitly admitted remains MANUAL_REVIEW rather than inheriting historical Doctor routing by default.",
+    "The R3 owner map remains intentionally minimal and fail-closed. Any repository path not explicitly admitted remains MANUAL_REVIEW rather than inheriting historical Doctor routing by default.",
+    "The Project Doctor deletion checkpoint namespace is explicitly admitted to project-check ownership after the 7c016de3 admission gap; no domain semantic ownership was expanded.",
     "Banner assets and Skin assets remain manual owner boundaries until independent final validators are explicitly admitted.",
-    "The NEW Project Check shadow context is not required by branch protection yet; required-check cutover remains later."
+    "Required-check cutover is complete: main requires project-check, while pr-guard and project-check-shadow are not required."
   ],
-  "nextStartPoint": "Run OLD-vs-NEW shadow comparison before required-check cutover. Compare migration-only behavior, representative admitted domain/asset/frontend paths, manual Banner/Skin/unmatched boundaries, and validator-failure aggregation. OLD remains observe-and-compare-only and must not be modified to accept NEW migration paths.",
+  "nextStartPoint": "Resume from the already-created OLD Project Doctor deletion inventory with the admission gap closed. Keep actual OLD Doctor deletion deferred until Status Source writer ownership and Project Status writer ownership are transitioned and proven separately.",
   "reopenConditions": [
     "an admitted owner validator command changes authoritatively",
     "a path family changes ownership authoritatively",
