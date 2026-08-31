@@ -125,6 +125,39 @@ assert.equal(lookupAdapterText.includes('scripts/lib/configdata-lookup-stage5.mj
 const freshnessAdapterText = fs.readFileSync('tools/configdata-lookup/lib/freshness.mjs', 'utf8');
 assert.equal(freshnessAdapterText.includes('scripts/lib/configdata-lookup-stage6.mjs'), true);
 
+const legacyStage6Workflow = fs.readFileSync('.github/workflows/configdata-lookup-stage6.yml', 'utf8');
+assert.equal(legacyStage6Workflow.includes('contents: read'), true);
+assert.equal(legacyStage6Workflow.includes('contents: write'), false);
+assert.equal(legacyStage6Workflow.includes('rebuild:configdata-lookup-stage6'), false);
+assert.equal(legacyStage6Workflow.includes('git push'), false);
+assert.equal(legacyStage6Workflow.includes('git commit'), false);
+assert.equal(legacyStage6Workflow.includes('Require read-only tracked state'), true);
+
+const generalValidationWorkflow = fs.readFileSync('.github/workflows/project-tooling-configdata-lookup-clr2.yml', 'utf8');
+assert.equal(generalValidationWorkflow.includes('contents: read'), true);
+assert.equal(generalValidationWorkflow.includes('contents: write'), false);
+assert.equal(generalValidationWorkflow.includes('tools/configdata-lookup/cli/rebuild.mjs'), false);
+
+const writerWorkflow = fs.readFileSync('.github/workflows/project-tooling-configdata-lookup-writer.yml', 'utf8');
+const writerTriggers = writerWorkflow.split('\npermissions:')[0];
+assert.equal(writerTriggers.includes('workflow_dispatch:'), true);
+assert.equal(writerTriggers.includes('pull_request:'), false);
+assert.equal(writerTriggers.includes('\n  push:'), false);
+assert.equal(writerWorkflow.includes('contents: write'), true);
+assert.equal(writerWorkflow.includes('APPLY_CONFIGDATA_LOOKUP_REBUILD'), true);
+assert.equal(writerWorkflow.includes("test \"$TARGET_BRANCH\" != 'main'"), true);
+assert.equal(writerWorkflow.includes("test \"$TARGET_BRANCH\" != 'gh-pages'"), true);
+assert.equal(writerWorkflow.includes('[[ "$TARGET_BRANCH" == work/* ]]'), true);
+assert.equal(writerWorkflow.includes('tools/configdata-lookup/cli/rebuild.mjs --apply --json'), true);
+assert.equal(writerWorkflow.includes('git push origin "HEAD:${TARGET_BRANCH}"'), true);
+
+const writerCliText = fs.readFileSync('tools/configdata-lookup/cli/rebuild.mjs', 'utf8');
+assert.equal(writerCliText.includes("if (!args.has('--apply'))"), true);
+assert.equal(writerCliText.includes('rebuildIncrementally'), true);
+const writerWithoutApply = runCli('tools/configdata-lookup/cli/rebuild.mjs', []);
+assert.notEqual(writerWithoutApply.status, 0);
+assert.match(writerWithoutApply.stderr, /explicit --apply is required/);
+
 const afterTrackedState = trackedState();
 assert.equal(afterTrackedState, beforeTrackedState, 'read-only self-test changed tracked repository state');
 
@@ -151,5 +184,10 @@ console.log(JSON.stringify({
     stage7RuntimeDependencyCount: 0,
     stage8RuntimeDependencyCount: 0,
     projectDoctorRuntimeDependencyCount: 0,
+    automaticWriterWorkflowCount: 0,
+    explicitWriterWorkflowCount: 1,
+    validationWorkflowWritePermissionCount: 0,
+    writerRequiresApplyFlag: true,
+    writerRejectsMainAndGhPages: true,
   },
 }, null, 2));
