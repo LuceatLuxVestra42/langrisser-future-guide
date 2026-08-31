@@ -4,7 +4,7 @@
   "stage": "RR9",
   "status": "CANDIDATE",
   "completion": "REGRESSION_RUNNER_RR9_RETIREMENT_CANDIDATE",
-  "purpose": "Close the Regression Runner rollback window after legitimate post-cutover workload proof by physically retiring the OLD manual V2 comparator and its package entrypoint while preserving historical V1/V2 evidence and the inert legacy audit script.",
+  "purpose": "Close the Regression Runner rollback window after legitimate post-cutover workload proof by physically retiring the OLD manual V2 comparator and its package entrypoint while preserving committed historical V1/V2 evidence and the inert legacy audit script.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
     "base": "main",
@@ -58,9 +58,10 @@
     "preserveHistorical": [
       "data/contracts/regression-coverage-promotion.v1.json",
       "data/contracts/regression-coverage-promotion.v2.json",
-      "data/validation/regression-coverage-promotion-summary.v2.json",
       "scripts/validate-regression-coverage-promotion-v2.mjs"
     ],
+    "historicalUncommittedOutput": "data/validation/regression-coverage-promotion-summary.v2.json",
+    "historicalUncommittedOutputPolicy": "DO_NOT_MATERIALIZE_FOR_RR9_PROOF",
     "legacyAuditScriptState": "HISTORICAL_INERT_NO_WORKFLOW_OR_PACKAGE_ENTRYPOINT"
   },
   "postRetirementAuthority": {
@@ -101,7 +102,13 @@
       "id": "LEGACY_V2_AUDIT_SCRIPT_RETAINED_AS_HISTORY",
       "blocking": false,
       "classification": "HISTORICAL_EVIDENCE",
-      "detail": "The legacy V2 audit script remains physically present only to reproduce historical V2 evidence. Its workflow and package entrypoint are retired, and NEW runtime already forbids depending on it."
+      "detail": "The legacy V2 audit script remains physically present only to reproduce committed historical V2 contract evidence. Its workflow and package entrypoint are retired, and NEW runtime already forbids depending on it."
+    },
+    {
+      "id": "LEGACY_V2_SUMMARY_WAS_NOT_COMMITTED",
+      "blocking": false,
+      "classification": "REVIEW_EXISTING_DRIFT",
+      "detail": "The legacy audit script names data/validation/regression-coverage-promotion-summary.v2.json, but that output is not committed on the RR9 authoritative baseline. RR9 does not manufacture it solely for retirement proof."
     },
     {
       "id": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
