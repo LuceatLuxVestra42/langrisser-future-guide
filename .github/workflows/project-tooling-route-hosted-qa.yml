@@ -1,0 +1,64 @@
+name: Project Tooling Route Hosted QA
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Hosted validation mode
+        required: true
+        default: probe-current
+        type: choice
+        options:
+          - probe-current
+          - strict-candidate
+      expected_sha:
+        description: Explicit deployed source SHA required only for strict-candidate
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-tooling-route-hosted-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  route-hosted-qa:
+    name: route-hosted-qa
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Validate frozen RH3 Route Hosted QA runtime
+        run: node tools/route-hosted-qa/test/route-hosted-qa-self-test.mjs
+
+      - name: Validate strict candidate input
+        if: ${{ inputs.mode == 'strict-candidate' }}
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$EXPECTED_SHA" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo 'strict-candidate requires expected_sha as an explicit 40-hex source SHA.' >&2
+            exit 2
+          fi
+
+      - name: Probe current deployed GitHub Pages
+        if: ${{ inputs.mode == 'probe-current' }}
+        run: node tools/route-hosted-qa/cli/check.mjs --probe-current
+
+      - name: Strict Hosted QA against explicit deployed source SHA
+        if: ${{ inputs.mode == 'strict-candidate' }}
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: node tools/route-hosted-qa/cli/check.mjs --expected-sha "$EXPECTED_SHA"
