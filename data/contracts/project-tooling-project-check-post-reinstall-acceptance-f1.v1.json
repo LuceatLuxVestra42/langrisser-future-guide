@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-post-reinstall-acceptance-f1/v1",
+  "stage": "F1",
+  "checkpoint": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_F1_AUTHORITY_RUNTIME_GRAPH",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "F1_AUTHORITY_RUNTIME_GRAPH_FROZEN",
+  "purpose": "Verify the post-reinstall authority/runtime graph from NEW Status Source through NEW Project Status to NEW Project Check, prove that retired OLD Doctor orchestration is not an active runtime predecessor, and repair only owning-scope projection/routing drift discovered during the inspection.",
+  "predecessor": {
+    "checkpoint": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_F0_BASELINE",
+    "path": "data/contracts/project-tooling-project-check-post-reinstall-acceptance-f0.v1.json",
+    "mainCommit": "f2bebd2f954360b9d859da71802184ec42d23429"
+  },
+  "authorityGraph": {
+    "statusSource": {
+      "namespace": "tools/status-source",
+      "authority": "data/status-sources/*.json declarations and their directly referenced authoritative validation/checkpoint sources",
+      "selectionSchema": "status-source-selection/v1",
+      "selectedDomainCount": 6,
+      "runtimePredecessor": null,
+      "rawConfigDataReadCount": 0,
+      "semanticRecomputationCount": 0,
+      "domainValidatorExecutionCount": 0,
+      "legacyRuntimeDependencyCount": 0
+    },
+    "projectStatus": {
+      "namespace": "tools/project-status",
+      "authorityPredecessor": "NEW R1 Status Source selection",
+      "role": "READ_ONLY_NORMALIZATION_AND_PROJECTION",
+      "canonicalTargets": [
+        "data/generated/project-status.v1.json",
+        "PROJECT_STATUS.md"
+      ],
+      "activeWriterCount": 1,
+      "legacyProjectDoctorRuntimeImportCount": 0,
+      "legacyGeneratedStatusReadCount": 0,
+      "legacyD1RuntimeDependencyCount": 0,
+      "legacyD5RuntimeDependencyCount": 0,
+      "rawConfigDataReadCount": 0,
+      "semanticRecomputationCount": 0,
+      "canonicalJoinRecomputationCount": 0
+    },
+    "projectCheck": {
+      "namespace": "tools/project-check",
+      "role": "EXPLICIT_PATH_TO_OWNER_TO_VALIDATOR_ORCHESTRATION",
+      "ownerPropagation": false,
+      "changeClassFanOut": false,
+      "legacyDoctorValidatorAllowed": false,
+      "legacyD2D3D4D5D7Allowed": false,
+      "requiredContext": "project-check",
+      "legacyD2D3D4D5D7RuntimeDependencyCount": 0
+    }
+  },
+  "oldDoctorRetirement": {
+    "d2D3D4D7ActiveRuntime": "RETIRED_AND_PHYSICALLY_ABSENT",
+    "deletedRuntimeFileCount": 10,
+    "removedPackageEntrypointCount": 9,
+    "retainedRollbackPathCount": 34,
+    "retainedRollbackRole": "STATUS_SOURCE_ROLLBACK_SUPPORT_ONLY",
+    "retainedRollbackIsNewRuntimePredecessor": false,
+    "note": "Retained D1/D5/status-source legacy support is not part of the NEW runtime chain. It remains only for the still-open legitimate-successor Status Source rollback proof window."
+  },
+  "driftResolved": [
+    {
+      "code": "STATUS_SOURCE_SKIN_ADMISSION_STALE_AFTER_STAGE3_2_COMPLETION",
+      "owner": "status-source",
+      "classification": "RUNTIME_CONTRACT_DRIFT",
+      "cause": "The same authoritative Skin Stage 3-2 source advanced from READY_FOR_ASSET_EVIDENCE to PASS/SKIN_STAGE3_2_COMPLETE while the R1 declaration still admitted only the prior status.",
+      "resolution": "Allow only the legitimate READY -> PASS/SKIN_STAGE3_2_COMPLETE progression on the same selected ID/path, with failedCheckCount=0 and an explicit Project Status lifecycle projection override.",
+      "semanticReopen": false
+    },
+    {
+      "code": "PROJECT_STATUS_SKIN_PROJECTION_STALE_AFTER_STAGE3_2_COMPLETION",
+      "owner": "project-status",
+      "classification": "PROJECTION_AND_VALIDATOR_DRIFT",
+      "cause": "The R2 fixture/self-test and canonical materialized outputs still expected Skin IN_PROGRESS/REVIEW/blocker=1 after the authoritative Stage 3-2 source completed.",
+      "resolution": "Refresh the R2 fixture/self-test to COMPLETE/PASS/blocker=0 and let the existing ACTIVE NEW writer update only the two canonical Project Status targets. Ordinary parity remains fail-closed; stale-canonical allowance exists only inside the active writer repair path.",
+      "semanticReopen": false
+    },
+    {
+      "code": "PROJECT_CHECK_STATUS_SOURCE_DECLARATION_ROUTE_MISSING",
+      "owner": "project-check",
+      "classification": "ROUTING_DRIFT",
+      "cause": "data/status-sources/** was authoritative for R1 but absent from the explicit Project Check status-source owner rule, producing MANUAL_REVIEW on the F1 PR.",
+      "resolution": "Add data/status-sources/** to the existing status-source-tooling path rule without propagation or fan-out.",
+      "semanticReopen": false
+    },
+    {
+      "code": "STATUS_SOURCE_SKIN_ARTIFACT_BRIDGE_STATUS_STALE",
+      "owner": "status-source",
+      "classification": "VALIDATOR_CONTRACT_DRIFT",
+      "cause": "The R1 artifact bridge still required Skin READY_FOR_ASSET_EVIDENCE although the same baseline source is now PASS after real Stage 3-2 evidence completion.",
+      "resolution": "Keep the same producer, selected ID, and source path; update only the current baseline status/semantic role to Stage 3-2 asset-evidence complete. This does not declare all Skin work final.",
+      "semanticReopen": false
+    }
+  ],
+  "currentProjectStatus": {
+    "projectHealth": "REVIEW",
+    "knownHardErrorTotal": 0,
+    "reviewTotal": 28,
+    "blockerTotal": 0,
+    "skin": {
+      "selectedId": "skin-stage3-2-readiness",
+      "activeSource": "data/validation/skin-stage3-2-readiness.v1.json",
+      "lifecycle": "COMPLETE",
+      "health": "PASS",
+      "status": "PASS",
+      "completion": "SKIN_STAGE3_2_COMPLETE",
+      "population": {
+        "skinCount": 540,
+        "heroCount": 267
+      },
+      "nextWork": "Skin Stage 3-3 remains downstream and does not alter F1 authority acceptance."
+    }
+  },
+  "validation": {
+    "statusSourceRun": {
+      "runId": 33446949268,
+      "result": "SUCCESS",
+      "selection": "PASS",
+      "promotion": "PASS",
+      "producerGate": "PASS",
+      "artifactBridge": "PASS",
+      "lifecycle": "PASS"
+    },
+    "projectStatusRun": {
+      "runId": 33446949245,
+      "result": "SUCCESS",
+      "r1Predecessor": "PASS",
+      "parityCompatibilityWriterBoundary": "PASS",
+      "writerPreviewNoMutation": "PASS"
+    },
+    "projectCheckRun": {
+      "runId": 33446949288,
+      "result": "SUCCESS",
+      "selfTest": "PASS",
+      "changedPathOwnershipPlan": "PASS",
+      "owningValidators": "PASS"
+    }
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+      "blocking": false,
+      "owner": "status-source",
+      "condition": "Close only when a legitimate future approved successor exists and NEW R1 explicit workflow_dispatch CAS/apply/commit/push proof succeeds.",
+      "forbiddenShortcut": "Do not synthesize a successor or semantic mutation solely to manufacture transport evidence."
+    }
+  ],
+  "nonScope": [
+    "Skin Stage 1/2 semantic or relation recomputation",
+    "Asset Intake reinstallation or semantic changes",
+    "raw ConfigData investigation",
+    "frontend, asset, Hosted QA, or Browser/UI work",
+    "synthetic Status Source successor creation",
+    "deletion of retained Status Source rollback support"
+  ],
+  "nextStartPoint": "F2: compare before/after domain semantic identity, membership, and exact relation parity using the frozen F0 baselines and current F1 authority graph.",
+  "reopenConditions": [
+    "NEW Status Source no longer directly selects explicit approved declarations",
+    "NEW Project Status gains a legacy Doctor/D1/D5/generated-status runtime predecessor",
+    "Project Check begins using legacy D2/D3/D4/D5/D7 runtime logic or implicit owner propagation",
+    "main required status context changes away from project-check",
+    "new authoritative evidence contradicts the current Skin Stage 3-2 completion state"
+  ]
+}
