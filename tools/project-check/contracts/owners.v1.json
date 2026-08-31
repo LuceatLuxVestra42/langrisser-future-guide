@@ -22,6 +22,7 @@
     {"id":"status-source","validators":["status-source-selection","status-source-promotion","status-source-producer-gate","status-source-artifact-bridge","status-source-lifecycle"]},
     {"id":"project-status","validators":["project-status-parity"]},
     {"id":"project-check","validators":["project-check-self-test"]},
+    {"id":"regression-runner","validators":["regression-runner-self-test"]},
     {"id":"configdata","validators":["configdata-integrity"]},
     {"id":"hero-canonical","validators":["hero-canonical"]},
     {"id":"soldier-canonical","validators":["soldier-canonical"]},
@@ -67,9 +68,9 @@
       "owners":["project-check"]
     },
     {
-      "id":"regression-runner-preimplementation-admission",
+      "id":"regression-runner-tooling",
       "patterns":["tools/regression-runner/**","data/contracts/project-tooling-regression-runner-*.json",".github/workflows/project-tooling-regression-runner.yml"],
-      "owners":["project-check"]
+      "owners":["regression-runner"]
     },
     {
       "id":"old-doctor-retirement-apply",
