@@ -2,8 +2,8 @@
   "version": 1,
   "schemaId": "configdata-lookup-clr8-final-freeze/v1",
   "stage": "CLR8",
-  "status": "CANDIDATE_VALIDATION_PENDING",
-  "completion": "PENDING_CONFIGDATA_LOOKUP_CLR8_FINAL_FREEZE",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR8_FINAL_FREEZE_FROZEN",
   "purpose": "Freeze the completed ConfigData Lookup reset after CLR0-7 by verifying the final package/runtime/validation/writer/retired-orchestration authority inventory and current Project Check routing without reopening Stage 0-6 materialization semantics.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
@@ -40,7 +40,7 @@
     "projectCheckValidator": "configdata-lookup-self-test"
   },
   "writerCompatibility": {
-    "status": "CURRENT_COMPATIBILITY_GATE_REQUIRED",
+    "status": "CURRENT_COMPATIBILITY_GATE_ALIGNED",
     "stage5Validation": "npm run validate:configdata-lookup-stage5",
     "stage6Validation": "node tools/configdata-lookup/test/configdata-lookup-stage6-current-validator.mjs",
     "materializationWriter": "node tools/configdata-lookup/cli/rebuild.mjs --apply --json",
@@ -85,11 +85,46 @@
     "aggregateOwnerSelfTest": "tools/configdata-lookup/test/configdata-lookup-owner-self-test.mjs"
   },
   "validationEvidence": {
-    "candidateHead": null,
-    "configdataLookupWorkflow": null,
-    "projectCheck": null,
-    "freezeHead": null,
-    "freezeHeadRevalidation": "PENDING"
+    "candidateHead": "a6737118328c5ed1836c1131ba877e11d613060b",
+    "configdataLookupWorkflow": {
+      "runId": 33407888791,
+      "jobId": 99539904133,
+      "stage5CurrentValidator": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "clr8FinalFreezeReady": "PASS",
+      "ownerSelfTest": "PASS",
+      "conclusion": "success"
+    },
+    "projectCheck": {
+      "runId": 33407888796,
+      "jobId": 99539903363,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "changedFileCount": 5,
+      "ownerCount": 1,
+      "validatorCount": 1,
+      "manualReviewCount": 0,
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "finalFreezeMetrics": {
+      "predecessorFrozenCount": 8,
+      "readOnlyValidationWorkflowCount": 2,
+      "explicitWriterWorkflowCount": 1,
+      "retiredLegacyOrchestrationWorkflowCount": 2,
+      "projectCheckOwnerCount": 1,
+      "projectCheckValidatorCount": 1,
+      "stage7ActiveAuthorityCount": 0,
+      "stage8ActiveAuthorityCount": 0,
+      "semanticMutationCount": 0,
+      "rawConfigDataReadCount": 0,
+      "materializationRebuildCount": 0,
+      "writerExecutionCount": 0,
+      "trackedMutationCount": 0
+    },
+    "freezeHead": "a6737118328c5ed1836c1131ba877e11d613060b",
+    "freezeHeadRevalidation": "PASS"
   },
   "blockers": [],
   "reviews": [
