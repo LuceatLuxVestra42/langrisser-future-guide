@@ -67,6 +67,22 @@
       "owners":["project-check"]
     },
     {
+      "id":"old-doctor-retirement-apply",
+      "patterns":[
+        ".github/workflows/project-doctor-d7-pr-guard.yml",
+        "scripts/run-project-doctor-closeout-v6.mjs",
+        "scripts/analyze-project-doctor-d2-impact-v6.mjs",
+        "scripts/validate-project-doctor-d2-impact-v6.mjs",
+        "scripts/plan-project-doctor-d3-v6.mjs",
+        "scripts/validate-project-doctor-d3-v6.mjs",
+        "scripts/run-project-doctor-d4-v6.mjs",
+        "scripts/validate-project-doctor-d4-v6.mjs",
+        "scripts/validate-project-doctor-closeout.mjs",
+        "scripts/validate-project-doctor-d7-v8.mjs"
+      ],
+      "owners":["project-check"]
+    },
+    {
       "id":"hero-soldier-relation",
       "patterns":["data/generated/hero-soldier-*","data/validation/hero-soldier-*","data/contracts/hero-soldier-*","scripts/*hero-soldier*",".github/workflows/hero-soldier-*"],
       "owners":["hero-soldier-relation"]
@@ -186,7 +202,7 @@
     },
     {
       "id":"shared-build",
-      "patterns":["vite.config.*","tsconfig*.json","src/routeTree.gen.ts","package-lock.json","bun.lock","bun.lockb"],
+      "patterns":["package.json","vite.config.*","tsconfig*.json","src/routeTree.gen.ts","package-lock.json","bun.lock","bun.lockb"],
       "owners":["shared-build"]
     },
     {
