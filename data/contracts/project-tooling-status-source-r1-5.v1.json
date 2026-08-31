@@ -3,8 +3,8 @@
   "schemaId": "project-tooling-status-source-r1-5/v1",
   "stage": "R1-5",
   "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_5_LIFECYCLE",
-  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
-  "completion": "R1_5_LIFECYCLE_IMPLEMENTED",
+  "status": "PASS",
+  "completion": "R1_5_LIFECYCLE_COMPLETE",
   "purpose": "Rehome explicit apply handoff, retained producer declaration, and explicit closeout-request behavior onto the independent R1-4 Status Source bridge without legacy active-registry, D5 freshness, or Project Status runtime dependencies.",
   "predecessor": {
     "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_4_ARTIFACT_BRIDGE",
@@ -29,6 +29,7 @@
     "runtimeDependency": false
   },
   "implementation": {
+    "implementationCommit": "b7fd14fd24ff707b74af1b22ffad1aad961be262",
     "lifecycleContract": "tools/status-source/contracts/lifecycle.v1.json",
     "runtime": "tools/status-source/lib/lifecycle-status-source.mjs",
     "cli": "tools/status-source/cli/lifecycle.mjs",
@@ -142,6 +143,31 @@
     "synthetic handoff APPLY performs preview then apply delegation and rechecks post-selection",
     "legacy active registry, D5, and Project Status runtime dependency scan remains zero"
   ],
+  "validationEvidence": {
+    "shadowWorkflow": {
+      "runId": 33343354887,
+      "jobId": 99342859032,
+      "headSha": "b7fd14fd24ff707b74af1b22ffad1aad961be262",
+      "conclusion": "success",
+      "selectionParityAndIsolationSelfTest": "PASS",
+      "promotionParityAndRollbackSelfTest": "PASS",
+      "producerGateParityAndDelegationSelfTest": "PASS",
+      "artifactBridgeParityAndDelegationSelfTest": "PASS",
+      "lifecycleParityAndCasSelfTest": "PASS",
+      "heroProducerDeclarationCli": "PASS",
+      "heroCloseoutCheckCli": "PASS",
+      "heroHandoffCheckCli": "PASS"
+    },
+    "mutationProof": {
+      "currentHeroSoldierHandoffCheckWrites": 0,
+      "syntheticCloseoutDeclarationWrites": 1,
+      "syntheticHandoffApplyDelegated": true,
+      "syntheticHandoffStatusSourceWrites": 1,
+      "stalePreviewCasBlocked": true,
+      "staleApplyCasBlocked": true,
+      "productionWriterWorkflowActivated": false
+    }
+  },
   "writerActivation": {
     "state": "DEFERRED_TO_CUTOVER",
     "reason": "Activating a second branch-scoped writer during shadow would violate the no-dual-writer migration boundary. R1-5 proves runtime behavior only; workflow ownership switches after NEW Project Check/cutover preparation."
@@ -153,10 +179,10 @@
     "lifecycleRuntimeImplemented": true,
     "lifecycleCliImplemented": true,
     "selfTestImplemented": true,
-    "shadowWorkflowUpdated": false,
-    "shadowCiPass": false,
-    "currentLifecycleParity": false,
-    "legacyRuntimeDependencyCountZero": false
+    "shadowWorkflowUpdated": true,
+    "shadowCiPass": true,
+    "currentLifecycleParity": true,
+    "legacyRuntimeDependencyCountZero": true
   },
   "blockers": [],
   "reviews": [
@@ -164,7 +190,7 @@
     "Production apply/declaration writer workflow activation is deferred to cutover to avoid dual writers.",
     "Legacy required pr-guard remains a CUTOVER_ONLY blocker and must not be repaired by admitting migration paths into legacy D2-D7."
   ],
-  "nextStartPoint": "Run R1-5 lifecycle self-test and representative declaration/closeout/handoff CHECK commands in the independent Status Source shadow workflow. If PASS, freeze R1-5 and the complete R1 Status Source migration, then start R2 Project Status.",
+  "nextStartPoint": "R1 Status Source is ready to freeze as a complete shadow implementation. Next start R2 Project Status using only the NEW Status Source selection/lifecycle outputs as predecessor authority; do not use OLD D1/D5/PROJECT_STATUS as runtime predecessors.",
   "reopenConditions": [
     "R1-1 active selection semantics change",
     "R1-4 bridge behavior changes",
