@@ -2,8 +2,8 @@
   "version": 1,
   "schemaId": "configdata-lookup-clr3-self-test/v1",
   "stage": "CLR3",
-  "status": "CANDIDATE_VALIDATION_PENDING",
-  "completion": "PENDING_CONFIGDATA_LOOKUP_CLR3_READ_ONLY_SELF_TEST",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR3_SELF_TEST_VALIDATED_PENDING_FREEZE_HEAD_REVALIDATION",
   "purpose": "Promote the independent ConfigData Lookup namespace from CLR2 smoke coverage to a dedicated read-only self-test that proves Stage 5 query parity, CLI parity, clean Stage 6 freshness, fail-closed input handling, zero tracked mutation, and zero Stage 7/8 or Project Doctor runtime dependency before dedicated Project Check owner admission in CLR4.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
@@ -69,9 +69,25 @@
     "trackedMutationCount": 0
   },
   "validationEvidence": {
-    "candidateHead": null,
-    "configdataLookupWorkflow": null,
-    "projectCheck": null,
+    "candidateHead": "1e614476f29b85fd2a409518aa49bcffd29ceb75",
+    "configdataLookupWorkflow": {
+      "name": "Project Tooling ConfigData Lookup CLR2",
+      "runId": 33391970698,
+      "jobId": 99487484801,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "clr3ReadOnlySelfTest": "PASS",
+      "conclusion": "success"
+    },
+    "projectCheck": {
+      "runId": 33391970653,
+      "jobId": 99487484309,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
     "freezeHeadRevalidation": "PENDING"
   },
   "blockers": [],
@@ -92,7 +108,7 @@
       "detail": "The read-only self-test does not expose rebuild/write behavior; writer separation remains CLR5 scope."
     }
   ],
-  "nextStart": "Run the updated ConfigData Lookup validation workflow and required Project Check on the CLR3 candidate. If the formal read-only self-test and Project Check both pass with zero tracked mutation, freeze CLR3 and proceed to CLR4 dedicated configdata-lookup owner and validator catalog admission.",
+  "nextStart": "Revalidate the evidence-only CLR3 freeze head with the ConfigData Lookup workflow and required Project Check. If both pass, set completion to CONFIGDATA_LOOKUP_CLR3_READ_ONLY_SELF_TEST_FROZEN and proceed to CLR4 dedicated configdata-lookup owner and validator catalog admission.",
   "reopenConditions": [
     "NEW adapter results diverge from the frozen Stage 5 query core for the declared parity fixtures.",
     "NEW CLI JSON or exit behavior diverges from the legacy Stage 5 CLI contract.",
