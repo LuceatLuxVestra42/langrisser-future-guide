@@ -1,0 +1,207 @@
+name: Project Tooling Browser UI QA
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/project-tooling-browser-ui-qa.yml'
+      - 'data/contracts/project-tooling-browser-ui-qa-*.json'
+  workflow_run:
+    workflows:
+      - Project Tooling Route Hosted QA
+    types:
+      - completed
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact deployed source SHA; defaults to current workflow SHA
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-tooling-browser-ui-qa-${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.ref }}
+  cancel-in-progress: true
+
+env:
+  HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+
+jobs:
+  browser-ui-qa:
+    name: browser-ui-qa
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact hosted source after Hosted Gate
+        if: ${{ github.event_name == 'workflow_run' }}
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Checkout QA runner source
+        if: ${{ github.event_name != 'workflow_run' }}
+        uses: actions/checkout@v5
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Resolve exact deployed source and Browser QA predecessor
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_RUN_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          DISPATCH_EXPECTED_SHA: ${{ inputs.expected_sha }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          case "$EVENT_NAME" in
+            workflow_run) expected="$WORKFLOW_RUN_HEAD_SHA" ;;
+            pull_request) expected="$PR_BASE_SHA" ;;
+            workflow_dispatch) expected="${DISPATCH_EXPECTED_SHA:-$CURRENT_SHA}" ;;
+            *) echo "Unsupported Browser/UI QA event: $EVENT_NAME" >&2; exit 2 ;;
+          esac
+          if [[ ! "$expected" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "Browser/UI QA requires an exact 40-hex deployed source SHA: $expected" >&2
+            exit 2
+          fi
+          EXPECTED_SOURCE_SHA="$expected" node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const base = process.env.HOSTED_BASE_URL;
+          const expected = process.env.EXPECTED_SOURCE_SHA;
+          const response = await fetch(`${base}authoritative-pages-source.json?browser_ui_qa=${Date.now()}`, { cache: 'no-store' });
+          if (!response.ok) throw new Error(`deployment manifest HTTP ${response.status}`);
+          const manifest = await response.json();
+          if (manifest.sourceSha !== expected) {
+            throw new Error(`Browser/UI predecessor freshness mismatch: expected=${expected} deployed=${manifest.sourceSha}`);
+          }
+          if (manifest.semanticStageReopened !== false) throw new Error('deployed manifest reopened semantic stage');
+          if (!manifest.skinRuntimeRef) throw new Error('deployed manifest is missing skinRuntimeRef');
+          fs.appendFileSync(process.env.GITHUB_ENV, `EXPECTED_SOURCE_SHA=${expected}\nEXPECTED_SKIN_REF=${manifest.skinRuntimeRef}\n`);
+          console.log(JSON.stringify({ status: 'PASS_BROWSER_UI_PREDECESSOR', expectedSourceSha: expected, deployedSourceSha: manifest.sourceSha, semanticStageReopened: false }, null, 2));
+          NODE
+
+      - name: Install Chromium Browser QA runtime
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Reuse stable hosted Browser interaction validators
+        run: |
+          set -euo pipefail
+          node scripts/project-doctor-validate-authoritative-pages-hosted.mjs
+          node scripts/validate-hero-central-discipline-hosted.mjs
+          node scripts/validate-hero-soldier-cards-hosted.mjs
+          node scripts/validate-hero-card-icons-hosted.mjs
+
+      - name: Browser UI interaction coverage spot checks
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+
+          const base = process.env.HOSTED_BASE_URL.replace(/\/?$/, '/');
+          const url = (path) => new URL(path.replace(/^\//, ''), base).toString();
+          const check = (condition, message) => { if (!condition) throw new Error(message); };
+          const waitForLoadedImage = async (image, message) => {
+            await image.waitFor({ state: 'attached', timeout: 20000 });
+            await image.scrollIntoViewIfNeeded();
+            await image.evaluate((node) => node.complete && node.naturalWidth > 0 ? true : new Promise((resolve, reject) => {
+              node.addEventListener('load', () => resolve(true), { once: true });
+              node.addEventListener('error', () => reject(new Error('image failed to load')), { once: true });
+            })).catch((error) => { throw new Error(`${message}: ${error}`); });
+          };
+
+          const browser = await chromium.launch({ headless: true });
+          const errors = [];
+          try {
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            page.on('pageerror', (error) => errors.push(`page:${String(error)}`));
+            page.on('console', (message) => { if (message.type() === 'error') errors.push(`console:${message.text()}`); });
+
+            let response = await page.goto(url('heroes/6/'), { waitUntil: 'networkidle', timeout: 45000 });
+            check(response && response.status() < 400, `Hero 6 browser entry failed: ${response?.status()}`);
+            await page.getByText('Hero #6', { exact: true }).waitFor();
+
+            const nextArtwork = page.getByRole('button', { name: '다음 일러스트' });
+            await nextArtwork.focus();
+            await page.keyboard.press('Enter');
+            await page.getByText(/스킨 1 · ID \d+/, { exact: false }).waitFor({ timeout: 10000 });
+
+            const soldier101 = page.locator('[data-hero-soldier-cards="true"] a[href*="/soldiers/101"]').first();
+            check(await soldier101.count() === 1, 'Hero 6 → Soldier 101 interaction link missing');
+            await soldier101.click();
+            await page.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
+            const soldierDialog = page.getByRole('dialog');
+            await soldierDialog.waitFor({ timeout: 20000 });
+            await page.getByText('사용 가능 영웅', { exact: true }).waitFor({ timeout: 20000 });
+            const soldierHeroCards = soldierDialog.locator('img[src*="/images/heroes/card-icons-webp/"]');
+            await waitForLoadedImage(soldierHeroCards.first(), 'Soldier 101 first Hero card WebP failed');
+            const soldierHeroCardCount = await soldierHeroCards.count();
+            check(soldierHeroCardCount > 0, 'Soldier 101 detail rendered no Hero card WebP images after ready state');
+            const soldierHeroCardSources = await soldierHeroCards.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('src') || ''));
+            check(soldierHeroCardSources.every((src) => src.includes('/images/heroes/card-icons-webp/') && src.endsWith('.webp')), 'Soldier 101 detail contains a non-WebP Hero card source');
+
+            await page.goBack({ waitUntil: 'networkidle', timeout: 45000 });
+            await page.getByText('Hero #6', { exact: true }).waitFor();
+            await page.goForward({ waitUntil: 'networkidle', timeout: 45000 });
+            await page.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
+            await page.getByRole('dialog').waitFor({ timeout: 20000 });
+
+            response = await page.goto(url('equipment/416/'), { waitUntil: 'networkidle', timeout: 45000 });
+            check(response && response.status() < 400, `Equipment 416 browser entry failed: ${response?.status()}`);
+            await page.getByRole('heading', { name: '전용 영웅', exact: true }).waitFor();
+            const heroLink = page.locator('a[href*="/heroes/6"]').first();
+            check(await heroLink.count() === 1, 'Equipment 416 → Hero 6 interaction link missing');
+            await heroLink.click();
+            await page.waitForURL(/\/heroes\/6\/?$/, { timeout: 45000 });
+            await page.getByText('Hero #6', { exact: true }).waitFor();
+
+            check(errors.length === 0, `desktop Browser/UI errors: ${JSON.stringify(errors)}`);
+            await page.close();
+
+            const unknownPage = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            response = await unknownPage.goto(url('heroes/999999999/'), { waitUntil: 'networkidle', timeout: 45000 });
+            check(response && response.status() === 404, `unknown Hero browser navigation must return 404, got ${response?.status()}`);
+            check((await unknownPage.locator('body').innerText()).trim().length > 0, 'unknown Hero browser response rendered an empty document');
+            await unknownPage.close();
+
+            const tablet = await browser.newContext({ viewport: { width: 768, height: 1024 }, hasTouch: true });
+            const tabletPage = await tablet.newPage();
+            const tabletErrors = [];
+            tabletPage.on('pageerror', (error) => tabletErrors.push(`page:${String(error)}`));
+            tabletPage.on('console', (message) => { if (message.type() === 'error') tabletErrors.push(`console:${message.text()}`); });
+            response = await tabletPage.goto(url('heroes/'), { waitUntil: 'networkidle', timeout: 45000 });
+            check(response && response.status() < 400, `Hero list tablet entry failed: ${response?.status()}`);
+            await tabletPage.locator('[data-hero-card-icons="true"]').waitFor();
+            const overflow = await tabletPage.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+            check(overflow <= 1, `Hero list tablet horizontal overflow=${overflow}`);
+            check(tabletErrors.length === 0, `tablet Browser/UI errors: ${JSON.stringify(tabletErrors)}`);
+            await tablet.close();
+
+            console.log(JSON.stringify({
+              status: 'PASS_BROWSER_UI_INTERACTION_SPOT_CHECKS',
+              sourceSha: process.env.EXPECTED_SOURCE_SHA,
+              keyboardSkinCarousel: 'PASS',
+              heroToSoldierNavigation: 'PASS',
+              soldierDetailHeroCardWebp: 'PASS',
+              soldierHeroCardCount,
+              backForwardNavigation: 'PASS',
+              equipmentToHeroNavigation: 'PASS',
+              unknownIdBrowser404: 'PASS',
+              tabletResponsiveOverflow: 0,
+              desktopPageConsoleErrors: 0,
+              tabletPageConsoleErrors: 0,
+              semanticStageReopened: false,
+            }, null, 2));
+          } finally {
+            await browser.close();
+          }
+          NODE
