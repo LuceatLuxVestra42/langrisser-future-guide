@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-post-reinstall-acceptance-f3/v1",
+  "stage": "F3",
+  "checkpoint": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_F3_PROJECT_CHECK_BEHAVIOR",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "F3_PROJECT_CHECK_BEHAVIOR_FROZEN",
+  "purpose": "Accept the post-reinstall Project Check behavior boundary: explicit owning-scope routing, no transitive fan-out, fail-fast owning-validator propagation, manual-review isolation, legacy Doctor runtime independence, and read-only tracked-state execution. Reuse F0-F2 frozen authority/semantic evidence and do not reopen domain semantics.",
+  "predecessors": {
+    "f0": "data/contracts/project-tooling-project-check-post-reinstall-acceptance-f0.v1.json",
+    "f1": "data/contracts/project-tooling-project-check-post-reinstall-acceptance-f1.v1.json",
+    "f2": {
+      "path": "data/contracts/project-tooling-project-check-post-reinstall-acceptance-f2.v1.json",
+      "mainCommit": "db32e16aa2f9026861437e322809da9a9e7a361a",
+      "requiredSemanticState": "F2_SEMANTIC_PARITY_FROZEN"
+    }
+  },
+  "authoritativeImplementation": {
+    "ownerMap": {
+      "path": "tools/project-check/contracts/owners.v1.json",
+      "blobSha": "9371a6e0aafd8497bba81d190200b26cb5160d3f",
+      "status": "DESIGN_FROZEN"
+    },
+    "validatorCatalog": {
+      "path": "tools/project-check/contracts/validators.v1.json",
+      "blobSha": "2fa3ce6070cf05892ed0459a6d02cb1dbfecf8b6",
+      "status": "DESIGN_FROZEN"
+    },
+    "core": {
+      "path": "tools/project-check/lib/project-check.mjs",
+      "blobSha": "87cd4bb22d2fa0175eb7b0fb9f256d038c7377d0"
+    },
+    "selfTest": {
+      "path": "tools/project-check/test/project-check-self-test.mjs",
+      "blobSha": "ea774f02b5d75a268a9e0e404caf210082a1111e",
+      "checkpoint": "PROJECT_CHECK_R3_SELF_TEST",
+      "fixtureCount": 34
+    },
+    "requiredWorkflow": {
+      "path": ".github/workflows/project-tooling-r3-project-check.yml",
+      "preF3BlobSha": "a9bbc84d021578b5017d95895dfbc940e8df4f74",
+      "f3CandidateBlobSha": "51281fc11715a0590b5d05b9375fa49af755cb2a",
+      "requiredContext": "project-check"
+    }
+  },
+  "routingAcceptance": {
+    "explicitOwnerRules": true,
+    "unmatchedPathPolicy": "MANUAL_REVIEW",
+    "unmatchedConfigDataPolicy": "MANUAL_REVIEW",
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "manualReviewFanOut": false,
+    "filenameSimilarityInference": false,
+    "nameJoinInference": false,
+    "idArithmeticInference": false,
+    "semanticRecomputation": false,
+    "representativeFixtures": {
+      "projectCheckTooling": {
+        "path": "tools/project-check/lib/project-check.mjs",
+        "owners": ["project-check"],
+        "validators": ["project-check-self-test"]
+      },
+      "heroFrontend": {
+        "path": "src/routes/heroes.tsx",
+        "owners": ["hero-frontend"],
+        "validators": ["production-build"]
+      },
+      "heroCanonical": {
+        "path": "data/validation/hero-stage6-4-final.v1.json",
+        "owners": ["hero-canonical"],
+        "validators": ["hero-canonical"]
+      },
+      "heroSoldierRelation": {
+        "path": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+        "owners": ["hero-soldier-relation"],
+        "validators": ["hero-soldier-relation"]
+      },
+      "equipmentPresentation": {
+        "path": "data/presentation/equipment-display-collection.v1.json",
+        "owners": ["equipment-frontend", "localization"],
+        "validators": ["localization-audit", "production-build"]
+      },
+      "unknownConfigData": {
+        "path": "data/configdata/ConfigDataUnknownFutureTable.json",
+        "result": "MANUAL_REVIEW",
+        "reason": "UNMATCHED_PATH"
+      }
+    }
+  },
+  "executionAcceptance": {
+    "preflightEntireSelectedQueue": true,
+    "shellExecution": false,
+    "cataloguedCommandsOnly": true,
+    "deduplicateByValidatorId": true,
+    "failFastOnFirstNonZero": true,
+    "owningValidatorFailure": {
+      "expectedStatus": "BLOCKER",
+      "expectedExitCode": 2,
+      "failurePropagationMissCount": 0,
+      "selfTestExecutionCountBeforeStop": 1
+    },
+    "manualReviewAfterSuccessfulValidators": {
+      "expectedStatus": "REVIEW",
+      "expectedExitCode": 3
+    },
+    "noChanges": {
+      "expectedStatus": "NO_CHANGES",
+      "expectedExitCode": 0,
+      "validatorExecutionCount": 0
+    },
+    "planOnly": {
+      "validatorExecutionCount": 0
+    },
+    "legacyRuntimeDependencies": {
+      "D2": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0,
+      "D7": 0
+    }
+  },
+  "regressionRunnerEvidence": {
+    "selfTest": {
+      "path": "tools/regression-runner/test/regression-runner-self-test.mjs",
+      "blobSha": "c41d10f646d19981a72ecbdc45bd4a4a2cef4430",
+      "profile": "core-regression-v1",
+      "validatorCount": 9,
+      "realCurrentParityExecutionCount": 9,
+      "failFastNegativeCase": true,
+      "trackedMutationNegativeCase": true,
+      "runtimeAuthorityOverrideAllowedCount": 0,
+      "automaticCoverageExpansionCount": 0,
+      "shellExecutionCount": 0,
+      "legacyProjectDoctorRuntimeDependencyCount": 0,
+      "semanticRecomputationCount": 0
+    },
+    "rr9": {
+      "path": "data/contracts/project-tooling-regression-runner-r9-retirement.v1.json",
+      "blobSha": "90365958c5f88bea19c7e463366561dbfe8a0c69",
+      "completion": "REGRESSION_RUNNER_RR9_RETIREMENT_FROZEN",
+      "legitimatePostCutoverWorkloadPr": 323,
+      "newRunnerConclusion": "success",
+      "selectedValidatorParity": "PASS",
+      "trackedMutationCount": 0,
+      "oldAutomaticRunnerCount": 0,
+      "oldManualRunnerCount": 0,
+      "runtimeLegacyV2DependencyCount": 0
+    }
+  },
+  "trackedStateBoundary": {
+    "preF3Gap": {
+      "classification": "PROJECT_CHECK_EXECUTION_GUARD_GAP",
+      "owner": "project-check",
+      "detail": "The R3 core and self-test declared read-only boundaries and selected independent validators correctly, but the required workflow did not independently fail a successful validator run that left tracked repository mutations behind."
+    },
+    "f3Fix": {
+      "scope": ".github/workflows/project-tooling-r3-project-check.yml only",
+      "command": "git status --porcelain=v1 --untracked-files=no",
+      "policy": "After owning validators succeed, any tracked working-tree mutation fails the required project-check job.",
+      "untrackedOutputsIgnored": true,
+      "canonicalOrSemanticLogicChanged": false,
+      "domainValidatorLogicChanged": false
+    },
+    "candidateProof": {
+      "commit": "98f7fcf89dd64c37c72d84d7bbfa2eb153ef8978",
+      "workflowRunId": 33448051738,
+      "jobId": 99671468156,
+      "conclusion": "success",
+      "r3SelfTest": "PASS",
+      "changedPathOwnershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "trackedStateUnchangedGuard": "PASS"
+    }
+  },
+  "f3Boundaries": {
+    "canonicalDataChanged": false,
+    "frozenSemanticDataChanged": false,
+    "generatedDomainDataChanged": false,
+    "relationRecomputed": false,
+    "rawConfigDataReadAdded": false,
+    "statusSourceChanged": false,
+    "projectStatusChanged": false,
+    "domainValidatorLogicChanged": false,
+    "frontendChanged": false,
+    "assetChanged": false,
+    "hostedQaChanged": false
+  },
+  "result": {
+    "routingBehavior": "PASS",
+    "owningValidatorFailurePropagation": "PASS",
+    "manualReviewIsolation": "PASS",
+    "legacyRuntimeIndependence": "PASS",
+    "coreRegressionRunnerEvidence": "PASS",
+    "trackedStateExecutionBoundary": "PASS_AFTER_F3_GUARD",
+    "newSemanticMismatchCount": 0,
+    "newBlockerCount": 0,
+    "decision": "Project Check is accepted as the post-reinstall required-check orchestrator for explicit owning-scope selection and failure propagation. F3 closes the remaining execution-boundary gap by making tracked repository mutation after successful owning validators a required-check failure."
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+      "blocking": false,
+      "owner": "status-source",
+      "inheritedFrom": "F1/F2",
+      "condition": "Close only when a legitimate future approved successor exists and NEW R1 explicit workflow_dispatch CAS/apply/commit/push proof succeeds.",
+      "forbiddenShortcut": "Do not synthesize a successor or semantic mutation solely to manufacture transport evidence."
+    }
+  ],
+  "strictExclusions": [
+    "F3 does not reopen Hero, Soldier, Equipment, Hero-Soldier, Banner, or Skin semantics frozen by F2.",
+    "F3 does not treat frontend, asset, Hosted QA, deployment, or Browser/UI behavior as semantic evidence.",
+    "F3 does not modify Status Source or Project Status authority.",
+    "F3 does not expand the Regression Runner profile or Project Check owner graph without an observed coverage requirement."
+  ],
+  "mergeGate": "The final F3 branch head must pass the required project-check workflow, including the tracked-state unchanged guard, before merge to main.",
+  "nextStartPoint": "Proceed to final post-reinstall acceptance closeout using frozen F0 authority baseline, F1 authority/runtime graph, F2 semantic parity, and F3 Project Check behavior evidence. Keep STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED as non-blocking review until a legitimate successor exists.",
+  "reopenConditions": [
+    "Project Check owner routing begins transitive propagation or change-class fan-out.",
+    "An owning validator failure no longer blocks the required check.",
+    "A successful Project Check execution can leave tracked repository mutations without blocking.",
+    "Legacy D2/D3/D4/D5/D7 runtime dependency becomes active again.",
+    "A new authoritative coverage requirement demonstrates an actual regression miss in an admitted owning scope.",
+    "New authoritative evidence contradicts F0-F3 acceptance evidence."
+  ]
+}
