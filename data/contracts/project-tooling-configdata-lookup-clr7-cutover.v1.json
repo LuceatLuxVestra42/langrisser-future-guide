@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-clr7-cutover/v1",
+  "stage": "CLR7",
+  "status": "CANDIDATE_VALIDATION_PENDING",
+  "completion": "PENDING_CONFIGDATA_LOOKUP_CLR7_CUTOVER",
+  "purpose": "Cut over public package lookup/refs/find authority to the NEW ConfigData Lookup namespace and retire legacy Stage 7/8 Doctor-style selector authority from active package/workflow/runtime surfaces without reopening Stage 0-6 materialization semantics.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "base": "main",
+    "sourceHead": "1c1de55c9eb93a8d6504b267438a9475c62a3cde",
+    "predecessor": {
+      "path": "data/contracts/project-tooling-configdata-lookup-clr6-shadow-parity.v1.json",
+      "requiredCompletion": "CONFIGDATA_LOOKUP_CLR6_SHADOW_PARITY_FROZEN"
+    }
+  },
+  "packageCliCutover": {
+    "lookup": "node tools/configdata-lookup/cli/run.mjs lookup",
+    "refs": "node tools/configdata-lookup/cli/run.mjs refs",
+    "find": "node tools/configdata-lookup/cli/run.mjs find",
+    "legacyCli": "scripts/configdata-lookup-cli.mjs",
+    "legacyCliAuthority": false,
+    "legacyCliDisposition": "HISTORICAL_COMPATIBILITY_REFERENCE_ONLY",
+    "commandShapePreserved": true
+  },
+  "legacyAuthorityRetirement": {
+    "stage7Contract": "data/contracts/configdata-lookup-stage7-smart-regression-contract.v1.json",
+    "stage8Contract": "data/contracts/configdata-lookup-stage8-project-doctor-expansion-contract.v1.json",
+    "stage7Validator": "scripts/validate-configdata-lookup-stage7.mjs",
+    "stage8Validator": "scripts/validate-configdata-lookup-stage8.mjs",
+    "historicalEvidencePreserved": true,
+    "packageInvocationAllowed": false,
+    "workflowInvocationAllowed": false,
+    "newRuntimeDependencyAllowed": false,
+    "physicalDeletionRequired": false,
+    "reason": "Stage 7/8 artifacts remain frozen historical evidence. CLR7 retires their active orchestration authority rather than deleting completed evidence or reopening their semantics."
+  },
+  "ownershipBoundary": {
+    "configdataLookupOwner": "configdata-lookup",
+    "configdataLookupValidator": "configdata-lookup-self-test",
+    "packageJsonProjectCheckOwnerRemains": "shared-build",
+    "packageJsonLookupValidation": "Project Tooling ConfigData Lookup workflow explicitly triggers on package.json and the aggregate owner self-test asserts exact lookup/refs/find aliases.",
+    "broadPackageOwnerExpansion": false,
+    "ownerPropagation": false,
+    "changeClassFanOut": false
+  },
+  "validationImplementation": {
+    "cutoverSelfTest": "tools/configdata-lookup/test/configdata-lookup-clr7-cutover.mjs",
+    "aggregateOwnerSelfTest": "tools/configdata-lookup/test/configdata-lookup-owner-self-test.mjs",
+    "generalWorkflow": ".github/workflows/project-tooling-configdata-lookup-clr2.yml",
+    "activeAuthorityScan": "Scan package.json and every .github/workflows YAML for legacy Stage 7/8 selector/validator invocation tokens.",
+    "cliParity": "Execute npm run lookup/refs/find through NEW package aliases and compare stdout/stderr/exit status to the preserved legacy CLI for representative positive, find, refs, and absent-ID cases."
+  },
+  "requiredValidation": {
+    "clr6Predecessor": "CONFIGDATA_LOOKUP_CLR6_SHADOW_PARITY_FROZEN",
+    "packageCliLegacyAliasCount": 0,
+    "packageCliParityMismatchCount": 0,
+    "activeStage7PackageReferenceCount": 0,
+    "activeStage8PackageReferenceCount": 0,
+    "activeStage7WorkflowReferenceCount": 0,
+    "activeStage8WorkflowReferenceCount": 0,
+    "newRuntimeStage7Or8DependencyCount": 0,
+    "stage6Freshness": "CLEAN_CONFIGDATA_LOOKUP_STAGE6",
+    "configdataLookupOwnerSelfTest": "PASS",
+    "projectCheckSelfTest": "PASS",
+    "projectCheckOwnershipPlan": "PASS",
+    "projectCheckOwningValidators": "PASS",
+    "productionBuild": "PASS",
+    "trackedMutationCount": 0
+  },
+  "unchangedScope": {
+    "stage0To6MaterializationAlgorithmMutationCount": 0,
+    "stage0To6GeneratedArtifactMutationCount": 0,
+    "rawConfigDataMutationCount": 0,
+    "semanticMutationCount": 0,
+    "writerAuthorityMutationCount": 0,
+    "stage7ContractMutationCount": 0,
+    "stage8ContractMutationCount": 0,
+    "stage7ValidatorMutationCount": 0,
+    "stage8ValidatorMutationCount": 0,
+    "frontendImplementationMutationCount": 0,
+    "assetMutationCount": 0,
+    "hostedQaMutationCount": 0,
+    "browserUiMutationCount": 0
+  },
+  "validationEvidence": {
+    "candidateHead": null,
+    "configdataLookupWorkflow": null,
+    "projectCheck": null,
+    "freezeHead": null,
+    "freezeHeadRevalidation": "PENDING"
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_STAGE5_CLI_FILE_PRESERVED",
+      "blocking": false,
+      "detail": "scripts/configdata-lookup-cli.mjs remains as preserved parity/historical compatibility reference, but package authority is transferred to tools/configdata-lookup/cli/run.mjs."
+    },
+    {
+      "id": "LEGACY_STAGE7_STAGE8_ARTIFACTS_PRESERVED_AS_HISTORY",
+      "blocking": false,
+      "detail": "Stage 7/8 contracts, libraries, validators and summaries are not physically deleted because they are completed historical evidence; active package/workflow/NEW runtime authority must remain zero."
+    }
+  ],
+  "nextStart": "After CLR7 freeze, begin CLR8 final freeze: inventory final ConfigData Lookup authority/runtime/writer surfaces, verify all CLR0-7 predecessor completions and current Project Check routing, then freeze the reset as complete without reopening Stage 0-6 semantics.",
+  "reopenConditions": [
+    "package lookup/refs/find stops resolving to tools/configdata-lookup/cli/run.mjs or diverges from preserved CLI behavior.",
+    "Any active package script or workflow begins invoking legacy ConfigData Lookup Stage 7/8 selector authority.",
+    "NEW ConfigData Lookup runtime imports Stage 7/8 Doctor-style selection logic.",
+    "Stage 0-6 materialization semantics or generated data are changed as part of the cutover.",
+    "Project Check or the dedicated ConfigData Lookup workflow no longer validates the CLR7 cutover contract."
+  ]
+}
