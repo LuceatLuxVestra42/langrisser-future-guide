@@ -2,8 +2,8 @@
   "version": 1,
   "schemaId": "configdata-lookup-clr6-shadow-parity/v1",
   "stage": "CLR6",
-  "status": "CANDIDATE_PASS",
-  "completion": "PENDING_FREEZE_HEAD_REVALIDATION",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR6_SHADOW_PARITY_FROZEN",
   "purpose": "Verify the NEW ConfigData Lookup surface against the preserved Stage 5/6 behavior without rebuilding materialization, reading raw ConfigData, recomputing semantic relations, or cutting over package/Stage 7/8 authority.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
@@ -107,8 +107,23 @@
       "owningValidators": "PASS",
       "conclusion": "success"
     },
-    "freezeHead": null,
-    "freezeHeadRevalidation": "PENDING"
+    "freezeHead": "fe8917b38278a362c9d5882e800fc22035f051a5",
+    "freezeHeadConfigdataLookupWorkflow": {
+      "runId": 33396659108,
+      "jobId": 99502675569,
+      "ownerSelfTest": "PASS",
+      "clr6ShadowParity": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadProjectCheck": {
+      "runId": 33396659142,
+      "jobId": 99502675634,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadRevalidation": "PASS"
   },
   "blockers": [],
   "reviews": [
@@ -128,7 +143,7 @@
       "detail": "Legacy Stage 7/8 orchestration remains unchanged and outside NEW ConfigData Lookup authority until CLR7."
     }
   ],
-  "nextStart": "Revalidate this evidence-only freeze head with Project Tooling ConfigData Lookup and required Project Check. If both pass, freeze CLR6 and proceed to CLR7 cutover without reopening Stage 0-6 materialization semantics.",
+  "nextStart": "Begin CLR7 cutover: move package lookup/refs/find authority to tools/configdata-lookup, remove NEW ownership dependence on legacy Stage 7/8 orchestration, and retire or demote legacy Stage 7/8 authority only within the ConfigData Lookup owning scope. Do not reopen Stage 0-6 materialization semantics.",
   "reopenConditions": [
     "The NEW lookup adapter no longer delegates exactly to the preserved Stage 5 read-only core before CLR7 replacement is explicitly admitted.",
     "A declared Stage 1-4 materialized input path becomes raw ConfigData or otherwise bypasses the frozen index layers.",
