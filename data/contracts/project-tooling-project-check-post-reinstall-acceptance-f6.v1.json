@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-post-reinstall-acceptance-f6/v1",
+  "stage": "F6",
+  "checkpoint": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_F6_REAL_WORKLOAD",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "F6_REAL_WORKLOAD_FROZEN",
+  "purpose": "Consolidate legitimate post-cutover workload evidence so final Doctor v2 acceptance does not rely only on synthetic routing or negative fixtures.",
+  "realWorkloads": [
+    {
+      "id": "REGRESSION_RUNNER_LEGITIMATE_POST_CUTOVER_WORKLOAD",
+      "sourceCheckpoint": "data/contracts/project-tooling-regression-runner-r9-retirement.v1.json",
+      "pr": 323,
+      "title": "Cut over ConfigData Lookup CLR7 authority",
+      "synthetic": false,
+      "newRunnerWorkflowRunId": 33403017709,
+      "newRunnerConclusion": "success",
+      "selectedValidatorCount": 9,
+      "selectedValidatorParity": "PASS",
+      "trackedMutationCount": 0,
+      "legacyProjectDoctorRuntimeDependencyCount": 0,
+      "oldAutomaticRunnerCount": 0,
+      "oldManualRunnerCount": 0
+    },
+    {
+      "id": "ASSET_INTAKE_FINAL_INSTALLATION_WORKLOAD",
+      "sourceCheckpoint": "tools/asset-intake/checkpoints/r4-installation-final-freeze.md",
+      "pr": 330,
+      "synthetic": false,
+      "merged": true,
+      "mainCommit": "c1b31cc315930c8f42782c2aab7895f21e9ab24e",
+      "projectCheckWorkflowRunId": 33445292261,
+      "projectCheckConclusion": "success",
+      "assetIntakeValidator": "PASS_24_OF_24",
+      "skinStage3_2EvidenceValidator": "PASS_45_OF_45",
+      "trackedMutationCount": 0,
+      "activeLegacyRuntimeDependency": 0,
+      "semanticRecomputation": 0
+    },
+    {
+      "id": "POST_REINSTALL_ACCEPTANCE_PR_CHAIN",
+      "synthetic": false,
+      "mergedPrs": [331, 332, 333, 334],
+      "stages": ["F0", "F1", "F2", "F3"],
+      "mainCommits": [
+        "f2bebd2f954360b9d859da71802184ec42d23429",
+        "75200c77ef6f67b268dce1c6f6481c55f34b741e",
+        "db32e16aa2f9026861437e322809da9a9e7a361a",
+        "6ae0898d12e142f707a8ac9721270d2b4cb3c2ce"
+      ],
+      "knownRequiredProjectCheckRuns": [
+        33446069175,
+        33447663389,
+        33448149145
+      ],
+      "allMergedUnderRequiredProjectCheck": true
+    }
+  ],
+  "result": {
+    "legitimateWorkloadGroups": 3,
+    "syntheticOnlyAcceptance": false,
+    "newRunnerRealWorkloadProof": "PASS",
+    "assetIntakeRealWorkloadProof": "PASS",
+    "acceptanceChainRequiredCheckProof": "PASS",
+    "trackedMutationObservedInAcceptedRealWorkload": 0,
+    "legacyRuntimeObservedInAcceptedRealWorkload": 0,
+    "decision": "NEW Project Check and independent tooling have legitimate post-cutover CI/workload evidence in addition to fixture and bait coverage."
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+      "blocking": false,
+      "owner": "status-source",
+      "condition": "A real non-main workflow_dispatch CAS/apply/commit/push proof remains deferred until a legitimate approved successor exists."
+    }
+  ],
+  "reopenConditions": [
+    "A cited legitimate workload is shown not to have executed the NEW tooling it is recorded as proving.",
+    "The required main branch status context changes away from NEW project-check without a successor acceptance.",
+    "New authoritative evidence contradicts the cited real-workload outcomes."
+  ]
+}
