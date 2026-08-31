@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-clr1-boundary/v1",
+  "stage": "CLR1",
+  "status": "DESIGN_FROZEN",
+  "completion": "CONFIGDATA_LOOKUP_CLR1_BOUNDARY_FROZEN",
+  "purpose": "Freeze the target authority and responsibility boundary for the ConfigData Lookup reset without modifying the validated Stage 0-6 lookup/index baseline or prematurely cutting over legacy Stage 7/8 Project Doctor orchestration.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "sourceHead": "ae93340afac7571e46a746273711f5fc53520ccc",
+    "predecessor": {
+      "path": "data/contracts/project-tooling-project-check-configdata-lookup-clr0-baseline.v1.json",
+      "blobSha": "7bc416bf70a794192c85dd50fba42e42ef7b4d4a",
+      "requiredCompletion": "CONFIGDATA_LOOKUP_CLR0_BASELINE_FROZEN"
+    },
+    "legacyStage7": {
+      "path": "data/contracts/configdata-lookup-stage7-smart-regression-contract.v1.json",
+      "blobSha": "238713b6a54ea228a483228fcb4e0c3e3a44d939",
+      "classification": "LEGACY_PROJECT_DOCTOR_ORCHESTRATION"
+    },
+    "legacyStage8": {
+      "path": "data/contracts/configdata-lookup-stage8-project-doctor-expansion-contract.v1.json",
+      "blobSha": "28361a24ae3dd98938b6b333e0545e60989b250d",
+      "classification": "LEGACY_PROJECT_DOCTOR_ORCHESTRATION_EXPANSION"
+    }
+  },
+  "preservedStage0To6Capabilities": {
+    "materializedIdIndices": true,
+    "materializedForwardReferences": true,
+    "materializedReverseReferences": true,
+    "frozenCanonicalOverlayConsumption": true,
+    "dependencyManifestAndFreshness": true,
+    "lookupCommand": true,
+    "refsCommand": true,
+    "findCommand": true,
+    "explicitIncrementalMaterializationCapability": true,
+    "semanticMeaningChanged": false,
+    "indexFormatChanged": false,
+    "cliContractChanged": false
+  },
+  "targetAuthority": {
+    "owns": [
+      "Read already-materialized ConfigData Lookup indices and dependency metadata.",
+      "Resolve ID locator lookups through the frozen Stage 0-6 materialized layers.",
+      "Return materialized direct/reverse reference results without transitive inference.",
+      "Perform bounded literal find operations supported by the existing CLI contract.",
+      "Determine lookup/index freshness from explicit dependency metadata and source hashes.",
+      "Report missing, malformed, or stale lookup materialization as a lookup-owned failure.",
+      "Perform explicit lookup/index materialization only through a separately invoked writer/rebuild operation after CLR5 separation."
+    ],
+    "doesNotOwn": [
+      "Hero, Soldier, Equipment, Banner, Skin, or other domain semantic authority.",
+      "Discovery of new semantic relations or recomputation of frozen canonical relations.",
+      "Domain semantic fan-out from ConfigData changes.",
+      "Selection or execution authority for Hero, Soldier, Equipment, Banner, or other page validators.",
+      "Selection or execution authority for Route/Hosted QA or Browser/UI QA.",
+      "Cross-domain mutation, frontend mutation, asset mutation, deployment mutation, status-source mutation, or Project Status mutation.",
+      "Filename-similarity inference, name JOIN, ID arithmetic, or transitive impact inference.",
+      "Silent fallback to raw ConfigData when materialized lookup data is stale or missing."
+    ]
+  },
+  "routingBoundary": {
+    "futureProjectCheckModel": "EXPLICIT_PATH_TO_OWNER_TO_CATALOGUED_VALIDATOR",
+    "lookupMayAdviseCrossDomainOwners": false,
+    "lookupMayFanOutValidators": false,
+    "lookupMaySelectHostedTargets": false,
+    "unknownConfigDataBehavior": "MANUAL_REVIEW_OR_EXPLICIT_CONFIGDATA_INTEGRITY_ONLY_UNTIL_AN_OWNER_RULE_IS_FROZEN",
+    "stage7UnknownConfigDataSelectAllBehaviorInherited": false,
+    "projectCheckOwnerAdmissionDeferredTo": "CLR4"
+  },
+  "readWriteBoundary": {
+    "requiredCiValidationTarget": "READ_ONLY",
+    "validationMayRebuildOrCommit": false,
+    "explicitMaterializationWriterAllowed": true,
+    "writerScope": "CONFIGDATA_LOOKUP_OWNED_GENERATED_INDEX_MANIFEST_AND_SUMMARY_ARTIFACTS_ONLY",
+    "writerSeparationDeferredTo": "CLR5",
+    "rawConfigDataMutationAllowed": false,
+    "canonicalSemanticMutationAllowed": false
+  },
+  "legacyStage7And8Disposition": {
+    "modifiedInClr1": false,
+    "deletedInClr1": false,
+    "currentHistoricalEvidencePreserved": true,
+    "targetRuntimeAuthority": false,
+    "actualCutoverDeferredTo": "CLR7",
+    "note": "CLR1 freezes what the reset ConfigData Lookup will and will not own. It does not falsely declare Stage 7/8 physically retired before the later cutover step."
+  },
+  "semanticBoundary": {
+    "rawConfigDataReadAsProductionFallback": false,
+    "rawConfigDataMutation": false,
+    "newRelationDiscovery": false,
+    "canonicalRelationRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarityInference": false,
+    "transitiveImpactInference": false,
+    "domainSemanticReopen": false,
+    "frontendAuthority": false,
+    "assetAuthority": false,
+    "hostedQaAuthority": false,
+    "browserUiAuthority": false,
+    "deploymentAuthority": false,
+    "statusAuthority": false
+  },
+  "currentChangeScope": {
+    "contractOnly": true,
+    "stage0To6ImplementationMutationCount": 0,
+    "stage0To6GeneratedArtifactMutationCount": 0,
+    "rawConfigDataMutationCount": 0,
+    "stage7Or8MutationCount": 0,
+    "projectCheckOwnerAdmissionCount": 0,
+    "semanticMutationCount": 0
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "DEDICATED_CONFIGDATA_LOOKUP_OWNER_DEFERRED",
+      "blocking": false,
+      "detail": "The dedicated configdata-lookup Project Check owner and validator are intentionally deferred to CLR4."
+    },
+    {
+      "id": "LEGACY_STAGE7_STAGE8_AUTHORITY_CUTOVER_DEFERRED",
+      "blocking": false,
+      "detail": "Stage 7/8 Project Doctor orchestration files are preserved during CLR1. Their active authority/runtime dependency is removed only after the independent replacement passes parity and admission gates in CLR7."
+    },
+    {
+      "id": "LEGACY_STAGE6_WRITER_SEPARATION_DEFERRED",
+      "blocking": false,
+      "detail": "The existing Stage 6 workflow writer capability remains unchanged in CLR1; required validation/write separation belongs to CLR5."
+    }
+  ],
+  "validation": {
+    "requiredProjectCheck": true,
+    "requiredSemanticValidation": false,
+    "requiredStage6Rebuild": false,
+    "requiredProductionBuild": false,
+    "requiredHostedQa": false,
+    "requiredBrowserUi": false,
+    "reason": "CLR1 changes only the reset authority contract and does not modify lookup implementation, generated lookup data, semantic data, frontend, assets, deployment, or hosted/browser behavior."
+  },
+  "nextStart": "Begin CLR2 from this frozen boundary. Create the independent tools/configdata-lookup namespace as an adapter/entrypoint over the validated Stage 0-6 materialized artifacts without rewriting the Stage 0-6 producers, changing CLI semantics, or inheriting Stage 7/8 Project Doctor orchestration.",
+  "reopenConditions": [
+    "Authoritative Stage 0-6 evidence contradicts the CLR0 frozen baseline.",
+    "A required core Lookup capability cannot be preserved without raw ConfigData fallback or semantic recomputation.",
+    "New authoritative evidence proves a cross-domain orchestration responsibility is intrinsic to ConfigData Lookup rather than Project Check or another owning tool.",
+    "The target read/write separation cannot preserve required lookup/index materialization behavior within a bounded owning scope."
+  ]
+}
