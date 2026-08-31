@@ -30,7 +30,10 @@
   },
   "resolutionPolicy": {
     "bundleNameUse": "DISCOVERY_ONLY",
-    "authority": "An asset target is located only by case-normalized exact Unity container path equality inside a selectively extracted official bundle.",
+    "unityContainerRootPrefix": "assets/gameproject/runtimeassets",
+    "containerPathNormalization": "Normalize slash and case, require the configured Unity container root prefix, remove that prefix exactly once, then require exact equality with the frozen runtime locator.",
+    "normalizationEvidence": "Fresh diagnostic run 33442980191 observed the same assets/gameproject/runtimeassets prefix for suffix matches on all 13 frozen representative locators.",
+    "authority": "An asset target is located only when the normalized official Unity container path, after the single frozen root-prefix removal, equals the frozen runtime locator exactly.",
     "beginCurrentPreferenceByName": false,
     "partialScanExtrapolation": false,
     "historicalCompletionEvidenceImported": false,
