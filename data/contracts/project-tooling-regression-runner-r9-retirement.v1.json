@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-regression-runner-r9-retirement/v1",
+  "stage": "RR9",
+  "status": "CANDIDATE",
+  "completion": "REGRESSION_RUNNER_RR9_RETIREMENT_CANDIDATE",
+  "purpose": "Close the Regression Runner rollback window after legitimate post-cutover workload proof by physically retiring the OLD manual V2 comparator and its package entrypoint while preserving historical V1/V2 evidence and the inert legacy audit script.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "base": "main",
+    "sourceHead": "571edbb69dca7a82aa6586c826e5ab9fd3fb9641",
+    "predecessor": {
+      "path": "data/contracts/project-tooling-regression-runner-r8-final-freeze.v1.json",
+      "requiredCompletion": "REGRESSION_RUNNER_RR8_INSTALLATION_FROZEN_ROLLBACK_OPEN"
+    }
+  },
+  "proof": {
+    "classification": "LEGITIMATE_POST_CUTOVER_NON_REGRESSION_RUNNER_TOOLING_WORKLOAD",
+    "synthetic": false,
+    "workload": {
+      "pr": 323,
+      "title": "Cut over ConfigData Lookup CLR7 authority",
+      "head": "185e84bd4dd6d41fcb2be92d8111bf7d00cf89de",
+      "triggerReason": "CLR7 changed package.json as part of a real ConfigData Lookup public CLI authority cutover; package.json belonged to the inherited OLD V2 automatic trigger scope."
+    },
+    "newRunner": {
+      "workflow": ".github/workflows/project-tooling-regression-runner.yml",
+      "runId": 33403017709,
+      "jobId": 99523733692,
+      "conclusion": "success",
+      "validatorCount": 9,
+      "selectedNineValidatorParity": "PASS",
+      "trackedMutationCount": 0,
+      "legacyProjectDoctorRuntimeDependencyCount": 0,
+      "legacyRegressionAdmissionAuditCount": 0
+    },
+    "oldRunner": {
+      "automaticPrRunObserved": false,
+      "dualAutomaticRunnerObserved": false
+    },
+    "rr8ProofConditionSatisfied": true
+  },
+  "runtimeRetirementInventory": {
+    "delete": [
+      {
+        "path": ".github/workflows/regression-coverage-promotion-v2.yml",
+        "classification": "OLD_MANUAL_READ_ONLY_ROLLBACK_COMPARATOR",
+        "reason": "RR9 proof removes the operational rollback need."
+      }
+    ],
+    "removeEntrypoint": [
+      {
+        "path": "package.json",
+        "key": "scripts.validate:regression-coverage-promotion:v2",
+        "classification": "OLD_V2_DEDICATED_PACKAGE_ENTRYPOINT"
+      }
+    ],
+    "preserveHistorical": [
+      "data/contracts/regression-coverage-promotion.v1.json",
+      "data/contracts/regression-coverage-promotion.v2.json",
+      "data/validation/regression-coverage-promotion-summary.v2.json",
+      "scripts/validate-regression-coverage-promotion-v2.mjs"
+    ],
+    "legacyAuditScriptState": "HISTORICAL_INERT_NO_WORKFLOW_OR_PACKAGE_ENTRYPOINT"
+  },
+  "postRetirementAuthority": {
+    "newRunner": ".github/workflows/project-tooling-regression-runner.yml",
+    "profile": "core-regression-v1",
+    "validatorAuthority": "tools/project-check/contracts/validators.v1.json",
+    "validatorCount": 9,
+    "oldAutomaticRunnerCount": 0,
+    "oldManualRunnerCount": 0,
+    "legacyPackageEntrypointCount": 0,
+    "runtimeLegacyV2DependencyCount": 0
+  },
+  "boundaries": {
+    "newRunnerCoreChanged": false,
+    "profileMembershipChanged": false,
+    "validatorCatalogChanged": false,
+    "semanticRelationChanged": false,
+    "canonicalDataChanged": false,
+    "frozenDataChanged": false,
+    "generatedDomainDataChanged": false,
+    "statusSourceChanged": false,
+    "projectStatusChanged": false,
+    "frontendChanged": false,
+    "assetChanged": false,
+    "hostedQaChanged": false,
+    "configDataChanged": false,
+    "localizationChanged": false
+  },
+  "candidateValidation": {
+    "regressionRunner": "PENDING",
+    "projectCheck": "PENDING",
+    "productionBuild": "PENDING",
+    "trackedMutationCount": null
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_V2_AUDIT_SCRIPT_RETAINED_AS_HISTORY",
+      "blocking": false,
+      "classification": "HISTORICAL_EVIDENCE",
+      "detail": "The legacy V2 audit script remains physically present only to reproduce historical V2 evidence. Its workflow and package entrypoint are retired, and NEW runtime already forbids depending on it."
+    },
+    {
+      "id": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+      "blocking": false,
+      "classification": "SEPARATE_TOOLING_TRACK",
+      "detail": "Status Source rollback closure remains independent of Regression Runner RR9 and is not changed by this retirement."
+    }
+  ],
+  "nextStart": "After candidate and freeze-head validation pass, close the Regression Runner rollback window, merge RR9, and continue to the next independent tooling track such as Asset Intake."
+}
