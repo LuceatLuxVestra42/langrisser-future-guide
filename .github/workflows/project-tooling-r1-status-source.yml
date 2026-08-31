@@ -10,6 +10,7 @@ on:
       - 'data/contracts/project-tooling-status-source-r1-2.v1.json'
       - 'data/contracts/project-tooling-status-source-r1-3.v1.json'
       - 'data/contracts/project-tooling-status-source-r1-4.v1.json'
+      - 'data/contracts/project-tooling-status-source-r1-5.v1.json'
       - 'data/contracts/project-tooling-migration-r0.v1.json'
       - 'data/status-sources/**'
       - '.github/workflows/project-tooling-r1-status-source.yml'
@@ -44,6 +45,9 @@ jobs:
       - name: Run independent Status Source artifact bridge parity and delegation self-test
         run: node tools/status-source/test/artifact-bridge-parity.mjs
 
+      - name: Run independent Status Source lifecycle parity and CAS self-test
+        run: node tools/status-source/test/lifecycle-parity.mjs
+
       - name: Print selected sources
         run: node tools/status-source/cli/select.mjs
 
@@ -63,3 +67,17 @@ jobs:
 
       - name: Prove artifact bridge CLI delegates to check-only on the active Equipment pipeline
         run: node tools/status-source/cli/bridge.mjs --pipeline equipment
+
+      - name: Resolve retained Hero producer declaration
+        run: node tools/status-source/cli/lifecycle.mjs declaration --pipeline hero
+
+      - name: Prove Hero closeout request is deterministic and check-only
+        run: node tools/status-source/cli/lifecycle.mjs closeout --pipeline hero
+
+      - name: Prove Hero lifecycle handoff defaults to check-only
+        run: >-
+          node tools/status-source/cli/lifecycle.mjs handoff
+          --pipeline hero
+          --expected-predecessor hero-stage6-4-final
+          --id hero-stage6-4-final
+          --source data/validation/hero-stage6-4-final.v1.json
