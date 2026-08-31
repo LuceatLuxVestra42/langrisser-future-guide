@@ -71,18 +71,18 @@ expectOwners(
 );
 expectOwners(
   'tools/regression-runner/lib/runner.mjs',
-  ['project-check'],
-  ['project-check-self-test'],
+  ['regression-runner'],
+  ['regression-runner-self-test'],
 );
 expectOwners(
   '.github/workflows/project-tooling-regression-runner.yml',
-  ['project-check'],
-  ['project-check-self-test'],
+  ['regression-runner'],
+  ['regression-runner-self-test'],
 );
 expectOwners(
   'data/contracts/project-tooling-regression-runner-r2-admission.v1.json',
-  ['project-check'],
-  ['project-check-self-test'],
+  ['regression-runner'],
+  ['regression-runner-self-test'],
 );
 expectOwners(
   'data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json',
