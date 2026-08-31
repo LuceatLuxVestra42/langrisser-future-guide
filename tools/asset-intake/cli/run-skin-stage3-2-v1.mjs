@@ -48,11 +48,27 @@ export async function loadSkinStage32RolloutAuthority() {
   if (rollout.schemaId !== 'asset-intake-skin-stage3-2-rollout/v1' || rollout.status !== 'DESIGN_FROZEN') {
     throw new Error('Skin Stage 3-2 rollout contract is not frozen.');
   }
-  if (readiness.status !== rollout.currentAuthority.requiredStatus) {
-    throw new Error(`Skin current authority status changed: ${readiness.status}`);
+
+  const allowedStates = Array.isArray(rollout.currentAuthority.allowedStates)
+    ? rollout.currentAuthority.allowedStates
+    : [];
+  const authorityState = allowedStates.find(state => state.status === readiness.status);
+  if (!authorityState) {
+    throw new Error(`Skin current authority status changed to an unadmitted state: ${readiness.status}`);
   }
-  if (readiness.evidence?.present !== false) {
-    throw new Error('Skin current authority unexpectedly claims evidence; re-evaluate the rollout predecessor before execution.');
+  if ((readiness.completion ?? null) !== (authorityState.completion ?? null)) {
+    throw new Error(`Skin current authority completion drifted: ${readiness.completion ?? null}`);
+  }
+  if (readiness.evidence?.present !== authorityState.evidencePresent) {
+    throw new Error(`Skin current authority evidence state drifted: ${readiness.evidence?.present}`);
+  }
+  if (readiness.status === 'PASS') {
+    if (readiness.completion !== 'SKIN_STAGE3_2_COMPLETE') {
+      throw new Error(`Skin completed authority has unexpected completion: ${readiness.completion}`);
+    }
+    if (readiness.evidence?.blocker != null || (readiness.evidence?.issues ?? []).length !== 0) {
+      throw new Error('Skin completed authority still reports an evidence blocker or issue.');
+    }
   }
   if (contract.contractVersion !== 'asset-intake/v1' || contract.domain !== 'skin') {
     throw new Error('Skin normalized Asset Intake contract is invalid.');
@@ -70,7 +86,7 @@ export async function loadSkinStage32RolloutAuthority() {
     throw new Error(`Skin rollout locator count drifted: ${locatorCount}`);
   }
 
-  return { rollout, readiness, contract };
+  return { rollout, readiness, contract, authorityState };
 }
 
 export async function runSkinStage32Rollout(argv) {
@@ -78,7 +94,7 @@ export async function runSkinStage32Rollout(argv) {
   if (options.help) return { status: 'HELP', exitCode: 0, text: `${usage()}\n` };
   if (!options.root) throw new Error('--root is required');
 
-  const { rollout } = await loadSkinStage32RolloutAuthority();
+  const { rollout, readiness } = await loadSkinStage32RolloutAuthority();
   const args = [
     'skin',
     '--root', options.root,
@@ -97,7 +113,8 @@ export async function runSkinStage32Rollout(argv) {
   return {
     status: 'PASS_ASSET_INTAKE_SKIN_STAGE3_2_ROLLOUT_EXECUTION',
     exitCode: 0,
-    currentAuthorityStatus: rollout.currentAuthority.requiredStatus,
+    currentAuthorityStatus: readiness.status,
+    currentAuthorityCompletion: readiness.completion ?? null,
     rolloutCompletion: rollout.rolloutCompletion,
     projectStatusPromoted: false,
     recordCounts: result.recordCounts,
