@@ -7,6 +7,7 @@ on:
     paths:
       - tools/asset-intake/contract/skin-stage3-2-fresh-source-inventory.v1.json
       - tools/asset-intake/diagnostics/scan-skin-stage3-2-fresh-source-v1.py
+      - tools/asset-intake/diagnostics/scan-skin-stage3-2-fresh-source-v2.py
       - tools/asset-intake/diagnostics/inspect-skin-stage3-2-container-path-shape-v1.py
       - .github/workflows/skin-stage3-2-fresh-source-inventory.yml
 
@@ -27,21 +28,16 @@ jobs:
       - name: Install pinned Unity parser
         shell: pwsh
         run: python -m pip install UnityPy==1.25.3
-      - name: Scan official installer for frozen Skin locators
+      - name: Scan official installer with frozen runtime-root normalization
         shell: pwsh
-        run: python tools/asset-intake/diagnostics/scan-skin-stage3-2-fresh-source-v1.py
-      - name: Diagnose Unity container path representation
-        shell: pwsh
-        run: python tools/asset-intake/diagnostics/inspect-skin-stage3-2-container-path-shape-v1.py
+        run: python tools/asset-intake/diagnostics/scan-skin-stage3-2-fresh-source-v2.py
       - name: Print inventory summary
         shell: pwsh
         run: |
-          python -c "import json; x=json.load(open('skin-stage3-2-fresh-source-inventory.v1.json',encoding='utf-8')); y=json.load(open('skin-stage3-2-container-path-shape.v1.json',encoding='utf-8')); print(json.dumps({'inventoryStatus':x['status'],'coverage':x['coverage'],'blockers':x['blockers'],'pathShape':{'prefixCounts':y['runtimePathPrefixCounts'],'targetsWithSuffixMatch':sum(1 for r in y['targets'] if r['suffixMatches']),'targetsWithBasenameMatch':sum(1 for r in y['targets'] if r['basenameMatches'])}},ensure_ascii=False,indent=2))"
-      - name: Upload fresh source diagnostics
+          python -c "import json; x=json.load(open('skin-stage3-2-fresh-source-inventory.v1.json',encoding='utf-8')); print(json.dumps({'status':x['status'],'freshSource':x['freshSource'],'coverage':x['coverage'],'blockers':x['blockers']},ensure_ascii=False,indent=2))"
+      - name: Upload fresh source inventory
         uses: actions/upload-artifact@v4
         with:
           name: skin-stage3-2-fresh-source-inventory
-          path: |
-            skin-stage3-2-fresh-source-inventory.v1.json
-            skin-stage3-2-container-path-shape.v1.json
+          path: skin-stage3-2-fresh-source-inventory.v1.json
           if-no-files-found: error
