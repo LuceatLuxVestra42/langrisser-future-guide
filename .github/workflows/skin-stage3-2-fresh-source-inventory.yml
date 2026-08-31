@@ -1,0 +1,41 @@
+name: Skin Stage 3-2 Fresh Source Inventory
+
+on:
+  push:
+    branches:
+      - work/skin-stage3-2-fresh-evidence-20260901
+    paths:
+      - tools/asset-intake/contract/skin-stage3-2-fresh-source-inventory.v1.json
+      - tools/asset-intake/diagnostics/scan-skin-stage3-2-fresh-source-v1.py
+      - .github/workflows/skin-stage3-2-fresh-source-inventory.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Unity parser
+        shell: pwsh
+        run: python -m pip install UnityPy==1.25.3
+      - name: Scan official installer for frozen Skin locators
+        shell: pwsh
+        run: python tools/asset-intake/diagnostics/scan-skin-stage3-2-fresh-source-v1.py
+      - name: Print inventory summary
+        shell: pwsh
+        run: |
+          python -c "import json; x=json.load(open('skin-stage3-2-fresh-source-inventory.v1.json',encoding='utf-8')); print(json.dumps({'status':x['status'],'coverage':x['coverage'],'blockers':x['blockers']},ensure_ascii=False,indent=2))"
+      - name: Upload fresh source inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-stage3-2-fresh-source-inventory
+          path: skin-stage3-2-fresh-source-inventory.v1.json
+          if-no-files-found: error
