@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-status-r2/v1",
+  "stage": "R2",
+  "checkpoint": "PROJECT_TOOLING_PROJECT_STATUS_R2",
+  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
+  "completion": "R2_PROJECT_STATUS_IMPLEMENTED",
+  "purpose": "Rehome Project Status normalization and projection from legacy Project Doctor D1 into an independent read-only tools/project-status implementation that consumes only NEW R1 Status Source authority.",
+  "predecessor": {
+    "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_COMPLETE",
+    "contract": "data/contracts/project-tooling-status-source-r1-final.v1.json",
+    "requiredStatus": "PASS",
+    "requiredCompletion": "R1_STATUS_SOURCE_COMPLETE"
+  },
+  "authoritativeReferences": {
+    "legacyNormalizationContract": "data/contracts/project-doctor-d1-0-contract.v1.json",
+    "legacyCollector": "scripts/collect-project-doctor-d1-1-active.mjs",
+    "legacyProjection": "scripts/build-project-status.mjs",
+    "currentLegacyProjection": "data/generated/project-status.v1.json",
+    "referenceUseOnly": true,
+    "runtimeDependency": false
+  },
+  "implementation": {
+    "normalizationContract": "tools/project-status/contracts/normalization.v1.json",
+    "normalizationRuntime": "tools/project-status/lib/normalize-project-status.mjs",
+    "projectionRuntime": "tools/project-status/lib/project-status-view.mjs",
+    "cli": "tools/project-status/cli/status.mjs",
+    "fixture": "tools/project-status/fixtures/current-project-status.v1.json",
+    "selfTest": "tools/project-status/test/current-parity.mjs",
+    "shadowWorkflow": ".github/workflows/project-tooling-r2-project-status.yml"
+  },
+  "ownershipBoundary": {
+    "projectStatusOwns": [
+      "lifecycle normalization",
+      "health normalization",
+      "population projection",
+      "hard-error extraction",
+      "review reconciliation",
+      "blocker projection",
+      "supplemental facet projection",
+      "next-work passthrough",
+      "project-level health/lifecycle/review/blocker aggregates",
+      "JSON and Markdown view rendering"
+    ],
+    "statusSourceOwns": [
+      "active source selection",
+      "selected source path",
+      "selected lineage",
+      "selected projectionOverride",
+      "admission authority"
+    ],
+    "notOwnedByProjectStatus": [
+      "status-source promotion mutation",
+      "domain validator execution",
+      "semantic recomputation",
+      "canonical relation recomputation",
+      "raw ConfigData interpretation",
+      "diff impact routing",
+      "PR guard",
+      "branch-protection cutover"
+    ]
+  },
+  "runtimeAuthority": {
+    "onlyStatusPredecessor": "tools/status-source/lib/select-active-sources.mjs",
+    "legacyActiveRegistryRead": false,
+    "legacyD1GeneratedStatusRead": false,
+    "d5FreshnessRead": false,
+    "projectStatusMarkdownInput": false,
+    "legacyProjectStatusGeneratedInput": false
+  },
+  "currentExpectedParity": {
+    "projectHealth": "REVIEW",
+    "healthCounts": {"PASS": 0, "REVIEW": 6, "FAIL": 0, "MISSING": 0, "INCONSISTENT": 0, "UNKNOWN": 0},
+    "lifecycleCounts": {"FROZEN": 4, "COMPLETE": 1, "IN_PROGRESS": 1, "UNKNOWN": 0},
+    "knownHardErrorTotal": 0,
+    "reviewTotal": 29,
+    "blockerTotal": 1,
+    "equipmentProjection": {"canonical": 390, "public": 365, "general": 198, "exclusive": 167},
+    "skin": {"lifecycle": "IN_PROGRESS", "health": "REVIEW", "blockerCount": 1}
+  },
+  "independenceBoundary": {
+    "legacyProjectDoctorRuntimeImports": 0,
+    "legacyGeneratedStatusReads": 0,
+    "legacyActiveRegistryReads": 0,
+    "d1RuntimeDependencies": 0,
+    "d5RuntimeDependencies": 0,
+    "projectStatusGeneratedInputDependencies": 0,
+    "projectStatusMarkdownInputDependencies": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "canonicalJoinRecomputationCount": 0,
+    "domainValidatorExecutionCount": 0,
+    "repositoryWriteCount": 0
+  },
+  "writerActivation": {
+    "state": "DEFERRED_TO_CUTOVER",
+    "canonicalJsonTarget": "data/generated/project-status.v1.json",
+    "canonicalMarkdownTarget": "PROJECT_STATUS.md",
+    "reason": "R2 shadow must not create a second authoritative Project Status writer while legacy Project Status Sync still owns current generated outputs."
+  },
+  "completionGate": {
+    "normalizationContractImplemented": true,
+    "normalizationRuntimeImplemented": true,
+    "projectionRuntimeImplemented": true,
+    "readOnlyCliImplemented": true,
+    "currentParityFixtureImplemented": true,
+    "selfTestImplemented": true,
+    "shadowWorkflowImplemented": true,
+    "shadowCiPass": false,
+    "sixDomainParity": false,
+    "aggregateParity": false,
+    "runtimeIndependenceProven": false
+  },
+  "blockers": [],
+  "reviews": [
+    "Canonical Project Status writer activation remains deferred to cutover to avoid dual-writer authority with the legacy Project Status Sync workflow.",
+    "The parity fixture is a migration oracle only; NEW runtime does not read legacy D1 or legacy Project Status outputs.",
+    "Legacy required pr-guard remains a CUTOVER_ONLY blocker and must not be repaired by extending legacy D2-D7."
+  ],
+  "nextStartPoint": "Run the R2 Project Status shadow workflow. If the NEW normalization/project-status view matches current six-domain parity and remains runtime-independent, freeze R2 as PASS and start R3 Project Check.",
+  "reopenConditions": [
+    "R1 Status Source selection or projectionOverride semantics change",
+    "a selected domain status source changes shape authoritatively",
+    "Project Status normalization contract is explicitly revised",
+    "new authoritative evidence contradicts current lifecycle/health/review/blocker parity"
+  ]
+}
