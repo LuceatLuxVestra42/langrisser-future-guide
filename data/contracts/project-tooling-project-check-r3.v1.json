@@ -18,11 +18,10 @@
   },
   "implementation": {
     "implementationHead": "fa5fe70020fa9918cceaf313c5e33272b0497ee0",
-    "validatedHead": "77b6f7ea58d167f7c01d42d0ab76fadbae81ed3c",
-    "validatedMergeResult": "267ce386a2cceef1c0e38710afcd6f0c4e2a2ca3",
-    "evidenceFreezeCommit": "8666fa9737107a5f8ea51d264a61345bf9d9caac",
+    "originalValidatedHead": "77b6f7ea58d167f7c01d42d0ab76fadbae81ed3c",
     "latestDeletionAdmissionValidatedHead": "4ba804b121a35d817215aa0822a45bc99d111d91",
-    "latestWriterTransportAdmissionValidatedHead": "7511edab392b2a91dee19aecd2d1f05f895558e4",
+    "latestStatusSourceWriterAdmissionValidatedHead": "7511edab392b2a91dee19aecd2d1f05f895558e4",
+    "latestProjectStatusWriterAdmissionValidatedHead": "9232f126e22191dc5fd9b059110ec6b39a0f4fe3",
     "ownerMap": "tools/project-check/contracts/owners.v1.json",
     "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
     "runtime": "tools/project-check/lib/project-check.mjs",
@@ -72,56 +71,61 @@
     "project-check": "R3 routing/execution self-test"
   },
   "validationEvidence": {
-    "originalR3": {
-      "runId": 33344192772,
-      "jobId": 99345101658,
-      "headSha": "77b6f7ea58d167f7c01d42d0ab76fadbae81ed3c",
-      "conclusion": "success"
-    },
+    "originalR3": {"runId":33344192772,"jobId":99345101658,"headSha":"77b6f7ea58d167f7c01d42d0ab76fadbae81ed3c","conclusion":"success"},
     "deletionCheckpointAdmissionRepair": {
-      "classification": "NEW_TOOLING_ADMISSION_GAP",
-      "failureHead": "7c016de33e69a0a642c4c48d4f35745b87f41dac",
-      "failureRunId": 33346670486,
-      "failureJobId": 99351990646,
-      "unmatchedPath": "data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json",
-      "admittedPattern": "data/contracts/project-tooling-project-doctor-deletion-*.json",
-      "owner": "project-check",
-      "validator": "project-check-self-test",
-      "repairHead": "4ba804b121a35d817215aa0822a45bc99d111d91",
-      "repairRunId": 33347378943,
-      "repairJobId": 99353992370,
-      "requiredJobConclusion": "success",
-      "semanticReopen": false,
-      "ownerContractLimitedReopen": true
+      "classification":"NEW_TOOLING_ADMISSION_GAP",
+      "failureHead":"7c016de33e69a0a642c4c48d4f35745b87f41dac",
+      "admittedPattern":"data/contracts/project-tooling-project-doctor-deletion-*.json",
+      "owner":"project-check",
+      "validator":"project-check-self-test",
+      "repairHead":"4ba804b121a35d817215aa0822a45bc99d111d91",
+      "repairRunId":33347378943,
+      "repairJobId":99353992370,
+      "requiredJobConclusion":"success",
+      "semanticReopen":false,
+      "ownerContractLimitedReopen":true
     },
     "statusSourceWriterTransportAdmission": {
-      "classification": "R3_OWNER_TRANSPORT_ADMISSION",
-      "admittedPaths": [
-        ".github/workflows/project-tooling-r1-status-source-writer.yml",
-        ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml"
+      "classification":"R3_OWNER_TRANSPORT_ADMISSION",
+      "admittedPaths":[".github/workflows/project-tooling-r1-status-source-writer.yml",".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml"],
+      "owner":"status-source",
+      "validatedHead":"7511edab392b2a91dee19aecd2d1f05f895558e4",
+      "runId":33348927042,
+      "jobId":99358324950,
+      "conclusion":"success",
+      "semanticReopen":false
+    },
+    "projectStatusWriterTransportAdmission": {
+      "classification":"R3_OWNER_TRANSPORT_AND_CANONICAL_OUTPUT_ADMISSION",
+      "admittedPaths":[
+        ".github/workflows/project-tooling-r2-project-status-writer.yml",
+        ".github/workflows/project-status-sync.yml",
+        "data/generated/project-status.v1.json",
+        "PROJECT_STATUS.md"
       ],
-      "owner": "status-source",
-      "validators": ["status-source-selection","status-source-promotion","status-source-producer-gate","status-source-artifact-bridge","status-source-lifecycle"],
-      "ownerMapCommit": "482a34cb2587ad8c9a14e53fb736522a25f25795",
-      "selfTestCommit": "1dd2b0fee16affe97e4fd67ec42364ce8e5cbe68",
-      "admissionRunId": 33348504957,
-      "admissionJobId": 99357145677,
-      "admissionConclusion": "success",
-      "implementationValidatedHead": "7511edab392b2a91dee19aecd2d1f05f895558e4",
-      "implementationRunId": 33348927042,
-      "implementationJobId": 99358324950,
-      "implementationConclusion": "success",
-      "selfTest": "PASS",
-      "plan": "PASS",
-      "execution": "PASS",
-      "fixtureCount": 17,
-      "semanticReopen": false,
-      "domainOwnerExpansion": false,
-      "ownerContractLimitedReopen": true
+      "owner":"project-status",
+      "validator":"project-status-parity",
+      "ownerMapCommit":"0383414e81a507acc61a18a0b5814feea5deb70e",
+      "selfTestCommit":"9232f126e22191dc5fd9b059110ec6b39a0f4fe3",
+      "admissionRunId":33350404910,
+      "admissionJobId":99362513706,
+      "admissionConclusion":"success",
+      "deferredImplementationHead":"e52d51fc475672656901562a73bd1df4d59575b1",
+      "deferredImplementationRunId":33350592817,
+      "deferredImplementationJobId":99363059318,
+      "deferredImplementationConclusion":"success",
+      "zeroWriterHead":"46282c4a9220b21cc9e7b6d9dd0baf3e47278db2",
+      "zeroWriterRunId":33350650054,
+      "zeroWriterJobId":99363214325,
+      "zeroWriterConclusion":"success",
+      "fixtureCount":21,
+      "semanticReopen":false,
+      "domainOwnerExpansion":false,
+      "ownerContractLimitedReopen":true
     }
   },
   "selfTest": {
-    "fixtureCount": 17,
+    "fixtureCount": 21,
     "catalogValidatorCount": 22,
     "ownerCount": 25,
     "manualReviewFallbackProven": true,
@@ -158,23 +162,23 @@
     "selectedValidatorsPass": true,
     "legacyRuntimeDependencyCountZero": true,
     "deletionCheckpointNamespaceAdmitted": true,
-    "statusSourceWriterTransportPathsAdmitted": true
+    "statusSourceWriterTransportPathsAdmitted": true,
+    "projectStatusWriterTransportAndOutputsAdmitted": true
   },
   "blockers": [],
   "cutoverBlockers": [],
   "reviews": [
     "The R3 owner map remains intentionally minimal and fail-closed; unmatched repository paths remain MANUAL_REVIEW.",
-    "The Project Doctor deletion checkpoint namespace is explicitly admitted to project-check ownership without domain semantic expansion.",
-    "The NEW and retired OLD Status Source writer workflow paths are explicitly admitted to status-source ownership; this is transport ownership only and does not reopen source semantics.",
+    "Writer workflow and canonical output admissions are transport/output ownership only and do not reopen domain semantics.",
     "Banner assets and Skin assets remain manual owner boundaries until independent final validators are explicitly admitted.",
     "Required-check cutover remains complete: main requires project-check, while pr-guard and project-check-shadow are not required."
   ],
-  "nextStartPoint": "Project Status writer ownership cutover. Status Source writer transport ownership is now complete; keep final OLD Doctor deletion deferred until the Project Status writer is transitioned and proven separately.",
+  "nextStartPoint": "Prepare the exact OLD Project Doctor deletion manifest after both writer cutovers. Preserve NEW canonical Project Status outputs and retained historical evidence; do not expand R3 ownership by inference during deletion planning.",
   "reopenConditions": [
     "an admitted owner validator command changes authoritatively",
     "a path family changes ownership authoritatively",
     "R1 or R2 tooling ownership changes",
-    "Status Source writer workflow ownership changes",
+    "Status Source or Project Status writer workflow ownership changes",
     "new evidence shows an explicit R3 mapping causes semantic or presentation ownership fan-out not represented by the contract"
   ]
 }
