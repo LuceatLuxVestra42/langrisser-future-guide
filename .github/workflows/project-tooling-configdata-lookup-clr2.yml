@@ -1,4 +1,4 @@
-name: Project Tooling ConfigData Lookup CLR2
+name: Project Tooling ConfigData Lookup
 
 on:
   pull_request:
@@ -9,7 +9,9 @@ on:
       - 'tools/configdata-lookup/**'
       - 'data/contracts/project-tooling-project-check-configdata-lookup-clr2-*.json'
       - 'data/contracts/project-tooling-project-check-configdata-lookup-clr3-*.json'
+      - 'data/contracts/project-tooling-configdata-lookup-*.json'
       - 'tools/project-check/contracts/owners.v1.json'
+      - 'tools/project-check/contracts/validators.v1.json'
       - '.github/workflows/project-tooling-configdata-lookup-clr2.yml'
   workflow_dispatch:
 
@@ -17,11 +19,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: project-tooling-configdata-lookup-clr2-${{ github.ref }}
+  group: project-tooling-configdata-lookup-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  clr2-namespace:
+  configdata-lookup-validation:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

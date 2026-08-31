@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-clr4-admission/v1",
+  "stage": "CLR4",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR4_PROJECT_CHECK_ADMISSION_FROZEN",
+  "purpose": "Promote the frozen CLR3 read-only ConfigData Lookup self-test into NEW Project Check as a dedicated owner/catalog validator, replacing the temporary CLR2 project-check admission without adding semantic fan-out, writer authority, or Stage 7/8 orchestration authority.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "base": "main",
+    "sourceHead": "ccad782909548f9828b9ddda91fb75c0ac6cf9e8",
+    "predecessor": {
+      "path": "data/contracts/project-tooling-project-check-configdata-lookup-clr3-self-test.v1.json",
+      "blobSha": "80b7c784155460585a97ef4a7a4a1fd33fe0cfb3",
+      "requiredCompletion": "CONFIGDATA_LOOKUP_CLR3_READ_ONLY_SELF_TEST_FROZEN"
+    }
+  },
+  "projectCheckAdmission": {
+    "owner": {
+      "id": "configdata-lookup",
+      "validators": ["configdata-lookup-self-test"]
+    },
+    "validator": {
+      "id": "configdata-lookup-self-test",
+      "phase": 6,
+      "executable": "node",
+      "args": ["tools/configdata-lookup/test/configdata-lookup-self-test.mjs"],
+      "readOnly": true
+    },
+    "ownerRule": {
+      "id": "configdata-lookup-tooling",
+      "patterns": [
+        "tools/configdata-lookup/**",
+        "data/contracts/project-tooling-configdata-lookup-*.json",
+        ".github/workflows/project-tooling-configdata-lookup-clr2.yml"
+      ]
+    },
+    "temporaryRuleRemoved": "configdata-lookup-clr2-preimplementation-admission",
+    "temporaryProjectCheckOwnerRemovedFromLookupPaths": true,
+    "historicalClr0ToClr3ProjectCheckCheckpointOwnershipPreserved": true
+  },
+  "routingProof": {
+    "newNamespaceExpectedOwner": "configdata-lookup",
+    "workflowExpectedOwner": "configdata-lookup",
+    "clr4CheckpointExpectedOwner": "configdata-lookup",
+    "historicalClr3CheckpointExpectedOwner": "project-check",
+    "candidateChangedFileCount": 5,
+    "candidateOwnerCount": 2,
+    "candidateValidatorCount": 2,
+    "candidateOwners": ["configdata-lookup", "project-check"],
+    "candidateValidators": ["project-check-self-test", "configdata-lookup-self-test"],
+    "manualReviewCount": 0,
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "manualReviewFanOut": false
+  },
+  "validationWorkflow": {
+    "path": ".github/workflows/project-tooling-configdata-lookup-clr2.yml",
+    "name": "Project Tooling ConfigData Lookup",
+    "permissions": "contents: read",
+    "steps": [
+      "Validate frozen Stage 5 predecessor",
+      "Require clean Stage 6 freshness",
+      "Run CLR2 namespace smoke",
+      "Run CLR3 read-only self-test"
+    ],
+    "repositoryMutation": false
+  },
+  "unchangedScope": {
+    "stage0To6ProducerMutationCount": 0,
+    "stage0To6GeneratedArtifactMutationCount": 0,
+    "packageJsonCliCutoverCount": 0,
+    "rawConfigDataMutationCount": 0,
+    "stage7Or8MutationCount": 0,
+    "semanticMutationCount": 0,
+    "frontendMutationCount": 0,
+    "assetMutationCount": 0,
+    "hostedQaMutationCount": 0,
+    "browserUiMutationCount": 0,
+    "writerAuthorityAddedCount": 0
+  },
+  "semanticBoundary": {
+    "rawConfigDataAsQueryFallback": false,
+    "newRelationDiscovery": false,
+    "canonicalRelationRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "transitiveImpactInference": false,
+    "domainFanOut": false,
+    "pageValidatorSelection": false,
+    "hostedQaSelection": false,
+    "browserUiSelection": false
+  },
+  "requiredValidation": {
+    "configdataLookupWorkflow": "PASS",
+    "legacyStage5Validator": "PASS_CONFIGDATA_LOOKUP_STAGE5_CLI",
+    "legacyStage6Freshness": "CLEAN_CONFIGDATA_LOOKUP_STAGE6",
+    "clr2NamespaceSmoke": "PASS",
+    "clr3ReadOnlySelfTest": "PASS",
+    "projectCheckSelfTest": "PASS",
+    "projectCheckOwnershipPlan": "PASS",
+    "projectCheckOwningValidators": "PASS",
+    "dedicatedConfigdataLookupValidatorExecutedByProjectCheck": true,
+    "trackedMutationCount": 0
+  },
+  "validationEvidence": {
+    "candidateHead": "b58c220ca0a9b86d2b41d0ecfcb34142c922cc0d",
+    "configdataLookupWorkflow": {
+      "name": "Project Tooling ConfigData Lookup",
+      "runId": 33393328541,
+      "jobId": 99491875305,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "clr3ReadOnlySelfTest": "PASS",
+      "conclusion": "success"
+    },
+    "projectCheck": {
+      "runId": 33393328509,
+      "jobId": 99491874180,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "projectCheckSelfTestExitCode": 0,
+      "configdataLookupSelfTestExitCode": 0,
+      "dedicatedValidatorExecuted": true,
+      "conclusion": "success"
+    },
+    "freezeHead": "960722de80e7f8b1ef591812dfeb87fff8c58073",
+    "freezeHeadConfigdataLookupWorkflow": {
+      "runId": 33393489832,
+      "jobId": 99492393824,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "clr3ReadOnlySelfTest": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadProjectCheck": {
+      "runId": 33393489811,
+      "jobId": 99492393471,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "dedicatedValidatorExecuted": true,
+      "conclusion": "success"
+    },
+    "freezeHeadRevalidation": "PASS"
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "WRITER_SEPARATION_DEFERRED_TO_CLR5",
+      "blocking": false,
+      "detail": "CLR4 admits only the read-only validator. Existing Stage 6 rebuild/write behavior remains outside NEW Project Check and is separated in CLR5."
+    },
+    {
+      "id": "PACKAGE_CLI_CUTOVER_DEFERRED_TO_CLR7",
+      "blocking": false,
+      "detail": "npm run lookup/refs/find still use the legacy Stage 5 CLI entrypoint until later parity/cutover."
+    },
+    {
+      "id": "STAGE7_STAGE8_AUTHORITY_CUTOVER_DEFERRED_TO_CLR7",
+      "blocking": false,
+      "detail": "Legacy Stage 7/8 orchestration remains unchanged and is not inherited by the dedicated ConfigData Lookup owner."
+    }
+  ],
+  "nextStart": "Begin CLR5 from this frozen dedicated admission. Separate read-only validation from explicit Stage 6 rebuild/write operations, keeping Project Check read-only and preserving Stage 0-6 materialization semantics.",
+  "reopenConditions": [
+    "Project Check cannot route tools/configdata-lookup/** exclusively to the dedicated configdata-lookup owner.",
+    "The catalogued configdata-lookup-self-test cannot execute read-only through Project Check.",
+    "Dedicated admission introduces domain fan-out, semantic authority, writer authority, or Stage 7/8/Doctor runtime dependency.",
+    "CLR3 parity/freshness/no-write guarantees fail after admission."
+  ]
+}
