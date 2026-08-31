@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-cutover/v1",
+  "stage": "REQUIRED_CHECK_CUTOVER",
+  "checkpoint": "PROJECT_TOOLING_PROJECT_CHECK_REQUIRED_CUTOVER",
+  "status": "IMPLEMENTED_PENDING_CONTEXT_PROOF",
+  "completion": "CUTOVER_PREPARATION_IMPLEMENTED",
+  "purpose": "Freeze the stable NEW Project Check required context, cutover preconditions, and rollback plan without coupling required-check ownership to OLD Project Doctor or to Status Source / Project Status writer transitions.",
+  "predecessors": [
+    {
+      "checkpoint": "PROJECT_TOOLING_PROJECT_CHECK_R3",
+      "contract": "data/contracts/project-tooling-project-check-r3.v1.json",
+      "requiredStatus": "PASS"
+    },
+    {
+      "checkpoint": "PROJECT_TOOLING_OLD_NEW_SHADOW_COMPARISON",
+      "contract": "data/contracts/project-tooling-project-check-shadow-comparison.v1.json",
+      "requiredStatus": "PASS"
+    }
+  ],
+  "baseline": {
+    "mainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "migrationBranch": "work/project-tooling-migration-r0-boundary-20260831",
+    "pullRequest": 309,
+    "legacyRequiredContext": "pr-guard",
+    "newRequiredContext": "project-check"
+  },
+  "implementation": {
+    "workflow": ".github/workflows/project-tooling-r3-project-check.yml",
+    "newRequiredJob": "project-check",
+    "shadowJob": "project-check-shadow",
+    "shadowDependsOnRequiredJob": true,
+    "newRequiredJobIncludesOldComparison": false,
+    "newRequiredJobIncludes": [
+      "project-check-self-test",
+      "changed-path-plan",
+      "selected-owning-validator-execution"
+    ]
+  },
+  "cutoverPolicy": {
+    "requiredCheckSwitchOnly": true,
+    "removeLegacyRequiredContext": "pr-guard",
+    "addNewRequiredContext": "project-check",
+    "legacyDoctorDeletionDuringThisStep": false,
+    "legacyDoctorRoutingExpansionAllowed": false,
+    "statusSourceWriterActivationDuringThisStep": false,
+    "projectStatusWriterActivationDuringThisStep": false,
+    "branchProtectionMustNotRequireShadowJob": true,
+    "newRequiredContextMustPassCurrentMigrationHeadBeforeSwitch": true,
+    "mainMustRemainAtFrozenBaselineOrBeRevalidatedBeforeSwitch": true
+  },
+  "rollbackPlan": {
+    "trigger": [
+      "project-check required context does not report on PRs targeting main",
+      "project-check reports a NEW owning-scope regression after cutover",
+      "branch protection becomes unsatisfiable because of context naming or workflow-trigger mismatch"
+    ],
+    "actions": [
+      "restore legacy required context pr-guard",
+      "remove project-check from required contexts",
+      "leave OLD Project Doctor implementation intact for rollback observation",
+      "do not activate Status Source or Project Status writers as part of rollback"
+    ],
+    "dataRollbackRequired": false,
+    "semanticRollbackRequired": false
+  },
+  "branchProtectionObservation": {
+    "liveReadAttempt": "FORBIDDEN_403_RESOURCE_NOT_ACCESSIBLE_BY_INTEGRATION",
+    "repositoryRulesets": [],
+    "lastFrozenRequiredContextEvidence": "pr-guard",
+    "writeCapabilityAvailableInCurrentGitHubConnector": false,
+    "installableBranchProtectionPluginFound": false
+  },
+  "boundaries": {
+    "legacyProjectDoctorRuntimeImportIntoNewRequiredJob": 0,
+    "legacyD2D3D4D5D7PredecessorCount": 0,
+    "statusSourceMutationCount": 0,
+    "projectStatusWriteCount": 0,
+    "statusSourceWriterActivated": false,
+    "projectStatusWriterActivated": false,
+    "branchProtectionChangeCount": 0
+  },
+  "completionGate": {
+    "stableNewContextDefined": true,
+    "rollbackPlanFrozen": true,
+    "newContextPassOnCurrentLineage": false,
+    "branchProtectionSwitched": false,
+    "postSwitchVerificationPass": false
+  },
+  "blockers": [],
+  "cutoverBlockers": [
+    "LIVE_BRANCH_PROTECTION_WRITE_CAPABILITY_UNAVAILABLE_IN_CURRENT_CONNECTION"
+  ],
+  "reviews": [
+    "The live branch-protection endpoint is not readable through the current integration, so current required-context state cannot be re-read directly before a privileged switch.",
+    "The legacy pr-guard workflow remains present and observable until a privileged branch-protection switch and post-switch verification are complete."
+  ],
+  "nextStartPoint": "Prove the new project-check job passes on the current migration lineage. If it passes and main remains at the frozen baseline, perform the branch-protection switch using a connection with branch administration permission, then verify project-check is required and pr-guard is no longer required before any writer-ownership transition.",
+  "reopenConditions": [
+    "new required context name or workflow trigger changes",
+    "R3 owner or validator contract changes",
+    "main SHA changes before branch-protection switch",
+    "new project-check job fails on current migration lineage",
+    "branch protection exposes a different current required context than the frozen legacy pr-guard evidence"
+  ]
+}
