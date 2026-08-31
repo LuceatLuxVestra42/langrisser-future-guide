@@ -87,17 +87,17 @@ expectOwners(
 expectOwners(
   'tools/route-hosted-qa/lib/hosted-qa.mjs',
   ['route-hosted-qa'],
-  ['project-check-self-test'],
+  ['route-hosted-qa-self-test'],
 );
 expectOwners(
   '.github/workflows/project-tooling-route-hosted-qa.yml',
   ['route-hosted-qa'],
-  ['project-check-self-test'],
+  ['route-hosted-qa-self-test'],
 );
 expectOwners(
   'data/contracts/project-tooling-route-hosted-qa-rh2-admission.v1.json',
   ['route-hosted-qa'],
-  ['project-check-self-test'],
+  ['route-hosted-qa-self-test'],
 );
 expectOwners(
   'data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json',
