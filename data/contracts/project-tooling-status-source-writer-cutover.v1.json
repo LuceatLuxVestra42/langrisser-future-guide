@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-status-source-writer-cutover/v1",
+  "stage": "STATUS_SOURCE_WRITER_CUTOVER",
+  "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_WRITER_CUTOVER",
+  "status": "PASS",
+  "completion": "STATUS_SOURCE_WRITER_CUTOVER_COMPLETE",
+  "purpose": "Freeze the single-writer ownership transition from the legacy Project Doctor Status Source handoff transport to the independent NEW R1 lifecycle/CAS writer without coupling Project Status writer ownership or OLD Doctor deletion into this step.",
+  "predecessors": [
+    {"contract":"data/contracts/project-tooling-status-source-r1-final.v1.json","requiredStatus":"PASS","requiredCompletion":"R1_STATUS_SOURCE_COMPLETE"},
+    {"contract":"data/contracts/project-tooling-project-check-cutover.v1.json","requiredStatus":"PASS","requiredCompletion":"CUTOVER_COMPLETE"},
+    {"contract":"data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json","requiredStatus":"PASS","requiredCompletion":"DELETION_INVENTORY_COMPLETE"}
+  ],
+  "baseline": {
+    "mainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "migrationBranch": "work/project-tooling-migration-r0-boundary-20260831",
+    "pullRequest": 309,
+    "selectedAuthorityChanged": false,
+    "selectedHero": "hero-stage6-4-final",
+    "selectedSoldier": "soldier-stage6-7-site-admission"
+  },
+  "writerInventoryBefore": {
+    "legacyWorkflow": ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+    "legacyWorkflowDispatch": true,
+    "legacyWorkflowCall": true,
+    "legacyContentsWrite": true,
+    "legacyMutationTargets": [
+      "data/status-sources/**",
+      "data/generated/project-doctor-active-source-registry.v1.json",
+      "data/validation/project-doctor-active-source-registry-summary.v1.json",
+      "data/generated/project-doctor-d1-1-status.v1.json",
+      "data/validation/project-doctor-d1-1-summary.v1.json",
+      "data/validation/project-doctor-d1-2-summary.v1.json",
+      "data/generated/project-status.v1.json",
+      "data/generated/project-doctor-d5-freshness.v1.json",
+      "PROJECT_STATUS.md"
+    ],
+    "newProductionWriterActive": false
+  },
+  "transition": {
+    "r3WriterPathAdmission": {
+      "ownerMapCommit": "482a34cb2587ad8c9a14e53fb736522a25f25795",
+      "selfTestCommit": "1dd2b0fee16affe97e4fd67ec42364ce8e5cbe68",
+      "validatedRunId": 33348504957,
+      "validatedJobId": 99357145677,
+      "conclusion": "success"
+    },
+    "legacyWriterOffCommit": "f28fb1570d0390a3749a2d6022bec6239679586c",
+    "newWriterCreatedCommit": "4c372810ce54bf050ccc3f59d980fdb051a81187",
+    "newWriterActivatedCommit": "23122b0eee4ce69159e93c0aa53ce06518bf355f",
+    "heroProducerSwitchCommit": "2b99f3e3e5b5a34470c7f3c3bfa980ee10c3857a",
+    "soldierProducerSwitchCommit": "2f3f30ce9607b9590212f2b45c0666647d362593",
+    "lifecycleWriterValidationCommit": "15e287a4be95c7af2b8641453da82bdac575b269",
+    "r1WorkflowCoverageCommit": "6f98527ea813400f77dfc0978fae990efac49a01",
+    "heroConcurrencyIsolationCommit": "210e7d906a4e762105f6d94c1277b8a91272e34f",
+    "soldierConcurrencyIsolationCommit": "7511edab392b2a91dee19aecd2d1f05f895558e4",
+    "oldWriterDisabledBeforeNewWriterActivated": true,
+    "zeroWriterWindowUsed": true,
+    "dualWriterWindowUsed": false
+  },
+  "writerInventoryAfter": {
+    "activeWriterCount": 1,
+    "activeWriter": ".github/workflows/project-tooling-r1-status-source-writer.yml",
+    "legacyWriter": ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+    "legacyWriterState": "RETIRED_READ_ONLY_TOMBSTONE",
+    "legacyWriterWorkflowCall": false,
+    "legacyWriterContentsWrite": false,
+    "newWriterState": "ACTIVE_NEW_R1_WRITER",
+    "newWriterMainAllowed": false,
+    "newWriterPullRequestAllowed": false,
+    "newWriterExplicitNonMainDispatchOnly": true,
+    "newWriterCandidateInputsFromCaller": false,
+    "newWriterResolvesCommittedApprovedDeclaration": true,
+    "newWriterMutationTargets": ["data/status-sources/**"],
+    "projectStatusWriteCount": 0,
+    "d5WriteCount": 0,
+    "legacyGeneratedWriteCount": 0,
+    "projectStatusWriterActivated": false
+  },
+  "producerOwnershipAfter": {
+    "hero": {
+      "workflow": ".github/workflows/hero-stage6-4-site-consumer.yml",
+      "closeout": "tools/status-source/cli/lifecycle.mjs closeout --pipeline hero",
+      "declaration": "tools/status-source/declarations/hero.v1.json",
+      "writer": ".github/workflows/project-tooling-r1-status-source-writer.yml",
+      "producerConcurrencyIsolated": true
+    },
+    "soldier": {
+      "workflow": ".github/workflows/soldier-stage6-7-site-admission.yml",
+      "closeout": "tools/status-source/cli/lifecycle.mjs closeout --pipeline soldier",
+      "declaration": "tools/status-source/declarations/soldier.v1.json",
+      "writer": ".github/workflows/project-tooling-r1-status-source-writer.yml",
+      "producerConcurrencyIsolated": true
+    }
+  },
+  "validationEvidence": {
+    "validatedImplementationHead": "7511edab392b2a91dee19aecd2d1f05f895558e4",
+    "r1RunId": 33348927050,
+    "r1JobId": 99358324979,
+    "r1Conclusion": "success",
+    "r1LifecycleParityAndCas": "PASS",
+    "projectCheckRunId": 33348927042,
+    "projectCheckJobId": 99358324950,
+    "projectCheckConclusion": "success",
+    "projectCheckSelfTest": "PASS",
+    "projectCheckPlan": "PASS",
+    "projectCheckExecution": "PASS",
+    "heroRunId": 33348927228,
+    "heroValidationJobId": 99358325543,
+    "heroNewCloseoutCheck": "PASS",
+    "heroNewBridgeCheck": "PASS",
+    "soldierRunId": 33348927441,
+    "soldierValidationJobId": 99358326503,
+    "soldierConclusion": "success",
+    "soldierNewCloseoutCheck": "PASS",
+    "soldierNewBridgeCheck": "PASS",
+    "selectedAuthorityParityChanged": false
+  },
+  "runtimeDispatchProof": {
+    "attemptedFromCurrentConnection": false,
+    "availableAction": false,
+    "blocking": false,
+    "reason": "The connected GitHub toolset has no workflow-dispatch write action. R1 lifecycle synthetic APPLY/CAS tests cover mutation behavior, GitHub validates the reusable workflow references in both producer workflows, and current PR producer checks execute the NEW lifecycle closeout/bridge paths."
+  },
+  "rollbackPlan": {
+    "trigger": [
+      "NEW writer transport cannot resolve committed approved declarations on an explicit work-branch dispatch",
+      "NEW writer mutates outside data/status-sources",
+      "NEW writer introduces Project Status/D5/legacy generated-output writes",
+      "NEW writer CAS/selection validation regresses"
+    ],
+    "actions": [
+      "set NEW lifecycle productionWriterActivation away from ACTIVE before restoring any OLD writer",
+      "disable NEW writer transport",
+      "restore the retained legacy handoff transport only after NEW writer is inactive",
+      "never leave both writer transports active",
+      "do not change selected Status Source authority as part of transport rollback",
+      "do not activate Project Status writer as part of Status Source rollback"
+    ],
+    "semanticRollbackRequired": false,
+    "selectedAuthorityRollbackRequired": false
+  },
+  "boundaries": {
+    "activeWriterCount": 1,
+    "maxConcurrentActiveWritersDuringCutover": 1,
+    "legacyProjectDoctorRuntimeImportIntoNewWriter": 0,
+    "legacyD5RuntimeDependency": 0,
+    "projectStatusRuntimeDependency": 0,
+    "semanticRecomputationCount": 0,
+    "rawConfigDataReadCount": 0,
+    "projectStatusWriterActivated": false,
+    "oldDoctorCoreDeleted": false,
+    "historicalOldEvidenceDeleted": false
+  },
+  "completionGate": {
+    "oldWriterOff": true,
+    "newWriterActive": true,
+    "singleWriterProven": true,
+    "noDualWriter": true,
+    "heroProducerSwitched": true,
+    "soldierProducerSwitched": true,
+    "r1ValidationPass": true,
+    "requiredProjectCheckPass": true,
+    "projectStatusWriterStillDeferred": true
+  },
+  "blockers": [],
+  "reviews": [
+    "A direct workflow_dispatch smoke run cannot be initiated by the current GitHub connection; this remains non-blocking and should be collected opportunistically when such write capability is available.",
+    "The retired OLD writer file is intentionally retained until final OLD Doctor deletion/archival scope is closed.",
+    "Project Status writer ownership is explicitly outside this checkpoint and remains the next separate transition."
+  ],
+  "nextStartPoint": "Project Status writer ownership cutover: identify the current OLD canonical Project Status mutation transport, activate the NEW R2 writer without dual writers, prove consumer compatibility, then freeze before final OLD Doctor deletion.",
+  "reopenConditions": [
+    "selected Status Source authority changes",
+    "NEW writer workflow or lifecycle writer binding changes",
+    "OLD Status Source writer becomes active again",
+    "Hero or Soldier producer switches away from the NEW writer",
+    "NEW writer gains Project Status, D5, legacy generated-output, main, or pull-request mutation responsibility",
+    "authoritative evidence shows more than one active Status Source writer"
+  ]
+}
