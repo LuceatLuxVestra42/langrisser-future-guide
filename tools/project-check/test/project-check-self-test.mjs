@@ -37,7 +37,7 @@ expectOwners(
 expectOwners(
   '.github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml',
   ['status-source'],
-  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-artifact-bridge', 'status-source-selection'].filter((value, index, array) => array.indexOf(value) === index).sort(),
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection'],
 );
 expectOwners(
   'tools/project-status/lib/normalize-project-status.mjs',
