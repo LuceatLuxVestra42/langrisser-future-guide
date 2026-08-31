@@ -38,6 +38,9 @@ jobs:
       - name: Run changed path owning validators
         run: node tools/project-check/cli/check.mjs --base "origin/${GITHUB_BASE_REF}" --head HEAD
 
+      - name: F5 bait inject tracked mutation
+        run: printf '\n<!-- F5_TRACKED_MUTATION_BAIT -->\n' >> PROJECT_STATUS.md
+
       - name: Verify Project Check tracked state is unchanged
         run: |
           CHANGES="$(git status --porcelain=v1 --untracked-files=no)"
