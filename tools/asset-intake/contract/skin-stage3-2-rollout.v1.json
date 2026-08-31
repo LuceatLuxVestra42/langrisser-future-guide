@@ -7,7 +7,18 @@
   "currentAuthority": {
     "projectStatus": "PROJECT_STATUS.md",
     "activeSource": "data/validation/skin-stage3-2-readiness.v1.json",
-    "requiredStatus": "READY_FOR_ASSET_EVIDENCE",
+    "allowedStates": [
+      {
+        "status": "READY_FOR_ASSET_EVIDENCE",
+        "completion": null,
+        "evidencePresent": false
+      },
+      {
+        "status": "PASS",
+        "completion": "SKIN_STAGE3_2_COMPLETE",
+        "evidencePresent": true
+      }
+    ],
     "normalizedContract": "tools/asset-intake/fixtures/skin-stage1-contract-fixtures.v1.json",
     "expectedCanonicalKeys": [102, 1901, 3701],
     "expectedLocatorCount": 13
@@ -26,7 +37,9 @@
     "pendingIsValidFailClosedResult": true,
     "resolvedOutputRequiresAllLocatorsExact": true,
     "partialEvidenceForbidden": true,
-    "historicalBranchEvidenceMayNotBeAutoPromoted": true
+    "historicalBranchEvidenceMayNotBeAutoPromoted": true,
+    "completedAuthorityMayRemainReadable": true,
+    "unknownAuthorityStateFailsClosed": true
   },
   "forbidden": {
     "skinSemanticRecomputation": true,
@@ -40,6 +53,7 @@
     "projectStatusMutation": true,
     "statusSourceMutation": true
   },
-  "currentDomainBlocker": "AUTHORITATIVE_UNITY_ASSET_ROOT_NOT_PRESENT_ON_CURRENT_MAIN",
+  "currentDomainBlocker": null,
+  "currentDomainCompletion": "SKIN_STAGE3_2_COMPLETE",
   "rolloutCompletion": "ASSET_INTAKE_SKIN_STAGE3_2_EXECUTION_PATH_ADOPTED"
 }

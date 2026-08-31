@@ -12,10 +12,22 @@ const check = (name, condition) => {
   checks.push(name);
 };
 
-const { rollout, readiness, contract } = await loadSkinStage32RolloutAuthority();
-check('current authority remains READY_FOR_ASSET_EVIDENCE', readiness.status === 'READY_FOR_ASSET_EVIDENCE');
-check('current authority still has no final evidence', readiness.evidence?.present === false);
+const { rollout, readiness, contract, authorityState } = await loadSkinStage32RolloutAuthority();
+check('current authority state is explicitly admitted', Boolean(authorityState));
+check('current authority evidence state matches admitted state', readiness.evidence?.present === authorityState.evidencePresent);
+check('current authority completion matches admitted state', (readiness.completion ?? null) === (authorityState.completion ?? null));
+if (readiness.status === 'PASS') {
+  check('completed current authority is SKIN_STAGE3_2_COMPLETE', readiness.completion === 'SKIN_STAGE3_2_COMPLETE');
+  check('completed current authority has final evidence', readiness.evidence?.present === true);
+  check('completed current authority has no evidence blocker', readiness.evidence?.blocker == null);
+  check('completed current authority has no evidence issues', (readiness.evidence?.issues ?? []).length === 0);
+} else {
+  check('pre-evidence current authority remains READY_FOR_ASSET_EVIDENCE', readiness.status === 'READY_FOR_ASSET_EVIDENCE');
+  check('pre-evidence current authority has no final evidence', readiness.evidence?.present === false);
+}
 check('rollout does not promote Project Status', rollout.resultPolicy.runnerSuccessDoesNotPromoteProjectStatus === true);
+check('unknown authority state fails closed', rollout.resultPolicy.unknownAuthorityStateFailsClosed === true);
+check('completed authority may remain readable', rollout.resultPolicy.completedAuthorityMayRemainReadable === true);
 check('rollout contract override is forbidden', rollout.runner.contractOverrideAllowed === false);
 check('three frozen representative records retained', contract.records.length === 3);
 check('thirteen frozen locators retained', contract.records.reduce((sum, record) => sum + record.expectedLocators.length, 0) === 13);
@@ -68,6 +80,7 @@ try {
   check('pending result emits no partial evidence', pending.evidenceCount === 0);
   check('pending state is explicit', pending.resolutionState === 'PENDING_AUTHORITATIVE_EVIDENCE');
   check('pending execution does not promote Project Status', pending.projectStatusPromoted === false);
+  check('pending execution reports current authority status', pending.currentAuthorityStatus === readiness.status);
 
   const resolved = await runSkinStage32Rollout([
     '--root', root,
@@ -80,6 +93,7 @@ try {
   check('resolved fixture emits thirteen evidence records', resolved.evidenceCount === 13);
   check('resolved output still does not promote Project Status', resolved.projectStatusPromoted === false);
   check('resolved state remains rollout-only', resolved.resolutionState === 'RESOLVED_ASSET_INTAKE_OUTPUT_NOT_PROJECT_STATUS_PROMOTED');
+  check('resolved execution reports current authority completion', (resolved.currentAuthorityCompletion ?? null) === (readiness.completion ?? null));
 
   let contractOverrideRejected = false;
   try {
@@ -100,6 +114,7 @@ console.log(JSON.stringify({
   failed: 0,
   hardErrors: 0,
   currentDomainStatus: readiness.status,
+  currentDomainCompletion: readiness.completion ?? null,
   currentDomainEvidencePresent: readiness.evidence?.present,
   projectStatusPromoted: false,
   semanticRecomputation: false,

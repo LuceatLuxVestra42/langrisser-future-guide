@@ -38,6 +38,7 @@
     {"id":"equipment-assets","validators":["equipment-assets"]},
     {"id":"hero-assets","validators":["hero-assets"]},
     {"id":"asset-intake","validators":["asset-intake"]},
+    {"id":"skin-stage3-2-evidence","validators":["skin-stage3-2-evidence"]},
     {"id":"localization","validators":["localization-audit"]},
     {"id":"hero-frontend","validators":["production-build"]},
     {"id":"soldier-frontend","validators":["production-build"]},
@@ -199,8 +200,14 @@
       "owners":["banner-assets","banner-frontend"]
     },
     {
+      "id":"skin-stage3-2-evidence",
+      "patterns":["data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json","data/validation/skin-stage3-2-readiness.v1.json"],
+      "owners":["skin-stage3-2-evidence"]
+    },
+    {
       "id":"skin-assets",
       "patterns":["data/generated/skin-stage3-*","data/validation/skin-stage3-*","data/contracts/skin-stage3-*","data/evidence/skin-stage3-*","scripts/*skin-stage3*",".github/workflows/skin-stage3-*"],
+      "excludePatterns":["data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json","data/validation/skin-stage3-2-readiness.v1.json"],
       "owners":["skin-assets"]
     },
     {
