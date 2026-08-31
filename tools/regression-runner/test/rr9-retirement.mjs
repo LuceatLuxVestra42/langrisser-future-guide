@@ -10,8 +10,8 @@ const legacyAuditScript = 'scripts/validate-regression-coverage-promotion-v2.mjs
 const historicalEvidence = [
   'data/contracts/regression-coverage-promotion.v1.json',
   'data/contracts/regression-coverage-promotion.v2.json',
-  'data/validation/regression-coverage-promotion-summary.v2.json',
 ];
+const historicalUncommittedOutput = 'data/validation/regression-coverage-promotion-summary.v2.json';
 
 const rr8 = readJson('data/contracts/project-tooling-regression-runner-r8-final-freeze.v1.json');
 assert.equal(rr8.completion, 'REGRESSION_RUNNER_RR8_INSTALLATION_FROZEN_ROLLBACK_OPEN');
@@ -28,6 +28,8 @@ assert.equal(fs.existsSync(legacyAuditScript), true,
 for (const path of historicalEvidence) {
   assert.equal(fs.existsSync(path), true, `historical evidence must be preserved: ${path}`);
 }
+assert.equal(fs.existsSync(historicalUncommittedOutput), false,
+  'RR9 must not manufacture the historically uncommitted V2 summary solely for retirement proof');
 
 const newWorkflow = readText('.github/workflows/project-tooling-regression-runner.yml');
 assert.match(newWorkflow, /pull_request:/);
@@ -67,6 +69,7 @@ console.log(JSON.stringify({
   retiredActiveSurfaces: [oldWorkflow, 'package.json#scripts.validate:regression-coverage-promotion:v2'],
   preservedHistoricalAuditScript: legacyAuditScript,
   preservedHistoricalEvidence: historicalEvidence,
+  historicalUncommittedOutputNotMaterialized: historicalUncommittedOutput,
   oldAutomaticRunnerCount: 0,
   oldManualRunnerCount: 0,
   legacyPackageEntrypointCount: 0,
