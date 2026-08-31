@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-doctor-deletion-complete/v1",
+  "stage": "OLD_PROJECT_DOCTOR_RETIREMENT_COMPLETE",
+  "checkpoint": "PROJECT_TOOLING_OLD_PROJECT_DOCTOR_RETIREMENT_COMPLETE",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "OLD_DOCTOR_RETIREMENT_COMPLETE",
+  "purpose": "Freeze completion of the exact OLD Project Doctor D2/D3/D4/D7 merge-gate/runtime retirement after APPLIED-state validation and Project Check runner prerequisite repair.",
+  "predecessors": [
+    {
+      "contract": "data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json",
+      "requiredCompletion": "DELETION_INVENTORY_COMPLETE"
+    },
+    {
+      "contract": "data/contracts/project-tooling-project-doctor-deletion-manifest.v1.json",
+      "requiredState": "APPLIED",
+      "requiredActualDeletionApplied": true
+    },
+    {
+      "contract": "data/contracts/project-tooling-project-check-r3.v1.json",
+      "requiredCompletion": "R3_PROJECT_CHECK_COMPLETE"
+    }
+  ],
+  "authoritativeState": {
+    "mainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "prNumber": 309,
+    "requiredContext": "project-check",
+    "appliedHeadBeforeRunnerRepair": "f794897d4ae5e95b8df777854036f1854f0c6bed",
+    "runnerRepairHead": "33ae5a75152a410583359c05819240151d60a4be",
+    "runnerRepairCommit": "33ae5a75152a410583359c05819240151d60a4be",
+    "runnerRepairWorkflow": ".github/workflows/project-tooling-r3-project-check.yml"
+  },
+  "retirement": {
+    "exactPathOnly": true,
+    "filenameSimilarityAllowed": false,
+    "deletedFileCount": 10,
+    "removedPackageScriptCount": 9,
+    "scope": "OLD D2/D3/D4/D7 merge-gate/runtime surfaces only",
+    "actualDeletionApplied": true,
+    "packageJsonMutated": true,
+    "writerRollbackSurfaceRetained": true,
+    "historicalEvidencePreserved": true,
+    "hostedQaPreserved": true,
+    "independentValidatorsPreserved": true,
+    "newCanonicalProjectStatusPreserved": true
+  },
+  "finalGate": {
+    "initialAppliedVerification": {
+      "headSha": "f794897d4ae5e95b8df777854036f1854f0c6bed",
+      "projectCheckRunId": 33352326164,
+      "projectCheckConclusion": "failure",
+      "selfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "failedValidatorId": "production-build",
+      "failureExitCode": 127,
+      "failureSignature": "vite: not found",
+      "classification": "REGRESSION_PROJECT_CHECK_RUNNER_PREREQUISITE",
+      "owningLayer": "Project Check workflow runner environment",
+      "frontendBuildRegression": false,
+      "semanticReopen": false
+    },
+    "repair": {
+      "workflowChange": "Add repository-standard Bun setup and bun install --frozen-lockfile before Project Check validators.",
+      "packageOrFrontendFilesChanged": false,
+      "dependencyLock": "bun.lock",
+      "dependencyInstall": "bun install --frozen-lockfile"
+    },
+    "repairedVerification": {
+      "headSha": "33ae5a75152a410583359c05819240151d60a4be",
+      "projectCheckRunId": 33353154882,
+      "projectCheckJobId": 99370213008,
+      "conclusion": "success",
+      "setupBun": "PASS",
+      "installDependencies": "PASS",
+      "selfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS",
+      "productionBuild": "PASS"
+    }
+  },
+  "boundaries": {
+    "statusSourceWriterChanged": false,
+    "projectStatusWriterChanged": false,
+    "semanticRelationChanged": false,
+    "canonicalPopulationChanged": false,
+    "hostedQaChanged": false,
+    "independentValidatorChanged": false,
+    "additionalOldDoctorDeletionBeyondManifest": false
+  },
+  "blockers": [],
+  "reviews": [
+    "Status Source direct workflow_dispatch live mutation proof remains unavailable from the current connection; its OLD writer rollback surface remains retained.",
+    "Project Status OLD writer rollback surface remains retained; rollback-surface closure is a later separate decision.",
+    "REVIEW_EXISTING_DRIFT: data/generated/project-doctor-status-sources.v1.json is named by the earlier deletion inventory but is absent on both main and the migration branch; it remains unsynthesized and outside delete/retain sets.",
+    "Historical OLD contracts and validation evidence remain preserved until a separate archive policy replaces their migration references."
+  ],
+  "nextStartPoint": "Review closure of retained OLD writer rollback surfaces as a separate task. Do not combine that review with additional semantic, frontend, hosted-QA, or validator changes.",
+  "reopenConditions": [
+    "required project-check context or Project Check workflow ownership changes",
+    "either NEW Status Source or Project Status writer ownership changes",
+    "an OLD writer becomes automatically active again",
+    "a current consumer is proven to require one of the 10 retired paths or 9 removed package entrypoints",
+    "authoritative evidence contradicts the exact retirement counts or preserved-scope boundary"
+  ]
+}
