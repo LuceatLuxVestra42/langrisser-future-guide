@@ -3,8 +3,8 @@
   "schemaId": "project-tooling-project-check-r3/v1",
   "stage": "R3",
   "checkpoint": "PROJECT_TOOLING_PROJECT_CHECK_R3",
-  "status": "IMPLEMENTED_PENDING_SHADOW_CI",
-  "completion": "R3_PROJECT_CHECK_IMPLEMENTED",
+  "status": "PASS",
+  "completion": "R3_PROJECT_CHECK_COMPLETE",
   "purpose": "Replace legacy Project Doctor D2/D3/D4/D7 PR routing with a minimal independent changed-path to explicit-owner to frozen-validator router, MANUAL_REVIEW fallback, validator execution, and aggregate PASS/REVIEW/BLOCKER semantics.",
   "predecessors": [
     {
@@ -39,6 +39,8 @@
   },
   "implementation": {
     "implementationHead": "fa5fe70020fa9918cceaf313c5e33272b0497ee0",
+    "validatedHead": "77b6f7ea58d167f7c01d42d0ab76fadbae81ed3c",
+    "validatedMergeResult": "267ce386a2cceef1c0e38710afcd6f0c4e2a2ca3",
     "ownerMap": "tools/project-check/contracts/owners.v1.json",
     "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
     "runtime": "tools/project-check/lib/project-check.mjs",
@@ -116,6 +118,53 @@
     "project-status": "R2 parity self-test",
     "project-check": "R3 routing/execution self-test"
   },
+  "validationEvidence": {
+    "shadowWorkflow": {
+      "runId": 33344192772,
+      "jobId": 99345101658,
+      "headSha": "77b6f7ea58d167f7c01d42d0ab76fadbae81ed3c",
+      "mergeResultSha": "267ce386a2cceef1c0e38710afcd6f0c4e2a2ca3",
+      "conclusion": "success",
+      "selfTest": "PASS",
+      "plan": "PASS",
+      "execution": "PASS"
+    },
+    "fullMigrationDiff": {
+      "changedFileCount": 47,
+      "routeStatus": "PLAN_READY",
+      "ownerCount": 3,
+      "owners": [
+        "project-check",
+        "project-status",
+        "status-source"
+      ],
+      "validatorCount": 7,
+      "validatorsInExecutionOrder": [
+        "status-source-artifact-bridge",
+        "status-source-lifecycle",
+        "status-source-producer-gate",
+        "status-source-promotion",
+        "status-source-selection",
+        "project-status-parity",
+        "project-check-self-test"
+      ],
+      "manualReviewCount": 0,
+      "preflight": "PASS",
+      "allSelectedValidatorExitCodesZero": true,
+      "finalStatus": "PASS",
+      "finalExitCode": 0
+    },
+    "selfTest": {
+      "fixtureCount": 13,
+      "catalogValidatorCount": 22,
+      "ownerCount": 25,
+      "manualReviewFallbackProven": true,
+      "manualOwnerReviewPersistsAfterPassingValidator": true,
+      "validatorFailureBecomesBlocker": true,
+      "wholeCatalogTargetPreflight": "PASS",
+      "pathTraversalBlocked": true
+    }
+  },
   "independenceBoundary": {
     "legacyProjectDoctorRuntimeImports": 0,
     "legacyD2RuntimeDependencies": 0,
@@ -124,24 +173,13 @@
     "legacyD5RuntimeDependencies": 0,
     "legacyD7RuntimeDependencies": 0,
     "freshnessResealCount": 0,
+    "ownerPropagationCount": 0,
+    "changeClassFanOutCount": 0,
+    "semanticRecomputationCount": 0,
     "statusSourceMutationCount": 0,
     "projectStatusNormalizationCount": 0,
     "projectStatusWriteCount": 0,
     "rawConfigDataSemanticInterpretationCount": 0
-  },
-  "currentShadowExpectation": {
-    "migrationPathsAllExplicitlyMapped": true,
-    "selectedOwners": ["status-source", "project-status", "project-check"],
-    "selectedValidators": [
-      "status-source-selection",
-      "status-source-promotion",
-      "status-source-producer-gate",
-      "status-source-artifact-bridge",
-      "status-source-lifecycle",
-      "project-status-parity",
-      "project-check-self-test"
-    ],
-    "heavyDomainValidatorsExpectedForMigrationOnlyDiff": false
   },
   "completionGate": {
     "ownerMapImplemented": true,
@@ -151,20 +189,22 @@
     "cliImplemented": true,
     "selfTestImplemented": true,
     "shadowWorkflowImplemented": true,
-    "shadowCiPass": false,
-    "currentMigrationDiffRoutesWithoutManualReview": false,
-    "selectedValidatorsPass": false,
-    "legacyRuntimeDependencyCountZero": false,
-    "readyForShadowComparison": false
+    "shadowCiPass": true,
+    "currentMigrationDiffRoutesWithoutManualReview": true,
+    "selectedValidatorsPass": true,
+    "legacyRuntimeDependencyCountZero": true,
+    "readyForShadowComparison": true
   },
   "blockers": [],
-  "cutoverBlockers": ["LEGACY_REQUIRED_PR_GUARD_STILL_ACTIVE"],
+  "cutoverBlockers": [
+    "LEGACY_REQUIRED_PR_GUARD_STILL_ACTIVE"
+  ],
   "reviews": [
     "The R3 owner map is intentionally minimal and fail-closed. Any repository path not explicitly admitted remains MANUAL_REVIEW rather than inheriting historical Doctor routing by default.",
     "Banner assets and Skin assets remain manual owner boundaries until independent final validators are explicitly admitted.",
     "The NEW Project Check shadow context is not required by branch protection yet; required-check cutover remains later."
   ],
-  "nextStartPoint": "Run R3 shadow workflow against the full migration PR diff. If all migration paths map only to status-source/project-status/project-check and all seven selected independent validators pass, freeze R3 and begin OLD-vs-NEW shadow comparison before required-check cutover.",
+  "nextStartPoint": "Run OLD-vs-NEW shadow comparison before required-check cutover. Compare migration-only behavior, representative admitted domain/asset/frontend paths, manual Banner/Skin/unmatched boundaries, and validator-failure aggregation. OLD remains observe-and-compare-only and must not be modified to accept NEW migration paths.",
   "reopenConditions": [
     "an admitted owner validator command changes authoritatively",
     "a path family changes ownership authoritatively",
