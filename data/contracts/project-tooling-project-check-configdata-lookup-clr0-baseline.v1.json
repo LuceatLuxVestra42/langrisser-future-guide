@@ -3,7 +3,7 @@
   "schemaId": "configdata-lookup-clr0-baseline/v1",
   "stage": "CLR0",
   "status": "PASS_WITH_REVIEW",
-  "completion": "CONFIGDATA_LOOKUP_CLR0_BASELINE_VALIDATED_PENDING_FINAL_PROJECT_CHECK",
+  "completion": "CONFIGDATA_LOOKUP_CLR0_BASELINE_FROZEN",
   "purpose": "Freeze the currently validated ConfigData Lookup Stage 0-6 operating baseline before reset work. Reuse the existing materialized indices, canonical overlay, CLI, dependency manifest and validators without semantic recomputation or raw ConfigData investigation.",
   "authoritativeState": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
@@ -57,11 +57,18 @@
   "projectCheckEvidence": {
     "initialCandidateRunId": 33388781371,
     "initialCandidateJobId": 99477331017,
-    "selfTest": "PASS",
+    "initialSelfTest": "PASS",
     "initialPlanStatus": "MANUAL_REVIEW",
-    "initialPlanReason": "The CLR0 checkpoint path was not yet explicitly owned. CLR0 must not prematurely add the future configdata-lookup owner reserved for CLR4.",
-    "resolution": "Move the CLR0 checkpoint into the already-owned Project Check tooling checkpoint namespace without modifying ConfigData Lookup ownership or validator catalogs.",
-    "finalProjectCheckConclusion": "PENDING"
+    "initialPlanReason": "The first CLR0 checkpoint path was not yet explicitly owned. CLR0 must not prematurely add the future configdata-lookup owner reserved for CLR4.",
+    "resolution": "Moved the CLR0 checkpoint into the already-owned Project Check tooling checkpoint namespace without modifying ConfigData Lookup ownership or validator catalogs.",
+    "resolvedHead": "93b357f13a427c11b594c61703b46efb3580d8b2",
+    "resolvedRunId": 33388974407,
+    "resolvedJobId": 99477942877,
+    "resolvedSelfTest": "PASS",
+    "resolvedOwnershipPlan": "PASS",
+    "resolvedOwningValidators": "PASS",
+    "resolvedConclusion": "success",
+    "freezeHeadRevalidation": "PENDING"
   },
   "semanticBoundary": {
     "rawConfigDataMutation": false,
@@ -83,7 +90,7 @@
     {
       "id": "LEGACY_STAGE6_WORKFLOW_HAS_WRITE_PERMISSION",
       "blocking": false,
-      "detail": "The existing Stage 6 workflow still has contents:write and a branch-specific materialization writer path. CLR0 only records the baseline; validation/write separation belongs to CLR5. On this PR baseline run, the materialization commit step was skipped and generated diff remained zero."
+      "detail": "The existing Stage 6 workflow still has contents:write and a branch-specific materialization writer path. CLR0 only records the baseline; validation/write separation belongs to CLR5. On the CLR0 baseline run, the materialization commit step was skipped and generated diff remained zero."
     }
   ],
   "nonScope": [
@@ -92,7 +99,7 @@
     "No Hero, Soldier, Equipment, Banner, Skin or relation semantic stage is reopened.",
     "No dedicated ConfigData Lookup Project Check owner admission is performed before CLR4."
   ],
-  "nextStart": "Complete final Project Check revalidation on the checkpoint-only final head. If Project Check passes with no ConfigData Lookup implementation/data mutation, set completion to CONFIGDATA_LOOKUP_CLR0_BASELINE_FROZEN and begin CLR1 authority/responsibility boundary freeze from this baseline.",
+  "nextStart": "Begin CLR1 authority/responsibility boundary freeze from this CLR0 baseline. Preserve Stage 0-6 outputs and define ConfigData Lookup as an independent lookup/index/freshness tool that does not own domain semantic fan-out, page validator selection, Hosted QA selection, or cross-domain mutation.",
   "reopenConditions": [
     "Stage 5 or Stage 6 existing validator fails on the unchanged baseline.",
     "The Stage 6 stale plan is non-zero on the unchanged baseline.",
