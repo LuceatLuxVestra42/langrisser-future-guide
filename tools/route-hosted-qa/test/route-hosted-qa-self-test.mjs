@@ -128,7 +128,11 @@ const strictResult = await runRouteHostedQa({
   expectedSourceSha: sourceSha,
   fetchImpl: fetchMock,
 });
-assert.equal(strictResult.exitCode, 0);
+assert.equal(
+  strictResult.exitCode,
+  0,
+  JSON.stringify(strictResult.checks.filter(item => !item.pass), null, 2),
+);
 assert.equal(strictResult.status, contract.modes[MODE_STRICT].passStatus);
 assert.equal(strictResult.classification, null);
 assert.equal(strictResult.candidateFreshnessClaim, true);
