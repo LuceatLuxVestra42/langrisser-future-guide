@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import {
   executeRegressionRun,
   loadRegressionRunnerContracts,
@@ -11,6 +12,11 @@ import {
 
 const repoRoot = process.cwd();
 const contracts = loadRegressionRunnerContracts({ repoRoot });
+const fixturePath = path.join(repoRoot, 'tools/regression-runner/test/fixtures/rr4-negative-cases.v1.json');
+const fixtures = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+assert.equal(fixtures.schemaId, 'regression-runner-rr4-negative-fixtures/v1');
+assert.equal(fixtures.status, 'DESIGN_FROZEN');
+
 const profile = contracts.profilesContract.profiles.find(item => item.id === 'core-regression-v1');
 const expectedProfileIds = [
   'hero-canonical',
@@ -59,10 +65,68 @@ for (const validator of plan.validators) {
 
 assert.deepEqual(preflightRegressionRun({ repoRoot, plan }), { pass: true, failures: [] });
 
+for (const fixture of fixtures.contractCases) {
+  const candidate = structuredClone(contracts);
+  if (fixture.mutation === 'PROFILE_APPEND_VALIDATOR_ID') {
+    candidate.profilesContract.profiles[0].validatorIds.push(fixture.value);
+  } else if (fixture.mutation === 'PROFILE_SET_EXECUTABLE') {
+    candidate.profilesContract.profiles[0].executable = fixture.value;
+  } else if (fixture.mutation === 'CATALOG_DUPLICATE_VALIDATOR') {
+    const source = candidate.validatorCatalog.validators.find(item => item.id === fixture.value);
+    assert.ok(source, `fixture catalog source missing: ${fixture.value}`);
+    candidate.validatorCatalog.validators.push(structuredClone(source));
+  } else if (fixture.mutation === 'CATALOG_SET_SHELL_EXECUTION') {
+    candidate.validatorCatalog.policy.shellExecution = fixture.value;
+  } else if (fixture.mutation === 'PROFILE_SET_AUTOMATIC_COVERAGE_EXPANSION') {
+    candidate.profilesContract.policy.automaticCoverageExpansion = fixture.value;
+  } else {
+    assert.fail(`Unknown contract fixture mutation: ${fixture.mutation}`);
+  }
+  assert.throws(
+    () => validateRegressionRunnerContracts(candidate),
+    new RegExp(fixture.expectedErrorToken),
+    fixture.id,
+  );
+}
+
+for (const fixture of fixtures.preflightCases) {
+  const fixturePlan = {
+    version: 1,
+    schemaId: 'regression-runner-plan/v1',
+    status: 'PLAN_READY',
+    profileId: `fixture-${fixture.id}`,
+    validatorCount: 1,
+    validatorIds: [fixture.validator.id],
+    validators: [fixture.validator],
+    authority: 'tools/project-check/contracts/validators.v1.json',
+  };
+  const result = preflightRegressionRun({ repoRoot, plan: fixturePlan });
+  assert.equal(result.pass, false, fixture.id);
+  assert.ok(result.failures.some(item => item.type === fixture.expectedFailureType), fixture.id);
+}
+
+const emptyPlanPreflight = preflightRegressionRun({
+  repoRoot,
+  plan: { validators: [] },
+});
+assert.equal(emptyPlanPreflight.pass, false);
+assert.deepEqual(emptyPlanPreflight.failures, [{ type: 'PLAN_VALIDATORS_INVALID' }]);
+
+for (const fixture of fixtures.runtimeAuthorityOverrideCases) {
+  assert.throws(
+    () => executeRegressionRun({ repoRoot, [fixture.key]: {} }),
+    new RegExp(fixture.expectedErrorToken),
+    fixture.id,
+  );
+}
+
+assert.throws(
+  () => executeRegressionRun({ repoRoot, profileId: '__rr4_unknown_profile__' }),
+  /Unknown regression profile/,
+);
+
 const passResult = executeRegressionRun({
   repoRoot,
-  contracts,
-  preflight: { pass: true, failures: [] },
   snapshotTrackedState: () => [],
   executor: validator => ({ validatorId: validator.id, exitCode: 0, signal: null }),
 });
@@ -79,8 +143,6 @@ assert.equal(passResult.boundaries.legacyRegressionAdmissionAuditCount, 0);
 let failureExecutions = 0;
 const failureResult = executeRegressionRun({
   repoRoot,
-  contracts,
-  preflight: { pass: true, failures: [] },
   snapshotTrackedState: () => [],
   executor: validator => {
     failureExecutions += 1;
@@ -91,12 +153,11 @@ assert.equal(failureResult.status, 'BLOCKER');
 assert.equal(failureResult.completion, 'BLOCKED_VALIDATOR');
 assert.equal(failureResult.failedValidatorId, plan.validatorIds[0]);
 assert.equal(failureExecutions, 1);
+assert.equal(failureResult.executions.length, 1);
 
 let snapshotCount = 0;
 const mutationResult = executeRegressionRun({
   repoRoot,
-  contracts,
-  preflight: { pass: true, failures: [] },
   snapshotTrackedState: () => {
     snapshotCount += 1;
     return snapshotCount === 1 ? [] : [' M data/generated/probe.json'];
@@ -107,29 +168,42 @@ assert.equal(mutationResult.status, 'BLOCKER');
 assert.equal(mutationResult.completion, 'BLOCKED_TRACKED_MUTATION');
 assert.equal(mutationResult.executions.length, 1);
 
+let planOnlyExecutorCalled = false;
+let planOnlySnapshotCalled = false;
 const planOnly = executeRegressionRun({
   repoRoot,
-  contracts,
-  preflight: { pass: true, failures: [] },
   planOnly: true,
+  executor: () => {
+    planOnlyExecutorCalled = true;
+    throw new Error('plan-only executor must not run');
+  },
+  snapshotTrackedState: () => {
+    planOnlySnapshotCalled = true;
+    throw new Error('plan-only snapshot must not run');
+  },
 });
 assert.equal(planOnly.status, 'PASS');
 assert.equal(planOnly.completion, 'PLAN_ONLY');
 assert.equal(planOnly.executions.length, 0);
+assert.equal(planOnlyExecutorCalled, false);
+assert.equal(planOnlySnapshotCalled, false);
+assert.equal(planOnly.plan.validatorCount, 9);
 
-const unknownContracts = structuredClone(contracts);
-unknownContracts.profilesContract.profiles[0].validatorIds.push('unknown-future-validator');
-assert.throws(
-  () => validateRegressionRunnerContracts(unknownContracts),
-  /UNKNOWN_PROFILE_VALIDATOR_ID/,
-);
-
-const duplicateContracts = structuredClone(contracts);
-duplicateContracts.profilesContract.profiles[0].validatorIds.push('hero-canonical');
-assert.throws(
-  () => validateRegressionRunnerContracts(duplicateContracts),
-  /DUPLICATE_PROFILE_VALIDATOR_ID/,
-);
+const cliFixture = fixtures.cliCases.find(item => item.id === 'current-profile-plan-only');
+assert.ok(cliFixture);
+const cliResult = spawnSync(process.execPath, ['tools/regression-runner/cli/check.mjs', ...cliFixture.args], {
+  cwd: repoRoot,
+  encoding: 'utf8',
+  shell: false,
+});
+assert.equal(cliResult.status, 0, String(cliResult.stderr ?? ''));
+const cliPayload = JSON.parse(cliResult.stdout);
+assert.equal(cliPayload.status, cliFixture.expectedStatus);
+assert.equal(cliPayload.completion, cliFixture.expectedCompletion);
+assert.equal(cliPayload.plan.validatorCount, cliFixture.expectedValidatorCount);
+assert.equal(cliPayload.executions.length, cliFixture.expectedExecutionCount);
+assert.deepEqual(cliPayload.plan.validatorIds, plan.validatorIds);
+assert.equal(cliPayload.plan.authority, 'tools/project-check/contracts/validators.v1.json');
 
 const runtimePaths = [
   'tools/regression-runner/lib/regression-runner.mjs',
@@ -156,17 +230,26 @@ for (const runtimePath of runtimePaths) {
   }
 }
 
+const negativeFixtureCount = fixtures.contractCases.length
+  + fixtures.preflightCases.length
+  + fixtures.runtimeAuthorityOverrideCases.length;
+
 console.log(JSON.stringify({
   status: 'PASS',
-  checkpoint: 'REGRESSION_RUNNER_RR3_SELF_TEST',
+  checkpoint: 'REGRESSION_RUNNER_RR4_SAFETY_SELF_TEST',
   profile: 'core-regression-v1',
   validatorCount: plan.validatorCount,
   commandAuthority: plan.authority,
-  fixtures: 12,
+  negativeFixtureCount,
+  executionSafetyCaseCount: fixtures.executionCases.length,
+  cliPlanOnlyCaseCount: fixtures.cliCases.length,
   boundaries: {
+    runtimeAuthorityOverrideAllowedCount: 0,
     profileCommandMetadataCount: 0,
     automaticCoverageExpansionCount: 0,
+    shellExecutionCount: 0,
     trackedMutationAllowedCount: 0,
+    realValidatorExecutionByPlanOnlyCount: 0,
     legacyProjectDoctorRuntimeDependencyCount: 0,
     legacyRegressionAdmissionAuditCount: 0,
     semanticRecomputationCount: 0,
