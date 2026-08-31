@@ -1,0 +1,210 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-route-hosted-qa-rh0-baseline/v1",
+  "stage": "RH0",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "ROUTE_HOSTED_QA_RH0_BASELINE_FROZEN",
+  "purpose": "Freeze the current OLD Route/Hosted QA contracts, deterministic validation, live hosted evidence, runtime/workflow/package surfaces, and failure boundaries before defining or admitting a NEW clean-room Route/Hosted QA implementation.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pullRequest": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "headBeforeFreeze": "508bbaa18d3faedc9e6a9f3aa812b7335e392d8f",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "requiredCheckContexts": ["project-check"]
+  },
+  "frozenQaContract": {
+    "stage0": {
+      "contract": "data/contracts/project-doctor-route-hosted-qa-stage0.v1.json",
+      "contractBlobSha": "35ee4da968ec57b618341574219e9961ba34af15",
+      "status": "DESIGN_FROZEN",
+      "validation": "data/validation/project-doctor-route-hosted-qa-stage0.v1.json",
+      "validationBlobSha": "5bf6b549b4b20807cc139ea9dfb2c95de594f765",
+      "validationStatus": "PASS",
+      "validationChecks": {"total": 10, "passed": 10, "failed": 0}
+    },
+    "stage1": {
+      "contract": "data/contracts/project-doctor-route-hosted-qa-stage1.v1.json",
+      "contractBlobSha": "e02b9c1da0a39b66f69f104cfb5d5c6e1d9c40e6",
+      "status": "DESIGN_FROZEN",
+      "validation": "data/validation/project-doctor-route-hosted-qa-stage1.v1.json",
+      "validationBlobSha": "73abe3fb799444457e58f2672a3f4f7b9674158c",
+      "validationStatus": "PASS",
+      "validationChecks": {"total": 12, "passed": 12, "failed": 0},
+      "successFixtureHostedCheckCount": 10,
+      "failureFixtureExpectedFailedChecks": [
+        "REPOSITORY_BASE_PATH",
+        "ASSET_AND_CHUNK_RESOLUTION",
+        "FILENAME_CASE_SENSITIVITY"
+      ]
+    },
+    "hostedTarget": {
+      "origin": "https://luceatluxvestra42.github.io",
+      "repositoryBase": "/langrisser-future-guide/",
+      "baseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+      "canonicalDirectoryStyle": "TRAILING_SLASH"
+    },
+    "requiredPublicRoutes": ["/", "/banners", "/equipment", "/equipment/exclusive", "/heroes", "/soldiers"],
+    "requiredDetailRoutePatterns": ["/equipment/$equipmentId", "/heroes/$heroId", "/soldiers/$soldierId"],
+    "representativeFixtures": {
+      "hero": [6],
+      "soldier": [300, 1000, 102, 5621],
+      "equipment": [13]
+    },
+    "hostedCheckIds": [
+      "DEPLOYED_COMMIT_FRESHNESS",
+      "REPOSITORY_BASE_PATH",
+      "PUBLIC_ROUTE_RESOLUTION",
+      "DETAIL_DIRECT_ENTRY",
+      "REFRESH_EQUIVALENT_GET",
+      "TRAILING_SLASH_POLICY",
+      "ASSET_AND_CHUNK_RESOLUTION",
+      "FILENAME_CASE_SENSITIVITY",
+      "ROUTE_TREE_HOSTED_PARITY",
+      "STALE_DEPLOY_OR_CACHE"
+    ],
+    "failureBoundary": {
+      "hosted": "DEPLOYMENT_HOSTING_FAIL",
+      "browser": "BROWSER_UI_FAIL",
+      "semanticReopenAllowed": false
+    },
+    "browserBoundary": {
+      "playwrightInstalled": false,
+      "browserAutomation": false,
+      "deferred": true
+    }
+  },
+  "validatedEvidence": {
+    "latestCurrentDeploymentProbe": {
+      "workflow": ".github/workflows/project-doctor-route-hosted-qa-stage1.yml",
+      "workflowRunId": 33359490759,
+      "jobId": 99387960612,
+      "artifactId": 9746215598,
+      "artifactName": "route-hosted-qa-stage1-live",
+      "artifactDigest": "sha256:aafbbb8150cd611fa1584f6b6aec64de94bb0e9ff81e99b2d9e2bf9812234016",
+      "mode": "PROBE_CURRENT_DEPLOYED",
+      "status": "PASS_ROUTE_HOSTED_QA_STAGE1_CURRENT_DEPLOYED_PROBE",
+      "checkCount": 10,
+      "passed": 10,
+      "failed": 0,
+      "semanticStageReopened": false,
+      "ghPagesCommitSha": "3d1b4c42beb6b15d81edb6daf7e08186c7ae80e7",
+      "deployedSourceSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+      "prCandidateHead": "508bbaa18d3faedc9e6a9f3aa812b7335e392d8f",
+      "candidateFreshnessClaim": false,
+      "publicRoutes": 6,
+      "detailFixtures": 6,
+      "refreshFixtures": 6,
+      "trailingSlashChecks": 11,
+      "negativeChecks": 3,
+      "sameOriginAssetsDiscovered": 337,
+      "assetsChecked": 60
+    },
+    "historicalStrictCandidateProof": {
+      "sourceCheckpoint": "data/generated/project-doctor-route-hosted-qa-stage1-checkpoint.v1.json",
+      "workflowRunId": 33228284108,
+      "jobId": 99036180035,
+      "artifactId": 9707623249,
+      "artifactName": "route-hosted-qa-stage1-strict",
+      "artifactDigest": "sha256:7d10a79ddaec517b7b8d3a941d95bd6cf49e8bfd867259dd86e244c9a9a26aaf",
+      "status": "PASS_ROUTE_HOSTED_QA_STAGE1_HTTP",
+      "candidateSourceSha": "e9b861d1a8c39a3a453edcdf783fd73e5c838d5e",
+      "deployedSourceSha": "e9b861d1a8c39a3a453edcdf783fd73e5c838d5e",
+      "checkCount": 10,
+      "passed": 10,
+      "failed": 0,
+      "semanticStageReopened": false
+    },
+    "historicalInitialHostedFailures": {
+      "classification": "DEPLOYMENT_HOSTING_FAIL",
+      "semanticStageReopened": false,
+      "discoveredPresentationRegressions": [
+        {"kind": "FAVICON_DOMAIN_ROOT_PATH", "source": "src/routes/__root.tsx", "fixCommit": "5b92cc6724d29f90a244bb5d7bfc5279725f16c5"},
+        {"kind": "BANNER_IMAGE_DOMAIN_ROOT_PATH", "source": "src/lib/banner-page.functions.ts", "fixCommit": "e4be1953ef10e80377787905b2f3b9632059a23b"}
+      ]
+    }
+  },
+  "oldSurfaceInventory": {
+    "preserveFrozenEvidence": [
+      "data/contracts/project-doctor-route-hosted-qa-stage0.v1.json",
+      "data/contracts/project-doctor-route-hosted-qa-stage1.v1.json",
+      "data/validation/project-doctor-route-hosted-qa-stage0.v1.json",
+      "data/validation/project-doctor-route-hosted-qa-stage1.v1.json",
+      "data/generated/project-doctor-route-hosted-qa-stage0-checkpoint.v1.json",
+      "data/generated/project-doctor-route-hosted-qa-stage1-checkpoint.v1.json"
+    ],
+    "runtimeToReplaceAfterNewParity": [
+      "scripts/validate-project-doctor-route-hosted-qa-stage0.mjs",
+      "scripts/run-project-doctor-route-hosted-qa-stage1.mjs",
+      "scripts/validate-project-doctor-route-hosted-qa-stage1.mjs"
+    ],
+    "automaticValidationWorkflowToReplaceAfterShadow": [
+      ".github/workflows/project-doctor-route-hosted-qa-stage1.yml"
+    ],
+    "packageEntrypointsToReplaceAtCutover": {
+      "qa:hosted": "node scripts/run-project-doctor-route-hosted-qa-stage1.mjs",
+      "qa:hosted:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage1.mjs --check",
+      "qa:hosted:stage0:validate": "node scripts/validate-project-doctor-route-hosted-qa-stage0.mjs --check"
+    },
+    "legacyDeploymentWriterReview": {
+      "workflow": ".github/workflows/project-doctor-route-hosted-qa-stage1-hosted-proof.yml",
+      "classification": "HISTORICAL_STRICT_PROOF_AND_LEGACY_DEPLOYMENT_WRITER",
+      "currentMigrationBranchAutomaticTrigger": false,
+      "pushBranchTrigger": "work/route-hosted-qa-stage1-http-runner",
+      "workflowDispatchAvailable": true,
+      "permissions": "contents: write",
+      "forcePushesGhPages": true,
+      "newSuccessorMustNotInheritDeploymentWriterRole": true
+    }
+  },
+  "migrationBoundary": {
+    "oldProjectDoctorNamespaceIsNewAuthority": false,
+    "oldRuntimeRole": "BASELINE_AND_COMPARATOR_ONLY_PENDING_NEW_INSTALL",
+    "newNamespaceImplemented": false,
+    "newR3OwnerAdmitted": false,
+    "deploymentWriterOwnershipIncludedInNewTool": false,
+    "browserUiIncluded": false,
+    "semanticOwnerChanged": false
+  },
+  "nonScope": [
+    "No tools/route-hosted-qa implementation is created in RH0.",
+    "No dedicated route-hosted-qa owner or validator is admitted into R3 in RH0.",
+    "No OLD Route/Hosted QA workflow, script, contract, validation artifact, or package entrypoint is modified or retired in RH0.",
+    "No GitHub Pages deployment or gh-pages write is performed in RH0.",
+    "No Playwright or Browser/UI automation is added in RH0.",
+    "No canonical, semantic relation, ConfigData, localization, asset mapping, frontend, Status Source, or Project Status state is changed in RH0.",
+    "No synthetic change is made solely to manufacture Regression Runner RR9 workload proof."
+  ],
+  "completionGate": {
+    "currentHeadConfirmed": true,
+    "stage0FrozenValidationPass": true,
+    "stage1DeterministicValidationPass": true,
+    "currentDeploymentProbeTenOfTenPass": true,
+    "currentProbeCandidateFreshnessNotClaimed": true,
+    "historicalStrictCandidateProofPreserved": true,
+    "oldRuntimeWorkflowPackageInventoryFrozen": true,
+    "failureBoundaryPreserved": true,
+    "semanticReopen": false,
+    "newImplementationStarted": false,
+    "deploymentMutationPerformed": false,
+    "rh0BaselineFreezeReady": true
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_HOSTED_PROOF_DEPLOYMENT_WRITER_PRESENT",
+      "blocking": false,
+      "classification": "DEPLOYMENT_WRITER_REVIEW",
+      "detail": "The historical strict-proof workflow still has contents:write and force-pushes gh-pages when invoked in its legacy scope. Preserve it during RH0, do not use it as a NEW runtime predecessor, and resolve its retirement separately during Route/Hosted QA cutover/closeout."
+    }
+  ],
+  "nextStart": "RH1: define the NEW Route/Hosted QA read-only HTTP validation boundary using the frozen QA-0/QA-1 meaning as predecessor evidence. Then perform RH2 explicit R3 owner/path admission before creating tools/route-hosted-qa runtime files.",
+  "reopenConditions": [
+    "The frozen QA-0 or QA-1 deterministic validation no longer passes against its recorded contract and fixture inputs.",
+    "The authoritative public route set, detail route patterns, representative fixtures, hosted check IDs, or repository-base policy changes.",
+    "The Hosted versus Browser failure classification or semantic-reopen boundary changes.",
+    "New authoritative evidence shows the preserved hosted failures were semantic corruption rather than presentation/hosting failures.",
+    "The OLD runtime/workflow/package inventory changes before NEW boundary/admission is established."
+  ]
+}
