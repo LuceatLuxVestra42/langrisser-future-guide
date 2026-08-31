@@ -37,8 +37,8 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validate frozen Stage 5 predecessor
-        run: node scripts/validate-configdata-lookup-stage5.mjs
+      - name: Validate frozen Stage 5 predecessor through current compatibility gate
+        run: npm run validate:configdata-lookup-stage5
 
       - name: Require clean Stage 6 freshness
         run: node scripts/configdata-lookup-stage6.mjs check
