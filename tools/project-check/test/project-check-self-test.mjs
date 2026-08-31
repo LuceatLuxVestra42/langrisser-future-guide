@@ -28,6 +28,16 @@ expectOwners(
   ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection'],
 );
 expectOwners(
+  '.github/workflows/project-tooling-r1-status-source-writer.yml',
+  ['status-source'],
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection'],
+);
+expectOwners(
+  '.github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml',
+  ['status-source'],
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection'],
+);
+expectOwners(
   'tools/project-status/lib/normalize-project-status.mjs',
   ['project-status'],
   ['project-status-parity'],
@@ -189,7 +199,7 @@ assert.throws(
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'PROJECT_CHECK_R3_SELF_TEST',
-  fixtures: 15,
+  fixtures: 17,
   catalogValidatorCount: contracts.validatorCatalog.validators.length,
   ownerCount: contracts.ownerMap.owners.length,
   boundaries: {
