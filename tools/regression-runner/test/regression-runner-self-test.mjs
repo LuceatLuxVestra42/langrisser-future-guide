@@ -205,6 +205,17 @@ assert.equal(cliPayload.executions.length, cliFixture.expectedExecutionCount);
 assert.deepEqual(cliPayload.plan.validatorIds, plan.validatorIds);
 assert.equal(cliPayload.plan.authority, 'tools/project-check/contracts/validators.v1.json');
 
+const currentParityResult = spawnSync(process.execPath, ['tools/regression-runner/test/current-parity.mjs'], {
+  cwd: repoRoot,
+  encoding: 'utf8',
+  shell: false,
+  maxBuffer: 16 * 1024 * 1024,
+});
+if (currentParityResult.stdout) process.stdout.write(currentParityResult.stdout);
+if (currentParityResult.stderr) process.stderr.write(currentParityResult.stderr);
+assert.equal(currentParityResult.status, 0, `RR5 current parity failed with status ${currentParityResult.status}`);
+assert.match(currentParityResult.stdout, /REGRESSION_RUNNER_RR5_CURRENT_HEAD_PARITY/);
+
 const runtimePaths = [
   'tools/regression-runner/lib/regression-runner.mjs',
   'tools/regression-runner/cli/check.mjs',
@@ -236,20 +247,20 @@ const negativeFixtureCount = fixtures.contractCases.length
 
 console.log(JSON.stringify({
   status: 'PASS',
-  checkpoint: 'REGRESSION_RUNNER_RR4_SAFETY_SELF_TEST',
+  checkpoint: 'REGRESSION_RUNNER_RR5_SELF_TEST_WITH_CURRENT_PARITY',
   profile: 'core-regression-v1',
   validatorCount: plan.validatorCount,
   commandAuthority: plan.authority,
   negativeFixtureCount,
   executionSafetyCaseCount: fixtures.executionCases.length,
   cliPlanOnlyCaseCount: fixtures.cliCases.length,
+  realCurrentParityExecutionCount: 9,
   boundaries: {
     runtimeAuthorityOverrideAllowedCount: 0,
     profileCommandMetadataCount: 0,
     automaticCoverageExpansionCount: 0,
     shellExecutionCount: 0,
     trackedMutationAllowedCount: 0,
-    realValidatorExecutionByPlanOnlyCount: 0,
     legacyProjectDoctorRuntimeDependencyCount: 0,
     legacyRegressionAdmissionAuditCount: 0,
     semanticRecomputationCount: 0,
