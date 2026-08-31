@@ -37,3 +37,12 @@ jobs:
 
       - name: Run changed path owning validators
         run: node tools/project-check/cli/check.mjs --base "origin/${GITHUB_BASE_REF}" --head HEAD
+
+      - name: Verify Project Check tracked state is unchanged
+        run: |
+          CHANGES="$(git status --porcelain=v1 --untracked-files=no)"
+          if [ -n "$CHANGES" ]; then
+            echo "$CHANGES"
+            echo 'Project Check owning validators mutated tracked repository state.'
+            exit 1
+          fi
