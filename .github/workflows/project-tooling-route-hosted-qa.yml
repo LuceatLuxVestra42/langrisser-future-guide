@@ -1,6 +1,13 @@
 name: Project Tooling Route Hosted QA
 
 on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'tools/route-hosted-qa/**'
+      - '.github/workflows/project-tooling-route-hosted-qa.yml'
   workflow_dispatch:
     inputs:
       mode:
@@ -42,7 +49,7 @@ jobs:
         run: node tools/route-hosted-qa/test/route-hosted-qa-self-test.mjs
 
       - name: Validate strict candidate input
-        if: ${{ inputs.mode == 'strict-candidate' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'strict-candidate' }}
         shell: bash
         env:
           EXPECTED_SHA: ${{ inputs.expected_sha }}
@@ -54,11 +61,11 @@ jobs:
           fi
 
       - name: Probe current deployed GitHub Pages
-        if: ${{ inputs.mode == 'probe-current' }}
+        if: ${{ github.event_name == 'pull_request' || inputs.mode == 'probe-current' }}
         run: node tools/route-hosted-qa/cli/check.mjs --probe-current
 
       - name: Strict Hosted QA against explicit deployed source SHA
-        if: ${{ inputs.mode == 'strict-candidate' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'strict-candidate' }}
         env:
           EXPECTED_SHA: ${{ inputs.expected_sha }}
         run: node tools/route-hosted-qa/cli/check.mjs --expected-sha "$EXPECTED_SHA"
