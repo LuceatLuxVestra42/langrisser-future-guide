@@ -24,6 +24,7 @@
     {"id":"project-check","validators":["project-check-self-test"]},
     {"id":"regression-runner","validators":["regression-runner-self-test"]},
     {"id":"route-hosted-qa","validators":["route-hosted-qa-self-test"]},
+    {"id":"configdata-lookup","validators":["configdata-lookup-self-test"]},
     {"id":"configdata","validators":["configdata-integrity"]},
     {"id":"hero-canonical","validators":["hero-canonical"]},
     {"id":"soldier-canonical","validators":["soldier-canonical"]},
@@ -84,9 +85,9 @@
       "owners":["project-check"]
     },
     {
-      "id":"configdata-lookup-clr2-preimplementation-admission",
-      "patterns":["tools/configdata-lookup/**",".github/workflows/project-tooling-configdata-lookup-clr2.yml"],
-      "owners":["project-check"]
+      "id":"configdata-lookup-tooling",
+      "patterns":["tools/configdata-lookup/**","data/contracts/project-tooling-configdata-lookup-*.json",".github/workflows/project-tooling-configdata-lookup-clr2.yml"],
+      "owners":["configdata-lookup"]
     },
     {
       "id":"old-doctor-retirement-apply",
