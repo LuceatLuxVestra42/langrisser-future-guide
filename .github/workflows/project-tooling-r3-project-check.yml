@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Probe current main ConfigData integrity
+        run: npm run check:configdata
+
       - name: Run R3 Project Check contract and routing self-test
         run: node tools/project-check/test/project-check-self-test.mjs
 
