@@ -1,0 +1,152 @@
+name: Skin FULLART-0 Current Spine Render
+
+on:
+  push:
+    branches:
+      - work/skin-stage3-3-batched-20260901
+    paths:
+      - scripts/extract-skin-fullart0-spine-source.py
+      - scripts/extract-skin-fullart0-spine-source-v2.py
+      - scripts/extract-skin-fullart0-atlas-page.py
+      - scripts/render-skin-fullart0-geometry.py
+      - tools/skin-fullart0/SpineGeometry.cs
+      - .github/workflows/skin-fullart0-render.yml
+      - data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: skin-fullart0-current-spine-render
+  cancel-in-progress: false
+
+jobs:
+  render-skin-102:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current work branch
+        uses: actions/checkout@v4
+        with:
+          ref: work/skin-stage3-3-batched-20260901
+          fetch-depth: 0
+
+      - name: Checkout exact official Spine 3.3-era runtime
+        uses: actions/checkout@v4
+        with:
+          repository: EsotericSoftware/spine-runtimes
+          ref: 1c1936532527900f74cfb58f7002998bf157b254
+          path: .runtime/spine-runtimes
+          fetch-depth: 1
+
+      - name: Verify pinned official runtime commit
+        run: |
+          actual="$(git -C .runtime/spine-runtimes rev-parse HEAD)"
+          test "$actual" = '1c1936532527900f74cfb58f7002998bf157b254'
+          git -C .runtime/spine-runtimes show -s --format='%H %cI %s' HEAD
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install bounded extraction/render dependencies
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow numpy
+
+      - name: Re-extract current Skin 102 Spine source only
+        run: python scripts/extract-skin-fullart0-spine-source-v2.py
+
+      - name: Resolve exact atlas page Texture2D from current bundle
+        run: python scripts/extract-skin-fullart0-atlas-page.py
+
+      - name: Locate bounded render inputs
+        run: |
+          atlas="$(find .skin-fullart0-spine-source/raw -maxdepth 1 -type f -name '*Mathew_Skin01.atlas.atlas.txt' -print -quit)"
+          skel="$(find .skin-fullart0-spine-source/raw -maxdepth 1 -type f -name '*Mathew_Skin01.skel.skel.bytes' -print -quit)"
+          texture='.skin-fullart0-spine-source/raw/Mathew_Skin01.png'
+          test -f "$atlas"
+          test -f "$skel"
+          test -f "$texture"
+          printf 'ATLAS_PATH=%s\nSKEL_PATH=%s\nTEXTURE_PATH=%s\n' "$atlas" "$skel" "$texture" >> "$GITHUB_ENV"
+
+      - name: Build exact version-matched Spine geometry probe
+        run: |
+          mkdir -p .runtime/geometry
+          runtime_src="$GITHUB_WORKSPACE/.runtime/spine-runtimes/spine-csharp/src"
+          program="$GITHUB_WORKSPACE/tools/skin-fullart0/SpineGeometry.cs"
+          cat > .runtime/geometry/SpineGeometry.csproj <<EOF
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net8.0</TargetFramework>
+              <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+              <Nullable>disable</Nullable>
+              <ImplicitUsings>disable</ImplicitUsings>
+              <LangVersion>latest</LangVersion>
+              <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+            </PropertyGroup>
+            <ItemGroup>
+              <Compile Include="$runtime_src/**/*.cs" />
+              <Compile Include="$program" />
+            </ItemGroup>
+          </Project>
+          EOF
+          dotnet build .runtime/geometry/SpineGeometry.csproj -c Release
+
+      - name: Compute setup-pose geometry with official 3.3 runtime
+        run: |
+          dotnet run --project .runtime/geometry/SpineGeometry.csproj -c Release --no-build -- \
+            "$ATLAS_PATH" \
+            "$SKEL_PATH" \
+            data/evidence/skin-fullart0-geometry.v1.json
+
+      - name: Rasterize current setup pose from geometry and atlas Texture2D
+        run: |
+          mkdir -p .skin-fullart0-render
+          python scripts/render-skin-fullart0-geometry.py \
+            --geometry data/evidence/skin-fullart0-geometry.v1.json \
+            --texture "$TEXTURE_PATH" \
+            --output .skin-fullart0-render/skin-102-setup.png \
+            --evidence-output data/evidence/skin-fullart0-current-render.v1.json
+
+      - name: Upload current Skin 102 render proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-fullart0-current-render
+          path: |
+            .skin-fullart0-render/skin-102-setup.png
+            data/evidence/skin-fullart0-spine-source.v1.json
+            data/evidence/skin-fullart0-render-input.v1.json
+            data/evidence/skin-fullart0-geometry.v1.json
+            data/evidence/skin-fullart0-current-render.v1.json
+          if-no-files-found: error
+
+      - name: Remove execution-only state
+        run: rm -rf .runtime .skin-fullart0-spine-source .skin-fullart0-render scripts/__pycache__
+
+      - name: Fail closed on unrelated tracked mutation
+        run: |
+          allowed='^data/evidence/skin-fullart0-(spine-source|render-input|geometry|current-render)\.v1\.json$'
+          bad="$(git status --porcelain --untracked-files=all | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
+          if [ -n "$bad" ]; then
+            printf 'Unexpected paths after FULLART-0 current render:\n%s\n' "$bad"
+            exit 1
+          fi
+
+      - name: Freeze bounded current render diagnostics
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/evidence/skin-fullart0-spine-source.v1.json \
+            data/evidence/skin-fullart0-render-input.v1.json \
+            data/evidence/skin-fullart0-geometry.v1.json \
+            data/evidence/skin-fullart0-current-render.v1.json
+          git diff --cached --quiet && { echo 'Current render diagnostics already frozen.'; exit 0; }
+          git commit -m 'Freeze Skin FULLART-0 current setup render diagnostics'
+          git push origin HEAD:work/skin-stage3-3-batched-20260901
