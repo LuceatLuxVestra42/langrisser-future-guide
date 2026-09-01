@@ -118,21 +118,6 @@ function BannerPage() {
     [data.dateGroups, displayStartDate],
   );
 
-  const visibleRows = useMemo(
-    () => visibleDateGroups.flatMap((group) => group.rows),
-    [visibleDateGroups],
-  );
-
-  const visibleSummary = useMemo(
-    () => ({
-      bannerRows: visibleRows.length,
-      dateGroups: visibleDateGroups.length,
-      wishRows: visibleRows.filter((row) => row.mechanicFamily === "WISH").length,
-      cpOccurrences: visibleRows.filter((row) => row.cpRelated).length,
-    }),
-    [visibleDateGroups.length, visibleRows],
-  );
-
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
@@ -140,7 +125,7 @@ function BannerPage() {
           <div>
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+              className="inline-flex items-center gap-1.5 rounded-xl border-2 border-primary/40 bg-card px-3 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/70 hover:bg-muted"
             >
               <ArrowLeft size={16} aria-hidden="true" />
               메인으로
@@ -148,21 +133,6 @@ function BannerPage() {
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               가챠 배너
             </h1>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-xs sm:flex sm:flex-wrap sm:justify-end">
-            <span className="rounded-lg border border-border bg-card px-3 py-2 text-muted-foreground">
-              배너 <strong className="text-foreground">{visibleSummary.bannerRows}</strong>
-            </span>
-            <span className="rounded-lg border border-border bg-card px-3 py-2 text-muted-foreground">
-              날짜 <strong className="text-foreground">{visibleSummary.dateGroups}</strong>
-            </span>
-            <span className="rounded-lg border border-border bg-card px-3 py-2 text-muted-foreground">
-              소원 <strong className="text-foreground">{visibleSummary.wishRows}</strong>
-            </span>
-            <span className="rounded-lg border border-border bg-card px-3 py-2 text-muted-foreground">
-              CP <strong className="text-foreground">{visibleSummary.cpOccurrences}</strong>
-            </span>
           </div>
         </div>
 
