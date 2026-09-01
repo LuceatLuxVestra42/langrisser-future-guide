@@ -11,6 +11,7 @@ import { loadProjectStatusWriterContract, writeProjectStatus } from '../lib/writ
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const readJson = relative => JSON.parse(fs.readFileSync(path.join(repoRoot, relative), 'utf8'));
 const fixture = readJson('tools/project-status/fixtures/current-project-status.v1.json');
+const normalizationContract = readJson('tools/project-status/contracts/normalization.v1.json');
 const allowStaleCanonical = process.env.PROJECT_STATUS_ALLOW_STALE_CANONICAL === '1';
 
 const fail = message => { throw new Error(message); };
@@ -38,6 +39,10 @@ if (normalized.legacyProjectDoctorRuntimeImportCount !== 0) fail('legacy Doctor 
 if (normalized.legacyGeneratedStatusReadCount !== 0) fail('legacy Doctor generated status reads must remain zero');
 if (normalized.sourceAuthority?.schemaId !== 'status-source-selection/v1') fail('R1 Status Source selection must be the authority predecessor');
 if (normalized.sourceAuthority?.selectedCount !== 6) fail('R1 Status Source selection must provide six domains');
+if (normalizationContract.policy?.reviewPresenceAloneDoesNotForceReviewHealth !== true
+  || normalizationContract.policy?.reviewHealthRequiresHealthImpact !== true) {
+  fail('Stage 7 normalization contract must make domain REVIEW health depend on health-impact reviews, not raw review presence');
+}
 if (normalized.reviewLifecycleAuthority?.schemaId !== 'project-status-review-lifecycle/v1') fail('review lifecycle authority must be the explicit Project Status contract');
 if (normalized.reviewLifecycleAuthority?.ruleCount !== 25) fail(`Stage 6 must expose 25 explicit lifecycle rules, got ${normalized.reviewLifecycleAuthority?.ruleCount}`);
 
@@ -204,7 +209,7 @@ if (syntheticHeroBoundary?.lifecycle !== 'BOUNDARY_NOTE'
   fail(`reviewKey rules must classify code-less Hero reviews: ${JSON.stringify(syntheticHeroBoundary)}`);
 }
 if (syntheticResolved.reviewTotal !== 28 || syntheticSoldier.health !== 'REVIEW') {
-  fail('synthetic lifecycle classification must preserve raw review entry counting and current domain health semantics');
+  fail('synthetic lifecycle classification must preserve raw review entry counting while active health-impact reviews remain REVIEW');
 }
 
 const syntheticPartialContract = {
@@ -319,6 +324,34 @@ if (failClosedSoldier.health !== 'INCONSISTENT') {
 const failClosedNotes = failClosedSoldier.notes.flatMap(note => note.reviewLifecycleRuleFailures ?? []);
 if (!failClosedNotes.some(item => item.type === 'REVIEW_LIFECYCLE_EVIDENCE_NOT_SATISFIED')) {
   fail(`missing fail-closed lifecycle evidence note: ${JSON.stringify(failClosedSoldier.notes)}`);
+}
+
+const syntheticNonHealthBannerContract = {
+  ...reviewLifecycleContract,
+  rules: reviewLifecycleContract.rules.map(rule => (
+    rule.id === 'banner-manual-image-active'
+      ? {
+        ...rule,
+        lifecycle: 'DEFERRED_NON_ERROR',
+        healthImpact: false,
+        remainingCount: 0,
+      }
+      : rule
+  )),
+};
+const syntheticNonHealthBanner = normalizeProjectStatus({ repoRoot, reviewLifecycleContract: syntheticNonHealthBannerContract });
+const nonHealthBanner = syntheticNonHealthBanner.domains.find(item => item.domain === 'banner');
+if (nonHealthBanner.reviewCount !== 8
+  || nonHealthBanner.reviews.some(review => review.healthImpact === true)
+  || nonHealthBanner.health !== 'PASS') {
+  fail(`Stage 7 must allow a PASS domain with reported non-health reviews: ${JSON.stringify({
+    reviewCount: nonHealthBanner.reviewCount,
+    health: nonHealthBanner.health,
+    healthImpactReviews: nonHealthBanner.reviews.filter(review => review.healthImpact === true).length,
+  })}`);
+}
+if (syntheticNonHealthBanner.reviewTotal !== 28 || syntheticNonHealthBanner.projectHealth !== 'REVIEW') {
+  fail('Stage 7 health cutover must preserve raw review totals and leave unrelated active-review domains unchanged');
 }
 
 for (const key of ['projectHealth', 'healthCounts', 'lifecycleCounts', 'knownHardErrorTotal', 'reviewTotal', 'blockerTotal']) {
@@ -471,7 +504,7 @@ for (const forbidden of [
 if (!first.markdown.includes('NEW Status Source authority')) fail('markdown must identify NEW Status Source authority');
 if (!first.markdown.includes('raw ConfigData')) fail('markdown must preserve no-raw-ConfigData boundary');
 
-console.log('[project-status-r2] PASS: Stage 6 current reconciliation, partial review resolution safety, review lifecycle contract, canonical compatibility, writer boundary, and runtime independence verified.');
+console.log('[project-status-r2] PASS: Stage 7 health-impact review cutover, Stage 6 reconciliation, partial review resolution safety, review lifecycle contract, canonical compatibility, writer boundary, and runtime independence verified.');
 console.log(JSON.stringify({
   projectHealth: projected.projectHealth,
   healthCounts: projected.healthCounts,
@@ -498,6 +531,7 @@ console.log(JSON.stringify({
     syntheticPartialRemainingCount: partialNameReview.remainingCount,
     syntheticInvalidPartialHealth: invalidPartialSoldier.health,
     syntheticFailClosedHealth: failClosedSoldier.health,
+    syntheticNonHealthBannerHealth: nonHealthBanner.health,
   },
   selectedDomains: Object.fromEntries(projected.domains.map(item => [item.domain, item.activeSourceId])),
   equipment: {
