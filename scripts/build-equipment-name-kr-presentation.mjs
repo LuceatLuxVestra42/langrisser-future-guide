@@ -1,7 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
+const authorityValidatorPath = path.join(
+  root,
+  "scripts/equipment-name-soldier-presentation-authority.mjs",
+);
 const sourceFiles = [
   ["weapon", "data/localization/equipment-name-kr/weapon.tsv"],
   ["armor", "data/localization/equipment-name-kr/armor.tsv"],
@@ -24,6 +29,16 @@ const validationPath = path.join(
 function fail(message) {
   console.error(`[equipment-name-kr] FAIL: ${message}`);
   process.exit(1);
+}
+
+if (fs.existsSync(authorityValidatorPath)) {
+  const authority = spawnSync(process.execPath, [authorityValidatorPath, "--check"], {
+    cwd: root,
+    stdio: "inherit",
+  });
+  if ((authority.status ?? 1) !== 0) {
+    fail("presentation authority validation failed before Equipment Korean projection");
+  }
 }
 
 function parseDisplayText(rawValue) {
