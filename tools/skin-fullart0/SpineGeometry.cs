@@ -158,7 +158,7 @@ public static class SpineGeometryProgram {
             runtime = new {
                 source = "EsotericSoftware/spine-runtimes",
                 commit = "1c1936532527900f74cfb58f7002998bf157b254",
-                sourceCommitDate = "2016-06-17",
+                sourceCommitDate = "2016-06-30",
                 sourceCommitPurpose = "C# runtimes v3.3.x format including SkeletonBinary",
             },
             skeleton = new {
