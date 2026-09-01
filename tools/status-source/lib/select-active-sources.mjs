@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { validateSourceProvenance } from './source-provenance.mjs';
 
 export const STATUS_SOURCE_DECLARATION_SCHEMA = 'project-doctor-active-source-entries/v1';
 export const DEFAULT_DECLARATION_DIR = 'data/status-sources';
@@ -80,14 +81,19 @@ function validateEntrySource(repoRoot, entry) {
     throw new Error(`Status source path is outside allowed prefixes: ${entry.sourcePath}`);
   }
   const absolute = assertRepositoryPath(repoRoot, entry.sourcePath);
-  if (!fs.existsSync(absolute)) throw new Error(`Status source does not exist: ${entry.sourcePath}`);
+  if (!fs.existsSync(absolute)) throw new Error(`SOURCE_UNAVAILABLE: ${entry.sourcePath}`);
+  const sourceProvenance = validateSourceProvenance({
+    repoRoot,
+    sourcePath: entry.sourcePath,
+    provenance: entry.sourceProvenance,
+  });
   const source = readJson(absolute);
   const admission = (entry.admission ?? []).map(rule => evaluateAdmission(source, rule));
   const failed = admission.filter(item => !item.pass);
   if (failed.length) {
     throw new Error(`Admission failed for ${entry.id}: ${failed.map(item => item.pointer).join(', ')}`);
   }
-  return { readable: true, admission };
+  return { readable: true, sourceProvenance, admission };
 }
 
 export function discoverStatusSourceDeclarations(repoRoot, declarationDir = DEFAULT_DECLARATION_DIR) {
