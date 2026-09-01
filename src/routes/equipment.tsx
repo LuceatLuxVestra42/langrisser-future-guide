@@ -12,60 +12,29 @@ export const Route = createFileRoute("/equipment")({
       { title: "SSR 장비 | 랑그릿사 모바일 미래시 정보" },
       {
         name: "description",
-        content: "랑그릿사 모바일 SSR 일반 장비 목록과 분류 정보를 확인합니다.",
+        content: "랑그릿사 모바일 SSR 일반 장비 목록을 확인합니다.",
       },
     ],
   }),
   component: EquipmentGeneralListPage,
 });
 
-type TabId = 1 | 2 | 3;
 type EquipmentSortMode = "default" | "name" | "id";
 
 type EquipmentListUiState = {
-  tab: TabId;
   group: string | null;
   subtype: string | null;
   query: string;
   sort: EquipmentSortMode;
 };
 
-const EQUIPMENT_LIST_STORAGE_KEY = "equipment-general-list-ui.v1";
+const EQUIPMENT_LIST_STORAGE_KEY = "equipment-general-list-ui.v2";
 
 const DEFAULT_UI_STATE: EquipmentListUiState = {
-  tab: 1,
   group: null,
   subtype: null,
   query: "",
   sort: "default",
-};
-
-const TAB_DEFINITIONS: ReadonlyArray<{
-  id: TabId;
-  label: string;
-  description: string;
-}> = [
-  {
-    id: 1,
-    label: "초기 장비",
-    description: "게임 출시부터 존재하던 장비",
-  },
-  {
-    id: 2,
-    label: "이전 추가 장비",
-    description: "과거 장비뽑기 계열에서 추가된 장비",
-  },
-  {
-    id: 3,
-    label: "장비패스",
-    description: "현재 장비패스 계열 장비",
-  },
-];
-
-const TAB_ORDER_POLICIES: Record<TabId, string> = {
-  1: "표시 순서는 확정된 역사적 출시순이 아니라 Stage 3의 deterministic presentation order야.",
-  2: "검증된 출시 그룹 단위만 반영하며 같은 그룹 안의 개별 출시순은 확정하지 않았어.",
-  3: "장비 종류·세부 타입 순서를 유지하고, 같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순이야. 같은 출시 그룹 안의 개별 순서는 별도 출시순 의미가 없어.",
 };
 
 const SORT_LABELS: Record<EquipmentSortMode, string> = {
@@ -73,10 +42,6 @@ const SORT_LABELS: Record<EquipmentSortMode, string> = {
   name: "이름순",
   id: "장비 ID순",
 };
-
-function isTabId(value: unknown): value is TabId {
-  return value === 1 || value === 2 || value === 3;
-}
 
 function isEquipmentSortMode(value: unknown): value is EquipmentSortMode {
   return value === "default" || value === "name" || value === "id";
@@ -96,7 +61,6 @@ function EquipmentGeneralListPage() {
       }
 
       const parsed = JSON.parse(stored) as Partial<EquipmentListUiState>;
-      const tab = isTabId(parsed.tab) ? parsed.tab : DEFAULT_UI_STATE.tab;
       const selectedGroup =
         typeof parsed.group === "string"
           ? data.filters.find((filter) => filter.group === parsed.group)
@@ -111,7 +75,7 @@ function EquipmentGeneralListPage() {
       const query = typeof parsed.query === "string" ? parsed.query.slice(0, 80) : "";
       const sort = isEquipmentSortMode(parsed.sort) ? parsed.sort : DEFAULT_UI_STATE.sort;
 
-      setUiState({ tab, group, subtype, query, sort });
+      setUiState({ group, subtype, query, sort });
     } catch {
       setUiState(DEFAULT_UI_STATE);
     } finally {
@@ -134,7 +98,6 @@ function EquipmentGeneralListPage() {
   const filteredRecords = useMemo(() => {
     const normalizedQuery = uiState.query.trim().toLocaleLowerCase();
     const records = data.records.filter((record) => {
-      if (record.siteTab !== uiState.tab) return false;
       if (uiState.group && record.group !== uiState.group) return false;
       if (uiState.subtype && record.subtype !== uiState.subtype) return false;
 
@@ -159,7 +122,10 @@ function EquipmentGeneralListPage() {
       return records.sort((left, right) => {
         const leftName = left.nameKr ?? left.nameCn;
         const rightName = right.nameKr ?? right.nameCn;
-        return leftName.localeCompare(rightName, "ko", { numeric: true, sensitivity: "base" }) || left.equipmentId - right.equipmentId;
+        return (
+          leftName.localeCompare(rightName, "ko", { numeric: true, sensitivity: "base" }) ||
+          left.equipmentId - right.equipmentId
+        );
       });
     }
 
@@ -167,10 +133,14 @@ function EquipmentGeneralListPage() {
       return records.sort((left, right) => left.equipmentId - right.equipmentId);
     }
 
-    return records;
+    return records.sort(
+      (left, right) =>
+        left.groupOrder - right.groupOrder ||
+        left.subtypeOrder - right.subtypeOrder ||
+        left.sortIndex - right.sortIndex ||
+        left.equipmentId - right.equipmentId,
+    );
   }, [data.records, uiState]);
-
-  const currentTabCount = data.tabs[String(uiState.tab)] ?? 0;
 
   const selectGroup = (group: string) => {
     setUiState((current) =>
@@ -203,7 +173,7 @@ function EquipmentGeneralListPage() {
 
   const orderPolicy =
     uiState.sort === "default"
-      ? TAB_ORDER_POLICIES[uiState.tab]
+      ? "장비 종류와 세부 타입 기준으로 표시하고, 같은 세부 타입 안에서는 기존 표시순을 사용해."
       : `${SORT_LABELS[uiState.sort]}으로 표시 중이야. 이 정렬은 출시순 의미를 갖지 않아.`;
 
   return (
@@ -222,7 +192,7 @@ function EquipmentGeneralListPage() {
               SSR 장비
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-              일반 SSR 장비 {data.records.length}개를 획득 계열과 장비 종류로 나눠 확인할 수 있어.
+              일반 SSR 장비 {data.records.length}개를 장비 종류와 세부 타입으로 찾아볼 수 있어.
             </p>
           </div>
 
@@ -237,37 +207,6 @@ function EquipmentGeneralListPage() {
         </div>
 
         <section className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <div className="grid grid-cols-1 border-b border-border sm:grid-cols-3">
-            {TAB_DEFINITIONS.map((tab) => {
-              const selected = uiState.tab === tab.id;
-              const count = data.tabs[String(tab.id)] ?? 0;
-
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => setUiState((current) => ({ ...current, tab: tab.id }))}
-                  className={`border-b px-5 py-4 text-left transition last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0 ${
-                    selected
-                      ? "bg-accent text-accent-foreground"
-                      : "bg-card text-foreground hover:bg-muted/60"
-                  }`}
-                >
-                  <span className="flex items-center justify-between gap-3">
-                    <span className="font-semibold">{tab.label}</span>
-                    <span className="rounded-full bg-background/80 px-2 py-0.5 text-xs font-semibold text-muted-foreground">
-                      {count}
-                    </span>
-                  </span>
-                  <span className="mt-1 block text-xs leading-5 text-muted-foreground">
-                    {tab.description}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
           <div className="space-y-4 p-4 sm:p-5">
             <div className="grid gap-3 border-b border-border pb-4 md:grid-cols-[minmax(0,1fr)_14rem]">
               <label className="relative block">
@@ -281,7 +220,9 @@ function EquipmentGeneralListPage() {
                   type="search"
                   value={uiState.query}
                   maxLength={80}
-                  onChange={(event) => setUiState((current) => ({ ...current, query: event.target.value }))}
+                  onChange={(event) =>
+                    setUiState((current) => ({ ...current, query: event.target.value }))
+                  }
                   placeholder="장비명·효과·ID 검색"
                   className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-10 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-ring/30"
                 />
@@ -298,7 +239,11 @@ function EquipmentGeneralListPage() {
               </label>
 
               <label className="relative flex h-11 items-center rounded-xl border border-border bg-background">
-                <ArrowUpDown size={16} aria-hidden="true" className="ml-3 shrink-0 text-muted-foreground" />
+                <ArrowUpDown
+                  size={16}
+                  aria-hidden="true"
+                  className="ml-3 shrink-0 text-muted-foreground"
+                />
                 <span className="sr-only">장비 정렬</span>
                 <select
                   value={uiState.sort}
@@ -412,12 +357,13 @@ function EquipmentGeneralListPage() {
         <div className="mt-6 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
           <div>
             <p className="text-sm text-muted-foreground">
-              현재 탭 {currentTabCount}개 중 <span className="font-semibold text-foreground">{filteredRecords.length}개</span> 표시
+              전체 {data.records.length}개 중{" "}
+              <span className="font-semibold text-foreground">{filteredRecords.length}개</span> 표시
             </p>
             <p className="mt-1 text-xs leading-5 text-muted-foreground">{orderPolicy}</p>
           </div>
           <p className="text-xs text-muted-foreground sm:text-right">
-            선택한 탭·필터·검색·정렬은 다음 방문에도 유지돼.
+            선택한 필터·검색·정렬은 다음 방문에도 유지돼.
           </p>
         </div>
 
