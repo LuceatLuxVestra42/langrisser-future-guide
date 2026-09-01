@@ -5,75 +5,128 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const LOCATOR_PATH = 'data/contracts/soldier-portrait-assets-current.v1.json';
+const SOLDIER_MASTER_PATH = 'data/generated/soldier-master.v1.json';
+const SOURCE_PACK_VERIFIER = 'scripts/hydrate-soldier-portrait-source-pack-v1.mjs';
+
 const readJson = (relativePath) => JSON.parse(fs.readFileSync(path.join(ROOT, relativePath), 'utf8'));
-
-const paths = {
-  manifest: 'data/generated/soldier-portrait-manifest.v9.json',
-  audit: 'data/validation/soldier-portrait-v9-source-audit.json',
-  soldierMaster: 'data/generated/soldier-master.v1.json',
-  webManifest: 'data/generated/soldier-portrait-web-manifest.v1.json',
-  sourcePackContract: 'data/contracts/soldier-portrait-source-pack.v1.json',
-  sourceDirectory: 'public/images/soldiers',
-  webpDirectory: 'public/images/soldiers-webp',
-  externalSourceVerifier: 'scripts/hydrate-soldier-portrait-source-pack-v1.mjs',
-};
-
-const manifest = readJson(paths.manifest);
-const audit = readJson(paths.audit);
-const soldierMaster = readJson(paths.soldierMaster);
-const webManifest = readJson(paths.webManifest);
-const sourcePackContract = readJson(paths.sourcePackContract);
+const sameJson = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const sortedIds = (records) => [...new Set(records.map((record) => record?.soldierId).filter(Number.isInteger))].sort((a, b) => a - b);
 const errors = [];
 const fail = (code, detail) => errors.push({ code, detail });
 
-const records = Array.isArray(manifest?.records) ? manifest.records : [];
+const locator = readJson(LOCATOR_PATH);
+if (
+  locator?.schemaId !== 'soldier-portrait-assets-current/v1' ||
+  locator?.status !== 'CURRENT' ||
+  locator?.owner !== 'soldier-assets' ||
+  locator?.role?.semanticAuthority !== false ||
+  locator?.role?.operationalLocatorOnly !== true ||
+  locator?.role?.selectsExistingFrozenArtifactsOnly !== true ||
+  locator?.boundaries?.semanticRecomputationCount !== 0 ||
+  locator?.boundaries?.canonicalJoinRecomputationCount !== 0 ||
+  locator?.boundaries?.nameJoinInference !== false ||
+  locator?.boundaries?.idArithmeticInference !== false ||
+  locator?.boundaries?.filenameSimilarityInference !== false ||
+  locator?.boundaries?.versionNumberDiscovery !== false ||
+  locator?.boundaries?.assetByteMutation !== false ||
+  locator?.updatePolicy?.explicitPointerUpdateOnly !== true ||
+  locator?.updatePolicy?.automaticHighestVersionSelection !== false
+) {
+  fail('current-asset-locator-boundary', locator ?? null);
+}
+
+const selectedPaths = {
+  manifest: locator?.currentSourceManifest,
+  sourcePackContract: locator?.currentSourcePackContract,
+  webManifest: locator?.currentWebManifest,
+};
+for (const [key, selectedPath] of Object.entries(selectedPaths)) {
+  if (typeof selectedPath !== 'string' || selectedPath.length === 0 || !fs.existsSync(path.join(ROOT, selectedPath))) {
+    fail(`locator-${key}-missing`, selectedPath ?? null);
+  }
+}
+
+if (errors.length) {
+  console.error(`SOLDIER PORTRAIT CURRENT VALIDATION: FAIL (${errors.length})`);
+  for (const error of errors) console.error(`- ${error.code}: ${JSON.stringify(error.detail)}`);
+  process.exit(1);
+}
+
+const manifest = readJson(selectedPaths.manifest);
+const sourcePackContract = readJson(selectedPaths.sourcePackContract);
+const webManifest = readJson(selectedPaths.webManifest);
+const soldierMaster = readJson(SOLDIER_MASTER_PATH);
+const auditPath = manifest?.sources?.sourceAudit;
+const audit = typeof auditPath === 'string' && fs.existsSync(path.join(ROOT, auditPath)) ? readJson(auditPath) : null;
+
 const canonical = Array.isArray(soldierMaster?.records) ? soldierMaster.records : [];
-const canonicalIds = [...new Set(canonical.map((record) => record?.soldierId).filter(Number.isInteger))].sort((a, b) => a - b);
-const manifestIds = [...new Set(records.map((record) => record?.soldierId).filter(Number.isInteger))].sort((a, b) => a - b);
-const sameJson = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const records = Array.isArray(manifest?.records) ? manifest.records : [];
+const webRecords = Array.isArray(webManifest?.records) ? webManifest.records : [];
+const canonicalIds = sortedIds(canonical);
+const manifestIds = sortedIds(records);
+const webIds = sortedIds(webRecords);
+const canonicalNormalCount = canonical.filter((record) => record?.isSp === false).length;
+const canonicalSpCount = canonical.filter((record) => record?.isSp === true).length;
+const canonicalUnknownSpCount = canonical.length - canonicalNormalCount - canonicalSpCount;
 const sourceById = new Map(records.map((record) => [record?.soldierId, record]));
 
-if (manifest?.version !== 9) fail('manifest-version', manifest?.version ?? null);
-if (manifest?.status !== 'PASS' || manifest?.assetsReady !== true) fail('manifest-readiness', { status: manifest?.status ?? null, assetsReady: manifest?.assetsReady ?? null });
-if (manifest?.publicRoot !== 'images/soldiers') fail('public-root', manifest?.publicRoot ?? null);
-if (manifest?.sources?.sourceAudit !== paths.audit) fail('source-audit-link', manifest?.sources?.sourceAudit ?? null);
+if (canonical.length !== canonicalIds.length) fail('canonical-id-uniqueness', { records: canonical.length, uniqueIds: canonicalIds.length });
+if (canonicalUnknownSpCount !== 0) fail('canonical-sp-classification', { unknown: canonicalUnknownSpCount });
+if (records.length !== manifestIds.length) fail('source-manifest-id-uniqueness', { records: records.length, uniqueIds: manifestIds.length });
+if (webRecords.length !== webIds.length) fail('web-manifest-id-uniqueness', { records: webRecords.length, uniqueIds: webIds.length });
+if (!sameJson(manifestIds, canonicalIds)) fail('canonical-source-id-parity', { canonical: canonicalIds.length, source: manifestIds.length });
+if (!sameJson(webIds, canonicalIds)) fail('canonical-web-id-parity', { canonical: canonicalIds.length, web: webIds.length });
+
+if (manifest?.status !== 'PASS' || manifest?.assetsReady !== true) {
+  fail('source-manifest-readiness', { status: manifest?.status ?? null, assetsReady: manifest?.assetsReady ?? null });
+}
+if (typeof manifest?.version !== 'number' || !Number.isFinite(manifest.version)) fail('source-manifest-version', manifest?.version ?? null);
+if (typeof manifest?.publicRoot !== 'string' || manifest.publicRoot.length === 0) fail('source-manifest-public-root', manifest?.publicRoot ?? null);
+if (typeof auditPath !== 'string' || audit === null) fail('source-audit-link', auditPath ?? null);
 if (audit?.status !== 'PASS') fail('source-audit-status', audit?.status ?? null);
 
-const expectedCounts = { canonical: 224, normal: 168, sp: 56 };
-if (canonicalIds.length !== expectedCounts.canonical) fail('canonical-soldier-count', canonicalIds.length);
-if (records.length !== expectedCounts.canonical || manifestIds.length !== expectedCounts.canonical) fail('manifest-record-count', { records: records.length, uniqueIds: manifestIds.length });
-if (!sameJson(manifestIds, canonicalIds)) fail('canonical-id-parity', { canonical: canonicalIds.length, manifest: manifestIds.length });
-
-const coverage = manifest?.coverage || {};
-const coverageChecks = {
-  canonicalSoldierCount: 224,
-  canonicalNormalCount: 168,
-  canonicalSpCount: 56,
-  resolvedCount: 224,
-  unresolvedCount: 0,
-  resolvedNormalCount: 168,
-  resolvedSpCount: 56,
+const coverage = manifest?.coverage ?? {};
+const expectedCoverage = {
+  canonicalSoldierCount: canonicalIds.length,
+  canonicalNormalCount,
+  canonicalSpCount,
+  resolvedCount: records.length,
+  unresolvedCount: canonicalIds.length - records.length,
+  resolvedNormalCount: records.filter((record) => record?.isSp === false).length,
+  resolvedSpCount: records.filter((record) => record?.isSp === true).length,
 };
-for (const [key, expected] of Object.entries(coverageChecks)) {
-  if (coverage[key] !== expected) fail(`coverage-${key}`, { expected, actual: coverage[key] ?? null });
+for (const [key, expected] of Object.entries(expectedCoverage)) {
+  if (coverage?.[key] !== expected) fail(`coverage-${key}`, { expected, actual: coverage?.[key] ?? null });
 }
-if (coverage?.sourceCounts?.BWIKI_CURRENT_CN_EXACT_TRANSPARENT_PNG_V9 !== 224) {
-  fail('coverage-source-family', coverage?.sourceCounts ?? null);
+if (expectedCoverage.unresolvedCount !== 0) fail('source-manifest-unresolved', expectedCoverage.unresolvedCount);
+
+const sourceKinds = [...new Set(records.map((record) => record?.sourceKind).filter((value) => typeof value === 'string' && value.length > 0))];
+if (manifest?.policy?.allPortraitsUseOneSourceFamily === true && sourceKinds.length !== 1) {
+  fail('source-family-count', sourceKinds);
+}
+if (coverage?.sourceCounts && typeof coverage.sourceCounts === 'object') {
+  const sourceCountTotal = Object.values(coverage.sourceCounts).reduce((sum, value) => sum + (Number.isInteger(value) ? value : 0), 0);
+  if (sourceCountTotal !== records.length) fail('source-family-coverage-total', { expected: records.length, actual: sourceCountTotal });
+  for (const sourceKind of sourceKinds) {
+    const count = records.filter((record) => record?.sourceKind === sourceKind).length;
+    if (coverage.sourceCounts[sourceKind] !== count) fail('source-family-coverage', { sourceKind, expected: count, actual: coverage.sourceCounts[sourceKind] ?? null });
+  }
 }
 
 const auditChecks = {
-  canonicalCount: 224,
-  normalCount: 168,
-  spCount: 56,
-  cleanResolvedCount: 224,
+  canonicalCount: canonicalIds.length,
+  normalCount: canonicalNormalCount,
+  spCount: canonicalSpCount,
+  cleanResolvedCount: records.length,
   unresolvedCount: 0,
 };
 for (const [key, expected] of Object.entries(auditChecks)) {
-  if (audit[key] !== expected) fail(`audit-${key}`, { expected, actual: audit[key] ?? null });
+  if (audit?.[key] !== expected) fail(`audit-${key}`, { expected, actual: audit?.[key] ?? null });
 }
 if (!Array.isArray(audit?.unresolved) || audit.unresolved.length !== 0) fail('audit-unresolved', audit?.unresolved ?? null);
 
-const policy = manifest?.policy || {};
+const policy = manifest?.policy ?? {};
 const requiredPolicy = {
   noGuessing: true,
   generatedImageUsed: false,
@@ -85,73 +138,64 @@ const requiredPolicy = {
   allPortraitsUseOneSourceFamily: true,
 };
 for (const [key, expected] of Object.entries(requiredPolicy)) {
-  if (policy[key] !== expected) fail(`policy-${key}`, { expected, actual: policy[key] ?? null });
+  if (policy?.[key] !== expected) fail(`policy-${key}`, { expected, actual: policy?.[key] ?? null });
 }
-if (policy?.identityJoin !== 'canonical Soldier ID -> ConfigDataSoldierInfo exact ID -> exact current Chinese Name') {
-  fail('identity-join-policy', policy?.identityJoin ?? null);
+if (typeof policy?.identityJoin !== 'string' || policy.identityJoin.length === 0) fail('identity-join-policy', policy?.identityJoin ?? null);
+
+const gate = policy?.transparencyGate ?? {};
+const auditGate = audit?.thresholds ?? {};
+if (gate?.sourceMustBePng !== true || gate?.sourceMustContainAlpha !== true) fail('source-format-gate', gate);
+for (const key of ['minimumTransparentPixelRatio', 'minimumBorderTransparentPixelRatio', 'requiredTransparentCorners']) {
+  if (!Number.isFinite(gate?.[key])) fail(`manifest-gate-${key}`, gate?.[key] ?? null);
+  if (auditGate?.[key] !== gate?.[key]) fail(`audit-gate-${key}`, { manifest: gate?.[key] ?? null, audit: auditGate?.[key] ?? null });
 }
 
-const gate = policy?.transparencyGate || {};
-const auditGate = audit?.thresholds || {};
-const expectedGate = {
-  minimumTransparentPixelRatio: 0.08,
-  minimumBorderTransparentPixelRatio: 0.5,
-  requiredTransparentCorners: 3,
-};
-if (gate.sourceMustBePng !== true || gate.sourceMustContainAlpha !== true) fail('source-format-gate', gate);
-for (const [key, expected] of Object.entries(expectedGate)) {
-  if (gate[key] !== expected) fail(`manifest-gate-${key}`, { expected, actual: gate[key] ?? null });
-  if (auditGate[key] !== expected) fail(`audit-gate-${key}`, { expected, actual: auditGate[key] ?? null });
-}
-
-let normalCount = 0;
-let spCount = 0;
-const seenDerivativeNames = new Set();
+let sourceTotalBytes = 0;
+const seenSourceFileNames = new Set();
 for (const record of records) {
   const soldierId = record?.soldierId;
   if (!Number.isInteger(soldierId)) {
-    fail('record-invalid-soldier-id', soldierId ?? null);
+    fail('source-record-invalid-soldier-id', soldierId ?? null);
     continue;
   }
-  if (record?.isSp === true) spCount += 1;
-  else if (record?.isSp === false) normalCount += 1;
-  else fail('record-invalid-sp-flag', soldierId);
-
-  if (record?.sourceKind !== 'BWIKI_CURRENT_CN_EXACT_TRANSPARENT_PNG_V9') fail('record-source-kind', soldierId);
-  if (typeof record?.sourceFileName !== 'string' || !record.sourceFileName.endsWith('.png')) fail('record-source-file', soldierId);
-  if (typeof record?.sourceUrl !== 'string' || !/^https:\/\//.test(record.sourceUrl)) fail('record-source-url', soldierId);
-  if (record?.fileName !== `${soldierId}.png`) fail('record-derivative-filename', { soldierId, fileName: record?.fileName ?? null });
-  if (record?.sourceFileName === record?.fileName) fail('source-derivative-name-not-separated', soldierId);
-  if (seenDerivativeNames.has(record?.fileName)) fail('duplicate-derivative-filename', record?.fileName ?? null);
-  seenDerivativeNames.add(record?.fileName);
-  if (record?.resolutionMethod !== 'CANONICAL_ID_TO_CONFIGDATA_EXACT_CN_NAME_TO_BWIKI_EXACT_TRANSPARENT_FILE') fail('record-resolution-method', soldierId);
-  if (!Number.isInteger(record?.size) || record.size <= 0) fail('record-size', soldierId);
-  if (!Number.isInteger(record?.width) || record.width <= 0 || !Number.isInteger(record?.height) || record.height <= 0) fail('record-dimensions', soldierId);
-  if (typeof record?.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(record.sha256)) fail('record-sha256', soldierId);
-  if (record?.sourceHasAlpha !== true) fail('record-alpha', soldierId);
-  if (!Number.isFinite(record?.transparentPixelRatio) || record.transparentPixelRatio < expectedGate.minimumTransparentPixelRatio) fail('record-transparent-ratio', soldierId);
-  if (!Number.isFinite(record?.borderTransparentPixelRatio) || record.borderTransparentPixelRatio < expectedGate.minimumBorderTransparentPixelRatio) fail('record-border-transparent-ratio', soldierId);
-  if (!Number.isInteger(record?.transparentCornerCount) || record.transparentCornerCount < expectedGate.requiredTransparentCorners) fail('record-transparent-corners', soldierId);
+  if (record?.isSp !== true && record?.isSp !== false) fail('source-record-invalid-sp-flag', soldierId);
+  if (typeof record?.sourceKind !== 'string' || record.sourceKind.length === 0) fail('source-record-kind', soldierId);
+  if (typeof record?.sourceFileName !== 'string' || !record.sourceFileName.toLowerCase().endsWith('.png')) fail('source-record-file', soldierId);
+  if (typeof record?.sourceUrl !== 'string' || !/^https:\/\//.test(record.sourceUrl)) fail('source-record-url', soldierId);
+  if (record?.fileName !== `${soldierId}.png`) fail('source-record-canonical-filename', { soldierId, fileName: record?.fileName ?? null });
+  if (record?.sourceFileName === record?.fileName) fail('source-record-name-not-separated', soldierId);
+  if (seenSourceFileNames.has(record?.fileName)) fail('source-record-duplicate-filename', record?.fileName ?? null);
+  seenSourceFileNames.add(record?.fileName);
+  if (typeof record?.resolutionMethod !== 'string' || record.resolutionMethod.length === 0) fail('source-record-resolution-method', soldierId);
+  if (!Number.isInteger(record?.size) || record.size <= 0) fail('source-record-size', soldierId);
+  else sourceTotalBytes += record.size;
+  if (!Number.isInteger(record?.width) || record.width <= 0 || !Number.isInteger(record?.height) || record.height <= 0) fail('source-record-dimensions', soldierId);
+  if (typeof record?.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(record.sha256)) fail('source-record-sha256', soldierId);
+  if (record?.sourceHasAlpha !== true) fail('source-record-alpha', soldierId);
+  if (!Number.isFinite(record?.transparentPixelRatio) || record.transparentPixelRatio < gate.minimumTransparentPixelRatio) fail('source-record-transparent-ratio', soldierId);
+  if (!Number.isFinite(record?.borderTransparentPixelRatio) || record.borderTransparentPixelRatio < gate.minimumBorderTransparentPixelRatio) fail('source-record-border-transparent-ratio', soldierId);
+  if (!Number.isInteger(record?.transparentCornerCount) || record.transparentCornerCount < gate.requiredTransparentCorners) fail('source-record-transparent-corners', soldierId);
 }
-if (normalCount !== expectedCounts.normal || spCount !== expectedCounts.sp) fail('record-normal-sp-counts', { normalCount, spCount });
 
-// A6 post-deletion storage boundary: the repository source PNG copy must stay absent.
-// Exact source bytes are retained and validated through the pinned external source-pack contract below.
-const sourceDirectory = path.join(ROOT, paths.sourceDirectory);
-if (fs.existsSync(sourceDirectory)) {
-  const retainedEntries = fs.readdirSync(sourceDirectory, { withFileTypes: true });
-  const retainedPngs = retainedEntries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.png'));
-  if (retainedPngs.length > 0) {
-    fail('repository-source-png-retained-after-a5', {
-      directory: paths.sourceDirectory,
-      pngCount: retainedPngs.length,
-      examples: retainedPngs.slice(0, 10).map((entry) => entry.name),
-    });
+const sourceDirectoryRelative = sourcePackContract?.authoritativePredecessor?.sourcePublicPath;
+if (typeof sourceDirectoryRelative === 'string' && sourceDirectoryRelative.length > 0) {
+  const sourceDirectory = path.join(ROOT, sourceDirectoryRelative);
+  if (fs.existsSync(sourceDirectory)) {
+    const retainedPngs = fs.readdirSync(sourceDirectory, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.png'));
+    if (retainedPngs.length > 0) {
+      fail('repository-source-png-retained', {
+        directory: sourceDirectoryRelative,
+        pngCount: retainedPngs.length,
+        examples: retainedPngs.slice(0, 10).map((entry) => entry.name),
+      });
+    }
   }
 }
 
 if (
-  sourcePackContract?.version !== 1 ||
+  !Number.isInteger(sourcePackContract?.version) ||
+  sourcePackContract.version <= 0 ||
   sourcePackContract?.contract !== 'soldier-portrait-source-pack' ||
   sourcePackContract?.status !== 'PASS' ||
   sourcePackContract?.owner !== 'soldier-assets'
@@ -164,37 +208,45 @@ if (
   });
 }
 if (
-  sourcePackContract?.authority?.semanticAndSourceIdentity !== paths.manifest ||
+  sourcePackContract?.authority?.semanticAndSourceIdentity !== selectedPaths.manifest ||
   sourcePackContract?.authority?.externalByteTransport !== 'THIS_CONTRACT_PLUS_PINNED_SHA256' ||
-  sourcePackContract?.authority?.externalInventoryMayCreateSemanticMappings !== false
+  sourcePackContract?.authority?.externalInventoryMayCreateSemanticMappings !== false ||
+  sourcePackContract?.authoritativePredecessor?.sourceManifest !== selectedPaths.manifest
 ) {
-  fail('source-pack-authority-boundary', sourcePackContract?.authority ?? null);
+  fail('source-pack-authority-boundary', {
+    authority: sourcePackContract?.authority ?? null,
+    predecessor: sourcePackContract?.authoritativePredecessor ?? null,
+  });
 }
-if (
-  sourcePackContract?.coverage?.fileCount !== 224 ||
-  sourcePackContract?.coverage?.totalSourceBytes !== 48931121 ||
-  sourcePackContract?.coverage?.canonicalSoldierCount !== 224 ||
-  sourcePackContract?.coverage?.canonicalNormalCount !== 168 ||
-  sourcePackContract?.coverage?.canonicalSpCount !== 56 ||
-  sourcePackContract?.coverage?.missingCount !== 0 ||
-  sourcePackContract?.coverage?.extraCount !== 0 ||
-  sourcePackContract?.coverage?.duplicateCount !== 0
-) {
-  fail('source-pack-coverage', sourcePackContract?.coverage ?? null);
+const packCoverage = sourcePackContract?.coverage ?? {};
+const expectedPackCoverage = {
+  fileCount: records.length,
+  totalSourceBytes: sourceTotalBytes,
+  canonicalSoldierCount: canonicalIds.length,
+  canonicalNormalCount,
+  canonicalSpCount,
+  missingCount: 0,
+  extraCount: 0,
+  duplicateCount: 0,
+};
+for (const [key, expected] of Object.entries(expectedPackCoverage)) {
+  if (packCoverage?.[key] !== expected) fail(`source-pack-coverage-${key}`, { expected, actual: packCoverage?.[key] ?? null });
 }
+const integrityPolicy = sourcePackContract?.integrityPolicy ?? {};
+const shaParityDeclared = integrityPolicy?.perFileSha256MustMatchSourceManifest === true || integrityPolicy?.perFileSha256MustMatchV9Manifest === true;
+const sizeParityDeclared = integrityPolicy?.perFileSizeMustMatchSourceManifest === true || integrityPolicy?.perFileSizeMustMatchV9Manifest === true;
 if (
-  sourcePackContract?.integrityPolicy?.failClosedOnAnyMismatch !== true ||
-  sourcePackContract?.integrityPolicy?.exactFileSetRequired !== true ||
-  sourcePackContract?.integrityPolicy?.perFileSha256MustMatchV9Manifest !== true ||
-  sourcePackContract?.integrityPolicy?.perFileSizeMustMatchV9Manifest !== true
+  integrityPolicy?.failClosedOnAnyMismatch !== true ||
+  integrityPolicy?.exactFileSetRequired !== true ||
+  shaParityDeclared !== true ||
+  sizeParityDeclared !== true ||
+  integrityPolicy?.soldierIdToFileNameMustRemainExact !== true
 ) {
-  fail('source-pack-integrity-policy', sourcePackContract?.integrityPolicy ?? null);
+  fail('source-pack-integrity-policy', integrityPolicy);
 }
 if (
   sourcePackContract?.productionPolicy?.sourcePackFetchedAtRuntime !== false ||
-  sourcePackContract?.productionPolicy?.productionWebManifest !== paths.webManifest ||
-  sourcePackContract?.productionPolicy?.productionPublicRoot !== 'images/soldiers-webp' ||
-  sourcePackContract?.productionPolicy?.productionWebpCount !== 224 ||
+  sourcePackContract?.productionPolicy?.productionWebManifest !== selectedPaths.webManifest ||
   sourcePackContract?.productionPolicy?.runtimePathChange !== false ||
   sourcePackContract?.productionPolicy?.webpReencodingInThisStage !== false
 ) {
@@ -211,18 +263,16 @@ if (
   fail('source-pack-semantic-boundary', sourcePackContract?.semanticBoundary ?? null);
 }
 
-const webRecords = Array.isArray(webManifest?.records) ? webManifest.records : [];
 if (
-  webManifest?.version !== 1 ||
-  webManifest?.stage !== 'frontend-soldier-portrait-webp-lossless' ||
+  !Number.isFinite(webManifest?.version) ||
   webManifest?.status !== 'PASS' ||
-  webManifest?.publicRoot !== 'images/soldiers-webp' ||
+  typeof webManifest?.publicRoot !== 'string' ||
+  webManifest.publicRoot.length === 0 ||
   webManifest?.assetsReady !== true ||
-  webManifest?.sourceManifest !== paths.manifest
+  webManifest?.sourceManifest !== selectedPaths.manifest
 ) {
   fail('web-manifest-identity', {
     version: webManifest?.version ?? null,
-    stage: webManifest?.stage ?? null,
     status: webManifest?.status ?? null,
     publicRoot: webManifest?.publicRoot ?? null,
     assetsReady: webManifest?.assetsReady ?? null,
@@ -238,34 +288,33 @@ if (
 ) {
   fail('web-manifest-policy', webManifest?.policy ?? null);
 }
-if (
-  webManifest?.coverage?.canonicalSoldierCount !== 224 ||
-  webManifest?.coverage?.resolvedCount !== 224 ||
-  webManifest?.coverage?.unresolvedCount !== 0 ||
-  webManifest?.coverage?.resolvedSpCount !== 56 ||
-  webRecords.length !== 224
-) {
-  fail('web-manifest-coverage', {
-    coverage: webManifest?.coverage ?? null,
-    records: webRecords.length,
-  });
+const expectedWebCoverage = {
+  canonicalSoldierCount: canonicalIds.length,
+  resolvedCount: webRecords.length,
+  unresolvedCount: canonicalIds.length - webRecords.length,
+  resolvedSpCount: webRecords.filter((record) => record?.isSp === true).length,
+};
+for (const [key, expected] of Object.entries(expectedWebCoverage)) {
+  if (webManifest?.coverage?.[key] !== expected) fail(`web-manifest-coverage-${key}`, { expected, actual: webManifest?.coverage?.[key] ?? null });
 }
-if (
-  webManifest?.sizeAudit?.pngTotalBytes !== 48931121 ||
-  webManifest?.sizeAudit?.webpTotalBytes !== 30577298 ||
-  webManifest?.sizeAudit?.savingBytes !== 18353823
-) {
-  fail('web-manifest-size-audit', webManifest?.sizeAudit ?? null);
+if (expectedWebCoverage.unresolvedCount !== 0) fail('web-manifest-unresolved', expectedWebCoverage.unresolvedCount);
+if (sourcePackContract?.productionPolicy?.productionPublicRoot !== webManifest.publicRoot) {
+  fail('source-pack-web-public-root', { contract: sourcePackContract?.productionPolicy?.productionPublicRoot ?? null, web: webManifest.publicRoot });
+}
+if (sourcePackContract?.productionPolicy?.productionWebpCount !== webRecords.length) {
+  fail('source-pack-web-count', { contract: sourcePackContract?.productionPolicy?.productionWebpCount ?? null, web: webRecords.length });
 }
 
-const webpDirectory = path.join(ROOT, paths.webpDirectory);
-if (!fs.existsSync(webpDirectory)) {
-  fail('webp-directory-missing', paths.webpDirectory);
+const expectedWebpDirectory = path.join(ROOT, 'public', webManifest.publicRoot);
+let actualWebpTotalBytes = 0;
+let verifiedWebpCount = 0;
+if (!fs.existsSync(expectedWebpDirectory)) {
+  fail('webp-directory-missing', path.relative(ROOT, expectedWebpDirectory));
 } else {
-  const entries = fs.readdirSync(webpDirectory, { withFileTypes: true });
+  const entries = fs.readdirSync(expectedWebpDirectory, { withFileTypes: true });
   const actualFiles = entries.filter((entry) => entry.isFile()).map((entry) => entry.name).sort();
   const expectedFiles = webRecords.map((record) => record?.fileName).filter((name) => typeof name === 'string').sort();
-  if (actualFiles.length !== 224 || !sameJson(actualFiles, expectedFiles)) {
+  if (!sameJson(actualFiles, expectedFiles)) {
     fail('webp-file-set', {
       actualCount: actualFiles.length,
       expectedCount: expectedFiles.length,
@@ -274,28 +323,19 @@ if (!fs.existsSync(webpDirectory)) {
     });
   }
 
-  const webIds = new Set();
-  let verifiedWebpCount = 0;
-  let webpTotalBytes = 0;
-  let webSpCount = 0;
   for (const record of webRecords) {
     const soldierId = record?.soldierId;
-    if (!Number.isInteger(soldierId) || webIds.has(soldierId)) {
-      fail('web-record-invalid-or-duplicate-id', soldierId ?? null);
-      continue;
-    }
-    webIds.add(soldierId);
-    if (record?.isSp === true) webSpCount += 1;
-
     const sourceRecord = sourceById.get(soldierId);
-    if (!sourceRecord) {
-      fail('web-record-source-missing', soldierId);
+    if (!Number.isInteger(soldierId) || !sourceRecord) {
+      fail('web-record-source-missing', soldierId ?? null);
       continue;
     }
     if (
       record?.fileName !== `${soldierId}.webp` ||
-      record?.sourceKind !== 'DERIVED_WEBP_LOSSLESS_FROM_V9_PNG' ||
-      record?.resolutionMethod !== 'LOSSLESS_WEBP_PIXEL_EXACT_FROM_CANONICAL_V9_PNG' ||
+      typeof record?.sourceKind !== 'string' ||
+      record.sourceKind.length === 0 ||
+      typeof record?.resolutionMethod !== 'string' ||
+      record.resolutionMethod.length === 0 ||
       record?.sourcePngFileName !== `${soldierId}.png` ||
       record?.sourcePngSha256 !== sourceRecord.sha256 ||
       record?.width !== sourceRecord.width ||
@@ -310,70 +350,78 @@ if (!fs.existsSync(webpDirectory)) {
       continue;
     }
 
-    const filePath = path.join(webpDirectory, record.fileName);
+    const filePath = path.join(expectedWebpDirectory, record.fileName);
     if (!fs.existsSync(filePath)) {
       fail('webp-file-missing', record.fileName);
       continue;
     }
     const bytes = fs.readFileSync(filePath);
     const stat = fs.statSync(filePath);
-    webpTotalBytes += stat.size;
+    actualWebpTotalBytes += stat.size;
     if (stat.size !== record.size) fail('webp-size-mismatch', { soldierId, expected: record.size, actual: stat.size });
     const actualSha = crypto.createHash('sha256').update(bytes).digest('hex');
     if (actualSha !== record.sha256) fail('webp-sha256-mismatch', { soldierId, expected: record.sha256, actual: actualSha });
-    if (
-      bytes.length < 12 ||
-      bytes.subarray(0, 4).toString('ascii') !== 'RIFF' ||
-      bytes.subarray(8, 12).toString('ascii') !== 'WEBP'
-    ) {
+    if (bytes.length < 12 || bytes.subarray(0, 4).toString('ascii') !== 'RIFF' || bytes.subarray(8, 12).toString('ascii') !== 'WEBP') {
       fail('webp-signature', soldierId);
     }
     verifiedWebpCount += 1;
   }
-  if (webIds.size !== 224) fail('web-record-unique-id-count', webIds.size);
-  if (webSpCount !== 56) fail('web-record-sp-count', webSpCount);
-  if (verifiedWebpCount !== 224) fail('webp-verified-count', verifiedWebpCount);
-  if (webpTotalBytes !== 30577298) fail('webp-total-bytes', { expected: 30577298, actual: webpTotalBytes });
 }
 
+const declaredPngBytes = webManifest?.sizeAudit?.pngTotalBytes;
+const declaredWebpBytes = webManifest?.sizeAudit?.webpTotalBytes;
+const declaredSavingBytes = webManifest?.sizeAudit?.savingBytes;
+if (declaredPngBytes !== sourceTotalBytes) fail('web-manifest-png-total-bytes', { expected: sourceTotalBytes, actual: declaredPngBytes ?? null });
+if (declaredWebpBytes !== actualWebpTotalBytes) fail('web-manifest-webp-total-bytes', { expected: actualWebpTotalBytes, actual: declaredWebpBytes ?? null });
+if (declaredSavingBytes !== sourceTotalBytes - actualWebpTotalBytes) {
+  fail('web-manifest-saving-bytes', { expected: sourceTotalBytes - actualWebpTotalBytes, actual: declaredSavingBytes ?? null });
+}
+if (verifiedWebpCount !== webRecords.length) fail('webp-verified-count', { expected: webRecords.length, actual: verifiedWebpCount });
+
 if (errors.length) {
-  console.error(`SOLDIER PORTRAIT V9 FINAL VALIDATION: FAIL (${errors.length})`);
+  console.error(`SOLDIER PORTRAIT CURRENT VALIDATION: FAIL (${errors.length})`);
   for (const error of errors.slice(0, 100)) console.error(`- ${error.code}: ${JSON.stringify(error.detail)}`);
   process.exit(1);
 }
 
-const externalVerifierPath = path.join(ROOT, paths.externalSourceVerifier);
+const externalVerifierPath = path.join(ROOT, SOURCE_PACK_VERIFIER);
 if (!fs.existsSync(externalVerifierPath)) {
-  console.error('SOLDIER PORTRAIT V9 FINAL VALIDATION: FAIL');
-  console.error(`- external-source-verifier-missing: ${paths.externalSourceVerifier}`);
+  console.error('SOLDIER PORTRAIT CURRENT VALIDATION: FAIL');
+  console.error(`- external-source-verifier-missing: ${SOURCE_PACK_VERIFIER}`);
   process.exit(1);
 }
 
-const externalVerification = spawnSync(process.execPath, [externalVerifierPath], {
+const externalVerification = spawnSync(process.execPath, [externalVerifierPath, '--contract', selectedPaths.sourcePackContract], {
   cwd: ROOT,
   env: process.env,
   stdio: 'inherit',
 });
 if (externalVerification.error || externalVerification.status !== 0) {
-  console.error('SOLDIER PORTRAIT V9 FINAL VALIDATION: FAIL');
+  console.error('SOLDIER PORTRAIT CURRENT VALIDATION: FAIL');
   console.error(`- external-source-pack-verification: ${externalVerification.error?.message ?? `exit ${externalVerification.status}`}`);
   process.exit(1);
 }
 
-console.log('SOLDIER PORTRAIT V9 FINAL VALIDATION: PASS');
+console.log('SOLDIER PORTRAIT CURRENT VALIDATION: PASS');
 console.log(JSON.stringify({
-  canonical: 224,
-  normal: 168,
-  sp: 56,
-  resolved: 224,
-  unresolved: 0,
-  sourceFamily: 'BWIKI_CURRENT_CN_EXACT_TRANSPARENT_PNG_V9',
+  locator: LOCATOR_PATH,
+  sourceManifest: selectedPaths.manifest,
+  sourceManifestVersion: manifest.version,
+  sourcePackContract: selectedPaths.sourcePackContract,
+  sourcePackContractVersion: sourcePackContract.version,
+  webManifest: selectedPaths.webManifest,
+  webManifestVersion: webManifest.version,
+  canonical: canonicalIds.length,
+  normal: canonicalNormalCount,
+  sp: canonicalSpCount,
+  resolved: records.length,
+  unresolved: canonicalIds.length - records.length,
+  sourceFamilies: sourceKinds,
   repositorySourcePngCount: 0,
   externalSourcePackVerified: true,
-  externalSourceVerifier: paths.externalSourceVerifier,
-  productionWebpVerified: 224,
-  productionWebpBytes: 30577298,
-  productionPublicRoot: 'images/soldiers-webp',
+  productionWebpVerified: verifiedWebpCount,
+  productionWebpBytes: actualWebpTotalBytes,
+  productionPublicRoot: webManifest.publicRoot,
   runtimePathChanged: false,
   semanticChanges: false,
 }, null, 2));
