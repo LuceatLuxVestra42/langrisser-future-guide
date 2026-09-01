@@ -1,7 +1,7 @@
 {
   "version": 1,
   "schemaId": "project-status-review-lifecycle/v1",
-  "stage": "R2-review-lifecycle-stage6",
+  "stage": "R2-review-lifecycle-stage10-correction",
   "status": "DESIGN_FROZEN",
   "purpose": "Classify normalized Project Status review entries by explicit reviewKey/code rules and declared evidence only. No text similarity, name JOIN, filename inference, chronology inference, or semantic recomputation is allowed.",
   "policy": {
@@ -55,15 +55,96 @@
       "evidence": []
     },
     {
-      "id": "soldier-kr-name-active",
+      "id": "soldier-display-name-resolved",
+      "domain": "soldier",
+      "match": {
+        "code": "HERO_PAGE_SOLDIER_DISPLAY_NAME_REVIEW"
+      },
+      "lifecycle": "RESOLVED_BY_EVIDENCE",
+      "healthImpact": false,
+      "remainingCount": 0,
+      "issueKey": "SOLDIER_KR_NAME_DISPLAY_COVERAGE",
+      "evidence": [
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "rawStatus",
+          "equals": "PASS"
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "displayReviewDisposition",
+          "equals": "RESOLVED_BY_PRESENTATION_EVIDENCE"
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "displayGapCount",
+          "equals": 0
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "effectiveKoreanDisplayCount",
+          "equals": 224
+        }
+      ]
+    },
+    {
+      "id": "soldier-identity-presentation-boundary",
+      "domain": "soldier",
+      "match": {
+        "code": "IDENTITY_PRESENTATION_REVIEW"
+      },
+      "lifecycle": "BOUNDARY_NOTE",
+      "healthImpact": false,
+      "remainingCount": 0,
+      "issueKey": "SOLDIER_IDENTITY_PRESENTATION_BOUNDARY",
+      "evidence": [
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "rawStatus",
+          "equals": "PASS"
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "identityReviewDisposition",
+          "equals": "BOUNDARY_NOTE"
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "lowerTierPresentationUnresolvedCount",
+          "equals": 0
+        }
+      ]
+    },
+    {
+      "id": "soldier-kr-name-partial",
       "domain": "soldier",
       "match": {
         "code": "KR_NAME_UNRESOLVED"
       },
       "lifecycle": "ACTIVE_REVIEW",
       "healthImpact": true,
-      "issueKey": "SOLDIER_KR_NAME_PRESENTATION_COVERAGE",
-      "evidence": []
+      "issueKey": "SOLDIER_KR_NAME_OFFICIAL_CONFIRMATION",
+      "evidence": [
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "rawStatus",
+          "equals": "PASS"
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "krNameReviewDisposition",
+          "equals": "PARTIALLY_RESOLVED_BY_LOCALIZATION_EVIDENCE"
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "lowerTierPresentationUnresolvedCount",
+          "equals": 0
+        }
+      ],
+      "remainingCountFromEvidence": {
+        "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+        "key": "officialKoreanNameUnresolvedCount"
+      }
     },
     {
       "id": "soldier-lower-tier-release-order-boundary",
@@ -187,15 +268,35 @@
       "evidence": []
     },
     {
-      "id": "hero-soldier-kr-name-active",
+      "id": "hero-soldier-kr-name-partial",
       "domain": "hero-soldier",
       "match": {
         "code": "SOLDIER_KR_NAME_UNRESOLVED"
       },
       "lifecycle": "ACTIVE_REVIEW",
       "healthImpact": true,
-      "issueKey": "SOLDIER_KR_NAME_PRESENTATION_COVERAGE",
-      "evidence": []
+      "issueKey": "SOLDIER_KR_NAME_OFFICIAL_CONFIRMATION",
+      "evidence": [
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "rawStatus",
+          "equals": "PASS"
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "krNameReviewDisposition",
+          "equals": "PARTIALLY_RESOLVED_BY_LOCALIZATION_EVIDENCE"
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "key": "lowerTierPresentationUnresolvedCount",
+          "equals": 0
+        }
+      ],
+      "remainingCountFromEvidence": {
+        "sourceRole": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+        "key": "officialKoreanNameUnresolvedCount"
+      }
     },
     {
       "id": "hero-soldier-release-date-active",

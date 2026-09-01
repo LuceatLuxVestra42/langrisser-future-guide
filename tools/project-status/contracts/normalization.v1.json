@@ -160,6 +160,26 @@
           },
           "supersedesPrimaryReviewCodes": [],
           "policy": "Presentation-only provisional names cannot mutate canonical Soldier identity or relation semantics."
+        },
+        {
+          "path": "data/validation/soldier-name-presentation-reconciliation-stage10.v1.json",
+          "role": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "facet": "localization",
+          "selectors": {
+            "rawStatus": "/status",
+            "rawCompletion": "/completion",
+            "revision": "/revision",
+            "lowerTierConfirmedPresentationCount": "/expected/lowerTierConfirmedPresentationCount",
+            "lowerTierPresentationUnresolvedCount": "/expected/lowerTierPresentationUnresolvedCount",
+            "effectiveKoreanDisplayCount": "/expected/effectiveKoreanDisplayCount",
+            "displayGapCount": "/expected/displayGapCount",
+            "officialKoreanNameUnresolvedCount": "/expected/officialKoreanNameUnresolvedCount",
+            "displayReviewDisposition": "/reviewDisposition/HERO_PAGE_SOLDIER_DISPLAY_NAME_REVIEW/stage10Disposition",
+            "identityReviewDisposition": "/reviewDisposition/IDENTITY_PRESENTATION_REVIEW/stage10Disposition",
+            "krNameReviewDisposition": "/reviewDisposition/KR_NAME_UNRESOLVED/stage10Disposition"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Corrected Stage 10 localization reconciliation may refine stale review lifecycle/count projection only; it cannot mutate canonical Soldier identity, relations, or release chronology."
         }
       ]
     },
@@ -212,7 +232,26 @@
         {"when": "/pipelineStatus == FINAL_FROZEN", "lifecycle": "FROZEN"},
         {"when": "/completion == COMPLETE", "lifecycle": "COMPLETE"}
       ],
-      "supplementalSources": []
+      "supplementalSources": [
+        {
+          "path": "data/validation/soldier-name-presentation-reconciliation-stage10.v1.json",
+          "role": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "facet": "localization",
+          "selectors": {
+            "rawStatus": "/status",
+            "rawCompletion": "/completion",
+            "revision": "/revision",
+            "lowerTierConfirmedPresentationCount": "/expected/lowerTierConfirmedPresentationCount",
+            "lowerTierPresentationUnresolvedCount": "/expected/lowerTierPresentationUnresolvedCount",
+            "effectiveKoreanDisplayCount": "/expected/effectiveKoreanDisplayCount",
+            "displayGapCount": "/expected/displayGapCount",
+            "officialKoreanNameUnresolvedCount": "/expected/officialKoreanNameUnresolvedCount",
+            "krNameReviewDisposition": "/reviewDisposition/KR_NAME_UNRESOLVED/stage10Disposition"
+          },
+          "supersedesPrimaryReviewCodes": [],
+          "policy": "Current localization evidence may refine the duplicated presentation review count only; frozen Hero-Soldier membership and relation semantics remain unchanged."
+        }
+      ]
     },
     "banner": {
       "primaryFacet": "canonical",
