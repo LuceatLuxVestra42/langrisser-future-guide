@@ -92,23 +92,6 @@ function BannerImage({
   );
 }
 
-function HeroChips({ heroes }: { heroes: Array<{ heroId: number; heroNameKr: string }> }) {
-  if (heroes.length === 0) return null;
-
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {heroes.map((hero) => (
-        <span
-          key={`${hero.heroId}-${hero.heroNameKr}`}
-          className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground"
-        >
-          {hero.heroNameKr}
-        </span>
-      ))}
-    </div>
-  );
-}
-
 function BannerPage() {
   const data = Route.useLoaderData();
   const [expandedWishOccurrence, setExpandedWishOccurrence] = useState<string | null>(null);
@@ -199,12 +182,15 @@ function BannerPage() {
                             alt={`${formatDisplayDate(row.krDisplayDate)} ${row.typeLabelKr} 배너`}
                           />
                           <div className="mt-3 flex items-start justify-between gap-3">
-                            <div>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="rounded-md bg-primary px-2 py-1 text-[11px] font-bold text-primary-foreground">
-                                  {displayTypeLabel}
+                            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1.5">
+                              <span className="shrink-0 rounded-md bg-primary px-2 py-1 text-[11px] font-bold text-primary-foreground">
+                                {displayTypeLabel}
+                              </span>
+                              {row.pickupHeroes.length > 0 && (
+                                <span className="text-sm font-semibold leading-6 text-foreground">
+                                  {row.pickupHeroes.map((hero) => hero.heroNameKr).join(" · ")}
                                 </span>
-                              </div>
+                              )}
                             </div>
                             {isWish && (
                               <ChevronDown
@@ -217,12 +203,6 @@ function BannerPage() {
                             )}
                           </div>
                         </button>
-
-                        {row.pickupHeroes.length > 0 && (
-                          <div className="border-t border-border px-4 py-3">
-                            <HeroChips heroes={row.pickupHeroes} />
-                          </div>
-                        )}
 
                         {isWish && expanded && (
                           <div className="border-t border-border bg-muted/25 p-4">
