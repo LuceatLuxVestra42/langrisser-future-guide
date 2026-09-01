@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "FULLART-0-representative-crosscheck",
+  "status": "PASS_REPRESENTATIVE_CLASSIFICATION",
+  "purpose": "Distinguish current official Skin STATIC, Spine/Char, and Spine/General resource families for Hero-detail full-art presentation without reopening Skin identity or Hero-Skin relation semantics.",
+  "authority": {
+    "stage3_2Evidence": "data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json",
+    "officialInstallerVersion": "1.1.113",
+    "predecessorBranch": "work/skin-stage3-3-batched-20260901",
+    "predecessorCommit": "ab1bed2c51df38eed79a7dfd94358065eba214c7",
+    "representativeSkinIds": [102, 1901, 3701]
+  },
+  "guardrails": {
+    "semanticStageReopened": false,
+    "heroSkinOwnershipRecomputed": false,
+    "historicalArtifactImported": false,
+    "imageGeneratedByAI": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "generalModelSelectedByExactSkinResourceId": true,
+    "currentOfficialSourceOnly": true
+  },
+  "classification": {
+    "STATIC": {
+      "role": "CARD_STYLE_SKIN_SPRITE_NOT_HERO_DETAIL_FULL_ART",
+      "representatives": [
+        {
+          "skinId": 102,
+          "observedSize": [204, 340],
+          "visualDecision": "CARD_FRAME_CROPPED_CHARACTER_ART"
+        },
+        {
+          "skinId": 1901,
+          "sourceImagePath": "UI/Icon/HeroSkin2_ABS/Skin/Skin_Lista_Skin01.png",
+          "observedSize": [204, 340],
+          "outputSha256": "ffa8024ae06f8487e2f1b2f2643283fbac196ef36f796a10a49f2b8239b0b583",
+          "visualDecision": "CARD_FRAME_CROPPED_CHARACTER_ART"
+        },
+        {
+          "skinId": 3701,
+          "sourceImagePath": "UI/Icon/HeroSkin_ABS/Skin/Skin_Zigodlla_01.png",
+          "observedSize": [204, 340],
+          "outputSha256": "eb690548f80c34fb31ca4f96663338a6c224b0ab62331f8c5d1615e79674e654",
+          "visualDecision": "CARD_FRAME_CROPPED_CHARACTER_ART"
+        }
+      ]
+    },
+    "Spine/General": {
+      "role": "SD_OR_COMBAT_MODEL_RESOURCE_NOT_HERO_DETAIL_FULL_ART",
+      "representatives": [
+        {
+          "skinId": 102,
+          "observedAtlasSize": [512, 256],
+          "visualDecision": "DISASSEMBLED_COMBAT_MODEL_PARTS"
+        },
+        {
+          "skinId": 1901,
+          "skinResourceId": 1901,
+          "prefabPath": "Spine/General/Lista_ABS/Lista_Skin01/Lista_Skin01_Prefab.prefab",
+          "observedAtlasSize": [1024, 512],
+          "regionCount": 49,
+          "outputSha256": "7c1b3ef07cf579fbf48a749e24eb802938129c0621eb38de35224637a2e10be3",
+          "visualDecision": "DISASSEMBLED_COMBAT_MODEL_PARTS"
+        },
+        {
+          "skinId": 3701,
+          "skinResourceId": 3701,
+          "prefabPath": "Spine/General/Zigodlla_ABS/Zigodlla_Skin01/Zigodlla_Skin01_Prefab.prefab",
+          "observedAtlasSize": [512, 512],
+          "regionCount": 37,
+          "outputSha256": "4decf0f304379a74e35729bb238bc3da417f6207139c686d455a3c49d45ce6e2",
+          "visualDecision": "DISASSEMBLED_COMBAT_MODEL_PARTS"
+        }
+      ]
+    },
+    "Spine/Char": {
+      "role": "HERO_DETAIL_FULL_BODY_CHARACTER_ART_SOURCE",
+      "validatedPose": {
+        "animation": "idle_Normal",
+        "time": 0
+      },
+      "spineVersion": "3.3.05",
+      "representatives": [
+        {
+          "skinId": 102,
+          "atlasSize": [2048, 1024],
+          "renderCanvas": [971, 1910],
+          "alphaBBox": [50, 24, 946, 1874],
+          "renderables": 37,
+          "triangles": 1068,
+          "outputSha256": "d0e7e659e819ce296979d22927660f6d5f40226a167764fd213169519c5f8c75",
+          "visualDecision": "COMPLETE_FULL_BODY_CHARACTER"
+        },
+        {
+          "skinId": 1901,
+          "sourceSpinePath": "Spine/Char/Lista_ABS/Lista_Skin01_Prefab.prefab",
+          "atlasSize": [2048, 2048],
+          "renderCanvas": [2114, 2342],
+          "alphaBBox": [105, 76, 2076, 2241],
+          "renderables": 65,
+          "triangles": 1759,
+          "outputSha256": "6819047ea152a22693f404bd6b07b8331d029dffda7a886366464e7d686616d8",
+          "visualDecision": "COMPLETE_FULL_BODY_CHARACTER"
+        },
+        {
+          "skinId": 3701,
+          "sourceSpinePath": "Spine/Char/Zigodlla_ABS/Zigodlla_Skin01_Prefab.prefab",
+          "atlasSize": [2048, 1024],
+          "renderCanvas": [898, 1081],
+          "alphaBBox": [24, 24, 873, 1057],
+          "renderables": 51,
+          "triangles": 824,
+          "outputSha256": "a2c6f42a38effe45f506081d6c82dce36ecec8ff1cd119deedf278bdab64127d",
+          "visualDecision": "COMPLETE_FULL_BODY_CHARACTER"
+        }
+      ]
+    }
+  },
+  "workflowEvidence": {
+    "charCrosscheckRunId": 33516153818,
+    "charArtifacts": {
+      "1901": {
+        "artifactId": 9803697036,
+        "digest": "sha256:372c821e3b6221616731a3342b830458bb9d04187766b15a44ff6c1bdccf8c0d"
+      },
+      "3701": {
+        "artifactId": 9803689710,
+        "digest": "sha256:0277d38e881b6da04046d4cd7edf786546d508d8f795b52fe70e988e6e3fce7d"
+      }
+    },
+    "generalCrosscheckRunId": 33516446049,
+    "generalArtifacts": {
+      "1901": {
+        "artifactId": 9803797036,
+        "digest": "sha256:e8fef3dc97b55f9de6a87c886c1bca577b7e76833bf4cb88af21e9f957d12320"
+      },
+      "3701": {
+        "artifactId": 9803794231,
+        "digest": "sha256:d874d7b6282189851fbb7668015d781081723c3d96e18199300c3aea427ea5d2"
+      }
+    },
+    "staticCrosscheckRunId": 33516698115,
+    "staticArtifacts": {
+      "1901": {
+        "artifactId": 9803891972,
+        "digest": "sha256:95048733d2bd8c85e84cdeaa40c62143984d074a2486d250f4d154dcbe5ee83d"
+      },
+      "3701": {
+        "artifactId": 9803895211,
+        "digest": "sha256:2cfc38b5f3c821e797805b26ac4213c6a85148f8e193426f041be5a9bb1c63cf"
+      }
+    }
+  },
+  "decision": {
+    "heroDetailSkinImageSourceFamily": "Spine/Char",
+    "excludeFamilies": ["STATIC", "Spine/General"],
+    "reason": "STATIC is card-style cropped artwork and Spine/General is a disassembled combat/SD model atlas, while Spine/Char produces complete full-body character artwork matching the Hero-detail presentation target.",
+    "currentStage3_3Implication": "REVISION_REQUIRED_AT_ASSET_EXTRACTION_CONTRACT_ONLY",
+    "semanticReopenRequired": false
+  },
+  "blocker": null,
+  "review": [
+    "Representative proof covers Skin 102, 1901, and 3701; bulk expansion must still fail closed per Skin if Char source, Spine version, required animation, atlas page, or render geometry differs.",
+    "Do not import the historical STATIC web-asset materialization as the Hero-detail full-art source after this contradiction is admitted."
+  ],
+  "nextOwner": "Skin asset extraction / presentation asset contract",
+  "nextStart": "Revise the current Stage 3-3 extraction contract from STATIC card extraction to exact Skin-ID Spine/Char full-body rendering, then execute a bounded bulk census before repository materialization.",
+  "reopenConditions": [
+    "A current official Skin representative where Spine/Char does not represent the intended full-body Hero presentation",
+    "A current authoritative asset contract that identifies a more direct full-body static source with exact Skin-ID provenance",
+    "A hard owning-validator failure or source snapshot change affecting the representative classification"
+  ]
+}
