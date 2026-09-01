@@ -6,6 +6,7 @@ const expectedSourceSha = process.env.EXPECTED_SOURCE_SHA;
 if (!expectedSourceSha) throw new Error("EXPECTED_SOURCE_SHA is required");
 
 const relation = JSON.parse(fs.readFileSync("data/generated/skin-stage2-3-bidirectional-relation.v1.json", "utf8"));
+const fullartManifest = JSON.parse(fs.readFileSync("data/generated/skin-fullart-reference.v1.json", "utf8"));
 const equipmentPublicAdmission = JSON.parse(fs.readFileSync("data/presentation/equipment-public-admission-correction.v1.json", "utf8"));
 const expectedGeneralEquipmentCount = Number(equipmentPublicAdmission.expectedPublicProjection?.generalEquipmentCount);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -55,19 +56,13 @@ await fetchWithRetry("images/heroes/cards/6.png");
 await fetchWithRetry("images/equipment/416.png");
 await fetchWithRetry("images/equipment/567.png");
 
-const heroRows = Object.entries(relation.byHeroId ?? {})
-  .map(([heroId, skinIds]) => ({ heroId: Number(heroId), skinIds: Array.isArray(skinIds) ? skinIds.map(Number) : [] }))
-  .sort((a, b) => b.skinIds.length - a.skinIds.length || a.heroId - b.heroId);
-const skinHero = heroRows[0];
-check(skinHero?.skinIds?.length >= 2, "no multi-Skin representative Hero");
-const firstSkinId = skinHero.skinIds[0];
-const secondSkinId = skinHero.skinIds[1];
-await fetchWithRetry(`images/skins/${firstSkinId}.png`);
-await fetchWithRetry(`images/skins/${secondSkinId}.png`);
-
 const hero6SkinIds = Array.isArray(relation.byHeroId?.["6"]) ? relation.byHeroId["6"].map(Number) : [];
 check(hero6SkinIds.length === 6, `Hero 6 frozen Skin count mismatch: ${hero6SkinIds.length}`);
-const hero6VisualCount = hero6SkinIds.length + 1;
+const fullartRecords = Array.isArray(fullartManifest?.records) ? [...fullartManifest.records].sort((a, b) => a.sourceOrder - b.sourceOrder) : [];
+const hero6FullartIds = fullartRecords.filter((record) => record.heroId === 6).map((record) => Number(record.skinId));
+check(JSON.stringify(hero6FullartIds) === JSON.stringify(hero6SkinIds), `Hero 6 fullart admission mismatch: ${JSON.stringify(hero6FullartIds)}`);
+for (const skinId of hero6FullartIds) await fetchWithRetry(`images/skin-fullart/${skinId}.webp`);
+const hero6VisualCount = hero6FullartIds.length + 1;
 
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -77,39 +72,7 @@ page.on("pageerror", (error) => pageErrors.push(String(error)));
 page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
 
 try {
-  let response = await page.goto(url(`heroes/${skinHero.heroId}/`), { waitUntil: "networkidle", timeout: 45000 });
-  check(response && response.status() < 400, `Hero ${skinHero.heroId} route failed: ${response?.status()}`);
-  await page.getByText(`Hero #${skinHero.heroId}`, { exact: true }).waitFor();
-  const next = page.getByRole("button", { name: "다음 일러스트" });
-  const prev = page.getByRole("button", { name: "이전 일러스트" });
-  check(await next.count() === 1 && await prev.count() === 1, "Skin carousel controls are missing or duplicated");
-
-  async function currentSkinLabel() {
-    const locator = page.getByText(/스킨 \d+ · ID \d+/).first();
-    return await locator.count() ? (await locator.textContent())?.trim() ?? null : null;
-  }
-  async function reachSkin(skinId) {
-    for (let step = 0; step <= skinHero.skinIds.length + 2; step += 1) {
-      const label = await currentSkinLabel();
-      if (label?.endsWith(`ID ${skinId}`)) return label;
-      await next.click();
-      await page.waitForTimeout(100);
-    }
-    throw new Error(`Could not reach Skin ${skinId}`);
-  }
-
-  const firstLabel = await reachSkin(firstSkinId);
-  check(firstLabel === `스킨 1 · ID ${firstSkinId}`, `first Skin label mismatch: ${firstLabel}`);
-  let activeImage = page.locator("main section img[alt]").first();
-  check((await activeImage.getAttribute("src"))?.includes(`/images/skins/${firstSkinId}.png`), "first Skin image source mismatch");
-  await next.click();
-  await page.waitForTimeout(100);
-  const secondLabel = await currentSkinLabel();
-  check(secondLabel === `스킨 2 · ID ${secondSkinId}`, `second Skin label mismatch: ${secondLabel}`);
-  activeImage = page.locator("main section img[alt]").first();
-  check((await activeImage.getAttribute("src"))?.includes(`/images/skins/${secondSkinId}.png`), "second Skin image source mismatch");
-
-  response = await page.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
+  let response = await page.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
   check(response && response.status() < 400, `Hero 6 detail failed: ${response?.status()}`);
   await page.getByText("Hero #6", { exact: true }).waitFor();
   await page.getByText("대표 일러스트", { exact: true }).waitFor();
@@ -118,12 +81,25 @@ try {
   check(await heroArtworkImage.count() === 1, "Hero 6 representative artwork image missing or duplicated");
   check((await heroArtworkImage.getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 representative artwork source mismatch");
   const hero6Next = page.getByRole("button", { name: "다음 일러스트" });
-  check(await hero6Next.count() === 1, "Hero 6 next artwork control missing or duplicated");
+  const hero6Prev = page.getByRole("button", { name: "이전 일러스트" });
+  check(await hero6Next.count() === 1 && await hero6Prev.count() === 1, "Hero 6 artwork controls missing or duplicated");
+  for (let index = 0; index < hero6FullartIds.length; index += 1) {
+    const skinId = hero6FullartIds[index];
+    await hero6Next.click();
+    await page.waitForTimeout(100);
+    await page.getByText(`스킨 ${index + 1} · ID ${skinId}`, { exact: true }).waitFor();
+    const image = page.locator(`img[src*="/images/skin-fullart/${skinId}.webp"]`);
+    check(await image.count() === 1, `Hero 6 fullart Skin ${skinId} image missing or duplicated`);
+    const imageState = await image.evaluate((node) => ({ complete: node.complete, naturalWidth: node.naturalWidth, naturalHeight: node.naturalHeight, objectFit: getComputedStyle(node).objectFit }));
+    check(imageState.complete && imageState.naturalWidth > 0 && imageState.naturalHeight > 0, `Hero 6 fullart Skin ${skinId} image did not load`);
+    check(imageState.objectFit === "contain", `Hero 6 fullart Skin ${skinId} object-fit=${imageState.objectFit}`);
+    check(await page.locator(`img[src*="/images/skins/${skinId}.png"]`).count() === 0, `Hero 6 reintroduced legacy static Skin ${skinId}`);
+  }
   await hero6Next.click();
   await page.waitForTimeout(100);
-  await page.getByText(`스킨 1 · ID ${hero6SkinIds[0]}`, { exact: true }).waitFor();
-  const hero6FirstSkinImage = page.locator(`img[src*="/images/skins/${hero6SkinIds[0]}.png"]`);
-  check(await hero6FirstSkinImage.count() === 1, "Hero 6 first Skin did not follow representative artwork");
+  await page.getByText("대표 일러스트", { exact: true }).waitFor();
+  await page.getByText(`1 / ${hero6VisualCount}`, { exact: true }).waitFor();
+  check((await page.locator('img[alt="레온 대표 일러스트"]').getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 carousel did not wrap back to representative artwork");
 
   const exclusiveHeading = page.getByRole("heading", { name: "전용장비", exact: true });
   await exclusiveHeading.waitFor();
@@ -194,6 +170,15 @@ try {
     const mobileHeroArtwork = mobilePage.locator('img[alt="레온 대표 일러스트"]');
     check(await mobileHeroArtwork.count() === 1, "Hero 6 mobile representative artwork missing or duplicated");
     check((await mobileHeroArtwork.getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 mobile representative artwork source mismatch");
+    const mobileNext = mobilePage.getByRole("button", { name: "다음 일러스트" });
+    await mobileNext.click();
+    await mobilePage.waitForTimeout(100);
+    await mobilePage.getByText(`스킨 1 · ID ${hero6FullartIds[0]}`, { exact: true }).waitFor();
+    const mobileFullart = mobilePage.locator(`img[src*="/images/skin-fullart/${hero6FullartIds[0]}.webp"]`);
+    check(await mobileFullart.count() === 1, "Hero 6 mobile first fullart Skin missing or duplicated");
+    const mobileFullartState = await mobileFullart.evaluate((node) => ({ complete: node.complete, naturalWidth: node.naturalWidth, naturalHeight: node.naturalHeight, objectFit: getComputedStyle(node).objectFit }));
+    check(mobileFullartState.complete && mobileFullartState.naturalWidth > 0 && mobileFullartState.naturalHeight > 0, "Hero 6 mobile first fullart Skin did not load");
+    check(mobileFullartState.objectFit === "contain", `Hero 6 mobile fullart object-fit=${mobileFullartState.objectFit}`);
     const mobileHeading = mobilePage.getByRole("heading", { name: "전용장비", exact: true });
     await mobileHeading.waitFor();
     const mobileSection = mobileHeading.locator("xpath=ancestor::section[1]");
@@ -218,7 +203,7 @@ try {
       desktop: "PASS",
       mobile: "PASS",
     },
-    skinRepresentative: { heroId: skinHero.heroId, firstSkinId, secondSkinId },
+    skinFullart: { heroId: 6, skinIds: hero6FullartIds, cycle: "BASE_TO_6_SKINS_TO_BASE_PASS", legacyStaticHeroDetailConsumption: false },
     heroExclusiveEquipment: {
       heroId: 6,
       equipmentId: 416,
