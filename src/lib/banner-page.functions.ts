@@ -5,6 +5,7 @@ import { readBannerPageData } from "./banner-page.server";
 const TRIPLE_BANNER_PICTURE_NOTICE_OVERRIDES = new Map<string, string>([
   ["/images/banners/Banner/Banner_1304.webp", "/images/banners/Picture_Notice/Picture_Notice_1304.webp"],
   ["/images/banners/Banner/Banner_1404.webp", "/images/banners/Picture_Notice/Picture_Notice_1404.webp"],
+  ["/images/banners/Banner/Banner_1503.webp", "/images/banners/Picture_Notice/Picture_Notice_1503.webp"],
   ["/images/banners/Banner/Banner_1704.webp", "/images/banners/Picture_Notice/Picture_Notice_1704.webp"],
   ["/images/banners/Banner/Banner_2003.webp", "/images/banners/Picture_Notice/Picture_Notice_2403.webp"],
   ["/images/banners/Banner/Banner_4203.webp", "/images/banners/Picture_Notice/Picture_Notice_4203.webp"],
