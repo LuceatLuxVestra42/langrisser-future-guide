@@ -12,7 +12,7 @@ export const Route = createFileRoute("/equipment")({
       { title: "SSR 장비 | 랑그릿사 모바일 미래시 정보" },
       {
         name: "description",
-        content: "랑그릿사 모바일 SSR 일반 장비 목록과 분류 정보를 확인합니다.",
+        content: "랑그릿사 모바일 SSR 일반 장비 목록을 확인합니다.",
       },
     ],
   }),
@@ -173,7 +173,7 @@ function EquipmentGeneralListPage() {
 
   const orderPolicy =
     uiState.sort === "default"
-      ? "장비 종류와 세부 타입 기준의 기본 표시순이야. 장비패스·초기/추가 장비 분류는 첫 목록 정렬에 사용하지 않아."
+      ? "장비 종류와 세부 타입 기준으로 표시하고, 같은 세부 타입 안에서는 기존 표시순을 사용해."
       : `${SORT_LABELS[uiState.sort]}으로 표시 중이야. 이 정렬은 출시순 의미를 갖지 않아.`;
 
   return (
