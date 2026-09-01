@@ -6,6 +6,7 @@
 
 - Preflight: **PASS**
 - Build: **PASS**
+- NEW Project Check owner/validator admission: **MERGED ON MAIN (#363)**
 - Deployment/Hosted: **BLOCKED_AWAITING_AUTHORITATIVE_PAGES_DEPLOY**
 - Browser/UI: **BLOCKED_UNTIL_HOSTED_PASS**
 
