@@ -1,0 +1,50 @@
+name: One-time Skin runtime source migration
+
+on:
+  push:
+    branches:
+      - fix/retire-doctor-pages-runtime
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout migration branch
+        uses: actions/checkout@v5
+        with:
+          ref: fix/retire-doctor-pages-runtime
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Materialize the already-proven Skin presentation patch
+        run: node scripts/project-doctor-compose-authoritative-pages-runtime.mjs
+
+      - name: Validate migrated source boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/validate-skin-stage3-6-hero-detail-consumer.mjs
+          git diff --check
+          mapfile -t changed < <(git diff --name-only | sort)
+          printf '%s\n' "${changed[@]}"
+          test "${#changed[@]}" -eq 2
+          test "${changed[0]}" = 'src/lib/hero-detail-stage5.server.ts'
+          test "${changed[1]}" = 'src/routes/heroes_.$heroId.tsx'
+
+      - name: Commit exact migrated source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/lib/hero-detail-stage5.server.ts 'src/routes/heroes_.$heroId.tsx'
+          git commit -m 'Materialize frozen Skin presentation in current Hero source [skip ci]'
+          git push origin HEAD:fix/retire-doctor-pages-runtime
