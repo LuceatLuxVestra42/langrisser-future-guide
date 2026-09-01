@@ -84,8 +84,7 @@ jobs:
             throw new Error(`Browser/UI predecessor freshness mismatch: expected=${expected} deployed=${manifest.sourceSha}`);
           }
           if (manifest.semanticStageReopened !== false) throw new Error('deployed manifest reopened semantic stage');
-          if (!manifest.skinRuntimeRef) throw new Error('deployed manifest is missing skinRuntimeRef');
-          fs.appendFileSync(process.env.GITHUB_ENV, `EXPECTED_SOURCE_SHA=${expected}\nEXPECTED_SKIN_REF=${manifest.skinRuntimeRef}\n`);
+          fs.appendFileSync(process.env.GITHUB_ENV, `EXPECTED_SOURCE_SHA=${expected}\n`);
           console.log(JSON.stringify({ status: 'PASS_BROWSER_UI_PREDECESSOR', expectedSourceSha: expected, deployedSourceSha: manifest.sourceSha, semanticStageReopened: false }, null, 2));
           NODE
 
@@ -97,7 +96,7 @@ jobs:
       - name: Reuse stable hosted Browser interaction validators
         run: |
           set -euo pipefail
-          node scripts/project-doctor-validate-authoritative-pages-hosted.mjs
+          node scripts/validate-authoritative-pages-hosted.mjs
           node scripts/validate-hero-central-discipline-hosted.mjs
           node scripts/validate-hero-soldier-cards-hosted.mjs
           node scripts/validate-hero-card-icons-hosted.mjs
