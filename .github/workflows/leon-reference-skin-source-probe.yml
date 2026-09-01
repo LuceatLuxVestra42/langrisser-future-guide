@@ -86,7 +86,7 @@ jobs:
           for row in skins:
               sid=int(row['skinId']); source=str(row['sourceSpinePath']); expected=norm(source)
               if not expected.startswith('spine/char/leon_abs/'): raise RuntimeError(f'Leon Char family drift: {sid}: {source}')
-              targets.append({'skinId':sid,'sourceOrder':int(row['sourceOrder']),'sourceSpinePath':source,'expectedRuntime':expected})
+              targets.append({'skinId':sid,'order':int(row['order']),'sourceSpinePath':source,'expectedRuntime':expected})
 
           stem='spine_char_leon_abs'; packages=[]; candidates=[]; seen=False; misses=0
           for part in range(1,MAX_PART+1):
