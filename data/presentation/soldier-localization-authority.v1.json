@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "schemaId": "soldier-localization-authority/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "SOLDIER_KOREAN_PRESENTATION_SOURCES_AUTHORITY_ADMITTED",
+  "authorityScope": "KOREAN_PRESENTATION_TEXT_ONLY",
+  "sources": {
+    "names": {
+      "path": "data/presentation/soldier-name-kr-authoritative-source.v1.txt",
+      "originalLabel": "용병명_통합.txt",
+      "sha256": "305a7e67ebcbac3cf46c8d35ec82256b4bccfece813a2e54ee740f3655117fee",
+      "encoding": "UTF-8"
+    },
+    "abilities": {
+      "path": "data/presentation/soldier-ability-kr-authoritative-source.v1.txt",
+      "originalLabel": "한섭용병명-고유기.txt",
+      "sha256": "44cfe95916e8f539125f02275ba7faecffb7823c7cbb465e227ac1fcba4131e4",
+      "encoding": "UTF-8"
+    }
+  },
+  "expected": {
+    "normalSoldierCount": 168,
+    "lowerTierNameCount": 39,
+    "tier3NameCount": 129,
+    "tier3ConfirmedNameCount": 127,
+    "tier3ProvisionalNameCount": 2,
+    "ability": {
+      "tier2Count": 27,
+      "normalTier3Count": 129,
+      "spTier3Count": 56,
+      "totalRecordCount": 212
+    }
+  },
+  "identityBoundary": {
+    "canonicalIdentitySource": "data/generated/soldier-list-stage5-8.v1.json",
+    "normalSpRelationSource": "normalSoldierId on frozen Soldier records",
+    "identityAuthority": false,
+    "tierArmyAuthority": false,
+    "heroSoldierRelationAuthority": false,
+    "combatSemanticAuthority": false,
+    "releaseAuthority": false,
+    "nameTextAuthority": true,
+    "abilityTextAuthority": true,
+    "runtimeNameJoinAllowed": false,
+    "idArithmeticAllowed": false
+  },
+  "currentNameConsumers": [
+    "data/presentation/soldier-lower-tier-name-kr.v1.json",
+    "data/presentation/soldier-t3-provisional-name-kr.v1.json",
+    "data/presentation/soldier-confirmed-name-correction.v1.json",
+    "data/generated/soldier-list-stage5-8.v1.json"
+  ],
+  "reviews": [
+    {
+      "code": "SOLDIER_ABILITY_ID_BOUND_PROJECTION_REQUIRED",
+      "blocking": false,
+      "owner": "soldier-frontend/localization",
+      "note": "Ability text source authority is admitted, but production use must first create an explicit soldierId-bound projection. Do not introduce runtime Korean-name joins."
+    }
+  ]
+}
