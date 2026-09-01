@@ -21,8 +21,8 @@ def barycentric(px, py, ax, ay, bx, by, cx, cy):
     denom = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy)
     if abs(denom) < 1e-8:
         return None
-    w0 = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / denom
-    w1 = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / denom
+    w0 = ((by - cy) * (ax - cx) + (cx - bx) * (ay - cy)) / denom
+    w1 = ((cy - ay) * (ax - cx) + (ax - cx) * (ay - cy)) / denom
     w2 = 1.0 - w0 - w1
     return w0, w1, w2
 
@@ -45,24 +45,25 @@ def sample_bilinear(texture, u, v):
 
 
 def blend(canvas_rgb_p, canvas_a, yy, xx, src_rgba, mode):
+    mode = mode.lower()
     src_rgb = np.clip(src_rgba[..., :3], 0.0, 1.0)
     src_a = np.clip(src_rgba[..., 3], 0.0, 1.0)
     dst_p = canvas_rgb_p[yy, xx]
     dst_a = canvas_a[yy, xx]
     dst_rgb = np.where(dst_a[..., None] > 1e-8, dst_p / np.maximum(dst_a[..., None], 1e-8), 0.0)
 
-    if mode == 'Normal':
+    if mode == 'normal':
         out_a = src_a + dst_a * (1.0 - src_a)
         out_p = src_rgb * src_a[..., None] + dst_p * (1.0 - src_a[..., None])
-    elif mode == 'Additive':
+    elif mode == 'additive':
         out_a = np.maximum(dst_a, src_a)
         out_p = np.clip(dst_p + src_rgb * src_a[..., None], 0.0, 1.0)
-    elif mode == 'Multiply':
+    elif mode == 'multiply':
         blended = dst_rgb * src_rgb
         out_a = src_a + dst_a * (1.0 - src_a)
         out_rgb = blended * src_a[..., None] + dst_rgb * (1.0 - src_a[..., None])
         out_p = out_rgb * out_a[..., None]
-    elif mode == 'Screen':
+    elif mode == 'screen':
         blended = 1.0 - (1.0 - dst_rgb) * (1.0 - src_rgb)
         out_a = src_a + dst_a * (1.0 - src_a)
         out_rgb = blended * src_a[..., None] + dst_rgb * (1.0 - src_a[..., None])
@@ -140,7 +141,7 @@ def main():
     width = int(math.ceil(bounds['width'])) + margin * 2
     height = int(math.ceil(bounds['height'])) + margin * 2
     if width <= 0 or height <= 0 or width > 8192 or height > 8192:
-        raise RuntimeError(f'unreasonable setup-pose canvas: {width}x{height}')
+        raise RuntimeError(f'unreasonable Char idle canvas: {width}x{height}')
 
     canvas_rgb_p = np.zeros((height, width, 3), dtype=np.float32)
     canvas_a = np.zeros((height, width), dtype=np.float32)
@@ -212,11 +213,12 @@ def main():
     output_path.parent.mkdir(parents=True, exist_ok=True)
     Image.fromarray(out_u8, 'RGBA').save(output_path)
 
+    pose = geometry.get('skeleton', {}).get('pose') or {}
     result = {
         'schemaVersion': 1,
         'stage': 'skin-page-3',
         'substage': 'FULLART-0-current-render',
-        'status': 'PASS_CURRENT_SPINE_SETUP_POSE_RENDER',
+        'status': 'PASS_CURRENT_SPINE_CHAR_IDLE_RENDER',
         'skinId': 102,
         'guardrails': {
             'imageGeneratedByAI': False,
@@ -237,7 +239,7 @@ def main():
             'atlasPages': sorted(page_names),
         },
         'render': {
-            'pose': 'setup',
+            'pose': pose,
             'canvasWidth': width,
             'canvasHeight': height,
             'geometryBounds': bounds,
