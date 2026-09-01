@@ -191,9 +191,11 @@ function BannerPage() {
                                   </span>
                                 )}
                               </div>
-                              <p className="mt-2 text-xs text-muted-foreground">
-                                {row.lifecycleLabelKr}
-                              </p>
+                              {row.lifecycleLabelKr !== "현 데이터셋 최초 관측" && (
+                                <p className="mt-2 text-xs text-muted-foreground">
+                                  {row.lifecycleLabelKr}
+                                </p>
+                              )}
                             </div>
                             {isWish && (
                               <ChevronDown
