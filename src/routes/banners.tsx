@@ -105,11 +105,6 @@ function BannerPage() {
     [data.wishCandidateSets],
   );
 
-  const cpByOccurrence = useMemo(
-    () => new Map(data.cpRecords.map((record) => [record.bannerOccurrenceId, record])),
-    [data.cpRecords],
-  );
-
   const visibleDateGroups = useMemo(
     () =>
       displayStartDate
@@ -156,7 +151,6 @@ function BannerPage() {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {group.rows.map((row) => {
                     const wish = wishByDefinition.get(row.bannerDefinitionId);
-                    const cpRecord = cpByOccurrence.get(row.bannerOccurrenceId);
                     const isWish = row.mechanicFamily === "WISH";
                     const expanded = expandedWishOccurrence === row.bannerOccurrenceId;
 
@@ -194,11 +188,12 @@ function BannerPage() {
                                   </span>
                                 )}
                               </div>
-                              {row.lifecycleLabelKr !== "현 데이터셋 최초 관측" && (
-                                <p className="mt-2 text-xs text-muted-foreground">
-                                  {row.lifecycleLabelKr}
-                                </p>
-                              )}
+                              {row.typeLabelKr !== "1인 픽업" &&
+                                row.lifecycleLabelKr !== "현 데이터셋 최초 관측" && (
+                                  <p className="mt-2 text-xs text-muted-foreground">
+                                    {row.lifecycleLabelKr}
+                                  </p>
+                                )}
                             </div>
                             {isWish && (
                               <ChevronDown
@@ -215,20 +210,6 @@ function BannerPage() {
                         {row.pickupHeroes.length > 0 && (
                           <div className="border-t border-border px-4 py-3">
                             <HeroChips heroes={row.pickupHeroes} />
-                          </div>
-                        )}
-
-                        {cpRecord && (
-                          <div className="border-t border-border bg-muted/35 px-4 py-3">
-                            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                              Event text reference
-                            </p>
-                            <p className="mt-1 text-sm font-bold text-foreground">
-                              {cpRecord.eventReferenceLabelCn}
-                            </p>
-                            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                              canonical Event ID 미확정 · 상세 이동 비활성
-                            </p>
                           </div>
                         )}
 
