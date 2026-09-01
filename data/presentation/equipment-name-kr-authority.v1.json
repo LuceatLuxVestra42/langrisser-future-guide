@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "schemaId": "equipment-name-kr-authority/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "EQUIPMENT_KOREAN_PRESENTATION_SOURCE_AUTHORITY_ADMITTED",
+  "authorityScope": "KOREAN_PRESENTATION_TEXT_ONLY",
+  "source": {
+    "path": "data/presentation/equipment-name-kr-authoritative-source.v1.txt",
+    "originalLabel": "장비명_통합.txt",
+    "sha256": "e5ef489176b0af9d3620fd03841874c03d2403c5ee95467f197179f1c80c7dca",
+    "encoding": "UTF-8"
+  },
+  "expected": {
+    "canonicalRecordCount": 390,
+    "sourceRecordCount": 390,
+    "resolvedKoreanTextCount": 373,
+    "unresolvedKoreanTextCount": 17,
+    "sectionCounts": {
+      "한섭 실장 일반장비": 190,
+      "한섭 실장 전용장비": 159,
+      "한섭 미실장 일반장비": 8,
+      "한섭 미실장 전용장비": 8,
+      "중복템, 구현 필요 없음": 8,
+      "이벤트템, 구현 필요 없음": 17
+    }
+  },
+  "identityBoundary": {
+    "canonicalIdentitySource": "data/generated/equipment_stage3_2_display_metadata.json",
+    "identityAuthority": false,
+    "publicAdmissionAuthority": false,
+    "exclusiveOwnershipAuthority": false,
+    "releaseAuthority": false,
+    "semanticAuthority": false,
+    "nameTextAuthority": true,
+    "runtimeNameJoinAllowed": false,
+    "idArithmeticAllowed": false
+  },
+  "downstream": {
+    "currentIdBoundPresentation": "data/generated/equipment-name-kr-user-approved.v1.json",
+    "legacyPartitionInputs": [
+      "data/localization/equipment-name-kr/weapon.tsv",
+      "data/localization/equipment-name-kr/armor.tsv",
+      "data/localization/equipment-name-kr/headgear.tsv",
+      "data/localization/equipment-name-kr/accessory.tsv"
+    ],
+    "policy": "The authoritative source owns Korean presentation text. Existing ID-bound/partitioned consumers may be migrated separately; mismatch is downstream presentation drift and does not mutate Equipment identity or admission."
+  },
+  "reviews": [
+    {
+      "code": "EQUIPMENT_NAME_LEGACY_CONSUMER_PARITY_REVIEW",
+      "blocking": false,
+      "owner": "localization/equipment-frontend",
+      "note": "Existing partitioned TSV/generated presentation may differ from the newly admitted source. Refresh only the downstream presentation consumer; do not reopen Equipment canonical/admission semantics."
+    }
+  ]
+}
