@@ -1,0 +1,51 @@
+name: Hero Card Icon Source Pack H3 Hydration
+
+on:
+  pull_request:
+    paths:
+      - scripts/hydrate-hero-card-icon-source-pack-v1.mjs
+      - data/contracts/hero-card-icon-source-pack.v1.json
+      - .github/workflows/hero-card-icon-source-pack-hydration-v1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clean-hydration:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Hydrate pinned external source pack into a clean temp target
+        run: |
+          set -euo pipefail
+          TARGET="$RUNNER_TEMP/hero-card-icon-source-hydrated"
+          rm -rf "$TARGET"
+          node scripts/hydrate-hero-card-icon-source-pack-v1.mjs --target-dir "$TARGET"
+
+          actual_files="$(find "$TARGET" -mindepth 1 -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')"
+          actual_entries="$(find "$TARGET" -mindepth 1 -maxdepth 1 | wc -l | tr -d ' ')"
+          actual_bytes="$(find "$TARGET" -mindepth 1 -maxdepth 1 -type f -name '*.png' -printf '%s\n' | awk '{sum += $1} END {print sum + 0}')"
+
+          test "$actual_files" = "267"
+          test "$actual_entries" = "267"
+          test "$actual_bytes" = "8990485"
+
+          echo "H3 clean hydration proof: files=$actual_files bytes=$actual_bytes"
+
+      - name: Verify hydration leaves tracked repository state unchanged
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
