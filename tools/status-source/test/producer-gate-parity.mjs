@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { selectActiveSources } from '../lib/select-active-sources.mjs';
+import { captureSourceProvenance } from '../lib/source-provenance.mjs';
 import {
   loadProducerGateContract,
   producerGateSummary,
@@ -171,6 +172,11 @@ try {
       },
     },
   };
+
+  fs.writeFileSync(path.join(tempRoot, 'data/validation/hero-root.v1.json'), `${JSON.stringify({ status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } }, null, 2)}\n`);
+  fs.writeFileSync(path.join(tempRoot, 'data/validation/hero-next.v1.json'), `${JSON.stringify({ status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } }, null, 2)}\n`);
+  fs.writeFileSync(path.join(tempRoot, 'data/validation/hero-apply.v1.json'), `${JSON.stringify({ status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } }, null, 2)}\n`);
+
   const baseline = {
     version: 1,
     schemaId: 'project-doctor-active-source-entries/v1',
@@ -179,15 +185,13 @@ try {
       domain: 'hero',
       state: 'APPROVED',
       sourcePath: 'data/validation/hero-root.v1.json',
+      sourceProvenance: captureSourceProvenance({ repoRoot: tempRoot, sourcePath: 'data/validation/hero-root.v1.json' }),
       facet: 'canonical',
       successorOf: null,
       admission: [{ pointer: '/status', equals: 'PASS' }],
     }],
   };
   fs.writeFileSync(path.join(tempRoot, 'data/status-sources/baseline.v1.json'), `${JSON.stringify(baseline, null, 2)}\n`);
-  fs.writeFileSync(path.join(tempRoot, 'data/validation/hero-root.v1.json'), `${JSON.stringify({ status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } }, null, 2)}\n`);
-  fs.writeFileSync(path.join(tempRoot, 'data/validation/hero-next.v1.json'), `${JSON.stringify({ status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } }, null, 2)}\n`);
-  fs.writeFileSync(path.join(tempRoot, 'data/validation/hero-apply.v1.json'), `${JSON.stringify({ status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } }, null, 2)}\n`);
 
   const runtime = {
     repoRoot: tempRoot,
