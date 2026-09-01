@@ -32,6 +32,9 @@ jobs:
       - name: Run R3 Project Check contract and routing self-test
         run: node tools/project-check/test/project-check-self-test.mjs
 
+      - name: Run deletion diff routing regression fixture
+        run: node tools/project-check/test/deletion-diff-regression.mjs
+
       - name: Run post-reinstall Soldier and Asset Intake routing fixtures
         run: node tools/project-check/test/post-reinstall-routing-fixtures.mjs
 
