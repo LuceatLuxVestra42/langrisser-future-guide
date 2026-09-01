@@ -35,6 +35,7 @@
     {"id":"skin-relation","validators":["skin-relation"]},
     {"id":"shared-movement","validators":["shared-movement"]},
     {"id":"soldier-assets","validators":["soldier-assets"]},
+    {"id":"soldier-training-material-assets","validators":["soldier-training-material-assets"]},
     {"id":"equipment-assets","validators":["equipment-assets"]},
     {"id":"hero-assets","validators":["hero-assets"]},
     {"id":"asset-intake","validators":["asset-intake"]},
@@ -156,6 +157,11 @@
       "owners":["soldier-assets"]
     },
     {
+      "id":"soldier-training-material-assets",
+      "patterns":["data/contracts/soldier-training-material-*","data/evidence/soldier-training-material-*","data/generated/soldier-training-material-*","data/manifests/soldier-training-material-*","data/validation/soldier-training-material-*","docs/checkpoints/soldier-training-material-*","scripts/*soldier-training-material*",".github/workflows/soldier-training-material-*","public/images/soldier-training-materials/**","public/images/soldier-training-materials-webp/**"],
+      "owners":["soldier-training-material-assets"]
+    },
+    {
       "id":"soldier-presentation",
       "patterns":["data/presentation/soldier-*","data/validation/soldier-*-presentation*","scripts/*soldier*presentation*",".github/workflows/soldier-*-presentation*"],
       "owners":["soldier-frontend","localization"]
@@ -163,7 +169,7 @@
     {
       "id":"soldier-canonical",
       "patterns":["data/soldier-*","data/generated/soldier-*","data/validation/soldier-*","data/contracts/soldier-*","scripts/*soldier*",".github/workflows/soldier-*"],
-      "excludePatterns":["data/generated/soldier-portrait-*","data/validation/soldier-portrait-*","data/contracts/soldier-portrait-*","scripts/*soldier-portrait*",".github/workflows/soldier-portrait-*","data/presentation/soldier-*","data/validation/soldier-*-presentation*","scripts/*soldier*presentation*",".github/workflows/soldier-*-presentation*"],
+      "excludePatterns":["data/generated/soldier-portrait-*","data/validation/soldier-portrait-*","data/contracts/soldier-portrait-*","scripts/*soldier-portrait*",".github/workflows/soldier-portrait-*","data/presentation/soldier-*","data/validation/soldier-*-presentation*","scripts/*soldier*presentation*",".github/workflows/soldier-*-presentation*","data/generated/soldier-training-material-*","data/validation/soldier-training-material-*","data/contracts/soldier-training-material-*","scripts/*soldier-training-material*",".github/workflows/soldier-training-material-*"],
       "owners":["soldier-canonical"]
     },
     {
