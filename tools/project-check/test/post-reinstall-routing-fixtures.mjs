@@ -37,14 +37,63 @@ assertRoute(
   ['asset-intake'],
 );
 
+assertRoute(
+  'data/validation/soldier-training-material-assets-a7.v1.json',
+  ['soldier-training-material-assets'],
+  ['soldier-training-material-assets'],
+);
+
+assertRoute(
+  'public/images/soldier-training-materials/6003.png',
+  ['soldier-training-material-assets'],
+  ['soldier-training-material-assets'],
+);
+
+assertRoute(
+  'public/images/soldier-training-materials-webp/6003.webp',
+  ['soldier-training-material-assets'],
+  ['soldier-training-material-assets'],
+);
+
+assertRoute(
+  'docs/checkpoints/soldier-training-material-assets-a7.md',
+  ['soldier-training-material-assets'],
+  ['soldier-training-material-assets'],
+);
+
+assertRoute(
+  'scripts/integrate-soldier-training-material-assets-a7.mjs',
+  ['soldier-training-material-assets'],
+  ['soldier-training-material-assets'],
+);
+
+assertRoute(
+  'src/lib/soldier-training-material-assets.ts',
+  ['soldier-frontend'],
+  ['production-build'],
+);
+
+assertRoute(
+  'src/components/soldier-detail-modal.tsx',
+  ['shared-frontend'],
+  ['production-build'],
+);
+
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'POST_REINSTALL_ROUTING_FIXTURES',
-  fixtureCount: 3,
+  fixtureCount: 10,
   fixtures: [
     'soldier-frontend -> production-build',
     'soldier-canonical + status-source -> provenance + soldier-canonical validators',
     'asset-intake -> asset-intake',
+    'soldier-training-material validation -> dedicated read-only validator',
+    'soldier-training-material PNG -> dedicated read-only validator',
+    'soldier-training-material WebP -> dedicated read-only validator',
+    'soldier-training-material checkpoint -> dedicated read-only validator',
+    'soldier-training-material script -> dedicated read-only validator',
+    'soldier-training-material helper -> production-build',
+    'Soldier detail component -> production-build',
   ],
   boundaries: {
     ownerPropagationCount: 0,
