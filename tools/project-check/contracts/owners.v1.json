@@ -102,7 +102,7 @@
     },
     {
       "id":"configdata-lookup-tooling",
-      "patterns":["tools/configdata-lookup/**","data/contracts/project-tooling-configdata-lookup-*.json",".github/workflows/project-tooling-configdata-lookup-clr2.yml",".github/workflows/project-tooling-configdata-lookup-writer.yml",".github/workflows/configdata-lookup-stage6.yml",".github/workflows/configdata-lookup-stage7.yml",".github/workflows/configdata-lookup-stage8.yml"],
+      "patterns":["tools/configdata-lookup/**","data/status-sources/**","data/contracts/project-tooling-configdata-lookup-*.json",".github/workflows/project-tooling-configdata-lookup-clr2.yml",".github/workflows/project-tooling-configdata-lookup-writer.yml",".github/workflows/configdata-lookup-stage6.yml",".github/workflows/configdata-lookup-stage7.yml",".github/workflows/configdata-lookup-stage8.yml"],
       "owners":["configdata-lookup"]
     },
     {
@@ -161,6 +161,11 @@
       "id":"soldier-assets",
       "patterns":["public/images/soldiers/**","data/generated/soldier-portrait-*","data/validation/soldier-portrait-*","data/contracts/soldier-portrait-*","scripts/*soldier-portrait*",".github/workflows/soldier-portrait-*"],
       "owners":["soldier-assets"]
+    },
+    {
+      "id":"soldier-portrait-web-delivery",
+      "patterns":["public/images/soldiers-webp/**","data/generated/soldier-portrait-web-*"],
+      "owners":["soldier-assets","soldier-frontend"]
     },
     {
       "id":"soldier-training-material-assets",
