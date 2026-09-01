@@ -1,0 +1,87 @@
+name: Leon Reference Fullart 604 Uniform Scale
+
+on:
+  push:
+    branches:
+      - work/leon-reference-hero-v1
+    paths:
+      - .github/workflows/leon-reference-fullart-604-uniform-scale.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render-604:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/leon-reference-hero-v1
+          fetch-depth: 1
+      - uses: actions/checkout@v4
+        with:
+          repository: EsotericSoftware/spine-runtimes
+          ref: 1c1936532527900f74cfb58f7002998bf157b254
+          path: .runtime/spine-runtimes
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Install bounded diagnostic dependencies
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow numpy PyYAML
+      - name: Execute 604 recipe with explicit uniform atlas-page scaling
+        env:
+          SKIN_ID: '604'
+          RENDER_PREDECESSOR: bccbdb564b3b2a70aeacfe6014f3829fdc7b09af
+        run: |
+          python - <<'PY'
+          import os, subprocess, yaml
+          from pathlib import Path
+          doc=yaml.safe_load(Path('.github/workflows/leon-reference-fullart-render.yml').read_text(encoding='utf-8'))
+          steps=doc['jobs']['render']['steps']; by_name={s.get('name'):s for s in steps if s.get('name')}; env=os.environ.copy()
+          for name in ['Restore verified representative renderer sources','Build exact version-matched geometry probe','Extract exact current-official Char render inputs','Render exact idle_Normal pose']:
+              script=by_name[name]['run']
+              if name=='Extract exact current-official Char render inputs':
+                  old="if isinstance(script,str): return script.encode('utf-8')"
+                  new="if isinstance(script,str): return script.encode('utf-8','surrogateescape')"
+                  if script.count(old)!=1: raise RuntimeError(f'byte patch point count={script.count(old)}')
+                  script=script.replace(old,new)
+                  strict="if (image.width,image.height)!=expected_size: raise RuntimeError(f'atlas texture size drift: {(image.width,image.height)} != {expected_size}')"
+                  scaled="""\nif (image.width,image.height)!=expected_size:\n    sx=image.width/expected_size[0]; sy=image.height/expected_size[1]\n    if abs(sx-sy)>1e-9:\n        raise RuntimeError(f'non-uniform atlas texture scaling: actual={(image.width,image.height)} expected={expected_size} scale={(sx,sy)}')\n    if not (0 < sx <= 1):\n        raise RuntimeError(f'unsupported atlas page scale: {sx}')\n    print(json.dumps({'atlasPageMetadataSize':expected_size,'texture2DSize':[image.width,image.height],'uniformScale':sx},ensure_ascii=False))\n"""
+                  if script.count(strict)!=1: raise RuntimeError(f'size patch point count={script.count(strict)}')
+                  script=script.replace(strict,scaled)
+              subprocess.run(['bash','-e','-c',script],check=True,env=env)
+          PY
+      - name: Append 604 scale evidence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('.probe-out/skin-604')
+          source=json.loads((root/'source.json').read_text(encoding='utf-8'))
+          atlas=next((root/'raw').glob('*.atlas.txt')).read_text(encoding='utf-8').splitlines()
+          lines=[x for x in atlas if x.strip()]
+          expected=[int(x.strip()) for x in lines[1].split(':',1)[1].split(',')]
+          actual=[source['inputs']['textureWidth'],source['inputs']['textureHeight']]
+          sx=actual[0]/expected[0]; sy=actual[1]/expected[1]
+          summary=json.loads((root/'summary.json').read_text(encoding='utf-8'))
+          summary['atlasPageMetadataSize']=expected
+          summary['texture2DSize']=actual
+          summary['uniformAtlasPageScale']=sx
+          summary['uniformScaleParity']=abs(sx-sy)<1e-9
+          summary['status']='PASS_LEON_REFERENCE_FULLART_RENDER_WITH_UNIFORM_ATLAS_SCALE'
+          (root/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(summary,ensure_ascii=False))
+          PY
+      - name: Upload bounded 604 artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: leon-reference-fullart-604-uniform-scale
+          path: .probe-out/skin-604
+          if-no-files-found: warn
