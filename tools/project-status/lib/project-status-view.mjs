@@ -158,6 +158,17 @@ export function projectStatusView(normalized) {
 }
 
 export function renderProjectStatusMarkdown(projectStatus) {
+  const healthImpactIssues = (projectStatus.reviewIssues ?? [])
+    .filter(issue => issue.healthImpactReviewEntryCount > 0);
+  const healthImpactIssueRows = healthImpactIssues.length > 0
+    ? healthImpactIssues.map(issue => [
+      escapeCell(issue.issueKey),
+      escapeCell(issue.domains.join(', ')),
+      escapeCell(issue.healthImpactReviewEntryCount),
+      escapeCell(issue.reportedReviewEntryCount),
+    ].join(' | ').replace(/^/, '| ').replace(/$/, ' |'))
+    : ['| - | - | 0 | 0 |'];
+
   const lines = [
     '# Project Status',
     '',
@@ -165,7 +176,8 @@ export function renderProjectStatusMarkdown(projectStatus) {
     '',
     `- Project health: **${projectStatus.projectHealth}**`,
     `- Hard errors: **${projectStatus.knownHardErrorTotal}**`,
-    `- Reviews: **${projectStatus.reviewTotal}**`,
+    `- Reported review entries: **${projectStatus.reportedReviewTotal}**`,
+    `- Health-impact review entries: **${projectStatus.healthImpactReviewTotal}**`,
     `- Blockers: **${projectStatus.blockerTotal}**`,
     `- Source: \`${projectStatus.source.path}\``,
     '',
@@ -180,6 +192,39 @@ export function renderProjectStatusMarkdown(projectStatus) {
       escapeCell(record.activeSource),
       escapeCell(nextWorkSummary(record.nextWork)),
     ].join(' | ').replace(/^/, '| ').replace(/$/, ' |')),
+    '',
+    '## Review 상태',
+    '',
+    '> Reported review entry는 source에 남아 있는 review 기록 수다. 현재 health를 REVIEW로 만드는 항목 수와 같지 않다.',
+    '',
+    `- Active review entries: **${projectStatus.activeReviewTotal}**`,
+    `- Resolved by evidence: **${projectStatus.resolvedReviewTotal}**`,
+    `- Deferred non-errors: **${projectStatus.deferredReviewTotal}**`,
+    `- Boundary notes: **${projectStatus.boundaryNoteTotal}**`,
+    `- Assigned health-impact issues: **${projectStatus.healthImpactIssueTotal}**`,
+    `- Unique assigned issues: **${projectStatus.uniqueIssueTotal}**`,
+    `- Unassigned review entries: **${projectStatus.unassignedReviewTotal}**`,
+    '',
+    '| Domain | Reported | Health-impact | Active | Resolved | Deferred | Boundary | Health |',
+    '|---|---:|---:|---:|---:|---:|---:|---|',
+    ...projectStatus.domains.map(record => [
+      escapeCell(record.domain),
+      escapeCell(record.reportedReviewTotal),
+      escapeCell(record.healthImpactReviewTotal),
+      escapeCell(record.activeReviewTotal),
+      escapeCell(record.resolvedReviewTotal),
+      escapeCell(record.deferredReviewTotal),
+      escapeCell(record.boundaryNoteTotal),
+      escapeCell(record.health),
+    ].join(' | ').replace(/^/, '| ').replace(/$/, ' |')),
+    '',
+    '### Health-impact issueKey',
+    '',
+    '> 아래 표는 explicit issueKey가 배정된 health-impact review만 보여준다. issueKey가 없는 review는 추측으로 묶거나 중복 제거하지 않는다.',
+    '',
+    '| Issue key | Domains | Health-impact entries | Reported entries |',
+    '|---|---|---:|---:|',
+    ...healthImpactIssueRows,
     '',
     '## 운용 경계',
     '',
