@@ -45,6 +45,12 @@ function assertEqual(actual, expected, label) {
   if (actual !== expected) fail(`${label} mismatch`, { expected, actual });
 }
 
+function assertPolicyTrue(policy, keys, label) {
+  if (!keys.some((key) => policy?.[key] === true)) {
+    fail(`${label} policy missing`, { acceptedKeys: keys, actual: policy ?? null });
+  }
+}
+
 function sorted(values) {
   return [...values].sort((a, b) => a.localeCompare(b, 'en'));
 }
@@ -58,7 +64,7 @@ function releaseAssetUrl(repository, releaseTag, assetName) {
 }
 
 async function downloadPinnedAsset(repository, releaseTag, assetSpec, outDir) {
-  if (!assetSpec || typeof assetSpec.name !== 'string' || !Number.isInteger(assetSpec.bytes)) {
+  if (!assetSpec || typeof assetSpec.name !== 'string' || !Number.isInteger(assetSpec.bytes) || assetSpec.bytes <= 0) {
     fail('invalid contract asset specification', assetSpec);
   }
   assertHexSha256(assetSpec.sha256, assetSpec.name);
@@ -81,7 +87,7 @@ async function downloadPinnedAsset(repository, releaseTag, assetSpec, outDir) {
 }
 
 function validateContract(contract) {
-  assertEqual(contract?.version, 1, 'contract version');
+  if (!Number.isInteger(contract?.version) || contract.version <= 0) fail('invalid contract version', contract?.version ?? null);
   assertEqual(contract?.contract, 'soldier-portrait-source-pack', 'contract identity');
   assertEqual(contract?.status, 'PASS', 'contract status');
   assertEqual(contract?.owner, 'soldier-assets', 'contract owner');
@@ -91,8 +97,8 @@ function validateContract(contract) {
   assertEqual(contract?.storage?.immutabilityPolicy, 'CONTENT_HASH_PINNED_FAIL_CLOSED', 'storage immutability policy');
   assertEqual(contract?.integrityPolicy?.failClosedOnAnyMismatch, true, 'fail-closed policy');
   assertEqual(contract?.integrityPolicy?.exactFileSetRequired, true, 'exact file-set policy');
-  assertEqual(contract?.integrityPolicy?.perFileSha256MustMatchV9Manifest, true, 'per-file SHA policy');
-  assertEqual(contract?.integrityPolicy?.perFileSizeMustMatchV9Manifest, true, 'per-file size policy');
+  assertPolicyTrue(contract?.integrityPolicy, ['perFileSha256MustMatchSourceManifest', 'perFileSha256MustMatchV9Manifest'], 'per-file SHA');
+  assertPolicyTrue(contract?.integrityPolicy, ['perFileSizeMustMatchSourceManifest', 'perFileSizeMustMatchV9Manifest'], 'per-file size');
   assertEqual(contract?.integrityPolicy?.soldierIdToFileNameMustRemainExact, true, 'ID-to-file policy');
   assertEqual(contract?.productionPolicy?.sourcePackFetchedAtRuntime, false, 'runtime source-pack policy');
   assertEqual(contract?.productionPolicy?.runtimePathChange, false, 'runtime path-change policy');
@@ -109,6 +115,12 @@ function validateContract(contract) {
   if (typeof contract?.authoritativePredecessor?.sourceManifest !== 'string') {
     fail('missing authoritative source manifest path');
   }
+  if (contract?.authority?.semanticAndSourceIdentity !== contract.authoritativePredecessor.sourceManifest) {
+    fail('source-pack authority/source-manifest mismatch', {
+      authority: contract?.authority?.semanticAndSourceIdentity ?? null,
+      sourceManifest: contract.authoritativePredecessor.sourceManifest,
+    });
+  }
 
   for (const key of ['archive', 'inventory', 'checksums']) {
     const spec = contract.storage[key];
@@ -120,24 +132,33 @@ function validateContract(contract) {
 }
 
 function validateManifestAndInventory(contract, manifest, inventory) {
-  assertEqual(manifest?.version, contract.authoritativePredecessor.sourceManifestVersion, 'source manifest version');
+  if (Number.isInteger(contract?.authoritativePredecessor?.sourceManifestVersion)) {
+    assertEqual(manifest?.version, contract.authoritativePredecessor.sourceManifestVersion, 'source manifest version');
+  }
   assertEqual(manifest?.status, 'PASS', 'source manifest status');
   assertEqual(manifest?.assetsReady, true, 'source manifest assetsReady');
-  assertEqual(manifest?.publicRoot, contract.authoritativePredecessor.sourcePublicRoot, 'source manifest publicRoot');
+  if (typeof contract?.authoritativePredecessor?.sourcePublicRoot === 'string') {
+    assertEqual(manifest?.publicRoot, contract.authoritativePredecessor.sourcePublicRoot, 'source manifest publicRoot');
+  }
 
   const manifestRecords = Array.isArray(manifest?.records) ? manifest.records : [];
-  const expectedCount = contract.coverage.fileCount;
+  const expectedCount = contract?.coverage?.fileCount;
+  if (!Number.isInteger(expectedCount) || expectedCount < 0) fail('invalid source-pack fileCount', expectedCount ?? null);
   assertEqual(manifestRecords.length, expectedCount, 'source manifest record count');
   assertEqual(manifest?.coverage?.canonicalSoldierCount, contract.coverage.canonicalSoldierCount, 'canonical Soldier coverage');
   assertEqual(manifest?.coverage?.canonicalNormalCount, contract.coverage.canonicalNormalCount, 'normal Soldier coverage');
   assertEqual(manifest?.coverage?.canonicalSpCount, contract.coverage.canonicalSpCount, 'SP Soldier coverage');
 
-  assertEqual(inventory?.version, 1, 'inventory version');
-  assertEqual(inventory?.schemaId, 'soldier-portrait-source-pack-inventory/v1', 'inventory schema');
+  if (!Number.isInteger(inventory?.version) || inventory.version <= 0) fail('invalid inventory version', inventory?.version ?? null);
+  if (typeof inventory?.schemaId !== 'string' || !inventory.schemaId.startsWith('soldier-portrait-source-pack-inventory/')) {
+    fail('invalid inventory schema', inventory?.schemaId ?? null);
+  }
   assertEqual(inventory?.status, 'PASS', 'inventory status');
   assertEqual(inventory?.sourceCommitSha, contract.authoritativePredecessor.sourceCommitSha, 'inventory source commit');
   assertEqual(inventory?.sourceManifest?.path, contract.authoritativePredecessor.sourceManifest, 'inventory source manifest path');
-  assertEqual(inventory?.sourceManifest?.version, contract.authoritativePredecessor.sourceManifestVersion, 'inventory source manifest version');
+  if (Number.isInteger(contract?.authoritativePredecessor?.sourceManifestVersion)) {
+    assertEqual(inventory?.sourceManifest?.version, contract.authoritativePredecessor.sourceManifestVersion, 'inventory source manifest version');
+  }
   assertEqual(inventory?.archive?.fileName, contract.storage.archive.name, 'inventory archive filename');
   assertEqual(inventory?.archive?.size, contract.storage.archive.bytes, 'inventory archive byte size');
   assertEqual(inventory?.archive?.sha256, contract.storage.archive.sha256, 'inventory archive SHA-256');
@@ -161,15 +182,15 @@ function validateManifestAndInventory(contract, manifest, inventory) {
     const soldierId = record?.soldierId;
     const fileName = record?.fileName;
     if (!Number.isInteger(soldierId) || fileName !== `${soldierId}.png`) {
-      fail('invalid v9 Soldier ID -> filename binding', { soldierId, fileName });
+      fail('invalid Soldier ID -> filename binding', { soldierId, fileName });
     }
-    if (manifestById.has(soldierId)) fail('duplicate Soldier ID in v9 manifest', soldierId);
-    assertHexSha256(record?.sha256, `v9 record ${soldierId}`);
-    if (!Number.isInteger(record?.size) || record.size <= 0) fail('invalid v9 source size', { soldierId, size: record?.size });
+    if (manifestById.has(soldierId)) fail('duplicate Soldier ID in source manifest', soldierId);
+    assertHexSha256(record?.sha256, `source record ${soldierId}`);
+    if (!Number.isInteger(record?.size) || record.size <= 0) fail('invalid source size', { soldierId, size: record?.size });
     manifestById.set(soldierId, record);
     totalBytes += record.size;
   }
-  assertEqual(totalBytes, contract.coverage.totalSourceBytes, 'v9 total source bytes');
+  assertEqual(totalBytes, contract.coverage.totalSourceBytes, 'source total bytes');
 
   for (const record of inventoryRecords) {
     const soldierId = record?.soldierId;
@@ -181,14 +202,14 @@ function validateManifestAndInventory(contract, manifest, inventory) {
 
   for (const [soldierId, source] of manifestById) {
     const external = inventoryById.get(soldierId);
-    if (!external) fail('inventory is missing v9 Soldier record', soldierId);
+    if (!external) fail('inventory is missing source Soldier record', soldierId);
     assertEqual(external.fileName, source.fileName, `inventory filename for ${soldierId}`);
     assertEqual(external.size, source.size, `inventory byte size for ${soldierId}`);
     assertEqual(external.sha256, source.sha256, `inventory SHA-256 for ${soldierId}`);
     assertEqual(external.isSp, source.isSp === true, `inventory SP flag for ${soldierId}`);
   }
 
-  return { manifestRecords, manifestById };
+  return { manifestRecords };
 }
 
 function validateChecksumFile(checksumText, contract) {
@@ -221,7 +242,7 @@ function listArchiveFiles(archivePath, expectedNames) {
 
   const actualNames = sorted(files);
   if (!exactArrayEqual(actualNames, expectedNames)) {
-    fail('archive file set differs from v9 manifest', {
+    fail('archive file set differs from source manifest', {
       expectedCount: expectedNames.length,
       actualCount: actualNames.length,
       missing: expectedNames.filter((name) => !actualNames.includes(name)),
@@ -237,7 +258,7 @@ function validateExtractedFiles(extractDir, manifestRecords) {
   const expectedNames = sorted(manifestRecords.map((record) => record.fileName));
   const actualNames = sorted(entries.map((entry) => entry.name));
   if (!exactArrayEqual(actualNames, expectedNames)) {
-    fail('extracted source file set differs from v9 manifest', { expectedCount: expectedNames.length, actualCount: actualNames.length });
+    fail('extracted source file set differs from source manifest', { expectedCount: expectedNames.length, actualCount: actualNames.length });
   }
 
   let totalBytes = 0;
@@ -291,7 +312,7 @@ async function main() {
 
   const sourceManifestPath = contract.authoritativePredecessor.sourceManifest;
   const manifest = readJson(sourceManifestPath);
-  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'soldier-portrait-source-pack-v1-'));
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'soldier-portrait-source-pack-'));
   const downloadDir = path.join(workDir, 'download');
   const extractDir = path.join(workDir, 'extract');
   fs.mkdirSync(downloadDir, { recursive: true });
@@ -317,9 +338,12 @@ async function main() {
     let hydratedDirectory = null;
     if (hydrateDirArg) hydratedDirectory = hydrateVerifiedFiles(extractDir, hydrateDirArg, manifestRecords);
 
-    console.log('SOLDIER SOURCE PACK A3: PASS');
+    console.log('SOLDIER SOURCE PACK VERIFICATION: PASS');
     console.log(JSON.stringify({
       contract: contractPath,
+      contractVersion: contract.version,
+      sourceManifest: sourceManifestPath,
+      sourceManifestVersion: manifest?.version ?? null,
       sourceCommitSha: contract.authoritativePredecessor.sourceCommitSha,
       releaseTag,
       fileCount: manifestRecords.length,
@@ -339,7 +363,7 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(`SOLDIER SOURCE PACK A3: FAIL - ${error.message}`);
+  console.error(`SOLDIER SOURCE PACK VERIFICATION: FAIL - ${error.message}`);
   if (error.detail !== undefined && error.detail !== null) console.error(JSON.stringify(error.detail, null, 2));
   process.exit(1);
 });
