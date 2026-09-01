@@ -9,6 +9,8 @@ import { useMemo, useState } from "react";
 
 import { getBannerPageData } from "@/lib/banner-page.functions";
 
+const DISPLAY_START_DATE = "2026-09-16";
+
 export const Route = createFileRoute("/banners")({
   loader: () => getBannerPageData(),
   head: () => ({
@@ -89,6 +91,26 @@ function BannerPage() {
     [data.cpRecords],
   );
 
+  const visibleDateGroups = useMemo(
+    () => data.dateGroups.filter((group) => group.date >= DISPLAY_START_DATE),
+    [data.dateGroups],
+  );
+
+  const visibleRows = useMemo(
+    () => visibleDateGroups.flatMap((group) => group.rows),
+    [visibleDateGroups],
+  );
+
+  const visibleSummary = useMemo(
+    () => ({
+      bannerRows: visibleRows.length,
+      dateGroups: visibleDateGroups.length,
+      wishRows: visibleRows.filter((row) => row.mechanicFamily === "WISH").length,
+      cpOccurrences: visibleRows.filter((row) => row.cpRelated).length,
+    }),
+    [visibleDateGroups.length, visibleRows],
+  );
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
@@ -108,23 +130,23 @@ function BannerPage() {
 
           <div className="grid grid-cols-2 gap-2 text-xs sm:flex sm:flex-wrap sm:justify-end">
             <span className="rounded-lg border border-border bg-card px-3 py-2 text-muted-foreground">
-              배너 <strong className="text-foreground">{data.summary.bannerRows}</strong>
+              배너 <strong className="text-foreground">{visibleSummary.bannerRows}</strong>
             </span>
             <span className="rounded-lg border border-border bg-card px-3 py-2 text-muted-foreground">
-              날짜 <strong className="text-foreground">{data.summary.dateGroups}</strong>
+              날짜 <strong className="text-foreground">{visibleSummary.dateGroups}</strong>
             </span>
             <span className="rounded-lg border border-border bg-card px-3 py-2 text-muted-foreground">
-              소원 <strong className="text-foreground">{data.summary.wishRows}</strong>
+              소원 <strong className="text-foreground">{visibleSummary.wishRows}</strong>
             </span>
             <span className="rounded-lg border border-border bg-card px-3 py-2 text-muted-foreground">
-              CP <strong className="text-foreground">{data.summary.cpOccurrences}</strong>
+              CP <strong className="text-foreground">{visibleSummary.cpOccurrences}</strong>
             </span>
           </div>
         </div>
 
         <section className="mt-8">
           <div className="space-y-8">
-            {data.dateGroups.map((group) => (
+            {visibleDateGroups.map((group) => (
               <section key={group.date} aria-labelledby={`date-${group.date}`}>
                 <div className="mb-3 flex items-center gap-2">
                   <CalendarDays size={17} className="text-muted-foreground" aria-hidden="true" />
@@ -255,7 +277,7 @@ function BannerPage() {
 
         <footer className="mt-10 border-t border-border pt-6 text-xs leading-5 text-muted-foreground">
           <p>
-            표시 범위는 현재 canonical KR schedule dataset이야. 최초 출시 여부, 고정 복각 주기, 미래 복각일은 이 페이지에서 추론하지 않아.
+            2026.09.16 이후의 canonical KR schedule dataset만 표시해. 최초 출시 여부, 고정 복각 주기, 미래 복각일은 이 페이지에서 추론하지 않아.
           </p>
         </footer>
       </div>
