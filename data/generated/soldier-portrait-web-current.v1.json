@@ -2,24 +2,17 @@
   "version": 1,
   "schemaId": "soldier-portrait-web-current/v1",
   "status": "CURRENT",
-  "purpose": "Rolling non-semantic production projection that selects the currently admitted Soldier portrait WebP manifest without requiring frontend code changes when immutable web manifest versions advance.",
+  "purpose": "Rolling non-semantic production selector for the currently admitted immutable Soldier portrait WebP manifest. All coverage, records, byte metadata, and publicRoot remain owned by the selected WebP manifest rather than being duplicated here.",
   "sourceLocator": "data/contracts/soldier-portrait-assets-current.v1.json",
   "sourceWebManifest": "data/generated/soldier-portrait-web-manifest.v1.json",
-  "sourceWebManifestVersion": 1,
-  "publicRoot": "images/soldiers-webp",
-  "assetsReady": true,
-  "coverage": {
-    "canonicalSoldierCount": 224,
-    "resolvedCount": 224,
-    "unresolvedCount": 0,
-    "resolvedSpCount": 56
-  },
   "role": {
     "semanticAuthority": false,
     "rollingProjectionOnly": true,
     "exactPointerSelection": true,
     "versionDiscovery": false,
     "semanticRecomputation": false,
-    "canonicalJoinRecomputation": false
+    "canonicalJoinRecomputation": false,
+    "duplicatesManifestCoverage": false,
+    "duplicatesManifestRecords": false
   }
 }
