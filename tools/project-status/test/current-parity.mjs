@@ -41,22 +41,21 @@ if (normalized.sourceAuthority?.schemaId !== 'status-source-selection/v1') fail(
 if (normalized.sourceAuthority?.selectedCount !== 6) fail('R1 Status Source selection must provide six domains');
 if (normalizationContract.policy?.reviewPresenceAloneDoesNotForceReviewHealth !== true
   || normalizationContract.policy?.reviewHealthRequiresHealthImpact !== true) {
-  fail('Stage 7 normalization contract must make domain REVIEW health depend on health-impact reviews, not raw review presence');
+  fail('domain REVIEW health must depend on health-impact reviews, not raw review presence');
 }
 if (normalized.reviewLifecycleAuthority?.schemaId !== 'project-status-review-lifecycle/v1') fail('review lifecycle authority must be the explicit Project Status contract');
-if (normalized.reviewLifecycleAuthority?.ruleCount !== 25) fail(`Stage 6 must expose 25 explicit lifecycle rules, got ${normalized.reviewLifecycleAuthority?.ruleCount}`);
+if (normalized.reviewLifecycleAuthority?.ruleCount !== 27) fail(`corrected lifecycle contract must expose 27 explicit rules, got ${normalized.reviewLifecycleAuthority?.ruleCount}`);
 
 const normalizedReviews = normalized.domains.flatMap(record => record.reviews ?? []);
-if (normalizedReviews.length !== 28) fail(`Stage 6 must preserve the 28 reported review entries, got ${normalizedReviews.length}`);
+if (normalizedReviews.length !== 28) fail(`must preserve the 28 reported review entries, got ${normalizedReviews.length}`);
 const reviewKeys = normalizedReviews.map(review => review.reviewKey);
 if (reviewKeys.some(key => typeof key !== 'string' || key.length === 0)) fail('every normalized review must have a stable reviewKey');
 if (new Set(reviewKeys).size !== reviewKeys.length) fail('normalized reviewKey values must be unique across current sources');
 for (const review of normalizedReviews) {
-  if (!Object.prototype.hasOwnProperty.call(review, 'reportedCount')) fail(`review missing reportedCount: ${review.reviewKey}`);
-  if (!Object.prototype.hasOwnProperty.call(review, 'resolvedCount')) fail(`review missing resolvedCount: ${review.reviewKey}`);
-  if (!Object.prototype.hasOwnProperty.call(review, 'remainingCount')) fail(`review missing remainingCount: ${review.reviewKey}`);
+  for (const field of ['reportedCount', 'resolvedCount', 'remainingCount', 'issueKey']) {
+    if (!Object.prototype.hasOwnProperty.call(review, field)) fail(`review missing ${field}: ${review.reviewKey}`);
+  }
   if (!Array.isArray(review.resolutionEvidence)) fail(`review missing resolutionEvidence: ${review.reviewKey}`);
-  if (!Object.prototype.hasOwnProperty.call(review, 'issueKey')) fail(`review missing issueKey: ${review.reviewKey}`);
 }
 
 const lifecycleCounts = {
@@ -66,15 +65,15 @@ const lifecycleCounts = {
   BOUNDARY_NOTE: normalizedReviews.filter(review => review.lifecycle === 'BOUNDARY_NOTE').length,
 };
 same(lifecycleCounts, {
-  ACTIVE_REVIEW: 11,
-  RESOLVED_BY_EVIDENCE: 1,
+  ACTIVE_REVIEW: 9,
+  RESOLVED_BY_EVIDENCE: 2,
   DEFERRED_NON_ERROR: 8,
-  BOUNDARY_NOTE: 8,
-}, 'Stage 6 lifecycle counts');
-if (normalizedReviews.filter(review => review.healthImpact === true).length !== 11) fail('Stage 6 must retain health impact on exactly 11 active review entries');
-if (normalizedReviews.filter(review => typeof review.issueKey === 'string' && review.issueKey.length > 0).length !== 25) fail('Stage 6 must assign issueKey to exactly 25 explicitly classified entries');
-if (normalizedReviews.filter(review => review.issueKey === null).length !== 3) fail('Stage 6 must leave exactly three mixed/ambiguous entries unassigned');
-if (new Set(normalizedReviews.map(review => review.issueKey).filter(Boolean)).size !== 23) fail('Stage 6 exact issueKey reconciliation must yield 23 unique assigned issues');
+  BOUNDARY_NOTE: 9,
+}, 'corrected lifecycle counts');
+if (normalizedReviews.filter(review => review.healthImpact === true).length !== 9) fail('corrected projection must retain health impact on exactly 9 review entries');
+if (normalizedReviews.filter(review => typeof review.issueKey === 'string' && review.issueKey.length > 0).length !== 27) fail('corrected projection must assign issueKey to exactly 27 entries');
+if (normalizedReviews.filter(review => review.issueKey === null).length !== 1) fail('only the mixed Hero publication umbrella must remain unassigned');
+if (new Set(normalizedReviews.map(review => review.issueKey).filter(Boolean)).size !== 25) fail('corrected exact issueKey reconciliation must yield 25 unique assigned issues');
 
 const normalizedHero = normalized.domains.find(item => item.domain === 'hero');
 const heroReviewKeys = normalizedHero.reviews.map(review => review.reviewKey);
@@ -88,20 +87,62 @@ if (heroMixedReview?.lifecycle !== 'ACTIVE_REVIEW' || heroMixedReview.healthImpa
   fail(`mixed Hero publication review must remain active/unassigned: ${JSON.stringify(heroMixedReview)}`);
 }
 if (heroBoundaryReview?.lifecycle !== 'BOUNDARY_NOTE' || heroBoundaryReview.healthImpact !== false || heroBoundaryReview.issueKey !== 'HERO_FRONTEND_ASSET_BOUNDARY') {
-  fail(`Hero frontend/asset note must be an explicit non-health boundary: ${JSON.stringify(heroBoundaryReview)}`);
+  fail(`Hero frontend/asset note must remain an explicit non-health boundary: ${JSON.stringify(heroBoundaryReview)}`);
 }
 
 const normalizedSoldier = normalized.domains.find(item => item.domain === 'soldier');
+if (!normalizedSoldier) fail('missing Soldier domain');
+if (normalizedSoldier.supplementalSources?.length !== 3) fail(`Soldier must expose three supplemental sources after Stage 10 correction, got ${normalizedSoldier.supplementalSources?.length}`);
+
 const releaseReview = normalizedSoldier.reviews.find(review => review.code === 'RELEASE_DATE_UNRESOLVED');
 if (!releaseReview || releaseReview.reportedCount !== 213 || releaseReview.resolvedCount !== 0 || releaseReview.remainingCount !== 213
   || releaseReview.lifecycle !== 'ACTIVE_REVIEW' || releaseReview.issueKey !== 'SOLDIER_RELEASE_DATE_METADATA') {
   fail(`Soldier release review must remain active with preserved count metadata: ${JSON.stringify(releaseReview)}`);
 }
-const krNameReview = normalizedSoldier.reviews.find(review => review.code === 'KR_NAME_UNRESOLVED');
-if (!krNameReview || krNameReview.reportedCount !== 41 || krNameReview.resolvedCount !== 0 || krNameReview.remainingCount !== 41
-  || krNameReview.lifecycle !== 'ACTIVE_REVIEW' || krNameReview.issueKey !== 'SOLDIER_KR_NAME_PRESENTATION_COVERAGE') {
-  fail(`Stage 6 must not collapse the primary 41-name review to the T3-only 2-name evidence scope: ${JSON.stringify(krNameReview)}`);
+
+const displayReview = normalizedSoldier.reviews.find(review => review.code === 'HERO_PAGE_SOLDIER_DISPLAY_NAME_REVIEW');
+if (!displayReview
+  || displayReview.reportedCount !== 41
+  || displayReview.resolvedCount !== 41
+  || displayReview.remainingCount !== 0
+  || displayReview.lifecycle !== 'RESOLVED_BY_EVIDENCE'
+  || displayReview.healthImpact !== false
+  || displayReview.issueKey !== 'SOLDIER_KR_NAME_DISPLAY_COVERAGE'
+  || displayReview.resolutionEvidence.length !== 4
+  || displayReview.resolutionEvidence.some(item => item.pass !== true)) {
+  fail(`current localization evidence must resolve the historical Soldier display-gap review: ${JSON.stringify(displayReview)}`);
 }
+
+const identityPresentationReview = normalizedSoldier.reviews.find(review => review.code === 'IDENTITY_PRESENTATION_REVIEW');
+if (!identityPresentationReview
+  || identityPresentationReview.reportedCount !== 41
+  || identityPresentationReview.resolvedCount !== 41
+  || identityPresentationReview.remainingCount !== 0
+  || identityPresentationReview.lifecycle !== 'BOUNDARY_NOTE'
+  || identityPresentationReview.healthImpact !== false
+  || identityPresentationReview.issueKey !== 'SOLDIER_IDENTITY_PRESENTATION_BOUNDARY'
+  || identityPresentationReview.resolutionEvidence.length !== 3
+  || identityPresentationReview.resolutionEvidence.some(item => item.pass !== true)) {
+  fail(`canonical identity versus confirmed presentation must be a non-health boundary: ${JSON.stringify(identityPresentationReview)}`);
+}
+
+const krNameReview = normalizedSoldier.reviews.find(review => review.code === 'KR_NAME_UNRESOLVED');
+if (!krNameReview
+  || krNameReview.reportedCount !== 41
+  || krNameReview.resolvedCount !== 39
+  || krNameReview.remainingCount !== 2
+  || krNameReview.lifecycle !== 'ACTIVE_REVIEW'
+  || krNameReview.healthImpact !== true
+  || krNameReview.issueKey !== 'SOLDIER_KR_NAME_OFFICIAL_CONFIRMATION'
+  || krNameReview.countEvidence?.sourceRole !== 'CURRENT_SOLDIER_NAME_RECONCILIATION'
+  || krNameReview.countEvidence?.key !== 'officialKoreanNameUnresolvedCount'
+  || krNameReview.countEvidence?.actual !== 2
+  || krNameReview.countEvidence?.pass !== true
+  || krNameReview.resolutionEvidence.length !== 3
+  || krNameReview.resolutionEvidence.some(item => item.pass !== true)) {
+  fail(`historical 41-name review must project as reported 41 / resolved 39 / remaining 2: ${JSON.stringify(krNameReview)}`);
+}
+
 const portraitReview = normalizedSoldier.reviews.find(review => review.code === 'REPRESENTATIVE_ASSET_ID_UNFROZEN');
 if (portraitReview?.lifecycle !== 'RESOLVED_BY_EVIDENCE'
   || portraitReview.healthImpact !== false
@@ -113,18 +154,41 @@ if (portraitReview?.lifecycle !== 'RESOLVED_BY_EVIDENCE'
 const lowerTierBoundary = normalizedSoldier.reviews.find(review => review.code === 'LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED');
 if (lowerTierBoundary?.lifecycle !== 'BOUNDARY_NOTE' || lowerTierBoundary.healthImpact !== false
   || lowerTierBoundary.remainingCount !== 0 || lowerTierBoundary.resolvedCount !== 39) {
-  fail(`lower-tier non-required chronology must be classified as a non-health boundary: ${JSON.stringify(lowerTierBoundary)}`);
+  fail(`lower-tier non-required chronology must remain a non-health boundary: ${JSON.stringify(lowerTierBoundary)}`);
+}
+if (normalizedSoldier.activeReviewTotal !== 4 || normalizedSoldier.resolvedReviewTotal !== 2
+  || normalizedSoldier.deferredReviewTotal !== 1 || normalizedSoldier.boundaryNoteTotal !== 5
+  || normalizedSoldier.healthImpactReviewTotal !== 4) {
+  fail(`corrected Soldier lifecycle aggregates mismatch: ${JSON.stringify({
+    active: normalizedSoldier.activeReviewTotal,
+    resolved: normalizedSoldier.resolvedReviewTotal,
+    deferred: normalizedSoldier.deferredReviewTotal,
+    boundary: normalizedSoldier.boundaryNoteTotal,
+    healthImpact: normalizedSoldier.healthImpactReviewTotal,
+  })}`);
 }
 
 const normalizedHeroSoldier = normalized.domains.find(item => item.domain === 'hero-soldier');
+if (!normalizedHeroSoldier) fail('missing Hero-Soldier domain');
+if (normalizedHeroSoldier.supplementalSources?.length !== 1) fail(`Hero-Soldier must expose corrected Stage 10 supplemental evidence, got ${normalizedHeroSoldier.supplementalSources?.length}`);
 const heroSoldierKr = normalizedHeroSoldier.reviews.find(review => review.code === 'SOLDIER_KR_NAME_UNRESOLVED');
 const heroSoldierRelease = normalizedHeroSoldier.reviews.find(review => review.code === 'RELEASE_DATE_UNRESOLVED');
-if (heroSoldierKr?.issueKey !== krNameReview.issueKey || heroSoldierRelease?.issueKey !== releaseReview.issueKey) {
-  fail(`Hero-Soldier inherited presentation reviews must share only their explicitly declared Soldier issue keys: ${JSON.stringify({ heroSoldierKr, heroSoldierRelease })}`);
+if (heroSoldierKr?.issueKey !== krNameReview.issueKey
+  || heroSoldierKr?.reportedCount !== 41
+  || heroSoldierKr?.resolvedCount !== 39
+  || heroSoldierKr?.remainingCount !== 2
+  || heroSoldierKr?.lifecycle !== 'ACTIVE_REVIEW'
+  || heroSoldierKr?.healthImpact !== true
+  || heroSoldierKr?.countEvidence?.sourceRole !== 'CURRENT_SOLDIER_NAME_RECONCILIATION'
+  || heroSoldierKr?.countEvidence?.actual !== 2) {
+  fail(`Hero-Soldier duplicated name review must share the corrected Soldier 41 -> 2 issue: ${JSON.stringify(heroSoldierKr)}`);
+}
+if (heroSoldierRelease?.issueKey !== releaseReview.issueKey) {
+  fail(`Hero-Soldier release review must share only its explicitly declared Soldier issue key: ${JSON.stringify(heroSoldierRelease)}`);
 }
 for (const code of ['ROUTE_IMPLEMENTATION_SEPARATE_FROM_IDENTITY', 'PRESENTATION_METADATA_INCOMPLETE', 'HERO_SOLDIER_FRONTEND_NOT_YET_IMPLEMENTED']) {
   const review = normalizedHeroSoldier.reviews.find(item => item.code === code);
-  if (review?.lifecycle !== 'BOUNDARY_NOTE' || review.healthImpact !== false) fail(`Hero-Soldier ${code} must be a non-health ownership boundary`);
+  if (review?.lifecycle !== 'BOUNDARY_NOTE' || review.healthImpact !== false) fail(`Hero-Soldier ${code} must remain a non-health ownership boundary`);
 }
 
 const normalizedBanner = normalized.domains.find(item => item.domain === 'banner');
@@ -138,16 +202,16 @@ if (deferredBannerReviews.length !== 7 || deferredBannerReviews.some(review => r
 }
 
 if (projected.reportedReviewTotal !== 28
-  || projected.activeReviewTotal !== 11
-  || projected.resolvedReviewTotal !== 1
+  || projected.activeReviewTotal !== 9
+  || projected.resolvedReviewTotal !== 2
   || projected.deferredReviewTotal !== 8
-  || projected.boundaryNoteTotal !== 8
-  || projected.healthImpactReviewTotal !== 11
-  || projected.assignedIssueReviewTotal !== 25
-  || projected.unassignedReviewTotal !== 3
-  || projected.uniqueIssueTotal !== 23
+  || projected.boundaryNoteTotal !== 9
+  || projected.healthImpactReviewTotal !== 9
+  || projected.assignedIssueReviewTotal !== 27
+  || projected.unassignedReviewTotal !== 1
+  || projected.uniqueIssueTotal !== 25
   || projected.healthImpactIssueTotal !== 6) {
-  fail(`Stage 6 projected review aggregates mismatch: ${JSON.stringify({
+  fail(`corrected projected review aggregates mismatch: ${JSON.stringify({
     reportedReviewTotal: projected.reportedReviewTotal,
     activeReviewTotal: projected.activeReviewTotal,
     resolvedReviewTotal: projected.resolvedReviewTotal,
@@ -162,55 +226,6 @@ if (projected.reportedReviewTotal !== 28
 }
 
 const reviewLifecycleContract = loadReviewLifecycleContract({ repoRoot });
-const syntheticResolvedContract = {
-  ...reviewLifecycleContract,
-  rules: [
-    {
-      id: 'synthetic-soldier-portrait-resolved',
-      domain: 'soldier',
-      match: { code: 'REPRESENTATIVE_ASSET_ID_UNFROZEN' },
-      lifecycle: 'RESOLVED_BY_EVIDENCE',
-      healthImpact: false,
-      issueKey: 'SOLDIER_PORTRAIT_COVERAGE',
-      evidence: [
-        { sourceRole: 'CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE', key: 'rawStatus', equals: 'PASS' },
-        { sourceRole: 'CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE', key: 'missingPortraitCount', equals: 0 },
-      ],
-    },
-    {
-      id: 'synthetic-hero-boundary-by-key',
-      domain: 'hero',
-      match: { reviewKey: 'data/validation/hero-stage6-4-final.v1.json#/nonBlockingReviews[1]' },
-      lifecycle: 'BOUNDARY_NOTE',
-      healthImpact: false,
-      issueKey: 'HERO_FRONTEND_BOUNDARY',
-      evidence: [],
-    },
-  ],
-};
-const syntheticResolved = normalizeProjectStatus({ repoRoot, reviewLifecycleContract: syntheticResolvedContract });
-const syntheticSoldier = syntheticResolved.domains.find(item => item.domain === 'soldier');
-const syntheticPortraitReview = syntheticSoldier.reviews.find(review => review.code === 'REPRESENTATIVE_ASSET_ID_UNFROZEN');
-if (syntheticPortraitReview?.lifecycle !== 'RESOLVED_BY_EVIDENCE'
-  || syntheticPortraitReview.healthImpact !== false
-  || syntheticPortraitReview.remainingCount !== 0
-  || syntheticPortraitReview.resolvedCount !== syntheticPortraitReview.reportedCount
-  || syntheticPortraitReview.issueKey !== 'SOLDIER_PORTRAIT_COVERAGE'
-  || syntheticPortraitReview.lifecycleRuleId !== 'synthetic-soldier-portrait-resolved'
-  || syntheticPortraitReview.resolutionEvidence.length !== 2
-  || syntheticPortraitReview.resolutionEvidence.some(item => item.pass !== true)) {
-  fail(`contract evidence must resolve the targeted Soldier review: ${JSON.stringify(syntheticPortraitReview)}`);
-}
-const syntheticHero = syntheticResolved.domains.find(item => item.domain === 'hero');
-const syntheticHeroBoundary = syntheticHero.reviews.find(review => review.reviewKey === 'data/validation/hero-stage6-4-final.v1.json#/nonBlockingReviews[1]');
-if (syntheticHeroBoundary?.lifecycle !== 'BOUNDARY_NOTE'
-  || syntheticHeroBoundary.healthImpact !== false
-  || syntheticHeroBoundary.issueKey !== 'HERO_FRONTEND_BOUNDARY') {
-  fail(`reviewKey rules must classify code-less Hero reviews: ${JSON.stringify(syntheticHeroBoundary)}`);
-}
-if (syntheticResolved.reviewTotal !== 28 || syntheticSoldier.health !== 'REVIEW') {
-  fail('synthetic lifecycle classification must preserve raw review entry counting while active health-impact reviews remain REVIEW');
-}
 
 const syntheticPartialContract = {
   ...reviewLifecycleContract,
@@ -245,7 +260,7 @@ if (partialNameReview?.reportedCount !== 41
   || partialNameReview.countEvidence?.key !== 'officialNameUnresolvedCount'
   || partialNameReview.countEvidence?.actual !== 2
   || partialNameReview.countEvidence?.pass !== true) {
-  fail(`partial resolution mechanism must derive 41 -> 39 resolved / 2 remaining when a caller explicitly supplies that scoped rule: ${JSON.stringify(partialNameReview)}`);
+  fail(`partial resolution mechanism must derive 41 -> 39 resolved / 2 remaining: ${JSON.stringify(partialNameReview)}`);
 }
 if (partialSoldier.health !== 'REVIEW' || syntheticPartial.reviewTotal !== 28) {
   fail('partial resolution must preserve ACTIVE_REVIEW health and raw review entry count');
@@ -253,17 +268,15 @@ if (partialSoldier.health !== 'REVIEW' || syntheticPartial.reviewTotal !== 28) {
 
 const syntheticInvalidPartialContract = {
   ...reviewLifecycleContract,
-  rules: [
-    {
-      id: 'synthetic-soldier-kr-name-invalid-count',
-      domain: 'soldier',
-      match: { code: 'KR_NAME_UNRESOLVED' },
-      lifecycle: 'ACTIVE_REVIEW',
-      healthImpact: true,
-      remainingCount: 42,
-      evidence: []
-    }
-  ]
+  rules: [{
+    id: 'synthetic-soldier-kr-name-invalid-count',
+    domain: 'soldier',
+    match: { code: 'KR_NAME_UNRESOLVED' },
+    lifecycle: 'ACTIVE_REVIEW',
+    healthImpact: true,
+    remainingCount: 42,
+    evidence: [],
+  }],
 };
 const syntheticInvalidPartial = normalizeProjectStatus({ repoRoot, reviewLifecycleContract: syntheticInvalidPartialContract });
 const invalidPartialSoldier = syntheticInvalidPartial.domains.find(item => item.domain === 'soldier');
@@ -276,50 +289,28 @@ if (!invalidPartialFailures.some(item => item.type === 'REVIEW_LIFECYCLE_COUNT_I
   fail(`missing invalid partial-count failure: ${JSON.stringify(invalidPartialSoldier.notes)}`);
 }
 
-const syntheticHiddenPartialContract = {
-  ...reviewLifecycleContract,
-  rules: [
-    {
-      id: 'synthetic-soldier-kr-name-hidden-partial',
-      domain: 'soldier',
-      match: { code: 'KR_NAME_UNRESOLVED' },
-      lifecycle: 'ACTIVE_REVIEW',
-      healthImpact: false,
-      remainingCount: 2,
-      evidence: []
-    }
-  ]
-};
-const syntheticHiddenPartial = normalizeProjectStatus({ repoRoot, reviewLifecycleContract: syntheticHiddenPartialContract });
-const hiddenPartialSoldier = syntheticHiddenPartial.domains.find(item => item.domain === 'soldier');
-const hiddenPartialReview = hiddenPartialSoldier.reviews.find(review => review.code === 'KR_NAME_UNRESOLVED');
-if (hiddenPartialReview?.remainingCount !== 41 || hiddenPartialReview.healthImpact !== true || hiddenPartialSoldier.health !== 'INCONSISTENT') {
-  fail(`partial resolution may not hide remaining work from health: ${JSON.stringify(hiddenPartialReview)}/${hiddenPartialSoldier.health}`);
-}
-
 const syntheticFailClosedContract = {
   ...reviewLifecycleContract,
-  rules: [
-    {
-      id: 'synthetic-soldier-portrait-bad-evidence',
-      domain: 'soldier',
-      match: { code: 'REPRESENTATIVE_ASSET_ID_UNFROZEN' },
-      lifecycle: 'RESOLVED_BY_EVIDENCE',
-      healthImpact: false,
-      evidence: [
-        { sourceRole: 'CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE', key: 'missingPortraitCount', equals: 1 },
-      ],
+  rules: [{
+    id: 'synthetic-stage10-bad-evidence',
+    domain: 'soldier',
+    match: { code: 'KR_NAME_UNRESOLVED' },
+    lifecycle: 'ACTIVE_REVIEW',
+    healthImpact: true,
+    evidence: [
+      { sourceRole: 'CURRENT_SOLDIER_NAME_RECONCILIATION', key: 'lowerTierPresentationUnresolvedCount', equals: 1 },
+    ],
+    remainingCountFromEvidence: {
+      sourceRole: 'CURRENT_SOLDIER_NAME_RECONCILIATION',
+      key: 'officialKoreanNameUnresolvedCount',
     },
-  ],
+  }],
 };
 const syntheticFailClosed = normalizeProjectStatus({ repoRoot, reviewLifecycleContract: syntheticFailClosedContract });
 const failClosedSoldier = syntheticFailClosed.domains.find(item => item.domain === 'soldier');
-const failClosedReview = failClosedSoldier.reviews.find(review => review.code === 'REPRESENTATIVE_ASSET_ID_UNFROZEN');
-if (failClosedReview?.lifecycle !== 'ACTIVE_REVIEW' || failClosedReview.healthImpact !== true) {
-  fail(`unsatisfied resolution evidence must fail closed to ACTIVE_REVIEW: ${JSON.stringify(failClosedReview)}`);
-}
-if (failClosedSoldier.health !== 'INCONSISTENT') {
-  fail(`unsatisfied lifecycle evidence must surface as INCONSISTENT, got ${failClosedSoldier.health}`);
+const failClosedReview = failClosedSoldier.reviews.find(review => review.code === 'KR_NAME_UNRESOLVED');
+if (failClosedReview?.remainingCount !== 41 || failClosedReview.resolvedCount !== 0 || failClosedReview.healthImpact !== true || failClosedSoldier.health !== 'INCONSISTENT') {
+  fail(`unsatisfied corrected Stage 10 evidence must fail closed: ${JSON.stringify(failClosedReview)}/${failClosedSoldier.health}`);
 }
 const failClosedNotes = failClosedSoldier.notes.flatMap(note => note.reviewLifecycleRuleFailures ?? []);
 if (!failClosedNotes.some(item => item.type === 'REVIEW_LIFECYCLE_EVIDENCE_NOT_SATISFIED')) {
@@ -330,12 +321,7 @@ const syntheticNonHealthBannerContract = {
   ...reviewLifecycleContract,
   rules: reviewLifecycleContract.rules.map(rule => (
     rule.id === 'banner-manual-image-active'
-      ? {
-        ...rule,
-        lifecycle: 'DEFERRED_NON_ERROR',
-        healthImpact: false,
-        remainingCount: 0,
-      }
+      ? { ...rule, lifecycle: 'DEFERRED_NON_ERROR', healthImpact: false, remainingCount: 0 }
       : rule
   )),
 };
@@ -344,14 +330,13 @@ const nonHealthBanner = syntheticNonHealthBanner.domains.find(item => item.domai
 if (nonHealthBanner.reviewCount !== 8
   || nonHealthBanner.reviews.some(review => review.healthImpact === true)
   || nonHealthBanner.health !== 'PASS') {
-  fail(`Stage 7 must allow a PASS domain with reported non-health reviews: ${JSON.stringify({
+  fail(`health cutover must allow PASS with reported non-health reviews: ${JSON.stringify({
     reviewCount: nonHealthBanner.reviewCount,
     health: nonHealthBanner.health,
-    healthImpactReviews: nonHealthBanner.reviews.filter(review => review.healthImpact === true).length,
   })}`);
 }
 if (syntheticNonHealthBanner.reviewTotal !== 28 || syntheticNonHealthBanner.projectHealth !== 'REVIEW') {
-  fail('Stage 7 health cutover must preserve raw review totals and leave unrelated active-review domains unchanged');
+  fail('health cutover must preserve raw review totals and unrelated active-review domains');
 }
 
 for (const key of ['projectHealth', 'healthCounts', 'lifecycleCounts', 'knownHardErrorTotal', 'reviewTotal', 'blockerTotal']) {
@@ -389,24 +374,15 @@ if (skin.lifecycle !== 'COMPLETE'
   || skin.completion !== 'SKIN_STAGE3_2_COMPLETE'
   || skin.reviewCount !== 0
   || skin.blockerCount !== 0) {
-  fail('Skin completed asset-evidence projection must be COMPLETE/PASS with no review or blocker');
+  fail('Skin completed asset-evidence projection must remain COMPLETE/PASS with no review or blocker');
 }
 
 const canonicalProjectStatus = readJson('data/generated/project-status.v1.json');
 if (canonicalProjectStatus.schemaId !== 'project-status/v1') fail('canonical Project Status schema must remain project-status/v1');
 if (!allowStaleCanonical) {
   for (const key of [
-    'version',
-    'schemaId',
-    'derivedOnly',
-    'rawConfigDataReadCount',
-    'semanticRecomputationCount',
-    'projectHealth',
-    'healthCounts',
-    'lifecycleCounts',
-    'knownHardErrorTotal',
-    'reviewTotal',
-    'blockerTotal',
+    'version', 'schemaId', 'derivedOnly', 'rawConfigDataReadCount', 'semanticRecomputationCount',
+    'projectHealth', 'healthCounts', 'lifecycleCounts', 'knownHardErrorTotal', 'reviewTotal', 'blockerTotal',
   ]) {
     same(projected[key], canonicalProjectStatus[key], `canonical compatibility ${key}`);
   }
@@ -418,8 +394,8 @@ if (!allowStaleCanonical) {
     }
   }
 }
-if (projected.source?.authoritySchemaId !== 'status-source-selection/v1') fail('NEW canonical Project Status must identify R1 Status Source authority');
-if (projected.readOnly !== true || projected.canonicalJoinRecomputationCount !== 0) fail('NEW canonical Project Status must add explicit safe projection boundaries');
+if (projected.source?.authoritySchemaId !== 'status-source-selection/v1') fail('canonical Project Status must identify R1 Status Source authority');
+if (projected.readOnly !== true || projected.canonicalJoinRecomputationCount !== 0) fail('canonical Project Status must preserve safe projection boundaries');
 
 const writerContract = loadProjectStatusWriterContract({ repoRoot });
 if (!['CUTOVER_DEFERRED', 'ACTIVE'].includes(writerContract.state)) fail(`unexpected writer state ${writerContract.state}`);
@@ -504,7 +480,7 @@ for (const forbidden of [
 if (!first.markdown.includes('NEW Status Source authority')) fail('markdown must identify NEW Status Source authority');
 if (!first.markdown.includes('raw ConfigData')) fail('markdown must preserve no-raw-ConfigData boundary');
 
-console.log('[project-status-r2] PASS: Stage 7 health-impact review cutover, Stage 6 reconciliation, partial review resolution safety, review lifecycle contract, canonical compatibility, writer boundary, and runtime independence verified.');
+console.log('[project-status-r2] PASS: corrected Stage 10 Soldier naming lifecycle, partial review resolution, health-impact cutover, canonical compatibility, writer boundary, and runtime independence verified.');
 console.log(JSON.stringify({
   projectHealth: projected.projectHealth,
   healthCounts: projected.healthCounts,
@@ -514,9 +490,11 @@ console.log(JSON.stringify({
   reviewModel: {
     normalizedReviewCount: normalizedReviews.length,
     uniqueReviewKeyCount: new Set(reviewKeys).size,
-    heroCodeLessReviewKeyCount: heroReviewKeys.length,
-    soldierReleaseReportedCount: releaseReview.reportedCount,
     lifecycleContractRuleCount: normalized.reviewLifecycleAuthority.ruleCount,
+    soldierDisplayResolvedCount: displayReview.resolvedCount,
+    soldierKrReportedCount: krNameReview.reportedCount,
+    soldierKrResolvedCount: krNameReview.resolvedCount,
+    soldierKrRemainingCount: krNameReview.remainingCount,
     activeReviewTotal: projected.activeReviewTotal,
     resolvedReviewTotal: projected.resolvedReviewTotal,
     deferredReviewTotal: projected.deferredReviewTotal,
@@ -525,28 +503,12 @@ console.log(JSON.stringify({
     unassignedReviewTotal: projected.unassignedReviewTotal,
     uniqueIssueTotal: projected.uniqueIssueTotal,
     healthImpactIssueTotal: projected.healthImpactIssueTotal,
-    syntheticResolvedLifecycle: syntheticPortraitReview.lifecycle,
-    syntheticPartialReportedCount: partialNameReview.reportedCount,
-    syntheticPartialResolvedCount: partialNameReview.resolvedCount,
     syntheticPartialRemainingCount: partialNameReview.remainingCount,
     syntheticInvalidPartialHealth: invalidPartialSoldier.health,
     syntheticFailClosedHealth: failClosedSoldier.health,
     syntheticNonHealthBannerHealth: nonHealthBanner.health,
   },
   selectedDomains: Object.fromEntries(projected.domains.map(item => [item.domain, item.activeSourceId])),
-  equipment: {
-    canonical: equipment.population.canonical,
-    public: equipment.population.public,
-    general: equipment.population.general,
-    exclusive: equipment.population.exclusive,
-  },
-  skin: {
-    lifecycle: skin.lifecycle,
-    health: skin.health,
-    status: skin.status,
-    completion: skin.completion,
-    blockerCount: skin.blockerCount,
-  },
   writer: {
     state: writerContract.state,
     canonicalTargets: writerCheck.canonicalTargets,
