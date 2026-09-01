@@ -1,0 +1,210 @@
+name: Skin FULLART Representative Crosscheck
+
+on:
+  push:
+    branches:
+      - work/skin-fullart-representative-crosscheck-20260901
+    paths:
+      - .github/workflows/skin-fullart-representative-crosscheck.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  crosscheck:
+    strategy:
+      fail-fast: false
+      matrix:
+        skin_id: [1901, 3701]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bounded crosscheck branch
+        uses: actions/checkout@v4
+        with:
+          ref: work/skin-fullart-representative-crosscheck-20260901
+          fetch-depth: 0
+
+      - name: Checkout exact official Spine 3.3-era runtime
+        uses: actions/checkout@v4
+        with:
+          repository: EsotericSoftware/spine-runtimes
+          ref: 1c1936532527900f74cfb58f7002998bf157b254
+          path: .runtime/spine-runtimes
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install bounded dependencies
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow numpy
+
+      - name: Patch existing FULLART probe for exact representative ID
+        env:
+          SKIN_ID: ${{ matrix.skin_id }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          sid = int(os.environ['SKIN_ID'])
+
+          p = Path('scripts/extract-skin-fullart0-spine-source.py')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('== 102)', f'== {sid})')
+          s = s.replace("'skinId': 102,", f"'skinId': {sid},")
+          s = s.replace('Skin 102', f'Skin {sid}')
+          p.write_text(s, encoding='utf-8')
+
+          p = Path('scripts/extract-skin-fullart0-atlas-page.py')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('== 102)', f'== {sid})')
+          s = s.replace("'skinId': 102,", f"'skinId': {sid},")
+          s = s.replace('Skin 102', f'Skin {sid}')
+          s = s.replace('*Mathew_Skin01.atlas.atlas.txt', '*.atlas.atlas.txt')
+          s = s.replace('*Mathew_Skin01.skel.skel.bytes', '*.skel.skel.bytes')
+          p.write_text(s, encoding='utf-8')
+
+          p = Path('scripts/render-skin-fullart0-geometry.py')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace("'skinId': 102,", f"'skinId': {sid},")
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Build exact version-matched Spine geometry probe
+        run: |
+          mkdir -p .runtime/geometry
+          runtime_src="$GITHUB_WORKSPACE/.runtime/spine-runtimes/spine-csharp/src"
+          program="$GITHUB_WORKSPACE/tools/skin-fullart0/SpineGeometry.cs"
+          cat > .runtime/geometry/SpineGeometry.csproj <<EOF
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net8.0</TargetFramework>
+              <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+              <Nullable>disable</Nullable>
+              <ImplicitUsings>disable</ImplicitUsings>
+              <LangVersion>latest</LangVersion>
+              <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+            </PropertyGroup>
+            <ItemGroup>
+              <Compile Include="$runtime_src/**/*.cs" />
+              <Compile Include="$program" />
+            </ItemGroup>
+          </Project>
+          EOF
+          dotnet build .runtime/geometry/SpineGeometry.csproj -c Release
+
+      - name: Re-extract current Char source chain
+        env:
+          SKIN_ID: ${{ matrix.skin_id }}
+        run: |
+          rm -rf .skin-fullart0-spine-source
+          python scripts/extract-skin-fullart0-spine-source-v2.py
+          python scripts/extract-skin-fullart0-atlas-page.py
+          mkdir -p ".probe-out/skin-${SKIN_ID}"
+          cp data/evidence/skin-fullart0-spine-source.v1.json ".probe-out/skin-${SKIN_ID}/char-source.json"
+          cp data/evidence/skin-fullart0-render-input.v1.json ".probe-out/skin-${SKIN_ID}/char-render-input.json"
+
+      - name: Render current Char idle_Normal
+        env:
+          SKIN_ID: ${{ matrix.skin_id }}
+        run: |
+          atlas="$(python -c "import json; print(json.load(open('data/evidence/skin-fullart0-render-input.v1.json'))['inputs']['atlas']['path'])")"
+          skel="$(python -c "import json; print(json.load(open('data/evidence/skin-fullart0-render-input.v1.json'))['inputs']['skeleton']['path'])")"
+          texture="$(python -c "import json; print(json.load(open('data/evidence/skin-fullart0-render-input.v1.json'))['inputs']['texture']['path'])")"
+          dotnet run --project .runtime/geometry/SpineGeometry.csproj -c Release --no-build -- \
+            "$atlas" "$skel" ".probe-out/skin-${SKIN_ID}/char-geometry.json"
+          python scripts/render-skin-fullart0-geometry.py \
+            --geometry ".probe-out/skin-${SKIN_ID}/char-geometry.json" \
+            --texture "$texture" \
+            --output ".probe-out/skin-${SKIN_ID}/char.png" \
+            --evidence-output ".probe-out/skin-${SKIN_ID}/char-render.json"
+
+      - name: Freeze exact Stage 3-2 split summary
+        env:
+          SKIN_ID: ${{ matrix.skin_id }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          sid = int(os.environ['SKIN_ID'])
+          stage = json.load(open('data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json', encoding='utf-8'))
+          fixture = next(r for r in stage['fixtures'] if int(r['skinId']) == sid)
+          exact_general = [r for r in fixture['model']['resources'] if int(r['skinResourceId']) == sid]
+          if len(exact_general) != 1:
+              raise RuntimeError(f'exact General resource count != 1: {len(exact_general)}')
+          root = Path(f'.probe-out/skin-{sid}')
+          source = json.load(open(root / 'char-source.json', encoding='utf-8'))
+          render_input = json.load(open(root / 'char-render-input.json', encoding='utf-8'))
+          geometry = json.load(open(root / 'char-geometry.json', encoding='utf-8'))
+          render = json.load(open(root / 'char-render.json', encoding='utf-8'))
+          result = {
+              'skinId': sid,
+              'status': 'PASS_REPRESENTATIVE_SPLIT_AND_CHAR_RENDER',
+              'authority': {
+                  'stage3_2Evidence': 'data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json',
+                  'officialInstallerVersion': stage['source']['installVersion'],
+              },
+              'guardrails': {
+                  'historicalArtifactImported': False,
+                  'imageGeneratedByAI': False,
+                  'nameJoin': False,
+                  'idArithmetic': False,
+                  'generalExactSkinResourceId': True,
+              },
+              'static': {
+                  'family': 'STATIC',
+                  'sourceImagePath': fixture['static']['sourceImagePath'],
+                  'resolvedSourcePath': fixture['static']['resolvedSourcePath'],
+                  'sha256': fixture['static']['sha256'],
+              },
+              'char': {
+                  'family': 'Spine/Char',
+                  'sourceSpinePath': fixture['spine']['sourceSpinePath'],
+                  'resolvedPrefabPath': fixture['spine']['resolvedPrefabPath'],
+                  'spineVersion': source['spineBinaryHeader']['version'],
+                  'atlasTextureSize': [render_input['inputs']['texture']['width'], render_input['inputs']['texture']['height']],
+                  'animation': geometry['skeleton']['pose'],
+                  'renderables': geometry['geometry']['renderableAttachmentCount'],
+                  'triangles': geometry['geometry']['triangleCount'],
+                  'bounds': geometry['geometry']['bounds'],
+                  'renderPath': render['render']['outputPath'],
+                  'renderCanvas': [render['render']['canvasWidth'], render['render']['canvasHeight']],
+                  'alphaBBox': render['render']['alphaBBox'],
+              },
+              'general': {
+                  'family': 'Spine/General',
+                  'skinResourceId': exact_general[0]['skinResourceId'],
+                  'prefabPath': exact_general[0]['prefabPath'],
+                  'resolvedContainerPath': exact_general[0]['resolvedContainerPath'],
+                  'sha256': exact_general[0]['sha256'],
+              },
+              'decision': 'VISUAL_REVIEW_CHAR_OUTPUT_BEFORE_BULK_EXPANSION',
+          }
+          (root / 'summary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps(result, ensure_ascii=False))
+          PY
+
+      - name: Upload representative crosscheck
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-fullart-representative-${{ matrix.skin_id }}
+          path: .probe-out/skin-${{ matrix.skin_id }}
+          if-no-files-found: error
+
+      - name: Restore tracked probe files
+        if: always()
+        run: |
+          git checkout -- \
+            scripts/extract-skin-fullart0-spine-source.py \
+            scripts/extract-skin-fullart0-atlas-page.py \
+            scripts/render-skin-fullart0-geometry.py
+          rm -rf .runtime .skin-fullart0-spine-source scripts/__pycache__
