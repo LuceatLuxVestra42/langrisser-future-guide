@@ -82,13 +82,13 @@ assertRoute(
 assertRoute(
   'public/images/soldiers-webp/9999.webp',
   ['soldier-assets', 'soldier-frontend'],
-  ['production-build', 'soldier-assets'],
+  ['soldier-assets', 'production-build'],
 );
 
 assertRoute(
   'data/generated/soldier-portrait-web-current.v1.json',
   ['soldier-assets', 'soldier-frontend'],
-  ['production-build', 'soldier-assets'],
+  ['soldier-assets', 'production-build'],
 );
 
 console.log(JSON.stringify({
