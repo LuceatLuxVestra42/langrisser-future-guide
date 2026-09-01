@@ -38,18 +38,27 @@ const sourceFingerprint = (repoRoot, record) => {
   ].filter(Boolean);
 
   const hash = createHash('sha256');
+  const unreadableSources = [];
+  let hashedSourceCount = 0;
   for (const sourcePath of sourcePaths) {
-    const bytes = fs.readFileSync(repositoryFile(repoRoot, sourcePath));
-    hash.update(sourcePath, 'utf8');
-    hash.update('\0', 'utf8');
-    hash.update(bytes);
-    hash.update('\0', 'utf8');
+    try {
+      const bytes = fs.readFileSync(repositoryFile(repoRoot, sourcePath));
+      hash.update(sourcePath, 'utf8');
+      hash.update('\0', 'utf8');
+      hash.update(bytes);
+      hash.update('\0', 'utf8');
+      hashedSourceCount += 1;
+    } catch {
+      unreadableSources.push(sourcePath);
+    }
   }
 
   return {
     algorithm: 'sha256',
-    digest: hash.digest('hex'),
+    digest: unreadableSources.length === 0 ? hash.digest('hex') : null,
     sourceCount: sourcePaths.length,
+    hashedSourceCount,
+    ...(unreadableSources.length > 0 ? { unreadableSources } : {}),
   };
 };
 
