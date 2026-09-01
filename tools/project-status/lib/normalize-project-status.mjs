@@ -59,16 +59,34 @@ const selectValues = (source, selectors = {}) => Object.fromEntries(
 const selectorMissing = (selected, selectors = {}) => Object.keys(selectors)
   .filter(key => selected[key] === undefined);
 
-const normalizeReview = (value, sourcePath, selector, index = null) => {
-  if (typeof value === 'string') {
-    return { code: value, scope: 'unknown', source: sourcePath, selector, raw: value };
-  }
-  if (!isObject(value)) {
-    return { code: null, scope: 'unknown', source: sourcePath, selector, raw: value };
-  }
+const reviewKeyFor = ({ sourcePath, selector, index, code }) => {
+  if (typeof code === 'string' && code.length > 0) return `${sourcePath}#${code}`;
+  return `${sourcePath}#${selector}${index === null ? '' : `[${index}]`}`;
+};
+
+const reviewCountFor = value => (
+  isObject(value) && typeof value.count === 'number' && Number.isFinite(value.count)
+    ? value.count
+    : null
+);
+
+export const normalizeReview = (value, sourcePath, selector, index = null) => {
+  const code = typeof value === 'string'
+    ? value
+    : isObject(value)
+      ? value.code ?? value.blocker ?? null
+      : null;
+  const reportedCount = reviewCountFor(value);
   return {
-    code: value.code ?? value.blocker ?? null,
+    reviewKey: reviewKeyFor({ sourcePath, selector, index, code }),
+    code,
     scope: 'unknown',
+    lifecycle: 'ACTIVE_REVIEW',
+    healthImpact: true,
+    reportedCount,
+    remainingCount: reportedCount,
+    resolutionEvidence: [],
+    issueKey: null,
     source: sourcePath,
     selector,
     ...(index === null ? {} : { index }),
@@ -125,9 +143,7 @@ const expectedValueForKey = (expectedKey, primarySelected, supplements) => {
   if (!stageMatch) return undefined;
   const digits = stageMatch[1];
   const stageTokens = [`stage${digits}`];
-  if (digits.length === 2) {
-    stageTokens.push(`stage${digits[0]}_${digits[1]}`, `stage${digits[0]}-${digits[1]}`);
-  }
+  if (digits.length === 2) stageTokens.push(`stage${digits[0]}_${digits[1]}`, `stage${digits[0]}-${digits[1]}`);
   const selectorKey = stageMatch[2].charAt(0).toLowerCase() + stageMatch[2].slice(1);
   const supplement = supplements.find(item => stageTokens.some(token => item.role.toLowerCase().includes(token.toLowerCase())));
   return supplement?.selected?.[selectorKey];
@@ -146,50 +162,29 @@ const populationFromExpected = (expected, primarySelected, supplements) => {
 export function normalizeDomain({ domain, baseSpec, activeMeta, contract, repoRoot }) {
   const spec = effectiveDomainSpec(baseSpec, activeMeta);
   const sourcePath = activeMeta?.sourcePath;
-  if (!sourcePath) {
-    return {
-      domain,
-      lifecycle: 'UNKNOWN',
-      health: 'MISSING',
-      rawStatus: null,
-      rawCompletion: null,
-      rawFreezeState: null,
-      population: {},
-      hardErrorCount: null,
-      reviewCount: 0,
-      reviews: [],
-      blockers: [],
-      facets: [],
-      primarySource: { path: null, readError: 'R1 selected source missing.' },
-      supplementalSources: [],
-      nextWork: [],
-      activeSource: activeMeta ?? null,
-      notes: ['R1 Status Source did not provide an active source.'],
-    };
-  }
+  const missingResult = (readError, note) => ({
+    domain,
+    lifecycle: 'UNKNOWN',
+    health: 'MISSING',
+    rawStatus: null,
+    rawCompletion: null,
+    rawFreezeState: null,
+    population: {},
+    hardErrorCount: null,
+    reviewCount: 0,
+    reviews: [],
+    blockers: [],
+    facets: [],
+    primarySource: { path: sourcePath ?? null, readError },
+    supplementalSources: [],
+    nextWork: [],
+    activeSource: activeMeta ?? null,
+    notes: [note],
+  });
 
+  if (!sourcePath) return missingResult('R1 selected source missing.', 'R1 Status Source did not provide an active source.');
   const primaryRead = safeReadJson(repoRoot, sourcePath);
-  if (!primaryRead.ok) {
-    return {
-      domain,
-      lifecycle: 'UNKNOWN',
-      health: 'MISSING',
-      rawStatus: null,
-      rawCompletion: null,
-      rawFreezeState: null,
-      population: {},
-      hardErrorCount: null,
-      reviewCount: 0,
-      reviews: [],
-      blockers: [],
-      facets: [],
-      primarySource: { path: sourcePath, readError: primaryRead.error },
-      supplementalSources: [],
-      nextWork: [],
-      activeSource: activeMeta,
-      notes: ['Selected primary status source could not be read.'],
-    };
-  }
+  if (!primaryRead.ok) return missingResult(primaryRead.error, 'Selected primary status source could not be read.');
 
   const primary = primaryRead.data;
   const primarySelected = selectValues(primary, spec.requiredSelectors);
@@ -229,7 +224,9 @@ export function normalizeDomain({ domain, baseSpec, activeMeta, contract, repoRo
     reviews.push(...reviewsFromSelector(getJsonPointer(primary, selector), sourcePath, selector));
   }
   const supersededCodes = new Set(supplements.flatMap(item => item.supersedesPrimaryReviewCodes ?? []));
-  const resolvedReviews = reviews.filter(review => review.code && supersededCodes.has(review.code));
+  const resolvedReviews = reviews
+    .filter(review => review.code && supersededCodes.has(review.code))
+    .map(review => ({ ...review, lifecycle: 'RESOLVED_BY_EVIDENCE', healthImpact: false, remainingCount: 0 }));
   reviews = reviews
     .filter(review => !(review.code && supersededCodes.has(review.code)))
     .map(review => ({ ...review, scope: reviewScope(review, contract.normalizedModel.reviewScopes) }));
@@ -255,20 +252,14 @@ export function normalizeDomain({ domain, baseSpec, activeMeta, contract, repoRo
   }
 
   const explicitFailureSignals = [];
-  if (typeof primarySelected.hardErrorCount === 'number' && primarySelected.hardErrorCount > 0) {
-    explicitFailureSignals.push('hardErrorCount');
-  }
-  if (Array.isArray(primarySelected.errors) && primarySelected.errors.length > 0) {
-    explicitFailureSignals.push('errors');
-  }
+  if (typeof primarySelected.hardErrorCount === 'number' && primarySelected.hardErrorCount > 0) explicitFailureSignals.push('hardErrorCount');
+  if (Array.isArray(primarySelected.errors) && primarySelected.errors.length > 0) explicitFailureSignals.push('errors');
   for (const [key, value] of Object.entries(primarySelected)) {
     if (/failedCheckCount/i.test(key) && typeof value === 'number' && value > 0) explicitFailureSignals.push(key);
   }
   for (const supplement of supplements) {
     for (const [key, value] of Object.entries(supplement.selected ?? {})) {
-      if (/failedCheckCount/i.test(key) && typeof value === 'number' && value > 0) {
-        explicitFailureSignals.push(`${supplement.role}.${key}`);
-      }
+      if (/failedCheckCount/i.test(key) && typeof value === 'number' && value > 0) explicitFailureSignals.push(`${supplement.role}.${key}`);
     }
   }
   if (zeroRequiredViolations.some(item => item.value !== 'MISSING')) explicitFailureSignals.push('zeroRequiredSelectors');
@@ -290,8 +281,7 @@ export function normalizeDomain({ domain, baseSpec, activeMeta, contract, repoRo
     ...supplementalMissingSelectors.map(item => ({ type: 'SUPPLEMENTAL_SELECTOR_MISSING', ...item })),
     ...expectedMissing.map(key => ({ type: 'EXPECTED_VALUE_MISSING', key })),
     ...expectedMismatches.map(item => ({ type: 'EXPECTED_VALUE_MISMATCH', ...item })),
-    ...zeroRequiredViolations
-      .filter(item => item.value === 'MISSING')
+    ...zeroRequiredViolations.filter(item => item.value === 'MISSING')
       .map(item => ({ type: 'ZERO_REQUIRED_SELECTOR_MISSING', pointer: item.pointer })),
   ];
 
@@ -339,7 +329,10 @@ export function normalizeDomain({ domain, baseSpec, activeMeta, contract, repoRo
     })),
     activeSource: activeMeta,
     notes: [
-      ...(resolvedReviews.length > 0 ? [{ resolvedReviewCodes: resolvedReviews.map(item => item.code) }] : []),
+      ...(resolvedReviews.length > 0 ? [{
+        resolvedReviewCodes: resolvedReviews.map(item => item.code),
+        resolvedReviewKeys: resolvedReviews.map(item => item.reviewKey),
+      }] : []),
       ...(consistencyIssues.length > 0 ? [{ consistencyIssues }] : []),
       ...(explicitFailureSignals.length > 0 ? [{ explicitFailureSignals }] : []),
       ...(zeroRequiredViolations.some(item => item.value !== 'MISSING') ? [{ zeroRequiredViolations }] : []),
