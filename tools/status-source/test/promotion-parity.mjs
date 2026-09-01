@@ -12,6 +12,7 @@ import {
   preflightPromotionCompatibility,
   promoteStatusSource,
 } from '../lib/promote-status-source.mjs';
+import { captureSourceProvenance } from '../lib/source-provenance.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const currentSelection = selectActiveSources({ repoRoot });
@@ -25,6 +26,7 @@ const currentCompatibility = {};
 for (const [domain, selected] of Object.entries(currentSelection.domains)) {
   const entry = entries.find(item => item.id === selected.selectedId);
   assert.ok(entry, `selected declaration missing for ${domain}`);
+  assert.equal(entry.sourceProvenance?.hashAlgorithm, 'git-blob-sha1', `${domain} selected source must carry provenance`);
   const compatibility = preflightPromotionCompatibility({
     repoRoot,
     domain,
@@ -49,6 +51,7 @@ const equipmentAlreadyActive = promoteStatusSource({
 assert.equal(equipmentAlreadyActive.status, 'PASS_STATUS_SOURCE_PROMOTION_ALREADY_ACTIVE');
 assert.equal(equipmentAlreadyActive.writePerformed, false);
 assert.equal(equipmentAlreadyActive.boundaries.statusSourceDeclarationWriteCount, 0);
+assert.equal(equipmentAlreadyActive.sourceProvenance.hashAlgorithm, 'git-blob-sha1');
 assert.deepEqual(
   Object.fromEntries(['canonical', 'public', 'general', 'exclusive'].map(key => [key, equipmentAlreadyActive.compatibility.effectiveExpected[key]])),
   { canonical: 390, public: 365, general: 198, exclusive: 167 },
@@ -102,6 +105,15 @@ try {
     },
   };
 
+  const writeSource = (relative, payload) => fs.writeFileSync(
+    path.join(tempRoot, relative),
+    `${JSON.stringify(payload, null, 2)}\n`,
+  );
+  writeSource('data/validation/hero-root.v1.json', { status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } });
+  writeSource('data/validation/hero-next.v1.json', { status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } });
+  writeSource('data/validation/hero-bad.v1.json', { status: 'PASS', summary: { canonicalHeroCount: 2, hardErrorCount: 0 } });
+  writeSource('data/validation/hero-rollback.v1.json', { status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } });
+
   const baseline = {
     version: 1,
     schemaId: 'project-doctor-active-source-entries/v1',
@@ -110,18 +122,16 @@ try {
       domain: 'hero',
       state: 'APPROVED',
       sourcePath: 'data/validation/hero-root.v1.json',
+      sourceProvenance: captureSourceProvenance({ repoRoot: tempRoot, sourcePath: 'data/validation/hero-root.v1.json' }),
       facet: 'canonical',
       successorOf: null,
       admission: [{ pointer: '/status', equals: 'PASS' }],
     }],
   };
   fs.writeFileSync(path.join(tempRoot, 'data/status-sources/baseline.v1.json'), `${JSON.stringify(baseline, null, 2)}\n`);
-  fs.writeFileSync(path.join(tempRoot, 'data/validation/hero-root.v1.json'), `${JSON.stringify({ status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } }, null, 2)}\n`);
-  fs.writeFileSync(path.join(tempRoot, 'data/validation/hero-next.v1.json'), `${JSON.stringify({ status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } }, null, 2)}\n`);
-  fs.writeFileSync(path.join(tempRoot, 'data/validation/hero-bad.v1.json'), `${JSON.stringify({ status: 'PASS', summary: { canonicalHeroCount: 2, hardErrorCount: 0 } }, null, 2)}\n`);
-  fs.writeFileSync(path.join(tempRoot, 'data/validation/hero-rollback.v1.json'), `${JSON.stringify({ status: 'PASS', summary: { canonicalHeroCount: 1, hardErrorCount: 0 } }, null, 2)}\n`);
 
   const runtime = { repoRoot: tempRoot, compatibilityContract: syntheticCompatibility };
+  const expectedNextProvenance = captureSourceProvenance({ repoRoot: tempRoot, sourcePath: 'data/validation/hero-next.v1.json' });
   const checked = promoteStatusSource({
     domain: 'hero',
     id: 'hero-next',
@@ -130,6 +140,7 @@ try {
   assert.equal(checked.status, 'PASS_STATUS_SOURCE_PROMOTION_CHECK');
   assert.equal(checked.writePerformed, false);
   assert.equal(checked.boundaries.statusSourceDeclarationWriteCount, 0);
+  assert.deepEqual(checked.sourceProvenance, expectedNextProvenance, 'check mode must capture deterministic source provenance');
   assert.equal(fs.existsSync(path.join(tempRoot, checked.outputPath)), false, 'check mode must not write declaration');
   assert.equal(selectActiveSources({ repoRoot: tempRoot }).domains.hero.selectedId, 'hero-root');
 
@@ -142,7 +153,10 @@ try {
   assert.equal(applied.status, 'PASS_STATUS_SOURCE_PROMOTION_APPLY');
   assert.equal(applied.writePerformed, true);
   assert.equal(applied.boundaries.statusSourceDeclarationWriteCount, 1);
+  assert.deepEqual(applied.sourceProvenance, expectedNextProvenance, 'apply mode must expose captured provenance');
   assert.equal(fs.existsSync(path.join(tempRoot, applied.outputPath)), true, 'apply mode must write one declaration');
+  const persistedPromotion = JSON.parse(fs.readFileSync(path.join(tempRoot, applied.outputPath), 'utf8'));
+  assert.deepEqual(persistedPromotion.entry.sourceProvenance, expectedNextProvenance, 'persisted promotion must bind sourcePath to content hash');
   assert.equal(selectActiveSources({ repoRoot: tempRoot }).domains.hero.selectedId, 'hero-next');
 
   assert.throws(() => promoteStatusSource({
@@ -181,6 +195,11 @@ console.log(JSON.stringify({
   equipmentAlreadyActive: {
     selectedId: equipmentAlreadyActive.selectedId,
     expected: Object.fromEntries(['canonical', 'public', 'general', 'exclusive'].map(key => [key, equipmentAlreadyActive.compatibility.effectiveExpected[key]])),
+  },
+  provenanceCapture: {
+    hashAlgorithm: 'git-blob-sha1',
+    checkModeCaptured: true,
+    applyModePersisted: true,
   },
   checkModeWrites: 0,
   syntheticApplyWrites: 1,
