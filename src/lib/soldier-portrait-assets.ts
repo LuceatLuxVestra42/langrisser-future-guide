@@ -1,5 +1,7 @@
 import soldierPortraitManifestJson from "../../data/generated/soldier-portrait-web-manifest.v1.json";
 
+// A7 storage boundary: production portrait URLs resolve only from the WebP manifest.
+// Canonical source PNG bytes live in the pinned external source pack and are never fetched at runtime.
 type SoldierPortraitManifestRecord = {
   soldierId: number;
   nameKr: string | null;
