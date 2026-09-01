@@ -1,0 +1,28 @@
+name: Soldier Portrait B3 Batch Planner
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/plan-soldier-portrait-batch.mjs'
+      - 'scripts/validate-soldier-portrait-batch-plan-b3.mjs'
+      - 'data/validation/soldier-portrait-batch-plan.v1.json'
+      - '.github/workflows/soldier-portrait-b3-batch-planner.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  batch-planner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate B3 batch planner
+        run: node scripts/validate-soldier-portrait-batch-plan-b3.mjs
+      - name: Verify tracked state unchanged
+        run: git diff --exit-code -- .
