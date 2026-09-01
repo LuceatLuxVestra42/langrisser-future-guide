@@ -56,9 +56,13 @@ def main():
         raise RuntimeError(f'exact raw Spine source files required: atlas={len(atlas_files)} skel={len(skel_files)}')
     atlas_path = atlas_files[0]
     skel_path = skel_files[0]
-    lines = atlas_path.read_text(encoding='utf-8').splitlines()
+    raw_lines = atlas_path.read_text(encoding='utf-8').splitlines()
+    first_content_index = next((index for index, line in enumerate(raw_lines) if line.strip()), None)
+    if first_content_index is None:
+        raise RuntimeError('atlas text contains no non-empty content')
+    lines = raw_lines[first_content_index:]
     if len(lines) < 2:
-        raise RuntimeError('atlas text is too short')
+        raise RuntimeError('atlas text is too short after leading blank lines')
     page_name = lines[0].strip()
     if not page_name or '/' in page_name or '\\' in page_name:
         raise RuntimeError(f'unexpected atlas page name: {page_name!r}')
