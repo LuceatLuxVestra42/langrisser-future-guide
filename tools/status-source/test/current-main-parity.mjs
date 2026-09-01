@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import nodeAssert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -117,7 +118,7 @@ function runFreshnessFixtures() {
     assert(selectActiveSources({ repoRoot: tempRoot }).domains.hero.admissionEvidence.sourceProvenance.status === 'FRESH', 'P1-MTIME mtime-only change must remain FRESH');
 
     fs.writeFileSync(sourceAbsolute, sourceB);
-    assert.throws(
+    nodeAssert.throws(
       () => selectActiveSources({ repoRoot: tempRoot }),
       /STALE_SOURCE_PROVENANCE/,
       'P2 same path + changed bytes must be STALE',
@@ -126,27 +127,27 @@ function runFreshnessFixtures() {
     fs.writeFileSync(sourceAbsolute, sourceA);
     fs.writeFileSync(copyAbsolute, sourceA);
     writeDeclaration({ ...baselineEntry, sourcePath: copyPath });
-    assert.throws(
+    nodeAssert.throws(
       () => selectActiveSources({ repoRoot: tempRoot }),
       /PROVENANCE_PATH_MISMATCH/,
       'P3 changed path + same bytes requires explicit provenance reattestation',
     );
 
     writeDeclaration({ ...baselineEntry, sourceProvenance: undefined });
-    assert.throws(() => selectActiveSources({ repoRoot: tempRoot }), /INVALID_PROVENANCE/, 'N1 missing provenance must fail closed');
+    nodeAssert.throws(() => selectActiveSources({ repoRoot: tempRoot }), /INVALID_PROVENANCE/, 'N1 missing provenance must fail closed');
 
     writeDeclaration({ ...baselineEntry, sourceProvenance: { ...provenance, gitBlobSha: 'bad' } });
-    assert.throws(() => selectActiveSources({ repoRoot: tempRoot }), /INVALID_PROVENANCE/, 'N2 malformed hash must fail closed');
+    nodeAssert.throws(() => selectActiveSources({ repoRoot: tempRoot }), /INVALID_PROVENANCE/, 'N2 malformed hash must fail closed');
 
     writeDeclaration({ ...baselineEntry, sourceProvenance: { ...provenance, hashAlgorithm: 'sha256' } });
-    assert.throws(() => selectActiveSources({ repoRoot: tempRoot }), /INVALID_PROVENANCE/, 'N3 unsupported hash algorithm must fail closed');
+    nodeAssert.throws(() => selectActiveSources({ repoRoot: tempRoot }), /INVALID_PROVENANCE/, 'N3 unsupported hash algorithm must fail closed');
 
     writeDeclaration({ ...baselineEntry, sourceProvenance: { ...provenance, sourcePath: copyPath } });
-    assert.throws(() => selectActiveSources({ repoRoot: tempRoot }), /PROVENANCE_PATH_MISMATCH/, 'N4 provenance path mismatch must fail closed');
+    nodeAssert.throws(() => selectActiveSources({ repoRoot: tempRoot }), /PROVENANCE_PATH_MISMATCH/, 'N4 provenance path mismatch must fail closed');
 
     writeDeclaration(baselineEntry);
     fs.unlinkSync(sourceAbsolute);
-    assert.throws(() => selectActiveSources({ repoRoot: tempRoot }), /SOURCE_UNAVAILABLE/, 'N5 missing source must fail closed');
+    nodeAssert.throws(() => selectActiveSources({ repoRoot: tempRoot }), /SOURCE_UNAVAILABLE/, 'N5 missing source must fail closed');
 
     return {
       p1Fresh: true,
