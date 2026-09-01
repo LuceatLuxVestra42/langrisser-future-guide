@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "schemaId": "soldier-portrait-batch-plan/v1",
+  "status": "NO_UPDATE_REQUIRED",
+  "owner": "soldier-assets",
+  "producer": "scripts/plan-soldier-portrait-batch.mjs",
+  "inputs": {
+    "canonical": "data/generated/soldier-master.v1.json",
+    "currentAssetLocator": "data/contracts/soldier-portrait-assets-current.v1.json",
+    "currentAssetManifest": "data/generated/soldier-portrait-manifest.v9.json"
+  },
+  "result": {
+    "canonicalCount": 224,
+    "currentAssetCount": 224,
+    "newIds": [],
+    "removedIds": []
+  },
+  "decision": {
+    "noUpdateRequiredWhen": "newIds.length === 0 && removedIds.length === 0",
+    "batchReadyWhen": "newIds.length > 0 && removedIds.length === 0",
+    "blockerWhen": "removedIds.length > 0"
+  },
+  "boundaries": {
+    "semanticAuthority": false,
+    "idSetDifferenceOnly": true,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "semanticRecomputation": false,
+    "sourceDiscovery": false,
+    "assetMutation": false,
+    "rawConfigDataReadCount": 0
+  },
+  "evidence": {
+    "currentBaseMain": "c6fa80e01690d1365cf735b67749edf749435de3",
+    "validatedB2Predecessor": "d52227e208fc0f3c6c71b81a970a0405e9610340",
+    "basis": "B2-A owning validator passed canonical/source/web ID-set parity; the intervening main changes through currentBaseMain are outside Soldier portrait canonical and current source-manifest populations."
+  }
+}
