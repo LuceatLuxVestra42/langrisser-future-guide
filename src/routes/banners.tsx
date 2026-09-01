@@ -4,8 +4,6 @@ import {
   CalendarDays,
   ChevronDown,
   CircleAlert,
-  History,
-  Sparkles,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -34,7 +32,6 @@ function formatDisplayDate(value: string) {
 function BannerImage({
   image,
   alt,
-  compact = false,
 }: {
   image: {
     canRenderImage: boolean;
@@ -42,15 +39,10 @@ function BannerImage({
     placeholderKey: string | null;
   };
   alt: string;
-  compact?: boolean;
 }) {
   if (!image.canRenderImage || !image.publicPath) {
     return (
-      <div
-        className={`flex items-center justify-center rounded-xl border border-dashed border-border bg-muted/60 px-3 text-center text-xs leading-5 text-muted-foreground ${
-          compact ? "h-20 w-32" : "aspect-[16/7] w-full"
-        }`}
-      >
+      <div className="flex aspect-[16/7] w-full items-center justify-center rounded-xl border border-dashed border-border bg-muted/60 px-3 text-center text-xs leading-5 text-muted-foreground">
         배너 이미지 준비 중
       </div>
     );
@@ -61,9 +53,7 @@ function BannerImage({
       src={image.publicPath}
       alt={alt}
       loading="lazy"
-      className={`rounded-xl border border-border bg-muted object-contain ${
-        compact ? "h-20 w-32" : "aspect-[16/7] w-full"
-      }`}
+      className="aspect-[16/7] w-full rounded-xl border border-border bg-muted object-contain"
     />
   );
 }
@@ -97,12 +87,6 @@ function BannerPage() {
   const cpByOccurrence = useMemo(
     () => new Map(data.cpRecords.map((record) => [record.bannerOccurrenceId, record])),
     [data.cpRecords],
-  );
-
-  const allRows = useMemo(() => data.dateGroups.flatMap((group) => group.rows), [data.dateGroups]);
-  const rowByOccurrence = useMemo(
-    () => new Map(allRows.map((row) => [row.bannerOccurrenceId, row])),
-    [allRows],
   );
 
   return (
@@ -267,111 +251,6 @@ function BannerPage() {
               </section>
             ))}
           </div>
-        </section>
-
-        <section className="mt-12" aria-labelledby="cp-banners-heading">
-          <h2 id="cp-banners-heading" className="mb-4 text-2xl font-bold tracking-tight text-foreground">
-            CP 배너
-          </h2>
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-            {data.cpRecords.map((record) => {
-              const row = rowByOccurrence.get(record.bannerOccurrenceId);
-              return (
-                <article key={record.bannerOccurrenceId} className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
-                  <div className="flex flex-col gap-4 sm:flex-row">
-                    {row && (
-                      <div className="shrink-0">
-                        <BannerImage image={row.image} alt="CP 관련 배너" compact />
-                      </div>
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-md bg-primary px-2 py-1 text-[11px] font-bold text-primary-foreground">
-                          CP 배너
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {formatDisplayDate(record.krDisplayDate)}
-                        </span>
-                      </div>
-                      <div className="mt-3">
-                        <HeroChips heroes={record.pickupHeroes} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 rounded-xl bg-muted/45 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Event text reference
-                    </p>
-                    <p className="mt-1 text-lg font-bold text-foreground">{record.eventReferenceLabelCn}</p>
-                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                      canonicalEventId: null · TEXT_REFERENCE_ONLY_REVIEW · Event 페이지 이동 없음
-                    </p>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="mt-12 space-y-5" aria-labelledby="pickup-log-heading">
-          <h2 id="pickup-log-heading" className="text-2xl font-bold tracking-tight text-foreground">
-            픽업 log
-          </h2>
-
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-start gap-3">
-              <History size={20} className="mt-0.5 shrink-0 text-muted-foreground" aria-hidden="true" />
-              <div>
-                <h3 className="font-bold text-foreground">현재 KR 데이터셋에서 재관측된 픽업만 표시해.</h3>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  날짜 간격은 관측된 gapDays일 뿐 고정 복각 주기나 다음 등장일 예측으로 해석하지 않아.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {data.pickupLogs.map((log) => (
-            <article key={log.bannerDefinitionId} className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-              <div className="flex flex-col gap-2 border-b border-border bg-muted/35 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles size={17} className="text-muted-foreground" aria-hidden="true" />
-                  <h3 className="font-bold text-foreground">{log.typeLabelKr}</h3>
-                  <span className="rounded-full border border-border bg-background px-2 py-0.5 text-xs text-muted-foreground">
-                    {log.historyLabelKr}
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {formatDisplayDate(log.firstObservedKrDisplayDate)} → {formatDisplayDate(log.latestObservedKrDisplayDate)}
-                </p>
-              </div>
-
-              <div className="p-4 sm:p-5">
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  {log.appearances.map((appearance, index) => (
-                    <div key={appearance.bannerOccurrenceId} className="rounded-xl border border-border bg-background p-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-bold text-foreground">
-                          {index + 1}회 관측 · {formatDisplayDate(appearance.krDisplayDate)}
-                        </span>
-                        {appearance.gapDaysFromPrevious !== null && (
-                          <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
-                            이전 관측 +{appearance.gapDaysFromPrevious}일
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-3 flex gap-3">
-                        <BannerImage image={appearance.image} alt="픽업 재등장 배너" compact />
-                        <div className="min-w-0 flex-1">
-                          <HeroChips heroes={appearance.pickupHeroes} />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </article>
-          ))}
         </section>
 
         <footer className="mt-10 border-t border-border pt-6 text-xs leading-5 text-muted-foreground">
