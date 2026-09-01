@@ -37,6 +37,7 @@ const sourceFingerprint = (repoRoot, record) => {
     ...(record.supplementalSources ?? []).map(item => item.path ?? null),
   ].filter(Boolean);
 
+  // Fingerprint the exact ordered source set already consumed by R2; do not discover or infer extra dependencies here.
   const hash = createHash('sha256');
   const unreadableSources = [];
   let hashedSourceCount = 0;
