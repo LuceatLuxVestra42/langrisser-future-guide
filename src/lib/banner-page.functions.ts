@@ -19,6 +19,7 @@ function resolvePictureNoticePresentationPath(
   if (!match) return publicPath;
 
   const sourceStem = match[1];
+  if (!sourceStem) return publicPath;
   const pictureNoticeStem = PICTURE_NOTICE_STEM_OVERRIDES.get(sourceStem) ?? sourceStem;
   return `/images/banners/Picture_Notice/Picture_Notice_${pictureNoticeStem}.webp`;
 }
