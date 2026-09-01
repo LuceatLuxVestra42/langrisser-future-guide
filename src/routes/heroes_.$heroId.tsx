@@ -1,10 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   BriefcaseBusiness,
-  ChevronLeft,
-  ChevronRight,
   Database,
   HeartHandshake,
   ImageOff,
@@ -71,13 +69,6 @@ function resolvePublicAssetUrl(webAssetPath: string) {
   return `${basePrefix}${normalizedPath}`;
 }
 
-type HeroVisual = {
-  kind: "hero" | "skin";
-  src: string;
-  label: string;
-  skinId: number | null;
-  sourceOrder: number | null;
-};
 
 function stripConfigMarkup(value: string | null) {
   if (!value) return "-";
@@ -88,27 +79,6 @@ function HeroDetailPage() {
   const { hero, stage6, detail, exclusiveEquipment, soldierCards } = Route.useLoaderData();
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
-  const visuals: HeroVisual[] = [];
-  if (imageUrl) {
-    visuals.push({ kind: "hero", src: imageUrl, label: "대표 일러스트", skinId: null, sourceOrder: null });
-  }
-  for (const skin of detail.presentation.skins) {
-    visuals.push({
-      kind: "skin",
-      src: resolvePublicAssetUrl(skin.publicPath),
-      label: `스킨 ${skin.sourceOrder}`,
-      skinId: skin.skinId,
-      sourceOrder: skin.sourceOrder,
-    });
-  }
-
-  const [visualIndex, setVisualIndex] = useState(0);
-  useEffect(() => setVisualIndex(0), [hero.heroId]);
-  const activeVisual = visuals[visualIndex] ?? null;
-  const moveVisual = (delta: number) => {
-    if (visuals.length <= 1) return;
-    setVisualIndex((current) => (current + delta + visuals.length) % visuals.length);
-  };
 
   return (
     <main
@@ -125,8 +95,8 @@ function HeroDetailPage() {
           <div className="grid lg:grid-cols-[minmax(300px,0.82fr)_minmax(0,1.18fr)]">
             <div className="relative min-h-[420px] overflow-hidden border-b border-border bg-muted/25 sm:min-h-[520px] lg:min-h-[620px] lg:border-b-0 lg:border-r">
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
-              {activeVisual ? (
-                <img src={activeVisual.src} alt={`${displayName} ${activeVisual.label}`} className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6" />
+              {imageUrl ? (
+                <img src={imageUrl} alt={`${displayName} 대표 일러스트`} className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6" />
               ) : (
                 <div className="flex h-full min-h-[420px] flex-col items-center justify-center gap-3 text-muted-foreground">
                   <UserRound className="h-20 w-20" strokeWidth={1.05} aria-hidden="true" />
@@ -134,28 +104,12 @@ function HeroDetailPage() {
                 </div>
               )}
 
-              {visuals.length > 1 ? (
-                <>
-                  <button type="button" onClick={() => moveVisual(-1)} aria-label="이전 일러스트" className="absolute left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-background/90 text-foreground shadow-sm backdrop-blur transition hover:bg-background sm:left-4">
-                    <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-                  </button>
-                  <button type="button" onClick={() => moveVisual(1)} aria-label="다음 일러스트" className="absolute right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-background/90 text-foreground shadow-sm backdrop-blur transition hover:bg-background sm:right-4">
-                    <ChevronRight className="h-5 w-5" aria-hidden="true" />
-                  </button>
-                </>
-              ) : null}
 
               <div className="absolute bottom-4 left-4 z-20 flex flex-wrap gap-2 sm:bottom-5 sm:left-5">
                 <span className="rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur">{hero.rarity.baseLabel}</span>
                 {detail.systems.spReleased ? <span className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur"><Sparkles className="h-3.5 w-3.5" aria-hidden="true" />SP</span> : null}
               </div>
 
-              {activeVisual ? (
-                <div className="absolute bottom-4 right-4 z-20 rounded-full border border-border/80 bg-background/90 px-3 py-1.5 text-right text-[11px] font-semibold text-foreground shadow-sm backdrop-blur sm:bottom-5 sm:right-5">
-                  <div>{activeVisual.kind === "hero" ? "대표 일러스트" : `스킨 ${activeVisual.sourceOrder} · ID ${activeVisual.skinId}`}</div>
-                  <div className="mt-0.5 text-muted-foreground">{visualIndex + 1} / {visuals.length}</div>
-                </div>
-              ) : null}
             </div>
 
             <div className="flex min-w-0 flex-col justify-center p-5 sm:p-8 lg:p-10">
