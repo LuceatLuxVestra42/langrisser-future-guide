@@ -1,0 +1,73 @@
+name: Soldier Portrait Source Pack A1
+
+on:
+  push:
+    branches:
+      - maintenance/soldier-source-pack-a1-v1
+    paths:
+      - scripts/build-soldier-portrait-source-pack-v1.mjs
+      - .github/workflows/soldier-portrait-source-pack-v1.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: soldier-portrait-source-pack-a1-v1
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish-source-pack:
+    runs-on: ubuntu-latest
+    env:
+      SOURCE_SHA: 5dc0904987b36b36776d887bea9445dd65ee64b6
+      RELEASE_TAG: source-assets-soldier-v9-5dc09049
+      ARCHIVE_BASE: soldier-portrait-source-v9-5dc09049
+    steps:
+      - name: Checkout preparation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build and round-trip verify exact-byte source pack
+        run: |
+          set -euo pipefail
+          node scripts/build-soldier-portrait-source-pack-v1.mjs \
+            --source-sha "$SOURCE_SHA" \
+            --out-dir dist/source-pack
+
+      - name: Publish immutable-by-hash source pack release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "::error::Release $RELEASE_TAG already exists; refusing to mutate or overwrite it."
+            exit 1
+          fi
+
+          created=0
+          cleanup_on_error() {
+            if [ "$created" -eq 1 ]; then
+              gh release delete "$RELEASE_TAG" --cleanup-tag --yes || true
+            fi
+          }
+          trap cleanup_on_error ERR
+
+          gh release create "$RELEASE_TAG" \
+            --target "$SOURCE_SHA" \
+            --title "Soldier portrait source pack v9 ($SOURCE_SHA)" \
+            --notes "1A-A1 exact-byte external source pack. Built from public/images/soldiers at pinned source commit $SOURCE_SHA. Production WebP assets and runtime paths are unchanged. Integrity authority is the published SHA-256 checksum."
+          created=1
+
+          gh release upload "$RELEASE_TAG" \
+            "dist/source-pack/${ARCHIVE_BASE}.tar.gz" \
+            "dist/source-pack/${ARCHIVE_BASE}.inventory.json" \
+            "dist/source-pack/${ARCHIVE_BASE}.sha256"
+
+          trap - ERR
+
+      - name: Report published checksums
+        run: |
+          set -euo pipefail
+          cat "dist/source-pack/${ARCHIVE_BASE}.sha256"

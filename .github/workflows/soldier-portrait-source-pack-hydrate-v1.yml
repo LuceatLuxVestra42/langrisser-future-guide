@@ -1,0 +1,36 @@
+name: Soldier Portrait Source Pack A3 Verify
+
+on:
+  push:
+    paths:
+      - scripts/hydrate-soldier-portrait-source-pack-v1.mjs
+      - data/contracts/soldier-portrait-source-pack.v1.json
+      - .github/workflows/soldier-portrait-source-pack-hydrate-v1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-external-source-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download, verify, and hydrate pinned Soldier source pack
+        run: |
+          set -euo pipefail
+          node scripts/hydrate-soldier-portrait-source-pack-v1.mjs \
+            --hydrate-dir "$RUNNER_TEMP/soldier-portrait-source-v9"
+
+      - name: Verify hydrated coverage
+        run: |
+          set -euo pipefail
+          count="$(find "$RUNNER_TEMP/soldier-portrait-source-v9" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')"
+          test "$count" = "224"
+
+      - name: Confirm validator did not mutate tracked repository files
+        run: |
+          set -euo pipefail
+          git diff --exit-code
