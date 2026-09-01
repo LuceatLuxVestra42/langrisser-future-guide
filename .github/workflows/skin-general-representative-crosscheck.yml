@@ -1,0 +1,180 @@
+name: Skin General Representative Crosscheck
+
+on:
+  push:
+    branches:
+      - work/skin-fullart-representative-crosscheck-20260901
+    paths:
+      - .github/workflows/skin-general-representative-crosscheck.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    strategy:
+      fail-fast: false
+      matrix:
+        skin_id: [1901, 3701]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bounded branch
+        uses: actions/checkout@v4
+        with:
+          ref: work/skin-fullart-representative-crosscheck-20260901
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install bounded dependency
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow
+
+      - name: Extract exact General atlas Texture2D
+        env:
+          SKIN_ID: ${{ matrix.skin_id }}
+        run: |
+          python - <<'PY'
+          import importlib.util, json, os, re
+          from pathlib import Path, PurePosixPath
+          sid = int(os.environ['SKIN_ID'])
+          spec = importlib.util.spec_from_file_location('wrap', 'scripts/extract-skin-fullart0-spine-source-v2.py')
+          wrap = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(wrap)
+          H = wrap.module
+          stage = json.load(open('data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json', encoding='utf-8'))
+          fixture = next(r for r in stage['fixtures'] if int(r['skinId']) == sid)
+          resources = [r for r in fixture['model']['resources'] if int(r['skinResourceId']) == sid]
+          if len(resources) != 1:
+              raise RuntimeError(f'exact General resource count != 1: {len(resources)}')
+          rec = resources[0]
+          match = H.SOURCE_REF_RE.match(rec['resolvedSource'])
+          if not match:
+              raise RuntimeError('invalid General official sourceRef')
+          parts = match.groupdict()
+          work = Path(f'.probe-general-{sid}')
+          package = work / 'packages' / parts['package']
+          bundle = work / 'bundles' / parts['bundle']
+          H.download(f"{stage['source']['base'].rstrip('/')}/{parts['package']}", package)
+          physical = H.extract_bundle(package, parts['bundle'], bundle)
+
+          import UnityPy
+          env = UnityPy.load(str(bundle))
+          local = {int(getattr(o, 'path_id', 0)): o for o in env.objects}
+          matches = [(p, H.deref_container(v)) for p, v in env.container.items() if isinstance(p, str) and H.norm(p) == H.norm(rec['resolvedContainerPath'])]
+          if len(matches) != 1:
+              raise RuntimeError(f'exact General prefab count != 1: {len(matches)}')
+          prefab_path, prefab = matches[0]
+          if H.sha256(prefab.get_raw_data()) != rec['sha256'].lower():
+              raise RuntimeError('General prefab hash differs from current Stage 3-2')
+
+          _, prefab_refs = H.resolve_local_refs(prefab, local)
+          skeleton_data = None
+          for pref in prefab_refs:
+              if pref['fileId'] != 0 or pref['pathId'] not in local:
+                  continue
+              component = local[pref['pathId']]
+              _, refs = H.resolve_local_refs(component, local)
+              hit = next((r for r in refs if r['fieldPath'].endswith('.skeletonDataAsset') and r['fileId'] == 0 and r['pathId'] in local), None)
+              if hit:
+                  skeleton_data = local[hit['pathId']]
+                  break
+          if skeleton_data is None:
+              raise RuntimeError('General skeletonDataAsset PPtr not found')
+
+          queue = [(skeleton_data, 0)]
+          seen = set()
+          textassets = []
+          while queue:
+              obj, depth = queue.pop(0)
+              pid = int(getattr(obj, 'path_id', 0))
+              if not pid or pid in seen:
+                  continue
+              seen.add(pid)
+              tree, refs = H.resolve_local_refs(obj, local)
+              typ = getattr(getattr(obj, 'type', None), 'name', None)
+              name = H.object_name(tree) or f'path-{pid}'
+              if typ == 'TextAsset':
+                  textassets.append((name, H.textasset_bytes(obj)))
+              if depth < 2:
+                  for ref in refs:
+                      if ref['fileId'] == 0 and ref['pathId'] in local and ref['pathId'] != 0:
+                          queue.append((local[ref['pathId']], depth + 1))
+
+          atlases = [(n, b) for n, b in textassets if '.atlas' in n.lower()]
+          skels = [(n, b) for n, b in textassets if '.skel' in n.lower()]
+          if len(atlases) != 1 or len(skels) != 1:
+              raise RuntimeError(f'General atlas/skel count mismatch: {len(atlases)}/{len(skels)}')
+          atlas_name, atlas_bytes = atlases[0]
+          skel_name, skel_bytes = skels[0]
+          lines = atlas_bytes.decode('utf-8').splitlines()
+          first = next(i for i, line in enumerate(lines) if line.strip())
+          page = lines[first].strip()
+          size = None
+          regions = []
+          for line in lines[first + 1:]:
+              stripped = line.strip()
+              if not stripped:
+                  continue
+              m = re.match(r'^size:\s*(\d+)\s*,\s*(\d+)\s*$', stripped)
+              if m and size is None:
+                  size = [int(m.group(1)), int(m.group(2))]
+                  continue
+              if line[:1].isspace():
+                  continue
+              if ':' not in stripped and stripped != page:
+                  regions.append(stripped)
+
+          runtime_texture = (PurePosixPath(rec['resolvedContainerPath']).parent / page).as_posix()
+          texture_matches = [(p, H.deref_container(v)) for p, v in env.container.items() if isinstance(p, str) and H.norm(p) == H.norm(runtime_texture)]
+          if len(texture_matches) != 1:
+              raise RuntimeError(f'exact General atlas Texture2D count != 1: {len(texture_matches)}')
+          texture_path, texture_obj = texture_matches[0]
+          if getattr(getattr(texture_obj, 'type', None), 'name', None) != 'Texture2D':
+              raise RuntimeError('General atlas page is not Texture2D')
+          image = texture_obj.read().image.convert('RGBA')
+          if size and [image.width, image.height] != size:
+              raise RuntimeError(f'General atlas dimension mismatch: declared={size} actual={[image.width, image.height]}')
+
+          out = Path(f'.probe-general-out/skin-{sid}')
+          out.mkdir(parents=True, exist_ok=True)
+          image.save(out / 'general-atlas.png')
+          (out / 'general.atlas.txt').write_bytes(atlas_bytes)
+          header = H.detect_spine_header(skel_bytes)
+          result = {
+              'skinId': sid,
+              'status': 'PASS_EXACT_CURRENT_GENERAL_ATLAS',
+              'skinResourceId': rec['skinResourceId'],
+              'prefabPath': rec['prefabPath'],
+              'runtimePrefabPath': prefab_path,
+              'physicalBundleEntry': physical,
+              'spineVersion': header.get('version'),
+              'atlasPage': page,
+              'atlasTextureRuntimePath': texture_path,
+              'atlasSize': [image.width, image.height],
+              'regionCount': len(regions),
+              'regionNames': regions,
+              'guardrails': {
+                  'currentOfficialSourceOnly': True,
+                  'exactSkinResourceId': True,
+                  'nameJoin': False,
+                  'idArithmetic': False,
+              },
+          }
+          (out / 'summary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps({'skinId': sid, 'spineVersion': result['spineVersion'], 'atlasSize': result['atlasSize'], 'regions': regions[:40]}, ensure_ascii=False))
+          PY
+
+      - name: Upload General atlas crosscheck
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-general-representative-${{ matrix.skin_id }}
+          path: .probe-general-out/skin-${{ matrix.skin_id }}
+          if-no-files-found: error
+
+      - name: Cleanup
+        if: always()
+        run: rm -rf .probe-general-* scripts/__pycache__
