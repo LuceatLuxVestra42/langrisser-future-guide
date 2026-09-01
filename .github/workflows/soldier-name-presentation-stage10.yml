@@ -1,0 +1,26 @@
+name: Soldier Name Presentation Stage 10
+
+on:
+  pull_request:
+    paths:
+      - 'data/presentation/soldier-*'
+      - 'data/validation/soldier-*-presentation*'
+      - 'scripts/*soldier*presentation*'
+      - '.github/workflows/soldier-*-presentation*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate Stage 10 checkpoint
+        run: node scripts/validate-soldier-name-presentation-reconciliation.mjs --check
+      - name: Validate fail-closed behavior
+        run: node scripts/validate-soldier-name-presentation-reconciliation.mjs --self-test

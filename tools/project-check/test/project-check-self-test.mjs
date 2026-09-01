@@ -150,6 +150,31 @@ expectOwners(
   ['production-build'],
 );
 expectOwners(
+  'data/generated/hero-card-icon-assets.v1.json',
+  ['hero-assets'],
+  ['hero-assets'],
+);
+expectOwners(
+  'data/contracts/hero-card-icon-source-pack.v1.json',
+  ['hero-assets'],
+  ['hero-assets'],
+);
+expectOwners(
+  'data/validation/hero-card-icon-source-pack.v1.json',
+  ['hero-assets'],
+  ['hero-assets'],
+);
+expectOwners(
+  'scripts/hydrate-hero-card-icon-source-pack.mjs',
+  ['hero-assets'],
+  ['hero-assets'],
+);
+expectOwners(
+  '.github/workflows/hero-card-icon-source-pack-restore-check.yml',
+  ['hero-assets'],
+  ['hero-assets'],
+);
+expectOwners(
   'data/validation/hero-stage6-4-final.v1.json',
   ['hero-canonical', 'status-source'],
   ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection', 'hero-canonical'],
@@ -413,7 +438,7 @@ assert.throws(
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'PROJECT_CHECK_R3_SELF_TEST',
-  fixtures: 39,
+  fixtures: 44,
   catalogValidatorCount: contracts.validatorCatalog.validators.length,
   ownerCount: contracts.ownerMap.owners.length,
   deletionManifest: {

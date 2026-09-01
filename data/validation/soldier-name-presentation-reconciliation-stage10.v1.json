@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "schemaId": "soldier-name-presentation-reconciliation-stage10/v1",
+  "stage": 10,
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "scope": "Soldier Korean-name canonical-versus-presentation reconciliation",
+  "owner": [
+    "soldier-frontend",
+    "localization"
+  ],
+  "authoritativeInputs": {
+    "canonical": "data/generated/soldier-list-stage5-8.v1.json",
+    "lowerTierPresentation": "data/presentation/soldier-lower-tier-name-kr.v1.json",
+    "tier3ProvisionalPresentation": "data/presentation/soldier-t3-provisional-name-kr.v1.json",
+    "tier3BoundaryValidation": "data/validation/soldier-t3-provisional-name-presentation.v1.json",
+    "siteAdmissionReviewSource": "data/validation/soldier-stage6-7-site-admission.v1.json",
+    "localizationContract": "data/contracts/localization-audit.v1.json",
+    "localizationAuditEvidence": "data/validation/localization-audit-soldier-stage2.v1.json"
+  },
+  "method": {
+    "joinKey": "soldierId",
+    "exactNumericIdEqualityOnly": true,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameInference": false,
+    "rawConfigDataReads": false,
+    "canonicalMutation": false,
+    "relationMutation": false,
+    "releaseMetadataMutation": false
+  },
+  "expected": {
+    "canonicalRecords": 224,
+    "canonicalUnresolvedCount": 41,
+    "lowerTierPresentationCount": 39,
+    "tier3ProvisionalPresentationCount": 2,
+    "overlayUnionCount": 41,
+    "overlayCollisionCount": 0,
+    "lowerTierConfirmedCanonicalOverlapCount": 0,
+    "tier3InvalidCanonicalBoundaryCount": 0,
+    "unknownOverlayIdCount": 0,
+    "exactCanonicalUnresolvedOverlaySetMatch": true,
+    "effectiveKoreanDisplayCount": 224,
+    "displayGapCount": 0,
+    "tier3OfficialUnresolvedCount": 2,
+    "tier3BoundaryTargetSetMatch": true,
+    "canonicalStateConflictCount": 0,
+    "siteAdmissionReviewCounts": {
+      "HERO_PAGE_SOLDIER_DISPLAY_NAME_REVIEW": 41,
+      "IDENTITY_PRESENTATION_REVIEW": 41,
+      "KR_NAME_UNRESOLVED": 41
+    }
+  },
+  "canonicalUnresolvedSoldierIds": [
+    100,
+    101,
+    103,
+    104,
+    136,
+    200,
+    201,
+    213,
+    228,
+    234,
+    300,
+    301,
+    303,
+    304,
+    323,
+    400,
+    401,
+    407,
+    416,
+    500,
+    501,
+    503,
+    600,
+    601,
+    603,
+    604,
+    617,
+    618,
+    619,
+    625,
+    628,
+    800,
+    801,
+    808,
+    1000,
+    1003,
+    1012,
+    1039,
+    1100,
+    1102,
+    1108
+  ],
+  "reviewDisposition": {
+    "HERO_PAGE_SOLDIER_DISPLAY_NAME_REVIEW": {
+      "currentMeaning": "Historical user-facing display gap review for the 41 canonically unresolved Korean-name records.",
+      "stage10Disposition": "RESOLVED_BY_PRESENTATION_EVIDENCE",
+      "healthImpact": false,
+      "evidence": "All 224 Soldiers have an effective Korean display; the 41 canonical unresolved IDs are covered exactly by 39 confirmed lower-tier presentation overlays plus 2 approved T3 provisional overlays."
+    },
+    "IDENTITY_PRESENTATION_REVIEW": {
+      "currentMeaning": "Canonical identity and frontend presentation intentionally remain separate for the same 41 records.",
+      "stage10Disposition": "BOUNDARY_NOTE",
+      "healthImpact": false,
+      "evidence": "Presentation overlays cover the exact unresolved canonical ID set without mutating canonical identity."
+    },
+    "KR_NAME_UNRESOLVED": {
+      "currentMeaning": "Canonical Korean-name confirmation remains unresolved for 41 Soldier records.",
+      "stage10Disposition": "ACTIVE_CANONICAL_CONFIRMATION_REVIEW",
+      "healthImpact": true,
+      "remainingCount": 41,
+      "note": "Do not reduce this review to 2. The two T3 records are only the T3 official-name-unresolved subset; the 39 lower-tier records remain presentation-only and canonically unresolved."
+    }
+  },
+  "blockers": [],
+  "nonBlockingReviews": [
+    {
+      "code": "T3_OFFICIAL_KOREAN_NAME_UNRESOLVED",
+      "count": 2,
+      "soldierIds": [
+        136,
+        1039
+      ],
+      "scope": "T3 official Korean-name confirmation only; presentation display is already covered."
+    }
+  ],
+  "decision": "Stage 10 COMPLETE. Canonical Korean-name unresolved population remains 41, and that exact soldierId set is fully covered in presentation by 39 lower-tier confirmed overlays plus 2 T3 provisional overlays. Therefore the historical Hero-page display-gap review is resolved, the identity-versus-presentation review is a boundary note, and KR_NAME_UNRESOLVED remains an active canonical-confirmation review at 41 rather than 2.",
+  "nextOwner": "project-status",
+  "nextStartPoint": "Reconcile Project Status lifecycle rules for the three Soldier 41-count reviews using this checkpoint. Do not edit Soldier canonical identity, presentation strings, Hero-Soldier relations, or release chronology in that handoff.",
+  "reopenConditions": [
+    "canonical Soldier Korean-name state changes",
+    "presentation overlay soldierId population changes",
+    "tier-3 provisional boundary validation changes",
+    "frontend effective-display policy changes",
+    "site-admission review population changes"
+  ]
+}
