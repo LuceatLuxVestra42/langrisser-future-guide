@@ -21,8 +21,8 @@ def barycentric(px, py, ax, ay, bx, by, cx, cy):
     denom = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy)
     if abs(denom) < 1e-8:
         return None
-    w0 = ((by - cy) * (ax - cx) + (cx - bx) * (ay - cy)) / denom
-    w1 = ((cy - ay) * (ax - cx) + (ax - cx) * (ay - cy)) / denom
+    w0 = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / denom
+    w1 = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / denom
     w2 = 1.0 - w0 - w1
     return w0, w1, w2
 
