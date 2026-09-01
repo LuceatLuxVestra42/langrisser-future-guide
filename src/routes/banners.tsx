@@ -19,23 +19,21 @@ export const Route = createFileRoute("/banners")({
       {
         name: "description",
         content:
-          "랑그릿사 모바일 한국 서버 미래 가챠 배너, 소원소환 후보, CP 배너와 관측된 픽업 재등장 로그를 확인합니다.",
+          "랑그릿사 모바일 한국 서버 미래 가챠 배너와 연결된 이벤트 정보, 소원소환 후보, CP 배너와 관측된 픽업 재등장 로그를 확인합니다.",
       },
     ],
   }),
   component: BannerPage,
 });
 
-type ViewId = "table" | "events" | "cp" | "logs";
-type RowFilter = "ALL" | "PICKUP" | "WISH";
+type ViewId = "schedule" | "cp" | "logs";
 
 const VIEW_DEFINITIONS: ReadonlyArray<{
   id: ViewId;
   label: string;
   description: string;
 }> = [
-  { id: "table", label: "배너표", description: "전체 픽업·소원소환 일정" },
-  { id: "events", label: "배너+이벤트", description: "확정된 Event 관계 범위" },
+  { id: "schedule", label: "배너+이벤트", description: "전체 배너 일정과 연결된 이벤트 정보" },
   { id: "cp", label: "CP배너", description: "CP 관련 픽업 4건" },
   { id: "logs", label: "픽업 log", description: "현재 데이터셋 재등장 이력" },
 ];
@@ -101,8 +99,7 @@ function HeroChips({ heroes }: { heroes: Array<{ heroId: number; heroNameKr: str
 
 function BannerPage() {
   const data = Route.useLoaderData();
-  const [activeView, setActiveView] = useState<ViewId>("table");
-  const [rowFilter, setRowFilter] = useState<RowFilter>("ALL");
+  const [activeView, setActiveView] = useState<ViewId>("schedule");
   const [expandedWishOccurrence, setExpandedWishOccurrence] = useState<string | null>(null);
 
   const wishByDefinition = useMemo(
@@ -110,23 +107,15 @@ function BannerPage() {
     [data.wishCandidateSets],
   );
 
+  const cpByOccurrence = useMemo(
+    () => new Map(data.cpRecords.map((record) => [record.bannerOccurrenceId, record])),
+    [data.cpRecords],
+  );
+
   const allRows = useMemo(() => data.dateGroups.flatMap((group) => group.rows), [data.dateGroups]);
   const rowByOccurrence = useMemo(
     () => new Map(allRows.map((row) => [row.bannerOccurrenceId, row])),
     [allRows],
-  );
-
-  const filteredDateGroups = useMemo(
-    () =>
-      data.dateGroups
-        .map((group) => ({
-          ...group,
-          rows: group.rows.filter(
-            (row) => rowFilter === "ALL" || row.mechanicFamily === rowFilter,
-          ),
-        }))
-        .filter((group) => group.rows.length > 0),
-    [data.dateGroups, rowFilter],
   );
 
   return (
@@ -145,7 +134,7 @@ function BannerPage() {
               가챠 배너
             </h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-              현재 확정된 KR 미래시 데이터셋의 배너 일정과 소원소환 후보, CP 관계, 재등장 관측 이력을 확인할 수 있어.
+              현재 확정된 KR 미래시 데이터셋의 배너 일정과 연결된 이벤트 정보, 소원소환 후보, CP 관계, 재등장 관측 이력을 확인할 수 있어.
             </p>
           </div>
 
@@ -166,7 +155,7 @@ function BannerPage() {
         </div>
 
         <section className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <div className="grid grid-cols-2 md:grid-cols-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3">
             {VIEW_DEFINITIONS.map((view) => {
               const selected = activeView === view.id;
               return (
@@ -175,7 +164,7 @@ function BannerPage() {
                   type="button"
                   aria-pressed={selected}
                   onClick={() => setActiveView(view.id)}
-                  className={`border-b border-r border-border px-4 py-4 text-left transition even:border-r-0 md:border-b-0 md:even:border-r md:last:border-r-0 ${
+                  className={`border-b border-border px-4 py-4 text-left transition last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0 ${
                     selected
                       ? "bg-accent text-accent-foreground"
                       : "bg-card text-foreground hover:bg-muted/60"
@@ -191,39 +180,14 @@ function BannerPage() {
           </div>
         </section>
 
-        {activeView === "table" && (
+        {activeView === "schedule" && (
           <section className="mt-6">
-            <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-wrap gap-2">
-                {(
-                  [
-                    ["ALL", "전체"],
-                    ["PICKUP", "픽업"],
-                    ["WISH", "소원소환"],
-                  ] as const
-                ).map(([value, label]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    aria-pressed={rowFilter === value}
-                    onClick={() => setRowFilter(value)}
-                    className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
-                      rowFilter === value
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-background text-foreground hover:bg-accent"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs leading-5 text-muted-foreground">
-                소원소환은 배너를 누르면 선택 가능 후보를 펼쳐볼 수 있어.
-              </p>
-            </div>
+            <p className="mb-5 text-xs leading-5 text-muted-foreground">
+              픽업·소원소환을 구분해서 거르지 않고 전체 일정을 한 번에 표시해. 소원소환은 배너를 누르면 선택 가능 후보를 펼쳐볼 수 있어.
+            </p>
 
-            <div className="mt-5 space-y-8">
-              {filteredDateGroups.map((group) => (
+            <div className="space-y-8">
+              {data.dateGroups.map((group) => (
                 <section key={group.date} aria-labelledby={`date-${group.date}`}>
                   <div className="mb-3 flex items-center gap-2">
                     <CalendarDays size={17} className="text-muted-foreground" aria-hidden="true" />
@@ -236,6 +200,7 @@ function BannerPage() {
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {group.rows.map((row) => {
                       const wish = wishByDefinition.get(row.bannerDefinitionId);
+                      const cpRecord = cpByOccurrence.get(row.bannerOccurrenceId);
                       const isWish = row.mechanicFamily === "WISH";
                       const expanded = expandedWishOccurrence === row.bannerOccurrenceId;
 
@@ -295,6 +260,20 @@ function BannerPage() {
                             </div>
                           )}
 
+                          {cpRecord && (
+                            <div className="border-t border-border bg-muted/35 px-4 py-3">
+                              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                Event text reference
+                              </p>
+                              <p className="mt-1 text-sm font-bold text-foreground">
+                                {cpRecord.eventReferenceLabelCn}
+                              </p>
+                              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                                canonical Event ID 미확정 · 상세 이동 비활성
+                              </p>
+                            </div>
+                          )}
+
                           {isWish && expanded && (
                             <div className="border-t border-border bg-muted/25 p-4">
                               {wish?.candidateState === "VERIFIED_EXPLICIT_CANDIDATES" ? (
@@ -331,36 +310,6 @@ function BannerPage() {
                     })}
                   </div>
                 </section>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {activeView === "events" && (
-          <section className="mt-6 space-y-5">
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-              <div className="flex items-start gap-3">
-                <CircleAlert size={20} className="mt-0.5 shrink-0 text-muted-foreground" aria-hidden="true" />
-                <div>
-                  <h2 className="font-bold text-foreground">일반 Event 일정 JOIN은 아직 미확정이야.</h2>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    현재 배너 데이터에서 확정된 Event 관계는 CP 배너의 중국어 텍스트 참조뿐이야. 따라서 이 화면은 Event ID나 한국어 Event 이름, 상세 페이지 경로를 임의로 만들지 않아.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {data.cpRecords.map((record) => (
-                <article key={record.bannerOccurrenceId} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-                  <p className="text-xs font-semibold text-muted-foreground">
-                    {formatDisplayDate(record.krDisplayDate)} · CP_EVENT_TEXT_REFERENCE
-                  </p>
-                  <h2 className="mt-2 text-xl font-bold text-foreground">{record.eventReferenceLabelCn}</h2>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    canonical Event ID 미확정 · 상세 이동 비활성
-                  </p>
-                </article>
               ))}
             </div>
           </section>
