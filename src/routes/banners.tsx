@@ -154,6 +154,9 @@ function BannerPage() {
                     const wish = wishByDefinition.get(row.bannerDefinitionId);
                     const isWish = row.mechanicFamily === "WISH";
                     const expanded = expandedWishOccurrence === row.bannerOccurrenceId;
+                    const wishCandidatesReady =
+                      wish?.candidateState === "VERIFIED_EXPLICIT_CANDIDATES" ||
+                      wish?.candidateState === "VERIFIED_DIRECT_RULE_CANDIDATES";
                     const displayTypeLabel = getBannerDisplayLabel(
                       row.typeLabelKr,
                       row.cpRelated,
@@ -206,7 +209,7 @@ function BannerPage() {
 
                         {isWish && expanded && (
                           <div className="border-t border-border bg-muted/25 p-4">
-                            {wish?.candidateState === "VERIFIED_EXPLICIT_CANDIDATES" ? (
+                            {wish && wishCandidatesReady ? (
                               <>
                                 <div className="flex items-center justify-between gap-3">
                                   <p className="text-sm font-semibold text-foreground">선택 가능 후보</p>
