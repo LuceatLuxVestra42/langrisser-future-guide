@@ -8,6 +8,7 @@ PAGES_CONFIG = Path('vite.config.pages.ts')
 SKIN_READONLY = Path('scripts/validate-skin-stage3-5-static-assets-readonly.mjs')
 OWNERS = Path('tools/project-check/contracts/owners.v1.json')
 VALIDATORS = Path('tools/project-check/contracts/validators.v1.json')
+PROJECT_CHECK_SELF_TEST = Path('tools/project-check/test/project-check-self-test.mjs')
 
 old_workflow = OLD_DEPLOY.read_text()
 
@@ -134,5 +135,15 @@ if marker not in validators:
     raise SystemExit('validator catalog anchor changed')
 validators = validators.replace(marker, insertion + marker, 1)
 VALIDATORS.write_text(validators)
+
+# The old self-test intentionally asserted MANUAL_REVIEW while skin-assets had no independent validator.
+# After admitting the read-only owner validator, this exact regression fixture must become PLAN_READY.
+self_test = PROJECT_CHECK_SELF_TEST.read_text()
+old_fixture = '''const skinAsset = routeProjectCheckPaths(['data/evidence/skin-stage3-2-static-source-evidence.v1.json'], contracts);\nassert.equal(skinAsset.status, 'MANUAL_REVIEW');\nassert.deepEqual(skinAsset.files[0].owners, ['skin-assets']);\nassert.deepEqual(validatorIds(skinAsset), []);'''
+new_fixture = '''const skinAsset = routeProjectCheckPaths(['data/evidence/skin-stage3-2-static-source-evidence.v1.json'], contracts);\nassert.equal(skinAsset.status, 'PLAN_READY');\nassert.deepEqual(skinAsset.files[0].owners, ['skin-assets']);\nassert.deepEqual(validatorIds(skinAsset), ['skin-static-assets-readonly']);'''
+if old_fixture not in self_test:
+    raise SystemExit('Project Check skin-assets regression fixture anchor changed')
+self_test = self_test.replace(old_fixture, new_fixture, 1)
+PROJECT_CHECK_SELF_TEST.write_text(self_test)
 
 print('PASS_MATERIALIZE_CURRENT_TREE_PAGES_RUNTIME')
