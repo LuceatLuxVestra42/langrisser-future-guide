@@ -21,6 +21,7 @@ import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
+import { getSkinFullartVisuals } from "@/lib/skin-fullart-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 
 export const Route = createFileRoute("/heroes_/$heroId")({
@@ -92,7 +93,7 @@ function HeroDetailPage() {
   if (imageUrl) {
     visuals.push({ kind: "hero", src: imageUrl, label: "대표 일러스트", skinId: null, sourceOrder: null });
   }
-  for (const skin of detail.presentation.skins) {
+  for (const skin of getSkinFullartVisuals(hero.heroId)) {
     visuals.push({
       kind: "skin",
       src: resolvePublicAssetUrl(skin.publicPath),

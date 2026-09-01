@@ -48,7 +48,8 @@
     {"id":"shared-frontend","validators":["production-build"]},
     {"id":"shared-build","validators":["production-build"]},
     {"id":"banner-assets","validators":[],"manualReview":"Banner asset ownership remains manual until an independent final asset validator is admitted."},
-    {"id":"skin-assets","validators":["skin-static-assets-readonly"]}
+    {"id":"skin-assets","validators":["skin-static-assets-readonly"]},
+    {"id":"skin-fullart-assets","validators":["skin-fullart-assets-readonly"]}
   ],
   "pathRules": [
     {
@@ -227,6 +228,16 @@
       "id":"skin-stage3-2-evidence",
       "patterns":["data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json","data/validation/skin-stage3-2-readiness.v1.json"],
       "owners":["skin-stage3-2-evidence"]
+    },
+    {
+      "id":"skin-fullart-assets",
+      "patterns":["public/images/skin-fullart/**","data/contracts/skin-fullart-*","data/generated/skin-fullart-*","data/validation/skin-fullart-*","data/evidence/leon-reference-skin-source-probe.v1.json","scripts/*skin-fullart*"],
+      "owners":["skin-fullart-assets"]
+    },
+    {
+      "id":"skin-fullart-hero-consumer",
+      "patterns":["src/lib/skin-fullart-assets.ts"],
+      "owners":["skin-fullart-assets","hero-frontend"]
     },
     {
       "id":"skin-assets",

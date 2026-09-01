@@ -226,6 +226,16 @@ assert.deepEqual(bannerAsset.files[0].owners, ['banner-assets', 'banner-frontend
 assert.deepEqual(validatorIds(bannerAsset), ['production-build']);
 assert.equal(bannerAsset.manualReviews[0].ownerId, 'banner-assets');
 
+const skinFullartAsset = routeProjectCheckPaths(['public/images/skin-fullart/601.webp'], contracts);
+assert.equal(skinFullartAsset.status, 'PLAN_READY');
+assert.deepEqual(skinFullartAsset.files[0].owners, ['skin-fullart-assets']);
+assert.deepEqual(validatorIds(skinFullartAsset), ['skin-fullart-assets-readonly']);
+
+const skinFullartConsumer = routeProjectCheckPaths(['src/lib/skin-fullart-assets.ts'], contracts);
+assert.equal(skinFullartConsumer.status, 'PLAN_READY');
+assert.deepEqual(skinFullartConsumer.files[0].owners, ['hero-frontend', 'skin-fullart-assets']);
+assert.deepEqual(validatorIds(skinFullartConsumer), ['skin-fullart-assets-readonly', 'production-build']);
+
 const skinAsset = routeProjectCheckPaths(['data/evidence/skin-stage3-2-static-source-evidence.v1.json'], contracts);
 assert.equal(skinAsset.status, 'PLAN_READY');
 assert.deepEqual(skinAsset.files[0].owners, ['skin-assets']);
