@@ -56,7 +56,6 @@ def collect_pptrs(node, path=""):
 
 
 def parse_ref(source_ref):
-    # official-install://1.1.113/InstallPage_1.1.113_25.zip/PC/AssetBundle/foo.b#container
     before_hash, container = source_ref.split("#", 1)
     parts = before_hash.split("/")
     package_name = next(p for p in parts if p.endswith(".zip"))
@@ -86,8 +85,9 @@ def fetch_named_bundle(base, package_name, basename):
 
 
 def object_reader(obj):
-    if hasattr(obj, "deref"):
-        return obj.deref()
+    deref = getattr(obj, "deref", None)
+    if callable(deref):
+        return deref()
     reader = getattr(obj, "object_reader", None)
     return reader if reader is not None else obj
 
