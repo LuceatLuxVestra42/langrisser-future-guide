@@ -88,8 +88,10 @@ const routeSource = readText('src/routes/heroes_.$heroId.tsx');
 assert(serverSource.includes('skin-stage2-3-bidirectional-relation.v1.json'), 'Skin frontend server is not consuming the frozen Stage 2 relation');
 assert(serverSource.includes('../../data/generated/skin-stage3-5-static-web-asset-map.v1.json'), 'Skin frontend server is not consuming the frozen Stage 3-5 asset map');
 assert(serverSource.includes('../../data/validation/skin-stage3-5-static-web-asset-map.v1.json'), 'Skin frontend server is not consuming Stage 3-5 final validation admission');
-assert(routeSource.includes('detail.presentation.skins'), 'Hero detail route is not consuming projected Skin rows');
-assert(routeSource.includes('resolvePublicAssetUrl(skin.publicPath)'), 'Hero detail route does not resolve frozen Skin public paths');
+assert(routeSource.includes('getSkinFullartVisuals') && routeSource.includes('@/lib/skin-fullart-assets'), 'Hero detail route is not consuming the admitted fullart Skin manifest');
+assert(routeSource.includes('getSkinFullartVisuals(hero.heroId)'), 'Hero detail route is not selecting fullart Skin rows by Hero ID');
+assert(!routeSource.includes('for (const skin of detail.presentation.skins)'), 'Hero detail route reintroduced legacy static Skin-card image consumption');
+assert(routeSource.includes('resolvePublicAssetUrl(skin.publicPath)'), 'Hero detail route does not resolve admitted Skin public paths');
 assert(routeSource.includes('ChevronLeft') && routeSource.includes('ChevronRight'), 'Hero detail Skin carousel controls are missing');
 
 const forbiddenRawConfigPatterns = [
@@ -121,6 +123,8 @@ const result = {
     stage2FrozenRelationOnly: true,
     stage35FrozenPublicAssetMapOnly: true,
     actualPublicArtifactHashVerified: true,
+    heroDetailFullartManifestConsumer: true,
+    legacyStaticHeroDetailImageConsumption: false,
     rawConfigDataRead: false,
     nameJoin: false,
     idArithmetic: false,
