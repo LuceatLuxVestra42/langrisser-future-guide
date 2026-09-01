@@ -6,6 +6,7 @@ on:
       - work/skin-stage3-3-batched-20260901
     paths:
       - scripts/run-skin-stage3-3-static-batch.py
+      - scripts/run-skin-stage3-3-static-batch-v2.py
       - scripts/diagnose-skin-stage3-3-batch0-zip.py
       - scripts/validate-skin-stage3-3-batch0.mjs
       - .github/workflows/skin-stage3-3-batch0-static-proof.yml
@@ -43,7 +44,7 @@ jobs:
 
       - name: Extract representative STATIC artwork only
         run: |
-          python scripts/run-skin-stage3-3-static-batch.py \
+          python scripts/run-skin-stage3-3-static-batch-v2.py \
             --skin-ids 102 1901 3701 \
             --batch-id batch-000 \
             --plan-output data/generated/skin-stage3-3-batches/batch-000-plan.v1.json \
