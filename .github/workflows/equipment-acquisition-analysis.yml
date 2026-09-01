@@ -2,6 +2,8 @@ name: Equipment Acquisition Analysis
 
 on:
   push:
+    branches:
+      - main
     paths:
       - '.github/workflows/equipment-acquisition-analysis.yml'
       - 'scripts/analyze-equipment-acquisition.mjs'
@@ -9,30 +11,108 @@ on:
       - 'scripts/sample-acquisition-pathtypes.mjs'
       - 'data/configdata/**'
       - 'data/generated/equipment_stage2_6_restrictions.json'
+      - 'data/generated/equipment_acquisition_path_analysis.json'
+      - 'data/generated/equipment_acquisition_pathtype_sources.json'
+      - 'data/generated/equipment_acquisition_pathtype_samples.json'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/equipment-acquisition-analysis.yml'
+      - 'scripts/analyze-equipment-acquisition.mjs'
+      - 'scripts/scan-acquisition-pathtype-sources.mjs'
+      - 'scripts/sample-acquisition-pathtypes.mjs'
+      - 'data/configdata/**'
+      - 'data/generated/equipment_stage2_6_restrictions.json'
+      - 'data/generated/equipment_acquisition_path_analysis.json'
+      - 'data/generated/equipment_acquisition_pathtype_sources.json'
+      - 'data/generated/equipment_acquisition_pathtype_samples.json'
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  analyze:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Reject protected main as explicit producer target
+        run: |
+          echo 'Explicit Equipment acquisition producer runs must target a non-main branch. Freeze there, then open a normal PR.'
+          exit 1
+
+  validate:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Analyze equipment acquisition paths
         run: node scripts/analyze-equipment-acquisition.mjs
+
       - name: Scan PathType sources
         run: node scripts/scan-acquisition-pathtype-sources.mjs
+
       - name: Sample PathTypes across ConfigData
         run: node scripts/sample-acquisition-pathtypes.mjs
-      - name: Persist acquisition checkpoints
+
+      - name: Verify frozen acquisition checkpoints
+        shell: bash
         run: |
+          set -euo pipefail
+          targets=(
+            data/generated/equipment_acquisition_path_analysis.json
+            data/generated/equipment_acquisition_pathtype_sources.json
+            data/generated/equipment_acquisition_pathtype_samples.json
+          )
+          if ! git diff --exit-code -- "${targets[@]}"; then
+            echo 'Equipment acquisition frozen outputs are stale. Run this workflow explicitly on a non-main producer branch and open a normal PR with the refreshed checkpoints.'
+            exit 1
+          fi
+          echo 'Equipment acquisition frozen outputs match the regenerated analysis.'
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout explicit producer target
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: Analyze equipment acquisition paths
+        run: node scripts/analyze-equipment-acquisition.mjs
+
+      - name: Scan PathType sources
+        run: node scripts/scan-acquisition-pathtype-sources.mjs
+
+      - name: Sample PathTypes across ConfigData
+        run: node scripts/sample-acquisition-pathtypes.mjs
+
+      - name: Freeze acquisition checkpoints on explicit producer branch
+        shell: bash
+        run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/generated/equipment_acquisition_path_analysis.json data/generated/equipment_acquisition_pathtype_sources.json data/generated/equipment_acquisition_pathtype_samples.json
+          git add \
+            data/generated/equipment_acquisition_path_analysis.json \
+            data/generated/equipment_acquisition_pathtype_sources.json \
+            data/generated/equipment_acquisition_pathtype_samples.json
           if git diff --cached --quiet; then
-            echo "No acquisition analysis changes"
-            exit 0
+            echo 'Equipment acquisition frozen outputs are already current.'
+          else
+            git commit -m 'Freeze equipment acquisition analysis'
+            git push origin HEAD:${{ github.ref_name }}
           fi
-          git commit -m "Freeze equipment acquisition analysis"
-          git pull --rebase origin main
-          git push

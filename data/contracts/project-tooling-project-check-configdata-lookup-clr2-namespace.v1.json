@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-clr2-namespace/v1",
+  "stage": "CLR2",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR2_NAMESPACE_FROZEN",
+  "purpose": "Install the independent tools/configdata-lookup adapter namespace over the frozen Stage 0-6 lookup implementation without changing Stage 0-6 producers, generated lookup data, package CLI authority, or Stage 7/8 legacy orchestration.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "base": "main",
+    "sourceHead": "54159df31fba35e08c6ee119b29af8f9f041047b",
+    "predecessor": {
+      "path": "data/contracts/project-tooling-project-check-configdata-lookup-clr1-boundary.v1.json",
+      "blobSha": "c62ec424baa39d787f030ac3b6f485fac412da02",
+      "requiredCompletion": "CONFIGDATA_LOOKUP_CLR1_BOUNDARY_FROZEN"
+    }
+  },
+  "installedNamespace": {
+    "runtimeContract": "tools/configdata-lookup/contracts/runtime.v1.json",
+    "queryAdapter": "tools/configdata-lookup/lib/lookup.mjs",
+    "freshnessAdapter": "tools/configdata-lookup/lib/freshness.mjs",
+    "queryCli": "tools/configdata-lookup/cli/run.mjs",
+    "freshnessCli": "tools/configdata-lookup/cli/check-freshness.mjs",
+    "smokeTest": "tools/configdata-lookup/test/clr2-namespace-smoke.mjs",
+    "validationWorkflow": ".github/workflows/project-tooling-configdata-lookup-clr2.yml"
+  },
+  "adapterPolicy": {
+    "legacyStage5QueryCoreReused": true,
+    "legacyStage6FreshnessDetectorReused": true,
+    "legacyStage0To6ProducerRewriteCount": 0,
+    "packageJsonCutoverCount": 0,
+    "rebuildApiExposed": false,
+    "repositoryMutation": false,
+    "semanticMutation": false,
+    "stage7Or8RuntimeDependency": false,
+    "projectDoctorRuntimeDependency": false
+  },
+  "temporaryAdmission": {
+    "dedicatedConfigdataLookupOwnerCreated": false,
+    "temporaryOwner": "project-check",
+    "ruleId": "configdata-lookup-clr2-preimplementation-admission",
+    "reason": "Prevent the independent CLR2 namespace from becoming an unmatched-path MANUAL_REVIEW before the dedicated configdata-lookup owner and validator are admitted in CLR4.",
+    "replacementStage": "CLR4"
+  },
+  "validationEvidence": {
+    "candidateHead": "a5d0ef058759f8230d08efcc29915810c098164e",
+    "candidateClr2Workflow": {
+      "name": "Project Tooling ConfigData Lookup CLR2",
+      "runId": 33390746524,
+      "jobId": 99483551569,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "namespaceSmoke": "PASS",
+      "conclusion": "success"
+    },
+    "candidateProjectCheck": {
+      "runId": 33390746549,
+      "jobId": 99483551865,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHead": "f208922407c54786f05ba8dd2049b3e0b53735f0",
+    "freezeHeadClr2Workflow": {
+      "runId": 33390856604,
+      "jobId": 99483895939,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "namespaceSmoke": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadProjectCheck": {
+      "runId": 33390856258,
+      "jobId": 99483894349,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadRevalidation": "PASS",
+    "finalMetadataHead": "ad8f81a97e099c94a4dd074ed27719ae855b357d",
+    "finalMetadataClr2Workflow": {
+      "runId": 33390985490,
+      "jobId": 99484298479,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "namespaceSmoke": "PASS",
+      "conclusion": "success"
+    },
+    "finalMetadataProjectCheck": {
+      "runId": 33390985487,
+      "jobId": 99484297635,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "finalMetadataHeadRevalidation": "PASS"
+  },
+  "requiredValidation": {
+    "legacyStage5Validator": "PASS_CONFIGDATA_LOOKUP_STAGE5_CLI",
+    "legacyStage6Freshness": "CLEAN_CONFIGDATA_LOOKUP_STAGE6",
+    "clr2NamespaceSmoke": "PASS",
+    "projectCheck": "PASS",
+    "trackedMutationCountDuringValidation": 0
+  },
+  "semanticBoundary": {
+    "rawConfigDataAsQueryFallback": false,
+    "rawConfigDataMutation": false,
+    "newRelationDiscovery": false,
+    "canonicalRelationRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "transitiveImpactInference": false,
+    "domainFanOut": false,
+    "pageValidatorSelection": false,
+    "hostedQaSelection": false,
+    "browserUiSelection": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "DEDICATED_CONFIGDATA_LOOKUP_OWNER_DEFERRED_TO_CLR4",
+      "blocking": false,
+      "detail": "CLR2 uses only temporary project-check preimplementation admission. The dedicated owner and catalogued self-test remain CLR4 scope."
+    },
+    {
+      "id": "PACKAGE_CLI_CUTOVER_DEFERRED_TO_CLR7",
+      "blocking": false,
+      "detail": "npm run lookup/refs/find remain on scripts/configdata-lookup-cli.mjs until later parity and cutover gates complete."
+    },
+    {
+      "id": "WRITER_SEPARATION_DEFERRED_TO_CLR5",
+      "blocking": false,
+      "detail": "CLR2 does not expose rebuildIncrementally through the new namespace. Explicit writer separation remains CLR5 scope."
+    }
+  ],
+  "nextStart": "Merge CLR2 after the evidence-only final commit passes the CLR2 namespace workflow and required Project Check, then begin CLR3 dedicated read-only self-test promotion without changing Stage 0-6 producers or package CLI authority.",
+  "reopenConditions": [
+    "The new namespace cannot preserve the existing Stage 5 query semantics through an adapter.",
+    "The new read-only freshness adapter requires rebuild/write behavior.",
+    "The new namespace depends on Stage 7/8 or Project Doctor orchestration at runtime.",
+    "Stage 0-6 materialized lookup outputs become stale or inconsistent during unchanged-baseline validation."
+  ]
+}

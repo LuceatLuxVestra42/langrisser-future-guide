@@ -1,0 +1,106 @@
+name: Project Tooling R2 Project Status Writer
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - 'tools/project-status/**'
+      - 'tools/status-source/**'
+      - 'data/status-sources/**'
+      - 'data/validation/**'
+      - 'data/checkpoints/**'
+      - '.github/workflows/project-tooling-r2-project-status-writer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-status-new-write-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  project-status-writer:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Reject direct main mutation
+        if: github.ref_name == 'main'
+        run: |
+          echo 'NEW Project Status writer must run on a non-main branch and reach main through a pull request.'
+          exit 1
+
+      - name: Checkout selected work branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify NEW R1 Status Source predecessor
+        run: node tools/status-source/test/current-main-parity.mjs
+
+      - name: Verify R2 runtime parity and writer isolation before repair
+        env:
+          PROJECT_STATUS_ALLOW_STALE_CANONICAL: '1'
+        run: node tools/project-status/test/current-parity.mjs
+
+      - name: Resolve writer activation
+        id: activation
+        shell: bash
+        run: |
+          STATE="$(node -p "require('./tools/project-status/contracts/writer.v1.json').state")"
+          echo "state=$STATE" >> "$GITHUB_OUTPUT"
+          if [ "$STATE" = 'ACTIVE' ]; then
+            echo 'active=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'active=false' >> "$GITHUB_OUTPUT"
+          fi
+          echo "Project Status writer state: $STATE"
+
+      - name: Preview canonical Project Status outputs
+        run: node tools/project-status/cli/write.mjs --check
+
+      - name: Apply canonical Project Status outputs
+        if: steps.activation.outputs.active == 'true'
+        run: node tools/project-status/cli/write.mjs --apply
+
+      - name: Reject unexpected working-tree mutations
+        if: steps.activation.outputs.active == 'true'
+        shell: bash
+        run: |
+          UNEXPECTED="$({ git status --porcelain || true; } | awk '{print $2}' | while IFS= read -r path; do
+            case "$path" in
+              data/generated/project-status.v1.json|PROJECT_STATUS.md|'')
+                ;;
+              *)
+                echo "$path"
+                ;;
+            esac
+          done)"
+          if [ -n "$UNEXPECTED" ]; then
+            echo 'Unexpected NEW Project Status writer mutations:'
+            echo "$UNEXPECTED"
+            exit 1
+          fi
+
+      - name: Commit canonical Project Status outputs
+        if: steps.activation.outputs.active == 'true'
+        shell: bash
+        run: |
+          git add data/generated/project-status.v1.json PROJECT_STATUS.md
+          if git diff --cached --quiet; then
+            echo 'Canonical Project Status outputs are already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore: refresh NEW Project Status projection'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

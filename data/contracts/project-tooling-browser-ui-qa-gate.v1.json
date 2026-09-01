@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-browser-ui-qa-gate/v1",
+  "stage": "BROWSER_UI",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "BROWSER_UI_QA_GATE_FROZEN",
+  "purpose": "Freeze the independent Browser/UI QA Gate after the RH4 Hosted Gate, exact deployed-source freshness, representative real-browser interaction validation, candidate Project Check success, and integrated-main Browser/UI success. Keep semantic, ConfigData, frontend implementation, asset authority, deployment writer, Hosted contract, and Status Source authority outside this Browser/UI checkpoint.",
+  "predecessors": {
+    "rh4HostedGate": "data/contracts/project-tooling-route-hosted-qa-rh4-hosted-gate.v1.json",
+    "rh4Completion": "ROUTE_HOSTED_QA_RH4_HOSTED_GATE_FROZEN",
+    "requiredFlow": "Preflight -> Build -> Deployment/Hosted -> Browser/UI"
+  },
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "base": "main",
+    "integratedMainHeadBeforeFreeze": "ffac9738c2e2603f638291d6bfd63fb1b7e27cfb",
+    "hostedBaseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+    "workflow": ".github/workflows/project-tooling-browser-ui-qa.yml",
+    "workflowBlobSha": "63453ff13d17eddc4c94e4377d44d16c56469036",
+    "ownerMap": "tools/project-check/contracts/owners.v1.json",
+    "ownerRule": "browser-ui-qa-tooling-admission",
+    "checkpointOwner": "project-check",
+    "requiredCheckContexts": ["project-check"]
+  },
+  "integrationEvidence": {
+    "pullRequest": 313,
+    "sourceHead": "fe0c0db828b6f7a93fc510e6767ae975119688a0",
+    "mergeCommit": "ffac9738c2e2603f638291d6bfd63fb1b7e27cfb",
+    "changedPaths": [
+      ".github/workflows/project-tooling-browser-ui-qa.yml",
+      "tools/project-check/contracts/owners.v1.json"
+    ],
+    "semanticSourceChanged": false,
+    "configDataChanged": false,
+    "frontendImplementationChanged": false,
+    "assetChanged": false,
+    "deploymentWriterChanged": false,
+    "hostedContractChanged": false
+  },
+  "candidateValidation": {
+    "head": "fe0c0db828b6f7a93fc510e6767ae975119688a0",
+    "projectCheck": {
+      "runId": 33383333103,
+      "jobId": 99460335759,
+      "conclusion": "success",
+      "projectCheckSelfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS"
+    },
+    "browserUi": {
+      "runId": 33383333098,
+      "jobId": 99460336402,
+      "conclusion": "success",
+      "exactDeployedSourcePredecessor": "PASS",
+      "chromiumRuntime": "PASS",
+      "stableHostedBrowserValidators": "PASS",
+      "interactionSpotChecks": "PASS"
+    }
+  },
+  "integratedMainValidation": {
+    "sourceSha": "ffac9738c2e2603f638291d6bfd63fb1b7e27cfb",
+    "authoritativePagesDeploy": {
+      "runId": 33383487310,
+      "jobId": 99460811105,
+      "conclusion": "success",
+      "publish": "PASS",
+      "hostedComposedSurface": "PASS"
+    },
+    "routeHostedStrict": {
+      "runId": 33383679213,
+      "jobId": 99461405923,
+      "conclusion": "success",
+      "exactSourceSha": "PASS",
+      "strictCandidate": "PASS"
+    },
+    "browserUi": {
+      "runId": 33383719513,
+      "jobId": 99461530526,
+      "conclusion": "success",
+      "exactHostedSourceCheckout": "PASS",
+      "predecessorFreshness": "PASS",
+      "chromiumRuntime": "PASS",
+      "stableHostedBrowserValidators": "PASS",
+      "interactionSpotChecks": "PASS"
+    }
+  },
+  "browserCoverage": {
+    "heroDetailDirectBrowserEntry": "PASS",
+    "skinCarouselKeyboardActivation": "PASS",
+    "heroToSoldierNavigation": "PASS",
+    "soldierDetailHeroCardWebpReadyState": "PASS",
+    "backNavigation": "PASS",
+    "forwardNavigation": "PASS",
+    "equipmentToHeroNavigation": "PASS",
+    "unknownHeroIdBrowser404": "PASS",
+    "tabletResponsiveOverflow": "PASS",
+    "desktopConsoleAndPageErrors": "PASS",
+    "tabletConsoleAndPageErrors": "PASS",
+    "existingHeroCentralDisciplineBrowserValidation": "PASS",
+    "existingHeroSoldierCardsBrowserValidation": "PASS",
+    "existingHeroCardIconsBrowserValidation": "PASS",
+    "existingAuthoritativePagesBrowserValidation": "PASS"
+  },
+  "completionGate": {
+    "rh4HostedGatePreserved": true,
+    "independentBrowserWorkflowIntegrated": true,
+    "exactDeployedSourceRequired": true,
+    "candidateProjectCheckPass": true,
+    "candidateBrowserUiPass": true,
+    "integratedMainDeploymentPass": true,
+    "integratedMainHostedStrictPass": true,
+    "integratedMainBrowserUiPass": true,
+    "browserUiOwnsBrowserFailures": true,
+    "semanticReopen": false,
+    "frontendImplementationMutation": false,
+    "deploymentMutationIntroducedByBrowserWorkflow": false,
+    "repositoryMutationIntroducedByBrowserWorkflow": false,
+    "freezeReady": true
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_SOLDIER_DETAIL_BROWSER_VALIDATOR_TIMING_FLAKE",
+      "blocking": false,
+      "classification": "VALIDATOR_TIMING_REVIEW",
+      "detail": "An earlier Browser/UI candidate run failed in scripts/validate-soldier-detail-hero-cards-hosted.mjs because that legacy validator can observe the '사용 가능 영웅' heading before asynchronous Hero-card data is ready and then immediately count zero images. The same deployed source had passed that legacy validator in authoritative hosted verification. The independent Browser/UI Gate does not modify the legacy validator; it validates the same presentation meaning with an explicit attached-and-loaded WebP ready-state condition."
+    },
+    {
+      "id": "REPRESENTATIVE_BROWSER_COVERAGE_NOT_EXHAUSTIVE",
+      "blocking": false,
+      "classification": "COVERAGE_REVIEW",
+      "detail": "This freeze records representative Browser/UI coverage required for the current hosted surfaces and interactions. It does not claim that every possible filter combination, storage path, device, pixel-level layout state, or future UI control has been exhaustively enumerated. New or changed interaction contracts require targeted Browser/UI extension without reopening completed semantic stages."
+    }
+  ],
+  "nonScope": [
+    "No semantic, canonical, relation, ConfigData, localization, frontend implementation, or asset data is changed by this Browser/UI freeze.",
+    "No GitHub Pages writer, gh-pages mutation, force-push, repository writer, Status Source writer, or Project Status writer is introduced by the Browser/UI workflow.",
+    "No Browser/UI failure is promoted into a semantic, relation, ConfigData, or Hosted failure without owning-layer evidence.",
+    "No legacy Browser validator is silently made authoritative for semantic meaning; reused validators remain presentation/runtime evidence only."
+  ],
+  "nextStart": "Validate this Browser/UI freeze checkpoint on its pull request with required project-check and the independent Browser/UI workflow against the exact deployed base source. If both PASS, merge the freeze. Then require authoritative Pages deployment, Route Hosted strict validation, and Browser/UI exact-source validation on the freeze merge SHA. Classify Browser/UI as COMPLETE only after that freeze revalidation succeeds.",
+  "reopenConditions": [
+    "The RH4 Hosted Gate predecessor no longer satisfies its frozen completion requirements.",
+    "The Browser/UI workflow no longer validates the exact deployed source SHA or no longer runs only after successful Hosted Gate validation on main.",
+    "Authoritative Browser/UI interaction contracts change for navigation, keyboard/touch behavior, responsive layout, direct entry, error handling, or representative detail surfaces.",
+    "A current-branch-only Browser/UI or Project Check failure is causally owned by the Browser/UI workflow, checkpoint ownership rule, or current Browser/UI interaction contract.",
+    "Authoritative evidence shows Browser/UI validation mutates repository/deployment state or improperly assumes semantic, ConfigData, frontend, or asset authority."
+  ]
+}

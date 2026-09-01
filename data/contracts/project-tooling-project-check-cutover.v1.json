@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-cutover/v1",
+  "stage": "REQUIRED_CHECK_CUTOVER",
+  "checkpoint": "PROJECT_TOOLING_PROJECT_CHECK_REQUIRED_CUTOVER",
+  "status": "PASS",
+  "completion": "CUTOVER_COMPLETE",
+  "purpose": "Freeze the completed required-check ownership switch from OLD Project Doctor pr-guard to NEW Project Check project-check without coupling the switch to Status Source / Project Status writer transitions or OLD Doctor deletion.",
+  "predecessors": [
+    {
+      "checkpoint": "PROJECT_TOOLING_PROJECT_CHECK_R3",
+      "contract": "data/contracts/project-tooling-project-check-r3.v1.json",
+      "requiredStatus": "PASS"
+    },
+    {
+      "checkpoint": "PROJECT_TOOLING_OLD_NEW_SHADOW_COMPARISON",
+      "contract": "data/contracts/project-tooling-project-check-shadow-comparison.v1.json",
+      "requiredStatus": "PASS"
+    }
+  ],
+  "baseline": {
+    "mainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "migrationBranch": "work/project-tooling-migration-r0-boundary-20260831",
+    "pullRequest": 309,
+    "legacyRequiredContext": "pr-guard",
+    "newRequiredContext": "project-check"
+  },
+  "implementation": {
+    "workflow": ".github/workflows/project-tooling-r3-project-check.yml",
+    "newRequiredJob": "project-check",
+    "shadowJob": "project-check-shadow",
+    "shadowDependsOnRequiredJob": true,
+    "newRequiredJobIncludesOldComparison": false,
+    "newRequiredJobIncludes": [
+      "project-check-self-test",
+      "changed-path-plan",
+      "selected-owning-validator-execution"
+    ]
+  },
+  "preCutoverValidationEvidence": {
+    "validatedHead": "e0e4f1bfda4a3488b1fe3aecd69bfab5ffcfd1aa",
+    "workflowRunId": 33345062357,
+    "requiredJobId": 99347485866,
+    "requiredJobName": "project-check",
+    "requiredJobConclusion": "success",
+    "changedFileCount": 50,
+    "ownerCount": 3,
+    "owners": ["project-check", "project-status", "status-source"],
+    "validatorCount": 7,
+    "manualReviewCount": 0,
+    "preflightPass": true,
+    "allSelectedValidatorExitCodesZero": true,
+    "finalProjectCheckStatus": "PASS",
+    "finalProjectCheckExitCode": 0
+  },
+  "postCutoverVerification": {
+    "verifiedMainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "verifiedPrHead": "b422546339e121526cd631ab1ddff2522012e8b7",
+    "mainProtected": true,
+    "requiredContexts": ["project-check"],
+    "requiredChecks": [
+      {
+        "context": "project-check",
+        "appId": 15368
+      }
+    ],
+    "legacyPrGuardRequired": false,
+    "shadowJobRequired": false,
+    "workflowRunId": 33345117252,
+    "requiredJobId": 99347641864,
+    "requiredJobName": "project-check",
+    "requiredJobConclusion": "success",
+    "shadowJobId": 99347685384,
+    "shadowJobConclusion": "success",
+    "legacyProjectDoctorRuntimeImports": 0,
+    "legacyD2D3D4D5D7RuntimeDependencies": 0,
+    "statusSourceMutationCount": 0,
+    "projectStatusWriteCount": 0
+  },
+  "cutoverPolicy": {
+    "requiredCheckSwitchOnly": true,
+    "removedLegacyRequiredContext": "pr-guard",
+    "addedNewRequiredContext": "project-check",
+    "legacyDoctorDeletionDuringThisStep": false,
+    "legacyDoctorRoutingExpansionAllowed": false,
+    "statusSourceWriterActivationDuringThisStep": false,
+    "projectStatusWriterActivationDuringThisStep": false,
+    "branchProtectionRequiresShadowJob": false
+  },
+  "rollbackPlan": {
+    "trigger": [
+      "project-check required context does not report on PRs targeting main",
+      "project-check reports a NEW owning-scope regression after cutover",
+      "branch protection becomes unsatisfiable because of context naming or workflow-trigger mismatch"
+    ],
+    "actions": [
+      "restore legacy required context pr-guard",
+      "remove project-check from required contexts",
+      "leave OLD Project Doctor implementation intact until OLD-off verification is complete",
+      "do not activate Status Source or Project Status writers as part of rollback"
+    ],
+    "dataRollbackRequired": false,
+    "semanticRollbackRequired": false
+  },
+  "branchProtectionObservation": {
+    "branchResourceRead": "SUCCESS",
+    "directProtectionEndpointRead": "FORBIDDEN_403_RESOURCE_NOT_ACCESSIBLE_BY_INTEGRATION",
+    "branchResourceProtectionSummaryAuthoritativeForRequiredContexts": true,
+    "repositoryRulesets": [],
+    "requiredContextAfterCutover": "project-check",
+    "legacyRequiredContextPresentAfterCutover": false
+  },
+  "boundaries": {
+    "legacyProjectDoctorRuntimeImportIntoNewRequiredJob": 0,
+    "legacyD2D3D4D5D7PredecessorCount": 0,
+    "statusSourceMutationCount": 0,
+    "projectStatusWriteCount": 0,
+    "statusSourceWriterActivated": false,
+    "projectStatusWriterActivated": false,
+    "branchProtectionChangeCount": 1
+  },
+  "completionGate": {
+    "stableNewContextDefined": true,
+    "rollbackPlanFrozen": true,
+    "newContextPassOnCurrentLineage": true,
+    "branchProtectionSwitched": true,
+    "postSwitchVerificationPass": true
+  },
+  "blockers": [],
+  "cutoverBlockers": [],
+  "reviews": [
+    "The direct branch-protection endpoint remains unreadable through the current integration, but the main branch resource now exposes the effective protection summary with project-check as the sole required status context.",
+    "OLD Project Doctor remains present for rollback observation but no longer owns the required merge gate.",
+    "Status Source production writer and Project Status canonical writer remain disabled and are not part of this required-check cutover."
+  ],
+  "nextStartPoint": "OLD Project Doctor OFF: remove its automatic pull-request merge-gate execution while retaining enough implementation for rollback observation until the OFF checkpoint passes. Do not delete OLD Doctor, activate Status Source writer ownership, or activate Project Status writer ownership in the same step.",
+  "reopenConditions": [
+    "main required context changes away from project-check",
+    "project-check workflow context name or trigger changes",
+    "R3 owner or validator contract changes",
+    "new project-check job fails due to an owning-scope regression",
+    "branch protection again requires pr-guard or project-check-shadow"
+  ]
+}

@@ -7,18 +7,14 @@ const expectedSkinRef = process.env.EXPECTED_SKIN_REF;
 if (!expectedSourceSha || !expectedSkinRef) throw new Error("EXPECTED_SOURCE_SHA and EXPECTED_SKIN_REF are required");
 
 const relation = JSON.parse(fs.readFileSync("data/generated/skin-stage2-3-bidirectional-relation.v1.json", "utf8"));
-const chronologyProjection = JSON.parse(fs.readFileSync("data/presentation/equipment-p3-1-release-metadata.v1.json", "utf8"));
-const displayCollection = JSON.parse(fs.readFileSync("data/presentation/equipment-display-collection.v1.json", "utf8"));
-const equipmentPass = displayCollection.displayCollections.equipmentPass;
-const equipmentPassIds = new Set(equipmentPass.equipmentIds.map(Number));
-const expectedEquipmentPassOrder = chronologyProjection.defaultOrderEquipmentIds.filter((equipmentId) => equipmentPassIds.has(Number(equipmentId)));
-const expectedPolicy = "장비 종류·세부 타입 순서를 유지하고, 같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순이야. 같은 출시 그룹 안의 개별 순서는 별도 출시순 의미가 없어.";
+const equipmentPublicAdmission = JSON.parse(fs.readFileSync("data/presentation/equipment-public-admission-correction.v1.json", "utf8"));
+const expectedGeneralEquipmentCount = Number(equipmentPublicAdmission.expectedPublicProjection?.generalEquipmentCount);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 const url = (path) => new URL(path.replace(/^\//, ""), baseUrl).toString();
 
-check(displayCollection.scope.equipmentPassMembershipMode === "EXPLICIT_EQUIPMENT_ID", "Equipment Pass display membership mode mismatch");
-check(expectedEquipmentPassOrder.length === equipmentPass.expectedCount, `Equipment Pass chronology coverage mismatch: ${expectedEquipmentPassOrder.length}`);
+check(equipmentPublicAdmission.status === "FROZEN", "Equipment public-admission correction must be FROZEN");
+check(Number.isInteger(expectedGeneralEquipmentCount) && expectedGeneralEquipmentCount > 0, "Equipment public general count is invalid");
 
 async function fetchWithRetry(path, attempts = 5) {
   let last = null;
@@ -159,19 +155,19 @@ try {
 
   response = await page.goto(url("equipment/"), { waitUntil: "networkidle", timeout: 45000 });
   check(response && response.status() < 400, `Equipment list failed: ${response?.status()}`);
-  await page.getByRole("button", { name: /장비패스/ }).click();
-  await page.getByText(expectedPolicy, { exact: true }).waitFor({ state: "visible" });
+  await page.getByText("장비 종류", { exact: true }).waitFor({ state: "visible" });
+  for (const removedLabel of ["초기 장비", "이전 추가 장비", "장비패스"]) {
+    check(await page.getByRole("button", { name: removedLabel, exact: true }).count() === 0, `Removed Equipment top-level category is still visible: ${removedLabel}`);
+  }
   const cardLinks = page.locator('section[aria-label="SSR 장비 이미지 목록"] a[href]');
   const cardCount = await cardLinks.count();
-  check(cardCount === equipmentPass.expectedCount, `Equipment Pass card count mismatch: ${cardCount}`);
-  const actualIds = [];
-  for (let index = 0; index < cardCount; index += 1) {
-    const href = await cardLinks.nth(index).getAttribute("href");
-    const match = href?.match(/\/equipment\/(\d+)\/?$/);
-    check(match, `unexpected Equipment href: ${href}`);
-    actualIds.push(Number(match[1]));
-  }
-  check(JSON.stringify(actualIds) === JSON.stringify(expectedEquipmentPassOrder), "Equipment Pass display membership/order parity failed");
+  check(cardCount === expectedGeneralEquipmentCount, `Equipment general list card count mismatch: ${cardCount}/${expectedGeneralEquipmentCount}`);
+  const weaponFilter = page.getByRole("button", { name: "무기", exact: true });
+  check(await weaponFilter.count() === 1, "Equipment weapon filter is missing or duplicated");
+  await weaponFilter.click();
+  await page.waitForTimeout(100);
+  const weaponCardCount = await cardLinks.count();
+  check(weaponCardCount > 0 && weaponCardCount < cardCount, `Equipment weapon filter did not narrow the list: ${weaponCardCount}/${cardCount}`);
 
   for (const [equipmentId, expectedDate] of [[642, "2026-07-16"], [299, "2019-05-09"]]) {
     response = await page.goto(url(`equipment/${equipmentId}/`), { waitUntil: "networkidle", timeout: 45000 });
@@ -233,7 +229,12 @@ try {
       desktop: "PASS",
       mobileOverflow: 0,
     },
-    equipmentP3_2: { tab3Count: cardCount, defaultOrderParity: "PASS", details: { 642: "2026-07-16", 299: "2019-05-09" } },
+    equipmentList: {
+      generalCount: cardCount,
+      removedTopLevelCollections: "PASS",
+      groupFilter: "PASS",
+      details: { 642: "2026-07-16", 299: "2019-05-09" },
+    },
     heroArtwork6: "HTTP_PASS_WITH_RETRY_POLICY",
     equipmentImage416: "HTTP_PASS_WITH_RETRY_POLICY",
     equipmentImage567: "HTTP_PASS_WITH_RETRY_POLICY",

@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "schemaId": "project-status-writer/v1",
+  "stage": "R2-WRITER-CUTOVER",
+  "state": "ACTIVE",
+  "activeWriterWorkflow": ".github/workflows/project-tooling-r2-project-status-writer.yml",
+  "legacyWriterWorkflow": ".github/workflows/project-status-sync.yml",
+  "canonicalTargets": {
+    "json": "data/generated/project-status.v1.json",
+    "markdown": "PROJECT_STATUS.md"
+  },
+  "policy": {
+    "sourceAuthority": "NEW_R1_STATUS_SOURCE",
+    "requiresExplicitApply": true,
+    "mainMutationAllowed": false,
+    "pullRequestMutationAllowed": false,
+    "canonicalTargetWriteOnly": true,
+    "legacyProjectDoctorRuntimeDependency": false,
+    "legacyD1RuntimeDependency": false,
+    "legacyD5RuntimeDependency": false,
+    "legacyGeneratedStatusRead": false,
+    "statusSourceMutationAllowed": false,
+    "rawConfigDataReadAllowed": false,
+    "semanticRecomputationAllowed": false,
+    "canonicalJoinRecomputationAllowed": false
+  },
+  "activation": {
+    "oldWriterMustBeInactiveFirst": true,
+    "maximumActiveWriterCount": 1,
+    "activationRequiresR2ParityPass": true,
+    "activationRequiresProjectCheckPass": true
+  }
+}

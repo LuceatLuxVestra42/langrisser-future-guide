@@ -1,0 +1,256 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-doctor-deletion-manifest/v1",
+  "stage": "OLD_PROJECT_DOCTOR_DELETION_MANIFEST",
+  "checkpoint": "PROJECT_TOOLING_OLD_PROJECT_DOCTOR_DELETION_MANIFEST",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "OLD_DOCTOR_RETIREMENT_APPLIED",
+  "purpose": "Record the applied exact OLD Project Doctor merge-gate/runtime retirement while preserving writer rollback surfaces, historical evidence, NEW canonical outputs, hosted QA, and independent validators.",
+  "authoritativeEvidence": {
+    "preparedFromHead": "8040404de7a81eb723505f5267f94fe16ed4a740",
+    "mainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "inventory": "data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json",
+    "r0Boundary": "data/contracts/project-tooling-migration-r0.v1.json",
+    "packageJson": "package.json",
+    "packageJsonPreRetirementBlobSha": "30176e6f3578494e1f2977afc8d72d8b611d8050",
+    "statusSourceWriterCutover": "data/contracts/project-tooling-status-source-writer-cutover.v1.json",
+    "projectStatusWriterCutover": "data/contracts/project-tooling-project-status-writer-cutover.v1.json",
+    "requiredProjectCheckFinalProof": {
+      "headSha": "8040404de7a81eb723505f5267f94fe16ed4a740",
+      "runId": 33351045311,
+      "jobId": 99364334197,
+      "conclusion": "success"
+    },
+    "inventoryDrift": {
+      "classification": "REVIEW_EXISTING_DRIFT",
+      "path": "data/generated/project-doctor-status-sources.v1.json",
+      "inventoryClaim": "generatedCompatibilityOutput",
+      "presentOnMain": false,
+      "presentOnCurrentBranchBeforeDeletion": false,
+      "action": "Do not materialize, delete, or retain a nonexistent compatibility output. Keep the inventory discrepancy as non-blocking review."
+    }
+  },
+  "scope": {
+    "purpose": "retire legacy required-check orchestration only",
+    "nonScope": [
+      "Status Source semantic or writer redesign",
+      "Project Status semantic or writer redesign",
+      "canonical domain data or relation changes",
+      "historical evidence archival",
+      "hosted/browser QA rehome",
+      "independent validator retirement"
+    ]
+  },
+  "requiredCheckRollbackWindow": {
+    "operationalLegacyGuardRetentionRequired": false,
+    "reason": "Required-check cutover is complete, OLD automatic PR guard execution was already off, and OLD D2/D3/D4/D7 files are retired from the live branch. Historical recovery remains available through git history.",
+    "historicalRecoveryStillPossible": true,
+    "historicalRecoveryMethod": "git history only; no live OLD guard runtime is retained after retirement"
+  },
+  "applyNextStep": {
+    "state": "APPLIED",
+    "actualDeletionApplied": true,
+    "packageJsonMutated": true,
+    "exactPathOnly": true,
+    "filenameSimilarityAllowed": false,
+    "fileDeletions": [
+      ".github/workflows/project-doctor-d7-pr-guard.yml",
+      "scripts/run-project-doctor-closeout-v6.mjs",
+      "scripts/analyze-project-doctor-d2-impact-v6.mjs",
+      "scripts/validate-project-doctor-d2-impact-v6.mjs",
+      "scripts/plan-project-doctor-d3-v6.mjs",
+      "scripts/validate-project-doctor-d3-v6.mjs",
+      "scripts/run-project-doctor-d4-v6.mjs",
+      "scripts/validate-project-doctor-d4-v6.mjs",
+      "scripts/validate-project-doctor-closeout.mjs",
+      "scripts/validate-project-doctor-d7-v8.mjs"
+    ],
+    "packageScriptRemovals": [
+      "doctor",
+      "doctor:impact",
+      "doctor:impact:validate",
+      "doctor:plan",
+      "doctor:plan:validate",
+      "doctor:run",
+      "doctor:run:validate",
+      "doctor:closeout:validate",
+      "doctor:pr-guard:validate"
+    ],
+    "executionCommits": {
+      "workflowDelete": "5eb7f91b1f56db39b9a601543f1aeb26f138bc6d",
+      "closeoutRuntimeDelete": "20efe53a1e57362e3c86ed94c0d1bbbc2b7f0007",
+      "d2RuntimeDelete": "1fd66b887761670f7e591e38d0ba1485c802efd0",
+      "d2ValidatorDelete": "017a2375ad540938d71a982dc84ff533837688c3",
+      "d3PlannerDelete": "19f9e6b68ef0a2aaa9f93a8d128b676c0e2013c3",
+      "d3ValidatorDelete": "aeb1eeff9f6e33c7872d3fcc21e2c7747c74559f",
+      "d4RuntimeDelete": "4b4636330508b6f516f76e39860421c907059e92",
+      "d4ValidatorDelete": "7a0c5e64bb612723f1d95b8014017563fe18d860",
+      "closeoutValidatorDelete": "b5f0f2eab488dfcbdeab6fafdbfde47d598bbfcd",
+      "d7ValidatorDelete": "afe4d234a321baad24b7ea5cdd79116031a37b27",
+      "packageEntrypointRemoval": "27af0541152bd5f921903f52f7cb29b882b92552"
+    }
+  },
+  "retainWriterRollback": {
+    "reason": "Both writer cutover checkpoints still define OLD writer restoration as a rollback action. Retain the OLD writer transports plus their Status Source/D1/D5 support until writer rollback scope is explicitly closed in a later checkpoint.",
+    "workflows": [
+      ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+      ".github/workflows/project-status-sync.yml"
+    ],
+    "scripts": [
+      "scripts/build-project-doctor-active-source-registry.mjs",
+      "scripts/validate-project-doctor-active-source-registry.mjs",
+      "scripts/promote-project-doctor-status-source.mjs",
+      "scripts/validate-project-doctor-status-source-promotion.mjs",
+      "scripts/submit-project-doctor-status-source.mjs",
+      "scripts/validate-project-doctor-status-source-producers.mjs",
+      "scripts/bridge-project-doctor-status-source.mjs",
+      "scripts/validate-project-doctor-status-source-artifact-bridge.mjs",
+      "scripts/validate-project-doctor-status-source-stage6-2-check-hooks.mjs",
+      "scripts/apply-project-doctor-status-source-handoff.mjs",
+      "scripts/validate-project-doctor-status-source-stage6-3-apply-handoff.mjs",
+      "scripts/resolve-project-doctor-status-source-declaration.mjs",
+      "scripts/validate-project-doctor-status-source-stage6-4-producer-declarations.mjs",
+      "scripts/render-project-doctor-status-source-closeout-request.mjs",
+      "scripts/validate-project-doctor-status-source-stage6-5-closeout-requests.mjs",
+      "scripts/run-project-doctor-d1-3.mjs",
+      "scripts/collect-project-doctor-d1-1.mjs",
+      "scripts/collect-project-doctor-d1-1-active.mjs",
+      "scripts/validate-project-doctor-d1-2.mjs",
+      "scripts/validate-project-doctor-d1-2-active.mjs",
+      "scripts/build-project-status.mjs",
+      "scripts/run-project-doctor-d5-refresh.mjs",
+      "scripts/validate-project-doctor-d5.mjs",
+      "scripts/validate-project-doctor-d5-fixtures.mjs",
+      "scripts/classify-project-doctor-frozen-freshness-v2.mjs",
+      "scripts/validate-project-doctor-frozen-freshness-v2.mjs"
+    ],
+    "generatedState": [
+      "data/generated/project-doctor-active-source-registry.v1.json",
+      "data/validation/project-doctor-active-source-registry-summary.v1.json",
+      "data/generated/project-doctor-d1-1-status.v1.json",
+      "data/validation/project-doctor-d1-1-summary.v1.json",
+      "data/validation/project-doctor-d1-2-summary.v1.json",
+      "data/generated/project-doctor-d5-freshness.v1.json"
+    ],
+    "packageEntrypoints": [
+      "doctor:status",
+      "doctor:collect",
+      "doctor:validate",
+      "doctor:freshness:refresh",
+      "doctor:freshness:validate",
+      "doctor:freshness:self-test",
+      "doctor:freshness:v2:self-test",
+      "doctor:source:promote",
+      "doctor:source:promote:self-test",
+      "doctor:source:submit",
+      "doctor:source:submit:self-test",
+      "doctor:source:bridge",
+      "doctor:source:bridge:self-test"
+    ]
+  },
+  "preserve": {
+    "newCanonicalProjectStatus": [
+      "data/generated/project-status.v1.json",
+      "PROJECT_STATUS.md"
+    ],
+    "historicalEvidencePolicy": {
+      "deleteProjectDoctorContractsInNextStep": false,
+      "deleteProjectDoctorValidationEvidenceInNextStep": false,
+      "protectedPrefixes": [
+        "data/contracts/project-doctor-",
+        "data/validation/project-doctor-"
+      ],
+      "reason": "Frozen migration checkpoints cite OLD contracts/validation artifacts as parity and reference evidence. Archive policy is separate."
+    },
+    "hostedQa": {
+      "packageEntrypoints": [
+        "qa:hosted",
+        "qa:hosted:validate",
+        "qa:hosted:stage0:validate"
+      ],
+      "protectedPathTokens": [
+        "project-doctor-route-hosted-qa"
+      ]
+    },
+    "independentValidators": {
+      "packageEntrypoints": [
+        "validate:coverage:hero-canonical",
+        "validate:coverage:soldier-canonical",
+        "validate:coverage:equipment-canonical",
+        "validate:coverage:hero-soldier-relation",
+        "validate:coverage:hero-equipment-relation",
+        "validate:coverage:banner-data",
+        "validate:coverage:skin-relation",
+        "validate:coverage:shared-movement",
+        "validate:coverage:soldier-assets",
+        "validate:regression-coverage-promotion:v2"
+      ]
+    },
+    "newToolingPrefixes": [
+      "tools/status-source/",
+      "tools/project-status/",
+      "tools/project-check/",
+      ".github/workflows/project-tooling-",
+      "data/contracts/project-tooling-"
+    ]
+  },
+  "manifestValidation": {
+    "owner": "project-check",
+    "validator": "project-check-self-test",
+    "candidateFilesMustExistBeforeDeletion": true,
+    "phaseAwareCandidateExistence": "PREPARED_PRESENT_APPLYING_PARTIAL_APPLIED_ABSENT",
+    "retainedRollbackFilesMustExist": true,
+    "packageEntrypointsMustMatchCurrentPackageJson": true,
+    "deleteAndRetainSetsMustBeDisjoint": true,
+    "protectedPrefixesMayNotAppearInDeletionSet": true,
+    "noDeletionBeforeValidationPass": true
+  },
+  "validationEvidence": {
+    "validatedHead": "3f7bb8e09cddb59d15a70e590c96d39bf1f1b6d1",
+    "projectCheckRunId": 33351548952,
+    "projectCheckJobId": 99365790200,
+    "conclusion": "success",
+    "projectCheckSelfTest": "PASS",
+    "changedPathPlan": "PASS",
+    "owningValidatorExecution": "PASS",
+    "fixtureCount": 22,
+    "deletionFileCount": 10,
+    "packageScriptRemovalCount": 9,
+    "applyTransitionSupport": {
+      "headSha": "7316a13d5cf7ca74e289d61c4c1f94f71411fc01",
+      "runId": 33352004193,
+      "jobId": 99367063794,
+      "conclusion": "success",
+      "selfTest": "PASS",
+      "plan": "PASS",
+      "execution": "PASS",
+      "fixtureCount": 24,
+      "retirementPathsExplicitlyOwned": true,
+      "packageJsonOwnedBySharedBuild": true
+    },
+    "applyingTransition": {
+      "headSha": "b5085ddbd187dc1869fa75de714d1d8d04871ec9",
+      "runId": 33352074613,
+      "jobId": 99367258874,
+      "conclusion": "success",
+      "selfTest": "PASS",
+      "plan": "PASS",
+      "execution": "PASS"
+    }
+  },
+  "blockers": [],
+  "reviews": [
+    "Status Source direct workflow_dispatch live mutation proof remains unavailable from the current connection; its writer rollback surface is therefore retained and this does not block retirement of unrelated D2/D3/D4/D7 merge-gate runtime.",
+    "Project Status OLD writer rollback surface is retained even though the NEW R2 writer has successful live non-main push proof; writer rollback closure is a later separate decision.",
+    "REVIEW_EXISTING_DRIFT: data/generated/project-doctor-status-sources.v1.json is named by the deletion inventory as a compatibility output but is absent on both main and the current branch; it is not synthesized or included in deletion/rollback sets.",
+    "Historical OLD contracts/validation evidence remain intentionally preserved and are not part of this retirement."
+  ],
+  "nextStartPoint": "Validate APPLIED state through Project Check. If strict absence, protected-scope, and production-build gates pass, freeze retirement completion and move next work to rollback-surface closure review.",
+  "reopenConditions": [
+    "required project-check ownership or required-context state changes",
+    "either NEW writer ownership changes",
+    "an OLD writer becomes automatically active again",
+    "a current consumer is proven to depend on an applied deletion candidate",
+    "historical evidence archive policy changes"
+  ]
+}

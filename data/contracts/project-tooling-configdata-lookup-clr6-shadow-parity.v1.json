@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-clr6-shadow-parity/v1",
+  "stage": "CLR6",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR6_SHADOW_PARITY_FROZEN",
+  "purpose": "Verify the NEW ConfigData Lookup surface against the preserved Stage 5/6 behavior without rebuilding materialization, reading raw ConfigData, recomputing semantic relations, or cutting over package/Stage 7/8 authority.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "base": "main",
+    "sourceHead": "52fc01ca40a396bfd5514bac3c1a5ecce77b7323",
+    "predecessor": {
+      "path": "data/contracts/project-tooling-configdata-lookup-clr5-writer-separation.v1.json",
+      "requiredCompletion": "CONFIGDATA_LOOKUP_CLR5_WRITER_SEPARATION_FROZEN"
+    }
+  },
+  "shadowImplementation": {
+    "validator": "tools/configdata-lookup/test/configdata-lookup-shadow-parity.mjs",
+    "ownerSelfTest": "tools/configdata-lookup/test/configdata-lookup-owner-self-test.mjs",
+    "projectCheckValidatorId": "configdata-lookup-self-test",
+    "projectCheckOwner": "configdata-lookup",
+    "generalWorkflow": ".github/workflows/project-tooling-configdata-lookup-clr2.yml"
+  },
+  "parityMethod": {
+    "stage5ContractParity": "EXACT_DEEP_EQUAL",
+    "adapterExportIdentity": "EXACT_FUNCTION_IDENTITY_FOR_LOOKUP_REFS_FIND_RENDERERS_AND_CONTRACT_LOADER",
+    "materializedInputInventory": "READ_EACH_DECLARED_STAGE1_TO4_INPUT_ONCE_AND_HASH",
+    "rawConfigDataRead": false,
+    "lookupCoverage": "ALL_6_SUPPORTED_ENTITY_TYPES_WITH_FIRST_MIDDLE_LAST_AND_DERIVED_ABSENT_ID_BOUNDARIES",
+    "refsCoverage": "ALL_8_SUPPORTED_ENTITY_TYPES_WITH_FIRST_MIDDLE_LAST_AND_DERIVED_ABSENT_ID_BOUNDARIES",
+    "findCoverage": "BOTH_SUPPORTED_ENTITY_TYPES_WITH_FIRST_MIDDLE_LAST_DISCOVERY_LABEL_AND_DERIVED_NO_MATCH_LITERAL",
+    "fullPopulationResultExecution": false,
+    "fullPopulationMeaning": "Population counts are derived from already-materialized indexes. Complete behavioral equivalence is additionally constrained by exact adapter function identity rather than reimplementing Stage 5 semantics in the validator."
+  },
+  "requiredValidation": {
+    "clr5Predecessor": "CONFIGDATA_LOOKUP_CLR5_WRITER_SEPARATION_FROZEN",
+    "stage6Freshness": "CLEAN_CONFIGDATA_LOOKUP_STAGE6",
+    "adapterIdentityMismatchCount": 0,
+    "rawConfigDataFileCount": 0,
+    "materializedInputFileCount": 16,
+    "materializedInputBytes": 7221869,
+    "materializedInputCombinedSha256": "166f7046e561d5f57e3e045967899e3415cceb40f56b16330ef672904462fab2",
+    "lookupEntityTypeCount": 6,
+    "lookupPopulationCount": 87665,
+    "lookupExecutedCaseCount": 24,
+    "refsEntityTypeCount": 8,
+    "refsPopulationCount": 51510,
+    "refsExecutedCaseCount": 32,
+    "findEntityTypeCount": 2,
+    "findLabelPopulationCount": 793,
+    "findExecutedCaseCount": 8,
+    "shadowMismatchCount": 0,
+    "materializationRebuildCount": 0,
+    "semanticRecomputationCount": 0,
+    "writerExecutionCount": 0,
+    "projectCheckSelfTest": "PASS",
+    "projectCheckOwnershipPlan": "PASS",
+    "projectCheckOwningValidators": "PASS",
+    "trackedMutationCount": 0
+  },
+  "unchangedScope": {
+    "stage0To6MaterializationAlgorithmMutationCount": 0,
+    "stage0To6GeneratedArtifactMutationCount": 0,
+    "rawConfigDataMutationCount": 0,
+    "packageJsonMutationCount": 0,
+    "packageCliCutoverCount": 0,
+    "stage7Or8MutationCount": 0,
+    "semanticMutationCount": 0,
+    "writerAuthorityMutationCount": 0,
+    "frontendMutationCount": 0,
+    "assetMutationCount": 0,
+    "hostedQaMutationCount": 0,
+    "browserUiMutationCount": 0
+  },
+  "validationEvidence": {
+    "candidateHead": "333818be306ded0d8d83c87a96d0d27477db7eab",
+    "configdataLookupWorkflow": {
+      "runId": 33396469759,
+      "jobId": 99502061742,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "ownerSelfTest": "PASS",
+      "clr6ShadowParity": "PASS",
+      "conclusion": "success"
+    },
+    "shadowMetrics": {
+      "contractParity": "EXACT",
+      "checkedExportCount": 8,
+      "mismatchedExportCount": 0,
+      "materializedInputFileCount": 16,
+      "materializedInputBytes": 7221869,
+      "materializedInputCombinedSha256": "166f7046e561d5f57e3e045967899e3415cceb40f56b16330ef672904462fab2",
+      "lookupPopulationCount": 87665,
+      "lookupExecutedCaseCount": 24,
+      "refsPopulationCount": 51510,
+      "refsExecutedCaseCount": 32,
+      "findLabelPopulationCount": 793,
+      "findExecutedCaseCount": 8,
+      "staleCount": 0
+    },
+    "projectCheck": {
+      "runId": 33396469767,
+      "jobId": 99502061835,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHead": "fe8917b38278a362c9d5882e800fc22035f051a5",
+    "freezeHeadConfigdataLookupWorkflow": {
+      "runId": 33396659108,
+      "jobId": 99502675569,
+      "ownerSelfTest": "PASS",
+      "clr6ShadowParity": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadProjectCheck": {
+      "runId": 33396659142,
+      "jobId": 99502675634,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadRevalidation": "PASS"
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "FULL_POPULATION_QUERY_EXECUTION_NOT_REQUIRED",
+      "blocking": false,
+      "detail": "CLR6 inventories/hashes the full materialized input surface and proves exact adapter function identity, while executing deterministic boundary queries for every supported entity type. It intentionally does not issue every possible query because that would repeatedly reread the same large indexes without adding independent semantic evidence."
+    },
+    {
+      "id": "PACKAGE_CLI_CUTOVER_DEFERRED_TO_CLR7",
+      "blocking": false,
+      "detail": "npm run lookup/refs/find still points to the legacy Stage 5 CLI until CLR7 cutover."
+    },
+    {
+      "id": "STAGE7_STAGE8_AUTHORITY_CUTOVER_DEFERRED_TO_CLR7",
+      "blocking": false,
+      "detail": "Legacy Stage 7/8 orchestration remains unchanged and outside NEW ConfigData Lookup authority until CLR7."
+    }
+  ],
+  "nextStart": "Begin CLR7 cutover: move package lookup/refs/find authority to tools/configdata-lookup, remove NEW ownership dependence on legacy Stage 7/8 orchestration, and retire or demote legacy Stage 7/8 authority only within the ConfigData Lookup owning scope. Do not reopen Stage 0-6 materialization semantics.",
+  "reopenConditions": [
+    "The NEW lookup adapter no longer delegates exactly to the preserved Stage 5 read-only core before CLR7 replacement is explicitly admitted.",
+    "A declared Stage 1-4 materialized input path becomes raw ConfigData or otherwise bypasses the frozen index layers.",
+    "Stage 6 freshness is no longer clean on the authoritative predecessor without a legitimate materialization update.",
+    "Shadow boundary queries differ between NEW and preserved Stage 5 behavior.",
+    "Project Check no longer executes the CLR6-aware aggregate owner self-test for configdata-lookup-owned changes."
+  ]
+}

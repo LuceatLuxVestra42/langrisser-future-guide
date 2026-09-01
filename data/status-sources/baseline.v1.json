@@ -7,6 +7,11 @@
       "domain": "hero",
       "state": "APPROVED",
       "sourcePath": "data/validation/hero-stage6-4-final.v1.json",
+      "sourceProvenance": {
+        "sourcePath": "data/validation/hero-stage6-4-final.v1.json",
+        "hashAlgorithm": "git-blob-sha1",
+        "gitBlobSha": "9ae03d2dcc0660aae9c28900345212426b2a4dd1"
+      },
       "facet": "canonical",
       "successorOf": null,
       "admission": [
@@ -21,6 +26,11 @@
       "domain": "soldier",
       "state": "APPROVED",
       "sourcePath": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "sourceProvenance": {
+        "sourcePath": "data/validation/soldier-stage6-7-site-admission.v1.json",
+        "hashAlgorithm": "git-blob-sha1",
+        "gitBlobSha": "3c14e789e78dffcc5509ef7d6fc33ff9ad7827a4"
+      },
       "facet": "canonical",
       "successorOf": null,
       "admission": [
@@ -34,6 +44,11 @@
       "domain": "equipment",
       "state": "APPROVED",
       "sourcePath": "data/validation/equipment-stage4-final.v1.json",
+      "sourceProvenance": {
+        "sourcePath": "data/validation/equipment-stage4-final.v1.json",
+        "hashAlgorithm": "git-blob-sha1",
+        "gitBlobSha": "afded15040cff46671c26f8ebf3abafea8e8b74b"
+      },
       "facet": "canonical",
       "successorOf": null,
       "admission": [
@@ -48,6 +63,11 @@
       "domain": "hero-soldier",
       "state": "APPROVED",
       "sourcePath": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+      "sourceProvenance": {
+        "sourcePath": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+        "hashAlgorithm": "git-blob-sha1",
+        "gitBlobSha": "db39e1a9fb59a3e07493afe8f66c88b6db7a802d"
+      },
       "facet": "relation",
       "successorOf": null,
       "admission": [
@@ -62,6 +82,11 @@
       "domain": "banner",
       "state": "APPROVED",
       "sourcePath": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+      "sourceProvenance": {
+        "sourcePath": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+        "hashAlgorithm": "git-blob-sha1",
+        "gitBlobSha": "fd162c3e5d29ac9239ff5b7a2a3b2f0f223e4f52"
+      },
       "facet": "canonical",
       "successorOf": null,
       "admission": [
@@ -75,12 +100,26 @@
       "domain": "skin",
       "state": "APPROVED",
       "sourcePath": "data/validation/skin-stage3-2-readiness.v1.json",
+      "sourceProvenance": {
+        "sourcePath": "data/validation/skin-stage3-2-readiness.v1.json",
+        "hashAlgorithm": "git-blob-sha1",
+        "gitBlobSha": "4a03e55df75d6f90d1a13240bbe0fae245cce358"
+      },
       "facet": "asset",
       "successorOf": null,
       "admission": [
-        { "pointer": "/status", "equals": "READY_FOR_ASSET_EVIDENCE" }
+        { "pointer": "/status", "in": ["READY_FOR_ASSET_EVIDENCE", "PASS"] },
+        { "pointer": "/completion", "in": [null, "SKIN_STAGE3_2_COMPLETE"] },
+        { "pointer": "/metrics/failedCheckCount", "equals": 0 }
       ],
-      "note": "Stage 2 baseline root. Must match the frozen D1-0 primary source."
+      "projectionOverride": {
+        "lifecycleRules": [
+          { "when": "/status == PASS AND /completion == SKIN_STAGE3_2_COMPLETE AND /evidence/present == true", "lifecycle": "COMPLETE" },
+          { "when": "/status == READY_FOR_ASSET_EVIDENCE AND /evidence/present == false", "lifecycle": "IN_PROGRESS" }
+        ],
+        "policy": "Accept the same authoritative Stage 3-2 readiness source across its legitimate READY_FOR_ASSET_EVIDENCE -> PASS/SKIN_STAGE3_2_COMPLETE progression without changing Skin semantic authority."
+      },
+      "note": "Skin Stage 3-2 asset-evidence authority. Same source path remains authoritative across readiness and completed evidence states; this does not change frozen Stage 1/2 Skin semantics."
     }
   ]
 }

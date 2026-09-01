@@ -1,0 +1,163 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-regression-runner-r3-core/v1",
+  "stage": "RR3",
+  "status": "PASS",
+  "completion": "REGRESSION_RUNNER_RR3_CORE_COMPLETE",
+  "purpose": "Install the clean-room NEW Regression Runner core, ID-only profile contract, CLI and self-test; promote RR2 temporary Project Check ownership to a dedicated regression-runner owner and catalogued self-test without expanding semantic coverage or activating an operational regression workflow.",
+  "predecessors": {
+    "rr0Baseline": "data/contracts/project-tooling-project-check-regression-runner-r0-baseline.v1.json",
+    "rr0Completion": "REGRESSION_RUNNER_R0_BASELINE_FROZEN",
+    "rr1Boundary": "data/contracts/project-tooling-project-check-regression-runner-r1-boundary.v1.json",
+    "rr1Completion": "REGRESSION_RUNNER_RR1_BOUNDARY_COMPLETE",
+    "rr2Admission": "data/contracts/project-tooling-regression-runner-r2-admission.v1.json",
+    "rr2Completion": "REGRESSION_RUNNER_RR2_ADMISSION_COMPLETE"
+  },
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pr": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "headBeforeRr3": "1f232a1dac528ab30c2a60051fd2a7f921c9cc2e",
+    "candidateHead": "5433a2077697c887368b0a43eb3285d017dff04f",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1"
+  },
+  "implementation": {
+    "profiles": "tools/regression-runner/contracts/profiles.v1.json",
+    "core": "tools/regression-runner/lib/regression-runner.mjs",
+    "cli": "tools/regression-runner/cli/check.mjs",
+    "selfTest": "tools/regression-runner/test/regression-runner-self-test.mjs",
+    "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
+    "ownerMap": "tools/project-check/contracts/owners.v1.json",
+    "projectCheckSelfTest": "tools/project-check/test/project-check-self-test.mjs"
+  },
+  "implementationCommits": {
+    "profileContract": "dd9755bdd86ca3ef064caf8573cbfbb9e930dd75",
+    "core": "8146af53ec1a17504f1bceabc36f2cbbb3898592",
+    "cli": "33965c8fdfd6876b8bf38a9264cb1991a4294d69",
+    "selfTest": "f693f7332e876140f5e32253b21eb9047bead0c8",
+    "validatorCatalogAdmission": "363de01be0cd3ef988943cb03e1168ddfca96d79",
+    "dedicatedOwnerPromotion": "408cd2f4ebf0cde1fdfc527418eaae940ee208e0",
+    "projectCheckFixtureUpdate": "5433a2077697c887368b0a43eb3285d017dff04f"
+  },
+  "validatorAuthority": {
+    "catalog": "tools/project-check/contracts/validators.v1.json",
+    "resolution": "BY_EXACT_VALIDATOR_ID",
+    "profileCarriesExecutableOrArgs": false,
+    "projectCheckRuntimeImportedByRegressionRunner": false,
+    "shellExecution": false,
+    "dynamicCommandSynthesis": false
+  },
+  "profile": {
+    "id": "core-regression-v1",
+    "validatorIds": [
+      "hero-canonical",
+      "soldier-canonical",
+      "equipment-canonical",
+      "hero-soldier-relation",
+      "hero-equipment-relation",
+      "banner-data",
+      "skin-relation",
+      "shared-movement",
+      "soldier-assets"
+    ],
+    "validatorCount": 9,
+    "automaticCoverageExpansion": false,
+    "assetIntakeIncluded": false,
+    "localizationAuditIncluded": false,
+    "productionBuildIncluded": false,
+    "configDataIntegrityIncluded": false
+  },
+  "r3Ownership": {
+    "owner": "regression-runner",
+    "validator": "regression-runner-self-test",
+    "validatorPhase": 4,
+    "validatorExecutable": "node",
+    "validatorArgs": ["tools/regression-runner/test/regression-runner-self-test.mjs"],
+    "patterns": [
+      "tools/regression-runner/**",
+      "data/contracts/project-tooling-regression-runner-*.json",
+      ".github/workflows/project-tooling-regression-runner.yml"
+    ],
+    "temporaryProjectCheckOwnershipRetired": true,
+    "manualReviewFallback": false,
+    "ownerPropagation": false,
+    "changeClassFanOut": false
+  },
+  "runtimeSafety": {
+    "preflightEntireQueueBeforeExecution": true,
+    "unknownValidatorIdBlocks": true,
+    "duplicateValidatorIdBlocks": true,
+    "allowedExecutables": ["node", "npm"],
+    "spawnShell": false,
+    "failFastOnFirstNonZero": true,
+    "trackedMutationDetectedAsBlocker": true,
+    "trackedSummaryWriteByDefault": false,
+    "semanticRecomputation": false,
+    "canonicalWrite": false,
+    "frozenWrite": false,
+    "generatedDomainWrite": false,
+    "statusSourceMutation": false,
+    "projectStatusMutation": false,
+    "legacyProjectDoctorRuntimeDependency": false,
+    "legacyRegressionV2RuntimeDependency": false,
+    "legacyFrozenShaAdmissionReimplemented": false
+  },
+  "candidateValidation": {
+    "head": "5433a2077697c887368b0a43eb3285d017dff04f",
+    "projectCheckRunId": 33356653518,
+    "projectCheckJobId": 99380016924,
+    "conclusion": "success",
+    "steps": {
+      "projectCheckSelfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS"
+    },
+    "meaning": "The R3 routing and owning-validator gate accepted the dedicated regression-runner owner/self-test and all RR3 core changes. The legacy Regression Coverage Promotion V2 failure on the same head remains RR0-frozen REVIEW_EXISTING_DRIFT and is not a current RR3 regression."
+  },
+  "preserve": [
+    "All nine current owning validators and their authoritative canonical/frozen/generated inputs.",
+    "RR0 exact legacy-drift evidence.",
+    "Historical Regression Coverage Promotion V1/V2 contracts, validation summaries and workflow for future shadow comparison.",
+    "Current R1 Status Source, R2 Project Status and R3 Project Check authority.",
+    "Existing Asset Intake, ConfigData Lookup, Route/Hosted QA and Localization tooling."
+  ],
+  "nonScope": [
+    "No .github/workflows/project-tooling-regression-runner.yml operational workflow creation in RR3.",
+    "No package.json entrypoint mutation in RR3.",
+    "No OLD Regression Coverage Promotion V2 workflow disablement, deletion or repair in RR3.",
+    "No shadow comparison or operational cutover in RR3.",
+    "No repair or reseal of RR0's four legacy frozen-SHA admission failures.",
+    "No semantic, canonical, relation, Status Source, Project Status, frontend, asset, Hosted QA, ConfigData Lookup or localization mutation."
+  ],
+  "completionGate": {
+    "profileContractInstalled": true,
+    "cleanRoomCoreInstalled": true,
+    "cliInstalled": true,
+    "selfTestInstalled": true,
+    "dedicatedR3ValidatorAdmitted": true,
+    "dedicatedR3OwnerAdmitted": true,
+    "rr2TemporaryOwnershipRetired": true,
+    "exactNineValidatorProfile": true,
+    "candidateProjectCheckPassed": true,
+    "semanticWriteAuthority": false,
+    "operationalWorkflowActivated": false,
+    "legacyRunnerChanged": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_V2_FROZEN_SHA_ADMISSION_DRIFT",
+      "blocking": false,
+      "detail": "The exact four RR0-frozen legacy V2 admission failures remain unchanged and must only be used as expected shadow drift; the NEW runner does not reimplement them."
+    }
+  ],
+  "nextStart": "RR4: harden and directly validate the NEW runner safety contract with negative fixtures and plan-only/current-profile checks before RR5 executes the real nine-owner current-head parity run. Do not create the operational workflow or disable OLD V2 yet.",
+  "reopenConditions": [
+    "The R3 validator catalog changes any of the nine selected validator identities or command authority.",
+    "The dedicated regression-runner owner routes its admitted paths to MANUAL_REVIEW or unintended owners.",
+    "Regression Runner runtime acquires a Project Check runtime or legacy Project Doctor/V2 dependency.",
+    "The NEW runner mutates tracked repository state during validation.",
+    "New authoritative evidence proves RR0's four known failures represent current semantic corruption."
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-status-writer-cutover/v1",
+  "stage": "PROJECT_STATUS_WRITER_CUTOVER",
+  "checkpoint": "PROJECT_TOOLING_PROJECT_STATUS_WRITER_CUTOVER",
+  "status": "PASS",
+  "completion": "PROJECT_STATUS_WRITER_CUTOVER_COMPLETE",
+  "purpose": "Transfer canonical Project Status JSON/Markdown writer ownership from legacy Project Status Sync to the independent NEW R2 writer without dual writers, semantic recomputation, or Status Source mutation.",
+  "predecessors": [
+    {"contract":"data/contracts/project-tooling-project-status-r2.v1.json","requiredStatus":"PASS","requiredCompletion":"R2_PROJECT_STATUS_COMPLETE"},
+    {"contract":"data/contracts/project-tooling-status-source-writer-cutover.v1.json","requiredStatus":"PASS","requiredCompletion":"STATUS_SOURCE_WRITER_CUTOVER_COMPLETE"},
+    {"contract":"data/contracts/project-tooling-project-check-r3.v1.json","requiredStatus":"PASS","requiredCompletion":"R3_PROJECT_CHECK_COMPLETE"}
+  ],
+  "writers": {
+    "old": {
+      "workflow": ".github/workflows/project-status-sync.yml",
+      "state": "RETIRED_READ_ONLY_TOMBSTONE",
+      "automaticPushTrigger": false,
+      "automaticPullRequestTrigger": false,
+      "mutation": false,
+      "writerOffCommit": "46282c4a9220b21cc9e7b6d9dd0baf3e47278db2"
+    },
+    "new": {
+      "workflow": ".github/workflows/project-tooling-r2-project-status-writer.yml",
+      "contract": "tools/project-status/contracts/writer.v1.json",
+      "runtime": "tools/project-status/lib/write-project-status.mjs",
+      "cli": "tools/project-status/cli/write.mjs",
+      "state": "ACTIVE",
+      "activationCommit": "d7334590d97a116e6f993728c0c47cf6387875cc"
+    }
+  },
+  "canonicalTargets": [
+    "data/generated/project-status.v1.json",
+    "PROJECT_STATUS.md"
+  ],
+  "transition": {
+    "sequence": [
+      "R3 explicitly admits OLD/NEW writer transports and both canonical outputs to project-status ownership",
+      "NEW writer implementation is introduced with CUTOVER_DEFERRED apply guard",
+      "R2 proves current parity, project-status/v1 canonical compatibility, synthetic two-target apply, and zero forbidden side effects",
+      "OLD Project Status Sync automatic writer is disabled first",
+      "zero-writer lineage passes R2 and required Project Check",
+      "NEW writer contract is activated",
+      "NEW writer executes on a real non-main push and writes only canonical targets",
+      "canonical Markdown wording is corrected from shadow to canonical and the NEW writer refreshes only the changed target"
+    ],
+    "activeWriterCountBefore": 1,
+    "minimumActiveWriterCountDuringTransition": 0,
+    "maximumActiveWriterCountDuringTransition": 1,
+    "activeWriterCountAfter": 1,
+    "dualWriterObserved": false
+  },
+  "compatibility": {
+    "schemaId": "project-status/v1",
+    "schemaIdPreserved": true,
+    "preCutoverAggregateAndDomainFieldsPreserved": true,
+    "authorityChange": "OLD Project Doctor D1 metadata replaced by NEW R2 normalization metadata backed by R1 Status Source selection",
+    "additiveSafetyAndIdentityFields": [
+      "readOnly",
+      "canonicalJoinRecomputationCount",
+      "source.authoritySchemaId",
+      "domains[].activeSourceId"
+    ],
+    "semanticPopulationChange": false,
+    "projectHealthChange": false,
+    "reviewBlockerAggregateChange": false
+  },
+  "evidence": {
+    "r3Admission": {
+      "headSha": "9232f126e22191dc5fd9b059110ec6b39a0f4fe3",
+      "runId": 33350404910,
+      "jobId": 99362513706,
+      "conclusion": "success"
+    },
+    "deferredImplementation": {
+      "headSha": "e52d51fc475672656901562a73bd1df4d59575b1",
+      "r2RunId": 33350592856,
+      "r2JobId": 99363059489,
+      "r2Conclusion": "success",
+      "projectCheckRunId": 33350592817,
+      "projectCheckJobId": 99363059318,
+      "projectCheckConclusion": "success"
+    },
+    "zeroWriter": {
+      "headSha": "46282c4a9220b21cc9e7b6d9dd0baf3e47278db2",
+      "oldAutomaticWriterRunPresent": false,
+      "r2RunId": 33350650056,
+      "r2JobId": 99363214303,
+      "r2Conclusion": "success",
+      "projectCheckRunId": 33350650054,
+      "projectCheckJobId": 99363214325,
+      "projectCheckConclusion": "success"
+    },
+    "liveWriter": {
+      "activationHead": "d7334590d97a116e6f993728c0c47cf6387875cc",
+      "runId": 33350702256,
+      "jobId": 99363362295,
+      "conclusion": "success",
+      "apply": "success",
+      "unexpectedMutationGuard": "success",
+      "outputCommit": "6e0854158fa9953b2c3fb276de780179adeae3dd",
+      "outputCommitAuthor": "github-actions[bot]",
+      "outputFiles": ["PROJECT_STATUS.md", "data/generated/project-status.v1.json"]
+    },
+    "canonicalWordingRefresh": {
+      "triggerHead": "aa6931c738df651007201ac7bb66391dfe7c07de",
+      "runId": 33350856776,
+      "jobId": 99363809053,
+      "conclusion": "success",
+      "outputCommit": "1a72baca436cfc5d074e8ce57fbd9c5e5b7a80c1",
+      "outputFiles": ["PROJECT_STATUS.md"]
+    }
+  },
+  "boundaries": {
+    "legacyProjectDoctorRuntimeDependencyCount": 0,
+    "legacyD1RuntimeDependencyCount": 0,
+    "legacyD5RuntimeDependencyCount": 0,
+    "legacyGeneratedStatusReadCount": 0,
+    "statusSourceMutationCount": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "canonicalJoinRecomputationCount": 0,
+    "domainValidatorExecutionCount": 0,
+    "allowedCanonicalTargetCount": 2
+  },
+  "rollback": {
+    "trigger": [
+      "NEW writer cannot produce deterministic project-status/v1 canonical outputs",
+      "NEW writer mutates any path outside the two canonical targets",
+      "NEW writer introduces OLD D1/D5/Project Doctor runtime dependencies",
+      "downstream compatibility regression is proven against a real consumer"
+    ],
+    "actions": [
+      "set tools/project-status/contracts/writer.v1.json state back to CUTOVER_DEFERRED",
+      "disable NEW automatic writer mutation",
+      "restore the retained legacy Project Status Sync writer only if canonical output availability requires rollback",
+      "do not roll back R1 Status Source authority or semantic domain data"
+    ]
+  },
+  "blockers": [],
+  "reviews": [
+    "Bot-authored output commits can produce action_required pull-request workflow shells with zero jobs; validator proof is taken from user-authored implementation/zero-writer/final checkpoint lineages rather than treating that approval state as a code regression.",
+    "Historical OLD D1/Project Doctor artifacts remain retained until the exact deletion manifest and rollback window are closed."
+  ],
+  "nextStartPoint": "Prepare the exact OLD Project Doctor deletion manifest. Preserve NEW canonical Project Status outputs and historical evidence, and delete only explicitly inventoried OLD runtime/transport surfaces after rollback-scope review.",
+  "reopenConditions": [
+    "canonical Project Status writer workflow, target set, or ownership changes",
+    "project-status/v1 compatibility changes authoritatively",
+    "R1 Status Source authority changes in a way that invalidates R2 normalization",
+    "a real downstream consumer proves incompatibility",
+    "OLD Project Status Sync automatic mutation is re-enabled"
+  ]
+}

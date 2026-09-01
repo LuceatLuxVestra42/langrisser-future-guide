@@ -1,0 +1,316 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-post-reinstall-acceptance-f2/v1",
+  "stage": "F2",
+  "checkpoint": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_F2_SEMANTIC_PARITY",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "F2_SEMANTIC_PARITY_FROZEN",
+  "purpose": "Prove that the Project Doctor v2 tooling reinstall and F1 authority/runtime cutover preserved frozen domain semantic identity, canonical membership, and exact relation membership without reopening or recomputing completed upstream semantics.",
+  "predecessors": {
+    "f0": {
+      "path": "data/contracts/project-tooling-project-check-post-reinstall-acceptance-f0.v1.json",
+      "checkpoint": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_F0_BASELINE"
+    },
+    "f1": {
+      "path": "data/contracts/project-tooling-project-check-post-reinstall-acceptance-f1.v1.json",
+      "checkpoint": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_F1_AUTHORITY_RUNTIME_GRAPH",
+      "mainCommit": "75200c77ef6f67b268dce1c6f6481c55f34b741e"
+    }
+  },
+  "comparison": {
+    "beforeCommit": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "beforeMeaning": "F0 frozen last authoritative main immediately before the R0 project-tooling migration boundary",
+    "afterCommit": "75200c77ef6f67b268dce1c6f6481c55f34b741e",
+    "afterMeaning": "F1 frozen main immediately before F2 checkpoint creation",
+    "commitDistance": 344,
+    "method": [
+      "Compare each F0-designated primary frozen validator/checkpoint blob before vs after.",
+      "Compare the actual generated canonical membership and relation artifacts before vs after instead of relying on population projections alone.",
+      "Reuse existing frozen validators for cardinality, identity, partition, and reciprocal relation assertions; do not reread raw ConfigData or manually rebuild semantic joins.",
+      "Treat identical Git blob SHA as byte-exact artifact identity across the comparison boundary."
+    ],
+    "semanticMutationPerformedByF2": false,
+    "rawConfigDataReadPerformedByF2": false,
+    "relationRecomputationPerformedByF2": false
+  },
+  "domains": {
+    "hero": {
+      "result": "PASS_EXACT",
+      "primary": {
+        "path": "data/validation/hero-stage6-4-final.v1.json",
+        "beforeBlobSha": "9ae03d2dcc0660aae9c28900345212426b2a4dd1",
+        "afterBlobSha": "9ae03d2dcc0660aae9c28900345212426b2a4dd1",
+        "byteExact": true
+      },
+      "canonicalMembership": {
+        "path": "data/generated/hero-detail.v1.json",
+        "beforeBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66",
+        "afterBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66",
+        "byteExact": true,
+        "canonicalHeroCount": 267,
+        "uniqueHeroKeyCount": 267
+      },
+      "frozenAssertions": {
+        "heroDataPipelineStatus": "FINAL_FROZEN",
+        "shardMissingCount": 0,
+        "shardIntegrityMismatchCount": 0,
+        "siteUsableHeroCount": 267,
+        "hardErrorCount": 0
+      }
+    },
+    "soldier": {
+      "result": "PASS_EXACT",
+      "primary": {
+        "path": "data/validation/soldier-stage6-7-site-admission.v1.json",
+        "beforeBlobSha": "3c14e789e78dffcc5509ef7d6fc33ff9ad7827a4",
+        "afterBlobSha": "3c14e789e78dffcc5509ef7d6fc33ff9ad7827a4",
+        "byteExact": true
+      },
+      "canonicalMembership": {
+        "path": "data/generated/soldier-stage6-1-full-records.v1.json",
+        "beforeBlobSha": "e2415aef365539c4fa7b88819e2d8a865b5d8870",
+        "afterBlobSha": "e2415aef365539c4fa7b88819e2d8a865b5d8870",
+        "byteExact": true
+      },
+      "classification": {
+        "path": "data/generated/soldier-stage6-2-classification.v1.json",
+        "beforeBlobSha": "3090c163fa7dff2cceaeb2ca540f108dc1444056",
+        "afterBlobSha": "3090c163fa7dff2cceaeb2ca540f108dc1444056",
+        "byteExact": true
+      },
+      "population": {
+        "canonicalSoldiers": 224,
+        "normalSoldiers": 168,
+        "spSoldiers": 56,
+        "heroSoldierRelations": 5977,
+        "reciprocalMismatchCount": 0
+      }
+    },
+    "equipment": {
+      "result": "PASS_EXACT",
+      "primary": {
+        "path": "data/validation/equipment-public-presentation-correction-final.v1.json",
+        "beforeBlobSha": "c42ace0d625a398fc7a97be389a037fa89016ac4",
+        "afterBlobSha": "c42ace0d625a398fc7a97be389a037fa89016ac4",
+        "byteExact": true
+      },
+      "canonicalMembership": {
+        "path": "data/generated/equipment_stage3_2_display_metadata.json",
+        "primaryKey": "equipmentId",
+        "beforeBlobSha": "0faeb47002c8017d58f9eff3068cd95d1a2a74f6",
+        "afterBlobSha": "0faeb47002c8017d58f9eff3068cd95d1a2a74f6",
+        "byteExact": true,
+        "canonicalCount": 390
+      },
+      "frozenConsumers": {
+        "generalList": {
+          "path": "data/generated/equipment_stage3_3_general_list.json",
+          "beforeBlobSha": "0a6bd77bfcd6995395b1936598f4b4ebf1f0c49f",
+          "afterBlobSha": "0a6bd77bfcd6995395b1936598f4b4ebf1f0c49f",
+          "byteExact": true
+        },
+        "generalDetail": {
+          "path": "data/generated/equipment_stage3_4_general_detail.json",
+          "beforeBlobSha": "5aa7dbbd8c055ccc1f37b862c801c34b02107d08",
+          "afterBlobSha": "5aa7dbbd8c055ccc1f37b862c801c34b02107d08",
+          "byteExact": true
+        },
+        "exclusive": {
+          "path": "data/generated/equipment_stage3_5_exclusive_consumer.json",
+          "beforeBlobSha": "014885f23a507f6c0171172290f010a351e015c5",
+          "afterBlobSha": "014885f23a507f6c0171172290f010a351e015c5",
+          "byteExact": true
+        }
+      },
+      "publicAdmission": {
+        "path": "data/presentation/equipment-public-admission-correction.v1.json",
+        "beforeBlobSha": "e221735636a72ab80948149bae18e6691954d694",
+        "afterBlobSha": "e221735636a72ab80948149bae18e6691954d694",
+        "byteExact": true,
+        "excludedEquipmentIds": [265, 266, 267, 268, 288, 289, 290, 291],
+        "excludedCount": 8
+      },
+      "displayMembership": {
+        "path": "data/presentation/equipment-display-collection.v1.json",
+        "beforeBlobSha": "d33c599cf64ded544959b93ed45e54982af599a1",
+        "afterBlobSha": "d33c599cf64ded544959b93ed45e54982af599a1",
+        "byteExact": true,
+        "initial": 94,
+        "previousAdditional": 80,
+        "equipmentPass": 24,
+        "totalGeneral": 198
+      },
+      "finalPopulation": {
+        "canonical": 390,
+        "public": 365,
+        "general": 198,
+        "exclusive": 167
+      },
+      "sourceDiscipline": {
+        "canonicalIdentityChanged": false,
+        "exclusiveEquipmentChanged": false,
+        "stage2AcquisitionClassificationChanged": false
+      }
+    },
+    "hero-soldier": {
+      "result": "PASS_EXACT",
+      "primary": {
+        "path": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+        "beforeBlobSha": "db39e1a9fb59a3e07493afe8f66c88b6db7a802d",
+        "afterBlobSha": "db39e1a9fb59a3e07493afe8f66c88b6db7a802d",
+        "byteExact": true
+      },
+      "canonicalRelation": {
+        "path": "data/generated/hero-soldier-relations.v1.json",
+        "beforeBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "afterBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6",
+        "byteExact": true,
+        "canonicalPairCount": 5977
+      },
+      "indexes": {
+        "byHero": {
+          "path": "data/generated/hero-soldier-by-hero.v1.json",
+          "beforeBlobSha": "e613bd05b0e7173734834cba5d8cfbff973298ad",
+          "afterBlobSha": "e613bd05b0e7173734834cba5d8cfbff973298ad",
+          "byteExact": true
+        },
+        "bySoldier": {
+          "path": "data/generated/hero-soldier-by-soldier.v1.json",
+          "beforeBlobSha": "ff9d8a881c03b6e0f2a196e12f37cd2e28e3e251",
+          "afterBlobSha": "ff9d8a881c03b6e0f2a196e12f37cd2e28e3e251",
+          "byteExact": true
+        }
+      },
+      "population": {
+        "heroes": 267,
+        "soldiers": 224,
+        "pairs": 5977
+      },
+      "frozenPairParity": {
+        "canonicalVsHeroMismatch": 0,
+        "canonicalVsSoldierMismatch": 0,
+        "heroVsSoldierMismatch": 0,
+        "duplicatePairCount": 0,
+        "malformedPairCount": 0,
+        "unknownHeroIdCount": 0,
+        "unknownSoldierIdCount": 0
+      }
+    },
+    "banner": {
+      "result": "PASS_EXACT",
+      "primary": {
+        "path": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+        "beforeBlobSha": "fd162c3e5d29ac9239ff5b7a2a3b2f0f223e4f52",
+        "afterBlobSha": "fd162c3e5d29ac9239ff5b7a2a3b2f0f223e4f52",
+        "byteExact": true
+      },
+      "membership": {
+        "definitions": {
+          "path": "data/generated/banner-definitions.v1.json",
+          "beforeBlobSha": "98e7229f80d8c1190825b25ef70c9f72249af22d",
+          "afterBlobSha": "98e7229f80d8c1190825b25ef70c9f72249af22d",
+          "byteExact": true,
+          "count": 77
+        },
+        "occurrences": {
+          "path": "data/generated/banner-occurrences.v1.json",
+          "beforeBlobSha": "2ca215d9d0af95f51f9d57e60da21f51f74d4434",
+          "afterBlobSha": "2ca215d9d0af95f51f9d57e60da21f51f74d4434",
+          "byteExact": true,
+          "count": 94
+        },
+        "occurrenceDefinitionMap": {
+          "path": "data/generated/banner-occurrence-definition-map.v1.json",
+          "beforeBlobSha": "c228c592fe0b4a07ac7a6640fec6cf871bc6b8a0",
+          "afterBlobSha": "c228c592fe0b4a07ac7a6640fec6cf871bc6b8a0",
+          "byteExact": true
+        }
+      },
+      "freezeState": "BANNER_STAGE3_FROZEN"
+    },
+    "skin": {
+      "result": "PASS_EXACT",
+      "officialRelation": {
+        "path": "data/generated/skin-stage2-3-bidirectional-relation.v1.json",
+        "beforeBlobSha": "c69bc6a970909b66502574dcd709d3c731607ead",
+        "afterBlobSha": "c69bc6a970909b66502574dcd709d3c731607ead",
+        "byteExact": true
+      },
+      "finalValidator": {
+        "path": "data/validation/skin-stage2-5-final.v1.json",
+        "beforeBlobSha": "1ea21a2c72be78daab8ae7b326976544432b617b",
+        "afterBlobSha": "1ea21a2c72be78daab8ae7b326976544432b617b",
+        "byteExact": true
+      },
+      "canonicalAndIndexes": {
+        "stage1Canonical": {
+          "path": "data/generated/skin-stage1-canonical.v1.json",
+          "beforeBlobSha": "acd83dc94e4ef30841f53ad464ae53a9ffef92b7",
+          "afterBlobSha": "acd83dc94e4ef30841f53ad464ae53a9ffef92b7",
+          "byteExact": true
+        },
+        "forward": {
+          "path": "data/generated/skin-stage2-1-forward-relation.v1.json",
+          "beforeBlobSha": "4f803f30904a044fbc1e6cb5f14a9b4f3118e563",
+          "afterBlobSha": "4f803f30904a044fbc1e6cb5f14a9b4f3118e563",
+          "byteExact": true
+        },
+        "reverse": {
+          "path": "data/generated/skin-stage2-2-reverse-index.v1.json",
+          "beforeBlobSha": "1c8ffe4110010e2747d924e6250c618a69622529",
+          "afterBlobSha": "1c8ffe4110010e2747d924e6250c618a69622529",
+          "byteExact": true
+        }
+      },
+      "parity": {
+        "bySkinIdCount": 540,
+        "byHeroIdCount": 267,
+        "edgeCount": 540,
+        "distinctSkinIdCount": 540,
+        "zeroSkinHeroCount": 32,
+        "skinToHeroCardinality": "EXACTLY_ONE",
+        "heroToSkinCardinality": "ZERO_OR_MANY",
+        "ownerMismatchCount": 0,
+        "sourceOrderMismatchCount": 0,
+        "missingSkinCount": 0,
+        "extraSkinCount": 0,
+        "reverseListMismatchCount": 0
+      }
+    }
+  },
+  "strictExclusions": [
+    "data/validation/skin-stage3-2-readiness.v1.json is a legitimate downstream asset-evidence lifecycle advance and is not the Skin relation authority for F2.",
+    "data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json is downstream asset evidence, not a semantic membership target.",
+    "Status Source, Project Status, Project Check, and other project-tooling migration artifacts are expected implementation changes and are not domain semantic parity targets.",
+    "Frontend, assets, Hosted QA, deployment, and Browser/UI outputs are outside F2 semantic parity scope."
+  ],
+  "result": {
+    "domainCount": 6,
+    "exactDomainPassCount": 6,
+    "semanticMismatchCount": 0,
+    "canonicalMembershipMismatchCount": 0,
+    "relationMembershipMismatchCount": 0,
+    "identityMismatchCount": 0,
+    "newSemanticBlockerCount": 0,
+    "decision": "The Project Doctor v2 reinstall/cutover preserved the F0-frozen Hero, Soldier, Equipment, Hero-Soldier, Banner, and Skin semantic populations and exact materialized membership/relation artifacts. No semantic reopening or repair is required."
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+      "blocking": false,
+      "owner": "status-source",
+      "inheritedFrom": "F1",
+      "condition": "Close only when a legitimate future approved successor exists and NEW R1 explicit workflow_dispatch CAS/apply/commit/push proof succeeds.",
+      "forbiddenShortcut": "Do not synthesize a successor or semantic mutation solely to manufacture transport evidence."
+    }
+  ],
+  "nextStartPoint": "Continue the post-reinstall acceptance sequence from the frozen F2 semantic parity checkpoint. Reuse F0-F2 evidence and do not reopen domain semantics unless an explicit reopen condition is met.",
+  "reopenConditions": [
+    "A canonical population or materialized canonical ID set changes.",
+    "An authoritative relation artifact or exact edge set changes.",
+    "The authoritative semantic source/contract for one of the six domains changes.",
+    "A current owning validator proves identity, membership, cardinality, or reciprocal parity failure.",
+    "New authoritative evidence contradicts an F0-F2 frozen semantic result."
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-regression-runner-r2-admission/v1",
+  "stage": "RR2",
+  "status": "PASS",
+  "completion": "REGRESSION_RUNNER_RR2_ADMISSION_COMPLETE",
+  "purpose": "Explicitly admit future NEW Regression Runner implementation, workflow, and successor checkpoint paths into R3 Project Check routing before clean-room core implementation. Prevent MANUAL_REVIEW fallback and unintended owner fan-out while preserving RR1's read-only orchestration boundary.",
+  "predecessors": {
+    "rr0Baseline": "data/contracts/project-tooling-project-check-regression-runner-r0-baseline.v1.json",
+    "rr0Completion": "REGRESSION_RUNNER_R0_BASELINE_FROZEN",
+    "rr1Boundary": "data/contracts/project-tooling-project-check-regression-runner-r1-boundary.v1.json",
+    "rr1Completion": "REGRESSION_RUNNER_RR1_BOUNDARY_COMPLETE"
+  },
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pr": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "headBeforeRr2": "a52c7f39cfc4d9a724644e6b72b677453670b1e7",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
+    "ownerMap": "tools/project-check/contracts/owners.v1.json",
+    "projectCheckSelfTest": "tools/project-check/test/project-check-self-test.mjs"
+  },
+  "admission": {
+    "ruleId": "regression-runner-preimplementation-admission",
+    "patterns": [
+      "tools/regression-runner/**",
+      "data/contracts/project-tooling-regression-runner-*.json",
+      ".github/workflows/project-tooling-regression-runner.yml"
+    ],
+    "preimplementationOwner": "project-check",
+    "preimplementationValidators": ["project-check-self-test"],
+    "temporaryUntilCoreSelfTestExists": true,
+    "manualReviewFallbackForAdmittedPaths": false,
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "semanticOwnerFanOut": false,
+    "frontendOwnerFanOut": false,
+    "assetOwnerFanOut": false
+  },
+  "selfTestFixtures": [
+    {
+      "path": "tools/regression-runner/lib/runner.mjs",
+      "expectedOwners": ["project-check"],
+      "expectedValidators": ["project-check-self-test"]
+    },
+    {
+      "path": ".github/workflows/project-tooling-regression-runner.yml",
+      "expectedOwners": ["project-check"],
+      "expectedValidators": ["project-check-self-test"]
+    },
+    {
+      "path": "data/contracts/project-tooling-regression-runner-r2-admission.v1.json",
+      "expectedOwners": ["project-check"],
+      "expectedValidators": ["project-check-self-test"]
+    }
+  ],
+  "implementationEvidence": {
+    "ownerMapAdmissionCommit": "ee26de6401734e5467a99a50c6068efcf1da3884",
+    "selfTestFixtureCommit": "bd92ab369632aae68dd8fce4084251e428fee4be",
+    "selfTestFixtureCountAfterRr2": 27
+  },
+  "candidateValidation": {
+    "head": "bd92ab369632aae68dd8fce4084251e428fee4be",
+    "projectCheckRunId": 33355904091,
+    "projectCheckJobId": 99377893663,
+    "conclusion": "success",
+    "steps": {
+      "selfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS"
+    }
+  },
+  "rr3TransitionContract": {
+    "nextOwnerEvolutionRequired": true,
+    "condition": "When the NEW Regression Runner core and its self-test are introduced, add a dedicated catalogued regression-runner self-test validator and evolve admitted NEW runner paths from temporary project-check ownership to the dedicated regression-runner owner in the same owning scope.",
+    "noImplementationBeforeAdmission": true,
+    "noIndependentRunnerValidatorYet": true,
+    "noWorkflowExecutionYet": true,
+    "noDualRunnerActivation": true
+  },
+  "preserve": [
+    "RR0 known legacy drift classification and evidence.",
+    "RR1 validator-ID-only boundary and R3 validator catalog authority.",
+    "All nine current owning validators and authoritative inputs.",
+    "Legacy Regression Coverage Promotion V1/V2 contracts and workflow for later shadow comparison.",
+    "Current R1 Status Source, R2 Project Status and R3 Project Check behavior.",
+    "Existing Asset Intake, ConfigData Lookup, Route/Hosted QA and Localization tooling."
+  ],
+  "nonScope": [
+    "No tools/regression-runner implementation in RR2.",
+    "No NEW Regression Runner workflow file creation in RR2.",
+    "No new regression-runner validator in the R3 validator catalog in RR2.",
+    "No package.json entrypoint change in RR2.",
+    "No OLD Regression Coverage Promotion V2 disablement or deletion in RR2.",
+    "No repair or reseal of RR0's four legacy frozen-SHA admission failures.",
+    "No semantic, canonical, relation, Status Source, Project Status, frontend, asset, Hosted QA, ConfigData Lookup or localization mutation."
+  ],
+  "completionGate": {
+    "corePathAdmitted": true,
+    "workflowPathAdmitted": true,
+    "successorCheckpointNamespaceAdmitted": true,
+    "threeRoutingFixturesPass": true,
+    "candidateProjectCheckPass": true,
+    "manualReviewFallbackRemovedForAdmittedPaths": true,
+    "ownerPropagationCount": 0,
+    "changeClassFanOutCount": 0,
+    "newRunnerImplementationStarted": false,
+    "newRunnerWorkflowCreated": false,
+    "validatorCatalogChanged": false,
+    "legacyRunnerChanged": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_V2_FROZEN_SHA_ADMISSION_DRIFT",
+      "blocking": false,
+      "detail": "RR0's four base-existing legacy admission failures remain unchanged and are not part of RR2 routing admission."
+    },
+    {
+      "id": "PREIMPLEMENTATION_PROJECT_CHECK_OWNERSHIP",
+      "blocking": false,
+      "detail": "NEW runner paths are intentionally owned by project-check only until the clean-room core introduces a dedicated regression-runner self-test validator. This temporary ownership must be evolved during the core-install step, not left as the final owner model."
+    }
+  ],
+  "nextStart": "RR3: install the clean-room tools/regression-runner core, profile contract and self-test; add a dedicated catalogued regression-runner self-test validator and evolve RR2 temporary project-check ownership to the dedicated regression-runner owner without expanding the nine-validator semantic scope.",
+  "reopenConditions": [
+    "R3 validator catalog or owner-map policy changes before clean-room core installation.",
+    "Any of the three admitted path families routes to MANUAL_REVIEW or an unintended owner.",
+    "Any of the nine RR1 selected owning validators changes identity or authority.",
+    "New evidence shows the RR0 legacy drift is a current semantic failure rather than historical admission drift."
+  ]
+}

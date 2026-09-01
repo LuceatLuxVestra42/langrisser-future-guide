@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-post-reinstall-acceptance-f7/v1",
+  "stage": "F7",
+  "checkpoint": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_FINAL",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_COMPLETE_FROZEN",
+  "purpose": "Close the Project Doctor v2 / Project Check reinstall-normalization acceptance by aggregating the frozen F0-F6 authority, semantic, independent-tool, routing, negative-integration, and real-workload proofs. Remaining unrelated or event-dependent reviews do not reopen completed acceptance.",
+  "predecessors": [
+    {"stage":"F0","path":"data/contracts/project-tooling-project-check-post-reinstall-acceptance-f0.v1.json","requiredCompletion":"F0_BASELINE_FROZEN"},
+    {"stage":"F1","path":"data/contracts/project-tooling-project-check-post-reinstall-acceptance-f1.v1.json","requiredCompletion":"F1_AUTHORITY_RUNTIME_GRAPH_FROZEN"},
+    {"stage":"F2","path":"data/contracts/project-tooling-project-check-post-reinstall-acceptance-f2.v1.json","requiredCompletion":"F2_SEMANTIC_PARITY_FROZEN"},
+    {"stage":"F3","path":"data/contracts/project-tooling-project-check-post-reinstall-acceptance-f3.v1.json","requiredCompletion":"F3_PROJECT_CHECK_BEHAVIOR_FROZEN"},
+    {"stage":"F4","path":"data/contracts/project-tooling-project-check-post-reinstall-acceptance-f4.v1.json","requiredCompletion":"F4_INDEPENDENT_TOOL_MATRIX_FROZEN"},
+    {"stage":"F5","path":"data/contracts/project-tooling-project-check-post-reinstall-acceptance-f5.v1.json","requiredCompletion":"F5_NEGATIVE_E2E_FROZEN"},
+    {"stage":"F6","path":"data/contracts/project-tooling-project-check-post-reinstall-acceptance-f6.v1.json","requiredCompletion":"F6_REAL_WORKLOAD_FROZEN"}
+  ],
+  "acceptanceGates": {
+    "baselineAuthority": "PASS",
+    "authorityRuntimeGraph": "PASS",
+    "semanticIdentityMembershipRelationParity": "PASS_EXACT",
+    "independentToolHealth": "PASS_WITH_REVIEW_EXISTING_DRIFT",
+    "projectCheckRoutingAndFailurePropagation": "PASS",
+    "negativeEndToEndFailureIsolation": "PASS",
+    "trackedMutationFailClosed": "PASS",
+    "legitimatePostCutoverWorkload": "PASS"
+  },
+  "finalMetrics": {
+    "dataLossCount": 0,
+    "canonicalIdUnexpectedDiffCount": 0,
+    "relationEdgeUnexpectedDiffCount": 0,
+    "identityCorruptionCount": 0,
+    "activeLegacyDoctorRuntimeDependencyCount": 0,
+    "testedMissedFailureCount": 0,
+    "baitUnrelatedValidatorFanOutCount": 0,
+    "acceptedTrackedMutationCount": 0,
+    "wrongSemanticReopenCount": 0,
+    "newSemanticMismatchCount": 0,
+    "acceptanceBlockerCount": 0
+  },
+  "finalBehavior": {
+    "authorityChain": ["NEW Status Source", "NEW Project Status", "NEW Project Check"],
+    "projectCheckRole": "Thin changed-path owner/validator orchestrator only",
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "unmatchedPath": "MANUAL_REVIEW",
+    "owningValidatorFailure": "BLOCKER_FAIL_FAST",
+    "trackedMutationAfterValidation": "BLOCKER_FAIL_CLOSED",
+    "legacyDoctorRuntimeAllowed": false,
+    "semanticRecomputationByProjectCheck": false
+  },
+  "evidenceHighlights": {
+    "semanticDomainsExact": 6,
+    "heroSoldierExactRelationEdges": 5977,
+    "skinExactRelationEdges": 540,
+    "independentDirectValidatorPassCount": 16,
+    "regressionRunnerCoreParityValidatorCount": 9,
+    "negativeE2EBaitCount": 2,
+    "negativeE2EExpectedFailureObservedCount": 2,
+    "syntheticFailureCodeMergedCount": 0,
+    "legitimateWorkloadProofPresent": true,
+    "soldierAndAssetIntakePermanentRoutingFixturesPresent": true,
+    "skinStage3_2ReadOnlyValidatorBoundaryPresent": true
+  },
+  "resolvedDuringAcceptance": [
+    {
+      "code": "PROJECT_STATUS_SKIN_PROJECTION_DRIFT",
+      "owner": "project-status/status-source tooling",
+      "resolvedIn": "F1",
+      "semanticReopen": false
+    },
+    {
+      "code": "PROJECT_CHECK_STATUS_SOURCE_ROUTING_DRIFT",
+      "owner": "project-check",
+      "resolvedIn": "F1",
+      "semanticReopen": false
+    },
+    {
+      "code": "PROJECT_CHECK_EXECUTION_GUARD_GAP",
+      "owner": "project-check",
+      "resolvedIn": "F3",
+      "semanticReopen": false
+    },
+    {
+      "code": "SKIN_STAGE3_2_VALIDATOR_PRODUCER_BOUNDARY_GAP",
+      "owner": "skin-stage3-2-evidence/asset-intake-tooling",
+      "resolvedIn": "F4",
+      "semanticReopen": false
+    },
+    {
+      "code": "SOLDIER_ASSET_INTAKE_ROUTING_REPRESENTATIVE_FIXTURE_GAP",
+      "owner": "project-check-test",
+      "resolvedIn": "F4/final closeout",
+      "semanticReopen": false
+    }
+  ],
+  "reviews": [
+    {
+      "code": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+      "blocking": false,
+      "owner": "status-source",
+      "classification": "EVENT_DEPENDENT_FUTURE_PROOF",
+      "condition": "Close only when a legitimate approved successor exists and the NEW R1 non-main workflow_dispatch CAS/apply/commit/push path is exercised successfully.",
+      "forbiddenShortcut": "Do not synthesize a successor solely to close this review."
+    },
+    {
+      "code": "CONFIGDATA_INTEGRITY_ARRAY_ROOT_VALIDATOR_DRIFT",
+      "blocking": false,
+      "owner": "configdata-validator-maintenance",
+      "classification": "REVIEW_EXISTING_DRIFT",
+      "proof": "Same 753/753 array-root failure reproduces on exact authoritative F3 main baseline and is not caused by the acceptance diff.",
+      "doNotReopen": ["F2 semantic parity", "canonical identities", "relations"]
+    }
+  ],
+  "blockers": [],
+  "decision": {
+    "projectDoctorV2ReinstallNormalization": "COMPLETE",
+    "acceptance": "COMPLETE_FROZEN",
+    "furtherMandatoryReinstallWork": null,
+    "remainingReviewsBlockCompletion": false,
+    "statement": "Project Doctor v2 / Project Check reinstall-normalization is accepted and frozen. The NEW authority chain, frozen domain data, independent tools, routing/failure isolation, fail-closed mutation boundary, and legitimate post-cutover workload are verified. Remaining reviews are independent non-blocking follow-up conditions."
+  },
+  "strictBoundaries": {
+    "finalCloseoutCanonicalDataMutationAllowed": false,
+    "finalCloseoutFrozenSemanticMutationAllowed": false,
+    "finalCloseoutRelationRecomputationAllowed": false,
+    "finalCloseoutRawConfigDataSemanticReinterpretationAllowed": false,
+    "frontendOrHostedFailureMayReopenSemantics": false,
+    "existingValidatorDriftMayReopenSemanticsWithoutCausality": false
+  },
+  "reopenConditions": [
+    "The NEW Status Source -> Project Status -> Project Check authority chain materially changes.",
+    "A canonical population or canonical ID set changes.",
+    "An authoritative relation edge set or relation contract changes.",
+    "Project Check begins owner propagation or change-class fan-out.",
+    "An owning validator failure no longer blocks the required project-check.",
+    "Tracked mutations can survive a successful required project-check.",
+    "An OLD Doctor D2/D3/D4/D5/D7 runtime dependency becomes active again.",
+    "New authoritative evidence contradicts any frozen F0-F7 acceptance result."
+  ],
+  "nextStartPoint": "Resume normal project work from the owning domain/tool. Do not reopen Project Doctor v2 reinstall acceptance unless a listed reopen condition is met."
+}

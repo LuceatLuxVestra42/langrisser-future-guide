@@ -1,0 +1,207 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-status-r2/v1",
+  "stage": "R2",
+  "checkpoint": "PROJECT_TOOLING_PROJECT_STATUS_R2",
+  "status": "PASS",
+  "completion": "R2_PROJECT_STATUS_COMPLETE",
+  "purpose": "Own Project Status normalization and projection independently from legacy Project Doctor D1. The normalization/projection core remains read-only and consumes only NEW R1 Status Source authority; canonical JSON/Markdown persistence is now owned by the separate guarded NEW R2 writer transport.",
+  "predecessor": {
+    "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_COMPLETE",
+    "contract": "data/contracts/project-tooling-status-source-r1-final.v1.json",
+    "requiredStatus": "PASS",
+    "requiredCompletion": "R1_STATUS_SOURCE_COMPLETE"
+  },
+  "authoritativeReferences": {
+    "legacyNormalizationContract": "data/contracts/project-doctor-d1-0-contract.v1.json",
+    "legacyCollector": "scripts/collect-project-doctor-d1-1-active.mjs",
+    "legacyProjection": "scripts/build-project-status.mjs",
+    "preCutoverCanonicalProjectionHead": "9a443ab5949ea06efe5607fe4b94975f9009926c",
+    "referenceUseOnly": true,
+    "runtimeDependency": false
+  },
+  "implementation": {
+    "originalImplementationHead": "55cd23acf5be65a4dbceb76d9d652fa19dcd7b76",
+    "normalizationContract": "tools/project-status/contracts/normalization.v1.json",
+    "normalizationRuntime": "tools/project-status/lib/normalize-project-status.mjs",
+    "projectionRuntime": "tools/project-status/lib/project-status-view.mjs",
+    "readOnlyCli": "tools/project-status/cli/status.mjs",
+    "writerContract": "tools/project-status/contracts/writer.v1.json",
+    "writerRuntime": "tools/project-status/lib/write-project-status.mjs",
+    "writerCli": "tools/project-status/cli/write.mjs",
+    "writerWorkflow": ".github/workflows/project-tooling-r2-project-status-writer.yml",
+    "retiredLegacyWriterWorkflow": ".github/workflows/project-status-sync.yml",
+    "fixture": "tools/project-status/fixtures/current-project-status.v1.json",
+    "selfTest": "tools/project-status/test/current-parity.mjs",
+    "validationWorkflow": ".github/workflows/project-tooling-r2-project-status.yml"
+  },
+  "ownershipBoundary": {
+    "projectStatusOwns": [
+      "lifecycle normalization",
+      "health normalization",
+      "population projection",
+      "hard-error extraction",
+      "review reconciliation",
+      "blocker projection",
+      "supplemental facet projection",
+      "next-work passthrough",
+      "project-level health/lifecycle/review/blocker aggregates",
+      "JSON and Markdown view rendering",
+      "canonical data/generated/project-status.v1.json persistence",
+      "canonical PROJECT_STATUS.md persistence"
+    ],
+    "statusSourceOwns": [
+      "active source selection",
+      "selected source path",
+      "selected lineage",
+      "selected projectionOverride",
+      "admission authority"
+    ],
+    "notOwnedByProjectStatus": [
+      "status-source promotion mutation",
+      "domain validator execution",
+      "semantic recomputation",
+      "canonical relation recomputation",
+      "raw ConfigData interpretation",
+      "diff impact routing",
+      "PR guard",
+      "branch-protection cutover"
+    ]
+  },
+  "runtimeAuthority": {
+    "onlyStatusPredecessor": "tools/status-source/lib/select-active-sources.mjs",
+    "legacyActiveRegistryRead": false,
+    "legacyD1GeneratedStatusRead": false,
+    "d5FreshnessRead": false,
+    "projectStatusMarkdownInput": false,
+    "legacyProjectStatusGeneratedInput": false
+  },
+  "currentParity": {
+    "projectHealth": "REVIEW",
+    "healthCounts": {"PASS": 0, "REVIEW": 6, "FAIL": 0, "MISSING": 0, "INCONSISTENT": 0, "UNKNOWN": 0},
+    "lifecycleCounts": {"FROZEN": 4, "COMPLETE": 1, "IN_PROGRESS": 1, "UNKNOWN": 0},
+    "knownHardErrorTotal": 0,
+    "reviewTotal": 29,
+    "blockerTotal": 1,
+    "selectedDomains": {
+      "hero": "hero-stage6-4-final",
+      "soldier": "soldier-stage6-7-site-admission",
+      "equipment": "equipment-public-presentation-correction-final",
+      "hero-soldier": "hero-soldier-stageC-final",
+      "banner": "banner-stage3-8-regression-freeze",
+      "skin": "skin-stage3-2-readiness"
+    },
+    "equipmentProjection": {"canonical": 390, "public": 365, "general": 198, "exclusive": 167},
+    "skin": {"lifecycle": "IN_PROGRESS", "health": "REVIEW", "blockerCount": 1}
+  },
+  "canonicalCompatibility": {
+    "schemaIdPreserved": "project-status/v1",
+    "preCutoverStableAggregateAndDomainFieldsPreserved": true,
+    "intentionalAuthorityMigration": "legacy D1 source metadata -> NEW R2 normalization backed by R1 Status Source selection",
+    "additiveFields": ["readOnly", "canonicalJoinRecomputationCount", "source.authoritySchemaId", "domains[].activeSourceId"],
+    "canonicalJsonTarget": "data/generated/project-status.v1.json",
+    "canonicalMarkdownTarget": "PROJECT_STATUS.md"
+  },
+  "validationEvidence": {
+    "originalShadow": {
+      "runId": 33343818772,
+      "jobId": 99344105820,
+      "headSha": "55cd23acf5be65a4dbceb76d9d652fa19dcd7b76",
+      "conclusion": "success"
+    },
+    "writerImplementation": {
+      "validatedHead": "e52d51fc475672656901562a73bd1df4d59575b1",
+      "r2RunId": 33350592856,
+      "r2JobId": 99363059489,
+      "r2Conclusion": "success",
+      "projectCheckRunId": 33350592817,
+      "projectCheckJobId": 99363059318,
+      "projectCheckConclusion": "success",
+      "canonicalCompatibility": "PASS",
+      "deferredApplyGuard": "PASS",
+      "syntheticTwoTargetApply": "PASS"
+    },
+    "zeroWriterGate": {
+      "headSha": "46282c4a9220b21cc9e7b6d9dd0baf3e47278db2",
+      "legacyWriterAutomaticRunPresent": false,
+      "r2RunId": 33350650056,
+      "r2JobId": 99363214303,
+      "r2Conclusion": "success",
+      "projectCheckRunId": 33350650054,
+      "projectCheckJobId": 99363214325,
+      "projectCheckConclusion": "success"
+    },
+    "liveWriter": {
+      "activationHead": "d7334590d97a116e6f993728c0c47cf6387875cc",
+      "runId": 33350702256,
+      "jobId": 99363362295,
+      "conclusion": "success",
+      "outputCommit": "6e0854158fa9953b2c3fb276de780179adeae3dd",
+      "outputFiles": ["data/generated/project-status.v1.json", "PROJECT_STATUS.md"],
+      "unexpectedMutationGuard": "PASS",
+      "canonicalWordingRunId": 33350856776,
+      "canonicalWordingJobId": 99363809053,
+      "canonicalWordingConclusion": "success",
+      "canonicalWordingOutputCommit": "1a72baca436cfc5d074e8ce57fbd9c5e5b7a80c1"
+    }
+  },
+  "independenceBoundary": {
+    "legacyProjectDoctorRuntimeImports": 0,
+    "legacyGeneratedStatusReads": 0,
+    "legacyActiveRegistryReads": 0,
+    "d1RuntimeDependencies": 0,
+    "d5RuntimeDependencies": 0,
+    "projectStatusGeneratedInputDependencies": 0,
+    "projectStatusMarkdownInputDependencies": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "canonicalJoinRecomputationCount": 0,
+    "domainValidatorExecutionCount": 0,
+    "projectionCoreRepositoryWriteCount": 0,
+    "canonicalWriterTargetCount": 2,
+    "statusSourceMutationCountFromWriter": 0
+  },
+  "writerActivation": {
+    "state": "ACTIVE_NEW_R2_WRITER",
+    "activeWriterWorkflow": ".github/workflows/project-tooling-r2-project-status-writer.yml",
+    "legacyWriterWorkflow": ".github/workflows/project-status-sync.yml",
+    "legacyWriterActive": false,
+    "activeWriterCount": 1,
+    "maximumActiveWriterCountDuringTransition": 1,
+    "canonicalJsonTarget": "data/generated/project-status.v1.json",
+    "canonicalMarkdownTarget": "PROJECT_STATUS.md",
+    "mainMutationAllowed": false,
+    "pullRequestMutationAllowed": false
+  },
+  "completionGate": {
+    "normalizationContractImplemented": true,
+    "normalizationRuntimeImplemented": true,
+    "projectionRuntimeImplemented": true,
+    "readOnlyCliImplemented": true,
+    "currentParityFixtureImplemented": true,
+    "selfTestImplemented": true,
+    "validationWorkflowImplemented": true,
+    "sixDomainParity": true,
+    "aggregateParity": true,
+    "runtimeIndependenceProven": true,
+    "canonicalCompatibilityProven": true,
+    "legacyWriterInactiveBeforeNewActivation": true,
+    "newCanonicalWriterActive": true,
+    "liveNonMainWriterProof": true
+  },
+  "blockers": [],
+  "cutoverBlockers": [],
+  "reviews": [
+    "The parity fixture remains a migration oracle only; NEW runtime does not read legacy D1 or legacy Project Status outputs.",
+    "GitHub code search results were not used as negative evidence for downstream consumer absence; compatibility is preserved at the existing project-status/v1 schema and pre-cutover field contract instead.",
+    "Bot-authored canonical output commits may surface pull_request workflow runs as action_required with zero jobs; post-cutover validation is therefore performed on the subsequent user-authored checkpoint lineage rather than treating that GitHub approval state as a validator regression."
+  ],
+  "nextStartPoint": "Prepare the exact OLD Project Doctor deletion manifest using the completed Status Source and Project Status writer cutovers as predecessors. Preserve NEW canonical Project Status outputs and historical migration evidence; do not delete by filename similarity.",
+  "reopenConditions": [
+    "R1 Status Source selection or projectionOverride semantics change",
+    "a selected domain status source changes shape authoritatively",
+    "Project Status normalization/projection contract is explicitly revised",
+    "canonical Project Status writer target or ownership changes",
+    "new authoritative evidence contradicts current lifecycle/health/review/blocker or canonical compatibility parity"
+  ]
+}

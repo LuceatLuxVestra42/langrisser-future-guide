@@ -2,18 +2,21 @@
   "version": 1,
   "schemaId": "project-status/v1",
   "source": {
-    "path": "data/generated/project-doctor-d1-1-status.v1.json",
-    "schemaId": "project-doctor-d1-1-status/v1",
-    "stage": "D1-1",
-    "status": "COLLECTED"
+    "path": "tools/project-status/lib/normalize-project-status.mjs",
+    "schemaId": "project-status-normalized/v1",
+    "stage": "R2",
+    "status": "COLLECTED",
+    "authoritySchemaId": "status-source-selection/v1"
   },
   "derivedOnly": true,
+  "readOnly": true,
   "rawConfigDataReadCount": 0,
   "semanticRecomputationCount": 0,
+  "canonicalJoinRecomputationCount": 0,
   "projectHealth": "REVIEW",
   "healthCounts": {
-    "PASS": 0,
-    "REVIEW": 6,
+    "PASS": 1,
+    "REVIEW": 5,
     "FAIL": 0,
     "MISSING": 0,
     "INCONSISTENT": 0,
@@ -21,13 +24,13 @@
   },
   "lifecycleCounts": {
     "FROZEN": 4,
-    "COMPLETE": 1,
-    "IN_PROGRESS": 1,
+    "COMPLETE": 2,
+    "IN_PROGRESS": 0,
     "UNKNOWN": 0
   },
   "knownHardErrorTotal": 0,
-  "reviewTotal": 29,
-  "blockerTotal": 1,
+  "reviewTotal": 28,
+  "blockerTotal": 0,
   "domains": [
     {
       "domain": "hero",
@@ -43,6 +46,7 @@
       "reviewCount": 2,
       "blockerCount": 0,
       "activeSource": "data/validation/hero-stage6-4-final.v1.json",
+      "activeSourceId": "hero-stage6-4-final",
       "supplementalSources": [
         {
           "path": "data/validation/hero-list-stage4.v1.json",
@@ -80,6 +84,7 @@
       "reviewCount": 12,
       "blockerCount": 0,
       "activeSource": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "activeSourceId": "soldier-stage6-7-site-admission",
       "supplementalSources": [
         {
           "path": "data/validation/soldier-portrait-stage3j-frontend-full.v1.json",
@@ -126,6 +131,7 @@
       "reviewCount": 1,
       "blockerCount": 0,
       "activeSource": "data/validation/equipment-public-presentation-correction-final.v1.json",
+      "activeSourceId": "equipment-public-presentation-correction-final",
       "supplementalSources": [
         {
           "path": "data/presentation/equipment-public-admission-correction.v1.json",
@@ -172,6 +178,7 @@
       "reviewCount": 5,
       "blockerCount": 0,
       "activeSource": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+      "activeSourceId": "hero-soldier-stageC-final",
       "supplementalSources": [],
       "nextWork": [
         {
@@ -196,6 +203,7 @@
       "reviewCount": 8,
       "blockerCount": 0,
       "activeSource": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+      "activeSourceId": "banner-stage3-8-regression-freeze",
       "supplementalSources": [],
       "nextWork": [
         {
@@ -207,19 +215,20 @@
     },
     {
       "domain": "skin",
-      "lifecycle": "IN_PROGRESS",
-      "health": "REVIEW",
-      "status": "READY_FOR_ASSET_EVIDENCE",
-      "completion": null,
+      "lifecycle": "COMPLETE",
+      "health": "PASS",
+      "status": "PASS",
+      "completion": "SKIN_STAGE3_2_COMPLETE",
       "freezeState": null,
       "population": {
         "skinCount": 540,
         "heroCount": 267
       },
       "hardErrorCount": 0,
-      "reviewCount": 1,
-      "blockerCount": 1,
+      "reviewCount": 0,
+      "blockerCount": 0,
       "activeSource": "data/validation/skin-stage3-2-readiness.v1.json",
+      "activeSourceId": "skin-stage3-2-readiness",
       "supplementalSources": [
         {
           "path": "data/validation/skin-stage3-1-final.v1.json",
@@ -231,7 +240,7 @@
         {
           "source": "data/validation/skin-stage3-2-readiness.v1.json",
           "selector": "/nextAction",
-          "value": "Provide or mount the authoritative Unity asset source/root, generate Stage 3-2 evidence for the selected fixtures, and rerun the Stage 3-2 validator without recomputing Stage 3-1."
+          "value": "Skin Stage 3-3 static artwork extraction/export using the proven resolver rule."
         }
       ]
     }

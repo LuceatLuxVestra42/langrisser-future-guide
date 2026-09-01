@@ -1,0 +1,50 @@
+name: Project Tooling R2 Project Status
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/project-status/**'
+      - 'tools/status-source/**'
+      - 'data/status-sources/**'
+      - 'data/generated/project-status.v1.json'
+      - 'PROJECT_STATUS.md'
+      - 'data/contracts/project-tooling-status-source-r1-final.v1.json'
+      - 'data/contracts/project-tooling-project-status-r2.v1.json'
+      - '.github/workflows/project-tooling-r2-project-status.yml'
+      - '.github/workflows/project-tooling-r2-project-status-writer.yml'
+      - '.github/workflows/project-status-sync.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  project-status-shadow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify R1 Status Source selection predecessor
+        run: node tools/status-source/test/current-main-parity.mjs
+
+      - name: Run independent R2 Project Status parity, compatibility, and writer-boundary self-test
+        run: node tools/project-status/test/current-parity.mjs
+
+      - name: Print read-only R2 Project Status projection
+        run: node tools/project-status/cli/status.mjs --project-status
+
+      - name: Render read-only R2 Project Status markdown
+        run: node tools/project-status/cli/status.mjs --markdown > /tmp/project-status-r2.md
+
+      - name: Preview canonical writer without mutation
+        run: node tools/project-status/cli/write.mjs --check

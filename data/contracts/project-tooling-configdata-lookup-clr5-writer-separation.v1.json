@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-clr5-writer-separation/v1",
+  "stage": "CLR5",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "CONFIGDATA_LOOKUP_CLR5_WRITER_SEPARATION_FROZEN",
+  "purpose": "Separate automatic/read-only ConfigData Lookup validation from explicit Stage 6 materialization writer authority without changing Stage 0-6 materialization semantics or package CLI authority.",
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "base": "main",
+    "sourceHead": "5fdbac2f80dc4e2c590046fd5cb0e98a4749b552",
+    "predecessor": {
+      "path": "data/contracts/project-tooling-configdata-lookup-clr4-admission.v1.json",
+      "blobSha": "55ff92f8ca42a27a53e3a563fb8bc97ee677f9e2",
+      "requiredCompletion": "CONFIGDATA_LOOKUP_CLR4_PROJECT_CHECK_ADMISSION_FROZEN"
+    }
+  },
+  "validationBoundary": {
+    "generalWorkflow": ".github/workflows/project-tooling-configdata-lookup-clr2.yml",
+    "legacyStage6Workflow": ".github/workflows/configdata-lookup-stage6.yml",
+    "permissions": "contents: read",
+    "rebuildExecution": false,
+    "gitCommit": false,
+    "gitPush": false,
+    "trackedMutationAllowed": false,
+    "staleMaterializationBehavior": "FAIL_READ_ONLY"
+  },
+  "writerBoundary": {
+    "workflow": ".github/workflows/project-tooling-configdata-lookup-writer.yml",
+    "cli": "tools/configdata-lookup/cli/rebuild.mjs",
+    "trigger": "workflow_dispatch_ONLY",
+    "permissions": "contents: write",
+    "requiredConfirmation": "APPLY_CONFIGDATA_LOOKUP_REBUILD",
+    "requiredCliFlag": "--apply",
+    "targetBranchPolicy": "EXISTING_WORK_BRANCH_ONLY",
+    "mainWriteAllowed": false,
+    "ghPagesWriteAllowed": false,
+    "writerAlgorithm": "scripts/lib/configdata-lookup-stage6.mjs#rebuildIncrementally",
+    "writerAlgorithmReimplemented": false,
+    "commitScope": "CONFIGDATA_LOOKUP_MATERIALIZATION_ONLY"
+  },
+  "projectCheckOwnership": {
+    "owner": "configdata-lookup",
+    "validator": "configdata-lookup-self-test",
+    "newlyAdmittedWorkflowPaths": [
+      ".github/workflows/configdata-lookup-stage6.yml",
+      ".github/workflows/project-tooling-configdata-lookup-writer.yml"
+    ],
+    "candidateChangedFileCount": 7,
+    "candidateOwnerCount": 2,
+    "candidateValidatorCount": 2,
+    "manualReviewCount": 0,
+    "ownerPropagation": false,
+    "changeClassFanOut": false
+  },
+  "writerProofPolicy": {
+    "syntheticStaleMutationForbidden": true,
+    "currentMaterializationExpectedClean": true,
+    "livePersistentWriterExecutionRequiredForClr5": false,
+    "reason": "CLR5 proves authority separation. A synthetic ConfigData/index mutation solely to force a writer commit would violate the frozen semantic/materialization boundary. Writer behavior reuses the already validated Stage 6 rebuild algorithm and is guarded structurally; a future legitimate stale materialization may exercise the explicit writer without reopening CLR5."
+  },
+  "unchangedScope": {
+    "stage0To6MaterializationAlgorithmMutationCount": 0,
+    "stage0To6GeneratedArtifactMutationCount": 0,
+    "rawConfigDataMutationCount": 0,
+    "packageJsonMutationCount": 0,
+    "packageCliCutoverCount": 0,
+    "stage7Or8MutationCount": 0,
+    "semanticMutationCount": 0,
+    "frontendMutationCount": 0,
+    "assetMutationCount": 0,
+    "hostedQaMutationCount": 0,
+    "browserUiMutationCount": 0
+  },
+  "requiredValidation": {
+    "configdataLookupWorkflow": "PASS",
+    "legacyStage6ReadOnlyWorkflow": "PASS",
+    "stage5Predecessor": "PASS",
+    "stage6Freshness": "CLEAN_CONFIGDATA_LOOKUP_STAGE6",
+    "clr3ReadOnlySelfTest": "PASS",
+    "automaticWriterWorkflowCount": 0,
+    "explicitWriterWorkflowCount": 1,
+    "validationWritePermissionCount": 0,
+    "writerWithoutApplyFailsClosed": true,
+    "writerRejectsMainAndGhPages": true,
+    "projectCheckSelfTest": "PASS",
+    "projectCheckOwnershipPlan": "PASS",
+    "projectCheckOwningValidators": "PASS",
+    "trackedMutationCount": 0
+  },
+  "validationEvidence": {
+    "candidateHead": "37e3991400aafeb2f72b6a00a0cb06a73f7593bd",
+    "legacyStage6ReadOnlyWorkflow": {
+      "runId": 33394892275,
+      "jobId": 99496953248,
+      "stage5Predecessor": "PASS",
+      "stage6CommittedMaterialization": "PASS",
+      "stage6Freshness": "PASS",
+      "trackedState": "PASS",
+      "conclusion": "success"
+    },
+    "configdataLookupWorkflow": {
+      "runId": 33394892250,
+      "jobId": 99496953357,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "clr3ReadOnlySelfTest": "PASS",
+      "conclusion": "success"
+    },
+    "projectCheck": {
+      "runId": 33394892231,
+      "jobId": 99496952926,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "configdataLookupSelfTestExitCode": 0,
+      "manualReviewCount": 0,
+      "conclusion": "success"
+    },
+    "freezeHead": "8dc6e05034238e5ea3f94957871db065f631bf4f",
+    "freezeHeadLegacyStage6ReadOnlyWorkflow": {
+      "runId": 33395051369,
+      "jobId": 99497466354,
+      "stage5Predecessor": "PASS",
+      "stage6CommittedMaterialization": "PASS",
+      "stage6Freshness": "PASS",
+      "trackedState": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadConfigdataLookupWorkflow": {
+      "runId": 33395051290,
+      "jobId": 99497466463,
+      "stage5Predecessor": "PASS",
+      "stage6Freshness": "PASS",
+      "clr2NamespaceSmoke": "PASS",
+      "clr3ReadOnlySelfTest": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadProjectCheck": {
+      "runId": 33395051356,
+      "jobId": 99497465905,
+      "selfTest": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "conclusion": "success"
+    },
+    "freezeHeadRevalidation": "PASS"
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "PACKAGE_CLI_CUTOVER_DEFERRED_TO_CLR7",
+      "blocking": false,
+      "detail": "npm run lookup/refs/find remains on the legacy Stage 5 CLI until CLR7 cutover."
+    },
+    {
+      "id": "STAGE7_STAGE8_AUTHORITY_CUTOVER_DEFERRED_TO_CLR7",
+      "blocking": false,
+      "detail": "Legacy Stage 7/8 orchestration remains unchanged and outside the NEW ConfigData Lookup owner authority."
+    },
+    {
+      "id": "LIVE_WRITER_EXERCISE_DEFERRED_UNTIL_LEGITIMATE_STALE_INPUT",
+      "blocking": false,
+      "detail": "The explicit writer is not forced to create a synthetic materialization change while Stage 6 is clean. A future legitimate stale input can exercise it without changing CLR5 completion."
+    }
+  ],
+  "nextStart": "Begin CLR6 shadow/parity verification between the preserved Stage 0-6 behavior and the NEW ConfigData Lookup surface. Do not cut over package CLI or retire Stage 7/8 authority until CLR7.",
+  "reopenConditions": [
+    "An automatic or required validation path regains contents:write, rebuild execution, commit, or push authority.",
+    "The explicit writer can target main or gh-pages, or can run without workflow_dispatch confirmation and --apply.",
+    "The writer reimplements Stage 0-6 materialization semantics instead of delegating to the frozen Stage 6 rebuild algorithm.",
+    "Project Check cannot route ConfigData Lookup validation/writer tooling to the dedicated configdata-lookup owner.",
+    "CLR3 read-only parity/freshness guarantees regress."
+  ]
+}

@@ -1,0 +1,113 @@
+name: Project Tooling R1 Status Source Writer
+
+on:
+  workflow_dispatch:
+    inputs:
+      pipeline:
+        description: Explicit R1 lifecycle pipeline
+        required: true
+        type: choice
+        options:
+          - hero
+          - soldier
+  workflow_call:
+    inputs:
+      pipeline:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: status-source-writer-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  status-source-writer:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      INPUT_PIPELINE: ${{ inputs.pipeline }}
+    steps:
+      - name: Reject main and non-dispatch producer events
+        if: github.ref_name == 'main' || github.event_name != 'workflow_dispatch'
+        run: |
+          echo 'Status Source mutation is allowed only from an explicit workflow_dispatch on a non-main work branch.'
+          exit 1
+
+      - name: Checkout selected work branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Require activated NEW writer ownership
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const contract = JSON.parse(fs.readFileSync('tools/status-source/contracts/lifecycle.v1.json', 'utf8'));
+          if (contract?.policy?.transport?.productionWriterActivation !== 'ACTIVE') {
+            throw new Error(`NEW Status Source writer is not active: ${contract?.policy?.transport?.productionWriterActivation ?? 'missing'}`);
+          }
+          if (contract?.policy?.transport?.productionWriterWorkflow !== '.github/workflows/project-tooling-r1-status-source-writer.yml') {
+            throw new Error('NEW Status Source writer workflow binding mismatch.');
+          }
+          NODE
+
+      - name: Resolve committed approved producer declaration
+        id: declaration
+        run: node tools/status-source/cli/lifecycle.mjs declaration --pipeline "$INPUT_PIPELINE" --github-output
+
+      - name: Preview CAS handoff
+        run: >-
+          node tools/status-source/cli/lifecycle.mjs handoff
+          --pipeline "$INPUT_PIPELINE"
+          --expected-predecessor "${{ steps.declaration.outputs.expected_predecessor }}"
+          --id "${{ steps.declaration.outputs.entry_id }}"
+          --source "${{ steps.declaration.outputs.source_path }}"
+          --check
+
+      - name: Apply CAS handoff through NEW R1 lifecycle
+        run: >-
+          node tools/status-source/cli/lifecycle.mjs handoff
+          --pipeline "$INPUT_PIPELINE"
+          --expected-predecessor "${{ steps.declaration.outputs.expected_predecessor }}"
+          --id "${{ steps.declaration.outputs.entry_id }}"
+          --source "${{ steps.declaration.outputs.source_path }}"
+          --apply
+
+      - name: Reject non-Status-Source mutations
+        shell: bash
+        run: |
+          UNEXPECTED="$({ git status --porcelain || true; } | awk '{print $2}' | while IFS= read -r path; do
+            case "$path" in
+              data/status-sources/*|'') ;;
+              *) echo "$path" ;;
+            esac
+          done)"
+          if [ -n "$UNEXPECTED" ]; then
+            echo 'Unexpected NEW Status Source writer mutations:'
+            echo "$UNEXPECTED"
+            exit 1
+          fi
+
+      - name: Commit Status Source declaration to work branch
+        shell: bash
+        run: |
+          git add data/status-sources
+          if git diff --cached --quiet; then
+            echo 'Status Source handoff is already current; no commit required.'
+            exit 0
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "chore: apply R1 Status Source handoff for ${INPUT_PIPELINE}"
+          git push origin HEAD:"${GITHUB_REF_NAME}"

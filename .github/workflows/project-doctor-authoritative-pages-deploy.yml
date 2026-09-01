@@ -83,7 +83,16 @@ jobs:
           node scripts/validate-hero-card-icon-frontend.mjs
           node scripts/validate-hero-fusion-power-frontend.mjs
           grep -q 'equipment-p3-1-release-metadata.v1.json' src/lib/equipment-page.localized.server.ts
-          grep -q '같은 세부 타입 안에서는 확인된 출시 그룹 기준 최신순' src/routes/equipment.tsx
+          if grep -Eq '초기 장비|이전 추가 장비|장비패스' src/routes/equipment.tsx; then
+            echo 'Equipment list still exposes a removed top-level collection category' >&2
+            exit 1
+          fi
+          if grep -q 'displayCollection' src/routes/equipment.tsx; then
+            echo 'Equipment list still filters or renders the removed displayCollection axis' >&2
+            exit 1
+          fi
+          grep -q 'record.group !== uiState.group' src/routes/equipment.tsx
+          grep -q 'record.subtype !== uiState.subtype' src/routes/equipment.tsx
 
       - name: Compose admission-aware GitHub Pages static build config
         shell: bash
@@ -309,11 +318,43 @@ jobs:
           EXPECTED_SKIN_REF: ${{ env.SKIN_RUNTIME_REF }}
           HOSTED_BASE_URL: ${{ env.HOSTED_BASE_URL }}
         run: |
-          node scripts/project-doctor-validate-authoritative-pages-hosted.mjs
-          node scripts/validate-hero-central-discipline-hosted.mjs
-          node scripts/validate-hero-soldier-cards-hosted.mjs
-          node scripts/validate-hero-card-icons-hosted.mjs
-          node scripts/validate-soldier-detail-hero-cards-hosted.mjs
+          set -euo pipefail
+
+          run_hosted_validator() {
+            local validator="$1"
+            shift
+            printf 'HOSTED_QA_START validator=%s expectedSource=%s baseUrl=%s timestamp=%s\n' \
+              "$validator" "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            if "$@"; then
+              printf 'HOSTED_QA_PASS validator=%s timestamp=%s\n' \
+                "$validator" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              return 0
+            else
+              local status=$?
+              printf 'HOSTED_QA_FAIL validator=%s exit=%s expectedSource=%s baseUrl=%s timestamp=%s\n' \
+                "$validator" "$status" "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
+              printf '%s\n' 'HOSTED_QA_MANIFEST_PROBE_BEGIN' >&2
+              curl --silent --show-error --location --max-time 20 \
+                -D /tmp/hosted-manifest.headers \
+                "${HOSTED_BASE_URL}authoritative-pages-source.json?qa=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-$(date +%s)" \
+                -o /tmp/hosted-manifest.json || true
+              cat /tmp/hosted-manifest.headers >&2 2>/dev/null || true
+              cat /tmp/hosted-manifest.json >&2 2>/dev/null || true
+              printf '\n%s\n' 'HOSTED_QA_MANIFEST_PROBE_END' >&2
+              return "$status"
+            fi
+          }
+
+          run_hosted_validator project-doctor-authoritative-pages \
+            node scripts/project-doctor-validate-authoritative-pages-hosted.mjs
+          run_hosted_validator hero-central-discipline \
+            node scripts/validate-hero-central-discipline-hosted.mjs
+          run_hosted_validator hero-soldier-cards \
+            node scripts/validate-hero-soldier-cards-hosted.mjs
+          run_hosted_validator hero-card-icons \
+            node scripts/validate-hero-card-icons-hosted.mjs
+          run_hosted_validator soldier-detail-hero-cards \
+            node scripts/validate-soldier-detail-hero-cards-hosted.mjs
 
       - name: Print authoritative deployment source
         if: always()

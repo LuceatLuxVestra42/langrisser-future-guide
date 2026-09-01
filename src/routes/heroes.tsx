@@ -42,7 +42,7 @@ export const Route = createFileRoute("/heroes")({
       { title: "영웅 | 랑그릿사 모바일 미래시 정보" },
       {
         name: "description",
-        content: "랑그릿사 모바일 영웅 267명을 이름, 희귀도, SP 여부로 검색하고 필터링할 수 있습니다.",
+        content: "랑그릿사 모바일 영웅 267명을 이름, 희귀도, 진영, 등장 시리즈, SP 여부로 검색하고 필터링할 수 있습니다.",
       },
     ],
   }),
@@ -50,6 +50,7 @@ export const Route = createFileRoute("/heroes")({
 });
 
 const ALL_RARITIES = "ALL";
+const LOW_RARITY = "N,R";
 
 function normalizeSearch(value: string) {
   return value.trim().toLocaleLowerCase();
@@ -70,6 +71,14 @@ function matchesHeroSearch(hero: HeroListStage4Record, normalizedQuery: string) 
     .some((name) => name.toLocaleLowerCase().includes(normalizedQuery));
 }
 
+function matchesRarity(hero: HeroListStage4Record, selectedRarity: string) {
+  if (selectedRarity === ALL_RARITIES) return true;
+  if (selectedRarity === LOW_RARITY) {
+    return hero.rarity.baseLabel === "N" || hero.rarity.baseLabel === "R";
+  }
+  return hero.rarity.baseLabel === selectedRarity;
+}
+
 function resolvePublicAssetUrl(webAssetPath: string) {
   const base = import.meta.env.BASE_URL || "/";
   return `${base.replace(/\/$/, "")}${webAssetPath}`;
@@ -79,7 +88,63 @@ function HeroGridPage() {
   const data = Route.useLoaderData();
   const [query, setQuery] = useState("");
   const [rarity, setRarity] = useState(ALL_RARITIES);
+  const [factionId, setFactionId] = useState<number | null>(null);
+  const [originId, setOriginId] = useState<number | null>(null);
   const [spOnly, setSpOnly] = useState(false);
+
+  const rarityOptions = useMemo(() => {
+    const regularOptions = data.filters.rarities.filter(
+      (option) => option.label !== "N" && option.label !== "R",
+    );
+    const lowRarityCount = data.filters.rarities
+      .filter((option) => option.label === "N" || option.label === "R")
+      .reduce((sum, option) => sum + option.count, 0);
+
+    return lowRarityCount > 0
+      ? [...regularOptions, { label: LOW_RARITY, count: lowRarityCount }]
+      : regularOptions;
+  }, [data.filters.rarities]);
+
+  const factionOptions = useMemo(() => {
+    const options = new Map<number, { id: number; label: string; count: number }>();
+
+    for (const hero of data.records) {
+      for (const faction of hero.factions) {
+        const current = options.get(faction.factionId);
+        if (current) {
+          current.count += 1;
+          continue;
+        }
+        options.set(faction.factionId, {
+          id: faction.factionId,
+          label: faction.nameKr ?? faction.nameCn,
+          count: 1,
+        });
+      }
+    }
+
+    return [...options.values()].sort((a, b) => a.id - b.id);
+  }, [data.records]);
+
+  const originOptions = useMemo(() => {
+    const options = new Map<number, { id: number; label: string; count: number }>();
+
+    for (const hero of data.records) {
+      const current = options.get(hero.origin.productionId);
+      if (current) {
+        current.count += 1;
+        continue;
+      }
+      options.set(hero.origin.productionId, {
+        id: hero.origin.productionId,
+        label: hero.origin.nameKr ?? hero.origin.nameCn,
+        count: 1,
+      });
+    }
+
+    return [...options.values()].sort((a, b) => a.id - b.id);
+  }, [data.records]);
+
   const cardIconByHeroId = useMemo(
     () => new Map(data.cardIcons.records.map((record) => [record.heroId, record])),
     [data.cardIcons.records],
@@ -95,17 +160,29 @@ function HeroGridPage() {
     return data.records
       .filter((hero) => {
         if (!matchesHeroSearch(hero, normalizedQuery)) return false;
-        if (rarity !== ALL_RARITIES && hero.rarity.baseLabel !== rarity) return false;
+        if (!matchesRarity(hero, rarity)) return false;
+        if (factionId !== null && !hero.factions.some((faction) => faction.factionId === factionId)) {
+          return false;
+        }
+        if (originId !== null && hero.origin.productionId !== originId) return false;
         if (spOnly && !hero.hasSp) return false;
         return true;
       })
       .reverse();
-  }, [data.records, query, rarity, spOnly]);
+  }, [data.records, query, rarity, factionId, originId, spOnly]);
 
-  const hasActiveFilters = Boolean(query.trim()) || rarity !== ALL_RARITIES || spOnly;
+  const hasActiveFilters =
+    Boolean(query.trim()) ||
+    rarity !== ALL_RARITIES ||
+    factionId !== null ||
+    originId !== null ||
+    spOnly;
+
   const resetFilters = () => {
     setQuery("");
     setRarity(ALL_RARITIES);
+    setFactionId(null);
+    setOriginId(null);
     setSpOnly(false);
   };
 
@@ -123,7 +200,7 @@ function HeroGridPage() {
             영웅
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            확정된 267명 영웅 목록에서 이름, 희귀도, SP 여부로 원하는 영웅을 빠르게 찾을 수 있어.
+            확정된 267명 영웅 목록에서 이름, 희귀도, 진영, 등장 시리즈, SP 여부로 원하는 영웅을 빠르게 찾을 수 있어.
           </p>
         </div>
 
@@ -159,7 +236,7 @@ function HeroGridPage() {
                 >
                   전체
                 </FilterButton>
-                {data.filters.rarities.map((option) => (
+                {rarityOptions.map((option) => (
                   <FilterButton
                     key={option.label}
                     active={rarity === option.label}
@@ -195,6 +272,42 @@ function HeroGridPage() {
                 <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
                 초기화
               </button>
+            </div>
+          </div>
+
+          <div className="mt-3 border-t border-border pt-3">
+            <span className="mb-1.5 block text-xs font-bold text-foreground">진영</span>
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label="진영 필터">
+              <FilterButton active={factionId === null} onClick={() => setFactionId(null)}>
+                전체
+              </FilterButton>
+              {factionOptions.map((option) => (
+                <FilterButton
+                  key={option.id}
+                  active={factionId === option.id}
+                  onClick={() => setFactionId(option.id)}
+                >
+                  {option.label} <span className="opacity-60">{option.count}</span>
+                </FilterButton>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-3">
+            <span className="mb-1.5 block text-xs font-bold text-foreground">등장 시리즈</span>
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label="등장 시리즈 필터">
+              <FilterButton active={originId === null} onClick={() => setOriginId(null)}>
+                전체
+              </FilterButton>
+              {originOptions.map((option) => (
+                <FilterButton
+                  key={option.id}
+                  active={originId === option.id}
+                  onClick={() => setOriginId(option.id)}
+                >
+                  {option.label} <span className="opacity-60">{option.count}</span>
+                </FilterButton>
+              ))}
             </div>
           </div>
         </section>
@@ -256,7 +369,7 @@ function FilterButton({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`h-10 rounded-md border px-3 text-xs font-bold transition ${
+      className={`h-10 whitespace-nowrap rounded-md border px-3 text-xs font-bold transition ${
         active
           ? "border-foreground bg-foreground text-background"
           : "border-border bg-background text-foreground hover:border-foreground/30"

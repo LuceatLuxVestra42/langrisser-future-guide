@@ -1,119 +1,172 @@
-import equipmentDisplayCollectionJson from "../../data/presentation/equipment-display-collection.v1.json";
+import equipmentPassClassificationJson from "../../data/generated/equipment-pass-classification.v1.json";
 
 export type EquipmentDisplayCollection = 1 | 2 | 3;
 
-type EquipmentDisplayCollectionContract = {
-  status: string;
-  completion: string;
-  scope: {
-    runtimePublicGeneralCount: number;
-    technicalSiteTabIsPresentationMembership: boolean;
-    equipmentPassMembershipMode: string;
-  };
-  displayCollections: {
-    initial: {
-      value: EquipmentDisplayCollection;
-      expectedCount: number;
-    };
-    previousAdditional: {
-      value: EquipmentDisplayCollection;
-      explicitCurrentAdditionalNonPassEquipmentIds: number[];
-      expectedCount: number;
-    };
-    equipmentPass: {
-      value: EquipmentDisplayCollection;
-      equipmentIds: number[];
-      expectedCount: number;
-    };
-  };
-  expectedPresentationCounts: {
-    initial: number;
-    previousAdditional: number;
-    equipmentPass: number;
-    total: number;
-  };
+type EquipmentPassClassificationState =
+  | "PASS_CONFIRMED"
+  | "NON_PASS_CONFIRMED"
+  | "PASS_CANDIDATE"
+  | "UNRESOLVED"
+  | "NON_PUBLIC_EXCLUDED";
+
+type EquipmentPassClassificationRecord = {
+  equipmentId: number;
+  nameCn: string;
+  technicalAcquisitionClass: string;
+  technicalSiteTab: number;
+  classificationState: EquipmentPassClassificationState;
+  evidenceSourceId: string | null;
+  displayCollection: EquipmentDisplayCollection | null;
 };
 
-const contract = equipmentDisplayCollectionJson as EquipmentDisplayCollectionContract;
-const explicitEquipmentPassIds = new Set(contract.displayCollections.equipmentPass.equipmentIds);
-const explicitCurrentAdditionalNonPassIds = new Set(
-  contract.displayCollections.previousAdditional.explicitCurrentAdditionalNonPassEquipmentIds,
+type EquipmentPassClassification = {
+  status: string;
+  completion: string;
+  policy: {
+    candidateClassIsMembership: boolean;
+    membershipMode: string;
+    explicitPassEquipmentIdListIsAuthoritative: boolean;
+    generatedPassEquipmentIdsAreOutputOnly: boolean;
+  };
+  displayCounts: {
+    "1": number;
+    "2": number;
+    "3": number;
+    total: number;
+  };
+  confirmedEquipmentPassIds: number[];
+  confirmedCurrentAdditionalNonPassIds: number[];
+  nonPublicExcludedCandidateIds: number[];
+  records: EquipmentPassClassificationRecord[];
+};
+
+const classification = equipmentPassClassificationJson as EquipmentPassClassification;
+const classificationByEquipmentId = new Map(
+  classification.records.map((record) => [record.equipmentId, record]),
 );
 
-function assertFrozenContract() {
-  if (
-    contract.status !== "FROZEN" ||
-    contract.completion !== "EQUIPMENT_DISPLAY_COLLECTION_V1_FROZEN" ||
-    contract.scope.technicalSiteTabIsPresentationMembership !== false ||
-    contract.scope.equipmentPassMembershipMode !== "EXPLICIT_EQUIPMENT_ID"
-  ) {
-    throw new Error("Equipment display collection frozen contract is inconsistent.");
-  }
+function sortedNumbers(values: Iterable<number>) {
+  return [...values].sort((left, right) => left - right);
+}
 
-  if (
-    explicitEquipmentPassIds.size !== contract.displayCollections.equipmentPass.expectedCount ||
-    explicitCurrentAdditionalNonPassIds.size !==
-      contract.displayCollections.previousAdditional.explicitCurrentAdditionalNonPassEquipmentIds.length
-  ) {
-    throw new Error("Equipment display collection explicit membership contains duplicates.");
-  }
-
-  for (const equipmentId of explicitEquipmentPassIds) {
-    if (explicitCurrentAdditionalNonPassIds.has(equipmentId)) {
-      throw new Error(`Equipment ${equipmentId} belongs to conflicting display collections.`);
-    }
-  }
-
-  const counts = contract.expectedPresentationCounts;
-  if (
-    counts.initial !== contract.displayCollections.initial.expectedCount ||
-    counts.previousAdditional !== contract.displayCollections.previousAdditional.expectedCount ||
-    counts.equipmentPass !== contract.displayCollections.equipmentPass.expectedCount ||
-    counts.total !== contract.scope.runtimePublicGeneralCount ||
-    counts.initial + counts.previousAdditional + counts.equipmentPass !== counts.total
-  ) {
-    throw new Error("Equipment display collection expected counts are inconsistent.");
+function assertSameIds(actual: Iterable<number>, expected: Iterable<number>, label: string) {
+  const left = JSON.stringify(sortedNumbers(actual));
+  const right = JSON.stringify(sortedNumbers(expected));
+  if (left !== right) {
+    throw new Error(`${label} mismatch: ${left} !== ${right}`);
   }
 }
 
-assertFrozenContract();
+function assertActiveClassification() {
+  if (
+    classification.status !== "PASS" ||
+    classification.completion !== "EQUIPMENT_PASS_CLASSIFICATION_V1_GENERATED" ||
+    classification.policy.candidateClassIsMembership !== false ||
+    classification.policy.membershipMode !== "EVIDENCE_CLASSIFICATION" ||
+    classification.policy.explicitPassEquipmentIdListIsAuthoritative !== false ||
+    classification.policy.generatedPassEquipmentIdsAreOutputOnly !== true
+  ) {
+    throw new Error("Equipment Pass generated classification is inconsistent.");
+  }
+
+  if (classificationByEquipmentId.size !== classification.records.length) {
+    throw new Error("Equipment Pass generated classification contains duplicate equipmentId records.");
+  }
+
+  const passIds: number[] = [];
+  const nonPassIds: number[] = [];
+  const excludedIds: number[] = [];
+
+  for (const record of classification.records) {
+    switch (record.classificationState) {
+      case "PASS_CONFIRMED":
+        if (record.displayCollection !== 3 || !record.evidenceSourceId) {
+          throw new Error(`Equipment ${record.equipmentId} confirmed Pass record is incomplete.`);
+        }
+        passIds.push(record.equipmentId);
+        break;
+      case "NON_PASS_CONFIRMED":
+        if (record.displayCollection !== 2 || !record.evidenceSourceId) {
+          throw new Error(`Equipment ${record.equipmentId} confirmed non-Pass record is incomplete.`);
+        }
+        nonPassIds.push(record.equipmentId);
+        break;
+      case "NON_PUBLIC_EXCLUDED":
+        if (record.displayCollection !== null) {
+          throw new Error(`Equipment ${record.equipmentId} public-excluded record has a display collection.`);
+        }
+        excludedIds.push(record.equipmentId);
+        break;
+      case "PASS_CANDIDATE":
+      case "UNRESOLVED":
+        throw new Error(
+          `Equipment ${record.equipmentId} classification is ${record.classificationState}; runtime admission is blocked until evidence resolves it.`,
+        );
+      default: {
+        const exhaustive: never = record.classificationState;
+        throw new Error(`Unsupported Equipment Pass classification state ${exhaustive}.`);
+      }
+    }
+  }
+
+  assertSameIds(passIds, classification.confirmedEquipmentPassIds, "Generated Equipment Pass output IDs");
+  assertSameIds(
+    nonPassIds,
+    classification.confirmedCurrentAdditionalNonPassIds,
+    "Generated current-additional non-Pass output IDs",
+  );
+  assertSameIds(
+    excludedIds,
+    classification.nonPublicExcludedCandidateIds,
+    "Generated non-public candidate output IDs",
+  );
+
+  if (
+    classification.displayCounts["1"] +
+      classification.displayCounts["2"] +
+      classification.displayCounts["3"] !==
+      classification.displayCounts.total
+  ) {
+    throw new Error("Equipment Pass generated display counts are inconsistent.");
+  }
+}
+
+assertActiveClassification();
 
 export const EQUIPMENT_DISPLAY_COLLECTION_EXPECTED_COUNTS = Object.freeze({
-  1: contract.expectedPresentationCounts.initial,
-  2: contract.expectedPresentationCounts.previousAdditional,
-  3: contract.expectedPresentationCounts.equipmentPass,
+  1: classification.displayCounts["1"],
+  2: classification.displayCounts["2"],
+  3: classification.displayCounts["3"],
 }) satisfies Readonly<Record<EquipmentDisplayCollection, number>>;
 
 export function resolveEquipmentDisplayCollection(
   equipmentId: number,
   technicalSiteTab: number,
 ): EquipmentDisplayCollection {
-  const isEquipmentPass = explicitEquipmentPassIds.has(equipmentId);
-  const isExplicitCurrentAdditionalNonPass = explicitCurrentAdditionalNonPassIds.has(equipmentId);
+  const resolved = classificationByEquipmentId.get(equipmentId);
 
-  if (isEquipmentPass && isExplicitCurrentAdditionalNonPass) {
-    throw new Error(`Equipment ${equipmentId} has conflicting display collection membership.`);
-  }
-
-  if (technicalSiteTab === 1) {
-    if (isEquipmentPass || isExplicitCurrentAdditionalNonPass) {
-      throw new Error(`Equipment ${equipmentId} explicit membership conflicts with technical siteTab 1.`);
+  if (resolved) {
+    if (resolved.technicalSiteTab !== technicalSiteTab) {
+      throw new Error(
+        `Equipment ${equipmentId} technical siteTab drift: ${technicalSiteTab} !== ${resolved.technicalSiteTab}.`,
+      );
     }
-    return 1;
-  }
 
-  if (technicalSiteTab === 2) {
-    if (isEquipmentPass || isExplicitCurrentAdditionalNonPass) {
-      throw new Error(`Equipment ${equipmentId} explicit membership conflicts with technical siteTab 2.`);
+    if (resolved.classificationState === "PASS_CONFIRMED") return 3;
+    if (resolved.classificationState === "NON_PASS_CONFIRMED") return 2;
+    if (resolved.classificationState === "NON_PUBLIC_EXCLUDED") {
+      throw new Error(`Equipment ${equipmentId} is excluded from the public Equipment projection.`);
     }
-    return 2;
-  }
-
-  if (technicalSiteTab === 3) {
-    if (isEquipmentPass) return 3;
-    if (isExplicitCurrentAdditionalNonPass) return 2;
     throw new Error(
-      `Equipment ${equipmentId} technical siteTab 3 is missing explicit display collection membership.`,
+      `Equipment ${equipmentId} classification is ${resolved.classificationState}; accepted evidence is required before display mapping.`,
+    );
+  }
+
+  if (technicalSiteTab === 1) return 1;
+  if (technicalSiteTab === 2) return 2;
+  if (technicalSiteTab === 3) {
+    throw new Error(
+      `Equipment ${equipmentId} technical siteTab 3 has no resolved Equipment Pass classification evidence.`,
     );
   }
 

@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-regression-runner-r7-cutover/v1",
+  "stage": "RR7",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "REGRESSION_RUNNER_RR7_CUTOVER_COMPLETE",
+  "purpose": "Cut over automatic regression-runner ownership from legacy Regression Coverage Promotion V2 to the NEW Project Tooling Regression Runner after RR6 repeatable shadow proof, without changing required branch protection or deleting the legacy comparator.",
+  "predecessor": {
+    "checkpoint": "data/contracts/project-tooling-regression-runner-r6-shadow.v1.json",
+    "completion": "REGRESSION_RUNNER_RR6_SHADOW_COMPLETE",
+    "head": "5868e038e7d55e415e4b7e9b1be6b21eae3613aa"
+  },
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pr": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "activationHead": "b7ec95b4cb9c3f5e34a43e48a48ba738b0f18037",
+    "requiredCheckContexts": ["project-check"],
+    "newRegressionRunnerRequired": false
+  },
+  "cutoverSequence": [
+    {
+      "sequence": 1,
+      "action": "OLD_AUTOMATIC_PR_TRIGGER_OFF",
+      "commit": "71cc2ca832067b6bd6928c1810f9bf4b265d2176",
+      "workflow": ".github/workflows/regression-coverage-promotion-v2.yml",
+      "state": "MANUAL_COMPARATOR_ONLY",
+      "pullRequestTriggerActive": false,
+      "workflowDispatchActive": true,
+      "contentsWrite": false,
+      "oldPrRunCreatedOnHead": false
+    },
+    {
+      "sequence": 2,
+      "action": "RR7_OWNER_ROUTING_REPAIR",
+      "commit": "70d85de83cc933f035720ac4a31861a855668e5e",
+      "reason": "The first OLD-off transition exposed the exact legacy comparator workflow path as UNMATCHED_PATH in Project Check. This was a cutover admission regression, not semantic or runner failure.",
+      "ownerRule": "regression-runner-tooling",
+      "owner": "regression-runner",
+      "validator": "regression-runner-self-test",
+      "projectCheckRunId": 33358892287,
+      "projectCheckJobId": 99386263620,
+      "conclusion": "success"
+    },
+    {
+      "sequence": 3,
+      "action": "NEW_OPERATIONAL_PR_TRIGGER_ON",
+      "commit": "b7ec95b4cb9c3f5e34a43e48a48ba738b0f18037",
+      "workflow": ".github/workflows/project-tooling-regression-runner.yml",
+      "state": "OPERATIONAL",
+      "pullRequestTriggerActive": true,
+      "workflowDispatchActive": true,
+      "contentsWrite": false
+    }
+  ],
+  "oldRunner": {
+    "workflow": ".github/workflows/regression-coverage-promotion-v2.yml",
+    "name": "Regression Coverage Promotion V2 Manual Comparator",
+    "automaticPrTriggerActive": false,
+    "manualDispatchActive": true,
+    "role": "MANUAL_READ_ONLY_COMPARATOR_PENDING_ROLLBACK_CLOSEOUT",
+    "deleted": false,
+    "legacyAdmissionAuditStillAuthoritativeForNewRunner": false,
+    "knownLegacyAdmissionDrift": "REVIEW_EXISTING_DRIFT"
+  },
+  "newRunner": {
+    "workflow": ".github/workflows/project-tooling-regression-runner.yml",
+    "name": "Project Tooling Regression Runner",
+    "job": "regression-runner",
+    "state": "OPERATIONAL",
+    "required": false,
+    "permissions": "contents: read",
+    "profile": "core-regression-v1",
+    "validatorAuthority": "tools/project-check/contracts/validators.v1.json",
+    "execution": "node tools/regression-runner/test/current-parity.mjs",
+    "trackedStateGuard": "git diff --exit-code",
+    "automaticCoverageExpansion": false
+  },
+  "operationalTriggerBoundary": {
+    "paths": [
+      "tools/regression-runner/**",
+      "tools/project-check/contracts/validators.v1.json",
+      "data/contracts/project-tooling-regression-runner-*.json",
+      ".github/workflows/project-tooling-regression-runner.yml",
+      ".github/workflows/regression-coverage-promotion-v2.yml",
+      "package.json",
+      "scripts/validate-shared-movement-type-index-final.mjs",
+      "scripts/validate-soldier-stage6-7-final.mjs",
+      "scripts/validate-soldier-portrait-v9-final.mjs"
+    ],
+    "allPullRequests": false,
+    "inheritsLegacyAutomaticScopeWhereRelevant": true,
+    "legacyV2AdmissionScriptRequiredAtRuntime": false
+  },
+  "activationProof": {
+    "head": "b7ec95b4cb9c3f5e34a43e48a48ba738b0f18037",
+    "newOperational": {
+      "runId": 33358965899,
+      "jobId": 99386483661,
+      "conclusion": "success",
+      "currentHeadParity": "PASS",
+      "trackedStateGuard": "PASS"
+    },
+    "requiredProjectCheck": {
+      "runId": 33358965823,
+      "jobId": 99386483229,
+      "conclusion": "success",
+      "projectCheckSelfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS"
+    },
+    "oldAutomaticPrRunObserved": false,
+    "dualActiveRunnerObserved": false
+  },
+  "branchProtection": {
+    "mainProtected": true,
+    "requiredContexts": ["project-check"],
+    "regressionRunnerRequired": false,
+    "legacyV2Required": false,
+    "changedInRr7": false
+  },
+  "boundaries": {
+    "semanticRelationChanged": false,
+    "canonicalDataChanged": false,
+    "frozenDataChanged": false,
+    "generatedDomainDataChanged": false,
+    "statusSourceChanged": false,
+    "projectStatusChanged": false,
+    "frontendChanged": false,
+    "assetChanged": false,
+    "hostedQaChanged": false,
+    "configDataChanged": false,
+    "localizationChanged": false,
+    "validatorCatalogChanged": false,
+    "profileMembershipChanged": false,
+    "packageJsonChanged": false,
+    "branchProtectionChanged": false,
+    "legacyWorkflowDeleted": false
+  },
+  "completionGate": {
+    "rr6RepeatableShadowProofAvailable": true,
+    "oldAutomaticTriggerDisabledBeforeNewActivation": true,
+    "legacyComparatorExplicitlyOwned": true,
+    "newOperationalWorkflowActive": true,
+    "newOperationalRunPassed": true,
+    "requiredProjectCheckPassed": true,
+    "dualActiveRunnerObserved": false,
+    "legacyComparatorRetained": true,
+    "branchProtectionUnchanged": true,
+    "cutoverComplete": true
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_V2_FROZEN_SHA_ADMISSION_DRIFT",
+      "blocking": false,
+      "classification": "REVIEW_EXISTING_DRIFT",
+      "detail": "The manual OLD V2 comparator still contains the RR0-frozen stale admission policy. It is no longer an automatic or NEW-runner runtime dependency."
+    },
+    {
+      "id": "LEGACY_V2_PHYSICAL_RETENTION",
+      "blocking": false,
+      "classification": "ROLLBACK_CLOSEOUT_REVIEW",
+      "detail": "Keep the OLD V2 workflow/script/contract as manual historical rollback/comparison surfaces until NEW operational proof is considered sufficient for RR9 physical retirement."
+    }
+  ],
+  "nextStart": "RR8: freeze the completed Regression Runner installation/cutover state, verify the NEW operational workflow and required project-check on the checkpoint head, and define the rollback-closeout condition for RR9. Do not delete the OLD V2 comparator in RR8 unless separate live operational evidence justifies closing the rollback window.",
+  "reopenConditions": [
+    "The NEW operational Regression Runner fails a selected owning validator or tracked-state guard.",
+    "OLD Regression Coverage Promotion V2 regains a pull_request automatic trigger.",
+    "Both OLD and NEW automatic PR runners become active simultaneously.",
+    "The R3 validator catalog or core-regression-v1 membership changes.",
+    "The regression-runner check is proposed as a required branch-protection context.",
+    "New authoritative evidence proves RR0 legacy admission drift represents semantic corruption."
+  ]
+}

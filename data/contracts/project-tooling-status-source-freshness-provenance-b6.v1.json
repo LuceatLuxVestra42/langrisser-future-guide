@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-status-source-freshness-provenance-b6/v1",
+  "stage": "B6",
+  "checkpoint": "STATUS_SOURCE_FRESHNESS_PROVENANCE_FINAL",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "STATUS_SOURCE_FRESHNESS_PROVENANCE_B0_B5_COMPLETE_FROZEN",
+  "purpose": "Freeze the completed B0-B5 investigation, design, implementation, independent validation, and negative end-to-end proof for Status Source freshness provenance. This checkpoint records the verified owning layer and failure behavior without reopening legacy Project Doctor D1/D5 or semantic domains.",
+  "authoritativeBaseline": {
+    "mainSha": "852acd12eccbe8a8bcc38c0f0c5d07a897165cf7",
+    "implementationPr": 360,
+    "implementationHeadSha": "22cc942fde11a3f9339bd8ff5936e5c81b157663",
+    "negativeProofPr": 361,
+    "negativeProofHeadSha": "62857dda6190d944ee71d43966b34be3ef9e2ca8",
+    "negativeProofMerged": false
+  },
+  "completedStages": [
+    {
+      "stage": "B0",
+      "status": "COMPLETE",
+      "result": "PASS_WITH_RESCOPING",
+      "statement": "Legacy Project Doctor D1/D5 is not the live owner for this issue; current work must stay in the NEW Status Source / Project Status / Project Check authority chain."
+    },
+    {
+      "stage": "B1",
+      "status": "COMPLETE",
+      "statement": "The live freshness-provenance gap was traced to Status Source authority binding rather than legacy D1/D5 runtime."
+    },
+    {
+      "stage": "B2",
+      "status": "COMPLETE",
+      "statement": "Failure behavior was fixed as deterministic raw-byte provenance: same path and same bytes is fresh; same path with changed bytes must fail closed."
+    },
+    {
+      "stage": "B3",
+      "status": "COMPLETE",
+      "statement": "Minimal design was fixed under the status-source owner, with no semantic recomputation and no legacy Doctor reactivation."
+    },
+    {
+      "stage": "B4",
+      "status": "COMPLETE",
+      "result": "IMPLEMENTATION_VALIDATED",
+      "statement": "R1 Status Source captures and validates deterministic git-blob-sha1 source provenance, existing APPROVED entries were bootstrapped, and exact approved-source paths were explicitly co-owned by status-source in Project Check."
+    },
+    {
+      "stage": "B5",
+      "status": "COMPLETE",
+      "result": "NEGATIVE_E2E_PROOF_PASS",
+      "statement": "A one-line byte-only mutation to an approved Banner primary source produced STALE_SOURCE_PROVENANCE and Project Check BLOCKER/BLOCKED_VALIDATOR while unrelated domains remained isolated."
+    }
+  ],
+  "verifiedBehavior": {
+    "freshnessBasis": "deterministic raw source bytes",
+    "hashAlgorithm": "git-blob-sha1",
+    "samePathSameBytes": "FRESH",
+    "mtimeOnlyChange": "FRESH",
+    "samePathChangedBytes": "STALE_SOURCE_PROVENANCE",
+    "changedPathWithoutReattestation": "PROVENANCE_PATH_MISMATCH",
+    "missingOrMalformedProvenance": "FAIL_CLOSED",
+    "missingSource": "FAIL_CLOSED",
+    "projectCheckRole": "changed path -> explicit owner -> independent validator -> result",
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "semanticRecomputationByProjectCheck": false,
+    "legacyDoctorD1D5RuntimeReopened": false
+  },
+  "negativeProof": {
+    "sourcePath": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+    "mutation": "one blank line added; JSON semantics and admission values unchanged",
+    "expectedGitBlobSha": "fd162c3e5d29ac9239ff5b7a2a3b2f0f223e4f52",
+    "actualGitBlobSha": "17a2eb7b282337b918eb074673025f9aa64c1a89",
+    "r1ObservedFailure": "STALE_SOURCE_PROVENANCE",
+    "projectCheckStatus": "BLOCKER",
+    "projectCheckCompletion": "BLOCKED_VALIDATOR",
+    "projectCheckManualReviews": 0,
+    "ownerPropagationCount": 0,
+    "changeClassFanOutCount": 0,
+    "semanticRecomputationCount": 0,
+    "unrelatedFailureFanOutCount": 0,
+    "baitMerged": false
+  },
+  "scope": {
+    "owner": "status-source",
+    "checkpointPathRule": "status-source-tooling",
+    "implementationPaths": [
+      "tools/status-source/**",
+      "data/status-sources/**",
+      "tools/project-check/contracts/owners.v1.json",
+      "tools/project-check/test/**"
+    ],
+    "semanticDomainsReopened": [],
+    "legacyDoctorRuntimePatchTargets": []
+  },
+  "strictBoundaries": {
+    "legacyD1D5RuntimeMutationAllowed": false,
+    "rawConfigDataSemanticReinterpretationAllowed": false,
+    "canonicalPopulationMutationAllowed": false,
+    "canonicalIdMutationAllowed": false,
+    "relationRecomputationAllowed": false,
+    "projectCheckOwnerPropagationAllowed": false,
+    "projectCheckChangeClassFanOutAllowed": false,
+    "frontendOrHostedFailureMayReopenSemantics": false
+  },
+  "reviews": [
+    {
+      "code": "STATUS_SOURCE_VALIDATOR_FAILURE_DISPLAY_PRECISION",
+      "blocking": false,
+      "owner": "project-check/status-source test maintenance",
+      "classification": "DIAGNOSTIC_PRECISION_REVIEW",
+      "proof": "In the B5 Project Check run, the first phase-1 status-source validator surfaced as status-source-artifact-bridge, while the underlying failure was the shared selectActiveSources provenance guard emitting STALE_SOURCE_PROVENANCE.",
+      "impact": "No missed failure, no incorrect PASS, no owner propagation, and no semantic reopen."
+    },
+    {
+      "code": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+      "blocking": false,
+      "owner": "status-source",
+      "classification": "EVENT_DEPENDENT_FUTURE_PROOF",
+      "condition": "Close only when a legitimate approved successor exists and the NEW R1 non-main workflow_dispatch CAS/apply/commit/push path is exercised successfully.",
+      "forbiddenShortcut": "Do not synthesize a successor solely to close this review."
+    }
+  ],
+  "blockers": [],
+  "decision": {
+    "b0ThroughB5": "COMPLETE",
+    "freshnessProvenanceFix": "COMPLETE_FROZEN",
+    "remainingReviewsBlockCompletion": false,
+    "legacyDoctorD1D5PatchRequired": false,
+    "semanticReopenRequired": false,
+    "statement": "Status Source authority is now bound to deterministic source-content provenance and fails closed on same-path byte changes. B0-B5 are complete and frozen; remaining reviews are non-blocking tooling or future-event proofs."
+  },
+  "reopenConditions": [
+    "The NEW Status Source authority or provenance contract materially changes.",
+    "An APPROVED Status Source can select a source whose current bytes do not match its recorded provenance without failing closed.",
+    "A same-path byte mutation is no longer detected as stale by the owning Status Source validator.",
+    "Project Check no longer routes an approved primary source through the explicit status-source owner.",
+    "Project Check begins owner propagation or change-class fan-out for this path class.",
+    "An owning provenance validator failure no longer blocks the required project-check.",
+    "Legacy Project Doctor D1/D5 becomes an active runtime dependency of the NEW authority chain.",
+    "New authoritative evidence contradicts the frozen B0-B6 result."
+  ],
+  "nextStartPoint": "B is complete. Resume only from a separately defined next task; do not invent or assume a C stage. Do not reopen B0-B6 unless a listed reopen condition is met."
+}

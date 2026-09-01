@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-status-source-r1-4/v1",
+  "stage": "R1-4",
+  "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_4_ARTIFACT_BRIDGE",
+  "status": "PASS",
+  "completion": "R1_4_ARTIFACT_BRIDGE_COMPLETE",
+  "purpose": "Replace the legacy Project Doctor artifact bridge with an independent Status Source bridge that binds explicit domain pipelines to the completed R1-3 producer gate without using the legacy generated active-source registry or executing validators.",
+  "predecessor": {
+    "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_3_PRODUCER_GATE",
+    "status": "PASS",
+    "completion": "R1_3_PRODUCER_GATE_COMPLETE",
+    "contract": "data/contracts/project-tooling-status-source-r1-3.v1.json"
+  },
+  "authoritativeReference": {
+    "legacyContract": "data/contracts/project-doctor-status-source-artifact-bridge.v1.json",
+    "legacyContractGitBlobSha": "66b236595a24cd3cda1e9bd42ebedb0bb4448844",
+    "legacyBridgeScript": "scripts/bridge-project-doctor-status-source.mjs",
+    "legacyBridgeScriptGitBlobSha": "bb876bd64d132d98ff3b905cdae84b565c74d865",
+    "referenceUseOnly": true,
+    "runtimeDependency": false
+  },
+  "implementation": {
+    "implementationCommit": "1e871f7814c27d79cf645c7f218012ea312e74dc",
+    "checkpointCommit": "c9679407806f3103277f368c14581fb64fbcb37d",
+    "bridgeContract": "tools/status-source/contracts/artifact-bridge.v1.json",
+    "bridgeLibrary": "tools/status-source/lib/bridge-status-source.mjs",
+    "cli": "tools/status-source/cli/bridge.mjs",
+    "selfTest": "tools/status-source/test/artifact-bridge-parity.mjs",
+    "activeSelection": "tools/status-source/lib/select-active-sources.mjs",
+    "delegatedProducerGate": "tools/status-source/lib/submit-status-source.mjs",
+    "shadowWorkflow": ".github/workflows/project-tooling-r1-status-source.yml"
+  },
+  "currentPipelineRegistry": {
+    "pipelineCount": 6,
+    "pipelineByDomain": {
+      "hero": "hero-final",
+      "soldier": "soldier-final",
+      "equipment": "equipment-final",
+      "hero-soldier": "hero-soldier-final",
+      "banner": "banner-final",
+      "skin": "skin-final"
+    }
+  },
+  "policy": {
+    "pipelineMustBeRegistered": true,
+    "pipelineDomainMustMatchProducer": true,
+    "baselineMustMatchCurrentR1_1Selection": true,
+    "defaultMode": "CHECK",
+    "mutationRequiresExplicitApplyFlag": true,
+    "allCandidateSubmissionsDelegateToR1_3": true,
+    "r1_3DelegatesPromotionToR1_2": true,
+    "allModeForbidsPerPipelineCandidateOverrides": true,
+    "candidateEntryIdAndSourceMustBeProvidedTogether": true,
+    "doesNotExecuteOwningValidator": true,
+    "doesNotInferOwningValidator": true,
+    "doesNotInferAuthorityFromFilename": true,
+    "doesNotInferAuthorityFromStageNumber": true,
+    "doesNotInferAuthorityFromChronology": true
+  },
+  "ownershipBoundary": {
+    "artifactBridgeOwns": [
+      "pipeline registration",
+      "pipeline-to-domain binding",
+      "pipeline-to-producer binding",
+      "frozen baseline entry/source binding",
+      "single pipeline or all-pipeline invocation",
+      "candidate id/source pair forwarding"
+    ],
+    "r1_1SelectorOwns": [
+      "current active source selection",
+      "baseline active parity"
+    ],
+    "r1_3ProducerGateOwns": [
+      "producer registration and enabled state",
+      "producer domain authority",
+      "producer output-family validation",
+      "source existence",
+      "explicit entry id gate"
+    ],
+    "r1_2PromotionOwns": [
+      "active predecessor selection",
+      "admission and projection compatibility",
+      "candidate selection preflight",
+      "check/apply declaration write",
+      "post-write verification and rollback"
+    ]
+  },
+  "independenceBoundary": {
+    "legacyProjectDoctorRuntimeImports": 0,
+    "legacyGeneratedStatusDependencies": 0,
+    "legacyActiveRegistryDependencies": 0,
+    "d1RuntimeDependencies": 0,
+    "d2RuntimeDependencies": 0,
+    "d3RuntimeDependencies": 0,
+    "d4RuntimeDependencies": 0,
+    "d5RuntimeDependencies": 0,
+    "d7RuntimeDependencies": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "canonicalJoinRecomputationCount": 0,
+    "domainValidatorExecutionCount": 0,
+    "owningValidatorInferenceCount": 0,
+    "legacyStateMutationCount": 0
+  },
+  "selfTestCoverage": [
+    "six pipeline bindings match the six current R1-1 selected domains",
+    "six pipeline producer bindings match the R1-3 producer registry",
+    "Skin readiness source status remains READY_FOR_ASSET_EVIDENCE",
+    "all-pipeline CHECK delegates six submissions with zero declaration writes",
+    "current Equipment bridge CHECK preserves 390/365/198/167",
+    "unknown pipeline is blocked",
+    "baseline drift is blocked",
+    "wrong candidate source family is blocked by R1-3",
+    "explicit APPLY flag is forwarded to R1-3 without repository mutation in the R1-4 unit test",
+    "legacy active registry and legacy Doctor runtime dependency scan remains zero"
+  ],
+  "validationEvidence": {
+    "shadowWorkflow": {
+      "runId": 33342981294,
+      "jobId": 99341834500,
+      "headSha": "1e871f7814c27d79cf645c7f218012ea312e74dc",
+      "conclusion": "success",
+      "selectionParityAndIsolationSelfTest": "PASS",
+      "promotionParityAndRollbackSelfTest": "PASS",
+      "producerGateParityAndDelegationSelfTest": "PASS",
+      "artifactBridgeParityAndDelegationSelfTest": "PASS",
+      "activeEquipmentPromotionCheckCli": "PASS",
+      "activeEquipmentProducerSubmitCheckCli": "PASS",
+      "activeEquipmentArtifactBridgeCheckCli": "PASS"
+    },
+    "currentBridgeParity": {
+      "pipelineCount": 6,
+      "currentBaselineBindingsAccepted": 6,
+      "allPipelineCheckDeclarationWrites": 0,
+      "currentEquipmentCheckDeclarationWrites": 0,
+      "equipmentProjectionSubset": {
+        "canonical": 390,
+        "public": 365,
+        "general": 198,
+        "exclusive": 167
+      }
+    },
+    "delegationProof": {
+      "applyFlagForwardedToR1_3": true,
+      "candidateProducerGateBypassBlocked": true,
+      "unknownPipelineBlocked": true,
+      "baselineDriftBlocked": true,
+      "domainValidatorExecutions": 0,
+      "owningValidatorInferences": 0,
+      "legacyActiveRegistryDependencies": 0,
+      "legacyRuntimeDependencies": 0,
+      "rawConfigDataReads": 0,
+      "semanticRecomputations": 0
+    }
+  },
+  "completionGate": {
+    "bridgeContractImplemented": true,
+    "bridgeLibraryImplemented": true,
+    "bridgeCliImplemented": true,
+    "pipelineRegistryParityImplemented": true,
+    "directR1_1SelectionImplemented": true,
+    "delegationToR1_3Implemented": true,
+    "checkDefaultImplemented": true,
+    "explicitApplyDelegationImplemented": true,
+    "selfTestImplemented": true,
+    "shadowWorkflowUpdated": true,
+    "shadowCiPass": true,
+    "currentPipelineParity": true,
+    "legacyActiveRegistryDependencyCountZero": true,
+    "legacyRuntimeDependencyCountZero": true
+  },
+  "blockers": [],
+  "reviews": [
+    "R1-5 apply handoff / producer declaration / closeout request behavior remains legacy-only and is outside this checkpoint.",
+    "Legacy required pr-guard remains a CUTOVER_ONLY blocker and must not be repaired by admitting migration paths into legacy D2-D7."
+  ],
+  "nextStartPoint": "R1-5: migrate apply handoff, producer declaration, and closeout request behavior onto the completed R1-4 bridge. Keep explicit apply as the only mutation path and do not reintroduce legacy Doctor registry/D1/D5 dependencies.",
+  "reopenConditions": [
+    "R1-1 selection semantics change",
+    "R1-3 producer gate behavior changes",
+    "the six authoritative completion/readiness pipeline bindings change",
+    "a frozen baseline entry/source no longer matches current R1-1 selection",
+    "new authoritative evidence contradicts R1-4 pipeline ownership or delegation parity"
+  ]
+}

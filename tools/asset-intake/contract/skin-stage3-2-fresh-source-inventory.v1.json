@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "schemaId": "asset-intake-skin-stage3-2-fresh-source-inventory/v1",
+  "stage": "Skin Stage 3-2 fresh source inventory",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Rebuild representative Skin asset source evidence from the current main frozen contract and a fresh official installer baseline without importing historical Stage 3-2 completion artifacts.",
+  "currentAuthority": {
+    "readiness": "data/validation/skin-stage3-2-readiness.v1.json",
+    "assetInventory": "data/generated/skin-stage3-1-asset-inventory.v1.json",
+    "assetIntakeContract": "tools/asset-intake/fixtures/skin-stage1-contract-fixtures.v1.json",
+    "requiredReadinessStatus": "READY_FOR_ASSET_EVIDENCE",
+    "representativeSkinIds": [102, 1901, 3701],
+    "expectedLocatorCount": 13
+  },
+  "freshSource": {
+    "kind": "OFFICIAL_INSTALLER",
+    "publisher": "Zlongame",
+    "installVersion": "1.1.113",
+    "base": "http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_1.1.113",
+    "packagePattern": "InstallPage_1.1.113_{part}.zip",
+    "discoveryMethod": "HTTP HEAD plus ZIP central-directory range reads; download only candidate bundle entries",
+    "unityParser": "UnityPy==1.25.3"
+  },
+  "modelResourceSource": {
+    "path": "data/configdata/ConfigDataModelSkinResourceInfo.json",
+    "mainBlobSha": "7d76f30223914f96dad31db894af782300dc283d",
+    "requiredIds": [102, 1021, 1022, 1023, 1024, 1901, 3701],
+    "mappingField": "Model",
+    "policy": "Filter exact IDs from the current checked-out file. Do not use historical resource maps, name JOIN, or ID arithmetic."
+  },
+  "resolutionPolicy": {
+    "bundleNameUse": "DISCOVERY_ONLY",
+    "unityContainerRootPrefix": "assets/gameproject/runtimeassets",
+    "containerPathNormalization": "Normalize slash and case, require the configured Unity container root prefix, remove that prefix exactly once, then require exact equality with the frozen runtime locator.",
+    "normalizationEvidence": "Fresh diagnostic run 33442980191 observed the same assets/gameproject/runtimeassets prefix for suffix matches on all 13 frozen representative locators.",
+    "authority": "An asset target is located only when the normalized official Unity container path, after the single frozen root-prefix removal, equals the frozen runtime locator exactly.",
+    "beginCurrentPreferenceByName": false,
+    "partialScanExtrapolation": false,
+    "historicalCompletionEvidenceImported": false,
+    "legacyDriveUsedAsAuthority": false
+  },
+  "boundaries": {
+    "skinCanonicalChanged": false,
+    "heroSkinRelationChanged": false,
+    "sourceOrderChanged": false,
+    "stage31Recomputed": false,
+    "projectStatusChanged": false,
+    "statusSourceChanged": false,
+    "frontendChanged": false,
+    "rawConfigDataScope": "ONE_EXACT_MODEL_RESOURCE_FILE_FILTERED_TO_SEVEN_IDS"
+  },
+  "output": "skin-stage3-2-fresh-source-inventory.v1.json",
+  "completionGate": {
+    "currentAuthorityParity": true,
+    "modelResourceIdsMappedExactly": 7,
+    "representativeLocatorCount": 13,
+    "officialPackageCatalogRead": true,
+    "eachLocatorClassified": true,
+    "semanticMutationCount": 0
+  },
+  "nextStart": "Use resolved exact-path source rows to perform fresh selective extraction and feed only authoritative extracted artifacts into the installed Skin Stage 3-2 Asset Intake runner."
+}

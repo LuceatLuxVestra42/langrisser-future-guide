@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-regression-runner-r1-boundary/v1",
+  "stage": "RR1",
+  "status": "PASS",
+  "completion": "REGRESSION_RUNNER_RR1_BOUNDARY_COMPLETE",
+  "purpose": "Define the clean-room NEW Regression Runner boundary before R3 admission or implementation. Preserve all authoritative semantic data and current owning validators. The NEW runner is a read-only orchestration and aggregation layer that selects validator identities only; validator executable/argv ownership remains exclusively in the NEW R3 Project Check validator catalog.",
+  "predecessors": {
+    "rr0Baseline": "data/contracts/project-tooling-project-check-regression-runner-r0-baseline.v1.json",
+    "rr0Completion": "REGRESSION_RUNNER_R0_BASELINE_FROZEN",
+    "legacyV2Contract": "data/contracts/regression-coverage-promotion.v2.json",
+    "legacyV2Role": "HISTORICAL_BASELINE_AND_SHADOW_COMPARATOR_ONLY"
+  },
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pr": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "headBeforeRr1": "49e9bd37b4b562470a715ec46d3587f451c203db",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1"
+  },
+  "validatorAuthority": {
+    "catalog": "tools/project-check/contracts/validators.v1.json",
+    "schemaId": "project-check-validator-catalog/v1",
+    "catalogBlobShaAtRr1": "90adfb78c7551997cfa68a52ddc857bb07f72d50",
+    "authorityRule": "The R3 validator catalog exclusively owns executable, argv, phase, validator owner, and coverage metadata. NEW Regression Runner contracts and profiles may reference validator IDs but may not duplicate or override command definitions.",
+    "runtimeResolution": "BY_EXACT_VALIDATOR_ID",
+    "shellCommandSynthesisAllowed": false,
+    "pathDerivedCommandSynthesisAllowed": false,
+    "nameInferenceAllowed": false,
+    "idArithmeticAllowed": false
+  },
+  "initialProfile": {
+    "id": "core-regression-v1",
+    "scope": "Exact replacement scope for the nine current Regression Coverage Promotion V2 owning-validator steps only.",
+    "validatorIds": [
+      "hero-canonical",
+      "soldier-canonical",
+      "equipment-canonical",
+      "hero-soldier-relation",
+      "hero-equipment-relation",
+      "banner-data",
+      "skin-relation",
+      "shared-movement",
+      "soldier-assets"
+    ],
+    "validatorCount": 9,
+    "duplicateValidatorIdsAllowed": false,
+    "unknownValidatorId": "BLOCKER",
+    "missingCatalogEntry": "BLOCKER",
+    "automaticCoverageExpansion": false,
+    "assetIntakeIncluded": false,
+    "localizationAuditIncluded": false,
+    "productionBuildIncluded": false,
+    "configDataIntegrityIncluded": false
+  },
+  "runnerRole": {
+    "classification": "READ_ONLY_VALIDATOR_ORCHESTRATOR",
+    "maySelectCataloguedValidatorIds": true,
+    "mayResolveCataloguedExecutableArgv": true,
+    "mayPreflightSelectedValidators": true,
+    "mayExecuteSelectedValidators": true,
+    "mayAggregateExitStatus": true,
+    "mayProduceEphemeralOrCiArtifactSummary": true,
+    "mayDefineSemanticRelations": false,
+    "mayRecomputeCanonicalPopulation": false,
+    "mayPerformNameJoin": false,
+    "mayPerformIdArithmetic": false,
+    "mayWriteCanonicalData": false,
+    "mayWriteFrozenData": false,
+    "mayWriteGeneratedDomainData": false,
+    "mayMutateStatusSource": false,
+    "mayMutateProjectStatus": false,
+    "mayMutateFrontendOrAssets": false,
+    "mayResealLegacyFrozenSha": false,
+    "mayImportLegacyProjectDoctorRuntime": false
+  },
+  "executionContract": {
+    "inheritCatalogPolicy": [
+      "shellExecution=false",
+      "commandsMustBeCatalogued=true",
+      "deduplicateByValidatorId=true",
+      "sortByPhaseThenId=true",
+      "preflightEntireQueueBeforeExecution=true",
+      "failFastOnFirstNonZero=true",
+      "validatorMayNotMutateStatusSource=true",
+      "validatorMayNotMutateProjectStatus=true",
+      "legacyDoctorValidatorAllowed=false",
+      "legacyD2D3D4D5D7Allowed=false"
+    ],
+    "profileCarriesExecutableOrArgs": false,
+    "dynamicShellAllowed": false,
+    "trackedMutationByRunner": "FORBIDDEN",
+    "trackedMutationDetectedAfterValidatorExecution": "FAIL",
+    "outputPersistenceDefault": "CI_ARTIFACT_OR_EPHEMERAL",
+    "trackedValidationSummaryWriteByDefault": false
+  },
+  "legacyBoundary": {
+    "legacyWorkflow": ".github/workflows/regression-coverage-promotion-v2.yml",
+    "legacyValidator": "scripts/validate-regression-coverage-promotion-v2.mjs",
+    "legacyContractV1": "data/contracts/regression-coverage-promotion.v1.json",
+    "legacyContractV2": "data/contracts/regression-coverage-promotion.v2.json",
+    "runtimePredecessorOfNewRunner": false,
+    "commandAuthorityForNewRunner": false,
+    "semanticAuthorityForNewRunner": false,
+    "allowedDuringMigration": [
+      "historical evidence",
+      "RR0 known-drift reference",
+      "shadow comparison until cutover"
+    ],
+    "knownLegacyAdmissionDrift": {
+      "source": "RR0",
+      "failureCount": 4,
+      "classification": "REVIEW_EXISTING_DRIFT",
+      "reimplementedInNewRunner": false,
+      "propagatedAsNewRunnerFailure": false,
+      "condition": "Only the exact RR0-frozen four failures are treated as known legacy drift. Any additional or changed failure signature requires separate review."
+    }
+  },
+  "rr1ValidationEvidence": {
+    "candidateCommit": "5405105fa0f25b2163d0c5da1bbf8a440bc44245",
+    "projectCheckRunId": 33355660077,
+    "projectCheckJobId": 99377189564,
+    "conclusion": "success",
+    "steps": {
+      "selfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS"
+    }
+  },
+  "preserve": [
+    "All nine current owning validators and their authoritative inputs.",
+    "Canonical, frozen, generated, relation, asset and presentation data.",
+    "RR0 evidence and historical Regression Coverage Promotion V1/V2 contracts/summaries.",
+    "Current R1 Status Source, R2 Project Status and R3 Project Check authority.",
+    "Existing independent Asset Intake, ConfigData Lookup, Route/Hosted QA and Localization tooling."
+  ],
+  "nonScope": [
+    "No tools/regression-runner implementation in RR1.",
+    "No NEW Regression Runner workflow in RR1.",
+    "No R3 owner-map or validator-catalog mutation in RR1.",
+    "No OLD Regression Coverage Promotion V2 workflow disablement or deletion in RR1.",
+    "No package.json entrypoint changes in RR1.",
+    "No repair of the four RR0 legacy admission failures.",
+    "No semantic, canonical, relation, Status Source, Project Status, frontend, asset, Hosted QA, ConfigData Lookup or localization mutation."
+  ],
+  "completionGate": {
+    "rr0PredecessorFrozen": true,
+    "validatorAuthorityIsR3Catalog": true,
+    "profileContainsOnlyValidatorIds": true,
+    "initialProfileValidatorCount": 9,
+    "legacyV2RuntimeDependency": false,
+    "legacyAdmissionDriftReimplementation": false,
+    "semanticWriteAuthority": false,
+    "projectCheckPassed": true,
+    "newRunnerImplementationStarted": false,
+    "r3AdmissionStarted": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_V2_FROZEN_SHA_ADMISSION_DRIFT",
+      "blocking": false,
+      "detail": "Carry RR0's exact four base-existing legacy admission failures only as shadow-comparison metadata; do not reproduce the stale SHA admission policy in the NEW runner."
+    }
+  ],
+  "nextStart": "RR2: explicitly admit tools/regression-runner/**, the NEW regression-runner workflow path, and successor regression-runner checkpoints into R3 owner routing/self-test before implementing the clean-room core.",
+  "reopenConditions": [
+    "The R3 validator catalog changes validator identity or ownership before RR2 admission.",
+    "Any of the nine selected current owning validators is removed or stops being authoritative.",
+    "New authoritative evidence requires the NEW runner to own semantic meaning rather than orchestration only.",
+    "RR0's four known legacy failure signatures change or are proven to represent semantic corruption."
+  ]
+}

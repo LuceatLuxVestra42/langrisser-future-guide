@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-regression-runner-r5-current-head-parity/v1",
+  "stage": "RR5",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "REGRESSION_RUNNER_RR5_CURRENT_HEAD_PARITY_COMPLETE",
+  "purpose": "Execute the NEW Regression Runner's exact core-regression-v1 profile against the real current branch head using catalog-authoritative commands, prove all nine owning validators pass without tracked repository mutation, and compare that result with the same-head legacy Regression Coverage Promotion V2 behavior before any shadow-workflow or cutover step.",
+  "predecessor": {
+    "checkpoint": "data/contracts/project-tooling-regression-runner-r4-safety.v1.json",
+    "completion": "REGRESSION_RUNNER_RR4_SAFETY_COMPLETE",
+    "head": "89972abcaac728274816a4b80823e352359b134a"
+  },
+  "authoritativeState": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "pr": 309,
+    "branch": "work/project-tooling-migration-r0-boundary-20260831",
+    "candidateHead": "ceba4f4151071e5986b7c48cc0a75eb352a6ada7",
+    "base": "main",
+    "baseHead": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "requiredCheckContext": "project-check"
+  },
+  "implementation": {
+    "currentParityProbe": "tools/regression-runner/test/current-parity.mjs",
+    "selfTest": "tools/regression-runner/test/regression-runner-self-test.mjs",
+    "runner": "tools/regression-runner/lib/regression-runner.mjs",
+    "profile": "tools/regression-runner/contracts/profiles.v1.json#core-regression-v1",
+    "validatorAuthority": "tools/project-check/contracts/validators.v1.json",
+    "probeCommit": "4ee6c4fdeebd244f0682bcad1bb5a13339535c2c",
+    "selfTestIntegrationCommit": "ceba4f4151071e5986b7c48cc0a75eb352a6ada7"
+  },
+  "newRunnerExecution": {
+    "executionMode": "REAL_DEFAULT_EXECUTOR",
+    "mockExecutorUsed": false,
+    "runtimeContractsOverrideUsed": false,
+    "runtimePlanOverrideUsed": false,
+    "runtimePreflightOverrideUsed": false,
+    "profileId": "core-regression-v1",
+    "validatorCount": 9,
+    "validatorIds": [
+      "banner-data",
+      "equipment-canonical",
+      "hero-canonical",
+      "hero-equipment-relation",
+      "hero-soldier-relation",
+      "shared-movement",
+      "skin-relation",
+      "soldier-canonical",
+      "soldier-assets"
+    ],
+    "validatorResults": {
+      "banner-data": "PASS",
+      "equipment-canonical": "PASS",
+      "hero-canonical": "PASS",
+      "hero-equipment-relation": "PASS",
+      "hero-soldier-relation": "PASS",
+      "shared-movement": "PASS",
+      "skin-relation": "PASS",
+      "soldier-canonical": "PASS",
+      "soldier-assets": "PASS"
+    },
+    "trackedMutationGuard": {
+      "snapshotBeforeQueue": true,
+      "snapshotAfterEachValidator": true,
+      "trackedMutationDetected": false,
+      "failureModeIfDetected": "BLOCKED_TRACKED_MUTATION"
+    },
+    "boundaries": {
+      "semanticRecomputationCount": 0,
+      "canonicalWriteCount": 0,
+      "frozenWriteCount": 0,
+      "generatedDomainWriteCount": 0,
+      "statusSourceMutationCount": 0,
+      "projectStatusMutationCount": 0,
+      "legacyProjectDoctorRuntimeDependencyCount": 0,
+      "legacyRegressionAdmissionAuditCount": 0
+    }
+  },
+  "newRunnerRequiredCheckProof": {
+    "head": "ceba4f4151071e5986b7c48cc0a75eb352a6ada7",
+    "projectCheckRunId": 33357679155,
+    "projectCheckJobId": 99382826470,
+    "conclusion": "success",
+    "steps": {
+      "setupNode22": "PASS",
+      "setupBun": "PASS",
+      "installDependencies": "PASS",
+      "projectCheckSelfTest": "PASS",
+      "changedPathPlan": "PASS",
+      "owningValidatorExecution": "PASS"
+    },
+    "meaning": "The regression-runner owning validator executed the RR5 current-parity probe. That probe uses executeRegressionRun with its real default executor and asserts exact nine-validator success plus zero tracked mutation; any validator failure or tracked mutation would have made the owning-validator step and required project-check fail."
+  },
+  "legacySameHeadComparison": {
+    "workflow": ".github/workflows/regression-coverage-promotion-v2.yml",
+    "runId": 33357679286,
+    "jobId": 99382827001,
+    "conclusion": "failure",
+    "ownerValidatorSteps": {
+      "heroCanonical": "PASS",
+      "soldierCanonical": "PASS",
+      "equipmentCanonical": "PASS",
+      "heroSoldierRelation": "PASS",
+      "heroEquipmentRelation": "PASS",
+      "bannerData": "PASS",
+      "skinRelation": "PASS",
+      "sharedMovement": "PASS",
+      "soldierAssets": "PASS"
+    },
+    "legacyAdmissionAudit": "FAIL",
+    "frozenOutputDirtyGuard": "PASS",
+    "classification": "EXPECTED_LEGACY_REGRESSION_ADMISSION_DRIFT",
+    "rr0Reference": "data/contracts/project-tooling-project-check-regression-runner-r0-baseline.v1.json",
+    "meaning": "The same-head OLD V2 run preserves the RR0-frozen pattern: all nine owning validators pass and only the legacy admission layer remains red. This legacy red state is not propagated into the NEW runner."
+  },
+  "parityJudgement": {
+    "newOwningValidatorFailureCount": 0,
+    "newTrackedMutationCount": 0,
+    "newLegacyAdmissionDependencyCount": 0,
+    "oldOwningValidatorFailureCount": 0,
+    "oldLegacyAdmissionFailurePresent": true,
+    "semanticRegressionProven": false,
+    "currentHeadParity": "PASS",
+    "meaning": "NEW Regression Runner matches the authoritative current owning-validator outcomes while correctly excluding the stale legacy V2 admission policy frozen in RR0."
+  },
+  "boundaries": {
+    "operationalRegressionWorkflowCreated": false,
+    "oldRegressionWorkflowDisabled": false,
+    "oldRegressionWorkflowDeleted": false,
+    "packageJsonChanged": false,
+    "validatorCatalogChanged": false,
+    "ownerMapChanged": false,
+    "profileMembershipChanged": false,
+    "semanticRelationChanged": false,
+    "canonicalDataChanged": false,
+    "frozenDataChanged": false,
+    "generatedDomainDataChanged": false,
+    "statusSourceChanged": false,
+    "projectStatusChanged": false,
+    "frontendChanged": false,
+    "assetChanged": false,
+    "hostedQaChanged": false,
+    "configDataChanged": false,
+    "localizationChanged": false
+  },
+  "completionGate": {
+    "realNineValidatorExecution": true,
+    "allNineValidatorsPass": true,
+    "trackedStateImmutable": true,
+    "catalogAuthorityUsed": true,
+    "sameHeadLegacyComparisonCollected": true,
+    "legacyDriftMatchesRr0Boundary": true,
+    "requiredProjectCheckPassed": true,
+    "operationalCutoverDeferred": true
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "id": "LEGACY_V2_FROZEN_SHA_ADMISSION_DRIFT",
+      "blocking": false,
+      "classification": "REVIEW_EXISTING_DRIFT",
+      "detail": "OLD Regression Coverage Promotion V2 remains red only in its legacy admission layer while all nine owning validators pass. RR5 confirms the NEW runner does not inherit this stale policy."
+    }
+  ],
+  "nextStart": "RR6: install a non-required NEW Regression Runner shadow workflow that runs the same exact nine-validator profile independently of Project Check, compare its result with the legacy V2 workflow without treating the known V2 admission drift as a NEW failure, and collect repeatable CI proof. Do not disable OLD V2 or perform cutover until shadow proof passes.",
+  "reopenConditions": [
+    "Any of the nine selected current owning validators fails on the same authoritative head.",
+    "The NEW current-parity probe observes tracked repository mutation.",
+    "The R3 validator catalog changes any selected validator identity, executable or argv authority.",
+    "The core-regression-v1 profile changes membership.",
+    "The NEW runner acquires legacy Project Doctor or Regression Coverage Promotion V2 runtime dependency.",
+    "New authoritative evidence proves the RR0 legacy admission failures represent semantic corruption."
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "schemaId": "route-hosted-qa-contract/v1",
+  "stage": "RH3",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Define the NEW independent read-only HTTP Route/Hosted QA runtime contract without OLD Project Doctor runtime, deployment-writer, Browser/UI, semantic, asset, or frontend authority.",
+  "hostedTarget": {
+    "origin": "https://luceatluxvestra42.github.io",
+    "repositoryBase": "/langrisser-future-guide/",
+    "baseUrl": "https://luceatluxvestra42.github.io/langrisser-future-guide/",
+    "canonicalDirectoryStyle": "TRAILING_SLASH"
+  },
+  "routes": {
+    "public": ["/", "/banners", "/equipment", "/equipment/exclusive", "/heroes", "/soldiers"],
+    "detailFixtures": {
+      "heroes": [6],
+      "soldiers": [300, 1000, 102, 5621],
+      "equipment": [13]
+    },
+    "negativeId": 999999999,
+    "negativeExpectedStatus": 404
+  },
+  "checkIds": [
+    "DEPLOYED_COMMIT_FRESHNESS",
+    "REPOSITORY_BASE_PATH",
+    "PUBLIC_ROUTE_RESOLUTION",
+    "DETAIL_DIRECT_ENTRY",
+    "REFRESH_EQUIVALENT_GET",
+    "TRAILING_SLASH_POLICY",
+    "ASSET_AND_CHUNK_RESOLUTION",
+    "FILENAME_CASE_SENSITIVITY",
+    "ROUTE_TREE_HOSTED_PARITY",
+    "STALE_DEPLOY_OR_CACHE"
+  ],
+  "freshness": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "deployBranch": "gh-pages",
+    "githubBranchApi": "https://api.github.com/repos/LuceatLuxVestra42/langrisser-future-guide/branches/gh-pages",
+    "sourceShaStrategy": "GH_PAGES_COMMIT_MESSAGE_TRAILING_40_HEX"
+  },
+  "runtime": {
+    "nodeMinimumMajor": 22,
+    "httpMethod": "GET",
+    "redirectPolicy": "FOLLOW_FOR_CANONICAL_RESOLUTION",
+    "cachePolicy": "NO_STORE_PLUS_UNIQUE_QUERY",
+    "requestTimeoutMs": 15000,
+    "maxAssetRequests": 60,
+    "sameOriginAssetsOnly": true,
+    "repositoryBaseRequired": true,
+    "shellExecution": false,
+    "browserLaunch": false,
+    "playwright": false,
+    "repositoryMutation": false,
+    "deploymentMutation": false,
+    "trackedRuntimeOutputMutation": false
+  },
+  "modes": {
+    "STRICT_CANDIDATE": {
+      "expectedSourceShaRequired": true,
+      "candidateFreshnessClaim": true,
+      "passStatus": "PASS_ROUTE_HOSTED_QA_STRICT_CANDIDATE"
+    },
+    "PROBE_CURRENT_DEPLOYED": {
+      "expectedSourceShaRequired": false,
+      "candidateFreshnessClaim": false,
+      "mustNotBeUpgradedToStrictCandidateProof": true,
+      "passStatus": "PASS_ROUTE_HOSTED_QA_CURRENT_DEPLOYED_PROBE"
+    }
+  },
+  "assetPolicy": {
+    "prioritize": ["script", "stylesheet", "modulepreload", "preload", "icon", "representative-image"],
+    "noCrossRootFallback": true,
+    "noFilenameSimilarity": true,
+    "noCaseInsensitiveRepair": true
+  },
+  "failurePolicy": {
+    "failedStatus": "FAIL_ROUTE_HOSTED_QA_HTTP",
+    "classification": "DEPLOYMENT_HOSTING_FAIL",
+    "semanticReopenAllowed": false,
+    "invalidInvocationExitCode": 2,
+    "hostedFailureExitCode": 1
+  },
+  "boundaries": {
+    "oldProjectDoctorRuntimeDependency": false,
+    "oldWorkflowAuthority": false,
+    "oldPackageAliasAuthority": false,
+    "deploymentWriterAuthority": false,
+    "ghPagesWriteAllowed": false,
+    "semanticAuthority": false,
+    "browserUiAuthority": false,
+    "assetAuthority": false,
+    "frontendAuthority": false,
+    "rawConfigDataInference": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "completedRelationRecalculation": false
+  }
+}

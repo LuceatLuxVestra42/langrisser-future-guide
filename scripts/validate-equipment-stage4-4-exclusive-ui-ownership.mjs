@@ -17,6 +17,8 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+const countOccurrences = (source, marker) => source.split(marker).length - 1;
+
 const stage43 = readJson("data/validation/equipment-stage4-3-general-detail-ui-summary.v1.json");
 const stage40 = readJson("data/contracts/equipment-stage4-0-frontend-consumer-contract.v1.json");
 const stageB = readJson("data/validation/hero-exclusive-equipment-relation-stageB-final.v1.json");
@@ -142,9 +144,25 @@ const requiredExclusiveRouteMarkers = [
 for (const marker of requiredExclusiveRouteMarkers) {
   assert(exclusiveRoute.includes(marker), `Exclusive route missing Stage 4-4 marker: ${marker}`);
 }
+const approvedListSortMarkers = [
+  'type EquipmentSortMode = "default" | "name" | "id";',
+  "const SORT_LABELS: Record<EquipmentSortMode, string> = {",
+  'return value === "default" || value === "name" || value === "id";',
+  "const records = data.records.filter((record) => {",
+  'if (uiState.sort === "name") {',
+  "return records.sort((left, right) => {",
+  'leftName.localeCompare(rightName, "ko", { numeric: true, sensitivity: "base" }) || left.equipmentId - right.equipmentId',
+  'if (uiState.sort === "id") {',
+  "return records.sort((left, right) => left.equipmentId - right.equipmentId);",
+  "return records;",
+];
+for (const marker of approvedListSortMarkers) {
+  assert(exclusiveRoute.includes(marker), `Exclusive route approved presentation sorting missing marker: ${marker}`);
+}
+assert(countOccurrences(exclusiveRoute, ".sort(") === 2, "Exclusive route must contain exactly the two approved presentation sort operations.");
+assert(!exclusiveRoute.includes("data.records.sort("), "Exclusive route must not mutate loader records in place.");
 assert(!exclusiveRoute.includes("SkillHero"), "Exclusive route must not derive ownership from SkillHero.");
 assert(!exclusiveRoute.includes("MissionType 77"), "Exclusive route must not use MissionType 77 as ownership authority.");
-assert(!exclusiveRoute.includes(".sort("), "Exclusive route must preserve generated presentation order.");
 assert(!exclusiveRoute.includes("ConfigData"), "Exclusive route must not read raw ConfigData.");
 
 const requiredDetailMarkers = [

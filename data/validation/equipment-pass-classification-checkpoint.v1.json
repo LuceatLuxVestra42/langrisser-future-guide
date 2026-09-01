@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "stage": "Equipment Pass Classification Checkpoint",
+  "status": "PASS",
+  "completion": "EQUIPMENT_PASS_CLASSIFICATION_SYSTEM_V1_READY",
+  "confirmedDate": "2026-09-01",
+  "predecessorMainSha": "f1516bbac043727c2d3c83f3e6c33d5117be817b",
+  "ownerLayer": "presentation-classification",
+  "authoritativeSources": {
+    "contract": "data/contracts/equipment-pass-classification-contract.v1.json",
+    "evidenceClaims": "data/presentation/equipment-pass-evidence.v1.json",
+    "generatedClassification": "data/generated/equipment-pass-classification.v1.json",
+    "technicalCandidateSource": "data/generated/equipment_stage2_7_acquisition.json",
+    "auditedEvidencePredecessor": "data/validation/equipment-p3-0-release-chronology-audit.v1.json",
+    "publicAdmission": "data/presentation/equipment-public-admission-correction.v1.json"
+  },
+  "supersededRuntimeMethod": {
+    "source": "data/presentation/equipment-display-collection.v1.json",
+    "method": "EXPLICIT_EQUIPMENT_ID",
+    "disposition": "Retain as frozen historical predecessor; do not use as current Equipment Pass classification cause."
+  },
+  "unchangedUpstream": {
+    "stage2AcquisitionClassificationChanged": false,
+    "technicalSiteTabChanged": false,
+    "releaseChronologyRecomputed": false,
+    "publicAdmissionChanged": false
+  },
+  "classificationRules": {
+    "candidateDiscovery": "acquisitionClass=current-additional is candidate-only, never membership",
+    "confirmation": "accepted audited evidence source claim",
+    "newCandidateFallback": "UNRESOLVED and blocking",
+    "generatedEquipmentIds": "output/checkpoint only, never authoritative input",
+    "forbidden": [
+      "siteTab=3 as membership",
+      "release date inference",
+      "releaseFamily inference",
+      "equipmentId arithmetic/range",
+      "name-pattern inference"
+    ]
+  },
+  "currentGeneratedResult": {
+    "candidateTotal": 32,
+    "publicCandidateTotal": 28,
+    "passConfirmed": 24,
+    "nonPassConfirmed": 4,
+    "nonPublicExcludedCandidate": 4,
+    "passCandidate": 0,
+    "unresolved": 0,
+    "displayCounts": {
+      "1": 94,
+      "2": 80,
+      "3": 24,
+      "total": 198
+    },
+    "countInterpretation": "24 is the present evidence-derived output, not a fixed expected maximum or invariant."
+  },
+  "completionConditions": [
+    "No authoritative fixed Equipment Pass ID list is consumed by runtime classification.",
+    "Every current public current-additional candidate resolves to confirmed Pass or confirmed non-Pass.",
+    "Future unclaimed public current-additional candidates become blocking UNRESOLVED records instead of silently defaulting to non-Pass.",
+    "Runtime list/detail display classification consumes the generated evidence classification.",
+    "Validator regenerates/checks classification freshness before runtime parity checks."
+  ],
+  "blockers": [],
+  "review": [
+    "The predecessor release-evidence audit is currently scoped to the known technical current-additional population. If authoritative Equipment Pass evidence is discovered outside that scope, extend the evidence audit/registry rather than guessing from technical fields."
+  ],
+  "nextStartPoint": "For new Equipment data, regenerate classification. If UNRESOLVED appears, add authoritative audited evidence/source claims for only those candidates, then regenerate and validate.",
+  "reopenConditions": [
+    "authoritative Equipment Pass evidence semantics change",
+    "candidate acquisition contract changes",
+    "public admission correction changes",
+    "generated classification reports PASS_CANDIDATE or UNRESOLVED",
+    "authoritative Equipment Pass evidence is found outside the current audited evidence scope"
+  ]
+}

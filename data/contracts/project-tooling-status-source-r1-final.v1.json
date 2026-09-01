@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-status-source-r1-final/v1",
+  "stage": "R1",
+  "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_COMPLETE",
+  "status": "PASS",
+  "completion": "R1_STATUS_SOURCE_COMPLETE",
+  "purpose": "Freeze the complete independent Status Source implementation after selection, promotion, producer gate, artifact bridge, lifecycle/CAS behavior, and production writer ownership all passed without legacy Project Doctor runtime authority.",
+  "designedAgainst": {
+    "mainCommit": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "historicalRequiredLegacyCheckAtDesignTime": "pr-guard",
+    "migrationBranch": "work/project-tooling-migration-r0-boundary-20260831"
+  },
+  "completedSubsteps": [
+    {"stage":"R1-1","checkpoint":"PROJECT_TOOLING_STATUS_SOURCE_R1_SELECTION_CORE","contract":"data/contracts/project-tooling-status-source-r1.v1.json","status":"PASS","completion":"R1_SELECTION_CORE_COMPLETE"},
+    {"stage":"R1-2","checkpoint":"PROJECT_TOOLING_STATUS_SOURCE_R1_2_PROMOTION","contract":"data/contracts/project-tooling-status-source-r1-2.v1.json","status":"PASS","completion":"R1_2_PROMOTION_COMPLETE"},
+    {"stage":"R1-3","checkpoint":"PROJECT_TOOLING_STATUS_SOURCE_R1_3_PRODUCER_GATE","contract":"data/contracts/project-tooling-status-source-r1-3.v1.json","status":"PASS","completion":"R1_3_PRODUCER_GATE_COMPLETE"},
+    {"stage":"R1-4","checkpoint":"PROJECT_TOOLING_STATUS_SOURCE_R1_4_ARTIFACT_BRIDGE","contract":"data/contracts/project-tooling-status-source-r1-4.v1.json","status":"PASS","completion":"R1_4_ARTIFACT_BRIDGE_COMPLETE"},
+    {"stage":"R1-5","checkpoint":"PROJECT_TOOLING_STATUS_SOURCE_R1_5_LIFECYCLE","contract":"data/contracts/project-tooling-status-source-r1-5.v1.json","status":"PASS","completion":"R1_5_LIFECYCLE_COMPLETE"}
+  ],
+  "runtimeArchitecture": {
+    "root": "tools/status-source",
+    "selection": "tools/status-source/lib/select-active-sources.mjs",
+    "promotion": "tools/status-source/lib/promote-status-source.mjs",
+    "producerGate": "tools/status-source/lib/submit-status-source.mjs",
+    "artifactBridge": "tools/status-source/lib/bridge-status-source.mjs",
+    "lifecycle": "tools/status-source/lib/lifecycle-status-source.mjs",
+    "validationWorkflow": ".github/workflows/project-tooling-r1-status-source.yml",
+    "productionWriterWorkflow": ".github/workflows/project-tooling-r1-status-source-writer.yml",
+    "retiredLegacyWriterWorkflow": ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml"
+  },
+  "authorityChain": [
+    "explicit data/status-sources declarations",
+    "directly referenced data/validation or data/checkpoints source",
+    "R1-1 active selection",
+    "R1-2 promotion compatibility and transactional declaration mutation",
+    "R1-3 explicit producer gate",
+    "R1-4 explicit artifact pipeline bridge",
+    "R1-5 explicit closeout request / producer declaration / compare-and-swap handoff",
+    "single active NEW R1 production writer transport"
+  ],
+  "currentParity": {
+    "selectedDomains": 6,
+    "selectedIds": {
+      "hero": "hero-stage6-4-final",
+      "soldier": "soldier-stage6-7-site-admission",
+      "equipment": "equipment-public-presentation-correction-final",
+      "hero-soldier": "hero-soldier-stageC-final",
+      "banner": "banner-stage3-8-regression-freeze",
+      "skin": "skin-stage3-2-readiness"
+    },
+    "equipmentProjectionSubset": {"canonical":390,"public":365,"general":198,"exclusive":167},
+    "producerCount": 6,
+    "artifactPipelineCount": 6,
+    "explicitLifecyclePipelineCount": 2
+  },
+  "independenceBoundary": {
+    "legacyProjectDoctorRuntimeImports": 0,
+    "legacyProjectDoctorGeneratedStatusDependencies": 0,
+    "legacyActiveRegistryDependencies": 0,
+    "d1RuntimeDependencies": 0,
+    "d2RuntimeDependencies": 0,
+    "d3RuntimeDependencies": 0,
+    "d4RuntimeDependencies": 0,
+    "d5RuntimeDependencies": 0,
+    "d7RuntimeDependencies": 0,
+    "projectStatusRuntimeDependencies": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "canonicalJoinRecomputationCount": 0,
+    "domainValidatorExecutionCount": 0,
+    "legacyStateMutationCount": 0,
+    "productionWriterWorkflowActivated": true,
+    "projectStatusWriteCountFromStatusSourceWriter": 0,
+    "d5WriteCountFromStatusSourceWriter": 0
+  },
+  "historicalShadowEvidence": {
+    "r1_1Run": 33341741318,
+    "r1_2ImplementationRun": 33342125677,
+    "r1_2FinalAssertionRun": 33342348207,
+    "r1_3Run": 33342644467,
+    "r1_4Run": 33342981294,
+    "r1_5Run": 33343354887,
+    "latestR1_5Job": 99342859032,
+    "latestConclusion": "success"
+  },
+  "writerActivation": {
+    "state": "ACTIVE_NEW_R1_WRITER",
+    "productionWriterWorkflowActivated": true,
+    "productionWriterWorkflow": ".github/workflows/project-tooling-r1-status-source-writer.yml",
+    "legacyWriterActive": false,
+    "legacyWriterWorkflow": ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+    "activeWriterCount": 1,
+    "oldWriterDisabledBeforeNewWriterActivated": true,
+    "zeroWriterWindowUsed": true,
+    "maxConcurrentActiveWritersDuringCutover": 1,
+    "mutationScope": "data/status-sources/** only",
+    "mainMutationAllowed": false,
+    "pullRequestMutationAllowed": false,
+    "validatedHead": "7511edab392b2a91dee19aecd2d1f05f895558e4",
+    "r1ValidationRunId": 33348927050,
+    "r1ValidationJobId": 99358324979,
+    "r1ValidationConclusion": "success"
+  },
+  "completionGate": {
+    "selectionComplete": true,
+    "promotionComplete": true,
+    "producerGateComplete": true,
+    "artifactBridgeComplete": true,
+    "lifecycleComplete": true,
+    "resultParityRequiredAndMet": true,
+    "legacyRuntimeDependencyCountZero": true,
+    "semanticRecomputationCountZero": true,
+    "domainValidatorExecutionCountZero": true,
+    "validationCiPass": true,
+    "singleNewWriterActive": true,
+    "legacyWriterInactive": true,
+    "noDualWriter": true,
+    "readyForProjectStatusWriterCutover": true
+  },
+  "blockers": [],
+  "cutoverBlockers": [],
+  "reviews": [
+    "A real future Hero/Soldier successor may require an explicit reviewed evolution of the R1-4 frozen baseline binding after promotion; current selected authority remains unchanged by writer cutover.",
+    "Direct workflow_dispatch proof cannot be initiated through the current GitHub connector. This is non-blocking because lifecycle apply/CAS is tested, producer workflows execute the NEW lifecycle checks, and writer boundaries are statically asserted.",
+    "Project Status canonical writer ownership remains separate and is not activated by this Status Source writer cutover."
+  ],
+  "nextStartPoint": "Project Status writer ownership cutover using NEW R2 normalization/projection as the sole new writer implementation. Keep OLD Doctor final deletion separate until that writer transition is proven.",
+  "reopenConditions": [
+    "data/status-sources authority or selection semantics change",
+    "R1-2 promotion compatibility changes",
+    "producer or artifact pipeline ownership changes authoritatively",
+    "explicit lifecycle schema or writer ownership changes",
+    "NEW writer gains legacy D5/Project Status/generated-state mutation responsibility",
+    "OLD Status Source writer becomes active again",
+    "new authoritative evidence contradicts any frozen R1 parity result"
+  ]
+}

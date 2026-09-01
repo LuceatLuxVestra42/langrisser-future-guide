@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-runtime/v1",
+  "stage": "CLR2",
+  "status": "ADAPTER_NAMESPACE",
+  "purpose": "Define the independent ConfigData Lookup adapter namespace over the validated Stage 0-6 materialized lookup implementation without inheriting legacy Stage 7/8 Project Doctor orchestration.",
+  "predecessor": {
+    "path": "data/contracts/project-tooling-project-check-configdata-lookup-clr1-boundary.v1.json",
+    "requiredCompletion": "CONFIGDATA_LOOKUP_CLR1_BOUNDARY_FROZEN"
+  },
+  "legacyAdapters": {
+    "lookupCore": "scripts/lib/configdata-lookup-stage5.mjs",
+    "freshnessCore": "scripts/lib/configdata-lookup-stage6.mjs"
+  },
+  "queryOperations": ["lookup", "refs", "find"],
+  "freshnessOperation": "check",
+  "runtimeBoundary": {
+    "readOnly": true,
+    "queryUsesMaterializedIndices": true,
+    "freshnessMayHashDeclaredRawSources": true,
+    "rawConfigDataAsQueryFallback": false,
+    "rebuildExposed": false,
+    "repositoryMutation": false,
+    "generatedArtifactMutation": false,
+    "semanticMutation": false,
+    "domainFanOut": false,
+    "pageValidatorSelection": false,
+    "hostedQaSelection": false,
+    "browserUiSelection": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "transitiveImpactInference": false,
+    "stage7RuntimeDependency": false,
+    "stage8RuntimeDependency": false,
+    "projectDoctorRuntimeDependency": false
+  },
+  "cutover": {
+    "packageScriptsChangedInClr2": false,
+    "legacyCliRemainsAuthoritativeUntil": "CLR7",
+    "dedicatedProjectCheckOwnerDeferredTo": "CLR4",
+    "validationWriterSeparationDeferredTo": "CLR5"
+  }
+}

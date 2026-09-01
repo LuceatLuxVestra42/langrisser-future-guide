@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-writer-rollback-closure/v1",
+  "stage": "WRITER_ROLLBACK_SURFACE_CLOSURE",
+  "checkpoint": "PROJECT_TOOLING_WRITER_ROLLBACK_SURFACE_CLOSURE",
+  "status": "PASS_WITH_BLOCKER",
+  "completion": "PROJECT_STATUS_ROLLBACK_CLOSED_STATUS_SOURCE_RETAINED",
+  "purpose": "Close the Project Status OLD-writer rollback window where live NEW-writer proof is sufficient, while retaining the Status Source rollback surface until a legitimate future approved declaration can provide real explicit non-main dispatch mutation proof without synthesizing semantic authority changes.",
+  "predecessors": [
+    {
+      "contract": "data/contracts/project-tooling-status-source-writer-cutover.v1.json",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "STATUS_SOURCE_WRITER_CUTOVER_COMPLETE"
+    },
+    {
+      "contract": "data/contracts/project-tooling-project-status-writer-cutover.v1.json",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "PROJECT_STATUS_WRITER_CUTOVER_COMPLETE"
+    },
+    {
+      "contract": "data/contracts/project-tooling-project-doctor-deletion-complete.v1.json",
+      "requiredCompletion": "OLD_DOCTOR_RETIREMENT_COMPLETE"
+    }
+  ],
+  "authoritativeState": {
+    "mainSha": "6356710de7965c5d94c8bbf8a44c41593bd989f1",
+    "prNumber": 309,
+    "decisionBasisHead": "4b3ae76e2cee55e7cc7d32e8462fa1142983ab55",
+    "requiredContext": "project-check"
+  },
+  "projectStatus": {
+    "rollbackWindow": "CLOSED",
+    "operationalRollbackRequired": false,
+    "newWriter": ".github/workflows/project-tooling-r2-project-status-writer.yml",
+    "newWriterState": "ACTIVE",
+    "canonicalTargets": [
+      "data/generated/project-status.v1.json",
+      "PROJECT_STATUS.md"
+    ],
+    "liveWriterEvidence": {
+      "runId": 33350702256,
+      "jobId": 99363362295,
+      "conclusion": "success",
+      "outputCommit": "6e0854158fa9953b2c3fb276de780179adeae3dd",
+      "outputFiles": [
+        "PROJECT_STATUS.md",
+        "data/generated/project-status.v1.json"
+      ],
+      "unexpectedMutationGuard": "success"
+    },
+    "legacyWorkflow": ".github/workflows/project-status-sync.yml",
+    "legacyWorkflowCurrentState": "RETIRED_READ_ONLY_TOMBSTONE",
+    "legacyWorkflowMutation": false,
+    "successorClassification": "HISTORICAL_OBSERVATION_ONLY",
+    "physicalDeletionInThisStep": false,
+    "reason": "The NEW R2 writer has real non-main write proof, deterministic project-status/v1 output proof, and an unexpected-mutation guard. The legacy workflow no longer carries an operational rollback requirement. Its file remains physically present only as a read-only historical observation surface until a later archive/joint-cleanup step."
+  },
+  "statusSource": {
+    "rollbackWindow": "OPEN",
+    "operationalRollbackRequired": true,
+    "newWriter": ".github/workflows/project-tooling-r1-status-source-writer.yml",
+    "newWriterState": "ACTIVE",
+    "legacyWorkflow": ".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml",
+    "legacyWorkflowCurrentState": "RETIRED_READ_ONLY_TOMBSTONE",
+    "legacyWorkflowMutation": false,
+    "currentProof": {
+      "syntheticLifecycleApplyAndCas": "PASS",
+      "producerCloseoutAndBridgeChecks": "PASS",
+      "workflowBindingValidation": "PASS",
+      "explicitNonMainDispatchMutationProof": "NOT_AVAILABLE"
+    },
+    "closureBlocker": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+    "reason": "The NEW R1 writer is active and isolated to data/status-sources, but the current connection cannot initiate workflow_dispatch and there is no legitimate new approved successor that should be synthesized solely to manufacture mutation evidence.",
+    "forbiddenWorkaround": "Do not create a fake successor, alter selected Status Source authority, or introduce a semantic mutation solely to obtain transport proof."
+  },
+  "retainedSharedSupport": {
+    "status": "RETAIN_FOR_STATUS_SOURCE_ROLLBACK_ONLY",
+    "projectStatusRollbackDependency": false,
+    "reason": "Legacy D1/D5/registry support retained by the earlier deletion manifest may still be needed only if the Status Source transport must be restored. It is no longer retained on behalf of Project Status rollback.",
+    "deletionInThisStep": false
+  },
+  "validationEvidence": {
+    "validatedHead": "6e8090bdf9114d2f7e1ab859e420c11dc4d4a683",
+    "projectCheckRunId": 33353608234,
+    "projectCheckJobId": 99371475261,
+    "conclusion": "success",
+    "setupBun": "PASS",
+    "frozenDependencyInstall": "PASS",
+    "projectCheckSelfTest": "PASS",
+    "changedPathPlan": "PASS",
+    "owningValidatorExecution": "PASS",
+    "routingOwner": "project-check",
+    "ownerRule": "data/contracts/project-tooling-project-doctor-deletion-*.json"
+  },
+  "boundaries": {
+    "semanticRelationChanged": false,
+    "selectedStatusSourceAuthorityChanged": false,
+    "canonicalPopulationChanged": false,
+    "projectStatusCanonicalTargetsChanged": false,
+    "statusSourceWriterChanged": false,
+    "projectStatusWriterChanged": false,
+    "oldWriterReactivated": false,
+    "additionalOldDoctorFileDeletion": false,
+    "frontendOrHostedQaChanged": false
+  },
+  "blockers": [
+    {
+      "id": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+      "scope": "Status Source rollback-surface closure only",
+      "conditionToClear": "A legitimate future approved Status Source declaration is applied by the NEW R1 writer through explicit non-main workflow_dispatch, with CAS/selection validation, mutation limited to data/status-sources, and successful commit/push proof.",
+      "notBlocking": [
+        "Project Status rollback closure",
+        "completed OLD D2/D3/D4/D7 retirement",
+        "current NEW writer operation"
+      ]
+    }
+  ],
+  "reviews": [
+    "The physically retained Project Status tombstone is reclassified as historical observation only; it is not an operational rollback dependency after this checkpoint.",
+    "Historical OLD contracts and validation evidence remain preserved until a separate archive policy replaces their migration references.",
+    "Status Source rollback support must not be removed merely to make the repository look fully retired while live transport mutation proof is still absent."
+  ],
+  "nextStartPoint": "When a legitimate future approved Status Source successor exists, run the NEW R1 writer through explicit non-main workflow_dispatch and collect real CAS/apply/commit/push evidence. If that proof passes, close the Status Source rollback window and then prepare an exact-path cleanup of its remaining OLD rollback-only transport/support. Until then, do not synthesize a successor and do not delete the retained Status Source rollback surface.",
+  "reopenConditions": [
+    "NEW Project Status writer workflow, target set, or project-status/v1 compatibility changes",
+    "a real Project Status consumer proves incompatibility",
+    "OLD Project Status Sync mutation is re-enabled",
+    "NEW Status Source writer workflow or lifecycle binding changes",
+    "OLD Status Source writer becomes active again",
+    "a legitimate future Status Source successor provides the missing live mutation proof"
+  ]
+}

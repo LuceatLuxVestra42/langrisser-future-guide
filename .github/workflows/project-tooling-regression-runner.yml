@@ -1,0 +1,53 @@
+name: Project Tooling Regression Runner
+
+on:
+  pull_request:
+    paths:
+      - 'tools/regression-runner/**'
+      - 'tools/project-check/contracts/validators.v1.json'
+      - 'data/contracts/project-tooling-regression-runner-*.json'
+      - '.github/workflows/project-tooling-regression-runner.yml'
+      - '.github/workflows/regression-coverage-promotion-v2.yml'
+      - 'package.json'
+      - 'scripts/validate-shared-movement-type-index-final.mjs'
+      - 'scripts/validate-soldier-stage6-7-final.mjs'
+      - 'scripts/validate-soldier-portrait-v9-final.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: regression-runner-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression-runner:
+    name: regression-runner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run NEW Regression Runner current-head parity
+        run: node tools/regression-runner/test/current-parity.mjs
+
+      - name: Verify RR9 retired runtime surfaces
+        run: node tools/regression-runner/test/rr9-retirement.mjs
+
+      - name: Ensure operational run leaves tracked state unchanged
+        if: always()
+        run: git diff --exit-code

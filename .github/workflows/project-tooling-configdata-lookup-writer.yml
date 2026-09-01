@@ -1,0 +1,93 @@
+name: Project Tooling ConfigData Lookup Writer
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: Existing work branch that will receive refreshed ConfigData Lookup materialization
+        required: true
+        default: work/configdata-lookup-stage6-incremental
+        type: string
+      confirmation:
+        description: Type APPLY_CONFIGDATA_LOOKUP_REBUILD to enable the writer
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: project-tooling-configdata-lookup-writer-${{ inputs.target_branch }}
+  cancel-in-progress: false
+
+jobs:
+  explicit-materialization-writer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate explicit writer request
+        shell: bash
+        env:
+          TARGET_BRANCH: ${{ inputs.target_branch }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+          test "$CONFIRMATION" = 'APPLY_CONFIGDATA_LOOKUP_REBUILD'
+          [[ "$TARGET_BRANCH" =~ ^[A-Za-z0-9._/-]+$ ]]
+          [[ "$TARGET_BRANCH" != -* ]]
+          [[ "$TARGET_BRANCH" != *'..'* ]]
+          test "$TARGET_BRANCH" != 'main'
+          test "$TARGET_BRANCH" != 'gh-pages'
+          [[ "$TARGET_BRANCH" == work/* ]]
+
+      - name: Checkout explicit work branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_branch }}
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Stage 5 predecessor through current compatibility gate
+        run: npm run validate:configdata-lookup-stage5
+
+      - name: Apply incremental materialization
+        run: node tools/configdata-lookup/cli/rebuild.mjs --apply --json
+
+      - name: Validate Stage 6 materialization through current compatibility gate
+        run: node tools/configdata-lookup/test/configdata-lookup-stage6-current-validator.mjs
+
+      - name: Require clean stale plan
+        run: npm run check:configdata-lookup-stage6
+
+      - name: Commit only ConfigData Lookup materialization
+        shell: bash
+        env:
+          TARGET_BRANCH: ${{ inputs.target_branch }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/index/hero.v1.json \
+            data/index/soldier.v1.json \
+            data/index/skill.v1.json \
+            data/index/equipment.v1.json \
+            data/index/forward \
+            data/index/reverse \
+            data/index/overlay \
+            data/index/configdata-lookup-dependency-manifest.v1.json \
+            data/validation/configdata-lookup-stage1-summary.v1.json \
+            data/validation/configdata-lookup-stage2-summary.v1.json \
+            data/validation/configdata-lookup-stage3-summary.v1.json \
+            data/validation/configdata-lookup-stage4-summary.v1.json \
+            data/validation/configdata-lookup-stage5-summary.v1.json \
+            data/validation/configdata-lookup-stage6-summary.v1.json
+          if git diff --cached --quiet; then
+            echo 'ConfigData Lookup materialization is already current.'
+            exit 0
+          fi
+          git commit -m 'Refresh ConfigData Lookup materialization'
+          git push origin "HEAD:${TARGET_BRANCH}"

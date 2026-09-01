@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-project-check-post-reinstall-acceptance-f5/v1",
+  "stage": "F5",
+  "checkpoint": "DOCTOR_V2_POST_REINSTALL_ACCEPTANCE_F5_NEGATIVE_E2E",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "F5_NEGATIVE_E2E_FROZEN",
+  "purpose": "Prove with disposable GitHub Actions PRs that the NEW required Project Check fails for the intended owning reason when tracked mutation or a real owning-validator failure is injected, without merging synthetic failure code or touching domain semantics.",
+  "predecessor": {
+    "path": "data/contracts/project-tooling-project-check-post-reinstall-acceptance-f3.v1.json",
+    "completion": "F3_PROJECT_CHECK_BEHAVIOR_FROZEN",
+    "mainCommit": "6ae0898d12e142f707a8ac9721270d2b4cb3c2ce"
+  },
+  "baitProofs": [
+    {
+      "id": "PROJECT_CHECK_TRACKED_MUTATION_TRIP_E2E",
+      "classification": "EXPECTED_FAILURE_PROOF",
+      "synthetic": true,
+      "disposablePr": 335,
+      "merged": false,
+      "closed": true,
+      "head": "9228939a926a32e9d3d0ca267b6de9ebbf4d0fbf",
+      "workflowRunId": 33449119159,
+      "jobId": 99674786308,
+      "injection": "Append a temporary marker to tracked PROJECT_STATUS.md after all owning validators have succeeded.",
+      "expectedSequence": [
+        "R3 self-test PASS",
+        "changed-path ownership plan PASS",
+        "owning validators PASS",
+        "tracked mutation injected",
+        "tracked-state unchanged guard FAIL"
+      ],
+      "observed": {
+        "r3SelfTest": "PASS",
+        "ownershipPlan": "PASS",
+        "owningValidators": "PASS",
+        "guard": "FAIL_AS_EXPECTED",
+        "detectedPath": "PROJECT_STATUS.md",
+        "gitStatus": "M PROJECT_STATUS.md",
+        "jobConclusion": "failure"
+      },
+      "passConditionSatisfied": true
+    },
+    {
+      "id": "PROJECT_CHECK_OWNING_VALIDATOR_FAILURE_E2E",
+      "classification": "EXPECTED_FAILURE_PROOF",
+      "synthetic": true,
+      "disposablePr": 336,
+      "merged": false,
+      "closed": true,
+      "head": "6154f0b2b90aa27226286736c98eebf2db5aa148",
+      "workflowRunId": 33449163285,
+      "jobId": 99674922647,
+      "injection": "Throw a temporary failure from the actual ConfigData Lookup owning validator entrypoint.",
+      "routing": {
+        "changedFileCount": 1,
+        "ownerCount": 1,
+        "validatorCount": 1,
+        "owner": "configdata-lookup",
+        "validator": "configdata-lookup-self-test",
+        "manualReviewCount": 0,
+        "ownerPropagationCount": 0,
+        "changeClassFanOutCount": 0,
+        "semanticRecomputationCount": 0
+      },
+      "observed": {
+        "r3SelfTest": "PASS",
+        "ownershipPlan": "PASS",
+        "resultStatus": "BLOCKER",
+        "completion": "BLOCKED_VALIDATOR",
+        "exitCode": 2,
+        "failedValidatorId": "configdata-lookup-self-test",
+        "executionCountBeforeStop": 1,
+        "unrelatedValidatorExecutionCount": 0,
+        "jobConclusion": "failure"
+      },
+      "passConditionSatisfied": true
+    }
+  ],
+  "result": {
+    "baitCaseCount": 2,
+    "expectedFailureCaseCount": 2,
+    "expectedFailureObservedCount": 2,
+    "missedFailureCount": 0,
+    "unrelatedFanOutCount": 0,
+    "syntheticFailureCodeMergedCount": 0,
+    "semanticMutationMergedCount": 0,
+    "decision": "The required Project Check has end-to-end GitHub Actions proof that tracked mutation and an actual owning-validator failure both fail closed for the intended reason."
+  },
+  "boundaries": {
+    "baitBranchesDisposable": true,
+    "baitPrsMerged": false,
+    "canonicalDataChanged": false,
+    "frozenSemanticDataChanged": false,
+    "relationRecomputed": false,
+    "statusSourceChanged": false,
+    "projectStatusAuthorityChanged": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "STATUS_SOURCE_LIVE_DISPATCH_MUTATION_PROOF_REQUIRED",
+      "blocking": false,
+      "owner": "status-source",
+      "condition": "Close only on a legitimate future approved successor; do not synthesize one for acceptance proof."
+    }
+  ],
+  "reopenConditions": [
+    "The tracked-state guard stops failing on a real tracked mutation.",
+    "An owning validator failure no longer becomes BLOCKED_VALIDATOR/exit 2.",
+    "Project Check begins executing unrelated validators after an owning failure.",
+    "New authoritative evidence contradicts either E2E proof."
+  ]
+}

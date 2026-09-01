@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "schemaId": "status-source-artifact-bridge/v1",
+  "stage": "R1-4",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Bind six explicit domain completion/readiness artifact pipelines to the independent R1-3 producer gate without executing validators or inferring authority.",
+  "selector": "tools/status-source/lib/select-active-sources.mjs",
+  "producerContract": "tools/status-source/contracts/producer-gate.v1.json",
+  "policy": {
+    "pipelineMustBeRegistered": true,
+    "pipelineDomainMustMatchProducer": true,
+    "baselineMustMatchCurrentR1_1Selection": true,
+    "defaultMode": "CHECK",
+    "mutationRequiresExplicitApplyFlag": true,
+    "candidateAlwaysDelegatesToR1_3ProducerGate": true,
+    "r1_3AlwaysDelegatesToR1_2Promotion": true,
+    "doesNotExecuteOwningValidator": true,
+    "doesNotInferOwningValidator": true,
+    "doesNotInferAuthorityFromFilename": true,
+    "doesNotInferAuthorityFromStageNumber": true,
+    "doesNotInferAuthorityFromChronology": true,
+    "preserveSourceStatusSemantics": true,
+    "rawConfigDataRead": false,
+    "semanticRecomputation": false,
+    "canonicalJoinRecomputation": false
+  },
+  "pipelines": [
+    {
+      "id": "hero",
+      "domain": "hero",
+      "producerId": "hero-final",
+      "baselineEntryId": "hero-stage6-4-final",
+      "baselineSourcePath": "data/validation/hero-stage6-4-final.v1.json",
+      "semanticRole": "CURRENT_FINAL_FROZEN"
+    },
+    {
+      "id": "soldier",
+      "domain": "soldier",
+      "producerId": "soldier-final",
+      "baselineEntryId": "soldier-stage6-7-site-admission",
+      "baselineSourcePath": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "semanticRole": "CURRENT_SITE_ADMISSION"
+    },
+    {
+      "id": "equipment",
+      "domain": "equipment",
+      "producerId": "equipment-final",
+      "baselineEntryId": "equipment-public-presentation-correction-final",
+      "baselineSourcePath": "data/validation/equipment-public-presentation-correction-final.v1.json",
+      "semanticRole": "CURRENT_FINAL_FROZEN"
+    },
+    {
+      "id": "hero-soldier",
+      "domain": "hero-soldier",
+      "producerId": "hero-soldier-final",
+      "baselineEntryId": "hero-soldier-stageC-final",
+      "baselineSourcePath": "data/validation/hero-soldier-integration-stageC-final.v1.json",
+      "semanticRole": "CURRENT_RELATION_FINAL_FROZEN"
+    },
+    {
+      "id": "banner",
+      "domain": "banner",
+      "producerId": "banner-final",
+      "baselineEntryId": "banner-stage3-8-regression-freeze",
+      "baselineSourcePath": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
+      "semanticRole": "CURRENT_REGRESSION_FREEZE"
+    },
+    {
+      "id": "skin",
+      "domain": "skin",
+      "producerId": "skin-final",
+      "baselineEntryId": "skin-stage3-2-readiness",
+      "baselineSourcePath": "data/validation/skin-stage3-2-readiness.v1.json",
+      "semanticRole": "CURRENT_STAGE3_2_ASSET_EVIDENCE_COMPLETE",
+      "expectedSourceStatus": "PASS"
+    }
+  ],
+  "boundaries": {
+    "doesNotChangeR1_2PromotionRules": true,
+    "doesNotChangeR1_3ProducerRules": true,
+    "doesNotPromoteOnArtifactCreationAlone": true,
+    "doesNotReopenFrozenSemantics": true,
+    "doesNotUpgradeSkinReadinessToFinal": true,
+    "legacyActiveRegistryDependency": false,
+    "productionMutationByDefault": false,
+    "canonicalMutation": false,
+    "frontendMutation": false
+  }
+}

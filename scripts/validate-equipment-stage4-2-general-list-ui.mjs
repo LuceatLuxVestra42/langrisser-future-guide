@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 const ROOT = process.cwd();
 const readJson = (path) => JSON.parse(fs.readFileSync(`${ROOT}/${path}`, "utf8"));
 const readText = (path) => fs.readFileSync(`${ROOT}/${path}`, "utf8");
+const countOccurrences = (source, marker) => source.split(marker).length - 1;
 
 const stage41 = readJson("data/validation/equipment-stage4-1-route-loader-summary.v1.json");
 const contract = readJson("data/contracts/equipment-stage4-2-general-list-ui.v1.json");
@@ -76,8 +77,18 @@ const sourceAssertions = [
   [routeSource.includes("window.localStorage.getItem"), "Persisted list state must be restored."],
   [routeSource.includes("window.localStorage.setItem"), "List state must be persisted."],
   [routeSource.includes("record.nameKr ?? record.nameCn"), "Korean-name fallback policy is missing."],
-  [routeSource.includes("data.records.filter"), "General List must filter the frozen record sequence in place."],
-  [!routeSource.includes(".sort("), "Stage 4-2 frontend must not invent a new equipment sort order."],
+  [routeSource.includes("const records = data.records.filter((record) => {"), "General List must sort only a filtered copy of the frozen loader records."],
+  [routeSource.includes('type EquipmentSortMode = "default" | "name" | "id";'), "Approved Equipment presentation sort modes are missing."],
+  [routeSource.includes("const SORT_LABELS: Record<EquipmentSortMode, string> = {"), "Equipment presentation sort labels are missing."],
+  [routeSource.includes('return value === "default" || value === "name" || value === "id";'), "Persisted Equipment sort mode must be sanitized."],
+  [routeSource.includes('if (uiState.sort === "name") {'), "Approved Equipment name sort is missing."],
+  [routeSource.includes("return records.sort((left, right) => {"), "Approved Equipment name sort must operate on the filtered copy."],
+  [routeSource.includes('leftName.localeCompare(rightName, "ko", { numeric: true, sensitivity: "base" }) || left.equipmentId - right.equipmentId'), "Approved Equipment name sort/tie-break contract drifted."],
+  [routeSource.includes('if (uiState.sort === "id") {'), "Approved Equipment ID sort is missing."],
+  [routeSource.includes("return records.sort((left, right) => left.equipmentId - right.equipmentId);"), "Approved Equipment ID sort contract drifted."],
+  [routeSource.includes("return records;"), "Default Equipment mode must preserve the filtered frozen order."],
+  [countOccurrences(routeSource, ".sort(") === 2, "General route must contain exactly the two approved presentation sort operations."],
+  [!routeSource.includes("data.records.sort("), "General route must not mutate loader records in place."],
   [!routeSource.includes("ConfigData"), "Stage 4-2 route must not read or name raw ConfigData."],
   [!routeSource.includes("equipment_stage3_3_general_list.json"), "Route must consume the Stage 4-1 loader, not import generated JSON directly."],
 ];
@@ -135,7 +146,10 @@ const summary = {
     uniqueEquipmentIds: new Set(ids).size,
     tabs: tabCounts,
     generatedOrderPreserved: true,
-    frontendSortAdded: false,
+    frontendSortAdded: true,
+    presentationSortModes: ["default", "name", "id"],
+    releaseChronologySortAdded: false,
+    loaderRecordsMutated: false,
   },
   filters: {
     groups: general.filters.map((filter) => ({

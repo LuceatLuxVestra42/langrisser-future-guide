@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "schemaId": "project-tooling-status-source-r1-2/v1",
+  "stage": "R1-2",
+  "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_2_PROMOTION",
+  "status": "PASS",
+  "completion": "R1_2_PROMOTION_COMPLETE",
+  "purpose": "Replace legacy Project Doctor status-source promotion with an independent Status Source command that is check-only by default, requires explicit --apply for mutation, and rolls back its declaration if post-write verification fails.",
+  "predecessor": {
+    "checkpoint": "PROJECT_TOOLING_STATUS_SOURCE_R1_SELECTION_CORE",
+    "status": "PASS",
+    "completion": "R1_SELECTION_CORE_COMPLETE",
+    "contract": "data/contracts/project-tooling-status-source-r1.v1.json"
+  },
+  "implementation": {
+    "selector": "tools/status-source/lib/select-active-sources.mjs",
+    "compatibilityContract": "tools/status-source/contracts/promotion-compatibility.v1.json",
+    "promotionLibrary": "tools/status-source/lib/promote-status-source.mjs",
+    "cli": "tools/status-source/cli/promote.mjs",
+    "selfTest": "tools/status-source/test/promotion-parity.mjs",
+    "shadowWorkflow": ".github/workflows/project-tooling-r1-status-source.yml"
+  },
+  "policy": {
+    "defaultMode": "CHECK",
+    "mutationRequiresExplicitApplyFlag": true,
+    "predecessorMustBeCurrentSelectedEntry": true,
+    "sourceMustAlreadyExist": true,
+    "sourceMustRemainUnderAllowedPrefixes": true,
+    "duplicateNonActiveEntryIdForbidden": true,
+    "alreadyActiveRequestIsIdempotent": true,
+    "defaultAdmissionMode": "INHERIT_CURRENT_ACTIVE_ENTRY",
+    "explicitAdmissionOverrideAllowed": true,
+    "defaultProjectionMode": "INHERIT_CURRENT_ACTIVE_ENTRY_OR_FROZEN_BASELINE_COMPATIBILITY",
+    "explicitProjectionOverrideAllowed": true,
+    "autoSnapshotAdmissionFromObservedSourceForbidden": true,
+    "candidateSelectionMustPassBeforeWrite": true,
+    "promotionCompatibilityMustPassBeforeWrite": true,
+    "postWriteSelectionMustPass": true,
+    "postWriteCompatibilityMustPass": true,
+    "failedPostWriteVerificationRollsBackDeclaration": true,
+    "noFilenameInference": true,
+    "noStageNumberInference": true,
+    "noTimestampInference": true,
+    "noCommitDateInference": true
+  },
+  "compatibilityMigration": {
+    "source": "data/contracts/project-doctor-d1-0-contract.v1.json",
+    "sourceGitBlobSha": "2cab75eae62dab0474bfc8cd19b164645acd4140",
+    "migratedFieldsOnly": [
+      "expected",
+      "requiredSelectors",
+      "zeroRequiredSelectors",
+      "supplementalSources"
+    ],
+    "intentionallyNotMigrated": [
+      "lifecycle normalization",
+      "health normalization",
+      "review reconciliation",
+      "blocker reconciliation",
+      "next-work passthrough"
+    ],
+    "runtimeReadsLegacyD1": false,
+    "reason": "Promotion requires a stable compatibility gate, but Project Status normalization remains a separate R2 responsibility."
+  },
+  "transactionBoundary": {
+    "writeTarget": "one data/status-sources/promotion.<domain>.<id>.v1.json declaration",
+    "generatedRegistryWrite": false,
+    "legacyD1Write": false,
+    "projectStatusWrite": false,
+    "domainValidationWrite": false,
+    "rollbackScope": "the newly created declaration only"
+  },
+  "independenceBoundary": {
+    "legacyProjectDoctorRuntimeImports": 0,
+    "legacyGeneratedStatusDependencies": 0,
+    "d1RuntimeDependencies": 0,
+    "d2RuntimeDependencies": 0,
+    "d3RuntimeDependencies": 0,
+    "d4RuntimeDependencies": 0,
+    "d5RuntimeDependencies": 0,
+    "d7RuntimeDependencies": 0,
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "canonicalJoinRecomputationCount": 0,
+    "domainValidatorExecutionCount": 0,
+    "legacyStateMutationCount": 0
+  },
+  "selfTestCoverage": [
+    "all six current selected sources pass migrated compatibility",
+    "active Equipment successor remains idempotent and preserves 390/365/198/167",
+    "default check mode writes zero declarations",
+    "explicit apply writes exactly one synthetic declaration",
+    "post-write failure rolls back the synthetic declaration",
+    "compatibility mismatch blocks before write",
+    "unsafe entry id blocks before write",
+    "legacy runtime dependency scan remains zero"
+  ],
+  "validationEvidence": {
+    "implementationCommit": "b914a622571de08ef6ac63f64fb08c28c8dc2f00",
+    "shadowWorkflow": {
+      "runId": 33342125677,
+      "jobId": 99339547047,
+      "conclusion": "success",
+      "selectionParityAndIsolationSelfTest": "PASS",
+      "promotionParityAndRollbackSelfTest": "PASS",
+      "selectedSourceCli": "PASS",
+      "activeEquipmentCheckOnlyCli": "PASS"
+    },
+    "currentCompatibility": {
+      "selectedDomainCount": 6,
+      "equipmentSelectedId": "equipment-public-presentation-correction-final",
+      "equipmentProjectionSubset": {
+        "canonical": 390,
+        "public": 365,
+        "general": 198,
+        "exclusive": 167
+      }
+    },
+    "mutationProof": {
+      "repositoryCheckModeDeclarationWrites": 0,
+      "syntheticApplyDeclarationWrites": 1,
+      "syntheticRollbackVerified": true,
+      "legacyRuntimeDependencies": 0,
+      "rawConfigDataReads": 0,
+      "semanticRecomputations": 0
+    }
+  },
+  "completionGate": {
+    "compatibilityContractImplemented": true,
+    "promotionLibraryImplemented": true,
+    "checkDefaultImplemented": true,
+    "explicitApplyImplemented": true,
+    "transactionRollbackImplemented": true,
+    "selfTestImplemented": true,
+    "shadowWorkflowUpdated": true,
+    "shadowCiPass": true,
+    "currentCompatibilityParity": true,
+    "rollbackProven": true,
+    "legacyRuntimeDependencyCountZero": true
+  },
+  "blockers": [],
+  "reviews": [
+    "R1-3 producer submit and later bridge/handoff behavior remain legacy-only and are outside this checkpoint.",
+    "Legacy required pr-guard remains a CUTOVER_ONLY blocker and must not be repaired by admitting these migration paths into legacy D2-D7."
+  ],
+  "nextStartPoint": "R1-3: migrate the producer submit gate so it validates producer/domain/source declarations and delegates promotion exclusively to tools/status-source/cli/promote.mjs rather than the legacy Project Doctor promotion runtime.",
+  "reopenConditions": [
+    "R1-1 selector semantics change",
+    "status-source declaration schema changes",
+    "promotion compatibility fields change authoritatively",
+    "new authoritative evidence contradicts the R1-2 shadow parity or rollback result"
+  ]
+}
