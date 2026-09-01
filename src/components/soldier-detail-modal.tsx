@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
+import { getSoldierMaterialAssetUrl } from "@/lib/soldier-material-assets";
 import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
 
 type MaterialCost = {
@@ -673,14 +674,33 @@ function SpStageCard({ title, stage }: { title: string; stage: SpStage | null })
       <div className="mt-3">
         <p className="text-xs font-bold text-muted-foreground">필요 재료</p>
         <div className="mt-1.5 flex flex-wrap gap-1.5">
-          {stage.awakenMaterials.map((material) => (
-            <span
-              key={`${material.goodsType}:${material.itemId}`}
-              className="rounded-md border border-border bg-muted px-2 py-1 text-xs font-semibold text-foreground"
-            >
-              #{material.itemId} × {material.count}
-            </span>
-          ))}
+          {stage.awakenMaterials.map((material) => {
+            const assetUrl = getSoldierMaterialAssetUrl(material.goodsType, material.itemId);
+
+            return (
+              <span
+                key={`${material.goodsType}:${material.itemId}`}
+                title={`G${material.goodsType} / I${material.itemId}`}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted px-2 py-1 text-xs font-semibold text-foreground"
+              >
+                {assetUrl ? (
+                  <>
+                    <img
+                      src={assetUrl}
+                      alt=""
+                      aria-hidden="true"
+                      loading="lazy"
+                      className="h-7 w-7 shrink-0 object-contain"
+                    />
+                    <span className="sr-only">아이템 #{material.itemId}</span>
+                  </>
+                ) : (
+                  <span className="text-muted-foreground">#{material.itemId}</span>
+                )}
+                <span className="tabular-nums">× {formatNumber(material.count)}</span>
+              </span>
+            );
+          })}
         </div>
       </div>
 
