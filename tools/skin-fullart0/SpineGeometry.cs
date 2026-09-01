@@ -67,7 +67,12 @@ public static class SpineGeometryProgram {
             throw new Exception("version-matched renderer expected Spine 3.3.05 but got: " + skeletonData.Version);
 
         var skeleton = new Skeleton(skeletonData);
+        var poseAnimation = skeletonData.FindAnimation("idle_Normal");
+        if (poseAnimation == null)
+            throw new Exception("exact Char pose animation not found: idle_Normal");
+        const float poseTime = 0f;
         skeleton.SetToSetupPose();
+        poseAnimation.Apply(skeleton, -1f, poseTime, false, null);
         skeleton.UpdateWorldTransform();
 
         var setupSlots = new List<object>();
@@ -135,7 +140,8 @@ public static class SpineGeometryProgram {
                     drawIndex, slot = slot.Data.Name, attachment = attachment.Name, type = "MeshAttachment", blendMode,
                     slotColor = Color(slot.R, slot.G, slot.B, slot.A),
                     attachmentColor = Color(mesh.R, mesh.G, mesh.B, mesh.A),
-                    atlas = AtlasRegionInfo(mesh.RendererObject), vertices, uvs, triangles,
+                    atlas = AtlasRegionInfo(mesh.RendererObject), vertices, uvs,
+                    triangles,
                 });
             } else {
                 nonRenderAttachments.Add(new {
@@ -152,6 +158,9 @@ public static class SpineGeometryProgram {
             setupSlotCount = skeleton.Slots.Count,
             setupNamedAttachmentCount = setupSlots.Count,
             setupResolvedAttachmentCount = skeleton.Slots.Count(slot => slot.Attachment != null),
+            poseAnimation = poseAnimation.Name,
+            poseAnimationDuration = poseAnimation.Duration,
+            poseTime,
         };
 
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
@@ -159,7 +168,7 @@ public static class SpineGeometryProgram {
         if (renderables.Count == 0 || triangleCount == 0) {
             var noRender = new {
                 schemaVersion = 1,
-                status = "DIAGNOSTIC_NO_SETUP_RENDERABLES",
+                status = "DIAGNOSTIC_NO_CHAR_IDLE_RENDERABLES",
                 runtime = new {
                     source = "EsotericSoftware/spine-runtimes",
                     commit = "1c1936532527900f74cfb58f7002998bf157b254",
@@ -170,7 +179,8 @@ public static class SpineGeometryProgram {
                     version = skeletonData.Version, hash = skeletonData.Hash,
                     setupWidth = skeletonData.Width, setupHeight = skeletonData.Height,
                     bones = skeletonData.Bones.Count, slots = skeletonData.Slots.Count,
-                    skins = skeletonData.Skins.Count, animations, pose = "setup",
+                    skins = skeletonData.Skins.Count, animations,
+                    pose = new { animation = poseAnimation.Name, time = poseTime },
                 },
                 diagnostic,
                 geometry = new {
@@ -185,16 +195,18 @@ public static class SpineGeometryProgram {
             Console.WriteLine(JsonSerializer.Serialize(new {
                 noRender.status,
                 version = skeletonData.Version,
+                animation = poseAnimation.Name,
+                poseTime,
                 defaultSkin = skeletonData.DefaultSkin == null ? null : skeletonData.DefaultSkin.Name,
                 skinNames = skeletonData.Skins.Select(s => s.Name).ToArray(),
                 slots = skeletonData.Slots.Count,
-                setupResolvedAttachments = skeleton.Slots.Count(slot => slot.Attachment != null),
+                resolvedAttachments = skeleton.Slots.Count(slot => slot.Attachment != null),
             }));
             return 3;
         }
 
         if (!float.IsFinite(minX) || !float.IsFinite(minY) || !float.IsFinite(maxX) || !float.IsFinite(maxY))
-            throw new Exception("setup pose bounds are non-finite");
+            throw new Exception("Char idle pose bounds are non-finite");
 
         var result = new {
             schemaVersion = 1,
@@ -209,7 +221,8 @@ public static class SpineGeometryProgram {
                 version = skeletonData.Version, hash = skeletonData.Hash,
                 setupWidth = skeletonData.Width, setupHeight = skeletonData.Height,
                 bones = skeletonData.Bones.Count, slots = skeletonData.Slots.Count,
-                skins = skeletonData.Skins.Count, animations, pose = "setup",
+                skins = skeletonData.Skins.Count, animations,
+                pose = new { animation = poseAnimation.Name, time = poseTime },
             },
             diagnostic,
             geometry = new {
@@ -223,7 +236,10 @@ public static class SpineGeometryProgram {
         };
         File.WriteAllText(outputPath, JsonSerializer.Serialize(result, options) + Environment.NewLine);
         Console.WriteLine(JsonSerializer.Serialize(new {
-            result.status, skeleton = new { skeletonData.Version, skeletonData.Width, skeletonData.Height },
+            result.status,
+            animation = poseAnimation.Name,
+            poseTime,
+            skeleton = new { skeletonData.Version, skeletonData.Width, skeletonData.Height },
             renderables = renderables.Count, triangleCount,
             bounds = new { minX, minY, maxX, maxY },
             blendModes = blendModes.OrderBy(x => x).ToArray(),
