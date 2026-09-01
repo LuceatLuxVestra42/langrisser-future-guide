@@ -9,6 +9,16 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getBannerPageData } from "@/lib/banner-page.functions";
 
+const WISH_DISPLAY_NAMES_BY_IMAGE_SUFFIX = new Map<string, string>([
+  ["/Picture_Notice_7404.webp", "랑그릿사 모바일 I, II"],
+  ["/Picture_Notice_9605.webp", "공주, 주역, 어둠"],
+  ["/Picture_Notice_ChuanShuoReturn.webp", "랑그릿사 I~V"],
+  ["/Picture_Notice_7902.webp", "리인카네이션 배너2"],
+  ["/Picture_Notice_7804.webp", "리인카네이션 배너1"],
+  ["/Picture_Notice_9616.webp", "전설, 전략, 리인카"],
+  ["/Picture_Notice_OptionalWish.webp", "성자 강림 소원소환"],
+]);
+
 function getKoreanToday() {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Seoul",
@@ -61,6 +71,16 @@ function getBannerDisplayLabel(typeLabelKr: string, cpRelated: boolean) {
     default:
       return typeLabelKr;
   }
+}
+
+function getWishDisplayName(publicPath: string | null) {
+  if (!publicPath) return null;
+
+  for (const [suffix, displayName] of WISH_DISPLAY_NAMES_BY_IMAGE_SUFFIX) {
+    if (publicPath.endsWith(suffix)) return displayName;
+  }
+
+  return null;
 }
 
 function BannerImage({
@@ -161,11 +181,14 @@ function BannerPage() {
                       row.typeLabelKr,
                       row.cpRelated,
                     );
+                    const wishDisplayName = isWish ? getWishDisplayName(row.image.publicPath) : null;
 
                     return (
                       <article
                         key={row.bannerOccurrenceId}
-                        className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
+                        className={`overflow-hidden rounded-2xl bg-card shadow-sm ${
+                          isWish ? "border-2 border-primary/30" : "border border-border"
+                        }`}
                       >
                         <button
                           type="button"
@@ -189,6 +212,11 @@ function BannerPage() {
                               <span className="shrink-0 rounded-md bg-primary px-2 py-1 text-[11px] font-bold text-primary-foreground">
                                 {displayTypeLabel}
                               </span>
+                              {wishDisplayName && (
+                                <span className="text-sm font-semibold leading-6 text-foreground">
+                                  {wishDisplayName}
+                                </span>
+                              )}
                               {row.pickupHeroes.length > 0 && (
                                 <span className="text-sm font-semibold leading-6 text-foreground">
                                   {row.pickupHeroes.map((hero) => hero.heroNameKr).join(" · ")}
@@ -196,13 +224,20 @@ function BannerPage() {
                               )}
                             </div>
                             {isWish && (
-                              <ChevronDown
-                                size={18}
-                                aria-hidden="true"
-                                className={`mt-1 shrink-0 text-muted-foreground transition-transform ${
-                                  expanded ? "rotate-180" : ""
+                              <span
+                                className={`mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-lg border-2 px-2 py-1 text-xs font-semibold shadow-sm transition-colors ${
+                                  expanded
+                                    ? "border-primary/60 bg-primary/10 text-foreground"
+                                    : "border-primary/30 bg-background text-muted-foreground"
                                 }`}
-                              />
+                              >
+                                목록
+                                <ChevronDown
+                                  size={16}
+                                  aria-hidden="true"
+                                  className={`transition-transform ${expanded ? "rotate-180" : ""}`}
+                                />
+                              </span>
                             )}
                           </div>
                         </button>
