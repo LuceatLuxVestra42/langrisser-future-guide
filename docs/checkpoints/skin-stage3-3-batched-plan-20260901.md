@@ -8,10 +8,10 @@ non-scope: Soldier, Hero↔Skin semantics, sourceOrder recomputation, acquisitio
 
 1. current `main` Skin Stage 3-2 readiness: `data/validation/skin-stage3-2-readiness.v1.json`
 2. current `main` fresh official-installer evidence: `data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json`
-3. current work-branch Batch 0 outputs and validators
+3. current work-branch bounded probe outputs and validators
 4. actual official installer 1.1.113 assets resolved by the current evidence
 
-The work branch is currently behind `main` only in unrelated banner presentation changes. No Skin authority/input path changed in that drift, so completed Batch 0 evidence remains fresh for this scope.
+The work branch is behind `main` only in unrelated banner presentation changes. No Skin authority/input path changed in that drift, so completed bounded evidence remains fresh for this scope.
 
 ## Evidence policy
 
@@ -22,7 +22,7 @@ They may be consulted only to avoid blindly repeating a previously explored appr
 In particular:
 
 - do not import historical 540-Skin completion artifacts
-- do not promote historical `STATIC_ONLY_NOT_VALIDATED_AS_FULL_ART` or Spine conclusions as current facts
+- do not promote historical STATIC/Spine full-art conclusions as current facts
 - do not use old branch manifests as source authority
 - do not reuse old rendered images as validation fixtures unless independently regenerated from current authoritative assets
 - if current evidence conflicts with a historical note, current evidence wins
@@ -48,6 +48,22 @@ Do not validate/materialize all 540 Skins as one unit.
 
 The previous STATIC Batch 0 extraction for 102/1901/3701 remains a technical extraction proof only. It does not by itself prove that the extracted 204×340 Sprite is the desired full-body artwork.
 
+## FULLART-0 current-only probe
+
+Evidence: `data/evidence/skin-fullart0-current-probe.v1.json`
+
+Current official-installer inspection for Skin 102 confirms:
+
+- exact current prefab: `Spine/Char/Mathew_ABS/Mathew_Skin01_Prefab.prefab`
+- exact installer package/bundle: `InstallPage_1.1.113_25.zip` / `begin_spine_char_mathew_abs.b`
+- current prefab serialized hash matches Stage 3-2 exactly
+- prefab local `SkeletonAnimation.skeletonDataAsset` resolves to `Mathew_Skin01_SkeletonData`
+- same current bundle contains `Mathew_Skin01.atlas`, `Mathew_Skin01.skel`, `Mathew_Skin01_Atlas`, `Mathew_Skin01_Material`, and `Mathew_Skin01` Texture2D
+- no external PPtr is required for the inspected prefab/component reference chain
+- current `Mathew_Skin01` Texture2D exports as 2048×1024 and is an atlas of separated character parts, not a display-ready composed full-body image
+
+This confirms the current Spine source chain but does NOT yet confirm the final composed full-body render or its canonical pose.
+
 ## Completion condition for representative confirmation
 
 - current official asset provenance is explicit
@@ -62,12 +78,14 @@ The previous STATIC Batch 0 extraction for 102/1901/3701 remains a technical ext
 - Stage 3-2 current readiness: PASS
 - Stage 3-2 fresh evidence source: official installer 1.1.113
 - STATIC Batch 0 technical extraction: PASS for 102, 1901, 3701
-- full-art source suitability: NOT YET CONFIRMED under the current-only evidence policy
+- FULLART-0 current source-chain probe: PASS
+- raw Skin 102 Spine texture as direct full-art: REJECTED_CURRENT_EVIDENCE (atlas pieces)
+- composed Skin 102 full-body render/canonical pose: NOT YET CONFIRMED
 
 ## Current blocker
 
-Confirm Skin 102 full-art/full-body source and rendering from current official-installer evidence/assets without relying on historical full-art conclusions.
+Render Skin 102 from the current `Mathew_Skin01.atlas` + `Mathew_Skin01.skel` chain and establish a deterministic display pose that satisfies the requested full-body criterion, without importing historical render output or conclusions.
 
 ## Next start
 
-Inspect only the current Skin 102 Stage 3-2 static/Spine/model locators and current official asset dependencies. Produce or reject a full-art candidate from those current assets. Consult historical notes only if needed to avoid repeating an already known dead-end, never as PASS evidence.
+Extract the current Skin 102 atlas/skeleton payload from the same verified installer bundle and perform one bounded render experiment. Do not inspect 1901, 3701, or the 540 population until Skin 102 has a current-evidence PASS or a precise BLOCKER.
