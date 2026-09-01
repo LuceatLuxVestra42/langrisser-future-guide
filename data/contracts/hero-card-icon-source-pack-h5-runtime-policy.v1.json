@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "contract": "hero-card-icon-source-pack-runtime-policy",
+  "status": "PASS",
+  "owner": "hero-card-icon-source-pack-assets",
+  "stage": "repository-size-reduction-H5",
+  "purpose": "Promote the H2-pinned external exact-byte Hero card-icon source pack to current repository source-byte transport authority while preserving frozen source identity, production lossless WebP delivery, runtime paths, and Hero semantic boundaries.",
+  "authority": {
+    "sourceIdentityManifest": "data/generated/hero-card-icon-assets.v1.json",
+    "sourceIdentityFreezeState": "HERO_CARD_ICON_ASSETS_FROZEN",
+    "externalSourceTransportContract": "data/contracts/hero-card-icon-source-pack.v1.json",
+    "productionWebDeliveryManifest": "data/generated/hero-card-icon-web-delivery.v1.json",
+    "productionWebDeliveryFreezeState": "HERO_CARD_ICON_WEB_DELIVERY_FROZEN",
+    "currentRepositorySourceByteTransport": "EXTERNAL_EXACT_BYTE_SOURCE_PACK",
+    "frozenManifestPathMetadataCreatesCurrentRetentionRequirement": false
+  },
+  "sourceTransportPolicy": {
+    "repositoryTrackedSourcePngRequired": false,
+    "sourcePackHydrationOnDemandAllowed": true,
+    "hydrator": "scripts/hydrate-hero-card-icon-source-pack-v1.mjs",
+    "sourcePackContract": "data/contracts/hero-card-icon-source-pack.v1.json",
+    "sourcePackStorageKind": "GITHUB_RELEASE_ASSET",
+    "sourcePackIntegrityMode": "CONTENT_HASH_PINNED_FAIL_CLOSED",
+    "expectedSourceFileCount": 267,
+    "expectedSourceTotalBytes": 8990485,
+    "sourcePngDeletionPerformedInThisStage": false,
+    "sourcePngDeletionDeferredToStage": "H6"
+  },
+  "frozenManifestInterpretation": {
+    "sourceManifestExpectedFilePathRole": "FROZEN_SOURCE_IDENTITY_LOCATOR",
+    "sourceManifestWebAssetPathRole": "FROZEN_SOURCE_PNG_LOCATOR_NOT_RUNTIME_DELIVERY",
+    "webManifestSourcePngFilePathRole": "FROZEN_WEBP_CONVERSION_INPUT_LOCATOR",
+    "webManifestSourcePngPathRole": "FROZEN_SOURCE_PNG_LOCATOR_NOT_RUNTIME_FALLBACK",
+    "webManifestPngAuthoritativeSourceRetainedFieldRole": "PRE_H5_ADMISSION_RETENTION_STATE",
+    "webManifestPngAuthoritativeSourceRetainedFieldIsCurrentRetentionAuthority": false,
+    "sourceRecordIdentityAndSha256RemainAuthoritative": true
+  },
+  "productionPolicy": {
+    "runtimeFetchesExternalSourcePack": false,
+    "runtimeUsesLosslessWebp": true,
+    "productionWebDeliveryFormat": "LOSSLESS_WEBP",
+    "productionWebDeliveryCount": 267,
+    "productionWebDeliveryBytes": 5772910,
+    "productionWebPathPattern": "/images/heroes/card-icons-webp/{id}.webp",
+    "sourcePngRuntimeFallbackEnabled": false,
+    "remoteRuntimeHotlinkEnabled": false,
+    "runtimePathChange": false,
+    "webpReencodingInThisStage": false,
+    "detailCardArtworkChange": false
+  },
+  "semanticBoundary": {
+    "canonicalHeroChanges": false,
+    "heroRelationChanges": false,
+    "localizationChanges": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "filenameSimilarityIntroduced": false,
+    "sourceMeaningReinterpreted": false,
+    "semanticRecomputationAllowed": false
+  },
+  "completion": "H5_POLICY_COMPLETE",
+  "nextOwner": "hero-card-icon-source-pack-assets",
+  "nextStage": "H6-delete-tracked-source-png",
+  "reopenConditions": [
+    "The H2 source-pack contract or pinned release-byte hashes no longer validate.",
+    "The frozen Hero card-icon source identity manifest changes population, Hero ID mapping, per-file SHA-256, or source byte lengths.",
+    "The production lossless WebP manifest changes delivery population, format, bytes, or runtime path contract.",
+    "Production runtime begins fetching the external source pack or falling back to source PNG paths.",
+    "Hero canonical or relation semantics are changed by this source transport policy."
+  ]
+}
