@@ -1,0 +1,40 @@
+name: Temporary fix Leon render surrogate handling
+
+on:
+  push:
+    branches:
+      - work/leon-reference-hero-v1
+    paths:
+      - .github/workflows/temp-fix-leon-render-surrogate.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/leon-reference-hero-v1
+          fetch-depth: 0
+      - name: Restore verified TextAsset byte handling
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/leon-reference-fullart-render.yml')
+          s=p.read_text(encoding='utf-8')
+          old="if isinstance(script,str): return script.encode('utf-8')"
+          new="if isinstance(script,str): return script.encode('utf-8','surrogateescape')"
+          assert s.count(old)==1, s.count(old)
+          p.write_text(s.replace(old,new),encoding='utf-8')
+          PY
+          rm .github/workflows/temp-fix-leon-render-surrogate.yml
+          git diff --check
+      - name: Commit bounded renderer fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Restore verified Skin TextAsset byte handling'
+          git push origin HEAD:work/leon-reference-hero-v1
