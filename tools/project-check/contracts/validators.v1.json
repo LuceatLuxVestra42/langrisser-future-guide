@@ -22,7 +22,9 @@
       "id": "status-source-selection",
       "phase": 1,
       "executable": "node",
-      "args": ["tools/status-source/test/current-main-parity.mjs"],
+      "args": [
+        "tools/status-source/test/current-main-parity.mjs"
+      ],
       "owner": "status-source",
       "coverage": "R1-1 selection parity and independence."
     },
@@ -30,7 +32,9 @@
       "id": "status-source-promotion",
       "phase": 1,
       "executable": "node",
-      "args": ["tools/status-source/test/promotion-parity.mjs"],
+      "args": [
+        "tools/status-source/test/promotion-parity.mjs"
+      ],
       "owner": "status-source",
       "coverage": "R1-2 promotion compatibility, check/apply and rollback."
     },
@@ -38,7 +42,9 @@
       "id": "status-source-producer-gate",
       "phase": 1,
       "executable": "node",
-      "args": ["tools/status-source/test/producer-gate-parity.mjs"],
+      "args": [
+        "tools/status-source/test/producer-gate-parity.mjs"
+      ],
       "owner": "status-source",
       "coverage": "R1-3 producer registration and delegation."
     },
@@ -46,7 +52,9 @@
       "id": "status-source-artifact-bridge",
       "phase": 1,
       "executable": "node",
-      "args": ["tools/status-source/test/artifact-bridge-parity.mjs"],
+      "args": [
+        "tools/status-source/test/artifact-bridge-parity.mjs"
+      ],
       "owner": "status-source",
       "coverage": "R1-4 artifact bridge parity."
     },
@@ -54,7 +62,9 @@
       "id": "status-source-lifecycle",
       "phase": 1,
       "executable": "node",
-      "args": ["tools/status-source/test/lifecycle-parity.mjs"],
+      "args": [
+        "tools/status-source/test/lifecycle-parity.mjs"
+      ],
       "owner": "status-source",
       "coverage": "R1-5 explicit declaration/closeout/CAS lifecycle."
     },
@@ -62,7 +72,9 @@
       "id": "project-status-parity",
       "phase": 2,
       "executable": "node",
-      "args": ["tools/project-status/test/current-parity.mjs"],
+      "args": [
+        "tools/project-status/test/current-parity.mjs"
+      ],
       "owner": "project-status",
       "coverage": "R2 six-domain normalization/projection parity and independence."
     },
@@ -70,7 +82,9 @@
       "id": "project-check-self-test",
       "phase": 3,
       "executable": "node",
-      "args": ["tools/project-check/test/project-check-self-test.mjs"],
+      "args": [
+        "tools/project-check/test/project-check-self-test.mjs"
+      ],
       "owner": "project-check",
       "coverage": "R3 routing, manual-review fallback, preflight and aggregate semantics."
     },
@@ -78,7 +92,9 @@
       "id": "regression-runner-self-test",
       "phase": 4,
       "executable": "node",
-      "args": ["tools/regression-runner/test/regression-runner-self-test.mjs"],
+      "args": [
+        "tools/regression-runner/test/regression-runner-self-test.mjs"
+      ],
       "owner": "regression-runner",
       "coverage": "RR3 clean-room profile authority, preflight, fail-fast, tracked-mutation guard and legacy-boundary self-test."
     },
@@ -86,7 +102,9 @@
       "id": "route-hosted-qa-self-test",
       "phase": 5,
       "executable": "node",
-      "args": ["tools/route-hosted-qa/test/route-hosted-qa-self-test.mjs"],
+      "args": [
+        "tools/route-hosted-qa/test/route-hosted-qa-self-test.mjs"
+      ],
       "owner": "route-hosted-qa",
       "coverage": "RH3 clean-room read-only HTTP contract, deterministic strict/probe execution, hosted failure boundary and legacy-runtime independence."
     },
@@ -94,7 +112,9 @@
       "id": "configdata-lookup-self-test",
       "phase": 6,
       "executable": "node",
-      "args": ["tools/configdata-lookup/test/configdata-lookup-owner-self-test.mjs"],
+      "args": [
+        "tools/configdata-lookup/test/configdata-lookup-owner-self-test.mjs"
+      ],
       "owner": "configdata-lookup",
       "coverage": "CLR3 read-only query/CLI parity, CLR5 validation/writer separation, CLR6 materialized-input shadow parity, CLR7 package CLI authority cutover and legacy Stage 7/8 active-authority retirement, Stage 6 freshness, fail-closed boundaries and tracked-mutation guard."
     },
@@ -102,7 +122,10 @@
       "id": "configdata-integrity",
       "phase": 10,
       "executable": "npm",
-      "args": ["run", "check:configdata"],
+      "args": [
+        "run",
+        "check:configdata"
+      ],
       "owner": "configdata",
       "coverage": "Parsed ConfigData integrity for explicitly admitted raw ConfigData inputs."
     },
@@ -110,7 +133,10 @@
       "id": "hero-canonical",
       "phase": 20,
       "executable": "npm",
-      "args": ["run", "validate:coverage:hero-canonical"],
+      "args": [
+        "run",
+        "validate:coverage:hero-canonical"
+      ],
       "owner": "hero-canonical",
       "coverage": "Existing Hero canonical validator."
     },
@@ -118,7 +144,10 @@
       "id": "soldier-canonical",
       "phase": 20,
       "executable": "npm",
-      "args": ["run", "validate:coverage:soldier-canonical"],
+      "args": [
+        "run",
+        "validate:coverage:soldier-canonical"
+      ],
       "owner": "soldier-canonical",
       "coverage": "Existing Soldier canonical validator."
     },
@@ -126,7 +155,10 @@
       "id": "equipment-canonical",
       "phase": 20,
       "executable": "npm",
-      "args": ["run", "validate:coverage:equipment-canonical"],
+      "args": [
+        "run",
+        "validate:coverage:equipment-canonical"
+      ],
       "owner": "equipment-canonical",
       "coverage": "Existing Equipment canonical validator."
     },
@@ -134,7 +166,10 @@
       "id": "hero-soldier-relation",
       "phase": 20,
       "executable": "npm",
-      "args": ["run", "validate:coverage:hero-soldier-relation"],
+      "args": [
+        "run",
+        "validate:coverage:hero-soldier-relation"
+      ],
       "owner": "hero-soldier-relation",
       "coverage": "Existing Hero-Soldier relation validator."
     },
@@ -142,7 +177,10 @@
       "id": "hero-equipment-relation",
       "phase": 20,
       "executable": "npm",
-      "args": ["run", "validate:coverage:hero-equipment-relation"],
+      "args": [
+        "run",
+        "validate:coverage:hero-equipment-relation"
+      ],
       "owner": "hero-equipment-relation",
       "coverage": "Existing Hero-Equipment relation validator."
     },
@@ -150,7 +188,10 @@
       "id": "banner-data",
       "phase": 20,
       "executable": "npm",
-      "args": ["run", "validate:coverage:banner-data"],
+      "args": [
+        "run",
+        "validate:coverage:banner-data"
+      ],
       "owner": "banner-data",
       "coverage": "Existing Banner data validator."
     },
@@ -158,7 +199,10 @@
       "id": "skin-relation",
       "phase": 20,
       "executable": "npm",
-      "args": ["run", "validate:coverage:skin-relation"],
+      "args": [
+        "run",
+        "validate:coverage:skin-relation"
+      ],
       "owner": "skin-relation",
       "coverage": "Existing Skin relation validator."
     },
@@ -166,7 +210,10 @@
       "id": "shared-movement",
       "phase": 20,
       "executable": "npm",
-      "args": ["run", "validate:coverage:shared-movement"],
+      "args": [
+        "run",
+        "validate:coverage:shared-movement"
+      ],
       "owner": "shared-movement",
       "coverage": "Existing shared movement validator."
     },
@@ -174,7 +221,10 @@
       "id": "soldier-assets",
       "phase": 30,
       "executable": "npm",
-      "args": ["run", "validate:coverage:soldier-assets"],
+      "args": [
+        "run",
+        "validate:coverage:soldier-assets"
+      ],
       "owner": "soldier-assets",
       "coverage": "Existing Soldier portrait validator."
     },
@@ -182,7 +232,9 @@
       "id": "soldier-training-material-assets",
       "phase": 30,
       "executable": "node",
-      "args": ["tools/project-check/test/soldier-training-material-assets-readonly.mjs"],
+      "args": [
+        "tools/project-check/test/soldier-training-material-assets-readonly.mjs"
+      ],
       "owner": "soldier-training-material-assets",
       "coverage": "Read-only A5 PNG admission, A6 WebP byte/frozen pixel-evidence binding, A7 predeploy consumer parity, and explicit non-semantic boundaries for the Soldier training-material pipeline."
     },
@@ -190,15 +242,30 @@
       "id": "skin-static-assets-readonly",
       "phase": 30,
       "executable": "node",
-      "args": ["scripts/validate-skin-stage3-5-static-assets-readonly.mjs"],
+      "args": [
+        "scripts/validate-skin-stage3-5-static-assets-readonly.mjs"
+      ],
       "owner": "skin-assets",
       "coverage": "Read-only parity of the frozen Stage 3-5 Skin static manifest, 540 repository PNG bytes, Stage 2 relation, and frozen validation checkpoint."
+    },
+    {
+      "id": "skin-fullart-assets-readonly",
+      "phase": 30,
+      "executable": "node",
+      "args": [
+        "scripts/validate-skin-fullart-assets-readonly.mjs"
+      ],
+      "owner": "skin-fullart-assets",
+      "coverage": "Read-only Leon reference full-body Skin WebP byte, alpha, dimension, current Hero shard, exact source-path and frozen manifest parity."
     },
     {
       "id": "equipment-assets",
       "phase": 30,
       "executable": "npm",
-      "args": ["run", "validate:equipment-image-final"],
+      "args": [
+        "run",
+        "validate:equipment-image-final"
+      ],
       "owner": "equipment-assets",
       "coverage": "Existing Equipment image final validator."
     },
@@ -206,7 +273,10 @@
       "id": "hero-assets",
       "phase": 30,
       "executable": "npm",
-      "args": ["run", "validate:hero-artwork-final"],
+      "args": [
+        "run",
+        "validate:hero-artwork-final"
+      ],
       "owner": "hero-assets",
       "coverage": "Existing Hero artwork final validator."
     },
@@ -214,7 +284,10 @@
       "id": "asset-intake",
       "phase": 30,
       "executable": "npm",
-      "args": ["run", "asset:intake:validate"],
+      "args": [
+        "run",
+        "asset:intake:validate"
+      ],
       "owner": "asset-intake",
       "coverage": "Existing Asset Intake validator."
     },
@@ -222,7 +295,9 @@
       "id": "skin-stage3-2-evidence",
       "phase": 30,
       "executable": "node",
-      "args": ["tools/asset-intake/test/skin-stage3-2-evidence-readonly.mjs"],
+      "args": [
+        "tools/asset-intake/test/skin-stage3-2-evidence-readonly.mjs"
+      ],
       "owner": "skin-stage3-2-evidence",
       "coverage": "Read-only Skin Stage 3-2 representative asset-resolution proof over authoritative evidence; producer behavior remains in the underlying script."
     },
@@ -230,7 +305,10 @@
       "id": "localization-audit",
       "phase": 40,
       "executable": "npm",
-      "args": ["run", "audit:localization:check"],
+      "args": [
+        "run",
+        "audit:localization:check"
+      ],
       "owner": "localization",
       "coverage": "Existing localization audit."
     },
@@ -238,7 +316,10 @@
       "id": "production-build",
       "phase": 50,
       "executable": "npm",
-      "args": ["run", "build"],
+      "args": [
+        "run",
+        "build"
+      ],
       "owner": "frontend-build",
       "coverage": "Production build for explicit frontend/build owners; not semantic proof."
     }
