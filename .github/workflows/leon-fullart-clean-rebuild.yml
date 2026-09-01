@@ -1,0 +1,114 @@
+name: Leon Fullart Clean Rebuild
+
+on:
+  push:
+    branches:
+      - work/leon-fullart-reference-v3
+    paths:
+      - .github/workflows/leon-fullart-clean-rebuild.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/leon-fullart-reference-v3
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Copy already validated Leon fullart artifacts
+        run: |
+          git fetch origin work/leon-fullart-reference-v2
+          git checkout origin/work/leon-fullart-reference-v2 -- \
+            data/contracts/skin-fullart-reference.v1.json \
+            data/evidence/leon-reference-skin-source-probe.v1.json \
+            data/generated/skin-fullart-reference.v1.json \
+            data/validation/skin-fullart-reference.v1.json \
+            public/images/skin-fullart/601.webp \
+            public/images/skin-fullart/602.webp \
+            public/images/skin-fullart/603.webp \
+            public/images/skin-fullart/604.webp \
+            public/images/skin-fullart/605.webp \
+            public/images/skin-fullart/606.webp \
+            scripts/validate-skin-fullart-assets-readonly.mjs \
+            src/lib/skin-fullart-assets.ts
+
+      - name: Apply minimal current-main Hero consumer change
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/routes/heroes_.$heroId.tsx')
+          s=p.read_text(encoding='utf-8')
+          anchor='import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";\n'
+          add='import { getSkinFullartVisuals } from "@/lib/skin-fullart-assets";\n'
+          if add not in s:
+              if s.count(anchor)!=1: raise RuntimeError('fullart import anchor drift')
+              s=s.replace(anchor,anchor+add)
+          old='''  for (const skin of detail.presentation.skins) {\n    visuals.push({\n      kind: "skin",\n      src: resolvePublicAssetUrl(skin.publicPath),\n      label: `스킨 ${skin.sourceOrder}`,\n      skinId: skin.skinId,\n      sourceOrder: skin.sourceOrder,\n    });\n  }\n'''
+          new='''  for (const skin of getSkinFullartVisuals(hero.heroId)) {\n    visuals.push({\n      kind: "skin",\n      src: resolvePublicAssetUrl(skin.publicPath),\n      label: `스킨 ${skin.sourceOrder}`,\n      skinId: skin.skinId,\n      sourceOrder: skin.sourceOrder,\n    });\n  }\n'''
+          if s.count(old)!=1: raise RuntimeError(f'legacy Skin visual loop count={s.count(old)}')
+          p.write_text(s.replace(old,new),encoding='utf-8')
+          PY
+
+      - name: Apply minimal Project Check routing additions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('tools/project-check/contracts/owners.v1.json')
+          s=p.read_text(encoding='utf-8')
+          old='    {"id":"skin-assets","validators":["skin-static-assets-readonly"]}\n'
+          new='    {"id":"skin-assets","validators":["skin-static-assets-readonly"]},\n    {"id":"skin-fullart-assets","validators":["skin-fullart-assets-readonly"]}\n'
+          if s.count(old)!=1: raise RuntimeError(f'owner insertion anchor count={s.count(old)}')
+          s=s.replace(old,new)
+          marker='''    {\n      "id":"skin-assets",\n      "patterns":["public/images/skins/**","data/generated/skin-stage3-*","data/validation/skin-stage3-*","data/contracts/skin-stage3-*","data/evidence/skin-stage3-*","scripts/*skin-stage3*",".github/workflows/skin-stage3-*"],\n      "excludePatterns":["data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json","data/validation/skin-stage3-2-readiness.v1.json"],\n      "owners":["skin-assets"]\n    },\n'''
+          insert='''    {\n      "id":"skin-fullart-assets",\n      "patterns":["public/images/skin-fullart/**","data/contracts/skin-fullart-*","data/generated/skin-fullart-*","data/validation/skin-fullart-*","data/evidence/leon-reference-skin-source-probe.v1.json","scripts/*skin-fullart*"],\n      "owners":["skin-fullart-assets"]\n    },\n    {\n      "id":"skin-fullart-hero-consumer",\n      "patterns":["src/lib/skin-fullart-assets.ts"],\n      "owners":["skin-fullart-assets","hero-frontend"]\n    },\n'''
+          if s.count(marker)!=1: raise RuntimeError(f'skin path rule anchor count={s.count(marker)}')
+          p.write_text(s.replace(marker,insert+marker),encoding='utf-8')
+
+          p=Path('tools/project-check/contracts/validators.v1.json')
+          s=p.read_text(encoding='utf-8')
+          marker='''    {\n      "id": "skin-static-assets-readonly",\n      "phase": 30,\n      "executable": "node",\n      "args": ["scripts/validate-skin-stage3-5-static-assets-readonly.mjs"],\n      "owner": "skin-assets",\n      "coverage": "Read-only parity of the frozen Stage 3-5 Skin static manifest, 540 repository PNG bytes, Stage 2 relation, and frozen validation checkpoint."\n    },\n'''
+          insert='''    {\n      "id": "skin-fullart-assets-readonly",\n      "phase": 30,\n      "executable": "node",\n      "args": ["scripts/validate-skin-fullart-assets-readonly.mjs"],\n      "owner": "skin-fullart-assets",\n      "coverage": "Read-only Leon reference full-body Skin WebP byte, alpha, dimension, current Hero shard, exact source-path and frozen manifest parity."\n    },\n'''
+          if s.count(marker)!=1: raise RuntimeError(f'validator insertion anchor count={s.count(marker)}')
+          p.write_text(s.replace(marker,marker+insert),encoding='utf-8')
+
+          p=Path('tools/project-check/test/project-check-self-test.mjs')
+          s=p.read_text(encoding='utf-8')
+          marker="const skinAsset = routeProjectCheckPaths(['data/evidence/skin-stage3-2-static-source-evidence.v1.json'], contracts);"
+          fixture='''const skinFullartAsset = routeProjectCheckPaths(['public/images/skin-fullart/601.webp'], contracts);\nassert.equal(skinFullartAsset.status, 'PLAN_READY');\nassert.deepEqual(skinFullartAsset.files[0].owners, ['skin-fullart-assets']);\nassert.deepEqual(validatorIds(skinFullartAsset), ['skin-fullart-assets-readonly']);\n\nconst skinFullartConsumer = routeProjectCheckPaths(['src/lib/skin-fullart-assets.ts'], contracts);\nassert.equal(skinFullartConsumer.status, 'PLAN_READY');\nassert.deepEqual(skinFullartConsumer.files[0].owners, ['hero-frontend', 'skin-fullart-assets']);\nassert.deepEqual(validatorIds(skinFullartConsumer), ['skin-fullart-assets-readonly', 'production-build']);\n\n'''
+          if fixture not in s:
+              if s.count(marker)!=1: raise RuntimeError(f'self-test anchor count={s.count(marker)}')
+              s=s.replace(marker,fixture+marker)
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Validate latest-main rebuilt scope
+        run: |
+          npm install --no-package-lock --no-audit --no-fund
+          node scripts/validate-skin-fullart-assets-readonly.mjs
+          node tools/project-check/test/project-check-self-test.mjs
+          npm run build
+          git diff --check
+          git diff --stat origin/main...
+          git diff --numstat origin/main... -- tools/project-check/contracts/owners.v1.json tools/project-check/contracts/validators.v1.json tools/project-check/test/project-check-self-test.mjs 'src/routes/heroes_.$heroId.tsx'
+
+      - name: Commit, run changed-path Project Check, and push
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/contracts/skin-fullart-reference.v1.json data/evidence/leon-reference-skin-source-probe.v1.json data/generated/skin-fullart-reference.v1.json data/validation/skin-fullart-reference.v1.json public/images/skin-fullart scripts/validate-skin-fullart-assets-readonly.mjs src/lib/skin-fullart-assets.ts 'src/routes/heroes_.$heroId.tsx' tools/project-check/contracts/owners.v1.json tools/project-check/contracts/validators.v1.json tools/project-check/test/project-check-self-test.mjs
+          git diff --cached --check
+          git commit -m 'Add Leon reference fullart Skin assets'
+          git diff --name-only origin/main...HEAD > /tmp/changed.txt
+          node tools/project-check/cli/check.mjs --stdin < /tmp/changed.txt
+          test -z "$(git status --porcelain --untracked-files=no)"
+          git push origin HEAD:work/leon-fullart-reference-v3
