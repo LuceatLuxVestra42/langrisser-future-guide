@@ -84,7 +84,9 @@ try {
   desktopPage.on("console", (message) => { if (message.type() === "error") desktopConsoleErrors.push(message.text()); });
 
   const desktop = await verifyHeroSoldierCards(desktopPage, "desktop");
-  const soldier101Card = desktop.cards.filter({ has: desktopPage.locator('img[src$="/images/soldiers-webp/101.webp"]') }).first();
+  const soldier101Index = expectedHero6SoldierIds.indexOf(101);
+  check(soldier101Index >= 0, "Hero 6 expected Soldier 101 index missing");
+  const soldier101Card = desktop.cards.nth(soldier101Index);
   check(await soldier101Card.count() === 1, "Hero 6 desktop Soldier 101 card missing");
   await soldier101Card.click();
   await desktopPage.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
