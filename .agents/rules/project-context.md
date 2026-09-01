@@ -6,6 +6,14 @@ This repository is the production website for a Langrisser Mobile future-informa
 
 The long-term project may expand from future-server information into a broader reference site covering characters, equipment, soldiers, events, SP systems, bonds, casting patterns, skins, and related game information.
 
+## Operating protocol authority
+
+`AGENTS.md` is the repository-level operating entrypoint for work-start authority checks, scope/owner boundaries, Project Status/Project Check usage, completed-upstream reuse, failure ownership, Git baseline hygiene, checkpoints, and owner handoffs.
+
+This file supplies project context and complementary development rules. If a conversational plan or accepted implementation predecessor conflicts with the current repository authority discovered through the `AGENTS.md` work-entry sequence, the current repository authority wins. Accepted predecessors remain implementation starting points, not automatic repository authority.
+
+Do not reactivate retired Project Doctor runtime or legacy orchestration merely to rediscover authority or resume work. Resume from the current authority chain and the last incomplete owning layer.
+
 ## Repository roles
 
 - `LuceatLuxVestra42/langrisser-future-guide`: production website source code and final web-ready assets.
@@ -22,6 +30,8 @@ Do not treat the production repository as an archive for every source asset. Kee
 - Check both desktop and mobile behavior when a UI change can affect responsive layout.
 - Prioritize clarity and easy navigation over decorative complexity.
 - Do not add services, databases, frameworks, or dependencies without a concrete need.
+- Do not reopen completed semantic/frozen work for presentation, asset, hosted, or browser/UI issues unless the authoritative reopen conditions in `AGENTS.md` are actually met.
+- When the current purpose is complete and remaining work belongs to another layer, checkpoint the result and hand off instead of extending the current owner scope.
 
 ## Safety rules
 
@@ -38,6 +48,7 @@ Do not treat the production repository as an archive for every source asset. Kee
 - Preserve useful original identifiers when available so future automation and cross-source matching remain possible.
 - Keep source/original assets separate from final web assets. Prefer copying and transforming source files rather than overwriting originals.
 - For web images, optimize for the smallest practical file size that preserves visually meaningful quality at the actual display size rather than maximizing source-resolution quality.
+- Use current frozen/generated consumers and explicit verified relations before raw-source research in completed domains; do not use names, filenames, ID arithmetic, or screen order to synthesize canonical relations.
 
 ## Decision handling
 
