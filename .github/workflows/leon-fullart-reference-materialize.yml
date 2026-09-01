@@ -1,0 +1,358 @@
+name: Leon Fullart Reference Materialize
+
+on:
+  push:
+    branches:
+      - work/leon-fullart-reference-v2
+    paths:
+      - .github/workflows/leon-fullart-reference-materialize.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout clean reference branch
+        uses: actions/checkout@v4
+        with:
+          ref: work/leon-fullart-reference-v2
+          fetch-depth: 0
+
+      - name: Checkout exact Spine 3.3 runtime
+        uses: actions/checkout@v4
+        with:
+          repository: EsotericSoftware/spine-runtimes
+          ref: 1c1936532527900f74cfb58f7002998bf157b254
+          path: .runtime/spine-runtimes
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install bounded render dependencies
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow numpy PyYAML
+
+      - name: Restore frozen Leon source evidence and verified renderer recipe
+        env:
+          OLD_LEON_REF: 0379c262408d2fd3eb0a39b4e298fab531df415c
+        run: |
+          git fetch --depth=1 origin "$OLD_LEON_REF"
+          mkdir -p .probe-tools data/evidence
+          git show "$OLD_LEON_REF:data/evidence/leon-reference-skin-source-probe.v1.json" > data/evidence/leon-reference-skin-source-probe.v1.json
+          git show "$OLD_LEON_REF:.github/workflows/leon-reference-fullart-render.yml" > .probe-tools/leon-reference-fullart-render.yml
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          shard=json.loads(Path('data/generated/hero-detail/by-id/6.json').read_text(encoding='utf-8'))
+          ev=json.loads(Path('data/evidence/leon-reference-skin-source-probe.v1.json').read_text(encoding='utf-8'))
+          actual=[(x['skinId'],x['order'],x['sourceSpinePath']) for x in shard['presentation']['skins']]
+          expected=[(x['skinId'],x['order'],x['sourceSpinePath']) for x in ev['records']]
+          if actual != expected:
+              raise SystemExit(f'Leon frozen shard drift: {actual!r} != {expected!r}')
+          print({'status':'PASS_CURRENT_MAIN_LEON_SHARD_PARITY','skinCount':len(actual)})
+          PY
+
+      - name: Render exact current-official Leon fullart set
+        env:
+          RENDER_PREDECESSOR: bccbdb564b3b2a70aeacfe6014f3829fdc7b09af
+        run: |
+          python - <<'PY'
+          import os, subprocess, yaml, json
+          from pathlib import Path
+          doc=yaml.safe_load(Path('.probe-tools/leon-reference-fullart-render.yml').read_text(encoding='utf-8'))
+          steps=doc['jobs']['render']['steps']
+          by_name={s.get('name'):s for s in steps if s.get('name')}
+          names=['Restore verified representative renderer sources','Build exact version-matched geometry probe','Extract exact current-official Char render inputs','Render exact idle_Normal pose']
+          for sid in [601,602,603,604,605,606]:
+              env=os.environ.copy(); env['SKIN_ID']=str(sid)
+              for name in names:
+                  script=by_name[name]['run']
+                  if name=='Extract exact current-official Char render inputs':
+                      old="if isinstance(script,str): return script.encode('utf-8')"
+                      new="if isinstance(script,str): return script.encode('utf-8','surrogateescape')"
+                      if script.count(old)!=1:
+                          raise RuntimeError(f'byte patch point count={script.count(old)} for {sid}')
+                      script=script.replace(old,new)
+                      if sid==604:
+                          strict="if (image.width,image.height)!=expected_size: raise RuntimeError(f'atlas texture size drift: {(image.width,image.height)} != {expected_size}')"
+                          scaled="""\nif (image.width,image.height)!=expected_size:\n    sx=image.width/expected_size[0]; sy=image.height/expected_size[1]\n    if abs(sx-sy)>1e-9:\n        raise RuntimeError(f'non-uniform atlas texture scaling: actual={(image.width,image.height)} expected={expected_size} scale={(sx,sy)}')\n    if not (0 < sx <= 1):\n        raise RuntimeError(f'unsupported atlas page scale: {sx}')\n    print(json.dumps({'atlasPageMetadataSize':expected_size,'texture2DSize':[image.width,image.height],'uniformScale':sx},ensure_ascii=False))\n"""
+                          if script.count(strict)!=1:
+                              raise RuntimeError(f'size patch point count={script.count(strict)}')
+                          script=script.replace(strict,scaled)
+                  subprocess.run(['bash','-e','-c',script],check=True,env=env)
+              root=Path(f'.probe-out/skin-{sid}')
+              summary=json.loads((root/'summary.json').read_text(encoding='utf-8'))
+              if sid==604:
+                  source=json.loads((root/'source.json').read_text(encoding='utf-8'))
+                  atlas=next((root/'raw').glob('*.atlas.txt')).read_text(encoding='utf-8').splitlines()
+                  lines=[x for x in atlas if x.strip()]
+                  expected=[int(x.strip()) for x in lines[1].split(':',1)[1].split(',')]
+                  actual=[source['inputs']['textureWidth'],source['inputs']['textureHeight']]
+                  sx=actual[0]/expected[0]; sy=actual[1]/expected[1]
+                  if abs(sx-sy)>=1e-9:
+                      raise RuntimeError('604 atlas scale lost uniform parity')
+                  summary['atlasPageMetadataSize']=expected
+                  summary['texture2DSize']=actual
+                  summary['uniformAtlasPageScale']=sx
+                  summary['uniformScaleParity']=True
+                  summary['status']='PASS_LEON_REFERENCE_FULLART_RENDER_WITH_UNIFORM_ATLAS_SCALE'
+                  (root/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+              print(json.dumps({'skinId':sid,'status':summary['status'],'canvas':summary['canvas'],'outputSizeBytes':summary['outputSizeBytes']},ensure_ascii=False))
+          PY
+
+      - name: Materialize optimized WebP assets and frozen manifest
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          from PIL import Image
+
+          ids=[601,602,603,604,605,606]
+          shard=json.loads(Path('data/generated/hero-detail/by-id/6.json').read_text(encoding='utf-8'))
+          source_ev=json.loads(Path('data/evidence/leon-reference-skin-source-probe.v1.json').read_text(encoding='utf-8'))
+          skin_by_id={x['skinId']:x for x in shard['presentation']['skins']}
+          out_root=Path('public/images/skin-fullart'); out_root.mkdir(parents=True,exist_ok=True)
+          records=[]
+          for sid in ids:
+              root=Path(f'.probe-out/skin-{sid}')
+              png=root/'fullart.png'
+              summary=json.loads((root/'summary.json').read_text(encoding='utf-8'))
+              im=Image.open(png).convert('RGBA')
+              original=[im.width,im.height]
+              scale=min(1.0,1600/max(im.width,im.height))
+              if scale < 1.0:
+                  im=im.resize((max(1,round(im.width*scale)),max(1,round(im.height*scale))),Image.Resampling.LANCZOS)
+              target=out_root/f'{sid}.webp'
+              im.save(target,'WEBP',quality=90,method=6,exact=True)
+              raw=target.read_bytes(); sha=hashlib.sha256(raw).hexdigest()
+              skin=skin_by_id[sid]
+              records.append({
+                  'skinId':sid,'heroId':6,'sourceOrder':skin['order'],'nameCn':skin['nameCn'],
+                  'sourceSpinePath':skin['sourceSpinePath'],
+                  'repoPath':target.as_posix(),'publicPath':f'/images/skin-fullart/{sid}.webp',
+                  'width':im.width,'height':im.height,'maxDimension':max(im.width,im.height),
+                  'hasAlpha':True,'sizeBytes':len(raw),'sha256':sha,
+                  'renderStatus':summary['status'],'renderPose':'idle_Normal @ 0',
+                  'originalCanvas':original,
+              })
+          manifest={
+              'schemaVersion':1,
+              'status':'LEON_REFERENCE_FULLART_MATERIALIZED',
+              'referenceHeroId':6,
+              'format':{'codec':'webp','quality':90,'method':6,'maxDimension':1600,'alphaRequired':True},
+              'authority':{
+                  'heroShard':'data/generated/hero-detail/by-id/6.json',
+                  'officialInstallerVersion':source_ev['authority']['officialInstallerVersion'],
+                  'officialBundle':source_ev['bundle'],
+                  'rendererPredecessor':'bccbdb564b3b2a70aeacfe6014f3829fdc7b09af',
+                  'spineRuntimeCommit':'1c1936532527900f74cfb58f7002998bf157b254',
+              },
+              'boundaries':{
+                  'semanticRecomputed':False,'relationRecomputed':False,'nameJoin':False,'idArithmetic':False,
+                  'legacyStaticAssetConsumed':False,'originalPngCommitted':False,
+              },
+              'records':records,
+          }
+          Path('data/generated').mkdir(parents=True,exist_ok=True)
+          Path('data/generated/skin-fullart-reference.v1.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          contract={
+              'schemaVersion':1,'stage':'skin-fullart-reference','status':'DESIGN_FROZEN','referenceHeroId':6,
+              'expectedSkinIds':ids,'expectedSkinCount':6,
+              'outputRoot':'public/images/skin-fullart','publicRoot':'/images/skin-fullart',
+              'format':manifest['format'],
+              'completion':{'status':'PASS_SKIN_FULLART_REFERENCE_ASSETS','expectedAcceptedCount':6},
+              'reopenConditions':['current hero shard Skin ID/order/sourceSpinePath changes','official source bundle hash changes','fullart file byte/hash parity breaks','fullart consumer path contract changes'],
+          }
+          Path('data/contracts').mkdir(parents=True,exist_ok=True)
+          Path('data/contracts/skin-fullart-reference.v1.json').write_text(json.dumps(contract,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print({'status':manifest['status'],'skinCount':len(records),'totalBytes':sum(r['sizeBytes'] for r in records)})
+          PY
+
+      - name: Add read-only fullart validator and generated client consumer
+        run: |
+          cat > scripts/validate-skin-fullart-assets-readonly.mjs <<'EOF'
+          import fs from 'node:fs';
+          import crypto from 'node:crypto';
+          import path from 'node:path';
+
+          const readJson = p => JSON.parse(fs.readFileSync(p, 'utf8'));
+          const sha256 = b => crypto.createHash('sha256').update(b).digest('hex');
+          const contract = readJson('data/contracts/skin-fullart-reference.v1.json');
+          const manifest = readJson('data/generated/skin-fullart-reference.v1.json');
+          const shard = readJson('data/generated/hero-detail/by-id/6.json');
+          const fail = m => { throw new Error(m); };
+          const eq = (a,b,m) => { if (JSON.stringify(a)!==JSON.stringify(b)) fail(`${m}: ${JSON.stringify(a)} != ${JSON.stringify(b)}`); };
+
+          if (contract.status !== 'DESIGN_FROZEN' || contract.referenceHeroId !== 6) fail('invalid fullart contract');
+          if (manifest.status !== 'LEON_REFERENCE_FULLART_MATERIALIZED' || manifest.referenceHeroId !== 6) fail('invalid fullart manifest');
+          eq(contract.expectedSkinIds, [601,602,603,604,605,606], 'reference Skin IDs changed');
+          if (!manifest.boundaries || manifest.boundaries.semanticRecomputed !== false || manifest.boundaries.relationRecomputed !== false || manifest.boundaries.nameJoin !== false || manifest.boundaries.idArithmetic !== false || manifest.boundaries.legacyStaticAssetConsumed !== false) fail('fullart non-semantic boundaries changed');
+          if (manifest.authority?.officialInstallerVersion !== '1.1.113') fail('official installer version changed');
+          if (manifest.authority?.officialBundle?.bundleSha256 !== '3fde9e1d477bfb8c7426e11036a7432f213237ef36944706948789a2e1c717da') fail('official Leon bundle hash changed');
+
+          const shardSkins = shard.presentation?.skins ?? [];
+          const byId = new Map(shardSkins.map(x => [x.skinId, x]));
+          if (manifest.records.length !== 6) fail(`fullart record count ${manifest.records.length} != 6`);
+          const expectedFiles = new Set(contract.expectedSkinIds.map(id => `${id}.webp`));
+          const seen = new Set();
+          let totalBytes = 0;
+          for (const r of manifest.records) {
+            if (seen.has(r.skinId)) fail(`duplicate skinId ${r.skinId}`); seen.add(r.skinId);
+            const source = byId.get(r.skinId); if (!source) fail(`skin ${r.skinId} absent from current Hero 6 shard`);
+            if (r.heroId !== 6 || r.sourceOrder !== source.order || r.sourceSpinePath !== source.sourceSpinePath || r.nameCn !== source.nameCn) fail(`source parity changed for ${r.skinId}`);
+            const expectedRepo = `public/images/skin-fullart/${r.skinId}.webp`;
+            const expectedPublic = `/images/skin-fullart/${r.skinId}.webp`;
+            if (r.repoPath !== expectedRepo || r.publicPath !== expectedPublic) fail(`path contract changed for ${r.skinId}`);
+            if (r.maxDimension > contract.format.maxDimension || Math.max(r.width,r.height) !== r.maxDimension || r.hasAlpha !== true) fail(`image metadata invalid for ${r.skinId}`);
+            const b = fs.readFileSync(r.repoPath);
+            if (b.length !== r.sizeBytes || sha256(b) !== r.sha256) fail(`byte parity failed for ${r.skinId}`);
+            if (b.toString('ascii',0,4) !== 'RIFF' || b.toString('ascii',8,12) !== 'WEBP') fail(`not WebP for ${r.skinId}`);
+            let off=12, vp8x=null;
+            while (off+8<=b.length) {
+              const tag=b.toString('ascii',off,off+4); const size=b.readUInt32LE(off+4); const start=off+8;
+              if (tag==='VP8X' && size>=10) { vp8x=b.subarray(start,start+10); break; }
+              off=start+size+(size%2);
+            }
+            if (!vp8x) fail(`VP8X missing for ${r.skinId}`);
+            const alpha=(vp8x[0] & 0x10)!==0;
+            const width=1+vp8x[4]+(vp8x[5]<<8)+(vp8x[6]<<16);
+            const height=1+vp8x[7]+(vp8x[8]<<8)+(vp8x[9]<<16);
+            if (!alpha || width!==r.width || height!==r.height) fail(`WebP alpha/dimension parity failed for ${r.skinId}`);
+            totalBytes += b.length;
+          }
+          eq([...seen].sort((a,b)=>a-b), contract.expectedSkinIds, 'Skin ID set changed');
+          const actual = fs.readdirSync(contract.outputRoot,{withFileTypes:true}).filter(x=>x.isFile()).map(x=>x.name).sort();
+          eq(actual,[...expectedFiles].sort(),'unexpected fullart files');
+          const result={status:'PASS_SKIN_FULLART_REFERENCE_ASSETS',referenceHeroId:6,acceptedSkinCount:6,totalBytes,repositoryMutation:false};
+          const frozenPath='data/validation/skin-fullart-reference.v1.json';
+          if (fs.existsSync(frozenPath)) eq(readJson(frozenPath),result,'frozen fullart validation changed');
+          console.log(JSON.stringify(result,null,2));
+          EOF
+
+          cat > src/lib/skin-fullart-assets.ts <<'EOF'
+          import manifest from "../../data/generated/skin-fullart-reference.v1.json";
+
+          export type SkinFullartVisual = {
+            skinId: number;
+            sourceOrder: number;
+            publicPath: string;
+          };
+
+          export function getSkinFullartVisuals(heroId: number): SkinFullartVisual[] {
+            return manifest.records
+              .filter((record) => record.heroId === heroId)
+              .sort((a, b) => a.sourceOrder - b.sourceOrder)
+              .map((record) => ({
+                skinId: record.skinId,
+                sourceOrder: record.sourceOrder,
+                publicPath: record.publicPath,
+              }));
+          }
+          EOF
+
+      - name: Replace legacy Skin card consumption with fullart manifest consumer
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/routes/heroes_.$heroId.tsx')
+          s=p.read_text(encoding='utf-8')
+          anchor='import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";\n'
+          add='import { getSkinFullartVisuals } from "@/lib/skin-fullart-assets";\n'
+          if add not in s:
+              if s.count(anchor)!=1: raise RuntimeError('skin fullart import anchor drift')
+              s=s.replace(anchor,anchor+add)
+          old='''  for (const skin of detail.presentation.skins) {\n    visuals.push({\n      kind: "skin",\n      src: resolvePublicAssetUrl(skin.publicPath),\n      label: `스킨 ${skin.sourceOrder}`,\n      skinId: skin.skinId,\n      sourceOrder: skin.sourceOrder,\n    });\n  }\n'''
+          new='''  for (const skin of getSkinFullartVisuals(hero.heroId)) {\n    visuals.push({\n      kind: "skin",\n      src: resolvePublicAssetUrl(skin.publicPath),\n      label: `스킨 ${skin.sourceOrder}`,\n      skinId: skin.skinId,\n      sourceOrder: skin.sourceOrder,\n    });\n  }\n'''
+          if s.count(old)!=1: raise RuntimeError(f'legacy Skin visual loop count={s.count(old)}')
+          p.write_text(s.replace(old,new),encoding='utf-8')
+          PY
+
+      - name: Admit explicit fullart owner and validator into Project Check
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          op=Path('tools/project-check/contracts/owners.v1.json')
+          owners=json.loads(op.read_text(encoding='utf-8'))
+          if not any(x['id']=='skin-fullart-assets' for x in owners['owners']):
+              idx=next(i for i,x in enumerate(owners['owners']) if x['id']=='skin-assets')+1
+              owners['owners'].insert(idx,{'id':'skin-fullart-assets','validators':['skin-fullart-assets-readonly']})
+          if not any(x['id']=='skin-fullart-assets' for x in owners['pathRules']):
+              idx=next(i for i,x in enumerate(owners['pathRules']) if x['id']=='skin-assets')
+              owners['pathRules'].insert(idx,{
+                  'id':'skin-fullart-assets',
+                  'patterns':['public/images/skin-fullart/**','data/contracts/skin-fullart-*','data/generated/skin-fullart-*','data/validation/skin-fullart-*','data/evidence/leon-reference-skin-source-probe.v1.json','scripts/*skin-fullart*'],
+                  'owners':['skin-fullart-assets']})
+              owners['pathRules'].insert(idx+1,{
+                  'id':'skin-fullart-hero-consumer',
+                  'patterns':['src/lib/skin-fullart-assets.ts'],
+                  'owners':['skin-fullart-assets','hero-frontend']})
+          op.write_text(json.dumps(owners,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          vp=Path('tools/project-check/contracts/validators.v1.json')
+          validators=json.loads(vp.read_text(encoding='utf-8'))
+          catalog=validators['validators']
+          if not any(x['id']=='skin-fullart-assets-readonly' for x in catalog):
+              idx=next(i for i,x in enumerate(catalog) if x['id']=='skin-static-assets-readonly')+1
+              catalog.insert(idx,{
+                  'id':'skin-fullart-assets-readonly','phase':30,'executable':'node',
+                  'args':['scripts/validate-skin-fullart-assets-readonly.mjs'],'owner':'skin-fullart-assets',
+                  'coverage':'Read-only Leon reference full-body Skin WebP byte, alpha, dimension, current Hero shard, exact source-path and frozen manifest parity.'})
+          vp.write_text(json.dumps(validators,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          tp=Path('tools/project-check/test/project-check-self-test.mjs')
+          s=tp.read_text(encoding='utf-8')
+          marker="const skinAsset = routeProjectCheckPaths(['data/evidence/skin-stage3-2-static-source-evidence.v1.json'], contracts);"
+          fixture='''const skinFullartAsset = routeProjectCheckPaths(['public/images/skin-fullart/601.webp'], contracts);\nassert.equal(skinFullartAsset.status, 'PLAN_READY');\nassert.deepEqual(skinFullartAsset.files[0].owners, ['skin-fullart-assets']);\nassert.deepEqual(validatorIds(skinFullartAsset), ['skin-fullart-assets-readonly']);\n\nconst skinFullartConsumer = routeProjectCheckPaths(['src/lib/skin-fullart-assets.ts'], contracts);\nassert.equal(skinFullartConsumer.status, 'PLAN_READY');\nassert.deepEqual(skinFullartConsumer.files[0].owners, ['hero-frontend', 'skin-fullart-assets']);\nassert.deepEqual(validatorIds(skinFullartConsumer), ['skin-fullart-assets-readonly', 'production-build']);\n\n'''
+          if fixture not in s:
+              if s.count(marker)!=1: raise RuntimeError('project-check self-test insertion anchor drift')
+              s=s.replace(marker,fixture+marker)
+          tp.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Freeze independent fullart validation result
+        run: |
+          node scripts/validate-skin-fullart-assets-readonly.mjs | tee /tmp/fullart-validation.json
+          node - <<'NODE'
+          import fs from 'node:fs';
+          const result=JSON.parse(fs.readFileSync('/tmp/fullart-validation.json','utf8'));
+          fs.mkdirSync('data/validation',{recursive:true});
+          fs.writeFileSync('data/validation/skin-fullart-reference.v1.json',JSON.stringify(result,null,2)+'\n');
+          NODE
+          node scripts/validate-skin-fullart-assets-readonly.mjs
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Commit locally then run changed-path Project Check
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/evidence/leon-reference-skin-source-probe.v1.json data/contracts/skin-fullart-reference.v1.json data/generated/skin-fullart-reference.v1.json data/validation/skin-fullart-reference.v1.json public/images/skin-fullart scripts/validate-skin-fullart-assets-readonly.mjs src/lib/skin-fullart-assets.ts 'src/routes/heroes_.$heroId.tsx' tools/project-check/contracts/owners.v1.json tools/project-check/contracts/validators.v1.json tools/project-check/test/project-check-self-test.mjs
+          git diff --cached --check
+          git commit -m 'Add Leon reference fullart Skin assets'
+          git diff --name-only origin/main...HEAD | grep -v '^.github/workflows/leon-fullart-reference-materialize.yml$' > /tmp/changed.txt
+          cat /tmp/changed.txt
+          node tools/project-check/cli/check.mjs --stdin < /tmp/changed.txt
+          git status --short
+          test -z "$(git status --porcelain)"
+
+      - name: Push validated reference implementation
+        run: git push origin HEAD:work/leon-fullart-reference-v2
