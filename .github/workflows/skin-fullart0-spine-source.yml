@@ -6,6 +6,7 @@ on:
       - work/skin-stage3-3-batched-20260901
     paths:
       - scripts/extract-skin-fullart0-spine-source.py
+      - scripts/extract-skin-fullart0-spine-source-v2.py
       - .github/workflows/skin-fullart0-spine-source.yml
       - data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json
   workflow_dispatch:
@@ -36,7 +37,7 @@ jobs:
         run: python -m pip install --disable-pip-version-check UnityPy==1.25.3
 
       - name: Extract current Skin 102 Spine source chain
-        run: python scripts/extract-skin-fullart0-spine-source.py
+        run: python scripts/extract-skin-fullart0-spine-source-v2.py
 
       - name: Upload raw current Spine source proof
         uses: actions/upload-artifact@v4
