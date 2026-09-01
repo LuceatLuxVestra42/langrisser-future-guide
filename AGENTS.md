@@ -85,6 +85,44 @@ Treat source/reference materials outside this repository as read-only unless the
 
 Keep original/source assets separate from final website assets. Copy and transform source material rather than overwriting the original whenever possible. Preserve useful original identifiers such as internal English names or IDs when creating normalized website data, when available.
 
+## Retrieval and context discipline
+
+Keep repository retrieval narrow so long-running work does not accumulate unnecessary context. Use the smallest evidence surface that can reliably answer the current question.
+
+Default retrieval order:
+
+1. reuse already-established evidence when the relevant authority, source/SHA, failure signature, and question have not materially changed;
+2. search or locate the relevant owner, artifact, path, symbol, record, or failure before broad retrieval;
+3. fetch only the relevant file, range, record, patch, step, or equivalent targeted evidence;
+4. expand to directly related evidence one level at a time only when the current evidence is insufficient;
+5. use full-tree, full-diff, full-log, large-blob, or similarly broad retrieval only when narrower evidence cannot establish the result.
+
+Use the first 1–3 primary files or artifacts as a soft initial investigation budget when practical. This is not a hard limit.
+
+For pull requests and repository changes:
+
+- inspect changed paths or filenames before requesting a full diff;
+- prefer relevant per-file patches or targeted ranges when sufficient;
+- do not fetch the full PR diff by default;
+- use a full diff when whole-scope or cross-file review actually requires it.
+
+For CI and Actions:
+
+- start from workflow, job, and step status rather than full raw logs;
+- inspect the failed step or relevant error range first;
+- do not fetch full Actions logs by default;
+- normally reuse successful PASS results without reading their full raw logs;
+- reuse an already-established failure signature instead of repeatedly retrieving the same failing output;
+- expand to broader logs only when targeted evidence cannot identify the failure.
+
+Do not repeatedly enumerate the full repository tree. Search known paths or relevant directories first and expand only when the required evidence remains unresolved.
+
+If a result is truncated, narrow the query, path, identifier, or requested range instead of repeating the same oversized retrieval.
+
+Reuse previously established evidence by default. Refetch or revalidate when relevant authority, source/SHA, contract, changed scope, failure signature, or the question being answered has materially changed.
+
+These are default efficiency rules, not absolute prohibitions. Broader retrieval is appropriate when targeted evidence cannot establish the result, including whole-scope comparison, final diff review, unknown-cause debugging, security-sensitive inspection, or genuine cross-file analysis.
+
 ## Failure ownership and validation gates
 
 Classify failures by the layer that owns them. Do not cascade one failure into unrelated layers.
