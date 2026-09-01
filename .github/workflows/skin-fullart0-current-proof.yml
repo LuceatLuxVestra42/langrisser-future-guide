@@ -1,0 +1,70 @@
+name: Skin FULLART-0 Current Proof
+
+on:
+  push:
+    branches:
+      - work/skin-stage3-3-batched-20260901
+    paths:
+      - scripts/inspect-skin-fullart0-current.py
+      - .github/workflows/skin-fullart0-current-proof.yml
+      - data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json
+      - data/validation/skin-stage3-2-readiness.v1.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: skin-fullart0-current-proof
+  cancel-in-progress: false
+
+jobs:
+  probe-skin-102:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current work branch
+        uses: actions/checkout@v4
+        with:
+          ref: work/skin-stage3-3-batched-20260901
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install current frozen parser
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3
+
+      - name: Probe Skin 102 from current official installer only
+        run: python scripts/inspect-skin-fullart0-current.py
+
+      - name: Upload current candidate evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-fullart0-current-probe
+          path: |
+            data/evidence/skin-fullart0-current-probe.v1.json
+            .skin-fullart0-current/candidates/*.png
+          if-no-files-found: warn
+
+      - name: Remove execution-only installer state
+        run: rm -rf .skin-fullart0-current
+
+      - name: Fail closed on unrelated tracked mutation
+        run: |
+          allowed='^data/evidence/skin-fullart0-current-probe\.v1\.json$'
+          bad="$(git status --porcelain --untracked-files=all | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
+          if [ -n "$bad" ]; then
+            printf 'Unexpected tracked/untracked paths after FULLART-0 current probe:\n%s\n' "$bad"
+            exit 1
+          fi
+
+      - name: Freeze current-only diagnostic evidence
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/evidence/skin-fullart0-current-probe.v1.json
+          git diff --cached --quiet && { echo 'Current FULLART-0 probe already frozen; nothing to commit.'; exit 0; }
+          git commit -m 'Freeze Skin FULLART-0 current-only probe'
+          git push origin HEAD:work/skin-stage3-3-batched-20260901
