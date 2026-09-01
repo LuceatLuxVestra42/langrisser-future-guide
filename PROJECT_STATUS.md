@@ -5,7 +5,7 @@
 - Project health: **REVIEW**
 - Hard errors: **0**
 - Reported review entries: **28**
-- Health-impact review entries: **11**
+- Health-impact review entries: **9**
 - Blockers: **0**
 - Source: `tools/project-status/lib/normalize-project-status.mjs`
 
@@ -22,18 +22,18 @@
 
 > Reported review entry는 source에 남아 있는 review 기록 수다. 현재 health를 REVIEW로 만드는 항목 수와 같지 않다.
 
-- Active review entries: **11**
-- Resolved by evidence: **1**
+- Active review entries: **9**
+- Resolved by evidence: **2**
 - Deferred non-errors: **8**
-- Boundary notes: **8**
+- Boundary notes: **9**
 - Assigned health-impact issues: **6**
-- Unique assigned issues: **23**
-- Unassigned review entries: **3**
+- Unique assigned issues: **25**
+- Unassigned review entries: **1**
 
 | Domain | Reported | Health-impact | Active | Resolved | Deferred | Boundary | Health |
 |---|---:|---:|---:|---:|---:|---:|---|
 | hero | 2 | 1 | 1 | 0 | 0 | 1 | REVIEW |
-| soldier | 12 | 6 | 6 | 1 | 1 | 4 | REVIEW |
+| soldier | 12 | 4 | 4 | 2 | 1 | 5 | REVIEW |
 | equipment | 1 | 1 | 1 | 0 | 0 | 0 | REVIEW |
 | hero-soldier | 5 | 2 | 2 | 0 | 0 | 3 | REVIEW |
 | banner | 8 | 1 | 1 | 0 | 7 | 0 | REVIEW |
@@ -47,7 +47,7 @@
 |---|---|---:|---:|
 | BANNER_MANUAL_IMAGE_PENDING | banner | 1 | 1 |
 | EQUIPMENT_SECONDARY_ARCHIVE_PROVENANCE | equipment | 1 | 1 |
-| SOLDIER_KR_NAME_PRESENTATION_COVERAGE | hero-soldier, soldier | 2 | 2 |
+| SOLDIER_KR_NAME_OFFICIAL_CONFIRMATION | hero-soldier, soldier | 2 | 2 |
 | SOLDIER_RELEASE_DATE_METADATA | hero-soldier, soldier | 2 | 2 |
 | SOLDIER_SAME_PATCH_ORDER | soldier | 1 | 1 |
 | SOLDIER_SP_INTERNAL_RELEASE_ORDER | soldier | 1 | 1 |
