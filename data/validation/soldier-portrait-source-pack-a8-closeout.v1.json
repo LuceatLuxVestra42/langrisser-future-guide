@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "checkpoint": "soldier-portrait-source-pack-a8-closeout",
+  "status": "COMPLETE",
+  "lifecycle": "CLOSED",
+  "owner": "soldier-assets",
+  "purpose": "Close Soldier repository-size-reduction 1A after external source-pack admission, repository source-PNG removal, post-deletion exact-byte/WebP validation, and production build validation, without reopening canonical Soldier semantics or Hero-Soldier relations.",
+  "authoritativePredecessor": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "mainShaAtCloseoutStart": "6c563a07d925abf6602b6bb3c1ea7c36d991a9af",
+    "sourcePackContract": "data/contracts/soldier-portrait-source-pack.v1.json",
+    "sourceManifest": "data/generated/soldier-portrait-manifest.v9.json",
+    "productionWebManifest": "data/generated/soldier-portrait-web-manifest.v1.json",
+    "owningValidator": "npm run validate:coverage:soldier-assets",
+    "frontendValidator": "npm run build"
+  },
+  "frozenSourcePack": {
+    "sourceCommitSha": "5dc0904987b36b36776d887bea9445dd65ee64b6",
+    "releaseTag": "source-assets-soldier-v9-5dc09049",
+    "releaseId": 380563632,
+    "archive": {
+      "name": "soldier-portrait-source-v9-5dc09049.tar.gz",
+      "bytes": 46731491,
+      "sha256": "1a2d56ba43d3f83390208d1351eb9c48d38f80adfe95b19afee1c27b54ad3cb6"
+    },
+    "inventory": {
+      "name": "soldier-portrait-source-v9-5dc09049.inventory.json",
+      "bytes": 44321,
+      "sha256": "48c56ffb39edbb9063e5d275f13ce1e9406a872273d68eb54e263e44fc3cfe42"
+    },
+    "checksums": {
+      "name": "soldier-portrait-source-v9-5dc09049.sha256",
+      "bytes": 226,
+      "sha256": "b667e2cf7aa52360ebd8791f46d94c26c78e1f24dfccbb28cc7ccbf83c634f0c"
+    },
+    "sourceFileCount": 224,
+    "sourceTotalBytes": 48931121,
+    "normalCount": 168,
+    "spCount": 56,
+    "missingCount": 0,
+    "extraCount": 0,
+    "duplicateCount": 0,
+    "repositorySourcePngCountAfterA5": 0
+  },
+  "productionState": {
+    "runtimeSourcePackFetch": false,
+    "publicRoot": "images/soldiers-webp",
+    "webpCount": 224,
+    "webpTotalBytes": 30577298,
+    "unresolvedCount": 0,
+    "resolvedSpCount": 56,
+    "runtimePathChangedBy1A": false,
+    "webpReencodedBy1A": false,
+    "productionBuildAfterSourcePngDeletion": "PASS"
+  },
+  "completedStages": [
+    {
+      "stage": "A1",
+      "completion": "EXACT_BYTE_SOURCE_PACK_BUILT_AND_PUBLISHED",
+      "evidence": {
+        "workflowRunId": 33518192447,
+        "releaseTag": "source-assets-soldier-v9-5dc09049"
+      }
+    },
+    {
+      "stage": "A2",
+      "completion": "SOURCE_PACK_HASH_CONTRACT_PINNED",
+      "evidence": {
+        "contract": "data/contracts/soldier-portrait-source-pack.v1.json"
+      }
+    },
+    {
+      "stage": "A3",
+      "completion": "EXTERNAL_DOWNLOAD_VERIFY_AND_HYDRATION_PROVED",
+      "evidence": {
+        "hydrator": "scripts/hydrate-soldier-portrait-source-pack-v1.mjs",
+        "workflowRunId": 33557250221
+      }
+    },
+    {
+      "stage": "A4",
+      "completion": "OWNING_VALIDATOR_FAIL_CLOSED_ON_EXTERNAL_SOURCE_PACK",
+      "evidence": {
+        "pullRequest": 397,
+        "headSha": "d2063ab293ff560ae17fc61a92d87be26ea61b1d",
+        "validator": "npm run validate:coverage:soldier-assets"
+      }
+    },
+    {
+      "stage": "A5",
+      "completion": "REPOSITORY_SOURCE_PNG_COPY_REMOVED",
+      "evidence": {
+        "pullRequest": 398,
+        "headSha": "44c340d9eeb2ff40cc0d6a3feab276b3ba0c548e",
+        "deletedSourcePngCount": 224
+      }
+    },
+    {
+      "stage": "A6",
+      "completion": "POST_DELETION_EXTERNAL_SOURCE_AND_WEBP_PARITY_PASS",
+      "evidence": {
+        "pullRequest": 402,
+        "headSha": "6780691899dcb682e47b8486431860189d7d929b",
+        "mergeMainSha": "2bd02c7949d64fb14c37215cd60472469a001b04",
+        "repositorySourcePngCount": 0,
+        "externalSourcePackVerified": true,
+        "productionWebpVerified": 224,
+        "productionWebpBytes": 30577298
+      }
+    },
+    {
+      "stage": "A7",
+      "completion": "PRODUCTION_BUILD_WITHOUT_REPOSITORY_SOURCE_PNG_PASS",
+      "evidence": {
+        "pullRequest": 404,
+        "headSha": "94c86d2267e9457c71b46972fba490d015af9041",
+        "mergeMainSha": "6c563a07d925abf6602b6bb3c1ea7c36d991a9af",
+        "projectCheckWorkflowRunId": 33562614500,
+        "projectCheckStatus": "PASS",
+        "projectCheckCompletion": "COMPLETE",
+        "productionBuildExitCode": 0
+      }
+    }
+  ],
+  "resolvedBlockers": [
+    {
+      "id": "PROJECT_CHECK_DELETION_PATH_OMITTED",
+      "cause": "Project Check changed-path collection excluded deleted paths, so a deletion-only Soldier asset change could skip the owning validator.",
+      "resolution": "Deletion diff routing was repaired and covered by a real Soldier PNG deletion regression fixture before A5 was admitted.",
+      "pullRequest": 400,
+      "headSha": "cd30b6f0c900a59bc74c5f34160a535c40fb797b",
+      "status": "RESOLVED"
+    }
+  ],
+  "boundaries": {
+    "canonicalSoldierChanges": false,
+    "heroSoldierRelationChanges": false,
+    "localizationChanges": false,
+    "productionRuntimeUrlChanges": false,
+    "webpReencoding": false,
+    "rawConfigDataReinterpretation": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "gitHistoryRewrite": false,
+    "projectStatusSemanticRecomputation": false
+  },
+  "blockers": [],
+  "nonBlockingReviews": [
+    {
+      "id": "RELEASE_METADATA_NOT_IMMUTABLE",
+      "status": "REVIEW",
+      "detail": "The GitHub Release was not immutable at admission. Integrity remains fail-closed through pinned archive, inventory, checksum, exact-file-set, and per-file byte hashes; changed bytes require a new tag and contract version."
+    },
+    {
+      "id": "GIT_HISTORY_SIZE_NOT_REWRITTEN",
+      "status": "BOUNDARY_NOTE",
+      "detail": "1A reduces current and future repository-tree duplication only. Historical source-PNG blobs remain in Git history because history rewriting was explicitly out of scope."
+    }
+  ],
+  "handoff": {
+    "soldier1AOwnerComplete": true,
+    "nextOwner": null,
+    "nextStart": "No Soldier 1A follow-up is required. Any Hero source-asset externalization is a separate scope and must re-check current main authority and Hero asset routing before work starts.",
+    "localWorkingTreeState": "UNKNOWN_NOT_OBSERVED"
+  },
+  "reopenConditions": [
+    "The pinned Soldier source-pack archive, inventory, or checksum SHA-256 no longer matches fetched bytes.",
+    "The external source pack no longer contains exactly the frozen 224 PNG source files or any per-file SHA-256/size differs from the v9 source manifest.",
+    "Repository Soldier source PNGs are reintroduced without an explicit new asset-owner decision.",
+    "Production Soldier WebP coverage, file hashes, total bytes, or public root loses parity with the admitted web manifest.",
+    "The production Soldier portrait runtime begins depending on the external source pack or changes its delivery path.",
+    "An authoritative Soldier portrait source contradiction or contract change invalidates this closeout.",
+    "The soldier-assets owning validator stops failing closed on the external exact-byte source-pack boundary."
+  ]
+}
