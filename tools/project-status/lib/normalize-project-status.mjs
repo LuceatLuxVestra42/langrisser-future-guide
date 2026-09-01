@@ -478,11 +478,12 @@ export function normalizeDomain({ domain, baseSpec, activeMeta, contract, review
   const statusLooksFailed = typeof rawStatus === 'string' && rawStatus.toUpperCase().includes('FAIL');
   const statusLooksAccepted = typeof rawStatus === 'string'
     && (rawStatus.toUpperCase().startsWith('PASS') || rawStatus === 'READY_FOR_ASSET_EVIDENCE');
+  const hasHealthImpactReview = reviews.some(review => review.healthImpact === true);
 
   let health = 'UNKNOWN';
   if (explicitFailureSignals.length > 0 || statusLooksFailed) health = 'FAIL';
   else if (consistencyIssues.length > 0) health = 'INCONSISTENT';
-  else if (reviews.length > 0 || blockers.length > 0) health = 'REVIEW';
+  else if (hasHealthImpactReview || blockers.length > 0) health = 'REVIEW';
   else if (statusLooksAccepted) health = 'PASS';
 
   const primaryFacet = spec.primaryFacet ?? activeMeta?.facet ?? null;
