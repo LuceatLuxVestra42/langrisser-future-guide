@@ -31,7 +31,7 @@ async function fetchWithRetry(path, attempts = 5) {
 }
 
 let manifest = null;
-for (let attempt = 1; attempt <= 30; attempt += 1) {
+for (let attempt = 1; attempt <= 120; attempt += 1) {
   try {
     const response = await fetch(url(`authoritative-pages-source.json?qa=${Date.now()}`), { cache: "no-store" });
     if (response.ok) {
@@ -42,7 +42,7 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
       }
     }
   } catch {}
-  if (attempt < 30) await sleep(5000);
+  if (attempt < 120) await sleep(5000);
 }
 check(manifest, `authoritative deployment manifest did not reach source=${expectedSourceSha} with current frozen Skin consumer`);
 check(manifest.semanticStageReopened === false, "deployment manifest reopened semantic stage");
