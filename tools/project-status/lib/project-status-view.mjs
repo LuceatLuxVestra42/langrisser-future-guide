@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { normalizeProjectStatus } from './normalize-project-status.mjs';
 
 const escapeCell = value => String(value ?? '-')
@@ -16,7 +19,41 @@ const nextWorkSummary = nextWork => {
   return values.length === 0 ? '-' : values.join(' / ');
 };
 
-export function projectStatusView(normalized) {
+const repositoryFile = (repoRoot, relativePath) => {
+  if (typeof relativePath !== 'string' || relativePath.length === 0 || path.isAbsolute(relativePath)) {
+    throw new Error(`Project Status freshness refuses invalid source path: ${relativePath ?? 'missing'}`);
+  }
+  const root = path.resolve(repoRoot);
+  const absolute = path.resolve(root, relativePath);
+  if (absolute !== root && !absolute.startsWith(`${root}${path.sep}`)) {
+    throw new Error(`Project Status freshness source escapes repository: ${relativePath}`);
+  }
+  return absolute;
+};
+
+const sourceFingerprint = (repoRoot, record) => {
+  const sourcePaths = [
+    record.primarySource?.path ?? null,
+    ...(record.supplementalSources ?? []).map(item => item.path ?? null),
+  ].filter(Boolean);
+
+  const hash = createHash('sha256');
+  for (const sourcePath of sourcePaths) {
+    const bytes = fs.readFileSync(repositoryFile(repoRoot, sourcePath));
+    hash.update(sourcePath, 'utf8');
+    hash.update('\0', 'utf8');
+    hash.update(bytes);
+    hash.update('\0', 'utf8');
+  }
+
+  return {
+    algorithm: 'sha256',
+    digest: hash.digest('hex'),
+    sourceCount: sourcePaths.length,
+  };
+};
+
+export function projectStatusView(normalized, runtime = {}) {
   if (normalized?.schemaId !== 'project-status-normalized/v1' || normalized?.status !== 'COLLECTED') {
     throw new Error(`Project Status projection refuses unsupported normalized input: ${normalized?.schemaId ?? 'missing'}/${normalized?.status ?? 'missing'}`);
   }
@@ -24,6 +61,7 @@ export function projectStatusView(normalized) {
     throw new Error('Project Status projection refuses unsafe normalized input.');
   }
 
+  const repoRoot = runtime.repoRoot ?? process.cwd();
   const domains = (normalized.domains ?? []).map(record => ({
     domain: record.domain,
     lifecycle: record.lifecycle,
@@ -37,6 +75,7 @@ export function projectStatusView(normalized) {
     blockerCount: (record.blockers ?? []).length,
     activeSource: record.primarySource?.path ?? null,
     activeSourceId: record.activeSource?.selectedId ?? null,
+    sourceFingerprint: sourceFingerprint(repoRoot, record),
     supplementalSources: (record.supplementalSources ?? []).map(item => ({
       path: item.path,
       role: item.role ?? null,
@@ -61,6 +100,7 @@ export function projectStatusView(normalized) {
       stage: normalized.stage,
       status: normalized.status,
       authoritySchemaId: normalized.sourceAuthority?.schemaId ?? null,
+      freshnessAlgorithm: 'sha256',
     },
     derivedOnly: true,
     readOnly: true,
@@ -115,7 +155,7 @@ export function renderProjectStatusMarkdown(projectStatus) {
 
 export function buildProjectStatus(runtime = {}) {
   const normalized = runtime.normalized ?? normalizeProjectStatus(runtime);
-  const projectStatus = projectStatusView(normalized);
+  const projectStatus = projectStatusView(normalized, runtime);
   return {
     normalized,
     projectStatus,
