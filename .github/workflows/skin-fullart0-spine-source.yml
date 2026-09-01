@@ -49,7 +49,7 @@ jobs:
           if-no-files-found: error
 
       - name: Remove execution-only installer state
-        run: rm -rf .skin-fullart0-spine-source
+        run: rm -rf .skin-fullart0-spine-source scripts/__pycache__
 
       - name: Fail closed on unrelated tracked mutation
         run: |
