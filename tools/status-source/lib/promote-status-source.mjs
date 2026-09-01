@@ -9,6 +9,7 @@ import {
   resolveActiveSources,
   selectActiveSources,
 } from './select-active-sources.mjs';
+import { captureSourceProvenance } from './source-provenance.mjs';
 
 export const DEFAULT_PROMOTION_COMPATIBILITY = 'tools/status-source/contracts/promotion-compatibility.v1.json';
 const PROMOTION_STAGE = 'R1-2';
@@ -234,6 +235,7 @@ export function promoteStatusSource(options, runtime = {}) {
       domain: options.domain,
       selectedId: options.id,
       sourcePath: options.sourcePath,
+      sourceProvenance: clone(existingById.sourceProvenance),
       outputPath: existingById.sourceEntryFile,
       compatibility,
       boundaries: promotionBoundaries(0),
@@ -245,6 +247,7 @@ export function promoteStatusSource(options, runtime = {}) {
   const admission = explicitAdmission.length > 0 ? clone(explicitAdmission) : clone(activeEntry.admission);
   if (!Array.isArray(admission) || admission.length === 0) throw new Error('Promotion admission cannot be empty.');
   const projectionOverride = projectionOverrideFrom(repoRoot, activeEntry, options, compatibilityContract);
+  const sourceProvenance = captureSourceProvenance({ repoRoot, sourcePath: options.sourcePath });
   const outputPath = outputFileFor(declarationDir, options.domain, options.id);
   const outputAbsolute = assertRepositoryPath(repoRoot, outputPath);
   if (fs.existsSync(outputAbsolute)) throw new Error(`Promotion output already exists: ${outputPath}`);
@@ -254,6 +257,7 @@ export function promoteStatusSource(options, runtime = {}) {
     domain: options.domain,
     state: 'APPROVED',
     sourcePath: options.sourcePath,
+    sourceProvenance,
     facet: options.facet ?? activeEntry.facet ?? activeMeta.facet ?? null,
     successorOf: activeMeta.selectedId,
     admission,
@@ -291,6 +295,7 @@ export function promoteStatusSource(options, runtime = {}) {
     predecessorId: activeMeta.selectedId,
     selectedId: options.id,
     sourcePath: options.sourcePath,
+    sourceProvenance,
     outputPath,
     admissionMode: explicitAdmission.length > 0 ? 'EXPLICIT' : 'INHERITED',
     projectionMode: options.projectionFile ? 'EXPLICIT_FILE' : (activeEntry.projectionOverride === undefined ? 'BASELINE_COMPATIBILITY' : 'INHERITED'),
