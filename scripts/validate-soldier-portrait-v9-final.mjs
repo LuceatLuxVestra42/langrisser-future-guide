@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -9,6 +10,7 @@ const paths = {
   manifest: 'data/generated/soldier-portrait-manifest.v9.json',
   audit: 'data/validation/soldier-portrait-v9-source-audit.json',
   soldierMaster: 'data/generated/soldier-master.v1.json',
+  externalSourceVerifier: 'scripts/hydrate-soldier-portrait-source-pack-v1.mjs',
 };
 
 const manifest = readJson(paths.manifest);
@@ -131,5 +133,32 @@ if (errors.length) {
   process.exit(1);
 }
 
+const externalVerifierPath = path.join(ROOT, paths.externalSourceVerifier);
+if (!fs.existsSync(externalVerifierPath)) {
+  console.error('SOLDIER PORTRAIT V9 FINAL VALIDATION: FAIL');
+  console.error(`- external-source-verifier-missing: ${paths.externalSourceVerifier}`);
+  process.exit(1);
+}
+
+const externalVerification = spawnSync(process.execPath, [externalVerifierPath], {
+  cwd: ROOT,
+  env: process.env,
+  stdio: 'inherit',
+});
+if (externalVerification.error || externalVerification.status !== 0) {
+  console.error('SOLDIER PORTRAIT V9 FINAL VALIDATION: FAIL');
+  console.error(`- external-source-pack-verification: ${externalVerification.error?.message ?? `exit ${externalVerification.status}`}`);
+  process.exit(1);
+}
+
 console.log('SOLDIER PORTRAIT V9 FINAL VALIDATION: PASS');
-console.log(JSON.stringify({ canonical: 224, normal: 168, sp: 56, resolved: 224, unresolved: 0, sourceFamily: 'BWIKI_CURRENT_CN_EXACT_TRANSPARENT_PNG_V9' }, null, 2));
+console.log(JSON.stringify({
+  canonical: 224,
+  normal: 168,
+  sp: 56,
+  resolved: 224,
+  unresolved: 0,
+  sourceFamily: 'BWIKI_CURRENT_CN_EXACT_TRANSPARENT_PNG_V9',
+  externalSourcePackVerified: true,
+  externalSourceVerifier: paths.externalSourceVerifier,
+}, null, 2));
