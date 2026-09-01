@@ -1,0 +1,105 @@
+name: Skin STATIC Representative Crosscheck
+
+on:
+  push:
+    branches:
+      - work/skin-fullart-representative-crosscheck-20260901
+    paths:
+      - .github/workflows/skin-static-representative-crosscheck.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    strategy:
+      fail-fast: false
+      matrix:
+        skin_id: [1901, 3701]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bounded branch
+        uses: actions/checkout@v4
+        with:
+          ref: work/skin-fullart-representative-crosscheck-20260901
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install bounded dependency
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow
+
+      - name: Extract exact current STATIC Sprite
+        env:
+          SKIN_ID: ${{ matrix.skin_id }}
+        run: |
+          python - <<'PY'
+          import importlib.util, json, os
+          from pathlib import Path
+          sid = int(os.environ['SKIN_ID'])
+          spec = importlib.util.spec_from_file_location('wrap', 'scripts/extract-skin-fullart0-spine-source-v2.py')
+          wrap = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(wrap)
+          H = wrap.module
+          stage = json.load(open('data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json', encoding='utf-8'))
+          fixture = next(r for r in stage['fixtures'] if int(r['skinId']) == sid)
+          rec = fixture['static']
+          match = H.SOURCE_REF_RE.match(rec['sourceRef'])
+          if not match:
+              raise RuntimeError('invalid STATIC official sourceRef')
+          parts = match.groupdict()
+          work = Path(f'.probe-static-{sid}')
+          package = work / 'packages' / parts['package']
+          bundle = work / 'bundles' / parts['bundle']
+          H.download(f"{stage['source']['base'].rstrip('/')}/{parts['package']}", package)
+          physical = H.extract_bundle(package, parts['bundle'], bundle)
+
+          import UnityPy
+          env = UnityPy.load(str(bundle))
+          matches = [(p, H.deref_container(v)) for p, v in env.container.items() if isinstance(p, str) and H.norm(p) == H.norm(rec['resolvedSourcePath'])]
+          if len(matches) != 1:
+              raise RuntimeError(f'exact STATIC Sprite count != 1: {len(matches)}')
+          runtime_path, obj = matches[0]
+          if getattr(getattr(obj, 'type', None), 'name', None) != 'Sprite':
+              raise RuntimeError('exact STATIC object is not Sprite')
+          if H.sha256(obj.get_raw_data()) != rec['sha256'].lower():
+              raise RuntimeError('STATIC Sprite hash differs from current Stage 3-2')
+          image = obj.read().image.convert('RGBA')
+          out = Path(f'.probe-static-out/skin-{sid}')
+          out.mkdir(parents=True, exist_ok=True)
+          image.save(out / 'static.png')
+          bbox = image.getchannel('A').getbbox()
+          result = {
+              'skinId': sid,
+              'status': 'PASS_EXACT_CURRENT_STATIC_SPRITE',
+              'sourceImagePath': rec['sourceImagePath'],
+              'runtimePath': runtime_path,
+              'physicalBundleEntry': physical,
+              'width': image.width,
+              'height': image.height,
+              'alphaBBox': list(bbox) if bbox else None,
+              'guardrails': {
+                  'currentOfficialSourceOnly': True,
+                  'exactRuntimePathOnly': True,
+                  'nameJoin': False,
+                  'idArithmetic': False,
+              },
+          }
+          (out / 'summary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps(result, ensure_ascii=False))
+          PY
+
+      - name: Upload STATIC crosscheck
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-static-representative-${{ matrix.skin_id }}
+          path: .probe-static-out/skin-${{ matrix.skin_id }}
+          if-no-files-found: error
+
+      - name: Cleanup
+        if: always()
+        run: rm -rf .probe-static-* scripts/__pycache__
