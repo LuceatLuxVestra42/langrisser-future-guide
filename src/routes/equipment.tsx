@@ -117,7 +117,6 @@ function EquipmentGeneralListPage() {
 
       return true;
     });
-
     if (uiState.sort === "name") {
       return records.sort((left, right) => {
         const leftName = left.nameKr ?? left.nameCn;
@@ -237,7 +236,6 @@ function EquipmentGeneralListPage() {
                   </button>
                 )}
               </label>
-
               <label className="relative flex h-11 items-center rounded-xl border border-border bg-background">
                 <ArrowUpDown
                   size={16}
@@ -406,7 +404,11 @@ function EquipmentGeneralListPage() {
                       alt=""
                       loading="lazy"
                       decoding="async"
-                      className="h-32 w-32 object-contain transition duration-200 group-hover:scale-[1.03] sm:h-36 sm:w-36"
+                      className={`h-32 w-32 object-contain transition duration-200 group-hover:scale-[1.03] sm:h-36 sm:w-36 ${
+                        record.equipmentId === 6
+                          ? "rounded-lg border border-border/70 bg-card p-1 shadow-sm"
+                          : ""
+                      }`}
                     />
                     <div className="absolute inset-x-0 bottom-0 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm">
                       <h2 className="line-clamp-2 text-base font-bold leading-snug text-foreground sm:text-lg">
