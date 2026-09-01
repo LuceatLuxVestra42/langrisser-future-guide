@@ -1,0 +1,36 @@
+name: Skin Stage 3-3 Mathew Official Probe
+
+on:
+  push:
+    branches:
+      - work/skin-stage3-3-mathew-official-probe-20260901
+    paths:
+      - tools/asset-intake/diagnostics/probe-skin-stage3-3-mathew-official-v1.py
+      - .github/workflows/skin-stage3-3-mathew-official-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Unity parser
+        shell: pwsh
+        run: python -m pip install UnityPy==1.25.3 Pillow
+      - name: Materialize official Skin 102 bundles and dependencies
+        shell: pwsh
+        run: python tools/asset-intake/diagnostics/probe-skin-stage3-3-mathew-official-v1.py
+      - name: Upload Skin 102 official probe
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-stage3-3-mathew-official-probe
+          path: skin-stage3-3-mathew-official-probe
+          if-no-files-found: error
