@@ -6,6 +6,7 @@ on:
       - work/skin-stage3-3-mathew-official-probe-20260901
     paths:
       - tools/asset-intake/diagnostics/probe-skin-stage3-3-mathew-official-v1.py
+      - tools/asset-intake/diagnostics/extract-skin102-spine-payload-v1.py
       - .github/workflows/skin-stage3-3-mathew-official-probe.yml
 
 permissions:
@@ -25,12 +26,12 @@ jobs:
       - name: Install pinned Unity parser
         shell: pwsh
         run: python -m pip install UnityPy==1.25.3 Pillow
-      - name: Materialize official Skin 102 bundles and dependencies
+      - name: Extract official Skin 102 Spine payload
         shell: pwsh
-        run: python tools/asset-intake/diagnostics/probe-skin-stage3-3-mathew-official-v1.py
-      - name: Upload Skin 102 official probe
+        run: python tools/asset-intake/diagnostics/extract-skin102-spine-payload-v1.py
+      - name: Upload Skin 102 Spine payload
         uses: actions/upload-artifact@v4
         with:
-          name: skin-stage3-3-mathew-official-probe
-          path: skin-stage3-3-mathew-official-probe
+          name: skin-stage3-3-mathew-spine-payload
+          path: skin-stage3-3-mathew-spine-payload
           if-no-files-found: error
