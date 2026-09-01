@@ -6,6 +6,7 @@ on:
       - work/skin-stage3-3-batched-20260901
     paths:
       - scripts/extract-skin-fullart0-general-source.py
+      - scripts/extract-skin-fullart0-static.py
       - .github/workflows/skin-fullart0-form-families.yml
   workflow_dispatch:
 
@@ -24,23 +25,28 @@ jobs:
           python-version: '3.11'
 
       - name: Install bounded extraction dependency
-        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow
 
       - name: Extract current General primary resource 102
         run: python scripts/extract-skin-fullart0-general-source.py
 
-      - name: Summarize General source morphology
+      - name: Extract current static artwork 102
+        run: python scripts/extract-skin-fullart0-static.py
+
+      - name: Summarize current family morphology
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          p = Path('data/evidence/skin-fullart0-general-source.v1.json')
-          d = json.loads(p.read_text())
-          print('resourceFamily=', d['resourceFamily'])
-          print('spineVersion=', d['spineBinaryHeader'].get('version'))
-          print('skeletonDataAssetName=', d['chain'].get('skeletonDataAssetName'))
-          for row in d.get('exports', []):
-              print('export=', {k: row.get(k) for k in ('type','name','width','height','sizeBytes')})
+          general = json.loads(Path('data/evidence/skin-fullart0-general-source.v1.json').read_text())
+          static = json.loads(Path('data/evidence/skin-fullart0-static.v1.json').read_text())
+          print('GENERAL resourceFamily=', general['resourceFamily'])
+          print('GENERAL spineVersion=', general['spineBinaryHeader'].get('version'))
+          print('GENERAL skeletonDataAssetName=', general['chain'].get('skeletonDataAssetName'))
+          for row in general.get('exports', []):
+              print('GENERAL export=', {k: row.get(k) for k in ('type','name','width','height','sizeBytes')})
+          print('STATIC image=', static['image'])
+          print('STATIC sourceImagePath=', static['authority']['sourceImagePath'])
           PY
 
       - name: Upload bounded family probe
@@ -49,15 +55,17 @@ jobs:
           name: skin-fullart0-form-families
           path: |
             data/evidence/skin-fullart0-general-source.v1.json
+            data/evidence/skin-fullart0-static.v1.json
             .skin-fullart0-general-source/raw/*
+            .skin-fullart0-static/skin-102-static.png
           if-no-files-found: error
 
       - name: Remove execution-only state
-        run: rm -rf .skin-fullart0-general-source scripts/__pycache__
+        run: rm -rf .skin-fullart0-general-source .skin-fullart0-static scripts/__pycache__
 
       - name: Fail closed on unrelated tracked mutation
         run: |
-          allowed='^data/evidence/skin-fullart0-general-source\.v1\.json$'
+          allowed='^data/evidence/skin-fullart0-(general-source|static)\.v1\.json$'
           bad="$(git status --porcelain --untracked-files=all | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
           if [ -n "$bad" ]; then
             printf 'Unexpected paths after family probe:\n%s\n' "$bad"
