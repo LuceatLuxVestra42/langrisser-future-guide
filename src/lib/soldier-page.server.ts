@@ -1,5 +1,6 @@
 import soldierCombatJson from "../../data/generated/soldier-detail-stage5-2.v1.json";
 import soldierListJson from "../../data/generated/soldier-list-stage5-8.v1.json";
+import soldierConfirmedNameCorrectionJson from "../../data/presentation/soldier-confirmed-name-correction.v1.json";
 import soldierLowerTierNameKrJson from "../../data/presentation/soldier-lower-tier-name-kr.v1.json";
 import soldierT3ProvisionalNameKrJson from "../../data/presentation/soldier-t3-provisional-name-kr.v1.json";
 
@@ -115,10 +116,26 @@ type SoldierT3ProvisionalNameKrSource = {
   }>;
 };
 
+type SoldierConfirmedNameCorrectionSource = {
+  status: string;
+  scope: string;
+  source: {
+    kind: string;
+    identityMutation: boolean;
+  };
+  records: Array<{
+    soldierId: number;
+    nameCn: string;
+    displayNameKr: string;
+  }>;
+};
+
 const soldierList = soldierListJson as unknown as SoldierListSource;
 const soldierCombat = soldierCombatJson as unknown as SoldierCombatSource;
 const soldierLowerTierNameKr = soldierLowerTierNameKrJson as unknown as SoldierLowerTierNameKrSource;
 const soldierT3ProvisionalNameKr = soldierT3ProvisionalNameKrJson as unknown as SoldierT3ProvisionalNameKrSource;
+const soldierConfirmedNameCorrection =
+  soldierConfirmedNameCorrectionJson as unknown as SoldierConfirmedNameCorrectionSource;
 const combatById = new Map(
   soldierCombat.records.map((record) => [record.soldierId, record.combat]),
 );
@@ -213,6 +230,39 @@ for (const presentation of soldierT3ProvisionalNameKr.records) {
   }
 }
 
+if (
+  soldierConfirmedNameCorrection.status !== "PASS" ||
+  soldierConfirmedNameCorrection.scope !== "frontend-presentation-only" ||
+  soldierConfirmedNameCorrection.source.kind !== "confirmed-korean-name-correction" ||
+  soldierConfirmedNameCorrection.source.identityMutation !== false
+) {
+  throw new Error("Confirmed Korean Soldier name correction source contract mismatch.");
+}
+
+const confirmedNameCorrectionById = new Map(
+  soldierConfirmedNameCorrection.records.map((record) => [record.soldierId, record]),
+);
+
+if (confirmedNameCorrectionById.size !== soldierConfirmedNameCorrection.records.length) {
+  throw new Error("Confirmed Korean Soldier name correction source contains duplicate Soldier IDs.");
+}
+
+for (const correction of soldierConfirmedNameCorrection.records) {
+  const base = soldierList.records.find((record) => record.soldierId === correction.soldierId);
+  if (
+    !base ||
+    base.tier !== 3 ||
+    base.nameKrStatus !== "confirmed" ||
+    correction.nameCn !== base.nameCn ||
+    !correction.displayNameKr.trim()
+  ) {
+    throw new Error(`Confirmed Korean name correction mismatch for Soldier ${correction.soldierId}.`);
+  }
+  if (lowerTierNameKrById.has(correction.soldierId) || t3ProvisionalNameKrById.has(correction.soldierId)) {
+    throw new Error(`Soldier ${correction.soldierId} has overlapping Korean presentation mappings.`);
+  }
+}
+
 const BUCKET_ORDER: Record<string, number> = {
   SP: 0,
   NORMAL_TIER3_CONFIRMED_RELEASE: 1,
@@ -243,6 +293,7 @@ export function readSoldierPrototypePageData() {
       throw new Error(`Soldier ${record.soldierId} is missing Stage 5-2 combat data.`);
     }
 
+    const confirmedNameCorrection = confirmedNameCorrectionById.get(record.soldierId);
     const lowerTierNameKr = lowerTierNameKrById.get(record.soldierId);
     const t3ProvisionalNameKr = t3ProvisionalNameKrById.get(record.soldierId);
     const presentationRecord = lowerTierNameKr
@@ -258,9 +309,15 @@ export function readSoldierPrototypePageData() {
             nameKrStatus: "provisional-display",
           }
         : record;
+    const correctedPresentationRecord = confirmedNameCorrection
+      ? {
+          ...presentationRecord,
+          nameKr: confirmedNameCorrection.displayNameKr,
+        }
+      : presentationRecord;
 
     return {
-      ...presentationRecord,
+      ...correctedPresentationRecord,
       combat,
     } satisfies SoldierPrototypeRecord;
   });
