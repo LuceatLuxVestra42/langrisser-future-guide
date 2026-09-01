@@ -4,7 +4,8 @@
 
 - Project health: **REVIEW**
 - Hard errors: **0**
-- Reviews: **28**
+- Reported review entries: **28**
+- Health-impact review entries: **11**
 - Blockers: **0**
 - Source: `tools/project-status/lib/normalize-project-status.mjs`
 
@@ -16,6 +17,40 @@
 | hero-soldier | FROZEN | REVIEW | PASS_WITH_REVIEW | heroCount=267, soldierCount=224, canonicalPairCount=5977 | data/validation/hero-soldier-integration-stageC-final.v1.json | - |
 | banner | FROZEN | REVIEW | PASS_BANNER_STAGE3_8_REGRESSION_FREEZE | definitions=77, occurrences=94 | data/validation/banner-stage3-8-regression-freeze-summary.v1.json | - |
 | skin | COMPLETE | PASS | PASS | skinCount=540, heroCount=267 | data/validation/skin-stage3-2-readiness.v1.json | - |
+
+## Review 상태
+
+> Reported review entry는 source에 남아 있는 review 기록 수다. 현재 health를 REVIEW로 만드는 항목 수와 같지 않다.
+
+- Active review entries: **11**
+- Resolved by evidence: **1**
+- Deferred non-errors: **8**
+- Boundary notes: **8**
+- Assigned health-impact issues: **6**
+- Unique assigned issues: **23**
+- Unassigned review entries: **3**
+
+| Domain | Reported | Health-impact | Active | Resolved | Deferred | Boundary | Health |
+|---|---:|---:|---:|---:|---:|---:|---|
+| hero | 2 | 1 | 1 | 0 | 0 | 1 | REVIEW |
+| soldier | 12 | 6 | 6 | 1 | 1 | 4 | REVIEW |
+| equipment | 1 | 1 | 1 | 0 | 0 | 0 | REVIEW |
+| hero-soldier | 5 | 2 | 2 | 0 | 0 | 3 | REVIEW |
+| banner | 8 | 1 | 1 | 0 | 7 | 0 | REVIEW |
+| skin | 0 | 0 | 0 | 0 | 0 | 0 | PASS |
+
+### Health-impact issueKey
+
+> 아래 표는 explicit issueKey가 배정된 health-impact review만 보여준다. issueKey가 없는 review는 추측으로 묶거나 중복 제거하지 않는다.
+
+| Issue key | Domains | Health-impact entries | Reported entries |
+|---|---|---:|---:|
+| BANNER_MANUAL_IMAGE_PENDING | banner | 1 | 1 |
+| EQUIPMENT_SECONDARY_ARCHIVE_PROVENANCE | equipment | 1 | 1 |
+| SOLDIER_KR_NAME_PRESENTATION_COVERAGE | hero-soldier, soldier | 2 | 2 |
+| SOLDIER_RELEASE_DATE_METADATA | hero-soldier, soldier | 2 | 2 |
+| SOLDIER_SAME_PATCH_ORDER | soldier | 1 | 1 |
+| SOLDIER_SP_INTERNAL_RELEASE_ORDER | soldier | 1 | 1 |
 
 ## 운용 경계
 
