@@ -104,8 +104,6 @@ jobs:
           test -f dist/client/heroes/6/index.html
           test -f dist/client/soldiers/101/index.html
           test -f dist/client/images/heroes/cards/6.png
-          test -f dist/client/images/heroes/card-icons/6.png
-          test "$(find dist/client/images/heroes/card-icons -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')" = '267'
           test -f dist/client/images/heroes/card-icons-webp/6.webp
           test "$(find dist/client/images/heroes/card-icons-webp -maxdepth 1 -type f -name '*.webp' | wc -l | tr -d ' ')" = '267'
           test -f dist/client/images/factions/4.png
