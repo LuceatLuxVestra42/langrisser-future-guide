@@ -625,18 +625,13 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
                       className="h-11 w-11 shrink-0 object-contain"
                     />
                   ) : (
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] font-black text-muted-foreground">
-                      #{material.itemId}
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-muted px-1 text-center text-[10px] font-black text-muted-foreground">
+                      재료
                     </div>
                   )}
-                  <div className="min-w-0">
-                    <p className="truncate text-[10px] font-semibold text-muted-foreground">
-                      아이템 #{material.itemId}
-                    </p>
-                    <p className="mt-0.5 text-base font-black tabular-nums text-foreground">
-                      × {material.count}
-                    </p>
-                  </div>
+                  <p className="text-base font-black tabular-nums text-foreground">
+                    × {formatNumber(material.count)}
+                  </p>
                 </div>
               </div>
             );
@@ -650,6 +645,24 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
 function clampLevel(value: number, min: number, max: number) {
   if (!Number.isFinite(value)) return min;
   return Math.min(max, Math.max(min, Math.trunc(value)));
+}
+
+function getSpMaterialPresentation(material: MaterialCost) {
+  if (material.goodsType === 6) {
+    const iconUrl = getSoldierTrainingMaterialIconUrl(material.itemId);
+    if (iconUrl) {
+      return { iconUrl, label: null };
+    }
+    if (material.itemId === 6503) {
+      return { iconUrl: null, label: "SP 전직 재료" };
+    }
+  }
+
+  if (material.goodsType === 24 && material.itemId === 0) {
+    return { iconUrl: null, label: "형귀 컨트롤러" };
+  }
+
+  return { iconUrl: null, label: "전직 재료" };
 }
 
 function SpConversionPanel({ sp }: { sp: SoldierRichRecord["sp"] }) {
@@ -698,14 +711,30 @@ function SpStageCard({ title, stage }: { title: string; stage: SpStage | null })
       <div className="mt-3">
         <p className="text-xs font-bold text-muted-foreground">필요 재료</p>
         <div className="mt-1.5 flex flex-wrap gap-1.5">
-          {stage.awakenMaterials.map((material) => (
-            <span
-              key={`${material.goodsType}:${material.itemId}`}
-              className="rounded-md border border-border bg-muted px-2 py-1 text-xs font-semibold text-foreground"
-            >
-              #{material.itemId} × {material.count}
-            </span>
-          ))}
+          {stage.awakenMaterials.map((material) => {
+            const presentation = getSpMaterialPresentation(material);
+            return (
+              <span
+                key={`${material.goodsType}:${material.itemId}`}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted px-2 py-1 text-xs font-semibold text-foreground"
+              >
+                {presentation.iconUrl ? (
+                  <img
+                    src={presentation.iconUrl}
+                    alt=""
+                    aria-hidden="true"
+                    width={28}
+                    height={28}
+                    loading="lazy"
+                    className="h-7 w-7 shrink-0 object-contain"
+                  />
+                ) : (
+                  <span className="text-muted-foreground">{presentation.label}</span>
+                )}
+                <span className="tabular-nums">× {formatNumber(material.count)}</span>
+              </span>
+            );
+          })}
         </div>
       </div>
 
