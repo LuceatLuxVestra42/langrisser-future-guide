@@ -105,7 +105,8 @@ jobs:
           rm .github/workflows/temp-hide-legacy-skin-cards.yml
           git diff --check
           changed="$(git status --porcelain --untracked-files=all | sed -E 's/^.. //' | sort -u)"
-          test "$changed" = 'src/routes/heroes_.$heroId.tsx'
+          expected="$(printf '%s\n' '.github/workflows/temp-hide-legacy-skin-cards.yml' 'src/routes/heroes_.$heroId.tsx' | sort)"
+          test "$changed" = "$expected"
 
       - name: Commit frontend-only change
         run: |
