@@ -2,6 +2,7 @@
   "version": 1,
   "schemaId": "soldier-name-presentation-reconciliation-stage10/v1",
   "stage": 10,
+  "revision": 2,
   "status": "PASS",
   "completion": "COMPLETE",
   "scope": "Soldier Korean-name canonical-versus-presentation reconciliation",
@@ -9,6 +10,11 @@
     "soldier-frontend",
     "localization"
   ],
+  "correction": {
+    "reason": "AUTHORITATIVE_CONTRADICTION",
+    "incorrectPreviousAssumption": "A null canonical nameKr value was treated as proof that the Soldier Korean name itself remained unresolved.",
+    "correctedRule": "Tier 1-2 confirmed Korean presentation names are resolved localization even when canonical Stage 5-8 identity intentionally keeps nameKr null; only approved T3 provisional targets remain official-name unresolved."
+  },
   "authoritativeInputs": {
     "canonical": "data/generated/soldier-list-stage5-8.v1.json",
     "lowerTierPresentation": "data/presentation/soldier-lower-tier-name-kr.v1.json",
@@ -31,27 +37,32 @@
   },
   "expected": {
     "canonicalRecords": 224,
-    "canonicalUnresolvedCount": 41,
+    "canonicalNameKrNullCount": 41,
     "lowerTierPresentationCount": 39,
+    "lowerTierConfirmedPresentationCount": 39,
+    "lowerTierPresentationUnresolvedCount": 0,
     "tier3ProvisionalPresentationCount": 2,
     "overlayUnionCount": 41,
     "overlayCollisionCount": 0,
     "lowerTierConfirmedCanonicalOverlapCount": 0,
     "tier3InvalidCanonicalBoundaryCount": 0,
     "unknownOverlayIdCount": 0,
-    "exactCanonicalUnresolvedOverlaySetMatch": true,
+    "exactCanonicalNameKrNullOverlaySetMatch": true,
     "effectiveKoreanDisplayCount": 224,
     "displayGapCount": 0,
-    "tier3OfficialUnresolvedCount": 2,
+    "officialKoreanNameUnresolvedCount": 2,
+    "officialKoreanNameUnresolvedIds": [136, 1039],
     "tier3BoundaryTargetSetMatch": true,
     "canonicalStateConflictCount": 0,
+    "localizationAuditReviewCount": 2,
+    "localizationAuditReviewSoldierIds": [136, 1039],
     "siteAdmissionReviewCounts": {
       "HERO_PAGE_SOLDIER_DISPLAY_NAME_REVIEW": 41,
       "IDENTITY_PRESENTATION_REVIEW": 41,
       "KR_NAME_UNRESOLVED": 41
     }
   },
-  "canonicalUnresolvedSoldierIds": [
+  "canonicalNameKrNullSoldierIds": [
     100,
     101,
     103,
@@ -94,25 +105,36 @@
     1102,
     1108
   ],
+  "officialKoreanNameUnresolvedSoldierIds": [
+    136,
+    1039
+  ],
   "reviewDisposition": {
     "HERO_PAGE_SOLDIER_DISPLAY_NAME_REVIEW": {
-      "currentMeaning": "Historical user-facing display gap review for the 41 canonically unresolved Korean-name records.",
+      "currentMeaning": "Historical user-facing display-gap review for the 41 records whose canonical Stage 5-8 nameKr storage was empty.",
       "stage10Disposition": "RESOLVED_BY_PRESENTATION_EVIDENCE",
       "healthImpact": false,
-      "evidence": "All 224 Soldiers have an effective Korean display; the 41 canonical unresolved IDs are covered exactly by 39 confirmed lower-tier presentation overlays plus 2 approved T3 provisional overlays."
+      "evidence": "All 224 Soldiers have an effective Korean display. Tier 1-2 coverage is 39/39 with confirmed presentation names and zero unresolved records; the remaining two T3 records have approved provisional display names."
     },
     "IDENTITY_PRESENTATION_REVIEW": {
-      "currentMeaning": "Canonical identity and frontend presentation intentionally remain separate for the same 41 records.",
+      "currentMeaning": "Canonical identity storage and frontend localization presentation intentionally remain separate for the same 41 records.",
       "stage10Disposition": "BOUNDARY_NOTE",
       "healthImpact": false,
-      "evidence": "Presentation overlays cover the exact unresolved canonical ID set without mutating canonical identity."
+      "evidence": "The frozen localization contract explicitly permits confirmed lower-tier presentation backfill without canonical identity mutation, and provisional T3 display remains separately bounded."
     },
     "KR_NAME_UNRESOLVED": {
-      "currentMeaning": "Canonical Korean-name confirmation remains unresolved for 41 Soldier records.",
-      "stage10Disposition": "ACTIVE_CANONICAL_CONFIRMATION_REVIEW",
+      "currentMeaning": "Historical aggregate review reported 41 records before the current lower-tier localization evidence was reconciled.",
+      "stage10Disposition": "PARTIALLY_RESOLVED_BY_LOCALIZATION_EVIDENCE",
       "healthImpact": true,
-      "remainingCount": 41,
-      "note": "Do not reduce this review to 2. The two T3 records are only the T3 official-name-unresolved subset; the 39 lower-tier records remain presentation-only and canonically unresolved."
+      "reportedCount": 41,
+      "resolvedCount": 39,
+      "remainingCount": 2,
+      "remainingSoldierIds": [
+        136,
+        1039
+      ],
+      "remainingScope": "T3 official Korean-name confirmation only; presentation display is already covered for both records.",
+      "evidence": "The lower-tier presentation source is PASS with 39/39 confirmed Korean names and unresolvedCount 0. The T3 boundary validation and read-only localization audit identify only Soldier 136 and 1039 as official-name unresolved."
     }
   },
   "blockers": [],
@@ -127,13 +149,14 @@
       "scope": "T3 official Korean-name confirmation only; presentation display is already covered."
     }
   ],
-  "decision": "Stage 10 COMPLETE. Canonical Korean-name unresolved population remains 41, and that exact soldierId set is fully covered in presentation by 39 lower-tier confirmed overlays plus 2 T3 provisional overlays. Therefore the historical Hero-page display-gap review is resolved, the identity-versus-presentation review is a boundary note, and KR_NAME_UNRESOLVED remains an active canonical-confirmation review at 41 rather than 2.",
+  "decision": "Stage 10 correction COMPLETE. Tier 1-2 Korean naming is confirmed at 39/39 and is intentionally stored as presentation-only localization without requiring canonical identity mutation. Canonical Stage 5-8 nameKr remains null for those 39 records as a storage boundary, not as evidence of unresolved naming. The historical KR_NAME_UNRESOLVED review therefore resolves 39 of its 41 reported records and retains only the two T3 official-name-unresolved Soldiers 136 and 1039. Hero-page display coverage is 224/224 with zero gaps.",
   "nextOwner": "project-status",
-  "nextStartPoint": "Reconcile Project Status lifecycle rules for the three Soldier 41-count reviews using this checkpoint. Do not edit Soldier canonical identity, presentation strings, Hero-Soldier relations, or release chronology in that handoff.",
+  "nextStartPoint": "Reconcile Project Status lifecycle rules using this corrected checkpoint: resolve HERO_PAGE_SOLDIER_DISPLAY_NAME_REVIEW, classify IDENTITY_PRESENTATION_REVIEW as BOUNDARY_NOTE, and represent KR_NAME_UNRESOLVED as reported 41 / resolved 39 / remaining 2. Apply the same current localization evidence to the duplicated Hero-Soldier SOLDIER_KR_NAME_UNRESOLVED review without mutating either frozen primary source.",
   "reopenConditions": [
-    "canonical Soldier Korean-name state changes",
-    "presentation overlay soldierId population changes",
+    "canonical Soldier Korean-name storage policy changes",
+    "lower-tier confirmed presentation coverage or unresolvedCount changes",
     "tier-3 provisional boundary validation changes",
+    "localization audit result changes",
     "frontend effective-display policy changes",
     "site-admission review population changes"
   ]
