@@ -38,6 +38,7 @@
     {"id":"soldier-training-material-assets","validators":["soldier-training-material-assets"]},
     {"id":"equipment-assets","validators":["equipment-assets"]},
     {"id":"hero-assets","validators":["hero-assets"]},
+    {"id":"hero-card-icon-source-pack-assets","validators":["hero-card-icon-source-pack-assets"]},
     {"id":"asset-intake","validators":["asset-intake"]},
     {"id":"skin-stage3-2-evidence","validators":["skin-stage3-2-evidence"]},
     {"id":"localization","validators":["localization-audit"]},
@@ -137,8 +138,14 @@
       "owners":["hero-frontend"]
     },
     {
+      "id":"hero-card-icon-source-pack-assets",
+      "patterns":["data/generated/hero-card-icon-source-pack*","data/validation/hero-card-icon-source-pack*","data/contracts/hero-card-icon-source-pack*","scripts/*hero-card-icon-source-pack*",".github/workflows/hero-card-icon-source-pack-*"],
+      "owners":["hero-card-icon-source-pack-assets"]
+    },
+    {
       "id":"hero-card-icon-assets",
       "patterns":["data/generated/hero-card-icon-*","data/validation/hero-card-icon-*","data/contracts/hero-card-icon-*","scripts/*hero-card-icon*",".github/workflows/hero-card-icon-*"],
+      "excludePatterns":["data/generated/hero-card-icon-source-pack*","data/validation/hero-card-icon-source-pack*","data/contracts/hero-card-icon-source-pack*","scripts/*hero-card-icon-source-pack*",".github/workflows/hero-card-icon-source-pack-*"],
       "owners":["hero-assets"]
     },
     {
@@ -155,7 +162,13 @@
     {
       "id":"hero-assets",
       "patterns":["public/images/heroes/**"],
+      "excludePatterns":["public/images/heroes/card-icons/**"],
       "owners":["hero-assets","hero-frontend"]
+    },
+    {
+      "id":"hero-card-icon-source-png",
+      "patterns":["public/images/heroes/card-icons/**"],
+      "owners":["hero-card-icon-source-pack-assets","hero-frontend"]
     },
     {
       "id":"soldier-assets",

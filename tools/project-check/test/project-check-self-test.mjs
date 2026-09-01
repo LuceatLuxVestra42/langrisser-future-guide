@@ -156,23 +156,38 @@ expectOwners(
 );
 expectOwners(
   'data/contracts/hero-card-icon-source-pack.v1.json',
-  ['hero-assets'],
-  ['hero-assets'],
+  ['hero-card-icon-source-pack-assets'],
+  ['hero-card-icon-source-pack-assets'],
 );
 expectOwners(
   'data/validation/hero-card-icon-source-pack.v1.json',
-  ['hero-assets'],
-  ['hero-assets'],
+  ['hero-card-icon-source-pack-assets'],
+  ['hero-card-icon-source-pack-assets'],
 );
 expectOwners(
-  'scripts/hydrate-hero-card-icon-source-pack.mjs',
-  ['hero-assets'],
-  ['hero-assets'],
+  'scripts/hydrate-hero-card-icon-source-pack-v1.mjs',
+  ['hero-card-icon-source-pack-assets'],
+  ['hero-card-icon-source-pack-assets'],
 );
 expectOwners(
-  '.github/workflows/hero-card-icon-source-pack-restore-check.yml',
-  ['hero-assets'],
-  ['hero-assets'],
+  '.github/workflows/hero-card-icon-source-pack-hydration-v1.yml',
+  ['hero-card-icon-source-pack-assets'],
+  ['hero-card-icon-source-pack-assets'],
+);
+expectOwners(
+  'public/images/heroes/card-icons/6.png',
+  ['hero-card-icon-source-pack-assets', 'hero-frontend'],
+  ['hero-card-icon-source-pack-assets', 'production-build'],
+);
+expectOwners(
+  'public/images/heroes/cards/6.png',
+  ['hero-assets', 'hero-frontend'],
+  ['hero-assets', 'production-build'],
+);
+expectOwners(
+  'public/images/heroes/card-icons-webp/6.webp',
+  ['hero-assets', 'hero-frontend'],
+  ['hero-assets', 'production-build'],
 );
 expectOwners(
   'data/validation/hero-stage6-4-final.v1.json',
@@ -438,7 +453,7 @@ assert.throws(
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'PROJECT_CHECK_R3_SELF_TEST',
-  fixtures: 44,
+  fixtures: 47,
   catalogValidatorCount: contracts.validatorCatalog.validators.length,
   ownerCount: contracts.ownerMap.owners.length,
   deletionManifest: {
