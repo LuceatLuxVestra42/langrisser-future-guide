@@ -1,0 +1,79 @@
+name: Soldier Training Material Assets A7
+
+on:
+  push:
+    branches:
+      - work/soldier-training-material-assets-stage1
+    paths:
+      - scripts/integrate-soldier-training-material-assets-a7.mjs
+      - src/lib/soldier-training-material-assets.ts
+      - src/components/soldier-detail-modal.tsx
+      - data/manifests/soldier-training-material-assets-a6-webp.v1.json
+      - public/images/soldier-training-materials-webp/**
+      - package.json
+      - bun.lock
+      - .github/workflows/soldier-training-material-assets-a7.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: A7 preflight and integrate frozen WebP consumer
+        run: node scripts/integrate-soldier-training-material-assets-a7.mjs
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build production frontend
+        run: bun run build
+
+      - name: Finalize A7 build gate
+        run: node scripts/integrate-soldier-training-material-assets-a7.mjs --finalize-build
+
+      - name: Require A7 predeploy PASS
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const result = JSON.parse(fs.readFileSync('data/validation/soldier-training-material-assets-a7.v1.json', 'utf8'));
+          if (result.status !== 'PASS') throw new Error(JSON.stringify(result));
+          if (result.completion !== 'PREDEPLOY_COMPLETE') throw new Error(JSON.stringify(result));
+          if (result.gates.preflight !== 'PASS' || result.gates.build !== 'PASS') throw new Error(JSON.stringify(result));
+          if (result.gates.deploymentHosted !== 'BLOCKED_AWAITING_AUTHORITATIVE_PAGES_DEPLOY') throw new Error(JSON.stringify(result));
+          if (result.gates.browserUi !== 'BLOCKED_UNTIL_HOSTED_PASS') throw new Error(JSON.stringify(result));
+          const c = result.counts;
+          for (const key of ['target','uniqueItemIds','uniqueWebpPaths','repositoryWebpHashParity','dimensions172x172','manifestPixelParity','manifestAlphaParity']) {
+            if (c[key] !== 24) throw new Error(`${key}=${c[key]}`);
+          }
+          if (c.missing !== 0 || c.errors !== 0) throw new Error(JSON.stringify(result));
+          console.log(JSON.stringify(result, null, 2));
+          NODE
+
+      - name: Commit A7 frontend integration checkpoint
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            src/components/soldier-detail-modal.tsx \
+            data/validation/soldier-training-material-assets-a7.v1.json \
+            docs/checkpoints/soldier-training-material-assets-a7.md
+          if git diff --cached --quiet; then
+            echo 'Soldier training material A7 frontend integration already current.'
+          else
+            git commit -m 'Integrate Soldier training material WebP frontend A7 [skip ci]'
+            git push origin HEAD:work/soldier-training-material-assets-stage1
+          fi

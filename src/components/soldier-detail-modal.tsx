@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
+import { getSoldierTrainingMaterialIconUrl } from "@/lib/soldier-training-material-assets";
 import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
 
 type MaterialCost = {
@@ -605,17 +606,41 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
         </div>
 
         <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-          {totals.materials.map((material) => (
-            <div
-              key={`${material.goodsType}:${material.itemId}`}
-              className="rounded-lg border border-border bg-background px-2.5 py-2"
-            >
-              <p className="truncate text-[10px] font-semibold text-muted-foreground">
-                아이템 #{material.itemId}
-              </p>
-              <p className="mt-0.5 text-base font-black tabular-nums text-foreground">× {material.count}</p>
-            </div>
-          ))}
+          {totals.materials.map((material) => {
+            const iconUrl = getSoldierTrainingMaterialIconUrl(material.itemId);
+            return (
+              <div
+                key={`${material.goodsType}:${material.itemId}`}
+                className="rounded-lg border border-border bg-background px-2.5 py-2"
+              >
+                <div className="flex items-center gap-2">
+                  {iconUrl ? (
+                    <img
+                      src={iconUrl}
+                      alt=""
+                      aria-hidden="true"
+                      width={44}
+                      height={44}
+                      loading="lazy"
+                      className="h-11 w-11 shrink-0 object-contain"
+                    />
+                  ) : (
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] font-black text-muted-foreground">
+                      #{material.itemId}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="truncate text-[10px] font-semibold text-muted-foreground">
+                      아이템 #{material.itemId}
+                    </p>
+                    <p className="mt-0.5 text-base font-black tabular-nums text-foreground">
+                      × {material.count}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-material-assets-a1/v1",
+  "stage": "A1 - Asset Intake Soldier Training Material Domain Rollout",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "predecessor": {
+    "a0": "data/validation/soldier-training-material-assets-a0.v1.json",
+    "source": "data/generated/soldier-training-material-iteminfo.v1.json",
+    "sourceGitBlobSha": "9df7bbba18064e34f46cf2f4fd99d1904cbd3d63",
+    "sourceStatus": "PASS"
+  },
+  "output": {
+    "contractPath": "data/contracts/soldier-training-material-asset-intake.v1.json",
+    "contractVersion": "asset-intake/v1",
+    "domain": "soldier-training-material"
+  },
+  "counts": {
+    "sourceItems": 24,
+    "canonicalRecords": 24,
+    "uniqueItemIds": 24,
+    "fullPathLocators": 24,
+    "pendingRecords": 24,
+    "evidenceRecords": 0,
+    "contractErrors": 0
+  },
+  "invariants": {
+    "canonicalKey": "itemId",
+    "locatorAuthority": "frozen ItemInfo.iconPath",
+    "assetRole": "trainingMaterialIcon",
+    "locatorKind": "FULL_PATH",
+    "iconRoot": "UI/Icon/Item_ABS/",
+    "noTargetInference": true,
+    "sourceAcquisitionPerformed": false
+  },
+  "boundaries": {
+    "semanticRecomputed": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false,
+    "fuzzyFilenameMatchingUsed": false,
+    "visualMatchingUsed": false,
+    "assetBytesChanged": false,
+    "frontendChanged": false
+  },
+  "nextStartPoint": "A2 source census: exact candidate discovery for the frozen 24 FULL_PATH locators, without changing itemId or ItemInfo.Icon semantics."
+}

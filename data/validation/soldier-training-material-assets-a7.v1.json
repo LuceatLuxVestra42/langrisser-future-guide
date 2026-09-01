@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-material-assets-a7-frontend-integration/v1",
+  "stage": "A7 - Soldier UI Integration",
+  "status": "PASS",
+  "completion": "PREDEPLOY_COMPLETE",
+  "predecessor": {
+    "a6ManifestPath": "data/manifests/soldier-training-material-assets-a6-webp.v1.json",
+    "expectedA6ManifestBlobSha": "69af732325de4ddcb0c2ca3bedc5eac9da8edee0",
+    "currentA6ManifestBlobSha": "69af732325de4ddcb0c2ca3bedc5eac9da8edee0",
+    "a6Status": "PASS",
+    "a6Completion": "COMPLETE"
+  },
+  "gates": {
+    "preflight": "PASS",
+    "build": "PASS",
+    "deploymentHosted": "BLOCKED_AWAITING_AUTHORITATIVE_PAGES_DEPLOY",
+    "browserUi": "BLOCKED_UNTIL_HOSTED_PASS"
+  },
+  "counts": {
+    "target": 24,
+    "uniqueItemIds": 24,
+    "uniqueWebpPaths": 24,
+    "repositoryWebpHashParity": 24,
+    "dimensions172x172": 24,
+    "manifestPixelParity": 24,
+    "manifestAlphaParity": 24,
+    "missing": 0,
+    "errors": 0
+  },
+  "consumer": {
+    "route": "/soldiers/$soldierId",
+    "componentPath": "src/components/soldier-detail-modal.tsx",
+    "helperPath": "src/lib/soldier-training-material-assets.ts",
+    "identity": "itemId",
+    "assetRoot": "public/images/soldier-training-materials-webp",
+    "presentation": "training total material cards"
+  },
+  "boundaries": {
+    "semanticRecomputed": false,
+    "configDataRuntimeUsed": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false,
+    "fuzzyOrVisualMatchingUsed": false,
+    "a5PngChanged": false,
+    "a6WebpChanged": false,
+    "resolverChangedOutsideDomainHelper": false,
+    "spAwakenMaterialPresentationChanged": false
+  },
+  "blocker": "AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT_NOT_YET_AT_A7_COMMIT",
+  "nextStartPoint": "A7.3 Deployment/Hosted Gate against authoritative GitHub Pages commit, then A7.4 Browser/UI Gate",
+  "hardErrors": []
+}

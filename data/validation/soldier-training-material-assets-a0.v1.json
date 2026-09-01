@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-material-assets-a0/v1",
+  "stage": "A0 - Freshness Adoption",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "branch": "work/soldier-training-material-assets-stage1",
+  "baseMainCommit": "bd44e14c3ae913031944689180eb0f13ab66e528",
+  "reusedCheckpoint": {
+    "sourceBranch": "soldier-material-item-census",
+    "sourceHead": "269f02a673d5f86b5264e0bb335589b21585354d",
+    "generated": {
+      "census": {
+        "path": "data/generated/soldier-training-material-census.v1.json",
+        "gitBlobSha": "e53a8e6aff92d843a711462001469830ec1c9fb6",
+        "status": "PASS"
+      },
+      "itemInfo": {
+        "path": "data/generated/soldier-training-material-iteminfo.v1.json",
+        "gitBlobSha": "9df7bbba18064e34f46cf2f4fd99d1904cbd3d63",
+        "status": "PASS"
+      }
+    },
+    "validation": {
+      "census": {
+        "path": "data/validation/soldier-training-material-census.v1.json",
+        "status": "PASS",
+        "failureCount": 0
+      },
+      "itemInfo": {
+        "path": "data/validation/soldier-training-material-iteminfo.v1.json",
+        "status": "PASS",
+        "failureCount": 0
+      },
+      "repositoryAssets": {
+        "path": "data/validation/soldier-training-material-repo-assets.v1.json",
+        "gitBlobSha": "133e46756003a1377118d0649e84825f9c6d77a2",
+        "status": "PASS",
+        "assetAdmissionStatus": "BLOCKED_REPOSITORY_ASSETS_MISSING"
+      }
+    }
+  },
+  "predecessorFreshness": {
+    "soldierTraining": {
+      "path": "data/generated/soldier-detail-stage5-4.v1.json",
+      "expectedGitBlobSha": "b4ab27f673318f9d44642d3fc674ccfa682937f6",
+      "currentGitBlobSha": "b4ab27f673318f9d44642d3fc674ccfa682937f6",
+      "match": true
+    },
+    "itemInfo": {
+      "path": "data/configdata/ConfigDataItemInfo.json",
+      "expectedGitBlobSha": "fd34c0a83bd403c1fd01d34f3439e4c24a794f5e",
+      "currentGitBlobSha": "fd34c0a83bd403c1fd01d34f3439e4c24a794f5e",
+      "match": true
+    }
+  },
+  "frozenSummary": {
+    "normalTier3Soldiers": 129,
+    "trainingLevels": 1290,
+    "materialEntries": 3505,
+    "goodsType6Entries": 3505,
+    "uniqueMaterialItemIds": 24,
+    "itemInfoExactJoin": "24/24",
+    "repositoryExactPng": "0/24",
+    "repositoryExactWebp": "0/24"
+  },
+  "boundaries": {
+    "semanticRecomputed": false,
+    "canonicalRelationReopened": false,
+    "rawConfigDataRescan": false,
+    "frontendChanged": false,
+    "assetBytesChanged": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false,
+    "fuzzyFilenameMatchingUsed": false
+  },
+  "nextStartPoint": "A1 Asset Intake Soldier training-material domain rollout using the frozen 24 itemId -> ItemInfo.Icon full-path mappings; source acquisition remains blocked until exact asset evidence is resolved.",
+  "reopenConditions": [
+    "data/generated/soldier-detail-stage5-4.v1.json blob changes",
+    "data/configdata/ConfigDataItemInfo.json blob changes for the frozen 24 item IDs",
+    "frozen census or itemInfo validation no longer passes",
+    "authoritative ItemInfo icon locator contract changes",
+    "new authoritative evidence contradicts the frozen item population"
+  ]
+}

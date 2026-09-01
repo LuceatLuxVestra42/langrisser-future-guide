@@ -1,0 +1,51 @@
+name: Soldier Training Material Assets A4
+
+on:
+  push:
+    branches:
+      - work/soldier-training-material-assets-stage1
+    paths:
+      - data/contracts/soldier-training-material-asset-intake.v1.json
+      - data/generated/soldier-training-material-assets-a2-source-census.v1.json
+      - data/evidence/soldier-training-material-assets-a3-representatives.v1.json
+      - scripts/freeze-soldier-training-material-assets-a4.mjs
+      - .github/workflows/soldier-training-material-assets-a4.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate shared Asset Intake contract
+        run: node tools/asset-intake/cli/validate-contract-v1.mjs
+
+      - name: Freeze and validate A4 bulk acquisition
+        run: node scripts/freeze-soldier-training-material-assets-a4.mjs
+
+      - name: Commit deterministic A4 outputs
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/evidence/soldier-training-material-assets-a4-bulk.v1.json \
+            data/contracts/soldier-training-material-asset-intake-a4.v1.json \
+            data/validation/soldier-training-material-assets-a4.v1.json \
+            docs/checkpoints/soldier-training-material-assets-a4.md
+          if git diff --cached --quiet; then
+            echo 'Soldier training material A4 outputs already current.'
+          else
+            git commit -m 'Freeze Soldier training material bulk acquisition A4 [skip ci]'
+            git push origin HEAD:work/soldier-training-material-assets-stage1
+          fi
