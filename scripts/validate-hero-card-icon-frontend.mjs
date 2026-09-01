@@ -1,9 +1,9 @@
 import fs from 'node:fs';
-import path from 'node:path';
 
 const manifest = JSON.parse(fs.readFileSync('data/generated/hero-card-icon-assets.v1.json', 'utf8'));
 const validation = JSON.parse(fs.readFileSync('data/validation/hero-card-icon-assets.v1.json', 'utf8'));
 const delivery = JSON.parse(fs.readFileSync('data/generated/hero-card-icon-web-delivery.v1.json', 'utf8'));
+const sourcePack = JSON.parse(fs.readFileSync('data/contracts/hero-card-icon-source-pack.v1.json', 'utf8'));
 const route = fs.readFileSync('src/routes/heroes.tsx', 'utf8');
 const helper = fs.readFileSync('src/lib/hero-card-icon-assets.server.ts', 'utf8');
 
@@ -26,14 +26,48 @@ assert(manifest.sourcePolicy?.rawConfigDataRead === false, 'raw ConfigData read 
 assert(manifest.sourcePolicy?.fuzzyMatching === false, 'fuzzy asset mapping must stay false');
 assert(validation.status === 'PASS' && validation.hardErrorCount === 0, 'asset validation must PASS');
 
-const files = fs.readdirSync('public/images/heroes/card-icons').filter((name) => /^\d+\.png$/.test(name));
+assert(sourcePack.version === 1, 'source-pack contract version must be 1');
+assert(sourcePack.contract === 'hero-card-icon-source-pack', 'source-pack contract identity mismatch');
+assert(sourcePack.status === 'PASS', 'source-pack contract must PASS');
+assert(sourcePack.owner === 'hero-assets', 'source-pack contract owner mismatch');
+assert(
+  sourcePack.authority?.semanticAndSourceIdentity === 'data/generated/hero-card-icon-assets.v1.json',
+  'source-pack semantic/source identity authority mismatch',
+);
+assert(
+  sourcePack.authority?.productionWebDelivery === 'data/generated/hero-card-icon-web-delivery.v1.json',
+  'source-pack production WebP authority mismatch',
+);
+assert(sourcePack.authority?.externalInventoryMayCreateSemanticMappings === false, 'external inventory must stay byte-only');
+assert(sourcePack.storage?.kind === 'GITHUB_RELEASE_ASSET', 'source-pack storage kind mismatch');
+assert(sourcePack.coverage?.fileCount === 267, 'source-pack file count must be 267');
+assert(sourcePack.coverage?.totalSourceBytes === 8990485, 'source-pack source byte count mismatch');
+assert(sourcePack.coverage?.missingCount === 0, 'source-pack must have no missing source bytes');
+assert(sourcePack.coverage?.extraCount === 0, 'source-pack must have no extra source bytes');
+assert(sourcePack.productionPolicy?.sourcePackFetchedAtRuntime === false, 'source pack must not be fetched at runtime');
+assert(sourcePack.productionPolicy?.productionWebDeliveryFormat === 'LOSSLESS_WEBP', 'source-pack production format mismatch');
+assert(sourcePack.productionPolicy?.productionWebDeliveryCount === 267, 'source-pack production count must be 267');
+assert(sourcePack.productionPolicy?.runtimePathChange === false, 'source-pack migration must not change runtime paths');
+
+const sourcePngRoot = manifest.source?.localAssetRoot;
+assert(
+  sourcePngRoot === sourcePack.authoritativePredecessor?.sourcePublicPath,
+  'frozen source locator must remain bound to the source-pack predecessor',
+);
+assert(
+  typeof sourcePngRoot === 'string' && !fs.existsSync(sourcePngRoot),
+  'H6 repository source PNG directory must remain absent after external source-pack cutover',
+);
+
 const webpFiles = fs.readdirSync('public/images/heroes/card-icons-webp').filter((name) => /^\d+\.webp$/.test(name));
-assert(files.length === 267, `expected 267 authoritative PNG card icons, got ${files.length}`);
 assert(webpFiles.length === 267, `expected 267 WebP delivery card icons, got ${webpFiles.length}`);
 assert(delivery.status === 'PASS' && delivery.completion === 'COMPLETE', 'WebP delivery manifest must be complete');
 assert(delivery.freezeState === 'HERO_CARD_ICON_WEB_DELIVERY_FROZEN', 'WebP delivery freezeState mismatch');
 assert(delivery.sourceFreezeState === manifest.freezeState, 'WebP delivery predecessor freeze mismatch');
-assert(delivery.sourcePolicy?.pngAuthoritativeSourceRetained === true, 'authoritative PNG sources must be retained');
+assert(
+  delivery.sourcePolicy?.pngAuthoritativeSourceRetained === true,
+  'frozen WebP delivery manifest must retain authoritative PNG source identity',
+);
 assert(delivery.sourcePolicy?.webDeliveryFormat === 'LOSSLESS_WEBP', 'delivery format must be lossless WebP');
 assert(delivery.sourcePolicy?.semanticRelationReopened === false, 'WebP delivery must not reopen semantic relations');
 assert(delivery.summary?.heroCount === 267 && delivery.summary?.webDeliveryCount === 267, 'WebP delivery count must be 267');
@@ -44,8 +78,7 @@ const deliveryByHeroId = new Map(delivery.records.map((row) => [row.heroId, row]
 for (const row of manifest.records ?? []) {
   assert(row.assetStatus === 'RESOLVED', `Hero ${row.heroId} card icon must be RESOLVED`);
   assert(row.webAssetPath === `/images/heroes/card-icons/${row.heroId}.png`, `Hero ${row.heroId} web path mismatch`);
-  assert(row.expectedFilePath === `public/images/heroes/card-icons/${row.heroId}.png`, `Hero ${row.heroId} local path mismatch`);
-  assert(fs.existsSync(row.expectedFilePath), `Hero ${row.heroId} local asset missing`);
+  assert(row.expectedFilePath === `public/images/heroes/card-icons/${row.heroId}.png`, `Hero ${row.heroId} frozen source path mismatch`);
   assert(row.width > 0 && row.height > 0 && Math.abs(row.width - row.height) <= 8, `Hero ${row.heroId} icon is not square`);
   const web = deliveryByHeroId.get(row.heroId);
   assert(web?.sourcePngPath === row.webAssetPath, `Hero ${row.heroId} WebP predecessor path mismatch`);
@@ -78,10 +111,11 @@ if (errors.length > 0) {
 console.log(JSON.stringify({
   status: 'PASS',
   heroCount: 267,
-  localCardIconCount: files.length,
+  repositorySourcePngCount: 0,
   webpDeliveryCount: webpFiles.length,
   losslessWebpDelivery: true,
-  authoritativePngSourceRetained: true,
+  authoritativePngSourceExternallyRetained: true,
+  sourcePackStorage: sourcePack.storage.kind,
   webDeliverySavingsPercent: delivery.summary.webDeliverySavingsPercent,
   frozenManifest: true,
   exactAssetMapping: true,
