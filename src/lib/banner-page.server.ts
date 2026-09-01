@@ -1,5 +1,6 @@
 import basicTableJson from "../../data/generated/banner-stage3-3-basic-table-consumer.v1.json";
 import wishConsumerJson from "../../data/generated/banner-stage3-4-wish-consumer.v1.json";
+import directWishCandidatesJson from "../../data/generated/banner-manual-wish-direct-candidates.v1.json";
 import cpConsumerJson from "../../data/generated/banner-stage3-5-cp-event-consumer.v1.json";
 import recurrenceConsumerJson from "../../data/generated/banner-stage3-6-recurrence-pickup-log-consumer.v1.json";
 
@@ -61,6 +62,25 @@ type WishConsumerSource = {
   occurrenceWishRecordCount: number;
   candidateEdgeCount: number;
   definitionCandidateSets: WishCandidateSet[];
+};
+
+type DirectWishCandidate = {
+  heroId: number;
+  heroNameKr: string;
+  productionId: number;
+};
+
+type DirectWishBinding = {
+  bannerOccurrenceId: string;
+  bannerDefinitionId: string;
+};
+
+type DirectWishCandidatesSource = {
+  status: string;
+  candidateState: string;
+  candidateCount: number;
+  candidates: DirectWishCandidate[];
+  bindings: DirectWishBinding[];
 };
 
 type CpOccurrence = {
@@ -133,7 +153,7 @@ export type BannerWishCandidateSet = {
   bannerDefinitionId: string;
   candidateState: string;
   candidateCount: number;
-  candidates: Array<Pick<WishCandidate, "heroId" | "heroNameKr">>;
+  candidates: Array<{ heroId: number; heroNameKr: string }>;
 };
 
 export type BannerCpRecord = {
@@ -167,6 +187,7 @@ export type BannerPickupLog = {
 
 const basicTable = basicTableJson as unknown as BasicTableSource;
 const wishConsumer = wishConsumerJson as unknown as WishConsumerSource;
+const directWishCandidates = directWishCandidatesJson as unknown as DirectWishCandidatesSource;
 const cpConsumer = cpConsumerJson as unknown as CpConsumerSource;
 const recurrenceConsumer = recurrenceConsumerJson as unknown as RecurrenceConsumerSource;
 
@@ -176,6 +197,9 @@ const basicRowByOccurrence = new Map(
 const wishByDefinition = new Map(
   wishConsumer.definitionCandidateSets.map((record) => [record.bannerDefinitionId, record]),
 );
+const directWishDefinitionIds = new Set(
+  directWishCandidates.bindings.map((binding) => binding.bannerDefinitionId),
+);
 const cpByOccurrence = new Map(
   cpConsumer.occurrenceRecords.map((record) => [record.bannerOccurrenceId, record]),
 );
@@ -183,16 +207,37 @@ const gapByToOccurrence = new Map(
   recurrenceConsumer.recurrenceLinks.map((link) => [link.toOccurrenceId, link.observedGapDays]),
 );
 
-function projectHero(hero: BannerHero | WishCandidate) {
+function projectHero(hero: BannerHero | WishCandidate | DirectWishCandidate) {
   return {
     heroId: hero.heroId,
     heroNameKr: hero.heroNameKr,
   };
 }
 
+function resolveWishCandidateSet(bannerDefinitionId: string): BannerWishCandidateSet | null {
+  const frozenSet = wishByDefinition.get(bannerDefinitionId);
+  if (!frozenSet) return null;
+
+  if (frozenSet.candidateCount > 0 || !directWishDefinitionIds.has(bannerDefinitionId)) {
+    return {
+      bannerDefinitionId,
+      candidateState: frozenSet.candidateState,
+      candidateCount: frozenSet.candidateCount,
+      candidates: frozenSet.candidates.map(projectHero),
+    };
+  }
+
+  return {
+    bannerDefinitionId,
+    candidateState: directWishCandidates.candidateState,
+    candidateCount: directWishCandidates.candidateCount,
+    candidates: directWishCandidates.candidates.map(projectHero),
+  };
+}
+
 export function readBannerPageData() {
   const rows: BannerPageRow[] = basicTable.rows.map((row) => {
-    const wish = row.mechanicFamily === "WISH" ? wishByDefinition.get(row.bannerDefinitionId) : null;
+    const wish = row.mechanicFamily === "WISH" ? resolveWishCandidateSet(row.bannerDefinitionId) : null;
 
     return {
       bannerOccurrenceId: row.bannerOccurrenceId,
@@ -221,12 +266,12 @@ export function readBannerPageData() {
   );
 
   const wishCandidateSets: BannerWishCandidateSet[] = wishConsumer.definitionCandidateSets.map(
-    (record) => ({
+    (record) => resolveWishCandidateSet(record.bannerDefinitionId) ?? {
       bannerDefinitionId: record.bannerDefinitionId,
       candidateState: record.candidateState,
       candidateCount: record.candidateCount,
       candidates: record.candidates.map(projectHero),
-    }),
+    },
   );
 
   const cpRecords: BannerCpRecord[] = cpConsumer.occurrenceRecords.map((record) => ({
@@ -276,12 +321,8 @@ export function readBannerPageData() {
       wishRows: rows.filter((row) => row.mechanicFamily === "WISH").length,
       renderableRows: rows.filter((row) => row.image.canRenderImage).length,
       wishDefinitions: wishCandidateSets.length,
-      wishDefinitionsWithCandidates: wishCandidateSets.filter(
-        (record) => record.candidateState === "VERIFIED_EXPLICIT_CANDIDATES",
-      ).length,
-      wishDefinitionsReview: wishCandidateSets.filter(
-        (record) => record.candidateState !== "VERIFIED_EXPLICIT_CANDIDATES",
-      ).length,
+      wishDefinitionsWithCandidates: wishCandidateSets.filter((record) => record.candidateCount > 0).length,
+      wishDefinitionsReview: wishCandidateSets.filter((record) => record.candidateCount === 0).length,
       cpOccurrences: cpRecords.length,
       canonicalEventRelations: cpRecords.filter((record) => record.canonicalEventId !== null).length,
       repeatedPickupDefinitions: pickupLogs.length,
