@@ -1,0 +1,133 @@
+name: Leon Reference Skin Source Probe
+
+on:
+  push:
+    branches:
+      - work/leon-reference-hero-v1
+    paths:
+      - .github/workflows/leon-reference-skin-source-probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/leon-reference-hero-v1
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install pinned Unity parser
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3
+
+      - name: Resolve exact current-official Leon Char sources
+        run: |
+          python - <<'PY'
+          import binascii, hashlib, json, struct, urllib.error, urllib.request, zlib
+          from pathlib import Path
+          import UnityPy
+
+          VERSION = '1.1.113'
+          BASE = f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{VERSION}'
+          UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36'
+          MAX_PART = 90
+          MISS_BREAK = 8
+          ROOT_PREFIX = 'assets/gameproject/runtimeassets/'
+          HERO_SHARD = Path('data/generated/hero-detail/by-id/6.json')
+          OUT = Path('.probe-out/leon-skin-source-probe.v1.json')
+
+          def norm(v): return str(v).replace('\\', '/').strip('/').lower()
+          def request(url, start=None, end=None):
+              headers={'User-Agent':UA,'Accept-Encoding':'identity'}
+              if start is not None: headers['Range']=f'bytes={start}-{end}'
+              req=urllib.request.Request(url,headers=headers)
+              with urllib.request.urlopen(req,timeout=90) as r: data=r.read()
+              if start is not None and len(data)!=end-start+1: raise RuntimeError(f'range mismatch: {url}')
+              return data
+          def head_size(url):
+              req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD')
+              try:
+                  with urllib.request.urlopen(req,timeout=45) as r: return int(r.headers['Content-Length'])
+              except urllib.error.HTTPError as e:
+                  if e.code in (403,404): return None
+                  raise
+          def zip_directory(url,total):
+              tail_size=min(131072,total); tail=request(url,total-tail_size,total-1); eocd=tail.rfind(b'PK\x05\x06')
+              if eocd<0: raise RuntimeError(f'EOCD missing: {url}')
+              _,_,_,_,cs,co,_=struct.unpack_from('<HHHHIIH',tail,eocd+4); central=request(url,co,co+cs-1); out=[]; i=0
+              while i+46<=len(central) and central[i:i+4]==b'PK\x01\x02':
+                  flags,method=struct.unpack_from('<HH',central,i+8); crc,compressed,uncompressed=struct.unpack_from('<III',central,i+16)
+                  fn,extra,comment=struct.unpack_from('<HHH',central,i+28); local=struct.unpack_from('<I',central,i+42)[0]
+                  nb=central[i+46:i+46+fn]; name=nb.decode('utf-8' if flags&0x800 else 'cp437','replace')
+                  out.append({'name':name,'method':method,'crc32':f'{crc:08X}','compressedBytes':compressed,'uncompressedBytes':uncompressed,'localOffset':local}); i+=46+fn+extra+comment
+              return out
+          def fetch_zip_entry(url,e):
+              off=e['localOffset']; hdr=request(url,off,off+4095)
+              if hdr[:4]!=b'PK\x03\x04': raise RuntimeError('local header missing')
+              method=struct.unpack_from('<H',hdr,8)[0]; fn,extra=struct.unpack_from('<HH',hdr,26); start=off+30+fn+extra
+              compressed=request(url,start,start+e['compressedBytes']-1)
+              raw=compressed if method==0 else zlib.decompress(compressed,-15) if method==8 else None
+              if raw is None: raise RuntimeError(f'unsupported method {method}')
+              if len(raw)!=e['uncompressedBytes']: raise RuntimeError('uncompressed size mismatch')
+              if f'{binascii.crc32(raw)&0xffffffff:08X}'!=e['crc32']: raise RuntimeError('CRC mismatch')
+              return raw
+
+          shard=json.loads(HERO_SHARD.read_text(encoding='utf-8')); skins=shard['presentation']['skins']; ids=[int(x['skinId']) for x in skins]
+          if ids!=[601,602,603,604,605,606]: raise RuntimeError(f'Leon frozen Skin IDs drifted: {ids}')
+          targets=[]
+          for row in skins:
+              sid=int(row['skinId']); source=str(row['sourceSpinePath']); expected=norm(source)
+              if not expected.startswith('spine/char/leon_abs/'): raise RuntimeError(f'Leon Char family drift: {sid}: {source}')
+              targets.append({'skinId':sid,'sourceOrder':int(row['sourceOrder']),'sourceSpinePath':source,'expectedRuntime':expected})
+
+          stem='spine_char_leon_abs'; packages=[]; candidates=[]; seen=False; misses=0
+          for part in range(1,MAX_PART+1):
+              name=f'InstallPage_{VERSION}_{part}.zip'; url=f'{BASE}/{name}'; total=head_size(url)
+              if total is None:
+                  if seen:
+                      misses+=1
+                      if misses>=MISS_BREAK: break
+                  continue
+              seen=True; misses=0; entries=zip_directory(url,total); matched=0
+              for e in entries:
+                  basename=norm(e['name']).rsplit('/',1)[-1]
+                  if basename.endswith(stem+'.b'):
+                      matched+=1; candidates.append({'part':part,'packageName':name,'packageUrl':url,'packageBytes':total,'entry':e,'bundleBasename':basename})
+              packages.append({'part':part,'packageName':name,'sizeBytes':total,'candidateCount':matched})
+          if not candidates: raise RuntimeError('No official installer Leon Char bundle candidate')
+
+          hits={sid:[] for sid in ids}; bundle_meta=[]
+          for c in candidates:
+              raw=fetch_zip_entry(c['packageUrl'],c['entry']); env=UnityPy.load(raw); containers=list(env.container.items()); bsha=hashlib.sha256(raw).hexdigest()
+              bundle_meta.append({'packagePart':c['part'],'packageName':c['packageName'],'bundleEntry':c['entry']['name'],'bundleBytes':len(raw),'bundleSha256':bsha,'containerCount':len(containers)})
+              for t in targets:
+                  for path,obj in containers:
+                      rel=norm(path); prefix=norm(ROOT_PREFIX)
+                      if rel.startswith(prefix+'/'): rel=rel[len(prefix)+1:]
+                      if rel!=t['expectedRuntime']: continue
+                      reader=obj.deref() if hasattr(obj,'deref') else getattr(obj,'object_reader',obj); raw_obj=reader.get_raw_data(); p=str(path).replace('\\','/')
+                      hits[t['skinId']].append({'packagePart':c['part'],'packageName':c['packageName'],'bundleEntry':c['entry']['name'],'containerPath':p,'objectType':reader.type.name,'objectBytes':len(raw_obj),'objectSha256':hashlib.sha256(raw_obj).hexdigest(),'sourceRef':f"official-install://{VERSION}/{c['packageName']}/{c['entry']['name']}#{p}"})
+
+          records=[]
+          for t in targets:
+              rows=hits[t['skinId']]
+              if len(rows)!=1: raise RuntimeError(f"Skin {t['skinId']} exact official Char source cardinality != 1: {len(rows)}")
+              records.append({**t,'resolved':True,**rows[0]})
+          result={'schemaVersion':1,'status':'PASS_LEON_CURRENT_OFFICIAL_CHAR_SOURCE_RESOLUTION','scope':{'heroId':6,'skinIds':ids,'skinCount':len(ids)},'authority':{'heroShard':HERO_SHARD.as_posix(),'officialInstallerVersion':VERSION,'officialInstallerBase':BASE,'resolverPredecessor':'scan-skin-stage3-2-fresh-source-v1.py @ 62a684c771b917313bcae8cc1bfe375489f82ea2'},'guardrails':{'semanticReopened':False,'nameJoin':False,'idArithmetic':False,'historicalArtifactImported':False,'fullPackageDownloaded':False,'repositoryAssetMaterialized':False},'packageCatalog':{'readablePackageCount':len(packages),'candidateBundleCount':len(candidates)},'candidateBundles':bundle_meta,'records':records,'next':'Render only these six exact Spine/Char sources as Actions artifacts before choosing repository web format.'}
+          OUT.parent.mkdir(parents=True,exist_ok=True); OUT.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'); print(json.dumps({'status':result['status'],'records':records},ensure_ascii=False,indent=2))
+          PY
+
+      - name: Upload bounded source evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: leon-reference-skin-source-probe
+          path: .probe-out/leon-skin-source-probe.v1.json
+          if-no-files-found: error
