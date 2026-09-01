@@ -120,9 +120,6 @@ function BannerPage() {
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               가챠 배너
             </h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-              현재 확정된 KR 미래시 데이터셋의 배너 일정과 연결된 이벤트 정보, 소원소환 후보, CP 관계, 재등장 관측 이력을 한 페이지에서 확인할 수 있어.
-            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs sm:flex sm:flex-wrap sm:justify-end">
@@ -142,10 +139,6 @@ function BannerPage() {
         </div>
 
         <section className="mt-8">
-          <p className="mb-5 text-xs leading-5 text-muted-foreground">
-            픽업·소원소환·CP·재등장 로그를 큰 필터로 나누지 않고 한 페이지에 모두 표시해. 소원소환은 배너를 누르면 선택 가능 후보를 펼쳐볼 수 있어.
-          </p>
-
           <div className="space-y-8">
             {data.dateGroups.map((group) => (
               <section key={group.date} aria-labelledby={`date-${group.date}`}>
