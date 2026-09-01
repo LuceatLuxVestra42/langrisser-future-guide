@@ -202,9 +202,9 @@ assert.deepEqual(validatorIds(bannerAsset), ['production-build']);
 assert.equal(bannerAsset.manualReviews[0].ownerId, 'banner-assets');
 
 const skinAsset = routeProjectCheckPaths(['data/evidence/skin-stage3-2-static-source-evidence.v1.json'], contracts);
-assert.equal(skinAsset.status, 'MANUAL_REVIEW');
+assert.equal(skinAsset.status, 'PLAN_READY');
 assert.deepEqual(skinAsset.files[0].owners, ['skin-assets']);
-assert.deepEqual(validatorIds(skinAsset), []);
+assert.deepEqual(validatorIds(skinAsset), ['skin-static-assets-readonly']);
 
 const unknownConfig = routeProjectCheckPaths(['data/configdata/ConfigDataUnknownFutureTable.json'], contracts);
 assert.equal(unknownConfig.status, 'MANUAL_REVIEW');

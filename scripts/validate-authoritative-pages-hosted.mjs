@@ -3,8 +3,7 @@ import { chromium } from "playwright";
 
 const baseUrl = (process.env.HOSTED_BASE_URL || "https://luceatluxvestra42.github.io/langrisser-future-guide/").replace(/\/?$/, "/");
 const expectedSourceSha = process.env.EXPECTED_SOURCE_SHA;
-const expectedSkinRef = process.env.EXPECTED_SKIN_REF;
-if (!expectedSourceSha || !expectedSkinRef) throw new Error("EXPECTED_SOURCE_SHA and EXPECTED_SKIN_REF are required");
+if (!expectedSourceSha) throw new Error("EXPECTED_SOURCE_SHA is required");
 
 const relation = JSON.parse(fs.readFileSync("data/generated/skin-stage2-3-bidirectional-relation.v1.json", "utf8"));
 const equipmentPublicAdmission = JSON.parse(fs.readFileSync("data/presentation/equipment-public-admission-correction.v1.json", "utf8"));
@@ -37,7 +36,7 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
     const response = await fetch(url(`authoritative-pages-source.json?qa=${Date.now()}`), { cache: "no-store" });
     if (response.ok) {
       const candidate = await response.json();
-      if (candidate.sourceSha === expectedSourceSha && candidate.skinRuntimeRef === expectedSkinRef) {
+      if (candidate.sourceSha === expectedSourceSha && candidate.skinSource === "CURRENT_REPOSITORY_FROZEN_CONSUMER" && candidate.skinPngCount === 540) {
         manifest = candidate;
         break;
       }
@@ -45,7 +44,7 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
   } catch {}
   if (attempt < 30) await sleep(5000);
 }
-check(manifest, `authoritative deployment manifest did not reach source=${expectedSourceSha} skin=${expectedSkinRef}`);
+check(manifest, `authoritative deployment manifest did not reach source=${expectedSourceSha} with current frozen Skin consumer`);
 check(manifest.semanticStageReopened === false, "deployment manifest reopened semantic stage");
 check(manifest.heroArtworkResolvedCount === 267, `deployment Hero artwork resolved count mismatch: ${manifest.heroArtworkResolvedCount}`);
 
@@ -210,7 +209,7 @@ try {
   console.log(JSON.stringify({
     status: "PASS_AUTHORITATIVE_GITHUB_PAGES_HOSTED",
     sourceSha: expectedSourceSha,
-    skinRuntimeRef: expectedSkinRef,
+    skinSource: "CURRENT_REPOSITORY_FROZEN_CONSUMER",
     heroArtwork: {
       resolvedCount: 267,
       heroId: 6,

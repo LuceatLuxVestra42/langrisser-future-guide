@@ -48,7 +48,7 @@
     {"id":"shared-frontend","validators":["production-build"]},
     {"id":"shared-build","validators":["production-build"]},
     {"id":"banner-assets","validators":[],"manualReview":"Banner asset ownership remains manual until an independent final asset validator is admitted."},
-    {"id":"skin-assets","validators":[],"manualReview":"Skin asset ownership remains manual until authoritative asset evidence and an independent final owner are admitted."}
+    {"id":"skin-assets","validators":["skin-static-assets-readonly"]}
   ],
   "pathRules": [
     {
@@ -91,7 +91,7 @@
     },
     {
       "id":"route-hosted-qa-preimplementation-admission",
-      "patterns":["tools/route-hosted-qa/**","data/contracts/project-tooling-route-hosted-qa-*.json",".github/workflows/project-tooling-route-hosted-qa.yml",".github/workflows/project-doctor-authoritative-pages-deploy.yml","scripts/project-doctor-validate-authoritative-pages-hosted.mjs"],
+      "patterns":["tools/route-hosted-qa/**","data/contracts/project-tooling-route-hosted-qa-*.json",".github/workflows/project-tooling-route-hosted-qa.yml",".github/workflows/project-doctor-authoritative-pages-deploy.yml","scripts/project-doctor-validate-authoritative-pages-hosted.mjs","scripts/project-doctor-compose-authoritative-pages-runtime.mjs",".github/workflows/authoritative-pages-deploy.yml","scripts/validate-authoritative-pages-hosted.mjs"],
       "owners":["route-hosted-qa"]
     },
     {
@@ -143,7 +143,7 @@
     },
     {
       "id":"hero-frontend",
-      "patterns":["src/routes/heroes*.tsx","src/lib/hero-*.ts","src/lib/hero-*.tsx"],
+      "patterns":["src/routes/heroes*.tsx","src/lib/hero-*.ts","src/lib/hero-*.tsx","src/lib/skin-detail.server.ts"],
       "owners":["hero-frontend"]
     },
     {
@@ -225,7 +225,7 @@
     },
     {
       "id":"skin-assets",
-      "patterns":["data/generated/skin-stage3-*","data/validation/skin-stage3-*","data/contracts/skin-stage3-*","data/evidence/skin-stage3-*","scripts/*skin-stage3*",".github/workflows/skin-stage3-*"],
+      "patterns":["public/images/skins/**","data/generated/skin-stage3-*","data/validation/skin-stage3-*","data/contracts/skin-stage3-*","data/evidence/skin-stage3-*","scripts/*skin-stage3*",".github/workflows/skin-stage3-*"],
       "excludePatterns":["data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json","data/validation/skin-stage3-2-readiness.v1.json"],
       "owners":["skin-assets"]
     },
