@@ -1,0 +1,266 @@
+name: Leon Reference Fullart Render
+
+on:
+  push:
+    branches:
+      - work/leon-reference-hero-v1
+    paths:
+      - .github/workflows/leon-reference-fullart-render.yml
+      - data/evidence/leon-reference-skin-source-probe.v1.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    strategy:
+      fail-fast: false
+      matrix:
+        skin_id: [601, 602, 603, 604, 605, 606]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout Leon reference branch
+        uses: actions/checkout@v4
+        with:
+          ref: work/leon-reference-hero-v1
+          fetch-depth: 1
+
+      - name: Checkout exact Spine 3.3 runtime
+        uses: actions/checkout@v4
+        with:
+          repository: EsotericSoftware/spine-runtimes
+          ref: 1c1936532527900f74cfb58f7002998bf157b254
+          path: .runtime/spine-runtimes
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install pinned render dependencies
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow numpy
+
+      - name: Restore verified representative renderer sources
+        env:
+          RENDER_PREDECESSOR: bccbdb564b3b2a70aeacfe6014f3829fdc7b09af
+          SKIN_ID: ${{ matrix.skin_id }}
+        run: |
+          git fetch --depth=1 origin "$RENDER_PREDECESSOR"
+          mkdir -p .probe-tools
+          git show "$RENDER_PREDECESSOR:tools/skin-fullart0/SpineGeometry.cs" > .probe-tools/SpineGeometry.cs
+          git show "$RENDER_PREDECESSOR:scripts/render-skin-fullart0-geometry.py" > .probe-tools/render.py
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          sid = int(os.environ['SKIN_ID'])
+          p = Path('.probe-tools/render.py')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace("'skinId': 102,", f"'skinId': {sid},")
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Build exact version-matched geometry probe
+        run: |
+          mkdir -p .runtime/geometry
+          runtime_src="$GITHUB_WORKSPACE/.runtime/spine-runtimes/spine-csharp/src"
+          program="$GITHUB_WORKSPACE/.probe-tools/SpineGeometry.cs"
+          cat > .runtime/geometry/SpineGeometry.csproj <<EOF
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net8.0</TargetFramework>
+              <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+              <Nullable>disable</Nullable>
+              <ImplicitUsings>disable</ImplicitUsings>
+              <LangVersion>latest</LangVersion>
+              <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+            </PropertyGroup>
+            <ItemGroup>
+              <Compile Include="$runtime_src/**/*.cs" />
+              <Compile Include="$program" />
+            </ItemGroup>
+          </Project>
+          EOF
+          dotnet build .runtime/geometry/SpineGeometry.csproj -c Release
+
+      - name: Extract exact current-official Char render inputs
+        env:
+          SKIN_ID: ${{ matrix.skin_id }}
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, re, runpy
+          from pathlib import Path, PurePosixPath
+          import UnityPy
+
+          sid = int(os.environ['SKIN_ID'])
+          evidence = json.loads(Path('data/evidence/leon-reference-skin-source-probe.v1.json').read_text(encoding='utf-8'))
+          if evidence.get('status') != 'PASS_LEON_CURRENT_OFFICIAL_CHAR_SOURCE_RESOLUTION':
+              raise RuntimeError('Leon source evidence is not PASS')
+          record = next((r for r in evidence['records'] if int(r['skinId']) == sid), None)
+          if record is None:
+              raise RuntimeError(f'Skin {sid} missing from bounded Leon source evidence')
+          bundle = evidence['bundle']
+          scanner = runpy.run_path('tools/asset-intake/diagnostics/scan-skin-stage3-2-fresh-source-v1.py')
+          base = evidence['authority']['officialInstallerBase'].rstrip('/')
+          url = f"{base}/{bundle['packageName']}"
+          total = scanner['head_size'](url)
+          if total is None:
+              raise RuntimeError('official installer package is unavailable')
+          entries = scanner['zip_directory'](url, total)
+          matches = [e for e in entries if e['name'].replace('\\','/') == bundle['bundleEntry']]
+          if len(matches) != 1:
+              raise RuntimeError(f'exact bundle entry cardinality != 1: {len(matches)}')
+          raw_bundle = scanner['fetch_zip_entry'](url, matches[0])
+          bundle_sha = hashlib.sha256(raw_bundle).hexdigest()
+          if bundle_sha != bundle['bundleSha256']:
+              raise RuntimeError(f'current official bundle hash drift: {bundle_sha}')
+          env = UnityPy.load(raw_bundle)
+          local = {int(getattr(obj, 'path_id', 0)): obj for obj in env.objects}
+
+          def norm(v): return str(v).replace('\\','/').strip().lower()
+          def deref(v):
+              fn = getattr(v, 'deref', None)
+              return fn() if callable(fn) else v
+          def safe_tree(obj):
+              try: return obj.read_typetree()
+              except Exception as exc: return {'__read_typetree_error__': str(exc)}
+          def object_name(tree):
+              if isinstance(tree, dict):
+                  for k in ('m_Name','name','Name'):
+                      v = tree.get(k)
+                      if isinstance(v, str) and v: return v
+              return None
+          def collect_pptrs(value, path='$', out=None):
+              if out is None: out=[]
+              if isinstance(value, dict):
+                  if 'm_FileID' in value and 'm_PathID' in value:
+                      try: out.append({'fieldPath':path,'fileId':int(value.get('m_FileID',0)),'pathId':int(value.get('m_PathID',0))})
+                      except Exception: pass
+                  for k,v in value.items(): collect_pptrs(v, f'{path}.{k}', out)
+              elif isinstance(value, list):
+                  for i,v in enumerate(value): collect_pptrs(v, f'{path}[{i}]', out)
+              return out
+          def refs(obj): return collect_pptrs(safe_tree(obj))
+          def textasset_bytes(obj):
+              data = obj.read(); script = getattr(data, 'script', None)
+              if script is None:
+                  tree=safe_tree(obj); script=tree.get('m_Script') if isinstance(tree,dict) else None
+              if isinstance(script,str): return script.encode('utf-8')
+              if isinstance(script,(bytes,bytearray,memoryview)): return bytes(script)
+              raise RuntimeError(f'unsupported TextAsset payload {type(script).__name__}')
+          def read_varint(data, offset):
+              result=0; shift=0
+              for _ in range(5):
+                  if offset>=len(data): raise RuntimeError('EOF varint')
+                  b=data[offset]; offset+=1; result|=(b&0x7f)<<shift
+                  if b&0x80==0: return result,offset
+                  shift+=7
+              raise RuntimeError('invalid varint')
+          def read_spine_string(data, offset):
+              length,offset=read_varint(data,offset)
+              if length==0: return None,offset
+              length-=1; end=offset+length
+              if end>len(data): raise RuntimeError('spine string overflow')
+              return data[offset:end].decode('utf-8'),end
+          def spine_version(data):
+              _,off=read_spine_string(data,0); version,_=read_spine_string(data,off); return version
+
+          prefab_matches=[]
+          for path,value in env.container.items():
+              if norm(path)==norm(record['containerPath']): prefab_matches.append((path,deref(value)))
+          if len(prefab_matches)!=1: raise RuntimeError(f'prefab exact container matches != 1: {len(prefab_matches)}')
+          prefab_path,prefab=prefab_matches[0]
+          if hashlib.sha256(prefab.get_raw_data()).hexdigest()!=record['objectSha256']:
+              raise RuntimeError('prefab serialized hash drift')
+
+          component_ids=[r['pathId'] for r in refs(prefab) if r['fileId']==0 and r['pathId'] in local]
+          skeleton_data=None
+          for cid in component_ids:
+              component=local[cid]
+              for r in refs(component):
+                  if r['fieldPath'].endswith('.skeletonDataAsset') and r['fileId']==0 and r['pathId'] in local:
+                      skeleton_data=local[r['pathId']]; break
+              if skeleton_data is not None: break
+          if skeleton_data is None: raise RuntimeError('explicit skeletonDataAsset PPtr not found')
+
+          frontier=[]
+          for r in refs(skeleton_data):
+              if r['fileId']==0 and r['pathId'] in local and r['pathId']!=0: frontier.append(local[r['pathId']])
+          expanded={int(getattr(o,'path_id',0)):o for o in frontier}
+          for obj in list(frontier):
+              for r in refs(obj):
+                  if r['fileId']==0 and r['pathId'] in local and r['pathId']!=0: expanded.setdefault(r['pathId'],local[r['pathId']])
+
+          out=Path(f'.probe-out/skin-{sid}'); rawdir=out/'raw'; rawdir.mkdir(parents=True,exist_ok=True)
+          atlas=[]; skels=[]
+          exported=[]
+          for pid,obj in sorted(expanded.items()):
+              typ=getattr(getattr(obj,'type',None),'name',None); name=object_name(safe_tree(obj)) or f'path-{pid}'
+              if typ!='TextAsset': continue
+              payload=textasset_bytes(obj); lower=name.lower(); clean=re.sub(r'[^A-Za-z0-9._-]+','_',name)
+              if '.atlas' in lower:
+                  target=rawdir/f'{pid}-{clean}.atlas.txt'; atlas.append(target)
+              elif '.skel' in lower:
+                  target=rawdir/f'{pid}-{clean}.skel.bytes'; skels.append(target)
+              else: continue
+              target.write_bytes(payload); exported.append({'pathId':pid,'name':name,'type':typ,'file':target.as_posix(),'sizeBytes':len(payload),'sha256':hashlib.sha256(payload).hexdigest()})
+          if len(atlas)!=1 or len(skels)!=1: raise RuntimeError(f'exact Spine TextAssets required atlas={len(atlas)} skel={len(skels)}')
+          atlas_path=atlas[0]; skel_path=skels[0]; version=spine_version(skel_path.read_bytes())
+
+          lines=[x for x in atlas_path.read_text(encoding='utf-8').splitlines()]
+          first=next((i for i,x in enumerate(lines) if x.strip()),None)
+          if first is None: raise RuntimeError('empty atlas')
+          lines=lines[first:]; page_name=lines[0].strip()
+          m=re.match(r'^size:\s*(\d+)\s*,\s*(\d+)\s*$',lines[1].strip())
+          if not m: raise RuntimeError('atlas first page size malformed')
+          expected_size=tuple(map(int,m.groups()))
+          runtime_path=(PurePosixPath(prefab_path).parent/page_name).as_posix()
+          tex_matches=[]
+          for path,value in env.container.items():
+              if norm(path)==norm(runtime_path): tex_matches.append((path,deref(value)))
+          if len(tex_matches)!=1: raise RuntimeError(f'atlas Texture2D exact matches != 1: {len(tex_matches)}')
+          tex_path,tex_obj=tex_matches[0]
+          if getattr(getattr(tex_obj,'type',None),'name',None)!='Texture2D': raise RuntimeError('atlas page is not Texture2D')
+          image=tex_obj.read().image
+          if (image.width,image.height)!=expected_size: raise RuntimeError(f'atlas texture size drift: {(image.width,image.height)} != {expected_size}')
+          texture_path=rawdir/page_name; image.save(texture_path)
+
+          result={'schemaVersion':1,'status':'PASS_LEON_CURRENT_SPINE_RENDER_INPUT','skinId':sid,'order':record['order'],'nameCn':record['nameCn'],'authority':{'officialInstallerVersion':evidence['authority']['officialInstallerVersion'],'packageName':bundle['packageName'],'bundleEntry':bundle['bundleEntry'],'bundleSha256':bundle_sha,'prefabPath':prefab_path,'prefabSha256':record['objectSha256']},'guardrails':{'currentOfficialOnly':True,'historicalArtifactImported':False,'nameJoin':False,'idArithmetic':False},'spineVersion':version,'inputs':{'atlas':atlas_path.as_posix(),'skeleton':skel_path.as_posix(),'texture':texture_path.as_posix(),'textureWidth':image.width,'textureHeight':image.height},'exports':exported}
+          (out/'source.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps({'status':result['status'],'skinId':sid,'spineVersion':version,'texture':[image.width,image.height]},ensure_ascii=False))
+          PY
+
+      - name: Render exact idle_Normal pose
+        env:
+          SKIN_ID: ${{ matrix.skin_id }}
+        run: |
+          root=".probe-out/skin-${SKIN_ID}"
+          atlas="$(python -c "import json,os; d=json.load(open(f'.probe-out/skin-{os.environ[\"SKIN_ID\"]}/source.json')); print(d['inputs']['atlas'])")"
+          skel="$(python -c "import json,os; d=json.load(open(f'.probe-out/skin-{os.environ[\"SKIN_ID\"]}/source.json')); print(d['inputs']['skeleton'])")"
+          texture="$(python -c "import json,os; d=json.load(open(f'.probe-out/skin-{os.environ[\"SKIN_ID\"]}/source.json')); print(d['inputs']['texture'])")"
+          dotnet run --project .runtime/geometry/SpineGeometry.csproj -c Release --no-build -- "$atlas" "$skel" "$root/geometry.json"
+          python .probe-tools/render.py --geometry "$root/geometry.json" --texture "$texture" --output "$root/fullart.png" --evidence-output "$root/render.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          sid=int(os.environ['SKIN_ID']); root=Path(f'.probe-out/skin-{sid}')
+          source=json.loads((root/'source.json').read_text(encoding='utf-8')); geom=json.loads((root/'geometry.json').read_text(encoding='utf-8')); render=json.loads((root/'render.json').read_text(encoding='utf-8'))
+          summary={'schemaVersion':1,'status':'PASS_LEON_REFERENCE_FULLART_RENDER','skinId':sid,'order':source['order'],'nameCn':source['nameCn'],'spineVersion':source['spineVersion'],'pose':geom['skeleton']['pose'],'renderables':geom['geometry']['renderableAttachmentCount'],'triangles':geom['geometry']['triangleCount'],'bounds':geom['geometry']['bounds'],'canvas':[render['render']['canvasWidth'],render['render']['canvasHeight']],'alphaBBox':render['render']['alphaBBox'],'outputSizeBytes':render['render']['outputSizeBytes'],'outputSha256':render['render']['outputSha256'],'decision':'ARTIFACT_ONLY_VISUAL_AND_SIZE_REVIEW_BEFORE_REPOSITORY_MATERIALIZATION'}
+          (root/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'); print(json.dumps(summary,ensure_ascii=False))
+          PY
+
+      - name: Upload bounded Leon render artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: leon-reference-fullart-${{ matrix.skin_id }}
+          path: .probe-out/skin-${{ matrix.skin_id }}
+          if-no-files-found: warn
