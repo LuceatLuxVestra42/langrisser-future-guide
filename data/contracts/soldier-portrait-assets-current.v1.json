@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "schemaId": "soldier-portrait-assets-current/v1",
+  "status": "CURRENT",
+  "owner": "soldier-assets",
+  "purpose": "Read-only operational locator for the currently admitted frozen Soldier portrait asset set. This contract selects existing artifacts only and is not semantic authority.",
+  "currentSourceManifest": "data/generated/soldier-portrait-manifest.v9.json",
+  "currentSourcePackContract": "data/contracts/soldier-portrait-source-pack.v1.json",
+  "currentWebManifest": "data/generated/soldier-portrait-web-manifest.v1.json",
+  "predecessor": {
+    "kind": "DECLARED_BY_CURRENT_SOURCE_PACK_CONTRACT",
+    "contract": "data/contracts/soldier-portrait-source-pack.v1.json",
+    "field": "authoritativePredecessor"
+  },
+  "role": {
+    "semanticAuthority": false,
+    "operationalLocatorOnly": true,
+    "selectsExistingFrozenArtifactsOnly": true
+  },
+  "boundaries": {
+    "rawConfigDataReadCount": 0,
+    "semanticRecomputationCount": 0,
+    "canonicalJoinRecomputationCount": 0,
+    "nameJoinInference": false,
+    "idArithmeticInference": false,
+    "filenameSimilarityInference": false,
+    "versionNumberDiscovery": false,
+    "assetByteMutation": false,
+    "sourceMeaningReinterpretation": false
+  },
+  "updatePolicy": {
+    "explicitPointerUpdateOnly": true,
+    "automaticHighestVersionSelection": false,
+    "targetArtifactsMustExistBeforeLocatorPromotion": true,
+    "owningValidatorsMustPassBeforeLocatorPromotion": true
+  }
+}
