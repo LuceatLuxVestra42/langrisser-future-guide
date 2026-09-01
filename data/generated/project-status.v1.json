@@ -31,20 +31,20 @@
   "knownHardErrorTotal": 0,
   "reviewTotal": 28,
   "reportedReviewTotal": 28,
-  "activeReviewTotal": 11,
-  "resolvedReviewTotal": 1,
+  "activeReviewTotal": 9,
+  "resolvedReviewTotal": 2,
   "deferredReviewTotal": 8,
-  "boundaryNoteTotal": 8,
-  "healthImpactReviewTotal": 11,
+  "boundaryNoteTotal": 9,
+  "healthImpactReviewTotal": 9,
   "reviewLifecycleCounts": {
-    "ACTIVE_REVIEW": 11,
-    "RESOLVED_BY_EVIDENCE": 1,
+    "ACTIVE_REVIEW": 9,
+    "RESOLVED_BY_EVIDENCE": 2,
     "DEFERRED_NON_ERROR": 8,
-    "BOUNDARY_NOTE": 8
+    "BOUNDARY_NOTE": 9
   },
-  "assignedIssueReviewTotal": 25,
-  "unassignedReviewTotal": 3,
-  "uniqueIssueTotal": 23,
+  "assignedIssueReviewTotal": 27,
+  "unassignedReviewTotal": 1,
+  "uniqueIssueTotal": 25,
   "healthImpactIssueTotal": 6,
   "reviewIssues": [
     {
@@ -204,7 +204,31 @@
       ]
     },
     {
-      "issueKey": "SOLDIER_KR_NAME_PRESENTATION_COVERAGE",
+      "issueKey": "SOLDIER_IDENTITY_PRESENTATION_BOUNDARY",
+      "reportedReviewEntryCount": 1,
+      "activeReviewEntryCount": 0,
+      "resolvedReviewEntryCount": 0,
+      "deferredReviewEntryCount": 0,
+      "boundaryNoteEntryCount": 1,
+      "healthImpactReviewEntryCount": 0,
+      "domains": [
+        "soldier"
+      ]
+    },
+    {
+      "issueKey": "SOLDIER_KR_NAME_DISPLAY_COVERAGE",
+      "reportedReviewEntryCount": 1,
+      "activeReviewEntryCount": 0,
+      "resolvedReviewEntryCount": 1,
+      "deferredReviewEntryCount": 0,
+      "boundaryNoteEntryCount": 0,
+      "healthImpactReviewEntryCount": 0,
+      "domains": [
+        "soldier"
+      ]
+    },
+    {
+      "issueKey": "SOLDIER_KR_NAME_OFFICIAL_CONFIRMATION",
       "reportedReviewEntryCount": 2,
       "activeReviewEntryCount": 2,
       "resolvedReviewEntryCount": 0,
@@ -403,24 +427,48 @@
       "hardErrorCount": 0,
       "reviewCount": 12,
       "reportedReviewTotal": 12,
-      "activeReviewTotal": 6,
-      "resolvedReviewTotal": 1,
+      "activeReviewTotal": 4,
+      "resolvedReviewTotal": 2,
       "deferredReviewTotal": 1,
-      "boundaryNoteTotal": 4,
-      "healthImpactReviewTotal": 6,
+      "boundaryNoteTotal": 5,
+      "healthImpactReviewTotal": 4,
       "reviewLifecycleCounts": {
-        "ACTIVE_REVIEW": 6,
-        "RESOLVED_BY_EVIDENCE": 1,
+        "ACTIVE_REVIEW": 4,
+        "RESOLVED_BY_EVIDENCE": 2,
         "DEFERRED_NON_ERROR": 1,
-        "BOUNDARY_NOTE": 4
+        "BOUNDARY_NOTE": 5
       },
-      "assignedIssueReviewTotal": 10,
-      "unassignedReviewTotal": 2,
-      "uniqueIssueTotal": 10,
+      "assignedIssueReviewTotal": 12,
+      "unassignedReviewTotal": 0,
+      "uniqueIssueTotal": 12,
       "healthImpactIssueTotal": 4,
       "reviewIssues": [
         {
-          "issueKey": "SOLDIER_KR_NAME_PRESENTATION_COVERAGE",
+          "issueKey": "SOLDIER_IDENTITY_PRESENTATION_BOUNDARY",
+          "reportedReviewEntryCount": 1,
+          "activeReviewEntryCount": 0,
+          "resolvedReviewEntryCount": 0,
+          "deferredReviewEntryCount": 0,
+          "boundaryNoteEntryCount": 1,
+          "healthImpactReviewEntryCount": 0,
+          "domains": [
+            "soldier"
+          ]
+        },
+        {
+          "issueKey": "SOLDIER_KR_NAME_DISPLAY_COVERAGE",
+          "reportedReviewEntryCount": 1,
+          "activeReviewEntryCount": 0,
+          "resolvedReviewEntryCount": 1,
+          "deferredReviewEntryCount": 0,
+          "boundaryNoteEntryCount": 0,
+          "healthImpactReviewEntryCount": 0,
+          "domains": [
+            "soldier"
+          ]
+        },
+        {
+          "issueKey": "SOLDIER_KR_NAME_OFFICIAL_CONFIRMATION",
           "reportedReviewEntryCount": 1,
           "activeReviewEntryCount": 1,
           "resolvedReviewEntryCount": 0,
@@ -552,6 +600,11 @@
         {
           "path": "data/validation/soldier-t3-provisional-name-presentation.v1.json",
           "role": "CURRENT_PRESENTATION_REVIEW",
+          "facet": "localization"
+        },
+        {
+          "path": "data/validation/soldier-name-presentation-reconciliation-stage10.v1.json",
+          "role": "CURRENT_SOLDIER_NAME_RECONCILIATION",
           "facet": "localization"
         }
       ],
@@ -712,7 +765,7 @@
           ]
         },
         {
-          "issueKey": "SOLDIER_KR_NAME_PRESENTATION_COVERAGE",
+          "issueKey": "SOLDIER_KR_NAME_OFFICIAL_CONFIRMATION",
           "reportedReviewEntryCount": 1,
           "activeReviewEntryCount": 1,
           "resolvedReviewEntryCount": 0,
@@ -739,7 +792,13 @@
       "blockerCount": 0,
       "activeSource": "data/validation/hero-soldier-integration-stageC-final.v1.json",
       "activeSourceId": "hero-soldier-stageC-final",
-      "supplementalSources": [],
+      "supplementalSources": [
+        {
+          "path": "data/validation/soldier-name-presentation-reconciliation-stage10.v1.json",
+          "role": "CURRENT_SOLDIER_NAME_RECONCILIATION",
+          "facet": "localization"
+        }
+      ],
       "nextWork": []
     },
     {
