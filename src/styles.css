@@ -211,3 +211,14 @@
     0 1px 2px oklch(0.55 0.05 258 / 0.08),
     0 10px 30px oklch(0.55 0.12 258 / 0.14);
 }
+
+/* Equipment ID 6 prototype: match the Hero list's framed-image treatment without touching other equipment. */
+@layer components {
+  section[aria-label="SSR 장비 이미지 목록"] img[src$="/images/equipment/6.png"] {
+    border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+    border-radius: var(--radius-lg);
+    background-color: var(--card);
+    padding: 0.25rem;
+    box-shadow: var(--shadow-card);
+  }
+}
