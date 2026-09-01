@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "stage": "Equipment Pass Evidence Claims",
+  "status": "ACTIVE",
+  "completion": "EQUIPMENT_PASS_EVIDENCE_V1_ACTIVE",
+  "policy": {
+    "join": "release-evidence record sourceId -> source claim",
+    "equipmentIdListDefinesPassMembership": false,
+    "sourceClaimDefinesClassificationMeaning": true,
+    "releaseFamilyDefinesMembership": false,
+    "technicalSiteTabDefinesMembership": false,
+    "newOfficialSourceClaimsMayBeAddedWithoutChangingClassifierCode": true
+  },
+  "predecessorEvidence": {
+    "audit": "data/validation/equipment-p3-0-release-chronology-audit.v1.json",
+    "nonPassCorrection": "data/validation/equipment-public-presentation-correction-final.v1.json"
+  },
+  "sourceClaims": {
+    "S2019_SAKURA_PRIMARY_ORIGINALS": {
+      "classificationState": "NON_PASS_CONFIRMED",
+      "requiredSourceTier": "PRIMARY_OFFICIAL",
+      "basis": "Frozen public-presentation correction identifies the standard-counterpart continuity records as current-additional non-pass; the sourceId is used as the stable audited record group, not as release-date proof."
+    },
+    "S2024_1226_FORGE_PRIMARY": {
+      "classificationState": "PASS_CONFIRMED",
+      "requiredSourceTier": "PRIMARY_OFFICIAL",
+      "basis": "Accepted primary official Equipment Pass/Forge release evidence."
+    },
+    "S2025_0424_FORGE_PRIMARY": {
+      "classificationState": "PASS_CONFIRMED",
+      "requiredSourceTier": "PRIMARY_OFFICIAL",
+      "basis": "Accepted primary official Equipment Pass/Forge release evidence."
+    },
+    "S2025_0814_FORGE_PRIMARY": {
+      "classificationState": "PASS_CONFIRMED",
+      "requiredSourceTier": "PRIMARY_OFFICIAL",
+      "basis": "Accepted primary official Equipment Pass/Forge release evidence."
+    },
+    "S2025_1204_FORGE_PRIMARY": {
+      "classificationState": "PASS_CONFIRMED",
+      "requiredSourceTier": "PRIMARY_OFFICIAL",
+      "basis": "Accepted primary official Equipment Pass/Forge release evidence."
+    },
+    "S2026_0326_FORGE_PRIMARY": {
+      "classificationState": "PASS_CONFIRMED",
+      "requiredSourceTier": "PRIMARY_OFFICIAL",
+      "basis": "Accepted primary official Equipment Pass/Forge release evidence."
+    },
+    "S2026_0716_FORGE_PRIMARY": {
+      "classificationState": "PASS_CONFIRMED",
+      "requiredSourceTier": "PRIMARY_OFFICIAL",
+      "basis": "Accepted primary official Equipment Pass/Forge release evidence."
+    }
+  },
+  "candidatePolicy": {
+    "unclaimedPublicCurrentAdditional": "UNRESOLVED",
+    "claimedButInsufficientEvidence": "PASS_CANDIDATE",
+    "publicExcludedCandidate": "NON_PUBLIC_EXCLUDED"
+  },
+  "review": {
+    "blockers": [],
+    "nonBlocking": [
+      "The current predecessor release-evidence audit was originally scoped to technical current-additional records. Future official Equipment Pass evidence outside that scope must be added to an evidence audit/registry before it can be confirmed."
+    ]
+  }
+}
