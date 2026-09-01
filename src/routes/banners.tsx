@@ -69,7 +69,7 @@ function BannerImage({
       src={image.publicPath}
       alt={alt}
       loading="lazy"
-      className="aspect-[16/7] w-full rounded-xl border border-border bg-muted object-contain"
+      className="h-auto w-full rounded-xl border border-border"
     />
   );
 }
