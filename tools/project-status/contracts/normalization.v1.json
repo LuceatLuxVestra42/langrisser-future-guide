@@ -54,7 +54,7 @@
       },
       "zeroRequiredSelectors": [],
       "reviewSelectors": ["/nonBlockingReviews"],
-      "nextWorkSelectors": ["/nextStartPoint"],
+      "nextWorkSelectors": [],
       "lifecycleRules": [
         {"when": "/heroDataPipelineStatus == FINAL_FROZEN", "lifecycle": "FROZEN"},
         {"when": "/completion == COMPLETE", "lifecycle": "COMPLETE"}
@@ -205,7 +205,7 @@
         "/summary/hardErrorCount"
       ],
       "reviewSelectors": ["/nonBlockingReviews"],
-      "nextWorkSelectors": ["/nextStartPoint"],
+      "nextWorkSelectors": [],
       "lifecycleRules": [
         {"when": "/pipelineStatus == FINAL_FROZEN", "lifecycle": "FROZEN"},
         {"when": "/completion == COMPLETE", "lifecycle": "COMPLETE"}
