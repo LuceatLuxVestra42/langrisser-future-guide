@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "schemaId": "soldier-portrait-batch-planner/v1",
+  "status": "ACTIVE",
+  "owner": "soldier-assets",
+  "producer": "scripts/plan-soldier-portrait-batch.mjs",
+  "validator": "scripts/validate-soldier-portrait-batch-plan-b3.mjs",
+  "inputs": {
+    "canonicalConsumer": "data/generated/soldier-master.v1.json",
+    "currentAssetLocator": "data/contracts/soldier-portrait-assets-current.v1.json"
+  },
+  "rules": {
+    "newIds": "canonicalIds - currentAssetIds",
+    "removedIds": "currentAssetIds - canonicalIds",
+    "NO_UPDATE_REQUIRED": "newIds.length === 0 && removedIds.length === 0",
+    "BATCH_READY": "newIds.length > 0 && removedIds.length === 0",
+    "BLOCKER": "removedIds.length > 0"
+  },
+  "boundaries": {
+    "semanticAuthority": false,
+    "readOnly": true,
+    "idSetDifferenceOnly": true,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "semanticRecomputation": false,
+    "sourceDiscovery": false,
+    "assetMutation": false,
+    "automaticVersionDiscovery": false
+  }
+}
