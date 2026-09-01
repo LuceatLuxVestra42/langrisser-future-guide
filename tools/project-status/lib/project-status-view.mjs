@@ -16,6 +16,33 @@ const nextWorkSummary = nextWork => {
   return values.length === 0 ? '-' : values.join(' / ');
 };
 
+const REVIEW_LIFECYCLES = [
+  'ACTIVE_REVIEW',
+  'RESOLVED_BY_EVIDENCE',
+  'DEFERRED_NON_ERROR',
+  'BOUNDARY_NOTE',
+];
+
+const reviewAggregate = reviews => {
+  const records = reviews ?? [];
+  const reviewLifecycleCounts = Object.fromEntries(REVIEW_LIFECYCLES
+    .map(lifecycle => [lifecycle, records.filter(review => review?.lifecycle === lifecycle).length]));
+  const classifiedTotal = Object.values(reviewLifecycleCounts).reduce((sum, count) => sum + count, 0);
+  if (classifiedTotal !== records.length) {
+    throw new Error(`Project Status refuses unclassified review lifecycle entries: classified=${classifiedTotal}/reported=${records.length}.`);
+  }
+
+  return {
+    reportedReviewTotal: records.length,
+    activeReviewTotal: reviewLifecycleCounts.ACTIVE_REVIEW,
+    resolvedReviewTotal: reviewLifecycleCounts.RESOLVED_BY_EVIDENCE,
+    deferredReviewTotal: reviewLifecycleCounts.DEFERRED_NON_ERROR,
+    boundaryNoteTotal: reviewLifecycleCounts.BOUNDARY_NOTE,
+    healthImpactReviewTotal: records.filter(review => review?.healthImpact === true).length,
+    reviewLifecycleCounts,
+  };
+};
+
 export function projectStatusView(normalized) {
   if (normalized?.schemaId !== 'project-status-normalized/v1' || normalized?.status !== 'COLLECTED') {
     throw new Error(`Project Status projection refuses unsupported normalized input: ${normalized?.schemaId ?? 'missing'}/${normalized?.status ?? 'missing'}`);
@@ -34,6 +61,7 @@ export function projectStatusView(normalized) {
     population: record.population ?? {},
     hardErrorCount: record.hardErrorCount ?? 0,
     reviewCount: record.reviewCount ?? 0,
+    ...reviewAggregate(record.reviews),
     blockerCount: (record.blockers ?? []).length,
     activeSource: record.primarySource?.path ?? null,
     activeSourceId: record.activeSource?.selectedId ?? null,
@@ -51,6 +79,8 @@ export function projectStatusView(normalized) {
 
   const names = domains.map(record => record.domain);
   if (new Set(names).size !== names.length) throw new Error('Project Status refuses duplicate domains.');
+
+  const aggregate = reviewAggregate((normalized.domains ?? []).flatMap(record => record.reviews ?? []));
 
   return {
     version: 1,
@@ -72,6 +102,7 @@ export function projectStatusView(normalized) {
     lifecycleCounts: normalized.lifecycleCounts ?? {},
     knownHardErrorTotal: normalized.knownHardErrorTotal ?? 0,
     reviewTotal: normalized.reviewTotal ?? 0,
+    ...aggregate,
     blockerTotal: normalized.blockerTotal ?? 0,
     domains,
   };
