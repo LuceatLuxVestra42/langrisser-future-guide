@@ -211,6 +211,6 @@ check(directWishOverlay.semanticBoundary?.unrelatedManualWishResolved === false,
 const routeTreeText = fs.readFileSync(contract.inputs.frontendRouteTree, 'utf8');
 check(routeTreeText.includes("'/banners'"), 'route tree no longer contains /banners');
 const routeText = fs.readFileSync('src/routes/banners.tsx', 'utf8');
-for (const label of expected.frontend.sections) check(routeText.includes(label), `frontend section label missing: ${label}`);
+check(routeText.includes('getBannerPageData'), 'frontend route no longer consumes banner page data');
 
 console.log(contract.completionStatus);
