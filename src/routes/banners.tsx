@@ -5,11 +5,25 @@ import {
   ChevronDown,
   CircleAlert,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { getBannerPageData } from "@/lib/banner-page.functions";
 
-const DISPLAY_START_DATE = "2026-09-16";
+function getKoreanToday() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  const day = parts.find((part) => part.type === "day")?.value;
+
+  if (!year || !month || !day) return null;
+  return `${year}-${month}-${day}`;
+}
 
 export const Route = createFileRoute("/banners")({
   loader: () => getBannerPageData(),
@@ -80,6 +94,11 @@ function HeroChips({ heroes }: { heroes: Array<{ heroId: number; heroNameKr: str
 function BannerPage() {
   const data = Route.useLoaderData();
   const [expandedWishOccurrence, setExpandedWishOccurrence] = useState<string | null>(null);
+  const [displayStartDate, setDisplayStartDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    setDisplayStartDate(getKoreanToday());
+  }, []);
 
   const wishByDefinition = useMemo(
     () => new Map(data.wishCandidateSets.map((record) => [record.bannerDefinitionId, record])),
@@ -92,8 +111,11 @@ function BannerPage() {
   );
 
   const visibleDateGroups = useMemo(
-    () => data.dateGroups.filter((group) => group.date >= DISPLAY_START_DATE),
-    [data.dateGroups],
+    () =>
+      displayStartDate
+        ? data.dateGroups.filter((group) => group.date >= displayStartDate)
+        : [],
+    [data.dateGroups, displayStartDate],
   );
 
   const visibleRows = useMemo(
@@ -145,6 +167,11 @@ function BannerPage() {
         </div>
 
         <section className="mt-8">
+          {!displayStartDate && (
+            <div className="mb-5 rounded-2xl border border-border bg-card px-4 py-6 text-sm text-muted-foreground">
+              한국시간 기준 일정을 확인하고 있어.
+            </div>
+          )}
           <div className="space-y-8">
             {visibleDateGroups.map((group) => (
               <section key={group.date} aria-labelledby={`date-${group.date}`}>
@@ -277,7 +304,7 @@ function BannerPage() {
 
         <footer className="mt-10 border-t border-border pt-6 text-xs leading-5 text-muted-foreground">
           <p>
-            2026.09.16 이후의 canonical KR schedule dataset만 표시해. 최초 출시 여부, 고정 복각 주기, 미래 복각일은 이 페이지에서 추론하지 않아.
+            한국시간 오늘 이후의 canonical KR schedule dataset만 표시해. 최초 출시 여부, 고정 복각 주기, 미래 복각일은 이 페이지에서 추론하지 않아.
           </p>
         </footer>
       </div>
