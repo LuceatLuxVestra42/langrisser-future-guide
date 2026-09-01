@@ -45,6 +45,24 @@ function formatDisplayDate(value: string) {
   return `${year}.${month}.${day}`;
 }
 
+function getBannerDisplayLabel(typeLabelKr: string, cpRelated: boolean) {
+  if (cpRelated && typeLabelKr === "2인 픽업") return "CP";
+
+  switch (typeLabelKr) {
+    case "1인 픽업":
+      return "1인";
+    case "2인 픽업":
+    case "픽업":
+      return "2인";
+    case "3인 픽업":
+      return "3인";
+    case "소원소환":
+      return "소원";
+    default:
+      return typeLabelKr;
+  }
+}
+
 function BannerImage({
   image,
   alt,
@@ -153,6 +171,10 @@ function BannerPage() {
                     const wish = wishByDefinition.get(row.bannerDefinitionId);
                     const isWish = row.mechanicFamily === "WISH";
                     const expanded = expandedWishOccurrence === row.bannerOccurrenceId;
+                    const displayTypeLabel = getBannerDisplayLabel(
+                      row.typeLabelKr,
+                      row.cpRelated,
+                    );
 
                     return (
                       <article
@@ -180,13 +202,8 @@ function BannerPage() {
                             <div>
                               <div className="flex flex-wrap items-center gap-2">
                                 <span className="rounded-md bg-primary px-2 py-1 text-[11px] font-bold text-primary-foreground">
-                                  {row.typeLabelKr}
+                                  {displayTypeLabel}
                                 </span>
-                                {row.cpRelated && (
-                                  <span className="rounded-md border border-border bg-muted px-2 py-1 text-[11px] font-semibold text-foreground">
-                                    CP 관련
-                                  </span>
-                                )}
                               </div>
                             </div>
                             {isWish && (
