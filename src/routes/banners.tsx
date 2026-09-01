@@ -173,6 +173,7 @@ function BannerPage() {
                   {group.rows.map((row) => {
                     const wish = wishByDefinition.get(row.bannerDefinitionId);
                     const isWish = row.mechanicFamily === "WISH";
+                    const isNew = row.lifecycleLabelKr === "신규";
                     const expanded = expandedWishOccurrence === row.bannerOccurrenceId;
                     const wishCandidatesReady =
                       wish?.candidateState === "VERIFIED_EXPLICIT_CANDIDATES" ||
@@ -186,9 +187,9 @@ function BannerPage() {
                     return (
                       <article
                         key={row.bannerOccurrenceId}
-                        className={`overflow-hidden rounded-2xl bg-card shadow-sm ${
-                          isWish ? "border-2 border-primary/30" : "border border-border"
-                        }`}
+                        className={`overflow-hidden rounded-2xl shadow-sm ${
+                          isNew ? "bg-orange-50/80 dark:bg-orange-950/20" : "bg-card"
+                        } ${isWish ? "border-2 border-primary/30" : "border border-border"}`}
                       >
                         <button
                           type="button"
@@ -209,6 +210,11 @@ function BannerPage() {
                           />
                           <div className="mt-3 flex items-start justify-between gap-3">
                             <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1.5">
+                              {isNew && (
+                                <span className="shrink-0 rounded-md border border-orange-300/80 bg-orange-100 px-2 py-1 text-[11px] font-bold text-orange-800 dark:border-orange-700 dark:bg-orange-900/40 dark:text-orange-200">
+                                  신규
+                                </span>
+                              )}
                               <span className="shrink-0 rounded-md bg-primary px-2 py-1 text-[11px] font-bold text-primary-foreground">
                                 {displayTypeLabel}
                               </span>
