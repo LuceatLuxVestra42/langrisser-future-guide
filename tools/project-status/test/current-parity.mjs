@@ -35,6 +35,31 @@ if (normalized.legacyGeneratedStatusReadCount !== 0) fail('legacy generated stat
 if (normalized.sourceAuthority?.schemaId !== 'status-source-selection/v1') fail('R1 Status Source selection must be the authority predecessor');
 if (normalized.sourceAuthority?.selectedCount !== 6) fail('R1 Status Source selection must provide six domains');
 
+const normalizedReviews = normalized.domains.flatMap(record => record.reviews ?? []);
+if (normalizedReviews.length !== 28) fail(`review-model Stage 1 must preserve the 28 reported review entries, got ${normalizedReviews.length}`);
+const reviewKeys = normalizedReviews.map(review => review.reviewKey);
+if (reviewKeys.some(key => typeof key !== 'string' || key.length === 0)) fail('every normalized review must have a stable reviewKey');
+if (new Set(reviewKeys).size !== reviewKeys.length) fail('normalized reviewKey values must be unique across current sources');
+for (const review of normalizedReviews) {
+  if (review.lifecycle !== 'ACTIVE_REVIEW') fail(`Stage 1 must preserve current review lifecycle as ACTIVE_REVIEW: ${review.reviewKey}`);
+  if (review.healthImpact !== true) fail(`Stage 1 must preserve current review health impact: ${review.reviewKey}`);
+  if (!Object.prototype.hasOwnProperty.call(review, 'reportedCount')) fail(`review missing reportedCount: ${review.reviewKey}`);
+  if (!Object.prototype.hasOwnProperty.call(review, 'remainingCount')) fail(`review missing remainingCount: ${review.reviewKey}`);
+  if (!Array.isArray(review.resolutionEvidence) || review.resolutionEvidence.length !== 0) fail(`Stage 1 resolutionEvidence must start empty: ${review.reviewKey}`);
+  if (review.issueKey !== null) fail(`Stage 1 issueKey must remain unassigned: ${review.reviewKey}`);
+}
+const normalizedHero = normalized.domains.find(item => item.domain === 'hero');
+const heroReviewKeys = normalizedHero.reviews.map(review => review.reviewKey);
+if (!heroReviewKeys.includes('data/validation/hero-stage6-4-final.v1.json#/nonBlockingReviews[0]')
+  || !heroReviewKeys.includes('data/validation/hero-stage6-4-final.v1.json#/nonBlockingReviews[1]')) {
+  fail(`code-less Hero reviews must use selector/index review keys: ${JSON.stringify(heroReviewKeys)}`);
+}
+const normalizedSoldier = normalized.domains.find(item => item.domain === 'soldier');
+const releaseReview = normalizedSoldier.reviews.find(review => review.code === 'RELEASE_DATE_UNRESOLVED');
+if (!releaseReview || releaseReview.reportedCount !== 213 || releaseReview.remainingCount !== 213) {
+  fail(`Soldier review count metadata must be preserved: ${JSON.stringify(releaseReview)}`);
+}
+
 for (const key of ['projectHealth', 'healthCounts', 'lifecycleCounts', 'knownHardErrorTotal', 'reviewTotal', 'blockerTotal']) {
   same(projected[key], fixture[key], `aggregate ${key}`);
 }
@@ -185,13 +210,19 @@ for (const forbidden of [
 if (!first.markdown.includes('NEW Status Source authority')) fail('markdown must identify NEW Status Source authority');
 if (!first.markdown.includes('raw ConfigData')) fail('markdown must preserve no-raw-ConfigData boundary');
 
-console.log('[project-status-r2] PASS: current parity, canonical compatibility, writer boundary, and runtime independence verified.');
+console.log('[project-status-r2] PASS: current parity, review model, canonical compatibility, writer boundary, and runtime independence verified.');
 console.log(JSON.stringify({
   projectHealth: projected.projectHealth,
   healthCounts: projected.healthCounts,
   lifecycleCounts: projected.lifecycleCounts,
   reviewTotal: projected.reviewTotal,
   blockerTotal: projected.blockerTotal,
+  reviewModel: {
+    normalizedReviewCount: normalizedReviews.length,
+    uniqueReviewKeyCount: new Set(reviewKeys).size,
+    heroCodeLessReviewKeyCount: heroReviewKeys.length,
+    soldierReleaseReportedCount: releaseReview.reportedCount,
+  },
   selectedDomains: Object.fromEntries(projected.domains.map(item => [item.domain, item.activeSourceId])),
   equipment: {
     canonical: equipment.population.canonical,
