@@ -1,0 +1,177 @@
+name: Skin Fullart Routing Admission
+
+on:
+  push:
+    branches:
+      - work/leon-reference-hero-v1
+    paths:
+      - .github/workflows/skin-stage3-fullart-routing-admission.yml
+
+permissions:
+  contents: write
+
+jobs:
+  admit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/leon-reference-hero-v1
+          fetch-depth: 0
+
+      - name: Add explicit fullart owner validator and fixture
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          owners_path=Path('tools/project-check/contracts/owners.v1.json')
+          owners=json.loads(owners_path.read_text(encoding='utf-8'))
+          if not any(x['id']=='skin-fullart-assets' for x in owners['owners']):
+              idx=next(i for i,x in enumerate(owners['owners']) if x['id']=='skin-assets')
+              owners['owners'].insert(idx, {'id':'skin-fullart-assets','validators':['skin-fullart-reference-assets']})
+          if not any(x['id']=='skin-fullart-assets' for x in owners['pathRules']):
+              idx=next(i for i,x in enumerate(owners['pathRules']) if x['id']=='skin-stage3-2-evidence')
+              owners['pathRules'].insert(idx, {
+                  'id':'skin-fullart-assets',
+                  'patterns':[
+                      'public/images/skin-fullart/**',
+                      'data/contracts/skin-fullart-*',
+                      'data/evidence/skin-fullart-*',
+                      'data/generated/skin-fullart-*',
+                      'data/validation/skin-fullart-*',
+                      'scripts/*skin-fullart*',
+                      '.github/workflows/skin-fullart-*'
+                  ],
+                  'owners':['skin-fullart-assets']
+              })
+          owners_path.write_text(json.dumps(owners,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          validators_path=Path('tools/project-check/contracts/validators.v1.json')
+          validators=json.loads(validators_path.read_text(encoding='utf-8'))
+          catalog=validators['validators']
+          if not any(x['id']=='skin-fullart-reference-assets' for x in catalog):
+              idx=next(i for i,x in enumerate(catalog) if x['id']=='skin-static-assets-readonly')
+              catalog.insert(idx, {
+                  'id':'skin-fullart-reference-assets',
+                  'phase':30,
+                  'executable':'node',
+                  'args':['scripts/validate-skin-fullart-reference-assets.mjs'],
+                  'owner':'skin-fullart-assets',
+                  'coverage':'Read-only byte/hash/path parity for the bounded Leon reference full-body WebP assets, frozen Hero 6 Skin ownership, and current-official Spine/Char render evidence.'
+              })
+          validators_path.write_text(json.dumps(validators,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          test_path=Path('tools/project-check/test/project-check-self-test.mjs')
+          text=test_path.read_text(encoding='utf-8')
+          fixture="""
+const skinFullartAsset = routeProjectCheckPaths(['public/images/skin-fullart/601.webp'], contracts);
+assert.equal(skinFullartAsset.status, 'PLAN_READY');
+assert.deepEqual(skinFullartAsset.files[0].owners, ['skin-fullart-assets']);
+assert.deepEqual(validatorIds(skinFullartAsset), ['skin-fullart-reference-assets']);
+
+"""
+          if 'const skinFullartAsset =' not in text:
+              marker="const skinAsset = routeProjectCheckPaths(['data/evidence/skin-stage3-2-static-source-evidence.v1.json'], contracts);"
+              pos=text.index(marker)
+              text=text[:pos]+fixture+text[pos:]
+              test_path.write_text(text,encoding='utf-8')
+          PY
+
+          cat > scripts/validate-skin-fullart-reference-assets.mjs <<'EOF'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import crypto from 'node:crypto';
+
+          const CONTRACT='data/contracts/skin-fullart-reference-assets.v1.json';
+          const MANIFEST='data/generated/skin-fullart-reference-assets.v1.json';
+          const EVIDENCE='data/evidence/skin-fullart-reference-leon.v1.json';
+          const HERO_SHARD='data/generated/hero-detail/by-id/6.json';
+          const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+          const assert=(c,m)=>{if(!c) throw new Error(m);};
+          const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+          const isWebP=b=>b.length>=12 && b.subarray(0,4).toString('ascii')==='RIFF' && b.subarray(8,12).toString('ascii')==='WEBP';
+
+          const contract=read(CONTRACT);
+          assert(contract.status==='DESIGN_FROZEN','fullart contract not DESIGN_FROZEN');
+          const manifest=read(MANIFEST);
+          const evidence=read(EVIDENCE);
+          const shard=read(HERO_SHARD);
+          assert(manifest.status==='LEON_REFERENCE_FULLART_MATERIALIZED','manifest not materialized');
+          assert(evidence.status==='PASS_LEON_REFERENCE_FULLART_RENDER_SET','render evidence not PASS');
+          assert(manifest.heroId===6 && evidence.heroId===6,'Hero scope drift');
+          const expected=contract.expectedSkinIds;
+          assert(JSON.stringify(manifest.records.map(x=>x.skinId))===JSON.stringify(expected),'manifest Skin ID/order drift');
+          assert(JSON.stringify(evidence.records.map(x=>x.skinId))===JSON.stringify(expected),'evidence Skin ID/order drift');
+          const shardSkins=shard.presentation.skins;
+          assert(JSON.stringify(shardSkins.map(x=>x.skinId))===JSON.stringify(expected),'frozen Hero 6 Skin IDs drifted');
+          const sourceById=new Map(evidence.records.map(x=>[x.skinId,x]));
+          const shardById=new Map(shardSkins.map(x=>[x.skinId,x]));
+          const seen=new Set();
+          let total=0;
+          for(const row of manifest.records){
+            assert(!seen.has(row.skinId),`duplicate skin ${row.skinId}`); seen.add(row.skinId);
+            const source=sourceById.get(row.skinId); const frozen=shardById.get(row.skinId);
+            assert(source && frozen,`missing source/frozen record ${row.skinId}`);
+            assert(source.sourceSpinePath===frozen.sourceSpinePath,`Spine/Char path drift ${row.skinId}`);
+            assert(row.heroId===6 && row.order===frozen.order,`ownership/order drift ${row.skinId}`);
+            const expectedRepo=`${contract.outputRoot}/${row.skinId}.webp`;
+            const expectedPublic=`${contract.publicRoot}/${row.skinId}.webp`;
+            assert(row.repoPath===expectedRepo && row.publicPath===expectedPublic,`path drift ${row.skinId}`);
+            const b=fs.readFileSync(row.repoPath);
+            assert(isWebP(b),`not WebP ${row.skinId}`);
+            assert(b.length===row.sizeBytes && sha(b)===row.sha256,`byte/hash drift ${row.skinId}`);
+            assert(row.width>0 && row.height>0 && Math.max(row.width,row.height)<=contract.transform.maxDimension,`dimension contract fail ${row.skinId}`);
+            total+=b.length;
+          }
+          const entries=fs.readdirSync(contract.outputRoot,{withFileTypes:true});
+          assert(entries.every(x=>x.isFile() && expected.includes(Number(x.name.replace(/\.webp$/,''))) && /^\d+\.webp$/.test(x.name)),'unexpected fullart file');
+          assert(entries.length===expected.length,'fullart file count drift');
+          assert(total===manifest.totalSizeBytes,'total byte accounting drift');
+          assert(manifest.totalSizeBytes<=contract.maxReferenceSetBytes,'reference set exceeds byte budget');
+          console.log(JSON.stringify({status:'PASS_SKIN_FULLART_REFERENCE_ASSETS',heroId:6,skinCount:expected.length,totalSizeBytes:total,repositoryMutation:false},null,2));
+          EOF
+
+          mkdir -p data/contracts
+          cat > data/contracts/skin-fullart-reference-assets.v1.json <<'EOF'
+          {
+            "schemaVersion": 1,
+            "contractId": "skin-fullart-reference-assets/v1",
+            "status": "DESIGN_FROZEN",
+            "scope": "Leon reference Hero only; presentation/asset delivery, no semantic recomputation",
+            "heroId": 6,
+            "expectedSkinIds": [601, 602, 603, 604, 605, 606],
+            "sourceFamily": "Spine/Char",
+            "outputRoot": "public/images/skin-fullart",
+            "publicRoot": "/images/skin-fullart",
+            "transform": {
+              "format": "WEBP",
+              "maxDimension": 1600,
+              "quality": 90,
+              "alphaQuality": 100,
+              "method": 4,
+              "preserveAlpha": true
+            },
+            "maxReferenceSetBytes": 1572864,
+            "boundaries": {
+              "staticCardRootUntouched": "public/images/skins",
+              "semanticReopen": false,
+              "nameJoin": false,
+              "idArithmetic": false,
+              "rawConfigDataFallback": false
+            }
+          }
+          EOF
+
+      - name: Verify routing self-test
+        run: |
+          node tools/project-check/test/project-check-self-test.mjs
+          git diff --check
+
+      - name: Commit routing admission
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/project-check/contracts/owners.v1.json tools/project-check/contracts/validators.v1.json tools/project-check/test/project-check-self-test.mjs scripts/validate-skin-fullart-reference-assets.mjs data/contracts/skin-fullart-reference-assets.v1.json
+          git commit -m 'Admit explicit Skin fullart asset owner'
+          git push origin HEAD:work/leon-reference-hero-v1
