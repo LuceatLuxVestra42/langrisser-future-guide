@@ -56,7 +56,11 @@ const malformed = records.filter(row =>
   !row.identity?.nameCn ||
   !row.rarity?.baseLabel ||
   !Number.isFinite(Number(row.rarity?.rank)) ||
-  typeof row.hasSp !== 'boolean'
+  typeof row.hasSp !== 'boolean' ||
+  !Array.isArray(row.factions) ||
+  row.factions.some(faction => !Number.isSafeInteger(faction?.factionId) || !faction?.nameCn) ||
+  !Number.isSafeInteger(row.origin?.productionId) ||
+  !row.origin?.nameCn
 );
 
 check('hero-population', records.length === 267 && uniqueIds.size === 267, `records=${records.length}, unique=${uniqueIds.size}`);
@@ -64,9 +68,20 @@ check('record-schema', malformed.length === 0, `malformed=${malformed.length}`);
 check('hard-error-zero', source.summary?.hardErrorCount === 0, `hardErrorCount=${source.summary?.hardErrorCount}`);
 
 const rarityCounts = new Map();
-for (const row of records) rarityCounts.set(row.rarity.baseLabel, (rarityCounts.get(row.rarity.baseLabel) || 0) + 1);
+const factionIds = new Set();
+const originIds = new Set();
+for (const row of records) {
+  rarityCounts.set(row.rarity.baseLabel, (rarityCounts.get(row.rarity.baseLabel) || 0) + 1);
+  for (const faction of row.factions) factionIds.add(faction.factionId);
+  originIds.add(row.origin.productionId);
+}
 const spCount = records.filter(row => row.hasSp).length;
+const lowRarityCount = (rarityCounts.get('N') || 0) + (rarityCounts.get('R') || 0);
+
 check('rarity-options-available', rarityCounts.size >= 3, `rarities=${JSON.stringify(Object.fromEntries(rarityCounts))}`);
+check('low-rarity-source-available', lowRarityCount > 0, `N+R=${lowRarityCount}`);
+check('faction-options-available', factionIds.size > 0, `factions=${factionIds.size}`);
+check('origin-options-available', originIds.size > 0, `origins=${originIds.size}`);
 check('sp-count', spCount === source.summary?.spReleasedCount && spCount === 25, `sp=${spCount}, summary=${source.summary?.spReleasedCount}`);
 
 const matthew = records.find(row => row.heroId === 1);
@@ -99,7 +114,7 @@ check(
     !server.includes('data/configdata/') &&
     !server.includes('ConfigDataHero') &&
     !server.includes('ConfigDataJob'),
-  'Stage 3 derives only presentation filter metadata from the frozen Stage 1 consumer',
+  'Stage 3 derives presentation filter data from the frozen Stage 1 consumer',
 );
 
 check(
@@ -124,9 +139,34 @@ check(
 check(
   'rarity-filter-ui',
   route.includes('희귀도 필터') &&
-    route.includes('data.filters.rarities.map') &&
-    route.includes('hero.rarity.baseLabel !== rarity'),
-  'rarity buttons filter records',
+    route.includes('rarityOptions.map') &&
+    route.includes('matchesRarity(hero, rarity)'),
+  'rarity buttons filter records through the presentation matcher',
+);
+
+check(
+  'low-rarity-combined-ui',
+  route.includes('const LOW_RARITY = "N,R"') &&
+    route.includes('option.label !== "N" && option.label !== "R"') &&
+    route.includes('hero.rarity.baseLabel === "N" || hero.rarity.baseLabel === "R"'),
+  'N and R remain canonical values but are exposed as one N,R filter option',
+);
+
+check(
+  'faction-filter-ui',
+  route.includes('진영 필터') &&
+    route.includes('factionOptions.map') &&
+    route.includes('hero.factions.some') &&
+    route.includes('faction.factionId === factionId'),
+  'faction buttons use frozen factionId membership',
+);
+
+check(
+  'origin-filter-ui',
+  route.includes('등장 시리즈 필터') &&
+    route.includes('originOptions.map') &&
+    route.includes('hero.origin.productionId !== originId'),
+  'origin buttons use frozen productionId',
 );
 
 check(
@@ -142,20 +182,20 @@ check(
   route.includes('검색 결과') &&
     route.includes('aria-live="polite"') &&
     route.includes('resetFilters') &&
+    route.includes('setFactionId(null)') &&
+    route.includes('setOriginId(null)') &&
     route.includes('필터 초기화'),
-  'result count and reset affordances exist',
+  'result count and all-filter reset affordances exist',
 );
 
 check(
-  'deferred-boundary-preserved',
-  !route.includes('hero.detailRoute') &&
-    !route.includes('sourceArtworkPath') &&
-    !route.includes('webAssetPath') &&
+  'presentation-boundary-preserved',
+  !route.includes('data/configdata/') &&
+    !route.includes('ConfigDataHero') &&
     !route.includes('releaseOrder') &&
     !route.includes('releaseChronology') &&
-    !route.includes('factionId ===') &&
-    !route.includes('productionId ==='),
-  'detail/artwork/release/faction/origin inference remains deferred',
+    !route.includes('nameOrIdHeuristics'),
+  'filters consume frozen presentation fields without raw ConfigData or release-order inference',
 );
 
 const result = {
@@ -166,6 +206,8 @@ const result = {
     heroCount: records.length,
     uniqueHeroCount: uniqueIds.size,
     rarityOptionCount: rarityCounts.size,
+    factionOptionCount: factionIds.size,
+    originOptionCount: originIds.size,
     spCount,
     malformedCount: malformed.length,
     hardErrorCount: failures.length,
