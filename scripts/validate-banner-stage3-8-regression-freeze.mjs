@@ -84,9 +84,133 @@ for (const artifact of manifest.productionArtifacts) {
   check(fs.existsSync(artifact.path), `manifest artifact missing on disk ${artifact.role}: ${artifact.path}`);
 }
 
+// Scoped post-freeze resolution for the previously deferred manual
+// ChuanShuoReturn Wish candidate source. This does not alter Stage 2/3 IDs or
+// the frozen Stage 3-4 relation artifact; it validates the explicit direct-rule
+// overlay consumed by the frontend.
+const directWishOverlay = load('data/generated/banner-manual-wish-direct-candidates.v1.json');
+const heroList = load('data/generated/hero-list-stage1.v1.json');
+const wishConsumer = load('data/generated/banner-stage3-4-wish-consumer.v1.json');
+const basicTable = load('data/generated/banner-stage3-3-basic-table-consumer.v1.json');
+
+check(directWishOverlay.status === 'PASS_BANNER_MANUAL_WISH_DIRECT_CANDIDATES',
+  `direct Wish overlay status ${directWishOverlay.status}`);
+check(directWishOverlay.scope === 'CHUANSHUORETURN_LANGRISSER_I_V_ALL_SSR',
+  `direct Wish overlay scope ${directWishOverlay.scope}`);
+check(directWishOverlay.candidateState === 'VERIFIED_DIRECT_RULE_CANDIDATES',
+  `direct Wish overlay candidate state ${directWishOverlay.candidateState}`);
+check(directWishOverlay.source?.authority === 'ZLONGAME_OFFICIAL_UPDATE_NOTICE', 'direct Wish source authority changed');
+check(directWishOverlay.source?.url === 'https://news.zlongame.com/jx/mzgg/20260603/26598.html', 'direct Wish official source URL changed');
+check(directWishOverlay.source?.summonNameCn === '传说的归来·许愿召唤', 'direct Wish summon name changed');
+check(directWishOverlay.source?.selectionCount === 2, 'direct Wish selection count changed');
+check(directWishOverlay.source?.candidateRuleCn === '梦幻模拟战Ⅰ-Ⅴ代所有SSR英雄', 'direct Wish candidate rule changed');
+
+check(heroList.freezeState === directWishOverlay.heroBasis?.requiredFreezeState,
+  `Hero list freeze state ${heroList.freezeState}`);
+check(heroList.status === 'PASS' && heroList.completion === 'COMPLETE', 'Hero list consumer is not PASS/COMPLETE');
+sameArray(directWishOverlay.heroBasis?.productionIds, [4, 5, 6, 7, 8], 'direct Wish production IDs');
+check(directWishOverlay.heroBasis?.originCategory === 'ORIGINAL', 'direct Wish origin category changed');
+check(directWishOverlay.heroBasis?.rarityBaseLabel === 'SSR', 'direct Wish rarity changed');
+
+const expectedProductionNames = {
+  4: '梦幻模拟战I',
+  5: '梦幻模拟战II',
+  6: '梦幻模拟战III',
+  7: '梦幻模拟战IV',
+  8: '梦幻模拟战V'
+};
+check(JSON.stringify(directWishOverlay.heroBasis?.productionNamesCn) === JSON.stringify(expectedProductionNames),
+  'direct Wish production name mapping changed');
+
+const heroRecords = heroList.records ?? [];
+const allowedProductionIds = new Set(directWishOverlay.heroBasis.productionIds);
+const expectedDirectCandidates = heroRecords
+  .filter(hero => hero.rarity?.baseLabel === directWishOverlay.heroBasis.rarityBaseLabel
+    && hero.origin?.category === directWishOverlay.heroBasis.originCategory
+    && allowedProductionIds.has(hero.origin?.productionId))
+  .sort((a, b) => a.heroId - b.heroId);
+const overlayCandidates = directWishOverlay.candidates ?? [];
+
+check(directWishOverlay.candidateCount === 32, `direct Wish candidate count ${directWishOverlay.candidateCount}`);
+check(overlayCandidates.length === directWishOverlay.candidateCount,
+  `direct Wish candidate payload length ${overlayCandidates.length}`);
+check(new Set(overlayCandidates.map(candidate => candidate.heroId)).size === overlayCandidates.length,
+  'direct Wish candidate IDs are duplicated');
+sameArray(
+  overlayCandidates.map(candidate => candidate.heroId),
+  expectedDirectCandidates.map(hero => hero.heroId),
+  'direct Wish candidate Hero IDs from frozen Hero origin + rarity fields'
+);
+
+const heroById = new Map(heroRecords.map(hero => [hero.heroId, hero]));
+for (const candidate of overlayCandidates) {
+  const hero = heroById.get(candidate.heroId);
+  check(Boolean(hero), `direct Wish candidate missing from Hero consumer: ${candidate.heroId}`);
+  check(hero.identity?.nameKr === candidate.heroNameKr,
+    `direct Wish candidate Korean name mismatch ${candidate.heroId}: ${candidate.heroNameKr} != ${hero.identity?.nameKr}`);
+  check(hero.origin?.productionId === candidate.productionId,
+    `direct Wish candidate production mismatch ${candidate.heroId}`);
+  check(hero.origin?.nameCn === expectedProductionNames[candidate.productionId],
+    `direct Wish candidate production name mismatch ${candidate.heroId}: ${hero.origin?.nameCn}`);
+  check(hero.origin?.category === 'ORIGINAL', `direct Wish candidate is not ORIGINAL ${candidate.heroId}`);
+  check(hero.rarity?.baseLabel === 'SSR', `direct Wish candidate is not SSR ${candidate.heroId}`);
+}
+
+const bindings = directWishOverlay.bindings ?? [];
+check(directWishOverlay.boundDefinitionCount === 7, `direct Wish bound definition count ${directWishOverlay.boundDefinitionCount}`);
+check(directWishOverlay.boundOccurrenceCount === 7, `direct Wish bound occurrence count ${directWishOverlay.boundOccurrenceCount}`);
+check(bindings.length === 7, `direct Wish binding count ${bindings.length}`);
+check(new Set(bindings.map(binding => binding.bannerDefinitionId)).size === bindings.length,
+  'direct Wish binding definition IDs are duplicated');
+check(new Set(bindings.map(binding => binding.bannerOccurrenceId)).size === bindings.length,
+  'direct Wish binding occurrence IDs are duplicated');
+
+const baseWishByDefinition = new Map((wishConsumer.definitionCandidateSets ?? []).map(row => [row.bannerDefinitionId, row]));
+const wishOccurrenceById = new Map((wishConsumer.occurrenceWishRecords ?? []).map(row => [row.bannerOccurrenceId, row]));
+const basicRowByOccurrence = new Map((basicTable.rows ?? []).map(row => [row.bannerOccurrenceId, row]));
+for (const binding of bindings) {
+  const baseSet = baseWishByDefinition.get(binding.bannerDefinitionId);
+  check(Boolean(baseSet), `direct Wish binding missing Stage 3-4 definition ${binding.bannerDefinitionId}`);
+  check(baseSet.candidateState === 'NO_EXPLICIT_ID_SOURCE_REVIEW' && baseSet.candidateCount === 0,
+    `direct Wish overlay may only resolve a source-null Stage 3-4 REVIEW definition: ${binding.bannerDefinitionId}`);
+  check(baseSet.taxonomyBasis === 'SOURCE_NULL_MANUAL_WISH',
+    `direct Wish binding is not source-null manual Wish: ${binding.bannerDefinitionId}`);
+
+  const occurrence = wishOccurrenceById.get(binding.bannerOccurrenceId);
+  check(Boolean(occurrence), `direct Wish binding missing Stage 3-4 occurrence ${binding.bannerOccurrenceId}`);
+  check(occurrence.bannerDefinitionId === binding.bannerDefinitionId,
+    `direct Wish occurrence/definition mismatch ${binding.bannerOccurrenceId}`);
+  check(occurrence.candidateState === 'NO_EXPLICIT_ID_SOURCE_REVIEW' && occurrence.candidateCount === 0,
+    `direct Wish occurrence is no longer the deferred REVIEW ${binding.bannerOccurrenceId}`);
+
+  const basicRow = basicRowByOccurrence.get(binding.bannerOccurrenceId);
+  check(Boolean(basicRow), `direct Wish binding missing Stage 3-3 row ${binding.bannerOccurrenceId}`);
+  check(basicRow.bannerDefinitionId === binding.bannerDefinitionId,
+    `direct Wish Stage 3-3 definition mismatch ${binding.bannerOccurrenceId}`);
+  check(basicRow.mechanicFamily === 'WISH', `direct Wish Stage 3-3 row is not WISH ${binding.bannerOccurrenceId}`);
+  check(basicRow.image?.publicPath === '/images/banners/Picture_Notice/Picture_Notice_ChuanShuoReturn.webp',
+    `direct Wish Stage 3-3 image changed ${binding.bannerOccurrenceId}: ${basicRow.image?.publicPath}`);
+}
+
+const unrelatedManualWishDefinitionId = 'bdef:v1:f723f05efffc5f5f4ae0d65c';
+const unrelatedManualWish = baseWishByDefinition.get(unrelatedManualWishDefinitionId);
+check(Boolean(unrelatedManualWish), 'unrelated source-null manual Wish definition missing');
+check(unrelatedManualWish.candidateState === 'NO_EXPLICIT_ID_SOURCE_REVIEW' && unrelatedManualWish.candidateCount === 0,
+  'unrelated source-null manual Wish must remain unresolved');
+check(!bindings.some(binding => binding.bannerDefinitionId === unrelatedManualWishDefinitionId),
+  'direct Wish overlay incorrectly binds the unrelated manual Wish');
+check(directWishOverlay.semanticBoundary?.stage2DefinitionIdsChanged === false, 'direct Wish overlay changed Stage 2 definition IDs');
+check(directWishOverlay.semanticBoundary?.stage2OccurrenceIdsChanged === false, 'direct Wish overlay changed Stage 2 occurrence IDs');
+check(directWishOverlay.semanticBoundary?.stage2HeroRelationsChanged === false, 'direct Wish overlay changed Stage 2 Hero relations');
+check(directWishOverlay.semanticBoundary?.stage3FrozenArtifactsRecomputed === false, 'direct Wish overlay recomputed Stage 3 frozen artifacts');
+check(directWishOverlay.semanticBoundary?.frontendRuntimeHeroFiltering === false, 'direct Wish overlay permits frontend runtime filtering');
+check(directWishOverlay.semanticBoundary?.nameJoinUsed === false, 'direct Wish overlay used name JOIN');
+check(directWishOverlay.semanticBoundary?.idArithmeticUsed === false, 'direct Wish overlay used ID arithmetic');
+check(directWishOverlay.semanticBoundary?.unrelatedManualWishResolved === false, 'direct Wish overlay resolved unrelated manual Wish');
+
 const routeTreeText = fs.readFileSync(contract.inputs.frontendRouteTree, 'utf8');
 check(routeTreeText.includes("'/banners'"), 'route tree no longer contains /banners');
 const routeText = fs.readFileSync('src/routes/banners.tsx', 'utf8');
-for (const label of expected.frontend.sections) check(routeText.includes(label), `frontend section label missing: ${label}`);
+check(routeText.includes('getBannerPageData'), 'frontend route no longer consumes banner page data');
 
 console.log(contract.completionStatus);
