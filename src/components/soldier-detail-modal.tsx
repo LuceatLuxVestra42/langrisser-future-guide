@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
+import { getSoldierCommonMaterialIconUrl } from "@/lib/soldier-common-material-assets";
 import { getSoldierTrainingMaterialIconUrl } from "@/lib/soldier-training-material-assets";
 import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
 
@@ -599,10 +600,23 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
         </div>
 
         <div className="mt-3 rounded-lg border border-border bg-background px-3 py-2.5">
-          <p className="text-[10px] font-bold text-muted-foreground">골드</p>
-          <p className="mt-0.5 text-lg font-black tabular-nums text-foreground">
-            {formatNumber(totals.gold)}
-          </p>
+          <div className="flex items-center gap-2">
+            <img
+              src={getSoldierCommonMaterialIconUrl("gold")}
+              alt=""
+              aria-hidden="true"
+              width={32}
+              height={32}
+              loading="lazy"
+              className="h-8 w-8 shrink-0 object-contain"
+            />
+            <div>
+              <p className="text-[10px] font-bold text-muted-foreground">골드</p>
+              <p className="mt-0.5 text-lg font-black tabular-nums text-foreground">
+                {formatNumber(totals.gold)}
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
@@ -648,18 +662,28 @@ function clampLevel(value: number, min: number, max: number) {
 }
 
 function getSpMaterialPresentation(material: MaterialCost) {
+  if (material.goodsType === 1) {
+    return { iconUrl: getSoldierCommonMaterialIconUrl("gold"), label: "골드" };
+  }
+
   if (material.goodsType === 6) {
     const iconUrl = getSoldierTrainingMaterialIconUrl(material.itemId);
     if (iconUrl) {
       return { iconUrl, label: null };
     }
     if (material.itemId === 6503) {
-      return { iconUrl: null, label: "SP 전직 재료" };
+      return {
+        iconUrl: getSoldierCommonMaterialIconUrl("fantasy-booster"),
+        label: "Fantasy 부스터",
+      };
     }
   }
 
   if (material.goodsType === 24 && material.itemId === 0) {
-    return { iconUrl: null, label: "형귀 컨트롤러" };
+    return {
+      iconUrl: getSoldierCommonMaterialIconUrl("aniki-controller"),
+      label: "형귀 컨트롤러",
+    };
   }
 
   return { iconUrl: null, label: "전직 재료" };
@@ -716,6 +740,7 @@ function SpStageCard({ title, stage }: { title: string; stage: SpStage | null })
             return (
               <span
                 key={`${material.goodsType}:${material.itemId}`}
+                title={presentation.label ?? undefined}
                 className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted px-2 py-1 text-xs font-semibold text-foreground"
               >
                 {presentation.iconUrl ? (
