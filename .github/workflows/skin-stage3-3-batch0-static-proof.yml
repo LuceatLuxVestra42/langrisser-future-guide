@@ -1,0 +1,77 @@
+name: Skin Stage 3-3 Batch 0 Static Proof
+
+on:
+  push:
+    branches:
+      - work/skin-stage3-3-batched-20260901
+    paths:
+      - scripts/run-skin-stage3-3-static-batch.py
+      - scripts/validate-skin-stage3-3-batch0.mjs
+      - .github/workflows/skin-stage3-3-batch0-static-proof.yml
+      - data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json
+      - data/validation/skin-stage3-2-readiness.v1.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: skin-stage3-3-batch0-static-proof
+  cancel-in-progress: false
+
+jobs:
+  batch0:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bounded work branch
+        uses: actions/checkout@v4
+        with:
+          ref: work/skin-stage3-3-batched-20260901
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install frozen Unity parser
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3
+
+      - name: Extract representative STATIC artwork only
+        run: |
+          python scripts/run-skin-stage3-3-static-batch.py \
+            --skin-ids 102 1901 3701 \
+            --batch-id batch-000 \
+            --plan-output data/generated/skin-stage3-3-batches/batch-000-plan.v1.json \
+            --result-output data/generated/skin-stage3-3-batches/batch-000-result.v1.json
+
+      - name: Validate Batch 0 independently
+        run: |
+          node scripts/validate-skin-stage3-3-batch0.mjs \
+            --plan data/generated/skin-stage3-3-batches/batch-000-plan.v1.json \
+            --result data/generated/skin-stage3-3-batches/batch-000-result.v1.json \
+            --write data/validation/skin-stage3-3-batch0-static-proof.v1.json
+
+      - name: Fail closed on unrelated tracked mutation
+        run: |
+          allowed='^(public/images/skins/(102|1901|3701)\.png|data/generated/skin-stage3-3-batches/batch-000-(plan|result)\.v1\.json|data/validation/skin-stage3-3-batch0-static-proof\.v1\.json)$'
+          bad="$(git status --porcelain | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
+          if [ -n "$bad" ]; then
+            printf 'Unexpected tracked/untracked paths after Batch 0:\n%s\n' "$bad"
+            exit 1
+          fi
+
+      - name: Commit only Batch 0 proof
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            public/images/skins/102.png \
+            public/images/skins/1901.png \
+            public/images/skins/3701.png \
+            data/generated/skin-stage3-3-batches/batch-000-plan.v1.json \
+            data/generated/skin-stage3-3-batches/batch-000-result.v1.json \
+            data/validation/skin-stage3-3-batch0-static-proof.v1.json
+          git diff --cached --quiet && { echo 'Batch 0 outputs already frozen; nothing to commit.'; exit 0; }
+          git commit -m 'Freeze Skin Stage 3-3 Batch 0 static proof'
+          git push origin HEAD:work/skin-stage3-3-batched-20260901
