@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "stage": "Equipment Pass Classification Contract",
+  "status": "ACTIVE",
+  "completion": "EQUIPMENT_PASS_CLASSIFICATION_V1_ACTIVE",
+  "ownerLayer": "presentation-classification",
+  "predecessor": {
+    "technicalAcquisition": "data/generated/equipment_stage2_7_acquisition.json",
+    "releaseEvidenceAudit": "data/validation/equipment-p3-0-release-chronology-audit.v1.json",
+    "publicAdmission": "data/presentation/equipment-public-admission-correction.v1.json",
+    "supersededDisplayMembership": "data/presentation/equipment-display-collection.v1.json"
+  },
+  "sources": {
+    "evidenceClaims": "data/presentation/equipment-pass-evidence.v1.json",
+    "generatedClassification": "data/generated/equipment-pass-classification.v1.json"
+  },
+  "candidateDiscovery": {
+    "technicalAcquisitionClass": "current-additional",
+    "technicalClassIsMembership": false,
+    "purpose": "candidate-discovery-only",
+    "positiveEvidenceMayOverrideTechnicalSiteTab": true
+  },
+  "states": {
+    "PASS_CONFIRMED": "Primary or otherwise explicitly accepted Equipment Pass evidence confirms membership.",
+    "NON_PASS_CONFIRMED": "Accepted classification evidence confirms the candidate is not Equipment Pass.",
+    "PASS_CANDIDATE": "Evidence points toward Equipment Pass but does not satisfy confirmation policy.",
+    "UNRESOLVED": "Candidate exists but no admissible classification evidence resolves it.",
+    "NON_PUBLIC_EXCLUDED": "Candidate is excluded by the frozen public-admission correction."
+  },
+  "confirmationPolicy": {
+    "joinKey": "equipmentId",
+    "passMembershipSource": "evidence-source-claim",
+    "explicitPassEquipmentIdListIsAuthoritative": false,
+    "generatedPassEquipmentIdsAreOutputOnly": true,
+    "unresolvedPublicCandidateIsBlocking": true,
+    "passCandidateIsBlocking": true,
+    "newCandidateMustNotDefaultToNonPass": true
+  },
+  "forbiddenInference": [
+    "technicalSiteTab==3 as Equipment Pass membership",
+    "acquisitionClass==current-additional as Equipment Pass membership",
+    "release date alone",
+    "releaseFamily alone",
+    "equipmentId range or arithmetic",
+    "sortIndex order",
+    "name pattern"
+  ],
+  "runtimePolicy": {
+    "PASS_CONFIRMED": 3,
+    "NON_PASS_CONFIRMED": 2,
+    "baselineTechnicalSiteTab1": 1,
+    "baselineTechnicalSiteTab2": 2,
+    "technicalSiteTab3WithoutResolvedClassification": "ERROR",
+    "confirmedPassOverridesTechnicalSiteTab": true
+  },
+  "reopenConditions": [
+    "authoritative Equipment Pass evidence semantics change",
+    "candidate acquisition contract changes",
+    "public admission correction changes",
+    "generated classification contains PASS_CANDIDATE or UNRESOLVED public candidates",
+    "positive Equipment Pass evidence is found outside the current candidate population"
+  ]
+}
