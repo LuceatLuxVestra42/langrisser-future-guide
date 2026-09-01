@@ -43,6 +43,48 @@ const reviewAggregate = reviews => {
   };
 };
 
+const issueAggregate = reviews => {
+  const records = reviews ?? [];
+  const assigned = records.filter(review => typeof review?.issueKey === 'string' && review.issueKey.length > 0);
+  const unassignedReviewTotal = records.length - assigned.length;
+  const grouped = new Map();
+
+  for (const review of assigned) {
+    const issueKey = review.issueKey;
+    if (!grouped.has(issueKey)) grouped.set(issueKey, []);
+    grouped.get(issueKey).push(review);
+  }
+
+  const reviewIssues = [...grouped.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([issueKey, issueReviews]) => {
+      const aggregate = reviewAggregate(issueReviews);
+      const domains = [...new Set(issueReviews
+        .map(review => review?.domain)
+        .filter(domain => typeof domain === 'string' && domain.length > 0))].sort();
+      return {
+        issueKey,
+        reportedReviewEntryCount: aggregate.reportedReviewTotal,
+        activeReviewEntryCount: aggregate.activeReviewTotal,
+        resolvedReviewEntryCount: aggregate.resolvedReviewTotal,
+        deferredReviewEntryCount: aggregate.deferredReviewTotal,
+        boundaryNoteEntryCount: aggregate.boundaryNoteTotal,
+        healthImpactReviewEntryCount: aggregate.healthImpactReviewTotal,
+        domains,
+      };
+    });
+
+  return {
+    assignedIssueReviewTotal: assigned.length,
+    unassignedReviewTotal,
+    uniqueIssueTotal: reviewIssues.length,
+    healthImpactIssueTotal: reviewIssues.filter(issue => issue.healthImpactReviewEntryCount > 0).length,
+    reviewIssues,
+  };
+};
+
+const reviewsWithDomain = (domain, reviews) => (reviews ?? []).map(review => ({ ...review, domain }));
+
 export function projectStatusView(normalized) {
   if (normalized?.schemaId !== 'project-status-normalized/v1' || normalized?.status !== 'COLLECTED') {
     throw new Error(`Project Status projection refuses unsupported normalized input: ${normalized?.schemaId ?? 'missing'}/${normalized?.status ?? 'missing'}`);
@@ -51,36 +93,42 @@ export function projectStatusView(normalized) {
     throw new Error('Project Status projection refuses unsafe normalized input.');
   }
 
-  const domains = (normalized.domains ?? []).map(record => ({
-    domain: record.domain,
-    lifecycle: record.lifecycle,
-    health: record.health,
-    status: record.rawStatus ?? null,
-    completion: record.rawCompletion ?? null,
-    freezeState: record.rawFreezeState ?? null,
-    population: record.population ?? {},
-    hardErrorCount: record.hardErrorCount ?? 0,
-    reviewCount: record.reviewCount ?? 0,
-    ...reviewAggregate(record.reviews),
-    blockerCount: (record.blockers ?? []).length,
-    activeSource: record.primarySource?.path ?? null,
-    activeSourceId: record.activeSource?.selectedId ?? null,
-    supplementalSources: (record.supplementalSources ?? []).map(item => ({
-      path: item.path,
-      role: item.role ?? null,
-      facet: item.facet ?? null,
-    })),
-    nextWork: (record.nextWork ?? []).map(item => ({
-      source: item.source ?? null,
-      selector: item.selector ?? null,
-      value: item.value ?? null,
-    })),
-  }));
+  const domains = (normalized.domains ?? []).map(record => {
+    const domainReviews = reviewsWithDomain(record.domain, record.reviews);
+    return {
+      domain: record.domain,
+      lifecycle: record.lifecycle,
+      health: record.health,
+      status: record.rawStatus ?? null,
+      completion: record.rawCompletion ?? null,
+      freezeState: record.rawFreezeState ?? null,
+      population: record.population ?? {},
+      hardErrorCount: record.hardErrorCount ?? 0,
+      reviewCount: record.reviewCount ?? 0,
+      ...reviewAggregate(domainReviews),
+      ...issueAggregate(domainReviews),
+      blockerCount: (record.blockers ?? []).length,
+      activeSource: record.primarySource?.path ?? null,
+      activeSourceId: record.activeSource?.selectedId ?? null,
+      supplementalSources: (record.supplementalSources ?? []).map(item => ({
+        path: item.path,
+        role: item.role ?? null,
+        facet: item.facet ?? null,
+      })),
+      nextWork: (record.nextWork ?? []).map(item => ({
+        source: item.source ?? null,
+        selector: item.selector ?? null,
+        value: item.value ?? null,
+      })),
+    };
+  });
 
   const names = domains.map(record => record.domain);
   if (new Set(names).size !== names.length) throw new Error('Project Status refuses duplicate domains.');
 
-  const aggregate = reviewAggregate((normalized.domains ?? []).flatMap(record => record.reviews ?? []));
+  const allReviews = (normalized.domains ?? []).flatMap(record => reviewsWithDomain(record.domain, record.reviews));
+  const aggregate = reviewAggregate(allReviews);
+  const issues = issueAggregate(allReviews);
 
   return {
     version: 1,
@@ -103,6 +151,7 @@ export function projectStatusView(normalized) {
     knownHardErrorTotal: normalized.knownHardErrorTotal ?? 0,
     reviewTotal: normalized.reviewTotal ?? 0,
     ...aggregate,
+    ...issues,
     blockerTotal: normalized.blockerTotal ?? 0,
     domains,
   };
