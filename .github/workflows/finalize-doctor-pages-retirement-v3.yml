@@ -1,4 +1,4 @@
-name: Finalize Doctor Pages runtime retirement v3
+name: Finalize Doctor Pages runtime retirement v4
 
 on:
   push:
@@ -81,12 +81,28 @@ jobs:
           git diff --name-only | sort > /tmp/after-build.txt
           diff -u /tmp/before-build.txt /tmp/after-build.txt
 
-      - name: Commit retirement
+      - name: Preserve workflow payload outside workflow namespace
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .github/workflows/authoritative-pages-deploy.yml authoritative-pages-deploy.migration.yml
+          git restore --staged --worktree \
+            .github/workflows/project-doctor-authoritative-pages-deploy.yml \
+            .github/workflows/finalize-doctor-pages-retirement-v3.yml
+          rm .github/workflows/authoritative-pages-deploy.yml
+          test -f authoritative-pages-deploy.migration.yml
+          if git diff --name-only | grep -q '^\.github/workflows/'; then
+            echo 'workflow namespace change leaked into bot commit' >&2
+            git diff --name-only >&2
+            exit 1
+          fi
+
+      - name: Commit validated non-workflow retirement
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
-          git commit -m 'Retire Project Doctor production Pages runtime [skip ci]'
+          git commit -m 'Materialize validated Pages retirement runtime [skip ci]'
           git push origin HEAD:fix/retire-doctor-pages-runtime
