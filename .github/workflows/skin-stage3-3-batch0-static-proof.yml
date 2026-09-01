@@ -57,10 +57,13 @@ jobs:
             --result data/generated/skin-stage3-3-batches/batch-000-result.v1.json \
             --write data/validation/skin-stage3-3-batch0-static-proof.v1.json
 
+      - name: Remove execution-only temp state
+        run: rm -rf .skin-stage3-3-batch-work .skin-stage3-3-zip-diagnostic scripts/__pycache__
+
       - name: Fail closed on unrelated tracked mutation
         run: |
           allowed='^(public/images/skins/(102|1901|3701)\.png|data/generated/skin-stage3-3-batches/batch-000-(plan|result)\.v1\.json|data/validation/skin-stage3-3-batch0-static-proof\.v1\.json)$'
-          bad="$(git status --porcelain | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
+          bad="$(git status --porcelain --untracked-files=all | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
           if [ -n "$bad" ]; then
             printf 'Unexpected tracked/untracked paths after Batch 0:\n%s\n' "$bad"
             exit 1
