@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "contract": "hero-card-icon-source-pack",
+  "status": "PASS",
+  "owner": "hero-assets",
+  "stage": "repository-size-reduction-H2",
+  "purpose": "Pin the external exact-byte storage contract for the frozen Hero card-icon PNG source set without changing Hero canonical semantics, source identity mappings, production lossless WebP delivery, runtime paths, or Hero detail-card artwork.",
+  "authority": {
+    "semanticAndSourceIdentity": "data/generated/hero-card-icon-assets.v1.json",
+    "productionWebDelivery": "data/generated/hero-card-icon-web-delivery.v1.json",
+    "externalByteTransport": "THIS_CONTRACT_PLUS_PINNED_SHA256",
+    "externalInventoryRole": "BYTE_INVENTORY_PROJECTION_ONLY",
+    "externalInventoryMayCreateSemanticMappings": false
+  },
+  "authoritativePredecessor": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "sourceCommitSha": "97abec60007f969a2414588f7b8e1069101c4fd2",
+    "sourceManifest": "data/generated/hero-card-icon-assets.v1.json",
+    "sourceManifestVersion": 1,
+    "sourceFreezeState": "HERO_CARD_ICON_ASSETS_FROZEN",
+    "webDeliveryManifest": "data/generated/hero-card-icon-web-delivery.v1.json",
+    "webDeliveryFreezeState": "HERO_CARD_ICON_WEB_DELIVERY_FROZEN",
+    "sourcePublicPath": "public/images/heroes/card-icons"
+  },
+  "storage": {
+    "kind": "GITHUB_RELEASE_ASSET",
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "releaseTag": "source-assets-hero-card-icon-v1-97abec60",
+    "releaseTargetCommitSha": "97abec60007f969a2414588f7b8e1069101c4fd2",
+    "releaseId": 380848010,
+    "releaseImmutableMetadataAtAdmission": false,
+    "immutabilityPolicy": "CONTENT_HASH_PINNED_FAIL_CLOSED",
+    "archive": {
+      "assetId": 540200351,
+      "name": "hero-card-icon-source-v1-97abec60.tar.gz",
+      "bytes": 8891154,
+      "sha256": "cb6b094c2d2ebe5ccc5fbe14fa894d92a5fbe8026817d65e7f779c6284f39a69"
+    },
+    "inventory": {
+      "assetId": 540200352,
+      "name": "hero-card-icon-source-v1-97abec60.inventory.json",
+      "bytes": 57310,
+      "sha256": "fa7e9f1f08f5d69a0d02d3268bb933c144b2a5c2cb3c91d6a287ba66d29636ca"
+    },
+    "checksums": {
+      "assetId": 540200350,
+      "name": "hero-card-icon-source-v1-97abec60.sha256",
+      "bytes": 222,
+      "sha256": "e045eb06c8322e39b5f035132a17e8a0e0eb992e10ffc75c4489a01786bb03f8"
+    }
+  },
+  "coverage": {
+    "fileCount": 267,
+    "totalSourceBytes": 8990485,
+    "heroCount": 267,
+    "missingCount": 0,
+    "extraCount": 0,
+    "duplicateCount": 0
+  },
+  "integrityPolicy": {
+    "archiveSha256Required": true,
+    "inventorySha256Required": true,
+    "checksumsAssetSha256Required": true,
+    "archiveRoundTripVerificationRequired": true,
+    "exactFileSetRequired": true,
+    "perFileSha256MustMatchFrozenSourceManifest": true,
+    "perFileSizeMustMatchFrozenSourceManifest": true,
+    "heroIdToFileNameMustRemainExact": true,
+    "failClosedOnAnyMismatch": true,
+    "releaseAssetOverwriteAllowed": false,
+    "changedBytesRequireNewTagAndNewContractVersion": true
+  },
+  "productionPolicy": {
+    "sourcePackFetchedAtRuntime": false,
+    "productionWebManifest": "data/generated/hero-card-icon-web-delivery.v1.json",
+    "productionWebDeliveryFormat": "LOSSLESS_WEBP",
+    "productionWebDeliveryCount": 267,
+    "productionWebDeliveryBytes": 5772910,
+    "runtimePathChange": false,
+    "webpReencodingInThisStage": false,
+    "detailCardArtworkChange": false
+  },
+  "semanticBoundary": {
+    "canonicalHeroChanges": false,
+    "heroRelationChanges": false,
+    "localizationChanges": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "filenameSimilarityIntroduced": false,
+    "sourceMeaningReinterpreted": false
+  },
+  "admissionEvidence": {
+    "builder": "scripts/build-hero-card-icon-source-pack-v1.mjs",
+    "workflow": ".github/workflows/hero-card-icon-source-pack-v1.yml",
+    "workflowRunId": 33563789380,
+    "workflowHeadSha": "bfffaaac435093ea46389e11c6b3429c8e88a70f",
+    "workflowConclusion": "success",
+    "archiveDigestMatchesPublishedAssetDigest": true,
+    "inventoryDigestMatchesPublishedAssetDigest": true,
+    "checksumsDigestMatchesPublishedAssetDigest": true
+  },
+  "nextOwner": "hero-assets",
+  "nextStage": "H3-hydration",
+  "reopenConditions": [
+    "Pinned archive SHA-256 no longer matches the fetched archive bytes.",
+    "Pinned inventory SHA-256 no longer matches the fetched inventory bytes.",
+    "Pinned checksums asset SHA-256 no longer matches the fetched checksum bytes.",
+    "Archive coverage is not exactly 267 PNG files totaling 8990485 source bytes.",
+    "Any extracted PNG SHA-256 or size differs from data/generated/hero-card-icon-assets.v1.json at source commit 97abec60007f969a2414588f7b8e1069101c4fd2.",
+    "The production lossless WebP delivery contract or runtime path changes.",
+    "An authoritative Hero card-icon source contradiction is introduced."
+  ]
+}
