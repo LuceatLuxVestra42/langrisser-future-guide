@@ -334,7 +334,7 @@ export function executeProjectCheck(paths, runtime = {}) {
 export function collectChangedPaths({ repoRoot = process.cwd(), base, head = 'HEAD' } = {}) {
   if (!base) throw new Error('base is required for compare mode.');
   const comparison = `${base}...${head}`;
-  const result = spawnSync('git', ['diff', '--name-only', '--diff-filter=ACMR', comparison], {
+  const result = spawnSync('git', ['diff', '--name-only', '--diff-filter=ACMRD', comparison], {
     cwd: repoRoot,
     encoding: 'utf8',
     shell: false,
