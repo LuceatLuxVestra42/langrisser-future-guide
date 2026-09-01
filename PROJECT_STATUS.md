@@ -10,10 +10,10 @@
 
 | Domain | Lifecycle | Health | Status | Population | Active source | Next work |
 |---|---|---|---|---|---|---|
-| hero | FROZEN | REVIEW | PASS_WITH_REVIEW | canonicalHeroCount=267 | data/validation/hero-stage6-4-final.v1.json | Hero frontend/UI and web-asset integration. Consume the Stage 6-4 contract; do not reopen Stage 4/5 or Stage B semantics unless a new source snapshot or explicit contradiction requires the owning stage to reopen. |
+| hero | FROZEN | REVIEW | PASS_WITH_REVIEW | canonicalHeroCount=267 | data/validation/hero-stage6-4-final.v1.json | - |
 | soldier | COMPLETE | REVIEW | PASS | canonicalSoldiers=224, normalSoldiers=168, spSoldiers=56, heroSoldierRelations=5977 | data/validation/soldier-stage6-7-site-admission.v1.json | - |
 | equipment | FROZEN | REVIEW | PASS_WITH_REVIEW | canonical=390, public=365, general=198, exclusive=167, admissionStatus=FROZEN, admissionGeneral=198, admissionExcluded=8, displayStatus=FROZEN, displayInitial=94, displayPreviousAdditional=80, displayPass=24, displayTotal=198, chronologyAuditStatus=PASS_WITH_REVIEW, chronologyAuditMembership=false, chronologyContractStatus=FROZEN, chronologyTechnicalTarget=32, chronologyPublicCount=28, chronologyPassCount=24, chronologyContractMembership=false | data/validation/equipment-public-presentation-correction-final.v1.json | - |
-| hero-soldier | FROZEN | REVIEW | PASS_WITH_REVIEW | heroCount=267, soldierCount=224, canonicalPairCount=5977 | data/validation/hero-soldier-integration-stageC-final.v1.json | Stage C is closed. Proceed to frontend/UI Integration implementation and route/click/back/404/mobile QA while consuming only the frozen final Hero/Soldier membership consumers. |
+| hero-soldier | FROZEN | REVIEW | PASS_WITH_REVIEW | heroCount=267, soldierCount=224, canonicalPairCount=5977 | data/validation/hero-soldier-integration-stageC-final.v1.json | - |
 | banner | FROZEN | REVIEW | PASS_BANNER_STAGE3_8_REGRESSION_FREEZE | definitions=77, occurrences=94 | data/validation/banner-stage3-8-regression-freeze-summary.v1.json | - |
 | skin | COMPLETE | PASS | PASS | skinCount=540, heroCount=267 | data/validation/skin-stage3-2-readiness.v1.json | - |
 
