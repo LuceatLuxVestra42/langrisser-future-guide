@@ -10,8 +10,13 @@
     "ruleMatch": "EXACT_REVIEW_KEY_OR_CODE_ONLY",
     "multipleMatchingRules": "FAIL_CLOSED_ACTIVE_REVIEW",
     "resolvedByEvidenceRequiresEvidence": true,
+    "partialResolutionRequiresReportedCount": true,
+    "partialResolutionCountBounds": "remainingCount must be between zero and reportedCount",
+    "partialResolutionCannotClearHealthImpactUnlessRemainingCountIsZero": true,
     "missingOrMismatchedEvidence": "FAIL_CLOSED_ACTIVE_REVIEW",
+    "invalidPartialResolution": "FAIL_CLOSED_ACTIVE_REVIEW",
     "evidenceMayUseOnlyDeclaredPrimaryOrSupplementalSelections": true,
+    "remainingCountFromEvidenceMayUseOnlyDeclaredSelections": true,
     "textSimilarityInference": false,
     "nameJoinInference": false,
     "filenameSimilarityInference": false,
@@ -28,6 +33,14 @@
     "sourceRole": "PRIMARY_STATUS_SOURCE or an exact supplementalSources.role",
     "key": "An exact selected-field key already declared by Project Status normalization",
     "equals": "Literal equality only"
+  },
+  "countContract": {
+    "reportedCount": "Immutable count from the primary review entry when present",
+    "remainingCount": "Optional literal count set by an exact lifecycle rule after evidence passes",
+    "remainingCountFromEvidence": "Optional sourceRole/key reference to an already declared selected count",
+    "resolvedCount": "Derived only as reportedCount minus remainingCount",
+    "fullResolution": "RESOLVED_BY_EVIDENCE requires remainingCount zero",
+    "partialResolution": "ACTIVE_REVIEW may retain health impact with a remainingCount below reportedCount"
   },
   "rules": []
 }
