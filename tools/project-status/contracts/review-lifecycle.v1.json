@@ -1,7 +1,7 @@
 {
   "version": 1,
   "schemaId": "project-status-review-lifecycle/v1",
-  "stage": "R2-review-lifecycle",
+  "stage": "R2-review-lifecycle-stage6",
   "status": "DESIGN_FROZEN",
   "purpose": "Classify normalized Project Status review entries by explicit reviewKey/code rules and declared evidence only. No text similarity, name JOIN, filename inference, chronology inference, or semantic recomputation is allowed.",
   "policy": {
@@ -10,8 +10,13 @@
     "ruleMatch": "EXACT_REVIEW_KEY_OR_CODE_ONLY",
     "multipleMatchingRules": "FAIL_CLOSED_ACTIVE_REVIEW",
     "resolvedByEvidenceRequiresEvidence": true,
+    "partialResolutionRequiresReportedCount": true,
+    "partialResolutionCountBounds": "remainingCount must be between zero and reportedCount",
+    "partialResolutionCannotClearHealthImpactUnlessRemainingCountIsZero": true,
     "missingOrMismatchedEvidence": "FAIL_CLOSED_ACTIVE_REVIEW",
+    "invalidPartialResolution": "FAIL_CLOSED_ACTIVE_REVIEW",
     "evidenceMayUseOnlyDeclaredPrimaryOrSupplementalSelections": true,
+    "remainingCountFromEvidenceMayUseOnlyDeclaredSelections": true,
     "textSimilarityInference": false,
     "nameJoinInference": false,
     "filenameSimilarityInference": false,
@@ -29,5 +34,314 @@
     "key": "An exact selected-field key already declared by Project Status normalization",
     "equals": "Literal equality only"
   },
-  "rules": []
+  "countContract": {
+    "reportedCount": "Immutable count from the primary review entry when present",
+    "remainingCount": "Optional literal count set by an exact lifecycle rule after evidence passes",
+    "remainingCountFromEvidence": "Optional sourceRole/key reference to an already declared selected count",
+    "resolvedCount": "Derived only as reportedCount minus remainingCount",
+    "fullResolution": "RESOLVED_BY_EVIDENCE requires remainingCount zero",
+    "partialResolution": "ACTIVE_REVIEW may retain health impact with a remainingCount below reportedCount"
+  },
+  "rules": [
+    {
+      "id": "hero-frontend-asset-boundary",
+      "domain": "hero",
+      "match": {
+        "reviewKey": "data/validation/hero-stage6-4-final.v1.json#/nonBlockingReviews[1]"
+      },
+      "lifecycle": "BOUNDARY_NOTE",
+      "healthImpact": false,
+      "issueKey": "HERO_FRONTEND_ASSET_BOUNDARY",
+      "evidence": []
+    },
+    {
+      "id": "soldier-kr-name-active",
+      "domain": "soldier",
+      "match": {
+        "code": "KR_NAME_UNRESOLVED"
+      },
+      "lifecycle": "ACTIVE_REVIEW",
+      "healthImpact": true,
+      "issueKey": "SOLDIER_KR_NAME_PRESENTATION_COVERAGE",
+      "evidence": []
+    },
+    {
+      "id": "soldier-lower-tier-release-order-boundary",
+      "domain": "soldier",
+      "match": {
+        "code": "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED"
+      },
+      "lifecycle": "BOUNDARY_NOTE",
+      "healthImpact": false,
+      "remainingCount": 0,
+      "issueKey": "SOLDIER_LOWER_TIER_RELEASE_ORDER_BOUNDARY",
+      "evidence": []
+    },
+    {
+      "id": "soldier-relation-provenance-boundary",
+      "domain": "soldier",
+      "match": {
+        "code": "RELATION_PROVENANCE_SEPARATE_AUTHORITY"
+      },
+      "lifecycle": "BOUNDARY_NOTE",
+      "healthImpact": false,
+      "issueKey": "SOLDIER_RELATION_PROVENANCE_BOUNDARY",
+      "evidence": []
+    },
+    {
+      "id": "soldier-release-date-active",
+      "domain": "soldier",
+      "match": {
+        "code": "RELEASE_DATE_UNRESOLVED"
+      },
+      "lifecycle": "ACTIVE_REVIEW",
+      "healthImpact": true,
+      "issueKey": "SOLDIER_RELEASE_DATE_METADATA",
+      "evidence": []
+    },
+    {
+      "id": "soldier-portrait-resolved",
+      "domain": "soldier",
+      "match": {
+        "code": "REPRESENTATIVE_ASSET_ID_UNFROZEN"
+      },
+      "lifecycle": "RESOLVED_BY_EVIDENCE",
+      "healthImpact": false,
+      "issueKey": "SOLDIER_PORTRAIT_COVERAGE",
+      "evidence": [
+        {
+          "sourceRole": "CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE",
+          "key": "rawStatus",
+          "equals": "PASS"
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE",
+          "key": "canonicalSoldierCount",
+          "equals": 224
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE",
+          "key": "missingPortraitCount",
+          "equals": 0
+        },
+        {
+          "sourceRole": "CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE",
+          "key": "verifiedAssetFileCount",
+          "equals": 224
+        }
+      ]
+    },
+    {
+      "id": "soldier-route-membership-boundary",
+      "domain": "soldier",
+      "match": {
+        "code": "ROUTE_IMPLEMENTATION_SEPARATE_FROM_MEMBERSHIP"
+      },
+      "lifecycle": "BOUNDARY_NOTE",
+      "healthImpact": false,
+      "issueKey": "SOLDIER_ROUTE_MEMBERSHIP_BOUNDARY",
+      "evidence": []
+    },
+    {
+      "id": "soldier-same-patch-order-active",
+      "domain": "soldier",
+      "match": {
+        "code": "SAME_PATCH_ORDER_UNRESOLVED"
+      },
+      "lifecycle": "ACTIVE_REVIEW",
+      "healthImpact": true,
+      "issueKey": "SOLDIER_SAME_PATCH_ORDER",
+      "evidence": []
+    },
+    {
+      "id": "soldier-simulator-deferred",
+      "domain": "soldier",
+      "match": {
+        "code": "SIMULATOR_IMPLEMENTATION_DEFERRED"
+      },
+      "lifecycle": "DEFERRED_NON_ERROR",
+      "healthImpact": false,
+      "issueKey": "SOLDIER_SIMULATOR_DEFERRED",
+      "evidence": []
+    },
+    {
+      "id": "soldier-sp-full-stats-boundary",
+      "domain": "soldier",
+      "match": {
+        "code": "SP_FULL_STATS_ARE_AUTHORITATIVE"
+      },
+      "lifecycle": "BOUNDARY_NOTE",
+      "healthImpact": false,
+      "issueKey": "SOLDIER_SP_STATS_AUTHORITY_BOUNDARY",
+      "evidence": []
+    },
+    {
+      "id": "soldier-sp-release-order-active",
+      "domain": "soldier",
+      "match": {
+        "code": "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED"
+      },
+      "lifecycle": "ACTIVE_REVIEW",
+      "healthImpact": true,
+      "issueKey": "SOLDIER_SP_INTERNAL_RELEASE_ORDER",
+      "evidence": []
+    },
+    {
+      "id": "hero-soldier-kr-name-active",
+      "domain": "hero-soldier",
+      "match": {
+        "code": "SOLDIER_KR_NAME_UNRESOLVED"
+      },
+      "lifecycle": "ACTIVE_REVIEW",
+      "healthImpact": true,
+      "issueKey": "SOLDIER_KR_NAME_PRESENTATION_COVERAGE",
+      "evidence": []
+    },
+    {
+      "id": "hero-soldier-release-date-active",
+      "domain": "hero-soldier",
+      "match": {
+        "code": "RELEASE_DATE_UNRESOLVED"
+      },
+      "lifecycle": "ACTIVE_REVIEW",
+      "healthImpact": true,
+      "issueKey": "SOLDIER_RELEASE_DATE_METADATA",
+      "evidence": []
+    },
+    {
+      "id": "hero-soldier-route-identity-boundary",
+      "domain": "hero-soldier",
+      "match": {
+        "code": "ROUTE_IMPLEMENTATION_SEPARATE_FROM_IDENTITY"
+      },
+      "lifecycle": "BOUNDARY_NOTE",
+      "healthImpact": false,
+      "issueKey": "HERO_SOLDIER_ROUTE_IDENTITY_BOUNDARY",
+      "evidence": []
+    },
+    {
+      "id": "hero-soldier-presentation-boundary",
+      "domain": "hero-soldier",
+      "match": {
+        "code": "PRESENTATION_METADATA_INCOMPLETE"
+      },
+      "lifecycle": "BOUNDARY_NOTE",
+      "healthImpact": false,
+      "issueKey": "HERO_SOLDIER_PRESENTATION_BOUNDARY",
+      "evidence": []
+    },
+    {
+      "id": "hero-soldier-frontend-boundary",
+      "domain": "hero-soldier",
+      "match": {
+        "code": "HERO_SOLDIER_FRONTEND_NOT_YET_IMPLEMENTED"
+      },
+      "lifecycle": "BOUNDARY_NOTE",
+      "healthImpact": false,
+      "issueKey": "HERO_SOLDIER_FRONTEND_BOUNDARY",
+      "evidence": []
+    },
+    {
+      "id": "equipment-secondary-archive-active",
+      "domain": "equipment",
+      "match": {
+        "code": "P3_SECONDARY_ARCHIVE_PROVENANCE_REVIEW"
+      },
+      "lifecycle": "ACTIVE_REVIEW",
+      "healthImpact": true,
+      "issueKey": "EQUIPMENT_SECONDARY_ARCHIVE_PROVENANCE",
+      "evidence": []
+    },
+    {
+      "id": "banner-manual-image-active",
+      "domain": "banner",
+      "match": {
+        "code": "MANUAL_BANNER_IMAGE_PENDING"
+      },
+      "lifecycle": "ACTIVE_REVIEW",
+      "healthImpact": true,
+      "issueKey": "BANNER_MANUAL_IMAGE_PENDING",
+      "evidence": []
+    },
+    {
+      "id": "banner-manual-wish-id-deferred",
+      "domain": "banner",
+      "match": {
+        "code": "MANUAL_WISH_NO_EXPLICIT_ID_SOURCE"
+      },
+      "lifecycle": "DEFERRED_NON_ERROR",
+      "healthImpact": false,
+      "remainingCount": 0,
+      "issueKey": "BANNER_MANUAL_WISH_ID_SOURCE_DEFERRED",
+      "evidence": []
+    },
+    {
+      "id": "banner-pickup-cardinality-deferred",
+      "domain": "banner",
+      "match": {
+        "code": "PICKUP_CARDINALITY_RELATION_REVIEW"
+      },
+      "lifecycle": "DEFERRED_NON_ERROR",
+      "healthImpact": false,
+      "remainingCount": 0,
+      "issueKey": "BANNER_PICKUP_CARDINALITY_DEFERRED",
+      "evidence": []
+    },
+    {
+      "id": "banner-event-id-deferred",
+      "domain": "banner",
+      "match": {
+        "code": "CANONICAL_EVENT_ID_UNRESOLVED"
+      },
+      "lifecycle": "DEFERRED_NON_ERROR",
+      "healthImpact": false,
+      "remainingCount": 0,
+      "issueKey": "BANNER_CANONICAL_EVENT_ID_DEFERRED",
+      "evidence": []
+    },
+    {
+      "id": "banner-hero-route-deferred",
+      "domain": "banner",
+      "match": {
+        "code": "HERO_FRONTEND_ROUTE_UNRESOLVED"
+      },
+      "lifecycle": "DEFERRED_NON_ERROR",
+      "healthImpact": false,
+      "issueKey": "BANNER_HERO_ROUTE_DEFERRED",
+      "evidence": []
+    },
+    {
+      "id": "banner-timezone-deferred",
+      "domain": "banner",
+      "match": {
+        "code": "EXACT_BANNER_TIME_DURATION_TIMEZONE_UNRESOLVED"
+      },
+      "lifecycle": "DEFERRED_NON_ERROR",
+      "healthImpact": false,
+      "issueKey": "BANNER_TIME_DURATION_TIMEZONE_DEFERRED",
+      "evidence": []
+    },
+    {
+      "id": "banner-first-ever-deferred",
+      "domain": "banner",
+      "match": {
+        "code": "FIRST_EVER_BEFORE_DATASET_UNASSERTED"
+      },
+      "lifecycle": "DEFERRED_NON_ERROR",
+      "healthImpact": false,
+      "issueKey": "BANNER_FIRST_EVER_DEFERRED",
+      "evidence": []
+    },
+    {
+      "id": "banner-recurrence-prediction-deferred",
+      "domain": "banner",
+      "match": {
+        "code": "RECURRENCE_CADENCE_AND_FUTURE_PREDICTION_UNASSERTED"
+      },
+      "lifecycle": "DEFERRED_NON_ERROR",
+      "healthImpact": false,
+      "issueKey": "BANNER_RECURRENCE_PREDICTION_DEFERRED",
+      "evidence": []
+    }
+  ]
 }

@@ -103,8 +103,10 @@ export const normalizeReview = (value, sourcePath, selector, index = null) => {
     lifecycle: 'ACTIVE_REVIEW',
     healthImpact: true,
     reportedCount,
+    resolvedCount: reportedCount === null ? null : 0,
     remainingCount: reportedCount,
     resolutionEvidence: [],
+    countEvidence: null,
     issueKey: null,
     source: sourcePath,
     selector,
@@ -160,6 +162,70 @@ const evaluateReviewEvidence = (evidenceRules, primarySelected, supplements) => 
   };
 });
 
+const resolveReviewCount = ({ review, rule, primarySelected, supplements }) => {
+  const hasLiteralRemaining = hasOwn(rule, 'remainingCount');
+  const hasEvidenceRemaining = hasOwn(rule, 'remainingCountFromEvidence');
+  if (hasLiteralRemaining && hasEvidenceRemaining) {
+    return { ok: false, reason: 'BOTH_LITERAL_AND_EVIDENCE_REMAINING_COUNT', remainingCount: review.remainingCount, resolvedCount: review.resolvedCount, countEvidence: null };
+  }
+
+  if (!hasLiteralRemaining && !hasEvidenceRemaining) {
+    const remainingCount = rule.lifecycle === 'RESOLVED_BY_EVIDENCE' ? 0 : review.remainingCount;
+    if (remainingCount !== null && rule.lifecycle === 'RESOLVED_BY_EVIDENCE' && remainingCount !== 0) {
+      return { ok: false, reason: 'FULL_RESOLUTION_REQUIRES_ZERO_REMAINING', remainingCount: review.remainingCount, resolvedCount: review.resolvedCount, countEvidence: null };
+    }
+    return {
+      ok: true,
+      remainingCount,
+      resolvedCount: review.reportedCount === null || remainingCount === null ? null : review.reportedCount - remainingCount,
+      countEvidence: null,
+    };
+  }
+
+  if (!Number.isInteger(review.reportedCount) || review.reportedCount < 0) {
+    return { ok: false, reason: 'PARTIAL_RESOLUTION_REQUIRES_REPORTED_COUNT', remainingCount: review.remainingCount, resolvedCount: review.resolvedCount, countEvidence: null };
+  }
+
+  let remainingCount;
+  let countEvidence = null;
+  if (hasLiteralRemaining) {
+    remainingCount = rule.remainingCount;
+  } else {
+    const ref = rule.remainingCountFromEvidence;
+    if (!isObject(ref) || typeof ref.sourceRole !== 'string' || typeof ref.key !== 'string') {
+      return { ok: false, reason: 'INVALID_REMAINING_COUNT_EVIDENCE_REFERENCE', remainingCount: review.remainingCount, resolvedCount: review.resolvedCount, countEvidence: null };
+    }
+    const selected = selectedEvidenceSource(ref, primarySelected, supplements);
+    remainingCount = selected?.[ref.key];
+    countEvidence = {
+      sourceRole: ref.sourceRole,
+      key: ref.key,
+      actual: remainingCount,
+      pass: selected !== undefined && Number.isInteger(remainingCount),
+    };
+    if (countEvidence.pass !== true) {
+      return { ok: false, reason: 'REMAINING_COUNT_EVIDENCE_NOT_AVAILABLE', remainingCount: review.remainingCount, resolvedCount: review.resolvedCount, countEvidence };
+    }
+  }
+
+  if (!Number.isInteger(remainingCount) || remainingCount < 0 || remainingCount > review.reportedCount) {
+    return { ok: false, reason: 'REMAINING_COUNT_OUT_OF_BOUNDS', remainingCount: review.remainingCount, resolvedCount: review.resolvedCount, countEvidence };
+  }
+  if (rule.lifecycle === 'RESOLVED_BY_EVIDENCE' && remainingCount !== 0) {
+    return { ok: false, reason: 'FULL_RESOLUTION_REQUIRES_ZERO_REMAINING', remainingCount: review.remainingCount, resolvedCount: review.resolvedCount, countEvidence };
+  }
+  if (remainingCount > 0 && rule.healthImpact === false) {
+    return { ok: false, reason: 'PARTIAL_RESOLUTION_MUST_RETAIN_HEALTH_IMPACT', remainingCount: review.remainingCount, resolvedCount: review.resolvedCount, countEvidence };
+  }
+
+  return {
+    ok: true,
+    remainingCount,
+    resolvedCount: review.reportedCount - remainingCount,
+    countEvidence,
+  };
+};
+
 const applyReviewLifecycleRules = ({ reviews, domain, lifecycleContract, primarySelected, supplements }) => {
   const failures = [];
   const allowedLifecycles = new Set(lifecycleContract.reviewLifecycleValues ?? []);
@@ -190,12 +256,28 @@ const applyReviewLifecycleRules = ({ reviews, domain, lifecycleContract, primary
       return review;
     }
 
+    const countResult = resolveReviewCount({ review, rule, primarySelected, supplements });
+    if (!countResult.ok) {
+      failures.push({
+        type: 'REVIEW_LIFECYCLE_COUNT_INVALID',
+        reviewKey: review.reviewKey,
+        ruleId: rule.id ?? null,
+        reason: countResult.reason,
+        reportedCount: review.reportedCount,
+        requestedRemainingCount: hasOwn(rule, 'remainingCount') ? rule.remainingCount : null,
+        countEvidence: countResult.countEvidence,
+      });
+      return review;
+    }
+
     return {
       ...review,
       lifecycle: rule.lifecycle,
       healthImpact: rule.healthImpact,
-      remainingCount: rule.lifecycle === 'RESOLVED_BY_EVIDENCE' ? 0 : review.remainingCount,
+      remainingCount: countResult.remainingCount,
+      resolvedCount: countResult.resolvedCount,
       resolutionEvidence: evidence,
+      countEvidence: countResult.countEvidence,
       issueKey: typeof rule.issueKey === 'string' && rule.issueKey.length > 0 ? rule.issueKey : null,
       lifecycleRuleId: rule.id ?? null,
     };
@@ -319,7 +401,13 @@ export function normalizeDomain({ domain, baseSpec, activeMeta, contract, review
   const supersededCodes = new Set(supplements.flatMap(item => item.supersedesPrimaryReviewCodes ?? []));
   const resolvedReviews = reviews
     .filter(review => review.code && supersededCodes.has(review.code))
-    .map(review => ({ ...review, lifecycle: 'RESOLVED_BY_EVIDENCE', healthImpact: false, remainingCount: 0 }));
+    .map(review => ({
+      ...review,
+      lifecycle: 'RESOLVED_BY_EVIDENCE',
+      healthImpact: false,
+      remainingCount: 0,
+      resolvedCount: review.reportedCount,
+    }));
   reviews = reviews
     .filter(review => !(review.code && supersededCodes.has(review.code)))
     .map(review => ({ ...review, scope: reviewScope(review, contract.normalizedModel.reviewScopes) }));
