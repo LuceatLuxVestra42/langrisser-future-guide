@@ -1,0 +1,246 @@
+import fs from "node:fs";
+import { chromium } from "playwright";
+
+const baseUrl = (process.env.HOSTED_BASE_URL || "https://luceatluxvestra42.github.io/langrisser-future-guide/").replace(/\/?$/, "/");
+const expectedSourceSha = process.env.EXPECTED_SOURCE_SHA;
+if (!expectedSourceSha) throw new Error("EXPECTED_SOURCE_SHA is required");
+
+const relation = JSON.parse(fs.readFileSync("data/generated/skin-stage2-3-bidirectional-relation.v1.json", "utf8"));
+const equipmentPublicAdmission = JSON.parse(fs.readFileSync("data/presentation/equipment-public-admission-correction.v1.json", "utf8"));
+const expectedGeneralEquipmentCount = Number(equipmentPublicAdmission.expectedPublicProjection?.generalEquipmentCount);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const check = (condition, message) => { if (!condition) throw new Error(message); };
+const url = (path) => new URL(path.replace(/^\//, ""), baseUrl).toString();
+
+check(equipmentPublicAdmission.status === "FROZEN", "Equipment public-admission correction must be FROZEN");
+check(Number.isInteger(expectedGeneralEquipmentCount) && expectedGeneralEquipmentCount > 0, "Equipment public general count is invalid");
+
+async function fetchWithRetry(path, attempts = 5) {
+  let last = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(url(`${path}${path.includes("?") ? "&" : "?"}qa=${Date.now()}`), { cache: "no-store" });
+      last = response;
+      if (response.ok) return response;
+    } catch (error) {
+      last = error;
+    }
+    if (attempt < attempts) await sleep(3000);
+  }
+  throw new Error(`${path} did not become healthy: ${last instanceof Response ? last.status : String(last)}`);
+}
+
+let manifest = null;
+for (let attempt = 1; attempt <= 30; attempt += 1) {
+  try {
+    const response = await fetch(url(`authoritative-pages-source.json?qa=${Date.now()}`), { cache: "no-store" });
+    if (response.ok) {
+      const candidate = await response.json();
+      if (candidate.sourceSha === expectedSourceSha && candidate.skinSource === "CURRENT_REPOSITORY_FROZEN_CONSUMER" && candidate.skinPngCount === 540) {
+        manifest = candidate;
+        break;
+      }
+    }
+  } catch {}
+  if (attempt < 30) await sleep(5000);
+}
+check(manifest, `authoritative deployment manifest did not reach source=${expectedSourceSha} with current frozen Skin consumer`);
+check(manifest.semanticStageReopened === false, "deployment manifest reopened semantic stage");
+check(manifest.heroArtworkResolvedCount === 267, `deployment Hero artwork resolved count mismatch: ${manifest.heroArtworkResolvedCount}`);
+
+for (const path of ["", "heroes/", "heroes/6/", "equipment/", "equipment/642/", "equipment/299/"]) {
+  await fetchWithRetry(path || "index.html");
+}
+await fetchWithRetry("images/heroes/cards/6.png");
+await fetchWithRetry("images/equipment/416.png");
+await fetchWithRetry("images/equipment/567.png");
+
+const heroRows = Object.entries(relation.byHeroId ?? {})
+  .map(([heroId, skinIds]) => ({ heroId: Number(heroId), skinIds: Array.isArray(skinIds) ? skinIds.map(Number) : [] }))
+  .sort((a, b) => b.skinIds.length - a.skinIds.length || a.heroId - b.heroId);
+const skinHero = heroRows[0];
+check(skinHero?.skinIds?.length >= 2, "no multi-Skin representative Hero");
+const firstSkinId = skinHero.skinIds[0];
+const secondSkinId = skinHero.skinIds[1];
+await fetchWithRetry(`images/skins/${firstSkinId}.png`);
+await fetchWithRetry(`images/skins/${secondSkinId}.png`);
+
+const hero6SkinIds = Array.isArray(relation.byHeroId?.["6"]) ? relation.byHeroId["6"].map(Number) : [];
+check(hero6SkinIds.length === 6, `Hero 6 frozen Skin count mismatch: ${hero6SkinIds.length}`);
+const hero6VisualCount = hero6SkinIds.length + 1;
+
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+const pageErrors = [];
+const consoleErrors = [];
+page.on("pageerror", (error) => pageErrors.push(String(error)));
+page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
+
+try {
+  let response = await page.goto(url(`heroes/${skinHero.heroId}/`), { waitUntil: "networkidle", timeout: 45000 });
+  check(response && response.status() < 400, `Hero ${skinHero.heroId} route failed: ${response?.status()}`);
+  await page.getByText(`Hero #${skinHero.heroId}`, { exact: true }).waitFor();
+  const next = page.getByRole("button", { name: "다음 일러스트" });
+  const prev = page.getByRole("button", { name: "이전 일러스트" });
+  check(await next.count() === 1 && await prev.count() === 1, "Skin carousel controls are missing or duplicated");
+
+  async function currentSkinLabel() {
+    const locator = page.getByText(/스킨 \d+ · ID \d+/).first();
+    return await locator.count() ? (await locator.textContent())?.trim() ?? null : null;
+  }
+  async function reachSkin(skinId) {
+    for (let step = 0; step <= skinHero.skinIds.length + 2; step += 1) {
+      const label = await currentSkinLabel();
+      if (label?.endsWith(`ID ${skinId}`)) return label;
+      await next.click();
+      await page.waitForTimeout(100);
+    }
+    throw new Error(`Could not reach Skin ${skinId}`);
+  }
+
+  const firstLabel = await reachSkin(firstSkinId);
+  check(firstLabel === `스킨 1 · ID ${firstSkinId}`, `first Skin label mismatch: ${firstLabel}`);
+  let activeImage = page.locator("main section img[alt]").first();
+  check((await activeImage.getAttribute("src"))?.includes(`/images/skins/${firstSkinId}.png`), "first Skin image source mismatch");
+  await next.click();
+  await page.waitForTimeout(100);
+  const secondLabel = await currentSkinLabel();
+  check(secondLabel === `스킨 2 · ID ${secondSkinId}`, `second Skin label mismatch: ${secondLabel}`);
+  activeImage = page.locator("main section img[alt]").first();
+  check((await activeImage.getAttribute("src"))?.includes(`/images/skins/${secondSkinId}.png`), "second Skin image source mismatch");
+
+  response = await page.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
+  check(response && response.status() < 400, `Hero 6 detail failed: ${response?.status()}`);
+  await page.getByText("Hero #6", { exact: true }).waitFor();
+  await page.getByText("대표 일러스트", { exact: true }).waitFor();
+  await page.getByText(`1 / ${hero6VisualCount}`, { exact: true }).waitFor();
+  const heroArtworkImage = page.locator('img[alt="레온 대표 일러스트"]');
+  check(await heroArtworkImage.count() === 1, "Hero 6 representative artwork image missing or duplicated");
+  check((await heroArtworkImage.getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 representative artwork source mismatch");
+  const hero6Next = page.getByRole("button", { name: "다음 일러스트" });
+  check(await hero6Next.count() === 1, "Hero 6 next artwork control missing or duplicated");
+  await hero6Next.click();
+  await page.waitForTimeout(100);
+  await page.getByText(`스킨 1 · ID ${hero6SkinIds[0]}`, { exact: true }).waitFor();
+  const hero6FirstSkinImage = page.locator(`img[src*="/images/skins/${hero6SkinIds[0]}.png"]`);
+  check(await hero6FirstSkinImage.count() === 1, "Hero 6 first Skin did not follow representative artwork");
+
+  const exclusiveHeading = page.getByRole("heading", { name: "전용장비", exact: true });
+  await exclusiveHeading.waitFor();
+  const exclusiveSection = exclusiveHeading.locator("xpath=ancestor::section[1]");
+  const exclusiveText = await exclusiveSection.innerText();
+  for (const token of [
+    "RELEASED",
+    "Equipment #416",
+    "청룡의 갑옷",
+    "青龙之胄",
+    "갑옷 · 중갑",
+    "최대 Lv.50",
+    "방어",
+    "65",
+    "생명",
+    "437",
+    "天翔游龙",
+    "Skill #51096",
+    "防御+10%。",
+    "移动不受地形限制",
+    "근거 신뢰도 99%",
+  ]) {
+    check(exclusiveText.includes(token), `Hero 6 exclusive Equipment missing token: ${token}`);
+  }
+  const exclusiveImage = exclusiveSection.locator('img[alt="청룡의 갑옷 전용장비"]');
+  check(await exclusiveImage.count() === 1, "Hero 6 exclusive Equipment image missing or duplicated");
+  check((await exclusiveImage.getAttribute("src"))?.includes("/images/equipment/416.png"), "Hero 6 exclusive Equipment image source mismatch");
+
+  response = await page.goto(url("equipment/"), { waitUntil: "networkidle", timeout: 45000 });
+  check(response && response.status() < 400, `Equipment list failed: ${response?.status()}`);
+  await page.getByText("장비 종류", { exact: true }).waitFor({ state: "visible" });
+  for (const removedLabel of ["초기 장비", "이전 추가 장비", "장비패스"]) {
+    check(await page.getByRole("button", { name: removedLabel, exact: true }).count() === 0, `Removed Equipment top-level category is still visible: ${removedLabel}`);
+  }
+  const cardLinks = page.locator('section[aria-label="SSR 장비 이미지 목록"] a[href]');
+  const cardCount = await cardLinks.count();
+  check(cardCount === expectedGeneralEquipmentCount, `Equipment general list card count mismatch: ${cardCount}/${expectedGeneralEquipmentCount}`);
+  const weaponFilter = page.getByRole("button", { name: "무기", exact: true });
+  check(await weaponFilter.count() === 1, "Equipment weapon filter is missing or duplicated");
+  await weaponFilter.click();
+  await page.waitForTimeout(100);
+  const weaponCardCount = await cardLinks.count();
+  check(weaponCardCount > 0 && weaponCardCount < cardCount, `Equipment weapon filter did not narrow the list: ${weaponCardCount}/${cardCount}`);
+
+  for (const [equipmentId, expectedDate] of [[642, "2026-07-16"], [299, "2019-05-09"]]) {
+    response = await page.goto(url(`equipment/${equipmentId}/`), { waitUntil: "networkidle", timeout: 45000 });
+    check(response && response.status() < 400, `Equipment ${equipmentId} detail failed: ${response?.status()}`);
+    const section = page.locator("section").filter({ has: page.getByRole("heading", { name: "획득 계열", exact: true }) }).first();
+    await section.getByText("확인된 출시 그룹 날짜", { exact: true }).waitFor();
+    await section.getByText(expectedDate, { exact: true }).waitFor();
+    check(!(await section.innerText()).includes("REVIEW"), `Equipment ${equipmentId} acquisition exposes REVIEW`);
+  }
+
+  check(pageErrors.length === 0, `page errors: ${JSON.stringify(pageErrors)}`);
+  check(consoleErrors.length === 0, `console errors: ${JSON.stringify(consoleErrors)}`);
+
+  const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true });
+  const mobilePage = await mobileContext.newPage();
+  const mobilePageErrors = [];
+  const mobileConsoleErrors = [];
+  mobilePage.on("pageerror", (error) => mobilePageErrors.push(String(error)));
+  mobilePage.on("console", (message) => { if (message.type() === "error") mobileConsoleErrors.push(message.text()); });
+  try {
+    response = await mobilePage.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
+    check(response && response.status() < 400, `Hero 6 mobile detail failed: ${response?.status()}`);
+    await mobilePage.getByText("대표 일러스트", { exact: true }).waitFor();
+    await mobilePage.getByText(`1 / ${hero6VisualCount}`, { exact: true }).waitFor();
+    const mobileHeroArtwork = mobilePage.locator('img[alt="레온 대표 일러스트"]');
+    check(await mobileHeroArtwork.count() === 1, "Hero 6 mobile representative artwork missing or duplicated");
+    check((await mobileHeroArtwork.getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 mobile representative artwork source mismatch");
+    const mobileHeading = mobilePage.getByRole("heading", { name: "전용장비", exact: true });
+    await mobileHeading.waitFor();
+    const mobileSection = mobileHeading.locator("xpath=ancestor::section[1]");
+    check((await mobileSection.innerText()).includes("청룡의 갑옷"), "Hero 6 mobile exclusive Equipment text missing");
+    const overflow = await mobilePage.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    check(overflow <= 1, `Hero 6 mobile horizontal overflow=${overflow}`);
+    check(mobilePageErrors.length === 0, `mobile page errors: ${JSON.stringify(mobilePageErrors)}`);
+    check(mobileConsoleErrors.length === 0, `mobile console errors: ${JSON.stringify(mobileConsoleErrors)}`);
+  } finally {
+    await mobileContext.close();
+  }
+
+  console.log(JSON.stringify({
+    status: "PASS_AUTHORITATIVE_GITHUB_PAGES_HOSTED",
+    sourceSha: expectedSourceSha,
+    skinSource: "CURRENT_REPOSITORY_FROZEN_CONSUMER",
+    heroArtwork: {
+      resolvedCount: 267,
+      heroId: 6,
+      webAssetPath: "/images/heroes/cards/6.png",
+      visualCount: hero6VisualCount,
+      desktop: "PASS",
+      mobile: "PASS",
+    },
+    skinRepresentative: { heroId: skinHero.heroId, firstSkinId, secondSkinId },
+    heroExclusiveEquipment: {
+      heroId: 6,
+      equipmentId: 416,
+      nameKr: "청룡의 갑옷",
+      maxLevel: 50,
+      effectSkillId: 51096,
+      desktop: "PASS",
+      mobileOverflow: 0,
+    },
+    equipmentList: {
+      generalCount: cardCount,
+      removedTopLevelCollections: "PASS",
+      groupFilter: "PASS",
+      details: { 642: "2026-07-16", 299: "2019-05-09" },
+    },
+    heroArtwork6: "HTTP_PASS_WITH_RETRY_POLICY",
+    equipmentImage416: "HTTP_PASS_WITH_RETRY_POLICY",
+    equipmentImage567: "HTTP_PASS_WITH_RETRY_POLICY",
+    pageErrors: 0,
+    consoleErrors: 0,
+    semanticStageReopened: false,
+  }, null, 2));
+} finally {
+  await browser.close();
+}

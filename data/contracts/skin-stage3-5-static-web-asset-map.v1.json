@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-5-0",
+  "evidenceClass": "STATIC_WEB_ASSET_MAPPING_CONTRACT",
+  "status": "DESIGN_FROZEN",
+  "scope": {
+    "includedKind": "STATIC",
+    "deferredKinds": ["CHAR_SPINE", "MODEL_PRIMARY"],
+    "note": "Stage 3-5-0 materializes only the 540 Stage 3-4 PNG static artifacts for web serving. Prefab/GameObject presentation conversion remains a separate downstream concern."
+  },
+  "predecessorRequirements": {
+    "stage34Status": "PASS_SKIN_STAGE3_4_SELECTIVE_EXTRACTION",
+    "stage34FinalReady": true,
+    "expectedRequestCount": 1869,
+    "acceptedRequestCount": 1869,
+    "acceptedStaticCount": 540,
+    "acceptedCharSpineCount": 540,
+    "acceptedModelPrimaryCount": 789,
+    "blockerCount": 0,
+    "actualArtifactHashVerified": true,
+    "stage2RelationStatus": "ACCEPTED",
+    "stage2BySkinIdCount": 540,
+    "stage2ByHeroIdCount": 267,
+    "stage2EdgeCount": 540
+  },
+  "output": {
+    "root": "public/images/skins",
+    "manifestPath": "data/generated/skin-stage3-5-static-web-asset-map.v1.json",
+    "validationPath": "data/validation/skin-stage3-5-static-web-asset-map.v1.json",
+    "repoPathTemplate": "public/images/skins/{skinId}.png",
+    "publicPathTemplate": "images/skins/{skinId}.png",
+    "filenamePolicy": "DECIMAL_SKIN_ID_PNG",
+    "expectedFileCount": 540
+  },
+  "materializationPolicy": {
+    "copyMode": "EXACT_BYTES_NO_REENCODE",
+    "sourceArtifactRole": "PRIMARY_OBJECT",
+    "sourceArtifactType": "PNG_TEXTURE_EXPORT",
+    "requiredPngSignature": true,
+    "sourceHashAndSizeMustMatchStage34Result": true,
+    "destinationHashAndSizeMustEqualSource": true,
+    "unexpectedOutputFiles": "FAIL",
+    "mismatchedExistingExpectedFile": "FAIL_UNLESS_EXPLICIT_REPLACE_EXISTING"
+  },
+  "mappingPolicy": {
+    "skinIdentity": "Stage 3-4 STATIC request skinId",
+    "requestIdTemplate": "skin:{skinId}:static",
+    "heroOwnershipAndSourceOrder": "data/generated/skin-stage2-3-bidirectional-relation.v1.json bySkinId",
+    "exactByteDuplicatePolicy": "REPORT_ONLY_DO_NOT_MERGE_SKIN_IDENTITY",
+    "pathCollisionPolicy": "FAIL",
+    "sortOrder": "NUMERIC_SKIN_ID_ASC"
+  },
+  "guardrails": {
+    "rawConfigDataRead": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "runtimePathInference": false,
+    "semanticOwnershipRecomputed": false,
+    "sourceOrderRecomputed": false,
+    "pngReencoding": false,
+    "charSpineWebConversionInThisStage": false,
+    "modelPrimaryWebConversionInThisStage": false
+  },
+  "completion": {
+    "status": "PASS_SKIN_STAGE3_5_STATIC_WEB_ASSET_MAP",
+    "required": {
+      "mappedSkinCount": 540,
+      "materializedFileCount": 540,
+      "missingFileCount": 0,
+      "hashMismatchCount": 0,
+      "pathCollisionCount": 0,
+      "unexpectedFileCount": 0
+    }
+  }
+}
