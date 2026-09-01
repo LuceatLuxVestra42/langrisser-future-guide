@@ -27,8 +27,8 @@ assertRoute(
 
 assertRoute(
   'data/validation/soldier-stage6-7-site-admission.v1.json',
-  ['soldier-canonical'],
-  ['soldier-canonical'],
+  ['soldier-canonical', 'status-source'],
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection', 'soldier-canonical'],
 );
 
 assertRoute(
@@ -43,7 +43,7 @@ console.log(JSON.stringify({
   fixtureCount: 3,
   fixtures: [
     'soldier-frontend -> production-build',
-    'soldier-canonical -> soldier-canonical',
+    'soldier-canonical + status-source -> provenance + soldier-canonical validators',
     'asset-intake -> asset-intake',
   ],
   boundaries: {

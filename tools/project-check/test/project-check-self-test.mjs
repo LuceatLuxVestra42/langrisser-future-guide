@@ -151,13 +151,38 @@ expectOwners(
 );
 expectOwners(
   'data/validation/hero-stage6-4-final.v1.json',
-  ['hero-canonical'],
-  ['hero-canonical'],
+  ['hero-canonical', 'status-source'],
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection', 'hero-canonical'],
+);
+expectOwners(
+  'data/validation/soldier-stage6-7-site-admission.v1.json',
+  ['soldier-canonical', 'status-source'],
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection', 'soldier-canonical'],
+);
+expectOwners(
+  'data/validation/equipment-stage4-final.v1.json',
+  ['equipment-frontend', 'status-source'],
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection', 'production-build'],
+);
+expectOwners(
+  'data/validation/equipment-public-presentation-correction-final.v1.json',
+  ['equipment-frontend', 'localization', 'status-source'],
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection', 'localization-audit', 'production-build'],
 );
 expectOwners(
   'data/validation/hero-soldier-integration-stageC-final.v1.json',
-  ['hero-soldier-relation'],
-  ['hero-soldier-relation'],
+  ['hero-soldier-relation', 'status-source'],
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection', 'hero-soldier-relation'],
+);
+expectOwners(
+  'data/validation/banner-stage3-8-regression-freeze-summary.v1.json',
+  ['banner-data', 'status-source'],
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection', 'banner-data'],
+);
+expectOwners(
+  'data/validation/skin-stage3-2-readiness.v1.json',
+  ['skin-stage3-2-evidence', 'status-source'],
+  ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection', 'skin-stage3-2-evidence'],
 );
 expectOwners(
   'data/presentation/equipment-display-collection.v1.json',
@@ -378,7 +403,7 @@ assert.throws(
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'PROJECT_CHECK_R3_SELF_TEST',
-  fixtures: 34,
+  fixtures: 39,
   catalogValidatorCount: contracts.validatorCatalog.validators.length,
   ownerCount: contracts.ownerMap.owners.length,
   deletionManifest: {
