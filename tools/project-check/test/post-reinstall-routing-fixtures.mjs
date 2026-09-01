@@ -44,6 +44,12 @@ assertRoute(
 );
 
 assertRoute(
+  'public/images/soldier-training-materials/6003.png',
+  ['soldier-training-material-assets'],
+  ['soldier-training-material-assets'],
+);
+
+assertRoute(
   'public/images/soldier-training-materials-webp/6003.webp',
   ['soldier-training-material-assets'],
   ['soldier-training-material-assets'],
@@ -76,12 +82,13 @@ assertRoute(
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'POST_REINSTALL_ROUTING_FIXTURES',
-  fixtureCount: 9,
+  fixtureCount: 10,
   fixtures: [
     'soldier-frontend -> production-build',
     'soldier-canonical + status-source -> provenance + soldier-canonical validators',
     'asset-intake -> asset-intake',
     'soldier-training-material validation -> dedicated read-only validator',
+    'soldier-training-material PNG -> dedicated read-only validator',
     'soldier-training-material WebP -> dedicated read-only validator',
     'soldier-training-material checkpoint -> dedicated read-only validator',
     'soldier-training-material script -> dedicated read-only validator',
