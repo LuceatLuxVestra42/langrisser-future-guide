@@ -99,6 +99,8 @@ jobs:
           dotnet build .runtime/geometry/SpineGeometry.csproj -c Release
 
       - name: Compute setup-pose geometry with official 3.3 runtime
+        id: geometry
+        continue-on-error: true
         run: |
           dotnet run --project .runtime/geometry/SpineGeometry.csproj -c Release --no-build -- \
             "$ATLAS_PATH" \
@@ -106,6 +108,7 @@ jobs:
             data/evidence/skin-fullart0-geometry.v1.json
 
       - name: Rasterize current setup pose from geometry and atlas Texture2D
+        if: steps.geometry.outcome == 'success'
         run: |
           mkdir -p .skin-fullart0-render
           python scripts/render-skin-fullart0-geometry.py \
@@ -114,7 +117,8 @@ jobs:
             --output .skin-fullart0-render/skin-102-setup.png \
             --evidence-output data/evidence/skin-fullart0-current-render.v1.json
 
-      - name: Upload current Skin 102 render proof
+      - name: Upload current Skin 102 render or geometry diagnostic
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: skin-fullart0-current-render
@@ -127,7 +131,12 @@ jobs:
           if-no-files-found: error
 
       - name: Remove execution-only state
+        if: always()
         run: rm -rf .runtime .skin-fullart0-spine-source .skin-fullart0-render scripts/__pycache__
+
+      - name: Require renderable setup geometry
+        if: steps.geometry.outcome != 'success'
+        run: exit 1
 
       - name: Fail closed on unrelated tracked mutation
         run: |
