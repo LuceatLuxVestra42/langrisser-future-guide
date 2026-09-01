@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "contract": "soldier-portrait-source-pack",
+  "status": "PASS",
+  "owner": "soldier-assets",
+  "purpose": "Pin the external exact-byte storage contract for the frozen Soldier portrait v9 PNG source set without changing canonical Soldier semantics, source identity joins, production WebP delivery, or runtime paths.",
+  "authority": {
+    "semanticAndSourceIdentity": "data/generated/soldier-portrait-manifest.v9.json",
+    "externalByteTransport": "THIS_CONTRACT_PLUS_PINNED_SHA256",
+    "externalInventoryRole": "BYTE_INVENTORY_PROJECTION_ONLY",
+    "externalInventoryMayCreateSemanticMappings": false
+  },
+  "authoritativePredecessor": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "sourceCommitSha": "5dc0904987b36b36776d887bea9445dd65ee64b6",
+    "sourceManifest": "data/generated/soldier-portrait-manifest.v9.json",
+    "sourceManifestVersion": 9,
+    "sourcePublicPath": "public/images/soldiers",
+    "sourcePublicRoot": "images/soldiers"
+  },
+  "storage": {
+    "kind": "GITHUB_RELEASE_ASSET",
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "releaseTag": "source-assets-soldier-v9-5dc09049",
+    "releaseTargetCommitSha": "5dc0904987b36b36776d887bea9445dd65ee64b6",
+    "releaseId": 380563632,
+    "releaseImmutableMetadataAtAdmission": false,
+    "immutabilityPolicy": "CONTENT_HASH_PINNED_FAIL_CLOSED",
+    "archive": {
+      "name": "soldier-portrait-source-v9-5dc09049.tar.gz",
+      "bytes": 46731491,
+      "sha256": "1a2d56ba43d3f83390208d1351eb9c48d38f80adfe95b19afee1c27b54ad3cb6"
+    },
+    "inventory": {
+      "name": "soldier-portrait-source-v9-5dc09049.inventory.json",
+      "bytes": 44321,
+      "sha256": "48c56ffb39edbb9063e5d275f13ce1e9406a872273d68eb54e263e44fc3cfe42"
+    },
+    "checksums": {
+      "name": "soldier-portrait-source-v9-5dc09049.sha256",
+      "bytes": 226,
+      "sha256": "b667e2cf7aa52360ebd8791f46d94c26c78e1f24dfccbb28cc7ccbf83c634f0c"
+    }
+  },
+  "coverage": {
+    "fileCount": 224,
+    "totalSourceBytes": 48931121,
+    "canonicalSoldierCount": 224,
+    "canonicalNormalCount": 168,
+    "canonicalSpCount": 56,
+    "missingCount": 0,
+    "extraCount": 0,
+    "duplicateCount": 0
+  },
+  "integrityPolicy": {
+    "archiveSha256Required": true,
+    "inventorySha256Required": true,
+    "archiveRoundTripVerificationRequired": true,
+    "exactFileSetRequired": true,
+    "perFileSha256MustMatchV9Manifest": true,
+    "perFileSizeMustMatchV9Manifest": true,
+    "soldierIdToFileNameMustRemainExact": true,
+    "failClosedOnAnyMismatch": true,
+    "releaseAssetOverwriteAllowed": false,
+    "changedBytesRequireNewTagAndNewContractVersion": true
+  },
+  "productionPolicy": {
+    "sourcePackFetchedAtRuntime": false,
+    "productionWebManifest": "data/generated/soldier-portrait-web-manifest.v1.json",
+    "productionPublicRoot": "images/soldiers-webp",
+    "productionWebpCount": 224,
+    "runtimePathChange": false,
+    "webpReencodingInThisStage": false
+  },
+  "semanticBoundary": {
+    "canonicalSoldierChanges": false,
+    "heroSoldierRelationChanges": false,
+    "localizationChanges": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "sourceMeaningReinterpreted": false
+  },
+  "admissionEvidence": {
+    "builder": "scripts/build-soldier-portrait-source-pack-v1.mjs",
+    "workflow": ".github/workflows/soldier-portrait-source-pack-v1.yml",
+    "workflowRunId": 33518192447,
+    "workflowConclusion": "success",
+    "archiveDigestMatchesPublishedAssetDigest": true,
+    "inventoryDigestMatchesPublishedAssetDigest": true
+  },
+  "reopenConditions": [
+    "Pinned archive SHA-256 no longer matches the fetched archive bytes.",
+    "Pinned inventory SHA-256 no longer matches the fetched inventory bytes.",
+    "Archive coverage is not exactly 224 PNG files.",
+    "Any extracted PNG SHA-256 or size differs from data/generated/soldier-portrait-manifest.v9.json.",
+    "The production Soldier portrait WebP delivery contract or runtime path changes.",
+    "An authoritative Soldier portrait source contradiction is introduced."
+  ]
+}
