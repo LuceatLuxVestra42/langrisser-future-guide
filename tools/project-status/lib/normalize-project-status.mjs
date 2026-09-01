@@ -6,6 +6,7 @@ import {
 } from '../../status-source/lib/select-active-sources.mjs';
 
 export const DEFAULT_NORMALIZATION_CONTRACT = 'tools/project-status/contracts/normalization.v1.json';
+export const DEFAULT_REVIEW_LIFECYCLE_CONTRACT = 'tools/project-status/contracts/review-lifecycle.v1.json';
 
 const readJson = filePath => JSON.parse(fs.readFileSync(filePath, 'utf8'));
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(Object(value), key);
@@ -22,6 +23,24 @@ export function loadNormalizationContract({
   if (contract.status !== 'DESIGN_FROZEN') {
     throw new Error(`Project Status normalization contract is not frozen: ${contract.status ?? 'missing'}`);
   }
+  return contract;
+}
+
+export function loadReviewLifecycleContract({
+  repoRoot = process.cwd(),
+  contractPath = DEFAULT_REVIEW_LIFECYCLE_CONTRACT,
+} = {}) {
+  const contract = readJson(assertRepositoryPath(repoRoot, contractPath));
+  if (contract?.schemaId !== 'project-status-review-lifecycle/v1') {
+    throw new Error(`Unsupported Project Status review lifecycle schema: ${contract?.schemaId ?? 'missing'}`);
+  }
+  if (contract.status !== 'DESIGN_FROZEN') {
+    throw new Error(`Project Status review lifecycle contract is not frozen: ${contract.status ?? 'missing'}`);
+  }
+  if (!Array.isArray(contract.reviewLifecycleValues) || contract.reviewLifecycleValues.length === 0) {
+    throw new Error('Project Status review lifecycle contract must declare reviewLifecycleValues.');
+  }
+  if (!Array.isArray(contract.rules)) throw new Error('Project Status review lifecycle contract rules must be an array.');
   return contract;
 }
 
@@ -110,6 +129,80 @@ const reviewScope = (review, allowedScopes) => {
   return typeof rawScope === 'string' && allowedScopes.includes(rawScope) ? rawScope : 'unknown';
 };
 
+const reviewRuleMatches = (review, rule, domain) => {
+  if (!isObject(rule) || rule.domain !== domain || !isObject(rule.match)) return false;
+  const match = rule.match;
+  if (!hasOwn(match, 'reviewKey') && !hasOwn(match, 'code')) return false;
+  if (hasOwn(match, 'reviewKey') && review.reviewKey !== match.reviewKey) return false;
+  if (hasOwn(match, 'code') && review.code !== match.code) return false;
+  if (hasOwn(match, 'source') && review.source !== match.source) return false;
+  if (hasOwn(match, 'selector') && review.selector !== match.selector) return false;
+  return true;
+};
+
+const selectedEvidenceSource = (evidence, primarySelected, supplements) => {
+  if (evidence.sourceRole === 'PRIMARY_STATUS_SOURCE') return primarySelected;
+  return supplements.find(item => item.role === evidence.sourceRole)?.selected;
+};
+
+const evaluateReviewEvidence = (evidenceRules, primarySelected, supplements) => (evidenceRules ?? []).map(evidence => {
+  if (!isObject(evidence) || typeof evidence.sourceRole !== 'string' || typeof evidence.key !== 'string') {
+    return { sourceRole: evidence?.sourceRole ?? null, key: evidence?.key ?? null, expected: evidence?.equals, actual: undefined, pass: false };
+  }
+  const selected = selectedEvidenceSource(evidence, primarySelected, supplements);
+  const actual = selected?.[evidence.key];
+  return {
+    sourceRole: evidence.sourceRole,
+    key: evidence.key,
+    expected: evidence.equals,
+    actual,
+    pass: selected !== undefined && Object.is(actual, evidence.equals),
+  };
+});
+
+const applyReviewLifecycleRules = ({ reviews, domain, lifecycleContract, primarySelected, supplements }) => {
+  const failures = [];
+  const allowedLifecycles = new Set(lifecycleContract.reviewLifecycleValues ?? []);
+  const rules = lifecycleContract.rules ?? [];
+  const normalized = reviews.map(review => {
+    const matches = rules.filter(rule => reviewRuleMatches(review, rule, domain));
+    if (matches.length === 0) return review;
+    if (matches.length > 1) {
+      failures.push({ type: 'REVIEW_LIFECYCLE_RULE_AMBIGUOUS', reviewKey: review.reviewKey, ruleIds: matches.map(rule => rule.id ?? null) });
+      return review;
+    }
+
+    const rule = matches[0];
+    if (!allowedLifecycles.has(rule.lifecycle) || typeof rule.healthImpact !== 'boolean') {
+      failures.push({ type: 'REVIEW_LIFECYCLE_RULE_INVALID', reviewKey: review.reviewKey, ruleId: rule.id ?? null });
+      return review;
+    }
+
+    const evidence = evaluateReviewEvidence(rule.evidence, primarySelected, supplements);
+    const requiresEvidence = rule.lifecycle === 'RESOLVED_BY_EVIDENCE';
+    if ((requiresEvidence && evidence.length === 0) || evidence.some(item => item.pass !== true)) {
+      failures.push({
+        type: 'REVIEW_LIFECYCLE_EVIDENCE_NOT_SATISFIED',
+        reviewKey: review.reviewKey,
+        ruleId: rule.id ?? null,
+        evidence,
+      });
+      return review;
+    }
+
+    return {
+      ...review,
+      lifecycle: rule.lifecycle,
+      healthImpact: rule.healthImpact,
+      remainingCount: rule.lifecycle === 'RESOLVED_BY_EVIDENCE' ? 0 : review.remainingCount,
+      resolutionEvidence: evidence,
+      issueKey: typeof rule.issueKey === 'string' && rule.issueKey.length > 0 ? rule.issueKey : null,
+      lifecycleRuleId: rule.id ?? null,
+    };
+  });
+  return { reviews: normalized, failures };
+};
+
 const lifecycleFromRules = (source, rules = []) => {
   for (const rule of rules) {
     if (conditionMatches(source, rule.when)) return rule.lifecycle;
@@ -159,7 +252,7 @@ const populationFromExpected = (expected, primarySelected, supplements) => {
   return population;
 };
 
-export function normalizeDomain({ domain, baseSpec, activeMeta, contract, repoRoot }) {
+export function normalizeDomain({ domain, baseSpec, activeMeta, contract, reviewLifecycleContract, repoRoot }) {
   const spec = effectiveDomainSpec(baseSpec, activeMeta);
   const sourcePath = activeMeta?.sourcePath;
   const missingResult = (readError, note) => ({
@@ -230,6 +323,14 @@ export function normalizeDomain({ domain, baseSpec, activeMeta, contract, repoRo
   reviews = reviews
     .filter(review => !(review.code && supersededCodes.has(review.code)))
     .map(review => ({ ...review, scope: reviewScope(review, contract.normalizedModel.reviewScopes) }));
+  const reviewLifecycleResult = applyReviewLifecycleRules({
+    reviews,
+    domain,
+    lifecycleContract: reviewLifecycleContract,
+    primarySelected,
+    supplements,
+  });
+  reviews = reviewLifecycleResult.reviews;
 
   const blockers = [];
   if (typeof primarySelected.blocker === 'string' && primarySelected.blocker.length > 0) {
@@ -283,6 +384,7 @@ export function normalizeDomain({ domain, baseSpec, activeMeta, contract, repoRo
     ...expectedMismatches.map(item => ({ type: 'EXPECTED_VALUE_MISMATCH', ...item })),
     ...zeroRequiredViolations.filter(item => item.value === 'MISSING')
       .map(item => ({ type: 'ZERO_REQUIRED_SELECTOR_MISSING', pointer: item.pointer })),
+    ...reviewLifecycleResult.failures,
   ];
 
   const statusLooksFailed = typeof rawStatus === 'string' && rawStatus.toUpperCase().includes('FAIL');
@@ -333,6 +435,7 @@ export function normalizeDomain({ domain, baseSpec, activeMeta, contract, repoRo
         resolvedReviewCodes: resolvedReviews.map(item => item.code),
         resolvedReviewKeys: resolvedReviews.map(item => item.reviewKey),
       }] : []),
+      ...(reviewLifecycleResult.failures.length > 0 ? [{ reviewLifecycleRuleFailures: reviewLifecycleResult.failures }] : []),
       ...(consistencyIssues.length > 0 ? [{ consistencyIssues }] : []),
       ...(explicitFailureSignals.length > 0 ? [{ explicitFailureSignals }] : []),
       ...(zeroRequiredViolations.some(item => item.value !== 'MISSING') ? [{ zeroRequiredViolations }] : []),
@@ -343,6 +446,10 @@ export function normalizeDomain({ domain, baseSpec, activeMeta, contract, repoRo
 export function normalizeProjectStatus(runtime = {}) {
   const repoRoot = runtime.repoRoot ?? process.cwd();
   const contract = runtime.contract ?? loadNormalizationContract({ repoRoot });
+  const reviewLifecycleContract = runtime.reviewLifecycleContract ?? loadReviewLifecycleContract({
+    repoRoot,
+    contractPath: runtime.reviewLifecycleContractPath ?? DEFAULT_REVIEW_LIFECYCLE_CONTRACT,
+  });
   const selection = runtime.selection ?? selectActiveSources({ repoRoot });
 
   if (selection?.status !== 'PASS' || selection?.completion !== 'SELECTION_COMPLETE') {
@@ -360,6 +467,7 @@ export function normalizeProjectStatus(runtime = {}) {
     baseSpec: contract.domains[domain],
     activeMeta: selection.domains[domain],
     contract,
+    reviewLifecycleContract,
     repoRoot,
   }));
 
@@ -383,6 +491,11 @@ export function normalizeProjectStatus(runtime = {}) {
       completion: selection.completion,
       selectedCount: selection.selectedCount,
       declarationFiles: selection.declarationFiles,
+    },
+    reviewLifecycleAuthority: {
+      schemaId: reviewLifecycleContract.schemaId,
+      status: reviewLifecycleContract.status,
+      ruleCount: reviewLifecycleContract.rules.length,
     },
     validatorExecutionCount: 0,
     rawConfigDataReadCount: 0,

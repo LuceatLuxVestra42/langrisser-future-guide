@@ -2,6 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildProjectStatus } from '../lib/project-status-view.mjs';
+import {
+  loadReviewLifecycleContract,
+  normalizeProjectStatus,
+} from '../lib/normalize-project-status.mjs';
 import { loadProjectStatusWriterContract, writeProjectStatus } from '../lib/write-project-status.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -31,22 +35,24 @@ if (normalized.rawConfigDataReadCount !== 0) fail('raw ConfigData reads must rem
 if (normalized.semanticRecomputationCount !== 0) fail('semantic recomputation must remain zero');
 if (normalized.canonicalJoinRecomputationCount !== 0) fail('canonical JOIN recomputation must remain zero');
 if (normalized.legacyProjectDoctorRuntimeImportCount !== 0) fail('legacy Doctor runtime imports must remain zero');
-if (normalized.legacyGeneratedStatusReadCount !== 0) fail('legacy generated status reads must remain zero');
+if (normalized.legacyGeneratedStatusReadCount !== 0) fail('legacy Doctor generated status reads must remain zero');
 if (normalized.sourceAuthority?.schemaId !== 'status-source-selection/v1') fail('R1 Status Source selection must be the authority predecessor');
 if (normalized.sourceAuthority?.selectedCount !== 6) fail('R1 Status Source selection must provide six domains');
+if (normalized.reviewLifecycleAuthority?.schemaId !== 'project-status-review-lifecycle/v1') fail('review lifecycle authority must be the explicit Project Status contract');
+if (normalized.reviewLifecycleAuthority?.ruleCount !== 0) fail('Stage 2 default contract must not classify current reviews yet');
 
 const normalizedReviews = normalized.domains.flatMap(record => record.reviews ?? []);
-if (normalizedReviews.length !== 28) fail(`review-model Stage 1 must preserve the 28 reported review entries, got ${normalizedReviews.length}`);
+if (normalizedReviews.length !== 28) fail(`review-model Stage 2 must preserve the 28 reported review entries, got ${normalizedReviews.length}`);
 const reviewKeys = normalizedReviews.map(review => review.reviewKey);
 if (reviewKeys.some(key => typeof key !== 'string' || key.length === 0)) fail('every normalized review must have a stable reviewKey');
 if (new Set(reviewKeys).size !== reviewKeys.length) fail('normalized reviewKey values must be unique across current sources');
 for (const review of normalizedReviews) {
-  if (review.lifecycle !== 'ACTIVE_REVIEW') fail(`Stage 1 must preserve current review lifecycle as ACTIVE_REVIEW: ${review.reviewKey}`);
-  if (review.healthImpact !== true) fail(`Stage 1 must preserve current review health impact: ${review.reviewKey}`);
+  if (review.lifecycle !== 'ACTIVE_REVIEW') fail(`Stage 2 default contract must preserve current review lifecycle as ACTIVE_REVIEW: ${review.reviewKey}`);
+  if (review.healthImpact !== true) fail(`Stage 2 default contract must preserve current review health impact: ${review.reviewKey}`);
   if (!Object.prototype.hasOwnProperty.call(review, 'reportedCount')) fail(`review missing reportedCount: ${review.reviewKey}`);
   if (!Object.prototype.hasOwnProperty.call(review, 'remainingCount')) fail(`review missing remainingCount: ${review.reviewKey}`);
-  if (!Array.isArray(review.resolutionEvidence) || review.resolutionEvidence.length !== 0) fail(`Stage 1 resolutionEvidence must start empty: ${review.reviewKey}`);
-  if (review.issueKey !== null) fail(`Stage 1 issueKey must remain unassigned: ${review.reviewKey}`);
+  if (!Array.isArray(review.resolutionEvidence) || review.resolutionEvidence.length !== 0) fail(`Stage 2 default resolutionEvidence must remain empty: ${review.reviewKey}`);
+  if (review.issueKey !== null) fail(`Stage 2 default issueKey must remain unassigned: ${review.reviewKey}`);
 }
 const normalizedHero = normalized.domains.find(item => item.domain === 'hero');
 const heroReviewKeys = normalizedHero.reviews.map(review => review.reviewKey);
@@ -58,6 +64,85 @@ const normalizedSoldier = normalized.domains.find(item => item.domain === 'soldi
 const releaseReview = normalizedSoldier.reviews.find(review => review.code === 'RELEASE_DATE_UNRESOLVED');
 if (!releaseReview || releaseReview.reportedCount !== 213 || releaseReview.remainingCount !== 213) {
   fail(`Soldier review count metadata must be preserved: ${JSON.stringify(releaseReview)}`);
+}
+
+const reviewLifecycleContract = loadReviewLifecycleContract({ repoRoot });
+const syntheticResolvedContract = {
+  ...reviewLifecycleContract,
+  rules: [
+    {
+      id: 'synthetic-soldier-portrait-resolved',
+      domain: 'soldier',
+      match: { code: 'REPRESENTATIVE_ASSET_ID_UNFROZEN' },
+      lifecycle: 'RESOLVED_BY_EVIDENCE',
+      healthImpact: false,
+      issueKey: 'SOLDIER_PORTRAIT_COVERAGE',
+      evidence: [
+        { sourceRole: 'CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE', key: 'rawStatus', equals: 'PASS' },
+        { sourceRole: 'CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE', key: 'missingPortraitCount', equals: 0 },
+      ],
+    },
+    {
+      id: 'synthetic-hero-boundary-by-key',
+      domain: 'hero',
+      match: { reviewKey: 'data/validation/hero-stage6-4-final.v1.json#/nonBlockingReviews[1]' },
+      lifecycle: 'BOUNDARY_NOTE',
+      healthImpact: false,
+      issueKey: 'HERO_FRONTEND_BOUNDARY',
+      evidence: [],
+    },
+  ],
+};
+const syntheticResolved = normalizeProjectStatus({ repoRoot, reviewLifecycleContract: syntheticResolvedContract });
+const syntheticSoldier = syntheticResolved.domains.find(item => item.domain === 'soldier');
+const syntheticPortraitReview = syntheticSoldier.reviews.find(review => review.code === 'REPRESENTATIVE_ASSET_ID_UNFROZEN');
+if (syntheticPortraitReview?.lifecycle !== 'RESOLVED_BY_EVIDENCE'
+  || syntheticPortraitReview.healthImpact !== false
+  || syntheticPortraitReview.remainingCount !== 0
+  || syntheticPortraitReview.issueKey !== 'SOLDIER_PORTRAIT_COVERAGE'
+  || syntheticPortraitReview.lifecycleRuleId !== 'synthetic-soldier-portrait-resolved'
+  || syntheticPortraitReview.resolutionEvidence.length !== 2
+  || syntheticPortraitReview.resolutionEvidence.some(item => item.pass !== true)) {
+  fail(`contract evidence must resolve the targeted Soldier review: ${JSON.stringify(syntheticPortraitReview)}`);
+}
+const syntheticHero = syntheticResolved.domains.find(item => item.domain === 'hero');
+const syntheticHeroBoundary = syntheticHero.reviews.find(review => review.reviewKey === 'data/validation/hero-stage6-4-final.v1.json#/nonBlockingReviews[1]');
+if (syntheticHeroBoundary?.lifecycle !== 'BOUNDARY_NOTE'
+  || syntheticHeroBoundary.healthImpact !== false
+  || syntheticHeroBoundary.issueKey !== 'HERO_FRONTEND_BOUNDARY') {
+  fail(`reviewKey rules must classify code-less Hero reviews: ${JSON.stringify(syntheticHeroBoundary)}`);
+}
+if (syntheticResolved.reviewTotal !== 28 || syntheticSoldier.health !== 'REVIEW') {
+  fail('Stage 2 lifecycle classification must not change current review counting or health semantics yet');
+}
+
+const syntheticFailClosedContract = {
+  ...reviewLifecycleContract,
+  rules: [
+    {
+      id: 'synthetic-soldier-portrait-bad-evidence',
+      domain: 'soldier',
+      match: { code: 'REPRESENTATIVE_ASSET_ID_UNFROZEN' },
+      lifecycle: 'RESOLVED_BY_EVIDENCE',
+      healthImpact: false,
+      evidence: [
+        { sourceRole: 'CURRENT_SOLDIER_FRONTEND_PORTRAIT_COVERAGE', key: 'missingPortraitCount', equals: 1 },
+      ],
+    },
+  ],
+};
+const syntheticFailClosed = normalizeProjectStatus({ repoRoot, reviewLifecycleContract: syntheticFailClosedContract });
+const failClosedSoldier = syntheticFailClosed.domains.find(item => item.domain === 'soldier');
+const failClosedReview = failClosedSoldier.reviews.find(review => review.code === 'REPRESENTATIVE_ASSET_ID_UNFROZEN');
+if (failClosedReview?.lifecycle !== 'ACTIVE_REVIEW' || failClosedReview.healthImpact !== true) {
+  fail(`unsatisfied resolution evidence must fail closed to ACTIVE_REVIEW: ${JSON.stringify(failClosedReview)}`);
+}
+if (failClosedSoldier.health !== 'INCONSISTENT') {
+  fail(`unsatisfied lifecycle evidence must surface as INCONSISTENT, got ${failClosedSoldier.health}`);
+}
+const failClosedNotes = failClosedSoldier.notes.flatMap(note => note.reviewLifecycleRuleFailures ?? []);
+if (!failClosedNotes.some(item => item.type === 'REVIEW_LIFECYCLE_EVIDENCE_NOT_SATISFIED')) {
+  fail(`missing fail-closed lifecycle evidence note: ${JSON.stringify(failClosedSoldier.notes)}`);
 }
 
 for (const key of ['projectHealth', 'healthCounts', 'lifecycleCounts', 'knownHardErrorTotal', 'reviewTotal', 'blockerTotal']) {
@@ -210,7 +295,7 @@ for (const forbidden of [
 if (!first.markdown.includes('NEW Status Source authority')) fail('markdown must identify NEW Status Source authority');
 if (!first.markdown.includes('raw ConfigData')) fail('markdown must preserve no-raw-ConfigData boundary');
 
-console.log('[project-status-r2] PASS: current parity, review model, canonical compatibility, writer boundary, and runtime independence verified.');
+console.log('[project-status-r2] PASS: current parity, review lifecycle contract, canonical compatibility, writer boundary, and runtime independence verified.');
 console.log(JSON.stringify({
   projectHealth: projected.projectHealth,
   healthCounts: projected.healthCounts,
@@ -222,6 +307,9 @@ console.log(JSON.stringify({
     uniqueReviewKeyCount: new Set(reviewKeys).size,
     heroCodeLessReviewKeyCount: heroReviewKeys.length,
     soldierReleaseReportedCount: releaseReview.reportedCount,
+    lifecycleContractRuleCount: normalized.reviewLifecycleAuthority.ruleCount,
+    syntheticResolvedLifecycle: syntheticPortraitReview.lifecycle,
+    syntheticFailClosedHealth: failClosedSoldier.health,
   },
   selectedDomains: Object.fromEntries(projected.domains.map(item => [item.domain, item.activeSourceId])),
   equipment: {

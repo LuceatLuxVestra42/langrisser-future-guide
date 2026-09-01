@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "schemaId": "project-status-review-lifecycle/v1",
+  "stage": "R2-review-lifecycle",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Classify normalized Project Status review entries by explicit reviewKey/code rules and declared evidence only. No text similarity, name JOIN, filename inference, chronology inference, or semantic recomputation is allowed.",
+  "policy": {
+    "defaultLifecycle": "ACTIVE_REVIEW",
+    "defaultHealthImpact": true,
+    "ruleMatch": "EXACT_REVIEW_KEY_OR_CODE_ONLY",
+    "multipleMatchingRules": "FAIL_CLOSED_ACTIVE_REVIEW",
+    "resolvedByEvidenceRequiresEvidence": true,
+    "missingOrMismatchedEvidence": "FAIL_CLOSED_ACTIVE_REVIEW",
+    "evidenceMayUseOnlyDeclaredPrimaryOrSupplementalSelections": true,
+    "textSimilarityInference": false,
+    "nameJoinInference": false,
+    "filenameSimilarityInference": false,
+    "idArithmeticInference": false,
+    "semanticRecomputation": false
+  },
+  "reviewLifecycleValues": [
+    "ACTIVE_REVIEW",
+    "RESOLVED_BY_EVIDENCE",
+    "DEFERRED_NON_ERROR",
+    "BOUNDARY_NOTE"
+  ],
+  "evidenceContract": {
+    "sourceRole": "PRIMARY_STATUS_SOURCE or an exact supplementalSources.role",
+    "key": "An exact selected-field key already declared by Project Status normalization",
+    "equals": "Literal equality only"
+  },
+  "rules": []
+}
