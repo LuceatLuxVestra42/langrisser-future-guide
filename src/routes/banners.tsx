@@ -188,7 +188,12 @@ function BannerPage() {
                                   </span>
                                 )}
                               </div>
-                              {row.typeLabelKr !== "1인 픽업" &&
+                              {![
+                                "1인 픽업",
+                                "2인 픽업",
+                                "3인 픽업",
+                                "소원소환",
+                              ].includes(row.typeLabelKr) &&
                                 row.lifecycleLabelKr !== "현 데이터셋 최초 관측" && (
                                   <p className="mt-2 text-xs text-muted-foreground">
                                     {row.lifecycleLabelKr}
