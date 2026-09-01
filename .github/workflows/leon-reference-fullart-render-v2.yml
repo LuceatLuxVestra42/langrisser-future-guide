@@ -1,0 +1,69 @@
+name: Leon Reference Fullart Render V2
+
+on:
+  push:
+    branches:
+      - work/leon-reference-hero-v1
+    paths:
+      - .github/workflows/leon-reference-fullart-render-v2.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    strategy:
+      fail-fast: false
+      matrix:
+        skin_id: [601, 602, 603, 604, 605, 606]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/leon-reference-hero-v1
+          fetch-depth: 1
+      - uses: actions/checkout@v4
+        with:
+          repository: EsotericSoftware/spine-runtimes
+          ref: 1c1936532527900f74cfb58f7002998bf157b254
+          path: .runtime/spine-runtimes
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Install bounded diagnostic dependencies
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow numpy PyYAML
+      - name: Execute pinned V1 recipe with verified surrogate byte restoration
+        env:
+          SKIN_ID: ${{ matrix.skin_id }}
+          RENDER_PREDECESSOR: bccbdb564b3b2a70aeacfe6014f3829fdc7b09af
+        run: |
+          python - <<'PY'
+          import os, subprocess, yaml
+          from pathlib import Path
+          doc=yaml.safe_load(Path('.github/workflows/leon-reference-fullart-render.yml').read_text(encoding='utf-8'))
+          steps=doc['jobs']['render']['steps']
+          by_name={s.get('name'):s for s in steps if s.get('name')}
+          env=os.environ.copy()
+          for name in ['Restore verified representative renderer sources','Build exact version-matched geometry probe','Extract exact current-official Char render inputs','Render exact idle_Normal pose']:
+              script=by_name[name]['run']
+              if name=='Extract exact current-official Char render inputs':
+                  old="if isinstance(script,str): return script.encode('utf-8')"
+                  new="if isinstance(script,str): return script.encode('utf-8','surrogateescape')"
+                  if script.count(old)!=1:
+                      raise RuntimeError(f'expected one verified byte-handling patch point, got {script.count(old)}')
+                  script=script.replace(old,new)
+              subprocess.run(['bash','-e','-c',script],check=True,env=env)
+          PY
+      - name: Upload bounded Leon render artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: leon-reference-fullart-v2-${{ matrix.skin_id }}
+          path: .probe-out/skin-${{ matrix.skin_id }}
+          if-no-files-found: warn
