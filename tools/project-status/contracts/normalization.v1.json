@@ -176,7 +176,7 @@
       },
       "zeroRequiredSelectors": [],
       "reviewSelectors": ["/nonBlockingReviews"],
-      "nextWorkSelectors": ["/nextStartPoint"],
+      "nextWorkSelectors": [],
       "lifecycleRules": [
         {"when": "/pipelineStatus == FINAL_FROZEN", "lifecycle": "FROZEN"},
         {"when": "/completion == COMPLETE", "lifecycle": "COMPLETE"}
@@ -242,7 +242,7 @@
       },
       "zeroRequiredSelectors": [],
       "reviewSelectors": ["/evidence"],
-      "nextWorkSelectors": ["/nextAction"],
+      "nextWorkSelectors": [],
       "lifecycleRules": [
         {"when": "/status == READY_FOR_ASSET_EVIDENCE AND /evidence/present == false", "lifecycle": "IN_PROGRESS"}
       ],
