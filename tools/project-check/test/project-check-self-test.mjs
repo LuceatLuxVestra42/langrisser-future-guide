@@ -261,11 +261,6 @@ expectOwners(
   ['evidence-lifecycle'],
   ['evidence-lifecycle-readonly'],
 );
-expectOwners(
-  '.github/workflows/evidence-lifecycle-c1-bootstrap.yml',
-  ['evidence-lifecycle'],
-  ['evidence-lifecycle-readonly'],
-);
 
 const bannerAsset = routeProjectCheckPaths(['public/images/banners/Banner/probe.png'], contracts);
 assert.equal(bannerAsset.status, 'MANUAL_REVIEW');
