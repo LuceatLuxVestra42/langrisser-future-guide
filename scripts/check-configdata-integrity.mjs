@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto'
-import { readdir, readFile, stat } from 'node:fs/promises'
+import { spawnSync } from 'node:child_process'
+import { access, mkdtemp, readdir, readFile, rm, stat } from 'node:fs/promises'
+import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
@@ -7,8 +9,13 @@ import { fileURLToPath } from 'node:url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const rootDir = path.resolve(__dirname, '..')
-const configDir = path.join(rootDir, 'data', 'configdata')
+const trackedConfigDir = path.join(rootDir, 'data', 'configdata')
+const sourcePackContractPath = path.join(rootDir, 'data', 'contracts', 'configdata-source-pack-contract.v1.json')
+const sourcePackHydratorPath = path.join(rootDir, 'scripts', 'hydrate-configdata-source-pack-v1.mjs')
 const dumpPath = path.join(rootDir, 'data', 'metadata', 'dump.cs')
+const CONFIGDATA_SOURCE_ROOT_ENV = 'CONFIGDATA_SOURCE_ROOT'
+
+let configDir = trackedConfigDir
 
 const STATUS = {
   PASS: 0,
@@ -31,6 +38,116 @@ function hashText(text) {
 
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+async function exists(filePath) {
+  try {
+    await access(filePath)
+    return true
+  } catch {
+    return false
+  }
+}
+
+async function readSourcePackContract() {
+  const contract = JSON.parse(await readFile(sourcePackContractPath, 'utf8'))
+  if (
+    contract?.version !== 1 ||
+    contract?.contract !== 'configdata-source-pack' ||
+    contract?.stage !== 'repository-size-reduction-B2' ||
+    contract?.status !== 'PASS' ||
+    contract?.owner !== 'configdata-source-pack' ||
+    contract?.authority?.logicalRawPathNamespace !== 'data/configdata' ||
+    contract?.coverage?.fileCount !== 753 ||
+    contract?.coverage?.missingCount !== 0 ||
+    contract?.coverage?.extraCount !== 0 ||
+    contract?.coverage?.duplicatePathCount !== 0
+  ) {
+    throw new Error('ConfigData integrity source-pack contract is not admitted B2 PASS input')
+  }
+  return contract
+}
+
+async function listJsonFiles(directory) {
+  if (!(await exists(directory))) return []
+  const entries = await readdir(directory, { withFileTypes: true })
+  return entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+    .map((entry) => entry.name)
+    .sort((a, b) => a.localeCompare(b))
+}
+
+async function hydratePinnedSourcePack(expectedCount) {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'configdata-integrity-'))
+  const targetRoot = path.join(tempRoot, 'hydrated')
+  const result = spawnSync(
+    process.execPath,
+    [sourcePackHydratorPath, '--target-dir', targetRoot],
+    {
+      cwd: rootDir,
+      encoding: 'utf8',
+      shell: false,
+      env: process.env,
+    },
+  )
+
+  if (result.status !== 0) {
+    await rm(tempRoot, { recursive: true, force: true })
+    const detail = [result.stdout, result.stderr].filter(Boolean).join('\n').trim()
+    throw new Error(`pinned ConfigData source-pack hydration failed${detail ? `: ${detail}` : ''}`)
+  }
+
+  const hydratedConfigDir = path.join(targetRoot, 'data', 'configdata')
+  const filenames = await listJsonFiles(hydratedConfigDir)
+  if (filenames.length !== expectedCount) {
+    await rm(tempRoot, { recursive: true, force: true })
+    throw new Error(`hydrated ConfigData file count mismatch: expected ${expectedCount}, got ${filenames.length}`)
+  }
+
+  return {
+    configDir: hydratedConfigDir,
+    sourceMode: 'PINNED_B2_EXTERNAL_HYDRATION',
+    cleanup: () => rm(tempRoot, { recursive: true, force: true }),
+  }
+}
+
+async function resolveConfigDataSource() {
+  const contract = await readSourcePackContract()
+  const expectedCount = contract.coverage.fileCount
+  const explicitRoot = process.env[CONFIGDATA_SOURCE_ROOT_ENV]
+
+  if (explicitRoot) {
+    const resolvedRoot = path.resolve(explicitRoot)
+    const explicitConfigDir = path.join(resolvedRoot, 'data', 'configdata')
+    const filenames = await listJsonFiles(explicitConfigDir)
+    if (filenames.length !== expectedCount) {
+      throw new Error(
+        `${CONFIGDATA_SOURCE_ROOT_ENV} must expose the exact admitted ConfigData set: expected ${expectedCount}, got ${filenames.length}`,
+      )
+    }
+    return {
+      configDir: explicitConfigDir,
+      sourceMode: 'EXPLICIT_CONFIGDATA_SOURCE_ROOT',
+      cleanup: null,
+    }
+  }
+
+  const trackedFilenames = await listJsonFiles(trackedConfigDir)
+  if (trackedFilenames.length === expectedCount) {
+    return {
+      configDir: trackedConfigDir,
+      sourceMode: 'TRACKED_REPOSITORY_ROOT',
+      cleanup: null,
+    }
+  }
+
+  if (trackedFilenames.length > 0) {
+    throw new Error(
+      `partial tracked ConfigData root is forbidden: expected ${expectedCount} JSON files or zero after admitted deletion, got ${trackedFilenames.length}`,
+    )
+  }
+
+  return hydratePinnedSourcePack(expectedCount)
 }
 
 function validateLegacyObject(data, result, basename) {
@@ -187,65 +304,73 @@ function printResult(result) {
 }
 
 async function main() {
-  const dumpMetadata = await loadDumpMetadata()
-  const filenames = (await readdir(configDir))
-    .filter((name) => name.endsWith('.json'))
-    .sort((a, b) => a.localeCompare(b))
+  const source = await resolveConfigDataSource()
+  configDir = source.configDir
 
-  const results = []
-  for (const filename of filenames) {
-    results.push(await inspectFile(filename, dumpMetadata))
-  }
+  try {
+    const dumpMetadata = await loadDumpMetadata()
+    const filenames = await listJsonFiles(configDir)
 
-  const duplicateGroups = new Map()
-  for (const result of results) {
-    const group = duplicateGroups.get(result.hash) ?? []
-    group.push(result.file)
-    duplicateGroups.set(result.hash, group)
-  }
-
-  const duplicates = [...duplicateGroups.entries()]
-    .filter(([, files]) => files.length > 1)
-    .sort((a, b) => b[1].length - a[1].length)
-
-  const counts = {
-    PASS: results.filter((item) => item.status === 'PASS').length,
-    SUSPECT: results.filter((item) => item.status === 'SUSPECT').length,
-    BROKEN: results.filter((item) => item.status === 'BROKEN').length,
-  }
-
-  console.log('ConfigData integrity check')
-  console.log(`Directory: ${path.relative(rootDir, configDir)}`)
-  console.log(`Total JSON files: ${results.length}`)
-  console.log(`PASS: ${counts.PASS}`)
-  console.log(`SUSPECT: ${counts.SUSPECT}`)
-  console.log(`BROKEN: ${counts.BROKEN}`)
-
-  if (dumpMetadata.available) {
-    console.log(`dump.cs ConfigData classes: ${dumpMetadata.classes.size}`)
-    console.log(`dump.cs MessageParser types: ${dumpMetadata.parsers.size}`)
-  } else {
-    console.log(`dump.cs unavailable: ${dumpMetadata.error}`)
-  }
-
-  for (const result of results) printResult(result)
-
-  if (duplicates.length > 0) {
-    console.log('\n[DUPLICATE CONTENT GROUPS]')
-    for (const [, files] of duplicates) {
-      console.log(`  ${files.length} files: ${files.join(', ')}`)
+    const results = []
+    for (const filename of filenames) {
+      results.push(await inspectFile(filename, dumpMetadata))
     }
+
+    const duplicateGroups = new Map()
+    for (const result of results) {
+      const group = duplicateGroups.get(result.hash) ?? []
+      group.push(result.file)
+      duplicateGroups.set(result.hash, group)
+    }
+
+    const duplicates = [...duplicateGroups.entries()]
+      .filter(([, files]) => files.length > 1)
+      .sort((a, b) => b[1].length - a[1].length)
+
+    const counts = {
+      PASS: results.filter((item) => item.status === 'PASS').length,
+      SUSPECT: results.filter((item) => item.status === 'SUSPECT').length,
+      BROKEN: results.filter((item) => item.status === 'BROKEN').length,
+    }
+
+    console.log('ConfigData integrity check')
+    console.log(`Source mode: ${source.sourceMode}`)
+    console.log(`Directory: ${path.relative(rootDir, configDir) || configDir}`)
+    console.log(`Total JSON files: ${results.length}`)
+    console.log(`PASS: ${counts.PASS}`)
+    console.log(`SUSPECT: ${counts.SUSPECT}`)
+    console.log(`BROKEN: ${counts.BROKEN}`)
+
+    if (dumpMetadata.available) {
+      console.log(`dump.cs ConfigData classes: ${dumpMetadata.classes.size}`)
+      console.log(`dump.cs MessageParser types: ${dumpMetadata.parsers.size}`)
+    } else {
+      console.log(`dump.cs unavailable: ${dumpMetadata.error}`)
+    }
+
+    for (const result of results) printResult(result)
+
+    if (duplicates.length > 0) {
+      console.log('\n[DUPLICATE CONTENT GROUPS]')
+      for (const [, files] of duplicates) {
+        console.log(`  ${files.length} files: ${files.join(', ')}`)
+      }
+    }
+
+    console.log('\nNotes:')
+    console.log('- Current UnityDataTool ConfigData sources are JSON record arrays; an empty array is valid.')
+    console.log('- Array entries must be JSON objects; malformed non-object records are BROKEN.')
+    console.log('- Legacy object-root integrity checks remain supported for compatibility.')
+    console.log('- SUSPECT means manual verification/re-export may be needed; it is not proof of corruption.')
+    console.log('- BROKEN means the parsed JSON itself is structurally inconsistent or unusable.')
+    console.log('- Duplicate-content groups are reported for inspection and do not fail this structural integrity gate.')
+    console.log('- A complete tracked root is preferred; an absent/zero-file root is verified through the pinned B2 external source pack.')
+    console.log('- Partial tracked deletion fails closed.')
+
+    if (counts.BROKEN > 0) process.exitCode = 1
+  } finally {
+    await source.cleanup?.()
   }
-
-  console.log('\nNotes:')
-  console.log('- Current UnityDataTool ConfigData sources are JSON record arrays; an empty array is valid.')
-  console.log('- Array entries must be JSON objects; malformed non-object records are BROKEN.')
-  console.log('- Legacy object-root integrity checks remain supported for compatibility.')
-  console.log('- SUSPECT means manual verification/re-export may be needed; it is not proof of corruption.')
-  console.log('- BROKEN means the parsed JSON itself is structurally inconsistent or unusable.')
-  console.log('- Duplicate-content groups are reported for inspection and do not fail this structural integrity gate.')
-
-  if (counts.BROKEN > 0) process.exitCode = 1
 }
 
 main().catch((error) => {
