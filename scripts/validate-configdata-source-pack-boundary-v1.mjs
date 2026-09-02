@@ -6,6 +6,7 @@ import { loadProjectCheckContracts, routeProjectCheckPaths } from '../tools/proj
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BOUNDARY_PATH = 'data/contracts/configdata-source-pack-routing-boundary.v1.json';
+const FORMAT_PATH = 'data/contracts/configdata-source-pack-format.v1.json';
 const OWNER_ID = 'configdata-source-pack';
 const VALIDATOR_ID = 'configdata-source-pack-boundary';
 
@@ -25,6 +26,116 @@ function expectRoute(contracts, filePath, owners, validators) {
   assert.equal(route.manualReviews.length, 0, `${filePath} must not require MANUAL_REVIEW`);
   assert.equal(route.boundaries.ownerPropagationCount, 0);
   assert.equal(route.boundaries.changeClassFanOutCount, 0);
+}
+
+function validateFormat(format, boundary) {
+  assert.equal(format.version, 1);
+  assert.equal(format.contract, 'configdata-source-pack-format');
+  assert.equal(format.stage, 'repository-size-reduction-B1a');
+  assert.equal(format.status, 'PASS');
+  assert.equal(format.owner, OWNER_ID);
+  assert.equal(format.authoritativePredecessor.routingBoundary, BOUNDARY_PATH);
+  assert.equal(format.authoritativePredecessor.repository, 'LuceatLuxVestra42/langrisser-future-guide');
+  assert.match(format.authoritativePredecessor.rawSourceCommitSha, /^[a-f0-9]{40}$/);
+  assert.equal(format.authoritativePredecessor.logicalSourceRoot, boundary.authority.currentTrackedRawRoot);
+  assert.equal(format.authoritativePredecessor.currentTrackedJsonCount, 753);
+
+  assert.equal(format.contentSelection.scope, 'DIRECT_CHILD_REGULAR_JSON_FILES_ONLY');
+  assert.equal(format.contentSelection.includePattern, boundary.routing.rawStoragePattern);
+  assert.equal(format.contentSelection.recursive, false);
+  assert.equal(format.contentSelection.directoriesIncludedAsMembers, false);
+  assert.equal(format.contentSelection.symlinksAllowed, false);
+  assert.equal(format.contentSelection.nonJsonFilesAllowed, false);
+  assert.equal(format.contentSelection.memberPathPrefix, 'data/configdata/');
+  assert.equal(format.contentSelection.sourceBytesMustRemainExact, true);
+  assert.equal(format.contentSelection.jsonReserializationAllowed, false);
+  assert.equal(format.contentSelection.textTranscodingAllowed, false);
+  assert.equal(format.contentSelection.newlineNormalizationAllowed, false);
+
+  assert.equal(format.ordering.key, 'FULL_ARCHIVE_MEMBER_PATH_UTF8_BYTES');
+  assert.equal(format.ordering.direction, 'ASCENDING');
+  assert.equal(format.ordering.localeAware, false);
+  assert.equal(format.ordering.numericAware, false);
+  assert.equal(format.ordering.caseFolding, false);
+
+  assert.equal(format.archive.fileName, 'langrisser-configdata-source-pack-v1.tar');
+  assert.equal(format.archive.mediaType, 'application/x-tar');
+  assert.equal(format.archive.format, 'POSIX_USTAR');
+  assert.equal(format.archive.compression, 'NONE');
+  assert.equal(format.archive.blockSize, 512);
+  assert.equal(format.archive.endOfArchiveZeroBlockCount, 2);
+  assert.equal(format.archive.extensionsAllowed, false);
+  assert.equal(format.archive.paxHeadersAllowed, false);
+  assert.equal(format.archive.gnuExtensionsAllowed, false);
+  assert.equal(format.archive.memberPathUtf8ByteLengthMax, 100);
+
+  assert.equal(format.regularFileHeader.modeOctal, '0644');
+  assert.equal(format.regularFileHeader.uid, 0);
+  assert.equal(format.regularFileHeader.gid, 0);
+  assert.equal(format.regularFileHeader.mtimeUnixSeconds, 0);
+  assert.equal(format.regularFileHeader.typeFlag, '0');
+  assert.equal(format.regularFileHeader.linkName, '');
+  assert.equal(format.regularFileHeader.ustarMagic, 'ustar\\0');
+  assert.equal(format.regularFileHeader.ustarVersion, '00');
+  assert.equal(format.regularFileHeader.userName, '');
+  assert.equal(format.regularFileHeader.groupName, '');
+  assert.equal(format.regularFileHeader.deviceMajor, 0);
+  assert.equal(format.regularFileHeader.deviceMinor, 0);
+  assert.equal(format.regularFileHeader.dataPaddingByte, 0);
+
+  assert.equal(format.identityPolicy.contentIdentityAuthorityStage, 'B1b');
+  assert.equal(format.identityPolicy.contentIdentityRequiresExactFileSet, true);
+  assert.equal(format.identityPolicy.contentIdentityRequiresPerFileSha256, true);
+  assert.equal(format.identityPolicy.contentIdentityRequiresPerFileByteLength, true);
+  assert.equal(format.identityPolicy.archiveSha256Role, 'TRANSPORT_CONTAINER_INTEGRITY_ONLY');
+  assert.equal(format.identityPolicy.archiveSha256CreatesSemanticAuthority, false);
+  assert.equal(format.identityPolicy.archiveMemberOrderCreatesSemanticMeaning, false);
+
+  assert.equal(format.determinism.sameExactInputSetMustProduceSameArchiveBytes, true);
+  assert.equal(format.determinism.filesystemMtimeMayAffectOutput, false);
+  assert.equal(format.determinism.filesystemOwnershipMayAffectOutput, false);
+  assert.equal(format.determinism.hostLocaleMayAffectOutput, false);
+  assert.equal(format.determinism.hostPathSeparatorMayAffectOutput, false);
+  assert.equal(format.determinism.sourceTraversalOrderMayAffectOutput, false);
+  assert.equal(format.determinism.failClosedOnUnrepresentableUstarMemberPath, true);
+
+  assert.equal(format.productionBoundary.productionRuntimeFetchesThisArchive, false);
+  assert.equal(format.productionBoundary.productionRuntimeReadsRawConfigData, false);
+  assert.equal(format.productionBoundary.rawConfigDataRuntimeFallbackAllowed, false);
+  assert.equal(format.semanticBoundary.semanticAuthorityChanged, false);
+  assert.equal(format.semanticBoundary.frozenSemanticDomainsReopened, false);
+  assert.equal(format.semanticBoundary.canonicalIdentityChanges, false);
+  assert.equal(format.semanticBoundary.relationChanges, false);
+  assert.equal(format.semanticBoundary.nameJoinIntroduced, false);
+  assert.equal(format.semanticBoundary.idArithmeticIntroduced, false);
+  assert.equal(format.semanticBoundary.filenameSimilarityIntroduced, false);
+  assert.equal(format.semanticBoundary.sourceMeaningReinterpreted, false);
+  assert.equal(format.handoff.completion, 'B1A_DETERMINISTIC_PACK_FORMAT_FROZEN');
+  assert.equal(format.handoff.nextOwner, OWNER_ID);
+  assert.equal(format.handoff.nextStage, 'B1b-exact-byte-snapshot');
+
+  const sourceRoot = path.join(ROOT, format.authoritativePredecessor.logicalSourceRoot);
+  const entries = fs.readdirSync(sourceRoot, { withFileTypes: true });
+  assert.equal(entries.length, format.authoritativePredecessor.currentTrackedJsonCount);
+  const members = [];
+  let totalSourceBytes = 0;
+  for (const entry of entries) {
+    assert.equal(entry.isFile(), true, `non-regular ConfigData entry: ${entry.name}`);
+    assert.equal(entry.name.endsWith('.json'), true, `non-JSON ConfigData entry: ${entry.name}`);
+    assert.equal(entry.name.includes('/'), false);
+    assert.equal(entry.name.includes('\\'), false);
+    const memberPath = `${format.contentSelection.memberPathPrefix}${entry.name}`;
+    const memberPathBytes = Buffer.from(memberPath, 'utf8');
+    assert.ok(
+      memberPathBytes.length <= format.archive.memberPathUtf8ByteLengthMax,
+      `USTAR member path exceeds ${format.archive.memberPathUtf8ByteLengthMax} UTF-8 bytes: ${memberPath}`,
+    );
+    members.push(memberPath);
+    totalSourceBytes += fs.statSync(path.join(sourceRoot, entry.name)).size;
+  }
+  const ordered = [...members].sort((a, b) => Buffer.compare(Buffer.from(a, 'utf8'), Buffer.from(b, 'utf8')));
+  assert.equal(new Set(ordered).size, ordered.length, 'archive member paths must be unique');
+  return { fileCount: ordered.length, totalSourceBytes, firstMember: ordered[0], lastMember: ordered.at(-1) };
 }
 
 function main() {
@@ -109,24 +220,10 @@ function main() {
   assert.deepEqual(rawRule.patterns, [boundary.routing.rawStoragePattern]);
   assert.deepEqual(rawRule.owners, boundary.routing.rawStorageOwners);
 
-  expectRoute(
-    contracts,
-    BOUNDARY_PATH,
-    [OWNER_ID],
-    [VALIDATOR_ID],
-  );
-  expectRoute(
-    contracts,
-    'scripts/hydrate-configdata-source-pack-v1.mjs',
-    [OWNER_ID],
-    [VALIDATOR_ID],
-  );
-  expectRoute(
-    contracts,
-    '.github/workflows/configdata-source-pack-hydration-v1.yml',
-    [OWNER_ID],
-    [VALIDATOR_ID],
-  );
+  expectRoute(contracts, BOUNDARY_PATH, [OWNER_ID], [VALIDATOR_ID]);
+  expectRoute(contracts, FORMAT_PATH, [OWNER_ID], [VALIDATOR_ID]);
+  expectRoute(contracts, 'scripts/hydrate-configdata-source-pack-v1.mjs', [OWNER_ID], [VALIDATOR_ID]);
+  expectRoute(contracts, '.github/workflows/configdata-source-pack-hydration-v1.yml', [OWNER_ID], [VALIDATOR_ID]);
   expectRoute(
     contracts,
     'data/configdata/ConfigDataUnknownFutureTable.json',
@@ -140,18 +237,30 @@ function main() {
     [VALIDATOR_ID, 'configdata-integrity', 'hero-canonical', 'skin-relation'],
   );
 
+  const format = readJson(FORMAT_PATH);
+  const topology = validateFormat(format, boundary);
+
   console.log(JSON.stringify({
     status: 'PASS',
-    checkpoint: 'CONFIGDATA_SOURCE_PACK_B0_5_B_ROUTING_BOUNDARY',
+    checkpoint: 'CONFIGDATA_SOURCE_PACK_B1A_FORMAT_BOUNDARY',
     owner: OWNER_ID,
     validator: VALIDATOR_ID,
     rawStoragePattern: boundary.routing.rawStoragePattern,
     sourcePackToolingPatternCount: boundary.routing.sourcePackToolingPatterns.length,
+    format: {
+      archive: format.archive.fileName,
+      archiveFormat: format.archive.format,
+      compression: format.archive.compression,
+      fileCount: topology.fileCount,
+      totalSourceBytesObserved: topology.totalSourceBytes,
+      firstMember: topology.firstMember,
+      lastMember: topology.lastMember,
+    },
     semanticAuthorityChanged: false,
     frozenSemanticDomainsReopened: false,
     ownerPropagationCount: 0,
     changeClassFanOutCount: 0,
-    nextStage: boundary.handoff.nextStage,
+    nextStage: format.handoff.nextStage,
   }, null, 2));
 }
 
