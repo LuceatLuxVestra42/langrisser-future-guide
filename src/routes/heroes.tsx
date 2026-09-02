@@ -51,6 +51,20 @@ export const Route = createFileRoute("/heroes")({
 
 const ALL_RARITIES = "ALL";
 const LOW_RARITY = "N,R";
+const FACTION_FILTER_SHORT_LABELS = new Map<number, string>([
+  [1, "주역"],
+  [2, "빛"],
+  [3, "기원"],
+  [4, "제국"],
+  [5, "어둠"],
+  [6, "공주"],
+  [7, "전략"],
+  [8, "유성"],
+  [9, "전설"],
+  [10, "시공"],
+  [11, "초월"],
+  [12, "전생"],
+]);
 type FilterSection = "rarity" | "faction" | "origin";
 
 function normalizeSearch(value: string) {
@@ -111,26 +125,51 @@ function HeroGridPage() {
       : regularOptions;
   }, [data.filters.rarities]);
 
+  const factionMarkById = useMemo(() => {
+    const marks = new Map<number, string>();
+
+    for (const record of data.fusionPowers.records) {
+      if (record.targetType !== "FACTION" || record.targetIds.length !== 1) continue;
+      const targetId = record.targetIds[0];
+      const markAsset = record.markAssets[0];
+      if (targetId === undefined || !markAsset) continue;
+
+      const existing = marks.get(targetId);
+      if (existing && existing !== markAsset.webAssetPath) {
+        throw new Error(`Faction ${targetId} has conflicting frozen mark assets.`);
+      }
+      marks.set(targetId, markAsset.webAssetPath);
+    }
+
+    if (marks.size !== data.fusionPowers.summary.factionAssets) {
+      throw new Error("Faction filter mark index is incomplete.");
+    }
+    return marks;
+  }, [data.fusionPowers.records, data.fusionPowers.summary.factionAssets]);
+
   const factionOptions = useMemo(() => {
-    const options = new Map<number, { id: number; label: string; count: number }>();
+    const options = new Map<number, { id: number; label: string; markPath: string }>();
 
     for (const hero of data.records) {
       for (const faction of hero.factions) {
-        const current = options.get(faction.factionId);
-        if (current) {
-          current.count += 1;
-          continue;
+        if (options.has(faction.factionId)) continue;
+
+        const label = FACTION_FILTER_SHORT_LABELS.get(faction.factionId);
+        const markPath = factionMarkById.get(faction.factionId);
+        if (!label || !markPath) {
+          throw new Error(`Faction ${faction.factionId} filter presentation mapping is incomplete.`);
         }
+
         options.set(faction.factionId, {
           id: faction.factionId,
-          label: faction.nameKr ?? faction.nameCn,
-          count: 1,
+          label,
+          markPath,
         });
       }
     }
 
     return [...options.values()].sort((a, b) => a.id - b.id);
-  }, [data.records]);
+  }, [data.records, factionMarkById]);
 
   const originOptions = useMemo(() => {
     const options = new Map<number, { id: number; label: string; count: number }>();
@@ -291,7 +330,16 @@ function HeroGridPage() {
                     active={factionId === option.id}
                     onClick={() => setFactionId(option.id)}
                   >
-                    {option.label} <span className="opacity-60">{option.count}</span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <img
+                        src={resolvePublicAssetUrl(option.markPath)}
+                        alt=""
+                        aria-hidden="true"
+                        className="h-6 w-6 shrink-0 object-contain"
+                      />
+                      <span aria-hidden="true">-</span>
+                      <span>{option.label}</span>
+                    </span>
                   </FilterButton>
                 ))}
               </div>
