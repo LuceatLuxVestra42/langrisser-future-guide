@@ -28,9 +28,14 @@ const expected = { SOLDIER_GROWTH: 129, COMMON_STAT: 84, COMMON_PASSIVE: 46, SOL
 for (const [label, n] of Object.entries(expected)) check((labels[label] ?? []).length === n, `${label} population mismatch.`);
 const all = Object.values(labels).flat();
 check(all.length === 287 && new Set(all).size === 287, "Stage 5 labels do not partition 287 IDs exactly once.");
-check((labels.COMMON_STAT ?? []).length + (labels.COMMON_PASSIVE ?? []).length === 130, "Extraction target population is not 130.");
-check((labels.SOLDIER_GROWTH ?? []).length + (labels.SOLDIER_SPECIFIC_PROGRESSION ?? []).length === 157, "Excluded population is not 157.");
-check(contract.frozenPopulationBoundary.extractionTargets.total === 130 && contract.frozenPopulationBoundary.excludedFromThisExtractionFamily.total === 157, "Contract target/exclusion counts drifted.");
+const targets = [...(labels.COMMON_STAT ?? []), ...(labels.COMMON_PASSIVE ?? [])];
+const excluded = [...(labels.SOLDIER_GROWTH ?? []), ...(labels.SOLDIER_SPECIFIC_PROGRESSION ?? [])];
+const targetSet = new Set(targets);
+check(targets.length === 130 && targetSet.size === 130, "Extraction target population is not 130 unique IDs.");
+check(excluded.length === 157 && new Set(excluded).size === 157, "Excluded population is not 157 unique IDs.");
+check(excluded.every((id) => !targetSet.has(id)), "Extraction target and excluded populations overlap.");
+check(contract.frozenPopulationBoundary.extractionTargets.total === 130 && contract.frozenPopulationBoundary.excludedFromThisExtractionFamily.total === 157 && contract.frozenPopulationBoundary.overlapAllowed === false, "Contract target/exclusion counts or overlap policy drifted.");
+check(contract.validationGates?.targetAndExcludedDisjoint === true, "Contract disjointness gate is not frozen true.");
 check(contract.scope.effectExtractionPerformed === false, "Boundary stage must not perform effect extraction.");
 check(contract.ownerSplit?.length === 2 && contract.ownerSplit[0]?.inputLabel === "COMMON_STAT" && contract.ownerSplit[1]?.inputLabel === "COMMON_PASSIVE", "Extraction owner split drifted.");
 check(contract.nextOwner === "TrainingTech COMMON_STAT Effect Extraction", "Unexpected next owner.");
@@ -40,4 +45,4 @@ if (errors.length) {
   console.error(JSON.stringify({ status: "FAIL", blockers: errors }, null, 2));
   process.exit(1);
 }
-console.log(JSON.stringify({ status: "PASS", completion: "COMPLETE", extractionPerformed: false, targets: { COMMON_STAT: 84, COMMON_PASSIVE: 46, total: 130 }, excluded: { SOLDIER_GROWTH: 129, SOLDIER_SPECIFIC_PROGRESSION: 28, total: 157 }, blockers: [], reviews: [] }));
+console.log(JSON.stringify({ status: "PASS", completion: "COMPLETE", extractionPerformed: false, targets: { COMMON_STAT: 84, COMMON_PASSIVE: 46, total: 130 }, excluded: { SOLDIER_GROWTH: 129, SOLDIER_SPECIFIC_PROGRESSION: 28, total: 157 }, overlap: 0, blockers: [], reviews: [] }));
