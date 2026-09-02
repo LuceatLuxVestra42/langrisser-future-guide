@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "contract": "configdata-source-pack-routing-boundary",
+  "stage": "repository-size-reduction-B0.5-B",
+  "status": "PASS",
+  "owner": "configdata-source-pack",
+  "purpose": "Freeze the storage-owner and Project Check routing boundary before ConfigData source-pack creation. This contract does not create, move, reinterpret, or recompute ConfigData semantics.",
+  "authority": {
+    "currentTrackedRawRoot": "data/configdata",
+    "semanticAuthorityChanged": false,
+    "frozenSemanticDomainsReopened": false,
+    "sourcePackCreatedInThisStage": false,
+    "configDataBytesChangedInThisStage": false
+  },
+  "routing": {
+    "ruleMatch": "UNION_ALL_MATCHING_RULES",
+    "rawStoragePattern": "data/configdata/*.json",
+    "rawStorageOwners": ["configdata", "configdata-source-pack"],
+    "existingDomainRulesRemainAdditive": true,
+    "sourcePackToolingOwner": "configdata-source-pack",
+    "sourcePackToolingPatterns": [
+      "data/contracts/configdata-source-pack-*",
+      "data/manifests/configdata-source-pack-*",
+      "data/generated/configdata-source-pack-*",
+      "data/validation/configdata-source-pack-*",
+      "docs/checkpoints/configdata-source-pack-*",
+      "scripts/*configdata-source-pack*",
+      ".github/workflows/configdata-source-pack-*"
+    ],
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "filenameSimilarityInference": false,
+    "nameJoinInference": false,
+    "idArithmeticInference": false,
+    "semanticRecomputation": false
+  },
+  "deletionBoundary": {
+    "rawJsonDeletionUsesSamePathRouting": true,
+    "trackedJsonDeletionHasExplicitStorageOwner": true,
+    "domainSpecificExistingRulesRemainActiveUnderUnion": true,
+    "semanticReopenOnStorageDeletion": false,
+    "sourceRootCutoverRequiredBeforeTrackedRawDeletion": true,
+    "deletionAdmissionStage": "B5",
+    "trackedRawDeletionStage": "B6"
+  },
+  "futureSnapshotPromotion": {
+    "opaquePackPointerMayInferDomainOwners": false,
+    "packHashMayInferSemanticImpact": false,
+    "filenameSimilarityMayInferSemanticImpact": false,
+    "nameJoinMayInferSemanticImpact": false,
+    "idArithmeticMayInferSemanticImpact": false,
+    "changedLogicalPathsRequiredBeforeDomainRouting": true,
+    "explicitPromotionContractRequiredBeforeExternalOnlyCutover": true,
+    "promotionMechanismImplementedInThisStage": false
+  },
+  "productionBoundary": {
+    "productionRuntimeReadsRawConfigData": false,
+    "productionRuntimeFetchesSourcePack": false,
+    "rawConfigDataRuntimeFallbackAllowed": false,
+    "frontendSemanticJoinIntroduced": false
+  },
+  "handoff": {
+    "completion": "B0_5_B_ROUTING_BOUNDARY_FROZEN",
+    "nextOwner": "configdata-source-pack",
+    "nextStage": "B1a-minimal-pack-format-freeze"
+  }
+}
