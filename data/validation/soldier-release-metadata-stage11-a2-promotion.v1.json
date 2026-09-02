@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-metadata-stage11-a2-promotion/v1",
+  "stage": "11-A2",
+  "status": "PASS",
+  "completion": "RELEASE_METADATA_PROMOTION_COMPLETE",
+  "owner": "soldier-release-metadata-promotion",
+  "scope": "PROMOTE_ADMITTED_OFFICIAL_NOTICE_OVERLAY_INTO_STAGE5_8_OUTPUTS",
+  "predecessors": {
+    "stage11AInventory": "data/validation/soldier-release-metadata-stage11-a-inventory.v1.json",
+    "stage11A1Evidence": "data/soldier-release-official-notice-evidence-stage11-a1.v1.json",
+    "baseReleaseSource": "data/soldier-release-source.v1.json"
+  },
+  "outputs": {
+    "releaseMetadata": "data/generated/soldier-release-metadata.v1.json",
+    "listOutput": "data/generated/soldier-list-stage5-8.v1.json",
+    "validation": "data/validation/soldier-stage5-8-release.v1.json"
+  },
+  "composition": {
+    "baseSourceKind": "GOOGLE_SHEET",
+    "baseConfirmedRecords": 11,
+    "overlaySourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+    "overlayPromotedRecords": 40,
+    "officialEventCount": 19,
+    "unionKey": "soldierId",
+    "duplicatePolicy": "FAIL_CLOSED",
+    "samePatchOrder": "UNRESOLVED"
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "baseConfirmed": 11,
+    "officialPromoted": 40,
+    "confirmed": 51,
+    "unresolved": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "boundaries": {
+    "baseReleaseSourceMutated": false,
+    "canonicalPopulationRecomputed": false,
+    "heroSoldierRelationRecomputed": false,
+    "rawConfigDataReleaseInference": false,
+    "nameSimilarityJoin": false,
+    "idArithmetic": false,
+    "samePatchOrderClaimed": false,
+    "spChronologyIncluded": false,
+    "lowerTierChronologyIncluded": false
+  },
+  "downstream": {
+    "path": "data/validation/soldier-stage6-7-site-admission.v1.json",
+    "stateAfterPromotion": "STALE_DEPENDENCY_EXPECTED",
+    "reason": "Stage 6-7 records the previous Stage 5-8 validation blob and release-review coverage; release promotion changes that predecessor without changing canonical Soldier identity or Hero-Soldier relations."
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "NORMAL_TIER3_RELEASE_DATE_REMAINING",
+      "count": 78,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "SP_INTERNAL_RELEASE_ORDER_SEPARATE_STAGE11_B",
+      "count": 56,
+      "classification": "REVIEW"
+    }
+  ],
+  "nextOwner": "soldier-site-admission-refresh",
+  "nextStartPoint": [
+    "Refresh the Stage 6-7 Soldier site-admission dependency on the promoted Stage 5-8 release validation without recomputing canonical Soldier identity or Hero-Soldier relations.",
+    "Update release-review coverage from 213 to 173 and normal tier-3 unresolved coverage from 118 to 78 only where the Stage 6-7 contract projects Stage 5-8 chronology state.",
+    "Keep SP 56 and lower-tier 39 boundaries unchanged, and do not introduce same-patch absolute ordering."
+  ],
+  "reopenConditions": [
+    "Any of the 40 Stage 11-A1 official-notice records loses exact canonical identity or release-event support.",
+    "The frozen 11-record Stage 5-8 base source changes.",
+    "Promoted Stage 5-8 outputs no longer validate as 224 = 51 confirmed + 173 unresolved.",
+    "A stronger authoritative release source contradicts a promoted date."
+  ]
+}

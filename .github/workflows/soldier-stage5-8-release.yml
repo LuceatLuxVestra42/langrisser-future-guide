@@ -7,28 +7,38 @@ on:
       - main
     paths:
       - 'scripts/finalize-soldier-stage5-8-release.cjs'
+      - 'scripts/promote-soldier-release-metadata-stage11-a2.mjs'
       - 'scripts/validate-soldier-release-metadata-stage11-a.mjs'
+      - 'scripts/validate-soldier-release-official-notice-evidence-stage11-a1.mjs'
+      - 'scripts/validate-soldier-release-metadata-stage11-a2.mjs'
       - 'data/contracts/soldier-detail-stage5-1-contract.v1.json'
       - 'data/generated/soldier-list-stage5-7.v1.json'
       - 'data/validation/soldier-stage5-7-list.v1.json'
       - 'data/soldier-release-source.v1.json'
+      - 'data/soldier-release-official-notice-evidence-stage11-a1.v1.json'
       - 'data/generated/soldier-release-metadata.v1.json'
       - 'data/generated/soldier-list-stage5-8.v1.json'
       - 'data/validation/soldier-stage5-8-release.v1.json'
       - 'data/validation/soldier-release-metadata-stage11-a-inventory.v1.json'
+      - 'data/validation/soldier-release-metadata-stage11-a2-promotion.v1.json'
       - '.github/workflows/soldier-stage5-8-release.yml'
   pull_request:
     paths:
       - 'scripts/finalize-soldier-stage5-8-release.cjs'
+      - 'scripts/promote-soldier-release-metadata-stage11-a2.mjs'
       - 'scripts/validate-soldier-release-metadata-stage11-a.mjs'
+      - 'scripts/validate-soldier-release-official-notice-evidence-stage11-a1.mjs'
+      - 'scripts/validate-soldier-release-metadata-stage11-a2.mjs'
       - 'data/contracts/soldier-detail-stage5-1-contract.v1.json'
       - 'data/generated/soldier-list-stage5-7.v1.json'
       - 'data/validation/soldier-stage5-7-list.v1.json'
       - 'data/soldier-release-source.v1.json'
+      - 'data/soldier-release-official-notice-evidence-stage11-a1.v1.json'
       - 'data/generated/soldier-release-metadata.v1.json'
       - 'data/generated/soldier-list-stage5-8.v1.json'
       - 'data/validation/soldier-stage5-8-release.v1.json'
       - 'data/validation/soldier-release-metadata-stage11-a-inventory.v1.json'
+      - 'data/validation/soldier-release-metadata-stage11-a2-promotion.v1.json'
       - '.github/workflows/soldier-stage5-8-release.yml'
 
 permissions:
@@ -61,13 +71,22 @@ jobs:
         with:
           node-version: 22
 
-      - name: Generate and validate Soldier Stage 5-8 release metadata
+      - name: Generate frozen Stage 5-8 baseline
         run: node scripts/finalize-soldier-stage5-8-release.cjs
 
-      - name: Validate Soldier Stage 11-A release evidence inventory
+      - name: Promote admitted Stage 11-A1 official release evidence
+        run: node scripts/promote-soldier-release-metadata-stage11-a2.mjs
+
+      - name: Validate Stage 11-A historical inventory compatibility
         run: node scripts/validate-soldier-release-metadata-stage11-a.mjs
 
-      - name: Upload Stage 5-8 and Stage 11-A artifacts
+      - name: Validate Stage 11-A1 official evidence compatibility
+        run: node scripts/validate-soldier-release-official-notice-evidence-stage11-a1.mjs
+
+      - name: Validate Stage 11-A2 release promotion
+        run: node scripts/validate-soldier-release-metadata-stage11-a2.mjs
+
+      - name: Upload Stage 5-8 and Stage 11 release artifacts
         uses: actions/upload-artifact@v4
         with:
           name: soldier-stage5-8-release
@@ -76,6 +95,8 @@ jobs:
             data/generated/soldier-list-stage5-8.v1.json
             data/validation/soldier-stage5-8-release.v1.json
             data/validation/soldier-release-metadata-stage11-a-inventory.v1.json
+            data/soldier-release-official-notice-evidence-stage11-a1.v1.json
+            data/validation/soldier-release-metadata-stage11-a2-promotion.v1.json
 
       - name: Verify frozen artifacts on main or PR
         run: git diff --exit-code -- data/generated/soldier-release-metadata.v1.json data/generated/soldier-list-stage5-8.v1.json data/validation/soldier-stage5-8-release.v1.json
@@ -95,13 +116,22 @@ jobs:
         with:
           node-version: 22
 
-      - name: Generate and validate Soldier Stage 5-8 release metadata
+      - name: Generate frozen Stage 5-8 baseline
         run: node scripts/finalize-soldier-stage5-8-release.cjs
 
-      - name: Validate Soldier Stage 11-A release evidence inventory
+      - name: Promote admitted Stage 11-A1 official release evidence
+        run: node scripts/promote-soldier-release-metadata-stage11-a2.mjs
+
+      - name: Validate Stage 11-A historical inventory compatibility
         run: node scripts/validate-soldier-release-metadata-stage11-a.mjs
 
-      - name: Upload Stage 5-8 and Stage 11-A artifacts
+      - name: Validate Stage 11-A1 official evidence compatibility
+        run: node scripts/validate-soldier-release-official-notice-evidence-stage11-a1.mjs
+
+      - name: Validate Stage 11-A2 release promotion
+        run: node scripts/validate-soldier-release-metadata-stage11-a2.mjs
+
+      - name: Upload Stage 5-8 and Stage 11 release artifacts
         uses: actions/upload-artifact@v4
         with:
           name: soldier-stage5-8-release
@@ -110,6 +140,8 @@ jobs:
             data/generated/soldier-list-stage5-8.v1.json
             data/validation/soldier-stage5-8-release.v1.json
             data/validation/soldier-release-metadata-stage11-a-inventory.v1.json
+            data/soldier-release-official-notice-evidence-stage11-a1.v1.json
+            data/validation/soldier-release-metadata-stage11-a2-promotion.v1.json
 
       - name: Freeze generated artifacts on explicit producer run
         run: |
@@ -120,8 +152,8 @@ jobs:
             data/generated/soldier-list-stage5-8.v1.json \
             data/validation/soldier-stage5-8-release.v1.json
           if git diff --cached --quiet; then
-            echo "Soldier Stage 5-8 artifacts already frozen."
+            echo "Soldier Stage 5-8 promoted artifacts already frozen."
           else
-            git commit -m "freeze Soldier stage 5-8 release PASS"
+            git commit -m "freeze Soldier stage 11-A2 release promotion PASS"
             git push origin HEAD:${{ github.ref_name }}
           fi
