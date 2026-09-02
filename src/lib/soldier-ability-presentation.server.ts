@@ -42,6 +42,8 @@ export type SoldierPrototypePresentationRecord = SoldierPrototypeRecord & {
   };
 };
 
+type SoldierPrototypePageData = ReturnType<typeof readSoldierPrototypePageData>;
+
 const soldierAbilityKr = soldierAbilityKrJson as unknown as SoldierAbilityPresentationSource;
 const CJK_IDEOGRAPH_PATTERN = /[\u3400-\u4dbf\u4e00-\u9fff]/u;
 const hasOwn = (record: object, key: string) => Object.prototype.hasOwnProperty.call(record, key);
@@ -120,10 +122,11 @@ function assertPresentationSourceContract() {
   }
 }
 
-export function readSoldierPrototypePageDataWithAbilityPresentation() {
+export function readSoldierPrototypePageDataWithAbilityPresentation(
+  pageData: SoldierPrototypePageData = readSoldierPrototypePageData(),
+) {
   assertPresentationSourceContract();
 
-  const pageData = readSoldierPrototypePageData();
   if (
     pageData.records.length !== 224 ||
     pageData.summary.recordCount !== 224 ||
