@@ -80,7 +80,7 @@
     "registeredValidatorEntrypoint": "Only validator entrypoints explicitly registered in the frozen Project Check validator catalog, including npm-script-resolved entrypoints, receive VALIDATOR_INPUT_REF protection for exact literal admitted-node paths.",
     "currentToolContract": "Contracts beneath tool roots reached by registered Project Check validator entrypoints protect only explicit semantic path locators.",
     "retentionDeclaration": "C1 RETENTION_DECLARATION nodes protect explicit semantic path locators.",
-    "activeWorkflow": "Tracked baseline .github/workflows files protect exact literal admitted-node paths when directly referenced.",
+    "activeWorkflow": "A workflow protects exact admitted-node references only when current authority explicitly admits that workflow as active. C2 currently derives this from the frozen Status Source lifecycle transport/pipeline fields and retained APPROVED_FOR_HANDOFF producer declarations. Mere tracked workflow existence is not active-workflow authority.",
     "currentProductionConsumer": "Tracked baseline src/app/pages sources protect exact literal admitted-node paths when directly referenced.",
     "manifest": "C1 MANIFEST nodes protect explicit semantic path locators.",
     "structuredSemanticPathLocators": [
@@ -97,6 +97,12 @@
       "outputPath(s)",
       "generatedPath(s)",
       "path beneath an explicitly named predecessor/provenance/source/input/manifest/artifact/validation/checkpoint/contract/supplemental/consumer/authority/producer/output/generated object"
+    ],
+    "trackedWorkflowExistenceProtects": false,
+    "activeWorkflowAdmissionSources": [
+      "tools/status-source/contracts/lifecycle.v1.json policy.transport when activation/active flags permit",
+      "tools/status-source/contracts/lifecycle.v1.json pipelines[].completionWorkflow",
+      "C1 RETENTION_DECLARATION nodes with state=APPROVED_FOR_HANDOFF and requestedByWorkflow"
     ]
   },
   "informationalPolicy": {
@@ -106,7 +112,8 @@
     "nonActiveContractMentionProtects": false,
     "genericEvidenceCrossReferenceProtects": false,
     "zeroProtectingReferenceMeansUnused": false,
-    "zeroProtectingReferenceMeansDelete": false
+    "zeroProtectingReferenceMeansDelete": false,
+    "unadmittedTrackedWorkflowMentionProtects": false
   },
   "forbiddenInference": {
     "filenameSimilarity": true,
@@ -135,7 +142,8 @@
       "Status Source declaration or active-source input changes.",
       "Project Check validator catalog or npm validator entrypoint mapping changes.",
       "Active workflow/current consumer/current tool contract sources change in a way that adds/removes exact admitted-node references.",
-      "Any baseline text source adds/removes an exact admitted-node path mention relevant to the graph."
+      "Any baseline text source adds/removes an exact admitted-node path mention relevant to the graph.",
+      "Explicit current-workflow admission fields in Status Source lifecycle/declarations change."
     ],
     "incrementalPolicy": "Recompute incoming/outgoing edges only for affected source paths and affected admitted targets when a future implementation supports delta refresh; full baseline rebuild is not the semantic authority."
   },

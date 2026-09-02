@@ -151,10 +151,33 @@ function buildContext({ baseline, tree, admittedRecords }) {
       const match = p.match(/^tools\/([^/]+)\/(?:contract|contracts)\//);
       return Boolean(match && activeToolRoots.has(match[1]));
     }));
-  const workflowPaths = new Set(tree.map(entry => entry.path).filter(p => /^\.github\/workflows\/[^/]+\.ya?ml$/.test(p)));
+  const trackedWorkflowPaths = new Set(tree.map(entry => entry.path).filter(p => /^\.github\/workflows\/[^/]+\.ya?ml$/.test(p)));
   const productionConsumerPaths = new Set(tree.map(entry => entry.path).filter(p => /^(?:src|app|pages)\//.test(p)));
   const manifestPaths = new Set(admittedRecords.filter(record => record.scopeAdmissionRole === 'MANIFEST').map(record => record.path));
   const retentionDeclarationPaths = new Set(admittedRecords.filter(record => record.scopeAdmissionRole === 'RETENTION_DECLARATION').map(record => record.path));
+  const explicitActiveWorkflowPaths = new Set();
+  const addExplicitActiveWorkflow = value => {
+    const candidate = normalize(value);
+    if (trackedWorkflowPaths.has(candidate)) explicitActiveWorkflowPaths.add(candidate);
+  };
+
+  const statusSourceLifecyclePath = 'tools/status-source/contracts/lifecycle.v1.json';
+  if (treeMap.has(statusSourceLifecyclePath)) {
+    const lifecycle = readJsonAt(baseline, statusSourceLifecyclePath);
+    const transport = lifecycle?.policy?.transport ?? {};
+    if (transport.productionWriterActivation === 'ACTIVE') addExplicitActiveWorkflow(transport.productionWriterWorkflow);
+    if (transport.legacyWriterActive === true) addExplicitActiveWorkflow(transport.legacyWriterWorkflow);
+    for (const pipeline of lifecycle?.pipelines ?? []) addExplicitActiveWorkflow(pipeline?.completionWorkflow);
+  }
+
+  for (const declarationPath of retentionDeclarationPaths) {
+    try {
+      const declaration = readJsonAt(baseline, declarationPath);
+      if (declaration?.state === 'APPROVED_FOR_HANDOFF') addExplicitActiveWorkflow(declaration.requestedByWorkflow);
+    } catch {
+      // C2 critical JSON handling below will fail closed if this source is operationally relevant.
+    }
+  }
 
   return {
     treeMap,
@@ -167,7 +190,8 @@ function buildContext({ baseline, tree, admittedRecords }) {
     validatorEntrypoints: entrypoints,
     activeToolRoots,
     currentToolContracts,
-    workflowPaths,
+    trackedWorkflowPaths,
+    explicitActiveWorkflowPaths,
     productionConsumerPaths,
     manifestPaths,
     retentionDeclarationPaths,
@@ -181,7 +205,7 @@ function sourceClasses(sourcePath, sourceRecord, context) {
   if (context.validatorEntrypoints.has(sourcePath)) classes.push('REGISTERED_PROJECT_CHECK_VALIDATOR_ENTRYPOINT');
   if (context.currentToolContracts.has(sourcePath)) classes.push('CURRENT_TOOL_CONTRACT');
   if (context.retentionDeclarationPaths.has(sourcePath)) classes.push('RETENTION_DECLARATION');
-  if (context.workflowPaths.has(sourcePath)) classes.push('ACTIVE_WORKFLOW');
+  if (context.explicitActiveWorkflowPaths.has(sourcePath)) classes.push('ACTIVE_WORKFLOW');
   if (context.productionConsumerPaths.has(sourcePath)) classes.push('CURRENT_PRODUCTION_CONSUMER');
   if (context.manifestPaths.has(sourcePath)) classes.push('MANIFEST');
   if (sourceRecord) classes.push('LIFECYCLE_NODE');
@@ -370,7 +394,7 @@ function build() {
     statusSourceDeclarationBlobs: [...context.statusDeclarationPaths].sort().map(p => [p, context.treeMap.get(p)?.blobSha ?? null]),
     validatorCatalogBlobSha: g(['rev-parse', `${baseline}:${VALIDATORS}`]).trim(),
     packageJsonBlobSha: g(['rev-parse', `${baseline}:${PACKAGE}`]).trim(),
-    activeWorkflowBlobs: [...context.workflowPaths].sort().map(p => [p, context.treeMap.get(p)?.blobSha ?? null]),
+    activeWorkflowBlobs: [...context.explicitActiveWorkflowPaths].sort().map(p => [p, context.treeMap.get(p)?.blobSha ?? null]),
   };
   const graphDigest = crypto.createHash('sha256').update(JSON.stringify(edges)).digest('hex');
   const referenceInputFingerprint = crypto.createHash('sha256').update(JSON.stringify(referenceInputFingerprintPayload)).digest('hex');
@@ -413,7 +437,8 @@ function build() {
       registeredValidatorEntrypointCount: context.validatorEntrypoints.size,
       activeToolRootCount: context.activeToolRoots.size,
       currentToolContractCount: context.currentToolContracts.size,
-      activeWorkflowCount: context.workflowPaths.size,
+      trackedWorkflowCount: context.trackedWorkflowPaths.size,
+      activeWorkflowCount: context.explicitActiveWorkflowPaths.size,
       productionConsumerSourceCount: context.productionConsumerPaths.size,
       manifestNodeCount: context.manifestPaths.size,
       retentionDeclarationNodeCount: context.retentionDeclarationPaths.size,
