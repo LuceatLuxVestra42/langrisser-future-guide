@@ -45,13 +45,15 @@ function sortHeroSoldierIdsForPresentation(ids: readonly number[]) {
     // Keep unresolved IDs stable here instead of changing that validation boundary.
     if (!a || !b) return 0;
 
+    // Presentation priority: SP > T3 > T2 > T1, then army type, then Soldier ID.
+    // This keeps every SP Soldier above normal tiers and every T1 Soldier at the bottom.
+    const tierOrderDiff = getHeroSoldierTierOrder(a) - getHeroSoldierTierOrder(b);
+    if (tierOrderDiff !== 0) return tierOrderDiff;
+
     const armyOrderDiff =
       (HERO_SOLDIER_ARMY_ORDER.get(a.armyType) ?? Number.MAX_SAFE_INTEGER) -
       (HERO_SOLDIER_ARMY_ORDER.get(b.armyType) ?? Number.MAX_SAFE_INTEGER);
     if (armyOrderDiff !== 0) return armyOrderDiff;
-
-    const tierOrderDiff = getHeroSoldierTierOrder(a) - getHeroSoldierTierOrder(b);
-    if (tierOrderDiff !== 0) return tierOrderDiff;
 
     return bId - aId;
   });
