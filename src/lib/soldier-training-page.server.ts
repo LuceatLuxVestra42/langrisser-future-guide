@@ -157,10 +157,11 @@ function reconstructPassiveDescription(template: string, formats: string[], valu
   if (formats.length !== values.length) {
     throw new Error("COMMON_PASSIVE parameter shape mismatch.");
   }
-  return values.reduce(
-    (text, value, index) => text.replace(`{P${index}}`, formatPassiveParameter(formats[index], value)),
-    template,
-  );
+  return values.reduce((text, value, index) => {
+    const format = formats[index];
+    if (!format) throw new Error(`Missing COMMON_PASSIVE token format P${index}.`);
+    return text.replace(`{P${index}}`, formatPassiveParameter(format, value));
+  }, template);
 }
 
 export function readSoldierTrainingPageData(): SoldierTrainingPageData {
@@ -188,11 +189,17 @@ export function readSoldierTrainingPageData(): SoldierTrainingPageData {
         maxLevel: sequence.levelCount,
         levels: sequence.values.map((values, index) => ({
           level: index + 1,
-          statEffects: shape.effects.map((effect, effectIndex) => ({
-            statKey: effect.statKey,
-            unit: effect.unit,
-            value: values[effectIndex],
-          })),
+          statEffects: shape.effects.map((effect, effectIndex) => {
+            const value = values[effectIndex];
+            if (value === undefined) {
+              throw new Error(`COMMON_STAT effect-value mismatch for Tech ${techId} Lv.${index + 1}.`);
+            }
+            return {
+              statKey: effect.statKey,
+              unit: effect.unit,
+              value,
+            };
+          }),
           passiveDescription: null,
         })),
       });
