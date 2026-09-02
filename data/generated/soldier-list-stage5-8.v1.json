@@ -33,7 +33,9 @@
     },
     "releaseSource": {
       "path": "data/soldier-release-source.v1.json",
-      "gitBlobSha": "296d59f10c7c6d1ecf0d6df1726a35db5199a0fb"
+      "gitBlobSha": "296d59f10c7c6d1ecf0d6df1726a35db5199a0fb",
+      "authorityRole": "HISTORICAL_TIMELINE_UNSPECIFIED_BASE_EVIDENCE",
+      "eligibleForCnChronology": false
     },
     "externalReleaseSource": {
       "kind": "GOOGLE_SHEET",
@@ -67,6 +69,16 @@
       "sourceAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
       "officialEventCount": 19,
       "promotedRecordCount": 40
+    },
+    "cnChronologyCorrectionEvidence": {
+      "path": "data/soldier-release-cn-chronology-correction-evidence-stage11-a4.v1.json",
+      "gitBlobSha": "906715cd30e9b33af3ca37a590caac3bb9dc9c03",
+      "schemaId": "soldier-release-cn-chronology-correction-evidence/v1",
+      "stage": "11-A4",
+      "targetTimeline": "CN_SERVER_RELEASE_CHRONOLOGY",
+      "sourceAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
+      "correctionEventCount": 5,
+      "correctedRecordCount": 11
     }
   },
   "summary": {
@@ -149,11 +161,9 @@
         "internalOrder": "soldierId-ascending-for-determinism-only"
       },
       {
-        "releaseDate": "2025-07-01",
+        "releaseDate": "2025-12-04",
         "soldierIds": [
-          135,
           819,
-          1037,
           1038,
           1118
         ],
@@ -161,18 +171,34 @@
         "internalOrder": "soldierId-ascending-for-determinism-only"
       },
       {
-        "releaseDate": "2025-05-06",
+        "releaseDate": "2025-11-06",
+        "soldierIds": [
+          135,
+          1037
+        ],
+        "samePatchOrderStatus": "UNRESOLVED",
+        "internalOrder": "soldierId-ascending-for-determinism-only"
+      },
+      {
+        "releaseDate": "2025-10-16",
+        "soldierIds": [
+          341,
+          427
+        ],
+        "samePatchOrderStatus": "UNRESOLVED",
+        "internalOrder": "soldierId-ascending-for-determinism-only"
+      },
+      {
+        "releaseDate": "2025-09-11",
         "soldierIds": [
           251,
-          341,
-          427,
           517
         ],
         "samePatchOrderStatus": "UNRESOLVED",
         "internalOrder": "soldierId-ascending-for-determinism-only"
       },
       {
-        "releaseDate": "2025-03-11",
+        "releaseDate": "2025-08-14",
         "soldierIds": [
           647,
           648
@@ -952,16 +978,13 @@
       "validationStatus": "PASS",
       "release": {
         "releaseStatus": "CONFIRMED",
-        "releaseDate": "2025-07-01",
-        "patchGroup": "2025-07-01",
+        "releaseDate": "2025-11-06",
+        "patchGroup": "2025-11-06",
         "samePatchOrder": null,
-        "sourceKind": "GOOGLE_SHEET",
-        "sourceLabel": "산의 파수꾼",
-        "sourceRows": [
-          40,
-          45
-        ],
-        "mappingStatus": "MANUALLY_VERIFIED"
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "山峦守望者",
+        "sourceRows": null,
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
       "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
@@ -1527,16 +1550,13 @@
       "validationStatus": "PASS",
       "release": {
         "releaseStatus": "CONFIRMED",
-        "releaseDate": "2025-05-06",
-        "patchGroup": "2025-05-06",
+        "releaseDate": "2025-09-11",
+        "patchGroup": "2025-09-11",
         "samePatchOrder": null,
-        "sourceKind": "GOOGLE_SHEET",
-        "sourceLabel": "야만인 검투사",
-        "sourceRows": [
-          15,
-          20
-        ],
-        "mappingStatus": "MANUALLY_VERIFIED"
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "荒蛮角斗士",
+        "sourceRows": null,
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
       "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
@@ -2076,16 +2096,13 @@
       "validationStatus": "PASS",
       "release": {
         "releaseStatus": "CONFIRMED",
-        "releaseDate": "2025-05-06",
-        "patchGroup": "2025-05-06",
+        "releaseDate": "2025-10-16",
+        "patchGroup": "2025-10-16",
         "samePatchOrder": null,
-        "sourceKind": "GOOGLE_SHEET",
-        "sourceLabel": "밀림 켄타우로스",
-        "sourceRows": [
-          15,
-          32
-        ],
-        "mappingStatus": "EXACT_LABEL"
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "密林半人马",
+        "sourceRows": null,
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
       "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
@@ -2495,16 +2512,13 @@
       "validationStatus": "PASS",
       "release": {
         "releaseStatus": "CONFIRMED",
-        "releaseDate": "2025-05-06",
-        "patchGroup": "2025-05-06",
+        "releaseDate": "2025-10-16",
+        "patchGroup": "2025-10-16",
         "samePatchOrder": null,
-        "sourceKind": "GOOGLE_SHEET",
-        "sourceLabel": "검은 페가수스 기사",
-        "sourceRows": [
-          15,
-          38
-        ],
-        "mappingStatus": "MANUALLY_VERIFIED"
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "黑天马骑士",
+        "sourceRows": null,
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
       "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
@@ -2862,16 +2876,13 @@
       "validationStatus": "PASS",
       "release": {
         "releaseStatus": "CONFIRMED",
-        "releaseDate": "2025-05-06",
-        "patchGroup": "2025-05-06",
+        "releaseDate": "2025-09-11",
+        "patchGroup": "2025-09-11",
         "samePatchOrder": null,
-        "sourceKind": "GOOGLE_SHEET",
-        "sourceLabel": "검은 조수 비늘",
-        "sourceRows": [
-          15,
-          26
-        ],
-        "mappingStatus": "MANUALLY_VERIFIED"
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "暗潮之鳞",
+        "sourceRows": null,
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
       "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
@@ -3671,16 +3682,13 @@
       "validationStatus": "PASS",
       "release": {
         "releaseStatus": "CONFIRMED",
-        "releaseDate": "2025-03-11",
-        "patchGroup": "2025-03-11",
+        "releaseDate": "2025-08-14",
+        "patchGroup": "2025-08-14",
         "samePatchOrder": null,
-        "sourceKind": "GOOGLE_SHEET",
-        "sourceLabel": "금지된 숲 법사",
-        "sourceRows": [
-          2,
-          13
-        ],
-        "mappingStatus": "MANUALLY_VERIFIED"
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "禁林通灵师",
+        "sourceRows": null,
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
       "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
@@ -3700,16 +3708,13 @@
       "validationStatus": "PASS",
       "release": {
         "releaseStatus": "CONFIRMED",
-        "releaseDate": "2025-03-11",
-        "patchGroup": "2025-03-11",
+        "releaseDate": "2025-08-14",
+        "patchGroup": "2025-08-14",
         "samePatchOrder": null,
-        "sourceKind": "GOOGLE_SHEET",
-        "sourceLabel": "비취 날개 궁수",
-        "sourceRows": [
-          2,
-          7
-        ],
-        "mappingStatus": "MANUALLY_VERIFIED"
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "翠翼射手",
+        "sourceRows": null,
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
       "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
@@ -4093,16 +4098,13 @@
       "validationStatus": "PASS",
       "release": {
         "releaseStatus": "CONFIRMED",
-        "releaseDate": "2025-07-01",
-        "patchGroup": "2025-07-01",
+        "releaseDate": "2025-12-04",
+        "patchGroup": "2025-12-04",
         "samePatchOrder": null,
-        "sourceKind": "GOOGLE_SHEET",
-        "sourceLabel": "산악 구조대",
-        "sourceRows": [
-          40,
-          57
-        ],
-        "mappingStatus": "MANUALLY_VERIFIED"
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "山罡救援队",
+        "sourceRows": null,
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
       "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
@@ -4434,16 +4436,13 @@
       "validationStatus": "PASS",
       "release": {
         "releaseStatus": "CONFIRMED",
-        "releaseDate": "2025-07-01",
-        "patchGroup": "2025-07-01",
+        "releaseDate": "2025-11-06",
+        "patchGroup": "2025-11-06",
         "samePatchOrder": null,
-        "sourceKind": "GOOGLE_SHEET",
-        "sourceLabel": "거대 수호 마충",
-        "sourceRows": [
-          40,
-          51
-        ],
-        "mappingStatus": "MANUALLY_VERIFIED"
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "魔虫巨卫",
+        "sourceRows": null,
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
       "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
@@ -4463,16 +4462,13 @@
       "validationStatus": "PASS",
       "release": {
         "releaseStatus": "CONFIRMED",
-        "releaseDate": "2025-07-01",
-        "patchGroup": "2025-07-01",
+        "releaseDate": "2025-12-04",
+        "patchGroup": "2025-12-04",
         "samePatchOrder": null,
-        "sourceKind": "GOOGLE_SHEET",
-        "sourceLabel": "크리스탈 슬라임",
-        "sourceRows": [
-          40,
-          69
-        ],
-        "mappingStatus": "MANUALLY_VERIFIED"
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "融晶魔灵",
+        "sourceRows": null,
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
       "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
@@ -4856,16 +4852,13 @@
       "validationStatus": "PASS",
       "release": {
         "releaseStatus": "CONFIRMED",
-        "releaseDate": "2025-07-01",
-        "patchGroup": "2025-07-01",
+        "releaseDate": "2025-12-04",
+        "patchGroup": "2025-12-04",
         "samePatchOrder": null,
-        "sourceKind": "GOOGLE_SHEET",
-        "sourceLabel": "심해의 복수자",
-        "sourceRows": [
-          40,
-          63
-        ],
-        "mappingStatus": "EXACT_LABEL"
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "深海复仇者",
+        "sourceRows": null,
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
       "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
@@ -6333,6 +6326,24 @@
     "officialNoticeOverlayRecords": 40,
     "totalConfirmedRecords": 51,
     "unresolvedRecords": 173,
+    "samePatchOrder": "UNRESOLVED"
+  },
+  "releaseTimeline": {
+    "authority": "CN_SERVER_RELEASE_CHRONOLOGY",
+    "officialSourceAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
+    "historicalGoogleSheetAuthority": "REGION_OR_TIMELINE_SCOPE_UNSPECIFIED",
+    "historicalGoogleSheetEligibleForCnChronology": false,
+    "correctionStage": "11-A5"
+  },
+  "correction": {
+    "stage": "11-A5",
+    "status": "PASS",
+    "correctedHistoricalRecords": 11,
+    "officialCnCorrectionEvents": 5,
+    "totalOfficialCnConfirmedRecords": 51,
+    "totalConfirmedRecords": 51,
+    "unresolvedRecords": 173,
+    "coverageChanged": false,
     "samePatchOrder": "UNRESOLVED"
   }
 }

@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-metadata-stage11-a5-correction/v1",
+  "stage": "11-A5",
+  "status": "PASS",
+  "completion": "CN_CHRONOLOGY_SOURCE_CORRECTION_COMPLETE",
+  "owner": "soldier-release-metadata-promotion-correction",
+  "scope": "CORRECT_11_CONFIRMED_GOOGLE_SHEET_TIMELINE_VALUES_TO_OFFICIAL_CN_CHRONOLOGY",
+  "predecessors": {
+    "stage11A2Checkpoint": "data/validation/soldier-release-metadata-stage11-a2-promotion.v1.json",
+    "stage11A4Evidence": "data/soldier-release-cn-chronology-correction-evidence-stage11-a4.v1.json",
+    "historicalReleaseSource": "data/soldier-release-source.v1.json"
+  },
+  "outputs": {
+    "releaseMetadata": "data/generated/soldier-release-metadata.v1.json",
+    "listOutput": "data/generated/soldier-list-stage5-8.v1.json",
+    "validation": "data/validation/soldier-stage5-8-release.v1.json"
+  },
+  "correction": {
+    "targetTimeline": "CN_SERVER_RELEASE_CHRONOLOGY",
+    "priorSourceKind": "GOOGLE_SHEET",
+    "finalSourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+    "historicalRecordsCorrected": 11,
+    "officialCorrectionEvents": 5,
+    "correctedByKey": "soldierId",
+    "exactCnLabelRequired": true,
+    "coverageChanged": false,
+    "samePatchOrder": "UNRESOLVED"
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "confirmed": 51,
+    "unresolved": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39,
+    "officialCnConfirmed": 51,
+    "historicalGoogleSheetConfirmedInFinalConsumer": 0
+  },
+  "boundaries": {
+    "historicalReleaseSourceMutated": false,
+    "canonicalPopulationRecomputed": false,
+    "heroSoldierRelationRecomputed": false,
+    "rawConfigDataReleaseInference": false,
+    "nameSimilarityJoin": false,
+    "idArithmetic": false,
+    "unresolved78Inferred": false,
+    "samePatchOrderClaimed": false,
+    "spChronologyIncluded": false,
+    "lowerTierChronologyIncluded": false
+  },
+  "downstream": {
+    "path": "data/validation/soldier-stage6-7-site-admission.v1.json",
+    "stateAfterCorrection": "STALE_DEPENDENCY_EXPECTED",
+    "reason": "Stage 11-A5 changes Stage 5-8 chronology bytes and patch-group provenance while preserving coverage and canonical Soldier identity, so release-dependent Stage 6 freshness must be refreshed without relation or population recomputation."
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "NORMAL_TIER3_RELEASE_DATE_REMAINING",
+      "count": 78,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "SP_INTERNAL_RELEASE_ORDER_SEPARATE_STAGE11_B",
+      "count": 56,
+      "classification": "REVIEW"
+    }
+  ],
+  "nextOwner": "soldier-site-admission-refresh",
+  "nextStartPoint": [
+    "Refresh only release-dependent Stage 6 provenance/freshness after the Stage 5-8 chronology correction.",
+    "Preserve canonical Soldier 224 and Hero-Soldier 5,977 without recomputation.",
+    "Keep release-review count 173 and normal tier-3 unresolved count 78 unchanged."
+  ],
+  "reopenConditions": [
+    "Any of the 11 Stage 11-A4 exact canonical mappings loses direct official Chinese release support.",
+    "A stronger authoritative Chinese-server source contradicts one of the five correction events.",
+    "Final Stage 5-8 coverage changes from 224 = 51 confirmed + 173 unresolved."
+  ]
+}
