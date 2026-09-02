@@ -5,7 +5,7 @@ import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import { getSoldierCommonMaterialIconUrl } from "@/lib/soldier-common-material-assets";
 import { getSoldierTrainingMaterialIconUrl } from "@/lib/soldier-training-material-assets";
-import type { SoldierPrototypeRecord } from "@/lib/soldier-page.server";
+import type { SoldierPrototypePresentationRecord } from "@/lib/soldier-ability-presentation.server";
 
 type MaterialCost = {
   goodsType: number;
@@ -119,7 +119,7 @@ export function SoldierDetailModal({
   record,
   heroCardIcons,
 }: {
-  record: SoldierPrototypeRecord;
+  record: SoldierPrototypePresentationRecord;
   heroCardIcons: HeroCardIconRecord[];
 }) {
   const [detail, setDetail] = useState<SoldierRichRecord | null>(null);
@@ -152,18 +152,8 @@ export function SoldierDetailModal({
     };
   }, [record.soldierId]);
 
-  const abilityEffect = useMemo(() => {
-    if (!detail) return null;
-
-    if (record.isSp) {
-      return detail.sp?.finalDescription ?? null;
-    }
-
-    return (
-      detail.ability.levels.find((level) => level.level === 10)?.description ??
-      detail.ability.finalDescription
-    );
-  }, [detail, record.isSp]);
+  const abilityEffect = record.presentation.abilityKr;
+  const hasNoAbility = record.presentation.abilityKrStatus === "NO_ABILITY";
 
   const heroGroups = useMemo(() => {
     if (!detail) {
@@ -182,7 +172,7 @@ export function SoldierDetailModal({
     };
   }, [detail, record.isSp]);
 
-  const abilityTitle = record.isSp ? "SP 고유기" : "10레벨 효과";
+  const abilityTitle = record.isSp ? "SP 고유기" : hasNoAbility ? "고유기" : "10레벨 효과";
 
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
@@ -200,14 +190,12 @@ export function SoldierDetailModal({
             <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-background p-3 sm:h-full sm:p-4">
               <p className="shrink-0 text-sm font-black text-foreground">{abilityTitle}</p>
               <div className="mt-2 min-h-0 flex-1 overflow-y-auto pr-1 text-sm leading-6 text-foreground sm:mt-3">
-                {loadState === "loading" ? (
-                  <LoadingText />
-                ) : loadState === "error" ? (
-                  <p className="text-muted-foreground">{abilityTitle} 데이터를 불러오지 못했어.</p>
+                {hasNoAbility ? (
+                  <p className="text-muted-foreground">별도의 고유기 효과가 없는 용병이야.</p>
                 ) : abilityEffect ? (
                   <ConfigText text={abilityEffect} />
                 ) : (
-                  <p className="text-muted-foreground">{abilityTitle} 데이터가 없는 용병이야.</p>
+                  <p className="text-muted-foreground">한국어 고유기 데이터를 불러오지 못했어.</p>
                 )}
               </div>
             </div>
@@ -346,7 +334,7 @@ function HeroIdGrid({
   );
 }
 
-function SoldierPreview({ record }: { record: SoldierPrototypeRecord }) {
+function SoldierPreview({ record }: { record: SoldierPrototypePresentationRecord }) {
   const army = ARMY_META.get(record.armyType);
   const displayName = record.nameKr ?? record.nameCn;
   const officialUrl = getOfficialArmyIconUrl(record.armyType);
@@ -404,7 +392,7 @@ function SoldierPreview({ record }: { record: SoldierPrototypeRecord }) {
   );
 }
 
-function SoldierStatTable({ record }: { record: SoldierPrototypeRecord }) {
+function SoldierStatTable({ record }: { record: SoldierPrototypePresentationRecord }) {
   const assetUrl = (folder: "stats" | "movement", fileName: string) =>
     `${import.meta.env.BASE_URL}images/shared/${folder}/${fileName}`;
 
