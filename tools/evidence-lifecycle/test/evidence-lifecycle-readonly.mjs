@@ -195,3 +195,5 @@ console.log(JSON.stringify({
 }, null, 2));
 
 await import('./c4-retention-readonly.mjs');
+
+await import('./c5-destructive-review-readonly.mjs');
