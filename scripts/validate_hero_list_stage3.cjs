@@ -128,12 +128,13 @@ check(
 check(
   'search-ui',
   route.includes('type="search"') &&
-    route.includes('한국명 · 중국명 · 영문명') &&
+    route.includes('placeholder="검색"') &&
+    !route.includes('한국명 · 중국명 · 영문명') &&
     route.includes('matchesHeroSearch') &&
     route.includes('identity.nameKr') &&
     route.includes('identity.nameCn') &&
     route.includes('identity.nameEn'),
-  'multilingual name search is wired',
+  'multilingual name search is wired with the simplified search placeholder',
 );
 
 check(
@@ -189,16 +190,18 @@ check(
 );
 
 const rarityPanelIndex = route.indexOf('aria-label="희귀도 필터"');
-const spButtonIndex = route.indexOf('SP만');
+const spButtonIndex = route.indexOf('SP <span');
 const factionPanelIndex = route.indexOf('{filterSection === "faction" ? (');
 check(
   'sp-filter-ui',
   route.includes('aria-pressed={spOnly}') &&
     route.includes('spOnly && !hero.hasSp') &&
+    !route.includes('Sparkles') &&
+    !route.includes('SP만') &&
     rarityPanelIndex >= 0 &&
     spButtonIndex > rarityPanelIndex &&
     factionPanelIndex > spButtonIndex,
-  'SP-only toggle remains combinable and is placed inside the rarity filter section',
+  'SP toggle remains combinable, uses the SP label without an icon, and stays inside the rarity filter section',
 );
 
 const integratedFilterIndex = route.indexOf('통합 필터');
