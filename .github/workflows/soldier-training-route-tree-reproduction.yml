@@ -1,0 +1,29 @@
+name: Soldier Training Route Tree Reproduction
+
+on:
+  pull_request:
+    paths:
+      - "src/routes/soldiers*.tsx"
+      - "src/lib/soldier-training-page*.ts"
+      - ".github/workflows/soldier-training-route-tree-reproduction.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce-route-tree:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Generate route tree through production build
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: soldier-training-route-tree
+          path: src/routeTree.gen.ts
+          if-no-files-found: error
