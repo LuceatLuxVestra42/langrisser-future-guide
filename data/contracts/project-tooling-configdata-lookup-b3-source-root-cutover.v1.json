@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-source-root-cutover/v1",
+  "stage": "repository-size-reduction-B3",
+  "status": "SOURCE_ROOT_CONTRACT_FROZEN",
+  "owner": "configdata-lookup",
+  "purpose": "Separate stable logical ConfigData provenance paths from the physical filesystem root used by Lookup rebuild and freshness tooling without changing materialized Lookup semantics.",
+  "authoritativePredecessor": {
+    "sourcePackContract": "data/contracts/configdata-source-pack-contract.v1.json",
+    "sourcePackHydrationCheckpoint": "data/validation/configdata-source-pack-b2-hydration.v1.json",
+    "b2MergeCommit": "8ab7516d773ed1e569c65e56c346ae564a984580"
+  },
+  "logicalSourceBoundary": {
+    "namespace": "data/configdata",
+    "contractPathsRemainLogical": true,
+    "generatedSourcePathsRemainLogical": true,
+    "logicalPathsMayBeRewrittenToPhysicalPaths": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "semanticReinterpretationIntroduced": false
+  },
+  "physicalSourceRoot": {
+    "environmentVariable": "CONFIGDATA_SOURCE_ROOT",
+    "configuredRootMustBeAbsolute": true,
+    "configuredRootContainsLogicalNamespaceBelowIt": true,
+    "defaultWhenUnset": "REPOSITORY_ROOT_COMPATIBILITY_UNTIL_TRACKED_RAW_DELETION",
+    "pathTraversalAllowed": false,
+    "backslashLogicalPathsAllowed": false,
+    "nonConfigDataLogicalPathsAllowed": false,
+    "nonJsonLogicalSourcesAllowed": false,
+    "missingPhysicalSourceFailsClosed": true
+  },
+  "owningConsumers": {
+    "stage1IdIndexProducerAndValidator": "scripts/lib/configdata-lookup-stage1.mjs",
+    "stage2ForwardJoinProducerAndValidator": "scripts/lib/configdata-lookup-stage2.mjs",
+    "stage6FreshnessAndIncrementalRebuild": "scripts/lib/configdata-lookup-stage6.mjs",
+    "resolver": "tools/configdata-lookup/lib/source-root.mjs"
+  },
+  "runtimeBoundary": {
+    "materializedLookupRemainsNormalQuerySource": true,
+    "queryReadsRawConfigData": false,
+    "rawQueryFallbackAllowed": false,
+    "productionRuntimeReadsRawConfigData": false,
+    "productionRuntimeFetchesSourcePack": false,
+    "rebuildAndFreshnessMayReadResolvedRawSources": true
+  },
+  "acceptance": {
+    "defaultRepositoryRootFreshnessClean": true,
+    "hydratedExternalRootFreshnessClean": true,
+    "stage1GeneratedParityUnderExternalRoot": true,
+    "stage2GeneratedParityUnderExternalRoot": true,
+    "stage6DependencyManifestParityUnderExternalRoot": true,
+    "logicalSourceMetadataByteIdentical": true,
+    "trackedRepositoryMutationCount": 0,
+    "semanticAuthorityChanged": false,
+    "frozenSemanticDomainsReopened": false
+  },
+  "nonScope": [
+    "B4 external-only clean-room with tracked raw source unavailable",
+    "B5 deletion admission",
+    "B6 tracked data/configdata deletion",
+    "frontend/runtime raw ConfigData access",
+    "canonical identity or relation changes"
+  ],
+  "handoff": {
+    "nextOwner": "configdata-lookup",
+    "nextStage": "B4-external-only-clean-room"
+  }
+}
