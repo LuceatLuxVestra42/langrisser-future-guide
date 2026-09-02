@@ -20,6 +20,7 @@ on:
       - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
       - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
       - 'data/contracts/configdata-lookup-stage*.json'
+      - 'data/contracts/project-tooling-configdata-lookup-*.json'
       - 'data/index/hero.v1.json'
       - 'data/index/soldier.v1.json'
       - 'data/index/skill.v1.json'
@@ -33,6 +34,7 @@ on:
       - 'scripts/build-configdata-lookup-stage*.mjs'
       - 'scripts/validate-configdata-lookup-stage*.mjs'
       - 'scripts/configdata-lookup*.mjs'
+      - 'tools/configdata-lookup/**'
       - 'package.json'
       - '.github/workflows/configdata-lookup-stage6.yml'
   pull_request:
@@ -52,6 +54,7 @@ on:
       - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
       - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
       - 'data/contracts/configdata-lookup-stage*.json'
+      - 'data/contracts/project-tooling-configdata-lookup-*.json'
       - 'data/index/hero.v1.json'
       - 'data/index/soldier.v1.json'
       - 'data/index/skill.v1.json'
@@ -65,6 +68,7 @@ on:
       - 'scripts/build-configdata-lookup-stage*.mjs'
       - 'scripts/validate-configdata-lookup-stage*.mjs'
       - 'scripts/configdata-lookup*.mjs'
+      - 'tools/configdata-lookup/**'
       - 'package.json'
       - '.github/workflows/configdata-lookup-stage6.yml'
 
@@ -91,8 +95,8 @@ jobs:
       - name: Validate Stage 6 committed materialization
         run: node tools/configdata-lookup/test/configdata-lookup-stage6-current-validator.mjs
 
-      - name: Require clean stale plan
-        run: npm run check:configdata-lookup-stage6
+      - name: Require clean stale plan through current source-root adapter
+        run: node tools/configdata-lookup/cli/check-freshness.mjs
 
       - name: Require read-only tracked state
         shell: bash
