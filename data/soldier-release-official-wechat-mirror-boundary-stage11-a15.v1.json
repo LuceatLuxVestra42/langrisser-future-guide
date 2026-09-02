@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-official-wechat-mirror-boundary-stage11-a15/v1",
+  "stage": "11-A15",
+  "status": "PASS",
+  "completion": "OFFICIAL_WECHAT_ACCOUNT_VERIFIED_MIRROR_NOT_PRIMARY_ADMITTED_NO_PROMOTION",
+  "owner": "soldier-release-metadata-evidence-acquisition",
+  "scope": "A7_OFFICIAL_WECHAT_MIRROR_PROVENANCE_BOUNDARY_NO_RELEASE_PROMOTION",
+  "capturedAt": "2026-09-02",
+  "capturedAgainstMain": "f18baf749a84e0ae6fd1145f492c0d45f833a45c",
+  "predecessors": {
+    "stage11A7Boundary": "data/soldier-release-pre2020-event-boundary-stage11-a7.v1.json",
+    "stage11A14PrimaryLocator": "data/soldier-release-primary-locator-recovery-stage11-a14.v1.json",
+    "releaseMetadata": "data/generated/soldier-release-metadata.v1.json",
+    "soldierList": "data/generated/soldier-list-stage5-8.v1.json"
+  },
+  "policy": {
+    "targetTimeline": "CN_SERVER_RELEASE_CHRONOLOGY",
+    "promotionAuthority": "OFFICIAL_CN_RELEASE_NOTICE_OR_EQUIVALENT_PRIMARY_PUBLISHER_SOURCE",
+    "officialWechatAccountMayBePrimary": true,
+    "thirdPartyMirrorRequiresAccountIdentityAndArticleProvenance": true,
+    "displayNameMatchAloneMayEstablishEquivalentPrimary": false,
+    "publisherEmailMarkerAloneMayEstablishEquivalentPrimary": false,
+    "mirrorWithoutOfficialWechatIdMayPromote": false,
+    "mirrorWithoutRecovered2019ArticleMayPromote": false,
+    "secondarySourceMayPromote": false,
+    "hybridOfficialEventPlusMirrorInferenceMayPromote": false,
+    "allowNameSimilarity": false,
+    "allowIdArithmetic": false,
+    "allowBatchCountToIdentityMapping": false,
+    "allowSamePatchOrderInference": false
+  },
+  "coverageBefore": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "officialWechatAccount": {
+    "accountDisplayName": "梦幻模拟战手游",
+    "wechatId": "mhmnzsy",
+    "authority": "OFFICIAL_ZLONGAME_PUBLISHER_SOURCE",
+    "officialSourceUrls": [
+      "https://www.zlongame.com/html/service.html",
+      "https://mz.zlongame.com/main.shtml",
+      "https://news.zlongame.com/zlxw/5848.jhtml"
+    ],
+    "officialSourceClaim": "Zlongame official pages explicitly identify 梦幻模拟战 official WeChat as mhmnzsy / 梦幻模拟战手游.",
+    "primaryAccountIdentityStatus": "VERIFIED"
+  },
+  "mirrorCandidate": {
+    "service": "FreeWeChat",
+    "profileUrl": "https://freewechat.com/profile/MzI4ODY2MjA4NA==",
+    "displayName": "梦幻模拟战手游",
+    "authority": "THIRD_PARTY_ARCHIVE_MIRROR",
+    "displayNameMatchesOfficialAccount": true,
+    "officialContentMarkersObserved": [
+      "langrisser_mkt@zlongame.com",
+      "official recharge/payment wording",
+      "official event and update copy"
+    ],
+    "officialWechatIdDisplayedInRetrievedProfile": false,
+    "retrievedOfficialWechatId": null,
+    "currentVisibleArchiveOldestObserved": "2025-09-10",
+    "retrieved2019Archive": false,
+    "retrieved2019A7Article": false,
+    "equivalentPrimaryAdmissionStatus": "NOT_ADMITTED_ACCOUNT_ID_AND_2019_ARTICLE_PROVENANCE_NOT_RECOVERED",
+    "releasePromotionEligible": false
+  },
+  "searchOutcome": {
+    "searchedOfficialAccountDisplayNameWithA7Titles": true,
+    "searchedOfficialAccountDisplayNameWithA7CandidateNames": true,
+    "searchedMirrorProfileIdentifierWith2019Keywords": true,
+    "recoveredA7PrimaryIdentityArticleCount": 0,
+    "recoveredA7CandidateIdentityCount": 0,
+    "negativeSearchMeaning": "CURRENT_SEARCH_DID_NOT_RECOVER_A_2019_OFFICIAL_WECHAT_ARTICLE_OR_PROVE_THE_THIRD_PARTY_PROFILE_IDENTITY",
+    "negativeSearchMayProveArticleNeverExisted": false
+  },
+  "a7CandidateBoundary": {
+    "candidateRecordCount": 13,
+    "augustCandidateIds": [1112, 1031, 420, 244, 128, 333],
+    "septemberCandidateIds": [245, 129, 334, 511, 635, 813, 636],
+    "primaryWechatIdentityRecoveredCount": 0,
+    "promotedRecordCount": 0,
+    "allRemainUnresolved": true
+  },
+  "coverageAfter": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "boundaries": {
+    "stage5_8Mutated": false,
+    "releaseMetadataMutated": false,
+    "a7CandidatePromoted": false,
+    "mirrorDisplayNamePromotedToPrimary": false,
+    "publisherEmailMarkerPromotedToPrimary": false,
+    "mirrorProfileMappedToWechatIdWithoutEvidence": false,
+    "missing2019ArticleInferredAsNonexistence": false,
+    "secondaryEvidencePromoted": false,
+    "hybridEventMirrorInferencePromoted": false,
+    "nameSimilarityJoin": false,
+    "idArithmetic": false,
+    "batchCountIdentityMapping": false,
+    "samePatchOrderClaimed": false
+  },
+  "blockers": [],
+  "reviews": [],
+  "nextOwner": "soldier-release-metadata-evidence-acquisition",
+  "nextStartPoint": [
+    "Do not repeat generic FreeWeChat profile searches unless a direct 2019 article URL, account-ID mapping, pagination/archive endpoint, or preserved snapshot becomes available.",
+    "Use official WeChat mhmnzsy as a valid primary-source class only when the article itself can be attributed to that official account with recoverable content.",
+    "Keep all thirteen Stage 11-A7 candidates unresolved until a primary publisher source explicitly identifies their release-event membership.",
+    "Continue other stronger primary archive/snapshot routes without treating the third-party mirror as equivalent primary by display-name similarity alone."
+  ],
+  "reopenConditions": [
+    "A preserved 2019 article from official WeChat mhmnzsy is recovered and explicitly identifies one or more A7 Soldiers.",
+    "The FreeWeChat profile can be directly proven to mirror mhmnzsy and exposes the relevant 2019 article content with article provenance.",
+    "Another official publisher archive recovers equivalent primary identity evidence for either A7 release event."
+  ]
+}
