@@ -1,0 +1,91 @@
+name: ConfigData Source Pack B5 Deletion Admission
+
+on:
+  push:
+    branches:
+      - configdata/b5-deletion-admission-v1
+    paths:
+      - data/contracts/configdata-source-pack-deletion-admission.v1.json
+      - scripts/check-configdata-integrity.mjs
+      - scripts/validate-configdata-source-pack-boundary-v1.mjs
+      - scripts/validate-configdata-source-pack-b5-deletion-admission-v1.mjs
+      - .github/workflows/configdata-source-pack-b5-deletion-admission.yml
+  pull_request:
+    paths:
+      - data/contracts/configdata-source-pack-deletion-admission.v1.json
+      - scripts/check-configdata-integrity.mjs
+      - scripts/validate-configdata-source-pack-boundary-v1.mjs
+      - scripts/validate-configdata-source-pack-b5-deletion-admission-v1.mjs
+      - .github/workflows/configdata-source-pack-b5-deletion-admission.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: configdata-source-pack-b5-deletion-admission-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deletion-admission:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Require clean tracked baseline
+        run: |
+          set -euo pipefail
+          test "$(find data/configdata -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')" = "753"
+          test -z "$(git status --porcelain=v1 --untracked-files=no)"
+
+      - name: Validate B5 admission with tracked source still present
+        run: |
+          set -euo pipefail
+          node scripts/validate-configdata-source-pack-boundary-v1.mjs
+          node scripts/validate-configdata-source-pack-b5-deletion-admission-v1.mjs
+          npm run check:configdata
+
+      - name: Simulate B6 full deletion and run exact owning validator queue
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-b5-tracked-hidden"
+          rm -rf "$hidden_raw"
+
+          restore_raw() {
+            if [ -d "$hidden_raw" ]; then
+              mv "$hidden_raw" "$tracked_raw"
+            fi
+          }
+          trap restore_raw EXIT
+
+          mv "$tracked_raw" "$hidden_raw"
+          test ! -e "$tracked_raw"
+
+          node scripts/validate-configdata-source-pack-b5-deletion-admission-v1.mjs --execute
+
+          restore_raw
+          trap - EXIT
+
+      - name: Require no tracked mutation after admission proof
+        run: |
+          set -euo pipefail
+          test "$(find data/configdata -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')" = "753"
+          git diff --exit-code
+          test -z "$(git status --porcelain=v1 --untracked-files=no)"
