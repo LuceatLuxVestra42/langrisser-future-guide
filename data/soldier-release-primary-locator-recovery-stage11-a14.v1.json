@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-primary-locator-recovery-stage11-a14/v1",
+  "stage": "11-A14",
+  "status": "PASS",
+  "completion": "PRIMARY_LOCATOR_RECOVERED_BODY_IDENTITY_NOT_RETRIEVED_NO_PROMOTION",
+  "owner": "soldier-release-metadata-evidence-acquisition",
+  "scope": "A7_PRIMARY_IDENTITY_LOCATOR_RECOVERY_ONLY_NO_RELEASE_PROMOTION",
+  "capturedAt": "2026-09-02",
+  "capturedAgainstMain": "f32c9aeab762c6a4eed44d178062d9f79b9eb64b",
+  "predecessors": {
+    "stage11A7Boundary": "data/soldier-release-pre2020-event-boundary-stage11-a7.v1.json",
+    "stage11A13LegacyPageBoundary": "data/soldier-release-legacy-page-chronology-boundary-stage11-a13.v1.json",
+    "releaseMetadata": "data/generated/soldier-release-metadata.v1.json",
+    "soldierList": "data/generated/soldier-list-stage5-8.v1.json"
+  },
+  "policy": {
+    "targetTimeline": "CN_SERVER_RELEASE_CHRONOLOGY",
+    "promotionAuthority": "OFFICIAL_CN_RELEASE_NOTICE_OR_EQUIVALENT_PRIMARY_PUBLISHER_SOURCE",
+    "canonicalIdentityRequirement": "PRIMARY_SOURCE_MUST_EXPLICITLY_IDENTIFY_EACH_PROMOTED_SOLDIER",
+    "primaryLocatorWithoutBodyMayPromote": false,
+    "officialEventCountWithoutNamesMayPromote": false,
+    "incidentalSoldierMentionMayIdentifyUnnamedReleaseBatch": false,
+    "secondarySourceMayPromote": false,
+    "hybridOfficialEventPlusSecondaryIdentityMayPromote": false,
+    "allowNameSimilarity": false,
+    "allowIdArithmetic": false,
+    "allowFilenameOrUrlInference": false,
+    "allowBatchCountToIdentityMapping": false,
+    "allowSamePatchOrderInference": false
+  },
+  "coverageBefore": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "primaryLocatorRecovery": {
+    "relatedOfficialEventSourceId": "official-cn-2019-08-15",
+    "officialTagIndexUrl": "https://news.zlongame.com/tag/3693.jspx",
+    "officialTagLabel": "兵种",
+    "listingCategory": "招募计划",
+    "listingTitle": "战术布局再升级----70级、英雄觉醒、全新兵种",
+    "listingSourceLabel": "本站原创",
+    "listingPublishedAtText": "2019-08-09 13:53:52",
+    "articleUrl": "https://news.zlongame.com/jx/mzplan/20190809/7386.html",
+    "tagIndexRetrievalStatus": "RETRIEVED",
+    "articleBodyRetrievalStatus": "NOT_RETRIEVED_IN_CAPTURED_CURRENT_WEB_ACCESS",
+    "articleBodyRetrievalFailure": "CACHE_MISS",
+    "primaryIdentityContentStatus": "NOT_RETRIEVED",
+    "explicitCandidateSoldierNamesRetrieved": false,
+    "releasePromotionEligible": false,
+    "meaning": "OFFICIAL_PRIMARY_PUBLISHER_LOCATOR_EXISTS_BUT_CURRENTLY_RECOVERED_CONTENT_DOES_NOT_IDENTIFY_THE_SIX_A7_CANDIDATES"
+  },
+  "septemberPrimaryConfirmation": {
+    "relatedOfficialEventSourceId": "official-cn-2019-09-12",
+    "url": "https://news.zlongame.com/jx/mzInfoNews/20190917/10597.html",
+    "title": "“少女的旅途”版本更新内容",
+    "sectionHeading": "练兵场新兵种解锁",
+    "officialNewSoldierCount": 7,
+    "officialEventClaim": "更新完成后，练兵场中将添加7个全新兵种。",
+    "explicitNewSoldierNamesListed": false,
+    "incidentalSoldierMentions": [
+      {
+        "label": "地精骑士",
+        "context": "SKILL_DESCRIPTION_ADJUSTMENT",
+        "mayIdentifySevenNewSoldiers": false
+      }
+    ],
+    "releasePromotionEligible": false,
+    "meaning": "OFFICIAL_PRIMARY_PAGE_CONFIRMS_THE_SEVEN_SOLDIER_EVENT_BUT_DOES_NOT_IDENTIFY_THE_SEVEN_NEW_SOLDIERS"
+  },
+  "a7CandidateBoundary": {
+    "candidateRecordCount": 13,
+    "augustCandidateIds": [1112, 1031, 420, 244, 128, 333],
+    "septemberCandidateIds": [245, 129, 334, 511, 635, 813, 636],
+    "primaryIdentityRecoveredCount": 0,
+    "promotedRecordCount": 0,
+    "allRemainUnresolved": true
+  },
+  "coverageAfter": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "boundaries": {
+    "stage5_8Mutated": false,
+    "releaseMetadataMutated": false,
+    "a7CandidatePromoted": false,
+    "primaryLocatorPromotedWithoutBody": false,
+    "officialCountMappedToCandidates": false,
+    "incidentalMentionMappedToSeptemberBatch": false,
+    "secondaryEvidencePromoted": false,
+    "hybridEventIdentityInferencePromoted": false,
+    "nameSimilarityJoin": false,
+    "idArithmetic": false,
+    "filenameOrUrlInference": false,
+    "samePatchOrderClaimed": false,
+    "spChronologyIncluded": false,
+    "lowerTierChronologyIncluded": false
+  },
+  "blockers": [],
+  "reviews": [],
+  "nextOwner": "soldier-release-metadata-evidence-acquisition",
+  "nextStartPoint": [
+    "Do not repeat discovery of the 2019-08-09 official Zlongame primary locator; recover its preserved body or another official primary source only if stronger retrieval becomes available.",
+    "Keep all thirteen Stage 11-A7 candidates unresolved until a primary publisher source explicitly identifies one or more Soldiers as belonging to the 2019-08-15 or 2019-09-12 release event.",
+    "Do not use the 2019-09 page's incidental 地精骑士 skill-description adjustment to identify the seven newly added Soldiers.",
+    "Keep promotion as a separate owner step if qualifying primary identity evidence is later admitted."
+  ],
+  "reopenConditions": [
+    "The body or a preserved official snapshot of the 2019-08-09 article is recovered and explicitly lists one or more of the six new Soldiers.",
+    "Another primary Zlongame or equivalent publisher source explicitly ties Soldier identities to either A7 release event.",
+    "The release evidence contract changes the admissible primary identity-provenance class."
+  ]
+}
