@@ -452,7 +452,11 @@ function SectionHeading({ id, children }: { id: string; children: string }) {
 }
 
 function ConfigText({ text }: { text: string }) {
-  const tokens = text.split(/(<color=[^>]+>|<\/color>)/g);
+  const formattedText = text.replace(
+    /([.!?])\s*(?=(?:<color=[^>]+>|<\/color>)*\()/g,
+    "$1\n",
+  );
+  const tokens = formattedText.split(/(<color=[^>]+>|<\/color>)/g);
   let emphasized = false;
   let index = 0;
   const nodes = [];
@@ -478,7 +482,11 @@ function ConfigText({ text }: { text: string }) {
     );
   }
 
-  return <p className="whitespace-pre-wrap break-keep [overflow-wrap:anywhere]">{nodes}</p>;
+  return (
+    <p className="whitespace-pre-wrap break-keep [overflow-wrap:break-word] [text-wrap:pretty]">
+      {nodes}
+    </p>
+  );
 }
 
 function LoadingText() {
