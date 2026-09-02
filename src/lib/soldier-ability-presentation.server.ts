@@ -52,7 +52,7 @@ function fail(message: string): never {
   throw new Error(`Soldier Korean ability presentation: ${message}`);
 }
 
-function assertLocalizedAbility(soldierId: number, abilityKr: unknown) {
+function assertLocalizedAbility(soldierId: number, abilityKr: unknown): asserts abilityKr is string {
   if (typeof abilityKr !== "string" || !abilityKr.trim()) {
     fail(`Soldier ${soldierId} has an empty/non-string Korean ability.`);
   }
