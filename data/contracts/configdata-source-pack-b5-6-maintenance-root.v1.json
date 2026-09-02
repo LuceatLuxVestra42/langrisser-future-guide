@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "schemaId": "configdata-source-pack-b5-6-maintenance-root/v1",
+  "stage": "repository-size-reduction-B5.6",
+  "status": "READY_FOR_VALIDATION",
+  "completion": "CONFIGDATA_SOURCE_PACK_B5_6_MAINTENANCE_ROOT_PENDING",
+  "owner": "configdata-source-pack",
+  "supportingOwners": ["configdata", "project-check", "hero-canonical", "soldier-canonical", "equipment-canonical", "shared-movement"],
+  "purpose": "Close repository-local ConfigData read assumptions exposed by the exact B6 deletion-only proof without changing semantic authority, canonical data, relations, logical provenance, production runtime, or normal ConfigData Lookup behavior. Maintenance and historical validation scripts may resolve the same pinned B2 exact-byte source through a maintenance-only physical source resolver when the tracked root is absent.",
+  "authoritativePredecessors": {
+    "sourcePack": {
+      "path": "data/contracts/configdata-source-pack-contract.v1.json",
+      "requiredStage": "repository-size-reduction-B2",
+      "requiredStatus": "PASS",
+      "requiredFileCount": 753,
+      "requiredLogicalRawPathNamespace": "data/configdata",
+      "requiredImmutabilityPolicy": "CONTENT_HASH_PINNED_FAIL_CLOSED"
+    },
+    "deletionAdmission": {
+      "path": "data/contracts/configdata-source-pack-deletion-admission.v1.json",
+      "requiredStage": "repository-size-reduction-B5",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "CONFIGDATA_SOURCE_PACK_B5_DELETION_ADMISSION_COMPLETE",
+      "requiredAdmittedDeletionCount": 753
+    },
+    "operationalCutover": {
+      "path": "data/contracts/project-tooling-configdata-lookup-b5-5-operational-cutover.v1.json",
+      "requiredStage": "repository-size-reduction-B5.5",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "CONFIGDATA_LOOKUP_B5_5_OPERATIONAL_CUTOVER_COMPLETE"
+    }
+  },
+  "discoveryEvidence": {
+    "b6DeletionProofPr": 496,
+    "b6DeletionProofHead": "2a6234dae18e326611d1883333f9d4a6a8dc629a",
+    "b6DeletionChangedFileCount": 753,
+    "b6DeletionAdditions": 0,
+    "projectCheckOnDeletion": "PASS",
+    "remainingTrackedRootDependencyDetected": true,
+    "representativeFailureSignatures": [
+      "scripts/lib/configdata-direct.cjs -> data/configdata/ConfigDataSoldierInfo.json ENOENT",
+      "scripts/validate_hero_stage3_direct.cjs -> data/configdata/ConfigDataHeroInfo.json ENOENT",
+      "scripts/build_shared_movement_types.mjs -> data/configdata/ConfigDataJobInfo.json ENOENT",
+      "scripts/analyze-equipment-acquisition.mjs -> data/configdata/ConfigDataEquipmentInfo.json ENOENT"
+    ],
+    "postProofMainReadersDetected": [
+      "scripts/finalize-soldier-training-tech-classification-stage1.mjs",
+      "scripts/validate-soldier-training-tech-classification-stage1.mjs",
+      "scripts/validate-soldier-training-tech-classification-stage2.mjs"
+    ],
+    "b6MergeBlockedUntilThisStagePasses": true
+  },
+  "maintenanceBoundary": {
+    "resolverCjs": "scripts/configdata-source-pack-maintenance-root.cjs",
+    "resolverEsm": "scripts/configdata-source-pack-maintenance-root.mjs",
+    "logicalRawPathNamespace": "data/configdata",
+    "expectedFileCount": 753,
+    "explicitPhysicalRootSelector": "CONFIGDATA_SOURCE_ROOT",
+    "trackedCompleteRootPreferredWhenPresent": true,
+    "partialTrackedRootFailsClosed": true,
+    "absentTrackedRootHydratesPinnedB2OutsideRepository": true,
+    "externalCacheMayBeReusedOnlyWithPinnedIdentityMarkerAndExactFileCount": true,
+    "hydrationFailureFailsClosed": true,
+    "historicalOutputFallbackAllowed": false,
+    "rawSemanticReinterpretationAllowed": false,
+    "logicalProvenanceMayChange": false,
+    "normalLookupImportsMaintenanceResolver": false,
+    "productionRuntimeImportsMaintenanceResolver": false,
+    "frontendImportsMaintenanceResolver": false
+  },
+  "coveredReaders": [
+    {"path":"scripts/lib/configdata-direct.cjs","role":"shared direct-array adapter used by Soldier and Hero maintenance validators","semanticAlgorithmChanged":false},
+    {"path":"scripts/build_shared_movement_types.mjs","role":"shared movement frozen producer/validator","semanticAlgorithmChanged":false},
+    {"path":"scripts/analyze-equipment-acquisition.mjs","role":"equipment acquisition investigation","semanticAlgorithmChanged":false},
+    {"path":"scripts/investigate_hero_display_stats.cjs","role":"hero display-stat evidence investigation","semanticAlgorithmChanged":false},
+    {"path":"scripts/finalize-soldier-training-tech-classification-stage1.mjs","role":"TrainingTech Stage 1 deterministic structural census producer","semanticAlgorithmChanged":false},
+    {"path":"scripts/validate-soldier-training-tech-classification-stage1.mjs","role":"TrainingTech Stage 1 independent read-only validator","semanticAlgorithmChanged":false},
+    {"path":"scripts/validate-soldier-training-tech-classification-stage2.mjs","role":"TrainingTech Stage 2 evidence-contract independent validator","semanticAlgorithmChanged":false}
+  ],
+  "semanticBoundary": {
+    "semanticAuthorityChanged": false,
+    "frozenSemanticDomainsReopened": false,
+    "canonicalIdentityChanges": false,
+    "relationChanges": false,
+    "newRelationDiscovery": false,
+    "sourceMeaningReinterpreted": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "filenameSimilarityIntroduced": false
+  },
+  "productionBoundary": {
+    "productionRuntimeChanged": false,
+    "productionRuntimeReadsRawConfigData": false,
+    "productionRuntimeFetchesSourcePack": false,
+    "rawConfigDataRuntimeFallbackAllowed": false,
+    "frontendChanged": false,
+    "normalLookupRefsFindChanged": false,
+    "normalLookupRawFallback": false
+  },
+  "migrationState": {
+    "trackedRepositoryRawSourceStillPresent": true,
+    "trackedRepositoryRawJsonCount": 753,
+    "trackedRawDeletionAdmitted": true,
+    "b5_5OperationalCutoverCompleted": true,
+    "maintenanceRootCutoverCompleted": false,
+    "trackedRawDeletionCompleted": false
+  },
+  "requiredValidation": {
+    "staticBoundaryGuard": "PENDING",
+    "externalAutoHydrationWithTrackedRootUnavailable": "PENDING",
+    "sharedDirectAdapterExternalRead": "PENDING",
+    "heroDirectValidatorExternalRead": "PENDING",
+    "sharedMovementExternalRead": "PENDING",
+    "equipmentAcquisitionExternalRead": "PENDING",
+    "heroDisplayInvestigationNoMissingSource": "PENDING",
+    "trainingTechStage1ProducerExternalRead": "PENDING",
+    "trainingTechStage1ValidatorExternalRead": "PENDING",
+    "trainingTechStage2ValidatorExternalRead": "PENDING",
+    "soldierStage4_8FrozenBaselineRefresh": "PENDING",
+    "projectCheck": "PENDING",
+    "manualReviewCount": 0,
+    "trackedMutationCountAfterValidation": 0
+  },
+  "blockers": ["B5_6_VALIDATION_PENDING", "SOLDIER_STAGE4_8_FROZEN_BASELINE_REFRESH_PENDING"],
+  "reviews": ["HERO_DISPLAY_EXIT2_BASELINE_CLASSIFICATION_PENDING"],
+  "handoff": {
+    "completion": "PENDING_B5_6_VALIDATION",
+    "nextOwner": "configdata-source-pack",
+    "nextSupportingOwners": ["configdata", "project-check", "configdata-lookup"],
+    "nextStage": "B6-delete-tracked-configdata",
+    "nextStart": "After B5.6 PASS, recreate B6 from latest main while preserving an exact deletion-only 753-file diff, then rerun all deletion-triggered workflows and merge only when no repository-local ConfigData read dependency remains."
+  }
+}
