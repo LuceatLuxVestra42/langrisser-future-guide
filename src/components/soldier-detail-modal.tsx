@@ -452,10 +452,12 @@ function SectionHeading({ id, children }: { id: string; children: string }) {
 }
 
 function ConfigText({ text }: { text: string }) {
-  const formattedText = text.replace(
-    /([.!?])\s*(?=(?:<color=[^>]+>|<\/color>)*\()/g,
-    "$1\n",
-  );
+  const formattedText = text
+    .replace(/([.!?])\s+(?=\S)/g, "$1\n")
+    .replace(
+      /([.!?])\s*(?=(?:<color=[^>]+>|<\/color>)*\()/g,
+      "$1\n",
+    );
   const tokens = formattedText.split(/(<color=[^>]+>|<\/color>)/g);
   let emphasized = false;
   let index = 0;
