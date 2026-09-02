@@ -32,8 +32,6 @@ concurrency:
 jobs:
   configdata-lookup-validation:
     runs-on: ubuntu-latest
-    env:
-      CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-lookup-owner-source
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,6 +42,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Configure external ConfigData source root
+        shell: bash
+        run: echo "CONFIGDATA_SOURCE_ROOT=$RUNNER_TEMP/configdata-lookup-owner-source" >> "$GITHUB_ENV"
 
       - name: Hydrate and verify pinned ConfigData source pack outside repository
         env:
@@ -80,7 +82,7 @@ jobs:
       - name: Run CLR2 namespace smoke
         run: node tools/configdata-lookup/test/clr2-namespace-smoke.mjs
 
-      - name: Run ConfigData Lookup owner self-test (CLR3 + CLR5 + CLR6 + CLR7 + CLR8 + B3)
+      - name: Run ConfigData Lookup owner self-test (CLR3 + CLR5 + CLR6 + CLR7 + CLR8 + B3 + B5.5)
         run: node tools/configdata-lookup/test/configdata-lookup-owner-self-test.mjs
 
       - name: Restore tracked ConfigData when present in this revision
