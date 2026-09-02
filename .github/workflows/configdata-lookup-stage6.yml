@@ -82,8 +82,6 @@ permissions:
 jobs:
   validation-only:
     runs-on: ubuntu-latest
-    env:
-      CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-lookup-stage6-source
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -94,6 +92,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Configure external ConfigData source root
+        shell: bash
+        run: echo "CONFIGDATA_SOURCE_ROOT=$RUNNER_TEMP/configdata-lookup-stage6-source" >> "$GITHUB_ENV"
 
       - name: Hydrate and verify pinned ConfigData source pack outside repository
         env:
