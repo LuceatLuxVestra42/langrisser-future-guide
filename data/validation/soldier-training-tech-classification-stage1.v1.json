@@ -40,18 +40,18 @@
     "trainingTechLevelPopulationMatch": true,
     "trainingTechRawMismatchCount": 0,
     "trainingTechMetadataMismatchCount": 0,
-    "trainingTechLevelRawMismatchCount": 0,
-    "trainingTechLevelMetadataMismatchCount": 0,
-    "reverseReferenceMismatchCount": 0,
+    "rawTrainingTechLevelDuplicatedInCensus": false,
     "trainingTechStructuralSummaryMatch": true,
     "trainingTechLevelStructuralSummaryMatch": true,
+    "levelReferenceCoverageMatch": true,
+    "diagnosticsMatch": true,
     "semanticClassificationPerformed": false
   },
   "coverage": {
     "trainingTechSourceRecords": 287,
-    "trainingTechCensusRecords": 287,
+    "trainingTechLosslessCensusRecords": 287,
     "trainingTechLevelSourceRecords": 2945,
-    "trainingTechLevelCensusRecords": 2945,
+    "trainingTechLevelStructurallyAccountedRecords": 2945,
     "explicitTrainingTechLevelReferenceCount": 2945,
     "missingReferencedLevelIdCount": 0,
     "unreferencedLevelRecordCount": 0,
@@ -71,7 +71,7 @@
   "reopenConditions": [
     "Stage 0 authoritative contradiction affecting this census.",
     "TrainingTech or TrainingTechLevel source snapshot change.",
-    "Census record-loss or raw round-trip parity damage.",
+    "Census record-loss or TrainingTech raw round-trip parity damage.",
     "Project Check ownership/orchestration contract change affecting this path.",
     "Hard owning-validator failure."
   ]
