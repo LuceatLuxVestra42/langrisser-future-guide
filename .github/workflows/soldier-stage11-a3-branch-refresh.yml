@@ -1,0 +1,86 @@
+name: Soldier Stage 11-A3 Branch Refresh
+
+on:
+  push:
+    branches:
+      - soldier/stage11-a3-site-admission-refresh
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: soldier/stage11-a3-site-admission-refresh
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Configure bot identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Refresh Stage 6-1 full records
+        run: |
+          node scripts/finalize-soldier-stage6-1-full-records.cjs
+          git add data/generated/soldier-stage6-1-full-records.v1.json data/validation/soldier-stage6-1-full-records.v1.json
+          if ! git diff --cached --quiet; then git commit -m "refresh Soldier stage 6-1 after release promotion"; fi
+
+      - name: Refresh Stage 6-2 classification
+        run: |
+          node scripts/finalize-soldier-stage6-2-classification.cjs
+          git add data/generated/soldier-stage6-2-classification.v1.json data/validation/soldier-stage6-2-classification.v1.json
+          if ! git diff --cached --quiet; then git commit -m "refresh Soldier stage 6-2 release review classification"; fi
+
+      - name: Refresh Stage 6-3 representative QA
+        run: |
+          node scripts/finalize-soldier-stage6-3-representative-qa.cjs
+          git add data/validation/soldier-stage6-3-representative-qa.v1.json
+          if ! git diff --cached --quiet; then git commit -m "refresh Soldier stage 6-3 QA provenance"; fi
+
+      - name: Refresh Stage 6-4 filter QA
+        run: |
+          node scripts/finalize-soldier-stage6-4-filter-qa.cjs
+          git add data/validation/soldier-stage6-4-filter-qa.v1.json
+          if ! git diff --cached --quiet; then git commit -m "refresh Soldier stage 6-4 QA provenance"; fi
+
+      - name: Refresh Stage 6-5 reciprocal links freshness
+        run: |
+          node scripts/finalize-soldier-stage6-5-reciprocal-links.cjs
+          git add data/generated/hero-soldier-page-links-stage6-5.v1.json data/validation/soldier-stage6-5-reciprocal-links.v1.json
+          if ! git diff --cached --quiet; then git commit -m "refresh Soldier stage 6-5 provenance after release projection"; fi
+
+      - name: Refresh Stage 6-6 expansion freshness
+        run: |
+          node scripts/finalize-soldier-stage6-6-expansion-basis.cjs
+          git add data/generated/soldier-stage6-6-expansion-basis.v1.json data/validation/soldier-stage6-6-expansion-basis.v1.json
+          if ! git diff --cached --quiet; then git commit -m "refresh Soldier stage 6-6 provenance after release projection"; fi
+
+      - name: Refresh Stage 6-7 site admission
+        run: |
+          node scripts/finalize-soldier-stage6-7-site-admission.cjs
+          git add data/generated/soldier-stage6-7-site-admission.v1.json data/validation/soldier-stage6-7-site-admission.v1.json
+          if ! git diff --cached --quiet; then git commit -m "refresh Soldier stage 6-7 site admission after release promotion"; fi
+
+      - name: Validate Stage 11-A3 downstream refresh
+        run: node scripts/validate-soldier-release-metadata-stage11-a3.mjs
+
+      - name: Run Soldier canonical owning validator
+        run: node scripts/validate-soldier-stage6-7-final.mjs
+
+      - name: Verify no unexpected tracked mutation remains
+        run: git diff --exit-code && test -z "$(git status --porcelain)"
+
+      - name: Push refreshed branch
+        run: |
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/soldier/stage11-a3-site-admission-refresh)" ]; then
+            echo "Stage 11-A3 artifacts already frozen."
+          else
+            git push origin HEAD:soldier/stage11-a3-site-admission-refresh
+          fi
