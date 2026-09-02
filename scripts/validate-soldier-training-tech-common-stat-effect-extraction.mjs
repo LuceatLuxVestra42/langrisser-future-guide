@@ -29,11 +29,7 @@ check(Boolean(sourcePath && existsSync(sourcePath)), `TrainingTechLevel source f
 check(existsSync(resolve(root, P.subject)), `${P.subject} is missing.`);
 if (errors.length) fail();
 
-const boundary = json(P.boundary);
-const stage5 = json(P.stage5);
-const stage5Validation = json(P.stage5Validation);
-const stage1 = json(P.stage1);
-const subject = json(P.subject);
+const boundary = json(P.boundary), stage5 = json(P.stage5), stage5Validation = json(P.stage5Validation), stage1 = json(P.stage1), subject = json(P.subject);
 const sourceBytes = readFileSync(sourcePath);
 const levelRows = JSON.parse(sourceBytes.toString("utf8"));
 
@@ -85,8 +81,7 @@ for (const record of records) {
   check(record?.sourceLabel === "COMMON_STAT", `Tech ${techId} sourceLabel drifted.`);
   const census = censusById.get(techId);
   if (!census) { errors.push(`Missing Stage 1 row for Tech ${techId}.`); continue; }
-  const raw = census.raw ?? {};
-  const refs = raw.TechLevelupInfoList ?? [];
+  const raw = census.raw ?? {}, refs = raw.TechLevelupInfoList ?? [];
   check(raw.ID === techId && raw.TechType === 1, `Tech ${techId} explicit locator fields drifted.`);
   check(Array.isArray(raw.ArmyIDRelated) && raw.ArmyIDRelated.length > 0, `Tech ${techId} lacks ArmyIDRelated.`);
   check(!Array.isArray(raw.SoldierIDRelated) || raw.SoldierIDRelated.length === 0, `Tech ${techId} has SoldierIDRelated.`);
@@ -101,7 +96,7 @@ for (const record of records) {
     const level = levels[i];
     check(level?.levelId === levelId, `Tech ${techId} level reference/order mismatch at ${levelId}.`);
     check(level?.effectTextRaw === source.Description, `TrainingTechLevel ${levelId} effectTextRaw mismatch.`);
-    check(same(level?.sourceLevelRecord, source), `TrainingTechLevel ${levelId} full source row mismatch.`);
+    check(Object.keys(level ?? {}).length === 2, `TrainingTechLevel ${levelId} generated effect row contains unrelated duplicated source fields.`);
     if (level?.effectTextRaw === source.Description && typeof source.Description === "string") rawEffectTextRows++;
     levelIds.push(levelId);
   });
@@ -110,12 +105,12 @@ for (const record of records) {
 check(levelIds.length === 1050 && new Set(levelIds).size === 1050, "COMMON_STAT materialized level coverage is not 1050 unique IDs.");
 check(rawEffectTextRows === 1050, "COMMON_STAT raw Description effect coverage is not 1050 rows.");
 check(subject.coverage?.targetTechCount === 84 && subject.coverage?.materializedTechCount === 84, "Subject Tech coverage counters drifted.");
-check(subject.coverage?.referencedLevelRowCount === 1050 && subject.coverage?.uniqueReferencedLevelRowCount === 1050, "Subject level coverage counters drifted.");
+check(subject.coverage?.referencedLevelRowCount === 1050 && subject.coverage?.uniqueReferencedLevelRowCount === 1050 && subject.coverage?.rawEffectTextRowCount === 1050, "Subject level/effect coverage counters drifted.");
 check(subject.coverage?.unresolvedLevelReferenceCount === 0 && subject.coverage?.duplicateReferencedLevelIdCount === 0 && subject.coverage?.excludedLabelTechMaterializedCount === 0, "Subject zero-error counters drifted.");
 const pol = subject.policy ?? {};
 check(pol.classificationAuthority === "STAGE5_FROZEN_MEMBERSHIP_ONLY" && pol.explicitTechLevelupInfoListJoinOnly === true, "Subject authority/join policy drifted.");
-check(pol.descriptionsMaterializedAsRawEffectText === true && pol.descriptionUsedForClassification === false, "Description use policy drifted.");
-check(pol.normalizedStatMeaningParsed === false && pol.numericEffectParsed === false, "Semantic/numeric normalization is outside this owner.");
+check(pol.descriptionsMaterializedAsRawEffectText === true && pol.unrelatedTrainingTechLevelFieldsDuplicated === false && pol.sourceRowsReadByValidatorForExactResolution === true, "Effect-focused materialization policy drifted.");
+check(pol.descriptionUsedForClassification === false && pol.normalizedStatMeaningParsed === false && pol.numericEffectParsed === false, "Description/semantic parsing policy drifted.");
 check(pol.nameJoinPerformed === false && pol.idArithmeticPerformed === false && pol.missingValueImputationPerformed === false && pol.historicalOutputFallbackUsed === false && pol.stage5MembershipMutationAllowed === false, "Forbidden inference/mutation policy drifted.");
 check((subject.blockers ?? []).length === 0 && (subject.reviews ?? []).length === 0, "Subject has blockers/reviews.");
 check(subject.nextOwner === boundary.parallelOwner, "Subject handoff does not match frozen parallel owner.");
@@ -137,7 +132,7 @@ const validation = {
     trainingTechLevelSource: { logicalPath: stage1.sourceSnapshots.trainingTechLevel.path, gitBlobSha: blobBytes(sourceBytes) },
   },
   coverage: { commonStatTechs: 84, materializedTechs: 84, referencedLevelRows: 1050, uniqueReferencedLevelRows: 1050, rawEffectTextRows: 1050, unresolvedLevelReferences: 0, duplicateLevelReferences: 0, foreignLabelTechs: 0 },
-  gates: { boundaryFrozenComplete: true, stage5FrozenExact: true, sourceSnapshotsExact: true, commonStatMembershipExact: true, explicitLevelJoinOnly: true, everyReferenceResolvedExactlyOnce: true, fullSourceLevelRowsExact: true, rawDescriptionEffectsExact: true, noClassificationMutation: true, noNameJoin: true, noIdArithmetic: true, noMissingValueImputation: true, noSemanticNormalization: true, noHistoricalFallback: true },
+  gates: { boundaryFrozenComplete: true, stage5FrozenExact: true, sourceSnapshotsExact: true, commonStatMembershipExact: true, explicitLevelJoinOnly: true, everyReferenceResolvedExactlyOnce: true, rawDescriptionEffectsExact: true, noUnrelatedSourceRowDuplication: true, noClassificationMutation: true, noNameJoin: true, noIdArithmetic: true, noMissingValueImputation: true, noSemanticNormalization: true, noHistoricalFallback: true },
   blockers: [],
   reviews: [],
   nextOwner: subject.nextOwner,
