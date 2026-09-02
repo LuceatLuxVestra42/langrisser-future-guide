@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-b3-source-root-cutover-checkpoint/v1",
+  "checkpoint": "configdata-lookup-b3-source-root-cutover",
+  "stage": "repository-size-reduction-B3",
+  "status": "PASS_B3_SOURCE_ROOT_CUTOVER",
+  "owner": "configdata-lookup",
+  "authoritativePredecessor": {
+    "b2MergeCommit": "8ab7516d773ed1e569c65e56c346ae564a984580",
+    "sourcePackContract": "data/contracts/configdata-source-pack-contract.v1.json",
+    "sourcePackHydrationCheckpoint": "data/validation/configdata-source-pack-b2-hydration.v1.json",
+    "b3Contract": "data/contracts/project-tooling-configdata-lookup-b3-source-root-cutover.v1.json"
+  },
+  "implementationProof": {
+    "head": "fe14786c8d6dedfbe6eb01086543480865097411",
+    "projectCheckRun": 33584800036,
+    "externalSourceRootRun": 33584799982,
+    "stage1Run": 33584799976,
+    "stage2Run": 33584800059,
+    "stage6Run": 33584800080,
+    "configdataLookupOwnerRun": 33584800014
+  },
+  "result": {
+    "logicalConfigDataNamespace": "data/configdata",
+    "physicalSourceRootEnvironmentVariable": "CONFIGDATA_SOURCE_ROOT",
+    "configuredRootMustBeAbsolute": true,
+    "repositoryRootCompatibilityMode": "PASS",
+    "hydratedExternalRootMode": "PASS",
+    "stage1GeneratedParity": "PASS",
+    "stage2GeneratedParity": "PASS",
+    "stage6RepositoryRootFreshness": "CLEAN_CONFIGDATA_LOOKUP_STAGE6",
+    "stage6ExternalRootFreshness": "CLEAN_CONFIGDATA_LOOKUP_STAGE6",
+    "physicalSourceRootMetadataLeakCount": 0,
+    "trackedRepositoryMutationCount": 0,
+    "b3ChangedPathManualReviewCount": 0,
+    "rawQueryFallbackAllowed": false,
+    "productionRuntimeReadsRawConfigData": false,
+    "semanticAuthorityChanged": false,
+    "frozenSemanticDomainsReopened": false
+  },
+  "routing": {
+    "owner": "configdata-lookup",
+    "validator": "configdata-lookup-self-test",
+    "sourceRootStage1LibExplicitlyRouted": true,
+    "sourceRootStage2LibExplicitlyRouted": true,
+    "sourceRootStage6LibExplicitlyRouted": true,
+    "sourceRootWorkflowExplicitlyRouted": true,
+    "regressionFixture": "tools/project-check/test/configdata-lookup-b3-routing-fixture.mjs",
+    "ownerPropagation": false,
+    "changeClassFanOut": false
+  },
+  "completedScope": [
+    "physical ConfigData source-root resolver admitted",
+    "Stage1 raw source reads cut over to resolver",
+    "Stage2 raw source reads cut over to resolver",
+    "Stage6 raw-source freshness and dependency hashing cut over to resolver",
+    "logical source paths preserved in contracts and materialized metadata",
+    "pinned B2 external source pack validated as an alternate physical root",
+    "Project Check routing for B3 source-root tooling admitted and regression-covered"
+  ],
+  "nonScope": [
+    "B4 external-only clean-room with tracked raw sources unavailable",
+    "B5 deletion admission",
+    "B6 tracked data/configdata deletion",
+    "canonical identity or relation changes",
+    "frontend or production runtime raw ConfigData access"
+  ],
+  "trackedRawStateAtCloseout": {
+    "dataConfigDataJsonStillTracked": true,
+    "expectedTrackedJsonCount": 753,
+    "reason": "Tracked raw removal is intentionally deferred to B6 after B4 and B5 gates."
+  },
+  "blockers": [],
+  "review": [],
+  "handoff": {
+    "nextOwner": "configdata-lookup",
+    "nextStage": "B4-external-only-clean-room",
+    "nextStart": "Prove Lookup rebuild/freshness and required owning validators with tracked data/configdata made unavailable while CONFIGDATA_SOURCE_ROOT points only to a verified hydrated B2 snapshot."
+  },
+  "reopenConditions": [
+    "source-pack authority or pinned content identity changes",
+    "logical data/configdata provenance paths are rewritten to physical paths",
+    "Stage1, Stage2, or Stage6 parity differs between repository-root and verified hydrated-root modes",
+    "physical source-root path leaks into tracked materialized metadata",
+    "raw query/runtime fallback becomes enabled",
+    "owning validator or Project Check routing fails for B3 source-root paths"
+  ]
+}

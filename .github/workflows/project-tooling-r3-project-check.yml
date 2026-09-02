@@ -40,6 +40,9 @@ jobs:
       - name: Run post-reinstall Soldier and Asset Intake routing fixtures
         run: node tools/project-check/test/post-reinstall-routing-fixtures.mjs
 
+      - name: Run ConfigData Lookup B3 routing regression fixture
+        run: node tools/project-check/test/configdata-lookup-b3-routing-fixture.mjs
+
       - name: Plan changed path ownership and validators
         run: node tools/project-check/cli/check.mjs --base "origin/${GITHUB_BASE_REF}" --head HEAD --plan
 
