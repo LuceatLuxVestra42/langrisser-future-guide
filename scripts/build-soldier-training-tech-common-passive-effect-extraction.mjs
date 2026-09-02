@@ -22,36 +22,50 @@ const blob = (p) => blobBytes(readFileSync(resolve(root, p)));
 const req = (ok, msg) => { if (!ok) throw new Error(msg); };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
+const tokenFormat = (raw) => {
+  if (/^\+/.test(raw) && /%$/.test(raw)) return "PLUS_PERCENT";
+  if (/^-/.test(raw) && /%$/.test(raw)) return "MINUS_PERCENT";
+  if (/%$/.test(raw)) return "PERCENT";
+  if (/^\+/.test(raw)) return "PLUS_NUMBER";
+  if (/^-/.test(raw)) return "MINUS_NUMBER";
+  return "NUMBER";
+};
+const formatToken = (value, format) => {
+  if (format === "PLUS_PERCENT") return `+${value}%`;
+  if (format === "MINUS_PERCENT") return `${value}%`;
+  if (format === "PERCENT") return `${value}%`;
+  if (format === "PLUS_NUMBER") return `+${value}`;
+  return `${value}`;
+};
 const parseToken = (rawToken, context) => {
   const compact = rawToken.trim();
   const match = compact.match(/^([+-]?\d+(?:\.\d+)?)(%)?$/);
   req(match, `${context} contains a non-numeric highlighted token: ${rawToken}`);
-  return {
-    raw: rawToken,
-    value: Number(match[1]),
-    lexicalUnit: match[2] ? "PERCENT" : "NUMBER",
-  };
+  const value = Number(match[1]);
+  const format = tokenFormat(compact);
+  req(formatToken(value, format) === compact, `${context} token is not canonically reconstructable: ${rawToken}`);
+  req(rawToken === compact, `${context} contains unsupported surrounding whitespace in highlighted token: ${JSON.stringify(rawToken)}`);
+  return { value, format };
 };
-
 const tokenizeDescription = (description, levelId) => {
   req(typeof description === "string" && description.length > 0, `TrainingTechLevel ${levelId} lacks Description.`);
-  const tokens = [];
+  const values = [];
+  const formats = [];
   let index = 0;
   const templateRichTextRaw = description.replace(/(<color=[^>]+>)([^<]*)(<\/color>)/g, (_full, open, content, close) => {
     const parsed = parseToken(content, `TrainingTechLevel ${levelId}`);
-    tokens.push(parsed);
-    const placeholder = `{P${index}}`;
-    index++;
-    return `${open}${placeholder}${close}`;
+    values.push(parsed.value);
+    formats.push(parsed.format);
+    return `${open}{P${index++}}${close}`;
   });
-  req(tokens.length > 0, `TrainingTechLevel ${levelId} has no highlighted numeric parameter.`);
+  req(values.length > 0 && values.length === index, `TrainingTechLevel ${levelId} has no admitted highlighted numeric parameter.`);
   const outside = description.replace(/<color=[^>]+>[\s\S]*?<\/color>/g, " ").replace(/<[^>]+>/g, " ");
   const outsideNumbers = [...outside.matchAll(/[+-]?\d+(?:\.\d+)?%?/g)].map((m) => m[0]);
   req(outsideNumbers.length === 0, `TrainingTechLevel ${levelId} contains numeric text outside highlighted parameter spans: ${outsideNumbers.join(",")}`);
   let reconstructed = templateRichTextRaw;
-  tokens.forEach((token, i) => { reconstructed = reconstructed.replace(`{P${i}}`, token.raw); });
+  values.forEach((value, i) => { reconstructed = reconstructed.replace(`{P${i}}`, formatToken(value, formats[i])); });
   req(reconstructed === description, `TrainingTechLevel ${levelId} template reconstruction is not lossless.`);
-  return { templateRichTextRaw, tokens };
+  return { templateRichTextRaw, values, formats };
 };
 
 req(sourcePath, "TRAINING_TECH_LEVEL_SOURCE is required; no source fallback is allowed.");
@@ -96,7 +110,7 @@ req(levelById.size === 2945, "TrainingTechLevel unique ID count is not 2945.");
 const referencedLevelIds = [];
 let highlightedParameterCount = 0;
 const templates = new Set();
-const records = targetIds.map((techId) => {
+const expanded = targetIds.map((techId) => {
   const census = censusById.get(techId);
   req(census, `Missing Stage 1 TrainingTech row: ${techId}`);
   const raw = census.raw ?? {};
@@ -105,39 +119,53 @@ const records = targetIds.map((techId) => {
   req(Array.isArray(refs) && refs.length === 10, `COMMON_PASSIVE Tech ${techId} explicit level reference count is not 10.`);
   req(same(refs, census.explicitLevelReferences), `Stage 1 explicit level reference projection drifted for Tech ${techId}.`);
   let templateRichTextRaw = null;
-  let lexicalUnitPattern = null;
-  const parameterRows = refs.map((levelId) => {
+  let tokenFormats = null;
+  const levelValueRows = refs.map((levelId) => {
     req(Number.isInteger(levelId), `Tech ${techId} has a non-integer level reference.`);
     const source = levelById.get(levelId);
     req(source, `Unresolved TrainingTechLevel ID ${levelId} referenced by Tech ${techId}.`);
     const tokenized = tokenizeDescription(source.Description, levelId);
-    const pattern = tokenized.tokens.map((token) => token.lexicalUnit);
-    if (templateRichTextRaw == null) {
-      templateRichTextRaw = tokenized.templateRichTextRaw;
-      lexicalUnitPattern = pattern;
-    }
+    if (templateRichTextRaw == null) { templateRichTextRaw = tokenized.templateRichTextRaw; tokenFormats = tokenized.formats; }
     req(tokenized.templateRichTextRaw === templateRichTextRaw, `COMMON_PASSIVE Tech ${techId} changes Description template across levels.`);
-    req(same(pattern, lexicalUnitPattern), `COMMON_PASSIVE Tech ${techId} changes parameter lexical-unit pattern across levels.`);
+    req(same(tokenized.formats, tokenFormats), `COMMON_PASSIVE Tech ${techId} changes parameter token-format pattern across levels.`);
     referencedLevelIds.push(levelId);
-    highlightedParameterCount += tokenized.tokens.length;
-    return tokenized.tokens;
+    highlightedParameterCount += tokenized.values.length;
+    return tokenized.values;
   });
-  req(templateRichTextRaw && lexicalUnitPattern?.length > 0, `COMMON_PASSIVE Tech ${techId} did not yield a template.`);
+  req(templateRichTextRaw && tokenFormats?.length > 0, `COMMON_PASSIVE Tech ${techId} did not yield a template.`);
   templates.add(templateRichTextRaw);
-  return {
-    techId,
-    templateRichTextRaw,
-    parameterCount: lexicalUnitPattern.length,
-    lexicalUnitPattern,
-    levelParameterRows: parameterRows,
-  };
+  return { techId, templateRichTextRaw, parameterCount: tokenFormats.length, tokenFormats, levelValueRows };
 });
 
-req(records.length === 46, "Materialized COMMON_PASSIVE Tech count is not 46.");
+req(expanded.length === 46, "Materialized COMMON_PASSIVE Tech count is not 46.");
 req(referencedLevelIds.length === 460, `COMMON_PASSIVE referenced level row count ${referencedLevelIds.length}, expected 460.`);
 req(new Set(referencedLevelIds).size === 460, "COMMON_PASSIVE level references are not globally unique.");
 req(highlightedParameterCount === 590, `COMMON_PASSIVE highlighted parameter count ${highlightedParameterCount}, expected 590.`);
 req(templates.size === 46, `COMMON_PASSIVE unique template count ${templates.size}, expected 46.`);
+
+const sequenceByKey = new Map();
+const parameterSequenceCatalog = [];
+for (const row of expanded) {
+  const key = JSON.stringify({ tokenFormats: row.tokenFormats, levelValueRows: row.levelValueRows });
+  let entry = sequenceByKey.get(key);
+  if (!entry) {
+    entry = {
+      sequenceId: `PARAM_SEQUENCE_${String(parameterSequenceCatalog.length + 1).padStart(2, "0")}`,
+      techIds: [],
+      parameterCount: row.parameterCount,
+      tokenFormats: row.tokenFormats,
+      levelValueRows: row.levelValueRows,
+    };
+    parameterSequenceCatalog.push(entry);
+    sequenceByKey.set(key, entry);
+  }
+  entry.techIds.push(row.techId);
+}
+req(parameterSequenceCatalog.length === 14, `COMMON_PASSIVE parameter sequence count ${parameterSequenceCatalog.length}, expected 14.`);
+const sequenceIdByTech = new Map();
+for (const sequence of parameterSequenceCatalog) for (const techId of sequence.techIds) sequenceIdByTech.set(techId, sequence.sequenceId);
+req(sequenceIdByTech.size === 46, "Parameter sequence catalog does not cover all 46 Tech IDs exactly once.");
+const records = expanded.map((row) => ({ techId: row.techId, templateRichTextRaw: row.templateRichTextRaw, parameterSequenceId: sequenceIdByTech.get(row.techId) }));
 
 const output = {
   version: 1,
@@ -146,7 +174,7 @@ const output = {
   status: "PASS",
   completion: "COMPLETE",
   freezeState: "TRAINING_TECH_COMMON_PASSIVE_EFFECT_EXTRACTION_FROZEN",
-  purpose: "Freeze a lossless parameterized source-Description representation for the frozen 46 COMMON_PASSIVE TrainingTech records. Conditional/passive meaning is preserved in the exact rich-text template while numeric highlighted parameters are structured without inferring parameter roles or a condition AST.",
+  purpose: "Freeze a compact lossless parameterized source-Description representation for the frozen 46 COMMON_PASSIVE TrainingTech records. Conditional/passive meaning remains in the exact rich-text template; repeated 10-level numeric parameter progressions are cataloged without inferring parameter roles or a condition AST.",
   authority: {
     boundary: { path: P.boundary, gitBlobSha: blob(P.boundary), requiredFreezeState: boundary.freezeState },
     stage5Classification: { path: P.stage5, gitBlobSha: blob(P.stage5), requiredFreezeState: stage5.freezeState },
@@ -159,9 +187,9 @@ const output = {
   },
   effectSemantics: {
     model: "LOSSLESS_PARAMETERIZED_RICH_TEXT_TEMPLATE",
-    placeholderRule: "Each explicit <color=...>...</color> numeric span is replaced in-place by {P0}, {P1}, ... while preserving the surrounding rich-text tags exactly.",
-    lexicalUnitRule: "A highlighted token carrying '%' is PERCENT; otherwise it is NUMBER. NUMBER is intentionally lexical and does not imply distance, count, flat stat, or another semantic unit.",
-    reconstructionRule: "For each explicit Stage 1 TechLevelupInfoList row, substituting parameter.raw values into the Tech template in placeholder order must reproduce the pinned source Description byte-for-byte.",
+    placeholderRule: "Each explicit <color=...>...</color> numeric span is replaced in-place by {P0}, {P1}, ... while preserving surrounding rich-text tags exactly.",
+    tokenFormatRule: "NUMBER/PERCENT and explicit PLUS_/MINUS_ variants preserve lexical formatting only; NUMBER does not imply distance, count, flat stat, or another semantic unit.",
+    reconstructionRule: "For each explicit Stage 1 TechLevelupInfoList row, selecting the Tech's parameter sequence, formatting its numeric row by tokenFormats, and substituting values into the template must reproduce the pinned source Description byte-for-byte.",
     semanticDepth: "PARAMETERIZED_TEMPLATE_ONLY",
   },
   policy: {
@@ -170,9 +198,10 @@ const output = {
     explicitTechLevelupInfoListJoinOnly: true,
     sourceDescriptionTemplatePreserved: true,
     highlightedNumericParametersStructured: true,
+    parameterSequencesCataloged: true,
     explicitLevelIdsMaterializedPerTech: false,
     explicitLevelIdsRecoveredFromStage1: true,
-    levelParameterRowOrderAlignedToExplicitTechLevelupInfoList: true,
+    levelValueRowOrderAlignedToExplicitTechLevelupInfoList: true,
     parameterRoleInferencePerformed: false,
     conditionAstInferencePerformed: false,
     effectTargetNormalizationPerformed: false,
@@ -192,8 +221,9 @@ const output = {
     uniqueReferencedLevelRowCount: 460,
     highlightedParameterCount: 590,
     uniqueTemplateCount: 46,
+    parameterSequenceCount: 14,
     templateDriftTechCount: 0,
-    lexicalUnitPatternDriftTechCount: 0,
+    tokenFormatPatternDriftTechCount: 0,
     numericTokensOutsideHighlightedSpans: 0,
     nonNumericHighlightedParameterCount: 0,
     unresolvedLevelReferenceCount: 0,
@@ -201,6 +231,7 @@ const output = {
     excludedLabelTechMaterializedCount: 0,
     sourceLevelPopulation: 2945,
   },
+  parameterSequenceCatalog,
   records,
   blockers: [],
   reviews: [],
@@ -212,21 +243,16 @@ const output = {
     "The frozen COMMON_PASSIVE membership is no longer exactly 46 Tech IDs.",
     "Any explicit TechLevelupInfoList reference fails exact resolution.",
     "Any COMMON_PASSIVE Description changes template across its explicit level rows.",
-    "Any numeric source token exists outside admitted highlighted spans or any highlighted parameter is non-numeric.",
+    "Any numeric source token exists outside admitted highlighted spans or any highlighted parameter is non-numeric/non-canonical.",
     "Lossless template reconstruction no longer reproduces the pinned source Description exactly.",
+    "The frozen parameter-sequence catalog no longer contains exactly 14 source-derived progressions covering all 46 Techs once.",
     "Independent validator fails or Project Check reports a hard owning-validator failure."
   ],
 };
 const serialized = `${JSON.stringify(output)}\n`;
-if (writeMode) {
-  writeFileSync(resolve(root, P.out), serialized);
-  console.log(`Wrote ${P.out}`);
-}
+if (writeMode) { writeFileSync(resolve(root, P.out), serialized); console.log(`Wrote ${P.out}`); }
 if (checkMode) {
   req(existsSync(resolve(root, P.out)), `${P.out} is missing. Run with --write.`);
-  if (text(P.out) !== serialized) {
-    console.error(`${P.out} is stale. Run with --write.`);
-    process.exit(1);
-  }
+  if (text(P.out) !== serialized) { console.error(`${P.out} is stale. Run with --write.`); process.exit(1); }
   console.log(JSON.stringify({ status: output.status, completion: output.completion, coverage: output.coverage }));
 }
