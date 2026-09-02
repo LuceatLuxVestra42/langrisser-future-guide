@@ -8,11 +8,15 @@ on:
     paths:
       - 'package.json'
       - 'tools/configdata-lookup/**'
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
       - 'data/contracts/project-tooling-project-check-configdata-lookup-clr2-*.json'
       - 'data/contracts/project-tooling-project-check-configdata-lookup-clr3-*.json'
       - 'data/contracts/project-tooling-configdata-lookup-*.json'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
       - 'tools/project-check/contracts/owners.v1.json'
       - 'tools/project-check/contracts/validators.v1.json'
+      - '.github/workflows/configdata-lookup-stage1.yml'
+      - '.github/workflows/configdata-lookup-stage2.yml'
       - '.github/workflows/configdata-lookup-stage6.yml'
       - '.github/workflows/project-tooling-configdata-lookup-clr2.yml'
       - '.github/workflows/project-tooling-configdata-lookup-writer.yml'
@@ -28,23 +32,69 @@ concurrency:
 jobs:
   configdata-lookup-validation:
     runs-on: ubuntu-latest
+    env:
+      CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-lookup-owner-source
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
+      - name: Hydrate and verify pinned ConfigData source pack outside repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$CONFIGDATA_SOURCE_ROOT"
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$CONFIGDATA_SOURCE_ROOT"
+          count="$(find "$CONFIGDATA_SOURCE_ROOT/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$count" = "753"
+          case "$CONFIGDATA_SOURCE_ROOT/" in
+            "$GITHUB_WORKSPACE/"*) echo 'external ConfigData source root must stay outside repository' >&2; exit 1 ;;
+          esac
+
+      - name: Make tracked ConfigData unavailable during owner validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-owner-tracked-hidden"
+          rm -rf "$hidden_raw"
+          if [ -d "$tracked_raw" ]; then
+            mv "$tracked_raw" "$hidden_raw"
+          fi
+          test ! -e "$tracked_raw"
+
       - name: Validate frozen Stage 5 predecessor through current compatibility gate
         run: npm run validate:configdata-lookup-stage5
 
-      - name: Require clean Stage 6 freshness
-        run: node scripts/configdata-lookup-stage6.mjs check
+      - name: Require clean Stage 6 freshness through current source-root adapter
+        run: node tools/configdata-lookup/cli/check-freshness.mjs
 
       - name: Run CLR2 namespace smoke
         run: node tools/configdata-lookup/test/clr2-namespace-smoke.mjs
 
-      - name: Run ConfigData Lookup owner self-test (CLR3 + CLR5 + CLR6 + CLR7 + CLR8)
+      - name: Run ConfigData Lookup owner self-test (CLR3 + CLR5 + CLR6 + CLR7 + CLR8 + B3)
         run: node tools/configdata-lookup/test/configdata-lookup-owner-self-test.mjs
+
+      - name: Restore tracked ConfigData when present in this revision
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-owner-tracked-hidden"
+          if [ -d "$hidden_raw" ]; then
+            test ! -e "$tracked_raw"
+            mv "$hidden_raw" "$tracked_raw"
+          fi
+
+      - name: Require read-only tracked state
+        shell: bash
+        run: git diff --exit-code
