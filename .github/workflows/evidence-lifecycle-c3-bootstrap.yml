@@ -28,7 +28,7 @@ jobs:
         run: node tools/evidence-lifecycle/cli/c3-lifecycle-classification.mjs --write
       - name: Commit generated classification if changed
         run: |
-          if git diff --quiet -- tools/evidence-lifecycle/generated/c3-lifecycle-classification.v1.json; then
+          if [ -z "$(git status --porcelain -- tools/evidence-lifecycle/generated/c3-lifecycle-classification.v1.json)" ]; then
             echo 'C3 classification already current.'
             exit 0
           fi
