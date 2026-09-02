@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const DEFAULT_CONTRACT = 'data/contracts/configdata-source-pack.v1.json';
+const DEFAULT_CONTRACT = 'data/contracts/configdata-source-pack-contract.v1.json';
 const EXPECTED_OWNER = 'configdata-source-pack';
 const EXPECTED_STAGE = 'repository-size-reduction-B2';
 
