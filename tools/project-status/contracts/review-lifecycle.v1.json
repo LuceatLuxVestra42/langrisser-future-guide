@@ -1,7 +1,7 @@
 {
   "version": 1,
   "schemaId": "project-status-review-lifecycle/v1",
-  "stage": "R2-review-lifecycle-stage10-correction",
+  "stage": "R2-review-lifecycle-stage11-0",
   "status": "DESIGN_FROZEN",
   "purpose": "Classify normalized Project Status review entries by explicit reviewKey/code rules and declared evidence only. No text similarity, name JOIN, filename inference, chronology inference, or semantic recomputation is allowed.",
   "policy": {
@@ -224,13 +224,13 @@
       "evidence": []
     },
     {
-      "id": "soldier-same-patch-order-active",
+      "id": "soldier-same-patch-order-boundary",
       "domain": "soldier",
       "match": {
         "code": "SAME_PATCH_ORDER_UNRESOLVED"
       },
-      "lifecycle": "ACTIVE_REVIEW",
-      "healthImpact": true,
+      "lifecycle": "BOUNDARY_NOTE",
+      "healthImpact": false,
       "issueKey": "SOLDIER_SAME_PATCH_ORDER",
       "evidence": []
     },
