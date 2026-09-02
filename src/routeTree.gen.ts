@@ -19,7 +19,9 @@ import { Route as SoldiersPrototypeRouteImport } from './routes/soldiers-prototy
 import { Route as EquipmentEquipmentIdRouteImport } from './routes/equipment_.$equipmentId'
 import { Route as EquipmentExclusiveRouteImport } from './routes/equipment_.exclusive'
 import { Route as HeroesHeroIdRouteImport } from './routes/heroes_.$heroId'
+import { Route as SoldiersIndexRouteImport } from './routes/soldiers.index'
 import { Route as SoldiersSoldierIdRouteImport } from './routes/soldiers.$soldierId'
+import { Route as SoldiersTrainingRouteImport } from './routes/soldiers.training'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -71,9 +73,19 @@ const HeroesHeroIdRoute = HeroesHeroIdRouteImport.update({
   path: '/heroes/$heroId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SoldiersIndexRoute = SoldiersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SoldiersRoute,
+} as any)
 const SoldiersSoldierIdRoute = SoldiersSoldierIdRouteImport.update({
   id: '/$soldierId',
   path: '/$soldierId',
+  getParentRoute: () => SoldiersRoute,
+} as any)
+const SoldiersTrainingRoute = SoldiersTrainingRouteImport.update({
+  id: '/training',
+  path: '/training',
   getParentRoute: () => SoldiersRoute,
 } as any)
 
@@ -89,6 +101,8 @@ export interface FileRoutesByFullPath {
   '/equipment/exclusive': typeof EquipmentExclusiveRoute
   '/heroes/$heroId': typeof HeroesHeroIdRoute
   '/soldiers/$soldierId': typeof SoldiersSoldierIdRoute
+  '/soldiers/training': typeof SoldiersTrainingRoute
+  '/soldiers/': typeof SoldiersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -96,12 +110,13 @@ export interface FileRoutesByTo {
   '/equipment': typeof EquipmentRoute
   '/equipment-prototype': typeof EquipmentPrototypeRoute
   '/heroes': typeof HeroesRoute
-  '/soldiers': typeof SoldiersRouteWithChildren
   '/soldiers-prototype': typeof SoldiersPrototypeRoute
   '/equipment/$equipmentId': typeof EquipmentEquipmentIdRoute
   '/equipment/exclusive': typeof EquipmentExclusiveRoute
   '/heroes/$heroId': typeof HeroesHeroIdRoute
   '/soldiers/$soldierId': typeof SoldiersSoldierIdRoute
+  '/soldiers/training': typeof SoldiersTrainingRoute
+  '/soldiers': typeof SoldiersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +131,8 @@ export interface FileRoutesById {
   '/equipment_/exclusive': typeof EquipmentExclusiveRoute
   '/heroes_/$heroId': typeof HeroesHeroIdRoute
   '/soldiers/$soldierId': typeof SoldiersSoldierIdRoute
+  '/soldiers/training': typeof SoldiersTrainingRoute
+  '/soldiers/': typeof SoldiersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +148,8 @@ export interface FileRouteTypes {
     | '/equipment/exclusive'
     | '/heroes/$heroId'
     | '/soldiers/$soldierId'
+    | '/soldiers/training'
+    | '/soldiers/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -138,12 +157,13 @@ export interface FileRouteTypes {
     | '/equipment'
     | '/equipment-prototype'
     | '/heroes'
-    | '/soldiers'
     | '/soldiers-prototype'
     | '/equipment/$equipmentId'
     | '/equipment/exclusive'
     | '/heroes/$heroId'
     | '/soldiers/$soldierId'
+    | '/soldiers/training'
+    | '/soldiers'
   id:
     | '__root__'
     | '/'
@@ -157,6 +177,8 @@ export interface FileRouteTypes {
     | '/equipment_/exclusive'
     | '/heroes_/$heroId'
     | '/soldiers/$soldierId'
+    | '/soldiers/training'
+    | '/soldiers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -244,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HeroesHeroIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/soldiers/': {
+      id: '/soldiers/'
+      path: '/'
+      fullPath: '/soldiers/'
+      preLoaderRoute: typeof SoldiersIndexRouteImport
+      parentRoute: typeof SoldiersRoute
+    }
     '/soldiers/$soldierId': {
       id: '/soldiers/$soldierId'
       path: '/$soldierId'
@@ -251,15 +280,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SoldiersSoldierIdRouteImport
       parentRoute: typeof SoldiersRoute
     }
+    '/soldiers/training': {
+      id: '/soldiers/training'
+      path: '/training'
+      fullPath: '/soldiers/training'
+      preLoaderRoute: typeof SoldiersTrainingRouteImport
+      parentRoute: typeof SoldiersRoute
+    }
   }
 }
 
 interface SoldiersRouteChildren {
   SoldiersSoldierIdRoute: typeof SoldiersSoldierIdRoute
+  SoldiersTrainingRoute: typeof SoldiersTrainingRoute
+  SoldiersIndexRoute: typeof SoldiersIndexRoute
 }
 
 const SoldiersRouteChildren: SoldiersRouteChildren = {
   SoldiersSoldierIdRoute: SoldiersSoldierIdRoute,
+  SoldiersTrainingRoute: SoldiersTrainingRoute,
+  SoldiersIndexRoute: SoldiersIndexRoute,
 }
 
 const SoldiersRouteWithChildren = SoldiersRoute._addFileChildren(
