@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "schemaId": "equipment-image-ssr-frame-provenance-checkpoint/v1",
+  "status": "PASS_EQUIPMENT_SSR_FRAME_PROVENANCE",
+  "completion": "COMPLETE",
+  "scope": "Resolve the current public Equipment SSR rank to the exact official runtime frame locator and exact official APK Sprite asset without mutating frozen Equipment images, canonical Equipment data, or frontend consumers.",
+  "authoritativePredecessor": {
+    "path": "data/checkpoints/equipment-image-stage2-final.v3.json",
+    "requiredStatus": "PASS_EQUIPMENT_IMAGE_STAGE2",
+    "requiredCompletion": "COMPLETE",
+    "requiredFreezeState": "EQUIPMENT_IMAGE_STAGE2_FROZEN"
+  },
+  "repositoryContext": {
+    "validatedMainSha": "a12b7c903fb1e1d7c86030e6cdd3685df3fa9a74",
+    "researchBranch": "research/equipment-ssr-frame-provenance-v2",
+    "validatedResearchSha": "44f8aa6e403ae78d330b4ffc8ef5971a783fa361",
+    "workflowRunId": 33594309717,
+    "workflowArtifactId": 9832875440,
+    "workflowArtifactDigest": "sha256:145d5b811be1747638db18d226d36f7b9c52d29e971b4941e2879a8df690aac2"
+  },
+  "officialSourceAuthority": {
+    "officialPage": "https://mz.zlongame.com/main.shtml",
+    "officialApkUrl": "https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/mz-client-formal-cn.apk",
+    "apkBytes": 2085438199,
+    "apkLastModified": "Wed, 12 Aug 2026 18:10:16 GMT",
+    "metadataPath": "assets/bin/Data/Managed/Metadata/global-metadata.dat",
+    "metadataBytes": 32273988,
+    "metadataSha256": "415b38ad222226b111637ac2a5995a8ef7a0c0a8c3aadea29f7cf8b236d90871",
+    "nativePath": "lib/arm64-v8a/libil2cpp.so",
+    "nativeBytes": 119402256,
+    "nativeSha256": "875ebc57b2ead7561184f0689535e886b184c3b0cc90b91410bc6e55963f304b"
+  },
+  "rankProof": {
+    "method": "BlackJack.ProjectL.UI.UIUtility$$GetGoodsFrameNameByRank",
+    "methodAddress": "0x4d375c0",
+    "fallbackTable": {
+      "2": "UI/Common_New_ABS/Border_Icon_Silver.png",
+      "3": "UI/Common_New_ABS/Border_Icon_Gold.png",
+      "4": "UI/Common_New_ABS/Border_Icon_Colour.png",
+      "5": "UI/Common_New_ABS/Border_Icon_Colour.png"
+    },
+    "rank4PresentationConstant": "HeroListRank4FrameNoArmy = UI/HeadFrame_ABS/NoCircle_Thumbnail_SSR.png",
+    "rank5ExtendedRankConstant": "SPHeroRankValue = 5",
+    "currentPublicEquipmentPopulation": 373,
+    "currentPublicEquipmentRankDistribution": {
+      "4": 373
+    },
+    "currentPublicEquipmentRank4Count": 373,
+    "currentPublicEquipmentRank5Count": 0,
+    "configSource": "data/configdata/ConfigDataEquipmentInfo.json",
+    "configJoin": "exact numeric ConfigDataEquipmentInfo.ID to current public equipment ID; no name JOIN or ID arithmetic"
+  },
+  "exactAssetBinding": {
+    "runtimeLocator": "UI/Common_New_ABS/Border_Icon_Colour.png",
+    "serializedContainerKey": "assets/gameproject/runtimeassets/ui/common_new_abs/border_icon_colour.png",
+    "serializedNormalization": "exact prefix assets/gameproject/runtimeassets/ plus lowercase runtime locator",
+    "officialApkBundleEntry": "assets/ExportAssetBundle/begin_ui_common_new_abs.b",
+    "bundleZipCrc32": "3d0add27",
+    "sourceBundleSha256": "51eb90cdbe1e0ebb2909130f6275a714c25b9e24b78c1688e7e3f4fb95917e7c",
+    "unitySignature": "UnityFS",
+    "unityPayloadOffset": 0,
+    "objectType": "Sprite",
+    "objectName": "Border_Icon_Colour",
+    "pathId": -4443469109255290003,
+    "width": 169,
+    "height": 169,
+    "hasAlpha": true,
+    "decodedPixelSha256": "98eac5a65f3a3523acecd70406c17faf04e6effe354c9c632183ecd8e86ce916",
+    "evidencePngSha256": "128c96f8ff3c2e2def6a0f1a76169587dcf0402cb9b251e436bd423a0b16bbd1",
+    "evidencePngBytes": 25295
+  },
+  "orchestration": {
+    "changedPathRule": "equipment-image",
+    "owners": [
+      "equipment-assets",
+      "equipment-frontend"
+    ],
+    "validators": [
+      "equipment-assets",
+      "production-build"
+    ],
+    "manualReviews": []
+  },
+  "validation": {
+    "provenanceWorkflow": "PASS",
+    "exactSerializedAssetResolution": "PASS_EQUIPMENT_SSR_FRAME_EXACT_ASSET",
+    "productionBuild": "PASS",
+    "trackedTreeMutationAfterValidation": false,
+    "equipmentAssetValidator": {
+      "classification": "EXISTING_DRIFT_REVIEW",
+      "blocker": false,
+      "baseSha": "a12b7c903fb1e1d7c86030e6cdd3685df3fa9a74",
+      "baseExitCode": 1,
+      "headExitCode": 1,
+      "sharedSignature": "Error: [EQUIPMENT_IMAGE_FINAL_INVALID] Browser evidence is stale for current inputs"
+    }
+  },
+  "boundaries": {
+    "frozenEquipmentStage2Reopened": false,
+    "productionEquipmentAssetsMutated": false,
+    "canonicalEquipmentMutated": false,
+    "frontendMutated": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false,
+    "filenameSimilarityUsedForSemanticMapping": false,
+    "crossRootFallbackUsed": false
+  },
+  "blockers": [],
+  "nonBlockingReview": [
+    "The existing Equipment final validator reports stale browser evidence on exact current main and the research branch with the same signature; this is existing drift, not a regression caused by this provenance scope."
+  ],
+  "nextOwner": "equipment-frontend",
+  "nextStart": "Consume the frozen exact SSR frame binding as a presentation asset. Do not re-resolve rank semantics or mutate the frozen 373 Equipment icon population. Start by checking the current Equipment frontend consumer and existing frame/CSS implementation, then make the smallest presentation-only change and run production build plus any impacted hosted/browser gate.",
+  "reopenConditions": [
+    "official APK/source snapshot changes",
+    "ConfigDataEquipmentInfo public Rank distribution changes",
+    "GetGoodsFrameNameByRank relocation target changes",
+    "serialized container key or decoded Sprite hash changes",
+    "a new authoritative contradiction is introduced"
+  ]
+}
