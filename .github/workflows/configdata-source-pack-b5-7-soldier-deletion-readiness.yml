@@ -1,0 +1,105 @@
+name: ConfigData B5.7 Soldier Deletion Readiness
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/validate-soldier-stage4-2-master.cjs'
+      - 'scripts/finalize-hero-soldier-relation-layer.cjs'
+      - 'scripts/validate-soldier-stage4-8-baseline.cjs'
+      - '.github/workflows/soldier-stage4-8-baseline.yml'
+      - 'data/validation/soldier-stage4-8-baseline.v1.json'
+      - '.github/workflows/configdata-source-pack-b5-7-soldier-deletion-readiness.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  external-root-proof:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Require clean tracked branch state
+        run: test -z "$(git status --porcelain --untracked-files=no)"
+
+      - name: Prove Soldier Stage4 maintenance with tracked ConfigData absent
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROOF="$RUNNER_TEMP/b57-soldier-proof"
+          git worktree add --detach "$PROOF" HEAD
+          rm -rf "$PROOF/data/configdata"
+          test ! -e "$PROOF/data/configdata"
+
+          (
+            cd "$PROOF"
+            node scripts/validate-soldier-stage4-1-input.cjs
+            node scripts/finalize-soldier-stage2.cjs
+            node scripts/validate-soldier-stage4-2-master.cjs
+            node scripts/finalize-hero-soldier-relation-layer.cjs
+            node scripts/validate-soldier-stage4-6-relation-consumer.cjs
+            node scripts/validate-soldier-stage4-8-baseline.cjs
+          )
+
+          PROOF="$PROOF" node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const crypto = require('crypto');
+          const cp = require('child_process');
+          const proof = process.env.PROOF;
+          const files = [
+            'data/generated/soldier-master.v1.json',
+            'data/validation/soldier-stage4-2-master.v1.json',
+            'data/generated/hero-soldier-relations.v1.json',
+            'data/generated/hero-soldier-by-hero.v1.json',
+            'data/generated/hero-soldier-by-soldier.v1.json',
+            'data/validation/hero-soldier-relation-validation.v1.json',
+            'data/validation/soldier-stage4-6-relation-consumer.v1.json',
+          ];
+          function stripVolatile(value) {
+            if (Array.isArray(value)) return value.map(stripVolatile);
+            if (value && typeof value === 'object') {
+              const out = {};
+              for (const key of Object.keys(value).sort()) {
+                if (key === 'generatedAt' || /blobsha$/i.test(key)) continue;
+                out[key] = stripVolatile(value[key]);
+              }
+              return out;
+            }
+            return value;
+          }
+          function digestText(text) {
+            return crypto.createHash('sha256').update(JSON.stringify(stripVolatile(JSON.parse(text)))).digest('hex');
+          }
+          for (const file of files) {
+            const frozen = cp.execFileSync('git', ['show', `HEAD:${file}`], { encoding: 'utf8' });
+            const regenerated = fs.readFileSync(path.join(proof, file), 'utf8');
+            const expected = digestText(frozen);
+            const actual = digestText(regenerated);
+            if (actual !== expected) throw new Error(`semantic drift after external-root regeneration: ${file}`);
+          }
+          const frozenBaseline = cp.execFileSync('git', ['show', 'HEAD:data/validation/soldier-stage4-8-baseline.v1.json']);
+          const proofBaseline = fs.readFileSync(path.join(proof, 'data/validation/soldier-stage4-8-baseline.v1.json'));
+          if (!frozenBaseline.equals(proofBaseline)) throw new Error('Stage4-8 frozen baseline mutated under external-root revalidation');
+          const baseline = JSON.parse(proofBaseline.toString('utf8'));
+          if (baseline.status !== 'PASS' || (baseline.errors || []).length !== 0) throw new Error('Stage4-8 baseline not PASS');
+          if ('inputAdapter' in (baseline.snapshots?.validations || {})) throw new Error('ephemeral Stage4-1 validation leaked back into frozen snapshot');
+          console.log(JSON.stringify({
+            status: 'PASS',
+            semanticParityFileCount: files.length,
+            stage4_8BaselineByteStable: true,
+            ephemeralInputAdapterFrozen: false,
+            logicalProvenanceChanged: false,
+            semanticAuthorityChanged: false,
+          }, null, 2));
+          NODE
+
+      - name: Require primary checkout unchanged
+        run: test -z "$(git status --porcelain --untracked-files=no)"
