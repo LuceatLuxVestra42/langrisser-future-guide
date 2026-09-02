@@ -1,14 +1,17 @@
 import fs from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 
-import {
+import { installConfigDataSourceRootReadRedirect } from '../lib/configdata-source-root.mjs';
+
+installConfigDataSourceRootReadRedirect();
+const {
   buildDependencyManifest,
   buildStage6Summary,
   detectStalePlan,
   loadContracts,
   renderJson,
-} from '../../../scripts/lib/configdata-lookup-stage6.mjs';
-import * as stage5 from '../../../scripts/lib/configdata-lookup-stage5.mjs';
+} = await import('../../../scripts/lib/configdata-lookup-stage6.mjs');
+const stage5 = await import('../../../scripts/lib/configdata-lookup-stage5.mjs');
 
 async function main() {
   execFileSync(process.execPath, ['tools/configdata-lookup/test/configdata-lookup-stage5-current-validator.mjs'], { stdio: 'inherit' });
@@ -54,6 +57,8 @@ async function main() {
     predecessorStatus: contracts.stage6.predecessor.requiredStatus,
     staleCount: plan.staleCount,
     rawConfigDataSemanticReopenCount: 0,
+    physicalSourceRootResolver: 'CONFIGDATA_SOURCE_ROOT',
+    logicalSourcePathNamespace: 'data/configdata',
   }, null, 2));
 }
 
