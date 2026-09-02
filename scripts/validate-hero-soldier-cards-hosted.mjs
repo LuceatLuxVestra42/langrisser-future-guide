@@ -4,13 +4,13 @@ const baseUrl = (process.env.HOSTED_BASE_URL || "https://luceatluxvestra42.githu
 const expectedSourceSha = process.env.EXPECTED_SOURCE_SHA;
 if (!expectedSourceSha) throw new Error("EXPECTED_SOURCE_SHA is required");
 
-// Independent hosted fixture for the Soldier-page presentation contract:
-// army type -> SP > T3 > T2 > T1 -> Soldier ID descending.
+// Independent hosted fixture for the Hero Soldier presentation contract:
+// SP > T3 > T2 > T1 -> army type -> Soldier ID descending.
 const expectedHero6SoldierIds = [
-  5248, 5231, 5203, 249, 248, 231, 203, 228, 201, 101,
-  5320, 5314, 5311, 341, 340, 339, 337, 336, 334, 320, 317, 311, 304, 301, 300,
-  5423, 5410, 5402, 426, 424, 410, 403, 407,
-  1036, 1032,
+  5248, 5231, 5203, 5320, 5314, 5311, 5423, 5410, 5402,
+  249, 248, 231, 203, 341, 340, 339, 337, 336, 334, 320, 317, 311, 426, 424, 410, 403, 1036, 1032,
+  228, 201, 101, 304, 301, 407,
+  300,
 ];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
