@@ -7,7 +7,7 @@
   "freezeState": "C1_INVENTORY_COMPLETE",
   "baseline": {
     "branch": "main",
-    "sha": "c76274ea805889fed23f716c954eb76dca4b29d1",
+    "sha": "151cd56ae3a53c98c7e5330c0e5aeeb82874e117",
     "ownerMapBlobSha": "345851004807de4d42c57d5bde391c8bba2c4655",
     "validatorCatalogBlobSha": "80cddeda6c93c06cf4b2435566c1890f30d1dcf7"
   },
@@ -22,10 +22,10 @@
     "idArithmeticInferenceCount": 0
   },
   "summary": {
-    "repositoryBlobCount": 4307,
-    "candidateCount": 1097,
-    "admittedCount": 640,
-    "manualReviewAdmissionCount": 457,
+    "repositoryBlobCount": 4312,
+    "candidateCount": 1099,
+    "admittedCount": 641,
+    "manualReviewAdmissionCount": 458,
     "projectCheckUnmatchedCount": 501,
     "exactPathHistoryMissingCount": 0,
     "jsonParseErrorCount": 0,
@@ -36,12 +36,12 @@
       "INVESTIGATION_EVIDENCE": 11,
       "MANIFEST": 2,
       "RETENTION_DECLARATION": 4,
-      "VALIDATION_EVIDENCE": 275
+      "VALIDATION_EVIDENCE": 276
     }
   },
   "inventoryDigest": {
     "algorithm": "sha256",
-    "value": "c1642e7031b66b9ab9a967f380698cc38125a861fd350a500aa953a0aa916941",
+    "value": "8876dfd996f028ff126273b8c39bb01e6671ed7ad04fe04b2c7c26aa9aee359c",
     "canonicalization": "JSON.stringify(sorted-record-array)"
   },
   "policy": {
@@ -26029,6 +26029,47 @@
       }
     },
     {
+      "path": "data/generated/soldier-training-tech-classification-stage5.v1.json",
+      "blobSha": "5c938be1dcfeb9e33e2503f73b926a6dcf7cb415",
+      "size": 16642,
+      "fileType": "JSON",
+      "firstCommit": "cf8b17020fd2075787d44d7daa2feb0c36caa6c4",
+      "lastCommit": "cf8b17020fd2075787d44d7daa2feb0c36caa6c4",
+      "historyMode": "EXACT_PATH_HISTORY_NO_RENAME_INFERENCE",
+      "discoveryClass": "CONDITIONAL",
+      "scopeAdmissionRole": null,
+      "scopeAdmissionReason": "C0:C0 conditional discovery:NO_EXPLICIT_ADMITTED_ROLE",
+      "admissionStatus": "MANUAL_REVIEW",
+      "parseStatus": "PARSED",
+      "projectCheckOwnerRuleIds": [
+        "soldier-canonical"
+      ],
+      "projectCheckOwners": [
+        "soldier-canonical"
+      ],
+      "projectCheckRoutingStatus": "MAPPED",
+      "explicitMetadata": {
+        "schemaId": "soldier-training-tech-classification-stage5/v1",
+        "version": 1,
+        "stage": "TrainingTech Classification Stage 5 - Full Record Classification",
+        "status": "PASS",
+        "completion": "COMPLETE",
+        "freezeState": "TRAINING_TECH_CLASSIFICATION_STAGE5_FULL_CLASSIFICATION_FROZEN",
+        "sourcePaths": [
+          "data/generated/soldier-training-tech-classification-stage1-census.v1.json"
+        ],
+        "predecessorPaths": [],
+        "artifactPaths": [],
+        "manifestPaths": [],
+        "commitShas": [],
+        "gitBlobShas": [
+          "30789c3e4fb0d79b56514e720bb71a053df78c72",
+          "ad8b290f0e34de24b6eab9538894068a06e086d4"
+        ],
+        "hashes": []
+      }
+    },
+    {
       "path": "data/hero-basic-combat-stage4-5.v1.json",
       "blobSha": "6ca3e9ee59611533cce8b75f4acd2acf80340200",
       "size": 5226,
@@ -37313,6 +37354,42 @@
         "gitBlobShas": [
           "33ba951fe0b3ed29fd20d92ba7ee583b16dda9cd"
         ],
+        "hashes": []
+      }
+    },
+    {
+      "path": "data/validation/soldier-training-tech-classification-stage5.v1.json",
+      "blobSha": "d28bbe0f7261bd40d69b47859302954225c60b9f",
+      "size": 3292,
+      "fileType": "JSON",
+      "firstCommit": "88ae4ec53030a914ac592df91752686d03450bf5",
+      "lastCommit": "88ae4ec53030a914ac592df91752686d03450bf5",
+      "historyMode": "EXACT_PATH_HISTORY_NO_RENAME_INFERENCE",
+      "discoveryClass": "PRIMARY",
+      "scopeAdmissionRole": "VALIDATION_EVIDENCE",
+      "scopeAdmissionReason": "C0:data/validation/**",
+      "admissionStatus": "ADMITTED",
+      "parseStatus": "PARSED",
+      "projectCheckOwnerRuleIds": [
+        "soldier-canonical"
+      ],
+      "projectCheckOwners": [
+        "soldier-canonical"
+      ],
+      "projectCheckRoutingStatus": "MAPPED",
+      "explicitMetadata": {
+        "schemaId": "soldier-training-tech-classification-stage5-validation/v1",
+        "version": 1,
+        "stage": "TrainingTech Classification Stage 5 - Full Record Classification",
+        "status": "PASS",
+        "completion": "COMPLETE",
+        "freezeState": "TRAINING_TECH_CLASSIFICATION_STAGE5_FULL_CLASSIFICATION_FROZEN",
+        "sourcePaths": [],
+        "predecessorPaths": [],
+        "artifactPaths": [],
+        "manifestPaths": [],
+        "commitShas": [],
+        "gitBlobShas": [],
         "hashes": []
       }
     },
