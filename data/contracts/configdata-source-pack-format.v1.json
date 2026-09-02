@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "contract": "configdata-source-pack-format",
+  "stage": "repository-size-reduction-B1a",
+  "status": "PASS",
+  "owner": "configdata-source-pack",
+  "purpose": "Freeze a deterministic exact-byte container format before building the ConfigData source snapshot. This contract defines transport layout only and does not create semantic meaning.",
+  "authoritativePredecessor": {
+    "routingBoundary": "data/contracts/configdata-source-pack-routing-boundary.v1.json",
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "rawSourceCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "logicalSourceRoot": "data/configdata",
+    "currentTrackedJsonCount": 753
+  },
+  "contentSelection": {
+    "scope": "DIRECT_CHILD_REGULAR_JSON_FILES_ONLY",
+    "includePattern": "data/configdata/*.json",
+    "recursive": false,
+    "directoriesIncludedAsMembers": false,
+    "symlinksAllowed": false,
+    "nonJsonFilesAllowed": false,
+    "memberPathPrefix": "data/configdata/",
+    "sourceBytesMustRemainExact": true,
+    "jsonReserializationAllowed": false,
+    "textTranscodingAllowed": false,
+    "newlineNormalizationAllowed": false
+  },
+  "ordering": {
+    "key": "FULL_ARCHIVE_MEMBER_PATH_UTF8_BYTES",
+    "direction": "ASCENDING",
+    "localeAware": false,
+    "numericAware": false,
+    "caseFolding": false
+  },
+  "archive": {
+    "fileName": "langrisser-configdata-source-pack-v1.tar",
+    "mediaType": "application/x-tar",
+    "format": "POSIX_USTAR",
+    "compression": "NONE",
+    "blockSize": 512,
+    "endOfArchiveZeroBlockCount": 2,
+    "extensionsAllowed": false,
+    "paxHeadersAllowed": false,
+    "gnuExtensionsAllowed": false,
+    "memberPathUtf8ByteLengthMax": 100
+  },
+  "regularFileHeader": {
+    "modeOctal": "0644",
+    "uid": 0,
+    "gid": 0,
+    "mtimeUnixSeconds": 0,
+    "typeFlag": "0",
+    "linkName": "",
+    "ustarMagic": "ustar\\0",
+    "ustarVersion": "00",
+    "userName": "",
+    "groupName": "",
+    "deviceMajor": 0,
+    "deviceMinor": 0,
+    "dataPaddingByte": 0
+  },
+  "identityPolicy": {
+    "contentIdentityAuthorityStage": "B1b",
+    "contentIdentityRequiresExactFileSet": true,
+    "contentIdentityRequiresPerFileSha256": true,
+    "contentIdentityRequiresPerFileByteLength": true,
+    "archiveSha256Role": "TRANSPORT_CONTAINER_INTEGRITY_ONLY",
+    "archiveSha256CreatesSemanticAuthority": false,
+    "archiveMemberOrderCreatesSemanticMeaning": false
+  },
+  "determinism": {
+    "sameExactInputSetMustProduceSameArchiveBytes": true,
+    "filesystemMtimeMayAffectOutput": false,
+    "filesystemOwnershipMayAffectOutput": false,
+    "hostLocaleMayAffectOutput": false,
+    "hostPathSeparatorMayAffectOutput": false,
+    "sourceTraversalOrderMayAffectOutput": false,
+    "failClosedOnUnrepresentableUstarMemberPath": true
+  },
+  "productionBoundary": {
+    "productionRuntimeFetchesThisArchive": false,
+    "productionRuntimeReadsRawConfigData": false,
+    "rawConfigDataRuntimeFallbackAllowed": false
+  },
+  "semanticBoundary": {
+    "semanticAuthorityChanged": false,
+    "frozenSemanticDomainsReopened": false,
+    "canonicalIdentityChanges": false,
+    "relationChanges": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "filenameSimilarityIntroduced": false,
+    "sourceMeaningReinterpreted": false
+  },
+  "handoff": {
+    "completion": "B1A_DETERMINISTIC_PACK_FORMAT_FROZEN",
+    "nextOwner": "configdata-source-pack",
+    "nextStage": "B1b-exact-byte-snapshot"
+  }
+}
