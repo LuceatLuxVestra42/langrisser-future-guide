@@ -11,6 +11,7 @@ on:
       - "data/validation/soldier-training-tech-common-stat-effect-extraction.v1.json"
       - "scripts/build-soldier-training-tech-common-stat-effect-extraction.mjs"
       - "scripts/validate-soldier-training-tech-common-stat-effect-extraction.mjs"
+      - "scripts/compact-soldier-training-tech-common-stat-effect-extraction.mjs"
       - ".github/workflows/soldier-training-tech-common-stat-effect-extraction.yml"
   workflow_dispatch:
 
@@ -42,11 +43,14 @@ jobs:
           test "$ACTUAL_BLOB" = "$EXPECTED_BLOB"
           echo "TRAINING_TECH_LEVEL_SOURCE=$RUNNER_TEMP/ConfigDataTrainingTechLevelInfo.json" >> "$GITHUB_ENV"
 
-      - name: Reproduce extraction artifact
+      - name: Reproduce expanded extraction artifact
         run: node scripts/build-soldier-training-tech-common-stat-effect-extraction.mjs --write
 
       - name: Reproduce independent validation artifact
         run: node scripts/validate-soldier-training-tech-common-stat-effect-extraction.mjs --write
+
+      - name: Project validated result into compact frozen consumer
+        run: node scripts/compact-soldier-training-tech-common-stat-effect-extraction.mjs
 
       - name: Upload exact reproduction outputs
         uses: actions/upload-artifact@v4
@@ -63,11 +67,11 @@ jobs:
           set -euo pipefail
           test -z "$(git status --porcelain)"
 
-      - name: Check extraction artifact
-        run: node scripts/build-soldier-training-tech-common-stat-effect-extraction.mjs --check
-
-      - name: Check independent validation artifact
-        run: node scripts/validate-soldier-training-tech-common-stat-effect-extraction.mjs --check
+      - name: Reproduce compact extraction and validation again
+        run: |
+          node scripts/build-soldier-training-tech-common-stat-effect-extraction.mjs --write
+          node scripts/validate-soldier-training-tech-common-stat-effect-extraction.mjs --write
+          node scripts/compact-soldier-training-tech-common-stat-effect-extraction.mjs
 
       - name: Require validation to leave no repository mutation
         shell: bash
