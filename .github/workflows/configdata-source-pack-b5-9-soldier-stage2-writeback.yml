@@ -1,0 +1,101 @@
+name: ConfigData B5.9 Soldier Stage2 Writeback Readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/finalize-soldier-stage2.cjs'
+      - '.github/workflows/soldier-stage2-final.yml'
+      - '.github/workflows/configdata-source-pack-b5-9-soldier-stage2-writeback.yml'
+      - 'data/contracts/configdata-source-pack-b5-9-soldier-stage2-writeback.v1.json'
+
+permissions:
+  contents: read
+
+jobs:
+  external-root-proof:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Require clean tracked branch state
+        run: test -z "$(git status --porcelain --untracked-files=no)"
+
+      - name: Regenerate Soldier Stage2 with tracked ConfigData absent
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROOF="$RUNNER_TEMP/b59-soldier-stage2-proof"
+          echo "PROOF=$PROOF" >> "$GITHUB_ENV"
+          git worktree add --detach "$PROOF" HEAD
+          rm -rf "$PROOF/data/configdata"
+          test ! -e "$PROOF/data/configdata"
+          (
+            cd "$PROOF"
+            node scripts/finalize-soldier-stage2.cjs
+          )
+
+      - name: Require frozen semantic parity and logical provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROOF="$PROOF" node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const proof = process.env.PROOF;
+          const masterPath = 'data/generated/soldier-master.v1.json';
+          const validationPath = 'data/validation/soldier-stage2-final.v1.json';
+          const frozenMaster = JSON.parse(fs.readFileSync(masterPath, 'utf8'));
+          const regeneratedMaster = JSON.parse(fs.readFileSync(path.join(proof, masterPath), 'utf8'));
+          if (JSON.stringify(frozenMaster) !== JSON.stringify(regeneratedMaster)) {
+            throw new Error('Soldier Stage2 external-root master semantic drift');
+          }
+          const frozenValidation = JSON.parse(fs.readFileSync(validationPath, 'utf8'));
+          const regeneratedValidation = JSON.parse(fs.readFileSync(path.join(proof, validationPath), 'utf8'));
+          const normalize = (value) => {
+            if (Array.isArray(value)) return value.map(normalize);
+            if (value && typeof value === 'object') {
+              const out = {};
+              for (const key of Object.keys(value).sort()) {
+                if (key === 'generatedAt') continue;
+                out[key] = normalize(value[key]);
+              }
+              return out;
+            }
+            return value;
+          };
+          if (JSON.stringify(normalize(frozenValidation)) !== JSON.stringify(normalize(regeneratedValidation))) {
+            throw new Error('Soldier Stage2 external-root validation semantic drift');
+          }
+          const expectedSources = {
+            soldier: 'data/configdata/ConfigDataSoldierInfo.json',
+            spSoldier: 'data/configdata/ConfigDataSPSoldierInfo.json',
+            army: 'data/configdata/ConfigDataArmyInfo.json',
+            tier3KoreanMap: 'data/metadata/soldier-name-kr-tier3.v1.json',
+          };
+          if (JSON.stringify(regeneratedValidation.sources) !== JSON.stringify(expectedSources)) {
+            throw new Error(`Soldier Stage2 external-root logical provenance drift: ${JSON.stringify(regeneratedValidation.sources)}`);
+          }
+          if ((regeneratedValidation.errors || []).length !== 0) {
+            throw new Error('Soldier Stage2 external-root validation has hard errors');
+          }
+          console.log(JSON.stringify({
+            status: 'PASS',
+            trackedRawRootPresentInProof: false,
+            masterRecordCount: regeneratedMaster.records?.length ?? null,
+            validationStatus: regeneratedValidation.status,
+            logicalProvenanceChanged: false,
+            semanticAuthorityChanged: false,
+            frozenSemanticDomainsReopened: false,
+          }, null, 2));
+          NODE
+
+      - name: Require primary checkout unchanged
+        run: test -z "$(git status --porcelain --untracked-files=no)"
