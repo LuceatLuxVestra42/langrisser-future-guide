@@ -1,0 +1,44 @@
+name: Project Check TrainingTech Routing Format Fix
+
+on:
+  push:
+    branches:
+      - project-check/soldier-training-tech-classification-evidence-routing
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+      - name: Restore main formatting and insert one explicit rule
+        run: |
+          git show origin/main:tools/project-check/contracts/owners.v1.json > /tmp/owners.base.json
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'tools/project-check/contracts/owners.v1.json';
+          let text = fs.readFileSync('/tmp/owners.base.json', 'utf8');
+          if (!text.includes('"id":"soldier-training-tech-classification-evidence"')) {
+            const marker = '    {\n      "id":"soldier-canonical",';
+            if (!text.includes(marker)) throw new Error('soldier-canonical insertion marker not found');
+            const rule = '    {\n      "id":"soldier-training-tech-classification-evidence",\n      "patterns":["data/evidence/soldier-training-tech-classification-*"],\n      "owners":["soldier-canonical"]\n    },\n';
+            text = text.replace(marker, rule + marker);
+          }
+          fs.writeFileSync(path, text);
+          NODE
+      - name: Run Project Check self-test
+        run: node tools/project-check/test/project-check-self-test.mjs
+      - name: Persist minimal owner map
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/project-check/contracts/owners.v1.json
+          git commit -m "Minimize TrainingTech classification evidence routing diff"
+          git push
