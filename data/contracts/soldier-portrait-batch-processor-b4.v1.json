@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "schemaId": "soldier-portrait-batch-processor-b4/v1",
+  "stage": "B4",
+  "status": "PASS",
+  "owner": "soldier-assets",
+  "validationCheckpoint": "data/validation/soldier-portrait-b4-fixture-validation.v1.json",
+  "authoritativePredecessors": {
+    "currentAssetLocator": "data/contracts/soldier-portrait-assets-current.v1.json",
+    "batchPlanner": "data/contracts/soldier-portrait-batch-planner.v1.json",
+    "currentProductionPlan": "data/validation/soldier-portrait-batch-plan.v1.json"
+  },
+  "tools": {
+    "sourceResolver": "scripts/resolve-soldier-portrait-batch-b4.mjs",
+    "batchProcessor": "scripts/process-soldier-portrait-batch-b4.mjs",
+    "imageInspector": "scripts/inspect-soldier-portrait-image-b4.py",
+    "fixtureValidator": "scripts/validate-soldier-portrait-batch-processor-b4.mjs",
+    "predecessorHydrator": "scripts/hydrate-soldier-portrait-source-pack-v1.mjs"
+  },
+  "runtimePrerequisites": {
+    "node": ">=22",
+    "python": ">=3",
+    "pythonPillow": true,
+    "cwebp": true,
+    "tar": true
+  },
+  "pipeline": [
+    "consume explicit B3 newIds or an explicitly fixture-only test batch",
+    "resolve only explicitly bound source records into a temporary PNG intake directory",
+    "validate exact intake ID/file set, PNG format and current transparency gate",
+    "hydrate all predecessor PNG bytes from the locator-selected immutable source-pack contract",
+    "copy predecessor WebP bytes unchanged from the locator-selected production WebP manifest",
+    "convert only new PNGs with cwebp lossless mode and verify decoded-pixel equality",
+    "assemble full next source/WebP candidate sets in temporary output",
+    "emit candidate manifest, inventory, archive, checksums and non-promotable fixture contract metadata"
+  ],
+  "productionPolicy": {
+    "requiresBatchReady": true,
+    "requiresRemovedIdsEmpty": true,
+    "existingPngRedownloadAllowed": false,
+    "existingWebpReencodeAllowed": false,
+    "newPngTemporaryOutsideRepository": true,
+    "newWebpOnlyConversion": true,
+    "losslessWebpRequired": true,
+    "decodedPixelExactRequired": true,
+    "releaseAssetOverwriteAllowed": false,
+    "currentLocatorMutationAllowedInB4": false,
+    "currentWebProjectionMutationAllowedInB4": false
+  },
+  "fixturePolicy": {
+    "fixtureContract": "data/contracts/soldier-portrait-b4-fixture-batch.v1.json",
+    "productionAdmissionAllowed": false,
+    "fixtureIdsMayCreateSemanticMeaning": false,
+    "fixtureImagesAreRealGameAssets": false,
+    "fixtureOutputIsTemporary": true
+  },
+  "boundaries": {
+    "semanticAuthority": false,
+    "semanticRecomputation": false,
+    "canonicalJoinRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "automaticVersionDiscovery": false,
+    "rawConfigDataRead": false,
+    "currentProductionPlanMustRemainNoUpdateRequiredUntilCanonicalDelta": true
+  }
+}
