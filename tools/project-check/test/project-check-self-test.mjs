@@ -256,6 +256,17 @@ expectOwners(
   ['soldier-canonical'],
 );
 
+expectOwners(
+  'tools/evidence-lifecycle/generated/c1-inventory.v1.json',
+  ['evidence-lifecycle'],
+  ['evidence-lifecycle-readonly'],
+);
+expectOwners(
+  '.github/workflows/evidence-lifecycle-c1-bootstrap.yml',
+  ['evidence-lifecycle'],
+  ['evidence-lifecycle-readonly'],
+);
+
 const bannerAsset = routeProjectCheckPaths(['public/images/banners/Banner/probe.png'], contracts);
 assert.equal(bannerAsset.status, 'MANUAL_REVIEW');
 assert.deepEqual(bannerAsset.files[0].owners, ['banner-assets', 'banner-frontend']);
