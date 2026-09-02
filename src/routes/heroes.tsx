@@ -88,7 +88,11 @@ function resolvePublicAssetUrl(webAssetPath: string) {
 function HeroGridPage() {
   const data = Route.useLoaderData();
   const [query, setQuery] = useState("");
-  const [filterSection, setFilterSection] = useState<FilterSection>("rarity");
+  const [openFilterSections, setOpenFilterSections] = useState<Record<FilterSection, boolean>>({
+    rarity: true,
+    faction: false,
+    origin: false,
+  });
   const [rarity, setRarity] = useState(ALL_RARITIES);
   const [factionId, setFactionId] = useState<number | null>(null);
   const [originId, setOriginId] = useState<number | null>(null);
@@ -180,9 +184,16 @@ function HeroGridPage() {
     originId !== null ||
     spOnly;
 
+  const toggleFilterSection = (section: FilterSection) => {
+    setOpenFilterSections((current) => ({
+      ...current,
+      [section]: !current[section],
+    }));
+  };
+
   const resetFilters = () => {
     setQuery("");
-    setFilterSection("rarity");
+    setOpenFilterSections({ rarity: true, faction: false, origin: false });
     setRarity(ALL_RARITIES);
     setFactionId(null);
     setOriginId(null);
@@ -205,20 +216,20 @@ function HeroGridPage() {
               <span className="mb-1.5 block text-xs font-bold text-foreground">통합 필터</span>
               <div className="flex flex-wrap gap-1.5" role="group" aria-label="통합 필터 분류">
                 <FilterSectionButton
-                  active={filterSection === "rarity"}
-                  onClick={() => setFilterSection("rarity")}
+                  active={openFilterSections.rarity}
+                  onClick={() => toggleFilterSection("rarity")}
                 >
                   희귀도
                 </FilterSectionButton>
                 <FilterSectionButton
-                  active={filterSection === "faction"}
-                  onClick={() => setFilterSection("faction")}
+                  active={openFilterSections.faction}
+                  onClick={() => toggleFilterSection("faction")}
                 >
                   진영
                 </FilterSectionButton>
                 <FilterSectionButton
-                  active={filterSection === "origin"}
-                  onClick={() => setFilterSection("origin")}
+                  active={openFilterSections.origin}
+                  onClick={() => toggleFilterSection("origin")}
                 >
                   출전작
                 </FilterSectionButton>
@@ -236,8 +247,8 @@ function HeroGridPage() {
             </button>
           </div>
 
-          <div className="mt-3 border-t border-border pt-3">
-            {filterSection === "rarity" ? (
+          <div className="mt-3 space-y-3 border-t border-border pt-3">
+            {openFilterSections.rarity ? (
               <div className="flex flex-wrap gap-1.5" role="group" aria-label="희귀도 필터">
                 <FilterButton
                   active={rarity === ALL_RARITIES}
@@ -269,7 +280,7 @@ function HeroGridPage() {
               </div>
             ) : null}
 
-            {filterSection === "faction" ? (
+            {openFilterSections.faction ? (
               <div className="flex flex-wrap gap-1.5" role="group" aria-label="진영 필터">
                 <FilterButton active={factionId === null} onClick={() => setFactionId(null)}>
                   전체
@@ -286,7 +297,7 @@ function HeroGridPage() {
               </div>
             ) : null}
 
-            {filterSection === "origin" ? (
+            {openFilterSections.origin ? (
               <div className="flex flex-wrap gap-1.5" role="group" aria-label="출전작 필터">
                 <FilterButton active={originId === null} onClick={() => setOriginId(null)}>
                   전체
