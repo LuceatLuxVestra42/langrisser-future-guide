@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "schemaId": "soldier-portrait-b4-fixture-validation/v1",
+  "stage": "B4",
+  "status": "PASS",
+  "owner": "soldier-assets",
+  "scope": "B4 incremental Soldier portrait pipeline implementation validated with an explicitly non-production four-ID fixture batch.",
+  "authoritativePredecessors": {
+    "currentAssetLocator": "data/contracts/soldier-portrait-assets-current.v1.json",
+    "batchPlannerContract": "data/contracts/soldier-portrait-batch-planner.v1.json",
+    "productionBatchPlan": "data/validation/soldier-portrait-batch-plan.v1.json",
+    "sourcePackContract": "data/contracts/soldier-portrait-source-pack.v1.json"
+  },
+  "productionState": {
+    "status": "NO_UPDATE_REQUIRED",
+    "newIds": [],
+    "removedIds": [],
+    "productionBatchCreated": false,
+    "currentLocatorChanged": false,
+    "currentWebProjectionChanged": false,
+    "repositoryAssetBytesChanged": false
+  },
+  "fixture": {
+    "contract": "data/contracts/soldier-portrait-b4-fixture-batch.v1.json",
+    "fixtureOnly": true,
+    "ids": [990001, 990002, 990003, 990004],
+    "realGameAssets": false,
+    "productionAdmissionAllowed": false
+  },
+  "validatedResult": {
+    "previousSourceHydrated": 224,
+    "previousSourceBytes": 48931121,
+    "generatedWebpIds": [990001, 990002, 990003, 990004],
+    "candidateSourceCount": 228,
+    "candidateWebpCount": 228,
+    "missingIntakeGate": "BLOCKER",
+    "extraIntakeGate": "BLOCKER",
+    "transparencyGate": "BLOCKER",
+    "losslessDecodedPixelParity": "PASS",
+    "oldPngRedownloaded": false,
+    "oldWebpReencoded": false,
+    "releaseAssetOverwriteAllowed": false
+  },
+  "evidence": {
+    "implementationHeadSha": "614b29af149da0514afa1ba42a5acf079f05840b",
+    "baseMainSha": "d73ed6dd8e2af1a17f9d4d4a67d895400afc0ce5",
+    "b4WorkflowRunId": 33574303345,
+    "b4WorkflowJobId": 100074782960,
+    "projectCheckRunId": 33574303270,
+    "sourcePackReleaseTag": "source-assets-soldier-v9-5dc09049",
+    "sourcePackArchiveSha256": "1a2d56ba43d3f83390208d1351eb9c48d38f80adfe95b19afee1c27b54ad3cb6"
+  },
+  "boundaries": {
+    "semanticAuthority": false,
+    "semanticRecomputation": false,
+    "canonicalPopulationChange": false,
+    "heroSoldierRelationChange": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "automaticVersionDiscovery": false,
+    "rawConfigDataRead": false
+  },
+  "blocker": null,
+  "review": null,
+  "nextStage": "B5 regression fixtures"
+}
