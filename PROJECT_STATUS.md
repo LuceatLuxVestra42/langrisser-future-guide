@@ -5,7 +5,7 @@
 - Project health: **REVIEW**
 - Hard errors: **0**
 - Reported review entries: **28**
-- Health-impact review entries: **9**
+- Health-impact review entries: **8**
 - Blockers: **0**
 - Source: `tools/project-status/lib/normalize-project-status.mjs`
 
@@ -22,18 +22,18 @@
 
 > Reported review entry는 source에 남아 있는 review 기록 수다. 현재 health를 REVIEW로 만드는 항목 수와 같지 않다.
 
-- Active review entries: **9**
+- Active review entries: **8**
 - Resolved by evidence: **2**
 - Deferred non-errors: **8**
-- Boundary notes: **9**
-- Assigned health-impact issues: **6**
+- Boundary notes: **10**
+- Assigned health-impact issues: **5**
 - Unique assigned issues: **25**
 - Unassigned review entries: **1**
 
 | Domain | Reported | Health-impact | Active | Resolved | Deferred | Boundary | Health |
 |---|---:|---:|---:|---:|---:|---:|---|
 | hero | 2 | 1 | 1 | 0 | 0 | 1 | REVIEW |
-| soldier | 12 | 4 | 4 | 2 | 1 | 5 | REVIEW |
+| soldier | 12 | 3 | 3 | 2 | 1 | 6 | REVIEW |
 | equipment | 1 | 1 | 1 | 0 | 0 | 0 | REVIEW |
 | hero-soldier | 5 | 2 | 2 | 0 | 0 | 3 | REVIEW |
 | banner | 8 | 1 | 1 | 0 | 7 | 0 | REVIEW |
@@ -49,7 +49,6 @@
 | EQUIPMENT_SECONDARY_ARCHIVE_PROVENANCE | equipment | 1 | 1 |
 | SOLDIER_KR_NAME_OFFICIAL_CONFIRMATION | hero-soldier, soldier | 2 | 2 |
 | SOLDIER_RELEASE_DATE_METADATA | hero-soldier, soldier | 2 | 2 |
-| SOLDIER_SAME_PATCH_ORDER | soldier | 1 | 1 |
 | SOLDIER_SP_INTERNAL_RELEASE_ORDER | soldier | 1 | 1 |
 
 ## 운용 경계
