@@ -1,0 +1,57 @@
+name: Soldier TrainingTech COMMON_PASSIVE Effect Audit
+
+on:
+  pull_request:
+    paths:
+      - "data/contracts/soldier-training-tech-effect-extraction-boundary.v1.json"
+      - "data/generated/soldier-training-tech-classification-stage1-census.v1.json"
+      - "data/generated/soldier-training-tech-classification-stage5.v1.json"
+      - "data/validation/soldier-training-tech-classification-stage5.v1.json"
+      - "scripts/audit-soldier-training-tech-common-passive-effects.mjs"
+      - ".github/workflows/soldier-training-tech-common-passive-effect-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  common-passive-effect-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Recover exact frozen TrainingTechLevel source snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_COMMIT="172d836e59fbdd84bca5e44a9b2e26d8812a927f"
+          SOURCE_PATH="data/configdata/ConfigDataTrainingTechLevelInfo.json"
+          EXPECTED_BLOB="30789c3e4fb0d79b56514e720bb71a053df78c72"
+          git fetch --no-tags --depth=1 origin "$SOURCE_COMMIT"
+          git show "$SOURCE_COMMIT:$SOURCE_PATH" > "$RUNNER_TEMP/ConfigDataTrainingTechLevelInfo.json"
+          ACTUAL_BLOB="$(git hash-object "$RUNNER_TEMP/ConfigDataTrainingTechLevelInfo.json")"
+          test "$ACTUAL_BLOB" = "$EXPECTED_BLOB"
+          echo "TRAINING_TECH_LEVEL_SOURCE=$RUNNER_TEMP/ConfigDataTrainingTechLevelInfo.json" >> "$GITHUB_ENV"
+          echo "COMMON_PASSIVE_AUDIT_OUT=$RUNNER_TEMP/common-passive-effect-audit.v1.json" >> "$GITHUB_ENV"
+
+      - name: Audit frozen COMMON_PASSIVE descriptions
+        run: node scripts/audit-soldier-training-tech-common-passive-effects.mjs
+
+      - name: Upload passive audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-tech-common-passive-effect-audit
+          if-no-files-found: error
+          path: ${{ runner.temp }}/common-passive-effect-audit.v1.json
+
+      - name: Require audit to leave repository unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain)"
