@@ -272,6 +272,10 @@ function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number
   const current = tech.levels[level - 1];
   const previous = level > 1 ? tech.levels[level - 2] : null;
 
+  if (!current) {
+    return <p className="mt-2 text-sm text-muted-foreground">선택한 레벨 정보를 찾을 수 없어.</p>;
+  }
+
   if (current.statEffects) {
     return (
       <div className="mt-2 space-y-2">
