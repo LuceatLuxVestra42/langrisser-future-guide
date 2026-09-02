@@ -20,7 +20,8 @@ function requireExcludes(text, forbidden, label) {
 }
 
 function validateExternalWorkflow(text, label) {
-  requireIncludes(text, 'CONFIGDATA_SOURCE_ROOT:', label);
+  requireIncludes(text, 'echo "CONFIGDATA_SOURCE_ROOT=$RUNNER_TEMP/', label);
+  requireIncludes(text, '>> "$GITHUB_ENV"', label);
   requireIncludes(text, 'scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$CONFIGDATA_SOURCE_ROOT"', label);
   requireIncludes(text, 'test "$count" = "753"', label);
   requireIncludes(text, 'external ConfigData source root must stay outside repository', label);
