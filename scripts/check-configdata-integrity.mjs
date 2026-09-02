@@ -33,6 +33,72 @@ function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
+function validateLegacyObject(data, result, basename) {
+  const keys = Object.keys(data)
+
+  if (keys.length === 1 && keys[0] === 'm_GameObject' && data.m_GameObject === null) {
+    addIssue(result, 'SUSPECT', 'contains only m_GameObject=null')
+  }
+
+  if ('m_Enabled' in data && typeof data.m_Enabled === 'number' && ![0, 1].includes(data.m_Enabled)) {
+    addIssue(result, 'BROKEN', `invalid m_Enabled=${data.m_Enabled}`)
+  }
+
+  if ('m_size' in data) {
+    if (!Number.isInteger(data.m_size) || data.m_size < 0) {
+      addIssue(result, 'BROKEN', `invalid m_size=${String(data.m_size)}`)
+    }
+  }
+
+  if ('m_bytes' in data) {
+    if (data.m_bytes === null) {
+      if (typeof data.m_size === 'number' && data.m_size > 0) {
+        addIssue(result, 'BROKEN', `m_bytes=null while m_size=${data.m_size}`)
+      } else {
+        addIssue(result, 'SUSPECT', 'm_bytes=null')
+      }
+    } else if (!Array.isArray(data.m_bytes)) {
+      addIssue(result, 'BROKEN', 'm_bytes is neither an array nor null')
+    } else {
+      const invalidByte = data.m_bytes.findIndex(
+        (value) => !Number.isInteger(value) || value < 0 || value > 255,
+      )
+      if (invalidByte !== -1) {
+        addIssue(result, 'BROKEN', `m_bytes contains invalid byte at index ${invalidByte}`)
+      }
+
+      if (Number.isInteger(data.m_size) && data.m_size !== data.m_bytes.length) {
+        addIssue(
+          result,
+          'BROKEN',
+          `m_size=${data.m_size} but m_bytes.length=${data.m_bytes.length}`,
+        )
+      }
+    }
+  }
+
+  if (typeof data.m_Name === 'string' && data.m_Name.length > 0 && data.m_Name !== basename) {
+    addIssue(result, 'SUSPECT', `m_Name=${JSON.stringify(data.m_Name)} differs from filename`)
+  }
+}
+
+function validateParsedJsonRoot(data, result, basename) {
+  if (Array.isArray(data)) {
+    const invalidRecord = data.findIndex((record) => !isPlainObject(record))
+    if (invalidRecord !== -1) {
+      addIssue(result, 'BROKEN', `array record at index ${invalidRecord} is not an object`)
+    }
+    return
+  }
+
+  if (isPlainObject(data)) {
+    validateLegacyObject(data, result, basename)
+    return
+  }
+
+  addIssue(result, 'BROKEN', 'JSON root is neither a record array nor an object')
+}
+
 function extractDumpTypes(dumpText) {
   const classes = new Set()
   const parsers = new Set()
@@ -92,58 +158,7 @@ async function inspectFile(filename, dumpMetadata) {
       )
     }
 
-    if (data !== undefined) {
-      if (!isPlainObject(data)) {
-        addIssue(result, 'BROKEN', 'JSON root is not an object')
-      } else {
-        const keys = Object.keys(data)
-
-        if (keys.length === 1 && keys[0] === 'm_GameObject' && data.m_GameObject === null) {
-          addIssue(result, 'SUSPECT', 'contains only m_GameObject=null')
-        }
-
-        if ('m_Enabled' in data && typeof data.m_Enabled === 'number' && ![0, 1].includes(data.m_Enabled)) {
-          addIssue(result, 'BROKEN', `invalid m_Enabled=${data.m_Enabled}`)
-        }
-
-        if ('m_size' in data) {
-          if (!Number.isInteger(data.m_size) || data.m_size < 0) {
-            addIssue(result, 'BROKEN', `invalid m_size=${String(data.m_size)}`)
-          }
-        }
-
-        if ('m_bytes' in data) {
-          if (data.m_bytes === null) {
-            if (typeof data.m_size === 'number' && data.m_size > 0) {
-              addIssue(result, 'BROKEN', `m_bytes=null while m_size=${data.m_size}`)
-            } else {
-              addIssue(result, 'SUSPECT', 'm_bytes=null')
-            }
-          } else if (!Array.isArray(data.m_bytes)) {
-            addIssue(result, 'BROKEN', 'm_bytes is neither an array nor null')
-          } else {
-            const invalidByte = data.m_bytes.findIndex(
-              (value) => !Number.isInteger(value) || value < 0 || value > 255,
-            )
-            if (invalidByte !== -1) {
-              addIssue(result, 'BROKEN', `m_bytes contains invalid byte at index ${invalidByte}`)
-            }
-
-            if (Number.isInteger(data.m_size) && data.m_size !== data.m_bytes.length) {
-              addIssue(
-                result,
-                'BROKEN',
-                `m_size=${data.m_size} but m_bytes.length=${data.m_bytes.length}`,
-              )
-            }
-          }
-        }
-
-        if (typeof data.m_Name === 'string' && data.m_Name.length > 0 && data.m_Name !== basename) {
-          addIssue(result, 'SUSPECT', `m_Name=${JSON.stringify(data.m_Name)} differs from filename`)
-        }
-      }
-    }
+    if (data !== undefined) validateParsedJsonRoot(data, result, basename)
   }
 
   if (dumpMetadata.available) {
@@ -223,9 +238,12 @@ async function main() {
   }
 
   console.log('\nNotes:')
+  console.log('- Current UnityDataTool ConfigData sources are JSON record arrays; an empty array is valid.')
+  console.log('- Array entries must be JSON objects; malformed non-object records are BROKEN.')
+  console.log('- Legacy object-root integrity checks remain supported for compatibility.')
   console.log('- SUSPECT means manual verification/re-export may be needed; it is not proof of corruption.')
-  console.log('- BROKEN means the exported JSON itself is internally inconsistent or unusable.')
-  console.log('- AssetStudio 753-name completeness comparison is intentionally deferred to stage 2.')
+  console.log('- BROKEN means the parsed JSON itself is structurally inconsistent or unusable.')
+  console.log('- Duplicate-content groups are reported for inspection and do not fail this structural integrity gate.')
 
   if (counts.BROKEN > 0) process.exitCode = 1
 }
