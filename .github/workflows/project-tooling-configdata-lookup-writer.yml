@@ -23,6 +23,8 @@ concurrency:
 jobs:
   explicit-materialization-writer:
     runs-on: ubuntu-latest
+    env:
+      CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-lookup-writer-source
     steps:
       - name: Validate explicit writer request
         shell: bash
@@ -50,6 +52,32 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Hydrate and verify pinned ConfigData source pack outside repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$CONFIGDATA_SOURCE_ROOT"
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$CONFIGDATA_SOURCE_ROOT"
+          count="$(find "$CONFIGDATA_SOURCE_ROOT/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$count" = "753"
+          case "$CONFIGDATA_SOURCE_ROOT/" in
+            "$GITHUB_WORKSPACE/"*) echo 'external ConfigData source root must stay outside repository' >&2; exit 1 ;;
+          esac
+
+      - name: Make tracked ConfigData unavailable during writer execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-writer-tracked-hidden"
+          rm -rf "$hidden_raw"
+          if [ -d "$tracked_raw" ]; then
+            mv "$tracked_raw" "$hidden_raw"
+          fi
+          test ! -e "$tracked_raw"
+
       - name: Validate Stage 5 predecessor through current compatibility gate
         run: npm run validate:configdata-lookup-stage5
 
@@ -59,8 +87,20 @@ jobs:
       - name: Validate Stage 6 materialization through current compatibility gate
         run: node tools/configdata-lookup/test/configdata-lookup-stage6-current-validator.mjs
 
-      - name: Require clean stale plan
-        run: npm run check:configdata-lookup-stage6
+      - name: Require clean stale plan through current source-root adapter
+        run: node tools/configdata-lookup/cli/check-freshness.mjs
+
+      - name: Restore tracked ConfigData when present in this revision
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-writer-tracked-hidden"
+          if [ -d "$hidden_raw" ]; then
+            test ! -e "$tracked_raw"
+            mv "$hidden_raw" "$tracked_raw"
+          fi
 
       - name: Commit only ConfigData Lookup materialization
         shell: bash
