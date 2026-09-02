@@ -8,6 +8,7 @@ on:
       - scripts/equipment-image-ssr-frame-provenance-v2.py
       - scripts/equipment-image-ssr-frame-asset-provenance.py
       - scripts/equipment-image-ssr-frame-asset-resolution.py
+      - data/checkpoints/equipment-image-ssr-frame-provenance.v1.json
       - .github/workflows/equipment-image-ssr-frame-provenance-v2.yml
   workflow_dispatch:
 
@@ -148,6 +149,37 @@ jobs:
           print(json.dumps(d, ensure_ascii=False, indent=2))
           PY
 
+      - name: Require checkpoint parity with regenerated proof
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          checkpoint = json.loads(Path('data/checkpoints/equipment-image-ssr-frame-provenance.v1.json').read_text())
+          resolution = json.loads(Path('artifacts/equipment-ssr-frame-asset-resolution.v2.json').read_text())
+          selected = resolution['selectedBinding']
+
+          assert checkpoint['status'] == 'PASS_EQUIPMENT_SSR_FRAME_PROVENANCE', checkpoint
+          assert checkpoint['completion'] == 'COMPLETE', checkpoint
+          assert checkpoint['rankProof']['currentPublicEquipmentRankDistribution'] == {'4': 373}, checkpoint
+          assert checkpoint['rankProof']['fallbackTable']['4'] == resolution['semanticConclusion']['rank4RuntimeFramePath'], checkpoint
+          assert checkpoint['exactAssetBinding']['runtimeLocator'] == resolution['semanticConclusion']['rank4RuntimeFramePath'], checkpoint
+          assert checkpoint['exactAssetBinding']['serializedContainerKey'] == selected['serializedContainerKey'], checkpoint
+          assert checkpoint['exactAssetBinding']['officialApkBundleEntry'] == selected['apkEntry'], checkpoint
+          assert checkpoint['exactAssetBinding']['sourceBundleSha256'] == selected['sourceBundleSha256'], checkpoint
+          assert checkpoint['exactAssetBinding']['objectType'] == selected['type'], checkpoint
+          assert checkpoint['exactAssetBinding']['objectName'] == selected['name'], checkpoint
+          assert checkpoint['exactAssetBinding']['pathId'] == selected['pathId'], checkpoint
+          assert checkpoint['exactAssetBinding']['decodedPixelSha256'] == selected['pixelSha256'], checkpoint
+          assert checkpoint['exactAssetBinding']['evidencePngSha256'] == selected['pngSha256'], checkpoint
+          print(json.dumps({
+              'status': checkpoint['status'],
+              'rankProof': checkpoint['rankProof'],
+              'exactAssetBinding': checkpoint['exactAssetBinding'],
+              'nextOwner': checkpoint['nextOwner'],
+          }, ensure_ascii=False, indent=2))
+          PY
+
       - name: Setup Bun for current owner validators
         uses: oven-sh/setup-bun@v2
         with:
@@ -240,6 +272,7 @@ jobs:
                   'researchOnly': all(
                       p.startswith('scripts/equipment-image-ssr-frame-')
                       or p.startswith('.github/workflows/equipment-image-ssr-frame-')
+                      or p.startswith('data/checkpoints/equipment-image-ssr-frame-provenance')
                       for p in changed
                   ),
               },
