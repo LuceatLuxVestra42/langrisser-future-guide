@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 jobs:
-  bootstrap-c2:
+  inspect-c2:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -20,20 +20,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Setup Node 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Generate C2 graph
-        run: node tools/evidence-lifecycle/cli/c2-reference-graph.mjs --write
-      - name: Commit generated graph if changed
+      - name: Inspect current workflow protecting edges
         run: |
-          if [ -z "$(git status --porcelain -- tools/evidence-lifecycle/generated/c2-reference-graph.v1.json)" ]; then
-            echo 'C2 graph already current.'
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add tools/evidence-lifecycle/generated/c2-reference-graph.v1.json
-          git commit -m 'Generate Evidence Lifecycle C2 reference graph'
-          git push
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const graph = JSON.parse(fs.readFileSync('tools/evidence-lifecycle/generated/c2-reference-graph.v1.json', 'utf8'));
+          const edges = graph.edges.filter(edge => edge.edgeType === 'ACTIVE_WORKFLOW_REF');
+          const bySource = new Map();
+          for (const edge of edges) bySource.set(edge.fromPath, (bySource.get(edge.fromPath) ?? 0) + 1);
+          const rows = [...bySource].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+          console.log(JSON.stringify({ workflowProtectingEdgeCount: edges.length, workflowSourceCount: rows.length, bySource: rows }, null, 2));
+          NODE
