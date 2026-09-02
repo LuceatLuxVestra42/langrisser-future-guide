@@ -24,29 +24,49 @@ const errors = [];
 const check = (ok, msg) => { if (!ok) errors.push(msg); };
 const fail = () => { console.error(JSON.stringify({ status: "FAIL", blockers: errors }, null, 2)); process.exit(1); };
 
+const tokenFormat = (raw) => {
+  if (/^\+/.test(raw) && /%$/.test(raw)) return "PLUS_PERCENT";
+  if (/^-/.test(raw) && /%$/.test(raw)) return "MINUS_PERCENT";
+  if (/%$/.test(raw)) return "PERCENT";
+  if (/^\+/.test(raw)) return "PLUS_NUMBER";
+  if (/^-/.test(raw)) return "MINUS_NUMBER";
+  return "NUMBER";
+};
+const formatToken = (value, format) => {
+  if (format === "PLUS_PERCENT") return `+${value}%`;
+  if (format === "MINUS_PERCENT") return `${value}%`;
+  if (format === "PERCENT") return `${value}%`;
+  if (format === "PLUS_NUMBER") return `+${value}`;
+  return `${value}`;
+};
 const parseToken = (rawToken, context) => {
   const compact = rawToken.trim();
   const match = compact.match(/^([+-]?\d+(?:\.\d+)?)(%)?$/);
   if (!match) { errors.push(`${context} contains a non-numeric highlighted token: ${rawToken}`); return null; }
-  return { raw: rawToken, value: Number(match[1]), lexicalUnit: match[2] ? "PERCENT" : "NUMBER" };
+  const value = Number(match[1]);
+  const format = tokenFormat(compact);
+  check(formatToken(value, format) === compact, `${context} token is not canonically reconstructable: ${rawToken}`);
+  check(rawToken === compact, `${context} contains unsupported surrounding whitespace in highlighted token.`);
+  return { value, format };
 };
 const tokenizeDescription = (description, levelId) => {
   if (typeof description !== "string" || !description.length) { errors.push(`TrainingTechLevel ${levelId} lacks Description.`); return null; }
-  const tokens = [];
+  const values = [];
+  const formats = [];
   let index = 0;
   const templateRichTextRaw = description.replace(/(<color=[^>]+>)([^<]*)(<\/color>)/g, (_full, open, content, close) => {
     const parsed = parseToken(content, `TrainingTechLevel ${levelId}`);
-    if (parsed) tokens.push(parsed);
+    if (parsed) { values.push(parsed.value); formats.push(parsed.format); }
     return `${open}{P${index++}}${close}`;
   });
-  check(tokens.length === index && tokens.length > 0, `TrainingTechLevel ${levelId} does not contain only admitted highlighted numeric parameters.`);
+  check(values.length === index && values.length > 0, `TrainingTechLevel ${levelId} does not contain only admitted highlighted numeric parameters.`);
   const outside = description.replace(/<color=[^>]+>[\s\S]*?<\/color>/g, " ").replace(/<[^>]+>/g, " ");
   const outsideNumbers = [...outside.matchAll(/[+-]?\d+(?:\.\d+)?%?/g)].map((m) => m[0]);
   check(outsideNumbers.length === 0, `TrainingTechLevel ${levelId} contains numeric text outside highlighted spans: ${outsideNumbers.join(",")}`);
   let reconstructed = templateRichTextRaw;
-  tokens.forEach((token, i) => { reconstructed = reconstructed.replace(`{P${i}}`, token.raw); });
+  values.forEach((value, i) => { reconstructed = reconstructed.replace(`{P${i}}`, formatToken(value, formats[i])); });
   check(reconstructed === description, `TrainingTechLevel ${levelId} template reconstruction is not lossless.`);
-  return { templateRichTextRaw, tokens };
+  return { templateRichTextRaw, values, formats };
 };
 
 check(Boolean(sourcePath), "TRAINING_TECH_LEVEL_SOURCE is required; no source fallback is allowed.");
@@ -94,59 +114,74 @@ for (const row of levelRows) {
 }
 check(levelById.size === 2945, "TrainingTechLevel unique ID count is not 2945.");
 
-const records = subject.records ?? [];
-check(Array.isArray(records) && records.length === 46, "Subject does not contain 46 Tech records.");
-check(same(records.map((record) => record.techId), targetIds), "Subject Tech order/membership differs from Stage 5 COMMON_PASSIVE.");
-check(new Set(records.map((record) => record.techId)).size === records.length, "Subject has duplicate Tech IDs.");
-const templates = new Set();
+const expanded = [];
 const levelIds = [];
-let parameterCount = 0;
-let foreignCount = 0;
-for (const record of records) {
-  const techId = record?.techId;
-  if (!target.has(techId) || foreign.has(techId)) foreignCount++;
+let highlightedParameterCount = 0;
+const templates = new Set();
+for (const techId of targetIds) {
   const census = censusById.get(techId);
   if (!census) { errors.push(`Missing Stage 1 row for Tech ${techId}.`); continue; }
   const refs = census.raw?.TechLevelupInfoList ?? [];
   check(Array.isArray(refs) && refs.length === 10, `Tech ${techId} explicit level reference count is not 10.`);
   check(same(refs, census.explicitLevelReferences), `Tech ${techId} level reference projection drifted.`);
-  const expectedRows = [];
-  let expectedTemplate = null;
-  let expectedPattern = null;
+  let templateRichTextRaw = null;
+  let tokenFormats = null;
+  const levelValueRows = [];
   refs.forEach((levelId) => {
     const source = levelById.get(levelId);
     check(Boolean(source), `Unresolved TrainingTechLevel ID ${levelId}.`);
     if (!source) return;
     const tokenized = tokenizeDescription(source.Description, levelId);
     if (!tokenized) return;
-    const pattern = tokenized.tokens.map((token) => token.lexicalUnit);
-    if (expectedTemplate == null) { expectedTemplate = tokenized.templateRichTextRaw; expectedPattern = pattern; }
-    check(tokenized.templateRichTextRaw === expectedTemplate, `Tech ${techId} source template changes across levels.`);
-    check(same(pattern, expectedPattern), `Tech ${techId} lexical-unit pattern changes across levels.`);
-    expectedRows.push(tokenized.tokens);
+    if (templateRichTextRaw == null) { templateRichTextRaw = tokenized.templateRichTextRaw; tokenFormats = tokenized.formats; }
+    check(tokenized.templateRichTextRaw === templateRichTextRaw, `Tech ${techId} source template changes across levels.`);
+    check(same(tokenized.formats, tokenFormats), `Tech ${techId} token-format pattern changes across levels.`);
+    levelValueRows.push(tokenized.values);
     levelIds.push(levelId);
-    parameterCount += tokenized.tokens.length;
+    highlightedParameterCount += tokenized.values.length;
   });
-  templates.add(expectedTemplate);
-  check(record?.templateRichTextRaw === expectedTemplate, `Tech ${techId} template mismatch.`);
-  check(record?.parameterCount === expectedPattern?.length, `Tech ${techId} parameterCount mismatch.`);
-  check(same(record?.lexicalUnitPattern, expectedPattern), `Tech ${techId} lexicalUnitPattern mismatch.`);
-  check(same(record?.levelParameterRows, expectedRows), `Tech ${techId} parameter rows do not reproduce from pinned source descriptions.`);
+  templates.add(templateRichTextRaw);
+  expanded.push({ techId, templateRichTextRaw, parameterCount: tokenFormats?.length ?? 0, tokenFormats, levelValueRows });
 }
 
-check(levelIds.length === 460 && new Set(levelIds).size === 460, "COMMON_PASSIVE materialized level coverage is not 460 unique IDs.");
-check(parameterCount === 590, `COMMON_PASSIVE highlighted parameter coverage is ${parameterCount}, expected 590.`);
+const expectedCatalog = [];
+const byKey = new Map();
+for (const row of expanded) {
+  const key = JSON.stringify({ tokenFormats: row.tokenFormats, levelValueRows: row.levelValueRows });
+  let entry = byKey.get(key);
+  if (!entry) {
+    entry = { sequenceId: `PARAM_SEQUENCE_${String(expectedCatalog.length + 1).padStart(2, "0")}`, techIds: [], parameterCount: row.parameterCount, tokenFormats: row.tokenFormats, levelValueRows: row.levelValueRows };
+    expectedCatalog.push(entry);
+    byKey.set(key, entry);
+  }
+  entry.techIds.push(row.techId);
+}
+const sequenceIdByTech = new Map();
+for (const sequence of expectedCatalog) for (const techId of sequence.techIds) sequenceIdByTech.set(techId, sequence.sequenceId);
+const expectedRecords = expanded.map((row) => ({ techId: row.techId, templateRichTextRaw: row.templateRichTextRaw, parameterSequenceId: sequenceIdByTech.get(row.techId) }));
+
+check(levelIds.length === 460 && new Set(levelIds).size === 460, "COMMON_PASSIVE source level coverage is not 460 unique IDs.");
+check(highlightedParameterCount === 590, `COMMON_PASSIVE highlighted parameter coverage is ${highlightedParameterCount}, expected 590.`);
 check(templates.size === 46, `COMMON_PASSIVE unique source template count is ${templates.size}, expected 46.`);
+check(expectedCatalog.length === 14, `COMMON_PASSIVE parameter sequence count is ${expectedCatalog.length}, expected 14.`);
+check(sequenceIdByTech.size === 46, "Expected parameter sequence catalog does not cover 46 Tech IDs exactly once.");
+check(same(subject.parameterSequenceCatalog, expectedCatalog), "Subject parameter sequence catalog does not reproduce exactly from pinned source descriptions.");
+check(same(subject.records, expectedRecords), "Subject Tech templates/sequence references do not reproduce exactly from pinned source descriptions.");
+check(subject.records?.length === 46 && same(subject.records.map((record) => record.techId), targetIds), "Subject Tech membership/order differs from Stage 5 COMMON_PASSIVE.");
+check(new Set(subject.records?.map((record) => record.techId)).size === 46, "Subject has duplicate Tech IDs.");
+let foreignCount = 0;
+for (const record of subject.records ?? []) if (!target.has(record.techId) || foreign.has(record.techId)) foreignCount++;
 check(foreignCount === 0, `Subject contains ${foreignCount} foreign-label Tech records.`);
+
 check(subject.coverage?.targetTechCount === 46 && subject.coverage?.materializedTechCount === 46 && subject.coverage?.levelRowsPerTech === 10, "Subject Tech coverage counters drifted.");
 check(subject.coverage?.referencedLevelRowCount === 460 && subject.coverage?.uniqueReferencedLevelRowCount === 460, "Subject level coverage counters drifted.");
-check(subject.coverage?.highlightedParameterCount === 590 && subject.coverage?.uniqueTemplateCount === 46, "Subject parameter/template coverage counters drifted.");
-check(subject.coverage?.templateDriftTechCount === 0 && subject.coverage?.lexicalUnitPatternDriftTechCount === 0 && subject.coverage?.numericTokensOutsideHighlightedSpans === 0 && subject.coverage?.nonNumericHighlightedParameterCount === 0, "Subject zero-drift token/template counters drifted.");
-check(subject.coverage?.unresolvedLevelReferenceCount === 0 && subject.coverage?.duplicateReferencedLevelIdCount === 0 && subject.coverage?.excludedLabelTechMaterializedCount === 0, "Subject zero-error coverage counters drifted.");
+check(subject.coverage?.highlightedParameterCount === 590 && subject.coverage?.uniqueTemplateCount === 46 && subject.coverage?.parameterSequenceCount === 14, "Subject parameter/template/sequence counters drifted.");
+check(subject.coverage?.templateDriftTechCount === 0 && subject.coverage?.tokenFormatPatternDriftTechCount === 0 && subject.coverage?.numericTokensOutsideHighlightedSpans === 0 && subject.coverage?.nonNumericHighlightedParameterCount === 0, "Subject zero-drift token/template counters drifted.");
+check(subject.coverage?.unresolvedLevelReferenceCount === 0 && subject.coverage?.duplicateReferencedLevelIdCount === 0 && subject.coverage?.excludedLabelTechMaterializedCount === 0, "Subject zero-error counters drifted.");
 check(subject.effectSemantics?.model === "LOSSLESS_PARAMETERIZED_RICH_TEXT_TEMPLATE" && subject.effectSemantics?.semanticDepth === "PARAMETERIZED_TEMPLATE_ONLY", "Subject passive semantic depth drifted.");
 const policy = subject.policy ?? {};
 check(policy.classificationAuthority === "STAGE5_FROZEN_MEMBERSHIP_ONLY" && policy.explicitTechLevelupInfoListJoinOnly === true, "Subject authority/join policy drifted.");
-check(policy.sourceDescriptionTemplatePreserved === true && policy.highlightedNumericParametersStructured === true && policy.explicitLevelIdsRecoveredFromStage1 === true, "Subject extraction policy drifted.");
+check(policy.sourceDescriptionTemplatePreserved === true && policy.highlightedNumericParametersStructured === true && policy.parameterSequencesCataloged === true && policy.explicitLevelIdsRecoveredFromStage1 === true, "Subject extraction policy drifted.");
 check(policy.parameterRoleInferencePerformed === false && policy.conditionAstInferencePerformed === false && policy.effectTargetNormalizationPerformed === false, "Subject inferred passive semantics beyond the frozen template boundary.");
 check(policy.nameJoinPerformed === false && policy.idArithmeticPerformed === false && policy.missingValueImputationPerformed === false && policy.historicalOutputFallbackUsed === false && policy.stage5MembershipMutationAllowed === false, "Forbidden inference/mutation policy drifted.");
 check((subject.blockers ?? []).length === 0 && (subject.reviews ?? []).length === 0, "Subject has blockers/reviews.");
@@ -176,6 +211,7 @@ const validation = {
     uniqueReferencedLevelRows: 460,
     highlightedParameters: 590,
     uniqueTemplates: 46,
+    parameterSequences: 14,
     unresolvedLevelReferences: 0,
     duplicateLevelReferences: 0,
     foreignLabelTechs: 0,
@@ -191,9 +227,11 @@ const validation = {
     sourceTemplateStableWithinEachTech: true,
     frozenUniqueTemplateCount46: true,
     frozenHighlightedParameterCount590: true,
-    everyHighlightedParameterNumeric: true,
+    frozenParameterSequenceCatalog14: true,
+    parameterSequenceTechCoverage46Exact: true,
+    everyHighlightedParameterNumericCanonical: true,
     noNumericTokensOutsideHighlightedSpans: true,
-    lexicalUnitPatternStableWithinEachTech: true,
+    tokenFormatPatternStableWithinEachTech: true,
     losslessDescriptionReconstructionExact: true,
     noParameterRoleInference: true,
     noConditionAstInference: true,
@@ -211,16 +249,10 @@ const validation = {
   reopenConditions: subject.reopenConditions,
 };
 const serialized = `${JSON.stringify(validation)}\n`;
-if (writeMode) {
-  writeFileSync(resolve(root, P.out), serialized);
-  console.log(`Wrote ${P.out}`);
-}
+if (writeMode) { writeFileSync(resolve(root, P.out), serialized); console.log(`Wrote ${P.out}`); }
 if (checkMode) {
   check(existsSync(resolve(root, P.out)), `${P.out} is missing. Run validator with --write.`);
   if (errors.length) fail();
-  if (text(P.out) !== serialized) {
-    console.error(`${P.out} is stale. Run validator with --write.`);
-    process.exit(1);
-  }
+  if (text(P.out) !== serialized) { console.error(`${P.out} is stale. Run validator with --write.`); process.exit(1); }
   console.log(JSON.stringify({ status: validation.status, completion: validation.completion, coverage: validation.coverage }));
 }
