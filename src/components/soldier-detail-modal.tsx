@@ -547,113 +547,112 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
   }
 
   return (
-    <div className="mt-2 grid gap-3 md:grid-cols-[280px_minmax(0,1fr)]">
-      <div className="rounded-xl border border-border bg-background p-3 sm:p-4">
-        <p className="text-sm font-black text-foreground">레벨 범위</p>
-        <div className="mt-3 flex items-end gap-2">
-          <label className="min-w-0 flex-1 text-xs font-bold text-muted-foreground">
-            A 레벨
-            <input
-              type="number"
-              inputMode="numeric"
-              min={0}
-              max={Math.max(0, maxLevel - 1)}
-              value={startLevel}
-              onChange={(event) => {
-                const next = clampLevel(Number(event.target.value), 0, Math.max(0, maxLevel - 1));
-                setStartLevel(next);
-                if (next >= endLevel) setEndLevel(Math.min(maxLevel, next + 1));
-              }}
-              className="mt-1 h-10 w-full rounded-md border border-border bg-card px-2 text-center text-base font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
-            />
-          </label>
+  <div className="mt-2 grid gap-2 md:grid-cols-[260px_minmax(0,1fr)] md:items-stretch">
+    <div className="flex min-w-0 items-center gap-2 rounded-xl border border-border bg-background px-3 py-2">
+      <p className="shrink-0 text-xs font-black text-foreground">레벨 범위</p>
+      <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5">
+        <label className="flex min-w-0 items-center gap-1 text-[10px] font-bold text-muted-foreground">
+          <span className="shrink-0">A 레벨</span>
+          <input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={Math.max(0, maxLevel - 1)}
+            value={startLevel}
+            onChange={(event) => {
+              const next = clampLevel(Number(event.target.value), 0, Math.max(0, maxLevel - 1));
+              setStartLevel(next);
+              if (next >= endLevel) setEndLevel(Math.min(maxLevel, next + 1));
+            }}
+            className="h-9 w-11 rounded-md border border-border bg-card px-1 text-center text-sm font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
+          />
+        </label>
 
-          <span className="pb-2 text-lg font-black text-muted-foreground" aria-hidden="true">
-            →
-          </span>
+        <span className="shrink-0 text-sm font-black text-muted-foreground" aria-hidden="true">
+          →
+        </span>
 
-          <label className="min-w-0 flex-1 text-xs font-bold text-muted-foreground">
-            B 레벨
-            <input
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={maxLevel}
-              value={endLevel}
-              onChange={(event) => {
-                const next = clampLevel(Number(event.target.value), 1, maxLevel);
-                setEndLevel(next);
-                if (next <= startLevel) setStartLevel(Math.max(0, next - 1));
-              }}
-              className="mt-1 h-10 w-full rounded-md border border-border bg-card px-2 text-center text-base font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
-            />
-          </label>
-        </div>
+        <label className="flex min-w-0 items-center gap-1 text-[10px] font-bold text-muted-foreground">
+          <span className="shrink-0">B 레벨</span>
+          <input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={maxLevel}
+            value={endLevel}
+            onChange={(event) => {
+              const next = clampLevel(Number(event.target.value), 1, maxLevel);
+              setEndLevel(next);
+              if (next <= startLevel) setStartLevel(Math.max(0, next - 1));
+            }}
+            className="h-9 w-11 rounded-md border border-border bg-card px-1 text-center text-sm font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
+          />
+        </label>
+      </div>
+    </div>
+
+    <div className="flex min-w-0 items-center gap-2 rounded-xl border border-border bg-muted/50 px-3 py-2">
+      <div className="w-[88px] shrink-0">
+        <p className="text-xs font-black leading-tight text-foreground">총 소모재료</p>
+        <p className="mt-0.5 whitespace-nowrap text-[10px] font-semibold tabular-nums text-muted-foreground">
+          Lv.{startLevel} → Lv.{endLevel}
+        </p>
       </div>
 
-      <div className="rounded-xl border border-border bg-muted/50 p-3 sm:p-4">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-black text-foreground">총 소모재료</p>
-          <span className="text-xs font-semibold tabular-nums text-muted-foreground">
-            Lv.{startLevel} → Lv.{endLevel}
-          </span>
-        </div>
-
-        <div className="mt-3 rounded-lg border border-border bg-background px-3 py-2.5">
-          <div className="flex items-center gap-2">
+      <div className="min-w-0 flex-1 overflow-x-auto">
+        <div className="flex min-w-max items-stretch gap-1.5 md:min-w-0">
+          <div
+            title="골드"
+            className="flex min-w-[68px] flex-1 flex-col items-center justify-center rounded-lg border border-border bg-background px-1.5 py-1"
+          >
             <img
               src={getSoldierCommonMaterialIconUrl("gold")}
               alt=""
               aria-hidden="true"
-              width={32}
-              height={32}
+              width={36}
+              height={36}
               loading="lazy"
-              className="h-8 w-8 shrink-0 object-contain"
+              className="h-9 w-9 object-contain"
             />
-            <div>
-              <p className="text-[10px] font-bold text-muted-foreground">골드</p>
-              <p className="mt-0.5 text-lg font-black tabular-nums text-foreground">
-                {formatNumber(totals.gold)}
-              </p>
-            </div>
+            <span className="mt-0.5 whitespace-nowrap text-[11px] font-black leading-none tabular-nums text-foreground">
+              {formatNumber(totals.gold)}
+            </span>
           </div>
-        </div>
 
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
           {totals.materials.map((material) => {
             const iconUrl = getSoldierTrainingMaterialIconUrl(material.itemId);
             return (
               <div
                 key={`${material.goodsType}:${material.itemId}`}
-                className="rounded-lg border border-border bg-background px-2.5 py-2"
+                title={`재료 ${material.itemId}`}
+                className="flex min-w-[68px] flex-1 flex-col items-center justify-center rounded-lg border border-border bg-background px-1.5 py-1"
               >
-                <div className="flex items-center gap-2">
-                  {iconUrl ? (
-                    <img
-                      src={iconUrl}
-                      alt=""
-                      aria-hidden="true"
-                      width={44}
-                      height={44}
-                      loading="lazy"
-                      className="h-11 w-11 shrink-0 object-contain"
-                    />
-                  ) : (
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-muted px-1 text-center text-[10px] font-black text-muted-foreground">
-                      재료
-                    </div>
-                  )}
-                  <p className="text-base font-black tabular-nums text-foreground">
-                    × {formatNumber(material.count)}
-                  </p>
-                </div>
+                {iconUrl ? (
+                  <img
+                    src={iconUrl}
+                    alt=""
+                    aria-hidden="true"
+                    width={36}
+                    height={36}
+                    loading="lazy"
+                    className="h-9 w-9 object-contain"
+                  />
+                ) : (
+                  <div className="flex h-9 w-9 items-center justify-center rounded-md bg-muted px-1 text-center text-[9px] font-black text-muted-foreground">
+                    재료
+                  </div>
+                )}
+                <span className="mt-0.5 whitespace-nowrap text-[11px] font-black leading-none tabular-nums text-foreground">
+                  ×{formatNumber(material.count)}
+                </span>
               </div>
             );
           })}
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 function clampLevel(value: number, min: number, max: number) {
