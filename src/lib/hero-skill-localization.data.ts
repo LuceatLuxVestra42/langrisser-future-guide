@@ -1,10 +1,80 @@
 import type { HeroSkillKrCatalog } from "./hero-skill-localization.schema";
 
-// Stage 1 structure only. Records are admitted in later migration/batch steps.
-// Keep this catalog empty until a Skill-ID + sourceNameCn pair has passed the
-// localization admission rules in hero-skill-localization.ts.
 export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
   schemaVersion: 1,
   sourceFamily: "hero-skill-korean-localization",
-  records: [],
+  records: [
+    {
+      skillId: 10301,
+      sourceNameCn: "突击",
+      nameKr: "돌격",
+      descKr: "단일 적에게 1배 피해. 치료 방해를 1턴 부여하고, 공격 전 이동 1칸마다 피해 +20%(최대 +60%).",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [6], note: "Migrated from the Leon-only Stage 5 presentation overlay." },
+    },
+    {
+      skillId: 5020,
+      sourceNameCn: "整军",
+      nameKr: "군단 정비",
+      descKr: "부대 생명이 90% 이상이면 공격과 방어 +10%.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [6], note: "Migrated from the Leon-only Stage 5 presentation overlay." },
+    },
+    {
+      skillId: 10324,
+      sourceNameCn: "猛撞",
+      nameKr: "맹렬한 돌격",
+      descKr: "단일 적에게 1.4배 피해. 대상을 2칸 밀치고 방어 -20%, 호위 불가를 2턴 부여.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [6], note: "Migrated from the Leon-only Stage 5 presentation overlay." },
+    },
+    {
+      skillId: 5003,
+      sourceNameCn: "破攻",
+      nameKr: "무기 파괴",
+      descKr: "전투 진입 전 50% 확률로 적의 공격과 지력 -20%. 1턴 지속.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [6], note: "Migrated from the Leon-only Stage 5 presentation overlay." },
+    },
+    {
+      skillId: 5007,
+      sourceNameCn: "压制",
+      nameKr: "제압",
+      descKr: "자신의 남은 생명 비율이 상대보다 높으면 전투 중 공격 +12%.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [6], note: "Migrated from the Leon-only Stage 5 presentation overlay." },
+    },
+    {
+      skillId: 10314,
+      sourceNameCn: "气浪",
+      nameKr: "폭풍",
+      descKr: "공격하여 전투 진입 시 부대 생명이 80% 이상이면 전투 중 받는 피해 -30%.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [6], note: "Migrated from the Leon-only Stage 5 presentation overlay." },
+    },
+    {
+      skillId: 10328,
+      sourceNameCn: "骑士精神",
+      nameKr: "기사도",
+      descKr: "자신 부대 공격 +30%, 면역과 폭풍을 2턴 부여. 사용 후 3칸 추가 이동하고 공격 가능.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [6], note: "Migrated from the Leon-only Stage 5 presentation overlay." },
+    },
+    {
+      skillId: 11807,
+      sourceNameCn: "帝国冲锋",
+      nameKr: "제국의 돌격",
+      descKr: "제국의 빛 아군의 공격·방어를 크게 올리고, 공격 전 이동 1칸마다 전투 피해 +5%(최대 +15%). 4턴 지속.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [6], note: "Migrated from the Leon-only Stage 5 presentation overlay." },
+    },
+    {
+      skillId: 10302,
+      sourceNameCn: "千骑",
+      nameKr: "일기당천",
+      descKr: "단일 적에게 1.7배 피해. 전투 후 이동력 -2와 호위 불가를 2턴 부여하며 제거되지 않음.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [6], note: "Migrated from the Leon-only Stage 5 presentation overlay." },
+    },
+  ],
 };
