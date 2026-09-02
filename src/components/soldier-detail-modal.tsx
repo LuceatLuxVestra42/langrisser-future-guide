@@ -189,7 +189,7 @@ export function SoldierDetailModal({
 
             <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-background p-3 sm:h-full sm:p-4">
               <p className="shrink-0 text-sm font-black text-foreground">{abilityTitle}</p>
-              <div className="mt-2 min-h-0 flex-1 overflow-y-auto pr-1 text-sm leading-6 text-foreground sm:mt-3">
+              <div className="mt-2 min-h-0 flex-1 overflow-y-auto pr-1 text-base leading-7 text-foreground sm:mt-3">
                 {hasNoAbility ? (
                   <p className="text-muted-foreground">별도의 고유기 효과가 없는 용병이야.</p>
                 ) : abilityEffect ? (
@@ -478,7 +478,7 @@ function ConfigText({ text }: { text: string }) {
     );
   }
 
-  return <p className="whitespace-pre-line">{nodes}</p>;
+  return <p className="whitespace-pre-wrap break-keep [overflow-wrap:anywhere]">{nodes}</p>;
 }
 
 function LoadingText() {
