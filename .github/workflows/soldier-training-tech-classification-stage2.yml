@@ -1,0 +1,52 @@
+name: TrainingTech Stage 2 Evidence Contract
+
+on:
+  push:
+    paths:
+      - data/contracts/soldier-training-tech-classification-stage2-evidence.v1.json
+      - data/validation/soldier-training-tech-classification-stage2.v1.json
+      - scripts/validate-soldier-training-tech-classification-stage2.mjs
+      - data/validation/soldier-training-tech-classification-stage1.v1.json
+      - data/generated/soldier-training-tech-classification-stage1-census.v1.json
+      - data/generated/soldier-detail-stage5-4.v1.json
+      - data/validation/soldier-stage5-4-training.v1.json
+      - data/validation/soldier-stage6-7-site-admission.v1.json
+      - data/configdata/ConfigDataTrainingTechInfo.json
+      - data/configdata/ConfigDataTrainingTechLevelInfo.json
+      - .github/workflows/soldier-training-tech-classification-stage2.yml
+  pull_request:
+    paths:
+      - data/contracts/soldier-training-tech-classification-stage2-evidence.v1.json
+      - data/validation/soldier-training-tech-classification-stage2.v1.json
+      - scripts/validate-soldier-training-tech-classification-stage2.mjs
+      - data/validation/soldier-training-tech-classification-stage1.v1.json
+      - data/generated/soldier-training-tech-classification-stage1-census.v1.json
+      - data/generated/soldier-detail-stage5-4.v1.json
+      - data/validation/soldier-stage5-4-training.v1.json
+      - data/validation/soldier-stage6-7-site-admission.v1.json
+      - data/configdata/ConfigDataTrainingTechInfo.json
+      - data/configdata/ConfigDataTrainingTechLevelInfo.json
+      - .github/workflows/soldier-training-tech-classification-stage2.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate frozen Stage 2 evidence contract
+        run: node scripts/validate-soldier-training-tech-classification-stage2.mjs --check
+      - name: Assert validator is read-only
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Stage 2 validator mutated tracked or untracked repository state."
+            git status --short
+            exit 1
+          fi

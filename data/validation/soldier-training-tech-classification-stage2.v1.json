@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-tech-classification-stage2-validation/v1",
+  "stage": "TrainingTech Classification Stage 2 - Evidence Contract",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "TRAINING_TECH_CLASSIFICATION_STAGE2_EVIDENCE_FROZEN",
+  "validationMode": "INDEPENDENT_READ_ONLY_RECOMPUTATION",
+  "contract": {
+    "path": "data/contracts/soldier-training-tech-classification-stage2-evidence.v1.json",
+    "gitBlobSha": "fbb67257d63412e82b04f92de94285db56d10d88"
+  },
+  "predecessors": {
+    "stage1Validation": "data/validation/soldier-training-tech-classification-stage1.v1.json",
+    "stage1Census": "data/generated/soldier-training-tech-classification-stage1-census.v1.json",
+    "frozenTrainingConsumer": "data/generated/soldier-detail-stage5-4.v1.json",
+    "soldierCanonicalAuthority": "data/validation/soldier-stage6-7-site-admission.v1.json"
+  },
+  "sourceSnapshots": {
+    "trainingTech": {
+      "path": "data/configdata/ConfigDataTrainingTechInfo.json",
+      "gitBlobSha": "ad8b290f0e34de24b6eab9538894068a06e086d4",
+      "recordCount": 287
+    },
+    "trainingTechLevel": {
+      "path": "data/configdata/ConfigDataTrainingTechLevelInfo.json",
+      "gitBlobSha": "30789c3e4fb0d79b56514e720bb71a053df78c72",
+      "recordCount": 2945
+    }
+  },
+  "semanticClassificationPerformed": false,
+  "checks": {
+    "contractSchema": true,
+    "contractFrozen": true,
+    "stage1ValidationBlobMatch": true,
+    "stage1CensusBlobMatch": true,
+    "stage1FrozenPass": true,
+    "stage5ConsumerBlobMatch": true,
+    "stage5ValidationBlobMatch": true,
+    "stage5ValidationPass": true,
+    "soldierAuthorityBlobMatch": true,
+    "soldierAuthorityPass": true,
+    "trainingTechSourceBlobMatch": true,
+    "trainingTechLevelSourceBlobMatch": true,
+    "trainingTechPopulation": true,
+    "trainingTechLevelPopulation": true,
+    "semanticClassificationNotPerformed": true,
+    "contractTechEvidenceFieldsExist": true,
+    "contractLevelEvidenceFieldsExist": true,
+    "forbiddenInferenceClosed": true,
+    "orderedListExceptionNarrow": true,
+    "unresolvedLabelsReviewOnly": true,
+    "onlyGrowthAutomaticLabelAdmitted": true,
+    "protectedGrowthTargetPopulation": true,
+    "protectedGrowthExactlyOneCandidate": true,
+    "protectedGrowthDistinctTechParity": true,
+    "protectedGrowthTrainingTechParity": true,
+    "protectedGrowthAbilityTechParity": true
+  },
+  "coverage": {
+    "trainingTech": 287,
+    "trainingTechLevel": 2945,
+    "protectedNormalTier3GrowthTarget": 129,
+    "protectedNormalTier3GrowthResolvedUnique": 129,
+    "protectedNormalTier3DistinctTechIds": 129,
+    "zeroGrowthCandidateSoldiers": 0,
+    "multipleGrowthCandidateSoldiers": 0,
+    "frozenTrainingTechMismatches": 0,
+    "frozenAbilityTechMismatches": 0
+  },
+  "admittedAutomaticWholeTechLabels": [
+    "SOLDIER_GROWTH"
+  ],
+  "unresolvedWholeTechLabels": [
+    "COMMON_STAT",
+    "COMMON_PASSIVE",
+    "PREREQUISITE_OR_UNLOCK"
+  ],
+  "requiredFallback": "REVIEW_UNCLASSIFIED",
+  "boundaryNotes": [
+    "COMMON_STAT, COMMON_PASSIVE, and PREREQUISITE_OR_UNLOCK remain intentionally unclassified until representative semantic evidence is frozen.",
+    "TrainingTechInfo.TechType is preserved only as a raw structural value; no numeric meaning is admitted by this contract.",
+    "Description and Name fields may support later human review but are not automatic classification evidence in Stage 2."
+  ],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "nextOwner": "TrainingTech Stage 3 Representative Semantic Evidence",
+  "nextStartPoint": "Select representative records for structurally distinct non-growth patterns and confirm only source-supported semantic distinctions needed to admit COMMON_STAT, COMMON_PASSIVE, or PREREQUISITE_OR_UNLOCK. Keep unresolved patterns as REVIEW_UNCLASSIFIED.",
+  "reopenConditions": [
+    "Stage 1 census or source snapshot changes.",
+    "Authoritative contradiction to the protected 129 NORMAL Tier 3 growth signature.",
+    "Soldier canonical authority or Stage 5-4 frozen training consumer changes in a way that invalidates the preservation gate.",
+    "Project Check ownership/orchestration contract changes for these paths.",
+    "Hard owning-validator failure."
+  ]
+}
