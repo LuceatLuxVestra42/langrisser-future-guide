@@ -1,0 +1,39 @@
+name: Soldier Stage 11-A14 Primary Locator Recovery
+
+on:
+  pull_request:
+    paths:
+      - 'data/soldier-release-primary-locator-recovery-stage11-a14.v1.json'
+      - 'data/soldier-release-pre2020-event-boundary-stage11-a7.v1.json'
+      - 'data/soldier-release-legacy-page-chronology-boundary-stage11-a13.v1.json'
+      - 'data/generated/soldier-release-metadata.v1.json'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'scripts/validate-soldier-release-primary-locator-recovery-stage11-a14.mjs'
+      - '.github/workflows/soldier-release-primary-locator-recovery-stage11-a14.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/soldier-release-primary-locator-recovery-stage11-a14.v1.json'
+      - 'data/soldier-release-pre2020-event-boundary-stage11-a7.v1.json'
+      - 'data/soldier-release-legacy-page-chronology-boundary-stage11-a13.v1.json'
+      - 'data/generated/soldier-release-metadata.v1.json'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'scripts/validate-soldier-release-primary-locator-recovery-stage11-a14.mjs'
+      - '.github/workflows/soldier-release-primary-locator-recovery-stage11-a14.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Stage 11-A14 primary locator recovery
+        run: node scripts/validate-soldier-release-primary-locator-recovery-stage11-a14.mjs
+      - name: Verify evidence validation is read-only
+        run: git diff --exit-code
