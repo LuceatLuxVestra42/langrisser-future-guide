@@ -320,6 +320,39 @@ function projectHeroNameLocalization(hero: HeroListRecord): HeroNameLocalization
   };
 }
 
+function projectLeonFactionOriginLocalization(hero: HeroListRecord) {
+  if (hero.heroId !== 6) {
+    return { factions: hero.factions, origin: hero.origin };
+  }
+
+  const expectedFactions = new Map<number, { nameCn: string; nameKr: string }>([
+    [4, { nameCn: "帝国之辉", nameKr: "제국의 빛" }],
+    [7, { nameCn: "战略大师", nameKr: "전략의 대가" }],
+  ]);
+
+  if (
+    hero.factions.length !== expectedFactions.size ||
+    hero.factions.some((faction) => expectedFactions.get(faction.factionId)?.nameCn !== faction.nameCn)
+  ) {
+    throw new Error("Hero 6 faction localization source no longer matches the frozen Hero presentation IDs.");
+  }
+
+  if (hero.origin.productionId !== 5 || hero.origin.nameCn !== "梦幻模拟战II") {
+    throw new Error("Hero 6 origin localization source no longer matches the frozen Hero presentation ID.");
+  }
+
+  return {
+    factions: hero.factions.map((faction) => ({
+      ...faction,
+      nameKr: expectedFactions.get(faction.factionId)?.nameKr ?? faction.nameKr,
+    })),
+    origin: {
+      ...hero.origin,
+      nameKr: "랑그릿사II",
+    },
+  };
+}
+
 function buildRarityOptions(records: HeroListRecord[]) {
   const rarityMap = new Map<string, { label: string; rank: number; count: number }>();
 
@@ -354,8 +387,12 @@ function projectStage4Record(hero: HeroListRecord): HeroListStage4Record {
     throw new Error(`Hero ${hero.heroId} Stage 4 parity/admission check failed.`);
   }
 
+  const presentationLocalization = projectLeonFactionOriginLocalization(hero);
+
   return {
     ...hero,
+    factions: presentationLocalization.factions,
+    origin: presentationLocalization.origin,
     card: {
       ...hero.card,
       webAssetPath: artwork.webAssetPath,
