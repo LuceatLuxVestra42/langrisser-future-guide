@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveConfigDataFile } from './configdata-source-pack-maintenance-root.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -8,8 +9,8 @@ const rootDir = path.resolve(__dirname, '..');
 
 const paths = {
   contract: path.join(rootDir, 'data/contracts/hero-soldier-movement-type-presentation.v1.json'),
-  jobInfo: path.join(rootDir, 'data/configdata/ConfigDataJobInfo.json'),
-  soldierInfo: path.join(rootDir, 'data/configdata/ConfigDataSoldierInfo.json'),
+  jobInfo: resolveConfigDataFile('ConfigDataJobInfo.json'),
+  soldierInfo: resolveConfigDataFile('ConfigDataSoldierInfo.json'),
   heroJobLinks: path.join(rootDir, 'data/generated/hero-job-links.v1.json'),
   soldierMaster: path.join(rootDir, 'data/generated/soldier-master.v1.json'),
   output: path.join(rootDir, 'data/generated/shared-movement-type-index.v1.json'),
