@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-tech-classification-stage1-validation/v1",
+  "stage": "TrainingTech Classification Stage 1 - Lossless Structural Census",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "TRAINING_TECH_CLASSIFICATION_STAGE1_CENSUS_FROZEN",
+  "predecessor": {
+    "path": "data/validation/soldier-training-tech-classification-stage0.v1.json",
+    "gitBlobSha": "e867aa4e99e80e06c0d8160073ee9110af125f9c",
+    "status": "PASS",
+    "completion": "COMPLETE"
+  },
+  "outputs": {
+    "census": "data/generated/soldier-training-tech-classification-stage1-census.v1.json",
+    "validation": "data/validation/soldier-training-tech-classification-stage1.v1.json"
+  },
+  "sourceSnapshots": {
+    "trainingTech": {
+      "path": "data/configdata/ConfigDataTrainingTechInfo.json",
+      "gitBlobSha": "ad8b290f0e34de24b6eab9538894068a06e086d4"
+    },
+    "trainingTechLevel": {
+      "path": "data/configdata/ConfigDataTrainingTechLevelInfo.json",
+      "gitBlobSha": "30789c3e4fb0d79b56514e720bb71a053df78c72"
+    }
+  },
+  "semanticClassificationPerformed": false,
+  "checks": {
+    "stage0FrozenPass": true,
+    "trainingTechSourceSnapshotMatch": true,
+    "trainingTechLevelSourceSnapshotMatch": true,
+    "trainingTechPopulationMatch": true,
+    "trainingTechLevelPopulationMatch": true,
+    "trainingTechRawRoundTripMismatchCount": 0,
+    "trainingTechLevelRawRoundTripMismatchCount": 0,
+    "semanticClassificationPerformed": false
+  },
+  "coverage": {
+    "trainingTechSourceRecords": 287,
+    "trainingTechCensusRecords": 287,
+    "trainingTechLevelSourceRecords": 2945,
+    "trainingTechLevelCensusRecords": 2945,
+    "explicitTrainingTechLevelReferenceCount": 2945,
+    "missingReferencedLevelIdCount": 0,
+    "unreferencedLevelRecordCount": 0,
+    "multiplyReferencedLevelRecordCount": 0,
+    "trainingTechDuplicateIdGroupCount": 0,
+    "trainingTechLevelDuplicateIdGroupCount": 0,
+    "trainingTechMissingIdCount": 0,
+    "trainingTechLevelMissingIdCount": 0,
+    "nonArrayLevelReferenceFieldCount": 0,
+    "preTechLevelCardinalityMismatchCount": 0
+  },
+  "reviews": [],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "nextOwner": "TrainingTech Stage 2 Evidence Contract",
+  "nextStartPoint": "Freeze which explicit TrainingTech and TrainingTechLevel source fields may be used as semantic classification evidence. Reuse this census; do not classify by names, descriptions, ID ranges/arithmetic, source order, or screen order.",
+  "reopenConditions": [
+    "Stage 0 authoritative contradiction affecting this census.",
+    "TrainingTech or TrainingTechLevel source snapshot change.",
+    "Census record-loss or raw round-trip parity damage.",
+    "Project Check ownership/orchestration contract change affecting this path.",
+    "Hard owning-validator failure."
+  ]
+}
