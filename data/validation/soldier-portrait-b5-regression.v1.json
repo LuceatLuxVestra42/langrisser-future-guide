@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "schemaId": "soldier-portrait-b5-regression-validation/v1",
+  "stage": "B5",
+  "status": "PASS",
+  "lifecycle": "COMPLETE",
+  "owner": "soldier-assets",
+  "scope": "Independent regression fixtures for the admitted B3/B4 Soldier portrait update path and existing source/WebP integrity gates.",
+  "authoritativePredecessors": {
+    "b4Validation": "data/validation/soldier-portrait-b4-fixture-validation.v1.json",
+    "productionBatchPlan": "data/validation/soldier-portrait-batch-plan.v1.json",
+    "currentAssetLocator": "data/contracts/soldier-portrait-assets-current.v1.json",
+    "b5Contract": "data/contracts/soldier-portrait-b5-regression.v1.json"
+  },
+  "productionState": {
+    "status": "NO_UPDATE_REQUIRED",
+    "newIds": [],
+    "removedIds": [],
+    "currentLocatorChanged": false,
+    "currentWebProjectionChanged": false,
+    "repositoryAssetBytesChanged": false
+  },
+  "cases": {
+    "zero": {
+      "status": "PASS",
+      "expectedGate": "batch-not-ready",
+      "intakeCreated": false
+    },
+    "one": {
+      "status": "PASS",
+      "fixtureOnly": true,
+      "ids": [990001],
+      "candidateSourceCount": 225,
+      "candidateWebpCount": 225,
+      "generatedWebpCount": 1
+    },
+    "four": {
+      "status": "PASS",
+      "fixtureOnly": true,
+      "ids": [990001, 990002, 990003, 990004],
+      "candidateSourceCount": 228,
+      "candidateWebpCount": 228,
+      "generatedWebpCount": 4
+    },
+    "missing": {
+      "status": "PASS",
+      "expectedGate": "file-set-mismatch"
+    },
+    "extra": {
+      "status": "PASS",
+      "expectedGate": "file-set-mismatch"
+    },
+    "sourceDrift": {
+      "status": "PASS",
+      "releaseTag": "source-assets-soldier-v9-5dc09049",
+      "archive": "soldier-portrait-source-v9-5dc09049.tar.gz",
+      "expectedGate": "pinned archive SHA-256 mismatch"
+    },
+    "webpDrift": {
+      "status": "PASS",
+      "soldierId": 100,
+      "fileName": "100.webp",
+      "expectedGate": "webp-sha256-mismatch"
+    }
+  },
+  "evidence": {
+    "baseMainSha": "8350014cf74b703ca609d955808699693ff460bc",
+    "implementationHeadSha": "dda3f9f1fc54f6252031578eba998f78d19d47cf",
+    "pullRequest": 437,
+    "latestBaseMergeRefSha": "05d5f9f6ef67c779a45da5d97b04facf2c1896da",
+    "b5WorkflowRunId": 33575067941,
+    "b5WorkflowJobId": 100077109755,
+    "projectCheckRunId": 33575067879,
+    "trackedRepositoryStateUnchanged": true
+  },
+  "boundaries": {
+    "semanticAuthority": false,
+    "semanticRecomputation": false,
+    "canonicalPopulationChange": false,
+    "heroSoldierRelationChange": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "automaticVersionDiscovery": false,
+    "rawConfigDataRead": false,
+    "b2Reopened": false,
+    "b3Reopened": false,
+    "b4Reopened": false
+  },
+  "blocker": null,
+  "review": null,
+  "handoff": {
+    "nextOwner": "soldier-assets",
+    "nextStage": "U0-U8 recurring Soldier portrait patch flow",
+    "nextStart": "Run the B3 ID-set planner when the authoritative canonical Soldier population changes. If it remains zero-delta, keep NO_UPDATE_REQUIRED and do not fabricate a batch.",
+    "reopenB5When": "A B5 regression case stops detecting its intended failure or a B3/B4/source-pack/WebP integrity contract changes."
+  }
+}

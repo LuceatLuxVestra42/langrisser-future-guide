@@ -1,0 +1,36 @@
+name: Soldier Portrait B5 Regression Fixtures
+
+on:
+  pull_request:
+    paths:
+      - 'data/contracts/soldier-portrait-b5-*'
+      - 'data/validation/soldier-portrait-b5-*'
+      - 'scripts/*soldier-portrait-b5*'
+      - '.github/workflows/soldier-portrait-b5-*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  b5-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install lossless WebP and Pillow tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webp python3-pil
+
+      - name: Validate B5 regression fixtures
+        run: node scripts/validate-soldier-portrait-b5-regressions.mjs
+
+      - name: Verify tracked state unchanged
+        run: git diff --exit-code -- .
