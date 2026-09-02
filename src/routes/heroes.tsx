@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { RotateCcw, Search, Sparkles, UserRound } from "lucide-react";
+import { RotateCcw, Search, UserRound } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { getHeroCardIconIndex } from "@/lib/hero-card-icon-assets.functions";
@@ -258,14 +258,13 @@ function HeroGridPage() {
                   type="button"
                   aria-pressed={spOnly}
                   onClick={() => setSpOnly((current) => !current)}
-                  className={`inline-flex h-10 items-center gap-1.5 rounded-md border px-3 text-xs font-bold transition ${
+                  className={`inline-flex h-10 items-center rounded-md border px-3 text-xs font-bold transition ${
                     spOnly
                       ? "border-foreground bg-foreground text-background"
                       : "border-border bg-background text-foreground hover:border-foreground/30"
                   }`}
                 >
-                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                  SP만 <span className="opacity-60">{data.filters.spCount}</span>
+                  SP <span className="opacity-60">{data.filters.spCount}</span>
                 </button>
               </div>
             ) : null}
@@ -319,7 +318,7 @@ function HeroGridPage() {
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="한국명 · 중국명 · 영문명"
+                placeholder="검색"
                 autoComplete="off"
                 className="h-10 w-full rounded-md border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/40 focus:ring-2 focus:ring-foreground/10"
               />
