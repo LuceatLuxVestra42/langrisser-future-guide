@@ -337,7 +337,6 @@ function HeroGridPage() {
                         aria-hidden="true"
                         className="h-6 w-6 shrink-0 object-contain"
                       />
-                      <span aria-hidden="true">-</span>
                       <span>{option.label}</span>
                     </span>
                   </FilterButton>
