@@ -1,0 +1,117 @@
+name: Temporary Stage 11-0 Same-Patch Boundary Apply
+
+on:
+  push:
+    branches:
+      - project-status/stage11-0-same-patch-boundary
+
+permissions:
+  contents: write
+
+jobs:
+  apply-stage11-0:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: project-status/stage11-0-same-patch-boundary
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Apply Stage 11-0 lifecycle correction
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const contractPath = 'tools/project-status/contracts/review-lifecycle.v1.json';
+          const testPath = 'tools/project-status/test/current-parity.mjs';
+
+          const contract = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
+          if (contract.schemaId !== 'project-status-review-lifecycle/v1') throw new Error('unexpected lifecycle schema');
+          if (contract.stage !== 'R2-review-lifecycle-stage10-correction') throw new Error(`unexpected lifecycle stage: ${contract.stage}`);
+          const rule = contract.rules.find(item => item?.domain === 'soldier' && item?.match?.code === 'SAME_PATCH_ORDER_UNRESOLVED');
+          if (!rule) throw new Error('SAME_PATCH_ORDER_UNRESOLVED rule missing');
+          if (rule.id !== 'soldier-same-patch-order-active' || rule.lifecycle !== 'ACTIVE_REVIEW' || rule.healthImpact !== true || rule.issueKey !== 'SOLDIER_SAME_PATCH_ORDER') {
+            throw new Error(`unexpected same-patch predecessor rule: ${JSON.stringify(rule)}`);
+          }
+          rule.id = 'soldier-same-patch-order-boundary';
+          rule.lifecycle = 'BOUNDARY_NOTE';
+          rule.healthImpact = false;
+          contract.stage = 'R2-review-lifecycle-stage11-0';
+          fs.writeFileSync(contractPath, `${JSON.stringify(contract, null, 2)}\n`);
+
+          let test = fs.readFileSync(testPath, 'utf8');
+          const replaceOnce = (from, to, label) => {
+            const first = test.indexOf(from);
+            if (first < 0) throw new Error(`missing test predecessor: ${label}`);
+            if (test.indexOf(from, first + from.length) >= 0) throw new Error(`ambiguous test predecessor: ${label}`);
+            test = `${test.slice(0, first)}${to}${test.slice(first + from.length)}`;
+          };
+
+          replaceOnce(
+          `}, {\n  ACTIVE_REVIEW: 9,\n  RESOLVED_BY_EVIDENCE: 2,\n  DEFERRED_NON_ERROR: 8,\n  BOUNDARY_NOTE: 9,\n}, 'corrected lifecycle counts');\nif (reviews.filter(review => review.healthImpact === true).length !== 9) fail('health-impact review entry count must be 9');`,
+          `}, {\n  ACTIVE_REVIEW: 8,\n  RESOLVED_BY_EVIDENCE: 2,\n  DEFERRED_NON_ERROR: 8,\n  BOUNDARY_NOTE: 10,\n}, 'Stage 11-0 lifecycle counts');\nif (reviews.filter(review => review.healthImpact === true).length !== 8) fail('health-impact review entry count must be 8 after Stage 11-0');`,
+          'global lifecycle counts');
+
+          replaceOnce(
+          `const lowerTierBoundary = soldierByCode('LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED');`,
+          `const lowerTierBoundary = soldierByCode('LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED');\nconst samePatchBoundary = soldierByCode('SAME_PATCH_ORDER_UNRESOLVED');`,
+          'same-patch review binding');
+
+          replaceOnce(
+          `if (lowerTierBoundary?.lifecycle !== 'BOUNDARY_NOTE' || lowerTierBoundary.healthImpact !== false\n  || lowerTierBoundary.remainingCount !== 0 || lowerTierBoundary.resolvedCount !== 39) {\n  fail(\`lower-tier chronology boundary drift: \${JSON.stringify(lowerTierBoundary)}\`);\n}`,
+          `if (lowerTierBoundary?.lifecycle !== 'BOUNDARY_NOTE' || lowerTierBoundary.healthImpact !== false\n  || lowerTierBoundary.remainingCount !== 0 || lowerTierBoundary.resolvedCount !== 39) {\n  fail(\`lower-tier chronology boundary drift: \${JSON.stringify(lowerTierBoundary)}\`);\n}\nif (samePatchBoundary?.lifecycle !== 'BOUNDARY_NOTE' || samePatchBoundary.healthImpact !== false\n  || samePatchBoundary.issueKey !== 'SOLDIER_SAME_PATCH_ORDER') {\n  fail(\`same-patch chronology must be a non-health boundary: \${JSON.stringify(samePatchBoundary)}\`);\n}`,
+          'same-patch boundary assertion');
+
+          replaceOnce(
+          `  reported: 28,\n  active: 9,\n  resolved: 2,\n  deferred: 8,\n  boundary: 9,\n  healthImpact: 9,\n  assigned: 27,\n  unassigned: 1,\n  uniqueIssues: 25,\n  healthImpactIssues: 6,`,
+          `  reported: 28,\n  active: 8,\n  resolved: 2,\n  deferred: 8,\n  boundary: 10,\n  healthImpact: 8,\n  assigned: 27,\n  unassigned: 1,\n  uniqueIssues: 25,\n  healthImpactIssues: 5,`,
+          'projected review aggregates');
+
+          replaceOnce(
+          `}, { active: 4, resolved: 2, deferred: 1, boundary: 5, healthImpact: 4 }, 'corrected Soldier projected lifecycle aggregates');`,
+          `}, { active: 3, resolved: 2, deferred: 1, boundary: 6, healthImpact: 3 }, 'Stage 11-0 Soldier projected lifecycle aggregates');`,
+          'Soldier review aggregates');
+
+          replaceOnce(
+          `console.log('[project-status-r2] PASS: corrected Stage 10 Soldier naming lifecycle, 41 -> 39/2 partial resolution, health cutover, canonical compatibility, writer boundary, and runtime independence verified.');`,
+          `console.log('[project-status-r2] PASS: Stage 11-0 same-patch chronology boundary, Stage 10 Soldier naming lifecycle, canonical compatibility, writer boundary, and runtime independence verified.');`,
+          'completion log');
+
+          fs.writeFileSync(testPath, test);
+          NODE
+
+      - name: Regenerate canonical Project Status projection
+        run: node tools/project-status/cli/write.mjs --apply
+
+      - name: Verify canonical projection is current
+        run: node tools/project-status/cli/write.mjs --check
+
+      - name: Validate Stage 11-0 Project Status parity
+        run: node tools/project-status/test/current-parity.mjs
+
+      - name: Validate diff whitespace
+        run: git diff --check
+
+      - name: Remove temporary workflow
+        run: rm .github/workflows/tmp-stage11-0-same-patch-boundary.yml
+
+      - name: Commit Stage 11-0 result
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/project-status/contracts/review-lifecycle.v1.json \
+                  tools/project-status/test/current-parity.mjs \
+                  data/generated/project-status.v1.json \
+                  PROJECT_STATUS.md \
+                  .github/workflows/tmp-stage11-0-same-patch-boundary.yml
+          git diff --cached --check
+          git commit -m 'Stage 11-0 reclassify Soldier same-patch order as boundary'
+          git push origin HEAD:project-status/stage11-0-same-patch-boundary
