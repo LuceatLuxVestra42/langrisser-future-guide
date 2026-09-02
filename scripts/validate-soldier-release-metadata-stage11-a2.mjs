@@ -142,7 +142,9 @@ const sourceKinds = confirmed.reduce((acc, record) => {
   acc[record.sourceKind] = (acc[record.sourceKind] ?? 0) + 1;
   return acc;
 }, {});
-if (!same(sourceKinds, { GOOGLE_SHEET: 11, OFFICIAL_CN_RELEASE_NOTICE: 40 })) {
+if (sourceKinds.GOOGLE_SHEET !== 11
+  || sourceKinds.OFFICIAL_CN_RELEASE_NOTICE !== 40
+  || Object.keys(sourceKinds).length !== 2) {
   push(`confirmed source-kind split mismatch: ${JSON.stringify(sourceKinds)}`);
 }
 if (confirmed.length !== 51 || unresolved.length !== 173) push('record-level confirmed/unresolved coverage mismatch');
