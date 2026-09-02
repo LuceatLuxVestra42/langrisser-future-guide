@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
+import { resolveConfigDataFile } from "./configdata-source-pack-maintenance-root.mjs";
 
 const STAGE0_PATH = "data/validation/soldier-training-tech-classification-stage0.v1.json";
 const TECH_PATH = "data/configdata/ConfigDataTrainingTechInfo.json";
@@ -11,6 +12,8 @@ const PRODUCER_PATH = "scripts/finalize-soldier-training-tech-classification-sta
 const VALIDATOR_PATH = "scripts/validate-soldier-training-tech-classification-stage1.mjs";
 
 function readBuffer(path) {
+  if (path === TECH_PATH) return readFileSync(resolveConfigDataFile('ConfigDataTrainingTechInfo.json'));
+  if (path === LEVEL_PATH) return readFileSync(resolveConfigDataFile('ConfigDataTrainingTechLevelInfo.json'));
   return readFileSync(path);
 }
 
