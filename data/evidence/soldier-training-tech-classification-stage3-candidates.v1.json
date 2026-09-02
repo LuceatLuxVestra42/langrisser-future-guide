@@ -1,0 +1,1956 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-tech-classification-stage3-candidate-evidence/v1",
+  "stage": "TrainingTech Classification Stage 3 - Representative Semantic Evidence Investigation",
+  "status": "INVESTIGATION_ONLY",
+  "predecessor": "data/validation/soldier-training-tech-classification-stage2.v1.json",
+  "sourceSnapshots": {
+    "trainingTech": {
+      "path": "data/configdata/ConfigDataTrainingTechInfo.json",
+      "gitBlobSha": "ad8b290f0e34de24b6eab9538894068a06e086d4",
+      "recordCount": 287
+    },
+    "trainingTechLevel": {
+      "path": "data/configdata/ConfigDataTrainingTechLevelInfo.json",
+      "gitBlobSha": "30789c3e4fb0d79b56514e720bb71a053df78c72",
+      "recordCount": 2945
+    }
+  },
+  "policy": {
+    "semanticClassificationPerformed": false,
+    "representativeSelectionUsesSourceOrderAsMeaning": false,
+    "representativeSelectionSourceOrderRole": "deterministic locator within an already-defined structural signature only",
+    "nameKeywordClassificationPerformed": false,
+    "descriptionKeywordClassificationPerformed": false,
+    "idArithmeticPerformed": false,
+    "techTypeMeaningAssigned": false
+  },
+  "coverage": {
+    "totalTrainingTech": 287,
+    "protectedGrowthTech": 129,
+    "nonGrowthTech": 158,
+    "structuralGroupCount": 15,
+    "representedNonGrowthTech": 158
+  },
+  "structuralGroups": [
+    {
+      "signatureKey": "techTypeRaw=1|relationShape=ARMY_ONLY|levelCount=5|skillLevelupShape=NONE|hasPreTech=false|hasRoomLevelRequired=false|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 1,
+        "relationShape": "ARMY_ONLY",
+        "levelCount": 5,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": false,
+        "hasRoomLevelRequired": false,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 7,
+      "techIds": [
+        101,
+        201,
+        301,
+        401,
+        402,
+        501,
+        601
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 0,
+        "techId": 101,
+        "rawTech": {
+          "ID": 101,
+          "Name": "基础攻击训练",
+          "Resource": "UI/Icon/Drill_ABS/Drill_AtkADD.png",
+          "ArmyIDRelated": [
+            2
+          ],
+          "TechType": 1,
+          "TechLevelupInfoList": [
+            1010,
+            1011,
+            1012,
+            1013,
+            1014
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 1010,
+            "Description": "所有步兵的生命<color=#DC143C>+2</color>，攻击<color=#DC143C>+2</color>",
+            "SoldierSkillID": 65000
+          },
+          {
+            "ID": 1011,
+            "Description": "所有步兵的生命<color=#DC143C>+4</color>，攻击<color=#DC143C>+4</color>",
+            "PreTechIDs": 1010,
+            "SoldierSkillID": 65001
+          },
+          {
+            "ID": 1012,
+            "Description": "所有步兵的生命<color=#DC143C>+6</color>，攻击<color=#DC143C>+6</color>",
+            "PreTechIDs": 1011,
+            "SoldierSkillID": 65002
+          },
+          {
+            "ID": 1013,
+            "Description": "所有步兵的生命<color=#DC143C>+8</color>，攻击<color=#DC143C>+8</color>",
+            "PreTechIDs": 1012,
+            "SoldierSkillID": 65003
+          },
+          {
+            "ID": 1014,
+            "Description": "所有步兵的生命<color=#DC143C>+10</color>，攻击<color=#DC143C>+10</color>",
+            "PreTechIDs": 1013,
+            "SoldierSkillID": 65004
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=1|relationShape=ARMY_ONLY|levelCount=5|skillLevelupShape=NONE|hasPreTech=true|hasRoomLevelRequired=false|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 1,
+        "relationShape": "ARMY_ONLY",
+        "levelCount": 5,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": true,
+        "hasRoomLevelRequired": false,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 5,
+      "techIds": [
+        102,
+        202,
+        302,
+        502,
+        602
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 1,
+        "techId": 102,
+        "rawTech": {
+          "ID": 102,
+          "Name": "基础防御训练",
+          "Resource": "UI/Icon/Drill_ABS/Drill_DefADD.png",
+          "PreTechIDs": [
+            101
+          ],
+          "PreTechLevel": [
+            5
+          ],
+          "ArmyIDRelated": [
+            2
+          ],
+          "TechType": 1,
+          "TechLevelupInfoList": [
+            1020,
+            1021,
+            1022,
+            1023,
+            1024
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 1020,
+            "Description": "所有步兵的防御<color=#DC143C>+1</color>，魔防<color=#DC143C>+1</color>",
+            "SoldierSkillID": 65010
+          },
+          {
+            "ID": 1021,
+            "Description": "所有步兵的防御<color=#DC143C>+2</color>，魔防<color=#DC143C>+2</color>",
+            "PreTechIDs": 1020,
+            "SoldierSkillID": 65011
+          },
+          {
+            "ID": 1022,
+            "Description": "所有步兵的防御<color=#DC143C>+3</color>，魔防<color=#DC143C>+3</color>",
+            "PreTechIDs": 1021,
+            "SoldierSkillID": 65012
+          },
+          {
+            "ID": 1023,
+            "Description": "所有步兵的防御<color=#DC143C>+4</color>，魔防<color=#DC143C>+4</color>",
+            "PreTechIDs": 1022,
+            "SoldierSkillID": 65013
+          },
+          {
+            "ID": 1024,
+            "Description": "所有步兵的防御<color=#DC143C>+6</color>，魔防<color=#DC143C>+6</color>",
+            "PreTechIDs": 1023,
+            "SoldierSkillID": 65014
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=1|relationShape=ARMY_ONLY|levelCount=10|skillLevelupShape=NONE|hasPreTech=true|hasRoomLevelRequired=false|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 1,
+        "relationShape": "ARMY_ONLY",
+        "levelCount": 10,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": true,
+        "hasRoomLevelRequired": false,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 20,
+      "techIds": [
+        103,
+        104,
+        129,
+        203,
+        204,
+        225,
+        303,
+        304,
+        326,
+        327,
+        403,
+        404,
+        432,
+        503,
+        504,
+        534,
+        535,
+        603,
+        604,
+        636
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 2,
+        "techId": 103,
+        "rawTech": {
+          "ID": 103,
+          "Name": "综合生存训练",
+          "Resource": "UI/Icon/Drill_ABS/Drill_HPMult.png",
+          "PreTechIDs": [
+            101
+          ],
+          "PreTechLevel": [
+            5
+          ],
+          "ArmyIDRelated": [
+            2
+          ],
+          "TechType": 1,
+          "TechLevelupInfoList": [
+            1030,
+            1031,
+            1032,
+            1033,
+            1034,
+            1035,
+            1036,
+            1037,
+            1038,
+            1039
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 1030,
+            "Description": "所有步兵的生命<color=#DC143C>+1%</color>",
+            "SoldierSkillID": 65030
+          },
+          {
+            "ID": 1031,
+            "Description": "所有步兵的生命<color=#DC143C>+2%</color>",
+            "PreTechIDs": 1030,
+            "SoldierSkillID": 65031
+          },
+          {
+            "ID": 1032,
+            "Description": "所有步兵的生命<color=#DC143C>+3%</color>",
+            "PreTechIDs": 1031,
+            "SoldierSkillID": 65032
+          },
+          {
+            "ID": 1033,
+            "Description": "所有步兵的生命<color=#DC143C>+4%</color>",
+            "PreTechIDs": 1032,
+            "SoldierSkillID": 65033
+          },
+          {
+            "ID": 1034,
+            "Description": "所有步兵的生命<color=#DC143C>+5%</color>",
+            "PreTechIDs": 1033,
+            "SoldierSkillID": 65034
+          },
+          {
+            "ID": 1035,
+            "Description": "所有步兵的生命<color=#DC143C>+6%</color>",
+            "PreTechIDs": 1034,
+            "SoldierSkillID": 65035
+          },
+          {
+            "ID": 1036,
+            "Description": "所有步兵的生命<color=#DC143C>+7%</color>",
+            "PreTechIDs": 1035,
+            "SoldierSkillID": 65036
+          },
+          {
+            "ID": 1037,
+            "Description": "所有步兵的生命<color=#DC143C>+8%</color>",
+            "PreTechIDs": 1036,
+            "SoldierSkillID": 65037
+          },
+          {
+            "ID": 1038,
+            "Description": "所有步兵的生命<color=#DC143C>+9%</color>",
+            "PreTechIDs": 1037,
+            "SoldierSkillID": 65038
+          },
+          {
+            "ID": 1039,
+            "Description": "所有步兵的生命<color=#DC143C>+10%</color>",
+            "PreTechIDs": 1038,
+            "SoldierSkillID": 65039
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=3|relationShape=ARMY_ONLY|levelCount=10|skillLevelupShape=NONE|hasPreTech=true|hasRoomLevelRequired=false|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 3,
+        "relationShape": "ARMY_ONLY",
+        "levelCount": 10,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": true,
+        "hasRoomLevelRequired": false,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 20,
+      "techIds": [
+        105,
+        130,
+        131,
+        205,
+        228,
+        229,
+        305,
+        329,
+        330,
+        434,
+        505,
+        522,
+        536,
+        537,
+        605,
+        622,
+        623,
+        638,
+        639,
+        640
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 4,
+        "techId": 105,
+        "rawTech": {
+          "ID": 105,
+          "Name": "对枪特训",
+          "Resource": "UI/Icon/Drill_ABS/Drill_Sward1.png",
+          "PreTechIDs": [
+            102
+          ],
+          "PreTechLevel": [
+            5
+          ],
+          "ArmyIDRelated": [
+            2
+          ],
+          "TechType": 3,
+          "TechLevelupInfoList": [
+            1050,
+            1051,
+            1052,
+            1053,
+            1054,
+            1055,
+            1056,
+            1057,
+            1058,
+            1059
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 1050,
+            "Description": "所有步兵，对枪兵战斗时，攻防提升<color=#DC143C>5%</color>。",
+            "SoldierSkillID": 65125
+          },
+          {
+            "ID": 1051,
+            "Description": "所有步兵，对枪兵战斗时，攻防提升<color=#DC143C>7%</color>。",
+            "PreTechIDs": 1050,
+            "SoldierSkillID": 65126
+          },
+          {
+            "ID": 1052,
+            "Description": "所有步兵，对枪兵战斗时，攻防提升<color=#DC143C>9%</color>。",
+            "PreTechIDs": 1051,
+            "SoldierSkillID": 65127
+          },
+          {
+            "ID": 1053,
+            "Description": "所有步兵，对枪兵战斗时，攻防提升<color=#DC143C>11%</color>。",
+            "PreTechIDs": 1052,
+            "SoldierSkillID": 65128
+          },
+          {
+            "ID": 1054,
+            "Description": "所有步兵，对枪兵战斗时，攻防提升<color=#DC143C>13%</color>。",
+            "PreTechIDs": 1053,
+            "SoldierSkillID": 65129
+          },
+          {
+            "ID": 1055,
+            "Description": "所有步兵，对枪兵战斗时，攻防提升<color=#DC143C>16%</color>。",
+            "PreTechIDs": 1054,
+            "SoldierSkillID": 65130
+          },
+          {
+            "ID": 1056,
+            "Description": "所有步兵，对枪兵战斗时，攻防提升<color=#DC143C>19%</color>。",
+            "PreTechIDs": 1055,
+            "SoldierSkillID": 65131
+          },
+          {
+            "ID": 1057,
+            "Description": "所有步兵，对枪兵战斗时，攻防提升<color=#DC143C>22%</color>。",
+            "PreTechIDs": 1056,
+            "SoldierSkillID": 65132
+          },
+          {
+            "ID": 1058,
+            "Description": "所有步兵，对枪兵战斗时，攻防提升<color=#DC143C>25%</color>。",
+            "PreTechIDs": 1057,
+            "SoldierSkillID": 65133
+          },
+          {
+            "ID": 1059,
+            "Description": "所有步兵，对枪兵战斗时，攻防提升<color=#DC143C>30%</color>。",
+            "PreTechIDs": 1058,
+            "SoldierSkillID": 65134
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=2|relationShape=SOLDIER_ONLY|levelCount=5|skillLevelupShape=EXACT_1_TO_5|hasPreTech=true|hasRoomLevelRequired=false|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 2,
+        "relationShape": "SOLDIER_ONLY",
+        "levelCount": 5,
+        "skillLevelupShape": "EXACT_1_TO_5",
+        "hasPreTech": true,
+        "hasRoomLevelRequired": false,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 27,
+      "techIds": [
+        106,
+        112,
+        113,
+        114,
+        206,
+        212,
+        213,
+        306,
+        312,
+        313,
+        406,
+        407,
+        414,
+        415,
+        416,
+        506,
+        511,
+        512,
+        513,
+        519,
+        520,
+        606,
+        612,
+        613,
+        614,
+        620,
+        621
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 5,
+        "techId": 106,
+        "rawTech": {
+          "ID": 106,
+          "Name": "精锐步兵",
+          "PreTechIDs": [
+            103
+          ],
+          "PreTechLevel": [
+            5
+          ],
+          "SoldierIDRelated": [
+            201
+          ],
+          "TechType": 2,
+          "TechLevelupInfoList": [
+            1060,
+            1061,
+            1062,
+            1063,
+            1064
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 1060,
+            "Description": "全属性<color=#DC143C>+1%</color>\n主动进入战斗时，遭受伤害降低<color=#DC143C>10%</color>。",
+            "SoldierSkillID": 65120,
+            "SoldierSkillLevelup": 1
+          },
+          {
+            "ID": 1061,
+            "Description": "全属性<color=#DC143C>+2%</color>\n主动进入战斗时，遭受伤害降低<color=#DC143C>12%</color>。",
+            "PreTechIDs": 1060,
+            "SoldierSkillID": 65121,
+            "SoldierSkillLevelup": 2
+          },
+          {
+            "ID": 1062,
+            "Description": "全属性<color=#DC143C>+3%</color>\n主动进入战斗时，遭受伤害降低<color=#DC143C>14%</color>。",
+            "PreTechIDs": 1061,
+            "SoldierSkillID": 65122,
+            "SoldierSkillLevelup": 3
+          },
+          {
+            "ID": 1063,
+            "Description": "全属性<color=#DC143C>+4%</color>\n主动进入战斗时，遭受伤害降低<color=#DC143C>17%</color>。",
+            "PreTechIDs": 1062,
+            "SoldierSkillID": 65123,
+            "SoldierSkillLevelup": 4
+          },
+          {
+            "ID": 1064,
+            "Description": "全属性<color=#DC143C>+5%</color>\n主动进入战斗时，遭受伤害降低<color=#DC143C>20%</color>。",
+            "PreTechIDs": 1063,
+            "SoldierSkillID": 65124,
+            "SoldierSkillLevelup": 5
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=1|relationShape=ARMY_ONLY|levelCount=10|skillLevelupShape=NONE|hasPreTech=false|hasRoomLevelRequired=false|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 1,
+        "relationShape": "ARMY_ONLY",
+        "levelCount": 10,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": false,
+        "hasRoomLevelRequired": false,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 16,
+      "techIds": [
+        109,
+        127,
+        128,
+        209,
+        226,
+        227,
+        309,
+        328,
+        411,
+        430,
+        431,
+        509,
+        533,
+        610,
+        635,
+        637
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 8,
+        "techId": 109,
+        "rawTech": {
+          "ID": 109,
+          "Name": "综合攻击训练",
+          "Resource": "UI/Icon/Drill_ABS/Drill_AtkMult.png",
+          "ArmyIDRelated": [
+            2
+          ],
+          "TechType": 1,
+          "TechLevelupInfoList": [
+            1090,
+            1091,
+            1092,
+            1093,
+            1094,
+            1095,
+            1096,
+            1097,
+            1098,
+            1099
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 1090,
+            "Description": "所有步兵的攻击<color=#DC143C>+1%</color>",
+            "SoldierSkillID": 65020
+          },
+          {
+            "ID": 1091,
+            "Description": "所有步兵的攻击<color=#DC143C>+2%</color>",
+            "PreTechIDs": 1090,
+            "SoldierSkillID": 65021
+          },
+          {
+            "ID": 1092,
+            "Description": "所有步兵的攻击<color=#DC143C>+3%</color>",
+            "PreTechIDs": 1091,
+            "SoldierSkillID": 65022
+          },
+          {
+            "ID": 1093,
+            "Description": "所有步兵的攻击<color=#DC143C>+4%</color>",
+            "PreTechIDs": 1092,
+            "SoldierSkillID": 65023
+          },
+          {
+            "ID": 1094,
+            "Description": "所有步兵的攻击<color=#DC143C>+5%</color>",
+            "PreTechIDs": 1093,
+            "SoldierSkillID": 65024
+          },
+          {
+            "ID": 1095,
+            "Description": "所有步兵的攻击<color=#DC143C>+6%</color>",
+            "PreTechIDs": 1094,
+            "SoldierSkillID": 65025
+          },
+          {
+            "ID": 1096,
+            "Description": "所有步兵的攻击<color=#DC143C>+7%</color>",
+            "PreTechIDs": 1095,
+            "SoldierSkillID": 65026
+          },
+          {
+            "ID": 1097,
+            "Description": "所有步兵的攻击<color=#DC143C>+8%</color>",
+            "PreTechIDs": 1096,
+            "SoldierSkillID": 65027
+          },
+          {
+            "ID": 1098,
+            "Description": "所有步兵的攻击<color=#DC143C>+9%</color>",
+            "PreTechIDs": 1097,
+            "SoldierSkillID": 65028
+          },
+          {
+            "ID": 1099,
+            "Description": "所有步兵的攻击<color=#DC143C>+10%</color>",
+            "PreTechIDs": 1098,
+            "SoldierSkillID": 65029
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=1|relationShape=ARMY_ONLY|levelCount=15|skillLevelupShape=NONE|hasPreTech=true|hasRoomLevelRequired=false|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 1,
+        "relationShape": "ARMY_ONLY",
+        "levelCount": 15,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": true,
+        "hasRoomLevelRequired": false,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 12,
+      "techIds": [
+        110,
+        111,
+        210,
+        211,
+        310,
+        311,
+        412,
+        413,
+        510,
+        518,
+        611,
+        619
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 9,
+        "techId": 110,
+        "rawTech": {
+          "ID": 110,
+          "Name": "强化生存训练",
+          "Resource": "UI/Icon/Drill_ABS/Drill_HPAdd.png",
+          "PreTechIDs": [
+            109
+          ],
+          "PreTechLevel": [
+            5
+          ],
+          "ArmyIDRelated": [
+            2
+          ],
+          "TechType": 1,
+          "TechLevelupInfoList": [
+            1100,
+            1101,
+            1102,
+            1103,
+            1104,
+            1105,
+            1106,
+            1107,
+            1108,
+            1109,
+            11100,
+            11101,
+            11102,
+            11103,
+            11104
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 1100,
+            "Description": "所有步兵的生命<color=#DC143C>+3</color>",
+            "SoldierSkillID": 65070
+          },
+          {
+            "ID": 1101,
+            "Description": "所有步兵的生命<color=#DC143C>+6</color>",
+            "PreTechIDs": 1100,
+            "SoldierSkillID": 65071
+          },
+          {
+            "ID": 1102,
+            "Description": "所有步兵的生命<color=#DC143C>+9</color>",
+            "PreTechIDs": 1101,
+            "SoldierSkillID": 65072
+          },
+          {
+            "ID": 1103,
+            "Description": "所有步兵的生命<color=#DC143C>+12</color>",
+            "PreTechIDs": 1102,
+            "SoldierSkillID": 65073
+          },
+          {
+            "ID": 1104,
+            "Description": "所有步兵的生命<color=#DC143C>+15</color>",
+            "PreTechIDs": 1103,
+            "SoldierSkillID": 65074
+          },
+          {
+            "ID": 1105,
+            "Description": "所有步兵的生命<color=#DC143C>+18</color>",
+            "PreTechIDs": 1104,
+            "SoldierSkillID": 65075
+          },
+          {
+            "ID": 1106,
+            "Description": "所有步兵的生命<color=#DC143C>+21</color>",
+            "PreTechIDs": 1105,
+            "SoldierSkillID": 65076
+          },
+          {
+            "ID": 1107,
+            "Description": "所有步兵的生命<color=#DC143C>+24</color>",
+            "PreTechIDs": 1106,
+            "SoldierSkillID": 65077
+          },
+          {
+            "ID": 1108,
+            "Description": "所有步兵的生命<color=#DC143C>+27</color>",
+            "PreTechIDs": 1107,
+            "SoldierSkillID": 65078
+          },
+          {
+            "ID": 1109,
+            "Description": "所有步兵的生命<color=#DC143C>+30</color>",
+            "PreTechIDs": 1108,
+            "SoldierSkillID": 65079
+          },
+          {
+            "ID": 11100,
+            "Description": "所有步兵的生命<color=#DC143C>+33</color>",
+            "PreTechIDs": 1109,
+            "SoldierSkillID": 9965075
+          },
+          {
+            "ID": 11101,
+            "Description": "所有步兵的生命<color=#DC143C>+36</color>",
+            "PreTechIDs": 11100,
+            "SoldierSkillID": 9965076
+          },
+          {
+            "ID": 11102,
+            "Description": "所有步兵的生命<color=#DC143C>+39</color>",
+            "PreTechIDs": 11101,
+            "SoldierSkillID": 9965077
+          },
+          {
+            "ID": 11103,
+            "Description": "所有步兵的生命<color=#DC143C>+42</color>",
+            "PreTechIDs": 11102,
+            "SoldierSkillID": 9965078
+          },
+          {
+            "ID": 11104,
+            "Description": "所有步兵的生命<color=#DC143C>+45</color>",
+            "PreTechIDs": 11103,
+            "SoldierSkillID": 9965079
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=1|relationShape=ARMY_ONLY|levelCount=15|skillLevelupShape=NONE|hasPreTech=false|hasRoomLevelRequired=false|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 1,
+        "relationShape": "ARMY_ONLY",
+        "levelCount": 15,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": false,
+        "hasRoomLevelRequired": false,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 6,
+      "techIds": [
+        118,
+        217,
+        317,
+        420,
+        517,
+        618
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 17,
+        "techId": 118,
+        "rawTech": {
+          "ID": 118,
+          "Name": "强化攻击训练",
+          "Resource": "UI/Icon/Drill_ABS/Drill_AtkADD.png",
+          "ArmyIDRelated": [
+            2
+          ],
+          "TechType": 1,
+          "TechLevelupInfoList": [
+            1180,
+            1181,
+            1182,
+            1183,
+            1184,
+            1185,
+            1186,
+            1187,
+            1188,
+            1189,
+            11180,
+            11181,
+            11182,
+            11183,
+            11184
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 1180,
+            "Description": "所有步兵的攻击<color=#DC143C>+3</color>",
+            "SoldierSkillID": 65040
+          },
+          {
+            "ID": 1181,
+            "Description": "所有步兵的攻击<color=#DC143C>+6</color>",
+            "PreTechIDs": 1180,
+            "SoldierSkillID": 65041
+          },
+          {
+            "ID": 1182,
+            "Description": "所有步兵的攻击<color=#DC143C>+9</color>",
+            "PreTechIDs": 1181,
+            "SoldierSkillID": 65042
+          },
+          {
+            "ID": 1183,
+            "Description": "所有步兵的攻击<color=#DC143C>+12</color>",
+            "PreTechIDs": 1182,
+            "SoldierSkillID": 65043
+          },
+          {
+            "ID": 1184,
+            "Description": "所有步兵的攻击<color=#DC143C>+15</color>",
+            "PreTechIDs": 1183,
+            "SoldierSkillID": 65044
+          },
+          {
+            "ID": 1185,
+            "Description": "所有步兵的攻击<color=#DC143C>+18</color>",
+            "PreTechIDs": 1184,
+            "SoldierSkillID": 65045
+          },
+          {
+            "ID": 1186,
+            "Description": "所有步兵的攻击<color=#DC143C>+21</color>",
+            "PreTechIDs": 1185,
+            "SoldierSkillID": 65046
+          },
+          {
+            "ID": 1187,
+            "Description": "所有步兵的攻击<color=#DC143C>+24</color>",
+            "PreTechIDs": 1186,
+            "SoldierSkillID": 65047
+          },
+          {
+            "ID": 1188,
+            "Description": "所有步兵的攻击<color=#DC143C>+27</color>",
+            "PreTechIDs": 1187,
+            "SoldierSkillID": 65048
+          },
+          {
+            "ID": 1189,
+            "Description": "所有步兵的攻击<color=#DC143C>+30</color>",
+            "PreTechIDs": 1188,
+            "SoldierSkillID": 65049
+          },
+          {
+            "ID": 11180,
+            "Description": "所有步兵的攻击<color=#DC143C>+33</color>",
+            "PreTechIDs": 1189,
+            "SoldierSkillID": 9965045
+          },
+          {
+            "ID": 11181,
+            "Description": "所有步兵的攻击<color=#DC143C>+36</color>",
+            "PreTechIDs": 11180,
+            "SoldierSkillID": 9965046
+          },
+          {
+            "ID": 11182,
+            "Description": "所有步兵的攻击<color=#DC143C>+39</color>",
+            "PreTechIDs": 11181,
+            "SoldierSkillID": 9965047
+          },
+          {
+            "ID": 11183,
+            "Description": "所有步兵的攻击<color=#DC143C>+42</color>",
+            "PreTechIDs": 11182,
+            "SoldierSkillID": 9965048
+          },
+          {
+            "ID": 11184,
+            "Description": "所有步兵的攻击<color=#DC143C>+45</color>",
+            "PreTechIDs": 11183,
+            "SoldierSkillID": 9965049
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=1|relationShape=ARMY_ONLY|levelCount=20|skillLevelupShape=NONE|hasPreTech=true|hasRoomLevelRequired=false|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 1,
+        "relationShape": "ARMY_ONLY",
+        "levelCount": 20,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": true,
+        "hasRoomLevelRequired": false,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 13,
+      "techIds": [
+        119,
+        120,
+        121,
+        218,
+        220,
+        318,
+        319,
+        320,
+        421,
+        423,
+        525,
+        526,
+        626
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 18,
+        "techId": 119,
+        "rawTech": {
+          "ID": 119,
+          "Name": "核心攻击训练",
+          "Resource": "UI/Icon/Drill_ABS/Drill_AtkMult.png",
+          "PreTechIDs": [
+            118
+          ],
+          "PreTechLevel": [
+            5
+          ],
+          "ArmyIDRelated": [
+            2
+          ],
+          "TechType": 1,
+          "TechLevelupInfoList": [
+            1190,
+            1191,
+            1192,
+            1193,
+            1194,
+            1195,
+            1196,
+            1197,
+            1198,
+            1199,
+            11190,
+            11191,
+            11192,
+            11193,
+            11194,
+            11195,
+            11196,
+            11197,
+            11198,
+            11199
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 1190,
+            "Description": "所有步兵的攻击<color=#DC143C>+2%</color>",
+            "SoldierSkillID": 65050
+          },
+          {
+            "ID": 1191,
+            "Description": "所有步兵的攻击<color=#DC143C>+3%</color>",
+            "PreTechIDs": 1190,
+            "SoldierSkillID": 65051
+          },
+          {
+            "ID": 1192,
+            "Description": "所有步兵的攻击<color=#DC143C>+4%</color>",
+            "PreTechIDs": 1191,
+            "SoldierSkillID": 65052
+          },
+          {
+            "ID": 1193,
+            "Description": "所有步兵的攻击<color=#DC143C>+5%</color>",
+            "PreTechIDs": 1192,
+            "SoldierSkillID": 65053
+          },
+          {
+            "ID": 1194,
+            "Description": "所有步兵的攻击<color=#DC143C>+6%</color>",
+            "PreTechIDs": 1193,
+            "SoldierSkillID": 65054
+          },
+          {
+            "ID": 1195,
+            "Description": "所有步兵的攻击<color=#DC143C>+8%</color>",
+            "PreTechIDs": 1194,
+            "SoldierSkillID": 65055
+          },
+          {
+            "ID": 1196,
+            "Description": "所有步兵的攻击<color=#DC143C>+10%</color>",
+            "PreTechIDs": 1195,
+            "SoldierSkillID": 65056
+          },
+          {
+            "ID": 1197,
+            "Description": "所有步兵的攻击<color=#DC143C>+12%</color>",
+            "PreTechIDs": 1196,
+            "SoldierSkillID": 65057
+          },
+          {
+            "ID": 1198,
+            "Description": "所有步兵的攻击<color=#DC143C>+14%</color>",
+            "PreTechIDs": 1197,
+            "SoldierSkillID": 65058
+          },
+          {
+            "ID": 1199,
+            "Description": "所有步兵的攻击<color=#DC143C>+16%</color>",
+            "PreTechIDs": 1198,
+            "SoldierSkillID": 65059
+          },
+          {
+            "ID": 11190,
+            "Description": "所有步兵的攻击<color=#DC143C>+18%</color>",
+            "PreTechIDs": 1199,
+            "SoldierSkillID": 9965050
+          },
+          {
+            "ID": 11191,
+            "Description": "所有步兵的攻击<color=#DC143C>+20%</color>",
+            "PreTechIDs": 11190,
+            "SoldierSkillID": 9965051
+          },
+          {
+            "ID": 11192,
+            "Description": "所有步兵的攻击<color=#DC143C>+22%</color>",
+            "PreTechIDs": 11191,
+            "SoldierSkillID": 9965052
+          },
+          {
+            "ID": 11193,
+            "Description": "所有步兵的攻击<color=#DC143C>+24%</color>",
+            "PreTechIDs": 11192,
+            "SoldierSkillID": 9965053
+          },
+          {
+            "ID": 11194,
+            "Description": "所有步兵的攻击<color=#DC143C>+26%</color>",
+            "PreTechIDs": 11193,
+            "SoldierSkillID": 9965054
+          },
+          {
+            "ID": 11195,
+            "Description": "所有步兵的攻击<color=#DC143C>+28%</color>",
+            "PreTechIDs": 11194,
+            "SoldierSkillID": 9965055
+          },
+          {
+            "ID": 11196,
+            "Description": "所有步兵的攻击<color=#DC143C>+30%</color>",
+            "PreTechIDs": 11195,
+            "SoldierSkillID": 9965056
+          },
+          {
+            "ID": 11197,
+            "Description": "所有步兵的攻击<color=#DC143C>+33%</color>",
+            "PreTechIDs": 11196,
+            "SoldierSkillID": 9965057
+          },
+          {
+            "ID": 11198,
+            "Description": "所有步兵的攻击<color=#DC143C>+36%</color>",
+            "PreTechIDs": 11197,
+            "SoldierSkillID": 9965058
+          },
+          {
+            "ID": 11199,
+            "Description": "所有步兵的攻击<color=#DC143C>+40%</color>",
+            "PreTechIDs": 11198,
+            "SoldierSkillID": 9965059
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=3|relationShape=ARMY_ONLY|levelCount=10|skillLevelupShape=NONE|hasPreTech=true|hasRoomLevelRequired=true|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 3,
+        "relationShape": "ARMY_ONLY",
+        "levelCount": 10,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": true,
+        "hasRoomLevelRequired": true,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 21,
+      "techIds": [
+        122,
+        123,
+        134,
+        221,
+        222,
+        232,
+        321,
+        322,
+        334,
+        426,
+        437,
+        438,
+        529,
+        540,
+        541,
+        629,
+        630,
+        631,
+        645,
+        646,
+        647
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 21,
+        "techId": 122,
+        "rawTech": {
+          "ID": 122,
+          "Name": "压制战法",
+          "Resource": "UI/Icon/Drill_ABS/Drill_Sward2.png",
+          "PreTechIDs": [
+            119
+          ],
+          "PreTechLevel": [
+            5
+          ],
+          "RoomLevelRequired": 10,
+          "ArmyIDRelated": [
+            2
+          ],
+          "TechType": 3,
+          "TechLevelupInfoList": [
+            1220,
+            1221,
+            1222,
+            1223,
+            1224,
+            1225,
+            1226,
+            1227,
+            1228,
+            1229
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 1220,
+            "Description": "所有步兵，在与生命值百分比等于和低于本部队的敌军交战时，攻防提升<color=#DC143C>5%</color>。",
+            "SoldierSkillID": 65135
+          },
+          {
+            "ID": 1221,
+            "Description": "所有步兵，在与生命值百分比等于和低于本部队的敌军交战时，攻防提升<color=#DC143C>6%</color>。",
+            "PreTechIDs": 1220,
+            "SoldierSkillID": 65137
+          },
+          {
+            "ID": 1222,
+            "Description": "所有步兵，在与生命值百分比等于和低于本部队的敌军交战时，攻防提升<color=#DC143C>7%</color>。",
+            "PreTechIDs": 1221,
+            "SoldierSkillID": 65139
+          },
+          {
+            "ID": 1223,
+            "Description": "所有步兵，在与生命值百分比等于和低于本部队的敌军交战时，攻防提升<color=#DC143C>8%</color>。",
+            "PreTechIDs": 1222,
+            "SoldierSkillID": 65141
+          },
+          {
+            "ID": 1224,
+            "Description": "所有步兵，在与生命值百分比等于和低于本部队的敌军交战时，攻防提升<color=#DC143C>9%</color>。",
+            "PreTechIDs": 1223,
+            "SoldierSkillID": 65143
+          },
+          {
+            "ID": 1225,
+            "Description": "所有步兵，在与生命值百分比等于和低于本部队的敌军交战时，攻防提升<color=#DC143C>11%</color>。",
+            "PreTechIDs": 1224,
+            "SoldierSkillID": 65145
+          },
+          {
+            "ID": 1226,
+            "Description": "所有步兵，在与生命值百分比等于和低于本部队的敌军交战时，攻防提升<color=#DC143C>13%</color>。",
+            "PreTechIDs": 1225,
+            "SoldierSkillID": 65147
+          },
+          {
+            "ID": 1227,
+            "Description": "所有步兵，在与生命值百分比等于和低于本部队的敌军交战时，攻防提升<color=#DC143C>15%</color>。",
+            "PreTechIDs": 1226,
+            "SoldierSkillID": 65149
+          },
+          {
+            "ID": 1228,
+            "Description": "所有步兵，在与生命值百分比等于和低于本部队的敌军交战时，攻防提升<color=#DC143C>17%</color>。",
+            "PreTechIDs": 1227,
+            "SoldierSkillID": 65151
+          },
+          {
+            "ID": 1229,
+            "Description": "所有步兵，在与生命值百分比等于和低于本部队的敌军交战时，攻防提升<color=#DC143C>20%</color>。",
+            "PreTechIDs": 1228,
+            "SoldierSkillID": 65153
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=1|relationShape=ARMY_ONLY|levelCount=20|skillLevelupShape=NONE|hasPreTech=false|hasRoomLevelRequired=false|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 1,
+        "relationShape": "ARMY_ONLY",
+        "levelCount": 20,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": false,
+        "hasRoomLevelRequired": false,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 5,
+      "techIds": [
+        219,
+        422,
+        527,
+        627,
+        628
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 58,
+        "techId": 219,
+        "rawTech": {
+          "ID": 219,
+          "Name": "核心生存训练",
+          "Resource": "UI/Icon/Drill_ABS/Drill_HPMult.png",
+          "ArmyIDRelated": [
+            1
+          ],
+          "TechType": 1,
+          "TechLevelupInfoList": [
+            2190,
+            2191,
+            2192,
+            2193,
+            2194,
+            2195,
+            2196,
+            2197,
+            2198,
+            2199,
+            12190,
+            12191,
+            12192,
+            12193,
+            12194,
+            12195,
+            12196,
+            12197,
+            12198,
+            12199
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 2190,
+            "Description": "所有枪兵的生命<color=#DC143C>+2%</color>",
+            "SoldierSkillID": 65090
+          },
+          {
+            "ID": 2191,
+            "Description": "所有枪兵的生命<color=#DC143C>+3%</color>",
+            "PreTechIDs": 2190,
+            "SoldierSkillID": 65091
+          },
+          {
+            "ID": 2192,
+            "Description": "所有枪兵的生命<color=#DC143C>+4%</color>",
+            "PreTechIDs": 2191,
+            "SoldierSkillID": 65092
+          },
+          {
+            "ID": 2193,
+            "Description": "所有枪兵的生命<color=#DC143C>+5%</color>",
+            "PreTechIDs": 2192,
+            "SoldierSkillID": 65093
+          },
+          {
+            "ID": 2194,
+            "Description": "所有枪兵的生命<color=#DC143C>+6%</color>",
+            "PreTechIDs": 2193,
+            "SoldierSkillID": 65094
+          },
+          {
+            "ID": 2195,
+            "Description": "所有枪兵的生命<color=#DC143C>+8%</color>",
+            "PreTechIDs": 2194,
+            "SoldierSkillID": 65095
+          },
+          {
+            "ID": 2196,
+            "Description": "所有枪兵的生命<color=#DC143C>+10%</color>",
+            "PreTechIDs": 2195,
+            "SoldierSkillID": 65096
+          },
+          {
+            "ID": 2197,
+            "Description": "所有枪兵的生命<color=#DC143C>+12%</color>",
+            "PreTechIDs": 2196,
+            "SoldierSkillID": 65097
+          },
+          {
+            "ID": 2198,
+            "Description": "所有枪兵的生命<color=#DC143C>+14%</color>",
+            "PreTechIDs": 2197,
+            "SoldierSkillID": 65098
+          },
+          {
+            "ID": 2199,
+            "Description": "所有枪兵的生命<color=#DC143C>+16%</color>",
+            "PreTechIDs": 2198,
+            "SoldierSkillID": 65099
+          },
+          {
+            "ID": 12190,
+            "Description": "所有枪兵的生命<color=#DC143C>+18%</color>",
+            "PreTechIDs": 2199,
+            "SoldierSkillID": 9965090
+          },
+          {
+            "ID": 12191,
+            "Description": "所有枪兵的生命<color=#DC143C>+20%</color>",
+            "PreTechIDs": 12190,
+            "SoldierSkillID": 9965091
+          },
+          {
+            "ID": 12192,
+            "Description": "所有枪兵的生命<color=#DC143C>+22%</color>",
+            "PreTechIDs": 12191,
+            "SoldierSkillID": 9965092
+          },
+          {
+            "ID": 12193,
+            "Description": "所有枪兵的生命<color=#DC143C>+24%</color>",
+            "PreTechIDs": 12192,
+            "SoldierSkillID": 9965093
+          },
+          {
+            "ID": 12194,
+            "Description": "所有枪兵的生命<color=#DC143C>+26%</color>",
+            "PreTechIDs": 12193,
+            "SoldierSkillID": 9965094
+          },
+          {
+            "ID": 12195,
+            "Description": "所有枪兵的生命<color=#DC143C>+28%</color>",
+            "PreTechIDs": 12194,
+            "SoldierSkillID": 9965095
+          },
+          {
+            "ID": 12196,
+            "Description": "所有枪兵的生命<color=#DC143C>+30%</color>",
+            "PreTechIDs": 12195,
+            "SoldierSkillID": 9965096
+          },
+          {
+            "ID": 12197,
+            "Description": "所有枪兵的生命<color=#DC143C>+33%</color>",
+            "PreTechIDs": 12196,
+            "SoldierSkillID": 9965097
+          },
+          {
+            "ID": 12198,
+            "Description": "所有枪兵的生命<color=#DC143C>+36%</color>",
+            "PreTechIDs": 12197,
+            "SoldierSkillID": 9965098
+          },
+          {
+            "ID": 12199,
+            "Description": "所有枪兵的生命<color=#DC143C>+40%</color>",
+            "PreTechIDs": 12198,
+            "SoldierSkillID": 9965099
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=3|relationShape=ARMY_AND_SOLDIER|levelCount=10|skillLevelupShape=NONE|hasPreTech=true|hasRoomLevelRequired=false|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 3,
+        "relationShape": "ARMY_AND_SOLDIER",
+        "levelCount": 10,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": true,
+        "hasRoomLevelRequired": false,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 3,
+      "techIds": [
+        405,
+        424,
+        433
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 122,
+        "techId": 405,
+        "rawTech": {
+          "ID": 405,
+          "Name": "先制打击",
+          "Resource": "UI/Icon/Drill_ABS/Drill_FlyWater1.png",
+          "PreTechIDs": [
+            401
+          ],
+          "PreTechLevel": [
+            5
+          ],
+          "SoldierIDRelated": [
+            134
+          ],
+          "ArmyIDRelated": [
+            4,
+            5
+          ],
+          "TechType": 3,
+          "TechLevelupInfoList": [
+            4050,
+            4051,
+            4052,
+            4053,
+            4054,
+            4055,
+            4056,
+            4057,
+            4058,
+            4059
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 4050,
+            "Description": "所有飞兵和水兵，生命大于<color=#DC143C>80%</color>时，攻防提升<color=#DC143C>5%</color>。",
+            "SoldierSkillID": 65225
+          },
+          {
+            "ID": 4051,
+            "Description": "所有飞兵和水兵，生命大于<color=#DC143C>80%</color>时，攻防提升<color=#DC143C>6%</color>。",
+            "PreTechIDs": 4050,
+            "SoldierSkillID": 65226
+          },
+          {
+            "ID": 4052,
+            "Description": "所有飞兵和水兵，生命大于<color=#DC143C>80%</color>时，攻防提升<color=#DC143C>7%</color>。",
+            "PreTechIDs": 4051,
+            "SoldierSkillID": 65227
+          },
+          {
+            "ID": 4053,
+            "Description": "所有飞兵和水兵，生命大于<color=#DC143C>80%</color>时，攻防提升<color=#DC143C>8%</color>。",
+            "PreTechIDs": 4052,
+            "SoldierSkillID": 65228
+          },
+          {
+            "ID": 4054,
+            "Description": "所有飞兵和水兵，生命大于<color=#DC143C>80%</color>时，攻防提升<color=#DC143C>9%</color>。",
+            "PreTechIDs": 4053,
+            "SoldierSkillID": 65229
+          },
+          {
+            "ID": 4055,
+            "Description": "所有飞兵和水兵，生命大于<color=#DC143C>80%</color>时，攻防提升<color=#DC143C>11%</color>。",
+            "PreTechIDs": 4054,
+            "SoldierSkillID": 65230
+          },
+          {
+            "ID": 4056,
+            "Description": "所有飞兵和水兵，生命大于<color=#DC143C>80%</color>时，攻防提升<color=#DC143C>13%</color>。",
+            "PreTechIDs": 4055,
+            "SoldierSkillID": 65231
+          },
+          {
+            "ID": 4057,
+            "Description": "所有飞兵和水兵，生命大于<color=#DC143C>80%</color>时，攻防提升<color=#DC143C>15%</color>。",
+            "PreTechIDs": 4056,
+            "SoldierSkillID": 65232
+          },
+          {
+            "ID": 4058,
+            "Description": "所有飞兵和水兵，生命大于<color=#DC143C>80%</color>时，攻防提升<color=#DC143C>17%</color>。",
+            "PreTechIDs": 4057,
+            "SoldierSkillID": 65233
+          },
+          {
+            "ID": 4059,
+            "Description": "所有飞兵和水兵，生命大于<color=#DC143C>80%</color>时，攻防提升<color=#DC143C>20%</color>。",
+            "PreTechIDs": 4058,
+            "SoldierSkillID": 65234
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=3|relationShape=ARMY_AND_SOLDIER|levelCount=10|skillLevelupShape=NONE|hasPreTech=true|hasRoomLevelRequired=true|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 3,
+        "relationShape": "ARMY_AND_SOLDIER",
+        "levelCount": 10,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": true,
+        "hasRoomLevelRequired": true,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 1,
+      "techIds": [
+        425
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 142,
+        "techId": 425,
+        "rawTech": {
+          "ID": 425,
+          "Name": "水战强化",
+          "Resource": "UI/Icon/Drill_ABS/Drill_Water1.png",
+          "PreTechIDs": [
+            421
+          ],
+          "PreTechLevel": [
+            5
+          ],
+          "RoomLevelRequired": 10,
+          "SoldierIDRelated": [
+            134
+          ],
+          "ArmyIDRelated": [
+            5
+          ],
+          "TechType": 3,
+          "TechLevelupInfoList": [
+            4250,
+            4251,
+            4252,
+            4253,
+            4254,
+            4255,
+            4256,
+            4257,
+            4258,
+            4259
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 4250,
+            "Description": "所有水兵，在水中攻击敌军时，造成伤害提升<color=#DC143C>5%</color>。",
+            "SoldierSkillID": 65245
+          },
+          {
+            "ID": 4251,
+            "Description": "所有水兵，在水中攻击敌军时，造成伤害提升<color=#DC143C>7%</color>。",
+            "PreTechIDs": 4250,
+            "SoldierSkillID": 65248
+          },
+          {
+            "ID": 4252,
+            "Description": "所有水兵，在水中攻击敌军时，造成伤害提升<color=#DC143C>9%</color>。",
+            "PreTechIDs": 4251,
+            "SoldierSkillID": 65251
+          },
+          {
+            "ID": 4253,
+            "Description": "所有水兵，在水中攻击敌军时，造成伤害提升<color=#DC143C>11%</color>。",
+            "PreTechIDs": 4252,
+            "SoldierSkillID": 65254
+          },
+          {
+            "ID": 4254,
+            "Description": "所有水兵，在水中攻击敌军时，造成伤害提升<color=#DC143C>13%</color>。",
+            "PreTechIDs": 4253,
+            "SoldierSkillID": 65257
+          },
+          {
+            "ID": 4255,
+            "Description": "所有水兵，在水中攻击敌军时，造成伤害提升<color=#DC143C>16%</color>。",
+            "PreTechIDs": 4254,
+            "SoldierSkillID": 65260
+          },
+          {
+            "ID": 4256,
+            "Description": "所有水兵，在水中攻击敌军时，造成伤害提升<color=#DC143C>19%</color>。",
+            "PreTechIDs": 4255,
+            "SoldierSkillID": 65263
+          },
+          {
+            "ID": 4257,
+            "Description": "所有水兵，在水中攻击敌军时，造成伤害提升<color=#DC143C>22%</color>。",
+            "PreTechIDs": 4256,
+            "SoldierSkillID": 65266
+          },
+          {
+            "ID": 4258,
+            "Description": "所有水兵，在水中攻击敌军时，造成伤害提升<color=#DC143C>25%</color>。",
+            "PreTechIDs": 4257,
+            "SoldierSkillID": 65269
+          },
+          {
+            "ID": 4259,
+            "Description": "所有水兵，在水中攻击敌军时，造成伤害提升<color=#DC143C>30%</color>。",
+            "PreTechIDs": 4258,
+            "SoldierSkillID": 65272
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=3|relationShape=ARMY_ONLY|levelCount=10|skillLevelupShape=NONE|hasPreTech=false|hasRoomLevelRequired=true|hasLevelUnlockField=false|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 3,
+        "relationShape": "ARMY_ONLY",
+        "levelCount": 10,
+        "skillLevelupShape": "NONE",
+        "hasPreTech": false,
+        "hasRoomLevelRequired": true,
+        "hasLevelUnlockField": false,
+        "hasSpDescription": false
+      },
+      "count": 1,
+      "techIds": [
+        528
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 195,
+        "techId": 528,
+        "rawTech": {
+          "ID": 528,
+          "Name": "杀戮气息",
+          "Resource": "UI/Icon/Drill_ABS/Drill_Ass1.png",
+          "RoomLevelRequired": 10,
+          "ArmyIDRelated": [
+            11
+          ],
+          "TechType": 3,
+          "TechLevelupInfoList": [
+            5280,
+            5281,
+            5282,
+            5283,
+            5284,
+            5285,
+            5286,
+            5287,
+            5288,
+            5289
+          ]
+        },
+        "explicitUnlockedSoldierIds": [],
+        "levelEvidence": [
+          {
+            "ID": 5280,
+            "Description": "所有刺客，在攻击<color=#DC143C>100%</color>生命值的敌军时，造成伤害提升<color=#DC143C>5%</color>。",
+            "SoldierSkillID": 65485
+          },
+          {
+            "ID": 5281,
+            "Description": "所有刺客，在攻击<color=#DC143C>100%</color>生命值的敌军时，造成伤害提升<color=#DC143C>7%</color>。",
+            "PreTechIDs": 5280,
+            "SoldierSkillID": 65486
+          },
+          {
+            "ID": 5282,
+            "Description": "所有刺客，在攻击<color=#DC143C>100%</color>生命值的敌军时，造成伤害提升<color=#DC143C>9%</color>。",
+            "PreTechIDs": 5281,
+            "SoldierSkillID": 65487
+          },
+          {
+            "ID": 5283,
+            "Description": "所有刺客，在攻击<color=#DC143C>100%</color>生命值的敌军时，造成伤害提升<color=#DC143C>11%</color>。",
+            "PreTechIDs": 5282,
+            "SoldierSkillID": 65488
+          },
+          {
+            "ID": 5284,
+            "Description": "所有刺客，在攻击<color=#DC143C>100%</color>生命值的敌军时，造成伤害提升<color=#DC143C>13%</color>。",
+            "PreTechIDs": 5283,
+            "SoldierSkillID": 65489
+          },
+          {
+            "ID": 5285,
+            "Description": "所有刺客，在攻击<color=#DC143C>100%</color>生命值的敌军时，造成伤害提升<color=#DC143C>16%</color>。",
+            "PreTechIDs": 5284,
+            "SoldierSkillID": 65490
+          },
+          {
+            "ID": 5286,
+            "Description": "所有刺客，在攻击<color=#DC143C>100%</color>生命值的敌军时，造成伤害提升<color=#DC143C>19%</color>。",
+            "PreTechIDs": 5285,
+            "SoldierSkillID": 65491
+          },
+          {
+            "ID": 5287,
+            "Description": "所有刺客，在攻击<color=#DC143C>100%</color>生命值的敌军时，造成伤害提升<color=#DC143C>22%</color>。",
+            "PreTechIDs": 5286,
+            "SoldierSkillID": 65492
+          },
+          {
+            "ID": 5288,
+            "Description": "所有刺客，在攻击<color=#DC143C>100%</color>生命值的敌军时，造成伤害提升<color=#DC143C>25%</color>。",
+            "PreTechIDs": 5287,
+            "SoldierSkillID": 65493
+          },
+          {
+            "ID": 5289,
+            "Description": "所有刺客，在攻击<color=#DC143C>100%</color>生命值的敌军时，造成伤害提升<color=#DC143C>30%</color>。",
+            "PreTechIDs": 5288,
+            "SoldierSkillID": 65494
+          }
+        ]
+      }
+    },
+    {
+      "signatureKey": "techTypeRaw=2|relationShape=SOLDIER_ONLY|levelCount=10|skillLevelupShape=EXACT_1_TO_10|hasPreTech=true|hasRoomLevelRequired=true|hasLevelUnlockField=true|hasSpDescription=false",
+      "signature": {
+        "techTypeRaw": 2,
+        "relationShape": "SOLDIER_ONLY",
+        "levelCount": 10,
+        "skillLevelupShape": "EXACT_1_TO_10",
+        "hasPreTech": true,
+        "hasRoomLevelRequired": true,
+        "hasLevelUnlockField": true,
+        "hasSpDescription": false
+      },
+      "count": 1,
+      "techIds": [
+        632
+      ],
+      "representativeSelection": "LOWEST_SOURCE_INDEX_WITHIN_STRUCTURAL_SIGNATURE_FOR_LOCATOR_ONLY",
+      "representative": {
+        "sourceIndex": 252,
+        "techId": 632,
+        "rawTech": {
+          "ID": 632,
+          "Name": "圣裁官",
+          "PreTechIDs": [
+            629
+          ],
+          "PreTechLevel": [
+            5
+          ],
+          "RoomLevelRequired": 12,
+          "SoldierIDRelated": [
+            804
+          ],
+          "TechType": 2,
+          "TechLevelupInfoList": [
+            6320,
+            6321,
+            6322,
+            6323,
+            6324,
+            6325,
+            6326,
+            6327,
+            6328,
+            6329
+          ]
+        },
+        "explicitUnlockedSoldierIds": [
+          804
+        ],
+        "levelEvidence": [
+          {
+            "ID": 6320,
+            "Description": "全属性<color=#DC143C>+2%</color>\n士兵生命高于<color=#DC143C>80%</color>时，身上每有一个强化状态，则士兵攻击、防御、魔防提升<color=#DC143C>5%</color>。（最高提升15%）",
+            "SoldierIDUnlocked": 804,
+            "SoldierSkillID": 65110,
+            "SoldierSkillLevelup": 1
+          },
+          {
+            "ID": 6321,
+            "Description": "全属性<color=#DC143C>+4%</color>\n士兵生命高于<color=#DC143C>80%</color>时，身上每有一个强化状态，则士兵攻击、防御、魔防提升<color=#DC143C>6%</color>。（最高提升18%）",
+            "PreTechIDs": 6320,
+            "SoldierIDUnlocked": 804,
+            "SoldierSkillID": 65111,
+            "SoldierSkillLevelup": 2
+          },
+          {
+            "ID": 6322,
+            "Description": "全属性<color=#DC143C>+6%</color>\n士兵生命高于<color=#DC143C>80%</color>时，身上每有一个强化状态，则士兵攻击、防御、魔防提升<color=#DC143C>7%</color>。（最高提升21%）",
+            "PreTechIDs": 6321,
+            "SoldierIDUnlocked": 804,
+            "SoldierSkillID": 65112,
+            "SoldierSkillLevelup": 3
+          },
+          {
+            "ID": 6323,
+            "Description": "全属性<color=#DC143C>+9%</color>\n士兵生命高于<color=#DC143C>80%</color>时，身上每有一个强化状态，则士兵攻击、防御、魔防提升<color=#DC143C>8%</color>。（最高提升24%）",
+            "PreTechIDs": 6322,
+            "SoldierIDUnlocked": 804,
+            "SoldierSkillID": 65113,
+            "SoldierSkillLevelup": 4
+          },
+          {
+            "ID": 6324,
+            "Description": "全属性<color=#DC143C>+12%</color>\n士兵生命高于<color=#DC143C>80%</color>时，身上每有一个强化状态，则士兵攻击、防御、魔防提升<color=#DC143C>9%</color>。（最高提升27%）",
+            "PreTechIDs": 6323,
+            "SoldierIDUnlocked": 804,
+            "SoldierSkillID": 65114,
+            "SoldierSkillLevelup": 5
+          },
+          {
+            "ID": 6325,
+            "Description": "全属性<color=#DC143C>+15%</color>\n士兵生命高于<color=#DC143C>80%</color>时，身上每有一个强化状态，则士兵攻击、防御、魔防提升<color=#DC143C>10%</color>。（最高提升30%）",
+            "PreTechIDs": 6324,
+            "SoldierIDUnlocked": 804,
+            "SoldierSkillID": 65115,
+            "SoldierSkillLevelup": 6
+          },
+          {
+            "ID": 6326,
+            "Description": "全属性<color=#DC143C>+18%</color>\n士兵生命高于<color=#DC143C>80%</color>时，身上每有一个强化状态，则士兵攻击、防御、魔防提升<color=#DC143C>11%</color>。（最高提升33%）",
+            "PreTechIDs": 6325,
+            "SoldierIDUnlocked": 804,
+            "SoldierSkillID": 65116,
+            "SoldierSkillLevelup": 7
+          },
+          {
+            "ID": 6327,
+            "Description": "全属性<color=#DC143C>+22%</color>\n士兵生命高于<color=#DC143C>80%</color>时，身上每有一个强化状态，则士兵攻击、防御、魔防提升<color=#DC143C>12%</color>。（最高提升36%）",
+            "PreTechIDs": 6326,
+            "SoldierIDUnlocked": 804,
+            "SoldierSkillID": 65117,
+            "SoldierSkillLevelup": 8
+          },
+          {
+            "ID": 6328,
+            "Description": "全属性<color=#DC143C>+26%</color>\n士兵生命高于<color=#DC143C>80%</color>时，身上每有一个强化状态，则士兵攻击、防御、魔防提升<color=#DC143C>13%</color>。（最高提升39%）",
+            "PreTechIDs": 6327,
+            "SoldierIDUnlocked": 804,
+            "SoldierSkillID": 65118,
+            "SoldierSkillLevelup": 9
+          },
+          {
+            "ID": 6329,
+            "Description": "全属性<color=#DC143C>+30%</color>\n士兵生命高于<color=#DC143C>80%</color>时，身上每有一个强化状态，则士兵攻击、防御、魔防提升<color=#DC143C>15%</color>。（最高提升45%）",
+            "PreTechIDs": 6328,
+            "SoldierIDUnlocked": 804,
+            "SoldierSkillID": 65119,
+            "SoldierSkillLevelup": 10
+          }
+        ]
+      }
+    }
+  ]
+}
