@@ -44,6 +44,15 @@
           "releaseDate": "2025-07-01"
         }
       ]
+    },
+    "officialNoticeEvidence": {
+      "path": "data/soldier-release-official-notice-evidence-stage11-a1.v1.json",
+      "gitBlobSha": "afcc3e891bf4ca3a32e8fb2f2ab9ddad4aaf8f06",
+      "schemaId": "soldier-release-official-notice-evidence/v1",
+      "stage": "11-A1",
+      "sourceAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
+      "officialEventCount": 19,
+      "promotedRecordCount": 40
     }
   },
   "checks": {
@@ -66,18 +75,27 @@
     "identityMutation": 0,
     "releaseProjectionMismatch": 0,
     "baselineMismatches": 0,
-    "outputRecordCountMismatch": 0
+    "outputRecordCountMismatch": 0,
+    "officialNoticePromotionMismatch": 0
   },
   "coverage": {
     "canonicalSoldiers": 224,
     "normalCount": 168,
     "spCount": 56,
     "normalTier3Count": 129,
-    "confirmedReleaseCount": 11,
-    "unresolvedReleaseCount": 213,
-    "unresolvedNormalTier3Count": 118,
+    "confirmedReleaseCount": 51,
+    "unresolvedReleaseCount": 173,
+    "unresolvedNormalTier3Count": 78,
     "lowerTierCount": 39,
     "patchGroups": [
+      {
+        "releaseDate": "2026-08-13",
+        "count": 2,
+        "soldierIds": [
+          136,
+          1039
+        ]
+      },
       {
         "releaseDate": "2025-07-01",
         "count": 5,
@@ -106,6 +124,152 @@
           647,
           648
         ]
+      },
+      {
+        "releaseDate": "2024-11-28",
+        "count": 2,
+        "soldierIds": [
+          516,
+          646
+        ]
+      },
+      {
+        "releaseDate": "2024-10-31",
+        "count": 2,
+        "soldierIds": [
+          250,
+          340
+        ]
+      },
+      {
+        "releaseDate": "2024-09-29",
+        "count": 2,
+        "soldierIds": [
+          134,
+          1036
+        ]
+      },
+      {
+        "releaseDate": "2024-09-05",
+        "count": 2,
+        "soldierIds": [
+          818,
+          1117
+        ]
+      },
+      {
+        "releaseDate": "2024-08-08",
+        "count": 2,
+        "soldierIds": [
+          426,
+          645
+        ]
+      },
+      {
+        "releaseDate": "2023-08-03",
+        "count": 2,
+        "soldierIds": [
+          339,
+          1035
+        ]
+      },
+      {
+        "releaseDate": "2022-12-15",
+        "count": 2,
+        "soldierIds": [
+          132,
+          338
+        ]
+      },
+      {
+        "releaseDate": "2022-09-22",
+        "count": 2,
+        "soldierIds": [
+          1034,
+          1115
+        ]
+      },
+      {
+        "releaseDate": "2022-08-25",
+        "count": 2,
+        "soldierIds": [
+          248,
+          641
+        ]
+      },
+      {
+        "releaseDate": "2021-12-16",
+        "count": 2,
+        "soldierIds": [
+          513,
+          640
+        ]
+      },
+      {
+        "releaseDate": "2021-11-18",
+        "count": 2,
+        "soldierIds": [
+          337,
+          1033
+        ]
+      },
+      {
+        "releaseDate": "2021-10-21",
+        "count": 2,
+        "soldierIds": [
+          423,
+          639
+        ]
+      },
+      {
+        "releaseDate": "2021-09-23",
+        "count": 2,
+        "soldierIds": [
+          247,
+          1114
+        ]
+      },
+      {
+        "releaseDate": "2021-08-26",
+        "count": 2,
+        "soldierIds": [
+          131,
+          815
+        ]
+      },
+      {
+        "releaseDate": "2020-11-11",
+        "count": 2,
+        "soldierIds": [
+          637,
+          1032
+        ]
+      },
+      {
+        "releaseDate": "2020-10-15",
+        "count": 3,
+        "soldierIds": [
+          130,
+          246,
+          1113
+        ]
+      },
+      {
+        "releaseDate": "2020-09-17",
+        "count": 3,
+        "soldierIds": [
+          422,
+          512,
+          638
+        ]
+      },
+      {
+        "releaseDate": "2020-08-20",
+        "count": 2,
+        "soldierIds": [
+          336,
+          814
+        ]
       }
     ],
     "nonPassIdentityMetadataCount": 41,
@@ -116,14 +280,24 @@
     "samePatchOrderPopulated": [],
     "identityMutation": [],
     "releaseProjectionMismatch": [],
-    "baselineMismatches": []
+    "baselineMismatches": [],
+    "officialNoticePromotedCount": 40
   },
   "errors": [],
   "reviews": [
-    "118 normal tier-3 Soldiers have no externally confirmed release date in the frozen Stage 5-8 source.",
-    "56 SP Soldiers are grouped before normal Soldiers by UI policy; their internal release order remains unresolved because the available SP sheet identifies Soldiers by images rather than canonical IDs.",
+    "78 normal tier-3 Soldiers have no externally confirmed release date after the frozen Stage 5-8 base source and admitted Stage 11-A1 official-notice overlay are combined.",
+    "56 SP Soldiers are grouped before normal Soldiers by UI policy; their internal release order remains unresolved because no canonical identity provenance has yet been admitted for the available SP release buckets.",
     "39 normal tier-1/tier-2 Soldiers remain in a technical bucket because release ordering is not required for the current list policy.",
     "41 list rows retain non-PASS identity/presentation metadata from Stage 5-7.",
     "Same-patch order is intentionally unresolved; no Soldier-ID ordering is presented as release ordering."
-  ]
+  ],
+  "promotion": {
+    "stage": "11-A2",
+    "status": "PASS",
+    "baseConfirmedRecords": 11,
+    "officialNoticeOverlayRecords": 40,
+    "totalConfirmedRecords": 51,
+    "unresolvedRecords": 173,
+    "samePatchOrder": "UNRESOLVED"
+  }
 }
