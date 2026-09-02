@@ -160,10 +160,65 @@ type HeroProvisionalNameSource = {
   }>;
 };
 
+type HeroTaxonomyLocalization = {
+  nameCn: string;
+  nameKr: string;
+};
+
 const heroList = heroListJson as unknown as HeroListStage1Source;
 const heroArtwork = heroArtworkJson as unknown as HeroArtworkStage4Source;
 const heroStage6Manifest = heroStage6ManifestJson as unknown as HeroStage6ManifestSource;
 const heroProvisionalNames = heroProvisionalNamesJson as unknown as HeroProvisionalNameSource;
+
+const factionLocalizationById = new Map<number, HeroTaxonomyLocalization>([
+  [1, { nameCn: "主角光环", nameKr: "시대의 주역" }],
+  [2, { nameCn: "光辉军团", nameKr: "빛의 군단" }],
+  [3, { nameCn: "光之起源", nameKr: "빛의 기원" }],
+  [4, { nameCn: "帝国之辉", nameKr: "제국의 빛" }],
+  [5, { nameCn: "黑暗轮回", nameKr: "어둠의 윤회" }],
+  [6, { nameCn: "公主联盟", nameKr: "공주 연맹" }],
+  [7, { nameCn: "战略大师", nameKr: "전략의 대가" }],
+  [8, { nameCn: "流星直击", nameKr: "메테오 스트라이크" }],
+  [9, { nameCn: "传说彼端", nameKr: "전설의 저편" }],
+  [10, { nameCn: "时空枢纽", nameKr: "시공의 중심" }],
+  [11, { nameCn: "超凡领域", nameKr: "초월 영역" }],
+  [12, { nameCn: "梦幻转生", nameKr: "리인카네이션 전생" }],
+]);
+
+const originLocalizationById = new Map<number, HeroTaxonomyLocalization>([
+  [1, { nameCn: "空之轨迹", nameKr: "영웅전설 하늘의 궤적" }],
+  [2, { nameCn: "樱花大战", nameKr: "사쿠라 대전" }],
+  [3, { nameCn: "梦幻模拟战手游I", nameKr: "랑그릿사 모바일I" }],
+  [4, { nameCn: "梦幻模拟战I", nameKr: "랑그릿사I" }],
+  [5, { nameCn: "梦幻模拟战II", nameKr: "랑그릿사II" }],
+  [6, { nameCn: "梦幻模拟战III", nameKr: "랑그릿사III" }],
+  [7, { nameCn: "梦幻模拟战IV", nameKr: "랑그릿사IV" }],
+  [8, { nameCn: "梦幻模拟战V", nameKr: "랑그릿사V" }],
+  [9, { nameCn: "梦幻模拟战·转生", nameKr: "랑그릿사 리인카네이션" }],
+  [10, { nameCn: "幽☆游☆白书", nameKr: "유유백서" }],
+  [11, { nameCn: "罗德斯岛", nameKr: "로도스도 전기" }],
+  [12, { nameCn: "梦幻模拟战手游II", nameKr: "랑그릿사 모바일II" }],
+  [13, { nameCn: "闪之轨迹", nameKr: "영웅전설 섬의 궤적" }],
+  [14, { nameCn: "OVERLORD", nameKr: "오버로드" }],
+  [15, { nameCn: "魔神英雄传", nameKr: "마신영웅전 와타루" }],
+  [16, { nameCn: "魔神坛斗士", nameKr: "사무라이 트루퍼" }],
+  [17, { nameCn: "银魂", nameKr: "은혼" }],
+  [18, { nameCn: "梦幻模拟战手游III", nameKr: "랑그릿사 모바일III" }],
+  [19, { nameCn: "战场女武神", nameKr: "전장의 발큐리아" }],
+  [20, { nameCn: "黎之轨迹", nameKr: "영웅전설 여의 궤적" }],
+  [21, { nameCn: "光明之响", nameKr: "샤이닝 레조넌스" }],
+  [22, { nameCn: "梦幻模拟战手游IV", nameKr: "랑그릿사 모바일IV(토이바르)" }],
+  [23, { nameCn: "秀逗魔导士", nameKr: "슬레이어즈" }],
+  [24, { nameCn: "强殖装甲凯普", nameKr: "강식장갑 가이버" }],
+  [25, { nameCn: "梦幻模拟战·千年纪WS", nameKr: "랑그릿사 밀레니엄 WS the Last Century" }],
+  [26, { nameCn: "名将战队", nameKr: "캡틴 코만도" }],
+  [27, { nameCn: "死或生", nameKr: "데드 오어 어라이브 6" }],
+  [28, { nameCn: "妖精的尾巴", nameKr: "페어리테일" }],
+  [29, { nameCn: "莱莎的炼金工房3 ～终结之炼金术士与秘密钥匙～", nameKr: "라이자의 아틀리에3 ~종극의 연금술사와 비밀의 열쇠~" }],
+  [30, { nameCn: "梦幻模拟战·千年纪DC", nameKr: "랑그릿사 밀레니엄 DC" }],
+  [31, { nameCn: "宇宙骑士", nameKr: "우주의 기사 테카맨 블레이드" }],
+  [32, { nameCn: "天空战记", nameKr: "천공전기 슈라토" }],
+]);
 
 function assertFrozenStage1Source(source: HeroListStage1Source) {
   if (
@@ -280,9 +335,30 @@ function assertProvisionalNameSource() {
   }
 }
 
+function assertTaxonomyLocalizationSource() {
+  if (factionLocalizationById.size !== 12 || originLocalizationById.size !== 32) {
+    throw new Error("Hero taxonomy Korean-name mapping coverage is invalid.");
+  }
+
+  for (const hero of heroList.records) {
+    for (const faction of hero.factions) {
+      const localized = factionLocalizationById.get(faction.factionId);
+      if (!localized || localized.nameCn !== faction.nameCn) {
+        throw new Error(`Hero ${hero.heroId} faction ${faction.factionId} Korean-name mapping parity failed.`);
+      }
+    }
+
+    const localizedOrigin = originLocalizationById.get(hero.origin.productionId);
+    if (!localizedOrigin || localizedOrigin.nameCn !== hero.origin.nameCn) {
+      throw new Error(`Hero ${hero.heroId} origin ${hero.origin.productionId} Korean-name mapping parity failed.`);
+    }
+  }
+}
+
 assertFrozenStage1Source(heroList);
 assertStage4Sources();
 assertProvisionalNameSource();
+assertTaxonomyLocalizationSource();
 
 const artworkByHeroId = new Map(heroArtwork.records.map((record) => [record.heroId, record]));
 const provisionalNameByHeroId = new Map(
@@ -320,37 +396,20 @@ function projectHeroNameLocalization(hero: HeroListRecord): HeroNameLocalization
   };
 }
 
-function projectLeonFactionOriginLocalization(hero: HeroListRecord) {
-  if (hero.heroId !== 6) {
-    return { factions: hero.factions, origin: hero.origin };
+function projectFactionLocalization(faction: HeroListFaction): HeroListFaction {
+  const localized = factionLocalizationById.get(faction.factionId);
+  if (!localized || localized.nameCn !== faction.nameCn) {
+    throw new Error(`Faction ${faction.factionId} Korean-name mapping parity failed.`);
   }
+  return { ...faction, nameKr: localized.nameKr };
+}
 
-  const expectedFactions = new Map<number, { nameCn: string; nameKr: string }>([
-    [4, { nameCn: "帝国之辉", nameKr: "제국의 빛" }],
-    [7, { nameCn: "战略大师", nameKr: "전략의 대가" }],
-  ]);
-
-  if (
-    hero.factions.length !== expectedFactions.size ||
-    hero.factions.some((faction) => expectedFactions.get(faction.factionId)?.nameCn !== faction.nameCn)
-  ) {
-    throw new Error("Hero 6 faction localization source no longer matches the frozen Hero presentation IDs.");
+function projectOriginLocalization(origin: HeroListOrigin): HeroListOrigin {
+  const localized = originLocalizationById.get(origin.productionId);
+  if (!localized || localized.nameCn !== origin.nameCn) {
+    throw new Error(`Origin ${origin.productionId} Korean-name mapping parity failed.`);
   }
-
-  if (hero.origin.productionId !== 5 || hero.origin.nameCn !== "梦幻模拟战II") {
-    throw new Error("Hero 6 origin localization source no longer matches the frozen Hero presentation ID.");
-  }
-
-  return {
-    factions: hero.factions.map((faction) => ({
-      ...faction,
-      nameKr: expectedFactions.get(faction.factionId)?.nameKr ?? faction.nameKr,
-    })),
-    origin: {
-      ...hero.origin,
-      nameKr: "랑그릿사II",
-    },
-  };
+  return { ...origin, nameKr: localized.nameKr };
 }
 
 function buildRarityOptions(records: HeroListRecord[]) {
@@ -387,12 +446,10 @@ function projectStage4Record(hero: HeroListRecord): HeroListStage4Record {
     throw new Error(`Hero ${hero.heroId} Stage 4 parity/admission check failed.`);
   }
 
-  const presentationLocalization = projectLeonFactionOriginLocalization(hero);
-
   return {
     ...hero,
-    factions: presentationLocalization.factions,
-    origin: presentationLocalization.origin,
+    factions: hero.factions.map(projectFactionLocalization),
+    origin: projectOriginLocalization(hero.origin),
     card: {
       ...hero.card,
       webAssetPath: artwork.webAssetPath,
@@ -438,6 +495,11 @@ export function readHeroListStage4Data() {
   return {
     ...readHeroListStage3Data(),
     records: heroList.records.map(projectStage4Record),
+    presentation: {
+      ...readHeroListStage3Data().presentation,
+      factionKoreanLabelsComplete: true,
+      originKoreanLabelsComplete: true,
+    },
     artwork: {
       resolved: heroArtwork.summary.resolvedCount,
       pending: heroArtwork.summary.pendingCount,
