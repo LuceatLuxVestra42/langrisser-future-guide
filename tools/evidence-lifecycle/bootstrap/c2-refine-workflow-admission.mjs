@@ -5,80 +5,31 @@ const contractPath = 'tools/evidence-lifecycle/contracts/c2-reference-graph.v1.j
 
 let source = fs.readFileSync(generatorPath, 'utf8');
 
-const oldContextBlock = `  const workflowPaths = new Set(tree.map(entry => entry.path).filter(p => /^\\.github\\/workflows\\/[^/]+\\.ya?ml$/.test(p)));
-  const productionConsumerPaths = new Set(tree.map(entry => entry.path).filter(p => /^(?:src|app|pages)\\//.test(p)));
-  const manifestPaths = new Set(admittedRecords.filter(record => record.scopeAdmissionRole === 'MANIFEST').map(record => record.path));
-  const retentionDeclarationPaths = new Set(admittedRecords.filter(record => record.scopeAdmissionRole === 'RETENTION_DECLARATION').map(record => record.path));
-`;
+const oldLocator = `  if (exact.has(terminal)) return true;\n  if (terminal !== 'path') return false;\n  const ancestors = tokens.slice(0, -1).join('.');\n  return /(predecessor|provenance|source|input|manifest|artifact|validation|checkpoint|contract|supplemental|consumer|authority|producer|output|generated)/.test(ancestors);`;
+const newLocator = `  if (exact.has(terminal)) return true;\n  if (/(?:source|artifact|manifest|predecessor|input|validation|checkpoint|contract|consumer|authority|output|generated)[a-z0-9_-]*paths?$/.test(terminal)) return true;\n  if (terminal !== 'path') return false;\n  const ancestors = tokens.slice(0, -1).join('.');\n  return /(predecessor|provenance|source|input|manifest|artifact|validation|checkpoint|contract|supplemental|consumer|authority|producer|output|generated)/.test(ancestors);`;
+if (!source.includes(oldLocator)) throw new Error('Expected structured locator block not found.');
+source = source.replace(oldLocator, newLocator);
 
-const newContextBlock = `  const trackedWorkflowPaths = new Set(tree.map(entry => entry.path).filter(p => /^\\.github\\/workflows\\/[^/]+\\.ya?ml$/.test(p)));
-  const productionConsumerPaths = new Set(tree.map(entry => entry.path).filter(p => /^(?:src|app|pages)\\//.test(p)));
-  const manifestPaths = new Set(admittedRecords.filter(record => record.scopeAdmissionRole === 'MANIFEST').map(record => record.path));
-  const retentionDeclarationPaths = new Set(admittedRecords.filter(record => record.scopeAdmissionRole === 'RETENTION_DECLARATION').map(record => record.path));
-  const explicitActiveWorkflowPaths = new Set();
-  const addExplicitActiveWorkflow = value => {
-    const candidate = normalize(value);
-    if (trackedWorkflowPaths.has(candidate)) explicitActiveWorkflowPaths.add(candidate);
-  };
-
-  const statusSourceLifecyclePath = 'tools/status-source/contracts/lifecycle.v1.json';
-  if (treeMap.has(statusSourceLifecyclePath)) {
-    const lifecycle = readJsonAt(baseline, statusSourceLifecyclePath);
-    const transport = lifecycle?.policy?.transport ?? {};
-    if (transport.productionWriterActivation === 'ACTIVE') addExplicitActiveWorkflow(transport.productionWriterWorkflow);
-    if (transport.legacyWriterActive === true) addExplicitActiveWorkflow(transport.legacyWriterWorkflow);
-    for (const pipeline of lifecycle?.pipelines ?? []) addExplicitActiveWorkflow(pipeline?.completionWorkflow);
-  }
-
-  for (const declarationPath of retentionDeclarationPaths) {
-    try {
-      const declaration = readJsonAt(baseline, declarationPath);
-      if (declaration?.state === 'APPROVED_FOR_HANDOFF') addExplicitActiveWorkflow(declaration.requestedByWorkflow);
-    } catch {
-      // C2 critical JSON handling below will fail closed if this source is operationally relevant.
-    }
-  }
-`;
-
-if (!source.includes(oldContextBlock)) throw new Error('Expected workflow context block not found.');
-source = source.replace(oldContextBlock, newContextBlock);
-
-source = source.replace(
-  `    workflowPaths,\n    productionConsumerPaths,`,
-  `    trackedWorkflowPaths,\n    explicitActiveWorkflowPaths,\n    productionConsumerPaths,`,
-);
-source = source.replace(
-  `  if (context.workflowPaths.has(sourcePath)) classes.push('ACTIVE_WORKFLOW');`,
-  `  if (context.explicitActiveWorkflowPaths.has(sourcePath)) classes.push('ACTIVE_WORKFLOW');`,
-);
-source = source.replace(
-  `      activeWorkflowCount: context.workflowPaths.size,`,
-  `      trackedWorkflowCount: context.trackedWorkflowPaths.size,\n      activeWorkflowCount: context.explicitActiveWorkflowPaths.size,`,
-);
-source = source.replace(
-  `    activeWorkflowBlobs: [...context.workflowPaths].sort().map(p => [p, context.treeMap.get(p)?.blobSha ?? null]),`,
-  `    activeWorkflowBlobs: [...context.explicitActiveWorkflowPaths].sort().map(p => [p, context.treeMap.get(p)?.blobSha ?? null]),`,
-);
-
-for (const forbidden of ['context.workflowPaths', 'workflowPaths,']) {
-  if (source.includes(forbidden)) throw new Error(`Stale workflow admission token remains: ${forbidden}`);
-}
+const validatorProtect = `  if (has('REGISTERED_PROJECT_CHECK_VALIDATOR_ENTRYPOINT')) {\n    return { edgeType: 'VALIDATOR_INPUT_REF', retentionClass: 'PROTECTING', sourceClasses: classes };\n  }`;
+const validatorRefined = `  if (sourcePath === 'tools/project-check/test/project-check-self-test.mjs') {\n    return { edgeType: 'VALIDATOR_ROUTING_FIXTURE', retentionClass: 'INFORMATIONAL', sourceClasses: classes };\n  }\n  if (has('REGISTERED_PROJECT_CHECK_VALIDATOR_ENTRYPOINT')) {\n    return { edgeType: 'VALIDATOR_INPUT_REF', retentionClass: 'PROTECTING', sourceClasses: classes };\n  }`;
+if (!source.includes(validatorProtect)) throw new Error('Expected validator protection block not found.');
+source = source.replace(validatorProtect, validatorRefined);
 
 fs.writeFileSync(generatorPath, source);
 
 const contract = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
-contract.protectingSourcePolicy.activeWorkflow = 'A workflow protects exact admitted-node references only when current authority explicitly admits that workflow as active. C2 currently derives this from the frozen Status Source lifecycle transport/pipeline fields and retained APPROVED_FOR_HANDOFF producer declarations. Mere tracked workflow existence is not active-workflow authority.';
-contract.protectingSourcePolicy.trackedWorkflowExistenceProtects = false;
-contract.protectingSourcePolicy.activeWorkflowAdmissionSources = [
-  'tools/status-source/contracts/lifecycle.v1.json policy.transport when activation/active flags permit',
-  'tools/status-source/contracts/lifecycle.v1.json pipelines[].completionWorkflow',
-  'C1 RETENTION_DECLARATION nodes with state=APPROVED_FOR_HANDOFF and requestedByWorkflow',
-];
-contract.informationalPolicy.unadmittedTrackedWorkflowMentionProtects = false;
-contract.freshness.refreshWhen = [
-  ...contract.freshness.refreshWhen,
-  'Explicit current-workflow admission fields in Status Source lifecycle/declarations change.',
-];
+if (!contract.edgeSchema.informationalEdgeTypes.includes('VALIDATOR_ROUTING_FIXTURE')) {
+  contract.edgeSchema.informationalEdgeTypes.push('VALIDATOR_ROUTING_FIXTURE');
+}
+contract.protectingSourcePolicy.registeredValidatorEntrypoint = 'Registered validator entrypoints protect exact admitted-node paths only when the mention represents validator input/dependency use. A path used solely as a routing/example fixture does not become retention-protecting.';
+contract.protectingSourcePolicy.validatorRoutingFixtureException = {
+  sourcePath: 'tools/project-check/test/project-check-self-test.mjs',
+  retentionClass: 'INFORMATIONAL',
+  edgeType: 'VALIDATOR_ROUTING_FIXTURE',
+  basis: 'The frozen baseline self-test passes these literal paths to expectOwners/routeProjectCheckPaths to test routing; it does not require the referenced artifact contents as validator inputs.'
+};
+contract.protectingSourcePolicy.semanticPathLocatorRule = 'Structured protection recognizes explicit path/path(s) keys and semantic *SourcePath/*ManifestPath/*ValidationPath/*CheckpointPath/*ContractPath/*PredecessorPath/*InputPath/*ArtifactPath/*ConsumerPath/*AuthorityPath/*OutputPath/*GeneratedPath-style keys, including prefixed keys such as a5ManifestPath beneath predecessor objects.';
+contract.informationalPolicy.routingFixtureMentionProtects = false;
 fs.writeFileSync(contractPath, JSON.stringify(contract, null, 2) + '\n');
 
-console.log('C2 workflow admission refined to explicit current-authority sources.');
+console.log('C2 validator-fixture and semantic-path locator policy refined.');
