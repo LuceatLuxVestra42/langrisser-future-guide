@@ -1,0 +1,36 @@
+name: Soldier Portrait B4 Batch Processor
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/resolve-soldier-portrait-batch-b4.mjs'
+      - 'scripts/process-soldier-portrait-batch-b4.mjs'
+      - 'scripts/inspect-soldier-portrait-image-b4.py'
+      - 'scripts/validate-soldier-portrait-batch-processor-b4.mjs'
+      - 'data/contracts/soldier-portrait-b4-fixture-batch.v1.json'
+      - 'data/contracts/soldier-portrait-batch-processor-b4.v1.json'
+      - 'data/validation/soldier-portrait-b4-*'
+      - '.github/workflows/soldier-portrait-b4-batch-processor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  b4-batch-processor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install lossless WebP and Pillow tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webp python3-pil
+      - name: Validate B4 fixture pipeline
+        run: node scripts/validate-soldier-portrait-batch-processor-b4.mjs
+      - name: Verify tracked state unchanged
+        run: git diff --exit-code -- .
