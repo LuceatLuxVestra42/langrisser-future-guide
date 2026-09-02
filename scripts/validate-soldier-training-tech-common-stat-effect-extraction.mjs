@@ -23,6 +23,33 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const errors = [];
 const check = (ok, msg) => { if (!ok) errors.push(msg); };
 const fail = () => { console.error(JSON.stringify({ status: "FAIL", blockers: errors }, null, 2)); process.exit(1); };
+const statKey = { "生命": "HP", "攻击": "ATK", "防御": "DEF", "魔防": "MDEF" };
+
+const independentlyParseDescription = (rawText, levelId) => {
+  if (typeof rawText !== "string" || rawText.length === 0) { errors.push(`TrainingTechLevel ${levelId} lacks Description.`); return null; }
+  const highlightedRaw = [...rawText.matchAll(/<color=[^>]+>\s*([^<]+?)\s*<\/color>/g)].map((m) => m[1].replace(/\s+/g, ""));
+  if (!highlightedRaw.length) { errors.push(`TrainingTechLevel ${levelId} has no highlighted effect token.`); return null; }
+  const highlighted = [];
+  for (const token of highlightedRaw) {
+    const m = token.match(/^([+-]?\d+(?:\.\d+)?)(%)?$/);
+    if (!m) { errors.push(`TrainingTechLevel ${levelId} has non-numeric highlighted token ${token}.`); return null; }
+    highlighted.push({ value: Number(m[1]), unit: m[2] ? "PERCENT" : "FLAT" });
+  }
+  const plain = rawText.replace(/<color=[^>]+>/g, "").replace(/<\/color>/g, "");
+  const everyNumber = [...plain.matchAll(/[+-]?\d+(?:\.\d+)?%?/g)].map((m) => m[0]);
+  if (everyNumber.length !== highlighted.length) { errors.push(`TrainingTechLevel ${levelId} has numeric text outside admitted highlighted effects.`); return null; }
+  const rx = /(生命|攻击|防御|魔防)(?:提升|提高|增加)?\s*([+-]?\d+(?:\.\d+)?)(%?)/g;
+  const matches = [...plain.matchAll(rx)];
+  if (matches.length !== highlighted.length) { errors.push(`TrainingTechLevel ${levelId} stat/value count differs from highlighted effect count.`); return null; }
+  const effects = matches.map((m, i) => {
+    const unit = m[3] ? "PERCENT" : "FLAT";
+    const value = Number(m[2]);
+    if (value !== highlighted[i].value || unit !== highlighted[i].unit) errors.push(`TrainingTechLevel ${levelId} highlighted value/stat alignment mismatch.`);
+    return { statTokenRaw: m[1], statKey: statKey[m[1]], unit, value, valueTextRaw: `${m[2]}${m[3]}` };
+  });
+  if (effects.some((e) => !e.statKey)) errors.push(`TrainingTechLevel ${levelId} has an unrecognized stat token.`);
+  return { effects, shapeKey: effects.map((e) => `${e.statKey}:${e.unit}`).join("|") };
+};
 
 check(Boolean(sourcePath), "TRAINING_TECH_LEVEL_SOURCE is required; no source fallback is allowed.");
 check(Boolean(sourcePath && existsSync(sourcePath)), `TrainingTechLevel source file does not exist: ${sourcePath ?? "<unset>"}`);
@@ -53,6 +80,8 @@ check(subject.authority?.stage5Validation?.gitBlobSha === blob(P.stage5Validatio
 check(subject.authority?.trainingTechLocatorProjection?.gitBlobSha === blob(P.stage1), "Stage 1 locator provenance mismatch.");
 check(subject.sourceSnapshots?.trainingTech?.gitBlobSha === boundary.futureExtractionEvidencePolicy.sourceSnapshotIdentity.trainingTechGitBlobSha, "Subject TrainingTech snapshot mismatch.");
 check(subject.sourceSnapshots?.trainingTechLevel?.gitBlobSha === boundary.futureExtractionEvidencePolicy.sourceSnapshotIdentity.trainingTechLevelGitBlobSha, "Subject TrainingTechLevel snapshot mismatch.");
+check(same(subject.effectSemantics?.statTokenMap, statKey), "Subject stat-token map drifted.");
+check(subject.effectSemantics?.model === "DIRECT_DESCRIPTION_STAT_VALUE_TOKENS", "Subject effect semantics model drifted.");
 
 const targetIds = stage5.classificationByLabel?.COMMON_STAT ?? [];
 check(targetIds.length === 84 && new Set(targetIds).size === 84, "Frozen COMMON_STAT membership is not 84 unique IDs.");
@@ -75,6 +104,9 @@ check(same(records.map((r) => r.techId), targetIds), "Subject Tech order/members
 check(new Set(records.map((r) => r.techId)).size === records.length, "Subject has duplicate Tech IDs.");
 const levelIds = [];
 let rawEffectTextRows = 0;
+let structuredEffectRows = 0;
+let structuredEffectEntries = 0;
+const independentShapeCatalog = new Map();
 for (const record of records) {
   const techId = record?.techId;
   check(target.has(techId) && !foreign.has(techId), `Foreign or excluded Tech materialized: ${techId}.`);
@@ -89,29 +121,52 @@ for (const record of records) {
   check(same(record?.trainingTechLocator, { ID: raw.ID, ArmyIDRelated: raw.ArmyIDRelated, TechType: raw.TechType, TechLevelupInfoList: refs }), `Tech ${techId} locator materialization mismatch.`);
   const levels = record?.levels ?? [];
   check(levels.length === refs.length, `Tech ${techId} materialized level count mismatch.`);
+  let expectedShapeKey = null;
+  let expectedShape = null;
   refs.forEach((levelId, i) => {
     const source = levelById.get(levelId);
     check(Boolean(source), `Unresolved TrainingTechLevel ID ${levelId}.`);
     if (!source) return;
+    const expected = independentlyParseDescription(source.Description, levelId);
+    if (!expected) return;
+    if (expectedShapeKey == null) {
+      expectedShapeKey = expected.shapeKey;
+      expectedShape = expected.effects.map(({ statTokenRaw, statKey: key, unit }) => ({ statTokenRaw, statKey: key, unit }));
+    }
+    check(expected.shapeKey === expectedShapeKey, `Tech ${techId} changes effect shape across source levels.`);
     const level = levels[i];
     check(level?.levelId === levelId, `Tech ${techId} level reference/order mismatch at ${levelId}.`);
     check(level?.effectTextRaw === source.Description, `TrainingTechLevel ${levelId} effectTextRaw mismatch.`);
-    check(Object.keys(level ?? {}).length === 2, `TrainingTechLevel ${levelId} generated effect row contains unrelated duplicated source fields.`);
-    if (level?.effectTextRaw === source.Description && typeof source.Description === "string") rawEffectTextRows++;
+    check(same(level?.effects, expected.effects), `TrainingTechLevel ${levelId} structured effects do not exactly match source Description.`);
+    check(Object.keys(level ?? {}).sort().join("|") === "effectTextRaw|effects|levelId", `TrainingTechLevel ${levelId} generated row contains fields outside the admitted effect projection.`);
+    if (level?.effectTextRaw === source.Description) rawEffectTextRows++;
+    if (same(level?.effects, expected.effects)) structuredEffectRows++;
+    structuredEffectEntries += expected.effects.length;
     levelIds.push(levelId);
   });
+  check(record?.effectShape?.shapeKey === expectedShapeKey && same(record?.effectShape?.effects, expectedShape), `Tech ${techId} effectShape differs from independently parsed source shape.`);
+  if (expectedShapeKey && expectedShape) {
+    const current = independentShapeCatalog.get(expectedShapeKey) ?? { shapeKey: expectedShapeKey, effects: expectedShape, techIds: [], levelRowCount: 0 };
+    current.techIds.push(techId);
+    current.levelRowCount += refs.length;
+    independentShapeCatalog.set(expectedShapeKey, current);
+  }
 }
 
+const independentCatalog = [...independentShapeCatalog.values()].sort((a, b) => a.shapeKey.localeCompare(b.shapeKey));
 check(levelIds.length === 1050 && new Set(levelIds).size === 1050, "COMMON_STAT materialized level coverage is not 1050 unique IDs.");
 check(rawEffectTextRows === 1050, "COMMON_STAT raw Description effect coverage is not 1050 rows.");
+check(structuredEffectRows === 1050, "COMMON_STAT structured effect coverage is not 1050 rows.");
+check(same(subject.effectSemantics?.effectShapeCatalog, independentCatalog), "Subject effect shape catalog differs from independently parsed source shapes.");
 check(subject.coverage?.targetTechCount === 84 && subject.coverage?.materializedTechCount === 84, "Subject Tech coverage counters drifted.");
-check(subject.coverage?.referencedLevelRowCount === 1050 && subject.coverage?.uniqueReferencedLevelRowCount === 1050 && subject.coverage?.rawEffectTextRowCount === 1050, "Subject level/effect coverage counters drifted.");
+check(subject.coverage?.referencedLevelRowCount === 1050 && subject.coverage?.uniqueReferencedLevelRowCount === 1050 && subject.coverage?.rawEffectTextRowCount === 1050 && subject.coverage?.structuredEffectRowCount === 1050, "Subject level/effect coverage counters drifted.");
+check(subject.coverage?.structuredEffectEntryCount === structuredEffectEntries && subject.coverage?.effectShapeCount === independentCatalog.length, "Subject structured effect counters drifted.");
 check(subject.coverage?.unresolvedLevelReferenceCount === 0 && subject.coverage?.duplicateReferencedLevelIdCount === 0 && subject.coverage?.excludedLabelTechMaterializedCount === 0, "Subject zero-error counters drifted.");
 const pol = subject.policy ?? {};
 check(pol.classificationAuthority === "STAGE5_FROZEN_MEMBERSHIP_ONLY" && pol.explicitTechLevelupInfoListJoinOnly === true, "Subject authority/join policy drifted.");
-check(pol.descriptionsMaterializedAsRawEffectText === true && pol.unrelatedTrainingTechLevelFieldsDuplicated === false && pol.sourceRowsReadByValidatorForExactResolution === true, "Effect-focused materialization policy drifted.");
-check(pol.descriptionUsedForClassification === false && pol.normalizedStatMeaningParsed === false && pol.numericEffectParsed === false, "Description/semantic parsing policy drifted.");
-check(pol.nameJoinPerformed === false && pol.idArithmeticPerformed === false && pol.missingValueImputationPerformed === false && pol.historicalOutputFallbackUsed === false && pol.stage5MembershipMutationAllowed === false, "Forbidden inference/mutation policy drifted.");
+check(pol.descriptionsMaterializedAsRawEffectText === true && pol.directStatTokensStructured === true && pol.numericEffectParsed === true, "Structured effect materialization policy drifted.");
+check(pol.conditionalEffectInferencePerformed === false && pol.unrelatedTrainingTechLevelFieldsDuplicated === false && pol.sourceRowsReadByValidatorForExactResolution === true, "Effect scope policy drifted.");
+check(pol.descriptionUsedForClassification === false && pol.nameJoinPerformed === false && pol.idArithmeticPerformed === false && pol.missingValueImputationPerformed === false && pol.historicalOutputFallbackUsed === false && pol.stage5MembershipMutationAllowed === false, "Forbidden inference/mutation policy drifted.");
 check((subject.blockers ?? []).length === 0 && (subject.reviews ?? []).length === 0, "Subject has blockers/reviews.");
 check(subject.nextOwner === boundary.parallelOwner, "Subject handoff does not match frozen parallel owner.");
 if (errors.length) fail();
@@ -131,8 +186,39 @@ const validation = {
     trainingTechLocatorProjection: { path: P.stage1, gitBlobSha: blob(P.stage1) },
     trainingTechLevelSource: { logicalPath: stage1.sourceSnapshots.trainingTechLevel.path, gitBlobSha: blobBytes(sourceBytes) },
   },
-  coverage: { commonStatTechs: 84, materializedTechs: 84, referencedLevelRows: 1050, uniqueReferencedLevelRows: 1050, rawEffectTextRows: 1050, unresolvedLevelReferences: 0, duplicateLevelReferences: 0, foreignLabelTechs: 0 },
-  gates: { boundaryFrozenComplete: true, stage5FrozenExact: true, sourceSnapshotsExact: true, commonStatMembershipExact: true, explicitLevelJoinOnly: true, everyReferenceResolvedExactlyOnce: true, rawDescriptionEffectsExact: true, noUnrelatedSourceRowDuplication: true, noClassificationMutation: true, noNameJoin: true, noIdArithmetic: true, noMissingValueImputation: true, noSemanticNormalization: true, noHistoricalFallback: true },
+  coverage: {
+    commonStatTechs: 84,
+    materializedTechs: 84,
+    referencedLevelRows: 1050,
+    uniqueReferencedLevelRows: 1050,
+    rawEffectTextRows: 1050,
+    structuredEffectRows: 1050,
+    structuredEffectEntries,
+    effectShapes: independentCatalog.length,
+    unresolvedLevelReferences: 0,
+    duplicateLevelReferences: 0,
+    foreignLabelTechs: 0,
+  },
+  gates: {
+    boundaryFrozenComplete: true,
+    stage5FrozenExact: true,
+    sourceSnapshotsExact: true,
+    commonStatMembershipExact: true,
+    explicitLevelJoinOnly: true,
+    everyReferenceResolvedExactlyOnce: true,
+    rawDescriptionEffectsExact: true,
+    everyNumericTokenAdmittedByExplicitStatValueAlignment: true,
+    structuredStatValuesExact: true,
+    effectShapeStableWithinEachTech: true,
+    noConditionalInference: true,
+    noUnrelatedSourceRowDuplication: true,
+    noClassificationMutation: true,
+    noNameJoin: true,
+    noIdArithmetic: true,
+    noMissingValueImputation: true,
+    noHistoricalFallback: true,
+  },
+  effectShapeCatalog: independentCatalog,
   blockers: [],
   reviews: [],
   nextOwner: subject.nextOwner,
