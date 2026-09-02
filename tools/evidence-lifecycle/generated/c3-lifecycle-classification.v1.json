@@ -7,16 +7,16 @@
   "freezeState": "C3_LIFECYCLE_CLASSIFICATION_COMPLETE",
   "baseline": {
     "branch": "main",
-    "sha": "c76274ea805889fed23f716c954eb76dca4b29d1"
+    "sha": "f991094d25a30e7d4ad905261cc3650987a63e0c"
   },
   "input": {
     "c0Contract": "tools/evidence-lifecycle/contracts/c0-scope-admission.v1.json",
     "c1Inventory": "tools/evidence-lifecycle/generated/c1-inventory.v1.json",
-    "c1InventoryDigest": "c1642e7031b66b9ab9a967f380698cc38125a861fd350a500aa953a0aa916941",
+    "c1InventoryDigest": "54ae464fb4d5cff74bebba0e49bfadbc0a7b30cc2c641b8c8a2fab69dfeebbb8",
     "c2ReferenceGraph": "tools/evidence-lifecycle/generated/c2-reference-graph.v1.json",
-    "c2GraphDigest": "bd71bc5f218f0d69be263fba7cbfcfabeae82bbca1730a9ee659b190ac5f6fee",
+    "c2GraphDigest": "ac182d7396b8476a7f8591fe671a528d9b00f81ef7f4fc86987892d7da778873",
     "c3Contract": "tools/evidence-lifecycle/contracts/c3-lifecycle-classification.v1.json",
-    "admittedNodeCount": 640
+    "admittedNodeCount": 642
   },
   "authorityBoundary": {
     "semanticReopen": false,
@@ -36,22 +36,22 @@
     "admittedStatusSourcePredecessorPathCount": 1
   },
   "summary": {
-    "admittedNodeCount": 640,
-    "classifiedNodeCount": 640,
+    "admittedNodeCount": 642,
+    "classifiedNodeCount": 642,
     "primaryLifecycleCounts": {
       "ACTIVE_AUTHORITY": 7,
       "ACTIVE_OPERATIONAL": 93,
       "RETENTION_HISTORICAL": 13,
       "RETENTION_PREDECESSOR": 5,
-      "UNREFERENCED_REVIEW": 522
+      "UNREFERENCED_REVIEW": 524
     },
-    "classificationBasisCount": 658,
+    "classificationBasisCount": 660,
     "secondaryReasonCount": 17,
     "unclassifiedCount": 0,
     "multiplePrimaryLifecycleCount": 0,
     "classificationBasisMissingCount": 0,
     "unreferencedReviewWithProtectingReferenceCount": 0,
-    "unreferencedReviewCount": 522,
+    "unreferencedReviewCount": 524,
     "hardErrorCount": 0
   },
   "policy": {
@@ -74,7 +74,7 @@
   },
   "classificationDigest": {
     "algorithm": "sha256",
-    "value": "06f936e9cc49885c2e8b648ab41ad4fe00935d6b0bf06e14961c52d10b79cc8a",
+    "value": "b0fcd1bb8524761d250492f89177890c458aa2978af3cc16c4b008ce871eb121",
     "canonicalization": "JSON.stringify(sorted-classification-record-array)"
   },
   "records": [
@@ -4990,8 +4990,25 @@
       "path": "data/contracts/soldier-training-tech-classification-stage4-contract.v1.json",
       "scopeAdmissionRole": "CONTRACT",
       "protectingReferenceCount": 0,
-      "informationalReferenceCount": 3,
-      "totalReferenceCount": 3,
+      "informationalReferenceCount": 6,
+      "totalReferenceCount": 6,
+      "protectingEdgeTypes": [],
+      "primaryLifecycle": "UNREFERENCED_REVIEW",
+      "classificationBasis": [
+        {
+          "kind": "NO_HIGHER_PRECEDENCE_SIGNAL",
+          "source": "tools/evidence-lifecycle/contracts/c3-lifecycle-classification.v1.json",
+          "detail": "protectingReferenceCount=0"
+        }
+      ],
+      "secondaryReasons": []
+    },
+    {
+      "path": "data/contracts/soldier-training-tech-effect-extraction-boundary.v1.json",
+      "scopeAdmissionRole": "CONTRACT",
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 2,
+      "totalReferenceCount": 2,
       "protectingEdgeTypes": [],
       "primaryLifecycle": "UNREFERENCED_REVIEW",
       "classificationBasis": [
@@ -5217,8 +5234,8 @@
       "path": "data/evidence/soldier-training-tech-classification-stage3-candidates.v1.json",
       "scopeAdmissionRole": "INVESTIGATION_EVIDENCE",
       "protectingReferenceCount": 0,
-      "informationalReferenceCount": 6,
-      "totalReferenceCount": 6,
+      "informationalReferenceCount": 9,
+      "totalReferenceCount": 9,
       "protectingEdgeTypes": [],
       "primaryLifecycle": "RETENTION_HISTORICAL",
       "classificationBasis": [
@@ -5234,8 +5251,8 @@
       "path": "data/evidence/soldier-training-tech-classification-stage3-semantic.v1.json",
       "scopeAdmissionRole": "VALIDATION_EVIDENCE",
       "protectingReferenceCount": 0,
-      "informationalReferenceCount": 5,
-      "totalReferenceCount": 5,
+      "informationalReferenceCount": 8,
+      "totalReferenceCount": 8,
       "protectingEdgeTypes": [],
       "primaryLifecycle": "UNREFERENCED_REVIEW",
       "classificationBasis": [
@@ -10330,8 +10347,8 @@
       "path": "data/validation/soldier-training-tech-classification-stage2.v1.json",
       "scopeAdmissionRole": "VALIDATION_EVIDENCE",
       "protectingReferenceCount": 0,
-      "informationalReferenceCount": 9,
-      "totalReferenceCount": 9,
+      "informationalReferenceCount": 12,
+      "totalReferenceCount": 12,
       "protectingEdgeTypes": [],
       "primaryLifecycle": "UNREFERENCED_REVIEW",
       "classificationBasis": [
@@ -10347,8 +10364,8 @@
       "path": "data/validation/soldier-training-tech-classification-stage3.v1.json",
       "scopeAdmissionRole": "VALIDATION_EVIDENCE",
       "protectingReferenceCount": 0,
-      "informationalReferenceCount": 4,
-      "totalReferenceCount": 4,
+      "informationalReferenceCount": 7,
+      "totalReferenceCount": 7,
       "protectingEdgeTypes": [],
       "primaryLifecycle": "UNREFERENCED_REVIEW",
       "classificationBasis": [
@@ -10364,8 +10381,25 @@
       "path": "data/validation/soldier-training-tech-classification-stage4.v1.json",
       "scopeAdmissionRole": "VALIDATION_EVIDENCE",
       "protectingReferenceCount": 0,
-      "informationalReferenceCount": 2,
-      "totalReferenceCount": 2,
+      "informationalReferenceCount": 5,
+      "totalReferenceCount": 5,
+      "protectingEdgeTypes": [],
+      "primaryLifecycle": "UNREFERENCED_REVIEW",
+      "classificationBasis": [
+        {
+          "kind": "NO_HIGHER_PRECEDENCE_SIGNAL",
+          "source": "tools/evidence-lifecycle/contracts/c3-lifecycle-classification.v1.json",
+          "detail": "protectingReferenceCount=0"
+        }
+      ],
+      "secondaryReasons": []
+    },
+    {
+      "path": "data/validation/soldier-training-tech-classification-stage5.v1.json",
+      "scopeAdmissionRole": "VALIDATION_EVIDENCE",
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 4,
+      "totalReferenceCount": 4,
       "protectingEdgeTypes": [],
       "primaryLifecycle": "UNREFERENCED_REVIEW",
       "classificationBasis": [

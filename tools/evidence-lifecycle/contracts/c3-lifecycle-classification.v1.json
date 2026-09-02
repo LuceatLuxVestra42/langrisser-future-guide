@@ -7,14 +7,14 @@
   "freezeState": "C3_LIFECYCLE_CLASSIFICATION_CONTRACT_FROZEN",
   "baseline": {
     "branch": "main",
-    "sha": "c76274ea805889fed23f716c954eb76dca4b29d1"
+    "sha": "f991094d25a30e7d4ad905261cc3650987a63e0c"
   },
   "input": {
     "c1InventoryPath": "tools/evidence-lifecycle/generated/c1-inventory.v1.json",
-    "c1InventoryDigest": "c1642e7031b66b9ab9a967f380698cc38125a861fd350a500aa953a0aa916941",
+    "c1InventoryDigest": "54ae464fb4d5cff74bebba0e49bfadbc0a7b30cc2c641b8c8a2fab69dfeebbb8",
     "c2ReferenceGraphPath": "tools/evidence-lifecycle/generated/c2-reference-graph.v1.json",
-    "c2GraphDigest": "bd71bc5f218f0d69be263fba7cbfcfabeae82bbca1730a9ee659b190ac5f6fee",
-    "admittedNodeCount": 640,
+    "c2GraphDigest": "ac182d7396b8476a7f8591fe671a528d9b00f81ef7f4fc86987892d7da778873",
+    "admittedNodeCount": 642,
     "populationPolicy": "C1_ADMITTED_ONLY"
   },
   "purpose": "Assign exactly one conservative lifecycle classification to every frozen C1 admitted node using C2 protecting references and explicit lifecycle evidence only, without semantic recomputation or destructive eligibility decisions.",
@@ -66,12 +66,16 @@
     "statusSourceReferenceAloneOperational": false
   },
   "retentionPredecessor": {
-    "edgeTypes": ["ACTIVE_PREDECESSOR_REF"],
+    "edgeTypes": [
+      "ACTIVE_PREDECESSOR_REF"
+    ],
     "manifestPredecessorLocator": true,
     "statusSourceSuccessorOfCreatesExplicitPredecessor": true
   },
   "retentionProvenance": {
-    "edgeTypes": ["ACTIVE_PROVENANCE_REF"],
+    "edgeTypes": [
+      "ACTIVE_PROVENANCE_REF"
+    ],
     "nonPredecessorManifestReference": true
   },
   "retentionHistorical": {
@@ -103,7 +107,11 @@
     "requiresC4OrC5ForAnyLaterRetentionOrDestructiveDecision": true
   },
   "classificationBasisSchema": {
-    "required": ["kind", "source", "detail"],
+    "required": [
+      "kind",
+      "source",
+      "detail"
+    ],
     "allowedKinds": [
       "STATUS_SOURCE_TERMINAL_AUTHORITY",
       "CURRENT_PROTECTING_EDGE",
@@ -134,8 +142,8 @@
     "protectingReferenceMeansDelete": true
   },
   "completionCriteria": {
-    "admittedPopulationParity": 640,
-    "classifiedPopulationParity": 640,
+    "admittedPopulationParity": 642,
+    "classifiedPopulationParity": 642,
     "unclassifiedCount": 0,
     "multiplePrimaryLifecycleCount": 0,
     "classificationBasisMissingCount": 0,

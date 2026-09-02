@@ -48,7 +48,7 @@ assert.equal(c2Contract.completion, 'COMPLETE');
 assert.equal(c2Contract.freezeState, 'C2_REFERENCE_GRAPH_CONTRACT_FROZEN');
 assert.equal(c2Contract.baseline.sha, c0.baseline.sha);
 assert.equal(c2Contract.input.c1InventoryDigest, c1Committed.inventoryDigest.value);
-assert.equal(c2Contract.input.admittedNodeCount, 640);
+assert.equal(c2Contract.input.admittedNodeCount, c1Committed.summary.admittedCount);
 assert.equal(c2Contract.completionCriteria.inferredReferenceCount, 0);
 assert.equal(c2Contract.completionCriteria.semanticReopen, false);
 assert.equal(c2Contract.completionCriteria.trackedMutationAfterValidationAllowed, false);
@@ -61,16 +61,16 @@ assert.equal(c2Committed.status, 'PASS_WITH_REVIEW');
 assert.equal(c2Committed.completion, 'COMPLETE');
 assert.equal(c2Committed.freezeState, 'C2_REFERENCE_GRAPH_COMPLETE');
 assert.equal(c2Committed.baseline.sha, c0.baseline.sha);
-assert.equal(c2Committed.input.admittedNodeCount, 640);
+assert.equal(c2Committed.input.admittedNodeCount, c1Committed.summary.admittedCount);
 assert.equal(c2Committed.authorityBoundary.semanticReopen, false);
 assert.equal(c2Committed.authorityBoundary.rawSemanticRecomputationCount, 0);
 assert.equal(c2Committed.authorityBoundary.inferredReferenceCount, 0);
 assert.equal(c2Committed.referenceSourceObservation.criticalJsonParseErrorCount, 0);
-assert.equal(c2Committed.summary.admittedNodeCount, 640);
+assert.equal(c2Committed.summary.admittedNodeCount, c1Committed.summary.admittedCount);
 assert.equal(c2Committed.summary.edgeCount, c2Committed.edges.length);
 assert.equal(c2Committed.summary.protectingEdgeCount + c2Committed.summary.informationalEdgeCount, c2Committed.summary.edgeCount);
-assert.equal(c2Committed.summary.referencedNodeCount + c2Committed.summary.zeroReferenceNodeCount, 640);
-assert.equal(c2Committed.summary.protectingReferencedNodeCount + c2Committed.summary.zeroProtectingReferenceNodeCount, 640);
+assert.equal(c2Committed.summary.referencedNodeCount + c2Committed.summary.zeroReferenceNodeCount, c1Committed.summary.admittedCount);
+assert.equal(c2Committed.summary.protectingReferencedNodeCount + c2Committed.summary.zeroProtectingReferenceNodeCount, c1Committed.summary.admittedCount);
 assert.ok(c2Committed.edges.every(edge => edge.explicit === true));
 assert.ok(c2Committed.edges.every(edge => ['PROTECTING', 'INFORMATIONAL'].includes(edge.retentionClass)));
 assert.ok(c2Committed.edges.every(edge => typeof edge.edgeType === 'string' && edge.edgeType.length > 0));
@@ -89,9 +89,9 @@ assert.equal(c3Contract.freezeState, 'C3_LIFECYCLE_CLASSIFICATION_CONTRACT_FROZE
 assert.equal(c3Contract.baseline.sha, c0.baseline.sha);
 assert.equal(c3Contract.input.c1InventoryDigest, c1Committed.inventoryDigest.value);
 assert.equal(c3Contract.input.c2GraphDigest, c2Committed.graphDigest.value);
-assert.equal(c3Contract.input.admittedNodeCount, 640);
-assert.equal(c3Contract.completionCriteria.admittedPopulationParity, 640);
-assert.equal(c3Contract.completionCriteria.classifiedPopulationParity, 640);
+assert.equal(c3Contract.input.admittedNodeCount, c1Committed.summary.admittedCount);
+assert.equal(c3Contract.completionCriteria.admittedPopulationParity, c1Committed.summary.admittedCount);
+assert.equal(c3Contract.completionCriteria.classifiedPopulationParity, c1Committed.summary.admittedCount);
 assert.equal(c3Contract.completionCriteria.unclassifiedCount, 0);
 assert.equal(c3Contract.completionCriteria.multiplePrimaryLifecycleCount, 0);
 assert.equal(c3Contract.completionCriteria.classificationBasisMissingCount, 0);
@@ -110,7 +110,7 @@ assert.equal(c3Committed.freezeState, 'C3_LIFECYCLE_CLASSIFICATION_COMPLETE');
 assert.equal(c3Committed.baseline.sha, c0.baseline.sha);
 assert.equal(c3Committed.input.c1InventoryDigest, c1Committed.inventoryDigest.value);
 assert.equal(c3Committed.input.c2GraphDigest, c2Committed.graphDigest.value);
-assert.equal(c3Committed.input.admittedNodeCount, 640);
+assert.equal(c3Committed.input.admittedNodeCount, c1Committed.summary.admittedCount);
 assert.equal(c3Committed.authorityBoundary.semanticReopen, false);
 assert.equal(c3Committed.authorityBoundary.rawSemanticRecomputationCount, 0);
 assert.equal(c3Committed.authorityBoundary.destructiveDecisionCount, 0);
@@ -125,10 +125,10 @@ const admittedC1Paths = c1Committed.records
   .map(record => record.path)
   .sort();
 const c3Paths = c3Committed.records.map(record => record.path).sort();
-assert.equal(admittedC1Paths.length, 640);
-assert.equal(c3Committed.records.length, 640);
+assert.equal(admittedC1Paths.length, c1Committed.summary.admittedCount);
+assert.equal(c3Committed.records.length, c1Committed.summary.admittedCount);
 assert.deepEqual(c3Paths, admittedC1Paths);
-assert.equal(new Set(c3Paths).size, 640);
+assert.equal(new Set(c3Paths).size, c1Committed.summary.admittedCount);
 
 const allowedLifecycle = new Set(c3Contract.primaryLifecycle);
 const allowedBasisKind = new Set(c3Contract.classificationBasisSchema.allowedKinds);
@@ -160,9 +160,9 @@ for (const record of c3Committed.records) {
 }
 
 const lifecycleCountSum = Object.values(c3Committed.summary.primaryLifecycleCounts).reduce((sum, count) => sum + count, 0);
-assert.equal(c3Committed.summary.admittedNodeCount, 640);
-assert.equal(c3Committed.summary.classifiedNodeCount, 640);
-assert.equal(lifecycleCountSum, 640);
+assert.equal(c3Committed.summary.admittedNodeCount, c1Committed.summary.admittedCount);
+assert.equal(c3Committed.summary.classifiedNodeCount, c1Committed.summary.admittedCount);
+assert.equal(lifecycleCountSum, c1Committed.summary.admittedCount);
 assert.equal(c3Committed.summary.unclassifiedCount, 0);
 assert.equal(c3Committed.summary.multiplePrimaryLifecycleCount, 0);
 assert.equal(c3Committed.summary.classificationBasisMissingCount, 0);
