@@ -1,0 +1,73 @@
+name: ConfigData Source Pack B1b
+
+on:
+  push:
+    branches:
+      - configdata/b1b-source-snapshot-v1
+    paths:
+      - scripts/build-configdata-source-pack-v1.mjs
+      - .github/workflows/configdata-source-pack-b1b-v1.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: configdata-source-pack-b1b-v1
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish-source-pack:
+    runs-on: ubuntu-latest
+    env:
+      SOURCE_SHA: 6475e63ee23d18adf733756c26a14fa9e3ed662c
+      RELEASE_TAG: source-configdata-v1-6475e63e
+      ARCHIVE_BASE: configdata-source-v1-6475e63e
+    steps:
+      - name: Checkout preparation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build deterministic exact-byte ConfigData source pack
+        run: |
+          set -euo pipefail
+          node scripts/build-configdata-source-pack-v1.mjs \
+            --source-sha "$SOURCE_SHA" \
+            --out-dir dist/configdata-source-pack
+
+      - name: Publish immutable-by-hash ConfigData source pack release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "::error::Release $RELEASE_TAG already exists; refusing to mutate or overwrite it."
+            exit 1
+          fi
+
+          created=0
+          cleanup_on_error() {
+            if [ "$created" -eq 1 ]; then
+              gh release delete "$RELEASE_TAG" --cleanup-tag --yes || true
+            fi
+          }
+          trap cleanup_on_error ERR
+
+          gh release create "$RELEASE_TAG" \
+            --target "$SOURCE_SHA" \
+            --title "ConfigData exact-byte source pack v1 ($SOURCE_SHA)" \
+            --notes "B1b exact-byte external ConfigData source snapshot. Built from data/configdata at pinned source commit $SOURCE_SHA using the B1a deterministic uncompressed POSIX USTAR format. Content identity is the exact file set plus per-file SHA-256 and byte length recorded in the inventory. Archive SHA-256 is transport/container integrity only. Canonical semantics, relations, Lookup materialized query behavior, and production runtime paths are unchanged."
+          created=1
+
+          gh release upload "$RELEASE_TAG" \
+            "dist/configdata-source-pack/${ARCHIVE_BASE}.tar" \
+            "dist/configdata-source-pack/${ARCHIVE_BASE}.inventory.json" \
+            "dist/configdata-source-pack/${ARCHIVE_BASE}.sha256"
+
+          trap - ERR
+
+      - name: Report published checksums
+        run: |
+          set -euo pipefail
+          cat "dist/configdata-source-pack/${ARCHIVE_BASE}.sha256"
