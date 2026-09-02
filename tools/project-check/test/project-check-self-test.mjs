@@ -231,8 +231,8 @@ expectOwners(
 );
 expectOwners(
   'data/configdata/ConfigDataHeroInfo.json',
-  ['configdata', 'hero-canonical', 'skin-relation'],
-  ['configdata-integrity', 'hero-canonical', 'skin-relation'],
+  ['configdata', 'configdata-source-pack', 'hero-canonical', 'skin-relation'],
+  ['configdata-source-pack-boundary', 'configdata-integrity', 'hero-canonical', 'skin-relation'],
 );
 
 const bannerAsset = routeProjectCheckPaths(['public/images/banners/Banner/probe.png'], contracts);
@@ -257,9 +257,11 @@ assert.deepEqual(skinAsset.files[0].owners, ['skin-assets']);
 assert.deepEqual(validatorIds(skinAsset), ['skin-static-assets-readonly']);
 
 const unknownConfig = routeProjectCheckPaths(['data/configdata/ConfigDataUnknownFutureTable.json'], contracts);
-assert.equal(unknownConfig.status, 'MANUAL_REVIEW');
-assert.equal(unknownConfig.files[0].status, 'MANUAL_REVIEW');
-assert.equal(unknownConfig.manualReviews[0].type, 'UNMATCHED_PATH');
+assert.equal(unknownConfig.status, 'PLAN_READY');
+assert.equal(unknownConfig.files[0].status, 'MAPPED');
+assert.deepEqual(unknownConfig.files[0].owners, ['configdata', 'configdata-source-pack']);
+assert.deepEqual(validatorIds(unknownConfig), ['configdata-source-pack-boundary', 'configdata-integrity']);
+assert.equal(unknownConfig.manualReviews.length, 0);
 
 const migrationRoute = routeProjectCheckPaths([
   'data/contracts/project-tooling-migration-r0.v1.json',
