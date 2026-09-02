@@ -52,7 +52,8 @@
     {"id":"shared-build","validators":["production-build"]},
     {"id":"banner-assets","validators":[],"manualReview":"Banner asset ownership remains manual until an independent final asset validator is admitted."},
     {"id":"skin-assets","validators":["skin-static-assets-readonly"]},
-    {"id":"skin-fullart-assets","validators":["skin-fullart-assets-readonly"]}
+    {"id":"skin-fullart-assets","validators":["skin-fullart-assets-readonly"]},
+    {"id":"evidence-lifecycle","validators":["evidence-lifecycle-readonly"]}
   ],
   "pathRules": [
     {
@@ -354,6 +355,11 @@
       "id":"config-hero-job-skill",
       "patterns":["data/configdata/ConfigDataJobConnectionInfo.json","data/configdata/ConfigDataJobLevelInfo.json","data/configdata/ConfigDataAwakenInfo.json","data/configdata/ConfigDataHeroStarInfo.json"],
       "owners":["configdata","hero-canonical"]
+    },
+    {
+      "id":"evidence-lifecycle",
+      "patterns":["tools/evidence-lifecycle/**"],
+      "owners":["evidence-lifecycle"]
     }
   ],
   "boundaries": {

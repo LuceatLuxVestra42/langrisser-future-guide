@@ -107,6 +107,14 @@
       "coverage": "Read-only B0.5-B storage-owner, deletion-routing, no-fan-out, no-semantic-inference and future snapshot-promotion boundary validation."
     },
     {
+      "id": "evidence-lifecycle-readonly",
+      "phase": 8,
+      "executable": "node",
+      "args": ["tools/evidence-lifecycle/test/evidence-lifecycle-readonly.mjs"],
+      "owner": "evidence-lifecycle",
+      "coverage": "Read-only C0 scope-admission and C1 physical inventory parity over the frozen baseline; no semantic recomputation, lifecycle classification, or deletion decision."
+    },
+    {
       "id": "configdata-integrity",
       "phase": 10,
       "executable": "npm",
