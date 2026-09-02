@@ -24,16 +24,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Refresh C1 inventory from frozen C0 baseline
-        run: node tools/evidence-lifecycle/cli/c1-inventory.mjs --write
-      - name: Commit refreshed C1 inventory if changed
+      - name: Print refreshed C1 identity
         run: |
-          if [ -z "$(git status --porcelain -- tools/evidence-lifecycle/generated/c1-inventory.v1.json)" ]; then
-            echo 'C1 inventory already current.'
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add tools/evidence-lifecycle/generated/c1-inventory.v1.json
-          git commit -m 'Refresh Evidence Lifecycle C1 inventory baseline'
-          git push
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const x = JSON.parse(fs.readFileSync('tools/evidence-lifecycle/generated/c1-inventory.v1.json', 'utf8'));
+          console.log(JSON.stringify({ baseline: x.baseline, summary: x.summary, inventoryDigest: x.inventoryDigest }, null, 2));
+          NODE
