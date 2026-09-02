@@ -12,6 +12,7 @@ APK_URL = "https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/mz-client-formal-
 APK_REF = "https://mz.zlongame.com/main.shtml"
 UA = "Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 Chrome/140.0 Mobile Safari/537.36"
 OUTPUT_PATH = Path(os.environ.get("OUTPUT_PATH", "equipment-ssr-frame-apk-probe.json"))
+EXTRACT_INPUT_DIR = os.environ.get("EXTRACT_INPUT_DIR")
 
 TARGET_METADATA_BASENAME = "global-metadata.dat"
 TARGET_NATIVE_BASENAME = "libil2cpp.so"
@@ -168,6 +169,35 @@ def entry_record(name, meta):
     return {"path": name, **meta}
 
 
+def write_il2cpp_inputs(metadata_candidates, native_candidates):
+    if not EXTRACT_INPUT_DIR:
+        return None
+    if len(metadata_candidates) != 1:
+        raise RuntimeError(f"expected exactly one global-metadata.dat, got {len(metadata_candidates)}")
+    if len(native_candidates) != 1:
+        raise RuntimeError(f"expected exactly one libil2cpp.so, got {len(native_candidates)}")
+
+    output_dir = Path(EXTRACT_INPUT_DIR)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    written = []
+    for candidate, out_name in (
+        (metadata_candidates[0], TARGET_METADATA_BASENAME),
+        (native_candidates[0], TARGET_NATIVE_BASENAME),
+    ):
+        raw = fetch_zip_entry(candidate)
+        out_path = output_dir / out_name
+        out_path.write_bytes(raw)
+        written.append(
+            {
+                "sourcePath": candidate["path"],
+                "outputName": out_name,
+                "bytes": len(raw),
+                "sha256": sha256(raw),
+            }
+        )
+    return written
+
+
 def main():
     total, headers = get_total_size()
     entries, zip_info = parse_zip_index(total)
@@ -212,6 +242,8 @@ def main():
             }
         )
 
+    extracted_inputs = write_il2cpp_inputs(metadata_candidates, native_candidates)
+
     report = {
         "stage": "Equipment SSR Frame APK Provenance Probe",
         "status": "PROBE_COMPLETE",
@@ -228,6 +260,7 @@ def main():
         "metadataCandidates": metadata_candidates,
         "nativeCandidates": native_candidates,
         "metadataProbes": metadata_probes,
+        "extractedIl2CppInputs": extracted_inputs,
         "assetLocatorCandidates": asset_locator_candidates,
         "locatorBoundary": {
             "candidatePathsAreSemanticEvidence": False,
