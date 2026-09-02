@@ -14,10 +14,6 @@ function readBuffer(path) {
   return readFileSync(path);
 }
 
-function readJson(path) {
-  return JSON.parse(readBuffer(path).toString("utf8"));
-}
-
 function gitBlobSha(buffer) {
   return createHash("sha1")
     .update(Buffer.from(`blob ${buffer.length}\0`, "utf8"))
@@ -36,20 +32,23 @@ function increment(map, key, amount = 1) {
 }
 
 function sortedObjectFromMap(map, numericKeys = false) {
-  return Object.fromEntries([...map.entries()].sort(([a], [b]) => {
-    if (numericKeys) {
-      const aNumber = Number(a);
-      const bNumber = Number(b);
-      if (Number.isFinite(aNumber) && Number.isFinite(bNumber)) return aNumber - bNumber;
-    }
-    return String(a).localeCompare(String(b));
-  }));
+  return Object.fromEntries(
+    [...map.entries()].sort(([a], [b]) => {
+      if (numericKeys) {
+        const aNumber = Number(a);
+        const bNumber = Number(b);
+        if (Number.isFinite(aNumber) && Number.isFinite(bNumber)) return aNumber - bNumber;
+      }
+      return String(a).localeCompare(String(b));
+    }),
+  );
 }
 
 function fieldCensus(records) {
   const presence = new Map();
   const kinds = new Map();
   const signatures = new Map();
+
   for (const record of records) {
     if (!record || typeof record !== "object" || Array.isArray(record)) {
       increment(signatures, `<${valueKind(record)}>`);
@@ -62,6 +61,7 @@ function fieldCensus(records) {
       increment(kinds, `${key}:${valueKind(record[key])}`);
     }
   }
+
   return {
     fieldPresence: sortedObjectFromMap(presence),
     fieldValueKinds: sortedObjectFromMap(kinds),
@@ -69,24 +69,31 @@ function fieldCensus(records) {
   };
 }
 
-function deepEqualJson(a, b) {
-  return JSON.stringify(a) === JSON.stringify(b);
-}
-
-function duplicateIdGroupCount(records) {
-  const counts = new Map();
+function duplicateIdSummary(records) {
+  const occurrences = new Map();
   let missingIdCount = 0;
-  for (const record of records) {
+
+  records.forEach((record, sourceIndex) => {
     if (!record || typeof record !== "object" || Array.isArray(record) || !("ID" in record)) {
       missingIdCount += 1;
-      continue;
+      return;
     }
-    increment(counts, JSON.stringify(record.ID));
-  }
+    const key = JSON.stringify(record.ID);
+    const indexes = occurrences.get(key) ?? [];
+    indexes.push(sourceIndex);
+    occurrences.set(key, indexes);
+  });
+
   return {
     missingIdCount,
-    duplicateIdGroupCount: [...counts.values()].filter((count) => count > 1).length,
+    duplicateGroups: [...occurrences.entries()]
+      .filter(([, indexes]) => indexes.length > 1)
+      .map(([serializedId, sourceIndexes]) => ({ id: JSON.parse(serializedId), sourceIndexes })),
   };
+}
+
+function sameJson(left, right) {
+  return JSON.stringify(left) === JSON.stringify(right);
 }
 
 const stage0Buffer = readBuffer(STAGE0_PATH);
@@ -106,13 +113,17 @@ const stage0BlobSha = gitBlobSha(stage0Buffer);
 const techBlobSha = gitBlobSha(techBuffer);
 const levelBlobSha = gitBlobSha(levelBuffer);
 
-if (stage0?.status !== "PASS" || stage0?.completion !== "COMPLETE" || stage0?.freezeState !== "TRAINING_TECH_CLASSIFICATION_STAGE0_FROZEN") {
+if (
+  stage0?.status !== "PASS" ||
+  stage0?.completion !== "COMPLETE" ||
+  stage0?.freezeState !== "TRAINING_TECH_CLASSIFICATION_STAGE0_FROZEN"
+) {
   fail("Stage 0 predecessor is not frozen PASS/COMPLETE.");
 }
-if (!Array.isArray(techRecords)) fail("TrainingTech source is not an array.");
-if (!Array.isArray(levelRecords)) fail("TrainingTechLevel source is not an array.");
+if (!Array.isArray(techRecords)) fail("TrainingTech source is not a JSON array.");
+if (!Array.isArray(levelRecords)) fail("TrainingTechLevel source is not a JSON array.");
 if (!Array.isArray(census?.records)) fail("Stage 1 census records is not an array.");
-if (!Array.isArray(census?.levelRecords)) fail("Stage 1 census levelRecords is not an array.");
+if ("levelRecords" in (census ?? {})) fail("Stage 1 census must not duplicate raw TrainingTechLevel records.");
 
 if (techBlobSha !== stage0?.sourceSnapshots?.trainingTech?.gitBlobSha) fail("TrainingTech source snapshot differs from Stage 0.");
 if (levelBlobSha !== stage0?.sourceSnapshots?.trainingTechLevel?.gitBlobSha) fail("TrainingTechLevel source snapshot differs from Stage 0.");
@@ -123,137 +134,168 @@ if (census?.population?.trainingTech !== techRecords.length || techRecords.lengt
 if (census?.population?.trainingTechLevel !== levelRecords.length || levelRecords.length !== stage0?.population?.trainingTechLevel) fail("TrainingTechLevel population parity failed.");
 
 const policy = census?.censusPolicy ?? {};
-const forbiddenPolicyFailures = [
-  ["semanticClassificationPerformed", false],
-  ["nameJoinPerformed", false],
-  ["idArithmeticPerformed", false],
-  ["descriptionKeywordClassificationPerformed", false],
-  ["sourceOrderUsedAsMeaning", false],
-  ["screenOrderUsedAsMeaning", false],
-  ["historicalFallbackUsed", false],
-].filter(([key, expected]) => policy[key] !== expected).map(([key]) => key);
-if (policy.parsedRecordLossless !== true || policy.rawSourceBytesFrozenByGitBlobSha !== true || forbiddenPolicyFailures.length > 0) {
-  fail(`Census policy boundary mismatch: ${forbiddenPolicyFailures.join(",") || "lossless flags"}`);
-}
+const requiredFalsePolicy = [
+  "semanticClassificationPerformed",
+  "nameJoinPerformed",
+  "idArithmeticPerformed",
+  "descriptionKeywordClassificationPerformed",
+  "sourceOrderUsedAsMeaning",
+  "screenOrderUsedAsMeaning",
+  "historicalFallbackUsed",
+];
+const policyFailures = requiredFalsePolicy.filter((key) => policy[key] !== false);
+if (policy.trainingTechRecordProjection !== "LOSSLESS_PARSED_RECORD") policyFailures.push("trainingTechRecordProjection");
+if (policy.trainingTechLevelProjection !== "FROZEN_SOURCE_STRUCTURAL_SUMMARY") policyFailures.push("trainingTechLevelProjection");
+if (policy.trainingTechRawRoundTripRequired !== true) policyFailures.push("trainingTechRawRoundTripRequired");
+if (policy.rawSourceBytesFrozenByGitBlobSha !== true) policyFailures.push("rawSourceBytesFrozenByGitBlobSha");
+if (policyFailures.length > 0) fail(`Census policy boundary mismatch: ${policyFailures.join(", ")}`);
 
 let trainingTechRawMismatchCount = 0;
 let trainingTechMetadataMismatchCount = 0;
-for (let index = 0; index < techRecords.length; index += 1) {
-  const source = techRecords[index];
-  const inventory = census.records?.[index];
-  if (!inventory || inventory.sourceIndex !== index || !deepEqualJson(inventory.raw, source)) trainingTechRawMismatchCount += 1;
-  const expectedId = source && typeof source === "object" && !Array.isArray(source) && "ID" in source ? source.ID : null;
-  const expectedFields = source && typeof source === "object" && !Array.isArray(source) ? Object.keys(source) : [];
-  const expectedRefs = source && typeof source === "object" && !Array.isArray(source) && Array.isArray(source.TechLevelupInfoList) ? source.TechLevelupInfoList : null;
-  if (!inventory || inventory.id !== expectedId || !deepEqualJson(inventory.fieldNames, expectedFields) || inventory.fieldCount !== expectedFields.length || !deepEqualJson(inventory.explicitLevelReferences, expectedRefs)) {
+for (let sourceIndex = 0; sourceIndex < techRecords.length; sourceIndex += 1) {
+  const raw = techRecords[sourceIndex];
+  const inventory = census.records?.[sourceIndex];
+  const isObject = raw && typeof raw === "object" && !Array.isArray(raw);
+  const expectedFields = isObject ? Object.keys(raw) : [];
+  const expectedRefs = isObject && Array.isArray(raw.TechLevelupInfoList) ? raw.TechLevelupInfoList : null;
+  const expectedId = isObject && "ID" in raw ? raw.ID : null;
+
+  if (!inventory || inventory.sourceIndex !== sourceIndex || !sameJson(inventory.raw, raw)) {
+    trainingTechRawMismatchCount += 1;
+  }
+  if (
+    !inventory ||
+    inventory.id !== expectedId ||
+    !sameJson(inventory.fieldNames, expectedFields) ||
+    inventory.fieldCount !== expectedFields.length ||
+    !sameJson(inventory.explicitLevelReferences, expectedRefs)
+  ) {
     trainingTechMetadataMismatchCount += 1;
   }
 }
-if (census.records?.length !== techRecords.length) trainingTechRawMismatchCount += Math.abs((census.records?.length ?? 0) - techRecords.length);
-
-let trainingTechLevelRawMismatchCount = 0;
-let trainingTechLevelMetadataMismatchCount = 0;
-for (let index = 0; index < levelRecords.length; index += 1) {
-  const source = levelRecords[index];
-  const inventory = census.levelRecords?.[index];
-  if (!inventory || inventory.sourceIndex !== index || !deepEqualJson(inventory.raw, source)) trainingTechLevelRawMismatchCount += 1;
-  const expectedId = source && typeof source === "object" && !Array.isArray(source) && "ID" in source ? source.ID : null;
-  const expectedFields = source && typeof source === "object" && !Array.isArray(source) ? Object.keys(source) : [];
-  if (!inventory || inventory.id !== expectedId || !deepEqualJson(inventory.fieldNames, expectedFields)) trainingTechLevelMetadataMismatchCount += 1;
+if ((census.records?.length ?? 0) !== techRecords.length) {
+  trainingTechRawMismatchCount += Math.abs((census.records?.length ?? 0) - techRecords.length);
 }
-if (census.levelRecords?.length !== levelRecords.length) trainingTechLevelRawMismatchCount += Math.abs((census.levelRecords?.length ?? 0) - levelRecords.length);
-
-if (trainingTechRawMismatchCount > 0) fail(`TrainingTech census raw mismatch count: ${trainingTechRawMismatchCount}`);
+if (trainingTechRawMismatchCount > 0) fail(`TrainingTech raw census mismatch count: ${trainingTechRawMismatchCount}`);
 if (trainingTechMetadataMismatchCount > 0) fail(`TrainingTech census metadata mismatch count: ${trainingTechMetadataMismatchCount}`);
-if (trainingTechLevelRawMismatchCount > 0) fail(`TrainingTechLevel census raw mismatch count: ${trainingTechLevelRawMismatchCount}`);
-if (trainingTechLevelMetadataMismatchCount > 0) fail(`TrainingTechLevel census metadata mismatch count: ${trainingTechLevelMetadataMismatchCount}`);
 
+const techIds = duplicateIdSummary(techRecords);
+const levelIds = duplicateIdSummary(levelRecords);
 const levelIdToIndexes = new Map();
-for (let index = 0; index < levelRecords.length; index += 1) {
-  const raw = levelRecords[index];
-  if (!raw || typeof raw !== "object" || Array.isArray(raw) || !("ID" in raw)) continue;
-  const key = JSON.stringify(raw.ID);
+levelRecords.forEach((record, sourceIndex) => {
+  if (!record || typeof record !== "object" || Array.isArray(record) || !("ID" in record)) return;
+  const key = JSON.stringify(record.ID);
   const indexes = levelIdToIndexes.get(key) ?? [];
-  indexes.push(index);
+  indexes.push(sourceIndex);
   levelIdToIndexes.set(key, indexes);
-}
+});
 
-const refsByLevelIndex = new Map();
-let explicitTrainingTechLevelReferenceCount = 0;
-let missingReferencedLevelIdCount = 0;
-let nonArrayLevelReferenceFieldCount = 0;
-let preTechLevelCardinalityMismatchCount = 0;
+const referencedByLevelIndex = new Map();
 const levelReferenceLengthCounts = new Map();
 const rawTechTypeValueCounts = new Map();
 const relationFieldPresence = new Map();
+const missingReferencedLevelIds = [];
+let explicitLevelReferenceCount = 0;
+let nonArrayLevelReferenceFieldCount = 0;
+let preTechLevelCardinalityMismatchCount = 0;
 
-for (let techSourceIndex = 0; techSourceIndex < techRecords.length; techSourceIndex += 1) {
-  const raw = techRecords[techSourceIndex];
-  const levelRefs = raw?.TechLevelupInfoList;
-  if (!Array.isArray(levelRefs)) {
-    nonArrayLevelReferenceFieldCount += 1;
-    increment(levelReferenceLengthCounts, `<${valueKind(levelRefs)}>`);
-  } else {
-    explicitTrainingTechLevelReferenceCount += levelRefs.length;
+techRecords.forEach((raw, techSourceIndex) => {
+  const isObject = raw && typeof raw === "object" && !Array.isArray(raw);
+  const levelRefs = isObject ? raw.TechLevelupInfoList : undefined;
+
+  if (Array.isArray(levelRefs)) {
+    explicitLevelReferenceCount += levelRefs.length;
     increment(levelReferenceLengthCounts, String(levelRefs.length));
     for (const levelId of levelRefs) {
-      const indexes = levelIdToIndexes.get(JSON.stringify(levelId)) ?? [];
-      if (indexes.length === 0) missingReferencedLevelIdCount += 1;
-      for (const levelSourceIndex of indexes) {
-        const refs = refsByLevelIndex.get(levelSourceIndex) ?? [];
-        refs.push(techSourceIndex);
-        refsByLevelIndex.set(levelSourceIndex, refs);
+      const levelIndexes = levelIdToIndexes.get(JSON.stringify(levelId)) ?? [];
+      if (levelIndexes.length === 0) {
+        missingReferencedLevelIds.push({
+          techSourceIndex,
+          techId: isObject && "ID" in raw ? raw.ID : null,
+          levelId,
+        });
+      }
+      for (const levelSourceIndex of levelIndexes) {
+        const references = referencedByLevelIndex.get(levelSourceIndex) ?? [];
+        references.push(techSourceIndex);
+        referencedByLevelIndex.set(levelSourceIndex, references);
       }
     }
+  } else {
+    nonArrayLevelReferenceFieldCount += 1;
+    increment(levelReferenceLengthCounts, `<${valueKind(levelRefs)}>`);
   }
-  if (raw && typeof raw === "object" && !Array.isArray(raw) && "TechType" in raw) increment(rawTechTypeValueCounts, JSON.stringify(raw.TechType));
-  const hasArmy = Boolean(raw && typeof raw === "object" && !Array.isArray(raw) && "ArmyIDRelated" in raw);
-  const hasSoldier = Boolean(raw && typeof raw === "object" && !Array.isArray(raw) && "SoldierIDRelated" in raw);
-  increment(relationFieldPresence, hasArmy && hasSoldier ? "both" : hasArmy ? "armyOnly" : hasSoldier ? "soldierOnly" : "neither");
-  if (Array.isArray(raw?.PreTechIDs) && Array.isArray(raw?.PreTechLevel) && raw.PreTechIDs.length !== raw.PreTechLevel.length) preTechLevelCardinalityMismatchCount += 1;
-}
+
+  if (isObject && "TechType" in raw) increment(rawTechTypeValueCounts, JSON.stringify(raw.TechType));
+  const hasArmy = Boolean(isObject && "ArmyIDRelated" in raw);
+  const hasSoldier = Boolean(isObject && "SoldierIDRelated" in raw);
+  increment(
+    relationFieldPresence,
+    hasArmy && hasSoldier ? "both" : hasArmy ? "armyOnly" : hasSoldier ? "soldierOnly" : "neither",
+  );
+
+  if (
+    isObject &&
+    Array.isArray(raw.PreTechIDs) &&
+    Array.isArray(raw.PreTechLevel) &&
+    raw.PreTechIDs.length !== raw.PreTechLevel.length
+  ) {
+    preTechLevelCardinalityMismatchCount += 1;
+  }
+});
 
 let unreferencedLevelRecordCount = 0;
 let multiplyReferencedLevelRecordCount = 0;
-let reverseReferenceMismatchCount = 0;
-for (let levelSourceIndex = 0; levelSourceIndex < levelRecords.length; levelSourceIndex += 1) {
-  const refs = refsByLevelIndex.get(levelSourceIndex) ?? [];
-  if (refs.length === 0) unreferencedLevelRecordCount += 1;
-  if (refs.length > 1) multiplyReferencedLevelRecordCount += 1;
-  const inventory = census.levelRecords?.[levelSourceIndex];
-  const expectedIds = refs.map((techSourceIndex) => techRecords[techSourceIndex]?.ID ?? null);
-  if (!inventory || !deepEqualJson(inventory.referencedByTrainingTechSourceIndexes, refs) || !deepEqualJson(inventory.referencedByTrainingTechIds, expectedIds)) reverseReferenceMismatchCount += 1;
+for (let sourceIndex = 0; sourceIndex < levelRecords.length; sourceIndex += 1) {
+  const references = referencedByLevelIndex.get(sourceIndex) ?? [];
+  if (references.length === 0) unreferencedLevelRecordCount += 1;
+  if (references.length > 1) multiplyReferencedLevelRecordCount += 1;
 }
-if (reverseReferenceMismatchCount > 0) fail(`Census reverse-reference mismatch count: ${reverseReferenceMismatchCount}`);
 
-const techIds = duplicateIdGroupCount(techRecords);
-const levelIds = duplicateIdGroupCount(levelRecords);
-const derivedTrainingTechStructuralSummary = {
+const expectedTechSummary = {
   ...fieldCensus(techRecords),
   rawTechTypeValueCounts: sortedObjectFromMap(rawTechTypeValueCounts, true),
   explicitLevelReferenceLengthCounts: sortedObjectFromMap(levelReferenceLengthCounts, true),
   relationFieldPresence: sortedObjectFromMap(relationFieldPresence),
   missingIdCount: techIds.missingIdCount,
-  duplicateIdGroupCount: techIds.duplicateIdGroupCount,
+  duplicateIdGroupCount: techIds.duplicateGroups.length,
   nonArrayLevelReferenceFieldCount,
   preTechLevelCardinalityMismatchCount,
 };
-const derivedLevelStructuralSummary = {
+const expectedLevelSummary = {
   ...fieldCensus(levelRecords),
   missingIdCount: levelIds.missingIdCount,
-  duplicateIdGroupCount: levelIds.duplicateIdGroupCount,
+  duplicateIdGroupCount: levelIds.duplicateGroups.length,
+};
+const expectedLevelCoverage = {
+  explicitReferenceCount: explicitLevelReferenceCount,
+  sourceRecordCount: levelRecords.length,
+  missingReferencedLevelIdCount: missingReferencedLevelIds.length,
   unreferencedRecordCount: unreferencedLevelRecordCount,
   multiplyReferencedRecordCount: multiplyReferencedLevelRecordCount,
 };
-if (!deepEqualJson(census?.structuralSummary?.trainingTech, derivedTrainingTechStructuralSummary)) fail("TrainingTech structural summary mismatch.");
-if (!deepEqualJson(census?.structuralSummary?.trainingTechLevel, derivedLevelStructuralSummary)) fail("TrainingTechLevel structural summary mismatch.");
+const expectedDiagnostics = {
+  trainingTechDuplicateIdGroups: techIds.duplicateGroups,
+  trainingTechLevelDuplicateIdGroups: levelIds.duplicateGroups,
+  missingReferencedLevelIds,
+};
+
+const trainingTechStructuralSummaryMatch = sameJson(census?.structuralSummary?.trainingTech, expectedTechSummary);
+const trainingTechLevelStructuralSummaryMatch = sameJson(census?.structuralSummary?.trainingTechLevel, expectedLevelSummary);
+const levelReferenceCoverageMatch = sameJson(census?.levelReferenceCoverage, expectedLevelCoverage);
+const diagnosticsMatch = sameJson(census?.diagnostics, expectedDiagnostics);
+
+if (!trainingTechStructuralSummaryMatch) fail("TrainingTech structural summary mismatch.");
+if (!trainingTechLevelStructuralSummaryMatch) fail("TrainingTechLevel structural summary mismatch.");
+if (!levelReferenceCoverageMatch) fail("TrainingTechLevel explicit-reference coverage mismatch.");
+if (!diagnosticsMatch) fail("Stage 1 structural diagnostics mismatch.");
 
 if (techIds.missingIdCount > 0) reviews.push({ code: "TRAINING_TECH_ID_MISSING", count: techIds.missingIdCount });
-if (techIds.duplicateIdGroupCount > 0) reviews.push({ code: "TRAINING_TECH_ID_DUPLICATE", count: techIds.duplicateIdGroupCount });
+if (techIds.duplicateGroups.length > 0) reviews.push({ code: "TRAINING_TECH_ID_DUPLICATE", count: techIds.duplicateGroups.length });
 if (levelIds.missingIdCount > 0) reviews.push({ code: "TRAINING_TECH_LEVEL_ID_MISSING", count: levelIds.missingIdCount });
-if (levelIds.duplicateIdGroupCount > 0) reviews.push({ code: "TRAINING_TECH_LEVEL_ID_DUPLICATE", count: levelIds.duplicateIdGroupCount });
+if (levelIds.duplicateGroups.length > 0) reviews.push({ code: "TRAINING_TECH_LEVEL_ID_DUPLICATE", count: levelIds.duplicateGroups.length });
 if (nonArrayLevelReferenceFieldCount > 0) reviews.push({ code: "TRAINING_TECH_LEVEL_REFERENCE_NON_ARRAY", count: nonArrayLevelReferenceFieldCount });
-if (missingReferencedLevelIdCount > 0) reviews.push({ code: "TRAINING_TECH_LEVEL_REFERENCE_MISSING_TARGET", count: missingReferencedLevelIdCount });
+if (missingReferencedLevelIds.length > 0) reviews.push({ code: "TRAINING_TECH_LEVEL_REFERENCE_MISSING_TARGET", count: missingReferencedLevelIds.length });
 if (unreferencedLevelRecordCount > 0) reviews.push({ code: "TRAINING_TECH_LEVEL_UNREFERENCED", count: unreferencedLevelRecordCount });
 if (multiplyReferencedLevelRecordCount > 0) reviews.push({ code: "TRAINING_TECH_LEVEL_MULTIPLY_REFERENCED", count: multiplyReferencedLevelRecordCount });
 if (preTechLevelCardinalityMismatchCount > 0) reviews.push({ code: "TRAINING_TECH_PRETECH_LEVEL_CARDINALITY_MISMATCH", count: preTechLevelCardinalityMismatchCount });
@@ -285,33 +327,40 @@ const validation = {
   },
   semanticClassificationPerformed: false,
   checks: {
-    stage0FrozenPass: stage0?.status === "PASS" && stage0?.completion === "COMPLETE" && stage0?.freezeState === "TRAINING_TECH_CLASSIFICATION_STAGE0_FROZEN",
+    stage0FrozenPass:
+      stage0?.status === "PASS" &&
+      stage0?.completion === "COMPLETE" &&
+      stage0?.freezeState === "TRAINING_TECH_CLASSIFICATION_STAGE0_FROZEN",
     trainingTechSourceSnapshotMatch: techBlobSha === stage0?.sourceSnapshots?.trainingTech?.gitBlobSha,
     trainingTechLevelSourceSnapshotMatch: levelBlobSha === stage0?.sourceSnapshots?.trainingTechLevel?.gitBlobSha,
     censusPredecessorMatch: census?.predecessor?.gitBlobSha === stage0BlobSha,
-    censusSourceSnapshotsMatch: census?.sourceSnapshots?.trainingTech?.gitBlobSha === techBlobSha && census?.sourceSnapshots?.trainingTechLevel?.gitBlobSha === levelBlobSha,
-    trainingTechPopulationMatch: census?.population?.trainingTech === techRecords.length && techRecords.length === stage0?.population?.trainingTech,
-    trainingTechLevelPopulationMatch: census?.population?.trainingTechLevel === levelRecords.length && levelRecords.length === stage0?.population?.trainingTechLevel,
+    censusSourceSnapshotsMatch:
+      census?.sourceSnapshots?.trainingTech?.gitBlobSha === techBlobSha &&
+      census?.sourceSnapshots?.trainingTechLevel?.gitBlobSha === levelBlobSha,
+    trainingTechPopulationMatch:
+      census?.population?.trainingTech === techRecords.length && techRecords.length === stage0?.population?.trainingTech,
+    trainingTechLevelPopulationMatch:
+      census?.population?.trainingTechLevel === levelRecords.length && levelRecords.length === stage0?.population?.trainingTechLevel,
     trainingTechRawMismatchCount,
     trainingTechMetadataMismatchCount,
-    trainingTechLevelRawMismatchCount,
-    trainingTechLevelMetadataMismatchCount,
-    reverseReferenceMismatchCount,
-    trainingTechStructuralSummaryMatch: deepEqualJson(census?.structuralSummary?.trainingTech, derivedTrainingTechStructuralSummary),
-    trainingTechLevelStructuralSummaryMatch: deepEqualJson(census?.structuralSummary?.trainingTechLevel, derivedLevelStructuralSummary),
+    rawTrainingTechLevelDuplicatedInCensus: "levelRecords" in (census ?? {}),
+    trainingTechStructuralSummaryMatch,
+    trainingTechLevelStructuralSummaryMatch,
+    levelReferenceCoverageMatch,
+    diagnosticsMatch,
     semanticClassificationPerformed: false,
   },
   coverage: {
     trainingTechSourceRecords: techRecords.length,
-    trainingTechCensusRecords: census.records?.length ?? 0,
+    trainingTechLosslessCensusRecords: census.records?.length ?? 0,
     trainingTechLevelSourceRecords: levelRecords.length,
-    trainingTechLevelCensusRecords: census.levelRecords?.length ?? 0,
-    explicitTrainingTechLevelReferenceCount,
-    missingReferencedLevelIdCount,
+    trainingTechLevelStructurallyAccountedRecords: levelRecords.length,
+    explicitTrainingTechLevelReferenceCount: explicitLevelReferenceCount,
+    missingReferencedLevelIdCount: missingReferencedLevelIds.length,
     unreferencedLevelRecordCount,
     multiplyReferencedLevelRecordCount,
-    trainingTechDuplicateIdGroupCount: techIds.duplicateIdGroupCount,
-    trainingTechLevelDuplicateIdGroupCount: levelIds.duplicateIdGroupCount,
+    trainingTechDuplicateIdGroupCount: techIds.duplicateGroups.length,
+    trainingTechLevelDuplicateIdGroupCount: levelIds.duplicateGroups.length,
     trainingTechMissingIdCount: techIds.missingIdCount,
     trainingTechLevelMissingIdCount: levelIds.missingIdCount,
     nonArrayLevelReferenceFieldCount,
@@ -321,13 +370,14 @@ const validation = {
   blockers,
   hardErrorCount: blockers.length,
   nextOwner: blockers.length === 0 ? "TrainingTech Stage 2 Evidence Contract" : null,
-  nextStartPoint: blockers.length === 0
-    ? "Freeze which explicit TrainingTech and TrainingTechLevel source fields may be used as semantic classification evidence. Reuse this census; do not classify by names, descriptions, ID ranges/arithmetic, source order, or screen order."
-    : null,
+  nextStartPoint:
+    blockers.length === 0
+      ? "Freeze which explicit TrainingTech and TrainingTechLevel source fields may be used as semantic classification evidence. Reuse this census; do not classify by names, descriptions, ID ranges/arithmetic, source order, or screen order."
+      : null,
   reopenConditions: [
     "Stage 0 authoritative contradiction affecting this census.",
     "TrainingTech or TrainingTechLevel source snapshot change.",
-    "Census record-loss or raw round-trip parity damage.",
+    "Census record-loss or TrainingTech raw round-trip parity damage.",
     "Project Check ownership/orchestration contract change affecting this path.",
     "Hard owning-validator failure.",
   ],
@@ -335,12 +385,20 @@ const validation = {
 
 mkdirSync(dirname(VALIDATION_PATH), { recursive: true });
 writeFileSync(VALIDATION_PATH, `${JSON.stringify(validation, null, 2)}\n`, "utf8");
-console.log(JSON.stringify({
-  status: validation.status,
-  completion: validation.completion,
-  validationMode: validation.validationMode,
-  coverage: validation.coverage,
-  reviews: validation.reviews,
-  blockers: validation.blockers,
-}, null, 2));
+
+console.log(
+  JSON.stringify(
+    {
+      status: validation.status,
+      completion: validation.completion,
+      validationMode: validation.validationMode,
+      coverage: validation.coverage,
+      reviews: validation.reviews,
+      blockers: validation.blockers,
+    },
+    null,
+    2,
+  ),
+);
+
 if (blockers.length > 0) process.exit(1);
