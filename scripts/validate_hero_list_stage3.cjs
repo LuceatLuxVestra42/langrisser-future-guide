@@ -138,22 +138,38 @@ check(
 );
 
 check(
-  'integrated-filter-navigation',
+  'integrated-filter-multiselect',
   route.includes('type FilterSection = "rarity" | "faction" | "origin"') &&
-    route.includes('useState<FilterSection>("rarity")') &&
-    route.includes('aria-label="통합 필터 분류"') &&
-    route.includes('setFilterSection("rarity")') &&
-    route.includes('setFilterSection("faction")') &&
-    route.includes('setFilterSection("origin")'),
-  'one integrated filter switcher exposes rarity, faction, and origin sections with rarity as the initial section',
+    route.includes('useState<Record<FilterSection, boolean>>') &&
+    route.includes('rarity: true') &&
+    route.includes('faction: false') &&
+    route.includes('origin: false') &&
+    route.includes('toggleFilterSection') &&
+    route.includes('[section]: !current[section]') &&
+    route.includes('active={openFilterSections.rarity}') &&
+    route.includes('active={openFilterSections.faction}') &&
+    route.includes('active={openFilterSections.origin}') &&
+    route.includes('toggleFilterSection("rarity")') &&
+    route.includes('toggleFilterSection("faction")') &&
+    route.includes('toggleFilterSection("origin")'),
+  'rarity, faction, and origin controls are independent toggles that can remain selected together',
 );
 
 check(
   'default-origin-options-hidden',
-  route.includes('useState<FilterSection>("rarity")') &&
-    route.includes('{filterSection === "origin" ? (') &&
+  route.includes('origin: false') &&
+    route.includes('{openFilterSections.origin ? (') &&
     route.includes('aria-label="출전작 필터"'),
-  'origin options are rendered only when the origin section is selected',
+  'origin options remain hidden on initial entry until the origin section is selected',
+);
+
+check(
+  'multiple-filter-panels-openable',
+  route.includes('{openFilterSections.rarity ? (') &&
+    route.includes('{openFilterSections.faction ? (') &&
+    route.includes('{openFilterSections.origin ? (') &&
+    route.includes('...current'),
+  'filter panels use independent open state so multiple sections can be displayed simultaneously',
 );
 
 check(
@@ -191,7 +207,7 @@ check(
 
 const rarityPanelIndex = route.indexOf('aria-label="희귀도 필터"');
 const spButtonIndex = route.indexOf('SP <span');
-const factionPanelIndex = route.indexOf('{filterSection === "faction" ? (');
+const factionPanelIndex = route.indexOf('{openFilterSections.faction ? (');
 check(
   'sp-filter-ui',
   route.includes('aria-pressed={spOnly}') &&
@@ -223,6 +239,7 @@ check(
   route.includes('검색 결과') &&
     route.includes('aria-live="polite"') &&
     route.includes('resetFilters') &&
+    route.includes('setOpenFilterSections({ rarity: true, faction: false, origin: false })') &&
     route.includes('setFactionId(null)') &&
     route.includes('setOriginId(null)') &&
     route.includes('필터 초기화'),
