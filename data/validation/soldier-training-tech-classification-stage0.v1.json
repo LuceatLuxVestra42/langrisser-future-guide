@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-tech-classification-stage0/v1",
+  "stage": "TrainingTech Classification Stage 0 - Authority / Population / Scope Freeze",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "TRAINING_TECH_CLASSIFICATION_STAGE0_FROZEN",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "commit": "57d629525ed28cfa17f79000a5a769b94ff71641",
+    "tree": "a08eecd1f06cef4f892a6540d91c61b29ff4d940"
+  },
+  "authoritativePredecessors": {
+    "currentSoldierAdmission": {
+      "path": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "gitBlobSha": "5b9a08161b1a8a7cb4cea07b03074b31ccada40f",
+      "status": "PASS",
+      "role": "Current frozen Soldier canonical/site-admission authority."
+    },
+    "trainingGrowth": {
+      "path": "data/validation/soldier-stage5-4-training.v1.json",
+      "gitBlobSha": "3018b35b9655c83d0a87f49700f0a4e9817c39d9",
+      "status": "PASS",
+      "role": "Existing normal Tier 3 Soldier training-growth predecessor; not reopened by this stage."
+    },
+    "directJsonBaseline": {
+      "path": "data/validation/soldier-stage4-8-baseline.v1.json",
+      "gitBlobSha": "5d60014dbacfd3ff492d5a19e13cc671f8d167ce",
+      "status": "PASS",
+      "role": "Frozen direct-JSON source snapshot and population authority for TrainingTech and TrainingTechLevel."
+    }
+  },
+  "sourceSnapshots": {
+    "trainingTech": {
+      "path": "data/configdata/ConfigDataTrainingTechInfo.json",
+      "gitBlobSha": "ad8b290f0e34de24b6eab9538894068a06e086d4"
+    },
+    "trainingTechLevel": {
+      "path": "data/configdata/ConfigDataTrainingTechLevelInfo.json",
+      "gitBlobSha": "30789c3e4fb0d79b56514e720bb71a053df78c72"
+    }
+  },
+  "population": {
+    "trainingTech": 287,
+    "trainingTechLevel": 2945,
+    "soldier": 224,
+    "normal": 168,
+    "sp": 56,
+    "normalTier3Growth": 129
+  },
+  "semanticClassificationPerformed": false,
+  "scope": [
+    "Freeze current authoritative predecessors and repository baseline.",
+    "Reuse already validated TrainingTech, TrainingTechLevel, Soldier, and normal Tier 3 growth populations without recomputation.",
+    "Freeze the classification non-scope, forbidden inference rules, completion criteria, and reopen conditions before Stage 1 Census."
+  ],
+  "nonScope": [
+    "TrainingTech category assignment or semantic grouping.",
+    "Soldier canonical identity or population changes.",
+    "SP relation changes.",
+    "Hero-Soldier relation changes.",
+    "Existing training-growth or material data changes.",
+    "Korean localization or presentation changes.",
+    "Frontend changes."
+  ],
+  "forbiddenClassificationInference": [
+    "name JOIN",
+    "ID range or arithmetic",
+    "Chinese description keyword heuristics",
+    "storage order",
+    "screen order",
+    "historical output silent fallback"
+  ],
+  "completionCriteria": {
+    "currentAuthorityFrozen": true,
+    "sourceSnapshotsFrozen": true,
+    "populationReusedWithoutRecomputation": true,
+    "semanticClassificationPerformed": false,
+    "nonScopeFrozen": true,
+    "reopenConditionsFrozen": true
+  },
+  "mutations": {
+    "canonicalDataChanged": false,
+    "canonicalRelationChanged": false,
+    "trainingGrowthChanged": false,
+    "localizationChanged": false,
+    "frontendChanged": false
+  },
+  "blockers": [],
+  "reviews": [],
+  "nextOwner": "TrainingTech Stage 1 Census",
+  "nextStartPoint": "Produce a lossless structural inventory of all 287 TrainingTech records against the frozen TrainingTech and TrainingTechLevel snapshots. Do not assign semantic categories in the census stage.",
+  "reopenConditions": [
+    "Authoritative predecessor contradiction affecting this scope.",
+    "TrainingTech or TrainingTechLevel source snapshot change.",
+    "Project Check ownership/orchestration contract change affecting this path.",
+    "Validated population or parity damage.",
+    "Hard owning-validator failure."
+  ]
+}
