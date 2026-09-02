@@ -1,0 +1,107 @@
+name: ConfigData B5.6 Maintenance Root
+
+on:
+  pull_request:
+    paths:
+      - 'data/contracts/configdata-source-pack-b5-6-maintenance-root.v1.json'
+      - 'scripts/configdata-source-pack-maintenance-root.cjs'
+      - 'scripts/configdata-source-pack-maintenance-root.mjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/build_shared_movement_types.mjs'
+      - 'scripts/analyze-equipment-acquisition.mjs'
+      - 'scripts/investigate_hero_display_stats.cjs'
+      - 'scripts/validate-configdata-source-pack-b5-6-maintenance-root-v1.mjs'
+      - '.github/workflows/configdata-source-pack-b5-6-maintenance-root.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/configdata-source-pack-b5-6-maintenance-root.v1.json'
+      - 'scripts/configdata-source-pack-maintenance-root.cjs'
+      - 'scripts/configdata-source-pack-maintenance-root.mjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/build_shared_movement_types.mjs'
+      - 'scripts/analyze-equipment-acquisition.mjs'
+      - 'scripts/investigate_hero_display_stats.cjs'
+      - 'scripts/validate-configdata-source-pack-b5-6-maintenance-root-v1.mjs'
+      - '.github/workflows/configdata-source-pack-b5-6-maintenance-root.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  maintenance-root-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Require clean tracked baseline
+        run: test -z "$(git status --porcelain)"
+
+      - name: Validate B5.6 static maintenance boundary
+        run: node scripts/validate-configdata-source-pack-b5-6-maintenance-root-v1.mjs
+
+      - name: Prove maintenance readers with tracked ConfigData unavailable
+        shell: bash
+        run: |
+          set -euo pipefail
+          RAW="$GITHUB_WORKSPACE/data/configdata"
+          HIDDEN="$RUNNER_TEMP/configdata-b5-6-tracked-hidden"
+
+          COUNT="$(find "$RAW" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$COUNT" = "753"
+          rm -rf "$HIDDEN"
+          mv "$RAW" "$HIDDEN"
+
+          cleanup() {
+            if [ -d "$HIDDEN" ] && [ ! -e "$RAW" ]; then
+              mkdir -p "$(dirname "$RAW")"
+              mv "$HIDDEN" "$RAW"
+            fi
+            git checkout -- .
+          }
+          trap cleanup EXIT
+
+          test ! -e "$RAW"
+
+          node scripts/validate-soldier-stage4-1-input.cjs
+          node scripts/validate_hero_stage3_direct.cjs
+          node scripts/build_shared_movement_types.mjs
+          node scripts/analyze-equipment-acquisition.mjs
+
+          set +e
+          node scripts/investigate_hero_display_stats.cjs
+          HERO_DISPLAY_EXIT=$?
+          set -e
+          if [ "$HERO_DISPLAY_EXIT" -ne 0 ] && [ "$HERO_DISPLAY_EXIT" -ne 2 ]; then
+            echo "Unexpected hero display investigation exit: $HERO_DISPLAY_EXIT" >&2
+            exit 1
+          fi
+          node - <<'NODE'
+          const fs = require('fs');
+          const result = JSON.parse(fs.readFileSync('data/validation/hero-display-stat-investigation.v1.json', 'utf8'));
+          const missing = (result.sourceHealth || []).filter((entry) => entry.status === 'missing');
+          if (missing.length) {
+            console.error(JSON.stringify(missing, null, 2));
+            process.exit(1);
+          }
+          console.log(JSON.stringify({ heroDisplayStatus: result.status, missingSourceCount: missing.length }, null, 2));
+          NODE
+
+          cleanup
+          trap - EXIT
+
+      - name: Require tracked ConfigData restoration and no mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          COUNT="$(find data/configdata -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$COUNT" = "753"
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
