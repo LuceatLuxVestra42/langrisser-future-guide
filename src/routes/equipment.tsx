@@ -2,7 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowUpDown, ChevronRight, RotateCcw, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-import { getOfficialEquipmentImageUrl } from "@/lib/equipment-image-assets";
+import {
+  getOfficialEquipmentImageUrl,
+  getOfficialEquipmentSsrFrameUrl,
+} from "@/lib/equipment-image-assets";
 import { getGeneralEquipmentPageData } from "@/lib/equipment-page.functions";
 
 export const Route = createFileRoute("/equipment")({
@@ -174,6 +177,7 @@ function EquipmentGeneralListPage() {
     uiState.sort === "default"
       ? "장비 종류와 세부 타입 기준으로 표시하고, 같은 세부 타입 안에서는 기존 표시순을 사용해."
       : `${SORT_LABELS[uiState.sort]}으로 표시 중이야. 이 정렬은 출시순 의미를 갖지 않아.`;
+  const ssrFrameUrl = getOfficialEquipmentSsrFrameUrl();
 
   return (
     <main className="min-h-screen bg-background">
@@ -399,17 +403,22 @@ function EquipmentGeneralListPage() {
                   </div>
 
                   <div className="relative flex min-h-52 items-center justify-center border-b border-border bg-muted/20 px-4 pb-16 pt-4 sm:min-h-56">
-                    <img
-                      src={imageUrl}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      className={`h-32 w-32 object-contain transition duration-200 group-hover:scale-[1.03] sm:h-36 sm:w-36 ${
-                        record.equipmentId === 6
-                          ? "rounded-lg border border-border/70 bg-card p-1 shadow-sm"
-                          : ""
-                      }`}
-                    />
+                    <div className="relative h-32 w-32 transition duration-200 group-hover:scale-[1.03] sm:h-36 sm:w-36">
+                      <img
+                        src={ssrFrameUrl}
+                        alt=""
+                        aria-hidden="true"
+                        decoding="async"
+                        className="absolute inset-0 h-full w-full object-contain"
+                      />
+                      <img
+                        src={imageUrl}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="relative z-10 h-full w-full object-contain"
+                      />
+                    </div>
                     <div className="absolute inset-x-0 bottom-0 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm">
                       <h2 className="line-clamp-2 text-base font-bold leading-snug text-foreground sm:text-lg">
                         {displayName}
