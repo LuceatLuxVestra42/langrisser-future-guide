@@ -58,6 +58,7 @@ export async function runB55OperationalCutover({ emit = true } = {}) {
   assert.equal(b5.deletionAdmission.admittedDeletionCount, 753);
 
   const workflowPaths = {
+    stage0: contract.operationalBoundary.stage0Workflow,
     stage1: contract.operationalBoundary.stage1Workflow,
     stage2: contract.operationalBoundary.stage2Workflow,
     stage6: contract.operationalBoundary.stage6Workflow,
@@ -69,6 +70,7 @@ export async function runB55OperationalCutover({ emit = true } = {}) {
   );
   for (const [key, text] of Object.entries(workflows)) validateExternalWorkflow(text, `${key} workflow`);
 
+  requireIncludes(workflows.stage0, 'npm run validate:configdata-lookup-stage0', 'Stage0 workflow');
   requireIncludes(workflows.stage1, 'node tools/configdata-lookup/cli/build-stage1.mjs', 'Stage1 workflow');
   requireIncludes(workflows.stage1, 'node tools/configdata-lookup/cli/validate-stage1.mjs', 'Stage1 workflow');
   requireIncludes(workflows.stage2, 'node tools/configdata-lookup/cli/validate-stage1.mjs', 'Stage2 workflow');
@@ -82,6 +84,11 @@ export async function runB55OperationalCutover({ emit = true } = {}) {
   requireIncludes(workflows.writer, 'node tools/configdata-lookup/cli/check-freshness.mjs', 'writer workflow');
   requireExcludes(workflows.owner, 'node scripts/configdata-lookup-stage6.mjs check', 'owner workflow');
   requireExcludes(workflows.writer, 'npm run check:configdata-lookup-stage6', 'writer workflow');
+
+  const stage0Validator = await readText(contract.operationalBoundary.stage0ValidatorEntrypoint);
+  requireIncludes(stage0Validator, 'process.env.CONFIGDATA_SOURCE_ROOT', 'Stage0 validator');
+  requireIncludes(stage0Validator, 'path.isAbsolute(configuredSourceRoot)', 'Stage0 validator');
+  requireIncludes(stage0Validator, 'sourcePathExists(expectedSource)', 'Stage0 validator');
 
   const wrapperExpected = {
     [contract.operationalBoundary.stage1BuilderEntrypoint]: "import { installConfigDataSourceRootReadRedirect } from '../lib/configdata-source-root.mjs';\n\ninstallConfigDataSourceRootReadRedirect();\nawait import('../../../scripts/build-configdata-lookup-stage1.mjs');\n",
@@ -106,6 +113,8 @@ export async function runB55OperationalCutover({ emit = true } = {}) {
   const lookupRule = ownerMap.pathRules.find((rule) => rule.id === 'configdata-lookup-tooling');
   assert.ok(lookupRule, 'configdata-lookup-tooling routing rule missing');
   assert.deepEqual(lookupRule.owners, ['configdata-lookup']);
+  assert.equal(lookupRule.patterns.includes('.github/workflows/configdata-lookup-stage0.yml'), true);
+  assert.equal(lookupRule.patterns.includes('scripts/validate-configdata-lookup-stage0.mjs'), true);
   assert.equal(lookupRule.patterns.includes('.github/workflows/configdata-lookup-stage1.yml'), true);
   assert.equal(lookupRule.patterns.includes('.github/workflows/configdata-lookup-stage2.yml'), true);
 
@@ -117,9 +126,11 @@ export async function runB55OperationalCutover({ emit = true } = {}) {
   requireExcludes(queryCli, 'configdata-source-root', 'materialized query CLI');
   requireExcludes(queryCli, 'CONFIGDATA_SOURCE_ROOT', 'materialized query CLI');
 
+  assert.equal(contract.operationalBoundary.legacyStage0ContractMeaningChanged, false);
   assert.equal(contract.operationalBoundary.legacyStage1AlgorithmModified, false);
   assert.equal(contract.operationalBoundary.legacyStage2AlgorithmModified, false);
   assert.equal(contract.operationalBoundary.legacyStage6AlgorithmModified, false);
+  assert.equal(contract.operationalBoundary.stage0ValidatorOnlyResolvesPhysicalExistenceThroughConfiguredRoot, true);
   assert.equal(contract.operationalBoundary.normalLookupRefsFindRemainMaterializedOnly, true);
   assert.equal(contract.operationalBoundary.trackedRawDeletionOccursInThisStage, false);
   assert.equal(contract.semanticBoundary.semanticAuthorityChanged, false);
@@ -132,8 +143,9 @@ export async function runB55OperationalCutover({ emit = true } = {}) {
     status: 'PASS',
     completion: 'CONFIGDATA_LOOKUP_B5_5_OPERATIONAL_CUTOVER_STATIC_GUARD',
     externalWorkflowCount: Object.keys(workflows).length,
+    sourceRootAwareStage0ValidatorCount: 1,
     sourceRootAwareWrapperCount: Object.keys(wrapperExpected).length,
-    explicitStageWorkflowRoutingCount: 2,
+    explicitStageWorkflowRoutingCount: 4,
     logicalRawPathNamespace: contract.operationalBoundary.logicalRawPathNamespace,
     physicalSourceRootSelector: contract.operationalBoundary.physicalSourceRootSelector,
     externalHydrationFileCount: contract.operationalBoundary.externalHydrationFileCount,
