@@ -1,7 +1,8 @@
 import fs from 'node:fs';
+import { resolveConfigDataFile } from './configdata-source-pack-maintenance-root.mjs';
 
 const load = p => JSON.parse(fs.readFileSync(p,'utf8'));
-const equipment = load('data/configdata/ConfigDataEquipmentInfo.json');
+const equipment = load(resolveConfigDataFile('ConfigDataEquipmentInfo.json'));
 const restrictions = load('data/generated/equipment_stage2_6_restrictions.json');
 const ids = new Set(restrictions.records.map(r=>Number(r.equipmentId)));
 const rows = equipment.filter(r=>ids.has(Number(r.ID)));
