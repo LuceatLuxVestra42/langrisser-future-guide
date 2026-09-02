@@ -1,0 +1,210 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-cn-chronology-correction-evidence/v1",
+  "stage": "11-A4",
+  "status": "FROZEN_CORRECTION_READY",
+  "owner": "soldier-release-metadata-evidence-acquisition",
+  "purpose": "Freeze explicit evidence that the 11 historical Google-Sheet release dates cannot be used as Chinese-server chronology and bind the same canonical Soldier IDs to official Chinese-server release events before any Stage 5-8 correction is promoted.",
+  "scope": "EVIDENCE_ONLY_NO_STAGE5_8_MUTATION",
+  "predecessors": {
+    "releaseSource": "data/soldier-release-source.v1.json",
+    "officialNoticeEvidence": "data/soldier-release-official-notice-evidence-stage11-a1.v1.json",
+    "releaseMetadata": "data/generated/soldier-release-metadata.v1.json",
+    "canonicalSoldiers": "data/generated/soldier-list-stage5-7.v1.json"
+  },
+  "timelineDecision": {
+    "targetTimeline": "CN_SERVER_RELEASE_CHRONOLOGY",
+    "officialCnAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
+    "historicalGoogleSheetAuthority": "REGION_OR_TIMELINE_SCOPE_UNSPECIFIED",
+    "historicalGoogleSheetUseForCnChronology": false,
+    "reason": "The connected Google Sheet labels the column only as 출시일 and provides no server/timeline scope. Its stored 2025 dates conflict with official Chinese-server notices that explicitly introduce the same canonical Chinese Soldier labels later in 2025. Therefore those Sheet dates remain historical evidence only and may not define Chinese-server chronology.",
+    "coverageChangeAtThisStage": false,
+    "samePatchOrderClaimed": false
+  },
+  "connectedSheetObservation": {
+    "spreadsheetId": "1Oa7afFUhP21SRLSJ0uzP9oUc5C1_Cij0JqRExzUJGFo",
+    "spreadsheetTitle": "업데이트",
+    "sheetName": "신규용병",
+    "header": "출시일",
+    "serverScopeDeclared": false,
+    "dateCells": [
+      { "row": 2, "storedSerial": 45727, "storedDate": "2025-03-11" },
+      { "row": 15, "storedSerial": 45783, "storedDate": "2025-05-06" },
+      { "row": 40, "storedSerial": 45839, "storedDate": "2025-07-01" }
+    ],
+    "notesOrCommentsDeclaringServerScope": false
+  },
+  "sources": [
+    {
+      "sourceId": "CN-2025-08-14-SEVEN-ANNIVERSARY",
+      "url": "https://mz.zlongame.com/jx/mzgg/20250813/24540.html",
+      "noticePublishedAt": "2025-08-13",
+      "releaseDate": "2025-08-14",
+      "newSoldierLabels": ["禁林通灵师", "翠翼射手"]
+    },
+    {
+      "sourceId": "CN-2025-09-11-BATTLE-BANNER",
+      "url": "https://mz.zlongame.com/jx/mzgg/20250908/24663.html",
+      "noticePublishedAt": "2025-09-08",
+      "releaseDate": "2025-09-11",
+      "newSoldierLabels": ["荒蛮角斗士", "暗潮之鳞"]
+    },
+    {
+      "sourceId": "CN-2025-10-16-LIGHT-DARK-JUDGMENT",
+      "url": "https://mz.zlongame.com/jx/mzgg/20251015/24909.html",
+      "noticePublishedAt": "2025-10-15",
+      "releaseDate": "2025-10-16",
+      "newSoldierLabels": ["密林半人马", "黑天马骑士"]
+    },
+    {
+      "sourceId": "CN-2025-11-06-SUNLIT-FOREST",
+      "url": "https://mz.zlongame.com/jx/mzgg/20251105/25142.html",
+      "noticePublishedAt": "2025-11-05",
+      "releaseDate": "2025-11-06",
+      "newSoldierLabels": ["山峦守望者", "魔虫巨卫"]
+    },
+    {
+      "sourceId": "CN-2025-12-04-RYZA3",
+      "url": "https://mz.zlongame.com/jx/mzgg/20251203/25463.html",
+      "noticePublishedAt": "2025-12-03",
+      "releaseDate": "2025-12-04",
+      "newSoldierLabels": ["山罡救援队", "深海复仇者", "融晶魔灵"]
+    }
+  ],
+  "records": [
+    {
+      "soldierId": 647,
+      "canonicalNameCn": "禁林通灵师",
+      "historicalSheetReleaseDate": "2025-03-11",
+      "historicalSheetSourceLabel": "금지된 숲 법사",
+      "officialCnReleaseDate": "2025-08-14",
+      "sourceId": "CN-2025-08-14-SEVEN-ANNIVERSARY",
+      "samePatchOrder": null,
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
+    },
+    {
+      "soldierId": 648,
+      "canonicalNameCn": "翠翼射手",
+      "historicalSheetReleaseDate": "2025-03-11",
+      "historicalSheetSourceLabel": "비취 날개 궁수",
+      "officialCnReleaseDate": "2025-08-14",
+      "sourceId": "CN-2025-08-14-SEVEN-ANNIVERSARY",
+      "samePatchOrder": null,
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
+    },
+    {
+      "soldierId": 251,
+      "canonicalNameCn": "荒蛮角斗士",
+      "historicalSheetReleaseDate": "2025-05-06",
+      "historicalSheetSourceLabel": "야만인 검투사",
+      "officialCnReleaseDate": "2025-09-11",
+      "sourceId": "CN-2025-09-11-BATTLE-BANNER",
+      "samePatchOrder": null,
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
+    },
+    {
+      "soldierId": 517,
+      "canonicalNameCn": "暗潮之鳞",
+      "historicalSheetReleaseDate": "2025-05-06",
+      "historicalSheetSourceLabel": "검은 조수 비늘",
+      "officialCnReleaseDate": "2025-09-11",
+      "sourceId": "CN-2025-09-11-BATTLE-BANNER",
+      "samePatchOrder": null,
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
+    },
+    {
+      "soldierId": 341,
+      "canonicalNameCn": "密林半人马",
+      "historicalSheetReleaseDate": "2025-05-06",
+      "historicalSheetSourceLabel": "밀림 켄타우로스",
+      "officialCnReleaseDate": "2025-10-16",
+      "sourceId": "CN-2025-10-16-LIGHT-DARK-JUDGMENT",
+      "samePatchOrder": null,
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
+    },
+    {
+      "soldierId": 427,
+      "canonicalNameCn": "黑天马骑士",
+      "historicalSheetReleaseDate": "2025-05-06",
+      "historicalSheetSourceLabel": "검은 페가수스 기사",
+      "officialCnReleaseDate": "2025-10-16",
+      "sourceId": "CN-2025-10-16-LIGHT-DARK-JUDGMENT",
+      "samePatchOrder": null,
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
+    },
+    {
+      "soldierId": 135,
+      "canonicalNameCn": "山峦守望者",
+      "historicalSheetReleaseDate": "2025-07-01",
+      "historicalSheetSourceLabel": "산의 파수꾼",
+      "officialCnReleaseDate": "2025-11-06",
+      "sourceId": "CN-2025-11-06-SUNLIT-FOREST",
+      "samePatchOrder": null,
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
+    },
+    {
+      "soldierId": 1037,
+      "canonicalNameCn": "魔虫巨卫",
+      "historicalSheetReleaseDate": "2025-07-01",
+      "historicalSheetSourceLabel": "거대 수호 마충",
+      "officialCnReleaseDate": "2025-11-06",
+      "sourceId": "CN-2025-11-06-SUNLIT-FOREST",
+      "samePatchOrder": null,
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
+    },
+    {
+      "soldierId": 819,
+      "canonicalNameCn": "山罡救援队",
+      "historicalSheetReleaseDate": "2025-07-01",
+      "historicalSheetSourceLabel": "산악 구조대",
+      "officialCnReleaseDate": "2025-12-04",
+      "sourceId": "CN-2025-12-04-RYZA3",
+      "samePatchOrder": null,
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
+    },
+    {
+      "soldierId": 1118,
+      "canonicalNameCn": "深海复仇者",
+      "historicalSheetReleaseDate": "2025-07-01",
+      "historicalSheetSourceLabel": "심해의 복수자",
+      "officialCnReleaseDate": "2025-12-04",
+      "sourceId": "CN-2025-12-04-RYZA3",
+      "samePatchOrder": null,
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
+    },
+    {
+      "soldierId": 1038,
+      "canonicalNameCn": "融晶魔灵",
+      "historicalSheetReleaseDate": "2025-07-01",
+      "historicalSheetSourceLabel": "크리스탈 슬라임",
+      "officialCnReleaseDate": "2025-12-04",
+      "sourceId": "CN-2025-12-04-RYZA3",
+      "samePatchOrder": null,
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
+    }
+  ],
+  "summary": {
+    "conflictingHistoricalSheetRecords": 11,
+    "officialCnCorrectionEvents": 5,
+    "officialCnCorrectionRecords": 11,
+    "currentConfirmedReleaseRecords": 51,
+    "currentUnresolvedReleaseRecords": 173,
+    "projectedConfirmedReleaseRecordsAfterCorrection": 51,
+    "projectedUnresolvedReleaseRecordsAfterCorrection": 173
+  },
+  "boundaries": {
+    "mutateStage5_8AtThisStage": false,
+    "changeCanonicalPopulation": false,
+    "changeHeroSoldierRelations": false,
+    "inferUnresolved78": false,
+    "inferSpChronology": false,
+    "inferLowerTierChronology": false,
+    "inferSamePatchOrder": false,
+    "treatGoogleSheetDatesAsCnChronology": false
+  },
+  "handoff": {
+    "nextOwner": "soldier-release-metadata-promotion-correction",
+    "nextStart": "Apply these 11 official CN dates/source provenance to the already-confirmed base records while preserving 51 confirmed / 173 unresolved coverage, then refresh only release-affected downstream freshness.",
+    "reopenCondition": "Only if direct evidence proves the Google Sheet date cells themselves are Chinese-server release dates or an official Chinese notice contradicts one of the five frozen correction events."
+  }
+}
