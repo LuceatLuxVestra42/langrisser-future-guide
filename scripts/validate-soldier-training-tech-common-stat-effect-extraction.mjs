@@ -112,7 +112,7 @@ check(Array.isArray(records) && records.length === 84, "Subject does not contain
 check(same(records.map((r) => r.techId), targetIds), "Subject Tech order/membership differs from Stage 5 COMMON_STAT.");
 check(new Set(records.map((r) => r.techId)).size === records.length, "Subject has duplicate Tech IDs.");
 const levelIds = [];
-let rawEffectTextRows = 0;
+let sourceDescriptionRowsValidated = 0;
 let structuredEffectRows = 0;
 let structuredEffectEntries = 0;
 const independentShapeCatalog = new Map();
@@ -145,11 +145,11 @@ for (const record of records) {
     check(expected.shapeKey === expectedShapeKey, `Tech ${techId} changes effect shape across source levels.`);
     const level = levels[i];
     check(level?.levelId === levelId, `Tech ${techId} level reference/order mismatch at ${levelId}.`);
-    check(level?.effectTextRaw === source.Description, `TrainingTechLevel ${levelId} effectTextRaw mismatch.`);
-    check(same(level?.effects, expected.effects), `TrainingTechLevel ${levelId} structured effects do not exactly match source Description.`);
-    check(Object.keys(level ?? {}).sort().join("|") === "effectTextRaw|effects|levelId", `TrainingTechLevel ${levelId} generated row contains fields outside the admitted effect projection.`);
-    if (level?.effectTextRaw === source.Description) rawEffectTextRows++;
-    if (same(level?.effects, expected.effects)) structuredEffectRows++;
+    const expectedValues = expected.effects.map((effect) => effect.value);
+    check(same(level?.values, expectedValues), `TrainingTechLevel ${levelId} compact numeric values do not exactly match source Description.`);
+    check(Object.keys(level ?? {}).sort().join("|") === "levelId|values", `TrainingTechLevel ${levelId} generated row contains fields outside the admitted compact effect projection.`);
+    sourceDescriptionRowsValidated++;
+    if (same(level?.values, expectedValues)) structuredEffectRows++;
     structuredEffectEntries += expected.effects.length;
     levelIds.push(levelId);
   });
@@ -164,19 +164,19 @@ for (const record of records) {
 
 const independentCatalog = [...independentShapeCatalog.values()].sort((a, b) => a.shapeKey.localeCompare(b.shapeKey));
 check(levelIds.length === 1050 && new Set(levelIds).size === 1050, "COMMON_STAT materialized level coverage is not 1050 unique IDs.");
-check(rawEffectTextRows === 1050, "COMMON_STAT raw Description effect coverage is not 1050 rows.");
+check(sourceDescriptionRowsValidated === 1050, "COMMON_STAT source Description validation coverage is not 1050 rows.");
 check(structuredEffectRows === 1050, "COMMON_STAT structured effect coverage is not 1050 rows.");
 check(same(subject.effectSemantics?.effectShapeCatalog, independentCatalog), "Subject effect shape catalog differs from independently parsed source shapes.");
 const compactShapeSnapshot = independentCatalog.map(({ shapeKey, techIds, levelRowCount }) => ({ shapeKey, techIds, levelRowCount }));
 check(same(compactShapeSnapshot, frozenShapeSnapshot), "COMMON_STAT frozen effect-shape membership snapshot drifted.");
 check(structuredEffectEntries === 1440 && independentCatalog.length === 7, "COMMON_STAT frozen structured-effect totals drifted from 1440 entries / 7 shapes.");
 check(subject.coverage?.targetTechCount === 84 && subject.coverage?.materializedTechCount === 84, "Subject Tech coverage counters drifted.");
-check(subject.coverage?.referencedLevelRowCount === 1050 && subject.coverage?.uniqueReferencedLevelRowCount === 1050 && subject.coverage?.rawEffectTextRowCount === 1050 && subject.coverage?.structuredEffectRowCount === 1050, "Subject level/effect coverage counters drifted.");
+check(subject.coverage?.referencedLevelRowCount === 1050 && subject.coverage?.uniqueReferencedLevelRowCount === 1050 && subject.coverage?.sourceDescriptionRowCountValidated === 1050 && subject.coverage?.structuredEffectRowCount === 1050, "Subject level/effect coverage counters drifted.");
 check(subject.coverage?.structuredEffectEntryCount === structuredEffectEntries && subject.coverage?.effectShapeCount === independentCatalog.length, "Subject structured effect counters drifted.");
 check(subject.coverage?.unresolvedLevelReferenceCount === 0 && subject.coverage?.duplicateReferencedLevelIdCount === 0 && subject.coverage?.excludedLabelTechMaterializedCount === 0, "Subject zero-error counters drifted.");
 const pol = subject.policy ?? {};
 check(pol.classificationAuthority === "STAGE5_FROZEN_MEMBERSHIP_ONLY" && pol.explicitTechLevelupInfoListJoinOnly === true, "Subject authority/join policy drifted.");
-check(pol.descriptionsMaterializedAsRawEffectText === true && pol.directStatTokensStructured === true && pol.numericEffectParsed === true, "Structured effect materialization policy drifted.");
+check(pol.descriptionsReadForDirectEffectExtraction === true && pol.descriptionsMaterializedInConsumer === false && pol.directStatTokensStructured === true && pol.numericEffectParsed === true, "Structured effect materialization policy drifted.");
 check(pol.conditionalEffectInferencePerformed === false && pol.unrelatedTrainingTechLevelFieldsDuplicated === false && pol.sourceRowsReadByValidatorForExactResolution === true, "Effect scope policy drifted.");
 check(pol.descriptionUsedForClassification === false && pol.nameJoinPerformed === false && pol.idArithmeticPerformed === false && pol.missingValueImputationPerformed === false && pol.historicalOutputFallbackUsed === false && pol.stage5MembershipMutationAllowed === false, "Forbidden inference/mutation policy drifted.");
 check((subject.blockers ?? []).length === 0 && (subject.reviews ?? []).length === 0, "Subject has blockers/reviews.");
@@ -203,7 +203,7 @@ const validation = {
     materializedTechs: 84,
     referencedLevelRows: 1050,
     uniqueReferencedLevelRows: 1050,
-    rawEffectTextRows: 1050,
+    sourceDescriptionRowsValidated: 1050,
     structuredEffectRows: 1050,
     structuredEffectEntries,
     effectShapes: independentCatalog.length,
@@ -218,7 +218,8 @@ const validation = {
     commonStatMembershipExact: true,
     explicitLevelJoinOnly: true,
     everyReferenceResolvedExactlyOnce: true,
-    rawDescriptionEffectsExact: true,
+    sourceDescriptionsParsedExactly: true,
+    compactStructuredValuesExact: true,
     everyNumericTokenAdmittedByExplicitStatValueAlignment: true,
     structuredStatValuesExact: true,
     effectShapeStableWithinEachTech: true,
