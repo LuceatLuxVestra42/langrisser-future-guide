@@ -1,0 +1,45 @@
+name: Soldier Stage 11-A7 Pre-2020 Release Event Boundary
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/soldier-release-pre2020-event-boundary-stage11-a7.v1.json'
+      - 'scripts/validate-soldier-release-pre2020-event-boundary-stage11-a7.mjs'
+      - '.github/workflows/soldier-release-pre2020-event-boundary-stage11-a7.yml'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'data/generated/soldier-release-metadata.v1.json'
+      - 'data/soldier-release-official-notice-evidence-stage11-a1.v1.json'
+      - 'data/validation/soldier-release-metadata-stage11-a5-correction.v1.json'
+  pull_request:
+    paths:
+      - 'data/soldier-release-pre2020-event-boundary-stage11-a7.v1.json'
+      - 'scripts/validate-soldier-release-pre2020-event-boundary-stage11-a7.mjs'
+      - '.github/workflows/soldier-release-pre2020-event-boundary-stage11-a7.yml'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'data/generated/soldier-release-metadata.v1.json'
+      - 'data/soldier-release-official-notice-evidence-stage11-a1.v1.json'
+      - 'data/validation/soldier-release-metadata-stage11-a5-correction.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate Stage 11-A7 pre-2020 release event boundary
+        run: node scripts/validate-soldier-release-pre2020-event-boundary-stage11-a7.mjs
+
+      - name: Verify evidence validation is read-only
+        run: git diff --exit-code
