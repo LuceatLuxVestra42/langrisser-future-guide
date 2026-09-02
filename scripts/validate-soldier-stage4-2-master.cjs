@@ -1,14 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { resolveConfigDataFile } = require('./configdata-source-pack-maintenance-root.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const P = (...parts) => path.join(ROOT, ...parts);
 const MASTER_PATH = P('data/generated/soldier-master.v1.json');
 const STAGE2_PATH = P('data/validation/soldier-stage2-final.v1.json');
 const CONTRACT_PATH = P('data/contracts/soldier-identity-contract.v1.json');
-const SOLDIER_PATH = P('data/configdata/ConfigDataSoldierInfo.json');
-const SP_PATH = P('data/configdata/ConfigDataSPSoldierInfo.json');
+const SOLDIER_PATH = resolveConfigDataFile('ConfigDataSoldierInfo.json');
+const SP_PATH = resolveConfigDataFile('ConfigDataSPSoldierInfo.json');
 const OUT_PATH = P('data/validation/soldier-stage4-2-master.v1.json');
 
 function readJson(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }

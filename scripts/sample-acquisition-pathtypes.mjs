@@ -1,7 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveConfigDataDir } from './configdata-source-pack-maintenance-root.mjs';
 
-const root='data/configdata';
+const physicalRoot=resolveConfigDataDir();
+const logicalRoot='data/configdata';
 const targetTypes=new Set([3,6,12,28,43,46]);
 const targetIds=new Set([8,27,39,405,406,407]);
 const pathSamples={};
@@ -29,16 +31,17 @@ function walkForPaths(v,file,context=null){
   }
 }
 
-for(const name of fs.readdirSync(root)){
+for(const name of fs.readdirSync(physicalRoot)){
   if(!name.endsWith('.json')) continue;
-  const file=path.join(root,name);
-  let data; try{data=JSON.parse(fs.readFileSync(file,'utf8'));}catch{continue;}
-  walkForPaths(data,file,null);
+  const physicalFile=path.join(physicalRoot,name);
+  const logicalFile=path.posix.join(logicalRoot,name);
+  let data; try{data=JSON.parse(fs.readFileSync(physicalFile,'utf8'));}catch{continue;}
+  walkForPaths(data,logicalFile,null);
   const rows=Array.isArray(data)?data:[];
   for(const r of rows){
     const id=Number(r?.ID);
     if(targetIds.has(id)&&idCandidates[id].length<100){
-      idCandidates[id].push({file,ID:id,Name:r?.Name??null,Title:r?.Title??null,Desc:typeof r?.Desc==='string'?r.Desc.slice(0,180):null,keys:Object.keys(r||{}).slice(0,30)});
+      idCandidates[id].push({file:logicalFile,ID:id,Name:r?.Name??null,Title:r?.Title??null,Desc:typeof r?.Desc==='string'?r.Desc.slice(0,180):null,keys:Object.keys(r||{}).slice(0,30)});
     }
   }
 }

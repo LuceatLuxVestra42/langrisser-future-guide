@@ -2,13 +2,19 @@ import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { mkdirSync } from "node:fs";
+import { resolveConfigDataFile } from "./configdata-source-pack-maintenance-root.mjs";
 
 const root = process.cwd();
 const contractPath = "data/contracts/soldier-training-tech-classification-stage2-evidence.v1.json";
 const outputPath = "data/validation/soldier-training-tech-classification-stage2.v1.json";
 
+function physicalPath(path) {
+  if (path.startsWith('data/configdata/')) return resolveConfigDataFile(path.slice('data/configdata/'.length));
+  return resolve(root, path);
+}
+
 function text(path) {
-  return readFileSync(resolve(root, path), "utf8");
+  return readFileSync(physicalPath(path), "utf8");
 }
 
 function json(path) {

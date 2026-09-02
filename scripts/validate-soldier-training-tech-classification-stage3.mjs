@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { resolveConfigDataFile } from "./configdata-source-pack-maintenance-root.mjs";
 
 const root = process.cwd();
 const args = new Set(process.argv.slice(2));
@@ -17,10 +18,13 @@ const paths = {
   output: "data/validation/soldier-training-tech-classification-stage3.v1.json",
 };
 
-const readText = (path) => readFileSync(resolve(root, path), "utf8");
+const physicalPath = (path) => path.startsWith("data/configdata/")
+  ? resolveConfigDataFile(path.slice("data/configdata/".length))
+  : resolve(root, path);
+const readText = (path) => readFileSync(physicalPath(path), "utf8");
 const readJson = (path) => JSON.parse(readText(path));
 const gitBlobSha = (path) => {
-  const bytes = readFileSync(resolve(root, path));
+  const bytes = readFileSync(physicalPath(path));
   const header = Buffer.from(`blob ${bytes.length}\0`);
   return createHash("sha1").update(header).update(bytes).digest("hex");
 };

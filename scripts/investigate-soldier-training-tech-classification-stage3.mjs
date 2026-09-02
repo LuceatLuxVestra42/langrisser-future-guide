@@ -1,8 +1,14 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { resolveConfigDataFile } from "./configdata-source-pack-maintenance-root.mjs";
 
 const root = process.cwd();
-const readJson = (path) => JSON.parse(readFileSync(resolve(root, path), "utf8"));
+const readJson = (path) => {
+  const physicalPath = path.startsWith("data/configdata/")
+    ? resolveConfigDataFile(path.slice("data/configdata/".length))
+    : resolve(root, path);
+  return JSON.parse(readFileSync(physicalPath, "utf8"));
+};
 const has = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
 
 const stage2 = readJson("data/validation/soldier-training-tech-classification-stage2.v1.json");

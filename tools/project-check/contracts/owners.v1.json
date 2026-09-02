@@ -114,6 +114,11 @@
       "owners":["configdata-source-pack"]
     },
     {
+      "id":"configdata-maintenance-direct-adapter",
+      "patterns":["scripts/lib/configdata-direct.cjs"],
+      "owners":["configdata-source-pack"]
+    },
+    {
       "id":"old-doctor-retirement-apply",
       "patterns":[
         ".github/workflows/project-doctor-d7-pr-guard.yml",
@@ -242,6 +247,11 @@
       "id":"equipment-presentation",
       "patterns":["data/presentation/equipment-*","data/validation/equipment-*-presentation*","data/generated/equipment-name-*","scripts/*equipment-name*",".github/workflows/equipment-*-presentation*"],
       "owners":["equipment-frontend","localization"]
+    },
+    {
+      "id":"equipment-acquisition-maintenance",
+      "patterns":["scripts/scan-acquisition-pathtype-sources.mjs","scripts/sample-acquisition-pathtypes.mjs"],
+      "owners":["equipment-canonical"]
     },
     {
       "id":"equipment-canonical",

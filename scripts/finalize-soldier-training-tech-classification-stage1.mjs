@@ -1,10 +1,13 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
+import { resolveConfigDataFile } from "./configdata-source-pack-maintenance-root.mjs";
 
 const STAGE0_PATH = "data/validation/soldier-training-tech-classification-stage0.v1.json";
 const TECH_PATH = "data/configdata/ConfigDataTrainingTechInfo.json";
 const LEVEL_PATH = "data/configdata/ConfigDataTrainingTechLevelInfo.json";
+const TECH_FILE = resolveConfigDataFile('ConfigDataTrainingTechInfo.json');
+const LEVEL_FILE = resolveConfigDataFile('ConfigDataTrainingTechLevelInfo.json');
 const OUTPUT_PATH = "data/generated/soldier-training-tech-classification-stage1-census.v1.json";
 
 function readBuffer(path) {
@@ -93,8 +96,8 @@ function duplicateIdSummary(records) {
 }
 
 const stage0Buffer = readBuffer(STAGE0_PATH);
-const techBuffer = readBuffer(TECH_PATH);
-const levelBuffer = readBuffer(LEVEL_PATH);
+const techBuffer = readBuffer(TECH_FILE);
+const levelBuffer = readBuffer(LEVEL_FILE);
 const stage0 = JSON.parse(stage0Buffer.toString("utf8"));
 const techRecords = JSON.parse(techBuffer.toString("utf8"));
 const levelRecords = JSON.parse(levelBuffer.toString("utf8"));

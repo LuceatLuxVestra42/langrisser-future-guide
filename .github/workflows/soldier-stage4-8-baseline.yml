@@ -1,4 +1,5 @@
 name: Soldier Stage 4-8 Baseline Freeze
+# B5.6 source-root adapter refresh trigger; workflow behavior is unchanged.
 
 on:
   workflow_dispatch:
@@ -31,6 +32,8 @@ on:
       - 'data/hero-name-master.v1.json'
       - 'data/contracts/hero-*.json'
       - 'data/contracts/soldier-identity-contract.v1.json'
+      - 'data/contracts/configdata-source-pack-b5-8-soldier-stage3-writeback.v1.json'
+      - 'data/contracts/configdata-source-pack-b5-9-soldier-stage2-writeback.v1.json'
       - 'data/validation/soldier-representative-fixture-plan.v1.json'
       - 'data/validation/soldier-stage4-8-baseline.v1.json'
       - '.github/workflows/soldier-stage4-8-baseline.yml'
@@ -92,14 +95,20 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const crypto = require('crypto');
-          const cp = require('child_process');
+          const path = require('path');
+          const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
           const baselinePath = 'data/validation/soldier-stage4-8-baseline.v1.json';
           const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
           const mismatches = [];
 
+          function physicalFile(p) {
+            return p.startsWith('data/configdata/') ? resolveConfigDataFile(path.basename(p)) : p;
+          }
           function gitBlobSha(p) {
             try {
-              return cp.execFileSync('git', ['hash-object', p], { encoding: 'utf8' }).trim();
+              const body = fs.readFileSync(physicalFile(p));
+              const header = Buffer.from(`blob ${body.length}\0`);
+              return crypto.createHash('sha1').update(header).update(body).digest('hex');
             } catch {
               return null;
             }
