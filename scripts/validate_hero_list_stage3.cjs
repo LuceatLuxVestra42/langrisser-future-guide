@@ -137,6 +137,25 @@ check(
 );
 
 check(
+  'integrated-filter-navigation',
+  route.includes('type FilterSection = "rarity" | "faction" | "origin"') &&
+    route.includes('useState<FilterSection>("rarity")') &&
+    route.includes('aria-label="통합 필터 분류"') &&
+    route.includes('setFilterSection("rarity")') &&
+    route.includes('setFilterSection("faction")') &&
+    route.includes('setFilterSection("origin")'),
+  'one integrated filter switcher exposes rarity, faction, and origin sections with rarity as the initial section',
+);
+
+check(
+  'default-origin-options-hidden',
+  route.includes('useState<FilterSection>("rarity")') &&
+    route.includes('{filterSection === "origin" ? (') &&
+    route.includes('aria-label="출전작 필터"'),
+  'origin options are rendered only when the origin section is selected',
+);
+
+check(
   'rarity-filter-ui',
   route.includes('희귀도 필터') &&
     route.includes('rarityOptions.map') &&
@@ -169,12 +188,31 @@ check(
   'origin buttons use frozen productionId',
 );
 
+const rarityPanelIndex = route.indexOf('aria-label="희귀도 필터"');
+const spButtonIndex = route.indexOf('SP만');
+const factionPanelIndex = route.indexOf('{filterSection === "faction" ? (');
 check(
   'sp-filter-ui',
-  route.includes('SP만') &&
-    route.includes('aria-pressed={spOnly}') &&
-    route.includes('spOnly && !hero.hasSp'),
-  'SP-only toggle filters records',
+  route.includes('aria-pressed={spOnly}') &&
+    route.includes('spOnly && !hero.hasSp') &&
+    rarityPanelIndex >= 0 &&
+    spButtonIndex > rarityPanelIndex &&
+    factionPanelIndex > spButtonIndex,
+  'SP-only toggle remains combinable and is placed inside the rarity filter section',
+);
+
+const integratedFilterIndex = route.indexOf('통합 필터');
+const searchInputIndex = route.indexOf('id="hero-search"');
+check(
+  'search-below-filter-ui',
+  integratedFilterIndex >= 0 && searchInputIndex > integratedFilterIndex,
+  'search input is rendered below the integrated filter controls',
+);
+
+check(
+  'list-heading-removed',
+  !route.includes('<h1'),
+  'the standalone Hero heading below the home link is removed',
 );
 
 check(
