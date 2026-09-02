@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,6 +8,9 @@ import { loadProjectCheckContracts, routeProjectCheckPaths } from '../tools/proj
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BOUNDARY_PATH = 'data/contracts/configdata-source-pack-routing-boundary.v1.json';
 const FORMAT_PATH = 'data/contracts/configdata-source-pack-format.v1.json';
+const SOURCE_PACK_PATH = 'data/contracts/configdata-source-pack-contract.v1.json';
+const B4_PATH = 'data/contracts/project-tooling-configdata-lookup-b4-external-clean-room.v1.json';
+const B5_PATH = 'data/contracts/configdata-source-pack-deletion-admission.v1.json';
 const OWNER_ID = 'configdata-source-pack';
 const VALIDATOR_ID = 'configdata-source-pack-boundary';
 
@@ -28,7 +32,23 @@ function expectRoute(contracts, filePath, owners, validators) {
   assert.equal(route.boundaries.changeClassFanOutCount, 0);
 }
 
-function validateFormat(format, boundary) {
+function git(args) {
+  const result = spawnSync('git', args, { cwd: ROOT, encoding: 'utf8', shell: false });
+  assert.equal(result.status, 0, `git ${args.join(' ')} failed: ${String(result.stderr ?? '').trim()}`);
+  return String(result.stdout ?? '').trim();
+}
+
+function listDeletionPaths(sourceCommitSha) {
+  const output = git(['ls-tree', '-r', '--name-only', sourceCommitSha, '--', 'data/configdata']);
+  return output
+    .split(/\r?\n/)
+    .map(item => item.trim())
+    .filter(Boolean)
+    .filter(item => /^data\/configdata\/[^/]+\.json$/.test(item))
+    .sort();
+}
+
+function validateFormat(format, boundary, admission) {
   assert.equal(format.version, 1);
   assert.equal(format.contract, 'configdata-source-pack-format');
   assert.equal(format.stage, 'repository-size-reduction-B1a');
@@ -115,8 +135,23 @@ function validateFormat(format, boundary) {
   assert.equal(format.handoff.nextStage, 'B1b-exact-byte-snapshot');
 
   const sourceRoot = path.join(ROOT, format.authoritativePredecessor.logicalSourceRoot);
-  const entries = fs.readdirSync(sourceRoot, { withFileTypes: true });
-  assert.equal(entries.length, format.authoritativePredecessor.currentTrackedJsonCount);
+  const entries = fs.existsSync(sourceRoot) ? fs.readdirSync(sourceRoot, { withFileTypes: true }) : [];
+  if (entries.length === 0) {
+    assert.equal(admission.b5.migrationState.trackedRawDeletionAdmitted, true, 'tracked ConfigData root may be absent only after B5 admission');
+    return {
+      sourceMode: 'ADMITTED_EXTERNAL_ONLY_POST_B5',
+      fileCount: admission.sourcePack.coverage.fileCount,
+      totalSourceBytes: admission.sourcePack.coverage.totalSourceBytes,
+      firstMember: null,
+      lastMember: null,
+    };
+  }
+
+  assert.equal(
+    entries.length,
+    format.authoritativePredecessor.currentTrackedJsonCount,
+    'partial tracked ConfigData root must fail closed',
+  );
   const members = [];
   let totalSourceBytes = 0;
   for (const entry of entries) {
@@ -135,7 +170,103 @@ function validateFormat(format, boundary) {
   }
   const ordered = [...members].sort((a, b) => Buffer.compare(Buffer.from(a, 'utf8'), Buffer.from(b, 'utf8')));
   assert.equal(new Set(ordered).size, ordered.length, 'archive member paths must be unique');
-  return { fileCount: ordered.length, totalSourceBytes, firstMember: ordered[0], lastMember: ordered.at(-1) };
+  assert.equal(totalSourceBytes, admission.sourcePack.coverage.totalSourceBytes, 'tracked ConfigData total bytes drifted from B2 exact source');
+  return {
+    sourceMode: 'TRACKED_PRE_B6',
+    fileCount: ordered.length,
+    totalSourceBytes,
+    firstMember: ordered[0],
+    lastMember: ordered.at(-1),
+  };
+}
+
+function validateAdmission(contracts) {
+  const sourcePack = readJson(SOURCE_PACK_PATH);
+  assert.equal(sourcePack.version, 1);
+  assert.equal(sourcePack.contract, 'configdata-source-pack');
+  assert.equal(sourcePack.stage, 'repository-size-reduction-B2');
+  assert.equal(sourcePack.status, 'PASS');
+  assert.equal(sourcePack.owner, OWNER_ID);
+  assert.equal(sourcePack.authority.logicalRawPathNamespace, 'data/configdata');
+  assert.equal(sourcePack.authority.rawConfigDataQueryFallback, false);
+  assert.equal(sourcePack.storage.immutabilityPolicy, 'CONTENT_HASH_PINNED_FAIL_CLOSED');
+  assert.equal(sourcePack.coverage.fileCount, 753);
+  assert.equal(sourcePack.coverage.totalSourceBytes, 308284658);
+  assert.equal(sourcePack.coverage.missingCount, 0);
+  assert.equal(sourcePack.coverage.extraCount, 0);
+  assert.equal(sourcePack.coverage.duplicatePathCount, 0);
+
+  const b4 = readJson(B4_PATH);
+  assert.equal(b4.version, 1);
+  assert.equal(b4.schemaId, 'configdata-lookup-b4-external-clean-room/v1');
+  assert.equal(b4.stage, 'repository-size-reduction-B4');
+  assert.equal(b4.status, 'PASS');
+  assert.equal(b4.completion, 'CONFIGDATA_LOOKUP_B4_EXTERNAL_ONLY_CLEAN_ROOM_COMPLETE');
+  assert.equal(b4.cleanRoomBoundary.externalHydrationExactFileCount, sourcePack.coverage.fileCount);
+  assert.equal(b4.cleanRoomBoundary.trackedRepositoryRawRootUnavailableDuringProof, true);
+  assert.equal(b4.cleanRoomBoundary.repositoryRootFallbackMaySatisfyProof, false);
+  assert.equal(b4.cleanRoomBoundary.explicitWriterChangedFileCount, 0);
+  assert.equal(b4.cleanRoomBoundary.trackedMutationCountAfterRestore, 0);
+  assert.equal(b4.cleanRoomBoundary.semanticMutationCount, 0);
+  assert.equal(b4.migrationState.externalOnlyCleanRoomCompleted, true);
+  assert.deepEqual(b4.blockers, []);
+  assert.deepEqual(b4.reviews, []);
+
+  const b5 = readJson(B5_PATH);
+  assert.equal(b5.version, 1);
+  assert.equal(b5.schemaId, 'configdata-source-pack-deletion-admission/v1');
+  assert.equal(b5.stage, 'repository-size-reduction-B5');
+  assert.equal(b5.status, 'PASS');
+  assert.equal(b5.completion, 'CONFIGDATA_SOURCE_PACK_B5_DELETION_ADMISSION_COMPLETE');
+  assert.equal(b5.owner, OWNER_ID);
+  assert.deepEqual(b5.supportingOwners, ['configdata', 'project-check']);
+  assert.equal(b5.deletionAdmission.trackedRawPattern, 'data/configdata/*.json');
+  assert.equal(b5.deletionAdmission.preDeletionTrackedRawJsonCount, sourcePack.coverage.fileCount);
+  assert.equal(b5.deletionAdmission.admittedDeletionCount, sourcePack.coverage.fileCount);
+  assert.equal(b5.deletionAdmission.postDeletionTrackedRawJsonCount, 0);
+  assert.equal(b5.deletionAdmission.atomicFullSetDeletionRequired, true);
+  assert.equal(b5.deletionAdmission.partialTrackedDeletionAllowed, false);
+  assert.equal(b5.deletionAdmission.deletionOccursInThisStage, false);
+  assert.equal(b5.deletionAdmission.deletionStage, 'B6');
+  assert.deepEqual(b5.deletionAdmission.requiredStorageOwners, ['configdata', OWNER_ID]);
+  assert.deepEqual(b5.deletionAdmission.requiredValidators, [VALIDATOR_ID, 'configdata-integrity']);
+  assert.equal(b5.deletionAdmission.orchestrationSpecialCaseIntroduced, false);
+  assert.equal(b5.deletionAdmission.ownerPropagation, false);
+  assert.equal(b5.deletionAdmission.changeClassFanOut, false);
+  assert.equal(b5.deletionAdmission.semanticReopenOnStorageDeletion, false);
+  assert.equal(b5.validatorReadiness.configDataIntegrityHydratesPinnedB2WhenTrackedRootAbsentOrEmpty, true);
+  assert.equal(b5.validatorReadiness.configDataIntegrityPartialTrackedRootFailsClosed, true);
+  assert.equal(b5.validatorReadiness.sourcePackBoundaryAllowsTrackedRootAbsenceOnlyAfterB5Admission, true);
+  assert.equal(b5.validatorReadiness.sourcePackBoundaryPartialTrackedRootFailsClosed, true);
+  assert.equal(b5.migrationState.trackedRawDeletionAdmitted, true);
+  assert.equal(b5.migrationState.trackedRawDeletionCompleted, false);
+  assert.deepEqual(b5.blockers, []);
+  assert.deepEqual(b5.reviews, []);
+  assert.equal(b5.handoff.nextStage, 'B6-delete-tracked-configdata');
+
+  for (const [key, value] of Object.entries(b5.semanticBoundary)) {
+    assert.equal(value, false, `B5 semantic boundary drift: ${key}`);
+  }
+
+  const deletionPaths = listDeletionPaths(sourcePack.authoritativePredecessor.sourceCommitSha);
+  assert.equal(deletionPaths.length, b5.deletionAdmission.admittedDeletionCount);
+  assert.equal(new Set(deletionPaths).size, deletionPaths.length);
+  const route = routeProjectCheckPaths(deletionPaths, contracts);
+  assert.equal(route.status, 'PLAN_READY');
+  assert.equal(route.changedFileCount, deletionPaths.length);
+  assert.equal(route.manualReviews.length, 0);
+  assert.equal(route.boundaries.ownerPropagationCount, 0);
+  assert.equal(route.boundaries.changeClassFanOutCount, 0);
+  for (const file of route.files) {
+    for (const owner of b5.deletionAdmission.requiredStorageOwners) {
+      assert.equal(file.owners.includes(owner), true, `${file.path}: missing B5 deletion owner ${owner}`);
+    }
+    for (const validator of b5.deletionAdmission.requiredValidators) {
+      assert.equal(file.validators.includes(validator), true, `${file.path}: missing B5 deletion validator ${validator}`);
+    }
+  }
+
+  return { sourcePack, b4, b5, deletionPaths, route };
 }
 
 function main() {
@@ -184,14 +315,10 @@ function main() {
   assert.equal(boundary.productionBoundary.productionRuntimeFetchesSourcePack, false);
   assert.equal(boundary.productionBoundary.rawConfigDataRuntimeFallbackAllowed, false);
   assert.equal(boundary.productionBoundary.frontendSemanticJoinIntroduced, false);
-  assert.equal(boundary.handoff.completion, 'B0_5_B_ROUTING_BOUNDARY_FROZEN');
-  assert.equal(boundary.handoff.nextOwner, OWNER_ID);
-  assert.equal(boundary.handoff.nextStage, 'B1a-minimal-pack-format-freeze');
 
   const contracts = loadProjectCheckContracts({ repoRoot: ROOT });
   const ownerMap = contracts.ownerMap;
   const catalog = contracts.validatorCatalog;
-
   assert.equal(ownerMap.policy.ruleMatch, 'UNION_ALL_MATCHING_RULES');
   assert.equal(ownerMap.policy.ownerPropagation, false);
   assert.equal(ownerMap.policy.changeClassFanOut, false);
@@ -202,7 +329,6 @@ function main() {
   const owner = ownerMap.owners.find(item => item.id === OWNER_ID);
   assert.ok(owner, `${OWNER_ID} owner missing`);
   assert.deepEqual(owner.validators, [VALIDATOR_ID]);
-
   const validator = catalog.validators.find(item => item.id === VALIDATOR_ID);
   assert.ok(validator, `${VALIDATOR_ID} validator missing`);
   assert.equal(validator.phase, 7);
@@ -214,7 +340,6 @@ function main() {
   assert.ok(toolingRule, 'configdata-source-pack-tooling rule missing');
   assert.deepEqual(toolingRule.patterns, boundary.routing.sourcePackToolingPatterns);
   assert.deepEqual(toolingRule.owners, [OWNER_ID]);
-
   const rawRule = ownerMap.pathRules.find(item => item.id === 'configdata-source-storage');
   assert.ok(rawRule, 'configdata-source-storage rule missing');
   assert.deepEqual(rawRule.patterns, [boundary.routing.rawStoragePattern]);
@@ -222,8 +347,11 @@ function main() {
 
   expectRoute(contracts, BOUNDARY_PATH, [OWNER_ID], [VALIDATOR_ID]);
   expectRoute(contracts, FORMAT_PATH, [OWNER_ID], [VALIDATOR_ID]);
+  expectRoute(contracts, SOURCE_PACK_PATH, [OWNER_ID], [VALIDATOR_ID]);
+  expectRoute(contracts, B5_PATH, [OWNER_ID], [VALIDATOR_ID]);
   expectRoute(contracts, 'scripts/hydrate-configdata-source-pack-v1.mjs', [OWNER_ID], [VALIDATOR_ID]);
-  expectRoute(contracts, '.github/workflows/configdata-source-pack-hydration-v1.yml', [OWNER_ID], [VALIDATOR_ID]);
+  expectRoute(contracts, 'scripts/validate-configdata-source-pack-b5-deletion-admission-v1.mjs', [OWNER_ID], [VALIDATOR_ID]);
+  expectRoute(contracts, '.github/workflows/configdata-source-pack-b5-deletion-admission.yml', [OWNER_ID], [VALIDATOR_ID]);
   expectRoute(
     contracts,
     'data/configdata/ConfigDataUnknownFutureTable.json',
@@ -237,30 +365,38 @@ function main() {
     [VALIDATOR_ID, 'configdata-integrity', 'hero-canonical', 'skin-relation'],
   );
 
+  const admission = validateAdmission(contracts);
   const format = readJson(FORMAT_PATH);
-  const topology = validateFormat(format, boundary);
+  const topology = validateFormat(format, boundary, admission);
 
   console.log(JSON.stringify({
     status: 'PASS',
-    checkpoint: 'CONFIGDATA_SOURCE_PACK_B1A_FORMAT_BOUNDARY',
+    checkpoint: 'CONFIGDATA_SOURCE_PACK_B5_DELETION_ADMISSION_BOUNDARY',
     owner: OWNER_ID,
     validator: VALIDATOR_ID,
     rawStoragePattern: boundary.routing.rawStoragePattern,
-    sourcePackToolingPatternCount: boundary.routing.sourcePackToolingPatterns.length,
+    sourceMode: topology.sourceMode,
     format: {
       archive: format.archive.fileName,
       archiveFormat: format.archive.format,
       compression: format.archive.compression,
       fileCount: topology.fileCount,
-      totalSourceBytesObserved: topology.totalSourceBytes,
+      totalSourceBytesObservedOrPinned: topology.totalSourceBytes,
       firstMember: topology.firstMember,
       lastMember: topology.lastMember,
+    },
+    deletionAdmission: {
+      admittedDeletionCount: admission.deletionPaths.length,
+      projectCheckStatus: admission.route.status,
+      manualReviewCount: admission.route.manualReviews.length,
+      ownerCount: admission.route.ownerCount,
+      validatorCount: admission.route.validatorCount,
     },
     semanticAuthorityChanged: false,
     frozenSemanticDomainsReopened: false,
     ownerPropagationCount: 0,
     changeClassFanOutCount: 0,
-    nextStage: format.handoff.nextStage,
+    nextStage: admission.b5.handoff.nextStage,
   }, null, 2));
 }
 
