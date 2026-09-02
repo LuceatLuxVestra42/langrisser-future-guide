@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "schemaId": "evidence-lifecycle-c0-scope-admission/v1",
+  "stage": "C0 - Scope / Authority / Ownership Admission Freeze",
+  "status": "DESIGN_FROZEN",
+  "completion": "COMPLETE",
+  "freezeState": "C0_SCOPE_ADMISSION_FROZEN",
+  "baseline": {
+    "branch": "main",
+    "sha": "c76274ea805889fed23f716c954eb76dca4b29d1",
+    "workingTreeStateAsserted": false,
+    "reason": "Remote GitHub baseline only; no local working-tree cleanliness is inferred."
+  },
+  "purpose": "Freeze repository-wide evidence/checkpoint lifecycle maintenance scope without semantic recomputation, authority reselection, or destructive mutation.",
+  "semanticReopen": false,
+  "scopeModel": {
+    "lifecycleNodeScopeDistinctFromReferenceSourceScope": true,
+    "primaryDiscoveryRoots": [
+      "data/checkpoints/**",
+      "data/contracts/**",
+      "data/evidence/**",
+      "data/investigation/**",
+      "data/manifests/**",
+      "data/status-sources/**",
+      "data/validation/**",
+      "docs/checkpoints/**",
+      "tools/**/checkpoints/**",
+      "tools/**/contract/**",
+      "tools/**/contracts/**",
+      "tools/status-source/declarations/**",
+      "tools/status-source/closeout-requests/**"
+    ],
+    "conditionalDiscoveryRoots": [
+      "data/generated/**",
+      "tools/**/generated/**",
+      "docs/*.md",
+      "data/*.json"
+    ],
+    "admittedRoles": [
+      "AUTHORITY_DECLARATION",
+      "RETENTION_DECLARATION",
+      "CONTRACT",
+      "MANIFEST",
+      "CHECKPOINT",
+      "CLOSEOUT",
+      "VALIDATION_EVIDENCE",
+      "INVESTIGATION_EVIDENCE",
+      "PROVENANCE_EVIDENCE",
+      "AUDIT_EVIDENCE",
+      "HISTORICAL_GENERATED_EVIDENCE"
+    ],
+    "explicitNonScopeRoles": [
+      "RAW_SOURCE_DATA",
+      "CANONICAL_SEMANTIC_DATA",
+      "CURRENT_PRODUCTION_CONSUMER",
+      "CURRENT_FRONTEND_PAGE_DATA",
+      "LOOKUP_INDEX",
+      "MATERIALIZED_OPERATIONAL_INDEX",
+      "PRODUCTION_SOURCE_CODE",
+      "FRONTEND_SOURCE",
+      "PUBLIC_WEB_ASSET",
+      "LOCALIZATION_SOURCE",
+      "PRESENTATION_SOURCE",
+      "BUILD_OUTPUT",
+      "ROUTE_GENERATION_OUTPUT",
+      "TEST_FIXTURE"
+    ]
+  },
+  "ownerResolution": {
+    "source": "tools/project-check/contracts/owners.v1.json",
+    "policy": "PROJECT_CHECK_EXPLICIT_ONLY",
+    "ruleMatch": "UNION_ALL_MATCHING_RULES",
+    "unmatchedPath": "MANUAL_REVIEW",
+    "ownerPropagation": false,
+    "changeClassFanOut": false
+  },
+  "outputOwnership": {
+    "ownerId": "evidence-lifecycle",
+    "namespace": "tools/evidence-lifecycle/**",
+    "validatorId": "evidence-lifecycle-readonly",
+    "bootstrapRequiredBeforeC1Publication": true
+  },
+  "forbiddenInference": {
+    "filenameSimilarity": true,
+    "stageNumberOrdering": true,
+    "chronologyLatestWins": true,
+    "nameJoin": true,
+    "idArithmetic": true,
+    "directoryProximityMeaning": true
+  },
+  "baselineFreshness": {
+    "mainAdvanceAloneReopensC0": false,
+    "refreshOnlyAffectedCStage": true,
+    "c0ReopenWhen": [
+      "Project Check owner/validator contract changes in a way that changes C ownership or admission.",
+      "C scope admission roles or discovery policy changes.",
+      "A new lifecycle artifact family cannot be represented by this contract.",
+      "Status Source authority-selection architecture changes.",
+      "C output owner/path boundary changes."
+    ]
+  },
+  "nextOwner": "Evidence Lifecycle C1 Physical Inventory",
+  "nextStartPoint": "Bootstrap only the explicit evidence-lifecycle Project Check owner/validator, then inventory the frozen baseline without semantic classification."
+}
