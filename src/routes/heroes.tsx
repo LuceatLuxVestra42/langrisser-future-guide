@@ -42,7 +42,7 @@ export const Route = createFileRoute("/heroes")({
       { title: "영웅 | 랑그릿사 모바일 미래시 정보" },
       {
         name: "description",
-        content: "랑그릿사 모바일 영웅 267명을 이름, 희귀도, 진영, 등장 시리즈, SP 여부로 검색하고 필터링할 수 있습니다.",
+        content: "랑그릿사 모바일 영웅 267명을 이름, 희귀도, 진영, 출전작, SP 여부로 검색하고 필터링할 수 있습니다.",
       },
     ],
   }),
@@ -291,8 +291,8 @@ function HeroGridPage() {
           </div>
 
           <div className="mt-3">
-            <span className="mb-1.5 block text-xs font-bold text-foreground">등장 시리즈</span>
-            <div className="flex flex-wrap gap-1.5" role="group" aria-label="등장 시리즈 필터">
+            <span className="mb-1.5 block text-xs font-bold text-foreground">출전작</span>
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label="출전작 필터">
               <FilterButton active={originId === null} onClick={() => setOriginId(null)}>
                 전체
               </FilterButton>
