@@ -2,6 +2,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { resolveConfigDataSourcePath } from '../../tools/configdata-lookup/lib/source-root.mjs';
+
 export const STAGE1_CONTRACT_PATH = 'data/contracts/configdata-lookup-stage1-id-index-contract.v1.json';
 export const STAGE0_CONTRACT_PATH = 'data/contracts/configdata-lookup-stage0-contract.v1.json';
 
@@ -74,7 +76,7 @@ export async function loadStage0Contract() {
 }
 
 export async function buildEntityIndex(entity, spec, contract) {
-  const sourceText = await fs.readFile(spec.source, 'utf8');
+  const sourceText = await fs.readFile(resolveConfigDataSourcePath(spec.source), 'utf8');
   const root = JSON.parse(sourceText);
   const { records, containerPath } = extractRecords(root, contract.acceptedSourceContainers);
 
