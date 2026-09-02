@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const crypto = require('crypto');
 const {
   ROOT,
   readJson,
@@ -8,6 +8,7 @@ const {
   loadSpSoldiers,
   loadSpHeroes,
 } = require('./lib/configdata-direct.cjs');
+const { resolveConfigDataFile } = require('./configdata-source-pack-maintenance-root.cjs');
 
 const paths = {
   heroMaster: 'data/hero-name-master.v1.json',
@@ -30,8 +31,13 @@ const paths = {
 
 function abs(p) { return path.join(ROOT, p); }
 function writeJson(p, value) { fs.writeFileSync(abs(p), JSON.stringify(value, null, 2) + '\n'); }
+function physicalFile(p) {
+  return p.startsWith('data/configdata/') ? resolveConfigDataFile(path.basename(p)) : abs(p);
+}
 function gitBlobSha(p) {
-  return execFileSync('git', ['hash-object', p], { cwd: ROOT, encoding: 'utf8' }).trim();
+  const body = fs.readFileSync(physicalFile(p));
+  const header = Buffer.from(`blob ${body.length}\0`);
+  return crypto.createHash('sha1').update(header).update(body).digest('hex');
 }
 function descriptor(p) { return { path: p, gitBlobSha: gitBlobSha(p) }; }
 function pairKey(heroId, soldierId) { return `${heroId}:${soldierId}`; }

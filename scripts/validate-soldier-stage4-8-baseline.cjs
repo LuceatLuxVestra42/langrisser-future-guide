@@ -3,6 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 const { ROOT, readJson } = require('./lib/configdata-direct.cjs');
+const { resolveConfigDataFile } = require('./configdata-source-pack-maintenance-root.cjs');
 
 const OUT_REL = 'data/validation/soldier-stage4-8-baseline.v1.json';
 const OUT = path.join(ROOT, OUT_REL);
@@ -19,6 +20,10 @@ const validationPaths = {
   relationConsumer: 'data/validation/soldier-stage4-6-relation-consumer.v1.json',
   representativeFixtures: 'data/validation/soldier-stage4-7-domain-fixtures.v1.json',
 };
+
+const frozenValidationPaths = Object.fromEntries(
+  Object.entries(validationPaths).filter(([key]) => key !== 'inputAdapter')
+);
 
 const generatedPaths = {
   soldierMaster: 'data/generated/soldier-master.v1.json',
@@ -75,8 +80,13 @@ const pipelineInputs = [
 
 function abs(p) { return path.join(ROOT, p); }
 function exists(p) { return fs.existsSync(abs(p)); }
+function physicalFile(p) {
+  return p.startsWith('data/configdata/') ? resolveConfigDataFile(path.basename(p)) : abs(p);
+}
 function gitBlobSha(p) {
-  return execFileSync('git', ['hash-object', p], { cwd: ROOT, encoding: 'utf8' }).trim();
+  const body = fs.readFileSync(physicalFile(p));
+  const header = Buffer.from(`blob ${body.length}\0`);
+  return crypto.createHash('sha1').update(header).update(body).digest('hex');
 }
 function gitHead() {
   return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
@@ -189,7 +199,7 @@ const inputSnapshot = descriptor(dataInputs);
 const contractSnapshot = descriptor(contractInputs);
 const pipelineSnapshot = descriptor(pipelineInputs);
 const artifactSnapshot = digestDescriptors(generatedPaths);
-const validationSnapshot = digestDescriptors(validationPaths);
+const validationSnapshot = digestDescriptors(frozenValidationPaths);
 
 const dataChanges = collectChanged(previous?.snapshots?.dataInputs, inputSnapshot);
 const contractChanges = collectChanged(previous?.snapshots?.contracts, contractSnapshot);

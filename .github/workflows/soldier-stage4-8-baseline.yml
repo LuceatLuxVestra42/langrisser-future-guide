@@ -93,14 +93,20 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const crypto = require('crypto');
-          const cp = require('child_process');
+          const path = require('path');
+          const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
           const baselinePath = 'data/validation/soldier-stage4-8-baseline.v1.json';
           const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
           const mismatches = [];
 
+          function physicalFile(p) {
+            return p.startsWith('data/configdata/') ? resolveConfigDataFile(path.basename(p)) : p;
+          }
           function gitBlobSha(p) {
             try {
-              return cp.execFileSync('git', ['hash-object', p], { encoding: 'utf8' }).trim();
+              const body = fs.readFileSync(physicalFile(p));
+              const header = Buffer.from(`blob ${body.length}\0`);
+              return crypto.createHash('sha1').update(header).update(body).digest('hex');
             } catch {
               return null;
             }
