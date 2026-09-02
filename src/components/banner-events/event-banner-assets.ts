@@ -22,8 +22,16 @@ const EVENT_BANNER_ASSET_BY_LEGACY_PATH = new Map<string, string>([
   ["/images/banners/events/time-space-prayer.webp", timeSpacePrayer],
 ]);
 
+function removeRepositoryBase(assetUrl: string) {
+  const baseUrl = import.meta.env.BASE_URL;
+  if (baseUrl !== "/" && assetUrl.startsWith(baseUrl)) {
+    return `/${assetUrl.slice(baseUrl.length)}`;
+  }
+  return assetUrl;
+}
+
 export function resolveEventBannerAssetUrl(legacyPath: string) {
   const assetUrl = EVENT_BANNER_ASSET_BY_LEGACY_PATH.get(legacyPath);
   if (!assetUrl) throw new Error(`Unknown event banner presentation asset: ${legacyPath}`);
-  return assetUrl;
+  return removeRepositoryBase(assetUrl);
 }
