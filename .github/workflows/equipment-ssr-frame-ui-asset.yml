@@ -1,0 +1,56 @@
+name: Equipment SSR Frame UI Asset
+
+on:
+  push:
+    branches:
+      - feat/equipment-ssr-frame-ui
+    paths:
+      - .github/workflows/equipment-ssr-frame-ui-asset.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  import-frame:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/equipment-ssr-frame-ui
+          fetch-depth: 0
+
+      - name: Download frozen provenance artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf /tmp/equipment-ssr-frame
+          mkdir -p /tmp/equipment-ssr-frame
+          gh run download 33594309717 \
+            --repo "${{ github.repository }}" \
+            --name equipment-ssr-frame-provenance-v2 \
+            --dir /tmp/equipment-ssr-frame
+
+      - name: Admit exact official SSR frame PNG
+        run: |
+          SOURCE="/tmp/equipment-ssr-frame/equipment-ssr-frame-previews/begin_ui_common_new_abs.b--Sprite---4443469109255290003.png"
+          TARGET="public/images/equipment/frame-ssr.png"
+          test -s "$SOURCE"
+          test "$(stat -c '%s' "$SOURCE")" = "25295"
+          test "$(sha256sum "$SOURCE" | awk '{print $1}')" = "128c96f8ff3c2e2def6a0f1a76169587dcf0402cb9b251e436bd423a0b16bbd1"
+          mkdir -p "$(dirname "$TARGET")"
+          cp "$SOURCE" "$TARGET"
+          test "$(sha256sum "$TARGET" | awk '{print $1}')" = "128c96f8ff3c2e2def6a0f1a76169587dcf0402cb9b251e436bd423a0b16bbd1"
+
+      - name: Commit exact frame asset
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/images/equipment/frame-ssr.png
+          if git diff --cached --quiet; then
+            echo "Exact SSR frame asset already present."
+            exit 0
+          fi
+          git commit -m "Add official Equipment SSR frame asset"
+          git push origin HEAD:feat/equipment-ssr-frame-ui
