@@ -99,6 +99,14 @@
       "coverage": "CLR3 read-only query/CLI parity, CLR5 validation/writer separation, CLR6 materialized-input shadow parity, CLR7 package CLI authority cutover and legacy Stage 7/8 active-authority retirement, Stage 6 freshness, fail-closed boundaries and tracked-mutation guard."
     },
     {
+      "id": "configdata-source-pack-boundary",
+      "phase": 7,
+      "executable": "node",
+      "args": ["scripts/validate-configdata-source-pack-boundary-v1.mjs"],
+      "owner": "configdata-source-pack",
+      "coverage": "Read-only B0.5-B storage-owner, deletion-routing, no-fan-out, no-semantic-inference and future snapshot-promotion boundary validation."
+    },
+    {
       "id": "configdata-integrity",
       "phase": 10,
       "executable": "npm",
