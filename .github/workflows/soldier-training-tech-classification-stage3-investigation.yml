@@ -1,4 +1,4 @@
-name: TrainingTech Stage 3 Candidate Evidence
+name: TrainingTech Stage 3 Bootstrap
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  investigate:
+  bootstrap:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -21,16 +21,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Build Stage 3 candidate evidence
+      - name: Rebuild Stage 3 candidate evidence
         run: node scripts/investigate-soldier-training-tech-classification-stage3.mjs
-      - name: Persist candidate evidence
+      - name: Recompute Stage 3 validation
+        run: node scripts/validate-soldier-training-tech-classification-stage3.mjs --write
+      - name: Verify Stage 3 validation
+        run: node scripts/validate-soldier-training-tech-classification-stage3.mjs --check
+      - name: Persist Stage 3 generated evidence and validation
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/evidence/soldier-training-tech-classification-stage3-candidates.v1.json
+          git add data/evidence/soldier-training-tech-classification-stage3-candidates.v1.json data/validation/soldier-training-tech-classification-stage3.v1.json
           if git diff --cached --quiet; then
-            echo "Candidate evidence already current."
+            echo "Stage 3 artifacts already current."
           else
-            git commit -m "Materialize TrainingTech Stage 3 candidate evidence"
+            git commit -m "Freeze TrainingTech Stage 3 validation"
             git push
           fi
