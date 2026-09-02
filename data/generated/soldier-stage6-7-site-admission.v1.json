@@ -4,7 +4,7 @@
   "stage": "6-7",
   "status": "PASS",
   "admissionStatus": "READY_WITH_REVIEW",
-  "generatedAt": "2026-08-30T00:48:09.761Z",
+  "generatedAt": "2026-09-02T03:00:34.504Z",
   "scope": "SOLDIER_PAGE_DATA_ADMISSION",
   "purpose": "Final gate proving canonical Soldier data can stably support list, detail, filters, reciprocal Hero links and later expansion without reopening semantic or JOIN inference.",
   "admissionRule": "Admit Soldier page data when every canonical record is generated, automated validation has no FAIL records, REVIEW items are explicit, representative/filter/reciprocal QA passes, expansion inputs are preserved, and each direct frozen dependency is semantically fresh under frozen-semantic-freshness/v2. Raw Git blob drift remains audit provenance and is not semantic authority.",
@@ -27,8 +27,8 @@
     "normalSoldiers": 168,
     "spSoldiers": 56,
     "normalTier3": 129,
-    "passRecords": 11,
-    "reviewRecords": 213,
+    "passRecords": 49,
+    "reviewRecords": 175,
     "failRecords": 0,
     "representativeFixtures": 6,
     "representativeFixturesPassed": 6,
@@ -81,7 +81,7 @@
     },
     {
       "code": "RELEASE_DATE_UNRESOLVED",
-      "count": 213,
+      "count": 173,
       "classification": "REVIEW"
     },
     {
@@ -129,34 +129,34 @@
     },
     "list": {
       "path": "data/generated/soldier-list-stage5-8.v1.json",
-      "gitBlobSha": "3c3304ac5122649e94ad4c0489d51ee154988d12",
+      "gitBlobSha": "dacae3e7af777f3df4ac18e62b994cf818b3f4dd",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-key-artifact/list/v2",
-        "digest": "sha256:84bbb96d479c25e5336f8a37e36676720420c1843ba5853832ac3130ef85d0b9"
+        "digest": "sha256:02fa60e1dc6ebd20381ac9bf4be16a1517bc2932ee225c85e441c9858cd0802c"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "releaseMetadata": {
       "path": "data/generated/soldier-release-metadata.v1.json",
-      "gitBlobSha": "67572f1e0b4330b544626df577aa4e801b46ad59",
+      "gitBlobSha": "74e8a93ee93df67544a97321a7f60ebd912b25b3",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-key-artifact/release-metadata/v2",
-        "digest": "sha256:a1d0e2e4c4bd3854b3fc18d59cb6a0bc858eb4e57a7b43bdcdef1280682e8915"
+        "digest": "sha256:7e1de1a11f4fafba88f4b517c893924cfcd2b98b05072177b6dccedab6138b95"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "fullRecords": {
       "path": "data/generated/soldier-stage6-1-full-records.v1.json",
-      "gitBlobSha": "e2415aef365539c4fa7b88819e2d8a865b5d8870",
+      "gitBlobSha": "451456fa428cb72256a16c75041156251ed722e3",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-key-artifact/full-records/v2",
-        "digest": "sha256:d3fe0c14838b3a83ce75d613ec1591a413b421a8f63c376eefa632289d24f5b5"
+        "digest": "sha256:dd0947e28c21b4bd52eddbd074b3fc4ac92eb933b38cb4c4c6249603c3020a91"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
@@ -197,12 +197,12 @@
     },
     "checkpoint": {
       "path": "data/validation/soldier-stage6-0-checkpoint.v1.json",
-      "gitBlobSha": "2d805415998c44d8f2dd109512b62110100aed3f",
+      "gitBlobSha": "0c79b5d0d4736bfe467d517fd5cfdf4b4c1c7acb",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-source/checkpoint/v2",
-        "digest": "sha256:af52fa9c5be5f4b5d74d9384129780a6392ab5ec332075f98509cd6c581d8cc6"
+        "digest": "sha256:2479ea0af6ee33b3503977809fa4a8028f52de8ea3e4ee97dd3e45d0d6a62dca"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
@@ -219,45 +219,45 @@
     },
     "stage5_8": {
       "path": "data/validation/soldier-stage5-8-release.v1.json",
-      "gitBlobSha": "9311c414d1ae90682775614e9cfa65b720236fe5",
+      "gitBlobSha": "5d211d2025490247a0a068b253bdcada4bc50ec0",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-source/stage5-8-validation/v2",
-        "digest": "sha256:d12900a290d1bff421cafc6cc7755ad4b8f50f9aafecf54c88136ead3b8c101d"
+        "digest": "sha256:f33469c30e18699e5f0ab4e226fdfb6a374ac4c1d1a33c4c6c5ef6f0b52feca6"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_1": {
       "path": "data/validation/soldier-stage6-1-full-records.v1.json",
-      "gitBlobSha": "aaf0126baacb2e1286ced8cb9496dc7d280b8c70",
+      "gitBlobSha": "ebe2816526274acb0969379622cecc856171f07e",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-source/stage6-1-validation/v2",
-        "digest": "sha256:dc923ed1c440f2fda10cea2feb401c7c039573c25034bd4db56a2f98758d62b0"
+        "digest": "sha256:32a68ca340545ae942cee941f66f7bd211e10283582618df71c0e13d26450684"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_2": {
       "path": "data/validation/soldier-stage6-2-classification.v1.json",
-      "gitBlobSha": "732d75f9b5c6828f693a7a22f2a5fe1881eecab7",
+      "gitBlobSha": "8b9229de716a53457ad680fa8c5376097e6af181",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-source/stage6-2-validation/v2",
-        "digest": "sha256:dbec9b65e1836ac8d6a5534cd877b631385b4356bcb3b44f8ffbef70635044dc"
+        "digest": "sha256:827f2bc59a273a196bd3e11c5d2f266c8e0059dafcf7e114a557d73e1c906004"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_3": {
       "path": "data/validation/soldier-stage6-3-representative-qa.v1.json",
-      "gitBlobSha": "533d702b3c14a39e7aa0d82cd9c3193d4dd4f1b0",
+      "gitBlobSha": "0afccfc9c28cd9e18ead5301d7abaf0b3f81ece7",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-source/stage6-3-validation/v2",
-        "digest": "sha256:6dd96068d8e047cc843f8daf5f35c845aa23e5689a75a1afa2515ff810b81610"
+        "digest": "sha256:00c75c5eab20e2a4bcbd288b400de2db59ef0d729396aeb09074ce9c33a72df8"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
@@ -324,7 +324,7 @@
       "contract": "frozen-semantic-freshness/v2",
       "algorithm": "sha256",
       "projection": "soldier-stage6-7-site-admission/semantic-v2",
-      "digest": "sha256:7c7d14b81e5c31c3145fbd8a35d0dda7ffaf50be9ea9da98ee8c17ab9654888d"
+      "digest": "sha256:0867b984debd6223634feba1152020a878e1a550e17307e7f0f30de514cff517"
     }
   }
 }
