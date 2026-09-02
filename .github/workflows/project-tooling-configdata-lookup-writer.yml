@@ -23,8 +23,6 @@ concurrency:
 jobs:
   explicit-materialization-writer:
     runs-on: ubuntu-latest
-    env:
-      CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-lookup-writer-source
     steps:
       - name: Validate explicit writer request
         shell: bash
@@ -51,6 +49,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Configure external ConfigData source root
+        shell: bash
+        run: echo "CONFIGDATA_SOURCE_ROOT=$RUNNER_TEMP/configdata-lookup-writer-source" >> "$GITHUB_ENV"
 
       - name: Hydrate and verify pinned ConfigData source pack outside repository
         env:
