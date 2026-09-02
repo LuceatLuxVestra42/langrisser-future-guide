@@ -26,6 +26,24 @@ jobs:
           node-version: 22
       - name: Generate C3 classification
         run: node tools/evidence-lifecycle/cli/c3-lifecycle-classification.mjs --write
+      - name: Inspect secondary lifecycle signals
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const x = JSON.parse(fs.readFileSync('tools/evidence-lifecycle/generated/c3-lifecycle-classification.v1.json', 'utf8'));
+          const counts = {};
+          const samples = {};
+          for (const row of x.records) {
+            for (const reason of row.secondaryReasons || []) {
+              counts[reason.lifecycle] = (counts[reason.lifecycle] || 0) + 1;
+              (samples[reason.lifecycle] ||= []).push(row.path);
+            }
+          }
+          console.log(JSON.stringify({
+            secondaryLifecycleCounts: counts,
+            samples: Object.fromEntries(Object.entries(samples).map(([k, v]) => [k, v.slice(0, 20)])),
+          }, null, 2));
+          NODE
       - name: Commit generated classification if changed
         run: |
           if [ -z "$(git status --porcelain -- tools/evidence-lifecycle/generated/c3-lifecycle-classification.v1.json)" ]; then
