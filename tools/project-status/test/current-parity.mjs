@@ -100,7 +100,7 @@ const portraitReview = soldierByCode('REPRESENTATIVE_ASSET_ID_UNFROZEN');
 const lowerTierBoundary = soldierByCode('LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED');
 const samePatchBoundary = soldierByCode('SAME_PATCH_ORDER_UNRESOLVED');
 
-if (!releaseReview || releaseReview.reportedCount !== 213 || releaseReview.resolvedCount !== 0 || releaseReview.remainingCount !== 213
+if (!releaseReview || releaseReview.reportedCount !== 173 || releaseReview.resolvedCount !== 0 || releaseReview.remainingCount !== 173
   || releaseReview.lifecycle !== 'ACTIVE_REVIEW' || releaseReview.issueKey !== 'SOLDIER_RELEASE_DATE_METADATA') {
   fail(`Soldier release review drift: ${JSON.stringify(releaseReview)}`);
 }
