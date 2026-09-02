@@ -1,0 +1,222 @@
+{
+  "version": 1,
+  "checkpoint": "hero-card-icon-source-pack-h8-closeout",
+  "status": "COMPLETE",
+  "lifecycle": "CLOSED",
+  "owner": "hero-card-icon-source-pack-assets",
+  "purpose": "Close the Hero card-icon repository-size-reduction work after explicit ownership routing, deterministic external exact-byte source-pack publication, SHA-pinned admission, clean hydration, dedicated owning validation, source-transport cutover, repository source-PNG removal, and post-H6 validator/build/deploy-gate alignment, without reopening frozen Hero semantics or changing production lossless WebP delivery.",
+  "authoritativePredecessor": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "mainShaAtCloseoutStart": "e2fe65e43e6ad2164c618281b80c049d52c13292",
+    "mainTreeAtCloseoutStart": "5dde886c9bcb3147eb80f2ad120fd8543b064ff9",
+    "heroSemanticFinal": "data/validation/hero-stage6-4-final.v1.json",
+    "sourceIdentityManifest": "data/generated/hero-card-icon-assets.v1.json",
+    "sourcePackContract": "data/contracts/hero-card-icon-source-pack.v1.json",
+    "sourceTransportPolicy": "data/contracts/hero-card-icon-source-pack-h5-runtime-policy.v1.json",
+    "productionWebManifest": "data/generated/hero-card-icon-web-delivery.v1.json",
+    "owningValidator": "node scripts/validate-hero-card-icon-source-pack-owner-v1.mjs",
+    "frontendValidator": "npm run build",
+    "authoritativePagesWorkflow": ".github/workflows/authoritative-pages-deploy.yml"
+  },
+  "frozenSourcePack": {
+    "sourceCommitSha": "97abec60007f969a2414588f7b8e1069101c4fd2",
+    "releaseTag": "source-assets-hero-card-icon-v1-97abec60",
+    "releaseId": 380848010,
+    "archive": {
+      "assetId": 540200351,
+      "name": "hero-card-icon-source-v1-97abec60.tar.gz",
+      "bytes": 8891154,
+      "sha256": "cb6b094c2d2ebe5ccc5fbe14fa894d92a5fbe8026817d65e7f779c6284f39a69"
+    },
+    "inventory": {
+      "assetId": 540200352,
+      "name": "hero-card-icon-source-v1-97abec60.inventory.json",
+      "bytes": 57310,
+      "sha256": "fa7e9f1f08f5d69a0d02d3268bb933c144b2a5c2cb3c91d6a287ba66d29636ca"
+    },
+    "checksums": {
+      "assetId": 540200350,
+      "name": "hero-card-icon-source-v1-97abec60.sha256",
+      "bytes": 222,
+      "sha256": "e045eb06c8322e39b5f035132a17e8a0e0eb992e10ffc75c4489a01786bb03f8"
+    },
+    "sourceFileCount": 267,
+    "sourceTotalBytes": 8990485,
+    "heroCount": 267,
+    "missingCount": 0,
+    "extraCount": 0,
+    "duplicateCount": 0,
+    "repositorySourcePngCountAfterH6": 0
+  },
+  "productionState": {
+    "currentSourceByteTransport": "EXTERNAL_EXACT_BYTE_SOURCE_PACK",
+    "repositoryTrackedSourcePngRequired": false,
+    "sourcePackHydrationOnDemandAllowed": true,
+    "runtimeFetchesExternalSourcePack": false,
+    "sourcePngRuntimeFallbackEnabled": false,
+    "remoteRuntimeHotlinkEnabled": false,
+    "productionWebDeliveryFormat": "LOSSLESS_WEBP",
+    "productionWebPathPattern": "/images/heroes/card-icons-webp/{id}.webp",
+    "webpCount": 267,
+    "webpTotalBytes": 5772910,
+    "runtimePathChangedByH1H8": false,
+    "webpReencodedByH1H8": false,
+    "heroDetailCardArtworkChangedByH1H8": false,
+    "repositorySourcePngPath": "public/images/heroes/card-icons",
+    "heroDetailCardArtworkPath": "public/images/heroes/cards"
+  },
+  "completedStages": [
+    {
+      "stage": "H0.5",
+      "completion": "SOURCE_PACK_PATHS_ROUTED_OUTSIDE_HERO_CANONICAL",
+      "evidence": {
+        "pullRequest": 403,
+        "routingOwner": "hero-assets",
+        "canonicalFanIn": false
+      }
+    },
+    {
+      "stage": "H1",
+      "completion": "DETERMINISTIC_EXACT_BYTE_SOURCE_PACK_BUILT_AND_PUBLISHED",
+      "evidence": {
+        "pullRequest": 408,
+        "workflowRunId": 33563789380,
+        "releaseTag": "source-assets-hero-card-icon-v1-97abec60"
+      }
+    },
+    {
+      "stage": "H2",
+      "completion": "SOURCE_PACK_HASH_AND_ADMISSION_CONTRACT_PINNED",
+      "evidence": {
+        "pullRequest": 409,
+        "contract": "data/contracts/hero-card-icon-source-pack.v1.json"
+      }
+    },
+    {
+      "stage": "H3",
+      "completion": "CLEAN_EXTERNAL_DOWNLOAD_VERIFY_AND_HYDRATION_PROVED",
+      "evidence": {
+        "pullRequest": 413,
+        "hydrator": "scripts/hydrate-hero-card-icon-source-pack-v1.mjs"
+      }
+    },
+    {
+      "stage": "H4",
+      "completion": "DEDICATED_OWNING_VALIDATOR_FAIL_CLOSED_ON_EXTERNAL_SOURCE_PACK",
+      "evidence": {
+        "pullRequest": 415,
+        "headSha": "018f0740c0b8ba94ba074031ce5ba7bdc74327d7",
+        "owner": "hero-card-icon-source-pack-assets",
+        "validator": "node scripts/validate-hero-card-icon-source-pack-owner-v1.mjs"
+      }
+    },
+    {
+      "stage": "H5",
+      "completion": "EXTERNAL_SOURCE_TRANSPORT_PROMOTED_WITH_RUNTIME_WEBP_PATH_UNCHANGED",
+      "evidence": {
+        "pullRequest": 418,
+        "headSha": "cad8ecbcbb28e626842f929c0b7588fe3ef86917",
+        "policy": "data/contracts/hero-card-icon-source-pack-h5-runtime-policy.v1.json"
+      }
+    },
+    {
+      "stage": "H6",
+      "completion": "REPOSITORY_SOURCE_PNG_COPY_REMOVED",
+      "evidence": {
+        "pullRequest": 419,
+        "headSha": "8a5f3d5ff8b47cecc3736119cde2df8216b8aded",
+        "mergeMainSha": "1aad28771fddcca5b15e140127f99b698494e73b",
+        "deletedSourcePngCount": 267,
+        "deletedSourceBytes": 8990485,
+        "projectCheckWorkflowRunId": 33569547384,
+        "projectCheckStatus": "PASS"
+      }
+    },
+    {
+      "stage": "H7",
+      "completion": "POST_H6_FRONTEND_AND_AUTHORITATIVE_PAGES_GATES_ALIGNED_AND_PASSING",
+      "evidence": {
+        "frontendValidatorRepairPullRequest": 429,
+        "frontendValidatorRepairHeadSha": "1254078a6be2bec929e3ee585cb46dd8a4e0fb30",
+        "frontendValidatorProjectCheckWorkflowRunId": 33570672312,
+        "authoritativePagesGateRepairPullRequest": 432,
+        "authoritativePagesGateRepairHeadSha": "75463c744fe19bf44b405d0edecc134029c3cc90",
+        "authoritativePagesGateProjectCheckWorkflowRunId": 33573035677,
+        "repositorySourcePngCount": 0,
+        "productionWebpVerified": 267,
+        "stalePositivePngDeploymentRequirementsRemoved": true,
+        "projectCheckStatus": "PASS"
+      }
+    }
+  ],
+  "resolvedBlockers": [
+    {
+      "id": "POST_H6_FRONTEND_VALIDATOR_REQUIRED_DELETED_SOURCE_PNG_DIRECTORY",
+      "owningLayer": "validator-maintenance",
+      "cause": "The Hero card-icon frontend validator still scanned the repository source-PNG directory after H6 intentionally removed it.",
+      "resolution": "PR #429 changed the validator to require the external source-pack contract, require the repository source-PNG directory to remain absent, and continue verifying all 267 production lossless WebP files.",
+      "pullRequest": 429,
+      "status": "RESOLVED"
+    },
+    {
+      "id": "POST_H6_AUTHORITATIVE_PAGES_GATE_REQUIRED_DELETED_SOURCE_PNGS",
+      "owningLayer": "deployment-validator-maintenance",
+      "cause": "The authoritative Pages composed gate still required the deleted Hero card-icon PNG directory even though production delivery uses the frozen lossless WebP set.",
+      "resolution": "PR #432 removed only the stale positive PNG existence/count checks and preserved WebP delivery checks.",
+      "pullRequest": 432,
+      "status": "RESOLVED"
+    }
+  ],
+  "boundaries": {
+    "heroSemanticFinalFrozenReopened": false,
+    "canonicalHeroChanges": false,
+    "heroRelationChanges": false,
+    "localizationChanges": false,
+    "rawConfigDataReinterpretation": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "filenameSimilarityIntroduced": false,
+    "semanticRelationReDerivation": false,
+    "runtimeExternalSourcePackFetch": false,
+    "runtimeSourcePngFallback": false,
+    "productionRuntimeUrlChanges": false,
+    "webpReencoding": false,
+    "heroDetailCardArtworkChanges": false,
+    "gitHistoryRewrite": false
+  },
+  "blockers": [],
+  "nonBlockingReviews": [
+    {
+      "id": "RELEASE_METADATA_NOT_IMMUTABLE",
+      "status": "REVIEW",
+      "detail": "The GitHub Release was not immutable at H2 admission. Integrity remains fail-closed through pinned archive, inventory, checksum, exact-file-set, and per-file byte hashes; changed bytes require a new tag and contract version."
+    },
+    {
+      "id": "GIT_HISTORY_SIZE_NOT_REWRITTEN",
+      "status": "BOUNDARY_NOTE",
+      "detail": "H1-H8 removes the redundant Hero card-icon source PNG copy from the current repository tree and future commits only. Historical PNG blobs remain in Git history because history rewriting was explicitly out of scope."
+    },
+    {
+      "id": "UNRELATED_HERO_DETAIL_FRONTEND_REVIEW_PR_393",
+      "status": "REVIEW",
+      "detail": "PR #393 is a separate Hero detail presentation review. It does not change the Hero card-icon source-pack authority, production lossless WebP delivery, or this closeout."
+    }
+  ],
+  "handoff": {
+    "heroCardIconSourcePackOwnerComplete": true,
+    "nextOwner": null,
+    "nextStart": "No H0.5-H8 Hero card-icon source-pack follow-up is required. Any later Hero detail-card artwork externalization, Git-history reduction, new source snapshot, or frontend presentation work is a separate scope and must re-check current repository authority before starting.",
+    "localWorkingTreeState": "UNKNOWN_NOT_OBSERVED"
+  },
+  "reopenConditions": [
+    "The pinned Hero card-icon source-pack archive, inventory, or checksum SHA-256 no longer matches fetched bytes.",
+    "The external source pack no longer contains exactly the frozen 267 PNG source files totaling 8990485 bytes or any per-file SHA-256/size differs from the frozen source identity manifest.",
+    "Repository Hero card-icon source PNGs are reintroduced without an explicit new asset-owner decision.",
+    "Production Hero card-icon lossless WebP coverage changes from 267 files / 5772910 bytes or its admitted runtime path contract changes.",
+    "Production runtime begins fetching the external source pack, falling back to source PNG paths, or remote-hotlinking card icons.",
+    "The H5 current source-transport policy no longer treats repository-tracked source PNGs as unnecessary.",
+    "The hero-card-icon-source-pack-assets owning validator stops failing closed on pinned exact-byte source-pack integrity.",
+    "The authoritative Pages or frontend validation gates again require the intentionally deleted repository source-PNG directory.",
+    "An authoritative Hero card-icon source contradiction, source snapshot change, contract change, or Hero semantic/relation parity failure invalidates this closeout."
+  ]
+}
