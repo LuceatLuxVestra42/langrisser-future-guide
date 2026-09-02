@@ -1,7 +1,10 @@
+import { readSoldierPrototypePageDataWithAbilityPresentation } from "./soldier-ability-presentation.server";
 import { readSoldierPrototypePageData } from "./soldier-page.server";
 
-// GitHub Pages static build: consume the frozen Soldier page data directly.
-// Do not recreate Soldier semantics or relationships in the frontend.
+// GitHub Pages static build: consume the frozen Soldier page data first, then apply
+// validated frontend-only presentation overlays. Ability presentation joins strictly by soldierId.
+// Do not recreate Soldier semantics or relationships.
 export function getSoldierPrototypePageData() {
-  return readSoldierPrototypePageData();
+  const frozenPageData = readSoldierPrototypePageData();
+  return readSoldierPrototypePageDataWithAbilityPresentation(frozenPageData);
 }

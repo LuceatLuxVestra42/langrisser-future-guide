@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "schemaId": "soldier-ability-presentation-closeout/v1",
+  "status": "PASS",
+  "scope": "frontend-presentation-only",
+  "authoritativePredecessor": "data/presentation/soldier-ability-kr.v1.json",
+  "sourceSha256": "bb5f828857fbe8267f2fa25bee0067d9e257f3427584b1bd57e5043ce1a0acc2",
+  "coverage": {
+    "recordCount": 224,
+    "normalCount": 168,
+    "spCount": 56,
+    "localizedAbilityCount": 212,
+    "noAbilityCount": 12,
+    "unresolvedCount": 0
+  },
+  "boundaries": {
+    "identityMutation": false,
+    "runtimeNameJoin": false,
+    "idArithmetic": false,
+    "semanticRecomputation": false,
+    "rawChineseAbilityDisplayFallback": false
+  },
+  "validation": {
+    "priorMergeCandidatePr": 441,
+    "projectCheck": "PASS_COMPLETE",
+    "localizationAudit": "PASS_WITH_REVIEW_ERRORS_0",
+    "productionBuild": "PASS",
+    "soldierNamePresentationStage10": "PASS",
+    "requiredCurrentPr": 442,
+    "note": "Current PR owning validators must pass before merge; this checkpoint does not replace Project Check."
+  },
+  "blocker": [],
+  "review": [
+    "Existing localization audit reviews remain non-blocking and are not caused by Soldier ability presentation."
+  ],
+  "nextOwner": "deployment-hosted-browser-qa",
+  "reopenConditions": [
+    "authoritative Soldier ability source changes",
+    "frozen Soldier population or SP relation contract changes",
+    "presentation validator fails",
+    "frontend display regains raw Chinese ability fallback",
+    "Project Check owning validator fails"
+  ]
+}
