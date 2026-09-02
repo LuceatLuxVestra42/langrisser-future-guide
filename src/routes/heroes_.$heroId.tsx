@@ -396,7 +396,7 @@ function HeroDetailPage() {
               </div>
               <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">{soldierCards.length}종</span>
             </div>
-            <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 xl:grid-cols-5">
+            <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
               {soldierCards.map((record) => <HeroSoldierCard key={record.soldierId} record={record} />)}
             </div>
           </div>
