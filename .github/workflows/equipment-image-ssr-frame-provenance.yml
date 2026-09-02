@@ -75,6 +75,12 @@ jobs:
             artifacts/il2cpp-dump
           find artifacts/il2cpp-dump -maxdepth 1 -type f -printf '%f %s bytes\n' | sort
 
+      - name: Install LLVM disassembler
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq llvm
+          command -v llvm-objdump
+
       - name: Build focused GetGoodsFrameNameByRank trace report
         run: |
           python - <<'PY'
@@ -118,7 +124,6 @@ jobs:
 
           method_matches = []
           collect_matching_dicts(script, method_matches)
-          # Keep leaf-most useful records and dedupe serialized content.
           unique = []
           seen = set()
           for item in sorted(method_matches, key=lambda x: len(json.dumps(x, ensure_ascii=False))):
