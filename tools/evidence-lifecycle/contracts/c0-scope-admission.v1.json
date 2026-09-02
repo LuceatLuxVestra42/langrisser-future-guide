@@ -7,9 +7,11 @@
   "freezeState": "C0_SCOPE_ADMISSION_FROZEN",
   "baseline": {
     "branch": "main",
-    "sha": "c76274ea805889fed23f716c954eb76dca4b29d1",
+    "sha": "151cd56ae3a53c98c7e5330c0e5aeeb82874e117",
+    "previousSha": "c76274ea805889fed23f716c954eb76dca4b29d1",
+    "refreshClass": "C1_C2_C3_INPUT_FRESHNESS_ONLY",
     "workingTreeStateAsserted": false,
-    "reason": "Remote GitHub baseline only; no local working-tree cleanliness is inferred."
+    "reason": "Remote GitHub snapshot advanced because main added a C1-admitted TrainingTech Stage 5 validation artifact. C0 scope, ownership, admission policy, and semantic boundary remain frozen; no local working-tree cleanliness is inferred."
   },
   "purpose": "Freeze repository-wide evidence/checkpoint lifecycle maintenance scope without semantic recomputation, authority reselection, or destructive mutation.",
   "semanticReopen": false,
@@ -91,6 +93,8 @@
   "baselineFreshness": {
     "mainAdvanceAloneReopensC0": false,
     "refreshOnlyAffectedCStage": true,
+    "lastRefreshReopenedC0": false,
+    "lastRefreshReason": "C1 admitted population and C2 reference-source inputs changed when TrainingTech Stage 5 materialized on main; snapshot advanced without changing C0 admission or ownership semantics.",
     "c0ReopenWhen": [
       "Project Check owner/validator contract changes in a way that changes C ownership or admission.",
       "C scope admission roles or discovery policy changes.",
