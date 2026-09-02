@@ -90,7 +90,7 @@ if (manifest.scope?.heroId !== 6 || manifest.scope?.targetUniqueIconCount !== 12
 if (manifest.scope?.centralDisciplineIncluded !== false) fail("central discipline scope mismatch");
 if (manifest.source?.kind !== "OFFICIAL_INSTALLER" || manifest.source?.installVersion !== "1.1.113") fail("source baseline mismatch");
 if (manifest.source?.verificationArtifactDigest !== "sha256:25c1b2dfdec1887c38c56fa2d0ea7d98636effff2be62af9350fe1292cbb249d") fail("verification artifact digest mismatch");
-if (manifest.source?.unityContainerRootPrefix !== "assets/gameproject/runtimeassets/") fail("container root mismatch");
+if (manifest.source?.unityContainerRootPrefix !== "assets/gameproject/runtimeassets") fail("container root mismatch");
 if (!Array.isArray(manifest.records) || manifest.records.length !== 12) fail("record count mismatch");
 
 const current = new Map();
