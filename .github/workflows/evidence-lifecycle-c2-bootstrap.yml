@@ -28,7 +28,7 @@ jobs:
         run: node tools/evidence-lifecycle/cli/c2-reference-graph.mjs --write
       - name: Commit generated graph if changed
         run: |
-          if git diff --quiet -- tools/evidence-lifecycle/generated/c2-reference-graph.v1.json; then
+          if [ -z "$(git status --porcelain -- tools/evidence-lifecycle/generated/c2-reference-graph.v1.json)" ]; then
             echo 'C2 graph already current.'
             exit 0
           fi
