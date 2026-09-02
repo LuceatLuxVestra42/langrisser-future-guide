@@ -148,6 +148,7 @@ function HeroDetailPage() {
     setTalentIndex((current) => Math.min(Math.max(current + delta, 0), visibleTalentProgression.length - 1));
   };
   const finalJobBranches = detail.jobs.branches.filter((branch) => branch.capstone?.rank === 4);
+  const hasBondUnlockConditions = detail.bonds.rows.some((bond) => bond.completionConditions.length > 0);
 
   return (
     <main
@@ -352,30 +353,19 @@ function HeroDetailPage() {
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle icon={<HeartHandshake className="h-4 w-4" aria-hidden="true" />} title="유대" />
-          {detail.bonds.rows.length > 0 ? (
-            <div className="mt-5 grid gap-3 lg:grid-cols-2">
-              {detail.bonds.rows.map((bond) => (
-                <article key={`${bond.order}-${bond.fetterId ?? "x"}`} className="rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div><p className="text-[11px] font-bold text-muted-foreground">유대 {bond.order + 1}</p><h3 className="mt-1 font-bold text-foreground">{bond.nameCn ?? `Fetter ${bond.fetterId ?? "?"}`}</h3></div>
-                    <div className="flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
-                      {bond.maxLevel != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">최대 Lv.{bond.maxLevel}</span> : null}
-                      {bond.fetterId != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">#{bond.fetterId}</span> : null}
-                    </div>
+          {hasBondUnlockConditions ? (
+            <div className="mt-5 grid gap-2 lg:grid-cols-2">
+              {detail.bonds.rows.flatMap((bond) =>
+                bond.completionConditions.map((condition, conditionIndex) => (
+                  <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="rounded-lg border border-border bg-muted/20 px-3 py-3">
+                    <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
                   </div>
-                  <div className="mt-4 space-y-2">
-                    {bond.completionConditions.map((condition, conditionIndex) => (
-                      <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="rounded-lg border border-border bg-background px-3 py-3">
-                        <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
-                        {condition.semanticStatus ? <p className="mt-1 text-[10px] font-semibold text-muted-foreground">{condition.semanticStatus}</p> : null}
-                      </div>
-                    ))}
-                    {bond.completionConditions.length === 0 ? <p className="text-sm text-muted-foreground">표시 가능한 해금 조건 없음</p> : null}
-                  </div>
-                </article>
-              ))}
+                )),
+              )}
             </div>
-          ) : <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 정보가 없어.</p>}
+          ) : (
+            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 해금 조건 없음</p>
+          )}
         </section>
         <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
         <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
