@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { resolveConfigDataSourcePath } from '../../tools/configdata-lookup/lib/source-root.mjs';
 import * as stage1 from './configdata-lookup-stage1.mjs';
 import * as stage2 from './configdata-lookup-stage2.mjs';
 import * as stage3 from './configdata-lookup-stage3.mjs';
@@ -34,6 +35,11 @@ export async function readJsonMaybe(filePath) {
 
 export async function hashFile(filePath) {
   const text = await fs.readFile(filePath, 'utf8');
+  return sha256Utf8(text);
+}
+
+export async function hashConfigDataSource(logicalPath) {
+  const text = await fs.readFile(resolveConfigDataSourcePath(logicalPath), 'utf8');
   return sha256Utf8(text);
 }
 
@@ -78,7 +84,7 @@ async function inspectStage1(contract, contractChanged) {
   const dirty = [];
   for (const [entity, spec] of Object.entries(contract.entities)) {
     const reasons = [];
-    const sourceText = await fs.readFile(spec.source, 'utf8');
+    const sourceText = await fs.readFile(resolveConfigDataSourcePath(spec.source), 'utf8');
     const currentSourceHash = sha256Utf8(sourceText);
     const output = await readJsonMaybe(spec.output);
     if (!output) reasons.push('MISSING_OUTPUT');
@@ -113,7 +119,7 @@ async function inspectStage2(contract, contractChanged) {
       if (output.value?.stage !== 'CONFIGDATA_LOOKUP_STAGE_2' || output.value?.domain !== domain) reasons.push('OUTPUT_IDENTITY_MISMATCH');
       for (const type of stage2DomainSourceTypes(contract, domain)) {
         const sourcePath = contract.sourceTypes[type];
-        const currentHash = await hashFile(sourcePath);
+        const currentHash = await hashConfigDataSource(sourcePath);
         if (output.value?.sources?.[type]?.sha256 !== currentHash) reasons.push(`SOURCE_HASH_MISMATCH:${type}`);
       }
     }
@@ -195,7 +201,7 @@ export async function buildDependencyManifest(contracts) {
     ...Object.values(contracts.stage2.sourceTypes),
   ]).sort();
   const rawSources = {};
-  for (const filePath of rawSourcePaths) rawSources[filePath] = await hashFile(filePath);
+  for (const filePath of rawSourcePaths) rawSources[filePath] = await hashConfigDataSource(filePath);
 
   const stage1Manifest = {};
   for (const [entity, spec] of Object.entries(contracts.stage1.entities)) {
