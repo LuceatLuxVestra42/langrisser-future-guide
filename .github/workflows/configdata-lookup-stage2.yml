@@ -8,6 +8,8 @@ on:
     paths:
       - 'data/contracts/configdata-lookup-stage1-id-index-contract.v1.json'
       - 'data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json'
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
+      - 'data/contracts/project-tooling-configdata-lookup-b5-5-operational-cutover.v1.json'
       - 'data/validation/configdata-lookup-stage1-summary.v1.json'
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/configdata/ConfigDataJobConnectionInfo.json'
@@ -20,6 +22,11 @@ on:
       - 'scripts/lib/configdata-lookup-stage2.mjs'
       - 'scripts/build-configdata-lookup-stage2.mjs'
       - 'scripts/validate-configdata-lookup-stage2.mjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
+      - 'tools/configdata-lookup/lib/configdata-source-root.mjs'
+      - 'tools/configdata-lookup/cli/validate-stage1.mjs'
+      - 'tools/configdata-lookup/cli/build-stage2.mjs'
+      - 'tools/configdata-lookup/cli/validate-stage2.mjs'
       - 'package.json'
       - '.github/workflows/configdata-lookup-stage2.yml'
   pull_request:
@@ -27,6 +34,8 @@ on:
       - main
     paths:
       - 'data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json'
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
+      - 'data/contracts/project-tooling-configdata-lookup-b5-5-operational-cutover.v1.json'
       - 'data/index/forward/**'
       - 'data/validation/configdata-lookup-stage2-summary.v1.json'
       - 'data/configdata/ConfigDataHeroInfo.json'
@@ -40,6 +49,11 @@ on:
       - 'scripts/lib/configdata-lookup-stage2.mjs'
       - 'scripts/build-configdata-lookup-stage2.mjs'
       - 'scripts/validate-configdata-lookup-stage2.mjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
+      - 'tools/configdata-lookup/lib/configdata-source-root.mjs'
+      - 'tools/configdata-lookup/cli/validate-stage1.mjs'
+      - 'tools/configdata-lookup/cli/build-stage2.mjs'
+      - 'tools/configdata-lookup/cli/validate-stage2.mjs'
       - 'package.json'
       - '.github/workflows/configdata-lookup-stage2.yml'
 
@@ -49,6 +63,8 @@ permissions:
 jobs:
   materialize-and-validate:
     runs-on: ubuntu-latest
+    env:
+      CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-lookup-stage2-source
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,14 +76,52 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validate Stage 1 predecessor
-        run: npm run validate:configdata-lookup-stage1
+      - name: Hydrate and verify pinned ConfigData source pack outside repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$CONFIGDATA_SOURCE_ROOT"
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$CONFIGDATA_SOURCE_ROOT"
+          count="$(find "$CONFIGDATA_SOURCE_ROOT/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$count" = "753"
+          case "$CONFIGDATA_SOURCE_ROOT/" in
+            "$GITHUB_WORKSPACE/"*) echo 'external ConfigData source root must stay outside repository' >&2; exit 1 ;;
+          esac
 
-      - name: Materialize Stage 2 forward joins
-        run: npm run build:configdata-lookup-stage2
+      - name: Make tracked ConfigData unavailable during Stage 2 validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-stage2-tracked-hidden"
+          rm -rf "$hidden_raw"
+          if [ -d "$tracked_raw" ]; then
+            mv "$tracked_raw" "$hidden_raw"
+          fi
+          test ! -e "$tracked_raw"
 
-      - name: Validate Stage 2 forward joins
-        run: npm run validate:configdata-lookup-stage2
+      - name: Validate Stage 1 predecessor through source-root adapter
+        run: node tools/configdata-lookup/cli/validate-stage1.mjs
+
+      - name: Materialize Stage 2 forward joins through source-root adapter
+        run: node tools/configdata-lookup/cli/build-stage2.mjs
+
+      - name: Validate Stage 2 forward joins through source-root adapter
+        run: node tools/configdata-lookup/cli/validate-stage2.mjs
+
+      - name: Restore tracked ConfigData when present in this revision
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-stage2-tracked-hidden"
+          if [ -d "$hidden_raw" ]; then
+            test ! -e "$tracked_raw"
+            mv "$hidden_raw" "$tracked_raw"
+          fi
 
       - name: Commit materialized Stage 2 indexes on work branch
         if: github.event_name == 'push' && github.ref == 'refs/heads/work/configdata-lookup-stage2-forward-joins'
