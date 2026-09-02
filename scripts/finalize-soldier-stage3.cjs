@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const {
   ROOT,
+  CONFIG_DIR,
   configPath,
   readJson,
   loadSoldiers,
@@ -25,7 +26,13 @@ const HERO_MASTER_PATH = path.join(ROOT, 'data/hero-name-master.v1.json');
 const OUT_DATA = path.join(ROOT, 'data/generated/soldier-stage3.v1.json');
 const OUT_VALIDATION = path.join(ROOT, 'data/validation/soldier-stage3-final.v1.json');
 
-function rel(p) { return p.replace(ROOT + path.sep, '').replaceAll('\\', '/'); }
+function rel(p) {
+  const configRelative = path.relative(CONFIG_DIR, p);
+  if (configRelative && !configRelative.startsWith(`..${path.sep}`) && configRelative !== '..' && !path.isAbsolute(configRelative)) {
+    return path.posix.join('data/configdata', configRelative.replaceAll('\\', '/'));
+  }
+  return p.replace(ROOT + path.sep, '').replaceAll('\\', '/');
+}
 function uniqueSorted(xs) { return [...new Set(xs)].sort((a,b)=>a-b); }
 function duplicates(xs) { const s=new Set(), d=new Set(); for (const x of xs) s.has(x)?d.add(x):s.add(x); return [...d]; }
 function sumGoods(levels, limit) {
