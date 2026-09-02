@@ -192,16 +192,13 @@ function HeroGridPage() {
         <div>
           <Link
             to="/"
-            className="text-xs font-semibold text-muted-foreground transition hover:text-foreground"
+            className="inline-flex items-center rounded-md border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:border-foreground/30 hover:bg-muted/40"
           >
             ← 메인으로
           </Link>
           <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             영웅
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            확정된 267명 영웅 목록에서 이름, 희귀도, 진영, 등장 시리즈, SP 여부로 원하는 영웅을 빠르게 찾을 수 있어.
-          </p>
         </div>
 
         <section aria-label="영웅 목록 필터" className="mt-6 rounded-lg border border-border bg-card p-3 sm:p-4">
@@ -312,13 +309,10 @@ function HeroGridPage() {
           </div>
         </section>
 
-        <div className="mt-4 flex items-end justify-between gap-4 border-y border-border py-3">
+        <div className="mt-4 border-y border-border py-3">
           <p className="text-sm text-muted-foreground" aria-live="polite">
             검색 결과 <span className="font-bold text-foreground">{filteredHeroes.length}</span>
             <span className="text-muted-foreground"> / {data.summary.total}명</span>
-          </p>
-          <p className="hidden text-xs text-muted-foreground sm:block">
-            공식 카드 아이콘 267명 연결
           </p>
         </div>
 
