@@ -163,7 +163,7 @@ check(
 
 check(
   'origin-filter-ui',
-  route.includes('등장 시리즈 필터') &&
+  route.includes('출전작 필터') &&
     route.includes('originOptions.map') &&
     route.includes('hero.origin.productionId !== originId'),
   'origin buttons use frozen productionId',
