@@ -211,3 +211,35 @@
     0 1px 2px oklch(0.55 0.05 258 / 0.08),
     0 10px 30px oklch(0.55 0.12 258 / 0.14);
 }
+
+/* Hero list primary filter controls. */
+@layer components {
+  [aria-label="통합 필터 분류"] > button {
+    border-color: oklch(0.62 0.12 238);
+    background-color: oklch(0.93 0.055 225);
+    color: oklch(0.28 0.075 240);
+  }
+
+  [aria-label="통합 필터 분류"] > button:hover {
+    border-color: oklch(0.5 0.15 240);
+    background-color: oklch(0.89 0.075 225);
+  }
+
+  [aria-label="통합 필터 분류"] > button[aria-pressed="true"] {
+    border-color: oklch(0.43 0.16 240);
+    background-color: oklch(0.82 0.105 225);
+    color: oklch(0.22 0.08 240);
+  }
+
+  .dark [aria-label="통합 필터 분류"] > button {
+    border-color: oklch(0.68 0.11 230);
+    background-color: oklch(0.35 0.075 235);
+    color: oklch(0.94 0.035 225);
+  }
+
+  .dark [aria-label="통합 필터 분류"] > button[aria-pressed="true"] {
+    border-color: oklch(0.78 0.12 225);
+    background-color: oklch(0.46 0.1 235);
+    color: oklch(0.98 0.02 220);
+  }
+}
