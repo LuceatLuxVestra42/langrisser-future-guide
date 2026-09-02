@@ -7,6 +7,10 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+import {
+  BANNER_EVENT_OVERLAY,
+  type BannerEventOverlayRow,
+} from "@/lib/banner-event-overlay";
 import { getBannerPageData } from "@/lib/banner-page.functions";
 
 const WISH_DISPLAY_NAMES_BY_IMAGE_SUFFIX = new Map<string, string>([
@@ -83,6 +87,10 @@ function getWishDisplayName(publicPath: string | null) {
   return null;
 }
 
+function resolveRoutePublicPath(publicPath: string) {
+  return `${import.meta.env.BASE_URL}${publicPath.replace(/^\/+/, "")}`;
+}
+
 function BannerImage({
   image,
   alt,
@@ -115,6 +123,7 @@ function BannerImage({
 function BannerPage() {
   const data = Route.useLoaderData();
   const [expandedWishOccurrence, setExpandedWishOccurrence] = useState<string | null>(null);
+  const [expandedEventOccurrence, setExpandedEventOccurrence] = useState<string | null>(null);
   const [displayStartDate, setDisplayStartDate] = useState<string | null>(null);
 
   useEffect(() => {
@@ -126,13 +135,51 @@ function BannerPage() {
     [data.wishCandidateSets],
   );
 
-  const visibleDateGroups = useMemo(
+  const eventRows = useMemo<BannerEventOverlayRow[]>(
     () =>
-      displayStartDate
-        ? data.dateGroups.filter((group) => group.date >= displayStartDate)
-        : [],
-    [data.dateGroups, displayStartDate],
+      BANNER_EVENT_OVERLAY.map((row) => ({
+        ...row,
+        image: {
+          ...row.image,
+          publicPath: resolveRoutePublicPath(row.image.publicPath),
+        },
+      })),
+    [],
   );
+
+  const visibleDateGroups = useMemo(() => {
+    if (!displayStartDate) return [];
+
+    const dateMap = new Map<
+      string,
+      {
+        date: string;
+        rows: (typeof data.dateGroups)[number]["rows"];
+        events: BannerEventOverlayRow[];
+      }
+    >();
+
+    for (const group of data.dateGroups) {
+      dateMap.set(group.date, { date: group.date, rows: group.rows, events: [] });
+    }
+
+    for (const event of eventRows) {
+      const existing = dateMap.get(event.krDisplayDate);
+      if (existing) {
+        existing.events.push(event);
+      } else {
+        dateMap.set(event.krDisplayDate, {
+          date: event.krDisplayDate,
+          rows: [],
+          events: [event],
+        });
+      }
+    }
+
+    return Array.from(dateMap.values())
+      .filter((group) => group.date >= displayStartDate)
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }, [data.dateGroups, displayStartDate, eventRows]);
 
   return (
     <main className="min-h-screen bg-background">
@@ -166,7 +213,9 @@ function BannerPage() {
                   <h2 id={`date-${group.date}`} className="text-lg font-bold text-foreground">
                     {formatDisplayDate(group.date)}
                   </h2>
-                  <span className="text-xs text-muted-foreground">{group.rows.length}개</span>
+                  <span className="text-xs text-muted-foreground">
+                    {group.rows.length + group.events.length}개
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -288,6 +337,79 @@ function BannerPage() {
                       </article>
                     );
                   })}
+
+                  {group.events.map((event) => {
+                    const hasSpCandidates = event.spCandidateNames.length > 0;
+                    const expanded = expandedEventOccurrence === event.eventOccurrenceId;
+
+                    return (
+                      <article
+                        key={event.eventOccurrenceId}
+                        className="overflow-hidden rounded-2xl border border-border shadow-sm"
+                      >
+                        <button
+                          type="button"
+                          disabled={!hasSpCandidates}
+                          onClick={() =>
+                            setExpandedEventOccurrence((current) =>
+                              current === event.eventOccurrenceId ? null : event.eventOccurrenceId,
+                            )
+                          }
+                          className={`w-full p-3 text-left ${
+                            hasSpCandidates ? "cursor-pointer" : "cursor-default"
+                          }`}
+                          aria-expanded={hasSpCandidates ? expanded : undefined}
+                        >
+                          <BannerImage
+                            image={event.image}
+                            alt={`${formatDisplayDate(event.krDisplayDate)} ${event.eventNameKr} 이벤트 배너`}
+                          />
+                          <div className="mt-3 flex items-start justify-between gap-3">
+                            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1.5">
+                              <span className="shrink-0 rounded-md bg-orange-500 px-2 py-1 text-[11px] font-bold text-white dark:bg-orange-600">
+                                이벤트
+                              </span>
+                              <span className="text-sm font-semibold leading-6 text-foreground">
+                                {event.eventNameKr}
+                              </span>
+                            </div>
+                            {hasSpCandidates && (
+                              <span
+                                className={`mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-lg border-2 px-2 py-1 text-xs font-semibold shadow-sm transition-colors ${
+                                  expanded
+                                    ? "border-orange-500/70 text-foreground"
+                                    : "border-orange-400/50 text-muted-foreground"
+                                }`}
+                              >
+                                목록
+                                <ChevronDown
+                                  size={16}
+                                  aria-hidden="true"
+                                  className={`transition-transform ${expanded ? "rotate-180" : ""}`}
+                                />
+                              </span>
+                            )}
+                          </div>
+                        </button>
+
+                        {hasSpCandidates && expanded && (
+                          <div className="border-t border-border p-4">
+                            <p className="text-sm font-semibold text-foreground">SP 가능 캐릭터</p>
+                            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                              {event.spCandidateNames.map((heroName) => (
+                                <div
+                                  key={heroName}
+                                  className="rounded-lg border border-border px-3 py-2 text-sm text-foreground"
+                                >
+                                  {heroName}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </article>
+                    );
+                  })}
                 </div>
               </section>
             ))}
@@ -296,7 +418,7 @@ function BannerPage() {
 
         <footer className="mt-10 border-t border-border pt-6 text-xs leading-5 text-muted-foreground">
           <p>
-            한국시간 오늘 이후의 canonical KR schedule dataset만 표시해. 최초 출시 여부, 고정 복각 주기, 미래 복각일은 이 페이지에서 추론하지 않아.
+            한국시간 오늘 이후의 canonical KR schedule dataset과 별도 확인된 이벤트 배너 일정을 함께 표시해. 최초 출시 여부, 고정 복각 주기, 미래 복각일은 이 페이지에서 추론하지 않아.
           </p>
         </footer>
       </div>
