@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-metadata-stage11-a-inventory/v1",
+  "stage": "11-A",
+  "status": "PASS",
+  "completion": "EVIDENCE_INVENTORY_COMPLETE_WITH_UNRESOLVED_REVIEW",
+  "owner": "soldier-canonical",
+  "scope": "INVENTORY_ONLY_NO_RELEASE_BACKFILL",
+  "capturedAgainstMain": "f867056e1ab1808511c2f0db0b16627f991358c9",
+  "authoritativeSources": {
+    "siteAdmission": "data/validation/soldier-stage6-7-site-admission.v1.json",
+    "releaseMetadata": "data/generated/soldier-release-metadata.v1.json",
+    "releaseValidation": "data/validation/soldier-stage5-8-release.v1.json",
+    "releaseSource": "data/soldier-release-source.v1.json"
+  },
+  "coverage": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 11,
+    "unresolvedReleaseRecords": 213,
+    "normalTier3Unresolved": 118,
+    "spUnresolved": 56,
+    "lowerTierReleaseOrderNotRequired": 39
+  },
+  "confirmedPatchGroups": [
+    {
+      "releaseDate": "2025-03-11",
+      "soldierIds": [647, 648]
+    },
+    {
+      "releaseDate": "2025-05-06",
+      "soldierIds": [251, 341, 427, 517]
+    },
+    {
+      "releaseDate": "2025-07-01",
+      "soldierIds": [135, 819, 1037, 1038, 1118]
+    }
+  ],
+  "evidenceInventory": [
+    {
+      "id": "frozen-stage5-8-release-source",
+      "state": "REUSABLE_AUTHORITATIVE_PARTIAL",
+      "source": "data/soldier-release-source.v1.json",
+      "confirmedRecordCount": 11,
+      "unresolvedRecordCount": 213,
+      "disposition": "REUSE_AS_CURRENT_RELEASE_METADATA_PREDECESSOR"
+    },
+    {
+      "id": "connected-google-sheet-new-soldiers",
+      "state": "REUSABLE_EXTERNAL_READ_ONLY_OBSERVATION",
+      "canonicalAuthority": false,
+      "spreadsheetId": "1Oa7afFUhP21SRLSJ0uzP9oUc5C1_Cij0JqRExzUJGFo",
+      "spreadsheetTitle": "업데이트",
+      "sheetName": "신규용병",
+      "observedRange": "A1:S69",
+      "observedAt": "2026-09-02",
+      "dateGroupCount": 3,
+      "textSoldierLabelCount": 11,
+      "matchesFrozenConfirmedRecordCount": 11,
+      "disposition": "CONFIRMS_CURRENT_PARTIAL_SOURCE_ONLY_NO_NEW_BACKFILL"
+    },
+    {
+      "id": "connected-google-sheet-sp-soldiers",
+      "state": "PATCH_BUCKETS_PRESENT_CANONICAL_JOIN_ABSENT",
+      "canonicalAuthority": false,
+      "spreadsheetId": "1Oa7afFUhP21SRLSJ0uzP9oUc5C1_Cij0JqRExzUJGFo",
+      "sheetName": "SP용병",
+      "observedRange": "A1:AC85",
+      "observedAt": "2026-09-02",
+      "dateGroupCellCount": 5,
+      "textSoldierIdentityCellValueCount": 0,
+      "canonicalSoldierIdCellValueCount": 0,
+      "canBackfillCanonicalReleaseMetadata": false,
+      "disposition": "DO_NOT_JOIN_BY_IMAGE_POSITION_ROW_ORDER_OR_ABILITY_TEXT"
+    },
+    {
+      "id": "connected-google-sheet-released-sp-soldiers",
+      "state": "CANONICAL_JOIN_ABSENT",
+      "canonicalAuthority": false,
+      "spreadsheetId": "1Oa7afFUhP21SRLSJ0uzP9oUc5C1_Cij0JqRExzUJGFo",
+      "sheetName": "출시 SP용병",
+      "observedRange": "A1:AB169",
+      "observedAt": "2026-09-02",
+      "textSoldierIdentityCellValueCount": 0,
+      "canonicalSoldierIdCellValueCount": 0,
+      "canBackfillCanonicalReleaseMetadata": false,
+      "disposition": "DO_NOT_JOIN_BY_IMAGE_POSITION_ROW_ORDER_OR_ABILITY_TEXT"
+    },
+    {
+      "id": "release-source-git-history",
+      "state": "NO_FURTHER_RELEASE_EVIDENCE_IN_CURRENT_HISTORY",
+      "path": "data/soldier-release-source.v1.json",
+      "commitCount": 1,
+      "commits": [
+        "980f1c66f50d87b4fcbb74644ee82fc699323e41"
+      ],
+      "disposition": "NO_POST_STAGE5_8_RELEASE_SOURCE_EXTENSION_TO_REUSE"
+    },
+    {
+      "id": "configdata-soldier-git-history",
+      "state": "NOT_A_PATCH_SNAPSHOT_SERIES",
+      "path": "data/configdata/ConfigDataSoldierInfo.json",
+      "commitCount": 3,
+      "commits": [
+        "7af1ac562aa3a0c340c42fde2e4a0f588ff82e03",
+        "e1614192c8b058ff5d002524a1e90c34f4005f14",
+        "a146489f73a2f6e6e1657abec16398a99b5b1fb2"
+      ],
+      "usableChronologySnapshotPairs": 0,
+      "disposition": "DO_NOT_DERIVE_RELEASE_CHRONOLOGY_FROM_IMPORT_REPAIR_MIGRATION_HISTORY"
+    },
+    {
+      "id": "official-update-notice-archive",
+      "state": "NOT_REGISTERED_IN_CURRENT_RELEASE_EVIDENCE_CHAIN",
+      "canonicalAuthority": false,
+      "disposition": "NEXT_EVIDENCE_ACQUISITION_CANDIDATE_REQUIRING_EXPLICIT_EVENT_TO_SOLDIER_ID_PROVENANCE"
+    }
+  ],
+  "acquisitionPartition": {
+    "normalTier3": {
+      "count": 118,
+      "disposition": "NEXT_RELEASE_DATE_EVIDENCE_PRIORITY"
+    },
+    "sp": {
+      "count": 56,
+      "disposition": "HANDOFF_STAGE11_B_REQUIREMENT_AND_IDENTITY_PROVENANCE"
+    },
+    "lowerTier": {
+      "count": 39,
+      "disposition": "CURRENT_UI_RELEASE_ORDER_NOT_REQUIRED_BOUNDARY"
+    }
+  },
+  "boundaries": {
+    "canonicalPopulationRecomputed": false,
+    "heroSoldierRelationRecomputed": false,
+    "rawConfigDataReleaseInference": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "screenOrRowOrderMapping": false,
+    "abilityTextSimilarityMapping": false,
+    "externalDriveMutation": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "RELEASE_DATE_UNRESOLVED",
+      "count": 213,
+      "classification": "REVIEW"
+    }
+  ],
+  "nextOwner": "soldier-release-metadata-evidence-acquisition",
+  "nextStartPoint": [
+    "Acquire explicit historical update notices or dated source snapshots for the 118 unresolved normal tier-3 Soldiers.",
+    "Require explicit release-event evidence and canonical soldierId provenance; do not use name similarity as a JOIN.",
+    "Keep the 56 SP Soldiers unresolved here and hand their internal chronology requirement to Stage 11-B.",
+    "Keep the 39 lower-tier Soldiers at the current release-order-not-required boundary unless product requirements change."
+  ],
+  "reopenConditions": [
+    "The canonical Soldier population or Stage 5-8 release coverage changes.",
+    "A new explicit release-evidence source is admitted into the repository release chain.",
+    "A dated ConfigData snapshot series with valid Soldier identity provenance becomes available.",
+    "The site requirement changes to require lower-tier or same-patch absolute release order."
+  ]
+}
