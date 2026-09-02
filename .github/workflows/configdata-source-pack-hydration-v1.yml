@@ -1,0 +1,50 @@
+name: ConfigData Source Pack B2 Hydration
+
+on:
+  push:
+    branches:
+      - configdata/b2-hydration-v1
+    paths:
+      - data/contracts/configdata-source-pack.v1.json
+      - scripts/hydrate-configdata-source-pack-v1.mjs
+      - scripts/validate-configdata-source-pack-boundary-v1.mjs
+      - .github/workflows/configdata-source-pack-hydration-v1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: configdata-source-pack-b2-hydration-v1
+  cancel-in-progress: false
+
+jobs:
+  hydrate-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Hydrate pinned external snapshot and prove tracked-byte parity
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/hydrate-configdata-source-pack-v1.mjs \
+            --target-dir "$RUNNER_TEMP/configdata-hydrated" \
+            --compare-repo-source
+
+      - name: Verify hydrated shape and repository non-mutation
+        run: |
+          set -euo pipefail
+          count="$(find "$RUNNER_TEMP/configdata-hydrated/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$count" = "753"
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
