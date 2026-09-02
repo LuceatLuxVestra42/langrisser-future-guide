@@ -1,0 +1,39 @@
+name: Soldier Stage 11-A11 Official Main-Site Identity Batch
+
+on:
+  pull_request:
+    paths:
+      - 'data/soldier-release-official-main-site-identity-stage11-a11.v1.json'
+      - 'data/soldier-release-official-data-site-identity-stage11-a10.v1.json'
+      - 'data/soldier-release-official-data-site-identity-stage11-a9.v1.json'
+      - 'data/generated/soldier-release-metadata.v1.json'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'scripts/validate-soldier-release-official-main-site-identity-stage11-a11.mjs'
+      - '.github/workflows/soldier-release-official-main-site-identity-stage11-a11.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/soldier-release-official-main-site-identity-stage11-a11.v1.json'
+      - 'data/soldier-release-official-data-site-identity-stage11-a10.v1.json'
+      - 'data/soldier-release-official-data-site-identity-stage11-a9.v1.json'
+      - 'data/generated/soldier-release-metadata.v1.json'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'scripts/validate-soldier-release-official-main-site-identity-stage11-a11.mjs'
+      - '.github/workflows/soldier-release-official-main-site-identity-stage11-a11.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Stage 11-A11 official main-site identity batch
+        run: node scripts/validate-soldier-release-official-main-site-identity-stage11-a11.mjs
+      - name: Verify evidence validation is read-only
+        run: git diff --exit-code
