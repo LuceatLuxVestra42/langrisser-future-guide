@@ -3,12 +3,12 @@
   "schemaId": "soldier-stage6-0-checkpoint/v1",
   "stage": "6-0",
   "status": "PASS",
-  "frozenAt": "2026-08-30",
+  "frozenAt": "2026-09-02",
   "purpose": "Freeze the completed Soldier Stage 5 page-data baseline before Stage 6 full QA. Stage 6 must compare against this checkpoint instead of reopening Stage 1-5 semantic or JOIN research unless a concrete regression is found.",
   "baseline": {
-    "commitSha": "c0763b51ac3fb2a8e75cff15f31e2d181c3373bd",
-    "treeSha": "d2b7149f49522c1945215db5eeea3c3efa758733",
-    "commitMessage": "Refresh Soldier stage 5-8 frozen provenance"
+    "commitSha": "402f2efd0e1e89a698baaeceb1484c0c3c4d678f",
+    "treeSha": "061f902faf6da9778a929af4c3cd359af97fbcec",
+    "commitMessage": "freeze Soldier stage 11-A2 promoted release artifacts"
   },
   "contracts": {
     "soldierDetailStage5_1": {
@@ -44,11 +44,11 @@
     },
     "soldierListFinal": {
       "path": "data/generated/soldier-list-stage5-8.v1.json",
-      "gitBlobSha": "3c3304ac5122649e94ad4c0489d51ee154988d12"
+      "gitBlobSha": "dacae3e7af777f3df4ac18e62b994cf818b3f4dd"
     },
     "soldierReleaseMetadata": {
       "path": "data/generated/soldier-release-metadata.v1.json",
-      "gitBlobSha": "67572f1e0b4330b544626df577aa4e801b46ad59"
+      "gitBlobSha": "74e8a93ee93df67544a97321a7f60ebd912b25b3"
     }
   },
   "validationBaseline": {
@@ -88,7 +88,7 @@
     },
     "stage5_8": {
       "path": "data/validation/soldier-stage5-8-release.v1.json",
-      "gitBlobSha": "9311c414d1ae90682775614e9cfa65b720236fe5",
+      "gitBlobSha": "5d211d2025490247a0a068b253bdcada4bc50ec0",
       "expectedStatus": "PASS"
     }
   },
@@ -103,9 +103,9 @@
     "relationBySoldierKeys": 224,
     "stage1MissionCount": 112,
     "stage2MissionCount": 45,
-    "confirmedReleaseCount": 11,
-    "unresolvedReleaseCount": 213,
-    "unresolvedNormalTier3ReleaseCount": 118,
+    "confirmedReleaseCount": 51,
+    "unresolvedReleaseCount": 173,
+    "unresolvedNormalTier3ReleaseCount": 78,
     "lowerTierReleaseBucketCount": 39,
     "nonPassIdentityMetadataCount": 41,
     "nullNameKrCount": 41
@@ -119,7 +119,7 @@
     },
     {
       "code": "RELEASE_DATE_UNRESOLVED",
-      "count": 213,
+      "count": 173,
       "classification": "REVIEW",
       "rule": "Only externally confirmed release metadata may be presented as release order/date."
     },
