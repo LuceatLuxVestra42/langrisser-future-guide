@@ -68,12 +68,16 @@ const protectedGrowthTechIds = new Set(
 );
 checks.protectedGrowthPopulation = check(protectedGrowthTechIds.size === 129, `Expected 129 protected growth Tech IDs, got ${protectedGrowthTechIds.size}.`);
 
+const structuralGroups = candidates.structuralGroups ?? [];
 const groupByTechId = new Map();
+const groupRefByTechId = new Map();
 let duplicateCandidateMembership = 0;
-for (const group of candidates.structuralGroups ?? []) {
+for (const [index, group] of structuralGroups.entries()) {
+  const ref = `STAGE3_GROUP_${index + 1}`;
   for (const techId of group.techIds ?? []) {
     if (groupByTechId.has(techId)) duplicateCandidateMembership += 1;
     groupByTechId.set(techId, group);
+    groupRefByTechId.set(techId, ref);
   }
 }
 checks.candidatePartition = check(groupByTechId.size === 158 && duplicateCandidateMembership === 0, `Stage 3 candidate partition is not unique 158/158; duplicates=${duplicateCandidateMembership}.`);
@@ -87,17 +91,29 @@ const expectedRuleIdByLabel = {
   SOLDIER_SPECIFIC_PROGRESSION: "nonprotected-soldier-specific-progression-v1",
   REVIEW_UNCLASSIFIED: null,
 };
+const labelForGroup = (group) => {
+  if (group?.signature?.techTypeRaw === 1) return "COMMON_STAT";
+  if (group?.signature?.techTypeRaw === 3) return "COMMON_PASSIVE";
+  if (group?.signature?.techTypeRaw === 2 && group?.signature?.relationShape === "SOLDIER_ONLY" && ["EXACT_1_TO_5", "EXACT_1_TO_10"].includes(group?.signature?.skillLevelupShape)) return "SOLDIER_SPECIFIC_PROGRESSION";
+  return "REVIEW_UNCLASSIFIED";
+};
 const expectedFor = (record) => {
   const id = record.id;
   const type = record.raw?.TechType;
   const group = groupByTechId.get(id) ?? null;
   const matches = [];
   if (protectedGrowthTechIds.has(id)) matches.push("SOLDIER_GROWTH");
-  if (!protectedGrowthTechIds.has(id) && type === 1 && group?.signature?.techTypeRaw === 1) matches.push("COMMON_STAT");
-  if (!protectedGrowthTechIds.has(id) && type === 3 && group?.signature?.techTypeRaw === 3) matches.push("COMMON_PASSIVE");
-  if (!protectedGrowthTechIds.has(id) && type === 2 && group?.signature?.techTypeRaw === 2 && group?.signature?.relationShape === "SOLDIER_ONLY" && ["EXACT_1_TO_5", "EXACT_1_TO_10"].includes(group?.signature?.skillLevelupShape)) matches.push("SOLDIER_SPECIFIC_PROGRESSION");
+  if (!protectedGrowthTechIds.has(id) && type === 1 && labelForGroup(group) === "COMMON_STAT") matches.push("COMMON_STAT");
+  if (!protectedGrowthTechIds.has(id) && type === 3 && labelForGroup(group) === "COMMON_PASSIVE") matches.push("COMMON_PASSIVE");
+  if (!protectedGrowthTechIds.has(id) && type === 2 && labelForGroup(group) === "SOLDIER_SPECIFIC_PROGRESSION") matches.push("SOLDIER_SPECIFIC_PROGRESSION");
   const label = matches.length === 1 ? matches[0] : "REVIEW_UNCLASSIFIED";
-  return { label, ruleId: expectedRuleIdByLabel[label], matchCount: matches.length, group };
+  return {
+    label,
+    ruleId: expectedRuleIdByLabel[label],
+    matchCount: matches.length,
+    group,
+    evidenceRef: label === "SOLDIER_GROWTH" ? "PROTECTED_GROWTH" : (groupRefByTechId.get(id) ?? null),
+  };
 };
 
 checks.classificationFrozen = check(classification.status === "PASS" && classification.completion === "COMPLETE" && classification.freezeState === "TRAINING_TECH_CLASSIFICATION_STAGE5_FULL_CLASSIFICATION_FROZEN", "Stage 5 classification artifact is not frozen PASS/COMPLETE.");
@@ -125,6 +141,48 @@ checks.policyBoundary = check(
   classification.policy?.soldierUnlockValuesMaterializedInStage5 === false,
   "Stage 5 policy boundary permits forbidden inference or facet/category collapse.",
 );
+checks.facetCatalogBoundary = check(
+  classification.facetCatalog?.PREREQUISITE?.model === "ORTHOGONAL_RELATION_FACET" &&
+  classification.facetCatalog?.PREREQUISITE?.sourcePath === paths.stage1Census &&
+  classification.facetCatalog?.PREREQUISITE?.classificationRole === "NONE" &&
+  classification.facetCatalog?.SOLDIER_UNLOCK?.model === "ORTHOGONAL_RELATION_FACET" &&
+  classification.facetCatalog?.SOLDIER_UNLOCK?.levelReferenceSourcePath === paths.stage1Census &&
+  classification.facetCatalog?.SOLDIER_UNLOCK?.levelSourceLogicalPath === contract.sourceSnapshots.trainingTechLevel.logicalPath &&
+  classification.facetCatalog?.SOLDIER_UNLOCK?.sourceField === "TrainingTechLevelInfo.SoldierIDUnlocked" &&
+  classification.facetCatalog?.SOLDIER_UNLOCK?.materializedValues === false &&
+  classification.facetCatalog?.SOLDIER_UNLOCK?.classificationRole === "NONE" &&
+  classification.facetCatalog?.rejectedExclusiveWholeTechLabel === "PREREQUISITE_OR_UNLOCK",
+  "Stage 5 facet catalog boundary drifted from Stage 4 contract.",
+);
+
+const evidenceCatalog = classification.evidenceCatalog ?? [];
+const evidenceByRef = new Map(evidenceCatalog.map((entry) => [entry.ref, entry]));
+checks.evidenceCatalogUnique = check(evidenceCatalog.length === 16 && evidenceByRef.size === 16, `Stage 5 evidence catalog is not unique 16/16: ${evidenceCatalog.length}/${evidenceByRef.size}.`);
+const protectedEvidence = evidenceByRef.get("PROTECTED_GROWTH");
+checks.protectedEvidenceCatalog = check(
+  protectedEvidence?.label === "SOLDIER_GROWTH" &&
+  protectedEvidence?.ruleId === expectedRuleIdByLabel.SOLDIER_GROWTH &&
+  JSON.stringify(protectedEvidence?.sources ?? []) === JSON.stringify([paths.stage1Census, paths.stage2Validation, paths.frozenTrainingConsumer, paths.stage4Contract]),
+  "Stage 5 protected-growth evidence catalog entry mismatch.",
+);
+let groupEvidenceMismatchCount = 0;
+for (const [index, group] of structuralGroups.entries()) {
+  const ref = `STAGE3_GROUP_${index + 1}`;
+  const entry = evidenceByRef.get(ref);
+  const label = labelForGroup(group);
+  const representativeReview = reviewByTechId.get(group.representative?.techId) ?? null;
+  if (
+    entry?.label !== label ||
+    entry?.ruleId !== expectedRuleIdByLabel[label] ||
+    entry?.candidatePath !== paths.stage3Candidates ||
+    entry?.signatureKey !== group.signatureKey ||
+    entry?.representativeTechId !== (group.representative?.techId ?? null) ||
+    entry?.semanticPath !== paths.stage3Semantic ||
+    entry?.semanticFinding !== (representativeReview?.semanticFinding ?? null) ||
+    entry?.stage4ContractPath !== paths.stage4Contract
+  ) groupEvidenceMismatchCount += 1;
+}
+checks.groupEvidenceCatalog = check(groupEvidenceMismatchCount === 0, `Stage 5 Stage 3 group evidence catalog mismatches: ${groupEvidenceMismatchCount}.`);
 
 const actualRecords = classification.records ?? [];
 const actualById = new Map(actualRecords.map((record) => [record.techId, record]));
@@ -133,9 +191,9 @@ checks.stage1CoverageExactlyOnce = check(stage1Records.every((record) => actualB
 checks.sourceOrderParity = check(actualRecords.every((record, index) => record.techId === stage1Records[index]?.id && record.sourceIndex === stage1Records[index]?.sourceIndex), "Stage 5 deterministic record order does not match Stage 1 source-index order.");
 
 let perRecordMismatchCount = 0;
-let prerequisiteMismatchCount = 0;
+let prerequisiteFacetMismatchCount = 0;
 let unlockFacetMismatchCount = 0;
-let evidenceMismatchCount = 0;
+let evidenceRefMismatchCount = 0;
 let protectedRelabelCount = 0;
 let ruleOverlapCount = 0;
 const fallbackIds = [];
@@ -155,53 +213,14 @@ for (const sourceRecord of stage1Records) {
   ) perRecordMismatchCount += 1;
 
   const preTechIds = Array.isArray(sourceRecord.raw?.PreTechIDs) ? sourceRecord.raw.PreTechIDs : [];
-  const preTechLevels = Array.isArray(sourceRecord.raw?.PreTechLevel) ? sourceRecord.raw.PreTechLevel : [];
-  const prerequisite = actual.facets?.prerequisite;
-  if (
-    prerequisite?.model !== "ORTHOGONAL_RELATION_FACET" ||
-    prerequisite?.classificationRole !== "NONE" ||
-    prerequisite?.present !== (preTechIds.length > 0) ||
-    JSON.stringify(prerequisite?.preTechIds ?? []) !== JSON.stringify(preTechIds) ||
-    JSON.stringify(prerequisite?.preTechLevels ?? []) !== JSON.stringify(preTechLevels)
-  ) prerequisiteMismatchCount += 1;
-
-  const unlock = actual.facets?.soldierUnlock;
-  if (
-    unlock?.model !== "ORTHOGONAL_RELATION_FACET" ||
-    unlock?.classificationRole !== "NONE" ||
-    unlock?.materializedValues !== false ||
-    JSON.stringify(unlock?.levelIds ?? []) !== JSON.stringify(sourceRecord.explicitLevelReferences ?? []) ||
-    unlock?.stage3CandidateSignatureHasLevelUnlockField !== (expected.group?.signature?.hasLevelUnlockField ?? null)
-  ) unlockFacetMismatchCount += 1;
-
-  const stage1Evidence = actual.evidence?.stage1Record;
-  const contractEvidence = actual.evidence?.stage4Contract;
-  if (stage1Evidence?.path !== paths.stage1Census || stage1Evidence?.techId !== sourceRecord.id || stage1Evidence?.sourceIndex !== sourceRecord.sourceIndex || contractEvidence?.path !== paths.stage4Contract || contractEvidence?.ruleId !== expected.ruleId) {
-    evidenceMismatchCount += 1;
-    continue;
-  }
-  if (expected.label === "SOLDIER_GROWTH") {
-    if (
-      actual.evidence?.protectedGrowth?.path !== paths.frozenTrainingConsumer ||
-      actual.evidence?.protectedGrowth?.stage2ValidationPath !== paths.stage2Validation ||
-      actual.evidence?.protectedGrowth?.techId !== sourceRecord.id
-    ) evidenceMismatchCount += 1;
-  } else {
-    const group = expected.group;
-    const representativeReview = group ? reviewByTechId.get(group.representative?.techId) ?? null : null;
-    if (
-      actual.evidence?.stage3Representative?.candidatePath !== paths.stage3Candidates ||
-      actual.evidence?.stage3Representative?.signatureKey !== group?.signatureKey ||
-      actual.evidence?.stage3Representative?.representativeTechId !== (group?.representative?.techId ?? null) ||
-      actual.evidence?.stage3Representative?.semanticPath !== paths.stage3Semantic ||
-      actual.evidence?.stage3Representative?.semanticFinding !== (representativeReview?.semanticFinding ?? null)
-    ) evidenceMismatchCount += 1;
-  }
+  if (actual.prerequisiteFacetRef !== "PREREQUISITE" || actual.prerequisitePresent !== (preTechIds.length > 0)) prerequisiteFacetMismatchCount += 1;
+  if (actual.soldierUnlockFacetRef !== "SOLDIER_UNLOCK" || actual.candidateSignatureHasLevelUnlockField !== (expected.group?.signature?.hasLevelUnlockField ?? null)) unlockFacetMismatchCount += 1;
+  if (actual.evidenceRef !== expected.evidenceRef || !evidenceByRef.has(actual.evidenceRef)) evidenceRefMismatchCount += 1;
 }
 checks.perRecordClassificationParity = check(perRecordMismatchCount === 0, `Stage 5 per-record classification mismatches: ${perRecordMismatchCount}.`);
-checks.prerequisiteFacetParity = check(prerequisiteMismatchCount === 0, `Stage 5 prerequisite facet mismatches: ${prerequisiteMismatchCount}.`);
+checks.prerequisiteFacetParity = check(prerequisiteFacetMismatchCount === 0, `Stage 5 prerequisite facet mismatches: ${prerequisiteFacetMismatchCount}.`);
 checks.soldierUnlockFacetBoundary = check(unlockFacetMismatchCount === 0, `Stage 5 Soldier unlock facet boundary mismatches: ${unlockFacetMismatchCount}.`);
-checks.recordEvidenceProvenance = check(evidenceMismatchCount === 0, `Stage 5 record evidence provenance mismatches: ${evidenceMismatchCount}.`);
+checks.recordEvidenceProvenance = check(evidenceRefMismatchCount === 0, `Stage 5 record evidenceRef mismatches: ${evidenceRefMismatchCount}.`);
 checks.ruleOverlapZero = check(ruleOverlapCount === 0, `Stage 5 recomputed rule overlap count is ${ruleOverlapCount}.`);
 checks.fallbackZero = check(fallbackIds.length === 0, `Stage 5 recomputed REVIEW_UNCLASSIFIED IDs: ${fallbackIds.join(",")}`);
 checks.protectedGrowthNeverRelabeled = check(protectedRelabelCount === 0, `Stage 5 protected growth relabel count is ${protectedRelabelCount}.`);
@@ -224,12 +243,6 @@ checks.coverageSummaryMatches = check(
   classification.coverage?.reviewUnclassifiedCount === 0 &&
   classification.coverage?.protectedGrowthRelabelCount === 0,
   "Stage 5 artifact coverage summary does not match independently recomputed coverage.",
-);
-checks.facetCatalogBoundary = check(
-  classification.facetBoundary?.prerequisite?.model === "ORTHOGONAL_RELATION_FACET" &&
-  classification.facetBoundary?.soldierUnlock?.model === "ORTHOGONAL_RELATION_FACET" &&
-  classification.facetBoundary?.rejectedExclusiveWholeTechLabel === "PREREQUISITE_OR_UNLOCK",
-  "Stage 5 facet catalog boundary drifted from Stage 4 contract.",
 );
 
 const output = {
@@ -257,9 +270,10 @@ const output = {
     uniqueTechIds: actualById.size,
     labelCounts,
     perRecordMismatchCount,
-    prerequisiteMismatchCount,
+    prerequisiteFacetMismatchCount,
     unlockFacetMismatchCount,
-    evidenceMismatchCount,
+    evidenceRefMismatchCount,
+    groupEvidenceMismatchCount,
     ruleOverlapCount,
     reviewUnclassifiedCount: fallbackIds.length,
     protectedGrowthRelabelCount: protectedRelabelCount,
