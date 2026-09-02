@@ -1,0 +1,226 @@
+name: Hero Talent Carousel Regression
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/hero-talent-carousel-regression.yml'
+      - 'src/routes/heroes_.$heroId.tsx'
+      - 'data/generated/hero-detail/by-id/**'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/hero-talent-carousel-regression.yml'
+      - 'src/routes/heroes_.$heroId.tsx'
+      - 'data/generated/hero-detail/by-id/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hero-talent-carousel-regression-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hero-talent-carousel-regression:
+    name: hero-talent-carousel-regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build static candidate
+        run: |
+          set -euo pipefail
+          node scripts/build-equipment-name-kr-presentation.mjs
+          bunx vite build --config vite.config.pages.ts
+          git diff --exit-code
+
+      - name: Install Chromium regression runtime
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Verify Hero talent star navigation
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .qa-site
+          mkdir -p .qa-site/langrisser-future-guide
+          cp -R dist/client/. .qa-site/langrisser-future-guide/
+
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory .qa-site >/tmp/hero-talent-carousel-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:4173/langrisser-future-guide/heroes/6/ >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" != "1" ]; then
+            cat /tmp/hero-talent-carousel-http.log >&2 || true
+            echo 'Static QA server did not become ready' >&2
+            exit 1
+          fi
+
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import { chromium } from 'playwright';
+
+          const baseUrl = 'http://127.0.0.1:4173/langrisser-future-guide/';
+          const check = (condition, message) => { if (!condition) throw new Error(message); };
+          const heroDir = 'data/generated/hero-detail/by-id';
+          const heroFiles = fs.readdirSync(heroDir)
+            .filter((name) => /^\d+\.json$/.test(name))
+            .sort((a, b) => Number(a.replace('.json', '')) - Number(b.replace('.json', '')));
+
+          const byInitialStar = new Map();
+          let hero6 = null;
+          for (const file of heroFiles) {
+            const record = JSON.parse(fs.readFileSync(`${heroDir}/${file}`, 'utf8'));
+            const heroId = Number(record.heroId);
+            const initialStar = Number(record.normal?.heroMeta?.initialStar);
+            if (heroId === 6) hero6 = { heroId, initialStar, nameCn: record.identity?.nameCn ?? null };
+            if ([1, 2].includes(initialStar) && !byInitialStar.has(initialStar)) {
+              byInitialStar.set(initialStar, { heroId, initialStar, nameCn: record.identity?.nameCn ?? null });
+            }
+          }
+
+          check(hero6?.initialStar === 3, `Hero 6 initialStar must stay 3, got ${JSON.stringify(hero6)}`);
+          check(byInitialStar.has(2), 'No frozen Hero detail representative with initialStar=2');
+          check(byInitialStar.has(1), 'No frozen Hero detail representative with initialStar=1');
+
+          const targets = [hero6, byInitialStar.get(2), byInitialStar.get(1)];
+          const hero6SkillIds = new Map([[3, 3067], [4, 3072], [5, 3077], [6, 3082]]);
+
+          async function verifyTalentCarousel(page, target, label) {
+            const pageErrors = [];
+            const consoleErrors = [];
+            page.on('pageerror', (error) => pageErrors.push(String(error)));
+            page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+
+            const response = await page.goto(`${baseUrl}heroes/${target.heroId}/`, { waitUntil: 'networkidle', timeout: 45000 });
+            check(response && response.status() < 400, `${label} Hero ${target.heroId} page failed: ${response?.status()}`);
+
+            const carousel = page.locator('[data-hero-talent-carousel="true"]');
+            await carousel.waitFor({ state: 'visible', timeout: 15000 });
+            const state = carousel.locator('[data-hero-talent-active-star]');
+            await state.waitFor({ state: 'attached', timeout: 15000 });
+
+            check((await state.getAttribute('data-hero-talent-active-star')) === '6', `${label} Hero ${target.heroId} default talent star is not 6`);
+            check((await state.getAttribute('data-hero-talent-min-star')) === String(target.initialStar), `${label} Hero ${target.heroId} min star mismatch`);
+            check((await state.getAttribute('data-hero-talent-max-star')) === '6', `${label} Hero ${target.heroId} max star is not 6`);
+
+            const selectorButtons = carousel.locator('[aria-label="재능 성급 선택"] button');
+            const selectorTexts = (await selectorButtons.allTextContents()).map((text) => text.trim());
+            const expectedSelectors = Array.from({ length: 7 - target.initialStar }, (_, index) => `${target.initialStar + index}성`);
+            check(JSON.stringify(selectorTexts) === JSON.stringify(expectedSelectors), `${label} Hero ${target.heroId} selector mismatch: ${JSON.stringify(selectorTexts)} / ${JSON.stringify(expectedSelectors)}`);
+            for (let hiddenStar = 1; hiddenStar < target.initialStar; hiddenStar += 1) {
+              check(await carousel.getByRole('button', { name: `${hiddenStar}성`, exact: true }).count() === 0, `${label} Hero ${target.heroId} exposed hidden ${hiddenStar}성 selector`);
+            }
+
+            const lower = carousel.getByRole('button', { name: '낮은 성급 재능 보기', exact: true });
+            const higher = carousel.getByRole('button', { name: '높은 성급 재능 보기', exact: true });
+            check(await lower.count() === 1 && await higher.count() === 1, `${label} Hero ${target.heroId} talent arrows missing or duplicated`);
+
+            const assertStar = async (star) => {
+              await carousel.locator(`[data-hero-talent-active-star="${star}"]`).waitFor({ state: 'attached', timeout: 5000 });
+              const starButton = carousel.getByRole('button', { name: `${star}성`, exact: true });
+              check((await starButton.getAttribute('aria-pressed')) === 'true', `${label} Hero ${target.heroId} ${star}성 selector is not pressed`);
+              const heading = (await carousel.locator('article h3').innerText()).trim();
+              check(heading.startsWith(`${star}성 ·`), `${label} Hero ${target.heroId} ${star}성 card heading mismatch: ${heading}`);
+              if (target.heroId === 6) {
+                const expectedSkillId = hero6SkillIds.get(star);
+                const cardText = await carousel.locator('article').innerText();
+                check(cardText.includes(`#${expectedSkillId}`), `${label} Hero 6 ${star}성 skill id mismatch: expected #${expectedSkillId}`);
+              }
+            };
+
+            await assertStar(6);
+            check(await higher.isDisabled(), `${label} Hero ${target.heroId} higher arrow must be disabled at 6성`);
+            check(!(await lower.isDisabled()), `${label} Hero ${target.heroId} lower arrow unexpectedly disabled at 6성`);
+
+            const downward = [6];
+            for (let star = 5; star >= target.initialStar; star -= 1) {
+              await lower.click();
+              await assertStar(star);
+              downward.push(star);
+            }
+            check(await lower.isDisabled(), `${label} Hero ${target.heroId} lower arrow must be disabled at ${target.initialStar}성`);
+            check(!(await higher.isDisabled()), `${label} Hero ${target.heroId} higher arrow unexpectedly disabled at minimum star`);
+
+            const upward = [target.initialStar];
+            for (let star = target.initialStar + 1; star <= 6; star += 1) {
+              await higher.click();
+              await assertStar(star);
+              upward.push(star);
+            }
+            check(await higher.isDisabled(), `${label} Hero ${target.heroId} higher arrow must be disabled after returning to 6성`);
+
+            await carousel.getByRole('button', { name: `${target.initialStar}성`, exact: true }).click();
+            await assertStar(target.initialStar);
+            await carousel.getByRole('button', { name: '6성', exact: true }).click();
+            await assertStar(6);
+
+            check(pageErrors.length === 0, `${label} Hero ${target.heroId} page errors: ${JSON.stringify(pageErrors)}`);
+            check(consoleErrors.length === 0, `${label} Hero ${target.heroId} console errors: ${JSON.stringify(consoleErrors)}`);
+            return { heroId: target.heroId, initialStar: target.initialStar, downward, upward, selectors: selectorTexts };
+          }
+
+          const browser = await chromium.launch({ headless: true });
+          try {
+            const desktopResults = [];
+            for (const target of targets) {
+              const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+              try {
+                desktopResults.push(await verifyTalentCarousel(page, target, 'desktop'));
+              } finally {
+                await page.close();
+              }
+            }
+
+            const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+            let mobileResult;
+            try {
+              const mobilePage = await mobileContext.newPage();
+              mobileResult = await verifyTalentCarousel(mobilePage, hero6, 'mobile');
+              const overflow = await mobilePage.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+              check(overflow <= 1, `mobile Hero 6 horizontal overflow=${overflow}`);
+            } finally {
+              await mobileContext.close();
+            }
+
+            console.log(JSON.stringify({
+              status: 'PASS_HERO_TALENT_CAROUSEL_REGRESSION',
+              defaultStar: 6,
+              representatives: desktopResults,
+              hero6ExpectedCycle: [6, 5, 4, 3, 4, 5, 6],
+              hero6SkillIds: Object.fromEntries(hero6SkillIds),
+              mobileHero6: mobileResult,
+              semanticRecomputation: false,
+            }, null, 2));
+          } finally {
+            await browser.close();
+          }
+          NODE
