@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const { ROOT, resolveConfigDataDir } = require('../configdata-source-pack-maintenance-root.cjs');
 
-const ROOT = path.resolve(__dirname, '..', '..');
-const CONFIG_DIR = path.join(ROOT, 'data', 'configdata');
+const CONFIG_DIR = resolveConfigDataDir();
 
 function readJson(p) {
   return JSON.parse(fs.readFileSync(p, 'utf8'));
