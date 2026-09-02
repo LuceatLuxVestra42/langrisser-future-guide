@@ -215,7 +215,13 @@ function BannerPage() {
                                   신규
                                 </span>
                               )}
-                              <span className="shrink-0 rounded-md bg-primary px-2 py-1 text-[11px] font-bold text-primary-foreground">
+                              <span
+                                className={`shrink-0 rounded-md px-2 py-1 text-[11px] font-bold text-primary-foreground ${
+                                  displayTypeLabel === "CP"
+                                    ? "bg-pink-500 dark:bg-pink-600"
+                                    : "bg-primary"
+                                }`}
+                              >
                                 {displayTypeLabel}
                               </span>
                               {wishDisplayName && (
