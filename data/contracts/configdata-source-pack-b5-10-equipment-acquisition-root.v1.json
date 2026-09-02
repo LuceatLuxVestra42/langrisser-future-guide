@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "schemaId": "configdata-source-pack-b5-10-equipment-acquisition-root/v1",
+  "stage": "repository-size-reduction-B5.10",
+  "status": "PASS",
+  "completion": "CONFIGDATA_SOURCE_PACK_B5_10_EQUIPMENT_ACQUISITION_ROOT_COMPLETE",
+  "owner": "configdata-source-pack",
+  "supportingOwners": [
+    "equipment",
+    "project-check"
+  ],
+  "purpose": "Close the Equipment Acquisition Analysis direct tracked-root blocker exposed by the fresh B6 deletion-only proof, without changing equipment semantics, canonical membership, or logical ConfigData provenance.",
+  "authoritativePredecessors": {
+    "b5": {
+      "path": "data/contracts/configdata-source-pack-deletion-admission.v1.json",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "CONFIGDATA_SOURCE_PACK_B5_DELETION_ADMISSION_COMPLETE",
+      "requiredAdmittedDeletionCount": 753
+    },
+    "b5_9": {
+      "path": "data/contracts/configdata-source-pack-b5-9-soldier-stage2-writeback.v1.json",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "CONFIGDATA_SOURCE_PACK_B5_9_SOLDIER_STAGE2_WRITEBACK_COMPLETE"
+    },
+    "sourcePack": {
+      "path": "data/contracts/configdata-source-pack-contract.v1.json",
+      "requiredStatus": "PASS",
+      "requiredFileCount": 753,
+      "requiredLogicalRawPathNamespace": "data/configdata"
+    }
+  },
+  "discoveryEvidence": {
+    "supersededRealB6DeletionProofPr": 513,
+    "supersededB6Merged": false,
+    "exactDeletionBeforeAutomation": true,
+    "intendedDeletionCount": 753,
+    "intendedAdditions": 0,
+    "projectCheckRunId": 33622425957,
+    "projectCheckConclusion": "success",
+    "blockingWorkflow": "Equipment Acquisition Analysis",
+    "blockingRunId": 33622425947,
+    "blockingStep": "Scan PathType sources",
+    "blockingPath": "scripts/scan-acquisition-pathtype-sources.mjs",
+    "secondaryDirectRootPath": "scripts/sample-acquisition-pathtypes.mjs",
+    "blockingSignature": "ENOENT scandir data/configdata after the admitted tracked source root was removed",
+    "blockingClassification": "PHYSICAL_SOURCE_ROOT_NOT_CUT_OVER",
+    "resolutionOwner": "equipment"
+  },
+  "maintenanceScope": [
+    {
+      "path": "scripts/scan-acquisition-pathtype-sources.mjs",
+      "role": "scan ConfigData through the pinned maintenance source-root resolver while serializing logical data/configdata paths",
+      "semanticAlgorithmChanged": false
+    },
+    {
+      "path": "scripts/sample-acquisition-pathtypes.mjs",
+      "role": "sample ConfigData through the pinned maintenance source-root resolver while serializing logical data/configdata paths",
+      "semanticAlgorithmChanged": false
+    },
+    {
+      "path": "data/generated/equipment_acquisition_pathtype_sources.json",
+      "role": "producer-refreshed scanner self-records after maintenance code changed",
+      "semanticAlgorithmChanged": false
+    }
+  ],
+  "externalRootProof": {
+    "producerCommit": "4d5e9d141d9720ced9b5ad99fa7b52f99b0d0706",
+    "trackedConfigDataHiddenDuringProof": true,
+    "pinnedB2HydrationRequired": true,
+    "equipmentAcquisitionPathAnalysisByteParity": true,
+    "pathTypeSamplesByteParity": true,
+    "configDataPathTypeScanParity": true,
+    "onlyExpectedScannerSelfRecordsChanged": true,
+    "physicalRunnerPathLeak": false,
+    "serializedConfigDataProvenanceNamespace": "data/configdata",
+    "trackedConfigDataRestoredAfterProof": true,
+    "trackedConfigDataRestoredJsonCount": 753,
+    "rawConfigDataCommittedByProof": false
+  },
+  "semanticBoundary": {
+    "semanticAuthorityChanged": false,
+    "frozenSemanticDomainsReopened": false,
+    "canonicalIdentityChanges": false,
+    "equipmentMembershipChanges": false,
+    "relationChanges": false,
+    "populationChanges": false,
+    "sourceMeaningReinterpreted": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "filenameSimilarityIntroduced": false,
+    "logicalProvenanceChanged": false
+  },
+  "productionBoundary": {
+    "productionRuntimeChanged": false,
+    "frontendChanged": false,
+    "productionRuntimeReadsRawConfigData": false,
+    "productionRuntimeFetchesSourcePack": false,
+    "rawConfigDataRuntimeFallbackAllowed": false,
+    "normalLookupRefsFindChanged": false,
+    "normalLookupRawFallback": false
+  },
+  "nonBlockingReviews": [
+    {
+      "code": "HERO_DISPLAY_STAT_LEGACY_TEXTASSET_INVESTIGATION_DRIFT",
+      "classification": "EXISTING_DRIFT_REVIEW",
+      "blocking": false,
+      "evidenceRunId": 33622426014,
+      "reason": "The legacy investigation hydrates the exact pinned B2 source successfully but still requires retired TextAsset m_Name/m_size/m_bytes structure instead of the current UnityDataTool direct JSON arrays. It is not a B6 storage-deletion regression."
+    },
+    {
+      "code": "SOLDIER_STAGE5_2_EXISTING_FROZEN_PROVENANCE_DRIFT_ON_MAIN",
+      "classification": "EXISTING_DRIFT_REVIEW",
+      "blocking": false,
+      "reason": "Inherited non-blocking review from the B5.7/B5.9 authority chain."
+    }
+  ],
+  "migrationState": {
+    "trackedRepositoryRawSourceStillPresent": true,
+    "trackedRepositoryRawJsonCount": 753,
+    "trackedRawDeletionAdmitted": true,
+    "equipmentAcquisitionPhysicalRootCutoverCompleted": true,
+    "trackedRawDeletionCompleted": false
+  },
+  "blockers": [],
+  "reviews": [
+    "HERO_DISPLAY_STAT_LEGACY_TEXTASSET_INVESTIGATION_DRIFT",
+    "SOLDIER_STAGE5_2_EXISTING_FROZEN_PROVENANCE_DRIFT_ON_MAIN"
+  ],
+  "handoff": {
+    "completion": "B5_10_EQUIPMENT_ACQUISITION_ROOT_COMPLETE",
+    "nextOwner": "configdata-source-pack",
+    "nextSupportingOwners": [
+      "configdata",
+      "project-check",
+      "configdata-lookup"
+    ],
+    "nextStage": "B6-delete-tracked-configdata",
+    "nextStart": "After this checkpoint merges, recreate B6 from the latest merged main as a brand-new exact deletion-only change removing all 753 direct data/configdata/*.json files with additions=0 and no other changed paths. Require real deletion-triggered Project Check and owning validators to pass with branch head unchanged and tracked mutation after automatic validation equal to zero. Do not reuse superseded PR #513."
+  }
+}
