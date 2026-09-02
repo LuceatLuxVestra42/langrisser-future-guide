@@ -35,7 +35,9 @@ for (const shape of subject.effectSemantics?.effectShapeCatalog ?? []) {
 }
 req(shapeByTech.size === 84, `Effect-shape catalog covers ${shapeByTech.size} Techs, expected 84.`);
 
-const compactRecords = (subject.records ?? []).map((record) => {
+const sequenceMap = new Map();
+let totalLevelRows = 0;
+for (const record of subject.records ?? []) {
   const techId = record.techId;
   const census = censusById.get(techId);
   req(census, `Missing Stage 1 row for Tech ${techId}.`);
@@ -46,23 +48,45 @@ const compactRecords = (subject.records ?? []).map((record) => {
   req(same(record.effectShape, shapeByTech.get(techId)), `Tech ${techId} repeated effect shape does not reproduce from the frozen shape catalog.`);
   const levelIds = (record.levels ?? []).map((level) => level.levelId);
   const values = (record.levels ?? []).map((level) => level.values);
-  req(same(levelIds, raw.TechLevelupInfoList), `Tech ${techId} level IDs do not reproduce the explicit source references.`);
-  req(levelIds.length === values.length, `Tech ${techId} compact level/value cardinality mismatch.`);
-  return { techId, levelIds, values };
-});
-req(compactRecords.length === 84 && new Set(compactRecords.map((r) => r.techId)).size === 84, "Compact projection does not contain 84 unique Techs.");
-req(compactRecords.reduce((n, r) => n + r.levelIds.length, 0) === 1050, "Compact projection does not contain 1050 explicit level IDs.");
+  req(same(levelIds, raw.TechLevelupInfoList), `Tech ${techId} level IDs do not reproduce the explicit Stage 1 references.`);
+  req(levelIds.length === values.length, `Tech ${techId} level/value cardinality mismatch.`);
+  totalLevelRows += levelIds.length;
+  const sequenceKey = JSON.stringify(values);
+  const entry = sequenceMap.get(sequenceKey) ?? { techIds: [], values };
+  entry.techIds.push(techId);
+  sequenceMap.set(sequenceKey, entry);
+}
+req(totalLevelRows === 1050, `Validated expanded level row count ${totalLevelRows}, expected 1050.`);
+const valueSequenceCatalog = [...sequenceMap.values()].map((entry, index) => ({
+  sequenceId: `VALUE_SEQUENCE_${index + 1}`,
+  techIds: entry.techIds,
+  levelCount: entry.values.length,
+  values: entry.values,
+}));
+req(valueSequenceCatalog.length === 10, `COMMON_STAT value-sequence catalog has ${valueSequenceCatalog.length} entries, expected 10.`);
+const catalogTechIds = valueSequenceCatalog.flatMap((entry) => entry.techIds);
+req(catalogTechIds.length === 84 && new Set(catalogTechIds).size === 84, "Value-sequence catalog does not cover 84 Techs exactly once.");
+for (const entry of valueSequenceCatalog) {
+  for (const techId of entry.techIds) {
+    const refs = censusById.get(techId)?.raw?.TechLevelupInfoList ?? [];
+    req(refs.length === entry.levelCount, `Tech ${techId} Stage 1 level count differs from ${entry.sequenceId}.`);
+  }
+}
 
+const { records: _expandedRecords, ...subjectWithoutRecords } = subject;
 const compactSubject = {
-  ...subject,
-  purpose: "Freeze a compact COMMON_STAT stat-effect consumer for 84 TrainingTech records. Exact source Description parsing remains independently reproduced before this projection; repeated locators and shape definitions are recoverable from frozen predecessors/catalogs and are not duplicated per Tech.",
+  ...subjectWithoutRecords,
+  purpose: "Freeze a compact COMMON_STAT stat-effect consumer for 84 TrainingTech records. Exact source Description parsing is independently reproduced before this projection; exact level IDs remain frozen in Stage 1 and repeated value progressions are represented once in a 10-sequence catalog.",
   policy: {
     ...subject.policy,
     compactConsumerProjection: true,
     repeatedLocatorMaterializedPerTech: false,
     repeatedEffectShapeMaterializedPerTech: false,
+    explicitLevelIdsMaterializedPerTech: false,
+    explicitLevelIdsRecoveredFromStage1: true,
+    valueSequencesCataloged: true,
   },
-  records: compactRecords,
+  valueSequenceCatalog,
 };
 const compactSubjectText = `${JSON.stringify(compactSubject)}\n`;
 const compactSubjectBlob = blobText(compactSubjectText);
@@ -71,18 +95,22 @@ const compactValidation = {
   subject: { path: P.subject, gitBlobSha: compactSubjectBlob },
   reproduction: {
     expandedValidatedSubjectGitBlobSha: expandedBlob,
-    compactProjection: "TECH_ID_PLUS_EXPLICIT_LEVEL_IDS_PLUS_NUMERIC_VALUES",
-    recoverableRepeatedFields: ["sourceLabel", "trainingTechLocator", "effectShape"],
-    recoveryAuthorities: [P.stage1, "subject.effectSemantics.effectShapeCatalog"],
+    compactProjection: "FROZEN_EFFECT_SHAPES_PLUS_VALUE_SEQUENCE_CATALOG_PLUS_STAGE1_LEVEL_REFERENCES",
+    valueSequenceCount: 10,
+    recoverableRepeatedFields: ["sourceLabel", "trainingTechLocator", "effectShape", "explicit level IDs"],
+    recoveryAuthorities: [P.stage1, "subject.effectSemantics.effectShapeCatalog", "subject.valueSequenceCatalog"],
   },
   gates: {
     ...validation.gates,
     compactConsumerProjectionExact: true,
     repeatedLocatorRecoverableFromStage1: true,
     repeatedEffectShapeRecoverableFromFrozenCatalog: true,
+    explicitLevelIdsRecoverableFromStage1: true,
+    frozenValueSequenceCatalog10: true,
+    valueSequenceTechCoverage84Exact: true,
   },
 };
 const compactValidationText = `${JSON.stringify(compactValidation)}\n`;
 writeFileSync(resolve(root, P.subject), compactSubjectText);
 writeFileSync(resolve(root, P.validation), compactValidationText);
-console.log(JSON.stringify({ status: "PASS", subjectBlob: compactSubjectBlob, expandedValidatedSubjectBlob: expandedBlob, techs: 84, levelRows: 1050 }));
+console.log(JSON.stringify({ status: "PASS", subjectBlob: compactSubjectBlob, expandedValidatedSubjectBlob: expandedBlob, techs: 84, levelRows: 1050, valueSequences: 10 }));
