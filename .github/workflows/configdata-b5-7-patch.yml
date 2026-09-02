@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
           ref: configdata/b5-7-soldier-deletion-readiness-v1
 
-      - name: Apply narrow B5.7 source-root fixes
+      - name: Apply non-workflow B5.7 source-root fixes
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -33,7 +33,6 @@ jobs:
                   raise SystemExit(f'non-unique patch anchor in {path}: count={text.count(old)}')
               p.write_text(text.replace(old, new))
 
-          # Stage 4-2: physical reads use maintenance resolver; logical output labels stay unchanged.
           replace(
               'scripts/validate-soldier-stage4-2-master.cjs',
               "const crypto = require('crypto');\n",
@@ -45,7 +44,6 @@ jobs:
               "const SOLDIER_PATH = resolveConfigDataFile('ConfigDataSoldierInfo.json');\nconst SP_PATH = resolveConfigDataFile('ConfigDataSPSoldierInfo.json');",
           )
 
-          # Stage 4-6: preserve logical provenance paths, but hash exact bytes from the resolved physical source.
           replace(
               'scripts/finalize-hero-soldier-relation-layer.cjs',
               "const path = require('path');\nconst { execFileSync } = require('child_process');\n",
@@ -62,7 +60,6 @@ jobs:
               "function physicalFile(p) {\n  return p.startsWith('data/configdata/') ? resolveConfigDataFile(path.basename(p)) : abs(p);\n}\nfunction gitBlobSha(p) {\n  const body = fs.readFileSync(physicalFile(p));\n  const header = Buffer.from(`blob ${body.length}\\0`);\n  return crypto.createHash('sha1').update(header).update(body).digest('hex');\n}\n",
           )
 
-          # Stage 4-8 producer: raw input hashes resolve external bytes; ephemeral Stage 4-1 validation remains a hard full-regeneration gate but is not a frozen tracked snapshot.
           replace(
               'scripts/validate-soldier-stage4-8-baseline.cjs',
               "const { ROOT, readJson } = require('./lib/configdata-direct.cjs');\n",
@@ -83,27 +80,16 @@ jobs:
               "const validationSnapshot = digestDescriptors(validationPaths);",
               "const validationSnapshot = digestDescriptors(frozenValidationPaths);",
           )
-
-          # Stage 4-8 PR freshness: same logical-key comparison, exact Git-blob hash over resolved external bytes when tracked raw files are absent.
-          replace(
-              '.github/workflows/soldier-stage4-8-baseline.yml',
-              "          const crypto = require('crypto');\n          const cp = require('child_process');\n",
-              "          const crypto = require('crypto');\n          const path = require('path');\n          const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');\n",
-          )
-          replace(
-              '.github/workflows/soldier-stage4-8-baseline.yml',
-              "          function gitBlobSha(p) {\n            try {\n              return cp.execFileSync('git', ['hash-object', p], { encoding: 'utf8' }).trim();\n            } catch {\n              return null;\n            }\n          }\n",
-              "          function physicalFile(p) {\n            return p.startsWith('data/configdata/') ? resolveConfigDataFile(path.basename(p)) : p;\n          }\n          function gitBlobSha(p) {\n            try {\n              const body = fs.readFileSync(physicalFile(p));\n              const header = Buffer.from(`blob ${body.length}\\0`);\n              return crypto.createHash('sha1').update(header).update(body).digest('hex');\n            } catch {\n              return null;\n            }\n          }\n",
-          )
           PY
 
-          rm .github/workflows/configdata-b5-7-patch.yml
-
           git diff --check
-          git diff -- scripts/validate-soldier-stage4-2-master.cjs scripts/finalize-hero-soldier-relation-layer.cjs scripts/validate-soldier-stage4-8-baseline.cjs .github/workflows/soldier-stage4-8-baseline.yml
+          git diff -- scripts/validate-soldier-stage4-2-master.cjs scripts/finalize-hero-soldier-relation-layer.cjs scripts/validate-soldier-stage4-8-baseline.cjs
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add \
+            scripts/validate-soldier-stage4-2-master.cjs \
+            scripts/finalize-hero-soldier-relation-layer.cjs \
+            scripts/validate-soldier-stage4-8-baseline.cjs
           git commit -m "Fix Soldier validators for external ConfigData root"
           git push origin HEAD:configdata/b5-7-soldier-deletion-readiness-v1
