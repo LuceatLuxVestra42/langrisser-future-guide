@@ -1,0 +1,168 @@
+{
+  "version": 1,
+  "schemaId": "evidence-lifecycle-c3-lifecycle-classification-contract/v1",
+  "stage": "C3 - Lifecycle Classification Contract",
+  "status": "DESIGN_FROZEN",
+  "completion": "COMPLETE",
+  "freezeState": "C3_LIFECYCLE_CLASSIFICATION_CONTRACT_FROZEN",
+  "baseline": {
+    "branch": "main",
+    "sha": "f991094d25a30e7d4ad905261cc3650987a63e0c"
+  },
+  "input": {
+    "c1InventoryPath": "tools/evidence-lifecycle/generated/c1-inventory.v1.json",
+    "c1InventoryDigest": "54ae464fb4d5cff74bebba0e49bfadbc0a7b30cc2c641b8c8a2fab69dfeebbb8",
+    "c2ReferenceGraphPath": "tools/evidence-lifecycle/generated/c2-reference-graph.v1.json",
+    "c2GraphDigest": "ac182d7396b8476a7f8591fe671a528d9b00f81ef7f4fc86987892d7da778873",
+    "admittedNodeCount": 642,
+    "populationPolicy": "C1_ADMITTED_ONLY"
+  },
+  "purpose": "Assign exactly one conservative lifecycle classification to every frozen C1 admitted node using C2 protecting references and explicit lifecycle evidence only, without semantic recomputation or destructive eligibility decisions.",
+  "primaryLifecycle": [
+    "ACTIVE_AUTHORITY",
+    "ACTIVE_OPERATIONAL",
+    "RETENTION_PREDECESSOR",
+    "RETENTION_PROVENANCE",
+    "RETENTION_HISTORICAL",
+    "EXPLICITLY_SUPERSEDED",
+    "UNREFERENCED_REVIEW"
+  ],
+  "precedence": [
+    "ACTIVE_AUTHORITY",
+    "ACTIVE_OPERATIONAL",
+    "RETENTION_PREDECESSOR",
+    "RETENTION_PROVENANCE",
+    "RETENTION_HISTORICAL",
+    "EXPLICITLY_SUPERSEDED",
+    "UNREFERENCED_REVIEW"
+  ],
+  "classificationPolicy": {
+    "exactlyOnePrimaryLifecycle": true,
+    "classificationBasisRequired": true,
+    "secondaryReasonsAllowed": true,
+    "protectingReferenceCountSource": "C2 incoming[].protectingReferenceCount",
+    "totalReferenceCountDoesNotDriveLifecycle": true,
+    "zeroProtectingReferenceMeansUnused": false,
+    "zeroProtectingReferenceMeansDelete": false,
+    "unreferencedReviewIsNotDeletionApproval": true
+  },
+  "activeAuthority": {
+    "rule": "Only lifecycle nodes that are explicit sourcePath or supplementalSources[].path of terminal APPROVED Status Source entries at the frozen baseline qualify.",
+    "terminalEntryRule": "An APPROVED entry is terminal when no other APPROVED entry explicitly names its id in successorOf.",
+    "statusSourceDeclarationFileItselfIsAuthority": false,
+    "supersededApprovedEntryRemainsCurrentAuthority": false
+  },
+  "activeOperational": {
+    "protectingEdgeTypes": [
+      "VALIDATOR_INPUT_REF",
+      "PRODUCER_INPUT_REF",
+      "ACTIVE_WORKFLOW_REF",
+      "FROZEN_CONSUMER_REF",
+      "CURRENT_CONTRACT_REF"
+    ],
+    "authorityDeclarationRoleOperational": true,
+    "approvedForHandoffRetentionDeclarationOperational": true,
+    "manifestReferenceAloneOperational": false,
+    "statusSourceReferenceAloneOperational": false
+  },
+  "retentionPredecessor": {
+    "edgeTypes": [
+      "ACTIVE_PREDECESSOR_REF"
+    ],
+    "manifestPredecessorLocator": true,
+    "statusSourceSuccessorOfCreatesExplicitPredecessor": true
+  },
+  "retentionProvenance": {
+    "edgeTypes": [
+      "ACTIVE_PROVENANCE_REF"
+    ],
+    "nonPredecessorManifestReference": true
+  },
+  "retentionHistorical": {
+    "explicitRoleSignals": [
+      "INVESTIGATION_EVIDENCE",
+      "AUDIT_EVIDENCE",
+      "PROVENANCE_EVIDENCE",
+      "HISTORICAL_GENERATED_EVIDENCE"
+    ],
+    "explicitRationaleKeyRegex": "(?:retention(?:Reason|Rationale|Policy|Basis)?|historical(?:Reason|Rationale|Retention)?|history(?:Reason|Rationale|Retention)?|auditRetention|reproducibility|retry.?prevention)",
+    "checkpointRoleAloneIsHistorical": false,
+    "closedOrFrozenStatusAloneIsHistorical": false,
+    "oldCommitOrStageNumberIsHistorical": false,
+    "genericProvenanceMetadataKeyAloneIsHistorical": false,
+    "genericAuditStatusKeyAloneIsHistorical": false
+  },
+  "explicitlySuperseded": {
+    "statusTokenRegex": "(?:SUPERSEDED|RETIRED|DEPRECATED)",
+    "explicitSuccessorKeyRegex": "(?:successorPath|successorArtifact|successorCheckpoint|successorContract|supersededBy|replacedBy|retiredBy)",
+    "statusSourceSuccessorOfRelation": true,
+    "nestedSuccessorOfDoesNotSupersedeContainer": true,
+    "chronologyOrStageOrderCreatesSuccessor": false
+  },
+  "unreferencedReview": {
+    "rule": "Use only when no higher-precedence explicit lifecycle signal applies.",
+    "zeroProtectingReferenceExpected": true,
+    "meansUnused": false,
+    "meansDelete": false,
+    "requiresC4OrC5ForAnyLaterRetentionOrDestructiveDecision": true
+  },
+  "classificationBasisSchema": {
+    "required": [
+      "kind",
+      "source",
+      "detail"
+    ],
+    "allowedKinds": [
+      "STATUS_SOURCE_TERMINAL_AUTHORITY",
+      "CURRENT_PROTECTING_EDGE",
+      "AUTHORITY_DECLARATION_ROLE",
+      "ACTIVE_RETENTION_DECLARATION",
+      "EXPLICIT_PREDECESSOR_EDGE",
+      "STATUS_SOURCE_SUCCESSOR_PREDECESSOR",
+      "EXPLICIT_PROVENANCE_EDGE",
+      "MANIFEST_PREDECESSOR_REF",
+      "MANIFEST_PROVENANCE_REF",
+      "EXPLICIT_HISTORICAL_ROLE",
+      "EXPLICIT_RETENTION_RATIONALE",
+      "EXPLICIT_SUPERSEDED_STATUS",
+      "EXPLICIT_SUCCESSOR_DECLARATION",
+      "NO_HIGHER_PRECEDENCE_SIGNAL"
+    ]
+  },
+  "forbiddenInference": {
+    "filenameSimilarity": true,
+    "stageNumberOrdering": true,
+    "chronologyLatestWins": true,
+    "nameJoin": true,
+    "idArithmetic": true,
+    "directoryProximityMeaning": true,
+    "commitAgeMeansHistorical": true,
+    "freezeOrCompleteStatusMeansHistorical": true,
+    "informationalReferenceMeansProtection": true,
+    "protectingReferenceMeansDelete": true
+  },
+  "completionCriteria": {
+    "admittedPopulationParity": 642,
+    "classifiedPopulationParity": 642,
+    "unclassifiedCount": 0,
+    "multiplePrimaryLifecycleCount": 0,
+    "classificationBasisMissingCount": 0,
+    "unreferencedReviewWithProtectingReferenceCount": 0,
+    "semanticReopen": false,
+    "destructiveDecisionCount": 0,
+    "trackedMutationAfterValidationAllowed": false
+  },
+  "freshness": {
+    "mainAdvanceAloneInvalidatesC3": false,
+    "refreshWhen": [
+      "C1 admitted population or inventory digest changes.",
+      "C2 graph digest or protecting-reference classification changes.",
+      "Status Source APPROVED entry sourcePath, supplemental source, or successorOf relation changes.",
+      "Explicit lifecycle metadata on an admitted node changes.",
+      "C3 classification contract or precedence changes."
+    ],
+    "incrementalPolicy": "Reclassify only nodes affected by changed C2 incoming protection or changed explicit lifecycle evidence; full repository semantic rebuild is not required."
+  },
+  "nextOwner": "Evidence Lifecycle C4 Retention Freeze",
+  "nextStartPoint": "Partition C3 primaryLifecycle into PROTECTED_CURRENT, PROTECTED_RETENTION, and RETIREMENT_REVIEW and freeze inventory/reference/classification digests."
+}

@@ -1,0 +1,76 @@
+name: Soldier TrainingTech COMMON_PASSIVE Effect Extraction
+
+on:
+  pull_request:
+    paths:
+      - "data/contracts/soldier-training-tech-effect-extraction-boundary.v1.json"
+      - "data/generated/soldier-training-tech-classification-stage1-census.v1.json"
+      - "data/generated/soldier-training-tech-classification-stage5.v1.json"
+      - "data/validation/soldier-training-tech-classification-stage5.v1.json"
+      - "data/generated/soldier-training-tech-common-passive-effect-extraction.v1.json"
+      - "data/validation/soldier-training-tech-common-passive-effect-extraction.v1.json"
+      - "scripts/build-soldier-training-tech-common-passive-effect-extraction.mjs"
+      - "scripts/validate-soldier-training-tech-common-passive-effect-extraction.mjs"
+      - ".github/workflows/soldier-training-tech-common-passive-effect-extraction.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  common-passive-effect-extraction:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Recover exact frozen TrainingTechLevel source snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_COMMIT="172d836e59fbdd84bca5e44a9b2e26d8812a927f"
+          SOURCE_PATH="data/configdata/ConfigDataTrainingTechLevelInfo.json"
+          EXPECTED_BLOB="30789c3e4fb0d79b56514e720bb71a053df78c72"
+          git fetch --no-tags --depth=1 origin "$SOURCE_COMMIT"
+          git show "$SOURCE_COMMIT:$SOURCE_PATH" > "$RUNNER_TEMP/ConfigDataTrainingTechLevelInfo.json"
+          ACTUAL_BLOB="$(git hash-object "$RUNNER_TEMP/ConfigDataTrainingTechLevelInfo.json")"
+          test "$ACTUAL_BLOB" = "$EXPECTED_BLOB"
+          echo "TRAINING_TECH_LEVEL_SOURCE=$RUNNER_TEMP/ConfigDataTrainingTechLevelInfo.json" >> "$GITHUB_ENV"
+
+      - name: Reproduce extraction artifact
+        run: node scripts/build-soldier-training-tech-common-passive-effect-extraction.mjs --write
+
+      - name: Reproduce independent validation artifact
+        run: node scripts/validate-soldier-training-tech-common-passive-effect-extraction.mjs --write
+
+      - name: Upload exact reproduction outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-tech-common-passive-effect-extraction-reproduction
+          if-no-files-found: error
+          path: |
+            data/generated/soldier-training-tech-common-passive-effect-extraction.v1.json
+            data/validation/soldier-training-tech-common-passive-effect-extraction.v1.json
+
+      - name: Require tracked outputs to reproduce cleanly
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain)"
+
+      - name: Check extraction artifact
+        run: node scripts/build-soldier-training-tech-common-passive-effect-extraction.mjs --check
+
+      - name: Check independent validation artifact
+        run: node scripts/validate-soldier-training-tech-common-passive-effect-extraction.mjs --check
+
+      - name: Require validation to leave no repository mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain)"

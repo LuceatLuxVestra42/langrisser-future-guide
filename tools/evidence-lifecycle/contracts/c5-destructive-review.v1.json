@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "schemaId": "evidence-lifecycle-c5-destructive-review-contract/v1",
+  "stage": "C5 - Destructive Candidate Review",
+  "status": "DESIGN_FROZEN",
+  "completion": "COMPLETE",
+  "freezeState": "C5_DESTRUCTIVE_REVIEW_CONTRACT_FROZEN",
+  "baseline": {
+    "branch": "main",
+    "sha": "f991094d25a30e7d4ad905261cc3650987a63e0c"
+  },
+  "input": {
+    "c1InventoryPath": "tools/evidence-lifecycle/generated/c1-inventory.v1.json",
+    "c1InventoryDigest": "54ae464fb4d5cff74bebba0e49bfadbc0a7b30cc2c641b8c8a2fab69dfeebbb8",
+    "c2ReferenceGraphPath": "tools/evidence-lifecycle/generated/c2-reference-graph.v1.json",
+    "c2GraphDigest": "ac182d7396b8476a7f8591fe671a528d9b00f81ef7f4fc86987892d7da778873",
+    "c3ClassificationPath": "tools/evidence-lifecycle/generated/c3-lifecycle-classification.v1.json",
+    "c3ClassificationDigest": "b0fcd1bb8524761d250492f89177890c458aa2978af3cc16c4b008ce871eb121",
+    "c4RetentionFreezePath": "tools/evidence-lifecycle/generated/c4-retention-freeze.v1.json",
+    "c4RetentionPartitionDigest": "e42e543fc7cebbd373b3308188237018f9355318c0908af5f4e52abd713b3d4c",
+    "retirementReviewCount": 524,
+    "reviewPolicyVersion": "evidence-lifecycle-destructive-review/v1"
+  },
+  "purpose": "Review only C4 RETIREMENT_REVIEW nodes through separate logical-retirement and repository-deletion-readiness gates. C5 may approve candidates for a later owner-specific C6 handoff but never deletes files.",
+  "candidateScope": {
+    "includePartition": "RETIREMENT_REVIEW",
+    "excludePartitions": [
+      "PROTECTED_CURRENT",
+      "PROTECTED_RETENTION"
+    ],
+    "candidateCount": 524,
+    "partitionMembershipIsNotDeletionApproval": true
+  },
+  "gateA": {
+    "name": "LOGICAL_RETIREMENT_ELIGIBILITY",
+    "allOf": [
+      "protectingReferenceCount == 0",
+      "no explicit retention lifecycle/policy signal",
+      "explicit successor declaration OR explicit retirement approval"
+    ],
+    "protectingReferenceSource": "C4 records[].protectingReferenceCount",
+    "retentionSignalSource": "C3 primaryLifecycle/classificationBasis/secondaryReasons only; no filename, stage, date, or chronology inference.",
+    "explicitSuccessorBasisKind": "EXPLICIT_SUCCESSOR_DECLARATION",
+    "explicitRetirementApprovalDeclarations": [],
+    "retirementApprovalPolicy": "Only exact machine-readable declarations enumerated in this contract may qualify. The current contract enumerates none, so no approval is inferred from prose, COMPLETE/FROZEN status, age, stage number, DEPRECATED/SUPERSEDED wording, or filename.",
+    "eligibleOutcome": "LOGICAL_ELIGIBLE",
+    "ineligibleOutcome": "LOGICAL_INELIGIBLE",
+    "retirementApprovalDeclarationSchema": {
+      "required": [
+        "path",
+        "approved"
+      ],
+      "path": "exact candidate repository path",
+      "approved": "boolean true only; false/omitted does not qualify",
+      "note": "Current declarations array is empty. Adding a declaration is a C5 contract change and refresh trigger."
+    }
+  },
+  "gateB": {
+    "name": "REPOSITORY_DELETION_READINESS",
+    "evaluateOnlyWhen": "gateA == LOGICAL_ELIGIBLE",
+    "allOf": [
+      "exactly one explicit Project Check owner resolves for the candidate path",
+      "at least one catalogued validator exists for that owner",
+      "a validator id is explicitly admitted as deletion-safe and read-only by this C5 contract",
+      "totalReferenceCount == 0 so deletion leaves no current exact-path reference edge dangling",
+      "Project Check owner rule ids are non-empty",
+      "automatic validation is fail-closed and leaves tracked repository state unchanged"
+    ],
+    "ownerSource": "C1 projectCheckOwners[] and projectCheckOwnerRuleIds[]",
+    "validatorSource": "tools/project-check/contracts/validators.v1.json",
+    "deletionSafeReadOnlyValidatorIds": [],
+    "deletionSafetyPolicy": "Do not infer deletion safety from validator names, coverage prose, successful non-deletion validation, or generic routing. A validator must be explicitly admitted here after owner-specific deletion-safety evidence exists.",
+    "readyOutcome": "REPOSITORY_READY",
+    "notReadyOutcome": "REPOSITORY_NOT_READY",
+    "notEvaluatedOutcome": "NOT_EVALUATED"
+  },
+  "approvalPolicy": {
+    "deleteApprovedWhen": "gateA == LOGICAL_ELIGIBLE && gateB == REPOSITORY_READY",
+    "repositoryReadyMeansDeleteApplied": false,
+    "c5DeletesFiles": false,
+    "c5ModifiesCandidateArtifacts": false,
+    "c5MayApproveForC6": true,
+    "c6RequiresDeleteApprovedCountGreaterThanZero": true,
+    "c6MustSplitByActualDomainOwner": true,
+    "mixedOwnerDeletionBatchAllowed": false
+  },
+  "forbiddenInference": {
+    "filenameSimilarity": true,
+    "stageNumberOrdering": true,
+    "chronologyLatestWins": true,
+    "nameJoin": true,
+    "idArithmetic": true,
+    "directoryProximityMeaning": true,
+    "zeroProtectingReferenceMeansUnused": true,
+    "zeroProtectingReferenceMeansDelete": true,
+    "informationalReferenceIgnoredForDanglingRefReadiness": true,
+    "validatorNameImpliesDeletionSafety": true,
+    "successfulValidatorRunImpliesDeletionSafety": true
+  },
+  "completionCriteria": {
+    "candidatePopulationParity": 524,
+    "gateAEvaluatedCount": 524,
+    "gateBOnlyEvaluatesGateAEligible": true,
+    "hardErrorCount": 0,
+    "semanticReopen": false,
+    "candidateArtifactMutationCount": 0,
+    "deletionCount": 0,
+    "trackedMutationAfterValidationAllowed": false
+  },
+  "freshness": {
+    "mainAdvanceAloneInvalidatesC5": false,
+    "refreshWhen": [
+      "C4 retentionPartitionDigest or RETIREMENT_REVIEW membership changes.",
+      "A C3 explicit successor/retention signal changes for a C5 candidate.",
+      "An exact retirement-approval declaration is added to this C5 contract.",
+      "Project Check owner routing or validator catalog changes for a Gate A eligible candidate.",
+      "C2 exact-path reference edges change for a Gate A eligible candidate.",
+      "Deletion-safe/read-only validator admission changes."
+    ],
+    "incrementalPolicy": "Re-evaluate only affected RETIREMENT_REVIEW candidates and any owner-readiness records impacted by changed routing/validator declarations."
+  },
+  "handoff": {
+    "whenDeleteApprovedCountPositive": "C6 Cleanup Apply, split into owner-specific deletion batches.",
+    "whenDeleteApprovedCountZero": "C6_NOT_OPENED; C5 remains complete and may be incrementally refreshed when explicit successor/retirement approval or deletion-readiness evidence changes.",
+    "semanticReopen": false
+  }
+}

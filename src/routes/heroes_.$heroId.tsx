@@ -5,10 +5,8 @@ import {
   BriefcaseBusiness,
   ChevronLeft,
   ChevronRight,
-  Database,
   HeartHandshake,
   ImageOff,
-  ShieldCheck,
   Sparkles,
   Swords,
   UserRound,
@@ -89,7 +87,7 @@ function stripConfigMarkup(value: string | null) {
 }
 
 function HeroDetailPage() {
-  const { hero, stage6, detail, exclusiveEquipment, soldierCards } = Route.useLoaderData();
+  const { hero, detail, exclusiveEquipment, soldierCards } = Route.useLoaderData();
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const soldierDetailById = useMemo(
     () => new Map(getSoldierPrototypePageData().records.map((record) => [record.soldierId, record])),
@@ -150,6 +148,7 @@ function HeroDetailPage() {
     setTalentIndex((current) => Math.min(Math.max(current + delta, 0), visibleTalentProgression.length - 1));
   };
   const finalJobBranches = detail.jobs.branches.filter((branch) => branch.capstone?.rank === 4);
+  const hasBondUnlockConditions = detail.bonds.rows.some((bond) => bond.completionConditions.length > 0);
 
   return (
     <main
@@ -213,27 +212,12 @@ function HeroDetailPage() {
                 <InfoBlock title="기본 정보"><p className="font-semibold text-foreground">초기 별 {detail.base.initialStar ?? "-"}</p><p className="mt-1 text-xs text-muted-foreground">등급 코드 {detail.base.rank ?? "-"}</p></InfoBlock>
                 <InfoBlock title="성우"><p className="font-semibold text-foreground">{detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-"}</p><p className="mt-1 text-xs text-muted-foreground">{detail.presentation.cvState ?? "-"}</p></InfoBlock>
               </div>
-
-              <div className="mt-5 flex flex-wrap gap-2 text-xs">
-                <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">최종 직업 {finalJobBranches.length}</span>
-                <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">용병 {detail.soldiers.count}</span>
-                <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">스킨 {detail.presentation.skinCount}</span>
-              </div>
             </div>
           </div>
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-talent-carousel="true">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <SectionTitle icon={<Sparkles className="h-4 w-4" aria-hidden="true" />} title="재능" />
-              <p className="mt-2 text-sm text-muted-foreground">초기 성급 미만은 숨기고, 6성부터 좌우로 낮은 성급을 확인해.</p>
-            </div>
-            <div className="flex flex-wrap gap-2 text-xs">
-              {detail.talent.status ? <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">{detail.talent.status}</span> : null}
-              {detail.talent.initialStar != null ? <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">초기 {detail.talent.initialStar}성</span> : null}
-            </div>
-          </div>
+          <SectionTitle icon={<Sparkles className="h-4 w-4" aria-hidden="true" />} title="재능" />
           {activeTalentRow ? (
             <div
               className="mt-4"
@@ -294,13 +278,9 @@ function HeroDetailPage() {
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle icon={<Swords className="h-4 w-4" aria-hidden="true" />} title="스킬" />
-          <p className="mt-2 text-sm text-muted-foreground">Stage 6의 기본 보유 스킬과 전직 습득 스킬을 합치지 않고 source group 그대로 표시해.</p>
 
           <div className="mt-5">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-bold text-foreground">기본 보유 스킬</h3>
-              <span className="text-xs font-semibold text-muted-foreground">{detail.skills.heroDirectSkills.length}개</span>
-            </div>
+            <h3 className="text-sm font-bold text-foreground">기본 보유 스킬</h3>
             {detail.skills.heroDirectSkills.length > 0 ? (
               <div className="mt-3 grid gap-3 lg:grid-cols-2">
                 {detail.skills.heroDirectSkills.map((skill) => <SkillCard key={`direct-${skill.skillId}`} heroId={hero.heroId} skill={skill} sourceLabel="Hero 직접 보유" />)}
@@ -311,10 +291,7 @@ function HeroDetailPage() {
           </div>
 
           <div className="mt-7 border-t border-border pt-5">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-bold text-foreground">전직 습득 스킬</h3>
-              <span className="text-xs font-semibold text-muted-foreground">{detail.skills.jobLevelAcquisitions.length}개</span>
-            </div>
+            <h3 className="text-sm font-bold text-foreground">전직 습득 스킬</h3>
             {detail.skills.jobLevelAcquisitions.length > 0 ? (
               <div className="mt-3 grid gap-3 lg:grid-cols-2">
                 {detail.skills.jobLevelAcquisitions.map((row) => (
@@ -328,13 +305,7 @@ function HeroDetailPage() {
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <SectionTitle icon={<BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />} title="최종 직업 스탯" />
-              <p className="mt-2 text-sm text-muted-foreground">3단계까지 완성되는 최종 직업만 표시해. 2단계에서 끝나는 가지는 제외해.</p>
-            </div>
-            <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">최종 직업 {finalJobBranches.length}</span>
-          </div>
+          <SectionTitle icon={<BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />} title="최종 직업 스탯" />
           {finalJobBranches.length > 0 ? (
             <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true">
               <table className="w-full min-w-[680px] border-collapse text-sm">
@@ -381,77 +352,34 @@ function HeroDetailPage() {
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <SectionTitle icon={<HeartHandshake className="h-4 w-4" aria-hidden="true" />} title="유대" />
-              <p className="mt-2 text-sm text-muted-foreground">Stage 6 frozen 유대 행과 이미 해석된 해금 조건만 표시해.</p>
-            </div>
-            <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">{detail.bonds.count}개</span>
-          </div>
-          {detail.bonds.rows.length > 0 ? (
-            <div className="mt-5 grid gap-3 lg:grid-cols-2">
-              {detail.bonds.rows.map((bond) => (
-                <article key={`${bond.order}-${bond.fetterId ?? "x"}`} className="rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div><p className="text-[11px] font-bold text-muted-foreground">유대 {bond.order + 1}</p><h3 className="mt-1 font-bold text-foreground">{bond.nameCn ?? `Fetter ${bond.fetterId ?? "?"}`}</h3></div>
-                    <div className="flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
-                      {bond.maxLevel != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">최대 Lv.{bond.maxLevel}</span> : null}
-                      {bond.fetterId != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">#{bond.fetterId}</span> : null}
-                    </div>
+          <SectionTitle icon={<HeartHandshake className="h-4 w-4" aria-hidden="true" />} title="유대" />
+          {hasBondUnlockConditions ? (
+            <div className="mt-5 grid gap-2 lg:grid-cols-2">
+              {detail.bonds.rows.flatMap((bond) =>
+                bond.completionConditions.map((condition, conditionIndex) => (
+                  <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="rounded-lg border border-border bg-muted/20 px-3 py-3">
+                    <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
                   </div>
-                  <div className="mt-4 space-y-2">
-                    {bond.completionConditions.map((condition, conditionIndex) => (
-                      <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="rounded-lg border border-border bg-background px-3 py-3">
-                        <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
-                        {condition.semanticStatus ? <p className="mt-1 text-[10px] font-semibold text-muted-foreground">{condition.semanticStatus}</p> : null}
-                      </div>
-                    ))}
-                    {bond.completionConditions.length === 0 ? <p className="text-sm text-muted-foreground">표시 가능한 해금 조건 없음</p> : null}
-                  </div>
-                </article>
-              ))}
+                )),
+              )}
             </div>
-          ) : <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 정보가 없어.</p>}
+          ) : (
+            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 해금 조건 없음</p>
+          )}
         </section>
         <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
         <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
 
-        <section className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-soldier-cards="true">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <SectionTitle icon={<UsersRound className="h-4 w-4" aria-hidden="true" />} title="사용 가능 용병" />
-                <p className="mt-2 text-sm text-muted-foreground">A단계 확정 관계의 Soldier ID를 기존 224종 frontend consumer와 ID lookup으로 연결해. 관계를 다시 계산하지 않아.</p>
-              </div>
-              <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">{soldierCards.length}종</span>
-            </div>
-            <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
-              {soldierCards.map((record) => (
-                <HeroSoldierCard
-                  key={record.soldierId}
-                  record={record}
-                  onOpen={setSelectedSoldierId}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-            <SectionTitle icon={<ShieldCheck className="h-4 w-4" aria-hidden="true" />} title="확정 시스템 연결" />
-            <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-              <StatusChip label="유대" value={`${detail.systems.bondRowCount}개`} active={detail.systems.bondRowCount > 0} />
-              <StatusChip label="전용장비" value={exclusiveEquipment.status} active={exclusiveEquipment.released} />
-              <StatusChip label="중앙율정" value={detail.systems.centralDisciplineStatus ?? "-"} active={detail.systems.centralDisciplineReleased} />
-              <StatusChip label="SP" value={detail.systems.spStatus ?? "-"} active={detail.systems.spReleased} />
-              <StatusChip label="스킨" value={`${detail.presentation.skinCount}개`} active={detail.presentation.skinCount > 0} />
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <SectionTitle icon={<Database className="h-4 w-4" aria-hidden="true" />} title="상세 데이터 상태" />
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">Hero 본문은 FINAL_FROZEN Stage 6 개별 shard 하나만 읽고, 전용장비는 별도 frozen B-5 byHero 소유권과 Equipment Stage 3-5 메타데이터를 조합해. 용병 카드는 Stage 6의 확정 Soldier ID를 기존 frozen Soldier frontend consumer에 ID lookup만 하고, 원본 ConfigData 관계 재계산이나 이름·ID 추론은 하지 않아.</p>
-          <div className="mt-4 flex flex-wrap gap-2 text-xs">
-            <span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">Stage 6 · {stage6.admissionStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">구조 {detail.validation.structuralStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">게시 {detail.validation.publicationStatus ?? "-"}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">review {detail.validation.reviewCount}</span>
+        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-soldier-cards="true">
+          <SectionTitle icon={<UsersRound className="h-4 w-4" aria-hidden="true" />} title="사용 가능 용병" />
+          <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
+            {soldierCards.map((record) => (
+              <HeroSoldierCard
+                key={record.soldierId}
+                record={record}
+                onOpen={setSelectedSoldierId}
+              />
+            ))}
           </div>
         </section>
       </div>
@@ -561,8 +489,8 @@ function HeroSkillIcon({ heroId, skill }: { heroId: number; skill: SkillView }) 
   return <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-background p-1.5 shadow-sm"><img src={iconUrl} alt="" aria-hidden="true" className="h-full w-full object-contain" /></div>;
 }
 
-function SkillCard({ heroId, skill, sourceLabel }: { heroId: number; skill: SkillView; sourceLabel: string }) {
-  return <article className="rounded-xl border border-border bg-muted/20 p-4"><div className="flex items-start gap-3"><HeroSkillIcon heroId={heroId} skill={skill} /><div className="min-w-0 flex-1"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-[11px] font-bold text-muted-foreground">{sourceLabel}</p><h4 className="mt-1 font-bold text-foreground">{skill.nameCn ?? `Skill ${skill.skillId}`}</h4></div><span className="rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{skill.skillId}</span></div><div className="mt-3 flex flex-wrap gap-1.5 text-[11px]">{skill.displayType ? <span className="rounded-md border border-border bg-background px-2 py-1 font-semibold text-foreground">{skill.displayType}</span> : null}{skill.cooldown ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">쿨 {skill.cooldown}</span> : null}{skill.range ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">사거리 {skill.range}</span> : null}{skill.areaOrTarget ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">대상 {skill.areaOrTarget}</span> : null}</div><p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.desc)}</p></div></div></article>;
+function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView; sourceLabel: string }) {
+  return <article className="rounded-xl border border-border bg-muted/20 p-4"><div className="flex items-start gap-3"><HeroSkillIcon heroId={heroId} skill={skill} /><div className="min-w-0 flex-1"><h4 className="font-bold text-foreground">{skill.nameCn ?? `Skill ${skill.skillId}`}</h4><p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.desc)}</p></div></div></article>;
 }
 
 function formatBondCondition(condition: { requiredHero: { heroId: number | null; nameKr: string | null; nameCn: string | null; nameEn: string | null } | null; mission: { missionId: number | null; title: string | null; desc: string | null; missionType: number | null } | null; stage: { stageId: number | null; nameCn: string | null } | null; favorability: { targetHeroId: number | null; targetHeroNameKr: string | null; targetHeroNameCn: string | null; targetHeroNameEn: string | null; requiredLevel: number | null } | null }) {
@@ -584,5 +512,4 @@ function formatBondCondition(condition: { requiredHero: { heroId: number | null;
 function SectionTitle({ icon, title }: { icon: ReactNode; title: string }) { return <div className="flex items-center gap-2">{icon}<h2 className="font-bold text-foreground">{title}</h2></div>; }
 function InfoBlock({ title, children }: { title: string; children: ReactNode }) { return <div className="rounded-xl border border-border bg-muted/30 p-4"><p className="mb-2 text-xs font-bold text-muted-foreground">{title}</p>{children}</div>; }
 function JobStatCell({ value }: { value: number | null }) { return <td className="px-4 py-3 text-right font-bold tabular-nums text-foreground">{value ?? "-"}</td>; }
-function StatusChip({ label, value, active }: { label: string; value: string; active: boolean }) { return <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2"><span className="font-semibold text-foreground">{label}</span><span className="text-muted-foreground">{active ? value : value}</span></div>; }
 function HeroNotFound() { return <main className="min-h-screen bg-background"><div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-4 text-center"><Swords className="mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="text-2xl font-bold text-foreground">영웅을 찾을 수 없어.</h1><p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 Hero 목록에 존재하지 않는 주소야.</p><Link reloadDocument to="/heroes" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground underline underline-offset-4"><ArrowLeft className="h-4 w-4" aria-hidden="true" />영웅 목록으로</Link></div></main>; }

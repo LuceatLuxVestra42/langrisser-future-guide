@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-tech-classification-stage5-validation/v1",
+  "stage": "TrainingTech Classification Stage 5 - Full Record Classification",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "TRAINING_TECH_CLASSIFICATION_STAGE5_FULL_CLASSIFICATION_FROZEN",
+  "validationMode": "INDEPENDENT_READ_ONLY_FROZEN_PREDECESSOR_RECORD_RECOMPUTATION",
+  "classification": [
+    "data/generated/soldier-training-tech-classification-stage5.v1.json",
+    "5c938be1dcfeb9e33e2503f73b926a6dcf7cb415"
+  ],
+  "predecessorBlobs": {
+    "stage1Census": "182e87f68af45a755b48a8d36a0415088ded9f3d",
+    "stage2Validation": "00da7db05cc5343f48a400961d5f42a7f840d763",
+    "stage3Candidates": "30d24bd673044b58f8f0711bb4e121078618d5c2",
+    "stage3Semantic": "a4934788df2a807c9336f27401f004439fa8ae58",
+    "stage3Validation": "61726f1110894b110f8db3ec71972ca1fa814bbd",
+    "stage4Contract": "33ba951fe0b3ed29fd20d92ba7ee583b16dda9cd",
+    "stage4Validation": "f67695ce2db28e47316009bf7bfeee61b1ed51e9",
+    "frozenTrainingConsumer": "b4ab27f673318f9d44642d3fc674ccfa682937f6"
+  },
+  "checks": {
+    "stage4Frozen": true,
+    "stage4ValidationPass": true,
+    "predecessorStatus": true,
+    "predecessorBlobs": true,
+    "protectedGrowthPopulation": true,
+    "candidatePartition": true,
+    "fullFrozenPartition": true,
+    "artifactFrozen": true,
+    "artifactSchema": true,
+    "artifactPredecessors": true,
+    "policyBoundary": true,
+    "classCatalog": true,
+    "classificationByLabel": true,
+    "recordCoverageExactlyOnce": true,
+    "ruleOverlapZero": true,
+    "fallbackZero": true,
+    "protectedGrowthNeverRelabeled": true,
+    "evidenceCatalogSize": true,
+    "protectedEvidence": true,
+    "groupEvidenceCatalog": true,
+    "recordEvidenceProvenance": true,
+    "prerequisiteFacetParity": true,
+    "soldierUnlockFacetBoundary": true,
+    "labelCounts": true,
+    "coverageSummary": true
+  },
+  "coverage": {
+    "trainingTech": 287,
+    "uniqueTechIds": 287,
+    "labelCounts": {
+      "SOLDIER_GROWTH": 129,
+      "COMMON_STAT": 84,
+      "COMMON_PASSIVE": 46,
+      "SOLDIER_SPECIFIC_PROGRESSION": 28,
+      "REVIEW_UNCLASSIFIED": 0
+    },
+    "classificationMismatchCount": 0,
+    "prerequisiteFacetMismatchCount": 0,
+    "unlockFacetMismatchCount": 0,
+    "evidenceRefMismatchCount": 0,
+    "groupEvidenceMismatchCount": 0,
+    "ruleOverlapCount": 0,
+    "reviewUnclassifiedCount": 0,
+    "protectedGrowthRelabelCount": 0
+  },
+  "reviews": [],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "nextOwner": "UNASSIGNED_AFTER_STAGE5",
+  "nextStartPoint": "Choose one downstream owner from the Stage 4 non-scope and reuse this frozen classification without reclassifying from names or descriptions.",
+  "reopenConditions": [
+    "Stage 1 census, Stage 2 evidence contract, Stage 3 evidence, or their frozen blob identities change.",
+    "TrainingTech or TrainingTechLevel source snapshot changes.",
+    "The protected 129 Soldier growth set or Stage 5-4 frozen training consumer changes.",
+    "A new authoritative contradiction invalidates the admitted TechType 1/3 family mappings or the 28 Soldier-specific progression treatment.",
+    "Project Check ownership/orchestration contract changes for these paths.",
+    "Hard owning-validator failure."
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "schemaId": "evidence-lifecycle-c4-retention-freeze-contract/v1",
+  "stage": "C4 - Retention / Current Admission Freeze",
+  "status": "DESIGN_FROZEN",
+  "completion": "COMPLETE",
+  "freezeState": "C4_RETENTION_CONTRACT_FROZEN",
+  "baseline": {
+    "branch": "main",
+    "sha": "f991094d25a30e7d4ad905261cc3650987a63e0c"
+  },
+  "input": {
+    "c1InventoryPath": "tools/evidence-lifecycle/generated/c1-inventory.v1.json",
+    "c1InventoryDigest": "54ae464fb4d5cff74bebba0e49bfadbc0a7b30cc2c641b8c8a2fab69dfeebbb8",
+    "c2ReferenceGraphPath": "tools/evidence-lifecycle/generated/c2-reference-graph.v1.json",
+    "c2GraphDigest": "ac182d7396b8476a7f8591fe671a528d9b00f81ef7f4fc86987892d7da778873",
+    "c3ClassificationPath": "tools/evidence-lifecycle/generated/c3-lifecycle-classification.v1.json",
+    "c3ClassificationDigest": "b0fcd1bb8524761d250492f89177890c458aa2978af3cc16c4b008ce871eb121",
+    "admittedNodeCount": 642,
+    "retentionPolicyVersion": "evidence-lifecycle-retention-partition/v1"
+  },
+  "purpose": "Freeze a complete, non-overlapping retention partition over the C3 lifecycle population without changing C3 semantic classification or making destructive eligibility decisions.",
+  "partitions": {
+    "PROTECTED_CURRENT": [
+      "ACTIVE_AUTHORITY",
+      "ACTIVE_OPERATIONAL"
+    ],
+    "PROTECTED_RETENTION": [
+      "RETENTION_PREDECESSOR",
+      "RETENTION_PROVENANCE",
+      "RETENTION_HISTORICAL"
+    ],
+    "RETIREMENT_REVIEW": [
+      "EXPLICITLY_SUPERSEDED",
+      "UNREFERENCED_REVIEW"
+    ]
+  },
+  "partitionPolicy": {
+    "exactlyOnePartitionPerNode": true,
+    "primaryLifecycleOnly": true,
+    "secondaryReasonsDoNotChangePartition": true,
+    "protectingReferenceCountDoesNotDirectlyChoosePartition": true,
+    "retirementReviewMeansUnused": false,
+    "retirementReviewMeansDelete": false,
+    "unreferencedReviewMeansDelete": false,
+    "c4DoesNotReclassifyLifecycle": true,
+    "c4DoesNotDecideDeletionEligibility": true
+  },
+  "freezeBundle": {
+    "required": [
+      "baselineSha",
+      "inventoryDigest",
+      "referenceGraphDigest",
+      "classificationDigest",
+      "retentionPolicyVersion",
+      "retentionPartitionDigest"
+    ],
+    "digestAlgorithm": "sha256"
+  },
+  "completionCriteria": {
+    "admittedPopulationParity": 642,
+    "partitionedPopulationParity": 642,
+    "overlapCount": 0,
+    "unpartitionedCount": 0,
+    "hardErrorCount": 0,
+    "semanticReopen": false,
+    "destructiveDecisionCount": 0,
+    "trackedMutationAfterValidationAllowed": false
+  },
+  "foundation": {
+    "completeWhenC4Passes": true,
+    "completionState": "C_FOUNDATION_COMPLETE",
+    "meaning": "C0 scope, C1 inventory, C2 typed references, C3 lifecycle classification, and C4 retention partition are frozen."
+  },
+  "freshness": {
+    "mainAdvanceAloneInvalidatesC4": false,
+    "refreshWhen": [
+      "C1 inventory digest or admitted population changes.",
+      "C2 reference graph digest changes in a way that changes C3 classification input.",
+      "C3 classification digest or primaryLifecycle changes.",
+      "Retention partition policy or retentionPolicyVersion changes."
+    ],
+    "incrementalPolicy": "Refresh only C3-changed nodes and their C4 partition membership; full repository semantic recomputation is not required."
+  },
+  "reopenConditions": [
+    "Any frozen C1/C2/C3 input digest is no longer authoritative for the chosen C baseline.",
+    "A C3 node is unpartitioned or belongs to multiple C4 partitions.",
+    "The partition policy changes."
+  ],
+  "nextOwner": "Evidence Lifecycle C5 Destructive Candidate Review",
+  "nextStartPoint": "Review only RETIREMENT_REVIEW nodes through separate logical-retirement and repository-deletion-readiness gates."
+}

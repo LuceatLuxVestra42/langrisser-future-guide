@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-tech-effect-extraction-boundary/v1",
+  "stage": "TrainingTech Post-Classification - Effect Extraction Boundary",
+  "status": "DESIGN_FROZEN",
+  "completion": "COMPLETE",
+  "freezeState": "TRAINING_TECH_EFFECT_EXTRACTION_BOUNDARY_FROZEN",
+  "purpose": "Freeze the handoff from completed Stage 5 whole-Tech classification to later effect extraction without extracting, parsing, or materializing any effect values in this stage.",
+  "authoritativePredecessor": {
+    "classification": {
+      "path": "data/generated/soldier-training-tech-classification-stage5.v1.json",
+      "gitBlobSha": "5c938be1dcfeb9e33e2503f73b926a6dcf7cb415",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "COMPLETE",
+      "requiredFreezeState": "TRAINING_TECH_CLASSIFICATION_STAGE5_FULL_CLASSIFICATION_FROZEN"
+    },
+    "validation": {
+      "path": "data/validation/soldier-training-tech-classification-stage5.v1.json",
+      "gitBlobSha": "d28bbe0f7261bd40d69b47859302954225c60b9f",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "COMPLETE",
+      "requiredFreezeState": "TRAINING_TECH_CLASSIFICATION_STAGE5_FULL_CLASSIFICATION_FROZEN"
+    }
+  },
+  "scope": {
+    "owns": [
+      "post-classification extraction target boundary",
+      "separation of COMMON_STAT and COMMON_PASSIVE extraction owners",
+      "immutable exclusion of SOLDIER_GROWTH and SOLDIER_SPECIFIC_PROGRESSION from common-effect extraction",
+      "pre-extraction authority and forbidden-inference contract"
+    ],
+    "doesNotOwn": [
+      "common-stat numeric or textual effect extraction",
+      "common-passive numeric, textual, conditional, or runtime effect extraction",
+      "TrainingTechLevel effect materialization",
+      "effect normalization or aggregation",
+      "Korean localization",
+      "UI grouping/order",
+      "frontend consumption",
+      "Soldier canonical population or identity",
+      "Hero-Soldier relation",
+      "SP-NORMAL relation",
+      "SOLDIER_GROWTH progression data",
+      "SOLDIER_SPECIFIC_PROGRESSION data"
+    ],
+    "effectExtractionPerformed": false
+  },
+  "frozenPopulationBoundary": {
+    "allTrainingTech": 287,
+    "extractionTargets": {
+      "total": 130,
+      "COMMON_STAT": 84,
+      "COMMON_PASSIVE": 46
+    },
+    "excludedFromThisExtractionFamily": {
+      "total": 157,
+      "SOLDIER_GROWTH": 129,
+      "SOLDIER_SPECIFIC_PROGRESSION": 28
+    },
+    "REVIEW_UNCLASSIFIED": 0,
+    "overlapAllowed": false
+  },
+  "ownerSplit": [
+    {
+      "owner": "TrainingTech COMMON_STAT Effect Extraction",
+      "inputLabel": "COMMON_STAT",
+      "requiredPopulation": 84,
+      "mayStartOnlyAfter": "this boundary contract and its independent validator are PASS/COMPLETE",
+      "classificationMutationAllowed": false
+    },
+    {
+      "owner": "TrainingTech COMMON_PASSIVE Effect Extraction",
+      "inputLabel": "COMMON_PASSIVE",
+      "requiredPopulation": 46,
+      "mayStartOnlyAfter": "this boundary contract and its independent validator are PASS/COMPLETE",
+      "classificationMutationAllowed": false
+    }
+  ],
+  "futureExtractionEvidencePolicy": {
+    "locatorAuthority": "Use only Stage 5 frozen Tech IDs and their explicit TrainingTechInfo.TechLevelupInfoList references to locate source records.",
+    "sourceSnapshotIdentity": {
+      "trainingTechGitBlobSha": "ad8b290f0e34de24b6eab9538894068a06e086d4",
+      "trainingTechLevelGitBlobSha": "30789c3e4fb0d79b56514e720bb71a053df78c72"
+    },
+    "allowedWhenExtractionActuallyStarts": [
+      "exact Stage 5 Tech ID membership",
+      "explicit TrainingTechInfo fields",
+      "explicit TechLevelupInfoList level IDs",
+      "explicit TrainingTechLevelInfo fields for those referenced level IDs",
+      "runtime or external evidence only when a semantic meaning is not directly established by the explicit source fields"
+    ],
+    "forbidden": [
+      "reclassifying Techs from Name or Description",
+      "name JOIN",
+      "ID arithmetic or range inference",
+      "filename/resource-path classification",
+      "screen-order mapping",
+      "missing-value imputation",
+      "historical-output silent fallback",
+      "using prerequisite or Soldier unlock presence as a whole-Tech category",
+      "mutating Stage 5 label membership during effect extraction"
+    ]
+  },
+  "validationGates": {
+    "stage5ClassificationBlobExact": true,
+    "stage5ValidationBlobExact": true,
+    "stage5FrozenPass": true,
+    "allTrainingTech": 287,
+    "targetCommonStat": 84,
+    "targetCommonPassive": 46,
+    "targetTotal": 130,
+    "excludedSoldierGrowth": 129,
+    "excludedSoldierSpecificProgression": 28,
+    "excludedTotal": 157,
+    "targetAndExcludedDisjoint": true,
+    "reviewUnclassified": 0,
+    "populationPartition": 287,
+    "effectExtractionPerformed": false,
+    "trackedMutationAfterValidationAllowed": false
+  },
+  "nextOwner": "TrainingTech COMMON_STAT Effect Extraction",
+  "nextStartPoint": "Start from the frozen 84 COMMON_STAT Tech IDs only. Resolve their explicit TechLevelupInfoList references and design the effect extraction output/semantics there. Do not reclassify any Tech and do not touch the 46 COMMON_PASSIVE records until their separate owner starts.",
+  "parallelOwner": "TrainingTech COMMON_PASSIVE Effect Extraction",
+  "reopenConditions": [
+    "Stage 5 classification or validation frozen blob identity changes.",
+    "Stage 5 status/completion/freeze state changes.",
+    "Stage 5 population or label counts no longer equal 287 = 129 + 84 + 46 + 28 with REVIEW_UNCLASSIFIED 0.",
+    "TrainingTech or TrainingTechLevel source snapshot identity changes before extraction begins.",
+    "A new authoritative contradiction invalidates the Stage 5 classification boundary.",
+    "Project Check ownership/orchestration contract changes for these paths.",
+    "Hard owning-validator failure."
+  ]
+}
