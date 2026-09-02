@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-metadata-stage11-a3-site-admission-refresh/v1",
+  "stage": "11-A3",
+  "status": "PASS",
+  "completion": "STAGE6_DOWNSTREAM_RELEASE_REFRESH_COMPLETE",
+  "owner": "soldier-site-admission-refresh",
+  "scope": "REFRESH_ONLY_RELEASE_AFFECTED_STAGE6_DOWNSTREAM_AFTER_STAGE11_A2",
+  "predecessors": {
+    "stage11A2": "data/validation/soldier-release-metadata-stage11-a2-promotion.v1.json",
+    "stage6Baseline": "data/validation/soldier-stage6-0-checkpoint.v1.json",
+    "stage5ReleaseValidation": "data/validation/soldier-stage5-8-release.v1.json"
+  },
+  "expected": {
+    "canonicalSoldiers": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "heroSoldierRelations": 5977,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Unresolved": 78,
+    "spReleaseReview": 56,
+    "lowerTierReleaseBoundary": 39,
+    "samePatchOrder": "UNRESOLVED"
+  },
+  "refreshChain": [
+    "data/validation/soldier-stage6-0-checkpoint.v1.json",
+    "data/generated/soldier-stage6-1-full-records.v1.json",
+    "data/validation/soldier-stage6-1-full-records.v1.json",
+    "data/generated/soldier-stage6-2-classification.v1.json",
+    "data/validation/soldier-stage6-2-classification.v1.json",
+    "data/validation/soldier-stage6-3-representative-qa.v1.json",
+    "data/validation/soldier-stage6-4-filter-qa.v1.json",
+    "data/generated/hero-soldier-page-links-stage6-5.v1.json",
+    "data/validation/soldier-stage6-5-reciprocal-links.v1.json",
+    "data/generated/soldier-stage6-6-expansion-basis.v1.json",
+    "data/validation/soldier-stage6-6-expansion-basis.v1.json",
+    "data/generated/soldier-stage6-7-site-admission.v1.json",
+    "data/validation/soldier-stage6-7-site-admission.v1.json"
+  ],
+  "boundaries": {
+    "canonicalPopulationRecomputed": false,
+    "heroSoldierRelationRecomputed": false,
+    "stage5ReleaseEvidenceReinterpreted": false,
+    "rawConfigDataReleaseInference": false,
+    "samePatchOrderClaimed": false,
+    "spChronologyAdded": false,
+    "lowerTierChronologyAdded": false,
+    "frontendChanged": false,
+    "statusSourceDeclarationChanged": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "RELEASE_DATE_UNRESOLVED",
+      "count": 173,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "NORMAL_TIER3_RELEASE_DATE_UNRESOLVED",
+      "count": 78,
+      "classification": "REVIEW"
+    },
+    {
+      "code": "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED",
+      "count": 56,
+      "classification": "REVIEW"
+    }
+  ],
+  "nextOwner": "soldier-release-metadata-evidence-acquisition",
+  "nextStartPoint": [
+    "Continue explicit release-evidence acquisition for the remaining 78 unresolved normal tier-3 Soldiers.",
+    "Keep the 56 SP internal-order requirement separate under Stage 11-B.",
+    "Keep the 39 lower-tier records at the release-order-not-required boundary unless product requirements change."
+  ],
+  "reopenConditions": [
+    "Stage 11-A2 promotion coverage no longer validates as 224 = 51 confirmed + 173 unresolved.",
+    "The refreshed Stage 6 chain no longer reports RELEASE_DATE_UNRESOLVED=173.",
+    "Canonical Soldier population or Hero-Soldier relation parity changes.",
+    "An owning Stage 6 validator reports a new blocking regression."
+  ]
+}
