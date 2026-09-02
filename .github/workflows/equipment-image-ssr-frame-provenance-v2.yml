@@ -7,6 +7,7 @@ on:
     paths:
       - scripts/equipment-image-ssr-frame-provenance-v2.py
       - scripts/equipment-image-ssr-frame-asset-provenance.py
+      - scripts/equipment-image-ssr-frame-asset-resolution.py
       - .github/workflows/equipment-image-ssr-frame-provenance-v2.yml
   workflow_dispatch:
 
@@ -47,6 +48,7 @@ jobs:
         run: |
           python -m py_compile scripts/equipment-image-ssr-frame-provenance-v2.py
           python -m py_compile scripts/equipment-image-ssr-frame-asset-provenance.py
+          python -m py_compile scripts/equipment-image-ssr-frame-asset-resolution.py
 
       - name: Extract exact official APK IL2CPP pair
         run: python scripts/equipment-image-ssr-frame-provenance-v2.py extract
@@ -115,28 +117,35 @@ jobs:
           }, ensure_ascii=False, indent=2))
           PY
 
-      - name: Resolve explicit Equipment Rank 4 population and exact frame asset
+      - name: Probe Equipment Rank 4 population and frame bundle
         run: |
+          set +e
           python scripts/equipment-image-ssr-frame-asset-provenance.py
+          PROBE_EXIT=$?
+          set -e
+          if [ "$PROBE_EXIT" -ne 0 ] && [ "$PROBE_EXIT" -ne 3 ]; then
+            echo "Unexpected asset probe failure: $PROBE_EXIT" >&2
+            exit "$PROBE_EXIT"
+          fi
+          test -s artifacts/equipment-ssr-frame-asset-provenance.v1.json
+
+      - name: Resolve exact serialized SSR frame binding
+        run: |
+          python scripts/equipment-image-ssr-frame-asset-resolution.py
           python - <<'PY'
           import json
           from pathlib import Path
-          p = Path('artifacts/equipment-ssr-frame-asset-provenance.v1.json')
+          p = Path('artifacts/equipment-ssr-frame-asset-resolution.v2.json')
           d = json.loads(p.read_text())
-          assert d['status'] == 'PASS_EXACT_SSR_FRAME_ASSET_PROVENANCE', d
-          assert d['target']['rank'] == 4, d
-          assert d['target']['sourcePath'] == 'UI/Common_New_ABS/Border_Icon_Colour.png', d
-          assert d['configDataProof']['publicPopulation'] == 373, d
-          assert d['configDataProof']['rank4PublicCount'] > 0, d
-          assert d['resolution']['decodedExactObjectCount'] > 0, d
-          print(json.dumps({
-              'status': d['status'],
-              'target': d['target'],
-              'publicRankCounts': d['configDataProof']['publicRankCounts'],
-              'rank4PublicCount': d['configDataProof']['rank4PublicCount'],
-              'rank5PublicCount': d['configDataProof']['rank5PublicCount'],
-              'resolution': d['resolution'],
-          }, ensure_ascii=False, indent=2))
+          assert d['status'] == 'PASS_EQUIPMENT_SSR_FRAME_EXACT_ASSET', d
+          assert d['semanticConclusion']['currentPublicEquipmentPopulation'] == 373, d
+          assert d['semanticConclusion']['currentPublicEquipmentRankDistribution'] == {'4': 373}, d
+          assert d['semanticConclusion']['rank4PresentationMeaning'] == 'SSR', d
+          assert d['semanticConclusion']['rank4RuntimeFramePath'] == 'UI/Common_New_ABS/Border_Icon_Colour.png', d
+          assert d['selectedBinding']['type'] == 'Sprite', d
+          assert d['selectedBinding']['name'] == 'Border_Icon_Colour', d
+          assert d['selectedBinding']['serializedContainerKey'] == 'assets/gameproject/runtimeassets/ui/common_new_abs/border_icon_colour.png', d
+          print(json.dumps(d, ensure_ascii=False, indent=2))
           PY
 
       - name: Setup Bun for current owner validators
@@ -263,6 +272,7 @@ jobs:
             artifacts/equipment-ssr-frame-apk-inputs.v2.json
             artifacts/equipment-ssr-frame-provenance-v2.json
             artifacts/equipment-ssr-frame-asset-provenance.v1.json
+            artifacts/equipment-ssr-frame-asset-resolution.v2.json
             artifacts/equipment-ssr-frame-previews/*.png
             artifacts/equipment-ssr-frame-project-check-plan.v1.json
             artifacts/equipment-ssr-frame-validator-classification.v1.json
