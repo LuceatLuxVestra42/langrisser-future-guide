@@ -5,33 +5,46 @@ on:
     branches:
       - evidence-lifecycle-c2
     paths:
+      - 'tools/evidence-lifecycle/bootstrap/c2-refine-workflow-admission.mjs'
       - '.github/workflows/evidence-lifecycle-c2-bootstrap.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  inspect-protecting-sources:
+  refine-and-regenerate-c2:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Inspect protecting edge sources
+        with:
+          fetch-depth: 0
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Refine validator fixture and semantic locators
+        run: node tools/evidence-lifecycle/bootstrap/c2-refine-workflow-admission.mjs
+      - name: Generate C2 graph
+        run: node tools/evidence-lifecycle/cli/c2-reference-graph.mjs --write
+      - name: Inspect final C2 summary
         run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           const graph = JSON.parse(fs.readFileSync('tools/evidence-lifecycle/generated/c2-reference-graph.v1.json', 'utf8'));
-          const protecting = graph.edges.filter(edge => edge.retentionClass === 'PROTECTING');
-          const grouped = {};
-          for (const edge of protecting) {
-            grouped[edge.edgeType] ??= {};
-            grouped[edge.edgeType][edge.fromPath] ??= [];
-            grouped[edge.edgeType][edge.fromPath].push({ toPath: edge.toPath, locator: edge.sourceFieldOrLocator });
-          }
-          for (const sources of Object.values(grouped)) {
-            for (const [source, edges] of Object.entries(sources)) {
-              sources[source] = edges.sort((a, b) => a.toPath.localeCompare(b.toPath) || a.locator.localeCompare(b.locator));
-            }
-          }
-          console.log(JSON.stringify(grouped, null, 2));
+          const manifestEdges = graph.edges.filter(edge => edge.edgeType === 'MANIFEST_REF');
+          const fixtureEdges = graph.edges.filter(edge => edge.edgeType === 'VALIDATOR_ROUTING_FIXTURE');
+          console.log(JSON.stringify({ summary: graph.summary, manifestEdges, validatorRoutingFixtureCount: fixtureEdges.length }, null, 2));
           NODE
+      - name: Commit refined C2 files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/evidence-lifecycle/cli/c2-reference-graph.mjs tools/evidence-lifecycle/contracts/c2-reference-graph.v1.json tools/evidence-lifecycle/generated/c2-reference-graph.v1.json
+          if git diff --cached --quiet; then
+            echo 'C2 files already current.'
+            exit 0
+          fi
+          git commit -m 'Refine C2 protecting reference classification'
+          git push
