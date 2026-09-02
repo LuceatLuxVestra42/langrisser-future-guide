@@ -15,7 +15,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,18 +27,214 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Setup .NET 6 for Il2CppDumper
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
       - name: Compile probe
         run: python -m py_compile scripts/equipment-image-ssr-frame-provenance-probe.py
 
-      - name: Probe official APK index and IL2CPP locators
+      - name: Probe official APK and extract exact IL2CPP pair
         env:
           OUTPUT_PATH: artifacts/equipment-ssr-frame-apk-probe.json
+          EXTRACT_INPUT_DIR: artifacts/il2cpp-inputs
         run: python scripts/equipment-image-ssr-frame-provenance-probe.py
 
-      - name: Upload probe report
+      - name: Download Il2CppDumper v6.7.46
+        run: |
+          mkdir -p /tmp/il2cppdumper
+          curl --fail --location --retry 3 \
+            https://github.com/Perfare/Il2CppDumper/releases/download/v6.7.46/Il2CppDumper-net6-v6.7.46.zip \
+            -o /tmp/Il2CppDumper.zip
+          unzip -q /tmp/Il2CppDumper.zip -d /tmp/il2cppdumper
+          find /tmp/il2cppdumper -maxdepth 2 -type f -printf '%P\n' | sort
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          configs = list(Path('/tmp/il2cppdumper').rglob('config.json'))
+          if len(configs) != 1:
+              raise SystemExit(f'expected one Il2CppDumper config.json, got {configs}')
+          path = configs[0]
+          config = json.loads(path.read_text())
+          config['RequireAnyKey'] = False
+          config['GenerateScript'] = True
+          config['GenerateDummyDll'] = False
+          path.write_text(json.dumps(config, indent=2) + '\n')
+          print(path)
+          PY
+
+      - name: Run Il2CppDumper on exact official APK pair
+        run: |
+          mkdir -p artifacts/il2cpp-dump
+          DUMPER_DLL="$(find /tmp/il2cppdumper -name 'Il2CppDumper.dll' -print -quit)"
+          test -n "$DUMPER_DLL"
+          dotnet "$DUMPER_DLL" \
+            artifacts/il2cpp-inputs/libil2cpp.so \
+            artifacts/il2cpp-inputs/global-metadata.dat \
+            artifacts/il2cpp-dump
+          find artifacts/il2cpp-dump -maxdepth 1 -type f -printf '%f %s bytes\n' | sort
+
+      - name: Build focused GetGoodsFrameNameByRank trace report
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          import subprocess
+          from pathlib import Path
+
+          dump_dir = Path('artifacts/il2cpp-dump')
+          out = Path('artifacts/equipment-ssr-frame-il2cpp-trace.json')
+          target = 'GetGoodsFrameNameByRank'
+
+          script_path = dump_dir / 'script.json'
+          strings_path = dump_dir / 'stringliteral.json'
+          dump_path = dump_dir / 'dump.cs'
+          if not script_path.exists() or not strings_path.exists() or not dump_path.exists():
+              raise SystemExit(f'missing Il2CppDumper outputs: {list(dump_dir.iterdir())}')
+
+          script = json.loads(script_path.read_text(encoding='utf-8-sig'))
+          string_literals = json.loads(strings_path.read_text(encoding='utf-8-sig'))
+          dump_lines = dump_path.read_text(encoding='utf-8-sig', errors='replace').splitlines()
+
+          def contains_target(value):
+              if isinstance(value, str):
+                  return target in value
+              if isinstance(value, dict):
+                  return any(contains_target(v) for v in value.values())
+              if isinstance(value, list):
+                  return any(contains_target(v) for v in value)
+              return False
+
+          def collect_matching_dicts(value, results):
+              if isinstance(value, dict):
+                  if contains_target(value):
+                      results.append(value)
+                  for child in value.values():
+                      collect_matching_dicts(child, results)
+              elif isinstance(value, list):
+                  for child in value:
+                      collect_matching_dicts(child, results)
+
+          method_matches = []
+          collect_matching_dicts(script, method_matches)
+          # Keep leaf-most useful records and dedupe serialized content.
+          unique = []
+          seen = set()
+          for item in sorted(method_matches, key=lambda x: len(json.dumps(x, ensure_ascii=False))):
+              raw = json.dumps(item, ensure_ascii=False, sort_keys=True)
+              if raw not in seen:
+                  seen.add(raw)
+                  unique.append(item)
+          method_matches = unique[:20]
+
+          dump_hits = [i for i, line in enumerate(dump_lines) if target in line]
+          dump_excerpts = []
+          for i in dump_hits[:10]:
+              start = max(0, i - 5)
+              end = min(len(dump_lines), i + 8)
+              dump_excerpts.append({
+                  'line': i + 1,
+                  'text': '\n'.join(f'{n + 1}: {dump_lines[n]}' for n in range(start, end)),
+              })
+
+          def parse_address(value):
+              if isinstance(value, int):
+                  return value
+              if isinstance(value, str):
+                  s = value.strip()
+                  if re.fullmatch(r'0x[0-9a-fA-F]+', s):
+                      return int(s, 16)
+                  if s.isdigit():
+                      return int(s)
+              return None
+
+          def walk_dicts(value):
+              if isinstance(value, dict):
+                  yield value
+                  for child in value.values():
+                      yield from walk_dicts(child)
+              elif isinstance(value, list):
+                  for child in value:
+                      yield from walk_dicts(child)
+
+          all_method_like = []
+          target_addresses = []
+          for item in walk_dicts(script):
+              address = None
+              for key in ('Address', 'address', 'VA', 'va', 'VirtualAddress', 'virtualAddress'):
+                  if key in item:
+                      address = parse_address(item[key])
+                      if address is not None:
+                          break
+              if address is None:
+                  continue
+              all_method_like.append((address, item))
+              if contains_target(item):
+                  target_addresses.append(address)
+
+          candidate_literals = []
+          for item in walk_dicts(string_literals):
+              text = None
+              for key in ('Value', 'value', 'String', 'string', 'Name', 'name'):
+                  if isinstance(item.get(key), str):
+                      text = item[key]
+                      break
+              if text is None:
+                  continue
+              lowered = text.lower()
+              if any(term in lowered for term in ('frame', 'ssr', 'rank', 'quality', 'goods')):
+                  candidate_literals.append(item)
+          candidate_literals = candidate_literals[:500]
+
+          disassembly = []
+          native = Path('artifacts/il2cpp-inputs/libil2cpp.so')
+          for address in sorted(set(target_addresses))[:8]:
+              next_addresses = sorted(a for a, _ in all_method_like if a > address)
+              stop = next_addresses[0] if next_addresses and next_addresses[0] - address <= 0x4000 else address + 0x1000
+              cmd = [
+                  'llvm-objdump', '-d',
+                  f'--start-address=0x{address:x}',
+                  f'--stop-address=0x{stop:x}',
+                  str(native),
+              ]
+              proc = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+              disassembly.append({
+                  'startAddress': f'0x{address:x}',
+                  'stopAddress': f'0x{stop:x}',
+                  'exitCode': proc.returncode,
+                  'text': proc.stdout[-120000:],
+              })
+
+          report = {
+              'stage': 'Equipment SSR Frame IL2CPP Trace',
+              'status': 'TRACE_GENERATED',
+              'targetMethod': target,
+              'methodMatches': method_matches,
+              'targetAddresses': [f'0x{x:x}' for x in sorted(set(target_addresses))],
+              'dumpCsExcerpts': dump_excerpts,
+              'candidateStringLiterals': candidate_literals,
+              'disassembly': disassembly,
+              'semanticBoundary': {
+                  'candidateStringLiteralsAreSemanticMapping': False,
+                  'requiredForConclusion': 'An explicit control/data-flow link from GetGoodsFrameNameByRank rank handling to an exact returned string or serialized asset locator.',
+              },
+          }
+          out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+          print(json.dumps({
+              'targetAddresses': report['targetAddresses'],
+              'dumpHitCount': len(dump_hits),
+              'candidateLiteralCount': len(candidate_literals),
+              'disassemblyCount': len(disassembly),
+          }, indent=2))
+          PY
+
+      - name: Upload focused provenance reports
         uses: actions/upload-artifact@v4
         with:
-          name: equipment-ssr-frame-apk-probe
-          path: artifacts/equipment-ssr-frame-apk-probe.json
+          name: equipment-ssr-frame-provenance
+          path: |
+            artifacts/equipment-ssr-frame-apk-probe.json
+            artifacts/equipment-ssr-frame-il2cpp-trace.json
           if-no-files-found: error
           retention-days: 7
