@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const {
   ROOT,
+  CONFIG_DIR,
   configPath,
   readJson,
   loadSoldiers,
@@ -17,7 +18,13 @@ const STAGE21_PATH = path.join(ROOT, 'data/soldier-master-stage2-1.v1.json');
 const OUT_MASTER = path.join(ROOT, 'data/generated/soldier-master.v1.json');
 const OUT_SUMMARY = path.join(ROOT, 'data/validation/soldier-stage2-final.v1.json');
 
-function rel(p) { return p.replace(ROOT + path.sep, '').replaceAll('\\', '/'); }
+function rel(p) {
+  const configRelative = path.relative(CONFIG_DIR, p);
+  if (configRelative && !configRelative.startsWith(`..${path.sep}`) && configRelative !== '..' && !path.isAbsolute(configRelative)) {
+    return path.posix.join('data/configdata', configRelative.replaceAll('\\', '/'));
+  }
+  return p.replace(ROOT + path.sep, '').replaceAll('\\', '/');
+}
 function duplicates(values) { const s=new Set(), d=new Set(); for (const v of values) s.has(v)?d.add(v):s.add(v); return [...d]; }
 
 const errors = [], reviews = [];
