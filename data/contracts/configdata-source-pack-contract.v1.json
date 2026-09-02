@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "contract": "configdata-source-pack",
+  "stage": "repository-size-reduction-B2",
+  "status": "PASS",
+  "owner": "configdata-source-pack",
+  "purpose": "Admit the B1b exact-byte external ConfigData snapshot as hash-pinned storage authority and define fail-closed hydration without changing semantic authority, logical provenance paths, materialized Lookup query behavior, or production runtime behavior.",
+  "authority": {
+    "semanticContentAuthority": "PINNED_UNITYDATATOOL_PARSED_CONFIGDATA_SNAPSHOT",
+    "logicalRawPathNamespace": "data/configdata",
+    "externalByteTransport": "THIS_CONTRACT_PLUS_PINNED_SHA256",
+    "externalInventoryRole": "EXACT_BYTE_IDENTITY_PROJECTION_ONLY",
+    "externalInventoryMayCreateSemanticMappings": false,
+    "materializedLookupRemainsNormalQuerySource": true,
+    "rawConfigDataQueryFallback": false
+  },
+  "authoritativePredecessor": {
+    "routingBoundary": "data/contracts/configdata-source-pack-routing-boundary.v1.json",
+    "formatContract": "data/contracts/configdata-source-pack-format.v1.json",
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "sourceCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "sourceTreeGitSha1": "b18983f60cb054c2e6e094d64cdb98979211d7fc",
+    "logicalSourceRoot": "data/configdata",
+    "fileCount": 753,
+    "totalSourceBytes": 308284658
+  },
+  "storage": {
+    "kind": "GITHUB_RELEASE_ASSET",
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "releaseTag": "source-configdata-v1-6475e63e",
+    "releaseTargetCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "releaseId": 380931071,
+    "releaseImmutableMetadataAtAdmission": false,
+    "immutabilityPolicy": "CONTENT_HASH_PINNED_FAIL_CLOSED",
+    "archive": {
+      "assetId": 540460413,
+      "name": "configdata-source-v1-6475e63e.tar",
+      "bytes": 308871680,
+      "sha256": "65855321776cba9523669a2d486c2edbd2908006cf854572b7a87b0b63405c84",
+      "format": "POSIX_USTAR",
+      "compression": "NONE"
+    },
+    "inventory": {
+      "assetId": 540460409,
+      "name": "configdata-source-v1-6475e63e.inventory.json",
+      "bytes": 192996,
+      "sha256": "ea7c6381e0901a55fe11014d14bb82862d9474c418e89d11869e03ba876dcade"
+    },
+    "checksums": {
+      "assetId": 540460408,
+      "name": "configdata-source-v1-6475e63e.sha256",
+      "bytes": 211,
+      "sha256": "be81655d43cacbb31fd55d4c64f0cdb46a47953b8247eea1b600025719a56be2"
+    }
+  },
+  "identityPolicy": {
+    "exactFileSetRequired": true,
+    "perFileSha256Required": true,
+    "perFileByteLengthRequired": true,
+    "inventorySourceCommitMustMatch": true,
+    "inventorySourceTreeMustMatch": true,
+    "archiveSha256Role": "TRANSPORT_CONTAINER_INTEGRITY_ONLY",
+    "archiveSha256CreatesSemanticAuthority": false,
+    "jsonReserializationAllowed": false,
+    "textTranscodingAllowed": false,
+    "newlineNormalizationAllowed": false,
+    "failClosedOnAnyMismatch": true
+  },
+  "hydrationPolicy": {
+    "script": "scripts/hydrate-configdata-source-pack-v1.mjs",
+    "workflow": ".github/workflows/configdata-source-pack-hydration-v1.yml",
+    "targetMustBeOutsideRepository": true,
+    "targetMustBeAbsentOrEmpty": true,
+    "logicalPathsPreservedBelowTargetRoot": true,
+    "releaseMetadataMustMatchContract": true,
+    "assetIdsNamesSizesAndDigestsMustMatch": true,
+    "checksumsAssetMustMatchPinnedDigest": true,
+    "inventoryMustMatchPinnedDigest": true,
+    "archiveMustMatchPinnedDigest": true,
+    "ustarHeadersMustMatchB1aFormat": true,
+    "memberOrderMustMatchInventory": true,
+    "exactFileSetMustMatchInventory": true,
+    "perFileSha256AndSizeMustMatchInventory": true,
+    "optionalTrackedSourceParityMode": true,
+    "partialHydrationMayBePublished": false,
+    "hydratorIncludesVerifier": true
+  },
+  "coverage": {
+    "fileCount": 753,
+    "totalSourceBytes": 308284658,
+    "missingCount": 0,
+    "extraCount": 0,
+    "duplicatePathCount": 0
+  },
+  "admissionEvidence": {
+    "builder": "scripts/build-configdata-source-pack-v1.mjs",
+    "publishWorkflow": ".github/workflows/configdata-source-pack-b1b-v1.yml",
+    "publishWorkflowRunId": 33581419272,
+    "publishWorkflowHeadSha": "5b5524608a2bddbea33a93d9cdb5f3e30d7976a6",
+    "publishWorkflowConclusion": "success",
+    "archiveDigestMatchesPublishedAssetDigest": true,
+    "inventoryDigestMatchesPublishedAssetDigest": true,
+    "checksumsDigestMatchesPublishedAssetDigest": true,
+    "deterministicRepeatBuildByteIdentical": true,
+    "archiveRoundTripExactBytesVerified": true
+  },
+  "productionBoundary": {
+    "productionRuntimeFetchesSourcePack": false,
+    "productionRuntimeReadsRawConfigData": false,
+    "rawConfigDataRuntimeFallbackAllowed": false,
+    "frontendSemanticJoinIntroduced": false,
+    "runtimePathChangedInB2": false
+  },
+  "semanticBoundary": {
+    "semanticAuthorityChanged": false,
+    "frozenSemanticDomainsReopened": false,
+    "canonicalIdentityChanges": false,
+    "relationChanges": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "filenameSimilarityIntroduced": false,
+    "sourceMeaningReinterpreted": false
+  },
+  "migrationState": {
+    "trackedRepositoryRawSourceStillPresent": true,
+    "lookupPhysicalSourceRootCutoverCompleted": false,
+    "externalOnlyCleanRoomCompleted": false,
+    "trackedRawDeletionAdmitted": false,
+    "trackedRawDeletionCompleted": false
+  },
+  "handoff": {
+    "completion": "B2_SOURCE_PACK_CONTRACT_AND_HYDRATION_DEFINED",
+    "nextOwner": "configdata-lookup",
+    "nextStage": "B3-source-root-cutover"
+  }
+}
