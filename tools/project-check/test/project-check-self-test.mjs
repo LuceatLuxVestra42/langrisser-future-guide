@@ -190,6 +190,21 @@ expectOwners(
   ['hero-assets', 'production-build'],
 );
 expectOwners(
+  'data/generated/hero-skill-icon-assets.v1.json',
+  ['hero-skill-icon-assets'],
+  ['hero-skill-icon-assets-readonly'],
+);
+expectOwners(
+  'public/images/heroes/skill-icons/Gift_Knight.png',
+  ['hero-skill-icon-assets', 'hero-frontend'],
+  ['hero-skill-icon-assets-readonly', 'production-build'],
+);
+expectOwners(
+  'src/lib/hero-skill-icon-assets.ts',
+  ['hero-skill-icon-assets', 'hero-frontend'],
+  ['hero-skill-icon-assets-readonly', 'production-build'],
+);
+expectOwners(
   'data/validation/hero-stage6-4-final.v1.json',
   ['hero-canonical', 'status-source'],
   ['status-source-artifact-bridge', 'status-source-lifecycle', 'status-source-producer-gate', 'status-source-promotion', 'status-source-selection', 'hero-canonical'],
