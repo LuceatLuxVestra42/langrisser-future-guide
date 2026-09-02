@@ -119,13 +119,13 @@
     },
     {
       "file": "scripts/sample-acquisition-pathtypes.mjs",
-      "size": 2238,
+      "size": 2481,
       "firstSnippet": "v||typeof v!=='object') return; const nextContext=(('ID' in v)||('Name' in v))?{ID:v.ID??null,Name:v.Name??null,keys:Object.keys(v).slice(0,20)}:context; if(Number.isInteger(v.PathType)&&targetTypes.has(v.PathType)){ const arr=pathSamples[v.PathType]; if(arr.length<40) arr.push({file,context:nextContext,path:{PathType:v.PathType,ID:v.ID??null,Name:v.Name??null}}); } for(const [k,x] of Object.entries(v)){ if(k==='GetPathList' && Array.isArray(x)){ for(const p of x){ if(p&&typeof p==='object'&&targetTypes.has(Number(p.PathType))){ c"
     },
     {
       "file": "scripts/scan-acquisition-pathtype-sources.mjs",
-      "size": 1581,
-      "firstSnippet": "import fs from 'node:fs'; import path from 'node:path'; const roots=['data/configdata']; const needles=['\"PathType\"','PathType']; const matches=[]; for(const root of roots){ for(const name of fs.readdirSync(root)){ if(!name.endsWith('.json')) continue; const p=path.join(root,name); const txt=fs.readFileSync(p,'utf8'); if(!needles.some(n=>txt.includes(n))) continue; const idx=txt.indexOf('PathType'); matches.push({file:p,size:Buffer.byteLength(txt),firstSnippet:txt.slice(Math."
+      "size": 1774,
+      "firstSnippet": "rt { resolveConfigDataDir } from './configdata-source-pack-maintenance-root.mjs'; const physicalRoot=resolveConfigDataDir(); const logicalRoot='data/configdata'; const needles=['\"PathType\"','PathType']; const matches=[]; for(const name of fs.readdirSync(physicalRoot)){ if(!name.endsWith('.json')) continue; const physicalPath=path.join(physicalRoot,name); const logicalPath=path.posix.join(logicalRoot,name); const txt=fs.readFileSync(physicalPath,'utf8'); if(!needles.some(n=>txt.includes(n))) continue; const idx=txt.indexOf('PathType'); matches.push({file:logic"
     },
     {
       "file": "scripts/scan-equipment-stage2-7-path-types.mjs",
