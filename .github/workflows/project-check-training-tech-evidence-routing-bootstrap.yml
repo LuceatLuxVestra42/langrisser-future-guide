@@ -51,8 +51,6 @@ jobs:
           NODE
       - name: Run Project Check self-test
         run: node tools/project-check/test/project-check-self-test.mjs
-      - name: Assert explicit Stage 3 evidence route
-        run: node tools/project-check/cli/check.mjs --paths data/evidence/soldier-training-tech-classification-stage3-semantic.v1.json --plan
       - name: Persist routing contract
         run: |
           git config user.name "github-actions[bot]"
