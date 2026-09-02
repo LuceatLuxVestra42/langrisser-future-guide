@@ -20,6 +20,7 @@ on:
       - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
       - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
       - 'data/contracts/configdata-lookup-stage*.json'
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
       - 'data/contracts/project-tooling-configdata-lookup-*.json'
       - 'data/index/hero.v1.json'
       - 'data/index/soldier.v1.json'
@@ -34,6 +35,7 @@ on:
       - 'scripts/build-configdata-lookup-stage*.mjs'
       - 'scripts/validate-configdata-lookup-stage*.mjs'
       - 'scripts/configdata-lookup*.mjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
       - 'tools/configdata-lookup/**'
       - 'package.json'
       - '.github/workflows/configdata-lookup-stage6.yml'
@@ -54,6 +56,7 @@ on:
       - 'data/generated/hero-exclusive-equipment-by-hero.v1.json'
       - 'data/generated/hero-exclusive-equipment-by-equipment.v1.json'
       - 'data/contracts/configdata-lookup-stage*.json'
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
       - 'data/contracts/project-tooling-configdata-lookup-*.json'
       - 'data/index/hero.v1.json'
       - 'data/index/soldier.v1.json'
@@ -68,6 +71,7 @@ on:
       - 'scripts/build-configdata-lookup-stage*.mjs'
       - 'scripts/validate-configdata-lookup-stage*.mjs'
       - 'scripts/configdata-lookup*.mjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
       - 'tools/configdata-lookup/**'
       - 'package.json'
       - '.github/workflows/configdata-lookup-stage6.yml'
@@ -89,6 +93,36 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Configure external ConfigData source root
+        shell: bash
+        run: echo "CONFIGDATA_SOURCE_ROOT=$RUNNER_TEMP/configdata-lookup-stage6-source" >> "$GITHUB_ENV"
+
+      - name: Hydrate and verify pinned ConfigData source pack outside repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$CONFIGDATA_SOURCE_ROOT"
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$CONFIGDATA_SOURCE_ROOT"
+          count="$(find "$CONFIGDATA_SOURCE_ROOT/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$count" = "753"
+          case "$CONFIGDATA_SOURCE_ROOT/" in
+            "$GITHUB_WORKSPACE/"*) echo 'external ConfigData source root must stay outside repository' >&2; exit 1 ;;
+          esac
+
+      - name: Make tracked ConfigData unavailable during Stage 6 validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-stage6-tracked-hidden"
+          rm -rf "$hidden_raw"
+          if [ -d "$tracked_raw" ]; then
+            mv "$tracked_raw" "$hidden_raw"
+          fi
+          test ! -e "$tracked_raw"
+
       - name: Validate Stage 5 predecessor
         run: npm run validate:configdata-lookup-stage5
 
@@ -97,6 +131,18 @@ jobs:
 
       - name: Require clean stale plan through current source-root adapter
         run: node tools/configdata-lookup/cli/check-freshness.mjs
+
+      - name: Restore tracked ConfigData when present in this revision
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-stage6-tracked-hidden"
+          if [ -d "$hidden_raw" ]; then
+            test ! -e "$tracked_raw"
+            mv "$hidden_raw" "$tracked_raw"
+          fi
 
       - name: Require read-only tracked state
         shell: bash

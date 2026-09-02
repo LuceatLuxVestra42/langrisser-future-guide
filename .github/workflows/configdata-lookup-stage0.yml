@@ -4,7 +4,10 @@ on:
   pull_request:
     paths:
       - 'data/contracts/configdata-lookup-stage0-contract.v1.json'
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
+      - 'data/contracts/project-tooling-configdata-lookup-b5-5-operational-cutover.v1.json'
       - 'scripts/validate-configdata-lookup-stage0.mjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
       - 'package.json'
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/configdata/ConfigDataSoldierInfo.json'
@@ -16,7 +19,10 @@ on:
       - main
     paths:
       - 'data/contracts/configdata-lookup-stage0-contract.v1.json'
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
+      - 'data/contracts/project-tooling-configdata-lookup-b5-5-operational-cutover.v1.json'
       - 'scripts/validate-configdata-lookup-stage0.mjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
       - 'package.json'
       - 'data/configdata/ConfigDataHeroInfo.json'
       - 'data/configdata/ConfigDataSoldierInfo.json'
@@ -36,5 +42,47 @@ jobs:
         with:
           node-version: 22
 
-      - name: Validate Stage 0 contract
+      - name: Configure external ConfigData source root
+        shell: bash
+        run: echo "CONFIGDATA_SOURCE_ROOT=$RUNNER_TEMP/configdata-lookup-stage0-source" >> "$GITHUB_ENV"
+
+      - name: Hydrate and verify pinned ConfigData source pack outside repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$CONFIGDATA_SOURCE_ROOT"
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$CONFIGDATA_SOURCE_ROOT"
+          count="$(find "$CONFIGDATA_SOURCE_ROOT/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$count" = "753"
+          case "$CONFIGDATA_SOURCE_ROOT/" in
+            "$GITHUB_WORKSPACE/"*) echo 'external ConfigData source root must stay outside repository' >&2; exit 1 ;;
+          esac
+
+      - name: Make tracked ConfigData unavailable during Stage 0 validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-stage0-tracked-hidden"
+          rm -rf "$hidden_raw"
+          if [ -d "$tracked_raw" ]; then
+            mv "$tracked_raw" "$hidden_raw"
+          fi
+          test ! -e "$tracked_raw"
+
+      - name: Validate Stage 0 contract against external source root
         run: npm run validate:configdata-lookup-stage0
+
+      - name: Restore tracked ConfigData when present in this revision
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-stage0-tracked-hidden"
+          if [ -d "$hidden_raw" ]; then
+            test ! -e "$tracked_raw"
+            mv "$hidden_raw" "$tracked_raw"
+          fi

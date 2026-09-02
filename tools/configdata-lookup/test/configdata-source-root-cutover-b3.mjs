@@ -6,6 +6,7 @@ import path from 'node:path';
 import {
   CONFIGDATA_SOURCE_ROOT_ENV,
   LOGICAL_CONFIGDATA_ROOT,
+  getConfiguredConfigDataSourceRoot,
   getDefaultConfigDataSourceRoot,
   installConfigDataSourceRootReadRedirect,
   resolveConfigDataSourcePath,
@@ -17,6 +18,9 @@ function renderJson(value) {
 
 export async function runB3SourceRootCutover({ emit = true } = {}) {
   const repoRoot = getDefaultConfigDataSourceRoot();
+  const configuredRoot = getConfiguredConfigDataSourceRoot();
+  const sourceRootEnvBefore = process.env[CONFIGDATA_SOURCE_ROOT_ENV] ?? null;
+  const seedRoot = sourceRootEnvBefore === null ? repoRoot : configuredRoot;
   const [stage1Contract, stage2Contract] = await Promise.all([
     fs.readFile('data/contracts/configdata-lookup-stage1-id-index-contract.v1.json', 'utf8').then(JSON.parse),
     fs.readFile('data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json', 'utf8').then(JSON.parse),
@@ -37,7 +41,7 @@ export async function runB3SourceRootCutover({ emit = true } = {}) {
   let redirect;
   try {
     for (const logicalPath of logicalSources) {
-      const sourcePath = path.join(repoRoot, ...logicalPath.split('/'));
+      const sourcePath = path.join(seedRoot, ...logicalPath.split('/'));
       const targetPath = path.join(tempRoot, ...logicalPath.split('/'));
       await fs.mkdir(path.dirname(targetPath), { recursive: true });
       await fs.copyFile(sourcePath, targetPath);
@@ -45,7 +49,11 @@ export async function runB3SourceRootCutover({ emit = true } = {}) {
 
     redirect = installConfigDataSourceRootReadRedirect({ sourceRoot: tempRoot });
     assert.equal(redirect.sourceRoot, tempRoot);
-    assert.equal(process.env[CONFIGDATA_SOURCE_ROOT_ENV] ?? null, null, 'fixture must prove explicit sourceRoot injection without mutating process env');
+    assert.equal(
+      process.env[CONFIGDATA_SOURCE_ROOT_ENV] ?? null,
+      sourceRootEnvBefore,
+      'fixture must prove explicit sourceRoot injection without mutating process env',
+    );
 
     const [stage1, stage2, stage6] = await Promise.all([
       import('../../../scripts/lib/configdata-lookup-stage1.mjs'),
@@ -97,7 +105,7 @@ export async function runB3SourceRootCutover({ emit = true } = {}) {
     for (const logicalPath of logicalSources) {
       const physicalPath = resolveConfigDataSourcePath(logicalPath, tempRoot);
       assert.equal(physicalPath.startsWith(`${tempRoot}${path.sep}`), true, `${logicalPath}: resolver did not select temp root`);
-      assert.notEqual(physicalPath, path.join(repoRoot, ...logicalPath.split('/')), `${logicalPath}: fixture accidentally read tracked physical source`);
+      assert.notEqual(physicalPath, path.join(seedRoot, ...logicalPath.split('/')), `${logicalPath}: fixture accidentally read seed physical source`);
     }
 
     const result = {
