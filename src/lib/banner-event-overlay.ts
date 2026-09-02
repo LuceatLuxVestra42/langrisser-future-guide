@@ -108,7 +108,7 @@ export const BANNER_EVENT_OVERLAY: readonly BannerEventOverlayRow[] = [
   eventRow(
     "bevent:kr-sheet:20260923:sp-stone-rachel",
     "2026-09-23",
-    "SP 스톤 뽑기(택 1)",
+    "SP 스톤 뽑기",
     EVENT_IMAGE_PATHS.spStoneRachel,
     34,
     "image90.png",
@@ -133,7 +133,7 @@ export const BANNER_EVENT_OVERLAY: readonly BannerEventOverlayRow[] = [
   eventRow(
     "bevent:kr-sheet:20261021:sp-stone-rachel",
     "2026-10-21",
-    "SP 스톤 뽑기(택 1)",
+    "SP 스톤 뽑기",
     EVENT_IMAGE_PATHS.spStoneRachel,
     58,
     "image90.png",
@@ -158,7 +158,7 @@ export const BANNER_EVENT_OVERLAY: readonly BannerEventOverlayRow[] = [
   eventRow(
     "bevent:kr-sheet:20261118:sp-stone-rachel",
     "2026-11-18",
-    "SP 스톤 뽑기(택 1)",
+    "SP 스톤 뽑기",
     EVENT_IMAGE_PATHS.spStoneRachel,
     68,
     "image90.png",
@@ -167,7 +167,7 @@ export const BANNER_EVENT_OVERLAY: readonly BannerEventOverlayRow[] = [
   eventRow(
     "bevent:kr-sheet:20261209:sp-stone-omega-rachel",
     "2026-12-09",
-    "SP 스톤 뽑기(택 1)",
+    "SP 스톤 뽑기",
     EVENT_IMAGE_PATHS.spStoneOmegaRachel,
     80,
     "image211.png",
@@ -208,7 +208,7 @@ export const BANNER_EVENT_OVERLAY: readonly BannerEventOverlayRow[] = [
   eventRow(
     "bevent:kr-sheet:20270113:sp-stone-omega-rachel",
     "2027-01-13",
-    "SP 스톤 뽑기(택 1)",
+    "SP 스톤 뽑기",
     EVENT_IMAGE_PATHS.spStoneOmegaRachel,
     100,
     "image211.png",
@@ -225,7 +225,7 @@ export const BANNER_EVENT_OVERLAY: readonly BannerEventOverlayRow[] = [
   eventRow(
     "bevent:kr-sheet:20270210:sp-stone-omega-rachel",
     "2027-02-10",
-    "SP 스톤 뽑기(택 1)",
+    "SP 스톤 뽑기",
     EVENT_IMAGE_PATHS.spStoneOmegaRachel,
     113,
     "image211.png",
