@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { RotateCcw, Search, Sparkles, UserRound } from "lucide-react";
+import { RotateCcw, Search, UserRound } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { getHeroCardIconIndex } from "@/lib/hero-card-icon-assets.functions";
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/heroes")({
       { title: "영웅 | 랑그릿사 모바일 미래시 정보" },
       {
         name: "description",
-        content: "랑그릿사 모바일 영웅 267명을 이름, 희귀도, 진영, 등장 시리즈, SP 여부로 검색하고 필터링할 수 있습니다.",
+        content: "랑그릿사 모바일 영웅 267명을 이름, 희귀도, 진영, 출전작, SP 여부로 검색하고 필터링할 수 있습니다.",
       },
     ],
   }),
@@ -51,6 +51,7 @@ export const Route = createFileRoute("/heroes")({
 
 const ALL_RARITIES = "ALL";
 const LOW_RARITY = "N,R";
+type FilterSection = "rarity" | "faction" | "origin";
 
 function normalizeSearch(value: string) {
   return value.trim().toLocaleLowerCase();
@@ -87,6 +88,11 @@ function resolvePublicAssetUrl(webAssetPath: string) {
 function HeroGridPage() {
   const data = Route.useLoaderData();
   const [query, setQuery] = useState("");
+  const [openFilterSections, setOpenFilterSections] = useState<Record<FilterSection, boolean>>({
+    rarity: true,
+    faction: false,
+    origin: false,
+  });
   const [rarity, setRarity] = useState(ALL_RARITIES);
   const [factionId, setFactionId] = useState<number | null>(null);
   const [originId, setOriginId] = useState<number | null>(null);
@@ -178,8 +184,16 @@ function HeroGridPage() {
     originId !== null ||
     spOnly;
 
+  const toggleFilterSection = (section: FilterSection) => {
+    setOpenFilterSections((current) => ({
+      ...current,
+      [section]: !current[section],
+    }));
+  };
+
   const resetFilters = () => {
     setQuery("");
+    setOpenFilterSections({ rarity: true, faction: false, origin: false });
     setRarity(ALL_RARITIES);
     setFactionId(null);
     setOriginId(null);
@@ -189,46 +203,52 @@ function HeroGridPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-        <div>
-          <Link
-            to="/"
-            className="text-xs font-semibold text-muted-foreground transition hover:text-foreground"
-          >
-            ← 메인으로
-          </Link>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            영웅
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            확정된 267명 영웅 목록에서 이름, 희귀도, 진영, 등장 시리즈, SP 여부로 원하는 영웅을 빠르게 찾을 수 있어.
-          </p>
-        </div>
+        <Link
+          to="/"
+          className="inline-flex items-center rounded-md border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:border-foreground/30 hover:bg-muted/40"
+        >
+          ← 메인으로
+        </Link>
 
-        <section aria-label="영웅 목록 필터" className="mt-6 rounded-lg border border-border bg-card p-3 sm:p-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
-            <div className="min-w-0 flex-1">
-              <label htmlFor="hero-search" className="mb-1.5 block text-xs font-bold text-foreground">
-                이름 검색
-              </label>
-              <div className="relative">
-                <Search
-                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <input
-                  id="hero-search"
-                  type="search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="한국명 · 중국명 · 영문명"
-                  autoComplete="off"
-                  className="h-10 w-full rounded-md border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/40 focus:ring-2 focus:ring-foreground/10"
-                />
+        <section aria-label="영웅 목록 필터" className="mt-4 rounded-lg border border-border bg-card p-3 sm:p-4">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <span className="mb-1.5 block text-xs font-bold text-foreground">통합 필터</span>
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="통합 필터 분류">
+                <FilterSectionButton
+                  active={openFilterSections.rarity}
+                  onClick={() => toggleFilterSection("rarity")}
+                >
+                  희귀도
+                </FilterSectionButton>
+                <FilterSectionButton
+                  active={openFilterSections.faction}
+                  onClick={() => toggleFilterSection("faction")}
+                >
+                  진영
+                </FilterSectionButton>
+                <FilterSectionButton
+                  active={openFilterSections.origin}
+                  onClick={() => toggleFilterSection("origin")}
+                >
+                  출전작
+                </FilterSectionButton>
               </div>
             </div>
 
-            <div className="min-w-0 flex-[1.4]">
-              <span className="mb-1.5 block text-xs font-bold text-foreground">희귀도</span>
+            <button
+              type="button"
+              onClick={resetFilters}
+              disabled={!hasActiveFilters}
+              className="inline-flex h-10 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-xs font-bold text-muted-foreground transition hover:text-foreground disabled:cursor-not-allowed disabled:opacity-35"
+            >
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+              초기화
+            </button>
+          </div>
+
+          <div className="mt-3 space-y-3 border-t border-border pt-3">
+            {openFilterSections.rarity ? (
               <div className="flex flex-wrap gap-1.5" role="group" aria-label="희귀도 필터">
                 <FilterButton
                   active={rarity === ALL_RARITIES}
@@ -245,80 +265,82 @@ function HeroGridPage() {
                     {option.label} <span className="opacity-60">{option.count}</span>
                   </FilterButton>
                 ))}
+                <button
+                  type="button"
+                  aria-pressed={spOnly}
+                  onClick={() => setSpOnly((current) => !current)}
+                  className={`inline-flex h-10 items-center rounded-md border px-3 text-xs font-bold transition ${
+                    spOnly
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-border bg-background text-foreground hover:border-foreground/30"
+                  }`}
+                >
+                  SP <span className="opacity-60">{data.filters.spCount}</span>
+                </button>
               </div>
-            </div>
+            ) : null}
 
-            <div className="flex items-end gap-2">
-              <button
-                type="button"
-                aria-pressed={spOnly}
-                onClick={() => setSpOnly((current) => !current)}
-                className={`inline-flex h-10 items-center gap-1.5 rounded-md border px-3 text-xs font-bold transition ${
-                  spOnly
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-border bg-background text-foreground hover:border-foreground/30"
-                }`}
-              >
-                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                SP만 <span className="opacity-60">{data.filters.spCount}</span>
-              </button>
+            {openFilterSections.faction ? (
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="진영 필터">
+                <FilterButton active={factionId === null} onClick={() => setFactionId(null)}>
+                  전체
+                </FilterButton>
+                {factionOptions.map((option) => (
+                  <FilterButton
+                    key={option.id}
+                    active={factionId === option.id}
+                    onClick={() => setFactionId(option.id)}
+                  >
+                    {option.label} <span className="opacity-60">{option.count}</span>
+                  </FilterButton>
+                ))}
+              </div>
+            ) : null}
 
-              <button
-                type="button"
-                onClick={resetFilters}
-                disabled={!hasActiveFilters}
-                className="inline-flex h-10 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-xs font-bold text-muted-foreground transition hover:text-foreground disabled:cursor-not-allowed disabled:opacity-35"
-              >
-                <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-                초기화
-              </button>
-            </div>
+            {openFilterSections.origin ? (
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="출전작 필터">
+                <FilterButton active={originId === null} onClick={() => setOriginId(null)}>
+                  전체
+                </FilterButton>
+                {originOptions.map((option) => (
+                  <FilterButton
+                    key={option.id}
+                    active={originId === option.id}
+                    onClick={() => setOriginId(option.id)}
+                  >
+                    {option.label} <span className="opacity-60">{option.count}</span>
+                  </FilterButton>
+                ))}
+              </div>
+            ) : null}
           </div>
 
-          <div className="mt-3 border-t border-border pt-3">
-            <span className="mb-1.5 block text-xs font-bold text-foreground">진영</span>
-            <div className="flex flex-wrap gap-1.5" role="group" aria-label="진영 필터">
-              <FilterButton active={factionId === null} onClick={() => setFactionId(null)}>
-                전체
-              </FilterButton>
-              {factionOptions.map((option) => (
-                <FilterButton
-                  key={option.id}
-                  active={factionId === option.id}
-                  onClick={() => setFactionId(option.id)}
-                >
-                  {option.label} <span className="opacity-60">{option.count}</span>
-                </FilterButton>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-3">
-            <span className="mb-1.5 block text-xs font-bold text-foreground">등장 시리즈</span>
-            <div className="flex flex-wrap gap-1.5" role="group" aria-label="등장 시리즈 필터">
-              <FilterButton active={originId === null} onClick={() => setOriginId(null)}>
-                전체
-              </FilterButton>
-              {originOptions.map((option) => (
-                <FilterButton
-                  key={option.id}
-                  active={originId === option.id}
-                  onClick={() => setOriginId(option.id)}
-                >
-                  {option.label} <span className="opacity-60">{option.count}</span>
-                </FilterButton>
-              ))}
+          <div className="mt-4 border-t border-border pt-4">
+            <label htmlFor="hero-search" className="mb-1.5 block text-xs font-bold text-foreground">
+              이름 검색
+            </label>
+            <div className="relative">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <input
+                id="hero-search"
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="검색"
+                autoComplete="off"
+                className="h-10 w-full rounded-md border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/40 focus:ring-2 focus:ring-foreground/10"
+              />
             </div>
           </div>
         </section>
 
-        <div className="mt-4 flex items-end justify-between gap-4 border-y border-border py-3">
+        <div className="mt-4 border-y border-border py-3">
           <p className="text-sm text-muted-foreground" aria-live="polite">
             검색 결과 <span className="font-bold text-foreground">{filteredHeroes.length}</span>
             <span className="text-muted-foreground"> / {data.summary.total}명</span>
-          </p>
-          <p className="hidden text-xs text-muted-foreground sm:block">
-            공식 카드 아이콘 267명 연결
           </p>
         </div>
 
@@ -352,6 +374,31 @@ function HeroGridPage() {
         )}
       </div>
     </main>
+  );
+}
+
+function FilterSectionButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={`h-10 whitespace-nowrap rounded-md border px-4 text-xs font-bold transition ${
+        active
+          ? "border-foreground bg-foreground text-background"
+          : "border-border bg-background text-foreground hover:border-foreground/30"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 

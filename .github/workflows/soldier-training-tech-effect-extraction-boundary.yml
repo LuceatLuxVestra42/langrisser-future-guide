@@ -1,0 +1,33 @@
+name: TrainingTech Effect Extraction Boundary
+
+on:
+  pull_request:
+    paths:
+      - 'data/contracts/soldier-training-tech-effect-extraction-boundary.v1.json'
+      - 'scripts/validate-soldier-training-tech-effect-extraction-boundary.mjs'
+      - '.github/workflows/soldier-training-tech-effect-extraction-boundary.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/soldier-training-tech-effect-extraction-boundary.v1.json'
+      - 'scripts/validate-soldier-training-tech-effect-extraction-boundary.mjs'
+      - '.github/workflows/soldier-training-tech-effect-extraction-boundary.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate frozen pre-extraction boundary
+        run: node scripts/validate-soldier-training-tech-effect-extraction-boundary.mjs
+      - name: Assert boundary validation is read-only
+        run: git diff --exit-code

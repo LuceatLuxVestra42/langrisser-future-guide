@@ -1,0 +1,50 @@
+name: TrainingTech Stage 5 Full Classification
+
+on:
+  pull_request:
+    paths:
+      - 'data/generated/soldier-training-tech-classification-stage5.v1.json'
+      - 'data/validation/soldier-training-tech-classification-stage5.v1.json'
+      - 'scripts/build-soldier-training-tech-classification-stage5.mjs'
+      - 'scripts/validate-soldier-training-tech-classification-stage5.mjs'
+      - '.github/workflows/soldier-training-tech-classification-stage5.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/generated/soldier-training-tech-classification-stage5.v1.json'
+      - 'data/validation/soldier-training-tech-classification-stage5.v1.json'
+      - 'scripts/build-soldier-training-tech-classification-stage5.mjs'
+      - 'scripts/validate-soldier-training-tech-classification-stage5.mjs'
+      - '.github/workflows/soldier-training-tech-classification-stage5.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Reproduce Stage 5 classification and validation
+        run: |
+          node scripts/build-soldier-training-tech-classification-stage5.mjs --write
+          node scripts/validate-soldier-training-tech-classification-stage5.mjs --write
+      - name: Upload Stage 5 reproduction
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-tech-stage5-reproduction
+          path: |
+            data/generated/soldier-training-tech-classification-stage5.v1.json
+            data/validation/soldier-training-tech-classification-stage5.v1.json
+      - name: Assert frozen Stage 5 outputs reproduce without tracked mutation
+        run: git diff --exit-code
+      - name: Validate frozen Stage 5 classification independently
+        run: node scripts/validate-soldier-training-tech-classification-stage5.mjs --check
+      - name: Assert Stage 5 validation is read-only
+        run: git diff --exit-code

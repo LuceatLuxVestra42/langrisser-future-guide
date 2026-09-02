@@ -128,12 +128,48 @@ check(
 check(
   'search-ui',
   route.includes('type="search"') &&
-    route.includes('한국명 · 중국명 · 영문명') &&
+    route.includes('placeholder="검색"') &&
+    !route.includes('한국명 · 중국명 · 영문명') &&
     route.includes('matchesHeroSearch') &&
     route.includes('identity.nameKr') &&
     route.includes('identity.nameCn') &&
     route.includes('identity.nameEn'),
-  'multilingual name search is wired',
+  'multilingual name search is wired with the simplified search placeholder',
+);
+
+check(
+  'integrated-filter-multiselect',
+  route.includes('type FilterSection = "rarity" | "faction" | "origin"') &&
+    route.includes('useState<Record<FilterSection, boolean>>') &&
+    route.includes('rarity: true') &&
+    route.includes('faction: false') &&
+    route.includes('origin: false') &&
+    route.includes('toggleFilterSection') &&
+    route.includes('[section]: !current[section]') &&
+    route.includes('active={openFilterSections.rarity}') &&
+    route.includes('active={openFilterSections.faction}') &&
+    route.includes('active={openFilterSections.origin}') &&
+    route.includes('toggleFilterSection("rarity")') &&
+    route.includes('toggleFilterSection("faction")') &&
+    route.includes('toggleFilterSection("origin")'),
+  'rarity, faction, and origin controls are independent toggles that can remain selected together',
+);
+
+check(
+  'default-origin-options-hidden',
+  route.includes('origin: false') &&
+    route.includes('{openFilterSections.origin ? (') &&
+    route.includes('aria-label="출전작 필터"'),
+  'origin options remain hidden on initial entry until the origin section is selected',
+);
+
+check(
+  'multiple-filter-panels-openable',
+  route.includes('{openFilterSections.rarity ? (') &&
+    route.includes('{openFilterSections.faction ? (') &&
+    route.includes('{openFilterSections.origin ? (') &&
+    route.includes('...current'),
+  'filter panels use independent open state so multiple sections can be displayed simultaneously',
 );
 
 check(
@@ -163,18 +199,39 @@ check(
 
 check(
   'origin-filter-ui',
-  route.includes('등장 시리즈 필터') &&
+  route.includes('출전작 필터') &&
     route.includes('originOptions.map') &&
     route.includes('hero.origin.productionId !== originId'),
   'origin buttons use frozen productionId',
 );
 
+const rarityPanelIndex = route.indexOf('aria-label="희귀도 필터"');
+const spButtonIndex = route.indexOf('SP <span');
+const factionPanelIndex = route.indexOf('{openFilterSections.faction ? (');
 check(
   'sp-filter-ui',
-  route.includes('SP만') &&
-    route.includes('aria-pressed={spOnly}') &&
-    route.includes('spOnly && !hero.hasSp'),
-  'SP-only toggle filters records',
+  route.includes('aria-pressed={spOnly}') &&
+    route.includes('spOnly && !hero.hasSp') &&
+    !route.includes('Sparkles') &&
+    !route.includes('SP만') &&
+    rarityPanelIndex >= 0 &&
+    spButtonIndex > rarityPanelIndex &&
+    factionPanelIndex > spButtonIndex,
+  'SP toggle remains combinable, uses the SP label without an icon, and stays inside the rarity filter section',
+);
+
+const integratedFilterIndex = route.indexOf('통합 필터');
+const searchInputIndex = route.indexOf('id="hero-search"');
+check(
+  'search-below-filter-ui',
+  integratedFilterIndex >= 0 && searchInputIndex > integratedFilterIndex,
+  'search input is rendered below the integrated filter controls',
+);
+
+check(
+  'list-heading-removed',
+  !route.includes('<h1'),
+  'the standalone Hero heading below the home link is removed',
 );
 
 check(
@@ -182,6 +239,7 @@ check(
   route.includes('검색 결과') &&
     route.includes('aria-live="polite"') &&
     route.includes('resetFilters') &&
+    route.includes('setOpenFilterSections({ rarity: true, faction: false, origin: false })') &&
     route.includes('setFactionId(null)') &&
     route.includes('setOriginId(null)') &&
     route.includes('필터 초기화'),
