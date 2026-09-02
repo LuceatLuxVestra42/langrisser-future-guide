@@ -40,6 +40,7 @@
     {"id":"equipment-assets","validators":["equipment-assets"]},
     {"id":"hero-assets","validators":["hero-assets"]},
     {"id":"hero-card-icon-source-pack-assets","validators":["hero-card-icon-source-pack-assets"]},
+    {"id":"hero-skill-icon-assets","validators":["hero-skill-icon-assets-readonly"]},
     {"id":"asset-intake","validators":["asset-intake"]},
     {"id":"skin-stage3-2-evidence","validators":["skin-stage3-2-evidence"]},
     {"id":"localization","validators":["localization-audit"]},
@@ -155,9 +156,24 @@
       "owners":["hero-assets"]
     },
     {
+      "id":"hero-skill-icon-assets",
+      "patterns":["data/generated/hero-skill-icon-*","data/validation/hero-skill-icon-*","data/contracts/hero-skill-icon-*","scripts/*hero-skill-icon*",".github/workflows/hero-skill-icon-*"],
+      "owners":["hero-skill-icon-assets"]
+    },
+    {
+      "id":"hero-skill-icon-public",
+      "patterns":["public/images/heroes/skill-icons/**"],
+      "owners":["hero-skill-icon-assets","hero-frontend"]
+    },
+    {
+      "id":"hero-skill-icon-consumer",
+      "patterns":["src/lib/hero-skill-icon-assets.ts"],
+      "owners":["hero-skill-icon-assets"]
+    },
+    {
       "id":"hero-canonical",
       "patterns":["data/hero-*","data/generated/hero-*","data/validation/hero-*","data/contracts/hero-*","scripts/*hero*",".github/workflows/hero-*"],
-      "excludePatterns":["data/generated/hero-soldier-*","data/validation/hero-soldier-*","data/contracts/hero-soldier-*","scripts/*hero-soldier*",".github/workflows/hero-soldier-*","data/generated/hero-exclusive-equipment-*","data/validation/hero-exclusive-equipment-*","data/contracts/hero-exclusive-equipment-*","scripts/*hero-exclusive-equipment*",".github/workflows/hero-exclusive-equipment-*","data/generated/hero-list-*","data/validation/hero-list-*","data/contracts/hero-list-*","scripts/*hero-list*",".github/workflows/hero-list-*","data/generated/hero-card-icon-*","data/validation/hero-card-icon-*","data/contracts/hero-card-icon-*","scripts/*hero-card-icon*",".github/workflows/hero-card-icon-*"],
+      "excludePatterns":["data/generated/hero-soldier-*","data/validation/hero-soldier-*","data/contracts/hero-soldier-*","scripts/*hero-soldier*",".github/workflows/hero-soldier-*","data/generated/hero-exclusive-equipment-*","data/validation/hero-exclusive-equipment-*","data/contracts/hero-exclusive-equipment-*","scripts/*hero-exclusive-equipment*",".github/workflows/hero-exclusive-equipment-*","data/generated/hero-list-*","data/validation/hero-list-*","data/contracts/hero-list-*","scripts/*hero-list*",".github/workflows/hero-list-*","data/generated/hero-card-icon-*","data/validation/hero-card-icon-*","data/contracts/hero-card-icon-*","scripts/*hero-card-icon*",".github/workflows/hero-card-icon-*","data/generated/hero-skill-icon-*","data/validation/hero-skill-icon-*","data/contracts/hero-skill-icon-*","scripts/*hero-skill-icon*",".github/workflows/hero-skill-icon-*"],
       "owners":["hero-canonical"]
     },
     {
@@ -168,7 +184,7 @@
     {
       "id":"hero-assets",
       "patterns":["public/images/heroes/**"],
-      "excludePatterns":["public/images/heroes/card-icons/**"],
+      "excludePatterns":["public/images/heroes/card-icons/**","public/images/heroes/skill-icons/**"],
       "owners":["hero-assets","hero-frontend"]
     },
     {
