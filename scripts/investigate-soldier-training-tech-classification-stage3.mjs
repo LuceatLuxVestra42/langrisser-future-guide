@@ -101,6 +101,15 @@ const structuralGroups = [...grouped.entries()]
   })
   .sort((a, b) => a.representative.sourceIndex - b.representative.sourceIndex);
 
+const groupSummary = structuralGroups.map((group) => ({
+  signatureKey: group.signatureKey,
+  count: group.count,
+  representativeTechId: group.representative.techId,
+  representativeName: group.representative.rawTech.Name,
+  explicitUnlockedSoldierIds: group.representative.explicitUnlockedSoldierIds,
+  firstDescription: group.representative.levelEvidence[0]?.Description ?? null,
+}));
+
 const output = {
   version: 1,
   schemaId: "soldier-training-tech-classification-stage3-candidate-evidence/v1",
@@ -124,6 +133,7 @@ const output = {
     structuralGroupCount: structuralGroups.length,
     representedNonGrowthTech: structuralGroups.reduce((sum, group) => sum + group.count, 0),
   },
+  groupSummary,
   structuralGroups,
 };
 
