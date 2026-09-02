@@ -65,6 +65,7 @@ jobs:
               mv "$HIDDEN" "$RAW"
             fi
             git checkout -- .
+            git clean -fd -- data/generated data/validation
           }
           trap cleanup EXIT
 
