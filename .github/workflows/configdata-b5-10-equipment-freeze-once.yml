@@ -1,0 +1,91 @@
+name: ConfigData B5.10 Equipment Acquisition Freeze Once
+
+on:
+  push:
+    branches:
+      - configdata/b5-10-equipment-acquisition-root-v1
+    paths:
+      - '.github/workflows/configdata-b5-10-equipment-freeze-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  freeze-once:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: configdata/b5-10-equipment-acquisition-root-v1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Preserve frozen outputs and hide tracked ConfigData
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp data/generated/equipment_acquisition_path_analysis.json "$RUNNER_TEMP/path-analysis.before.json"
+          cp data/generated/equipment_acquisition_pathtype_sources.json "$RUNNER_TEMP/pathtype-sources.before.json"
+          cp data/generated/equipment_acquisition_pathtype_samples.json "$RUNNER_TEMP/pathtype-samples.before.json"
+          rm -rf data/configdata
+          test ! -e data/configdata
+
+      - name: Regenerate acquisition analysis from pinned external source
+        run: |
+          node scripts/analyze-equipment-acquisition.mjs
+          node scripts/scan-acquisition-pathtype-sources.mjs
+          node scripts/sample-acquisition-pathtypes.mjs
+
+      - name: Require semantic and logical-path parity
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const assert = (ok, msg) => { if (!ok) throw new Error(msg); };
+          const read = p => JSON.parse(fs.readFileSync(p, 'utf8'));
+          const beforeAnalysis = read(process.env.RUNNER_TEMP + '/path-analysis.before.json');
+          const afterAnalysis = read('data/generated/equipment_acquisition_path_analysis.json');
+          const beforeSources = read(process.env.RUNNER_TEMP + '/pathtype-sources.before.json');
+          const afterSources = read('data/generated/equipment_acquisition_pathtype_sources.json');
+          const beforeSamples = read(process.env.RUNNER_TEMP + '/pathtype-samples.before.json');
+          const afterSamples = read('data/generated/equipment_acquisition_pathtype_samples.json');
+          assert(JSON.stringify(beforeAnalysis) === JSON.stringify(afterAnalysis), 'equipment acquisition path analysis semantic drift');
+          assert(JSON.stringify(beforeSamples) === JSON.stringify(afterSamples), 'equipment acquisition PathType samples semantic drift');
+          assert(JSON.stringify(beforeSources.configDataMatches) === JSON.stringify(afterSources.configDataMatches), 'ConfigData PathType scan drift');
+          const allowed = new Set(['scripts/scan-acquisition-pathtype-sources.mjs','scripts/sample-acquisition-pathtypes.mjs']);
+          const map = xs => new Map(xs.map(x => [x.file, JSON.stringify(x)]));
+          const a = map(beforeSources.otherMatches || []);
+          const b = map(afterSources.otherMatches || []);
+          const keys = [...new Set([...a.keys(), ...b.keys()])];
+          const changed = keys.filter(k => a.get(k) !== b.get(k));
+          assert(changed.length > 0, 'expected scanner source self-record refresh');
+          assert(changed.every(k => allowed.has(k)), `unexpected non-ConfigData PathType source drift: ${JSON.stringify(changed)}`);
+          const serialized = JSON.stringify({afterAnalysis, afterSources, afterSamples});
+          assert(!serialized.includes('/home/runner/') && !serialized.includes('_temp/'), 'physical runner path leaked into frozen outputs');
+          assert(serialized.includes('data/configdata/'), 'logical ConfigData provenance missing');
+          console.log(JSON.stringify({status:'PASS', configDataMatches:afterSources.configDataMatches.length, changedOtherMatches:changed, logicalProvenance:'data/configdata/...'}, null, 2));
+          NODE
+
+      - name: Restore tracked source and freeze reviewed output
+        shell: bash
+        run: |
+          set -euo pipefail
+          git restore --source=HEAD --worktree -- data/configdata
+          test "$(find data/configdata -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')" = "753"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            data/generated/equipment_acquisition_path_analysis.json \
+            data/generated/equipment_acquisition_pathtype_sources.json \
+            data/generated/equipment_acquisition_pathtype_samples.json
+          git rm .github/workflows/configdata-b5-10-equipment-freeze-once.yml
+          if git diff --cached --name-only | grep -q '^data/configdata/'; then
+            echo 'ConfigData source mutation must not be committed.'
+            exit 1
+          fi
+          git diff --cached --name-status
+          git commit -m 'B5.10 freeze equipment acquisition external-root parity'
+          git push origin HEAD:configdata/b5-10-equipment-acquisition-root-v1
