@@ -1,0 +1,283 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-pre2020-event-boundary-stage11-a7/v1",
+  "stage": "11-A7",
+  "status": "PASS",
+  "completion": "PRE2020_EVENT_BOUNDARY_INVENTORIED_NO_PROMOTION",
+  "owner": "soldier-release-metadata-evidence-acquisition",
+  "scope": "OFFICIAL_EVENT_CONFIRMED_IDENTITY_NOT_ADMITTED_NO_STAGE5_8_PROMOTION",
+  "capturedAt": "2026-09-02",
+  "capturedAgainstMain": "3bf81c06fb68a253c7657b2ab63b2e84822d566c",
+  "predecessors": {
+    "releaseMetadata": "data/generated/soldier-release-metadata.v1.json",
+    "soldierList": "data/generated/soldier-list-stage5-8.v1.json",
+    "stage11A1Evidence": "data/soldier-release-official-notice-evidence-stage11-a1.v1.json",
+    "stage11A5Checkpoint": "data/validation/soldier-release-metadata-stage11-a5-correction.v1.json"
+  },
+  "policy": {
+    "targetTimeline": "CN_SERVER_RELEASE_CHRONOLOGY",
+    "promotionAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
+    "officialEventRequirement": "OFFICIAL_UPDATE_TEXT_EXPLICITLY_ADDS_OR_UNLOCKS_NEW_SOLDIERS",
+    "canonicalIdentityRequirement": "OFFICIAL_EVENT_OR_EQUIVALENT_PRIMARY_SOURCE_MUST_EXPLICITLY_IDENTIFY_THE_SOLDIER",
+    "secondarySourceRole": "LOCATOR_AND_SUPPORTING_EVIDENCE_ONLY",
+    "secondarySourceMayPromote": false,
+    "hybridOfficialEventPlusSecondaryIdentityMayPromote": false,
+    "allowNameSimilarity": false,
+    "allowIdArithmetic": false,
+    "allowFilenameSimilarity": false,
+    "allowScreenOrRowOrderMapping": false,
+    "allowBatchCountToIdentityMapping": false,
+    "allowSamePatchOrderInference": false
+  },
+  "coverageBefore": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "officialEvents": [
+    {
+      "sourceId": "official-cn-2019-08-15",
+      "noticePublishedAt": "2019-08-14",
+      "releaseDate": "2019-08-15",
+      "title": "“梦幻模拟战2.0”更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20190814/7403.html",
+      "eventKind": "TRAINING_GROUND_NEW_SOLDIERS",
+      "officialNewSoldierCount": 6,
+      "officialTextListsSoldierNames": false,
+      "officialClaim": "更新完成后，练兵场中将添加全新兵种和全新科技……以及6个新的兵种及其相关科技。",
+      "admissionStatus": "EVENT_CONFIRMED_IDENTITY_UNRESOLVED"
+    },
+    {
+      "sourceId": "official-cn-2019-09-12",
+      "noticePublishedAt": "2019-09-11",
+      "releaseDate": "2019-09-12",
+      "title": "“少女的旅途”更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20190911/10567.html",
+      "eventKind": "TRAINING_GROUND_NEW_SOLDIERS",
+      "officialNewSoldierCount": 7,
+      "officialTextListsSoldierNames": false,
+      "officialClaim": "更新完成后，练兵场中将添加7个全新兵种。",
+      "admissionStatus": "EVENT_CONFIRMED_IDENTITY_UNRESOLVED"
+    }
+  ],
+  "supportingSources": [
+    {
+      "sourceId": "secondary-ali213-2019-07-29",
+      "publishedAt": "2019-07-29",
+      "title": "梦幻模拟战2.0有哪些新东西 梦幻模拟战全新版本更新内容预览",
+      "url": "https://m.ali213.net/news/gl1907/353165.html",
+      "authority": "NON_AUTHORITATIVE_SECONDARY",
+      "role": "CONTEMPORANEOUS_CANDIDATE_IDENTITY_LOCATOR",
+      "relatedOfficialEvent": "official-cn-2019-08-15",
+      "listedSoldierLabels": [
+        "地精骑士",
+        "蛛魔精灵",
+        "钢翼勇士",
+        "素体改造人",
+        "水晶塑造者",
+        "独角兽"
+      ]
+    },
+    {
+      "sourceId": "secondary-ali213-2019-09-06",
+      "publishedAt": "2019-09-06",
+      "title": "梦幻模拟战全新资料片少女的旅途 新资料片士兵爆料",
+      "url": "https://m.ali213.net/news/gl1909/364063.html",
+      "authority": "NON_AUTHORITATIVE_SECONDARY",
+      "role": "CONTEMPORANEOUS_CANDIDATE_IDENTITY_LOCATOR",
+      "relatedOfficialEvent": "official-cn-2019-09-12",
+      "listedSoldierLabels": [
+        "王女亲卫",
+        "树人守卫",
+        "魔蝎",
+        "潮汐精灵",
+        "矮人冒险者",
+        "森林祭司",
+        "魔晶术士"
+      ]
+    },
+    {
+      "sourceId": "secondary-hackhome-2019-09-10",
+      "publishedAt": "2019-09-10",
+      "title": "梦幻模拟战手游9月12日更新公告 新增女神化身、艾米莉亚英雄",
+      "url": "https://www.hackhome.com/info/489683.html",
+      "authority": "NON_AUTHORITATIVE_SECONDARY",
+      "role": "INDEPENDENT_SUPPORTING_CANDIDATE_IDENTITY_LIST",
+      "relatedOfficialEvent": "official-cn-2019-09-12",
+      "listedSoldierLabels": [
+        "王女亲卫",
+        "树人守卫",
+        "魔蝎",
+        "潮汐精灵",
+        "矮人冒险者",
+        "森林祭司",
+        "魔晶术士"
+      ]
+    }
+  ],
+  "candidateRecords": [
+    {
+      "soldierId": 1112,
+      "canonicalNameCn": "地精骑士",
+      "secondaryLabel": "地精骑士",
+      "officialEventSourceId": "official-cn-2019-08-15",
+      "supportingSourceIds": ["secondary-ali213-2019-07-29"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    },
+    {
+      "soldierId": 1031,
+      "canonicalNameCn": "蛛魔精灵",
+      "secondaryLabel": "蛛魔精灵",
+      "officialEventSourceId": "official-cn-2019-08-15",
+      "supportingSourceIds": ["secondary-ali213-2019-07-29"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    },
+    {
+      "soldierId": 420,
+      "canonicalNameCn": "钢翼勇士",
+      "secondaryLabel": "钢翼勇士",
+      "officialEventSourceId": "official-cn-2019-08-15",
+      "supportingSourceIds": ["secondary-ali213-2019-07-29"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    },
+    {
+      "soldierId": 244,
+      "canonicalNameCn": "素体改造人",
+      "secondaryLabel": "素体改造人",
+      "officialEventSourceId": "official-cn-2019-08-15",
+      "supportingSourceIds": ["secondary-ali213-2019-07-29"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    },
+    {
+      "soldierId": 128,
+      "canonicalNameCn": "水晶塑型者",
+      "secondaryLabel": "水晶塑造者",
+      "officialEventSourceId": "official-cn-2019-08-15",
+      "supportingSourceIds": ["secondary-ali213-2019-07-29"],
+      "canonicalExactLabelMatch": false,
+      "labelConflict": "SECONDARY_VARIANT_DIFFERS_FROM_CANONICAL_CN_LABEL",
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING_AND_LABEL_MISMATCH"
+    },
+    {
+      "soldierId": 333,
+      "canonicalNameCn": "独角兽",
+      "secondaryLabel": "独角兽",
+      "officialEventSourceId": "official-cn-2019-08-15",
+      "supportingSourceIds": ["secondary-ali213-2019-07-29"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    },
+    {
+      "soldierId": 245,
+      "canonicalNameCn": "王女亲卫",
+      "secondaryLabel": "王女亲卫",
+      "officialEventSourceId": "official-cn-2019-09-12",
+      "supportingSourceIds": ["secondary-ali213-2019-09-06", "secondary-hackhome-2019-09-10"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    },
+    {
+      "soldierId": 129,
+      "canonicalNameCn": "树人守卫",
+      "secondaryLabel": "树人守卫",
+      "officialEventSourceId": "official-cn-2019-09-12",
+      "supportingSourceIds": ["secondary-ali213-2019-09-06", "secondary-hackhome-2019-09-10"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    },
+    {
+      "soldierId": 334,
+      "canonicalNameCn": "魔蝎",
+      "secondaryLabel": "魔蝎",
+      "officialEventSourceId": "official-cn-2019-09-12",
+      "supportingSourceIds": ["secondary-ali213-2019-09-06", "secondary-hackhome-2019-09-10"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    },
+    {
+      "soldierId": 511,
+      "canonicalNameCn": "潮汐精灵",
+      "secondaryLabel": "潮汐精灵",
+      "officialEventSourceId": "official-cn-2019-09-12",
+      "supportingSourceIds": ["secondary-ali213-2019-09-06", "secondary-hackhome-2019-09-10"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    },
+    {
+      "soldierId": 635,
+      "canonicalNameCn": "矮人冒险者",
+      "secondaryLabel": "矮人冒险者",
+      "officialEventSourceId": "official-cn-2019-09-12",
+      "supportingSourceIds": ["secondary-ali213-2019-09-06", "secondary-hackhome-2019-09-10"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    },
+    {
+      "soldierId": 813,
+      "canonicalNameCn": "森林祭司",
+      "secondaryLabel": "森林祭司",
+      "officialEventSourceId": "official-cn-2019-09-12",
+      "supportingSourceIds": ["secondary-ali213-2019-09-06", "secondary-hackhome-2019-09-10"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    },
+    {
+      "soldierId": 636,
+      "canonicalNameCn": "魔晶术士",
+      "secondaryLabel": "魔晶术士",
+      "officialEventSourceId": "official-cn-2019-09-12",
+      "supportingSourceIds": ["secondary-ali213-2019-09-06", "secondary-hackhome-2019-09-10"],
+      "canonicalExactLabelMatch": true,
+      "admissionStatus": "NOT_ADMITTED_PRIMARY_IDENTITY_PROVENANCE_MISSING"
+    }
+  ],
+  "summary": {
+    "officialEventCount": 2,
+    "officialNewSoldierCountTotal": 13,
+    "candidateRecordCount": 13,
+    "candidateExactCanonicalLabelMatches": 12,
+    "candidateCanonicalLabelMismatches": 1,
+    "promotedRecordCount": 0,
+    "coverageChanged": false
+  },
+  "boundaries": {
+    "stage5_8Mutated": false,
+    "canonicalPopulationRecomputed": false,
+    "heroSoldierRelationRecomputed": false,
+    "secondaryEvidencePromoted": false,
+    "hybridEventIdentityInferencePromoted": false,
+    "nameSimilarityJoin": false,
+    "idArithmetic": false,
+    "batchCountIdentityMapping": false,
+    "samePatchOrderClaimed": false,
+    "spChronologyIncluded": false,
+    "lowerTierChronologyIncluded": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "PRE2020_OFFICIAL_EVENT_IDENTITY_PROVENANCE_MISSING",
+      "count": 13,
+      "classification": "REVIEW"
+    }
+  ],
+  "nextOwner": "soldier-release-metadata-evidence-acquisition",
+  "nextStartPoint": [
+    "Search official Zlongame or equivalent primary publisher archives for explicit identity labels tied to the 2019-08-15 and 2019-09-12 Soldier release events.",
+    "Promote none of these 13 candidates until primary identity provenance is admitted under the release chronology contract.",
+    "Continue earlier pre-2019/2020 event discovery separately; do not infer release dates from hero unlock notices, figure-wall mentions, batch counts, or Soldier IDs."
+  ],
+  "reopenConditions": [
+    "A primary publisher source explicitly identifies one or more of the 13 candidate Soldiers as belonging to either official release event.",
+    "The release evidence contract explicitly changes to admit a different identity-provenance class.",
+    "Any candidate is no longer unresolved normal tier-3 in the authoritative Stage 5-8 consumer."
+  ]
+}
