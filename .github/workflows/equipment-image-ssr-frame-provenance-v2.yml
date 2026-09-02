@@ -6,6 +6,7 @@ on:
       - research/equipment-ssr-frame-provenance-v2
     paths:
       - scripts/equipment-image-ssr-frame-provenance-v2.py
+      - scripts/equipment-image-ssr-frame-asset-provenance.py
       - .github/workflows/equipment-image-ssr-frame-provenance-v2.yml
   workflow_dispatch:
 
@@ -15,7 +16,7 @@ permissions:
 jobs:
   trace:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - name: Checkout current research branch
         uses: actions/checkout@v4
@@ -39,8 +40,13 @@ jobs:
           command -v llvm-readelf
           command -v llvm-objdump
 
-      - name: Compile focused tracer
-        run: python -m py_compile scripts/equipment-image-ssr-frame-provenance-v2.py
+      - name: Install exact asset decode dependencies
+        run: python -m pip install --disable-pip-version-check UnityPy Pillow
+
+      - name: Compile focused tracers
+        run: |
+          python -m py_compile scripts/equipment-image-ssr-frame-provenance-v2.py
+          python -m py_compile scripts/equipment-image-ssr-frame-asset-provenance.py
 
       - name: Extract exact official APK IL2CPP pair
         run: python scripts/equipment-image-ssr-frame-provenance-v2.py extract
@@ -106,6 +112,30 @@ jobs:
               'defaultSlot': d['defaultSlot'],
               'callerCount': d['callerCount'],
               'rankFrameContexts': d['rankFrameContexts'][:8],
+          }, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Resolve explicit Equipment Rank 4 population and exact frame asset
+        run: |
+          python scripts/equipment-image-ssr-frame-asset-provenance.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('artifacts/equipment-ssr-frame-asset-provenance.v1.json')
+          d = json.loads(p.read_text())
+          assert d['status'] == 'PASS_EXACT_SSR_FRAME_ASSET_PROVENANCE', d
+          assert d['target']['rank'] == 4, d
+          assert d['target']['sourcePath'] == 'UI/Common_New_ABS/Border_Icon_Colour.png', d
+          assert d['configDataProof']['publicPopulation'] == 373, d
+          assert d['configDataProof']['rank4PublicCount'] > 0, d
+          assert d['resolution']['decodedExactObjectCount'] > 0, d
+          print(json.dumps({
+              'status': d['status'],
+              'target': d['target'],
+              'publicRankCounts': d['configDataProof']['publicRankCounts'],
+              'rank4PublicCount': d['configDataProof']['rank4PublicCount'],
+              'rank5PublicCount': d['configDataProof']['rank5PublicCount'],
+              'resolution': d['resolution'],
           }, ensure_ascii=False, indent=2))
           PY
 
@@ -199,8 +229,8 @@ jobs:
                   'frozenEquipmentAssetsChanged': False,
                   'canonicalEquipmentChanged': False,
                   'researchOnly': all(
-                      p.startswith('scripts/equipment-image-ssr-frame-provenance')
-                      or p.startswith('.github/workflows/equipment-image-ssr-frame-provenance')
+                      p.startswith('scripts/equipment-image-ssr-frame-')
+                      or p.startswith('.github/workflows/equipment-image-ssr-frame-')
                       for p in changed
                   ),
               },
@@ -232,6 +262,8 @@ jobs:
           path: |
             artifacts/equipment-ssr-frame-apk-inputs.v2.json
             artifacts/equipment-ssr-frame-provenance-v2.json
+            artifacts/equipment-ssr-frame-asset-provenance.v1.json
+            artifacts/equipment-ssr-frame-previews/*.png
             artifacts/equipment-ssr-frame-project-check-plan.v1.json
             artifacts/equipment-ssr-frame-validator-classification.v1.json
             artifacts/equipment-ssr-frame-base-validator.log
