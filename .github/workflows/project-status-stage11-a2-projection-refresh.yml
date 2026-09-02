@@ -59,8 +59,6 @@ jobs:
           mapfile -t changed < <(git status --porcelain | sed 's/^...//' | sort)
           printf '%s\n' "${changed[@]}"
           expected=(
-            PROJECT_STATUS.md
-            data/generated/project-status.v1.json
             tools/project-status/test/current-parity.mjs
           )
           mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
@@ -71,6 +69,6 @@ jobs:
 
       - name: Freeze Project Status refresh
         run: |
-          git add PROJECT_STATUS.md data/generated/project-status.v1.json tools/project-status/test/current-parity.mjs
+          git add tools/project-status/test/current-parity.mjs
           git commit -m "Refresh Project Status Soldier release review count"
           git push origin HEAD:${GITHUB_REF_NAME}
