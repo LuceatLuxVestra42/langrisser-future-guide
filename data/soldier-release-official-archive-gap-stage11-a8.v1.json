@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-official-archive-gap-stage11-a8/v1",
+  "stage": "11-A8",
+  "status": "PASS",
+  "completion": "OFFICIAL_ARCHIVE_WINDOW_SCANNED_NO_QUALIFYING_EVENT_FOUND",
+  "owner": "soldier-release-metadata-evidence-acquisition",
+  "scope": "OFFICIAL_ARCHIVE_GAP_INVENTORY_NO_RELEASE_PROMOTION",
+  "capturedAt": "2026-09-02",
+  "capturedAgainstMain": "b6e87c65078ba233a99d42bc496575cd04c87aab",
+  "predecessors": {
+    "stage11A7Boundary": "data/soldier-release-pre2020-event-boundary-stage11-a7.v1.json",
+    "stage11A1Evidence": "data/soldier-release-official-notice-evidence-stage11-a1.v1.json",
+    "releaseMetadata": "data/generated/soldier-release-metadata.v1.json",
+    "soldierList": "data/generated/soldier-list-stage5-8.v1.json"
+  },
+  "policy": {
+    "targetTimeline": "CN_SERVER_RELEASE_CHRONOLOGY",
+    "promotionAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
+    "qualifyingEventRequirement": "OFFICIAL_UPDATE_TEXT_EXPLICITLY_ADDS_OR_UNLOCKS_NEW_SOLDIERS",
+    "canonicalIdentityRequirement": "PRIMARY_SOURCE_MUST_EXPLICITLY_IDENTIFY_EACH_PROMOTED_SOLDIER",
+    "negativeSearchMeaning": "NO_QUALIFYING_EVENT_FOUND_IN_CAPTURED_OFFICIAL_ARCHIVE_SEARCH_WINDOW",
+    "negativeSearchMayProveAbsoluteNonexistence": false,
+    "negativeSearchMayAssignReleaseDate": false,
+    "negativeSearchMayInferLaunchPopulation": false,
+    "allowNameSimilarity": false,
+    "allowIdArithmetic": false,
+    "allowFilenameSimilarity": false,
+    "allowArchiveOrderInference": false,
+    "allowBatchCountToIdentityMapping": false,
+    "allowSamePatchOrderInference": false
+  },
+  "coverageBefore": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "archiveScan": {
+    "officialArchiveUrl": "https://mz.zlongame.com/jx/mzgg/",
+    "windowStart": "2019-10-01",
+    "windowEnd": "2020-07-31",
+    "method": "OFFICIAL_ARCHIVE_TERM_SEARCH_PLUS_BOUNDARY_AND_REPRESENTATIVE_NOTICE_REVIEW",
+    "terms": [
+      "练兵场",
+      "全新兵种",
+      "新增兵种",
+      "新增科技兵种",
+      "解锁全新小兵"
+    ],
+    "qualifyingOfficialEventCountFound": 0,
+    "promotedRecordCount": 0,
+    "conclusion": "NO_QUALIFYING_SOLDIER_RELEASE_EVENT_FOUND_IN_CAPTURED_OFFICIAL_ARCHIVE_SEARCH_WINDOW"
+  },
+  "boundaryAnchors": {
+    "previousQualifyingEvent": {
+      "sourceId": "official-cn-2019-09-12",
+      "releaseDate": "2019-09-12",
+      "url": "https://mz.zlongame.com/jx/mzgg/20190911/10567.html",
+      "identityStatus": "EVENT_CONFIRMED_IDENTITY_UNRESOLVED",
+      "officialNewSoldierCount": 7,
+      "sourceCheckpoint": "11-A7"
+    },
+    "nextQualifyingEvent": {
+      "sourceId": "official-cn-2020-08-20",
+      "releaseDate": "2020-08-20",
+      "url": "https://mz.zlongame.com/jx/mzgg/20200819/12530.html",
+      "identityStatus": "PRIMARY_SOURCE_NAMES_EXPLICIT",
+      "newSoldierLabels": [
+        "洗罪者",
+        "机械骑士"
+      ],
+      "sourceCheckpoint": "11-A1"
+    }
+  },
+  "representativeNonQualifyingNotices": [
+    {
+      "noticePublishedAt": "2019-10-09",
+      "title": "“月辉下的守护者”更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20191009/10697.html",
+      "reviewResult": "NO_TRAINING_GROUND_NEW_SOLDIER_ADDITION_FOUND"
+    },
+    {
+      "noticePublishedAt": "2019-11-13",
+      "title": "11月14日更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20191113/11212.html",
+      "reviewResult": "NO_TRAINING_GROUND_NEW_SOLDIER_ADDITION_FOUND"
+    },
+    {
+      "noticePublishedAt": "2020-02-26",
+      "title": "2月27日更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20200226/11692.html",
+      "reviewResult": "NO_TRAINING_GROUND_NEW_SOLDIER_ADDITION_FOUND"
+    },
+    {
+      "noticePublishedAt": "2020-03-04",
+      "title": "“魔之启示录”更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20200304/11713.html",
+      "reviewResult": "NO_TRAINING_GROUND_NEW_SOLDIER_ADDITION_FOUND"
+    },
+    {
+      "noticePublishedAt": "2020-04-15",
+      "title": "4月16日更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20200415/11874.html",
+      "reviewResult": "NO_TRAINING_GROUND_NEW_SOLDIER_ADDITION_FOUND"
+    },
+    {
+      "noticePublishedAt": "2020-05-27",
+      "title": "“晶澈的预言”更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20200527/12068.html",
+      "reviewResult": "NO_TRAINING_GROUND_NEW_SOLDIER_ADDITION_FOUND"
+    },
+    {
+      "noticePublishedAt": "2020-07-22",
+      "title": "《梦幻模拟战》X《OVERLORD》更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20200722/12315.html",
+      "reviewResult": "NO_TRAINING_GROUND_NEW_SOLDIER_ADDITION_FOUND"
+    },
+    {
+      "noticePublishedAt": "2020-07-29",
+      "title": "7月30日更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20200729/12338.html",
+      "reviewResult": "NO_TRAINING_GROUND_NEW_SOLDIER_ADDITION_FOUND"
+    }
+  ],
+  "coverageAfter": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "boundaries": {
+    "stage5_8Mutated": false,
+    "releaseMetadataMutated": false,
+    "canonicalPopulationRecomputed": false,
+    "heroSoldierRelationRecomputed": false,
+    "negativeEvidencePromoted": false,
+    "launchPopulationInferred": false,
+    "nameSimilarityJoin": false,
+    "idArithmetic": false,
+    "archiveOrderInference": false,
+    "batchCountIdentityMapping": false,
+    "samePatchOrderClaimed": false,
+    "spChronologyIncluded": false,
+    "lowerTierChronologyIncluded": false
+  },
+  "blockers": [],
+  "reviews": [],
+  "nextOwner": "soldier-release-metadata-evidence-acquisition",
+  "nextStartPoint": [
+    "Continue backward into official Chinese publisher archives before 2019-08, keeping Stage 11-A7's 13 candidate identities unresolved unless primary identity provenance is found.",
+    "Treat launch/base Soldier chronology as a separate evidence problem; do not infer it by subtracting later additions from the current population.",
+    "If a newly found primary notice inside 2019-10-01 through 2020-07-31 explicitly adds Soldiers, reopen Stage 11-A8 and admit that event through the release-evidence owner."
+  ],
+  "reopenConditions": [
+    "A primary publisher source inside the scanned window explicitly adds or unlocks one or more new Soldiers.",
+    "The official archive index or preserved source snapshot reveals a missed qualifying notice in the scanned window.",
+    "The release evidence contract changes the meaning or admissibility of negative archive evidence."
+  ]
+}
