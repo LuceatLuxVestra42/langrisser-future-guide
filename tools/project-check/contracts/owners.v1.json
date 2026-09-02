@@ -105,12 +105,17 @@
     },
     {
       "id":"configdata-lookup-tooling",
-      "patterns":["tools/configdata-lookup/**","data/contracts/project-tooling-configdata-lookup-*.json",".github/workflows/project-tooling-configdata-lookup-clr2.yml",".github/workflows/project-tooling-configdata-lookup-writer.yml",".github/workflows/configdata-lookup-stage6.yml",".github/workflows/configdata-lookup-stage7.yml",".github/workflows/configdata-lookup-stage8.yml"],
+      "patterns":["tools/configdata-lookup/**","data/contracts/project-tooling-configdata-lookup-*.json","scripts/validate-configdata-lookup-stage0.mjs",".github/workflows/project-tooling-configdata-lookup-clr2.yml",".github/workflows/project-tooling-configdata-lookup-writer.yml",".github/workflows/configdata-lookup-stage0.yml",".github/workflows/configdata-lookup-stage1.yml",".github/workflows/configdata-lookup-stage2.yml",".github/workflows/configdata-lookup-stage6.yml",".github/workflows/configdata-lookup-stage7.yml",".github/workflows/configdata-lookup-stage8.yml"],
       "owners":["configdata-lookup"]
     },
     {
       "id":"configdata-source-pack-tooling",
       "patterns":["data/contracts/configdata-source-pack-*","data/manifests/configdata-source-pack-*","data/generated/configdata-source-pack-*","data/validation/configdata-source-pack-*","docs/checkpoints/configdata-source-pack-*","scripts/*configdata-source-pack*",".github/workflows/configdata-source-pack-*"],
+      "owners":["configdata-source-pack"]
+    },
+    {
+      "id":"configdata-maintenance-direct-adapter",
+      "patterns":["scripts/lib/configdata-direct.cjs"],
       "owners":["configdata-source-pack"]
     },
     {
@@ -213,6 +218,11 @@
       "owners":["soldier-frontend","localization"]
     },
     {
+      "id":"soldier-training-tech-classification-evidence",
+      "patterns":["data/evidence/soldier-training-tech-classification-*"],
+      "owners":["soldier-canonical"]
+    },
+    {
       "id":"soldier-canonical",
       "patterns":["data/soldier-*","data/generated/soldier-*","data/validation/soldier-*","data/contracts/soldier-*","scripts/*soldier*",".github/workflows/soldier-*"],
       "excludePatterns":["data/generated/soldier-portrait-*","data/validation/soldier-portrait-*","data/contracts/soldier-portrait-*","scripts/*soldier-portrait*",".github/workflows/soldier-portrait-*","data/presentation/soldier-*","data/validation/soldier-*-presentation*","scripts/*soldier*presentation*",".github/workflows/soldier-*-presentation*","data/generated/soldier-training-material-*","data/validation/soldier-training-material-*","data/contracts/soldier-training-material-*","scripts/*soldier-training-material*",".github/workflows/soldier-training-material-*"],
@@ -237,6 +247,11 @@
       "id":"equipment-presentation",
       "patterns":["data/presentation/equipment-*","data/validation/equipment-*-presentation*","data/generated/equipment-name-*","scripts/*equipment-name*",".github/workflows/equipment-*-presentation*"],
       "owners":["equipment-frontend","localization"]
+    },
+    {
+      "id":"equipment-acquisition-maintenance",
+      "patterns":["scripts/scan-acquisition-pathtype-sources.mjs","scripts/sample-acquisition-pathtypes.mjs"],
+      "owners":["equipment-canonical"]
     },
     {
       "id":"equipment-canonical",

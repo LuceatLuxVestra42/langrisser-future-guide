@@ -1,0 +1,251 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-tech-classification-stage3-semantic-evidence/v1",
+  "stage": "TrainingTech Classification Stage 3 - Representative Semantic Evidence",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "TRAINING_TECH_CLASSIFICATION_STAGE3_REPRESENTATIVE_EVIDENCE_FROZEN",
+  "purpose": "Freeze human-reviewed semantic evidence for every non-protected TrainingTech structural signature without yet classifying all 287 Tech records or admitting new automatic whole-Tech rules.",
+  "predecessors": {
+    "stage2Validation": {
+      "path": "data/validation/soldier-training-tech-classification-stage2.v1.json",
+      "gitBlobSha": "00da7db05cc5343f48a400961d5f42a7f840d763",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "COMPLETE",
+      "requiredFreezeState": "TRAINING_TECH_CLASSIFICATION_STAGE2_EVIDENCE_FROZEN"
+    },
+    "candidateEvidence": {
+      "path": "data/evidence/soldier-training-tech-classification-stage3-candidates.v1.json",
+      "gitBlobSha": "30d24bd673044b58f8f0711bb4e121078618d5c2",
+      "requiredStatus": "INVESTIGATION_ONLY",
+      "requiredStructuralGroupCount": 15,
+      "requiredNonGrowthTechCount": 158
+    }
+  },
+  "sourceSnapshots": {
+    "trainingTech": {
+      "path": "data/configdata/ConfigDataTrainingTechInfo.json",
+      "gitBlobSha": "ad8b290f0e34de24b6eab9538894068a06e086d4",
+      "recordCount": 287
+    },
+    "trainingTechLevel": {
+      "path": "data/configdata/ConfigDataTrainingTechLevelInfo.json",
+      "gitBlobSha": "30789c3e4fb0d79b56514e720bb71a053df78c72",
+      "recordCount": 2945
+    }
+  },
+  "reviewMethod": {
+    "mode": "HUMAN_REVIEW_OF_EXPLICIT_SOURCE_TEXT_AND_RELATION_FIELDS",
+    "automaticDescriptionKeywordClassifierUsed": false,
+    "automaticNameKeywordClassifierUsed": false,
+    "idArithmeticUsed": false,
+    "idRangeUsed": false,
+    "sourceOrderUsedAsMeaning": false,
+    "techTypeNumericMeaningAssumedBeforeReview": false,
+    "note": "Name and Description are used only as manually reviewed source evidence for the selected representatives. The validator verifies exact source binding but does not infer semantics from text."
+  },
+  "coverage": {
+    "totalTrainingTech": 287,
+    "protectedCanonicalNormalTier3GrowthTech": 129,
+    "nonProtectedTrainingTech": 158,
+    "nonProtectedStructuralGroups": 15,
+    "representativeSemanticReviews": 15,
+    "commonStatRepresentativeGroups": 8,
+    "commonStatStructurallyCoveredTech": 84,
+    "commonPassiveRepresentativeGroups": 5,
+    "commonPassiveStructurallyCoveredTech": 46,
+    "soldierSpecificProgressionRepresentativeGroups": 2,
+    "soldierSpecificProgressionStructurallyCoveredTech": 28
+  },
+  "representativeReviews": [
+    {
+      "techId": 101,
+      "techTypeRaw": 1,
+      "semanticFinding": "COMMON_STAT_REPRESENTATIVE",
+      "evidenceLevelInfoId": 1010,
+      "evidenceDescription": "所有步兵的生命<color=#DC143C>+2</color>，攻击<color=#DC143C>+2</color>",
+      "reason": "Explicit level text applies unconditional HP and ATK stat increases to all related infantry."
+    },
+    {
+      "techId": 102,
+      "techTypeRaw": 1,
+      "semanticFinding": "COMMON_STAT_REPRESENTATIVE",
+      "evidenceLevelInfoId": 1020,
+      "evidenceDescription": "所有步兵的防御<color=#DC143C>+1</color>，魔防<color=#DC143C>+1</color>",
+      "reason": "Explicit level text applies unconditional DEF and MDEF stat increases to all related infantry."
+    },
+    {
+      "techId": 103,
+      "techTypeRaw": 1,
+      "semanticFinding": "COMMON_STAT_REPRESENTATIVE",
+      "evidenceLevelInfoId": 1030,
+      "evidenceDescription": "所有步兵的生命<color=#DC143C>+1%</color>",
+      "reason": "Explicit level text applies an unconditional HP percentage increase to all related infantry."
+    },
+    {
+      "techId": 109,
+      "techTypeRaw": 1,
+      "semanticFinding": "COMMON_STAT_REPRESENTATIVE",
+      "evidenceLevelInfoId": 1090,
+      "evidenceDescription": "所有步兵的攻击<color=#DC143C>+1%</color>",
+      "reason": "Explicit level text applies an unconditional ATK percentage increase to all related infantry."
+    },
+    {
+      "techId": 110,
+      "techTypeRaw": 1,
+      "semanticFinding": "COMMON_STAT_REPRESENTATIVE",
+      "evidenceLevelInfoId": 1100,
+      "evidenceDescription": "所有步兵的生命<color=#DC143C>+3</color>",
+      "reason": "Explicit level text applies an unconditional flat HP increase to all related infantry."
+    },
+    {
+      "techId": 118,
+      "techTypeRaw": 1,
+      "semanticFinding": "COMMON_STAT_REPRESENTATIVE",
+      "evidenceLevelInfoId": 1180,
+      "evidenceDescription": "所有步兵的攻击<color=#DC143C>+3</color>",
+      "reason": "Explicit level text applies an unconditional flat ATK increase to all related infantry."
+    },
+    {
+      "techId": 119,
+      "techTypeRaw": 1,
+      "semanticFinding": "COMMON_STAT_REPRESENTATIVE",
+      "evidenceLevelInfoId": 1190,
+      "evidenceDescription": "所有步兵的攻击<color=#DC143C>+2%</color>",
+      "reason": "Explicit level text applies an unconditional ATK percentage increase in the 20-level structural signature."
+    },
+    {
+      "techId": 219,
+      "techTypeRaw": 1,
+      "semanticFinding": "COMMON_STAT_REPRESENTATIVE",
+      "evidenceLevelInfoId": 2190,
+      "evidenceDescription": "所有枪兵的生命<color=#DC143C>+2%</color>",
+      "reason": "Explicit level text confirms the remaining TechType 1 structural signature is also an unconditional related-army stat increase."
+    },
+    {
+      "techId": 105,
+      "techTypeRaw": 3,
+      "semanticFinding": "COMMON_PASSIVE_REPRESENTATIVE",
+      "evidenceLevelInfoId": 1050,
+      "evidenceDescription": "所有步兵，对枪兵战斗时，攻防提升<color=#DC143C>5%</color>。",
+      "reason": "Explicit level text conditions ATK/DEF improvement on fighting a target army type, so it is a combat-condition effect rather than a base stat node."
+    },
+    {
+      "techId": 122,
+      "techTypeRaw": 3,
+      "semanticFinding": "COMMON_PASSIVE_REPRESENTATIVE",
+      "evidenceLevelInfoId": 1220,
+      "evidenceDescription": "所有步兵，在与生命值百分比等于和低于本部队的敌军交战时，攻防提升<color=#DC143C>5%</color>。",
+      "reason": "Explicit level text conditions the effect on relative HP during combat."
+    },
+    {
+      "techId": 405,
+      "techTypeRaw": 3,
+      "semanticFinding": "COMMON_PASSIVE_REPRESENTATIVE",
+      "evidenceLevelInfoId": 4050,
+      "evidenceDescription": "所有飞兵和水兵，生命大于<color=#DC143C>80%</color>时，攻防提升<color=#DC143C>5%</color>。",
+      "reason": "Explicit level text applies a conditional combat effect to related flying and aquatic armies and demonstrates that SoldierIDRelated may coexist with a common passive."
+    },
+    {
+      "techId": 425,
+      "techTypeRaw": 3,
+      "semanticFinding": "COMMON_PASSIVE_REPRESENTATIVE",
+      "evidenceLevelInfoId": 4250,
+      "evidenceDescription": "所有水兵，在水中攻击敌军时，造成伤害提升<color=#DC143C>5%</color>。",
+      "reason": "Explicit level text conditions damage increase on attacking in water; SoldierIDRelated and ArmyIDRelated coexist without making the Tech Soldier growth."
+    },
+    {
+      "techId": 528,
+      "techTypeRaw": 3,
+      "semanticFinding": "COMMON_PASSIVE_REPRESENTATIVE",
+      "evidenceLevelInfoId": 5280,
+      "evidenceDescription": "所有刺客，在攻击<color=#DC143C>100%</color>生命值的敌军时，造成伤害提升<color=#DC143C>5%</color>。",
+      "reason": "Explicit level text conditions damage increase on the enemy's HP state and covers the no-PreTech TechType 3 structural signature."
+    },
+    {
+      "techId": 106,
+      "techTypeRaw": 2,
+      "semanticFinding": "SOLDIER_SPECIFIC_PROGRESSION_REPRESENTATIVE",
+      "evidenceLevelInfoId": 1060,
+      "evidenceDescription": "全属性<color=#DC143C>+1%</color>\n主动进入战斗时，遭受伤害降低<color=#DC143C>10%</color>。",
+      "reason": "TrainingTechInfo has SoldierIDRelated and its five referenced level records carry an exact SoldierSkillLevelup 1-to-5 progression. It is Soldier-specific progression, not a common stat/passive node."
+    },
+    {
+      "techId": 632,
+      "techTypeRaw": 2,
+      "semanticFinding": "SOLDIER_SPECIFIC_PROGRESSION_WITH_UNLOCK_FACET_REPRESENTATIVE",
+      "evidenceLevelInfoId": 6320,
+      "evidenceDescription": "全属性<color=#DC143C>+2%</color>\n士兵生命高于<color=#DC143C>80%</color>时，身上每有一个强化状态，则士兵攻击、防御、魔防提升<color=#DC143C>5%</color>。（最高提升15%）",
+      "explicitUnlockedSoldierIds": [804],
+      "reason": "The same Tech has SoldierIDRelated, exact SoldierSkillLevelup 1-to-10 progression, and SoldierIDUnlocked=804 on its level records. Unlock is therefore an orthogonal facet that can coexist with Soldier progression."
+    }
+  ],
+  "semanticConclusions": {
+    "commonStatFamily": {
+      "status": "REPRESENTATIVE_EVIDENCE_CONFIRMED",
+      "observedRawTechType": 1,
+      "reviewedStructuralSignatures": 8,
+      "structurallyCoveredTechCount": 84,
+      "stage4CandidateRule": "TechTypeRaw=1 -> COMMON_STAT",
+      "automaticRuleAdmittedNow": false
+    },
+    "commonPassiveFamily": {
+      "status": "REPRESENTATIVE_EVIDENCE_CONFIRMED",
+      "observedRawTechType": 3,
+      "reviewedStructuralSignatures": 5,
+      "structurallyCoveredTechCount": 46,
+      "stage4CandidateRule": "TechTypeRaw=3 -> COMMON_PASSIVE",
+      "automaticRuleAdmittedNow": false
+    },
+    "soldierSpecificProgressionOutsideProtected129": {
+      "status": "REPRESENTATIVE_EVIDENCE_CONFIRMED",
+      "observedRawTechType": 2,
+      "reviewedStructuralSignatures": 2,
+      "structurallyCoveredTechCount": 28,
+      "note": "These 28 Tech records are outside the Stage 2 protected canonical NORMAL Tier 3 set. Stage 3 does not assign them to the protected SOLDIER_GROWTH category.",
+      "automaticRuleAdmittedNow": false
+    },
+    "prerequisiteAndUnlock": {
+      "exclusiveWholeTechLabel": "REJECTED_BY_REPRESENTATIVE_EVIDENCE",
+      "reason": "PreTechIDs/PreTechLevel occur across common stat, common passive, and Soldier-specific progression. SoldierIDUnlocked can coexist with exact 1-to-10 Soldier progression (Tech 632).",
+      "requiredModel": {
+        "prerequisite": "ORTHOGONAL_RELATION_FACET",
+        "unlock": "ORTHOGONAL_RELATION_FACET"
+      },
+      "forbiddenStage4Behavior": "Do not classify a whole Tech as PREREQUISITE_OR_UNLOCK merely because PreTechIDs, PreTechLevel, RoomLevelRequired, or SoldierIDUnlocked exists."
+    }
+  },
+  "stage4RuleAdmissionBoundary": {
+    "newAutomaticWholeTechRulesAdmittedByStage3": [],
+    "candidateRulesForIndependentStage4Admission": [
+      "TechTypeRaw=1 -> COMMON_STAT",
+      "TechTypeRaw=3 -> COMMON_PASSIVE"
+    ],
+    "type2Boundary": "Keep the protected 129 NORMAL Tier 3 growth Techs as SOLDIER_GROWTH. Keep the other 28 Soldier-specific progression Techs separate until Stage 4 freezes their final label/preservation treatment.",
+    "requiredFallback": "REVIEW_UNCLASSIFIED"
+  },
+  "nonScope": [
+    "full 287-record classification",
+    "effect/stat numeric extraction for all common Techs",
+    "Korean localization",
+    "UI grouping/order",
+    "frontend consumption",
+    "Soldier canonical mutation",
+    "Hero-Soldier or SP-NORMAL relation mutation"
+  ],
+  "reviews": [
+    "The two candidate TechType whole-family rules are not automatic production rules until Stage 4 independently admits them.",
+    "The 28 non-protected TechType 2 Soldier-specific progression records need an explicit Stage 4 final label or review treatment; they must not be folded into PREREQUISITE_OR_UNLOCK."
+  ],
+  "blockers": [],
+  "nextOwner": "TrainingTech Stage 4 Classification Contract",
+  "nextStartPoint": "Use this representative evidence plus the frozen Stage 1 census and Stage 2 evidence boundary to admit only independently validated whole-Tech rules. Model prerequisite/unlock as facets, preserve the protected 129 SOLDIER_GROWTH Techs, and define explicit treatment for the remaining 28 Soldier-specific progression Techs.",
+  "reopenConditions": [
+    "Stage 2 evidence contract or Stage 1 census changes.",
+    "TrainingTech or TrainingTechLevel source snapshot changes.",
+    "Representative evidence source binding mismatch.",
+    "Authoritative contradiction to the common-stat/common-passive representative semantics or prerequisite/unlock facet conclusion.",
+    "Project Check ownership/orchestration contract change affecting these paths.",
+    "Hard owning-validator failure."
+  ]
+}

@@ -2,22 +2,22 @@
 
 const fs = require('fs');
 const path = require('path');
+const { resolveConfigDataFile } = require('./configdata-source-pack-maintenance-root.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
-const CONFIG = path.join(ROOT, 'data', 'configdata');
 const OUT = path.join(ROOT, 'data', 'validation', 'hero-display-stat-investigation.v1.json');
 const JOB_LINKS = path.join(ROOT, 'data', 'generated', 'hero-job-links.v1.json');
 
-const HERO_INFO = path.join(CONFIG, 'ConfigDataHeroInfo.json');
-const JOB_INFO = path.join(CONFIG, 'ConfigDataJobInfo.json');
-const PROPERTY_MODIFY_INFO = path.join(CONFIG, 'ConfigDataPropertyModifyInfo.json');
+const HERO_INFO = resolveConfigDataFile('ConfigDataHeroInfo.json');
+const JOB_INFO = resolveConfigDataFile('ConfigDataJobInfo.json');
+const PROPERTY_MODIFY_INFO = resolveConfigDataFile('ConfigDataPropertyModifyInfo.json');
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 
-function preflightTextAsset(file, expectedName) {
-  const result = { file: path.relative(ROOT, file).replaceAll('\\\\', '/'), status: 'usable', issues: [] };
+function preflightTextAsset(file, expectedName, logicalFile) {
+  const result = { file: logicalFile, status: 'usable', issues: [] };
   if (!fs.existsSync(file)) {
     result.status = 'missing';
     result.issues.push('file missing');
@@ -182,9 +182,9 @@ function indexById(records, decode) {
 }
 
 function main() {
-  const heroHealth = preflightTextAsset(HERO_INFO, 'ConfigDataHeroInfo');
-  const jobHealth = preflightTextAsset(JOB_INFO, 'ConfigDataJobInfo');
-  const propertyHealth = preflightTextAsset(PROPERTY_MODIFY_INFO, 'ConfigDataPropertyModifyInfo');
+  const heroHealth = preflightTextAsset(HERO_INFO, 'ConfigDataHeroInfo', 'data/configdata/ConfigDataHeroInfo.json');
+  const jobHealth = preflightTextAsset(JOB_INFO, 'ConfigDataJobInfo', 'data/configdata/ConfigDataJobInfo.json');
+  const propertyHealth = preflightTextAsset(PROPERTY_MODIFY_INFO, 'ConfigDataPropertyModifyInfo', 'data/configdata/ConfigDataPropertyModifyInfo.json');
   const sourceHealth = [heroHealth, jobHealth, propertyHealth].map(({ asset, ...rest }) => rest);
 
   if (heroHealth.status !== 'usable' || jobHealth.status !== 'usable') {

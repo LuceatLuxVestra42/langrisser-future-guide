@@ -1,0 +1,198 @@
+{
+  "version": 1,
+  "schemaId": "configdata-lookup-b5-5-operational-cutover/v1",
+  "stage": "repository-size-reduction-B5.5",
+  "status": "PASS",
+  "completion": "CONFIGDATA_LOOKUP_B5_5_OPERATIONAL_CUTOVER_COMPLETE",
+  "owner": "configdata-lookup",
+  "supportingOwner": "configdata-source-pack",
+  "purpose": "Remove the remaining repository-local data/configdata availability precondition from ConfigData Lookup CI, maintenance validation, and explicit writer paths before the already-admitted B6 tracked raw deletion, without changing semantic authority, frozen domains, logical provenance, or production query/runtime behavior.",
+  "authoritativePredecessors": {
+    "sourcePack": {
+      "path": "data/contracts/configdata-source-pack-contract.v1.json",
+      "requiredStage": "repository-size-reduction-B2",
+      "requiredStatus": "PASS",
+      "requiredFileCount": 753,
+      "requiredLogicalRawPathNamespace": "data/configdata"
+    },
+    "sourceRootCutover": {
+      "path": "data/contracts/project-tooling-configdata-lookup-b3-source-root.v1.json",
+      "requiredStage": "repository-size-reduction-B3",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "CONFIGDATA_LOOKUP_B3_SOURCE_ROOT_CUTOVER_COMPLETE",
+      "requiredPhysicalRootSelector": "CONFIGDATA_SOURCE_ROOT"
+    },
+    "externalCleanRoom": {
+      "path": "data/contracts/project-tooling-configdata-lookup-b4-external-clean-room.v1.json",
+      "requiredStage": "repository-size-reduction-B4",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "CONFIGDATA_LOOKUP_B4_EXTERNAL_ONLY_CLEAN_ROOM_COMPLETE"
+    },
+    "deletionAdmission": {
+      "path": "data/contracts/configdata-source-pack-deletion-admission.v1.json",
+      "requiredStage": "repository-size-reduction-B5",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "CONFIGDATA_SOURCE_PACK_B5_DELETION_ADMISSION_COMPLETE",
+      "requiredAdmittedDeletionCount": 753
+    }
+  },
+  "operationalBoundary": {
+    "logicalRawPathNamespace": "data/configdata",
+    "physicalSourceRootSelector": "CONFIGDATA_SOURCE_ROOT",
+    "externalHydrationFileCount": 753,
+    "externalHydrationMustStayOutsideRepository": true,
+    "trackedRepositoryRawRootMustBeUnavailableDuringOperationalProof": true,
+    "stage0Workflow": ".github/workflows/configdata-lookup-stage0.yml",
+    "stage1Workflow": ".github/workflows/configdata-lookup-stage1.yml",
+    "stage2Workflow": ".github/workflows/configdata-lookup-stage2.yml",
+    "stage6Workflow": ".github/workflows/configdata-lookup-stage6.yml",
+    "ownerWorkflow": ".github/workflows/project-tooling-configdata-lookup-clr2.yml",
+    "writerWorkflow": ".github/workflows/project-tooling-configdata-lookup-writer.yml",
+    "stage0ValidatorEntrypoint": "scripts/validate-configdata-lookup-stage0.mjs",
+    "stage1BuilderEntrypoint": "tools/configdata-lookup/cli/build-stage1.mjs",
+    "stage1ValidatorEntrypoint": "tools/configdata-lookup/cli/validate-stage1.mjs",
+    "stage2BuilderEntrypoint": "tools/configdata-lookup/cli/build-stage2.mjs",
+    "stage2ValidatorEntrypoint": "tools/configdata-lookup/cli/validate-stage2.mjs",
+    "stage6FreshnessEntrypoint": "tools/configdata-lookup/cli/check-freshness.mjs",
+    "stage6WriterEntrypoint": "tools/configdata-lookup/cli/rebuild.mjs",
+    "legacyStage0ContractMeaningChanged": false,
+    "legacyStage1AlgorithmModified": false,
+    "legacyStage2AlgorithmModified": false,
+    "legacyStage6AlgorithmModified": false,
+    "stage0ValidatorOnlyResolvesPhysicalExistenceThroughConfiguredRoot": true,
+    "stage1AndStage2WrappersOnlyInstallCurrentSourceRootAdapter": true,
+    "b3SourceRootFixtureSeedsFromConfiguredRootWhenPresent": true,
+    "normalLookupRefsFindRemainMaterializedOnly": true,
+    "productionRuntimeReadsRawConfigData": false,
+    "productionRuntimeFetchesSourcePack": false,
+    "rawConfigDataQueryFallback": false,
+    "trackedRawDeletionOccursInThisStage": false,
+    "trackedRawDeletionStage": "B6"
+  },
+  "routingBoundary": {
+    "stage0WorkflowOwner": "configdata-lookup",
+    "stage0ValidatorOwner": "configdata-lookup",
+    "stage1WorkflowOwner": "configdata-lookup",
+    "stage2WorkflowOwner": "configdata-lookup",
+    "exactPathRulesOnly": true,
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "semanticRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarityInference": false,
+    "manualReviewAllowedForB5_5ChangedPaths": false
+  },
+  "semanticBoundary": {
+    "semanticAuthorityChanged": false,
+    "frozenSemanticDomainsReopened": false,
+    "canonicalIdentityChanges": false,
+    "relationChanges": false,
+    "newRelationDiscovery": false,
+    "sourceMeaningReinterpreted": false,
+    "logicalProvenanceChanged": false
+  },
+  "migrationState": {
+    "trackedRepositoryRawSourceStillPresent": true,
+    "trackedRepositoryRawJsonCount": 753,
+    "sourcePackContractAndHydrationCompleted": true,
+    "lookupPhysicalSourceRootCutoverCompleted": true,
+    "externalOnlyCleanRoomCompleted": true,
+    "trackedRawDeletionAdmitted": true,
+    "operationalCutoverCompleted": true,
+    "trackedRawDeletionCompleted": false
+  },
+  "requiredValidation": {
+    "stage0ExternalOnly": "PASS",
+    "stage1ExternalOnly": "PASS",
+    "stage2ExternalOnly": "PASS",
+    "stage6ExternalOnly": "PASS",
+    "configdataLookupOwnerExternalOnly": "PASS",
+    "writerExternalOnlyBehavior": "PASS_REUSE_B4_WRITER_NOOP_PLUS_B5_5_STATIC_WORKFLOW_GUARD",
+    "projectCheck": "PASS",
+    "manualReviewCount": 0,
+    "trackedMutationCount": 0,
+    "semanticMutationCount": 0
+  },
+  "validationEvidence": {
+    "proofCandidateHead": "822929a9feaaf5086efee3e95b31a386de7f596a",
+    "stage0ExternalOnly": {
+      "runId": 33597607084,
+      "jobId": 100144123118,
+      "externalHydration753": "PASS",
+      "repositoryRawRootUnavailable": "PASS",
+      "sourceRootAwareContractValidation": "PASS",
+      "trackedRawRestore": "PASS",
+      "conclusion": "success"
+    },
+    "stage1ExternalOnly": {
+      "runId": 33597607036,
+      "jobId": 100144122732,
+      "externalHydration753": "PASS",
+      "repositoryRawRootUnavailable": "PASS",
+      "stage0Predecessor": "PASS",
+      "sourceRootAwareMaterialization": "PASS",
+      "sourceRootAwareValidation": "PASS",
+      "committedIndexParity": "PASS",
+      "conclusion": "success"
+    },
+    "stage2ExternalOnly": {
+      "runId": 33597607101,
+      "jobId": 100144123434,
+      "externalHydration753": "PASS",
+      "repositoryRawRootUnavailable": "PASS",
+      "stage1Predecessor": "PASS",
+      "sourceRootAwareMaterialization": "PASS",
+      "sourceRootAwareValidation": "PASS",
+      "committedIndexParity": "PASS",
+      "conclusion": "success"
+    },
+    "stage6ExternalOnly": {
+      "runId": 33597607140,
+      "jobId": 100144123367,
+      "externalHydration753": "PASS",
+      "repositoryRawRootUnavailable": "PASS",
+      "stage5Predecessor": "PASS",
+      "committedMaterialization": "PASS",
+      "sourceRootAwareFreshness": "PASS",
+      "trackedStateUnchanged": "PASS",
+      "conclusion": "success"
+    },
+    "configdataLookupOwner": {
+      "runId": 33597607143,
+      "jobId": 100144134871,
+      "externalHydration753": "PASS",
+      "repositoryRawRootUnavailable": "PASS",
+      "stage5Compatibility": "PASS",
+      "stage6Freshness": "PASS",
+      "ownerSelfTestIncludingB5_5": "PASS",
+      "trackedStateUnchanged": "PASS",
+      "conclusion": "success"
+    },
+    "projectCheck": {
+      "runId": 33597607098,
+      "jobId": 100144123387,
+      "routingSelfTest": "PASS",
+      "deletionRoutingFixture": "PASS",
+      "ownershipPlan": "PASS",
+      "owningValidators": "PASS",
+      "trackedStateUnchanged": "PASS",
+      "conclusion": "success"
+    },
+    "writerExternalOnly": {
+      "predecessorContract": "data/contracts/project-tooling-configdata-lookup-b4-external-clean-room.v1.json",
+      "b4ExplicitWriterExecuted": true,
+      "b4ExplicitWriterChangedFileCount": 0,
+      "b5_5StaticWorkflowGuard": "PASS_VIA_CONFIGDATA_LOOKUP_OWNER_SELF_TEST"
+    }
+  },
+  "blockers": [],
+  "reviews": [],
+  "handoff": {
+    "completion": "B5_5_OPERATIONAL_CUTOVER_COMPLETE",
+    "nextOwner": "configdata-source-pack",
+    "nextSupportingOwners": ["configdata", "project-check", "configdata-lookup"],
+    "nextStage": "B6-delete-tracked-configdata",
+    "nextStart": "Delete exactly the B5-admitted 753 tracked data/configdata/*.json files in one B6 change, then run the changed-path owner/validator plan against the external-only operational paths proven here."
+  }
+}

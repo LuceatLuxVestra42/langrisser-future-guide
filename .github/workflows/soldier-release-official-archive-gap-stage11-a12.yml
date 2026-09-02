@@ -1,0 +1,39 @@
+name: Soldier Stage 11-A12 Pre-2.0 Official Archive Gap
+
+on:
+  pull_request:
+    paths:
+      - 'data/soldier-release-official-archive-gap-stage11-a12.v1.json'
+      - 'data/soldier-release-pre2020-event-boundary-stage11-a7.v1.json'
+      - 'data/soldier-release-official-archive-gap-stage11-a8.v1.json'
+      - 'data/generated/soldier-release-metadata.v1.json'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'scripts/validate-soldier-release-official-archive-gap-stage11-a12.mjs'
+      - '.github/workflows/soldier-release-official-archive-gap-stage11-a12.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/soldier-release-official-archive-gap-stage11-a12.v1.json'
+      - 'data/soldier-release-pre2020-event-boundary-stage11-a7.v1.json'
+      - 'data/soldier-release-official-archive-gap-stage11-a8.v1.json'
+      - 'data/generated/soldier-release-metadata.v1.json'
+      - 'data/generated/soldier-list-stage5-8.v1.json'
+      - 'scripts/validate-soldier-release-official-archive-gap-stage11-a12.mjs'
+      - '.github/workflows/soldier-release-official-archive-gap-stage11-a12.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Stage 11-A12 pre-2.0 official archive gap
+        run: node scripts/validate-soldier-release-official-archive-gap-stage11-a12.mjs
+      - name: Verify evidence validation is read-only
+        run: git diff --exit-code

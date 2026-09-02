@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-tech-classification-stage2-evidence-contract/v1",
+  "stage": "TrainingTech Classification Stage 2 - Evidence Contract",
+  "status": "DESIGN_FROZEN",
+  "completion": "COMPLETE",
+  "purpose": "Freeze which explicit TrainingTech and TrainingTechLevel source fields may be used as semantic classification evidence before any new common-stat/common-passive classification is produced.",
+  "predecessors": {
+    "stage1Validation": {
+      "path": "data/validation/soldier-training-tech-classification-stage1.v1.json",
+      "gitBlobSha": "6d92026762b67771c709cd8f2459c53985f9c5c6",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "COMPLETE",
+      "requiredFreezeState": "TRAINING_TECH_CLASSIFICATION_STAGE1_CENSUS_FROZEN"
+    },
+    "stage1Census": {
+      "path": "data/generated/soldier-training-tech-classification-stage1-census.v1.json",
+      "gitBlobSha": "182e87f68af45a755b48a8d36a0415088ded9f3d"
+    },
+    "frozenTrainingConsumer": {
+      "path": "data/generated/soldier-detail-stage5-4.v1.json",
+      "gitBlobSha": "b4ab27f673318f9d44642d3fc674ccfa682937f6",
+      "validationPath": "data/validation/soldier-stage5-4-training.v1.json",
+      "validationGitBlobSha": "3018b35b9655c83d0a87f49700f0a4e9817c39d9",
+      "requiredNormalTier3GrowthCount": 129
+    },
+    "soldierCanonicalAuthority": {
+      "path": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "gitBlobSha": "5b9a08161b1a8a7cb4cea07b03074b31ccada40f",
+      "requiredStatus": "PASS",
+      "requiredCanonicalSoldiers": 224,
+      "requiredNormalTier3": 129
+    }
+  },
+  "sourceSnapshots": {
+    "trainingTech": {
+      "path": "data/configdata/ConfigDataTrainingTechInfo.json",
+      "gitBlobSha": "ad8b290f0e34de24b6eab9538894068a06e086d4",
+      "recordCount": 287
+    },
+    "trainingTechLevel": {
+      "path": "data/configdata/ConfigDataTrainingTechLevelInfo.json",
+      "gitBlobSha": "30789c3e4fb0d79b56514e720bb71a053df78c72",
+      "recordCount": 2945
+    }
+  },
+  "scope": {
+    "owns": [
+      "classification-evidence admissibility",
+      "field-level evidence roles",
+      "protected existing NORMAL Tier 3 Soldier growth signature",
+      "REVIEW boundary for not-yet-confirmed common TrainingTech semantics"
+    ],
+    "doesNotOwn": [
+      "new classification of all 287 TrainingTech records",
+      "COMMON_STAT final classification rule",
+      "COMMON_PASSIVE final classification rule",
+      "final UI grouping/order",
+      "Korean localization",
+      "Soldier canonical population or identity",
+      "Hero-Soldier relation",
+      "SP-NORMAL relation",
+      "training material calculations",
+      "frontend consumption"
+    ],
+    "semanticClassificationPerformed": false
+  },
+  "evidenceRoles": {
+    "automaticClassification": {
+      "admittedWholeTechLabels": [
+        "SOLDIER_GROWTH"
+      ],
+      "rules": [
+        {
+          "id": "normal-tier3-soldier-growth-signature-v1",
+          "label": "SOLDIER_GROWTH",
+          "targetPopulation": "Frozen Stage 5-4 NORMAL Tier 3 Soldier records with populated training.techId",
+          "candidateRelation": "TrainingTechInfo.SoldierIDRelated explicitly contains the Soldier ID",
+          "levelJoin": "TrainingTechInfo.TechLevelupInfoList explicitly references TrainingTechLevelInfo.ID",
+          "orderedLevelEvidence": "Within one TechLevelupInfoList only, list position is the explicit progression order used by the frozen Soldier training consumer; global source-record order is not evidence.",
+          "requiredLevelSignature": "Resolved TrainingTechLevelInfo.SoldierSkillLevelup values are exactly 1,2,3,4,5,6,7,8,9,10 in TechLevelupInfoList order",
+          "cardinality": "Exactly one candidate Tech per frozen NORMAL Tier 3 Soldier",
+          "parity": "Candidate TrainingTechInfo.ID must equal frozen Stage 5-4 training.techId and ability.techId",
+          "expectedPopulation": 129,
+          "newMeaningIntroduced": false
+        }
+      ]
+    },
+    "explicitRelationFactsOnly": [
+      {
+        "field": "TrainingTechInfo.SoldierIDRelated",
+        "allowedMeaning": "Explicit Tech-to-Soldier relation/candidate relation only",
+        "notSufficientFor": ["SOLDIER_GROWTH by itself", "COMMON_STAT", "COMMON_PASSIVE", "PREREQUISITE_OR_UNLOCK whole-Tech classification"]
+      },
+      {
+        "field": "TrainingTechInfo.ArmyIDRelated",
+        "allowedMeaning": "Explicit Tech-to-army relation only",
+        "notSufficientFor": ["COMMON_STAT", "COMMON_PASSIVE", "whole-Tech category"]
+      },
+      {
+        "field": "TrainingTechInfo.TechLevelupInfoList",
+        "allowedMeaning": "Explicit ordered references to TrainingTechLevelInfo.ID within the same Tech",
+        "notSufficientFor": ["whole-Tech category from list length alone"]
+      },
+      {
+        "fields": ["TrainingTechInfo.PreTechIDs", "TrainingTechInfo.PreTechLevel"],
+        "allowedMeaning": "Explicit prerequisite Tech relation and required prerequisite level when cardinalities align",
+        "notSufficientFor": ["PREREQUISITE_OR_UNLOCK whole-Tech category", "COMMON_STAT", "COMMON_PASSIVE"]
+      },
+      {
+        "field": "TrainingTechInfo.RoomLevelRequired",
+        "allowedMeaning": "Explicit training-room level requirement only",
+        "notSufficientFor": ["whole-Tech category"]
+      },
+      {
+        "field": "TrainingTechLevelInfo.SoldierIDUnlocked",
+        "allowedMeaning": "Explicit Soldier unlock target carried by that level record",
+        "notSufficientFor": ["whole-Tech category without a later classification contract"]
+      },
+      {
+        "field": "TrainingTechLevelInfo.SoldierSkillID",
+        "allowedMeaning": "Explicit Soldier skill reference only",
+        "notSufficientFor": ["whole-Tech category"]
+      },
+      {
+        "field": "TrainingTechLevelInfo.SoldierSkillLevelup",
+        "allowedMeaning": "Explicit Soldier skill-level evidence; automatic whole-Tech use is admitted only inside normal-tier3-soldier-growth-signature-v1",
+        "notSufficientFor": ["COMMON_STAT", "COMMON_PASSIVE"]
+      },
+      {
+        "field": "TrainingTechLevelInfo.PreTechIDs",
+        "allowedMeaning": "Explicit level-record prerequisite reference as stored",
+        "notSufficientFor": ["whole-Tech category"]
+      }
+    ],
+    "structuralOrEconomicOnly": [
+      "TrainingTechInfo.ID",
+      "TrainingTechInfo.TechType",
+      "TrainingTechInfo.Resource",
+      "TrainingTechLevelInfo.ID",
+      "TrainingTechLevelInfo.LevelupGoldCost",
+      "TrainingTechLevelInfo.LevelupMaterialsCost",
+      "TrainingTechLevelInfo.RoomExp"
+    ],
+    "reviewOnlyText": [
+      "TrainingTechInfo.Name",
+      "TrainingTechLevelInfo.Description",
+      "TrainingTechLevelInfo.SpSoidlierDescription"
+    ]
+  },
+  "forbiddenAutomaticInference": {
+    "nameJoin": true,
+    "nameKeywordClassification": true,
+    "descriptionKeywordClassification": true,
+    "idArithmetic": true,
+    "idRangeClassification": true,
+    "filenameSimilarity": true,
+    "resourcePathKeywordClassification": true,
+    "globalSourceOrder": true,
+    "screenOrder": true,
+    "listLengthAsCategory": true,
+    "TechTypeNumericMeaningWithoutSeparateConfirmedMapping": true,
+    "SoldierIDRelatedAsGrowthByItself": true,
+    "GetSoldierTechIdAsAbsoluteJoin": true,
+    "missingValueImputation": true,
+    "historicalOutputSilentFallback": true
+  },
+  "orderedListException": {
+    "field": "TrainingTechInfo.TechLevelupInfoList",
+    "allowed": true,
+    "boundary": "Only the order of explicit level references inside one TechLevelupInfoList may align that Tech's progression levels. It may not assign a category by record position, file position, screen position, or ID pattern."
+  },
+  "unresolvedClassificationBoundary": {
+    "requiredFallback": "REVIEW_UNCLASSIFIED",
+    "wholeTechLabelsNotYetAdmitted": [
+      "COMMON_STAT",
+      "COMMON_PASSIVE",
+      "PREREQUISITE_OR_UNLOCK"
+    ],
+    "reason": "Current confirmed evidence does not yet freeze a safe whole-Tech distinction for common stat/passive/prerequisite UI categories. Representative semantic evidence is required before admission."
+  },
+  "preservationGates": {
+    "normalTier3GrowthPopulation": 129,
+    "candidateCardinalityMismatchAllowed": false,
+    "frozenTrainingTechMismatchAllowed": false,
+    "frozenAbilityTechMismatchAllowed": false,
+    "soldierCanonicalMutationAllowed": false,
+    "heroSoldierRelationMutationAllowed": false,
+    "spRelationMutationAllowed": false
+  },
+  "nextOwner": "TrainingTech Stage 3 Representative Semantic Evidence",
+  "nextStartPoint": "Select representative records for structurally distinct non-growth patterns and confirm only source-supported semantic distinctions needed to admit COMMON_STAT, COMMON_PASSIVE, or PREREQUISITE_OR_UNLOCK. Keep unresolved patterns as REVIEW_UNCLASSIFIED.",
+  "reopenConditions": [
+    "Stage 1 census or source snapshot changes.",
+    "Authoritative contradiction to the protected 129 NORMAL Tier 3 growth signature.",
+    "Soldier canonical authority or Stage 5-4 frozen training consumer changes in a way that invalidates the preservation gate.",
+    "Project Check ownership/orchestration contract changes for these paths.",
+    "Hard owning-validator failure."
+  ]
+}

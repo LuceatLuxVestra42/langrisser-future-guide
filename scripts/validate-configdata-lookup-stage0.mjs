@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const contractPath = path.join(root, 'data/contracts/configdata-lookup-stage0-contract.v1.json');
+const configuredSourceRoot = process.env.CONFIGDATA_SOURCE_ROOT?.trim() ?? '';
 
 const failures = [];
 const checks = [];
@@ -12,8 +13,9 @@ function check(name, condition, detail = null) {
   if (!condition) failures.push({ name, detail });
 }
 
-function repoPathExists(relativePath) {
-  return fs.existsSync(path.join(root, relativePath));
+function sourcePathExists(relativePath) {
+  const physicalRoot = configuredSourceRoot && path.isAbsolute(configuredSourceRoot) ? configuredSourceRoot : root;
+  return fs.existsSync(path.join(physicalRoot, relativePath));
 }
 
 let contract = null;
@@ -23,6 +25,12 @@ try {
 } catch (error) {
   check('contract parses as JSON', false, error instanceof Error ? error.message : String(error));
 }
+
+check(
+  'configured physical source root is absolute when provided',
+  configuredSourceRoot === '' || path.isAbsolute(configuredSourceRoot),
+  configuredSourceRoot || null,
+);
 
 if (contract) {
   check('stage identity is frozen', contract.stage === 'CONFIGDATA_LOOKUP_STAGE_0' && contract.status === 'CONTRACT_FROZEN');
@@ -40,7 +48,7 @@ if (contract) {
     const declaration = contract.mvpEntities?.[entity];
     check(`${entity} source declaration`, declaration?.source === expectedSource, declaration?.source ?? null);
     check(`${entity} primary key is ID`, declaration?.primaryKey === 'ID', declaration?.primaryKey ?? null);
-    check(`${entity} source exists`, repoPathExists(expectedSource), expectedSource);
+    check(`${entity} source exists`, sourcePathExists(expectedSource), expectedSource);
   }
 
   const separation = new Set(contract.semanticBoundary?.mustRemainSeparated ?? []);

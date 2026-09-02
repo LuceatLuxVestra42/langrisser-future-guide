@@ -250,6 +250,12 @@ expectOwners(
   ['configdata-source-pack-boundary', 'configdata-integrity', 'hero-canonical', 'skin-relation'],
 );
 
+expectOwners(
+  'data/evidence/soldier-training-tech-classification-stage3-semantic.v1.json',
+  ['soldier-canonical'],
+  ['soldier-canonical'],
+);
+
 const bannerAsset = routeProjectCheckPaths(['public/images/banners/Banner/probe.png'], contracts);
 assert.equal(bannerAsset.status, 'MANUAL_REVIEW');
 assert.deepEqual(bannerAsset.files[0].owners, ['banner-assets', 'banner-frontend']);

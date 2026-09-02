@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-official-archive-gap-stage11-a12/v1",
+  "stage": "11-A12",
+  "status": "PASS",
+  "completion": "PRE2_OFFICIAL_ARCHIVE_WINDOW_SCANNED_NO_QUALIFYING_EVENT_FOUND",
+  "owner": "soldier-release-metadata-evidence-acquisition",
+  "scope": "OFFICIAL_ARCHIVE_GAP_INVENTORY_NO_RELEASE_PROMOTION",
+  "capturedAt": "2026-09-02",
+  "capturedAgainstMain": "3a23088a28a3bf2c76bd650b67fce16f334581a0",
+  "predecessors": {
+    "stage11A7Boundary": "data/soldier-release-pre2020-event-boundary-stage11-a7.v1.json",
+    "stage11A8ArchiveGap": "data/soldier-release-official-archive-gap-stage11-a8.v1.json",
+    "releaseMetadata": "data/generated/soldier-release-metadata.v1.json",
+    "soldierList": "data/generated/soldier-list-stage5-8.v1.json"
+  },
+  "policy": {
+    "targetTimeline": "CN_SERVER_RELEASE_CHRONOLOGY",
+    "promotionAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
+    "qualifyingEventRequirement": "OFFICIAL_UPDATE_TEXT_EXPLICITLY_ADDS_OR_UNLOCKS_NEW_SOLDIERS_IN_TRAINING_GROUND",
+    "heroProfessionSoldierUnlockIsReleaseEvidence": false,
+    "trainingGuideIsReleaseEvidence": false,
+    "negativeSearchMeaning": "NO_QUALIFYING_EVENT_FOUND_IN_CAPTURED_OFFICIAL_ARCHIVE_SEARCH_WINDOW",
+    "negativeSearchMayProveAbsoluteNonexistence": false,
+    "negativeSearchMayAssignReleaseDate": false,
+    "negativeSearchMayInferLaunchPopulation": false,
+    "allowNameSimilarity": false,
+    "allowIdArithmetic": false,
+    "allowFilenameSimilarity": false,
+    "allowArchiveOrderInference": false,
+    "allowBatchCountToIdentityMapping": false,
+    "allowLaunchPopulationSubtraction": false,
+    "allowSamePatchOrderInference": false
+  },
+  "coverageBefore": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "archiveScan": {
+    "officialArchiveUrl": "https://mz.zlongame.com/jx/mzgg/",
+    "windowStart": "2018-08-16",
+    "windowEnd": "2019-08-14",
+    "method": "OFFICIAL_ARCHIVE_TERM_SEARCH_PLUS_BOUNDARY_AND_REPRESENTATIVE_NOTICE_REVIEW",
+    "terms": [
+      "练兵场",
+      "全新兵种",
+      "新增兵种",
+      "添加全新兵种",
+      "解锁全新小兵",
+      "解锁兵种"
+    ],
+    "qualifyingOfficialEventCountFound": 0,
+    "promotedRecordCount": 0,
+    "conclusion": "NO_QUALIFYING_TRAINING_GROUND_NEW_SOLDIER_RELEASE_EVENT_FOUND_IN_CAPTURED_PRE2_ARCHIVE_WINDOW"
+  },
+  "boundaryAnchors": {
+    "windowStartContext": {
+      "sourceId": "official-cn-all-platform-open-2018-08-16",
+      "contextDate": "2018-08-16",
+      "url": "https://mz.zlongame.com/jx/mzhd/20180816/5586.html",
+      "meaning": "OFFICIAL_ALL_PLATFORM_PUBLIC_TEST_CONTEXT_ONLY",
+      "mapsSoldiersToReleaseDate": false,
+      "mapsLaunchPopulation": false
+    },
+    "nextQualifyingEvent": {
+      "sourceId": "official-cn-2019-08-15",
+      "releaseDate": "2019-08-15",
+      "url": "https://mz.zlongame.com/jx/mzgg/20190814/7403.html",
+      "identityStatus": "EVENT_CONFIRMED_IDENTITY_UNRESOLVED",
+      "officialNewSoldierCount": 6,
+      "sourceCheckpoint": "11-A7"
+    }
+  },
+  "representativeNonQualifyingNotices": [
+    {
+      "noticePublishedAt": "2018-09-05",
+      "title": "梦幻模拟战9月6日更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20180905/5728.html",
+      "observedSoldierText": [
+        "克丽丝新职业公主解锁兵种：神官、大精灵",
+        "雾风新职业影解锁兵种：暗杀者、暗精灵射手"
+      ],
+      "reviewResult": "HERO_PROFESSION_SOLDIER_UNLOCK_NOT_TRAINING_GROUND_NEW_SOLDIER_RELEASE"
+    },
+    {
+      "noticePublishedAt": "2018-10-17",
+      "title": "梦幻模拟战10月18日更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20181017/5894.html",
+      "observedSoldierText": [
+        "艾玛林克新职业大元帅解锁兵种：近卫枪兵、狂兽人"
+      ],
+      "reviewResult": "HERO_PROFESSION_SOLDIER_UNLOCK_NOT_TRAINING_GROUND_NEW_SOLDIER_RELEASE"
+    },
+    {
+      "noticePublishedAt": "2019-02-13",
+      "title": "2月14日更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20190213/6419.html",
+      "observedSoldierText": [
+        "弗拉基亚新职业漆黑魅影解锁兵种：重装骷髅、绯雾女侍"
+      ],
+      "reviewResult": "HERO_PROFESSION_SOLDIER_UNLOCK_NOT_TRAINING_GROUND_NEW_SOLDIER_RELEASE"
+    },
+    {
+      "noticePublishedAt": "2019-04-03",
+      "title": "4月4日更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20190403/6624.html",
+      "observedSoldierText": [
+        "莉亚娜新终极职业线解锁兵种：大精灵、男巫"
+      ],
+      "reviewResult": "HERO_PROFESSION_SOLDIER_UNLOCK_NOT_TRAINING_GROUND_NEW_SOLDIER_RELEASE"
+    },
+    {
+      "noticePublishedAt": "2019-07-24",
+      "title": "7月25日更新维护公告",
+      "url": "https://mz.zlongame.com/jx/mzgg/20190724/7300.html",
+      "observedSoldierText": [
+        "英雄职业解锁兵种：男巫、圣殿骑士",
+        "格尼尔新职业弓骑统帅解锁兵种：旋风游骑兵、重戟百夫长"
+      ],
+      "reviewResult": "HERO_PROFESSION_SOLDIER_UNLOCK_NOT_TRAINING_GROUND_NEW_SOLDIER_RELEASE"
+    }
+  ],
+  "supportingSystemContext": {
+    "title": "士兵的试炼：练兵场",
+    "publishedAt": "2018-08-13",
+    "url": "https://mz.zlongame.com/jx/mzgl/20180813/5557.html",
+    "meaning": "PRE_LAUNCH_TRAINING_GROUND_SYSTEM_GUIDE_ONLY",
+    "notes": "The guide explains that Training Ground progression can unlock advanced Soldier types, but it does not enumerate a launch population or establish per-Soldier release chronology.",
+    "mapsSoldiersToReleaseDate": false,
+    "mapsLaunchPopulation": false
+  },
+  "coverageAfter": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "boundaries": {
+    "stage5_8Mutated": false,
+    "releaseMetadataMutated": false,
+    "canonicalPopulationRecomputed": false,
+    "heroSoldierRelationRecomputed": false,
+    "negativeEvidencePromoted": false,
+    "heroProfessionUnlockPromoted": false,
+    "trainingGuidePromoted": false,
+    "launchPopulationInferred": false,
+    "launchPopulationSubtractedFromCurrent": false,
+    "nameSimilarityJoin": false,
+    "idArithmetic": false,
+    "archiveOrderInference": false,
+    "batchCountIdentityMapping": false,
+    "samePatchOrderClaimed": false,
+    "spChronologyIncluded": false,
+    "lowerTierChronologyIncluded": false
+  },
+  "blockers": [],
+  "reviews": [],
+  "nextOwner": "soldier-release-metadata-evidence-acquisition",
+  "nextStartPoint": [
+    "The post-launch official update archive from 2018-08-16 through 2020-07-31 is now covered by A12, A7, and A8 boundaries; do not repeat the same archive-term scan without a new source index or preserved snapshot.",
+    "Keep Stage 11-A7's 2019-08 and 2019-09 event-only candidate identities unresolved unless a primary source explicitly ties identities to those events.",
+    "Treat launch/base Soldier availability as a separate evidence problem; do not infer it by subtracting later additions from the current population.",
+    "Continue exact official identity evidence or stronger primary chronology evidence for the remaining normal tier-3 unresolved records."
+  ],
+  "reopenConditions": [
+    "A primary publisher source inside 2018-08-16 through 2019-08-14 explicitly adds or unlocks one or more new Soldiers in the Training Ground.",
+    "The official archive index or preserved source snapshot reveals a missed qualifying notice in the scanned window.",
+    "The release evidence contract changes the treatment of Hero profession Soldier unlocks, training guides, or negative archive evidence."
+  ]
+}

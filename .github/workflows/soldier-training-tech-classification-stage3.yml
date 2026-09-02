@@ -1,0 +1,41 @@
+name: TrainingTech Stage 3 Representative Evidence
+
+on:
+  pull_request:
+    paths:
+      - 'data/evidence/soldier-training-tech-classification-stage3-*'
+      - 'data/validation/soldier-training-tech-classification-stage3.v1.json'
+      - 'scripts/investigate-soldier-training-tech-classification-stage3.mjs'
+      - 'scripts/validate-soldier-training-tech-classification-stage3.mjs'
+      - '.github/workflows/soldier-training-tech-classification-stage3.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/evidence/soldier-training-tech-classification-stage3-*'
+      - 'data/validation/soldier-training-tech-classification-stage3.v1.json'
+      - 'scripts/investigate-soldier-training-tech-classification-stage3.mjs'
+      - 'scripts/validate-soldier-training-tech-classification-stage3.mjs'
+      - '.github/workflows/soldier-training-tech-classification-stage3.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify candidate evidence reproduces without tracked mutation
+        run: |
+          node scripts/investigate-soldier-training-tech-classification-stage3.mjs
+          git diff --exit-code
+      - name: Validate frozen Stage 3 representative evidence
+        run: node scripts/validate-soldier-training-tech-classification-stage3.mjs --check
+      - name: Assert Stage 3 validation is read-only
+        run: git diff --exit-code

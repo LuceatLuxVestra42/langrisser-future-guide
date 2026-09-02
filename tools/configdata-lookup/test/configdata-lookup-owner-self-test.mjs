@@ -5,6 +5,8 @@ const cutover = (await import('./configdata-lookup-clr7-cutover.mjs')).default;
 const finalFreeze = (await import('./configdata-lookup-clr8-final-freeze.mjs')).default;
 const { runB3SourceRootCutover } = await import('./configdata-source-root-cutover-b3.mjs');
 const sourceRootCutover = await runB3SourceRootCutover({ emit: true });
+const { runB55OperationalCutover } = await import('./configdata-b5-5-operational-cutover.mjs');
+const operationalCutover = await runB55OperationalCutover({ emit: true });
 
 console.log(JSON.stringify({
   status: 'PASS',
@@ -16,6 +18,7 @@ console.log(JSON.stringify({
     cutover.completion,
     finalFreeze.completion,
     sourceRootCutover.completion,
+    operationalCutover.completion,
   ],
   shadow: {
     contractParity: shadow.contractParity,
@@ -48,6 +51,13 @@ console.log(JSON.stringify({
     logicalPathMetadataChangedCount: sourceRootCutover.logicalPathMetadataChangedCount,
     materializedByteDriftCount: sourceRootCutover.materializedByteDriftCount,
   },
+  operationalCutover: {
+    externalWorkflowCount: operationalCutover.externalWorkflowCount,
+    sourceRootAwareWrapperCount: operationalCutover.sourceRootAwareWrapperCount,
+    explicitStageWorkflowRoutingCount: operationalCutover.explicitStageWorkflowRoutingCount,
+    externalHydrationFileCount: operationalCutover.externalHydrationFileCount,
+    trackedRawDeletionCount: operationalCutover.trackedRawDeletionCount,
+  },
   boundaries: {
     ...shadow.boundaries,
     trackedMutationCount: finalFreeze.boundaries.trackedMutationCount,
@@ -59,5 +69,8 @@ console.log(JSON.stringify({
     stage8ActiveAuthorityCount: finalFreeze.boundaries.stage8ActiveAuthorityCount,
     sourceRootTrackedRawMutationCount: sourceRootCutover.trackedRawMutationCount,
     sourceRootSemanticMutationCount: sourceRootCutover.semanticMutationCount,
+    b55SemanticAuthorityChanged: operationalCutover.semanticAuthorityChanged,
+    b55FrozenSemanticDomainsReopened: operationalCutover.frozenSemanticDomainsReopened,
+    b55TrackedRawDeletionCount: operationalCutover.trackedRawDeletionCount,
   },
 }, null, 2));
