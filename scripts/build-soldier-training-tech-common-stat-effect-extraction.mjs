@@ -104,18 +104,22 @@ const records = targetIds.map((techId) => {
   req(Array.isArray(refs) && refs.length > 0, `COMMON_STAT Tech ${techId} lacks TechLevelupInfoList.`);
   req(same(refs, census.explicitLevelReferences), `Stage 1 explicit level reference projection drifted for Tech ${techId}.`);
   let techShapeKey = null;
+  let techShapeEffects = null;
   const levels = refs.map((levelId) => {
     req(Number.isInteger(levelId), `Tech ${techId} has a non-integer level reference.`);
     const source = levelById.get(levelId);
     req(source, `Unresolved TrainingTechLevel ID ${levelId} referenced by Tech ${techId}.`);
     const parsed = parseEffectText(source.Description, levelId);
-    if (techShapeKey == null) techShapeKey = parsed.shapeKey;
+    if (techShapeKey == null) {
+      techShapeKey = parsed.shapeKey;
+      techShapeEffects = parsed.effects.map(({ statTokenRaw, statKey: key, unit }) => ({ statTokenRaw, statKey: key, unit }));
+    }
     req(parsed.shapeKey === techShapeKey, `COMMON_STAT Tech ${techId} changes effect shape across levels: ${techShapeKey} -> ${parsed.shapeKey}.`);
     referencedLevelIds.push(levelId);
     structuredEffectEntryCount += parsed.effects.length;
-    return { levelId, effectTextRaw: source.Description, effects: parsed.effects };
+    return { levelId, values: parsed.effects.map((effect) => effect.value) };
   });
-  const shape = levels[0]?.effects?.map(({ statTokenRaw, statKey: key, unit }) => ({ statTokenRaw, statKey: key, unit })) ?? [];
+  const shape = techShapeEffects ?? [];
   req(techShapeKey && shape.length > 0, `COMMON_STAT Tech ${techId} has no structured effect shape.`);
   const current = shapeCatalog.get(techShapeKey) ?? { shapeKey: techShapeKey, effects: shape, techIds: [], levelRowCount: 0 };
   current.techIds.push(techId);
@@ -137,7 +141,7 @@ const output = {
   status: "PASS",
   completion: "COMPLETE",
   freezeState: "TRAINING_TECH_COMMON_STAT_EFFECT_EXTRACTION_FROZEN",
-  purpose: "Materialize raw and directly structured stat effects for the frozen 84 COMMON_STAT TrainingTech records through exact explicit TechLevelupInfoList joins, without reclassification, conditional inference, or unrelated raw-source duplication.",
+  purpose: "Materialize compact structured stat effects for the frozen 84 COMMON_STAT TrainingTech records through exact explicit TechLevelupInfoList joins, while the independent validator retains responsibility for exact source-Description parity.",
   authority: {
     boundary: { path: P.boundary, gitBlobSha: blob(P.boundary), requiredFreezeState: boundary.freezeState },
     stage5Classification: { path: P.stage5, gitBlobSha: blob(P.stage5), requiredFreezeState: stage5.freezeState },
@@ -160,7 +164,8 @@ const output = {
     inputLabel: "COMMON_STAT",
     classificationAuthority: "STAGE5_FROZEN_MEMBERSHIP_ONLY",
     explicitTechLevelupInfoListJoinOnly: true,
-    descriptionsMaterializedAsRawEffectText: true,
+    descriptionsReadForDirectEffectExtraction: true,
+    descriptionsMaterializedInConsumer: false,
     directStatTokensStructured: true,
     numericEffectParsed: true,
     conditionalEffectInferencePerformed: false,
@@ -179,7 +184,7 @@ const output = {
     materializedTechCount: 84,
     referencedLevelRowCount: 1050,
     uniqueReferencedLevelRowCount: 1050,
-    rawEffectTextRowCount: 1050,
+    sourceDescriptionRowCountValidated: 1050,
     structuredEffectRowCount: 1050,
     structuredEffectEntryCount,
     effectShapeCount: effectShapeCatalog.length,
@@ -199,6 +204,7 @@ const output = {
     "The frozen COMMON_STAT membership is no longer exactly 84 Tech IDs.",
     "Any explicit TechLevelupInfoList reference fails exact resolution.",
     "Any admitted COMMON_STAT Description contains a numeric token that cannot be aligned one-to-one with an explicit stat/value effect token.",
+    "The compact structured values no longer reproduce exactly from the pinned source Description rows.",
     "Independent validator fails or Project Check reports a hard owning-validator failure."
   ],
 };
