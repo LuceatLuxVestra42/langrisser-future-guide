@@ -69,12 +69,12 @@ same({
   DEFERRED_NON_ERROR: reviews.filter(review => review.lifecycle === 'DEFERRED_NON_ERROR').length,
   BOUNDARY_NOTE: reviews.filter(review => review.lifecycle === 'BOUNDARY_NOTE').length,
 }, {
-  ACTIVE_REVIEW: 9,
+  ACTIVE_REVIEW: 8,
   RESOLVED_BY_EVIDENCE: 2,
   DEFERRED_NON_ERROR: 8,
-  BOUNDARY_NOTE: 9,
-}, 'corrected lifecycle counts');
-if (reviews.filter(review => review.healthImpact === true).length !== 9) fail('health-impact review entry count must be 9');
+  BOUNDARY_NOTE: 10,
+}, 'Stage 11-0 lifecycle counts');
+if (reviews.filter(review => review.healthImpact === true).length !== 8) fail('health-impact review entry count must be 8 after Stage 11-0');
 if (reviews.filter(review => typeof review.issueKey === 'string' && review.issueKey.length > 0).length !== 27) fail('assigned review entry count must be 27');
 if (reviews.filter(review => review.issueKey === null).length !== 1) fail('only the Hero mixed publication umbrella may remain unassigned');
 if (new Set(reviews.map(review => review.issueKey).filter(Boolean)).size !== 25) fail('unique assigned issue count must be 25');
@@ -98,6 +98,7 @@ const identityReview = soldierByCode('IDENTITY_PRESENTATION_REVIEW');
 const krNameReview = soldierByCode('KR_NAME_UNRESOLVED');
 const portraitReview = soldierByCode('REPRESENTATIVE_ASSET_ID_UNFROZEN');
 const lowerTierBoundary = soldierByCode('LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED');
+const samePatchBoundary = soldierByCode('SAME_PATCH_ORDER_UNRESOLVED');
 
 if (!releaseReview || releaseReview.reportedCount !== 213 || releaseReview.resolvedCount !== 0 || releaseReview.remainingCount !== 213
   || releaseReview.lifecycle !== 'ACTIVE_REVIEW' || releaseReview.issueKey !== 'SOLDIER_RELEASE_DATE_METADATA') {
@@ -132,6 +133,10 @@ if (portraitReview?.lifecycle !== 'RESOLVED_BY_EVIDENCE' || portraitReview.healt
 if (lowerTierBoundary?.lifecycle !== 'BOUNDARY_NOTE' || lowerTierBoundary.healthImpact !== false
   || lowerTierBoundary.remainingCount !== 0 || lowerTierBoundary.resolvedCount !== 39) {
   fail(`lower-tier chronology boundary drift: ${JSON.stringify(lowerTierBoundary)}`);
+}
+if (samePatchBoundary?.lifecycle !== 'BOUNDARY_NOTE' || samePatchBoundary.healthImpact !== false
+  || samePatchBoundary.issueKey !== 'SOLDIER_SAME_PATCH_ORDER') {
+  fail(`same-patch chronology must be a non-health boundary: ${JSON.stringify(samePatchBoundary)}`);
 }
 
 const heroSoldier = normalized.domains.find(item => item.domain === 'hero-soldier');
@@ -174,15 +179,15 @@ same({
   healthImpactIssues: projected.healthImpactIssueTotal,
 }, {
   reported: 28,
-  active: 9,
+  active: 8,
   resolved: 2,
   deferred: 8,
-  boundary: 9,
-  healthImpact: 9,
+  boundary: 10,
+  healthImpact: 8,
   assigned: 27,
   unassigned: 1,
   uniqueIssues: 25,
-  healthImpactIssues: 6,
+  healthImpactIssues: 5,
 }, 'corrected projected review aggregates');
 
 const projectedSoldier = projected.domains.find(item => item.domain === 'soldier');
@@ -192,7 +197,7 @@ same({
   deferred: projectedSoldier.deferredReviewTotal,
   boundary: projectedSoldier.boundaryNoteTotal,
   healthImpact: projectedSoldier.healthImpactReviewTotal,
-}, { active: 4, resolved: 2, deferred: 1, boundary: 5, healthImpact: 4 }, 'corrected Soldier projected lifecycle aggregates');
+}, { active: 3, resolved: 2, deferred: 1, boundary: 6, healthImpact: 3 }, 'Stage 11-0 Soldier projected lifecycle aggregates');
 
 const reviewLifecycleContract = loadReviewLifecycleContract({ repoRoot });
 const syntheticPartial = normalizeProjectStatus({
@@ -361,7 +366,7 @@ for (const forbidden of ['data/generated/project-doctor', 'data/configdata/', 's
 }
 if (!first.markdown.includes('NEW Status Source authority') || !first.markdown.includes('raw ConfigData')) fail('markdown safety/authority copy drift');
 
-console.log('[project-status-r2] PASS: corrected Stage 10 Soldier naming lifecycle, 41 -> 39/2 partial resolution, health cutover, canonical compatibility, writer boundary, and runtime independence verified.');
+console.log('[project-status-r2] PASS: Stage 11-0 same-patch chronology boundary, Stage 10 Soldier naming lifecycle, canonical compatibility, writer boundary, and runtime independence verified.');
 console.log(JSON.stringify({
   projectHealth: projected.projectHealth,
   reviewTotal: projected.reviewTotal,
