@@ -193,3 +193,5 @@ console.log(JSON.stringify({
   graphDigest: c2Committed.graphDigest,
   classificationDigest: c3Committed.classificationDigest,
 }, null, 2));
+
+await import('./c4-retention-readonly.mjs');
