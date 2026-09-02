@@ -5,10 +5,8 @@ import {
   BriefcaseBusiness,
   ChevronLeft,
   ChevronRight,
-  Database,
   HeartHandshake,
   ImageOff,
-  ShieldCheck,
   Sparkles,
   Swords,
   UserRound,
@@ -89,7 +87,7 @@ function stripConfigMarkup(value: string | null) {
 }
 
 function HeroDetailPage() {
-  const { hero, stage6, detail, exclusiveEquipment, soldierCards } = Route.useLoaderData();
+  const { hero, detail, exclusiveEquipment, soldierCards } = Route.useLoaderData();
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const soldierDetailById = useMemo(
     () => new Map(getSoldierPrototypePageData().records.map((record) => [record.soldierId, record])),
@@ -416,42 +414,22 @@ function HeroDetailPage() {
         <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
         <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
 
-        <section className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-soldier-cards="true">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <SectionTitle icon={<UsersRound className="h-4 w-4" aria-hidden="true" />} title="사용 가능 용병" />
-                <p className="mt-2 text-sm text-muted-foreground">A단계 확정 관계의 Soldier ID를 기존 224종 frontend consumer와 ID lookup으로 연결해. 관계를 다시 계산하지 않아.</p>
-              </div>
-              <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">{soldierCards.length}종</span>
+        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-soldier-cards="true">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <SectionTitle icon={<UsersRound className="h-4 w-4" aria-hidden="true" />} title="사용 가능 용병" />
+              <p className="mt-2 text-sm text-muted-foreground">A단계 확정 관계의 Soldier ID를 기존 224종 frontend consumer와 ID lookup으로 연결해. 관계를 다시 계산하지 않아.</p>
             </div>
-            <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
-              {soldierCards.map((record) => (
-                <HeroSoldierCard
-                  key={record.soldierId}
-                  record={record}
-                  onOpen={setSelectedSoldierId}
-                />
-              ))}
-            </div>
+            <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">{soldierCards.length}종</span>
           </div>
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-            <SectionTitle icon={<ShieldCheck className="h-4 w-4" aria-hidden="true" />} title="확정 시스템 연결" />
-            <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-              <StatusChip label="유대" value={`${detail.systems.bondRowCount}개`} active={detail.systems.bondRowCount > 0} />
-              <StatusChip label="전용장비" value={exclusiveEquipment.status} active={exclusiveEquipment.released} />
-              <StatusChip label="중앙율정" value={detail.systems.centralDisciplineStatus ?? "-"} active={detail.systems.centralDisciplineReleased} />
-              <StatusChip label="SP" value={detail.systems.spStatus ?? "-"} active={detail.systems.spReleased} />
-              <StatusChip label="스킨" value={`${detail.presentation.skinCount}개`} active={detail.presentation.skinCount > 0} />
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <SectionTitle icon={<Database className="h-4 w-4" aria-hidden="true" />} title="상세 데이터 상태" />
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">Hero 본문은 FINAL_FROZEN Stage 6 개별 shard 하나만 읽고, 전용장비는 별도 frozen B-5 byHero 소유권과 Equipment Stage 3-5 메타데이터를 조합해. 용병 카드는 Stage 6의 확정 Soldier ID를 기존 frozen Soldier frontend consumer에 ID lookup만 하고, 원본 ConfigData 관계 재계산이나 이름·ID 추론은 하지 않아.</p>
-          <div className="mt-4 flex flex-wrap gap-2 text-xs">
-            <span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">Stage 6 · {stage6.admissionStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">구조 {detail.validation.structuralStatus}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">게시 {detail.validation.publicationStatus ?? "-"}</span><span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">review {detail.validation.reviewCount}</span>
+          <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
+            {soldierCards.map((record) => (
+              <HeroSoldierCard
+                key={record.soldierId}
+                record={record}
+                onOpen={setSelectedSoldierId}
+              />
+            ))}
           </div>
         </section>
       </div>
@@ -584,5 +562,4 @@ function formatBondCondition(condition: { requiredHero: { heroId: number | null;
 function SectionTitle({ icon, title }: { icon: ReactNode; title: string }) { return <div className="flex items-center gap-2">{icon}<h2 className="font-bold text-foreground">{title}</h2></div>; }
 function InfoBlock({ title, children }: { title: string; children: ReactNode }) { return <div className="rounded-xl border border-border bg-muted/30 p-4"><p className="mb-2 text-xs font-bold text-muted-foreground">{title}</p>{children}</div>; }
 function JobStatCell({ value }: { value: number | null }) { return <td className="px-4 py-3 text-right font-bold tabular-nums text-foreground">{value ?? "-"}</td>; }
-function StatusChip({ label, value, active }: { label: string; value: string; active: boolean }) { return <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2"><span className="font-semibold text-foreground">{label}</span><span className="text-muted-foreground">{active ? value : value}</span></div>; }
 function HeroNotFound() { return <main className="min-h-screen bg-background"><div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-4 text-center"><Swords className="mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="text-2xl font-bold text-foreground">영웅을 찾을 수 없어.</h1><p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 Hero 목록에 존재하지 않는 주소야.</p><Link reloadDocument to="/heroes" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground underline underline-offset-4"><ArrowLeft className="h-4 w-4" aria-hidden="true" />영웅 목록으로</Link></div></main>; }
