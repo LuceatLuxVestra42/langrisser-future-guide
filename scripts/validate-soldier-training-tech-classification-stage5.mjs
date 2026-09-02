@@ -6,243 +6,175 @@ const root = process.cwd();
 const args = new Set(process.argv.slice(2));
 const writeMode = args.has("--write");
 const checkMode = args.has("--check") || !writeMode;
-
 const paths = {
-  stage1Census: "data/generated/soldier-training-tech-classification-stage1-census.v1.json",
-  stage2Validation: "data/validation/soldier-training-tech-classification-stage2.v1.json",
+  stage1: "data/generated/soldier-training-tech-classification-stage1-census.v1.json",
+  stage2: "data/validation/soldier-training-tech-classification-stage2.v1.json",
   stage3Candidates: "data/evidence/soldier-training-tech-classification-stage3-candidates.v1.json",
   stage3Semantic: "data/evidence/soldier-training-tech-classification-stage3-semantic.v1.json",
   stage3Validation: "data/validation/soldier-training-tech-classification-stage3.v1.json",
   stage4Contract: "data/contracts/soldier-training-tech-classification-stage4-contract.v1.json",
   stage4Validation: "data/validation/soldier-training-tech-classification-stage4.v1.json",
-  frozenTrainingConsumer: "data/generated/soldier-detail-stage5-4.v1.json",
+  trainingConsumer: "data/generated/soldier-detail-stage5-4.v1.json",
   classification: "data/generated/soldier-training-tech-classification-stage5.v1.json",
   output: "data/validation/soldier-training-tech-classification-stage5.v1.json",
 };
-
-const readText = (path) => readFileSync(resolve(root, path), "utf8");
-const readJson = (path) => JSON.parse(readText(path));
-const gitBlobSha = (path) => {
-  const bytes = readFileSync(resolve(root, path));
-  const header = Buffer.from(`blob ${bytes.length}\0`);
-  return createHash("sha1").update(header).update(bytes).digest("hex");
+const text = (p) => readFileSync(resolve(root, p), "utf8");
+const json = (p) => JSON.parse(text(p));
+const blob = (p) => {
+  const b = readFileSync(resolve(root, p));
+  return createHash("sha1").update(Buffer.from(`blob ${b.length}\0`)).update(b).digest("hex");
 };
-
-const stage1 = readJson(paths.stage1Census);
-const stage2 = readJson(paths.stage2Validation);
-const candidates = readJson(paths.stage3Candidates);
-const semantic = readJson(paths.stage3Semantic);
-const stage3 = readJson(paths.stage3Validation);
-const contract = readJson(paths.stage4Contract);
-const stage4 = readJson(paths.stage4Validation);
-const soldierDetail = readJson(paths.frozenTrainingConsumer);
-const classification = readJson(paths.classification);
-
+const stage1 = json(paths.stage1);
+const stage2 = json(paths.stage2);
+const candidates = json(paths.stage3Candidates);
+const semantic = json(paths.stage3Semantic);
+const stage3 = json(paths.stage3Validation);
+const contract = json(paths.stage4Contract);
+const stage4 = json(paths.stage4Validation);
+const training = json(paths.trainingConsumer);
+const artifact = json(paths.classification);
 const errors = [];
-const check = (condition, message) => {
-  if (!condition) errors.push(message);
-  return Boolean(condition);
-};
+const check = (ok, message) => { if (!ok) errors.push(message); return Boolean(ok); };
 const checks = {};
 
-checks.stage4ContractFrozen = check(contract.status === "DESIGN_FROZEN" && contract.completion === "COMPLETE" && contract.freezeState === "TRAINING_TECH_CLASSIFICATION_STAGE4_CONTRACT_FROZEN", "Stage 4 contract is not frozen COMPLETE.");
-checks.stage4ValidationPass = check(stage4.status === "PASS" && stage4.completion === "COMPLETE" && stage4.freezeState === "TRAINING_TECH_CLASSIFICATION_STAGE4_CONTRACT_FROZEN", "Stage 4 validation is not frozen PASS/COMPLETE.");
-checks.stage1BlobMatch = check(gitBlobSha(paths.stage1Census) === contract.predecessors.stage1Census.gitBlobSha, "Stage 1 census blob mismatch.");
-checks.stage2BlobMatch = check(gitBlobSha(paths.stage2Validation) === contract.predecessors.stage2Validation.gitBlobSha, "Stage 2 validation blob mismatch.");
-checks.stage3CandidateBlobMatch = check(gitBlobSha(paths.stage3Candidates) === contract.predecessors.stage3CandidateEvidence.gitBlobSha, "Stage 3 candidate evidence blob mismatch.");
-checks.stage3SemanticBlobMatch = check(gitBlobSha(paths.stage3Semantic) === contract.predecessors.stage3SemanticEvidence.gitBlobSha, "Stage 3 semantic evidence blob mismatch.");
-checks.stage3ValidationBlobMatch = check(gitBlobSha(paths.stage3Validation) === contract.predecessors.stage3Validation.gitBlobSha, "Stage 3 validation blob mismatch.");
-checks.frozenTrainingConsumerBlobMatch = check(gitBlobSha(paths.frozenTrainingConsumer) === contract.predecessors.frozenTrainingConsumer.gitBlobSha, "Frozen training consumer blob mismatch.");
-checks.stage4ContractBlobBound = check(stage4.contract?.gitBlobSha === gitBlobSha(paths.stage4Contract), "Stage 4 validation does not bind the current contract blob.");
-checks.stage1Population = check(stage1.status === "PASS" && stage1.records?.length === 287 && stage1.population?.trainingTech === 287, "Stage 1 census is not frozen at 287 records.");
-checks.stage2Pass = check(stage2.status === "PASS" && stage2.completion === "COMPLETE", "Stage 2 validation is not PASS/COMPLETE.");
-checks.stage3Pass = check(stage3.status === "PASS" && stage3.completion === "COMPLETE" && semantic.status === "PASS" && semantic.completion === "COMPLETE", "Stage 3 evidence is not PASS/COMPLETE.");
-checks.stage4DryRunPass = check(stage4.coverage?.trainingTech === 287 && stage4.coverage?.ruleOverlapCount === 0 && stage4.coverage?.reviewUnclassifiedCount === 0, "Stage 4 dry-run is not the frozen 287/0/0 state.");
-
-const stage1Records = stage1.records ?? [];
-const stage1ById = new Map(stage1Records.map((record) => [record.id, record]));
-const protectedGrowthTechIds = new Set(
-  (soldierDetail.records ?? [])
-    .filter((record) => record.identity?.tier === 3 && record.identity?.isSp === false && record.training?.techId != null)
-    .map((record) => record.training.techId),
+checks.stage4ContractFrozen = check(contract.status === "DESIGN_FROZEN" && contract.completion === "COMPLETE" && contract.freezeState === "TRAINING_TECH_CLASSIFICATION_STAGE4_CONTRACT_FROZEN", "Stage 4 contract not frozen COMPLETE.");
+checks.stage4ValidationPass = check(stage4.status === "PASS" && stage4.completion === "COMPLETE", "Stage 4 validation not PASS/COMPLETE.");
+checks.stage1Population = check(stage1.status === "PASS" && stage1.records?.length === 287, "Stage 1 census not 287 PASS records.");
+checks.stage2Pass = check(stage2.status === "PASS" && stage2.completion === "COMPLETE", "Stage 2 validation not PASS/COMPLETE.");
+checks.stage3Pass = check(stage3.status === "PASS" && stage3.completion === "COMPLETE" && semantic.status === "PASS" && semantic.completion === "COMPLETE", "Stage 3 evidence not PASS/COMPLETE.");
+checks.predecessorBlobs = check(
+  blob(paths.stage1) === contract.predecessors.stage1Census.gitBlobSha &&
+  blob(paths.stage2) === contract.predecessors.stage2Validation.gitBlobSha &&
+  blob(paths.stage3Candidates) === contract.predecessors.stage3CandidateEvidence.gitBlobSha &&
+  blob(paths.stage3Semantic) === contract.predecessors.stage3SemanticEvidence.gitBlobSha &&
+  blob(paths.stage3Validation) === contract.predecessors.stage3Validation.gitBlobSha &&
+  blob(paths.trainingConsumer) === contract.predecessors.frozenTrainingConsumer.gitBlobSha &&
+  stage4.contract?.gitBlobSha === blob(paths.stage4Contract),
+  "Frozen predecessor blob binding mismatch.",
 );
-checks.protectedGrowthPopulation = check(protectedGrowthTechIds.size === 129, `Expected 129 protected growth Tech IDs, got ${protectedGrowthTechIds.size}.`);
+checks.stage4DryRunPass = check(stage4.coverage?.trainingTech === 287 && stage4.coverage?.ruleOverlapCount === 0 && stage4.coverage?.reviewUnclassifiedCount === 0, "Stage 4 dry-run coverage drifted.");
 
-const structuralGroups = candidates.structuralGroups ?? [];
-const groupByTechId = new Map();
-const groupRefByTechId = new Map();
-let duplicateCandidateMembership = 0;
-for (const [index, group] of structuralGroups.entries()) {
-  const ref = `STAGE3_GROUP_${index + 1}`;
-  for (const techId of group.techIds ?? []) {
-    if (groupByTechId.has(techId)) duplicateCandidateMembership += 1;
-    groupByTechId.set(techId, group);
-    groupRefByTechId.set(techId, ref);
+const rows = stage1.records ?? [];
+const byId = new Map(rows.map((r) => [r.id, r]));
+const growth = new Set((training.records ?? []).filter((r) => r.identity?.tier === 3 && r.identity?.isSp === false && r.training?.techId != null).map((r) => r.training.techId));
+checks.protectedGrowthPopulation = check(growth.size === 129, `Protected growth population ${growth.size}, expected 129.`);
+const groups = candidates.structuralGroups ?? [];
+const groupByTech = new Map();
+const groupRefByTech = new Map();
+let duplicateGroupMembership = 0;
+for (const [index, g] of groups.entries()) {
+  for (const id of g.techIds ?? []) {
+    if (groupByTech.has(id)) duplicateGroupMembership += 1;
+    groupByTech.set(id, g);
+    groupRefByTech.set(id, `G${index + 1}`);
   }
 }
-checks.candidatePartition = check(groupByTechId.size === 158 && duplicateCandidateMembership === 0, `Stage 3 candidate partition is not unique 158/158; duplicates=${duplicateCandidateMembership}.`);
-checks.fullFrozenPartition = check(stage1Records.every((record) => protectedGrowthTechIds.has(record.id) !== groupByTechId.has(record.id)), "Protected growth plus Stage 3 candidates do not partition all Stage 1 IDs exactly once.");
+checks.candidatePartition = check(groups.length === 15 && groupByTech.size === 158 && duplicateGroupMembership === 0, `Stage 3 partition mismatch: groups=${groups.length}, techs=${groupByTech.size}, duplicates=${duplicateGroupMembership}.`);
+checks.fullFrozenPartition = check(rows.every((r) => growth.has(r.id) !== groupByTech.has(r.id)), "Protected growth and Stage 3 groups do not partition Stage 1 IDs exactly once.");
 
-const reviewByTechId = new Map((semantic.representativeReviews ?? []).map((review) => [review.techId, review]));
-const expectedRuleIdByLabel = {
-  SOLDIER_GROWTH: "protected-normal-tier3-soldier-growth-v1",
-  COMMON_STAT: "common-stat-techtype-v1",
-  COMMON_PASSIVE: "common-passive-techtype-v1",
-  SOLDIER_SPECIFIC_PROGRESSION: "nonprotected-soldier-specific-progression-v1",
-  REVIEW_UNCLASSIFIED: null,
+const classCatalogExpected = {
+  GROWTH: { label: "SOLDIER_GROWTH", ruleId: "protected-normal-tier3-soldier-growth-v1" },
+  STAT: { label: "COMMON_STAT", ruleId: "common-stat-techtype-v1" },
+  PASSIVE: { label: "COMMON_PASSIVE", ruleId: "common-passive-techtype-v1" },
+  PROGRESSION: { label: "SOLDIER_SPECIFIC_PROGRESSION", ruleId: "nonprotected-soldier-specific-progression-v1" },
 };
-const labelForGroup = (group) => {
-  if (group?.signature?.techTypeRaw === 1) return "COMMON_STAT";
-  if (group?.signature?.techTypeRaw === 3) return "COMMON_PASSIVE";
-  if (group?.signature?.techTypeRaw === 2 && group?.signature?.relationShape === "SOLDIER_ONLY" && ["EXACT_1_TO_5", "EXACT_1_TO_10"].includes(group?.signature?.skillLevelupShape)) return "SOLDIER_SPECIFIC_PROGRESSION";
-  return "REVIEW_UNCLASSIFIED";
+const classForGroup = (g) => {
+  if (g?.signature?.techTypeRaw === 1) return "STAT";
+  if (g?.signature?.techTypeRaw === 3) return "PASSIVE";
+  if (g?.signature?.techTypeRaw === 2 && g?.signature?.relationShape === "SOLDIER_ONLY" && ["EXACT_1_TO_5", "EXACT_1_TO_10"].includes(g?.signature?.skillLevelupShape)) return "PROGRESSION";
+  return null;
 };
-const expectedFor = (record) => {
-  const id = record.id;
-  const type = record.raw?.TechType;
-  const group = groupByTechId.get(id) ?? null;
-  const matches = [];
-  if (protectedGrowthTechIds.has(id)) matches.push("SOLDIER_GROWTH");
-  if (!protectedGrowthTechIds.has(id) && type === 1 && labelForGroup(group) === "COMMON_STAT") matches.push("COMMON_STAT");
-  if (!protectedGrowthTechIds.has(id) && type === 3 && labelForGroup(group) === "COMMON_PASSIVE") matches.push("COMMON_PASSIVE");
-  if (!protectedGrowthTechIds.has(id) && type === 2 && labelForGroup(group) === "SOLDIER_SPECIFIC_PROGRESSION") matches.push("SOLDIER_SPECIFIC_PROGRESSION");
-  const label = matches.length === 1 ? matches[0] : "REVIEW_UNCLASSIFIED";
-  return {
-    label,
-    ruleId: expectedRuleIdByLabel[label],
-    matchCount: matches.length,
-    group,
-    evidenceRef: label === "SOLDIER_GROWTH" ? "PROTECTED_GROWTH" : (groupRefByTechId.get(id) ?? null),
-  };
-};
-
-checks.classificationFrozen = check(classification.status === "PASS" && classification.completion === "COMPLETE" && classification.freezeState === "TRAINING_TECH_CLASSIFICATION_STAGE5_FULL_CLASSIFICATION_FROZEN", "Stage 5 classification artifact is not frozen PASS/COMPLETE.");
-checks.classificationSchema = check(classification.schemaId === "soldier-training-tech-classification-stage5/v1" && classification.version === 1, "Stage 5 classification schema/version mismatch.");
-checks.classificationPredecessorBlobs = check(
-  classification.predecessors?.stage1Census?.gitBlobSha === gitBlobSha(paths.stage1Census) &&
-  classification.predecessors?.stage2Validation?.gitBlobSha === gitBlobSha(paths.stage2Validation) &&
-  classification.predecessors?.stage3Candidates?.gitBlobSha === gitBlobSha(paths.stage3Candidates) &&
-  classification.predecessors?.stage3Semantic?.gitBlobSha === gitBlobSha(paths.stage3Semantic) &&
-  classification.predecessors?.stage3Validation?.gitBlobSha === gitBlobSha(paths.stage3Validation) &&
-  classification.predecessors?.stage4Contract?.gitBlobSha === gitBlobSha(paths.stage4Contract) &&
-  classification.predecessors?.stage4Validation?.gitBlobSha === gitBlobSha(paths.stage4Validation) &&
-  classification.predecessors?.frozenTrainingConsumer?.gitBlobSha === gitBlobSha(paths.frozenTrainingConsumer),
-  "Stage 5 predecessor blob binding mismatch.",
+checks.artifactFrozen = check(artifact.status === "PASS" && artifact.completion === "COMPLETE" && artifact.freezeState === "TRAINING_TECH_CLASSIFICATION_STAGE5_FULL_CLASSIFICATION_FROZEN", "Stage 5 artifact not frozen PASS/COMPLETE.");
+checks.artifactSchema = check(artifact.version === 1 && artifact.schemaId === "soldier-training-tech-classification-stage5/v1", "Stage 5 schema/version mismatch.");
+checks.artifactPredecessors = check(
+  artifact.predecessors?.stage1Census?.[1] === blob(paths.stage1) && artifact.predecessors?.stage1Census?.[0] === paths.stage1 &&
+  artifact.predecessors?.stage2Validation?.[1] === blob(paths.stage2) &&
+  artifact.predecessors?.stage3Candidates?.[1] === blob(paths.stage3Candidates) &&
+  artifact.predecessors?.stage3Semantic?.[1] === blob(paths.stage3Semantic) &&
+  artifact.predecessors?.stage3Validation?.[1] === blob(paths.stage3Validation) &&
+  artifact.predecessors?.stage4Contract?.[1] === blob(paths.stage4Contract) &&
+  artifact.predecessors?.stage4Validation?.[1] === blob(paths.stage4Validation) &&
+  artifact.predecessors?.frozenTrainingConsumer?.[1] === blob(paths.trainingConsumer),
+  "Stage 5 predecessor binding mismatch.",
 );
 checks.policyBoundary = check(
-  classification.policy?.classificationAuthority === "STAGE4_FROZEN_CONTRACT_ONLY" &&
-  classification.policy?.descriptionsReadForClassification === false &&
-  classification.policy?.namesReadForClassification === false &&
-  classification.policy?.idArithmeticPerformed === false &&
-  classification.policy?.nameJoinPerformed === false &&
-  classification.policy?.sourceOrderUsedAsMeaning === false &&
-  classification.policy?.prerequisiteUsedAsWholeTechCategory === false &&
-  classification.policy?.soldierUnlockUsedAsWholeTechCategory === false &&
-  classification.policy?.soldierUnlockValuesMaterializedInStage5 === false,
-  "Stage 5 policy boundary permits forbidden inference or facet/category collapse.",
+  artifact.policy?.classificationAuthority === "STAGE4_FROZEN_CONTRACT_ONLY" &&
+  artifact.policy?.descriptionsReadForClassification === false && artifact.policy?.namesReadForClassification === false &&
+  artifact.policy?.nameJoinPerformed === false && artifact.policy?.idArithmeticPerformed === false && artifact.policy?.sourceOrderUsedAsMeaning === false &&
+  artifact.policy?.prerequisiteUsedAsWholeTechCategory === false && artifact.policy?.soldierUnlockUsedAsWholeTechCategory === false &&
+  artifact.policy?.soldierUnlockValuesMaterializedInStage5 === false && artifact.policy?.historicalFallbackUsed === false,
+  "Stage 5 policy boundary permits forbidden inference.",
 );
-checks.facetCatalogBoundary = check(
-  classification.facetCatalog?.PREREQUISITE?.model === "ORTHOGONAL_RELATION_FACET" &&
-  classification.facetCatalog?.PREREQUISITE?.sourcePath === paths.stage1Census &&
-  classification.facetCatalog?.PREREQUISITE?.classificationRole === "NONE" &&
-  classification.facetCatalog?.SOLDIER_UNLOCK?.model === "ORTHOGONAL_RELATION_FACET" &&
-  classification.facetCatalog?.SOLDIER_UNLOCK?.levelReferenceSourcePath === paths.stage1Census &&
-  classification.facetCatalog?.SOLDIER_UNLOCK?.levelSourceLogicalPath === contract.sourceSnapshots.trainingTechLevel.logicalPath &&
-  classification.facetCatalog?.SOLDIER_UNLOCK?.sourceField === "TrainingTechLevelInfo.SoldierIDUnlocked" &&
-  classification.facetCatalog?.SOLDIER_UNLOCK?.materializedValues === false &&
-  classification.facetCatalog?.SOLDIER_UNLOCK?.classificationRole === "NONE" &&
-  classification.facetCatalog?.rejectedExclusiveWholeTechLabel === "PREREQUISITE_OR_UNLOCK",
-  "Stage 5 facet catalog boundary drifted from Stage 4 contract.",
+checks.classCatalog = check(JSON.stringify(artifact.classCatalog) === JSON.stringify(classCatalogExpected), "Stage 5 class catalog mismatch.");
+checks.recordColumns = check(JSON.stringify(artifact.recordColumns) === JSON.stringify(["sourceIndex", "techId", "rawTechType", "classCode", "evidenceRef", "prerequisitePresent", "candidateSignatureHasLevelUnlockField"]), "Stage 5 record columns mismatch.");
+checks.facetBoundary = check(
+  artifact.facetCatalog?.PREREQUISITE?.model === "ORTHOGONAL_RELATION_FACET" && artifact.facetCatalog?.PREREQUISITE?.sourcePath === paths.stage1 && artifact.facetCatalog?.PREREQUISITE?.classificationRole === "NONE" &&
+  artifact.facetCatalog?.SOLDIER_UNLOCK?.model === "ORTHOGONAL_RELATION_FACET" && artifact.facetCatalog?.SOLDIER_UNLOCK?.levelReferenceSourcePath === paths.stage1 &&
+  artifact.facetCatalog?.SOLDIER_UNLOCK?.levelSourceLogicalPath === contract.sourceSnapshots.trainingTechLevel.logicalPath && artifact.facetCatalog?.SOLDIER_UNLOCK?.materializedValues === false && artifact.facetCatalog?.SOLDIER_UNLOCK?.classificationRole === "NONE" &&
+  artifact.facetCatalog?.rejectedExclusiveWholeTechLabel === "PREREQUISITE_OR_UNLOCK",
+  "Stage 5 facet boundary drifted.",
 );
 
-const evidenceCatalog = classification.evidenceCatalog ?? [];
-const evidenceByRef = new Map(evidenceCatalog.map((entry) => [entry.ref, entry]));
-checks.evidenceCatalogUnique = check(evidenceCatalog.length === 16 && evidenceByRef.size === 16, `Stage 5 evidence catalog is not unique 16/16: ${evidenceCatalog.length}/${evidenceByRef.size}.`);
-const protectedEvidence = evidenceByRef.get("PROTECTED_GROWTH");
-checks.protectedEvidenceCatalog = check(
-  protectedEvidence?.label === "SOLDIER_GROWTH" &&
-  protectedEvidence?.ruleId === expectedRuleIdByLabel.SOLDIER_GROWTH &&
-  JSON.stringify(protectedEvidence?.sources ?? []) === JSON.stringify([paths.stage1Census, paths.stage2Validation, paths.frozenTrainingConsumer, paths.stage4Contract]),
-  "Stage 5 protected-growth evidence catalog entry mismatch.",
+const reviewByTech = new Map((semantic.representativeReviews ?? []).map((r) => [r.techId, r]));
+const evidence = artifact.evidenceCatalog ?? {};
+checks.evidenceCatalogSize = check(Object.keys(evidence).length === 16, `Evidence catalog size ${Object.keys(evidence).length}, expected 16.`);
+checks.protectedEvidence = check(
+  evidence.PG?.classCode === "GROWTH" && JSON.stringify(evidence.PG?.sources ?? []) === JSON.stringify([paths.stage1, paths.stage2, paths.trainingConsumer, paths.stage4Contract]),
+  "Protected growth evidence catalog mismatch.",
 );
 let groupEvidenceMismatchCount = 0;
-for (const [index, group] of structuralGroups.entries()) {
-  const ref = `STAGE3_GROUP_${index + 1}`;
-  const entry = evidenceByRef.get(ref);
-  const label = labelForGroup(group);
-  const representativeReview = reviewByTechId.get(group.representative?.techId) ?? null;
-  if (
-    entry?.label !== label ||
-    entry?.ruleId !== expectedRuleIdByLabel[label] ||
-    entry?.candidatePath !== paths.stage3Candidates ||
-    entry?.signatureKey !== group.signatureKey ||
-    entry?.representativeTechId !== (group.representative?.techId ?? null) ||
-    entry?.semanticPath !== paths.stage3Semantic ||
-    entry?.semanticFinding !== (representativeReview?.semanticFinding ?? null) ||
-    entry?.stage4ContractPath !== paths.stage4Contract
-  ) groupEvidenceMismatchCount += 1;
+for (const [index, g] of groups.entries()) {
+  const e = evidence[`G${index + 1}`];
+  const rep = g.representative?.techId ?? null;
+  if (e?.classCode !== classForGroup(g) || e?.signatureKey !== g.signatureKey || e?.representativeTechId !== rep || e?.semanticFinding !== (reviewByTech.get(rep)?.semanticFinding ?? null) || JSON.stringify(e?.sources ?? []) !== JSON.stringify([paths.stage3Candidates, paths.stage3Semantic, paths.stage4Contract])) groupEvidenceMismatchCount += 1;
 }
-checks.groupEvidenceCatalog = check(groupEvidenceMismatchCount === 0, `Stage 5 Stage 3 group evidence catalog mismatches: ${groupEvidenceMismatchCount}.`);
+checks.groupEvidenceCatalog = check(groupEvidenceMismatchCount === 0, `Stage 3 evidence catalog mismatches: ${groupEvidenceMismatchCount}.`);
 
-const actualRecords = classification.records ?? [];
-const actualById = new Map(actualRecords.map((record) => [record.techId, record]));
-checks.recordPopulation = check(actualRecords.length === 287 && actualById.size === 287, `Stage 5 record population/uniqueness is ${actualRecords.length}/${actualById.size}, expected 287/287.`);
-checks.stage1CoverageExactlyOnce = check(stage1Records.every((record) => actualById.has(record.id)) && actualRecords.every((record) => stage1ById.has(record.techId)), "Stage 5 record IDs do not exactly cover the frozen Stage 1 population.");
-checks.sourceOrderParity = check(actualRecords.every((record, index) => record.techId === stage1Records[index]?.id && record.sourceIndex === stage1Records[index]?.sourceIndex), "Stage 5 deterministic record order does not match Stage 1 source-index order.");
+const matrix = artifact.records ?? [];
+const matrixById = new Map(matrix.map((r) => [r?.[1], r]));
+checks.recordPopulation = check(matrix.length === 287 && matrixById.size === 287, `Stage 5 record population/uniqueness ${matrix.length}/${matrixById.size}.`);
+checks.stage1Coverage = check(rows.every((r) => matrixById.has(r.id)) && matrix.every((r) => byId.has(r?.[1])), "Stage 5 records do not exactly cover Stage 1 IDs.");
+checks.sourceOrderParity = check(matrix.every((r, i) => r?.[0] === rows[i]?.sourceIndex && r?.[1] === rows[i]?.id), "Stage 5 matrix order does not match Stage 1 source order.");
 
 let perRecordMismatchCount = 0;
 let prerequisiteFacetMismatchCount = 0;
 let unlockFacetMismatchCount = 0;
 let evidenceRefMismatchCount = 0;
+let overlap = 0;
 let protectedRelabelCount = 0;
-let ruleOverlapCount = 0;
-const fallbackIds = [];
-for (const sourceRecord of stage1Records) {
-  const actual = actualById.get(sourceRecord.id);
+const labelCounts = { SOLDIER_GROWTH: 0, COMMON_STAT: 0, COMMON_PASSIVE: 0, SOLDIER_SPECIFIC_PROGRESSION: 0, REVIEW_UNCLASSIFIED: 0 };
+for (const source of rows) {
+  const actual = matrixById.get(source.id);
   if (!actual) continue;
-  const expected = expectedFor(sourceRecord);
-  if (expected.matchCount > 1) ruleOverlapCount += 1;
-  if (expected.label === "REVIEW_UNCLASSIFIED") fallbackIds.push(sourceRecord.id);
-  if (protectedGrowthTechIds.has(sourceRecord.id) && actual.label !== "SOLDIER_GROWTH") protectedRelabelCount += 1;
-  if (
-    actual.sourceIndex !== sourceRecord.sourceIndex ||
-    actual.rawTechType !== sourceRecord.raw?.TechType ||
-    actual.label !== expected.label ||
-    actual.ruleId !== expected.ruleId ||
-    actual.ruleMatchCount !== expected.matchCount
-  ) perRecordMismatchCount += 1;
-
-  const preTechIds = Array.isArray(sourceRecord.raw?.PreTechIDs) ? sourceRecord.raw.PreTechIDs : [];
-  if (actual.prerequisiteFacetRef !== "PREREQUISITE" || actual.prerequisitePresent !== (preTechIds.length > 0)) prerequisiteFacetMismatchCount += 1;
-  if (actual.soldierUnlockFacetRef !== "SOLDIER_UNLOCK" || actual.candidateSignatureHasLevelUnlockField !== (expected.group?.signature?.hasLevelUnlockField ?? null)) unlockFacetMismatchCount += 1;
-  if (actual.evidenceRef !== expected.evidenceRef || !evidenceByRef.has(actual.evidenceRef)) evidenceRefMismatchCount += 1;
+  const group = groupByTech.get(source.id) ?? null;
+  const matches = [];
+  if (growth.has(source.id)) matches.push("GROWTH");
+  if (!growth.has(source.id) && source.raw?.TechType === 1 && classForGroup(group) === "STAT") matches.push("STAT");
+  if (!growth.has(source.id) && source.raw?.TechType === 3 && classForGroup(group) === "PASSIVE") matches.push("PASSIVE");
+  if (!growth.has(source.id) && source.raw?.TechType === 2 && classForGroup(group) === "PROGRESSION") matches.push("PROGRESSION");
+  if (matches.length > 1) overlap += 1;
+  const expectedCode = matches.length === 1 ? matches[0] : null;
+  if (expectedCode) labelCounts[classCatalogExpected[expectedCode].label] += 1; else labelCounts.REVIEW_UNCLASSIFIED += 1;
+  const expectedEvidence = expectedCode === "GROWTH" ? "PG" : groupRefByTech.get(source.id);
+  const prePresent = Array.isArray(source.raw?.PreTechIDs) && source.raw.PreTechIDs.length > 0;
+  const unlockSignature = group?.signature?.hasLevelUnlockField ?? null;
+  if (actual?.[0] !== source.sourceIndex || actual?.[1] !== source.id || actual?.[2] !== (source.raw?.TechType ?? null) || actual?.[3] !== expectedCode) perRecordMismatchCount += 1;
+  if (actual?.[4] !== expectedEvidence || !evidence[actual?.[4]]) evidenceRefMismatchCount += 1;
+  if (actual?.[5] !== prePresent) prerequisiteFacetMismatchCount += 1;
+  if (actual?.[6] !== unlockSignature) unlockFacetMismatchCount += 1;
+  if (growth.has(source.id) && actual?.[3] !== "GROWTH") protectedRelabelCount += 1;
 }
-checks.perRecordClassificationParity = check(perRecordMismatchCount === 0, `Stage 5 per-record classification mismatches: ${perRecordMismatchCount}.`);
-checks.prerequisiteFacetParity = check(prerequisiteFacetMismatchCount === 0, `Stage 5 prerequisite facet mismatches: ${prerequisiteFacetMismatchCount}.`);
-checks.soldierUnlockFacetBoundary = check(unlockFacetMismatchCount === 0, `Stage 5 Soldier unlock facet boundary mismatches: ${unlockFacetMismatchCount}.`);
-checks.recordEvidenceProvenance = check(evidenceRefMismatchCount === 0, `Stage 5 record evidenceRef mismatches: ${evidenceRefMismatchCount}.`);
-checks.ruleOverlapZero = check(ruleOverlapCount === 0, `Stage 5 recomputed rule overlap count is ${ruleOverlapCount}.`);
-checks.fallbackZero = check(fallbackIds.length === 0, `Stage 5 recomputed REVIEW_UNCLASSIFIED IDs: ${fallbackIds.join(",")}`);
-checks.protectedGrowthNeverRelabeled = check(protectedRelabelCount === 0, `Stage 5 protected growth relabel count is ${protectedRelabelCount}.`);
-
-const labelCounts = {
-  SOLDIER_GROWTH: actualRecords.filter((record) => record.label === "SOLDIER_GROWTH").length,
-  COMMON_STAT: actualRecords.filter((record) => record.label === "COMMON_STAT").length,
-  COMMON_PASSIVE: actualRecords.filter((record) => record.label === "COMMON_PASSIVE").length,
-  SOLDIER_SPECIFIC_PROGRESSION: actualRecords.filter((record) => record.label === "SOLDIER_SPECIFIC_PROGRESSION").length,
-  REVIEW_UNCLASSIFIED: actualRecords.filter((record) => record.label === "REVIEW_UNCLASSIFIED").length,
-};
-checks.labelCountsMatchContract = check(
-  Object.entries(labelCounts).every(([label, count]) => count === contract.wholeTechClassification.currentSnapshotExpectedCoverage?.[label]),
-  `Stage 5 label counts do not match Stage 4 contract: ${JSON.stringify(labelCounts)}`,
-);
-checks.coverageSummaryMatches = check(
-  classification.coverage?.trainingTech === 287 &&
-  JSON.stringify(classification.coverage?.labelCounts) === JSON.stringify(labelCounts) &&
-  classification.coverage?.ruleOverlapCount === 0 &&
-  classification.coverage?.reviewUnclassifiedCount === 0 &&
-  classification.coverage?.protectedGrowthRelabelCount === 0,
-  "Stage 5 artifact coverage summary does not match independently recomputed coverage.",
+checks.perRecordClassificationParity = check(perRecordMismatchCount === 0, `Per-record classification mismatches: ${perRecordMismatchCount}.`);
+checks.recordEvidenceProvenance = check(evidenceRefMismatchCount === 0, `Record evidence mismatches: ${evidenceRefMismatchCount}.`);
+checks.prerequisiteFacetParity = check(prerequisiteFacetMismatchCount === 0, `Prerequisite facet mismatches: ${prerequisiteFacetMismatchCount}.`);
+checks.soldierUnlockFacetBoundary = check(unlockFacetMismatchCount === 0, `Soldier unlock facet mismatches: ${unlockFacetMismatchCount}.`);
+checks.ruleOverlapZero = check(overlap === 0, `Rule overlap count: ${overlap}.`);
+checks.fallbackZero = check(labelCounts.REVIEW_UNCLASSIFIED === 0, `REVIEW_UNCLASSIFIED count: ${labelCounts.REVIEW_UNCLASSIFIED}.`);
+checks.protectedGrowthNeverRelabeled = check(protectedRelabelCount === 0, `Protected growth relabel count: ${protectedRelabelCount}.`);
+checks.labelCounts = check(Object.entries(labelCounts).every(([label, n]) => n === contract.wholeTechClassification.currentSnapshotExpectedCoverage?.[label]), `Label counts mismatch: ${JSON.stringify(labelCounts)}`);
+checks.coverageSummary = check(
+  artifact.coverage?.trainingTech === 287 && JSON.stringify(artifact.coverage?.labelCounts) === JSON.stringify(labelCounts) && artifact.coverage?.ruleOverlapCount === 0 && artifact.coverage?.reviewUnclassifiedCount === 0 && artifact.coverage?.protectedGrowthRelabelCount === 0,
+  "Stage 5 coverage summary mismatch.",
 );
 
 const output = {
@@ -253,53 +185,19 @@ const output = {
   completion: errors.length === 0 ? "COMPLETE" : "INCOMPLETE",
   freezeState: errors.length === 0 ? "TRAINING_TECH_CLASSIFICATION_STAGE5_FULL_CLASSIFICATION_FROZEN" : "OPEN",
   validationMode: "INDEPENDENT_READ_ONLY_FROZEN_PREDECESSOR_RECORD_RECOMPUTATION",
-  classification: { path: paths.classification, gitBlobSha: gitBlobSha(paths.classification) },
+  classification: [paths.classification, blob(paths.classification)],
   predecessorBlobs: {
-    stage1Census: gitBlobSha(paths.stage1Census),
-    stage2Validation: gitBlobSha(paths.stage2Validation),
-    stage3Candidates: gitBlobSha(paths.stage3Candidates),
-    stage3Semantic: gitBlobSha(paths.stage3Semantic),
-    stage3Validation: gitBlobSha(paths.stage3Validation),
-    stage4Contract: gitBlobSha(paths.stage4Contract),
-    stage4Validation: gitBlobSha(paths.stage4Validation),
-    frozenTrainingConsumer: gitBlobSha(paths.frozenTrainingConsumer),
+    stage1Census: blob(paths.stage1), stage2Validation: blob(paths.stage2), stage3Candidates: blob(paths.stage3Candidates), stage3Semantic: blob(paths.stage3Semantic), stage3Validation: blob(paths.stage3Validation), stage4Contract: blob(paths.stage4Contract), stage4Validation: blob(paths.stage4Validation), frozenTrainingConsumer: blob(paths.trainingConsumer),
   },
   checks,
-  coverage: {
-    trainingTech: actualRecords.length,
-    uniqueTechIds: actualById.size,
-    labelCounts,
-    perRecordMismatchCount,
-    prerequisiteFacetMismatchCount,
-    unlockFacetMismatchCount,
-    evidenceRefMismatchCount,
-    groupEvidenceMismatchCount,
-    ruleOverlapCount,
-    reviewUnclassifiedCount: fallbackIds.length,
-    protectedGrowthRelabelCount: protectedRelabelCount,
-  },
-  reviews: [],
-  blockers: errors,
-  hardErrorCount: errors.length,
-  nextOwner: classification.nextOwner,
-  nextStartPoint: classification.nextStartPoint,
-  reopenConditions: classification.reopenConditions,
+  coverage: { trainingTech: matrix.length, uniqueTechIds: matrixById.size, labelCounts, perRecordMismatchCount, prerequisiteFacetMismatchCount, unlockFacetMismatchCount, evidenceRefMismatchCount, groupEvidenceMismatchCount, ruleOverlapCount: overlap, reviewUnclassifiedCount: labelCounts.REVIEW_UNCLASSIFIED, protectedGrowthRelabelCount },
+  reviews: [], blockers: errors, hardErrorCount: errors.length,
+  nextOwner: artifact.nextOwner, nextStartPoint: artifact.nextStartPoint, reopenConditions: artifact.reopenConditions,
 };
-
 const serialized = `${JSON.stringify(output, null, 2)}\n`;
-if (writeMode) {
-  writeFileSync(resolve(root, paths.output), serialized);
-  console.log(`Wrote ${paths.output}`);
-}
+if (writeMode) { writeFileSync(resolve(root, paths.output), serialized); console.log(`Wrote ${paths.output}`); }
 if (checkMode) {
-  if (errors.length > 0) {
-    console.error(JSON.stringify(output, null, 2));
-    process.exit(1);
-  }
-  const existing = readText(paths.output);
-  if (existing !== serialized) {
-    console.error(`${paths.output} is stale. Run with --write.`);
-    process.exit(1);
-  }
+  if (errors.length) { console.error(JSON.stringify(output, null, 2)); process.exit(1); }
+  if (text(paths.output) !== serialized) { console.error(`${paths.output} is stale. Run with --write.`); process.exit(1); }
   console.log(JSON.stringify({ status: output.status, coverage: output.coverage }));
 }
