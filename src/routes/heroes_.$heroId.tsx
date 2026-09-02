@@ -20,6 +20,7 @@ import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equip
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
+import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import { getSkinFullartVisuals } from "@/lib/skin-fullart-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
@@ -111,6 +112,19 @@ function HeroDetailPage() {
     setVisualIndex((current) => (current + delta + visuals.length) % visuals.length);
   };
 
+  const visibleTalentProgression = detail.talent.starProgression
+    .filter((row) => detail.talent.initialStar == null || row.star >= detail.talent.initialStar)
+    .sort((a, b) => a.star - b.star);
+  const sixStarTalentIndex = visibleTalentProgression.findIndex((row) => row.star === 6);
+  const defaultTalentIndex = sixStarTalentIndex >= 0 ? sixStarTalentIndex : Math.max(visibleTalentProgression.length - 1, 0);
+  const [talentIndex, setTalentIndex] = useState(defaultTalentIndex);
+  useEffect(() => setTalentIndex(defaultTalentIndex), [hero.heroId, defaultTalentIndex]);
+  const activeTalentRow = visibleTalentProgression[talentIndex] ?? null;
+  const moveTalent = (delta: number) => {
+    if (visibleTalentProgression.length <= 1) return;
+    setTalentIndex((current) => Math.min(Math.max(current + delta, 0), visibleTalentProgression.length - 1));
+  };
+
   return (
     <main
       data-name-kr-status={hero.localization.nameKrStatus}
@@ -183,28 +197,69 @@ function HeroDetailPage() {
           </div>
         </section>
 
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-talent-carousel="true">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <SectionTitle icon={<Sparkles className="h-4 w-4" aria-hidden="true" />} title="재능" />
-              <p className="mt-2 text-sm text-muted-foreground">별 단계별 확정 재능 효과를 그대로 표시해.</p>
+              <p className="mt-2 text-sm text-muted-foreground">초기 성급 미만은 숨기고, 6성부터 좌우로 낮은 성급을 확인해.</p>
             </div>
             <div className="flex flex-wrap gap-2 text-xs">
               {detail.talent.status ? <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">{detail.talent.status}</span> : null}
               {detail.talent.initialStar != null ? <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">초기 {detail.talent.initialStar}성</span> : null}
             </div>
           </div>
-          {detail.talent.starProgression.length > 0 ? (
-            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {detail.talent.starProgression.map((row) => (
-                <article key={`${row.star}-${row.skillId}`} className="rounded-xl border border-border bg-muted/20 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="font-bold text-foreground">{row.star}성 · {row.skill.nameCn ?? `Skill ${row.skillId}`}</h3>
-                    <span className="shrink-0 rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{row.skillId}</span>
+          {activeTalentRow ? (
+            <div
+              className="mt-4"
+              data-hero-talent-active-star={activeTalentRow.star}
+              data-hero-talent-min-star={visibleTalentProgression[0]?.star ?? ""}
+              data-hero-talent-max-star={visibleTalentProgression[visibleTalentProgression.length - 1]?.star ?? ""}
+            >
+              <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-stretch gap-2 sm:gap-3">
+                <button
+                  type="button"
+                  aria-label="낮은 성급 재능 보기"
+                  onClick={() => moveTalent(-1)}
+                  disabled={talentIndex === 0}
+                  className="flex w-10 items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-sm transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 sm:w-12"
+                >
+                  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                </button>
+                <article key={`${activeTalentRow.star}-${activeTalentRow.skillId}`} className="min-w-0 rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
+                  <div className="flex items-start gap-3">
+                    <HeroSkillIcon heroId={hero.heroId} skill={activeTalentRow.skill} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <h3 className="font-bold text-foreground">{activeTalentRow.star}성 · {activeTalentRow.skill.nameCn ?? `Skill ${activeTalentRow.skillId}`}</h3>
+                        <span className="shrink-0 rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{activeTalentRow.skillId}</span>
+                      </div>
+                      <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(activeTalentRow.skill.desc)}</p>
+                    </div>
                   </div>
-                  <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(row.skill.desc)}</p>
                 </article>
-              ))}
+                <button
+                  type="button"
+                  aria-label="높은 성급 재능 보기"
+                  onClick={() => moveTalent(1)}
+                  disabled={talentIndex === visibleTalentProgression.length - 1}
+                  className="flex w-10 items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-sm transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 sm:w-12"
+                >
+                  <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                </button>
+              </div>
+              <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:justify-center" aria-label="재능 성급 선택">
+                {visibleTalentProgression.map((row, index) => (
+                  <button
+                    key={`${row.star}-${row.skillId}-selector`}
+                    type="button"
+                    onClick={() => setTalentIndex(index)}
+                    aria-pressed={index === talentIndex}
+                    className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-bold transition ${index === talentIndex ? "border-foreground bg-foreground text-background" : "border-border bg-background text-muted-foreground hover:text-foreground"}`}
+                  >
+                    {row.star}성
+                  </button>
+                ))}
+              </div>
             </div>
           ) : (
             <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 재능 progression이 없어.</p>
@@ -222,7 +277,7 @@ function HeroDetailPage() {
             </div>
             {detail.skills.heroDirectSkills.length > 0 ? (
               <div className="mt-3 grid gap-3 lg:grid-cols-2">
-                {detail.skills.heroDirectSkills.map((skill) => <SkillCard key={`direct-${skill.skillId}`} skill={skill} sourceLabel="Hero 직접 보유" />)}
+                {detail.skills.heroDirectSkills.map((skill) => <SkillCard key={`direct-${skill.skillId}`} heroId={hero.heroId} skill={skill} sourceLabel="Hero 직접 보유" />)}
               </div>
             ) : (
               <p className="mt-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">기본 보유 스킬 없음</p>
@@ -237,7 +292,7 @@ function HeroDetailPage() {
             {detail.skills.jobLevelAcquisitions.length > 0 ? (
               <div className="mt-3 grid gap-3 lg:grid-cols-2">
                 {detail.skills.jobLevelAcquisitions.map((row) => (
-                  <SkillCard key={`job-${row.acquisitionOrder ?? "x"}-${row.skillId}`} skill={row.skill} sourceLabel={`${row.jobNameCn ?? `Job ${row.jobId ?? "?"}`} · Hero Lv.${row.jobLevelUpHeroLevel ?? "-"}`} />
+                  <SkillCard key={`job-${row.acquisitionOrder ?? "x"}-${row.skillId}`} heroId={hero.heroId} skill={row.skill} sourceLabel={`${row.jobNameCn ?? `Job ${row.jobId ?? "?"}`} · Hero Lv.${row.jobLevelUpHeroLevel ?? "-"}`} />
                 ))}
               </div>
             ) : (
@@ -436,8 +491,14 @@ function HeroSoldierCard({ record }: { record: HeroSoldierCardView }) {
   );
 }
 
-function SkillCard({ skill, sourceLabel }: { skill: SkillView; sourceLabel: string }) {
-  return <article className="rounded-xl border border-border bg-muted/20 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-[11px] font-bold text-muted-foreground">{sourceLabel}</p><h4 className="mt-1 font-bold text-foreground">{skill.nameCn ?? `Skill ${skill.skillId}`}</h4></div><span className="rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{skill.skillId}</span></div><div className="mt-3 flex flex-wrap gap-1.5 text-[11px]">{skill.displayType ? <span className="rounded-md border border-border bg-background px-2 py-1 font-semibold text-foreground">{skill.displayType}</span> : null}{skill.cooldown ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">쿨 {skill.cooldown}</span> : null}{skill.range ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">사거리 {skill.range}</span> : null}{skill.areaOrTarget ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">대상 {skill.areaOrTarget}</span> : null}</div><p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.desc)}</p></article>;
+function HeroSkillIcon({ heroId, skill }: { heroId: number; skill: SkillView }) {
+  const iconUrl = getHeroSkillIconUrl(heroId, skill.iconPath);
+  if (!iconUrl) return null;
+  return <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-background p-1.5 shadow-sm"><img src={iconUrl} alt="" aria-hidden="true" className="h-full w-full object-contain" /></div>;
+}
+
+function SkillCard({ heroId, skill, sourceLabel }: { heroId: number; skill: SkillView; sourceLabel: string }) {
+  return <article className="rounded-xl border border-border bg-muted/20 p-4"><div className="flex items-start gap-3"><HeroSkillIcon heroId={heroId} skill={skill} /><div className="min-w-0 flex-1"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-[11px] font-bold text-muted-foreground">{sourceLabel}</p><h4 className="mt-1 font-bold text-foreground">{skill.nameCn ?? `Skill ${skill.skillId}`}</h4></div><span className="rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{skill.skillId}</span></div><div className="mt-3 flex flex-wrap gap-1.5 text-[11px]">{skill.displayType ? <span className="rounded-md border border-border bg-background px-2 py-1 font-semibold text-foreground">{skill.displayType}</span> : null}{skill.cooldown ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">쿨 {skill.cooldown}</span> : null}{skill.range ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">사거리 {skill.range}</span> : null}{skill.areaOrTarget ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">대상 {skill.areaOrTarget}</span> : null}</div><p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.desc)}</p></div></div></article>;
 }
 
 function formatBondCondition(condition: { requiredHero: { heroId: number | null; nameKr: string | null; nameCn: string | null; nameEn: string | null } | null; mission: { missionId: number | null; title: string | null; desc: string | null; missionType: number | null } | null; stage: { stageId: number | null; nameCn: string | null } | null; favorability: { targetHeroId: number | null; targetHeroNameKr: string | null; targetHeroNameCn: string | null; targetHeroNameEn: string | null; requiredLevel: number | null } | null }) {

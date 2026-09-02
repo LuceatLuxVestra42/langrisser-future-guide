@@ -1,0 +1,103 @@
+name: ConfigData B4 External-Only Clean Room
+
+on:
+  push:
+    branches:
+      - configdata/b4-external-clean-room-v1
+    paths:
+      - data/contracts/configdata-source-pack-contract.v1.json
+      - data/contracts/project-tooling-configdata-lookup-b3-source-root.v1.json
+      - data/contracts/project-tooling-configdata-lookup-b4-external-clean-room.v1.json
+      - scripts/hydrate-configdata-source-pack-v1.mjs
+      - tools/configdata-lookup/lib/configdata-source-root.mjs
+      - tools/configdata-lookup/lib/freshness.mjs
+      - tools/configdata-lookup/cli/rebuild.mjs
+      - tools/configdata-lookup/test/configdata-lookup-stage6-current-validator.mjs
+      - tools/configdata-lookup/test/configdata-external-clean-room-b4.mjs
+      - .github/workflows/configdata-source-pack-b4-external-clean-room.yml
+  pull_request:
+    paths:
+      - data/contracts/configdata-source-pack-contract.v1.json
+      - data/contracts/project-tooling-configdata-lookup-b3-source-root.v1.json
+      - data/contracts/project-tooling-configdata-lookup-b4-external-clean-room.v1.json
+      - scripts/hydrate-configdata-source-pack-v1.mjs
+      - tools/configdata-lookup/lib/configdata-source-root.mjs
+      - tools/configdata-lookup/lib/freshness.mjs
+      - tools/configdata-lookup/cli/rebuild.mjs
+      - tools/configdata-lookup/test/configdata-lookup-stage6-current-validator.mjs
+      - tools/configdata-lookup/test/configdata-external-clean-room-b4.mjs
+      - .github/workflows/configdata-source-pack-b4-external-clean-room.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: configdata-b4-external-clean-room-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  external-only-clean-room:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Require clean tracked baseline
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain)"
+
+      - name: Hydrate and verify pinned B2 source pack outside repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/configdata-b4-external"
+          node scripts/hydrate-configdata-source-pack-v1.mjs \
+            --target-dir "$RUNNER_TEMP/configdata-b4-external" \
+            --compare-repo-source
+          count="$(find "$RUNNER_TEMP/configdata-b4-external/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$count" = "753"
+
+      - name: Prove Lookup with repository raw root unavailable
+        env:
+          CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-b4-external
+        run: |
+          set -euo pipefail
+          tracked_raw="$GITHUB_WORKSPACE/data/configdata"
+          hidden_raw="$RUNNER_TEMP/configdata-b4-tracked-hidden"
+          rm -rf "$hidden_raw"
+
+          restore_raw() {
+            if [ -d "$hidden_raw" ]; then
+              mv "$hidden_raw" "$tracked_raw"
+            fi
+          }
+          trap restore_raw EXIT
+
+          mv "$tracked_raw" "$hidden_raw"
+          test ! -e "$tracked_raw"
+
+          node tools/configdata-lookup/test/configdata-external-clean-room-b4.mjs
+          node tools/configdata-lookup/cli/check-freshness.mjs
+          node tools/configdata-lookup/test/configdata-lookup-stage6-current-validator.mjs
+          node tools/configdata-lookup/cli/rebuild.mjs --apply --json > "$RUNNER_TEMP/configdata-b4-rebuild.json"
+          node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync(process.argv[1],"utf8")); if (r.changedFileCount !== 0) { console.error(r); process.exit(1); }' "$RUNNER_TEMP/configdata-b4-rebuild.json"
+
+          restore_raw
+          trap - EXIT
+
+      - name: Require no tracked mutation after clean-room proof
+        run: |
+          set -euo pipefail
+          test "$(find data/configdata -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')" = "753"
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
