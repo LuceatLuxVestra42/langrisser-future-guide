@@ -20,6 +20,7 @@ import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equip
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
+import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import { getSkinFullartVisuals } from "@/lib/skin-fullart-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
@@ -198,11 +199,16 @@ function HeroDetailPage() {
             <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {detail.talent.starProgression.map((row) => (
                 <article key={`${row.star}-${row.skillId}`} className="rounded-xl border border-border bg-muted/20 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="font-bold text-foreground">{row.star}성 · {row.skill.nameCn ?? `Skill ${row.skillId}`}</h3>
-                    <span className="shrink-0 rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{row.skillId}</span>
+                  <div className="flex items-start gap-3">
+                    <HeroSkillIcon heroId={hero.heroId} skill={row.skill} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-3">
+                        <h3 className="font-bold text-foreground">{row.star}성 · {row.skill.nameCn ?? `Skill ${row.skillId}`}</h3>
+                        <span className="shrink-0 rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{row.skillId}</span>
+                      </div>
+                      <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(row.skill.desc)}</p>
+                    </div>
                   </div>
-                  <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(row.skill.desc)}</p>
                 </article>
               ))}
             </div>
@@ -222,7 +228,7 @@ function HeroDetailPage() {
             </div>
             {detail.skills.heroDirectSkills.length > 0 ? (
               <div className="mt-3 grid gap-3 lg:grid-cols-2">
-                {detail.skills.heroDirectSkills.map((skill) => <SkillCard key={`direct-${skill.skillId}`} skill={skill} sourceLabel="Hero 직접 보유" />)}
+                {detail.skills.heroDirectSkills.map((skill) => <SkillCard key={`direct-${skill.skillId}`} heroId={hero.heroId} skill={skill} sourceLabel="Hero 직접 보유" />)}
               </div>
             ) : (
               <p className="mt-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">기본 보유 스킬 없음</p>
@@ -237,7 +243,7 @@ function HeroDetailPage() {
             {detail.skills.jobLevelAcquisitions.length > 0 ? (
               <div className="mt-3 grid gap-3 lg:grid-cols-2">
                 {detail.skills.jobLevelAcquisitions.map((row) => (
-                  <SkillCard key={`job-${row.acquisitionOrder ?? "x"}-${row.skillId}`} skill={row.skill} sourceLabel={`${row.jobNameCn ?? `Job ${row.jobId ?? "?"}`} · Hero Lv.${row.jobLevelUpHeroLevel ?? "-"}`} />
+                  <SkillCard key={`job-${row.acquisitionOrder ?? "x"}-${row.skillId}`} heroId={hero.heroId} skill={row.skill} sourceLabel={`${row.jobNameCn ?? `Job ${row.jobId ?? "?"}`} · Hero Lv.${row.jobLevelUpHeroLevel ?? "-"}`} />
                 ))}
               </div>
             ) : (
@@ -436,8 +442,14 @@ function HeroSoldierCard({ record }: { record: HeroSoldierCardView }) {
   );
 }
 
-function SkillCard({ skill, sourceLabel }: { skill: SkillView; sourceLabel: string }) {
-  return <article className="rounded-xl border border-border bg-muted/20 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-[11px] font-bold text-muted-foreground">{sourceLabel}</p><h4 className="mt-1 font-bold text-foreground">{skill.nameCn ?? `Skill ${skill.skillId}`}</h4></div><span className="rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{skill.skillId}</span></div><div className="mt-3 flex flex-wrap gap-1.5 text-[11px]">{skill.displayType ? <span className="rounded-md border border-border bg-background px-2 py-1 font-semibold text-foreground">{skill.displayType}</span> : null}{skill.cooldown ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">쿨 {skill.cooldown}</span> : null}{skill.range ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">사거리 {skill.range}</span> : null}{skill.areaOrTarget ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">대상 {skill.areaOrTarget}</span> : null}</div><p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.desc)}</p></article>;
+function HeroSkillIcon({ heroId, skill }: { heroId: number; skill: SkillView }) {
+  const iconUrl = getHeroSkillIconUrl(heroId, skill.iconPath);
+  if (!iconUrl) return null;
+  return <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-background p-1.5 shadow-sm"><img src={iconUrl} alt="" aria-hidden="true" className="h-full w-full object-contain" /></div>;
+}
+
+function SkillCard({ heroId, skill, sourceLabel }: { heroId: number; skill: SkillView; sourceLabel: string }) {
+  return <article className="rounded-xl border border-border bg-muted/20 p-4"><div className="flex items-start gap-3"><HeroSkillIcon heroId={heroId} skill={skill} /><div className="min-w-0 flex-1"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-[11px] font-bold text-muted-foreground">{sourceLabel}</p><h4 className="mt-1 font-bold text-foreground">{skill.nameCn ?? `Skill ${skill.skillId}`}</h4></div><span className="rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{skill.skillId}</span></div><div className="mt-3 flex flex-wrap gap-1.5 text-[11px]">{skill.displayType ? <span className="rounded-md border border-border bg-background px-2 py-1 font-semibold text-foreground">{skill.displayType}</span> : null}{skill.cooldown ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">쿨 {skill.cooldown}</span> : null}{skill.range ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">사거리 {skill.range}</span> : null}{skill.areaOrTarget ? <span className="rounded-md bg-background px-2 py-1 text-muted-foreground">대상 {skill.areaOrTarget}</span> : null}</div><p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.desc)}</p></div></div></article>;
 }
 
 function formatBondCondition(condition: { requiredHero: { heroId: number | null; nameKr: string | null; nameCn: string | null; nameEn: string | null } | null; mission: { missionId: number | null; title: string | null; desc: string | null; missionType: number | null } | null; stage: { stageId: number | null; nameCn: string | null } | null; favorability: { targetHeroId: number | null; targetHeroNameKr: string | null; targetHeroNameCn: string | null; targetHeroNameEn: string | null; requiredLevel: number | null } | null }) {
