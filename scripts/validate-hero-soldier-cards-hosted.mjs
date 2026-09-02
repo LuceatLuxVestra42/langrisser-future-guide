@@ -79,6 +79,31 @@ async function verifyHeroSoldierCards(page, label) {
   return { section, cards };
 }
 
+async function verifyInlineSoldierDialog(page, cards, cardIndex, label) {
+  const card = cards.nth(cardIndex);
+  check(await card.count() === 1, `Hero 6 ${label} target Soldier card missing`);
+  const heroUrl = page.url();
+
+  await card.click();
+  const dialog = page.getByRole("dialog");
+  await dialog.waitFor({ timeout: 45000 });
+  check(page.url() === heroUrl, `Hero 6 ${label} navigated away while opening inline Soldier dialog: ${page.url()}`);
+  const detailTitle = (await page.locator("#soldier-detail-title").innerText()).trim();
+  check(detailTitle.length > 0, `Hero 6 ${label} inline Soldier detail title is empty`);
+  check((await dialog.innerText()).includes("사용 가능 영웅"), `Hero 6 ${label} inline Soldier detail did not render expected frontend consumer content`);
+
+  await page.getByRole("button", { name: "상세 창 닫기" }).click();
+  await dialog.waitFor({ state: "detached", timeout: 45000 });
+  check(page.url() === heroUrl, `Hero 6 ${label} URL changed after closing inline Soldier dialog`);
+  check(await cards.count() === expectedHero6SoldierIds.length, `Hero 6 ${label} Soldier cards did not survive inline dialog close`);
+
+  await card.click();
+  await page.getByRole("dialog").waitFor({ timeout: 45000 });
+  await page.keyboard.press("Escape");
+  await page.getByRole("dialog").waitFor({ state: "detached", timeout: 45000 });
+  check(page.url() === heroUrl, `Hero 6 ${label} URL changed after Escape-closing inline Soldier dialog`);
+}
+
 const browser = await chromium.launch({ headless: true });
 try {
   const desktopPage = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
@@ -90,18 +115,7 @@ try {
   const desktop = await verifyHeroSoldierCards(desktopPage, "desktop");
   const soldier101Index = expectedHero6SoldierIds.indexOf(101);
   check(soldier101Index >= 0, "Hero 6 expected Soldier 101 index missing");
-  const soldier101Card = desktop.cards.nth(soldier101Index);
-  check(await soldier101Card.count() === 1, "Hero 6 desktop Soldier 101 card missing");
-  await soldier101Card.click();
-  await desktopPage.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
-  await desktopPage.getByRole("dialog").waitFor({ timeout: 45000 });
-  const detailTitle = (await desktopPage.locator("#soldier-detail-title").innerText()).trim();
-  check(detailTitle.length > 0, "Soldier 101 detail title is empty after Hero card navigation");
-  check((await desktopPage.getByRole("dialog").innerText()).includes("사용 가능 영웅"), "Soldier 101 detail did not render expected frontend consumer content");
-
-  await desktopPage.goBack({ waitUntil: "networkidle", timeout: 45000 });
-  await desktopPage.getByText("Hero #6", { exact: true }).waitFor();
-  check(await desktopPage.locator('[data-hero-soldier-cards="true"] a[href*="/soldiers/"]').count() === expectedHero6SoldierIds.length, "Hero 6 Soldier cards did not survive back navigation");
+  await verifyInlineSoldierDialog(desktopPage, desktop.cards, soldier101Index, "desktop Soldier 101");
   check(desktopPageErrors.length === 0, `desktop page errors: ${JSON.stringify(desktopPageErrors)}`);
   check(desktopConsoleErrors.length === 0, `desktop console errors: ${JSON.stringify(desktopConsoleErrors)}`);
   await desktopPage.close();
@@ -113,7 +127,8 @@ try {
   mobilePage.on("pageerror", (error) => mobilePageErrors.push(String(error)));
   mobilePage.on("console", (message) => { if (message.type() === "error") mobileConsoleErrors.push(message.text()); });
 
-  await verifyHeroSoldierCards(mobilePage, "mobile");
+  const mobile = await verifyHeroSoldierCards(mobilePage, "mobile");
+  await verifyInlineSoldierDialog(mobilePage, mobile.cards, soldier101Index, "mobile Soldier 101");
   const overflow = await mobilePage.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   check(overflow <= 1, `Hero 6 mobile horizontal overflow=${overflow}`);
   check(mobilePageErrors.length === 0, `mobile page errors: ${JSON.stringify(mobilePageErrors)}`);
@@ -130,7 +145,11 @@ try {
       idOrderParity: "PASS",
       portraitCoverage: "35/35",
       portraitFormat: "WebP",
-      heroToSoldierNavigation: "PASS",
+      progressiveRouteFallbackHrefs: "PASS",
+      heroInlineSoldierDialog: "PASS",
+      heroRoutePreservedDuringDialog: "PASS",
+      closeButton: "PASS",
+      escapeClose: "PASS",
       desktop: "PASS",
       mobile: "PASS",
       mobileOverflow: 0,
