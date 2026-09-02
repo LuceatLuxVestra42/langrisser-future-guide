@@ -81,11 +81,12 @@
       "PROVENANCE_EVIDENCE",
       "HISTORICAL_GENERATED_EVIDENCE"
     ],
-    "explicitRationaleKeyRegex": "(?:retention|historical|history|audit|reproduc|retry.?prevention)",
+    "explicitRationaleKeyRegex": "(?:retention(?:Reason|Rationale|Policy|Basis)?|historical(?:Reason|Rationale|Retention)?|history(?:Reason|Rationale|Retention)?|auditRetention|reproducibility|retry.?prevention)",
     "checkpointRoleAloneIsHistorical": false,
     "closedOrFrozenStatusAloneIsHistorical": false,
     "oldCommitOrStageNumberIsHistorical": false,
-    "genericProvenanceMetadataKeyAloneIsHistorical": false
+    "genericProvenanceMetadataKeyAloneIsHistorical": false,
+    "genericAuditStatusKeyAloneIsHistorical": false
   },
   "explicitlySuperseded": {
     "statusTokenRegex": "(?:SUPERSEDED|RETIRED|DEPRECATED)",
