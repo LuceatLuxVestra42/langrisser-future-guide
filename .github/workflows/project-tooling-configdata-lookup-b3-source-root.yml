@@ -1,0 +1,72 @@
+name: ConfigData Lookup B3 Source Root Cutover
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/lib/configdata-lookup-stage1.mjs'
+      - 'scripts/lib/configdata-lookup-stage2.mjs'
+      - 'scripts/lib/configdata-lookup-stage6.mjs'
+      - 'tools/configdata-lookup/**'
+      - 'data/contracts/project-tooling-configdata-lookup-b3-source-root-cutover.v1.json'
+      - 'data/validation/configdata-lookup-b3-source-root-cutover.v1.json'
+      - '.github/workflows/project-tooling-configdata-lookup-b3-source-root.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-root-cutover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Capture tracked state
+        run: git status --porcelain=v1 --untracked-files=no > "$RUNNER_TEMP/b3-before-status.txt"
+
+      - name: Validate repository-root compatibility mode
+        run: |
+          npm run validate:configdata-lookup-stage1
+          npm run validate:configdata-lookup-stage2
+          npm run check:configdata-lookup-stage6
+          node tools/configdata-lookup/test/configdata-lookup-self-test.mjs
+
+      - name: Hydrate pinned external ConfigData source pack
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/hydrate-configdata-source-pack-v1.mjs \
+            --target-dir "$RUNNER_TEMP/configdata-b3-source-root" \
+            --compare-repo-source
+
+      - name: Validate Lookup against hydrated external source root
+        env:
+          CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-b3-source-root
+        run: |
+          test -f "$CONFIGDATA_SOURCE_ROOT/data/configdata/ConfigDataHeroInfo.json"
+          npm run validate:configdata-lookup-stage1
+          npm run validate:configdata-lookup-stage2
+          npm run check:configdata-lookup-stage6
+          node tools/configdata-lookup/test/configdata-lookup-self-test.mjs
+
+      - name: Require logical provenance to remain physical-root free
+        env:
+          CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-b3-source-root
+        run: |
+          if grep -R -F "$CONFIGDATA_SOURCE_ROOT" data/index data/generated data/validation 2>/dev/null; then
+            echo 'physical ConfigData source root leaked into tracked materialized metadata' >&2
+            exit 1
+          fi
+
+      - name: Require tracked state unchanged
+        run: |
+          git diff --exit-code
+          git status --porcelain=v1 --untracked-files=no > "$RUNNER_TEMP/b3-after-status.txt"
+          diff -u "$RUNNER_TEMP/b3-before-status.txt" "$RUNNER_TEMP/b3-after-status.txt"
