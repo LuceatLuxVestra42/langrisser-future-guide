@@ -2,8 +2,8 @@
   "version": 1,
   "schemaId": "configdata-source-pack-b5-6-maintenance-root/v1",
   "stage": "repository-size-reduction-B5.6",
-  "status": "READY_FOR_VALIDATION",
-  "completion": "CONFIGDATA_SOURCE_PACK_B5_6_MAINTENANCE_ROOT_PENDING",
+  "status": "PASS",
+  "completion": "CONFIGDATA_SOURCE_PACK_B5_6_MAINTENANCE_ROOT_COMPLETE",
   "owner": "configdata-source-pack",
   "supportingOwners": ["configdata", "project-check", "hero-canonical", "soldier-canonical", "equipment-canonical", "shared-movement"],
   "purpose": "Close repository-local ConfigData read assumptions exposed by the exact B6 deletion-only proof without changing semantic authority, canonical data, relations, logical provenance, production runtime, or normal ConfigData Lookup behavior. Maintenance and historical validation scripts may resolve the same pinned B2 exact-byte source through a maintenance-only physical source resolver when the tracked root is absent.",
@@ -102,32 +102,63 @@
     "trackedRepositoryRawJsonCount": 753,
     "trackedRawDeletionAdmitted": true,
     "b5_5OperationalCutoverCompleted": true,
-    "maintenanceRootCutoverCompleted": false,
+    "maintenanceRootCutoverCompleted": true,
     "trackedRawDeletionCompleted": false
   },
   "requiredValidation": {
-    "staticBoundaryGuard": "PENDING",
-    "externalAutoHydrationWithTrackedRootUnavailable": "PENDING",
-    "sharedDirectAdapterExternalRead": "PENDING",
-    "heroDirectValidatorExternalRead": "PENDING",
-    "sharedMovementExternalRead": "PENDING",
-    "equipmentAcquisitionExternalRead": "PENDING",
-    "heroDisplayInvestigationNoMissingSource": "PENDING",
-    "trainingTechStage1ProducerExternalRead": "PENDING",
-    "trainingTechStage1ValidatorExternalRead": "PENDING",
-    "trainingTechStage2ValidatorExternalRead": "PENDING",
-    "soldierStage4_8FrozenBaselineRefresh": "PENDING",
-    "projectCheck": "PENDING",
+    "staticBoundaryGuard": "PASS",
+    "externalAutoHydrationWithTrackedRootUnavailable": "PASS",
+    "sharedDirectAdapterExternalRead": "PASS",
+    "heroDirectValidatorExternalRead": "PASS",
+    "sharedMovementExternalRead": "PASS",
+    "equipmentAcquisitionExternalRead": "PASS",
+    "heroDisplayInvestigationNoMissingSource": "PASS_WITH_EXISTING_SOURCE_BLOCKED_REVIEW",
+    "trainingTechStage1ProducerExternalRead": "PASS",
+    "trainingTechStage1ValidatorExternalRead": "PASS",
+    "trainingTechStage2ValidatorExternalRead": "PASS",
+    "soldierStage4_8FrozenBaselineRefresh": "PASS",
+    "projectCheck": "PASS",
     "manualReviewCount": 0,
     "trackedMutationCountAfterValidation": 0
   },
-  "blockers": ["B5_6_VALIDATION_PENDING", "SOLDIER_STAGE4_8_FROZEN_BASELINE_REFRESH_PENDING"],
-  "reviews": ["HERO_DISPLAY_EXIT2_BASELINE_CLASSIFICATION_PENDING"],
+  "validationEvidence": {
+    "finalPreCloseoutHead": "85460915fd45fa033d21620a419c836993931fca",
+    "b5_6ExternalOnlyRunId": 33611538189,
+    "projectCheckRunId": 33611538244,
+    "trainingTechStage2RunId": 33611538186,
+    "soldierStage4_8RunId": 33611538198,
+    "soldierStage4_8BaselineGitBlobSha": "ed9fe0a46807638be2535b6d8cdcf9149fb192d1",
+    "heroDisplayRunId": 33611538203,
+    "soldierStage5_2RunId": 33611538263
+  },
+  "blockers": [],
+  "reviews": [
+    "HERO_DISPLAY_INVESTIGATION_EXISTING_LEGACY_TEXTASSET_SOURCE_BLOCKED",
+    "SOLDIER_STAGE5_2_EXISTING_FROZEN_PROVENANCE_DRIFT_ON_MAIN"
+  ],
+  "nonBlockingReviewEvidence": {
+    "heroDisplay": {
+      "classification": "EXISTING_DRIFT_REVIEW",
+      "blocking": false,
+      "externalOnlyMissingSourceCount": 0,
+      "reason": "The maintenance resolver supplies the exact pinned ConfigData bytes successfully. The remaining exit 2 is the existing investigation script expecting legacy TextAsset wrapper fields while current UnityDataTool ConfigData is direct-array JSON."
+    },
+    "soldierStage5_2": {
+      "classification": "EXISTING_DRIFT_REVIEW",
+      "blocking": false,
+      "baseRef": "898919963d87fd86a7ebc311b5785af9f8b1ddca",
+      "frozenSoldierStage3GitBlobSha": "afaebae396017391689c78a1b76c244e06067011",
+      "baseSoldierStage3GitBlobSha": "88e331f05d0293dfcef8e08a85b23c89c580e408",
+      "frozenStage3ValidationGitBlobSha": "e1aa89d12d07edd513f993458be3e08e7ec57e03",
+      "baseStage3ValidationGitBlobSha": "85436fb25261b8a104f1c66ff72b637593d8efe6",
+      "reason": "The Stage5-2 frozen provenance is already stale on current main independently of B5.6. Its producer still computes PASS semantics, so this pre-existing freshness drift is separated from the B5.6 owner scope instead of cascading a Stage5 refresh."
+    }
+  },
   "handoff": {
-    "completion": "PENDING_B5_6_VALIDATION",
+    "completion": "B5_6_MAINTENANCE_ROOT_COMPLETE",
     "nextOwner": "configdata-source-pack",
     "nextSupportingOwners": ["configdata", "project-check", "configdata-lookup"],
     "nextStage": "B6-delete-tracked-configdata",
-    "nextStart": "After B5.6 PASS, recreate B6 from latest main while preserving an exact deletion-only 753-file diff, then rerun all deletion-triggered workflows and merge only when no repository-local ConfigData read dependency remains."
+    "nextStart": "Recreate B6 from latest main while preserving an exact deletion-only 753-file diff, then rerun all deletion-triggered workflows. Treat the recorded Hero display and Stage5-2 existing drifts as separate reviews unless their owning base behavior changes."
   }
 }
