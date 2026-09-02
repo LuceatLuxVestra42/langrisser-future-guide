@@ -1,9 +1,17 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 import * as lookup from '../lib/lookup.mjs';
 import { checkLookupFreshness } from '../lib/freshness.mjs';
+import {
+  CONFIGDATA_SOURCE_ROOT_ENV,
+  LOGICAL_CONFIGDATA_ROOT,
+  REPOSITORY_ROOT,
+  getConfigDataSourceRoot,
+  resolveConfigDataSourcePath,
+} from '../lib/source-root.mjs';
 import * as legacyLookup from '../../../scripts/lib/configdata-lookup-stage5.mjs';
 
 const repoRoot = process.cwd();
@@ -47,6 +55,53 @@ assert.equal(runtime.runtimeBoundary.pageValidatorSelection, false);
 assert.equal(runtime.runtimeBoundary.hostedQaSelection, false);
 assert.equal(runtime.runtimeBoundary.browserUiSelection, false);
 assert.equal(runtime.runtimeBoundary.projectDoctorRuntimeDependency, false);
+
+const sourceRootContract = readJson('data/contracts/project-tooling-configdata-lookup-b3-source-root-cutover.v1.json');
+assert.equal(sourceRootContract.schemaId, 'configdata-lookup-source-root-cutover/v1');
+assert.equal(sourceRootContract.stage, 'repository-size-reduction-B3');
+assert.equal(sourceRootContract.status, 'SOURCE_ROOT_CONTRACT_FROZEN');
+assert.equal(sourceRootContract.owner, 'configdata-lookup');
+assert.equal(sourceRootContract.logicalSourceBoundary.namespace, LOGICAL_CONFIGDATA_ROOT);
+assert.equal(sourceRootContract.physicalSourceRoot.environmentVariable, CONFIGDATA_SOURCE_ROOT_ENV);
+assert.equal(sourceRootContract.logicalSourceBoundary.contractPathsRemainLogical, true);
+assert.equal(sourceRootContract.logicalSourceBoundary.generatedSourcePathsRemainLogical, true);
+assert.equal(sourceRootContract.logicalSourceBoundary.logicalPathsMayBeRewrittenToPhysicalPaths, false);
+assert.equal(sourceRootContract.runtimeBoundary.materializedLookupRemainsNormalQuerySource, true);
+assert.equal(sourceRootContract.runtimeBoundary.queryReadsRawConfigData, false);
+assert.equal(sourceRootContract.runtimeBoundary.rawQueryFallbackAllowed, false);
+
+assert.equal(REPOSITORY_ROOT, path.resolve(repoRoot));
+assert.equal(getConfigDataSourceRoot({}), path.resolve(repoRoot));
+const alternateSourceRoot = path.resolve(repoRoot, '..', 'configdata-b3-source-root-fixture');
+assert.equal(
+  getConfigDataSourceRoot({ [CONFIGDATA_SOURCE_ROOT_ENV]: alternateSourceRoot }),
+  alternateSourceRoot,
+);
+const logicalSourceFixture = 'data/configdata/ConfigDataHeroInfo.json';
+assert.equal(
+  resolveConfigDataSourcePath(logicalSourceFixture, { sourceRoot: alternateSourceRoot }),
+  path.join(alternateSourceRoot, 'data', 'configdata', 'ConfigDataHeroInfo.json'),
+);
+assert.throws(
+  () => getConfigDataSourceRoot({ [CONFIGDATA_SOURCE_ROOT_ENV]: 'relative/configdata-root' }),
+  /must be an absolute filesystem path/,
+);
+assert.throws(
+  () => resolveConfigDataSourcePath('data/configdata/../ConfigDataHeroInfo.json', { sourceRoot: alternateSourceRoot }),
+  /unsafe segment/,
+);
+assert.throws(
+  () => resolveConfigDataSourcePath('/data/configdata/ConfigDataHeroInfo.json', { sourceRoot: alternateSourceRoot }),
+  /relative POSIX path/,
+);
+assert.throws(
+  () => resolveConfigDataSourcePath('data/other/ConfigDataHeroInfo.json', { sourceRoot: alternateSourceRoot }),
+  /outside the admitted namespace/,
+);
+assert.throws(
+  () => resolveConfigDataSourcePath('data\\configdata\\ConfigDataHeroInfo.json', { sourceRoot: alternateSourceRoot }),
+  /relative POSIX path/,
+);
 
 const beforeTrackedState = trackedState();
 
@@ -189,5 +244,8 @@ console.log(JSON.stringify({
     validationWorkflowWritePermissionCount: 0,
     writerRequiresApplyFlag: true,
     writerRejectsMainAndGhPages: true,
+    sourceRootResolverContractFrozen: true,
+    logicalSourceMetadataRemainsStable: true,
+    physicalSourceRootMayBeExternal: true,
   },
 }, null, 2));
