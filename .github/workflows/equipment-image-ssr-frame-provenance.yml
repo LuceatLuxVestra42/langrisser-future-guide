@@ -1,0 +1,44 @@
+name: Equipment SSR Frame Provenance Probe
+
+on:
+  push:
+    branches:
+      - research/equipment-ssr-frame-provenance
+    paths:
+      - scripts/equipment-image-ssr-frame-provenance-probe.py
+      - .github/workflows/equipment-image-ssr-frame-provenance.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile probe
+        run: python -m py_compile scripts/equipment-image-ssr-frame-provenance-probe.py
+
+      - name: Probe official APK index and IL2CPP locators
+        env:
+          OUTPUT_PATH: artifacts/equipment-ssr-frame-apk-probe.json
+        run: python scripts/equipment-image-ssr-frame-provenance-probe.py
+
+      - name: Upload probe report
+        uses: actions/upload-artifact@v4
+        with:
+          name: equipment-ssr-frame-apk-probe
+          path: artifacts/equipment-ssr-frame-apk-probe.json
+          if-no-files-found: error
+          retention-days: 7
