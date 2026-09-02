@@ -26,6 +26,8 @@ jobs:
           node-version: 22
       - name: Generate C3 classification
         run: node tools/evidence-lifecycle/cli/c3-lifecycle-classification.mjs --write
+      - name: Run permanent C0-C3 read-only validator
+        run: node tools/evidence-lifecycle/test/evidence-lifecycle-readonly.mjs
       - name: Inspect secondary lifecycle signals
         run: |
           node --input-type=module <<'NODE'
