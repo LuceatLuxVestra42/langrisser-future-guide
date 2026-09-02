@@ -13,7 +13,7 @@
     "c1InventoryPath": "tools/evidence-lifecycle/generated/c1-inventory.v1.json",
     "c1InventoryDigest": "c1642e7031b66b9ab9a967f380698cc38125a861fd350a500aa953a0aa916941",
     "c2ReferenceGraphPath": "tools/evidence-lifecycle/generated/c2-reference-graph.v1.json",
-    "c2GraphDigest": "f62776305dccbc19b69d689fb48a26516261eb711a41c90e945780a614205575",
+    "c2GraphDigest": "bd71bc5f218f0d69be263fba7cbfcfabeae82bbca1730a9ee659b190ac5f6fee",
     "admittedNodeCount": 640,
     "populationPolicy": "C1_ADMITTED_ONLY"
   },
@@ -81,15 +81,17 @@
       "PROVENANCE_EVIDENCE",
       "HISTORICAL_GENERATED_EVIDENCE"
     ],
-    "explicitRationaleKeyRegex": "(?:retention|historical|history|audit|provenance|reproduc|retry.?prevention)",
+    "explicitRationaleKeyRegex": "(?:retention|historical|history|audit|reproduc|retry.?prevention)",
     "checkpointRoleAloneIsHistorical": false,
     "closedOrFrozenStatusAloneIsHistorical": false,
-    "oldCommitOrStageNumberIsHistorical": false
+    "oldCommitOrStageNumberIsHistorical": false,
+    "genericProvenanceMetadataKeyAloneIsHistorical": false
   },
   "explicitlySuperseded": {
     "statusTokenRegex": "(?:SUPERSEDED|RETIRED|DEPRECATED)",
-    "explicitSuccessorKeyRegex": "(?:successor|supersededBy|replacedBy|retiredBy)",
+    "explicitSuccessorKeyRegex": "(?:successorPath|successorArtifact|successorCheckpoint|successorContract|supersededBy|replacedBy|retiredBy)",
     "statusSourceSuccessorOfRelation": true,
+    "nestedSuccessorOfDoesNotSupersedeContainer": true,
     "chronologyOrStageOrderCreatesSuccessor": false
   },
   "unreferencedReview": {
@@ -136,6 +138,7 @@
     "unclassifiedCount": 0,
     "multiplePrimaryLifecycleCount": 0,
     "classificationBasisMissingCount": 0,
+    "unreferencedReviewWithProtectingReferenceCount": 0,
     "semanticReopen": false,
     "destructiveDecisionCount": 0,
     "trackedMutationAfterValidationAllowed": false
