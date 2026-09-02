@@ -24,6 +24,15 @@ const errors = [];
 const check = (ok, msg) => { if (!ok) errors.push(msg); };
 const fail = () => { console.error(JSON.stringify({ status: "FAIL", blockers: errors }, null, 2)); process.exit(1); };
 const statKey = { "生命": "HP", "攻击": "ATK", "防御": "DEF", "魔防": "MDEF" };
+const frozenShapeSnapshot = [
+  { shapeKey: "ATK:FLAT", techIds: [118,217,317,420,517,618], levelRowCount: 90 },
+  { shapeKey: "ATK:PERCENT", techIds: [109,119,127,209,218,225,309,318,326,411,421,430,509,525,533,610,626,635], levelRowCount: 240 },
+  { shapeKey: "DEF:FLAT|MDEF:FLAT", techIds: [102,111,202,211,302,311,402,413,502,518,602,619], levelRowCount: 120 },
+  { shapeKey: "DEF:PERCENT|MDEF:PERCENT", techIds: [104,121,128,204,220,226,304,320,327,404,423,431,504,526,534,604,628,636], levelRowCount: 240 },
+  { shapeKey: "HP:FLAT", techIds: [110,210,310,412,510,611], levelRowCount: 90 },
+  { shapeKey: "HP:FLAT|ATK:FLAT", techIds: [101,201,301,401,501,601], levelRowCount: 30 },
+  { shapeKey: "HP:PERCENT", techIds: [103,120,129,203,219,227,303,319,328,403,422,432,503,527,535,603,627,637], levelRowCount: 240 },
+];
 
 const independentlyParseDescription = (rawText, levelId) => {
   if (typeof rawText !== "string" || rawText.length === 0) { errors.push(`TrainingTechLevel ${levelId} lacks Description.`); return null; }
@@ -158,6 +167,9 @@ check(levelIds.length === 1050 && new Set(levelIds).size === 1050, "COMMON_STAT 
 check(rawEffectTextRows === 1050, "COMMON_STAT raw Description effect coverage is not 1050 rows.");
 check(structuredEffectRows === 1050, "COMMON_STAT structured effect coverage is not 1050 rows.");
 check(same(subject.effectSemantics?.effectShapeCatalog, independentCatalog), "Subject effect shape catalog differs from independently parsed source shapes.");
+const compactShapeSnapshot = independentCatalog.map(({ shapeKey, techIds, levelRowCount }) => ({ shapeKey, techIds, levelRowCount }));
+check(same(compactShapeSnapshot, frozenShapeSnapshot), "COMMON_STAT frozen effect-shape membership snapshot drifted.");
+check(structuredEffectEntries === 1440 && independentCatalog.length === 7, "COMMON_STAT frozen structured-effect totals drifted from 1440 entries / 7 shapes.");
 check(subject.coverage?.targetTechCount === 84 && subject.coverage?.materializedTechCount === 84, "Subject Tech coverage counters drifted.");
 check(subject.coverage?.referencedLevelRowCount === 1050 && subject.coverage?.uniqueReferencedLevelRowCount === 1050 && subject.coverage?.rawEffectTextRowCount === 1050 && subject.coverage?.structuredEffectRowCount === 1050, "Subject level/effect coverage counters drifted.");
 check(subject.coverage?.structuredEffectEntryCount === structuredEffectEntries && subject.coverage?.effectShapeCount === independentCatalog.length, "Subject structured effect counters drifted.");
@@ -210,6 +222,9 @@ const validation = {
     everyNumericTokenAdmittedByExplicitStatValueAlignment: true,
     structuredStatValuesExact: true,
     effectShapeStableWithinEachTech: true,
+    frozenShapeSnapshotExact: true,
+    frozenStructuredEffectEntries1440: true,
+    frozenEffectShapes7: true,
     noConditionalInference: true,
     noUnrelatedSourceRowDuplication: true,
     noClassificationMutation: true,
