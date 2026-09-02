@@ -51,7 +51,8 @@
       "CHECKPOINT_CROSS_REFERENCE",
       "NON_ACTIVE_CONTRACT_REF",
       "EVIDENCE_CROSS_REFERENCE",
-      "NON_ACTIVE_CROSS_REFERENCE"
+      "NON_ACTIVE_CROSS_REFERENCE",
+      "VALIDATOR_ROUTING_FIXTURE"
     ],
     "multipleExplicitLocators": "Group identical edge identities, retain the first sorted locator in sourceFieldOrLocator, and preserve the rest in additionalLocators."
   },
@@ -77,7 +78,7 @@
     ],
     "statusSourceDeclaration": "APPROVED Status Source declaration path fields protect referenced admitted nodes. All APPROVED source entries are operationally validated by current Status Source selection, including lineage predecessors.",
     "currentStatusSourceTarget": "An admitted node used by an APPROVED Status Source entry, or a supplemental source declared by that entry, may protect explicit path/provenance/predecessor references in its structured fields.",
-    "registeredValidatorEntrypoint": "Only validator entrypoints explicitly registered in the frozen Project Check validator catalog, including npm-script-resolved entrypoints, receive VALIDATOR_INPUT_REF protection for exact literal admitted-node paths.",
+    "registeredValidatorEntrypoint": "Registered validator entrypoints protect exact admitted-node paths only when the mention represents validator input/dependency use. A path used solely as a routing/example fixture does not become retention-protecting.",
     "currentToolContract": "Contracts beneath tool roots reached by registered Project Check validator entrypoints protect only explicit semantic path locators.",
     "retentionDeclaration": "C1 RETENTION_DECLARATION nodes protect explicit semantic path locators.",
     "activeWorkflow": "A workflow protects exact admitted-node references only when current authority explicitly admits that workflow as active. C2 currently derives this from the frozen Status Source lifecycle transport/pipeline fields and retained APPROVED_FOR_HANDOFF producer declarations. Mere tracked workflow existence is not active-workflow authority.",
@@ -103,7 +104,14 @@
       "tools/status-source/contracts/lifecycle.v1.json policy.transport when activation/active flags permit",
       "tools/status-source/contracts/lifecycle.v1.json pipelines[].completionWorkflow",
       "C1 RETENTION_DECLARATION nodes with state=APPROVED_FOR_HANDOFF and requestedByWorkflow"
-    ]
+    ],
+    "validatorRoutingFixtureException": {
+      "sourcePath": "tools/project-check/test/project-check-self-test.mjs",
+      "retentionClass": "INFORMATIONAL",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "basis": "The frozen baseline self-test passes these literal paths to expectOwners/routeProjectCheckPaths to test routing; it does not require the referenced artifact contents as validator inputs."
+    },
+    "semanticPathLocatorRule": "Structured protection recognizes explicit path/path(s) keys and semantic *SourcePath/*ManifestPath/*ValidationPath/*CheckpointPath/*ContractPath/*PredecessorPath/*InputPath/*ArtifactPath/*ConsumerPath/*AuthorityPath/*OutputPath/*GeneratedPath-style keys, including prefixed keys such as a5ManifestPath beneath predecessor objects."
   },
   "informationalPolicy": {
     "default": "Every exact admitted-node path mention that does not satisfy a protecting-source rule remains INFORMATIONAL.",
@@ -113,7 +121,8 @@
     "genericEvidenceCrossReferenceProtects": false,
     "zeroProtectingReferenceMeansUnused": false,
     "zeroProtectingReferenceMeansDelete": false,
-    "unadmittedTrackedWorkflowMentionProtects": false
+    "unadmittedTrackedWorkflowMentionProtects": false,
+    "routingFixtureMentionProtects": false
   },
   "forbiddenInference": {
     "filenameSimilarity": true,

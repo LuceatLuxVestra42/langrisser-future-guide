@@ -114,6 +114,7 @@ function structuredProtectingLocator(locator) {
     'authoritypath', 'authoritypaths', 'outputpath', 'outputpaths', 'generatedpath', 'generatedpaths',
   ]);
   if (exact.has(terminal)) return true;
+  if (/(?:source|artifact|manifest|predecessor|input|validation|checkpoint|contract|consumer|authority|output|generated)[a-z0-9_-]*paths?$/.test(terminal)) return true;
   if (terminal !== 'path') return false;
   const ancestors = tokens.slice(0, -1).join('.');
   return /(predecessor|provenance|source|input|manifest|artifact|validation|checkpoint|contract|supplemental|consumer|authority|producer|output|generated)/.test(ancestors);
@@ -219,6 +220,9 @@ function classifyMention({ sourcePath, sourceRecord, locator, context }) {
   const semanticLocator = structuredProtectingLocator(locator);
   const has = name => classes.includes(name);
 
+  if (sourcePath === 'tools/project-check/test/project-check-self-test.mjs') {
+    return { edgeType: 'VALIDATOR_ROUTING_FIXTURE', retentionClass: 'INFORMATIONAL', sourceClasses: classes };
+  }
   if (has('REGISTERED_PROJECT_CHECK_VALIDATOR_ENTRYPOINT')) {
     return { edgeType: 'VALIDATOR_INPUT_REF', retentionClass: 'PROTECTING', sourceClasses: classes };
   }

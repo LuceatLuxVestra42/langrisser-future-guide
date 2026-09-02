@@ -49,27 +49,29 @@
     "rawExplicitMentionCount": 3976,
     "selfMentionExcludedCount": 15,
     "edgeCount": 3213,
-    "protectingEdgeCount": 156,
-    "informationalEdgeCount": 3057,
+    "protectingEdgeCount": 146,
+    "informationalEdgeCount": 3067,
     "referencedNodeCount": 558,
     "zeroReferenceNodeCount": 82,
-    "protectingReferencedNodeCount": 113,
-    "zeroProtectingReferenceNodeCount": 527,
+    "protectingReferencedNodeCount": 104,
+    "zeroProtectingReferenceNodeCount": 536,
     "protectingEdgeTypeCounts": {
       "ACTIVE_PREDECESSOR_REF": 5,
       "ACTIVE_PROVENANCE_REF": 9,
       "ACTIVE_WORKFLOW_REF": 22,
-      "CURRENT_CONTRACT_REF": 12,
+      "CURRENT_CONTRACT_REF": 18,
       "FROZEN_CONSUMER_REF": 6,
+      "MANIFEST_REF": 2,
       "STATUS_SOURCE_REF": 8,
-      "VALIDATOR_INPUT_REF": 94
+      "VALIDATOR_INPUT_REF": 76
     },
     "informationalEdgeTypeCounts": {
       "CHECKPOINT_CROSS_REFERENCE": 50,
-      "EVIDENCE_CROSS_REFERENCE": 469,
+      "EVIDENCE_CROSS_REFERENCE": 467,
       "HISTORICAL_DOC_MENTION": 114,
-      "NON_ACTIVE_CONTRACT_REF": 854,
-      "NON_ACTIVE_CROSS_REFERENCE": 1570
+      "NON_ACTIVE_CONTRACT_REF": 848,
+      "NON_ACTIVE_CROSS_REFERENCE": 1570,
+      "VALIDATOR_ROUTING_FIXTURE": 18
     }
   },
   "policy": {
@@ -120,7 +122,7 @@
   },
   "graphDigest": {
     "algorithm": "sha256",
-    "value": "d9449db8bbe700cd0746ee35b857e4ddad8fe50a89547143a230eaf1e3225473",
+    "value": "bd71bc5f218f0d69be263fba7cbfcfabeae82bbca1730a9ee659b190ac5f6fee",
     "canonicalization": "JSON.stringify(sorted-edge-array)"
   },
   "edges": [
@@ -4700,8 +4702,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/contracts/hero-card-icon-source-pack.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L158",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -11755,8 +11757,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/contracts/project-tooling-configdata-lookup-clr4-admission.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L113",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -11968,8 +11970,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/contracts/project-tooling-migration-r0.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L288",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -12164,8 +12166,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/contracts/project-tooling-project-check-configdata-lookup-clr3-self-test.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L118",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -12671,8 +12673,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L123",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -12723,8 +12725,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/contracts/project-tooling-project-doctor-deletion-manifest.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L128",
       "additionalLocators": [
         "L379"
@@ -12832,8 +12834,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/contracts/project-tooling-regression-runner-r2-admission.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L83",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -12962,8 +12964,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/contracts/project-tooling-regression-runner-r9-retirement.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L448",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -12988,8 +12990,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/contracts/project-tooling-route-hosted-qa-rh2-admission.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L98",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -16597,8 +16599,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/evidence/skin-stage3-2-static-source-evidence.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L275",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -16953,8 +16955,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/evidence/soldier-training-tech-classification-stage3-semantic.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L254",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -17747,8 +17749,8 @@
     {
       "fromPath": "data/manifests/soldier-training-material-assets-a6-webp.v1.json",
       "toPath": "data/manifests/soldier-training-material-assets-a5.v1.json",
-      "edgeType": "EVIDENCE_CROSS_REFERENCE",
-      "retentionClass": "INFORMATIONAL",
+      "edgeType": "MANIFEST_REF",
+      "retentionClass": "PROTECTING",
       "sourceFieldOrLocator": "/predecessor/a5ManifestPath",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -20724,8 +20726,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L233",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -20750,8 +20752,8 @@
     {
       "fromPath": "tools/status-source/contracts/artifact-bridge.v1.json",
       "toPath": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json",
-      "edgeType": "NON_ACTIVE_CONTRACT_REF",
-      "retentionClass": "INFORMATIONAL",
+      "edgeType": "CURRENT_CONTRACT_REF",
+      "retentionClass": "PROTECTING",
       "sourceFieldOrLocator": "/pipelines/4/baselineSourcePath",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -22788,8 +22790,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/validation/equipment-public-presentation-correction-final.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L223",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -22814,8 +22816,8 @@
     {
       "fromPath": "tools/status-source/contracts/artifact-bridge.v1.json",
       "toPath": "data/validation/equipment-public-presentation-correction-final.v1.json",
-      "edgeType": "NON_ACTIVE_CONTRACT_REF",
-      "retentionClass": "INFORMATIONAL",
+      "edgeType": "CURRENT_CONTRACT_REF",
+      "retentionClass": "PROTECTING",
       "sourceFieldOrLocator": "/pipelines/2/baselineSourcePath",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -24446,8 +24448,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/validation/equipment-stage4-final.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L218",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -29009,8 +29011,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/validation/hero-soldier-integration-stageC-final.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L228",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -29035,8 +29037,8 @@
     {
       "fromPath": "tools/status-source/contracts/artifact-bridge.v1.json",
       "toPath": "data/validation/hero-soldier-integration-stageC-final.v1.json",
-      "edgeType": "NON_ACTIVE_CONTRACT_REF",
-      "retentionClass": "INFORMATIONAL",
+      "edgeType": "CURRENT_CONTRACT_REF",
+      "retentionClass": "PROTECTING",
       "sourceFieldOrLocator": "/pipelines/3/baselineSourcePath",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -30876,8 +30878,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/validation/hero-stage6-4-final.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L208",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -30930,8 +30932,8 @@
     {
       "fromPath": "tools/status-source/contracts/artifact-bridge.v1.json",
       "toPath": "data/validation/hero-stage6-4-final.v1.json",
-      "edgeType": "NON_ACTIVE_CONTRACT_REF",
-      "retentionClass": "INFORMATIONAL",
+      "edgeType": "CURRENT_CONTRACT_REF",
+      "retentionClass": "PROTECTING",
       "sourceFieldOrLocator": "/pipelines/0/baselineSourcePath",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -33994,8 +33996,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/validation/skin-stage3-2-readiness.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L238",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -34020,8 +34022,8 @@
     {
       "fromPath": "tools/status-source/contracts/artifact-bridge.v1.json",
       "toPath": "data/validation/skin-stage3-2-readiness.v1.json",
-      "edgeType": "NON_ACTIVE_CONTRACT_REF",
-      "retentionClass": "INFORMATIONAL",
+      "edgeType": "CURRENT_CONTRACT_REF",
+      "retentionClass": "PROTECTING",
       "sourceFieldOrLocator": "/pipelines/5/baselineSourcePath",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -39802,8 +39804,8 @@
     {
       "fromPath": "tools/project-check/test/project-check-self-test.mjs",
       "toPath": "data/validation/soldier-stage6-7-site-admission.v1.json",
-      "edgeType": "VALIDATOR_INPUT_REF",
-      "retentionClass": "PROTECTING",
+      "edgeType": "VALIDATOR_ROUTING_FIXTURE",
+      "retentionClass": "INFORMATIONAL",
       "sourceFieldOrLocator": "L213",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -39842,8 +39844,8 @@
     {
       "fromPath": "tools/status-source/contracts/artifact-bridge.v1.json",
       "toPath": "data/validation/soldier-stage6-7-site-admission.v1.json",
-      "edgeType": "NON_ACTIVE_CONTRACT_REF",
-      "retentionClass": "INFORMATIONAL",
+      "edgeType": "CURRENT_CONTRACT_REF",
+      "retentionClass": "PROTECTING",
       "sourceFieldOrLocator": "/pipelines/1/baselineSourcePath",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -40369,8 +40371,8 @@
     {
       "fromPath": "data/manifests/soldier-training-material-assets-a6-webp.v1.json",
       "toPath": "data/validation/soldier-training-material-assets-a5.v1.json",
-      "edgeType": "EVIDENCE_CROSS_REFERENCE",
-      "retentionClass": "INFORMATIONAL",
+      "edgeType": "MANIFEST_REF",
+      "retentionClass": "PROTECTING",
       "sourceFieldOrLocator": "/predecessor/a5ValidationPath",
       "additionalLocators": [],
       "occurrenceCount": 1,
@@ -44640,20 +44642,20 @@
     },
     {
       "path": "data/contracts/hero-card-icon-source-pack.v1.json",
-      "protectingReferenceCount": 3,
-      "informationalReferenceCount": 5,
+      "protectingReferenceCount": 2,
+      "informationalReferenceCount": 6,
       "totalReferenceCount": 8,
       "protectingFromPaths": [
         "scripts/validate-hero-card-icon-source-pack-owner-v1.mjs",
-        "src/lib/hero-card-icon-assets.server.ts",
-        "tools/project-check/test/project-check-self-test.mjs"
+        "src/lib/hero-card-icon-assets.server.ts"
       ],
       "informationalFromPaths": [
         ".github/workflows/hero-card-icon-source-pack-hydration-v1.yml",
         "data/contracts/hero-card-icon-source-pack-h5-runtime-policy.v1.json",
         "data/validation/hero-card-icon-source-pack-h8-closeout.v1.json",
         "scripts/hydrate-hero-card-icon-source-pack-v1.mjs",
-        "scripts/validate-hero-card-icon-frontend.mjs"
+        "scripts/validate-hero-card-icon-frontend.mjs",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
@@ -45960,16 +45962,15 @@
     },
     {
       "path": "data/contracts/project-tooling-configdata-lookup-clr4-admission.v1.json",
-      "protectingReferenceCount": 1,
-      "informationalReferenceCount": 3,
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 4,
       "totalReferenceCount": 4,
-      "protectingFromPaths": [
-        "tools/project-check/test/project-check-self-test.mjs"
-      ],
+      "protectingFromPaths": [],
       "informationalFromPaths": [
         "data/contracts/project-tooling-configdata-lookup-clr5-writer-separation.v1.json",
         "data/contracts/project-tooling-configdata-lookup-clr8-final-freeze.v1.json",
-        "tools/configdata-lookup/test/configdata-lookup-clr8-final-freeze.mjs"
+        "tools/configdata-lookup/test/configdata-lookup-clr8-final-freeze.mjs",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
@@ -46021,17 +46022,16 @@
     },
     {
       "path": "data/contracts/project-tooling-migration-r0.v1.json",
-      "protectingReferenceCount": 1,
-      "informationalReferenceCount": 4,
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 5,
       "totalReferenceCount": 5,
-      "protectingFromPaths": [
-        "tools/project-check/test/project-check-self-test.mjs"
-      ],
+      "protectingFromPaths": [],
       "informationalFromPaths": [
         ".github/workflows/project-tooling-r1-status-source.yml",
         "data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json",
         "data/contracts/project-tooling-project-doctor-deletion-manifest.v1.json",
-        "tools/project-check/contracts/owners.v1.json"
+        "tools/project-check/contracts/owners.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
@@ -46075,16 +46075,15 @@
     },
     {
       "path": "data/contracts/project-tooling-project-check-configdata-lookup-clr3-self-test.v1.json",
-      "protectingReferenceCount": 1,
-      "informationalReferenceCount": 3,
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 4,
       "totalReferenceCount": 4,
-      "protectingFromPaths": [
-        "tools/project-check/test/project-check-self-test.mjs"
-      ],
+      "protectingFromPaths": [],
       "informationalFromPaths": [
         "data/contracts/project-tooling-configdata-lookup-clr4-admission.v1.json",
         "data/contracts/project-tooling-configdata-lookup-clr8-final-freeze.v1.json",
-        "tools/configdata-lookup/test/configdata-lookup-clr8-final-freeze.mjs"
+        "tools/configdata-lookup/test/configdata-lookup-clr8-final-freeze.mjs",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
@@ -46275,30 +46274,28 @@
     },
     {
       "path": "data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json",
-      "protectingReferenceCount": 1,
-      "informationalReferenceCount": 3,
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 4,
       "totalReferenceCount": 4,
-      "protectingFromPaths": [
-        "tools/project-check/test/project-check-self-test.mjs"
-      ],
+      "protectingFromPaths": [],
       "informationalFromPaths": [
         "data/contracts/project-tooling-project-doctor-deletion-complete.v1.json",
         "data/contracts/project-tooling-project-doctor-deletion-manifest.v1.json",
-        "data/contracts/project-tooling-status-source-writer-cutover.v1.json"
+        "data/contracts/project-tooling-status-source-writer-cutover.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
       "path": "data/contracts/project-tooling-project-doctor-deletion-manifest.v1.json",
-      "protectingReferenceCount": 1,
-      "informationalReferenceCount": 3,
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 4,
       "totalReferenceCount": 4,
-      "protectingFromPaths": [
-        "tools/project-check/test/project-check-self-test.mjs"
-      ],
+      "protectingFromPaths": [],
       "informationalFromPaths": [
         "data/contracts/project-tooling-project-check-r3.v1.json",
         "data/contracts/project-tooling-project-doctor-deletion-complete.v1.json",
-        "data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json"
+        "data/contracts/project-tooling-project-doctor-deletion-inventory.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
@@ -46335,14 +46332,13 @@
     },
     {
       "path": "data/contracts/project-tooling-regression-runner-r2-admission.v1.json",
-      "protectingReferenceCount": 1,
-      "informationalReferenceCount": 1,
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 2,
       "totalReferenceCount": 2,
-      "protectingFromPaths": [
-        "tools/project-check/test/project-check-self-test.mjs"
-      ],
+      "protectingFromPaths": [],
       "informationalFromPaths": [
-        "data/contracts/project-tooling-regression-runner-r3-core.v1.json"
+        "data/contracts/project-tooling-regression-runner-r3-core.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
@@ -46408,27 +46404,25 @@
     },
     {
       "path": "data/contracts/project-tooling-regression-runner-r9-retirement.v1.json",
-      "protectingReferenceCount": 1,
-      "informationalReferenceCount": 2,
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 3,
       "totalReferenceCount": 3,
-      "protectingFromPaths": [
-        "tools/project-check/test/project-check-self-test.mjs"
-      ],
+      "protectingFromPaths": [],
       "informationalFromPaths": [
         "data/contracts/project-tooling-project-check-post-reinstall-acceptance-f3.v1.json",
-        "data/contracts/project-tooling-project-check-post-reinstall-acceptance-f6.v1.json"
+        "data/contracts/project-tooling-project-check-post-reinstall-acceptance-f6.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
       "path": "data/contracts/project-tooling-route-hosted-qa-rh2-admission.v1.json",
-      "protectingReferenceCount": 1,
-      "informationalReferenceCount": 1,
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 2,
       "totalReferenceCount": 2,
-      "protectingFromPaths": [
-        "tools/project-check/test/project-check-self-test.mjs"
-      ],
+      "protectingFromPaths": [],
       "informationalFromPaths": [
-        "data/contracts/project-tooling-route-hosted-qa-rh3-implementation.v1.json"
+        "data/contracts/project-tooling-route-hosted-qa-rh3-implementation.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
@@ -47137,18 +47131,17 @@
     },
     {
       "path": "data/evidence/skin-stage3-2-static-source-evidence.v1.json",
-      "protectingReferenceCount": 1,
-      "informationalReferenceCount": 5,
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 6,
       "totalReferenceCount": 6,
-      "protectingFromPaths": [
-        "tools/project-check/test/project-check-self-test.mjs"
-      ],
+      "protectingFromPaths": [],
       "informationalFromPaths": [
         "data/contracts/project-doctor-d3-validator-plan.v5.json",
         "data/validation/asset-intake-stage2-skin-evidence-checkpoint.v1.json",
         "data/validation/asset-intake-stage3-skin-adapter-summary.v1.json",
         "docs/checkpoints/asset-intake-stage3-skin-adapter.md",
-        "tools/asset-intake/cli/self-test-skin-adapter-v1.mjs"
+        "tools/asset-intake/cli/self-test-skin-adapter-v1.mjs",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
@@ -47211,17 +47204,16 @@
     },
     {
       "path": "data/evidence/soldier-training-tech-classification-stage3-semantic.v1.json",
-      "protectingReferenceCount": 1,
-      "informationalReferenceCount": 4,
+      "protectingReferenceCount": 0,
+      "informationalReferenceCount": 5,
       "totalReferenceCount": 5,
-      "protectingFromPaths": [
-        "tools/project-check/test/project-check-self-test.mjs"
-      ],
+      "protectingFromPaths": [],
       "informationalFromPaths": [
         "data/contracts/soldier-training-tech-classification-stage4-contract.v1.json",
         "data/validation/soldier-training-tech-classification-stage3.v1.json",
         "scripts/validate-soldier-training-tech-classification-stage3.mjs",
-        "scripts/validate-soldier-training-tech-classification-stage4.mjs"
+        "scripts/validate-soldier-training-tech-classification-stage4.mjs",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
@@ -47374,16 +47366,16 @@
     },
     {
       "path": "data/manifests/soldier-training-material-assets-a5.v1.json",
-      "protectingReferenceCount": 1,
-      "informationalReferenceCount": 7,
+      "protectingReferenceCount": 2,
+      "informationalReferenceCount": 6,
       "totalReferenceCount": 8,
       "protectingFromPaths": [
+        "data/manifests/soldier-training-material-assets-a6-webp.v1.json",
         "tools/project-check/test/soldier-training-material-assets-readonly.mjs"
       ],
       "informationalFromPaths": [
         ".github/workflows/soldier-training-material-assets-a5.yml",
         ".github/workflows/soldier-training-material-assets-a6.yml",
-        "data/manifests/soldier-training-material-assets-a6-webp.v1.json",
         "docs/checkpoints/soldier-training-material-assets-a5.md",
         "docs/checkpoints/soldier-training-material-assets-a6.md",
         "scripts/admit-soldier-training-material-assets-a5.py",
@@ -48002,7 +47994,7 @@
       "totalReferenceCount": 27,
       "protectingFromPaths": [
         "data/status-sources/baseline.v1.json",
-        "tools/project-check/test/project-check-self-test.mjs"
+        "tools/status-source/contracts/artifact-bridge.v1.json"
       ],
       "informationalFromPaths": [
         ".github/workflows/banner-stage3-8-regression-freeze.yml",
@@ -48027,8 +48019,8 @@
         "docs/checkpoints/asset-intake-hygiene-stage2-source-freeze.md",
         "tools/asset-intake/hygiene/generated/asset-hygiene-stage2-reference-sources.v1.json",
         "tools/project-check/contracts/owners.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs",
         "tools/project-status/fixtures/current-project-status.v1.json",
-        "tools/status-source/contracts/artifact-bridge.v1.json",
         "tools/status-source/fixtures/current-selection.v1.json"
       ]
     },
@@ -48414,7 +48406,7 @@
       "totalReferenceCount": 21,
       "protectingFromPaths": [
         "data/status-sources/promotion.equipment.equipment-public-presentation-correction-final.v1.json",
-        "tools/project-check/test/project-check-self-test.mjs"
+        "tools/status-source/contracts/artifact-bridge.v1.json"
       ],
       "informationalFromPaths": [
         ".github/workflows/equipment-active-source-correction.yml",
@@ -48433,8 +48425,8 @@
         "scripts/validate-equipment-public-presentation-correction-final.mjs",
         "tools/asset-intake/hygiene/generated/asset-hygiene-stage2-reference-sources.v1.json",
         "tools/project-check/contracts/owners.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs",
         "tools/project-status/fixtures/current-project-status.v1.json",
-        "tools/status-source/contracts/artifact-bridge.v1.json",
         "tools/status-source/fixtures/current-selection.v1.json"
       ]
     },
@@ -48699,13 +48691,12 @@
     },
     {
       "path": "data/validation/equipment-stage4-final.v1.json",
-      "protectingReferenceCount": 3,
-      "informationalReferenceCount": 8,
+      "protectingReferenceCount": 2,
+      "informationalReferenceCount": 9,
       "totalReferenceCount": 11,
       "protectingFromPaths": [
         "data/status-sources/baseline.v1.json",
-        "scripts/validate-equipment-stage4-final.mjs",
-        "tools/project-check/test/project-check-self-test.mjs"
+        "scripts/validate-equipment-stage4-final.mjs"
       ],
       "informationalFromPaths": [
         ".github/workflows/equipment-stage4-final.yml",
@@ -48715,7 +48706,8 @@
         "data/validation/equipment-public-presentation-correction-final.v1.json",
         "data/validation/project-doctor-d1-0-summary.v1.json",
         "scripts/validate-equipment-public-presentation-correction-final.mjs",
-        "tools/project-check/contracts/owners.v1.json"
+        "tools/project-check/contracts/owners.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs"
       ]
     },
     {
@@ -49601,7 +49593,7 @@
       "protectingFromPaths": [
         "data/status-sources/baseline.v1.json",
         "scripts/validate-hero-soldier-stageC-5-final.cjs",
-        "tools/project-check/test/project-check-self-test.mjs"
+        "tools/status-source/contracts/artifact-bridge.v1.json"
       ],
       "informationalFromPaths": [
         ".github/workflows/hero-soldier-stageC-5-final.yml",
@@ -49629,8 +49621,8 @@
         "docs/hero-soldier-stageC-closeout.md",
         "tools/asset-intake/hygiene/generated/asset-hygiene-stage2-reference-sources.v1.json",
         "tools/project-check/contracts/owners.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs",
         "tools/project-status/fixtures/current-project-status.v1.json",
-        "tools/status-source/contracts/artifact-bridge.v1.json",
         "tools/status-source/fixtures/current-selection.v1.json"
       ]
     },
@@ -49820,8 +49812,8 @@
       "protectingFromPaths": [
         ".github/workflows/hero-stage6-4-site-consumer.yml",
         "data/status-sources/baseline.v1.json",
-        "tools/project-check/test/project-check-self-test.mjs",
         "tools/status-source/closeout-requests/hero.v1.json",
+        "tools/status-source/contracts/artifact-bridge.v1.json",
         "tools/status-source/declarations/hero.v1.json",
         "tools/status-source/test/artifact-bridge-parity.mjs",
         "tools/status-source/test/lifecycle-parity.mjs",
@@ -49864,9 +49856,9 @@
         "scripts/validate_hero_stage6_4_site_consumer.cjs",
         "tools/asset-intake/hygiene/generated/asset-hygiene-stage2-reference-sources.v1.json",
         "tools/project-check/contracts/owners.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs",
         "tools/project-status/contracts/review-lifecycle.v1.json",
         "tools/project-status/fixtures/current-project-status.v1.json",
-        "tools/status-source/contracts/artifact-bridge.v1.json",
         "tools/status-source/fixtures/current-selection.v1.json"
       ]
     },
@@ -50450,7 +50442,7 @@
       "protectingFromPaths": [
         "data/status-sources/baseline.v1.json",
         "tools/asset-intake/test/skin-stage3-2-evidence-readonly.mjs",
-        "tools/project-check/test/project-check-self-test.mjs"
+        "tools/status-source/contracts/artifact-bridge.v1.json"
       ],
       "informationalFromPaths": [
         "PROJECT_STATUS.md",
@@ -50480,8 +50472,8 @@
         "tools/asset-intake/fixtures/skin-stage1-contract-fixtures.v1.json",
         "tools/asset-intake/hygiene/generated/asset-hygiene-stage2-reference-sources.v1.json",
         "tools/project-check/contracts/owners.v1.json",
+        "tools/project-check/test/project-check-self-test.mjs",
         "tools/project-status/fixtures/current-project-status.v1.json",
-        "tools/status-source/contracts/artifact-bridge.v1.json",
         "tools/status-source/fixtures/current-selection.v1.json"
       ]
     },
@@ -51211,8 +51203,8 @@
         ".github/workflows/soldier-stage6-7-site-admission.yml",
         "data/status-sources/baseline.v1.json",
         "scripts/validate-soldier-stage6-7-final.mjs",
-        "tools/project-check/test/project-check-self-test.mjs",
         "tools/status-source/closeout-requests/soldier.v1.json",
+        "tools/status-source/contracts/artifact-bridge.v1.json",
         "tools/status-source/declarations/soldier.v1.json",
         "tools/status-source/test/lifecycle-parity.mjs"
       ],
@@ -51268,8 +51260,8 @@
         "tools/asset-intake/hygiene/generated/asset-hygiene-stage2-reference-sources.v1.json",
         "tools/project-check/contracts/owners.v1.json",
         "tools/project-check/test/post-reinstall-routing-fixtures.mjs",
+        "tools/project-check/test/project-check-self-test.mjs",
         "tools/project-status/fixtures/current-project-status.v1.json",
-        "tools/status-source/contracts/artifact-bridge.v1.json",
         "tools/status-source/fixtures/current-selection.v1.json"
       ]
     },
@@ -51371,14 +51363,15 @@
     },
     {
       "path": "data/validation/soldier-training-material-assets-a5.v1.json",
-      "protectingReferenceCount": 0,
-      "informationalReferenceCount": 7,
+      "protectingReferenceCount": 1,
+      "informationalReferenceCount": 6,
       "totalReferenceCount": 7,
-      "protectingFromPaths": [],
+      "protectingFromPaths": [
+        "data/manifests/soldier-training-material-assets-a6-webp.v1.json"
+      ],
       "informationalFromPaths": [
         ".github/workflows/soldier-training-material-assets-a5.yml",
         ".github/workflows/soldier-training-material-assets-a6.yml",
-        "data/manifests/soldier-training-material-assets-a6-webp.v1.json",
         "docs/checkpoints/soldier-training-material-assets-a5.md",
         "docs/checkpoints/soldier-training-material-assets-a6.md",
         "scripts/admit-soldier-training-material-assets-a5.py",
