@@ -67,6 +67,14 @@ const TIER_FILTERS: Array<{ id: TierFilter; label: string }> = [
   { id: "SP", label: "SP" },
 ];
 
+function getSoldierTierOrder(record: SoldierPrototypeRecord) {
+  if (record.isSp) return 0;
+  if (record.tier === 3) return 1;
+  if (record.tier === 2) return 2;
+  if (record.tier === 1) return 3;
+  return Number.MAX_SAFE_INTEGER;
+}
+
 function SoldierPage() {
   const data = Route.useLoaderData();
   const [armyFilter, setArmyFilter] = useState<ArmyFilter | null>(null);
@@ -100,6 +108,9 @@ function SoldierPage() {
           (ARMY_ORDER.get(a.armyType) ?? Number.MAX_SAFE_INTEGER) -
           (ARMY_ORDER.get(b.armyType) ?? Number.MAX_SAFE_INTEGER);
         if (armyOrderDiff !== 0) return armyOrderDiff;
+
+        const tierOrderDiff = getSoldierTierOrder(a) - getSoldierTierOrder(b);
+        if (tierOrderDiff !== 0) return tierOrderDiff;
 
         return b.soldierId - a.soldierId;
       });
