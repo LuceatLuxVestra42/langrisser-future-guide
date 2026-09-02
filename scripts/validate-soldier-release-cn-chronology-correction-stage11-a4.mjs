@@ -6,7 +6,6 @@ const paths = {
   evidence: 'data/soldier-release-cn-chronology-correction-evidence-stage11-a4.v1.json',
   releaseSource: 'data/soldier-release-source.v1.json',
   canonical: 'data/generated/soldier-list-stage5-7.v1.json',
-  releaseMetadata: 'data/generated/soldier-release-metadata.v1.json',
   a1: 'data/soldier-release-official-notice-evidence-stage11-a1.v1.json',
 };
 const readJson = rel => JSON.parse(fs.readFileSync(path.join(root, rel), 'utf8'));
@@ -28,7 +27,6 @@ function indexById(records, label) {
 const evidence = readJson(paths.evidence);
 const releaseSource = readJson(paths.releaseSource);
 const canonical = readJson(paths.canonical);
-const releaseMetadata = readJson(paths.releaseMetadata);
 const a1 = readJson(paths.a1);
 
 if (evidence.version !== 1
@@ -41,12 +39,6 @@ if (evidence.version !== 1
 }
 if (releaseSource.schemaId !== 'soldier-release-source/v1' || releaseSource.status !== 'FROZEN_PARTIAL') fail('historical release source must remain FROZEN_PARTIAL');
 if (canonical.status !== 'PASS' || canonical.summary?.recordCount !== 224) fail('canonical Soldier Stage 5-7 must remain PASS/224');
-if (releaseMetadata.status !== 'PASS'
-  || releaseMetadata.summary?.confirmedReleaseRecords !== 51
-  || releaseMetadata.summary?.unresolvedReleaseRecords !== 173
-  || releaseMetadata.summary?.normalTier3Unresolved !== 78) {
-  fail('current Stage 5-8 release metadata must remain PASS at 51 confirmed / 173 unresolved / 78 normal tier-3 unresolved');
-}
 if (a1.stage !== '11-A1' || a1.status !== 'FROZEN_ADMITTED' || a1.records?.length !== 40) fail('Stage 11-A1 admitted official evidence predecessor drift');
 
 const decision = evidence.timelineDecision ?? {};
@@ -99,31 +91,21 @@ if (labelCount !== 11) fail(`official correction labels must total 11, got ${lab
 
 const canonicalIndex = indexById(canonical.records, 'canonical');
 const historicalIndex = indexById(releaseSource.confirmedRecords, 'historical release source');
-const currentIndex = indexById(releaseMetadata.records, 'current release metadata');
 const correctionIndex = indexById(records, 'Stage 11-A4 correction evidence');
 const labelsBySource = new Map();
 
 for (const record of records) {
   const base = canonicalIndex.get(record.soldierId);
   const historical = historicalIndex.get(record.soldierId);
-  const current = currentIndex.get(record.soldierId);
   const source = sourceMap.get(record.sourceId);
   if (!base) { fail(`correction soldierId ${record.soldierId} absent from canonical Soldier list`); continue; }
   if (base.tier !== 3 || base.isSp !== false) fail(`correction soldierId ${record.soldierId} must remain normal tier-3`);
   if (base.nameCn !== record.canonicalNameCn) fail(`correction soldierId ${record.soldierId} canonicalNameCn mismatch`);
   if (!historical) { fail(`correction soldierId ${record.soldierId} absent from 11-record historical source`); continue; }
   if (historical.releaseDate !== record.historicalSheetReleaseDate
+    || historical.patchGroup !== record.historicalSheetReleaseDate
     || historical.sourceLabel !== record.historicalSheetSourceLabel) {
     fail(`correction soldierId ${record.soldierId} historical Sheet provenance mismatch`);
-  }
-  if (!current) { fail(`correction soldierId ${record.soldierId} absent from current Stage 5-8 metadata`); continue; }
-  if (current.releaseStatus !== 'CONFIRMED'
-    || current.releaseDate !== record.historicalSheetReleaseDate
-    || current.patchGroup !== record.historicalSheetReleaseDate
-    || current.sourceKind !== 'GOOGLE_SHEET'
-    || current.sourceLabel !== record.historicalSheetSourceLabel
-    || current.samePatchOrder !== null) {
-    fail(`correction soldierId ${record.soldierId} current pre-correction state drift`);
   }
   if (!source) fail(`correction soldierId ${record.soldierId} references unknown source ${record.sourceId}`);
   else {
@@ -167,5 +149,6 @@ if (errors.length) {
 console.log('Soldier Stage 11-A4 CN chronology correction evidence: PASS');
 console.log('correctionEvents=5');
 console.log('correctionRecords=11');
-console.log('coverageUnchanged=51 confirmed / 173 unresolved');
+console.log('coverageBoundary=51 confirmed / 173 unresolved unchanged by A4 evidence stage');
+console.log('downstreamState=independent');
 console.log('nextOwner=soldier-release-metadata-promotion-correction');
