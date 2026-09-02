@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   BriefcaseBusiness,
@@ -17,7 +17,9 @@ import {
 
 import { HeroCentralDisciplineSection } from "@/components/hero-central-discipline-section";
 import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";
+import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
+import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
@@ -89,6 +91,29 @@ function stripConfigMarkup(value: string | null) {
 function HeroDetailPage() {
   const { hero, stage6, detail, exclusiveEquipment, soldierCards } = Route.useLoaderData();
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
+  const soldierDetailById = useMemo(
+    () => new Map(getSoldierPrototypePageData().records.map((record) => [record.soldierId, record])),
+    [],
+  );
+  const heroCardIconIndex = useMemo(() => getStaticHeroCardIconIndex(), []);
+  if (
+    heroCardIconIndex.summary.total !== 267 ||
+    heroCardIconIndex.summary.resolved !== 267 ||
+    heroCardIconIndex.summary.pending !== 0 ||
+    heroCardIconIndex.summary.hardErrors !== 0 ||
+    heroCardIconIndex.records.length !== 267
+  ) {
+    throw new Error("Hero card icon frozen index is not production-ready.");
+  }
+  const [selectedSoldierId, setSelectedSoldierId] = useState<number | null>(null);
+  useEffect(() => setSelectedSoldierId(null), [hero.heroId]);
+  const selectedSoldierRecord = selectedSoldierId == null
+    ? null
+    : (soldierDetailById.get(selectedSoldierId) ?? null);
+  if (selectedSoldierId != null && !selectedSoldierRecord) {
+    throw new Error(`Hero ${hero.heroId} requested Soldier ${selectedSoldierId}, but the frozen Soldier frontend consumer does not contain it.`);
+  }
+  const closeSoldierDetail = useCallback(() => setSelectedSoldierId(null), []);
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
   const visuals: HeroVisual[] = [];
   if (imageUrl) {
@@ -124,6 +149,7 @@ function HeroDetailPage() {
     if (visibleTalentProgression.length <= 1) return;
     setTalentIndex((current) => Math.min(Math.max(current + delta, 0), visibleTalentProgression.length - 1));
   };
+  const finalJobBranches = detail.jobs.branches.filter((branch) => branch.capstone?.rank === 4);
 
   return (
     <main
@@ -189,7 +215,7 @@ function HeroDetailPage() {
               </div>
 
               <div className="mt-5 flex flex-wrap gap-2 text-xs">
-                <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">직업 분기 {detail.jobs.branchCount}</span>
+                <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">최종 직업 {finalJobBranches.length}</span>
                 <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">용병 {detail.soldiers.count}</span>
                 <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">스킨 {detail.presentation.skinCount}</span>
               </div>
@@ -304,51 +330,54 @@ function HeroDetailPage() {
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <SectionTitle icon={<BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />} title="직업 트리 · 최종 스탯" />
-              <p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 분기 구조를 순서 그대로 시각화해. 관계를 다시 계산하지 않아.</p>
+              <SectionTitle icon={<BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />} title="최종 직업 스탯" />
+              <p className="mt-2 text-sm text-muted-foreground">3단계까지 완성되는 최종 직업만 표시해. 2단계에서 끝나는 가지는 제외해.</p>
             </div>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">분기 {detail.jobs.branchCount}</span>
-              <span className="rounded-full bg-muted px-3 py-1.5 font-semibold text-foreground">연결 {detail.jobs.connectionCount}</span>
+            <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">최종 직업 {finalJobBranches.length}</span>
+          </div>
+          {finalJobBranches.length > 0 ? (
+            <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true">
+              <table className="w-full min-w-[680px] border-collapse text-sm">
+                <thead className="bg-muted/50">
+                  <tr className="border-b border-border">
+                    <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-muted-foreground">직업</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">생명</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">공격</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">지력</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">방어</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">마방</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">기술</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {finalJobBranches.map((branch) => {
+                    const capstone = branch.capstone;
+                    if (!capstone) return null;
+                    return (
+                      <tr key={branch.branchIndex} className="border-b border-border last:border-b-0">
+                        <th scope="row" className="px-4 py-3 text-left">
+                          <div className="font-bold text-foreground">{capstone.nameCn ?? `Job ${capstone.jobId ?? "?"}`}</div>
+                          <div className="mt-1 text-[11px] font-semibold text-muted-foreground">
+                            Job #{capstone.jobId ?? "-"}
+                            {capstone.heroLevel != null ? ` · Lv.${capstone.heroLevel}` : ""}
+                            {capstone.star != null ? ` · ${capstone.star}성` : ""}
+                          </div>
+                        </th>
+                        <JobStatCell value={capstone.finalStats.HP} />
+                        <JobStatCell value={capstone.finalStats.ATK} />
+                        <JobStatCell value={capstone.finalStats.INT} />
+                        <JobStatCell value={capstone.finalStats.DEF} />
+                        <JobStatCell value={capstone.finalStats.MDEF} />
+                        <JobStatCell value={capstone.finalStats.DEX} />
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-          </div>
-          <div className="mt-5 space-y-4">
-            {detail.jobs.branches.map((branch) => (
-              <article key={branch.branchIndex} className="overflow-hidden rounded-2xl border border-border bg-muted/20">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/70 px-4 py-3 sm:px-5">
-                  <h3 className="text-sm font-bold text-foreground">전직 분기 {branch.branchIndex}</h3>
-                  <span className="text-xs font-semibold text-muted-foreground">직업 {branch.jobs.length}개</span>
-                </div>
-                <div className="overflow-x-auto px-4 py-5 sm:px-5">
-                  <div className="flex min-w-max items-stretch">
-                    {branch.jobs.map((job, jobIndex) => (
-                      <div key={`${branch.branchIndex}-${job.jobId ?? jobIndex}`} className="flex items-center">
-                        {jobIndex > 0 ? <div className="mx-2 flex w-8 items-center sm:mx-3 sm:w-12" aria-hidden="true"><div className="h-px flex-1 bg-border" /><span className="ml-1 text-sm font-bold text-muted-foreground">→</span></div> : null}
-                        <div className="flex min-h-24 w-36 flex-col justify-between rounded-xl border border-border bg-background p-3 shadow-sm sm:w-40">
-                          <div><p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">단계 {jobIndex + 1}</p><p className="mt-2 text-sm font-bold text-foreground">{job.nameCn ?? `Job ${job.jobId ?? "?"}`}</p></div>
-                          <p className="mt-3 text-[11px] font-semibold text-muted-foreground">Job #{job.jobId ?? "-"}</p>
-                        </div>
-                      </div>
-                    ))}
-                    {branch.jobs.length === 0 ? <p className="text-sm text-muted-foreground">직업 정보 없음</p> : null}
-                  </div>
-                </div>
-                {branch.capstone ? (
-                  <div className="border-t border-border px-4 py-4 sm:px-5">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div><p className="text-[11px] font-bold text-muted-foreground">최종 직업 검증 스탯</p><p className="mt-1 text-sm font-bold text-foreground">{branch.capstone.nameCn ?? `Job ${branch.capstone.jobId ?? "?"}`}</p></div>
-                      <div className="flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
-                        {branch.capstone.heroLevel != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">Lv.{branch.capstone.heroLevel}</span> : null}
-                        {branch.capstone.star != null ? <span className="rounded-md bg-background px-2 py-1 font-semibold">{branch.capstone.star}성</span> : null}
-                        {branch.capstone.statStatus ? <span className="rounded-md bg-background px-2 py-1 font-semibold">{branch.capstone.statStatus}</span> : null}
-                      </div>
-                    </div>
-                    <StatGrid stats={branch.capstone.finalStats} />
-                  </div>
-                ) : null}
-              </article>
-            ))}
-          </div>
+          ) : (
+            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 3단계 최종 직업 스탯이 없어.</p>
+          )}
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
@@ -397,7 +426,13 @@ function HeroDetailPage() {
               <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">{soldierCards.length}종</span>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
-              {soldierCards.map((record) => <HeroSoldierCard key={record.soldierId} record={record} />)}
+              {soldierCards.map((record) => (
+                <HeroSoldierCard
+                  key={record.soldierId}
+                  record={record}
+                  onOpen={setSelectedSoldierId}
+                />
+              ))}
             </div>
           </div>
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
@@ -420,6 +455,14 @@ function HeroDetailPage() {
           </div>
         </section>
       </div>
+
+      {selectedSoldierRecord ? (
+        <SoldierDetailDialog
+          record={selectedSoldierRecord}
+          heroCardIcons={heroCardIconIndex.records}
+          onClose={closeSoldierDetail}
+        />
+      ) : null}
     </main>
   );
 }
@@ -440,7 +483,13 @@ const SOLDIER_ARMY_LABELS: Record<string, string> = {
   DEMON: "마족",
 };
 
-function HeroSoldierCard({ record }: { record: HeroSoldierCardView }) {
+function HeroSoldierCard({
+  record,
+  onOpen,
+}: {
+  record: HeroSoldierCardView;
+  onOpen: (soldierId: number) => void;
+}) {
   const displayName = record.nameKr ?? record.nameCn;
   const portraitUrl = getOfficialSoldierPortraitUrl(record.soldierId);
   const armyIconUrl = getOfficialArmyIconUrl(record.armyType);
@@ -454,6 +503,21 @@ function HeroSoldierCard({ record }: { record: HeroSoldierCardView }) {
       params={{ soldierId: String(record.soldierId) }}
       aria-label={`${displayName} 용병 상세 보기`}
       title={`${displayName} · Soldier ${record.soldierId}`}
+      data-hero-soldier-card="true"
+      data-soldier-id={record.soldierId}
+      onClick={(event) => {
+        if (
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        ) {
+          return;
+        }
+        event.preventDefault();
+        onOpen(record.soldierId);
+      }}
       className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-8 text-muted-foreground transition group-hover:text-foreground">
@@ -519,6 +583,6 @@ function formatBondCondition(condition: { requiredHero: { heroId: number | null;
 
 function SectionTitle({ icon, title }: { icon: ReactNode; title: string }) { return <div className="flex items-center gap-2">{icon}<h2 className="font-bold text-foreground">{title}</h2></div>; }
 function InfoBlock({ title, children }: { title: string; children: ReactNode }) { return <div className="rounded-xl border border-border bg-muted/30 p-4"><p className="mb-2 text-xs font-bold text-muted-foreground">{title}</p>{children}</div>; }
-function StatGrid({ stats }: { stats: { HP: number | null; ATK: number | null; INT: number | null; DEF: number | null; MDEF: number | null; DEX: number | null } }) { const entries = [["HP", stats.HP], ["ATK", stats.ATK], ["INT", stats.INT], ["DEF", stats.DEF], ["MDEF", stats.MDEF], ["DEX", stats.DEX]] as const; return <div className="mt-3 grid grid-cols-3 gap-1.5 sm:grid-cols-6">{entries.map(([label, value]) => <div key={label} className="rounded-lg bg-background px-2 py-2 text-center"><div className="text-[10px] font-bold text-muted-foreground">{label}</div><div className="mt-0.5 text-sm font-bold text-foreground">{value ?? "-"}</div></div>)}</div>; }
+function JobStatCell({ value }: { value: number | null }) { return <td className="px-4 py-3 text-right font-bold tabular-nums text-foreground">{value ?? "-"}</td>; }
 function StatusChip({ label, value, active }: { label: string; value: string; active: boolean }) { return <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2"><span className="font-semibold text-foreground">{label}</span><span className="text-muted-foreground">{active ? value : value}</span></div>; }
 function HeroNotFound() { return <main className="min-h-screen bg-background"><div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-4 text-center"><Swords className="mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="text-2xl font-bold text-foreground">영웅을 찾을 수 없어.</h1><p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 Hero 목록에 존재하지 않는 주소야.</p><Link reloadDocument to="/heroes" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground underline underline-offset-4"><ArrowLeft className="h-4 w-4" aria-hidden="true" />영웅 목록으로</Link></div></main>; }

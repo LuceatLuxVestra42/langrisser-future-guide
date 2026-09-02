@@ -1,0 +1,229 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-tech-classification-stage4-contract/v1",
+  "stage": "TrainingTech Classification Stage 4 - Classification Contract",
+  "status": "DESIGN_FROZEN",
+  "completion": "COMPLETE",
+  "freezeState": "TRAINING_TECH_CLASSIFICATION_STAGE4_CONTRACT_FROZEN",
+  "purpose": "Freeze automatic whole-Tech classification rules, precedence, fallback, and orthogonal prerequisite/unlock facets from Stage 3 representative evidence without emitting the full 287-record classification artifact yet.",
+  "predecessors": {
+    "stage1Census": {
+      "path": "data/generated/soldier-training-tech-classification-stage1-census.v1.json",
+      "gitBlobSha": "182e87f68af45a755b48a8d36a0415088ded9f3d",
+      "requiredTrainingTech": 287
+    },
+    "stage2Validation": {
+      "path": "data/validation/soldier-training-tech-classification-stage2.v1.json",
+      "gitBlobSha": "00da7db05cc5343f48a400961d5f42a7f840d763",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "COMPLETE",
+      "requiredFreezeState": "TRAINING_TECH_CLASSIFICATION_STAGE2_EVIDENCE_FROZEN"
+    },
+    "stage3CandidateEvidence": {
+      "path": "data/evidence/soldier-training-tech-classification-stage3-candidates.v1.json",
+      "gitBlobSha": "30d24bd673044b58f8f0711bb4e121078618d5c2",
+      "requiredStatus": "INVESTIGATION_ONLY",
+      "requiredStructuralGroups": 15,
+      "requiredNonProtectedTech": 158
+    },
+    "stage3SemanticEvidence": {
+      "path": "data/evidence/soldier-training-tech-classification-stage3-semantic.v1.json",
+      "gitBlobSha": "a4934788df2a807c9336f27401f004439fa8ae58",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "COMPLETE",
+      "requiredFreezeState": "TRAINING_TECH_CLASSIFICATION_STAGE3_REPRESENTATIVE_EVIDENCE_FROZEN"
+    },
+    "stage3Validation": {
+      "path": "data/validation/soldier-training-tech-classification-stage3.v1.json",
+      "gitBlobSha": "61726f1110894b110f8db3ec71972ca1fa814bbd",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "COMPLETE"
+    },
+    "frozenTrainingConsumer": {
+      "path": "data/generated/soldier-detail-stage5-4.v1.json",
+      "gitBlobSha": "b4ab27f673318f9d44642d3fc674ccfa682937f6",
+      "requiredProtectedNormalTier3GrowthTech": 129
+    }
+  },
+  "sourceSnapshots": {
+    "trainingTech": {
+      "logicalPath": "data/configdata/ConfigDataTrainingTechInfo.json",
+      "gitBlobSha": "ad8b290f0e34de24b6eab9538894068a06e086d4",
+      "recordCount": 287,
+      "trackedRepositoryCopyRequired": false
+    },
+    "trainingTechLevel": {
+      "logicalPath": "data/configdata/ConfigDataTrainingTechLevelInfo.json",
+      "gitBlobSha": "30789c3e4fb0d79b56514e720bb71a053df78c72",
+      "recordCount": 2945,
+      "trackedRepositoryCopyRequired": false
+    }
+  },
+  "scope": {
+    "owns": [
+      "automatic whole-Tech classification rule admission",
+      "whole-Tech classification precedence",
+      "REVIEW_UNCLASSIFIED fallback",
+      "protected 129 NORMAL Tier 3 SOLDIER_GROWTH preservation",
+      "final semantic label for the remaining 28 Soldier-specific progression Techs",
+      "prerequisite and Soldier unlock orthogonal facet boundary"
+    ],
+    "doesNotOwn": [
+      "full 287-record classification artifact emission",
+      "common-stat numeric effect extraction",
+      "common-passive numeric/effect extraction",
+      "Korean localization",
+      "UI grouping/order",
+      "frontend consumption",
+      "Soldier canonical population or identity",
+      "Hero-Soldier relation",
+      "SP-NORMAL relation",
+      "training material calculations"
+    ],
+    "fullClassificationArtifactEmitted": false
+  },
+  "wholeTechClassification": {
+    "admittedLabels": [
+      "SOLDIER_GROWTH",
+      "COMMON_STAT",
+      "COMMON_PASSIVE",
+      "SOLDIER_SPECIFIC_PROGRESSION"
+    ],
+    "priority": [
+      "SOLDIER_GROWTH",
+      "COMMON_STAT",
+      "COMMON_PASSIVE",
+      "SOLDIER_SPECIFIC_PROGRESSION",
+      "REVIEW_UNCLASSIFIED"
+    ],
+    "rules": [
+      {
+        "id": "protected-normal-tier3-soldier-growth-v1",
+        "label": "SOLDIER_GROWTH",
+        "status": "PRESERVED_FROM_STAGE2",
+        "target": "The 129 frozen NORMAL Tier 3 Soldier training Tech IDs from the Stage 5-4 consumer.",
+        "requiredEvidence": [
+          "TrainingTechInfo.SoldierIDRelated explicitly contains the frozen Soldier ID",
+          "TrainingTechInfo.TechLevelupInfoList resolves TrainingTechLevelInfo.SoldierSkillLevelup exactly 1 through 10 in list order",
+          "exactly one candidate per protected Soldier",
+          "candidate Tech ID equals frozen training.techId and ability.techId"
+        ],
+        "expectedCurrentPopulation": 129,
+        "failurePolicy": "BLOCKER"
+      },
+      {
+        "id": "common-stat-techtype-v1",
+        "label": "COMMON_STAT",
+        "status": "NEWLY_ADMITTED_BY_STAGE4",
+        "automaticCondition": "TrainingTechInfo.TechType == 1",
+        "admissionEvidence": "Stage 3 manually reviewed all 8 structural signatures observed for raw TechType 1 and confirmed each as COMMON_STAT.",
+        "expectedCurrentPopulation": 84,
+        "textClassifierRequired": false
+      },
+      {
+        "id": "common-passive-techtype-v1",
+        "label": "COMMON_PASSIVE",
+        "status": "NEWLY_ADMITTED_BY_STAGE4",
+        "automaticCondition": "TrainingTechInfo.TechType == 3",
+        "admissionEvidence": "Stage 3 manually reviewed all 5 structural signatures observed for raw TechType 3 and confirmed each as COMMON_PASSIVE.",
+        "expectedCurrentPopulation": 46,
+        "textClassifierRequired": false
+      },
+      {
+        "id": "nonprotected-soldier-specific-progression-v1",
+        "label": "SOLDIER_SPECIFIC_PROGRESSION",
+        "status": "NEWLY_ADMITTED_BY_STAGE4",
+        "exclusion": "Tech ID is not in the protected 129 SOLDIER_GROWTH set.",
+        "automaticConditions": [
+          "TrainingTechInfo.TechType == 2",
+          "TrainingTechInfo.SoldierIDRelated is explicitly present and non-empty",
+          "resolved TrainingTechLevelInfo.SoldierSkillLevelup values form an exact 1..N sequence in TechLevelupInfoList order",
+          "N is 5 or 10 under the frozen current snapshot"
+        ],
+        "admissionEvidence": "Stage 3 reviewed both non-protected TechType 2 structural signatures: 27 exact 1-to-5 Techs and 1 exact 1-to-10 Tech with a Soldier unlock facet.",
+        "expectedCurrentPopulation": 28,
+        "textClassifierRequired": false,
+        "notEquivalentTo": "SOLDIER_GROWTH"
+      }
+    ],
+    "currentSnapshotExpectedCoverage": {
+      "SOLDIER_GROWTH": 129,
+      "COMMON_STAT": 84,
+      "COMMON_PASSIVE": 46,
+      "SOLDIER_SPECIFIC_PROGRESSION": 28,
+      "REVIEW_UNCLASSIFIED": 0,
+      "total": 287
+    },
+    "fallback": {
+      "label": "REVIEW_UNCLASSIFIED",
+      "requiredWhen": [
+        "no admitted rule matches",
+        "more than one non-preservation rule matches",
+        "a future TechType or structural signature is not covered by the frozen contract",
+        "a non-protected TechType 2 record lacks the explicit Soldier progression signature"
+      ],
+      "silentGuessAllowed": false
+    }
+  },
+  "relationFacets": {
+    "wholeTechLabel": "NONE",
+    "prerequisite": {
+      "model": "ORTHOGONAL_RELATION_FACET",
+      "evidence": [
+        "TrainingTechInfo.PreTechIDs",
+        "TrainingTechInfo.PreTechLevel"
+      ],
+      "cardinalityMustAlign": true,
+      "categoryInferenceAllowed": false
+    },
+    "soldierUnlock": {
+      "model": "ORTHOGONAL_RELATION_FACET",
+      "evidence": [
+        "TrainingTechLevelInfo.SoldierIDUnlocked"
+      ],
+      "categoryInferenceAllowed": false,
+      "coexistenceProof": "Tech 632 is Soldier-specific progression and also carries SoldierIDUnlocked=804."
+    },
+    "rejectedExclusiveLabel": "PREREQUISITE_OR_UNLOCK"
+  },
+  "forbiddenAutomaticInference": {
+    "nameJoin": true,
+    "nameKeywordClassification": true,
+    "descriptionKeywordClassification": true,
+    "idArithmetic": true,
+    "idRangeClassification": true,
+    "filenameSimilarity": true,
+    "resourcePathKeywordClassification": true,
+    "globalSourceOrder": true,
+    "screenOrder": true,
+    "listLengthAsCategory": true,
+    "SoldierIDRelatedAsGrowthByItself": true,
+    "GetSoldierTechIdAsAbsoluteJoin": true,
+    "missingValueImputation": true,
+    "historicalOutputSilentFallback": true,
+    "prerequisitePresenceAsWholeTechCategory": true,
+    "unlockPresenceAsWholeTechCategory": true
+  },
+  "validationGates": {
+    "currentTrainingTechPopulation": 287,
+    "protectedGrowthPopulation": 129,
+    "allStage1IdsCoveredExactlyOnceInDryRun": true,
+    "ruleOverlapCount": 0,
+    "currentFallbackCount": 0,
+    "protectedGrowthRelabelAllowed": false,
+    "soldierCanonicalMutationAllowed": false,
+    "heroSoldierRelationMutationAllowed": false,
+    "spRelationMutationAllowed": false,
+    "trackedMutationAfterValidationAllowed": false
+  },
+  "nextOwner": "TrainingTech Stage 5 Full Classification",
+  "nextStartPoint": "Apply only this frozen contract to emit the record-by-record 287-Tech classification artifact with explicit rule/evidence provenance. Do not re-read descriptions to classify records, and keep prerequisite/unlock as separate facets.",
+  "reopenConditions": [
+    "Stage 1 census, Stage 2 evidence contract, Stage 3 evidence, or their frozen blob identities change.",
+    "TrainingTech or TrainingTechLevel source snapshot changes.",
+    "The protected 129 Soldier growth set or Stage 5-4 frozen training consumer changes.",
+    "A new authoritative contradiction invalidates the admitted TechType 1/3 family mappings or the 28 Soldier-specific progression treatment.",
+    "Project Check ownership/orchestration contract changes for these paths.",
+    "Hard owning-validator failure."
+  ]
+}
