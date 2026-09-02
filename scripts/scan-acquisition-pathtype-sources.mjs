@@ -1,18 +1,19 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveConfigDataDir } from './configdata-source-pack-maintenance-root.mjs';
 
-const roots=['data/configdata'];
+const physicalRoot=resolveConfigDataDir();
+const logicalRoot='data/configdata';
 const needles=['"PathType"','PathType'];
 const matches=[];
-for(const root of roots){
-  for(const name of fs.readdirSync(root)){
-    if(!name.endsWith('.json')) continue;
-    const p=path.join(root,name);
-    const txt=fs.readFileSync(p,'utf8');
-    if(!needles.some(n=>txt.includes(n))) continue;
-    const idx=txt.indexOf('PathType');
-    matches.push({file:p,size:Buffer.byteLength(txt),firstSnippet:txt.slice(Math.max(0,idx-180),Math.min(txt.length,idx+320)).replace(/\s+/g,' ')});
-  }
+for(const name of fs.readdirSync(physicalRoot)){
+  if(!name.endsWith('.json')) continue;
+  const physicalPath=path.join(physicalRoot,name);
+  const logicalPath=path.posix.join(logicalRoot,name);
+  const txt=fs.readFileSync(physicalPath,'utf8');
+  if(!needles.some(n=>txt.includes(n))) continue;
+  const idx=txt.indexOf('PathType');
+  matches.push({file:logicalPath,size:Buffer.byteLength(txt),firstSnippet:txt.slice(Math.max(0,idx-180),Math.min(txt.length,idx+320)).replace(/\s+/g,' ')});
 }
 const sourceRoots=['scripts','src','data'];
 const codeMatches=[];
