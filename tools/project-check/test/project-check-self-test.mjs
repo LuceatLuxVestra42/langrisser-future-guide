@@ -258,7 +258,7 @@ assert.deepEqual(validatorIds(skinAsset), ['skin-static-assets-readonly']);
 
 const unknownConfig = routeProjectCheckPaths(['data/configdata/ConfigDataUnknownFutureTable.json'], contracts);
 assert.equal(unknownConfig.status, 'PLAN_READY');
-assert.equal(unknownConfig.files[0].status, 'OWNED');
+assert.equal(unknownConfig.files[0].status, 'MAPPED');
 assert.deepEqual(unknownConfig.files[0].owners, ['configdata', 'configdata-source-pack']);
 assert.deepEqual(validatorIds(unknownConfig), ['configdata-source-pack-boundary', 'configdata-integrity']);
 assert.equal(unknownConfig.manualReviews.length, 0);
