@@ -1,0 +1,123 @@
+name: Equipment SSR Frame Provenance V2
+
+on:
+  push:
+    branches:
+      - research/equipment-ssr-frame-provenance-v2
+    paths:
+      - scripts/equipment-image-ssr-frame-provenance-v2.py
+      - .github/workflows/equipment-image-ssr-frame-provenance-v2.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout current research branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup .NET 6 for Il2CppDumper
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Install LLVM tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq llvm
+          command -v llvm-readelf
+          command -v llvm-objdump
+
+      - name: Compile focused tracer
+        run: python -m py_compile scripts/equipment-image-ssr-frame-provenance-v2.py
+
+      - name: Extract exact official APK IL2CPP pair
+        run: python scripts/equipment-image-ssr-frame-provenance-v2.py extract
+
+      - name: Download Il2CppDumper v6.7.46
+        run: |
+          mkdir -p /tmp/il2cppdumper
+          curl --fail --location --retry 3 \
+            https://github.com/Perfare/Il2CppDumper/releases/download/v6.7.46/Il2CppDumper-net6-v6.7.46.zip \
+            -o /tmp/Il2CppDumper.zip
+          unzip -q /tmp/Il2CppDumper.zip -d /tmp/il2cppdumper
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          configs = list(Path('/tmp/il2cppdumper').rglob('config.json'))
+          if len(configs) != 1:
+              raise SystemExit(f'expected one config.json, got {configs}')
+          path = configs[0]
+          config = json.loads(path.read_text())
+          config['RequireAnyKey'] = False
+          config['GenerateScript'] = True
+          config['GenerateDummyDll'] = False
+          path.write_text(json.dumps(config, indent=2) + '\n')
+          print(path)
+          PY
+
+      - name: Dump exact official metadata and native pair
+        run: |
+          mkdir -p artifacts/il2cpp-dump
+          DUMPER_DLL="$(find /tmp/il2cppdumper -name 'Il2CppDumper.dll' -print -quit)"
+          test -n "$DUMPER_DLL"
+          dotnet "$DUMPER_DLL" \
+            artifacts/il2cpp-inputs/libil2cpp.so \
+            artifacts/il2cpp-inputs/global-metadata.dat \
+            artifacts/il2cpp-dump
+          test -s artifacts/il2cpp-dump/dump.cs
+          test -s artifacts/il2cpp-dump/script.json
+          test -s artifacts/il2cpp-dump/stringliteral.json
+
+      - name: Resolve fallback rank table, SSR enums and callers
+        run: |
+          python scripts/equipment-image-ssr-frame-provenance-v2.py analyze
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('artifacts/equipment-ssr-frame-provenance-v2.json')
+          d = json.loads(p.read_text())
+          assert d['status'] == 'TRACE_COMPLETE', d
+          assert d['targetMethod']['Name'].endswith('GetGoodsFrameNameByRank'), d
+          assert len(d['fallbackRankTable']) == 4, d
+          print(json.dumps({
+              'targetMethod': d['targetMethod'],
+              'fallbackRankTable': d['fallbackRankTable'],
+              'defaultSlot': d['defaultSlot'],
+              'callerCount': d['callerCount'],
+              'ssrEnumBlocks': d['ssrEnumBlocks'],
+              'rankFrameContexts': d['rankFrameContexts'],
+          }, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Setup Bun for changed-path Project Check
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install repository dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run current changed-path Project Check
+        run: node tools/project-check/cli/check.mjs --base origin/main --head HEAD
+
+      - name: Upload focused provenance report
+        uses: actions/upload-artifact@v4
+        with:
+          name: equipment-ssr-frame-provenance-v2
+          path: |
+            artifacts/equipment-ssr-frame-apk-inputs.v2.json
+            artifacts/equipment-ssr-frame-provenance-v2.json
+          if-no-files-found: error
+          retention-days: 7
