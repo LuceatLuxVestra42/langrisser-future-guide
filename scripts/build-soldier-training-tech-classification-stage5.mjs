@@ -64,11 +64,15 @@ const protectedGrowthTechIds = new Set(
 );
 assert(protectedGrowthTechIds.size === 129, `Expected 129 protected growth Tech IDs, got ${protectedGrowthTechIds.size}.`);
 
+const structuralGroups = candidates.structuralGroups ?? [];
 const groupByTechId = new Map();
-for (const group of candidates.structuralGroups ?? []) {
+const groupRefByTechId = new Map();
+for (const [index, group] of structuralGroups.entries()) {
+  const ref = `STAGE3_GROUP_${index + 1}`;
   for (const techId of group.techIds ?? []) {
     assert(!groupByTechId.has(techId), `Stage 3 candidate Tech ${techId} belongs to more than one structural group.`);
     groupByTechId.set(techId, group);
+    groupRefByTechId.set(techId, ref);
   }
 }
 assert(groupByTechId.size === 158, `Expected 158 non-protected candidate Tech IDs, got ${groupByTechId.size}.`);
@@ -84,84 +88,66 @@ const ruleIdByLabel = {
   SOLDIER_SPECIFIC_PROGRESSION: "nonprotected-soldier-specific-progression-v1",
   REVIEW_UNCLASSIFIED: null,
 };
-
+const labelForGroup = (group) => {
+  if (group?.signature?.techTypeRaw === 1) return "COMMON_STAT";
+  if (group?.signature?.techTypeRaw === 3) return "COMMON_PASSIVE";
+  if (group?.signature?.techTypeRaw === 2 && group?.signature?.relationShape === "SOLDIER_ONLY" && ["EXACT_1_TO_5", "EXACT_1_TO_10"].includes(group?.signature?.skillLevelupShape)) return "SOLDIER_SPECIFIC_PROGRESSION";
+  return "REVIEW_UNCLASSIFIED";
+};
 const classify = (record) => {
   const id = record.id;
   const type = record.raw?.TechType;
   const group = groupByTechId.get(id) ?? null;
   const matches = [];
   if (protectedGrowthTechIds.has(id)) matches.push("SOLDIER_GROWTH");
-  if (!protectedGrowthTechIds.has(id) && type === 1 && group?.signature?.techTypeRaw === 1) matches.push("COMMON_STAT");
-  if (!protectedGrowthTechIds.has(id) && type === 3 && group?.signature?.techTypeRaw === 3) matches.push("COMMON_PASSIVE");
-  if (
-    !protectedGrowthTechIds.has(id) &&
-    type === 2 &&
-    group?.signature?.techTypeRaw === 2 &&
-    group?.signature?.relationShape === "SOLDIER_ONLY" &&
-    ["EXACT_1_TO_5", "EXACT_1_TO_10"].includes(group?.signature?.skillLevelupShape)
-  ) matches.push("SOLDIER_SPECIFIC_PROGRESSION");
+  if (!protectedGrowthTechIds.has(id) && type === 1 && labelForGroup(group) === "COMMON_STAT") matches.push("COMMON_STAT");
+  if (!protectedGrowthTechIds.has(id) && type === 3 && labelForGroup(group) === "COMMON_PASSIVE") matches.push("COMMON_PASSIVE");
+  if (!protectedGrowthTechIds.has(id) && type === 2 && labelForGroup(group) === "SOLDIER_SPECIFIC_PROGRESSION") matches.push("SOLDIER_SPECIFIC_PROGRESSION");
   return { label: matches.length === 1 ? matches[0] : "REVIEW_UNCLASSIFIED", matchCount: matches.length, group };
 };
 
-const records = stage1Records.map((record) => {
-  const { label, matchCount, group } = classify(record);
-  const ruleId = ruleIdByLabel[label];
-  const preTechIds = Array.isArray(record.raw?.PreTechIDs) ? record.raw.PreTechIDs : [];
-  const preTechLevels = Array.isArray(record.raw?.PreTechLevel) ? record.raw.PreTechLevel : [];
-  assert(preTechIds.length === preTechLevels.length, `Tech ${record.id} prerequisite cardinality mismatch in frozen Stage 1 census.`);
-  const representativeReview = group ? reviewByTechId.get(group.representative?.techId) ?? null : null;
-  const evidence = {
-    stage1Record: {
-      path: paths.stage1Census,
-      techId: record.id,
-      sourceIndex: record.sourceIndex,
-    },
-    stage4Contract: {
-      path: paths.stage4Contract,
-      ruleId,
-    },
-  };
-  if (label === "SOLDIER_GROWTH") {
-    evidence.protectedGrowth = {
-      path: paths.frozenTrainingConsumer,
-      techId: record.id,
-      stage2ValidationPath: paths.stage2Validation,
-    };
-  } else if (group) {
-    evidence.stage3Representative = {
+const evidenceCatalog = [
+  {
+    ref: "PROTECTED_GROWTH",
+    label: "SOLDIER_GROWTH",
+    ruleId: ruleIdByLabel.SOLDIER_GROWTH,
+    sources: [paths.stage1Census, paths.stage2Validation, paths.frozenTrainingConsumer, paths.stage4Contract],
+  },
+  ...structuralGroups.map((group, index) => {
+    const label = labelForGroup(group);
+    const representativeReview = reviewByTechId.get(group.representative?.techId) ?? null;
+    return {
+      ref: `STAGE3_GROUP_${index + 1}`,
+      label,
+      ruleId: ruleIdByLabel[label],
       candidatePath: paths.stage3Candidates,
       signatureKey: group.signatureKey,
       representativeTechId: group.representative?.techId ?? null,
       semanticPath: paths.stage3Semantic,
       semanticFinding: representativeReview?.semanticFinding ?? null,
+      stage4ContractPath: paths.stage4Contract,
     };
-  }
+  }),
+];
+assert(evidenceCatalog.length === 16, `Expected 16 evidence catalog entries, got ${evidenceCatalog.length}.`);
+
+const records = stage1Records.map((record) => {
+  const { label, matchCount, group } = classify(record);
+  const preTechIds = Array.isArray(record.raw?.PreTechIDs) ? record.raw.PreTechIDs : [];
+  const preTechLevels = Array.isArray(record.raw?.PreTechLevel) ? record.raw.PreTechLevel : [];
+  assert(preTechIds.length === preTechLevels.length, `Tech ${record.id} prerequisite cardinality mismatch in frozen Stage 1 census.`);
   return {
     sourceIndex: record.sourceIndex,
     techId: record.id,
     rawTechType: record.raw?.TechType ?? null,
     label,
-    ruleId,
+    ruleId: ruleIdByLabel[label],
     ruleMatchCount: matchCount,
-    evidence,
-    facets: {
-      prerequisite: {
-        model: "ORTHOGONAL_RELATION_FACET",
-        sourceFields: ["TrainingTechInfo.PreTechIDs", "TrainingTechInfo.PreTechLevel"],
-        present: preTechIds.length > 0,
-        preTechIds,
-        preTechLevels,
-        classificationRole: "NONE",
-      },
-      soldierUnlock: {
-        model: "ORTHOGONAL_RELATION_FACET",
-        sourceField: "TrainingTechLevelInfo.SoldierIDUnlocked",
-        levelIds: [...(record.explicitLevelReferences ?? [])],
-        materializedValues: false,
-        stage3CandidateSignatureHasLevelUnlockField: group?.signature?.hasLevelUnlockField ?? null,
-        classificationRole: "NONE",
-      },
-    },
+    evidenceRef: label === "SOLDIER_GROWTH" ? "PROTECTED_GROWTH" : (groupRefByTechId.get(record.id) ?? null),
+    prerequisiteFacetRef: "PREREQUISITE",
+    prerequisitePresent: preTechIds.length > 0,
+    soldierUnlockFacetRef: "SOLDIER_UNLOCK",
+    candidateSignatureHasLevelUnlockField: group?.signature?.hasLevelUnlockField ?? null,
   };
 });
 
@@ -181,6 +167,7 @@ for (const [label, actual] of Object.entries(labelCounts)) {
 assert(records.length === 287, `Expected 287 Stage 5 records, got ${records.length}.`);
 assert(overlapCount === 0, `Stage 5 rule overlap count is ${overlapCount}.`);
 assert(fallbackIds.length === 0, `Stage 5 REVIEW_UNCLASSIFIED IDs: ${fallbackIds.join(",")}`);
+assert(records.every((record) => record.evidenceRef != null), "A Stage 5 record has no evidenceRef.");
 
 const output = {
   version: 1,
@@ -222,12 +209,27 @@ const output = {
     protectedGrowthRelabelCount: records.filter((record) => protectedGrowthTechIds.has(record.techId) && record.label !== "SOLDIER_GROWTH").length,
   },
   ruleCatalog: (contract.wholeTechClassification.rules ?? []).map((rule) => ({ id: rule.id, label: rule.label, status: rule.status })),
-  fallback: contract.wholeTechClassification.fallback,
-  facetBoundary: {
-    prerequisite: contract.relationFacets.prerequisite,
-    soldierUnlock: contract.relationFacets.soldierUnlock,
+  evidenceCatalog,
+  facetCatalog: {
+    PREREQUISITE: {
+      model: "ORTHOGONAL_RELATION_FACET",
+      sourcePath: paths.stage1Census,
+      sourceFields: ["TrainingTechInfo.PreTechIDs", "TrainingTechInfo.PreTechLevel"],
+      recordProjection: "present-only; exact values remain in the frozen Stage 1 record",
+      classificationRole: "NONE",
+    },
+    SOLDIER_UNLOCK: {
+      model: "ORTHOGONAL_RELATION_FACET",
+      levelReferenceSourcePath: paths.stage1Census,
+      levelSourceLogicalPath: contract.sourceSnapshots.trainingTechLevel.logicalPath,
+      sourceField: "TrainingTechLevelInfo.SoldierIDUnlocked",
+      materializedValues: false,
+      candidateSignaturePresenceProjected: true,
+      classificationRole: "NONE",
+    },
     rejectedExclusiveWholeTechLabel: contract.relationFacets.rejectedExclusiveLabel,
   },
+  fallback: contract.wholeTechClassification.fallback,
   records,
   blockers: [],
   reviews: [],
@@ -236,7 +238,7 @@ const output = {
   reopenConditions: contract.reopenConditions,
 };
 
-const serialized = `${JSON.stringify(output, null, 2)}\n`;
+const serialized = `${JSON.stringify(output)}\n`;
 if (writeMode) {
   writeFileSync(resolve(root, paths.output), serialized);
   console.log(`Wrote ${paths.output}`);
