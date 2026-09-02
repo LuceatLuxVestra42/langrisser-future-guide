@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "schemaId": "soldier-portrait-b5-regression/v1",
+  "stage": "B5",
+  "status": "DESIGN_FROZEN",
+  "owner": "soldier-assets",
+  "purpose": "Freeze independent regression cases for the admitted B3 planner, B4 batch processor, pinned source-pack verifier, and current Soldier portrait owning validator without changing production asset state.",
+  "authoritativePredecessors": {
+    "b4Validation": "data/validation/soldier-portrait-b4-fixture-validation.v1.json",
+    "productionBatchPlan": "data/validation/soldier-portrait-batch-plan.v1.json",
+    "currentAssetLocator": "data/contracts/soldier-portrait-assets-current.v1.json",
+    "fixtureBatch": "data/contracts/soldier-portrait-b4-fixture-batch.v1.json",
+    "owningValidator": "scripts/validate-soldier-portrait-v9-final.mjs",
+    "sourcePackVerifier": "scripts/hydrate-soldier-portrait-source-pack-v1.mjs"
+  },
+  "cases": {
+    "zero": {
+      "productionDelta": 0,
+      "expectedProductionPlan": "NO_UPDATE_REQUIRED",
+      "expectedProcessorGate": "batch-not-ready",
+      "assetMutationAllowed": false
+    },
+    "one": {
+      "fixtureOnly": true,
+      "ids": [990001],
+      "expectedStatus": "PASS",
+      "expectedGeneratedWebpCount": 1,
+      "productionAdmissionAllowed": false
+    },
+    "four": {
+      "fixtureOnly": true,
+      "ids": [990001, 990002, 990003, 990004],
+      "expectedStatus": "PASS",
+      "expectedGeneratedWebpCount": 4,
+      "productionAdmissionAllowed": false
+    },
+    "missing": {
+      "basis": "four",
+      "mutation": "remove one expected intake PNG from a temporary intake copy",
+      "expectedGate": "file-set-mismatch"
+    },
+    "extra": {
+      "basis": "four",
+      "mutation": "add one unexpected PNG filename to a temporary intake copy",
+      "expectedGate": "file-set-mismatch"
+    },
+    "sourceDrift": {
+      "mutation": "change only the pinned archive SHA-256 in a temporary source-pack contract copy",
+      "validator": "scripts/hydrate-soldier-portrait-source-pack-v1.mjs",
+      "expectedGate": "pinned archive SHA-256 mismatch"
+    },
+    "webpDrift": {
+      "mutation": "change one byte of one current WebP in a temporary validator sandbox while keeping the admitted manifest unchanged",
+      "validator": "scripts/validate-soldier-portrait-v9-final.mjs",
+      "expectedGate": "webp-sha256-mismatch"
+    }
+  },
+  "executionPolicy": {
+    "useExistingB4ResolverAndProcessor": true,
+    "useExistingSourcePackVerifier": true,
+    "useExistingOwningValidatorForWebpDrift": true,
+    "fixtureBytesCommittedToRepository": false,
+    "temporaryMutationOnly": true,
+    "trackedRepositoryMutationAllowed": false,
+    "productionLocatorMutationAllowed": false,
+    "productionWebCurrentMutationAllowed": false,
+    "releaseAssetOverwriteAllowed": false
+  },
+  "boundaries": {
+    "semanticAuthority": false,
+    "semanticRecomputation": false,
+    "canonicalPopulationChange": false,
+    "heroSoldierRelationChange": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "automaticVersionDiscovery": false,
+    "rawConfigDataRead": false,
+    "b2Reopened": false,
+    "b3Reopened": false,
+    "b4Reopened": false
+  }
+}
