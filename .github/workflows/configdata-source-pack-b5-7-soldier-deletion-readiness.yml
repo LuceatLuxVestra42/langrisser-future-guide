@@ -52,7 +52,6 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           const crypto = require('crypto');
-          const cp = require('child_process');
           const proof = process.env.PROOF;
           const files = [
             'data/generated/soldier-master.v1.json',
@@ -79,13 +78,13 @@ jobs:
             return crypto.createHash('sha256').update(JSON.stringify(stripVolatile(JSON.parse(text)))).digest('hex');
           }
           for (const file of files) {
-            const frozen = cp.execFileSync('git', ['show', `HEAD:${file}`], { encoding: 'utf8' });
+            const frozen = fs.readFileSync(file, 'utf8');
             const regenerated = fs.readFileSync(path.join(proof, file), 'utf8');
             const expected = digestText(frozen);
             const actual = digestText(regenerated);
             if (actual !== expected) throw new Error(`semantic drift after external-root regeneration: ${file}`);
           }
-          const frozenBaseline = cp.execFileSync('git', ['show', 'HEAD:data/validation/soldier-stage4-8-baseline.v1.json']);
+          const frozenBaseline = fs.readFileSync('data/validation/soldier-stage4-8-baseline.v1.json');
           const proofBaseline = fs.readFileSync(path.join(proof, 'data/validation/soldier-stage4-8-baseline.v1.json'));
           if (!frozenBaseline.equals(proofBaseline)) throw new Error('Stage4-8 frozen baseline mutated under external-root revalidation');
           const baseline = JSON.parse(proofBaseline.toString('utf8'));
