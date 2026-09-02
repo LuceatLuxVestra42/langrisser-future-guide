@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "schemaId": "configdata-source-pack-b5-8-soldier-stage3-writeback/v1",
+  "stage": "repository-size-reduction-B5.8",
+  "status": "PASS",
+  "completion": "CONFIGDATA_SOURCE_PACK_B5_8_SOLDIER_STAGE3_WRITEBACK_COMPLETE",
+  "owner": "configdata-source-pack",
+  "supportingOwners": [
+    "soldier-canonical",
+    "project-check"
+  ],
+  "purpose": "Close the Soldier Stage3 operational writeback blocker exposed by the real B6 deletion-only proof after B5.7. Preserve resolver-controlled physical ConfigData reads while keeping serialized provenance in the logical data/configdata namespace, make automatic push/PR validation read-only, and leave explicit workflow_dispatch as the only Stage3 writer. This stage deletes no tracked ConfigData files and changes no Soldier semantics.",
+  "authoritativePredecessors": {
+    "soldierDeletionReadiness": {
+      "path": "data/contracts/configdata-source-pack-b5-7-soldier-deletion-readiness.v1.json",
+      "requiredStage": "repository-size-reduction-B5.7",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "CONFIGDATA_SOURCE_PACK_B5_7_SOLDIER_DELETION_READINESS_COMPLETE",
+      "requiredTrackedRawJsonCount": 753,
+      "requiredTrackedRawDeletionCompleted": false
+    },
+    "sourcePack": {
+      "path": "data/contracts/configdata-source-pack-contract.v1.json",
+      "requiredStage": "repository-size-reduction-B2",
+      "requiredStatus": "PASS",
+      "requiredFileCount": 753,
+      "requiredLogicalRawPathNamespace": "data/configdata"
+    }
+  },
+  "discoveryEvidence": {
+    "supersededRealB6DeletionProofPr": 509,
+    "b6DeletionWasExactBeforeAutomation": true,
+    "intendedDeletionCount": 753,
+    "intendedAdditions": 0,
+    "blockingSignature": "Soldier Stage3 push validation wrote generated and validation files back to the B6 branch and serialized hydrated runner physical paths into sources.* provenance",
+    "blockingClassification": "TRACKED_MUTATION_AFTER_VALIDATION",
+    "supersededB6Merged": false,
+    "resolutionOwner": "soldier-canonical"
+  },
+  "changedMaintenanceScope": [
+    {
+      "path": "scripts/finalize-soldier-stage3.cjs",
+      "role": "separate physical ConfigData read paths from logical serialized provenance paths",
+      "semanticAlgorithmChanged": false
+    },
+    {
+      "path": ".github/workflows/soldier-stage3-final.yml",
+      "role": "push/PR validation runs in a detached proof worktree without branch writeback; explicit workflow_dispatch remains the writer",
+      "semanticAlgorithmChanged": false
+    },
+    {
+      "path": ".github/workflows/configdata-source-pack-b5-8-soldier-stage3-writeback.yml",
+      "role": "external-root clean-room proof with tracked data/configdata absent and primary checkout mutation guard",
+      "semanticAlgorithmChanged": false
+    },
+    {
+      "path": ".github/workflows/soldier-stage4-8-baseline.yml",
+      "role": "route this closeout checkpoint through the Stage4-8 full-regeneration freshness gate",
+      "semanticAlgorithmChanged": false
+    },
+    {
+      "path": "data/validation/soldier-stage4-8-baseline.v1.json",
+      "role": "reviewed frozen baseline refreshed by the official Stage4-8 producer after the Stage3 producer/workflow maintenance change",
+      "semanticAlgorithmChanged": false
+    }
+  ],
+  "semanticBoundary": {
+    "semanticAuthorityChanged": false,
+    "frozenSemanticDomainsReopened": false,
+    "canonicalIdentityChanges": false,
+    "relationChanges": false,
+    "newRelationDiscovery": false,
+    "populationChanges": false,
+    "sourceMeaningReinterpreted": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "filenameSimilarityIntroduced": false,
+    "logicalProvenanceChanged": false
+  },
+  "productionBoundary": {
+    "productionRuntimeChanged": false,
+    "frontendChanged": false,
+    "productionRuntimeReadsRawConfigData": false,
+    "productionRuntimeFetchesSourcePack": false,
+    "rawConfigDataRuntimeFallbackAllowed": false,
+    "normalLookupRefsFindChanged": false,
+    "normalLookupRawFallback": false
+  },
+  "stage3OperationalBoundary": {
+    "physicalReadRootResolverControlled": true,
+    "serializedConfigDataProvenanceNamespace": "data/configdata",
+    "pushValidationWritesBranch": false,
+    "pullRequestValidationWritesBranch": false,
+    "explicitWorkflowDispatchWriterAllowed": true,
+    "trackedMutationAfterAutomaticValidationAllowed": false
+  },
+  "fullRegenerationEvidence": {
+    "producerRunId": 33618584110,
+    "producerArtifactId": 9841959006,
+    "producerArtifactDigest": "sha256:f10a47f34e3f1ea9bd379ba696f132af5439edd78196e130613e4b2ab8fdadf1",
+    "stage4_8BaselineGitBlobSha": "bb492d7df28241c4686d1acdbe5f0afa58316df5",
+    "status": "PASS",
+    "classification": "SOURCE_CHANGE_REVALIDATED",
+    "relationEdgeCount": 5977,
+    "dataChanges": 0,
+    "contractChanges": 0,
+    "pipelineChanges": 2,
+    "artifactSemanticChanges": 0,
+    "validationSemanticChanges": 0,
+    "errors": 0,
+    "reviews": 0
+  },
+  "validationEvidence": {
+    "validatedCandidateHead": "d55479ce4697e463f78abbd9b5cb135d83ff0244",
+    "b5_8ExternalRootRunId": 33619262110,
+    "b5_8ExternalRootConclusion": "success",
+    "projectCheckRunId": 33619261912,
+    "projectCheckConclusion": "success",
+    "soldierStage3RunId": 33619261897,
+    "soldierStage3Conclusion": "success",
+    "soldierStage4_8RunId": 33619261905,
+    "soldierStage4_8Conclusion": "success",
+    "soldierStage4_1RunId": 33619262085,
+    "soldierStage4_1Conclusion": "success",
+    "soldierStage4_3RunId": 33619261945,
+    "soldierStage4_3Conclusion": "success",
+    "soldierStage4_4RunId": 33619262114,
+    "soldierStage4_4Conclusion": "success",
+    "soldierStage4_5RunId": 33619261919,
+    "soldierStage4_5Conclusion": "success",
+    "soldierStage4_7RunId": 33619262032,
+    "soldierStage4_7Conclusion": "success",
+    "localizationAuditRunId": 33619261977,
+    "localizationAuditConclusion": "success",
+    "b5_7ExternalRootRunId": 33619262084,
+    "b5_7ExternalRootConclusion": "success",
+    "branchHeadStableAfterAutomaticValidation": true,
+    "trackedMutationCountAfterAutomaticValidation": 0,
+    "logicalProvenanceChanged": false,
+    "semanticAuthorityChanged": false,
+    "closeoutCheckpointAddedAfterValidatedCandidate": true,
+    "finalHeadProjectCheckRequired": true,
+    "finalHeadB5_8ExternalRootProofRequired": true,
+    "finalHeadStage4_8Required": true
+  },
+  "nonBlockingReviews": [
+    {
+      "code": "SOLDIER_STAGE5_2_EXISTING_FROZEN_PROVENANCE_DRIFT_ON_MAIN",
+      "classification": "EXISTING_DRIFT_REVIEW",
+      "blocking": false,
+      "authoritativePredecessor": "data/contracts/configdata-source-pack-b5-7-soldier-deletion-readiness.v1.json",
+      "candidateRunId": 33619262057,
+      "candidateConclusion": "failure",
+      "reason": "Stage5-2 remains the pre-recorded frozen-provenance drift from B5.7 and is not caused by the B5.8 Stage3 writeback/provenance maintenance changes."
+    }
+  ],
+  "migrationState": {
+    "trackedRepositoryRawSourceStillPresent": true,
+    "trackedRepositoryRawJsonCount": 753,
+    "trackedRawDeletionAdmitted": true,
+    "b5_7SoldierDeletionReadinessCompleted": true,
+    "b5_8SoldierStage3WritebackCompleted": true,
+    "trackedRawDeletionCompleted": false
+  },
+  "blockers": [],
+  "reviews": [
+    "SOLDIER_STAGE5_2_EXISTING_FROZEN_PROVENANCE_DRIFT_ON_MAIN"
+  ],
+  "handoff": {
+    "completion": "B5_8_SOLDIER_STAGE3_WRITEBACK_COMPLETE",
+    "nextOwner": "configdata-source-pack",
+    "nextSupportingOwners": [
+      "configdata",
+      "project-check",
+      "configdata-lookup"
+    ],
+    "nextStage": "B6-delete-tracked-configdata",
+    "nextStart": "After this checkpoint merges, recreate B6 from the latest merged main as a fresh exact deletion-only change removing the admitted 753 direct data/configdata/*.json files with additions=0 and no other paths. Require the real deletion-triggered Project Check and owning validators to pass with tracked mutation after validation equal to zero. Do not reuse superseded B6 PR #509."
+  }
+}
