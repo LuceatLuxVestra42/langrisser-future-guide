@@ -25,6 +25,7 @@
     {"id":"regression-runner","validators":["regression-runner-self-test"]},
     {"id":"route-hosted-qa","validators":["route-hosted-qa-self-test"]},
     {"id":"configdata-lookup","validators":["configdata-lookup-self-test"]},
+    {"id":"configdata-source-pack","validators":["configdata-source-pack-boundary"]},
     {"id":"configdata","validators":["configdata-integrity"]},
     {"id":"hero-canonical","validators":["hero-canonical"]},
     {"id":"soldier-canonical","validators":["soldier-canonical"]},
@@ -105,6 +106,11 @@
       "id":"configdata-lookup-tooling",
       "patterns":["tools/configdata-lookup/**","data/contracts/project-tooling-configdata-lookup-*.json",".github/workflows/project-tooling-configdata-lookup-clr2.yml",".github/workflows/project-tooling-configdata-lookup-writer.yml",".github/workflows/configdata-lookup-stage6.yml",".github/workflows/configdata-lookup-stage7.yml",".github/workflows/configdata-lookup-stage8.yml"],
       "owners":["configdata-lookup"]
+    },
+    {
+      "id":"configdata-source-pack-tooling",
+      "patterns":["data/contracts/configdata-source-pack-*","data/manifests/configdata-source-pack-*","data/generated/configdata-source-pack-*","data/validation/configdata-source-pack-*","docs/checkpoints/configdata-source-pack-*","scripts/*configdata-source-pack*",".github/workflows/configdata-source-pack-*"],
+      "owners":["configdata-source-pack"]
     },
     {
       "id":"old-doctor-retirement-apply",
@@ -292,6 +298,11 @@
       "id":"configdata-integrity-tooling",
       "patterns":["scripts/check-configdata-integrity.mjs"],
       "owners":["configdata"]
+    },
+    {
+      "id":"configdata-source-storage",
+      "patterns":["data/configdata/*.json"],
+      "owners":["configdata","configdata-source-pack"]
     },
     {
       "id":"config-hero-info",
