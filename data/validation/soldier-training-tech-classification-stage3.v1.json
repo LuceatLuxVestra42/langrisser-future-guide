@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-tech-classification-stage3-validation/v1",
+  "stage": "TrainingTech Classification Stage 3 - Representative Semantic Evidence",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "TRAINING_TECH_CLASSIFICATION_STAGE3_REPRESENTATIVE_EVIDENCE_FROZEN",
+  "validationMode": "INDEPENDENT_READ_ONLY_SOURCE_BINDING_AND_BOUNDARY_VALIDATION",
+  "predecessors": {
+    "stage2Validation": "data/validation/soldier-training-tech-classification-stage2.v1.json",
+    "candidateEvidence": "data/evidence/soldier-training-tech-classification-stage3-candidates.v1.json",
+    "semanticEvidence": "data/evidence/soldier-training-tech-classification-stage3-semantic.v1.json"
+  },
+  "blobShas": {
+    "stage2Validation": "00da7db05cc5343f48a400961d5f42a7f840d763",
+    "candidateEvidence": "30d24bd673044b58f8f0711bb4e121078618d5c2",
+    "semanticEvidence": "a4934788df2a807c9336f27401f004439fa8ae58",
+    "trainingTech": "ad8b290f0e34de24b6eab9538894068a06e086d4",
+    "trainingTechLevel": "30789c3e4fb0d79b56514e720bb71a053df78c72"
+  },
+  "checks": {
+    "stage2FrozenPass": true,
+    "stage2BlobMatch": true,
+    "candidateBlobMatch": true,
+    "semanticSchema": true,
+    "semanticFrozenPass": true,
+    "sourceSnapshotsMatch": true,
+    "sourcePopulationMatch": true,
+    "candidateCoverageMatch": true,
+    "candidatePolicyNoSemanticClassification": true,
+    "structuralGroupsPartitionNonGrowth": true,
+    "reviewCountMatchesGroups": true,
+    "everyStructuralGroupReviewedOnce": true,
+    "representativeSourceBinding": true,
+    "reviewFamilyCounts": true,
+    "reviewedRawTechTypeConsistency": true,
+    "structuralFamilyPopulation": true,
+    "prerequisiteCrossCutsFamilies": true,
+    "unlockCoexistsWithProgression": true,
+    "prerequisiteUnlockExclusiveLabelRejected": true,
+    "noNewAutomaticWholeTechRules": true,
+    "stage4CandidateRulesRemainCandidates": true,
+    "protectedGrowthPopulationPreserved": true,
+    "forbiddenInferenceRemainsClosed": true
+  },
+  "coverage": {
+    "trainingTech": 287,
+    "trainingTechLevel": 2945,
+    "protectedCanonicalNormalTier3GrowthTech": 129,
+    "nonProtectedTrainingTech": 158,
+    "structuralGroups": 15,
+    "representativeReviews": 15,
+    "representativeSourceBindingMismatchCount": 0,
+    "commonStatRepresentativeGroups": 8,
+    "commonStatStructurallyCoveredTech": 84,
+    "commonPassiveRepresentativeGroups": 5,
+    "commonPassiveStructurallyCoveredTech": 46,
+    "soldierSpecificProgressionRepresentativeGroups": 2,
+    "soldierSpecificProgressionStructurallyCoveredTech": 28
+  },
+  "semanticClassificationPerformedForAll287": false,
+  "newlyAdmittedAutomaticWholeTechRules": [],
+  "rejectedExclusiveWholeTechLabels": [
+    "PREREQUISITE_OR_UNLOCK"
+  ],
+  "relationFacetsConfirmed": [
+    "PREREQUISITE",
+    "SOLDIER_UNLOCK"
+  ],
+  "reviews": [
+    "The two candidate TechType whole-family rules are not automatic production rules until Stage 4 independently admits them.",
+    "The 28 non-protected TechType 2 Soldier-specific progression records need an explicit Stage 4 final label or review treatment; they must not be folded into PREREQUISITE_OR_UNLOCK."
+  ],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "nextOwner": "TrainingTech Stage 4 Classification Contract",
+  "nextStartPoint": "Use this representative evidence plus the frozen Stage 1 census and Stage 2 evidence boundary to admit only independently validated whole-Tech rules. Model prerequisite/unlock as facets, preserve the protected 129 SOLDIER_GROWTH Techs, and define explicit treatment for the remaining 28 Soldier-specific progression Techs.",
+  "reopenConditions": [
+    "Stage 2 evidence contract or Stage 1 census changes.",
+    "TrainingTech or TrainingTechLevel source snapshot changes.",
+    "Representative evidence source binding mismatch.",
+    "Authoritative contradiction to the common-stat/common-passive representative semantics or prerequisite/unlock facet conclusion.",
+    "Project Check ownership/orchestration contract change affecting these paths.",
+    "Hard owning-validator failure."
+  ]
+}
