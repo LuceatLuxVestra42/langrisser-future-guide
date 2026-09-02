@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   BriefcaseBusiness,
@@ -17,7 +17,9 @@ import {
 
 import { HeroCentralDisciplineSection } from "@/components/hero-central-discipline-section";
 import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";
+import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
+import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
@@ -89,6 +91,29 @@ function stripConfigMarkup(value: string | null) {
 function HeroDetailPage() {
   const { hero, stage6, detail, exclusiveEquipment, soldierCards } = Route.useLoaderData();
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
+  const soldierDetailById = useMemo(
+    () => new Map(getSoldierPrototypePageData().records.map((record) => [record.soldierId, record])),
+    [],
+  );
+  const heroCardIconIndex = useMemo(() => getStaticHeroCardIconIndex(), []);
+  if (
+    heroCardIconIndex.summary.total !== 267 ||
+    heroCardIconIndex.summary.resolved !== 267 ||
+    heroCardIconIndex.summary.pending !== 0 ||
+    heroCardIconIndex.summary.hardErrors !== 0 ||
+    heroCardIconIndex.records.length !== 267
+  ) {
+    throw new Error("Hero card icon frozen index is not production-ready.");
+  }
+  const [selectedSoldierId, setSelectedSoldierId] = useState<number | null>(null);
+  useEffect(() => setSelectedSoldierId(null), [hero.heroId]);
+  const selectedSoldierRecord = selectedSoldierId == null
+    ? null
+    : (soldierDetailById.get(selectedSoldierId) ?? null);
+  if (selectedSoldierId != null && !selectedSoldierRecord) {
+    throw new Error(`Hero ${hero.heroId} requested Soldier ${selectedSoldierId}, but the frozen Soldier frontend consumer does not contain it.`);
+  }
+  const closeSoldierDetail = useCallback(() => setSelectedSoldierId(null), []);
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
   const visuals: HeroVisual[] = [];
   if (imageUrl) {
@@ -397,7 +422,13 @@ function HeroDetailPage() {
               <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">{soldierCards.length}종</span>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
-              {soldierCards.map((record) => <HeroSoldierCard key={record.soldierId} record={record} />)}
+              {soldierCards.map((record) => (
+                <HeroSoldierCard
+                  key={record.soldierId}
+                  record={record}
+                  onOpen={setSelectedSoldierId}
+                />
+              ))}
             </div>
           </div>
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
@@ -420,6 +451,14 @@ function HeroDetailPage() {
           </div>
         </section>
       </div>
+
+      {selectedSoldierRecord ? (
+        <SoldierDetailDialog
+          record={selectedSoldierRecord}
+          heroCardIcons={heroCardIconIndex.records}
+          onClose={closeSoldierDetail}
+        />
+      ) : null}
     </main>
   );
 }
@@ -440,7 +479,13 @@ const SOLDIER_ARMY_LABELS: Record<string, string> = {
   DEMON: "마족",
 };
 
-function HeroSoldierCard({ record }: { record: HeroSoldierCardView }) {
+function HeroSoldierCard({
+  record,
+  onOpen,
+}: {
+  record: HeroSoldierCardView;
+  onOpen: (soldierId: number) => void;
+}) {
   const displayName = record.nameKr ?? record.nameCn;
   const portraitUrl = getOfficialSoldierPortraitUrl(record.soldierId);
   const armyIconUrl = getOfficialArmyIconUrl(record.armyType);
@@ -454,6 +499,21 @@ function HeroSoldierCard({ record }: { record: HeroSoldierCardView }) {
       params={{ soldierId: String(record.soldierId) }}
       aria-label={`${displayName} 용병 상세 보기`}
       title={`${displayName} · Soldier ${record.soldierId}`}
+      data-hero-soldier-card="true"
+      data-soldier-id={record.soldierId}
+      onClick={(event) => {
+        if (
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        ) {
+          return;
+        }
+        event.preventDefault();
+        onOpen(record.soldierId);
+      }}
       className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-8 text-muted-foreground transition group-hover:text-foreground">
