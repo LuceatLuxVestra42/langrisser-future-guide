@@ -2,6 +2,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { resolveConfigDataSourcePath } from '../../tools/configdata-lookup/lib/source-root.mjs';
+
 export const STAGE2_CONTRACT_PATH = 'data/contracts/configdata-lookup-stage2-forward-join-contract.v1.json';
 export const STAGE1_SUMMARY_PATH = 'data/validation/configdata-lookup-stage1-summary.v1.json';
 
@@ -59,7 +61,7 @@ export async function loadSourceTypes(contract) {
   const loaded = {};
 
   for (const [type, filePath] of Object.entries(contract.sourceTypes)) {
-    const text = await fs.readFile(filePath, 'utf8');
+    const text = await fs.readFile(resolveConfigDataSourcePath(filePath), 'utf8');
     const root = JSON.parse(text);
     if (!Array.isArray(root)) throw new Error(`${type}: ${filePath} must be a root array`);
 
