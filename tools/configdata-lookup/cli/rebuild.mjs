@@ -1,4 +1,7 @@
-import { rebuildIncrementally, renderJson } from '../../../scripts/lib/configdata-lookup-stage6.mjs';
+import { installConfigDataSourceRootReadRedirect } from '../lib/configdata-source-root.mjs';
+
+installConfigDataSourceRootReadRedirect();
+const { rebuildIncrementally, renderJson } = await import('../../../scripts/lib/configdata-lookup-stage6.mjs');
 
 function usage() {
   return 'usage: node tools/configdata-lookup/cli/rebuild.mjs --apply [--json]\n';
