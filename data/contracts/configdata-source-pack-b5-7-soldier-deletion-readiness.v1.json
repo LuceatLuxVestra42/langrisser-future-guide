@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "schemaId": "configdata-source-pack-b5-7-soldier-deletion-readiness/v1",
+  "stage": "repository-size-reduction-B5.7",
+  "status": "PASS",
+  "completion": "CONFIGDATA_SOURCE_PACK_B5_7_SOLDIER_DELETION_READINESS_COMPLETE",
+  "owner": "configdata-source-pack",
+  "supportingOwners": [
+    "soldier-canonical",
+    "project-check"
+  ],
+  "purpose": "Close the Soldier Stage 4 maintenance and freshness dependencies exposed by the real B6 deletion-only proof after B5.6, while preserving the pinned B2 exact-byte ConfigData source, logical data/configdata provenance, canonical identities, Hero-Soldier relations, production runtime, frontend behavior, and normal ConfigData Lookup behavior. This stage deletes no tracked ConfigData files.",
+  "authoritativePredecessors": {
+    "maintenanceRoot": {
+      "path": "data/contracts/configdata-source-pack-b5-6-maintenance-root.v1.json",
+      "requiredStage": "repository-size-reduction-B5.6",
+      "requiredStatus": "PASS",
+      "requiredCompletion": "CONFIGDATA_SOURCE_PACK_B5_6_MAINTENANCE_ROOT_COMPLETE",
+      "requiredTrackedRawJsonCount": 753,
+      "requiredTrackedRawDeletionCompleted": false
+    },
+    "sourcePack": {
+      "path": "data/contracts/configdata-source-pack-contract.v1.json",
+      "requiredStage": "repository-size-reduction-B2",
+      "requiredStatus": "PASS",
+      "requiredFileCount": 753,
+      "requiredLogicalRawPathNamespace": "data/configdata"
+    }
+  },
+  "discoveryEvidence": {
+    "realB6DeletionProofPr": 507,
+    "b6BaseSha": "8d3e29cf23843e3ee36b988325f752c05a52aece",
+    "intendedDeletionCount": 753,
+    "intendedAdditions": 0,
+    "projectCheckOnDeletion": "PASS",
+    "newBlockingDependenciesDetected": [
+      {
+        "ownerLayer": "soldier-canonical",
+        "stage": "4-2",
+        "signature": "tracked data/configdata Soldier/SP Soldier physical read failed after tracked-root deletion",
+        "resolution": "resolve physical raw bytes through the B5.6 maintenance source root while keeping logical input paths unchanged"
+      },
+      {
+        "ownerLayer": "soldier-canonical",
+        "stage": "4-6",
+        "signature": "relation producer attempted git hash-object on deleted logical data/configdata paths",
+        "resolution": "compute Git blob identity from the exact resolved physical bytes while preserving logical provenance paths"
+      },
+      {
+        "ownerLayer": "soldier-canonical",
+        "stage": "4-8",
+        "signature": "freshness hashing returned null for deleted logical raw paths",
+        "resolution": "hash logical ConfigData inputs through the maintenance source resolver; keep Stage 4-1 validation as a hard regeneration gate but do not freeze its ephemeral untracked output"
+      }
+    ],
+    "b6MergeBlockedUntilThisStagePasses": true
+  },
+  "changedMaintenanceScope": [
+    {
+      "path": "scripts/validate-soldier-stage4-2-master.cjs",
+      "role": "Stage 4-2 physical ConfigData resolution",
+      "semanticAlgorithmChanged": false
+    },
+    {
+      "path": "scripts/finalize-hero-soldier-relation-layer.cjs",
+      "role": "Stage 4-6 logical-provenance-preserving source blob hashing",
+      "semanticAlgorithmChanged": false
+    },
+    {
+      "path": "scripts/validate-soldier-stage4-8-baseline.cjs",
+      "role": "Stage 4-8 raw-input freshness hashing and ephemeral validation snapshot exclusion",
+      "semanticAlgorithmChanged": false
+    },
+    {
+      "path": ".github/workflows/soldier-stage4-8-baseline.yml",
+      "role": "Stage 4-8 PR freshness check uses the same maintenance source resolution boundary",
+      "semanticAlgorithmChanged": false
+    },
+    {
+      "path": "data/validation/soldier-stage4-8-baseline.v1.json",
+      "role": "reviewed frozen baseline refreshed from full regeneration with zero data, contract, artifact-semantic, or validation-semantic changes",
+      "semanticAlgorithmChanged": false
+    },
+    {
+      "path": ".github/workflows/configdata-source-pack-b5-7-soldier-deletion-readiness.yml",
+      "role": "external-root clean-room proof for the affected Soldier Stage 4 maintenance chain",
+      "semanticAlgorithmChanged": false
+    }
+  ],
+  "semanticBoundary": {
+    "semanticAuthorityChanged": false,
+    "frozenSemanticDomainsReopened": false,
+    "canonicalIdentityChanges": false,
+    "relationChanges": false,
+    "newRelationDiscovery": false,
+    "populationChanges": false,
+    "sourceMeaningReinterpreted": false,
+    "nameJoinIntroduced": false,
+    "idArithmeticIntroduced": false,
+    "filenameSimilarityIntroduced": false,
+    "logicalProvenanceChanged": false
+  },
+  "productionBoundary": {
+    "productionRuntimeChanged": false,
+    "frontendChanged": false,
+    "productionRuntimeReadsRawConfigData": false,
+    "productionRuntimeFetchesSourcePack": false,
+    "rawConfigDataRuntimeFallbackAllowed": false,
+    "normalLookupRefsFindChanged": false,
+    "normalLookupRawFallback": false
+  },
+  "fullRegenerationEvidence": {
+    "stage4_8BaselineGitBlobSha": "6308ca7bb80868a45f27efa1186e7a2e987378ed",
+    "status": "PASS",
+    "relationEdgeCount": 5977,
+    "dataChanges": 0,
+    "contractChanges": 0,
+    "artifactSemanticChanges": 0,
+    "validationSemanticChanges": 0,
+    "ephemeralStage4_1ValidationFrozen": false
+  },
+  "validationEvidence": {
+    "validatedCandidateHead": "ff1cd2d3b6f1513cb7b33504184c74dc3113c5f7",
+    "b5_7ExternalRootRunId": 33614856274,
+    "b5_7ExternalRootJobId": 100198218805,
+    "b5_7ExternalRootConclusion": "success",
+    "projectCheckRunId": 33614856291,
+    "projectCheckConclusion": "success",
+    "soldierStage4_2RunId": 33614856281,
+    "soldierStage4_2Conclusion": "success",
+    "soldierStage4_6RunId": 33614856286,
+    "soldierStage4_6Conclusion": "success",
+    "soldierStage4_8RunId": 33614856290,
+    "soldierStage4_8Conclusion": "success",
+    "localizationAuditRunId": 33614856273,
+    "localizationAuditConclusion": "success",
+    "externalHydratedFileCount": 753,
+    "semanticParityFileCount": 7,
+    "stage4_8BaselineByteStable": true,
+    "logicalProvenanceChanged": false,
+    "semanticAuthorityChanged": false,
+    "trackedMutationCountAfterValidation": 0,
+    "closeoutCheckpointAddedAfterValidatedCandidate": true,
+    "finalHeadProjectCheckRequired": true,
+    "finalHeadExternalRootProofRequired": true
+  },
+  "nonBlockingReviews": [
+    {
+      "code": "SOLDIER_MASTER_BYTE_DRIFT",
+      "classification": "REVIEW",
+      "blocking": false,
+      "reason": "Stage 4-2 continues to report whole-master byte drift as diagnostic only while all canonical identity, source-field, duplicate, population, and SP-link hard gates pass."
+    },
+    {
+      "code": "SOLDIER_STAGE5_2_EXISTING_FROZEN_PROVENANCE_DRIFT_ON_MAIN",
+      "classification": "EXISTING_DRIFT_REVIEW",
+      "blocking": false,
+      "authoritativePredecessor": "data/contracts/configdata-source-pack-b5-6-maintenance-root.v1.json",
+      "reason": "The Stage 5-2 producer still computes PASS semantics for 224/224 records with zero invalid combat records. Its failing frozen-artifact gate is the already-recorded stale Stage3/Stage4 provenance review and is not caused by the B5.7 maintenance changes."
+    }
+  ],
+  "migrationState": {
+    "trackedRepositoryRawSourceStillPresent": true,
+    "trackedRepositoryRawJsonCount": 753,
+    "trackedRawDeletionAdmitted": true,
+    "b5_6MaintenanceRootCompleted": true,
+    "b5_7SoldierDeletionReadinessCompleted": true,
+    "trackedRawDeletionCompleted": false
+  },
+  "blockers": [],
+  "reviews": [
+    "SOLDIER_MASTER_BYTE_DRIFT",
+    "SOLDIER_STAGE5_2_EXISTING_FROZEN_PROVENANCE_DRIFT_ON_MAIN"
+  ],
+  "handoff": {
+    "completion": "B5_7_SOLDIER_DELETION_READINESS_COMPLETE",
+    "nextOwner": "configdata-source-pack",
+    "nextSupportingOwners": [
+      "configdata",
+      "project-check",
+      "configdata-lookup"
+    ],
+    "nextStage": "B6-delete-tracked-configdata",
+    "nextStart": "From the latest merged main, recreate B6 as an exact deletion-only change removing the admitted 753 direct data/configdata/*.json files with additions=0 and no other paths, then rerun the actual deletion-triggered Project Check and owning validators. Do not reuse the pre-B5.7 deletion branch or PR."
+  }
+}
