@@ -1,0 +1,34 @@
+name: Soldier Stage 11-A1 Official Release Evidence
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/soldier-release-official-notice-evidence-stage11-a1.v1.json'
+      - 'scripts/validate-soldier-release-official-notice-evidence-stage11-a1.mjs'
+      - '.github/workflows/soldier-release-official-notice-evidence-stage11-a1.yml'
+  pull_request:
+    paths:
+      - 'data/soldier-release-official-notice-evidence-stage11-a1.v1.json'
+      - 'scripts/validate-soldier-release-official-notice-evidence-stage11-a1.mjs'
+      - '.github/workflows/soldier-release-official-notice-evidence-stage11-a1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate Soldier Stage 11-A1 official release evidence
+        run: node scripts/validate-soldier-release-official-notice-evidence-stage11-a1.mjs
+
+      - name: Verify validator is read-only
+        run: git diff --exit-code
