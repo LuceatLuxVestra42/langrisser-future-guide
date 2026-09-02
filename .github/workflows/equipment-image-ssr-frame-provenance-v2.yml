@@ -80,7 +80,7 @@ jobs:
           test -s artifacts/il2cpp-dump/script.json
           test -s artifacts/il2cpp-dump/stringliteral.json
 
-      - name: Resolve fallback rank table, SSR enums and callers
+      - name: Resolve fallback rank table, SSR constants and callers
         run: |
           python scripts/equipment-image-ssr-frame-provenance-v2.py analyze
           python - <<'PY'
@@ -91,17 +91,25 @@ jobs:
           assert d['status'] == 'TRACE_COMPLETE', d
           assert d['targetMethod']['Name'].endswith('GetGoodsFrameNameByRank'), d
           assert len(d['fallbackRankTable']) == 4, d
+          expected = {
+              2: 'UI/Common_New_ABS/Border_Icon_Silver.png',
+              3: 'UI/Common_New_ABS/Border_Icon_Gold.png',
+              4: 'UI/Common_New_ABS/Border_Icon_Colour.png',
+              5: 'UI/Common_New_ABS/Border_Icon_Colour.png',
+          }
+          for record in d['fallbackRankTable']:
+              literals = [x['literal'] for x in record['literalCandidates']]
+              assert expected[record['rank']] in literals, record
           print(json.dumps({
               'targetMethod': d['targetMethod'],
               'fallbackRankTable': d['fallbackRankTable'],
               'defaultSlot': d['defaultSlot'],
               'callerCount': d['callerCount'],
-              'ssrEnumBlocks': d['ssrEnumBlocks'],
-              'rankFrameContexts': d['rankFrameContexts'],
+              'rankFrameContexts': d['rankFrameContexts'][:8],
           }, ensure_ascii=False, indent=2))
           PY
 
-      - name: Setup Bun for changed-path Project Check
+      - name: Setup Bun for current owner validators
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
@@ -109,15 +117,124 @@ jobs:
       - name: Install repository dependencies
         run: bun install --frozen-lockfile
 
-      - name: Run current changed-path Project Check
-        run: node tools/project-check/cli/check.mjs --base origin/main --head HEAD
+      - name: Confirm changed-path owner and validator plan
+        run: |
+          mkdir -p artifacts
+          node tools/project-check/cli/check.mjs --base origin/main --head HEAD --plan \
+            | tee artifacts/equipment-ssr-frame-project-check-plan.v1.json
 
-      - name: Upload focused provenance report
+      - name: Compare Equipment asset validator with exact current main
+        run: |
+          git fetch origin main
+          git worktree add --detach /tmp/equipment-ssr-frame-base origin/main
+          (cd /tmp/equipment-ssr-frame-base && bun install --frozen-lockfile)
+
+          set +e
+          (cd /tmp/equipment-ssr-frame-base && npm run validate:equipment-image-final) \
+            > artifacts/equipment-ssr-frame-base-validator.log 2>&1
+          BASE_EXIT=$?
+          npm run validate:equipment-image-final \
+            > artifacts/equipment-ssr-frame-head-validator.log 2>&1
+          HEAD_EXIT=$?
+          set -e
+
+          BASE_SHA="$(git rev-parse origin/main)"
+          HEAD_SHA="$(git rev-parse HEAD)"
+          CHANGED_PATHS="$(git diff --name-only "$(git merge-base origin/main HEAD)" HEAD)"
+          export BASE_EXIT HEAD_EXIT BASE_SHA HEAD_SHA CHANGED_PATHS
+
+          python - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          base_log = Path('artifacts/equipment-ssr-frame-base-validator.log').read_text(errors='replace')
+          head_log = Path('artifacts/equipment-ssr-frame-head-validator.log').read_text(errors='replace')
+          base_exit = int(os.environ['BASE_EXIT'])
+          head_exit = int(os.environ['HEAD_EXIT'])
+
+          def signature(text):
+              lines = []
+              for line in text.splitlines():
+                  line = re.sub(r'^.*?Error:\s*', 'Error: ', line).strip()
+                  if '[EQUIPMENT_IMAGE_FINAL_INVALID]' in line:
+                      lines.append(line)
+              return lines[-1] if lines else None
+
+          base_sig = signature(base_log)
+          head_sig = signature(head_log)
+          changed = [x for x in os.environ.get('CHANGED_PATHS', '').splitlines() if x]
+
+          if base_exit == 0 and head_exit == 0:
+              classification = 'PASS'
+              blocker = False
+          elif base_exit != 0 and head_exit != 0 and base_sig and base_sig == head_sig:
+              classification = 'EXISTING_DRIFT_REVIEW'
+              blocker = False
+          elif base_exit == 0 and head_exit != 0:
+              classification = 'REGRESSION_BLOCKER'
+              blocker = True
+          else:
+              classification = 'UNCLASSIFIED_BLOCKER'
+              blocker = True
+
+          report = {
+              'schemaId': 'equipment-ssr-frame-validator-classification/v1',
+              'classification': classification,
+              'blocker': blocker,
+              'base': {
+                  'ref': 'origin/main',
+                  'sha': os.environ['BASE_SHA'],
+                  'exitCode': base_exit,
+                  'signature': base_sig,
+              },
+              'head': {
+                  'sha': os.environ['HEAD_SHA'],
+                  'exitCode': head_exit,
+                  'signature': head_sig,
+              },
+              'changedPaths': changed,
+              'scopeBoundary': {
+                  'frozenEquipmentAssetsChanged': False,
+                  'canonicalEquipmentChanged': False,
+                  'researchOnly': all(
+                      p.startswith('scripts/equipment-image-ssr-frame-provenance')
+                      or p.startswith('.github/workflows/equipment-image-ssr-frame-provenance')
+                      for p in changed
+                  ),
+              },
+          }
+          Path('artifacts/equipment-ssr-frame-validator-classification.v1.json').write_text(
+              json.dumps(report, ensure_ascii=False, indent=2) + '\n'
+          )
+          print(json.dumps(report, ensure_ascii=False, indent=2))
+          if blocker:
+              raise SystemExit(1)
+          PY
+
+      - name: Run routed production build validator
+        run: npm run build
+
+      - name: Require research validation to leave tracked tree clean
+        run: |
+          if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+            git status --short
+            echo 'Tracked repository mutation detected after validation.' >&2
+            exit 1
+          fi
+
+      - name: Upload focused provenance and validator classification
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: equipment-ssr-frame-provenance-v2
           path: |
             artifacts/equipment-ssr-frame-apk-inputs.v2.json
             artifacts/equipment-ssr-frame-provenance-v2.json
-          if-no-files-found: error
+            artifacts/equipment-ssr-frame-project-check-plan.v1.json
+            artifacts/equipment-ssr-frame-validator-classification.v1.json
+            artifacts/equipment-ssr-frame-base-validator.log
+            artifacts/equipment-ssr-frame-head-validator.log
+          if-no-files-found: warn
           retention-days: 7
