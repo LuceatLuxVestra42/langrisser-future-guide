@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import heroDungeonSupplementalPart0001 from "../../data/generated/hero-dungeon-supplemental-part-0001.v1.json";
+import { applyHeroDungeonBondPresentation } from "./hero-dungeon-presentation.server";
 import { readHeroDetailRouteStage5Data } from "./hero-detail-stage5.server";
 import {
   readHeroDetailRouteStage4Data,
@@ -62,45 +62,6 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
   ])],
 ]);
 
-const LEON_HERO_ID = 6;
-
-const LEON_HERO_DUNGEON_GATE_BY_LEVEL_ID = (() => {
-  const record = heroDungeonSupplementalPart0001.records.find((row) => row.heroId === LEON_HERO_ID);
-  if (
-    !record ||
-    record.state !== "HAS_HERO_DUNGEON" ||
-    record.accepted !== true ||
-    record.gateCount !== 7 ||
-    record.stages.length !== 7
-  ) {
-    throw new Error("Leon Hero Dungeon frozen consumer is not production-ready.");
-  }
-
-  const gateByDungeonLevelId = new Map<number, number>();
-  for (const stage of record.stages) {
-    if (stage.length !== 2) {
-      throw new Error("Leon Hero Dungeon frozen consumer contains an invalid gate tuple.");
-    }
-    const gateOrdinal = stage[0];
-    const dungeonLevelId = stage[1];
-    if (
-      typeof gateOrdinal !== "number" ||
-      typeof dungeonLevelId !== "number" ||
-      !Number.isInteger(gateOrdinal) ||
-      !Number.isInteger(dungeonLevelId) ||
-      gateOrdinal < 1 ||
-      gateOrdinal > 7 ||
-      dungeonLevelId <= 0 ||
-      gateByDungeonLevelId.has(dungeonLevelId)
-    ) {
-      throw new Error("Leon Hero Dungeon frozen consumer contains an invalid gate assignment.");
-    }
-    gateByDungeonLevelId.set(dungeonLevelId, gateOrdinal);
-  }
-
-  return gateByDungeonLevelId;
-})();
-
 function getHeroSoldierTierOrder(record: { isSp: boolean; tier: number }) {
   if (record.isSp) return 0;
   if (record.tier === 3) return 1;
@@ -159,57 +120,6 @@ function localizeLegacyHeroSkill<T extends { skillId: number; nameCn: string | n
   };
 }
 
-function applyLeonHeroDungeonBondPresentation<T extends {
-  bonds: {
-    rows: Array<{
-      completionConditions: Array<{
-        requiredHero: {
-          heroId: number | null;
-          nameKr: string | null;
-          nameCn: string | null;
-          nameEn: string | null;
-        } | null;
-        stage: { stageId: number | null; nameCn: string | null } | null;
-      }>;
-    }>;
-  };
-}>(heroId: number, detail: T): T {
-  if (heroId !== LEON_HERO_ID) return detail;
-
-  return {
-    ...detail,
-    bonds: {
-      ...detail.bonds,
-      rows: detail.bonds.rows.map((bond) => ({
-        ...bond,
-        completionConditions: bond.completionConditions.map((condition) => {
-          if (!condition.requiredHero || condition.stage?.stageId == null) return condition;
-          const gateOrdinal = LEON_HERO_DUNGEON_GATE_BY_LEVEL_ID.get(condition.stage.stageId);
-          if (gateOrdinal == null) return condition;
-
-          const requiredHeroName =
-            condition.requiredHero.nameKr ??
-            condition.requiredHero.nameCn ??
-            condition.requiredHero.nameEn ??
-            `Hero ${condition.requiredHero.heroId ?? "?"}`;
-
-          // Presentation-only projection: the frozen Stage 5/6 relation remains untouched.
-          // Clearing requiredHero here makes the existing route renderer print this exact text
-          // instead of adding its generic "와 함께 ·" separator.
-          return {
-            ...condition,
-            requiredHero: null,
-            stage: {
-              ...condition.stage,
-              nameCn: `${requiredHeroName}와 함께 운명의문 ${gateOrdinal} 클리어`,
-            },
-          };
-        }),
-      })),
-    },
-  };
-}
-
 export const getHeroListStage2Data = createServerFn({ method: "GET" }).handler(
   async () => readHeroListStage2Data(),
 );
@@ -255,7 +165,7 @@ export const getHeroDetailRouteStage5Data = createServerFn({ method: "GET" })
 
     return {
       ...routeData,
-      detail: applyLeonHeroDungeonBondPresentation(data.heroId, {
+      detail: applyHeroDungeonBondPresentation(data.heroId, {
         ...routeData.detail,
         skills,
         soldiers: {
