@@ -1,0 +1,17 @@
+name: Localization Audit Equipment Refresh Debug
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Dump Stage 4 localization audit result
+        run: node scripts/audit-localization-stage4.mjs --json
