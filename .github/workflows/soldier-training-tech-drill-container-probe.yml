@@ -1,0 +1,126 @@
+name: Soldier Training Tech Drill Container Probe
+
+on:
+  push:
+    branches:
+      - asset/training-tech-drill-bundle-probe
+    paths:
+      - .github/workflows/soldier-training-tech-drill-container-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install readers
+        run: python -m pip install --disable-pip-version-check UnityPy remotezip
+      - name: Verify exact Sprite and AssetBundle container mapping
+        run: |
+          python - <<'PY'
+          import collections
+          import hashlib
+          import json
+          from pathlib import Path
+          from remotezip import RemoteZip
+          import UnityPy
+
+          APK_URL = "https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/mz-client-formal-cn.apk"
+          APK_REF = "https://mz.zlongame.com/main.shtml"
+          ENTRY = "assets/ExportAssetBundle/ui_icon_drill_abs.b"
+          SOURCE_ROOT = "UI/Icon/Drill_ABS/"
+          CENSUS = Path("data/generated/soldier-training-tech-classification-stage1-census.v1.json")
+          HEADERS = {
+              "User-Agent": "Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 Chrome/140.0 Mobile Safari/537.36",
+              "Referer": APK_REF,
+          }
+
+          census = json.loads(CENSUS.read_text())
+          all_resource_records = [
+              record["raw"]["Resource"]
+              for record in census["records"]
+              if isinstance(record.get("raw"), dict) and isinstance(record["raw"].get("Resource"), str)
+          ]
+          root_counts = collections.Counter(resource.rsplit("/", 1)[0] + "/" for resource in all_resource_records)
+          drill_resource_records = [resource for resource in all_resource_records if resource.startswith(SOURCE_ROOT)]
+          unique_resources = sorted(set(drill_resource_records))
+          expected_stems = sorted({Path(resource).stem for resource in unique_resources})
+
+          with RemoteZip(APK_URL, headers=HEADERS) as apk:
+              names = set(apk.namelist())
+              if ENTRY not in names:
+                  raise RuntimeError(f"missing exact APK entry: {ENTRY}")
+              raw = apk.read(ENTRY)
+
+          env = UnityPy.load(raw)
+          sprite_names = []
+          for obj in env.objects:
+              if obj.type.name != "Sprite":
+                  continue
+              data = obj.read()
+              name = getattr(data, "m_Name", None) or getattr(data, "name", None)
+              if name:
+                  sprite_names.append(name)
+          sprite_set = set(sprite_names)
+          duplicate_sprites = sorted(name for name, count in collections.Counter(sprite_names).items() if count > 1)
+          missing_stems = sorted(set(expected_stems) - sprite_set)
+
+          container_keys = sorted(str(key) for key in env.container.keys())
+          drill_container_keys = sorted(key for key in container_keys if "drill" in key.lower())
+
+          normalized_container_keys = {key.replace("\\", "/").lower() for key in container_keys}
+          resource_container_matches = {}
+          for resource in unique_resources:
+              rel = resource.replace("\\", "/").lower()
+              candidates = [key for key in normalized_container_keys if key.endswith(rel)]
+              resource_container_matches[resource] = sorted(candidates)
+          direct_container_match_count = sum(bool(matches) for matches in resource_container_matches.values())
+
+          result = {
+              "status": "PASS_EXACT_DRILL_SPRITE_MAPPING" if not missing_stems and not duplicate_sprites else "BLOCKER_DRILL_SPRITE_COVERAGE",
+              "sourceRoot": SOURCE_ROOT,
+              "officialApkBundleEntry": ENTRY,
+              "bundleSha256": hashlib.sha256(raw).hexdigest(),
+              "resourceSummary": {
+                  "allResourceBearingRecordCount": len(all_resource_records),
+                  "resourceRootRecordCounts": dict(sorted(root_counts.items())),
+                  "drillResourceBearingRecordCount": len(drill_resource_records),
+                  "drillUniqueResourcePathCount": len(unique_resources),
+                  "drillUniqueStemCount": len(expected_stems),
+              },
+              "spriteEvidence": {
+                  "spriteCount": len(sprite_names),
+                  "uniqueSpriteCount": len(sprite_set),
+                  "exactExpectedStemMatchedCount": len(expected_stems) - len(missing_stems),
+                  "missingExpectedStems": missing_stems,
+                  "duplicateSpriteNames": duplicate_sprites,
+                  "extraSpriteNames": sorted(sprite_set - set(expected_stems)),
+              },
+              "containerEvidence": {
+                  "containerKeyCount": len(container_keys),
+                  "drillContainerKeys": drill_container_keys,
+                  "directResourceSuffixMatchCount": direct_container_match_count,
+                  "resourceSuffixMatches": resource_container_matches,
+              },
+          }
+          Path("drill-container-probe.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+          print("RESOURCE_ROOT_COUNTS=" + json.dumps(dict(sorted(root_counts.items())), ensure_ascii=False))
+          print("DRILL_CONTAINER_KEYS=" + json.dumps(drill_container_keys, ensure_ascii=False))
+          print("DRILL_CONTAINER_PROBE_RESULT")
+          print(json.dumps(result, ensure_ascii=False, indent=2))
+          if result["status"] != "PASS_EXACT_DRILL_SPRITE_MAPPING":
+              raise SystemExit(3)
+          PY
+      - name: Upload probe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-training-tech-drill-container-probe
+          path: drill-container-probe.json
+          if-no-files-found: error
