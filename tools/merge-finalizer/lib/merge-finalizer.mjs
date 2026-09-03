@@ -3,6 +3,8 @@ export const REQUIRED_PROJECT_CHECK = Object.freeze({
   appId: 15368,
 });
 
+export const PROJECT_CHECK_WORKFLOW = 'project-tooling-r3-project-check.yml';
+
 const BLOCKING_CONCLUSIONS = new Set([
   'action_required',
   'cancelled',
@@ -11,18 +13,43 @@ const BLOCKING_CONCLUSIONS = new Set([
   'timed_out',
 ]);
 
-function assertSha(value, label) {
+export function assertSha(value, label) {
   if (typeof value !== 'string' || !/^[0-9a-f]{40}$/i.test(value)) {
     throw new Error(`${label} must be a 40-character Git SHA`);
   }
 }
 
-function newestExactCheck(checkRuns, headSha, requiredCheck) {
-  const exact = (checkRuns ?? []).filter(check => (
+export function classifyExecutionBoundary({ repository, pr }) {
+  if (!repository || !/^[^/]+\/[^/]+$/.test(repository)) {
+    throw new Error('repository must be owner/repo');
+  }
+  if (pr?.base?.ref !== 'main') {
+    return { status: 'BLOCKER_WRONG_BASE', baseRef: pr?.base?.ref ?? null };
+  }
+  const baseRepository = pr?.base?.repo?.full_name ?? repository;
+  if (baseRepository !== repository) {
+    return { status: 'BLOCKER_WRONG_BASE_REPOSITORY', baseRepository };
+  }
+  const headRepository = pr?.head?.repo?.full_name ?? null;
+  if (headRepository !== repository) {
+    return { status: 'BLOCKER_UNSUPPORTED_FORK', headRepository };
+  }
+  if (typeof pr?.head?.ref !== 'string' || pr.head.ref.length === 0) {
+    return { status: 'BLOCKER_HEAD_REF_MISSING' };
+  }
+  return { status: 'SUPPORTED', headRef: pr.head.ref };
+}
+
+function exactChecks(checkRuns, headSha, requiredCheck) {
+  return (checkRuns ?? []).filter(check => (
     check?.name === requiredCheck.name
     && check?.app?.id === requiredCheck.appId
     && check?.head_sha === headSha
   ));
+}
+
+function newestExactCheck(checkRuns, headSha, requiredCheck) {
+  const exact = exactChecks(checkRuns, headSha, requiredCheck);
   exact.sort((a, b) => {
     const aTime = Date.parse(a?.started_at ?? a?.completed_at ?? '') || 0;
     const bTime = Date.parse(b?.started_at ?? b?.completed_at ?? '') || 0;
@@ -30,6 +57,22 @@ function newestExactCheck(checkRuns, headSha, requiredCheck) {
     return Number(b?.id ?? 0) - Number(a?.id ?? 0);
   });
   return exact[0] ?? null;
+}
+
+export function findExactProjectCheckForWorkflowRun(
+  checkRuns,
+  headSha,
+  workflowRunId,
+  requiredCheck = REQUIRED_PROJECT_CHECK,
+) {
+  assertSha(headSha, 'headSha');
+  if (!Number.isInteger(Number(workflowRunId)) || Number(workflowRunId) <= 0) {
+    throw new Error('workflowRunId must be a positive integer');
+  }
+  const runPath = `/actions/runs/${Number(workflowRunId)}/`;
+  return exactChecks(checkRuns, headSha, requiredCheck).find(check => (
+    typeof check?.details_url === 'string' && check.details_url.includes(runPath)
+  )) ?? null;
 }
 
 export function classifyMergeFinalization(snapshot, options = {}) {
@@ -96,5 +139,6 @@ function summarizeCheck(check) {
     conclusion: check.conclusion ?? null,
     startedAt: check.started_at ?? null,
     completedAt: check.completed_at ?? null,
+    detailsUrl: check.details_url ?? null,
   };
 }
