@@ -78,6 +78,7 @@ export default defineConfig({
       { path: "/equipment", prerender: { enabled: true, outputPath: "/equipment/index.html" } },
       { path: "/equipment/exclusive", prerender: { enabled: true, outputPath: "/equipment/exclusive/index.html" } },
       { path: "/soldiers", prerender: { enabled: true, outputPath: "/soldiers/index.html" } },
+      { path: "/soldiers/training", prerender: { enabled: true, outputPath: "/soldiers/training/index.html" } },
       { path: "/heroes", prerender: { enabled: true, outputPath: "/heroes/index.html" } },
       ...equipmentDetailPages,
       ...heroDetailPages,
