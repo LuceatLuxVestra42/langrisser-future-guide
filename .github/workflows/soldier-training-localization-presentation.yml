@@ -1,0 +1,32 @@
+name: Soldier Training Localization Presentation
+
+on:
+  pull_request:
+    paths:
+      - 'data/presentation/soldier-training-material-name-kr.v1.json'
+      - 'data/presentation/soldier-training-tech-name-kr.v1.json'
+      - 'data/presentation/soldier-training-tech-common-passive-template-kr.v1.json'
+      - 'data/presentation/soldier-training-localization-frozen.v1.json'
+      - 'data/generated/soldier-training-material-iteminfo.v1.json'
+      - 'data/generated/soldier-training-tech-common-stat-effect-extraction.v1.json'
+      - 'data/generated/soldier-training-tech-common-passive-effect-extraction.v1.json'
+      - 'data/validation/soldier-training-localization-presentation.v1.json'
+      - 'scripts/validate-soldier-training-localization-presentation.mjs'
+      - '.github/workflows/soldier-training-localization-presentation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate frozen Soldier Training localization presentation
+        run: node scripts/validate-soldier-training-localization-presentation.mjs --check
+      - name: Validate fail-closed behavior
+        run: node scripts/validate-soldier-training-localization-presentation.mjs --self-test
