@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "schemaId": "hero-dungeon-stageB2-exact-join-integrity/v1",
+  "stage": "hero-dungeon-B2",
+  "status": "PASS",
+  "completion": "B2_EXACT_JOIN_INTEGRITY_COMPLETE",
+  "owner": "hero-canonical",
+  "purpose": "Validate every explicit B1-frozen HeroInformationInfo.DungeonLevels_ID source reference against exactly one HeroDungeonLevelInfo.ID target. B2 performs no NameNum ordinal interpretation and no 5/7 acceptance decision.",
+  "authority": {
+    "b0Contract": "data/contracts/hero-dungeon-stageB0-scope-reset.v1.json",
+    "b1PopulationFreeze": "data/validation/hero-dungeon-stageB1-population-classification.v1.json",
+    "sourcePackContract": "data/contracts/configdata-source-pack-contract.v1.json",
+    "sourcePackCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "logicalConfigDataRoot": "data/configdata",
+    "heroInformationFile": "ConfigDataHeroInformationInfo.json",
+    "heroInformationSha256": "ee9f81f161f79939e771b16db97329bfaa45872edad0ecbf9dd9285587ebad7e",
+    "heroDungeonLevelFile": "ConfigDataHeroDungeonLevelInfo.json",
+    "heroDungeonLevelSha256": "07f2923ed34aa2aa7c483079458dba184913f2fe816c5840f436b03533d20677"
+  },
+  "scope": {
+    "inScope": [
+      "Consume the frozen B1 Hero Dungeon population and membership without reclassifying canonical Hero identity.",
+      "Re-read the exact pinned HeroInformationInfo DungeonLevels_ID arrays only to prove B1 source freshness and enumerate explicit references.",
+      "Resolve each positive-integer DungeonLevels_ID by exact HeroDungeonLevelInfo.ID equality only.",
+      "Fail closed on dangling references, repeated source references, cross-Hero shared source references, or referenced target IDs that are not unique."
+    ],
+    "outOfScope": [
+      "Read, interpret, validate, sort, or infer HeroDungeonLevelInfo.NameNum (B3).",
+      "Apply 5/7 versus 6/other cardinality acceptance (B4).",
+      "Use DungeonLevels_ID array position, DungeonLevel ID arithmetic, PreLevel_ID, names, filenames, or UI order.",
+      "Reopen Stage 5 Fetter semantics, Stage 6 Hero lifecycle, frontend, localization, assets, release, or presentation."
+    ]
+  },
+  "sourceTableIntegrity": {
+    "heroInformationSourceRecordCount": 291,
+    "heroInformationIntegerIdRecordCount": 291,
+    "heroDungeonLevelSourceRecordCount": 1391,
+    "heroDungeonLevelIntegerIdRecordCount": 1391,
+    "heroDungeonLevelUniqueIntegerIdCount": 1391,
+    "heroDungeonLevelDuplicateIntegerIds": []
+  },
+  "joinIntegrity": {
+    "referencedUniqueDungeonLevelIdCount": 1274,
+    "resolvedUniqueDungeonLevelIdCount": 1274,
+    "danglingDungeonLevelIds": [],
+    "ambiguousTargetDungeonLevelIds": [],
+    "duplicateSourceReferenceHeroIds": [],
+    "sharedAcrossHeroDungeonLevelIds": [],
+    "exactJoinPairSetSha256": "646ab2764bacad9de861fbbb83dca6502d61c557b75f4c260cfaaf183a6462a6",
+    "normalizedHeroReferenceSetSha256": "fa1aed8bbb297a57b05b16c8f684b8d2548e7594ff7b4dffd343b6b7e76d7eb7"
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "noHeroDungeonCount": 17,
+    "hasHeroDungeonCount": 250,
+    "dungeonCount5HeroCount": 238,
+    "dungeonCount7HeroCount": 12,
+    "dungeonCount6HeroCount": 0,
+    "otherNonEmptyDungeonCountHeroCount": 0,
+    "totalDungeonLevelReferenceCount": 1274,
+    "exactJoinResolvedReferenceCount": 1274,
+    "danglingDungeonLevelReferenceCount": 0,
+    "duplicateSourceReferenceCount": 0,
+    "duplicateSourceReferenceHeroCount": 0,
+    "sharedAcrossHeroDungeonLevelIdCount": 0,
+    "ambiguousTargetReferenceCount": 0,
+    "ambiguousTargetIdCount": 0,
+    "missingNameNumCount": null,
+    "duplicateNameNumHeroCount": null,
+    "invalidOrdinalSetHeroCount": null,
+    "hardErrorCount": 0
+  },
+  "checks": [
+    {
+      "name": "B1 frozen membership consumed",
+      "pass": true,
+      "actual": 250
+    },
+    {
+      "name": "B1 raw HeroInformation bytes unchanged",
+      "pass": true,
+      "actual": "ee9f81f161f79939e771b16db97329bfaa45872edad0ecbf9dd9285587ebad7e"
+    },
+    {
+      "name": "all explicit DungeonLevels_ID references resolved by exact HeroDungeonLevelInfo.ID",
+      "pass": true,
+      "actual": 1274
+    },
+    {
+      "name": "no repeated DungeonLevels_ID source references within a Hero",
+      "pass": true,
+      "actual": 0
+    },
+    {
+      "name": "no DungeonLevel source reference is shared across canonical Heroes",
+      "pass": true,
+      "actual": 0
+    },
+    {
+      "name": "B3 NameNum ordinal validation deferred",
+      "pass": true,
+      "actual": "DEFERRED_TO_B3"
+    },
+    {
+      "name": "B4 population acceptance deferred",
+      "pass": true,
+      "actual": "DEFERRED_TO_B4"
+    }
+  ],
+  "hardErrors": [],
+  "reviews": [],
+  "handoff": {
+    "nextOwner": "hero-canonical",
+    "nextStage": "B3-namenum-ordinal-integrity",
+    "nextStart": "Consume this frozen B2 exact-join set. Read NameNum only from the uniquely joined HeroDungeonLevelInfo rows; require explicit valid positive-integer NameNum and per-Hero uniqueness. Do not infer ordinals from array position, ID arithmetic, PreLevel_ID, names, filenames, or UI order."
+  }
+}
