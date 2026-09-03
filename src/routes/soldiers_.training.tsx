@@ -15,7 +15,7 @@ export const Route = createFileRoute("/soldiers_/training")({
       { title: "훈련장 | 용병 | 랑그릿사 모바일 미래시 정보" },
       {
         name: "description",
-        content: "검증된 용병 훈련장 자료와 TrainingTech 레벨별 상승 효과를 확인합니다.",
+        content: "검증된 용병 훈련장 자료와 훈련 항목별 레벨 상승 효과를 확인합니다.",
       },
     ],
   }),
@@ -92,10 +92,10 @@ function SoldierTrainingPage() {
 
         <section className="mt-7">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Training Hall</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">훈련장 자료</p>
             <h1 className="mt-2 text-2xl font-black tracking-tight text-foreground sm:text-3xl">훈련장</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              검증된 훈련 재료 에셋을 둘러보고, 아래 시뮬레이터에서 frozen TrainingTech의 레벨별 상승 효과를 확인할 수 있어.
+              검증된 훈련 재료와 한국어 훈련 항목을 둘러보고, 아래에서 레벨별 상승 효과를 확인할 수 있어.
             </p>
           </div>
 
@@ -130,17 +130,17 @@ function SoldierTrainingPage() {
             })}
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            에셋 선택은 시뮬레이터 진입용 UI야. 재료 아이템과 특정 TrainingTech 사이의 관계는 이 화면에서 새로 추론하지 않아.
+            재료를 선택하면 아래 효과 목록으로 이동해. 재료와 특정 훈련 항목을 이 화면에서 임의로 연결해 표시하지는 않아.
           </p>
         </section>
 
         <section ref={simulatorRef} className="mt-10 scroll-mt-6 border-t border-border pt-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Simulator</p>
-              <h2 className="mt-2 text-xl font-black text-foreground sm:text-2xl">레벨별 상승효과</h2>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">훈련 효과</p>
+              <h2 className="mt-2 text-xl font-black text-foreground sm:text-2xl">레벨별 상승 효과</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                기본 능력치 84개 + 조건부 효과 46개. 아직 effect extraction 대상이 아닌 성장/병사 전용 진행 Tech는 계산하지 않아.
+                기본 능력치 84개와 조건부 효과 46개의 레벨별 값을 확인할 수 있어. 개별 용병 성장용 훈련은 현재 목록에 포함하지 않았어.
               </p>
             </div>
 
@@ -149,11 +149,11 @@ function SoldierTrainingPage() {
                 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                 aria-hidden="true"
               />
-              <span className="sr-only">훈련 Tech 검색</span>
+              <span className="sr-only">훈련 항목 검색</span>
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="한국어 이름 / 중문 이름 / Tech ID / Army ID 검색"
+                placeholder="한국어 이름 / 중문 이름 / 훈련 ID / 병종 ID 검색"
                 className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/50 focus:ring-2 focus:ring-ring"
               />
             </label>
@@ -204,7 +204,7 @@ function SoldierTrainingPage() {
                   <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
                     <span>{tech.kind === "COMMON_STAT" ? "기본 능력치" : "조건부 효과"}</span>
                     <span>Lv.{tech.maxLevel}</span>
-                    {tech.armyIds.length ? <span>Army {tech.armyIds.join(", ")}</span> : null}
+                    {tech.armyIds.length ? <span>병종 ID {tech.armyIds.join(", ")}</span> : null}
                   </div>
                 </button>
               ))}
@@ -225,11 +225,11 @@ function SoldierTrainingPage() {
                         </span>
                       ) : null}
                       <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">
-                        Tech #{selectedTech.techId}
+                        훈련 #{selectedTech.techId}
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {selectedTech.kind === "COMMON_STAT" ? "COMMON_STAT frozen consumer" : "COMMON_PASSIVE frozen consumer"}
+                      {selectedTech.kind === "COMMON_STAT" ? "기본 능력치 훈련" : "조건부 효과 훈련"}
                     </p>
                   </div>
                   <div className="min-w-40">
@@ -323,7 +323,7 @@ function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number
         </p>
       ) : null}
       <p className="mt-3 text-[11px] leading-5 text-muted-foreground">
-        조건부 효과는 source template의 의미를 그대로 보존하며, 화면에서 조건/대상 AST를 새로 해석하지 않아.
+        조건부 효과 문구는 검증된 원문 조건과 레벨별 수치를 그대로 반영해.
       </p>
     </div>
   );
