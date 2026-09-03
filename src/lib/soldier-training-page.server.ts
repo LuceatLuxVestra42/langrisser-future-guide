@@ -464,7 +464,7 @@ export function readSoldierTrainingPageData(): SoldierTrainingPageData {
       itemId: item.itemId,
       nameCn: item.name,
       nameKr: display.displayNameKr,
-      imageUrl: `/images/soldier-training-materials/${item.itemId}.png`,
+      imageUrl: `../../images/soldier-training-materials/${item.itemId}.png`,
     };
   });
 
