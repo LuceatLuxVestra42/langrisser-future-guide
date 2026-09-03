@@ -195,8 +195,8 @@ jobs:
 
       - name: Install Chromium QA runtime
         run: |
-          npm install --no-save --package-lock=false playwright@1.55.0
-          npx playwright install --with-deps chromium
+          bun add --no-save playwright@1.55.0
+          bunx playwright install --with-deps chromium
 
       - name: Verify actual hosted composed surface
         env:
