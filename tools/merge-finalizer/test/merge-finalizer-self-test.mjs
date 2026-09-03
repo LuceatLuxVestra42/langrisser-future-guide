@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
   classifyExecutionBoundary,
   classifyMergeFinalization,
+  classifyMergeGateChecks,
   findExactProjectCheckForWorkflowRun,
   getValidationSha,
   PROJECT_CHECK_WORKFLOW,
@@ -41,6 +43,23 @@ const successCheck = {
   started_at: '2026-09-03T01:00:00Z',
   completed_at: '2026-09-03T01:01:00Z',
   details_url: `https://github.com/${REPOSITORY}/actions/runs/${RUN_ID}/job/67890`,
+};
+const hostedGate = {
+  id: 'hosted-preview',
+  validationRef: 'PR_HEAD',
+  requiredCheck: { name: 'publish-pr-preview', appId: 15368 },
+  failurePolicy: 'BLOCK_MERGE',
+};
+const hostedSuccessCheck = {
+  id: 200,
+  name: hostedGate.requiredCheck.name,
+  app: { id: hostedGate.requiredCheck.appId },
+  head_sha: HEAD,
+  status: 'completed',
+  conclusion: 'success',
+  started_at: '2026-09-03T02:00:00Z',
+  completed_at: '2026-09-03T02:01:00Z',
+  details_url: `https://github.com/${REPOSITORY}/actions/runs/222/job/333`,
 };
 const classify = overrides => classifyMergeFinalization({
   mainSha: MAIN,
@@ -90,9 +109,49 @@ assert.equal(classify({ pr: { merge_commit_sha: null }, checkRuns: [], validatio
 assert.equal(findExactProjectCheckForWorkflowRun([successCheck], MERGE, RUN_ID)?.id, successCheck.id);
 assert.equal(findExactProjectCheckForWorkflowRun([{ ...successCheck, details_url: 'https://example.invalid/other' }], MERGE, RUN_ID), null);
 
-const cliText = fs.readFileSync(path.resolve('tools/merge-finalizer/cli/finalize.mjs'), 'utf8');
+assert.equal(classifyMergeGateChecks({ headSha: HEAD, mergeGates: [], checkRuns: [] }).status, 'PASS');
+assert.equal(classifyMergeGateChecks({ headSha: HEAD, mergeGates: [hostedGate], checkRuns: [hostedSuccessCheck] }).status, 'PASS');
+assert.equal(classifyMergeGateChecks({ headSha: HEAD, mergeGates: [hostedGate], checkRuns: [] }).status, 'MERGE_GATE_REQUIRED');
+assert.equal(classifyMergeGateChecks({
+  headSha: HEAD,
+  mergeGates: [hostedGate],
+  checkRuns: [{ ...hostedSuccessCheck, status: 'in_progress', conclusion: null }],
+}).status, 'MERGE_GATE_PENDING');
+assert.equal(classifyMergeGateChecks({
+  headSha: HEAD,
+  mergeGates: [hostedGate],
+  checkRuns: [{ ...hostedSuccessCheck, conclusion: 'failure' }],
+}).status, 'BLOCKER_MERGE_GATE');
+assert.equal(classifyMergeGateChecks({
+  headSha: HEAD,
+  mergeGates: [hostedGate],
+  checkRuns: [{ ...hostedSuccessCheck, conclusion: 'skipped' }],
+}).status, 'BLOCKER_MERGE_GATE');
+assert.equal(classifyMergeGateChecks({
+  headSha: HEAD,
+  mergeGates: [hostedGate],
+  checkRuns: [{ ...hostedSuccessCheck, app: { id: 999 } }],
+}).status, 'MERGE_GATE_REQUIRED');
+assert.equal(classifyMergeGateChecks({
+  headSha: HEAD,
+  mergeGates: [hostedGate],
+  checkRuns: [{ ...hostedSuccessCheck, head_sha: HEAD2 }],
+}).status, 'MERGE_GATE_REQUIRED');
+assert.equal(classifyMergeGateChecks({
+  headSha: HEAD,
+  mergeGates: [hostedGate],
+  checkRuns: [
+    hostedSuccessCheck,
+    { ...hostedSuccessCheck, id: 201, conclusion: 'failure', started_at: '2026-09-03T03:00:00Z', completed_at: '2026-09-03T03:01:00Z' },
+  ],
+}).status, 'BLOCKER_MERGE_GATE');
+
+const cliPath = path.resolve('tools/merge-finalizer/cli/finalize.mjs');
+const cliText = fs.readFileSync(cliPath, 'utf8');
 const workflowText = fs.readFileSync(path.resolve('.github/workflows/merge-finalize-main.yml'), 'utf8');
 const projectCheckText = fs.readFileSync(path.resolve('.github/workflows/project-tooling-r3-project-check.yml'), 'utf8');
+const cliSyntax = spawnSync(process.execPath, ['--check', cliPath], { encoding: 'utf8', shell: false });
+assert.equal(cliSyntax.status, 0, `Finalizer CLI syntax check failed: ${String(cliSyntax.stderr ?? '').trim()}`);
 
 for (const required of [
   "`/git/ref/pull/${prNumber}/merge`",
@@ -107,10 +166,21 @@ for (const required of [
   'validationRefName',
   'shouldRestartFinalization',
   'findExactProjectCheckForWorkflowRun',
+  'loadProjectCheckContracts',
+  'routeProjectCheckPaths',
+  'classifyMergeGateChecks',
+  'boundary.pr?.changed_files',
+  'comparison?.files',
+  '`/commits/${boundary.headSha}/check-runs?per_page=100`',
+  'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE',
+  'MERGE_GATE_REQUIRED',
+  'MERGE_GATE_PENDING',
+  'waitForMergeGates',
 ]) {
-  assert.equal(cliText.includes(required), true, `Stage 4 CLI missing merge-result guard/mutation primitive: ${required}`);
+  assert.equal(cliText.includes(required), true, `Finalizer CLI missing merge-result/merge-gate guard: ${required}`);
 }
-assert.equal(cliText.includes("method: 'PATCH'"), false, 'Stage 4 CLI contains forbidden PATCH mutation primitive');
+assert.equal(cliText.includes("method: 'PATCH'"), false, 'Finalizer CLI contains forbidden PATCH mutation primitive');
+assert.equal(cliText.includes("'src/routes/"), false, 'Finalizer CLI must not duplicate frontend path inference');
 assert.equal(cliText.includes('--execute'), true);
 assert.equal(cliText.includes('return_run_details: true'), true);
 assert.equal(cliText.includes('async function waitForPostMergeVerification'), true);
@@ -138,16 +208,17 @@ assert.equal(workflowText.includes('cancel-in-progress: true'), false);
 assert.equal(workflowText.includes('contents: write'), true);
 assert.equal(workflowText.includes('pull-requests: write'), true);
 assert.equal(workflowText.includes('actions: write'), true);
+assert.equal(workflowText.includes('checks: read'), true);
 assert.equal(workflowText.includes('actions/create-github-app-token@v2'), true);
 assert.equal(workflowText.includes('secrets.MERGEFINALIZER_APP_ID'), true);
 assert.equal(workflowText.includes('secrets.MERGEFINALIZER_APP_KEY'), true);
 assert.equal(workflowText.includes('permission-contents: write'), true);
 assert.equal(workflowText.includes('permission-actions: read'), true);
+assert.equal(workflowText.includes('permission-checks: read'), true);
 assert.equal(workflowText.includes('MERGE_FINALIZER_APP_PREFLIGHT_STATUS'), true);
 assert.equal(workflowText.includes('GH_TOKEN="$APP_TOKEN" gh api --method PUT'), true);
-assert.equal(workflowText.includes('CHECK_REQUIRED|CHECK_PENDING|CHECK_NOT_SUCCESSFUL)'), true);
+assert.equal(workflowText.includes('CHECK_REQUIRED|CHECK_PENDING|CHECK_NOT_SUCCESSFUL|MERGE_GATE_REQUIRED|MERGE_GATE_PENDING)'), true);
 assert.equal(workflowText.includes('MERGE_FINALIZER_APP_PREFLIGHT=HANDOFF_TO_EXECUTE'), true);
-assert.equal(workflowText.includes('WAIT_MERGEABILITY|CHECK_REQUIRED|CHECK_PENDING)'), false);
 assert.equal(workflowText.includes('GITHUB_TOKEN: ${{ github.token }}'), true);
 assert.equal(projectCheckText.includes('workflow_dispatch:'), true);
 assert.equal(projectCheckText.includes('base_sha:'), true);
@@ -157,13 +228,16 @@ assert.equal(projectCheckText.includes('ACTUAL_HEAD'), true);
 
 console.log(JSON.stringify({
   status: 'PASS',
-  checkpoint: 'MERGE_FINALIZER_APP_REFRESH_SELF_TEST',
-  fixtures: 24,
-  staticGuards: 54,
+  checkpoint: 'MERGE_FINALIZER_HOSTED_GATE_SELF_TEST',
+  fixtures: 33,
+  staticGuards: 67,
   requiredCheck: REQUIRED_PROJECT_CHECK,
+  hostedGate: hostedGate.requiredCheck,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,
   validationLocator: 'refs/pull/<pr>/merge',
   validationTarget: 'PR_SYNTHETIC_MERGE_RESULT_SHA',
+  hostedValidationTarget: 'EXACT_PR_HEAD_SHA',
+  hostedGateSource: 'PROJECT_CHECK_OWNER_ROUTE_PROJECTION',
   validationRefLifetime: 'TEMPORARY_DISPATCH_REF_ONLY',
   staleRefreshActor: 'GITHUB_APP_INSTALLATION_TOKEN',
   appSecretNames: ['MERGEFINALIZER_APP_ID', 'MERGEFINALIZER_APP_KEY'],

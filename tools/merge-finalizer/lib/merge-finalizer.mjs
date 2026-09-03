@@ -106,6 +106,38 @@ export function findExactProjectCheckForWorkflowRun(
   )) ?? null;
 }
 
+export function classifyMergeGateChecks({ headSha, mergeGates = [], checkRuns = [] } = {}) {
+  assertSha(headSha, 'headSha');
+  const gateResults = [];
+  for (const gate of mergeGates) {
+    if (gate?.validationRef !== 'PR_HEAD' || typeof gate?.requiredCheck?.name !== 'string' || !Number.isInteger(gate?.requiredCheck?.appId)) {
+      return {
+        status: 'BLOCKER_MERGE_GATE_CONTRACT',
+        gateId: gate?.id ?? null,
+        gateResults,
+      };
+    }
+    const check = newestExactCheck(checkRuns, headSha, gate.requiredCheck);
+    if (!check) {
+      return {
+        status: 'MERGE_GATE_REQUIRED',
+        gateId: gate.id,
+        requiredCheck: gate.requiredCheck,
+        gateResults,
+      };
+    }
+    const summary = { gateId: gate.id, requiredCheck: gate.requiredCheck, check: summarizeCheck(check) };
+    gateResults.push(summary);
+    if (check.status !== 'completed') {
+      return { status: 'MERGE_GATE_PENDING', ...summary, gateResults };
+    }
+    if (check.conclusion !== 'success') {
+      return { status: 'BLOCKER_MERGE_GATE', ...summary, gateResults };
+    }
+  }
+  return { status: 'PASS', gateResults };
+}
+
 export function classifyMergeFinalization(snapshot, options = {}) {
   const requiredCheck = options.requiredCheck ?? REQUIRED_PROJECT_CHECK;
   const { mainSha, pr, comparison, checkRuns = [], validationSha: suppliedValidationSha = null } = snapshot ?? {};

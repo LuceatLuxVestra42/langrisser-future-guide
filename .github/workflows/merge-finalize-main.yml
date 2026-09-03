@@ -126,7 +126,7 @@ jobs:
               WAIT_MERGEABILITY)
                 sleep 5
                 ;;
-              CHECK_REQUIRED|CHECK_PENDING|CHECK_NOT_SUCCESSFUL)
+              CHECK_REQUIRED|CHECK_PENDING|CHECK_NOT_SUCCESSFUL|MERGE_GATE_REQUIRED|MERGE_GATE_PENDING)
                 printf 'MERGE_FINALIZER_APP_PREFLIGHT=HANDOFF_TO_EXECUTE\nAPP_REFRESH_COUNT=%s\n' "$updates"
                 exit 0
                 ;;

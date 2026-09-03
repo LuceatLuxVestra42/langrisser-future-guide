@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 import {
+  loadProjectCheckContracts,
+  routeProjectCheckPaths,
+} from '../../project-check/lib/project-check.mjs';
+import {
   assertSha,
   classifyExecutionBoundary,
   classifyMergeFinalization,
+  classifyMergeGateChecks,
   findExactProjectCheckForWorkflowRun,
   PROJECT_CHECK_WORKFLOW,
   REQUIRED_PROJECT_CHECK,
@@ -118,10 +123,72 @@ async function readBoundary(repository, prNumber, token) {
   return { mainSha, headSha, validationSha, pr, support };
 }
 
+function projectMergeGates(boundary, comparison) {
+  const behindBy = Number(comparison?.behind_by ?? 0);
+  if (behindBy > 0) {
+    return {
+      status: 'DEFERRED_UPDATE_REQUIRED',
+      changedFileCount: null,
+      owners: [],
+      mergeGates: [],
+      manualReviews: [],
+    };
+  }
+
+  const expectedChangedFileCount = Number(boundary.pr?.changed_files);
+  const files = Array.isArray(comparison?.files) ? comparison.files : [];
+  if (!Number.isInteger(expectedChangedFileCount) || expectedChangedFileCount < 0 || files.length !== expectedChangedFileCount) {
+    return {
+      status: 'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE',
+      expectedChangedFileCount: Number.isInteger(expectedChangedFileCount) ? expectedChangedFileCount : null,
+      actualChangedFileCount: files.length,
+      mergeGates: [],
+    };
+  }
+
+  const paths = files.map(file => file?.filename).filter(item => typeof item === 'string' && item.length > 0);
+  if (paths.length !== files.length) {
+    return {
+      status: 'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE',
+      expectedChangedFileCount,
+      actualChangedFileCount: paths.length,
+      mergeGates: [],
+    };
+  }
+
+  const contracts = loadProjectCheckContracts();
+  const route = routeProjectCheckPaths(paths, contracts);
+  return {
+    status: route.status,
+    changedFileCount: route.changedFileCount,
+    owners: route.owners,
+    mergeGates: route.mergeGates,
+    manualReviews: route.manualReviews,
+    boundaries: route.boundaries,
+  };
+}
+
+function effectiveStatus(result, mergeGateProjection, mergeGateResult) {
+  if (mergeGateProjection.status === 'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE') return mergeGateProjection.status;
+  if (mergeGateResult.status === 'BLOCKER_MERGE_GATE_CONTRACT' || mergeGateResult.status === 'BLOCKER_MERGE_GATE') {
+    return mergeGateResult.status;
+  }
+  if (result.status !== 'READY_TO_MERGE') return result.status;
+  return mergeGateResult.status === 'PASS' ? 'READY_TO_MERGE' : mergeGateResult.status;
+}
+
 async function readSnapshot(repository, prNumber, token) {
   const boundary = await readBoundary(repository, prNumber, token);
   if (boundary.support.status !== 'SUPPORTED') {
-    return { ...boundary, result: boundary.support, comparison: null, checkRuns: [] };
+    return {
+      ...boundary,
+      result: boundary.support,
+      comparison: null,
+      checkRuns: [],
+      mergeGateProjection: { status: 'NOT_APPLICABLE', mergeGates: [] },
+      mergeGateResult: { status: 'PASS', gateResults: [] },
+      status: boundary.support.status,
+    };
   }
   const [comparison, checks] = await Promise.all([
     githubRequest(repository, `/compare/${boundary.mainSha}...${boundary.headSha}`, token),
@@ -137,7 +204,27 @@ async function readSnapshot(repository, prNumber, token) {
     checkRuns,
     validationSha: boundary.validationSha,
   });
-  return { ...boundary, comparison, checkRuns, result };
+  const mergeGateProjection = projectMergeGates(boundary, comparison);
+  let mergeGateResult = { status: 'PASS', gateResults: [] };
+  if (mergeGateProjection.status === 'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE') {
+    mergeGateResult = mergeGateProjection;
+  } else if ((mergeGateProjection.mergeGates ?? []).length > 0) {
+    const headChecks = await githubRequest(repository, `/commits/${boundary.headSha}/check-runs?per_page=100`, token);
+    mergeGateResult = classifyMergeGateChecks({
+      headSha: boundary.headSha,
+      mergeGates: mergeGateProjection.mergeGates,
+      checkRuns: headChecks?.check_runs ?? [],
+    });
+  }
+  return {
+    ...boundary,
+    comparison,
+    checkRuns,
+    result,
+    mergeGateProjection,
+    mergeGateResult,
+    status: effectiveStatus(result, mergeGateProjection, mergeGateResult),
+  };
 }
 
 async function waitForUpdatedHead(repository, prNumber, token, beforeHeadSha, options) {
@@ -161,6 +248,29 @@ async function waitForMergeability(repository, prNumber, token, options) {
     }
   }
   return null;
+}
+
+async function waitForMergeGates(repository, snapshot, token, options) {
+  const deadline = Date.now() + options.timeoutMs;
+  while (Date.now() < deadline) {
+    await sleep(options.pollMs);
+    const current = await readSnapshot(repository, snapshot.pr.number, token);
+    if (current.support.status !== 'SUPPORTED') return { status: current.support.status, snapshot: current };
+    const restart = shouldRestartFinalization(
+      { mainSha: snapshot.mainSha, headSha: snapshot.headSha, validationSha: snapshot.validationSha },
+      { mainSha: current.mainSha, headSha: current.headSha, validationSha: current.validationSha },
+    );
+    if (restart.restart) return { status: 'RESTART', reason: restart.reason, snapshot: current };
+    if (current.result.status !== 'READY_TO_MERGE') return { status: current.result.status, snapshot: current };
+    if (current.mergeGateResult.status === 'PASS') return { status: 'PASS', snapshot: current };
+    if (current.mergeGateResult.status === 'MERGE_GATE_REQUIRED' || current.mergeGateResult.status === 'MERGE_GATE_PENDING') continue;
+    return { status: current.mergeGateResult.status, snapshot: current };
+  }
+  return {
+    status: 'BLOCKER_MERGE_GATE_TIMEOUT',
+    expectedHeadSha: snapshot.headSha,
+    mergeGates: snapshot.mergeGateProjection.mergeGates,
+  };
 }
 
 async function waitForPostMergeVerification(repository, prNumber, mergeSha, expectedHeadSha, token, options) {
@@ -314,9 +424,17 @@ async function executeFinalization(args, token) {
     const snapshot = await readSnapshot(args.repository, args.pr, token);
     if (snapshot.support.status !== 'SUPPORTED') return blocker(snapshot.support.status, snapshot.support);
 
-    const status = snapshot.result.status;
-    if (status === 'BLOCKER_PR_NOT_OPEN' || status === 'BLOCKER_DRAFT' || status === 'BLOCKER_CONFLICT' || status === 'BLOCKER_OWNING_VALIDATOR') {
-      return blocker(status, { snapshot: snapshot.result });
+    const status = snapshot.status;
+    if (
+      status === 'BLOCKER_PR_NOT_OPEN'
+      || status === 'BLOCKER_DRAFT'
+      || status === 'BLOCKER_CONFLICT'
+      || status === 'BLOCKER_OWNING_VALIDATOR'
+      || status === 'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE'
+      || status === 'BLOCKER_MERGE_GATE_CONTRACT'
+      || status === 'BLOCKER_MERGE_GATE'
+    ) {
+      return blocker(status, { snapshot: snapshot.result, mergeGate: snapshot.mergeGateResult, projection: snapshot.mergeGateProjection });
     }
 
     if (status === 'WAIT_MERGEABILITY') {
@@ -385,7 +503,22 @@ async function executeFinalization(args, token) {
       continue;
     }
 
-    if (status !== 'READY_TO_MERGE') return blocker(status, { snapshot: snapshot.result });
+    if (status === 'MERGE_GATE_REQUIRED' || status === 'MERGE_GATE_PENDING') {
+      const gate = await waitForMergeGates(args.repository, snapshot, token, args);
+      if (gate.status === 'RESTART') {
+        restarts += 1;
+        if (restarts > args.maxRestarts) return blocker('BLOCKER_RESTART_EXHAUSTED', { reason: gate.reason, restarts });
+        continue;
+      }
+      if (gate.status !== 'PASS') return blocker(gate.status, gate);
+      continue;
+    }
+
+    if (status !== 'READY_TO_MERGE') return blocker(status, {
+      snapshot: snapshot.result,
+      mergeGate: snapshot.mergeGateResult,
+      projection: snapshot.mergeGateProjection,
+    });
 
     const guard = await readSnapshot(args.repository, args.pr, token);
     const restart = shouldRestartFinalization(
@@ -397,13 +530,23 @@ async function executeFinalization(args, token) {
       if (restarts > args.maxRestarts) return blocker('BLOCKER_RESTART_EXHAUSTED', { reason: restart.reason, restarts });
       continue;
     }
-    if (guard.result.status !== 'READY_TO_MERGE') {
-      if (guard.result.status === 'UPDATE_REQUIRED' || guard.result.status === 'CHECK_REQUIRED' || guard.result.status === 'CHECK_PENDING') {
+    if (guard.status !== 'READY_TO_MERGE') {
+      if (
+        guard.status === 'UPDATE_REQUIRED'
+        || guard.status === 'CHECK_REQUIRED'
+        || guard.status === 'CHECK_PENDING'
+        || guard.status === 'MERGE_GATE_REQUIRED'
+        || guard.status === 'MERGE_GATE_PENDING'
+      ) {
         restarts += 1;
-        if (restarts > args.maxRestarts) return blocker('BLOCKER_RESTART_EXHAUSTED', { reason: guard.result.status, restarts });
+        if (restarts > args.maxRestarts) return blocker('BLOCKER_RESTART_EXHAUSTED', { reason: guard.status, restarts });
         continue;
       }
-      return blocker(guard.result.status, { snapshot: guard.result });
+      return blocker(guard.status, {
+        snapshot: guard.result,
+        mergeGate: guard.mergeGateResult,
+        projection: guard.mergeGateProjection,
+      });
     }
 
     let merge;
@@ -461,6 +604,8 @@ async function executeFinalization(args, token) {
       dispatches,
       restarts,
       requiredCheck: REQUIRED_PROJECT_CHECK,
+      mergeGates: guard.mergeGateProjection.mergeGates,
+      mergeGateResult: guard.mergeGateResult,
     });
     if (postMergeBaseRace) process.exitCode = 3;
     return null;
@@ -478,6 +623,9 @@ async function main() {
       repository: args.repository,
       support: snapshot.support,
       ...snapshot.result,
+      status: snapshot.status,
+      mergeGateProjection: snapshot.mergeGateProjection,
+      mergeGateResult: snapshot.mergeGateResult,
     });
     return;
   }
