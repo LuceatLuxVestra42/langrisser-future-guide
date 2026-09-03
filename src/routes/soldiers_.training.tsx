@@ -51,7 +51,7 @@ function SoldierTrainingPage() {
     return data.techs.filter((tech) => {
       if (kindFilter !== "ALL" && tech.kind !== kindFilter) return false;
       if (!needle) return true;
-      return [tech.nameCn, String(tech.techId), tech.armyIds.join(" ")]
+      return [tech.nameKr, tech.nameCn, String(tech.techId), tech.armyIds.join(" ")]
         .join(" ")
         .toLowerCase()
         .includes(needle);
@@ -121,7 +121,7 @@ function SoldierTrainingPage() {
                   </div>
                   <div className="border-t border-border px-2 py-2">
                     <p className="line-clamp-2 text-[11px] font-semibold leading-4 text-foreground">
-                      {material.nameCn}
+                      {material.nameKr}
                     </p>
                     <p className="mt-0.5 text-[10px] text-muted-foreground">#{material.itemId}</p>
                   </div>
@@ -153,7 +153,7 @@ function SoldierTrainingPage() {
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="중문 이름 / Tech ID / Army ID 검색"
+                placeholder="한국어 이름 / 중문 이름 / Tech ID / Army ID 검색"
                 className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/50 focus:ring-2 focus:ring-ring"
               />
             </label>
@@ -191,7 +191,14 @@ function SoldierTrainingPage() {
                   }`}
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <span className="truncate text-sm font-bold">{tech.nameCn}</span>
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="truncate text-sm font-bold">{tech.nameKr}</span>
+                      {tech.nameStatus === "provisional-display" ? (
+                        <span className="shrink-0 rounded border border-current/25 px-1 py-0.5 text-[9px] font-bold opacity-70">
+                          임시 표기
+                        </span>
+                      ) : null}
+                    </div>
                     <span className="shrink-0 text-[10px] opacity-70">#{tech.techId}</span>
                   </div>
                   <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
@@ -211,7 +218,12 @@ function SoldierTrainingPage() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-black text-foreground">{selectedTech.nameCn}</h3>
+                      <h3 className="text-lg font-black text-foreground">{selectedTech.nameKr}</h3>
+                      {selectedTech.nameStatus === "provisional-display" ? (
+                        <span className="rounded border border-border px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">
+                          임시 표기
+                        </span>
+                      ) : null}
                       <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">
                         Tech #{selectedTech.techId}
                       </span>
@@ -255,7 +267,7 @@ function SoldierTrainingPage() {
                       >
                         <span className="font-black text-foreground">Lv.{row.level}</span>
                         <span className="leading-5 text-muted-foreground">
-                          {row.statEffects ? formatStatEffects(row.statEffects) : stripColorTags(row.passiveDescription ?? "-")}
+                          {row.statEffects ? formatStatEffects(row.statEffects) : stripColorTags(row.passiveDescriptionKr ?? "-")}
                         </span>
                       </button>
                     ))}
@@ -304,10 +316,10 @@ function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number
 
   return (
     <div className="mt-2">
-      <p className="text-sm leading-6 text-foreground">{stripColorTags(current.passiveDescription ?? "-")}</p>
-      {previous?.passiveDescription ? (
+      <p className="text-sm leading-6 text-foreground">{stripColorTags(current.passiveDescriptionKr ?? "-")}</p>
+      {previous?.passiveDescriptionKr ? (
         <p className="mt-3 border-t border-border pt-3 text-xs leading-5 text-muted-foreground">
-          이전 레벨: {stripColorTags(previous.passiveDescription)}
+          이전 레벨: {stripColorTags(previous.passiveDescriptionKr)}
         </p>
       ) : null}
       <p className="mt-3 text-[11px] leading-5 text-muted-foreground">
