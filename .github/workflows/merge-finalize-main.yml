@@ -1,16 +1,17 @@
-name: Merge Finalize Main Dry Run
+name: Merge Finalize Main
 
 on:
   workflow_dispatch:
     inputs:
       pr:
-        description: Pull request number to classify
+        description: Pull request number to finalize onto main
         required: true
         type: string
 
 permissions:
-  contents: read
-  pull-requests: read
+  contents: write
+  pull-requests: write
+  actions: write
   checks: read
 
 concurrency:
@@ -18,11 +19,16 @@ concurrency:
   queue: max
 
 jobs:
-  classify:
+  finalize:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - name: Checkout
+      - name: Checkout authoritative main
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Setup Node 22
         uses: actions/setup-node@v4
@@ -32,7 +38,14 @@ jobs:
       - name: Run merge finalizer self-test
         run: node tools/merge-finalizer/test/merge-finalizer-self-test.mjs
 
-      - name: Classify pull request without mutation
+      - name: Finalize pull request with fail-closed guards
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: node tools/merge-finalizer/cli/finalize.mjs --repository "$GITHUB_REPOSITORY" --pr "${{ inputs.pr }}"
+        run: >-
+          node tools/merge-finalizer/cli/finalize.mjs
+          --repository "$GITHUB_REPOSITORY"
+          --pr "${{ inputs.pr }}"
+          --execute
+          --max-restarts 3
+          --timeout-ms 900000
+          --poll-ms 5000
