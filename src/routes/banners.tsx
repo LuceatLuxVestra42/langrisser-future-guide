@@ -410,12 +410,6 @@ function BannerPage() {
             ))}
           </div>
         </section>
-
-        <footer className="mt-10 border-t border-border pt-6 text-xs leading-5 text-muted-foreground">
-          <p>
-            한국시간 오늘 이후의 canonical KR schedule dataset과 별도 확인된 이벤트 배너 일정을 함께 표시해. 최초 출시 여부, 고정 복각 주기, 미래 복각일은 이 페이지에서 추론하지 않아.
-          </p>
-        </footer>
       </div>
     </main>
   );
