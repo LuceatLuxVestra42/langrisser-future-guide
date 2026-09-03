@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "schemaId": "project-check-merge-gate-map/v1",
+  "stage": "R3",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Map explicit Project Check owners to merge-time gates without changed-path reinterpretation, owner propagation, change-class fan-out, or semantic recomputation.",
+  "gates": [
+    {
+      "id": "hosted-preview",
+      "validationRef": "PR_HEAD",
+      "requiredCheck": {
+        "name": "publish-pr-preview",
+        "appId": 15368
+      },
+      "failurePolicy": "BLOCK_MERGE"
+    }
+  ],
+  "ownerRequirements": [
+    {"ownerId": "route-hosted-qa", "gates": ["hosted-preview"]},
+    {"ownerId": "hero-frontend", "gates": ["hosted-preview"]},
+    {"ownerId": "soldier-frontend", "gates": ["hosted-preview"]},
+    {"ownerId": "equipment-frontend", "gates": ["hosted-preview"]},
+    {"ownerId": "banner-frontend", "gates": ["hosted-preview"]},
+    {"ownerId": "shared-frontend", "gates": ["hosted-preview"]},
+    {"ownerId": "shared-build", "gates": ["hosted-preview"]}
+  ],
+  "policy": {
+    "ownerPropagation": false,
+    "changeClassFanOut": false,
+    "pathInference": false,
+    "semanticRecomputation": false,
+    "unknownOwnerRequirement": "BLOCK_CONTRACT",
+    "unknownGateRequirement": "BLOCK_CONTRACT"
+  }
+}
