@@ -26,10 +26,11 @@ jobs:
       - name: Install Unity bundle reader
         run: python -m pip install --disable-pip-version-check UnityPy
 
-      - name: Probe official APK Drill bundle and verify frozen Resource coverage
+      - name: Probe every official APK Drill bundle against frozen Resource locators
         run: |
           python - <<'PY'
           import binascii
+          import collections
           import hashlib
           import json
           import re
@@ -43,7 +44,7 @@ jobs:
           APK_URL = "https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/mz-client-formal-cn.apk"
           APK_REF = "https://mz.zlongame.com/main.shtml"
           UA = "Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 Chrome/140.0 Mobile Safari/537.36"
-          EXACT_ENTRY = "assets/ExportAssetBundle/begin_ui_icon_drill_abs.b"
+          SOURCE_ROOT = "UI/Icon/Drill_ABS/"
           CENSUS = Path("data/generated/soldier-training-tech-classification-stage1-census.v1.json")
           OUT = Path("drill-bundle-probe.json")
 
@@ -82,12 +83,10 @@ jobs:
               pos = tail.rfind(b"PK\x05\x06")
               if pos < 0:
                   raise RuntimeError("EOCD not found")
-
               eocd_off = tail_start + pos
               eocd = tail[pos : pos + 22]
               _, _, _, total_entries, cd_size32, cd_off32, _ = struct.unpack_from("<HHHHIIH", eocd, 4)
               cd_size, cd_off = cd_size32, cd_off32
-
               if total_entries == 0xFFFF or cd_size32 == 0xFFFFFFFF or cd_off32 == 0xFFFFFFFF:
                   locator, _ = get_range(eocd_off - 20, eocd_off - 1)
                   if locator[:4] != b"PK\x06\x07":
@@ -98,7 +97,6 @@ jobs:
                       raise RuntimeError("Zip64 EOCD missing")
                   cd_size = struct.unpack_from("<Q", zip64_eocd, 40)[0]
                   cd_off = struct.unpack_from("<Q", zip64_eocd, 48)[0]
-
               cd, _ = get_range(cd_off, cd_off + cd_size - 1)
               entries = {}
               i = 0
@@ -117,7 +115,6 @@ jobs:
                   except UnicodeDecodeError:
                       name = raw_name.decode("cp437")
                   extra = cd[i + 46 + fn : i + 46 + fn + ex]
-
                   if compressed == 0xFFFFFFFF or uncompressed == 0xFFFFFFFF or local_off == 0xFFFFFFFF:
                       p = 0
                       while p + 4 <= len(extra):
@@ -135,7 +132,6 @@ jobs:
                                   local_off = struct.unpack_from("<Q", payload, q)[0]
                               break
                           p += 4 + size
-
                   entries[name] = {
                       "method": method,
                       "crc32": crc,
@@ -172,96 +168,124 @@ jobs:
                       return raw[pos:], pos, signature.decode("ascii")
               raise RuntimeError(f"Unity bundle signature not found in first 256 bytes: {raw[:32].hex()}")
 
-          total, headers = get_total_size()
-          zip_index = parse_zip_index(total)
-          drill_entries = sorted(name for name in zip_index if "drill" in name.lower())
-          print("DRILL_ZIP_MATCHES=" + json.dumps(drill_entries, ensure_ascii=False))
-
-          exact_present = EXACT_ENTRY in zip_index
-          if not exact_present:
-              result = {
-                  "status": "BLOCKER_EXACT_DRILL_BUNDLE_ENTRY_NOT_FOUND",
-                  "officialApkUrl": APK_URL,
-                  "apkBytes": total,
-                  "apkLastModified": headers.get("Last-Modified"),
-                  "apkEtag": headers.get("ETag"),
-                  "drillZipMatches": drill_entries,
-                  "expectedExactEntry": EXACT_ENTRY,
-              }
-              OUT.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-              print(json.dumps(result, ensure_ascii=False, indent=2))
-              raise SystemExit(2)
-
-          meta = zip_index[EXACT_ENTRY]
-          raw_bundle = fetch_zip_entry(meta)
-          normalized, payload_offset, unity_signature = normalize_unity_bundle(raw_bundle)
-          env = UnityPy.load(normalized)
-          texture_names = []
-          for obj in env.objects:
-              if obj.type.name != "Texture2D":
-                  continue
-              data = obj.read()
-              name = getattr(data, "m_Name", None) or getattr(data, "name", None)
-              if name:
-                  texture_names.append(name)
-
-          duplicates = sorted({name for name in texture_names if texture_names.count(name) > 1})
-          texture_set = set(texture_names)
-
           census = json.loads(CENSUS.read_text())
-          resources = sorted({
+          resource_records = [
               record["raw"]["Resource"]
               for record in census["records"]
               if isinstance(record.get("raw"), dict)
               and isinstance(record["raw"].get("Resource"), str)
-              and record["raw"]["Resource"].startswith("UI/Icon/Drill_ABS/")
-          })
-          expected_names = sorted({Path(resource).stem for resource in resources})
-          missing_names = sorted(set(expected_names) - texture_set)
+              and record["raw"]["Resource"].startswith(SOURCE_ROOT)
+          ]
+          unique_resources = sorted(set(resource_records))
+          expected_names = sorted({Path(resource).stem for resource in unique_resources})
+          expected_set = set(expected_names)
 
+          total, headers = get_total_size()
+          zip_index = parse_zip_index(total)
+          drill_entries = sorted(
+              name for name in zip_index
+              if name.startswith("assets/ExportAssetBundle/") and "drill" in name.lower()
+          )
+          print("DRILL_ZIP_MATCHES=" + json.dumps(drill_entries, ensure_ascii=False))
+
+          bundle_results = []
+          union_texture_names = set()
+          for entry in drill_entries:
+              meta = zip_index[entry]
+              raw_bundle = fetch_zip_entry(meta)
+              normalized, payload_offset, unity_signature = normalize_unity_bundle(raw_bundle)
+              env = UnityPy.load(normalized)
+              object_types = collections.Counter(obj.type.name for obj in env.objects)
+              texture_names = []
+              sprite_names = []
+              for obj in env.objects:
+                  if obj.type.name not in {"Texture2D", "Sprite"}:
+                      continue
+                  try:
+                      data = obj.read()
+                  except Exception as exc:
+                      print(f"READ_WARNING {entry} {obj.type.name}: {exc}")
+                      continue
+                  name = getattr(data, "m_Name", None) or getattr(data, "name", None)
+                  if not name:
+                      continue
+                  if obj.type.name == "Texture2D":
+                      texture_names.append(name)
+                  else:
+                      sprite_names.append(name)
+              texture_set = set(texture_names)
+              union_texture_names.update(texture_set)
+              duplicates = sorted(name for name, count in collections.Counter(texture_names).items() if count > 1)
+              matched = sorted(expected_set & texture_set)
+              missing = sorted(expected_set - texture_set)
+              result = {
+                  "apkEntry": entry,
+                  "zipMethod": meta["method"],
+                  "zipCrc32": f"{meta['crc32']:08x}",
+                  "compressedBytes": meta["compressedSize"],
+                  "uncompressedBytes": meta["uncompressedSize"],
+                  "sourceBundleBytes": len(raw_bundle),
+                  "sourceBundleSha256": sha256(raw_bundle),
+                  "unityPayloadOffset": payload_offset,
+                  "unitySignature": unity_signature,
+                  "objectTypeCounts": dict(sorted(object_types.items())),
+                  "texture2DCount": len(texture_names),
+                  "spriteCount": len(sprite_names),
+                  "duplicateTexture2DNames": duplicates,
+                  "exactExpectedStemMatchedCount": len(matched),
+                  "exactExpectedStemMatched": matched,
+                  "missingExpectedStems": missing,
+                  "representativePresence": {
+                      name: name in texture_set
+                      for name in ["Drill_AtkADD", "Drill_DefADD", "Drill_HPMult", "Drill_DefMult", "Drill_Sward1", "Drill_AtkMult"]
+                  },
+                  "sampleTexture2DNames": sorted(texture_set)[:100],
+                  "sampleSpriteNames": sorted(set(sprite_names))[:100],
+              }
+              bundle_results.append(result)
+              print("DRILL_BUNDLE=" + json.dumps(result, ensure_ascii=False))
+
+          full_coverage_bundles = [
+              item["apkEntry"] for item in bundle_results
+              if item["exactExpectedStemMatchedCount"] == len(expected_names)
+              and not item["duplicateTexture2DNames"]
+          ]
+          union_missing = sorted(expected_set - union_texture_names)
+          status = (
+              "PASS_EXACT_DRILL_BUNDLE_MAPPING"
+              if len(resource_records) == 130
+              and len(unique_resources) == len(expected_names)
+              and len(expected_names) > 0
+              and len(full_coverage_bundles) == 1
+              and not union_missing
+              else "BLOCKER_DRILL_BUNDLE_MAPPING_AMBIGUOUS_OR_INCOMPLETE"
+          )
           result = {
-              "status": "PASS_EXACT_DRILL_BUNDLE_MAPPING" if len(resources) == 130 and not missing_names and not duplicates else "BLOCKER_DRILL_BUNDLE_COVERAGE_MISMATCH",
+              "status": status,
               "sourceAuthority": {
                   "officialPage": APK_REF,
                   "officialApkUrl": APK_URL,
                   "apkBytes": total,
                   "apkLastModified": headers.get("Last-Modified"),
                   "apkEtag": headers.get("ETag"),
-                  "method": "HTTP Range ZIP central directory -> exact APK entry -> UnityFS Texture2D exact stem coverage"
-              },
-              "mapping": {
-                  "sourceRoot": "UI/Icon/Drill_ABS/",
-                  "officialApkBundleEntry": EXACT_ENTRY,
-                  "zipEntryPresent": True,
-                  "drillZipMatches": drill_entries,
-              },
-              "bundleEvidence": {
-                  "zipMethod": meta["method"],
-                  "zipCrc32": f"{meta['crc32']:08x}",
-                  "compressedBytes": meta["compressedSize"],
-                  "sourceBundleBytes": len(raw_bundle),
-                  "sourceBundleSha256": sha256(raw_bundle),
-                  "unityPayloadOffset": payload_offset,
-                  "unitySignature": unity_signature,
-                  "texture2DCount": len(texture_names),
-                  "duplicateTexture2DNames": duplicates,
+                  "method": "HTTP Range ZIP central directory -> all Drill APK entries -> UnityFS exact Texture2D stem coverage against frozen Resource locators"
               },
               "frozenLocatorCoverage": {
-                  "resourceCount": len(resources),
+                  "resourceBearingRecordCount": len(resource_records),
+                  "uniqueResourcePathCount": len(unique_resources),
                   "uniqueTextureStemCount": len(expected_names),
-                  "exactTextureStemMatchedCount": len(expected_names) - len(missing_names),
-                  "missingTextureStems": missing_names,
               },
-              "representativePresence": {
-                  name: name in texture_set
-                  for name in ["Drill_AtkADD", "Drill_DefADD", "Drill_HPMult", "Drill_DefMult", "Drill_Sward1", "Drill_AtkMult"]
-              },
+              "drillZipMatches": drill_entries,
+              "bundleResults": bundle_results,
+              "fullCoverageBundles": full_coverage_bundles,
+              "unionExactTextureStemMatchedCount": len(expected_set & union_texture_names),
+              "unionMissingTextureStems": union_missing,
           }
           OUT.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
           print("DRILL_BUNDLE_PROBE_RESULT")
           print(json.dumps(result, ensure_ascii=False, indent=2))
 
-          if result["status"] != "PASS_EXACT_DRILL_BUNDLE_MAPPING":
+          if status != "PASS_EXACT_DRILL_BUNDLE_MAPPING":
               raise SystemExit(3)
           PY
 
