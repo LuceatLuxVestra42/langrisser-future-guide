@@ -4,7 +4,6 @@ import {
   classifyExecutionBoundary,
   classifyMergeFinalization,
   findExactProjectCheckForWorkflowRun,
-  getValidationSha,
   PROJECT_CHECK_WORKFLOW,
   REQUIRED_PROJECT_CHECK,
   shouldRestartFinalization,
@@ -90,6 +89,19 @@ function blocker(status, details = {}) {
   return null;
 }
 
+async function readPullMergeSha(repository, prNumber, token) {
+  try {
+    const ref = await githubRequest(repository, `/git/ref/pull/${prNumber}/merge`, token);
+    const sha = ref?.object?.sha ?? null;
+    if (sha === null) return null;
+    assertSha(sha, 'pullMergeRef.sha');
+    return sha;
+  } catch (error) {
+    if (error instanceof GitHubHttpError && error.status === 404) return null;
+    throw error;
+  }
+}
+
 async function readBoundary(repository, prNumber, token) {
   const [mainBranch, pr] = await Promise.all([
     githubRequest(repository, '/branches/main', token),
@@ -99,8 +111,10 @@ async function readBoundary(repository, prNumber, token) {
   const headSha = pr?.head?.sha;
   assertSha(mainSha, 'mainSha');
   assertSha(headSha, 'pr.head.sha');
-  const validationSha = getValidationSha(pr);
   const support = classifyExecutionBoundary({ repository, pr });
+  const validationSha = support.status === 'SUPPORTED'
+    ? await readPullMergeSha(repository, prNumber, token)
+    : null;
   return { mainSha, headSha, validationSha, pr, support };
 }
 
@@ -121,6 +135,7 @@ async function readSnapshot(repository, prNumber, token) {
     pr: boundary.pr,
     comparison,
     checkRuns,
+    validationSha: boundary.validationSha,
   });
   return { ...boundary, comparison, checkRuns, result };
 }
