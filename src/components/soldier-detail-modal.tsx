@@ -247,7 +247,7 @@ export function SoldierDetailModal({
             <>
               <HeroIdGrid heroIds={heroGroups.baseHeroIds} heroCardByHeroId={heroCardByHeroId} />
 
-              {record.isSp ? (
+              {record.isSp && detail.sp?.secondStageUnlock ? (
                 <div className="mt-5 border-t border-border pt-4">
                   <div className="flex items-end justify-between gap-3">
                     <p className="text-sm font-black tracking-tight text-foreground sm:text-base">
