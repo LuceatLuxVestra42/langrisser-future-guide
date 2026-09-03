@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "schemaId": "hero-dungeon-stageB0-scope-reset/v1",
+  "stage": "hero-dungeon-B0",
+  "status": "DESIGN_FROZEN",
+  "completion": "B0_SCOPE_RESET_COMPLETE",
+  "owner": "hero-canonical",
+  "purpose": "Reset the Hero Dungeon supplemental validation scope so canonical Hero population is reused from the frozen Hero consumer while only Heroes with an explicit non-empty DungeonLevels_ID[] participate in Hero Dungeon cardinality and ordinal validation.",
+  "authority": {
+    "primaryHeroLifecycleSource": "data/validation/hero-stage6-4-final.v1.json",
+    "primaryHeroLifecycleRequiredStatus": "PASS_WITH_REVIEW",
+    "primaryHeroLifecycleRequiredCompletion": "COMPLETE",
+    "primaryHeroPipelineRequiredStatus": "FINAL_FROZEN",
+    "canonicalHeroCount": 267,
+    "canonicalHeroPopulationConsumer": "data/generated/hero-detail/by-id",
+    "semanticSnapshotSourcePackContract": "data/contracts/configdata-source-pack-contract.v1.json",
+    "semanticSnapshotCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "semanticSnapshotLogicalRoot": "data/configdata",
+    "maintenanceSourceResolver": "scripts/configdata-source-pack-maintenance-root.cjs",
+    "rawTables": [
+      "ConfigDataHeroInformationInfo",
+      "ConfigDataHeroDungeonLevelInfo"
+    ]
+  },
+  "scope": {
+    "goal": "Validate HeroInformationInfo.DungeonLevels_ID[] -> HeroDungeonLevelInfo.ID -> HeroDungeonLevelInfo.NameNum for the frozen canonical Hero population without recomputing primary Hero identity, Fetter semantics, or Stage 5/6 outputs.",
+    "inScope": [
+      "Classify each frozen canonical Hero as NO_HERO_DUNGEON or HAS_HERO_DUNGEON from explicit DungeonLevels_ID presence/content.",
+      "Exact-ID JOIN every explicit DungeonLevels_ID value to HeroDungeonLevelInfo.ID.",
+      "Use HeroDungeonLevelInfo.NameNum as the sole gateOrdinal authority.",
+      "Validate per-Hero NameNum presence, positive-integer form, uniqueness, and explicit ordinal-set integrity.",
+      "Apply Hero Dungeon cardinality acceptance only to HAS_HERO_DUNGEON Heroes.",
+      "Record observed 5-gate and 7-gate populations and fail closed on any other non-empty population, including 6."
+    ],
+    "outOfScope": [
+      "Recompute or refilter the canonical 267-Hero population from ConfigDataHeroInfo.",
+      "Revalidate the Stage 5-1 five-Fetter invariant.",
+      "Recompute Stage 5-1 ConditionType 2 required-Hero relations.",
+      "Reopen or regenerate Hero Stage 5 or Stage 6 frozen outputs.",
+      "Infer gateOrdinal from DungeonLevels_ID array position, DungeonLevel ID arithmetic, PreLevel_ID, Fetter count, filename, name similarity, or UI order.",
+      "Create frontend, localization, asset, release, or presentation changes."
+    ]
+  },
+  "classification": {
+    "noHeroDungeon": {
+      "when": "DungeonLevels_ID is absent, null, or an empty array on the canonical Hero's HeroInformation record.",
+      "state": "NO_HERO_DUNGEON",
+      "cardinalityAcceptanceApplies": false,
+      "blocking": false
+    },
+    "hasHeroDungeon": {
+      "when": "DungeonLevels_ID is an explicit non-empty array on the canonical Hero's HeroInformation record.",
+      "state": "HAS_HERO_DUNGEON",
+      "cardinalityAcceptanceApplies": true
+    }
+  },
+  "ordinalAuthority": {
+    "join": "HeroInformationInfo.DungeonLevels_ID[] -> exact HeroDungeonLevelInfo.ID -> HeroDungeonLevelInfo.NameNum -> gateOrdinal",
+    "nameNumRequired": true,
+    "nameNumType": "POSITIVE_INTEGER_TEXT_OR_NUMBER",
+    "perHeroDuplicateNameNumAllowed": false,
+    "fallbackAllowed": false,
+    "forbiddenFallbacks": [
+      "HeroFetters_ID count",
+      "DungeonLevels_ID array position",
+      "DungeonLevel ID arithmetic",
+      "PreLevel_ID order",
+      "UI display order"
+    ]
+  },
+  "populationAcceptance": {
+    "appliesTo": "HAS_HERO_DUNGEON_ONLY",
+    "allowedDungeonLevelCounts": [5, 7],
+    "count6Allowed": false,
+    "otherNonEmptyCountAllowed": false,
+    "failureClass": "BLOCKER",
+    "note": "The validator must measure the snapshot before publishing counts; this contract does not predeclare the number of 5-gate or 7-gate Heroes."
+  },
+  "stages": [
+    {
+      "id": "B0",
+      "name": "authority-and-scope-freeze",
+      "completion": "Reuse frozen Hero 267 and pinned source-pack authority; freeze in-scope/non-scope and fail-closed rules.",
+      "status": "COMPLETE"
+    },
+    {
+      "id": "B1",
+      "name": "population-classification",
+      "completion": "Classify all 267 canonical Heroes into NO_HERO_DUNGEON or HAS_HERO_DUNGEON and publish observed non-empty cardinality distribution.",
+      "status": "PENDING"
+    },
+    {
+      "id": "B2",
+      "name": "exact-join-integrity",
+      "completion": "All explicit DungeonLevels_ID values resolve by exact ID with no dangling or duplicate source references.",
+      "status": "PENDING"
+    },
+    {
+      "id": "B3",
+      "name": "namenum-ordinal-integrity",
+      "completion": "Every joined stage has a valid NameNum; no per-Hero duplicate NameNum; no fallback inference is used; observed ordinal sets are explicit and valid.",
+      "status": "PENDING"
+    },
+    {
+      "id": "B4",
+      "name": "population-acceptance",
+      "completion": "Every HAS_HERO_DUNGEON Hero has exactly 5 or 7 joined stages; count 6 and every other non-empty count fail closed as BLOCKER.",
+      "status": "PENDING"
+    },
+    {
+      "id": "B5",
+      "name": "supplemental-final-freeze",
+      "completion": "Freeze the Hero Dungeon supplemental ordinal facet and summary without changing the primary Hero lifecycle or Stage 5/6 frozen consumers.",
+      "status": "PENDING"
+    }
+  ],
+  "requiredB1ToB5Summary": [
+    "canonicalHeroCount",
+    "noHeroDungeonCount",
+    "hasHeroDungeonCount",
+    "dungeonCount5HeroCount",
+    "dungeonCount7HeroCount",
+    "dungeonCount6HeroCount",
+    "otherNonEmptyDungeonCountHeroCount",
+    "totalDungeonLevelReferenceCount",
+    "danglingDungeonLevelReferenceCount",
+    "missingNameNumCount",
+    "duplicateNameNumHeroCount",
+    "invalidOrdinalSetHeroCount",
+    "hardErrorCount"
+  ],
+  "blockers": [
+    "Frozen canonical Hero consumer is not exactly 267 unique Hero IDs.",
+    "Pinned ConfigData source-pack identity or hydration fails closed.",
+    "A canonical Hero cannot be matched to its explicit HeroInformation record without an already-validated ID relation.",
+    "An explicit DungeonLevels_ID has no exact HeroDungeonLevelInfo.ID target.",
+    "A joined HeroDungeonLevelInfo has missing or invalid NameNum.",
+    "A Hero has duplicate NameNum values within its explicit DungeonLevels_ID set.",
+    "A HAS_HERO_DUNGEON Hero has 6 stages or any other non-empty cardinality outside 5 or 7.",
+    "Any implementation introduces array-order, ID-arithmetic, PreLevel-order, name-based, filename-based, or UI-order inference."
+  ],
+  "reviews": [],
+  "primaryHeroLifecycle": {
+    "reopened": false,
+    "stage5_1FetterSemanticChanged": false,
+    "stage6ConsumerChanged": false,
+    "canonicalHeroPopulationChanged": false
+  },
+  "handoff": {
+    "nextOwner": "hero-canonical",
+    "nextStage": "B1-population-classification",
+    "nextStart": "Implement a read-only supplemental validator that enumerates the frozen hero-detail/by-id consumer, resolves the pinned ConfigData source through the maintenance resolver, classifies DungeonLevels_ID presence, and only then reports the observed population distribution. Do not publish B1 counts before executing that validator."
+  }
+}
