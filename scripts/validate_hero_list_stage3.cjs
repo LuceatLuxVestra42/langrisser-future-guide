@@ -192,9 +192,16 @@ check(
   'faction-filter-ui',
   route.includes('진영 필터') &&
     route.includes('factionOptions.map') &&
+    route.includes('const [factionIds, setFactionIds] = useState<number[]>([])') &&
+    route.includes('toggleFaction') &&
+    route.includes('factionIds.every') &&
     route.includes('hero.factions.some') &&
-    route.includes('faction.factionId === factionId'),
-  'faction buttons use frozen factionId membership',
+    route.includes('faction.factionId === selectedFactionId') &&
+    route.includes('active={factionIds.includes(option.id)}') &&
+    route.includes('onClick={() => toggleFaction(option.id)}') &&
+    route.includes('active={factionIds.length === 0}') &&
+    route.includes('onClick={() => setFactionIds([])}'),
+  'faction buttons support independent multi-selection and require membership in every selected frozen factionId',
 );
 
 check(
@@ -240,7 +247,7 @@ check(
     route.includes('aria-live="polite"') &&
     route.includes('resetFilters') &&
     route.includes('setOpenFilterSections({ rarity: true, faction: false, origin: false })') &&
-    route.includes('setFactionId(null)') &&
+    route.includes('setFactionIds([])') &&
     route.includes('setOriginId(null)') &&
     route.includes('필터 초기화'),
   'result count and all-filter reset affordances exist',

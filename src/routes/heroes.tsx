@@ -108,7 +108,7 @@ function HeroGridPage() {
     origin: false,
   });
   const [rarity, setRarity] = useState(ALL_RARITIES);
-  const [factionId, setFactionId] = useState<number | null>(null);
+  const [factionIds, setFactionIds] = useState<number[]>([]);
   const [originId, setOriginId] = useState<number | null>(null);
   const [spOnly, setSpOnly] = useState(false);
 
@@ -206,7 +206,12 @@ function HeroGridPage() {
       .filter((hero) => {
         if (!matchesHeroSearch(hero, normalizedQuery)) return false;
         if (!matchesRarity(hero, rarity)) return false;
-        if (factionId !== null && !hero.factions.some((faction) => faction.factionId === factionId)) {
+        if (
+          factionIds.length > 0 &&
+          !factionIds.every((selectedFactionId) =>
+            hero.factions.some((faction) => faction.factionId === selectedFactionId),
+          )
+        ) {
           return false;
         }
         if (originId !== null && hero.origin.productionId !== originId) return false;
@@ -214,12 +219,12 @@ function HeroGridPage() {
         return true;
       })
       .reverse();
-  }, [data.records, query, rarity, factionId, originId, spOnly]);
+  }, [data.records, query, rarity, factionIds, originId, spOnly]);
 
   const hasActiveFilters =
     Boolean(query.trim()) ||
     rarity !== ALL_RARITIES ||
-    factionId !== null ||
+    factionIds.length > 0 ||
     originId !== null ||
     spOnly;
 
@@ -230,11 +235,19 @@ function HeroGridPage() {
     }));
   };
 
+  const toggleFaction = (factionId: number) => {
+    setFactionIds((current) =>
+      current.includes(factionId)
+        ? current.filter((selectedFactionId) => selectedFactionId !== factionId)
+        : [...current, factionId],
+    );
+  };
+
   const resetFilters = () => {
     setQuery("");
     setOpenFilterSections({ rarity: true, faction: false, origin: false });
     setRarity(ALL_RARITIES);
-    setFactionId(null);
+    setFactionIds([]);
     setOriginId(null);
     setSpOnly(false);
   };
@@ -321,14 +334,14 @@ function HeroGridPage() {
 
             {openFilterSections.faction ? (
               <div className="flex flex-wrap gap-1.5" role="group" aria-label="진영 필터">
-                <FilterButton active={factionId === null} onClick={() => setFactionId(null)}>
+                <FilterButton active={factionIds.length === 0} onClick={() => setFactionIds([])}>
                   전체
                 </FilterButton>
                 {factionOptions.map((option) => (
                   <FilterButton
                     key={option.id}
-                    active={factionId === option.id}
-                    onClick={() => setFactionId(option.id)}
+                    active={factionIds.includes(option.id)}
+                    onClick={() => toggleFaction(option.id)}
                   >
                     <span className="inline-flex items-center gap-1.5">
                       <img
