@@ -35,18 +35,36 @@ async function readFreshManifest() {
   );
 }
 
-async function waitForMaterialImage(image, itemIndex) {
+async function waitForMaterialImage(image) {
   await image.scrollIntoViewIfNeeded();
   await image.waitFor({ state: "visible", timeout: 10000 });
-  await image.page().waitForFunction(
-    ({ index }) => {
-      const images = [...document.querySelectorAll('img[src*="soldier-training-materials/"]')];
-      const target = images[index];
-      return Boolean(target && target.complete && target.naturalWidth > 0 && target.naturalHeight > 0);
-    },
-    { index: itemIndex },
-    { timeout: 10000 },
+  const loaded = await image.evaluate(
+    (target) =>
+      new Promise((resolve) => {
+        if (target.complete) {
+          resolve(target.naturalWidth > 0 && target.naturalHeight > 0);
+          return;
+        }
+        const timer = window.setTimeout(() => resolve(false), 10000);
+        target.addEventListener(
+          "load",
+          () => {
+            window.clearTimeout(timer);
+            resolve(target.naturalWidth > 0 && target.naturalHeight > 0);
+          },
+          { once: true },
+        );
+        target.addEventListener(
+          "error",
+          () => {
+            window.clearTimeout(timer);
+            resolve(false);
+          },
+          { once: true },
+        );
+      }),
   );
+  assert.equal(loaded, true, `Material image failed to load: ${await image.getAttribute("src")}`);
 }
 
 async function assertNoHorizontalOverflow(page, label) {
@@ -92,7 +110,7 @@ async function runDesktop(browser) {
   const materialImages = page.locator('img[src*="soldier-training-materials/"]');
   assert.equal(await materialImages.count(), 24, "Expected exactly 24 Soldier Training material images.");
   for (let index = 0; index < 24; index += 1) {
-    await waitForMaterialImage(materialImages.nth(index), index);
+    await waitForMaterialImage(materialImages.nth(index));
   }
 
   const trainingSection = page
@@ -133,7 +151,11 @@ async function runDesktop(browser) {
   assert.equal(await slider.count(), 1, "Expected one Training level slider.");
   const sliderMax = Number(await slider.getAttribute("max"));
   assert.ok(sliderMax >= 2, `Unexpected slider max: ${sliderMax}`);
-  await slider.fill("2");
+  await slider.evaluate((element) => {
+    element.value = "2";
+    element.dispatchEvent(new Event("input", { bubbles: true }));
+    element.dispatchEvent(new Event("change", { bubbles: true }));
+  });
   assert.ok((await trainingSection.innerText()).includes(`Lv.2 / ${sliderMax}`), "Slider did not select Lv.2.");
   assert.ok((await trainingSection.innerText()).includes("Lv.2 효과"), "Selected-level effect panel did not update to Lv.2.");
 
