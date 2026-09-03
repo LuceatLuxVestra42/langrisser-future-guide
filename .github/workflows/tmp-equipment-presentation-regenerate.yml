@@ -1,0 +1,36 @@
+name: TEMP Equipment Presentation Regenerate
+
+on:
+  push:
+    branches:
+      - fix/equipment-presentation-build-drift-20260903
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/equipment-presentation-build-drift-20260903
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Regenerate equipment Korean presentation artifacts
+        run: node scripts/build-equipment-name-kr-presentation.mjs
+      - name: Commit generated drift repair if needed
+        run: |
+          set -euo pipefail
+          git status --short
+          if git diff --quiet -- data/generated/equipment-name-kr-user-approved.v1.json data/validation/equipment-name-kr-user-approved-summary.v1.json; then
+            echo "No generated drift to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/equipment-name-kr-user-approved.v1.json data/validation/equipment-name-kr-user-approved-summary.v1.json
+          git commit -m "Regenerate equipment Korean presentation artifacts"
+          git push origin HEAD:fix/equipment-presentation-build-drift-20260903
