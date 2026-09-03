@@ -102,25 +102,16 @@ function PickupLogGrid({
 function LogSectionHeader({
   title,
   description,
-  recordCount,
-  totalEntries,
 }: {
   title: string;
   description: string;
-  recordCount: number;
-  totalEntries: number;
 }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          {title}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      </div>
-      <span className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground shadow-sm">
-        {recordCount}개 배너 · {totalEntries}회
-      </span>
+    <div className="mb-6">
+      <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+        {title}
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
     </div>
   );
 }
@@ -136,22 +127,12 @@ export function SinglePickupLogPage() {
     label: record.bannerNameKr,
     entries: record.entries,
   }));
-  const singleTotalEntries = SINGLE_PICKUP_LOG.reduce(
-    (sum, record) => sum + record.entries.length,
-    0,
-  );
-  const llrTotalEntries = LLR_PICKUP_LOG.reduce(
-    (sum, record) => sum + record.entries.length,
-    0,
-  );
 
   return (
     <section>
       <LogSectionHeader
         title="1인 log"
         description="한섭 1인 SSR 픽업 기록"
-        recordCount={SINGLE_PICKUP_LOG.length}
-        totalEntries={singleTotalEntries}
       />
       <PickupLogGrid records={singleRecords} badge="1인" />
 
@@ -159,8 +140,6 @@ export function SinglePickupLogPage() {
         <LogSectionHeader
           title="LLR log"
           description="한섭 LLR 한정 소환 기록"
-          recordCount={LLR_PICKUP_LOG.length}
-          totalEntries={llrTotalEntries}
         />
         <PickupLogGrid records={llrRecords} badge="LLR" />
       </div>
