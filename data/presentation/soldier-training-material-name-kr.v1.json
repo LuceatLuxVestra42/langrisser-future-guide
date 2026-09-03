@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-material-name-kr-presentation/v1",
+  "stage": "B - Soldier Training Material Localization",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "scope": "frontend-presentation-only; Korean display names for the 24 frozen Soldier Training Hall material item IDs",
+  "predecessor": {
+    "path": "data/presentation/soldier-training-localization-stage-a-source.v1.json",
+    "gitBlobSha": "91dd56aaf4a61738766def671625f0cc92aacfc3",
+    "status": "PASS",
+    "completion": "COMPLETE"
+  },
+  "identityAuthority": {
+    "path": "data/generated/soldier-training-material-iteminfo.v1.json",
+    "gitBlobSha": "9df7bbba18064e34f46cf2f4fd99d1904cbd3d63",
+    "status": "PASS",
+    "join": "exact itemId only"
+  },
+  "policy": {
+    "presentationOnly": true,
+    "identityMutation": false,
+    "semanticRecomputation": false,
+    "nameJoinCreatesIdentity": false,
+    "idArithmeticAllowed": false,
+    "screenOrderBindingAllowed": false,
+    "sourceOrderBindingAllowed": false,
+    "officialKoreanNameConfirmed": false,
+    "displayNameStatus": "project-display-confirmed",
+    "note": "These names are approved for this project's Korean presentation layer from the frozen itemId census plus Korean legacy/public cross-checks. They are not asserted to be direct official Korean client strings."
+  },
+  "sources": {
+    "legacyKoreanSheet": {
+      "repository": "redpanda7301/langrisser",
+      "branch": "gh-pages",
+      "commitSha": "a85bba49dcf073563e7366dc18e96b7ba67c2ae3",
+      "page": "classup.html",
+      "role": "legacy Korean localization cross-check"
+    },
+    "publicCrossChecks": [
+      {
+        "url": "https://k88-ko.github.io/event.html",
+        "role": "Korean textbook labels cross-check"
+      },
+      {
+        "url": "https://anotherkyo.github.io/langrisser/",
+        "role": "Korean training facility and Aniki material label cross-check"
+      },
+      {
+        "url": "https://lunavenia.tistory.com/518",
+        "role": "Aniki material spelling cross-check, including Brown 오일"
+      }
+    ]
+  },
+  "coverage": {
+    "targetItemCount": 24,
+    "recordCount": 24,
+    "uniqueItemIdCount": 24,
+    "localizedDisplayNameCount": 24,
+    "blankDisplayNameCount": 0,
+    "duplicateItemIdCount": 0,
+    "projectDisplayConfirmedCount": 24,
+    "officialKoreanNameConfirmedCount": 0,
+    "explicitNormalizationCount": 1
+  },
+  "records": [
+    {"itemId":6003,"nameCn":"高级步兵教材","displayNameKr":"고급 보병 교재","status":"project-display-confirmed"},
+    {"itemId":6006,"nameCn":"高级枪兵教材","displayNameKr":"고급 창병 교재","status":"project-display-confirmed"},
+    {"itemId":6009,"nameCn":"高级骑兵教材","displayNameKr":"고급 기병 교재","status":"project-display-confirmed"},
+    {"itemId":6012,"nameCn":"高级驯养教材","displayNameKr":"고급 비병 교재","status":"project-display-confirmed"},
+    {"itemId":6015,"nameCn":"高级生存教材","displayNameKr":"고급 궁병 교재","status":"project-display-confirmed"},
+    {"itemId":6018,"nameCn":"高级宗教教材","displayNameKr":"고급 승병 교재","status":"project-display-confirmed"},
+    {"itemId":6031,"nameCn":"杠铃","displayNameKr":"역기","status":"project-display-confirmed"},
+    {"itemId":6032,"nameCn":"沙袋","displayNameKr":"샌드백","status":"project-display-confirmed"},
+    {"itemId":6033,"nameCn":"扩胸器","displayNameKr":"체스트 익스팬더","status":"project-display-confirmed"},
+    {"itemId":6034,"nameCn":"健腹轮","displayNameKr":"AB슬라이더","status":"project-display-confirmed"},
+    {"itemId":6035,"nameCn":"瑜伽垫","displayNameKr":"요가 매트","status":"project-display-confirmed"},
+    {"itemId":6036,"nameCn":"平衡球","displayNameKr":"짐볼","status":"project-display-confirmed"},
+    {
+      "itemId":6037,
+      "nameCn":"Brown♂精油",
+      "displayNameKr":"Brown 오일",
+      "status":"project-display-confirmed",
+      "legacyNameKrRaw":"Brwon 오일",
+      "normalization": {
+        "type": "explicit-spelling-correction",
+        "from": "Brwon 오일",
+        "to": "Brown 오일",
+        "basis": "The frozen Chinese source spells the Latin token Brown, and an independent Korean public source also uses Brown 오일."
+      }
+    },
+    {"itemId":6038,"nameCn":"Dark♂锁链","displayNameKr":"Dark 체인","status":"project-display-confirmed"},
+    {"itemId":6039,"nameCn":"Devout♂手套","displayNameKr":"Devout 글러브","status":"project-display-confirmed"},
+    {"itemId":6040,"nameCn":"Pretty♂喷雾","displayNameKr":"Pretty 스프레이","status":"project-display-confirmed"},
+    {"itemId":6041,"nameCn":"Crazy♂短裤","displayNameKr":"Crazy 팬츠","status":"project-display-confirmed"},
+    {"itemId":6042,"nameCn":"Burning♂背带","displayNameKr":"Burning 서스펜더","status":"project-display-confirmed"},
+    {"itemId":6043,"nameCn":"特级步兵教材","displayNameKr":"특급 보병 교재","status":"project-display-confirmed"},
+    {"itemId":6044,"nameCn":"特级枪兵教材","displayNameKr":"특급 창병 교재","status":"project-display-confirmed"},
+    {"itemId":6045,"nameCn":"特级骑兵教材","displayNameKr":"특급 기병 교재","status":"project-display-confirmed"},
+    {"itemId":6046,"nameCn":"特级驯养教材","displayNameKr":"특급 비병 교재","status":"project-display-confirmed"},
+    {"itemId":6047,"nameCn":"特级生存教材","displayNameKr":"특급 궁병 교재","status":"project-display-confirmed"},
+    {"itemId":6048,"nameCn":"特级宗教教材","displayNameKr":"특급 승병 교재","status":"project-display-confirmed"}
+  ],
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "DIRECT_OFFICIAL_KR_CLIENT_STRING_UNVERIFIED",
+      "classification": "REVIEW",
+      "count": 24,
+      "note": "All 24 names are confirmed for project presentation, but no direct official Korean client-string authority is claimed. A later direct official source may replace displayNameKr without reopening item identity or material semantics."
+    }
+  ],
+  "nextOwner": "Soldier Training Tech name localization (C)",
+  "nextStartPoint": "Localize the frozen 130 visible TrainingTech names by exact techId. Reuse Stage A census and preserve official/provisional distinction; do not bind legacy Korean names by screen order.",
+  "reopenConditions": [
+    "Stage A predecessor blob identity changes.",
+    "Frozen Soldier training material itemInfo blob identity changes or the target itemId population is no longer exactly 24.",
+    "A direct official Korean source contradicts a project display name.",
+    "Localization or Project Check owning validator reports a hard failure."
+  ]
+}
