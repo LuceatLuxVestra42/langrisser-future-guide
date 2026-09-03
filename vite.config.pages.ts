@@ -18,7 +18,7 @@ const soldierIds = soldierListJson.records.map((record) => record.soldierId);
 const staticBase = process.env.STATIC_SITE_BASE ?? "/langrisser-future-guide/";
 
 if (!staticBase.startsWith("/") || !staticBase.endsWith("/") || staticBase.includes("//")) {
-  throw new Error(`STATIC_SITE_BASE must be an absolute directory-style path; got ${staticBase}`);
+  throw new Error(`STATIC_SITE_BASE must start and end with / and contain no //; got ${staticBase}`);
 }
 
 if (
