@@ -119,6 +119,7 @@ assert.equal(cliText.includes('mergedPr?.merged_at != null && mergeCommit?.sha =
 assert.equal(cliText.includes('mergedPr?.merge_commit_sha === mergeSha'), false);
 assert.equal(cliText.includes('parentShas.includes(expectedHeadSha)'), true);
 assert.equal(cliText.includes('guard.headSha,\n      token,'), true);
+assert.equal(cliText.includes('expectedHeadParentFound: verification?.parentShas?.includes(guard.headSha) ?? false'), true);
 assert.equal(cliText.includes("blocker('BLOCKER_POST_MERGE_VERIFICATION'"), true);
 assert.equal(workflowText.includes('workflow_dispatch:'), true);
 assert.equal(workflowText.includes('pull_request_target:'), true);
@@ -158,7 +159,7 @@ console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'MERGE_FINALIZER_APP_REFRESH_SELF_TEST',
   fixtures: 24,
-  staticGuards: 53,
+  staticGuards: 54,
   requiredCheck: REQUIRED_PROJECT_CHECK,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,
   validationLocator: 'refs/pull/<pr>/merge',
