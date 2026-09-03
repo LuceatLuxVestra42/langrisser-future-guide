@@ -42,7 +42,6 @@ jobs:
     name: publish-pr-preview
     if: >-
       github.event_name == 'pull_request' &&
-      github.event.pull_request.draft == false &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -129,6 +128,12 @@ jobs:
           done
           echo "BLOCKER_PREVIEW_DEPLOYMENT_NOT_FRESH url=${PREVIEW_BASE_URL} expected=${SOURCE_SHA}" >&2
           exit 1
+
+      - name: Strict Hosted QA against exact Data Pages preview
+        run: >-
+          node tools/route-hosted-qa/cli/check-preview.mjs
+          --pr "${{ github.event.pull_request.number }}"
+          --expected-sha "$SOURCE_SHA"
 
   route-hosted-qa:
     name: route-hosted-qa
