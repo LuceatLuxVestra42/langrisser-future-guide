@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "schemaId": "hero-dungeon-stageB5-supplemental-final-freeze/v1",
+  "stage": "hero-dungeon-B5",
+  "status": "PASS",
+  "completion": "B5_SUPPLEMENTAL_FINAL_FREEZE_COMPLETE",
+  "lifecycle": "FINAL_FROZEN",
+  "owner": "hero-canonical",
+  "purpose": "Freeze the reusable Hero Dungeon supplemental consumer after B1-B4 complete, without reopening raw ConfigData interpretation or the primary Hero lifecycle.",
+  "authority": {
+    "consumer": "data/generated/hero-dungeon-supplemental-final.v1.json",
+    "b1PopulationFreeze": "data/validation/hero-dungeon-stageB1-population-classification.v1.json",
+    "b2ExactJoinFreeze": "data/validation/hero-dungeon-stageB2-exact-join-integrity.v1.json",
+    "b3NameNumOrdinalFreeze": "data/validation/hero-dungeon-stageB3-namenum-ordinal-integrity.v1.json",
+    "b4PopulationAcceptanceFreeze": "data/validation/hero-dungeon-stageB4-population-acceptance.v1.json",
+    "sourcePackCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c"
+  },
+  "scope": {
+    "inScope": [
+      "Freeze the B1-B4 validated supplemental Hero Dungeon facet for downstream exact-ID reuse.",
+      "Validate consumer membership, explicit gate ordinals, reference counts, predecessor hashes, and accepted 5/7 populations from frozen repository artifacts only.",
+      "Keep NO_HERO_DUNGEON entries explicit and non-blocking."
+    ],
+    "outOfScope": [
+      "Read or reinterpret raw ConfigData.",
+      "Recompute canonical Hero identity, Fetter semantics, or Stage 5/6 outputs.",
+      "Add localization, frontend presentation, asset, release, or hosted behavior.",
+      "Infer gate order from array position, ID arithmetic, PreLevel_ID, names, filenames, or UI order."
+    ]
+  },
+  "integrity": {
+    "b2ExactJoinPairSetSha256": "646ab2764bacad9de861fbbb83dca6502d61c557b75f4c260cfaaf183a6462a6",
+    "normalizedOrdinalAssignmentSetSha256": "fe52c494fc0ef9f2771cd549650539a703af60dcaacaceab0e6293511850aece",
+    "normalizedHeroOrdinalSetSha256": "2c1404804493c8ff004e2fa61b478e72cfecc07135d61ceb9249f57b470576e0",
+    "acceptedHeroIdSetSha256": "5243cf02c61a8f7f6196bf9cd6de1843585b57fac7eadb5fc4a46ed103434759",
+    "acceptedCount5HeroIdSetSha256": "cde767196b7e3579b9767c64049168fdd47109bb18c8aaf3aefb3e9b1432219b",
+    "acceptedCount7HeroIdSetSha256": "7329ed518ff79ee11e95fccbafe9cef24142f7e8a22d12e6a3de9ab57dc93e06",
+    "consumerHeroFacetSha256": "31d26a9c30fae9a5bf9631b9410cc35699d94953f4dffe289ccd7e1fe3dbf830"
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "noHeroDungeonCount": 17,
+    "hasHeroDungeonCount": 250,
+    "dungeonCount5HeroCount": 238,
+    "dungeonCount7HeroCount": 12,
+    "dungeonCount6HeroCount": 0,
+    "otherNonEmptyDungeonCountHeroCount": 0,
+    "totalDungeonLevelReferenceCount": 1274,
+    "danglingDungeonLevelReferenceCount": 0,
+    "missingNameNumCount": 0,
+    "duplicateNameNumHeroCount": 0,
+    "invalidOrdinalSetHeroCount": 0,
+    "acceptedHeroCount": 250,
+    "rejectedHeroCount": 0,
+    "hardErrorCount": 0
+  },
+  "checks": [
+    {"name":"B1-B4 predecessor chain remains complete","pass":true,"actual":"PASS"},
+    {"name":"final consumer contains exactly 267 canonical Hero facets","pass":true,"actual":267},
+    {"name":"NO_HERO_DUNGEON membership preserved","pass":true,"actual":17},
+    {"name":"HAS_HERO_DUNGEON membership and 5/7 acceptance preserved","pass":true,"actual":250},
+    {"name":"B3 normalized ordinal assignment hash preserved","pass":true,"actual":"fe52c494fc0ef9f2771cd549650539a703af60dcaacaceab0e6293511850aece"},
+    {"name":"B3 normalized Hero ordinal-set hash preserved","pass":true,"actual":"2c1404804493c8ff004e2fa61b478e72cfecc07135d61ceb9249f57b470576e0"},
+    {"name":"B4 accepted Hero ID hashes preserved","pass":true,"actual":"5243cf02c61a8f7f6196bf9cd6de1843585b57fac7eadb5fc4a46ed103434759"},
+    {"name":"raw ConfigData read during B5","pass":true,"actual":0}
+  ],
+  "hardErrors": [],
+  "reviews": [],
+  "primaryHeroLifecycle": {
+    "reopened": false,
+    "stage5_1FetterSemanticChanged": false,
+    "stage6ConsumerChanged": false,
+    "canonicalHeroPopulationChanged": false
+  },
+  "handoff": {
+    "currentOwnerComplete": true,
+    "blockers": [],
+    "nonBlockingReviews": [],
+    "nextOwner": null,
+    "nextStage": null,
+    "nextStart": "Hero Dungeon supplemental semantics are closed. Any localization/frontend integration is a separate owner and must consume data/generated/hero-dungeon-supplemental-final.v1.json without raw fallback."
+  },
+  "reopenConditions": [
+    "The pinned ConfigData semantic snapshot changes.",
+    "The primary canonical Hero population changes from the frozen 267-Hero authority.",
+    "A B1-B4 owning validator reports a hard failure or authoritative contradiction.",
+    "The explicit HeroDungeonLevelInfo.NameNum ordinal relation or cardinality acceptance contract changes."
+  ]
+}
