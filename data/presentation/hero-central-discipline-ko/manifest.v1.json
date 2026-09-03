@@ -2,7 +2,7 @@
   "version": 1,
   "artifact": "hero-central-discipline-ko-presentation-overlay",
   "scope": "Korean central-discipline effect text presentation overlay for explicitly mapped Drive rows; semantic Hero->CastingLawSkill relation is inherited read-only from frozen Hero Stage 5-2.",
-  "status": "C3_READY_FOR_VALIDATION",
+  "status": "C3_COMPLETE",
   "semanticPredecessor": {
     "repositoryCommit": "5087a16f1ced3ca42721288f32735eed6e1c0c9c",
     "path": "data/generated/hero-page-stage5-2-exclusive-central.v1.json",
@@ -32,6 +32,15 @@
     "sourceReleasedCount": 148,
     "sourceRecentCount": 16
   },
+  "validation": {
+    "projectCheck": "PASS",
+    "localizationAudit": "PASS",
+    "routingOwners": ["hero-frontend", "localization"],
+    "semanticReopenRequired": false,
+    "blockerCount": 0
+  },
+  "nextOwner": "hero-frontend",
+  "nextStartPoint": "C4 integration: consume this HeroID-keyed Korean central-discipline overlay in the Hero detail presentation without runtime Drive/name JOIN or semantic relation re-derivation.",
   "shards": [
     {"path":"data/presentation/hero-central-discipline-ko/part-01.v1.json","recordCount":20,"firstHeroId":56,"lastHeroId":21},
     {"path":"data/presentation/hero-central-discipline-ko/part-02.v1.json","recordCount":30,"firstHeroId":67,"lastHeroId":99174},
