@@ -108,11 +108,12 @@ export function findExactProjectCheckForWorkflowRun(
 
 export function classifyMergeFinalization(snapshot, options = {}) {
   const requiredCheck = options.requiredCheck ?? REQUIRED_PROJECT_CHECK;
-  const { mainSha, pr, comparison, checkRuns = [] } = snapshot ?? {};
+  const { mainSha, pr, comparison, checkRuns = [], validationSha: suppliedValidationSha = null } = snapshot ?? {};
 
   assertSha(mainSha, 'mainSha');
   assertSha(pr?.head?.sha, 'pr.head.sha');
-  const validationSha = getValidationSha(pr);
+  const validationSha = suppliedValidationSha ?? getValidationSha(pr);
+  if (validationSha !== null) assertSha(validationSha, 'validationSha');
 
   const resultBase = {
     mainSha,
