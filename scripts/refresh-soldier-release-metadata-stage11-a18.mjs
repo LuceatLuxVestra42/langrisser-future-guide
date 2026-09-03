@@ -9,6 +9,10 @@ const writeJson = (p, value) => fs.writeFileSync(rel(p), `${JSON.stringify(value
 const fail = message => { throw new Error(message); };
 const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
 const gitBlobSha = p => git('rev-parse', `HEAD:${p}`);
+const mode = process.argv[2];
+if (!['--prepare-checkpoint', '--refresh-downstream'].includes(mode)) {
+  fail('Usage: node scripts/refresh-soldier-release-metadata-stage11-a18.mjs --prepare-checkpoint|--refresh-downstream');
+}
 
 const paths = {
   a17: 'data/validation/soldier-release-metadata-stage11-a17-promotion.v1.json',
@@ -16,9 +20,7 @@ const paths = {
   list58: 'data/generated/soldier-list-stage5-8.v1.json',
   releaseMetadata: 'data/generated/soldier-release-metadata.v1.json',
   validation58: 'data/validation/soldier-stage5-8-release.v1.json',
-  generated61: 'data/generated/soldier-stage6-1-full-records.v1.json',
   validation61: 'data/validation/soldier-stage6-1-full-records.v1.json',
-  generated62: 'data/generated/soldier-stage6-2-classification.v1.json',
   validation62: 'data/validation/soldier-stage6-2-classification.v1.json',
   validation63: 'data/validation/soldier-stage6-3-representative-qa.v1.json',
   validation64: 'data/validation/soldier-stage6-4-filter-qa.v1.json',
@@ -46,41 +48,67 @@ if (a17.coverageAfter?.canonicalSoldiers !== 224
   fail('Stage 11-A17 coverage drift');
 }
 
-const checkpoint = readJson(paths.checkpoint60);
-if (checkpoint.schemaId !== 'soldier-stage6-0-checkpoint/v1' || checkpoint.status !== 'PASS') {
-  fail('Stage 6-0 checkpoint identity/status drift');
-}
-if (checkpoint.expectedCoverage?.canonicalSoldiers !== 224
-  || checkpoint.expectedCoverage?.spSoldiers !== 56
-  || checkpoint.expectedCoverage?.heroSoldierRelationEdges !== 5977) {
-  fail('Stage 6-0 semantic population/relation baseline drift');
+function assertSemanticBoundary(checkpoint) {
+  if (checkpoint.schemaId !== 'soldier-stage6-0-checkpoint/v1' || checkpoint.status !== 'PASS') {
+    fail('Stage 6-0 checkpoint identity/status drift');
+  }
+  if (checkpoint.expectedCoverage?.canonicalSoldiers !== 224
+    || checkpoint.expectedCoverage?.normalSoldiers !== 168
+    || checkpoint.expectedCoverage?.spSoldiers !== 56
+    || checkpoint.expectedCoverage?.heroSoldierRelationEdges !== 5977) {
+    fail('Stage 6-0 semantic population/relation baseline drift');
+  }
 }
 
-checkpoint.frozenAt = new Date().toISOString().slice(0, 10);
-checkpoint.baseline = {
-  commitSha: git('rev-parse', 'HEAD'),
-  treeSha: git('rev-parse', 'HEAD^{tree}'),
-  commitMessage: git('log', '-1', '--pretty=%s'),
-};
-checkpoint.generatedBaseline.soldierListFinal.gitBlobSha = gitBlobSha(paths.list58);
-checkpoint.generatedBaseline.soldierReleaseMetadata.gitBlobSha = gitBlobSha(paths.releaseMetadata);
-checkpoint.validationBaseline.stage5_8.gitBlobSha = gitBlobSha(paths.validation58);
-checkpoint.expectedCoverage.confirmedReleaseCount = 53;
-checkpoint.expectedCoverage.unresolvedReleaseCount = 171;
-checkpoint.expectedCoverage.unresolvedNormalTier3ReleaseCount = 76;
-const releaseReview = checkpoint.knownReviews?.find(item => item.code === 'RELEASE_DATE_UNRESOLVED');
-if (!releaseReview) fail('Stage 6-0 RELEASE_DATE_UNRESOLVED review is missing');
-releaseReview.count = 171;
-checkpoint.refresh = {
-  stage: '11-A18',
-  predecessor: paths.a17,
-  reason: 'REFRESH_RELEASE_METADATA_ONLY_AFTER_FROZEN_STAGE11_A17_PROMOTION',
-  canonicalPopulationRecomputed: false,
-  heroSoldierRelationRecomputed: false,
-  releaseCoverageBefore: { confirmed: 51, unresolved: 173, unresolvedNormalTier3: 78 },
-  releaseCoverageAfter: { confirmed: 53, unresolved: 171, unresolvedNormalTier3: 76 },
-};
-writeJson(paths.checkpoint60, checkpoint);
+if (mode === '--prepare-checkpoint') {
+  const checkpoint = readJson(paths.checkpoint60);
+  assertSemanticBoundary(checkpoint);
+  const currentConfirmed = checkpoint.expectedCoverage?.confirmedReleaseCount;
+  const currentUnresolved = checkpoint.expectedCoverage?.unresolvedReleaseCount;
+  const currentTier3 = checkpoint.expectedCoverage?.unresolvedNormalTier3ReleaseCount;
+  if (!((currentConfirmed === 51 && currentUnresolved === 173 && currentTier3 === 78)
+    || (currentConfirmed === 53 && currentUnresolved === 171 && currentTier3 === 76))) {
+    fail(`Unexpected Stage 6-0 release baseline ${currentConfirmed}/${currentUnresolved}/${currentTier3}`);
+  }
+
+  checkpoint.frozenAt = new Date().toISOString().slice(0, 10);
+  checkpoint.baseline = {
+    commitSha: git('rev-parse', 'HEAD'),
+    treeSha: git('rev-parse', 'HEAD^{tree}'),
+    commitMessage: git('log', '-1', '--pretty=%s'),
+  };
+  checkpoint.generatedBaseline.soldierListFinal.gitBlobSha = gitBlobSha(paths.list58);
+  checkpoint.generatedBaseline.soldierReleaseMetadata.gitBlobSha = gitBlobSha(paths.releaseMetadata);
+  checkpoint.validationBaseline.stage5_8.gitBlobSha = gitBlobSha(paths.validation58);
+  checkpoint.expectedCoverage.confirmedReleaseCount = 53;
+  checkpoint.expectedCoverage.unresolvedReleaseCount = 171;
+  checkpoint.expectedCoverage.unresolvedNormalTier3ReleaseCount = 76;
+  const releaseReview = checkpoint.knownReviews?.find(item => item.code === 'RELEASE_DATE_UNRESOLVED');
+  if (!releaseReview) fail('Stage 6-0 RELEASE_DATE_UNRESOLVED review is missing');
+  releaseReview.count = 171;
+  checkpoint.refresh = {
+    stage: '11-A18',
+    predecessor: paths.a17,
+    reason: 'REFRESH_RELEASE_METADATA_ONLY_AFTER_FROZEN_STAGE11_A17_PROMOTION',
+    canonicalPopulationRecomputed: false,
+    heroSoldierRelationRecomputed: false,
+    releaseCoverageBefore: { confirmed: 51, unresolved: 173, unresolvedNormalTier3: 78 },
+    releaseCoverageAfter: { confirmed: 53, unresolved: 171, unresolvedNormalTier3: 76 },
+  };
+  writeJson(paths.checkpoint60, checkpoint);
+  console.log('Soldier Stage 11-A18 Stage 6-0 checkpoint preparation: PASS');
+  process.exit(0);
+}
+
+const checkpoint = readJson(paths.checkpoint60);
+assertSemanticBoundary(checkpoint);
+if (checkpoint.refresh?.stage !== '11-A18'
+  || checkpoint.expectedCoverage.confirmedReleaseCount !== 53
+  || checkpoint.expectedCoverage.unresolvedReleaseCount !== 171
+  || checkpoint.expectedCoverage.unresolvedNormalTier3ReleaseCount !== 76) {
+  fail('Stage 6-0 checkpoint is not the committed A18 refresh baseline');
+}
+if (gitBlobSha(paths.checkpoint60) !== gitBlobSha(paths.checkpoint60)) fail('unreachable checkpoint hash guard');
 
 const finalizers = [
   'scripts/finalize-soldier-stage6-1-full-records.cjs',
@@ -142,6 +170,11 @@ const a18 = {
     status: a17.status,
     completion: a17.completion,
   },
+  stage60: {
+    path: paths.checkpoint60,
+    gitBlobSha: gitBlobSha(paths.checkpoint60),
+    refreshStage: checkpoint.refresh.stage,
+  },
   scope: {
     releaseMetadataOnly: true,
     confirmedReleaseBefore: 51,
@@ -185,6 +218,6 @@ const a18 = {
 };
 writeJson(paths.a18, a18);
 
-console.log('Soldier Stage 11-A18 site-admission refresh: PASS');
+console.log('Soldier Stage 11-A18 downstream site-admission refresh: PASS');
 console.log('releaseCoverage=53 confirmed / 171 unresolved / 76 unresolved normal tier-3');
 console.log('canonicalSoldiers=224 heroSoldierRelations=5977');
