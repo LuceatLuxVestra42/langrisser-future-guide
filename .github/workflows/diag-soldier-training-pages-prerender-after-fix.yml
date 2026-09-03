@@ -1,0 +1,26 @@
+name: Diagnostic Soldier Training Pages Prerender After Fix
+
+on:
+  push:
+    branches:
+      - diag/soldier-training-pages-prerender-after-639-640
+
+permissions:
+  contents: read
+
+jobs:
+  pages-prerender:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+      - name: Build authoritative Pages candidate
+        run: bunx vite build --config vite.config.pages.ts
+      - name: Verify Soldier Training static output
+        run: |
+          test -f dist/client/soldiers/training/index.html
+          grep -q '훈련장' dist/client/soldiers/training/index.html
