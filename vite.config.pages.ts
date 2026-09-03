@@ -15,6 +15,11 @@ const exclusiveEquipmentIds = exclusiveEquipmentJson.detailRecords.map((record) 
 const equipmentIds = [...generalEquipmentIds, ...exclusiveEquipmentIds];
 const heroIds = heroListJson.records.map((record) => record.heroId);
 const soldierIds = soldierListJson.records.map((record) => record.soldierId);
+const staticBase = process.env.STATIC_SITE_BASE ?? "/langrisser-future-guide/";
+
+if (!staticBase.startsWith("/") || !staticBase.endsWith("/") || staticBase.includes("//")) {
+  throw new Error(`STATIC_SITE_BASE must be an absolute directory-style path; got ${staticBase}`);
+}
 
 if (
   correction.status !== "FROZEN" ||
@@ -62,7 +67,7 @@ const soldierDetailPages = soldierIds.map((soldierId) => ({
 }));
 
 export default defineConfig({
-  vite: { base: "/langrisser-future-guide/" },
+  vite: { base: staticBase },
   nitro: false,
   tanstackStart: {
     server: { entry: "server" },
