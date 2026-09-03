@@ -1,0 +1,69 @@
+name: Hero Dungeon B3 NameNum Ordinal Integrity
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/hero-dungeon-stageB0-scope-reset.v1.json'
+      - 'data/validation/hero-dungeon-stageB1-population-classification.v1.json'
+      - 'data/validation/hero-dungeon-stageB2-exact-join-integrity.v1.json'
+      - 'data/validation/hero-dungeon-stageB3-namenum-ordinal-integrity.v1.json'
+      - 'scripts/validate-hero-dungeon-stageB3-namenum-ordinal-integrity.mjs'
+      - 'scripts/validate-hero-dungeon-stageB3-freeze.mjs'
+      - '.github/workflows/hero-dungeon-stageB3-namenum-ordinal-integrity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hero-dungeon-b3:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Measure B3 NameNum ordinal integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTPUT="$RUNNER_TEMP/hero-dungeon-stageB3-namenum-ordinal-integrity.v1.json"
+          node scripts/validate-hero-dungeon-stageB3-namenum-ordinal-integrity.mjs --output "$OUTPUT"
+
+      - name: Validate frozen B3 parity
+        if: ${{ hashFiles('data/validation/hero-dungeon-stageB3-namenum-ordinal-integrity.v1.json') != '' && hashFiles('scripts/validate-hero-dungeon-stageB3-freeze.mjs') != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/validate-hero-dungeon-stageB3-freeze.mjs \
+            --measurement "$RUNNER_TEMP/hero-dungeon-stageB3-namenum-ordinal-integrity.v1.json" \
+            --expected data/validation/hero-dungeon-stageB3-namenum-ordinal-integrity.v1.json
+
+      - name: Upload B3 measurement
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-dungeon-stageB3-namenum-ordinal-integrity
+          path: ${{ runner.temp }}/hero-dungeon-stageB3-namenum-ordinal-integrity.v1.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Verify tracked state is unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHANGES="$(git status --porcelain=v1 --untracked-files=no)"
+          if [ -n "$CHANGES" ]; then
+            echo "$CHANGES"
+            echo 'Hero Dungeon B3 validator mutated tracked repository state.'
+            exit 1
+          fi
