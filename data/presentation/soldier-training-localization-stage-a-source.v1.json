@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-localization-stage-a-source/v1",
+  "stage": "A - Translation Census and Existing KR Source Recovery",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "scope": "frontend-presentation-only; census and localization-source recovery for the current Soldier Training Hall surface",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "branch": "main",
+    "commitSha": "76ccaf6bbeb985be26d588114f1d3f97f652124a",
+    "workingTreeStatus": "UNAVAILABLE_REMOTE_ONLY"
+  },
+  "authority": {
+    "soldierStatusSource": {
+      "path": "data/validation/soldier-stage6-7-site-admission.v1.json",
+      "gitBlobSha": "5b9a08161b1a8a7cb4cea07b03074b31ccada40f",
+      "status": "PASS",
+      "admissionStatus": "READY_WITH_REVIEW"
+    },
+    "trainingTechLocator": {
+      "path": "data/generated/soldier-training-tech-classification-stage1-census.v1.json",
+      "gitBlobSha": "182e87f68af45a755b48a8d36a0415088ded9f3d",
+      "projection": "LOSSLESS_PARSED_RECORD"
+    },
+    "commonStatConsumer": {
+      "path": "data/generated/soldier-training-tech-common-stat-effect-extraction.v1.json",
+      "gitBlobSha": "b188cd613d4be86617c102af8520b529e4a99ede",
+      "requiredFreezeState": "TRAINING_TECH_COMMON_STAT_EFFECT_EXTRACTION_FROZEN"
+    },
+    "commonPassiveConsumer": {
+      "path": "data/generated/soldier-training-tech-common-passive-effect-extraction.v1.json",
+      "gitBlobSha": "9a10573a0887a7cd7c18df68942c51113c253ef6",
+      "requiredFreezeState": "TRAINING_TECH_COMMON_PASSIVE_EFFECT_EXTRACTION_FROZEN"
+    },
+    "trainingMaterialConsumer": {
+      "path": "data/generated/soldier-training-material-iteminfo.v1.json",
+      "gitBlobSha": "9df7bbba18064e34f46cf2f4fd99d1904cbd3d63",
+      "status": "PASS"
+    },
+    "pageConsumer": {
+      "route": "src/routes/soldiers_.training.tsx",
+      "routeGitBlobSha": "15d327d02d1afe9183285ab5cdf6ca3c5fedf109",
+      "server": "src/lib/soldier-training-page.server.ts",
+      "serverGitBlobSha": "ed01b8c516fd5bdf3e80a6513aa8a5e58f283106"
+    }
+  },
+  "targetCensus": {
+    "materials": {
+      "count": 24,
+      "itemIds": [6003, 6006, 6009, 6012, 6015, 6018, 6031, 6032, 6033, 6034, 6035, 6036, 6037, 6038, 6039, 6040, 6041, 6042, 6043, 6044, 6045, 6046, 6047, 6048]
+    },
+    "commonStatTechs": {
+      "count": 84,
+      "techIds": [101, 102, 103, 104, 109, 110, 111, 118, 119, 120, 121, 127, 128, 129, 201, 202, 203, 204, 209, 210, 211, 217, 218, 219, 220, 225, 226, 227, 301, 302, 303, 304, 309, 310, 311, 317, 318, 319, 320, 326, 327, 328, 401, 402, 403, 404, 411, 412, 413, 420, 421, 422, 423, 430, 431, 432, 501, 502, 503, 504, 509, 510, 517, 518, 525, 526, 527, 533, 534, 535, 601, 602, 603, 604, 610, 611, 618, 619, 626, 627, 628, 635, 636, 637]
+    },
+    "commonPassiveTechs": {
+      "count": 46,
+      "techIds": [105, 122, 123, 130, 131, 134, 205, 221, 222, 228, 229, 232, 305, 321, 322, 329, 330, 334, 405, 424, 425, 426, 433, 434, 437, 438, 505, 522, 528, 529, 536, 537, 540, 541, 605, 622, 623, 629, 630, 631, 638, 639, 640, 645, 646, 647]
+    },
+    "visibleTechCount": 130,
+    "passiveTemplateCount": 46,
+    "excludedIndividualSoldierGrowthTechCount": 157
+  },
+  "recoveryPolicy": {
+    "identityAuthority": "Current frozen project IDs only",
+    "legacySourceRole": "localization/presentation cross-check only",
+    "legacyNamesAreOfficialByDefault": false,
+    "nameJoinCreatesIdentity": false,
+    "idArithmeticAllowed": false,
+    "screenOrderBindingAllowed": false,
+    "sourceOrderBindingAllowed": false,
+    "semanticRecomputationAllowed": false,
+    "canonicalMutationAllowed": false
+  },
+  "projectInternalLocalizationSearch": {
+    "checkedPath": "data/presentation/",
+    "trainingSpecificKrArtifactFound": false,
+    "relevantExistingPresentationSources": [
+      "data/presentation/soldier-ability-kr.v1.json",
+      "data/presentation/soldier-lower-tier-name-kr.v1.json",
+      "data/presentation/soldier-confirmed-name-correction.v1.json",
+      "data/presentation/soldier-t3-provisional-name-kr.v1.json"
+    ],
+    "note": "Existing Soldier KR presentation sources establish the presentation-only localization pattern, but none is a Training Hall material/TrainingTech localization artifact."
+  },
+  "legacyKoreanSource": {
+    "repository": "redpanda7301/langrisser",
+    "branch": "gh-pages",
+    "commitSha": "a85bba49dcf073563e7366dc18e96b7ba67c2ae3",
+    "page": "classup.html",
+    "publicPage": "https://redpanda7301.github.io/langrisser/classup.html",
+    "sourceClass": "legacy Korean sheet / localization cross-check",
+    "findings": {
+      "trainingHallSectionLocated": true,
+      "materialKoreanLabelsLocated": true,
+      "materialCandidateCount": 24,
+      "trainingTechKoreanNameCorpusLocated": true,
+      "conditionalEffectKoreanPresentationLocatedInTroopPages": true,
+      "legacyTechIdBindingAvailable": false
+    }
+  },
+  "materialCandidates": [
+    {"itemId":6003,"nameCn":"高级步兵教材","legacyNameKrRaw":"고급 보병 교재","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6006,"nameCn":"高级枪兵教材","legacyNameKrRaw":"고급 창병 교재","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6009,"nameCn":"高级骑兵教材","legacyNameKrRaw":"고급 기병 교재","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6012,"nameCn":"高级驯养教材","legacyNameKrRaw":"고급 비병 교재","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6015,"nameCn":"高级生存教材","legacyNameKrRaw":"고급 궁병 교재","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6018,"nameCn":"高级宗教教材","legacyNameKrRaw":"고급 승병 교재","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6031,"nameCn":"杠铃","legacyNameKrRaw":"역기","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6032,"nameCn":"沙袋","legacyNameKrRaw":"샌드백","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6033,"nameCn":"扩胸器","legacyNameKrRaw":"체스트 익스팬더","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6034,"nameCn":"健腹轮","legacyNameKrRaw":"AB슬라이더","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6035,"nameCn":"瑜伽垫","legacyNameKrRaw":"요가 매트","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6036,"nameCn":"平衡球","legacyNameKrRaw":"짐볼","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6037,"nameCn":"Brown♂精油","legacyNameKrRaw":"Brwon 오일","status":"LEGACY_KR_CANDIDATE","review":"Legacy source spelling is preserved verbatim; do not silently correct in Stage A."},
+    {"itemId":6038,"nameCn":"Dark♂锁链","legacyNameKrRaw":"Dark 체인","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6039,"nameCn":"Devout♂手套","legacyNameKrRaw":"Devout 글러브","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6040,"nameCn":"Pretty♂喷雾","legacyNameKrRaw":"Pretty 스프레이","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6041,"nameCn":"Crazy♂短裤","legacyNameKrRaw":"Crazy 팬츠","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6042,"nameCn":"Burning♂背带","legacyNameKrRaw":"Burning 서스펜더","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6043,"nameCn":"特级步兵教材","legacyNameKrRaw":"특급 보병 교재","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6044,"nameCn":"特级枪兵教材","legacyNameKrRaw":"특급 창병 교재","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6045,"nameCn":"特级骑兵教材","legacyNameKrRaw":"특급 기병 교재","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6046,"nameCn":"特级驯养教材","legacyNameKrRaw":"특급 비병 교재","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6047,"nameCn":"特级生存教材","legacyNameKrRaw":"특급 궁병 교재","status":"LEGACY_KR_CANDIDATE"},
+    {"itemId":6048,"nameCn":"特级宗教教材","legacyNameKrRaw":"특급 승병 교재","status":"LEGACY_KR_CANDIDATE"}
+  ],
+  "recoveredTechSamples": [
+    {"techId":101,"nameCn":"基础攻击训练","legacyNameKrRaw":"기초 공격 훈련","status":"LEGACY_KR_CANDIDATE"},
+    {"techId":102,"nameCn":"基础防御训练","legacyNameKrRaw":"기초 방어 훈련","status":"LEGACY_KR_CANDIDATE"},
+    {"techId":103,"nameCn":"综合生存训练","legacyNameKrRaw":"종합 생존 훈련","status":"LEGACY_KR_CANDIDATE"},
+    {"techId":104,"nameCn":"综合防御训练","legacyNameKrRaw":"종합 방어 훈련","status":"LEGACY_KR_CANDIDATE"},
+    {"techId":105,"nameCn":"对枪特训","legacyNameKrRaw":"창병 대항 특훈","status":"LEGACY_KR_CANDIDATE"},
+    {"techId":109,"nameCn":"综合攻击训练","legacyNameKrRaw":"종합 공격 훈련","status":"LEGACY_KR_CANDIDATE"},
+    {"techId":110,"nameCn":"强化生存训练","legacyNameKrRaw":"강화 생존 훈련","status":"LEGACY_KR_CANDIDATE"},
+    {"techId":111,"nameCn":"强化防御训练","legacyNameKrRaw":"강화 방어 훈련","status":"LEGACY_KR_CANDIDATE"}
+  ],
+  "uiCopyTargets": [
+    "Training Hall",
+    "frozen TrainingTech",
+    "effect extraction",
+    "COMMON_STAT frozen consumer",
+    "COMMON_PASSIVE frozen consumer",
+    "source template",
+    "조건/대상 AST"
+  ],
+  "blockers": [],
+  "reviews": [
+    {
+      "code": "LEGACY_TECH_ID_BINDING_NOT_AUTHORITATIVE",
+      "classification": "REVIEW",
+      "note": "The legacy Korean sheet exposes Korean Training Hall names but not current canonical TrainingTech IDs. Stage A therefore records exact current ID census separately and does not bind the remaining names by screen/source order."
+    },
+    {
+      "code": "OFFICIAL_KR_CONFIRMATION_NOT_PERFORMED",
+      "classification": "REVIEW",
+      "note": "Legacy Korean labels are candidates, not automatically official KR names. B/C/D must preserve confirmed/provisional distinction."
+    },
+    {
+      "code": "LEGACY_BROWN_LABEL_SPELLING",
+      "classification": "REVIEW",
+      "sourceValue": "Brwon 오일",
+      "note": "Source spelling is retained verbatim for review."
+    }
+  ],
+  "nextOwner": "Soldier Training material localization (B)",
+  "nextStartPoint": "Review/promote the 24 material candidates by itemId into a dedicated KR presentation mapping without changing frozen material identity or TrainingTech semantics.",
+  "reopenConditions": [
+    "Any referenced frozen input blob identity changes.",
+    "The current Training Hall visible population is no longer exactly 24 materials and 130 common-effect Techs.",
+    "A project-internal Training Hall KR authority newer than this Stage A source is admitted.",
+    "A direct official KR source contradicts a recovered legacy candidate."
+  ]
+}
