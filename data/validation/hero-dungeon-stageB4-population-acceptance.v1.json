@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "schemaId": "hero-dungeon-stageB4-population-acceptance/v1",
+  "stage": "hero-dungeon-B4",
+  "status": "PASS",
+  "completion": "B4_POPULATION_ACCEPTANCE_COMPLETE",
+  "owner": "hero-canonical",
+  "purpose": "Apply the B0 Hero Dungeon population acceptance rule to the frozen B1 HAS_HERO_DUNGEON population after B2 exact-join and B3 explicit NameNum ordinal integrity have passed. Exactly 5 or 7 joined stages pass; 6 and every other non-empty cardinality fail closed as BLOCKER.",
+  "authority": {
+    "b0Contract": "data/contracts/hero-dungeon-stageB0-scope-reset.v1.json",
+    "b1PopulationFreeze": "data/validation/hero-dungeon-stageB1-population-classification.v1.json",
+    "b2ExactJoinFreeze": "data/validation/hero-dungeon-stageB2-exact-join-integrity.v1.json",
+    "b3NameNumOrdinalFreeze": "data/validation/hero-dungeon-stageB3-namenum-ordinal-integrity.v1.json",
+    "sourcePackCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "b2ExactJoinPairSetSha256": "646ab2764bacad9de861fbbb83dca6502d61c557b75f4c260cfaaf183a6462a6",
+    "b3NormalizedOrdinalAssignmentSetSha256": "fe52c494fc0ef9f2771cd549650539a703af60dcaacaceab0e6293511850aece",
+    "b3NormalizedHeroOrdinalSetSha256": "2c1404804493c8ff004e2fa61b478e72cfecc07135d61ceb9249f57b470576e0"
+  },
+  "scope": {
+    "inScope": [
+      "Consume the frozen B1 population classification without re-reading raw ConfigData or reclassifying canonical Hero identity.",
+      "Require B2 exact-ID join integrity and B3 explicit NameNum ordinal integrity to remain PASS.",
+      "Apply cardinality acceptance only to B1-frozen HAS_HERO_DUNGEON Heroes.",
+      "Accept exactly 5 or 7 joined stages and fail closed on 6 or every other non-empty cardinality as BLOCKER.",
+      "Keep NO_HERO_DUNGEON Heroes outside cardinality acceptance and non-blocking."
+    ],
+    "outOfScope": [
+      "Re-read or reinterpret raw ConfigData for population, JOIN, or NameNum semantics.",
+      "Infer gate count or ordinal from array position, ID arithmetic, PreLevel_ID, Fetter count, names, filenames, or UI order.",
+      "Reopen B1-B3, Stage 5 Fetter semantics, Stage 6 Hero lifecycle, frontend, localization, assets, release, or presentation.",
+      "Publish the final supplemental Hero Dungeon consumer/freeze; that belongs to B5."
+    ]
+  },
+  "acceptance": {
+    "appliesTo": "HAS_HERO_DUNGEON_ONLY",
+    "allowedDungeonLevelCounts": [5, 7],
+    "noHeroDungeonExcludedFromCardinalityAcceptanceCount": 17,
+    "acceptedHeroCount": 250,
+    "acceptedCount5HeroCount": 238,
+    "acceptedCount7HeroCount": 12,
+    "rejectedHeroCount": 0,
+    "count6RejectedHeroCount": 0,
+    "otherNonEmptyRejectedHeroCount": 0,
+    "acceptedHeroIdSetSha256": "5243cf02c61a8f7f6196bf9cd6de1843585b57fac7eadb5fc4a46ed103434759",
+    "acceptedCount5HeroIdSetSha256": "cde767196b7e3579b9767c64049168fdd47109bb18c8aaf3aefb3e9b1432219b",
+    "acceptedCount7HeroIdSetSha256": "7329ed518ff79ee11e95fccbafe9cef24142f7e8a22d12e6a3de9ab57dc93e06",
+    "rejectedHeroIdSetSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "noHeroDungeonCount": 17,
+    "hasHeroDungeonCount": 250,
+    "dungeonCount5HeroCount": 238,
+    "dungeonCount7HeroCount": 12,
+    "dungeonCount6HeroCount": 0,
+    "otherNonEmptyDungeonCountHeroCount": 0,
+    "totalDungeonLevelReferenceCount": 1274,
+    "danglingDungeonLevelReferenceCount": 0,
+    "missingNameNumCount": 0,
+    "duplicateNameNumHeroCount": 0,
+    "invalidOrdinalSetHeroCount": 0,
+    "acceptedHeroCount": 250,
+    "rejectedHeroCount": 0,
+    "hardErrorCount": 0
+  },
+  "checks": [
+    {"name": "B1-B3 predecessor chain remains PASS", "pass": true, "actual": "PASS"},
+    {"name": "NO_HERO_DUNGEON excluded from cardinality acceptance", "pass": true, "actual": 17},
+    {"name": "all HAS_HERO_DUNGEON Heroes have allowed count 5 or 7", "pass": true, "actual": 250},
+    {"name": "count 6 population is absent", "pass": true, "actual": 0},
+    {"name": "other non-empty population is absent", "pass": true, "actual": 0},
+    {"name": "accepted count-derived references preserve B1/B2/B3 total", "pass": true, "actual": 1274}
+  ],
+  "hardErrors": [],
+  "reviews": [],
+  "handoff": {
+    "nextOwner": "hero-canonical",
+    "nextStage": "B5-supplemental-final-freeze",
+    "nextStart": "Consume the frozen B1-B4 results and freeze the supplemental Hero Dungeon ordinal facet/summary for reuse. Do not reopen canonical Hero identity, Stage 5/6 semantics, raw ConfigData interpretation, or presentation layers."
+  }
+}

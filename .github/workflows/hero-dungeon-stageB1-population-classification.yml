@@ -1,0 +1,66 @@
+name: Hero Dungeon B1 Population Classification
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/hero-dungeon-stageB0-scope-reset.v1.json'
+      - 'data/validation/hero-dungeon-stageB1-population-classification.v1.json'
+      - 'scripts/validate-hero-dungeon-stageB1-population-classification.mjs'
+      - 'scripts/validate-hero-dungeon-stageB1-freeze.mjs'
+      - '.github/workflows/hero-dungeon-stageB1-population-classification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hero-dungeon-b1:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Measure B1 classification
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/validate-hero-dungeon-stageB1-population-classification.mjs \
+            --output "$RUNNER_TEMP/hero-dungeon-stageB1-population-classification.v1.json"
+
+      - name: Validate frozen B1 parity
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/validate-hero-dungeon-stageB1-freeze.mjs \
+            --measurement "$RUNNER_TEMP/hero-dungeon-stageB1-population-classification.v1.json" \
+            --expected data/validation/hero-dungeon-stageB1-population-classification.v1.json
+
+      - name: Upload B1 measurement
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-dungeon-stageB1-population-classification
+          path: ${{ runner.temp }}/hero-dungeon-stageB1-population-classification.v1.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Verify tracked state is unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHANGES="$(git status --porcelain=v1 --untracked-files=no)"
+          if [ -n "$CHANGES" ]; then
+            echo "$CHANGES"
+            echo 'Hero Dungeon B1 validator mutated tracked repository state.'
+            exit 1
+          fi

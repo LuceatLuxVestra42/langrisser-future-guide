@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "schemaId": "hero-dungeon-supplemental-final/v1",
+  "status": "FINAL_FROZEN",
+  "completion": "B5_SUPPLEMENTAL_FINAL_FREEZE_COMPLETE",
+  "owner": "hero-canonical",
+  "purpose": "Final frozen supplemental Hero Dungeon consumer. Reuses the completed B1-B4 population/JOIN/NameNum/cardinality results and exposes only explicit per-Hero gateOrdinal assignments for downstream reuse without reopening primary Hero Stage 5/6 semantics.",
+  "authority": {
+    "primaryHeroLifecycleSource": "data/validation/hero-stage6-4-final.v1.json",
+    "b0Contract": "data/contracts/hero-dungeon-stageB0-scope-reset.v1.json",
+    "b1PopulationFreeze": "data/validation/hero-dungeon-stageB1-population-classification.v1.json",
+    "b2ExactJoinFreeze": "data/validation/hero-dungeon-stageB2-exact-join-integrity.v1.json",
+    "b3NameNumOrdinalFreeze": "data/validation/hero-dungeon-stageB3-namenum-ordinal-integrity.v1.json",
+    "b4PopulationAcceptanceFreeze": "data/validation/hero-dungeon-stageB4-population-acceptance.v1.json",
+    "sourcePackCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "ordinalAuthority": "HeroDungeonLevelInfo.NameNum",
+    "materializedFromB3WorkflowEvidence": {
+      "workflowRunId": 33742210182,
+      "headSha": "2506a1fedf040b288879f7f8176906a6805d75f9",
+      "artifactId": 9888173808,
+      "artifactDigestSha256": "e34a4e1440ad0acebb78e3563092a9667701e9208eb55bf2ac0af0dcb0e55093",
+      "measurementFileSha256": "9fa549994ef26c49ff18ef307e5909fb0defa268f32596cd811f576d631ee606"
+    }
+  },
+  "integrity": {
+    "b2ExactJoinPairSetSha256": "646ab2764bacad9de861fbbb83dca6502d61c557b75f4c260cfaaf183a6462a6",
+    "normalizedOrdinalAssignmentSetSha256": "fe52c494fc0ef9f2771cd549650539a703af60dcaacaceab0e6293511850aece",
+    "normalizedHeroOrdinalSetSha256": "2c1404804493c8ff004e2fa61b478e72cfecc07135d61ceb9249f57b470576e0",
+    "acceptedHeroIdSetSha256": "5243cf02c61a8f7f6196bf9cd6de1843585b57fac7eadb5fc4a46ed103434759",
+    "acceptedCount5HeroIdSetSha256": "cde767196b7e3579b9767c64049168fdd47109bb18c8aaf3aefb3e9b1432219b",
+    "acceptedCount7HeroIdSetSha256": "7329ed518ff79ee11e95fccbafe9cef24142f7e8a22d12e6a3de9ab57dc93e06",
+    "consumerHeroFacetSha256": "31d26a9c30fae9a5bf9631b9410cc35699d94953f4dffe289ccd7e1fe3dbf830"
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "noHeroDungeonCount": 17,
+    "hasHeroDungeonCount": 250,
+    "dungeonCount5HeroCount": 238,
+    "dungeonCount7HeroCount": 12,
+    "dungeonCount6HeroCount": 0,
+    "otherNonEmptyDungeonCountHeroCount": 0,
+    "totalDungeonLevelReferenceCount": 1274,
+    "danglingDungeonLevelReferenceCount": 0,
+    "missingNameNumCount": 0,
+    "duplicateNameNumHeroCount": 0,
+    "invalidOrdinalSetHeroCount": 0,
+    "acceptedHeroCount": 250,
+    "rejectedHeroCount": 0,
+    "hardErrorCount": 0
+  },
+  "storage": {
+    "format": "SHARDED_HERO_RECORDS",
+    "stageTuple": ["gateOrdinal", "dungeonLevelId"],
+    "heroCount": 267,
+    "shards": [
+      {"path":"data/generated/hero-dungeon-supplemental-part-0001.v1.json","recordCount":45,"firstHeroId":1,"lastHeroId":47,"sha256":"d3826fd34b2546d347c3c72a97a352a54e0e7355ca71a70e4787d57c387a60e2"},
+      {"path":"data/generated/hero-dungeon-supplemental-part-0002.v1.json","recordCount":45,"firstHeroId":48,"lastHeroId":95,"sha256":"979ae380668b80d2074d94dee157f9ad1746cfec7fbf4743b4f9e62cdfee706c"},
+      {"path":"data/generated/hero-dungeon-supplemental-part-0003.v1.json","recordCount":45,"firstHeroId":96,"lastHeroId":143,"sha256":"08fbd1315b01bc27b2e0db85d9f124287176f495c8b0d6f74b9921526ce9e97d"},
+      {"path":"data/generated/hero-dungeon-supplemental-part-0004.v1.json","recordCount":45,"firstHeroId":144,"lastHeroId":99200,"sha256":"ee216a2f0d429a22cc6f5c85de841cf98af54cf7d4480eadda27d8166136450e"},
+      {"path":"data/generated/hero-dungeon-supplemental-part-0005.v1.json","recordCount":45,"firstHeroId":99201,"lastHeroId":99245,"sha256":"427ff5f2b28519b412bdb0974c999efa98936d27c37cd3b569fd58bb684da5ac"},
+      {"path":"data/generated/hero-dungeon-supplemental-part-0006.v1.json","recordCount":42,"firstHeroId":99246,"lastHeroId":99287,"sha256":"bf974c62a9e7d082cb70c40bdfcb4df88cd39014859d665f39e66a7d7b2c60f5"}
+    ]
+  },
+  "reopenConditions": [
+    "The pinned ConfigData semantic snapshot changes.",
+    "The primary canonical Hero population changes from the frozen 267-Hero authority.",
+    "A B1-B4 owning validator reports a hard failure or authoritative contradiction.",
+    "The explicit HeroDungeonLevelInfo.NameNum ordinal relation or cardinality acceptance contract changes."
+  ]
+}

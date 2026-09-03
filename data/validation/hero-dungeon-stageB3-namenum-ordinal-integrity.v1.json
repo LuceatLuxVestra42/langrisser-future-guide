@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "schemaId": "hero-dungeon-stageB3-namenum-ordinal-integrity/v1",
+  "stage": "hero-dungeon-B3",
+  "status": "PASS",
+  "completion": "B3_NAMENUM_ORDINAL_INTEGRITY_COMPLETE",
+  "owner": "hero-canonical",
+  "purpose": "Consume the frozen B2 exact-ID join set and validate HeroDungeonLevelInfo.NameNum as the sole explicit gateOrdinal authority, without using array position, ID arithmetic, PreLevel_ID, names, filenames, UI order, or B4 population acceptance.",
+  "authority": {
+    "b0Contract": "data/contracts/hero-dungeon-stageB0-scope-reset.v1.json",
+    "b1PopulationFreeze": "data/validation/hero-dungeon-stageB1-population-classification.v1.json",
+    "b2ExactJoinFreeze": "data/validation/hero-dungeon-stageB2-exact-join-integrity.v1.json",
+    "sourcePackContract": "data/contracts/configdata-source-pack-contract.v1.json",
+    "sourcePackCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "logicalConfigDataRoot": "data/configdata",
+    "heroInformationFile": "ConfigDataHeroInformationInfo.json",
+    "heroInformationSha256": "ee9f81f161f79939e771b16db97329bfaa45872edad0ecbf9dd9285587ebad7e",
+    "heroDungeonLevelFile": "ConfigDataHeroDungeonLevelInfo.json",
+    "heroDungeonLevelSha256": "07f2923ed34aa2aa7c483079458dba184913f2fe816c5840f436b03533d20677",
+    "b2ExactJoinPairSetSha256": "646ab2764bacad9de861fbbb83dca6502d61c557b75f4c260cfaaf183a6462a6",
+    "b2NormalizedHeroReferenceSetSha256": "fa1aed8bbb297a57b05b16c8f684b8d2548e7594ff7b4dffd343b6b7e76d7eb7",
+    "ordinalField": "HeroDungeonLevelInfo.NameNum"
+  },
+  "scope": {
+    "inScope": [
+      "Consume the B2-frozen exact Hero -> DungeonLevel ID pair set without changing canonical Hero identity or B1 population classification.",
+      "Read NameNum only from the uniquely joined HeroDungeonLevelInfo row for each B2-frozen DungeonLevel ID.",
+      "Require NameNum to be explicitly present and represent a positive integer.",
+      "Require per-Hero NameNum uniqueness.",
+      "Validate the explicit NameNum set for each Hero as the complete ordinal set 1..N, where N is that Hero's already-observed explicit DungeonLevels_ID reference count.",
+      "Freeze normalized explicit ordinal assignments independently of DungeonLevels_ID array order."
+    ],
+    "outOfScope": [
+      "Apply B4 acceptance or rejection based on whether N is 5, 7, 6, or another non-empty cardinality.",
+      "Infer gateOrdinal from DungeonLevels_ID array position, DungeonLevel ID arithmetic, PreLevel_ID, Fetter count, names, filenames, or UI order.",
+      "Recompute canonical Hero identity, Stage 5 Fetter semantics, Stage 6 Hero lifecycle, or B1/B2 membership.",
+      "Modify frontend, localization, assets, release, or presentation."
+    ]
+  },
+  "ordinalIntegrity": {
+    "nameNumType": "POSITIVE_INTEGER_TEXT_OR_NUMBER",
+    "fallbackAllowed": false,
+    "validNameNumReferenceCount": 1274,
+    "missingNameNumCount": 0,
+    "invalidNameNumCount": 0,
+    "duplicateNameNumHeroIds": [],
+    "invalidOrdinalSetHeroIds": [],
+    "ordinalValueDistribution": [
+      { "gateOrdinal": 1, "referenceCount": 250 },
+      { "gateOrdinal": 2, "referenceCount": 250 },
+      { "gateOrdinal": 3, "referenceCount": 250 },
+      { "gateOrdinal": 4, "referenceCount": 250 },
+      { "gateOrdinal": 5, "referenceCount": 250 },
+      { "gateOrdinal": 6, "referenceCount": 12 },
+      { "gateOrdinal": 7, "referenceCount": 12 }
+    ],
+    "normalizedOrdinalAssignmentSetSha256": "fe52c494fc0ef9f2771cd549650539a703af60dcaacaceab0e6293511850aece",
+    "normalizedHeroOrdinalSetSha256": "2c1404804493c8ff004e2fa61b478e72cfecc07135d61ceb9249f57b470576e0"
+  },
+  "summary": {
+    "canonicalHeroCount": 267,
+    "noHeroDungeonCount": 17,
+    "hasHeroDungeonCount": 250,
+    "dungeonCount5HeroCount": 238,
+    "dungeonCount7HeroCount": 12,
+    "dungeonCount6HeroCount": 0,
+    "otherNonEmptyDungeonCountHeroCount": 0,
+    "totalDungeonLevelReferenceCount": 1274,
+    "exactJoinResolvedReferenceCount": 1274,
+    "missingNameNumCount": 0,
+    "invalidNameNumCount": 0,
+    "validNameNumReferenceCount": 1274,
+    "duplicateNameNumHeroCount": 0,
+    "invalidOrdinalSetHeroCount": 0,
+    "hardErrorCount": 0
+  },
+  "checks": [
+    { "name": "B2 exact join pair-set parity preserved", "pass": true, "actual": "646ab2764bacad9de861fbbb83dca6502d61c557b75f4c260cfaaf183a6462a6" },
+    { "name": "every B2-resolved reference has explicit valid NameNum", "pass": true, "actual": 1274 },
+    { "name": "no Hero has duplicate explicit NameNum", "pass": true, "actual": 0 },
+    { "name": "every Hero explicit NameNum set is complete 1..N", "pass": true, "actual": 0 },
+    { "name": "forbidden ordinal fallbacks used", "pass": true, "actual": 0 },
+    { "name": "B4 population acceptance deferred", "pass": true, "actual": "DEFERRED_TO_B4" }
+  ],
+  "hardErrors": [],
+  "reviews": [],
+  "handoff": {
+    "nextOwner": "hero-canonical",
+    "nextStage": "B4-population-acceptance",
+    "nextStart": "Consume this frozen B3 explicit NameNum ordinal facet together with the frozen B1 population counts. Apply the B0 cardinality acceptance rule only to HAS_HERO_DUNGEON Heroes: exactly 5 or 7 stages pass; 6 and every other non-empty cardinality fail closed. Do not reopen B1-B3 semantics."
+  }
+}
