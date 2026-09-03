@@ -21,7 +21,7 @@ jobs:
           private-key: ${{ secrets.MERGEFINALIZER_APP_KEY }}
           permission-contents: write
           permission-pull-requests: write
-          permission-actions: write
+          permission-actions: read
           permission-checks: read
 
       - name: Verify installation token without mutation
