@@ -130,6 +130,12 @@ jobs:
           echo "BLOCKER_PREVIEW_DEPLOYMENT_NOT_FRESH url=${PREVIEW_BASE_URL} expected=${SOURCE_SHA}" >&2
           exit 1
 
+      - name: Strict Hosted QA against exact Data Pages preview
+        run: >-
+          node tools/route-hosted-qa/cli/check-preview.mjs
+          --pr "${{ github.event.pull_request.number }}"
+          --expected-sha "$SOURCE_SHA"
+
   route-hosted-qa:
     name: route-hosted-qa
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
