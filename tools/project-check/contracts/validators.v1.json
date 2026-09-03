@@ -75,6 +75,14 @@
       "coverage": "R3 routing, manual-review fallback, preflight and aggregate semantics."
     },
     {
+      "id": "merge-finalizer-self-test",
+      "phase": 4,
+      "executable": "node",
+      "args": ["tools/merge-finalizer/test/merge-finalizer-self-test.mjs"],
+      "owner": "merge-finalization",
+      "coverage": "Stage 2 dry-run freshness and exact required-check classification, stale main/head restart boundaries, and mutation-free CLI contract."
+    },
+    {
       "id": "regression-runner-self-test",
       "phase": 4,
       "executable": "node",
