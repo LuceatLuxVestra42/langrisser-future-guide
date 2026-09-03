@@ -142,7 +142,7 @@ export function SinglePickupLogPage() {
     <section>
       <PickupLogGrid records={singleRecords} />
 
-      <div className="mt-8 border-t border-border pt-8">
+      <div className="mt-8 pt-8">
         <PickupLogGrid records={llrRecords} />
       </div>
     </section>
