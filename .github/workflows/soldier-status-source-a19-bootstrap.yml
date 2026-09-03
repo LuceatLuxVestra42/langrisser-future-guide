@@ -1,0 +1,30 @@
+name: Soldier Status Source A19 Bootstrap
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-soldier-handoff:
+    if: github.head_ref == 'data/soldier-release-stage11-a17-promote-2022-10'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check Soldier status-source handoff
+        run: >-
+          node tools/status-source/cli/lifecycle.mjs handoff
+          --pipeline soldier
+          --expected-predecessor soldier-stage6-7-site-admission
+          --id soldier-stage6-7-site-admission
+          --source data/validation/soldier-stage6-7-site-admission.v1.json
+          --note "Stage 11-A18 release-metadata-only refresh; canonical Soldier and Hero-Soldier relation semantics unchanged."
+          --check
