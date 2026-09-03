@@ -151,12 +151,8 @@ async function runDesktop(browser) {
   assert.equal(await slider.count(), 1, "Expected one Training level slider.");
   const sliderMax = Number(await slider.getAttribute("max"));
   assert.ok(sliderMax >= 2, `Unexpected slider max: ${sliderMax}`);
-  await slider.evaluate((element) => {
-    element.value = "2";
-    element.dispatchEvent(new Event("input", { bubbles: true }));
-    element.dispatchEvent(new Event("change", { bubbles: true }));
-  });
-  assert.ok((await trainingSection.innerText()).includes(`Lv.2 / ${sliderMax}`), "Slider did not select Lv.2.");
+  await slider.fill("2");
+  await assert.poll(async () => trainingSection.innerText()).toContain(`Lv.2 / ${sliderMax}`);
   assert.ok((await trainingSection.innerText()).includes("Lv.2 효과"), "Selected-level effect panel did not update to Lv.2.");
 
   const levelOneRow = trainingSection.locator("button").filter({ hasText: /^Lv\.1(?:\D|$)/ }).first();
