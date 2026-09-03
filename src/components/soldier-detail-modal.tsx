@@ -99,6 +99,23 @@ const ARMY_META = new Map<string, ArmyMeta>([
   ["DEMON", { label: "마족", shortLabel: "마" }],
 ]);
 
+const SP_SUBMIT_BOOK_ITEM_BY_UI_GROUP: Record<
+  SoldierPrototypePresentationRecord["uiGroup"],
+  number
+> = {
+  INFANTRY: 6043,
+  LANCER: 6044,
+  CAVALRY: 6045,
+  FLYING_WATER: 6046,
+  ARCHER_ASSASSIN: 6047,
+  MAGE_HOLY_DEMON: 6048,
+};
+
+const SP_SUBMIT_MISSION_BOOK_COUNT = 200;
+const SP_SUBMIT_MISSION_FANTASY_BOOSTER_COUNT = 35;
+const SP_SUBMIT_MISSION_GOLD_COUNT = 600_000;
+const FANTASY_BOOSTER_ITEM_ID = 6503;
+
 let soldierRichSourcePromise: Promise<SoldierRichSource> | null = null;
 
 function loadSoldierRichSource() {
@@ -271,7 +288,7 @@ export function SoldierDetailModal({
               성장 데이터를 불러오지 못했어.
             </div>
           ) : record.isSp ? (
-            <SpConversionPanel sp={detail.sp} />
+            <SpConversionPanel sp={detail.sp} uiGroup={record.uiGroup} />
           ) : (
             <TrainingSimulator levels={detail.training.perLevelCost} />
           )}
@@ -672,7 +689,7 @@ function getSpMaterialPresentation(material: MaterialCost) {
     if (iconUrl) {
       return { iconUrl, label: null };
     }
-    if (material.itemId === 6503) {
+    if (material.itemId === FANTASY_BOOSTER_ITEM_ID) {
       return {
         iconUrl: getSoldierCommonMaterialIconUrl("fantasy-booster"),
         label: "Fantasy 부스터",
@@ -690,7 +707,51 @@ function getSpMaterialPresentation(material: MaterialCost) {
   return { iconUrl: null, label: "전직 재료" };
 }
 
-function SpConversionPanel({ sp }: { sp: SoldierRichRecord["sp"] }) {
+function getSpSubmitMissionMaterials(
+  uiGroup: SoldierPrototypePresentationRecord["uiGroup"],
+): MaterialCost[] {
+  return [
+    {
+      goodsType: 6,
+      itemId: SP_SUBMIT_BOOK_ITEM_BY_UI_GROUP[uiGroup],
+      count: SP_SUBMIT_MISSION_BOOK_COUNT,
+    },
+    {
+      goodsType: 6,
+      itemId: FANTASY_BOOSTER_ITEM_ID,
+      count: SP_SUBMIT_MISSION_FANTASY_BOOSTER_COUNT,
+    },
+    {
+      goodsType: 1,
+      itemId: 0,
+      count: SP_SUBMIT_MISSION_GOLD_COUNT,
+    },
+  ];
+}
+
+function mergeMaterialCosts(materials: MaterialCost[]) {
+  const merged = new Map<string, MaterialCost>();
+
+  for (const material of materials) {
+    const key = `${material.goodsType}:${material.itemId}`;
+    const previous = merged.get(key);
+    merged.set(key, {
+      goodsType: material.goodsType,
+      itemId: material.itemId,
+      count: (previous?.count ?? 0) + material.count,
+    });
+  }
+
+  return [...merged.values()];
+}
+
+function SpConversionPanel({
+  sp,
+  uiGroup,
+}: {
+  sp: SoldierRichRecord["sp"];
+  uiGroup: SoldierPrototypePresentationRecord["uiGroup"];
+}) {
   if (!sp) {
     return (
       <div className="mt-2 rounded-xl border border-border bg-background px-4 py-5 text-sm text-muted-foreground">
@@ -701,9 +762,9 @@ function SpConversionPanel({ sp }: { sp: SoldierRichRecord["sp"] }) {
 
   return (
     <div className="mt-2 grid gap-3 lg:grid-cols-2">
-      <SpStageCard title="1차 SP 전직" stage={sp.stage1 ?? null} />
+      <SpStageCard title="1차 SP 전직" stage={sp.stage1 ?? null} uiGroup={uiGroup} />
       {sp.secondStageUnlock ? (
-        <SpStageCard title="2차 SP 전직" stage={sp.stage2 ?? null} />
+        <SpStageCard title="2차 SP 전직" stage={sp.stage2 ?? null} uiGroup={uiGroup} />
       ) : (
         <div className="rounded-xl border border-border bg-background p-4">
           <p className="text-sm font-black text-foreground">2차 SP 전직</p>
@@ -714,7 +775,15 @@ function SpConversionPanel({ sp }: { sp: SoldierRichRecord["sp"] }) {
   );
 }
 
-function SpStageCard({ title, stage }: { title: string; stage: SpStage | null }) {
+function SpStageCard({
+  title,
+  stage,
+  uiGroup,
+}: {
+  title: string;
+  stage: SpStage | null;
+  uiGroup: SoldierPrototypePresentationRecord["uiGroup"];
+}) {
   if (!stage) {
     return (
       <div className="rounded-xl border border-border bg-background p-4">
@@ -723,6 +792,12 @@ function SpStageCard({ title, stage }: { title: string; stage: SpStage | null })
       </div>
     );
   }
+
+  const hasSubmitMission = stage.missions.some((mission) => mission.missionType === 73);
+  const requiredMaterials = mergeMaterialCosts([
+    ...stage.awakenMaterials,
+    ...(hasSubmitMission ? getSpSubmitMissionMaterials(uiGroup) : []),
+  ]);
 
   return (
     <div className="rounded-xl border border-border bg-background p-4">
@@ -736,7 +811,7 @@ function SpStageCard({ title, stage }: { title: string; stage: SpStage | null })
       <div className="mt-3">
         <p className="text-xs font-bold text-muted-foreground">필요 재료</p>
         <div className="mt-1.5 flex flex-wrap gap-1.5">
-          {stage.awakenMaterials.map((material) => {
+          {requiredMaterials.map((material) => {
             const presentation = getSpMaterialPresentation(material);
             return (
               <span
@@ -768,8 +843,7 @@ function SpStageCard({ title, stage }: { title: string; stage: SpStage | null })
         <p className="text-xs font-bold text-muted-foreground">전직 미션</p>
         {stage.missions.map((mission) => (
           <div key={mission.missionId} className="rounded-lg border border-border bg-card px-3 py-2.5">
-            <p className="text-xs font-black text-foreground">{mission.title}</p>
-            <p className="mt-1 whitespace-pre-line text-xs leading-5 text-muted-foreground">
+            <p className="whitespace-pre-line text-xs leading-5 text-muted-foreground">
               {resolveSoldierSpMissionDescKo(mission)}
             </p>
           </div>
