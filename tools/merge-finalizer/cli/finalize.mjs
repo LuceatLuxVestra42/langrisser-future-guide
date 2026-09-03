@@ -163,6 +163,24 @@ async function waitForMergeability(repository, prNumber, token, options) {
   return null;
 }
 
+async function waitForPostMergeVerification(repository, prNumber, mergeSha, token, options) {
+  const deadline = Date.now() + Math.min(options.timeoutMs, 60_000);
+  let last = null;
+  while (Date.now() < deadline) {
+    const [mergedPr, mainAfter, mergeCommit] = await Promise.all([
+      githubRequest(repository, `/pulls/${prNumber}`, token),
+      githubRequest(repository, '/branches/main', token),
+      githubRequest(repository, `/commits/${mergeSha}`, token),
+    ]);
+    last = { mergedPr, mainAfter, mergeCommit };
+    if (mergedPr?.merged === true && mergedPr?.merge_commit_sha === mergeSha) {
+      return { verified: true, ...last };
+    }
+    await sleep(options.pollMs);
+  }
+  return { verified: false, ...last };
+}
+
 async function ensureValidationRef(repository, refName, validationSha, token) {
   try {
     await githubRequest(repository, '/git/refs', token, {
@@ -405,14 +423,19 @@ async function executeFinalization(args, token) {
       return blocker('BLOCKER_MERGE_REJECTED', { merge });
     }
 
-    const [mergedPr, mainAfter, mergeCommit] = await Promise.all([
-      githubRequest(args.repository, `/pulls/${args.pr}`, token),
-      githubRequest(args.repository, '/branches/main', token),
-      githubRequest(args.repository, `/commits/${merge.sha}`, token),
-    ]);
+    const verification = await waitForPostMergeVerification(
+      args.repository,
+      args.pr,
+      merge.sha,
+      token,
+      args,
+    );
+    const mergedPr = verification?.mergedPr ?? null;
+    const mainAfter = verification?.mainAfter ?? null;
+    const mergeCommit = verification?.mergeCommit ?? null;
     const firstParent = mergeCommit?.parents?.[0]?.sha ?? null;
     const postMergeBaseRace = firstParent !== guard.mainSha;
-    if (mergedPr?.merged !== true || mergedPr?.merge_commit_sha !== merge.sha) {
+    if (verification?.verified !== true) {
       return blocker('BLOCKER_POST_MERGE_VERIFICATION', {
         mergeSha: merge.sha,
         merged: mergedPr?.merged ?? null,
