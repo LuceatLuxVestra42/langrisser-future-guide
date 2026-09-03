@@ -13,6 +13,7 @@ const P = {
   material: 'data/generated/soldier-training-material-iteminfo.v1.json',
   stat: 'data/generated/soldier-training-tech-common-stat-effect-extraction.v1.json',
   passive: 'data/generated/soldier-training-tech-common-passive-effect-extraction.v1.json',
+  stage1: 'data/generated/soldier-training-tech-classification-stage1-census.v1.json',
 };
 const text = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
 const json = (p) => JSON.parse(text(p));
@@ -67,7 +68,7 @@ function load() {
   return {
     consumer: JSON.parse(raw.consumer), checkpoint: json(P.checkpoint),
     b: JSON.parse(raw.b), c: JSON.parse(raw.c), d: JSON.parse(raw.d),
-    material: JSON.parse(raw.material), stat: JSON.parse(raw.stat), passive: JSON.parse(raw.passive),
+    material: JSON.parse(raw.material), stat: JSON.parse(raw.stat), passive: JSON.parse(raw.passive), stage1: JSON.parse(raw.stage1),
     raw,
   };
 }
@@ -79,8 +80,9 @@ function evaluate(x) {
   const dr = Array.isArray(x.d.records) ? x.d.records : [];
   const mr = Array.isArray(x.material.items) ? x.material.items : [];
   const pr = Array.isArray(x.passive.records) ? x.passive.records : [];
+  const sr = Array.isArray(x.stage1.records) ? x.stage1.records : [];
   const bi = index(br, 'itemId'), mi = index(mr, 'itemId'), ci = index(cr, 'techId'),
-    di = index(dr, 'techId'), pi = index(pr, 'techId');
+    di = index(dr, 'techId'), pi = index(pr, 'techId'), si = index(sr, 'id');
 
   const materialIds = ids(bi.map.keys()), materialAuthorityIds = ids(mi.map.keys());
   const statRaw = (x.stat.valueSequenceCatalog ?? []).flatMap((s) => s.techIds ?? []);
@@ -91,6 +93,7 @@ function evaluate(x) {
   const materialNameMismatch = materialIds.filter((id) => bi.map.get(id)?.nameCn !== mi.map.get(id)?.name);
   const kindMismatch = techIds.filter((id) => ci.map.get(id)?.kind !==
     (statIds.includes(id) ? 'COMMON_STAT' : passiveIds.includes(id) ? 'COMMON_PASSIVE' : null));
+  const techSourceNameMismatch = techIds.filter((id) => ci.map.get(id)?.nameCn !== si.map.get(id)?.raw?.Name);
   const dNameMismatch = dIds.filter((id) => di.map.get(id)?.displayNameKr !== ci.map.get(id)?.displayNameKr);
   const dStatusMismatch = dIds.filter((id) => di.map.get(id)?.stageCNameStatus !== ci.map.get(id)?.status);
   const seqMismatch = dIds.filter((id) => di.map.get(id)?.parameterSequenceId !== pi.map.get(id)?.parameterSequenceId);
@@ -105,7 +108,7 @@ function evaluate(x) {
   const blanks = br.filter((r) => !okText(r.displayNameKr)).length +
     cr.filter((r) => !okText(r.displayNameKr)).length +
     dr.filter((r) => !okText(r.templateRichTextKr)).length;
-  const dup = bi.dup.length + mi.dup.length + ci.dup.length + di.dup.length + pi.dup.length;
+  const dup = bi.dup.length + mi.dup.length + ci.dup.length + di.dup.length + pi.dup.length + si.dup.length;
 
   const sources = [
     ['b', x.consumer.presentationSources?.materialNames],
@@ -114,6 +117,7 @@ function evaluate(x) {
     ['material', x.consumer.semanticAuthorities?.materials],
     ['stat', x.consumer.semanticAuthorities?.commonStat],
     ['passive', x.consumer.semanticAuthorities?.commonPassive],
+    ['stage1', x.consumer.semanticAuthorities?.trainingTechLocator],
   ];
   const blobMismatch = sources.filter(([k, s]) => !x.raw?.[k] || s?.gitBlobSha !== blobSha(x.raw[k])).map(([k]) => k);
 
@@ -129,6 +133,7 @@ function evaluate(x) {
   if (x.material.schemaId !== 'soldier-training-material-iteminfo/v1' || x.material.status !== 'PASS') e.push('MATERIAL_AUTHORITY_NOT_PASS');
   if (x.stat.status !== 'PASS' || x.stat.completion !== 'COMPLETE' || x.stat.freezeState !== 'TRAINING_TECH_COMMON_STAT_EFFECT_EXTRACTION_FROZEN') e.push('STAT_AUTHORITY_NOT_FROZEN');
   if (x.passive.status !== 'PASS' || x.passive.completion !== 'COMPLETE' || x.passive.freezeState !== 'TRAINING_TECH_COMMON_PASSIVE_EFFECT_EXTRACTION_FROZEN') e.push('PASSIVE_AUTHORITY_NOT_FROZEN');
+  if (x.stage1.schemaId !== 'soldier-training-tech-classification-stage1-census/v1' || x.stage1.status !== 'PASS' || x.stage1.population?.trainingTech !== 287) e.push('STAGE1_LOCATOR_NOT_ADMITTED');
 
   if (dup) e.push('DUPLICATE_ID');
   if (!same(materialIds, materialAuthorityIds)) e.push('MATERIAL_ID_SET_MISMATCH');
@@ -138,6 +143,7 @@ function evaluate(x) {
   if (statIds.length !== 84 || passiveIds.length !== 46 || visibleIds.length !== 130) e.push('TECH_AUTHORITY_POPULATION_MISMATCH');
   if (!same(techIds, visibleIds)) e.push('TECH_ID_SET_MISMATCH');
   if (kindMismatch.length) e.push(`TECH_KIND_MISMATCH:${kindMismatch.join(',')}`);
+  if (techSourceNameMismatch.length) e.push(`TECH_CN_NAME_MISMATCH:${techSourceNameMismatch.join(',')}`);
   if (!same(dIds, passiveIds)) e.push('D_ID_SET_MISMATCH');
   if (dNameMismatch.length) e.push(`D_NAME_MISMATCH:${dNameMismatch.join(',')}`);
   if (dStatusMismatch.length) e.push(`D_STATUS_MISMATCH:${dStatusMismatch.join(',')}`);
@@ -147,14 +153,14 @@ function evaluate(x) {
   if (blanks) e.push('BLANK_PRESENTATION_VALUE');
   if (blobMismatch.length) e.push(`PINNED_BLOB_MISMATCH:${blobMismatch.join(',')}`);
   if (br.length !== 24 || bConfirmed !== 24) e.push('B_COVERAGE_MISMATCH');
-  if (cr.length !== 130 || cConfirmed !== 85 || cProvisional !== 45) e.push('C_COVERAGE_MISMATCH');
+  if (cr.length !== 130 || cConfirmed !== 87 || cProvisional !== 43) e.push('C_COVERAGE_MISMATCH');
   if (dr.length !== 46 || seqCount !== 14) e.push('D_COVERAGE_MISMATCH');
   if (forbiddenKeys.length) e.push(`CONSUMER_SEMANTIC_PAYLOAD:${forbiddenKeys.join(',')}`);
 
   const coverage = {
     materialRecordCount:24, materialProjectDisplayConfirmedCount:24, techRecordCount:130,
-    commonStatTechCount:84, commonPassiveTechCount:46, techProjectDisplayConfirmedCount:85,
-    techProvisionalDisplayCount:45, passiveTemplateRecordCount:46, passiveParameterSequenceCount:14,
+    commonStatTechCount:84, commonPassiveTechCount:46, techProjectDisplayConfirmedCount:87,
+    techProvisionalDisplayCount:43, passiveTemplateRecordCount:46, passiveParameterSequenceCount:14,
     blankPresentationValueCount:0, duplicateIdCount:0,
   };
   const population = { materialItemIds:materialIds, commonStatTechIds:statIds, commonPassiveTechIds:passiveIds, visibleTechIds:visibleIds };
@@ -165,7 +171,7 @@ function evaluate(x) {
   if (!same(x.consumer.population, population)) e.push('CONSUMER_POPULATION_MISMATCH');
   const p = x.consumer.admissionPolicy ?? {};
   if (p.presentationOnly !== true || p.componentSelectionByPinnedBlobIdentity !== true ||
-      p.exactNumericIdEqualityOnly !== true || p.nameJoin !== false || p.idArithmetic !== false ||
+      p.exactNumericIdEqualityOnly !== true || p.sourceNameParityByExactTechId !== true || p.nameJoin !== false || p.idArithmetic !== false ||
       p.screenOrderBinding !== false || p.sourceOrderBinding !== false || p.semanticRecomputation !== false ||
       p.semanticLevelValuesCopied !== false || p.presentationPayloadMode !== 'PINNED_COMPONENT_REFERENCES') e.push('CONSUMER_POLICY_MISMATCH');
 
@@ -174,7 +180,7 @@ function evaluate(x) {
     materialProjectDisplayConfirmedCount:bConfirmed, materialIdSetMatch:same(materialIds, materialAuthorityIds),
     materialSourceNameMismatchCount:materialNameMismatch.length, techRecordCount:cr.length,
     commonStatTechCount:statIds.length, commonPassiveTechCount:passiveIds.length, visibleTechCount:visibleIds.length,
-    techIdSetMatch:same(techIds, visibleIds), techKindMismatchCount:kindMismatch.length,
+    techIdSetMatch:same(techIds, visibleIds), techKindMismatchCount:kindMismatch.length, techSourceNameMismatchCount:techSourceNameMismatch.length,
     techProjectDisplayConfirmedCount:cConfirmed, techProvisionalDisplayCount:cProvisional,
     passiveTemplateRecordCount:dr.length, passiveTemplateIdSetMatch:same(dIds, passiveIds),
     passiveDisplayNameMismatchCount:dNameMismatch.length, passiveNameStatusMismatchCount:dStatusMismatch.length,
@@ -190,7 +196,7 @@ function evaluate(x) {
   const m = x.checkpoint?.method ?? {};
   if (x.checkpoint?.schemaId !== 'soldier-training-localization-presentation-validation/v1' ||
       x.checkpoint?.stage !== 'E' || x.checkpoint?.status !== 'PASS' || x.checkpoint?.completion !== 'COMPLETE' ||
-      m.materialJoinKey !== 'itemId' || m.techJoinKey !== 'techId' || m.exactNumericIdEqualityOnly !== true ||
+      m.materialJoinKey !== 'itemId' || m.techJoinKey !== 'techId' || m.techSourceNameParity !== 'Stage C nameCn must equal Stage 1 frozen locator raw.Name by exact techId' || m.exactNumericIdEqualityOnly !== true ||
       m.nameJoin !== false || m.idArithmetic !== false || m.semanticRecomputation !== false || m.semanticValueCopy !== false ||
       x.checkpoint?.nextOwner !== 'soldier-frontend') e.push('CHECKPOINT_CONTRACT_MISMATCH');
 
@@ -206,6 +212,7 @@ function selfTest() {
   tests.push({ name:'current-source-pass', passed:evaluate(base).status === 'PASS' });
   t('missing-material-fails-closed', x => x.b.records.shift(), 'MATERIAL_ID_SET_MISMATCH');
   t('tech-kind-drift-fails-closed', x => x.c.records.find(r => r.kind === 'COMMON_STAT').kind='COMMON_PASSIVE', 'TECH_KIND_MISMATCH');
+  t('tech-source-name-drift-fails-closed', x => x.c.records[0].nameCn += 'x', 'TECH_CN_NAME_MISMATCH');
   t('d-name-drift-fails-closed', x => x.d.records[0].displayNameKr+='x', 'D_NAME_MISMATCH');
   t('placeholder-drift-fails-closed', x => x.d.records.find(r => r.placeholderOrder.length===2).placeholderOrder=['P1','P0'], 'D_PLACEHOLDER_MISMATCH');
   t('semantic-payload-copy-fails-closed', x => x.consumer.levelValueRows=[[1]], 'CONSUMER_SEMANTIC_PAYLOAD');
