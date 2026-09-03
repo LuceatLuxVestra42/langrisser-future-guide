@@ -8,6 +8,7 @@ on:
       - 'data/contracts/hero-dungeon-stageB0-scope-reset.v1.json'
       - 'data/validation/hero-dungeon-stageB1-population-classification.v1.json'
       - 'scripts/validate-hero-dungeon-stageB1-population-classification.mjs'
+      - 'scripts/validate-hero-dungeon-stageB1-freeze.mjs'
       - '.github/workflows/hero-dungeon-stageB1-population-classification.yml'
   workflow_dispatch:
 
@@ -30,16 +31,20 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Measure and validate B1 classification
+      - name: Measure B1 classification
         shell: bash
         run: |
           set -euo pipefail
-          OUTPUT="$RUNNER_TEMP/hero-dungeon-stageB1-population-classification.v1.json"
-          ARGS=(--output "$OUTPUT")
-          if [ -f data/validation/hero-dungeon-stageB1-population-classification.v1.json ]; then
-            ARGS+=(--expected data/validation/hero-dungeon-stageB1-population-classification.v1.json)
-          fi
-          node scripts/validate-hero-dungeon-stageB1-population-classification.mjs "${ARGS[@]}"
+          node scripts/validate-hero-dungeon-stageB1-population-classification.mjs \
+            --output "$RUNNER_TEMP/hero-dungeon-stageB1-population-classification.v1.json"
+
+      - name: Validate frozen B1 parity
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/validate-hero-dungeon-stageB1-freeze.mjs \
+            --measurement "$RUNNER_TEMP/hero-dungeon-stageB1-population-classification.v1.json" \
+            --expected data/validation/hero-dungeon-stageB1-population-classification.v1.json
 
       - name: Upload B1 measurement
         uses: actions/upload-artifact@v4
