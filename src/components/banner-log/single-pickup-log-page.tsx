@@ -1,5 +1,3 @@
-import { CalendarDays } from "lucide-react";
-
 import {
   LLR_PICKUP_LOG,
   SINGLE_PICKUP_LOG,
@@ -36,36 +34,46 @@ type PickupLogCardRecord = {
 function BannerLogArtwork({
   label,
   artworkPublicPath,
-  badge,
+  entryCount,
 }: {
   label: string;
   artworkPublicPath: string;
-  badge: string;
+  entryCount: number;
 }) {
+  const artworkUrl = getPublicAssetUrl(artworkPublicPath);
+
   return (
-    <div className="flex min-h-full min-w-0 flex-col justify-center gap-2.5 bg-muted/20 p-2.5 sm:gap-3 sm:p-4">
-      <div className="flex min-h-0 w-full items-center justify-center">
+    <div className="relative flex min-h-full min-w-0 overflow-hidden bg-muted/20">
+      <img
+        src={artworkUrl}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full scale-110 object-cover opacity-15 blur-2xl"
+      />
+      <div className="absolute inset-0 bg-background/75" aria-hidden="true" />
+
+      <div className="relative z-10 flex min-h-full w-full flex-col justify-center gap-3 p-3 sm:gap-4 sm:p-5">
         <img
-          src={getPublicAssetUrl(artworkPublicPath)}
+          src={artworkUrl}
           alt={`${label} 배너`}
           loading="lazy"
           decoding="async"
           className="block h-auto w-full rounded-lg object-contain shadow-sm ring-1 ring-black/5 sm:rounded-xl"
         />
-      </div>
-      <div className="flex min-w-0 items-center gap-1.5 px-0.5 sm:gap-2 sm:px-1">
-        <span className="shrink-0 rounded-lg bg-primary/10 px-1.5 py-1 text-[10px] font-black text-primary sm:px-2 sm:text-xs">
-          {badge}
-        </span>
-        <h2 className="min-w-0 truncate text-xs font-bold text-foreground sm:text-lg">
-          {label}
-        </h2>
+
+        <div className="rounded-xl border border-border/80 bg-card/90 px-3 py-2.5 shadow-sm backdrop-blur-sm sm:px-4 sm:py-3">
+          <h2 className="truncate text-sm font-bold text-foreground sm:text-lg">{label}</h2>
+          <div className="mt-1 flex items-center justify-between gap-3 text-xs sm:text-sm">
+            <span className="font-semibold text-foreground">픽업 기록</span>
+            <span className="shrink-0 text-muted-foreground">총 {entryCount}회</span>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function PickupLogGrid({ records, badge }: { records: PickupLogCardRecord[]; badge: string }) {
+function PickupLogGrid({ records }: { records: PickupLogCardRecord[] }) {
   return (
     <div className="grid grid-cols-1 gap-4">
       {records.map((record) => (
@@ -76,18 +84,10 @@ function PickupLogGrid({ records, badge }: { records: PickupLogCardRecord[]; bad
           <BannerLogArtwork
             label={record.label}
             artworkPublicPath={record.artworkPublicPath}
-            badge={badge}
+            entryCount={record.entries.length}
           />
 
           <div className="min-w-0 border-l border-border">
-            <div className="flex items-center justify-between gap-3 border-b border-border px-3 py-3 sm:px-5 sm:py-3.5">
-              <div>
-                <p className="text-sm font-bold text-foreground">픽업 기록</p>
-                <p className="text-xs text-muted-foreground">총 {record.entries.length}회</p>
-              </div>
-              <CalendarDays size={18} className="shrink-0 text-muted-foreground" aria-hidden="true" />
-            </div>
-
             <div className="divide-y divide-border">
               {groupEntriesByYear(record.entries).map(([year, entries]) => (
                 <div
@@ -124,15 +124,6 @@ function PickupLogGrid({ records, badge }: { records: PickupLogCardRecord[]; bad
   );
 }
 
-function LogSectionHeader({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="mb-6">
-      <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{title}</h1>
-      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-    </div>
-  );
-}
-
 export function SinglePickupLogPage() {
   const singleRecords: PickupLogCardRecord[] = SINGLE_PICKUP_LOG.map((record) => ({
     key: record.heroNameKr,
@@ -149,12 +140,10 @@ export function SinglePickupLogPage() {
 
   return (
     <section>
-      <LogSectionHeader title="1인 log" description="한섭 1인 SSR 픽업 기록" />
-      <PickupLogGrid records={singleRecords} badge="1인" />
+      <PickupLogGrid records={singleRecords} />
 
-      <div className="mt-10 border-t border-border pt-8">
-        <LogSectionHeader title="LLR log" description="한섭 LLR 한정 소환 기록" />
-        <PickupLogGrid records={llrRecords} badge="LLR" />
+      <div className="mt-8 border-t border-border pt-8">
+        <PickupLogGrid records={llrRecords} />
       </div>
     </section>
   );
