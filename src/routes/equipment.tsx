@@ -368,7 +368,7 @@ function EquipmentGeneralListPage() {
         {filteredRecords.length > 0 ? (
           <section
             aria-label="SSR 장비 이미지 목록"
-            className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
           >
             {filteredRecords.map((record) => {
               const displayName = record.nameKr ?? record.nameCn;
@@ -380,25 +380,9 @@ function EquipmentGeneralListPage() {
                   key={record.equipmentId}
                   to="/equipment/$equipmentId"
                   params={{ equipmentId: String(record.equipmentId) }}
-                  className="group flex min-h-[22rem] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="group flex flex-col items-center rounded-2xl border border-border bg-card p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <div className="flex items-center justify-between gap-3 border-b border-border bg-muted/40 px-4 py-3">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <span className="rounded-md bg-primary px-2 py-1 text-[11px] font-bold tracking-wide text-primary-foreground">
-                        SSR
-                      </span>
-                      <span className="truncate text-xs font-medium text-muted-foreground">
-                        {record.groupKo} · {record.subtypeKo}
-                      </span>
-                    </div>
-                    <ChevronRight
-                      size={17}
-                      aria-hidden="true"
-                      className="shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
-                    />
-                  </div>
-
-                  <div className="relative flex min-h-52 items-center justify-center border-b border-border bg-muted/20 px-4 pb-16 pt-4 sm:min-h-56">
+                  <div className="flex h-40 w-full items-center justify-center sm:h-44">
                     <img
                       src={imageUrl}
                       alt=""
@@ -406,31 +390,10 @@ function EquipmentGeneralListPage() {
                       decoding="async"
                       className="h-32 w-32 object-contain transition duration-200 group-hover:scale-[1.03] sm:h-36 sm:w-36"
                     />
-                    <div className="absolute inset-x-0 bottom-0 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm">
-                      <h2 className="line-clamp-2 text-base font-bold leading-snug text-foreground sm:text-lg">
-                        {displayName}
-                      </h2>
-                      {record.nameKr === null && (
-                        <p className="mt-0.5 text-[11px] text-muted-foreground">
-                          한국명 REVIEW · 중문명 임시 표시
-                        </p>
-                      )}
-                    </div>
                   </div>
-
-                  <div className="flex flex-1 flex-col p-4">
-                    <div className="rounded-xl bg-muted/55 p-3">
-                      <p className="text-xs font-semibold text-foreground">{record.effectName}</p>
-                      <p className="mt-1 line-clamp-4 text-xs leading-5 text-muted-foreground">
-                        {record.effectText}
-                      </p>
-                    </div>
-
-                    <div className="mt-auto flex items-center justify-between gap-3 pt-4 text-[11px] text-muted-foreground">
-                      <span>{record.groupKo} · {record.subtypeKo}</span>
-                      <span className="tabular-nums">ID {record.equipmentId}</span>
-                    </div>
-                  </div>
+                  <h2 className="mt-3 line-clamp-2 w-full text-center text-base font-bold leading-snug text-foreground sm:text-lg">
+                    {displayName}
+                  </h2>
                 </Link>
               );
             })}
