@@ -25,16 +25,40 @@ const HERO_SOLDIER_ARMY_ORDER = new Map<string, number>(
   ].map((armyType, index) => [armyType, index]),
 );
 
-const LEON_LEGACY_SKILL_IDS = new Set([
-  10301,
-  5020,
-  10324,
-  5003,
-  5007,
-  10314,
-  10328,
-  11807,
-  10302,
+const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
+  [6, new Set([
+    10301,
+    5020,
+    10324,
+    5003,
+    5007,
+    10314,
+    10328,
+    11807,
+    10302,
+  ])],
+  [8, new Set([
+    10705,
+    10703,
+    10706,
+    20001,
+    10841,
+    10813,
+    10109,
+    10717,
+    10716,
+  ])],
+  [9, new Set([
+    10701,
+    10712,
+    10716,
+    20001,
+    10719,
+    10717,
+    11813,
+    10709,
+    10711,
+  ])],
 ]);
 
 function getHeroSoldierTierOrder(record: { isSp: boolean; tier: number }) {
@@ -72,13 +96,17 @@ function sortHeroSoldierIdsForPresentation(ids: readonly number[]) {
   });
 }
 
-function localizeLeonLegacySkill<T extends { skillId: number; nameCn: string | null; desc: string | null }>(skill: T): T {
-  if (!LEON_LEGACY_SKILL_IDS.has(skill.skillId)) return skill;
+function localizeLegacyHeroSkill<T extends { skillId: number; nameCn: string | null; desc: string | null }>(
+  heroId: number,
+  skill: T,
+): T {
+  const admittedSkillIds = LEGACY_SKILL_IDS_BY_HERO.get(heroId);
+  if (!admittedSkillIds?.has(skill.skillId)) return skill;
 
   const localization = resolveHeroSkillKr(skill);
   if (!localization) {
     throw new Error(
-      `Leon legacy skill ${skill.skillId} no longer matches the admitted Korean localization catalog.`,
+      `Hero ${heroId} legacy skill ${skill.skillId} no longer matches the admitted Korean localization catalog.`,
     );
   }
 
@@ -120,13 +148,16 @@ export const getHeroDetailRouteStage5Data = createServerFn({ method: "GET" })
     const routeData = await readHeroDetailRouteStage5Data(data.heroId);
     if (!routeData) return routeData;
 
-    const skills = data.heroId === 6
+    const legacySkillIds = LEGACY_SKILL_IDS_BY_HERO.get(data.heroId);
+    const skills = legacySkillIds
       ? {
           ...routeData.detail.skills,
-          heroDirectSkills: routeData.detail.skills.heroDirectSkills.map(localizeLeonLegacySkill),
+          heroDirectSkills: routeData.detail.skills.heroDirectSkills.map((skill) =>
+            localizeLegacyHeroSkill(data.heroId, skill),
+          ),
           jobLevelAcquisitions: routeData.detail.skills.jobLevelAcquisitions.map((row) => ({
             ...row,
-            skill: localizeLeonLegacySkill(row.skill),
+            skill: localizeLegacyHeroSkill(data.heroId, row.skill),
           })),
         }
       : routeData.detail.skills;
