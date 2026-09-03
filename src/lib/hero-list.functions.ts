@@ -157,7 +157,12 @@ function applyLeonHeroDungeonBondPresentation<T extends {
   bonds: {
     rows: Array<{
       completionConditions: Array<{
-        requiredHero: unknown | null;
+        requiredHero: {
+          heroId: number | null;
+          nameKr: string | null;
+          nameCn: string | null;
+          nameEn: string | null;
+        } | null;
         stage: { stageId: number | null; nameCn: string | null } | null;
       }>;
     }>;
@@ -175,11 +180,22 @@ function applyLeonHeroDungeonBondPresentation<T extends {
           if (!condition.requiredHero || condition.stage?.stageId == null) return condition;
           const gateOrdinal = LEON_HERO_DUNGEON_GATE_BY_LEVEL_ID.get(condition.stage.stageId);
           if (gateOrdinal == null) return condition;
+
+          const requiredHeroName =
+            condition.requiredHero.nameKr ??
+            condition.requiredHero.nameCn ??
+            condition.requiredHero.nameEn ??
+            `Hero ${condition.requiredHero.heroId ?? "?"}`;
+
+          // Presentation-only projection: the frozen Stage 5/6 relation remains untouched.
+          // Clearing requiredHero here makes the existing route renderer print this exact text
+          // instead of adding its generic "와 함께 ·" separator.
           return {
             ...condition,
+            requiredHero: null,
             stage: {
               ...condition.stage,
-              nameCn: `운명의문 ${gateOrdinal} 클리어`,
+              nameCn: `${requiredHeroName}와 함께 운명의문 ${gateOrdinal} 클리어`,
             },
           };
         }),
