@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+import { SinglePickupLogPage } from "@/components/banner-log/single-pickup-log-page";
 import {
   BANNER_EVENT_OVERLAY,
   type BannerEventOverlayRow,
@@ -122,6 +123,7 @@ function BannerImage({
 
 function BannerPage() {
   const data = Route.useLoaderData();
+  const [showSinglePickupLog, setShowSinglePickupLog] = useState(false);
   const [expandedWishOccurrence, setExpandedWishOccurrence] = useState<string | null>(null);
   const [expandedEventOccurrence, setExpandedEventOccurrence] = useState<string | null>(null);
   const [displayStartDate, setDisplayStartDate] = useState<string | null>(null);
@@ -181,17 +183,47 @@ function BannerPage() {
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [data.dateGroups, displayStartDate, eventRows]);
 
+  const navButtonClass =
+    "inline-flex items-center gap-1.5 rounded-xl border-2 border-primary/40 bg-card/95 px-3 py-2 text-sm font-semibold text-foreground shadow-sm backdrop-blur transition hover:border-primary/70 hover:bg-muted";
+
+  if (showSinglePickupLog) {
+    return (
+      <main className="min-h-screen bg-background">
+        <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+          <div className="sticky top-3 z-40 mb-8 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => setShowSinglePickupLog(false)}
+              className={navButtonClass}
+            >
+              <ArrowLeft size={16} aria-hidden="true" />
+              가챠 배너로
+            </button>
+            <Link to="/" className={navButtonClass}>
+              메인으로
+            </Link>
+          </div>
+          <SinglePickupLogPage />
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-        <div className="sticky top-3 z-40 mb-8 w-fit">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 rounded-xl border-2 border-primary/40 bg-card/95 px-3 py-2 text-sm font-semibold text-foreground shadow-sm backdrop-blur transition hover:border-primary/70 hover:bg-muted"
-          >
+        <div className="sticky top-3 z-40 mb-8 flex items-center justify-between gap-3">
+          <Link to="/" className={navButtonClass}>
             <ArrowLeft size={16} aria-hidden="true" />
             메인으로
           </Link>
+          <button
+            type="button"
+            onClick={() => setShowSinglePickupLog(true)}
+            className={navButtonClass}
+          >
+            1인 log
+          </button>
         </div>
 
         <section>
