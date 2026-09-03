@@ -249,4 +249,10 @@
     object-fit: contain;
     object-position: center;
   }
+
+  /* Hero detail section headings are text-only. */
+  main[data-name-kr-status] section > div.flex.items-center.gap-2 > svg,
+  main[data-name-kr-status] section:first-of-type .absolute.bottom-4.left-4 span.inline-flex > svg {
+    display: none;
+  }
 }
