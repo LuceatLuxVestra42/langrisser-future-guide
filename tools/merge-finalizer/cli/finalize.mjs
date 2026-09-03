@@ -173,7 +173,7 @@ async function waitForPostMergeVerification(repository, prNumber, mergeSha, toke
       githubRequest(repository, `/commits/${mergeSha}`, token),
     ]);
     last = { mergedPr, mainAfter, mergeCommit };
-    if (mergedPr?.merged === true && mergedPr?.merge_commit_sha === mergeSha) {
+    if (mergedPr?.merged_at != null && mergedPr?.merge_commit_sha === mergeSha) {
       return { verified: true, ...last };
     }
     await sleep(options.pollMs);
