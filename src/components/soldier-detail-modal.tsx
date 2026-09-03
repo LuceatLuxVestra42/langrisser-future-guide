@@ -804,9 +804,6 @@ function SpStageCard({
     <div className="rounded-xl border border-border bg-background p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-black text-foreground">{title}</p>
-        <span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
-          단계 #{stage.awakenLevelId}
-        </span>
       </div>
 
       <div className="mt-3">
