@@ -5,6 +5,19 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      base_sha:
+        description: Exact main SHA used by merge finalizer validation
+        required: true
+        type: string
+      expected_head_sha:
+        description: Exact PR head SHA that must be checked out
+        required: true
+        type: string
+      pr:
+        description: Pull request number for audit context
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -19,6 +32,43 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Normalize Project Check base and head
+        id: project-check-context
+        shell: bash
+        env:
+          DISPATCH_BASE_SHA: ${{ inputs.base_sha }}
+          DISPATCH_HEAD_SHA: ${{ inputs.expected_head_sha }}
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            if [[ ! "$DISPATCH_BASE_SHA" =~ ^[0-9a-fA-F]{40}$ ]]; then
+              echo 'workflow_dispatch base_sha must be a 40-character Git SHA.'
+              exit 1
+            fi
+            if [[ ! "$DISPATCH_HEAD_SHA" =~ ^[0-9a-fA-F]{40}$ ]]; then
+              echo 'workflow_dispatch expected_head_sha must be a 40-character Git SHA.'
+              exit 1
+            fi
+            ACTUAL_HEAD="$(git rev-parse HEAD)"
+            if [ "$ACTUAL_HEAD" != "$DISPATCH_HEAD_SHA" ]; then
+              echo "Dispatched head moved: expected=$DISPATCH_HEAD_SHA actual=$ACTUAL_HEAD"
+              exit 1
+            fi
+            git fetch --no-tags origin main
+            ACTUAL_MAIN="$(git rev-parse origin/main)"
+            if [ "$ACTUAL_MAIN" != "$DISPATCH_BASE_SHA" ]; then
+              echo "Main moved before Project Check started: expected=$DISPATCH_BASE_SHA actual=$ACTUAL_MAIN"
+              exit 1
+            fi
+            echo "base_spec=$DISPATCH_BASE_SHA" >> "$GITHUB_OUTPUT"
+          else
+            if [ -z "$GITHUB_BASE_REF" ]; then
+              echo 'pull_request event is missing GITHUB_BASE_REF.'
+              exit 1
+            fi
+            echo "base_spec=origin/$GITHUB_BASE_REF" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup Node 22
         uses: actions/setup-node@v4
@@ -41,10 +91,10 @@ jobs:
         run: node tools/project-check/test/post-reinstall-routing-fixtures.mjs
 
       - name: Plan changed path ownership and validators
-        run: node tools/project-check/cli/check.mjs --base "origin/${GITHUB_BASE_REF}" --head HEAD --plan
+        run: node tools/project-check/cli/check.mjs --base "${{ steps.project-check-context.outputs.base_spec }}" --head HEAD --plan
 
       - name: Run changed path owning validators
-        run: node tools/project-check/cli/check.mjs --base "origin/${GITHUB_BASE_REF}" --head HEAD
+        run: node tools/project-check/cli/check.mjs --base "${{ steps.project-check-context.outputs.base_spec }}" --head HEAD
 
       - name: Verify Project Check tracked state is unchanged
         run: |
