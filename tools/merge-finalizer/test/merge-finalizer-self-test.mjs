@@ -119,6 +119,13 @@ assert.equal(workflowText.includes('cancel-in-progress: true'), false);
 assert.equal(workflowText.includes('contents: write'), true);
 assert.equal(workflowText.includes('pull-requests: write'), true);
 assert.equal(workflowText.includes('actions: write'), true);
+assert.equal(workflowText.includes('actions/create-github-app-token@v2'), true);
+assert.equal(workflowText.includes('secrets.MERGEFINALIZER_APP_ID'), true);
+assert.equal(workflowText.includes('secrets.MERGEFINALIZER_APP_KEY'), true);
+assert.equal(workflowText.includes('permission-actions: read'), true);
+assert.equal(workflowText.includes('MERGE_FINALIZER_APP_PREFLIGHT_STATUS'), true);
+assert.equal(workflowText.includes('GH_TOKEN="$APP_TOKEN" gh api --method PUT'), true);
+assert.equal(workflowText.includes('GITHUB_TOKEN: ${{ github.token }}'), true);
 assert.equal(projectCheckText.includes('workflow_dispatch:'), true);
 assert.equal(projectCheckText.includes('base_sha:'), true);
 assert.equal(projectCheckText.includes('expected_head_sha:'), true);
@@ -127,13 +134,17 @@ assert.equal(projectCheckText.includes('ACTUAL_HEAD'), true);
 
 console.log(JSON.stringify({
   status: 'PASS',
-  checkpoint: 'MERGE_FINALIZER_STAGE4_PULL_MERGE_REF_SELF_TEST',
+  checkpoint: 'MERGE_FINALIZER_APP_REFRESH_SELF_TEST',
   fixtures: 24,
-  staticGuards: 24,
+  staticGuards: 31,
   requiredCheck: REQUIRED_PROJECT_CHECK,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,
   validationLocator: 'refs/pull/<pr>/merge',
   validationTarget: 'PR_SYNTHETIC_MERGE_RESULT_SHA',
   validationRefLifetime: 'TEMPORARY_DISPATCH_REF_ONLY',
+  staleRefreshActor: 'GITHUB_APP_INSTALLATION_TOKEN',
+  appSecretNames: ['MERGEFINALIZER_APP_ID', 'MERGEFINALIZER_APP_KEY'],
+  appPermissions: ['contents:read', 'pull-requests:write', 'actions:read', 'checks:read'],
+  mergeExecutionToken: 'github.token',
   mutationMethods: ['PUT update-branch', 'POST temp validation ref', 'POST workflow_dispatch', 'DELETE temp validation ref', 'PUT merge'],
 }, null, 2));

@@ -35,8 +35,74 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Create merge finalizer GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.MERGEFINALIZER_APP_ID }}
+          private-key: ${{ secrets.MERGEFINALIZER_APP_KEY }}
+          permission-contents: read
+          permission-pull-requests: write
+          permission-actions: read
+          permission-checks: read
+
       - name: Run merge finalizer self-test
         run: node tools/merge-finalizer/test/merge-finalizer-self-test.mjs
+
+      - name: Refresh stale PR with GitHub App and wait for protected check
+        env:
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+          READ_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr }}
+        run: |
+          set -euo pipefail
+          deadline=$((SECONDS + 900))
+          updates=0
+
+          while (( SECONDS < deadline )); do
+            snapshot="$(GITHUB_TOKEN="$READ_TOKEN" node tools/merge-finalizer/cli/finalize.mjs --repository "$GITHUB_REPOSITORY" --pr "$PR_NUMBER")"
+            status="$(printf '%s' "$snapshot" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>process.stdout.write(String(JSON.parse(s).status ?? '')))")"
+            printf 'MERGE_FINALIZER_APP_PREFLIGHT_STATUS=%s\n' "$status"
+
+            case "$status" in
+              READY_TO_MERGE)
+                printf 'MERGE_FINALIZER_APP_PREFLIGHT=PASS\nAPP_REFRESH_COUNT=%s\n' "$updates"
+                exit 0
+                ;;
+              UPDATE_REQUIRED)
+                if (( updates >= 3 )); then
+                  echo 'BLOCKER_APP_REFRESH_RESTART_EXHAUSTED'
+                  exit 1
+                fi
+                old_head="$(GH_TOKEN="$APP_TOKEN" gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.head.sha')"
+                GH_TOKEN="$APP_TOKEN" gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/update-branch" -f expected_head_sha="$old_head" >/dev/null
+                changed=false
+                for _ in $(seq 1 60); do
+                  sleep 5
+                  new_head="$(GH_TOKEN="$APP_TOKEN" gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.head.sha')"
+                  if [[ "$new_head" != "$old_head" ]]; then
+                    changed=true
+                    break
+                  fi
+                done
+                if [[ "$changed" != true ]]; then
+                  echo 'BLOCKER_APP_REFRESH_HEAD_TIMEOUT'
+                  exit 1
+                fi
+                updates=$((updates + 1))
+                ;;
+              WAIT_MERGEABILITY|CHECK_REQUIRED|CHECK_PENDING)
+                sleep 5
+                ;;
+              *)
+                printf '%s\n' "$snapshot"
+                exit 1
+                ;;
+            esac
+          done
+
+          echo 'BLOCKER_APP_PREFLIGHT_TIMEOUT'
+          exit 1
 
       - name: Finalize pull request with fail-closed guards
         env:
