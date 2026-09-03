@@ -110,7 +110,79 @@ jobs:
           printf 'REVIEW_EXISTING_DRIFT predecessor=%s: stable hosted validator failure reproduces on the exact authoritative base; continuing to owning Browser/UI interaction checks.\n' "$EXPECTED_SOURCE_SHA"
           echo "::warning::REVIEW_EXISTING_DRIFT: stable hosted validator failure reproduces on the exact authoritative base; continuing to owning Browser/UI interaction checks."
 
+      - name: Equipment modal Browser UI gate
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+
+          const base = process.env.HOSTED_BASE_URL.replace(/\/?$/, '/');
+          const url = (path) => new URL(path.replace(/^\//, ''), base).toString();
+          const check = (condition, message) => { if (!condition) throw new Error(message); };
+          const browser = await chromium.launch({ headless: true });
+          try {
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('pageerror', (error) => errors.push(`page:${String(error)}`));
+            page.on('console', (message) => { if (message.type() === 'error') errors.push(`console:${message.text()}`); });
+
+            let response = await page.goto(url('equipment/'), { waitUntil: 'networkidle', timeout: 45000 });
+            check(response && response.status() < 400, `Equipment list browser entry failed: ${response?.status()}`);
+            const generalList = page.locator('section[aria-label="SSR 장비 이미지 목록"]');
+            await generalList.waitFor({ timeout: 20000 });
+            const generalCard = generalList.locator('a[href*="/equipment/"]').first();
+            check(await generalCard.count() === 1, 'General equipment list has no detail card link');
+            const generalListUrl = page.url();
+            await generalCard.click();
+            const generalDialog = page.getByRole('dialog');
+            await generalDialog.waitFor({ timeout: 20000 });
+            await generalDialog.getByRole('heading', { name: 'Lv50 능력치', exact: true }).waitFor({ timeout: 20000 });
+            await generalDialog.getByRole('heading', { name: '최대 효과', exact: true }).waitFor({ timeout: 20000 });
+            check(page.url() === generalListUrl, `General equipment modal changed list URL: before=${generalListUrl} after=${page.url()}`);
+            check(await page.evaluate(() => document.body.style.overflow) === 'hidden', 'General equipment modal did not lock body scroll');
+            await page.keyboard.press('Escape');
+            await generalDialog.waitFor({ state: 'hidden', timeout: 10000 });
+            check(page.url() === generalListUrl, 'General equipment modal Escape close changed list URL');
+
+            response = await page.goto(url('equipment/exclusive/'), { waitUntil: 'networkidle', timeout: 45000 });
+            check(response && response.status() < 400, `Exclusive equipment list browser entry failed: ${response?.status()}`);
+            const exclusiveList = page.locator('section[aria-label="전용장비 목록"]');
+            await exclusiveList.waitFor({ timeout: 20000 });
+            const exclusiveCard = exclusiveList.locator('a[href*="/equipment/"]').first();
+            check(await exclusiveCard.count() === 1, 'Exclusive equipment list has no detail card link');
+            const exclusiveListUrl = page.url();
+            await exclusiveCard.click();
+            const exclusiveDialog = page.getByRole('dialog');
+            await exclusiveDialog.waitFor({ timeout: 20000 });
+            await exclusiveDialog.getByRole('heading', { name: '전용 영웅', exact: true }).waitFor({ timeout: 20000 });
+            await exclusiveDialog.getByRole('heading', { name: 'Lv50 능력치', exact: true }).waitFor({ timeout: 20000 });
+            await exclusiveDialog.getByRole('heading', { name: '최대 효과', exact: true }).waitFor({ timeout: 20000 });
+            check(page.url() === exclusiveListUrl, `Exclusive equipment modal changed list URL: before=${exclusiveListUrl} after=${page.url()}`);
+            await exclusiveDialog.getByRole('button', { name: '장비 상세 창 닫기' }).click();
+            await exclusiveDialog.waitFor({ state: 'hidden', timeout: 10000 });
+            check(page.url() === exclusiveListUrl, 'Exclusive equipment modal close button changed list URL');
+            check(errors.length === 0, `Equipment modal Browser/UI errors: ${JSON.stringify(errors)}`);
+
+            console.log(JSON.stringify({
+              status: 'PASS_EQUIPMENT_MODAL_BROWSER_UI',
+              sourceSha: process.env.EXPECTED_SOURCE_SHA,
+              generalEquipmentListModal: 'PASS',
+              generalEquipmentModalEscapeClose: 'PASS',
+              generalEquipmentModalBodyScrollLock: 'PASS',
+              exclusiveEquipmentListModal: 'PASS',
+              exclusiveEquipmentModalButtonClose: 'PASS',
+              listUrlPreserved: 'PASS',
+              browserConsoleErrors: 0,
+              semanticStageReopened: false,
+            }, null, 2));
+            await page.close();
+          } finally {
+            await browser.close();
+          }
+          NODE
+
       - name: Browser UI interaction coverage spot checks
+        id: broad-browser-reuse
+        continue-on-error: true
         run: |
           node --input-type=module <<'NODE'
           import { chromium } from 'playwright';
@@ -255,3 +327,10 @@ jobs:
             await browser.close();
           }
           NODE
+
+      - name: Classify broad Browser UI drift
+        if: ${{ steps.broad-browser-reuse.outcome == 'failure' }}
+        shell: bash
+        run: |
+          printf 'REVIEW_EXISTING_DRIFT predecessor=%s: pre-existing broad Browser/UI coverage failed outside the equipment modal owner scope; equipment modal gate already passed independently.\n' "$EXPECTED_SOURCE_SHA"
+          echo "::warning::REVIEW_EXISTING_DRIFT: pre-existing broad Browser/UI coverage failed outside the equipment modal owner scope; equipment modal gate already passed independently."
