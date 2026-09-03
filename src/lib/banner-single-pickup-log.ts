@@ -97,7 +97,7 @@ export const SINGLE_PICKUP_LOG: SinglePickupLogRecord[] = [
 // The recurring wish-summon block and the future 2027-01-13 LLR row are excluded.
 export const LLR_PICKUP_LOG: LlrPickupLogRecord[] = [
   {
-    bannerNameKr: "빙룡의 정복",
+    bannerNameKr: "빙설 심연의 지배자",
     entries: [
       { date: "2024-09-24", note: "출시" },
       { date: "2025-06-04", note: "6주년" },
@@ -124,7 +124,7 @@ export const LLR_PICKUP_LOG: LlrPickupLogRecord[] = [
     ],
   },
   {
-    bannerNameKr: "마인의 서큐버스",
+    bannerNameKr: "마안의 서큐버스",
     entries: [
       { date: "2025-11-19", note: "출시" },
       { date: "2026-04-29", note: null },
@@ -132,7 +132,7 @@ export const LLR_PICKUP_LOG: LlrPickupLogRecord[] = [
     ],
   },
   {
-    bannerNameKr: "빛과 어둠의 심판",
+    bannerNameKr: "빛과 어둠의 반역자",
     entries: [{ date: "2026-06-03", note: "출시" }],
   },
 ];
