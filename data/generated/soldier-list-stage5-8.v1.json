@@ -79,6 +79,16 @@
       "sourceAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
       "correctionEventCount": 5,
       "correctedRecordCount": 11
+    },
+    "officialNoticeExtensionStage11A16": {
+      "path": "data/soldier-release-official-notice-extension-stage11-a16.v1.json",
+      "gitBlobSha": "9d44f915d49d9a88bf95faea3c8afdee914acda5",
+      "schemaId": "soldier-release-official-notice-extension-stage11-a16/v1",
+      "stage": "11-A16",
+      "sourceAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
+      "sourceId": "official-cn-2022-10-20-forest-redemption",
+      "releaseDate": "2022-10-20",
+      "promotedRecordCount": 2
     }
   },
   "summary": {
@@ -86,8 +96,8 @@
     "normalCount": 168,
     "spCount": 56,
     "normalTier3Count": 129,
-    "confirmedReleaseCount": 51,
-    "unresolvedNormalTier3Count": 78,
+    "confirmedReleaseCount": 53,
+    "unresolvedNormalTier3Count": 76,
     "lowerTierCount": 39,
     "nonPassIdentityMetadataCount": 41
   },
@@ -270,6 +280,15 @@
         "internalOrder": "soldierId-ascending-for-determinism-only"
       },
       {
+        "releaseDate": "2022-10-20",
+        "soldierIds": [
+          514,
+          816
+        ],
+        "samePatchOrderStatus": "UNRESOLVED",
+        "internalOrder": "soldierId-ascending-for-determinism-only"
+      },
+      {
         "releaseDate": "2022-09-22",
         "soldierIds": [
           1034,
@@ -416,7 +435,6 @@
       507,
       510,
       511,
-      514,
       515,
       602,
       607,
@@ -438,7 +456,6 @@
       811,
       812,
       813,
-      816,
       817,
       1006,
       1009,
@@ -2797,16 +2814,16 @@
       "spSoldierId": 5514,
       "validationStatus": "PASS",
       "release": {
-        "releaseStatus": "UNRESOLVED",
-        "releaseDate": null,
-        "patchGroup": null,
+        "releaseStatus": "CONFIRMED",
+        "releaseDate": "2022-10-20",
+        "patchGroup": "2022-10-20",
         "samePatchOrder": null,
-        "sourceKind": null,
-        "sourceLabel": null,
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "海洋祭师",
         "sourceRows": null,
-        "mappingStatus": null
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
-      "sortBucket": "NORMAL_TIER3_UNRESOLVED"
+      "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
     {
       "soldierId": 515,
@@ -4019,16 +4036,16 @@
       "spSoldierId": 5816,
       "validationStatus": "PASS",
       "release": {
-        "releaseStatus": "UNRESOLVED",
-        "releaseDate": null,
-        "patchGroup": null,
+        "releaseStatus": "CONFIRMED",
+        "releaseDate": "2022-10-20",
+        "patchGroup": "2022-10-20",
         "samePatchOrder": null,
-        "sourceKind": null,
-        "sourceLabel": null,
+        "sourceKind": "OFFICIAL_CN_RELEASE_NOTICE",
+        "sourceLabel": "圣卫术师",
         "sourceRows": null,
-        "mappingStatus": null
+        "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION"
       },
-      "sortBucket": "NORMAL_TIER3_UNRESOLVED"
+      "sortBucket": "NORMAL_TIER3_CONFIRMED_RELEASE"
     },
     {
       "soldierId": 817,
@@ -6344,6 +6361,17 @@
     "totalConfirmedRecords": 51,
     "unresolvedRecords": 173,
     "coverageChanged": false,
+    "samePatchOrder": "UNRESOLVED"
+  },
+  "promotionExtension": {
+    "stage": "11-A17",
+    "status": "PASS",
+    "predecessorConfirmedRecords": 51,
+    "promotedRecords": 2,
+    "totalConfirmedRecords": 53,
+    "unresolvedRecords": 171,
+    "normalTier3Unresolved": 76,
+    "sourceEvidence": "data/soldier-release-official-notice-extension-stage11-a16.v1.json",
     "samePatchOrder": "UNRESOLVED"
   }
 }

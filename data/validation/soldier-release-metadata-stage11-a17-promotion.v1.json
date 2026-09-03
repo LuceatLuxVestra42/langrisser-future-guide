@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-metadata-stage11-a17-promotion/v1",
+  "stage": "11-A17",
+  "status": "PASS",
+  "completion": "SOLDIER_RELEASE_METADATA_2022_10_PROMOTION_COMPLETE",
+  "owner": "soldier-release-metadata-promotion",
+  "predecessor": {
+    "evidence": "data/soldier-release-official-notice-extension-stage11-a16.v1.json",
+    "evidenceGitBlobSha": "9d44f915d49d9a88bf95faea3c8afdee914acda5",
+    "postA5ConfirmedReleaseRecords": 51,
+    "postA5UnresolvedReleaseRecords": 173,
+    "postA5NormalTier3Unresolved": 78
+  },
+  "promotedRecords": [
+    {
+      "soldierId": 514,
+      "canonicalNameCn": "海洋祭师",
+      "releaseDate": "2022-10-20",
+      "samePatchOrder": null,
+      "sourceAuthority": "OFFICIAL_CN_RELEASE_NOTICE"
+    },
+    {
+      "soldierId": 816,
+      "canonicalNameCn": "圣卫术师",
+      "releaseDate": "2022-10-20",
+      "samePatchOrder": null,
+      "sourceAuthority": "OFFICIAL_CN_RELEASE_NOTICE"
+    }
+  ],
+  "coverageAfter": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 53,
+    "unresolvedReleaseRecords": 171,
+    "normalTier3Confirmed": 53,
+    "normalTier3Unresolved": 76,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "checks": {
+    "exactCandidateSet": true,
+    "exactCanonicalLabels": true,
+    "targetsPreviouslyUnresolved": true,
+    "promotedReleaseListParity": true,
+    "exact20221020PatchGroup": true,
+    "samePatchOrderUnresolved": true,
+    "canonicalPopulationUnchanged": true,
+    "spChronologyUnchanged": true,
+    "lowerTierBoundaryUnchanged": true
+  },
+  "blockers": [],
+  "reviews": [
+    "76 normal tier-3 Soldier release dates remain unresolved and stay with soldier-release-metadata-evidence-acquisition.",
+    "Same-patch order between Soldier 514 and 816 remains unresolved."
+  ],
+  "nextOwner": "soldier-site-admission-refresh",
+  "nextStartPoint": "Refresh only Stage 6 release/freshness projections affected by 51/173 -> 53/171 and normal tier-3 unresolved 78 -> 76. Do not recompute canonical Soldier population or Hero-Soldier relation membership."
+}

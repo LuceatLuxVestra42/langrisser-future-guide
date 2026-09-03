@@ -65,6 +65,16 @@
       "sourceAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
       "correctionEventCount": 5,
       "correctedRecordCount": 11
+    },
+    "officialNoticeExtensionStage11A16": {
+      "path": "data/soldier-release-official-notice-extension-stage11-a16.v1.json",
+      "gitBlobSha": "9d44f915d49d9a88bf95faea3c8afdee914acda5",
+      "schemaId": "soldier-release-official-notice-extension-stage11-a16/v1",
+      "stage": "11-A16",
+      "sourceAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
+      "sourceId": "official-cn-2022-10-20-forest-redemption",
+      "releaseDate": "2022-10-20",
+      "promotedRecordCount": 2
     }
   },
   "checks": {
@@ -89,16 +99,17 @@
     "baselineMismatches": 0,
     "outputRecordCountMismatch": 0,
     "officialNoticePromotionMismatch": 0,
-    "cnChronologyCorrectionMismatch": 0
+    "cnChronologyCorrectionMismatch": 0,
+    "stage11A17PromotionMismatch": 0
   },
   "coverage": {
     "canonicalSoldiers": 224,
     "normalCount": 168,
     "spCount": 56,
     "normalTier3Count": 129,
-    "confirmedReleaseCount": 51,
-    "unresolvedReleaseCount": 173,
-    "unresolvedNormalTier3Count": 78,
+    "confirmedReleaseCount": 53,
+    "unresolvedReleaseCount": 171,
+    "unresolvedNormalTier3Count": 76,
     "lowerTierCount": 39,
     "patchGroups": [
       {
@@ -207,6 +218,14 @@
         ]
       },
       {
+        "releaseDate": "2022-10-20",
+        "count": 2,
+        "soldierIds": [
+          514,
+          816
+        ]
+      },
+      {
         "releaseDate": "2022-09-22",
         "count": 2,
         "soldierIds": [
@@ -308,15 +327,16 @@
     "baselineMismatches": [],
     "officialNoticePromotedCount": 40,
     "cnChronologyCorrectedCount": 11,
-    "officialCnConfirmedCount": 51
+    "officialCnConfirmedCount": 51,
+    "stage11A17PromotedCount": 2
   },
   "errors": [],
   "reviews": [
-    "78 normal tier-3 Soldiers still have no officially admitted Chinese-server release date after the Stage 11-A1 overlay and Stage 11-A5 source correction are applied.",
-    "56 SP Soldiers are grouped before normal Soldiers by UI policy; their internal release order remains unresolved because no canonical identity provenance has yet been admitted for the available SP release buckets.",
+    "76 normal tier-3 Soldiers have no externally confirmed release date after the frozen Stage 11-A17 extension is applied.",
+    "56 SP Soldiers remain a separate chronology owner scope; their internal release order is unresolved.",
     "39 normal tier-1/tier-2 Soldiers remain in a technical bucket because release ordering is not required for the current list policy.",
     "41 list rows retain non-PASS identity/presentation metadata from Stage 5-7.",
-    "Same-patch order is intentionally unresolved; no Soldier-ID ordering is presented as release ordering."
+    "Same-patch order is intentionally unresolved; Soldier ID is used only for deterministic display inside a confirmed patch group."
   ],
   "promotion": {
     "stage": "11-A2",
@@ -343,6 +363,17 @@
     "totalConfirmedRecords": 51,
     "unresolvedRecords": 173,
     "coverageChanged": false,
+    "samePatchOrder": "UNRESOLVED"
+  },
+  "promotionExtension": {
+    "stage": "11-A17",
+    "status": "PASS",
+    "predecessorConfirmedRecords": 51,
+    "promotedRecords": 2,
+    "totalConfirmedRecords": 53,
+    "unresolvedRecords": 171,
+    "normalTier3Unresolved": 76,
+    "sourceEvidence": "data/soldier-release-official-notice-extension-stage11-a16.v1.json",
     "samePatchOrder": "UNRESOLVED"
   }
 }
