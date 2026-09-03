@@ -78,8 +78,14 @@ const LEON_HERO_DUNGEON_GATE_BY_LEVEL_ID = (() => {
 
   const gateByDungeonLevelId = new Map<number, number>();
   for (const stage of record.stages) {
-    const [gateOrdinal, dungeonLevelId] = stage;
+    if (stage.length !== 2) {
+      throw new Error("Leon Hero Dungeon frozen consumer contains an invalid gate tuple.");
+    }
+    const gateOrdinal = stage[0];
+    const dungeonLevelId = stage[1];
     if (
+      typeof gateOrdinal !== "number" ||
+      typeof dungeonLevelId !== "number" ||
       !Number.isInteger(gateOrdinal) ||
       !Number.isInteger(dungeonLevelId) ||
       gateOrdinal < 1 ||
