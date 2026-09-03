@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-official-notice-extension-stage11-a16/v1",
+  "stage": "11-A16",
+  "status": "PASS",
+  "completion": "OFFICIAL_CN_RELEASE_EVENT_BATCH_FROZEN_NO_PROMOTION",
+  "owner": "soldier-release-metadata-evidence-acquisition",
+  "scope": "PRIMARY_OFFICIAL_RELEASE_EVIDENCE_ONLY_NO_STAGE5_8_PROMOTION",
+  "capturedAt": "2026-09-04",
+  "capturedAgainstMain": "bfc8dd47e87c076ed68286bb79a50ece08ee559c",
+  "predecessors": {
+    "stage11A15Boundary": "data/soldier-release-official-wechat-mirror-boundary-stage11-a15.v1.json",
+    "stage11A1OfficialNoticeEvidence": "data/soldier-release-official-notice-evidence-stage11-a1.v1.json",
+    "releaseMetadata": "data/generated/soldier-release-metadata.v1.json",
+    "soldierList": "data/generated/soldier-list-stage5-8.v1.json"
+  },
+  "policy": {
+    "targetTimeline": "CN_SERVER_RELEASE_CHRONOLOGY",
+    "sourceAuthority": "OFFICIAL_CN_RELEASE_NOTICE",
+    "publisher": "ZLONGAME",
+    "eventToCanonicalIdentity": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION",
+    "releaseDateMeaning": "DATE_ON_WHICH_THE_OFFICIAL_NOTICE_SAYS_THE_UPDATE_UNLOCKS_OR_ADDS_THE_SOLDIER",
+    "allowNameSimilarity": false,
+    "allowIdArithmetic": false,
+    "allowFilenameSimilarity": false,
+    "allowScreenOrRowOrderMapping": false,
+    "allowAbilityTextSimilarityMapping": false,
+    "allowBatchCountToIdentityMapping": false,
+    "allowSamePatchOrderInference": false,
+    "promoteIntoStage5_8": false
+  },
+  "coverageBefore": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "source": {
+    "sourceId": "official-cn-2022-10-20-forest-redemption",
+    "url": "https://news.zlongame.com/jx/mzgg/20221019/15940.html",
+    "noticePublishedAt": "2022-10-19",
+    "releaseDate": "2022-10-20",
+    "title": "“森罗与救赎之祈”更新维护公告",
+    "eventKind": "TRAINING_GROUND_NEW_SOLDIERS",
+    "officialStatementMeaning": "After the 2022-10-20 update, the training ground unlocks the two explicitly named new Soldiers.",
+    "newSoldierLabels": [
+      "海洋祭师",
+      "圣卫术师"
+    ]
+  },
+  "records": [
+    {
+      "soldierId": 514,
+      "canonicalNameCn": "海洋祭师",
+      "releaseDate": "2022-10-20",
+      "sourceId": "official-cn-2022-10-20-forest-redemption",
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION",
+      "currentReleaseStatus": "UNRESOLVED",
+      "releasePromotionEligible": true,
+      "samePatchOrder": null
+    },
+    {
+      "soldierId": 816,
+      "canonicalNameCn": "圣卫术师",
+      "releaseDate": "2022-10-20",
+      "sourceId": "official-cn-2022-10-20-forest-redemption",
+      "mappingStatus": "CANONICAL_ID_WITH_EXACT_CN_LABEL_MANUAL_VERIFICATION",
+      "currentReleaseStatus": "UNRESOLVED",
+      "releasePromotionEligible": true,
+      "samePatchOrder": null
+    }
+  ],
+  "summary": {
+    "officialCnReleaseEvents": 1,
+    "explicitNewSoldierLabels": 2,
+    "canonicalIdMappings": 2,
+    "exactCanonicalLabelMatches": 2,
+    "promotionEligibleRecords": 2,
+    "promotedRecordCountAtThisStage": 0,
+    "coverageChangedAtThisStage": false
+  },
+  "coverageAfter": {
+    "canonicalSoldiers": 224,
+    "confirmedReleaseRecords": 51,
+    "unresolvedReleaseRecords": 173,
+    "normalTier3Confirmed": 51,
+    "normalTier3Unresolved": 78,
+    "sp": 56,
+    "lowerTier": 39
+  },
+  "boundaries": {
+    "stage5_8Mutated": false,
+    "releaseMetadataMutated": false,
+    "canonicalPopulationChanged": false,
+    "heroSoldierRelationRecomputed": false,
+    "nameSimilarityJoin": false,
+    "idArithmetic": false,
+    "screenOrRowOrderMapping": false,
+    "abilityTextSimilarityMapping": false,
+    "batchCountIdentityMapping": false,
+    "samePatchOrderClaimed": false,
+    "spChronologyInferred": false,
+    "lowerTierChronologyInferred": false
+  },
+  "blockers": [],
+  "reviews": [],
+  "nextOwner": "soldier-release-metadata-promotion",
+  "nextStartPoint": [
+    "Promote only Soldier 514 and 816 to the 2022-10-20 CN release batch using this frozen official notice evidence.",
+    "Reduce normal tier-3 unresolved coverage by exactly two while preserving all other 76 unresolved normal tier-3 records, 56 SP records, and 39 lower-tier boundary records.",
+    "Do not assert an internal same-patch order between Soldier 514 and 816.",
+    "Refresh only release-affected generated consumers, validation, and Project Status review counts required by the owning contracts."
+  ],
+  "reopenConditions": [
+    "A primary official source contradicts the 2022-10-20 release event membership for 海洋祭师 or 圣卫术师.",
+    "Canonical Soldier identity for 514 or 816 changes.",
+    "The release chronology contract changes its release-date meaning or evidence-admission requirements."
+  ]
+}
