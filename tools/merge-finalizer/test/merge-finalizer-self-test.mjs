@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -145,9 +146,12 @@ assert.equal(classifyMergeGateChecks({
   ],
 }).status, 'BLOCKER_MERGE_GATE');
 
-const cliText = fs.readFileSync(path.resolve('tools/merge-finalizer/cli/finalize.mjs'), 'utf8');
+const cliPath = path.resolve('tools/merge-finalizer/cli/finalize.mjs');
+const cliText = fs.readFileSync(cliPath, 'utf8');
 const workflowText = fs.readFileSync(path.resolve('.github/workflows/merge-finalize-main.yml'), 'utf8');
 const projectCheckText = fs.readFileSync(path.resolve('.github/workflows/project-tooling-r3-project-check.yml'), 'utf8');
+const cliSyntax = spawnSync(process.execPath, ['--check', cliPath], { encoding: 'utf8', shell: false });
+assert.equal(cliSyntax.status, 0, `Finalizer CLI syntax check failed: ${String(cliSyntax.stderr ?? '').trim()}`);
 
 for (const required of [
   "`/git/ref/pull/${prNumber}/merge`",
@@ -226,7 +230,7 @@ console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'MERGE_FINALIZER_HOSTED_GATE_SELF_TEST',
   fixtures: 33,
-  staticGuards: 66,
+  staticGuards: 67,
   requiredCheck: REQUIRED_PROJECT_CHECK,
   hostedGate: hostedGate.requiredCheck,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,
