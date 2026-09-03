@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 
 export const DEFAULT_OWNER_MAP = 'tools/project-check/contracts/owners.v1.json';
 export const DEFAULT_VALIDATOR_CATALOG = 'tools/project-check/contracts/validators.v1.json';
+export const DEFAULT_MERGE_GATE_MAP = 'tools/project-check/contracts/merge-gates.v1.json';
 
 const readJson = filePath => JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
@@ -76,14 +77,16 @@ export function loadProjectCheckContracts({
   repoRoot = process.cwd(),
   ownerMapPath = DEFAULT_OWNER_MAP,
   validatorCatalogPath = DEFAULT_VALIDATOR_CATALOG,
+  mergeGateMapPath = DEFAULT_MERGE_GATE_MAP,
 } = {}) {
   const ownerMap = readJson(assertRepositoryPath(repoRoot, ownerMapPath));
   const validatorCatalog = readJson(assertRepositoryPath(repoRoot, validatorCatalogPath));
-  validateProjectCheckContracts({ ownerMap, validatorCatalog });
-  return { ownerMap, validatorCatalog };
+  const mergeGateMap = readJson(assertRepositoryPath(repoRoot, mergeGateMapPath));
+  validateProjectCheckContracts({ ownerMap, validatorCatalog, mergeGateMap });
+  return { ownerMap, validatorCatalog, mergeGateMap };
 }
 
-export function validateProjectCheckContracts({ ownerMap, validatorCatalog }) {
+export function validateProjectCheckContracts({ ownerMap, validatorCatalog, mergeGateMap = null }) {
   const failures = [];
   if (ownerMap?.schemaId !== 'project-check-owner-map/v1' || ownerMap.status !== 'DESIGN_FROZEN') {
     failures.push({ type: 'OWNER_MAP_INVALID', schemaId: ownerMap?.schemaId ?? null, status: ownerMap?.status ?? null });
@@ -91,12 +94,17 @@ export function validateProjectCheckContracts({ ownerMap, validatorCatalog }) {
   if (validatorCatalog?.schemaId !== 'project-check-validator-catalog/v1' || validatorCatalog.status !== 'DESIGN_FROZEN') {
     failures.push({ type: 'VALIDATOR_CATALOG_INVALID', schemaId: validatorCatalog?.schemaId ?? null, status: validatorCatalog?.status ?? null });
   }
+  if (mergeGateMap !== null && (mergeGateMap?.schemaId !== 'project-check-merge-gate-map/v1' || mergeGateMap.status !== 'DESIGN_FROZEN')) {
+    failures.push({ type: 'MERGE_GATE_MAP_INVALID', schemaId: mergeGateMap?.schemaId ?? null, status: mergeGateMap?.status ?? null });
+  }
   for (const id of duplicateIds(ownerMap?.owners)) failures.push({ type: 'DUPLICATE_OWNER_ID', id });
   for (const id of duplicateIds(ownerMap?.pathRules)) failures.push({ type: 'DUPLICATE_PATH_RULE_ID', id });
   for (const id of duplicateIds(validatorCatalog?.validators)) failures.push({ type: 'DUPLICATE_VALIDATOR_ID', id });
+  for (const id of duplicateIds(mergeGateMap?.gates)) failures.push({ type: 'DUPLICATE_MERGE_GATE_ID', id });
 
   const owners = new Map((ownerMap?.owners ?? []).map(item => [item.id, item]));
   const validators = new Map((validatorCatalog?.validators ?? []).map(item => [item.id, item]));
+  const mergeGates = new Map((mergeGateMap?.gates ?? []).map(item => [item.id, item]));
 
   for (const rule of ownerMap?.pathRules ?? []) {
     if (!Array.isArray(rule.patterns) || rule.patterns.length === 0) failures.push({ type: 'PATH_RULE_WITHOUT_PATTERNS', id: rule.id });
@@ -121,21 +129,50 @@ export function validateProjectCheckContracts({ ownerMap, validatorCatalog }) {
     if (!Array.isArray(validator.args) || validator.args.some(item => typeof item !== 'string')) failures.push({ type: 'VALIDATOR_ARGS_INVALID', validatorId: validator.id });
   }
 
+  for (const gate of mergeGateMap?.gates ?? []) {
+    if (!gate?.id || !gate?.requiredCheck || typeof gate.requiredCheck.name !== 'string' || !Number.isInteger(gate.requiredCheck.appId)) {
+      failures.push({ type: 'MERGE_GATE_REQUIRED_CHECK_INVALID', gateId: gate?.id ?? null });
+    }
+    if (gate?.validationRef !== 'PR_HEAD') {
+      failures.push({ type: 'MERGE_GATE_VALIDATION_REF_INVALID', gateId: gate?.id ?? null, validationRef: gate?.validationRef ?? null });
+    }
+  }
+  for (const requirement of mergeGateMap?.ownerRequirements ?? []) {
+    if (!owners.has(requirement?.ownerId)) {
+      failures.push({ type: 'MERGE_GATE_UNKNOWN_OWNER', ownerId: requirement?.ownerId ?? null });
+    }
+    if (!Array.isArray(requirement?.gates) || requirement.gates.length === 0) {
+      failures.push({ type: 'MERGE_GATE_OWNER_WITHOUT_GATES', ownerId: requirement?.ownerId ?? null });
+      continue;
+    }
+    for (const gateId of requirement.gates) {
+      if (!mergeGates.has(gateId)) failures.push({ type: 'MERGE_GATE_UNKNOWN_GATE', ownerId: requirement.ownerId, gateId });
+    }
+  }
+
   if (ownerMap?.policy?.ownerPropagation !== false) failures.push({ type: 'OWNER_PROPAGATION_MUST_BE_FALSE' });
   if (ownerMap?.policy?.changeClassFanOut !== false) failures.push({ type: 'CHANGE_CLASS_FANOUT_MUST_BE_FALSE' });
   if (validatorCatalog?.policy?.shellExecution !== false) failures.push({ type: 'SHELL_EXECUTION_MUST_BE_FALSE' });
   if (validatorCatalog?.policy?.legacyDoctorValidatorAllowed !== false) failures.push({ type: 'LEGACY_DOCTOR_VALIDATOR_MUST_BE_FALSE' });
+  if (mergeGateMap !== null) {
+    if (mergeGateMap?.policy?.ownerPropagation !== false) failures.push({ type: 'MERGE_GATE_OWNER_PROPAGATION_MUST_BE_FALSE' });
+    if (mergeGateMap?.policy?.changeClassFanOut !== false) failures.push({ type: 'MERGE_GATE_CHANGE_CLASS_FANOUT_MUST_BE_FALSE' });
+    if (mergeGateMap?.policy?.pathInference !== false) failures.push({ type: 'MERGE_GATE_PATH_INFERENCE_MUST_BE_FALSE' });
+  }
 
   if (failures.length) throw new Error(`Project Check contract invalid: ${JSON.stringify(failures)}`);
   return { pass: true };
 }
 
-export function routeProjectCheckPaths(paths, { ownerMap, validatorCatalog }) {
+export function routeProjectCheckPaths(paths, { ownerMap, validatorCatalog, mergeGateMap = null }) {
   const normalizedPaths = [...new Set((paths ?? []).map(normalizeRepositoryPath))].sort();
   const ownersById = new Map(ownerMap.owners.map(item => [item.id, item]));
   const validatorsById = new Map(validatorCatalog.validators.map(item => [item.id, item]));
+  const gatesById = new Map((mergeGateMap?.gates ?? []).map(item => [item.id, item]));
+  const gateIdsByOwner = new Map((mergeGateMap?.ownerRequirements ?? []).map(item => [item.ownerId, item.gates ?? []]));
   const selectedValidatorIds = new Set();
   const selectedOwnerIds = new Set();
+  const selectedMergeGateIds = new Set();
   const manualReviews = [];
 
   const files = normalizedPaths.map(filePath => {
@@ -143,10 +180,11 @@ export function routeProjectCheckPaths(paths, { ownerMap, validatorCatalog }) {
     const ownerIds = [...new Set(matchedRules.flatMap(rule => rule.owners ?? []))].sort();
     if (ownerIds.length === 0) {
       manualReviews.push({ type: 'UNMATCHED_PATH', path: filePath, reason: 'No explicit Project Check owner rule matched this path.' });
-      return { path: filePath, status: 'MANUAL_REVIEW', matchedRules: [], owners: [], validators: [] };
+      return { path: filePath, status: 'MANUAL_REVIEW', matchedRules: [], owners: [], validators: [], mergeGates: [] };
     }
 
     const validatorIds = new Set();
+    const fileMergeGateIds = new Set();
     const fileManual = [];
     for (const ownerId of ownerIds) {
       const owner = ownersById.get(ownerId);
@@ -154,6 +192,10 @@ export function routeProjectCheckPaths(paths, { ownerMap, validatorCatalog }) {
       for (const validatorId of owner.validators ?? []) {
         validatorIds.add(validatorId);
         selectedValidatorIds.add(validatorId);
+      }
+      for (const gateId of gateIdsByOwner.get(ownerId) ?? []) {
+        fileMergeGateIds.add(gateId);
+        selectedMergeGateIds.add(gateId);
       }
       if (owner.manualReview) {
         const review = { type: 'MANUAL_OWNER', path: filePath, ownerId, reason: owner.manualReview };
@@ -168,12 +210,16 @@ export function routeProjectCheckPaths(paths, { ownerMap, validatorCatalog }) {
       matchedRules: matchedRules.map(rule => rule.id),
       owners: ownerIds,
       validators: [...validatorIds].sort(),
+      mergeGates: [...fileMergeGateIds].sort(),
     };
   });
 
   const validators = [...selectedValidatorIds]
     .map(id => validatorsById.get(id))
     .sort((a, b) => a.phase - b.phase || a.id.localeCompare(b.id));
+  const mergeGates = [...selectedMergeGateIds]
+    .sort()
+    .map(id => gatesById.get(id));
 
   return {
     version: 1,
@@ -182,14 +228,17 @@ export function routeProjectCheckPaths(paths, { ownerMap, validatorCatalog }) {
     changedFileCount: normalizedPaths.length,
     ownerCount: selectedOwnerIds.size,
     validatorCount: validators.length,
+    mergeGateCount: mergeGates.length,
     files,
     owners: [...selectedOwnerIds].sort(),
     validators,
+    mergeGates,
     manualReviews,
     boundaries: {
       ownerPropagationCount: 0,
       changeClassFanOutCount: 0,
       semanticRecomputationCount: 0,
+      mergeGatePathInferenceCount: 0,
       statusSourceMutationCount: 0,
       projectStatusMutationCount: 0,
     },
