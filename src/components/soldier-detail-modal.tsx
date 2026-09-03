@@ -251,7 +251,7 @@ export function SoldierDetailModal({
                 <div className="mt-5 border-t border-border pt-4">
                   <div className="flex items-end justify-between gap-3">
                     <p className="text-sm font-black tracking-tight text-foreground sm:text-base">
-                      SP 전직 후 추가 사용 가능 영웅
+                      SP 2차미션 완료 후 추가 사용 가능 영웅
                     </p>
                     <span className="text-xs font-semibold tabular-nums text-muted-foreground">
                       {heroGroups.spUnlockedHeroIds.length}명
@@ -798,6 +798,7 @@ function SpStageCard({
     ...stage.awakenMaterials,
     ...(hasSubmitMission ? getSpSubmitMissionMaterials(uiGroup) : []),
   ]);
+  const visibleMissions = stage.missions.filter((mission) => mission.missionType !== 73);
 
   return (
     <div className="rounded-xl border border-border bg-background p-4">
@@ -839,16 +840,18 @@ function SpStageCard({
         </div>
       </div>
 
-      <div className="mt-4 space-y-2">
-        <p className="text-xs font-bold text-muted-foreground">전직 미션</p>
-        {stage.missions.map((mission) => (
-          <div key={mission.missionId} className="rounded-lg border border-border bg-card px-3 py-2.5">
-            <p className="whitespace-pre-line text-xs leading-5 text-muted-foreground">
-              {resolveSoldierSpMissionDescKo(mission)}
-            </p>
-          </div>
-        ))}
-      </div>
+      {visibleMissions.length > 0 ? (
+        <div className="mt-4 space-y-2">
+          <p className="text-xs font-bold text-muted-foreground">전직 미션</p>
+          {visibleMissions.map((mission) => (
+            <div key={mission.missionId} className="rounded-lg border border-border bg-card px-3 py-2.5">
+              <p className="whitespace-pre-line text-xs leading-5 text-muted-foreground">
+                {resolveSoldierSpMissionDescKo(mission)}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
