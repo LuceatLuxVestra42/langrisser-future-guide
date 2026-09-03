@@ -51,6 +51,9 @@ const classify = overrides => classifyMergeFinalization({
   },
   comparison: { behind_by: overrides?.behindBy ?? 0 },
   checkRuns: overrides?.checkRuns ?? [successCheck],
+  ...(Object.prototype.hasOwnProperty.call(overrides ?? {}, 'validationSha')
+    ? { validationSha: overrides.validationSha }
+    : {}),
 });
 
 assert.equal(classifyExecutionBoundary({ repository: REPOSITORY, pr: basePr }).status, 'SUPPORTED');
@@ -75,6 +78,7 @@ assert.deepEqual(
   { restart: true, reason: 'VALIDATION_SHA_CHANGED' },
 );
 assert.equal(classify().status, 'READY_TO_MERGE');
+assert.equal(classify({ pr: { merge_commit_sha: null }, validationSha: MERGE }).status, 'READY_TO_MERGE');
 assert.equal(classify({ checkRuns: [{ ...successCheck, conclusion: 'failure' }] }).status, 'BLOCKER_OWNING_VALIDATOR');
 assert.equal(classify({ checkRuns: [{ ...successCheck, app: { id: 999 } }] }).status, 'CHECK_REQUIRED');
 assert.equal(classify({ checkRuns: [{ ...successCheck, head_sha: HEAD }] }).status, 'CHECK_REQUIRED');
@@ -82,7 +86,7 @@ assert.equal(classify({ pr: { mergeable: false, mergeable_state: 'dirty' } }).st
 assert.equal(classify({ checkRuns: [] }).status, 'CHECK_REQUIRED');
 assert.equal(classify({ checkRuns: [{ ...successCheck, status: 'in_progress', conclusion: null }] }).status, 'CHECK_PENDING');
 assert.equal(classify({ pr: { draft: true } }).status, 'BLOCKER_DRAFT');
-assert.equal(classify({ pr: { merge_commit_sha: null }, checkRuns: [] }).status, 'WAIT_MERGEABILITY');
+assert.equal(classify({ pr: { merge_commit_sha: null }, checkRuns: [], validationSha: null }).status, 'WAIT_MERGEABILITY');
 assert.equal(findExactProjectCheckForWorkflowRun([successCheck], MERGE, RUN_ID)?.id, successCheck.id);
 assert.equal(findExactProjectCheckForWorkflowRun([{ ...successCheck, details_url: 'https://example.invalid/other' }], MERGE, RUN_ID), null);
 
@@ -91,6 +95,8 @@ const workflowText = fs.readFileSync(path.resolve('.github/workflows/merge-final
 const projectCheckText = fs.readFileSync(path.resolve('.github/workflows/project-tooling-r3-project-check.yml'), 'utf8');
 
 for (const required of [
+  "`/git/ref/pull/${prNumber}/merge`",
+  "validationSha: boundary.validationSha",
   "method: 'PUT', body: { expected_head_sha: snapshot.headSha }",
   "method: 'POST',\n      body: { ref: `refs/heads/${refName}`, sha: validationSha }",
   "method: 'DELETE'",
@@ -121,11 +127,12 @@ assert.equal(projectCheckText.includes('ACTUAL_HEAD'), true);
 
 console.log(JSON.stringify({
   status: 'PASS',
-  checkpoint: 'MERGE_FINALIZER_STAGE4_MERGE_RESULT_SELF_TEST',
-  fixtures: 23,
-  staticGuards: 22,
+  checkpoint: 'MERGE_FINALIZER_STAGE4_PULL_MERGE_REF_SELF_TEST',
+  fixtures: 24,
+  staticGuards: 24,
   requiredCheck: REQUIRED_PROJECT_CHECK,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,
+  validationLocator: 'refs/pull/<pr>/merge',
   validationTarget: 'PR_SYNTHETIC_MERGE_RESULT_SHA',
   validationRefLifetime: 'TEMPORARY_DISPATCH_REF_ONLY',
   mutationMethods: ['PUT update-branch', 'POST temp validation ref', 'POST workflow_dispatch', 'DELETE temp validation ref', 'PUT merge'],
