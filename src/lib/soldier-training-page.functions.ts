@@ -1,7 +1,12 @@
 import { readSoldierTrainingPageData } from "./soldier-training-page.server";
 
-// GitHub Pages static build: consume frozen TrainingTech/material semantic artifacts
-// plus only the Stage E-admitted Soldier Training Korean presentation components.
+// Diagnostic-only branch: surface the exact Soldier Training prerender exception.
+// Do not merge this logging wrapper; the owning fix will be prepared separately.
 export function getSoldierTrainingPageData() {
-  return readSoldierTrainingPageData();
+  try {
+    return readSoldierTrainingPageData();
+  } catch (error) {
+    console.error("[soldier-training-prerender-diagnostic]", error);
+    throw error;
+  }
 }
