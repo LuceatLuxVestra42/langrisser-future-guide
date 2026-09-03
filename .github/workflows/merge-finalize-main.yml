@@ -123,8 +123,12 @@ jobs:
                 fi
                 updates=$((updates + 1))
                 ;;
-              WAIT_MERGEABILITY|CHECK_REQUIRED|CHECK_PENDING)
+              WAIT_MERGEABILITY)
                 sleep 5
+                ;;
+              CHECK_REQUIRED|CHECK_PENDING|CHECK_NOT_SUCCESSFUL)
+                printf 'MERGE_FINALIZER_APP_PREFLIGHT=HANDOFF_TO_EXECUTE\nAPP_REFRESH_COUNT=%s\n' "$updates"
+                exit 0
                 ;;
               *)
                 printf '%s\n' "$snapshot"
