@@ -1,0 +1,27 @@
+name: Diagnostic Soldier Training Pages Prerender
+
+on:
+  pull_request:
+    paths:
+      - "src/lib/soldier-training-page.functions.ts"
+      - ".github/workflows/diag-soldier-training-pages-prerender.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  pages-prerender:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+      - name: Reproduce Soldier Training Pages prerender
+        run: bunx vite build --config vite.config.pages.ts
