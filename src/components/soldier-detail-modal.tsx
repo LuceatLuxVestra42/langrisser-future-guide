@@ -6,6 +6,7 @@ import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import { getSoldierCommonMaterialIconUrl } from "@/lib/soldier-common-material-assets";
 import { getSoldierTrainingMaterialIconUrl } from "@/lib/soldier-training-material-assets";
 import type { SoldierPrototypePresentationRecord } from "@/lib/soldier-ability-presentation.server";
+import { resolveSoldierSpMissionDescKo } from "@/lib/soldier-sp-mission-presentation";
 
 type MaterialCost = {
   goodsType: number;
@@ -28,6 +29,9 @@ type SpMission = {
   missionId: number;
   title: string;
   desc: string;
+  missionType: number;
+  param1: number;
+  param2: number;
 };
 
 type SpStage = {
@@ -766,7 +770,7 @@ function SpStageCard({ title, stage }: { title: string; stage: SpStage | null })
           <div key={mission.missionId} className="rounded-lg border border-border bg-card px-3 py-2.5">
             <p className="text-xs font-black text-foreground">{mission.title}</p>
             <p className="mt-1 whitespace-pre-line text-xs leading-5 text-muted-foreground">
-              {mission.desc}
+              {resolveSoldierSpMissionDescKo(mission)}
             </p>
           </div>
         ))}
