@@ -115,7 +115,7 @@ function assertPresentationSourceContract() {
 
   if (
     source.templates["123"] !== "기존에 이 용병을 쓰는 영웅 중 {param1}명 {param2}레벨" ||
-    source.templates["124"] !== "추가 캐릭 영웅 중에서 영웅 {param1}명의 중앙유대 {param2}렙"
+    source.templates["124"] !== "추가 사용 가능 영웅 중에서 {param1}명의 중앙유대 {param2}레벨"
   ) {
     fail("Korean template mismatch.");
   }
