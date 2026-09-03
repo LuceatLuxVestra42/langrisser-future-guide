@@ -163,7 +163,7 @@ async function waitForMergeability(repository, prNumber, token, options) {
   return null;
 }
 
-async function waitForPostMergeVerification(repository, prNumber, mergeSha, token, options) {
+async function waitForPostMergeVerification(repository, prNumber, mergeSha, expectedHeadSha, token, options) {
   const deadline = Date.now() + Math.min(options.timeoutMs, 60_000);
   let last = null;
   while (Date.now() < deadline) {
@@ -172,8 +172,9 @@ async function waitForPostMergeVerification(repository, prNumber, mergeSha, toke
       githubRequest(repository, '/branches/main', token),
       githubRequest(repository, `/commits/${mergeSha}`, token),
     ]);
-    last = { mergedPr, mainAfter, mergeCommit };
-    if (mergedPr?.merged_at != null && mergedPr?.merge_commit_sha === mergeSha) {
+    const parentShas = (mergeCommit?.parents ?? []).map(parent => parent?.sha).filter(Boolean);
+    last = { mergedPr, mainAfter, mergeCommit, parentShas };
+    if (mergedPr?.merged_at != null && mergeCommit?.sha === mergeSha && parentShas.includes(expectedHeadSha)) {
       return { verified: true, ...last };
     }
     await sleep(options.pollMs);
@@ -427,6 +428,7 @@ async function executeFinalization(args, token) {
       args.repository,
       args.pr,
       merge.sha,
+      guard.headSha,
       token,
       args,
     );
@@ -438,8 +440,9 @@ async function executeFinalization(args, token) {
     if (verification?.verified !== true) {
       return blocker('BLOCKER_POST_MERGE_VERIFICATION', {
         mergeSha: merge.sha,
-        merged: mergedPr?.merged ?? null,
-        mergeCommitSha: mergedPr?.merge_commit_sha ?? null,
+        mergedAt: mergedPr?.merged_at ?? null,
+        observedMergeCommitSha: mergeCommit?.sha ?? null,
+        expectedHeadParentFound: verification?.parentShas?.includes(guard.headSha) ?? false,
       });
     }
 
