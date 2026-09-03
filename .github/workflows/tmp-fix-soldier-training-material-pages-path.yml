@@ -1,0 +1,35 @@
+name: Temporary Soldier Training asset path fixer
+on:
+  push:
+    branches:
+      - fix/soldier-training-material-pages-path
+permissions:
+  contents: write
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: fix/soldier-training-material-pages-path
+      - name: Fix Pages-relative material image path
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('src/lib/soldier-training-page.server.ts')
+          s = p.read_text()
+          old = 'imageUrl: `/images/soldier-training-materials/${item.itemId}.png`,'
+          new = 'imageUrl: `../../images/soldier-training-materials/${item.itemId}.png`,'
+          if s.count(old) != 1:
+              raise SystemExit(f'expected exactly one target, found {s.count(old)}')
+          p.write_text(s.replace(old, new))
+          PY
+      - name: Remove temporary workflow and commit result
+        run: |
+          rm .github/workflows/tmp-fix-soldier-training-material-pages-path.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/lib/soldier-training-page.server.ts .github/workflows/tmp-fix-soldier-training-material-pages-path.yml
+          git commit -m 'Fix Soldier Training material image path on Pages'
+          git push origin HEAD:fix/soldier-training-material-pages-path
