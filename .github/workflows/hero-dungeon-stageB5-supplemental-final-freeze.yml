@@ -1,0 +1,70 @@
+name: Hero Dungeon B5 Supplemental Final Freeze
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/hero-dungeon-stageB0-scope-reset.v1.json'
+      - 'data/validation/hero-dungeon-stageB1-population-classification.v1.json'
+      - 'data/validation/hero-dungeon-stageB2-exact-join-integrity.v1.json'
+      - 'data/validation/hero-dungeon-stageB3-namenum-ordinal-integrity.v1.json'
+      - 'data/validation/hero-dungeon-stageB4-population-acceptance.v1.json'
+      - 'data/generated/hero-dungeon-supplemental-final.v1.json'
+      - 'data/generated/hero-dungeon-supplemental/**'
+      - 'data/validation/hero-dungeon-stageB5-supplemental-final-freeze.v1.json'
+      - 'scripts/validate-hero-dungeon-stageB5-supplemental-final-freeze.mjs'
+      - 'scripts/validate-hero-dungeon-stageB5-freeze.mjs'
+      - '.github/workflows/hero-dungeon-stageB5-supplemental-final-freeze.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hero-dungeon-b5:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate B5 supplemental final consumer
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTPUT="$RUNNER_TEMP/hero-dungeon-stageB5-supplemental-final-freeze.v1.json"
+          node scripts/validate-hero-dungeon-stageB5-supplemental-final-freeze.mjs --output "$OUTPUT"
+
+      - name: Validate frozen B5 parity
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/validate-hero-dungeon-stageB5-freeze.mjs \
+            --measurement "$RUNNER_TEMP/hero-dungeon-stageB5-supplemental-final-freeze.v1.json" \
+            --expected data/validation/hero-dungeon-stageB5-supplemental-final-freeze.v1.json
+
+      - name: Upload B5 validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-dungeon-stageB5-supplemental-final-freeze
+          path: ${{ runner.temp }}/hero-dungeon-stageB5-supplemental-final-freeze.v1.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Verify tracked state is unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHANGES="$(git status --porcelain=v1 --untracked-files=no)"
+          if [ -n "$CHANGES" ]; then
+            echo "$CHANGES"
+            echo 'Hero Dungeon B5 validator mutated tracked repository state.'
+            exit 1
+          fi
