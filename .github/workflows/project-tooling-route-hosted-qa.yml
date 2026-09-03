@@ -38,6 +38,98 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  publish-pr-preview:
+    name: publish-pr-preview
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PREVIEW_REPOSITORY: LuceatLuxVestra42/Data
+      PREVIEW_BRANCH: gh-pages
+      PREVIEW_PATH: pr-${{ github.event.pull_request.number }}
+      PREVIEW_BASE_URL: https://luceatluxvestra42.github.io/Data/pr-${{ github.event.pull_request.number }}/
+      STATIC_SITE_BASE: /Data/pr-${{ github.event.pull_request.number }}/
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build isolated preview candidate
+        run: |
+          set -euo pipefail
+          node scripts/build-equipment-name-kr-presentation.mjs
+          bunx vite build --config vite.config.pages.ts
+          cp dist/client/index.html dist/client/404.html
+          cat > dist/client/preview-source.json <<JSON
+          {
+            "status": "PR_PREVIEW_DEPLOYMENT",
+            "sourceRepository": "${GITHUB_REPOSITORY}",
+            "sourceSha": "${SOURCE_SHA}",
+            "pullRequest": ${{ github.event.pull_request.number }},
+            "publisher": ".github/workflows/project-tooling-route-hosted-qa.yml"
+          }
+          JSON
+
+      - name: Create Data repository GitHub App token
+        id: preview-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.MERGEFINALIZER_APP_ID }}
+          private-key: ${{ secrets.MERGEFINALIZER_APP_KEY }}
+          owner: LuceatLuxVestra42
+          repositories: Data
+          permission-contents: write
+
+      - name: Publish only this PR directory
+        env:
+          PREVIEW_TOKEN: ${{ steps.preview-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch "$PREVIEW_BRANCH" "https://x-access-token:${PREVIEW_TOKEN}@github.com/${PREVIEW_REPOSITORY}.git" /tmp/preview-pages
+          mkdir -p "/tmp/preview-pages/${PREVIEW_PATH}"
+          find "/tmp/preview-pages/${PREVIEW_PATH}" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+          cp -a dist/client/. "/tmp/preview-pages/${PREVIEW_PATH}/"
+          touch /tmp/preview-pages/.nojekyll
+          cd /tmp/preview-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'PR_PREVIEW_PUBLISH=NO_CHANGE'
+          else
+            git commit -m "PR preview ${GITHUB_REPOSITORY}#${{ github.event.pull_request.number }} ${SOURCE_SHA}"
+            git push origin "$PREVIEW_BRANCH"
+          fi
+
+      - name: Wait for exact preview deployment
+        run: |
+          set -euo pipefail
+          deadline=$((SECONDS + 300))
+          while (( SECONDS < deadline )); do
+            body="$(curl --silent --show-error --location --fail --max-time 15 "${PREVIEW_BASE_URL}preview-source.json?sha=${SOURCE_SHA}&run=${GITHUB_RUN_ID}" || true)"
+            if printf '%s' "$body" | grep -q "\"sourceSha\": \"${SOURCE_SHA}\""; then
+              echo 'PR_PREVIEW_PUBLISH=PASS'
+              echo "PR_PREVIEW_URL=${PREVIEW_BASE_URL}"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "BLOCKER_PREVIEW_DEPLOYMENT_NOT_FRESH url=${PREVIEW_BASE_URL} expected=${SOURCE_SHA}" >&2
+          exit 1
+
   route-hosted-qa:
     name: route-hosted-qa
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
