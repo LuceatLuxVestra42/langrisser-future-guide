@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Dumbbell, Search } from "lucide-react";
+import { ArrowLeft, Dumbbell, Search } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 
 import { getSoldierTrainingPageData } from "@/lib/soldier-training-page.functions";
@@ -8,7 +8,7 @@ import type {
   TrainingStatEffect,
 } from "@/lib/soldier-training-page.server";
 
-export const Route = createFileRoute("/soldiers/training")({
+export const Route = createFileRoute("/soldiers_/training")({
   loader: () => getSoldierTrainingPageData(),
   head: () => ({
     meta: [
@@ -77,10 +77,12 @@ function SoldierTrainingPage() {
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <Link
+            reloadDocument
             to="/soldiers"
-            className="inline-flex items-center rounded-md border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
           >
-            ← 용병으로
+            <ArrowLeft size={16} aria-hidden="true" />
+            용병 라인업으로
           </Link>
           <div className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-xs font-semibold text-muted-foreground">
             <Dumbbell className="h-4 w-4" aria-hidden="true" />

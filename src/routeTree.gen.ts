@@ -21,7 +21,7 @@ import { Route as EquipmentExclusiveRouteImport } from './routes/equipment_.excl
 import { Route as HeroesHeroIdRouteImport } from './routes/heroes_.$heroId'
 import { Route as SoldiersIndexRouteImport } from './routes/soldiers.index'
 import { Route as SoldiersSoldierIdRouteImport } from './routes/soldiers.$soldierId'
-import { Route as SoldiersTrainingRouteImport } from './routes/soldiers.training'
+import { Route as SoldiersTrainingRouteImport } from './routes/soldiers_.training'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -84,9 +84,9 @@ const SoldiersSoldierIdRoute = SoldiersSoldierIdRouteImport.update({
   getParentRoute: () => SoldiersRoute,
 } as any)
 const SoldiersTrainingRoute = SoldiersTrainingRouteImport.update({
-  id: '/training',
-  path: '/training',
-  getParentRoute: () => SoldiersRoute,
+  id: '/soldiers_/training',
+  path: '/soldiers/training',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -131,7 +131,7 @@ export interface FileRoutesById {
   '/equipment_/exclusive': typeof EquipmentExclusiveRoute
   '/heroes_/$heroId': typeof HeroesHeroIdRoute
   '/soldiers/$soldierId': typeof SoldiersSoldierIdRoute
-  '/soldiers/training': typeof SoldiersTrainingRoute
+  '/soldiers_/training': typeof SoldiersTrainingRoute
   '/soldiers/': typeof SoldiersIndexRoute
 }
 export interface FileRouteTypes {
@@ -177,7 +177,7 @@ export interface FileRouteTypes {
     | '/equipment_/exclusive'
     | '/heroes_/$heroId'
     | '/soldiers/$soldierId'
-    | '/soldiers/training'
+    | '/soldiers_/training'
     | '/soldiers/'
   fileRoutesById: FileRoutesById
 }
@@ -192,6 +192,7 @@ export interface RootRouteChildren {
   EquipmentEquipmentIdRoute: typeof EquipmentEquipmentIdRoute
   EquipmentExclusiveRoute: typeof EquipmentExclusiveRoute
   HeroesHeroIdRoute: typeof HeroesHeroIdRoute
+  SoldiersTrainingRoute: typeof SoldiersTrainingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -280,25 +281,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SoldiersSoldierIdRouteImport
       parentRoute: typeof SoldiersRoute
     }
-    '/soldiers/training': {
-      id: '/soldiers/training'
-      path: '/training'
+    '/soldiers_/training': {
+      id: '/soldiers_/training'
+      path: '/soldiers/training'
       fullPath: '/soldiers/training'
       preLoaderRoute: typeof SoldiersTrainingRouteImport
-      parentRoute: typeof SoldiersRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
 interface SoldiersRouteChildren {
   SoldiersSoldierIdRoute: typeof SoldiersSoldierIdRoute
-  SoldiersTrainingRoute: typeof SoldiersTrainingRoute
   SoldiersIndexRoute: typeof SoldiersIndexRoute
 }
 
 const SoldiersRouteChildren: SoldiersRouteChildren = {
   SoldiersSoldierIdRoute: SoldiersSoldierIdRoute,
-  SoldiersTrainingRoute: SoldiersTrainingRoute,
   SoldiersIndexRoute: SoldiersIndexRoute,
 }
 
@@ -317,6 +316,7 @@ const rootRouteChildren: RootRouteChildren = {
   EquipmentEquipmentIdRoute: EquipmentEquipmentIdRoute,
   EquipmentExclusiveRoute: EquipmentExclusiveRoute,
   HeroesHeroIdRoute: HeroesHeroIdRoute,
+  SoldiersTrainingRoute: SoldiersTrainingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
