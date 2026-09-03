@@ -89,7 +89,7 @@ function SoldierTrainingPage() {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="한국어 이름 / 중문 이름 / 훈련 ID / 병종 ID 검색"
+              placeholder="검색"
               className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/50 focus:ring-2 focus:ring-ring"
             />
           </label>
