@@ -11,6 +11,7 @@ const B2_PATH = 'data/validation/hero-dungeon-stageB2-exact-join-integrity.v1.js
 const B3_PATH = 'data/validation/hero-dungeon-stageB3-namenum-ordinal-integrity.v1.json';
 const B4_PATH = 'data/validation/hero-dungeon-stageB4-population-acceptance.v1.json';
 const CONSUMER_PATH = 'data/generated/hero-dungeon-supplemental-final.v1.json';
+const SHARD_PREFIX = 'data/generated/hero-dungeon-supplemental-part-';
 
 function arg(name) {
   const index = process.argv.indexOf(name);
@@ -72,7 +73,7 @@ function buildMeasurement() {
   const consumerRecords = [];
   if (Array.isArray(shardSpecs)) {
     for (const shardSpec of shardSpecs) {
-      if (typeof shardSpec?.path !== 'string' || !shardSpec.path.startsWith('data/generated/hero-dungeon-supplemental/')) {
+      if (typeof shardSpec?.path !== 'string' || !shardSpec.path.startsWith(SHARD_PREFIX)) {
         push('INVALID_CONSUMER_SHARD_PATH', { path: shardSpec?.path });
         continue;
       }
