@@ -1,0 +1,38 @@
+name: Merge Finalize Main Dry Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Pull request number to classify
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+
+concurrency:
+  group: merge-finalize-main
+  queue: max
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run merge finalizer self-test
+        run: node tools/merge-finalizer/test/merge-finalizer-self-test.mjs
+
+      - name: Classify pull request without mutation
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/merge-finalizer/cli/finalize.mjs --repository "$GITHUB_REPOSITORY" --pr "${{ inputs.pr }}"
