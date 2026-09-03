@@ -368,7 +368,7 @@ function EquipmentGeneralListPage() {
         {filteredRecords.length > 0 ? (
           <section
             aria-label="SSR 장비 이미지 목록"
-            className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+            className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10"
           >
             {filteredRecords.map((record) => {
               const displayName = record.nameKr ?? record.nameCn;
@@ -380,18 +380,18 @@ function EquipmentGeneralListPage() {
                   key={record.equipmentId}
                   to="/equipment/$equipmentId"
                   params={{ equipmentId: String(record.equipmentId) }}
-                  className="group flex flex-col items-center rounded-2xl border border-border bg-card p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="group flex flex-col items-center rounded-xl border border-border bg-card p-2 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:p-3"
                 >
-                  <div className="flex h-40 w-full items-center justify-center sm:h-44">
+                  <div className="flex h-24 w-full items-center justify-center sm:h-28">
                     <img
                       src={imageUrl}
                       alt=""
                       loading="lazy"
                       decoding="async"
-                      className="h-32 w-32 object-contain transition duration-200 group-hover:scale-[1.03] sm:h-36 sm:w-36"
+                      className="h-20 w-20 object-contain transition duration-200 group-hover:scale-[1.03] sm:h-24 sm:w-24"
                     />
                   </div>
-                  <h2 className="mt-3 line-clamp-2 w-full text-center text-base font-bold leading-snug text-foreground sm:text-lg">
+                  <h2 className="mt-2 line-clamp-2 w-full text-center text-xs font-bold leading-snug text-foreground sm:text-sm">
                     {displayName}
                   </h2>
                 </Link>
