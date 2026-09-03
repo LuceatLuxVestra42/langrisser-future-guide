@@ -113,6 +113,17 @@ for (const required of [
 assert.equal(cliText.includes("method: 'PATCH'"), false, 'Stage 4 CLI contains forbidden PATCH mutation primitive');
 assert.equal(cliText.includes('--execute'), true);
 assert.equal(cliText.includes('return_run_details: true'), true);
+assert.equal(workflowText.includes('workflow_dispatch:'), true);
+assert.equal(workflowText.includes('pull_request_target:'), true);
+assert.equal(workflowText.includes('      - opened'), true);
+assert.equal(workflowText.includes('      - reopened'), true);
+assert.equal(workflowText.includes('      - synchronize'), true);
+assert.equal(workflowText.includes('      - ready_for_review'), true);
+assert.equal(workflowText.includes("github.event.pull_request.draft == false"), true);
+assert.equal(workflowText.includes('github.event.pull_request.head.repo.full_name == github.repository'), true);
+assert.equal(workflowText.includes('PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}'), true);
+assert.equal(workflowText.includes('ref: main'), true);
+assert.equal(workflowText.includes('MERGE_FINALIZER_ALREADY_MERGED_NOOP=PASS'), true);
 assert.equal(workflowText.includes('group: merge-finalize-main'), true);
 assert.equal(workflowText.includes('queue: max'), true);
 assert.equal(workflowText.includes('cancel-in-progress: true'), false);
@@ -137,7 +148,7 @@ console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'MERGE_FINALIZER_APP_REFRESH_SELF_TEST',
   fixtures: 24,
-  staticGuards: 32,
+  staticGuards: 42,
   requiredCheck: REQUIRED_PROJECT_CHECK,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,
   validationLocator: 'refs/pull/<pr>/merge',
@@ -147,5 +158,7 @@ console.log(JSON.stringify({
   appSecretNames: ['MERGEFINALIZER_APP_ID', 'MERGEFINALIZER_APP_KEY'],
   appPermissions: ['contents:write', 'pull-requests:write', 'actions:read', 'checks:read'],
   mergeExecutionToken: 'github.token',
+  automaticTrigger: 'pull_request_target non-draft same-repository PR to main',
+  duplicateMergeEventHandling: 'ALREADY_MERGED_NOOP',
   mutationMethods: ['PUT update-branch', 'POST temp validation ref', 'POST workflow_dispatch', 'DELETE temp validation ref', 'PUT merge'],
 }, null, 2));
