@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Dumbbell } from "lucide-react";
+import { ChevronRight, Dumbbell } from "lucide-react";
 
 export const Route = createFileRoute("/soldiers/")({
   component: SoldierIndexAction,
@@ -8,13 +8,15 @@ export const Route = createFileRoute("/soldiers/")({
 function SoldierIndexAction() {
   return (
     <Link
+      reloadDocument
       to="/soldiers/training"
-      className="fixed top-6 z-20 inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-2 text-xs font-bold text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:top-10"
+      className="fixed top-6 z-20 inline-flex items-center justify-center gap-2 rounded-xl border border-primary/25 bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/45 hover:bg-accent lg:top-10"
       style={{ right: "max(1rem, calc((100vw - 80rem) / 2 + 2rem))" }}
-      aria-label="훈련장 열기"
+      aria-label="훈련장 보러가기"
     >
       <Dumbbell className="h-4 w-4" aria-hidden="true" />
-      훈련장
+      훈련장 보러가기
+      <ChevronRight className="h-4 w-4" aria-hidden="true" />
     </Link>
   );
 }
