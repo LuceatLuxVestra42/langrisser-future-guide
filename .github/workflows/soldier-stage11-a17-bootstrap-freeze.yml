@@ -1,0 +1,64 @@
+name: Soldier Stage 11-A17 Bootstrap Freeze
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  freeze-a17:
+    if: github.head_ref == 'data/soldier-release-stage11-a17-promote-2022-10'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate Stage 5-8 baseline
+        run: node scripts/finalize-soldier-stage5-8-release.cjs
+
+      - name: Apply Stage 11-A2 official release overlay
+        run: node scripts/promote-soldier-release-metadata-stage11-a2.mjs
+
+      - name: Validate historical and A1/A2 release chain
+        run: |
+          node scripts/validate-soldier-release-metadata-stage11-a.mjs
+          node scripts/validate-soldier-release-official-notice-evidence-stage11-a1.mjs
+          node scripts/validate-soldier-release-metadata-stage11-a2.mjs
+
+      - name: Apply and validate Stage 11-A5 CN chronology correction
+        run: |
+          node scripts/validate-soldier-release-cn-chronology-correction-stage11-a4.mjs
+          node scripts/promote-soldier-release-metadata-stage11-a5-correction.mjs
+          node scripts/validate-soldier-release-metadata-stage11-a5.mjs
+
+      - name: Apply and validate Stage 11-A17 promotion
+        run: |
+          node scripts/promote-soldier-release-metadata-stage11-a17.mjs
+          node scripts/validate-soldier-release-metadata-stage11-a17.mjs
+
+      - name: Freeze exact A17 generated artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            data/generated/soldier-release-metadata.v1.json \
+            data/generated/soldier-list-stage5-8.v1.json \
+            data/validation/soldier-stage5-8-release.v1.json \
+            data/validation/soldier-release-metadata-stage11-a17-promotion.v1.json
+          if git diff --cached --quiet; then
+            echo 'A17 artifacts already frozen.'
+          else
+            git commit -m 'freeze Soldier stage 11-A17 release promotion PASS'
+            git push origin HEAD:${{ github.head_ref }}
+          fi
