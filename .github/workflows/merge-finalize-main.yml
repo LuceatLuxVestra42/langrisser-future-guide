@@ -7,6 +7,14 @@ on:
         description: Pull request number to finalize onto main
         required: true
         type: string
+  pull_request_target:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 permissions:
   contents: write
@@ -20,9 +28,16 @@ concurrency:
 
 jobs:
   finalize:
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request_target' &&
+       github.event.pull_request.base.ref == 'main' &&
+       github.event.pull_request.draft == false &&
+       github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
     steps:
       - name: Checkout authoritative main
         uses: actions/checkout@v4
@@ -30,12 +45,28 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Skip duplicate finalizer after merge
+        id: merged-state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          merged="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.merged')"
+          if [[ "$merged" == "true" ]]; then
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+            echo 'MERGE_FINALIZER_ALREADY_MERGED_NOOP=PASS'
+          else
+            echo 'skip=false' >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node 22
+        if: steps.merged-state.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
       - name: Create merge finalizer GitHub App token
+        if: steps.merged-state.outputs.skip != 'true'
         id: app-token
         uses: actions/create-github-app-token@v2
         with:
@@ -47,13 +78,14 @@ jobs:
           permission-checks: read
 
       - name: Run merge finalizer self-test
+        if: steps.merged-state.outputs.skip != 'true'
         run: node tools/merge-finalizer/test/merge-finalizer-self-test.mjs
 
       - name: Refresh stale PR with GitHub App and wait for protected check
+        if: steps.merged-state.outputs.skip != 'true'
         env:
           APP_TOKEN: ${{ steps.app-token.outputs.token }}
           READ_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ inputs.pr }}
         run: |
           set -euo pipefail
           deadline=$((SECONDS + 900))
@@ -105,12 +137,13 @@ jobs:
           exit 1
 
       - name: Finalize pull request with fail-closed guards
+        if: steps.merged-state.outputs.skip != 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: >-
           node tools/merge-finalizer/cli/finalize.mjs
           --repository "$GITHUB_REPOSITORY"
-          --pr "${{ inputs.pr }}"
+          --pr "$PR_NUMBER"
           --execute
           --max-restarts 3
           --timeout-ms 900000
