@@ -115,7 +115,7 @@ assert.equal(cliText.includes('--execute'), true);
 assert.equal(cliText.includes('return_run_details: true'), true);
 assert.equal(cliText.includes('async function waitForPostMergeVerification'), true);
 assert.equal(cliText.includes('Math.min(options.timeoutMs, 60_000)'), true);
-assert.equal(cliText.includes('mergedPr?.merged === true && mergedPr?.merge_commit_sha === mergeSha'), true);
+assert.equal(cliText.includes('mergedPr?.merged_at != null && mergedPr?.merge_commit_sha === mergeSha'), true);
 assert.equal(cliText.includes("blocker('BLOCKER_POST_MERGE_VERIFICATION'"), true);
 assert.equal(workflowText.includes('workflow_dispatch:'), true);
 assert.equal(workflowText.includes('pull_request_target:'), true);
