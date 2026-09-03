@@ -1,24 +1,28 @@
-import { createServerFn } from "@tanstack/react-start";
-
 import {
   readEquipmentDetailPageData,
   readExclusiveEquipmentPageData,
   readGeneralEquipmentPageData,
 } from "./equipment-page.localized.server";
 
-export const getGeneralEquipmentPageData = createServerFn({ method: "GET" }).handler(
-  async () => readGeneralEquipmentPageData(),
-);
+// GitHub Pages is a static deployment. Keep the equipment page API async-compatible,
+// but resolve from the current frozen/localized repository consumers in the client bundle
+// instead of issuing a TanStack server-function RPC that has no runtime server on Pages.
+export async function getGeneralEquipmentPageData() {
+  return readGeneralEquipmentPageData();
+}
 
-export const getExclusiveEquipmentPageData = createServerFn({ method: "GET" }).handler(
-  async () => readExclusiveEquipmentPageData(),
-);
+export async function getExclusiveEquipmentPageData() {
+  return readExclusiveEquipmentPageData();
+}
 
-export const getEquipmentDetailPageData = createServerFn({ method: "GET" })
-  .validator((input: { equipmentId: number }) => {
-    if (!Number.isSafeInteger(input.equipmentId) || input.equipmentId <= 0) {
-      throw new Error("equipmentId must be a positive safe integer.");
-    }
-    return input;
-  })
-  .handler(async ({ data }) => readEquipmentDetailPageData(data.equipmentId));
+export async function getEquipmentDetailPageData({
+  data,
+}: {
+  data: { equipmentId: number };
+}) {
+  if (!Number.isSafeInteger(data.equipmentId) || data.equipmentId <= 0) {
+    throw new Error("equipmentId must be a positive safe integer.");
+  }
+
+  return readEquipmentDetailPageData(data.equipmentId);
+}
