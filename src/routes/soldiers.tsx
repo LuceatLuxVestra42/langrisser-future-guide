@@ -415,16 +415,12 @@ function SoldierCard({ record }: { record: SoldierPrototypeRecord }) {
             src={portraitUrl}
             alt=""
             aria-hidden="true"
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-contain object-bottom px-1 pb-7 pt-2 transition-transform duration-200 group-hover:scale-[1.02]"
             onError={() => setPortraitFailed(true)}
           />
-        ) : (
-          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-current/20 bg-background/70 sm:h-16 sm:w-16">
-            <span className="text-base font-black tracking-tight sm:text-lg">
-              {army?.shortLabel ?? "?"}
-            </span>
-          </div>
-        )}
+        ) : null}
       </div>
 
       <div className="absolute left-1.5 top-1.5 flex gap-1">
