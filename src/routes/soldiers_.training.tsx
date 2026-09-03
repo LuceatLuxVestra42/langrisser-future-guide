@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Dumbbell, Search } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { getSoldierTrainingPageData } from "@/lib/soldier-training-page.functions";
@@ -68,55 +68,31 @@ function SoldierTrainingPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-        <header className="flex flex-wrap items-center justify-between gap-3">
+        <header>
           <Link
             reloadDocument
             to="/soldiers"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
           >
             <ArrowLeft size={16} aria-hidden="true" />
-            용병 라인업으로
+            용병
           </Link>
-          <div className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-xs font-semibold text-muted-foreground">
-            <Dumbbell className="h-4 w-4" aria-hidden="true" />
-            검증된 효과 {data.coverage.total}개
-          </div>
         </header>
 
-        <section className="mt-7">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">훈련장 자료</p>
-            <h1 className="mt-2 text-2xl font-black tracking-tight text-foreground sm:text-3xl">훈련장</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              한국어 훈련 항목을 둘러보고, 아래에서 레벨별 상승 효과를 확인할 수 있어.
-            </p>
-          </div>
-        </section>
-
-        <section className="mt-10 border-t border-border pt-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">훈련 효과</p>
-              <h2 className="mt-2 text-xl font-black text-foreground sm:text-2xl">레벨별 상승 효과</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                기본 능력치 84개와 조건부 효과 46개의 레벨별 값을 확인할 수 있어. 개별 용병 성장용 훈련은 현재 목록에 포함하지 않았어.
-              </p>
-            </div>
-
-            <label className="relative block w-full lg:max-w-sm">
-              <Search
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <span className="sr-only">훈련 항목 검색</span>
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="한국어 이름 / 중문 이름 / 훈련 ID / 병종 ID 검색"
-                className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/50 focus:ring-2 focus:ring-ring"
-              />
-            </label>
-          </div>
+        <section className="mt-6">
+          <label className="relative block w-full">
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <span className="sr-only">훈련 항목 검색</span>
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="한국어 이름 / 중문 이름 / 훈련 ID / 병종 ID 검색"
+              className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/50 focus:ring-2 focus:ring-ring"
+            />
+          </label>
 
           <div className="mt-4 flex flex-wrap gap-2">
             {KIND_FILTERS.map((filter) => (
