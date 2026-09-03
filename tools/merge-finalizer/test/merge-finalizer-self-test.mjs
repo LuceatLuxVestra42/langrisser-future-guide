@@ -113,6 +113,10 @@ for (const required of [
 assert.equal(cliText.includes("method: 'PATCH'"), false, 'Stage 4 CLI contains forbidden PATCH mutation primitive');
 assert.equal(cliText.includes('--execute'), true);
 assert.equal(cliText.includes('return_run_details: true'), true);
+assert.equal(cliText.includes('async function waitForPostMergeVerification'), true);
+assert.equal(cliText.includes('Math.min(options.timeoutMs, 60_000)'), true);
+assert.equal(cliText.includes('mergedPr?.merged === true && mergedPr?.merge_commit_sha === mergeSha'), true);
+assert.equal(cliText.includes("blocker('BLOCKER_POST_MERGE_VERIFICATION'"), true);
 assert.equal(workflowText.includes('workflow_dispatch:'), true);
 assert.equal(workflowText.includes('pull_request_target:'), true);
 assert.equal(workflowText.includes('      - opened'), true);
@@ -151,7 +155,7 @@ console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'MERGE_FINALIZER_APP_REFRESH_SELF_TEST',
   fixtures: 24,
-  staticGuards: 45,
+  staticGuards: 49,
   requiredCheck: REQUIRED_PROJECT_CHECK,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,
   validationLocator: 'refs/pull/<pr>/merge',
