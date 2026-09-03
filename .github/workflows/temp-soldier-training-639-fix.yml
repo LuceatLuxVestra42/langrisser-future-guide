@@ -145,9 +145,34 @@ jobs:
           const checkpoint = readJson(paths.checkpoint);
           checkpoint.consumer.gitBlobSha = eSha;
           checkpoint.method.techSourceNameParity = 'Stage C nameCn must equal Stage 1 frozen locator raw.Name by exact techId';
-          checkpoint.expected.techSourceNameMismatchCount = 0;
-          checkpoint.expected.techProjectDisplayConfirmedCount = 87;
-          checkpoint.expected.techProvisionalDisplayCount = 43;
+          checkpoint.expected = {
+            materialRecordCount: 24,
+            materialAuthorityRecordCount: 24,
+            materialProjectDisplayConfirmedCount: 24,
+            materialIdSetMatch: true,
+            materialSourceNameMismatchCount: 0,
+            techRecordCount: 130,
+            commonStatTechCount: 84,
+            commonPassiveTechCount: 46,
+            visibleTechCount: 130,
+            techIdSetMatch: true,
+            techKindMismatchCount: 0,
+            techSourceNameMismatchCount: 0,
+            techProjectDisplayConfirmedCount: 87,
+            techProvisionalDisplayCount: 43,
+            passiveTemplateRecordCount: 46,
+            passiveTemplateIdSetMatch: true,
+            passiveDisplayNameMismatchCount: 0,
+            passiveNameStatusMismatchCount: 0,
+            passiveParameterSequenceMismatchCount: 0,
+            passiveParameterSequenceCount: 14,
+            placeholderParityFailureCount: 0,
+            numericLiteralLeakCount: 0,
+            blankPresentationValueCount: 0,
+            duplicateIdCount: 0,
+            pinnedSourceBlobMismatchCount: 0,
+            consumerForbiddenSemanticPayloadKeyCount: 0,
+          };
           const cpProv = checkpoint.reviews.find((r) => r.code === 'PROVISIONAL_TRAINING_TECH_DISPLAY_NAMES');
           if (cpProv) {
             cpProv.count = 43;
