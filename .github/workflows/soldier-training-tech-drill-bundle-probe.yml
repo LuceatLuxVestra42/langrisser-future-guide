@@ -1,0 +1,274 @@
+name: Soldier Training Tech Drill Bundle Probe
+
+on:
+  push:
+    branches:
+      - asset/training-tech-drill-bundle-probe
+    paths:
+      - .github/workflows/soldier-training-tech-drill-bundle-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Unity bundle reader
+        run: python -m pip install --disable-pip-version-check UnityPy
+
+      - name: Probe official APK Drill bundle and verify frozen Resource coverage
+        run: |
+          python - <<'PY'
+          import binascii
+          import hashlib
+          import json
+          import re
+          import struct
+          import urllib.request
+          import zlib
+          from pathlib import Path
+
+          import UnityPy
+
+          APK_URL = "https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/mz-client-formal-cn.apk"
+          APK_REF = "https://mz.zlongame.com/main.shtml"
+          UA = "Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 Chrome/140.0 Mobile Safari/537.36"
+          EXACT_ENTRY = "assets/ExportAssetBundle/begin_ui_icon_drill_abs.b"
+          CENSUS = Path("data/generated/soldier-training-tech-classification-stage1-census.v1.json")
+          OUT = Path("drill-bundle-probe.json")
+
+          def sha256(data: bytes) -> str:
+              return hashlib.sha256(data).hexdigest()
+
+          def get_range(start: int, end: int):
+              req = urllib.request.Request(
+                  APK_URL,
+                  headers={
+                      "User-Agent": UA,
+                      "Referer": APK_REF,
+                      "Range": f"bytes={start}-{end}",
+                  },
+              )
+              with urllib.request.urlopen(req, timeout=180) as response:
+                  data = response.read()
+                  expected = end - start + 1
+                  if len(data) != expected:
+                      raise RuntimeError(
+                          f"range {start}-{end}: got {len(data)} bytes, expected {expected}, "
+                          f"status={response.status}, Content-Range={response.headers.get('Content-Range')}"
+                      )
+                  return data, response.headers
+
+          def get_total_size():
+              _, headers = get_range(0, 1023)
+              match = re.search(r"/([0-9]+)$", headers.get("Content-Range", ""))
+              if not match:
+                  raise RuntimeError(f"No total in Content-Range: {headers.get('Content-Range')}")
+              return int(match.group(1)), headers
+
+          def parse_zip_index(total: int):
+              tail_start = max(0, total - 1024 * 1024)
+              tail, _ = get_range(tail_start, total - 1)
+              pos = tail.rfind(b"PK\x05\x06")
+              if pos < 0:
+                  raise RuntimeError("EOCD not found")
+
+              eocd_off = tail_start + pos
+              eocd = tail[pos : pos + 22]
+              _, _, _, total_entries, cd_size32, cd_off32, _ = struct.unpack_from("<HHHHIIH", eocd, 4)
+              cd_size, cd_off = cd_size32, cd_off32
+
+              if total_entries == 0xFFFF or cd_size32 == 0xFFFFFFFF or cd_off32 == 0xFFFFFFFF:
+                  locator, _ = get_range(eocd_off - 20, eocd_off - 1)
+                  if locator[:4] != b"PK\x06\x07":
+                      raise RuntimeError("Zip64 locator missing")
+                  zip64_eocd_off = struct.unpack_from("<Q", locator, 8)[0]
+                  zip64_eocd, _ = get_range(zip64_eocd_off, zip64_eocd_off + 55)
+                  if zip64_eocd[:4] != b"PK\x06\x06":
+                      raise RuntimeError("Zip64 EOCD missing")
+                  cd_size = struct.unpack_from("<Q", zip64_eocd, 40)[0]
+                  cd_off = struct.unpack_from("<Q", zip64_eocd, 48)[0]
+
+              cd, _ = get_range(cd_off, cd_off + cd_size - 1)
+              entries = {}
+              i = 0
+              while i + 46 <= len(cd):
+                  if cd[i : i + 4] != b"PK\x01\x02":
+                      raise RuntimeError(f"bad central header at {i}")
+                  method = struct.unpack_from("<H", cd, i + 10)[0]
+                  crc = struct.unpack_from("<I", cd, i + 16)[0]
+                  compressed = struct.unpack_from("<I", cd, i + 20)[0]
+                  uncompressed = struct.unpack_from("<I", cd, i + 24)[0]
+                  fn, ex, cm = struct.unpack_from("<HHH", cd, i + 28)
+                  local_off = struct.unpack_from("<I", cd, i + 42)[0]
+                  raw_name = cd[i + 46 : i + 46 + fn]
+                  try:
+                      name = raw_name.decode("utf-8")
+                  except UnicodeDecodeError:
+                      name = raw_name.decode("cp437")
+                  extra = cd[i + 46 + fn : i + 46 + fn + ex]
+
+                  if compressed == 0xFFFFFFFF or uncompressed == 0xFFFFFFFF or local_off == 0xFFFFFFFF:
+                      p = 0
+                      while p + 4 <= len(extra):
+                          tag, size = struct.unpack_from("<HH", extra, p)
+                          payload = extra[p + 4 : p + 4 + size]
+                          if tag == 0x0001:
+                              q = 0
+                              if uncompressed == 0xFFFFFFFF:
+                                  uncompressed = struct.unpack_from("<Q", payload, q)[0]
+                                  q += 8
+                              if compressed == 0xFFFFFFFF:
+                                  compressed = struct.unpack_from("<Q", payload, q)[0]
+                                  q += 8
+                              if local_off == 0xFFFFFFFF:
+                                  local_off = struct.unpack_from("<Q", payload, q)[0]
+                              break
+                          p += 4 + size
+
+                  entries[name] = {
+                      "method": method,
+                      "crc32": crc,
+                      "compressedSize": compressed,
+                      "uncompressedSize": uncompressed,
+                      "localOffset": local_off,
+                  }
+                  i += 46 + fn + ex + cm
+              return entries
+
+          def fetch_zip_entry(meta):
+              local, _ = get_range(meta["localOffset"], meta["localOffset"] + 29)
+              if local[:4] != b"PK\x03\x04":
+                  raise RuntimeError("bad local header")
+              fn, ex = struct.unpack_from("<HH", local, 26)
+              data_start = meta["localOffset"] + 30 + fn + ex
+              compressed, _ = get_range(data_start, data_start + meta["compressedSize"] - 1)
+              if meta["method"] == 0:
+                  raw = compressed
+              elif meta["method"] == 8:
+                  raw = zlib.decompress(compressed, -15)
+              else:
+                  raise RuntimeError(f"unsupported ZIP method {meta['method']}")
+              if len(raw) != meta["uncompressedSize"]:
+                  raise RuntimeError(f"uncompressed size mismatch {len(raw)} != {meta['uncompressedSize']}")
+              if (binascii.crc32(raw) & 0xFFFFFFFF) != meta["crc32"]:
+                  raise RuntimeError("ZIP CRC mismatch")
+              return raw
+
+          def normalize_unity_bundle(raw: bytes):
+              for signature in (b"UnityFS", b"UnityWeb", b"UnityRaw"):
+                  pos = raw.find(signature, 0, 256)
+                  if pos >= 0:
+                      return raw[pos:], pos, signature.decode("ascii")
+              raise RuntimeError(f"Unity bundle signature not found in first 256 bytes: {raw[:32].hex()}")
+
+          total, headers = get_total_size()
+          zip_index = parse_zip_index(total)
+          drill_entries = sorted(name for name in zip_index if "drill" in name.lower())
+          print("DRILL_ZIP_MATCHES=" + json.dumps(drill_entries, ensure_ascii=False))
+
+          exact_present = EXACT_ENTRY in zip_index
+          if not exact_present:
+              result = {
+                  "status": "BLOCKER_EXACT_DRILL_BUNDLE_ENTRY_NOT_FOUND",
+                  "officialApkUrl": APK_URL,
+                  "apkBytes": total,
+                  "apkLastModified": headers.get("Last-Modified"),
+                  "apkEtag": headers.get("ETag"),
+                  "drillZipMatches": drill_entries,
+                  "expectedExactEntry": EXACT_ENTRY,
+              }
+              OUT.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+              print(json.dumps(result, ensure_ascii=False, indent=2))
+              raise SystemExit(2)
+
+          meta = zip_index[EXACT_ENTRY]
+          raw_bundle = fetch_zip_entry(meta)
+          normalized, payload_offset, unity_signature = normalize_unity_bundle(raw_bundle)
+          env = UnityPy.load(normalized)
+          texture_names = []
+          for obj in env.objects:
+              if obj.type.name != "Texture2D":
+                  continue
+              data = obj.read()
+              name = getattr(data, "m_Name", None) or getattr(data, "name", None)
+              if name:
+                  texture_names.append(name)
+
+          duplicates = sorted({name for name in texture_names if texture_names.count(name) > 1})
+          texture_set = set(texture_names)
+
+          census = json.loads(CENSUS.read_text())
+          resources = sorted({
+              record["raw"]["Resource"]
+              for record in census["records"]
+              if isinstance(record.get("raw"), dict)
+              and isinstance(record["raw"].get("Resource"), str)
+              and record["raw"]["Resource"].startswith("UI/Icon/Drill_ABS/")
+          })
+          expected_names = sorted({Path(resource).stem for resource in resources})
+          missing_names = sorted(set(expected_names) - texture_set)
+
+          result = {
+              "status": "PASS_EXACT_DRILL_BUNDLE_MAPPING" if len(resources) == 130 and not missing_names and not duplicates else "BLOCKER_DRILL_BUNDLE_COVERAGE_MISMATCH",
+              "sourceAuthority": {
+                  "officialPage": APK_REF,
+                  "officialApkUrl": APK_URL,
+                  "apkBytes": total,
+                  "apkLastModified": headers.get("Last-Modified"),
+                  "apkEtag": headers.get("ETag"),
+                  "method": "HTTP Range ZIP central directory -> exact APK entry -> UnityFS Texture2D exact stem coverage"
+              },
+              "mapping": {
+                  "sourceRoot": "UI/Icon/Drill_ABS/",
+                  "officialApkBundleEntry": EXACT_ENTRY,
+                  "zipEntryPresent": True,
+                  "drillZipMatches": drill_entries,
+              },
+              "bundleEvidence": {
+                  "zipMethod": meta["method"],
+                  "zipCrc32": f"{meta['crc32']:08x}",
+                  "compressedBytes": meta["compressedSize"],
+                  "sourceBundleBytes": len(raw_bundle),
+                  "sourceBundleSha256": sha256(raw_bundle),
+                  "unityPayloadOffset": payload_offset,
+                  "unitySignature": unity_signature,
+                  "texture2DCount": len(texture_names),
+                  "duplicateTexture2DNames": duplicates,
+              },
+              "frozenLocatorCoverage": {
+                  "resourceCount": len(resources),
+                  "uniqueTextureStemCount": len(expected_names),
+                  "exactTextureStemMatchedCount": len(expected_names) - len(missing_names),
+                  "missingTextureStems": missing_names,
+              },
+              "representativePresence": {
+                  name: name in texture_set
+                  for name in ["Drill_AtkADD", "Drill_DefADD", "Drill_HPMult", "Drill_DefMult", "Drill_Sward1", "Drill_AtkMult"]
+              },
+          }
+          OUT.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+          print("DRILL_BUNDLE_PROBE_RESULT")
+          print(json.dumps(result, ensure_ascii=False, indent=2))
+
+          if result["status"] != "PASS_EXACT_DRILL_BUNDLE_MAPPING":
+              raise SystemExit(3)
+          PY
+
+      - name: Upload probe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: soldier-training-tech-drill-bundle-probe
+          path: drill-bundle-probe.json
+          if-no-files-found: error
