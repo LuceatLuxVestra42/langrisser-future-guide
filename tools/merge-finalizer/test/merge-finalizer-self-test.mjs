@@ -5,15 +5,20 @@ import {
   classifyExecutionBoundary,
   classifyMergeFinalization,
   findExactProjectCheckForWorkflowRun,
+  getValidationSha,
   PROJECT_CHECK_WORKFLOW,
   REQUIRED_PROJECT_CHECK,
   shouldRestartFinalization,
+  validateSyntheticMergeParents,
+  validationRefName,
 } from '../lib/merge-finalizer.mjs';
 
 const REPOSITORY = 'owner/repo';
 const MAIN = '1'.repeat(40);
 const HEAD = '2'.repeat(40);
 const HEAD2 = '3'.repeat(40);
+const MERGE = '4'.repeat(40);
+const MERGE2 = '5'.repeat(40);
 const RUN_ID = 12345;
 
 const basePr = {
@@ -22,6 +27,7 @@ const basePr = {
   draft: false,
   mergeable: true,
   mergeable_state: 'clean',
+  merge_commit_sha: MERGE,
   base: { ref: 'main', repo: { full_name: REPOSITORY } },
   head: { sha: HEAD, ref: 'feature/example', repo: { full_name: REPOSITORY } },
 };
@@ -29,7 +35,7 @@ const successCheck = {
   id: 100,
   name: REQUIRED_PROJECT_CHECK.name,
   app: { id: REQUIRED_PROJECT_CHECK.appId },
-  head_sha: HEAD,
+  head_sha: MERGE,
   status: 'completed',
   conclusion: 'success',
   started_at: '2026-09-03T01:00:00Z',
@@ -38,7 +44,11 @@ const successCheck = {
 };
 const classify = overrides => classifyMergeFinalization({
   mainSha: MAIN,
-  pr: { ...basePr, ...(overrides?.pr ?? {}), head: { ...basePr.head, ...(overrides?.pr?.head ?? {}) } },
+  pr: {
+    ...basePr,
+    ...(overrides?.pr ?? {}),
+    head: { ...basePr.head, ...(overrides?.pr?.head ?? {}) },
+  },
   comparison: { behind_by: overrides?.behindBy ?? 0 },
   checkRuns: overrides?.checkRuns ?? [successCheck],
 });
@@ -46,25 +56,35 @@ const classify = overrides => classifyMergeFinalization({
 assert.equal(classifyExecutionBoundary({ repository: REPOSITORY, pr: basePr }).status, 'SUPPORTED');
 assert.equal(classifyExecutionBoundary({ repository: REPOSITORY, pr: { ...basePr, base: { ...basePr.base, ref: 'develop' } } }).status, 'BLOCKER_WRONG_BASE');
 assert.equal(classifyExecutionBoundary({ repository: REPOSITORY, pr: { ...basePr, head: { ...basePr.head, repo: { full_name: 'fork/repo' } } } }).status, 'BLOCKER_UNSUPPORTED_FORK');
+assert.equal(getValidationSha(basePr), MERGE);
+assert.equal(getValidationSha({ ...basePr, merge_commit_sha: null }), null);
+assert.equal(validationRefName(basePr.number, MERGE), `merge-finalizer/validation/pr-42-${MERGE.slice(0, 12)}`);
+assert.equal(validateSyntheticMergeParents({ sha: MERGE, parents: [{ sha: MAIN }, { sha: HEAD }] }, MAIN, HEAD).status, 'PASS');
+assert.equal(validateSyntheticMergeParents({ sha: MERGE, parents: [{ sha: HEAD }, { sha: MAIN }] }, MAIN, HEAD).status, 'BLOCKER_SYNTHETIC_MERGE_PARENT_MISMATCH');
 assert.equal(classify({ behindBy: 2 }).status, 'UPDATE_REQUIRED');
 assert.deepEqual(
-  shouldRestartFinalization({ mainSha: MAIN, headSha: HEAD }, { mainSha: HEAD2, headSha: HEAD }),
+  shouldRestartFinalization({ mainSha: MAIN, headSha: HEAD, validationSha: MERGE }, { mainSha: HEAD2, headSha: HEAD, validationSha: MERGE }),
   { restart: true, reason: 'MAIN_CHANGED' },
 );
 assert.deepEqual(
-  shouldRestartFinalization({ mainSha: MAIN, headSha: HEAD }, { mainSha: MAIN, headSha: HEAD2 }),
+  shouldRestartFinalization({ mainSha: MAIN, headSha: HEAD, validationSha: MERGE }, { mainSha: MAIN, headSha: HEAD2, validationSha: MERGE }),
   { restart: true, reason: 'HEAD_CHANGED' },
+);
+assert.deepEqual(
+  shouldRestartFinalization({ mainSha: MAIN, headSha: HEAD, validationSha: MERGE }, { mainSha: MAIN, headSha: HEAD, validationSha: MERGE2 }),
+  { restart: true, reason: 'VALIDATION_SHA_CHANGED' },
 );
 assert.equal(classify().status, 'READY_TO_MERGE');
 assert.equal(classify({ checkRuns: [{ ...successCheck, conclusion: 'failure' }] }).status, 'BLOCKER_OWNING_VALIDATOR');
 assert.equal(classify({ checkRuns: [{ ...successCheck, app: { id: 999 } }] }).status, 'CHECK_REQUIRED');
-assert.equal(classify({ checkRuns: [{ ...successCheck, head_sha: HEAD2 }] }).status, 'CHECK_REQUIRED');
+assert.equal(classify({ checkRuns: [{ ...successCheck, head_sha: HEAD }] }).status, 'CHECK_REQUIRED');
 assert.equal(classify({ pr: { mergeable: false, mergeable_state: 'dirty' } }).status, 'BLOCKER_CONFLICT');
 assert.equal(classify({ checkRuns: [] }).status, 'CHECK_REQUIRED');
 assert.equal(classify({ checkRuns: [{ ...successCheck, status: 'in_progress', conclusion: null }] }).status, 'CHECK_PENDING');
 assert.equal(classify({ pr: { draft: true } }).status, 'BLOCKER_DRAFT');
-assert.equal(findExactProjectCheckForWorkflowRun([successCheck], HEAD, RUN_ID)?.id, successCheck.id);
-assert.equal(findExactProjectCheckForWorkflowRun([{ ...successCheck, details_url: 'https://example.invalid/other' }], HEAD, RUN_ID), null);
+assert.equal(classify({ pr: { merge_commit_sha: null }, checkRuns: [] }).status, 'WAIT_MERGEABILITY');
+assert.equal(findExactProjectCheckForWorkflowRun([successCheck], MERGE, RUN_ID)?.id, successCheck.id);
+assert.equal(findExactProjectCheckForWorkflowRun([{ ...successCheck, details_url: 'https://example.invalid/other' }], MERGE, RUN_ID), null);
 
 const cliText = fs.readFileSync(path.resolve('tools/merge-finalizer/cli/finalize.mjs'), 'utf8');
 const workflowText = fs.readFileSync(path.resolve('.github/workflows/merge-finalize-main.yml'), 'utf8');
@@ -72,18 +92,20 @@ const projectCheckText = fs.readFileSync(path.resolve('.github/workflows/project
 
 for (const required of [
   "method: 'PUT', body: { expected_head_sha: snapshot.headSha }",
-  "method: 'POST', body",
+  "method: 'POST',\n      body: { ref: `refs/heads/${refName}`, sha: validationSha }",
+  "method: 'DELETE'",
+  "ref: refName",
+  "expected_head_sha: validationSha",
   "method: 'PUT', body: { sha: guard.headSha, merge_method: 'merge' }",
+  'validateSyntheticMergeParents',
+  'validationRefName',
   'shouldRestartFinalization',
   'findExactProjectCheckForWorkflowRun',
 ]) {
-  assert.equal(cliText.includes(required), true, `Stage 3 CLI missing guard/mutation primitive: ${required}`);
+  assert.equal(cliText.includes(required), true, `Stage 4 CLI missing merge-result guard/mutation primitive: ${required}`);
 }
-for (const forbidden of ["method: 'PATCH'", "method: 'DELETE'"]) {
-  assert.equal(cliText.includes(forbidden), false, `Stage 3 CLI contains forbidden mutation primitive: ${forbidden}`);
-}
+assert.equal(cliText.includes("method: 'PATCH'"), false, 'Stage 4 CLI contains forbidden PATCH mutation primitive');
 assert.equal(cliText.includes('--execute'), true);
-assert.equal(cliText.includes(`/actions/workflows/${PROJECT_CHECK_WORKFLOW}/dispatches`), false, 'static source uses template expression, not evaluated test string');
 assert.equal(cliText.includes('return_run_details: true'), true);
 assert.equal(workflowText.includes('group: merge-finalize-main'), true);
 assert.equal(workflowText.includes('queue: max'), true);
@@ -99,10 +121,12 @@ assert.equal(projectCheckText.includes('ACTUAL_HEAD'), true);
 
 console.log(JSON.stringify({
   status: 'PASS',
-  checkpoint: 'MERGE_FINALIZER_STAGE3_SELF_TEST',
-  fixtures: 16,
-  staticGuards: 18,
+  checkpoint: 'MERGE_FINALIZER_STAGE4_MERGE_RESULT_SELF_TEST',
+  fixtures: 23,
+  staticGuards: 22,
   requiredCheck: REQUIRED_PROJECT_CHECK,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,
-  mutationMethods: ['PUT update-branch', 'POST workflow_dispatch', 'PUT merge'],
+  validationTarget: 'PR_SYNTHETIC_MERGE_RESULT_SHA',
+  validationRefLifetime: 'TEMPORARY_DISPATCH_REF_ONLY',
+  mutationMethods: ['PUT update-branch', 'POST temp validation ref', 'POST workflow_dispatch', 'DELETE temp validation ref', 'PUT merge'],
 }, null, 2));

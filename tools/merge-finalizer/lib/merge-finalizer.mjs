@@ -4,6 +4,7 @@ export const REQUIRED_PROJECT_CHECK = Object.freeze({
 });
 
 export const PROJECT_CHECK_WORKFLOW = 'project-tooling-r3-project-check.yml';
+export const VALIDATION_REF_PREFIX = 'merge-finalizer/validation';
 
 const BLOCKING_CONCLUSIONS = new Set([
   'action_required',
@@ -40,16 +41,46 @@ export function classifyExecutionBoundary({ repository, pr }) {
   return { status: 'SUPPORTED', headRef: pr.head.ref };
 }
 
-function exactChecks(checkRuns, headSha, requiredCheck) {
+export function getValidationSha(pr) {
+  const sha = pr?.merge_commit_sha;
+  return typeof sha === 'string' && /^[0-9a-f]{40}$/i.test(sha) ? sha : null;
+}
+
+export function validationRefName(prNumber, validationSha) {
+  if (!Number.isInteger(Number(prNumber)) || Number(prNumber) <= 0) {
+    throw new Error('prNumber must be a positive integer');
+  }
+  assertSha(validationSha, 'validationSha');
+  return `${VALIDATION_REF_PREFIX}/pr-${Number(prNumber)}-${validationSha.slice(0, 12)}`;
+}
+
+export function validateSyntheticMergeParents(commit, mainSha, headSha) {
+  assertSha(mainSha, 'mainSha');
+  assertSha(headSha, 'headSha');
+  const commitSha = commit?.sha;
+  assertSha(commitSha, 'syntheticMerge.sha');
+  const parents = Array.isArray(commit?.parents) ? commit.parents.map(parent => parent?.sha ?? null) : [];
+  if (parents.length !== 2 || parents[0] !== mainSha || parents[1] !== headSha) {
+    return {
+      status: 'BLOCKER_SYNTHETIC_MERGE_PARENT_MISMATCH',
+      validationSha: commitSha,
+      expectedParents: [mainSha, headSha],
+      actualParents: parents,
+    };
+  }
+  return { status: 'PASS', validationSha: commitSha, parents };
+}
+
+function exactChecks(checkRuns, validationSha, requiredCheck) {
   return (checkRuns ?? []).filter(check => (
     check?.name === requiredCheck.name
     && check?.app?.id === requiredCheck.appId
-    && check?.head_sha === headSha
+    && check?.head_sha === validationSha
   ));
 }
 
-function newestExactCheck(checkRuns, headSha, requiredCheck) {
-  const exact = exactChecks(checkRuns, headSha, requiredCheck);
+function newestExactCheck(checkRuns, validationSha, requiredCheck) {
+  const exact = exactChecks(checkRuns, validationSha, requiredCheck);
   exact.sort((a, b) => {
     const aTime = Date.parse(a?.started_at ?? a?.completed_at ?? '') || 0;
     const bTime = Date.parse(b?.started_at ?? b?.completed_at ?? '') || 0;
@@ -61,16 +92,16 @@ function newestExactCheck(checkRuns, headSha, requiredCheck) {
 
 export function findExactProjectCheckForWorkflowRun(
   checkRuns,
-  headSha,
+  validationSha,
   workflowRunId,
   requiredCheck = REQUIRED_PROJECT_CHECK,
 ) {
-  assertSha(headSha, 'headSha');
+  assertSha(validationSha, 'validationSha');
   if (!Number.isInteger(Number(workflowRunId)) || Number(workflowRunId) <= 0) {
     throw new Error('workflowRunId must be a positive integer');
   }
   const runPath = `/actions/runs/${Number(workflowRunId)}/`;
-  return exactChecks(checkRuns, headSha, requiredCheck).find(check => (
+  return exactChecks(checkRuns, validationSha, requiredCheck).find(check => (
     typeof check?.details_url === 'string' && check.details_url.includes(runPath)
   )) ?? null;
 }
@@ -81,11 +112,13 @@ export function classifyMergeFinalization(snapshot, options = {}) {
 
   assertSha(mainSha, 'mainSha');
   assertSha(pr?.head?.sha, 'pr.head.sha');
+  const validationSha = getValidationSha(pr);
 
   const resultBase = {
     mainSha,
     prNumber: pr.number,
     headSha: pr.head.sha,
+    validationSha,
     mergeable: pr.mergeable ?? null,
     mergeableState: pr.mergeable_state ?? null,
     behindBy: Number(comparison?.behind_by ?? 0),
@@ -104,8 +137,9 @@ export function classifyMergeFinalization(snapshot, options = {}) {
     throw new Error('comparison.behind_by must be a non-negative integer');
   }
   if (resultBase.behindBy > 0) return { ...resultBase, status: 'UPDATE_REQUIRED' };
+  if (!validationSha) return { ...resultBase, status: 'WAIT_MERGEABILITY' };
 
-  const check = newestExactCheck(checkRuns, pr.head.sha, requiredCheck);
+  const check = newestExactCheck(checkRuns, validationSha, requiredCheck);
   if (!check) return { ...resultBase, status: 'CHECK_REQUIRED', check: null };
   if (check.status !== 'completed') {
     return { ...resultBase, status: 'CHECK_PENDING', check: summarizeCheck(check) };
@@ -126,6 +160,9 @@ export function shouldRestartFinalization(before, after) {
   assertSha(after?.headSha, 'after.headSha');
   if (before.mainSha !== after.mainSha) return { restart: true, reason: 'MAIN_CHANGED' };
   if (before.headSha !== after.headSha) return { restart: true, reason: 'HEAD_CHANGED' };
+  if (before.validationSha && after.validationSha && before.validationSha !== after.validationSha) {
+    return { restart: true, reason: 'VALIDATION_SHA_CHANGED' };
+  }
   return { restart: false, reason: null };
 }
 
