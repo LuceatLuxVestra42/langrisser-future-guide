@@ -1,4 +1,4 @@
-name: Temporary Soldier Training 639 Fix
+name: Temporary Soldier Training 639-640 Fix
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   apply-fix:
-    if: ${{ !contains(github.event.head_commit.message, '[tech639-applied]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[tech639-640-applied]') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -18,7 +18,7 @@ jobs:
         with:
           ref: fix/soldier-training-tech-639-localization-prerender
           fetch-depth: 0
-      - name: Apply exact-ID correction and validator hardening
+      - name: Apply exact-ID corrections and validator hardening
         shell: bash
         run: |
           node <<'NODE'
@@ -41,41 +41,56 @@ jobs:
 
           const c = readJson(paths.c);
           const c639 = c.records.find((r) => r.techId === 639);
+          const c640 = c.records.find((r) => r.techId === 640);
           if (!c639 || c639.nameCn !== '法力爆裂' || c639.displayNameKr !== '마력 폭발' || c639.status !== 'provisional-display') {
             throw new Error(`Unexpected Stage C Tech 639 baseline: ${JSON.stringify(c639)}`);
           }
-          Object.assign(c639, {
-            nameCn: '聚精会神',
-            displayNameKr: '정신집중',
-            status: 'project-display-confirmed',
-          });
+          if (!c640 || c640.nameCn !== '自我催眠' || c640.displayNameKr !== '자기 최면' || c640.status !== 'provisional-display') {
+            throw new Error(`Unexpected Stage C Tech 640 baseline: ${JSON.stringify(c640)}`);
+          }
+          Object.assign(c639, { nameCn: '聚精会神', displayNameKr: '정신집중', status: 'project-display-confirmed' });
+          Object.assign(c640, { nameCn: '祛除不纯', displayNameKr: '불순정화', status: 'project-display-confirmed' });
           Object.assign(c.coverage, {
-            projectDisplayConfirmedRecordCount: 86,
-            provisionalDisplayRecordCount: 44,
-            projectDisplayConfirmedUniqueLabelCount: 31,
-            provisionalDisplayUniqueLabelCount: 29,
+            projectDisplayConfirmedRecordCount: 87,
+            provisionalDisplayRecordCount: 43,
+            projectDisplayConfirmedUniqueLabelCount: 32,
+            provisionalDisplayUniqueLabelCount: 28,
           });
-          c.confirmedLabelEvidence.count = 31;
-          if (!c.confirmedLabelEvidence.labels.includes('정신집중')) c.confirmedLabelEvidence.labels.push('정신집중');
-          c.confirmedLabelEvidence.labels.sort((a, b) => a.localeCompare(b, 'ko'));
-          c.provisionalLabels.labels = c.provisionalLabels.labels.filter((x) => x !== '마력 폭발');
+          c.confirmedLabelEvidence.count = 32;
+          for (const label of ['정신집중', '불순정화']) {
+            if (!c.confirmedLabelEvidence.labels.includes(label)) c.confirmedLabelEvidence.labels.push(label);
+          }
+          c.provisionalLabels.labels = c.provisionalLabels.labels.filter((x) => !['마력 폭발', '자기 최면'].includes(x));
           c.provisionalLabels.count = c.provisionalLabels.labels.length;
           const provisionalReview = c.reviews.find((r) => r.code === 'PROVISIONAL_TRAINING_TECH_DISPLAY_NAMES');
           if (provisionalReview) {
-            provisionalReview.recordCount = 44;
-            provisionalReview.uniqueLabelCount = 29;
+            provisionalReview.recordCount = 43;
+            provisionalReview.uniqueLabelCount = 28;
           }
-          c.corrections = [...(c.corrections ?? []).filter((x) => x.techId !== 639), {
-            techId: 639,
-            type: 'authoritative-source-name-and-korean-display-correction',
-            from: { nameCn: '法力爆裂', displayNameKr: '마력 폭발', status: 'provisional-display' },
-            to: { nameCn: '聚精会神', displayNameKr: '정신집중', status: 'project-display-confirmed' },
-            basis: {
-              identity: 'Stage 1 frozen TrainingTech locator exact techId 639 has raw.Name 聚精会神',
-              localization: 'Pinned legacy Korean Training Hall source directly labels the matching mage HP-threshold damage effect 정신집중',
-              semanticMutation: false,
+          c.corrections = [...(c.corrections ?? []).filter((x) => ![639, 640].includes(x.techId)),
+            {
+              techId: 639,
+              type: 'authoritative-source-name-and-korean-display-correction',
+              from: { nameCn: '法力爆裂', displayNameKr: '마력 폭발', status: 'provisional-display' },
+              to: { nameCn: '聚精会神', displayNameKr: '정신집중', status: 'project-display-confirmed' },
+              basis: {
+                identity: 'Stage 1 frozen TrainingTech locator exact techId 639 has raw.Name 聚精会神',
+                localization: 'Pinned legacy Korean Training Hall source directly labels the matching mage HP-threshold damage effect 정신집중',
+                semanticMutation: false,
+              },
             },
-          }];
+            {
+              techId: 640,
+              type: 'authoritative-source-name-and-korean-display-correction',
+              from: { nameCn: '自我催眠', displayNameKr: '자기 최면', status: 'provisional-display' },
+              to: { nameCn: '祛除不纯', displayNameKr: '불순정화', status: 'project-display-confirmed' },
+              basis: {
+                identity: 'Stage 1 frozen TrainingTech locator exact techId 640 has raw.Name 祛除不纯',
+                localization: 'Pinned legacy Korean Training Hall source directly labels the matching monk mixed-unit combat effect 불순정화',
+                semanticMutation: false,
+              },
+            },
+          ];
           writeJson(paths.c, c);
           const cSha = fileBlobSha(paths.c);
 
@@ -85,13 +100,19 @@ jobs:
           }
           d.predecessor.gitBlobSha = cSha;
           const d639 = d.records.find((r) => r.techId === 639);
+          const d640 = d.records.find((r) => r.techId === 640);
           if (!d639 || d639.displayNameKr !== '마력 폭발' || d639.stageCNameStatus !== 'provisional-display') {
             throw new Error(`Unexpected Stage D Tech 639 baseline: ${JSON.stringify(d639)}`);
           }
+          if (!d640 || d640.displayNameKr !== '자기 최면' || d640.stageCNameStatus !== 'provisional-display') {
+            throw new Error(`Unexpected Stage D Tech 640 baseline: ${JSON.stringify(d640)}`);
+          }
           d639.displayNameKr = '정신집중';
           d639.stageCNameStatus = 'project-display-confirmed';
-          d.coverage.stageCProjectDisplayConfirmedNameCount = 20;
-          d.coverage.stageCProvisionalDisplayNameCount = 26;
+          d640.displayNameKr = '불순정화';
+          d640.stageCNameStatus = 'project-display-confirmed';
+          d.coverage.stageCProjectDisplayConfirmedNameCount = 21;
+          d.coverage.stageCProvisionalDisplayNameCount = 25;
           writeJson(paths.d, d);
           const dSha = fileBlobSha(paths.d);
 
@@ -106,12 +127,12 @@ jobs:
             projection: 'LOSSLESS_PARSED_RECORD',
           };
           e.admissionPolicy.sourceNameParityByExactTechId = true;
-          e.coverage.techProjectDisplayConfirmedCount = 86;
-          e.coverage.techProvisionalDisplayCount = 44;
+          e.coverage.techProjectDisplayConfirmedCount = 87;
+          e.coverage.techProvisionalDisplayCount = 43;
           const eProv = e.reviews.find((r) => r.code === 'PROVISIONAL_TRAINING_TECH_DISPLAY_NAMES');
           if (eProv) {
-            eProv.count = 44;
-            eProv.note = 'C carries 44 provisional-display records. E preserves that status exactly and does not promote them.';
+            eProv.count = 43;
+            eProv.note = 'C carries 43 provisional-display records. E preserves that status exactly and does not promote them.';
           }
           e.reopenConditions = e.reopenConditions.map((x) =>
             x.startsWith('B/C/D exact-ID parity')
@@ -125,12 +146,12 @@ jobs:
           checkpoint.consumer.gitBlobSha = eSha;
           checkpoint.method.techSourceNameParity = 'Stage C nameCn must equal Stage 1 frozen locator raw.Name by exact techId';
           checkpoint.expected.techSourceNameMismatchCount = 0;
-          checkpoint.expected.techProjectDisplayConfirmedCount = 86;
-          checkpoint.expected.techProvisionalDisplayCount = 44;
+          checkpoint.expected.techProjectDisplayConfirmedCount = 87;
+          checkpoint.expected.techProvisionalDisplayCount = 43;
           const cpProv = checkpoint.reviews.find((r) => r.code === 'PROVISIONAL_TRAINING_TECH_DISPLAY_NAMES');
           if (cpProv) {
-            cpProv.count = 44;
-            cpProv.note = 'The 44 provisional C records remain provisional through E; this does not block frontend presentation use.';
+            cpProv.count = 43;
+            cpProv.note = 'The 43 provisional C records remain provisional through E; this does not block frontend presentation use.';
           }
           checkpoint.reopenConditions = checkpoint.reopenConditions.map((x) =>
             x.startsWith('Exact-ID, kind, D-to-C display')
@@ -192,12 +213,12 @@ jobs:
           );
           replaceOnce(
             "  if (cr.length !== 130 || cConfirmed !== 85 || cProvisional !== 45) e.push('C_COVERAGE_MISMATCH');\n",
-            "  if (cr.length !== 130 || cConfirmed !== 86 || cProvisional !== 44) e.push('C_COVERAGE_MISMATCH');\n",
+            "  if (cr.length !== 130 || cConfirmed !== 87 || cProvisional !== 43) e.push('C_COVERAGE_MISMATCH');\n",
             'coverage-counts'
           );
           replaceOnce(
             "    commonStatTechCount:84, commonPassiveTechCount:46, techProjectDisplayConfirmedCount:85,\n    techProvisionalDisplayCount:45, passiveTemplateRecordCount:46, passiveParameterSequenceCount:14,\n",
-            "    commonStatTechCount:84, commonPassiveTechCount:46, techProjectDisplayConfirmedCount:86,\n    techProvisionalDisplayCount:44, passiveTemplateRecordCount:46, passiveParameterSequenceCount:14,\n",
+            "    commonStatTechCount:84, commonPassiveTechCount:46, techProjectDisplayConfirmedCount:87,\n    techProvisionalDisplayCount:43, passiveTemplateRecordCount:46, passiveParameterSequenceCount:14,\n",
             'consumer-coverage'
           );
           replaceOnce(
@@ -222,9 +243,7 @@ jobs:
           );
           fs.writeFileSync(paths.validator, v);
 
-          const finalCheckpoint = readJson(paths.checkpoint);
-          if (finalCheckpoint.expected.techSourceNameMismatchCount !== 0) throw new Error('Checkpoint source-name expectation not set');
-          console.log(JSON.stringify({ cSha, dSha, eSha, tech639: c639, d639 }, null, 2));
+          console.log(JSON.stringify({ cSha, dSha, eSha, tech639: c639, tech640: c640, d639, d640 }, null, 2));
           NODE
 
           node scripts/validate-soldier-training-localization-presentation.mjs
@@ -238,5 +257,5 @@ jobs:
                   data/validation/soldier-training-localization-presentation.v1.json \
                   scripts/validate-soldier-training-localization-presentation.mjs \
                   .github/workflows/temp-soldier-training-639-fix.yml
-          git commit -m "Correct Soldier Training Tech 639 localization [tech639-applied]"
+          git commit -m "Correct Soldier Training Tech 639-640 localization [tech639-640-applied]"
           git push origin HEAD:fix/soldier-training-tech-639-localization-prerender
