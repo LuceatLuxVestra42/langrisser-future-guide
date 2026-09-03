@@ -4,7 +4,7 @@
   "stage": "6-2",
   "status": "PASS",
   "classificationStatus": "PASS_WITH_REVIEW",
-  "generatedAt": "2026-09-02T04:36:09.310Z",
+  "generatedAt": "2026-09-03T23:38:02.834Z",
   "policy": {
     "PASS": "No blocking data-integrity, JOIN, relation, structural, or required-reference failure.",
     "REVIEW": "Known non-blocking presentation/release/UI-policy uncertainty that must remain explicit.",
@@ -13,7 +13,7 @@
   "sources": {
     "checkpoint": {
       "path": "data/validation/soldier-stage6-0-checkpoint.v1.json",
-      "gitBlobSha": "0c79b5d0d4736bfe467d517fd5cfdf4b4c1c7acb"
+      "gitBlobSha": "f5e80fc3a87bb37e812989debee71cd3eb21f1f7"
     },
     "fullRecords": {
       "path": "data/generated/soldier-stage6-1-full-records.v1.json",
@@ -42,8 +42,8 @@
   },
   "summary": {
     "records": 224,
-    "passRecords": 49,
-    "reviewRecords": 175,
+    "passRecords": 51,
+    "reviewRecords": 173,
     "failRecords": 0,
     "blockingFailureCount": 0,
     "reviewIssueCount": 7,
@@ -51,7 +51,7 @@
       "IDENTITY_PRESENTATION_REVIEW": 41,
       "KR_NAME_UNRESOLVED": 41,
       "LOWER_TIER_RELEASE_ORDER_NOT_REQUIRED": 39,
-      "RELEASE_DATE_UNRESOLVED": 173,
+      "RELEASE_DATE_UNRESOLVED": 171,
       "SP_INTERNAL_RELEASE_ORDER_UNRESOLVED": 56
     }
   },
@@ -76,7 +76,7 @@
     },
     {
       "code": "RELEASE_DATE_UNRESOLVED",
-      "count": 173,
+      "count": 171,
       "classification": "REVIEW",
       "scope": "RECORD_OR_POLICY",
       "rule": "Only externally confirmed release metadata may be presented as release order/date."
@@ -756,10 +756,8 @@
     },
     {
       "soldierId": 514,
-      "classification": "REVIEW",
-      "reasons": [
-        "RELEASE_DATE_UNRESOLVED"
-      ]
+      "classification": "PASS",
+      "reasons": []
     },
     {
       "soldierId": 515,
@@ -1095,10 +1093,8 @@
     },
     {
       "soldierId": 816,
-      "classification": "REVIEW",
-      "reasons": [
-        "RELEASE_DATE_UNRESOLVED"
-      ]
+      "classification": "PASS",
+      "reasons": []
     },
     {
       "soldierId": 817,

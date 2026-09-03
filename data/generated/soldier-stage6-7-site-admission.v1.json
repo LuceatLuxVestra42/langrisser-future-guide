@@ -4,7 +4,7 @@
   "stage": "6-7",
   "status": "PASS",
   "admissionStatus": "READY_WITH_REVIEW",
-  "generatedAt": "2026-09-02T03:00:34.504Z",
+  "generatedAt": "2026-09-03T23:38:02.834Z",
   "scope": "SOLDIER_PAGE_DATA_ADMISSION",
   "purpose": "Final gate proving canonical Soldier data can stably support list, detail, filters, reciprocal Hero links and later expansion without reopening semantic or JOIN inference.",
   "admissionRule": "Admit Soldier page data when every canonical record is generated, automated validation has no FAIL records, REVIEW items are explicit, representative/filter/reciprocal QA passes, expansion inputs are preserved, and each direct frozen dependency is semantically fresh under frozen-semantic-freshness/v2. Raw Git blob drift remains audit provenance and is not semantic authority.",
@@ -27,8 +27,8 @@
     "normalSoldiers": 168,
     "spSoldiers": 56,
     "normalTier3": 129,
-    "passRecords": 49,
-    "reviewRecords": 175,
+    "passRecords": 51,
+    "reviewRecords": 173,
     "failRecords": 0,
     "representativeFixtures": 6,
     "representativeFixturesPassed": 6,
@@ -81,7 +81,7 @@
     },
     {
       "code": "RELEASE_DATE_UNRESOLVED",
-      "count": 173,
+      "count": 171,
       "classification": "REVIEW"
     },
     {
@@ -129,23 +129,23 @@
     },
     "list": {
       "path": "data/generated/soldier-list-stage5-8.v1.json",
-      "gitBlobSha": "d3c634a83bf0e2aeea87f4023e8743fd73a984f8",
+      "gitBlobSha": "1ea742d654127769787944940d40c084354647ab",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-key-artifact/list/v2",
-        "digest": "sha256:96d917ecb2ce8974b48264aa961d27f982197e12483e641ea4e4d8491ddd9e45"
+        "digest": "sha256:e9a57cd119a8e235f1dc8862651569a9cdf4ca680c01c20c3d04525338a5c38c"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "releaseMetadata": {
       "path": "data/generated/soldier-release-metadata.v1.json",
-      "gitBlobSha": "b658c167a722542ec73e90eb92c9c7f9a9488741",
+      "gitBlobSha": "aba1acf5144f8b7da9543a95bc39ac981040175b",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-key-artifact/release-metadata/v2",
-        "digest": "sha256:2b3ecb35d6ca6781f4f2de8bcd47f67378e9f80cdcb3bc051c1560c11cf75d35"
+        "digest": "sha256:60101d273ab2ba8f3aa7bcca13043888a3aaf9f9bcfa158556c0416c1de1bae1"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
@@ -156,7 +156,7 @@
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-key-artifact/full-records/v2",
-        "digest": "sha256:42fbfd8ba9db685618eab480d4279a3ab12d4123abcbe8241f3c4db3c8d05317"
+        "digest": "sha256:09aef54626ec1085c43dcf4e9d282a4a5352938f7689a2a1ea90f9889ec553a4"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
@@ -197,12 +197,12 @@
     },
     "checkpoint": {
       "path": "data/validation/soldier-stage6-0-checkpoint.v1.json",
-      "gitBlobSha": "0c79b5d0d4736bfe467d517fd5cfdf4b4c1c7acb",
+      "gitBlobSha": "f5e80fc3a87bb37e812989debee71cd3eb21f1f7",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-source/checkpoint/v2",
-        "digest": "sha256:2479ea0af6ee33b3503977809fa4a8028f52de8ea3e4ee97dd3e45d0d6a62dca"
+        "digest": "sha256:e22fb9fd9f04144e8316cf68cd32db2804ec765c08e2d9dd0ff1927b4ca0c131"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
@@ -219,34 +219,34 @@
     },
     "stage5_8": {
       "path": "data/validation/soldier-stage5-8-release.v1.json",
-      "gitBlobSha": "8f7b7062dcec44cabc1267fe1c7ed0b650e253e7",
+      "gitBlobSha": "983d8295ad791790ce22742c0e84ad23a84fc413",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-source/stage5-8-validation/v2",
-        "digest": "sha256:c36095416c5f17d59ebc1d01410d1cc40950e8f4b8def425f45741c5fefb5218"
+        "digest": "sha256:384348e7a7e24033f03af9cde3dd3166efddf1be6853b349e5bfdec12b688e4d"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_1": {
       "path": "data/validation/soldier-stage6-1-full-records.v1.json",
-      "gitBlobSha": "ebe2816526274acb0969379622cecc856171f07e",
+      "gitBlobSha": "630f757c6e3337b7ff2c2327ff5b6e7e9bb3fa98",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-source/stage6-1-validation/v2",
-        "digest": "sha256:32a68ca340545ae942cee941f66f7bd211e10283582618df71c0e13d26450684"
+        "digest": "sha256:f6aa01516936733a15abb52bf84dff635e23da81a1da625af84d6e4048f1f4fc"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
     "stage6_2": {
       "path": "data/validation/soldier-stage6-2-classification.v1.json",
-      "gitBlobSha": "8b9229de716a53457ad680fa8c5376097e6af181",
+      "gitBlobSha": "fd955a1f66a6cdc4a3376bb29d1290ff2c7aec61",
       "semanticDigest": {
         "contract": "frozen-semantic-freshness/v2",
         "algorithm": "sha256",
         "projection": "soldier-stage6-7-source/stage6-2-validation/v2",
-        "digest": "sha256:827f2bc59a273a196bd3e11c5d2f266c8e0059dafcf7e114a557d73e1c906004"
+        "digest": "sha256:d12314122c0b384074e39b873f35d0742b6c856785a349a2f927c1ac5c7fa00b"
       },
       "freshnessMode": "SEMANTIC_DIGEST_V2_STICKY_PROVENANCE"
     },
@@ -324,7 +324,7 @@
       "contract": "frozen-semantic-freshness/v2",
       "algorithm": "sha256",
       "projection": "soldier-stage6-7-site-admission/semantic-v2",
-      "digest": "sha256:0867b984debd6223634feba1152020a878e1a550e17307e7f0f30de514cff517"
+      "digest": "sha256:652cf3d2c75f425fdeb0240a4f3aa680aebd826739d021974b1b5e876dc123b8"
     }
   }
 }

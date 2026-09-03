@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "schemaId": "soldier-release-metadata-stage11-a18-site-admission-refresh/v1",
+  "stage": "11-A18",
+  "status": "PASS",
+  "completion": "SOLDIER_SITE_ADMISSION_RELEASE_REFRESH_COMPLETE",
+  "owner": "soldier-site-admission-refresh",
+  "predecessor": {
+    "path": "data/validation/soldier-release-metadata-stage11-a17-promotion.v1.json",
+    "gitBlobSha": "6eb88644fdbd89d2d552e808faf1f8d8a42975dd",
+    "status": "PASS",
+    "completion": "SOLDIER_RELEASE_METADATA_2022_10_PROMOTION_COMPLETE"
+  },
+  "stage60": {
+    "path": "data/validation/soldier-stage6-0-checkpoint.v1.json",
+    "gitBlobSha": "f5e80fc3a87bb37e812989debee71cd3eb21f1f7",
+    "refreshStage": "11-A18"
+  },
+  "scope": {
+    "releaseMetadataOnly": true,
+    "confirmedReleaseBefore": 51,
+    "confirmedReleaseAfter": 53,
+    "unresolvedReleaseBefore": 173,
+    "unresolvedReleaseAfter": 171,
+    "unresolvedNormalTier3Before": 78,
+    "unresolvedNormalTier3After": 76,
+    "promotedSoldierIds": [
+      514,
+      816
+    ]
+  },
+  "invariants": {
+    "canonicalSoldiers": 224,
+    "normalSoldiers": 168,
+    "spSoldiers": 56,
+    "heroSoldierRelations": 5977,
+    "canonicalPopulationRecomputed": false,
+    "heroSoldierRelationRecomputed": false,
+    "spChronologyChanged": false,
+    "lowerTierChronologyChanged": false,
+    "samePatchOrderInferred": false
+  },
+  "downstream": {
+    "stage61": "PASS",
+    "stage62": "PASS",
+    "stage63": "PASS",
+    "stage64": "PASS",
+    "stage65": "PASS",
+    "stage66": "PASS",
+    "stage67Generated": "PASS",
+    "stage67Validation": "PASS",
+    "releaseDateUnresolvedReviewCount": 171
+  },
+  "blockers": [],
+  "reviews": [
+    "76 normal tier-3 Soldier release dates remain unresolved for future evidence acquisition.",
+    "SP chronology remains a separate owner scope.",
+    "Same-patch internal release order remains unresolved."
+  ],
+  "nextOwner": "status-source",
+  "nextStartPoint": "Refresh only the Soldier Status Source provenance/declaration projection for the newly frozen Stage 6-7 validation artifact. Do not reopen canonical Soldier or Hero-Soldier relation semantics."
+}
