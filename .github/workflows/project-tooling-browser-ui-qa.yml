@@ -154,6 +154,44 @@ jobs:
             await page.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
             await page.getByRole('dialog').waitFor({ timeout: 20000 });
 
+            response = await page.goto(url('equipment/'), { waitUntil: 'networkidle', timeout: 45000 });
+            check(response && response.status() < 400, `Equipment list browser entry failed: ${response?.status()}`);
+            const generalEquipmentList = page.locator('section[aria-label="SSR 장비 이미지 목록"]');
+            await generalEquipmentList.waitFor({ timeout: 20000 });
+            const generalEquipmentCard = generalEquipmentList.locator('a[href*="/equipment/"]').first();
+            check(await generalEquipmentCard.count() === 1, 'General equipment list has no detail card link');
+            const generalEquipmentHref = await generalEquipmentCard.getAttribute('href');
+            check(Boolean(generalEquipmentHref && /\/equipment\/[1-9]\d*\/?$/.test(new URL(generalEquipmentHref, page.url()).pathname)), `General equipment card href is not a detail route: ${generalEquipmentHref}`);
+            const generalEquipmentListUrl = page.url();
+            check(await page.getByRole('dialog').count() === 0, 'General equipment list unexpectedly starts with a dialog');
+            await generalEquipmentCard.click();
+            const generalEquipmentDialog = page.getByRole('dialog');
+            await generalEquipmentDialog.waitFor({ timeout: 20000 });
+            await generalEquipmentDialog.getByRole('heading', { name: 'Lv50 능력치', exact: true }).waitFor({ timeout: 20000 });
+            await generalEquipmentDialog.getByRole('heading', { name: '최대 효과', exact: true }).waitFor({ timeout: 20000 });
+            check(page.url() === generalEquipmentListUrl, `General equipment modal changed list URL: before=${generalEquipmentListUrl} after=${page.url()}`);
+            await page.keyboard.press('Escape');
+            await generalEquipmentDialog.waitFor({ state: 'hidden', timeout: 10000 });
+            check(page.url() === generalEquipmentListUrl, 'General equipment modal Escape close changed list URL');
+
+            response = await page.goto(url('equipment/exclusive/'), { waitUntil: 'networkidle', timeout: 45000 });
+            check(response && response.status() < 400, `Exclusive equipment list browser entry failed: ${response?.status()}`);
+            const exclusiveEquipmentList = page.locator('section[aria-label="전용장비 목록"]');
+            await exclusiveEquipmentList.waitFor({ timeout: 20000 });
+            const exclusiveEquipmentCard = exclusiveEquipmentList.locator('a[href*="/equipment/"]').first();
+            check(await exclusiveEquipmentCard.count() === 1, 'Exclusive equipment list has no detail card link');
+            const exclusiveEquipmentListUrl = page.url();
+            await exclusiveEquipmentCard.click();
+            const exclusiveEquipmentDialog = page.getByRole('dialog');
+            await exclusiveEquipmentDialog.waitFor({ timeout: 20000 });
+            await exclusiveEquipmentDialog.getByRole('heading', { name: '전용 영웅', exact: true }).waitFor({ timeout: 20000 });
+            await exclusiveEquipmentDialog.getByRole('heading', { name: 'Lv50 능력치', exact: true }).waitFor({ timeout: 20000 });
+            await exclusiveEquipmentDialog.getByRole('heading', { name: '최대 효과', exact: true }).waitFor({ timeout: 20000 });
+            check(page.url() === exclusiveEquipmentListUrl, `Exclusive equipment modal changed list URL: before=${exclusiveEquipmentListUrl} after=${page.url()}`);
+            await exclusiveEquipmentDialog.getByRole('button', { name: '장비 상세 창 닫기' }).click();
+            await exclusiveEquipmentDialog.waitFor({ state: 'hidden', timeout: 10000 });
+            check(page.url() === exclusiveEquipmentListUrl, 'Exclusive equipment modal close button changed list URL');
+
             response = await page.goto(url('equipment/416/'), { waitUntil: 'networkidle', timeout: 45000 });
             check(response && response.status() < 400, `Equipment 416 browser entry failed: ${response?.status()}`);
             await page.getByRole('heading', { name: '전용 영웅', exact: true }).waitFor();
@@ -193,6 +231,10 @@ jobs:
               soldierDetailHeroCardWebp: 'PASS',
               soldierHeroCardCount,
               backForwardNavigation: 'PASS',
+              generalEquipmentListModal: 'PASS',
+              generalEquipmentModalEscapeClose: 'PASS',
+              exclusiveEquipmentListModal: 'PASS',
+              exclusiveEquipmentModalButtonClose: 'PASS',
               equipmentToHeroNavigation: 'PASS',
               unknownIdBrowser404: 'PASS',
               tabletResponsiveOverflow: 0,
