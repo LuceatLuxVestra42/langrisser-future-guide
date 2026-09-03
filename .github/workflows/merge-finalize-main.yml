@@ -35,12 +35,23 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Create merge finalizer GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.MERGEFINALIZER_APP_ID }}
+          private-key: ${{ secrets.MERGEFINALIZER_APP_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-actions: write
+          permission-checks: read
+
       - name: Run merge finalizer self-test
         run: node tools/merge-finalizer/test/merge-finalizer-self-test.mjs
 
       - name: Finalize pull request with fail-closed guards
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: >-
           node tools/merge-finalizer/cli/finalize.mjs
           --repository "$GITHUB_REPOSITORY"
