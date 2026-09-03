@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Dumbbell, Search } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { getSoldierTrainingPageData } from "@/lib/soldier-training-page.functions";
 import type {
@@ -39,12 +39,10 @@ const STAT_LABELS: Record<TrainingStatEffect["statKey"], string> = {
 
 function SoldierTrainingPage() {
   const data = Route.useLoaderData();
-  const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(null);
   const [selectedTechId, setSelectedTechId] = useState(data.techs[0]?.techId ?? 0);
   const [level, setLevel] = useState(1);
   const [kindFilter, setKindFilter] = useState<KindFilter>("ALL");
   const [query, setQuery] = useState("");
-  const simulatorRef = useRef<HTMLElement | null>(null);
 
   const filteredTechs = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -61,11 +59,6 @@ function SoldierTrainingPage() {
   const selectedTech =
     data.techs.find((tech) => tech.techId === selectedTechId) ?? filteredTechs[0] ?? data.techs[0];
   const safeLevel = selectedTech ? Math.min(Math.max(level, 1), selectedTech.maxLevel) : 1;
-
-  function focusSimulator(materialId: number) {
-    setSelectedMaterialId(materialId);
-    simulatorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
 
   function selectTech(tech: SoldierTrainingTech) {
     setSelectedTechId(tech.techId);
@@ -95,46 +88,12 @@ function SoldierTrainingPage() {
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">훈련장 자료</p>
             <h1 className="mt-2 text-2xl font-black tracking-tight text-foreground sm:text-3xl">훈련장</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              검증된 훈련 재료와 한국어 훈련 항목을 둘러보고, 아래에서 레벨별 상승 효과를 확인할 수 있어.
+              한국어 훈련 항목을 둘러보고, 아래에서 레벨별 상승 효과를 확인할 수 있어.
             </p>
           </div>
-
-          <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
-            {data.materials.map((material) => {
-              const selected = selectedMaterialId === material.itemId;
-              return (
-                <button
-                  key={material.itemId}
-                  type="button"
-                  onClick={() => focusSimulator(material.itemId)}
-                  className={`group overflow-hidden rounded-xl border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                    selected ? "border-foreground ring-1 ring-foreground" : "border-border"
-                  }`}
-                >
-                  <div className="aspect-square bg-muted/40 p-2">
-                    <img
-                      src={material.imageUrl}
-                      alt=""
-                      className="h-full w-full object-contain transition group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="border-t border-border px-2 py-2">
-                    <p className="line-clamp-2 text-[11px] font-semibold leading-4 text-foreground">
-                      {material.nameKr}
-                    </p>
-                    <p className="mt-0.5 text-[10px] text-muted-foreground">#{material.itemId}</p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            재료를 선택하면 아래 효과 목록으로 이동해. 재료와 특정 훈련 항목을 이 화면에서 임의로 연결해 표시하지는 않아.
-          </p>
         </section>
 
-        <section ref={simulatorRef} className="mt-10 scroll-mt-6 border-t border-border pt-8">
+        <section className="mt-10 border-t border-border pt-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">훈련 효과</p>
