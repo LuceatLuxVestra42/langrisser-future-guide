@@ -4,9 +4,12 @@ import {
   classifyExecutionBoundary,
   classifyMergeFinalization,
   findExactProjectCheckForWorkflowRun,
+  getValidationSha,
   PROJECT_CHECK_WORKFLOW,
   REQUIRED_PROJECT_CHECK,
   shouldRestartFinalization,
+  validateSyntheticMergeParents,
+  validationRefName,
 } from '../lib/merge-finalizer.mjs';
 
 const API_VERSION = '2026-03-10';
@@ -96,8 +99,9 @@ async function readBoundary(repository, prNumber, token) {
   const headSha = pr?.head?.sha;
   assertSha(mainSha, 'mainSha');
   assertSha(headSha, 'pr.head.sha');
+  const validationSha = getValidationSha(pr);
   const support = classifyExecutionBoundary({ repository, pr });
-  return { mainSha, headSha, pr, support };
+  return { mainSha, headSha, validationSha, pr, support };
 }
 
 async function readSnapshot(repository, prNumber, token) {
@@ -107,7 +111,9 @@ async function readSnapshot(repository, prNumber, token) {
   }
   const [comparison, checks] = await Promise.all([
     githubRequest(repository, `/compare/${boundary.mainSha}...${boundary.headSha}`, token),
-    githubRequest(repository, `/commits/${boundary.headSha}/check-runs?per_page=100`, token),
+    boundary.validationSha
+      ? githubRequest(repository, `/commits/${boundary.validationSha}/check-runs?per_page=100`, token)
+      : Promise.resolve({ check_runs: [] }),
   ]);
   const checkRuns = checks?.check_runs ?? [];
   const result = classifyMergeFinalization({
@@ -142,84 +148,126 @@ async function waitForMergeability(repository, prNumber, token, options) {
   return null;
 }
 
+async function ensureValidationRef(repository, refName, validationSha, token) {
+  try {
+    await githubRequest(repository, '/git/refs', token, {
+      method: 'POST',
+      body: { ref: `refs/heads/${refName}`, sha: validationSha },
+    });
+    return { created: true, refName };
+  } catch (error) {
+    if (!(error instanceof GitHubHttpError) || error.status !== 422) throw error;
+    const existing = await githubRequest(repository, `/git/ref/heads/${refName}`, token);
+    const existingSha = existing?.object?.sha ?? null;
+    if (existingSha !== validationSha) {
+      return { status: 'BLOCKER_VALIDATION_REF_COLLISION', refName, expectedSha: validationSha, actualSha: existingSha };
+    }
+    return { created: false, refName };
+  }
+}
+
+async function deleteValidationRef(repository, refName, token) {
+  try {
+    await githubRequest(repository, `/git/refs/heads/${refName}`, token, { method: 'DELETE' });
+  } catch (error) {
+    if (error instanceof GitHubHttpError && error.status === 404) return;
+    throw error;
+  }
+}
+
 async function dispatchProjectCheck(repository, snapshot, token, options) {
-  const body = {
-    ref: snapshot.pr.head.ref,
-    inputs: {
-      base_sha: snapshot.mainSha,
-      expected_head_sha: snapshot.headSha,
-      pr: String(snapshot.pr.number),
-    },
-    return_run_details: true,
-  };
-  const dispatch = await githubRequest(
-    repository,
-    `/actions/workflows/${PROJECT_CHECK_WORKFLOW}/dispatches`,
-    token,
-    { method: 'POST', body },
-  );
-  const runId = Number(dispatch?.workflow_run_id);
-  if (!Number.isInteger(runId) || runId <= 0) {
-    return { status: 'BLOCKER_PROJECT_CHECK_DISPATCH_ID_MISSING', dispatch };
-  }
+  const validationSha = snapshot.validationSha;
+  if (!validationSha) return { status: 'BLOCKER_SYNTHETIC_MERGE_SHA_MISSING' };
 
-  const deadline = Date.now() + options.timeoutMs;
-  while (Date.now() < deadline) {
-    await sleep(options.pollMs);
-    const boundary = await readBoundary(repository, snapshot.pr.number, token);
-    if (boundary.support.status !== 'SUPPORTED') {
-      return { status: boundary.support.status, runId, boundary };
-    }
-    const restart = shouldRestartFinalization(
-      { mainSha: snapshot.mainSha, headSha: snapshot.headSha },
-      { mainSha: boundary.mainSha, headSha: boundary.headSha },
+  const syntheticMerge = await githubRequest(repository, `/commits/${validationSha}`, token);
+  const parentValidation = validateSyntheticMergeParents(syntheticMerge, snapshot.mainSha, snapshot.headSha);
+  if (parentValidation.status !== 'PASS') return parentValidation;
+
+  const refName = validationRefName(snapshot.pr.number, validationSha);
+  const refResult = await ensureValidationRef(repository, refName, validationSha, token);
+  if (refResult.status) return refResult;
+
+  try {
+    const body = {
+      ref: refName,
+      inputs: {
+        base_sha: snapshot.mainSha,
+        expected_head_sha: validationSha,
+        pr: String(snapshot.pr.number),
+      },
+      return_run_details: true,
+    };
+    const dispatch = await githubRequest(
+      repository,
+      `/actions/workflows/${PROJECT_CHECK_WORKFLOW}/dispatches`,
+      token,
+      { method: 'POST', body },
     );
-    if (restart.restart) return { status: 'RESTART', reason: restart.reason, runId, boundary };
+    const runId = Number(dispatch?.workflow_run_id);
+    if (!Number.isInteger(runId) || runId <= 0) {
+      return { status: 'BLOCKER_PROJECT_CHECK_DISPATCH_ID_MISSING', dispatch };
+    }
 
-    const run = await githubRequest(repository, `/actions/runs/${runId}`, token);
-    if (run?.head_sha !== snapshot.headSha || run?.event !== 'workflow_dispatch') {
-      return {
-        status: 'BLOCKER_PROJECT_CHECK_DISPATCH_MISMATCH',
+    const deadline = Date.now() + options.timeoutMs;
+    while (Date.now() < deadline) {
+      await sleep(options.pollMs);
+      const boundary = await readBoundary(repository, snapshot.pr.number, token);
+      if (boundary.support.status !== 'SUPPORTED') {
+        return { status: boundary.support.status, runId, boundary };
+      }
+      const restart = shouldRestartFinalization(
+        { mainSha: snapshot.mainSha, headSha: snapshot.headSha, validationSha },
+        { mainSha: boundary.mainSha, headSha: boundary.headSha, validationSha: boundary.validationSha },
+      );
+      if (restart.restart) return { status: 'RESTART', reason: restart.reason, runId, boundary };
+
+      const run = await githubRequest(repository, `/actions/runs/${runId}`, token);
+      if (run?.head_sha !== validationSha || run?.event !== 'workflow_dispatch') {
+        return {
+          status: 'BLOCKER_PROJECT_CHECK_DISPATCH_MISMATCH',
+          runId,
+          expectedValidationSha: validationSha,
+          actualHeadSha: run?.head_sha ?? null,
+          event: run?.event ?? null,
+        };
+      }
+      if (run.status !== 'completed') continue;
+      if (run.conclusion !== 'success') {
+        return { status: 'BLOCKER_OWNING_VALIDATOR', runId, conclusion: run.conclusion ?? null };
+      }
+
+      const jobs = await githubRequest(repository, `/actions/runs/${runId}/jobs?per_page=100`, token);
+      const projectCheckJob = (jobs?.jobs ?? []).find(job => job?.name === REQUIRED_PROJECT_CHECK.name);
+      if (!projectCheckJob || projectCheckJob.status !== 'completed' || projectCheckJob.conclusion !== 'success') {
+        return {
+          status: 'BLOCKER_PROJECT_CHECK_JOB_IDENTITY',
+          runId,
+          job: projectCheckJob ? {
+            id: projectCheckJob.id,
+            name: projectCheckJob.name,
+            status: projectCheckJob.status,
+            conclusion: projectCheckJob.conclusion,
+          } : null,
+        };
+      }
+
+      const checks = await githubRequest(repository, `/commits/${validationSha}/check-runs?per_page=100`, token);
+      const exact = findExactProjectCheckForWorkflowRun(
+        checks?.check_runs ?? [],
+        validationSha,
         runId,
-        expectedHeadSha: snapshot.headSha,
-        actualHeadSha: run?.head_sha ?? null,
-        event: run?.event ?? null,
-      };
+        REQUIRED_PROJECT_CHECK,
+      );
+      if (!exact) continue;
+      if (exact.status !== 'completed' || exact.conclusion !== 'success') {
+        return { status: 'BLOCKER_OWNING_VALIDATOR', runId, checkId: exact.id, conclusion: exact.conclusion ?? null };
+      }
+      return { status: 'PASS', runId, checkId: exact.id, validationSha, validationRef: refName };
     }
-    if (run.status !== 'completed') continue;
-    if (run.conclusion !== 'success') {
-      return { status: 'BLOCKER_OWNING_VALIDATOR', runId, conclusion: run.conclusion ?? null };
-    }
-
-    const jobs = await githubRequest(repository, `/actions/runs/${runId}/jobs?per_page=100`, token);
-    const projectCheckJob = (jobs?.jobs ?? []).find(job => job?.name === REQUIRED_PROJECT_CHECK.name);
-    if (!projectCheckJob || projectCheckJob.status !== 'completed' || projectCheckJob.conclusion !== 'success') {
-      return {
-        status: 'BLOCKER_PROJECT_CHECK_JOB_IDENTITY',
-        runId,
-        job: projectCheckJob ? {
-          id: projectCheckJob.id,
-          name: projectCheckJob.name,
-          status: projectCheckJob.status,
-          conclusion: projectCheckJob.conclusion,
-        } : null,
-      };
-    }
-
-    const checks = await githubRequest(repository, `/commits/${snapshot.headSha}/check-runs?per_page=100`, token);
-    const exact = findExactProjectCheckForWorkflowRun(
-      checks?.check_runs ?? [],
-      snapshot.headSha,
-      runId,
-      REQUIRED_PROJECT_CHECK,
-    );
-    if (!exact) continue;
-    if (exact.status !== 'completed' || exact.conclusion !== 'success') {
-      return { status: 'BLOCKER_OWNING_VALIDATOR', runId, checkId: exact.id, conclusion: exact.conclusion ?? null };
-    }
-    return { status: 'PASS', runId, checkId: exact.id };
+    return { status: 'BLOCKER_PROJECT_CHECK_TIMEOUT', validationSha };
+  } finally {
+    await deleteValidationRef(repository, refName, token);
   }
-  return { status: 'BLOCKER_PROJECT_CHECK_TIMEOUT', headSha: snapshot.headSha };
 }
 
 async function executeFinalization(args, token) {
@@ -289,8 +337,8 @@ async function executeFinalization(args, token) {
       if (validation.status !== 'PASS') return blocker(validation.status, validation);
       const afterValidation = await readSnapshot(args.repository, args.pr, token);
       const restart = shouldRestartFinalization(
-        { mainSha: snapshot.mainSha, headSha: snapshot.headSha },
-        { mainSha: afterValidation.mainSha, headSha: afterValidation.headSha },
+        { mainSha: snapshot.mainSha, headSha: snapshot.headSha, validationSha: snapshot.validationSha },
+        { mainSha: afterValidation.mainSha, headSha: afterValidation.headSha, validationSha: afterValidation.validationSha },
       );
       if (restart.restart) {
         restarts += 1;
@@ -307,8 +355,8 @@ async function executeFinalization(args, token) {
 
     const guard = await readSnapshot(args.repository, args.pr, token);
     const restart = shouldRestartFinalization(
-      { mainSha: snapshot.mainSha, headSha: snapshot.headSha },
-      { mainSha: guard.mainSha, headSha: guard.headSha },
+      { mainSha: snapshot.mainSha, headSha: snapshot.headSha, validationSha: snapshot.validationSha },
+      { mainSha: guard.mainSha, headSha: guard.headSha, validationSha: guard.validationSha },
     );
     if (restart.restart) {
       restarts += 1;
@@ -364,6 +412,7 @@ async function executeFinalization(args, token) {
       prNumber: args.pr,
       validatedMainSha: guard.mainSha,
       validatedHeadSha: guard.headSha,
+      validatedMergeResultSha: guard.validationSha,
       mergeSha: merge.sha,
       mainAfterSha: mainAfter?.commit?.sha ?? null,
       firstParent,
