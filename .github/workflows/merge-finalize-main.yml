@@ -180,6 +180,16 @@ jobs:
             exit 0
           fi
 
+          if [[ "$status" == 'CHECK_NOT_SUCCESSFUL' ]]; then
+            echo 'handoff=true' >> "$GITHUB_OUTPUT"
+            gh api --method POST \
+              "repos/$GITHUB_REPOSITORY/actions/workflows/merge-finalize-main.yml/dispatches" \
+              -f ref=main \
+              -f "inputs[pr]=$PR_NUMBER" >/dev/null
+            echo 'MERGE_FINALIZER_STALE_REVALIDATION_HANDOFF=PASS'
+            exit 0
+          fi
+
           if [[ "$code" -eq 3 && "$status" == 'PREPARE_REVALIDATION_REQUIRED' ]]; then
             echo 'handoff=true' >> "$GITHUB_OUTPUT"
             gh api --method POST \
