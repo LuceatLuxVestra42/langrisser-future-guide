@@ -88,7 +88,7 @@
   --hero-accent: oklch(0.86 0.11 250);
 
   --shadow-card: 0 1px 2px oklch(0.55 0.05 258 / 0.06), 0 8px 24px oklch(0.55 0.05 258 / 0.07);
-  --shadow-card-hover: 0 2px 4px oklch(0.55 0.05 258 / 0.08), 0 16px 36px oklch(0.55 0.05 258 / 0.13);
+  --shadow-card-hover: 0 2px 4px oklch(0.55 0.05 258 / 0.08), 0 16px 36px oklch(0.55 0.12 258 / 0.13);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -103,7 +103,6 @@
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
 }
-
 
 .dark {
   --background: oklch(0.129 0.042 264.695);
@@ -173,7 +172,6 @@
     var(--background) 100%
   );
 }
-
 
 @layer base {
   html {
@@ -249,4 +247,29 @@
     object-fit: contain;
     object-position: center;
   }
+}
+
+/* Hero detail typography: presentation-only +1px adjustment. */
+main[data-name-kr-status] {
+  font-size: 17px;
+}
+
+main[data-name-kr-status] .text-\[10px\] { font-size: 11px !important; }
+main[data-name-kr-status] .text-\[11px\] { font-size: 12px !important; }
+main[data-name-kr-status] .text-\[12px\] { font-size: 13px !important; }
+main[data-name-kr-status] .text-\[13px\] { font-size: 14px !important; }
+main[data-name-kr-status] .text-xs { font-size: 13px !important; }
+main[data-name-kr-status] .text-sm { font-size: 15px !important; }
+main[data-name-kr-status] .text-base { font-size: 17px !important; }
+main[data-name-kr-status] .text-lg { font-size: 19px !important; }
+main[data-name-kr-status] .text-xl { font-size: 21px !important; }
+main[data-name-kr-status] .text-2xl { font-size: 25px !important; }
+main[data-name-kr-status] .text-4xl { font-size: 37px !important; }
+main[data-name-kr-status] .text-5xl { font-size: 49px !important; }
+
+@media (min-width: 40rem) {
+  main[data-name-kr-status] .sm\:text-xs { font-size: 13px !important; }
+  main[data-name-kr-status] .sm\:text-\[13px\] { font-size: 14px !important; }
+  main[data-name-kr-status] .sm\:text-lg { font-size: 19px !important; }
+  main[data-name-kr-status] .sm\:text-5xl { font-size: 49px !important; }
 }
