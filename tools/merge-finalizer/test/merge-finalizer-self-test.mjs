@@ -245,7 +245,9 @@ await assert.rejects(
 );
 
 const cliPath = path.resolve('tools/merge-finalizer/cli/finalize.mjs');
+const changedPathsPath = path.resolve('tools/merge-finalizer/lib/changed-paths.mjs');
 const cliText = fs.readFileSync(cliPath, 'utf8');
+const changedPathsText = fs.readFileSync(changedPathsPath, 'utf8');
 const workflowText = fs.readFileSync(path.resolve('.github/workflows/merge-finalize-main.yml'), 'utf8');
 const projectCheckText = fs.readFileSync(path.resolve('.github/workflows/project-tooling-r3-project-check.yml'), 'utf8');
 const cliSyntax = spawnSync(process.execPath, ['--check', cliPath], { encoding: 'utf8', shell: false });
@@ -269,7 +271,6 @@ for (const required of [
   'classifyMergeGateChecks',
   'boundary.pr?.changed_files',
   'readPaginatedPullFiles',
-  '`/pulls/${Number(prNumber)}/files?per_page=${perPage}&page=${page}`',
   '`/commits/${boundary.headSha}/check-runs?per_page=100`',
   'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE',
   'MERGE_GATE_REQUIRED',
@@ -278,6 +279,11 @@ for (const required of [
 ]) {
   assert.equal(cliText.includes(required), true, `Finalizer CLI missing merge-result/merge-gate guard: ${required}`);
 }
+assert.equal(
+  changedPathsText.includes('`/pulls/${Number(prNumber)}/files?per_page=${perPage}&page=${page}`'),
+  true,
+  'Changed-path collector must page through the authoritative PR files endpoint.',
+);
 assert.equal(cliText.includes('comparison?.files'), false, 'Finalizer CLI must not use compare.files as merge-gate path authority.');
 assert.equal(cliText.includes("method: 'PATCH'"), false, 'Finalizer CLI contains forbidden PATCH mutation primitive');
 assert.equal(cliText.includes("'src/routes/"), false, 'Finalizer CLI must not duplicate frontend path inference');
