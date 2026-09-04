@@ -26,6 +26,8 @@ function parseArgs(argv) {
     repository: process.env.GITHUB_REPOSITORY ?? null,
     pr: null,
     execute: false,
+    prepare: false,
+    mergeOnly: false,
     pollMs: DEFAULT_POLL_MS,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     maxRestarts: DEFAULT_MAX_RESTARTS,
@@ -35,6 +37,8 @@ function parseArgs(argv) {
     if (arg === '--repository') args.repository = argv[++i] ?? null;
     else if (arg === '--pr') args.pr = Number(argv[++i]);
     else if (arg === '--execute') args.execute = true;
+    else if (arg === '--prepare') args.prepare = true;
+    else if (arg === '--merge-only') args.mergeOnly = true;
     else if (arg === '--poll-ms') args.pollMs = Number(argv[++i]);
     else if (arg === '--timeout-ms') args.timeoutMs = Number(argv[++i]);
     else if (arg === '--max-restarts') args.maxRestarts = Number(argv[++i]);
@@ -49,6 +53,8 @@ function parseArgs(argv) {
   if (!Number.isInteger(args.maxRestarts) || args.maxRestarts < 0 || args.maxRestarts > 10) {
     throw new Error('--max-restarts must be an integer from 0 to 10');
   }
+  const modeCount = [args.execute, args.prepare, args.mergeOnly].filter(Boolean).length;
+  if (modeCount > 1) throw new Error('--execute, --prepare, and --merge-only are mutually exclusive');
   return args;
 }
 
@@ -91,6 +97,12 @@ function output(payload) {
 function blocker(status, details = {}) {
   output({ status, ...details });
   process.exitCode = 1;
+  return null;
+}
+
+function handoff(status, details = {}) {
+  output({ status, ...details });
+  process.exitCode = 3;
   return null;
 }
 
@@ -437,6 +449,15 @@ async function executeFinalization(args, token) {
       return blocker(status, { snapshot: snapshot.result, mergeGate: snapshot.mergeGateResult, projection: snapshot.mergeGateProjection });
     }
 
+    if (args.mergeOnly && status !== 'READY_TO_MERGE') {
+      return handoff('MERGE_ADMISSION_REVALIDATION_REQUIRED', {
+        reason: status,
+        observedMainSha: snapshot.mainSha,
+        observedHeadSha: snapshot.headSha,
+        observedValidationSha: snapshot.validationSha,
+      });
+    }
+
     if (status === 'WAIT_MERGEABILITY') {
       const settled = await waitForMergeability(
         args.repository,
@@ -449,6 +470,14 @@ async function executeFinalization(args, token) {
     }
 
     if (status === 'UPDATE_REQUIRED') {
+      if (args.prepare) {
+        return handoff('PREPARE_REVALIDATION_REQUIRED', {
+          reason: 'UPDATE_REQUIRED',
+          observedMainSha: snapshot.mainSha,
+          observedHeadSha: snapshot.headSha,
+          observedValidationSha: snapshot.validationSha,
+        });
+      }
       try {
         await githubRequest(
           args.repository,
@@ -482,6 +511,7 @@ async function executeFinalization(args, token) {
       const validation = await dispatchProjectCheck(args.repository, snapshot, token, args);
       dispatches += 1;
       if (validation.status === 'RESTART') {
+        if (args.prepare) return handoff('PREPARE_REVALIDATION_REQUIRED', { reason: validation.reason });
         restarts += 1;
         if (restarts > args.maxRestarts) return blocker('BLOCKER_RESTART_EXHAUSTED', { reason: validation.reason, restarts });
         continue;
@@ -493,6 +523,7 @@ async function executeFinalization(args, token) {
         { mainSha: afterValidation.mainSha, headSha: afterValidation.headSha, validationSha: afterValidation.validationSha },
       );
       if (restart.restart) {
+        if (args.prepare) return handoff('PREPARE_REVALIDATION_REQUIRED', { reason: restart.reason });
         restarts += 1;
         if (restarts > args.maxRestarts) return blocker('BLOCKER_RESTART_EXHAUSTED', { reason: restart.reason, restarts });
         continue;
@@ -506,6 +537,7 @@ async function executeFinalization(args, token) {
     if (status === 'MERGE_GATE_REQUIRED' || status === 'MERGE_GATE_PENDING') {
       const gate = await waitForMergeGates(args.repository, snapshot, token, args);
       if (gate.status === 'RESTART') {
+        if (args.prepare) return handoff('PREPARE_REVALIDATION_REQUIRED', { reason: gate.reason });
         restarts += 1;
         if (restarts > args.maxRestarts) return blocker('BLOCKER_RESTART_EXHAUSTED', { reason: gate.reason, restarts });
         continue;
@@ -526,11 +558,14 @@ async function executeFinalization(args, token) {
       { mainSha: guard.mainSha, headSha: guard.headSha, validationSha: guard.validationSha },
     );
     if (restart.restart) {
+      if (args.mergeOnly) return handoff('MERGE_ADMISSION_REVALIDATION_REQUIRED', { reason: restart.reason });
+      if (args.prepare) return handoff('PREPARE_REVALIDATION_REQUIRED', { reason: restart.reason });
       restarts += 1;
       if (restarts > args.maxRestarts) return blocker('BLOCKER_RESTART_EXHAUSTED', { reason: restart.reason, restarts });
       continue;
     }
     if (guard.status !== 'READY_TO_MERGE') {
+      if (args.mergeOnly) return handoff('MERGE_ADMISSION_REVALIDATION_REQUIRED', { reason: guard.status });
       if (
         guard.status === 'UPDATE_REQUIRED'
         || guard.status === 'CHECK_REQUIRED'
@@ -538,6 +573,7 @@ async function executeFinalization(args, token) {
         || guard.status === 'MERGE_GATE_REQUIRED'
         || guard.status === 'MERGE_GATE_PENDING'
       ) {
+        if (args.prepare) return handoff('PREPARE_REVALIDATION_REQUIRED', { reason: guard.status });
         restarts += 1;
         if (restarts > args.maxRestarts) return blocker('BLOCKER_RESTART_EXHAUSTED', { reason: guard.status, restarts });
         continue;
@@ -547,6 +583,26 @@ async function executeFinalization(args, token) {
         mergeGate: guard.mergeGateResult,
         projection: guard.mergeGateProjection,
       });
+    }
+
+    if (args.prepare) {
+      output({
+        status: 'PREPARED_FOR_MERGE_ADMISSION',
+        mode: 'PREPARE',
+        mutationAttempted: false,
+        repository: args.repository,
+        prNumber: args.pr,
+        validatedMainSha: guard.mainSha,
+        validatedHeadSha: guard.headSha,
+        validatedMergeResultSha: guard.validationSha,
+        updates,
+        dispatches,
+        restarts,
+        requiredCheck: REQUIRED_PROJECT_CHECK,
+        mergeGates: guard.mergeGateProjection.mergeGates,
+        mergeGateResult: guard.mergeGateResult,
+      });
+      return null;
     }
 
     let merge;
@@ -591,7 +647,7 @@ async function executeFinalization(args, token) {
 
     output({
       status: postMergeBaseRace ? 'MERGED_REVIEW_POST_MERGE_BASE_RACE' : 'MERGED',
-      mode: 'EXECUTE',
+      mode: args.mergeOnly ? 'MERGE_ONLY' : 'EXECUTE',
       repository: args.repository,
       prNumber: args.pr,
       validatedMainSha: guard.mainSha,
@@ -615,7 +671,7 @@ async function executeFinalization(args, token) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const token = process.env.GITHUB_TOKEN ?? '';
-  if (!args.execute) {
+  if (!args.execute && !args.prepare && !args.mergeOnly) {
     const snapshot = await readSnapshot(args.repository, args.pr, token);
     output({
       mode: 'DRY_RUN',
