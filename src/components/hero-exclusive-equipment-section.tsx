@@ -1,5 +1,3 @@
-import { ShieldCheck } from "lucide-react";
-
 import { getOfficialEquipmentImageUrl } from "@/lib/equipment-image-assets";
 
 type HeroExclusiveEquipmentPresentation = {
@@ -26,10 +24,7 @@ export function HeroExclusiveEquipmentSection({
 
   return (
     <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-      <div className="flex items-center gap-2">
-        <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-        <h2 className="font-bold text-foreground">전용장비</h2>
-      </div>
+      <h2 className="font-bold text-foreground">전용장비</h2>
 
       {exclusiveEquipment.released && detail ? (
         <div className="mt-5 grid gap-5 lg:grid-cols-[180px_minmax(0,1fr)]">
