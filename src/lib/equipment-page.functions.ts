@@ -9,7 +9,6 @@ import type {
 } from "./equipment-page.server";
 
 const ACCESSORY_GROUP = "accessory";
-const ATTACK_SUBTYPE = "attack";
 const ATTACK_INTELLECT_SUBTYPE = "attack-intellect";
 const ATTACK_INTELLECT_SUBTYPE_KO = "공격+지력";
 const ATTACK_INTELLECT_SUBTYPE_ORDER = 1;
