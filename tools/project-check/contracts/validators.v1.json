@@ -277,10 +277,10 @@
     {
       "id": "localization-audit",
       "phase": 40,
-      "executable": "npm",
-      "args": ["run", "audit:localization:check"],
+      "executable": "node",
+      "args": ["scripts/audit-localization-project-check.mjs"],
       "owner": "localization",
-      "coverage": "Existing localization audit."
+      "coverage": "Existing localization audit plus read-only Equipment Korean-name generated-presentation freshness."
     },
     {
       "id": "production-build",
