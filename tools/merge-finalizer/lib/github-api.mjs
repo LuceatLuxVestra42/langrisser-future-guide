@@ -2,6 +2,8 @@ export const DEFAULT_GITHUB_READ_MAX_ATTEMPTS = 4;
 export const DEFAULT_GITHUB_READ_RETRY_DELAYS_MS = Object.freeze([250, 500, 1000]);
 export const RETRYABLE_GITHUB_READ_STATUSES = Object.freeze(new Set([429, 502, 503, 504]));
 
+const INSTALLATION_RATE_LIMIT_MESSAGE_PREFIX = 'API rate limit exceeded for installation';
+
 export class GitHubHttpError extends Error {
   constructor(method, path, status, body) {
     super(`GitHub ${method} ${path} failed: ${status} ${String(body ?? '').slice(0, 500)}`);
@@ -35,8 +37,27 @@ export class GitHubTransientExhaustedError extends Error {
   }
 }
 
-export function isRetryableReadFailure(method, status) {
-  return method === 'GET' && RETRYABLE_GITHUB_READ_STATUSES.has(Number(status));
+export function isInstallationRateLimitFailure(status, body) {
+  if (Number(status) !== 403) return false;
+
+  let message = '';
+  const text = String(body ?? '').trim();
+  if (!text) return false;
+
+  try {
+    const parsed = JSON.parse(text);
+    message = typeof parsed?.message === 'string' ? parsed.message.trim() : '';
+  } catch {
+    message = text;
+  }
+
+  return message.startsWith(INSTALLATION_RATE_LIMIT_MESSAGE_PREFIX);
+}
+
+export function isRetryableReadFailure(method, status, body = '') {
+  if (method !== 'GET') return false;
+  return RETRYABLE_GITHUB_READ_STATUSES.has(Number(status))
+    || isInstallationRateLimitFailure(status, body);
 }
 
 const defaultSleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -65,7 +86,7 @@ export async function githubRequest(repository, path, token, options = {}) {
     const text = await response.text();
 
     if (!response.ok) {
-      if (isRetryableReadFailure(method, response.status)) {
+      if (isRetryableReadFailure(method, response.status, text)) {
         if (attempt >= maxAttempts) {
           throw new GitHubTransientExhaustedError(method, path, response.status, attempt);
         }
