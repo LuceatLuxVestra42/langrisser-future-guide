@@ -137,7 +137,7 @@ const cardStart = route.indexOf('function HeroGridCard');
 check(cardStart >= 0, 'HeroGridCard missing');
 const cardSource = route.slice(cardStart);
 check(!/>\s*{hero\.rarity\.baseLabel}\s*</.test(cardSource), 'Hero card must not render rarity text below the icon');
-check(!cardSource.includes('hero.hasSp ?'), 'Hero card must not render an SP text badge');
+check(!/>\s*SP\s*</.test(cardSource), 'Hero card must not render an SP text badge');
 check(!cardSource.includes('>\n                초절\n'), 'Hero card must not render a 초절 text badge');
 
 console.log(JSON.stringify({
