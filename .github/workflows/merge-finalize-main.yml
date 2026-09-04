@@ -23,8 +23,8 @@ permissions:
   checks: read
 
 concurrency:
-  group: merge-finalize-main
-  queue: max
+  group: merge-finalize-pr-${{ github.event.pull_request.number || inputs.pr }}
+  cancel-in-progress: true
 
 jobs:
   finalize:
@@ -81,8 +81,9 @@ jobs:
         if: steps.merged-state.outputs.skip != 'true'
         run: node tools/merge-finalizer/test/merge-finalizer-self-test.mjs
 
-      - name: Refresh stale PR with GitHub App and wait for protected check
+      - name: Refresh stale PR with GitHub App and hand off to exact-head run
         if: steps.merged-state.outputs.skip != 'true'
+        id: refresh-state
         env:
           APP_TOKEN: ${{ steps.app-token.outputs.token }}
           READ_TOKEN: ${{ github.token }}
@@ -90,6 +91,7 @@ jobs:
           set -euo pipefail
           deadline=$((SECONDS + 900))
           updates=0
+          echo 'handoff=false' >> "$GITHUB_OUTPUT"
 
           while (( SECONDS < deadline )); do
             snapshot="$(GITHUB_TOKEN="$READ_TOKEN" node tools/merge-finalizer/cli/finalize.mjs --repository "$GITHUB_REPOSITORY" --pr "$PR_NUMBER")"
@@ -122,6 +124,9 @@ jobs:
                   exit 1
                 fi
                 updates=$((updates + 1))
+                echo 'handoff=true' >> "$GITHUB_OUTPUT"
+                printf 'MERGE_FINALIZER_EXACT_HEAD_HANDOFF=PASS\nOLD_HEAD=%s\nNEW_HEAD=%s\nAPP_REFRESH_COUNT=%s\n' "$old_head" "$new_head" "$updates"
+                exit 0
                 ;;
               WAIT_MERGEABILITY)
                 sleep 5
@@ -141,7 +146,7 @@ jobs:
           exit 1
 
       - name: Finalize pull request with fail-closed guards
-        if: steps.merged-state.outputs.skip != 'true'
+        if: steps.merged-state.outputs.skip != 'true' && steps.refresh-state.outputs.handoff != 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: >-
