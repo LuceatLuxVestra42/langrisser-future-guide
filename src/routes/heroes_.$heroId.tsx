@@ -14,8 +14,9 @@ import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equip
 import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
-import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
+import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
+import { getHeroSkinAcquisitionDisplayLabel } from "@/lib/hero-skin-acquisition-display";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import { getSkinFullartVisuals } from "@/lib/skin-fullart-assets";
@@ -183,7 +184,7 @@ function HeroDetailPage() {
 
               {activeVisual ? (
                 <div className="absolute bottom-4 right-4 z-20 rounded-full border border-border/80 bg-background/90 px-3 py-1.5 text-right text-[11px] font-semibold text-foreground shadow-sm backdrop-blur sm:bottom-5 sm:right-5">
-                  <div>{activeVisual.kind === "hero" ? "대표 일러스트" : `스킨 ${activeVisual.sourceOrder} · ID ${activeVisual.skinId}`}</div>
+                  <div>{activeVisual.kind === "hero" ? "대표 일러스트" : getHeroSkinAcquisitionDisplayLabel(hero.heroId, activeVisual.skinId, activeVisual.sourceOrder)}</div>
                   <div className="mt-0.5 text-muted-foreground">{visualIndex + 1} / {visuals.length}</div>
                 </div>
               ) : null}
