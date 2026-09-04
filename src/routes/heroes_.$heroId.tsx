@@ -439,6 +439,8 @@ function HeroSoldierCard({
             src={portraitUrl}
             alt=""
             aria-hidden="true"
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-contain object-bottom px-1 pb-7 pt-2 transition-transform duration-200 group-hover:scale-[1.02]"
             onError={() => setPortraitFailed(true)}
           />
@@ -471,7 +473,7 @@ function HeroSoldierCard({
 function HeroSkillIcon({ heroId, skill }: { heroId: number; skill: SkillView }) {
   const iconUrl = getHeroSkillIconUrl(heroId, skill.iconPath);
   if (!iconUrl) return null;
-  return <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-background p-1.5 shadow-sm"><img src={iconUrl} alt="" aria-hidden="true" className="h-full w-full object-contain" /></div>;
+  return <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-background p-1.5 shadow-sm"><img src={iconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-full w-full object-contain" /></div>;
 }
 
 function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView; sourceLabel: string }) {
