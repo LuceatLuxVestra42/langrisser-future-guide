@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "owner": "merge-finalizer/orchestration",
+  "purpose": "Allow independent PR validation to proceed in parallel while serializing only the main-branch merge mutation boundary.",
+  "validationConcurrency": {
+    "scope": "PR",
+    "groupExpression": "merge-finalize-pr-${{ github.event.pull_request.number || inputs.pr }}",
+    "cancelInProgress": true
+  },
+  "mergeMutationConcurrency": {
+    "scope": "MAIN_MUTATION",
+    "group": "merge-finalize-main-mutation",
+    "queue": "max"
+  },
+  "staleRefreshHandoff": {
+    "policy": "NEW_EXACT_HEAD_RUN_OWNS_CONTINUATION",
+    "oldRunMustNotMergeAfterHeadChange": true
+  },
+  "freshnessGuards": [
+    "MAIN_CHANGED",
+    "HEAD_CHANGED",
+    "VALIDATION_SHA_CHANGED"
+  ],
+  "validationTargets": {
+    "projectCheck": "PR_SYNTHETIC_MERGE_RESULT_SHA",
+    "hostedPreview": "EXACT_PR_HEAD_SHA"
+  },
+  "forbidden": {
+    "workflowWideGlobalMergeLock": "merge-finalize-main",
+    "mergeMutationCriticalSectionStages": [
+      "stale-refresh-wait",
+      "project-check-wait",
+      "data-pages-deploy-wait",
+      "hosted-qa-wait"
+    ]
+  },
+  "nonScope": [
+    "Data repository publication contract",
+    "GitHub Pages deployment contract",
+    "Project Check owner routing",
+    "Hosted QA semantics",
+    "canonical or semantic data",
+    "frontend presentation"
+  ]
+}
