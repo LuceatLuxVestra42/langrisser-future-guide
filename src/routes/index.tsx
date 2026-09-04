@@ -79,6 +79,7 @@ function CategoryCard({ category }: { category: Category }) {
           width={512}
           height={512}
           loading="lazy"
+          decoding="async"
           className={`${
             category.imageClassName ?? "h-36 w-36"
           } object-contain transition-transform duration-200 group-hover:scale-105`}
