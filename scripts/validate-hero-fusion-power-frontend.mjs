@@ -136,7 +136,7 @@ check(!route.includes('bg-fuchsia-950/85'), 'old SP card badge styling must be r
 const cardStart = route.indexOf('function HeroGridCard');
 check(cardStart >= 0, 'HeroGridCard missing');
 const cardSource = route.slice(cardStart);
-check(!cardSource.includes('{hero.rarity.baseLabel}'), 'Hero card must not render rarity text below the icon');
+check(!/>\s*{hero\.rarity\.baseLabel}\s*</.test(cardSource), 'Hero card must not render rarity text below the icon');
 check(!cardSource.includes('hero.hasSp ?'), 'Hero card must not render an SP text badge');
 check(!cardSource.includes('>\n                초절\n'), 'Hero card must not render a 초절 text badge');
 
