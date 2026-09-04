@@ -3,6 +3,10 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+  classifyChangedPathCompleteness,
+  readPaginatedPullFiles,
+} from '../lib/changed-paths.mjs';
+import {
   classifyExecutionBoundary,
   classifyMergeFinalization,
   classifyMergeGateChecks,
@@ -146,8 +150,104 @@ assert.equal(classifyMergeGateChecks({
   ],
 }).status, 'BLOCKER_MERGE_GATE');
 
+const sevenPullFiles = [
+  { filename: '.github/workflows/project-tooling-route-hosted-qa.yml', status: 'modified' },
+  { filename: 'src/lib/hero-skin-acquisition-display.ts', status: 'added' },
+  { filename: 'src/routes/heroes_.$heroId.tsx', status: 'modified' },
+  { filename: 'tools/merge-finalizer/test/merge-finalizer-concurrency-contract.mjs', status: 'modified' },
+  { filename: 'tools/route-hosted-qa/evidence/hosted-preview-retry-proof-a.txt', status: 'added' },
+  { filename: 'tools/route-hosted-qa/evidence/hosted-preview-retry-proof-b.txt', status: 'added' },
+  { filename: 'tools/route-hosted-qa/test/preview-publisher-self-test.mjs', status: 'added' },
+];
+const completeSeven = classifyChangedPathCompleteness({
+  expectedChangedFileCount: 7,
+  files: sevenPullFiles,
+});
+assert.equal(completeSeven.status, 'PASS');
+assert.equal(completeSeven.actualChangedFileCount, 7);
+assert.deepEqual(completeSeven.paths, sevenPullFiles.map(file => file.filename));
+assert.equal(
+  classifyChangedPathCompleteness({
+    expectedChangedFileCount: 7,
+    files: sevenPullFiles.slice(0, 2),
+  }).status,
+  'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE',
+);
+assert.deepEqual(
+  classifyChangedPathCompleteness({
+    expectedChangedFileCount: 1,
+    files: [{ filename: 'src/new-name.ts', previous_filename: 'src/old-name.ts', status: 'renamed' }],
+  }).paths,
+  ['src/new-name.ts'],
+);
+assert.deepEqual(
+  classifyChangedPathCompleteness({
+    expectedChangedFileCount: 1,
+    files: [{ filename: 'src/deleted.ts', status: 'removed' }],
+  }).paths,
+  ['src/deleted.ts'],
+);
+assert.equal(
+  classifyChangedPathCompleteness({
+    expectedChangedFileCount: 2,
+    files: [{ filename: 'a.ts' }, { filename: null }],
+  }).reason,
+  'CHANGED_PATH_MISSING',
+);
+assert.equal(
+  classifyChangedPathCompleteness({
+    expectedChangedFileCount: 2,
+    files: [{ filename: 'a.ts' }, { filename: 'a.ts' }],
+  }).reason,
+  'DUPLICATE_CHANGED_PATH',
+);
+
+async function readPullFilesFixture(pageSizes) {
+  const calls = [];
+  const files = await readPaginatedPullFiles({
+    repository: REPOSITORY,
+    prNumber: 42,
+    token: 'fixture-token',
+    request: async (_repository, requestPath) => {
+      calls.push(requestPath);
+      const match = requestPath.match(/[?&]page=(\d+)/);
+      const page = Number(match?.[1] ?? 0);
+      const size = pageSizes[page - 1] ?? 0;
+      return Array.from({ length: size }, (_, index) => ({
+        filename: `fixture/page-${page}-${index}.txt`,
+        status: 'modified',
+      }));
+    },
+  });
+  return { calls, files };
+}
+
+const onePage = await readPullFilesFixture([1]);
+assert.equal(onePage.files.length, 1);
+assert.equal(onePage.calls.length, 1);
+
+const exactHundred = await readPullFilesFixture([100, 0]);
+assert.equal(exactHundred.files.length, 100);
+assert.equal(exactHundred.calls.length, 2);
+
+const twoHundredFive = await readPullFilesFixture([100, 100, 5]);
+assert.equal(twoHundredFive.files.length, 205);
+assert.equal(twoHundredFive.calls.length, 3);
+
+await assert.rejects(
+  readPaginatedPullFiles({
+    repository: REPOSITORY,
+    prNumber: 42,
+    token: 'fixture-token',
+    request: async () => ({ not: 'an-array' }),
+  }),
+  /GitHub PR files response must be an array/,
+);
+
 const cliPath = path.resolve('tools/merge-finalizer/cli/finalize.mjs');
+const changedPathsPath = path.resolve('tools/merge-finalizer/lib/changed-paths.mjs');
 const cliText = fs.readFileSync(cliPath, 'utf8');
+const changedPathsText = fs.readFileSync(changedPathsPath, 'utf8');
 const workflowText = fs.readFileSync(path.resolve('.github/workflows/merge-finalize-main.yml'), 'utf8');
 const projectCheckText = fs.readFileSync(path.resolve('.github/workflows/project-tooling-r3-project-check.yml'), 'utf8');
 const cliSyntax = spawnSync(process.execPath, ['--check', cliPath], { encoding: 'utf8', shell: false });
@@ -170,7 +270,7 @@ for (const required of [
   'routeProjectCheckPaths',
   'classifyMergeGateChecks',
   'boundary.pr?.changed_files',
-  'comparison?.files',
+  'readPaginatedPullFiles',
   '`/commits/${boundary.headSha}/check-runs?per_page=100`',
   'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE',
   'MERGE_GATE_REQUIRED',
@@ -179,6 +279,12 @@ for (const required of [
 ]) {
   assert.equal(cliText.includes(required), true, `Finalizer CLI missing merge-result/merge-gate guard: ${required}`);
 }
+assert.equal(
+  changedPathsText.includes('`/pulls/${Number(prNumber)}/files?per_page=${perPage}&page=${page}`'),
+  true,
+  'Changed-path collector must page through the authoritative PR files endpoint.',
+);
+assert.equal(cliText.includes('comparison?.files'), false, 'Finalizer CLI must not use compare.files as merge-gate path authority.');
 assert.equal(cliText.includes("method: 'PATCH'"), false, 'Finalizer CLI contains forbidden PATCH mutation primitive');
 assert.equal(cliText.includes("'src/routes/"), false, 'Finalizer CLI must not duplicate frontend path inference');
 assert.equal(cliText.includes('--execute'), true);
@@ -247,8 +353,8 @@ assert.equal(projectCheckText.includes('ACTUAL_HEAD'), true);
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'MERGE_FINALIZER_HOSTED_GATE_SELF_TEST',
-  fixtures: 33,
-  staticGuards: 83,
+  fixtures: 43,
+  staticGuards: 85,
   requiredCheck: REQUIRED_PROJECT_CHECK,
   hostedGate: hostedGate.requiredCheck,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,

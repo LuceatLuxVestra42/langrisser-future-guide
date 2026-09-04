@@ -4,6 +4,10 @@ import {
   routeProjectCheckPaths,
 } from '../../project-check/lib/project-check.mjs';
 import {
+  classifyChangedPathCompleteness,
+  readPaginatedPullFiles,
+} from '../lib/changed-paths.mjs';
+import {
   assertSha,
   classifyExecutionBoundary,
   classifyMergeFinalization,
@@ -135,7 +139,7 @@ async function readBoundary(repository, prNumber, token) {
   return { mainSha, headSha, validationSha, pr, support };
 }
 
-function projectMergeGates(boundary, comparison) {
+function projectMergeGates(boundary, comparison, pullFiles) {
   const behindBy = Number(comparison?.behind_by ?? 0);
   if (behindBy > 0) {
     return {
@@ -147,29 +151,19 @@ function projectMergeGates(boundary, comparison) {
     };
   }
 
-  const expectedChangedFileCount = Number(boundary.pr?.changed_files);
-  const files = Array.isArray(comparison?.files) ? comparison.files : [];
-  if (!Number.isInteger(expectedChangedFileCount) || expectedChangedFileCount < 0 || files.length !== expectedChangedFileCount) {
+  const pathSet = classifyChangedPathCompleteness({
+    expectedChangedFileCount: boundary.pr?.changed_files,
+    files: pullFiles,
+  });
+  if (pathSet.status !== 'PASS') {
     return {
-      status: 'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE',
-      expectedChangedFileCount: Number.isInteger(expectedChangedFileCount) ? expectedChangedFileCount : null,
-      actualChangedFileCount: files.length,
-      mergeGates: [],
-    };
-  }
-
-  const paths = files.map(file => file?.filename).filter(item => typeof item === 'string' && item.length > 0);
-  if (paths.length !== files.length) {
-    return {
-      status: 'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE',
-      expectedChangedFileCount,
-      actualChangedFileCount: paths.length,
+      ...pathSet,
       mergeGates: [],
     };
   }
 
   const contracts = loadProjectCheckContracts();
-  const route = routeProjectCheckPaths(paths, contracts);
+  const route = routeProjectCheckPaths(pathSet.paths, contracts);
   return {
     status: route.status,
     changedFileCount: route.changedFileCount,
@@ -216,7 +210,15 @@ async function readSnapshot(repository, prNumber, token) {
     checkRuns,
     validationSha: boundary.validationSha,
   });
-  const mergeGateProjection = projectMergeGates(boundary, comparison);
+  const pullFiles = result.status === 'UPDATE_REQUIRED'
+    ? []
+    : await readPaginatedPullFiles({
+      repository,
+      prNumber,
+      token,
+      request: githubRequest,
+    });
+  const mergeGateProjection = projectMergeGates(boundary, comparison, pullFiles);
   let mergeGateResult = { status: 'PASS', gateResults: [] };
   if (mergeGateProjection.status === 'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE') {
     mergeGateResult = mergeGateProjection;
