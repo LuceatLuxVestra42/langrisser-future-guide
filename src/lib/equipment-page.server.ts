@@ -323,6 +323,47 @@ export function readExclusiveEquipmentPageData() {
   };
 }
 
+export type ExclusiveEquipmentSheetRecord = {
+  equipmentId: number;
+  classification: ExclusiveEquipmentDetailRecord["classification"];
+  stats: ExclusiveEquipmentDetailRecord["stats"];
+  effect: ExclusiveEquipmentDetailRecord["effect"];
+  restriction: EquipmentRestrictionPresentation;
+  acquisition: ExclusiveEquipmentDetailRecord["acquisition"];
+  exclusiveHeroId: number;
+};
+
+export function readExclusiveEquipmentSheetData(): ExclusiveEquipmentSheetRecord[] {
+  if (
+    exclusiveConsumer.counts.total !== 167 ||
+    exclusiveConsumer.counts.detail !== 167 ||
+    exclusiveConsumer.detailRecords.length !== 167
+  ) {
+    throw new Error(
+      `Exclusive equipment sheet projection requires the frozen 167-record population; got total=${exclusiveConsumer.counts.total}, detail=${exclusiveConsumer.counts.detail}, records=${exclusiveConsumer.detailRecords.length}.`,
+    );
+  }
+
+  const records = exclusiveConsumer.detailRecords.map((record) => ({
+    equipmentId: record.equipmentId,
+    classification: record.classification,
+    stats: record.stats,
+    effect: record.effect,
+    restriction: resolveExclusiveRestrictionPresentation(record),
+    acquisition: record.acquisition,
+    exclusiveHeroId: resolveExclusiveOwnerHero(record.equipmentId).heroId,
+  }));
+
+  const equipmentIds = new Set(records.map((record) => record.equipmentId));
+  if (equipmentIds.size !== 167) {
+    throw new Error(
+      `Exclusive equipment sheet projection requires 167 unique equipmentIds; got ${equipmentIds.size}.`,
+    );
+  }
+
+  return records;
+}
+
 export type GeneralEquipmentDetailPageData = {
   kind: "general";
   equipmentId: number;
