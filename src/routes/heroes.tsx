@@ -51,6 +51,14 @@ export const Route = createFileRoute("/heroes")({
 
 const ALL_RARITIES = "ALL";
 const LOW_RARITY = "N,R";
+const RARITY_ICON_PATHS = new Map<string, string>([
+  ["N", "/images/heroes/rarity/N.png"],
+  ["R", "/images/heroes/rarity/R.png"],
+  ["SR", "/images/heroes/rarity/SR.png"],
+  ["SSR", "/images/heroes/rarity/SSR.png"],
+  ["LLR", "/images/heroes/rarity/LLR.png"],
+]);
+const SP_ICON_PATH = "/images/heroes/rarity/SP.png";
 const FACTION_FILTER_SHORT_LABELS = new Map<number, string>([
   [1, "주역"],
   [2, "빛"],
@@ -97,6 +105,11 @@ function matchesRarity(hero: HeroListStage4Record, selectedRarity: string) {
 function resolvePublicAssetUrl(webAssetPath: string) {
   const base = import.meta.env.BASE_URL || "/";
   return `${base.replace(/\/$/, "")}${webAssetPath}`;
+}
+
+function getRarityIconUrl(label: string) {
+  const path = RARITY_ICON_PATHS.get(label);
+  return path ? resolvePublicAssetUrl(path) : null;
 }
 
 function HeroGridPage() {
@@ -314,20 +327,49 @@ function HeroGridPage() {
                     active={rarity === option.label}
                     onClick={() => setRarity(option.label)}
                   >
-                    {option.label} <span className="opacity-60">{option.count}</span>
+                    <span className="inline-flex items-center gap-1.5">
+                      {option.label === LOW_RARITY ? (
+                        <span className="inline-flex items-center gap-0.5" aria-label="N, R">
+                          <img
+                            src={getRarityIconUrl("N") ?? undefined}
+                            alt="N"
+                            className="h-5 w-auto object-contain"
+                          />
+                          <img
+                            src={getRarityIconUrl("R") ?? undefined}
+                            alt="R"
+                            className="h-5 w-auto object-contain"
+                          />
+                        </span>
+                      ) : getRarityIconUrl(option.label) ? (
+                        <img
+                          src={getRarityIconUrl(option.label) ?? undefined}
+                          alt={option.label}
+                          className="h-6 w-auto object-contain"
+                        />
+                      ) : (
+                        <span>{option.label}</span>
+                      )}
+                      <span className="opacity-60">{option.count}</span>
+                    </span>
                   </FilterButton>
                 ))}
                 <button
                   type="button"
                   aria-pressed={spOnly}
                   onClick={() => setSpOnly((current) => !current)}
-                  className={`inline-flex h-10 items-center rounded-md border px-3 text-xs font-bold transition ${
+                  className={`inline-flex h-10 items-center gap-1.5 rounded-md border px-3 text-xs font-bold transition ${
                     spOnly
                       ? "border-foreground bg-foreground text-background"
                       : "border-border bg-background text-foreground hover:border-foreground/30"
                   }`}
                 >
-                  SP <span className="opacity-60">{data.filters.spCount}</span>
+                  <img
+                    src={resolvePublicAssetUrl(SP_ICON_PATH)}
+                    alt="SP"
+                    className="h-6 w-auto object-contain"
+                  />
+                  <span className="opacity-60">{data.filters.spCount}</span>
                 </button>
               </div>
             ) : null}
@@ -409,6 +451,7 @@ function HeroGridPage() {
             aria-label="영웅 목록"
             data-hero-card-icons="true"
             data-hero-fusion-power-marks="true"
+            data-hero-rarity-icons="true"
             className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10"
           >
             {filteredHeroes.map((hero) => (
@@ -522,6 +565,8 @@ function HeroGridCard({
   const imageUrl = cardIcon?.assetStatus === "RESOLVED"
     ? resolvePublicAssetUrl(cardIcon.webAssetPath)
     : null;
+  const rarityIconUrl = getRarityIconUrl(hero.rarity.baseLabel);
+  const spIconUrl = hero.hasSp ? resolvePublicAssetUrl(SP_ICON_PATH) : null;
   const markAssets = fusionPower?.assetStatus === "RESOLVED"
     ? fusionPower.markAssets.map((asset) => ({ ...asset, url: resolvePublicAssetUrl(asset.webAssetPath) }))
     : [];
@@ -542,6 +587,8 @@ function HeroGridCard({
       <article
         data-hero-card="true"
         data-hero-id={hero.heroId}
+        data-hero-rarity={hero.rarity.baseLabel}
+        data-hero-sp={hero.hasSp ? "true" : "false"}
         data-name-kr-status={hero.localization.nameKrStatus}
         data-name-source-authority={hero.localization.sourceAuthority}
         className="overflow-hidden rounded-lg border border-border/70 bg-card p-1 shadow-sm transition duration-200 group-hover:-translate-y-0.5 group-hover:border-foreground/25 group-hover:shadow-md"
@@ -567,6 +614,30 @@ function HeroGridCard({
               />
             </div>
           )}
+
+          {rarityIconUrl ? (
+            <img
+              data-hero-rarity-icon="true"
+              data-hero-id={hero.heroId}
+              src={rarityIconUrl}
+              alt={hero.rarity.baseLabel}
+              title={`희귀도 ${hero.rarity.baseLabel}`}
+              className="absolute left-1.5 top-1.5 h-6 w-auto max-w-[52%] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:h-7"
+              loading="lazy"
+            />
+          ) : null}
+
+          {spIconUrl ? (
+            <img
+              data-hero-sp-icon="true"
+              data-hero-id={hero.heroId}
+              src={spIconUrl}
+              alt="SP"
+              title="SP 전직 가능"
+              className="absolute bottom-1.5 left-1.5 h-6 w-auto max-w-[52%] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:h-7"
+              loading="lazy"
+            />
+          ) : null}
 
           {fusionPower && primaryMarkAsset ? (
             <span
