@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getSoldierTrainingPageData } from "@/lib/soldier-training-page.functions";
 import type {
   SoldierTrainingTech,
@@ -35,18 +36,23 @@ const TRAINING_GROUPS: Array<{
   id: Exclude<TrainingGroupFilter, "ALL">;
   label: string;
   armyIds: number[];
+  armyTypes: string[];
 }> = [
-  { id: "INFANTRY", label: "보병", armyIds: [2] },
-  { id: "LANCER", label: "창병", armyIds: [1] },
-  { id: "CAVALRY", label: "기병", armyIds: [3] },
-  { id: "FLYING_WATER", label: "비병 + 수병", armyIds: [4, 5] },
-  { id: "ARCHER_ASSASSIN", label: "궁병 + 암살자", armyIds: [6, 11] },
-  { id: "MAGE_HOLY_DEMON", label: "마법사 + 승려 + 마물", armyIds: [7, 8, 9] },
+  { id: "INFANTRY", label: "보병", armyIds: [2], armyTypes: ["INFANTRY"] },
+  { id: "LANCER", label: "창병", armyIds: [1], armyTypes: ["LANCER"] },
+  { id: "CAVALRY", label: "기병", armyIds: [3], armyTypes: ["CAVALRY"] },
+  { id: "FLYING_WATER", label: "비병 + 수병", armyIds: [4, 5], armyTypes: ["FLYING", "WATER"] },
+  { id: "ARCHER_ASSASSIN", label: "궁병 + 암살자", armyIds: [6, 11], armyTypes: ["ARCHER", "ASSASSIN"] },
+  { id: "MAGE_HOLY_DEMON", label: "마법사 + 승려 + 마물", armyIds: [7, 8, 9], armyTypes: ["MAGE", "HOLY", "DEMON"] },
 ];
 
-const TRAINING_GROUP_FILTERS: Array<{ id: TrainingGroupFilter; label: string }> = [
-  { id: "ALL", label: "전체 훈련" },
-  ...TRAINING_GROUPS.map(({ id, label }) => ({ id, label })),
+const TRAINING_GROUP_FILTERS: Array<{
+  id: TrainingGroupFilter;
+  label: string;
+  armyTypes: string[];
+}> = [
+  { id: "ALL", label: "전체 훈련", armyTypes: [] },
+  ...TRAINING_GROUPS.map(({ id, label, armyTypes }) => ({ id, label, armyTypes })),
 ];
 
 const STAT_LABELS: Record<TrainingStatEffect["statKey"], string> = {
@@ -165,7 +171,16 @@ function SoldierTrainingPage() {
                       : "border-border bg-card text-foreground hover:bg-muted"
                   }`}
                 >
-                  {filter.label}
+                  <span className="inline-flex items-center justify-center gap-1.5">
+                    {filter.armyTypes.length > 0 ? (
+                      <span className="inline-flex items-center -space-x-0.5" aria-hidden="true">
+                        {filter.armyTypes.map((armyType) => (
+                          <TrainingArmyIcon key={armyType} armyType={armyType} />
+                        ))}
+                      </span>
+                    ) : null}
+                    <span>{filter.label}</span>
+                  </span>
                 </button>
               ))}
             </div>
@@ -303,6 +318,20 @@ function SoldierTrainingPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+function TrainingArmyIcon({ armyType }: { armyType: string }) {
+  const iconUrl = getOfficialArmyIconUrl(armyType);
+  if (!iconUrl) return null;
+
+  return (
+    <img
+      src={iconUrl}
+      alt=""
+      className="h-4 w-4 shrink-0 object-contain"
+      aria-hidden="true"
+    />
   );
 }
 
