@@ -8,6 +8,12 @@ import {
   readPaginatedPullFiles,
 } from '../lib/changed-paths.mjs';
 import {
+  GitHubHttpError,
+  GitHubResponseError,
+  GitHubTransientExhaustedError,
+  githubRequest,
+} from '../lib/github-api.mjs';
+import {
   assertSha,
   classifyExecutionBoundary,
   classifyMergeFinalization,
@@ -20,7 +26,6 @@ import {
   validationRefName,
 } from '../lib/merge-finalizer.mjs';
 
-const API_VERSION = '2026-03-10';
 const DEFAULT_POLL_MS = 5000;
 const DEFAULT_TIMEOUT_MS = 15 * 60 * 1000;
 const DEFAULT_MAX_RESTARTS = 3;
@@ -60,36 +65,6 @@ function parseArgs(argv) {
   const modeCount = [args.execute, args.prepare, args.mergeOnly].filter(Boolean).length;
   if (modeCount > 1) throw new Error('--execute, --prepare, and --merge-only are mutually exclusive');
   return args;
-}
-
-class GitHubHttpError extends Error {
-  constructor(method, path, status, body) {
-    super(`GitHub ${method} ${path} failed: ${status} ${body.slice(0, 500)}`);
-    this.status = status;
-    this.path = path;
-  }
-}
-
-async function githubRequest(repository, path, token, options = {}) {
-  const method = options.method ?? 'GET';
-  const response = await fetch(`https://api.github.com/repos/${repository}${path}`, {
-    method,
-    headers: {
-      Accept: 'application/vnd.github+json',
-      'X-GitHub-Api-Version': API_VERSION,
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.body === undefined ? {} : { 'Content-Type': 'application/json' }),
-    },
-    ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
-  });
-  const text = await response.text();
-  if (!response.ok) throw new GitHubHttpError(method, path, response.status, text);
-  if (!text) return null;
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
 }
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -691,6 +666,24 @@ async function main() {
 }
 
 main().catch(error => {
-  console.error(JSON.stringify({ status: 'BLOCKER_TOOLING', error: error.message }, null, 2));
+  const structured = {
+    status: 'BLOCKER_TOOLING',
+    reason: error?.reason ?? 'UNHANDLED_TOOLING_ERROR',
+    error: error?.message ?? String(error),
+  };
+  if (error instanceof GitHubTransientExhaustedError) {
+    structured.method = error.method;
+    structured.path = error.path;
+    structured.httpStatus = error.httpStatus;
+    structured.attempts = error.attempts;
+  } else if (error instanceof GitHubResponseError) {
+    structured.method = error.method;
+    structured.path = error.path;
+  } else if (error instanceof GitHubHttpError) {
+    structured.method = error.method;
+    structured.path = error.path;
+    structured.httpStatus = error.status;
+  }
+  output(structured);
   process.exitCode = 2;
 });
