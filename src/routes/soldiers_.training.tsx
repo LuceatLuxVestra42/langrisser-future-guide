@@ -62,6 +62,20 @@ const STAT_LABELS: Record<TrainingStatEffect["statKey"], string> = {
   MDEF: "마방",
 };
 
+const STAT_TRAINING_ROWS = [
+  ["기초 공격 훈련", "기초 방어 훈련"],
+  ["종합 공격 훈련", "종합 방어 훈련", "종합 생존 훈련"],
+  ["강화 공격 훈련", "강화 방어 훈련", "강화 생존 훈련"],
+  ["핵심 공격 훈련", "핵심 방어 훈련", "핵심 생존 훈련"],
+  ["연합 공격 훈련", "연합 방어 훈련", "연합 생존 훈련"],
+] as const;
+
+const STAT_TRAINING_POSITION = new Map<string, { row: number; column: number }>(
+  STAT_TRAINING_ROWS.flatMap((row, rowIndex) =>
+    row.map((nameKr, columnIndex) => [nameKr, { row: rowIndex, column: columnIndex }] as const),
+  ),
+);
+
 function resolveTrainingGroup(tech: SoldierTrainingTech) {
   if (tech.armyIds.length === 0) {
     throw new Error(`Training Tech ${tech.techId} has no army relation.`);
@@ -215,35 +229,12 @@ function SoldierTrainingPage() {
                     <span>{group.label}</span>
                     <span className="text-[10px] font-bold text-muted-foreground">{techs.length}개</span>
                   </div>
-                  {techs.map((tech) => (
-                    <button
-                      key={tech.techId}
-                      type="button"
-                      onClick={() => selectTech(tech)}
-                      className={`mb-1 w-full rounded-lg px-3 py-2.5 text-left transition last:mb-0 ${
-                        selectedTech?.techId === tech.techId
-                          ? "bg-foreground text-background"
-                          : "hover:bg-muted"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex min-w-0 items-center gap-2">
-                          <span className="truncate text-sm font-bold">{tech.nameKr}</span>
-                          {tech.nameStatus === "provisional-display" ? (
-                            <span className="shrink-0 rounded border border-current/25 px-1 py-0.5 text-[9px] font-bold opacity-70">
-                              임시 표기
-                            </span>
-                          ) : null}
-                        </div>
-                        <span className="shrink-0 text-[10px] opacity-70">#{tech.techId}</span>
-                      </div>
-                      <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
-                        <span>{tech.kind === "COMMON_STAT" ? "기본 능력치" : "조건부 효과"}</span>
-                        <span>Lv.{tech.maxLevel}</span>
-                        <span>{group.label}</span>
-                      </div>
-                    </button>
-                  ))}
+                  <TrainingTechGroupList
+                    techs={techs}
+                    selectedTechId={selectedTech?.techId}
+                    groupLabel={group.label}
+                    onSelect={selectTech}
+                  />
                 </section>
               ))}
               {filteredTechs.length === 0 ? (
@@ -318,6 +309,144 @@ function SoldierTrainingPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+function TrainingTechGroupList({
+  techs,
+  selectedTechId,
+  groupLabel,
+  onSelect,
+}: {
+  techs: SoldierTrainingTech[];
+  selectedTechId?: number;
+  groupLabel: string;
+  onSelect: (tech: SoldierTrainingTech) => void;
+}) {
+  const statTechs = techs.filter((tech) => tech.kind === "COMMON_STAT");
+  const passiveTechs = techs.filter((tech) => tech.kind === "COMMON_PASSIVE");
+  const knownStatTechIds = new Set<number>();
+
+  const statRows = STAT_TRAINING_ROWS.map((names, rowIndex) => {
+    const rowTechs = statTechs
+      .filter((tech) => STAT_TRAINING_POSITION.get(tech.nameKr)?.row === rowIndex)
+      .sort(
+        (a, b) =>
+          (STAT_TRAINING_POSITION.get(a.nameKr)?.column ?? Number.MAX_SAFE_INTEGER) -
+          (STAT_TRAINING_POSITION.get(b.nameKr)?.column ?? Number.MAX_SAFE_INTEGER),
+      );
+    rowTechs.forEach((tech) => knownStatTechIds.add(tech.techId));
+    return { key: names[0], techs: rowTechs };
+  }).filter(({ techs: rowTechs }) => rowTechs.length > 0);
+
+  const ungroupedStatTechs = statTechs.filter((tech) => !knownStatTechIds.has(tech.techId));
+
+  return (
+    <>
+      {statRows.length > 0 ? (
+        <div className="space-y-1.5 py-1">
+          {statRows.map((row) => (
+            <div key={row.key} className="grid grid-cols-3 gap-1.5">
+              {row.techs.map((tech) => (
+                <TrainingTechButton
+                  key={tech.techId}
+                  tech={tech}
+                  selected={selectedTechId === tech.techId}
+                  groupLabel={groupLabel}
+                  compact
+                  onSelect={onSelect}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {ungroupedStatTechs.length > 0 ? (
+        <div className={statRows.length > 0 ? "mt-2 border-t border-border pt-2" : ""}>
+          {ungroupedStatTechs.map((tech) => (
+            <TrainingTechButton
+              key={tech.techId}
+              tech={tech}
+              selected={selectedTechId === tech.techId}
+              groupLabel={groupLabel}
+              onSelect={onSelect}
+            />
+          ))}
+        </div>
+      ) : null}
+
+      {passiveTechs.length > 0 ? (
+        <div className={statTechs.length > 0 ? "mt-2 border-t border-border pt-2" : ""}>
+          {passiveTechs.map((tech) => (
+            <TrainingTechButton
+              key={tech.techId}
+              tech={tech}
+              selected={selectedTechId === tech.techId}
+              groupLabel={groupLabel}
+              onSelect={onSelect}
+            />
+          ))}
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+function TrainingTechButton({
+  tech,
+  selected,
+  groupLabel,
+  compact = false,
+  onSelect,
+}: {
+  tech: SoldierTrainingTech;
+  selected: boolean;
+  groupLabel: string;
+  compact?: boolean;
+  onSelect: (tech: SoldierTrainingTech) => void;
+}) {
+  if (compact) {
+    return (
+      <button
+        type="button"
+        onClick={() => onSelect(tech)}
+        title={`${tech.nameKr} · 훈련 #${tech.techId}`}
+        className={`min-h-[58px] min-w-0 rounded-lg px-2 py-2 text-center transition ${
+          selected ? "bg-foreground text-background" : "bg-background hover:bg-muted"
+        }`}
+      >
+        <span className="block text-[11px] font-black leading-4 sm:text-xs">{tech.nameKr}</span>
+        <span className="mt-1 block text-[9px] font-semibold opacity-65">Lv.{tech.maxLevel}</span>
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(tech)}
+      className={`mb-1 w-full rounded-lg px-3 py-2.5 text-left transition last:mb-0 ${
+        selected ? "bg-foreground text-background" : "hover:bg-muted"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="truncate text-sm font-bold">{tech.nameKr}</span>
+          {tech.nameStatus === "provisional-display" ? (
+            <span className="shrink-0 rounded border border-current/25 px-1 py-0.5 text-[9px] font-bold opacity-70">
+              임시 표기
+            </span>
+          ) : null}
+        </div>
+        <span className="shrink-0 text-[10px] opacity-70">#{tech.techId}</span>
+      </div>
+      <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
+        <span>{tech.kind === "COMMON_STAT" ? "기본 능력치" : "조건부 효과"}</span>
+        <span>Lv.{tech.maxLevel}</span>
+        <span>{groupLabel}</span>
+      </div>
+    </button>
   );
 }
 
