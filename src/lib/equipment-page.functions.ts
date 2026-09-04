@@ -1,4 +1,8 @@
 import {
+  readExclusiveEquipmentPresentationData,
+  type ExclusiveEquipmentPresentationRecord,
+} from "./equipment-exclusive-presentation.server";
+import {
   readEquipmentDetailPageData,
   readExclusiveEquipmentPageData,
   readGeneralEquipmentPageData,
@@ -6,6 +10,7 @@ import {
 import type {
   EquipmentFilterGroup,
   EquipmentStatProperty,
+  ExclusiveEquipmentDetailPageData,
 } from "./equipment-page.server";
 
 const ACCESSORY_GROUP = "accessory";
@@ -27,6 +32,15 @@ type AccessoryClassifiable = {
   subtypeKo: string;
   subtypeOrder: number;
 };
+
+export type ExclusiveEquipmentDetailRouteData = ExclusiveEquipmentDetailPageData & {
+  presentation: ExclusiveEquipmentPresentationRecord;
+};
+
+const exclusivePresentationData = readExclusiveEquipmentPresentationData();
+const exclusivePresentationByEquipmentId = new Map(
+  exclusivePresentationData.records.map((record) => [record.equipmentId, record]),
+);
 
 function hasAttackAndIntellectBaseStats(properties: EquipmentStatProperty[]) {
   let hasAttack = false;
@@ -163,8 +177,28 @@ export async function getEquipmentDetailPageData({
   }
 
   const pageData = readEquipmentDetailPageData(data.equipmentId);
-  if (!pageData || pageData.kind !== "general") {
-    return pageData;
+  if (!pageData) {
+    return null;
+  }
+
+  if (pageData.kind === "exclusive") {
+    const presentation = exclusivePresentationByEquipmentId.get(data.equipmentId);
+    if (!presentation) {
+      throw new Error(
+        `Exclusive equipment ${data.equipmentId} is missing its frozen presentation record.`,
+      );
+    }
+
+    if (pageData.ownerHero.heroId !== presentation.sections.exclusiveHero.heroId) {
+      throw new Error(
+        `Exclusive equipment ${data.equipmentId} owner mismatch between detail and presentation consumers.`,
+      );
+    }
+
+    return {
+      ...pageData,
+      presentation,
+    } satisfies ExclusiveEquipmentDetailRouteData;
   }
 
   return {
