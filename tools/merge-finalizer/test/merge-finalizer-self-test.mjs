@@ -202,9 +202,13 @@ assert.equal(workflowText.includes('github.event.pull_request.head.repo.full_nam
 assert.equal(workflowText.includes('PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}'), true);
 assert.equal(workflowText.includes('ref: main'), true);
 assert.equal(workflowText.includes('MERGE_FINALIZER_ALREADY_MERGED_NOOP=PASS'), true);
-assert.equal(workflowText.includes('group: merge-finalize-main'), true);
-assert.equal(workflowText.includes('queue: max'), true);
-assert.equal(workflowText.includes('cancel-in-progress: true'), false);
+assert.equal(workflowText.includes('group: merge-finalize-pr-${{ github.event.pull_request.number || inputs.pr }}'), true);
+assert.equal(workflowText.includes('group: merge-finalize-main\n'), false);
+assert.equal(workflowText.includes('cancel-in-progress: true'), true);
+assert.equal(workflowText.includes('id: refresh-state'), true);
+assert.equal(workflowText.includes("echo 'handoff=true' >> \"$GITHUB_OUTPUT\""), true);
+assert.equal(workflowText.includes('MERGE_FINALIZER_EXACT_HEAD_HANDOFF=PASS'), true);
+assert.equal(workflowText.includes("steps.refresh-state.outputs.handoff != 'true'"), true);
 assert.equal(workflowText.includes('contents: write'), true);
 assert.equal(workflowText.includes('pull-requests: write'), true);
 assert.equal(workflowText.includes('actions: write'), true);
@@ -230,7 +234,7 @@ console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'MERGE_FINALIZER_HOSTED_GATE_SELF_TEST',
   fixtures: 33,
-  staticGuards: 67,
+  staticGuards: 71,
   requiredCheck: REQUIRED_PROJECT_CHECK,
   hostedGate: hostedGate.requiredCheck,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,
@@ -240,10 +244,12 @@ console.log(JSON.stringify({
   hostedGateSource: 'PROJECT_CHECK_OWNER_ROUTE_PROJECTION',
   validationRefLifetime: 'TEMPORARY_DISPATCH_REF_ONLY',
   staleRefreshActor: 'GITHUB_APP_INSTALLATION_TOKEN',
+  staleRefreshHandoff: 'NEW_EXACT_HEAD_RUN_OWNS_CONTINUATION',
+  validationConcurrency: 'PR_LOCAL_CANCEL_OLDER',
   appSecretNames: ['MERGEFINALIZER_APP_ID', 'MERGEFINALIZER_APP_KEY'],
   appPermissions: ['contents:write', 'pull-requests:write', 'actions:read', 'checks:read'],
   mergeExecutionToken: 'github.token',
   automaticTrigger: 'pull_request_target non-draft same-repository PR to main',
-  duplicateMergeEventHandling: 'ALREADY_MERGED_NOOP',
+  duplicateMergeEventHandling: 'ALREADY_MERGED_NOOP_OR_EXACT_HEAD_HANDOFF',
   mutationMethods: ['PUT update-branch', 'POST temp validation ref', 'POST workflow_dispatch', 'DELETE temp validation ref', 'PUT merge'],
 }, null, 2));
