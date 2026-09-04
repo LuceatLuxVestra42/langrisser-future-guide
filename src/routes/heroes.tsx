@@ -572,8 +572,6 @@ function HeroGridCard({
   const imageUrl = cardIcon?.assetStatus === "RESOLVED"
     ? resolvePublicAssetUrl(cardIcon.webAssetPath)
     : null;
-  const rarityIconUrl = getRarityIconUrl(hero.rarity.baseLabel);
-  const spIconUrl = hero.hasSp ? resolvePublicAssetUrl(SP_ICON_PATH) : null;
   const markAssets = fusionPower?.assetStatus === "RESOLVED"
     ? fusionPower.markAssets.map((asset) => ({ ...asset, url: resolvePublicAssetUrl(asset.webAssetPath) }))
     : [];
@@ -622,30 +620,6 @@ function HeroGridCard({
               />
             </div>
           )}
-
-          {rarityIconUrl ? (
-            <img
-              data-hero-rarity-icon="true"
-              data-hero-id={hero.heroId}
-              src={rarityIconUrl}
-              alt={hero.rarity.baseLabel}
-              title={`희귀도 ${hero.rarity.baseLabel}`}
-              className="absolute left-1.5 top-1.5 h-6 w-auto max-w-[52%] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:h-7"
-              loading="lazy"
-            />
-          ) : null}
-
-          {spIconUrl ? (
-            <img
-              data-hero-sp-icon="true"
-              data-hero-id={hero.heroId}
-              src={spIconUrl}
-              alt="SP"
-              title="SP 전직 가능"
-              className="absolute bottom-1.5 left-1.5 h-6 w-auto max-w-[52%] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:h-7"
-              loading="lazy"
-            />
-          ) : null}
 
           {fusionPower && primaryMarkAsset ? (
             <span
