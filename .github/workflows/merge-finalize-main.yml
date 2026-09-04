@@ -36,6 +36,9 @@ jobs:
        github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    outputs:
+      ready: ${{ steps.prepare.outputs.ready }}
+      handoff: ${{ steps.refresh-state.outputs.handoff == 'true' || steps.prepare.outputs.handoff == 'true' }}
     env:
       PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
     steps:
@@ -79,7 +82,9 @@ jobs:
 
       - name: Run merge finalizer self-test
         if: steps.merged-state.outputs.skip != 'true'
-        run: node tools/merge-finalizer/test/merge-finalizer-self-test.mjs
+        run: |
+          node tools/merge-finalizer/test/merge-finalizer-self-test.mjs
+          node tools/merge-finalizer/test/merge-finalizer-concurrency-contract.mjs
 
       - name: Refresh stale PR with GitHub App and hand off to exact-head run
         if: steps.merged-state.outputs.skip != 'true'
@@ -132,7 +137,7 @@ jobs:
                 sleep 5
                 ;;
               CHECK_REQUIRED|CHECK_PENDING|CHECK_NOT_SUCCESSFUL|MERGE_GATE_REQUIRED|MERGE_GATE_PENDING)
-                printf 'MERGE_FINALIZER_APP_PREFLIGHT=HANDOFF_TO_EXECUTE\nAPP_REFRESH_COUNT=%s\n' "$updates"
+                printf 'MERGE_FINALIZER_APP_PREFLIGHT=HANDOFF_TO_PREPARE\nAPP_REFRESH_COUNT=%s\n' "$updates"
                 exit 0
                 ;;
               *)
@@ -145,15 +150,108 @@ jobs:
           echo 'BLOCKER_APP_PREFLIGHT_TIMEOUT'
           exit 1
 
-      - name: Finalize pull request with fail-closed guards
+      - name: Prepare exact PR for merge admission
         if: steps.merged-state.outputs.skip != 'true' && steps.refresh-state.outputs.handoff != 'true'
+        id: prepare
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: >-
-          node tools/merge-finalizer/cli/finalize.mjs
-          --repository "$GITHUB_REPOSITORY"
-          --pr "$PR_NUMBER"
-          --execute
-          --max-restarts 3
-          --timeout-ms 900000
-          --poll-ms 5000
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          echo 'ready=false' >> "$GITHUB_OUTPUT"
+          echo 'handoff=false' >> "$GITHUB_OUTPUT"
+
+          set +e
+          result="$(node tools/merge-finalizer/cli/finalize.mjs \
+            --repository "$GITHUB_REPOSITORY" \
+            --pr "$PR_NUMBER" \
+            --prepare \
+            --max-restarts 3 \
+            --timeout-ms 900000 \
+            --poll-ms 5000)"
+          code=$?
+          set -e
+          printf '%s\n' "$result"
+          status="$(printf '%s' "$result" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>process.stdout.write(String(JSON.parse(s).status ?? '')))")"
+
+          if [[ "$code" -eq 0 && "$status" == 'PREPARED_FOR_MERGE_ADMISSION' ]]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+            echo 'MERGE_FINALIZER_PREPARE=PASS'
+            exit 0
+          fi
+
+          if [[ "$code" -eq 3 && "$status" == 'PREPARE_REVALIDATION_REQUIRED' ]]; then
+            echo 'handoff=true' >> "$GITHUB_OUTPUT"
+            gh api --method POST \
+              "repos/$GITHUB_REPOSITORY/actions/workflows/merge-finalize-main.yml/dispatches" \
+              -f ref=main \
+              -f "inputs[pr]=$PR_NUMBER" >/dev/null
+            echo 'MERGE_FINALIZER_PREPARE_HANDOFF=PASS'
+            exit 0
+          fi
+
+          echo 'BLOCKER_MERGE_FINALIZER_PREPARE'
+          exit 1
+
+  merge-admission:
+    needs: finalize
+    if: needs.finalize.outputs.ready == 'true' && needs.finalize.outputs.handoff != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: merge-finalize-main-mutation
+      queue: max
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
+    steps:
+      - name: Checkout authoritative main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Merge exact ready PR or hand off revalidation
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          set +e
+          result="$(node tools/merge-finalizer/cli/finalize.mjs \
+            --repository "$GITHUB_REPOSITORY" \
+            --pr "$PR_NUMBER" \
+            --merge-only \
+            --max-restarts 0 \
+            --timeout-ms 60000 \
+            --poll-ms 1000)"
+          code=$?
+          set -e
+          printf '%s\n' "$result"
+          status="$(printf '%s' "$result" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>process.stdout.write(String(JSON.parse(s).status ?? '')))")"
+
+          if [[ "$code" -eq 0 && "$status" == 'MERGED' ]]; then
+            echo 'MERGE_FINALIZER_MAIN_MUTATION=PASS'
+            exit 0
+          fi
+
+          if [[ "$code" -eq 3 && "$status" == 'MERGE_ADMISSION_REVALIDATION_REQUIRED' ]]; then
+            gh api --method POST \
+              "repos/$GITHUB_REPOSITORY/actions/workflows/merge-finalize-main.yml/dispatches" \
+              -f ref=main \
+              -f "inputs[pr]=$PR_NUMBER" >/dev/null
+            echo 'MERGE_FINALIZER_MAIN_MUTATION_HANDOFF=PASS'
+            exit 0
+          fi
+
+          if [[ "$code" -eq 3 && "$status" == 'MERGED_REVIEW_POST_MERGE_BASE_RACE' ]]; then
+            echo 'BLOCKER_MERGE_FINALIZER_POST_MERGE_BASE_RACE'
+            exit 1
+          fi
+
+          echo 'BLOCKER_MERGE_FINALIZER_MAIN_MUTATION'
+          exit 1
