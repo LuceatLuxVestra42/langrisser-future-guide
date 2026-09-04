@@ -29,8 +29,6 @@ const prConcurrencyLine = `group: ${contract.validationConcurrency.groupExpressi
 const mergeMutationConcurrencyLine = `group: ${contract.mergeMutationConcurrency.group}`;
 const forbiddenWorkflowWideGlobalLine = `group: ${contract.forbidden.workflowWideGlobalMergeLock}\n`;
 
-// RED contract for Stage 1: these assertions intentionally describe the target
-// workflow and are expected to fail until Stage 2 implements the orchestration split.
 assert.equal(
   workflowText.includes(prConcurrencyLine),
   true,
@@ -51,6 +49,12 @@ assert.equal(
   false,
   'The legacy workflow-wide merge-finalize-main lock must be removed.',
 );
+assert.equal(workflowText.includes('Prepare exact PR for merge admission'), true);
+assert.equal(workflowText.includes('--prepare'), true);
+assert.equal(workflowText.includes('merge-admission:'), true);
+assert.equal(workflowText.includes('--merge-only'), true);
+assert.equal(workflowText.includes('--max-restarts 0'), true);
+assert.equal(workflowText.includes('MERGE_FINALIZER_MAIN_MUTATION_HANDOFF=PASS'), true);
 
 for (const reason of contract.freshnessGuards) {
   assert.equal(
@@ -65,8 +69,11 @@ for (const required of [
   'validateSyntheticMergeParents',
   'findExactProjectCheckForWorkflowRun',
   '`/commits/${boundary.headSha}/check-runs?per_page=100`',
+  "status: 'PREPARED_FOR_MERGE_ADMISSION'",
+  "handoff('PREPARE_REVALIDATION_REQUIRED'",
+  "handoff('MERGE_ADMISSION_REVALIDATION_REQUIRED'",
 ]) {
-  assert.equal(cliText.includes(required), true, `Existing merge safety guard missing: ${required}`);
+  assert.equal(cliText.includes(required), true, `Existing merge safety/concurrency guard missing: ${required}`);
 }
 
 assert.equal(
@@ -84,4 +91,5 @@ console.log(JSON.stringify({
   staleRefreshHandoff: contract.staleRefreshHandoff,
   freshnessGuards: contract.freshnessGuards,
   validationTargets: contract.validationTargets,
+  mergeAdmission: 'SERIALIZED_FAIL_FAST_EXACT_READY',
 }, null, 2));
