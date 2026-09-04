@@ -181,11 +181,6 @@ function HeroDetailPage() {
                 </>
               ) : null}
 
-              <div className="absolute bottom-4 left-4 z-20 flex flex-wrap gap-2 sm:bottom-5 sm:left-5">
-                <span className="rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur">{hero.rarity.baseLabel}</span>
-                {detail.systems.spReleased ? <span className="rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur">SP</span> : null}
-              </div>
-
               {activeVisual ? (
                 <div className="absolute bottom-4 right-4 z-20 rounded-full border border-border/80 bg-background/90 px-3 py-1.5 text-right text-[11px] font-semibold text-foreground shadow-sm backdrop-blur sm:bottom-5 sm:right-5">
                   <div>{activeVisual.kind === "hero" ? "대표 일러스트" : `스킨 ${activeVisual.sourceOrder} · ID ${activeVisual.skinId}`}</div>
@@ -195,8 +190,7 @@ function HeroDetailPage() {
             </div>
 
             <div className="flex min-w-0 flex-col justify-center p-5 sm:p-8 lg:p-10">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Hero #{hero.heroId}</p>
-              <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{displayName}</h1>
+              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{displayName}</h1>
               <div className="mt-3 space-y-0.5 text-sm text-muted-foreground">
                 <p>{hero.identity.nameCn}</p>
                 {hero.identity.nameEn ? <p>{hero.identity.nameEn}</p> : null}
@@ -204,9 +198,8 @@ function HeroDetailPage() {
 
               <div className="mt-7 grid gap-3 sm:grid-cols-2">
                 <InfoBlock title="진영"><div className="flex flex-wrap gap-1.5">{hero.factions.map((faction) => <span key={faction.factionId} className="rounded-md border border-border bg-background px-2 py-1 text-xs font-semibold text-foreground">{faction.nameKr ?? faction.nameCn}</span>)}</div></InfoBlock>
-                <InfoBlock title="출전작"><p className="font-semibold text-foreground">{hero.origin.nameKr ?? hero.origin.nameCn}</p><p className="mt-1 text-xs text-muted-foreground">{hero.origin.category}</p></InfoBlock>
-                <InfoBlock title="기본 정보"><p className="font-semibold text-foreground">초기 별 {detail.base.initialStar ?? "-"}</p><p className="mt-1 text-xs text-muted-foreground">등급 코드 {detail.base.rank ?? "-"}</p></InfoBlock>
-                <InfoBlock title="성우"><p className="font-semibold text-foreground">{detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-"}</p><p className="mt-1 text-xs text-muted-foreground">{detail.presentation.cvState ?? "-"}</p></InfoBlock>
+                <InfoBlock title="출전작"><p className="font-semibold text-foreground">{hero.origin.nameKr ?? hero.origin.nameCn}</p></InfoBlock>
+                <InfoBlock title="성우"><p className="font-semibold text-foreground">{detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-"}</p></InfoBlock>
               </div>
             </div>
           </div>
@@ -235,10 +228,7 @@ function HeroDetailPage() {
                   <div className="flex items-start gap-3">
                     <HeroSkillIcon heroId={hero.heroId} skill={activeTalentRow.skill} />
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <h3 className="font-bold text-foreground">{activeTalentRow.star}성 · {activeTalentRow.skill.nameCn ?? `Skill ${activeTalentRow.skillId}`}</h3>
-                        <span className="shrink-0 rounded-md bg-background px-2 py-1 text-[11px] font-bold text-muted-foreground">#{activeTalentRow.skillId}</span>
-                      </div>
+                      <h3 className="font-bold text-foreground">{activeTalentRow.star}성 · {activeTalentRow.skill.nameCn ?? `Skill ${activeTalentRow.skillId}`}</h3>
                       <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(activeTalentRow.skill.desc)}</p>
                     </div>
                   </div>
@@ -276,26 +266,24 @@ function HeroDetailPage() {
           <SectionTitle title="스킬" />
 
           <div className="mt-5">
-            <h3 className="text-sm font-bold text-foreground">기본 보유 스킬</h3>
             {detail.skills.heroDirectSkills.length > 0 ? (
-              <div className="mt-3 grid gap-3 lg:grid-cols-2">
+              <div className="grid gap-3 lg:grid-cols-2">
                 {detail.skills.heroDirectSkills.map((skill) => <SkillCard key={`direct-${skill.skillId}`} heroId={hero.heroId} skill={skill} sourceLabel="Hero 직접 보유" />)}
               </div>
             ) : (
-              <p className="mt-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">기본 보유 스킬 없음</p>
+              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">기본 보유 스킬 없음</p>
             )}
           </div>
 
           <div className="mt-7 border-t border-border pt-5">
-            <h3 className="text-sm font-bold text-foreground">전직 습득 스킬</h3>
             {detail.skills.jobLevelAcquisitions.length > 0 ? (
-              <div className="mt-3 grid gap-3 lg:grid-cols-2">
+              <div className="grid gap-3 lg:grid-cols-2">
                 {detail.skills.jobLevelAcquisitions.map((row) => (
                   <SkillCard key={`job-${row.acquisitionOrder ?? "x"}-${row.skillId}`} heroId={hero.heroId} skill={row.skill} sourceLabel={`${row.jobNameCn ?? `Job ${row.jobId ?? "?"}`} · Hero Lv.${row.jobLevelUpHeroLevel ?? "-"}`} />
                 ))}
               </div>
             ) : (
-              <p className="mt-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">전직 습득 스킬 없음</p>
+              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">전직 습득 스킬 없음</p>
             )}
           </div>
         </section>
