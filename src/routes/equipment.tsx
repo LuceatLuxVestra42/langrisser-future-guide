@@ -37,12 +37,6 @@ const DEFAULT_UI_STATE: EquipmentListUiState = {
   sort: "default",
 };
 
-const SORT_LABELS: Record<EquipmentSortMode, string> = {
-  default: "기본 표시순",
-  name: "이름순",
-  id: "장비 ID순",
-};
-
 function isEquipmentSortMode(value: unknown): value is EquipmentSortMode {
   return value === "default" || value === "name" || value === "id";
 }
@@ -170,11 +164,6 @@ function EquipmentGeneralListPage() {
     }));
   };
 
-  const orderPolicy =
-    uiState.sort === "default"
-      ? "장비 종류와 세부 타입 기준으로 표시하고, 같은 세부 타입 안에서는 기존 표시순을 사용해."
-      : `${SORT_LABELS[uiState.sort]}으로 표시 중이야. 이 정렬은 출시순 의미를 갖지 않아.`;
-
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
@@ -190,9 +179,6 @@ function EquipmentGeneralListPage() {
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               SSR 장비
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-              일반 SSR 장비 {data.records.length}개를 장비 종류와 세부 타입으로 찾아볼 수 있어.
-            </p>
           </div>
 
           <Link
@@ -222,7 +208,7 @@ function EquipmentGeneralListPage() {
                   onChange={(event) =>
                     setUiState((current) => ({ ...current, query: event.target.value }))
                   }
-                  placeholder="장비명·효과·ID 검색"
+                  placeholder="검색"
                   className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-10 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-ring/30"
                 />
                 {uiState.query && (
@@ -352,16 +338,10 @@ function EquipmentGeneralListPage() {
           </div>
         </section>
 
-        <div className="mt-6 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-          <div>
-            <p className="text-sm text-muted-foreground">
-              전체 {data.records.length}개 중{" "}
-              <span className="font-semibold text-foreground">{filteredRecords.length}개</span> 표시
-            </p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">{orderPolicy}</p>
-          </div>
-          <p className="text-xs text-muted-foreground sm:text-right">
-            선택한 필터·검색·정렬은 다음 방문에도 유지돼.
+        <div className="mt-6">
+          <p className="text-sm text-muted-foreground">
+            전체 {data.records.length}개 중{" "}
+            <span className="font-semibold text-foreground">{filteredRecords.length}개</span> 표시
           </p>
         </div>
 
