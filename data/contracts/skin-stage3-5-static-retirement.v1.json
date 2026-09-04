@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "stage": "skin-page-3",
+  "substage": "3-5-retirement",
+  "evidenceClass": "LEGACY_STATIC_WEB_ASSET_RETIREMENT_CONTRACT",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Retire public/images/skins as a production delivery dependency while preserving the frozen Stage 3-5 manifest and validation as historical evidence.",
+  "predecessor": {
+    "contractPath": "data/contracts/skin-stage3-5-static-web-asset-map.v1.json",
+    "validationPath": "data/validation/skin-stage3-5-static-web-asset-map.v1.json",
+    "expectedSkinCount": 540,
+    "historicalStatus": "PASS_SKIN_STAGE3_5_STATIC_WEB_ASSET_MAP"
+  },
+  "productionBoundary": {
+    "legacyRoot": "public/images/skins",
+    "legacyPublicPrefix": "/images/skins/",
+    "legacyStaticAssetConsumed": false,
+    "fullartHelperPath": "src/lib/skin-fullart-assets.ts",
+    "heroDetailConsumerPath": "src/routes/heroes_.$heroId.tsx",
+    "fullartManifestPath": "data/generated/skin-fullart-reference.v1.json",
+    "fullartPublicPrefix": "/images/skin-fullart/",
+    "missingVisualFallbackAllowed": true,
+    "note": "The current fullart manifest is an independently validated reference delivery path and is not asserted to materialize all 540 canonical skins. Hero detail has a built-in no-image fallback for entries without a delivered visual."
+  },
+  "retirementPolicy": {
+    "legacyDirectoryMayBeAbsent": true,
+    "legacyFileCountRequired": false,
+    "historicalManifestMayReferenceRetiredPaths": true,
+    "historicalManifestMustNotBeRewrittenAsCurrentProduction": true,
+    "productionSourceLiteralReferenceToLegacyPrefix": "FAIL",
+    "semanticPopulationChange": false,
+    "semanticRelationChange": false,
+    "semanticRecomputation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false
+  },
+  "completion": {
+    "status": "PASS_SKIN_STAGE3_5_STATIC_RETIREMENT",
+    "required": {
+      "historicalExpectedSkinCount": 540,
+      "historicalValidationFinalReady": true,
+      "productionLegacyReferenceCount": 0,
+      "fullartLegacyStaticAssetConsumed": false,
+      "heroDetailUsesFullartHelper": true,
+      "heroDetailHasMissingVisualFallback": true
+    }
+  }
+}
