@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import {
+  classifyTrackedMutation,
+  normalizeStatusLines,
+} from '../lib/tracked-mutation.mjs';
 
 const repoRoot = process.cwd();
 const workflowPath = path.join(
@@ -10,103 +14,108 @@ const workflowPath = path.join(
 const workflow = fs.readFileSync(workflowPath, 'utf8');
 
 const mutationStepStart = workflow.indexOf(
-  '      - name: Verify Project Check tracked state is unchanged',
+  '      - name: Verify and classify Project Check tracked state',
 );
 assert.notEqual(
   mutationStepStart,
   -1,
-  'Project Check workflow must keep the tracked-state mutation guard',
+  'Project Check workflow must keep tracked-state verification and classification',
 );
 
 const mutationStep = workflow.slice(mutationStepStart);
 assert.match(
   mutationStep,
-  /git status --porcelain=v1 --untracked-files=no/u,
-  'tracked-state guard must inspect tracked repository mutation',
+  /tracked-mutation\.mjs signature/u,
+  'tracked-state guard must capture a deterministic head mutation signature',
 );
 assert.match(
   mutationStep,
-  /Project Check owning validators mutated tracked repository state\./u,
-  'tracked-state guard must retain its fail-closed diagnostic',
+  /git worktree add --detach/u,
+  'tracked-state guard must reproduce the owning validators on exact base',
 );
 assert.match(
   mutationStep,
-  /exit 1/u,
-  'tracked-state mutation currently fails the required Project Check',
+  /tracked-mutation\.mjs classify/u,
+  'tracked-state guard must classify base/head mutation parity',
+);
+assert.match(
+  mutationStep,
+  /REVIEW_EXISTING_DRIFT/u,
+  'workflow must expose existing drift as a non-blocking review classification',
+);
+assert.match(
+  mutationStep,
+  /REGRESSION_BLOCKER/u,
+  'workflow must retain a blocking regression classification',
 );
 
-function normalizeMutationSignature(lines) {
-  return [...lines].map(line => line.trim()).filter(Boolean).sort();
-}
-
-function currentTrackedMutationGuard(headMutations) {
-  const signature = normalizeMutationSignature(headMutations);
+function signature(lines, diffSha256) {
   return {
-    status: signature.length === 0 ? 'PASS' : 'BLOCKER_TRACKED_MUTATION',
-    exitCode: signature.length === 0 ? 0 : 1,
-    signature,
+    lines: normalizeStatusLines(lines.join('\n')),
+    diffSha256,
   };
 }
 
 const knownEquipmentGeneratedMutation = [
-  'M data/generated/equipment-name-kr-user-approved.v1.json',
-  'M data/validation/equipment-name-kr-user-approved-summary.v1.json',
+  ' M data/generated/equipment-name-kr-user-approved.v1.json',
+  ' M data/validation/equipment-name-kr-user-approved-summary.v1.json',
 ];
 
 const existingDriftFixture = {
   id: 'BASE_AND_HEAD_SAME_TRACKED_MUTATION',
-  baseMutations: knownEquipmentGeneratedMutation,
-  headMutations: knownEquipmentGeneratedMutation,
-  futureExpectedClassification: 'REVIEW_EXISTING_DRIFT',
+  base: signature(knownEquipmentGeneratedMutation, 'same-diff-hash'),
+  head: signature(knownEquipmentGeneratedMutation, 'same-diff-hash'),
 };
 
 const headOnlyRegressionFixture = {
   id: 'HEAD_ONLY_TRACKED_MUTATION',
-  baseMutations: [],
-  headMutations: knownEquipmentGeneratedMutation,
-  futureExpectedClassification: 'REGRESSION_BLOCKER',
+  base: signature([], 'empty-base-hash'),
+  head: signature(knownEquipmentGeneratedMutation, 'head-only-diff-hash'),
 };
 
-const existingCurrent = currentTrackedMutationGuard(
-  existingDriftFixture.headMutations,
+const changedMutationFixture = {
+  id: 'BASE_AND_HEAD_DIFFERENT_TRACKED_MUTATION',
+  base: signature(knownEquipmentGeneratedMutation, 'base-diff-hash'),
+  head: signature(knownEquipmentGeneratedMutation, 'head-diff-hash'),
+};
+
+const existing = classifyTrackedMutation(
+  existingDriftFixture.head,
+  existingDriftFixture.base,
 );
-const regressionCurrent = currentTrackedMutationGuard(
-  headOnlyRegressionFixture.headMutations,
+const headOnly = classifyTrackedMutation(
+  headOnlyRegressionFixture.head,
+  headOnlyRegressionFixture.base,
+);
+const changed = classifyTrackedMutation(
+  changedMutationFixture.head,
+  changedMutationFixture.base,
 );
 
-assert.equal(existingCurrent.status, 'BLOCKER_TRACKED_MUTATION');
-assert.equal(existingCurrent.exitCode, 1);
-assert.equal(regressionCurrent.status, 'BLOCKER_TRACKED_MUTATION');
-assert.equal(regressionCurrent.exitCode, 1);
-assert.deepEqual(existingCurrent.signature, regressionCurrent.signature);
-assert.deepEqual(
-  normalizeMutationSignature(existingDriftFixture.baseMutations),
-  existingCurrent.signature,
-);
-assert.deepEqual(
-  normalizeMutationSignature(headOnlyRegressionFixture.baseMutations),
-  [],
-);
-assert.notEqual(
-  existingDriftFixture.futureExpectedClassification,
-  headOnlyRegressionFixture.futureExpectedClassification,
-);
+assert.equal(existing.status, 'REVIEW_EXISTING_DRIFT');
+assert.equal(existing.exitCode, 0);
+assert.equal(headOnly.status, 'REGRESSION_BLOCKER');
+assert.equal(headOnly.exitCode, 1);
+assert.equal(changed.status, 'REGRESSION_BLOCKER');
+assert.equal(changed.exitCode, 1);
 
 console.log(
-  '[project-check tracked-mutation baseline] PASS ' +
+  '[project-check tracked-mutation classification] PASS ' +
     JSON.stringify({
-      currentBehavior: 'UNDifferentiated tracked mutation failure'.toUpperCase(),
       existingDrift: {
         fixture: existingDriftFixture.id,
-        currentStatus: existingCurrent.status,
-        futureExpectedClassification:
-          existingDriftFixture.futureExpectedClassification,
+        status: existing.status,
+        exitCode: existing.exitCode,
       },
       headOnlyRegression: {
         fixture: headOnlyRegressionFixture.id,
-        currentStatus: regressionCurrent.status,
-        futureExpectedClassification:
-          headOnlyRegressionFixture.futureExpectedClassification,
+        status: headOnly.status,
+        exitCode: headOnly.exitCode,
+      },
+      changedMutation: {
+        fixture: changedMutationFixture.id,
+        status: changed.status,
+        exitCode: changed.exitCode,
       },
     }),
 );

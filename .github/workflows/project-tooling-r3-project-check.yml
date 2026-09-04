@@ -99,11 +99,73 @@ jobs:
       - name: Run changed path owning validators
         run: node tools/project-check/cli/check.mjs --base "${{ steps.project-check-context.outputs.base_spec }}" --head HEAD
 
-      - name: Verify Project Check tracked state is unchanged
+      - name: Verify and classify Project Check tracked state
+        shell: bash
+        env:
+          BASE_SPEC: ${{ steps.project-check-context.outputs.base_spec }}
         run: |
-          CHANGES="$(git status --porcelain=v1 --untracked-files=no)"
-          if [ -n "$CHANGES" ]; then
-            echo "$CHANGES"
-            echo 'Project Check owning validators mutated tracked repository state.'
-            exit 1
+          set -euo pipefail
+
+          HEAD_SIGNATURE="$RUNNER_TEMP/project-check-head-mutation.json"
+          BASE_SIGNATURE="$RUNNER_TEMP/project-check-base-mutation.json"
+          CHANGED_PATHS="$RUNNER_TEMP/project-check-changed-paths.txt"
+          BASE_WORKTREE="$RUNNER_TEMP/project-check-exact-base"
+
+          node tools/project-check/cli/tracked-mutation.mjs signature --repo "$GITHUB_WORKSPACE" --output "$HEAD_SIGNATURE"
+          HEAD_MUTATION_COUNT="$(node -e "const fs=require('fs');const s=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));process.stdout.write(String(s.lines.length));" "$HEAD_SIGNATURE")"
+
+          if [ "$HEAD_MUTATION_COUNT" = "0" ]; then
+            echo 'Project Check tracked state is unchanged.'
+            exit 0
           fi
+
+          echo 'Project Check owning validators mutated tracked repository state; reproducing on exact base.'
+          cat "$HEAD_SIGNATURE"
+
+          BASE_SHA="$(git rev-parse "$BASE_SPEC")"
+          git diff --name-only "$BASE_SHA"...HEAD > "$CHANGED_PATHS"
+
+          cleanup_base_worktree() {
+            git -C "$GITHUB_WORKSPACE" worktree remove --force "$BASE_WORKTREE" >/dev/null 2>&1 || true
+          }
+          trap cleanup_base_worktree EXIT
+
+          git worktree add --detach "$BASE_WORKTREE" "$BASE_SHA"
+          (
+            cd "$BASE_WORKTREE"
+            bun install --frozen-lockfile
+
+            SETUP_CHANGES="$(git status --porcelain=v1 --untracked-files=no)"
+            if [ -n "$SETUP_CHANGES" ]; then
+              echo "$SETUP_CHANGES"
+              echo 'REGRESSION_BLOCKER: exact-base replay setup mutated tracked repository state.'
+              exit 91
+            fi
+
+            set +e
+            node tools/project-check/cli/check.mjs --stdin < "$CHANGED_PATHS"
+            BASE_VALIDATOR_EXIT=$?
+            set -e
+
+            if [ "$BASE_VALIDATOR_EXIT" -ne 0 ]; then
+              echo "REGRESSION_BLOCKER: exact-base owning validator replay did not complete cleanly (exit=$BASE_VALIDATOR_EXIT)."
+              exit 92
+            fi
+          )
+
+          node tools/project-check/cli/tracked-mutation.mjs signature --repo "$BASE_WORKTREE" --output "$BASE_SIGNATURE"
+
+          set +e
+          CLASSIFICATION="$(node tools/project-check/cli/tracked-mutation.mjs classify --head "$HEAD_SIGNATURE" --base "$BASE_SIGNATURE")"
+          CLASSIFY_EXIT=$?
+          set -e
+          echo "$CLASSIFICATION"
+
+          STATUS="$(printf '%s' "$CLASSIFICATION" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>process.stdout.write(JSON.parse(s).status));")"
+          if [ "$STATUS" = "REVIEW_EXISTING_DRIFT" ]; then
+            echo 'REVIEW_EXISTING_DRIFT: exact base reproduces the identical tracked-mutation signature; required project-check remains successful.'
+          elif [ "$STATUS" = "REGRESSION_BLOCKER" ]; then
+            echo 'REGRESSION_BLOCKER: head mutation is absent or different on exact base.'
+          fi
+
+          exit "$CLASSIFY_EXIT"
