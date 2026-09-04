@@ -162,7 +162,7 @@ jobs:
       - name: Wait for exact preview deployment
         run: |
           set -euo pipefail
-          deadline=$((SECONDS + 600))
+          deadline=$((SECONDS + 1200))
           while (( SECONDS < deadline )); do
             body="$(curl --silent --show-error --location --fail --max-time 15 "${PREVIEW_BASE_URL}preview-source.json?sha=${SOURCE_SHA}&run=${GITHUB_RUN_ID}" || true)"
             if printf '%s' "$body" | grep -q "\"sourceSha\": \"${SOURCE_SHA}\""; then
