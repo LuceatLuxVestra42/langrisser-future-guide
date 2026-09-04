@@ -4,6 +4,16 @@ import {
   routeProjectCheckPaths,
 } from '../../project-check/lib/project-check.mjs';
 import {
+  classifyChangedPathCompleteness,
+  readPaginatedPullFiles,
+} from '../lib/changed-paths.mjs';
+import {
+  GitHubHttpError,
+  GitHubResponseError,
+  GitHubTransientExhaustedError,
+  githubRequest,
+} from '../lib/github-api.mjs';
+import {
   assertSha,
   classifyExecutionBoundary,
   classifyMergeFinalization,
@@ -16,7 +26,6 @@ import {
   validationRefName,
 } from '../lib/merge-finalizer.mjs';
 
-const API_VERSION = '2026-03-10';
 const DEFAULT_POLL_MS = 5000;
 const DEFAULT_TIMEOUT_MS = 15 * 60 * 1000;
 const DEFAULT_MAX_RESTARTS = 3;
@@ -56,36 +65,6 @@ function parseArgs(argv) {
   const modeCount = [args.execute, args.prepare, args.mergeOnly].filter(Boolean).length;
   if (modeCount > 1) throw new Error('--execute, --prepare, and --merge-only are mutually exclusive');
   return args;
-}
-
-class GitHubHttpError extends Error {
-  constructor(method, path, status, body) {
-    super(`GitHub ${method} ${path} failed: ${status} ${body.slice(0, 500)}`);
-    this.status = status;
-    this.path = path;
-  }
-}
-
-async function githubRequest(repository, path, token, options = {}) {
-  const method = options.method ?? 'GET';
-  const response = await fetch(`https://api.github.com/repos/${repository}${path}`, {
-    method,
-    headers: {
-      Accept: 'application/vnd.github+json',
-      'X-GitHub-Api-Version': API_VERSION,
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.body === undefined ? {} : { 'Content-Type': 'application/json' }),
-    },
-    ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
-  });
-  const text = await response.text();
-  if (!response.ok) throw new GitHubHttpError(method, path, response.status, text);
-  if (!text) return null;
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
 }
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -135,7 +114,7 @@ async function readBoundary(repository, prNumber, token) {
   return { mainSha, headSha, validationSha, pr, support };
 }
 
-function projectMergeGates(boundary, comparison) {
+function projectMergeGates(boundary, comparison, pullFiles) {
   const behindBy = Number(comparison?.behind_by ?? 0);
   if (behindBy > 0) {
     return {
@@ -147,29 +126,19 @@ function projectMergeGates(boundary, comparison) {
     };
   }
 
-  const expectedChangedFileCount = Number(boundary.pr?.changed_files);
-  const files = Array.isArray(comparison?.files) ? comparison.files : [];
-  if (!Number.isInteger(expectedChangedFileCount) || expectedChangedFileCount < 0 || files.length !== expectedChangedFileCount) {
+  const pathSet = classifyChangedPathCompleteness({
+    expectedChangedFileCount: boundary.pr?.changed_files,
+    files: pullFiles,
+  });
+  if (pathSet.status !== 'PASS') {
     return {
-      status: 'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE',
-      expectedChangedFileCount: Number.isInteger(expectedChangedFileCount) ? expectedChangedFileCount : null,
-      actualChangedFileCount: files.length,
-      mergeGates: [],
-    };
-  }
-
-  const paths = files.map(file => file?.filename).filter(item => typeof item === 'string' && item.length > 0);
-  if (paths.length !== files.length) {
-    return {
-      status: 'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE',
-      expectedChangedFileCount,
-      actualChangedFileCount: paths.length,
+      ...pathSet,
       mergeGates: [],
     };
   }
 
   const contracts = loadProjectCheckContracts();
-  const route = routeProjectCheckPaths(paths, contracts);
+  const route = routeProjectCheckPaths(pathSet.paths, contracts);
   return {
     status: route.status,
     changedFileCount: route.changedFileCount,
@@ -216,7 +185,15 @@ async function readSnapshot(repository, prNumber, token) {
     checkRuns,
     validationSha: boundary.validationSha,
   });
-  const mergeGateProjection = projectMergeGates(boundary, comparison);
+  const pullFiles = result.status === 'UPDATE_REQUIRED'
+    ? []
+    : await readPaginatedPullFiles({
+      repository,
+      prNumber,
+      token,
+      request: githubRequest,
+    });
+  const mergeGateProjection = projectMergeGates(boundary, comparison, pullFiles);
   let mergeGateResult = { status: 'PASS', gateResults: [] };
   if (mergeGateProjection.status === 'BLOCKER_MERGE_GATE_PATH_SET_INCOMPLETE') {
     mergeGateResult = mergeGateProjection;
@@ -689,6 +666,24 @@ async function main() {
 }
 
 main().catch(error => {
-  console.error(JSON.stringify({ status: 'BLOCKER_TOOLING', error: error.message }, null, 2));
+  const structured = {
+    status: 'BLOCKER_TOOLING',
+    reason: error?.reason ?? 'UNHANDLED_TOOLING_ERROR',
+    error: error?.message ?? String(error),
+  };
+  if (error instanceof GitHubTransientExhaustedError) {
+    structured.method = error.method;
+    structured.path = error.path;
+    structured.httpStatus = error.httpStatus;
+    structured.attempts = error.attempts;
+  } else if (error instanceof GitHubResponseError) {
+    structured.method = error.method;
+    structured.path = error.path;
+  } else if (error instanceof GitHubHttpError) {
+    structured.method = error.method;
+    structured.path = error.path;
+    structured.httpStatus = error.status;
+  }
+  output(structured);
   process.exitCode = 2;
 });
