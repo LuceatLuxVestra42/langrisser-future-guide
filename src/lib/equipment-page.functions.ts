@@ -3,29 +3,115 @@ import {
   readExclusiveEquipmentPageData,
   readGeneralEquipmentPageData,
 } from "./equipment-page.localized.server";
+import type {
+  EquipmentFilterGroup,
+  EquipmentStatProperty,
+} from "./equipment-page.server";
 
 const ACCESSORY_GROUP = "accessory";
+const ATTACK_SUBTYPE = "attack";
+const ATTACK_INTELLECT_SUBTYPE = "attack-intellect";
+const ATTACK_INTELLECT_SUBTYPE_KO = "공격+지력";
+const ATTACK_INTELLECT_SUBTYPE_ORDER = 1;
 const HEALING_SUBTYPE = "healing";
 const INTELLECT_SUBTYPE = "intellect";
 const INTELLECT_SUBTYPE_KO = "지력";
-const INTELLECT_SUBTYPE_ORDER = 1;
+const INTELLECT_SUBTYPE_ORDER = 2;
+const DEFENSE_SUBTYPE = "defense";
+const DEFENSE_SUBTYPE_ORDER = 3;
+const ATTACK_PROPERTY_ID = 2;
+const INTELLECT_PROPERTY_ID = 4;
 
-function mergeAccessoryHealingIntoIntellect<T extends {
+type AccessoryClassifiable = {
   group: string;
   subtype: string;
   subtypeKo: string;
   subtypeOrder: number;
-}>(record: T): T {
-  if (record.group !== ACCESSORY_GROUP || record.subtype !== HEALING_SUBTYPE) {
+};
+
+function hasAttackAndIntellectBaseStats(properties: EquipmentStatProperty[]) {
+  let hasAttack = false;
+  let hasIntellect = false;
+
+  for (const property of properties) {
+    if (property.base <= 0) continue;
+    if (property.propertyId === ATTACK_PROPERTY_ID) hasAttack = true;
+    if (property.propertyId === INTELLECT_PROPERTY_ID) hasIntellect = true;
+  }
+
+  return hasAttack && hasIntellect;
+}
+
+function applyAccessoryPresentationClassification<T extends AccessoryClassifiable>(
+  record: T,
+  attackIntellectBaseStats: boolean,
+): T {
+  if (record.group !== ACCESSORY_GROUP) {
     return record;
   }
 
-  return {
-    ...record,
-    subtype: INTELLECT_SUBTYPE,
-    subtypeKo: INTELLECT_SUBTYPE_KO,
-    subtypeOrder: INTELLECT_SUBTYPE_ORDER,
-  } as T;
+  if (attackIntellectBaseStats) {
+    return {
+      ...record,
+      subtype: ATTACK_INTELLECT_SUBTYPE,
+      subtypeKo: ATTACK_INTELLECT_SUBTYPE_KO,
+      subtypeOrder: ATTACK_INTELLECT_SUBTYPE_ORDER,
+    } as T;
+  }
+
+  if (record.subtype === HEALING_SUBTYPE || record.subtype === INTELLECT_SUBTYPE) {
+    return {
+      ...record,
+      subtype: INTELLECT_SUBTYPE,
+      subtypeKo: INTELLECT_SUBTYPE_KO,
+      subtypeOrder: INTELLECT_SUBTYPE_ORDER,
+    } as T;
+  }
+
+  if (record.subtype === DEFENSE_SUBTYPE) {
+    return {
+      ...record,
+      subtypeOrder: DEFENSE_SUBTYPE_ORDER,
+    } as T;
+  }
+
+  return record;
+}
+
+function buildAccessoryFilterSubtypes(
+  subtypes: EquipmentFilterGroup["subtypes"],
+): EquipmentFilterGroup["subtypes"] {
+  const normalized = subtypes
+    .filter(
+      (subtype) =>
+        subtype.subtype !== HEALING_SUBTYPE &&
+        subtype.subtype !== ATTACK_INTELLECT_SUBTYPE,
+    )
+    .map((subtype) => {
+      if (subtype.subtype === INTELLECT_SUBTYPE) {
+        return {
+          ...subtype,
+          subtypeOrder: INTELLECT_SUBTYPE_ORDER,
+        };
+      }
+
+      if (subtype.subtype === DEFENSE_SUBTYPE) {
+        return {
+          ...subtype,
+          subtypeOrder: DEFENSE_SUBTYPE_ORDER,
+        };
+      }
+
+      return subtype;
+    });
+
+  normalized.push({
+    subtype: ATTACK_INTELLECT_SUBTYPE,
+    subtypeKo: ATTACK_INTELLECT_SUBTYPE_KO,
+    subtypeOrder: ATTACK_INTELLECT_SUBTYPE_ORDER,
+  });
+
+  return normalized.sort((left, right) => left.subtypeOrder - right.subtypeOrder);
 }
 
 // GitHub Pages is a static deployment. Keep the equipment page API async-compatible,
@@ -36,12 +122,28 @@ export async function getGeneralEquipmentPageData() {
 
   return {
     ...data,
-    records: data.records.map(mergeAccessoryHealingIntoIntellect),
+    records: data.records.map((record) => {
+      if (record.group !== ACCESSORY_GROUP) {
+        return record;
+      }
+
+      const detailPageData = readEquipmentDetailPageData(record.equipmentId);
+      if (!detailPageData || detailPageData.kind !== "general") {
+        throw new Error(
+          `Public general accessory ${record.equipmentId} is missing its frozen detail consumer.`,
+        );
+      }
+
+      return applyAccessoryPresentationClassification(
+        record,
+        hasAttackAndIntellectBaseStats(detailPageData.detail.stats.properties),
+      );
+    }),
     filters: data.filters.map((filter) =>
       filter.group === ACCESSORY_GROUP
         ? {
             ...filter,
-            subtypes: filter.subtypes.filter((subtype) => subtype.subtype !== HEALING_SUBTYPE),
+            subtypes: buildAccessoryFilterSubtypes(filter.subtypes),
           }
         : filter,
     ),
@@ -70,7 +172,10 @@ export async function getEquipmentDetailPageData({
     ...pageData,
     detail: {
       ...pageData.detail,
-      classification: mergeAccessoryHealingIntoIntellect(pageData.detail.classification),
+      classification: applyAccessoryPresentationClassification(
+        pageData.detail.classification,
+        hasAttackAndIntellectBaseStats(pageData.detail.stats.properties),
+      ),
     },
   };
 }
