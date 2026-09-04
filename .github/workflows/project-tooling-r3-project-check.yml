@@ -111,6 +111,9 @@ jobs:
           CHANGED_PATHS="$RUNNER_TEMP/project-check-changed-paths.txt"
           BASE_WORKTREE="$RUNNER_TEMP/project-check-exact-base"
 
+          # AUDIT CANARY ONLY: create one deterministic runtime-only mutation on head.
+          printf '\nPROJECT_CHECK_EXISTING_DRIFT_CANARY\n' >> "$GITHUB_WORKSPACE/README.md"
+
           node tools/project-check/cli/tracked-mutation.mjs signature --repo "$GITHUB_WORKSPACE" --output "$HEAD_SIGNATURE"
           HEAD_MUTATION_COUNT="$(node -e "const fs=require('fs');const s=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));process.stdout.write(String(s.lines.length));" "$HEAD_SIGNATURE")"
 
@@ -152,6 +155,9 @@ jobs:
               exit 92
             fi
           )
+
+          # AUDIT CANARY ONLY: reproduce byte-identical mutation on exact base after clean replay.
+          printf '\nPROJECT_CHECK_EXISTING_DRIFT_CANARY\n' >> "$BASE_WORKTREE/README.md"
 
           node tools/project-check/cli/tracked-mutation.mjs signature --repo "$BASE_WORKTREE" --output "$BASE_SIGNATURE"
 
