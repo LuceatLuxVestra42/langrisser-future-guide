@@ -60,16 +60,46 @@ export function isRetryableReadFailure(method, status, body = '') {
     || isInstallationRateLimitFailure(status, body);
 }
 
+function retryAfterDelayMs(value, nowMs) {
+  const text = String(value ?? '').trim();
+  if (!text) return null;
+
+  const seconds = Number(text);
+  if (Number.isFinite(seconds) && seconds >= 0) return Math.ceil(seconds * 1000);
+
+  const timestamp = Date.parse(text);
+  if (!Number.isFinite(timestamp)) return null;
+  return Math.max(0, timestamp - nowMs);
+}
+
+function rateLimitResetDelayMs(value, nowMs) {
+  const resetEpochSeconds = Number(String(value ?? '').trim());
+  if (!Number.isFinite(resetEpochSeconds) || resetEpochSeconds < 0) return null;
+  return Math.max(0, Math.ceil((resetEpochSeconds * 1000) - nowMs));
+}
+
+export function installationRateLimitRetryDelayMs(response, fallbackDelayMs, nowMs = Date.now()) {
+  const retryAfter = retryAfterDelayMs(response?.headers?.get?.('retry-after'), nowMs);
+  if (retryAfter != null) return retryAfter;
+
+  const rateLimitReset = rateLimitResetDelayMs(response?.headers?.get?.('x-ratelimit-reset'), nowMs);
+  if (rateLimitReset != null) return rateLimitReset;
+
+  return fallbackDelayMs;
+}
+
 const defaultSleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function githubRequest(repository, path, token, options = {}) {
   const method = options.method ?? 'GET';
   const fetchImpl = options.fetchImpl ?? globalThis.fetch;
   const sleepImpl = options.sleepImpl ?? defaultSleep;
+  const nowImpl = options.nowImpl ?? Date.now;
   const maxAttempts = options.maxAttempts ?? DEFAULT_GITHUB_READ_MAX_ATTEMPTS;
   const retryDelaysMs = options.retryDelaysMs ?? DEFAULT_GITHUB_READ_RETRY_DELAYS_MS;
 
   if (typeof fetchImpl !== 'function') throw new Error('fetch implementation is required');
+  if (typeof nowImpl !== 'function') throw new Error('now implementation is required');
   if (!Number.isInteger(maxAttempts) || maxAttempts <= 0) throw new Error('maxAttempts must be a positive integer');
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -90,7 +120,10 @@ export async function githubRequest(repository, path, token, options = {}) {
         if (attempt >= maxAttempts) {
           throw new GitHubTransientExhaustedError(method, path, response.status, attempt);
         }
-        const delay = retryDelaysMs[Math.min(attempt - 1, retryDelaysMs.length - 1)] ?? 0;
+        const fallbackDelay = retryDelaysMs[Math.min(attempt - 1, retryDelaysMs.length - 1)] ?? 0;
+        const delay = isInstallationRateLimitFailure(response.status, text)
+          ? installationRateLimitRetryDelayMs(response, fallbackDelay, nowImpl())
+          : fallbackDelay;
         await sleepImpl(delay);
         continue;
       }
