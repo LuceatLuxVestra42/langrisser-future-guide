@@ -1,12 +1,20 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ChevronRight, Sparkles, Swords, UserRound } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarDays,
+  ChevronRight,
+  Shield,
+  Sparkles,
+  Swords,
+  UserRound,
+} from "lucide-react";
 
 import { getOfficialEquipmentImageUrl } from "@/lib/equipment-image-assets";
-import { getEquipmentDetailPageData } from "@/lib/equipment-page.functions";
-import type {
-  ExclusiveEquipmentDetailPageData,
-  GeneralEquipmentDetailPageData,
-} from "@/lib/equipment-page.server";
+import {
+  getEquipmentDetailPageData,
+  type ExclusiveEquipmentDetailRouteData,
+} from "@/lib/equipment-page.functions";
+import type { GeneralEquipmentDetailPageData } from "@/lib/equipment-page.server";
 
 export const Route = createFileRoute("/equipment_/$equipmentId")({
   loader: async ({ params }) => {
@@ -41,6 +49,10 @@ export const Route = createFileRoute("/equipment_/$equipmentId")({
 
 type Stats = GeneralEquipmentDetailPageData["detail"]["stats"];
 type Effect = GeneralEquipmentDetailPageData["detail"]["effect"];
+type RestrictionSection =
+  ExclusiveEquipmentDetailRouteData["presentation"]["sections"]["restriction"];
+type AcquisitionSection =
+  ExclusiveEquipmentDetailRouteData["presentation"]["sections"]["acquisition"];
 
 function EquipmentDetailPage() {
   const data = Route.useLoaderData();
@@ -74,8 +86,8 @@ function GeneralEquipmentDetail({ data }: { data: GeneralEquipmentDetailPageData
         />
 
         <div className="mt-6 space-y-6">
-          <StatsSection stats={stats} />
-          <EffectSection effect={effect} />
+          <StatsSection title="Lv50 능력치" rows={stats.properties} />
+          <EffectSection title="최대 효과" effect={effect} />
         </div>
 
         <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
@@ -101,9 +113,9 @@ function GeneralEquipmentDetail({ data }: { data: GeneralEquipmentDetailPageData
   );
 }
 
-function ExclusiveEquipmentDetail({ data }: { data: ExclusiveEquipmentDetailPageData }) {
-  const { classification, stats, effect } = data.detail;
-  const { ownerHero } = data;
+function ExclusiveEquipmentDetail({ data }: { data: ExclusiveEquipmentDetailRouteData }) {
+  const { ownerHero, presentation } = data;
+  const { classification, sections } = presentation;
 
   return (
     <main className="min-h-screen bg-background">
@@ -126,12 +138,12 @@ function ExclusiveEquipmentDetail({ data }: { data: ExclusiveEquipmentDetailPage
         <section className="mt-6 rounded-2xl border border-primary/20 bg-card p-5 shadow-sm sm:p-6">
           <div className="flex items-center gap-2">
             <UserRound size={18} aria-hidden="true" className="text-primary" />
-            <h2 className="text-lg font-bold text-foreground">전용 영웅</h2>
+            <h2 className="text-lg font-bold text-foreground">{sections.exclusiveHero.titleKo}</h2>
           </div>
           <Link
             reloadDocument
             to="/heroes/$heroId"
-            params={{ heroId: String(ownerHero.heroId) }}
+            params={{ heroId: String(sections.exclusiveHero.heroId) }}
             className="group mt-4 flex items-center justify-between gap-4 rounded-xl border border-border bg-muted/35 p-4 transition hover:border-primary/35 hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <p className="min-w-0 truncate text-xl font-bold text-foreground">{ownerHero.nameKr}</p>
@@ -147,8 +159,10 @@ function ExclusiveEquipmentDetail({ data }: { data: ExclusiveEquipmentDetailPage
         </section>
 
         <div className="mt-6 space-y-6">
-          <StatsSection stats={stats} />
-          <EffectSection effect={effect} />
+          <StatsSection title={sections.stats.titleKo} rows={sections.stats.rows} />
+          <EffectSection title={sections.effect.titleKo} effect={sections.effect} />
+          <RestrictionPresentationSection section={sections.restriction} />
+          <AcquisitionPresentationSection section={sections.acquisition} />
         </div>
 
         <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
@@ -213,16 +227,16 @@ function EquipmentHeader({
   );
 }
 
-function StatsSection({ stats }: { stats: Stats }) {
+function StatsSection({ title, rows }: { title: string; rows: Stats["properties"] }) {
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
       <div className="flex items-center gap-2">
         <Swords size={18} aria-hidden="true" className="text-primary" />
-        <h2 className="text-lg font-bold text-foreground">Lv50 능력치</h2>
+        <h2 className="text-lg font-bold text-foreground">{title}</h2>
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {stats.properties.map((property) => (
+        {rows.map((property) => (
           <div
             key={property.propertyId}
             className="rounded-xl border border-border bg-muted/35 px-4 py-4"
@@ -238,12 +252,12 @@ function StatsSection({ stats }: { stats: Stats }) {
   );
 }
 
-function EffectSection({ effect }: { effect: Effect }) {
+function EffectSection({ title, effect }: { title: string; effect: Effect }) {
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
       <div className="flex items-center gap-2">
         <Sparkles size={18} aria-hidden="true" className="text-primary" />
-        <h2 className="text-lg font-bold text-foreground">최대 효과</h2>
+        <h2 className="text-lg font-bold text-foreground">{title}</h2>
       </div>
 
       <div className="mt-4 rounded-xl bg-muted/45 p-4 sm:p-5">
@@ -263,6 +277,91 @@ function EffectSection({ effect }: { effect: Effect }) {
           )}
         </p>
       </div>
+    </section>
+  );
+}
+
+function RestrictionPresentationSection({ section }: { section: RestrictionSection }) {
+  return (
+    <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+      <div className="flex items-center gap-2">
+        <Shield size={18} aria-hidden="true" className="text-primary" />
+        <h2 className="text-lg font-bold text-foreground">{section.titleKo}</h2>
+      </div>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div className="rounded-xl border border-border bg-muted/35 p-4">
+          <p className="text-sm font-semibold text-foreground">일반 병종</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {section.generalArmies.length > 0 ? (
+              section.generalArmies.map((army) => (
+                <span
+                  key={army.armyId}
+                  className="rounded-full border border-border bg-background px-3 py-1.5 text-sm text-foreground"
+                >
+                  {army.nameKo}
+                </span>
+              ))
+            ) : (
+              <span className="text-sm text-muted-foreground">—</span>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-muted/35 p-4">
+          <p className="text-sm font-semibold text-foreground">특수 직업</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {section.specialJobs.length > 0 ? (
+              section.specialJobs.map((job) => (
+                <span
+                  key={job.jobId}
+                  className="rounded-full border border-border bg-background px-3 py-1.5 text-sm text-foreground"
+                >
+                  {job.nameCn} · {job.armyNameKo}
+                </span>
+              ))
+            ) : (
+              <span className="text-sm text-muted-foreground">—</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <p className="mt-3 text-xs text-muted-foreground">
+        제한 방식 {section.mode} · semantic {section.semanticStatus} · 신뢰도 {section.semanticConfidence}%
+      </p>
+    </section>
+  );
+}
+
+function AcquisitionPresentationSection({ section }: { section: AcquisitionSection }) {
+  return (
+    <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+      <div className="flex items-center gap-2">
+        <CalendarDays size={18} aria-hidden="true" className="text-primary" />
+        <h2 className="text-lg font-bold text-foreground">{section.titleKo}</h2>
+      </div>
+
+      <dl className="mt-4 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-border bg-muted/35 p-4">
+          <dt className="text-xs font-medium text-muted-foreground">출시 그룹일</dt>
+          <dd className="mt-1 text-sm font-semibold text-foreground">
+            {section.releaseGroupDate ?? "—"}
+          </dd>
+        </div>
+        <div className="rounded-xl border border-border bg-muted/35 p-4">
+          <dt className="text-xs font-medium text-muted-foreground">분류 근거</dt>
+          <dd className="mt-1 break-words text-sm font-semibold text-foreground">
+            {section.classificationBasis}
+          </dd>
+        </div>
+        <div className="rounded-xl border border-border bg-muted/35 p-4">
+          <dt className="text-xs font-medium text-muted-foreground">신뢰도</dt>
+          <dd className="mt-1 text-sm font-semibold tabular-nums text-foreground">
+            {section.confidencePercent}%
+          </dd>
+        </div>
+      </dl>
     </section>
   );
 }
