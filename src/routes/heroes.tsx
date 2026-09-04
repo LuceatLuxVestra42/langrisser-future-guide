@@ -557,6 +557,7 @@ function HeroGridCard({
               height={cardIcon?.height}
               className="h-full w-full object-contain transition duration-200 group-hover:scale-[1.015]"
               loading="lazy"
+              decoding="async"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-muted/30 text-muted-foreground">
@@ -588,6 +589,7 @@ function HeroGridCard({
                     className="absolute inset-0 h-full w-full object-contain"
                     style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
                     loading="lazy"
+                    decoding="async"
                   />
                   <img
                     src={secondaryMarkAsset.url}
@@ -595,6 +597,7 @@ function HeroGridCard({
                     className="absolute inset-0 h-full w-full object-contain"
                     style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }}
                     loading="lazy"
+                    decoding="async"
                   />
                   <span
                     aria-hidden="true"
@@ -609,6 +612,7 @@ function HeroGridCard({
                   height={primaryMarkAsset.height}
                   className="h-full w-full object-contain"
                   loading="lazy"
+                  decoding="async"
                 />
               )}
             </span>
