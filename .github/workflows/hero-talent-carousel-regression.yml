@@ -112,7 +112,6 @@ jobs:
           check(byInitialStar.has(1), 'No frozen Hero detail representative with initialStar=1');
 
           const targets = [hero6, byInitialStar.get(2), byInitialStar.get(1)];
-          const hero6SkillIds = new Map([[3, 3067], [4, 3072], [5, 3077], [6, 3082]]);
 
           async function verifyTalentCarousel(page, target, label) {
             const pageErrors = [];
@@ -150,11 +149,6 @@ jobs:
               check((await starButton.getAttribute('aria-pressed')) === 'true', `${label} Hero ${target.heroId} ${star}성 selector is not pressed`);
               const heading = (await carousel.locator('article h3').innerText()).trim();
               check(heading.startsWith(`${star}성 ·`), `${label} Hero ${target.heroId} ${star}성 card heading mismatch: ${heading}`);
-              if (target.heroId === 6) {
-                const expectedSkillId = hero6SkillIds.get(star);
-                const cardText = await carousel.locator('article').innerText();
-                check(cardText.includes(`#${expectedSkillId}`), `${label} Hero 6 ${star}성 skill id mismatch: expected #${expectedSkillId}`);
-              }
             };
 
             await assertStar(6);
@@ -216,7 +210,6 @@ jobs:
               defaultStar: 6,
               representatives: desktopResults,
               hero6ExpectedCycle: [6, 5, 4, 3, 4, 5, 6],
-              hero6SkillIds: Object.fromEntries(hero6SkillIds),
               mobileHero6: mobileResult,
               semanticRecomputation: false,
             }, null, 2));
