@@ -333,6 +333,7 @@ function HeroIdGrid({
                     width={card?.width}
                     height={card?.height}
                     loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-contain transition duration-200 group-hover:scale-[1.015]"
                   />
                 ) : (
@@ -631,6 +632,7 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
               width={36}
               height={36}
               loading="lazy"
+              decoding="async"
               className="h-9 w-9 object-contain"
             />
             <span className="mt-0.5 whitespace-nowrap text-[11px] font-black leading-none tabular-nums text-foreground">
@@ -654,6 +656,7 @@ function TrainingSimulator({ levels }: { levels: TrainingLevelCost[] }) {
                     width={36}
                     height={36}
                     loading="lazy"
+                    decoding="async"
                     className="h-9 w-9 object-contain"
                   />
                 ) : (
@@ -825,6 +828,7 @@ function SpStageCard({
                     width={28}
                     height={28}
                     loading="lazy"
+                    decoding="async"
                     className="h-7 w-7 shrink-0 object-contain"
                   />
                 ) : (
