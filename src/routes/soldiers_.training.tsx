@@ -319,7 +319,7 @@ function TrainingTechGroupList({
   onSelect,
 }: {
   techs: SoldierTrainingTech[];
-  selectedTechId?: number;
+  selectedTechId?: number | undefined;
   groupLabel: string;
   onSelect: (tech: SoldierTrainingTech) => void;
 }) {
