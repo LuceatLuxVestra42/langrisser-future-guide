@@ -1,5 +1,3 @@
-import { ShieldCheck } from "lucide-react";
-
 import { getHeroCentralDisciplineKoBySkillId } from "@/lib/hero-central-discipline-ko";
 
 export type HeroCentralDisciplinePresentation = {
@@ -28,10 +26,7 @@ export function HeroCentralDisciplineSection({
 
   return (
     <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-central-discipline>
-      <div className="flex items-center gap-2">
-        <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-        <h2 className="font-bold text-foreground">중앙율정</h2>
-      </div>
+      <h2 className="font-bold text-foreground">중앙율정</h2>
 
       {koreanPresentation ? (
         <article

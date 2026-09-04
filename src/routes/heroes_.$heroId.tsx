@@ -2,15 +2,11 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
-  BriefcaseBusiness,
   ChevronLeft,
   ChevronRight,
-  HeartHandshake,
   ImageOff,
-  Sparkles,
   Swords,
   UserRound,
-  UsersRound,
 } from "lucide-react";
 
 import { HeroCentralDisciplineSection } from "@/components/hero-central-discipline-section";
@@ -187,7 +183,7 @@ function HeroDetailPage() {
 
               <div className="absolute bottom-4 left-4 z-20 flex flex-wrap gap-2 sm:bottom-5 sm:left-5">
                 <span className="rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur">{hero.rarity.baseLabel}</span>
-                {detail.systems.spReleased ? <span className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur"><Sparkles className="h-3.5 w-3.5" aria-hidden="true" />SP</span> : null}
+                {detail.systems.spReleased ? <span className="rounded-full border border-border/80 bg-background/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur">SP</span> : null}
               </div>
 
               {activeVisual ? (
@@ -217,7 +213,7 @@ function HeroDetailPage() {
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-talent-carousel="true">
-          <SectionTitle icon={<Sparkles className="h-4 w-4" aria-hidden="true" />} title="재능" />
+          <SectionTitle title="재능" />
           {activeTalentRow ? (
             <div
               className="mt-4"
@@ -277,7 +273,7 @@ function HeroDetailPage() {
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <SectionTitle icon={<Swords className="h-4 w-4" aria-hidden="true" />} title="스킬" />
+          <SectionTitle title="스킬" />
 
           <div className="mt-5">
             <h3 className="text-sm font-bold text-foreground">기본 보유 스킬</h3>
@@ -305,7 +301,7 @@ function HeroDetailPage() {
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <SectionTitle icon={<BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />} title="최종 직업 스탯" />
+          <SectionTitle title="최종 직업 스탯" />
           {finalJobBranches.length > 0 ? (
             <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true">
               <table className="w-full min-w-[680px] border-collapse text-sm">
@@ -352,7 +348,7 @@ function HeroDetailPage() {
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <SectionTitle icon={<HeartHandshake className="h-4 w-4" aria-hidden="true" />} title="유대" />
+          <SectionTitle title="유대" />
           {hasBondUnlockConditions ? (
             <div className="mt-5 grid gap-2 lg:grid-cols-2">
               {detail.bonds.rows.flatMap((bond) =>
@@ -371,7 +367,7 @@ function HeroDetailPage() {
         <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-soldier-cards="true">
-          <SectionTitle icon={<UsersRound className="h-4 w-4" aria-hidden="true" />} title="사용 가능 용병" />
+          <SectionTitle title="사용 가능 용병" />
           <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
             {soldierCards.map((record) => (
               <HeroSoldierCard
@@ -509,7 +505,7 @@ function formatBondCondition(condition: { requiredHero: { heroId: number | null;
   return "해금 조건 확인됨";
 }
 
-function SectionTitle({ icon, title }: { icon: ReactNode; title: string }) { return <div className="flex items-center gap-2">{icon}<h2 className="font-bold text-foreground">{title}</h2></div>; }
+function SectionTitle({ title }: { title: string }) { return <h2 className="font-bold text-foreground">{title}</h2>; }
 function InfoBlock({ title, children }: { title: string; children: ReactNode }) { return <div className="rounded-xl border border-border bg-muted/30 p-4"><p className="mb-2 text-xs font-bold text-muted-foreground">{title}</p>{children}</div>; }
 function JobStatCell({ value }: { value: number | null }) { return <td className="px-4 py-3 text-right font-bold tabular-nums text-foreground">{value ?? "-"}</td>; }
 function HeroNotFound() { return <main className="min-h-screen bg-background"><div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-4 text-center"><Swords className="mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="text-2xl font-bold text-foreground">영웅을 찾을 수 없어.</h1><p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 Hero 목록에 존재하지 않는 주소야.</p><Link reloadDocument to="/heroes" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground underline underline-offset-4"><ArrowLeft className="h-4 w-4" aria-hidden="true" />영웅 목록으로</Link></div></main>; }
