@@ -48,6 +48,8 @@ function BannerLogArtwork({
         src={artworkUrl}
         alt=""
         aria-hidden="true"
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 h-full w-full scale-110 object-cover opacity-15 blur-2xl"
       />
       <div className="absolute inset-0 bg-background/75" aria-hidden="true" />
