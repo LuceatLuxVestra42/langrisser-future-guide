@@ -37,6 +37,12 @@ const DEFAULT_UI_STATE: EquipmentListUiState = {
   sort: "default",
 };
 
+const SORT_LABELS: Record<EquipmentSortMode, string> = {
+  default: "기본 표시순",
+  name: "이름순",
+  id: "장비 ID순",
+};
+
 function isEquipmentSortMode(value: unknown): value is EquipmentSortMode {
   return value === "default" || value === "name" || value === "id";
 }
@@ -239,9 +245,9 @@ function EquipmentGeneralListPage() {
                   }
                   className="h-full min-w-0 flex-1 appearance-none bg-transparent px-2 pr-8 text-sm font-medium text-foreground outline-none"
                 >
-                  <option value="default">기본 표시순</option>
-                  <option value="name">이름순</option>
-                  <option value="id">장비 ID순</option>
+                  <option value="default">{SORT_LABELS.default}</option>
+                  <option value="name">{SORT_LABELS.name}</option>
+                  <option value="id">{SORT_LABELS.id}</option>
                 </select>
                 <ChevronRight
                   size={14}
