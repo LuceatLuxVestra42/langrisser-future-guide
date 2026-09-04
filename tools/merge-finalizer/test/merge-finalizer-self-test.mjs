@@ -297,7 +297,7 @@ for (const status of [429, 503, 504]) {
   );
   assert.equal(fixture.calls.length, 4);
 }
-for (const status of [404, 422]) {
+for (const status of [401, 403, 404, 422]) {
   const fixture = retryFixture([{ status, body: '{}' }]);
   await assert.rejects(
     githubRequest(REPOSITORY, '/branches/main', 'token', { fetchImpl: fixture.fetchImpl, sleepImpl: noRetrySleep }),
@@ -339,6 +339,8 @@ assert.equal(isRetryableReadFailure('GET', 502), true);
 assert.equal(isRetryableReadFailure('GET', 503), true);
 assert.equal(isRetryableReadFailure('GET', 504), true);
 assert.equal(isRetryableReadFailure('PUT', 502), false);
+assert.equal(isRetryableReadFailure('GET', 401), false);
+assert.equal(isRetryableReadFailure('GET', 403), false);
 assert.equal(isRetryableReadFailure('GET', 404), false);
 assert.equal(isRetryableReadFailure('GET', 422), false);
 
@@ -468,8 +470,8 @@ assert.equal(projectCheckText.includes('ACTUAL_HEAD'), true);
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'MERGE_FINALIZER_HOSTED_GATE_SELF_TEST',
-  fixtures: 52,
-  staticGuards: 93,
+  fixtures: 54,
+  staticGuards: 95,
   requiredCheck: REQUIRED_PROJECT_CHECK,
   hostedGate: hostedGate.requiredCheck,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,
