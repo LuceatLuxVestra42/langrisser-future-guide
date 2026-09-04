@@ -119,3 +119,6 @@ console.log(
       },
     }),
 );
+
+// AUDIT CANARY ONLY — intentionally create a head-only tracked mutation.
+fs.appendFileSync(path.join(repoRoot, 'README.md'), '\nPROJECT_CHECK_HEAD_ONLY_CANARY\n');
