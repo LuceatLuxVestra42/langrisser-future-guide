@@ -23,11 +23,30 @@ export const Route = createFileRoute("/soldiers_/training")({
 });
 
 type KindFilter = "ALL" | "COMMON_STAT" | "COMMON_PASSIVE";
+type TrainingGroupFilter = "ALL" | "INFANTRY" | "LANCER" | "CAVALRY" | "FLYING_WATER" | "ARCHER_ASSASSIN" | "MAGE_HOLY_DEMON";
 
 const KIND_FILTERS: Array<{ id: KindFilter; label: string }> = [
   { id: "ALL", label: "전체" },
   { id: "COMMON_STAT", label: "기본 능력치" },
   { id: "COMMON_PASSIVE", label: "조건부 효과" },
+];
+
+const TRAINING_GROUPS: Array<{
+  id: Exclude<TrainingGroupFilter, "ALL">;
+  label: string;
+  armyIds: number[];
+}> = [
+  { id: "INFANTRY", label: "보병", armyIds: [2] },
+  { id: "LANCER", label: "창병", armyIds: [1] },
+  { id: "CAVALRY", label: "기병", armyIds: [3] },
+  { id: "FLYING_WATER", label: "비병 + 수병", armyIds: [4, 5] },
+  { id: "ARCHER_ASSASSIN", label: "궁병 + 암살자", armyIds: [6, 11] },
+  { id: "MAGE_HOLY_DEMON", label: "마법사 + 승려 + 마물", armyIds: [7, 8, 9] },
+];
+
+const TRAINING_GROUP_FILTERS: Array<{ id: TrainingGroupFilter; label: string }> = [
+  { id: "ALL", label: "전체 훈련" },
+  ...TRAINING_GROUPS.map(({ id, label }) => ({ id, label })),
 ];
 
 const STAT_LABELS: Record<TrainingStatEffect["statKey"], string> = {
@@ -37,27 +56,64 @@ const STAT_LABELS: Record<TrainingStatEffect["statKey"], string> = {
   MDEF: "마방",
 };
 
+function resolveTrainingGroup(tech: SoldierTrainingTech) {
+  if (tech.armyIds.length === 0) {
+    throw new Error(`Training Tech ${tech.techId} has no army relation.`);
+  }
+
+  const matches = TRAINING_GROUPS.filter((group) =>
+    tech.armyIds.every((armyId) => group.armyIds.some((groupArmyId) => groupArmyId === armyId)),
+  );
+
+  if (matches.length !== 1) {
+    throw new Error(
+      `Training Tech ${tech.techId} must belong to exactly one training group; armyIds=${tech.armyIds.join(",")}.`,
+    );
+  }
+
+  return matches[0];
+}
+
 function SoldierTrainingPage() {
   const data = Route.useLoaderData();
   const [selectedTechId, setSelectedTechId] = useState(data.techs[0]?.techId ?? 0);
   const [level, setLevel] = useState(1);
   const [kindFilter, setKindFilter] = useState<KindFilter>("ALL");
+  const [trainingGroupFilter, setTrainingGroupFilter] = useState<TrainingGroupFilter>("ALL");
   const [query, setQuery] = useState("");
+
+  const trainingGroupByTechId = useMemo(
+    () => new Map(data.techs.map((tech) => [tech.techId, resolveTrainingGroup(tech)] as const)),
+    [data.techs],
+  );
 
   const filteredTechs = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return data.techs.filter((tech) => {
       if (kindFilter !== "ALL" && tech.kind !== kindFilter) return false;
+      const trainingGroup = trainingGroupByTechId.get(tech.techId);
+      if (!trainingGroup) throw new Error(`Missing training group for Tech ${tech.techId}.`);
+      if (trainingGroupFilter !== "ALL" && trainingGroup.id !== trainingGroupFilter) return false;
       if (!needle) return true;
-      return [tech.nameKr, tech.nameCn, String(tech.techId), tech.armyIds.join(" ")]
+      return [tech.nameKr, tech.nameCn, String(tech.techId), trainingGroup.label]
         .join(" ")
         .toLowerCase()
         .includes(needle);
     });
-  }, [data.techs, kindFilter, query]);
+  }, [data.techs, kindFilter, query, trainingGroupByTechId, trainingGroupFilter]);
+
+  const groupedFilteredTechs = useMemo(
+    () =>
+      TRAINING_GROUPS.map((group) => ({
+        group,
+        techs: filteredTechs.filter((tech) => trainingGroupByTechId.get(tech.techId)?.id === group.id),
+      })).filter(({ techs }) => techs.length > 0),
+    [filteredTechs, trainingGroupByTechId],
+  );
 
   const selectedTech =
     data.techs.find((tech) => tech.techId === selectedTechId) ?? filteredTechs[0] ?? data.techs[0];
+  const selectedTrainingGroup = selectedTech ? trainingGroupByTechId.get(selectedTech.techId) : undefined;
   const safeLevel = selectedTech ? Math.min(Math.max(level, 1), selectedTech.maxLevel) : 1;
 
   function selectTech(tech: SoldierTrainingTech) {
@@ -94,54 +150,86 @@ function SoldierTrainingPage() {
             />
           </label>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {KIND_FILTERS.map((filter) => (
-              <button
-                key={filter.id}
-                type="button"
-                aria-pressed={kindFilter === filter.id}
-                onClick={() => setKindFilter(filter.id)}
-                className={`rounded-md border px-3 py-1.5 text-xs font-bold transition ${
-                  kindFilter === filter.id
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-border bg-card text-foreground hover:bg-muted"
-                }`}
-              >
-                {filter.label}
-              </button>
-            ))}
+          <div className="mt-4">
+            <p className="text-xs font-bold text-muted-foreground">훈련 계열</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {TRAINING_GROUP_FILTERS.map((filter) => (
+                <button
+                  key={filter.id}
+                  type="button"
+                  aria-pressed={trainingGroupFilter === filter.id}
+                  onClick={() => setTrainingGroupFilter(filter.id)}
+                  className={`rounded-md border px-3 py-1.5 text-xs font-bold transition ${
+                    trainingGroupFilter === filter.id
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-border bg-card text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <p className="text-xs font-bold text-muted-foreground">효과 유형</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {KIND_FILTERS.map((filter) => (
+                <button
+                  key={filter.id}
+                  type="button"
+                  aria-pressed={kindFilter === filter.id}
+                  onClick={() => setKindFilter(filter.id)}
+                  className={`rounded-md border px-3 py-1.5 text-xs font-bold transition ${
+                    kindFilter === filter.id
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-border bg-card text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.6fr)]">
             <div className="max-h-[680px] overflow-y-auto rounded-xl border border-border bg-card p-2">
-              {filteredTechs.map((tech) => (
-                <button
-                  key={tech.techId}
-                  type="button"
-                  onClick={() => selectTech(tech)}
-                  className={`mb-1 w-full rounded-lg px-3 py-2.5 text-left transition last:mb-0 ${
-                    selectedTech?.techId === tech.techId
-                      ? "bg-foreground text-background"
-                      : "hover:bg-muted"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <span className="truncate text-sm font-bold">{tech.nameKr}</span>
-                      {tech.nameStatus === "provisional-display" ? (
-                        <span className="shrink-0 rounded border border-current/25 px-1 py-0.5 text-[9px] font-bold opacity-70">
-                          임시 표기
-                        </span>
-                      ) : null}
-                    </div>
-                    <span className="shrink-0 text-[10px] opacity-70">#{tech.techId}</span>
+              {groupedFilteredTechs.map(({ group, techs }) => (
+                <section key={group.id} className="mb-3 last:mb-0">
+                  <div className="sticky top-0 z-10 mb-1 flex items-center justify-between rounded-md bg-muted px-3 py-2 text-xs font-black text-foreground">
+                    <span>{group.label}</span>
+                    <span className="text-[10px] font-bold text-muted-foreground">{techs.length}개</span>
                   </div>
-                  <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
-                    <span>{tech.kind === "COMMON_STAT" ? "기본 능력치" : "조건부 효과"}</span>
-                    <span>Lv.{tech.maxLevel}</span>
-                    {tech.armyIds.length ? <span>병종 ID {tech.armyIds.join(", ")}</span> : null}
-                  </div>
-                </button>
+                  {techs.map((tech) => (
+                    <button
+                      key={tech.techId}
+                      type="button"
+                      onClick={() => selectTech(tech)}
+                      className={`mb-1 w-full rounded-lg px-3 py-2.5 text-left transition last:mb-0 ${
+                        selectedTech?.techId === tech.techId
+                          ? "bg-foreground text-background"
+                          : "hover:bg-muted"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span className="truncate text-sm font-bold">{tech.nameKr}</span>
+                          {tech.nameStatus === "provisional-display" ? (
+                            <span className="shrink-0 rounded border border-current/25 px-1 py-0.5 text-[9px] font-bold opacity-70">
+                              임시 표기
+                            </span>
+                          ) : null}
+                        </div>
+                        <span className="shrink-0 text-[10px] opacity-70">#{tech.techId}</span>
+                      </div>
+                      <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
+                        <span>{tech.kind === "COMMON_STAT" ? "기본 능력치" : "조건부 효과"}</span>
+                        <span>Lv.{tech.maxLevel}</span>
+                        <span>{group.label}</span>
+                      </div>
+                    </button>
+                  ))}
+                </section>
               ))}
               {filteredTechs.length === 0 ? (
                 <div className="px-3 py-10 text-center text-sm text-muted-foreground">검색 결과가 없어.</div>
@@ -164,6 +252,7 @@ function SoldierTrainingPage() {
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
+                      {selectedTrainingGroup ? `${selectedTrainingGroup.label} · ` : ""}
                       {selectedTech.kind === "COMMON_STAT" ? "기본 능력치 훈련" : "조건부 효과 훈련"}
                     </p>
                   </div>
