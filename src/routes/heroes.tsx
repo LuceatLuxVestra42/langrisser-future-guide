@@ -188,6 +188,8 @@ function HeroGridPage() {
     const options = new Map<number, { id: number; label: string; count: number }>();
 
     for (const hero of data.records) {
+      if (hero.rarity.baseLabel === "LLR") continue;
+
       const current = options.get(hero.origin.productionId);
       if (current) {
         current.count += 1;
@@ -227,7 +229,12 @@ function HeroGridPage() {
         ) {
           return false;
         }
-        if (originId !== null && hero.origin.productionId !== originId) return false;
+        if (
+          originId !== null &&
+          (hero.rarity.baseLabel === "LLR" || hero.origin.productionId !== originId)
+        ) {
+          return false;
+        }
         if (spOnly && !hero.hasSp) return false;
         return true;
       })
