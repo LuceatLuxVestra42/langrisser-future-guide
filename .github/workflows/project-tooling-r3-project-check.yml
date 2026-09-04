@@ -90,6 +90,9 @@ jobs:
       - name: Run post-reinstall Soldier and Asset Intake routing fixtures
         run: node tools/project-check/test/post-reinstall-routing-fixtures.mjs
 
+      - name: Run tracked-mutation baseline regression fixture
+        run: node tools/project-check/test/tracked-mutation-baseline-regression.mjs
+
       - name: Plan changed path ownership and validators
         run: node tools/project-check/cli/check.mjs --base "${{ steps.project-check-context.outputs.base_spec }}" --head HEAD --plan
 
