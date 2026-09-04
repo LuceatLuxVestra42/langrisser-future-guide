@@ -182,6 +182,11 @@ for (const required of [
 assert.equal(cliText.includes("method: 'PATCH'"), false, 'Finalizer CLI contains forbidden PATCH mutation primitive');
 assert.equal(cliText.includes("'src/routes/"), false, 'Finalizer CLI must not duplicate frontend path inference');
 assert.equal(cliText.includes('--execute'), true);
+assert.equal(cliText.includes('--prepare'), true);
+assert.equal(cliText.includes('--merge-only'), true);
+assert.equal(cliText.includes("status: 'PREPARED_FOR_MERGE_ADMISSION'"), true);
+assert.equal(cliText.includes("handoff('PREPARE_REVALIDATION_REQUIRED'"), true);
+assert.equal(cliText.includes("handoff('MERGE_ADMISSION_REVALIDATION_REQUIRED'"), true);
 assert.equal(cliText.includes('return_run_details: true'), true);
 assert.equal(cliText.includes('async function waitForPostMergeVerification'), true);
 assert.equal(cliText.includes('Math.min(options.timeoutMs, 60_000)'), true);
@@ -209,6 +214,16 @@ assert.equal(workflowText.includes('id: refresh-state'), true);
 assert.equal(workflowText.includes("echo 'handoff=true' >> \"$GITHUB_OUTPUT\""), true);
 assert.equal(workflowText.includes('MERGE_FINALIZER_EXACT_HEAD_HANDOFF=PASS'), true);
 assert.equal(workflowText.includes("steps.refresh-state.outputs.handoff != 'true'"), true);
+assert.equal(workflowText.includes('MERGE_FINALIZER_APP_PREFLIGHT=HANDOFF_TO_PREPARE'), true);
+assert.equal(workflowText.includes('Prepare exact PR for merge admission'), true);
+assert.equal(workflowText.includes('--prepare'), true);
+assert.equal(workflowText.includes('merge-admission:'), true);
+assert.equal(workflowText.includes('group: merge-finalize-main-mutation'), true);
+assert.equal(workflowText.includes('queue: max'), true);
+assert.equal(workflowText.includes('--merge-only'), true);
+assert.equal(workflowText.includes('--max-restarts 0'), true);
+assert.equal(workflowText.includes('MERGE_FINALIZER_MAIN_MUTATION=PASS'), true);
+assert.equal(workflowText.includes('MERGE_FINALIZER_MAIN_MUTATION_HANDOFF=PASS'), true);
 assert.equal(workflowText.includes('contents: write'), true);
 assert.equal(workflowText.includes('pull-requests: write'), true);
 assert.equal(workflowText.includes('actions: write'), true);
@@ -222,7 +237,6 @@ assert.equal(workflowText.includes('permission-checks: read'), true);
 assert.equal(workflowText.includes('MERGE_FINALIZER_APP_PREFLIGHT_STATUS'), true);
 assert.equal(workflowText.includes('GH_TOKEN="$APP_TOKEN" gh api --method PUT'), true);
 assert.equal(workflowText.includes('CHECK_REQUIRED|CHECK_PENDING|CHECK_NOT_SUCCESSFUL|MERGE_GATE_REQUIRED|MERGE_GATE_PENDING)'), true);
-assert.equal(workflowText.includes('MERGE_FINALIZER_APP_PREFLIGHT=HANDOFF_TO_EXECUTE'), true);
 assert.equal(workflowText.includes('GITHUB_TOKEN: ${{ github.token }}'), true);
 assert.equal(projectCheckText.includes('workflow_dispatch:'), true);
 assert.equal(projectCheckText.includes('base_sha:'), true);
@@ -234,7 +248,7 @@ console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'MERGE_FINALIZER_HOSTED_GATE_SELF_TEST',
   fixtures: 33,
-  staticGuards: 71,
+  staticGuards: 83,
   requiredCheck: REQUIRED_PROJECT_CHECK,
   hostedGate: hostedGate.requiredCheck,
   projectCheckWorkflow: PROJECT_CHECK_WORKFLOW,
@@ -246,6 +260,8 @@ console.log(JSON.stringify({
   staleRefreshActor: 'GITHUB_APP_INSTALLATION_TOKEN',
   staleRefreshHandoff: 'NEW_EXACT_HEAD_RUN_OWNS_CONTINUATION',
   validationConcurrency: 'PR_LOCAL_CANCEL_OLDER',
+  mergeMutationConcurrency: 'MAIN_MUTATION_SERIALIZED_ONLY',
+  mergeAdmissionMode: 'MERGE_ONLY_FAIL_FAST_REVALIDATION',
   appSecretNames: ['MERGEFINALIZER_APP_ID', 'MERGEFINALIZER_APP_KEY'],
   appPermissions: ['contents:write', 'pull-requests:write', 'actions:read', 'checks:read'],
   mergeExecutionToken: 'github.token',
