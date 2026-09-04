@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - main
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, closed]
   workflow_run:
     workflows:
       - Authoritative GitHub Pages Deploy
@@ -37,7 +37,7 @@ concurrency:
 jobs:
   preview_gate_plan:
     name: preview-gate-plan
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed' }}
     runs-on: ubuntu-latest
     outputs:
       hosted_preview_required: ${{ steps.plan.outputs.hosted_preview_required }}
@@ -69,6 +69,9 @@ jobs:
 
   publish-pr-preview:
     name: publish-pr-preview
+    concurrency:
+      group: project-tooling-route-hosted-qa-preview-publish
+      cancel-in-progress: false
     needs: preview_gate_plan
     if: >-
       github.event_name == 'pull_request' &&
@@ -93,7 +96,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-download-url: https://github.com/oven-sh/bun/releases/download/bun-v1.4.1/bun-linux-x64.zip
 
       - name: Install frozen dependencies
         run: bun install --frozen-lockfile
@@ -180,6 +183,68 @@ jobs:
           node tools/route-hosted-qa/cli/check-preview.mjs
           --pr "${{ github.event.pull_request.number }}"
           --expected-sha "$SOURCE_SHA"
+
+  cleanup-pr-preview:
+    name: cleanup-pr-preview
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    concurrency:
+      group: project-tooling-route-hosted-qa-preview-publish
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    env:
+      PREVIEW_REPOSITORY: LuceatLuxVestra42/Data
+      PREVIEW_BRANCH: gh-pages
+      PREVIEW_PATH: pr-${{ github.event.pull_request.number }}
+    steps:
+      - name: Create Data repository GitHub App token
+        id: preview-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.MERGEFINALIZER_APP_ID }}
+          private-key: ${{ secrets.MERGEFINALIZER_APP_KEY }}
+          owner: LuceatLuxVestra42
+          repositories: Data
+          permission-contents: write
+
+      - name: Remove closed PR preview directory
+        env:
+          PREVIEW_TOKEN: ${{ steps.preview-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch "$PREVIEW_BRANCH" "https://x-access-token:${PREVIEW_TOKEN}@github.com/${PREVIEW_REPOSITORY}.git" /tmp/preview-pages
+          cd /tmp/preview-pages
+          if [ ! -d "$PREVIEW_PATH" ]; then
+            echo 'PR_PREVIEW_CLEANUP=NO_CHANGE'
+            exit 0
+          fi
+          rm -rf -- "$PREVIEW_PATH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- "$PREVIEW_PATH"
+          if git diff --cached --quiet; then
+            echo 'PR_PREVIEW_CLEANUP=NO_CHANGE'
+            exit 0
+          fi
+          git commit -m "Remove closed PR preview ${GITHUB_REPOSITORY}#${{ github.event.pull_request.number }}"
+          pushed=false
+          for attempt in 1 2 3 4 5; do
+            if git push origin "$PREVIEW_BRANCH"; then
+              pushed=true
+              break
+            fi
+            echo "PR_PREVIEW_CLEANUP_PUSH_RETRY attempt=${attempt}" >&2
+            git fetch origin "$PREVIEW_BRANCH"
+            git rebase "origin/$PREVIEW_BRANCH"
+            sleep $((attempt * 2))
+          done
+          if [[ "$pushed" != 'true' ]]; then
+            echo 'BLOCKER_PREVIEW_CLEANUP_RETRY_EXHAUSTED' >&2
+            exit 1
+          fi
+          echo 'PR_PREVIEW_CLEANUP=PASS'
 
   route-hosted-qa:
     name: route-hosted-qa
