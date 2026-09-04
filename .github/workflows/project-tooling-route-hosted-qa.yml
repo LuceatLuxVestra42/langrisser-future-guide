@@ -69,6 +69,9 @@ jobs:
 
   publish-pr-preview:
     name: publish-pr-preview
+    concurrency:
+      group: project-tooling-route-hosted-qa-preview-publish
+      cancel-in-progress: false
     needs: preview_gate_plan
     if: >-
       github.event_name == 'pull_request' &&
