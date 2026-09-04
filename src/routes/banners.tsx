@@ -116,6 +116,7 @@ function BannerImage({
       src={image.publicPath}
       alt={alt}
       loading="lazy"
+      decoding="async"
       className="h-auto w-full rounded-xl border border-border"
     />
   );
