@@ -142,13 +142,27 @@ jobs:
             echo 'PR_PREVIEW_PUBLISH=NO_CHANGE'
           else
             git commit -m "PR preview ${GITHUB_REPOSITORY}#${{ github.event.pull_request.number }} ${SOURCE_SHA}"
-            git push origin "$PREVIEW_BRANCH"
+            pushed=false
+            for attempt in 1 2 3 4 5; do
+              if git push origin "$PREVIEW_BRANCH"; then
+                pushed=true
+                break
+              fi
+              echo "PR_PREVIEW_PUSH_RETRY attempt=${attempt}" >&2
+              git fetch origin "$PREVIEW_BRANCH"
+              git rebase "origin/$PREVIEW_BRANCH"
+              sleep $((attempt * 2))
+            done
+            if [[ "$pushed" != 'true' ]]; then
+              echo 'BLOCKER_PREVIEW_PUBLISH_RETRY_EXHAUSTED' >&2
+              exit 1
+            fi
           fi
 
       - name: Wait for exact preview deployment
         run: |
           set -euo pipefail
-          deadline=$((SECONDS + 300))
+          deadline=$((SECONDS + 600))
           while (( SECONDS < deadline )); do
             body="$(curl --silent --show-error --location --fail --max-time 15 "${PREVIEW_BASE_URL}preview-source.json?sha=${SOURCE_SHA}&run=${GITHUB_RUN_ID}" || true)"
             if printf '%s' "$body" | grep -q "\"sourceSha\": \"${SOURCE_SHA}\""; then
@@ -199,7 +213,9 @@ jobs:
           node-version: '22'
 
       - name: Validate frozen RH3 Route Hosted QA runtime
-        run: node tools/route-hosted-qa/test/route-hosted-qa-self-test.mjs
+        run: |
+          node tools/route-hosted-qa/test/route-hosted-qa-self-test.mjs
+          node tools/route-hosted-qa/test/preview-publisher-self-test.mjs
 
       - name: Validate strict candidate input
         if: ${{ github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'strict-candidate') }}
