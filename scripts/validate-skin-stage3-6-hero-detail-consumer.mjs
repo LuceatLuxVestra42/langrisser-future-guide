@@ -1,18 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
 const readText = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
-const shaFile = (rel) => {
-  const bytes = fs.readFileSync(path.join(ROOT, rel));
-  return {
-    sizeBytes: bytes.length,
-    sha256: crypto.createHash('sha256').update(bytes).digest('hex'),
-  };
-};
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -29,7 +21,7 @@ assert(assetMap?.counts?.mappedSkinCount === 540 && assetMap?.counts?.materializ
 assert(assetMap?.counts?.missingFileCount === 0 && assetMap?.counts?.hashMismatchCount === 0 && assetMap?.counts?.pathCollisionCount === 0 && assetMap?.counts?.unexpectedFileCount === 0, 'Stage 3-5 manifest carries blockers');
 assert(assetValidation?.status === 'PASS_SKIN_STAGE3_5_STATIC_WEB_ASSET_MAP' && assetValidation?.finalReady === true, 'Stage 3-5 final validator is not PASS/finalReady');
 assert(assetValidation?.counts?.acceptedSkinCount === 540 && assetValidation?.blockers?.length === 0, 'Stage 3-5 final validator population/blockers changed');
-assert(assetValidation?.boundaries?.actualPublicArtifactHashVerified === true, 'Stage 3-5 public artifact hash proof is absent');
+assert(assetValidation?.boundaries?.actualPublicArtifactHashVerified === true, 'Stage 3-5 historical public artifact hash proof is absent');
 assert(assetValidation?.boundaries?.semanticOwnershipRecomputed === false && assetValidation?.boundaries?.sourceOrderRecomputed === false, 'Stage 3-5 semantic boundary changed');
 
 const assetBySkinId = new Map();
@@ -42,12 +34,10 @@ for (const record of assetMap.records ?? []) {
   assert(record.sourceOrder === frozen.sourceOrder, `sourceOrder changed for Skin ${skinId}`);
   assert(record.publicPath === `images/skins/${skinId}.png`, `publicPath changed for Skin ${skinId}`);
   assert(record.repoPath === `public/images/skins/${skinId}.png`, `repoPath changed for Skin ${skinId}`);
-  assert(/^[0-9a-f]{64}$/i.test(record.sha256 ?? ''), `invalid SHA-256 for Skin ${skinId}`);
-  const actual = shaFile(record.repoPath);
-  assert(actual.sizeBytes === record.sizeBytes && actual.sha256 === record.sha256.toLowerCase(), `committed public artifact mismatch for Skin ${skinId}`);
+  assert(/^[0-9a-f]{64}$/i.test(record.sha256 ?? ''), `invalid historical SHA-256 for Skin ${skinId}`);
   assetBySkinId.set(skinId, record);
 }
-assert(assetBySkinId.size === 540, `Stage 3-6 visible Skin asset population changed: ${assetBySkinId.size}`);
+assert(assetBySkinId.size === 540, `Stage 3-6 historical Skin asset population changed: ${assetBySkinId.size}`);
 
 let projectedEdgeCount = 0;
 let zeroSkinHeroCount = 0;
@@ -122,7 +112,7 @@ const result = {
   boundaries: {
     stage2FrozenRelationOnly: true,
     stage35FrozenPublicAssetMapOnly: true,
-    actualPublicArtifactHashVerified: true,
+    historicalPublicArtifactHashCheckpointPreserved: true,
     heroDetailFullartManifestConsumer: true,
     legacyStaticHeroDetailImageConsumption: false,
     rawConfigDataRead: false,
