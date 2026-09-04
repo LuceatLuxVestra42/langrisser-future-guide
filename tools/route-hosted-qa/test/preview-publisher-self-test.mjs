@@ -13,9 +13,19 @@ assert.match(workflow, /BLOCKER_PREVIEW_PUBLISH_RETRY_EXHAUSTED/);
 assert.match(workflow, /deadline=\$\(\(SECONDS \+ 1200\)\)/);
 assert.doesNotMatch(workflow, /deadline=\$\(\(SECONDS \+ 600\)\)/);
 
+assert.match(workflow, /ready_for_review, closed/);
+assert.match(workflow, /cleanup-pr-preview:/);
+assert.match(workflow, /github\.event\.action == 'closed'/);
+assert.match(workflow, /group: project-tooling-route-hosted-qa-preview-publish/);
+assert.match(workflow, /cancel-in-progress: false/);
+assert.match(workflow, /rm -rf -- "\$PREVIEW_PATH"/);
+assert.match(workflow, /BLOCKER_PREVIEW_CLEANUP_RETRY_EXHAUSTED/);
+assert.match(workflow, /PR_PREVIEW_CLEANUP=PASS/);
+
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'ROUTE_HOSTED_QA_PREVIEW_PUBLISHER_SELF_TEST',
   pushRetryAttempts: 5,
   deploymentWaitBudgetSeconds: 1200,
+  closedPreviewCleanup: true,
 }, null, 2));
