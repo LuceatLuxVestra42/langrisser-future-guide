@@ -25,7 +25,7 @@ function mergeAccessoryHealingIntoIntellect<T extends {
     subtype: INTELLECT_SUBTYPE,
     subtypeKo: INTELLECT_SUBTYPE_KO,
     subtypeOrder: INTELLECT_SUBTYPE_ORDER,
-  };
+  } as T;
 }
 
 // GitHub Pages is a static deployment. Keep the equipment page API async-compatible,
