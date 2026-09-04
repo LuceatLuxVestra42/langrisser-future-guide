@@ -5,10 +5,12 @@ import path from 'node:path';
 const contractPath = path.resolve('tools/merge-finalizer/contracts/concurrency.v1.json');
 const workflowPath = path.resolve('.github/workflows/merge-finalize-main.yml');
 const cliPath = path.resolve('tools/merge-finalizer/cli/finalize.mjs');
+const libPath = path.resolve('tools/merge-finalizer/lib/merge-finalizer.mjs');
 
 const contract = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
 const workflowText = fs.readFileSync(workflowPath, 'utf8');
 const cliText = fs.readFileSync(cliPath, 'utf8');
+const libText = fs.readFileSync(libPath, 'utf8');
 
 assert.equal(contract.version, 1);
 assert.equal(contract.owner, 'merge-finalizer/orchestration');
@@ -56,11 +58,16 @@ assert.equal(workflowText.includes('--merge-only'), true);
 assert.equal(workflowText.includes('--max-restarts 0'), true);
 assert.equal(workflowText.includes('MERGE_FINALIZER_MAIN_MUTATION_HANDOFF=PASS'), true);
 
+assert.equal(
+  cliText.includes('shouldRestartFinalization'),
+  true,
+  'Finalizer CLI must delegate freshness changes to the authoritative restart guard.',
+);
 for (const reason of contract.freshnessGuards) {
   assert.equal(
-    cliText.includes(`reason: '${reason}'`) || cliText.includes(`reason: \"${reason}\"`),
+    libText.includes(`reason: '${reason}'`) || libText.includes(`reason: \"${reason}\"`),
     true,
-    `Finalizer CLI must preserve freshness restart guard ${reason}.`,
+    `Authoritative merge-finalizer lib must preserve freshness restart guard ${reason}.`,
   );
 }
 
