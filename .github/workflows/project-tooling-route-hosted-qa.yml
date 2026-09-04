@@ -93,7 +93,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-download-url: https://github.com/oven-sh/bun/releases/download/bun-v1.4.1/bun-linux-x64.zip
 
       - name: Install frozen dependencies
         run: bun install --frozen-lockfile
