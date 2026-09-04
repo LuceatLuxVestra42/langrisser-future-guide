@@ -84,6 +84,7 @@ jobs:
         if: steps.merged-state.outputs.skip != 'true'
         run: |
           node tools/merge-finalizer/test/merge-finalizer-self-test.mjs
+          node tools/merge-finalizer/test/merge-finalizer-rate-limit-self-test.mjs
           node tools/merge-finalizer/test/merge-finalizer-concurrency-contract.mjs
 
       - name: Refresh stale PR with GitHub App and hand off to exact-head run
