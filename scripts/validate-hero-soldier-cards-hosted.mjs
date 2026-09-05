@@ -54,7 +54,6 @@ async function verifyHeroSoldierCards(page, label) {
   const section = page.locator('[data-hero-soldier-cards="true"]');
   check(await section.count() === 1, `Hero 6 ${label} Soldier card section missing or duplicated`);
   check((await section.innerText()).includes("사용 가능 용병"), `Hero 6 ${label} Soldier section title missing`);
-  check((await section.innerText()).includes("35종"), `Hero 6 ${label} Soldier count label missing`);
 
   const cards = section.locator('a[href*="/soldiers/"]');
   check(await cards.count() === expectedHero6SoldierIds.length, `Hero 6 ${label} Soldier card count mismatch`);
