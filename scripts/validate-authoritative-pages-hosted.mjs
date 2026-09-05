@@ -100,6 +100,7 @@ try {
     await page.getByText(expectedLabel, { exact: true }).waitFor();
     const image = page.locator(`img[src*="/images/skin-fullart/${skinId}.webp"]`);
     check(await image.count() === 1, `Hero 6 fullart Skin ${skinId} image missing or duplicated`);
+    await image.evaluate((node) => node.decode());
     const imageState = await image.evaluate((node) => ({ complete: node.complete, naturalWidth: node.naturalWidth, naturalHeight: node.naturalHeight, objectFit: getComputedStyle(node).objectFit }));
     check(imageState.complete && imageState.naturalWidth > 0 && imageState.naturalHeight > 0, `Hero 6 fullart Skin ${skinId} image did not load`);
     check(imageState.objectFit === "contain", `Hero 6 fullart Skin ${skinId} object-fit=${imageState.objectFit}`);
@@ -173,6 +174,7 @@ try {
     await mobilePage.getByText(firstSkinLabel, { exact: true }).waitFor();
     const mobileFullart = mobilePage.locator(`img[src*="/images/skin-fullart/${firstSkinId}.webp"]`);
     check(await mobileFullart.count() === 1, "Hero 6 mobile first fullart Skin missing or duplicated");
+    await mobileFullart.evaluate((node) => node.decode());
     const mobileFullartState = await mobileFullart.evaluate((node) => ({ complete: node.complete, naturalWidth: node.naturalWidth, naturalHeight: node.naturalHeight, objectFit: getComputedStyle(node).objectFit }));
     check(mobileFullartState.complete && mobileFullartState.naturalWidth > 0 && mobileFullartState.naturalHeight > 0, "Hero 6 mobile first fullart Skin did not load");
     check(mobileFullartState.objectFit === "contain", `Hero 6 mobile fullart object-fit=${mobileFullartState.objectFit}`);
