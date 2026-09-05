@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
@@ -94,27 +94,22 @@ function SoldierTrainingPage() {
   const [level, setLevel] = useState(1);
   const [kindFilter, setKindFilter] = useState<KindFilter>("ALL");
   const [trainingGroupFilter, setTrainingGroupFilter] = useState<TrainingGroupFilter>("INFANTRY");
-  const [query, setQuery] = useState("");
 
   const trainingGroupByTechId = useMemo(
     () => new Map(data.techs.map((tech) => [tech.techId, resolveTrainingGroup(tech)] as const)),
     [data.techs],
   );
 
-  const filteredTechs = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    return data.techs.filter((tech) => {
-      if (kindFilter !== "ALL" && tech.kind !== kindFilter) return false;
-      const trainingGroup = trainingGroupByTechId.get(tech.techId);
-      if (!trainingGroup) throw new Error(`Missing training group for Tech ${tech.techId}.`);
-      if (trainingGroup.id !== trainingGroupFilter) return false;
-      if (!needle) return true;
-      return [tech.nameKr, tech.nameCn, String(tech.techId), trainingGroup.label]
-        .join(" ")
-        .toLowerCase()
-        .includes(needle);
-    });
-  }, [data.techs, kindFilter, query, trainingGroupByTechId, trainingGroupFilter]);
+  const filteredTechs = useMemo(
+    () =>
+      data.techs.filter((tech) => {
+        if (kindFilter !== "ALL" && tech.kind !== kindFilter) return false;
+        const trainingGroup = trainingGroupByTechId.get(tech.techId);
+        if (!trainingGroup) throw new Error(`Missing training group for Tech ${tech.techId}.`);
+        return trainingGroup.id === trainingGroupFilter;
+      }),
+    [data.techs, kindFilter, trainingGroupByTechId, trainingGroupFilter],
+  );
 
   const groupedFilteredTechs = useMemo(
     () =>
@@ -150,21 +145,7 @@ function SoldierTrainingPage() {
         </header>
 
         <section className="mt-6">
-          <label className="relative block w-full">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <span className="sr-only">훈련 항목 검색</span>
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="검색"
-              className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-foreground/50 focus:ring-2 focus:ring-ring"
-            />
-          </label>
-
-          <div className="mt-4">
+          <div>
             <p className="text-xs font-bold text-muted-foreground">훈련 계열</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {TRAINING_GROUP_FILTERS.map((filter) => (
@@ -229,9 +210,6 @@ function SoldierTrainingPage() {
                   />
                 </section>
               ))}
-              {filteredTechs.length === 0 ? (
-                <div className="px-3 py-10 text-center text-sm text-muted-foreground">검색 결과가 없어.</div>
-              ) : null}
             </div>
 
             {selectedTech ? (
