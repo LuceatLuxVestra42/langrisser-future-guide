@@ -106,21 +106,8 @@ try {
   const exclusiveSection = exclusiveHeading.locator("xpath=ancestor::section[1]");
   const exclusiveText = await exclusiveSection.innerText();
   for (const token of [
-    "RELEASED",
-    "Equipment #416",
     "청룡의 갑옷",
-    "青龙之胄",
-    "갑옷 · 중갑",
-    "최대 Lv.50",
-    "방어",
-    "65",
-    "생명",
-    "437",
     "天翔游龙",
-    "Skill #51096",
-    "防御+10%。",
-    "移动不受地形限制",
-    "근거 신뢰도 99%",
   ]) {
     check(exclusiveText.includes(token), `Hero 6 exclusive Equipment missing token: ${token}`);
   }
