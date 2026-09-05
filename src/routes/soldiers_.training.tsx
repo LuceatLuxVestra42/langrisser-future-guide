@@ -28,8 +28,8 @@ type TrainingGroupFilter = "ALL" | "INFANTRY" | "LANCER" | "CAVALRY" | "FLYING_W
 
 const KIND_FILTERS: Array<{ id: KindFilter; label: string }> = [
   { id: "ALL", label: "전체" },
-  { id: "COMMON_STAT", label: "기본 능력치" },
-  { id: "COMMON_PASSIVE", label: "조건부 효과" },
+  { id: "COMMON_STAT", label: "스탯" },
+  { id: "COMMON_PASSIVE", label: "패시브" },
 ];
 
 const TRAINING_GROUPS: Array<{
@@ -253,9 +253,6 @@ function SoldierTrainingPage() {
                           임시 표기
                         </span>
                       ) : null}
-                      <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">
-                        훈련 #{selectedTech.techId}
-                      </span>
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {selectedTrainingGroup ? `${selectedTrainingGroup.label} · ` : ""}
@@ -411,7 +408,7 @@ function TrainingTechButton({
       <button
         type="button"
         onClick={() => onSelect(tech)}
-        title={`${tech.nameKr} · 훈련 #${tech.techId}`}
+        title={tech.nameKr}
         className={`min-h-[58px] min-w-0 rounded-lg px-2 py-2 text-center transition ${
           selected ? "bg-foreground text-background" : "bg-background hover:bg-muted"
         }`}
@@ -439,7 +436,6 @@ function TrainingTechButton({
             </span>
           ) : null}
         </div>
-        <span className="shrink-0 text-[10px] opacity-70">#{tech.techId}</span>
       </div>
       <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
         <span>{tech.kind === "COMMON_STAT" ? "기본 능력치" : "조건부 효과"}</span>

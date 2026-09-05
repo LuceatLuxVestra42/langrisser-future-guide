@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import './preview-publisher-self-test.mjs';
 import { parseCliArgs } from '../cli/check.mjs';
 import {
   MODE_PROBE,

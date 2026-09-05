@@ -10,7 +10,6 @@ const BLOCKING_CONCLUSIONS = new Set([
   'action_required',
   'cancelled',
   'failure',
-  'stale',
   'timed_out',
 ]);
 
@@ -179,6 +178,14 @@ export function classifyMergeFinalization(snapshot, options = {}) {
   }
   if (check.conclusion === 'success') {
     return { ...resultBase, status: 'READY_TO_MERGE', check: summarizeCheck(check) };
+  }
+  if (check.conclusion === 'stale') {
+    return {
+      ...resultBase,
+      status: 'CHECK_NOT_SUCCESSFUL',
+      reason: 'STALE_REVALIDATION_REQUIRED',
+      check: summarizeCheck(check),
+    };
   }
   if (BLOCKING_CONCLUSIONS.has(check.conclusion)) {
     return { ...resultBase, status: 'BLOCKER_OWNING_VALIDATOR', check: summarizeCheck(check) };
