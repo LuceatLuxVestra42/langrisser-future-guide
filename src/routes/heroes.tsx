@@ -145,7 +145,7 @@ function compareHeroDisplayOrder(a: HeroListStage4Record, b: HeroListStage4Recor
   const bIsBeforeSchelfaniel = b.heroId < SCHELFANIEL_HERO_ID;
 
   if (aIsBeforeSchelfaniel && bIsBeforeSchelfaniel) {
-    return a.rarity.rank - b.rarity.rank || b.heroId - a.heroId;
+    return b.rarity.rank - a.rarity.rank || b.heroId - a.heroId;
   }
 
   return b.heroId - a.heroId;
