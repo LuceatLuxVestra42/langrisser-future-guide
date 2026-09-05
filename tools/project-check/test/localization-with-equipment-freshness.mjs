@@ -23,5 +23,10 @@ run(
   ["tools/project-check/test/equipment-name-presentation-freshness.mjs"],
   "equipment-name-presentation-freshness",
 );
+run(
+  process.execPath,
+  ["scripts/audit-localization-effect-descriptions.mjs"],
+  "equipment-effect-description-presentation",
+);
 
 console.log("[localization-project-check] PASS");
