@@ -248,11 +248,6 @@ function SoldierTrainingPage() {
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-lg font-black text-foreground">{selectedTech.nameKr}</h3>
-                      {selectedTech.nameStatus === "provisional-display" ? (
-                        <span className="rounded border border-border px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">
-                          임시 표기
-                        </span>
-                      ) : null}
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {selectedTrainingGroup ? `${selectedTrainingGroup.label} · ` : ""}
@@ -430,11 +425,6 @@ function TrainingTechButton({
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
           <span className="truncate text-sm font-bold">{tech.nameKr}</span>
-          {tech.nameStatus === "provisional-display" ? (
-            <span className="shrink-0 rounded border border-current/25 px-1 py-0.5 text-[9px] font-bold opacity-70">
-              임시 표기
-            </span>
-          ) : null}
         </div>
       </div>
       <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
