@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-tech-level-costs-validation/v1",
+  "stage": "TrainingTech Common Level Cost Projection Validation",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "SOLDIER_TRAINING_TECH_LEVEL_COSTS_FROZEN",
+  "generated": {
+    "path": "data/generated/soldier-training-tech-level-costs.v1.json",
+    "gitBlobSha": "6dc2e4b52c3f8159fecbf01170558ea52b459fac"
+  },
+  "sourceAuthority": {
+    "configDataSourcePackContractPath": "data/contracts/configdata-source-pack-contract.v1.json",
+    "sourceCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "trainingTechLevelGitBlobSha": "30789c3e4fb0d79b56514e720bb71a053df78c72"
+  },
+  "checks": {
+    "targetMembershipExact": true,
+    "explicitLevelIdResolutionExact": true,
+    "levelOrderExact": true,
+    "goldCostExact": true,
+    "materialCostExact": true,
+    "semanticBoundaryPreserved": true
+  },
+  "coverage": {
+    "targetTechCount": 130,
+    "commonStatTechCount": 84,
+    "commonPassiveTechCount": 46,
+    "referencedLevelRowCount": 1510,
+    "uniqueReferencedLevelRowCount": 1510,
+    "materialEntryCount": 3930,
+    "uniqueMaterialReferenceCount": 48,
+    "unresolvedLevelReferenceCount": 0
+  },
+  "blockers": [],
+  "reviews": [],
+  "nextOwner": "soldier-frontend",
+  "nextStartPoint": "Consume the frozen per-level cost projection in soldier-training-page.server.ts without raw ConfigData joins."
+}
