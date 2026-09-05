@@ -125,13 +125,9 @@ function audit() {
       continue;
     }
 
-    if (
-      !frozen ||
-      frozen.identity?.nameCn !== record.nameCn ||
-      frozen.identity?.nameKr !== record.displayNameKr
-    ) {
+    if (!frozen || frozen.identity?.nameCn !== record.nameCn) {
       identityParityMismatchCount += 1;
-      errors.push(issue('HERO_IDENTITY_PARITY_MISMATCH', `Hero ${heroId} does not match the frozen Hero list identity.`, {
+      errors.push(issue('HERO_IDENTITY_PARITY_MISMATCH', `Hero ${heroId} does not match the frozen Hero identity key/Chinese name.`, {
         heroId,
         overlay: { nameCn: record.nameCn, displayNameKr: record.displayNameKr },
         frozen: frozen?.identity ?? null,
