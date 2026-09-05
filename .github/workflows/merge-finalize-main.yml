@@ -100,7 +100,7 @@ jobs:
 
           while (( SECONDS < deadline )); do
             snapshot="$(GITHUB_TOKEN="$READ_TOKEN" node tools/merge-finalizer/cli/finalize.mjs --repository "$GITHUB_REPOSITORY" --pr "$PR_NUMBER")"
-            status="$(printf '%s' "$snapshot" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>process.stdout.write(String(JSON.parse(s).status ?? '')))")"
+            status="$(printf '%s' "$snapshot" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>process.stdout.write(String(JSON.parse(s).status ?? '')))" )"
             printf 'MERGE_FINALIZER_APP_PREFLIGHT_STATUS=%s\n' "$status"
 
             case "$status" in
@@ -172,7 +172,7 @@ jobs:
           code=$?
           set -e
           printf '%s\n' "$result"
-          status="$(printf '%s' "$result" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>process.stdout.write(String(JSON.parse(s).status ?? '')))")"
+          status="$(printf '%s' "$result" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>process.stdout.write(String(JSON.parse(s).status ?? '')))" )"
 
           if [[ "$code" -eq 0 && "$status" == 'PREPARED_FOR_MERGE_ADMISSION' ]]; then
             echo 'ready=true' >> "$GITHUB_OUTPUT"
@@ -225,9 +225,20 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Create merge finalizer GitHub App token for main mutation
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.MERGEFINALIZER_APP_ID }}
+          private-key: ${{ secrets.MERGEFINALIZER_APP_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-actions: read
+          permission-checks: read
+
       - name: Merge exact ready PR or hand off revalidation
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
@@ -242,7 +253,7 @@ jobs:
           code=$?
           set -e
           printf '%s\n' "$result"
-          status="$(printf '%s' "$result" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>process.stdout.write(String(JSON.parse(s).status ?? '')))")"
+          status="$(printf '%s' "$result" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>process.stdout.write(String(JSON.parse(s).status ?? '')))" )"
 
           if [[ "$code" -eq 0 && "$status" == 'MERGED' ]]; then
             echo 'MERGE_FINALIZER_MAIN_MUTATION=PASS'
