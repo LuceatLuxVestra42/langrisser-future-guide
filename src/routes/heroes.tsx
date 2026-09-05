@@ -51,6 +51,7 @@ export const Route = createFileRoute("/heroes")({
 
 const ALL_RARITIES = "ALL";
 const LOW_RARITY = "N,R";
+const SCHELFANIEL_HERO_ID = 51;
 const RARITY_ICON_PATHS = new Map<string, string>([
   ["N", "/images/heroes/rarity/N.png"],
   ["R", "/images/heroes/rarity/R.png"],
@@ -137,6 +138,17 @@ function matchesRarity(hero: HeroListStage4Record, selectedRarity: string) {
     return hero.rarity.baseLabel === "N" || hero.rarity.baseLabel === "R";
   }
   return hero.rarity.baseLabel === selectedRarity;
+}
+
+function compareHeroDisplayOrder(a: HeroListStage4Record, b: HeroListStage4Record) {
+  const aIsBeforeSchelfaniel = a.heroId < SCHELFANIEL_HERO_ID;
+  const bIsBeforeSchelfaniel = b.heroId < SCHELFANIEL_HERO_ID;
+
+  if (aIsBeforeSchelfaniel && bIsBeforeSchelfaniel) {
+    return a.rarity.rank - b.rarity.rank || b.heroId - a.heroId;
+  }
+
+  return b.heroId - a.heroId;
 }
 
 function resolvePublicAssetUrl(webAssetPath: string) {
@@ -279,7 +291,7 @@ function HeroGridPage() {
         if (spOnly && !hero.hasSp) return false;
         return true;
       })
-      .reverse();
+      .sort(compareHeroDisplayOrder);
   }, [data.records, query, rarity, factionIds, originId, spOnly]);
 
   const hasActiveFilters =
