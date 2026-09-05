@@ -74,7 +74,7 @@ page.on("console", (message) => { if (message.type() === "error") consoleErrors.
 try {
   let response = await page.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
   check(response && response.status() < 400, `Hero 6 detail failed: ${response?.status()}`);
-  await page.getByText("Hero #6", { exact: true }).waitFor();
+  await page.getByRole("heading", { name: "레온", exact: true }).waitFor();
   await page.getByText("대표 일러스트", { exact: true }).waitFor();
   await page.getByText(`1 / ${hero6VisualCount}`, { exact: true }).waitFor();
   const heroArtworkImage = page.locator('img[alt="레온 대표 일러스트"]');
