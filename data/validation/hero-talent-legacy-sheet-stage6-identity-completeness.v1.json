@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "stage": "hero-talent-localization-stage6",
+  "schemaId": "hero-talent-legacy-sheet-identity-completeness/v1",
+  "status": "BLOCKER",
+  "completion": "COMPLETE",
+  "scope": "legacy-korean-sheet-source-to-canonical-hero-identity-and-normal-talent-completeness",
+  "predecessor": {
+    "path": "data/presentation/hero-talent-legacy-sheet-intake-stage5.v1.json",
+    "gitBlobSha": "b9f11bf0d94057acca2b1fd22de39cfe3b3ae0f3",
+    "stage5Commit": "6fcf16da14092f031c65afb099ae26dde1cf635d",
+    "sourceGroupCount": 251
+  },
+  "authorityBoundary": {
+    "heroSemanticPipelineReopened": false,
+    "semanticMutation": false,
+    "canonicalIdentityMutation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarityJoin": false,
+    "nameFieldsUsedAsIndependentGuardOnly": true,
+    "presentationLocalizationAdmission": false
+  },
+  "sources": {
+    "heroCanonical": {
+      "ref": "636df4972a707a8d7dfb5c9dcb672b30d0dba4ba",
+      "activeSource": "data/validation/hero-stage6-4-final.v1.json",
+      "generatedShardPattern": "data/generated/hero-detail/by-id/<heroId>.json"
+    },
+    "legacyKoreanSheet": {
+      "repository": "redpanda7301/langrisser",
+      "ref": "a85bba49dcf073563e7366dc18e96b7ba67c2ae3",
+      "detailPathPattern": "hero/data/<page-query-name>.js",
+      "externalTreeHasHeroIDField": false,
+      "externalTreeHasheroIdField": false
+    },
+    "existingProjectProvenance": {
+      "path": "src/lib/hero-skill-localization.data.ts",
+      "role": "Existing reviewed legacy-sheet provenance tying exact canonical Hero IDs to legacy Korean sheet localization records"
+    }
+  },
+  "summary": {
+    "stage5SourceGroupCount": 251,
+    "explicitIdentityConfirmedCount": 3,
+    "identityPendingCount": 248,
+    "confirmedTalentSourceShapeCount": 3,
+    "confirmedTalentStarParityCount": 3,
+    "localizationAdmissionCount": 0,
+    "blockerCount": 1,
+    "hardSemanticErrorCount": 0
+  },
+  "confirmedRecords": [
+    {
+      "heroId": 6,
+      "sourceKey": "레온",
+      "sourcePath": "hero/data/레온.js",
+      "identityStatus": "CONFIRMED_BY_EXISTING_PROJECT_PROVENANCE",
+      "identityGuard": {
+        "project": { "nameKr": "레온", "nameCn": "利昂", "nameEn": "Leon" },
+        "legacySheet": { "Name": "레온", "ChName": "利昂", "EngName": "Leon" },
+        "match": true
+      },
+      "talent": {
+        "nameKr": "전설의 기사",
+        "initialStar": 3,
+        "sourceAbilitiesCount": 6,
+        "starProgression": [
+          { "star": 3, "skillId": 3067, "parity": "PASS" },
+          { "star": 4, "skillId": 3072, "parity": "PASS" },
+          { "star": 5, "skillId": 3077, "parity": "PASS" },
+          { "star": 6, "skillId": 3082, "parity": "PASS" }
+        ],
+        "status": "SOURCE_SHAPE_AND_EFFECT_PARITY_PASS"
+      }
+    },
+    {
+      "heroId": 8,
+      "sourceKey": "라나",
+      "sourcePath": "hero/data/라나.js",
+      "identityStatus": "CONFIRMED_BY_EXISTING_PROJECT_PROVENANCE",
+      "identityGuard": {
+        "project": { "nameKr": "라나", "nameCn": "拉娜", "nameEn": "Lana" },
+        "legacySheet": { "Name": "라나", "ChName": "拉娜", "EngName": "Lana" },
+        "match": true
+      },
+      "talent": {
+        "nameKr": "마력 강화",
+        "initialStar": 3,
+        "sourceAbilitiesCount": 6,
+        "starProgression": [
+          { "star": 3, "skillId": 3196, "parity": "PASS" },
+          { "star": 4, "skillId": 3197, "parity": "PASS" },
+          { "star": 5, "skillId": 3198, "parity": "PASS" },
+          { "star": 6, "skillId": 3199, "parity": "PASS" }
+        ],
+        "status": "SOURCE_SHAPE_AND_EFFECT_PARITY_PASS"
+      }
+    },
+    {
+      "heroId": 9,
+      "sourceKey": "보젤",
+      "sourcePath": "hero/data/보젤.js",
+      "identityStatus": "CONFIRMED_BY_EXISTING_PROJECT_PROVENANCE",
+      "identityGuard": {
+        "project": { "nameKr": "보젤", "nameCn": "波赞鲁", "nameEn": "Bozel" },
+        "legacySheet": { "Name": "보젤", "ChName": "波赞鲁", "EngName": "Bozel" },
+        "match": true
+      },
+      "talent": {
+        "nameKr": "천년의 사념",
+        "initialStar": 3,
+        "sourceAbilitiesCount": 6,
+        "starProgression": [
+          { "star": 3, "skillId": 3200, "parity": "PASS" },
+          { "star": 4, "skillId": 3201, "parity": "PASS" },
+          { "star": 5, "skillId": 3202, "parity": "PASS" },
+          { "star": 6, "skillId": 3203, "parity": "PASS" }
+        ],
+        "status": "SOURCE_SHAPE_AND_EFFECT_PARITY_PASS"
+      }
+    }
+  ],
+  "blockers": [
+    {
+      "code": "LEGACY_SHEET_CANONICAL_HERO_ID_PROVENANCE_MISSING",
+      "count": 248,
+      "owner": "localization/source-identity-validation",
+      "blocking": true,
+      "detail": "The pinned legacy Korean detail sources do not contain canonical HeroID/heroId. No current reviewed project mapping was found that explicitly binds the remaining Stage 5 source groups to canonical Hero IDs. ChName/EngName/Korean display-name equality may be used to reject a stale pairing but must not create the pairing as a name JOIN.",
+      "requiredResolution": "Add or locate a reviewed explicit source-path/source-key -> canonical HeroID provenance artifact for the remaining 248 source groups, then rerun this identity/completeness gate."
+    }
+  ],
+  "decision": "Stage 6 audit execution is complete but admission is BLOCKED. Hero 6/8/9 have existing project provenance and their legacy Korean normal TalentName plus 3/4/5/6-star descriptions match the frozen verified star progression. The remaining 248 Stage 5 source groups are not assigned Hero IDs because doing so from names alone would violate the project identity/JOIN boundary.",
+  "nextStartPoint": "localization/source-identity-validation: obtain reviewed explicit provenance for the remaining 248 legacy source groups. Do not reopen Hero semantic Stage 4/5/6 or alter canonical Hero identity/population/relation."
+}
