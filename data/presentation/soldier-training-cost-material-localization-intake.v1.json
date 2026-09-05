@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "schemaId": "soldier-training-cost-material-localization-intake/v1",
+  "stage": "D",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "COMPLETE",
+  "scope": "presentation/localization intake for the exact 24 frozen Soldier TrainingTech cost-material refs not admitted by the existing 24-material frozen presentation source",
+  "authority": {
+    "costPredecessor": "data/generated/soldier-training-tech-level-costs.v1.json",
+    "existingMaterialSource": "data/generated/soldier-training-material-iteminfo.v1.json",
+    "sourcePackContract": "data/contracts/configdata-source-pack-contract.v1.json",
+    "sourceCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "itemInfoPath": "data/configdata/ConfigDataItemInfo.json",
+    "itemInfoGitBlobSha": "fd34c0a83bd403c1fd01d34f3439e4c24a794f5e",
+    "koreanCrosscheckUrl": "https://redpanda7301.github.io/langrisser/classup.html"
+  },
+  "boundary": {
+    "semanticRecomputation": false,
+    "canonicalIdentityMutation": false,
+    "relationMutation": false,
+    "costMutation": false,
+    "productionConsumerMutation": false,
+    "assetAdmissionMutation": false,
+    "localizationPromotion": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "screenOrderAsSemanticRule": false
+  },
+  "method": {
+    "targetSet": "exact GoodsType 6 refs from frozen cost projection MINUS exact itemIds in current 24-material generated source",
+    "sourceMetadataLookup": "exact ConfigDataItemInfo.ID lookup in the source-pack contract pinned source commit",
+    "koreanTextRole": "existing Korean sheet cross-check candidate only",
+    "promotionPolicy": "REVIEW_REQUIRED_BEFORE_PROJECT_DISPLAY_CONFIRMED",
+    "uiPolicy": "do not replace the existing ID+quantity fallback from this intake alone"
+  },
+  "coverage": {
+    "frozenCostUniqueMaterialReferenceCount": 48,
+    "existingVerifiedPresentationCount": 24,
+    "targetUnresolvedReferenceCount": 24,
+    "sourceMetadataExactCount": 24,
+    "koreanCandidateCount": 24,
+    "productionEligibleCount": 0,
+    "reviewRequiredCount": 24
+  },
+  "records": [
+    {"goodsType":6,"itemId":6001,"nameCn":"初级步兵教材","iconPath":"UI/Icon/Item_ABS/Training_Sword01.png","rank":1,"displayNameKrCandidate":"초급 보병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6002,"nameCn":"中级步兵教材","iconPath":"UI/Icon/Item_ABS/Training_Sword02.png","rank":2,"displayNameKrCandidate":"중급 보병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6004,"nameCn":"初级枪兵教材","iconPath":"UI/Icon/Item_ABS/Training_Spear01.png","rank":1,"displayNameKrCandidate":"초급 창병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6005,"nameCn":"中级枪兵教材","iconPath":"UI/Icon/Item_ABS/Training_Spear02.png","rank":2,"displayNameKrCandidate":"중급 창병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6007,"nameCn":"初级骑兵教材","iconPath":"UI/Icon/Item_ABS/Training_Ride01.png","rank":1,"displayNameKrCandidate":"초급 기병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6008,"nameCn":"中级骑兵教材","iconPath":"UI/Icon/Item_ABS/Training_Ride02.png","rank":2,"displayNameKrCandidate":"중급 기병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6010,"nameCn":"初级驯养教材","iconPath":"UI/Icon/Item_ABS/Training_Fly01.png","rank":1,"displayNameKrCandidate":"초급 비병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6011,"nameCn":"中级驯养教材","iconPath":"UI/Icon/Item_ABS/Training_Fly02.png","rank":2,"displayNameKrCandidate":"중급 비병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6013,"nameCn":"初级生存教材","iconPath":"UI/Icon/Item_ABS/Training_Bow01.png","rank":1,"displayNameKrCandidate":"초급 궁병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6014,"nameCn":"中级生存教材","iconPath":"UI/Icon/Item_ABS/Training_Bow02.png","rank":2,"displayNameKrCandidate":"중급 궁병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6016,"nameCn":"初级宗教教材","iconPath":"UI/Icon/Item_ABS/Training_Monk01.png","rank":1,"displayNameKrCandidate":"초급 승병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6017,"nameCn":"中级宗教教材","iconPath":"UI/Icon/Item_ABS/Training_Monk02.png","rank":2,"displayNameKrCandidate":"중급 승병 교재","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6019,"nameCn":"红龙特饮","iconPath":"UI/Icon/Item_ABS/Training_Drink01.png","rank":1,"displayNameKrCandidate":"파워 드링크","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6020,"nameCn":"加力特饮","iconPath":"UI/Icon/Item_ABS/Training_Drink02.png","rank":1,"displayNameKrCandidate":"디펜스 드링크","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6021,"nameCn":"维西特饮","iconPath":"UI/Icon/Item_ABS/Training_Drink03.png","rank":1,"displayNameKrCandidate":"리시카민 드링크","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6022,"nameCn":"宝特特饮","iconPath":"UI/Icon/Item_ABS/Training_Drink05.png","rank":1,"displayNameKrCandidate":"스피릿 드링크","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6023,"nameCn":"永动特饮","iconPath":"UI/Icon/Item_ABS/Training_Drink04.png","rank":1,"displayNameKrCandidate":"브레인 드링크","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6024,"nameCn":"力满特饮","iconPath":"UI/Icon/Item_ABS/Training_Drink06.png","rank":1,"displayNameKrCandidate":"스피드 드링크","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6025,"nameCn":"铁哑铃","iconPath":"UI/Icon/Item_ABS/Training_Equipment01.png","rank":2,"displayNameKrCandidate":"아령","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6026,"nameCn":"弹簧棒","iconPath":"UI/Icon/Item_ABS/Training_Equipment06.png","rank":2,"displayNameKrCandidate":"트위스트 바","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6027,"nameCn":"俯卧撑架","iconPath":"UI/Icon/Item_ABS/Training_Equipment04.png","rank":2,"displayNameKrCandidate":"푸쉬업바","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6028,"nameCn":"弹力绳","iconPath":"UI/Icon/Item_ABS/Training_Equipment02.png","rank":2,"displayNameKrCandidate":"탄력밴드","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6029,"nameCn":"吊环","iconPath":"UI/Icon/Item_ABS/Training_Equipment05.png","rank":2,"displayNameKrCandidate":"링","localizationStatus":"review-existing-korean-sheet","productionEligible":false},
+    {"goodsType":6,"itemId":6030,"nameCn":"握力器","iconPath":"UI/Icon/Item_ABS/Training_Equipment03.png","rank":2,"displayNameKrCandidate":"악력기","localizationStatus":"review-existing-korean-sheet","productionEligible":false}
+  ],
+  "reviews": [
+    "All 24 Korean names are retained as presentation candidates from the existing Korean training simulator and are not promoted to project-display-confirmed in Stage D.",
+    "Asset intake for these 24 IDs is a separate owner/task; the current UI fallback remains authoritative until localization and asset admission are independently completed."
+  ],
+  "blockers": [],
+  "handoff": {
+    "nextOwner": "soldier-training-material-asset-intake",
+    "nextStartPoint": "Use the exact 24 itemIds and ConfigData Icon paths from this intake to resolve provenance-verified assets without filename-similarity or name-based identity inference.",
+    "reopenConditions": [
+      "frozen cost material reference set changes",
+      "source-pack contract source snapshot changes",
+      "exact ConfigData ItemInfo ID/name/icon parity fails",
+      "owning localization validator hard-fails"
+    ]
+  }
+}
