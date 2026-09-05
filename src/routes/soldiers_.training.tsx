@@ -208,10 +208,6 @@ function SoldierTrainingPage() {
             <div className="max-h-[680px] overflow-y-auto rounded-xl border border-border bg-card p-2">
               {groupedFilteredTechs.map(({ group, techs }) => (
                 <section key={group.id} className="mb-3 last:mb-0">
-                  <div className="sticky top-0 z-10 mb-1 flex items-center justify-between rounded-md bg-muted px-3 py-2 text-xs font-black text-foreground">
-                    <span>{group.label}</span>
-                    <span className="text-[10px] font-bold text-muted-foreground">{techs.length}개</span>
-                  </div>
                   <TrainingTechGroupList
                     techs={techs}
                     selectedTechId={selectedTech?.techId}
@@ -350,7 +346,7 @@ function TrainingTechGroupList({
       ) : null}
 
       {ultimateStatTechs.length > 0 ? (
-        <div className={statRows.length > 0 || ungroupedStatTechs.length > 0 ? "mt-2 border-t border-border pt-2" : ""}>
+        <div className={statRows.length > 0 || ungroupedStatTechs.length > 0 ? "mt-2" : ""}>
           <div className="grid grid-cols-3 gap-1.5">
             {ultimateStatTechs.map((tech) => (
               <TrainingTechButton
