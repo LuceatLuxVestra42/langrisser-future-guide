@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "stage": "hero-talent-localization-stage10",
+  "schemaId": "hero-talent-pr-preview-browser-ui-closure/v1",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "scope": "hero-6-8-9-korean-talent-pr-preview-browser-ui-interaction",
+  "predecessor": {
+    "pr": 729,
+    "headSha": "bfa5a32863dbcd01f233b78cc424536b4294e73d",
+    "previewBase": "https://luceatluxvestra42.github.io/Data/pr-729/",
+    "stage8": "data/validation/hero-talent-legacy-sheet-stage8-overlay.v1.json"
+  },
+  "browserQa": {
+    "workflow": "Project Tooling Browser UI QA",
+    "runId": 33964908715,
+    "jobId": 101303210337,
+    "mode": "pr-preview",
+    "predecessorFreshness": "PASS",
+    "interactionStatus": "PASS_BROWSER_UI_INTERACTION_SPOT_CHECKS",
+    "heroTalentKrStarSwitching": "PASS_HERO_6_8_9",
+    "desktopPageConsoleErrors": 0,
+    "semanticStageReopened": false
+  },
+  "interactionCoverage": {
+    "heroIds": [6, 8, 9],
+    "entryDefaultStar": 6,
+    "lowerStarSequence": [6, 5, 4, 3],
+    "directSelectionVerified": [6, 4],
+    "exactKoreanTalentNameAndDescription": true
+  },
+  "authorityBoundary": {
+    "heroSemanticPipelineReopened": false,
+    "canonicalIdentityMutation": false,
+    "canonicalPopulationMutation": false,
+    "canonicalRelationMutation": false,
+    "skillIdMutation": false,
+    "starProgressionMutation": false,
+    "selectionRuleMutation": false,
+    "presentationOnly": true
+  },
+  "inheritedBlockers": [
+    {
+      "code": "LEGACY_SHEET_CANONICAL_HERO_ID_PROVENANCE_MISSING",
+      "count": 248,
+      "owner": "localization/source-identity-validation",
+      "blockingFullPopulationAdmission": true,
+      "blockingStage10ThreeHeroClosure": false
+    }
+  ],
+  "decision": "Stage 10 is COMPLETE for Hero 6/8/9 on the exact PR #729 preview. Browser/UI interaction verified the default 6-star state, 6-to-5-to-4-to-3 lower-star switching, direct 6-star and 4-star selection, exact Korean talent names/descriptions, zero page/console errors, and no semantic-stage reopen. The remaining 248-source HeroID provenance blocker stays isolated for a separate localization/source-identity-validation task.",
+  "nextStartPoint": "Close PR #729 after required project-check passes on the refreshed PR head, then verify normal main Hosted/Browser deployment gates after merge."
+}

@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "stage": "hero-talent-localization-stage8",
+  "schemaId": "hero-talent-legacy-sheet-presentation-overlay/v1",
+  "status": "PASS_WITH_BLOCKER",
+  "completion": "COMPLETE",
+  "scope": "presentation-localization-overlay-implementation",
+  "predecessor": {
+    "path": "data/validation/hero-talent-legacy-sheet-stage7-semantic-parity.v1.json",
+    "commit": "9879a37cc61e5d55438f936cf3445780a46b11aa",
+    "status": "PASS_WITH_BLOCKER"
+  },
+  "implementation": {
+    "overlayModule": "src/lib/hero-talent-localization.ts",
+    "routeIntegration": "src/lib/hero-list.functions.ts",
+    "admittedHeroIds": [6, 8, 9],
+    "recordCount": 12,
+    "lookupKey": ["heroId", "star", "skillId"],
+    "independentGuard": "sourceNameCn",
+    "failClosedOnAdmittedMismatch": true,
+    "fallbackForUnadmittedHeroes": "unchanged frozen source presentation"
+  },
+  "records": [
+    { "heroId": 6, "star": 3, "skillId": 3067, "talentNameKr": "전설의 기사" },
+    { "heroId": 6, "star": 4, "skillId": 3072, "talentNameKr": "전설의 기사" },
+    { "heroId": 6, "star": 5, "skillId": 3077, "talentNameKr": "전설의 기사" },
+    { "heroId": 6, "star": 6, "skillId": 3082, "talentNameKr": "전설의 기사" },
+    { "heroId": 8, "star": 3, "skillId": 3196, "talentNameKr": "마력 강화" },
+    { "heroId": 8, "star": 4, "skillId": 3197, "talentNameKr": "마력 강화" },
+    { "heroId": 8, "star": 5, "skillId": 3198, "talentNameKr": "마력 강화" },
+    { "heroId": 8, "star": 6, "skillId": 3199, "talentNameKr": "마력 강화" },
+    { "heroId": 9, "star": 3, "skillId": 3200, "talentNameKr": "천년의 사념" },
+    { "heroId": 9, "star": 4, "skillId": 3201, "talentNameKr": "천년의 사념" },
+    { "heroId": 9, "star": 5, "skillId": 3202, "talentNameKr": "천년의 사념" },
+    { "heroId": 9, "star": 6, "skillId": 3203, "talentNameKr": "천년의 사념" }
+  ],
+  "semanticInvariants": {
+    "heroSemanticPipelineReopened": false,
+    "canonicalHeroCountMutation": false,
+    "heroIdMutation": false,
+    "skillIdMutation": false,
+    "starProgressionMutation": false,
+    "selectionRuleMutation": false,
+    "relationMutation": false,
+    "rawConfigDataReadAdded": false,
+    "nameJoinAdded": false,
+    "idArithmeticAdded": false
+  },
+  "checks": [
+    {
+      "name": "exact-overlay-key",
+      "pass": true,
+      "detail": "All admitted presentation substitutions require exact canonical HeroID + frozen SkillID + star."
+    },
+    {
+      "name": "stale-source-guard",
+      "pass": true,
+      "detail": "The frozen Chinese talent skill name is checked only as an independent guard after exact-key lookup."
+    },
+    {
+      "name": "admitted-mismatch-fails-closed",
+      "pass": true,
+      "detail": "Hero 6/8/9 star 3-6 missing skill payload, Skill-ID mismatch, or overlay mismatch throws instead of silently presenting stale Korean text."
+    },
+    {
+      "name": "unadmitted-population-unchanged",
+      "pass": true,
+      "detail": "No talent localization path is applied to the remaining Hero population."
+    }
+  ],
+  "inheritedBlockers": [
+    {
+      "code": "LEGACY_SHEET_CANONICAL_HERO_ID_PROVENANCE_MISSING",
+      "count": 248,
+      "owner": "localization/source-identity-validation",
+      "blockingFullPopulationAdmission": true,
+      "blockingStage8ThreeHeroOverlay": false
+    }
+  ],
+  "validationBoundary": {
+    "repositoryDiffValidation": "PASS",
+    "ciBuild": "NOT_OBSERVED_AT_CHECKPOINT_WRITE",
+    "browserQa": "NOT_RUN_IN_STAGE8",
+    "hostedQa": "NOT_RUN_IN_STAGE8"
+  },
+  "decision": "Stage 8 presentation overlay implementation is COMPLETE for Hero 6/8/9. Korean TalentName and 3/4/5/6-star descriptions are resolved only by exact HeroID + frozen SkillID + star with sourceNameCn as a stale-snapshot guard. The 248-source identity blocker remains isolated and no Hero semantic authority is reopened.",
+  "nextStartPoint": "Run the owning frontend preflight/build gate for the Stage 8 diff, then verify Hero 6/8/9 route rendering and star switching. Keep the 248-source provenance blocker separate."
+}
