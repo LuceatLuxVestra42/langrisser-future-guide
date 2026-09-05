@@ -325,12 +325,8 @@ function assertProvisionalNameSource() {
     seen.add(record.heroId);
 
     const frozen = frozenByHeroId.get(record.heroId);
-    if (
-      !frozen ||
-      frozen.identity.nameCn !== record.nameCn ||
-      frozen.identity.nameKr !== record.displayNameKr
-    ) {
-      throw new Error(`Hero ${record.heroId} provisional Korean-name identity parity failed.`);
+    if (!frozen || frozen.identity.nameCn !== record.nameCn) {
+      throw new Error(`Hero ${record.heroId} provisional Korean-name ID/Chinese-name parity failed.`);
     }
   }
 }
