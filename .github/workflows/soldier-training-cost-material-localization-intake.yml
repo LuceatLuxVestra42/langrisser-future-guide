@@ -1,0 +1,30 @@
+name: Soldier Training Cost Material Localization Intake
+
+on:
+  pull_request:
+    paths:
+      - "data/contracts/configdata-source-pack-contract.v1.json"
+      - "data/generated/soldier-training-tech-level-costs.v1.json"
+      - "data/generated/soldier-training-material-iteminfo.v1.json"
+      - "data/presentation/soldier-training-cost-material-localization-intake.v1.json"
+      - "scripts/validate-soldier-training-cost-material-localization-intake.mjs"
+      - ".github/workflows/soldier-training-cost-material-localization-intake.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history for pinned source snapshot validation
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate Stage D intake
+        run: node scripts/validate-soldier-training-cost-material-localization-intake.mjs
