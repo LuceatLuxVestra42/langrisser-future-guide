@@ -47,6 +47,8 @@ const TRAINING_GROUPS: Array<{
 
 const TRAINING_GROUP_FILTERS = TRAINING_GROUPS.map(({ id, label, armyTypes }) => ({ id, label, armyTypes }));
 
+const ULTIMATE_TRAINING_TECH_IDS = new Set([134, 232, 334, 437, 438, 540, 541, 645, 646, 647]);
+
 const STAT_LABELS: Record<TrainingStatEffect["statKey"], string> = {
   HP: "생명",
   ATK: "공격",
@@ -67,6 +69,14 @@ const STAT_TRAINING_POSITION = new Map<string, { row: number; column: number }>(
     row.map((nameKr, columnIndex) => [nameKr, { row: rowIndex, column: columnIndex }] as const),
   ),
 );
+
+function isUltimateTrainingTech(tech: SoldierTrainingTech) {
+  return ULTIMATE_TRAINING_TECH_IDS.has(tech.techId);
+}
+
+function getPresentationKind(tech: SoldierTrainingTech): Exclude<KindFilter, "ALL"> {
+  return isUltimateTrainingTech(tech) ? "COMMON_STAT" : tech.kind;
+}
 
 function resolveTrainingGroup(tech: SoldierTrainingTech) {
   if (tech.armyIds.length === 0) {
@@ -103,7 +113,7 @@ function SoldierTrainingPage() {
   const filteredTechs = useMemo(
     () =>
       data.techs.filter((tech) => {
-        if (kindFilter !== "ALL" && tech.kind !== kindFilter) return false;
+        if (kindFilter !== "ALL" && getPresentationKind(tech) !== kindFilter) return false;
         const trainingGroup = trainingGroupByTechId.get(tech.techId);
         if (!trainingGroup) throw new Error(`Missing training group for Tech ${tech.techId}.`);
         return trainingGroup.id === trainingGroupFilter;
@@ -221,7 +231,7 @@ function SoldierTrainingPage() {
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {selectedTrainingGroup ? `${selectedTrainingGroup.label} · ` : ""}
-                      {selectedTech.kind === "COMMON_STAT" ? "기본 능력치 훈련" : "조건부 효과 훈련"}
+                      {getPresentationKind(selectedTech) === "COMMON_STAT" ? "기본 능력치 훈련" : "조건부 효과 훈련"}
                     </p>
                   </div>
                   <div className="min-w-40">
@@ -285,8 +295,9 @@ function TrainingTechGroupList({
   groupLabel: string;
   onSelect: (tech: SoldierTrainingTech) => void;
 }) {
-  const statTechs = techs.filter((tech) => tech.kind === "COMMON_STAT");
-  const passiveTechs = techs.filter((tech) => tech.kind === "COMMON_PASSIVE");
+  const ultimateStatTechs = techs.filter(isUltimateTrainingTech);
+  const statTechs = techs.filter((tech) => getPresentationKind(tech) === "COMMON_STAT" && !isUltimateTrainingTech(tech));
+  const passiveTechs = techs.filter((tech) => getPresentationKind(tech) === "COMMON_PASSIVE");
   const knownStatTechIds = new Set<number>();
 
   const statRows = STAT_TRAINING_ROWS.map((names, rowIndex) => {
@@ -338,8 +349,25 @@ function TrainingTechGroupList({
         </div>
       ) : null}
 
+      {ultimateStatTechs.length > 0 ? (
+        <div className={statRows.length > 0 || ungroupedStatTechs.length > 0 ? "mt-2 border-t border-border pt-2" : ""}>
+          <div className="grid grid-cols-3 gap-1.5">
+            {ultimateStatTechs.map((tech) => (
+              <TrainingTechButton
+                key={tech.techId}
+                tech={tech}
+                selected={selectedTechId === tech.techId}
+                groupLabel={groupLabel}
+                compact
+                onSelect={onSelect}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       {passiveTechs.length > 0 ? (
-        <div className={statTechs.length > 0 ? "mt-2 border-t border-border pt-2" : ""}>
+        <div className={statTechs.length > 0 || ultimateStatTechs.length > 0 ? "mt-2 border-t border-border pt-2" : ""}>
           {passiveTechs.map((tech) => (
             <TrainingTechButton
               key={tech.techId}
@@ -398,7 +426,7 @@ function TrainingTechButton({
         </div>
       </div>
       <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
-        <span>{tech.kind === "COMMON_STAT" ? "기본 능력치" : "조건부 효과"}</span>
+        <span>{getPresentationKind(tech) === "COMMON_STAT" ? "기본 능력치" : "조건부 효과"}</span>
         <span>Lv.{tech.maxLevel}</span>
         <span>{groupLabel}</span>
       </div>
@@ -461,7 +489,9 @@ function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number
         </p>
       ) : null}
       <p className="mt-3 text-[11px] leading-5 text-muted-foreground">
-        조건부 효과 문구는 검증된 원문 조건과 레벨별 수치를 그대로 반영해.
+        {isUltimateTrainingTech(tech)
+          ? "궁극 특훈 문구는 검증된 원문과 레벨별 수치를 그대로 반영해."
+          : "조건부 효과 문구는 검증된 원문 조건과 레벨별 수치를 그대로 반영해."}
       </p>
     </div>
   );
