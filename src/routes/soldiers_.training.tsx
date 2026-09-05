@@ -421,11 +421,13 @@ function TrainingTechButton({
           <span className="truncate text-sm font-bold">{tech.nameKr}</span>
         </div>
       </div>
-      <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
-        <span>{getPresentationKind(tech) === "COMMON_STAT" ? "기본 능력치" : "조건부 효과"}</span>
-        <span>Lv.{tech.maxLevel}</span>
-        <span>{groupLabel}</span>
-      </div>
+      {getPresentationKind(tech) === "COMMON_PASSIVE" ? null : (
+        <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
+          <span>기본 능력치</span>
+          <span>Lv.{tech.maxLevel}</span>
+          <span>{groupLabel}</span>
+        </div>
+      )}
     </button>
   );
 }
