@@ -93,7 +93,7 @@ function resolveTrainingGroup(tech: SoldierTrainingTech) {
     );
   }
 
-  return matches[0];
+  return matches[0]!;
 }
 
 function SoldierTrainingPage() {
