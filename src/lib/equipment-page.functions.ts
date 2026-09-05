@@ -6,7 +6,7 @@ import {
   readEquipmentDetailPageData,
   readExclusiveEquipmentPageData,
   readGeneralEquipmentPageData,
-} from "./equipment-page.localized.server";
+} from "./equipment-effect-description-kr.server";
 import type {
   EquipmentFilterGroup,
   EquipmentStatProperty,
