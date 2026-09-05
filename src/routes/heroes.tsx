@@ -73,6 +73,43 @@ const FACTION_FILTER_SHORT_LABELS = new Map<number, string>([
   [11, "초월"],
   [12, "전생"],
 ]);
+const ORIGIN_FILTER_DISPLAY_ORDER = [
+  3,
+  12,
+  18,
+  22,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  25,
+  30,
+  1,
+  2,
+  10,
+  11,
+  13,
+  14,
+  15,
+  16,
+  19,
+  17,
+  20,
+  21,
+  23,
+  24,
+  26,
+  27,
+  28,
+  29,
+  31,
+  32,
+] as const;
+const ORIGIN_FILTER_DISPLAY_RANK = new Map<number, number>(
+  ORIGIN_FILTER_DISPLAY_ORDER.map((productionId, index) => [productionId, index]),
+);
 type FilterSection = "rarity" | "faction" | "origin";
 
 function normalizeSearch(value: string) {
@@ -202,7 +239,11 @@ function HeroGridPage() {
       });
     }
 
-    return [...options.values()].sort((a, b) => a.id - b.id);
+    return [...options.values()].sort((a, b) => {
+      const aRank = ORIGIN_FILTER_DISPLAY_RANK.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+      const bRank = ORIGIN_FILTER_DISPLAY_RANK.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+      return aRank - bRank || a.id - b.id;
+    });
   }, [data.records]);
 
   const cardIconByHeroId = useMemo(
