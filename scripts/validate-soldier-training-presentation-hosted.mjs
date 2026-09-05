@@ -102,7 +102,7 @@ async function runDesktop(browser) {
 
   await search.fill("127");
   assert.equal(await techButtons.count(), 1, "Training ID search should resolve Tech 127 exactly.");
-  assert.ok(await page.getByText("연합 공격 훈련", { exact: true }).count(), "Tech 127 Korean display name missing.");
+  assert.ok(await page.getByText("연계 공격 훈련", { exact: true }).count(), "Tech 127 Korean display name missing.");
   assert.ok(await page.getByText("임시 표기", { exact: true }).count(), "Provisional display badge missing for Tech 127.");
 
   await search.fill("창병 대항 특훈");
