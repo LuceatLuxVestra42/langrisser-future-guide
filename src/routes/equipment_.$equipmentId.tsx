@@ -4,8 +4,6 @@ import {
   CalendarDays,
   ChevronRight,
   Shield,
-  Sparkles,
-  Swords,
   UserRound,
 } from "lucide-react";
 
@@ -87,7 +85,7 @@ function GeneralEquipmentDetail({ data }: { data: GeneralEquipmentDetailPageData
 
         <div className="mt-6 space-y-6">
           <StatsSection title="Lv50 능력치" rows={stats.properties} />
-          <EffectSection title="최대 효과" effect={effect} />
+          <EffectSection effect={effect} />
         </div>
 
         <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
@@ -160,7 +158,7 @@ function ExclusiveEquipmentDetail({ data }: { data: ExclusiveEquipmentDetailRout
 
         <div className="mt-6 space-y-6">
           <StatsSection title={sections.stats.titleKo} rows={sections.stats.rows} />
-          <EffectSection title={sections.effect.titleKo} effect={sections.effect} />
+          <EffectSection effect={sections.effect} />
           <RestrictionPresentationSection section={sections.restriction} />
           <AcquisitionPresentationSection section={sections.acquisition} />
         </div>
@@ -230,10 +228,7 @@ function EquipmentHeader({
 function StatsSection({ title, rows }: { title: string; rows: Stats["properties"] }) {
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-      <div className="flex items-center gap-2">
-        <Swords size={18} aria-hidden="true" className="text-primary" />
-        <h2 className="text-lg font-bold text-foreground">{title}</h2>
-      </div>
+      <h2 className="text-lg font-bold text-foreground">{title}</h2>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {rows.map((property) => (
@@ -252,17 +247,13 @@ function StatsSection({ title, rows }: { title: string; rows: Stats["properties"
   );
 }
 
-function EffectSection({ title, effect }: { title: string; effect: Effect }) {
+function EffectSection({ effect }: { effect: Effect }) {
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-      <div className="flex items-center gap-2">
-        <Sparkles size={18} aria-hidden="true" className="text-primary" />
-        <h2 className="text-lg font-bold text-foreground">{title}</h2>
-      </div>
+      <h2 className="text-lg font-bold text-foreground">효과</h2>
 
       <div className="mt-4 rounded-xl bg-muted/45 p-4 sm:p-5">
-        <p className="font-bold text-foreground">{effect.effectName}</p>
-        <p className="mt-2 text-sm leading-7 text-muted-foreground">
+        <p className="text-sm leading-7 text-muted-foreground">
           {effect.effectSegments.map((segment, index) =>
             segment.highlight ? (
               <mark
