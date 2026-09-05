@@ -63,10 +63,30 @@ function resolveCategoryHref(to: string) {
   return normalizedPath ? `${normalizedBase}${normalizedPath}/` : normalizedBase;
 }
 
+function navigateWithFreshDocument(event: React.MouseEvent<HTMLAnchorElement>, href: string) {
+  if (
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  const separator = href.includes("?") ? "&" : "?";
+  window.location.assign(`${href}${separator}fresh=${Date.now()}`);
+}
+
 function CategoryCard({ category }: { category: Category }) {
+  const href = resolveCategoryHref(category.to);
+
   return (
     <a
-      href={resolveCategoryHref(category.to)}
+      href={href}
+      onClick={(event) => navigateWithFreshDocument(event, href)}
       aria-label={category.title}
       className={`card-nav card-nav-hover group flex flex-col items-center px-8 py-9 ${
         category.primary ? "card-nav-primary" : ""
