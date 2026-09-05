@@ -49,7 +49,7 @@ for (const [path, label] of [
 async function verifyHeroSoldierCards(page, label) {
   const navigation = await page.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
   check(navigation && navigation.status() < 400, `Hero 6 ${label} detail failed: ${navigation?.status()}`);
-  await page.getByText("Hero #6", { exact: true }).waitFor();
+  await page.getByRole("heading", { name: "레온", exact: true }).waitFor();
 
   const section = page.locator('[data-hero-soldier-cards="true"]');
   check(await section.count() === 1, `Hero 6 ${label} Soldier card section missing or duplicated`);

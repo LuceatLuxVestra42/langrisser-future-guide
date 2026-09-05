@@ -52,7 +52,7 @@ const requiredTokens = [
 async function verifyCentralDiscipline(page, label) {
   const navigation = await page.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
   check(navigation && navigation.status() < 400, `Hero 6 ${label} detail failed: ${navigation?.status()}`);
-  await page.getByText("Hero #6", { exact: true }).waitFor();
+  await page.getByRole("heading", { name: "레온", exact: true }).waitFor();
   const section = page.locator("[data-hero-central-discipline]");
   check(await section.count() === 1, `Hero 6 ${label} central discipline section missing or duplicated`);
   const text = await section.innerText();
