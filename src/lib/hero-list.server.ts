@@ -212,7 +212,7 @@ const originLocalizationById = new Map<number, HeroTaxonomyLocalization>([
   [24, { nameCn: "强殖装甲凯普", nameKr: "강식장갑 가이버" }],
   [25, { nameCn: "梦幻模拟战·千年纪WS", nameKr: "랑그릿사 밀레니엄 WS the Last Century" }],
   [26, { nameCn: "名将战队", nameKr: "캡틴 코만도" }],
-  [27, { nameCn: "死或生", nameKr: "데드 오어 얼라이브 6" }],
+  [27, { nameCn: "死或生", nameKr: "데드 오어 어라이브 6" }],
   [28, { nameCn: "妖精的尾巴", nameKr: "페어리테일" }],
   [29, { nameCn: "莱莎的炼金工房3 ～终结之炼金术士与秘密钥匙～", nameKr: "라이자의 아틀리에3 ~종극의 연금술사와 비밀의 열쇠~" }],
   [30, { nameCn: "梦幻模拟战·千年纪DC", nameKr: "랑그릿사 밀레니엄 DC" }],
