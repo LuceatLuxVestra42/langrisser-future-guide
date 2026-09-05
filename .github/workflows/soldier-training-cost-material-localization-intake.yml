@@ -18,10 +18,12 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout full history for pinned source snapshot validation
+      - name: Checkout current PR head
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+      - name: Fetch only the source commit pinned by the current source-pack contract
+        run: git fetch --no-tags --depth=1 origin 6475e63ee23d18adf733756c26a14fa9e3ed662c
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
