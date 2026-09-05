@@ -2,14 +2,7 @@ import generalPart1Json from "../../data/presentation/equipment-effect-descripti
 import generalPart2Json from "../../data/presentation/equipment-effect-description-kr-general.part2.v1.json";
 import exclusivePart1Json from "../../data/presentation/equipment-effect-description-kr-exclusive.part1.v1.json";
 import exclusivePart2Json from "../../data/presentation/equipment-effect-description-kr-exclusive.part2.v1.json";
-import {
-  readEquipmentDetailPageData as readLocalizedEquipmentDetailPageData,
-  readExclusiveEquipmentPageData,
-  readGeneralEquipmentPageData,
-} from "./equipment-page.localized.server";
 import type { EquipmentEffectSegment } from "./equipment-page.server";
-
-export { readExclusiveEquipmentPageData, readGeneralEquipmentPageData };
 
 type EffectDescriptionProjection = {
   version: number;
@@ -35,11 +28,11 @@ type EffectDescriptionProjection = {
   byEquipmentId: Record<string, string>;
 };
 
-type EffectCarrier = {
-  effect: {
-    effectText: string;
-    effectSegments: EquipmentEffectSegment[];
-  };
+export type EquipmentEffectPresentation = {
+  maxEffectSkillId: number;
+  effectName: string;
+  effectText: string;
+  effectSegments: EquipmentEffectSegment[];
 };
 
 const projections = [
@@ -47,7 +40,7 @@ const projections = [
   generalPart2Json,
   exclusivePart1Json,
   exclusivePart2Json,
-] as EffectDescriptionProjection[];
+] as unknown as EffectDescriptionProjection[];
 
 const expectedScopeCounts = {
   general: { sourceRows: 174, matched: 128, review: 46 },
@@ -116,33 +109,16 @@ if (effectDescriptionByEquipmentId.size !== 261) {
   throw new Error(`Equipment KR effect total matched count mismatch: ${effectDescriptionByEquipmentId.size} !== 261.`);
 }
 
-function applyEffectDescription<T extends EffectCarrier>(equipmentId: number, detail: T): T {
+export function localizeEquipmentEffectDescription(
+  equipmentId: number,
+  effect: EquipmentEffectPresentation,
+): EquipmentEffectPresentation {
   const effectTextKr = effectDescriptionByEquipmentId.get(equipmentId);
-  if (!effectTextKr) return detail;
+  if (!effectTextKr) return effect;
 
   return {
-    ...detail,
-    effect: {
-      ...detail.effect,
-      effectText: effectTextKr,
-      effectSegments: [{ text: effectTextKr, highlight: false }],
-    },
-  } as T;
-}
-
-export function readEquipmentDetailPageData(equipmentId: number) {
-  const pageData = readLocalizedEquipmentDetailPageData(equipmentId);
-  if (!pageData) return null;
-
-  if (pageData.kind === "general") {
-    return {
-      ...pageData,
-      detail: applyEffectDescription(equipmentId, pageData.detail),
-    };
-  }
-
-  return {
-    ...pageData,
-    detail: applyEffectDescription(equipmentId, pageData.detail),
+    ...effect,
+    effectText: effectTextKr,
+    effectSegments: [{ text: effectTextKr, highlight: false }],
   };
 }
