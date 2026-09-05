@@ -24,16 +24,15 @@ export const Route = createFileRoute("/soldiers_/training")({
 });
 
 type KindFilter = "ALL" | "COMMON_STAT" | "COMMON_PASSIVE";
-type TrainingGroupFilter = "ALL" | "INFANTRY" | "LANCER" | "CAVALRY" | "FLYING_WATER" | "ARCHER_ASSASSIN" | "MAGE_HOLY_DEMON";
+type TrainingGroupFilter = "INFANTRY" | "LANCER" | "CAVALRY" | "FLYING_WATER" | "ARCHER_ASSASSIN" | "MAGE_HOLY_DEMON";
 
-const KIND_FILTERS: Array<{ id: KindFilter; label: string }> = [
-  { id: "ALL", label: "전체" },
+const KIND_FILTERS: Array<{ id: Exclude<KindFilter, "ALL">; label: string }> = [
   { id: "COMMON_STAT", label: "스탯" },
   { id: "COMMON_PASSIVE", label: "패시브" },
 ];
 
 const TRAINING_GROUPS: Array<{
-  id: Exclude<TrainingGroupFilter, "ALL">;
+  id: TrainingGroupFilter;
   label: string;
   armyIds: number[];
   armyTypes: string[];
@@ -46,14 +45,7 @@ const TRAINING_GROUPS: Array<{
   { id: "MAGE_HOLY_DEMON", label: "마법사 + 승려 + 마물", armyIds: [7, 8, 9], armyTypes: ["MAGE", "HOLY", "DEMON"] },
 ];
 
-const TRAINING_GROUP_FILTERS: Array<{
-  id: TrainingGroupFilter;
-  label: string;
-  armyTypes: string[];
-}> = [
-  { id: "ALL", label: "전체 훈련", armyTypes: [] },
-  ...TRAINING_GROUPS.map(({ id, label, armyTypes }) => ({ id, label, armyTypes })),
-];
+const TRAINING_GROUP_FILTERS = TRAINING_GROUPS.map(({ id, label, armyTypes }) => ({ id, label, armyTypes }));
 
 const STAT_LABELS: Record<TrainingStatEffect["statKey"], string> = {
   HP: "생명",
@@ -96,10 +88,12 @@ function resolveTrainingGroup(tech: SoldierTrainingTech) {
 
 function SoldierTrainingPage() {
   const data = Route.useLoaderData();
-  const [selectedTechId, setSelectedTechId] = useState(data.techs[0]?.techId ?? 0);
+  const [selectedTechId, setSelectedTechId] = useState(
+    () => data.techs.find((tech) => resolveTrainingGroup(tech).id === "INFANTRY")?.techId ?? data.techs[0]?.techId ?? 0,
+  );
   const [level, setLevel] = useState(1);
   const [kindFilter, setKindFilter] = useState<KindFilter>("ALL");
-  const [trainingGroupFilter, setTrainingGroupFilter] = useState<TrainingGroupFilter>("ALL");
+  const [trainingGroupFilter, setTrainingGroupFilter] = useState<TrainingGroupFilter>("INFANTRY");
   const [query, setQuery] = useState("");
 
   const trainingGroupByTechId = useMemo(
@@ -113,7 +107,7 @@ function SoldierTrainingPage() {
       if (kindFilter !== "ALL" && tech.kind !== kindFilter) return false;
       const trainingGroup = trainingGroupByTechId.get(tech.techId);
       if (!trainingGroup) throw new Error(`Missing training group for Tech ${tech.techId}.`);
-      if (trainingGroupFilter !== "ALL" && trainingGroup.id !== trainingGroupFilter) return false;
+      if (trainingGroup.id !== trainingGroupFilter) return false;
       if (!needle) return true;
       return [tech.nameKr, tech.nameCn, String(tech.techId), trainingGroup.label]
         .join(" ")
@@ -186,13 +180,11 @@ function SoldierTrainingPage() {
                   }`}
                 >
                   <span className="inline-flex items-center justify-center gap-1.5">
-                    {filter.armyTypes.length > 0 ? (
-                      <span className="inline-flex items-center -space-x-0.5" aria-hidden="true">
-                        {filter.armyTypes.map((armyType) => (
-                          <TrainingArmyIcon key={armyType} armyType={armyType} />
-                        ))}
-                      </span>
-                    ) : null}
+                    <span className="inline-flex items-center -space-x-0.5" aria-hidden="true">
+                      {filter.armyTypes.map((armyType) => (
+                        <TrainingArmyIcon key={armyType} armyType={armyType} />
+                      ))}
+                    </span>
                     <span>{filter.label}</span>
                   </span>
                 </button>
@@ -201,7 +193,7 @@ function SoldierTrainingPage() {
           </div>
 
           <div className="mt-4">
-            <p className="text-xs font-bold text-muted-foreground">효과 유형</p>
+            <p className="text-xs font-bold text-muted-foreground">유형</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {KIND_FILTERS.map((filter) => (
                 <button
