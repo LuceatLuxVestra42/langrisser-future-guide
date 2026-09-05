@@ -177,7 +177,7 @@ jobs:
               const nextArtwork = page.getByRole('button', { name: '다음 일러스트' });
               await nextArtwork.focus();
               await page.keyboard.press('Enter');
-              await page.getByText(/스킨 1 · ID \d+/, { exact: false }).waitFor({ timeout: 10000 });
+              await page.getByText('스킨 상점 · 스킨권 구매', { exact: true }).waitFor({ timeout: 10000 });
 
               const soldier101 = page.locator('[data-hero-soldier-cards="true"] a[href*="/soldiers/101"]').first();
               check(await soldier101.count() === 1, 'Hero 6 → Soldier 101 interaction link missing');
