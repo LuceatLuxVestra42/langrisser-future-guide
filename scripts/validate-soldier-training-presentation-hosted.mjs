@@ -54,7 +54,7 @@ async function getTrainingSearch(page) {
 }
 
 function getTechButtons(page) {
-  return page.locator('button[title]');
+  return page.locator("section section button");
 }
 
 async function runDesktop(browser) {
