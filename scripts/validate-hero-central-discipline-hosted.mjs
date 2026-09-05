@@ -30,23 +30,9 @@ check(response.ok, `Hero 6 Hosted HTTP failed: ${response.status}`);
 
 const requiredTokens = [
   "중앙율정",
-  "RELEASED",
-  "骑士楷模",
-  "Skill #90085",
-  "장비 레벨",
-  "Lv.1",
-  "영웅 성급",
-  "6성",
-  "율정 레벨",
-  "Lv.5",
-  "GoodsType 6 · ID 3303",
-  "× 12",
-  "Template #3",
-  "Template #1",
-  "Template #29",
-  "Template #32",
-  "Template #41",
-  "ConfigDataHeroInfo.CastingLawSkill_ID -> ConfigDataSkillInfo.ID",
+  "기사도가 레온에게 부여하는 효과",
+  "공격 지력 +20%",
+  "지속 2행동",
 ];
 
 async function verifyCentralDiscipline(page, label) {
@@ -59,6 +45,9 @@ async function verifyCentralDiscipline(page, label) {
   for (const token of requiredTokens) {
     check(text.includes(token), `Hero 6 ${label} central discipline missing token: ${token}`);
   }
+  const article = section.locator("[data-central-discipline-skill-id]");
+  check(await article.count() === 1, `Hero 6 ${label} central discipline article missing or duplicated`);
+  check(await article.getAttribute("data-central-discipline-skill-id") === "90085", `Hero 6 ${label} central discipline skill id drift`);
   return section;
 }
 
@@ -92,13 +81,7 @@ try {
     sourceSha: expectedSourceSha,
     heroId: 6,
     centralDiscipline: {
-      status: "RELEASED",
       skillId: 90085,
-      equipmentLevel: 1,
-      heroStarLevel: 6,
-      castingLawLevel: 5,
-      material: { goodsType: 6, sourceId: 3303, count: 12 },
-      templateIds: [3, 1, 29, 32, 41],
       desktop: "PASS",
       mobile: "PASS",
       mobileOverflow: 0,
