@@ -7,6 +7,11 @@ on:
     paths:
       - '.github/workflows/project-tooling-browser-ui-qa.yml'
       - 'data/contracts/project-tooling-browser-ui-qa-*.json'
+      - 'data/presentation/hero-talent-*'
+      - 'data/validation/hero-talent-*'
+      - 'src/lib/hero-talent-localization.ts'
+      - 'src/lib/hero-list.functions.ts'
+      - 'src/routes/heroes_.$heroId.tsx'
   workflow_run:
     workflows:
       - Project Tooling Route Hosted QA
@@ -58,34 +63,69 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           WORKFLOW_RUN_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           DISPATCH_EXPECTED_SHA: ${{ inputs.expected_sha }}
           CURRENT_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           case "$EVENT_NAME" in
-            workflow_run) expected="$WORKFLOW_RUN_HEAD_SHA" ;;
-            pull_request) expected="$PR_BASE_SHA" ;;
-            workflow_dispatch) expected="${DISPATCH_EXPECTED_SHA:-$CURRENT_SHA}" ;;
+            workflow_run)
+              expected="$WORKFLOW_RUN_HEAD_SHA"
+              base='https://luceatluxvestra42.github.io/langrisser-future-guide/'
+              manifest='authoritative-pages-source.json'
+              mode='main-deployed'
+              ;;
+            pull_request)
+              expected="$PR_HEAD_SHA"
+              base="https://luceatluxvestra42.github.io/Data/pr-${PR_NUMBER}/"
+              manifest='preview-source.json'
+              mode='pr-preview'
+              ;;
+            workflow_dispatch)
+              expected="${DISPATCH_EXPECTED_SHA:-$CURRENT_SHA}"
+              base='https://luceatluxvestra42.github.io/langrisser-future-guide/'
+              manifest='authoritative-pages-source.json'
+              mode='main-deployed'
+              ;;
             *) echo "Unsupported Browser/UI QA event: $EVENT_NAME" >&2; exit 2 ;;
           esac
           if [[ ! "$expected" =~ ^[0-9a-fA-F]{40}$ ]]; then
             echo "Browser/UI QA requires an exact 40-hex deployed source SHA: $expected" >&2
             exit 2
           fi
-          EXPECTED_SOURCE_SHA="$expected" node --input-type=module <<'NODE'
+          EXPECTED_SOURCE_SHA="$expected" BROWSER_UI_BASE_URL="$base" BROWSER_UI_MANIFEST="$manifest" BROWSER_UI_MODE="$mode" node --input-type=module <<'NODE'
           import fs from 'node:fs';
-          const base = process.env.HOSTED_BASE_URL;
+          const base = process.env.BROWSER_UI_BASE_URL;
           const expected = process.env.EXPECTED_SOURCE_SHA;
-          const response = await fetch(`${base}authoritative-pages-source.json?browser_ui_qa=${Date.now()}`, { cache: 'no-store' });
-          if (!response.ok) throw new Error(`deployment manifest HTTP ${response.status}`);
-          const manifest = await response.json();
-          if (manifest.sourceSha !== expected) {
-            throw new Error(`Browser/UI predecessor freshness mismatch: expected=${expected} deployed=${manifest.sourceSha}`);
+          const manifestName = process.env.BROWSER_UI_MANIFEST;
+          const mode = process.env.BROWSER_UI_MODE;
+          const deadline = Date.now() + (mode === 'pr-preview' ? 10 * 60_000 : 30_000);
+          let manifest = null;
+          let lastError = null;
+          while (Date.now() < deadline) {
+            try {
+              const response = await fetch(`${base}${manifestName}?browser_ui_qa=${Date.now()}`, { cache: 'no-store' });
+              if (!response.ok) throw new Error(`deployment manifest HTTP ${response.status}`);
+              manifest = await response.json();
+              if (manifest.sourceSha === expected) break;
+              lastError = new Error(`freshness mismatch expected=${expected} deployed=${manifest.sourceSha}`);
+            } catch (error) {
+              lastError = error;
+            }
+            if (mode !== 'pr-preview') break;
+            await new Promise((resolve) => setTimeout(resolve, 5000));
           }
-          if (manifest.semanticStageReopened !== false) throw new Error('deployed manifest reopened semantic stage');
+          if (!manifest || manifest.sourceSha !== expected) {
+            throw lastError ?? new Error(`Browser/UI predecessor unavailable: expected=${expected}`);
+          }
+          if (mode === 'main-deployed' && manifest.semanticStageReopened !== false) {
+            throw new Error('deployed manifest reopened semantic stage');
+          }
           fs.appendFileSync(process.env.GITHUB_ENV, `EXPECTED_SOURCE_SHA=${expected}\n`);
-          console.log(JSON.stringify({ status: 'PASS_BROWSER_UI_PREDECESSOR', expectedSourceSha: expected, deployedSourceSha: manifest.sourceSha, semanticStageReopened: false }, null, 2));
+          fs.appendFileSync(process.env.GITHUB_ENV, `HOSTED_BASE_URL=${base}\n`);
+          fs.appendFileSync(process.env.GITHUB_ENV, `BROWSER_UI_MODE=${mode}\n`);
+          console.log(JSON.stringify({ status: 'PASS_BROWSER_UI_PREDECESSOR', expectedSourceSha: expected, deployedSourceSha: manifest.sourceSha, mode, base }, null, 2));
           NODE
 
       - name: Install Chromium Browser QA runtime
@@ -94,6 +134,7 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Reuse stable hosted Browser interaction validators
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           set -euo pipefail
           node scripts/validate-authoritative-pages-hosted.mjs
@@ -163,6 +204,68 @@ jobs:
             await page.waitForURL(/\/heroes\/6\/?$/, { timeout: 45000 });
             await page.getByText('Hero #6', { exact: true }).waitFor();
 
+            if (process.env.BROWSER_UI_MODE === 'pr-preview') {
+              const cases = [
+                {
+                  heroId: 6,
+                  nameKr: '전설의 기사',
+                  desc: {
+                    3: '1칸 이동할 때마다 피해 +1%, 방어 +5%. 공격 후 3칸 재이동 가능.',
+                    4: '1칸 이동할 때마다 피해 +2%, 방어 +10%. 공격 후 3칸 재이동 가능.',
+                    5: '1칸 이동할 때마다 피해 +3%, 방어 +15%. 공격 후 3칸 재이동 가능.',
+                    6: '1칸 이동할 때마다 피해 +4%, 방어 +20%. 공격 후 3칸 재이동 가능.',
+                  },
+                },
+                {
+                  heroId: 8,
+                  nameKr: '마력 강화',
+                  desc: {
+                    3: '전투 진입 시 마법 피해 +10%, 스킬 사거리 +1.',
+                    4: '전투 진입 시 마법 피해 +15%, 스킬 사거리 +1.',
+                    5: '전투 진입 시 마법 피해 +20%, 스킬 사거리 +1.',
+                    6: '전투 진입 시 마법 피해 +30%, 스킬 사거리 +1.',
+                  },
+                },
+                {
+                  heroId: 9,
+                  nameKr: '천년의 사념',
+                  desc: {
+                    3: '자신 마방의 1.5배로 지력을 대체. 적 부대에게 피해를 준 후 50% 확률로 무작위 디버프 1개 부여.',
+                    4: '자신 마방의 1.5배로 지력을 대체. 적 부대에게 피해를 준 후 60% 확률로 무작위 디버프 1개 부여.',
+                    5: '자신 마방의 1.5배로 지력을 대체. 적 부대에게 피해를 준 후 80% 확률로 무작위 디버프 1개 부여.',
+                    6: '자신 마방의 1.5배로 지력을 대체. 적 부대에게 피해를 준 후 100% 확률로 무작위 디버프 1개 부여.',
+                  },
+                },
+              ];
+
+              for (const talentCase of cases) {
+                response = await page.goto(url(`heroes/${talentCase.heroId}/`), { waitUntil: 'networkidle', timeout: 45000 });
+                check(response && response.status() < 400, `Hero ${talentCase.heroId} talent Browser/UI entry failed: ${response?.status()}`);
+                const carousel = page.locator('[data-hero-talent-carousel="true"]');
+                await carousel.waitFor({ timeout: 20000 });
+                const active = carousel.locator('[data-hero-talent-active-star]');
+                const assertStar = async (star) => {
+                  await active.waitFor({ timeout: 10000 });
+                  check(await active.getAttribute('data-hero-talent-active-star') === String(star), `Hero ${talentCase.heroId} expected ${star}★ active talent`);
+                  await carousel.getByText(`${star}성 · ${talentCase.nameKr}`, { exact: true }).waitFor({ timeout: 10000 });
+                  await carousel.getByText(talentCase.desc[star], { exact: true }).waitFor({ timeout: 10000 });
+                };
+
+                await assertStar(6);
+                const lower = carousel.getByRole('button', { name: '낮은 성급 재능 보기' });
+                await lower.click();
+                await assertStar(5);
+                await lower.click();
+                await assertStar(4);
+                await lower.click();
+                await assertStar(3);
+                await carousel.getByRole('button', { name: '6성', exact: true }).click();
+                await assertStar(6);
+                await carousel.getByRole('button', { name: '4성', exact: true }).click();
+                await assertStar(4);
+              }
+            }
+
             check(errors.length === 0, `desktop Browser/UI errors: ${JSON.stringify(errors)}`);
             await page.close();
 
@@ -188,12 +291,14 @@ jobs:
             console.log(JSON.stringify({
               status: 'PASS_BROWSER_UI_INTERACTION_SPOT_CHECKS',
               sourceSha: process.env.EXPECTED_SOURCE_SHA,
+              mode: process.env.BROWSER_UI_MODE,
               keyboardSkinCarousel: 'PASS',
               heroToSoldierNavigation: 'PASS',
               soldierDetailHeroCardWebp: 'PASS',
               soldierHeroCardCount,
               backForwardNavigation: 'PASS',
               equipmentToHeroNavigation: 'PASS',
+              heroTalentKrStarSwitching: process.env.BROWSER_UI_MODE === 'pr-preview' ? 'PASS_HERO_6_8_9' : 'NOT_APPLICABLE',
               unknownIdBrowser404: 'PASS',
               tabletResponsiveOverflow: 0,
               desktopPageConsoleErrors: 0,
