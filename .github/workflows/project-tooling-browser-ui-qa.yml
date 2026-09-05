@@ -168,7 +168,7 @@ jobs:
 
             let response = await page.goto(url('heroes/6/'), { waitUntil: 'networkidle', timeout: 45000 });
             check(response && response.status() < 400, `Hero 6 browser entry failed: ${response?.status()}`);
-            await page.getByText('Hero #6', { exact: true }).waitFor();
+            await page.locator('[data-hero-talent-carousel="true"]').waitFor({ timeout: 20000 });
 
             const nextArtwork = page.getByRole('button', { name: '다음 일러스트' });
             await nextArtwork.focus();
@@ -190,7 +190,7 @@ jobs:
             check(soldierHeroCardSources.every((src) => src.includes('/images/heroes/card-icons-webp/') && src.endsWith('.webp')), 'Soldier 101 detail contains a non-WebP Hero card source');
 
             await page.goBack({ waitUntil: 'networkidle', timeout: 45000 });
-            await page.getByText('Hero #6', { exact: true }).waitFor();
+            await page.locator('[data-hero-talent-carousel="true"]').waitFor({ timeout: 20000 });
             await page.goForward({ waitUntil: 'networkidle', timeout: 45000 });
             await page.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
             await page.getByRole('dialog').waitFor({ timeout: 20000 });
@@ -202,7 +202,7 @@ jobs:
             check(await heroLink.count() === 1, 'Equipment 416 → Hero 6 interaction link missing');
             await heroLink.click();
             await page.waitForURL(/\/heroes\/6\/?$/, { timeout: 45000 });
-            await page.getByText('Hero #6', { exact: true }).waitFor();
+            await page.locator('[data-hero-talent-carousel="true"]').waitFor({ timeout: 20000 });
 
             if (process.env.BROWSER_UI_MODE === 'pr-preview') {
               const cases = [
