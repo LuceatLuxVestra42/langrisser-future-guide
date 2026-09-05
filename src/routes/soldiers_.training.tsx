@@ -93,7 +93,7 @@ function resolveTrainingGroup(tech: SoldierTrainingTech) {
     );
   }
 
-  return matches[0];
+  return matches[0]!;
 }
 
 function SoldierTrainingPage() {
@@ -102,7 +102,7 @@ function SoldierTrainingPage() {
     () => data.techs.find((tech) => resolveTrainingGroup(tech).id === "INFANTRY")?.techId ?? data.techs[0]?.techId ?? 0,
   );
   const [level, setLevel] = useState(1);
-  const [kindFilter, setKindFilter] = useState<KindFilter>("ALL");
+  const [kindFilter, setKindFilter] = useState<KindFilter>("COMMON_STAT");
   const [trainingGroupFilter, setTrainingGroupFilter] = useState<TrainingGroupFilter>("INFANTRY");
 
   const trainingGroupByTechId = useMemo(
