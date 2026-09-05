@@ -180,11 +180,12 @@ jobs:
               await page.getByText('스킨 상점 · 스킨권 구매', { exact: true }).waitFor({ timeout: 10000 });
 
               const soldier101 = page.locator('[data-hero-soldier-cards="true"] a[href*="/soldiers/101"]').first();
-              check(await soldier101.count() === 1, 'Hero 6 → Soldier 101 interaction link missing');
+              check(await soldier101.count() === 1, 'Hero 6 → Soldier 101 progressive fallback link missing');
+              const heroUrl = page.url();
               await soldier101.click();
-              await page.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
               const soldierDialog = page.getByRole('dialog');
               await soldierDialog.waitFor({ timeout: 20000 });
+              check(page.url() === heroUrl, `Hero route changed while Soldier 101 dialog opened: ${page.url()}`);
               await page.getByText('사용 가능 영웅', { exact: true }).waitFor({ timeout: 20000 });
               const soldierHeroCards = soldierDialog.locator('img[src*="/images/heroes/card-icons-webp/"]');
               await waitForLoadedImage(soldierHeroCards.first(), 'Soldier 101 first Hero card WebP failed');
@@ -193,11 +194,10 @@ jobs:
               const soldierHeroCardSources = await soldierHeroCards.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('src') || ''));
               check(soldierHeroCardSources.every((src) => src.includes('/images/heroes/card-icons-webp/') && src.endsWith('.webp')), 'Soldier 101 detail contains a non-WebP Hero card source');
 
-              await page.goBack({ waitUntil: 'networkidle', timeout: 45000 });
+              await page.getByRole('button', { name: '상세 창 닫기' }).click();
+              await soldierDialog.waitFor({ state: 'detached', timeout: 20000 });
+              check(page.url() === heroUrl, `Hero route changed after closing Soldier 101 dialog: ${page.url()}`);
               await page.locator('[data-hero-talent-carousel="true"]').waitFor({ timeout: 20000 });
-              await page.goForward({ waitUntil: 'networkidle', timeout: 45000 });
-              await page.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
-              await page.getByRole('dialog').waitFor({ timeout: 20000 });
 
               response = await page.goto(url('equipment/416/'), { waitUntil: 'networkidle', timeout: 45000 });
               check(response && response.status() < 400, `Equipment 416 browser entry failed: ${response?.status()}`);
@@ -299,10 +299,11 @@ jobs:
               sourceSha: process.env.EXPECTED_SOURCE_SHA,
               mode: process.env.BROWSER_UI_MODE,
               keyboardSkinCarousel: isPreview ? 'NOT_APPLICABLE' : 'PASS',
-              heroToSoldierNavigation: isPreview ? 'NOT_APPLICABLE' : 'PASS',
+              progressiveSoldierFallbackHref: isPreview ? 'NOT_APPLICABLE' : 'PASS',
+              heroInlineSoldierDialog: isPreview ? 'NOT_APPLICABLE' : 'PASS',
+              heroRoutePreservedDuringSoldierDialog: isPreview ? 'NOT_APPLICABLE' : 'PASS',
               soldierDetailHeroCardWebp: isPreview ? 'NOT_APPLICABLE' : 'PASS',
               soldierHeroCardCount: isPreview ? 'NOT_APPLICABLE' : soldierHeroCardCount,
-              backForwardNavigation: isPreview ? 'NOT_APPLICABLE' : 'PASS',
               equipmentToHeroNavigation: isPreview ? 'NOT_APPLICABLE' : 'PASS',
               heroTalentKrStarSwitching: isPreview ? 'PASS_HERO_6_8_9' : 'NOT_APPLICABLE',
               unknownIdBrowser404: isPreview ? 'NOT_APPLICABLE' : 'PASS',
