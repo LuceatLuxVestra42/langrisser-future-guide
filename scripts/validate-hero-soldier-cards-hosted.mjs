@@ -72,6 +72,18 @@ async function verifyHeroSoldierCards(page, label) {
     return match ? Number(match[1]) : null;
   }));
   check(JSON.stringify(portraitIds) === JSON.stringify(expectedHero6SoldierIds), `Hero 6 ${label} portrait ID/order mismatch: ${JSON.stringify(portraitIds)}`);
+
+  for (let index = 0; index < expectedHero6SoldierIds.length; index += 1) {
+    const portrait = portraits.nth(index);
+    await portrait.scrollIntoViewIfNeeded();
+    await portrait.waitFor({ state: "visible", timeout: 10000 });
+    await page.waitForFunction(
+      (image) => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0 && image.naturalHeight > 0,
+      await portrait.elementHandle(),
+      { timeout: 10000 },
+    );
+  }
+
   const allPortraitsLoaded = await portraits.evaluateAll((nodes) => nodes.every((node) => node instanceof HTMLImageElement && node.complete && node.naturalWidth > 0 && node.naturalHeight > 0));
   check(allPortraitsLoaded, `Hero 6 ${label} has an unloaded Soldier portrait`);
 
