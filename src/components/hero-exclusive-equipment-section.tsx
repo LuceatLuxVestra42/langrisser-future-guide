@@ -32,6 +32,8 @@ export function HeroExclusiveEquipmentSection({
             <img
               src={getOfficialEquipmentImageUrl(detail.equipmentId)}
               alt={`${detail.identity.nameKr ?? detail.identity.nameCn} 전용장비`}
+              loading="lazy"
+              decoding="async"
               className="h-32 w-32 object-contain sm:h-36 sm:w-36"
             />
           </div>
