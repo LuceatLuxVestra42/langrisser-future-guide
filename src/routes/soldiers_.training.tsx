@@ -346,7 +346,7 @@ function TrainingTechGroupList({
       ) : null}
 
       {ultimateStatTechs.length > 0 ? (
-        <div className={statRows.length > 0 || ungroupedStatTechs.length > 0 ? "mt-2" : ""}>
+        <div>
           <div className="grid grid-cols-3 gap-1.5">
             {ultimateStatTechs.map((tech) => (
               <TrainingTechButton
