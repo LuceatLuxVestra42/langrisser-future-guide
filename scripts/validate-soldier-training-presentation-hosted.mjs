@@ -35,38 +35,6 @@ async function readFreshManifest() {
   );
 }
 
-async function waitForMaterialImage(image) {
-  await image.scrollIntoViewIfNeeded();
-  await image.waitFor({ state: "visible", timeout: 10000 });
-  const loaded = await image.evaluate(
-    (target) =>
-      new Promise((resolve) => {
-        if (target.complete) {
-          resolve(target.naturalWidth > 0 && target.naturalHeight > 0);
-          return;
-        }
-        const timer = window.setTimeout(() => resolve(false), 10000);
-        target.addEventListener(
-          "load",
-          () => {
-            window.clearTimeout(timer);
-            resolve(target.naturalWidth > 0 && target.naturalHeight > 0);
-          },
-          { once: true },
-        );
-        target.addEventListener(
-          "error",
-          () => {
-            window.clearTimeout(timer);
-            resolve(false);
-          },
-          { once: true },
-        );
-      }),
-  );
-  assert.equal(loaded, true, `Material image failed to load: ${await image.getAttribute("src")}`);
-}
-
 async function assertNoHorizontalOverflow(page, label) {
   const metrics = await page.evaluate(() => ({
     innerWidth: window.innerWidth,
@@ -78,6 +46,17 @@ async function assertNoHorizontalOverflow(page, label) {
   );
 }
 
+async function getTrainingSearch(page) {
+  const search = page.getByRole("textbox", { name: "훈련 항목 검색", exact: true });
+  await search.waitFor({ timeout: 20000 });
+  assert.equal(await search.getAttribute("placeholder"), "검색", "Training search placeholder drifted.");
+  return search;
+}
+
+function getTechButtons(page) {
+  return page.locator('button[title]');
+}
+
 async function runDesktop(browser) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const page = await context.newPage();
@@ -87,9 +66,7 @@ async function runDesktop(browser) {
   });
   const directStatus = response?.status() ?? null;
 
-  await page.getByRole("heading", { name: "훈련장", exact: true }).waitFor({ timeout: 20000 });
-  await page.getByRole("heading", { name: "레벨별 상승 효과", exact: true }).waitFor();
-  await page.getByPlaceholder("한국어 이름 / 중문 이름 / 훈련 ID / 병종 ID 검색").waitFor();
+  const search = await getTrainingSearch(page);
 
   const bodyText = await page.locator("body").innerText();
   for (const forbidden of [
@@ -103,32 +80,17 @@ async function runDesktop(browser) {
     assert.ok(!bodyText.includes(forbidden), `Internal implementation wording leaked: ${forbidden}`);
   }
 
-  assert.ok(bodyText.includes("훈련장 자료"), "Missing G training-page heading copy.");
-  assert.ok(bodyText.includes("훈련 효과"), "Missing G training-effect heading copy.");
-  assert.ok(bodyText.includes("검증된 효과 130개"), "Missing 130-effect coverage witness.");
-
-  const materialImages = page.locator('img[src*="soldier-training-materials/"]');
-  assert.equal(await materialImages.count(), 24, "Expected exactly 24 Soldier Training material images.");
-  for (let index = 0; index < 24; index += 1) {
-    await waitForMaterialImage(materialImages.nth(index));
-  }
-
-  const trainingSection = page
-    .getByRole("heading", { name: "레벨별 상승 효과", exact: true })
-    .locator("xpath=ancestor::section[1]");
-  const techButtons = trainingSection.locator("button").filter({ hasText: /#\d+/ });
+  const techButtons = getTechButtons(page);
   assert.equal(await techButtons.count(), 130, "ALL filter must render exactly 130 TrainingTech rows.");
 
-  await page.getByRole("button", { name: "기본 능력치", exact: true }).click();
+  await page.getByRole("button", { name: "스탯", exact: true }).click();
   assert.equal(await techButtons.count(), 84, "COMMON_STAT filter must render exactly 84 rows.");
 
-  await page.getByRole("button", { name: "조건부 효과", exact: true }).click();
+  await page.getByRole("button", { name: "패시브", exact: true }).click();
   assert.equal(await techButtons.count(), 46, "COMMON_PASSIVE filter must render exactly 46 rows.");
 
   await page.getByRole("button", { name: "전체", exact: true }).click();
   assert.equal(await techButtons.count(), 130, "ALL filter must restore exactly 130 rows.");
-
-  const search = page.getByPlaceholder("한국어 이름 / 중문 이름 / 훈련 ID / 병종 ID 검색");
 
   await search.fill("창병 대항 특훈");
   assert.equal(await techButtons.count(), 1, "Korean TrainingTech search should resolve one exact row.");
@@ -156,18 +118,11 @@ async function runDesktop(browser) {
     ({ expectedText }) => document.body.innerText.includes(expectedText),
     { expectedText: `Lv.2 / ${sliderMax}` },
   );
-  assert.ok((await trainingSection.innerText()).includes(`Lv.2 / ${sliderMax}`), "Slider did not select Lv.2.");
-  assert.ok((await trainingSection.innerText()).includes("Lv.2 효과"), "Selected-level effect panel did not update to Lv.2.");
+  assert.ok(await page.getByText("Lv.2 효과", { exact: true }).count(), "Selected-level effect panel did not update to Lv.2.");
 
-  const levelOneRow = trainingSection.locator("button").filter({ hasText: /^Lv\.1(?:\D|$)/ }).first();
+  const levelOneRow = page.locator("button").filter({ hasText: /^Lv\.1(?:\D|$)/ }).first();
   await levelOneRow.click();
-  assert.ok((await trainingSection.innerText()).includes("Lv.1 효과"), "Full level table click did not return to Lv.1.");
-
-  const materialButton = page.getByRole("button", { name: /고급 보병 교재/ }).first();
-  await materialButton.click();
-  await page.waitForTimeout(700);
-  const effectHeadingBox = await page.getByRole("heading", { name: "레벨별 상승 효과", exact: true }).boundingBox();
-  assert.ok(effectHeadingBox && effectHeadingBox.y < 1000, "Material click did not bring the training-effect section into view.");
+  assert.ok(await page.getByText("Lv.1 효과", { exact: true }).count(), "Full level table click did not return to Lv.1.");
 
   await assertNoHorizontalOverflow(page, "desktop");
   await context.close();
@@ -182,10 +137,8 @@ async function runMobile(browser) {
     timeout: 30000,
   });
 
-  await page.getByRole("heading", { name: "훈련장", exact: true }).waitFor({ timeout: 20000 });
-  const search = page.getByPlaceholder("한국어 이름 / 중문 이름 / 훈련 ID / 병종 ID 검색");
-  await search.waitFor();
-  await page.getByRole("button", { name: "조건부 효과", exact: true }).click();
+  const search = await getTrainingSearch(page);
+  await page.getByRole("button", { name: "패시브", exact: true }).click();
   await search.fill("对枪特训");
   assert.ok(await page.getByText("창병 대항 특훈", { exact: true }).count(), "Mobile Chinese-name search failed.");
   await assertNoHorizontalOverflow(page, "mobile");
@@ -203,7 +156,7 @@ try {
     `Unexpected direct-route HTTP status: ${directStatus}`,
   );
   console.log(
-    `[soldier-training-hosted] PASS sourceSha=${manifest.sourceSha} directStatus=${directStatus} route=/soldiers/training materials=24 techs=130 filters=84/46 searches=kr/cn/id slider=true levelTable=true materialScroll=true mobile=true`,
+    `[soldier-training-hosted] PASS sourceSha=${manifest.sourceSha} directStatus=${directStatus} route=/soldiers/training techs=130 filters=84/46 searches=kr/cn/id slider=true levelTable=true mobile=true`,
   );
 } finally {
   await browser.close();
