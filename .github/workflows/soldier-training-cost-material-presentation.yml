@@ -1,0 +1,25 @@
+name: Soldier Training Cost Material Presentation
+
+on:
+  pull_request:
+    paths:
+      - "data/generated/soldier-training-tech-level-costs.v1.json"
+      - "data/generated/soldier-training-material-iteminfo.v1.json"
+      - "data/presentation/soldier-training-material-name-kr.v1.json"
+      - "public/images/soldier-training-materials/**"
+      - "scripts/validate-soldier-training-cost-material-presentation.mjs"
+      - ".github/workflows/soldier-training-cost-material-presentation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate exact cost-material presentation coverage
+        run: node scripts/validate-soldier-training-cost-material-presentation.mjs
