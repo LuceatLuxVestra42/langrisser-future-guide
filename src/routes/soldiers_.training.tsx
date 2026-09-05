@@ -5,8 +5,10 @@ import { useMemo, useState } from "react";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getSoldierTrainingPageData } from "@/lib/soldier-training-page.functions";
 import type {
+  SoldierTrainingMaterial,
   SoldierTrainingTech,
   TrainingStatEffect,
+  TrainingTechLevel,
 } from "@/lib/soldier-training-page.server";
 
 export const Route = createFileRoute("/soldiers_/training")({
@@ -93,7 +95,7 @@ function resolveTrainingGroup(tech: SoldierTrainingTech) {
     );
   }
 
-  return matches[0];
+  return matches[0]!;
 }
 
 function SoldierTrainingPage() {
@@ -102,12 +104,16 @@ function SoldierTrainingPage() {
     () => data.techs.find((tech) => resolveTrainingGroup(tech).id === "INFANTRY")?.techId ?? data.techs[0]?.techId ?? 0,
   );
   const [level, setLevel] = useState(1);
-  const [kindFilter, setKindFilter] = useState<KindFilter>("ALL");
+  const [kindFilter, setKindFilter] = useState<KindFilter>("COMMON_STAT");
   const [trainingGroupFilter, setTrainingGroupFilter] = useState<TrainingGroupFilter>("INFANTRY");
 
   const trainingGroupByTechId = useMemo(
     () => new Map(data.techs.map((tech) => [tech.techId, resolveTrainingGroup(tech)] as const)),
     [data.techs],
+  );
+  const materialById = useMemo(
+    () => new Map(data.materials.map((material) => [material.itemId, material] as const)),
+    [data.materials],
   );
 
   const filteredTechs = useMemo(
@@ -134,6 +140,7 @@ function SoldierTrainingPage() {
     data.techs.find((tech) => tech.techId === selectedTechId) ?? filteredTechs[0] ?? data.techs[0];
   const selectedTrainingGroup = selectedTech ? trainingGroupByTechId.get(selectedTech.techId) : undefined;
   const safeLevel = selectedTech ? Math.min(Math.max(level, 1), selectedTech.maxLevel) : 1;
+  const selectedLevel = selectedTech?.levels[safeLevel - 1];
 
   function selectTech(tech: SoldierTrainingTech) {
     setSelectedTechId(tech.techId);
@@ -208,10 +215,6 @@ function SoldierTrainingPage() {
             <div className="max-h-[680px] overflow-y-auto rounded-xl border border-border bg-card p-2">
               {groupedFilteredTechs.map(({ group, techs }) => (
                 <section key={group.id} className="mb-3 last:mb-0">
-                  <div className="sticky top-0 z-10 mb-1 flex items-center justify-between rounded-md bg-muted px-3 py-2 text-xs font-black text-foreground">
-                    <span>{group.label}</span>
-                    <span className="text-[10px] font-bold text-muted-foreground">{techs.length}개</span>
-                  </div>
                   <TrainingTechGroupList
                     techs={techs}
                     selectedTechId={selectedTech?.techId}
@@ -253,6 +256,9 @@ function SoldierTrainingPage() {
                 <div className="mt-5 rounded-lg border border-border bg-background p-4">
                   <p className="text-xs font-bold text-muted-foreground">Lv.{safeLevel} 효과</p>
                   <LevelEffect tech={selectedTech} level={safeLevel} />
+                  {selectedLevel ? (
+                    <LevelCost level={selectedLevel} materialById={materialById} />
+                  ) : null}
                 </div>
 
                 <div className="mt-5">
@@ -268,8 +274,13 @@ function SoldierTrainingPage() {
                         }`}
                       >
                         <span className="font-black text-foreground">Lv.{row.level}</span>
-                        <span className="leading-5 text-muted-foreground">
-                          {row.statEffects ? formatStatEffects(row.statEffects) : stripColorTags(row.passiveDescriptionKr ?? "-")}
+                        <span className="min-w-0 leading-5 text-muted-foreground">
+                          <span className="block">
+                            {row.statEffects ? formatStatEffects(row.statEffects) : stripColorTags(row.passiveDescriptionKr ?? "-")}
+                          </span>
+                          <span className="mt-1 block text-[10px] font-semibold text-muted-foreground/80">
+                            강화 비용 · 골드 {formatNumber(row.goldCost)} · 재료 {row.materialCosts.length}종
+                          </span>
                         </span>
                       </button>
                     ))}
@@ -350,7 +361,7 @@ function TrainingTechGroupList({
       ) : null}
 
       {ultimateStatTechs.length > 0 ? (
-        <div className={statRows.length > 0 || ungroupedStatTechs.length > 0 ? "mt-2 border-t border-border pt-2" : ""}>
+        <div>
           <div className="grid grid-cols-3 gap-1.5">
             {ultimateStatTechs.map((tech) => (
               <TrainingTechButton
@@ -425,11 +436,13 @@ function TrainingTechButton({
           <span className="truncate text-sm font-bold">{tech.nameKr}</span>
         </div>
       </div>
-      <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
-        <span>{getPresentationKind(tech) === "COMMON_STAT" ? "기본 능력치" : "조건부 효과"}</span>
-        <span>Lv.{tech.maxLevel}</span>
-        <span>{groupLabel}</span>
-      </div>
+      {getPresentationKind(tech) === "COMMON_PASSIVE" ? null : (
+        <div className="mt-1 flex items-center gap-2 text-[10px] opacity-70">
+          <span>기본 능력치</span>
+          <span>Lv.{tech.maxLevel}</span>
+          <span>{groupLabel}</span>
+        </div>
+      )}
     </button>
   );
 }
@@ -497,6 +510,57 @@ function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number
   );
 }
 
+function LevelCost({
+  level,
+  materialById,
+}: {
+  level: TrainingTechLevel;
+  materialById: Map<number, SoldierTrainingMaterial>;
+}) {
+  const unresolvedMaterialIds = level.materialCosts
+    .filter((material) => !materialById.has(material.id))
+    .map((material) => material.id);
+
+  return (
+    <div className="mt-4 border-t border-border pt-4">
+      <p className="text-xs font-bold text-muted-foreground">Lv.{level.level} 강화 비용</p>
+      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+        <span className="rounded-md border border-border bg-card px-2.5 py-1.5 font-bold text-foreground">
+          골드 {formatNumber(level.goldCost)}
+        </span>
+        {level.materialCosts.map((material) => {
+          const display = materialById.get(material.id);
+          return (
+            <span
+              key={`${material.goodsType}-${material.id}`}
+              className="inline-flex min-w-0 items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1.5 text-foreground"
+              title={display ? display.nameKr : `재료 ID ${material.id}`}
+            >
+              {display ? (
+                <img
+                  src={display.imageUrl}
+                  alt=""
+                  className="h-5 w-5 shrink-0 object-contain"
+                  aria-hidden="true"
+                />
+              ) : null}
+              <span className="max-w-40 truncate font-semibold">
+                {display?.nameKr ?? `재료 ID ${material.id}`}
+              </span>
+              <span className="font-black">×{formatNumber(material.count)}</span>
+            </span>
+          );
+        })}
+      </div>
+      {unresolvedMaterialIds.length > 0 ? (
+        <p className="mt-2 text-[10px] leading-4 text-muted-foreground">
+          한글명·아이콘이 아직 현재 presentation source에 없는 재료는 검증된 재료 ID로 표시해.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function formatEffectValue(effect: TrainingStatEffect) {
   return `+${effect.value}${effect.unit === "PERCENT" ? "%" : ""}`;
 }
@@ -510,6 +574,10 @@ function formatStatEffects(effects: TrainingStatEffect[]) {
   return effects
     .map((effect) => `${STAT_LABELS[effect.statKey]} ${formatEffectValue(effect)}`)
     .join(" · ");
+}
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("ko-KR").format(value);
 }
 
 function stripColorTags(value: string) {

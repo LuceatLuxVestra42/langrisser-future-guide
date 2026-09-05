@@ -1,0 +1,79 @@
+name: Soldier TrainingTech Level Costs Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
+      - 'data/generated/soldier-training-tech-classification-stage1-census.v1.json'
+      - 'data/generated/soldier-training-tech-common-stat-effect-extraction.v1.json'
+      - 'data/generated/soldier-training-tech-common-passive-effect-extraction.v1.json'
+      - 'data/generated/soldier-training-tech-level-costs.v1.json'
+      - 'data/validation/soldier-training-tech-level-costs.v1.json'
+      - 'scripts/build-soldier-training-tech-level-costs.mjs'
+      - 'scripts/validate-soldier-training-tech-level-costs.mjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
+      - '.github/workflows/soldier-training-tech-level-costs-materialize.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
+      - 'data/generated/soldier-training-tech-classification-stage1-census.v1.json'
+      - 'data/generated/soldier-training-tech-common-stat-effect-extraction.v1.json'
+      - 'data/generated/soldier-training-tech-common-passive-effect-extraction.v1.json'
+      - 'data/generated/soldier-training-tech-level-costs.v1.json'
+      - 'data/validation/soldier-training-tech-level-costs.v1.json'
+      - 'scripts/build-soldier-training-tech-level-costs.mjs'
+      - 'scripts/validate-soldier-training-tech-level-costs.mjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
+      - '.github/workflows/soldier-training-tech-level-costs-materialize.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Configure external ConfigData source root
+        shell: bash
+        run: echo "CONFIGDATA_SOURCE_ROOT=$RUNNER_TEMP/soldier-training-level-cost-source" >> "$GITHUB_ENV"
+
+      - name: Hydrate and verify pinned ConfigData source pack outside repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$CONFIGDATA_SOURCE_ROOT"
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$CONFIGDATA_SOURCE_ROOT"
+          count="$(find "$CONFIGDATA_SOURCE_ROOT/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$count" = "753"
+          case "$CONFIGDATA_SOURCE_ROOT/" in
+            "$GITHUB_WORKSPACE/"*) echo 'external ConfigData source root must stay outside repository' >&2; exit 1 ;;
+          esac
+
+      - name: Rebuild exact TrainingTech level costs from current authority
+        run: node scripts/build-soldier-training-tech-level-costs.mjs
+
+      - name: Independently revalidate exact source parity
+        run: node scripts/validate-soldier-training-tech-level-costs.mjs --write
+
+      - name: Require frozen artifacts to be exactly current
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code -- data/generated/soldier-training-tech-level-costs.v1.json data/validation/soldier-training-tech-level-costs.v1.json
+          test -z "$(git status --porcelain --untracked-files=no)"

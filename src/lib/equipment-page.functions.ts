@@ -197,7 +197,18 @@ export async function getEquipmentDetailPageData({
 
     return {
       ...pageData,
-      presentation,
+      presentation: {
+        ...presentation,
+        sections: {
+          ...presentation.sections,
+          effect: {
+            ...presentation.sections.effect,
+            effectName: pageData.detail.effect.effectName,
+            effectText: pageData.detail.effect.effectText,
+            effectSegments: pageData.detail.effect.effectSegments,
+          },
+        },
+      },
     } satisfies ExclusiveEquipmentDetailRouteData;
   }
 

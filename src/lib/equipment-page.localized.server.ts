@@ -7,6 +7,7 @@ import {
   resolveEquipmentDisplayCollection,
 } from "./equipment-display-collection";
 import type { EquipmentDisplayCollection } from "./equipment-display-collection";
+import { localizeEquipmentEffectDescription } from "./equipment-effect-description-kr.server";
 import {
   readEquipmentDetailPageData as readBaseEquipmentDetailPageData,
   readExclusiveEquipmentPageData as readBaseExclusiveEquipmentPageData,
@@ -402,6 +403,7 @@ export function readEquipmentDetailPageData(
           ...identity,
           nameKr,
         },
+        effect: localizeEquipmentEffectDescription(equipmentId, data.detail.effect),
         classification: {
           ...data.detail.classification,
           technicalSiteTab,
@@ -430,6 +432,7 @@ export function readEquipmentDetailPageData(
         ...identity,
         nameKr,
       },
+      effect: localizeEquipmentEffectDescription(equipmentId, data.detail.effect),
     },
   };
   return localized;

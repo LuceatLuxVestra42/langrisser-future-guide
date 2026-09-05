@@ -1,6 +1,7 @@
 import trainingTechStage1Json from "../../data/generated/soldier-training-tech-classification-stage1-census.v1.json";
 import commonStatJson from "../../data/generated/soldier-training-tech-common-stat-effect-extraction.v1.json";
 import commonPassiveJson from "../../data/generated/soldier-training-tech-common-passive-effect-extraction.v1.json";
+import trainingTechLevelCostsJson from "../../data/generated/soldier-training-tech-level-costs.v1.json";
 import trainingMaterialItemInfoJson from "../../data/generated/soldier-training-material-iteminfo.v1.json";
 import trainingLocalizationJson from "../../data/presentation/soldier-training-localization-frozen.v1.json";
 import trainingMaterialNameKrJson from "../../data/presentation/soldier-training-material-name-kr.v1.json";
@@ -13,12 +14,20 @@ export type TrainingStatEffect = {
   value: number;
 };
 
+export type TrainingTechLevelMaterialCost = {
+  goodsType: number;
+  id: number;
+  count: number;
+};
+
 export type TrainingTechNameStatus = "project-display-confirmed" | "provisional-display";
 
 export type TrainingTechLevel = {
   level: number;
   statEffects: TrainingStatEffect[] | null;
   passiveDescriptionKr: string | null;
+  goldCost: number;
+  materialCosts: TrainingTechLevelMaterialCost[];
 };
 
 export type SoldierTrainingTech = {
@@ -104,6 +113,30 @@ type CommonPassiveSource = {
     techId: number;
     templateRichTextRaw: string;
     parameterSequenceId: string;
+  }>;
+};
+
+type TrainingTechLevelCostSource = {
+  status: string;
+  completion: string;
+  freezeState: string;
+  coverage: {
+    targetTechCount: number;
+    commonStatTechCount: number;
+    commonPassiveTechCount: number;
+    referencedLevelRowCount: number;
+    uniqueReferencedLevelRowCount: number;
+    unresolvedLevelReferenceCount: number;
+  };
+  records: Array<{
+    techId: number;
+    kind: "COMMON_STAT" | "COMMON_PASSIVE";
+    levels: Array<{
+      level: number;
+      trainingTechLevelInfoId: number;
+      goldCost: number;
+      materials: TrainingTechLevelMaterialCost[];
+    }>;
   }>;
 };
 
@@ -209,6 +242,7 @@ const SEMANTIC_VALUE_PATHS = [
 const stage1 = trainingTechStage1Json as unknown as Stage1Source;
 const commonStat = commonStatJson as unknown as CommonStatSource;
 const commonPassive = commonPassiveJson as unknown as CommonPassiveSource;
+const trainingTechLevelCosts = trainingTechLevelCostsJson as unknown as TrainingTechLevelCostSource;
 const trainingMaterials = trainingMaterialItemInfoJson as unknown as TrainingMaterialSource;
 const trainingLocalization = trainingLocalizationJson as unknown as TrainingLocalizationAdmission;
 const materialNamesKr = trainingMaterialNameKrJson as unknown as TrainingMaterialNameKrSource;
@@ -232,6 +266,19 @@ function requireFrozenSources() {
     commonPassive.coverage.targetTechCount !== 46
   ) {
     throw new Error("COMMON_PASSIVE TrainingTech extraction is not frozen as expected.");
+  }
+  if (
+    trainingTechLevelCosts.status !== "PASS" ||
+    trainingTechLevelCosts.completion !== "COMPLETE" ||
+    trainingTechLevelCosts.freezeState !== "SOLDIER_TRAINING_TECH_LEVEL_COSTS_FROZEN" ||
+    trainingTechLevelCosts.coverage.targetTechCount !== 130 ||
+    trainingTechLevelCosts.coverage.commonStatTechCount !== 84 ||
+    trainingTechLevelCosts.coverage.commonPassiveTechCount !== 46 ||
+    trainingTechLevelCosts.coverage.referencedLevelRowCount !== 1510 ||
+    trainingTechLevelCosts.coverage.uniqueReferencedLevelRowCount !== 1510 ||
+    trainingTechLevelCosts.coverage.unresolvedLevelReferenceCount !== 0
+  ) {
+    throw new Error("TrainingTech level-cost projection is not frozen as expected.");
   }
   if (trainingMaterials.status !== "PASS" || trainingMaterials.summary.targetItemIdCount !== 24) {
     throw new Error("Soldier training material source is not complete.");
@@ -341,24 +388,54 @@ function reconstructPassiveDescription(template: string, formats: string[], valu
   }, template);
 }
 
+function readLevelCost(
+  costRecord: TrainingTechLevelCostSource["records"][number],
+  explicitLevelReferences: number[],
+  index: number,
+) {
+  const costLevel = costRecord.levels[index];
+  const expectedLevelInfoId = explicitLevelReferences[index];
+  if (
+    !costLevel ||
+    expectedLevelInfoId === undefined ||
+    costLevel.level !== index + 1 ||
+    costLevel.trainingTechLevelInfoId !== expectedLevelInfoId
+  ) {
+    throw new Error(`TrainingTech level-cost parity mismatch for Tech ${costRecord.techId} Lv.${index + 1}.`);
+  }
+  return {
+    goldCost: costLevel.goldCost,
+    materialCosts: costLevel.materials.map((material) => ({ ...material })),
+  };
+}
+
 export function readSoldierTrainingPageData(): SoldierTrainingPageData {
   requireFrozenSources();
 
   const stage1ById = new Map(stage1.records.map((record) => [record.id, record]));
+  const levelCostByTechId = uniqueIndex(trainingTechLevelCosts.records, "techId", "Tech level cost");
   const materialNameById = uniqueIndex(materialNamesKr.records, "itemId", "material presentation");
   const techNameById = uniqueIndex(techNamesKr.records, "techId", "Tech presentation");
   const passiveTemplateById = uniqueIndex(passiveTemplatesKr.records, "techId", "passive presentation");
   const techs: SoldierTrainingTech[] = [];
 
+  if (levelCostByTechId.size !== 130) {
+    throw new Error("TrainingTech level-cost projection must contain exactly 130 Tech IDs.");
+  }
+
   for (const sequence of commonStat.valueSequenceCatalog) {
     for (const techId of sequence.techIds) {
       const record = stage1ById.get(techId);
+      const costRecord = levelCostByTechId.get(techId);
       const display = techNameById.get(techId);
       const shape = commonStat.effectSemantics.effectShapeCatalog.find((entry) =>
         entry.techIds.includes(techId),
       );
-      if (!record || !display || !shape) {
-        throw new Error(`Missing frozen COMMON_STAT locator/presentation for Tech ${techId}.`);
+      if (!record || !costRecord || !display || !shape) {
+        throw new Error(`Missing frozen COMMON_STAT locator/cost/presentation for Tech ${techId}.`);
+      }
+      if (costRecord.kind !== "COMMON_STAT" || costRecord.levels.length !== sequence.levelCount) {
+        throw new Error(`COMMON_STAT level-cost shape mismatch for Tech ${techId}.`);
       }
       if (display.kind !== "COMMON_STAT" || display.nameCn !== record.raw.Name) {
         throw new Error(`COMMON_STAT Korean presentation parity mismatch for Tech ${techId}.`);
@@ -389,6 +466,7 @@ export function readSoldierTrainingPageData(): SoldierTrainingPageData {
             };
           }),
           passiveDescriptionKr: null,
+          ...readLevelCost(costRecord, record.explicitLevelReferences, index),
         })),
       });
     }
@@ -396,6 +474,7 @@ export function readSoldierTrainingPageData(): SoldierTrainingPageData {
 
   for (const passiveRecord of commonPassive.records) {
     const record = stage1ById.get(passiveRecord.techId);
+    const costRecord = levelCostByTechId.get(passiveRecord.techId);
     const display = techNameById.get(passiveRecord.techId);
     const passiveDisplay = passiveTemplateById.get(passiveRecord.techId);
     const sequence = commonPassive.parameterSequenceCatalog.find(
@@ -403,12 +482,19 @@ export function readSoldierTrainingPageData(): SoldierTrainingPageData {
     );
     if (
       !record ||
+      !costRecord ||
       !display ||
       !passiveDisplay ||
       !sequence ||
       !sequence.techIds.includes(passiveRecord.techId)
     ) {
-      throw new Error(`Missing frozen COMMON_PASSIVE locator/presentation for Tech ${passiveRecord.techId}.`);
+      throw new Error(`Missing frozen COMMON_PASSIVE locator/cost/presentation for Tech ${passiveRecord.techId}.`);
+    }
+    if (
+      costRecord.kind !== "COMMON_PASSIVE" ||
+      costRecord.levels.length !== sequence.levelValueRows.length
+    ) {
+      throw new Error(`COMMON_PASSIVE level-cost shape mismatch for Tech ${passiveRecord.techId}.`);
     }
     if (
       display.kind !== "COMMON_PASSIVE" ||
@@ -439,6 +525,7 @@ export function readSoldierTrainingPageData(): SoldierTrainingPageData {
           sequence.tokenFormats,
           values,
         ),
+        ...readLevelCost(costRecord, record.explicitLevelReferences, index),
       })),
     });
   }
