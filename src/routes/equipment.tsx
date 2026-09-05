@@ -19,7 +19,7 @@ export const Route = createFileRoute("/equipment")({
   component: EquipmentGeneralListPage,
 });
 
-type EquipmentSortMode = "default" | "name" | "id";
+type EquipmentSortMode = "release" | "name";
 
 type EquipmentListUiState = {
   group: string | null;
@@ -34,17 +34,16 @@ const DEFAULT_UI_STATE: EquipmentListUiState = {
   group: null,
   subtype: null,
   query: "",
-  sort: "default",
+  sort: "release",
 };
 
 const SORT_LABELS: Record<EquipmentSortMode, string> = {
-  default: "기본 표시순",
+  release: "출시순",
   name: "이름순",
-  id: "장비 ID순",
 };
 
 function isEquipmentSortMode(value: unknown): value is EquipmentSortMode {
-  return value === "default" || value === "name" || value === "id";
+  return value === "release" || value === "name";
 }
 
 function EquipmentGeneralListPage() {
@@ -123,22 +122,12 @@ function EquipmentGeneralListPage() {
         const rightName = right.nameKr ?? right.nameCn;
         return (
           leftName.localeCompare(rightName, "ko", { numeric: true, sensitivity: "base" }) ||
-          left.equipmentId - right.equipmentId
+          right.equipmentId - left.equipmentId
         );
       });
     }
 
-    if (uiState.sort === "id") {
-      return records.sort((left, right) => left.equipmentId - right.equipmentId);
-    }
-
-    return records.sort(
-      (left, right) =>
-        left.groupOrder - right.groupOrder ||
-        left.subtypeOrder - right.subtypeOrder ||
-        left.sortIndex - right.sortIndex ||
-        left.equipmentId - right.equipmentId,
-    );
+    return records.sort((left, right) => right.equipmentId - left.equipmentId);
   }, [data.records, uiState]);
 
   const selectGroup = (group: string) => {
@@ -166,7 +155,7 @@ function EquipmentGeneralListPage() {
       group: null,
       subtype: null,
       query: "",
-      sort: "default",
+      sort: "release",
     }));
   };
 
@@ -245,9 +234,8 @@ function EquipmentGeneralListPage() {
                   }
                   className="h-full min-w-0 flex-1 appearance-none bg-transparent px-2 pr-8 text-sm font-medium text-foreground outline-none"
                 >
-                  <option value="default">{SORT_LABELS.default}</option>
+                  <option value="release">{SORT_LABELS.release}</option>
                   <option value="name">{SORT_LABELS.name}</option>
-                  <option value="id">{SORT_LABELS.id}</option>
                 </select>
                 <ChevronRight
                   size={14}
