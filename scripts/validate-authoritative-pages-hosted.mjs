@@ -63,6 +63,14 @@ const hero6FullartIds = fullartRecords.filter((record) => record.heroId === 6).m
 check(JSON.stringify(hero6FullartIds) === JSON.stringify(hero6SkinIds), `Hero 6 fullart admission mismatch: ${JSON.stringify(hero6FullartIds)}`);
 for (const skinId of hero6FullartIds) await fetchWithRetry(`images/skin-fullart/${skinId}.webp`);
 const hero6VisualCount = hero6FullartIds.length + 1;
+const hero6SkinPresentationLabels = new Map([
+  [601, "스킨 상점 · 스킨권 구매"],
+  [602, "빛의 메아리 보상"],
+  [603, "형귀뽑기 보상"],
+  [604, "서밋 아레나 패자 스킨 · 스킨권 구매"],
+  [605, "빛의 메아리 보상"],
+  [606, "7주년 출석체크 보상"],
+]);
 
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -85,9 +93,11 @@ try {
   check(await hero6Next.count() === 1 && await hero6Prev.count() === 1, "Hero 6 artwork controls missing or duplicated");
   for (let index = 0; index < hero6FullartIds.length; index += 1) {
     const skinId = hero6FullartIds[index];
+    const expectedLabel = hero6SkinPresentationLabels.get(skinId);
+    check(expectedLabel, `Hero 6 Skin ${skinId} presentation label is not registered`);
     await hero6Next.click();
     await page.waitForTimeout(100);
-    await page.getByText(`스킨 ${index + 1} · ID ${skinId}`, { exact: true }).waitFor();
+    await page.getByText(expectedLabel, { exact: true }).waitFor();
     const image = page.locator(`img[src*="/images/skin-fullart/${skinId}.webp"]`);
     check(await image.count() === 1, `Hero 6 fullart Skin ${skinId} image missing or duplicated`);
     const imageState = await image.evaluate((node) => ({ complete: node.complete, naturalWidth: node.naturalWidth, naturalHeight: node.naturalHeight, objectFit: getComputedStyle(node).objectFit }));
@@ -160,8 +170,11 @@ try {
     const mobileNext = mobilePage.getByRole("button", { name: "다음 일러스트" });
     await mobileNext.click();
     await mobilePage.waitForTimeout(100);
-    await mobilePage.getByText(`스킨 1 · ID ${hero6FullartIds[0]}`, { exact: true }).waitFor();
-    const mobileFullart = mobilePage.locator(`img[src*="/images/skin-fullart/${hero6FullartIds[0]}.webp"]`);
+    const firstSkinId = hero6FullartIds[0];
+    const firstSkinLabel = hero6SkinPresentationLabels.get(firstSkinId);
+    check(firstSkinLabel, `Hero 6 Skin ${firstSkinId} presentation label is not registered`);
+    await mobilePage.getByText(firstSkinLabel, { exact: true }).waitFor();
+    const mobileFullart = mobilePage.locator(`img[src*="/images/skin-fullart/${firstSkinId}.webp"]`);
     check(await mobileFullart.count() === 1, "Hero 6 mobile first fullart Skin missing or duplicated");
     const mobileFullartState = await mobileFullart.evaluate((node) => ({ complete: node.complete, naturalWidth: node.naturalWidth, naturalHeight: node.naturalHeight, objectFit: getComputedStyle(node).objectFit }));
     check(mobileFullartState.complete && mobileFullartState.naturalWidth > 0 && mobileFullartState.naturalHeight > 0, "Hero 6 mobile first fullart Skin did not load");
