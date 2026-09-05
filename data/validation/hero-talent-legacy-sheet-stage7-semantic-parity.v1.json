@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "stage": "hero-talent-localization-stage7",
+  "schemaId": "hero-talent-legacy-sheet-semantic-parity/v1",
+  "status": "PASS_WITH_BLOCKER",
+  "completion": "COMPLETE",
+  "scope": "presentation-localization-semantic-parity-guard",
+  "predecessor": {
+    "path": "data/validation/hero-talent-legacy-sheet-stage6-identity-completeness.v1.json",
+    "commit": "9a9ff6957d47c62762c33d96dc4926fc4b113bf9",
+    "status": "BLOCKER",
+    "confirmedHeroCount": 3,
+    "identityPendingCount": 248
+  },
+  "heroAuthority": {
+    "ref": "9a9ff6957d47c62762c33d96dc4926fc4b113bf9",
+    "finalSource": "data/validation/hero-stage6-4-final.v1.json",
+    "pipelineStatus": "FINAL_FROZEN",
+    "canonicalHeroCount": 267,
+    "heroShardCount": 267,
+    "siteUsableHeroCount": 267,
+    "hardErrorCount": 0,
+    "manifestBlobSha": "f7926eb3cfc552443b03b0cd6795524215e34b66"
+  },
+  "semanticInvariants": {
+    "canonicalHeroCountMustRemain": 267,
+    "heroIdMutationAllowed": false,
+    "skillIdMutationAllowed": false,
+    "starProgressionMutationAllowed": false,
+    "talentSelectionRuleMutationAllowed": false,
+    "canonicalRelationMutationAllowed": false,
+    "rawConfigDataRejoinAllowed": false,
+    "nameJoinAllowed": false,
+    "idArithmeticAllowed": false,
+    "presentationTextSubstitutionAllowed": true,
+    "presentationTextSubstitutionKeys": [
+      "exact canonical heroId",
+      "exact frozen talent skillId",
+      "exact star"
+    ]
+  },
+  "confirmedParityRecords": [
+    {
+      "heroId": 6,
+      "shardPath": "data/generated/hero-detail/by-id/6.json",
+      "shardBlobSha": "5a2b251f505c74208ccc813fc84d090a7622d22b",
+      "initialStar": 3,
+      "selectionRule": "TalentSkill_IDs[star - 1]",
+      "talentRows": [
+        { "star": 3, "skillId": 3067 },
+        { "star": 4, "skillId": 3072 },
+        { "star": 5, "skillId": 3077 },
+        { "star": 6, "skillId": 3082 }
+      ],
+      "allowedPresentation": {
+        "talentNameKr": "전설의 기사",
+        "starDescriptionKr": true
+      },
+      "semanticParity": "PASS"
+    },
+    {
+      "heroId": 8,
+      "shardPath": "data/generated/hero-detail/by-id/8.json",
+      "shardBlobSha": "33d8f8c7aa6189d6966ad28f20eb558ff5cb2388",
+      "initialStar": 3,
+      "selectionRule": "TalentSkill_IDs[star - 1]",
+      "talentRows": [
+        { "star": 3, "skillId": 3196 },
+        { "star": 4, "skillId": 3197 },
+        { "star": 5, "skillId": 3198 },
+        { "star": 6, "skillId": 3199 }
+      ],
+      "allowedPresentation": {
+        "talentNameKr": "마력 강화",
+        "starDescriptionKr": true
+      },
+      "semanticParity": "PASS"
+    },
+    {
+      "heroId": 9,
+      "shardPath": "data/generated/hero-detail/by-id/9.json",
+      "shardBlobSha": "1453e081b633c77c3494874a40da4d0b88177a51",
+      "initialStar": 3,
+      "selectionRule": "TalentSkill_IDs[star - 1]",
+      "talentRows": [
+        { "star": 3, "skillId": 3200 },
+        { "star": 4, "skillId": 3201 },
+        { "star": 5, "skillId": 3202 },
+        { "star": 6, "skillId": 3203 }
+      ],
+      "allowedPresentation": {
+        "talentNameKr": "천년의 사념",
+        "starDescriptionKr": true
+      },
+      "semanticParity": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "name": "hero-authority-remains-final-frozen",
+      "pass": true,
+      "detail": "Hero Stage 6-4 remains FINAL_FROZEN with canonicalHeroCount=267 and hardErrorCount=0."
+    },
+    {
+      "name": "confirmed-hero-identity-exact",
+      "pass": true,
+      "detail": "Only canonical HeroID 6/8/9 are admitted by Stage 6 existing project provenance."
+    },
+    {
+      "name": "confirmed-talent-star-skillid-parity",
+      "pass": true,
+      "detail": "Hero 6/8/9 exact 3/4/5/6-star Skill IDs are frozen and recorded without recomputation."
+    },
+    {
+      "name": "presentation-only-boundary",
+      "pass": true,
+      "detail": "Korean TalentName and star descriptions may be overlaid only after exact HeroID + SkillID + star lookup; canonical identity/relation/population and frozen star progression are immutable."
+    },
+    {
+      "name": "stage6-identity-blocker-preserved",
+      "pass": true,
+      "detail": "248 legacy source groups remain unadmitted until explicit reviewed source-to-HeroID provenance exists."
+    }
+  ],
+  "inheritedBlockers": [
+    {
+      "code": "LEGACY_SHEET_CANONICAL_HERO_ID_PROVENANCE_MISSING",
+      "count": 248,
+      "owner": "localization/source-identity-validation",
+      "blockingFullPopulationAdmission": true,
+      "blocksConfirmedThreeHeroSemanticParityClosure": false
+    }
+  ],
+  "decision": "Stage 7 semantic parity protection is COMPLETE for the three Stage 6-confirmed Heroes. Their canonical Hero IDs, frozen talent Skill IDs, star progression, selection rule, and Hero population remain immutable; only Korean TalentName/star-description presentation substitution is admissible. Full-population localization admission remains blocked for the other 248 legacy source groups pending explicit reviewed source-to-HeroID provenance.",
+  "nextStartPoint": "presentation/localization overlay design for Hero 6/8/9 using exact HeroID + frozen SkillID + star keys, while separately resolving the 248-source identity provenance blocker."
+}

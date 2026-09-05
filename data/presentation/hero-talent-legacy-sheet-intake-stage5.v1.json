@@ -1,0 +1,1827 @@
+{
+  "version": 1,
+  "stage": "hero-talent-localization-stage5",
+  "schemaId": "hero-talent-legacy-sheet-intake/v1",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "scope": "legacy-korean-sheet-public-hero-talent-source-intake",
+  "authorityBoundary": {
+    "semanticMutation": false,
+    "heroIdAssignment": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "presentationOnly": true,
+    "nextOwner": "hero-talent-localization-stage6-identity-and-completeness"
+  },
+  "source": {
+    "repository": "redpanda7301/langrisser",
+    "ref": "gh-pages",
+    "commitSha": "a85bba49dcf073563e7366dc18e96b7ba67c2ae3",
+    "heroListPath": "hero.html",
+    "heroListBlobSha": "9263d44258c3ea482efb9d753282191e7bbadea0",
+    "detailLoaderPath": "assets/js/hero-details.js",
+    "detailLoaderBlobSha": "536f8bcbb1390c0c18aca6bc44241a9a67ad00b3",
+    "detailSourceRule": "../hero/data/<name>.js",
+    "talentNameRule": "data[0].Talent[0].TalentName",
+    "talentStarDescriptionRule": {
+      "3": "data[0].Talent[0].Abilities[2].Desc",
+      "4": "data[0].Talent[0].Abilities[3].Desc",
+      "5": "data[0].Talent[0].Abilities[4].Desc",
+      "6": "data[0].Talent[0].Abilities[5].Desc"
+    }
+  },
+  "collectionPolicy": {
+    "populationAuthority": "public hero.html card entries at pinned source commit",
+    "sourcePathAuthority": "exact hero.html name query consumed by hero-details.js",
+    "collapseOnly": {
+      "sourceKey": "매튜",
+      "reason": "Four public Matthew class cards share the same canonical character and identical normal TalentName/Abilities payload in all four checked source files.",
+      "cardQueryNames": [
+        "매튜기병",
+        "매튜비병",
+        "매튜궁병",
+        "매튜암살자"
+      ]
+    },
+    "doNotInferCanonicalIdentityUntilStage6": true,
+    "doNotPromoteLocalizationUntilStage6": true
+  },
+  "summary": {
+    "publicCardCount": 254,
+    "collectedSourceGroupCount": 251,
+    "singleSourceGroupCount": 250,
+    "multiVariantSourceGroupCount": 1,
+    "matthewVariantSourceCount": 4,
+    "pendingStage6IdentityValidationCount": 251,
+    "hardErrorCount": 0
+  },
+  "records": [
+    {
+      "sourceKey": "매튜",
+      "cardQueryNames": [
+        "매튜기병",
+        "매튜비병",
+        "매튜궁병",
+        "매튜암살자"
+      ],
+      "sourcePaths": [
+        "hero/data/매튜기병.js",
+        "hero/data/매튜비병.js",
+        "hero/data/매튜궁병.js",
+        "hero/data/매튜암살자.js"
+      ],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아멜다",
+      "cardQueryNames": ["아멜다"],
+      "sourcePaths": ["hero/data/아멜다.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "그레니어",
+      "cardQueryNames": ["그레니어"],
+      "sourcePaths": ["hero/data/그레니어.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아론",
+      "cardQueryNames": ["아론"],
+      "sourcePaths": ["hero/data/아론.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "안나",
+      "cardQueryNames": ["안나"],
+      "sourcePaths": ["hero/data/안나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "디오스",
+      "cardQueryNames": ["디오스"],
+      "sourcePaths": ["hero/data/디오스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "키스",
+      "cardQueryNames": ["키스"],
+      "sourcePaths": ["hero/data/키스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "제시카",
+      "cardQueryNames": ["제시카"],
+      "sourcePaths": ["hero/data/제시카.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "스코트",
+      "cardQueryNames": ["스코트"],
+      "sourcePaths": ["hero/data/스코트.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "로우가",
+      "cardQueryNames": ["로우가"],
+      "sourcePaths": ["hero/data/로우가.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "루인",
+      "cardQueryNames": ["루인"],
+      "sourcePaths": ["hero/data/루인.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레아드",
+      "cardQueryNames": ["레아드"],
+      "sourcePaths": ["hero/data/레아드.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "피엘",
+      "cardQueryNames": ["피엘"],
+      "sourcePaths": ["hero/data/피엘.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레티시아",
+      "cardQueryNames": ["레티시아"],
+      "sourcePaths": ["hero/data/레티시아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레스터",
+      "cardQueryNames": ["레스터"],
+      "sourcePaths": ["hero/data/레스터.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "소피아",
+      "cardQueryNames": ["소피아"],
+      "sourcePaths": ["hero/data/소피아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "페라키아",
+      "cardQueryNames": ["페라키아"],
+      "sourcePaths": ["hero/data/페라키아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "프레아",
+      "cardQueryNames": ["프레아"],
+      "sourcePaths": ["hero/data/프레아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "발가스",
+      "cardQueryNames": ["발가스"],
+      "sourcePaths": ["hero/data/발가스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "파나",
+      "cardQueryNames": ["파나"],
+      "sourcePaths": ["hero/data/파나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "나암",
+      "cardQueryNames": ["나암"],
+      "sourcePaths": ["hero/data/나암.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "크리스",
+      "cardQueryNames": ["크리스"],
+      "sourcePaths": ["hero/data/크리스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "키리카제",
+      "cardQueryNames": ["키리카제"],
+      "sourcePaths": ["hero/data/키리카제.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "실버울프",
+      "cardQueryNames": ["실버울프"],
+      "sourcePaths": ["hero/data/실버울프.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "소니아",
+      "cardQueryNames": ["소니아"],
+      "sourcePaths": ["hero/data/소니아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "에마링크",
+      "cardQueryNames": ["에마링크"],
+      "sourcePaths": ["hero/data/에마링크.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "이멜다",
+      "cardQueryNames": ["이멜다"],
+      "sourcePaths": ["hero/data/이멜다.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "리파니",
+      "cardQueryNames": ["리파니"],
+      "sourcePaths": ["hero/data/리파니.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "에그베르트",
+      "cardQueryNames": ["에그베르트"],
+      "sourcePaths": ["hero/data/에그베르트.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "헤인",
+      "cardQueryNames": ["헤인"],
+      "sourcePaths": ["hero/data/헤인.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "란스",
+      "cardQueryNames": ["란스"],
+      "sourcePaths": ["hero/data/란스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "보젤",
+      "cardQueryNames": ["보젤"],
+      "sourcePaths": ["hero/data/보젤.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레딘",
+      "cardQueryNames": ["레딘"],
+      "sourcePaths": ["hero/data/레딘.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레온",
+      "cardQueryNames": ["레온"],
+      "sourcePaths": ["hero/data/레온.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "베른하르트",
+      "cardQueryNames": ["베른하르트"],
+      "sourcePaths": ["hero/data/베른하르트.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "라나",
+      "cardQueryNames": ["라나"],
+      "sourcePaths": ["hero/data/라나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "엘윈",
+      "cardQueryNames": ["엘윈"],
+      "sourcePaths": ["hero/data/엘윈.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "쉐리",
+      "cardQueryNames": ["쉐리"],
+      "sourcePaths": ["hero/data/쉐리.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "리아나",
+      "cardQueryNames": ["리아나"],
+      "sourcePaths": ["hero/data/리아나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "알테뮬러",
+      "cardQueryNames": ["알테뮬러"],
+      "sourcePaths": ["hero/data/알테뮬러.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "루나",
+      "cardQueryNames": ["루나"],
+      "sourcePaths": ["hero/data/루나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "디하르트",
+      "cardQueryNames": ["디하르트"],
+      "sourcePaths": ["hero/data/디하르트.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "티아리스",
+      "cardQueryNames": ["티아리스"],
+      "sourcePaths": ["hero/data/티아리스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "쥬그라",
+      "cardQueryNames": ["쥬그라"],
+      "sourcePaths": ["hero/data/쥬그라.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "젤다",
+      "cardQueryNames": ["젤다"],
+      "sourcePaths": ["hero/data/젤다.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "제리올",
+      "cardQueryNames": ["제리올"],
+      "sourcePaths": ["hero/data/제리올.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "셀파닐",
+      "cardQueryNames": ["셀파닐"],
+      "sourcePaths": ["hero/data/셀파닐.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "안젤리나",
+      "cardQueryNames": ["안젤리나"],
+      "sourcePaths": ["hero/data/안젤리나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "란포드",
+      "cardQueryNames": ["란포드"],
+      "sourcePaths": ["hero/data/란포드.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "리스틸",
+      "cardQueryNames": ["리스틸"],
+      "sourcePaths": ["hero/data/리스틸.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "에스텔",
+      "cardQueryNames": ["에스텔"],
+      "sourcePaths": ["hero/data/에스텔.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "요슈아",
+      "cardQueryNames": ["요슈아"],
+      "sourcePaths": ["hero/data/요슈아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "클로제",
+      "cardQueryNames": ["클로제"],
+      "sourcePaths": ["hero/data/클로제.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레온하르트",
+      "cardQueryNames": ["레온하르트"],
+      "sourcePaths": ["hero/data/레온하르트.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "렌",
+      "cardQueryNames": ["렌"],
+      "sourcePaths": ["hero/data/렌.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "올리비에",
+      "cardQueryNames": ["올리비에"],
+      "sourcePaths": ["hero/data/올리비에.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "란디우스",
+      "cardQueryNames": ["란디우스"],
+      "sourcePaths": ["hero/data/란디우스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레이첼",
+      "cardQueryNames": ["레이첼"],
+      "sourcePaths": ["hero/data/레이첼.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "윌러",
+      "cardQueryNames": ["윌러"],
+      "sourcePaths": ["hero/data/윌러.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "기자로프",
+      "cardQueryNames": ["기자로프"],
+      "sourcePaths": ["hero/data/기자로프.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "세레나",
+      "cardQueryNames": ["세레나"],
+      "sourcePaths": ["hero/data/세레나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "시그마",
+      "cardQueryNames": ["시그마"],
+      "sourcePaths": ["hero/data/시그마.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "람다",
+      "cardQueryNames": ["람다"],
+      "sourcePaths": ["hero/data/람다.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "사쿠라",
+      "cardQueryNames": ["사쿠라"],
+      "sourcePaths": ["hero/data/사쿠라.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "스미레",
+      "cardQueryNames": ["스미레"],
+      "sourcePaths": ["hero/data/스미레.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아이리스",
+      "cardQueryNames": ["아이리스"],
+      "sourcePaths": ["hero/data/아이리스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "안젤리카",
+      "cardQueryNames": ["안젤리카"],
+      "sourcePaths": ["hero/data/안젤리카.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "클라렛",
+      "cardQueryNames": ["클라렛"],
+      "sourcePaths": ["hero/data/클라렛.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "엘라스타",
+      "cardQueryNames": ["엘라스타"],
+      "sourcePaths": ["hero/data/엘라스타.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "오메가",
+      "cardQueryNames": ["오메가"],
+      "sourcePaths": ["hero/data/오메가.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "유리아",
+      "cardQueryNames": ["유리아"],
+      "sourcePaths": ["hero/data/유리아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "유스케",
+      "cardQueryNames": ["유스케"],
+      "sourcePaths": ["hero/data/유스케.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "쿠라마",
+      "cardQueryNames": ["쿠라마"],
+      "sourcePaths": ["hero/data/쿠라마.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "카즈마",
+      "cardQueryNames": ["카즈마"],
+      "sourcePaths": ["hero/data/카즈마.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "히에이",
+      "cardQueryNames": ["히에이"],
+      "sourcePaths": ["hero/data/히에이.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "도구로",
+      "cardQueryNames": ["도구로"],
+      "sourcePaths": ["hero/data/도구로.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레인폴스",
+      "cardQueryNames": ["레인폴스"],
+      "sourcePaths": ["hero/data/레인폴스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "베티",
+      "cardQueryNames": ["베티"],
+      "sourcePaths": ["hero/data/베티.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "알프레드",
+      "cardQueryNames": ["알프레드"],
+      "sourcePaths": ["hero/data/알프레드.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "환생제시카",
+      "cardQueryNames": ["환생제시카"],
+      "sourcePaths": ["hero/data/환생제시카.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "에밀리아",
+      "cardQueryNames": ["에밀리아"],
+      "sourcePaths": ["hero/data/에밀리아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "비라쥬",
+      "cardQueryNames": ["비라쥬"],
+      "sourcePaths": ["hero/data/비라쥬.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "미지의기사",
+      "cardQueryNames": ["미지의기사"],
+      "sourcePaths": ["hero/data/미지의기사.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아카야",
+      "cardQueryNames": ["아카야"],
+      "sourcePaths": ["hero/data/아카야.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "브렌다",
+      "cardQueryNames": ["브렌다"],
+      "sourcePaths": ["hero/data/브렌다.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "올리버",
+      "cardQueryNames": ["올리버"],
+      "sourcePaths": ["hero/data/올리버.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "디드리트",
+      "cardQueryNames": ["디드리트"],
+      "sourcePaths": ["hero/data/디드리트.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아슈람",
+      "cardQueryNames": ["아슈람"],
+      "sourcePaths": ["hero/data/아슈람.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "판",
+      "cardQueryNames": ["판"],
+      "sourcePaths": ["hero/data/판.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "필로테스",
+      "cardQueryNames": ["필로테스"],
+      "sourcePaths": ["hero/data/필로테스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아레스",
+      "cardQueryNames": ["아레스"],
+      "sourcePaths": ["hero/data/아레스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "마이야",
+      "cardQueryNames": ["마이야"],
+      "sourcePaths": ["hero/data/마이야.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "일루시아",
+      "cardQueryNames": ["일루시아"],
+      "sourcePaths": ["hero/data/일루시아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "실린카",
+      "cardQueryNames": ["실린카"],
+      "sourcePaths": ["hero/data/실린카.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "리코리스",
+      "cardQueryNames": ["리코리스"],
+      "sourcePaths": ["hero/data/리코리스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레나타",
+      "cardQueryNames": ["레나타"],
+      "sourcePaths": ["hero/data/레나타.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "린",
+      "cardQueryNames": ["린"],
+      "sourcePaths": ["hero/data/린.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아리안로드",
+      "cardQueryNames": ["아리안로드"],
+      "sourcePaths": ["hero/data/아리안로드.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "알티나",
+      "cardQueryNames": ["알티나"],
+      "sourcePaths": ["hero/data/알티나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "로자리아",
+      "cardQueryNames": ["로자리아"],
+      "sourcePaths": ["hero/data/로자리아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "노에미",
+      "cardQueryNames": ["노에미"],
+      "sourcePaths": ["hero/data/노에미.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "헬레나",
+      "cardQueryNames": ["헬레나"],
+      "sourcePaths": ["hero/data/헬레나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "세계수의현자",
+      "cardQueryNames": ["세계수의현자"],
+      "sourcePaths": ["hero/data/세계수의현자.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "플로렌티아",
+      "cardQueryNames": ["플로렌티아"],
+      "sourcePaths": ["hero/data/플로렌티아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "츠바메",
+      "cardQueryNames": ["츠바메"],
+      "sourcePaths": ["hero/data/츠바메.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아인즈",
+      "cardQueryNames": ["아인즈"],
+      "sourcePaths": ["hero/data/아인즈.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "알베도",
+      "cardQueryNames": ["알베도"],
+      "sourcePaths": ["hero/data/알베도.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "샤르티아",
+      "cardQueryNames": ["샤르티아"],
+      "sourcePaths": ["hero/data/샤르티아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "멜파니",
+      "cardQueryNames": ["멜파니"],
+      "sourcePaths": ["hero/data/멜파니.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "로젠실",
+      "cardQueryNames": ["로젠실"],
+      "sourcePaths": ["hero/data/로젠실.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "클로테르",
+      "cardQueryNames": ["클로테르"],
+      "sourcePaths": ["hero/data/클로테르.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "탄생의빛",
+      "cardQueryNames": ["탄생의빛"],
+      "sourcePaths": ["hero/data/탄생의빛.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "마리엘",
+      "cardQueryNames": ["마리엘"],
+      "sourcePaths": ["hero/data/마리엘.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "힐다",
+      "cardQueryNames": ["힐다"],
+      "sourcePaths": ["hero/data/힐다.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "베르너",
+      "cardQueryNames": ["베르너"],
+      "sourcePaths": ["hero/data/베르너.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "와타루",
+      "cardQueryNames": ["와타루"],
+      "sourcePaths": ["hero/data/와타루.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "히미코",
+      "cardQueryNames": ["히미코"],
+      "sourcePaths": ["hero/data/히미코.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "시바라쿠",
+      "cardQueryNames": ["시바라쿠"],
+      "sourcePaths": ["hero/data/시바라쿠.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "크루거",
+      "cardQueryNames": ["크루거"],
+      "sourcePaths": ["hero/data/크루거.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "빈센트",
+      "cardQueryNames": ["빈센트"],
+      "sourcePaths": ["hero/data/빈센트.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "토와",
+      "cardQueryNames": ["토와"],
+      "sourcePaths": ["hero/data/토와.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "팟시르",
+      "cardQueryNames": ["팟시르"],
+      "sourcePaths": ["hero/data/팟시르.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "크림조의왕",
+      "cardQueryNames": ["크림조의왕"],
+      "sourcePaths": ["hero/data/크림조의왕.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "화이트시시",
+      "cardQueryNames": ["화이트시시"],
+      "sourcePaths": ["hero/data/화이트시시.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "료",
+      "cardQueryNames": ["료"],
+      "sourcePaths": ["hero/data/료.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "카유라",
+      "cardQueryNames": ["카유라"],
+      "sourcePaths": ["hero/data/카유라.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "토마",
+      "cardQueryNames": ["토마"],
+      "sourcePaths": ["hero/data/토마.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "오토크라토4세",
+      "cardQueryNames": ["오토크라토4세"],
+      "sourcePaths": ["hero/data/오토크라토4세.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "루크레치아",
+      "cardQueryNames": ["루크레치아"],
+      "sourcePaths": ["hero/data/루크레치아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "입실론",
+      "cardQueryNames": ["입실론"],
+      "sourcePaths": ["hero/data/입실론.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "뮤",
+      "cardQueryNames": ["뮤"],
+      "sourcePaths": ["hero/data/뮤.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "크리스티안네",
+      "cardQueryNames": ["크리스티안네"],
+      "sourcePaths": ["hero/data/크리스티안네.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "수제트",
+      "cardQueryNames": ["수제트"],
+      "sourcePaths": ["hero/data/수제트.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "초월자",
+      "cardQueryNames": ["초월자"],
+      "sourcePaths": ["hero/data/초월자.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "알파",
+      "cardQueryNames": ["알파"],
+      "sourcePaths": ["hero/data/알파.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "에길",
+      "cardQueryNames": ["에길"],
+      "sourcePaths": ["hero/data/에길.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "마리안델",
+      "cardQueryNames": ["마리안델"],
+      "sourcePaths": ["hero/data/마리안델.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "웨탐",
+      "cardQueryNames": ["웨탐"],
+      "sourcePaths": ["hero/data/웨탐.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "엘마",
+      "cardQueryNames": ["엘마"],
+      "sourcePaths": ["hero/data/엘마.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "켈티스",
+      "cardQueryNames": ["켈티스"],
+      "sourcePaths": ["hero/data/켈티스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "로비나대제",
+      "cardQueryNames": ["로비나대제"],
+      "sourcePaths": ["hero/data/로비나대제.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "방주의성녀",
+      "cardQueryNames": ["방주의성녀"],
+      "sourcePaths": ["hero/data/방주의성녀.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "구스타프",
+      "cardQueryNames": ["구스타프"],
+      "sourcePaths": ["hero/data/구스타프.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "미셸",
+      "cardQueryNames": ["미셸"],
+      "sourcePaths": ["hero/data/미셸.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "리자",
+      "cardQueryNames": ["리자"],
+      "sourcePaths": ["hero/data/리자.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아이언챈슬러",
+      "cardQueryNames": ["아이언챈슬러"],
+      "sourcePaths": ["hero/data/아이언챈슬러.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "달의집정관",
+      "cardQueryNames": ["달의집정관"],
+      "sourcePaths": ["hero/data/달의집정관.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "셀베리아",
+      "cardQueryNames": ["셀베리아"],
+      "sourcePaths": ["hero/data/셀베리아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "알리시아",
+      "cardQueryNames": ["알리시아"],
+      "sourcePaths": ["hero/data/알리시아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "이사라",
+      "cardQueryNames": ["이사라"],
+      "sourcePaths": ["hero/data/이사라.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아즈사",
+      "cardQueryNames": ["아즈사"],
+      "sourcePaths": ["hero/data/아즈사.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "오보로",
+      "cardQueryNames": ["오보로"],
+      "sourcePaths": ["hero/data/오보로.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "카구야",
+      "cardQueryNames": ["카구야"],
+      "sourcePaths": ["hero/data/카구야.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "캐롤리안",
+      "cardQueryNames": ["캐롤리안"],
+      "sourcePaths": ["hero/data/캐롤리안.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아샤메르",
+      "cardQueryNames": ["아샤메르"],
+      "sourcePaths": ["hero/data/아샤메르.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "로스탐",
+      "cardQueryNames": ["로스탐"],
+      "sourcePaths": ["hero/data/로스탐.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "방랑투사",
+      "cardQueryNames": ["방랑투사"],
+      "sourcePaths": ["hero/data/방랑투사.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "율리안",
+      "cardQueryNames": ["율리안"],
+      "sourcePaths": ["hero/data/율리안.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "리키",
+      "cardQueryNames": ["리키"],
+      "sourcePaths": ["hero/data/리키.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "마크렌",
+      "cardQueryNames": ["마크렌"],
+      "sourcePaths": ["hero/data/마크렌.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "긴토키",
+      "cardQueryNames": ["긴토키"],
+      "sourcePaths": ["hero/data/긴토키.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "카구라",
+      "cardQueryNames": ["카구라"],
+      "sourcePaths": ["hero/data/카구라.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "신파치",
+      "cardQueryNames": ["신파치"],
+      "sourcePaths": ["hero/data/신파치.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아단켈모",
+      "cardQueryNames": ["아단켈모"],
+      "sourcePaths": ["hero/data/아단켈모.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "빛의수호사도",
+      "cardQueryNames": ["빛의수호사도"],
+      "sourcePaths": ["hero/data/빛의수호사도.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "빛과그림자검의영혼",
+      "cardQueryNames": ["빛과그림자검의영혼"],
+      "sourcePaths": ["hero/data/빛과그림자검의영혼.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "껍질소녀",
+      "cardQueryNames": ["껍질소녀"],
+      "sourcePaths": ["hero/data/껍질소녀.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "리오벡",
+      "cardQueryNames": ["리오벡"],
+      "sourcePaths": ["hero/data/리오벡.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "지온",
+      "cardQueryNames": ["지온"],
+      "sourcePaths": ["hero/data/지온.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "폴리알",
+      "cardQueryNames": ["폴리알"],
+      "sourcePaths": ["hero/data/폴리알.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "루그너",
+      "cardQueryNames": ["루그너"],
+      "sourcePaths": ["hero/data/루그너.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "그렌실",
+      "cardQueryNames": ["그렌실"],
+      "sourcePaths": ["hero/data/그렌실.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "코니",
+      "cardQueryNames": ["코니"],
+      "sourcePaths": ["hero/data/코니.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아니에스",
+      "cardQueryNames": ["아니에스"],
+      "sourcePaths": ["hero/data/아니에스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "일레인",
+      "cardQueryNames": ["일레인"],
+      "sourcePaths": ["hero/data/일레인.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "반",
+      "cardQueryNames": ["반"],
+      "sourcePaths": ["hero/data/반.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "각성자",
+      "cardQueryNames": ["각성자"],
+      "sourcePaths": ["hero/data/각성자.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "사그니",
+      "cardQueryNames": ["사그니"],
+      "sourcePaths": ["hero/data/사그니.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아마데우스",
+      "cardQueryNames": ["아마데우스"],
+      "sourcePaths": ["hero/data/아마데우스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "키리카",
+      "cardQueryNames": ["키리카"],
+      "sourcePaths": ["hero/data/키리카.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "블랑쉬",
+      "cardQueryNames": ["블랑쉬"],
+      "sourcePaths": ["hero/data/블랑쉬.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "엑셀라",
+      "cardQueryNames": ["엑셀라"],
+      "sourcePaths": ["hero/data/엑셀라.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "님프",
+      "cardQueryNames": ["님프"],
+      "sourcePaths": ["hero/data/님프.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "타탈리아",
+      "cardQueryNames": ["타탈리아"],
+      "sourcePaths": ["hero/data/타탈리아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "투어밀크",
+      "cardQueryNames": ["투어밀크"],
+      "sourcePaths": ["hero/data/투어밀크.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "이리스",
+      "cardQueryNames": ["이리스"],
+      "sourcePaths": ["hero/data/이리스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "롤랑",
+      "cardQueryNames": ["롤랑"],
+      "sourcePaths": ["hero/data/롤랑.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "프레시아",
+      "cardQueryNames": ["프레시아"],
+      "sourcePaths": ["hero/data/프레시아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "리나",
+      "cardQueryNames": ["리나"],
+      "sourcePaths": ["hero/data/리나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "제르가디스",
+      "cardQueryNames": ["제르가디스"],
+      "sourcePaths": ["hero/data/제르가디스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "가우리",
+      "cardQueryNames": ["가우리"],
+      "sourcePaths": ["hero/data/가우리.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "강신자",
+      "cardQueryNames": ["강신자"],
+      "sourcePaths": ["hero/data/강신자.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "잭",
+      "cardQueryNames": ["잭"],
+      "sourcePaths": ["hero/data/잭.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "안드리올",
+      "cardQueryNames": ["안드리올"],
+      "sourcePaths": ["hero/data/안드리올.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "네미아",
+      "cardQueryNames": ["네미아"],
+      "sourcePaths": ["hero/data/네미아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "애쉬엔",
+      "cardQueryNames": ["애쉬엔"],
+      "sourcePaths": ["hero/data/애쉬엔.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "호프만",
+      "cardQueryNames": ["호프만"],
+      "sourcePaths": ["hero/data/호프만.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "이졸데",
+      "cardQueryNames": ["이졸데"],
+      "sourcePaths": ["hero/data/이졸데.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "제이스",
+      "cardQueryNames": ["제이스"],
+      "sourcePaths": ["hero/data/제이스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "페트리시아",
+      "cardQueryNames": ["페트리시아"],
+      "sourcePaths": ["hero/data/페트리시아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "군",
+      "cardQueryNames": ["군"],
+      "sourcePaths": ["hero/data/군.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "쇼우",
+      "cardQueryNames": ["쇼우"],
+      "sourcePaths": ["hero/data/쇼우.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "알칸펠",
+      "cardQueryNames": ["알칸펠"],
+      "sourcePaths": ["hero/data/알칸펠.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아기토",
+      "cardQueryNames": ["아기토"],
+      "sourcePaths": ["hero/data/아기토.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "얼어붙은심연의지배자",
+      "cardQueryNames": ["얼어붙은심연의지배자"],
+      "sourcePaths": ["hero/data/얼어붙은심연의지배자.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "타브리스",
+      "cardQueryNames": ["타브리스"],
+      "sourcePaths": ["hero/data/타브리스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "타이란텔",
+      "cardQueryNames": ["타이란텔"],
+      "sourcePaths": ["hero/data/타이란텔.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "세리카",
+      "cardQueryNames": ["세리카"],
+      "sourcePaths": ["hero/data/세리카.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "이미르",
+      "cardQueryNames": ["이미르"],
+      "sourcePaths": ["hero/data/이미르.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "비리아",
+      "cardQueryNames": ["비리아"],
+      "sourcePaths": ["hero/data/비리아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "세라피나",
+      "cardQueryNames": ["세라피나"],
+      "sourcePaths": ["hero/data/세라피나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "빛의소환사",
+      "cardQueryNames": ["빛의소환사"],
+      "sourcePaths": ["hero/data/빛의소환사.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "시온",
+      "cardQueryNames": ["시온"],
+      "sourcePaths": ["hero/data/시온.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "티아나",
+      "cardQueryNames": ["티아나"],
+      "sourcePaths": ["hero/data/티아나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "캡틴코만도_후버",
+      "cardQueryNames": ["캡틴코만도_후버"],
+      "sourcePaths": ["hero/data/캡틴코만도_후버.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "맥_긴주",
+      "cardQueryNames": ["맥_긴주"],
+      "sourcePaths": ["hero/data/맥_긴주.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "엔야",
+      "cardQueryNames": ["엔야"],
+      "sourcePaths": ["hero/data/엔야.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아리아",
+      "cardQueryNames": ["아리아"],
+      "sourcePaths": ["hero/data/아리아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "이리아",
+      "cardQueryNames": ["이리아"],
+      "sourcePaths": ["hero/data/이리아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "노노린",
+      "cardQueryNames": ["노노린"],
+      "sourcePaths": ["hero/data/노노린.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "사프린",
+      "cardQueryNames": ["사프린"],
+      "sourcePaths": ["hero/data/사프린.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "염룡파멸자",
+      "cardQueryNames": ["염룡파멸자"],
+      "sourcePaths": ["hero/data/염룡파멸자.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "란델",
+      "cardQueryNames": ["란델"],
+      "sourcePaths": ["hero/data/란델.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "히비스커스",
+      "cardQueryNames": ["히비스커스"],
+      "sourcePaths": ["hero/data/히비스커스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "마리로즈",
+      "cardQueryNames": ["마리로즈"],
+      "sourcePaths": ["hero/data/마리로즈.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "뇨텐구",
+      "cardQueryNames": ["뇨텐구"],
+      "sourcePaths": ["hero/data/뇨텐구.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "카스미",
+      "cardQueryNames": ["카스미"],
+      "sourcePaths": ["hero/data/카스미.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "실나",
+      "cardQueryNames": ["실나"],
+      "sourcePaths": ["hero/data/실나.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "솀",
+      "cardQueryNames": ["솀"],
+      "sourcePaths": ["hero/data/솀.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "마카에라",
+      "cardQueryNames": ["마카에라"],
+      "sourcePaths": ["hero/data/마카에라.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "마안의서큐버스",
+      "cardQueryNames": ["마안의서큐버스"],
+      "sourcePaths": ["hero/data/마안의서큐버스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "루크만",
+      "cardQueryNames": ["루크만"],
+      "sourcePaths": ["hero/data/루크만.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "아브샤이트",
+      "cardQueryNames": ["아브샤이트"],
+      "sourcePaths": ["hero/data/아브샤이트.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "엘비스",
+      "cardQueryNames": ["엘비스"],
+      "sourcePaths": ["hero/data/엘비스.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레아",
+      "cardQueryNames": ["레아"],
+      "sourcePaths": ["hero/data/레아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "엘자",
+      "cardQueryNames": ["엘자"],
+      "sourcePaths": ["hero/data/엘자.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "루시",
+      "cardQueryNames": ["루시"],
+      "sourcePaths": ["hero/data/루시.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "나츠",
+      "cardQueryNames": ["나츠"],
+      "sourcePaths": ["hero/data/나츠.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "샤리크",
+      "cardQueryNames": ["샤리크"],
+      "sourcePaths": ["hero/data/샤리크.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레이피어",
+      "cardQueryNames": ["레이피어"],
+      "sourcePaths": ["hero/data/레이피어.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "훔바바",
+      "cardQueryNames": ["훔바바"],
+      "sourcePaths": ["hero/data/훔바바.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "시벨리",
+      "cardQueryNames": ["시벨리"],
+      "sourcePaths": ["hero/data/시벨리.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "비앙카",
+      "cardQueryNames": ["비앙카"],
+      "sourcePaths": ["hero/data/비앙카.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "운명을거스르는자",
+      "cardQueryNames": ["운명을거스르는자"],
+      "sourcePaths": ["hero/data/운명을거스르는자.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "상거",
+      "cardQueryNames": ["상거"],
+      "sourcePaths": ["hero/data/상거.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "레이가",
+      "cardQueryNames": ["레이가"],
+      "sourcePaths": ["hero/data/레이가.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "클라우디아",
+      "cardQueryNames": ["클라우디아"],
+      "sourcePaths": ["hero/data/클라우디아.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "릴라",
+      "cardQueryNames": ["릴라"],
+      "sourcePaths": ["hero/data/릴라.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "라이자",
+      "cardQueryNames": ["라이자"],
+      "sourcePaths": ["hero/data/라이자.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "린마오싱",
+      "cardQueryNames": ["린마오싱"],
+      "sourcePaths": ["hero/data/린마오싱.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    },
+    {
+      "sourceKey": "타지",
+      "cardQueryNames": ["타지"],
+      "sourcePaths": ["hero/data/타지.js"],
+      "collectionStatus": "SOURCE_PATH_COLLECTED",
+      "identityStatus": "PENDING_STAGE6"
+    }
+  ]
+}
