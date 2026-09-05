@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "owner": "merge-finalization",
+  "purpose": "Keep stale project-check results on the revalidation path while preserving hard blocker semantics for actual validator failures.",
+  "classification": {
+    "stale": {
+      "status": "CHECK_NOT_SUCCESSFUL",
+      "reason": "STALE_REVALIDATION_REQUIRED",
+      "hardBlocker": false
+    },
+    "hardBlockerConclusions": [
+      "action_required",
+      "cancelled",
+      "failure",
+      "timed_out"
+    ],
+    "hardBlockerStatus": "BLOCKER_OWNING_VALIDATOR"
+  },
+  "precedence": {
+    "behindMain": "UPDATE_REQUIRED",
+    "behindMainBeforeCheckConclusion": true
+  },
+  "lifecycle": {
+    "initialCheckNotSuccessful": "REVALIDATE",
+    "prepareCheckNotSuccessful": "HANDOFF_REVALIDATION",
+    "mergeOnlyNotReady": "MERGE_ADMISSION_REVALIDATION_REQUIRED",
+    "exactTargetPrOnly": true,
+    "newExactHeadRunOwnsContinuation": true
+  },
+  "forbidden": [
+    "STALE_AS_BLOCKER_OWNING_VALIDATOR",
+    "MAIN_PUSH_ALL_OPEN_PR_REFRESH_FANOUT",
+    "OLD_RUN_MERGE_AFTER_HEAD_CHANGE"
+  ],
+  "nonScope": [
+    "semantic data",
+    "frontend presentation",
+    "Hosted QA semantics",
+    "Project Check owner routing",
+    "new refresh fan-out orchestration"
+  ]
+}
