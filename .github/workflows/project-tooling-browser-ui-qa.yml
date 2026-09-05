@@ -150,6 +150,7 @@ jobs:
           const base = process.env.HOSTED_BASE_URL.replace(/\/?$/, '/');
           const url = (path) => new URL(path.replace(/^\//, ''), base).toString();
           const check = (condition, message) => { if (!condition) throw new Error(message); };
+          const isPreview = process.env.BROWSER_UI_MODE === 'pr-preview';
           const waitForLoadedImage = async (image, message) => {
             await image.waitFor({ state: 'attached', timeout: 20000 });
             await image.scrollIntoViewIfNeeded();
@@ -161,50 +162,52 @@ jobs:
 
           const browser = await chromium.launch({ headless: true });
           const errors = [];
+          let soldierHeroCardCount = 0;
+          let response = null;
           try {
             const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
             page.on('pageerror', (error) => errors.push(`page:${String(error)}`));
             page.on('console', (message) => { if (message.type() === 'error') errors.push(`console:${message.text()}`); });
 
-            let response = await page.goto(url('heroes/6/'), { waitUntil: 'networkidle', timeout: 45000 });
-            check(response && response.status() < 400, `Hero 6 browser entry failed: ${response?.status()}`);
-            await page.locator('[data-hero-talent-carousel="true"]').waitFor({ timeout: 20000 });
+            if (!isPreview) {
+              response = await page.goto(url('heroes/6/'), { waitUntil: 'networkidle', timeout: 45000 });
+              check(response && response.status() < 400, `Hero 6 browser entry failed: ${response?.status()}`);
+              await page.locator('[data-hero-talent-carousel="true"]').waitFor({ timeout: 20000 });
 
-            const nextArtwork = page.getByRole('button', { name: '다음 일러스트' });
-            await nextArtwork.focus();
-            await page.keyboard.press('Enter');
-            await page.getByText(/스킨 1 · ID \d+/, { exact: false }).waitFor({ timeout: 10000 });
+              const nextArtwork = page.getByRole('button', { name: '다음 일러스트' });
+              await nextArtwork.focus();
+              await page.keyboard.press('Enter');
+              await page.getByText(/스킨 1 · ID \d+/, { exact: false }).waitFor({ timeout: 10000 });
 
-            const soldier101 = page.locator('[data-hero-soldier-cards="true"] a[href*="/soldiers/101"]').first();
-            check(await soldier101.count() === 1, 'Hero 6 → Soldier 101 interaction link missing');
-            await soldier101.click();
-            await page.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
-            const soldierDialog = page.getByRole('dialog');
-            await soldierDialog.waitFor({ timeout: 20000 });
-            await page.getByText('사용 가능 영웅', { exact: true }).waitFor({ timeout: 20000 });
-            const soldierHeroCards = soldierDialog.locator('img[src*="/images/heroes/card-icons-webp/"]');
-            await waitForLoadedImage(soldierHeroCards.first(), 'Soldier 101 first Hero card WebP failed');
-            const soldierHeroCardCount = await soldierHeroCards.count();
-            check(soldierHeroCardCount > 0, 'Soldier 101 detail rendered no Hero card WebP images after ready state');
-            const soldierHeroCardSources = await soldierHeroCards.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('src') || ''));
-            check(soldierHeroCardSources.every((src) => src.includes('/images/heroes/card-icons-webp/') && src.endsWith('.webp')), 'Soldier 101 detail contains a non-WebP Hero card source');
+              const soldier101 = page.locator('[data-hero-soldier-cards="true"] a[href*="/soldiers/101"]').first();
+              check(await soldier101.count() === 1, 'Hero 6 → Soldier 101 interaction link missing');
+              await soldier101.click();
+              await page.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
+              const soldierDialog = page.getByRole('dialog');
+              await soldierDialog.waitFor({ timeout: 20000 });
+              await page.getByText('사용 가능 영웅', { exact: true }).waitFor({ timeout: 20000 });
+              const soldierHeroCards = soldierDialog.locator('img[src*="/images/heroes/card-icons-webp/"]');
+              await waitForLoadedImage(soldierHeroCards.first(), 'Soldier 101 first Hero card WebP failed');
+              soldierHeroCardCount = await soldierHeroCards.count();
+              check(soldierHeroCardCount > 0, 'Soldier 101 detail rendered no Hero card WebP images after ready state');
+              const soldierHeroCardSources = await soldierHeroCards.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('src') || ''));
+              check(soldierHeroCardSources.every((src) => src.includes('/images/heroes/card-icons-webp/') && src.endsWith('.webp')), 'Soldier 101 detail contains a non-WebP Hero card source');
 
-            await page.goBack({ waitUntil: 'networkidle', timeout: 45000 });
-            await page.locator('[data-hero-talent-carousel="true"]').waitFor({ timeout: 20000 });
-            await page.goForward({ waitUntil: 'networkidle', timeout: 45000 });
-            await page.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
-            await page.getByRole('dialog').waitFor({ timeout: 20000 });
+              await page.goBack({ waitUntil: 'networkidle', timeout: 45000 });
+              await page.locator('[data-hero-talent-carousel="true"]').waitFor({ timeout: 20000 });
+              await page.goForward({ waitUntil: 'networkidle', timeout: 45000 });
+              await page.waitForURL(/\/soldiers\/101\/?$/, { timeout: 45000 });
+              await page.getByRole('dialog').waitFor({ timeout: 20000 });
 
-            response = await page.goto(url('equipment/416/'), { waitUntil: 'networkidle', timeout: 45000 });
-            check(response && response.status() < 400, `Equipment 416 browser entry failed: ${response?.status()}`);
-            await page.getByRole('heading', { name: '전용 영웅', exact: true }).waitFor();
-            const heroLink = page.locator('a[href*="/heroes/6"]').first();
-            check(await heroLink.count() === 1, 'Equipment 416 → Hero 6 interaction link missing');
-            await heroLink.click();
-            await page.waitForURL(/\/heroes\/6\/?$/, { timeout: 45000 });
-            await page.locator('[data-hero-talent-carousel="true"]').waitFor({ timeout: 20000 });
-
-            if (process.env.BROWSER_UI_MODE === 'pr-preview') {
+              response = await page.goto(url('equipment/416/'), { waitUntil: 'networkidle', timeout: 45000 });
+              check(response && response.status() < 400, `Equipment 416 browser entry failed: ${response?.status()}`);
+              await page.getByRole('heading', { name: '전용 영웅', exact: true }).waitFor();
+              const heroLink = page.locator('a[href*="/heroes/6"]').first();
+              check(await heroLink.count() === 1, 'Equipment 416 → Hero 6 interaction link missing');
+              await heroLink.click();
+              await page.waitForURL(/\/heroes\/6\/?$/, { timeout: 45000 });
+              await page.locator('[data-hero-talent-carousel="true"]').waitFor({ timeout: 20000 });
+            } else {
               const cases = [
                 {
                   heroId: 6,
@@ -269,40 +272,42 @@ jobs:
             check(errors.length === 0, `desktop Browser/UI errors: ${JSON.stringify(errors)}`);
             await page.close();
 
-            const unknownPage = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-            response = await unknownPage.goto(url('heroes/999999999/'), { waitUntil: 'networkidle', timeout: 45000 });
-            check(response && response.status() === 404, `unknown Hero browser navigation must return 404, got ${response?.status()}`);
-            check((await unknownPage.locator('body').innerText()).trim().length > 0, 'unknown Hero browser response rendered an empty document');
-            await unknownPage.close();
+            let tabletOverflow = 'NOT_APPLICABLE';
+            if (!isPreview) {
+              const unknownPage = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+              response = await unknownPage.goto(url('heroes/999999999/'), { waitUntil: 'networkidle', timeout: 45000 });
+              check(response && response.status() === 404, `unknown Hero browser navigation must return 404, got ${response?.status()}`);
+              check((await unknownPage.locator('body').innerText()).trim().length > 0, 'unknown Hero browser response rendered an empty document');
+              await unknownPage.close();
 
-            const tablet = await browser.newContext({ viewport: { width: 768, height: 1024 }, hasTouch: true });
-            const tabletPage = await tablet.newPage();
-            const tabletErrors = [];
-            tabletPage.on('pageerror', (error) => tabletErrors.push(`page:${String(error)}`));
-            tabletPage.on('console', (message) => { if (message.type() === 'error') tabletErrors.push(`console:${message.text()}`); });
-            response = await tabletPage.goto(url('heroes/'), { waitUntil: 'networkidle', timeout: 45000 });
-            check(response && response.status() < 400, `Hero list tablet entry failed: ${response?.status()}`);
-            await tabletPage.locator('[data-hero-card-icons="true"]').waitFor();
-            const overflow = await tabletPage.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-            check(overflow <= 1, `Hero list tablet horizontal overflow=${overflow}`);
-            check(tabletErrors.length === 0, `tablet Browser/UI errors: ${JSON.stringify(tabletErrors)}`);
-            await tablet.close();
+              const tablet = await browser.newContext({ viewport: { width: 768, height: 1024 }, hasTouch: true });
+              const tabletPage = await tablet.newPage();
+              const tabletErrors = [];
+              tabletPage.on('pageerror', (error) => tabletErrors.push(`page:${String(error)}`));
+              tabletPage.on('console', (message) => { if (message.type() === 'error') tabletErrors.push(`console:${message.text()}`); });
+              response = await tabletPage.goto(url('heroes/'), { waitUntil: 'networkidle', timeout: 45000 });
+              check(response && response.status() < 400, `Hero list tablet entry failed: ${response?.status()}`);
+              await tabletPage.locator('[data-hero-card-icons="true"]').waitFor();
+              tabletOverflow = await tabletPage.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+              check(tabletOverflow <= 1, `Hero list tablet horizontal overflow=${tabletOverflow}`);
+              check(tabletErrors.length === 0, `tablet Browser/UI errors: ${JSON.stringify(tabletErrors)}`);
+              await tablet.close();
+            }
 
             console.log(JSON.stringify({
               status: 'PASS_BROWSER_UI_INTERACTION_SPOT_CHECKS',
               sourceSha: process.env.EXPECTED_SOURCE_SHA,
               mode: process.env.BROWSER_UI_MODE,
-              keyboardSkinCarousel: 'PASS',
-              heroToSoldierNavigation: 'PASS',
-              soldierDetailHeroCardWebp: 'PASS',
-              soldierHeroCardCount,
-              backForwardNavigation: 'PASS',
-              equipmentToHeroNavigation: 'PASS',
-              heroTalentKrStarSwitching: process.env.BROWSER_UI_MODE === 'pr-preview' ? 'PASS_HERO_6_8_9' : 'NOT_APPLICABLE',
-              unknownIdBrowser404: 'PASS',
-              tabletResponsiveOverflow: 0,
+              keyboardSkinCarousel: isPreview ? 'NOT_APPLICABLE' : 'PASS',
+              heroToSoldierNavigation: isPreview ? 'NOT_APPLICABLE' : 'PASS',
+              soldierDetailHeroCardWebp: isPreview ? 'NOT_APPLICABLE' : 'PASS',
+              soldierHeroCardCount: isPreview ? 'NOT_APPLICABLE' : soldierHeroCardCount,
+              backForwardNavigation: isPreview ? 'NOT_APPLICABLE' : 'PASS',
+              equipmentToHeroNavigation: isPreview ? 'NOT_APPLICABLE' : 'PASS',
+              heroTalentKrStarSwitching: isPreview ? 'PASS_HERO_6_8_9' : 'NOT_APPLICABLE',
+              unknownIdBrowser404: isPreview ? 'NOT_APPLICABLE' : 'PASS',
+              tabletResponsiveOverflow: tabletOverflow,
               desktopPageConsoleErrors: 0,
-              tabletPageConsoleErrors: 0,
               semanticStageReopened: false,
             }, null, 2));
           } finally {
