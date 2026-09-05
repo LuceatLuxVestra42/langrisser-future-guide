@@ -67,7 +67,7 @@ const STAT_TRAINING_ROWS = [
   ["종합 공격 훈련", "종합 방어 훈련", "종합 생존 훈련"],
   ["강화 공격 훈련", "강화 방어 훈련", "강화 생존 훈련"],
   ["핵심 공격 훈련", "핵심 방어 훈련", "핵심 생존 훈련"],
-  ["연합 공격 훈련", "연합 방어 훈련", "연합 생존 훈련"],
+  ["연계 공격 훈련", "연계 방어 훈련", "연계 생존 훈련"],
 ] as const;
 
 const STAT_TRAINING_POSITION = new Map<string, { row: number; column: number }>(
