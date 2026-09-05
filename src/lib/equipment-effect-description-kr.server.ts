@@ -134,6 +134,13 @@ export function readEquipmentDetailPageData(equipmentId: number) {
   const pageData = readLocalizedEquipmentDetailPageData(equipmentId);
   if (!pageData) return null;
 
+  if (pageData.kind === "general") {
+    return {
+      ...pageData,
+      detail: applyEffectDescription(equipmentId, pageData.detail),
+    };
+  }
+
   return {
     ...pageData,
     detail: applyEffectDescription(equipmentId, pageData.detail),
