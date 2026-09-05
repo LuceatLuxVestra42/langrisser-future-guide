@@ -1,0 +1,79 @@
+name: Soldier TrainingTech Level Costs Materialize
+
+on:
+  push:
+    branches:
+      - feat/soldier-training-level-cost-projection-20260905
+    paths:
+      - 'scripts/build-soldier-training-tech-level-costs.mjs'
+      - 'scripts/validate-soldier-training-tech-level-costs.mjs'
+      - 'data/generated/soldier-training-tech-level-costs.v1.json'
+      - 'data/validation/soldier-training-tech-level-costs.v1.json'
+      - '.github/workflows/soldier-training-tech-level-costs-materialize.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Configure external ConfigData source root
+        shell: bash
+        run: echo "CONFIGDATA_SOURCE_ROOT=$RUNNER_TEMP/soldier-training-level-cost-source" >> "$GITHUB_ENV"
+
+      - name: Hydrate and verify pinned ConfigData source pack outside repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$CONFIGDATA_SOURCE_ROOT"
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$CONFIGDATA_SOURCE_ROOT"
+          count="$(find "$CONFIGDATA_SOURCE_ROOT/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$count" = "753"
+          case "$CONFIGDATA_SOURCE_ROOT/" in
+            "$GITHUB_WORKSPACE/"*) echo 'external ConfigData source root must stay outside repository' >&2; exit 1 ;;
+          esac
+
+      - name: Materialize exact TrainingTech level costs
+        run: node scripts/build-soldier-training-tech-level-costs.mjs
+
+      - name: Independently validate and materialize validation record
+        run: |
+          node scripts/validate-soldier-training-tech-level-costs.mjs --write
+          node scripts/validate-soldier-training-tech-level-costs.mjs
+
+      - name: Fail closed on unexpected tracked mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          unexpected="$(git status --porcelain | grep -Ev '^[ MARC?]{2} (data/generated/soldier-training-tech-level-costs\.v1\.json|data/validation/soldier-training-tech-level-costs\.v1\.json)$' || true)"
+          if [ -n "$unexpected" ]; then
+            echo "$unexpected" >&2
+            exit 1
+          fi
+
+      - name: Persist frozen generated and validation artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$(git status --porcelain -- data/generated/soldier-training-tech-level-costs.v1.json data/validation/soldier-training-tech-level-costs.v1.json)" ]; then
+            echo 'TrainingTech level-cost artifacts already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/generated/soldier-training-tech-level-costs.v1.json data/validation/soldier-training-tech-level-costs.v1.json
+          git commit -m 'Materialize Soldier training level costs'
+          git push origin HEAD:feat/soldier-training-level-cost-projection-20260905
