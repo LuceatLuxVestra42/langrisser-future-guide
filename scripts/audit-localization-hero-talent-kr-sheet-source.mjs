@@ -9,9 +9,7 @@ const CONTRACT_PATH = 'data/contracts/localization-audit-hero-talent-kr-sheet-so
 const readJson = (file) => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8'));
 const stable = (value) => {
   if (Array.isArray(value)) return value.map(stable);
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stable(value[key])]));
-  }
+  if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stable(value[key])]));
   return value;
 };
 
@@ -34,10 +32,7 @@ function parseArgs(argv) {
 }
 
 function rawUrl(contract, relativePath) {
-  const encoded = relativePath
-    .split('/')
-    .map((part) => encodeURIComponent(part))
-    .join('/');
+  const encoded = relativePath.split('/').map((part) => encodeURIComponent(part)).join('/');
   return `https://raw.githubusercontent.com/${contract.source.repository}/${contract.source.ref}/${encoded}`;
 }
 
@@ -73,9 +68,7 @@ function parseLegacyHeroData(sourceText, sourcePath) {
     fail(`Unable to parse legacy Hero data: ${sourcePath}`, { error: error.message });
   }
   const data = sandbox.__result;
-  if (!Array.isArray(data) || !data[0] || typeof data[0] !== 'object') {
-    fail(`Legacy Hero data did not expose data[0]: ${sourcePath}`);
-  }
+  if (!Array.isArray(data) || !data[0] || typeof data[0] !== 'object') fail(`Legacy Hero data did not expose data[0]: ${sourcePath}`);
   return data[0];
 }
 
@@ -117,10 +110,14 @@ function matchHero({ routeKey, legacy, contract, indexes }) {
   const krCandidates = indexes.byKr.get(legacy.Name) ?? [];
   if (krCandidates.length === 1) return { target: krCandidates[0], method: 'EXACT_KR_NAME' };
   if (krCandidates.length > 1) {
-    fail('Ambiguous exact Korean-name localization match.', {
+    const narrowed = krCandidates.filter((record) => record.nameCn === legacy.ChName);
+    if (narrowed.length === 1) return { target: narrowed[0], method: 'EXACT_KR_NAME_THEN_CN_NAME' };
+    fail('Ambiguous exact Korean-name localization match after exact Chinese-name disambiguation.', {
       routeKey,
       legacyNameKr: legacy.Name,
+      legacyNameCn: legacy.ChName ?? null,
       candidateHeroIds: krCandidates.map((row) => row.heroId),
+      narrowedHeroIds: narrowed.map((row) => row.heroId),
     });
   }
 
@@ -146,14 +143,10 @@ function extractTalent(legacy, sourcePath, contract) {
   if (!talent || typeof talent !== 'object') fail('Missing Talent[0] in legacy Hero source.', { sourcePath });
   if (contract.validation.requireTalentName && !talent.TalentName) fail('Missing Talent[0].TalentName.', { sourcePath });
   const abilities = talent.Abilities;
-  if (!Array.isArray(abilities) || abilities.length < 6) {
-    fail('Talent[0].Abilities must contain the 1-6 star slots.', { sourcePath, length: abilities?.length ?? null });
-  }
+  if (!Array.isArray(abilities) || abilities.length < 6) fail('Talent[0].Abilities must contain the 1-6 star slots.', { sourcePath, length: abilities?.length ?? null });
   const descriptions = contract.scope.includeStars.map((star) => {
     const raw = abilities[star - 1]?.Desc;
-    if (contract.validation.requireFourStarDescriptions && (typeof raw !== 'string' || raw.length === 0)) {
-      fail(`Missing ${star}-star talent description.`, { sourcePath });
-    }
+    if (contract.validation.requireFourStarDescriptions && (typeof raw !== 'string' || raw.length === 0)) fail(`Missing ${star}-star talent description.`, { sourcePath });
     return [star, raw];
   });
   return {
@@ -184,12 +177,7 @@ async function mapConcurrent(items, limit, worker) {
 async function buildOutput({ contract, master, source }) {
   const heroHtml = await source.read(contract.source.heroIndexPath);
   const routeKeys = extractRouteKeys(heroHtml);
-  if (routeKeys.length !== contract.scope.expectedCardRouteCount) {
-    fail('Legacy Hero card route count mismatch.', {
-      expected: contract.scope.expectedCardRouteCount,
-      actual: routeKeys.length,
-    });
-  }
+  if (routeKeys.length !== contract.scope.expectedCardRouteCount) fail('Legacy Hero card route count mismatch.', { expected: contract.scope.expectedCardRouteCount, actual: routeKeys.length });
 
   const indexes = buildMasterIndexes(master);
   const rows = await mapConcurrent(routeKeys, 16, async (routeKey, sourceOrder) => {
@@ -219,20 +207,14 @@ async function buildOutput({ contract, master, source }) {
 
   const duplicateGroups = [...grouped.entries()].filter(([, group]) => group.length > 1);
   const expectedDuplicate = contract.validation.expectedDuplicateRouteGroup;
-  if (
-    duplicateGroups.length !== 1 ||
-    duplicateGroups[0][0] !== expectedDuplicate.heroId ||
-    duplicateGroups[0][1].length !== expectedDuplicate.routeCount
-  ) {
+  if (duplicateGroups.length !== 1 || duplicateGroups[0][0] !== expectedDuplicate.heroId || duplicateGroups[0][1].length !== expectedDuplicate.routeCount) {
     fail('Unexpected duplicate legacy Hero route groups.', {
       expected: expectedDuplicate,
       actual: duplicateGroups.map(([heroId, group]) => ({ heroId, routeCount: group.length, sourceKeys: group.map((row) => row.sourceKey) })),
     });
   }
   for (const [, group] of duplicateGroups) {
-    if (!group.slice(1).every((row) => sameTalent(row.talent, group[0].talent))) {
-      fail('Duplicate legacy Hero routes disagree on normal Talent data.', { sourceKeys: group.map((row) => row.sourceKey) });
-    }
+    if (!group.slice(1).every((row) => sameTalent(row.talent, group[0].talent))) fail('Duplicate legacy Hero routes disagree on normal Talent data.', { sourceKeys: group.map((row) => row.sourceKey) });
   }
 
   const records = [...grouped.values()]
@@ -252,34 +234,18 @@ async function buildOutput({ contract, master, source }) {
     }))
     .sort((left, right) => left.sourceOrder - right.sourceOrder);
 
-  if (records.length !== contract.scope.expectedUniqueHeroCount) {
-    fail('Legacy KR-sheet unique Hero count mismatch.', {
-      expected: contract.scope.expectedUniqueHeroCount,
-      actual: records.length,
-    });
-  }
+  if (records.length !== contract.scope.expectedUniqueHeroCount) fail('Legacy KR-sheet unique Hero count mismatch.', { expected: contract.scope.expectedUniqueHeroCount, actual: records.length });
 
   const cutoffActual = records.slice(-2).map((record) => record.heroId);
-  if (JSON.stringify(cutoffActual) !== JSON.stringify(contract.scope.cutoffHeroIds)) {
-    fail('KR-sheet cutoff anchors are not the final two unique Hero records.', {
-      expected: contract.scope.cutoffHeroIds,
-      actual: cutoffActual,
-    });
-  }
+  if (JSON.stringify(cutoffActual) !== JSON.stringify(contract.scope.cutoffHeroIds)) fail('KR-sheet cutoff anchors are not the final two unique Hero records.', { expected: contract.scope.cutoffHeroIds, actual: cutoffActual });
   const cutoffKeys = records.slice(-2).map((record) => record.primarySheetKey);
-  if (JSON.stringify(cutoffKeys) !== JSON.stringify(contract.scope.cutoffSourceKeys)) {
-    fail('KR-sheet cutoff source keys changed.', { expected: contract.scope.cutoffSourceKeys, actual: cutoffKeys });
-  }
+  if (JSON.stringify(cutoffKeys) !== JSON.stringify(contract.scope.cutoffSourceKeys)) fail('KR-sheet cutoff source keys changed.', { expected: contract.scope.cutoffSourceKeys, actual: cutoffKeys });
 
   const coveredIds = new Set(records.map((record) => record.heroId));
   const postCutoffHeroIds = master.records.filter((record) => !coveredIds.has(record.heroId)).map((record) => record.heroId);
-  if (postCutoffHeroIds.length !== contract.scope.expectedPostCutoffHeroCount) {
-    fail('Post-cutoff current Hero count mismatch.', {
-      expected: contract.scope.expectedPostCutoffHeroCount,
-      actual: postCutoffHeroIds.length,
-      postCutoffHeroIds,
-    });
-  }
+  if (postCutoffHeroIds.length !== contract.scope.expectedPostCutoffHeroCount) fail('Post-cutoff current Hero count mismatch.', { expected: contract.scope.expectedPostCutoffHeroCount, actual: postCutoffHeroIds.length, postCutoffHeroIds });
+
+  const matchMethodCounts = Object.fromEntries([...new Set(records.map((record) => record.matchMethod))].sort().map((method) => [method, records.filter((record) => record.matchMethod === method).length]));
 
   return {
     version: 1,
@@ -311,8 +277,9 @@ async function buildOutput({ contract, master, source }) {
     },
     matching: {
       mode: contract.matching.mode,
-      order: contract.matching.order,
+      order: [...contract.matching.order, 'EXACT_KR_NAME_THEN_CN_NAME'],
       explicitExceptionHeroIds: contract.matching.exceptions.map((row) => row.heroId),
+      matchMethodCounts,
     },
     records,
   };
@@ -329,9 +296,7 @@ async function main() {
   if (options.check) {
     if (!fs.existsSync(outputPath)) fail('Committed KR-sheet Hero talent output is missing.', { outputPath });
     const expected = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
-    if (JSON.stringify(stable(result)) !== JSON.stringify(stable(expected))) {
-      fail('Committed KR-sheet Hero talent output is stale or mismatched.');
-    }
+    if (JSON.stringify(stable(result)) !== JSON.stringify(stable(expected))) fail('Committed KR-sheet Hero talent output is stale or mismatched.');
     console.log(`Hero Talent KR Sheet Source: PASS (${result.coverage.uniqueHeroCount}/${result.coverage.canonicalHeroCount}; post-cutoff ${result.coverage.postCutoffHeroCount})`);
     return;
   }
