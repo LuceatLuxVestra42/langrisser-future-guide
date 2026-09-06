@@ -1,0 +1,55 @@
+name: Hero Talent Frontend Integration
+
+on:
+  pull_request:
+    paths:
+      - 'src/lib/hero-talent-localization.ts'
+      - 'src/lib/hero-list.functions.ts'
+      - 'data/presentation/hero-talent-localization-final.v1.json'
+      - '.github/workflows/hero-talent-frontend-integration.yml'
+  workflow_dispatch:
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Verify final localization resolver parity
+        run: |
+          bun -e '
+            import finalData from "./data/presentation/hero-talent-localization-final.v1.json";
+            import { hasHeroTalentKr, resolveHeroTalentKr } from "./src/lib/hero-talent-localization.ts";
+            if (finalData.summary.heroCount !== 251) throw new Error("expected 251 localized Heroes");
+            let starCount = 0;
+            for (const record of finalData.records) {
+              if (!hasHeroTalentKr(record.heroId)) throw new Error(`missing Hero ${record.heroId}`);
+              for (const star of [3,4,5,6]) {
+                const row = record.descriptions[`star${star}`];
+                const resolved = resolveHeroTalentKr({ heroId: record.heroId, star, skillId: row.currentCnSkillId, nameCn: row.currentCnTalentName });
+                if (!resolved || resolved.nameKr !== record.talentNameKr || resolved.descKr !== row.descriptionKrText) {
+                  throw new Error(`resolver mismatch ${record.heroId}:${star}`);
+                }
+                starCount += 1;
+              }
+            }
+            if (starCount !== 1004) throw new Error(`expected 1004 localized star rows, got ${starCount}`);
+            for (let heroId = 99272; heroId <= 99287; heroId += 1) {
+              if (hasHeroTalentKr(heroId)) throw new Error(`post-cutoff Hero ${heroId} must remain unlocalized`);
+            }
+            console.log(`Hero talent frontend resolver parity: PASS (${starCount} rows)`);
+          '
+      - name: Snapshot tracked state
+        run: git diff --binary > /tmp/frontend-before.patch
+      - name: Run localization owner validator
+        run: node tools/project-check/test/localization-with-equipment-freshness.mjs
+      - name: Run frontend production gate
+        run: node tools/project-check/test/frontend-production-gate.mjs
+      - name: Verify validators left no tracked mutation
+        run: |
+          git diff --binary > /tmp/frontend-after.patch
+          cmp /tmp/frontend-before.patch /tmp/frontend-after.patch
