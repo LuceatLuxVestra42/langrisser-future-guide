@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -234,15 +234,31 @@ function HeroDetailPage() {
             </div>
 
             <div className="flex min-w-0 flex-col justify-center p-5 sm:p-8 lg:p-10">
+              <p className="mb-2 text-sm font-black tracking-[0.16em] text-muted-foreground">{hero.rarity.baseLabel}</p>
               <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{displayName}</h1>
               <div className="mt-3 space-y-0.5 text-sm text-muted-foreground">
                 <p>{hero.identity.nameCn}</p>
                 {hero.identity.nameEn ? <p>{hero.identity.nameEn}</p> : null}
               </div>
 
-              <div className="mt-7 grid gap-3 sm:grid-cols-2">
-                <InfoBlock title="진영"><div className="flex flex-wrap gap-2">{factionMarks.map((faction) => <span key={faction.factionId} title={faction.label} className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border bg-background p-1"><img src={resolvePublicAssetUrl(faction.webAssetPath)} alt={faction.label} className="h-full w-full object-contain" /></span>)}</div></InfoBlock>
-                <InfoBlock title="성우"><p className="font-semibold text-foreground">{detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-"}</p></InfoBlock>
+              <div className="mt-7">
+                <p className="text-xs font-bold text-muted-foreground">CV</p>
+                <p className="mt-2 font-semibold text-foreground">{detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-"}</p>
+
+                <div className="mt-6">
+                  <p className="text-xs font-bold text-muted-foreground">진영</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {factionMarks.map((faction) => (
+                      <img
+                        key={faction.factionId}
+                        src={resolvePublicAssetUrl(faction.webAssetPath)}
+                        alt={faction.label}
+                        title={faction.label}
+                        className="h-10 w-10 object-contain"
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -540,6 +556,5 @@ function formatBondCondition(condition: { requiredHero: { heroId: number | null;
 }
 
 function SectionTitle({ title }: { title: string }) { return <h2 className="font-bold text-foreground">{title}</h2>; }
-function InfoBlock({ title, children }: { title: string; children: ReactNode }) { return <div className="rounded-xl border border-border bg-muted/30 p-4"><p className="mb-2 text-xs font-bold text-muted-foreground">{title}</p>{children}</div>; }
 function JobStatCell({ value }: { value: number | null }) { return <td className="px-4 py-3 text-right font-bold tabular-nums text-foreground">{value ?? "-"}</td>; }
 function HeroNotFound() { return <main className="min-h-screen bg-background"><div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-4 text-center"><Swords className="mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="text-2xl font-bold text-foreground">영웅을 찾을 수 없어.</h1><p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 Hero 목록에 존재하지 않는 주소야.</p><Link reloadDocument to="/heroes" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground underline underline-offset-4"><ArrowLeft className="h-4 w-4" aria-hidden="true" />영웅 목록으로</Link></div></main>; }
