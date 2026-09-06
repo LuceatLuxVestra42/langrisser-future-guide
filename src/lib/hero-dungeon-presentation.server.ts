@@ -106,58 +106,170 @@ const HERO_DUNGEON_GATE_BY_HERO_ID = (() => {
   return gateByHeroId;
 })();
 
+type HeroDungeonBondCondition = {
+  favorability: {
+    targetHeroId: number | null;
+    targetHeroNameKr: string | null;
+    targetHeroNameCn: string | null;
+    targetHeroNameEn: string | null;
+    requiredLevel: number | null;
+  } | null;
+  requiredHero: {
+    heroId: number | null;
+    nameKr: string | null;
+    nameCn: string | null;
+    nameEn: string | null;
+  } | null;
+  mission: {
+    missionId: number | null;
+    title: string | null;
+    desc: string | null;
+    missionType: number | null;
+  } | null;
+  stage: { stageId: number | null; nameCn: string | null } | null;
+};
+
 type HeroDungeonBondDetail = {
   bonds: {
     rows: Array<{
-      completionConditions: Array<{
-        requiredHero: {
-          heroId: number | null;
-          nameKr: string | null;
-          nameCn: string | null;
-          nameEn: string | null;
-        } | null;
-        stage: { stageId: number | null; nameCn: string | null } | null;
-      }>;
+      completionConditions: HeroDungeonBondCondition[];
     }>;
   };
 };
+
+function getHeroName(condition: HeroDungeonBondCondition) {
+  return (
+    condition.favorability?.targetHeroNameKr ??
+    condition.favorability?.targetHeroNameCn ??
+    condition.favorability?.targetHeroNameEn ??
+    null
+  );
+}
+
+function getRequiredHeroName(condition: HeroDungeonBondCondition) {
+  if (!condition.requiredHero) return null;
+  return (
+    condition.requiredHero.nameKr ??
+    condition.requiredHero.nameCn ??
+    condition.requiredHero.nameEn ??
+    `Hero ${condition.requiredHero.heroId ?? "?"}`
+  );
+}
+
+function formatBondMissionDesc(desc: string | null, currentHeroName: string | null) {
+  if (!desc) return desc;
+
+  const levelMatch = desc.match(/^.+(?:到达|达到)(\d+)级$/);
+  if (levelMatch) return `레벨 ${levelMatch[1]} 달성`;
+
+  const classMatch = desc.match(/^.+转职(?:成为|为)(.+)$/);
+  if (classMatch) return `${classMatch[1]}로 전직`;
+
+  const eliteRiftMatch = desc.match(/^使用.+完成时空裂缝精英(\d+-\d+)$/);
+  if (eliteRiftMatch && currentHeroName) {
+    return `${currentHeroName}을 출전시켜 시공의 균열 ${eliteRiftMatch[1]}[정예] 클리어`;
+  }
+
+  const riftMatch = desc.match(/^使用.+完成时空裂缝(\d+-\d+)$/);
+  if (riftMatch && currentHeroName) {
+    return `${currentHeroName}을 출전시켜 시공의 균열 ${riftMatch[1]} 클리어`;
+  }
+
+  const arenaMatch = desc.match(/^使用.+在竞技场中获得(\d+)次胜利$/);
+  if (arenaMatch && currentHeroName) {
+    const winCount = Number(arenaMatch[1]);
+    if (winCount === 1 || winCount === 5) {
+      return `${currentHeroName}을 사용해 아레나에서 1회 승리`;
+    }
+  }
+
+  return desc;
+}
 
 export function applyHeroDungeonBondPresentation<T extends HeroDungeonBondDetail>(heroId: number, detail: T): T {
   const gateByDungeonLevelId = HERO_DUNGEON_GATE_BY_HERO_ID.get(heroId);
   if (!gateByDungeonLevelId) {
     throw new Error(`Hero ${heroId} is missing from the Hero Dungeon B5 frozen consumer.`);
   }
-  if (gateByDungeonLevelId.size === 0) return detail;
 
   return {
     ...detail,
     bonds: {
       ...detail.bonds,
-      rows: detail.bonds.rows.map((bond) => ({
-        ...bond,
-        completionConditions: bond.completionConditions.map((condition) => {
-          if (!condition.requiredHero || condition.stage?.stageId == null) return condition;
-          const gateOrdinal = gateByDungeonLevelId.get(condition.stage.stageId);
-          if (gateOrdinal == null) return condition;
+      rows: detail.bonds.rows.map((bond) => {
+        const currentHeroName = bond.completionConditions.map(getHeroName).find((name) => name !== null) ?? null;
 
-          const requiredHeroName =
-            condition.requiredHero.nameKr ??
-            condition.requiredHero.nameCn ??
-            condition.requiredHero.nameEn ??
-            `Hero ${condition.requiredHero.heroId ?? "?"}`;
+        return {
+          ...bond,
+          // Favorability thresholds stay frozen in the semantic consumer, but their
+          // text rows are intentionally hidden until the bond-icon presentation is added.
+          completionConditions: bond.completionConditions
+            .filter((condition) => !condition.favorability)
+            .map((condition) => {
+              const mission = condition.mission
+                ? {
+                    ...condition.mission,
+                    desc: formatBondMissionDesc(condition.mission.desc, currentHeroName),
+                  }
+                : condition.mission;
 
-          // Presentation-only: B5 supplies the exact dungeonLevelId -> gateOrdinal mapping.
-          // Stage 5/6 relations remain unchanged and unmatched conditions keep their existing presentation.
-          return {
-            ...condition,
-            requiredHero: null,
-            stage: {
-              ...condition.stage,
-              nameCn: `${requiredHeroName}와 함께 운명의문 ${gateOrdinal} 클리어`,
-            },
-          };
-        }),
-      })),
+              if (!condition.requiredHero || condition.stage?.stageId == null) {
+                return {
+                  ...condition,
+                  mission,
+                };
+              }
+
+              const stageId = condition.stage.stageId;
+              const requiredHeroName = getRequiredHeroName(condition);
+              if (!requiredHeroName) {
+                return {
+                  ...condition,
+                  mission,
+                };
+              }
+
+              const ownGateOrdinal = gateByDungeonLevelId.get(stageId);
+              if (ownGateOrdinal != null) {
+                // A's own Gate of Fate requires B to accompany A.
+                return {
+                  ...condition,
+                  requiredHero: null,
+                  mission,
+                  stage: {
+                    ...condition.stage,
+                    nameCn: `${requiredHeroName}와 함께 운명의문 ${ownGateOrdinal} 클리어`,
+                  },
+                };
+              }
+
+              const requiredHeroId = condition.requiredHero.heroId;
+              const otherHeroGateOrdinal =
+                requiredHeroId == null
+                  ? null
+                  : HERO_DUNGEON_GATE_BY_HERO_ID.get(requiredHeroId)?.get(stageId) ?? null;
+
+              if (otherHeroGateOrdinal != null) {
+                // A must participate in D's Gate of Fate. Keep the ownership direction explicit.
+                return {
+                  ...condition,
+                  requiredHero: null,
+                  mission,
+                  stage: {
+                    ...condition.stage,
+                    nameCn: `${requiredHeroName}의 운명의문 ${otherHeroGateOrdinal}에 함께 출전하여 클리어`,
+                  },
+                };
+              }
+
+              // Unmatched frozen relations fail closed to the existing route presentation.
+              return {
+                ...condition,
+                mission,
+              };
+            }),
+        };
+      }),
     },
   };
 }

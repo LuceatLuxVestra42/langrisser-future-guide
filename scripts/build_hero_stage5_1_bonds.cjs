@@ -117,10 +117,20 @@ let totalFetterRefs = 0;
 let totalConditions = 0;
 let type2ConditionCount = 0;
 let requiredHeroResolvedCount = 0;
+let legacyArenaFiveWinDescCorrectionCount = 0;
 
 function heroRef(id) {
   const row = heroNameById.get(Number(id));
   return row ? identity(row) : { heroId: Number(id), nameKr: null, nameCn: null, nameEn: null };
+}
+
+function normalizeBondMissionDesc(desc) {
+  if (typeof desc !== 'string') return desc ?? null;
+  if (/^使用.+在竞技场中获得5次胜利$/.test(desc)) {
+    legacyArenaFiveWinDescCorrectionCount += 1;
+    return desc.replace('5次胜利', '1次胜利');
+  }
+  return desc;
 }
 
 function resolveCondition(ownerHeroId, fetterId, condition, conditionIndex) {
@@ -232,7 +242,7 @@ function resolveCondition(ownerHeroId, fetterId, condition, conditionIndex) {
     mission: {
       missionId,
       title: mission.Title ?? null,
-      desc: mission.Desc ?? null,
+      desc: normalizeBondMissionDesc(mission.Desc ?? null),
       missionType: mission.MissionType ?? null,
       param1: own(mission, 'Param1') ? mission.Param1 : null,
       param2: own(mission, 'Param2') ? mission.Param2 : null,
@@ -337,7 +347,7 @@ const dataDoc = {
   version: 1,
   stage: 'hero-page-5-1',
   artifact: 'hero-bond-production-candidate',
-  sourcePolicy: 'Canonical Hero IDs come from hero-name-master; HeroInformation exact-ID ownership and source HeroFetter order are preserved. No name/pattern fallback joins are used.',
+  sourcePolicy: 'Canonical Hero IDs come from hero-name-master; HeroInformation exact-ID ownership and source HeroFetter order are preserved. No name/pattern fallback joins are used. Legacy arena five-win display text is normalized to the current one-win requirement without changing Hero or stage relations.',
   semanticCoverage,
   recordCount: outputHeroes.length,
   records: outputHeroes,
@@ -375,6 +385,7 @@ const audit = {
     type2MissionTypeDistribution: sortedObject(missionTypeDist),
     type5Param2Distribution: sortedObject(type5Param2Dist),
     requiredHeroResolvedCount,
+    legacyArenaFiveWinDescCorrectionCount,
     type1ConditionCount,
     type1Parm1EqualsOwner: type1Parm1SelfCount,
     type1Parm2Distribution: sortedObject(type1Parm2Values),
