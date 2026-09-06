@@ -1,9 +1,7 @@
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import vm from 'node:vm';
-import { spawnSync } from 'node:child_process';
 
 const ROOT = process.cwd();
 const CONTRACT_PATH = 'data/contracts/localization-audit-hero-talent-kr-sheet-source.v1.json';
@@ -35,20 +33,34 @@ function parseArgs(argv) {
   return options;
 }
 
-async function downloadSourceArchive(contract) {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hero-talent-kr-sheet-'));
-  const archive = path.join(tempDir, 'source.tar.gz');
-  const url = `https://codeload.github.com/${contract.source.repository}/tar.gz/${contract.source.ref}`;
+function rawUrl(contract, relativePath) {
+  const encoded = relativePath
+    .split('/')
+    .map((part) => encodeURIComponent(part))
+    .join('/');
+  return `https://raw.githubusercontent.com/${contract.source.repository}/${contract.source.ref}/${encoded}`;
+}
+
+async function fetchText(url) {
   const response = await fetch(url, { headers: { 'user-agent': 'langrisser-future-guide-localization-extractor' } });
-  if (!response.ok) fail(`Failed to download KR sheet source archive: HTTP ${response.status}`, { url });
-  fs.writeFileSync(archive, Buffer.from(await response.arrayBuffer()));
-  const extracted = path.join(tempDir, 'extracted');
-  fs.mkdirSync(extracted, { recursive: true });
-  const tar = spawnSync('tar', ['-xzf', archive, '-C', extracted], { encoding: 'utf8' });
-  if (tar.status !== 0) fail('Failed to extract KR sheet source archive.', { stderr: tar.stderr });
-  const roots = fs.readdirSync(extracted, { withFileTypes: true }).filter((entry) => entry.isDirectory());
-  if (roots.length !== 1) fail('Unexpected KR sheet archive root layout.', { roots: roots.map((entry) => entry.name) });
-  return { sourceDir: path.join(extracted, roots[0].name), cleanupDir: tempDir, archiveUrl: url };
+  if (!response.ok) fail(`Failed to fetch KR-sheet source: HTTP ${response.status}`, { url });
+  return response.text();
+}
+
+function makeSourceReader(contract, sourceDir) {
+  if (sourceDir) {
+    const root = path.resolve(sourceDir);
+    return {
+      mode: 'LOCAL_SOURCE_DIR',
+      locator: root,
+      read: async (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8'),
+    };
+  }
+  return {
+    mode: 'PINNED_RAW_GITHUB',
+    locator: `https://raw.githubusercontent.com/${contract.source.repository}/${contract.source.ref}/`,
+    read: async (relativePath) => fetchText(rawUrl(contract, relativePath)),
+  };
 }
 
 function parseLegacyHeroData(sourceText, sourcePath) {
@@ -154,9 +166,23 @@ function sameTalent(left, right) {
   return JSON.stringify(stable(left)) === JSON.stringify(stable(right));
 }
 
-function buildOutput({ contract, master, sourceDir, archiveUrl }) {
-  const heroHtmlPath = path.join(sourceDir, contract.source.heroIndexPath);
-  const heroHtml = fs.readFileSync(heroHtmlPath, 'utf8');
+async function mapConcurrent(items, limit, worker) {
+  const results = new Array(items.length);
+  let next = 0;
+  const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (true) {
+      const index = next;
+      next += 1;
+      if (index >= items.length) return;
+      results[index] = await worker(items[index], index);
+    }
+  });
+  await Promise.all(runners);
+  return results;
+}
+
+async function buildOutput({ contract, master, source }) {
+  const heroHtml = await source.read(contract.source.heroIndexPath);
   const routeKeys = extractRouteKeys(heroHtml);
   if (routeKeys.length !== contract.scope.expectedCardRouteCount) {
     fail('Legacy Hero card route count mismatch.', {
@@ -166,15 +192,11 @@ function buildOutput({ contract, master, sourceDir, archiveUrl }) {
   }
 
   const indexes = buildMasterIndexes(master);
-  const rows = [];
-  for (const [sourceOrder, routeKey] of routeKeys.entries()) {
+  const rows = await mapConcurrent(routeKeys, 16, async (routeKey, sourceOrder) => {
     const relativeSourcePath = `${contract.source.heroDataDir}/${routeKey}.js`;
-    const sourcePath = path.join(sourceDir, relativeSourcePath);
-    if (!fs.existsSync(sourcePath)) fail('Legacy Hero detail source is missing.', { routeKey, relativeSourcePath });
-    const legacy = parseLegacyHeroData(fs.readFileSync(sourcePath, 'utf8'), relativeSourcePath);
+    const legacy = parseLegacyHeroData(await source.read(relativeSourcePath), relativeSourcePath);
     const { target, method } = matchHero({ routeKey, legacy, contract, indexes });
-    const talent = extractTalent(legacy, relativeSourcePath, contract);
-    rows.push({
+    return {
       sourceOrder,
       heroId: target.heroId,
       currentNameKr: target.nameKr,
@@ -184,9 +206,9 @@ function buildOutput({ contract, master, sourceDir, archiveUrl }) {
       sourceNameKr: legacy.Name ?? null,
       sourceNameCn: legacy.ChName ?? null,
       matchMethod: method,
-      talent,
-    });
-  }
+      talent: extractTalent(legacy, relativeSourcePath, contract),
+    };
+  });
 
   const grouped = new Map();
   for (const row of rows) {
@@ -267,7 +289,8 @@ function buildOutput({ contract, master, sourceDir, archiveUrl }) {
     source: {
       repository: contract.source.repository,
       ref: contract.source.ref,
-      archiveUrl,
+      fetchMode: source.mode,
+      locator: source.locator,
       heroIndexPath: contract.source.heroIndexPath,
       heroDataDir: contract.source.heroDataDir,
     },
@@ -299,41 +322,28 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   const contract = readJson(CONTRACT_PATH);
   const master = readJson(contract.currentHeroMaster);
-  let cleanupDir = null;
-  let sourceDir = options.sourceDir ? path.resolve(options.sourceDir) : null;
-  let archiveUrl = null;
+  const source = makeSourceReader(contract, options.sourceDir);
+  const result = await buildOutput({ contract, master, source });
+  const outputPath = path.resolve(ROOT, options.output ?? contract.output);
 
-  try {
-    if (!sourceDir) {
-      const downloaded = await downloadSourceArchive(contract);
-      sourceDir = downloaded.sourceDir;
-      cleanupDir = downloaded.cleanupDir;
-      archiveUrl = downloaded.archiveUrl;
+  if (options.check) {
+    if (!fs.existsSync(outputPath)) fail('Committed KR-sheet Hero talent output is missing.', { outputPath });
+    const expected = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
+    if (JSON.stringify(stable(result)) !== JSON.stringify(stable(expected))) {
+      fail('Committed KR-sheet Hero talent output is stale or mismatched.');
     }
-    const result = buildOutput({ contract, master, sourceDir, archiveUrl });
-    const outputPath = path.resolve(ROOT, options.output ?? contract.output);
-
-    if (options.check) {
-      if (!fs.existsSync(outputPath)) fail('Committed KR-sheet Hero talent output is missing.', { outputPath });
-      const expected = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
-      if (JSON.stringify(stable(result)) !== JSON.stringify(stable(expected))) {
-        fail('Committed KR-sheet Hero talent output is stale or mismatched.');
-      }
-      console.log(`Hero Talent KR Sheet Source: PASS (${result.coverage.uniqueHeroCount}/${result.coverage.canonicalHeroCount}; post-cutoff ${result.coverage.postCutoffHeroCount})`);
-      return;
-    }
-
-    if (options.json) {
-      process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-      return;
-    }
-
-    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-    fs.writeFileSync(outputPath, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
-    console.log(`Wrote ${path.relative(ROOT, outputPath)} (${result.coverage.uniqueHeroCount} Heroes)`);
-  } finally {
-    if (cleanupDir) fs.rmSync(cleanupDir, { recursive: true, force: true });
+    console.log(`Hero Talent KR Sheet Source: PASS (${result.coverage.uniqueHeroCount}/${result.coverage.canonicalHeroCount}; post-cutoff ${result.coverage.postCutoffHeroCount})`);
+    return;
   }
+
+  if (options.json) {
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return;
+  }
+
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  fs.writeFileSync(outputPath, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+  console.log(`Wrote ${path.relative(ROOT, outputPath)} (${result.coverage.uniqueHeroCount} Heroes)`);
 }
 
 main().catch((error) => {
