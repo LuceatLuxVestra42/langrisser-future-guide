@@ -97,7 +97,8 @@ try {
       const displayName = normalizeSemanticText(await heading.innerText());
       check(displayName.length > 0, `Equipment ${testCase.equipmentId} display name is blank`);
 
-      const rawParagraphTexts = await page.locator("main p").allInnerTexts();
+      const paragraphLocator = page.locator("main p");
+      const rawParagraphTexts = await paragraphLocator.allInnerTexts();
       const expectedSemanticText = normalizeSemanticText(testCase.effectText);
       const semanticParagraphTexts = rawParagraphTexts.map(normalizeSemanticText);
       const semanticEffectParagraphCount = semanticParagraphTexts.filter(
@@ -110,12 +111,30 @@ try {
 
       const expectedPresentationText = normalizePresentationText(testCase.effectText);
       const presentationParagraphTexts = rawParagraphTexts.map(normalizePresentationText);
-      const presentationEffectParagraphCount = presentationParagraphTexts.filter(
-        (text) => text === expectedPresentationText,
-      ).length;
+      const presentationMatchingIndexes = presentationParagraphTexts.flatMap((text, index) =>
+        text === expectedPresentationText ? [index] : [],
+      );
       check(
-        presentationEffectParagraphCount === 1,
-        `Equipment ${testCase.equipmentId} hosted KR effect presentation mismatch: expected newline-preserving paragraph count=1 actual=${presentationEffectParagraphCount} expected=${JSON.stringify(expectedPresentationText)}`,
+        presentationMatchingIndexes.length === 1,
+        `Equipment ${testCase.equipmentId} hosted KR effect presentation mismatch: expected newline-preserving paragraph count=1 actual=${presentationMatchingIndexes.length} expected=${JSON.stringify(expectedPresentationText)}`,
+      );
+
+      const effectParagraph = paragraphLocator.nth(presentationMatchingIndexes[0]);
+      const computedStyle = await effectParagraph.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          whiteSpace: style.whiteSpace,
+          display: style.display,
+          visibility: style.visibility,
+        };
+      });
+      check(
+        computedStyle.whiteSpace === "pre-line",
+        `Equipment ${testCase.equipmentId} hosted KR effect white-space mismatch: expected=pre-line actual=${computedStyle.whiteSpace}`,
+      );
+      check(
+        computedStyle.display !== "none" && computedStyle.visibility !== "hidden",
+        `Equipment ${testCase.equipmentId} hosted KR effect paragraph is not visible: display=${computedStyle.display} visibility=${computedStyle.visibility}`,
       );
 
       check(pageErrors.length === 0, `Equipment ${testCase.equipmentId} page errors: ${JSON.stringify(pageErrors)}`);
@@ -129,6 +148,12 @@ try {
         effectParagraph: "EXACT_MATCH",
         semanticTextMatch: "EXACT_MATCH",
         presentationTextMatch: "NEWLINE_PRESERVING_EXACT_MATCH",
+        computedStyle: {
+          whiteSpace: computedStyle.whiteSpace,
+          display: computedStyle.display,
+          visibility: computedStyle.visibility,
+          result: "PASS",
+        },
         pageErrors: 0,
         consoleErrors: 0,
         result: "PASS",
