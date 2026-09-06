@@ -14,6 +14,7 @@ import { EquipmentDetailModalBridge } from "../lib/equipment-detail-modal-bridge
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const SOURCE_SHA_PATTERN = /^[0-9a-f]{40}$/i;
+const SITE_VERSION_QUERY_KEY = "__v";
 
 type SiteVersionState = "current" | "stale" | "unavailable" | "unversioned";
 
@@ -42,6 +43,18 @@ function publishSiteVersionState(
       detail: { status, currentSourceSha, deployedSourceSha },
     }),
   );
+}
+
+function navigateToDeployedVersion(deployedSourceSha: string) {
+  const target = new URL(window.location.href);
+  if (target.searchParams.get(SITE_VERSION_QUERY_KEY) === deployedSourceSha) {
+    return false;
+  }
+
+  target.searchParams.set(SITE_VERSION_QUERY_KEY, deployedSourceSha);
+  document.documentElement.dataset.siteVersionNavigation = "requested";
+  window.location.replace(target.toString());
+  return true;
 }
 
 function SiteVersionGuard() {
@@ -86,11 +99,13 @@ function SiteVersionGuard() {
         }
         if (cancelled) return;
 
-        publishSiteVersionState(
-          deployedSourceSha === currentSourceSha ? "current" : "stale",
-          currentSourceSha,
-          deployedSourceSha,
-        );
+        const status: SiteVersionState =
+          deployedSourceSha === currentSourceSha ? "current" : "stale";
+        publishSiteVersionState(status, currentSourceSha, deployedSourceSha);
+
+        if (status === "stale") {
+          navigateToDeployedVersion(deployedSourceSha);
+        }
       } catch {
         if (!cancelled) {
           publishSiteVersionState("unavailable", currentSourceSha);
