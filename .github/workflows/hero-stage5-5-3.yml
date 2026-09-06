@@ -27,6 +27,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Hydrate pinned ConfigData source pack outside repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf /tmp/langrisser-configdata-pack
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir /tmp/langrisser-configdata-pack
+          test -f /tmp/langrisser-configdata-pack/data/configdata/ConfigDataHeroInfo.json
+          ln -s /tmp/langrisser-configdata-pack/data/configdata data/configdata
+
       - name: Apply reviewed Hero 99164 Korean-name correction
         run: |
           node - <<'NODE'
@@ -71,6 +80,12 @@ jobs:
           }, null, 2));
           if (r.status !== 'PASS') process.exit(1);
           NODE
+
+      - name: Remove temporary ConfigData mount
+        if: always()
+        run: |
+          if [ -L data/configdata ]; then rm data/configdata; fi
+          rm -rf /tmp/langrisser-configdata-pack
 
       - name: Freeze Hero name master and Stage 5-5-3 outputs
         run: |
