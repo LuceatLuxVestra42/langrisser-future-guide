@@ -317,7 +317,7 @@ function projectCentralDiscipline(centralDiscipline: Stage6CentralDiscipline) {
   return {
     status: centralDiscipline?.status ?? null,
     released: isReleased(centralDiscipline),
-    skillId: Number.isInteger(centralDiscipline?.skillId) ? Number(centralDiscipline.skillId) : null,
+    skillId: Number.isInteger(centralDiscipline?.skillId) ? Number(centralDiscipline?.skillId) : null,
     nameCn: centralDiscipline?.nameCn ?? null,
     descCn: centralDiscipline?.descCn ?? null,
     iconPath: centralDiscipline?.icon ?? null,
@@ -325,9 +325,9 @@ function projectCentralDiscipline(centralDiscipline: Stage6CentralDiscipline) {
       ? centralDiscipline.templates.filter((value): value is number => Number.isInteger(value)).map(Number)
       : [],
     unlock: {
-      equipmentLevel: Number.isInteger(centralDiscipline?.unlock?.equipmentLevel) ? Number(centralDiscipline.unlock.equipmentLevel) : null,
-      heroStarLevel: Number.isInteger(centralDiscipline?.unlock?.heroStarLevel) ? Number(centralDiscipline.unlock.heroStarLevel) : null,
-      castingLawLevel: Number.isInteger(centralDiscipline?.unlock?.castingLawLevel) ? Number(centralDiscipline.unlock.castingLawLevel) : null,
+      equipmentLevel: Number.isInteger(centralDiscipline?.unlock?.equipmentLevel) ? Number(centralDiscipline?.unlock?.equipmentLevel) : null,
+      heroStarLevel: Number.isInteger(centralDiscipline?.unlock?.heroStarLevel) ? Number(centralDiscipline?.unlock?.heroStarLevel) : null,
+      castingLawLevel: Number.isInteger(centralDiscipline?.unlock?.castingLawLevel) ? Number(centralDiscipline?.unlock?.castingLawLevel) : null,
       materials,
     },
     resolver: centralDiscipline?.resolver ?? null,
