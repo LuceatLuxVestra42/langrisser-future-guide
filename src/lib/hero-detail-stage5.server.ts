@@ -1,3 +1,4 @@
+import { readHeroCvLocalization } from "./hero-cv-localization.server";
 import { readHeroSkinPresentation } from "./skin-detail.server";
 import { readHeroDetailRouteStage4Data } from "./hero-list.server";
 
@@ -440,6 +441,8 @@ export async function readHeroDetailRouteStage5Data(heroId: number) {
   if (!shell) return null;
   const skinPresentation = readHeroSkinPresentation(heroId);
   if (!skinPresentation) return null;
+  const cvLocalization = readHeroCvLocalization(heroId);
+  if (!cvLocalization) throw new Error(`Hero ${heroId} CV localization materialization is missing.`);
   const moduleKey = `../../data/generated/hero-detail/by-id/${heroId}.json`;
   const loadShard = stage6ShardModules[moduleKey];
   if (!loadShard) return null;
@@ -448,6 +451,12 @@ export async function readHeroDetailRouteStage5Data(heroId: number) {
   const detail = projectStage6Shard(shard);
   if (detail.presentation.skinCount !== skinPresentation.items.length) {
     throw new Error(`Hero ${heroId} Stage 6/Skin frozen relation count mismatch.`);
+  }
+  if (detail.presentation.cvSourceValue !== cvLocalization.cvSourceValue) {
+    throw new Error(`Hero ${heroId} Stage 6/CV localization sourceValue mismatch.`);
+  }
+  if (detail.presentation.cvState !== cvLocalization.cvState) {
+    throw new Error(`Hero ${heroId} Stage 6/CV localization state mismatch.`);
   }
   return {
     ...shell,
@@ -461,6 +470,8 @@ export async function readHeroDetailRouteStage5Data(heroId: number) {
       ...detail,
       presentation: {
         ...detail.presentation,
+        cvNameKr: cvLocalization.cvNameKr,
+        cvLocalizationStatus: cvLocalization.localizationStatus,
         skins: skinPresentation.items,
         skinSource: skinPresentation.source,
       },
