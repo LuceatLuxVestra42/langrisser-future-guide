@@ -212,13 +212,13 @@ function HeroDetailPage() {
         </Link>
 
         <section className="mt-5 overflow-hidden rounded-3xl border border-border bg-card shadow-sm lg:relative lg:left-1/2 lg:w-[calc(100vw-4rem)] lg:max-w-[96rem] lg:-translate-x-1/2">
-          <div className="grid lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
-            <div className="relative min-h-[420px] overflow-hidden bg-muted/25 sm:min-h-[520px] lg:min-h-[620px]">
+          <div className="grid lg:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)]">
+            <div className="relative min-h-[357px] overflow-hidden bg-muted/25 sm:min-h-[442px] lg:min-h-[527px]">
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
               {activeVisual ? (
                 <img src={activeVisual.src} alt={`${displayName} ${activeVisual.label}`} className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6" />
               ) : (
-                <div className="flex h-full min-h-[420px] flex-col items-center justify-center gap-3 text-muted-foreground">
+                <div className="flex h-full min-h-[357px] flex-col items-center justify-center gap-3 text-muted-foreground">
                   <UserRound className="h-20 w-20" strokeWidth={1.05} aria-hidden="true" />
                   <span className="inline-flex items-center gap-1 text-xs font-semibold"><ImageOff className="h-3.5 w-3.5" aria-hidden="true" />이미지 연결 대기</span>
                 </div>
