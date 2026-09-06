@@ -35,7 +35,7 @@ jobs:
       - name: Commit generated projection when changed
         if: github.event_name == 'pull_request'
         run: |
-          if git diff --quiet -- data/presentation/hero-talent-kr-sheet-source.v1.json; then
+          if [ -z "$(git status --porcelain -- data/presentation/hero-talent-kr-sheet-source.v1.json)" ]; then
             echo 'Generated projection already current.'
             exit 0
           fi
