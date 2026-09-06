@@ -15,24 +15,30 @@ assert.match(workflow, /deadline=\$\(\(SECONDS \+ 1200\)\)/);
 assert.doesNotMatch(workflow, /deadline=\$\(\(SECONDS \+ 600\)\)/);
 assert.match(workflow, /Strict Hosted QA against exact Data Pages preview[\s\S]*--expected-sha "\$SOURCE_SHA"/);
 
-assert.match(workflow, /finalizer-handoff:\n    name: finalizer-handoff/);
-assert.match(workflow, /finalizer-handoff:[\s\S]*needs:\n      - preview_gate_plan\n      - publish-pr-preview/);
-assert.match(workflow, /finalizer-handoff:[\s\S]*github\.event_name == 'pull_request'/);
-assert.match(workflow, /finalizer-handoff:[\s\S]*github\.event\.action != 'closed'/);
-assert.match(workflow, /finalizer-handoff:[\s\S]*needs\.preview_gate_plan\.outputs\.hosted_preview_required == 'true'/);
-assert.match(workflow, /finalizer-handoff:[\s\S]*needs\.publish-pr-preview\.result == 'success'/);
-assert.match(workflow, /finalizer-handoff:[\s\S]*github\.event\.pull_request\.head\.repo\.full_name == github\.repository/);
-assert.match(workflow, /finalizer-handoff:[\s\S]*permissions:\n      contents: read\n      pull-requests: read\n      actions: write/);
-assert.doesNotMatch(workflow, /finalizer-handoff:[\s\S]*contents: write/);
-assert.match(workflow, /FINALIZER_HANDOFF=SKIP_DIFFERENT_REPOSITORY/);
-assert.match(workflow, /FINALIZER_HANDOFF=SKIP_CLOSED/);
-assert.match(workflow, /FINALIZER_HANDOFF=SKIP_MERGED/);
-assert.match(workflow, /FINALIZER_HANDOFF=SKIP_STALE_HEAD/);
-assert.match(workflow, /actions\/workflows\/merge-finalize-main\.yml\/dispatches/);
-assert.match(workflow, /-f ref=main/);
-assert.match(workflow, /-f "inputs\[pr\]=\$PR_NUMBER"/);
-assert.match(workflow, /FINALIZER_HANDOFF=DISPATCHED/);
-assert.doesNotMatch(workflow, /finalizer-handoff:[\s\S]*gh pr merge/);
+const finalizerHandoffMatch = workflow.match(
+  /^  finalizer-handoff:\n[\s\S]*?(?=^  [A-Za-z0-9_-]+:\n)/m,
+);
+assert.ok(finalizerHandoffMatch, 'finalizer-handoff job must exist');
+const finalizerHandoff = finalizerHandoffMatch[0];
+
+assert.match(finalizerHandoff, /finalizer-handoff:\n    name: finalizer-handoff/);
+assert.match(finalizerHandoff, /needs:\n      - preview_gate_plan\n      - publish-pr-preview/);
+assert.match(finalizerHandoff, /github\.event_name == 'pull_request'/);
+assert.match(finalizerHandoff, /github\.event\.action != 'closed'/);
+assert.match(finalizerHandoff, /needs\.preview_gate_plan\.outputs\.hosted_preview_required == 'true'/);
+assert.match(finalizerHandoff, /needs\.publish-pr-preview\.result == 'success'/);
+assert.match(finalizerHandoff, /github\.event\.pull_request\.head\.repo\.full_name == github\.repository/);
+assert.match(finalizerHandoff, /permissions:\n      contents: read\n      pull-requests: read\n      actions: write/);
+assert.doesNotMatch(finalizerHandoff, /contents:\s*write/);
+assert.match(finalizerHandoff, /FINALIZER_HANDOFF=SKIP_DIFFERENT_REPOSITORY/);
+assert.match(finalizerHandoff, /FINALIZER_HANDOFF=SKIP_CLOSED/);
+assert.match(finalizerHandoff, /FINALIZER_HANDOFF=SKIP_MERGED/);
+assert.match(finalizerHandoff, /FINALIZER_HANDOFF=SKIP_STALE_HEAD/);
+assert.match(finalizerHandoff, /actions\/workflows\/merge-finalize-main\.yml\/dispatches/);
+assert.match(finalizerHandoff, /-f ref=main/);
+assert.match(finalizerHandoff, /-f "inputs\[pr\]=\$PR_NUMBER"/);
+assert.match(finalizerHandoff, /FINALIZER_HANDOFF=DISPATCHED/);
+assert.doesNotMatch(finalizerHandoff, /gh pr merge/);
 
 function classifyHandoffFixture({
   eventName = 'pull_request',
