@@ -253,7 +253,7 @@ function EffectSection({ effect }: { effect: Effect }) {
       <h2 className="text-lg font-bold text-foreground">효과</h2>
 
       <div className="mt-4 rounded-xl bg-muted/45 p-4 sm:p-5">
-        <p className="text-sm leading-7 text-muted-foreground">
+        <p className="max-w-3xl whitespace-normal break-words text-sm leading-7 text-muted-foreground">
           {effect.effectSegments.map((segment, index) =>
             segment.highlight ? (
               <mark
