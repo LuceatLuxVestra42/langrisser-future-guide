@@ -16,6 +16,7 @@ const equipmentIds = [...generalEquipmentIds, ...exclusiveEquipmentIds];
 const heroIds = heroListJson.records.map((record) => record.heroId);
 const soldierIds = soldierListJson.records.map((record) => record.soldierId);
 const staticBase = process.env.STATIC_SITE_BASE ?? "/langrisser-future-guide/";
+const siteSourceSha = process.env.GITHUB_SHA?.trim() ?? "";
 
 if (!staticBase.startsWith("/") || !staticBase.endsWith("/") || staticBase.includes("//")) {
   throw new Error(`STATIC_SITE_BASE must start and end with / and contain no //; got ${staticBase}`);
@@ -67,7 +68,12 @@ const soldierDetailPages = soldierIds.map((soldierId) => ({
 }));
 
 export default defineConfig({
-  vite: { base: staticBase },
+  vite: {
+    base: staticBase,
+    define: {
+      "import.meta.env.VITE_SITE_SOURCE_SHA": JSON.stringify(siteSourceSha),
+    },
+  },
   nitro: false,
   tanstackStart: {
     server: { entry: "server" },
