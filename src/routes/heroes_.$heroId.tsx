@@ -114,12 +114,12 @@ type HeroVisual = {
 };
 
 const HERO_RARITY_ICON_PATH_BY_LABEL: Record<string, string> = {
-  LLR: "/images/hero-rarity/LLR.png",
-  SSR: "/images/hero-rarity/SSR.png",
-  SR: "/images/hero-rarity/SR.png",
-  R: "/images/hero-rarity/R.png",
-  N: "/images/hero-rarity/N.png",
-  SP: "/images/hero-rarity/SP.png",
+  LLR: "/images/heroes/rarity/LLR.png",
+  SSR: "/images/heroes/rarity/SSR.png",
+  SR: "/images/heroes/rarity/SR.png",
+  R: "/images/heroes/rarity/R.png",
+  N: "/images/heroes/rarity/N.png",
+  SP: "/images/heroes/rarity/SP.png",
 };
 
 const FETTER_ICON_BY_FAVORABILITY_LEVEL: Record<number, number> = {
