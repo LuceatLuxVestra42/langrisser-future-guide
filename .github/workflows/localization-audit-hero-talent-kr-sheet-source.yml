@@ -1,0 +1,40 @@
+name: Hero Talent KR Sheet Source
+
+on:
+  pull_request:
+    paths:
+      - 'data/contracts/localization-audit-hero-talent-kr-sheet-source.v1.json'
+      - 'data/presentation/hero-talent-kr-sheet-source.v1.json'
+      - 'scripts/audit-localization-hero-talent-kr-sheet-source.mjs'
+      - '.github/workflows/localization-audit-hero-talent-kr-sheet-source.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Extract pinned Korean-sheet normal Hero talents
+        run: |
+          mkdir -p artifacts
+          node scripts/audit-localization-hero-talent-kr-sheet-source.mjs \
+            --output artifacts/hero-talent-kr-sheet-source.v1.json
+      - name: Verify committed projection when present
+        run: |
+          if [ -f data/presentation/hero-talent-kr-sheet-source.v1.json ]; then
+            node scripts/audit-localization-hero-talent-kr-sheet-source.mjs --check
+          else
+            echo 'Committed projection not present yet; extraction artifact will be used for intake.'
+          fi
+      - name: Upload extraction artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-talent-kr-sheet-source
+          path: artifacts/hero-talent-kr-sheet-source.v1.json
+          if-no-files-found: error
