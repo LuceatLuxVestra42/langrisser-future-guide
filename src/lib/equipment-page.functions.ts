@@ -12,6 +12,7 @@ import type {
   EquipmentFilterGroup,
   EquipmentStatProperty,
   ExclusiveEquipmentDetailPageData,
+  GeneralEquipmentDetailPageData,
 } from "./equipment-page.server";
 
 const ACCESSORY_GROUP = "accessory";
@@ -227,7 +228,9 @@ export async function getEquipmentDetailPageData({
   data,
 }: {
   data: { equipmentId: number };
-}) {
+}): Promise<
+  GeneralEquipmentDetailPageData | ExclusiveEquipmentDetailRouteData | null
+> {
   if (!Number.isSafeInteger(data.equipmentId) || data.equipmentId <= 0) {
     throw new Error("equipmentId must be a positive safe integer.");
   }
@@ -237,12 +240,11 @@ export async function getEquipmentDetailPageData({
     return null;
   }
 
-  const detail = {
-    ...pageData.detail,
-    effect: applyEquipmentEffectPresentation(pageData.detail.effect),
-  };
-
   if (pageData.kind === "exclusive") {
+    const detail = {
+      ...pageData.detail,
+      effect: applyEquipmentEffectPresentation(pageData.detail.effect),
+    };
     const presentation = exclusivePresentationByEquipmentId.get(data.equipmentId);
     if (!presentation) {
       throw new Error(
@@ -274,6 +276,11 @@ export async function getEquipmentDetailPageData({
     } satisfies ExclusiveEquipmentDetailRouteData;
   }
 
+  const detail = {
+    ...pageData.detail,
+    effect: applyEquipmentEffectPresentation(pageData.detail.effect),
+  };
+
   return {
     ...pageData,
     detail: {
@@ -283,5 +290,5 @@ export async function getEquipmentDetailPageData({
         hasAttackAndIntellectBaseStats(detail.stats.properties),
       ),
     },
-  };
+  } satisfies GeneralEquipmentDetailPageData;
 }
