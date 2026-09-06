@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "stage": "hero-talent-localization-stage3-reviewed-internal-binding-pilot",
+  "schemaId": "hero-talent-reviewed-internal-binding-pilot/v1",
+  "status": "PASS_WITH_REVIEW",
+  "completion": "PILOT_COMPLETE",
+  "scope": "legacy-korean-sheet-source-to-reviewed-configdata-hero-binding-pilot",
+  "base": {
+    "ref": "main",
+    "commitSha": "ddab3a354a7bf8ee25d589b5cdaa1298d9b837db"
+  },
+  "predecessors": {
+    "legacyIntake": "data/presentation/hero-talent-legacy-sheet-intake-stage5.v1.json",
+    "identityGate": "data/validation/hero-talent-legacy-sheet-stage6-identity-completeness.v1.json",
+    "heroCanonical": "data/validation/hero-stage6-4-final.v1.json"
+  },
+  "authorityBoundary": {
+    "heroSemanticPipelineReopened": false,
+    "semanticMutation": false,
+    "canonicalIdentityMutation": false,
+    "canonicalPopulationMutation": false,
+    "canonicalRelationMutation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarityJoin": false,
+    "displayOrderJoin": false,
+    "presentationLocalizationAdmission": false
+  },
+  "bindingPolicy": {
+    "identityCreatingEvidence": "MANUALLY_REVIEWED_EXACT_INTERNAL_HERO_RECORD_WITH_DIRECT_HERO_ID",
+    "internalSource": "ConfigDataHeroInfo",
+    "candidateLocatorEvidence": [
+      "legacy sourcePath/sourceKey",
+      "KR/CN/EN names",
+      "TalentName and descriptions"
+    ],
+    "postBindingParityEvidence": [
+      "Skill",
+      "Job",
+      "Soldier",
+      "Equipment",
+      "other frozen canonical metadata"
+    ],
+    "forbiddenIdentityCreation": [
+      "name equality alone",
+      "Talent or skill similarity alone",
+      "ID arithmetic",
+      "filename similarity",
+      "display or source order"
+    ],
+    "manualReviewRequirement": "The reviewer must verify that the located ConfigDataHeroInfo record is the same Hero entity as the legacy source before adopting the record's direct HeroID."
+  },
+  "positiveControls": [
+    {
+      "heroId": 6,
+      "sourceKey": "레온",
+      "sourcePath": "hero/data/레온.js",
+      "controlSource": "data/validation/hero-talent-legacy-sheet-stage6-identity-completeness.v1.json#confirmedRecords",
+      "existingIdentityStatus": "CONFIRMED_BY_EXISTING_PROJECT_PROVENANCE",
+      "guard": {
+        "nameKr": "레온",
+        "nameCn": "利昂",
+        "nameEn": "Leon",
+        "match": true
+      },
+      "pilotStatus": "PASS_EXISTING_REVIEWED_BINDING_CONTROL"
+    },
+    {
+      "heroId": 8,
+      "sourceKey": "라나",
+      "sourcePath": "hero/data/라나.js",
+      "controlSource": "data/validation/hero-talent-legacy-sheet-stage6-identity-completeness.v1.json#confirmedRecords",
+      "existingIdentityStatus": "CONFIRMED_BY_EXISTING_PROJECT_PROVENANCE",
+      "guard": {
+        "nameKr": "라나",
+        "nameCn": "拉娜",
+        "nameEn": "Lana",
+        "match": true
+      },
+      "pilotStatus": "PASS_EXISTING_REVIEWED_BINDING_CONTROL"
+    },
+    {
+      "heroId": 9,
+      "sourceKey": "보젤",
+      "sourcePath": "hero/data/보젤.js",
+      "controlSource": "data/validation/hero-talent-legacy-sheet-stage6-identity-completeness.v1.json#confirmedRecords",
+      "existingIdentityStatus": "CONFIRMED_BY_EXISTING_PROJECT_PROVENANCE",
+      "guard": {
+        "nameKr": "보젤",
+        "nameCn": "波赞鲁",
+        "nameEn": "Bozel",
+        "match": true
+      },
+      "pilotStatus": "PASS_EXISTING_REVIEWED_BINDING_CONTROL"
+    }
+  ],
+  "newBindings": [],
+  "manualReviewQueue": {
+    "sourceGroupCount": 248,
+    "status": "MANUAL_REVIEW_REQUIRED",
+    "blockerCode": "LEGACY_SHEET_CANONICAL_HERO_ID_PROVENANCE_MISSING",
+    "owner": "localization/source-identity-validation",
+    "rule": "Do not reduce this count until an explicit reviewed legacy source -> exact ConfigDataHeroInfo record -> direct HeroID binding is recorded."
+  },
+  "summary": {
+    "stage5SourceGroupCount": 251,
+    "positiveControlCount": 3,
+    "positiveControlPassCount": 3,
+    "newBindingCount": 0,
+    "remainingManualReviewCount": 248,
+    "hardSemanticErrorCount": 0
+  },
+  "checks": [
+    {
+      "name": "existing-reviewed-controls-preserved",
+      "pass": true,
+      "detail": "Hero 6/8/9 exactly reuse the current Stage 6 confirmedRecords and create no new identity."
+    },
+    {
+      "name": "forbidden-join-boundary",
+      "pass": true,
+      "detail": "No name JOIN, ID arithmetic, filename-similarity JOIN, source/display-order mapping, or similarity-based HeroID assignment is performed."
+    },
+    {
+      "name": "canonical-hero-freeze-preserved",
+      "pass": true,
+      "detail": "Hero canonical identity/population/relation remain untouched; Stage 6-4 is predecessor-only."
+    },
+    {
+      "name": "unreviewed-population-preserved",
+      "pass": true,
+      "detail": "248 unresolved source groups remain MANUAL_REVIEW_REQUIRED; the pilot does not silently promote candidate matches."
+    }
+  ],
+  "decision": "Stage 3 pilot is complete. The reviewed-binding contract is executable without reopening Hero semantics or creating identity from names/similarity. Existing Hero 6/8/9 mappings pass as positive controls. No new 248-source binding is claimed without a reviewed exact ConfigDataHeroInfo record, so the remaining manual-review population stays 248.",
+  "nextStartPoint": "localization/source-identity-validation: author the first small reviewed batch from exact ConfigDataHeroInfo records. Each accepted record must preserve an explicit legacy sourcePath/sourceKey -> reviewed internal record -> direct HeroID evidence chain; ambiguous cases remain MANUAL_REVIEW."
+}
