@@ -293,10 +293,10 @@
     {
       "id": "production-build",
       "phase": 50,
-      "executable": "npm",
-      "args": ["run", "build"],
+      "executable": "node",
+      "args": ["tools/project-check/test/frontend-production-gate.mjs"],
       "owner": "frontend-build",
-      "coverage": "Production build for explicit frontend/build owners; not semantic proof."
+      "coverage": "Production build plus TypeScript no-emit gate for explicit frontend/build owners; not semantic proof."
     }
   ]
 }
