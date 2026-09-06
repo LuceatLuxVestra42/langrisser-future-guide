@@ -347,11 +347,6 @@ function HeroDetailPage() {
                       <tr key={branch.branchIndex} className="border-b border-border last:border-b-0">
                         <th scope="row" className="px-4 py-3 text-left">
                           <div className="font-bold text-foreground">{capstone.nameCn ?? `Job ${capstone.jobId ?? "?"}`}</div>
-                          <div className="mt-1 text-[11px] font-semibold text-muted-foreground">
-                            Job #{capstone.jobId ?? "-"}
-                            {capstone.heroLevel != null ? ` · Lv.${capstone.heroLevel}` : ""}
-                            {capstone.star != null ? ` · ${capstone.star}성` : ""}
-                          </div>
                         </th>
                         <JobStatCell value={capstone.finalStats.HP} />
                         <JobStatCell value={capstone.finalStats.ATK} />
