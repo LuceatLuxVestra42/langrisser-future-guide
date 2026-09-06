@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "schemaId": "hero-talent-stage5-review-contract/v1",
+  "status": "ACTIVE",
+  "purpose": "Close the in-scope Hero talent localization reuse decision without reopening FINAL_FROZEN Hero semantics.",
+  "predecessor": {
+    "stage4Commit": "57258855a7f99f80d59f22e66ca3d34724da29b9",
+    "parityProjection": "data/presentation/hero-talent-kr-cn-parity.v1.json",
+    "expectedHeroCount": 251,
+    "expectedPostCutoffHeroCount": 16
+  },
+  "normalizationCorrection": {
+    "decodeHtmlEntitiesBeforeNumericParsing": true,
+    "knownLegacyEntity": "&#39;",
+    "expectedCorrectedStrongCount": 158,
+    "expectedCorrectedStructureCount": 51,
+    "expectedCorrectedDriftCount": 42
+  },
+  "reviewDecisions": {
+    "REUSE_CONFIRMED": [36,37,59,64,70,72,80,104,108,116,126,129,130,131,133,136,138,140,142,99161,99162,99165,99178,99179,99181,99185,99186,99188,99190,99191,99192,99196,99197,99198,99204,99205,99206,99208,99210,99212,99213,99227,99229,99235,99237,99240,99243,99244,99245,99249,99251,99252,99256,99258,99260,99261,99262,99264,99265,99266,99268,99271],
+    "PARTIAL_UPDATE_REQUIRED": [12,21,27,32,62,69,82,86,94,109,119,122,139,147,148,99168,99177,99189,99214,99219,99226,99255,99263],
+    "RETRANSLATE_FROM_CURRENT_CN": [99164,99167,99169,99170,99173,99218,99225,99238]
+  },
+  "partialReasons": {
+    "12": "CURRENT_CN_RATE_CHANGED",
+    "21": "STAR_SCALING_CHANGED",
+    "27": "CURRENT_VALUE_REPLACES_LEGACY_NOTE",
+    "32": "MOVEMENT_REDUCTION_VALUE_CHANGED",
+    "62": "MAX_STAT_BONUS_CHANGED",
+    "69": "AURA_RANGE_CHANGED",
+    "82": "HEAL_RATE_CHANGED",
+    "86": "TRIGGER_RADIUS_CHANGED",
+    "94": "HEAL_BASIS_CHANGED",
+    "109": "CURRENT_CN_HAS_MISSING_COOLDOWN",
+    "119": "LEGACY_EXTRA_SUMMON_DETAIL_NOT_IN_CURRENT_TALENT",
+    "122": "PROTECTION_RADIUS_CHANGED",
+    "139": "CURRENT_CN_HAS_MISSING_MOVEMENT_BONUS",
+    "147": "CURRENT_CN_TRIGGER_SCOPE_IS_BROADER",
+    "148": "DAMAGE_REDUCTION_VALUE_CHANGED",
+    "99168": "SUMMON_INHERITANCE_CHANGED",
+    "99177": "CURRENT_CN_HAS_MISSING_STACK_CAP",
+    "99189": "CURRENT_CN_HAS_MISSING_TERRAIN_DURATION",
+    "99214": "LEGACY_EXTRA_CAST_RANGE_NOT_IN_CURRENT_TALENT",
+    "99219": "CURRENT_CN_HAS_MISSING_NO_REPLACE_THIS_TURN_CLAUSE",
+    "99226": "CURRENT_CN_HAS_MISSING_DOMINATION_EFFECT_AND_DURATION",
+    "99255": "CURRENT_CN_HAS_MISSING_ONCE_PER_TURN_LIMIT",
+    "99263": "CONTROL_TRIGGER_TIMING_CHANGED"
+  },
+  "retranslateReasons": {
+    "99164": "LEGACY_KR_DELEGATES_STANCE_DETAILS",
+    "99167": "LEGACY_KR_DELEGATES_FORM_DETAILS",
+    "99169": "CURRENT_CN_TALENT_STRUCTURE_SUBSTANTIALLY_DIFFERS",
+    "99170": "LEGACY_KR_DELEGATES_DEPLOYMENT_DETAILS",
+    "99173": "LEGACY_KR_DELEGATES_FORMATION_DETAILS",
+    "99218": "LEGACY_KR_DELEGATES_WILL_DETAILS",
+    "99225": "LEGACY_KR_DELEGATES_EFFECT_DETAILS",
+    "99238": "LEGACY_KR_DELEGATES_LUCK_DETAILS"
+  },
+  "expectedFinal": {
+    "DIRECT_REUSE_FINAL": 220,
+    "PARTIAL_UPDATE_REQUIRED": 23,
+    "RETRANSLATE_FROM_CURRENT_CN": 8,
+    "TOTAL": 251
+  },
+  "nonScope": {
+    "semanticMutation": false,
+    "identityMutation": false,
+    "relationMutation": false,
+    "postCutoffTranslation": false,
+    "translationGenerationInThisStage": false
+  },
+  "output": "data/presentation/hero-talent-stage5-review.v1.json"
+}
