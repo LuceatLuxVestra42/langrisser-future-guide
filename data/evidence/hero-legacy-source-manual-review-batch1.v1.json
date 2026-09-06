@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "purpose": "Record explicitly human-reviewed identity provenance from the legacy Korean hero source to playable ConfigDataHeroInfo records without name-based automatic JOIN.",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "mainHead": "9978ba91d5581613bc0685dfbc4c1f26f0538879"
+  },
+  "legacySource": {
+    "repository": "redpanda7301/langrisser",
+    "commit": "a85bba49dcf073563e7366dc18e96b7ba67c2ae3",
+    "pathPattern": "hero/data/<sourceKey>.js"
+  },
+  "gameDataEvidence": {
+    "logicalSource": "data/configdata/ConfigDataHeroInfo.json",
+    "admittedSnapshotCommit": "172d836e59fbdd84bca5e44a9b2e26d8812a927f",
+    "sourceRootRemovalCommit": "d57b5afc8147ba607e9d7d4826521d76895ab15c",
+    "note": "The tracked ConfigData source root was intentionally removed after source-root readiness; this review uses the admitted pre-removal ConfigDataHeroInfo snapshot as exact internal-record evidence."
+  },
+  "reviewPolicy": {
+    "type": "MANUALLY_REVIEWED_GAME_DATA",
+    "automaticNameJoin": false,
+    "automaticContentSimilarityJoin": false,
+    "automaticOrderJoin": false,
+    "automaticFilenameJoin": false,
+    "reviewRequirement": "A human reviewer must confirm that the legacy hero entity and the playable ConfigDataHeroInfo record are the same hero."
+  },
+  "reviewResult": {
+    "status": "PASS_ACCEPTED",
+    "reviewedCount": 5,
+    "acceptedCount": 5,
+    "rejectedCount": 0,
+    "ambiguousCount": 0,
+    "previousPending": 248,
+    "remainingPending": 243,
+    "canonicalHeroSemanticReopened": false
+  },
+  "bindings": [
+    {
+      "legacySourcePath": "hero/data/그레니어.js",
+      "legacySourceKey": "그레니어",
+      "legacyNameCn": "格尼尔",
+      "legacyNameEn": "Grenier",
+      "canonicalHeroId": 3,
+      "configDataRecord": {
+        "ID": 3,
+        "Name": "格尼尔",
+        "Name_Eng": "Grenier",
+        "Useable": true
+      },
+      "review": "ACCEPTED"
+    },
+    {
+      "legacySourcePath": "hero/data/아멜다.js",
+      "legacySourceKey": "아멜다",
+      "legacyNameCn": "艾梅达",
+      "legacyNameEn": "Almeda",
+      "canonicalHeroId": 4,
+      "configDataRecord": {
+        "ID": 4,
+        "Name": "艾梅达",
+        "Name_Eng": "Aimeeda",
+        "Useable": true
+      },
+      "review": "ACCEPTED",
+      "note": "Legacy and internal English spellings differ; the binding is explicitly human-reviewed and is not based on automatic English-name equality."
+    },
+    {
+      "legacySourcePath": "hero/data/크리스.js",
+      "legacySourceKey": "크리스",
+      "legacyNameCn": "克丽丝",
+      "legacyNameEn": "Chris",
+      "canonicalHeroId": 5,
+      "configDataRecord": {
+        "ID": 5,
+        "Name": "克丽丝",
+        "Name_Eng": "Chris",
+        "Useable": true
+      },
+      "review": "ACCEPTED"
+    },
+    {
+      "legacySourcePath": "hero/data/레딘.js",
+      "legacySourceKey": "레딘",
+      "legacyNameCn": "雷丁",
+      "legacyNameEn": "Ledin",
+      "canonicalHeroId": 10,
+      "configDataRecord": {
+        "ID": 10,
+        "Name": "雷丁",
+        "Useable": true
+      },
+      "review": "ACCEPTED",
+      "note": "ConfigDataHeroInfo contains other non-playable records reusing 雷丁; this review explicitly selects the playable master record ID 10."
+    },
+    {
+      "legacySourcePath": "hero/data/엘윈.js",
+      "legacySourceKey": "엘윈",
+      "legacyNameCn": "艾尔文",
+      "legacyNameEn": "Elwin",
+      "canonicalHeroId": 12,
+      "configDataRecord": {
+        "ID": 12,
+        "Name": "艾尔文",
+        "Useable": true
+      },
+      "review": "ACCEPTED",
+      "note": "ConfigDataHeroInfo contains other non-playable records reusing 艾尔文; this review explicitly selects the playable master record ID 12."
+    }
+  ],
+  "scope": {
+    "changesCanonicalHeroPopulation": false,
+    "changesCanonicalHeroIdentity": false,
+    "changesHeroRelations": false,
+    "changesFrontend": false,
+    "recordsLegacySourceIdentityProvenanceOnly": true
+  },
+  "validation": {
+    "projectCheckOwner": "MANUAL_REVIEW",
+    "reason": "No current explicit Project Check owner rule for this newly introduced legacy-source identity provenance evidence path was established during this batch. Do not infer an owner.",
+    "nextStep": "Continue manual review in small batches; only accepted bindings reduce the legacy-source identity pending count."
+  }
+}
