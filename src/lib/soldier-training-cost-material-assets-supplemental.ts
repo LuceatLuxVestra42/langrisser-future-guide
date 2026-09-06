@@ -83,6 +83,7 @@ export function getSupplementalSoldierTrainingCostMaterialIconUrl(itemId: number
 }
 
 export function getSoldierTrainingCostMaterialIconUrl(itemId: number): string | null {
+  // Keep the frozen A6 resolver authoritative; the supplemental set only fills its exact missing IDs.
   return getSoldierTrainingMaterialIconUrl(itemId) ?? getSupplementalSoldierTrainingCostMaterialIconUrl(itemId);
 }
 
