@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Sparkles, Swords, UserRound, X } from "lucide-react";
+import { ChevronRight, UserRound, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { getOfficialEquipmentImageUrl } from "@/lib/equipment-image-assets";
@@ -253,10 +253,7 @@ function EquipmentHeader({
 function StatsSection({ stats }: { stats: Stats }) {
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-      <div className="flex items-center gap-2">
-        <Swords size={18} aria-hidden="true" className="text-primary" />
-        <h2 className="text-lg font-bold text-foreground">Lv50 능력치</h2>
-      </div>
+      <h2 className="text-lg font-bold text-foreground">Lv50 능력치</h2>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {stats.properties.map((property) => (
@@ -278,14 +275,10 @@ function StatsSection({ stats }: { stats: Stats }) {
 function EffectSection({ effect }: { effect: Effect }) {
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-      <div className="flex items-center gap-2">
-        <Sparkles size={18} aria-hidden="true" className="text-primary" />
-        <h2 className="text-lg font-bold text-foreground">최대 효과</h2>
-      </div>
+      <h2 className="text-lg font-bold text-foreground">효과</h2>
 
       <div className="mt-4 rounded-xl bg-muted/45 p-4 sm:p-5">
-        <p className="font-bold text-foreground">{effect.effectName}</p>
-        <p className="mt-2 text-sm leading-7 text-muted-foreground">
+        <p className="text-sm leading-7 text-muted-foreground">
           {effect.effectSegments.map((segment, index) =>
             segment.highlight ? (
               <mark

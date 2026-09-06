@@ -30,12 +30,12 @@ function publishSiteVersionState(
   deployedSourceSha = "",
 ) {
   const root = document.documentElement;
-  root.dataset.siteVersionStatus = status;
-  root.dataset.siteVersionCurrent = currentSourceSha;
+  root.dataset["siteVersionStatus"] = status;
+  root.dataset["siteVersionCurrent"] = currentSourceSha;
   if (deployedSourceSha) {
-    root.dataset.siteVersionDeployed = deployedSourceSha;
+    root.dataset["siteVersionDeployed"] = deployedSourceSha;
   } else {
-    delete root.dataset.siteVersionDeployed;
+    delete root.dataset["siteVersionDeployed"];
   }
 
   window.dispatchEvent(
@@ -52,14 +52,14 @@ function navigateToDeployedVersion(deployedSourceSha: string) {
   }
 
   target.searchParams.set(SITE_VERSION_QUERY_KEY, deployedSourceSha);
-  document.documentElement.dataset.siteVersionNavigation = "requested";
+  document.documentElement.dataset["siteVersionNavigation"] = "requested";
   window.location.replace(target.toString());
   return true;
 }
 
 function SiteVersionGuard() {
   useEffect(() => {
-    const currentSourceSha = import.meta.env.VITE_SITE_SOURCE_SHA?.trim() ?? "";
+    const currentSourceSha = import.meta.env["VITE_SITE_SOURCE_SHA"]?.trim() ?? "";
 
     if (!SOURCE_SHA_PATTERN.test(currentSourceSha)) {
       publishSiteVersionState("unversioned", currentSourceSha);
