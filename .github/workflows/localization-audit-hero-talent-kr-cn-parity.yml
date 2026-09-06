@@ -1,0 +1,53 @@
+name: Hero Talent KR CN Parity
+
+on:
+  pull_request:
+    paths:
+      - 'data/contracts/localization-audit-hero-talent-kr-cn-parity.v1.json'
+      - 'data/presentation/hero-talent-kr-cn-parity.v1.json'
+      - 'data/presentation/hero-talent-kr-sheet-source.v1.json'
+      - 'scripts/audit-localization-hero-talent-kr-cn-parity.mjs'
+      - '.github/workflows/localization-audit-hero-talent-kr-cn-parity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build Hero talent KR/CN parity projection
+        run: |
+          mkdir -p artifacts
+          node scripts/audit-localization-hero-talent-kr-cn-parity.mjs \
+            --output artifacts/hero-talent-kr-cn-parity.v1.json
+      - name: Verify or materialize projection
+        run: |
+          if [ -f data/presentation/hero-talent-kr-cn-parity.v1.json ]; then
+            node scripts/audit-localization-hero-talent-kr-cn-parity.mjs --check
+          else
+            cp artifacts/hero-talent-kr-cn-parity.v1.json data/presentation/hero-talent-kr-cn-parity.v1.json
+          fi
+      - name: Commit generated projection when changed
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          if [ -n "$(git status --porcelain -- data/presentation/hero-talent-kr-cn-parity.v1.json)" ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add data/presentation/hero-talent-kr-cn-parity.v1.json
+            git commit -m 'Materialize Hero talent KR CN parity projection'
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
+      - name: Upload parity artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-talent-kr-cn-parity
+          path: artifacts/hero-talent-kr-cn-parity.v1.json
+          if-no-files-found: error
