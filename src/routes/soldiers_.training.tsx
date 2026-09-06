@@ -6,7 +6,6 @@ import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getSoldierTrainingCostMaterialIconUrl } from "@/lib/soldier-training-cost-material-assets-supplemental";
 import { getSoldierTrainingPageData } from "@/lib/soldier-training-page.functions";
 import type {
-  SoldierTrainingMaterial,
   SoldierTrainingTech,
   TrainingStatEffect,
   TrainingTechLevel,
@@ -112,11 +111,6 @@ function SoldierTrainingPage() {
     () => new Map(data.techs.map((tech) => [tech.techId, resolveTrainingGroup(tech)] as const)),
     [data.techs],
   );
-  const materialById = useMemo(
-    () => new Map(data.materials.map((material) => [material.itemId, material] as const)),
-    [data.materials],
-  );
-
   const filteredTechs = useMemo(
     () =>
       data.techs.filter((tech) => {
@@ -258,7 +252,7 @@ function SoldierTrainingPage() {
                   <p className="text-xs font-bold text-muted-foreground">Lv.{safeLevel} 효과</p>
                   <LevelEffect tech={selectedTech} level={safeLevel} />
                   {selectedLevel ? (
-                    <LevelCost level={selectedLevel} materialById={materialById} />
+                    <LevelCost level={selectedLevel} />
                   ) : null}
                 </div>
 
@@ -511,17 +505,7 @@ function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number
   );
 }
 
-function LevelCost({
-  level,
-  materialById,
-}: {
-  level: TrainingTechLevel;
-  materialById: Map<number, SoldierTrainingMaterial>;
-}) {
-  const unresolvedMaterialIds = level.materialCosts
-    .filter((material) => !materialById.has(material.id))
-    .map((material) => material.id);
-
+function LevelCost({ level }: { level: TrainingTechLevel }) {
   return (
     <div className="mt-4 border-t border-border pt-4">
       <p className="text-xs font-bold text-muted-foreground">Lv.{level.level} 강화 비용</p>
@@ -530,13 +514,11 @@ function LevelCost({
           골드 {formatNumber(level.goldCost)}
         </span>
         {level.materialCosts.map((material) => {
-          const display = materialById.get(material.id);
           const iconUrl = getSoldierTrainingCostMaterialIconUrl(material.id);
           return (
             <span
               key={`${material.goodsType}-${material.id}`}
               className="inline-flex min-w-0 items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1.5 text-foreground"
-              title={display ? display.nameKr : `재료 ID ${material.id}`}
             >
               {iconUrl ? (
                 <img
@@ -546,19 +528,11 @@ function LevelCost({
                   aria-hidden="true"
                 />
               ) : null}
-              <span className="max-w-40 truncate font-semibold">
-                {display?.nameKr ?? `재료 ID ${material.id}`}
-              </span>
               <span className="font-black">×{formatNumber(material.count)}</span>
             </span>
           );
         })}
       </div>
-      {unresolvedMaterialIds.length > 0 ? (
-        <p className="mt-2 text-[10px] leading-4 text-muted-foreground">
-          한글명이 아직 현재 presentation source에 없는 재료는 검증된 재료 ID로 표시해.
-        </p>
-      ) : null}
     </div>
   );
 }
