@@ -65,6 +65,14 @@ type Stage6Skills = {
   heroDirectSkills?: Stage6Skill[] | null;
 };
 
+type Stage6Awakening = {
+  status?: string | null;
+  awakenId?: number | null;
+  nameCn?: string | null;
+  level2SkillId?: number | null;
+  skill?: Stage6Skill | null;
+};
+
 type Stage6Talent = {
   status?: string | null;
   selectionRule?: string | null;
@@ -159,6 +167,7 @@ type Stage6HeroShard = {
     } | null;
     jobTree?: Stage6JobTree | null;
     skills?: Stage6Skills | null;
+    awakening?: Stage6Awakening | null;
     talent?: Stage6Talent | null;
   } | null;
   bonds?: Stage6Bond[] | null;
@@ -308,7 +317,7 @@ function projectCentralDiscipline(centralDiscipline: Stage6CentralDiscipline) {
   return {
     status: centralDiscipline?.status ?? null,
     released: isReleased(centralDiscipline),
-    skillId: Number.isInteger(centralDiscipline?.skillId) ? Number(centralDiscipline?.skillId) : null,
+    skillId: Number.isInteger(centralDiscipline?.skillId) ? Number(centralDiscipline.skillId) : null,
     nameCn: centralDiscipline?.nameCn ?? null,
     descCn: centralDiscipline?.descCn ?? null,
     iconPath: centralDiscipline?.icon ?? null,
@@ -316,9 +325,9 @@ function projectCentralDiscipline(centralDiscipline: Stage6CentralDiscipline) {
       ? centralDiscipline.templates.filter((value): value is number => Number.isInteger(value)).map(Number)
       : [],
     unlock: {
-      equipmentLevel: Number.isInteger(centralDiscipline?.unlock?.equipmentLevel) ? Number(centralDiscipline?.unlock?.equipmentLevel) : null,
-      heroStarLevel: Number.isInteger(centralDiscipline?.unlock?.heroStarLevel) ? Number(centralDiscipline?.unlock?.heroStarLevel) : null,
-      castingLawLevel: Number.isInteger(centralDiscipline?.unlock?.castingLawLevel) ? Number(centralDiscipline?.unlock?.castingLawLevel) : null,
+      equipmentLevel: Number.isInteger(centralDiscipline?.unlock?.equipmentLevel) ? Number(centralDiscipline.unlock.equipmentLevel) : null,
+      heroStarLevel: Number.isInteger(centralDiscipline?.unlock?.heroStarLevel) ? Number(centralDiscipline.unlock.heroStarLevel) : null,
+      castingLawLevel: Number.isInteger(centralDiscipline?.unlock?.castingLawLevel) ? Number(centralDiscipline.unlock.castingLawLevel) : null,
       materials,
     },
     resolver: centralDiscipline?.resolver ?? null,
@@ -367,6 +376,14 @@ function projectStage6Shard(shard: Stage6HeroShard) {
         .map(projectSkill)
         .filter((skill): skill is NonNullable<typeof skill> => skill !== null)
     : [];
+  const awakeningSkill = projectSkill(shard.normal?.awakening?.skill);
+  const awakening = {
+    status: shard.normal?.awakening?.status ?? "NONE",
+    awakenId: Number.isInteger(shard.normal?.awakening?.awakenId) ? Number(shard.normal?.awakening?.awakenId) : null,
+    nameCn: shard.normal?.awakening?.nameCn ?? null,
+    level2SkillId: Number.isInteger(shard.normal?.awakening?.level2SkillId) ? Number(shard.normal?.awakening?.level2SkillId) : null,
+    skill: awakeningSkill,
+  };
   const talentProgression = Array.isArray(shard.normal?.talent?.starProgression)
     ? shard.normal.talent.starProgression
         .map((row) => {
@@ -406,6 +423,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
     skills: {
       heroDirectSkills,
       jobLevelAcquisitions,
+      awakening,
     },
     jobs: {
       branchCount: branches.length,
