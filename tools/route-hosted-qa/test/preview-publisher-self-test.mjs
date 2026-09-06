@@ -56,45 +56,54 @@ function classifyHandoffFixture({
 
 const handoffCases = [
   {
-    name: 'pending or non-success later reruns successfully',
-    input: { publishResult: 'success' },
-    expected: 'DISPATCH',
+    name: 'pending or non-success then later success',
+    steps: [
+      [{ publishResult: 'failure' }, 'SKIP_NOT_PUBLISHED'],
+      [{ publishResult: 'success' }, 'DISPATCH'],
+    ],
   },
   {
-    name: 'cancelled preview later reruns successfully',
-    input: { publishResult: 'success' },
-    expected: 'DISPATCH',
+    name: 'cancelled then rerun success',
+    steps: [
+      [{ publishResult: 'cancelled' }, 'SKIP_NOT_PUBLISHED'],
+      [{ publishResult: 'success' }, 'DISPATCH'],
+    ],
   },
   {
     name: 'validated head A but current head B',
-    input: { sourceSha: 'a'.repeat(40), currentHead: 'b'.repeat(40) },
-    expected: 'SKIP_STALE_HEAD',
+    steps: [
+      [{ sourceSha: 'a'.repeat(40), currentHead: 'b'.repeat(40) }, 'SKIP_STALE_HEAD'],
+    ],
   },
   {
     name: 'closed or already merged PR',
-    input: { state: 'closed', merged: true },
-    expected: 'SKIP_CLOSED',
+    steps: [
+      [{ state: 'closed' }, 'SKIP_CLOSED'],
+      [{ merged: true }, 'SKIP_MERGED'],
+    ],
   },
   {
     name: 'hosted preview not required',
-    input: { hostedPreviewRequired: false },
-    expected: 'SKIP_NON_REQUIRED',
+    steps: [
+      [{ hostedPreviewRequired: false }, 'SKIP_NON_REQUIRED'],
+    ],
   },
   {
     name: 'workflow_run or manual non-PR event',
-    input: { eventName: 'workflow_run' },
-    expected: 'SKIP_NON_PR',
+    steps: [
+      [{ eventName: 'workflow_run' }, 'SKIP_NON_PR'],
+      [{ eventName: 'workflow_dispatch' }, 'SKIP_NON_PR'],
+    ],
   },
 ];
 
 for (const fixture of handoffCases) {
-  assert.equal(classifyHandoffFixture(fixture.input), fixture.expected, fixture.name);
+  for (const [input, expected] of fixture.steps) {
+    assert.equal(classifyHandoffFixture(input), expected, fixture.name);
+  }
 }
 
-assert.equal(classifyHandoffFixture({ publishResult: 'cancelled' }), 'SKIP_NOT_PUBLISHED');
 assert.equal(classifyHandoffFixture({ sameRepository: false }), 'SKIP_DIFFERENT_REPOSITORY');
-assert.equal(classifyHandoffFixture({ merged: true }), 'SKIP_MERGED');
-assert.equal(classifyHandoffFixture({ eventName: 'workflow_dispatch' }), 'SKIP_NON_PR');
 
 assert.match(workflow, /ready_for_review, closed/);
 assert.match(workflow, /cleanup-pr-preview:/);
