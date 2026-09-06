@@ -16,6 +16,7 @@ import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
+import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
 import { getHeroSkinAcquisitionDisplayLabel } from "@/lib/hero-skin-acquisition-display";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
@@ -30,6 +31,40 @@ export const Route = createFileRoute("/heroes_/$heroId")({
     const data = await getHeroDetailRouteStage5Data({ data: { heroId } });
     if (!data) throw notFound();
     const exclusiveEquipment = await getHeroExclusiveEquipmentPresentation({ data: { heroId } });
+    const fusionPowers = await getHeroFusionPowerIndex();
+    if (
+      fusionPowers.summary.factionAssets !== 12 ||
+      fusionPowers.summary.pending !== 0 ||
+      fusionPowers.summary.hardErrors !== 0
+    ) {
+      throw new Error("Hero faction mark index is not production-ready.");
+    }
+    const factionMarkById = new Map<number, string>();
+    for (const record of fusionPowers.records) {
+      if (record.targetType !== "FACTION" || record.targetIds.length !== 1) continue;
+      const factionId = record.targetIds[0];
+      const markAsset = record.markAssets[0];
+      if (factionId === undefined || !markAsset) continue;
+      const existing = factionMarkById.get(factionId);
+      if (existing && existing !== markAsset.webAssetPath) {
+        throw new Error(`Faction ${factionId} has conflicting frozen mark assets.`);
+      }
+      factionMarkById.set(factionId, markAsset.webAssetPath);
+    }
+    if (factionMarkById.size !== fusionPowers.summary.factionAssets) {
+      throw new Error("Hero faction mark index is incomplete.");
+    }
+    const factionMarks = data.hero.factions.map((faction) => {
+      const webAssetPath = factionMarkById.get(faction.factionId);
+      if (!webAssetPath) {
+        throw new Error(`Hero ${heroId} faction ${faction.factionId} has no frozen mark asset.`);
+      }
+      return {
+        factionId: faction.factionId,
+        label: faction.nameKr ?? faction.nameCn,
+        webAssetPath,
+      };
+    });
     const soldierPage = getSoldierPrototypePageData();
     const soldierById = new Map(soldierPage.records.map((record) => [record.soldierId, record]));
     const soldierCards = data.detail.soldiers.ids.map((soldierId) => {
@@ -50,7 +85,7 @@ export const Route = createFileRoute("/heroes_/$heroId")({
     if (soldierCards.length !== data.detail.soldiers.count) {
       throw new Error(`Hero ${heroId} Soldier card count mismatch: ${soldierCards.length} != ${data.detail.soldiers.count}.`);
     }
-    return { ...data, exclusiveEquipment, soldierCards };
+    return { ...data, exclusiveEquipment, factionMarks, soldierCards };
   },
   head: ({ loaderData }) => ({
     meta: [{
@@ -84,7 +119,7 @@ function stripConfigMarkup(value: string | null) {
 }
 
 function HeroDetailPage() {
-  const { hero, detail, exclusiveEquipment, soldierCards } = Route.useLoaderData();
+  const { hero, detail, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const soldierDetailById = useMemo(
     () => new Map(getSoldierPrototypePageData().records.map((record) => [record.soldierId, record])),
@@ -198,7 +233,7 @@ function HeroDetailPage() {
               </div>
 
               <div className="mt-7 grid gap-3 sm:grid-cols-2">
-                <InfoBlock title="진영"><div className="flex flex-wrap gap-1.5">{hero.factions.map((faction) => <span key={faction.factionId} className="rounded-md border border-border bg-background px-2 py-1 text-xs font-semibold text-foreground">{faction.nameKr ?? faction.nameCn}</span>)}</div></InfoBlock>
+                <InfoBlock title="진영"><div className="flex flex-wrap gap-2">{factionMarks.map((faction) => <span key={faction.factionId} title={faction.label} className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border bg-background p-1"><img src={resolvePublicAssetUrl(faction.webAssetPath)} alt={faction.label} className="h-full w-full object-contain" /></span>)}</div></InfoBlock>
                 <InfoBlock title="성우"><p className="font-semibold text-foreground">{detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-"}</p></InfoBlock>
               </div>
             </div>
