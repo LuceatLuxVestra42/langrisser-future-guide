@@ -184,6 +184,66 @@ jobs:
           --pr "${{ github.event.pull_request.number }}"
           --expected-sha "$SOURCE_SHA"
 
+  finalizer-handoff:
+    name: finalizer-handoff
+    needs:
+      - preview_gate_plan
+      - publish-pr-preview
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action != 'closed' &&
+      needs.preview_gate_plan.result == 'success' &&
+      needs.preview_gate_plan.outputs.hosted_preview_required == 'true' &&
+      needs.publish-pr-preview.result == 'success' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: write
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Revalidate exact PR head and dispatch merge finalizer
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          IFS=$'\t' read -r state merged current_head current_repo < <(
+            gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" \
+              --jq '[.state, (.merged | tostring), .head.sha, .head.repo.full_name] | @tsv'
+          )
+
+          if [[ "$current_repo" != "$GITHUB_REPOSITORY" ]]; then
+            echo 'FINALIZER_HANDOFF=SKIP_DIFFERENT_REPOSITORY'
+            exit 0
+          fi
+
+          if [[ "$state" != 'open' ]]; then
+            echo 'FINALIZER_HANDOFF=SKIP_CLOSED'
+            exit 0
+          fi
+
+          if [[ "$merged" == 'true' ]]; then
+            echo 'FINALIZER_HANDOFF=SKIP_MERGED'
+            exit 0
+          fi
+
+          if [[ "$current_head" != "$SOURCE_SHA" ]]; then
+            printf 'FINALIZER_HANDOFF=SKIP_STALE_HEAD validated=%s current=%s\n' "$SOURCE_SHA" "$current_head"
+            exit 0
+          fi
+
+          gh api --method POST \
+            "repos/$GITHUB_REPOSITORY/actions/workflows/merge-finalize-main.yml/dispatches" \
+            -f ref=main \
+            -f "inputs[pr]=$PR_NUMBER" \
+            >/dev/null
+
+          printf 'FINALIZER_HANDOFF=DISPATCHED pr=%s source_sha=%s\n' "$PR_NUMBER" "$SOURCE_SHA"
+
   cleanup-pr-preview:
     name: cleanup-pr-preview
     if: >-
