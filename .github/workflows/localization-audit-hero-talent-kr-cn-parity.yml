@@ -28,13 +28,10 @@ jobs:
           mkdir -p artifacts
           node scripts/audit-localization-hero-talent-kr-cn-parity.mjs \
             --output artifacts/hero-talent-kr-cn-parity.v1.json
-      - name: Verify or materialize projection
+      - name: Materialize and verify projection
         run: |
-          if [ -f data/presentation/hero-talent-kr-cn-parity.v1.json ]; then
-            node scripts/audit-localization-hero-talent-kr-cn-parity.mjs --check
-          else
-            cp artifacts/hero-talent-kr-cn-parity.v1.json data/presentation/hero-talent-kr-cn-parity.v1.json
-          fi
+          cp artifacts/hero-talent-kr-cn-parity.v1.json data/presentation/hero-talent-kr-cn-parity.v1.json
+          node scripts/audit-localization-hero-talent-kr-cn-parity.mjs --check
       - name: Commit generated projection when changed
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: |
