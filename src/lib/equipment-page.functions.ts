@@ -33,6 +33,11 @@ type AccessoryClassifiable = {
   subtypeOrder: number;
 };
 
+type EffectPresentable = {
+  effectText: string;
+  effectSegments: Array<{ text: string }>;
+};
+
 export type ExclusiveEquipmentDetailRouteData = ExclusiveEquipmentDetailPageData & {
   presentation: ExclusiveEquipmentPresentationRecord;
 };
@@ -53,6 +58,54 @@ function hasAttackAndIntellectBaseStats(properties: EquipmentStatProperty[]) {
   }
 
   return hasAttack && hasIntellect;
+}
+
+function normalizeEquipmentEffectPresentationText(value: string) {
+  const sourceLines = value.replace(/\r\n?/g, "\n").split("\n");
+  const presentedLines: string[] = [];
+
+  for (let index = 0; index < sourceLines.length; index += 1) {
+    const rawLine = sourceLines[index];
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    const previousRawLine = index > 0 ? sourceLines[index - 1] : "";
+    const previousPresentedLine = presentedLines.at(-1) ?? "";
+    const startsIndependentUnit = /^(?:지휘\s*[:：.]|\[[^\]]+\]\s*[:：]?)/.test(line);
+    const isSuffixLine = /^(?:지속\s*\d+\s*(?:턴|행동|회합)|해제 불가|면역 불가)(?:[,.]|$|\s)/.test(
+      line,
+    );
+    const previousEndsWithCondition = /(?:^|\s)경우[,.]?$/.test(previousPresentedLine.trim());
+    const sourceBoundarySignalsContinuation =
+      /[ \t]$/.test(previousRawLine) || /^[ \t]/.test(rawLine);
+
+    const shouldJoin =
+      presentedLines.length > 0 &&
+      !startsIndependentUnit &&
+      (line.startsWith("(") ||
+        isSuffixLine ||
+        previousEndsWithCondition ||
+        sourceBoundarySignalsContinuation);
+
+    if (shouldJoin) {
+      presentedLines[presentedLines.length - 1] = `${previousPresentedLine.trimEnd()} ${line}`;
+    } else {
+      presentedLines.push(line);
+    }
+  }
+
+  return presentedLines.join("\n");
+}
+
+function applyEquipmentEffectPresentation<T extends EffectPresentable>(effect: T): T {
+  return {
+    ...effect,
+    effectText: normalizeEquipmentEffectPresentationText(effect.effectText),
+    effectSegments: effect.effectSegments.map((segment) => ({
+      ...segment,
+      text: normalizeEquipmentEffectPresentationText(segment.text),
+    })),
+  } as T;
 }
 
 function applyAccessoryPresentationClassification<T extends AccessoryClassifiable>(
@@ -181,6 +234,11 @@ export async function getEquipmentDetailPageData({
     return null;
   }
 
+  const detail = {
+    ...pageData.detail,
+    effect: applyEquipmentEffectPresentation(pageData.detail.effect),
+  };
+
   if (pageData.kind === "exclusive") {
     const presentation = exclusivePresentationByEquipmentId.get(data.equipmentId);
     if (!presentation) {
@@ -197,15 +255,16 @@ export async function getEquipmentDetailPageData({
 
     return {
       ...pageData,
+      detail,
       presentation: {
         ...presentation,
         sections: {
           ...presentation.sections,
           effect: {
             ...presentation.sections.effect,
-            effectName: pageData.detail.effect.effectName,
-            effectText: pageData.detail.effect.effectText,
-            effectSegments: pageData.detail.effect.effectSegments,
+            effectName: detail.effect.effectName,
+            effectText: detail.effect.effectText,
+            effectSegments: detail.effect.effectSegments,
           },
         },
       },
@@ -215,10 +274,10 @@ export async function getEquipmentDetailPageData({
   return {
     ...pageData,
     detail: {
-      ...pageData.detail,
+      ...detail,
       classification: applyAccessoryPresentationClassification(
-        pageData.detail.classification,
-        hasAttackAndIntellectBaseStats(pageData.detail.stats.properties),
+        detail.classification,
+        hasAttackAndIntellectBaseStats(detail.stats.properties),
       ),
     },
   };
