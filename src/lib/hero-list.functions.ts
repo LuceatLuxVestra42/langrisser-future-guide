@@ -10,7 +10,7 @@ import {
   readHeroListStage4Data,
 } from "./hero-list.server";
 import { resolveHeroSkillKr } from "./hero-skill-localization";
-import { resolveHeroTalentKr } from "./hero-talent-localization";
+import { hasHeroTalentKr, resolveHeroTalentKr } from "./hero-talent-localization";
 import { getSoldierPrototypePageData } from "./soldier-page.functions";
 
 const HERO_SOLDIER_ARMY_ORDER = new Map<string, number>(
@@ -63,8 +63,6 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10711,
   ])],
 ]);
-
-const LEGACY_TALENT_HERO_IDS = new Set([6, 8, 9]);
 
 function getHeroSoldierTierOrder(record: { isSp: boolean; tier: number }) {
   if (record.isSp) return 0;
@@ -141,14 +139,14 @@ function localizeLegacyHeroSkill<T extends { skillId: number; nameCn: string | n
   };
 }
 
-function localizeLegacyHeroTalentRow<
+function localizeHeroTalentRow<
   T extends {
     star: number;
     skillId: number;
     skill: { skillId: number; nameCn: string | null; desc: string | null } | null;
   },
 >(heroId: number, row: T): T {
-  if (!LEGACY_TALENT_HERO_IDS.has(heroId) || row.star < 3 || row.star > 6) return row;
+  if (row.star < 3 || row.star > 6 || !hasHeroTalentKr(heroId)) return row;
   if (!row.skill) {
     throw new Error(`Hero ${heroId} talent ${row.star}-star row is missing its frozen skill payload.`);
   }
@@ -164,7 +162,7 @@ function localizeLegacyHeroTalentRow<
   });
   if (!localization) {
     throw new Error(
-      `Hero ${heroId} talent ${row.star}-star Skill ${row.skillId} no longer matches the admitted Korean talent overlay.`,
+      `Hero ${heroId} talent ${row.star}-star Skill ${row.skillId} no longer matches the final Korean talent localization consumer.`,
     );
   }
 
@@ -172,7 +170,7 @@ function localizeLegacyHeroTalentRow<
     ...row,
     skill: {
       ...row.skill,
-      // Stage 8 is presentation-only. HeroID, SkillID, star progression and
+      // Frontend integration is presentation-only. HeroID, SkillID, star progression and
       // selection semantics remain frozen; only visible Korean text is replaced.
       nameCn: localization.nameKr,
       desc: localization.descKr,
@@ -236,11 +234,11 @@ export const getHeroDetailRouteStage5Data = createServerFn({ method: "GET" })
         }
       : routeData.detail.skills;
 
-    const talent = LEGACY_TALENT_HERO_IDS.has(data.heroId)
+    const talent = hasHeroTalentKr(data.heroId)
       ? {
           ...routeData.detail.talent,
           starProgression: routeData.detail.talent.starProgression.map((row) =>
-            localizeLegacyHeroTalentRow(data.heroId, row),
+            localizeHeroTalentRow(data.heroId, row),
           ),
         }
       : routeData.detail.talent;

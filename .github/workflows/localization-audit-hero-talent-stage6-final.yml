@@ -1,0 +1,62 @@
+name: Hero Talent Stage 6 Final Localization
+
+on:
+  pull_request:
+    paths:
+      - 'data/contracts/localization-audit-hero-talent-stage6-final.v1.json'
+      - 'data/presentation/hero-talent-stage6-writing.v1.json'
+      - 'data/presentation/hero-talent-localization-final.v1.json'
+      - 'scripts/audit-localization-hero-talent-stage6-final.mjs'
+      - '.github/workflows/localization-audit-hero-talent-stage6-final.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  localization:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Build Stage 6 final localization
+        run: |
+          mkdir -p artifacts
+          node scripts/audit-localization-hero-talent-stage6-final.mjs --output artifacts/hero-talent-localization-final.v1.json
+      - name: Materialize and verify projection
+        run: |
+          cp artifacts/hero-talent-localization-final.v1.json data/presentation/hero-talent-localization-final.v1.json
+          node scripts/audit-localization-hero-talent-stage6-final.mjs --check
+      - name: Snapshot intended tracked state
+        run: git diff --binary > /tmp/stage6-intended.patch
+      - name: Run localization owner validator
+        run: node tools/project-check/test/localization-with-equipment-freshness.mjs
+      - name: Run Hero frontend production validator
+        run: node tools/project-check/test/frontend-production-gate.mjs
+      - name: Verify validators left no extra tracked mutation
+        run: |
+          git diff --binary > /tmp/stage6-after.patch
+          cmp /tmp/stage6-intended.patch /tmp/stage6-after.patch
+      - name: Commit generated projection when changed
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          if [ -n "$(git status --porcelain -- data/presentation/hero-talent-localization-final.v1.json)" ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add data/presentation/hero-talent-localization-final.v1.json
+            git commit -m 'Materialize final Hero talent Korean localization'
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
+      - name: Upload localization artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-talent-stage6-final-localization
+          path: artifacts/hero-talent-localization-final.v1.json
+          if-no-files-found: error

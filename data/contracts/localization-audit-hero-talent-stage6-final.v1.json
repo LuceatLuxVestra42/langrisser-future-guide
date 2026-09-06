@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "schemaId": "hero-talent-stage6-localization-final-contract/v1",
+  "status": "ACTIVE",
+  "purpose": "Materialize final Korean normal Hero talent localization for the 251 in-scope Heroes by reusing Stage 5 accepted KR text and applying explicit Stage 6 current-CN patches/translations only to the 31 reviewed Heroes.",
+  "predecessor": {
+    "stage5Commit": "d677863b37ff40d49b25fb382846b1762e1a8e02",
+    "stage5Projection": "data/presentation/hero-talent-stage5-review.v1.json",
+    "stage3KrSheetProjection": "data/presentation/hero-talent-kr-sheet-source.v1.json",
+    "currentHeroValidation": "data/validation/hero-stage6-4-final.v1.json",
+    "requiredHeroPipelineStatus": "FINAL_FROZEN",
+    "requiredHeroCompletion": "COMPLETE"
+  },
+  "input": {
+    "overrides": "data/presentation/hero-talent-stage6-writing.v1.json",
+    "expectedHeroCount": 251,
+    "expectedDirectReuseCount": 220,
+    "expectedPartialUpdateCount": 23,
+    "expectedRetranslateCount": 8,
+    "expectedOverrideCount": 31,
+    "stars": [3, 4, 5, 6]
+  },
+  "output": "data/presentation/hero-talent-localization-final.v1.json",
+  "authorityBoundary": {
+    "semanticMutation": false,
+    "identityMutation": false,
+    "relationMutation": false,
+    "postCutoffTranslation": false,
+    "talentNameRename": false
+  },
+  "validation": {
+    "requireAllFourStars": true,
+    "requireExactDecisionOverrideParity": true,
+    "requireCurrentTalentVerified": true,
+    "requirePercentAndDecimalLiteralCoverageForOverrides": true,
+    "forbidPostCutoffHeroIds": [99272, 99273, 99274, 99275, 99276, 99277, 99278, 99279, 99280, 99281, 99282, 99283, 99284, 99285, 99286, 99287]
+  }
+}

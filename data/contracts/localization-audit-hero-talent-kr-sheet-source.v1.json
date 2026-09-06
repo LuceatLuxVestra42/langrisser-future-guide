@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "schemaId": "hero-talent-kr-sheet-source-contract/v1",
+  "status": "ACTIVE",
+  "purpose": "Extract the existing Korean-sheet normal Hero talent localization as presentation evidence without changing Hero canonical identity or relations.",
+  "source": {
+    "repository": "redpanda7301/langrisser",
+    "ref": "a85bba49dcf073563e7366dc18e96b7ba67c2ae3",
+    "heroIndexPath": "hero.html",
+    "heroDataDir": "hero/data"
+  },
+  "currentHeroMaster": "data/hero-name-master.v1.json",
+  "output": "data/presentation/hero-talent-kr-sheet-source.v1.json",
+  "materializedProjection": {
+    "path": "data/presentation/hero-talent-kr-sheet-source.v1.json",
+    "blobSha": "2d5abd279eccc1186335cd513a74472117258090",
+    "sourceArtifactSha256": "9d5fd03078fe05a1b5f94aa7a4e09bb3b8c5b1f753d7481b668f0c6a33401e73"
+  },
+  "scope": {
+    "talentField": "Talent[0]",
+    "includeStars": [3, 4, 5, 6],
+    "excludeFields": ["SPTalent", "Second_Awaken", "Skills", "Equip"],
+    "expectedCardRouteCount": 254,
+    "expectedUniqueHeroCount": 251,
+    "expectedPostCutoffHeroCount": 16,
+    "cutoffHeroIds": [99271, 99270],
+    "cutoffSourceKeys": ["린마오싱", "타지"]
+  },
+  "matching": {
+    "mode": "LOCALIZATION_EVIDENCE_NAME_MATCH_ONLY",
+    "order": ["EXPLICIT_SOURCE_KEY_EXCEPTION", "EXACT_KR_NAME", "EXACT_CN_NAME"],
+    "identityMutation": false,
+    "relationshipMutation": false,
+    "idArithmetic": false,
+    "fuzzyNameMatch": false,
+    "exceptions": [
+      {"sourceKey": "린", "heroId": 133, "reason": "existing Trails character displayed as 린 in the legacy sheet"},
+      {"sourceKey": "린마오싱", "heroId": 99271, "reason": "new Lynn character uses 린마오싱 as the legacy-sheet route key to avoid the duplicate display name"},
+      {"sourceKey": "코니", "heroId": 99193, "reason": "legacy 코니.js identifies Yoa & Conna by Name/EngName/content but contains stale copied ChName 修杰特; reviewed project localization confirms 琼&康娜 = 요아&코니"}
+    ]
+  },
+  "validation": {
+    "requireTalentName": true,
+    "requireFourStarDescriptions": true,
+    "preserveRawHtml": true,
+    "allowUnmatched": false,
+    "allowDuplicateHeroIdsAfterCollapse": false,
+    "expectedDuplicateRouteGroup": {"heroId": 1, "routeCount": 4}
+  }
+}
