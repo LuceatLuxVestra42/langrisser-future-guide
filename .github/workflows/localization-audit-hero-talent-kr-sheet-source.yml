@@ -10,13 +10,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   extract:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -25,13 +27,23 @@ jobs:
           mkdir -p artifacts
           node scripts/audit-localization-hero-talent-kr-sheet-source.mjs \
             --output artifacts/hero-talent-kr-sheet-source.v1.json
-      - name: Verify committed projection when present
+      - name: Verify or materialize projection
         run: |
-          if [ -f data/presentation/hero-talent-kr-sheet-source.v1.json ]; then
-            node scripts/audit-localization-hero-talent-kr-sheet-source.mjs --check
-          else
-            echo 'Committed projection not present yet; extraction artifact will be used for intake.'
+          mkdir -p data/presentation
+          cp artifacts/hero-talent-kr-sheet-source.v1.json data/presentation/hero-talent-kr-sheet-source.v1.json
+          node scripts/audit-localization-hero-talent-kr-sheet-source.mjs --check
+      - name: Commit generated projection when changed
+        if: github.event_name == 'pull_request'
+        run: |
+          if git diff --quiet -- data/presentation/hero-talent-kr-sheet-source.v1.json; then
+            echo 'Generated projection already current.'
+            exit 0
           fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/presentation/hero-talent-kr-sheet-source.v1.json
+          git commit -m 'Materialize KR sheet Hero talent projection'
+          git push origin HEAD:${{ github.head_ref }}
       - name: Upload extraction artifact
         uses: actions/upload-artifact@v4
         with:
