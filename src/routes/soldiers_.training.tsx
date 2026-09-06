@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
+import { getSoldierTrainingCostMaterialIconUrl } from "@/lib/soldier-training-cost-material-assets-supplemental";
 import { getSoldierTrainingPageData } from "@/lib/soldier-training-page.functions";
 import type {
   SoldierTrainingMaterial,
@@ -530,15 +531,16 @@ function LevelCost({
         </span>
         {level.materialCosts.map((material) => {
           const display = materialById.get(material.id);
+          const iconUrl = getSoldierTrainingCostMaterialIconUrl(material.id);
           return (
             <span
               key={`${material.goodsType}-${material.id}`}
               className="inline-flex min-w-0 items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1.5 text-foreground"
               title={display ? display.nameKr : `재료 ID ${material.id}`}
             >
-              {display ? (
+              {iconUrl ? (
                 <img
-                  src={display.imageUrl}
+                  src={iconUrl}
                   alt=""
                   className="h-5 w-5 shrink-0 object-contain"
                   aria-hidden="true"
@@ -554,7 +556,7 @@ function LevelCost({
       </div>
       {unresolvedMaterialIds.length > 0 ? (
         <p className="mt-2 text-[10px] leading-4 text-muted-foreground">
-          한글명·아이콘이 아직 현재 presentation source에 없는 재료는 검증된 재료 ID로 표시해.
+          한글명이 아직 현재 presentation source에 없는 재료는 검증된 재료 ID로 표시해.
         </p>
       ) : null}
     </div>
