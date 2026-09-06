@@ -162,19 +162,14 @@ function EquipmentGeneralListPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <Link
-              to="/"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
-            >
-              <ArrowLeft size={16} aria-hidden="true" />
-              메인으로
-            </Link>
-            <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              SSR 장비
-            </h1>
-          </div>
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <Link
+            to="/"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-primary/25 bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/45 hover:bg-accent"
+          >
+            <ArrowLeft size={16} aria-hidden="true" />
+            메인으로
+          </Link>
 
           <Link
             reloadDocument
