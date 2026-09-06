@@ -122,12 +122,12 @@ const HERO_RARITY_ICON_PATH_BY_LABEL: Record<string, string> = {
   SP: "/images/heroes/rarity/SP.png",
 };
 
-const FETTER_ICON_BY_FAVORABILITY_LEVEL: Record<number, number> = {
-  5: 1,
-  10: 2,
-  15: 3,
-  23: 4,
-  25: 5,
+const FETTER_ICON_BY_BOND_ORDER: Record<number, number> = {
+  0: 1,
+  1: 2,
+  2: 3,
+  3: 4,
+  4: 5,
 };
 
 type KoreanParticlePair = "은/는" | "이/가" | "을/를" | "와/과" | "으로/로";
@@ -231,6 +231,7 @@ function HeroDetailPage() {
   };
   const finalJobBranches = detail.jobs.branches.filter((branch) => branch.capstone?.rank === 4);
   const hasBondUnlockConditions = detail.bonds.rows.some((bond) => bond.completionConditions.some((condition) => !condition.favorability));
+  const shouldShowBondSection = hero.heroId !== 1;
 
   return (
     <main
@@ -436,28 +437,48 @@ function HeroDetailPage() {
           )}
         </section>
 
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <SectionTitle title="유대" />
-          {hasBondUnlockConditions ? (
-            <div className="mt-5 grid gap-2 lg:grid-cols-2">
-              {detail.bonds.rows.flatMap((bond) => {
-                const favorabilityLevel = bond.completionConditions.find((condition) => condition.favorability)?.favorability?.requiredLevel ?? null;
-                const fetterIconNumber = favorabilityLevel == null ? null : (FETTER_ICON_BY_FAVORABILITY_LEVEL[favorabilityLevel] ?? null);
-                const fetterIconUrl = fetterIconNumber == null ? null : resolvePublicAssetUrl(`/images/fetter/Fetter${fetterIconNumber}.png`);
-                return bond.completionConditions
-                  .filter((condition) => !condition.favorability)
-                  .map((condition, conditionIndex) => (
-                    <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3 py-3">
-                      {fetterIconUrl ? <img src={fetterIconUrl} alt="" aria-hidden="true" className="h-9 w-9 shrink-0 object-contain" /> : null}
-                      <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
-                    </div>
-                  ));
-              })}
-            </div>
-          ) : (
-            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 해금 조건 없음</p>
-          )}
-        </section>
+        {shouldShowBondSection ? (
+          <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-bond-unlocks="true">
+            <SectionTitle title="유대" />
+            {hasBondUnlockConditions ? (
+              <div className="mt-5 overflow-hidden rounded-xl border border-border">
+                {detail.bonds.rows.flatMap((bond) => {
+                  const fetterIconNumber = FETTER_ICON_BY_BOND_ORDER[bond.order] ?? null;
+                  const fetterIconUrl = fetterIconNumber == null ? null : resolvePublicAssetUrl(`/images/fetter/Fetter${fetterIconNumber}.png`);
+                  return bond.completionConditions
+                    .filter((condition) => !condition.favorability)
+                    .map((condition, conditionIndex) => (
+                      <div
+                        key={`${bond.fetterId ?? bond.order}-${conditionIndex}`}
+                        className="grid grid-cols-[64px_minmax(0,1fr)] border-b border-border bg-background last:border-b-0"
+                        data-hero-bond-unlock-row="true"
+                        data-fetter-order={fetterIconNumber ?? ""}
+                      >
+                        <div className="flex min-h-14 items-center justify-center border-r border-border bg-muted/45 px-2 py-2">
+                          {fetterIconUrl ? (
+                            <img
+                              src={fetterIconUrl}
+                              alt=""
+                              aria-hidden="true"
+                              loading="lazy"
+                              decoding="async"
+                              className="h-9 w-9 object-contain"
+                              data-hero-bond-fetter-icon="true"
+                            />
+                          ) : null}
+                        </div>
+                        <div className="flex min-h-14 items-center px-4 py-3">
+                          <p className="text-sm font-semibold leading-6 text-foreground">{formatBondCondition(condition)}</p>
+                        </div>
+                      </div>
+                    ));
+                })}
+              </div>
+            ) : (
+              <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 해금 조건 없음</p>
+            )}
+          </section>
+        ) : null}
         <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
         <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
 
