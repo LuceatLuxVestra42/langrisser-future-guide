@@ -4,3 +4,5 @@ await import('./stale-reclassification-fixture.mjs');
 await import('./stale-lifecycle-fixture.mjs');
 await import('./stale-lifecycle-contract-fixture.mjs');
 await import('./main-merge-app-token-fixture.mjs');
+await import('./merge-finalizer-admission-contract.mjs');
+await import('./merge-finalizer-concurrency-contract.mjs');

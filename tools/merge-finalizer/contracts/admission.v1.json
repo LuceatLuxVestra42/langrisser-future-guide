@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "schemaId": "merge-finalizer-admission/v1",
+  "status": "DESIGN_FROZEN",
+  "owner": "merge-finalizer/orchestration",
+  "purpose": "Admit exactly one explicit non-draft pull request into merge finalization without changing Project Check routing, semantic ownership, hosted QA semantics, or main-mutation serialization.",
+  "label": "merge-admitted",
+  "maxActiveAdmissions": 1,
+  "manualDispatchBypassesAdmission": false,
+  "admissionRequiredForValidation": true,
+  "admissionRequiredForMergeMutation": true,
+  "revalidateOnSynchronize": true,
+  "revocationIsFailClosed": true,
+  "states": {
+    "DEVELOPMENT": {"draft": true, "admitted": false},
+    "READY_POOL": {"draft": false, "admitted": false},
+    "FINALIZING": {"draft": false, "admitted": true}
+  },
+  "nonScope": [
+    "Project Check owner routing",
+    "Project Check validator catalog",
+    "Hosted QA semantics",
+    "GitHub Pages deployment contract",
+    "canonical or semantic data",
+    "frontend presentation"
+  ]
+}
