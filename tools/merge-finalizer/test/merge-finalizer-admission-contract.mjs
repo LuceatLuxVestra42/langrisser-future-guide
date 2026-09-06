@@ -58,11 +58,12 @@ assert.deepEqual(
   { status: 'NOT_ADMITTED', reason: 'PR_NOT_OPEN' },
 );
 
-for (const event of ['labeled', 'unlabeled', 'synchronize', 'ready_for_review', 'converted_to_draft', 'reopened', 'closed']) {
+for (const event of ['opened', 'labeled', 'unlabeled', 'synchronize', 'ready_for_review', 'converted_to_draft', 'reopened', 'closed']) {
   assert.equal(workflowText.includes(`- ${event}`), true, `Admission event missing from workflow: ${event}`);
 }
-assert.equal(workflowText.includes('- opened'), false, 'Opening a non-draft PR must not automatically admit it to finalization.');
+assert.equal(workflowText.includes("github.event.pull_request.draft == false"), true);
 assert.equal(workflowText.includes('tools/merge-finalizer/cli/check-admission.mjs'), true);
+assert.equal(workflowText.includes('MERGE_FINALIZER_ADMISSION=NOT_ADMITTED'), true);
 assert.equal(workflowText.includes('Reconfirm merge admission before main mutation'), true);
 
 console.log(JSON.stringify({
