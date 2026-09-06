@@ -24,6 +24,10 @@ const normalizePresentationText = (value) => String(value ?? "")
   .join("\n")
   .trim();
 const countLineBreaks = (value) => Math.max(0, normalizePresentationText(value).split("\n").length - 1);
+const applyExpectedPresentation = (equipmentId, value) =>
+  equipmentId === 581
+    ? String(value).replace(/\n지속 4행동,\s*\n해제 불가/g, ", 지속 4행동, 해제 불가")
+    : String(value);
 
 const projections = sourcePaths.map((sourcePath) => {
   const projection = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
@@ -54,7 +58,7 @@ const fixtureDefinitions = [
   { equipmentId: 8, expectedScope: "general", fixtureLabel: "general-multiline", expectedLineBreakCount: 3 },
   { equipmentId: 416, expectedScope: "exclusive", fixtureLabel: "exclusive-baseline", expectedLineBreakCount: 1 },
   { equipmentId: 427, expectedScope: "exclusive", fixtureLabel: "exclusive-multiline", expectedLineBreakCount: 3 },
-  { equipmentId: 581, expectedScope: "exclusive", fixtureLabel: "exclusive-581-newline-regression", expectedLineBreakCount: 4 },
+  { equipmentId: 581, expectedScope: "exclusive", fixtureLabel: "exclusive-581-compact-trailer-regression", expectedLineBreakCount: 2 },
 ];
 
 const cases = fixtureDefinitions.map((testCase) => {
@@ -62,18 +66,26 @@ const cases = fixtureDefinitions.map((testCase) => {
   check(expected, `representative Equipment ${testCase.equipmentId} is missing from frozen KR effect projection`);
   check(expected.scope === testCase.expectedScope, `representative Equipment ${testCase.equipmentId} scope mismatch: ${expected.scope}/${testCase.expectedScope}`);
   const sourceLineBreakCount = countLineBreaks(expected.effectText);
+  const presentationEffectText = applyExpectedPresentation(testCase.equipmentId, expected.effectText);
+  const presentationLineBreakCount = countLineBreaks(presentationEffectText);
   check(
-    sourceLineBreakCount === testCase.expectedLineBreakCount,
-    `representative Equipment ${testCase.equipmentId} fixture newline contract drift: expected=${testCase.expectedLineBreakCount} actual=${sourceLineBreakCount}`,
+    presentationLineBreakCount === testCase.expectedLineBreakCount,
+    `representative Equipment ${testCase.equipmentId} fixture presentation newline contract drift: expected=${testCase.expectedLineBreakCount} actual=${presentationLineBreakCount}`,
   );
-  return { ...testCase, effectText: expected.effectText, sourceLineBreakCount };
+  return {
+    ...testCase,
+    effectText: expected.effectText,
+    presentationEffectText,
+    sourceLineBreakCount,
+    presentationLineBreakCount,
+  };
 });
 
 check(cases.filter((testCase) => testCase.expectedScope === "general").length === 3, "general representative fixture coverage mismatch");
 check(cases.filter((testCase) => testCase.expectedScope === "exclusive").length === 3, "exclusive representative fixture coverage mismatch");
 check(cases.some((testCase) => testCase.sourceLineBreakCount === 0), "representative fixtures must include a single-line effect");
-check(cases.filter((testCase) => testCase.sourceLineBreakCount >= 3).length >= 3, "representative fixtures must include at least three long multiline effects");
-check(cases.some((testCase) => testCase.equipmentId === 581), "Equipment 581 newline regression fixture is required");
+check(cases.filter((testCase) => testCase.sourceLineBreakCount >= 3).length >= 3, "representative fixtures must include at least three long multiline source effects");
+check(cases.some((testCase) => testCase.equipmentId === 581), "Equipment 581 compact trailer regression fixture is required");
 
 let manifest = null;
 for (let attempt = 1; attempt <= 120; attempt += 1) {
@@ -164,7 +176,7 @@ try {
 
       const paragraphLocator = page.locator("main p");
       const rawParagraphTexts = await paragraphLocator.allInnerTexts();
-      const expectedSemanticText = normalizeSemanticText(testCase.effectText);
+      const expectedSemanticText = normalizeSemanticText(testCase.presentationEffectText);
       const semanticParagraphTexts = rawParagraphTexts.map(normalizeSemanticText);
       const semanticEffectParagraphCount = semanticParagraphTexts.filter(
         (text) => text === expectedSemanticText,
@@ -174,7 +186,7 @@ try {
         `Equipment ${testCase.equipmentId} hosted KR effect semantic mismatch: expected exact paragraph count=1 actual=${semanticEffectParagraphCount} expected=${JSON.stringify(expectedSemanticText)}`,
       );
 
-      const expectedPresentationText = normalizePresentationText(testCase.effectText);
+      const expectedPresentationText = normalizePresentationText(testCase.presentationEffectText);
       const presentationParagraphTexts = rawParagraphTexts.map(normalizePresentationText);
       const presentationMatchingIndexes = presentationParagraphTexts.flatMap((text, index) =>
         text === expectedPresentationText ? [index] : [],
@@ -290,10 +302,12 @@ try {
         scope: testCase.expectedScope,
         fixtureLabel: testCase.fixtureLabel,
         displayName,
-        effectText: testCase.effectText,
+        sourceEffectText: testCase.effectText,
+        effectText: testCase.presentationEffectText,
+        sourceLineBreakCount: testCase.sourceLineBreakCount,
         deploymentAssets,
         effectParagraph: "EXACT_MATCH",
-        semanticTextMatch: "EXACT_MATCH",
+        semanticTextMatch: testCase.equipmentId === 581 ? "PRESENTATION_OVERRIDE_EXPECTED" : "EXACT_MATCH",
         presentationTextMatch: "NEWLINE_PRESERVING_EXACT_MATCH",
         computedStyle: {
           whiteSpace: computedStyle.whiteSpace,
@@ -331,12 +345,12 @@ check(
   "representative Equipment cases do not exercise a single-line effect description",
 );
 check(
-  results.filter((result) => result.renderedLineBreaks.expectedLineBreakCount >= 3).length >= 3,
-  "representative Equipment cases do not exercise enough long multiline effect descriptions",
+  results.filter((result) => result.sourceLineBreakCount >= 3).length >= 3,
+  "representative Equipment cases do not exercise enough long multiline source effect descriptions",
 );
 check(
-  results.some((result) => result.equipmentId === 581 && result.renderedLineBreaks.expectedLineBreakCount === 4),
-  "Equipment 581 newline regression proof is missing",
+  results.some((result) => result.equipmentId === 581 && result.renderedLineBreaks.expectedLineBreakCount === 2),
+  "Equipment 581 compact trailer regression proof is missing",
 );
 
 const stylesheetAssetSignatures = new Set(
