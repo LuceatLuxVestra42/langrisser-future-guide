@@ -1,0 +1,65 @@
+{
+  "version": 2,
+  "schemaId": "merge-finalizer-concurrency/v2",
+  "status": "DESIGN_FROZEN",
+  "owner": "merge-finalizer/orchestration",
+  "supersedes": "tools/merge-finalizer/contracts/concurrency.v1.json",
+  "purpose": "Keep PR wake-up and ordinary CI parallel while allowing exactly one explicitly admitted PR to occupy the merge-finalization validation lane at a time, with main mutation remaining independently serialized.",
+  "wakeupConcurrency": {
+    "scope": "PR",
+    "groupExpression": "merge-finalize-pr-${{ github.event.pull_request.number || inputs.pr }}",
+    "cancelInProgress": true
+  },
+  "finalizingConcurrency": {
+    "scope": "FINALIZING",
+    "group": "merge-finalize-active",
+    "queue": "max",
+    "maxActive": 1,
+    "requiresAdmission": true,
+    "recheckAdmissionAfterLockAcquired": true
+  },
+  "mergeMutationConcurrency": {
+    "scope": "MAIN_MUTATION",
+    "group": "merge-finalize-main-mutation",
+    "queue": "max",
+    "maxActive": 1
+  },
+  "staleRefreshHandoff": {
+    "policy": "NEW_EXACT_HEAD_RUN_OWNS_CONTINUATION",
+    "oldRunMustNotMergeAfterHeadChange": true
+  },
+  "freshnessGuards": [
+    "MAIN_CHANGED",
+    "HEAD_CHANGED",
+    "VALIDATION_SHA_CHANGED"
+  ],
+  "validationTargets": {
+    "projectCheck": "PR_SYNTHETIC_MERGE_RESULT_SHA",
+    "hostedPreview": "EXACT_PR_HEAD_SHA"
+  },
+  "parallelOutsideFinalizing": [
+    "pull_request Project Check",
+    "pull_request Hosted QA routing",
+    "localization audit",
+    "READY_POOL work"
+  ],
+  "forbidden": {
+    "workflowWideGlobalMergeLock": "merge-finalize-main",
+    "unadmittedFinalizing": true,
+    "multipleActiveFinalizing": true,
+    "mergeMutationCriticalSectionStages": [
+      "stale-refresh-wait",
+      "project-check-wait",
+      "data-pages-deploy-wait",
+      "hosted-qa-wait"
+    ]
+  },
+  "nonScope": [
+    "Data repository publication contract",
+    "GitHub Pages deployment contract",
+    "Project Check owner routing",
+    "Hosted QA semantics",
+    "canonical or semantic data",
+    "frontend presentation"
+  ]
+}
