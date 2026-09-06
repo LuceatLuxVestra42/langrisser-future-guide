@@ -1,0 +1,58 @@
+name: Apply Training Material Icon Count Only
+
+on:
+  push:
+    branches:
+      - work/soldier-training-material-icon-count-only
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: work/soldier-training-material-icon-count-only
+      - name: Patch Training Hall material cost presentation
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('src/routes/soldiers_.training.tsx')
+          text = path.read_text(encoding='utf-8')
+
+          text = text.replace('  SoldierTrainingMaterial,\n', '')
+          text = text.replace('''  const materialById = useMemo(\n    () => new Map(data.materials.map((material) => [material.itemId, material] as const)),\n    [data.materials],\n  );\n\n''', '')
+          text = text.replace('<LevelCost level={selectedLevel} materialById={materialById} />', '<LevelCost level={selectedLevel} />')
+
+          replacement = '''function LevelCost({ level }: { level: TrainingTechLevel }) {\n  return (\n    <div className="mt-4 border-t border-border pt-4">\n      <p className="text-xs font-bold text-muted-foreground">Lv.{level.level} 강화 비용</p>\n      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">\n        <span className="rounded-md border border-border bg-card px-2.5 py-1.5 font-bold text-foreground">\n          골드 {formatNumber(level.goldCost)}\n        </span>\n        {level.materialCosts.map((material) => {\n          const iconUrl = getSoldierTrainingCostMaterialIconUrl(material.id);\n          return (\n            <span\n              key={`${material.goodsType}-${material.id}`}\n              className="inline-flex min-w-0 items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1.5 text-foreground"\n            >\n              {iconUrl ? (\n                <img\n                  src={iconUrl}\n                  alt=""\n                  className="h-5 w-5 shrink-0 object-contain"\n                  aria-hidden="true"\n                />\n              ) : null}\n              <span className="font-black">×{formatNumber(material.count)}</span>\n            </span>\n          );\n        })}\n      </div>\n    </div>\n  );\n}\n\n'''
+
+          text, count = re.subn(
+              r'function LevelCost\(\{.*?\n\}\n\n(?=function formatEffectValue)',
+              replacement,
+              text,
+              count=1,
+              flags=re.S,
+          )
+          if count != 1:
+              raise SystemExit(f'LevelCost replacement count={count}')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+          rm .github/workflows/apply-soldier-training-material-icon-count-only.yml
+          git diff --check
+          git diff -- src/routes/soldiers_.training.tsx
+      - name: Commit patch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routes/soldiers_.training.tsx .github/workflows/apply-soldier-training-material-icon-count-only.yml
+          git commit -m "Show Training materials as icon and count only"
+          git push origin HEAD:work/soldier-training-material-icon-count-only
