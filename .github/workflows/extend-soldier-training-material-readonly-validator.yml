@@ -1,0 +1,133 @@
+name: Extend Soldier Training Material Readonly Validator
+
+on:
+  push:
+    branches:
+      - work/soldier-training-cost-material-icons-48
+    paths:
+      - ".github/workflows/extend-soldier-training-material-readonly-validator.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  extend-validator:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/soldier-training-cost-material-icons-48
+      - name: Extend independent read-only validation to supplemental 24
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('tools/project-check/test/soldier-training-material-assets-readonly.mjs')
+          text = p.read_text(encoding='utf-8')
+
+          old = "const COMPONENT_PATH = 'src/components/soldier-detail-modal.tsx';"
+          new = old + "\nconst SUPPLEMENTAL_PATH = 'data/manifests/soldier-training-material-cost-assets-supplemental.v1.json';\nconst STAGE_D_PATH = 'data/presentation/soldier-training-cost-material-localization-intake.v1.json';"
+          if text.count(old) != 1:
+              raise SystemExit('constant insertion point drifted')
+          text = text.replace(old, new, 1)
+
+          old = "for (const path of [A5_PATH, A6_PATH, A7_PATH, HELPER_PATH, COMPONENT_PATH]) {"
+          new = "for (const path of [A5_PATH, A6_PATH, A7_PATH, HELPER_PATH, COMPONENT_PATH, SUPPLEMENTAL_PATH, STAGE_D_PATH]) {"
+          if text.count(old) != 1:
+              raise SystemExit('required-path insertion point drifted')
+          text = text.replace(old, new, 1)
+
+          old = "const a7 = readJson(A7_PATH);"
+          new = old + "\nconst supplemental = readJson(SUPPLEMENTAL_PATH);\nconst stageD = readJson(STAGE_D_PATH);"
+          if text.count(old) != 1:
+              raise SystemExit('json-read insertion point drifted')
+          text = text.replace(old, new, 1)
+
+          marker = "assert.equal(a5ById.size, 24);"
+          block = r'''
+
+assert.equal(stageD.status, 'PASS_WITH_REVIEW');
+assert.equal(stageD.completion, 'COMPLETE');
+assert.equal(stageD.coverage?.targetUnresolvedReferenceCount, 24);
+assert.equal(Array.isArray(stageD.records), true);
+assert.equal(stageD.records.length, 24);
+const stageDById = new Map(stageD.records.map((record) => [record.itemId, record]));
+assert.equal(stageDById.size, 24);
+
+assert.equal(supplemental.schemaId, 'soldier-training-cost-material-assets-supplemental/v1');
+assert.equal(supplemental.status, 'PASS');
+assert.equal(supplemental.completion, 'COMPLETE');
+assert.equal(supplemental.summary?.target, 24);
+assert.equal(Array.isArray(supplemental.records), true);
+assert.equal(supplemental.records.length, 24);
+const supplementalById = new Map();
+const supplementalDriveIds = new Set();
+const supplementalRepoPaths = new Set();
+for (const record of supplemental.records) {
+  assert.equal(Number.isInteger(record.itemId), true, `supplemental invalid itemId: ${record.itemId}`);
+  assert.equal(supplementalById.has(record.itemId), false, `supplemental duplicate itemId: ${record.itemId}`);
+  assert.equal(a5ById.has(record.itemId), false, `supplemental overlaps frozen A5/A6 itemId: ${record.itemId}`);
+  const intake = stageDById.get(record.itemId);
+  assert.ok(intake, `supplemental itemId absent from Stage D intake: ${record.itemId}`);
+  assert.equal(record.configIconPath, intake.iconPath, `supplemental ConfigData Icon path mismatch: ${record.itemId}`);
+  assert.equal(record.driveFileName, intake.iconPath.split('/').at(-1), `supplemental Drive basename mismatch: ${record.itemId}`);
+  assert.equal(typeof record.driveFileId, 'string');
+  assert.equal(record.driveFileId.length > 0, true);
+  assert.equal(supplementalDriveIds.has(record.driveFileId), false, `supplemental duplicate Drive file id: ${record.itemId}`);
+  supplementalDriveIds.add(record.driveFileId);
+  assert.equal(record.repoPngPath, `public/images/soldier-training-materials/${record.itemId}.png`);
+  assert.equal(supplementalRepoPaths.has(record.repoPngPath), false, `supplemental duplicate repository path: ${record.itemId}`);
+  supplementalRepoPaths.add(record.repoPngPath);
+  assert.equal(record.width, 172);
+  assert.equal(record.height, 172);
+  assert.equal(record.mode, 'RGBA');
+  assert.equal(record.admissionStatus, 'DELIVERED_EXACT_PNG');
+  assert.equal(fs.existsSync(record.repoPngPath), true, `supplemental repository PNG missing: ${record.itemId}`);
+  const bytes = fs.readFileSync(record.repoPngPath);
+  assert.equal(bytes.length, record.byteSize, `supplemental PNG byte size mismatch: ${record.itemId}`);
+  assert.equal(sha256(bytes), record.pngSha256, `supplemental PNG SHA-256 mismatch: ${record.itemId}`);
+  const dimensions = pngDimensions(bytes);
+  assert.deepEqual(dimensions, { width: 172, height: 172 }, `supplemental PNG dimensions mismatch: ${record.itemId}`);
+  assert.equal(bytes[24], 8, `supplemental PNG bit depth mismatch: ${record.itemId}`);
+  assert.equal(bytes[25], 6, `supplemental PNG color type must be RGBA: ${record.itemId}`);
+  supplementalById.set(record.itemId, record);
+}
+assert.equal(supplementalById.size, 24);
+assert.equal(supplementalDriveIds.size, 24);
+assert.equal(supplementalRepoPaths.size, 24);
+assert.equal(supplemental.summary?.deliveredPng, 24);
+assert.equal(supplemental.summary?.dimensions172x172, 24);
+assert.equal(supplemental.summary?.rgba, 24);
+assert.equal(supplemental.summary?.uniqueItemIds, 24);
+assert.equal(supplemental.summary?.uniqueDriveFileIds, 24);
+assert.equal(supplemental.summary?.uniqueRepoPngPaths, 24);
+assert.equal(supplemental.summary?.missing, 0);
+assert.equal(supplemental.summary?.errors, 0);
+for (const itemId of stageDById.keys()) {
+  assert.equal(supplementalById.has(itemId), true, `Stage D itemId absent from supplemental assets: ${itemId}`);
+}
+assert.equal(a5ById.size + supplementalById.size, 48, 'combined exact itemId asset coverage must be 48');'''
+          if text.count(marker) != 1:
+              raise SystemExit('supplemental block insertion point drifted')
+          text = text.replace(marker, marker + block, 1)
+
+          old = "    a5Png: a5ById.size,\n    a6Webp: a6ById.size,"
+          new = "    a5Png: a5ById.size,\n    supplementalPng: supplementalById.size,\n    combinedResolvableItemIds: a5ById.size + supplementalById.size,\n    a6Webp: a6ById.size,"
+          if text.count(old) != 1:
+              raise SystemExit('count output insertion point drifted')
+          text = text.replace(old, new, 1)
+
+          p.write_text(text, encoding='utf-8')
+          PY
+          node tools/project-check/test/soldier-training-material-assets-readonly.mjs
+      - name: Remove one-off workflow and commit
+        shell: bash
+        run: |
+          rm .github/workflows/extend-soldier-training-material-readonly-validator.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Extend Soldier Training asset validator to 48 cost materials"
+          git push origin HEAD:work/soldier-training-cost-material-icons-48
