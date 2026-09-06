@@ -23,14 +23,15 @@
   },
   "matching": {
     "mode": "LOCALIZATION_EVIDENCE_NAME_MATCH_ONLY",
-    "order": ["EXPLICIT_SOURCE_KEY_EXCEPTION", "EXACT_KR_NAME", "EXACT_CN_NAME"],
+    "order": ["EXPLICIT_SOURCE_KEY_EXCEPTION", "EXACT_KR_NAME", "EXACT_KR_NAME_THEN_CN_NAME", "EXACT_CN_NAME"],
     "identityMutation": false,
     "relationshipMutation": false,
     "idArithmetic": false,
     "fuzzyNameMatch": false,
     "exceptions": [
       {"sourceKey": "린", "heroId": 133, "reason": "existing Trails character displayed as 린 in the legacy sheet"},
-      {"sourceKey": "린마오싱", "heroId": 99271, "reason": "new Lynn character uses 린마오싱 as the legacy-sheet route key to avoid the duplicate display name"}
+      {"sourceKey": "린마오싱", "heroId": 99271, "reason": "new Lynn character uses 린마오싱 as the legacy-sheet route key to avoid the duplicate display name"},
+      {"sourceKey": "코니", "heroId": 99193, "reason": "legacy 코니.js identifies Yoa & Conna by Name/EngName/content but contains stale copied ChName 修杰特; reviewed project localization confirms 琼&康娜 = 요아&코니"}
     ]
   },
   "validation": {
