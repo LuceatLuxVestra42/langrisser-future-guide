@@ -15,7 +15,13 @@ const sourcePaths = [
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const url = (path) => new URL(path.replace(/^\//, ""), baseUrl).toString();
-const normalizeText = (value) => String(value ?? "").replace(/\s+/g, " ").trim();
+const normalizeSemanticText = (value) => String(value ?? "").replace(/\s+/g, " ").trim();
+const normalizePresentationText = (value) => String(value ?? "")
+  .replace(/\r\n?/g, "\n")
+  .split("\n")
+  .map((line) => line.replace(/[ \t]+$/g, ""))
+  .join("\n")
+  .trim();
 
 const projections = sourcePaths.map((sourcePath) => {
   const projection = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
@@ -33,7 +39,7 @@ for (const projection of projections) {
   for (const [rawEquipmentId, effectText] of Object.entries(projection.byEquipmentId ?? {})) {
     const equipmentId = Number(rawEquipmentId);
     check(Number.isSafeInteger(equipmentId) && equipmentId > 0, `invalid EquipmentID in ${projection.scope}: ${rawEquipmentId}`);
-    check(normalizeText(effectText).length > 0, `blank KR effect description for Equipment ${equipmentId}`);
+    check(normalizeSemanticText(effectText).length > 0, `blank KR effect description for Equipment ${equipmentId}`);
     check(!expectedByEquipmentId.has(equipmentId), `duplicate KR effect description EquipmentID ${equipmentId}`);
     expectedByEquipmentId.set(equipmentId, { scope: projection.scope, effectText });
   }
@@ -88,15 +94,28 @@ try {
 
       const heading = page.locator("main h1");
       check(await heading.count() === 1, `Equipment ${testCase.equipmentId} detail heading missing or duplicated`);
-      const displayName = normalizeText(await heading.innerText());
+      const displayName = normalizeSemanticText(await heading.innerText());
       check(displayName.length > 0, `Equipment ${testCase.equipmentId} display name is blank`);
 
-      const expectedEffectText = normalizeText(testCase.effectText);
-      const paragraphTexts = (await page.locator("main p").allInnerTexts()).map(normalizeText);
-      const exactEffectParagraphCount = paragraphTexts.filter((text) => text === expectedEffectText).length;
+      const rawParagraphTexts = await page.locator("main p").allInnerTexts();
+      const expectedSemanticText = normalizeSemanticText(testCase.effectText);
+      const semanticParagraphTexts = rawParagraphTexts.map(normalizeSemanticText);
+      const semanticEffectParagraphCount = semanticParagraphTexts.filter(
+        (text) => text === expectedSemanticText,
+      ).length;
       check(
-        exactEffectParagraphCount === 1,
-        `Equipment ${testCase.equipmentId} hosted KR effect paragraph mismatch: expected exact paragraph count=1 actual=${exactEffectParagraphCount} expected=${JSON.stringify(expectedEffectText)}`,
+        semanticEffectParagraphCount === 1,
+        `Equipment ${testCase.equipmentId} hosted KR effect semantic mismatch: expected exact paragraph count=1 actual=${semanticEffectParagraphCount} expected=${JSON.stringify(expectedSemanticText)}`,
+      );
+
+      const expectedPresentationText = normalizePresentationText(testCase.effectText);
+      const presentationParagraphTexts = rawParagraphTexts.map(normalizePresentationText);
+      const presentationEffectParagraphCount = presentationParagraphTexts.filter(
+        (text) => text === expectedPresentationText,
+      ).length;
+      check(
+        presentationEffectParagraphCount === 1,
+        `Equipment ${testCase.equipmentId} hosted KR effect presentation mismatch: expected newline-preserving paragraph count=1 actual=${presentationEffectParagraphCount} expected=${JSON.stringify(expectedPresentationText)}`,
       );
 
       check(pageErrors.length === 0, `Equipment ${testCase.equipmentId} page errors: ${JSON.stringify(pageErrors)}`);
@@ -108,6 +127,8 @@ try {
         displayName,
         effectText: testCase.effectText,
         effectParagraph: "EXACT_MATCH",
+        semanticTextMatch: "EXACT_MATCH",
+        presentationTextMatch: "NEWLINE_PRESERVING_EXACT_MATCH",
         pageErrors: 0,
         consoleErrors: 0,
         result: "PASS",
