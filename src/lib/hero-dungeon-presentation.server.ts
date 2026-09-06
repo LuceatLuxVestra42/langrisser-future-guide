@@ -201,11 +201,9 @@ export function applyHeroDungeonBondPresentation<T extends HeroDungeonBondDetail
 
         return {
           ...bond,
-          // Favorability thresholds stay frozen in the semantic consumer, but their
-          // text rows are intentionally hidden until the bond-icon presentation is added.
-          completionConditions: bond.completionConditions
-            .filter((condition) => !condition.favorability)
-            .map((condition) => {
+          // Preserve frozen favorability thresholds for the Hero detail route so it can
+          // resolve the matching Fetter icon. The route still hides favorability text rows.
+          completionConditions: bond.completionConditions.map((condition) => {
               const mission = condition.mission
                 ? {
                     ...condition.mission,
