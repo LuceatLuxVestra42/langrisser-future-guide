@@ -3,6 +3,7 @@ import wishConsumerJson from "../../data/generated/banner-stage3-4-wish-consumer
 import directWishCandidatesJson from "../../data/generated/banner-manual-wish-direct-candidates.v1.json";
 import cpConsumerJson from "../../data/generated/banner-stage3-5-cp-event-consumer.v1.json";
 import recurrenceConsumerJson from "../../data/generated/banner-stage3-6-recurrence-pickup-log-consumer.v1.json";
+import { resolveHeroDisplayNameKr } from "./hero-display-name";
 
 type BannerHero = {
   heroId: number;
@@ -210,7 +211,7 @@ const gapByToOccurrence = new Map(
 function projectHero(hero: BannerHero | WishCandidate | DirectWishCandidate) {
   return {
     heroId: hero.heroId,
-    heroNameKr: hero.heroNameKr,
+    heroNameKr: resolveHeroDisplayNameKr(hero.heroId, hero.heroNameKr) ?? hero.heroNameKr,
   };
 }
 

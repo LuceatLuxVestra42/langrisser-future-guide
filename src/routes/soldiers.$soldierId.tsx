@@ -3,6 +3,7 @@ import { useCallback } from "react";
 
 import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
 import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
+import { resolveHeroDisplayNameKr } from "@/lib/hero-display-name";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 
 export const Route = createFileRoute("/soldiers/$soldierId")({
@@ -25,7 +26,12 @@ export const Route = createFileRoute("/soldiers/$soldierId")({
       throw new Error("Hero card icon frozen index is not production-ready.");
     }
 
-    return { record, heroCardIcons: heroCardIcons.records };
+    const presentedHeroCardIcons = heroCardIcons.records.map((card) => ({
+      ...card,
+      nameKr: resolveHeroDisplayNameKr(card.heroId, card.nameKr, card.nameCn),
+    }));
+
+    return { record, heroCardIcons: presentedHeroCardIcons };
   },
   head: ({ loaderData }) => ({
     meta: [{ title: loaderData ? `${loaderData.record.nameKr ?? loaderData.record.nameCn} | 랑그릿사 모바일 용병` : "용병 | 랑그릿사 모바일 미래시 정보" }],
