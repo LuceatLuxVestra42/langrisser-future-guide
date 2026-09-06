@@ -23,6 +23,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
       - name: Build Hero talent KR/CN parity projection
         run: |
           mkdir -p artifacts
@@ -32,6 +35,16 @@ jobs:
         run: |
           cp artifacts/hero-talent-kr-cn-parity.v1.json data/presentation/hero-talent-kr-cn-parity.v1.json
           node scripts/audit-localization-hero-talent-kr-cn-parity.mjs --check
+      - name: Snapshot intended tracked state
+        run: git status --porcelain > /tmp/hero-talent-parity-before.txt
+      - name: Run localization owner validator
+        run: node tools/project-check/test/localization-with-equipment-freshness.mjs
+      - name: Run Hero frontend production validator
+        run: node tools/project-check/test/frontend-production-gate.mjs
+      - name: Verify validators left no extra tracked mutation
+        run: |
+          git status --porcelain > /tmp/hero-talent-parity-after.txt
+          diff -u /tmp/hero-talent-parity-before.txt /tmp/hero-talent-parity-after.txt
       - name: Commit generated projection when changed
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: |
