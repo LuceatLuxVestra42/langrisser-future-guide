@@ -156,6 +156,25 @@ function getRequiredHeroName(condition: HeroDungeonBondCondition) {
   );
 }
 
+type KoreanParticlePair = "을/를" | "과/와";
+
+function withKoreanParticle(text: string, pair: KoreanParticlePair) {
+  const lastChar = text.at(-1);
+  const codePoint = lastChar?.codePointAt(0) ?? null;
+  const hasFinalConsonant =
+    codePoint != null && codePoint >= 0xac00 && codePoint <= 0xd7a3
+      ? (codePoint - 0xac00) % 28 !== 0
+      : null;
+
+  if (pair === "을/를") {
+    // Keep the previous "을" fallback for CN/EN/non-Hangul names.
+    return `${text}${hasFinalConsonant === false ? "를" : "을"}`;
+  }
+
+  // Keep the previous "와" fallback for CN/EN/non-Hangul names.
+  return `${text}${hasFinalConsonant === true ? "과" : "와"}`;
+}
+
 function formatBondMissionDesc(desc: string | null, currentHeroName: string | null) {
   if (!desc) return desc;
 
@@ -167,19 +186,19 @@ function formatBondMissionDesc(desc: string | null, currentHeroName: string | nu
 
   const eliteRiftMatch = desc.match(/^使用.+完成时空裂缝精英(\d+-\d+)$/);
   if (eliteRiftMatch && currentHeroName) {
-    return `${currentHeroName}을 출전시켜 시공의 균열 ${eliteRiftMatch[1]}[정예] 클리어`;
+    return `${withKoreanParticle(currentHeroName, "을/를")} 출전시켜 시공의 균열 ${eliteRiftMatch[1]}[정예] 클리어`;
   }
 
   const riftMatch = desc.match(/^使用.+完成时空裂缝(\d+-\d+)$/);
   if (riftMatch && currentHeroName) {
-    return `${currentHeroName}을 출전시켜 시공의 균열 ${riftMatch[1]} 클리어`;
+    return `${withKoreanParticle(currentHeroName, "을/를")} 출전시켜 시공의 균열 ${riftMatch[1]} 클리어`;
   }
 
   const arenaMatch = desc.match(/^使用.+在竞技场中获得(\d+)次胜利$/);
   if (arenaMatch && currentHeroName) {
     const winCount = Number(arenaMatch[1]);
     if (winCount === 1 || winCount === 5) {
-      return `${currentHeroName}을 사용해 아레나에서 1회 승리`;
+      return `${withKoreanParticle(currentHeroName, "을/를")} 사용해 아레나에서 1회 승리`;
     }
   }
 
@@ -236,7 +255,7 @@ export function applyHeroDungeonBondPresentation<T extends HeroDungeonBondDetail
                   mission,
                   stage: {
                     ...condition.stage,
-                    nameCn: `${requiredHeroName}와 함께 운명의문 ${ownGateOrdinal} 클리어`,
+                    nameCn: `${withKoreanParticle(requiredHeroName, "과/와")} 함께 운명의문 ${ownGateOrdinal} 클리어`,
                   },
                 };
               }
