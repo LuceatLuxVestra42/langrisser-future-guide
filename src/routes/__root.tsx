@@ -13,6 +13,100 @@ import appCss from "../styles.css?url";
 import { EquipmentDetailModalBridge } from "../lib/equipment-detail-modal-bridge";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
+const SOURCE_SHA_PATTERN = /^[0-9a-f]{40}$/i;
+
+type SiteVersionState = "current" | "stale" | "unavailable" | "unversioned";
+
+type PagesSourceManifest = {
+  status?: unknown;
+  sourceSha?: unknown;
+  sourceRef?: unknown;
+};
+
+function publishSiteVersionState(
+  status: SiteVersionState,
+  currentSourceSha: string,
+  deployedSourceSha = "",
+) {
+  const root = document.documentElement;
+  root.dataset.siteVersionStatus = status;
+  root.dataset.siteVersionCurrent = currentSourceSha;
+  if (deployedSourceSha) {
+    root.dataset.siteVersionDeployed = deployedSourceSha;
+  } else {
+    delete root.dataset.siteVersionDeployed;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("site-version-state", {
+      detail: { status, currentSourceSha, deployedSourceSha },
+    }),
+  );
+}
+
+function SiteVersionGuard() {
+  useEffect(() => {
+    const currentSourceSha = import.meta.env.VITE_SITE_SOURCE_SHA?.trim() ?? "";
+
+    if (!SOURCE_SHA_PATTERN.test(currentSourceSha)) {
+      publishSiteVersionState("unversioned", currentSourceSha);
+      return;
+    }
+
+    let cancelled = false;
+
+    const checkVersion = async () => {
+      try {
+        const base = import.meta.env.BASE_URL || "/";
+        const normalizedBase = base.endsWith("/") ? base : `${base}/`;
+        const manifestUrl = new URL(
+          `${normalizedBase}authoritative-pages-source.json`,
+          window.location.origin,
+        );
+        manifestUrl.searchParams.set("site_version_check", String(Date.now()));
+
+        const response = await fetch(manifestUrl, {
+          cache: "no-store",
+          headers: { Accept: "application/json" },
+        });
+        if (!response.ok) {
+          throw new Error(`Site version manifest returned HTTP ${response.status}`);
+        }
+
+        const manifest = (await response.json()) as PagesSourceManifest;
+        const deployedSourceSha =
+          typeof manifest.sourceSha === "string" ? manifest.sourceSha.trim() : "";
+
+        if (
+          manifest.status !== "AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT" ||
+          manifest.sourceRef !== "main" ||
+          !SOURCE_SHA_PATTERN.test(deployedSourceSha)
+        ) {
+          throw new Error("Site version manifest has an invalid deployment identity");
+        }
+        if (cancelled) return;
+
+        publishSiteVersionState(
+          deployedSourceSha === currentSourceSha ? "current" : "stale",
+          currentSourceSha,
+          deployedSourceSha,
+        );
+      } catch {
+        if (!cancelled) {
+          publishSiteVersionState("unavailable", currentSourceSha);
+        }
+      }
+    };
+
+    void checkVersion();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return null;
+}
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -120,6 +214,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <SiteVersionGuard />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <EquipmentDetailModalBridge />
