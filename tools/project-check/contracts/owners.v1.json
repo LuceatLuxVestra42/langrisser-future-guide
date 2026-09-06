@@ -1,134 +1,302 @@
 {
   "version": 1,
-  "schemaId": "project-check-owner-map/v1",
+  "schemaId": "project-check-validator-catalog/v1",
   "stage": "R3",
   "status": "DESIGN_FROZEN",
-  "validatorCatalog": "tools/project-check/contracts/validators.v1.json",
-  "purpose": "Map changed paths directly to explicit owners. No transitive propagation, filename similarity, name JOIN, ID arithmetic, semantic recomputation, or legacy Project Doctor routing is allowed.",
+  "purpose": "Freeze executable validator identities for NEW Project Check. Commands are explicit argv arrays; Project Check never constructs shell commands from changed paths.",
   "policy": {
-    "ruleMatch": "UNION_ALL_MATCHING_RULES",
-    "unmatchedPath": "MANUAL_REVIEW",
-    "unmatchedConfigData": "MANUAL_REVIEW",
-    "ownerPropagation": false,
-    "changeClassFanOut": false,
-    "frontendDoesNotReopenCanonical": true,
-    "assetDoesNotReopenCanonical": true,
-    "manualReviewDoesNotFanOut": true,
-    "noFilenameSimilarityInference": true,
-    "noNameJoinInference": true,
-    "noIdArithmeticInference": true
+    "shellExecution": false,
+    "commandsMustBeCatalogued": true,
+    "deduplicateByValidatorId": true,
+    "sortByPhaseThenId": true,
+    "preflightEntireQueueBeforeExecution": true,
+    "failFastOnFirstNonZero": true,
+    "manualReviewSurvivesSuccessfulValidators": true,
+    "validatorMayNotMutateStatusSource": true,
+    "validatorMayNotMutateProjectStatus": true,
+    "legacyDoctorValidatorAllowed": false,
+    "legacyD2D3D4D5D7Allowed": false
   },
-  "owners": [
-    {"id":"status-source","validators":["status-source-selection","status-source-promotion","status-source-producer-gate","status-source-artifact-bridge","status-source-lifecycle"]},
-    {"id":"project-status","validators":["project-status-parity"]},
-    {"id":"project-check","validators":["project-check-self-test"]},
-    {"id":"merge-finalization","validators":["merge-finalizer-self-test"]},
-    {"id":"regression-runner","validators":["regression-runner-self-test"]},
-    {"id":"route-hosted-qa","validators":["route-hosted-qa-self-test"]},
-    {"id":"configdata-lookup","validators":["configdata-lookup-self-test"]},
-    {"id":"configdata-source-pack","validators":["configdata-source-pack-boundary"]},
-    {"id":"configdata","validators":["configdata-integrity"]},
-    {"id":"hero-canonical","validators":["hero-canonical"]},
-    {"id":"soldier-canonical","validators":["soldier-canonical"]},
-    {"id":"equipment-canonical","validators":["equipment-canonical"]},
-    {"id":"hero-soldier-relation","validators":["hero-soldier-relation"]},
-    {"id":"hero-equipment-relation","validators":["hero-equipment-relation"]},
-    {"id":"banner-data","validators":["banner-data"]},
-    {"id":"skin-relation","validators":["skin-relation"]},
-    {"id":"shared-movement","validators":["shared-movement"]},
-    {"id":"soldier-assets","validators":["soldier-assets"]},
-    {"id":"soldier-training-material-assets","validators":["soldier-training-material-assets"]},
-    {"id":"equipment-assets","validators":["equipment-assets"]},
-    {"id":"hero-assets","validators":["hero-assets"]},
-    {"id":"hero-card-icon-source-pack-assets","validators":["hero-card-icon-source-pack-assets"]},
-    {"id":"hero-skill-icon-assets","validators":["hero-skill-icon-assets-readonly"]},
-    {"id":"asset-intake","validators":["asset-intake"]},
-    {"id":"skin-stage3-2-evidence","validators":["skin-stage3-2-evidence"]},
-    {"id":"localization","validators":["localization-audit"]},
-    {"id":"hero-frontend","validators":["production-build"]},
-    {"id":"soldier-frontend","validators":["production-build"]},
-    {"id":"equipment-frontend","validators":["production-build"]},
-    {"id":"banner-frontend","validators":["production-build"]},
-    {"id":"shared-frontend","validators":["production-build"]},
-    {"id":"shared-build","validators":["production-build"]},
-    {"id":"banner-assets","validators":[],"manualReview":"Banner asset ownership remains manual until an independent final asset validator is admitted."},
-    {"id":"skin-assets","validators":["skin-static-assets-readonly"]},
-    {"id":"skin-fullart-assets","validators":["skin-fullart-assets-readonly"]},
-    {"id":"evidence-lifecycle","validators":["evidence-lifecycle-readonly"]}
-  ],
-  "pathRules": [
-    {"id":"r0-migration-boundary","patterns":["data/contracts/project-tooling-migration-r0.v1.json"],"owners":["project-check"]},
-    {"id":"status-source-tooling","patterns":["tools/status-source/**","data/status-sources/**","data/contracts/project-tooling-status-source-*.json",".github/workflows/project-tooling-r1-status-source.yml",".github/workflows/project-tooling-r1-status-source-writer.yml",".github/workflows/project-doctor-status-source-stage6-3-apply-handoff.yml"],"owners":["status-source"]},
-    {"id":"status-source-approved-primary-provenance","patterns":["data/validation/hero-stage6-4-final.v1.json","data/validation/soldier-stage6-7-site-admission.v1.json","data/validation/equipment-stage4-final.v1.json","data/validation/equipment-public-presentation-correction-final.v1.json","data/validation/hero-soldier-integration-stageC-final.v1.json","data/validation/banner-stage3-8-regression-freeze-summary.v1.json","data/validation/skin-stage3-2-readiness.v1.json"],"owners":["status-source"]},
-    {"id":"project-status-tooling","patterns":["tools/project-status/**","data/contracts/project-tooling-project-status-*.json","data/generated/project-status.v1.json","PROJECT_STATUS.md",".github/workflows/project-tooling-r2-project-status.yml",".github/workflows/project-tooling-r2-project-status-writer.yml",".github/workflows/project-status-sync.yml"],"owners":["project-status"]},
-    {"id":"project-check-tooling","patterns":["tools/project-check/**","data/contracts/project-tooling-project-check-*.json","data/contracts/project-tooling-project-doctor-deletion-*.json",".github/workflows/project-tooling-r3-project-check.yml",".github/workflows/project-doctor-d7-pr-guard.yml","AGENTS.md",".agents/rules/project-context.md"],"owners":["project-check"]},
-    {"id":"merge-finalization-tooling","patterns":["tools/merge-finalizer/**",".github/workflows/merge-finalize-main.yml"],"owners":["merge-finalization"]},
-    {"id":"localization-audit-tooling","patterns":["data/contracts/localization-audit-*","data/validation/localization-audit-*","scripts/audit-localization*",".github/workflows/localization-audit*"],"owners":["localization"]},
-    {"id":"regression-runner-tooling","patterns":["tools/regression-runner/**","data/contracts/project-tooling-regression-runner-*.json",".github/workflows/project-tooling-regression-runner.yml",".github/workflows/regression-coverage-promotion-v2.yml"],"owners":["regression-runner"]},
-    {"id":"route-hosted-qa-preimplementation-admission","patterns":["tools/route-hosted-qa/**","data/contracts/project-tooling-route-hosted-qa-*.json",".github/workflows/project-tooling-route-hosted-qa.yml",".github/workflows/project-doctor-authoritative-pages-deploy.yml","scripts/project-doctor-validate-authoritative-pages-hosted.mjs","scripts/project-doctor-compose-authoritative-pages-runtime.mjs",".github/workflows/authoritative-pages-deploy.yml","scripts/validate-authoritative-pages-hosted.mjs","scripts/validate-soldier-training-presentation-hosted.mjs","scripts/validate-hero-central-discipline-hosted.mjs","scripts/validate-hero-soldier-cards-hosted.mjs","scripts/validate-hero-card-icons-hosted.mjs"],"owners":["route-hosted-qa"]},
-    {"id":"browser-ui-qa-tooling-admission","patterns":["data/contracts/project-tooling-browser-ui-qa-*.json",".github/workflows/project-tooling-browser-ui-qa.yml"],"owners":["project-check"]},
-    {"id":"configdata-lookup-tooling","patterns":["tools/configdata-lookup/**","data/contracts/project-tooling-configdata-lookup-*.json","scripts/validate-configdata-lookup-stage0.mjs",".github/workflows/project-tooling-configdata-lookup-clr2.yml",".github/workflows/project-tooling-configdata-lookup-writer.yml",".github/workflows/configdata-lookup-stage0.yml",".github/workflows/configdata-lookup-stage1.yml",".github/workflows/configdata-lookup-stage2.yml",".github/workflows/configdata-lookup-stage6.yml",".github/workflows/configdata-lookup-stage7.yml",".github/workflows/configdata-lookup-stage8.yml"],"owners":["configdata-lookup"]},
-    {"id":"configdata-source-pack-tooling","patterns":["data/contracts/configdata-source-pack-*","data/manifests/configdata-source-pack-*","data/generated/configdata-source-pack-*","data/validation/configdata-source-pack-*","docs/checkpoints/configdata-source-pack-*","scripts/*configdata-source-pack*",".github/workflows/configdata-source-pack-*"],"owners":["configdata-source-pack"]},
-    {"id":"configdata-maintenance-direct-adapter","patterns":["scripts/lib/configdata-direct.cjs"],"owners":["configdata-source-pack"]},
-    {"id":"old-doctor-retirement-apply","patterns":[".github/workflows/project-doctor-d7-pr-guard.yml","scripts/run-project-doctor-closeout-v6.mjs","scripts/analyze-project-doctor-d2-impact-v6.mjs","scripts/validate-project-doctor-d2-impact-v6.mjs","scripts/plan-project-doctor-d3-v6.mjs","scripts/validate-project-doctor-d3-v6.mjs","scripts/run-project-doctor-d4-v6.mjs","scripts/validate-project-doctor-d4-v6.mjs","scripts/validate-project-doctor-closeout.mjs","scripts/validate-project-doctor-d7-v8.mjs"],"owners":["project-check"]},
-    {"id":"hero-soldier-relation","patterns":["data/generated/hero-soldier-*","data/validation/hero-soldier-*","data/contracts/hero-soldier-*","scripts/*hero-soldier*",".github/workflows/hero-soldier-*"],"excludePatterns":["scripts/validate-hero-soldier-cards-hosted.mjs"],"owners":["hero-soldier-relation"]},
-    {"id":"hero-equipment-relation","patterns":["data/generated/hero-exclusive-equipment-*","data/validation/hero-exclusive-equipment-*","data/contracts/hero-exclusive-equipment-*","scripts/*hero-exclusive-equipment*","data/generated/equipment_stage3_5_exclusive_consumer.json",".github/workflows/hero-exclusive-equipment-*"],"owners":["hero-equipment-relation"]},
-    {"id":"hero-frontend-data","patterns":["data/generated/hero-list-*","data/validation/hero-list-*","data/contracts/hero-list-*","scripts/*hero-list*",".github/workflows/hero-list-*"],"owners":["hero-frontend"]},
-    {"id":"hero-central-discipline-presentation","patterns":["data/presentation/hero-central-discipline-ko/**"],"owners":["hero-frontend","localization"]},
-    {"id":"hero-talent-localization-presentation","patterns":["data/presentation/hero-talent-*"],"owners":["hero-frontend","localization"]},
-    {"id":"hero-provisional-name-localization-presentation","patterns":["data/presentation/hero-provisional-name-kr.v1.json"],"owners":["hero-frontend","localization"]},
-    {"id":"hero-card-icon-source-pack-assets","patterns":["data/generated/hero-card-icon-source-pack*","data/validation/hero-card-icon-source-pack*","data/contracts/hero-card-icon-source-pack*","scripts/*hero-card-icon-source-pack*",".github/workflows/hero-card-icon-source-pack-*"],"owners":["hero-card-icon-source-pack-assets"]},
-    {"id":"hero-card-icon-assets","patterns":["data/generated/hero-card-icon-*","data/validation/hero-card-icon-*","data/contracts/hero-card-icon-*","scripts/*hero-card-icon*",".github/workflows/hero-card-icon-*"],"excludePatterns":["data/generated/hero-card-icon-source-pack*","data/validation/hero-card-icon-source-pack*","data/contracts/hero-card-icon-source-pack*","scripts/*hero-card-icon-source-pack*",".github/workflows/hero-card-icon-source-pack-*","scripts/validate-hero-card-icons-hosted.mjs"],"owners":["hero-assets"]},
-    {"id":"hero-skill-icon-assets","patterns":["data/generated/hero-skill-icon-*","data/validation/hero-skill-icon-*","data/contracts/hero-skill-icon-*","scripts/*hero-skill-icon*",".github/workflows/hero-skill-icon-*"],"owners":["hero-skill-icon-assets"]},
-    {"id":"hero-skill-icon-public","patterns":["public/images/heroes/skill-icons/**"],"owners":["hero-skill-icon-assets","hero-frontend"]},
-    {"id":"hero-skill-icon-consumer","patterns":["src/lib/hero-skill-icon-assets.ts"],"owners":["hero-skill-icon-assets"]},
-    {"id":"hero-canonical","patterns":["data/hero-*","data/generated/hero-*","data/validation/hero-*","data/contracts/hero-*","scripts/*hero*",".github/workflows/hero-*"],"excludePatterns":["data/generated/hero-soldier-*","data/validation/hero-soldier-*","data/contracts/hero-soldier-*","scripts/*hero-soldier*",".github/workflows/hero-soldier-*","data/generated/hero-exclusive-equipment-*","data/validation/hero-exclusive-equipment-*","data/contracts/hero-exclusive-equipment-*","scripts/*hero-exclusive-equipment*",".github/workflows/hero-exclusive-equipment-*","data/generated/hero-list-*","data/validation/hero-list-*","data/contracts/hero-list-*","scripts/*hero-list*",".github/workflows/hero-list-*","data/generated/hero-card-icon-*","data/validation/hero-card-icon-*","data/contracts/hero-card-icon-*","scripts/*hero-card-icon*",".github/workflows/hero-card-icon-*","data/generated/hero-skill-icon-*","data/validation/hero-skill-icon-*","data/contracts/hero-skill-icon-*","scripts/*hero-skill-icon*",".github/workflows/hero-skill-icon-*","scripts/validate-hero-central-discipline-hosted.mjs"],"owners":["hero-canonical"]},
-    {"id":"hero-frontend","patterns":["src/routes/heroes*.tsx","src/lib/hero-*.ts","src/lib/hero-*.tsx","src/lib/skin-detail.server.ts"],"owners":["hero-frontend"]},
-    {"id":"hero-fetter-presentation-assets","patterns":["public/images/fetter/**"],"owners":["hero-frontend"]},
-    {"id":"hero-assets","patterns":["public/images/heroes/**"],"excludePatterns":["public/images/heroes/card-icons/**","public/images/heroes/skill-icons/**"],"owners":["hero-assets","hero-frontend"]},
-    {"id":"hero-card-icon-source-png","patterns":["public/images/heroes/card-icons/**"],"owners":["hero-card-icon-source-pack-assets","hero-frontend"]},
-    {"id":"soldier-assets","patterns":["public/images/soldiers/**","data/generated/soldier-portrait-*","data/validation/soldier-portrait-*","data/contracts/soldier-portrait-*","scripts/*soldier-portrait*",".github/workflows/soldier-portrait-*"],"owners":["soldier-assets"]},
-    {"id":"soldier-portrait-web-delivery","patterns":["public/images/soldiers-webp/**","data/generated/soldier-portrait-web-*"],"owners":["soldier-assets","soldier-frontend"]},
-    {"id":"soldier-training-material-assets","patterns":["data/contracts/soldier-training-material-*","data/evidence/soldier-training-material-*","data/generated/soldier-training-material-*","data/manifests/soldier-training-material-*","data/validation/soldier-training-material-*","docs/checkpoints/soldier-training-material-*","scripts/*soldier-training-material*",".github/workflows/soldier-training-material-*","public/images/soldier-training-materials/**","public/images/soldier-training-materials-webp/**"],"owners":["soldier-training-material-assets"]},
-    {"id":"soldier-presentation","patterns":["data/presentation/soldier-*","data/validation/soldier-*-presentation*","scripts/*soldier*presentation*",".github/workflows/soldier-*-presentation*"],"excludePatterns":["scripts/validate-soldier-training-presentation-hosted.mjs"],"owners":["soldier-frontend","localization"]},
-    {"id":"soldier-training-tech-classification-evidence","patterns":["data/evidence/soldier-training-tech-classification-*"],"owners":["soldier-canonical"]},
-    {"id":"soldier-canonical","patterns":["data/soldier-*","data/generated/soldier-*","data/validation/soldier-*","data/contracts/soldier-*","scripts/*soldier*",".github/workflows/soldier-*"],"excludePatterns":["data/generated/soldier-portrait-*","data/validation/soldier-portrait-*","data/contracts/soldier-portrait-*","scripts/*soldier-portrait*",".github/workflows/soldier-portrait-*","data/presentation/soldier-*","data/validation/soldier-*-presentation*","scripts/*soldier*presentation*",".github/workflows/soldier-*-presentation*","data/generated/soldier-training-material-*","data/validation/soldier-training-material-*","data/contracts/soldier-training-material-*","scripts/*soldier-training-material*",".github/workflows/soldier-training-material-*","scripts/validate-hero-soldier-cards-hosted.mjs"],"owners":["soldier-canonical"]},
-    {"id":"soldier-frontend","patterns":["src/routes/soldiers*.tsx","src/lib/soldier-*.ts","src/lib/soldier-*.tsx"],"owners":["soldier-frontend"]},
-    {"id":"equipment-image","patterns":["public/images/equipment/**","data/contracts/equipment-image-*","data/checkpoints/equipment-image-*","data/generated/equipment-image-*","data/validation/equipment-image-*","scripts/*equipment-image*",".github/workflows/equipment-image-*"],"owners":["equipment-assets","equipment-frontend"]},
-    {"id":"equipment-frontend-stage4","patterns":["data/generated/equipment-stage4-*","data/generated/equipment_stage4_*","data/validation/equipment-stage4-*","data/contracts/equipment-stage4-*","scripts/*equipment-stage4*",".github/workflows/equipment-stage4-*"],"owners":["equipment-frontend"]},
-    {"id":"equipment-presentation","patterns":["data/presentation/equipment-*","data/validation/equipment-*-presentation*","data/generated/equipment-name-*","scripts/*equipment-name*",".github/workflows/equipment-*-presentation*"],"owners":["equipment-frontend","localization"]},
-    {"id":"equipment-name-localization-source","patterns":["data/localization/equipment-name-kr/**"],"owners":["localization"]},
-    {"id":"equipment-acquisition-maintenance","patterns":["scripts/scan-acquisition-pathtype-sources.mjs","scripts/sample-acquisition-pathtypes.mjs"],"owners":["equipment-canonical"]},
-    {"id":"equipment-canonical","patterns":["data/equipment*","data/generated/equipment_*","data/generated/equipment-*","data/validation/equipment-*","data/contracts/equipment-*","scripts/*equipment*",".github/workflows/equipment-*"],"excludePatterns":["data/contracts/equipment-image-*","data/checkpoints/equipment-image-*","data/generated/equipment-image-*","data/validation/equipment-image-*","scripts/*equipment-image*",".github/workflows/equipment-image-*","data/generated/equipment-stage4-*","data/generated/equipment_stage4_*","data/validation/equipment-stage4-*","data/contracts/equipment-stage4-*","scripts/*equipment-stage4*",".github/workflows/equipment-stage4-*","data/presentation/equipment-*","data/validation/equipment-*-presentation*","data/generated/equipment-name-*","scripts/*equipment-name*",".github/workflows/equipment-*-presentation*"],"owners":["equipment-canonical"]},
-    {"id":"equipment-frontend","patterns":["src/routes/equipment*.tsx","src/lib/equipment-*.ts","src/lib/equipment-*.tsx"],"owners":["equipment-frontend"]},
-    {"id":"banner-data","patterns":["data/generated/banner-*","data/validation/banner-*","data/contracts/banner-*","scripts/*banner*",".github/workflows/banner-*"],"owners":["banner-data"]},
-    {"id":"banner-frontend","patterns":["src/routes/banners.tsx","src/lib/banner-*.ts","src/lib/banner-*.tsx"],"owners":["banner-frontend"]},
-    {"id":"banner-assets","patterns":["public/images/banners/**"],"owners":["banner-assets","banner-frontend"]},
-    {"id":"skin-stage3-2-evidence","patterns":["data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json","data/validation/skin-stage3-2-readiness.v1.json"],"owners":["skin-stage3-2-evidence"]},
-    {"id":"skin-fullart-assets","patterns":["public/images/skin-fullart/**","data/contracts/skin-fullart-*","data/generated/skin-fullart-*","data/validation/skin-fullart-*","data/evidence/leon-reference-skin-source-probe.v1.json","scripts/*skin-fullart*"],"owners":["skin-fullart-assets"]},
-    {"id":"skin-fullart-hero-consumer","patterns":["src/lib/skin-fullart-assets.ts"],"owners":["skin-fullart-assets","hero-frontend"]},
-    {"id":"skin-assets","patterns":["public/images/skins/**","data/generated/skin-stage3-*","data/validation/skin-stage3-*","data/contracts/skin-stage3-*","data/evidence/skin-stage3-*","scripts/*skin-stage3*",".github/workflows/skin-stage3-*"],"excludePatterns":["data/evidence/skin-stage3-2-asset-resolution-evidence.v1.json","data/validation/skin-stage3-2-readiness.v1.json"],"owners":["skin-assets"]},
-    {"id":"skin-relation","patterns":["data/generated/skin-stage1-*","data/generated/skin-stage2-*","data/validation/skin-stage1-*","data/validation/skin-stage2-*","data/contracts/skin-stage1-*","data/contracts/skin-stage2-*","scripts/*skin-stage1*","scripts/*skin-stage2*"],"owners":["skin-relation"]},
-    {"id":"shared-movement","patterns":["public/images/shared/stats/**","public/images/shared/movement/**","data/generated/shared-movement-*","data/validation/shared-movement-*","scripts/*movement*",".github/workflows/shared-movement-type-validation.yml"],"owners":["shared-movement"]},
-    {"id":"asset-intake","patterns":["tools/asset-intake/**"],"owners":["asset-intake"]},
-    {"id":"shared-frontend","patterns":["src/components/**","src/styles/**","src/routes/__root.tsx","src/routes/index.tsx","src/index.css","src/styles.css"],"owners":["shared-frontend"]},
-    {"id":"shared-build","patterns":["package.json","vite.config.*","tsconfig*.json","src/routeTree.gen.ts","package-lock.json","bun.lock","bun.lockb"],"owners":["shared-build"]},
-    {"id":"configdata-integrity-tooling","patterns":["scripts/check-configdata-integrity.mjs"],"owners":["configdata"]},
-    {"id":"configdata-source-storage","patterns":["data/configdata/*.json"],"owners":["configdata","configdata-source-pack"]},
-    {"id":"config-hero-info","patterns":["data/configdata/ConfigDataHeroInfo.json"],"owners":["configdata","hero-canonical","skin-relation"]},
-    {"id":"config-sp-hero-info","patterns":["data/configdata/ConfigDataSPHeroInfo.json"],"owners":["configdata","hero-canonical","soldier-canonical"]},
-    {"id":"config-soldier-info","patterns":["data/configdata/ConfigDataSoldierInfo.json","data/configdata/ConfigDataSPSoldierInfo.json","data/configdata/ConfigDataTrainingTechInfo.json","data/configdata/ConfigDataTrainingTechLevelInfo.json","data/configdata/ConfigDataMissionInfo.json","data/configdata/ConfigDataMissionSumitItemInfo.json"],"owners":["configdata","soldier-canonical"]},
-    {"id":"config-hero-job-skill","patterns":["data/configdata/ConfigDataJobConnectionInfo.json","data/configdata/ConfigDataJobLevelInfo.json","data/configdata/ConfigDataAwakenInfo.json","data/configdata/ConfigDataHeroStarInfo.json"],"owners":["configdata","hero-canonical"]},
-    {"id":"evidence-lifecycle","patterns":["tools/evidence-lifecycle/**"],"owners":["evidence-lifecycle"]}
-  ],
-  "boundaries": {
-    "legacyProjectDoctorRuntimeDependency": false,
-    "legacyD2DependencyMapRuntimeDependency": false,
-    "legacyD3PlanRuntimeDependency": false,
-    "legacyD4RuntimeDependency": false,
-    "legacyD5FreshnessDependency": false,
-    "legacyD7GuardDependency": false,
-    "statusSourceMutation": false,
-    "projectStatusNormalization": false
-  }
+  "validators": [
+    {
+      "id": "status-source-selection",
+      "phase": 1,
+      "executable": "node",
+      "args": ["tools/status-source/test/current-main-parity.mjs"],
+      "owner": "status-source",
+      "coverage": "R1-1 selection parity and independence."
+    },
+    {
+      "id": "status-source-promotion",
+      "phase": 1,
+      "executable": "node",
+      "args": ["tools/status-source/test/promotion-parity.mjs"],
+      "owner": "status-source",
+      "coverage": "R1-2 promotion compatibility, check/apply and rollback."
+    },
+    {
+      "id": "status-source-producer-gate",
+      "phase": 1,
+      "executable": "node",
+      "args": ["tools/status-source/test/producer-gate-parity.mjs"],
+      "owner": "status-source",
+      "coverage": "R1-3 producer registration and delegation."
+    },
+    {
+      "id": "status-source-artifact-bridge",
+      "phase": 1,
+      "executable": "node",
+      "args": ["tools/status-source/test/artifact-bridge-parity.mjs"],
+      "owner": "status-source",
+      "coverage": "R1-4 artifact bridge parity."
+    },
+    {
+      "id": "status-source-lifecycle",
+      "phase": 1,
+      "executable": "node",
+      "args": ["tools/status-source/test/lifecycle-parity.mjs"],
+      "owner": "status-source",
+      "coverage": "R1-5 explicit declaration/closeout/CAS lifecycle."
+    },
+    {
+      "id": "project-status-parity",
+      "phase": 2,
+      "executable": "node",
+      "args": ["tools/project-status/test/current-parity.mjs"],
+      "owner": "project-status",
+      "coverage": "R2 six-domain normalization/projection parity and independence."
+    },
+    {
+      "id": "project-check-self-test",
+      "phase": 3,
+      "executable": "node",
+      "args": ["tools/project-check/test/project-check-self-test.mjs"],
+      "owner": "project-check",
+      "coverage": "R3 routing, manual-review fallback, preflight and aggregate semantics."
+    },
+    {
+      "id": "merge-finalizer-self-test",
+      "phase": 4,
+      "executable": "node",
+      "args": ["tools/merge-finalizer/test/merge-finalizer-self-test.mjs"],
+      "owner": "merge-finalization",
+      "coverage": "Stage 2 dry-run freshness and exact required-check classification, stale main/head restart boundaries, and mutation-free CLI contract."
+    },
+    {
+      "id": "regression-runner-self-test",
+      "phase": 4,
+      "executable": "node",
+      "args": ["tools/regression-runner/test/regression-runner-self-test.mjs"],
+      "owner": "regression-runner",
+      "coverage": "RR3 clean-room profile authority, preflight, fail-fast, tracked-mutation guard and legacy-boundary self-test."
+    },
+    {
+      "id": "route-hosted-qa-self-test",
+      "phase": 5,
+      "executable": "node",
+      "args": ["tools/route-hosted-qa/test/route-hosted-qa-self-test.mjs"],
+      "owner": "route-hosted-qa",
+      "coverage": "RH3 clean-room read-only HTTP contract, deterministic strict/probe execution, hosted failure boundary and legacy-runtime independence."
+    },
+    {
+      "id": "configdata-lookup-self-test",
+      "phase": 6,
+      "executable": "node",
+      "args": ["tools/configdata-lookup/test/configdata-lookup-owner-self-test.mjs"],
+      "owner": "configdata-lookup",
+      "coverage": "CLR3 read-only query/CLI parity, CLR5 validation/writer separation, CLR6 materialized-input shadow parity, CLR7 package CLI authority cutover and legacy Stage 7/8 active-authority retirement, Stage 6 freshness, fail-closed boundaries and tracked-mutation guard."
+    },
+    {
+      "id": "configdata-source-pack-boundary",
+      "phase": 7,
+      "executable": "node",
+      "args": ["scripts/validate-configdata-source-pack-boundary-v1.mjs"],
+      "owner": "configdata-source-pack",
+      "coverage": "Read-only B0.5-B storage-owner, deletion-routing, no-fan-out, no-semantic-inference and future snapshot-promotion boundary validation."
+    },
+    {
+      "id": "evidence-lifecycle-readonly",
+      "phase": 8,
+      "executable": "node",
+      "args": ["tools/evidence-lifecycle/test/evidence-lifecycle-readonly.mjs"],
+      "owner": "evidence-lifecycle",
+      "coverage": "Read-only C0 scope-admission and C1 physical inventory parity over the frozen baseline; no semantic recomputation, lifecycle classification, or deletion decision."
+    },
+    {
+      "id": "configdata-integrity",
+      "phase": 10,
+      "executable": "npm",
+      "args": ["run", "check:configdata"],
+      "owner": "configdata",
+      "coverage": "Parsed ConfigData integrity for explicitly admitted raw ConfigData inputs."
+    },
+    {
+      "id": "hero-canonical",
+      "phase": 20,
+      "executable": "npm",
+      "args": ["run", "validate:coverage:hero-canonical"],
+      "owner": "hero-canonical",
+      "coverage": "Existing Hero canonical validator."
+    },
+    {
+      "id": "soldier-canonical",
+      "phase": 20,
+      "executable": "npm",
+      "args": ["run", "validate:coverage:soldier-canonical"],
+      "owner": "soldier-canonical",
+      "coverage": "Existing Soldier canonical validator."
+    },
+    {
+      "id": "equipment-canonical",
+      "phase": 20,
+      "executable": "npm",
+      "args": ["run", "validate:coverage:equipment-canonical"],
+      "owner": "equipment-canonical",
+      "coverage": "Existing Equipment canonical validator."
+    },
+    {
+      "id": "hero-soldier-relation",
+      "phase": 20,
+      "executable": "npm",
+      "args": ["run", "validate:coverage:hero-soldier-relation"],
+      "owner": "hero-soldier-relation",
+      "coverage": "Existing Hero-Soldier relation validator."
+    },
+    {
+      "id": "hero-equipment-relation",
+      "phase": 20,
+      "executable": "npm",
+      "args": ["run", "validate:coverage:hero-equipment-relation"],
+      "owner": "hero-equipment-relation",
+      "coverage": "Existing Hero-Equipment relation validator."
+    },
+    {
+      "id": "banner-data",
+      "phase": 20,
+      "executable": "npm",
+      "args": ["run", "validate:coverage:banner-data"],
+      "owner": "banner-data",
+      "coverage": "Existing Banner data validator."
+    },
+    {
+      "id": "skin-relation",
+      "phase": 20,
+      "executable": "npm",
+      "args": ["run", "validate:coverage:skin-relation"],
+      "owner": "skin-relation",
+      "coverage": "Existing Skin relation validator."
+    },
+    {
+      "id": "shared-movement",
+      "phase": 20,
+      "executable": "npm",
+      "args": ["run", "validate:coverage:shared-movement"],
+      "owner": "shared-movement",
+      "coverage": "Existing shared movement validator."
+    },
+    {
+      "id": "soldier-assets",
+      "phase": 30,
+      "executable": "npm",
+      "args": ["run", "validate:coverage:soldier-assets"],
+      "owner": "soldier-assets",
+      "coverage": "Existing Soldier portrait validator."
+    },
+    {
+      "id": "soldier-training-material-assets",
+      "phase": 30,
+      "executable": "node",
+      "args": ["tools/project-check/test/soldier-training-material-assets-readonly.mjs"],
+      "owner": "soldier-training-material-assets",
+      "coverage": "Read-only A5 PNG admission, A6 WebP byte/frozen pixel-evidence binding, A7 predeploy consumer parity, and explicit non-semantic boundaries for the Soldier training-material pipeline."
+    },
+    {
+      "id": "skin-static-assets-readonly",
+      "phase": 30,
+      "executable": "node",
+      "args": ["scripts/validate-skin-stage3-5-static-assets-readonly.mjs"],
+      "owner": "skin-assets",
+      "coverage": "Read-only parity of the frozen Stage 3-5 Skin static manifest, 540 repository PNG bytes, Stage 2 relation, and frozen validation checkpoint."
+    },
+    {
+      "id": "skin-fullart-assets-readonly",
+      "phase": 30,
+      "executable": "node",
+      "args": ["scripts/validate-skin-fullart-assets-readonly.mjs"],
+      "owner": "skin-fullart-assets",
+      "coverage": "Read-only Leon reference full-body Skin WebP byte, alpha, dimension, current Hero shard, exact source-path and frozen manifest parity."
+    },
+    {
+      "id": "equipment-assets",
+      "phase": 30,
+      "executable": "npm",
+      "args": ["run", "validate:equipment-image-final"],
+      "owner": "equipment-assets",
+      "coverage": "Existing Equipment image final validator."
+    },
+    {
+      "id": "hero-assets",
+      "phase": 30,
+      "executable": "npm",
+      "args": ["run", "validate:hero-artwork-final"],
+      "owner": "hero-assets",
+      "coverage": "Existing Hero artwork final validator."
+    },
+    {
+      "id": "hero-card-icon-source-pack-assets",
+      "phase": 30,
+      "executable": "node",
+      "args": ["scripts/validate-hero-card-icon-source-pack-owner-v1.mjs"],
+      "owner": "hero-card-icon-source-pack-assets",
+      "coverage": "Read-only H2 contract plus H3 clean hydration exact-byte verification against the pinned frozen Hero card-icon source manifest; no Hero semantic or relation recomputation."
+    },
+    {
+      "id": "hero-skill-icon-assets-readonly",
+      "phase": 30,
+      "executable": "node",
+      "args": ["scripts/validate-hero-skill-icon-assets-readonly.mjs"],
+      "owner": "hero-skill-icon-assets",
+      "coverage": "Read-only Leon Hero skill-icon manifest, official proof hashes, frozen Hero 6 icon-path coverage, PNG RGBA parity, and public delivery validation."
+    },
+    {
+      "id": "asset-intake",
+      "phase": 30,
+      "executable": "npm",
+      "args": ["run", "asset:intake:validate"],
+      "owner": "asset-intake",
+      "coverage": "Existing Asset Intake validator."
+    },
+    {
+      "id": "skin-stage3-2-evidence",
+      "phase": 30,
+      "executable": "node",
+      "args": ["tools/asset-intake/test/skin-stage3-2-evidence-readonly.mjs"],
+      "owner": "skin-stage3-2-evidence",
+      "coverage": "Read-only Skin Stage 3-2 representative asset-resolution proof over authoritative evidence; producer behavior remains in the underlying script."
+    },
+    {
+      "id": "hero-cv-localization-freeze",
+      "phase": 40,
+      "executable": "node",
+      "args": ["tools/project-check/test/hero-cv-localization-readonly.mjs"],
+      "owner": "hero-cv-localization",
+      "coverage": "Read-only Stage 4 Hero CV localization freeze parity against authoritative CV sourceValue distribution and confirmed no-CV Hero IDs; no Hero semantic recomputation or HeroID materialization."
+    },
+    {
+      "id": "localization-audit",
+      "phase": 40,
+      "executable": "node",
+      "args": ["tools/project-check/test/localization-with-equipment-freshness.mjs"],
+      "owner": "localization",
+      "coverage": "Existing localization audit plus read-only Equipment Korean-name generated-presentation freshness."
+    },
+    {
+      "id": "production-build",
+      "phase": 50,
+      "executable": "npm",
+      "args": ["run", "build"],
+      "owner": "frontend-build",
+      "coverage": "Production build for explicit frontend/build owners; not semantic proof."
+    }
+  ]
 }
