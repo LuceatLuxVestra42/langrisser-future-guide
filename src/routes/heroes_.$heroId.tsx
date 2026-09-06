@@ -286,7 +286,7 @@ function HeroDetailPage() {
               ) : (
                 <p className="mb-2 text-sm font-black tracking-[0.16em] text-muted-foreground">{hero.rarity.baseLabel}</p>
               )}
-              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{displayName}</h1>
+              <h1 className="text-4xl font-bold tracking-tight text-foreground [word-break:keep-all] [overflow-wrap:break-word] sm:text-5xl">{displayName}</h1>
               <div className="mt-3 space-y-0.5 text-sm text-muted-foreground">
                 <p>{hero.identity.nameCn}</p>
                 {hero.identity.nameEn ? <p>{hero.identity.nameEn}</p> : null}
