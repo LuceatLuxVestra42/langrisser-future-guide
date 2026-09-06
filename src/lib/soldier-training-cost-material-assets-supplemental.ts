@@ -1,4 +1,4 @@
-import supplementalManifestJson from "../../data/manifests/soldier-training-cost-material-assets-supplemental.v1.json";
+import supplementalManifestJson from "../../data/manifests/soldier-training-material-cost-assets-supplemental.v1.json";
 import { getSoldierTrainingMaterialIconUrl } from "./soldier-training-material-assets";
 
 type SupplementalCostMaterialAssetRecord = {

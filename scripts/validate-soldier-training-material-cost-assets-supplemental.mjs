@@ -3,7 +3,7 @@ import fs from "node:fs";
 
 const INTAKE_PATH = "data/presentation/soldier-training-cost-material-localization-intake.v1.json";
 const EXISTING_PATH = "data/manifests/soldier-training-material-assets-a6-webp.v1.json";
-const MANIFEST_PATH = "data/manifests/soldier-training-cost-material-assets-supplemental.v1.json";
+const MANIFEST_PATH = "data/manifests/soldier-training-material-cost-assets-supplemental.v1.json";
 
 function readJson(path) {
   return JSON.parse(fs.readFileSync(path, "utf8"));
