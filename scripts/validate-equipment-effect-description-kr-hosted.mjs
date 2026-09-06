@@ -22,6 +22,7 @@ const normalizePresentationText = (value) => String(value ?? "")
   .map((line) => line.replace(/[ \t]+$/g, ""))
   .join("\n")
   .trim();
+const countLineBreaks = (value) => Math.max(0, normalizePresentationText(value).split("\n").length - 1);
 
 const projections = sourcePaths.map((sourcePath) => {
   const projection = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
@@ -46,15 +47,32 @@ for (const projection of projections) {
 }
 check(expectedByEquipmentId.size === 261, `KR effect description projection size mismatch: ${expectedByEquipmentId.size}/261`);
 
-const cases = [
-  { equipmentId: 13, expectedScope: "general" },
-  { equipmentId: 416, expectedScope: "exclusive" },
-].map((testCase) => {
+const fixtureDefinitions = [
+  { equipmentId: 140, expectedScope: "general", fixtureLabel: "general-single-line", expectedLineBreakCount: 0 },
+  { equipmentId: 13, expectedScope: "general", fixtureLabel: "general-two-line", expectedLineBreakCount: 1 },
+  { equipmentId: 8, expectedScope: "general", fixtureLabel: "general-multiline", expectedLineBreakCount: 3 },
+  { equipmentId: 416, expectedScope: "exclusive", fixtureLabel: "exclusive-baseline", expectedLineBreakCount: 1 },
+  { equipmentId: 427, expectedScope: "exclusive", fixtureLabel: "exclusive-multiline", expectedLineBreakCount: 3 },
+  { equipmentId: 581, expectedScope: "exclusive", fixtureLabel: "exclusive-581-newline-regression", expectedLineBreakCount: 4 },
+];
+
+const cases = fixtureDefinitions.map((testCase) => {
   const expected = expectedByEquipmentId.get(testCase.equipmentId);
   check(expected, `representative Equipment ${testCase.equipmentId} is missing from frozen KR effect projection`);
   check(expected.scope === testCase.expectedScope, `representative Equipment ${testCase.equipmentId} scope mismatch: ${expected.scope}/${testCase.expectedScope}`);
-  return { ...testCase, effectText: expected.effectText };
+  const sourceLineBreakCount = countLineBreaks(expected.effectText);
+  check(
+    sourceLineBreakCount === testCase.expectedLineBreakCount,
+    `representative Equipment ${testCase.equipmentId} fixture newline contract drift: expected=${testCase.expectedLineBreakCount} actual=${sourceLineBreakCount}`,
+  );
+  return { ...testCase, effectText: expected.effectText, sourceLineBreakCount };
 });
+
+check(cases.filter((testCase) => testCase.expectedScope === "general").length === 3, "general representative fixture coverage mismatch");
+check(cases.filter((testCase) => testCase.expectedScope === "exclusive").length === 3, "exclusive representative fixture coverage mismatch");
+check(cases.some((testCase) => testCase.sourceLineBreakCount === 0), "representative fixtures must include a single-line effect");
+check(cases.filter((testCase) => testCase.sourceLineBreakCount >= 3).length >= 3, "representative fixtures must include at least three long multiline effects");
+check(cases.some((testCase) => testCase.equipmentId === 581), "Equipment 581 newline regression fixture is required");
 
 let manifest = null;
 for (let attempt = 1; attempt <= 120; attempt += 1) {
@@ -138,6 +156,10 @@ try {
       );
 
       const expectedLineBreakCount = Math.max(0, expectedPresentationText.split("\n").length - 1);
+      check(
+        expectedLineBreakCount === testCase.expectedLineBreakCount,
+        `Equipment ${testCase.equipmentId} runtime fixture newline contract drift: expected=${testCase.expectedLineBreakCount} actual=${expectedLineBreakCount}`,
+      );
       const renderedLineBreaks = await effectParagraph.evaluate((element) => {
         const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
         const textNodes = [];
@@ -219,6 +241,7 @@ try {
       results.push({
         equipmentId: testCase.equipmentId,
         scope: testCase.expectedScope,
+        fixtureLabel: testCase.fixtureLabel,
         displayName,
         effectText: testCase.effectText,
         effectParagraph: "EXACT_MATCH",
@@ -249,9 +272,23 @@ try {
   await browser.close();
 }
 
+check(results.length === fixtureDefinitions.length, `representative Equipment result count mismatch: ${results.length}/${fixtureDefinitions.length}`);
 check(
-  results.some((result) => result.renderedLineBreaks.expectedLineBreakCount > 0),
-  "representative Equipment cases do not exercise any multiline effect description",
+  results.filter((result) => result.scope === "general").length === 3 &&
+    results.filter((result) => result.scope === "exclusive").length === 3,
+  "representative Equipment hosted scope coverage mismatch",
+);
+check(
+  results.some((result) => result.renderedLineBreaks.expectedLineBreakCount === 0),
+  "representative Equipment cases do not exercise a single-line effect description",
+);
+check(
+  results.filter((result) => result.renderedLineBreaks.expectedLineBreakCount >= 3).length >= 3,
+  "representative Equipment cases do not exercise enough long multiline effect descriptions",
+);
+check(
+  results.some((result) => result.equipmentId === 581 && result.renderedLineBreaks.expectedLineBreakCount === 4),
+  "Equipment 581 newline regression proof is missing",
 );
 
 console.log(JSON.stringify({
@@ -259,6 +296,7 @@ console.log(JSON.stringify({
   sourceSha: expectedSourceSha,
   deployedSourceSha: manifest.sourceSha,
   projectionCount: expectedByEquipmentId.size,
+  representativeFixtureCount: fixtureDefinitions.length,
   representativeCases: results,
   nameMutation: false,
   semanticStageReopened: false,
