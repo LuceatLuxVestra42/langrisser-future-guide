@@ -293,7 +293,7 @@ function HeroDetailPage() {
               </div>
 
               <div className="mt-7">
-                <p className="font-semibold text-foreground">CV. {detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-"}</p>
+                <p className="font-semibold text-foreground">CV. {detail.presentation.cvState === "NONE" ? "-" : (detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-")}</p>
 
                 <div className="mt-6 flex flex-wrap gap-2">
                   {factionMarks.map((faction) => (
