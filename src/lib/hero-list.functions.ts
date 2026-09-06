@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { applyHeroDungeonBondPresentation } from "./hero-dungeon-presentation.server";
 import { readHeroDetailRouteStage5Data } from "./hero-detail-stage5.server";
+import { resolveHeroNameLocalization } from "./hero-display-name";
 import {
   readHeroDetailRouteStage4Data,
   readHeroListStage2Data,
@@ -100,6 +101,23 @@ function sortHeroSoldierIdsForPresentation(ids: readonly number[]) {
   });
 }
 
+function projectSharedHeroNameLocalization<
+  T extends {
+    heroId: number;
+    identity: { nameKr: string | null; nameCn: string };
+    localization: unknown;
+  },
+>(hero: T): T {
+  return {
+    ...hero,
+    localization: resolveHeroNameLocalization(
+      hero.heroId,
+      hero.identity.nameKr,
+      hero.identity.nameCn,
+    ),
+  };
+}
+
 function localizeLegacyHeroSkill<T extends { skillId: number; nameCn: string | null; desc: string | null }>(
   heroId: number,
   skill: T,
@@ -171,7 +189,13 @@ export const getHeroListStage3Data = createServerFn({ method: "GET" }).handler(
 );
 
 export const getHeroListStage4Data = createServerFn({ method: "GET" }).handler(
-  async () => readHeroListStage4Data(),
+  async () => {
+    const data = readHeroListStage4Data();
+    return {
+      ...data,
+      records: data.records.map(projectSharedHeroNameLocalization),
+    };
+  },
 );
 
 function validateHeroId(input: { heroId: number }) {
@@ -183,7 +207,14 @@ function validateHeroId(input: { heroId: number }) {
 
 export const getHeroDetailRouteStage4Data = createServerFn({ method: "GET" })
   .validator(validateHeroId)
-  .handler(async ({ data }) => readHeroDetailRouteStage4Data(data.heroId));
+  .handler(async ({ data }) => {
+    const routeData = readHeroDetailRouteStage4Data(data.heroId);
+    if (!routeData) return routeData;
+    return {
+      ...routeData,
+      hero: projectSharedHeroNameLocalization(routeData.hero),
+    };
+  });
 
 export const getHeroDetailRouteStage5Data = createServerFn({ method: "GET" })
   .validator(validateHeroId)
@@ -216,6 +247,7 @@ export const getHeroDetailRouteStage5Data = createServerFn({ method: "GET" })
 
     return {
       ...routeData,
+      hero: projectSharedHeroNameLocalization(routeData.hero),
       detail: applyHeroDungeonBondPresentation(data.heroId, {
         ...routeData.detail,
         skills,
