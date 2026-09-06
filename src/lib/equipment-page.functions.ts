@@ -25,12 +25,18 @@ const DEFENSE_SUBTYPE = "defense";
 const DEFENSE_SUBTYPE_ORDER = 3;
 const ATTACK_PROPERTY_ID = 2;
 const INTELLECT_PROPERTY_ID = 4;
+const EQUIPMENT_581_ID = 581;
 
 type AccessoryClassifiable = {
   group: string;
   subtype: string;
   subtypeKo: string;
   subtypeOrder: number;
+};
+
+type EffectPresentable = {
+  effectText: string;
+  effectSegments: Array<{ text: string }>;
 };
 
 export type ExclusiveEquipmentDetailRouteData = ExclusiveEquipmentDetailPageData & {
@@ -53,6 +59,31 @@ function hasAttackAndIntellectBaseStats(properties: EquipmentStatProperty[]) {
   }
 
   return hasAttack && hasIntellect;
+}
+
+function compactEquipment581EffectTrailer(value: string) {
+  return value.replace(
+    /\n지속 4행동,\s*\n해제 불가/g,
+    ", 지속 4행동, 해제 불가",
+  );
+}
+
+function applyEquipmentEffectPresentation<T extends EffectPresentable>(
+  equipmentId: number,
+  effect: T,
+): T {
+  if (equipmentId !== EQUIPMENT_581_ID) {
+    return effect;
+  }
+
+  return {
+    ...effect,
+    effectText: compactEquipment581EffectTrailer(effect.effectText),
+    effectSegments: effect.effectSegments.map((segment) => ({
+      ...segment,
+      text: compactEquipment581EffectTrailer(segment.text),
+    })),
+  } as T;
 }
 
 function applyAccessoryPresentationClassification<T extends AccessoryClassifiable>(
@@ -181,6 +212,11 @@ export async function getEquipmentDetailPageData({
     return null;
   }
 
+  const detail = {
+    ...pageData.detail,
+    effect: applyEquipmentEffectPresentation(data.equipmentId, pageData.detail.effect),
+  };
+
   if (pageData.kind === "exclusive") {
     const presentation = exclusivePresentationByEquipmentId.get(data.equipmentId);
     if (!presentation) {
@@ -197,15 +233,16 @@ export async function getEquipmentDetailPageData({
 
     return {
       ...pageData,
+      detail,
       presentation: {
         ...presentation,
         sections: {
           ...presentation.sections,
           effect: {
             ...presentation.sections.effect,
-            effectName: pageData.detail.effect.effectName,
-            effectText: pageData.detail.effect.effectText,
-            effectSegments: pageData.detail.effect.effectSegments,
+            effectName: detail.effect.effectName,
+            effectText: detail.effect.effectText,
+            effectSegments: detail.effect.effectSegments,
           },
         },
       },
@@ -215,10 +252,10 @@ export async function getEquipmentDetailPageData({
   return {
     ...pageData,
     detail: {
-      ...pageData.detail,
+      ...detail,
       classification: applyAccessoryPresentationClassification(
-        pageData.detail.classification,
-        hasAttackAndIntellectBaseStats(pageData.detail.stats.properties),
+        detail.classification,
+        hasAttackAndIntellectBaseStats(detail.stats.properties),
       ),
     },
   };
