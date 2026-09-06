@@ -37,12 +37,6 @@ const DEFAULT_EXCLUSIVE_UI_STATE: ExclusiveEquipmentListUiState = {
   sort: "default",
 };
 
-const SORT_LABELS: Record<EquipmentSortMode, string> = {
-  default: "기본 표시순",
-  name: "이름순",
-  id: "장비 ID순",
-};
-
 function isEquipmentSortMode(value: unknown): value is EquipmentSortMode {
   return value === "default" || value === "name" || value === "id";
 }
@@ -157,34 +151,19 @@ function ExclusiveEquipmentPage() {
     setUiState(DEFAULT_EXCLUSIVE_UI_STATE);
   };
 
-  const orderPolicy =
-    uiState.sort === "default"
-      ? "현재 순서는 표시용 deterministic order이며 전용장비 출시순으로 해석하지 않아."
-      : `${SORT_LABELS[uiState.sort]}으로 표시 중이야. 이 정렬은 출시순 의미를 갖지 않아.`;
-
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <Link
-              reloadDocument
-              to="/equipment"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
-            >
-              <ArrowLeft size={16} aria-hidden="true" />
-              SSR 장비로
-            </Link>
-            <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              전용장비
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-              공개 consumer에 포함된 전용장비 {data.total}개와 각 장비의 전용 영웅을 확인할 수 있어.
-            </p>
-          </div>
-        </div>
+        <Link
+          reloadDocument
+          to="/equipment"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-primary/35 bg-card px-3 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/60 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          SSR 장비로
+        </Link>
 
-        <section className="mt-8 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+        <section className="mt-6 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
           <div className="grid gap-3 border-b border-border pb-4 md:grid-cols-[minmax(0,1fr)_14rem]">
             <label className="relative block">
               <span className="sr-only">전용장비 검색</span>
@@ -324,15 +303,9 @@ function ExclusiveEquipmentPage() {
           )}
         </section>
 
-        <div className="mt-6 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-          <div>
-            <p className="text-sm text-muted-foreground">
-              전체 {data.total}개 중 <span className="font-semibold text-foreground">{filteredRecords.length}개</span> 표시
-            </p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">{orderPolicy}</p>
-          </div>
-          <p className="text-xs text-muted-foreground sm:text-right">
-            선택한 필터·검색·정렬은 다음 방문에도 유지돼.
+        <div className="mt-6">
+          <p className="text-sm text-muted-foreground">
+            전체 {data.total}개 중 <span className="font-semibold text-foreground">{filteredRecords.length}개</span> 표시
           </p>
         </div>
 
