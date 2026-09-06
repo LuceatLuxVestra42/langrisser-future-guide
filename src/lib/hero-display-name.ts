@@ -48,6 +48,17 @@ type HeroProvisionalNameSource = {
   }>;
 };
 
+export type HeroNameKrStatus = "official-confirmed" | "provisional-display" | "cn-fallback";
+export type HeroNameSourceAuthority = "KR" | "CN";
+
+export type HeroNameLocalization = {
+  officialNameKr: string | null;
+  displayNameKr: string | null;
+  displayName: string;
+  nameKrStatus: HeroNameKrStatus;
+  sourceAuthority: HeroNameSourceAuthority;
+};
+
 const heroList = heroListJson as unknown as HeroListSource;
 const provisionalNames = heroProvisionalNamesJson as unknown as HeroProvisionalNameSource;
 
@@ -100,11 +111,7 @@ for (const provisional of provisionalNames.records) {
   }
 }
 
-export function resolveHeroDisplayNameKr(
-  heroId: number,
-  fallbackNameKr: string | null,
-  consumerNameCn?: string,
-) {
+function resolveFrozenHero(heroId: number, consumerNameCn?: string) {
   const hero = heroById.get(heroId);
   if (!hero) {
     throw new Error(`Hero display-name consumer references unknown Hero ${heroId}.`);
@@ -112,6 +119,50 @@ export function resolveHeroDisplayNameKr(
   if (consumerNameCn !== undefined && consumerNameCn !== hero.identity.nameCn) {
     throw new Error(`Hero display-name consumer CN parity mismatch for Hero ${heroId}.`);
   }
+  return hero;
+}
 
-  return provisionalByHeroId.get(heroId)?.displayNameKr ?? fallbackNameKr;
+export function resolveHeroNameLocalization(
+  heroId: number,
+  fallbackNameKr: string | null,
+  consumerNameCn?: string,
+): HeroNameLocalization {
+  const hero = resolveFrozenHero(heroId, consumerNameCn);
+  const provisional = provisionalByHeroId.get(heroId);
+
+  if (provisional) {
+    return {
+      officialNameKr: null,
+      displayNameKr: provisional.displayNameKr,
+      displayName: provisional.displayNameKr,
+      nameKrStatus: "provisional-display",
+      sourceAuthority: "CN",
+    };
+  }
+
+  if (fallbackNameKr) {
+    return {
+      officialNameKr: fallbackNameKr,
+      displayNameKr: fallbackNameKr,
+      displayName: fallbackNameKr,
+      nameKrStatus: "official-confirmed",
+      sourceAuthority: "KR",
+    };
+  }
+
+  return {
+    officialNameKr: null,
+    displayNameKr: null,
+    displayName: hero.identity.nameCn,
+    nameKrStatus: "cn-fallback",
+    sourceAuthority: "CN",
+  };
+}
+
+export function resolveHeroDisplayNameKr(
+  heroId: number,
+  fallbackNameKr: string | null,
+  consumerNameCn?: string,
+) {
+  return resolveHeroNameLocalization(heroId, fallbackNameKr, consumerNameCn).displayNameKr;
 }
