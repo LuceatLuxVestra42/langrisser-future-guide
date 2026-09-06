@@ -7,6 +7,8 @@ const A6_PATH = 'data/manifests/soldier-training-material-assets-a6-webp.v1.json
 const A7_PATH = 'data/validation/soldier-training-material-assets-a7.v1.json';
 const HELPER_PATH = 'src/lib/soldier-training-material-assets.ts';
 const COMPONENT_PATH = 'src/components/soldier-detail-modal.tsx';
+const SUPPLEMENTAL_PATH = 'data/manifests/soldier-training-material-cost-assets-supplemental.v1.json';
+const STAGE_D_PATH = 'data/presentation/soldier-training-cost-material-localization-intake.v1.json';
 
 function readJson(path) {
   return JSON.parse(fs.readFileSync(path, 'utf8'));
@@ -31,7 +33,7 @@ function pngDimensions(bytes) {
   };
 }
 
-for (const path of [A5_PATH, A6_PATH, A7_PATH, HELPER_PATH, COMPONENT_PATH]) {
+for (const path of [A5_PATH, A6_PATH, A7_PATH, HELPER_PATH, COMPONENT_PATH, SUPPLEMENTAL_PATH, STAGE_D_PATH]) {
   assert.equal(fs.existsSync(path), true, `required Soldier training-material artifact missing: ${path}`);
 }
 
@@ -39,6 +41,8 @@ const a5 = readJson(A5_PATH);
 const a6Bytes = fs.readFileSync(A6_PATH);
 const a6 = JSON.parse(a6Bytes.toString('utf8'));
 const a7 = readJson(A7_PATH);
+const supplemental = readJson(SUPPLEMENTAL_PATH);
+const stageD = readJson(STAGE_D_PATH);
 
 assert.equal(a5.schemaId, 'soldier-training-material-assets-a5-repository-admission/v1');
 assert.equal(a5.status, 'PASS');
@@ -68,6 +72,68 @@ for (const record of a5.records) {
   a5ById.set(record.itemId, record);
 }
 assert.equal(a5ById.size, 24);
+
+assert.equal(stageD.status, 'PASS_WITH_REVIEW');
+assert.equal(stageD.completion, 'COMPLETE');
+assert.equal(stageD.coverage?.targetUnresolvedReferenceCount, 24);
+assert.equal(Array.isArray(stageD.records), true);
+assert.equal(stageD.records.length, 24);
+const stageDById = new Map(stageD.records.map((record) => [record.itemId, record]));
+assert.equal(stageDById.size, 24);
+
+assert.equal(supplemental.schemaId, 'soldier-training-cost-material-assets-supplemental/v1');
+assert.equal(supplemental.status, 'PASS');
+assert.equal(supplemental.completion, 'COMPLETE');
+assert.equal(supplemental.summary?.target, 24);
+assert.equal(Array.isArray(supplemental.records), true);
+assert.equal(supplemental.records.length, 24);
+const supplementalById = new Map();
+const supplementalDriveIds = new Set();
+const supplementalRepoPaths = new Set();
+for (const record of supplemental.records) {
+  assert.equal(Number.isInteger(record.itemId), true, `supplemental invalid itemId: ${record.itemId}`);
+  assert.equal(supplementalById.has(record.itemId), false, `supplemental duplicate itemId: ${record.itemId}`);
+  assert.equal(a5ById.has(record.itemId), false, `supplemental overlaps frozen A5/A6 itemId: ${record.itemId}`);
+  const intake = stageDById.get(record.itemId);
+  assert.ok(intake, `supplemental itemId absent from Stage D intake: ${record.itemId}`);
+  assert.equal(record.configIconPath, intake.iconPath, `supplemental ConfigData Icon path mismatch: ${record.itemId}`);
+  assert.equal(record.driveFileName, intake.iconPath.split('/').at(-1), `supplemental Drive basename mismatch: ${record.itemId}`);
+  assert.equal(typeof record.driveFileId, 'string');
+  assert.equal(record.driveFileId.length > 0, true);
+  assert.equal(supplementalDriveIds.has(record.driveFileId), false, `supplemental duplicate Drive file id: ${record.itemId}`);
+  supplementalDriveIds.add(record.driveFileId);
+  assert.equal(record.repoPngPath, `public/images/soldier-training-materials/${record.itemId}.png`);
+  assert.equal(supplementalRepoPaths.has(record.repoPngPath), false, `supplemental duplicate repository path: ${record.itemId}`);
+  supplementalRepoPaths.add(record.repoPngPath);
+  assert.equal(record.width, 172);
+  assert.equal(record.height, 172);
+  assert.equal(record.mode, 'RGBA');
+  assert.equal(record.admissionStatus, 'DELIVERED_EXACT_PNG');
+  assert.equal(fs.existsSync(record.repoPngPath), true, `supplemental repository PNG missing: ${record.itemId}`);
+  const bytes = fs.readFileSync(record.repoPngPath);
+  assert.equal(bytes.length, record.byteSize, `supplemental PNG byte size mismatch: ${record.itemId}`);
+  assert.equal(sha256(bytes), record.pngSha256, `supplemental PNG SHA-256 mismatch: ${record.itemId}`);
+  const dimensions = pngDimensions(bytes);
+  assert.deepEqual(dimensions, { width: 172, height: 172 }, `supplemental PNG dimensions mismatch: ${record.itemId}`);
+  assert.equal(bytes[24], 8, `supplemental PNG bit depth mismatch: ${record.itemId}`);
+  assert.equal(bytes[25], 6, `supplemental PNG color type must be RGBA: ${record.itemId}`);
+  supplementalById.set(record.itemId, record);
+}
+assert.equal(supplementalById.size, 24);
+assert.equal(supplementalDriveIds.size, 24);
+assert.equal(supplementalRepoPaths.size, 24);
+assert.equal(supplemental.summary?.deliveredPng, 24);
+assert.equal(supplemental.summary?.dimensions172x172, 24);
+assert.equal(supplemental.summary?.rgba, 24);
+assert.equal(supplemental.summary?.uniqueItemIds, 24);
+assert.equal(supplemental.summary?.uniqueDriveFileIds, 24);
+assert.equal(supplemental.summary?.uniqueRepoPngPaths, 24);
+assert.equal(supplemental.summary?.missing, 0);
+assert.equal(supplemental.summary?.errors, 0);
+for (const itemId of stageDById.keys()) {
+  assert.equal(supplementalById.has(itemId), true, `Stage D itemId absent from supplemental assets: ${itemId}`);
+}
+assert.equal(a5ById.size + supplementalById.size, 48, 'combined exact itemId asset coverage must be 48');
 
 assert.equal(a6.schemaId, 'soldier-training-material-assets-a6-webp-delivery/v1');
 assert.equal(a6.status, 'PASS');
@@ -150,6 +216,8 @@ console.log(JSON.stringify({
   checkpoint: 'SOLDIER_TRAINING_MATERIAL_ASSETS_READ_ONLY',
   counts: {
     a5Png: a5ById.size,
+    supplementalPng: supplementalById.size,
+    combinedResolvableItemIds: a5ById.size + supplementalById.size,
     a6Webp: a6ById.size,
     a7ItemIds: a7.counts.uniqueItemIds,
     errors: 0,
