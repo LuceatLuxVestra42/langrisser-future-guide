@@ -21,14 +21,22 @@
     "stars": [3, 4, 5, 6],
     "coveredHeroCount": 251,
     "postCutoffHeroCount": 16,
-    "compareFields": ["talent name", "star description numeric signature"],
+    "compareFields": ["talent name", "star description normalized numeric signature"],
     "preserveRawKrHtml": true,
     "preserveRawCnMarkup": true
   },
   "classification": {
-    "DIRECT_REUSE_CANDIDATE": "Current frozen CN star descriptions and direct KR-sheet descriptions have identical numeric signatures at stars 3-6.",
-    "REVIEW_NUMERIC_DRIFT": "At least one star has a different numeric signature; do not reuse the old KR description without review.",
+    "DIRECT_REUSE_STRONG": "After ignoring localization-only numeric sign/percent notation, the ordered numeric signatures agree at stars 3-6.",
+    "REUSE_CANDIDATE_STRUCTURE_ONLY": "The normalized numeric value sets agree at stars 3-6 but order or repetition count differs; retain as a light-review reuse candidate.",
+    "REVIEW_NUMERIC_DRIFT": "At least one star contains a normalized numeric value that is absent on the other side; do not reuse the old KR description without review.",
     "MANUAL_REVIEW": "Current frozen talent structure cannot be deterministically aligned by the existing star-selection contract."
+  },
+  "normalization": {
+    "stripMarkup": true,
+    "ignoreLeadingMinusForReductionWording": true,
+    "ignorePercentMarkerDifference": true,
+    "strongRequiresOrderedParity": true,
+    "structureOnlyRequiresPerStarValueSetParity": true
   },
   "nonScope": {
     "translationGeneration": false,
