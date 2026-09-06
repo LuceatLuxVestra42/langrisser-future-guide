@@ -1,9 +1,10 @@
 {
   "version": 1,
-  "purpose": "Record explicitly human-reviewed identity provenance from the legacy Korean hero source to playable ConfigDataHeroInfo records without name-based automatic JOIN.",
+  "purpose": "Record explicitly human-reviewed identity provenance from the legacy Korean hero source to playable ConfigDataHeroInfo records without name-based automatic JOIN, and record a separate sample validation for recovering already-frozen Hero identity mappings.",
   "baseline": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
-    "mainHead": "9978ba91d5581613bc0685dfbc4c1f26f0538879"
+    "mainHeadAtInitialReview": "9978ba91d5581613bc0685dfbc4c1f26f0538879",
+    "mainHeadAtRecoverySampleApproval": "23abb8657d09a651b65f39a25793df4f074b7b8b"
   },
   "legacySource": {
     "repository": "redpanda7301/langrisser",
@@ -14,7 +15,7 @@
     "logicalSource": "data/configdata/ConfigDataHeroInfo.json",
     "admittedSnapshotCommit": "172d836e59fbdd84bca5e44a9b2e26d8812a927f",
     "sourceRootRemovalCommit": "d57b5afc8147ba607e9d7d4826521d76895ab15c",
-    "note": "The tracked ConfigData source root was intentionally removed after source-root readiness; this review uses the admitted pre-removal ConfigDataHeroInfo snapshot as exact internal-record evidence."
+    "note": "The tracked ConfigData source root was intentionally removed after source-root readiness; the first manual review batch uses the admitted pre-removal ConfigDataHeroInfo snapshot as exact internal-record evidence."
   },
   "reviewPolicy": {
     "type": "MANUALLY_REVIEWED_GAME_DATA",
@@ -22,7 +23,7 @@
     "automaticContentSimilarityJoin": false,
     "automaticOrderJoin": false,
     "automaticFilenameJoin": false,
-    "reviewRequirement": "A human reviewer must confirm that the legacy hero entity and the playable ConfigDataHeroInfo record are the same hero."
+    "reviewRequirement": "A human reviewer must confirm that the legacy hero entity and the playable ConfigDataHeroInfo record are the same hero for exact-record manual bindings."
   },
   "reviewResult": {
     "status": "PASS_ACCEPTED",
@@ -41,12 +42,7 @@
       "legacyNameCn": "格尼尔",
       "legacyNameEn": "Grenier",
       "canonicalHeroId": 3,
-      "configDataRecord": {
-        "ID": 3,
-        "Name": "格尼尔",
-        "Name_Eng": "Grenier",
-        "Useable": true
-      },
+      "configDataRecord": {"ID": 3, "Name": "格尼尔", "Name_Eng": "Grenier", "Useable": true},
       "review": "ACCEPTED"
     },
     {
@@ -55,12 +51,7 @@
       "legacyNameCn": "艾梅达",
       "legacyNameEn": "Almeda",
       "canonicalHeroId": 4,
-      "configDataRecord": {
-        "ID": 4,
-        "Name": "艾梅达",
-        "Name_Eng": "Aimeeda",
-        "Useable": true
-      },
+      "configDataRecord": {"ID": 4, "Name": "艾梅达", "Name_Eng": "Aimeeda", "Useable": true},
       "review": "ACCEPTED",
       "note": "Legacy and internal English spellings differ; the binding is explicitly human-reviewed and is not based on automatic English-name equality."
     },
@@ -70,12 +61,7 @@
       "legacyNameCn": "克丽丝",
       "legacyNameEn": "Chris",
       "canonicalHeroId": 5,
-      "configDataRecord": {
-        "ID": 5,
-        "Name": "克丽丝",
-        "Name_Eng": "Chris",
-        "Useable": true
-      },
+      "configDataRecord": {"ID": 5, "Name": "克丽丝", "Name_Eng": "Chris", "Useable": true},
       "review": "ACCEPTED"
     },
     {
@@ -84,11 +70,7 @@
       "legacyNameCn": "雷丁",
       "legacyNameEn": "Ledin",
       "canonicalHeroId": 10,
-      "configDataRecord": {
-        "ID": 10,
-        "Name": "雷丁",
-        "Useable": true
-      },
+      "configDataRecord": {"ID": 10, "Name": "雷丁", "Useable": true},
       "review": "ACCEPTED",
       "note": "ConfigDataHeroInfo contains other non-playable records reusing 雷丁; this review explicitly selects the playable master record ID 10."
     },
@@ -98,11 +80,7 @@
       "legacyNameCn": "艾尔文",
       "legacyNameEn": "Elwin",
       "canonicalHeroId": 12,
-      "configDataRecord": {
-        "ID": 12,
-        "Name": "艾尔文",
-        "Useable": true
-      },
+      "configDataRecord": {"ID": 12, "Name": "艾尔文", "Useable": true},
       "review": "ACCEPTED",
       "note": "ConfigDataHeroInfo contains other non-playable records reusing 艾尔文; this review explicitly selects the playable master record ID 12."
     },
@@ -112,12 +90,7 @@
       "legacyNameCn": "马修",
       "legacyNameEn": "Matthew",
       "canonicalHeroId": 1,
-      "configDataRecord": {
-        "ID": 1,
-        "Name": "马修",
-        "Name_Eng": "Matthew",
-        "Useable": true
-      },
+      "configDataRecord": {"ID": 1, "Name": "马修", "Name_Eng": "Matthew", "Useable": true},
       "review": "ACCEPTED",
       "note": "ConfigDataHeroInfo contains other non-playable records reusing 马修; this review explicitly selects the playable master record ID 1."
     },
@@ -127,12 +100,7 @@
       "legacyNameCn": "海恩",
       "legacyNameEn": "Hein",
       "canonicalHeroId": 13,
-      "configDataRecord": {
-        "ID": 13,
-        "Name": "海恩",
-        "Name_Eng": "Hein",
-        "Useable": true
-      },
+      "configDataRecord": {"ID": 13, "Name": "海恩", "Name_Eng": "Hein", "Useable": true},
       "review": "ACCEPTED",
       "note": "ConfigDataHeroInfo contains other non-playable records reusing 海恩; this review explicitly selects the playable master record ID 13."
     },
@@ -142,11 +110,7 @@
       "legacyNameCn": "雪莉",
       "legacyNameEn": "Cherie",
       "canonicalHeroId": 14,
-      "configDataRecord": {
-        "ID": 14,
-        "Name": "雪莉",
-        "Useable": true
-      },
+      "configDataRecord": {"ID": 14, "Name": "雪莉", "Useable": true},
       "review": "ACCEPTED",
       "note": "ConfigDataHeroInfo contains other non-playable records reusing 雪莉; this review explicitly selects the playable master record ID 14."
     },
@@ -156,11 +120,7 @@
       "legacyNameCn": "莉亚娜",
       "legacyNameEn": "Riana",
       "canonicalHeroId": 15,
-      "configDataRecord": {
-        "ID": 15,
-        "Name": "莉亚娜",
-        "Useable": true
-      },
+      "configDataRecord": {"ID": 15, "Name": "莉亚娜", "Useable": true},
       "review": "ACCEPTED",
       "note": "This binding was explicitly human-reviewed against the playable master record and does not depend on automatic English-name equality."
     },
@@ -170,16 +130,36 @@
       "legacyNameCn": "兰斯",
       "legacyNameEn": "Lance",
       "canonicalHeroId": 16,
-      "configDataRecord": {
-        "ID": 16,
-        "Name": "兰斯",
-        "Name_Eng": "Lance",
-        "Useable": true
-      },
+      "configDataRecord": {"ID": 16, "Name": "兰斯", "Name_Eng": "Lance", "Useable": true},
       "review": "ACCEPTED",
       "note": "ConfigDataHeroInfo contains other non-playable records reusing 兰斯; this review explicitly selects the playable master record ID 16."
     }
   ],
+  "mappingRecoverySampleValidation": {
+    "stage": "Stage 3A — Existing Mapping Recovery Sample Validation",
+    "status": "PASS_ACCEPTED",
+    "reviewedCount": 10,
+    "acceptedCount": 10,
+    "rejectedCount": 0,
+    "ambiguousCount": 0,
+    "reviewedAgainstCurrentFrozenConsumer": true,
+    "frozenConsumerAuthority": "data/validation/hero-stage6-4-final.v1.json -> data/generated/hero-detail/by-id/<HeroID>.json",
+    "canonicalHeroSemanticReopened": false,
+    "automaticNameJoinAuthorized": false,
+    "bulkPolicy": "The 10/10 sample validates reuse of an already-established explicit/current mapping recovery path. It does not authorize creating remaining legacySource→HeroID relations from name equality alone. Remaining records may be bulk-admitted only when an existing explicit/generated mapping relation is recoverable; unresolved records remain MANUAL_REVIEW.",
+    "samples": [
+      {"legacySourcePath":"hero/data/에그베르트.js","canonicalHeroId":17,"frozenIdentity":{"nameKr":"에그베르트","nameCn":"埃格贝尔特","nameEn":"Eggbert"},"review":"ACCEPTED"},
+      {"legacySourcePath":"hero/data/이멜다.js","canonicalHeroId":18,"frozenIdentity":{"nameKr":"이멜다","nameCn":"伊梅尔达","nameEn":"Imelda"},"review":"ACCEPTED"},
+      {"legacySourcePath":"hero/data/레스터.js","canonicalHeroId":19,"frozenIdentity":{"nameKr":"레스터","nameCn":"利斯塔","nameEn":"Lester"},"review":"ACCEPTED"},
+      {"legacySourcePath":"hero/data/소니아.js","canonicalHeroId":20,"frozenIdentity":{"nameKr":"소니아","nameCn":"索尼娅","nameEn":"Sonia"},"review":"ACCEPTED"},
+      {"legacySourcePath":"hero/data/발가스.js","canonicalHeroId":21,"frozenIdentity":{"nameKr":"발가스","nameCn":"巴尔加斯","nameEn":"Vargas"},"review":"ACCEPTED"},
+      {"legacySourcePath":"hero/data/제시카.js","canonicalHeroId":22,"frozenIdentity":{"nameKr":"제시카","nameCn":"杰西卡","nameEn":"Jessica"},"review":"ACCEPTED"},
+      {"legacySourcePath":"hero/data/로우가.js","canonicalHeroId":23,"frozenIdentity":{"nameKr":"로우가","nameCn":"洛加","nameEn":"Rouga"},"review":"ACCEPTED"},
+      {"legacySourcePath":"hero/data/스코트.js","canonicalHeroId":24,"frozenIdentity":{"nameKr":"스코트","nameCn":"斯科特","nameEn":"Scott"},"review":"ACCEPTED"},
+      {"legacySourcePath":"hero/data/알테뮬러.js","canonicalHeroId":25,"frozenIdentity":{"nameKr":"알테뮬러","nameCn":"亚鲁特缪拉","nameEn":"Alutemurat"},"review":"ACCEPTED"},
+      {"legacySourcePath":"hero/data/루나.js","canonicalHeroId":26,"frozenIdentity":{"nameKr":"루나","nameCn":"露娜","nameEn":"Luna"},"review":"ACCEPTED"}
+    ]
+  },
   "scope": {
     "changesCanonicalHeroPopulation": false,
     "changesCanonicalHeroIdentity": false,
@@ -189,7 +169,7 @@
   },
   "validation": {
     "projectCheckOwner": "MANUAL_REVIEW",
-    "reason": "No current explicit Project Check owner rule for this newly introduced legacy-source identity provenance evidence path was established during this batch. Do not infer an owner.",
-    "nextStep": "Continue manual review in small batches; only accepted bindings reduce the legacy-source identity pending count."
+    "reason": "No current explicit Project Check owner rule for this newly introduced legacy-source identity provenance evidence path was established during this work. Do not infer an owner.",
+    "nextStep": "Recover an existing explicit/generated legacy-source→HeroID relation set if present. Apply the accepted Stage 3A recovery policy in bulk only to records backed by that existing relation; quarantine all unresolved cases as MANUAL_REVIEW."
   }
 }
