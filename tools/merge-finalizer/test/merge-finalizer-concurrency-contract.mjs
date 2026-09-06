@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const contractPath = path.resolve('tools/merge-finalizer/contracts/concurrency.v1.json');
+const contractPath = path.resolve('tools/merge-finalizer/contracts/concurrency.v2.json');
 const workflowPath = path.resolve('.github/workflows/merge-finalize-main.yml');
 const cliPath = path.resolve('tools/merge-finalizer/cli/finalize.mjs');
 const libPath = path.resolve('tools/merge-finalizer/lib/merge-finalizer.mjs');
@@ -12,11 +12,18 @@ const workflowText = fs.readFileSync(workflowPath, 'utf8');
 const cliText = fs.readFileSync(cliPath, 'utf8');
 const libText = fs.readFileSync(libPath, 'utf8');
 
-assert.equal(contract.version, 1);
+assert.equal(contract.version, 2);
+assert.equal(contract.schemaId, 'merge-finalizer-concurrency/v2');
+assert.equal(contract.status, 'DESIGN_FROZEN');
 assert.equal(contract.owner, 'merge-finalizer/orchestration');
-assert.equal(contract.validationConcurrency.scope, 'PR');
-assert.equal(contract.validationConcurrency.cancelInProgress, true);
+assert.equal(contract.wakeupConcurrency.scope, 'PR');
+assert.equal(contract.wakeupConcurrency.cancelInProgress, true);
+assert.equal(contract.finalizingConcurrency.scope, 'FINALIZING');
+assert.equal(contract.finalizingConcurrency.maxActive, 1);
+assert.equal(contract.finalizingConcurrency.requiresAdmission, true);
+assert.equal(contract.finalizingConcurrency.recheckAdmissionAfterLockAcquired, true);
 assert.equal(contract.mergeMutationConcurrency.scope, 'MAIN_MUTATION');
+assert.equal(contract.mergeMutationConcurrency.maxActive, 1);
 assert.equal(contract.mergeMutationConcurrency.queue, 'max');
 assert.equal(contract.staleRefreshHandoff.policy, 'NEW_EXACT_HEAD_RUN_OWNS_CONTINUATION');
 assert.equal(contract.staleRefreshHandoff.oldRunMustNotMergeAfterHeadChange, true);
@@ -27,14 +34,15 @@ assert.deepEqual(
 assert.equal(contract.validationTargets.projectCheck, 'PR_SYNTHETIC_MERGE_RESULT_SHA');
 assert.equal(contract.validationTargets.hostedPreview, 'EXACT_PR_HEAD_SHA');
 
-const prConcurrencyLine = `group: ${contract.validationConcurrency.groupExpression}`;
+const wakeupConcurrencyLine = `group: ${contract.wakeupConcurrency.groupExpression}`;
+const finalizingConcurrencyLine = `group: ${contract.finalizingConcurrency.group}`;
 const mergeMutationConcurrencyLine = `group: ${contract.mergeMutationConcurrency.group}`;
 const forbiddenWorkflowWideGlobalLine = `group: ${contract.forbidden.workflowWideGlobalMergeLock}\n`;
 
 assert.equal(
-  workflowText.includes(prConcurrencyLine),
+  workflowText.includes(wakeupConcurrencyLine),
   true,
-  'Finalizer validation must use PR-local concurrency so unrelated PR validation can run in parallel.',
+  'Workflow wake-up ownership must remain PR-local so unrelated PR events do not cancel each other.',
 );
 assert.equal(
   workflowText.includes('cancel-in-progress: true'),
@@ -42,14 +50,34 @@ assert.equal(
   'Same-PR synchronize events must hand ownership to the newest exact-head run.',
 );
 assert.equal(
+  workflowText.includes('admission:'),
+  true,
+  'Explicit admission must be resolved before a PR enters the global FINALIZING lane.',
+);
+assert.equal(
+  workflowText.includes("needs.admission.outputs.admitted == 'true'"),
+  true,
+  'Unadmitted PRs must not occupy the FINALIZING concurrency lane.',
+);
+assert.equal(
+  workflowText.includes(finalizingConcurrencyLine),
+  true,
+  'Exactly one admitted PR may occupy FINALIZING validation at a time.',
+);
+assert.equal(
+  workflowText.includes('Reconfirm merge admission at FINALIZING entry'),
+  true,
+  'Admission must be rechecked after the global FINALIZING lock is acquired.',
+);
+assert.equal(
   workflowText.includes(mergeMutationConcurrencyLine),
   true,
-  'Only the main mutation admission boundary may use a repository-wide merge concurrency group.',
+  'Main mutation must remain independently serialized after exact validation.',
 );
 assert.equal(
   workflowText.includes(forbiddenWorkflowWideGlobalLine),
   false,
-  'The legacy workflow-wide merge-finalize-main lock must be removed.',
+  'The legacy workflow-wide merge-finalize-main lock must remain retired.',
 );
 assert.equal(workflowText.includes('Prepare exact PR for merge admission'), true);
 assert.equal(workflowText.includes('--prepare'), true);
@@ -91,12 +119,13 @@ assert.equal(
 
 console.log(JSON.stringify({
   status: 'PASS',
-  checkpoint: 'MERGE_FINALIZER_CONCURRENCY_CONTRACT_V1',
+  checkpoint: 'MERGE_FINALIZER_CONCURRENCY_CONTRACT_V2',
   owner: contract.owner,
-  validationConcurrency: contract.validationConcurrency,
+  wakeupConcurrency: contract.wakeupConcurrency,
+  finalizingConcurrency: contract.finalizingConcurrency,
   mergeMutationConcurrency: contract.mergeMutationConcurrency,
   staleRefreshHandoff: contract.staleRefreshHandoff,
   freshnessGuards: contract.freshnessGuards,
   validationTargets: contract.validationTargets,
-  mergeAdmission: 'SERIALIZED_FAIL_FAST_EXACT_READY',
+  mergeAdmission: 'EXPLICIT_ADMISSION_SINGLE_FINALIZING_EXACT_READY',
 }, null, 2));
