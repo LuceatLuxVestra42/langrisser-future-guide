@@ -392,6 +392,19 @@ function HeroDetailPage() {
               <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">전직 습득 스킬 없음</p>
             )}
           </div>
+
+          <div className="mt-7 border-t border-border pt-5" data-hero-awakening-skill="true">
+            <h3 className="mb-3 text-sm font-bold text-foreground">각성기</h3>
+            {detail.skills.awakening.status === "VERIFIED" && detail.skills.awakening.skill ? (
+              <div className="grid gap-3 lg:grid-cols-2">
+                <SkillCard heroId={hero.heroId} skill={detail.skills.awakening.skill} sourceLabel="각성기" />
+              </div>
+            ) : detail.skills.awakening.status === "NONE" ? (
+              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 없음</p>
+            ) : (
+              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 데이터 확인 필요</p>
+            )}
+          </div>
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
