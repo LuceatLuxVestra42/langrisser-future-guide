@@ -130,6 +130,38 @@ const FETTER_ICON_BY_FAVORABILITY_LEVEL: Record<number, number> = {
   25: 5,
 };
 
+type KoreanParticlePair = "은/는" | "이/가" | "을/를" | "와/과" | "으로/로";
+
+function withKoreanParticle(value: string, pair: KoreanParticlePair) {
+  const trimmed = value.trimEnd();
+  const lastCharacter = Array.from(trimmed).at(-1);
+  if (!lastCharacter) return value;
+
+  const codePoint = lastCharacter.charCodeAt(0);
+  if (codePoint < 0xac00 || codePoint > 0xd7a3) {
+    const fallbackParticle: Record<KoreanParticlePair, string> = {
+      "은/는": "는",
+      "이/가": "가",
+      "을/를": "를",
+      "와/과": "와",
+      "으로/로": "로",
+    };
+    return `${value}${fallbackParticle[pair]}`;
+  }
+
+  const finalConsonantIndex = (codePoint - 0xac00) % 28;
+  const hasFinalConsonant = finalConsonantIndex !== 0;
+  const hasRieulFinalConsonant = finalConsonantIndex === 8;
+  const particle: Record<KoreanParticlePair, string> = {
+    "은/는": hasFinalConsonant ? "은" : "는",
+    "이/가": hasFinalConsonant ? "이" : "가",
+    "을/를": hasFinalConsonant ? "을" : "를",
+    "와/과": hasFinalConsonant ? "과" : "와",
+    "으로/로": hasFinalConsonant && !hasRieulFinalConsonant ? "으로" : "로",
+  };
+  return `${value}${particle[pair]}`;
+}
+
 function stripConfigMarkup(value: string | null) {
   if (!value) return "-";
   return value.replace(/<color=[^>]+>/g, "").replace(/<\/color>/g, "");
@@ -212,13 +244,13 @@ function HeroDetailPage() {
         </Link>
 
         <section className="mt-5 overflow-hidden rounded-3xl border border-border bg-card shadow-sm lg:relative lg:left-1/2 lg:w-[calc(100vw-4rem)] lg:max-w-[96rem] lg:-translate-x-1/2">
-          <div className="grid lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
-            <div className="relative min-h-[420px] overflow-hidden bg-muted/25 sm:min-h-[520px] lg:min-h-[620px]">
+          <div className="grid lg:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)]">
+            <div className="relative min-h-[357px] overflow-hidden bg-muted/25 sm:min-h-[442px] lg:min-h-[527px]">
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
               {activeVisual ? (
                 <img src={activeVisual.src} alt={`${displayName} ${activeVisual.label}`} className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6" />
               ) : (
-                <div className="flex h-full min-h-[420px] flex-col items-center justify-center gap-3 text-muted-foreground">
+                <div className="flex h-full min-h-[357px] flex-col items-center justify-center gap-3 text-muted-foreground">
                   <UserRound className="h-20 w-20" strokeWidth={1.05} aria-hidden="true" />
                   <span className="inline-flex items-center gap-1 text-xs font-semibold"><ImageOff className="h-3.5 w-3.5" aria-hidden="true" />이미지 연결 대기</span>
                 </div>
@@ -254,7 +286,7 @@ function HeroDetailPage() {
               ) : (
                 <p className="mb-2 text-sm font-black tracking-[0.16em] text-muted-foreground">{hero.rarity.baseLabel}</p>
               )}
-              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{displayName}</h1>
+              <h1 className="text-4xl font-bold tracking-tight text-foreground [word-break:keep-all] [overflow-wrap:break-word] sm:text-5xl">{displayName}</h1>
               <div className="mt-3 space-y-0.5 text-sm text-muted-foreground">
                 <p>{hero.identity.nameCn}</p>
                 {hero.identity.nameEn ? <p>{hero.identity.nameEn}</p> : null}
@@ -562,7 +594,8 @@ function formatBondCondition(condition: { requiredHero: { heroId: number | null;
   if (condition.requiredHero) {
     const heroName = condition.requiredHero.nameKr ?? condition.requiredHero.nameCn ?? condition.requiredHero.nameEn ?? `Hero ${condition.requiredHero.heroId ?? "?"}`;
     const stageName = condition.stage?.nameCn ?? condition.mission?.desc ?? condition.mission?.title;
-    return stageName ? `${heroName}와 함께 · ${stageName}` : `${heroName} 필요`;
+    const heroNameWithParticle = withKoreanParticle(heroName, "와/과");
+    return stageName ? `${heroNameWithParticle} 함께 · ${stageName}` : `${heroName} 필요`;
   }
   if (condition.stage?.nameCn) return condition.stage.nameCn;
   if (condition.mission?.desc) return condition.mission.desc;
