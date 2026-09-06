@@ -113,6 +113,15 @@ type HeroVisual = {
   sourceOrder: number | null;
 };
 
+const HERO_RARITY_ICON_PATH_BY_LABEL: Record<string, string> = {
+  LLR: "/images/heroes/rarity/LLR.png",
+  SSR: "/images/heroes/rarity/SSR.png",
+  SR: "/images/heroes/rarity/SR.png",
+  R: "/images/heroes/rarity/R.png",
+  N: "/images/heroes/rarity/N.png",
+  SP: "/images/heroes/rarity/SP.png",
+};
+
 const FETTER_ICON_BY_FAVORABILITY_LEVEL: Record<number, number> = {
   5: 1,
   10: 2,
@@ -129,6 +138,7 @@ function stripConfigMarkup(value: string | null) {
 function HeroDetailPage() {
   const { hero, detail, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
+  const rarityIconPath = HERO_RARITY_ICON_PATH_BY_LABEL[hero.rarity.baseLabel] ?? null;
   const soldierDetailById = useMemo(
     () => new Map(getSoldierPrototypePageData().records.map((record) => [record.soldierId, record])),
     [],
@@ -234,7 +244,16 @@ function HeroDetailPage() {
             </div>
 
             <div className="flex min-w-0 flex-col justify-center p-5 sm:p-8 lg:p-10">
-              <p className="mb-2 text-sm font-black tracking-[0.16em] text-muted-foreground">{hero.rarity.baseLabel}</p>
+              {rarityIconPath ? (
+                <img
+                  src={resolvePublicAssetUrl(rarityIconPath)}
+                  alt={`${hero.rarity.baseLabel} 등급`}
+                  title={hero.rarity.baseLabel}
+                  className="mb-2 h-8 w-auto self-start object-contain sm:h-9"
+                />
+              ) : (
+                <p className="mb-2 text-sm font-black tracking-[0.16em] text-muted-foreground">{hero.rarity.baseLabel}</p>
+              )}
               <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{displayName}</h1>
               <div className="mt-3 space-y-0.5 text-sm text-muted-foreground">
                 <p>{hero.identity.nameCn}</p>
