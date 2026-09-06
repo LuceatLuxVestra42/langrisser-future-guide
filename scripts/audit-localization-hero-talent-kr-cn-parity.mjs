@@ -8,9 +8,7 @@ const readJson = (relativePath) => JSON.parse(fs.readFileSync(path.join(ROOT, re
 
 function stable(value) {
   if (Array.isArray(value)) return value.map(stable);
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stable(value[key])]));
-  }
+  if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stable(value[key])]));
   return value;
 }
 
@@ -42,8 +40,19 @@ function stripMarkup(text) {
 }
 
 function numericSignature(text) {
-  const clean = stripMarkup(text);
-  return [...clean.matchAll(/-?\d+(?:\.\d+)?%?/gu)].map((match) => match[0]);
+  return [...stripMarkup(text).matchAll(/-?\d+(?:\.\d+)?%?/gu)].map((match) => match[0]);
+}
+
+function normalizedToken(token) {
+  return String(token).replace(/^-/, '').replace(/%$/, '');
+}
+
+function normalizedSignature(tokens) {
+  return tokens.map(normalizedToken);
+}
+
+function valueSet(tokens) {
+  return [...new Set(normalizedSignature(tokens))].sort((left, right) => left.localeCompare(right, 'en', { numeric: true }));
 }
 
 function sameArray(left, right) {
@@ -52,80 +61,50 @@ function sameArray(left, right) {
 
 function getCurrentTalent(shard, heroId, stars) {
   const talent = shard.normal?.talent;
-  if (!talent || talent.status !== 'VERIFIED') {
-    return { status: 'MANUAL_REVIEW', reason: 'CURRENT_TALENT_NOT_VERIFIED' };
-  }
+  if (!talent || talent.status !== 'VERIFIED') return { status: 'MANUAL_REVIEW', reason: 'CURRENT_TALENT_NOT_VERIFIED' };
 
   const connections = talent.connectionTalentSkills;
-  if (!Array.isArray(connections) || connections.length === 0) {
-    return { status: 'MANUAL_REVIEW', reason: 'CURRENT_TALENT_CONNECTIONS_MISSING' };
-  }
+  if (!Array.isArray(connections) || connections.length === 0) return { status: 'MANUAL_REVIEW', reason: 'CURRENT_TALENT_CONNECTIONS_MISSING' };
 
   const sequences = connections.map((connection) => (connection.skills ?? []).map((skill) => skill.skillId));
   const firstSequence = sequences[0];
   if (!sequences.every((sequence) => sameArray(sequence, firstSequence))) {
-    return {
-      status: 'MANUAL_REVIEW',
-      reason: 'CURRENT_TALENT_CONNECTION_SEQUENCE_DIVERGENCE',
-      sequences,
-    };
+    return { status: 'MANUAL_REVIEW', reason: 'CURRENT_TALENT_CONNECTION_SEQUENCE_DIVERGENCE', sequences };
   }
 
   const initialStar = talent.initialStar;
   const skills = connections[0].skills ?? [];
-  if (!Number.isInteger(initialStar) || initialStar < 1 || initialStar > 6) {
-    return { status: 'MANUAL_REVIEW', reason: 'CURRENT_TALENT_INITIAL_STAR_INVALID', initialStar };
-  }
+  if (!Number.isInteger(initialStar) || initialStar < 1 || initialStar > 6) return { status: 'MANUAL_REVIEW', reason: 'CURRENT_TALENT_INITIAL_STAR_INVALID', initialStar };
 
   const expectedLength = 7 - initialStar;
   if (skills.length !== expectedLength) {
-    return {
-      status: 'MANUAL_REVIEW',
-      reason: 'CURRENT_TALENT_STAR_SEQUENCE_LENGTH_MISMATCH',
-      initialStar,
-      expectedLength,
-      actualLength: skills.length,
-    };
+    return { status: 'MANUAL_REVIEW', reason: 'CURRENT_TALENT_STAR_SEQUENCE_LENGTH_MISMATCH', initialStar, expectedLength, actualLength: skills.length };
   }
 
   const byStar = {};
   for (const star of stars) {
-    if (star < initialStar) {
-      return { status: 'MANUAL_REVIEW', reason: 'REQUESTED_STAR_BELOW_INITIAL_STAR', star, initialStar };
-    }
+    if (star < initialStar) return { status: 'MANUAL_REVIEW', reason: 'REQUESTED_STAR_BELOW_INITIAL_STAR', star, initialStar };
     const skill = skills[star - initialStar];
-    if (!skill?.nameCn || typeof skill.desc !== 'string') {
-      return { status: 'MANUAL_REVIEW', reason: 'CURRENT_TALENT_STAR_SKILL_MISSING', star, heroId };
-    }
+    if (!skill?.nameCn || typeof skill.desc !== 'string') return { status: 'MANUAL_REVIEW', reason: 'CURRENT_TALENT_STAR_SKILL_MISSING', star, heroId };
+    const signature = numericSignature(skill.desc);
     byStar[`star${star}`] = {
       skillId: skill.skillId,
       nameCn: skill.nameCn,
       descriptionRaw: skill.desc,
       descriptionText: stripMarkup(skill.desc),
-      numericSignature: numericSignature(skill.desc),
+      numericSignature: signature,
+      normalizedNumericSignature: normalizedSignature(signature),
+      normalizedNumericValueSet: valueSet(signature),
     };
   }
 
-  return {
-    status: 'VERIFIED',
-    selectionRule: talent.selectionRule,
-    initialStar,
-    connectionCount: connections.length,
-    byStar,
-  };
+  return { status: 'VERIFIED', selectionRule: talent.selectionRule, initialStar, connectionCount: connections.length, byStar };
 }
 
 function compareRecord(record, contract) {
   const shardPath = `${contract.currentHeroAuthority.shardDirectory}/${record.heroId}.json`;
   if (!fs.existsSync(path.join(ROOT, shardPath))) {
-    return {
-      heroId: record.heroId,
-      nameKr: record.nameKr,
-      nameCn: record.nameCn,
-      classification: 'MANUAL_REVIEW',
-      reason: 'CURRENT_HERO_SHARD_MISSING',
-      shardPath,
-    };
+    return { heroId: record.heroId, nameKr: record.nameKr, nameCn: record.nameCn, classification: 'MANUAL_REVIEW', reason: 'CURRENT_HERO_SHARD_MISSING', shardPath };
   }
 
   const shard = readJson(shardPath);
@@ -135,45 +114,54 @@ function compareRecord(record, contract) {
   const krByStar = {};
   for (const star of contract.scope.stars) {
     const raw = record.talent?.descriptionsRaw?.[`star${star}`];
+    const signature = numericSignature(raw);
     krByStar[`star${star}`] = {
       descriptionRaw: raw ?? null,
       descriptionText: stripMarkup(raw),
-      numericSignature: numericSignature(raw),
+      numericSignature: signature,
+      normalizedNumericSignature: normalizedSignature(signature),
+      normalizedNumericValueSet: valueSet(signature),
     };
   }
 
   if (current.status !== 'VERIFIED') {
-    return {
-      heroId: record.heroId,
-      nameKr: record.nameKr,
-      nameCn: record.nameCn,
-      krTalentName: record.talent?.nameKr ?? null,
-      classification: 'MANUAL_REVIEW',
-      reason: current.reason,
-      current,
-      krByStar,
-      shardPath,
-    };
+    return { heroId: record.heroId, nameKr: record.nameKr, nameCn: record.nameCn, krTalentName: record.talent?.nameKr ?? null, classification: 'MANUAL_REVIEW', reason: current.reason, current, krByStar, shardPath };
   }
 
   const starComparisons = {};
-  let numericParity = true;
+  let orderedParity = true;
+  let valueSetParity = true;
   for (const star of contract.scope.stars) {
     const key = `star${star}`;
-    const krSig = krByStar[key].numericSignature;
-    const cnSig = current.byStar[key].numericSignature;
-    const equal = sameArray(krSig, cnSig);
-    if (!equal) numericParity = false;
+    const krRaw = krByStar[key].numericSignature;
+    const cnRaw = current.byStar[key].numericSignature;
+    const krNormalized = krByStar[key].normalizedNumericSignature;
+    const cnNormalized = current.byStar[key].normalizedNumericSignature;
+    const krSet = krByStar[key].normalizedNumericValueSet;
+    const cnSet = current.byStar[key].normalizedNumericValueSet;
+    const orderedEqual = sameArray(krNormalized, cnNormalized);
+    const valueSetEqual = sameArray(krSet, cnSet);
+    if (!orderedEqual) orderedParity = false;
+    if (!valueSetEqual) valueSetParity = false;
     starComparisons[key] = {
-      equal,
-      krNumericSignature: krSig,
-      cnNumericSignature: cnSig,
+      orderedEqual,
+      valueSetEqual,
+      krNumericSignature: krRaw,
+      cnNumericSignature: cnRaw,
+      krNormalizedNumericSignature: krNormalized,
+      cnNormalizedNumericSignature: cnNormalized,
+      krNormalizedNumericValueSet: krSet,
+      cnNormalizedNumericValueSet: cnSet,
       cnSkillId: current.byStar[key].skillId,
     };
   }
 
+  const classification = orderedParity
+    ? 'DIRECT_REUSE_STRONG'
+    : valueSetParity
+      ? 'REUSE_CANDIDATE_STRUCTURE_ONLY'
+      : 'REVIEW_NUMERIC_DRIFT';
   const cnTalentNames = [...new Set(Object.values(current.byStar).map((row) => row.nameCn))];
-  const classification = numericParity ? 'DIRECT_REUSE_CANDIDATE' : 'REVIEW_NUMERIC_DRIFT';
 
   return {
     heroId: record.heroId,
@@ -187,11 +175,7 @@ function compareRecord(record, contract) {
     currentTalent: current,
     krByStar,
     starComparisons,
-    source: {
-      krSheetPrimaryKey: record.primarySheetKey,
-      krSheetSourcePaths: record.sourcePaths,
-      currentShardPath: shardPath,
-    },
+    source: { krSheetPrimaryKey: record.primarySheetKey, krSheetSourcePaths: record.sourcePaths, currentShardPath: shardPath },
   };
 }
 
@@ -202,30 +186,19 @@ function buildResult() {
   const manifest = readJson(contract.currentHeroAuthority.manifest);
 
   if (stage3.status !== contract.predecessor.krSheetExpectedStatus || stage3.coverage?.uniqueHeroCount !== contract.predecessor.krSheetExpectedHeroCount) {
-    fail('Stage 3 KR-sheet projection predecessor mismatch.', {
-      status: stage3.status,
-      uniqueHeroCount: stage3.coverage?.uniqueHeroCount,
-    });
+    fail('Stage 3 KR-sheet projection predecessor mismatch.', { status: stage3.status, uniqueHeroCount: stage3.coverage?.uniqueHeroCount });
   }
-  if (
-    authority.completion !== contract.currentHeroAuthority.requiredCompletion ||
-    authority.heroDataPipelineStatus !== contract.currentHeroAuthority.requiredPipelineStatus
-  ) {
-    fail('Current Hero authority is not the required FINAL_FROZEN predecessor.', {
-      completion: authority.completion,
-      heroDataPipelineStatus: authority.heroDataPipelineStatus,
-    });
+  if (authority.completion !== contract.currentHeroAuthority.requiredCompletion || authority.heroDataPipelineStatus !== contract.currentHeroAuthority.requiredPipelineStatus) {
+    fail('Current Hero authority is not the required FINAL_FROZEN predecessor.', { completion: authority.completion, heroDataPipelineStatus: authority.heroDataPipelineStatus });
   }
   if (manifest.summary?.canonicalHeroCount !== contract.currentHeroAuthority.canonicalHeroCount) {
-    fail('Current Hero manifest canonical count mismatch.', {
-      expected: contract.currentHeroAuthority.canonicalHeroCount,
-      actual: manifest.summary?.canonicalHeroCount,
-    });
+    fail('Current Hero manifest canonical count mismatch.', { expected: contract.currentHeroAuthority.canonicalHeroCount, actual: manifest.summary?.canonicalHeroCount });
   }
 
   const records = stage3.records.map((record) => compareRecord(record, contract));
   const counts = {
-    DIRECT_REUSE_CANDIDATE: records.filter((row) => row.classification === 'DIRECT_REUSE_CANDIDATE').length,
+    DIRECT_REUSE_STRONG: records.filter((row) => row.classification === 'DIRECT_REUSE_STRONG').length,
+    REUSE_CANDIDATE_STRUCTURE_ONLY: records.filter((row) => row.classification === 'REUSE_CANDIDATE_STRUCTURE_ONLY').length,
     REVIEW_NUMERIC_DRIFT: records.filter((row) => row.classification === 'REVIEW_NUMERIC_DRIFT').length,
     MANUAL_REVIEW: records.filter((row) => row.classification === 'MANUAL_REVIEW').length,
   };
@@ -244,28 +217,22 @@ function buildResult() {
       currentHeroManifest: contract.currentHeroAuthority.manifest,
       canonicalHeroCount: manifest.summary.canonicalHeroCount,
     },
-    authorityBoundary: {
-      semanticRejoin: false,
-      identityMutation: false,
-      relationMutation: false,
-      nameJoin: false,
-      idArithmetic: false,
-      translationGeneration: false,
-      postCutoffTranslation: false,
-    },
+    authorityBoundary: { semanticRejoin: false, identityMutation: false, relationMutation: false, nameJoin: false, idArithmetic: false, translationGeneration: false, postCutoffTranslation: false },
     comparisonPolicy: {
       joinKey: 'HeroID from the accepted Stage 3 projection',
       stars: contract.scope.stars,
       currentTalentSource: 'FINAL_FROZEN Hero detail shard normal.talent',
-      numericSignatureOnly: true,
-      directReuseMeaning: contract.classification.DIRECT_REUSE_CANDIDATE,
+      normalization: contract.normalization,
+      strongMeaning: contract.classification.DIRECT_REUSE_STRONG,
+      structureOnlyMeaning: contract.classification.REUSE_CANDIDATE_STRUCTURE_ONLY,
       numericDriftMeaning: contract.classification.REVIEW_NUMERIC_DRIFT,
       manualReviewMeaning: contract.classification.MANUAL_REVIEW,
     },
     summary: {
       comparedHeroCount: records.length,
       ...counts,
-      reviewCount: counts.REVIEW_NUMERIC_DRIFT + counts.MANUAL_REVIEW,
+      directReuseCandidateCount: counts.DIRECT_REUSE_STRONG + counts.REUSE_CANDIDATE_STRUCTURE_ONLY,
+      reviewCount: counts.REUSE_CANDIDATE_STRUCTURE_ONLY + counts.REVIEW_NUMERIC_DRIFT + counts.MANUAL_REVIEW,
       postCutoffHeroCount: stage3.coverage.postCutoffHeroCount,
     },
     records,
@@ -281,7 +248,7 @@ if (options.check) {
   if (!fs.existsSync(outputPath)) fail('Committed Hero talent KR/CN parity output is missing.', { outputPath });
   const expected = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
   if (JSON.stringify(stable(result)) !== JSON.stringify(stable(expected))) fail('Committed Hero talent KR/CN parity output is stale or mismatched.');
-  console.log(`Hero Talent KR/CN Parity: ${result.status} (${result.summary.DIRECT_REUSE_CANDIDATE} direct; ${result.summary.REVIEW_NUMERIC_DRIFT} drift; ${result.summary.MANUAL_REVIEW} manual)`);
+  console.log(`Hero Talent KR/CN Parity: ${result.status} (${result.summary.DIRECT_REUSE_STRONG} strong; ${result.summary.REUSE_CANDIDATE_STRUCTURE_ONLY} structure-only; ${result.summary.REVIEW_NUMERIC_DRIFT} drift; ${result.summary.MANUAL_REVIEW} manual)`);
 } else if (options.json) {
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
 } else {
