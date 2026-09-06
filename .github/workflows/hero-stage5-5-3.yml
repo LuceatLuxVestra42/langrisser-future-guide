@@ -7,14 +7,16 @@ on:
       - '.github/workflows/hero-stage5-5-3.yml'
       - 'scripts/build_hero_page_stage5_5_3.cjs'
       - 'scripts/validate_hero_page_stage5_5_3.cjs'
-      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
-      - 'data/contracts/configdata-source-pack-contract.v1.json'
       - 'data/contracts/hero-page-stage5-5-3-output-contract.v1.json'
       - 'data/hero-name-master.v1.json'
       - 'data/validation/hero-page-stage5-5-2-rarity.v1.json'
       - 'data/validation/hero-page-stage5-5-2-factions.v1.json'
       - 'data/validation/hero-page-stage5-5-2-cv.v1.json'
       - 'data/validation/hero-page-stage5-5-2-origin.v1.json'
+      - 'data/configdata/ConfigDataHeroInfo.json'
+      - 'data/configdata/ConfigDataCharImageInfo.json'
+      - 'data/configdata/ConfigDataHeroSkinInfo.json'
+      - 'data/configdata/ConfigDataCharImageSkinResourceInfo.json'
 
 permissions:
   contents: write
@@ -24,40 +26,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Configure external ConfigData source root
-        shell: bash
-        run: echo "CONFIGDATA_SOURCE_ROOT=$RUNNER_TEMP/hero-stage5-5-3-configdata" >> "$GITHUB_ENV"
-
-      - name: Hydrate pinned ConfigData source pack
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf "$CONFIGDATA_SOURCE_ROOT"
-          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$CONFIGDATA_SOURCE_ROOT"
-          count="$(find "$CONFIGDATA_SOURCE_ROOT/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
-          test "$count" = "753"
-          case "$CONFIGDATA_SOURCE_ROOT/" in
-            "$GITHUB_WORKSPACE/"*) echo 'external ConfigData source root must stay outside repository' >&2; exit 1 ;;
-          esac
-
-      - name: Expose hydrated ConfigData at legacy Stage 5 logical path
-        shell: bash
-        run: |
-          set -euo pipefail
-          logical_root="$GITHUB_WORKSPACE/data/configdata"
-          test ! -e "$logical_root"
-          ln -s "$CONFIGDATA_SOURCE_ROOT/data/configdata" "$logical_root"
-          test -f "$logical_root/ConfigDataHeroInfo.json"
-          test -f "$logical_root/ConfigDataCharImageInfo.json"
-          test -f "$logical_root/ConfigDataHeroSkinInfo.json"
-          test -f "$logical_root/ConfigDataCharImageSkinResourceInfo.json"
 
       - name: Generate integrated 267-Hero output
         run: node scripts/build_hero_page_stage5_5_3.cjs
