@@ -11,10 +11,13 @@ on:
     branches:
       - main
     types:
-      - opened
+      - labeled
+      - unlabeled
       - reopened
       - synchronize
       - ready_for_review
+      - converted_to_draft
+      - closed
 
 permissions:
   contents: write
@@ -32,7 +35,6 @@ jobs:
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'pull_request_target' &&
        github.event.pull_request.base.ref == 'main' &&
-       github.event.pull_request.draft == false &&
        github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -68,8 +70,39 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Create merge finalizer GitHub App token
+      - name: Check explicit merge admission
         if: steps.merged-state.outputs.skip != 'true'
+        id: admission
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          echo 'admitted=false' >> "$GITHUB_OUTPUT"
+          set +e
+          result="$(node tools/merge-finalizer/cli/check-admission.mjs \
+            --repository "$GITHUB_REPOSITORY" \
+            --pr "$PR_NUMBER")"
+          code=$?
+          set -e
+          printf '%s\n' "$result"
+          status="$(printf '%s' "$result" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>process.stdout.write(String(JSON.parse(s).status ?? '')))")"
+
+          if [[ "$code" -eq 0 && "$status" == 'ADMITTED' ]]; then
+            echo 'admitted=true' >> "$GITHUB_OUTPUT"
+            echo 'MERGE_FINALIZER_ADMISSION=PASS'
+            exit 0
+          fi
+
+          if [[ "$code" -eq 3 && "$status" == 'NOT_ADMITTED' ]]; then
+            echo 'MERGE_FINALIZER_ADMISSION=NOT_ADMITTED'
+            exit 0
+          fi
+
+          echo 'BLOCKER_MERGE_FINALIZER_ADMISSION'
+          exit 1
+
+      - name: Create merge finalizer GitHub App token
+        if: steps.merged-state.outputs.skip != 'true' && steps.admission.outputs.admitted == 'true'
         id: app-token
         uses: actions/create-github-app-token@v2
         with:
@@ -81,13 +114,13 @@ jobs:
           permission-checks: read
 
       - name: Run merge finalizer self-test
-        if: steps.merged-state.outputs.skip != 'true'
+        if: steps.merged-state.outputs.skip != 'true' && steps.admission.outputs.admitted == 'true'
         run: |
           node tools/merge-finalizer/test/merge-finalizer-self-test.mjs
           node tools/merge-finalizer/test/merge-finalizer-concurrency-contract.mjs
 
       - name: Refresh stale PR with GitHub App and hand off to exact-head run
-        if: steps.merged-state.outputs.skip != 'true'
+        if: steps.merged-state.outputs.skip != 'true' && steps.admission.outputs.admitted == 'true'
         id: refresh-state
         env:
           APP_TOKEN: ${{ steps.app-token.outputs.token }}
@@ -151,7 +184,7 @@ jobs:
           exit 1
 
       - name: Prepare exact PR for merge admission
-        if: steps.merged-state.outputs.skip != 'true' && steps.refresh-state.outputs.handoff != 'true'
+        if: steps.merged-state.outputs.skip != 'true' && steps.admission.outputs.admitted == 'true' && steps.refresh-state.outputs.handoff != 'true'
         id: prepare
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -235,6 +268,15 @@ jobs:
           permission-pull-requests: write
           permission-actions: read
           permission-checks: read
+
+      - name: Reconfirm merge admission before main mutation
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node tools/merge-finalizer/cli/check-admission.mjs \
+            --repository "$GITHUB_REPOSITORY" \
+            --pr "$PR_NUMBER"
 
       - name: Merge exact ready PR or hand off revalidation
         env:
