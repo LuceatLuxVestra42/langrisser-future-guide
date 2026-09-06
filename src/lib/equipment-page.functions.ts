@@ -8,6 +8,7 @@ import {
   readGeneralEquipmentPageData,
 } from "./equipment-page.localized.server";
 import type {
+  EquipmentEffectSegment,
   EquipmentFilterGroup,
   EquipmentStatProperty,
   ExclusiveEquipmentDetailPageData,
@@ -35,7 +36,7 @@ type AccessoryClassifiable = {
 
 type EffectPresentable = {
   effectText: string;
-  effectSegments: Array<{ text: string }>;
+  effectSegments: EquipmentEffectSegment[];
 };
 
 export type ExclusiveEquipmentDetailRouteData = ExclusiveEquipmentDetailPageData & {
@@ -65,11 +66,11 @@ function normalizeEquipmentEffectPresentationText(value: string) {
   const presentedLines: string[] = [];
 
   for (let index = 0; index < sourceLines.length; index += 1) {
-    const rawLine = sourceLines[index];
+    const rawLine = sourceLines[index] ?? "";
     const line = rawLine.trim();
     if (!line) continue;
 
-    const previousRawLine = index > 0 ? sourceLines[index - 1] : "";
+    const previousRawLine = index > 0 ? (sourceLines[index - 1] ?? "") : "";
     const previousPresentedLine = presentedLines.at(-1) ?? "";
     const startsIndependentUnit = /^(?:지휘\s*[:：.]|\[[^\]]+\]\s*[:：]?)/.test(line);
     const isSuffixLine = /^(?:지속\s*\d+\s*(?:턴|행동|회합)|해제 불가|면역 불가)(?:[,.]|$|\s)/.test(
@@ -98,13 +99,15 @@ function normalizeEquipmentEffectPresentationText(value: string) {
 }
 
 function applyEquipmentEffectPresentation<T extends EffectPresentable>(effect: T): T {
+  const effectSegments = effect.effectSegments.map((segment): EquipmentEffectSegment => ({
+    ...segment,
+    text: normalizeEquipmentEffectPresentationText(segment.text),
+  }));
+
   return {
     ...effect,
     effectText: normalizeEquipmentEffectPresentationText(effect.effectText),
-    effectSegments: effect.effectSegments.map((segment) => ({
-      ...segment,
-      text: normalizeEquipmentEffectPresentationText(segment.text),
-    })),
+    effectSegments,
   } as T;
 }
 
