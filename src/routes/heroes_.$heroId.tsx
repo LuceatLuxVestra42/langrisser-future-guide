@@ -261,22 +261,18 @@ function HeroDetailPage() {
               </div>
 
               <div className="mt-7">
-                <p className="text-xs font-bold text-muted-foreground">CV</p>
-                <p className="mt-2 font-semibold text-foreground">{detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-"}</p>
+                <p className="font-semibold text-foreground">CV. {detail.presentation.cvNameKr ?? detail.presentation.cvSourceValue ?? "-"}</p>
 
-                <div className="mt-6">
-                  <p className="text-xs font-bold text-muted-foreground">진영</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {factionMarks.map((faction) => (
-                      <img
-                        key={faction.factionId}
-                        src={resolvePublicAssetUrl(faction.webAssetPath)}
-                        alt={faction.label}
-                        title={faction.label}
-                        className="h-10 w-10 object-contain"
-                      />
-                    ))}
-                  </div>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {factionMarks.map((faction) => (
+                    <img
+                      key={faction.factionId}
+                      src={resolvePublicAssetUrl(faction.webAssetPath)}
+                      alt={faction.label}
+                      title={faction.label}
+                      className="h-10 w-10 object-contain"
+                    />
+                  ))}
                 </div>
               </div>
             </div>
