@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "schemaId": "hero-talent-kr-cn-parity-contract/v1",
+  "status": "ACTIVE",
+  "purpose": "Compare the materialized Korean-sheet normal Hero talent localization against the current FINAL_FROZEN Hero talent consumer by HeroID, without recomputing Hero semantics.",
+  "predecessor": {
+    "stage3Commit": "3f55cb47783d39e8e9eb22cdc4a063eef7fcd467",
+    "krSheetProjection": "data/presentation/hero-talent-kr-sheet-source.v1.json",
+    "krSheetExpectedStatus": "PASS",
+    "krSheetExpectedHeroCount": 251
+  },
+  "currentHeroAuthority": {
+    "validation": "data/validation/hero-stage6-4-final.v1.json",
+    "requiredPipelineStatus": "FINAL_FROZEN",
+    "requiredCompletion": "COMPLETE",
+    "manifest": "data/generated/hero-detail.v1.json",
+    "shardDirectory": "data/generated/hero-detail/by-id",
+    "canonicalHeroCount": 267
+  },
+  "scope": {
+    "stars": [3, 4, 5, 6],
+    "coveredHeroCount": 251,
+    "postCutoffHeroCount": 16,
+    "compareFields": ["talent name", "star description numeric signature"],
+    "preserveRawKrHtml": true,
+    "preserveRawCnMarkup": true
+  },
+  "classification": {
+    "DIRECT_REUSE_CANDIDATE": "Current frozen CN star descriptions and direct KR-sheet descriptions have identical numeric signatures at stars 3-6.",
+    "REVIEW_NUMERIC_DRIFT": "At least one star has a different numeric signature; do not reuse the old KR description without review.",
+    "MANUAL_REVIEW": "Current frozen talent structure cannot be deterministically aligned by the existing star-selection contract."
+  },
+  "nonScope": {
+    "translationGeneration": false,
+    "semanticRejoin": false,
+    "identityMutation": false,
+    "relationMutation": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "postCutoffTranslation": false
+  },
+  "output": "data/presentation/hero-talent-kr-cn-parity.v1.json"
+}
