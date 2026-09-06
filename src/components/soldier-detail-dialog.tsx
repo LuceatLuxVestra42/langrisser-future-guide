@@ -1,7 +1,8 @@
 import { X } from "lucide-react";
-import { useEffect, type ComponentProps } from "react";
+import { useEffect, useMemo, type ComponentProps } from "react";
 
 import { SoldierDetailModal } from "@/components/soldier-detail-modal";
+import { resolveHeroDisplayNameKr } from "@/lib/hero-display-name";
 
 type SoldierDetailDialogProps = ComponentProps<typeof SoldierDetailModal> & {
   onClose: () => void;
@@ -12,6 +13,14 @@ export function SoldierDetailDialog({
   heroCardIcons,
   onClose,
 }: SoldierDetailDialogProps) {
+  const presentedHeroCardIcons = useMemo(
+    () => heroCardIcons.map((card) => ({
+      ...card,
+      nameKr: resolveHeroDisplayNameKr(card.heroId, card.nameKr, card.nameCn),
+    })),
+    [heroCardIcons],
+  );
+
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -51,7 +60,7 @@ export function SoldierDetailDialog({
         <SoldierDetailModal
           key={record.soldierId}
           record={record}
-          heroCardIcons={heroCardIcons}
+          heroCardIcons={presentedHeroCardIcons}
         />
       </div>
     </div>
