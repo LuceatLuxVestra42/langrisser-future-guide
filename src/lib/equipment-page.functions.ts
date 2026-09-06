@@ -25,7 +25,6 @@ const DEFENSE_SUBTYPE = "defense";
 const DEFENSE_SUBTYPE_ORDER = 3;
 const ATTACK_PROPERTY_ID = 2;
 const INTELLECT_PROPERTY_ID = 4;
-const EQUIPMENT_581_ID = 581;
 
 type AccessoryClassifiable = {
   group: string;
@@ -61,27 +60,50 @@ function hasAttackAndIntellectBaseStats(properties: EquipmentStatProperty[]) {
   return hasAttack && hasIntellect;
 }
 
-function compactEquipment581EffectTrailer(value: string) {
-  return value.replace(
-    /\n지속 4행동,\s*\n해제 불가/g,
-    ", 지속 4행동, 해제 불가",
-  );
-}
+function normalizeEquipmentEffectPresentationText(value: string) {
+  const sourceLines = value.replace(/\r\n?/g, "\n").split("\n");
+  const presentedLines: string[] = [];
 
-function applyEquipmentEffectPresentation<T extends EffectPresentable>(
-  equipmentId: number,
-  effect: T,
-): T {
-  if (equipmentId !== EQUIPMENT_581_ID) {
-    return effect;
+  for (let index = 0; index < sourceLines.length; index += 1) {
+    const rawLine = sourceLines[index];
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    const previousRawLine = index > 0 ? sourceLines[index - 1] : "";
+    const previousPresentedLine = presentedLines.at(-1) ?? "";
+    const startsIndependentUnit = /^(?:지휘\s*[:：.]|\[[^\]]+\]\s*[:：]?)/.test(line);
+    const isSuffixLine = /^(?:지속\s*\d+\s*(?:턴|행동|회합)|해제 불가|면역 불가)(?:[,.]|$|\s)/.test(
+      line,
+    );
+    const previousEndsWithCondition = /(?:^|\s)경우[,.]?$/.test(previousPresentedLine.trim());
+    const sourceBoundarySignalsContinuation =
+      /[ \t]$/.test(previousRawLine) || /^[ \t]/.test(rawLine);
+
+    const shouldJoin =
+      presentedLines.length > 0 &&
+      !startsIndependentUnit &&
+      (line.startsWith("(") ||
+        isSuffixLine ||
+        previousEndsWithCondition ||
+        sourceBoundarySignalsContinuation);
+
+    if (shouldJoin) {
+      presentedLines[presentedLines.length - 1] = `${previousPresentedLine.trimEnd()} ${line}`;
+    } else {
+      presentedLines.push(line);
+    }
   }
 
+  return presentedLines.join("\n");
+}
+
+function applyEquipmentEffectPresentation<T extends EffectPresentable>(effect: T): T {
   return {
     ...effect,
-    effectText: compactEquipment581EffectTrailer(effect.effectText),
+    effectText: normalizeEquipmentEffectPresentationText(effect.effectText),
     effectSegments: effect.effectSegments.map((segment) => ({
       ...segment,
-      text: compactEquipment581EffectTrailer(segment.text),
+      text: normalizeEquipmentEffectPresentationText(segment.text),
     })),
   } as T;
 }
@@ -214,7 +236,7 @@ export async function getEquipmentDetailPageData({
 
   const detail = {
     ...pageData.detail,
-    effect: applyEquipmentEffectPresentation(data.equipmentId, pageData.detail.effect),
+    effect: applyEquipmentEffectPresentation(pageData.detail.effect),
   };
 
   if (pageData.kind === "exclusive") {
