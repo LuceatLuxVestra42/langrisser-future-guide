@@ -15,6 +15,7 @@ const sourcePaths = [
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const url = (path) => new URL(path.replace(/^\//, ""), baseUrl).toString();
+const hostedBaseUrl = new URL(baseUrl);
 const normalizeSemanticText = (value) => String(value ?? "").replace(/\s+/g, " ").trim();
 const normalizePresentationText = (value) => String(value ?? "")
   .replace(/\r\n?/g, "\n")
@@ -91,6 +92,50 @@ for (let attempt = 1; attempt <= 120; attempt += 1) {
 check(manifest, `authoritative deployment manifest did not reach source=${expectedSourceSha}`);
 check(manifest.semanticStageReopened === false, "deployment manifest reopened semantic stage");
 
+const validateDeploymentAssets = async (page, equipmentId) => {
+  const discovered = await page.evaluate(() => ({
+    documentUrl: document.location.href,
+    stylesheets: [...new Set(
+      Array.from(document.querySelectorAll('link[rel~="stylesheet"][href]'), (element) => element.href),
+    )].sort(),
+    scripts: [...new Set(
+      Array.from(document.querySelectorAll("script[src]"), (element) => element.src),
+    )].sort(),
+  }));
+
+  check(discovered.stylesheets.length > 0, `Equipment ${equipmentId} hosted page has no stylesheet asset evidence`);
+  check(discovered.scripts.length > 0, `Equipment ${equipmentId} hosted page has no script asset evidence`);
+
+  const verifyAsset = async (href, kind) => {
+    const assetUrl = new URL(href);
+    check(
+      assetUrl.origin === hostedBaseUrl.origin && assetUrl.pathname.startsWith(hostedBaseUrl.pathname),
+      `Equipment ${equipmentId} hosted ${kind} asset escaped authoritative Pages base: ${href}`,
+    );
+    const response = await fetch(assetUrl, { cache: "no-store" });
+    check(response.ok, `Equipment ${equipmentId} hosted ${kind} asset failed: ${response.status} ${href}`);
+    return {
+      href: assetUrl.href,
+      path: assetUrl.pathname,
+      fileName: assetUrl.pathname.split("/").filter(Boolean).at(-1) ?? "",
+      status: response.status,
+    };
+  };
+
+  const stylesheets = [];
+  for (const href of discovered.stylesheets) stylesheets.push(await verifyAsset(href, "stylesheet"));
+  const scripts = [];
+  for (const href of discovered.scripts) scripts.push(await verifyAsset(href, "script"));
+
+  return {
+    documentUrl: discovered.documentUrl,
+    sourceSha: expectedSourceSha,
+    stylesheets,
+    scripts,
+    result: "PASS",
+  };
+};
+
 const browser = await chromium.launch({ headless: true });
 const results = [];
 
@@ -109,6 +154,8 @@ try {
         timeout: 45000,
       });
       check(response && response.status() < 400, `Equipment ${testCase.equipmentId} detail failed: ${response?.status()}`);
+
+      const deploymentAssets = await validateDeploymentAssets(page, testCase.equipmentId);
 
       const heading = page.locator("main h1");
       check(await heading.count() === 1, `Equipment ${testCase.equipmentId} detail heading missing or duplicated`);
@@ -244,6 +291,7 @@ try {
         fixtureLabel: testCase.fixtureLabel,
         displayName,
         effectText: testCase.effectText,
+        deploymentAssets,
         effectParagraph: "EXACT_MATCH",
         semanticTextMatch: "EXACT_MATCH",
         presentationTextMatch: "NEWLINE_PRESERVING_EXACT_MATCH",
@@ -291,10 +339,24 @@ check(
   "Equipment 581 newline regression proof is missing",
 );
 
+const stylesheetAssetSignatures = new Set(
+  results.map((result) => JSON.stringify(result.deploymentAssets.stylesheets.map((asset) => asset.path))),
+);
+check(
+  stylesheetAssetSignatures.size === 1,
+  `representative Equipment pages loaded inconsistent stylesheet bundles: signatures=${stylesheetAssetSignatures.size}`,
+);
+
 console.log(JSON.stringify({
   status: "PASS_EQUIPMENT_EFFECT_DESCRIPTION_KR_HOSTED",
   sourceSha: expectedSourceSha,
   deployedSourceSha: manifest.sourceSha,
+  deploymentEvidence: {
+    manifestSourceSha: manifest.sourceSha,
+    stylesheetSignatureCount: stylesheetAssetSignatures.size,
+    representativeAssetProofCount: results.length,
+    result: "PASS",
+  },
   projectionCount: expectedByEquipmentId.size,
   representativeFixtureCount: fixtureDefinitions.length,
   representativeCases: results,
