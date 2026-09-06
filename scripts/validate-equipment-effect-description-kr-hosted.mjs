@@ -24,10 +24,39 @@ const normalizePresentationText = (value) => String(value ?? "")
   .join("\n")
   .trim();
 const countLineBreaks = (value) => Math.max(0, normalizePresentationText(value).split("\n").length - 1);
-const applyExpectedPresentation = (equipmentId, value) =>
-  equipmentId === 581
-    ? String(value).replace(/\n지속 4행동,\s*\n해제 불가/g, ", 지속 4행동, 해제 불가")
-    : String(value);
+const applyExpectedPresentation = (value) => {
+  const sourceLines = String(value ?? "").replace(/\r\n?/g, "\n").split("\n");
+  const presentedLines = [];
+
+  for (let index = 0; index < sourceLines.length; index += 1) {
+    const rawLine = sourceLines[index];
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    const previousRawLine = index > 0 ? sourceLines[index - 1] : "";
+    const previousPresentedLine = presentedLines.at(-1) ?? "";
+    const startsIndependentUnit = /^(?:지휘\s*[:：.]|\[[^\]]+\]\s*[:：]?)/.test(line);
+    const isSuffixLine = /^(?:지속\s*\d+\s*(?:턴|행동|회합)|해제 불가|면역 불가)(?:[,.]|$|\s)/.test(line);
+    const previousEndsWithCondition = /(?:^|\s)경우[,.]?$/.test(previousPresentedLine.trim());
+    const sourceBoundarySignalsContinuation = /[ \t]$/.test(previousRawLine) || /^[ \t]/.test(rawLine);
+
+    const shouldJoin =
+      presentedLines.length > 0 &&
+      !startsIndependentUnit &&
+      (line.startsWith("(") ||
+        isSuffixLine ||
+        previousEndsWithCondition ||
+        sourceBoundarySignalsContinuation);
+
+    if (shouldJoin) {
+      presentedLines[presentedLines.length - 1] = `${previousPresentedLine.trimEnd()} ${line}`;
+    } else {
+      presentedLines.push(line);
+    }
+  }
+
+  return presentedLines.join("\n");
+};
 
 const projections = sourcePaths.map((sourcePath) => {
   const projection = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
@@ -52,10 +81,27 @@ for (const projection of projections) {
 }
 check(expectedByEquipmentId.size === 261, `KR effect description projection size mismatch: ${expectedByEquipmentId.size}/261`);
 
+const presentationProjectionStats = [...expectedByEquipmentId.entries()].map(([equipmentId, expected]) => {
+  const presentationEffectText = applyExpectedPresentation(expected.effectText);
+  check(
+    normalizeSemanticText(presentationEffectText) === normalizeSemanticText(expected.effectText),
+    `Equipment ${equipmentId} presentation normalizer changed semantic text`,
+  );
+  return {
+    equipmentId,
+    scope: expected.scope,
+    sourceLineBreakCount: countLineBreaks(expected.effectText),
+    presentationLineBreakCount: countLineBreaks(presentationEffectText),
+    changed: normalizePresentationText(presentationEffectText) !== normalizePresentationText(expected.effectText),
+  };
+});
+const presentationChangedProjectionCount = presentationProjectionStats.filter((entry) => entry.changed).length;
+check(presentationChangedProjectionCount > 0, "equipment effect presentation normalizer changed no projected records");
+
 const fixtureDefinitions = [
   { equipmentId: 140, expectedScope: "general", fixtureLabel: "general-single-line", expectedLineBreakCount: 0 },
   { equipmentId: 13, expectedScope: "general", fixtureLabel: "general-two-line", expectedLineBreakCount: 1 },
-  { equipmentId: 8, expectedScope: "general", fixtureLabel: "general-multiline", expectedLineBreakCount: 3 },
+  { equipmentId: 8, expectedScope: "general", fixtureLabel: "general-multiline-suffix-compaction", expectedLineBreakCount: 2 },
   { equipmentId: 416, expectedScope: "exclusive", fixtureLabel: "exclusive-baseline", expectedLineBreakCount: 1 },
   { equipmentId: 427, expectedScope: "exclusive", fixtureLabel: "exclusive-multiline", expectedLineBreakCount: 3 },
   { equipmentId: 581, expectedScope: "exclusive", fixtureLabel: "exclusive-581-compact-trailer-regression", expectedLineBreakCount: 2 },
@@ -66,7 +112,7 @@ const cases = fixtureDefinitions.map((testCase) => {
   check(expected, `representative Equipment ${testCase.equipmentId} is missing from frozen KR effect projection`);
   check(expected.scope === testCase.expectedScope, `representative Equipment ${testCase.equipmentId} scope mismatch: ${expected.scope}/${testCase.expectedScope}`);
   const sourceLineBreakCount = countLineBreaks(expected.effectText);
-  const presentationEffectText = applyExpectedPresentation(testCase.equipmentId, expected.effectText);
+  const presentationEffectText = applyExpectedPresentation(expected.effectText);
   const presentationLineBreakCount = countLineBreaks(presentationEffectText);
   check(
     presentationLineBreakCount === testCase.expectedLineBreakCount,
@@ -307,7 +353,7 @@ try {
         sourceLineBreakCount: testCase.sourceLineBreakCount,
         deploymentAssets,
         effectParagraph: "EXACT_MATCH",
-        semanticTextMatch: testCase.equipmentId === 581 ? "PRESENTATION_OVERRIDE_EXPECTED" : "EXACT_MATCH",
+        semanticTextMatch: "PRESENTATION_WHITESPACE_ONLY",
         presentationTextMatch: "NEWLINE_PRESERVING_EXACT_MATCH",
         computedStyle: {
           whiteSpace: computedStyle.whiteSpace,
@@ -372,6 +418,7 @@ console.log(JSON.stringify({
     result: "PASS",
   },
   projectionCount: expectedByEquipmentId.size,
+  presentationChangedProjectionCount,
   representativeFixtureCount: fixtureDefinitions.length,
   representativeCases: results,
   nameMutation: false,
