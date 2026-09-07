@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { loadArray } = require('./lib/configdata-direct.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const P = (...parts) => path.join(ROOT, ...parts);
@@ -15,6 +16,18 @@ function read(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
 function set(ids) { return new Set(ids.filter(Number.isInteger)); }
 function diff(a, b) { return [...a].filter((x) => !b.has(x)); }
 function ints(o) { return o && Object.values(o).every((v) => Number.isInteger(v) && v >= 0); }
+function hasOwn(value, key) { return Boolean(value && Object.prototype.hasOwnProperty.call(value, key)); }
+function indexUnique(rows, idField, label, errors, filter = () => true) {
+  const map = new Map();
+  for (const row of rows) {
+    if (!filter(row)) continue;
+    const id = row?.[idField];
+    if (!Number.isInteger(id)) continue;
+    if (map.has(id)) errors.push(`${label}: duplicate ${idField}=${id}`);
+    else map.set(id, row);
+  }
+  return map;
+}
 function forbidden(value, out = []) {
   if (!value || typeof value !== 'object') return out;
   const bad = new Set(['usableSoldiers','soldierIds','usableSoldierIds','heroSoldierRelations','soldierMembership','relationEdges','byHeroId','bySoldierId']);
@@ -36,6 +49,12 @@ const canonical = set((master.records || []).map((x) => x.heroId));
 const combatIds = set((combat.records || []).map((x) => x.heroId));
 const treeByHero = new Map((tree.records || []).map((x) => [x.heroId, x]));
 const skillIds = set((skills.records || []).map((x) => x.heroId));
+const combatByHero = new Map((combat.records || []).map((x) => [x.heroId, x]));
+
+const awakenRows = loadArray('ConfigDataAwakenInfo');
+const skillRows = loadArray('ConfigDataSkillInfo');
+const awakenIndex = indexUnique(awakenRows, 'ID', 'AwakenInfo', errors);
+const skillIndex = indexUnique(skillRows, 'ID', 'SkillInfo', errors, (r) => Object.prototype.hasOwnProperty.call(r || {}, 'Name'));
 
 if (upstream.status !== 'PASS') errors.push(`upstream direct regression status=${upstream.status}`);
 if ((upstream.errors || []).length) errors.push(`upstream direct regression errors=${upstream.errors.length}`);
@@ -49,6 +68,80 @@ if ((summary.unresolvedComponents || []).length) errors.push(`unresolvedComponen
 if ((summary.hardErrors || []).length) errors.push(`summary hardErrors=${summary.hardErrors.length}`);
 if (boundary.status !== 'PASS') errors.push(`A-boundary status=${boundary.status}`);
 if (summary.relationBoundary?.membershipFieldLeakCount !== 0) errors.push('summary relation boundary leak count is nonzero');
+
+const awakeningAudit = {
+  canonicalAwakenInfoRows: 0,
+  verifiedLevel2Skill: 0,
+  level2SkillNotDefined: 0,
+  falseNone: 0,
+  missingSkillReference: 0,
+};
+
+for (const heroId of canonical) {
+  const sourceAwaken = awakenIndex.get(heroId);
+  const generatedHero = combatByHero.get(heroId);
+  const generated = generatedHero?.awakening;
+
+  if (!sourceAwaken) {
+    errors.push(`heroId ${heroId}: canonical AwakenInfo row missing`);
+    continue;
+  }
+  awakeningAudit.canonicalAwakenInfoRows += 1;
+
+  if (!generated) {
+    errors.push(`heroId ${heroId}: generated awakening block missing`);
+    continue;
+  }
+  if (generated.status === 'NONE') awakeningAudit.falseNone += 1;
+  if (generated.awakenId !== sourceAwaken.ID) errors.push(`heroId ${heroId}: generated awakenId=${generated.awakenId} source=${sourceAwaken.ID}`);
+  if ((generated.nameCn ?? null) !== (sourceAwaken.Name ?? null)) errors.push(`heroId ${heroId}: generated awakening name mismatch`);
+
+  const sourceHasLevel2 = hasOwn(sourceAwaken, 'Level2SkillID');
+  const sourceHasUnlock = hasOwn(sourceAwaken, 'Awaken2Unlock');
+
+  if (sourceHasLevel2) {
+    const level2SkillId = sourceAwaken.Level2SkillID;
+    if (!Number.isInteger(level2SkillId) || level2SkillId <= 0) {
+      errors.push(`heroId ${heroId}: source Level2SkillID=${level2SkillId} invalid`);
+      continue;
+    }
+    if (sourceAwaken.Awaken2Unlock !== true) errors.push(`heroId ${heroId}: source Level2SkillID defined but Awaken2Unlock is not true`);
+    const sourceSkill = skillIndex.get(level2SkillId);
+    if (!sourceSkill) {
+      awakeningAudit.missingSkillReference += 1;
+      errors.push(`heroId ${heroId}: source Level2SkillID ${level2SkillId} missing from SkillInfo`);
+      continue;
+    }
+    if (generated.status !== 'VERIFIED') errors.push(`heroId ${heroId}: generated awakening status=${generated.status}, expected VERIFIED`);
+    if (generated.level2Status !== 'DEFINED') errors.push(`heroId ${heroId}: generated level2Status=${generated.level2Status}, expected DEFINED`);
+    if (generated.level2SkillId !== level2SkillId) errors.push(`heroId ${heroId}: generated Level2SkillID=${generated.level2SkillId}, expected ${level2SkillId}`);
+    if (generated.skill?.skillId !== level2SkillId) errors.push(`heroId ${heroId}: generated awakening Skill snapshot mismatch`);
+    awakeningAudit.verifiedLevel2Skill += 1;
+  } else {
+    if (sourceHasUnlock) errors.push(`heroId ${heroId}: source Awaken2Unlock defined without Level2SkillID`);
+    if (generated.status !== 'VERIFIED') errors.push(`heroId ${heroId}: generated source-row status=${generated.status}, expected VERIFIED`);
+    if (generated.level2Status !== 'LEVEL2_SKILL_NOT_DEFINED') errors.push(`heroId ${heroId}: generated level2Status=${generated.level2Status}, expected LEVEL2_SKILL_NOT_DEFINED`);
+    if (generated.level2SkillId !== null || generated.skill !== null) errors.push(`heroId ${heroId}: Level2-not-defined state must not carry a Skill reference`);
+    awakeningAudit.level2SkillNotDefined += 1;
+  }
+}
+
+if (awakeningAudit.canonicalAwakenInfoRows !== 267) errors.push(`awakening canonical coverage=${awakeningAudit.canonicalAwakenInfoRows}, expected 267`);
+if (awakeningAudit.verifiedLevel2Skill !== 257) errors.push(`awakening defined Level2 count=${awakeningAudit.verifiedLevel2Skill}, expected 257`);
+if (awakeningAudit.level2SkillNotDefined !== 10) errors.push(`awakening Level2-not-defined count=${awakeningAudit.level2SkillNotDefined}, expected 10`);
+if (awakeningAudit.falseNone !== 0) errors.push(`awakening false NONE=${awakeningAudit.falseNone}`);
+if (awakeningAudit.missingSkillReference !== 0) errors.push(`awakening missing SkillInfo references=${awakeningAudit.missingSkillReference}`);
+
+const summaryAwakening = summary.awakeningSummary || {};
+for (const [key, expected] of Object.entries({
+  canonicalAwakenInfoRows: 267,
+  verifiedLevel2Skill: 257,
+  level2SkillNotDefined: 10,
+  falseNone: 0,
+})) {
+  if (summaryAwakening[key] !== expected) errors.push(`summary awakeningSummary.${key}=${summaryAwakening[key]}, expected ${expected}`);
+  if (awakeningAudit[key] !== expected) errors.push(`independent awakening audit ${key}=${awakeningAudit[key]}, expected ${expected}`);
+}
 
 for (const hero of combat.records || []) {
   const sourceTree = treeByHero.get(hero.heroId);
@@ -84,7 +177,7 @@ for (const id of ['awakeningClassification','displayJobStats','heroSoldierModifi
 if (gates.get('talentIdentity') !== 'VERIFIED_REFERENCE_SET') errors.push(`semantic gate talentIdentity=${gates.get('talentIdentity')}`);
 
 console.log(`HERO STAGE 4 FINAL VALIDATION: ${errors.length ? 'FAIL' : 'PASS'}`);
-console.log(`heroes=${combat.records?.length || 0} upstream=${upstream.status} errors=${errors.length}`);
+console.log(`heroes=${combat.records?.length || 0} upstream=${upstream.status} awakening=${awakeningAudit.canonicalAwakenInfoRows}/${awakeningAudit.verifiedLevel2Skill}/${awakeningAudit.level2SkillNotDefined} errors=${errors.length}`);
 if (errors.length) {
   for (const error of errors.slice(0, 100)) console.log(`- FAIL: ${error}`);
   process.exitCode = 1;
