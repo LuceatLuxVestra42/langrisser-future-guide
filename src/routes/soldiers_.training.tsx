@@ -269,58 +269,39 @@ function SoldierTrainingPage() {
 
             {selectedTech ? (
               <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <TrainingPassiveIcon techId={selectedTech.techId} className="h-10 w-10" />
-                      <h3 className="text-lg font-black text-foreground">{selectedTech.nameKr}</h3>
-                    </div>
+                <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <TrainingPassiveIcon techId={selectedTech.techId} className="h-10 w-10" />
+                    <h3 className="truncate text-lg font-black text-foreground">{selectedTech.nameKr}</h3>
                   </div>
-                  <div className="min-w-56">
-                    <div className="grid grid-cols-2 gap-2">
-                      <label className="text-xs font-bold text-foreground">
-                        <span className="block text-muted-foreground">현재 레벨</span>
-                        <input
-                          type="number"
-                          inputMode="numeric"
-                          min={0}
-                          max={Math.max(0, selectedTech.maxLevel - 1)}
-                          value={safeCurrentLevel}
-                          onChange={(event) => {
-                            const next = clampLevel(
-                              Number(event.target.value),
-                              0,
-                              Math.max(0, selectedTech.maxLevel - 1),
-                            );
-                            setCurrentLevel(next);
-                            if (next >= safeTargetLevel) {
-                              setTargetLevel(Math.min(selectedTech.maxLevel, next + 1));
-                            }
-                          }}
-                          className="mt-1 h-9 w-full rounded-md border border-border bg-background px-2 text-center text-sm font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
-                        />
-                      </label>
-                      <label className="text-xs font-bold text-foreground">
-                        <span className="block text-muted-foreground">목표 레벨</span>
-                        <input
-                          type="number"
-                          inputMode="numeric"
-                          min={1}
-                          max={selectedTech.maxLevel}
-                          value={safeTargetLevel}
-                          onChange={(event) => {
-                            const next = clampLevel(Number(event.target.value), 1, selectedTech.maxLevel);
-                            setTargetLevel(next);
-                            if (next <= safeCurrentLevel) {
-                              setCurrentLevel(Math.max(0, next - 1));
-                            }
-                          }}
-                          className="mt-1 h-9 w-full rounded-md border border-border bg-background px-2 text-center text-sm font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
-                        />
-                      </label>
-                    </div>
+
+                  <div className="grid min-w-0 grid-cols-[auto_minmax(110px,220px)_auto] items-center gap-2 sm:gap-3 xl:w-[430px]">
+                    <label className="flex min-w-0 items-center gap-1.5 text-xs font-bold text-muted-foreground">
+                      <span className="whitespace-nowrap">현재</span>
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min={0}
+                        max={Math.max(0, selectedTech.maxLevel - 1)}
+                        value={safeCurrentLevel}
+                        onChange={(event) => {
+                          const next = clampLevel(
+                            Number(event.target.value),
+                            0,
+                            Math.max(0, selectedTech.maxLevel - 1),
+                          );
+                          setCurrentLevel(next);
+                          if (next >= safeTargetLevel) {
+                            setTargetLevel(Math.min(selectedTech.maxLevel, next + 1));
+                          }
+                        }}
+                        className="h-9 w-12 rounded-md border border-border bg-background px-1 text-center text-sm font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
+                      />
+                    </label>
+
                     <input
                       type="range"
+                      aria-label="목표 레벨"
                       min={1}
                       max={selectedTech.maxLevel}
                       value={safeTargetLevel}
@@ -331,14 +312,50 @@ function SoldierTrainingPage() {
                           setCurrentLevel(Math.max(0, next - 1));
                         }
                       }}
-                      className="mt-3 w-full accent-foreground"
+                      className="w-full accent-foreground"
                     />
+
+                    <label className="flex min-w-0 items-center gap-1.5 text-xs font-bold text-muted-foreground">
+                      <span className="whitespace-nowrap">목표</span>
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min={1}
+                        max={selectedTech.maxLevel}
+                        value={safeTargetLevel}
+                        onChange={(event) => {
+                          const next = clampLevel(Number(event.target.value), 1, selectedTech.maxLevel);
+                          setTargetLevel(next);
+                          if (next <= safeCurrentLevel) {
+                            setCurrentLevel(Math.max(0, next - 1));
+                          }
+                        }}
+                        className="h-9 w-12 rounded-md border border-border bg-background px-1 text-center text-sm font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
+                      />
+                    </label>
                   </div>
                 </div>
 
                 <div className="mt-5 rounded-lg border border-border bg-background p-4">
-                  <p className="text-xs font-bold text-muted-foreground">Lv.{safeTargetLevel} 효과</p>
-                  <LevelEffect tech={selectedTech} level={safeTargetLevel} />
+                  <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-stretch">
+                    <EffectComparisonCard
+                      label="현재 효과"
+                      tech={selectedTech}
+                      level={safeCurrentLevel}
+                      emptyAtZero
+                    />
+
+                    <div
+                      className="flex items-center justify-center text-muted-foreground"
+                      aria-label={`Lv.${safeCurrentLevel}에서 Lv.${safeTargetLevel}로 강화`}
+                    >
+                      <span className="hidden text-3xl font-light leading-none md:block" aria-hidden="true">→</span>
+                      <span className="text-3xl font-light leading-none md:hidden" aria-hidden="true">↓</span>
+                    </div>
+
+                    <EffectComparisonCard label="목표 효과" tech={selectedTech} level={safeTargetLevel} />
+                  </div>
+
                   <TrainingCostSimulator
                     levels={selectedTech.levels}
                     startLevel={safeCurrentLevel}
@@ -526,6 +543,32 @@ function TrainingPassiveIcon({ techId, className }: { techId: number; className:
   if (!iconUrl) return null;
 
   return <img src={iconUrl} alt="" className={`${className} shrink-0 object-contain`} aria-hidden="true" />;
+}
+
+function EffectComparisonCard({
+  label,
+  tech,
+  level,
+  emptyAtZero = false,
+}: {
+  label: string;
+  tech: SoldierTrainingTech;
+  level: number;
+  emptyAtZero?: boolean;
+}) {
+  return (
+    <section className="min-w-0 rounded-lg border border-border bg-card p-3 sm:p-4">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-xs font-bold text-muted-foreground">{label}</p>
+        <p className="text-xs font-black tabular-nums text-foreground">Lv.{level}</p>
+      </div>
+      {emptyAtZero && level === 0 ? (
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">아직 적용된 효과 없음</p>
+      ) : (
+        <LevelEffect tech={tech} level={level} />
+      )}
+    </section>
+  );
 }
 
 function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number }) {
