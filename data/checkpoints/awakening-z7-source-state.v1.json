@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "stage": "awakening-z7",
+  "status": "PASS",
+  "purpose": "Freeze the source-explicit state for canonical AwakenInfo rows that do not define a Level2SkillID without collapsing them into a false Hero-level NONE state.",
+  "source": {
+    "configDataCommit": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "awakenInfoPath": "data/configdata/ConfigDataAwakenInfo.json",
+    "awakenInfoGitBlobSha": "7593f77f0fa0aafac8850ee3fc2b093dd499bbcf"
+  },
+  "canonical": {
+    "heroCount": 267,
+    "awakenInfoCoverage": 267,
+    "level2SkillIdPresent": 257,
+    "level2SkillIdMissing": 10,
+    "missingHeroIds": [19, 22, 23, 24, 41, 42, 43, 45, 47, 48]
+  },
+  "sourceShape": {
+    "presentRows": "The 257 canonical rows with Level2SkillID also define Awaken2Unlock=true in the verified population.",
+    "missingRows": "Each of the 10 canonical rows above contains Awaken1LevelID, Awaken2Material and Awaken2LevelID, but does not define Awaken2Unlock or Level2SkillID.",
+    "falseValueObserved": false,
+    "nullOrZeroLevel2SkillIdObserved": false
+  },
+  "semanticDecision": {
+    "heroAwakenInfoRelation": "DOMAIN_PROVEN_CANONICAL_HERO_ID_TO_SAME_ID_AWAKENINFO",
+    "rowAbsentState": "FAIL",
+    "level2PresentState": "VERIFIED",
+    "level2MissingState": "LEVEL2_SKILL_NOT_DEFINED",
+    "level2MissingMeaning": "Source row exists, but the source does not define an Awaken2Unlock flag or Level2SkillID. Do not infer release chronology or rewrite this as Hero awakening NONE.",
+    "noneStateAllowedForCanonicalPopulation": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false,
+    "releaseChronologyInferred": false,
+    "silentFallbackUsed": false
+  },
+  "next": "Z8_STAGE4_5_CONTRACT_UPDATE"
+}
