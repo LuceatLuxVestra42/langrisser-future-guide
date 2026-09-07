@@ -1,4 +1,5 @@
 import heroListJson from "../../data/generated/hero-list-stage1.v1.json";
+import heroNameCorrectionsJson from "../../data/hero-name-corrections.v1.json";
 import heroProvisionalNamesJson from "../../data/presentation/hero-provisional-name-kr.v1.json";
 
 type FrozenHero = {
@@ -23,6 +24,19 @@ type HeroListSource = {
     hardErrorCount: number;
   };
   records: FrozenHero[];
+};
+
+type HeroNameCorrectionSource = {
+  version: number;
+  status: string;
+  source: string;
+  corrections: Array<{
+    heroId: number;
+    nameCn: string;
+    nameKr: string;
+    previousNameKr: string;
+    reason: string;
+  }>;
 };
 
 type HeroProvisionalNameSource = {
@@ -60,6 +74,7 @@ export type HeroNameLocalization = {
 };
 
 const heroList = heroListJson as unknown as HeroListSource;
+const heroNameCorrections = heroNameCorrectionsJson as unknown as HeroNameCorrectionSource;
 const provisionalNames = heroProvisionalNamesJson as unknown as HeroProvisionalNameSource;
 
 if (
@@ -78,6 +93,14 @@ if (
 }
 
 if (
+  heroNameCorrections.version !== 1 ||
+  heroNameCorrections.status !== "canonical-source-confirmed" ||
+  !heroNameCorrections.source.trim()
+) {
+  throw new Error("Hero display-name resolver requires the reviewed Hero name correction source.");
+}
+
+if (
   provisionalNames.version !== 1 ||
   provisionalNames.schemaId !== "hero-provisional-name-kr-presentation/v1" ||
   provisionalNames.status !== "PASS" ||
@@ -92,10 +115,28 @@ if (
 }
 
 const heroById = new Map(heroList.records.map((hero) => [hero.heroId, hero]));
+const correctionByHeroId = new Map(heroNameCorrections.corrections.map((record) => [record.heroId, record]));
 const provisionalByHeroId = new Map(provisionalNames.records.map((record) => [record.heroId, record]));
 
-if (heroById.size !== heroList.records.length || provisionalByHeroId.size !== provisionalNames.records.length) {
+if (
+  heroById.size !== heroList.records.length ||
+  correctionByHeroId.size !== heroNameCorrections.corrections.length ||
+  provisionalByHeroId.size !== provisionalNames.records.length
+) {
   throw new Error("Hero display-name resolver found duplicate Hero IDs.");
+}
+
+for (const correction of heroNameCorrections.corrections) {
+  const hero = heroById.get(correction.heroId);
+  if (
+    !hero ||
+    hero.identity.nameCn !== correction.nameCn ||
+    hero.identity.nameKr !== correction.previousNameKr ||
+    !correction.nameKr.trim() ||
+    correction.nameKr === correction.previousNameKr
+  ) {
+    throw new Error(`Hero confirmed display-name correction mismatch for Hero ${correction.heroId}.`);
+  }
 }
 
 for (const provisional of provisionalNames.records) {
@@ -137,6 +178,17 @@ export function resolveHeroNameLocalization(
       displayName: provisional.displayNameKr,
       nameKrStatus: "provisional-display",
       sourceAuthority: "CN",
+    };
+  }
+
+  const correction = correctionByHeroId.get(heroId);
+  if (correction) {
+    return {
+      officialNameKr: correction.nameKr,
+      displayNameKr: correction.nameKr,
+      displayName: correction.nameKr,
+      nameKrStatus: "official-confirmed",
+      sourceAuthority: "KR",
     };
   }
 
