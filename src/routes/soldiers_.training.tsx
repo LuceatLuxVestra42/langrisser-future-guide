@@ -52,6 +52,45 @@ const TRAINING_GROUP_FILTERS = TRAINING_GROUPS.map(({ id, label, armyTypes }) =>
 
 const ULTIMATE_TRAINING_TECH_IDS = new Set([134, 232, 334, 437, 438, 540, 541, 645, 646, 647]);
 
+const PASSIVE_TRAINING_ICON_FILE_IDS: Record<number, string> = {
+  105: "1U8rkHk93Vep39-mHe-RObiLBecIlP2_b",
+  122: "12HjCcfHNM4XbNPJI9Wg_lfg2G74KGSUH",
+  123: "1eVBGBf9rDfhUlV3m16v6Ox-XdY9qXGh-",
+  130: "11w5SN2Pj4ZFJGvWENTPFCfB4ha4kmW2T",
+  131: "1kT915GMyJ4fkOKwF5knWxnOdAX84HX5a",
+  205: "1m9AEKUkqz1K3MdPl0V5yYK8_0yR_yJhg",
+  221: "1Ke_CIf5CpklYFnNFHDSwJPph9fYuM4v2",
+  222: "1x3W3Wo7WppACsp1gU-C_iX6kE5ilGvkI",
+  228: "1DrMr6K2BmRxhQhJyOyP_LgZTpQmsouoZ",
+  229: "1_uvASF9unaYIo7UoKafE_U_WcIet2m45",
+  305: "1fuQ5lpBhpdYbtSKukh48tjDuYNXDIW02",
+  321: "1j8vKXqkdaFJ56MlbV0LRDwSroSt-1qHD",
+  322: "1NlVKUINVs3pUWscRsM3tSuSSpIkBNj-C",
+  329: "1lU20bQ4_9DZKRykve3gWmyDVj-HybrbD",
+  330: "17pxeC8trB0kmzkNrXOxFz5RNaWxOXgeB",
+  405: "1nKls1Sf5SYi8tlJ52pLDzd7L-b5J0UyY",
+  424: "1bpx1EmpHfOMiWLvruZ4BpXFeF6hjHgtc",
+  425: "1TQm-ob6obFQ10VuXixVnvHGI3PnCHyDw",
+  426: "1Obdwj23q1KOdWBQlCXgUlruXKpABNDBQ",
+  433: "17IZKkOwwldOJ0Q6_QkqC0i9D61qZBHTp",
+  434: "1cvFmaiQk_ROYNEVpphkS4HMQEwJEh6ol",
+  505: "1ntRkfxyWK9gePNa9a1lL6F5OglhGZg7U",
+  522: "1otprMjUIk7vU6TEWGI0GTbAfc_ZUS6po",
+  528: "1Wq5KUKhaEdJ8pa8TZQyWlVE6tYf8BiR3",
+  529: "1vCrOl0gsVTj-YN-Z1FUltoX_NTnnX-qJ",
+  536: "1inP6YKFkYy5f5izq4uIv0UiMsKLsXDVj",
+  537: "1LdU5Xi6QPhoUOivHW0yaspWN26ZoAZFS",
+  605: "1_wn-pvgkpw4kGHrtHamNAAEVB5IIfScV",
+  622: "1sVsMa9InaNYtiShjnGjG9W9i8TdIarzi",
+  623: "1QGNbY3hpqWxwEmAmlzoFb06dAjUwU4R2",
+  629: "1FhXWK01SFKfD9VqsiqD-6EVHT17pVgvF",
+  630: "1rk3TZg3BpSLpZmYufE8ArEF4oO832UVl",
+  631: "1cWD-LX3IBakA0kwkNDhgNKhMvIPXJE3j",
+  638: "1s8irSRbS-yvjEBmkicii-u_hNwoM4Ud_",
+  639: "1dD1AAXKtpJiBcVJKA6qJwC1TMpRr5X8S",
+  640: "14pdhdNODSIFIxC2ITtq-axujw0TsNTH-",
+};
+
 const STAT_LABELS: Record<TrainingStatEffect["statKey"], string> = {
   HP: "생명",
   ATK: "공격",
@@ -79,6 +118,11 @@ function isUltimateTrainingTech(tech: SoldierTrainingTech) {
 
 function getPresentationKind(tech: SoldierTrainingTech): Exclude<KindFilter, "ALL"> {
   return isUltimateTrainingTech(tech) ? "COMMON_STAT" : tech.kind;
+}
+
+function getPassiveTrainingIconUrl(techId: number) {
+  const fileId = PASSIVE_TRAINING_ICON_FILE_IDS[techId];
+  return fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w170` : null;
 }
 
 function resolveTrainingGroup(tech: SoldierTrainingTech) {
@@ -225,6 +269,7 @@ function SoldierTrainingPage() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
+                      <TrainingPassiveIcon techId={selectedTech.techId} className="h-10 w-10" />
                       <h3 className="text-lg font-black text-foreground">{selectedTech.nameKr}</h3>
                     </div>
                   </div>
@@ -396,6 +441,7 @@ function TrainingTechButton({
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
+          <TrainingPassiveIcon techId={tech.techId} className="h-8 w-8" />
           <span className="truncate text-sm font-bold">{tech.nameKr}</span>
         </div>
       </div>
@@ -422,6 +468,13 @@ function TrainingArmyIcon({ armyType }: { armyType: string }) {
       aria-hidden="true"
     />
   );
+}
+
+function TrainingPassiveIcon({ techId, className }: { techId: number; className: string }) {
+  const iconUrl = getPassiveTrainingIconUrl(techId);
+  if (!iconUrl) return null;
+
+  return <img src={iconUrl} alt="" className={`${className} shrink-0 object-contain`} aria-hidden="true" />;
 }
 
 function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number }) {
