@@ -386,7 +386,7 @@ function TrainingTechGroupList({
       ) : null}
 
       {passiveTechs.length > 0 ? (
-        <div className={statTechs.length > 0 || ultimateStatTechs.length > 0 ? "mt-2 border-t border-border pt-2" : ""}>
+        <div className={`${statTechs.length > 0 || ultimateStatTechs.length > 0 ? "mt-2 border-t border-border pt-2 " : ""}grid grid-cols-3 gap-1.5`}>
           {passiveTechs.map((tech) => (
             <TrainingTechButton
               key={tech.techId}
