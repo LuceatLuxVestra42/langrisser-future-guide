@@ -1,5 +1,6 @@
 await import('./configdata-lookup-self-test.mjs');
 await import('./bounded-source-record-self-test.mjs');
+await import('./a5-property-namespace-discovery-probe.mjs');
 const { runShadowParity } = await import('./configdata-lookup-shadow-parity.mjs');
 const shadow = await runShadowParity({ emit: true });
 const cutover = (await import('./configdata-lookup-clr7-cutover.mjs')).default;
@@ -32,7 +33,7 @@ console.log(JSON.stringify({
     findLabelPopulationCount: shadow.shadow.find.labelPopulationCount,
     lookupExecutedCaseCount: shadow.shadow.lookup.executedCaseCount,
     refsExecutedCaseCount: shadow.shadow.refs.executedCaseCount,
-    findExecutedCaseCount: shadow.shadow.find.executedCaseCount,
+    findLabelPopulationCount: shadow.shadow.find.labelPopulationCount,
     staleCount: shadow.freshness.staleCount,
   },
   cutover: {
