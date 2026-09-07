@@ -30,7 +30,7 @@
     {
       "id": "awakeningClassification",
       "status": "VERIFIED",
-      "rule": "HeroInfo.Awaken_ID -> AwakenInfo.ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID"
+      "rule": "Canonical heroId -> AwakenInfo.ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID. This same-ID relation is domain-specific to the verified awakening snapshot and must not be generalized to other entities."
     },
     {
       "id": "displayJobStats",
@@ -60,6 +60,8 @@
     "Use heroId as the only canonical Hero JOIN key and require exact parity with the frozen 267-record Hero Master.",
     "Select playable HeroInfo records by the presence of the playable-Hero Useable schema; do not take the first duplicate raw ID from the 28k-row mixed table.",
     "Use UnityDataTool direct JSON arrays; legacy TextAsset m_bytes parsing is forbidden in Stage 4-5.",
+    "For awakening only, select AwakenInfo by canonical heroId == AwakenInfo.ID; HeroInfo.Awaken_ID is not an awakening identity relation and must not be used.",
+    "If the canonical AwakenInfo row has an explicit Level2SkillID, require a positive integer exact SkillInfo.ID reference and emit VERIFIED; if the field is absent, preserve that source state as VERIFIED_NO_LEVEL2_SKILL with null level2SkillId/skill.",
     "Use JobInfo Property1-3 rewards only when PropertyModify IDs map to HP=87, AT=88, DF=89, Magic=90, MagicDF=91, DEX=92; unknown nonzero mastery IDs are hard errors.",
     "Compute display stats for each normal JobConnection using its final JobLevel and add global mastered-job flat rewards after star-adjusted rounding.",
     "Keep bond effects outside Stage 4 so Stage 5 can own bond semantics without double counting.",
@@ -70,7 +72,9 @@
   "validationPolicy": {
     "FAIL": [
       "Canonical Hero, Stage 4-3, Stage 4-4 or playable HeroInfo sets disagree.",
-      "A required Job, JobConnection, JobLevel, Skill or Awaken reference is missing or ambiguous.",
+      "A required Job, JobConnection, JobLevel or Skill reference is missing or ambiguous.",
+      "A canonical Hero has no exact AwakenInfo.ID row, or an explicit AwakenInfo.Level2SkillID is invalid or does not resolve exactly to SkillInfo.ID.",
+      "Generated awakening status/ID/skill payload differs from the canonical heroId -> AwakenInfo.ID source relation.",
       "A stat star-correction array or TalentSkill_IDs array is not six slots.",
       "TalentSkill_IDs differ between normal JobConnections of the same Hero.",
       "A nonzero JobInfo mastery PropertyModify ID is outside the verified 87-92 mapping.",
@@ -78,7 +82,8 @@
       "Stage 4-5 embeds or independently computes usable-Soldier membership."
     ],
     "PASS": [
-      "267 records are generated with all five semantic gates verified, zero hard errors, A-1 identity parity and A-9 ownership preserved."
+      "267 records are generated with all five semantic gates verified, zero hard errors, A-1 identity parity and A-9 ownership preserved.",
+      "Every canonical Hero resolves to exactly one same-ID AwakenInfo row; present Level2SkillID values resolve to exact SkillInfo IDs and field-absent rows remain explicitly classified without inference."
     ]
   },
   "output": {
