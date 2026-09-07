@@ -257,31 +257,6 @@ function SoldierTrainingPage() {
                   ) : null}
                 </div>
 
-                <div className="mt-5">
-                  <h4 className="text-sm font-black text-foreground">전체 레벨표</h4>
-                  <div className="mt-2 overflow-hidden rounded-lg border border-border">
-                    {selectedTech.levels.map((row) => (
-                      <button
-                        key={row.level}
-                        type="button"
-                        onClick={() => setLevel(row.level)}
-                        className={`grid w-full grid-cols-[52px_minmax(0,1fr)] border-b border-border px-3 py-2.5 text-left text-xs last:border-b-0 ${
-                          safeLevel === row.level ? "bg-muted" : "bg-card hover:bg-muted/60"
-                        }`}
-                      >
-                        <span className="font-black text-foreground">Lv.{row.level}</span>
-                        <span className="min-w-0 leading-5 text-muted-foreground">
-                          <span className="block">
-                            {row.statEffects ? formatStatEffects(row.statEffects) : stripColorTags(row.passiveDescriptionKr ?? "-")}
-                          </span>
-                          <span className="mt-1 block text-[10px] font-semibold text-muted-foreground/80">
-                            강화 비용 · 골드 {formatNumber(row.goldCost)} · 재료 {row.materialCosts.length}종
-                          </span>
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </div>
             ) : null}
           </div>
@@ -497,11 +472,6 @@ function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number
           이전 레벨: {stripColorTags(previous.passiveDescriptionKr)}
         </p>
       ) : null}
-      <p className="mt-3 text-[11px] leading-5 text-muted-foreground">
-        {isUltimateTrainingTech(tech)
-          ? "궁극 특훈 문구는 검증된 원문과 레벨별 수치를 그대로 반영해."
-          : "조건부 효과 문구는 검증된 원문 조건과 레벨별 수치를 그대로 반영해."}
-      </p>
     </div>
   );
 }
