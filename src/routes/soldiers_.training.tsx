@@ -145,10 +145,10 @@ function resolveTrainingGroup(tech: SoldierTrainingTech) {
 
 function SoldierTrainingPage() {
   const data = Route.useLoaderData();
-  const [selectedTechId, setSelectedTechId] = useState(
-    () => data.techs.find((tech) => resolveTrainingGroup(tech).id === "INFANTRY")?.techId ?? data.techs[0]?.techId ?? 0,
-  );
-  const [level, setLevel] = useState(1);
+  const initialTech = data.techs.find((tech) => resolveTrainingGroup(tech).id === "INFANTRY") ?? data.techs[0];
+  const [selectedTechId, setSelectedTechId] = useState(() => initialTech?.techId ?? 0);
+  const [currentLevel, setCurrentLevel] = useState(0);
+  const [targetLevel, setTargetLevel] = useState(() => initialTech?.maxLevel ?? 1);
   const [kindFilter, setKindFilter] = useState<KindFilter>("COMMON_STAT");
   const [trainingGroupFilter, setTrainingGroupFilter] = useState<TrainingGroupFilter>("INFANTRY");
 
@@ -178,12 +178,15 @@ function SoldierTrainingPage() {
 
   const selectedTech =
     data.techs.find((tech) => tech.techId === selectedTechId) ?? filteredTechs[0] ?? data.techs[0];
-  const safeLevel = selectedTech ? Math.min(Math.max(level, 1), selectedTech.maxLevel) : 1;
-  const selectedLevel = selectedTech?.levels[safeLevel - 1];
+  const safeTargetLevel = selectedTech ? clampLevel(targetLevel, 1, selectedTech.maxLevel) : 1;
+  const safeCurrentLevel = selectedTech
+    ? clampLevel(currentLevel, 0, Math.max(0, safeTargetLevel - 1))
+    : 0;
 
   function selectTech(tech: SoldierTrainingTech) {
     setSelectedTechId(tech.techId);
-    setLevel((current) => Math.min(current, tech.maxLevel));
+    setCurrentLevel(0);
+    setTargetLevel(tech.maxLevel);
   }
 
   return (
@@ -273,26 +276,74 @@ function SoldierTrainingPage() {
                       <h3 className="text-lg font-black text-foreground">{selectedTech.nameKr}</h3>
                     </div>
                   </div>
-                  <div className="min-w-40">
-                    <div className="flex items-center justify-between text-xs font-bold text-foreground">
-                      <span>선택 레벨</span>
-                      <span>Lv.{safeLevel} / {selectedTech.maxLevel}</span>
+                  <div className="min-w-56">
+                    <div className="grid grid-cols-2 gap-2">
+                      <label className="text-xs font-bold text-foreground">
+                        <span className="block text-muted-foreground">현재 레벨</span>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          max={Math.max(0, selectedTech.maxLevel - 1)}
+                          value={safeCurrentLevel}
+                          onChange={(event) => {
+                            const next = clampLevel(
+                              Number(event.target.value),
+                              0,
+                              Math.max(0, selectedTech.maxLevel - 1),
+                            );
+                            setCurrentLevel(next);
+                            if (next >= safeTargetLevel) {
+                              setTargetLevel(Math.min(selectedTech.maxLevel, next + 1));
+                            }
+                          }}
+                          className="mt-1 h-9 w-full rounded-md border border-border bg-background px-2 text-center text-sm font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
+                        />
+                      </label>
+                      <label className="text-xs font-bold text-foreground">
+                        <span className="block text-muted-foreground">목표 레벨</span>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={1}
+                          max={selectedTech.maxLevel}
+                          value={safeTargetLevel}
+                          onChange={(event) => {
+                            const next = clampLevel(Number(event.target.value), 1, selectedTech.maxLevel);
+                            setTargetLevel(next);
+                            if (next <= safeCurrentLevel) {
+                              setCurrentLevel(Math.max(0, next - 1));
+                            }
+                          }}
+                          className="mt-1 h-9 w-full rounded-md border border-border bg-background px-2 text-center text-sm font-black tabular-nums text-foreground outline-none focus:ring-2 focus:ring-ring"
+                        />
+                      </label>
                     </div>
                     <input
                       type="range"
                       min={1}
                       max={selectedTech.maxLevel}
-                      value={safeLevel}
-                      onChange={(event) => setLevel(Number(event.target.value))}
-                      className="mt-2 w-full accent-foreground"
+                      value={safeTargetLevel}
+                      onChange={(event) => {
+                        const next = Number(event.target.value);
+                        setTargetLevel(next);
+                        if (next <= safeCurrentLevel) {
+                          setCurrentLevel(Math.max(0, next - 1));
+                        }
+                      }}
+                      className="mt-3 w-full accent-foreground"
                     />
                   </div>
                 </div>
 
                 <div className="mt-5 rounded-lg border border-border bg-background p-4">
-                  <p className="text-xs font-bold text-muted-foreground">Lv.{safeLevel} 효과</p>
-                  <LevelEffect tech={selectedTech} level={safeLevel} />
-                  {selectedLevel ? <LevelCost level={selectedLevel} /> : null}
+                  <p className="text-xs font-bold text-muted-foreground">Lv.{safeTargetLevel} 효과</p>
+                  <LevelEffect tech={selectedTech} level={safeTargetLevel} />
+                  <TrainingCostSimulator
+                    levels={selectedTech.levels}
+                    startLevel={safeCurrentLevel}
+                    endLevel={safeTargetLevel}
+                  />
                 </div>
               </div>
             ) : null}
@@ -506,10 +557,47 @@ function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number
   );
 }
 
-function LevelCost({ level }: { level: TrainingTechLevel }) {
+function TrainingCostSimulator({
+  levels,
+  startLevel,
+  endLevel,
+}: {
+  levels: TrainingTechLevel[];
+  startLevel: number;
+  endLevel: number;
+}) {
+  const totals = useMemo(() => {
+    const materials = new Map<
+      string,
+      { goodsType: number; id: number; count: number }
+    >();
+    let gold = 0;
+
+    for (const level of levels) {
+      if (level.level <= startLevel || level.level > endLevel) continue;
+      gold += level.goldCost;
+      for (const material of level.materialCosts) {
+        const key = `${material.goodsType}:${material.id}`;
+        const previous = materials.get(key);
+        materials.set(key, {
+          goodsType: material.goodsType,
+          id: material.id,
+          count: (previous?.count ?? 0) + material.count,
+        });
+      }
+    }
+
+    return { gold, materials: [...materials.values()] };
+  }, [endLevel, levels, startLevel]);
+
   return (
     <div className="mt-4 border-t border-border pt-4">
-      <p className="text-xs font-bold text-muted-foreground">Lv.{level.level} 강화 비용</p>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="text-xs font-bold text-muted-foreground">총 강화 비용</p>
+        <p className="text-[11px] font-semibold tabular-nums text-muted-foreground">
+          Lv.{startLevel} → Lv.{endLevel}
+        </p>
+      </div>
       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
         <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1.5 text-foreground">
           <img
@@ -518,9 +606,9 @@ function LevelCost({ level }: { level: TrainingTechLevel }) {
             className="h-5 w-5 shrink-0 object-contain"
             aria-hidden="true"
           />
-          <span className="font-black">×{formatNumber(level.goldCost)}</span>
+          <span className="font-black">×{formatNumber(totals.gold)}</span>
         </span>
-        {level.materialCosts.map((material) => {
+        {totals.materials.map((material) => {
           const iconUrl = getSoldierTrainingCostMaterialIconUrl(material.id);
           return (
             <span
@@ -552,6 +640,11 @@ function formatStatEffects(effects: TrainingStatEffect[]) {
   return effects
     .map((effect) => `${STAT_LABELS[effect.statKey]} ${formatEffectValue(effect)}`)
     .join(" · ");
+}
+
+function clampLevel(value: number, min: number, max: number) {
+  if (!Number.isFinite(value)) return min;
+  return Math.min(max, Math.max(min, Math.trunc(value)));
 }
 
 function formatNumber(value: number) {
