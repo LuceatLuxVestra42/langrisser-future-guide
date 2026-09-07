@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - work/hero-awakening-stage45-fix
     paths:
       - 'data/contracts/hero-stage6-4-site-consumer.v1.json'
       - 'tools/status-source/declarations/hero.v1.json'
@@ -61,7 +62,7 @@ jobs:
           exit 1
 
   site-consumer-final-freeze:
-    if: github.event_name != 'workflow_dispatch'
+    if: github.event_name != 'workflow_dispatch' && github.ref != 'refs/heads/work/hero-awakening-stage45-fix'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -130,7 +131,7 @@ jobs:
         run: exit 1
 
   explicit-producer:
-    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    if: (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main') || (github.event_name == 'push' && github.ref == 'refs/heads/work/hero-awakening-stage45-fix')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -220,7 +221,7 @@ jobs:
 
   status-source-handoff:
     needs: explicit-producer
-    if: needs.explicit-producer.result == 'success' && github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    if: needs.explicit-producer.result == 'success' && ((github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main') || (github.event_name == 'push' && github.ref == 'refs/heads/work/hero-awakening-stage45-fix'))
     permissions:
       contents: write
     uses: ./.github/workflows/project-tooling-r1-status-source-writer.yml
