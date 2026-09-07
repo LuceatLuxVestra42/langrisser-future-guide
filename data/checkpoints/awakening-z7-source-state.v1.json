@@ -16,15 +16,15 @@
     "missingHeroIds": [19, 22, 23, 24, 41, 42, 43, 45, 47, 48]
   },
   "sourceShape": {
-    "presentRows": "The 257 canonical rows with Level2SkillID also define Awaken2Unlock=true in the verified population.",
     "missingRows": "Each of the 10 canonical rows above contains Awaken1LevelID, Awaken2Material and Awaken2LevelID, but does not define Awaken2Unlock or Level2SkillID.",
-    "falseValueObserved": false,
+    "adjacentDefinedRows": "Adjacent canonical rows with explicit Level2SkillID show Awaken2Unlock=true; producer and validator must verify that combination across the full 257-row population instead of assuming it.",
+    "falseValueObservedInInspectedMissingRows": false,
     "nullOrZeroLevel2SkillIdObserved": false
   },
   "semanticDecision": {
     "heroAwakenInfoRelation": "DOMAIN_PROVEN_CANONICAL_HERO_ID_TO_SAME_ID_AWAKENINFO",
     "rowAbsentState": "FAIL",
-    "level2PresentState": "VERIFIED",
+    "level2PresentState": "VERIFIED_AFTER_EXACT_SKILLINFO_REFERENCE_VALIDATION",
     "level2MissingState": "LEVEL2_SKILL_NOT_DEFINED",
     "level2MissingMeaning": "Source row exists, but the source does not define an Awaken2Unlock flag or Level2SkillID. Do not infer release chronology or rewrite this as Hero awakening NONE.",
     "noneStateAllowedForCanonicalPopulation": false,
