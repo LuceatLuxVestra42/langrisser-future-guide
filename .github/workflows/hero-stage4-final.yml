@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - work/hero-stage4-finalize
+      - work/hero-awakening-stage45-fix
     paths:
       - 'scripts/prepare_hero_basic_combat_stage45.cjs'
       - 'scripts/validate_hero_stage4_upstream_direct.cjs'
@@ -41,12 +42,12 @@ jobs:
       - name: Recheck A-1/A-9 boundary
         run: node scripts/validate_hero_stage4_a_boundary.cjs
       - name: Persist generated Stage 4 outputs on work branch
-        if: github.event_name == 'push' && github.ref == 'refs/heads/work/hero-stage4-finalize'
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/work/hero-stage4-finalize' || github.ref == 'refs/heads/work/hero-awakening-stage45-fix')
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/generated/hero-basic-combat.v1.json data/validation/hero-stage4-upstream-direct.v1.json data/validation/hero-basic-combat-stage4-5-summary.v1.json data/validation/hero-stage4-a-boundary.v1.json
           if ! git diff --cached --quiet; then
             git commit -m 'Record Hero Stage 4 final PASS outputs'
-            git push origin HEAD:work/hero-stage4-finalize
+            git push origin HEAD:${GITHUB_REF_NAME}
           fi
