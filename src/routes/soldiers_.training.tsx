@@ -134,7 +134,6 @@ function SoldierTrainingPage() {
 
   const selectedTech =
     data.techs.find((tech) => tech.techId === selectedTechId) ?? filteredTechs[0] ?? data.techs[0];
-  const selectedTrainingGroup = selectedTech ? trainingGroupByTechId.get(selectedTech.techId) : undefined;
   const safeLevel = selectedTech ? Math.min(Math.max(level, 1), selectedTech.maxLevel) : 1;
   const selectedLevel = selectedTech?.levels[safeLevel - 1];
 
@@ -228,10 +227,6 @@ function SoldierTrainingPage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-lg font-black text-foreground">{selectedTech.nameKr}</h3>
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {selectedTrainingGroup ? `${selectedTrainingGroup.label} · ` : ""}
-                      {getPresentationKind(selectedTech) === "COMMON_STAT" ? "기본 능력치 훈련" : "조건부 효과 훈련"}
-                    </p>
                   </div>
                   <div className="min-w-40">
                     <div className="flex items-center justify-between text-xs font-bold text-foreground">
@@ -252,11 +247,8 @@ function SoldierTrainingPage() {
                 <div className="mt-5 rounded-lg border border-border bg-background p-4">
                   <p className="text-xs font-bold text-muted-foreground">Lv.{safeLevel} 효과</p>
                   <LevelEffect tech={selectedTech} level={safeLevel} />
-                  {selectedLevel ? (
-                    <LevelCost level={selectedLevel} />
-                  ) : null}
+                  {selectedLevel ? <LevelCost level={selectedLevel} /> : null}
                 </div>
-
               </div>
             ) : null}
           </div>
@@ -434,7 +426,6 @@ function TrainingArmyIcon({ armyType }: { armyType: string }) {
 
 function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number }) {
   const current = tech.levels[level - 1];
-  const previous = level > 1 ? tech.levels[level - 2] : null;
 
   if (!current) {
     return <p className="mt-2 text-sm text-muted-foreground">선택한 레벨 정보를 찾을 수 없어.</p>;
@@ -443,23 +434,14 @@ function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number
   if (current.statEffects) {
     return (
       <div className="mt-2 space-y-2">
-        {current.statEffects.map((effect, index) => {
-          const previousValue = previous?.statEffects?.[index]?.value ?? 0;
-          const delta = effect.value - previousValue;
-          return (
-            <div key={`${effect.statKey}-${effect.unit}`} className="flex items-baseline justify-between gap-3">
-              <span className="text-sm font-bold text-foreground">
-                {STAT_LABELS[effect.statKey]} {effect.unit === "PERCENT" ? "%" : ""}
-              </span>
-              <span className="text-sm font-black text-foreground">
-                {formatEffectValue(effect)}
-                <span className="ml-2 text-xs font-semibold text-muted-foreground">
-                  전 레벨 대비 {formatSigned(delta, effect.unit)}
-                </span>
-              </span>
-            </div>
-          );
-        })}
+        {current.statEffects.map((effect) => (
+          <div key={`${effect.statKey}-${effect.unit}`} className="flex items-baseline justify-between gap-3">
+            <span className="text-sm font-bold text-foreground">
+              {STAT_LABELS[effect.statKey]} {effect.unit === "PERCENT" ? "%" : ""}
+            </span>
+            <span className="text-sm font-black text-foreground">{formatEffectValue(effect)}</span>
+          </div>
+        ))}
       </div>
     );
   }
@@ -467,11 +449,6 @@ function LevelEffect({ tech, level }: { tech: SoldierTrainingTech; level: number
   return (
     <div className="mt-2">
       <p className="text-sm leading-6 text-foreground">{stripColorTags(current.passiveDescriptionKr ?? "-")}</p>
-      {previous?.passiveDescriptionKr ? (
-        <p className="mt-3 border-t border-border pt-3 text-xs leading-5 text-muted-foreground">
-          이전 레벨: {stripColorTags(previous.passiveDescriptionKr)}
-        </p>
-      ) : null}
     </div>
   );
 }
@@ -516,11 +493,6 @@ function LevelCost({ level }: { level: TrainingTechLevel }) {
 
 function formatEffectValue(effect: TrainingStatEffect) {
   return `+${effect.value}${effect.unit === "PERCENT" ? "%" : ""}`;
-}
-
-function formatSigned(value: number, unit: TrainingStatEffect["unit"]) {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value}${unit === "PERCENT" ? "%" : ""}`;
 }
 
 function formatStatEffects(effects: TrainingStatEffect[]) {
