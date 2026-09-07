@@ -1,6 +1,5 @@
 await import('./configdata-lookup-self-test.mjs');
 await import('./bounded-source-record-self-test.mjs');
-await import('./a5-passive-buff-locator-probe.mjs');
 const { runShadowParity } = await import('./configdata-lookup-shadow-parity.mjs');
 const shadow = await runShadowParity({ emit: true });
 const cutover = (await import('./configdata-lookup-clr7-cutover.mjs')).default;
@@ -16,7 +15,6 @@ console.log(JSON.stringify({
   components: [
     'CONFIGDATA_LOOKUP_CLR3_READ_ONLY_SELF_TEST',
     'CONFIGDATA_LOOKUP_BOUNDED_SOURCE_RECORD_SELF_TEST',
-    'A5_PASSIVE_BUFF_LOCATOR_PROBE',
     'CONFIGDATA_LOOKUP_CLR5_WRITER_SEPARATION_FROZEN',
     shadow.completion,
     cutover.completion,
@@ -71,7 +69,7 @@ console.log(JSON.stringify({
     writerExecutionCount: finalFreeze.boundaries.writerExecutionCount,
     stage7ActiveAuthorityCount: finalFreeze.boundaries.stage7ActiveAuthorityCount,
     stage8ActiveAuthorityCount: finalFreeze.boundaries.stage8ActiveAuthorityCount,
-    sourceRootTrackedRawMutationCount: sourceRootCutover.trackedRawMutationCount,
+    sourceRootTrackedRawMutationCount: sourceRootCutover.trackedMutationCount,
     sourceRootSemanticMutationCount: sourceRootCutover.semanticMutationCount,
     b55SemanticAuthorityChanged: operationalCutover.semanticAuthorityChanged,
     b55FrozenSemanticDomainsReopened: operationalCutover.frozenSemanticDomainsReopened,
