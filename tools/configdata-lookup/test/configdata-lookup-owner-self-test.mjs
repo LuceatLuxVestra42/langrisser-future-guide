@@ -32,7 +32,7 @@ console.log(JSON.stringify({
     findLabelPopulationCount: shadow.shadow.find.labelPopulationCount,
     lookupExecutedCaseCount: shadow.shadow.lookup.executedCaseCount,
     refsExecutedCaseCount: shadow.shadow.refs.executedCaseCount,
-    findLabelPopulationCount: shadow.shadow.find.labelPopulationCount,
+    findExecutedCaseCount: shadow.shadow.find.executedCaseCount,
     staleCount: shadow.freshness.staleCount,
   },
   cutover: {
