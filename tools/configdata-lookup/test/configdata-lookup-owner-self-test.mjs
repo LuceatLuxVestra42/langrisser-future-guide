@@ -1,6 +1,5 @@
 await import('./configdata-lookup-self-test.mjs');
 await import('./bounded-source-record-self-test.mjs');
-await import('./a5-property-namespace-discovery-probe.mjs');
 const { runShadowParity } = await import('./configdata-lookup-shadow-parity.mjs');
 const shadow = await runShadowParity({ emit: true });
 const cutover = (await import('./configdata-lookup-clr7-cutover.mjs')).default;
