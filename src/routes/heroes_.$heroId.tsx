@@ -574,7 +574,6 @@ function HeroSoldierCard({
         <span className="rounded bg-black/65 px-1.5 py-0.5 text-[12px] font-bold leading-none text-white sm:text-[13px]">
           {record.isSp ? "SP" : `T${record.tier}`}
         </span>
-        {record.nameKrStatus === "provisional-display" ? <span className="rounded bg-black/65 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">임시</span> : null}
       </div>
 
       <div className="absolute right-1.5 top-1.5 flex h-6 min-w-6 items-center justify-center rounded bg-background/80 px-1 shadow-sm backdrop-blur" title={armyLabel}>
