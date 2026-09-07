@@ -275,26 +275,29 @@ function SoldierTrainingPage() {
                     <h3 className="truncate text-lg font-black text-foreground">{selectedTech.nameKr}</h3>
                   </div>
 
-                  <input
-                    type="range"
-                    aria-label="목표 레벨"
-                    min={1}
-                    max={selectedTech.maxLevel}
-                    value={safeTargetLevel}
-                    onChange={(event) => {
-                      const next = Number(event.target.value);
-                      setTargetLevel(next);
-                      if (next <= safeCurrentLevel) {
-                        setCurrentLevel(Math.max(0, next - 1));
-                      }
-                    }}
-                    className="w-full accent-foreground sm:w-[280px] lg:w-[340px]"
-                  />
+                  <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
+                    <input
+                      type="range"
+                      aria-label="목표 레벨 조절"
+                      min={1}
+                      max={selectedTech.maxLevel}
+                      value={safeTargetLevel}
+                      onChange={(event) => {
+                        const next = Number(event.target.value);
+                        setTargetLevel(next);
+                        if (next <= safeCurrentLevel) {
+                          setCurrentLevel(Math.max(0, next - 1));
+                        }
+                      }}
+                      className="min-w-0 flex-1 accent-foreground sm:w-[280px] sm:flex-none lg:w-[340px]"
+                    />
+                    <span className="shrink-0 text-xs font-bold text-muted-foreground">목표 레벨 조절</span>
+                  </div>
                 </div>
 
                 <div className="mt-4 flex items-center justify-center gap-4 sm:gap-6">
                   <label className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
-                    <span>현재</span>
+                    <span>현재 Lv</span>
                     <input
                       type="number"
                       inputMode="numeric"
@@ -324,7 +327,7 @@ function SoldierTrainingPage() {
                   </span>
 
                   <label className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
-                    <span>목표</span>
+                    <span>목표 Lv</span>
                     <input
                       type="number"
                       inputMode="numeric"
