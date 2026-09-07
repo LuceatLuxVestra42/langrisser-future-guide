@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
+import { getSoldierCommonMaterialIconUrl } from "@/lib/soldier-common-material-assets";
 import { getSoldierTrainingCostMaterialIconUrl } from "@/lib/soldier-training-cost-material-assets-supplemental";
 import { getSoldierTrainingPageData } from "@/lib/soldier-training-page.functions";
 import type {
@@ -510,8 +511,14 @@ function LevelCost({ level }: { level: TrainingTechLevel }) {
     <div className="mt-4 border-t border-border pt-4">
       <p className="text-xs font-bold text-muted-foreground">Lv.{level.level} 강화 비용</p>
       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-        <span className="rounded-md border border-border bg-card px-2.5 py-1.5 font-bold text-foreground">
-          골드 {formatNumber(level.goldCost)}
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1.5 text-foreground">
+          <img
+            src={getSoldierCommonMaterialIconUrl("gold")}
+            alt=""
+            className="h-5 w-5 shrink-0 object-contain"
+            aria-hidden="true"
+          />
+          <span className="font-black">×{formatNumber(level.goldCost)}</span>
         </span>
         {level.materialCosts.map((material) => {
           const iconUrl = getSoldierTrainingCostMaterialIconUrl(material.id);
