@@ -32,7 +32,15 @@ jobs:
         with:
           node-version: 22
 
-      - name: Freeze Cost-4K equipable SkillID set identity
+      - name: Hydrate pinned external snapshot
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/hydrate-configdata-source-pack-v1.mjs \
+            --target-dir "$RUNNER_TEMP/configdata-hydrated"
+
+      - name: Count Cost-5B SkillCost key coverage on frozen equipable set
         shell: bash
         run: |
           set -euo pipefail
@@ -40,67 +48,72 @@ jobs:
           import fs from 'node:fs';
           import crypto from 'node:crypto';
 
+          const expectedFrozenSha = '8681629d110b5e6ec6fbfdb673e4585918b8b5d73a22bda3893b3e0998932064';
+
           const manifest = JSON.parse(fs.readFileSync('data/generated/hero-detail.v1.json', 'utf8'));
           const byHeroId = manifest?.storage?.byHeroId;
           if (!byHeroId || typeof byHeroId !== 'object' || Array.isArray(byHeroId)) {
             throw new Error('hero-detail manifest storage.byHeroId is missing or malformed');
           }
 
-          const ids = new Set();
+          const equipableIds = new Set();
           for (const [heroId, meta] of Object.entries(byHeroId)) {
-            if (!meta || typeof meta.path !== 'string') {
-              throw new Error(`missing shard path for hero ${heroId}`);
-            }
+            if (!meta || typeof meta.path !== 'string') throw new Error(`missing shard path for hero ${heroId}`);
             const shard = JSON.parse(fs.readFileSync(meta.path, 'utf8'));
-            if (String(shard.heroId) !== String(heroId)) {
-              throw new Error(`heroId mismatch for shard ${heroId}`);
-            }
+            if (String(shard.heroId) !== String(heroId)) throw new Error(`heroId mismatch for shard ${heroId}`);
             const connections = shard?.normal?.jobTree?.connections;
-            if (!Array.isArray(connections)) {
-              throw new Error(`normal.jobTree.connections missing for hero ${heroId}`);
-            }
+            if (!Array.isArray(connections)) throw new Error(`connections missing for hero ${heroId}`);
             for (const connection of connections) {
-              if (!Array.isArray(connection?.levels)) {
-                throw new Error(`levels missing for hero ${heroId}`);
-              }
+              if (!Array.isArray(connection?.levels)) throw new Error(`levels missing for hero ${heroId}`);
               for (const level of connection.levels) {
                 const id = level?.gotSkillId;
                 if (id === null || id === undefined) continue;
-                if (typeof id !== 'number' || !Number.isFinite(id)) {
-                  throw new Error(`non-numeric gotSkillId for hero ${heroId}`);
-                }
-                ids.add(String(id));
+                if (typeof id !== 'number' || !Number.isFinite(id)) throw new Error(`non-numeric gotSkillId for hero ${heroId}`);
+                equipableIds.add(String(id));
               }
             }
           }
 
-          const sortedIds = [...ids].sort((a, b) => Number(a) - Number(b));
-          const canonical = JSON.stringify(sortedIds);
-          const sha256 = crypto.createHash('sha256').update(canonical).digest('hex');
-          const outPath = `${process.env.RUNNER_TEMP}/cost-4k-equipable-skill-ids.v1.json`;
-          fs.writeFileSync(outPath, JSON.stringify({
-            version: 1,
-            source: 'data/generated/hero-detail.v1.json -> storage.byHeroId shards -> normal.jobTree.connections[].levels[].gotSkillId',
-            count: sortedIds.length,
-            sha256OfCanonicalIdArray: sha256,
-            ids: sortedIds
-          }, null, 2) + '\n');
+          const sortedIds = [...equipableIds].sort((a, b) => Number(a) - Number(b));
+          const frozenSha = crypto.createHash('sha256').update(JSON.stringify(sortedIds)).digest('hex');
+          if (sortedIds.length !== 678 || frozenSha !== expectedFrozenSha) {
+            throw new Error(`Cost-4K frozen set identity mismatch count=${sortedIds.length} sha=${frozenSha}`);
+          }
+
+          const skillIndex = JSON.parse(fs.readFileSync('data/index/skill.v1.json', 'utf8'));
+          const entries = skillIndex?.index?.entries;
+          if (!Array.isArray(entries)) throw new Error('skill index entries missing or malformed');
+          const recordIndexById = new Map();
+          for (const tuple of entries) {
+            if (!Array.isArray(tuple) || tuple.length < 2 || typeof tuple[0] !== 'string' || !Number.isInteger(tuple[1])) {
+              throw new Error('malformed skill index tuple');
+            }
+            recordIndexById.set(tuple[0], tuple[1]);
+          }
+
+          const sourcePath = `${process.env.RUNNER_TEMP}/configdata-hydrated/data/configdata/ConfigDataSkillInfo.json`;
+          const rows = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
+          if (!Array.isArray(rows)) throw new Error('ConfigDataSkillInfo root is not an array');
+
+          let present = 0;
+          let missing = 0;
+          for (const id of sortedIds) {
+            const recordIndex = recordIndexById.get(id);
+            if (!Number.isInteger(recordIndex)) throw new Error(`equipable SkillID absent from lookup index: ${id}`);
+            const row = rows[recordIndex];
+            if (!row || typeof row !== 'object' || Array.isArray(row)) throw new Error(`malformed SkillInfo row for ${id}`);
+            if (String(row.ID) !== id) throw new Error(`SkillInfo ID/index mismatch for ${id}`);
+            if (Object.prototype.hasOwnProperty.call(row, 'SkillCost')) present += 1;
+            else missing += 1;
+          }
 
           console.log(JSON.stringify({
             equipableDistinctSkillIds: sortedIds.length,
-            sha256,
-            sampleFirst5: sortedIds.slice(0, 5),
-            frozenFile: 'cost-4k-equipable-skill-ids.v1.json'
+            frozenSetSha256: frozenSha,
+            skillCostPresent: present,
+            skillCostMissing: missing
           }));
           NODE
-
-      - name: Upload Cost-4K frozen set
-        uses: actions/upload-artifact@v4
-        with:
-          name: cost-4k-equipable-skill-ids
-          path: ${{ runner.temp }}/cost-4k-equipable-skill-ids.v1.json
-          if-no-files-found: error
-          retention-days: 30
 
       - name: Verify repository non-mutation
         run: |
