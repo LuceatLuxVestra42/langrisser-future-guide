@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "stage": "hero-b3-final-job-extrema-consumer",
+  "status": "COMPLETE",
+  "completion": "B3_COMPLETE",
+  "authoritativePredecessor": {
+    "branch": "b2-7-sp-bonded-freeze",
+    "commitSha": "f0e8e9271f96e0016d5b38283e7a92e9fb539ad2",
+    "checkpoint": "data/checkpoints/hero-b2-7-sp-bonded-freeze.v1.json",
+    "status": "FINAL_FROZEN"
+  },
+  "materialization": {
+    "branch": "b3-final-job-extrema-consumer",
+    "outputCommitSha": "fa5c6aa6129e37e1b8f60e1e28dc6690c2104561",
+    "contract": "data/contracts/hero-b3-final-job-extrema-consumer.v1.json",
+    "producer": "scripts/run_hero_b3_final_job_extrema_consumer.cjs",
+    "generated": "data/generated/hero-final-job-extrema.v1.json",
+    "validator": "scripts/validate_hero_b3_final_job_extrema_consumer.cjs",
+    "validation": "data/validation/hero-b3-final-job-extrema-summary.v1.json",
+    "workflow": ".github/workflows/hero-b3-final-job-extrema.yml"
+  },
+  "sourceProvenance": {
+    "configDataSourceCommit": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "sourcePackReleaseTag": "source-configdata-v1-6475e63e",
+    "sourcePackArchiveSha256": "65855321776cba9523669a2d486c2edbd2908006cf854572b7a87b0b63405c84",
+    "sourcePackInventorySha256": "ea7c6381e0901a55fe11014d14bb82862d9474c418e89d11869e03ba876dcade"
+  },
+  "eligibility": {
+    "authoritativeField": "ConfigDataJobInfo.Rank",
+    "requiredRank": 4,
+    "tierMeaning": "Final job Tier:4 == JobInfo Rank 4",
+    "normalRelation": "normalBondedStats.jobConnectionId -> normal.jobTree.connections.jobConnectionId -> exact jobId -> JobInfo.ID",
+    "spRelation": "RELEASED spBondedStats.jobId -> JobInfo.ID",
+    "topologyUsed": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false
+  },
+  "statAuthority": {
+    "normal": "frozen normalBondedStats.values",
+    "sp": "frozen spBondedStats.values",
+    "recomputed": false,
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"]
+  },
+  "population": {
+    "canonicalHeroCount": 267,
+    "normalBondedConnectionCount": 1388,
+    "normalTier4CandidateCount": 508,
+    "spReleasedCount": 25,
+    "spTier4CandidateCount": 25,
+    "candidateCount": 533,
+    "notReleasedPollution": 0,
+    "lowerRankPollution": 0
+  },
+  "candidateHashes": {
+    "candidateSetSha256": "a49e57fc6a5ff0a577c909bde25293e03e197a31b8687637b75bc7fdea5bd94f",
+    "candidateValuesSha256": "edec161463f26d5283dc7458d951b56c0a946e28154004fb7858220828689b6f"
+  },
+  "extrema": {
+    "hp": {"min":2332,"minWinnerCount":2,"max":4803,"maxWinnerCount":1},
+    "at": {"min":233,"minWinnerCount":1,"max":636,"maxWinnerCount":1},
+    "magic": {"min":198,"minWinnerCount":3,"max":589,"maxWinnerCount":2},
+    "df": {"min":174,"minWinnerCount":1,"max":356,"maxWinnerCount":1},
+    "magicDf": {"min":144,"minWinnerCount":1,"max":377,"maxWinnerCount":1},
+    "dex": {"min":71,"minWinnerCount":1,"max":329,"maxWinnerCount":1}
+  },
+  "validation": {
+    "githubActionsRunId": 34215895585,
+    "githubActionsJobId": 102027425963,
+    "conclusion": "success",
+    "status": "PASS",
+    "candidateMismatchCount": 0,
+    "valueMismatchCount": 0,
+    "extremaMismatchCount": 0,
+    "tieSetMismatchCount": 0,
+    "hardErrorCount": 0,
+    "boundedGeneratedChanges": [
+      "data/generated/hero-final-job-extrema.v1.json",
+      "data/validation/hero-b3-final-job-extrema-summary.v1.json"
+    ]
+  },
+  "blockers": [],
+  "review": [
+    "GitHub Actions emits the existing non-blocking Node20 action-runtime deprecation warning; semantic producer and validator both PASS."
+  ],
+  "reopenConditions": [
+    "B1 normalBondedStats frozen consumer changes",
+    "B2 spBondedStats frozen consumer changes",
+    "B2-7 FINAL_FROZEN predecessor is reopened by an owning hard failure",
+    "ConfigData JobInfo Rank/source snapshot changes",
+    "candidate-set or candidate-value hash mismatch",
+    "independent B3 validator hard failure",
+    "actual canonical/parity damage"
+  ],
+  "handoff": {
+    "nextOwner": "B4 Hero detail UI",
+    "nextStart": "Consume data/generated/hero-final-job-extrema.v1.json directly. Do not recalculate final-job eligibility or bonded stats in frontend; use the generated Tier4 candidates/extrema and preserve tie sets."
+  }
+}
