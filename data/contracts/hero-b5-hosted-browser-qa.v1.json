@@ -31,7 +31,17 @@
       ],
       "unknownHeroStatus": 404,
       "pageErrorAllowed": false,
-      "consoleErrorAllowed": false
+      "unexpectedConsoleErrorAllowed": false,
+      "knownExistingDrift": {
+        "owner": "hero skill icon asset/resolver",
+        "classification": "REVIEW",
+        "reason": "These exact image requests predate B4 and are outside the B4 final-job-stats diff/owner. They do not change or obscure the B3-backed final-job table.",
+        "allowed404ImagePaths": [
+          "/langrisser-future-guide/images/icon/skill/10301.png",
+          "/langrisser-future-guide/images/icon/skill/10302.png",
+          "/langrisser-future-guide/images/icon/skill/10324.png"
+        ]
+      }
     }
   },
   "boundaries": {
@@ -42,11 +52,13 @@
     "rawConfigData": false,
     "nameJoin": false,
     "idArithmetic": false,
-    "semanticReopenOnHostedFailure": false
+    "semanticReopenOnHostedFailure": false,
+    "skillAssetRepairInB5": false
   },
   "completion": {
     "requiredHostedStatus": "PASS_ROUTE_HOSTED_QA_STRICT_CANDIDATE",
     "requiredBrowserStatus": "PASS_BROWSER_UI",
-    "blockersMustBeEmpty": true
+    "blockersMustBeEmpty": true,
+    "nonBlockingReviewAllowed": true
   }
 }
