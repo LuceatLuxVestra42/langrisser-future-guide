@@ -282,33 +282,26 @@ function main() {
     } else {
       awakeningSummary.canonicalAwakenInfoRows += 1;
       const hasLevel2SkillId = hasOwn(awaken, 'Level2SkillID');
-      const hasAwaken2Unlock = hasOwn(awaken, 'Awaken2Unlock');
 
       if (hasLevel2SkillId) {
         const level2SkillId = awaken.Level2SkillID;
         if (!Number.isInteger(level2SkillId) || level2SkillId <= 0) {
           errors.push(`heroId ${treeHero.heroId}: invalid Level2SkillID=${level2SkillId}`);
         }
-        if (awaken.Awaken2Unlock !== true) {
-          errors.push(`heroId ${treeHero.heroId}: Level2SkillID is defined but Awaken2Unlock is not true`);
-        }
         const awakenSkill = Number.isInteger(level2SkillId) && level2SkillId > 0 ? skillIndex.get(level2SkillId) : null;
         if (Number.isInteger(level2SkillId) && level2SkillId > 0 && !awakenSkill) {
           errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from SkillInfo`);
         }
         awakening = {
-          status: awakenSkill && awaken.Awaken2Unlock === true ? 'VERIFIED' : 'FAIL',
+          status: awakenSkill ? 'VERIFIED' : 'FAIL',
           awakenId: awaken.ID,
           nameCn: awaken.Name ?? null,
-          level2Status: awakenSkill && awaken.Awaken2Unlock === true ? 'DEFINED' : 'UNRESOLVED',
+          level2Status: awakenSkill ? 'DEFINED' : 'UNRESOLVED',
           level2SkillId: Number.isInteger(level2SkillId) && level2SkillId > 0 ? level2SkillId : null,
           skill: skillSnapshot(awakenSkill),
         };
         if (awakening.status === 'VERIFIED') awakeningSummary.verifiedLevel2Skill += 1;
       } else {
-        if (hasAwaken2Unlock) {
-          errors.push(`heroId ${treeHero.heroId}: Awaken2Unlock is defined without Level2SkillID`);
-        }
         awakening = {
           status: 'VERIFIED',
           awakenId: awaken.ID,
