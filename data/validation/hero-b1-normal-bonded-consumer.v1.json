@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "stage": "hero-b1-normal-bonded-consumer",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/hero-b1-normal-bonded-consumer.v1.json",
+  "predecessor": "current COMPLETE/FROZEN Hero Stage 6-3 shards",
+  "summary": {
+    "canonicalHeroCount": 267,
+    "heroShardCount": 267,
+    "normalConnectionCount": 1388,
+    "generatedConnectionCount": 1388,
+    "normalPayloadMismatchCount": 0,
+    "connectionParityMismatchCount": 0,
+    "formulaMismatchCount": 0,
+    "nonIntegerOrNegativeCount": 0,
+    "bondedBelowUnbondedCount": 0,
+    "metadataMismatchCount": 0,
+    "shardIntegrityMismatchCount": 0,
+    "leonRegressionMatchCount": 1,
+    "failedHeroCount": 0,
+    "hardErrorCount": 0
+  },
+  "checks": [
+    {
+      "name": "contract-frozen",
+      "pass": true
+    },
+    {
+      "name": "stage4-complete",
+      "pass": true
+    },
+    {
+      "name": "stage4-canonical-267",
+      "pass": true,
+      "detail": "count=267"
+    },
+    {
+      "name": "manifest-sharded-267",
+      "pass": true,
+      "detail": "SHARDED_BY_HERO/267"
+    },
+    {
+      "name": "manifest-b1-materialized",
+      "pass": true,
+      "detail": "{\"status\":\"VERIFIED\",\"contract\":\"data/contracts/hero-b1-normal-bonded-consumer.v1.json\",\"heroCount\":267,\"normalConnectionCount\":1388,\"field\":\"normalBondedStats\"}"
+    },
+    {
+      "name": "all-267-shards-present",
+      "pass": true,
+      "detail": "actual=267"
+    },
+    {
+      "name": "shard-integrity",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "manifest-total-shard-bytes",
+      "pass": true,
+      "detail": "expected=15306601, actual=15306601"
+    },
+    {
+      "name": "normal-frozen-payload-parity",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "normal-connection-count-parity",
+      "pass": true,
+      "detail": "source=1388, generated=1388, heroMismatch=0"
+    },
+    {
+      "name": "metadata-exact",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "formula-exact",
+      "pass": true,
+      "detail": "mismatch=0"
+    },
+    {
+      "name": "all-values-nonnegative-integer",
+      "pass": true,
+      "detail": "invalid=0"
+    },
+    {
+      "name": "bonded-not-below-unbonded",
+      "pass": true,
+      "detail": "violations=0"
+    },
+    {
+      "name": "leon-frozen-royal-knight-regression",
+      "pass": true,
+      "detail": "matches=1"
+    }
+  ],
+  "failedHeroes": [],
+  "hardErrors": [],
+  "decision": "B1 Normal bonded generated consumer PASS. All 267 Hero shards and all normal JobConnections match the frozen formula and Leon regression fixture."
+}
