@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Count Cost-4D final Hero source population
+      - name: Count Cost-4E non-null gotSkillId references
         shell: bash
         run: |
           set -euo pipefail
@@ -49,6 +49,7 @@ jobs:
 
           const entries = Object.entries(byHeroId);
           let jobLevelRows = 0;
+          let skillRefs = 0;
 
           for (const [heroId, meta] of entries) {
             if (!meta || typeof meta.path !== 'string') {
@@ -66,11 +67,19 @@ jobs:
               if (!Array.isArray(connection?.levels)) {
                 throw new Error(`levels missing for hero ${heroId}`);
               }
-              jobLevelRows += connection.levels.length;
+              for (const level of connection.levels) {
+                jobLevelRows += 1;
+                if (level?.gotSkillId !== null && level?.gotSkillId !== undefined) {
+                  if (typeof level.gotSkillId !== 'number' || !Number.isFinite(level.gotSkillId)) {
+                    throw new Error(`non-numeric gotSkillId for hero ${heroId}`);
+                  }
+                  skillRefs += 1;
+                }
+              }
             }
           }
 
-          console.log(JSON.stringify({ heroShards: entries.length, jobLevelRows }));
+          console.log(JSON.stringify({ heroShards: entries.length, jobLevelRows, skillRefs }));
           NODE
 
       - name: Verify repository non-mutation
