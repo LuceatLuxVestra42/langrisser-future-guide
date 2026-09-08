@@ -21,13 +21,17 @@ function isAllowedExisting404(entry) {
   }
 }
 
-function isAllowedExistingConsoleError(entry) {
+function isAllowedPathful404ConsoleError(entry) {
   if (!entry.url || !entry.text.includes("404")) return false;
   try {
     return allowedExisting404Paths.has(new URL(entry.url).pathname);
   } catch {
     return false;
   }
+}
+
+function isGenericChromium404ConsoleError(entry) {
+  return entry.text.startsWith("Failed to load resource:") && /\b404\b/.test(entry.text);
 }
 
 const manifestUrl = new URL("authoritative-pages-source.json", baseUrl);
@@ -117,10 +121,32 @@ for (const testCase of cases) {
 
   const allowedHttp = failedResponses.filter(isAllowedExisting404);
   const unexpectedHttp = failedResponses.filter((entry) => !isAllowedExisting404(entry));
-  const allowedConsole = consoleErrors.filter(isAllowedExistingConsoleError);
-  const unexpectedConsole = consoleErrors.filter((entry) => !isAllowedExistingConsoleError(entry));
-  if (allowedHttp.length || allowedConsole.length) {
-    existingDrift.push({ viewport: testCase.name, http404s: allowedHttp, consoleErrors: allowedConsole });
+  const allowedPathfulConsole = consoleErrors.filter(isAllowedPathful404ConsoleError);
+  const generic404Console = consoleErrors.filter(
+    (entry) => !isAllowedPathful404ConsoleError(entry) && isGenericChromium404ConsoleError(entry),
+  );
+  const unexpectedConsole = consoleErrors.filter(
+    (entry) => !isAllowedPathful404ConsoleError(entry) && !isGenericChromium404ConsoleError(entry),
+  );
+
+  const accountedConsole404Count = allowedPathfulConsole.length + generic404Console.length;
+  if (accountedConsole404Count !== allowedHttp.length) {
+    failures.push(
+      `${testCase.name}: admitted console 404 count ${accountedConsole404Count} != admitted HTTP 404 count ${allowedHttp.length}`,
+    );
+  }
+
+  if (allowedHttp.length || accountedConsole404Count) {
+    existingDrift.push({
+      viewport: testCase.name,
+      http404s: allowedHttp,
+      consoleErrors: [...allowedPathfulConsole, ...generic404Console],
+      pairing: {
+        admittedHttp404Count: allowedHttp.length,
+        admittedConsole404Count: accountedConsole404Count,
+        exactCountMatch: accountedConsole404Count === allowedHttp.length,
+      },
+    });
   }
 
   if (pageErrors.length) failures.push(`${testCase.name}: page errors: ${JSON.stringify(pageErrors)}`);
