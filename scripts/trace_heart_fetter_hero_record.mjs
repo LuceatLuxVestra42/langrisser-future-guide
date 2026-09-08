@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import path from 'node:path';
+const ROOT=process.cwd();
+const i=process.argv.indexOf('--source-root');
+if(i<0) throw new Error('missing --source-root');
+const root=path.resolve(process.argv[i+1]);
+const p=path.join(root,'data/configdata/ConfigDataHeroHeartFetterInfo.json');
+const data=JSON.parse(fs.readFileSync(p,'utf8'));
+const rows=Array.isArray(data)?data:Object.values(data).flatMap(v=>Array.isArray(v)?v:[]);
+const targets=rows.filter(r=>r && typeof r==='object' && [1,6].includes(r.ID));
+fs.writeFileSync(path.join(ROOT,'heart-fetter-hero-record-trace.json'),JSON.stringify({targets},null,2)+'\n');
+console.log(JSON.stringify(targets));
+if(!targets.some(r=>r.ID===6)) process.exitCode=1;
