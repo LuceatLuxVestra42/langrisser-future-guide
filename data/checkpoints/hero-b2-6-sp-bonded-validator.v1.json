@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "stage": "hero-b2-6-sp-bonded-validator",
+  "status": "COMPLETE",
+  "completion": "B2_6_COMPLETE",
+  "authoritativePredecessor": {
+    "b2_5Branch": "b2-5-sp-bonded-producer",
+    "b2_5CommitSha": "a193d15503296488ff9b512a015a89400f96311f",
+    "b2_5Checkpoint": "data/checkpoints/hero-b2-5-sp-bonded-producer.v1.json",
+    "b1CommitSha": "59d6098e9dfd1e826640ca670d097e7418ed810e"
+  },
+  "validator": {
+    "contract": "data/contracts/hero-b2-sp-bonded-validator.v1.json",
+    "script": "scripts/validate_hero_b2_sp_bonded_consumer.cjs",
+    "workflow": ".github/workflows/hero-b2-6-validator.yml",
+    "validationCommitSha": "382f66a269710e49aa956a39afe2c851c97d3897",
+    "producerArithmeticImported": false,
+    "producerFunctionReused": false,
+    "producerOutputUsedAsExpectedValueSource": false,
+    "readOnly": true
+  },
+  "sourceProvenance": {
+    "configDataSourceCommit": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "sourcePackReleaseTag": "source-configdata-v1-6475e63e",
+    "sourcePackArchiveSha256": "65855321776cba9523669a2d486c2edbd2908006cf854572b7a87b0b63405c84",
+    "sourcePackInventorySha256": "ea7c6381e0901a55fe11014d14bb82862d9474c418e89d11869e03ba876dcade",
+    "hydratedFileCount": 753,
+    "semanticAuthorityChanged": false,
+    "frozenSemanticDomainsReopened": false
+  },
+  "executionEvidence": {
+    "githubActionsRunId": 34210941450,
+    "githubActionsJobId": 102011518001,
+    "conclusion": "success",
+    "validatorStatus": "PASS",
+    "readOnlyGate": "PASS"
+  },
+  "results": {
+    "canonicalHeroCount": 267,
+    "spReleasedCount": 25,
+    "spNotReleasedCount": 242,
+    "spBondedPresentCount": 25,
+    "notReleasedPollution": 0,
+    "formulaMismatchCount": 0,
+    "relationErrorCount": 0,
+    "inputErrorCount": 0,
+    "reshapeErrorCount": 0,
+    "predecessorMutationCount": 0,
+    "fixtureFailureCount": 0,
+    "manifestIntegrityErrorCount": 0,
+    "provenanceMismatchCount": 0,
+    "usedReshapePropertyIds": [99, 100, 101, 102, 103, 104],
+    "hardErrorCount": 0
+  },
+  "predecessorParity": {
+    "baseline": "git object at B1 commit for all 267 Hero shards",
+    "comparedFields": ["normal", "normalBondedStats", "sp"],
+    "mutationCount": 0
+  },
+  "fixtures": {
+    "leon": {
+      "heroId": 6,
+      "jobConnectionId": 66,
+      "jobId": 377,
+      "finalJobLevelId": 661,
+      "reshapeBuffId": 8570110,
+      "values": {"hp": 4041, "at": 602, "magic": 224, "df": 260, "magicDf": 231, "dex": 125},
+      "pass": true
+    },
+    "matthew": {
+      "heroId": 1,
+      "jobConnectionId": 22,
+      "jobId": 262,
+      "reshapeBuffId": 8670110,
+      "reshapeProperties": [
+        {"propertyId": 103, "value": 500},
+        {"propertyId": 101, "value": 500}
+      ],
+      "pass": true
+    }
+  },
+  "blockers": [],
+  "review": [],
+  "reopenConditions": [
+    "B2-5 materialized spBondedStats changes",
+    "Stage5-4 SP source snapshot changes",
+    "ConfigData source-pack snapshot or relevant schema changes",
+    "B1/Stage4 global mastery authority changes",
+    "explicit SP JobConnection/JobLevel relation contradiction",
+    "reshape PropertyModify numeric mapping contradiction",
+    "independent validator hard failure"
+  ],
+  "handoff": {
+    "nextOwner": "B2-7 freeze/checkpoint",
+    "nextStart": "Freeze B2 SP bonded semantics using the B2-5 COMPLETE producer checkpoint plus this independent B2-6 PASS evidence; do not recompute B1/B2 semantics unless a reopen condition is met."
+  }
+}
