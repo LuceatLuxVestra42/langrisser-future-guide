@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Count Cost-4E non-null gotSkillId references
+      - name: Count Cost-4F distinct gotSkillId values
         shell: bash
         run: |
           set -euo pipefail
@@ -50,6 +50,7 @@ jobs:
           const entries = Object.entries(byHeroId);
           let jobLevelRows = 0;
           let skillRefs = 0;
+          const distinctSkillIds = new Set();
 
           for (const [heroId, meta] of entries) {
             if (!meta || typeof meta.path !== 'string') {
@@ -74,12 +75,18 @@ jobs:
                     throw new Error(`non-numeric gotSkillId for hero ${heroId}`);
                   }
                   skillRefs += 1;
+                  distinctSkillIds.add(level.gotSkillId);
                 }
               }
             }
           }
 
-          console.log(JSON.stringify({ heroShards: entries.length, jobLevelRows, skillRefs }));
+          console.log(JSON.stringify({
+            heroShards: entries.length,
+            jobLevelRows,
+            skillRefs,
+            distinctSkillIds: distinctSkillIds.size
+          }));
           NODE
 
       - name: Verify repository non-mutation
