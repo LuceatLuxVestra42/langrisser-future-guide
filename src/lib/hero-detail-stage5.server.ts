@@ -42,6 +42,7 @@ type Stage6Skill = {
   cooldown?: string | null;
   range?: string | null;
   areaOrTarget?: string | null;
+  cost?: number | null;
 };
 
 type Stage6SkillAcquisition = {
@@ -206,6 +207,18 @@ function projectSkill(skill: Stage6Skill | null | undefined) {
   };
 }
 
+function projectEquipableSkill(skill: Stage6Skill | null | undefined) {
+  const projected = projectSkill(skill);
+  if (!projected) return null;
+  if (!Number.isInteger(skill?.cost)) {
+    throw new Error(`Equipable Skill ${projected.skillId} is missing canonical cost.`);
+  }
+  return {
+    ...projected,
+    cost: Number(skill.cost),
+  };
+}
+
 function projectJobBranches(jobTree: Stage6JobTree | null | undefined) {
   const branchIds = Array.isArray(jobTree?.branches) ? jobTree.branches : [];
   const connections = Array.isArray(jobTree?.connections) ? jobTree.connections : [];
@@ -351,7 +364,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
   const jobLevelAcquisitions = Array.isArray(shard.normal?.skills?.jobLevelAcquisitions)
     ? shard.normal.skills.jobLevelAcquisitions
         .map((row) => {
-          const skill = projectSkill(row.skill);
+          const skill = projectEquipableSkill(row.skill);
           if (!skill) return null;
           return {
             acquisitionOrder: row.acquisitionOrder ?? null,
