@@ -40,7 +40,7 @@ jobs:
           node scripts/hydrate-configdata-source-pack-v1.mjs \
             --target-dir "$RUNNER_TEMP/configdata-hydrated"
 
-      - name: Census SkillInfo SkillCost key presence
+      - name: Census present SkillCost null values
         shell: bash
         run: |
           set -euo pipefail
@@ -55,19 +55,21 @@ jobs:
           }
 
           let present = 0;
-          let missing = 0;
+          let nullCount = 0;
+          let nonNull = 0;
 
           for (const row of root) {
-            if (row && typeof row === 'object' && !Array.isArray(row) && Object.prototype.hasOwnProperty.call(row, 'SkillCost')) {
-              present += 1;
-            } else {
-              missing += 1;
-            }
+            if (!row || typeof row !== 'object' || Array.isArray(row)) continue;
+            if (!Object.prototype.hasOwnProperty.call(row, 'SkillCost')) continue;
+
+            present += 1;
+            if (row.SkillCost === null) nullCount += 1;
+            else nonNull += 1;
           }
 
-          const out = { total: root.length, present, missing };
-          if (out.total !== out.present + out.missing) {
-            throw new Error('SkillCost key presence census total mismatch');
+          const out = { total: root.length, present, null: nullCount, nonNull };
+          if (present !== nullCount + nonNull) {
+            throw new Error('SkillCost null census total mismatch');
           }
 
           console.log(JSON.stringify(out));
