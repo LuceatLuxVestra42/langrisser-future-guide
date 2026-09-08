@@ -122,7 +122,7 @@ for (const testCase of cases) {
     for (const expected of [
       "突击骑士", "皇家骑士", "湮黯青龙",
       "3497", "599", "3806", "569", "4041", "602", "260",
-      "Lv.70 · 6성 · 모든 직업 마스터 · 유대 MAX", "SP",
+      "Lv.70 · 6성 · MAX 유대", "SP",
     ]) {
       if (!text.includes(expected)) failures.push(`${testCase.name}: missing visible value ${expected}`);
     }
