@@ -1,0 +1,52 @@
+name: Hero B2-5 SP bonded producer
+
+on:
+  push:
+    branches:
+      - b2-5-sp-bonded-producer
+    paths:
+      - 'scripts/run_hero_b2_sp_bonded_consumer.cjs'
+      - 'data/contracts/hero-b2-sp-bonded-producer.v1.json'
+      - '.github/workflows/hero-b2-5-producer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: b2-5-sp-bonded-producer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Materialize B2-5 SP bonded stats
+        run: node scripts/run_hero_b2_sp_bonded_consumer.cjs
+      - name: Enforce bounded output paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git diff --name-only)
+          printf '%s\n' "${changed[@]}"
+          for p in "${changed[@]}"; do
+            if [[ "$p" == "data/generated/hero-detail.v1.json" ]]; then continue; fi
+            if [[ "$p" =~ ^data/generated/hero-detail/by-id/[0-9]+\.json$ ]]; then continue; fi
+            echo "Unexpected producer mutation: $p" >&2
+            exit 1
+          done
+          shard_count=$(printf '%s\n' "${changed[@]}" | grep -Ec '^data/generated/hero-detail/by-id/[0-9]+\.json$' || true)
+          manifest_count=$(printf '%s\n' "${changed[@]}" | grep -Ec '^data/generated/hero-detail\.v1\.json$' || true)
+          test "$shard_count" -eq 25
+          test "$manifest_count" -eq 1
+      - name: Commit generated B2-5 output
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/hero-detail.v1.json data/generated/hero-detail/by-id
+          git commit -m "B2-5: materialize SP bonded Hero stats"
+          git push origin HEAD:b2-5-sp-bonded-producer
