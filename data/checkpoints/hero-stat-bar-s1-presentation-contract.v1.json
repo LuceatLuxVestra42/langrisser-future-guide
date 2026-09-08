@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "stage": "hero-stat-bar-s1-presentation-contract",
+  "status": "COMPLETE",
+  "completion": "S1_COMPLETE",
+  "scope": "Freeze the presentation-only scaling and layout rules for final-job Hero stat bars without changing semantic stat or Tier4 authority.",
+  "startingPoint": {
+    "branch": "skill-icon-404-drift-fix",
+    "commitSha": "514b895aec10d9296141ddbd556850ce8f3f49cc"
+  },
+  "branch": "s1-hero-stat-bar-presentation-contract",
+  "contract": {
+    "path": "data/contracts/hero-stat-bar-presentation.v1.json",
+    "materializedCommitSha": "7890fc84e1f2683a48561511c9599cc3a72c059a",
+    "status": "FROZEN"
+  },
+  "authoritativeInput": {
+    "path": "data/generated/hero-final-job-extrema.v1.json",
+    "stage": "hero-b3-final-job-extrema-consumer",
+    "candidateCount": 533,
+    "requiredRank": 4,
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"]
+  },
+  "decisions": {
+    "minimumFillPercent": 25,
+    "maximumFillPercent": 100,
+    "formula": "barPercent = clamp(25 + ((value - min) / (max - min)) * 75, 25, 100)",
+    "domain": "per-stat global min/max from B3",
+    "layout": "3-B final-job card with six vertical stat rows",
+    "barDirection": "LEFT_TO_RIGHT",
+    "numericValuePlacement": "RIGHT_OF_BAR",
+    "spCurrent": "temporarily visible alongside Normal for inspection",
+    "spFuture": "move SP-specific presentation under a future [SP로 전환] interaction",
+    "desktopPriority": true,
+    "mobile": "sanity-only in this scope"
+  },
+  "semanticBoundary": {
+    "b1Reopened": false,
+    "b2Reopened": false,
+    "b3Reopened": false,
+    "tier4Reclassification": false,
+    "statRecalculation": false,
+    "rawConfigDataRead": false,
+    "nameJoin": false,
+    "idArithmetic": false
+  },
+  "validation": {
+    "contractReadback": "PASS",
+    "requiredScaleFixturesDeclared": true,
+    "productionCodeChanged": false,
+    "generatedSemanticArtifactChanged": false
+  },
+  "blockers": [],
+  "review": [],
+  "nextOwner": "frontend/presentation data projection",
+  "nextStage": "S2 B3 extrema presentation supply",
+  "reopenConditions": [
+    "user changes the visual floor or scale mapping policy",
+    "B3 authoritative extrema schema or population changes",
+    "the final-job stat presentation requirements materially change"
+  ]
+}
