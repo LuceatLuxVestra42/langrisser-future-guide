@@ -40,11 +40,11 @@ for (const heart of heartRows) {
   const buffs = passiveIds.map((id) => buffById.get(id)).filter(Boolean);
   rows.push({
     heartRecordId: heart.ID,
-    heroId: heart.HeroID ?? null,
+    heroId: heart.HeroID ?? heart.ID,
     maxLevel: heart.HeroFetterMaxLevel ?? null,
     finalSkillId,
     skillName: skill.Name ?? null,
-    skillDescribe: skill.SkillDescribe ?? null,
+    skillDescribe: skill.Desc ?? null,
     passiveIds,
     buffs: buffs.map((b) => ({
       id: b.ID,
@@ -71,9 +71,18 @@ for (const row of rows) {
   }
 }
 
-const report = { rowCount: rows.length, propertyUsage, rows };
+const descriptionChecks = {
+  rowCount: rows.length,
+  life: rows.filter((r) => /生命/.test(r.skillDescribe ?? '')).length,
+  defence: rows.filter((r) => /防御/.test(r.skillDescribe ?? '')).length,
+  magicDefence: rows.filter((r) => /魔防/.test(r.skillDescribe ?? '')).length,
+  intelligence: rows.filter((r) => /智力/.test(r.skillDescribe ?? '')).length,
+};
+
+const report = { rowCount: rows.length, descriptionChecks, propertyUsage, rows };
 fs.writeFileSync(outPath, `${JSON.stringify(report, null, 2)}\n`);
 console.log(`TRACE_OUTPUT=${path.relative(ROOT, outPath)}`);
 console.log(`ROW_COUNT=${rows.length}`);
+console.log(`DESCRIPTION_CHECKS=${JSON.stringify(descriptionChecks)}`);
 console.log(`PROPERTY_USAGE=${JSON.stringify(Object.fromEntries(Object.entries(propertyUsage).map(([k,v]) => [k,v.count])))}`);
 if (!rows.length) process.exitCode = 1;
