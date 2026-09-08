@@ -49,6 +49,7 @@ const combatIds = set((combat.records || []).map((x) => x.heroId));
 const treeByHero = new Map((tree.records || []).map((x) => [x.heroId, x]));
 const skillIds = set((skills.records || []).map((x) => x.heroId));
 const equipableSkillIds = new Set();
+const heroDirectSkillIds = new Set();
 
 if (upstream.status !== 'PASS') errors.push(`upstream direct regression status=${upstream.status}`);
 if ((upstream.errors || []).length) errors.push(`upstream direct regression errors=${upstream.errors.length}`);
@@ -97,6 +98,38 @@ for (const hero of combat.records || []) {
       errors.push(`heroId ${hero.heroId}: skill ${skillId} cost=${String(acquisition.skill.cost)} source=${sourceCost}`);
     }
   }
+
+  const directIds = Array.isArray(hero.skills?.heroDirectSkillIds) ? hero.skills.heroDirectSkillIds : [];
+  const directSkills = Array.isArray(hero.skills?.heroDirectSkills) ? hero.skills.heroDirectSkills : [];
+  if (directIds.length !== directSkills.length) {
+    errors.push(`heroId ${hero.heroId}: direct skill id/payload length mismatch ${directIds.length}/${directSkills.length}`);
+  }
+  for (let i = 0; i < directSkills.length; i += 1) {
+    const skill = directSkills[i];
+    const skillId = skill?.skillId;
+    if (!Number.isInteger(skillId) || skillId <= 0) {
+      errors.push(`heroId ${hero.heroId}: invalid hero-direct skillId=${String(skillId)}`);
+      continue;
+    }
+    heroDirectSkillIds.add(skillId);
+    if (directIds[i] !== skillId) {
+      errors.push(`heroId ${hero.heroId}: heroDirectSkillIds[${i}]=${String(directIds[i])} resolved skillId=${skillId}`);
+      continue;
+    }
+    const sourceCost = skillCostById.get(skillId);
+    if (!Number.isInteger(sourceCost)) {
+      errors.push(`heroId ${hero.heroId}: direct SkillInfo ${skillId} SkillCost is not an integer (${String(sourceCost)})`);
+      continue;
+    }
+    if (sourceCost !== 1 && sourceCost !== 2) {
+      errors.push(`heroId ${hero.heroId}: direct SkillInfo ${skillId} SkillCost=${sourceCost} outside normal-skill domain {1,2}`);
+      continue;
+    }
+    if (skill.cost !== sourceCost) {
+      errors.push(`heroId ${hero.heroId}: direct skill ${skillId} cost=${String(skill.cost)} source=${sourceCost}`);
+    }
+  }
+
   const sm = hero.soldierModifiers;
   if (sm?.status !== 'VERIFIED' || !['hp','at','df','magicDf'].every((k) => Number.isFinite(sm[k]) && Number.isInteger(sm.raw?.[k]) && sm.raw[k] / 100 === sm[k])) {
     errors.push(`heroId ${hero.heroId}: soldierModifiers invalid`);
@@ -128,12 +161,20 @@ if (skillCost1 !== 254 || skillCost2 !== 424) {
   errors.push(`equipable SkillCost distribution 1=${skillCost1} 2=${skillCost2}, expected 254/424`);
 }
 
+let directCost1 = 0;
+let directCost2 = 0;
+for (const skillId of heroDirectSkillIds) {
+  const cost = skillCostById.get(skillId);
+  if (cost === 1) directCost1 += 1;
+  else if (cost === 2) directCost2 += 1;
+}
+
 const gates = new Map((summary.semanticGates || []).map((g) => [g.id, g.status]));
-for (const id of ['awakeningClassification','displayJobStats','heroSoldierModifiers','talentStarProgression','equipableSkillCost']) if (gates.get(id) !== 'VERIFIED') errors.push(`semantic gate ${id}=${gates.get(id)}`);
+for (const id of ['awakeningClassification','displayJobStats','heroSoldierModifiers','talentStarProgression','equipableSkillCost','heroDirectSkillCost']) if (gates.get(id) !== 'VERIFIED') errors.push(`semantic gate ${id}=${gates.get(id)}`);
 if (gates.get('talentIdentity') !== 'VERIFIED_REFERENCE_SET') errors.push(`semantic gate talentIdentity=${gates.get('talentIdentity')}`);
 
 console.log(`HERO STAGE 4 FINAL VALIDATION: ${errors.length ? 'FAIL' : 'PASS'}`);
-console.log(`heroes=${combat.records?.length || 0} upstream=${upstream.status} equipableSkills=${equipableSkillIds.size} cost1=${skillCost1} cost2=${skillCost2} errors=${errors.length}`);
+console.log(`heroes=${combat.records?.length || 0} upstream=${upstream.status} equipableSkills=${equipableSkillIds.size} cost1=${skillCost1} cost2=${skillCost2} directSkills=${heroDirectSkillIds.size} directCost1=${directCost1} directCost2=${directCost2} errors=${errors.length}`);
 if (errors.length) {
   for (const error of errors.slice(0, 100)) console.log(`- FAIL: ${error}`);
   process.exitCode = 1;
