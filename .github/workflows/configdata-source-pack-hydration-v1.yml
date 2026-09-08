@@ -40,7 +40,7 @@ jobs:
           node scripts/hydrate-configdata-source-pack-v1.mjs \
             --target-dir "$RUNNER_TEMP/configdata-hydrated"
 
-      - name: Count Cost-5B SkillCost key coverage on frozen equipable set
+      - name: Count Cost-5C SkillCost nulls on frozen equipable set
         shell: bash
         run: |
           set -euo pipefail
@@ -52,9 +52,7 @@ jobs:
 
           const manifest = JSON.parse(fs.readFileSync('data/generated/hero-detail.v1.json', 'utf8'));
           const byHeroId = manifest?.storage?.byHeroId;
-          if (!byHeroId || typeof byHeroId !== 'object' || Array.isArray(byHeroId)) {
-            throw new Error('hero-detail manifest storage.byHeroId is missing or malformed');
-          }
+          if (!byHeroId || typeof byHeroId !== 'object' || Array.isArray(byHeroId)) throw new Error('hero-detail manifest storage.byHeroId is missing or malformed');
 
           const equipableIds = new Set();
           for (const [heroId, meta] of Object.entries(byHeroId)) {
@@ -76,42 +74,38 @@ jobs:
 
           const sortedIds = [...equipableIds].sort((a, b) => Number(a) - Number(b));
           const frozenSha = crypto.createHash('sha256').update(JSON.stringify(sortedIds)).digest('hex');
-          if (sortedIds.length !== 678 || frozenSha !== expectedFrozenSha) {
-            throw new Error(`Cost-4K frozen set identity mismatch count=${sortedIds.length} sha=${frozenSha}`);
-          }
+          if (sortedIds.length !== 678 || frozenSha !== expectedFrozenSha) throw new Error(`Cost-4K frozen set identity mismatch count=${sortedIds.length} sha=${frozenSha}`);
 
           const skillIndex = JSON.parse(fs.readFileSync('data/index/skill.v1.json', 'utf8'));
           const entries = skillIndex?.index?.entries;
           if (!Array.isArray(entries)) throw new Error('skill index entries missing or malformed');
           const recordIndexById = new Map();
           for (const tuple of entries) {
-            if (!Array.isArray(tuple) || tuple.length < 2 || typeof tuple[0] !== 'string' || !Number.isInteger(tuple[1])) {
-              throw new Error('malformed skill index tuple');
-            }
+            if (!Array.isArray(tuple) || tuple.length < 2 || typeof tuple[0] !== 'string' || !Number.isInteger(tuple[1])) throw new Error('malformed skill index tuple');
             recordIndexById.set(tuple[0], tuple[1]);
           }
 
-          const sourcePath = `${process.env.RUNNER_TEMP}/configdata-hydrated/data/configdata/ConfigDataSkillInfo.json`;
-          const rows = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
+          const rows = JSON.parse(fs.readFileSync(`${process.env.RUNNER_TEMP}/configdata-hydrated/data/configdata/ConfigDataSkillInfo.json`, 'utf8'));
           if (!Array.isArray(rows)) throw new Error('ConfigDataSkillInfo root is not an array');
 
-          let present = 0;
-          let missing = 0;
+          let nullCount = 0;
+          let nonNullCount = 0;
           for (const id of sortedIds) {
             const recordIndex = recordIndexById.get(id);
             if (!Number.isInteger(recordIndex)) throw new Error(`equipable SkillID absent from lookup index: ${id}`);
             const row = rows[recordIndex];
             if (!row || typeof row !== 'object' || Array.isArray(row)) throw new Error(`malformed SkillInfo row for ${id}`);
             if (String(row.ID) !== id) throw new Error(`SkillInfo ID/index mismatch for ${id}`);
-            if (Object.prototype.hasOwnProperty.call(row, 'SkillCost')) present += 1;
-            else missing += 1;
+            if (!Object.prototype.hasOwnProperty.call(row, 'SkillCost')) throw new Error(`SkillCost missing for equipable SkillID ${id}`);
+            if (row.SkillCost === null) nullCount += 1;
+            else nonNullCount += 1;
           }
 
           console.log(JSON.stringify({
             equipableDistinctSkillIds: sortedIds.length,
             frozenSetSha256: frozenSha,
-            skillCostPresent: present,
-            skillCostMissing: missing
+            skillCostNull: nullCount,
+            skillCostNonNull: nonNullCount
           }));
           NODE
 
