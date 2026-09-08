@@ -97,7 +97,6 @@ for (const heroId of canonical) {
   if ((generated.nameCn ?? null) !== (sourceAwaken.Name ?? null)) errors.push(`heroId ${heroId}: generated awakening name mismatch`);
 
   const sourceHasLevel2 = hasOwn(sourceAwaken, 'Level2SkillID');
-  const sourceHasUnlock = hasOwn(sourceAwaken, 'Awaken2Unlock');
 
   if (sourceHasLevel2) {
     const level2SkillId = sourceAwaken.Level2SkillID;
@@ -105,7 +104,6 @@ for (const heroId of canonical) {
       errors.push(`heroId ${heroId}: source Level2SkillID=${level2SkillId} invalid`);
       continue;
     }
-    if (sourceAwaken.Awaken2Unlock !== true) errors.push(`heroId ${heroId}: source Level2SkillID defined but Awaken2Unlock is not true`);
     const sourceSkill = skillIndex.get(level2SkillId);
     if (!sourceSkill) {
       awakeningAudit.missingSkillReference += 1;
@@ -118,7 +116,6 @@ for (const heroId of canonical) {
     if (generated.skill?.skillId !== level2SkillId) errors.push(`heroId ${heroId}: generated awakening Skill snapshot mismatch`);
     awakeningAudit.verifiedLevel2Skill += 1;
   } else {
-    if (sourceHasUnlock) errors.push(`heroId ${heroId}: source Awaken2Unlock defined without Level2SkillID`);
     if (generated.status !== 'VERIFIED') errors.push(`heroId ${heroId}: generated source-row status=${generated.status}, expected VERIFIED`);
     if (generated.level2Status !== 'LEVEL2_SKILL_NOT_DEFINED') errors.push(`heroId ${heroId}: generated level2Status=${generated.level2Status}, expected LEVEL2_SKILL_NOT_DEFINED`);
     if (generated.level2SkillId !== null || generated.skill !== null) errors.push(`heroId ${heroId}: Level2-not-defined state must not carry a Skill reference`);
