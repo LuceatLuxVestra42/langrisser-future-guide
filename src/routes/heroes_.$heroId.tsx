@@ -11,11 +11,13 @@ import {
 
 import { HeroCentralDisciplineSection } from "@/components/hero-central-discipline-section";
 import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";
+import { HeroFinalJobStatsSection } from "@/components/hero-final-job-stats-section";
 import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
+import { getHeroFinalJobStatsPresentation } from "@/lib/hero-final-job-extrema.functions";
 import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
 import { getHeroSkinAcquisitionDisplayLabel } from "@/lib/hero-skin-acquisition-display";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
@@ -31,6 +33,7 @@ export const Route = createFileRoute("/heroes_/$heroId")({
     const data = await getHeroDetailRouteStage5Data({ data: { heroId } });
     if (!data) throw notFound();
     const exclusiveEquipment = await getHeroExclusiveEquipmentPresentation({ data: { heroId } });
+    const finalJobStats = await getHeroFinalJobStatsPresentation({ data: { heroId } });
     const fusionPowers = await getHeroFusionPowerIndex();
     if (
       fusionPowers.summary.factionAssets !== 12 ||
@@ -85,7 +88,7 @@ export const Route = createFileRoute("/heroes_/$heroId")({
     if (soldierCards.length !== data.detail.soldiers.count) {
       throw new Error(`Hero ${heroId} Soldier card count mismatch: ${soldierCards.length} != ${data.detail.soldiers.count}.`);
     }
-    return { ...data, exclusiveEquipment, factionMarks, soldierCards };
+    return { ...data, exclusiveEquipment, finalJobStats, factionMarks, soldierCards };
   },
   head: ({ loaderData }) => ({
     meta: [{
@@ -168,7 +171,7 @@ function stripConfigMarkup(value: string | null) {
 }
 
 function HeroDetailPage() {
-  const { hero, detail, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
+  const { hero, detail, exclusiveEquipment, finalJobStats, factionMarks, soldierCards } = Route.useLoaderData();
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const rarityIconPath = HERO_RARITY_ICON_PATH_BY_LABEL[hero.rarity.baseLabel] ?? null;
   const soldierDetailById = useMemo(
@@ -229,7 +232,6 @@ function HeroDetailPage() {
     if (visibleTalentProgression.length <= 1) return;
     setTalentIndex((current) => Math.min(Math.max(current + delta, 0), visibleTalentProgression.length - 1));
   };
-  const finalJobBranches = detail.jobs.branches.filter((branch) => branch.capstone?.rank === 4);
   const hasBondUnlockConditions = detail.bonds.rows.some((bond) => bond.completionConditions.some((condition) => !condition.favorability));
 
   return (
@@ -407,47 +409,7 @@ function HeroDetailPage() {
           </div>
         </section>
 
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <SectionTitle title="최종 직업 스탯" />
-          {finalJobBranches.length > 0 ? (
-            <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true">
-              <table className="w-full min-w-[680px] border-collapse text-sm">
-                <thead className="bg-muted/50">
-                  <tr className="border-b border-border">
-                    <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-muted-foreground">직업</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">생명</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">공격</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">지력</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">방어</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">마방</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">기술</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {finalJobBranches.map((branch) => {
-                    const capstone = branch.capstone;
-                    if (!capstone) return null;
-                    return (
-                      <tr key={branch.branchIndex} className="border-b border-border last:border-b-0">
-                        <th scope="row" className="px-4 py-3 text-left">
-                          <div className="font-bold text-foreground">{capstone.nameCn ?? `Job ${capstone.jobId ?? "?"}`}</div>
-                        </th>
-                        <JobStatCell value={capstone.finalStats.HP} />
-                        <JobStatCell value={capstone.finalStats.ATK} />
-                        <JobStatCell value={capstone.finalStats.INT} />
-                        <JobStatCell value={capstone.finalStats.DEF} />
-                        <JobStatCell value={capstone.finalStats.MDEF} />
-                        <JobStatCell value={capstone.finalStats.DEX} />
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 3단계 최종 직업 스탯이 없어.</p>
-          )}
-        </section>
+        <HeroFinalJobStatsSection data={finalJobStats} />
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle title="유대" />
