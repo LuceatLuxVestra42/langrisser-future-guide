@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "stage": "hero-stat-bar-s4-sp-presentation",
+  "status": "COMPLETE",
+  "completion": "S4_COMPLETE",
+  "predecessor": {
+    "stage": "hero-stat-bar-s3-ui",
+    "branch": "s3-hero-stat-bar-ui",
+    "commitSha": "dd6735b2b8c9adb786118a4adcfb245f0a7b9df8",
+    "presentationContract": "data/contracts/hero-stat-bar-presentation.v1.json"
+  },
+  "owner": "frontend/presentation",
+  "purpose": "Freeze and verify the temporary released-SP presentation behavior before a dedicated SP mode/toggle exists.",
+  "presentationPolicy": {
+    "normalCardsVisible": true,
+    "releasedSpCardsVisibleAlongsideNormal": true,
+    "spBadgeVisible": true,
+    "spToggleImplemented": false,
+    "futureHandoff": "When [SP로 전환] is implemented, move SP-specific job/stat/bar presentation into that SP presentation state without changing B3 semantic identity or extrema authority."
+  },
+  "fixtures": {
+    "b3CandidateCount": 533,
+    "releasedSpTier4CandidateCount": 25,
+    "leonHeroId": 6,
+    "leonRows": [
+      {"variant":"NORMAL","jobConnectionId":64,"jobId":307,"values":{"hp":3497,"at":599,"magic":224,"df":231,"magicDf":203,"dex":125}},
+      {"variant":"NORMAL","jobConnectionId":65,"jobId":306,"values":{"hp":3806,"at":569,"magic":224,"df":242,"magicDf":231,"dex":125}},
+      {"variant":"SP","jobConnectionId":66,"jobId":377,"values":{"hp":4041,"at":602,"magic":224,"df":260,"magicDf":231,"dex":125}}
+    ]
+  },
+  "semanticBoundary": {
+    "semanticMutation": false,
+    "spSemanticReclassification": false,
+    "tier4Recomputation": false,
+    "statFormulaRecomputation": false,
+    "extremaRecomputation": false,
+    "rawConfigDataRead": false,
+    "nameJoin": false,
+    "idArithmetic": false
+  },
+  "implementationChanges": {
+    "componentChangedInS4": false,
+    "reason": "S3 already renders the full B3 row set and visibly badges SP rows, so S4 required verification/freeze only."
+  },
+  "validation": {
+    "validator": "scripts/validate_hero_stat_bar_s4_sp_presentation.mjs",
+    "workflow": ".github/workflows/hero-stat-bar-s4-sp-presentation.yml",
+    "initialRunId": 34228228862,
+    "initialJobId": 102067546441,
+    "initialCandidateSha": "d54f4fce8a8d9a88c7da2f6cab189c8d3e4e2f61",
+    "validatorResult": "PASS",
+    "buildResult": "PASS",
+    "repositoryReadOnly": "PASS",
+    "workflowConclusion": "success"
+  },
+  "blockers": [],
+  "reviews": [],
+  "nextStage": "S5 numeric/domain parity validation and exact bar/value presentation fixtures"
+}
