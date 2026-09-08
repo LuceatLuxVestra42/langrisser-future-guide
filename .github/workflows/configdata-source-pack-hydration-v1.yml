@@ -40,7 +40,7 @@ jobs:
           node scripts/hydrate-configdata-source-pack-v1.mjs \
             --target-dir "$RUNNER_TEMP/configdata-hydrated"
 
-      - name: Count SkillCost value 1
+      - name: Count SkillCost value 2
         shell: bash
         run: |
           set -euo pipefail
@@ -55,7 +55,7 @@ jobs:
           }
 
           let present = 0;
-          let eq1 = 0;
+          let eq2 = 0;
 
           for (const row of root) {
             if (!row || typeof row !== 'object' || Array.isArray(row)) continue;
@@ -63,12 +63,12 @@ jobs:
 
             present += 1;
             if (typeof row.SkillCost !== 'number' || !Number.isFinite(row.SkillCost)) {
-              throw new Error('SkillCost non-finite/non-number encountered during Cost-3C');
+              throw new Error('SkillCost non-finite/non-number encountered during Cost-3D');
             }
-            if (row.SkillCost === 1) eq1 += 1;
+            if (row.SkillCost === 2) eq2 += 1;
           }
 
-          console.log(JSON.stringify({ total: root.length, present, eq1 }));
+          console.log(JSON.stringify({ total: root.length, present, eq2 }));
           NODE
 
       - name: Verify hydrated shape and repository non-mutation
