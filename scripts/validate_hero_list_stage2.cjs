@@ -77,13 +77,12 @@ check(
 );
 
 check(
-  'server-consumes-stage1-only',
+  'server-frozen-list-boundary',
   server.includes('../../data/generated/hero-list-stage1.v1.json') &&
     !server.includes('data/configdata/') &&
     !server.includes('ConfigDataHero') &&
-    !server.includes('ConfigDataJob') &&
-    !server.includes('hero-detail.v1.json'),
-  'frozen list import present; raw/producer imports absent',
+    !server.includes('ConfigDataJob'),
+  'frozen Stage 1 list remains the Stage 2 list source; raw ConfigData imports are absent',
 );
 
 check(
@@ -93,18 +92,11 @@ check(
 );
 
 check(
-  'heroes-route',
+  'heroes-route-basic-grid',
   route.includes('createFileRoute("/heroes")') &&
-    route.includes('getHeroListStage2Data') &&
-    route.includes('data.records.map') &&
-    !route.includes('/heroes/$heroId'),
-  'basic /heroes grid exists without premature detail route activation',
-);
-
-check(
-  'no-premature-web-artwork-inference',
-  route.includes('UserRound') && !route.includes('sourceArtworkPath') && !route.includes('webAssetPath'),
-  'placeholder is used until web asset resolution stage',
+    route.includes('HeroGridPage') &&
+    route.includes('data.records'),
+  'the /heroes route retains the Stage 2 basic grid foundation while later presentation stages may layer on top',
 );
 
 check(

@@ -213,18 +213,18 @@ check(
 );
 
 const rarityPanelIndex = route.indexOf('aria-label="희귀도 필터"');
-const spButtonIndex = route.indexOf('SP <span');
+const spIconIndex = route.indexOf('src={resolvePublicAssetUrl(SP_ICON_PATH)}');
 const factionPanelIndex = route.indexOf('{openFilterSections.faction ? (');
 check(
   'sp-filter-ui',
   route.includes('aria-pressed={spOnly}') &&
     route.includes('spOnly && !hero.hasSp') &&
+    route.includes('const SP_ICON_PATH = "/images/heroes/rarity/SP.png"') &&
     !route.includes('Sparkles') &&
-    !route.includes('SP만') &&
     rarityPanelIndex >= 0 &&
-    spButtonIndex > rarityPanelIndex &&
-    factionPanelIndex > spButtonIndex,
-  'SP toggle remains combinable, uses the SP label without an icon, and stays inside the rarity filter section',
+    spIconIndex > rarityPanelIndex &&
+    factionPanelIndex > spIconIndex,
+  'SP toggle remains combinable, uses the frozen SP presentation icon, and stays inside the rarity filter section',
 );
 
 const integratedFilterIndex = route.indexOf('통합 필터');

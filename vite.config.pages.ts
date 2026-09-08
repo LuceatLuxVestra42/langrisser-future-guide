@@ -17,6 +17,7 @@ const heroIds = heroListJson.records.map((record) => record.heroId);
 const soldierIds = soldierListJson.records.map((record) => record.soldierId);
 const staticBase = process.env.STATIC_SITE_BASE ?? "/langrisser-future-guide/";
 const siteSourceSha = process.env.GITHUB_SHA?.trim() ?? "";
+const siteDeploymentMode = process.env.SITE_DEPLOYMENT_MODE?.trim() === "preview" ? "preview" : "authoritative";
 
 if (!staticBase.startsWith("/") || !staticBase.endsWith("/") || staticBase.includes("//")) {
   throw new Error(`STATIC_SITE_BASE must start and end with / and contain no //; got ${staticBase}`);
@@ -72,6 +73,7 @@ export default defineConfig({
     base: staticBase,
     define: {
       "import.meta.env.VITE_SITE_SOURCE_SHA": JSON.stringify(siteSourceSha),
+      "import.meta.env.VITE_SITE_DEPLOYMENT_MODE": JSON.stringify(siteDeploymentMode),
     },
   },
   nitro: false,

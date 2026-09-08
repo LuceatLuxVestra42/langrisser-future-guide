@@ -82,6 +82,8 @@ jobs:
   validate-hero-stage4:
     needs: validate-hero-stage3
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

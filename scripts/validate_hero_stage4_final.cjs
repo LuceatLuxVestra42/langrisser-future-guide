@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { loadArray } = require('./lib/configdata-direct.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const P = (...parts) => path.join(ROOT, ...parts);
@@ -32,10 +33,22 @@ const boundary = read(BOUNDARY);
 const upstream = read(UPSTREAM);
 const errors = [];
 
+const skillRows = loadArray('ConfigDataSkillInfo');
+const skillCostById = new Map();
+for (const row of skillRows) {
+  if (!Number.isInteger(row?.ID)) continue;
+  if (skillCostById.has(row.ID)) {
+    errors.push(`SkillInfo duplicate ID=${row.ID}`);
+    continue;
+  }
+  skillCostById.set(row.ID, row.SkillCost);
+}
+
 const canonical = set((master.records || []).map((x) => x.heroId));
 const combatIds = set((combat.records || []).map((x) => x.heroId));
 const treeByHero = new Map((tree.records || []).map((x) => [x.heroId, x]));
 const skillIds = set((skills.records || []).map((x) => x.heroId));
+const equipableSkillIds = new Set();
 
 if (upstream.status !== 'PASS') errors.push(`upstream direct regression status=${upstream.status}`);
 if ((upstream.errors || []).length) errors.push(`upstream direct regression errors=${upstream.errors.length}`);
@@ -60,6 +73,30 @@ for (const hero of combat.records || []) {
     const item = hero.talent.starProgression[i];
     if (item.star !== i + 1 || !Number.isInteger(item.skillId)) errors.push(`heroId ${hero.heroId}: invalid talent star slot ${i + 1}`);
   }
+  for (const acquisition of hero.skills?.jobLevelAcquisitions || []) {
+    const skillId = acquisition?.skillId;
+    if (!Number.isInteger(skillId) || skillId <= 0) {
+      errors.push(`heroId ${hero.heroId}: invalid equipable acquisition skillId=${String(skillId)}`);
+      continue;
+    }
+    equipableSkillIds.add(skillId);
+    const sourceCost = skillCostById.get(skillId);
+    if (!Number.isInteger(sourceCost)) {
+      errors.push(`heroId ${hero.heroId}: SkillInfo ${skillId} SkillCost is not an integer (${String(sourceCost)})`);
+      continue;
+    }
+    if (sourceCost !== 1 && sourceCost !== 2) {
+      errors.push(`heroId ${hero.heroId}: SkillInfo ${skillId} SkillCost=${sourceCost} outside frozen equipable domain {1,2}`);
+      continue;
+    }
+    if (acquisition?.skill?.skillId !== skillId) {
+      errors.push(`heroId ${hero.heroId}: acquisition ${skillId} resolved skillId=${String(acquisition?.skill?.skillId)}`);
+      continue;
+    }
+    if (acquisition.skill.cost !== sourceCost) {
+      errors.push(`heroId ${hero.heroId}: skill ${skillId} cost=${String(acquisition.skill.cost)} source=${sourceCost}`);
+    }
+  }
   const sm = hero.soldierModifiers;
   if (sm?.status !== 'VERIFIED' || !['hp','at','df','magicDf'].every((k) => Number.isFinite(sm[k]) && Number.isInteger(sm.raw?.[k]) && sm.raw[k] / 100 === sm[k])) {
     errors.push(`heroId ${hero.heroId}: soldierModifiers invalid`);
@@ -79,12 +116,24 @@ for (const hero of combat.records || []) {
   if (forbidden(hero).length) errors.push(`heroId ${hero.heroId}: forbidden Hero-Soldier membership field present`);
 }
 
+if (equipableSkillIds.size !== 678) errors.push(`equipable distinct SkillID count=${equipableSkillIds.size}, expected 678`);
+let skillCost1 = 0;
+let skillCost2 = 0;
+for (const skillId of equipableSkillIds) {
+  const cost = skillCostById.get(skillId);
+  if (cost === 1) skillCost1 += 1;
+  else if (cost === 2) skillCost2 += 1;
+}
+if (skillCost1 !== 254 || skillCost2 !== 424) {
+  errors.push(`equipable SkillCost distribution 1=${skillCost1} 2=${skillCost2}, expected 254/424`);
+}
+
 const gates = new Map((summary.semanticGates || []).map((g) => [g.id, g.status]));
-for (const id of ['awakeningClassification','displayJobStats','heroSoldierModifiers','talentStarProgression']) if (gates.get(id) !== 'VERIFIED') errors.push(`semantic gate ${id}=${gates.get(id)}`);
+for (const id of ['awakeningClassification','displayJobStats','heroSoldierModifiers','talentStarProgression','equipableSkillCost']) if (gates.get(id) !== 'VERIFIED') errors.push(`semantic gate ${id}=${gates.get(id)}`);
 if (gates.get('talentIdentity') !== 'VERIFIED_REFERENCE_SET') errors.push(`semantic gate talentIdentity=${gates.get('talentIdentity')}`);
 
 console.log(`HERO STAGE 4 FINAL VALIDATION: ${errors.length ? 'FAIL' : 'PASS'}`);
-console.log(`heroes=${combat.records?.length || 0} upstream=${upstream.status} errors=${errors.length}`);
+console.log(`heroes=${combat.records?.length || 0} upstream=${upstream.status} equipableSkills=${equipableSkillIds.size} cost1=${skillCost1} cost2=${skillCost2} errors=${errors.length}`);
 if (errors.length) {
   for (const error of errors.slice(0, 100)) console.log(`- FAIL: ${error}`);
   process.exitCode = 1;

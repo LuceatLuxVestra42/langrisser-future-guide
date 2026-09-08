@@ -86,6 +86,7 @@ jobs:
       PREVIEW_PATH: pr-${{ github.event.pull_request.number }}
       PREVIEW_BASE_URL: https://luceatluxvestra42.github.io/Data/pr-${{ github.event.pull_request.number }}/
       STATIC_SITE_BASE: /Data/pr-${{ github.event.pull_request.number }}/
+      SITE_DEPLOYMENT_MODE: preview
       SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
     steps:
       - name: Checkout exact PR head

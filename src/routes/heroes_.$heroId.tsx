@@ -499,7 +499,7 @@ function HeroDetailPage() {
   );
 }
 
-type SkillView = { skillId: number; nameCn: string | null; desc: string | null; iconPath: string | null; displayType: string | null; cooldown: string | null; range: string | null; areaOrTarget: string | null };
+type SkillView = { skillId: number; nameCn: string | null; desc: string | null; iconPath: string | null; displayType: string | null; cooldown: string | null; range: string | null; areaOrTarget: string | null; cost?: number | null };
 type HeroSoldierCardView = { soldierId: number; nameKr: string | null; nameCn: string; nameKrStatus: string; tier: number; armyType: string; isSp: boolean };
 
 const SOLDIER_ARMY_LABELS: Record<string, string> = {
@@ -606,6 +606,7 @@ function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView; source
             <span className="rounded bg-zinc-800 px-2 py-1">쿨 {skill.cooldown}</span>
             <span className="rounded bg-zinc-800 px-2 py-1">사거리 {skill.range}</span>
             <span className="rounded bg-zinc-800 px-2 py-1">범위 {skill.areaOrTarget}</span>
+            {heroId === 6 && Number.isInteger(skill.cost) ? <span className="rounded bg-zinc-800 px-2 py-1">{skill.cost}코스트</span> : null}
           </div>
           <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.desc)}</p>
         </div>
