@@ -32,27 +32,23 @@ jobs:
         with:
           node-version: 22
 
-      - name: Count Cost-4F distinct gotSkillId values
+      - name: Count Cost-4G duplicate gotSkillId references
         shell: bash
         run: |
           set -euo pipefail
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
 
-          const manifestPath = 'data/generated/hero-detail.v1.json';
-          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+          const manifest = JSON.parse(fs.readFileSync('data/generated/hero-detail.v1.json', 'utf8'));
           const byHeroId = manifest?.storage?.byHeroId;
-
           if (!byHeroId || typeof byHeroId !== 'object' || Array.isArray(byHeroId)) {
             throw new Error('hero-detail manifest storage.byHeroId is missing or malformed');
           }
 
-          const entries = Object.entries(byHeroId);
-          let jobLevelRows = 0;
           let skillRefs = 0;
-          const distinctSkillIds = new Set();
+          const counts = new Map();
 
-          for (const [heroId, meta] of entries) {
+          for (const [heroId, meta] of Object.entries(byHeroId)) {
             if (!meta || typeof meta.path !== 'string') {
               throw new Error(`missing shard path for hero ${heroId}`);
             }
@@ -69,23 +65,27 @@ jobs:
                 throw new Error(`levels missing for hero ${heroId}`);
               }
               for (const level of connection.levels) {
-                jobLevelRows += 1;
-                if (level?.gotSkillId !== null && level?.gotSkillId !== undefined) {
-                  if (typeof level.gotSkillId !== 'number' || !Number.isFinite(level.gotSkillId)) {
-                    throw new Error(`non-numeric gotSkillId for hero ${heroId}`);
-                  }
-                  skillRefs += 1;
-                  distinctSkillIds.add(level.gotSkillId);
+                const id = level?.gotSkillId;
+                if (id === null || id === undefined) continue;
+                if (typeof id !== 'number' || !Number.isFinite(id)) {
+                  throw new Error(`non-numeric gotSkillId for hero ${heroId}`);
                 }
+                skillRefs += 1;
+                counts.set(id, (counts.get(id) ?? 0) + 1);
               }
             }
           }
 
+          const duplicateIds = [...counts.entries()].filter(([, count]) => count > 1);
+          const duplicateReferenceOccurrences = duplicateIds.reduce((sum, [, count]) => sum + (count - 1), 0);
+          const maxReferenceCount = duplicateIds.length ? Math.max(...duplicateIds.map(([, count]) => count)) : 1;
+
           console.log(JSON.stringify({
-            heroShards: entries.length,
-            jobLevelRows,
             skillRefs,
-            distinctSkillIds: distinctSkillIds.size
+            distinctSkillIds: counts.size,
+            duplicatedSkillIds: duplicateIds.length,
+            duplicateReferenceOccurrences,
+            maxReferenceCount
           }));
           NODE
 
