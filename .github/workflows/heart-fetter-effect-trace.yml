@@ -16,8 +16,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Hydrate pinned ConfigData source pack
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/hydrate-configdata-source-pack-v1.mjs \
+            --target-dir "$RUNNER_TEMP/configdata-hydrated"
+
       - name: Trace Heart Fetter SkillInfo records
-        run: node scripts/trace_hero_heart_fetter_skillinfo.mjs
+        run: |
+          node scripts/trace_hero_heart_fetter_skillinfo.mjs \
+            --source-root "$RUNNER_TEMP/configdata-hydrated"
 
       - name: Upload trace artifact
         uses: actions/upload-artifact@v4
