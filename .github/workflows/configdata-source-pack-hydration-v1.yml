@@ -40,7 +40,7 @@ jobs:
           node scripts/hydrate-configdata-source-pack-v1.mjs \
             --target-dir "$RUNNER_TEMP/configdata-hydrated"
 
-      - name: Census SkillInfo ID types
+      - name: Census SkillInfo SkillCost key presence
         shell: bash
         run: |
           set -euo pipefail
@@ -54,24 +54,20 @@ jobs:
             throw new Error('ConfigDataSkillInfo root is not an array');
           }
 
-          const out = {
-            total: root.length,
-            number: 0,
-            string: 0,
-            null: 0,
-            other: 0,
-          };
+          let present = 0;
+          let missing = 0;
 
           for (const row of root) {
-            const value = row?.ID;
-            if (value === null) out.null += 1;
-            else if (typeof value === 'number') out.number += 1;
-            else if (typeof value === 'string') out.string += 1;
-            else out.other += 1;
+            if (row && typeof row === 'object' && !Array.isArray(row) && Object.prototype.hasOwnProperty.call(row, 'SkillCost')) {
+              present += 1;
+            } else {
+              missing += 1;
+            }
           }
 
-          if (out.total !== out.number + out.string + out.null + out.other) {
-            throw new Error('ID type census total mismatch');
+          const out = { total: root.length, present, missing };
+          if (out.total !== out.present + out.missing) {
+            throw new Error('SkillCost key presence census total mismatch');
           }
 
           console.log(JSON.stringify(out));
