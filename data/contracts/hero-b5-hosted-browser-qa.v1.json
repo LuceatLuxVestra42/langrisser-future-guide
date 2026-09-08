@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "stage": "hero-b5-hosted-browser-qa",
+  "status": "READY",
+  "purpose": "Validate the B4 Hero final-job stats presentation on the actual GitHub Pages deployment without reopening B1/B2/B3 semantic authority.",
+  "predecessor": {
+    "stage": "hero-b4-final-job-stats-ui",
+    "status": "COMPLETE",
+    "commitSha": "48678e8198387ffc31fe0ffdd36ce1e47c623857",
+    "b3Consumer": "data/generated/hero-final-job-extrema.v1.json"
+  },
+  "gates": {
+    "preflight": "REUSE_B4_PASS",
+    "build": "REUSE_B4_PASS",
+    "hosted": {
+      "owner": "tools/route-hosted-qa/contracts/hosted.v1.json",
+      "mode": "STRICT_CANDIDATE",
+      "required": true
+    },
+    "browserUi": {
+      "required": true,
+      "fixtureHeroId": 6,
+      "directEntry": "/heroes/6/",
+      "refreshEquivalent": true,
+      "viewports": ["desktop-1440x1000", "mobile-390x844"],
+      "expectedCandidateRows": 3,
+      "expectedRows": [
+        { "variant": "NORMAL", "jobConnectionId": 64, "jobId": 307 },
+        { "variant": "NORMAL", "jobConnectionId": 65, "jobId": 306 },
+        { "variant": "SP", "jobConnectionId": 66, "jobId": 377 }
+      ],
+      "unknownHeroStatus": 404,
+      "pageErrorAllowed": false,
+      "consoleErrorAllowed": false
+    }
+  },
+  "boundaries": {
+    "b1Recompute": false,
+    "b2Recompute": false,
+    "b3Recompute": false,
+    "tier4Reclassification": false,
+    "rawConfigData": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "semanticReopenOnHostedFailure": false
+  },
+  "completion": {
+    "requiredHostedStatus": "PASS_ROUTE_HOSTED_QA_STRICT_CANDIDATE",
+    "requiredBrowserStatus": "PASS_BROWSER_UI",
+    "blockersMustBeEmpty": true
+  }
+}
