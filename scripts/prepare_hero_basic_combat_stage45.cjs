@@ -60,6 +60,45 @@ function skillSnapshot(row) {
   };
 }
 
+function jobLevelAcquisitionsWithCost(skillHero, skillIndex, heroId, errors) {
+  return (skillHero.jobLevelAcquisitions || []).map((event) => {
+    const skillId = event?.skillId;
+    if (!Number.isInteger(skillId) || skillId <= 0) {
+      errors.push(`heroId ${heroId}: invalid job-level acquisition skillId=${String(skillId)}`);
+      return event;
+    }
+    const sourceSkill = skillIndex.get(skillId);
+    if (!sourceSkill) {
+      errors.push(`heroId ${heroId}: job-level acquisition skill ${skillId} missing from SkillInfo`);
+      return event;
+    }
+    const cost = sourceSkill.SkillCost;
+    if (!Number.isInteger(cost)) {
+      errors.push(`heroId ${heroId}: SkillInfo ${skillId} SkillCost is not an integer (${String(cost)})`);
+      return event;
+    }
+    if (cost !== 1 && cost !== 2) {
+      errors.push(`heroId ${heroId}: SkillInfo ${skillId} SkillCost=${cost} outside frozen equipable domain {1,2}`);
+      return event;
+    }
+    if (!event.skill || typeof event.skill !== 'object' || Array.isArray(event.skill)) {
+      errors.push(`heroId ${heroId}: job-level acquisition skill ${skillId} missing resolved skill payload`);
+      return event;
+    }
+    if (event.skill.skillId !== skillId) {
+      errors.push(`heroId ${heroId}: acquisition skillId ${skillId} disagrees with resolved skill.skillId=${String(event.skill.skillId)}`);
+      return event;
+    }
+    return {
+      ...event,
+      skill: {
+        ...event.skill,
+        cost,
+      },
+    };
+  });
+}
+
 function masteryRewards(job) {
   const out = [];
   for (let i = 1; i <= 3; i += 1) {
@@ -292,7 +331,7 @@ function main() {
         connections,
       },
       skills: {
-        jobLevelAcquisitions: skillHero.jobLevelAcquisitions || [],
+        jobLevelAcquisitions: jobLevelAcquisitionsWithCost(skillHero, skillIndex, treeHero.heroId, errors),
         heroDirectSkillIds: skillHero.heroDirectSkillIds || [],
         heroDirectSkills: skillHero.heroDirectSkills || [],
         hiddenSkillIds: skillHero.hiddenSkillIds || [],
@@ -322,7 +361,7 @@ function main() {
 
   const semanticGates = (contract.semanticGates || []).map((gate) => ({
     ...gate,
-    status: ['displayJobStats', 'heroSoldierModifiers', 'talentStarProgression'].includes(gate.id) ? 'VERIFIED' : gate.status,
+    status: ['displayJobStats', 'heroSoldierModifiers', 'talentStarProgression', 'equipableSkillCost'].includes(gate.id) ? 'VERIFIED' : gate.status,
   }));
   const summary = {
     version: 3,
@@ -345,10 +384,12 @@ function main() {
       displayJobStats: 'round((INI + UP * 69 / 10) * (1 + HeroInfo.StatStar[5] / 10000)) + global JobInfo mastery flat; bond effects excluded until Stage 5',
       heroSoldierModifiers: 'HeroInfo.HPCmd_INI/ATCmd_INI/DFCmd_INI/MagicDFCmd_INI divided by 100',
       talentStarProgression: 'JobConnectionInfo.TalentSkill_IDs[star - 1] for star 1..6',
+      equipableSkillCost: 'ConfigDataSkillInfo.SkillCost projected by exact skillId onto Stage 4-4 jobLevelAcquisitions[].skill.cost only',
     },
     verifiedComponents: [
       'Stage 4-3 normal job topology for canonical 267 heroes',
       'Stage 4-4 normal skill acquisition/reference data for canonical 267 heroes',
+      'Equipable job-level skill cost from ConfigDataSkillInfo.SkillCost by exact SkillID',
       'HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID',
       'displayJobStats at Lv70 / 6-star for every normal JobConnection',
       'Hero-owned soldier modifier percentages from Cmd fields',
