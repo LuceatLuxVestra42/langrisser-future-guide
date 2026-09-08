@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "stage": "hero-b5-hosted-browser-qa",
+  "status": "COMPLETE",
+  "completion": "B5_COMPLETE",
+  "predecessor": {
+    "stage": "hero-b4-final-job-stats-ui",
+    "status": "COMPLETE",
+    "commitSha": "48678e8198387ffc31fe0ffdd36ce1e47c623857",
+    "checkpoint": "data/checkpoints/hero-b4-final-job-stats-ui.v1.json"
+  },
+  "validatedCandidate": {
+    "branch": "b5-hosted-browser-qa",
+    "validationCommitSha": "d698b41d01391ab220c78ccf305599b95cf3b7c9",
+    "contract": "data/contracts/hero-b5-hosted-browser-qa.v1.json",
+    "workflow": ".github/workflows/hero-b5-hosted-browser-qa.yml",
+    "browserValidator": "scripts/validate_hero_b5_browser_ui.mjs"
+  },
+  "gates": {
+    "preflight": {
+      "status": "PASS",
+      "source": "REUSED_B4_COMPLETE"
+    },
+    "build": {
+      "status": "PASS",
+      "source": "B4_REUSED_AND_B5_PAGES_BUILD"
+    },
+    "hostedDeployment": {
+      "status": "PASS",
+      "mode": "STRICT_CANDIDATE"
+    },
+    "browserUi": {
+      "status": "PASS",
+      "fixtureHeroId": 6,
+      "viewports": [
+        "desktop-1440x1000",
+        "mobile-390x844"
+      ],
+      "candidateRows": 3,
+      "sourceStage": "hero-b3-final-job-extrema-consumer",
+      "requiredRank": 4,
+      "directEntry": true,
+      "refresh": true
+    },
+    "readOnly": {
+      "status": "PASS"
+    }
+  },
+  "executionEvidence": {
+    "runId": 34223834978,
+    "jobId": 102053030198,
+    "conclusion": "success",
+    "validatedAtCommitSha": "d698b41d01391ab220c78ccf305599b95cf3b7c9"
+  },
+  "semanticBoundary": {
+    "recomputed": false,
+    "b1": false,
+    "b2": false,
+    "b3": false,
+    "tier4Reclassification": false
+  },
+  "blockers": [],
+  "knownExistingDrift": [
+    {
+      "classification": "REVIEW",
+      "owner": "hero skill icon asset/resolver",
+      "paths": [
+        "/langrisser-future-guide/images/icon/skill/10301.png",
+        "/langrisser-future-guide/images/icon/skill/10302.png",
+        "/langrisser-future-guide/images/icon/skill/10324.png"
+      ],
+      "impact": "Outside the B4/B5 final-job stats owner. These exact image paths are admissible only when observed as the pre-existing 404 drift defined by the B5 contract.",
+      "blocking": false
+    }
+  ],
+  "resolvedValidatorDrift": [
+    {
+      "type": "HOSTED_PROPAGATION_RACE",
+      "resolution": "Bounded retry only while the hosted manifest source SHA is stale; all other hosted failures remain fail-fast."
+    },
+    {
+      "type": "B4_VISIBLE_TEXT_MARKER",
+      "authoritativeValue": "Lv.70 · 6성 · MAX 유대"
+    }
+  ],
+  "reopenConditions": [
+    "B4 Hero final-job stats presentation changes",
+    "B3 final-job consumer or schema changes",
+    "actual hosted source SHA mismatch after the bounded propagation window",
+    "browser structural or value mismatch",
+    "new page, HTTP, request, or console failures outside explicitly admitted existing drift"
+  ],
+  "nonReopenConditions": [
+    "known skill-icon existing drift alone",
+    "localization, asset, or hosting review outside the B4 final-job stats owner",
+    "confidence-only review"
+  ],
+  "handoff": {
+    "nextOwner": null,
+    "nextStart": "B-series final-job bonded extrema and Hero-detail presentation scope is closed. Handle the known skill-icon drift separately under its asset/resolver owner if needed."
+  }
+}
