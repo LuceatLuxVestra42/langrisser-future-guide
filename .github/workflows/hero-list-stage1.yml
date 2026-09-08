@@ -101,3 +101,5 @@ jobs:
       - name: Enforce Hero list Stage 1 gate
         if: always() && steps.finalize.outcome != 'success'
         run: exit 1
+
+# refresh-trigger: hero-direct-skill-cost-stage1
