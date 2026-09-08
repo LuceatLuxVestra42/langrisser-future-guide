@@ -1,55 +1,32 @@
 name: Heart Fetter effect trace
-
 on:
   push:
-    branches:
-      - heart-fetter-effect-trace
+    branches: [heart-fetter-effect-trace]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
   trace:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Hydrate pinned ConfigData source pack
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          node scripts/hydrate-configdata-source-pack-v1.mjs \
-            --target-dir "$RUNNER_TEMP/configdata-hydrated"
-
+        run: node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$RUNNER_TEMP/configdata-hydrated"
       - name: Trace Heart Fetter SkillInfo records
-        run: |
-          node scripts/trace_hero_heart_fetter_skillinfo.mjs \
-            --source-root "$RUNNER_TEMP/configdata-hydrated"
-
+        run: node scripts/trace_hero_heart_fetter_skillinfo.mjs --source-root "$RUNNER_TEMP/configdata-hydrated"
       - name: Trace Heart Fetter passive records
-        run: |
-          node scripts/trace_hero_heart_fetter_passives.mjs \
-            --source-root "$RUNNER_TEMP/configdata-hydrated"
-
+        run: node scripts/trace_hero_heart_fetter_passives.mjs --source-root "$RUNNER_TEMP/configdata-hydrated"
       - name: Trace Heart Fetter property definitions
-        run: |
-          node scripts/trace_hero_heart_fetter_properties.mjs \
-            --source-root "$RUNNER_TEMP/configdata-hydrated"
-
+        run: node scripts/trace_hero_heart_fetter_properties.mjs --source-root "$RUNNER_TEMP/configdata-hydrated"
       - name: Trace Heart Fetter population stat effects
-        run: |
-          node scripts/trace_heart_fetter_population_stats.mjs \
-            --source-root "$RUNNER_TEMP/configdata-hydrated"
-
+        run: node scripts/trace_heart_fetter_population_stats.mjs --source-root "$RUNNER_TEMP/configdata-hydrated"
       - name: Trace Heart Fetter reverse references
-        run: |
-          node scripts/trace_heart_fetter_reverse_refs.mjs \
-            --source-root "$RUNNER_TEMP/configdata-hydrated"
-
-      - name: Upload trace artifacts
-        uses: actions/upload-artifact@v4
+        run: node scripts/trace_heart_fetter_reverse_refs.mjs --source-root "$RUNNER_TEMP/configdata-hydrated"
+      - name: Trace explicit Heart Fetter hero records
+        run: node scripts/trace_heart_fetter_hero_record.mjs --source-root "$RUNNER_TEMP/configdata-hydrated"
+      - uses: actions/upload-artifact@v4
         with:
           name: heart-fetter-effect-trace
           path: |
@@ -58,10 +35,9 @@ jobs:
             heart-fetter-property-trace.json
             heart-fetter-population-stats-trace.json
             heart-fetter-reverse-ref-trace.json
-
+            heart-fetter-hero-record-trace.json
       - name: Clean trace output
-        run: rm heart-fetter-skillinfo-trace.json heart-fetter-passive-trace.json heart-fetter-property-trace.json heart-fetter-population-stats-trace.json heart-fetter-reverse-ref-trace.json
-
+        run: rm heart-fetter-*-trace.json
       - name: Assert repository read-only
         run: |
           git update-index -q --refresh
