@@ -60,6 +60,10 @@ function navigateToDeployedVersion(deployedSourceSha: string) {
 function SiteVersionGuard() {
   useEffect(() => {
     const currentSourceSha = import.meta.env["VITE_SITE_SOURCE_SHA"]?.trim() ?? "";
+    const deploymentMode =
+      import.meta.env["VITE_SITE_DEPLOYMENT_MODE"]?.trim() === "preview"
+        ? "preview"
+        : "authoritative";
 
     if (!SOURCE_SHA_PATTERN.test(currentSourceSha)) {
       publishSiteVersionState("unversioned", currentSourceSha);
@@ -72,8 +76,12 @@ function SiteVersionGuard() {
       try {
         const base = import.meta.env.BASE_URL || "/";
         const normalizedBase = base.endsWith("/") ? base : `${base}/`;
+        const manifestName =
+          deploymentMode === "preview"
+            ? "preview-source.json"
+            : "authoritative-pages-source.json";
         const manifestUrl = new URL(
-          `${normalizedBase}authoritative-pages-source.json`,
+          `${normalizedBase}${manifestName}`,
           window.location.origin,
         );
         manifestUrl.searchParams.set("site_version_check", String(Date.now()));
@@ -89,12 +97,15 @@ function SiteVersionGuard() {
         const manifest = (await response.json()) as PagesSourceManifest;
         const deployedSourceSha =
           typeof manifest.sourceSha === "string" ? manifest.sourceSha.trim() : "";
+        const validDeploymentIdentity =
+          deploymentMode === "preview"
+            ? manifest.status === "PR_PREVIEW_DEPLOYMENT" &&
+              SOURCE_SHA_PATTERN.test(deployedSourceSha)
+            : manifest.status === "AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT" &&
+              manifest.sourceRef === "main" &&
+              SOURCE_SHA_PATTERN.test(deployedSourceSha);
 
-        if (
-          manifest.status !== "AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT" ||
-          manifest.sourceRef !== "main" ||
-          !SOURCE_SHA_PATTERN.test(deployedSourceSha)
-        ) {
+        if (!validDeploymentIdentity) {
           throw new Error("Site version manifest has an invalid deployment identity");
         }
         if (cancelled) return;
