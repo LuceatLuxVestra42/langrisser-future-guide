@@ -19,6 +19,15 @@ jobs:
       - name: Trace Heart Fetter SkillInfo records
         run: node scripts/trace_hero_heart_fetter_skillinfo.mjs
 
+      - name: Upload trace artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: heart-fetter-skillinfo-trace
+          path: heart-fetter-skillinfo-trace.json
+
+      - name: Clean trace output
+        run: rm heart-fetter-skillinfo-trace.json
+
       - name: Assert repository read-only
         run: |
           git update-index -q --refresh
