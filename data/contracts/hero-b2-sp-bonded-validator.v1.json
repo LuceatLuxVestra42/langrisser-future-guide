@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "stage": "hero-b2-sp-bonded-validator",
+  "status": "READY",
+  "purpose": "Independently validate every materialized RELEASED SP bonded Hero-body vector without importing or invoking B2-5 producer arithmetic.",
+  "authoritativePredecessor": {
+    "b2_5Checkpoint": "data/checkpoints/hero-b2-5-sp-bonded-producer.v1.json",
+    "b2_5Commit": "a193d15503296488ff9b512a015a89400f96311f",
+    "b1Commit": "59d6098e9dfd1e826640ca670d097e7418ed810e",
+    "spSource": "data/generated/hero-page-stage5-4-sp.v1.json",
+    "heroManifest": "data/generated/hero-detail.v1.json"
+  },
+  "scope": {
+    "canonicalHeroCount": 267,
+    "spReleasedCount": 25,
+    "spNotReleasedCount": 242,
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"]
+  },
+  "independence": {
+    "forbiddenImports": ["scripts/run_hero_b2_sp_bonded_consumer.cjs"],
+    "producerFunctionReuse": false,
+    "producerOutputAsExpectedValueSource": false,
+    "allowedSharedAuthority": [
+      "B2-5 input contract",
+      "Stage5-4 SP source",
+      "pinned ConfigData source-pack resolver",
+      "B1/Stage4 frozen mastery semantics"
+    ]
+  },
+  "requiredChecks": [
+    "canonical Hero count = 267",
+    "RELEASED SP count = 25",
+    "NOT_RELEASED SP count = 242",
+    "spBondedStats present on 25/25 RELEASED only",
+    "explicit SP JobConnection and Job relation parity",
+    "explicit SP final JobLevel input resolves with no missing stat inputs",
+    "six-entry SP star arrays resolve for all six Hero-body stats",
+    "Stage4 Hero-global mastery totals resolve for all six stats",
+    "all referenced reshape PropertyModify IDs resolve through fixed numeric contract mapping",
+    "all 25 bonded vectors independently recompute exactly",
+    "B1 predecessor normal/normalBondedStats/sp semantic payloads match current shards",
+    "Leon numeric regression fixture exact match",
+    "Matthew reshape structural fixture exact match",
+    "all six reshape PropertyModify IDs 99..104 are represented by the RELEASED population",
+    "validator leaves tracked repository files unchanged"
+  ],
+  "fixtures": {
+    "leon": {
+      "heroId": 6,
+      "jobConnectionId": 66,
+      "jobId": 377,
+      "finalJobLevelId": 661,
+      "reshapeBuffId": 8570110,
+      "values": {"hp": 4041, "at": 602, "magic": 224, "df": 260, "magicDf": 231, "dex": 125}
+    },
+    "matthew": {
+      "heroId": 1,
+      "jobConnectionId": 22,
+      "jobId": 262,
+      "reshapeBuffId": 8670110,
+      "reshapeProperties": [
+        {"propertyId": 103, "value": 500},
+        {"propertyId": 101, "value": 500}
+      ]
+    }
+  },
+  "completion": {
+    "passRequires": {
+      "formulaMismatchCount": 0,
+      "relationErrorCount": 0,
+      "inputErrorCount": 0,
+      "reshapeErrorCount": 0,
+      "predecessorMutationCount": 0,
+      "notReleasedPollution": 0,
+      "fixtureFailureCount": 0,
+      "hardErrorCount": 0
+    },
+    "nextStage": "B2-7 freeze/checkpoint"
+  }
+}
