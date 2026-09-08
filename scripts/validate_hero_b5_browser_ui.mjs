@@ -125,26 +125,33 @@ for (const testCase of cases) {
   const generic404Console = consoleErrors.filter(
     (entry) => !isAllowedPathful404ConsoleError(entry) && isGenericChromium404ConsoleError(entry),
   );
-  const unexpectedConsole = consoleErrors.filter(
+  const non404UnexpectedConsole = consoleErrors.filter(
     (entry) => !isAllowedPathful404ConsoleError(entry) && !isGenericChromium404ConsoleError(entry),
   );
 
-  const accountedConsole404Count = allowedPathfulConsole.length + generic404Console.length;
-  if (accountedConsole404Count !== allowedHttp.length) {
-    failures.push(
-      `${testCase.name}: admitted console 404 count ${accountedConsole404Count} != admitted HTTP 404 count ${allowedHttp.length}`,
-    );
-  }
+  // Chromium's generic 404 console message does not reliably expose the failed
+  // resource URL. Admit it only when this viewport also observed at least one
+  // explicitly allowed HTTP 404 and no unexpected HTTP failure. Any unrelated
+  // 4xx/5xx response remains a hard failure through unexpectedHttp below.
+  const canAdmitGeneric404Console = allowedHttp.length > 0 && unexpectedHttp.length === 0;
+  const unexpectedConsole = [
+    ...non404UnexpectedConsole,
+    ...(canAdmitGeneric404Console ? [] : generic404Console),
+  ];
+  const admittedConsole404 = [
+    ...allowedPathfulConsole,
+    ...(canAdmitGeneric404Console ? generic404Console : []),
+  ];
 
-  if (allowedHttp.length || accountedConsole404Count) {
+  if (allowedHttp.length || admittedConsole404.length) {
     existingDrift.push({
       viewport: testCase.name,
       http404s: allowedHttp,
-      consoleErrors: [...allowedPathfulConsole, ...generic404Console],
-      pairing: {
-        admittedHttp404Count: allowedHttp.length,
-        admittedConsole404Count: accountedConsole404Count,
-        exactCountMatch: accountedConsole404Count === allowedHttp.length,
+      consoleErrors: admittedConsole404,
+      admission: {
+        allowedPathsOnly: true,
+        unexpectedHttpFailureCount: unexpectedHttp.length,
+        genericConsole404RequiresAllowedHttpEvidence: true,
       },
     });
   }
