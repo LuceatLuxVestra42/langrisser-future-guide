@@ -168,6 +168,7 @@ jobs:
             const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
             page.on('pageerror', (error) => errors.push(`page:${String(error)}`));
             page.on('console', (message) => { if (message.type() === 'error') errors.push(`console:${message.text()}`); });
+            page.on('response', (response) => { if (response.status() >= 400) errors.push(`http:${response.status()}:${response.url()}`); });
 
             if (!isPreview) {
               response = await page.goto(url('heroes/6/'), { waitUntil: 'networkidle', timeout: 45000 });
