@@ -1,0 +1,158 @@
+name: Hero stat bar S6 browser QA
+
+on:
+  push:
+    branches:
+      - s6-hero-stat-bar-browser-qa
+    paths:
+      - '.github/workflows/hero-stat-bar-s6-browser-qa.yml'
+      - 'scripts/validate_hero_stat_bar_s6_browser_ui.mjs'
+      - 'data/checkpoints/hero-stat-bar-s6-browser-qa.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hero-stat-bar-s6-browser-qa
+  cancel-in-progress: true
+
+env:
+  HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+
+jobs:
+  hosted-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact S6 candidate
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-download-url: https://github.com/oven-sh/bun/releases/download/bun-v1.4.1/bun-linux-x64.zip
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Confirm S5 predecessor boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor ba8d470d5ee8ede1a1a75315cac9cbcc8c621cc0 HEAD
+          grep -q 'data-final-job-card="true"' src/components/hero-final-job-stats-section.tsx
+          grep -q 'data-stat-bar={key}' src/components/hero-final-job-stats-section.tsx
+          grep -q 'data-stat-value={key}' src/components/hero-final-job-stats-section.tsx
+          grep -q 'const MINIMUM_FILL_PERCENT = 25' src/components/hero-final-job-stats-section.tsx
+
+      - name: Build GitHub Pages candidate
+        run: |
+          set -euo pipefail
+          node scripts/build-equipment-name-kr-presentation.mjs
+          bunx vite build --config vite.config.pages.ts
+          test -f dist/client/heroes/6/index.html
+          grep -q 'data-final-job-card="true"' dist/client/heroes/6/index.html
+          grep -q 'data-stat-bar-min-fill="25"' dist/client/heroes/6/index.html
+          grep -q '湮黯青龙' dist/client/heroes/6/index.html
+          grep -q '>4041<' dist/client/heroes/6/index.html
+          cp dist/client/index.html dist/client/404.html
+          cat > dist/client/authoritative-pages-source.json <<JSON
+          {
+            "status": "AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT",
+            "sourceSha": "${GITHUB_SHA}",
+            "sourceRef": "${GITHUB_REF_NAME}",
+            "s5PredecessorSha": "ba8d470d5ee8ede1a1a75315cac9cbcc8c621cc0",
+            "b3Consumer": "data/generated/hero-final-job-extrema.v1.json",
+            "semanticRecomputed": false,
+            "publisher": ".github/workflows/hero-stat-bar-s6-browser-qa.yml"
+          }
+          JSON
+
+      - name: Publish exact S6 candidate to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd dist/client
+          touch .nojekyll
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "S6 hero stat bar candidate ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
+
+      - name: Strict hosted QA with bounded propagation retry
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 12); do
+            echo "Strict hosted QA attempt ${attempt}/12"
+            set +e
+            output="$(node tools/route-hosted-qa/cli/check.mjs --expected-sha "${GITHUB_SHA}" 2>&1)"
+            status=$?
+            set -e
+            printf '%s\n' "$output"
+            if [ "$status" -eq 0 ]; then
+              exit 0
+            fi
+            if [ "$status" -ne 4 ] || ! grep -q '"status":"FAIL_STALE_DEPLOYMENT"' <<<"$output"; then
+              exit "$status"
+            fi
+            if [ "$attempt" -lt 12 ]; then sleep 10; fi
+          done
+          exit 4
+
+      - name: Install Chromium browser QA runtime
+        run: |
+          bun add --no-save playwright@1.55.0
+          bunx playwright install --with-deps chromium
+
+      - name: Browser desktop UI QA
+        id: browser_ui
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set +e
+          node scripts/validate_hero_stat_bar_s6_browser_ui.mjs > /tmp/s6-browser-ui.log 2>&1
+          status=$?
+          set -e
+          cat /tmp/s6-browser-ui.log
+          exit "$status"
+
+      - name: Upload S6 desktop screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s6-leon-desktop
+          path: /tmp/s6-leon-desktop.png
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Upload S6 browser diagnostic
+        if: failure() && steps.browser_ui.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: s6-browser-ui-diagnostic
+          path: /tmp/s6-browser-ui.log
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Assert repository remained read-only after QA
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git checkout -- bun.lock 2>/dev/null || true
+          test -z "$(git status --porcelain --untracked-files=no)"
