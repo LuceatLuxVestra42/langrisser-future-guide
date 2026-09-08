@@ -1,0 +1,72 @@
+name: Hero B3 Tier4 final-job extrema
+
+on:
+  push:
+    branches:
+      - b3-final-job-extrema-consumer
+    paths:
+      - 'data/contracts/hero-b3-final-job-extrema-consumer.v1.json'
+      - 'data/checkpoints/hero-b2-7-sp-bonded-freeze.v1.json'
+      - 'data/contracts/hero-b1-normal-bonded-consumer.v1.json'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/hero-detail/by-id/**'
+      - 'scripts/run_hero_b3_final_job_extrema_consumer.cjs'
+      - 'scripts/validate_hero_b3_final_job_extrema_consumer.cjs'
+      - 'scripts/configdata-source-pack-maintenance-root.cjs'
+      - '.github/workflows/hero-b3-final-job-extrema.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: b3-final-job-extrema-consumer
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build B3 integrated Tier4 consumer
+        run: node scripts/run_hero_b3_final_job_extrema_consumer.cjs
+      - name: Validate B3 independently
+        run: node scripts/validate_hero_b3_final_job_extrema_consumer.cjs
+      - name: Assert bounded generated changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git status --porcelain | sed -E 's/^...//' | sort)
+          if [[ ${#changed[@]} -eq 0 ]]; then
+            echo 'B3 outputs already materialized and validation is idempotent.'
+            exit 0
+          fi
+          printf '%s\n' "${changed[@]}"
+          expected=(
+            'data/generated/hero-final-job-extrema.v1.json'
+            'data/validation/hero-b3-final-job-extrema-summary.v1.json'
+          )
+          if [[ ${#changed[@]} -ne 2 ]]; then
+            echo "Unexpected B3 changed path count: ${#changed[@]}" >&2
+            exit 1
+          fi
+          for i in 0 1; do
+            if [[ "${changed[$i]}" != "${expected[$i]}" ]]; then
+              echo "Unexpected B3 changed path: ${changed[$i]}" >&2
+              exit 1
+            fi
+          done
+      - name: Commit B3 generated outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$(git status --porcelain)" ]]; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/generated/hero-final-job-extrema.v1.json data/validation/hero-b3-final-job-extrema-summary.v1.json
+          git commit -m 'B3: materialize Tier4 final-job extrema'
+          git push origin HEAD:b3-final-job-extrema-consumer
