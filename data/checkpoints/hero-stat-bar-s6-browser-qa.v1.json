@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "stage": "hero-stat-bar-s6-browser-qa",
+  "status": "COMPLETE",
+  "completion": "S6_TECHNICAL_BROWSER_QA_COMPLETE",
+  "predecessor": {
+    "stage": "hero-stat-bar-s5-parity",
+    "branch": "s5-hero-stat-bar-parity",
+    "commitSha": "ba8d470d5ee8ede1a1a75315cac9cbcc8c621cc0"
+  },
+  "scope": {
+    "owner": "frontend/browser-ui",
+    "fixtureHeroId": 6,
+    "viewport": { "width": 1440, "height": 1000 },
+    "desktopPriority": true,
+    "mobileDetailedQA": false,
+    "spTemporaryVisibility": true,
+    "spToggleImplemented": false
+  },
+  "validatedPresentation": {
+    "finalJobCardCount": 3,
+    "normalCardCount": 2,
+    "spCardCount": 1,
+    "desktopGrid": "first two cards same row; third SP card next row",
+    "statRowsPerCard": 6,
+    "rowFlow": "label -> left-to-right bar -> numeric value on right",
+    "minimumFillPercent": 25,
+    "renderedPixelRatioComparedToDataPercent": true,
+    "horizontalOverflow": false,
+    "refreshRetention": true,
+    "unexpectedHttpErrors": 0,
+    "unexpectedConsoleErrors": 0,
+    "pageErrors": 0,
+    "requestFailures": 0
+  },
+  "visualInspection": {
+    "source": "GitHub Actions full-page screenshot",
+    "artifactName": "s6-leon-desktop",
+    "artifactId": 10057086146,
+    "observed": [
+      "two-column Normal final-job cards render cleanly",
+      "SP card remains visibly rendered on the next row",
+      "bars begin at the left edge of each track",
+      "numeric values are aligned to the right of each bar",
+      "25 percent floor remains visibly present without collapsing weak stats to zero-width",
+      "no obvious destructive desktop overflow or overlap"
+    ],
+    "humanProductApproval": "PENDING_USER_REVIEW"
+  },
+  "validation": {
+    "validator": "scripts/validate_hero_stat_bar_s6_browser_ui.mjs",
+    "workflow": ".github/workflows/hero-stat-bar-s6-browser-qa.yml",
+    "runId": 34229155915,
+    "jobId": 102070629261,
+    "candidateSha": "d75600ebe178dcaecfba53c54513d6ae5e9831ff",
+    "build": "PASS",
+    "hosted": "PASS",
+    "browserDesktop": "PASS",
+    "repositoryReadOnly": "PASS",
+    "workflowConclusion": "success"
+  },
+  "semanticBoundary": {
+    "semanticMutation": false,
+    "tier4Recomputation": false,
+    "statFormulaRecomputation": false,
+    "extremaRecomputation": false,
+    "rawConfigDataRead": false
+  },
+  "blockers": [],
+  "reviews": [
+    {
+      "classification": "NON_BLOCKING_REVIEW",
+      "owner": "user/product visual review",
+      "item": "Judge whether the 25 percent visual floor, bar thickness, spacing and card proportions feel right in the hosted desktop page."
+    }
+  ],
+  "reopenConditions": [
+    "hosted exact-SHA browser QA fails",
+    "rendered bar pixel ratio diverges from S5 percent",
+    "card geometry no longer matches 3-B desktop layout",
+    "user requests presentation tuning after visual review"
+  ],
+  "nextOwner": "user/product visual review"
+}
