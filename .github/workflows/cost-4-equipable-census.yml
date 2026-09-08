@@ -1,0 +1,62 @@
+name: Cost 4 Equipable Census
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cost-4d-source-population:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Count frozen Hero job-level source population
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+
+          const manifestPath = 'data/generated/hero-detail.v1.json';
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+          const byHeroId = manifest?.storage?.byHeroId;
+          if (!byHeroId || typeof byHeroId !== 'object' || Array.isArray(byHeroId)) {
+            throw new Error('hero-detail manifest storage.byHeroId missing or malformed');
+          }
+
+          const entries = Object.entries(byHeroId);
+          let jobLevelRows = 0;
+
+          for (const [heroId, meta] of entries) {
+            if (!meta || typeof meta.path !== 'string' || meta.path.length === 0) {
+              throw new Error(`missing shard path for hero ${heroId}`);
+            }
+            const shard = JSON.parse(fs.readFileSync(meta.path, 'utf8'));
+            if (String(shard.heroId) !== String(heroId)) {
+              throw new Error(`heroId mismatch for ${heroId}`);
+            }
+            const connections = shard?.normal?.jobTree?.connections;
+            if (!Array.isArray(connections)) {
+              throw new Error(`normal.jobTree.connections missing for hero ${heroId}`);
+            }
+            for (const connection of connections) {
+              if (!Array.isArray(connection?.levels)) {
+                throw new Error(`levels missing for hero ${heroId}`);
+              }
+              jobLevelRows += connection.levels.length;
+            }
+          }
+
+          console.log(JSON.stringify({ heroShards: entries.length, jobLevelRows }));
+          NODE
+
+      - name: Verify repository non-mutation
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
