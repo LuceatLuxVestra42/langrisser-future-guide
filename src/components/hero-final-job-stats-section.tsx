@@ -1,4 +1,5 @@
 type ExtremeKind = "MIN" | "MAX" | "BOTH" | null;
+type StatKey = "hp" | "at" | "magic" | "df" | "magicDf" | "dex";
 
 type FinalJobStatsData = {
   heroId: number;
@@ -8,44 +9,47 @@ type FinalJobStatsData = {
     requiredRank: number;
     topologyUsed: boolean;
   };
+  scaleDomains: Record<StatKey, { min: number; max: number }>;
   rows: Array<{
     variant: "NORMAL" | "SP";
     jobConnectionId: number;
     jobId: number;
     jobNameCn: string | null;
-    values: {
-      hp: number;
-      at: number;
-      magic: number;
-      df: number;
-      magicDf: number;
-      dex: number;
-    };
-    extremes: {
-      hp: ExtremeKind;
-      at: ExtremeKind;
-      magic: ExtremeKind;
-      df: ExtremeKind;
-      magicDf: ExtremeKind;
-      dex: ExtremeKind;
-    };
+    values: Record<StatKey, number>;
+    extremes: Record<StatKey, ExtremeKind>;
   }>;
 };
 
-const COLUMNS = [
+const STATS = [
   ["hp", "생명"],
   ["at", "공격"],
   ["magic", "지력"],
   ["df", "방어"],
   ["magicDf", "마방"],
   ["dex", "기술"],
-] as const;
+] as const satisfies ReadonlyArray<readonly [StatKey, string]>;
+
+const MINIMUM_FILL_PERCENT = 25;
+const MAXIMUM_FILL_PERCENT = 100;
+
+function getBarPercent(value: number, domain: { min: number; max: number }) {
+  if (!Number.isFinite(value) || !Number.isFinite(domain.min) || !Number.isFinite(domain.max) || domain.max <= domain.min) {
+    throw new Error("Hero stat bar received an invalid S2 scale domain.");
+  }
+  if (value < domain.min || value > domain.max) {
+    throw new Error(`Hero stat value ${value} is outside its B3 presentation domain ${domain.min}-${domain.max}.`);
+  }
+
+  const ratio = (value - domain.min) / (domain.max - domain.min);
+  const barPercent = MINIMUM_FILL_PERCENT + ratio * (MAXIMUM_FILL_PERCENT - MINIMUM_FILL_PERCENT);
+  return Math.min(MAXIMUM_FILL_PERCENT, Math.max(MINIMUM_FILL_PERCENT, barPercent));
+}
 
 function ExtremeBadge({ kind }: { kind: ExtremeKind }) {
   if (!kind) return null;
   const label = kind === "MIN" ? "전체 최저" : kind === "MAX" ? "전체 최고" : "전체 최저·최고";
   return (
-    <span className="ml-1 inline-flex rounded-full border border-border bg-muted px-1.5 py-0.5 text-[10px] font-bold leading-none text-muted-foreground">
+    <span className="inline-flex rounded-full border border-border bg-muted px-1.5 py-0.5 text-[10px] font-bold leading-none text-muted-foreground">
       {label}
     </span>
   );
@@ -58,6 +62,7 @@ export function HeroFinalJobStatsSection({ data }: { data: FinalJobStatsData }) 
       data-hero-final-job-stats="true"
       data-final-job-source={data.sourceStage}
       data-final-job-rank={data.eligibility.requiredRank}
+      data-stat-bar-min-fill={MINIMUM_FILL_PERCENT}
     >
       <div className="flex flex-wrap items-end justify-between gap-2">
         <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">최종 직업 스탯</h2>
@@ -68,37 +73,55 @@ export function HeroFinalJobStatsSection({ data }: { data: FinalJobStatsData }) 
       </p>
 
       {data.rows.length > 0 ? (
-        <div className="mt-5 overflow-x-auto rounded-xl border border-border">
-          <table className="w-full min-w-[760px] border-collapse text-sm">
-            <thead className="bg-muted/50">
-              <tr className="border-b border-border">
-                <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-muted-foreground">직업</th>
-                {COLUMNS.map(([, label]) => (
-                  <th key={label} scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">{label}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.rows.map((row) => (
-                <tr key={`${row.variant}-${row.jobConnectionId}-${row.jobId}`} className="border-b border-border last:border-b-0">
-                  <th scope="row" className="px-4 py-3 text-left">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">{row.jobNameCn ?? `Job ${row.jobId}`}</span>
-                      {row.variant === "SP" ? (
-                        <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-black tracking-wide text-foreground">SP</span>
-                      ) : null}
+        <div className="mt-5 grid gap-4 lg:grid-cols-2" data-final-job-card-grid="true">
+          {data.rows.map((row) => (
+            <article
+              key={`${row.variant}-${row.jobConnectionId}-${row.jobId}`}
+              className="min-w-0 rounded-xl border border-border bg-background/40 p-4"
+              data-final-job-card="true"
+              data-final-job-variant={row.variant}
+              data-job-connection-id={row.jobConnectionId}
+              data-job-id={row.jobId}
+            >
+              <header className="flex min-w-0 items-center gap-2 border-b border-border pb-3">
+                <h3 className="min-w-0 truncate text-base font-bold text-foreground">{row.jobNameCn ?? `Job ${row.jobId}`}</h3>
+                {row.variant === "SP" ? (
+                  <span className="shrink-0 rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-black tracking-wide text-foreground">SP</span>
+                ) : null}
+              </header>
+
+              <div className="mt-4 space-y-3">
+                {STATS.map(([key, label]) => {
+                  const value = row.values[key];
+                  const barPercent = getBarPercent(value, data.scaleDomains[key]);
+                  return (
+                    <div
+                      key={key}
+                      className="grid min-w-0 grid-cols-[2.75rem_minmax(0,1fr)_3.75rem] items-center gap-3"
+                      data-stat-bar-row={key}
+                      data-extreme={row.extremes[key] ?? undefined}
+                    >
+                      <span className="text-xs font-bold text-muted-foreground">{label}</span>
+                      <div className="h-3 min-w-0 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                        <div
+                          className="h-full rounded-full bg-foreground/75 transition-[width] duration-300"
+                          style={{ width: `${barPercent}%` }}
+                          data-stat-bar={key}
+                          data-bar-percent={barPercent.toFixed(4)}
+                          data-domain-min={data.scaleDomains[key].min}
+                          data-domain-max={data.scaleDomains[key].max}
+                        />
+                      </div>
+                      <div className="flex min-w-0 flex-col items-end gap-1">
+                        <span className="tabular-nums text-sm font-bold text-foreground" data-stat-value={key}>{value}</span>
+                        <ExtremeBadge kind={row.extremes[key]} />
+                      </div>
                     </div>
-                  </th>
-                  {COLUMNS.map(([key]) => (
-                    <td key={key} className="px-4 py-3 text-right tabular-nums text-foreground" data-extreme={row.extremes[key] ?? undefined}>
-                      <span className="font-semibold">{row.values[key]}</span>
-                      <ExtremeBadge kind={row.extremes[key]} />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  );
+                })}
+              </div>
+            </article>
+          ))}
         </div>
       ) : (
         <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 Tier 4 최종 직업이 없어.</p>
