@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "stage": "hero-stat-bar-s2-extrema-supply",
+  "status": "COMPLETE",
+  "completion": "S2_COMPLETE",
+  "predecessor": {
+    "stage": "hero-stat-bar-s1-presentation-contract",
+    "commitSha": "897c8e216117bc71690328f469b4b44429bb023f",
+    "contract": "data/contracts/hero-stat-bar-presentation.v1.json"
+  },
+  "authoritativeSource": {
+    "artifact": "data/generated/hero-final-job-extrema.v1.json",
+    "stage": "hero-b3-final-job-extrema-consumer",
+    "candidateCount": 533,
+    "requiredRank": 4,
+    "topologyUsed": false
+  },
+  "supply": {
+    "consumer": "src/lib/hero-final-job-extrema.server.ts",
+    "responseField": "scaleDomains",
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"],
+    "shape": {"min": "number", "max": "number"},
+    "copyFromB3Extrema": true,
+    "candidateScanForExtrema": false,
+    "semanticRecomputation": false,
+    "tier4Reclassification": false,
+    "statFormulaRecomputation": false,
+    "rawConfigDataRead": false
+  },
+  "domains": {
+    "hp": {"min": 2332, "max": 4803},
+    "at": {"min": 233, "max": 636},
+    "magic": {"min": 198, "max": 589},
+    "df": {"min": 174, "max": 356},
+    "magicDf": {"min": 144, "max": 377},
+    "dex": {"min": 71, "max": 329}
+  },
+  "failClosed": {
+    "requiresFiniteDomain": true,
+    "requiresMaxGreaterThanMin": true,
+    "invalidDomainDisposition": "BLOCKER"
+  },
+  "validation": {
+    "script": "scripts/validate_hero_stat_bar_s2_extrema_supply.mjs",
+    "purpose": "Verify direct B3 extrema supply, exact six-domain fixtures, S1 25%-100% contract continuity, and absence of extrema/semantic recomputation."
+  },
+  "gates": {
+    "preflight": "S2_BOUNDARY_VALIDATION",
+    "build": "DEFERRED_TO_UI_IMPLEMENTATION_STAGE",
+    "hosted": "NOT_REQUIRED_FOR_DATA_SUPPLY_ONLY",
+    "browserUi": "NOT_REQUIRED_FOR_DATA_SUPPLY_ONLY"
+  },
+  "changedScope": [
+    "src/lib/hero-final-job-extrema.server.ts",
+    "scripts/validate_hero_stat_bar_s2_extrema_supply.mjs",
+    "data/checkpoints/hero-stat-bar-s2-extrema-supply.v1.json"
+  ],
+  "blockers": [],
+  "reviews": [],
+  "nextStage": "S3 3-B final-job stat bar UI implementation",
+  "reopenConditions": [
+    "B3 authoritative extrema artifact changes",
+    "S1 presentation scale contract changes",
+    "scaleDomains parity or fail-closed validator failure"
+  ]
+}
