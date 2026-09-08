@@ -21,13 +21,18 @@ type SourceCandidate = Winner & {
   values: Record<StatKey, number>;
 };
 
+type SourceRange = {
+  min: { value: number; winners: Winner[] };
+  max: { value: number; winners: Winner[] };
+};
+
 type SourceArtifact = {
   stage: string;
   status: string;
   eligibility: { authoritativeField: string; requiredRank: number; topologyUsed: boolean };
   summary: { canonicalHeroCount: number; candidateCount: number };
   candidates: SourceCandidate[];
-  extrema: Record<StatKey, { min: { value: number; winners: Winner[] }; max: { value: number; winners: Winner[] } }>;
+  extrema: Record<StatKey, SourceRange>;
 };
 
 function sameCandidate(a: Winner, b: Winner) {
@@ -48,11 +53,36 @@ function readArtifact(): SourceArtifact {
   ) {
     throw new Error("B3 final-job extrema consumer is not production-ready.");
   }
+
+  for (const stat of STAT_KEYS) {
+    const range = parsed.extrema?.[stat];
+    if (
+      !range ||
+      !Number.isFinite(range.min?.value) ||
+      !Number.isFinite(range.max?.value) ||
+      range.max.value <= range.min.value ||
+      !Array.isArray(range.min?.winners) ||
+      !Array.isArray(range.max?.winners)
+    ) {
+      throw new Error(`B3 ${stat} extrema domain is not presentation-ready.`);
+    }
+  }
+
   return parsed;
 }
 
 export function readHeroFinalJobStatsPresentation(heroId: number) {
   const source = readArtifact();
+  const scaleDomains = Object.fromEntries(
+    STAT_KEYS.map((stat) => [
+      stat,
+      {
+        min: source.extrema[stat].min.value,
+        max: source.extrema[stat].max.value,
+      },
+    ]),
+  ) as Record<StatKey, { min: number; max: number }>;
+
   const rows = source.candidates
     .filter((candidate) => candidate.heroId === heroId)
     .map((candidate) => {
@@ -77,6 +107,7 @@ export function readHeroFinalJobStatsPresentation(heroId: number) {
     heroId,
     sourceStage: source.stage,
     eligibility: source.eligibility,
+    scaleDomains,
     rows,
   };
 }
