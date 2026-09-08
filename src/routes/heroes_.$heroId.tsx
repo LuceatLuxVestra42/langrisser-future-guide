@@ -499,7 +499,7 @@ function HeroDetailPage() {
   );
 }
 
-type SkillView = { skillId: number; nameCn: string | null; desc: string | null; iconPath: string | null; displayType: string | null; cooldown: string | null; range: string | null; areaOrTarget: string | null };
+type SkillView = { skillId: number; nameCn: string | null; desc: string | null; iconPath: string | null; displayType: string | null; cooldown: string | null; range: string | null; areaOrTarget: string | null; cost?: number | null };
 type HeroSoldierCardView = { soldierId: number; nameKr: string | null; nameCn: string; nameKrStatus: string; tier: number; armyType: string; isSp: boolean };
 
 const SOLDIER_ARMY_LABELS: Record<string, string> = {
@@ -602,6 +602,7 @@ function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView; source
         <div className="min-w-0 flex-1">
           <h4 className="font-bold text-foreground">{skill.nameCn ?? `Skill ${skill.skillId}`}</h4>
           <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-300" data-hero-skill-metadata="true">
+            {Number.isInteger(skill.cost) ? <span className="rounded bg-zinc-800 px-2 py-1">코스트 {skill.cost}</span> : null}
             <span className="rounded bg-zinc-800 px-2 py-1">유형 {skill.displayType}</span>
             <span className="rounded bg-zinc-800 px-2 py-1">쿨 {skill.cooldown}</span>
             <span className="rounded bg-zinc-800 px-2 py-1">사거리 {skill.range}</span>
