@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "stage": "hero-skill-icon-404-drift-investigation",
+  "status": "COMPLETE",
+  "completion": "NO_CURRENT_ASSET_DEFECT",
+  "predecessor": {
+    "stage": "hero-b5-hosted-browser-qa",
+    "status": "COMPLETE",
+    "commitSha": "de44282846ab413be0cbbb2f3c3054eeaa7208fd"
+  },
+  "scope": {
+    "heroId": 6,
+    "observedLegacy404Paths": [
+      "/langrisser-future-guide/images/icon/skill/10301.png",
+      "/langrisser-future-guide/images/icon/skill/10302.png",
+      "/langrisser-future-guide/images/icon/skill/10324.png"
+    ],
+    "owner": "hero skill icon asset/resolver",
+    "semanticChanges": false,
+    "productionAssetChanges": false,
+    "resolverChanges": false
+  },
+  "currentAuthority": {
+    "resolver": "src/lib/hero-skill-icon-assets.ts",
+    "manifest": "data/generated/hero-skill-icon-assets.v1.json",
+    "manifestStatus": "FROZEN",
+    "materializationRule": "exact verified sourcePath only; no basename/name/ID inference",
+    "deployedGhPagesCommit": "be97673335a5cdd06bea03ca3c04da839e52bdc9",
+    "deployedSourceSha": "d698b41d01391ab220c78ccf305599b95cf3b7c9"
+  },
+  "verifiedMappings": [
+    {
+      "skillId": 10301,
+      "sourcePath": "UI/Icon/Skill_ABS/Skill_KnightCrash.png",
+      "publicPath": "/images/heroes/skill-icons/Skill_KnightCrash.png",
+      "assetPresentInSource": true,
+      "assetPresentInGhPages": true
+    },
+    {
+      "skillId": 10302,
+      "sourcePath": "UI/Icon/Skill_ABS/Passive_Assault.png",
+      "publicPath": "/images/heroes/skill-icons/Passive_Assault.png",
+      "assetPresentInSource": true,
+      "assetPresentInGhPages": true
+    },
+    {
+      "skillId": 10324,
+      "sourcePath": "UI/Icon/Skill_ABS/Skill_SpeedUp1.png",
+      "publicPath": "/images/heroes/skill-icons/Skill_SpeedUp1.png",
+      "assetPresentInSource": true,
+      "assetPresentInGhPages": true
+    }
+  ],
+  "deployedPresentation": {
+    "heroPath": "heroes/6/index.html",
+    "usesFrozenSkillIconPaths": true,
+    "legacyIdDerivedSkillIconPathsObserved": false
+  },
+  "rootCauseClassification": {
+    "classification": "HISTORICAL_HOSTED_PROPAGATION_ARTIFACT",
+    "reason": "The current source resolver, frozen manifest, current gh-pages HTML, and deployed assets are mutually consistent. The legacy /images/icon/skill/{skillId}.png requests are not produced by the current owner. B5 separately established Pages edge propagation races while candidate SHAs were changing.",
+    "assetDefect": false,
+    "resolverDefect": false,
+    "canonicalDefect": false
+  },
+  "decision": {
+    "addLegacyAliasAssets": false,
+    "changeResolver": false,
+    "rewriteFrozenManifest": false,
+    "reopenB5": false,
+    "result": "NO_OP_CURRENT_OWNER_ALREADY_CORRECT"
+  },
+  "blockers": [],
+  "review": [],
+  "reopenConditions": [
+    "current built Hero detail HTML emits /images/icon/skill/{skillId}.png",
+    "a frozen manifest record resolves one of the three skills to a missing public asset",
+    "current gh-pages deployment omits one of the verified public assets",
+    "current browser QA reproduces the legacy 404 after hosted source-SHA convergence"
+  ],
+  "handoff": {
+    "nextOwner": null,
+    "nextStart": "No asset/resolver repair is required for the three historical Leon skill-icon 404s. Continue with the next independent project scope."
+  }
+}
