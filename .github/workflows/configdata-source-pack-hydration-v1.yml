@@ -40,7 +40,7 @@ jobs:
           node scripts/hydrate-configdata-source-pack-v1.mjs \
             --target-dir "$RUNNER_TEMP/configdata-hydrated"
 
-      - name: Count Cost-5D SkillCost raw types on frozen equipable set
+      - name: Count Cost-5E SkillCost value distribution on frozen equipable set
         shell: bash
         run: |
           set -euo pipefail
@@ -88,7 +88,7 @@ jobs:
           const rows = JSON.parse(fs.readFileSync(`${process.env.RUNNER_TEMP}/configdata-hydrated/data/configdata/ConfigDataSkillInfo.json`, 'utf8'));
           if (!Array.isArray(rows)) throw new Error('ConfigDataSkillInfo root is not an array');
 
-          const counts = { number: 0, string: 0, boolean: 0, object: 0, array: 0, null: 0, other: 0 };
+          const counts = new Map();
           for (const id of sortedIds) {
             const recordIndex = recordIndexById.get(id);
             if (!Number.isInteger(recordIndex)) throw new Error(`equipable SkillID absent from lookup index: ${id}`);
@@ -96,21 +96,18 @@ jobs:
             if (!row || typeof row !== 'object' || Array.isArray(row)) throw new Error(`malformed SkillInfo row for ${id}`);
             if (String(row.ID) !== id) throw new Error(`SkillInfo ID/index mismatch for ${id}`);
             if (!Object.prototype.hasOwnProperty.call(row, 'SkillCost')) throw new Error(`SkillCost missing for equipable SkillID ${id}`);
-
-            const value = row.SkillCost;
-            if (value === null) counts.null += 1;
-            else if (Array.isArray(value)) counts.array += 1;
-            else if (typeof value === 'number') counts.number += 1;
-            else if (typeof value === 'string') counts.string += 1;
-            else if (typeof value === 'boolean') counts.boolean += 1;
-            else if (typeof value === 'object') counts.object += 1;
-            else counts.other += 1;
+            if (typeof row.SkillCost !== 'number' || !Number.isFinite(row.SkillCost)) throw new Error(`SkillCost non-finite/non-number for equipable SkillID ${id}`);
+            counts.set(row.SkillCost, (counts.get(row.SkillCost) ?? 0) + 1);
           }
+
+          const distribution = Object.fromEntries([...counts.entries()].sort((a, b) => a[0] - b[0]).map(([value, count]) => [String(value), count]));
+          const counted = Object.values(distribution).reduce((sum, count) => sum + count, 0);
 
           console.log(JSON.stringify({
             equipableDistinctSkillIds: sortedIds.length,
             frozenSetSha256: frozenSha,
-            ...counts
+            distribution,
+            counted
           }));
           NODE
 
