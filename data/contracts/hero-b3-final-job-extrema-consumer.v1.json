@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "stage": "hero-b3-final-job-extrema-consumer",
+  "status": "INPUTS_FROZEN",
+  "purpose": "Build the integrated Normal + RELEASED SP final-job Hero-body stat consumer and global extrema without reopening B1/B2 stat calculation semantics.",
+  "authoritativePredecessors": {
+    "b2FreezeBranch": "b2-7-sp-bonded-freeze",
+    "b2FreezeCommitSha": "f0e8e9271f96e0016d5b38283e7a92e9fb539ad2",
+    "b2FreezeCheckpoint": "data/checkpoints/hero-b2-7-sp-bonded-freeze.v1.json",
+    "b1Contract": "data/contracts/hero-b1-normal-bonded-consumer.v1.json",
+    "heroManifest": "data/generated/hero-detail.v1.json",
+    "heroShardTemplate": "data/generated/hero-detail/by-id/{heroId}.json"
+  },
+  "eligibility": {
+    "rule": "A final-job candidate is eligible only when its authoritative ConfigDataJobInfo Rank equals 4.",
+    "tierAlias": "Project final-job Tier:4 means ConfigDataJobInfo.Rank == 4.",
+    "normal": "Join normalBondedStats.connections.jobConnectionId to normal.jobTree.connections.jobConnectionId, resolve the connection job ID, verify the materialized job.rank matches ConfigDataJobInfo.Rank, and include only Rank == 4.",
+    "sp": "For RELEASED SP only, use spBondedStats.jobId and verify ConfigDataJobInfo.Rank == 4 before inclusion.",
+    "forbidden": [
+      "childConnectionIds or leaf topology as final-job eligibility",
+      "depth or screen/order based eligibility",
+      "name JOIN",
+      "ID arithmetic",
+      "filename similarity",
+      "NOT_RELEASED SP",
+      "lower-rank jobs"
+    ]
+  },
+  "statAuthority": {
+    "normal": "frozen normalBondedStats.values only",
+    "sp": "frozen spBondedStats.values only",
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"],
+    "displayAliases": {"hp":"HP","at":"ATK","magic":"INT","df":"DEF","magicDf":"MDEF","dex":"DEX"},
+    "recalculation": false
+  },
+  "candidateSchema": {
+    "fields": ["heroId", "identity", "variant", "jobConnectionId", "jobId", "jobNameCn", "values"],
+    "variant": ["NORMAL", "SP"],
+    "identitySource": "Hero Stage6-3 shard identity",
+    "jobNameCn": "presentation metadata copied from the already-related job payload only; never used for eligibility or JOIN"
+  },
+  "extrema": {
+    "scope": "all eligible Tier4 Normal + RELEASED SP candidate rows",
+    "operations": ["min", "max"],
+    "ties": "Preserve every candidate tied at the global minimum or maximum for each stat.",
+    "winnerIdentity": ["heroId", "identity", "variant", "jobConnectionId", "jobId", "jobNameCn"]
+  },
+  "output": {
+    "generated": "data/generated/hero-final-job-extrema.v1.json",
+    "validation": "data/validation/hero-b3-final-job-extrema-summary.v1.json",
+    "frontendRecalculation": false
+  },
+  "completion": {
+    "required": [
+      "267 canonical Hero shards consumed with manifest integrity",
+      "all normal bonded connections directly matched to their job connection",
+      "normal materialized rank parity with authoritative JobInfo",
+      "all and only Rank4 normal candidates included",
+      "25/25 RELEASED SP candidates included and each authoritative JobInfo Rank4",
+      "0 NOT_RELEASED SP pollution",
+      "all six values copied exactly from frozen bonded consumers",
+      "global min/max computed for all six stats with all ties preserved",
+      "independent validator PASS",
+      "0 mutation of Hero shards or B1/B2 frozen consumers"
+    ]
+  },
+  "nonScope": [
+    "B1 normal stat recomputation",
+    "B2 SP stat recomputation",
+    "per-hero extrema not required by current UI scope",
+    "frontend rendering",
+    "localization changes",
+    "asset changes"
+  ],
+  "nextStage": "B4 Hero detail UI"
+}
