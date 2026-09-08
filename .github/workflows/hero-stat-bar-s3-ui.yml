@@ -1,0 +1,44 @@
+name: Hero stat bar S3 UI
+
+on:
+  push:
+    branches:
+      - s3-hero-stat-bar-ui
+    paths:
+      - 'src/components/hero-final-job-stats-section.tsx'
+      - 'src/lib/hero-final-job-extrema.server.ts'
+      - 'data/contracts/hero-stat-bar-presentation.v1.json'
+      - 'data/checkpoints/hero-stat-bar-s2-extrema-supply.v1.json'
+      - 'scripts/validate_hero_stat_bar_s3_ui.mjs'
+      - '.github/workflows/hero-stat-bar-s3-ui.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: s3-hero-stat-bar-ui
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.1
+      - name: Validate S3 stat bar UI
+        run: node scripts/validate_hero_stat_bar_s3_ui.mjs
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+      - name: Build frontend
+        run: bun run build
+      - name: Assert repository remained read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+            echo 'Unexpected tracked repository mutation:' >&2
+            git status --short --untracked-files=no >&2
+            exit 1
+          fi
