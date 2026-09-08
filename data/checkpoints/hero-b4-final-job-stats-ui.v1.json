@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "stage": "hero-b4-final-job-stats-ui",
+  "status": "COMPLETE",
+  "completion": "B4_COMPLETE",
+  "authoritativePredecessor": {
+    "b3Branch": "b3-final-job-extrema-consumer",
+    "b3CommitSha": "a8918a245d996e99c56a6e71d90487e3aad923d4",
+    "b3Checkpoint": "data/checkpoints/hero-b3-final-job-extrema.v1.json",
+    "consumer": "data/generated/hero-final-job-extrema.v1.json",
+    "validation": "data/validation/hero-b3-final-job-extrema-summary.v1.json"
+  },
+  "implementation": {
+    "materializedCommitSha": "a269c65a5c3f2300e031035c3b592d929ae0ce5e",
+    "route": "src/routes/heroes_.$heroId.tsx",
+    "component": "src/components/hero-final-job-stats-section.tsx",
+    "serverReader": "src/lib/hero-final-job-extrema.server.ts",
+    "serverFunction": "src/lib/hero-final-job-extrema.functions.ts",
+    "patcher": "scripts/apply_hero_b4_final_job_stats_ui.mjs",
+    "validator": "scripts/validate_hero_b4_final_job_stats_ui.mjs",
+    "contract": "data/contracts/hero-b4-final-job-stats-ui.v1.json"
+  },
+  "consumerBoundary": {
+    "semanticRecomputation": false,
+    "frontendTierFiltering": false,
+    "topologyEligibility": false,
+    "rawConfigDataJoin": false,
+    "statSource": "B3 candidates[].values",
+    "eligibilitySource": "B3 ConfigDataJobInfo.Rank == 4 decision",
+    "normalAndSpIncluded": true,
+    "globalTiesPreservedByB3": true
+  },
+  "presentation": {
+    "profile": "Lv.70 · 6성 · MAX 유대",
+    "spVariantBadge": true,
+    "globalMinMaxBadge": true,
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"]
+  },
+  "executionEvidence": {
+    "githubActionsRunId": 34218179915,
+    "githubActionsJobId": 102034811383,
+    "conclusion": "success",
+    "consumerBoundaryValidation": "PASS",
+    "dependencyInstall": "PASS",
+    "productionBuild": "PASS",
+    "boundedTrackedMutation": "PASS",
+    "materializedRoutePatch": "PASS"
+  },
+  "blockers": [],
+  "review": [],
+  "nonScope": [
+    "Hosted/Deployment QA",
+    "Browser/UI interaction and responsive QA",
+    "Job-name localization changes",
+    "B1/B2/B3 semantic changes"
+  ],
+  "reopenConditions": [
+    "B3 final-job extrema consumer changes",
+    "B3 candidate schema changes",
+    "Hero detail route contract changes so the B4 reader/component no longer compiles",
+    "production build failure caused by B4 paths",
+    "presentation requirement changes"
+  ],
+  "handoff": {
+    "nextOwner": "B5 Preflight/Build/Hosted/UI QA",
+    "nextStart": "Reuse B4 COMPLETE implementation. Preflight and production Build already passed in B4; run only the remaining Hosted/Deployment and Browser/UI gates required for release, while distinguishing any existing drift from B4 regressions."
+  }
+}
