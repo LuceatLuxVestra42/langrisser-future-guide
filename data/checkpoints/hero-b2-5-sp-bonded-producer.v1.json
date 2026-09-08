@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "stage": "hero-b2-5-sp-bonded-producer",
+  "status": "COMPLETE",
+  "completion": "B2_5_COMPLETE",
+  "authoritativePredecessor": {
+    "branch": "b1-normal-bonded-consumer",
+    "commitSha": "59d6098e9dfd1e826640ca670d097e7418ed810e",
+    "contract": "data/contracts/hero-b1-normal-bonded-consumer.v1.json",
+    "spSource": "data/generated/hero-page-stage5-4-sp.v1.json"
+  },
+  "sourceProvenance": {
+    "configDataSourceCommit": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "configDataSourceTree": "b18983f60cb054c2e6e094d64cdb98979211d7fc",
+    "sourcePackReleaseTag": "source-configdata-v1-6475e63e",
+    "sourcePackArchiveSha256": "65855321776cba9523669a2d486c2edbd2908006cf854572b7a87b0b63405c84",
+    "hydratedFileCount": 753,
+    "semanticAuthorityChanged": false
+  },
+  "resolvedInputs": {
+    "progression": "Stage5-4 explicit SP jobConnectionId -> ConfigDataJobConnectionInfo.ID -> JobLevels_ID -> ConfigDataJobLevelInfo.ID; final row uses the Stage4 final-level ordering rule.",
+    "starCorrection": "Stage5-4 SPHeroInfo-derived StatStar[5] arrays.",
+    "masteryFlat": "Frozen Hero shard normal.displayStats.globalJobMastery.totals from the validated Stage4 all-mastered normal-job aggregate.",
+    "reshape": {
+      "source": "Stage5-4 secondStageRewards.buff.properties",
+      "propertyModifyMapping": {
+        "99": "hp",
+        "100": "at",
+        "101": "df",
+        "102": "magic",
+        "103": "magicDf",
+        "104": "dex"
+      },
+      "mappingAuthority": "data/contracts/hero-b2-sp-bonded-producer.v1.json",
+      "rawVerificationSource": "ConfigDataPropertyModifyInfo"
+    }
+  },
+  "formula": {
+    "expression": "RoundHalfToEven((INI + UP * 69 / 10) * (1 + starCorrection / 10000) * (1 + 2500 / 10000 + reshapeSelfMul / 10000) + masteryFlat)",
+    "intermediateRounding": false,
+    "rounding": "HALF_TO_EVEN"
+  },
+  "materialization": {
+    "producer": "scripts/run_hero_b2_sp_bonded_consumer.cjs",
+    "workflow": ".github/workflows/hero-b2-5-producer.yml",
+    "outputCommitSha": "076053c",
+    "field": "spBondedStats",
+    "manifest": "data/generated/hero-detail.v1.json",
+    "canonicalHeroCount": 267,
+    "spReleasedCount": 25,
+    "spGeneratedCount": 25,
+    "spNotReleasedCount": 242,
+    "notReleasedPollution": 0,
+    "changedShardCount": 25,
+    "frozenMutationCount": 0,
+    "totalShardBytes": 15352088
+  },
+  "executionEvidence": {
+    "githubActionsRunId": 34209892923,
+    "githubActionsJobId": 102008118347,
+    "conclusion": "success",
+    "boundedOutputPathsPass": true,
+    "allowedGeneratedChanges": "data/generated/hero-detail.v1.json plus exactly 25 data/generated/hero-detail/by-id/{heroId}.json shards"
+  },
+  "regressionFixture": {
+    "heroId": 6,
+    "jobConnectionId": 66,
+    "jobId": 377,
+    "finalJobLevelId": 661,
+    "values": {
+      "hp": 4041,
+      "at": 602,
+      "magic": 224,
+      "df": 260,
+      "magicDf": 231,
+      "dex": 125
+    },
+    "pass": true
+  },
+  "hardErrors": [],
+  "blockers": [],
+  "review": [],
+  "reopenConditions": [
+    "Stage5-4 SP source snapshot changes",
+    "ConfigData source-pack snapshot or relevant schema changes",
+    "B1/Stage4 global mastery authority changes",
+    "explicit SP JobConnection/JobLevel relation contradiction",
+    "reshape PropertyModify numeric mapping contradiction",
+    "B2-6 independent validator hard failure"
+  ],
+  "handoff": {
+    "nextOwner": "B2-6 independent SP bonded validator",
+    "nextStart": "Consume the materialized spBondedStats and recompute all 25 SP variants independently from authoritative inputs without reusing producer arithmetic."
+  }
+}
