@@ -65,6 +65,13 @@ jobs:
           rm -rf .qa-site
           mkdir -p .qa-site/langrisser-future-guide
           cp -R dist/client/. .qa-site/langrisser-future-guide/
+          cat > .qa-site/langrisser-future-guide/authoritative-pages-source.json <<JSON
+          {
+            "status": "AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT",
+            "sourceSha": "${GITHUB_SHA}",
+            "sourceRef": "main"
+          }
+          JSON
 
           python3 -m http.server 4173 --bind 127.0.0.1 --directory .qa-site >/tmp/hero-talent-carousel-http.log 2>&1 &
           server_pid=$!
