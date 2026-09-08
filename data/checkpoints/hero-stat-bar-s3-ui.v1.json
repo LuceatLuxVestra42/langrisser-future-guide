@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "stage": "hero-stat-bar-s3-ui",
+  "status": "COMPLETE",
+  "completion": "S3_COMPLETE",
+  "predecessor": {
+    "stage": "hero-stat-bar-s2-extrema-supply",
+    "branch": "s2-hero-stat-bar-extrema-supply",
+    "commitSha": "ba8c72deac69c5e44177a178a316b7b095136099",
+    "presentationContract": "data/contracts/hero-stat-bar-presentation.v1.json"
+  },
+  "implementation": {
+    "component": "src/components/hero-final-job-stats-section.tsx",
+    "layout": "3-B final-job card/block",
+    "statOrder": ["hp", "at", "magic", "df", "magicDf", "dex"],
+    "rowFlow": "label -> left-to-right horizontal bar -> exact numeric value on the right",
+    "minimumFillPercent": 25,
+    "maximumFillPercent": 100,
+    "normalization": "linear global per-stat B3 min/max",
+    "spTemporaryVisibility": true,
+    "spToggleImplemented": false,
+    "desktopPriority": true,
+    "mobileScope": "sanity only"
+  },
+  "semanticBoundary": {
+    "semanticMutation": false,
+    "tier4Recomputation": false,
+    "statFormulaRecomputation": false,
+    "extremaRecomputation": false,
+    "rawConfigDataRead": false,
+    "nameJoin": false,
+    "idArithmetic": false
+  },
+  "validation": {
+    "validator": "scripts/validate_hero_stat_bar_s3_ui.mjs",
+    "workflow": ".github/workflows/hero-stat-bar-s3-ui.yml",
+    "runId": 34227894477,
+    "jobId": 102066431522,
+    "candidateSha": "b903dcf6ab8394002daa6be8e15ef9d7fc65b009",
+    "validator": "PASS",
+    "build": "PASS",
+    "repositoryReadOnly": "PASS",
+    "workflowConclusion": "success"
+  },
+  "blockers": [],
+  "reviews": [],
+  "nextStage": "S4 temporary SP presentation handoff / presentation behavior verification"
+}
