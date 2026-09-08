@@ -3,6 +3,18 @@ import fs from "node:fs";
 const routePath = "src/routes/heroes_.$heroId.tsx";
 let source = fs.readFileSync(routePath, "utf8");
 
+const alreadyApplied =
+  source.includes('import { HeroFinalJobStatsSection } from "@/components/hero-final-job-stats-section";') &&
+  source.includes('import { getHeroFinalJobStatsPresentation } from "@/lib/hero-final-job-extrema.functions";') &&
+  source.includes("<HeroFinalJobStatsSection data={finalJobStats} />") &&
+  !source.includes("finalJobBranches") &&
+  !source.includes("capstone.finalStats.HP");
+
+if (alreadyApplied) {
+  console.log(JSON.stringify({ status: "PASS", stage: "hero-b4-final-job-stats-ui-patch", changed: false, path: routePath }, null, 2));
+  process.exit(0);
+}
+
 function replaceOnce(before, after, label) {
   const first = source.indexOf(before);
   if (first < 0) throw new Error(`B4 patch marker missing: ${label}`);
@@ -61,4 +73,4 @@ if (!source.includes("<HeroFinalJobStatsSection data={finalJobStats} />")) {
 }
 
 fs.writeFileSync(routePath, source);
-console.log(JSON.stringify({ status: "PASS", stage: "hero-b4-final-job-stats-ui-patch", changedPath: routePath }, null, 2));
+console.log(JSON.stringify({ status: "PASS", stage: "hero-b4-final-job-stats-ui-patch", changed: true, path: routePath }, null, 2));
