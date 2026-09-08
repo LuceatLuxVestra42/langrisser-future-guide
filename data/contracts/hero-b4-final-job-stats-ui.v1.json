@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "stage": "hero-b4-final-job-stats-ui",
+  "status": "IMPLEMENTED",
+  "purpose": "Present B3 frozen Tier4 Normal/SP MAX-bond final-job stats on Hero detail pages without recomputing stats or final-job eligibility in the frontend.",
+  "authoritativePredecessor": {
+    "b3Checkpoint": "data/checkpoints/hero-b3-final-job-extrema.v1.json",
+    "b3CommitSha": "a8918a245d996e99c56a6e71d90487e3aad923d4",
+    "consumer": "data/generated/hero-final-job-extrema.v1.json",
+    "validation": "data/validation/hero-b3-final-job-extrema-summary.v1.json"
+  },
+  "presentation": {
+    "route": "src/routes/heroes_.$heroId.tsx",
+    "component": "src/components/hero-final-job-stats-section.tsx",
+    "serverReader": "src/lib/hero-final-job-extrema.server.ts",
+    "serverFunction": "src/lib/hero-final-job-extrema.functions.ts",
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"],
+    "displayAliases": {"hp":"생명","at":"공격","magic":"지력","df":"방어","magicDf":"마방","dex":"기술"},
+    "showSpVariant": true,
+    "showGlobalExtremeBadges": true,
+    "profileLabel": "Lv.70 · 6성 · MAX 유대"
+  },
+  "boundaries": {
+    "frontendTierFiltering": false,
+    "frontendStatRecalculation": false,
+    "topologyEligibility": false,
+    "rawConfigDataJoin": false,
+    "sourceField": "B3 candidates[].values",
+    "eligibilityAuthority": "B3 eligibility: ConfigDataJobInfo.Rank == 4"
+  },
+  "replaces": {
+    "legacyFrontendFilter": "detail.jobs.branches.filter(branch => branch.capstone?.rank === 4)",
+    "legacyStatSource": "branch.capstone.finalStats"
+  },
+  "validation": {
+    "script": "scripts/validate_hero_b4_final_job_stats_ui.mjs",
+    "workflow": ".github/workflows/hero-b4-final-job-stats-ui.yml",
+    "required": [
+      "B3 consumer GENERATED and validator PASS",
+      "533 B3 candidates retained as source population",
+      "Hero route loads B3-derived presentation data",
+      "legacy frontend Tier4 filter removed",
+      "legacy capstone.finalStats display removed",
+      "no normalBondedStats/spBondedStats/raw topology semantic reopening",
+      "production frontend build PASS",
+      "bounded tracked mutation PASS"
+    ]
+  },
+  "nonScope": [
+    "B1/B2/B3 semantic recalculation",
+    "new final-job eligibility rules",
+    "localization of Job names",
+    "Hosted/Deployment QA",
+    "Browser/UI interaction QA"
+  ]
+}
