@@ -210,12 +210,13 @@ function projectSkill(skill: Stage6Skill | null | undefined) {
 function projectEquipableSkill(skill: Stage6Skill | null | undefined) {
   const projected = projectSkill(skill);
   if (!projected) return null;
-  if (!Number.isInteger(skill?.cost)) {
+  const cost = skill?.cost;
+  if (typeof cost !== "number" || !Number.isInteger(cost)) {
     throw new Error(`Equipable Skill ${projected.skillId} is missing canonical cost.`);
   }
   return {
     ...projected,
-    cost: Number(skill.cost),
+    cost,
   };
 }
 
