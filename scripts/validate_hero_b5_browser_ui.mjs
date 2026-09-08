@@ -26,9 +26,35 @@ for (const testCase of cases) {
   const page = await browser.newPage({ viewport: testCase.viewport });
   const pageErrors = [];
   const consoleErrors = [];
+  const failedResponses = [];
+  const requestFailures = [];
   page.on("pageerror", (error) => pageErrors.push(String(error.message ?? error)));
   page.on("console", (message) => {
-    if (message.type() === "error") consoleErrors.push(message.text());
+    if (message.type() === "error") {
+      const location = message.location();
+      consoleErrors.push({
+        text: message.text(),
+        url: location.url || null,
+        lineNumber: location.lineNumber ?? null,
+        columnNumber: location.columnNumber ?? null,
+      });
+    }
+  });
+  page.on("response", (response) => {
+    if (response.status() >= 400) {
+      failedResponses.push({
+        status: response.status(),
+        url: response.url(),
+        resourceType: response.request().resourceType(),
+      });
+    }
+  });
+  page.on("requestfailed", (request) => {
+    requestFailures.push({
+      url: request.url(),
+      resourceType: request.resourceType(),
+      errorText: request.failure()?.errorText ?? null,
+    });
   });
 
   const heroUrl = new URL("heroes/6/", baseUrl).toString();
@@ -53,7 +79,7 @@ for (const testCase of cases) {
     for (const expected of [
       "突击骑士", "皇家骑士", "湮黯青龙",
       "3497", "599", "3806", "569", "4041", "602", "260",
-      "Lv.70", "MAX 유대", "SP",
+      "Lv.70 · 6성 · 모든 직업 마스터 · 유대 MAX", "SP",
     ]) {
       if (!text.includes(expected)) failures.push(`${testCase.name}: missing visible value ${expected}`);
     }
@@ -64,8 +90,10 @@ for (const testCase of cases) {
     failures.push(`${testCase.name}: refresh lost final-job stats section`);
   }
 
-  if (pageErrors.length) failures.push(`${testCase.name}: page errors: ${pageErrors.join(" | ")}`);
-  if (consoleErrors.length) failures.push(`${testCase.name}: console errors: ${consoleErrors.join(" | ")}`);
+  if (pageErrors.length) failures.push(`${testCase.name}: page errors: ${JSON.stringify(pageErrors)}`);
+  if (consoleErrors.length) failures.push(`${testCase.name}: console errors: ${JSON.stringify(consoleErrors)}`);
+  if (failedResponses.length) failures.push(`${testCase.name}: HTTP failures: ${JSON.stringify(failedResponses)}`);
+  if (requestFailures.length) failures.push(`${testCase.name}: request failures: ${JSON.stringify(requestFailures)}`);
   await page.close();
 }
 
