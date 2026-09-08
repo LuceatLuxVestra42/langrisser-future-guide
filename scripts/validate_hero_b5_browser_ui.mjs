@@ -35,29 +35,33 @@ for (const testCase of cases) {
   const response = await page.goto(heroUrl, { waitUntil: "networkidle" });
   if (!response || !response.ok()) failures.push(`${testCase.name}: hero direct entry failed`);
 
-  const section = page.locator('[data-hero-final-job-stats="b3-frozen-consumer"]');
-  if ((await section.count()) !== 1) failures.push(`${testCase.name}: B3 frozen stats section missing`);
+  const section = page.locator('[data-hero-final-job-stats="true"]');
+  if ((await section.count()) !== 1) failures.push(`${testCase.name}: final-job stats section missing`);
   else {
-    const rows = section.locator('tbody tr[data-final-job-variant]');
+    const sourceStage = await section.getAttribute("data-final-job-source");
+    const rank = await section.getAttribute("data-final-job-rank");
+    if (sourceStage !== "hero-b3-final-job-extrema-consumer") {
+      failures.push(`${testCase.name}: unexpected source stage ${sourceStage}`);
+    }
+    if (rank !== "4") failures.push(`${testCase.name}: unexpected final-job rank ${rank}`);
+
+    const rows = section.locator("tbody tr");
     const count = await rows.count();
     if (count !== 3) failures.push(`${testCase.name}: Leon candidate row count ${count} != 3`);
 
-    const normal64 = section.locator('tr[data-job-connection-id="64"][data-final-job-variant="NORMAL"]');
-    const normal65 = section.locator('tr[data-job-connection-id="65"][data-final-job-variant="NORMAL"]');
-    const sp66 = section.locator('tr[data-job-connection-id="66"][data-final-job-variant="SP"]');
-    if ((await normal64.count()) !== 1) failures.push(`${testCase.name}: Leon NORMAL JC64 missing`);
-    if ((await normal65.count()) !== 1) failures.push(`${testCase.name}: Leon NORMAL JC65 missing`);
-    if ((await sp66.count()) !== 1) failures.push(`${testCase.name}: Leon SP JC66 missing`);
-
     const text = await section.innerText();
-    for (const expected of ["3497", "599", "3806", "569", "4041", "602", "260", "Lv.70", "MAX 유대", "SP"]) {
+    for (const expected of [
+      "突击骑士", "皇家骑士", "湮黯青龙",
+      "3497", "599", "3806", "569", "4041", "602", "260",
+      "Lv.70", "MAX 유대", "SP",
+    ]) {
       if (!text.includes(expected)) failures.push(`${testCase.name}: missing visible value ${expected}`);
     }
   }
 
   await page.reload({ waitUntil: "networkidle" });
-  if ((await page.locator('[data-hero-final-job-stats="b3-frozen-consumer"]').count()) !== 1) {
-    failures.push(`${testCase.name}: refresh lost B3 frozen stats section`);
+  if ((await page.locator('[data-hero-final-job-stats="true"]').count()) !== 1) {
+    failures.push(`${testCase.name}: refresh lost final-job stats section`);
   }
 
   if (pageErrors.length) failures.push(`${testCase.name}: page errors: ${pageErrors.join(" | ")}`);
