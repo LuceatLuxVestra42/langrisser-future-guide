@@ -47,7 +47,8 @@ jobs:
         run: |
           set -euo pipefail
           git merge-base --is-ancestor 48678e8198387ffc31fe0ffdd36ce1e47c623857 HEAD
-          grep -q 'data-hero-final-job-stats="b3-frozen-consumer"' src/components/hero-final-job-stats-section.tsx
+          grep -q 'data-hero-final-job-stats="true"' src/components/hero-final-job-stats-section.tsx
+          grep -q 'data-final-job-source={data.sourceStage}' src/components/hero-final-job-stats-section.tsx
           grep -q 'getHeroFinalJobStatsPresentation' 'src/routes/heroes_.$heroId.tsx'
           if grep -q 'finalJobBranches = detail.jobs.branches.filter' 'src/routes/heroes_.$heroId.tsx'; then
             echo 'Legacy frontend Tier4 filter returned' >&2
@@ -60,9 +61,10 @@ jobs:
           node scripts/build-equipment-name-kr-presentation.mjs
           bunx vite build --config vite.config.pages.ts
           test -f dist/client/heroes/6/index.html
-          grep -q 'data-hero-final-job-stats="b3-frozen-consumer"' dist/client/heroes/6/index.html
-          grep -q 'data-job-connection-id="66"' dist/client/heroes/6/index.html
-          grep -q 'data-final-job-variant="SP"' dist/client/heroes/6/index.html
+          grep -q 'data-hero-final-job-stats="true"' dist/client/heroes/6/index.html
+          grep -q 'data-final-job-source="hero-b3-final-job-extrema-consumer"' dist/client/heroes/6/index.html
+          grep -q '湮黯青龙' dist/client/heroes/6/index.html
+          grep -q '>4041<' dist/client/heroes/6/index.html
           cp dist/client/index.html dist/client/404.html
           cat > dist/client/authoritative-pages-source.json <<JSON
           {
