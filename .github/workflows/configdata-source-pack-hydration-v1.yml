@@ -40,7 +40,7 @@ jobs:
           node scripts/hydrate-configdata-source-pack-v1.mjs \
             --target-dir "$RUNNER_TEMP/configdata-hydrated"
 
-      - name: Census present SkillCost null values
+      - name: Census present SkillCost raw types
         shell: bash
         run: |
           set -euo pipefail
@@ -54,22 +54,37 @@ jobs:
             throw new Error('ConfigDataSkillInfo root is not an array');
           }
 
-          let present = 0;
-          let nullCount = 0;
-          let nonNull = 0;
+          const out = {
+            total: root.length,
+            present: 0,
+            number: 0,
+            string: 0,
+            boolean: 0,
+            object: 0,
+            array: 0,
+            null: 0,
+            other: 0,
+          };
 
           for (const row of root) {
             if (!row || typeof row !== 'object' || Array.isArray(row)) continue;
             if (!Object.prototype.hasOwnProperty.call(row, 'SkillCost')) continue;
 
-            present += 1;
-            if (row.SkillCost === null) nullCount += 1;
-            else nonNull += 1;
+            out.present += 1;
+            const value = row.SkillCost;
+
+            if (value === null) out.null += 1;
+            else if (Array.isArray(value)) out.array += 1;
+            else if (typeof value === 'number') out.number += 1;
+            else if (typeof value === 'string') out.string += 1;
+            else if (typeof value === 'boolean') out.boolean += 1;
+            else if (typeof value === 'object') out.object += 1;
+            else out.other += 1;
           }
 
-          const out = { total: root.length, present, null: nullCount, nonNull };
-          if (present !== nullCount + nonNull) {
-            throw new Error('SkillCost null census total mismatch');
+          const classified = out.number + out.string + out.boolean + out.object + out.array + out.null + out.other;
+          if (out.present !== classified) {
+            throw new Error('SkillCost raw type census total mismatch');
           }
 
           console.log(JSON.stringify(out));
