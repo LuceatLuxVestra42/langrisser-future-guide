@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "stage": "hero-b1-normal-bonded-consumer",
+  "status": "FROZEN",
+  "purpose": "Materialize verified Lv70/6-star/all-job-mastery/MAX-bond Hero-body stats for every normal JobConnection without reopening Stage 4 semantics or mutating the frozen normal payload.",
+  "authority": {
+    "normalStatSource": "data/generated/hero-basic-combat.v1.json",
+    "normalStatValidation": "data/validation/hero-basic-combat-stage4-5-summary.v1.json",
+    "materializationOwner": "Hero Stage 6-3 generated consumer",
+    "outputManifest": "data/generated/hero-detail.v1.json",
+    "heroShardTemplate": "data/generated/hero-detail/by-id/{heroId}.json"
+  },
+  "scope": {
+    "canonicalHeroCount": 267,
+    "target": "normal JobConnection Hero-body stats only",
+    "bondProfile": "MAX",
+    "bondSelfMul": 2500,
+    "heroLevel": 70,
+    "star": 6,
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"]
+  },
+  "formula": {
+    "inputs": ["progressionBase", "starCorrection", "masteryFlat"],
+    "expression": "RoundHalfToEven(progressionBase * (1 + starCorrection / 10000) * 1.25 + masteryFlat)",
+    "rounding": "HALF_TO_EVEN",
+    "intermediateRounding": false,
+    "forbiddenCalculationInputs": ["starAdjusted", "finalDisplayStats.values"]
+  },
+  "schema": {
+    "field": "normalBondedStats",
+    "placement": "top-level sibling of normal in each Hero Stage 6-3 record",
+    "preserveNormalPayload": true,
+    "connectionKey": "jobConnectionId"
+  },
+  "nonScope": [
+    "SP jobs and SP reshape rewards",
+    "equipment and exclusive equipment",
+    "central discipline",
+    "enchant",
+    "combat buffs and conditional modifiers",
+    "Soldier command stats and Soldier own stats",
+    "new semantic joins or relationship derivation"
+  ],
+  "validation": {
+    "validator": "scripts/validate_hero_b1_normal_bonded_consumer.cjs",
+    "required": [
+      "267 canonical Hero shards",
+      "normal JobConnection 1:1 parity with Stage 4",
+      "all six generated stats are non-negative integers",
+      "exact independent formula recomputation parity",
+      "bonded values are not below unbonded Stage 4 values",
+      "Leon heroId=6 contains exactly one normal connection matching the frozen Royal Knight regression vector 3806/569/224/242/231/125",
+      "zero hard errors"
+    ]
+  }
+}

@@ -1,0 +1,107 @@
+name: Hero B1 Normal Bonded Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/hero-b1-normal-bonded-consumer.v1.json'
+      - 'scripts/run_hero_b1_normal_bonded_consumer.cjs'
+      - 'scripts/validate_hero_b1_normal_bonded_consumer.cjs'
+      - '.github/workflows/hero-b1-normal-bonded-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate-b1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Materialize B1 normal bonded Hero shards
+        run: node scripts/run_hero_b1_normal_bonded_consumer.cjs
+
+      - name: Run independent B1 validator
+        run: node scripts/validate_hero_b1_normal_bonded_consumer.cjs
+
+      - name: Write B1 closeout checkpoint
+        if: github.event_name == 'pull_request'
+        env:
+          VALIDATED_HEAD: ${{ github.sha }}
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const out = 'data/checkpoints/hero-b1-normal-bonded-consumer.json';
+          if (!fs.existsSync(out)) {
+            const v = require('./data/validation/hero-b1-normal-bonded-consumer.v1.json');
+            const checkpoint = {
+              version: 1,
+              stage: 'hero-b1-normal-bonded-consumer',
+              status: 'COMPLETE',
+              validatedSourceHead: process.env.VALIDATED_HEAD,
+              authoritativePredecessor: 'current COMPLETE/FROZEN Hero Stage 6-3 shards',
+              contract: 'data/contracts/hero-b1-normal-bonded-consumer.v1.json',
+              generatedManifest: 'data/generated/hero-detail.v1.json',
+              generatedField: 'normalBondedStats',
+              validation: 'data/validation/hero-b1-normal-bonded-consumer.v1.json',
+              canonicalHeroCount: v.summary.canonicalHeroCount,
+              heroShardCount: v.summary.heroShardCount,
+              normalConnectionCount: v.summary.normalConnectionCount,
+              generatedConnectionCount: v.summary.generatedConnectionCount,
+              leonRegressionMatchCount: v.summary.leonRegressionMatchCount,
+              hardErrorCount: v.summary.hardErrorCount,
+              blocker: 'NONE',
+              nonBlockingReview: 'NONE_FOR_B1',
+              nextOwner: 'B2 SP bonded consumer',
+              reopenConditions: [
+                'Stage4 stat component source changes',
+                'bond semantic contract changes',
+                'canonical Hero population changes',
+                'normal/SP ownership boundary changes',
+                'authoritative runtime contradiction'
+              ]
+            };
+            fs.mkdirSync(path.dirname(out), { recursive: true });
+            fs.writeFileSync(out, JSON.stringify(checkpoint, null, 2) + '\n');
+          }
+          NODE
+
+      - name: Show B1 validation summary
+        if: always() && hashFiles('data/validation/hero-b1-normal-bonded-consumer.v1.json') != ''
+        run: |
+          node - <<'NODE'
+          const v = require('./data/validation/hero-b1-normal-bonded-consumer.v1.json');
+          console.log(JSON.stringify(v, null, 2));
+          NODE
+
+      - name: Freeze validated B1 generated outputs to PR branch
+        if: github.event_name == 'pull_request'
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+        run: |
+          git add data/generated/hero-detail.v1.json data/generated/hero-detail/by-id data/validation/hero-b1-normal-bonded-consumer.v1.json data/checkpoints/hero-b1-normal-bonded-consumer.json
+          if git diff --cached --quiet; then
+            echo 'B1 generated outputs already frozen; no writeback needed.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Freeze B1 normal bonded Hero consumer'
+          git push origin HEAD:"${HEAD_BRANCH}"
+
+      - name: Show generated scope
+        if: always()
+        run: |
+          git status --short -- data/generated/hero-detail.v1.json data/generated/hero-detail-shared.v1.json data/generated/hero-detail/by-id data/validation/hero-stage6-3-final.v1.json data/checkpoints/hero-stage6-3-full-generation.json data/checkpoints/hero-stage6-3-full-generation.md data/validation/hero-b1-normal-bonded-consumer.v1.json data/checkpoints/hero-b1-normal-bonded-consumer.json || true
