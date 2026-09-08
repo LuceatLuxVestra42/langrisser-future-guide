@@ -1,56 +1,17 @@
 'use strict';
+const fs=require('fs'),path=require('path'); const ROOT=path.resolve(__dirname,'..');
+const read=p=>JSON.parse(fs.readFileSync(path.join(ROOT,p),'utf8'));
+const rows=d=>Array.isArray(d)?d:(d?.records||d?.rows||d?.data||[]);
+const sp=read('data/generated/hero-page-stage5-4-sp.v1.json');
+const records=sp.records||[]; const released=records.filter(r=>r?.sp?.status==='RELEASED');
+console.log('SP_SUMMARY',JSON.stringify({heroRecords:records.length,releasedCount:released.length,releasedHeroIds:released.map(r=>r.heroId)},null,2));
+const leon=records.find(r=>Number(r.heroId)===6); console.log('LEON_STAGE54',JSON.stringify(leon,null,2));
 
-const fs = require('fs');
-const path = require('path');
-const ROOT = path.resolve(__dirname, '..');
-const read = p => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
+const tables=['ConfigDataSPHeroInfo.json','ConfigDataJobConnectionInfo.json','ConfigDataJobInfo.json','ConfigDataJobLevelInfo.json','ConfigDataHeroInfo.json','ConfigDataPropertyModifyInfo.json'];
+for(const name of tables){const p='data/configdata/'+name;if(!fs.existsSync(path.join(ROOT,p))){console.log('TABLE_MISSING',name);continue;}const a=rows(read(p));console.log('TABLE',name,'COUNT',a.length,'KEYS',JSON.stringify(Object.keys(a[0]||{}))); if(name==='ConfigDataSPHeroInfo.json')console.log('RAW_SP6',JSON.stringify(a.find(x=>Number(x.ID)===6),null,2)); if(name==='ConfigDataJobConnectionInfo.json')console.log('RAW_JC66',JSON.stringify(a.find(x=>Number(x.ID)===66),null,2)); if(name==='ConfigDataJobInfo.json')console.log('RAW_JOB377',JSON.stringify(a.find(x=>Number(x.ID)===377),null,2));}
 
-const sp = read('data/generated/hero-page-stage5-4-sp.v1.json');
-const leonShard = read('data/generated/hero-detail/by-id/6.json');
-const records = Array.isArray(sp.records) ? sp.records : [];
-const spRecords = records.filter(r => r && r.sp);
-console.log('SP_SUMMARY', JSON.stringify({ heroRecords: records.length, spHeroCount: spRecords.length, spHeroIds: spRecords.map(r => r.heroId) }, null, 2));
-const leon = records.find(r => Number(r?.heroId) === 6);
-console.log('LEON_STAGE54', JSON.stringify(leon, null, 2));
-console.log('LEON_SHARD_SP', JSON.stringify(leonShard.sp, null, 2));
+for(const name of ['ConfigDataJobLevelInfo.json']){const p='data/configdata/'+name;if(!fs.existsSync(path.join(ROOT,p)))continue;const a=rows(read(p));const hits=a.filter(x=>Object.values(x).some(v=>Number(v)===377||Number(v)===66));console.log('JOBLEVEL_377_66_HITS',JSON.stringify(hits.slice(0,30),null,2));}
 
-const skipDirs = new Set(['.git','node_modules','.next','dist','build','coverage','public','data']);
-const textExt = new Set(['.cjs','.mjs','.js','.ts','.tsx','.json','.yml','.yaml','.md']);
-const needles = [
-  'hero-page-stage5-4-sp.v1.json',
-  'secondStageRewardBuffId',
-  'propertyModifiers',
-  'ConfigDataHeroSP',
-  'ConfigDataJobLevel',
-  'starCorrection',
-  'masteryFlat',
-  'JobConnection',
-];
-const hits = [];
-function scan(dir) {
-  for (const ent of fs.readdirSync(dir, {withFileTypes:true})) {
-    if (skipDirs.has(ent.name)) continue;
-    const abs = path.join(dir, ent.name);
-    if (ent.isDirectory()) { scan(abs); continue; }
-    if (!textExt.has(path.extname(ent.name))) continue;
-    let text;
-    try { text = fs.readFileSync(abs, 'utf8'); } catch { continue; }
-    const found = needles.filter(n => text.includes(n));
-    if (found.length) hits.push({ path: path.relative(ROOT, abs).replaceAll('\\','/'), found });
-  }
-}
-scan(ROOT);
-console.log('SOURCE_HITS', JSON.stringify(hits, null, 2));
-
-const likelyFiles = [];
-function listLikely(dir) {
-  for (const ent of fs.readdirSync(dir, {withFileTypes:true})) {
-    if (skipDirs.has(ent.name)) continue;
-    const abs = path.join(dir, ent.name);
-    if (ent.isDirectory()) { listLikely(abs); continue; }
-    const rel = path.relative(ROOT, abs).replaceAll('\\','/');
-    if (/hero.*(sp|stage5)|sp.*hero|job.*(level|mastery|star)/i.test(rel)) likelyFiles.push(rel);
-  }
-}
-listLikely(ROOT);
-console.log('LIKELY_FILES', JSON.stringify(likelyFiles.slice(0,300), null, 2));
+const skip=new Set(['.git','node_modules','.next','dist','build','coverage','public','data']); const exts=new Set(['.cjs','.mjs','.js','.ts','.tsx','.json','.yml','.yaml','.md']); const needles=['ATStar','HPStar','ConfigDataSPHeroInfo','ConfigDataJobLevelInfo','masteryRewards','Property1']; const hits=[];
+function scan(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(skip.has(e.name))continue;const a=path.join(dir,e.name);if(e.isDirectory()){scan(a);continue;}if(!exts.has(path.extname(e.name)))continue;let t;try{t=fs.readFileSync(a,'utf8')}catch{continue}const found=needles.filter(n=>t.includes(n));if(found.length)hits.push({path:path.relative(ROOT,a).replaceAll('\\','/'),found});}}
+scan(ROOT);console.log('SOURCE_HITS',JSON.stringify(hits,null,2));
