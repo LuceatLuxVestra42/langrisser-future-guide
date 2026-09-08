@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "stage": "hero-b2-sp-bonded-producer",
+  "status": "INPUTS_RESOLVED",
+  "purpose": "Materialize verified Lv70/6-star/MAX-bond Hero-body stats for each RELEASED SP variant while preserving the B1 Hero detail predecessor and frozen SP payload.",
+  "authoritativePredecessor": {
+    "b1Commit": "59d6098e9dfd1e826640ca670d097e7418ed810e",
+    "b1Contract": "data/contracts/hero-b1-normal-bonded-consumer.v1.json",
+    "spSource": "data/generated/hero-page-stage5-4-sp.v1.json",
+    "heroManifest": "data/generated/hero-detail.v1.json",
+    "heroShardTemplate": "data/generated/hero-detail/by-id/{heroId}.json"
+  },
+  "scope": {
+    "canonicalHeroCount": 267,
+    "spReleasedCount": 25,
+    "spNotReleasedCount": 242,
+    "heroLevel": 70,
+    "star": 6,
+    "bondProfile": "MAX",
+    "bondSelfMul": 2500,
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"]
+  },
+  "inputContract": {
+    "progression": {
+      "relation": "Stage5-4 sp.job.jobConnectionId -> ConfigDataJobConnectionInfo.ID -> JobLevels_ID -> ConfigDataJobLevelInfo.ID",
+      "finalJobLevelRule": "Resolve every explicit JobLevels_ID; sort by JobLevelUpHeroLevel then ID; use the last row, matching Stage 4 final-level selection semantics.",
+      "fields": {
+        "hp": ["HP_INI", "HP_UP", "HPStar"],
+        "at": ["AT_INI", "AT_UP", "ATStar"],
+        "magic": ["Magic_INI", "Magic_UP", "MagicStar"],
+        "df": ["DF_INI", "DF_UP", "DFStar"],
+        "magicDf": ["MagicDF_INI", "MagicDF_UP", "MagicDFStar"],
+        "dex": ["DEX_INI", "DEX_UP", "DEXStar"]
+      },
+      "missingUpRule": "A missing *_UP field is numeric zero only under the already-verified Stage 4 number(value, fallback=0) field rule; this is not a new inferred value.",
+      "forbidden": ["SP *Cmd_INI as Hero-body progression", "normal finalDisplayStats.values", "normal starAdjusted", "normalBondedStats"]
+    },
+    "mastery": {
+      "source": "Hero Stage 6-3 shard normal.displayStats.globalJobMastery.totals",
+      "meaning": "The validated Stage 4 Hero-global mastered-normal-job flat totals remain the Hero mastery flat when evaluating the SP variant.",
+      "spJobInfoMasteryFallback": false,
+      "normalConnectionSelection": false
+    },
+    "reshape": {
+      "source": "Stage5-4 sp.secondStageRewards.buff.properties",
+      "verificationSource": "ConfigDataPropertyModifyInfo",
+      "propertyIdToStat": {
+        "99": "hp",
+        "100": "at",
+        "101": "df",
+        "102": "magic",
+        "103": "magicDf",
+        "104": "dex"
+      },
+      "verifiedRawIdentity": {
+        "99": {"propertyModifyType": 99, "sourceNameCn": "生命"},
+        "100": {"propertyModifyType": 100, "sourceNameCn": "攻击"},
+        "101": {"propertyModifyType": 101, "sourceNameCn": "防御"},
+        "102": {"propertyModifyType": 102, "sourceNameCn": "智力"},
+        "103": {"propertyModifyType": 103, "sourceNameCn": "魔防"},
+        "104": {"propertyModifyType": 104, "sourceNameCn": "技巧"}
+      },
+      "semanticRule": "The fixed numeric mapping above is the contract. Source names are provenance verification only and must never be used as a name JOIN or text parser.",
+      "missingStatSelfMul": 0
+    }
+  },
+  "formula": {
+    "progressionBase": "INI + UP * 69 / 10",
+    "expression": "RoundHalfToEven(progressionBase * (1 + starCorrection / 10000) * (1 + 2500 / 10000 + reshapeSelfMul / 10000) + masteryFlat)",
+    "rounding": "HALF_TO_EVEN",
+    "intermediateRounding": false
+  },
+  "schema": {
+    "field": "spBondedStats",
+    "placement": "top-level sibling of sp in each RELEASED Hero Stage 6-3 shard",
+    "preserveFields": ["normal", "normalBondedStats", "sp"],
+    "notReleasedFieldMustBeAbsent": true,
+    "frontendRecalculation": false
+  },
+  "nonScope": [
+    "Normal bonded recomputation",
+    "equipment and exclusive equipment",
+    "central discipline",
+    "enchant",
+    "combat buffs and conditional modifiers",
+    "Soldier stats or Hero-Soldier membership",
+    "presentation and frontend eligibility"
+  ],
+  "regressionFixture": {
+    "heroId": 6,
+    "name": "Leon",
+    "jobConnectionId": 66,
+    "jobId": 377,
+    "finalJobLevelId": 661,
+    "reshapeBuffId": 8570110,
+    "expectedValues": {"hp": 4041, "at": 602, "magic": 224, "df": 260, "magicDf": 231, "dex": 125}
+  },
+  "completion": {
+    "required": [
+      "25/25 RELEASED SP variants materialized",
+      "0 spBondedStats on 242 NOT_RELEASED Heroes",
+      "0 unresolved explicit SP JobConnection/JobLevel relations",
+      "0 unknown reshape PropertyModify IDs",
+      "0 formula/input hard errors",
+      "Leon regression fixture exact match",
+      "0 mutation of normal, normalBondedStats, or sp predecessor payloads"
+    ],
+    "nextStage": "B2-6 independent SP bonded validator"
+  }
+}
