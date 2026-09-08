@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "stage": "hero-b2-7-sp-bonded-freeze",
+  "status": "FINAL_FROZEN",
+  "purpose": "Freeze the completed and independently validated RELEASED SP Lv70/6-star/MAX-bond Hero-body stat semantics for downstream reuse without recomputation.",
+  "authoritativePredecessors": {
+    "b2_5ProducerCheckpoint": "data/checkpoints/hero-b2-5-sp-bonded-producer.v1.json",
+    "b2_5ProducerComplete": true,
+    "b2_6ValidatorCheckpoint": "data/checkpoints/hero-b2-6-sp-bonded-validator.v1.json",
+    "b2_6ValidatorPass": true,
+    "b2_6CommitSha": "421bf4719ec8d2b99293ba63281529374277ef35",
+    "b1CommitSha": "59d6098e9dfd1e826640ca670d097e7418ed810e"
+  },
+  "frozenConsumer": {
+    "manifest": "data/generated/hero-detail.v1.json",
+    "heroShardTemplate": "data/generated/hero-detail/by-id/{heroId}.json",
+    "field": "spBondedStats",
+    "populationRule": "Present only on RELEASED SP Heroes",
+    "canonicalHeroCount": 267,
+    "spReleasedCount": 25,
+    "spNotReleasedCount": 242,
+    "spBondedPresentCount": 25,
+    "notReleasedPollution": 0
+  },
+  "frozenSemantics": {
+    "heroLevel": 70,
+    "star": 6,
+    "bondProfile": "MAX",
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"],
+    "progression": "Stage5-4 explicit SP jobConnectionId -> ConfigDataJobConnectionInfo.ID -> JobLevels_ID -> ConfigDataJobLevelInfo.ID; select final row by JobLevelUpHeroLevel then ID ordering.",
+    "starCorrection": "Stage5-4 SPHeroInfo-derived StatStar[5] arrays.",
+    "masteryFlat": "Validated Stage4 Hero-global mastered-normal-job flat totals from normal.displayStats.globalJobMastery.totals.",
+    "reshape": {
+      "source": "Stage5-4 sp.secondStageRewards.buff.properties",
+      "propertyIdToStat": {
+        "99": "hp",
+        "100": "at",
+        "101": "df",
+        "102": "magic",
+        "103": "magicDf",
+        "104": "dex"
+      }
+    },
+    "formula": "RoundHalfToEven((INI + UP * 69 / 10) * (1 + starCorrection / 10000) * (1 + 2500 / 10000 + reshapeSelfMul / 10000) + masteryFlat)",
+    "intermediateRounding": false,
+    "rounding": "HALF_TO_EVEN"
+  },
+  "validationEvidence": {
+    "independentValidator": "scripts/validate_hero_b2_sp_bonded_consumer.cjs",
+    "githubActionsRunId": 34210941450,
+    "githubActionsJobId": 102011518001,
+    "formulaMismatchCount": 0,
+    "relationErrorCount": 0,
+    "inputErrorCount": 0,
+    "reshapeErrorCount": 0,
+    "predecessorMutationCount": 0,
+    "fixtureFailureCount": 0,
+    "manifestIntegrityErrorCount": 0,
+    "provenanceMismatchCount": 0,
+    "hardErrorCount": 0,
+    "readOnlyGate": "PASS"
+  },
+  "fixtures": {
+    "leon": {
+      "heroId": 6,
+      "jobConnectionId": 66,
+      "jobId": 377,
+      "finalJobLevelId": 661,
+      "reshapeBuffId": 8570110,
+      "values": {"hp": 4041, "at": 602, "magic": 224, "df": 260, "magicDf": 231, "dex": 125}
+    },
+    "matthew": {
+      "heroId": 1,
+      "jobConnectionId": 22,
+      "jobId": 262,
+      "reshapeBuffId": 8670110,
+      "reshapeProperties": [
+        {"propertyId": 103, "value": 500},
+        {"propertyId": 101, "value": 500}
+      ]
+    }
+  },
+  "downstreamUse": {
+    "reuseOrder": [
+      "current frozen/generated spBondedStats consumer",
+      "this freeze contract and B2-6 validation checkpoint",
+      "B2-5 producer checkpoint",
+      "Stage5-4/ConfigData inputs only if a reopen condition is met"
+    ],
+    "frontendRecalculation": false,
+    "semanticRecomputationForB3": false,
+    "b3EligibilityRule": "B3 may consume bonded outputs and filter final-job candidates by authoritative JobInfo Tier==4 only; do not redefine final-job semantics by topology, leaf position, ordering, name JOIN, or ID arithmetic."
+  },
+  "reopenConditions": [
+    "Stage5-4 SP source snapshot changes",
+    "ConfigData source-pack snapshot or relevant schema changes",
+    "B1/Stage4 global mastery authority changes",
+    "explicit SP JobConnection/JobLevel relation contradiction",
+    "reshape PropertyModify numeric mapping contradiction",
+    "materialized spBondedStats changes",
+    "owning independent validator hard failure",
+    "actual canonical/parity damage"
+  ],
+  "nonReopenReasons": [
+    "presentation/UI changes",
+    "localization changes",
+    "asset changes",
+    "hosting/deployment failures",
+    "additional confidence-only REVIEW"
+  ],
+  "handoff": {
+    "nextOwner": "B3 Normal/SP integrated final-job consumer",
+    "nextStart": "Consume frozen normalBondedStats plus frozen RELEASED spBondedStats, filter candidate jobs by authoritative JobInfo Tier==4, then compute six-stat global extrema while preserving all ties."
+  }
+}
