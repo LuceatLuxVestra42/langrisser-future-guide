@@ -2,8 +2,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = process.cwd();
+const sourceRootArg = process.argv.includes('--source-root')
+  ? process.argv[process.argv.indexOf('--source-root') + 1]
+  : null;
+if (!sourceRootArg) throw new Error('missing --source-root');
+
 const TARGET_IDS = new Set([70110, 70343, 70344, 70345, 70346, 70347, 70348, 70349, 70350, 70351, 70352]);
-const sourcePath = path.join(ROOT, 'data/configdata/ConfigDataSkillInfo.json');
+const sourceRoot = path.resolve(sourceRootArg);
+const sourcePath = path.join(sourceRoot, 'data/configdata/ConfigDataSkillInfo.json');
 const outPath = path.join(ROOT, 'heart-fetter-skillinfo-trace.json');
 
 const raw = fs.readFileSync(sourcePath, 'utf8');
@@ -28,7 +34,7 @@ matches.sort((a, b) => a.record.ID - b.record.ID);
 const found = new Set(matches.map((m) => m.record.ID));
 const missing = [...TARGET_IDS].filter((id) => !found.has(id));
 const report = {
-  source: path.relative(ROOT, sourcePath),
+  sourceLogicalPath: 'data/configdata/ConfigDataSkillInfo.json',
   targetIds: [...TARGET_IDS],
   matchCount: matches.length,
   missing,
