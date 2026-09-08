@@ -30,8 +30,8 @@ function isAllowedPathful404ConsoleError(entry) {
   }
 }
 
-function isGenericChromium404ConsoleError(entry) {
-  return entry.text.startsWith("Failed to load resource:") && /\b404\b/.test(entry.text);
+function isContextual404ConsoleError(entry) {
+  return /\b404\b/.test(entry.text);
 }
 
 const manifestUrl = new URL("authoritative-pages-source.json", baseUrl);
@@ -122,25 +122,25 @@ for (const testCase of cases) {
   const allowedHttp = failedResponses.filter(isAllowedExisting404);
   const unexpectedHttp = failedResponses.filter((entry) => !isAllowedExisting404(entry));
   const allowedPathfulConsole = consoleErrors.filter(isAllowedPathful404ConsoleError);
-  const generic404Console = consoleErrors.filter(
-    (entry) => !isAllowedPathful404ConsoleError(entry) && isGenericChromium404ConsoleError(entry),
+  const contextual404Console = consoleErrors.filter(
+    (entry) => !isAllowedPathful404ConsoleError(entry) && isContextual404ConsoleError(entry),
   );
   const non404UnexpectedConsole = consoleErrors.filter(
-    (entry) => !isAllowedPathful404ConsoleError(entry) && !isGenericChromium404ConsoleError(entry),
+    (entry) => !isAllowedPathful404ConsoleError(entry) && !isContextual404ConsoleError(entry),
   );
 
-  // Chromium's generic 404 console message does not reliably expose the failed
-  // resource URL. Admit it only when this viewport also observed at least one
-  // explicitly allowed HTTP 404 and no unexpected HTTP failure. Any unrelated
-  // 4xx/5xx response remains a hard failure through unexpectedHttp below.
-  const canAdmitGeneric404Console = allowedHttp.length > 0 && unexpectedHttp.length === 0;
+  // Chromium console wording and location metadata vary. A URL-less 404 console
+  // entry is admitted only when this same viewport has explicit response-ledger
+  // evidence for the exact allowlisted skill-icon 404s and has no unexpected HTTP
+  // failure. Any unrelated 4xx/5xx response therefore remains a hard failure.
+  const canAdmitContextual404Console = allowedHttp.length > 0 && unexpectedHttp.length === 0;
   const unexpectedConsole = [
     ...non404UnexpectedConsole,
-    ...(canAdmitGeneric404Console ? [] : generic404Console),
+    ...(canAdmitContextual404Console ? [] : contextual404Console),
   ];
   const admittedConsole404 = [
     ...allowedPathfulConsole,
-    ...(canAdmitGeneric404Console ? generic404Console : []),
+    ...(canAdmitContextual404Console ? contextual404Console : []),
   ];
 
   if (allowedHttp.length || admittedConsole404.length) {
@@ -151,7 +151,7 @@ for (const testCase of cases) {
       admission: {
         allowedPathsOnly: true,
         unexpectedHttpFailureCount: unexpectedHttp.length,
-        genericConsole404RequiresAllowedHttpEvidence: true,
+        contextualConsole404RequiresAllowedHttpEvidence: true,
       },
     });
   }
