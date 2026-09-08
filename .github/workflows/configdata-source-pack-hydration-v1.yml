@@ -32,12 +32,13 @@ jobs:
         with:
           node-version: 22
 
-      - name: Count Cost-4H exact SkillInfo intersection
+      - name: Freeze Cost-4K equipable SkillID set identity
         shell: bash
         run: |
           set -euo pipefail
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
+          import crypto from 'node:crypto';
 
           const manifest = JSON.parse(fs.readFileSync('data/generated/hero-detail.v1.json', 'utf8'));
           const byHeroId = manifest?.storage?.byHeroId;
@@ -45,7 +46,7 @@ jobs:
             throw new Error('hero-detail manifest storage.byHeroId is missing or malformed');
           }
 
-          const equipableSkillIds = new Set();
+          const ids = new Set();
           for (const [heroId, meta] of Object.entries(byHeroId)) {
             if (!meta || typeof meta.path !== 'string') {
               throw new Error(`missing shard path for hero ${heroId}`);
@@ -68,42 +69,38 @@ jobs:
                 if (typeof id !== 'number' || !Number.isFinite(id)) {
                   throw new Error(`non-numeric gotSkillId for hero ${heroId}`);
                 }
-                equipableSkillIds.add(String(id));
+                ids.add(String(id));
               }
             }
           }
 
-          const skillIndex = JSON.parse(fs.readFileSync('data/index/skill.v1.json', 'utf8'));
-          const entries = skillIndex?.index?.entries;
-          if (!Array.isArray(entries)) {
-            throw new Error('skill index entries missing or malformed');
-          }
-          const skillInfoIds = new Set();
-          for (const tuple of entries) {
-            if (!Array.isArray(tuple) || tuple.length < 2) {
-              throw new Error('malformed skill index tuple');
-            }
-            const id = tuple[0];
-            if (typeof id !== 'string' || id.length === 0) {
-              throw new Error('malformed skill index id');
-            }
-            skillInfoIds.add(id);
-          }
-
-          let intersection = 0;
-          let equipableNotInSkillInfo = 0;
-          for (const id of equipableSkillIds) {
-            if (skillInfoIds.has(id)) intersection += 1;
-            else equipableNotInSkillInfo += 1;
-          }
+          const sortedIds = [...ids].sort((a, b) => Number(a) - Number(b));
+          const canonical = JSON.stringify(sortedIds);
+          const sha256 = crypto.createHash('sha256').update(canonical).digest('hex');
+          const outPath = `${process.env.RUNNER_TEMP}/cost-4k-equipable-skill-ids.v1.json`;
+          fs.writeFileSync(outPath, JSON.stringify({
+            version: 1,
+            source: 'data/generated/hero-detail.v1.json -> storage.byHeroId shards -> normal.jobTree.connections[].levels[].gotSkillId',
+            count: sortedIds.length,
+            sha256OfCanonicalIdArray: sha256,
+            ids: sortedIds
+          }, null, 2) + '\n');
 
           console.log(JSON.stringify({
-            equipableDistinctSkillIds: equipableSkillIds.size,
-            skillInfoIds: skillInfoIds.size,
-            intersection,
-            equipableNotInSkillInfo
+            equipableDistinctSkillIds: sortedIds.length,
+            sha256,
+            sampleFirst5: sortedIds.slice(0, 5),
+            frozenFile: 'cost-4k-equipable-skill-ids.v1.json'
           }));
           NODE
+
+      - name: Upload Cost-4K frozen set
+        uses: actions/upload-artifact@v4
+        with:
+          name: cost-4k-equipable-skill-ids
+          path: ${{ runner.temp }}/cost-4k-equipable-skill-ids.v1.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Verify repository non-mutation
         run: |
