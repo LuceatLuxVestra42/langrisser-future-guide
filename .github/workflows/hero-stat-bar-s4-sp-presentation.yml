@@ -1,0 +1,44 @@
+name: Hero stat bar S4 SP presentation
+
+on:
+  push:
+    branches:
+      - s4-hero-stat-bar-sp-presentation
+    paths:
+      - 'src/components/hero-final-job-stats-section.tsx'
+      - 'data/contracts/hero-stat-bar-presentation.v1.json'
+      - 'data/generated/hero-final-job-extrema.v1.json'
+      - 'scripts/validate_hero_stat_bar_s4_sp_presentation.mjs'
+      - '.github/workflows/hero-stat-bar-s4-sp-presentation.yml'
+      - 'data/checkpoints/hero-stat-bar-s4-sp-presentation.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: s4-hero-stat-bar-sp-presentation
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.1
+      - name: Validate S4 temporary SP presentation
+        run: node scripts/validate_hero_stat_bar_s4_sp_presentation.mjs
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+      - name: Build frontend
+        run: bun run build
+      - name: Assert repository remained read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+            echo 'Unexpected tracked mutation during S4 validation:' >&2
+            git status --short >&2
+            exit 1
+          fi
