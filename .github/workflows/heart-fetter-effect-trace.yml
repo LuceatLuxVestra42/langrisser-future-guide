@@ -43,6 +43,11 @@ jobs:
           node scripts/trace_heart_fetter_population_stats.mjs \
             --source-root "$RUNNER_TEMP/configdata-hydrated"
 
+      - name: Trace Heart Fetter reverse references
+        run: |
+          node scripts/trace_heart_fetter_reverse_refs.mjs \
+            --source-root "$RUNNER_TEMP/configdata-hydrated"
+
       - name: Upload trace artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -52,9 +57,10 @@ jobs:
             heart-fetter-passive-trace.json
             heart-fetter-property-trace.json
             heart-fetter-population-stats-trace.json
+            heart-fetter-reverse-ref-trace.json
 
       - name: Clean trace output
-        run: rm heart-fetter-skillinfo-trace.json heart-fetter-passive-trace.json heart-fetter-property-trace.json heart-fetter-population-stats-trace.json
+        run: rm heart-fetter-skillinfo-trace.json heart-fetter-passive-trace.json heart-fetter-property-trace.json heart-fetter-population-stats-trace.json heart-fetter-reverse-ref-trace.json
 
       - name: Assert repository read-only
         run: |
