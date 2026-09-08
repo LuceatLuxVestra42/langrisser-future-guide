@@ -34,14 +34,28 @@ function isContextual404ConsoleError(entry) {
   return /\b404\b/.test(entry.text);
 }
 
-const manifestUrl = new URL("authoritative-pages-source.json", baseUrl);
-manifestUrl.searchParams.set("b5", `${Date.now()}`);
-const manifestResponse = await fetch(manifestUrl, { cache: "no-store" });
-if (!manifestResponse.ok) throw new Error(`Hosted manifest HTTP ${manifestResponse.status}`);
-const manifest = await manifestResponse.json();
-if (manifest.sourceSha !== expectedSha) {
-  throw new Error(`Hosted source SHA mismatch: ${manifest.sourceSha} != ${expectedSha}`);
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+async function waitForExpectedHostedManifest() {
+  let lastSourceSha = null;
+  for (let attempt = 1; attempt <= 12; attempt += 1) {
+    const manifestUrl = new URL("authoritative-pages-source.json", baseUrl);
+    manifestUrl.searchParams.set("b5", `${Date.now()}-${attempt}`);
+    const manifestResponse = await fetch(manifestUrl, { cache: "no-store" });
+    if (!manifestResponse.ok) {
+      throw new Error(`Hosted manifest HTTP ${manifestResponse.status}`);
+    }
+    const manifest = await manifestResponse.json();
+    lastSourceSha = manifest.sourceSha ?? null;
+    if (lastSourceSha === expectedSha) return manifest;
+    if (attempt < 12) await sleep(5000);
+  }
+  throw new Error(`Hosted source SHA mismatch after bounded propagation retry: ${lastSourceSha} != ${expectedSha}`);
+}
+
+await waitForExpectedHostedManifest();
 
 const browser = await chromium.launch({ headless: true });
 const failures = [];
@@ -129,10 +143,6 @@ for (const testCase of cases) {
     (entry) => !isAllowedPathful404ConsoleError(entry) && !isContextual404ConsoleError(entry),
   );
 
-  // Chromium console wording and location metadata vary. A URL-less 404 console
-  // entry is admitted only when this same viewport has explicit response-ledger
-  // evidence for the exact allowlisted skill-icon 404s and has no unexpected HTTP
-  // failure. Any unrelated 4xx/5xx response therefore remains a hard failure.
   const canAdmitContextual404Console = allowedHttp.length > 0 && unexpectedHttp.length === 0;
   const unexpectedConsole = [
     ...non404UnexpectedConsole,
