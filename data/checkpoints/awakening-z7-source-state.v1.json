@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "stage": "awakening-z7",
+  "status": "PASS",
+  "purpose": "Freeze the source-explicit canonical AwakenInfo Level2 state without collapsing Level2SkillID absence into a false Hero-level NONE state or requiring Awaken2Unlock as a universal Level2SkillID validity gate.",
+  "source": {
+    "configDataCommit": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "awakenInfoPath": "data/configdata/ConfigDataAwakenInfo.json",
+    "awakenInfoGitBlobSha": "7593f77f0fa0aafac8850ee3fc2b093dd499bbcf"
+  },
+  "canonical": {
+    "heroCount": 267,
+    "awakenInfoCoverage": 267,
+    "level2SkillIdPresent": 257,
+    "level2SkillIdMissing": 10,
+    "missingHeroIds": [19, 22, 23, 24, 41, 42, 43, 45, 47, 48]
+  },
+  "sourceShape": {
+    "level2DefinedRows": "257 canonical AwakenInfo rows explicitly define Level2SkillID. Of those, 256 define Awaken2Unlock=true; canonical heroId 44 explicitly defines Level2SkillID=13152 while omitting the Awaken2Unlock field.",
+    "level2MissingRows": "Each of the 10 canonical rows above contains Awaken1LevelID, Awaken2Material and Awaken2LevelID, but does not define Awaken2Unlock or Level2SkillID.",
+    "hero44Shape": "AwakenInfo.ID=44 defines Awaken1LevelID=1044, Awaken2LevelID=2044 and Level2SkillID=13152, while Awaken2Unlock is absent.",
+    "level2SkillReferenceParity": "All 257 explicit Level2SkillID values resolve exact-one against the validated SkillInfo ID index.",
+    "nullOrZeroLevel2SkillIdObserved": false
+  },
+  "semanticDecision": {
+    "heroAwakenInfoRelation": "DOMAIN_PROVEN_CANONICAL_HERO_ID_TO_SAME_ID_AWAKENINFO",
+    "rowAbsentState": "FAIL",
+    "level2PresentState": "VERIFIED_AFTER_EXACT_SKILLINFO_REFERENCE_VALIDATION",
+    "level2MissingState": "LEVEL2_SKILL_NOT_DEFINED",
+    "level2MissingMeaning": "Source row exists, but the source does not define a Level2SkillID. Do not infer release chronology or rewrite this as Hero awakening NONE.",
+    "awaken2UnlockRequiredForLevel2Reference": false,
+    "awaken2UnlockExactRuntimeMeaning": "MANUAL_REVIEW_NON_BLOCKING",
+    "hero44HardcodedExceptionUsed": false,
+    "noneStateAllowedForCanonicalPopulation": false,
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false,
+    "releaseChronologyInferred": false,
+    "silentFallbackUsed": false
+  },
+  "next": "Y1_STAGE4_5_CONTRACT_UPDATE"
+}

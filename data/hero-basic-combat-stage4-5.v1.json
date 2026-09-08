@@ -16,7 +16,8 @@
   },
   "upstream": {
     "jobTree": "data/generated/hero-job-trees.v1.json",
-    "skillAcquisition": "data/generated/hero-skill-acquisition.v1.json"
+    "skillAcquisition": "data/generated/hero-skill-acquisition.v1.json",
+    "awakeningZ7": "data/checkpoints/awakening-z7-source-state.v1.json"
   },
   "requiredSources": [
     "ConfigDataHeroInfo.json",
@@ -26,11 +27,26 @@
     "ConfigDataSkillInfo.json",
     "ConfigDataAwakenInfo.json"
   ],
+  "awakeningStateModel": {
+    "canonicalRelation": "DOMAIN_PROVEN_CANONICAL_HERO_ID_TO_SAME_ID_AWAKENINFO",
+    "canonicalAwakenInfoCoverage": 267,
+    "level2SkillDefinedCount": 257,
+    "level2SkillNotDefinedCount": 10,
+    "level2SkillNotDefinedHeroIds": [19, 22, 23, 24, 41, 42, 43, 45, 47, 48],
+    "verifiedState": "AwakenInfo row exists, Level2SkillID is a positive integer and resolves to exactly one SkillInfo.ID. Awaken2Unlock is not a universal validity gate for this explicit Level2SkillID relation.",
+    "level2SkillNotDefinedState": "AwakenInfo row exists and defines Awaken1LevelID, Awaken2Material and Awaken2LevelID, but does not define Level2SkillID. This is LEVEL2_SKILL_NOT_DEFINED, not Hero awakening NONE.",
+    "awaken2UnlockRequiredForLevel2Reference": false,
+    "awaken2UnlockExactRuntimeMeaning": "MANUAL_REVIEW_NON_BLOCKING",
+    "hero44HardcodedExceptionAllowed": false,
+    "rowAbsentState": "FAIL",
+    "canonicalNoneAllowed": false,
+    "releaseChronologyInferenceAllowed": false
+  },
   "semanticGates": [
     {
       "id": "awakeningClassification",
       "status": "VERIFIED",
-      "rule": "HeroInfo.Awaken_ID -> AwakenInfo.ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID"
+      "rule": "For each canonical Hero, resolve the domain-proven same-valued AwakenInfo.ID row. If Level2SkillID is explicitly defined, require a positive integer and an exact SkillInfo.ID reference; do not require Awaken2Unlock=true as a universal validity gate. If Level2SkillID is absent, preserve the source row as LEVEL2_SKILL_NOT_DEFINED; do not collapse it to Hero awakening NONE."
     },
     {
       "id": "displayJobStats",
@@ -60,6 +76,11 @@
     "Use heroId as the only canonical Hero JOIN key and require exact parity with the frozen 267-record Hero Master.",
     "Select playable HeroInfo records by the presence of the playable-Hero Useable schema; do not take the first duplicate raw ID from the 28k-row mixed table.",
     "Use UnityDataTool direct JSON arrays; legacy TextAsset m_bytes parsing is forbidden in Stage 4-5.",
+    "For awakening only, consume the domain-proven canonical Hero.ID -> same-valued AwakenInfo.ID correspondence established by the awakening Z3-Z7 proof. This is a domain-specific frozen relation, not a generic ID-equality heuristic.",
+    "Do not use HeroInfo.Awaken_ID as the normal Hero awakening relation. Those sparse references include special/Cutscene rows and are not the canonical Hero-to-AwakenInfo relation.",
+    "When an AwakenInfo row defines Level2SkillID, require a positive integer and exact SkillInfo.ID resolution. Do not require Awaken2Unlock=true as a universal validity gate and do not hardcode heroId 44 as an exception.",
+    "When a canonical AwakenInfo row omits Level2SkillID, emit level2Status=LEVEL2_SKILL_NOT_DEFINED while preserving the AwakenInfo row identity; never emit Hero awakening NONE for that case.",
+    "Do not infer release chronology from Level2SkillID absence, Awaken2Unlock presence or absence, Hero ID, row order, names or numeric patterns.",
     "Use JobInfo Property1-3 rewards only when PropertyModify IDs map to HP=87, AT=88, DF=89, Magic=90, MagicDF=91, DEX=92; unknown nonzero mastery IDs are hard errors.",
     "Compute display stats for each normal JobConnection using its final JobLevel and add global mastered-job flat rewards after star-adjusted rounding.",
     "Keep bond effects outside Stage 4 so Stage 5 can own bond semantics without double counting.",
@@ -70,7 +91,12 @@
   "validationPolicy": {
     "FAIL": [
       "Canonical Hero, Stage 4-3, Stage 4-4 or playable HeroInfo sets disagree.",
-      "A required Job, JobConnection, JobLevel, Skill or Awaken reference is missing or ambiguous.",
+      "A canonical Hero has no exact domain-proven AwakenInfo row.",
+      "A Level2SkillID is non-positive, ambiguous or missing from SkillInfo.",
+      "A row without Level2SkillID is collapsed to Hero awakening NONE.",
+      "Canonical awakening counts differ from 267 total / 257 Level2 defined / 10 Level2 not defined.",
+      "A hardcoded heroId-specific awakening exception is introduced.",
+      "A required Job, JobConnection, JobLevel or Skill reference is missing or ambiguous.",
       "A stat star-correction array or TalentSkill_IDs array is not six slots.",
       "TalentSkill_IDs differ between normal JobConnections of the same Hero.",
       "A nonzero JobInfo mastery PropertyModify ID is outside the verified 87-92 mapping.",
@@ -78,13 +104,13 @@
       "Stage 4-5 embeds or independently computes usable-Soldier membership."
     ],
     "PASS": [
-      "267 records are generated with all five semantic gates verified, zero hard errors, A-1 identity parity and A-9 ownership preserved."
+      "267 records are generated with 267 canonical AwakenInfo rows, 257 VERIFIED Level2 Skill references, 10 LEVEL2_SKILL_NOT_DEFINED source states, zero Hero awakening NONE, all five semantic gates verified, zero hard errors, A-1 identity parity and A-9 ownership preserved."
     ]
   },
   "output": {
     "generated": "data/generated/hero-basic-combat.v1.json",
     "summary": "data/validation/hero-basic-combat-stage4-5-summary.v1.json"
   },
-  "stage4CompletionRule": "Stage 4 is COMPLETE only when the generated summary status is PASS with generatedHeroCount=267 and unresolvedComponents empty.",
+  "stage4CompletionRule": "Stage 4 is COMPLETE only when the generated summary status is PASS with generatedHeroCount=267, awakening canonical coverage=267, false NONE=0 and unresolvedComponents empty.",
   "nextStage": "Proceed to Hero Stage 5. Hero 5-3 usable Soldiers must consume the validated A-7 byHeroId index rather than recomputing membership."
 }

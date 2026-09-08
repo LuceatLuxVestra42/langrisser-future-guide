@@ -29,6 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -40,13 +42,17 @@ jobs:
         run: node scripts/validate_hero_stage4_final.cjs
       - name: Recheck A-1/A-9 boundary
         run: node scripts/validate_hero_stage4_a_boundary.cjs
-      - name: Persist generated Stage 4 outputs on work branch
-        if: github.event_name == 'push' && github.ref == 'refs/heads/work/hero-stage4-finalize'
+      - name: Persist generated Stage 4 outputs on owning branch
+        if: >-
+          (github.event_name == 'push' && github.ref == 'refs/heads/work/hero-stage4-finalize') ||
+          (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+        env:
+          TARGET_BRANCH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || 'work/hero-stage4-finalize' }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/generated/hero-basic-combat.v1.json data/validation/hero-stage4-upstream-direct.v1.json data/validation/hero-basic-combat-stage4-5-summary.v1.json data/validation/hero-stage4-a-boundary.v1.json
           if ! git diff --cached --quiet; then
             git commit -m 'Record Hero Stage 4 final PASS outputs'
-            git push origin HEAD:work/hero-stage4-finalize
+            git push origin HEAD:"$TARGET_BRANCH"
           fi
