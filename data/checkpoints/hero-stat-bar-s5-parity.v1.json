@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "stage": "hero-stat-bar-s5-parity",
+  "status": "COMPLETE",
+  "completion": "S5_COMPLETE",
+  "predecessor": {
+    "stage": "hero-stat-bar-s4-sp-presentation",
+    "branch": "s4-hero-stat-bar-sp-presentation",
+    "commitSha": "decf715f42b3c804884ad2511dcafd028a49422d"
+  },
+  "authority": {
+    "b3Artifact": "data/generated/hero-final-job-extrema.v1.json",
+    "candidateCount": 533,
+    "canonicalHeroCount": 267,
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"],
+    "minimumFillPercent": 25,
+    "maximumFillPercent": 100
+  },
+  "validatedParity": {
+    "allCandidateValuesWithinOwnStatDomain": true,
+    "extremaWinnersResolveToCandidateRows": true,
+    "extremaWinnerValuesMatchExtrema": true,
+    "minWidthPercent": 25,
+    "midpointWidthPercent": 62.5,
+    "maxWidthPercent": 100,
+    "displayedValueSource": "exact B3 row.values[key]",
+    "barDomainSource": "exact B3 extrema for the same stat",
+    "leonFixture": {
+      "heroId": 6,
+      "candidateCount": 3,
+      "normal": [
+        {"jobConnectionId": 64, "jobId": 307, "values": {"hp":3497,"at":599,"magic":224,"df":231,"magicDf":203,"dex":125}},
+        {"jobConnectionId": 65, "jobId": 306, "values": {"hp":3806,"at":569,"magic":224,"df":242,"magicDf":231,"dex":125}}
+      ],
+      "sp": {"jobConnectionId":66,"jobId":377,"values":{"hp":4041,"at":602,"magic":224,"df":260,"magicDf":231,"dex":125}},
+      "normal64ExpectedBarPercent": {
+        "hp": 60.3601780656,
+        "at": 93.1141439206,
+        "magic": 29.9872122762,
+        "df": 48.4890109890,
+        "magicDf": 43.9914163090,
+        "dex": 40.6976744186
+      }
+    }
+  },
+  "semanticBoundary": {
+    "semanticMutation": false,
+    "tier4Recomputation": false,
+    "statFormulaRecomputation": false,
+    "extremaRecomputation": false,
+    "rawConfigDataRead": false,
+    "nameJoin": false,
+    "idArithmetic": false
+  },
+  "validation": {
+    "validator": "scripts/validate_hero_stat_bar_s5_parity.mjs",
+    "workflow": ".github/workflows/hero-stat-bar-s5-parity.yml",
+    "initialRunId": 34228638236,
+    "initialJobId": 102068885548,
+    "initialCandidateSha": "831f241b68c817a80df4e1102de3d755f52775ca",
+    "validator": "PASS",
+    "build": "PASS",
+    "repositoryReadOnly": "PASS",
+    "workflowConclusion": "success"
+  },
+  "blockers": [],
+  "reviews": [],
+  "nextStage": "S6 desktop presentation verification"
+}
